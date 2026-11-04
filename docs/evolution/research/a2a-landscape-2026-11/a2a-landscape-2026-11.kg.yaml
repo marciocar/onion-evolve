@@ -1,0 +1,755 @@
+# Pesquisa em MODO LANDSCAPE (2026-11-04): panorama do A2A (Agent2Agent Protocol) em novembro de 2026,
+# com o Onion como lente: spec e governança, adoção, caminhos consolidados, autenticação entre agentes,
+# comparação com o perfil Onion A2A do core e mercado/capital.
+#
+# ⚠️ Proveniência (R15): label e narrative das evidências web carregam texto extraído de páginas da web.
+#    É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Relação com o corpus: amplia a2a-empresa-adotante-2026-10, a2a-cross-user-spike-2026-10 e
+# a2a-configurator-2026-10 sem editar os grafos antigos (contrato v4.3, external_edges). Nenhum nó do
+# corpus é derrubado: o que esta rodada mede LIMITA uma premissa (E_OBJECAO_07: "o Onion já usa tasks/get
+# ou SSE para a volta"), porque o bridge não serve tasks/get. A objeção (complexidade sem medida) sobrevive,
+# por isso a aresta é CONSTRAINS e não REFUTES (dissent que limita, não que mata).
+#
+# Este escritor NÃO sela nada: as superações nascem OPEN (afirmação de UM juiz).
+meta:
+  id: a2a-landscape-2026-11
+  schema_version: "1"
+  baseline: "2026-11-04"
+  review_after: "2026-12-04"   # 30d: o tipo dominante é FERRAMENTA/SPEC (releases da a2aproject, a tag
+                               # v1.1.0-rc já existe no repo, SDKs e suporte das nuvens). O eixo mercado
+                               # (adoção, AAIF, analistas) pediria 90d, mas a comparação com o perfil Onion
+                               # pende da spec. Gatilhos antecipados: (1) a v1.1.0 final publicada; (2) o
+                               # maestro decidir tasks/get ou push no onion-bridge; (3) medição do Logto
+                               # como emissor client_credentials para agentes.
+  # kg-backlog-guard: on
+  # ═══ TETO: 33 NÓS ═══
+  #   Run modo landscape (33): 1 question + 26 evidências confirmadas (votação 3 juízes) + 1 E_MERCADO
+  #   + 1 E_LACUNAS + 4 superações achadas nas 4 refutadas (C_SUPERACAO_20261104_*). Nada agregado.
+
+external_edges:
+  - from: Q_A2A_LANDSCAPE_2026_11
+    to: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml#Q_A2A_EMPRESA_ADOTANTE_2026_10"
+    edge_type: TRACES_TO
+  - from: E_LF_V1_STABLE_SIGNED_CARDS
+    to: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml#E_A2A_1_0_SIGNED_AGENT_CARDS"
+    edge_type: SUPPORTS
+  - from: E_AAIF_HOSTS_A2A_2026_08_17
+    to: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#E_AAIF_HOSTS_A2A_SINCE_2026_08_17"
+    edge_type: SUPPORTS
+  - from: E_SPEC_101_DEFINES_GETTASK
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET"
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261104_INPUT_REQUIRED_PRESENT_GAP_IS_QUERY
+    to: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml#E_OBJECAO_07_A2A_COMPLEXITY_UNMEASURED"
+    edge_type: CONSTRAINS
+  - from: E_QUARKUS_KEYCLOAK_SELF_HOSTED_OIDC
+    to: "docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml#E_LACUNAS_DO_A2A_MEDIDAS"
+    edge_type: TRACES_TO
+
+nodes:
+  - id: Q_A2A_LANDSCAPE_2026_11
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.7
+    label: "Panorama do A2A em novembro de 2026 com o Onion como lente: spec e governança, quem adota, caminhos consolidados e composição com MCP, autenticação entre agentes (OIDC self-hosted como o Logto), comparação com o perfil Onion A2A e mercado."
+    narrative: "Respondida pelo run /onion-research de 2026-11-04 (gênero landscape). (1) SPEC E GOVERNANÇA: v1.0.0 em 12/03/2026 é a primeira estável (a2a.proto normativo, versão por interface, multi-tenancy, Signed Agent Cards em JWS+JCS); v1.0.1 em 28/05/2026; a tag v1.1.0-rc existe no repo; doada pela Google à Linux Foundation e hospedada pela AAIF desde 17/08/2026. (2) ADOÇÃO: mais de 150 organizações, presente em Google Cloud, Azure AI Foundry e AWS Bedrock AgentCore, produção declarada em Huawei HarmonyOS/Celia e Tencent WeChat; SDK Java/Quarkus com OIDC documentado. (3) CAMINHOS: três bindings (JSON-RPC/SSE, gRPC, REST), GetTask/ListTasks/CancelTask e push opcional; composição com MCP não teve claim confirmada nesta rodada (lacuna). (4) AUTH: o card declara securitySchemes OpenAPI (API key, HTTP bearer/basic, OAuth2 com PKCE/client credentials/device code, OIDC, mTLS); credencial obtida fora do protocolo; IdP OIDC self-hosted (Keycloak) emite client_credentials para servidor A2A; Logto não medido. (5) PERFIL ONION: bearer de convite + JWT RS256 com body_sha256 + jti são cunhagem acima do padrão (a spec não define assinatura de mensagem); o input_required do bridge já casa com o estado nativo; lacunas: tasks/get (conformidade) e push (capacidade opcional), AUTH_REQUIRED, Signed Agent Card e securitySchemes declarados. (6) MERCADO: nenhum sinal de capital direto; o dinheiro corre pelas plataformas."
+    trace: "docs/evolution/research/a2a-landscape-2026-11/SYNTHESIS.md"
+
+  # ── (1) Especificação normativa e versões ────────────────────────────────────────────────
+
+  - id: E_SPEC_101_DEFINES_GETTASK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "A spec normativa A2A v1.0.1 (package lf.a2a.v1) define o RPC GetTask (GET /tasks/{id}): tasks/get existe no protocolo, e sua ausência no perfil Onion é lacuna frente à spec."
+    narrative: "Lente Onion: o bridge não serve tasks/get (a2a-agent-card.sh registra) e por isso o remetente não consulta o desfecho do aceite humano. Ao contrário de push, GetTask não tem flag opcional em AgentCapabilities: é a lacuna de CONFORMIDADE candidata (ver C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY)."
+    trace: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto"
+    provenance:
+      source: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto"
+      locator: "service A2AService, rpc GetTask (option google.api.http get /tasks/{id})"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_SPEC_101_TASKSTATE_INPUT_AUTH_REQUIRED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O enum TaskState inclui INPUT_REQUIRED e AUTH_REQUIRED, estados nativos que modelam pausa para aprovação humana ou autorização; a spec não define JWT, body_sha256, jti nem gate humano."
+    narrative: "Lente Onion: o gate com aceite humano do bridge cabe no estado nativo (o bridge já devolve input_required na grafia da v0.3); o JWT com body_sha256 e o jti anti-replay são cunhagem do Onion por cima do padrão, onde a spec não cobre. AUTH_REQUIRED não é usado pelo bridge."
+    trace: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto"
+    provenance:
+      source: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto"
+      locator: "enum TaskState (TASK_STATE_INPUT_REQUIRED, TASK_STATE_AUTH_REQUIRED)"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_SPEC_101_SECURITY_SCHEMES_OAUTH_FLOWS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O Agent Card declara security_schemes (API key, HTTP Bearer/Basic, OAuth2, OpenID Connect, mTLS) e security_requirements; OAuth2 cobre authorization code com PKCE, client credentials e device code, com implicit e password deprecated."
+    narrative: "Autenticação por bearer e OIDC é nativa do card. Lente Onion: o bearer de convite do core pode ser DECLARADO como HTTPAuthSecurityScheme bearer no card, em vez de ficar implícito; o JWT RS256 por mensagem não tem esquema equivalente na spec."
+    trace: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto"
+    provenance:
+      source: "https://a2a-protocol.org/v1.0.1/spec/a2a.proto"
+      locator: "message SecurityScheme (oneof), message OAuthFlows, AgentCard.security_schemes e security_requirements"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_RELEASE_V1_0_0_2026_03_12
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/a2aproject/A2A/releases · votos 3-0"
+    valid_from: "2026-03-12"
+    source_tier: 9
+    source_kind: primary
+    label: "A a2aproject/A2A publicou a v1.0.0 em 12/03/2026 como maior release da série, com muitas mudanças quebrando compatibilidade, incluindo tasks/list com filtros e paginação e multi-tenancy no gRPC."
+    trace: "https://github.com/a2aproject/A2A/releases"
+    provenance:
+      source: "https://github.com/a2aproject/A2A/releases"
+      locator: "release v1.0.0 (2026-03-12), notas de breaking changes"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_RELEASE_V1_0_1_2026_05_28
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/a2aproject/A2A/releases · votos 2-1"
+    valid_from: "2026-05-28"
+    source_tier: 9
+    source_kind: primary
+    label: "A release mais recente visível é a v1.0.1, de 28/05/2026, que prioriza application/a2a+json no binding HTTP e corrige valores de TaskStatus; nada posterior a maio de 2026 aparece na página de releases."
+    narrative: "Ressalva medida por uma superação (C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED): a TAG v1.1.0-rc existe no repositório (raw.githubusercontent.com), sem release publicada na página. A linha major atual segue sendo 1.0; a 1.1 é candidata."
+    trace: "https://github.com/a2aproject/A2A/releases"
+    provenance:
+      source: "https://github.com/a2aproject/A2A/releases"
+      locator: "release v1.0.1 (2026-05-28), topo da lista"
+      method: "judges: votação 2-1 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_RELEASE_OAUTH_MODERNIZED_AND_V0_3_SIGNATURES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/a2aproject/A2A/releases · votos 2-1"
+    valid_from: "2025-07-30"
+    source_tier: 9
+    source_kind: primary
+    label: "A v1.0.0 modernizou o OAuth2 do Agent Card (fora implicit e password, dentro device code e PKCE); a v0.3.0 já havia adicionado mTLS em SecuritySchemes e o campo signatures (Signed Agent Cards) no AgentCard."
+    narrative: "Limitada pela primária normativa (C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED): implicit e password foram DEPRECIADOS ([deprecated = true] no oneof OAuthFlows), não removidos; só podem sair na próxima major. valid_from é a data da v0.3.0 (assinaturas e mTLS)."
+    trace: "https://github.com/a2aproject/A2A/releases"
+    provenance:
+      source: "https://github.com/a2aproject/A2A/releases"
+      locator: "notas das releases v1.0.0 (OAuth2) e v0.3.0 (mTLS, AgentCard.signatures)"
+      method: "judges: votação 2-1 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_WHATS_NEW_V1_PROTO_NORMATIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/a2aproject/A2A/blob/main/docs/whats-new-v1.md · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "A v1.0 do A2A consolida a v0.3.0 com o a2a.proto como fonte normativa universal e declara a versão por interface (protocolVersion em cada AgentInterface)."
+    narrative: "Lente Onion: o perfil do core ainda fala a grafia da v0.3 (state input_required); a negociação por interface permite anunciar as duas sem quebrar o remetente."
+    trace: "https://github.com/a2aproject/A2A/blob/main/docs/whats-new-v1.md"
+    provenance:
+      source: "https://github.com/a2aproject/A2A/blob/main/docs/whats-new-v1.md"
+      locator: "seções sobre fonte normativa e versionamento por AgentInterface"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_WHATS_NEW_V1_SIGNED_CARD_JWS_JCS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/a2aproject/A2A/blob/main/docs/whats-new-v1.md · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "Agent Cards assinados na v1.0 usam JWS (RFC 7515) sobre forma canônica JCS (RFC 8785), excluindo o campo signatures, com chaves via jku ou keystores confiáveis."
+    narrative: "Lente Onion: o core já tem par RS256 por membro e kid no registro (a2a-configurator-2026-10); assinar o card do bridge com a mesma chave é costura barata, mas assina o AGENTE, não a mensagem (o body_sha256 do Onion segue sem equivalente na spec)."
+    trace: "https://github.com/a2aproject/A2A/blob/main/docs/whats-new-v1.md"
+    provenance:
+      source: "https://github.com/a2aproject/A2A/blob/main/docs/whats-new-v1.md"
+      locator: "seção de Agent Card signing (JWS + JCS, jku)"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_DEFINITIONS_NORMATIVE_AND_AAIF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/latest/definitions/ · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "A página de definições do A2A se declara a fonte normativa da especificação e registra que o A2A passou para a Agentic AI Foundation (AAIF)."
+    trace: "https://a2a-protocol.org/latest/definitions/"
+    provenance:
+      source: "https://a2a-protocol.org/latest/definitions/"
+      locator: "cabeçalho da página e aviso de governança"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_DEFINITIONS_SECURITY_SCHEMES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/latest/definitions/ · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "O Agent Card declara securitySchemes de API key, HTTP auth, OAuth2, OpenID Connect (com Discovery URL) e mTLS; os fluxos OAuth2 implicit e password estão obsoletos, e PKCE é recomendado."
+    narrative: "O esquema OpenID Connect aponta uma Discovery URL: qualquer IdP OIDC conforme (inclusive self-hosted) é declarável no card sem extensão."
+    trace: "https://a2a-protocol.org/latest/definitions/"
+    provenance:
+      source: "https://a2a-protocol.org/latest/definitions/"
+      locator: "definições SecurityScheme, OpenIdConnectSecurityScheme, OAuthFlows"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_LLMS_REF_V1_PROTO_PER_INTERFACE_VERSION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/llms-reference.txt · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "A referência do A2A está na versão 1.0.0, e o arquivo Protobuf specification/a2a.proto é a fonte normativa; cada AgentInterface anuncia sua própria protocol_version."
+    trace: "https://a2a-protocol.org/llms-reference.txt"
+    provenance:
+      source: "https://a2a-protocol.org/llms-reference.txt"
+      locator: "cabeçalho de versão e seção AgentInterface"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_LLMS_REF_THREE_BINDINGS_AND_TASK_RPCS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/llms-reference.txt · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "A spec 1.0 suporta três bindings (JSON-RPC 2.0 sobre HTTP/SSE, gRPC e HTTP/REST) e define GetTask, ListTasks, CancelTask e métodos de push notification, superfície que o perfil Onion omite (tasks/get, push)."
+    narrative: "Limitada por C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY: push é capacidade OPCIONAL (AgentCapabilities.push_notifications) e o perfil fica conforme ao declarar false e devolver PushNotificationNotSupportedError (-32003); a omissão de GetTask não tem essa saída."
+    trace: "https://a2a-protocol.org/llms-reference.txt"
+    provenance:
+      source: "https://a2a-protocol.org/llms-reference.txt"
+      locator: "seções de protocol bindings e de operações (GetTask, ListTasks, CancelTask, push notification config)"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_LLMS_REF_SECURITY_EXTENDED_CARD_TLS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://a2a-protocol.org/llms-reference.txt · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "O Agent Card declara security_schemes no estilo OpenAPI (API Key, OAuth2, OIDC, mTLS, HTTP Auth) com security_requirements; GetExtendedAgentCard devolve metadados após autenticação; TLS é exigido em produção."
+    narrative: "Lente Onion: GetExtendedAgentCard é o lugar padrão para o que o bridge só deveria mostrar a membro autenticado (habilidades internas), em vez de um card público único."
+    trace: "https://a2a-protocol.org/llms-reference.txt"
+    provenance:
+      source: "https://a2a-protocol.org/llms-reference.txt"
+      locator: "seções de segurança, GetExtendedAgentCard e requisitos de transporte"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  # ── (1)(2) Governança e adoção ───────────────────────────────────────────────────────────
+
+  - id: E_AAIF_V1_FIRST_STABLE_MARCH_2026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://aaif.io/blog/a2a-joins-aaif · votos 3-0"
+    valid_from: "2026-03"
+    source_tier: 8
+    source_kind: primary
+    label: "A2A v1.0, a primeira especificação estável, foi lançada em março de 2026, com bindings para múltiplos protocolos, negociação de versão, multi-tenancy e Agent Cards assinadas."
+    trace: "https://aaif.io/blog/a2a-joins-aaif"
+    provenance:
+      source: "https://aaif.io/blog/a2a-joins-aaif"
+      locator: "parágrafo sobre a v1.0"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_AAIF_HOSTS_A2A_2026_08_17
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://aaif.io/blog/a2a-joins-aaif · votos 3-0"
+    valid_from: "2026-08-17"
+    source_tier: 8
+    source_kind: primary
+    label: "Em 17/08/2026 o A2A passou a ser projeto hospedado da AAIF (Agentic AI Foundation), depois de doado pela Google à Linux Foundation com AWS, Cisco, Microsoft, Salesforce, SAP e ServiceNow."
+    narrative: "Confirma o nó do corpus E_AAIF_HOSTS_A2A_SINCE_2026_08_17 (federation-research-2026-06-reconciled). Lente Onion: aaif.io é fonte constante de consulta; o Onion A2A é perfil do A2A aberto, sob a mesma fundação que hospeda o MCP."
+    trace: "https://aaif.io/blog/a2a-joins-aaif"
+    provenance:
+      source: "https://aaif.io/blog/a2a-joins-aaif"
+      locator: "anúncio de entrada do A2A na AAIF (data e histórico de doação)"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_AAIF_150_ORGS_PRODUCTION_AND_CLOUDS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://aaif.io/blog/a2a-joins-aaif · votos 3-0"
+    valid_from: "2026-08-17"
+    source_tier: 8
+    source_kind: primary
+    label: "Mais de 150 organizações apoiam o A2A; há adoção em produção na Huawei (HarmonyOS/Celia) e na Tencent (WeChat), e suporte nas nuvens Google Cloud, Azure AI Foundry e AWS Bedrock AgentCore."
+    narrative: "Fecha em parte a lacuna 'adoção real em produção' de a2a-empresa-adotante-2026-10: agora há nomes de produto, ainda sem volume medido. Fonte é a própria fundação (parte interessada)."
+    trace: "https://aaif.io/blog/a2a-joins-aaif"
+    provenance:
+      source: "https://aaif.io/blog/a2a-joins-aaif"
+      locator: "parágrafos de adoção e de plataformas de nuvem"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_LF_V1_STABLE_SIGNED_CARDS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year · votos 3-0"
+    valid_from: "2026-04"
+    source_tier: 8
+    source_kind: primary
+    label: "A2A v1.0 é a primeira especificação estável, com multi-protocolo, multi-tenancy empresarial, fluxos de segurança modernizados e Signed Agent Cards para verificação criptográfica de identidade; o projeto é hospedado pela Linux Foundation."
+    narrative: "Confirma o nó do corpus E_A2A_1_0_SIGNED_AGENT_CARDS (a2a-empresa-adotante-2026-10). 'Hospedado pela LF' é a data do comunicado (abr/2026), anterior à passagem para a AAIF em 17/08/2026."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "parágrafo sobre a v1.0"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_LF_150_ORGS_22K_STARS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year · votos 3-0"
+    valid_from: "2026-04"
+    source_tier: 8
+    source_kind: primary
+    label: "Mais de 150 organizações adotam o A2A (eram mais de 50 em abril de 2025), incluindo AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP e ServiceNow; o repositório principal passa de 22 mil estrelas."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "parágrafos de contagem de organizações e de estrelas"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  # ── (4) Segurança: análise formal e autenticação na prática ─────────────────────────────────
+
+  - id: E_ARXIV_FORMAL_ANALYSIS_11_VULNS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-04"
+    verified_against: "https://arxiv.org/abs/2609.10871 · votos 3-0"
+    valid_from: "2026-09-09"
+    source_tier: 7
+    source_kind: paper
+    label: "A análise formal da especificação A2A (FSM de 37 estados, 76 transições, 929 afirmações) encontrou 11 vulnerabilidades novas, exploráveis por adversário que segue a especificação, sem falha de implementação."
+    trace: "https://arxiv.org/abs/2609.10871"
+    provenance:
+      source: "https://arxiv.org/abs/2609.10871"
+      locator: "abstract"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_ARXIV_CONTEXT_INJECTION_DELEGATION_LOSS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-04"
+    verified_against: "https://arxiv.org/abs/2609.10871 · votos 2-1"
+    valid_from: "2026-09-09"
+    source_tier: 7
+    source_kind: paper
+    label: "Entre as vulnerabilidades: injeção de contexto entre clientes por identificadores de contexto desprotegidos, coleta de credenciais por perda de identidade em delegação multi-salto e exfiltração por agentes com capacidades não atestadas."
+    narrative: "Lente Onion: o perfil do core não tem delegação multi-salto nem Signed Agent Card; o JWT por mensagem com body_sha256 e o gate humano reduzem a superfície de injeção, mas capacidade anunciada sem atestação continua aberta se o card não for assinado. Votação 2-1."
+    trace: "https://arxiv.org/abs/2609.10871"
+    provenance:
+      source: "https://arxiv.org/abs/2609.10871"
+      locator: "abstract e lista de vulnerabilidades"
+      method: "judges: votação 2-1 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_QUARKUS_OAUTH2_CLIENT_CREDENTIALS_CARD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-04"
+    verified_against: "https://quarkus.io/blog/quarkus-a2a-java-security/ · votos 3-0"
+    valid_from: "2025-10-28"
+    source_tier: 6
+    source_kind: engineer
+    label: "O A2A delega a autenticação a mecanismos padrão como OAuth2 e OpenID Connect; o Agent Card declara securitySchemes (OAuth2SecurityScheme com ClientCredentialsOAuthFlow) e um requisito de segurança que referencia o esquema."
+    trace: "https://quarkus.io/blog/quarkus-a2a-java-security/"
+    provenance:
+      source: "https://quarkus.io/blog/quarkus-a2a-java-security/"
+      locator: "seção de configuração do Agent Card com securitySchemes"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_QUARKUS_KEYCLOAK_SELF_HOSTED_OIDC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-04"
+    verified_against: "https://quarkus.io/blog/quarkus-a2a-java-security/ · votos 3-0"
+    valid_from: "2025-10-28"
+    source_tier: 6
+    source_kind: engineer
+    label: "Em Java/Quarkus, o servidor A2A é protegido com quarkus-oidc e Keycloak, e os endpoints da spec levam @Authenticated: um IdP OIDC self-hosted emite credenciais por client_credentials para um servidor A2A."
+    narrative: "Responde por analogia a parte (4) da pergunta: um OIDC self-hosted SERVE como emissor de credencial de agente (client_credentials). O Logto do core (self-hosted na VPS, email-logto-2026-08) não foi medido nesta rodada como emissor M2M para o bridge: lacuna nomeada em E_LACUNAS_A2A_LANDSCAPE_1104. Liga-se à lacuna 'convite é bearer sem dono nem validade' (a2a-configurator-2026-10)."
+    trace: "https://quarkus.io/blog/quarkus-a2a-java-security/"
+    provenance:
+      source: "https://quarkus.io/blog/quarkus-a2a-java-security/"
+      locator: "seções de quarkus-oidc, Keycloak Dev Services e @Authenticated"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_AGENTCORE_SIGV4_VS_OAUTH_401
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-04"
+    verified_against: "https://builder.aws.com/content/3IKWutnjRhXqdCaNc3uEu8wNthm/mix-and-match-serving-a-bedrock-agent-to-google-and-azure · votos 3-0"
+    valid_from: "2026-08"
+    source_tier: 5
+    source_kind: engineer
+    label: "No AgentCore Runtime, runtimes com SigV4 retornam ACCESS_DENIED sem WWW-Authenticate, enquanto um runtime com OAuth responde 401 anunciando seu authorization server; GetAgentCard é ação IAM separada de InvokeAgentRuntime."
+    narrative: "Caminho de implantação real entre nuvens (Bedrock servindo Google e Azure): interop entre provedores pede OAuth com descoberta, não credencial proprietária."
+    trace: "https://builder.aws.com/content/3IKWutnjRhXqdCaNc3uEu8wNthm/mix-and-match-serving-a-bedrock-agent-to-google-and-azure"
+    provenance:
+      source: "https://builder.aws.com/content/3IKWutnjRhXqdCaNc3uEu8wNthm/mix-and-match-serving-a-bedrock-agent-to-google-and-azure"
+      locator: "seções sobre SigV4 vs OAuth e permissões IAM"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_API7_AUTH_DELEGATED_OUT_OF_BAND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-04"
+    verified_against: "https://api7.ai/blog/a2a-protocol-gateway-layer · votos 3-0"
+    source_tier: 5
+    source_kind: vendor-on-competitor
+    label: "No A2A a autenticação é delegada a mecanismos web (OAuth 2.0, OIDC, API keys, transporte seguro) declarados no Agent Card; credenciais são obtidas fora do protocolo e a autorização fica a cargo do servidor."
+    narrative: "Fonte de fornecedor de gateway (suspeita por classe), mas a afirmação coincide com as primárias de tier 9-10. Lente Onion: a entrega do bearer fora de banda do core é o mesmo padrão."
+    trace: "https://api7.ai/blog/a2a-protocol-gateway-layer"
+    provenance:
+      source: "https://api7.ai/blog/a2a-protocol-gateway-layer"
+      locator: "seção sobre autenticação no A2A"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_API7_SIGNED_CARD_NOT_TRUST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-04"
+    verified_against: "https://api7.ai/blog/a2a-protocol-gateway-layer · votos 3-0"
+    source_tier: 5
+    source_kind: vendor-on-competitor
+    label: "Uma assinatura válida do Agent Card prova integridade e proveniência do signatário, mas não torna o agente confiável nem autentica requisições individuais; exige política de confiança do operador."
+    narrative: "Lente Onion: é o argumento para o perfil MANTER o JWT por mensagem (body_sha256, jti) mesmo adotando Signed Agent Card; um não substitui o outro. Fonte de fornecedor (suspeita por classe)."
+    trace: "https://api7.ai/blog/a2a-protocol-gateway-layer"
+    provenance:
+      source: "https://api7.ai/blog/a2a-protocol-gateway-layer"
+      locator: "seção sobre Signed Agent Cards"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  # ── (6) Mercado, analistas e lacunas ─────────────────────────────────────────────────────
+
+  - id: E_THOUGHTWORKS_ASSESS_2025_11
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-04"
+    verified_against: "https://www.thoughtworks.com/radar/platforms/agent-to-agent-a2a-protocol · votos 3-0"
+    valid_from: "2025-11-05"
+    source_tier: 6
+    source_kind: analyst
+    label: "O Thoughtworks Technology Radar classificou o A2A no anel Assess, em blip publicado em 2025-11-05, e o blip não está na edição atual do Radar."
+    trace: "https://www.thoughtworks.com/radar/platforms/agent-to-agent-a2a-protocol"
+    provenance:
+      source: "https://www.thoughtworks.com/radar/platforms/agent-to-agent-a2a-protocol"
+      locator: "página do blip (anel e data de publicação)"
+      method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_MERCADO_A2A_LANDSCAPE_1104
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-04"
+    verified_against: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year · https://aaif.io/blog/a2a-joins-aaif · síntese de mercado do run"
+    valid_from: "2026-04"
+    source_tier: 8
+    source_kind: primary
+    label: "Mercado: sem sinal de capital direto (rodada, M&A ou valuation) ligado ao A2A. Sinais institucionais: mais de 150 apoiadores, as três grandes nuvens, produção em Huawei e Tencent, AAIF desde 17/08/2026; o dinheiro corre pelas plataformas."
+    narrative: "Do sintetizador: (a) >50 → >150 organizações (LF, abr/2026), com AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP e ServiceNow; (b) Google Cloud, Azure AI Foundry e AWS Bedrock AgentCore, e produção de consumo de massa na China (Huawei HarmonyOS/Celia, Tencent WeChat); (c) governança consolidada na AAIF em 17/08/2026; (d) analistas: Thoughtworks Radar Assess em 2025-11, blip fora da edição atual; nenhum sinal de Gartner ou Forrester no material verificado. Fornecedores de gateway (API7/AISIX) se posicionam sobre o A2A, mas a claim de suporte do AISIX a 0.3 e 1.0 foi refutada. Leitura follow-the-money: o protocolo é bem comum de fundação; o valor é capturado por nuvens, gateways e IdPs. Para o Onion: construir sobre o padrão aberto, não competir com ele."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "comunicado LF de abr/2026 + anúncio AAIF de 17/08/2026 + blip Thoughtworks"
+      method: "derived: síntese do eixo mercado/capital do run /onion-research de 2026-11-04"
+      locality: "web"
+
+  - id: E_LACUNAS_A2A_LANDSCAPE_1104
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-11-04"
+    verified_against: "contabilidade do run /onion-research landscape de 2026-11-04: 26 confirmadas, 4 refutadas (0 por fonte fraca), 0 não verificadas, 31 fontes e 50 claims cortadas por orçamento; 0 recusadas pelo motor; 4 superações achadas"
+    label: "Lacunas: 26 confirmadas, 4 refutadas (todas com superação, nenhuma por fonte fraca), 0 não verificadas, 31 fontes e 50 claims cortadas por orçamento, 0 reprovações recusadas pelo motor, 4 superações."
+    narrative: "REFUTADAS (4, nenhuma virou evidência; cada uma tem superação C_SUPERACAO_20261104_* com TRACES_TO para este nó): (1) 'push na v1.0.1 é lacuna frente à spec' (tier 10): push é capacidade opcional; (2) 'implicit e password removidos na v1.0' (tier 9): depreciados, não removidos; (3) 'perfil Onion não cobre os estados de pausa' (tier 9): o bridge já devolve input_required, falta consulta e notificação; (4) 'AISIX suporta A2A 0.3 e 1.0 sem tradução' (tier 5, vendor): autodeclaração, e a 0.10.0 invalida card 1.0 assinado. REFUTADAS POR FONTE FRACA (tier ≤4): 0. NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 31 fontes e 50 claims. RECUSADAS PELO MOTOR: 0. LACUNAS ABERTAS: (a) composição com MCP: nenhuma claim confirmada sobre o padrão A2A+MCP nesta rodada; (b) SDKs oficiais por linguagem e frameworks de agentes (ADK, LangGraph, CrewAI etc.) sem claim confirmada; (c) cookbooks e guias de referência de implantação não ancorados; (d) Logto como emissor client_credentials/M2M para agente: não medido (só analogia com Keycloak); (e) identidade de PESSOA por trás do agente (delegação OBO, token exchange) sem claim confirmada; (f) extensões do A2A e rascunhos da AAIF (Role, Handoff, Human-in-the-Loop) não lidos nesta rodada; (g) volume de produção (Huawei, Tencent) sem número; (h) conteúdo da v1.1.0-rc não lido; (i) Gartner e Forrester sem sinal."
+    trace: "journal do run /onion-research gênero landscape de 2026-11-04"
+    provenance:
+      source: "journal do run /onion-research gênero landscape de 2026-11-04"
+      locator: "listas de claims confirmadas, refutadas, cortadas por orçamento e superações"
+      method: "derived: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  # ── Superações (SAC-151): cada reprovação que achou o que supera vira nó ──────────────────
+
+  - id: C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A spec v1.0.1 define push (TaskPushNotificationConfig + Create/Get/List/Delete) como capacidade OPCIONAL; o perfil Onion fica conforme ao declarar pushNotifications:false e devolver -32003. É lacuna de capacidade; tasks/get é a de conformidade."
+    narrative: "Medida: curl do proto v1.0.1 com grep -n 'rpc |push_notifications' (l.90/102/112/131 e l.415 'optional bool push_notifications'); curl da spec /latest/specification/ e extração do trecho Capability Validation e da tabela de erros (PushNotificationNotSupportedError -32003 / FAILED_PRECONDITION / 400). Critério: V2_CONTRADITA. Alvo reprovado: 'A spec v1.0.1 define push notifications ..., logo a ausência de push no perfil Onion é lacuna frente à spec' (tier 10). Afirmação de UM juiz, sem votação."
+    trace: "curl -sSL https://a2a-protocol.org/v1.0.1/spec/a2a.proto | sed -n 410,416p; curl -sSL https://a2a-protocol.org/latest/specification/ | grep -o 'If AgentCard.capabilities.pushNotifications is false or not present[^.]*'"
+
+  - id: C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Na v1.0, ImplicitOAuthFlow e PasswordOAuthFlow foram DEPRECIADOS (seguem no oneof com [deprecated = true]), DeviceCodeOAuthFlow entrou como device_code = 5 e AuthorizationCodeOAuthFlow ganhou pkce_required; igual na v1.0.1 e na v1.1.0-rc."
+    narrative: "Medida: grep no a2a.proto das tags v1.0.0, v1.0.1 e v1.1.0-rc (raw.githubusercontent.com); as três têm as mesmas 4 linhas (implicit e password com deprecated=true, device_code=5, pkce_required=5). A regra de depreciação está em docs/specification.md da v1.0.0, linha 117 (só sai na próxima major). Critério: V2_CONTRADITA. Alvo reprovado: 'Na v1.0 os fluxos ImplicitOAuthFlow e PasswordOAuthFlow foram removidos ...' (tier 9). Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/specification/a2a.proto | grep -n -E 'ImplicitOAuthFlow implicit|PasswordOAuthFlow password|device_code = |pkce_required'"
+
+  - id: C_SUPERACAO_20261104_INPUT_REQUIRED_PRESENT_GAP_IS_QUERY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A spec v1 define GetTask, TaskPushNotificationConfig e os estados INPUT_REQUIRED e AUTH_REQUIRED; o perfil Onion JÁ devolve input_required como gate humano, mas não serve tasks/get, push nem AUTH_REQUIRED: a lacuna é consultar o desfecho, não a pausa."
+    narrative: "Medida: WebFetch da página de definições (GetTask, TaskPushNotificationConfig, TaskState 6/8) e grep no onion-bridge-dev em 7e736ba (src/a2a.ts:96 state input_required) e no core (.claude/validation/a2a-agent-card.sh:27-61, capabilities streaming/push false, sem tasks/get). Critério: V2_CONTRADITA. Alvo reprovado: 'O perfil Onion, sem tasks/get nem push, não cobre esses elementos nativos' (tier 9). Limita a premissa de E_OBJECAO_07 (a2a-empresa-adotante-2026-10) de que o Onion já usa tasks/get para a volta. Afirmação de UM juiz, sem votação."
+    trace: "grep -n 'input_required' src/a2a.ts src/server.ts (onion-bridge-dev@7e736ba) && grep -n 'tasks/get\\|pushNotifications' .claude/validation/a2a-agent-card.sh"
+
+  - id: C_SUPERACAO_20261104_A2A_1_0_LINE_AISIX_SELF_DECLARED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A A2A 1.0 (v1.0.0 em 12/03/2026, v1.0.1 em 28/05/2026) traz tenant opcional e assinatura de card por JWS+JCS; o suporte do AISIX a 0.3 e 1.0 sem tradução é autodeclaração da API7, e a 0.10.0 invalida card 1.0 assinado ao reescrever URLs."
+    narrative: "Medida: WebFetch em a2a-protocol.org/latest/whats-new-v1 (multi-tenancy e JWS/JCS verbatim), github.com/a2aproject/A2A/releases (datas das tags) e api7.ai/blog/a2a-protocol-gateway-layer (ressalva verbatim da 0.10.0: 'not as a transparent signed-card proxy'). Critério: V5_MARKETING (o domínio api7.ai é o fornecedor do AISIX). Alvo reprovado: 'A2A 1.0 ...; o gateway AISIX da API7 suporta A2A 0.3 e 1.0 sem tradução de protocolo' (tier 5). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://api7.ai/blog/a2a-protocol-gateway-layer e grep -F 'not as a transparent signed-card proxy'"
+
+edges:
+  - from: E_SPEC_101_DEFINES_GETTASK
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_SPEC_101_TASKSTATE_INPUT_AUTH_REQUIRED
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_SPEC_101_SECURITY_SCHEMES_OAUTH_FLOWS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_RELEASE_V1_0_0_2026_03_12
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_RELEASE_V1_0_1_2026_05_28
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_RELEASE_OAUTH_MODERNIZED_AND_V0_3_SIGNATURES
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_WHATS_NEW_V1_PROTO_NORMATIVE
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_WHATS_NEW_V1_SIGNED_CARD_JWS_JCS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_DEFINITIONS_NORMATIVE_AND_AAIF
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_DEFINITIONS_SECURITY_SCHEMES
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_LLMS_REF_V1_PROTO_PER_INTERFACE_VERSION
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_LLMS_REF_THREE_BINDINGS_AND_TASK_RPCS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_LLMS_REF_SECURITY_EXTENDED_CARD_TLS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_AAIF_V1_FIRST_STABLE_MARCH_2026
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_AAIF_HOSTS_A2A_2026_08_17
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_AAIF_150_ORGS_PRODUCTION_AND_CLOUDS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_LF_V1_STABLE_SIGNED_CARDS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_LF_150_ORGS_22K_STARS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_ARXIV_FORMAL_ANALYSIS_11_VULNS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_ARXIV_CONTEXT_INJECTION_DELEGATION_LOSS
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_QUARKUS_OAUTH2_CLIENT_CREDENTIALS_CARD
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_QUARKUS_KEYCLOAK_SELF_HOSTED_OIDC
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_AGENTCORE_SIGV4_VS_OAUTH_401
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_API7_AUTH_DELEGATED_OUT_OF_BAND
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_API7_SIGNED_CARD_NOT_TRUST
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_THOUGHTWORKS_ASSESS_2025_11
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_MERCADO_A2A_LANDSCAPE_1104
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_A2A_LANDSCAPE_1104
+    to: Q_A2A_LANDSCAPE_2026_11
+    edge_type: SUPPORTS
+  # Superações: cada uma aponta o nó que registra a reprovação.
+  - from: C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY
+    to: E_LACUNAS_A2A_LANDSCAPE_1104
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED
+    to: E_LACUNAS_A2A_LANDSCAPE_1104
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261104_INPUT_REQUIRED_PRESENT_GAP_IS_QUERY
+    to: E_LACUNAS_A2A_LANDSCAPE_1104
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261104_A2A_1_0_LINE_AISIX_SELF_DECLARED
+    to: E_LACUNAS_A2A_LANDSCAPE_1104
+    edge_type: TRACES_TO
+  # Limitações internas (dissent que LIMITA, não que mata: CONSTRAINS, sem mudar o status do alvo).
+  - from: C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED
+    to: E_RELEASE_OAUTH_MODERNIZED_AND_V0_3_SIGNATURES
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY
+    to: E_LLMS_REF_THREE_BINDINGS_AND_TASK_RPCS
+    edge_type: CONSTRAINS
+  - from: E_API7_SIGNED_CARD_NOT_TRUST
+    to: E_WHATS_NEW_V1_SIGNED_CARD_JWS_JCS
+    edge_type: CONSTRAINS
