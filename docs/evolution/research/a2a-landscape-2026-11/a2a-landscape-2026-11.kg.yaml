@@ -509,7 +509,7 @@ nodes:
       method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
       locality: "web"
 
-  - id: E_a fornecedora api7.ai_AUTH_DELEGATED_OUT_OF_BAND
+  - id: E_API7_AUTH_DELEGATED_OUT_OF_BAND
     node_type: evidence
     plane: DEV
     status: confirmed
@@ -528,7 +528,7 @@ nodes:
       method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
       locality: "web"
 
-  - id: E_a fornecedora api7.ai_SIGNED_CARD_NOT_TRUST
+  - id: E_API7_SIGNED_CARD_NOT_TRUST
     node_type: evidence
     plane: DEV
     status: confirmed
@@ -717,10 +717,10 @@ edges:
   - from: E_AGENTCORE_SIGV4_VS_OAUTH_401
     to: Q_A2A_LANDSCAPE_2026_11
     edge_type: SUPPORTS
-  - from: E_a fornecedora api7.ai_AUTH_DELEGATED_OUT_OF_BAND
+  - from: E_API7_AUTH_DELEGATED_OUT_OF_BAND
     to: Q_A2A_LANDSCAPE_2026_11
     edge_type: SUPPORTS
-  - from: E_a fornecedora api7.ai_SIGNED_CARD_NOT_TRUST
+  - from: E_API7_SIGNED_CARD_NOT_TRUST
     to: Q_A2A_LANDSCAPE_2026_11
     edge_type: SUPPORTS
   - from: E_THOUGHTWORKS_ASSESS_2025_11
@@ -752,6 +752,6 @@ edges:
   - from: C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY
     to: E_LLMS_REF_THREE_BINDINGS_AND_TASK_RPCS
     edge_type: CONSTRAINS
-  - from: E_a fornecedora api7.ai_SIGNED_CARD_NOT_TRUST
+  - from: E_API7_SIGNED_CARD_NOT_TRUST
     to: E_WHATS_NEW_V1_SIGNED_CARD_JWS_JCS
     edge_type: CONSTRAINS
