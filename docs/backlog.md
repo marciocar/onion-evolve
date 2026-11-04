@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**798 itens abertos** em 139 grafo(s) com aberto (de 179 no escopo) · 140 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**797 itens abertos** em 139 grafo(s) com aberto (de 179 no escopo) · 140 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -562,14 +562,13 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 21 item(ns)
+## maestro — 20 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 30.0 | `Q_SPIKE_COPILOT_STUDIO_MCP` | spike-copilot-studio-mcp-2026-10 | O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? INFER |
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
-| 12.5 | `Q_MA_FREE_ORG_READ_ENFORCED` | company-brain-multiaudiencia-2026-10 | Na organização gratuita do GitHub, o servidor aplica a permissão por repositório: a conta que não é dona, com Read num repo  |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
