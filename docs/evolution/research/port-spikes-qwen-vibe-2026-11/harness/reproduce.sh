@@ -17,7 +17,9 @@
 #    retrato no meio da execução e sai como informação).
 #    aggregate-r2.json (rodada 2): roda aggregate.py --batch r2 e compara o JSON inteiro, menos
 #    o campo "evidence".
-# rc 0 se os três agregados baterem e a integridade conferir; 1 senão.
+# 6. roda check_parent_rule.py na célula de calibração e nas R2b-S0-V: a regra do filho do Vibe aceita o
+#    que o cliente grava de fato.
+# rc 0 se os três agregados baterem, a integridade conferir e a regra aceitar os registros reais; 1 senão.
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -110,6 +112,14 @@ for ref in ("aggregate-m2.json", "aggregate-final.json", "aggregate-r2.json"):
                 if got.get(k) != want.get(k):
                     print(f"     differs in '{k}'")
     rc |= 0 if same else 1
+
+# 6. a lista positiva do pai aceita o que o Vibe grava (Emenda R2-10 parte D)
+real = sorted(str(d) for d in ev.iterdir() if d.name == "CAL-sub-vibe-r1" or d.name.startswith("R2b-S0-V-r"))
+out = subprocess.run([sys.executable, "-I", str(here / "check_parent_rule.py"), "--classify-dir", str(here), *real],
+                     capture_output=True, text=True)
+print(out.stdout.rstrip() or out.stderr[-300:])
+print(f"{'ok  ' if out.returncode == 0 and len(real) == 4 else 'FAIL'} parent rule on the real records: {len(real)} cells")
+rc |= 0 if out.returncode == 0 and len(real) == 4 else 1
 sys.exit(rc)
 PY
 RC=$?

@@ -653,14 +653,18 @@ def _walk_dicts(obj):
 # dão INCONCLUSIVO.
 CHILD_ALLOWED_STATUS = {"skipped"}
 PARENT_ALLOWED_STATUS = {"completed"}
-# Emenda R2-10 (medido na CAL-sub-vibe-r1): nos chunks, o efeito do spawn do pai aparece também no meio,
-# com status "running" e ainda sem childSessionId. "running" só é aceito como forma de passagem: o efeito
-# tem de ter também a forma "completed".
+# Emenda R2-10 (medido): nos chunks, efeitos do pai aparecem também no meio, com status "running". O spawn
+# passa por ele nos quatro registros reais (CAL-sub-vibe-r1 e R2b-S0-V), ainda sem childSessionId; o self.wait,
+# em um deles (R2b-S0-V-r1). "running" só é aceito como forma de passagem: o efeito tem de ter também a
+# forma "completed", e só nos passos em que foi medido (PARENT_RUNNING_STEPS; o read nunca passou por ele).
 PARENT_TRANSIENT_STATUS = {"running"}
+PARENT_RUNNING_STEPS = {"spawn", "wait"}
 # Emenda R2-10: o timeout que o stub manda no passo wait (stub_llm.py, r2_script do sub); o Vibe grava
 # {"timeout_ms": <este>, "deadline_unix_ms": <instante>} (WaitArgs, _self_tools.py:24-30)
 WAIT_TIMEOUT_MS = 60000
 SUBTASK_TOKEN = "ONION-SPIKE-SUBTASK"
+# kg-ssot R10: os resultados de ferramenta MEDIDOS no pai (CAL-sub-vibe-r1 e R2b-S0-V, 4 de 4)
+PARENT_TOOL_RESULTS = {"read_file", "run_typescript", "wait"}
 
 
 # Emenda R2-8 (kg-ssot A3): o código EXATO do run_typescript do sub no Vibe (o mesmo do stub_llm.py;
@@ -700,8 +704,8 @@ def _parent_step_known(d: dict, child_sid):
       limit}: o path terminando em /README.txt, o offset ausente ou 0, o limit ausente ou null. A forma
       MEDIDA na CAL-sub-vibe-r1 e nas R2b-S0-V é {"path"} só (Emenda R2-10). Todo builtin sai com kind
       "tool" e toolName "<grupo>.<ferramenta>" (mistralai_vibe_local_harness/vibe/_projection.py:1946-1958);
-    - "spawn": kind "subagent", toolName "agents.spawn", input.task começando pelo token e sem o alvo, e
-      detail.childSessionId igual ao session_id do filho (_projection.py:1990-1997;
+    - "spawn": kind "subagent", toolName "agents.spawn", input EXATAMENTE {"agent": "generic", "task":
+      SUBTASK_TEXT} (medido, 4 de 4; kg-ssot R10), e detail.childSessionId igual ao session_id do filho (_projection.py:1990-1997;
       _subagents/_controller.py:1841-1855). A forma de passagem "running" pode vir sem o
       childSessionId (medido nos chunks, Emenda R2-10); a forma "completed" tem de trazê-lo;
     - "wait": kind "tool", toolName "self.wait" e o input EXATAMENTE {timeout_ms, deadline_unix_ms}: o
@@ -723,7 +727,7 @@ def _parent_step_known(d: dict, child_sid):
             and inp.get("limit") is None):
         return "read"
     if (det.get("kind") == "subagent" and det.get("toolName") == "agents.spawn" and isinstance(inp, dict)
-            and str(inp.get("task") or "").startswith(SUBTASK_TOKEN) and not target_in(inp, "sub")
+            and inp == {"agent": "generic", "task": SUBTASK_TEXT}
             and child_sid and (det.get("childSessionId") == child_sid
                                or (status in PARENT_TRANSIENT_STATUS and det.get("childSessionId") is None))):
         return "spawn"
@@ -753,6 +757,8 @@ def _parent_effects_ok(effects: dict, scenario: str, child_sid, where: str):
         if None in kinds_ or len(kinds_) != 1:
             return False, f"(2) the parent record ({where}) has an effect that is not a known step of the script", seen
         k_ = kinds_.pop()
+        if st_ & PARENT_TRANSIENT_STATUS and k_ not in PARENT_RUNNING_STEPS:
+            return False, f"(2) a parent step ({where}) passed through running, never measured: {k_}", seen
         seen[k_] = seen.get(k_, 0) + 1
     if any(n > 1 for n in seen.values()):
         return False, f"(2) a parent step ({where}) appears more than once: {seen}", seen
@@ -844,14 +850,19 @@ def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "
         if not ok_:
             return False, why_, facts
     # (2) pai, no stdout (kg-ssot R9-A6): todo efeito do stdout tem par, pelo id, nos chunks ou no store
-    # (medido: 162 de 162 efeitos do stdout do Vibe têm o mesmo id nos chunks); a forma do stdout não importa
+    # (medido: 162 de 162 efeitos do stdout do Vibe têm o mesmo id nos chunks); e o mesmo toolName, salvo no par
+    # com o efeito do filho (kg-ssot R10; medido: 288 de 288)
     if parent_stdout is not None:
         known: dict = {}
+        known_tools: dict = {}
         for src in (_effect_states(parent_chunks or []), _effect_states(parent[0].get("projection")), ch_eff):
             for k_, (st_, _d, _f) in src.items():
                 known.setdefault(k_, set()).update(st_)
+                if src is not ch_eff:
+                    known_tools.setdefault(k_, set()).update((f_.get("detail") or {}).get("toolName") for f_ in _f)
         for k_, (st_, _d, _f) in _effect_states(parent_stdout).items():
-            if k_ not in known or not st_ <= known[k_]:
+            if (k_ not in known or not st_ <= known[k_]
+                    or (k_ in known_tools and not {(f_.get("detail") or {}).get("toolName") for f_ in _f} <= known_tools[k_])):
                 return False, "(2) a parent stdout effect has no counterpart, by id and status, in the chunks or the store", facts
     # (2) outras sessões
     for other in sessions:
@@ -861,6 +872,7 @@ def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "
             return False, f"(2) another session ({other.get('session_id')}) has effects", facts
     # (4)
     all_same_id, child_hits, parent_other = [], 0, 0
+    parent_names: set = set()
     for sess in sessions:
         for item in (sess.get("messages") or []):
             m = item.get("message") if isinstance(item, dict) and isinstance(item.get("message"), dict) else item
@@ -878,6 +890,10 @@ def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "
                 parent_other += 1
                 if target_in(m, scenario):
                     return False, "(4) a parent tool message has the target", facts
+                # kg-ssot R10: só os resultados medidos do roteiro do pai, cada um no máximo uma vez
+                if m.get("name") not in PARENT_TOOL_RESULTS or m.get("name") in parent_names:
+                    return False, f"(4) a parent tool message outside the script: {m.get('name')!r}", facts
+                parent_names.add(m.get("name"))
     if parent_other > sum(seen.values()):
         return False, f"(4) the parent has {parent_other} tool results for {sum(seen.values())} known steps", facts
     facts["child_tool_message_matches"] = child_hits

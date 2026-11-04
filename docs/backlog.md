@@ -950,6 +950,12 @@
 | 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
 | 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
 
+## port-spikes-qwen-vibe-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.4 | `Q_PORT_SPIKES_RODADA_2_LACUNAS_1104` | port-spikes-qwen-vibe-2026-11 | Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen;  |
+
 ## radar-E3-2026-10-03-r6 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
