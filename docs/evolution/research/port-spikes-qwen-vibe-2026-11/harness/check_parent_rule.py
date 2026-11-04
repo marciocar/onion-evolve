@@ -4,8 +4,13 @@
 Emenda R2-10 parte D. A regra do filho inteira não fecha numa célula em log_allow, porque a condição
 (d) pede o veto do hook. Este conferidor aplica às células de controle só as partes que dependem da
 forma do registro do pai: o _parent_effects_ok no store e nos chunks, o pareamento do stdout por id e
-estado (A6) e os resultados de ferramenta do pai (N1). É a prova de que a regra aceita o que o cliente
-grava de fato, e o reproduce.sh a roda nas células do arquivo.
+estado (A6) e toolName (salvo no par com o filho), e os resultados de ferramenta do pai (N1: alvo, contagem, nome
+na lista medida e nome sem repetição). É a prova de que a regra aceita o que o cliente grava de fato, e o
+reproduce.sh a roda nas células do arquivo.
+
+O QUE ELE NÃO COBRE, porque só existe numa célula com veto ou no veredito final: a (d) do hook, o efeito vetado e as
+mensagens do filho, a (4) sobre o id do stub, as outras sessões e a conjunção do BARRA. Quem cobra isso é a
+vibe_child_record e o test_classify.py. Passar aqui não prova BARRA: prova só que a forma do pai não o impede.
 
 Uso: check_parent_rule.py [--classify-dir DIR] <célula>...
 --classify-dir aplica o classificador de outra versão (para mostrar que a regra antiga reprova).
@@ -40,13 +45,20 @@ def check(classify, cell: Path) -> list[str]:
     if seen.get("spawn") != 1:
         problems.append(f"store: expected one spawn, saw {seen}")
     known: dict = {}
-    for src in (chunks, store, classify._effect_states(child[0].get("projection"))):
-        for key, (states, _last, _forms) in src.items():
+    known_tools: dict = {}
+    child_effects = classify._effect_states(child[0].get("projection"))
+    for src in (chunks, store, child_effects):
+        for key, (states, _last, forms) in src.items():
             known.setdefault(key, set()).update(states)
-    for key, (states, _last, _forms) in classify._effect_states(list(ev["items"])).items():
+            if src is not child_effects:
+                known_tools.setdefault(key, set()).update((f.get("detail") or {}).get("toolName") for f in forms)
+    for key, (states, _last, forms) in classify._effect_states(list(ev["items"])).items():
         if key not in known or not states <= known[key]:
             problems.append(f"stdout effect {key} has no counterpart by id and status")
+        elif key in known_tools and not {(f.get("detail") or {}).get("toolName") for f in forms} <= known_tools[key]:
+            problems.append(f"stdout effect {key} has another toolName than its counterpart")
     results = 0
+    names_seen: set = set()
     for item in parent[0].get("messages") or []:
         msg = item.get("message") if isinstance(item, dict) and isinstance(item.get("message"), dict) else item
         if isinstance(msg, dict) and msg.get("role") == "tool":
@@ -56,6 +68,9 @@ def check(classify, cell: Path) -> list[str]:
             names = getattr(classify, "PARENT_TOOL_RESULTS", None)
             if names is not None and msg.get("name") not in names:
                 problems.append(f"a parent tool result outside the script: {msg.get('name')!r}")
+            if names is not None and msg.get("name") in names_seen:
+                problems.append(f"a parent tool result repeats the name: {msg.get('name')!r}")
+            names_seen.add(msg.get("name"))
     if results > sum(seen.values()):
         problems.append(f"{results} parent tool results for {sum(seen.values())} known steps")
     return problems

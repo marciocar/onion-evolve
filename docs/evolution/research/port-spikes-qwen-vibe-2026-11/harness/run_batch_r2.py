@@ -2,9 +2,9 @@
 """Roda o lote r2 (braço stub) da rodada 2 dos spikes das portas, família por família.
 
 Montado do §5 e do §11 do PRE-REGISTRO-R2.md (a rodada 1 não tinha roteiro de lote em arquivo; isto
-está declarado no pré-registro). Ficam de fora as duas células do subagente no Vibe (R2b-S1-V e
-R2b-M-V), que esperam a reconferência da Emenda R2-8 (decisão
-D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104).
+está declarado no pré-registro). As duas famílias do veto do subagente no Vibe (R2b-S1-V e R2b-M-V) só rodam
+por --only: ficaram fora do lote inicial (decisão D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104) e rodam
+depois da Emenda R2-10, por ordem da sessão do core.
 
 Regra do §5: cada família roda até ter 3 células válidas (veredito em aggregate.VALID), com no
 máximo 6 tentativas. As famílias rodam no máximo 2 em paralelo (outra bancada roda na máquina);
@@ -38,11 +38,13 @@ FAMILIES = [
     ("R2a-S0-V", "vibe", "mcp", "log_allow", "none"),
     ("R2a-S1-V", "vibe", "mcp", "deny_target_json", "none"),
     ("R2a-M-V", "vibe", "mcp", "matcher_bash", "none"),
-    # §5b subagente (R2b-S1-V e R2b-M-V ficam de fora)
+    # §5b subagente
     ("R2b-S0-Q", "qwen", "sub", "log_allow", "none"),
     ("R2b-S1-Q", "qwen", "sub", "deny_target_exit2", "none"),
     ("R2b-M-Q", "qwen", "sub", "matcher_bash", "none"),
     ("R2b-S0-V", "vibe", "sub", "log_allow", "none"),
+    ("R2b-S1-V", "vibe", "sub", "deny_target_json", "none"),
+    ("R2b-M-V", "vibe", "sub", "matcher_bash", "none"),
     # §5c contornos
     ("R2c-tc-S0-Q", "qwen", "tc", "log_allow", "none"),
     ("R2c-tc-S1-Q", "qwen", "tc", "deny_target_exit2", "none"),
@@ -112,7 +114,8 @@ def main() -> int:
     ap.add_argument("--jobs", type=int, default=2)
     ap.add_argument("--only", default="")
     a = ap.parse_args()
-    rows = [r for r in FAMILIES if not a.only or r[0] in set(a.only.split(","))]
+    veto_sub_vibe = {"R2b-S1-V", "R2b-M-V"}
+    rows = [r for r in FAMILIES if (r[0] in set(a.only.split(",")) if a.only else r[0] not in veto_sub_vibe)]
     with ThreadPoolExecutor(max_workers=max(1, min(a.jobs, 2))) as ex:
         for res in ex.map(lambda r: run_family(r, a.batch), rows):
             print(json.dumps(res, ensure_ascii=False), flush=True)

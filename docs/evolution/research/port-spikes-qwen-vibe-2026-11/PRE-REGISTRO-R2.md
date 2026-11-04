@@ -1177,6 +1177,43 @@ depois de «a ligação é pelo `toolCallId`». As duas eram raciocínio sem um 
   `aggregate-r2.json` (117 células, 35 famílias) com `match=True`; a regra do pai aceita os 4 registros reais.
 - **O `mut10.py` não foi rodado de novo nesta parte.** Os mutantes dele que importavam viraram caso e mutante próprios.
 
+### Emenda R2-10 · parte F · 2026-11-04, ANTES de qualquer dado das células de veto do subagente no Vibe
+
+As reconferências de `9e9d29db6` não trouxeram objeção. A suíte em modo padrão, em série, deu rc 0 e ALL PASS (rodada
+pela sessão do core, 2410 s). Faltavam quatro pendências, fechadas aqui e commitadas antes dos dados.
+
+**1. O que acontece se a forma mudar. Vale para a R2b-S1-V e a R2b-M-V.** A forma do pai foi medida em células sem
+veto. **Se a célula de veto gravar o pai em forma nova, a regra dá INCONCLUSIVO, e essa é a resposta da célula.**
+Afrouxar a regra depois de ver isso é **emenda pós-dado, declarada como tal**: entra datada, depois do resultado, e
+os vereditos dessas células não mudam em silêncio. O mesmo vale para a forma do **filho vetado**, que ainda é
+inferida: se não for a que a regra lista, INCONCLUSIVO, nunca BARRA.
+
+**2. `harness/check_parent_rule.py`.** Era mais frouxo que a regra. Passa a cobrar o nome repetido nos resultados do
+pai e o `toolName` no stdout, e o cabeçalho declara o que ele não cobre: a (d) do hook, o efeito vetado e as mensagens do
+filho, a (4) sobre o id do stub, as outras sessões e a conjunção do BARRA.
+
+**3. `harness/cmp_classify.py`,** vindo do `cmp275.py` do kg-ssot. A isenção da regra do medidor depende dele, e o
+`reproduce.sh` agora o roda (passo 7) contra `harness/reference/classify_r2_lot.py`, a cópia byte a byte do classificador
+de `cbc067cc0`, o que produziu o lote `r2`. A cópia evita depender do histórico do git. As células coletadas depois da
+referência (lote `r2veto`) ficam fora do comparador, porque a referência não tem a regra refeita.
+
+**4. O achado do kg-ssot.** Efeito nos chunks com `state` em texto ou `detail` em lista derrubava o classificador com
+`AttributeError`. A cura é o `_check_record_shapes`, na leitura: efeito ou aviso do Vibe com `detail`, `state`,
+`detail.display` ou `state.error` que não seja objeto, no stdout, nos chunks ou no extrato do store, é evidência
+inválida (INCONCLUSIVO, `EVIDENCIA-INVALIDA`). Sete casos «R212 …» e seis mutantes, um por fonte e por campo. Efeito colateral declarado: o N10 da seção
+10 com `state.error` em texto agora dá INCONCLUSIVO; com `state.error` em objeto continua dando BARRA.
+
+**Testes da parte F**, nesta data, com a cópia limpa provada antes de contar:
+- **A cópia limpa:** passou no arranjo dos mutantes (linha «CODE-MUTANT baseline»).
+- **`test_classify.py --mutant-jobs=3`:** rc 0, ALL PASS. **538 checagens** e **194 mutantes de código: 193 mortos e 1
+  equivalente declarado** («R27 parent chunks not read»). Sete morrem por exceção, com 0 checagens falhando: cinco deles
+  são os «R212», em que a exceção é o próprio defeito que a guarda cura; os outros dois são os já declarados na
+  parte E.
+- **`reproduce.sh`:** rc 0, `match=True` nos três agregados, a regra do pai aceita os 4 registros reais, e o
+  `cmp_classify.py` dá **0 diferenças de veredito e 0 no dicionário inteiro em 393 células**.
+- **O blob da `reference/classify_r2_lot.py`** é o mesmo de `classify.py` em `cbc067cc0` (`43988b581cc4`).
+- **`run_batch_r2.py`** ganhou as duas famílias, que só rodam por `--only`.
+
 ## 11. O que esta rodada pode e não pode responder (Emenda R2-2; o alcance é do maestro)
 
 O desfecho **admissível** é o que a célula pode dar dado o código citado. «Prova» é o que um desfecho válido afirma.
@@ -1360,7 +1397,8 @@ calibração dá BARRA falso.
     - N2: no pai, uma entrada `type: "tool_call"` com o push completed;
     - N3: o mesmo, no filho;
     - N4: no filho, uma mensagem de papel `toolResult` de outra chamada, com sucesso;
-    - N10: no filho, o efeito skipped com o alvo e um `state.error` mostrando a saída do push.
+    - N10: no filho, o efeito skipped com o alvo e um `state.error` mostrando a saída do push (em objeto; em texto,
+      a parte F o torna INCONCLUSIVO).
 
     Nos quatro registros reais do sub do Vibe (a CAL-sub-vibe-r1 e as três R2b-S0-V), o `type` "tool_call" só
     aparece como **parte de mensagem** do assistant (4 por registro), nunca como entrada da projeção. O papel

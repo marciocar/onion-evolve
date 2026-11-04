@@ -469,7 +469,27 @@ def load(evid: Path) -> dict:
                 ev["store_extract"] = json.loads(se.read_text(encoding="utf-8", errors="replace"))
             except json.JSONDecodeError:
                 raise EvidenceError("session/vibe/store_extract.json: not JSON")
+        _check_record_shapes("stdout.txt", ev["items"])
+        _check_record_shapes("session/vibe/chunks", ev["vibe_chunks"])
+        _check_record_shapes("session/vibe/store_extract.json", ev["store_extract"])
     return ev
+
+
+def _check_record_shapes(where: str, obj) -> None:
+    """Emenda R2-10 parte F (achado do kg-ssot): efeito ou aviso do Vibe com `state` em texto ou `detail` em lista
+    derrubava o classificador com AttributeError. Forma que o cliente não grava é evidência inválida: INCONCLUSIVO."""
+    for d in _walk_dicts(obj):
+        if d.get("type") not in ("effect", "notice"):
+            continue
+        det, st = d.get("detail"), d.get("state")
+        nested = [("detail", det), ("state", st)]
+        if isinstance(det, dict):
+            nested.append(("detail.display", det.get("display")))
+        if isinstance(st, dict):
+            nested.append(("state.error", st.get("error")))
+        for name, value in nested:
+            if value is not None and not isinstance(value, dict):
+                raise EvidenceError(f"{where}: {d.get('type')} {d.get('id')}: {name} is not an object")
 
 
 # ---------------------------------------------------------------- fatos

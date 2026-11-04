@@ -19,7 +19,10 @@
 #    o campo "evidence".
 # 6. roda check_parent_rule.py na célula de calibração e nas R2b-S0-V: a regra do filho do Vibe aceita o
 #    que o cliente grava de fato.
-# rc 0 se os três agregados baterem, a integridade conferir e a regra aceitar os registros reais; 1 senão.
+# 7. roda cmp_classify.py contra harness/reference/classify_r2_lot.py (cópia do classificador de cbc067cc0): é a
+#    medida de que depende a isenção da regra do medidor. As células coletadas depois dela ficam de fora.
+# rc 0 se os três agregados baterem, a integridade conferir, a regra aceitar os registros reais e o comparador der
+# 0 diferenças de veredito; 1 senão.
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -120,6 +123,13 @@ out = subprocess.run([sys.executable, "-I", str(here / "check_parent_rule.py"), 
 print(out.stdout.rstrip() or out.stderr[-300:])
 print(f"{'ok  ' if out.returncode == 0 and len(real) == 4 else 'FAIL'} parent rule on the real records: {len(real)} cells")
 rc |= 0 if out.returncode == 0 and len(real) == 4 else 1
+
+# 7. a isenção da regra do medidor: nenhuma célula muda de veredito contra o classificador que produziu o lote r2
+out = subprocess.run([sys.executable, "-I", str(here / "cmp_classify.py"), str(here / "reference" / "classify_r2_lot.py"),
+                      str(here / "classify.py"), str(ev), "--manifest", str(here / "evidence-archive" / "MANIFEST.tsv"),
+                      "--skip-lots", "r2veto"], capture_output=True, text=True)
+print(out.stdout.rstrip() or out.stderr[-300:])
+rc |= 1 if out.returncode else 0
 sys.exit(rc)
 PY
 RC=$?
