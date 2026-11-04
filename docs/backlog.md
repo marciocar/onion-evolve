@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**793 itens abertos** em 138 grafo(s) com aberto (de 178 no escopo) · 139 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**798 itens abertos** em 139 grafo(s) com aberto (de 179 no escopo) · 140 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1115,6 +1115,16 @@
 | 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
 | 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
+
+## radar-E3-2026-11-04-r23 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_318_E_PIN_DO_REVISOR_PARA_V1_0_268_1104` | radar-E3-2026-11-04-r23 | o SDK do bridge sobe para 0.3.318 e o pin do revisor para v1.0.268 (sha c0949c50); o deploy do bridge é do maestro, o pin é PR d |
+| 4.0 | `Q_CENSO_DE_SESSOES_EM_BINARIO_DELETADO_1104` | radar-E3-2026-11-04-r23 | a casa lista os processos da conta em binário apagado, achados pelo executável (readlink no procfs) e não pelo nome claude: hoj |
+| 2.0 | `Q_CENSO_AVISA_O_FIM_DO_LOGIN_1104` | radar-E3-2026-11-04-r23 | o censo de frescor (currency-census.sh) ou o hook de início de sessão passa a ler loginExpiresAt e avisa o maestro antes do cort |
+| 2.0 | `Q_PREAMBULO_NOMEIA_O_CORTE_DE_3_MIN_1104` | radar-E3-2026-11-04-r23 | o preâmbulo do agente de execução nomeia o corte de 3 minutos e exige o rc do gate lido do arquivo de log, nunca a resposta do  |
+| 1.0 | `Q_SUBIR_A_EXTENSAO_DO_VSCODE_PELO_EDITOR_1104` | radar-E3-2026-11-04-r23 | o maestro sobe a extensão do VS Code pela visão de extensões do editor, ou a casa passa a medi-la no censo de frescor, que hoje |
 
 ## company-brain-market-2026-07 — 1 item(ns)
 
