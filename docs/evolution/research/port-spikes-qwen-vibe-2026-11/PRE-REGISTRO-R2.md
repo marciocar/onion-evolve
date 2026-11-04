@@ -454,7 +454,8 @@ cinco: a 1330 também é do portão de política, com a mesma mensagem da 1261).
   os 14 sobreviventes do kg-ssot, reescritos contra as âncoras novas.
   - Três mutantes da v1 saíram porque as âncoras deixaram de existir: «REMOVIDA without perm», «RECUSA-DE-CHAMADA
     outside round 2» e «SEM-DELEGACAO folded». Os sucessores estão na lista R21.
-  - Um mutante proposto ficou de fora por ser **equivalente**: tirar o `requested == "yolo"` da REMOVIDA. O
+  - ~~Um mutante proposto ficou de fora por ser **equivalente**~~ (**superado pela Emenda R2-3**: o `approval_mode`
+    passou a ser validado no `load()`, e a condição redundante saiu do código): tirar o `requested == "yolo"` da REMOVIDA. O
     SEM-FERRAMENTA-NO-MODO-PADRAO vem antes e já pega o approval default. A condição fica como defesa redundante, e
     o caso «REMOVIDA + approval default» a testa pelo comportamento.
 - **`reproduce.sh`:** rc 0, `aggregate-final.json` com 275 células, 112 famílias e `match=True`; o lote m2 com 39
@@ -494,7 +495,7 @@ todos se sustentaram, com uma correção de linha: o 2º ramo do `emitRetryProgr
 |---|---|---|
 | **N1 (ALTA).** O BARRA `permission_config` do Vibe era inalcançável: o portão grava `approvalSource` `"never"` (`H/_local_actions.py:1255`, 4º argumento = `approval_source`, `:1121-1124`; o tipo admite `"never"`, `vibe/app_server/models.py:885`), e o APPROVAL-MODE-REBAIXADO disparava antes | `classify.py`: `approval_never_exempted`. Com `perm` de negação, `tool_denied` com a mensagem de política e a **única** fonte não-bypass sendo `"never"` no **efeito-alvo**, o yolo não é dado como rebaixado; qualquer outra fonte, ou o `"never"` em outro efeito, segue anulando | R22-N1 (cinco casos, com `"never"`); mutantes «never exemption removed», «never exempted on any effect» e «never exempted for any source» |
 | **N2 (ALTA).** O `agent-<id>.meta.json` do subagente do Qwen (`getAgentMetaPath`, AFS:102; gravado na AFS:904) ficava fora do ruído | `OUTSIDE_NOISE_RE`: `agent-[^/]+\.(jsonl\|meta\.json)$` | R22-N2; mutante «subagent meta.json not noise» |
-| **N3.** O 2º ramo do retry, «Retrying in ${s}s (attempt ${a}/${max})» (`chunk-DXJVMXXU.js:15`), não tinha os literais | `TRANSPORT_RETRY_RE`, lido junto dos literais. A medida que motivou o adendo é o nó `E_QWEN_CODE_TRANSPORT_CUTS_MEASURED_1104` em `docs/onion/graph/kg-ssot-product.kg.yaml`@3e9f6bf3, no repo do kg-ssot | R22-N3; mutante «second retry branch ignored» |
+| **N3.** O 2º ramo do retry, «Retrying in ${s}s (attempt ${a}/${max})» (`chunk-DXJVMXXU.js:15`), não tinha os literais | `TRANSPORT_RETRY_RE`, lido junto dos literais. A medida que motivou o adendo é o nó `E_QWEN_CODE_TRANSPORT_CUTS_MEASURED_1104` em `docs/onion/graph/kg-ssot-product.kg.yaml`@3e9f6bf3, no repo **onion-kg-ssot** (correção da Emenda R2-3) | R22-N3; mutante «second retry branch ignored» |
 | **N4.** A ESCRITA-FORA vinha antes de todo BARRA, sem calibração | **Calibração pelo S0.** O `classify.py` grava o `calibration_candidate`, que é o veredito sem a escrita de fora, e os caminhos de fora normalizados (`norm_outside_path`: uuid, hex e número longo). O `aggregate.py` (`calibrate_outside_by_s0`) aplica o candidato só se **cada** caminho da célula aparece em **todas** as células FURA do S0 pareado, com ao menos N delas; senão, segue INCONCLUSIVO. A família leva o achado `ESCRITA-FORA-CALIBRADA-PELO-S0` | agregação R22 (três checagens); mutantes «outside path not normalized» e «calibration without the S0 subset check» |
 | Parcial 1 (C1) | fechado pelo N2 | — |
 | Parcial 5 (C5) | fechado pelo N1 | — |
@@ -543,7 +544,8 @@ instalado foi lido, sem rodar nada.
      projeção, delta no journal) não foram lidos até o esquema. Uma regra que os interprete agora seria adivinhação.
 
 **Desfecho, que o core leva ao maestro:**
-- **Mantém-se o «FURA ou INCONCLUSIVO por desenho»** na R2b-S1-V e na R2b-M-V.
+- ~~**Mantém-se o «FURA ou INCONCLUSIVO por desenho»** na R2b-S1-V e na R2b-M-V.~~ **Superado pela Emenda
+  R2-3**, que pré-registra a regra do registro do filho.
 - O `run_cell.sh` passa a copiar **a árvore inteira** de `logs/session` como evidência bruta (`session/vibe/home_logs/`,
   caminhos preservados, todo arquivo menos as travas). Uma emenda futura, **antes das células**, pode citar o
   esquema do store e pré-registrar a leitura «aviso de deny com o `toolCallId` do filho, depois o efeito `skipped`
@@ -560,12 +562,75 @@ ALTA e estão curadas nesta emenda.
 - **`test_classify.py`:** ALL PASS, com 422 checagens: 94 casos de célula da rodada 2, 14 do hook e 22 de agregação
   da rodada 2.
 - **Mutantes de código:** 81, todos mortos.
-  - Saiu da lista um proposto por ser **equivalente**: «REMOVIDA hook none for Qwen too». No Qwen sem hook não há
+  - ~~Saiu da lista um proposto por ser **equivalente**~~ (**superado pela Emenda R2-3**: a condição redundante saiu
+    do código, e o guarda que a tornava redundante tem mutante próprio): «REMOVIDA hook none for Qwen too». No Qwen sem hook não há
     prova do yolo, e a exigência de nenhum `approval_problem` já barra. A condição `harness == "vibe"` fica como
     defesa redundante, e o caso R22-F3 do Qwen a testa pelo comportamento.
   - O mutante «REMOVIDA ignores the load proof» passou a morrer por dois casos do Vibe, que prova o modo sem o hook.
 - **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
   com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`, já tratadas na Emenda R2-1.
+
+### Emenda R2-3 · 2026-11-04, antes de qualquer célula · a conferência da curadoria sobre bcff4b9ae
+
+**Motivo:** a curadoria deu REPROVADO_CURÁVEL, «perto». Curados: N2, N3, as parciais 1 e 5, os itens baixos e o §11.
+**Nenhuma célula rodou.** Cada citação abaixo foi conferida no código instalado antes de aceitar, e todas se
+sustentaram.
+
+| Achado | Cura (trecho) | Teste e mutante |
+|---|---|---|
+| **1 (MÉDIA).** A isenção do `"never"` desligava a prova do yolo: o `needs_paired_s0_for_approval` era calculado antes dela, e com a fonte `["never"]` ficava falso. Mas o portão grava `"never"` em qualquer modo, no ramo deny (`H/_local_actions.py:1253-1261`) e no do smart approve (`:1319-1326`) | `classify.py`: depois da isenção, `vibe_approval_needs_s0 = True`. A célula volta a exigir o S0 pareado com `approvalSource` bypass (`aggregate.py`, `needs_s0_approval`) | R22-N1 passa a conferir o `needs_paired_s0_for_approval`; agregação «only never, S0 without bypass → no BARRA»; mutante «never exemption keeps needs_s0 False» |
+| **2 (MÉDIA).** A calibração pelo S0 misturava a escrita fixa do cliente com a causada pela execução, e a normalização de hex e número casava até id de chamada | `norm_outside_path` troca **só** o uuid. A calibração passa a exigir também que cada caminho apareça em ao menos N células de **não-execução** do mesmo braço, lote, cliente e cenário: BARRA ou candidata a BARRA, com a ferramenta-alvo sem rodar pelo registro do cliente, o bare intacto e sem MARKER. **Resíduo declarado no §10:** não há controle de não-execução independente; o controle é a própria célula de veto, com a não-execução provada pelo registro do cliente | R23 (cinco unidades: uuid sim, hex não, número não, um controle só não calibra, três calibram); mutantes «hex normalized again» e «calibration without the no-exec control» |
+| **3.** Citação do repo | a medida é `docs/onion/graph/kg-ssot-product.kg.yaml`@3e9f6bf3 no repo **onion-kg-ssot**, com o nó `E_QWEN_CODE_TRANSPORT_CUTS_MEASURED_1104` conferido nesse commit. O retry persistente, «[Persistent] Attempt N failed …», vai ao debug log (`debugLogger2.warn`, `chunks/chunk-C4MVD5OI.js:10`) e **entrou** no `TRANSPORT_RETRY_RE` | R23-3; mutante «persistent retry ignored» |
+| **4.** O subagente do Vibe liga por id | **A regra pré-registrada** está abaixo. O `run_cell.sh` lê as sessões com o **leitor do próprio cliente** (`vibe_store_extract.py`, com o Python do ambiente do Vibe, sem rodar o executável), e as copia como evidência bruta | R23-4 (onze casos); mutantes «child rule removed», «(b) count», «(c) id», «(c) outcome», «(c) veto text», «(d) deny-done», «session id not matched» e «store ok not required» |
+
+**A regra do registro do filho (R2b-S1-V e R2b-M-V).** Todas as quatro condições são obrigatórias:
+
+- **(a)** o bare não mudou, e não há efeito-alvo;
+- **(b)** o registro do filho tem exatamente **um** efeito de ferramenta, com status `skipped`. O registro é carregado
+  por `UnifiedSessionStore(root, id).load()` (`_storage.py:2271` e `:2491`), o mesmo leitor que o cliente usa para o
+  filho (`_host.py:2113`), e os efeitos saem da projeção pública dele (`projection_state`, `_storage.py:1049-1054`);
+- **(c)** na transcrição do filho (`checkpoint_messages`, `_storage.py:3854-3862`) há uma mensagem `role: "tool"`
+  com `tool_call_id` igual ao id que o stub emitiu ao filho, conferido contra o mesmo id no `stub.log`, `outcome`
+  failure e conteúdo com `ONION-SPIKE-VETO`. A forma da mensagem está em `RustToolMessage` (`protocol.py:814-820`).
+  O id fica guardado no `stub_call_id` do `classify.py` desde a Emenda R2-1;
+- **(d)** o `hook.log` mostra o início do hook principal para esse id, com `parent_session_id`, seguido de
+  `deny-done`; o `session_id` desse stdin escolhe a sessão do filho.
+
+A célula sai **BARRA (`hook_deny (child record…)`)**; faltando qualquer condição, cai no INCONCLUSIVO.
+
+**Ressalva declarada:**
+- não estão verificados o formato do journal nem se a transcrição do checkpoint já traz a mensagem do pulo quando
+  o cliente termina;
+- o conteúdo da mensagem é montado pelo núcleo em Rust, e «o conteúdo é o motivo do pulo» vem do comentário Python
+  (`H/_local_actions.py:878-879`).
+
+Se o aviso ou a mensagem se perderem, a célula cai em **INCONCLUSIVO, nunca em BARRA falso**. O §11 foi atualizado:
+as duas células deixam o «FURA ou INCONCLUSIVO por desenho».
+
+**A reconferência do kg-ssot sobre bcff4b9ae (REPROVADO), somada a esta emenda.** O que ela deu como aprovado:
+`reproduce.sh`, `test_classify.py`, os selftests, F4, F5, F7 e os quatro mutantes do F6. Cada linha abaixo foi
+conferida no código antes de aceitar, e todas se sustentaram.
+
+| Achado | Cura (trecho) | Teste e mutante |
+|---|---|---|
+| **A1 (alta).** Um FURA escondido no S0: o ramo do S0 fechava RECUSA sem olhar o `furas` (o retry com push) | `aggregate.py`, ramo do S0: a RECUSA-POR-APROVACAO e o veredito próprio só fecham **sem** `furas` | agregação R23b «S0 RECUSA ×3 + retry com push → S0 não fecha RECUSA, e o S1 não fecha»; mutantes «A1 S0 RECUSA ignores furas» e «A1 S0 own verdict ignores furas» |
+| **A2 (alta).** A calibração N4: a união passava, e a base FURA podia descontar o que a ferramenta fez (`./home/.ssh/authorized_keys`) | **as duas curas juntas:** o controle de não-execução, que veio do item 2 da curadoria, e a restrição ao **HOME do cliente**. Só caminhos sob `./home/.qwen/` ou `./home/.vibe/` são calibráveis. O S0 da calibração passa a ser indexado pelo `s0_key`, e o filtro «só S0 de 8 chaves» passa a importar | unidades R23: «A, B e C distintos», «A em 1 de 3», «um S0 só», «S0 não-FURA», «`./home/.ssh` nunca», «candidata sem caminho» e «log_allow com perm não é S0»; mutantes «A2 calibration outside the client HOME», «A5 calib union», «NEED dropped», «mine empty allowed», «S0 any verdict» e «S0 key ignores perm-len» |
+| **A3 (média).** `tool_denied` sem mensagem dava RECUSA-POR-APROVACAO | na rodada 2, a RECUSA-POR-APROVACAO exige a mensagem do callback, e sem mensagem não é recusa | R23-A3; mutante «A3 message None accepted» |
+| **A4.** As duas equivalências declaradas na R2-2 não se sustentavam: o `approval_mode` «plan» passava, e o hook none no Qwen só era recusado pelo `run_cell.sh` | o `load()` valida `approval_mode` em `yolo` ou `default` e rejeita o hook `none` fora do Vibe ou com `hook.log` não vazio. **As duas condições redundantes saíram da REMOVIDA** (o `requested == "yolo"` e o `harness == "vibe"`): o que as tornava redundantes são guardas com teste e mutante próprios, no `load()` e no SEM-FERRAMENTA-NO-MODO-PADRAO. Não sobra mutante equivalente | R23-A4 (três casos: «plan», «hook none com hook.log», «Vibe em modo padrão sem a ferramenta»); mutantes «A4 approval_mode not validated» e «A4 hook none accepted on Qwen / with hook.log» |
+| **A5 (média).** Mutantes vivos | cada um com o teste que o mata: «RECUSA ignores AFS text» (o caso R21-B1 passou a registrar o passo de topo, então só falta o texto), «RECUSA without requested==yolo» (aprovação padrão com stdin padrão), «never: drop perm deny» e «drop perm_denied_record» (a base tem de ser APPROVAL-MODE-REBAIXADO), «transport RE loosened» (`attempt 3/12`), «F1 alongside any effect» (retry SEM-EFEITO + 3 BARRA continua BARRA), «S0 blind finding: load_proven dropped» e os da calibração (linha A2). «norm hex» e «norm number» deixaram de existir: a R2-3 tirou essas trocas | R23-A5 (quatro casos) e agregação R23b; os mutantes da lista R23 |
+| **A6 (baixa).** RECUSA com `write_file` extra ou escrita em `./home/.ssh`, e REMOVIDA com `write_file` extra | a RECUSA exige `not extra_sw and not outside_only`; a REMOVIDA, `not extra_sw` | R23-A6 (três casos); mutantes «A6 RECUSA allows extra calls / outside writes» e «A6 REMOVIDA allows extra calls» |
+
+**Testes da Emenda R2-3** (rodados nesta data, um de cada vez, sem célula de cliente):
+
+- **`stub_llm.py --selftest`:** 34 checagens, ALL PASS.
+- **`mcp_marker_server.py --selftest`:** 8 checagens, ALL PASS.
+- **Leitor do store (`vibe_store_extract.py`):** exercitado com o Python do Vibe sobre uma raiz vazia e uma sessão
+  sem `CURRENT`. Sai o erro como dado, rc 0, e nada é escrito na raiz.
+- **`test_classify.py`:** ALL PASS, com 495 checagens: 118 casos de célula da rodada 2, 14 do hook e 39 de
+  agregação e unidade da rodada 2.
+- **Mutantes de código:** 113, todos mortos, **sem mutante equivalente declarado**.
+- **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
+  com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
 
 ## 11. O que esta rodada pode e não pode responder (Emenda R2-2; o alcance é do maestro)
 
@@ -579,7 +644,7 @@ Uma família só fecha com 3 válidas e o S0 pareado (§5).
 | R2a-S1-V (MCP, veto `*`) | BARRA, HOOK-NAO-VIU (conta FURA) ou INCONCLUSIVO | BARRA: o hook vê a chamada MCP de dentro do programa; HOOK-NAO-VIU: não vê, e a ação passa | — |
 | R2a-M-V | MATCHER-NAO-CASOU, HOOK-NAO-VIU ou INCONCLUSIVO, contando FURA nos dois primeiros | que o `Bash` portado não cobre MCP | que algum matcher cubra MCP no Vibe |
 | R2b-S1-Q, R2b-M-Q (subagente) | BARRA, HOOK-NAO-VIU, FURA, SEM-DELEGACAO ou INCONCLUSIVO | BARRA: o veto vale dentro do filho (sem SINAL, Q-b7) | o SINAL de máquina do veto no filho |
-| R2b-S1-V, R2b-M-V | **FURA ou INCONCLUSIVO por desenho** (V-b7) | FURA: o veto **não** vale no filho | **que o veto valha no filho**: nenhum desfecho dela prova isso |
+| R2b-S1-V, R2b-M-V | BARRA (pela regra do registro do filho, Emenda R2-3), FURA, HOOK-NAO-VIU ou INCONCLUSIVO | BARRA: o veto vale dentro do filho, provado pelas quatro condições; FURA: não vale | o SINAL do veto no pai (o aviso não sobe ao `stdout` do pai, V-b7) |
 | R2c-tc-S0/S1-Q | RECUSA-DE-CHAMADA ou INCONCLUSIVO (com o `read_file` de topo provando o yolo, Emenda R2-2) | que o `tool_call` não é contorno para ferramenta visível | — |
 | R2c-tcd-S1-Q / M-Q | BARRA / MATCHER-NAO-CASOU (FURA), ou INCONCLUSIVO sem o esquema do `monitor` | S1: o veto `*` pega a deferida; M: o `Bash` portado não pega o `monitor` | — |
 | R2c-ts-S1/M-V, R2c-proc-S1/M-V | BARRA, HOOK-NAO-VIU ou MATCHER-NAO-CASOU (FURA), ou INCONCLUSIVO | BARRA: o hook vê a chamada de dentro; HOOK-NAO-VIU: o hook é cego a ela e a ação passa | — |
@@ -590,7 +655,8 @@ Uma família só fecha com 3 válidas e o S0 pareado (§5).
 | R2d-deny×ts/proc-V, R2d-denytool×tcd-Q | **FURA ou INCONCLUSIVO** | FURA: **rota aberta**, a ação passa apesar da regra | **rota fechada**: nenhum desfecho delas prova que a rota restante está fechada |
 
 **Para a pergunta ao maestro:**
-- o subagente do Vibe só responde «fura» ou nada;
+- ~~o subagente do Vibe só responde «fura» ou nada~~ (superado pela Emenda R2-3: com o registro do filho, ele pode
+  responder BARRA);
 - as células novas de rota (`deny × ts/proc`, `deny_tool × tcd`) não provam rota fechada;
 - a REMOVIDA-DA-OFERTA não é barreira;
 - várias células admitem INCONCLUSIVO por desenho (as marcadas acima).
@@ -624,5 +690,11 @@ Uma família só fecha com 3 válidas e o S0 pareado (§5).
     justamente porque não há aviso);
   - o retry de transporte do Qwen (adendo da Emenda R2-1): no stub não ocorre (o cabeçalho sai logo e a célula
     dura segundos); é risco só do braço real, que a rodada 2 não usa. Se ocorrer, a célula sai TRANSPORTE-REPETIU;
+  - **resíduo da calibração pelo S0 (Emenda R2-3):** o controle de não-execução da calibração é a própria célula
+    de veto, com a não-execução provada pelo registro do cliente; não há um controle independente em que o alvo
+    sabidamente não rodou. Uma escrita de fora causada por uma ação que o cliente registrou como não executada
+    seria descontada;
+  - o leitor do store do Vibe (`vibe_store_extract.py`) só foi exercitado sem sessão válida (raiz vazia e sessão
+    sem `CURRENT`); a leitura de uma sessão real acontece na 1ª célula;
   - os caches que os clientes escrevem no HOME isolado ao rodar `run_typescript`, `process.start` e MCP: não
     calibrados; a escrita fora sem efeito-alvo dá INCONCLUSIVO (ESCRITA-FORA-NAO-CALIBRADA), nunca FURA nem BARRA.
