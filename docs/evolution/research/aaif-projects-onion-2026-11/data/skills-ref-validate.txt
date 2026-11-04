@@ -1,0 +1,15 @@
+.claude/skills/language-standards	rc=1	Validation failed for .claude/skills/language-standards:   - Missing required field in frontmatter: name
+.claude/skills/onion-compliance-context	rc=0	Valid skill: .claude/skills/onion-compliance-context
+.claude/skills/onion-design-context	rc=0	Valid skill: .claude/skills/onion-design-context
+.claude/skills/onion-engineering-context	rc=0	Valid skill: .claude/skills/onion-engineering-context
+.claude/skills/onion-onboarding	rc=1	Validation failed for .claude/skills/onion-onboarding:   - Missing required field in frontmatter: name
+.claude/skills/onion-orchestration	rc=1	Validation failed for .claude/skills/onion-orchestration:   - Missing required field in frontmatter: name
+.claude/skills/onion-patterns	rc=1	Validation failed for .claude/skills/onion-patterns:   - Invalid YAML in frontmatter: While scanning   in "<unicode string>", line 8, column 8:     paths: [".claude/**", "docs/onion/**"]            ^ (line: 8) Found ugly disallowed JSONesque flow mapping (surr
+.claude/skills/onion-product-context	rc=0	Valid skill: .claude/skills/onion-product-context
+.claude/skills/onion-publish	rc=1	Validation failed for .claude/skills/onion-publish:   - Missing required field in frontmatter: name
+.claude/skills/onion-research	rc=1	Validation failed for .claude/skills/onion-research:   - Missing required field in frontmatter: name
+.claude/skills/onion-retro	rc=1	Validation failed for .claude/skills/onion-retro:   - Missing required field in frontmatter: name
+.claude/skills/onion-validation	rc=1	Validation failed for .claude/skills/onion-validation:   - Invalid YAML in frontmatter: While scanning   in "<unicode string>", line 8, column 8:     paths: [".claude/**"]            ^ (line: 8) Found ugly disallowed JSONesque flow mapping (surround with ' and
+.claude/skills/onion-wizard	rc=1	Validation failed for .claude/skills/onion-wizard:   - Missing required field in frontmatter: name
+.claude/skills/onion	rc=1	Validation failed for .claude/skills/onion:   - Missing required field in frontmatter: name
+vendor/kg-ssot/skills/kg-ssot	rc=0	Valid skill: vendor/kg-ssot/skills/kg-ssot

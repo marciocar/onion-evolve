@@ -1,0 +1,28 @@
+name	language-standards	ok
+name	onion-compliance-context	ok
+name	onion-design-context	ok
+name	onion-engineering-context	ok
+name	onion-onboarding	ok
+name	onion-orchestration	ok
+name	onion-patterns	  - Invalid YAML in frontmatter: While scanning
+name	onion-product-context	ok
+name	onion-publish	ok
+name	onion-research	ok
+name	onion-retro	ok
+name	onion-validation	  - Invalid YAML in frontmatter: While scanning
+name	onion-wizard	ok
+name	onion	ok
+name+block	language-standards	ok
+name+block	onion-compliance-context	ok
+name+block	onion-design-context	ok
+name+block	onion-engineering-context	ok
+name+block	onion-onboarding	ok
+name+block	onion-orchestration	ok
+name+block	onion-patterns	  - Unexpected fields in frontmatter: paths. Only ['allowed-tools', 'compatibility', 'description', 'license', 'metadata
+name+block	onion-product-context	ok
+name+block	onion-publish	ok
+name+block	onion-research	ok
+name+block	onion-retro	ok
+name+block	onion-validation	  - Unexpected fields in frontmatter: paths. Only ['allowed-tools', 'compatibility', 'description', 'license', 'metadata
+name+block	onion-wizard	ok
+name+block	onion	ok

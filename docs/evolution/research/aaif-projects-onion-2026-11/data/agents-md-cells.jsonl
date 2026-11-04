@@ -1,0 +1,6 @@
+{"cell": "nenhum", "rc": "rc=0", "reqs": 1, "claude_md_na_requisicao": 0, "agents_md_na_requisicao": 0}
+{"cell": "so-claude", "rc": "rc=0", "reqs": 1, "claude_md_na_requisicao": 1, "agents_md_na_requisicao": 0}
+{"cell": "so-agents", "rc": "rc=0", "reqs": 1, "claude_md_na_requisicao": 0, "agents_md_na_requisicao": 1}
+{"cell": "os-dois", "rc": "rc=0", "reqs": 1, "claude_md_na_requisicao": 1, "agents_md_na_requisicao": 0}
+{"cell": "os-dois-import", "rc": "rc=0", "reqs": 1, "claude_md_na_requisicao": 1, "agents_md_na_requisicao": 1}
+{"cell": "agents-em-subdir", "rc": "rc=0", "reqs": 1, "claude_md_na_requisicao": 1, "agents_md_na_requisicao": 0}

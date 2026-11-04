@@ -1,0 +1,42 @@
+node	fetch	bytes	result	quote
+E_AAIF_PROJECTS_PAGE_TEN_LISTED	curl	250128	LITERAL	an open source AI gateway built on Envoy
+E_AAIF_ABOUT_NEUTRAL_UNDER_LF	curl	643338	LITERAL	a neutral, open foundation under the Linux Foundation
+E_AAIF_GOVERNING_BOARD_TEN_SEATS	curl	643338	LITERAL	The governing board members of the AAIF.
+E_AAIF_TC_CHAIRED_SORIA_PARRA	curl	643338	LITERAL	Steering the technical direction of agentic AI.
+E_MCP_SPEC_CURRENT_2026_07_28	curl	168781	LITERAL	This specification defines the authoritative protocol requirements, based on the TypeScrip
+E_MCP_STATELESS_NO_INITIALIZE	curl	175508	SO-MARCACAO	Make MCP stateless: remove the `initialize`/`notifications/initialized` handshake. Every r
+E_MCP_TASKS_EXTENSION_ROOTS_DEPRECATED	curl	175508	SO-MARCACAO	Move experimental tasks out of the core protocol and into an official extension (`io.model
+E_MCP_GOVERNANCE_LF_PROJECTS	curl	194043	SO-MARCACAO	Model Context Protocol has been established as **Model Context Protocol a Series of LF Pro
+E_MCP_LICENSE_TRANSITION_MIT_APACHE	curl	12227	LITERAL	The MCP project is undergoing a licensing transition from the MIT License to the Apache Li
+E_A2A_LICENSE_APACHE_2	curl	11358	LITERAL	Apache License Version 2.0, January 2004 http://www.apache.org/licenses/
+E_AGENTS_MD_STEWARDED_BY_AAIF	curl	81670	LITERAL	AGENTS.md is now stewarded by the Agentic AI Foundation under the Linux Foundation
+E_AGENTS_MD_60K_AND_COMPAT_LIST	curl	81670	LITERAL	used by over 60k open-source projects
+E_AGENTS_MD_REPO_MIT_NO_RELEASES	gh-raw	1063	LITERAL	MIT License Copyright (c) 2025 OpenAI Permission is hereby granted, free of charge, to any
+E_SKILLS_SPEC_FRONTMATTER_FIELDS	curl	261819	LITERAL	Space-separated string of pre-approved tools the skill may use. (Experimental)
+E_SKILLS_NAME_MUST_MATCH_DIR_10_OF_14_MISS	curl	261819	LITERAL	Must match the parent directory name
+E_SKILLS_LOCAL_MEASURE_FIELDS_14	curl	261819	LITERAL	Keep your main `SKILL.md` under 500 lines. Move detailed reference material to separate fi
+E_GOOSE_UNDER_AAIF_REPO_MOVED	curl	3433	LITERAL	goose is part of the Agentic AI Foundation (AAIF) at the Linux Foundation.
+E_GOOSE_GOVERNANCE_AAIF_STEWARD	gh-raw	10485	LITERAL	now stewarded by AAIF (Agentic AI Foundation)
+E_GOOSE_LICENSE_APACHE_2	gh-raw	11341	LITERAL	Apache License Version 2.0, January 2004 http://www.apache.org/licenses/
+E_GOOSE_RELEASE_V1_57_0	curl	82162	NAO-LITERAL	tag_name: v1.57.0; published_at: 2026-10-28T19:26:10Z
+E_GOOSE_PRE_TOOL_CALL_TRAIT_ALLOW_DENY	gh-raw	2987	LITERAL	pub enum PreToolCallDecision { Allow, Deny { reason: String }, }
+E_GOOSE_EXTENSIONS_VIA_MCP	curl	3433	LITERAL	Connect to 70+ extensions via the Model Context Protocol open standard.
+E_AGENTGATEWAY_LF_PROJECT	gh-readme	6439	LITERAL	Agentgateway is a Linux Foundation project.
+E_AGENTGATEWAY_PROXIES_A2A_MCP	gh-readme	6439	LITERAL	Enable secure agent-to-agent communication using A2A
+E_AGENTGATEWAY_AUTH_JWT_OAUTH_RBAC	curl	566070	LITERAL	Authenticate callers into MCP servers and scope which tools each identity may invoke
+E_AGENTGATEWAY_LICENSE_APACHE_2	gh-raw	11310	LITERAL	Apache License Version 2.0, January 2004
+E_AGENTGATEWAY_QUICKSTART_TWO_PATHS	gh-readme	6439	LITERAL	Get started with agentgateway in minutes
+E_AGENT_ROUTER_FORMER_ENVOY_JOINED_0909	curl	136592	LITERAL	Formerly Envoy AI Gateway, Agent Router gives developers a stable, OpenAI-compatible inter
+E_AGENT_ROUTER_NINE_SEATS_NO_MAJORITY	curl	136592	LITERAL	Nine maintainer seats are shared across Bloomberg, Nutanix, AMD, Tetrate, and Netflix, wit
+E_AGENT_ROUTER_LICENSE_APACHE_2	curl	136592	LITERAL	The license remains Apache 2.0.
+E_AGENT_ROUTER_OPENAI_COMPAT_CONTROL_PLANE	gh-readme	9597	LITERAL	one consistent, OpenAI-compatible API for every model and tool
+E_AGENT_ROUTER_V1_SHIPPED_JUNE_ELEVEN_ADOPTERS	curl	136592	SO-MARCACAO	Version 1.0 shipped in June 2026 with a compatibility commitment for the 1.x series.
+E_OPEN_RESPONSES_APACHE_OPENAPI_DATED	gh-readme	2939	LITERAL	Dated releases in `public/openapi/<YYYY-MM-DD>/` are immutable.
+E_OPEN_RESPONSES_CHARTER_LF_PROJECTS	curl	23685	SO-MARCACAO	Copyright © Open Responses a Series of LF Projects, LLC.
+E_OPEN_RESPONSES_JOINED_AAIF_OPENAI_1022	curl	93136	LITERAL	Open Responses is an open specification for building multi-provider, interoperable LLM int
+E_OPENSANDBOX_AAIF_PAGE_DEFINITION	curl	146185	LITERAL	OpenSandbox is an open source, general purpose sandbox platform built for AI applications.
+E_OPENSANDBOX_ISOLATES_EXECUTION	gh-readme	11632	LITERAL	isolated environments to execute code, run commands, manage files, and operate browsers or
+E_OPENSANDBOX_DOCKER_K8S_UNIFIED_API	gh-readme	11632	LITERAL	Start locally with Docker and deploy on Kubernetes through a unified sandbox API.
+E_OPENSANDBOX_REQUIRES_DOCKER_PY310	gh-readme	11632	LITERAL	Docker (required for local execution)
+E_OPENSANDBOX_LICENSE_APACHE_README	gh-readme	11632	LITERAL	Code is licensed under the Apache 2.0 License.
+E_OPENSANDBOX_ORIGIN_ALIBABA_VENDOR_NEUTRAL	curl	93136	LITERAL	While OpenSandbox was created at Alibaba, we don't want its future to be defined by a sing
