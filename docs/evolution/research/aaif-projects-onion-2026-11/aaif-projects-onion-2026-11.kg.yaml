@@ -99,6 +99,8 @@ nodes:
     node_type: question
     plane: DEV
     status: "done"
+    verified_at: "2026-11-04"
+    verified_against: "tabela projeto x peça na SYNTHESIS deste diretório, com a revisão da curadoria curada e o parecer do kg-ssot"
     impact: 5
     confidence: 0.5
     label: "Estudo dos projetos da AAIF (SAC-275): tabela projeto x peça do Onion e do kg-ssot. Fechada em 2026-11-04 por C_TABELA_FINAL_AAIF_2026_11, com o critério pré-registrado abaixo; o que ficou sem medir está em Q_AAIF_NAO_MEDIDO_2026_11."
