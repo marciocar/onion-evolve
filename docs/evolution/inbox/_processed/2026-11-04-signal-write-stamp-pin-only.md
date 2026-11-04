@@ -5,7 +5,7 @@ from: onion-curation (adotante)
 to: core (onion-evolve)
 type: signal
 evidencia: docs/onion/graph/onion-adoption.kg.yaml#E_STAMP_HELPER_PIN_ONLY_LABEL
-reviewed_for_public: false  # o carteiro mediu a visibilidade deste repo: public
+reviewed_for_public: true  # revisado pela sessão do core em 2026-11-04: só pins, caminhos e commits do repo público da curadoria
 ---
 
 # Sinal: o escritor do carimbo deixa o nó do Onion instalado com dados do update anterior
