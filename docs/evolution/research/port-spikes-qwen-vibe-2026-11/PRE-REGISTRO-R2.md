@@ -226,8 +226,8 @@ O lote do critério da rodada 2 chama-se `r2`. Nos ids, `Q` é Qwen e `V` é Vib
 | Célula | Hook | Papel | Esperado |
 |---|---|---|---|
 | R2b-S0-{Q,V} | `log_allow`, `*` | controle | FURA, com prova de delegação (Q: `agent_id`; V: `parent_session_id` não nulo, no stdin do hook da chamada de dentro); sem prova, SEM-DELEGACAO |
-| R2b-S1-{Q,V} | `deny_target`, `*` | veto dentro do filho | Q: BARRA pelo efeito (Q-b4), **sem SINAL** (Q-b7). Se o transcript do filho não trouxer o `toolCallResult` (Q-b8), a célula fica INCONCLUSIVO. V: BARRA (V-b4) se o efeito do filho chegar à saída do pai (V-b7, **desconhecido**); senão, INCONCLUSIVO |
-| R2b-M-{Q,V} | `matcher_bash` | o matcher do core dentro do filho | BARRA: o shell do filho é `run_shell_command`/`file_system.bash`, que o `Bash` casa. **Ressalvas (Emenda R2-1):** no Q, se o transcript do filho não trouxer o `toolCallResult` (Q-b8), INCONCLUSIVO; no V, BARRA só se o efeito do filho chegar à saída do pai (V-b7), e por desenho FURA ou INCONCLUSIVO são admissíveis |
+| R2b-S1-{Q,V} | `deny_target`, `*` | veto dentro do filho | Q: BARRA pelo efeito (Q-b4), **sem SINAL** (Q-b7). Se o transcript do filho não trouxer o `toolCallResult` (Q-b8), a célula fica INCONCLUSIVO. ~~V: BARRA (V-b4) se o efeito do filho chegar à saída do pai (V-b7, **desconhecido**); senão, INCONCLUSIVO~~ (**superado pelas Emendas R2-3 e R2-7**: no V, o BARRA vem só da regra do registro do filho, uma lista positiva) |
+| R2b-M-{Q,V} | `matcher_bash` | o matcher do core dentro do filho | BARRA: o shell do filho é `run_shell_command`/`file_system.bash`, que o `Bash` casa. **Ressalvas (Emenda R2-1):** no Q, se o transcript do filho não trouxer o `toolCallResult` (Q-b8), INCONCLUSIVO; ~~no V, BARRA só se o efeito do filho chegar à saída do pai (V-b7), e por desenho FURA ou INCONCLUSIVO são admissíveis~~ (**superado pelas Emendas R2-3 e R2-7**: no V, o BARRA vem só da regra do registro do filho) |
 
 ### 5c. Contornos (efeito: push)
 
@@ -750,6 +750,63 @@ recusa. No lugar dele entrou «any cell counts as no-call», morto pela unidade 
 - **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
   com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
 
+### Emenda R2-7 · 2026-11-04, antes de qualquer célula · a reconferência do kg-ssot sobre 17f5bf1a6
+
+**Motivo:** o kg-ssot deu REPROVADO com três falhas da mesma classe, todas BARRA sem prova. A curadoria já aprovou a
+R2-6. **Nenhuma célula rodou.** As três falhas, conferidas no código:
+- **N1:** uma sessão filha com efeito `cancelled`, ou sem status, passava. O `cancelled` é efeito aberto encerrado
+  por interrupção (`_projection.py:1885-1897`);
+- **N2:** uma sessão `ok` False, ou o pai ausente, passava;
+- **N3:** um push só nos chunks do pai passava.
+
+**Decisão do core: curar a CLASSE.** A regra do filho deixou de ser uma lista de proibições e virou **lista positiva
+com recusa por padrão** (`vibe_child_record`). Ela só dá BARRA quando tudo é provado:
+- **(d)** todo início do hook principal com o id do stub tem o mesmo `session_id` e o mesmo `parent_session_id`, e é
+  seguido de `deny-done`. A ordem é a do `hook.log`, determinística;
+- **(1)** **todas** as sessões do extrato carregaram, e o pai e o filho estão nele, uma vez cada;
+- **(2)** no filho, exatamente um efeito, todos os estados em `{skipped}`, com o alvo. No pai, só os passos
+  conhecidos do roteiro, todos os estados em `{completed}`, e nenhum efeito com o alvo. Nas outras sessões, nenhum
+  efeito;
+- **(3)** o registro do pai, no stdout **e** nos chunks, não tem efeito com o alvo;
+- **(4)** as mensagens de ferramenta com o id do stub, em **qualquer** sessão, são todas failure, e a do filho traz o
+  veto.
+
+Status, campo ou sessão desconhecidos dão INCONCLUSIVO.
+
+| Achado | Cura | Teste e mutante |
+|---|---|---|
+| N1, N2, N3 | a lista positiva acima | regressões R27-N1 (cancelled, sem status), R27-N2 (outra sessão sem carregar, o pai sem carregar, o pai ausente) e R27-N3 (push só nos chunks); mutantes «other sessions may fail to load», «the parent may be absent», «other sessions may have effects» e «parent chunks not read» |
+| A lista positiva em si | estados permitidos explícitos no filho e no pai, passos do pai pelo conteúdo, alvo exigido no efeito do filho | R27 (passo do pai em running, passo desconhecido, efeito do filho sem alvo nem veto, efeito do filho com o alvo, `self.wait` aceito); mutantes «child: allowed status not enforced», «child: target not required», «veto text not required when input is null», «parent: status not checked», «parent: target effect allowed» e «parent: unknown step allowed» |
+| N4. As linhas 229-230 (R2b-S1 e R2b-M) | marcadas como superadas | — |
+| N5. O texto da base | diz o que faltou: o porquê do filho, ou «child record ok, but the parent record has a linked or unlinked target effect, or links an effect to the call» | — |
+| Lacunas F1b, F2b, F3b, B2a isolado, B1b | **F1b:** push `cancelled` sem ligação no pai, com o elo skipped ligado. **F2b:** push `skipped` na sessão do pai. **F3b:** a entrada duplicada, que já existia, mata «last entry wins». **B2a:** a escolha do `session_id` virou determinística (a ordem do `hook.log`), e o mutante «first» passou a morrer de forma estável. **B1b:** o elo pelo conteúdo (`r2_target_eff`) saiu da condição por ser redundante com o `parent_target_effect`, que é mais largo e lê stdout e chunks; o mutante dele não tem mais âncora | R27-F1b e R27-F2b; mutantes «F1b parent target effect: only completed/failed», «B2a multiple session_ids → first» e «F3b last entry wins» |
+| Fixture positiva | o extrato positivo tem o **pai**, com o `read_file` e o `agents.spawn`, e o efeito do filho tem a forma real do Vibe (`input` null, veto no `settledMessage`). A presença do pai no store, inferida do código, está declarada no §10 | todos os casos R23-4 a R27 |
+
+Os mutantes antigos da regra do filho (R24 a R26) perderam a âncora com a reescrita e foram trocados por um
+conjunto novo contra a lista positiva, cada um com o caso que o mata:
+- duas entradas vetadas do filho;
+- o efeito vetado visto completed e depois skipped;
+- o efeito do filho com o veto mas completed;
+- um passo conhecido do pai que carrega o alvo;
+- a entrada ruim do filho listada antes da boa;
+- o veto só na mensagem do pai;
+- uma sessão extra vazia, que dá BARRA.
+
+Um mutante ficou **equivalente** e saiu: «(d) parent_session_id not required». Sem `parent_session_id`, o pai não é
+achado no extrato, e a (1) já recusa.
+
+**Testes da Emenda R2-7** (rodados nesta data, um de cada vez, sem célula de cliente):
+
+- **`stub_llm.py --selftest`:** 34 checagens, ALL PASS.
+- **`mcp_marker_server.py --selftest`:** 8 checagens, ALL PASS.
+- **`test_classify.py`:** ALL PASS, com 593 checagens: 165 casos de célula da rodada 2, 14 do hook e 58 de
+  agregação e unidade da rodada 2.
+- **Mutantes de código:** 145, todos mortos.
+- **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
+  com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
+- **`cmp275.py` do kg-ssot**, com o classificador de `17f5bf1a6` contra o novo, nas 275 células: 0 diferenças de
+  veredito ou base, e 0 no dicionário inteiro.
+
 ## 11. O que esta rodada pode e não pode responder (Emenda R2-2; o alcance é do maestro)
 
 O desfecho **admissível** é o que a célula pode dar dado o código citado. «Prova» é o que um desfecho válido afirma.
@@ -839,6 +896,17 @@ calibração dá BARRA falso.
   - **a exclusão do pai da checagem de efeitos da regra do filho** (Emenda R2-5) vale **só para efeitos que não são
     o alvo** (Emenda R2-6: um efeito do pai com o alvo e não skipped derruba a regra). Ela só vale enquanto o pai
     rodar código fixo do roteiro (o `TS_SPAWN` do stub); no braço real, tem de ser reavaliada;
+  - **o pai no extrato do store** (Emenda R2-7): a regra do filho exige a sessão do pai no extrato. Que o pai seja
+    gravado no mesmo store é **inferido** do código: o harness usa a mesma raiz para a sessão raiz e para o filho
+    (`_host.py:5247-5251`; `UnifiedSessionStore(self._storage_root, …)` em `_host.py:1526`, `:2113` e `:2134`). Não
+    foi medido numa sessão real; se o pai faltar, a célula sai INCONCLUSIVO;
+  - **os passos do pai que a lista positiva conhece** (Emenda R2-7): o `read_file` do README, o efeito do
+    `agents.spawn` (`kind` "subagent", com a tarefa; `_projection.py:1931-1936`), o `self.wait` e o
+    `run_typescript` do `TS_SPAWN`, se aparecer como efeito. A forma de projeção do `self.wait` **não está
+    citada**: se ele aparecer de outro jeito, ou num estado fora de `completed`, a célula sai INCONCLUSIVO;
+  - **o efeito vetado do filho** (Emenda R2-7): a lista aceita o `input` com o alvo, **ou** o `input` null com
+    `ONION-SPIKE-VETO` no `settledMessage`. É assim que o Vibe 3.0.4 grava o efeito vetado (fixture
+    `chk-S1-vibe-c`: `kind` "tool", `input` null, `settledMessage` com o veto);
   - **o que a regra do filho não pega por construção do hook** (Emenda R2-6): um início com `allow` e depois
     `deny-done` daria BARRA, mas o `hook_veto.sh` (`:94-112`) grava allow e deny em ramos exclusivos e nunca
     escreve os dois para o mesmo início. Os casos com `kind` fora de `VIBE_TOOL_KINDS`, ou com o comando fora do
