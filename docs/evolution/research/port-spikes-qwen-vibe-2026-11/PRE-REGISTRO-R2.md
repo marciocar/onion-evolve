@@ -1537,6 +1537,9 @@ acima são os de antes do rebase**, e não ficam no histórico remoto. Eu não o
 - **O conteúdo não mudou.** O único conflito foi no `.kg.yaml`: os dois nós de decisão que vieram da main e os desta
   rodada, unidos sem perda. `classify.py`, `aggregate.py`, `test_classify.py` e os arquivos de evidência saíram idênticos
   aos de `7a77f07b5`.
+- **O grafo:** com os dois nós da main ele chegou a 21 nós, e a REGRA 58 (O backlog cumpre as promessas do próprio `meta:`)
+  cobra o teto de 20. Não subi o teto: uni dois nós desta rodada em `E_PORT_SPIKE_R2_MCP_E_CONTORNOS_1104`, sem perder
+  afirmação. O commit que diz «21 nós» é anterior a essa união.
 - **A prova de que o commit pré-dado veio antes dos dados** passa a ser esta: o pré-dado foi commitado às 18:29:23Z (o
   reflog e a data de autor), e a 1ª célula de veto começou às 18:55:46Z (`meta.json`). A data de *committer* mudou com o
   rebase. As 7 células gravam em `sha256.txt` os hashes de `classify.py` e `test_classify.py`, os do commit pré-dado.
