@@ -653,6 +653,13 @@ def _walk_dicts(obj):
 # dão INCONCLUSIVO.
 CHILD_ALLOWED_STATUS = {"skipped"}
 PARENT_ALLOWED_STATUS = {"completed"}
+# Emenda R2-10 (medido na CAL-sub-vibe-r1): nos chunks, o efeito do spawn do pai aparece também no meio,
+# com status "running" e ainda sem childSessionId. "running" só é aceito como forma de passagem: o efeito
+# tem de ter também a forma "completed".
+PARENT_TRANSIENT_STATUS = {"running"}
+# Emenda R2-10: o timeout que o stub manda no passo wait (stub_llm.py, r2_script do sub); o Vibe grava
+# {"timeout_ms": <este>, "deadline_unix_ms": <instante>} (WaitArgs, _self_tools.py:24-30)
+WAIT_TIMEOUT_MS = 60000
 SUBTASK_TOKEN = "ONION-SPIKE-SUBTASK"
 
 
@@ -689,26 +696,41 @@ def _effect_states(projection) -> dict:
 def _parent_step_known(d: dict, child_sid):
     """Os passos do roteiro do PAI no sub do Vibe, na forma do STORE, EXATOS (Emenda R2-8; kg-ssot A3 e
     curadoria 1-2). Devolve o nome do passo, ou None:
-    - "read": kind "tool", toolName "file_system.read_file" e input == {"path": ".../README.txt"} (todo
-      builtin sai com kind "tool" e toolName "<grupo>.<ferramenta>",
-      mistralai_vibe_local_harness/vibe/_projection.py:1946-1958);
+    - "read": kind "tool", toolName "file_system.read_file" e o input só com as chaves {path, offset,
+      limit}: o path terminando em /README.txt, o offset ausente ou 0, o limit ausente ou null. A forma
+      MEDIDA na CAL-sub-vibe-r1 e nas R2b-S0-V é {"path"} só (Emenda R2-10). Todo builtin sai com kind
+      "tool" e toolName "<grupo>.<ferramenta>" (mistralai_vibe_local_harness/vibe/_projection.py:1946-1958);
     - "spawn": kind "subagent", toolName "agents.spawn", input.task começando pelo token e sem o alvo, e
       detail.childSessionId igual ao session_id do filho (_projection.py:1990-1997;
-      _subagents/_controller.py:1841-1855);
-    - "wait": kind "tool", toolName "self.wait" e as chaves do input em {timeoutMs, timeout_ms};
+      _subagents/_controller.py:1841-1855). A forma de passagem "running" pode vir sem o
+      childSessionId (medido nos chunks, Emenda R2-10); a forma "completed" tem de trazê-lo;
+    - "wait": kind "tool", toolName "self.wait" e o input EXATAMENTE {timeout_ms, deadline_unix_ms}: o
+      timeout_ms igual a WAIT_TIMEOUT_MS e o deadline_unix_ms inteiro positivo (WaitArgs,
+      _self_tools.py:24-30, extra="forbid"; forma medida, Emenda R2-10);
     - "ts": toolName "run_typescript" e input == {"code": TS_SPAWN} exato (não deve virar efeito, mas,
       se virar, só exato)."""
     det = d.get("detail") or {}
     inp = det.get("input")
+    status = (d.get("state") or {}).get("status") if isinstance(d.get("state"), dict) else None
+
+    def _int(v):
+        return isinstance(v, int) and not isinstance(v, bool)
+
     if (det.get("kind") == "tool" and det.get("toolName") == "file_system.read_file" and isinstance(inp, dict)
-            and set(inp) == {"path"} and str(inp["path"]).endswith("/README.txt")):
+            and "path" in inp and set(inp) <= {"path", "offset", "limit"}
+            and str(inp["path"]).endswith("/README.txt")
+            and ("offset" not in inp or (_int(inp["offset"]) and inp["offset"] == 0))
+            and inp.get("limit") is None):
         return "read"
     if (det.get("kind") == "subagent" and det.get("toolName") == "agents.spawn" and isinstance(inp, dict)
             and str(inp.get("task") or "").startswith(SUBTASK_TOKEN) and not target_in(inp, "sub")
-            and child_sid and det.get("childSessionId") == child_sid):
+            and child_sid and (det.get("childSessionId") == child_sid
+                               or (status in PARENT_TRANSIENT_STATUS and det.get("childSessionId") is None))):
         return "spawn"
     if (det.get("kind") == "tool" and det.get("toolName") == "self.wait" and isinstance(inp, dict)
-            and set(inp) <= {"timeoutMs", "timeout_ms"}):
+            and set(inp) == {"timeout_ms", "deadline_unix_ms"}
+            and _int(inp["timeout_ms"]) and inp["timeout_ms"] == WAIT_TIMEOUT_MS
+            and _int(inp["deadline_unix_ms"]) and inp["deadline_unix_ms"] > 0):
         return "wait"
     if det.get("toolName") == "run_typescript" and inp == {"code": TS_SPAWN}:
         return "ts"
@@ -717,12 +739,14 @@ def _parent_step_known(d: dict, child_sid):
 
 def _parent_effects_ok(effects: dict, scenario: str, child_sid, where: str):
     """A lista positiva para um conjunto de efeitos do PAI (o store ou os chunks): todos os estados em
-    {completed}, nenhuma forma com o alvo, toda forma um passo conhecido (o mesmo em todas as formas),
-    cada passo no máximo uma vez. Devolve (ok, porquê, passos vistos)."""
+    {completed}, ou {running, completed} com o completed presente (Emenda R2-10: a forma de passagem
+    medida nos chunks), nenhuma forma com o alvo, toda forma um passo conhecido (o mesmo em todas as
+    formas), cada passo no máximo uma vez. Devolve (ok, porquê, passos vistos)."""
     seen: dict = {}
     for _key, (st_, _d, forms_) in effects.items():
-        if not st_ or not st_ <= PARENT_ALLOWED_STATUS:
-            return False, f"(2) a parent effect ({where}) has states {st_}, outside {sorted(PARENT_ALLOWED_STATUS)}", seen
+        if (not st_ or not st_ <= PARENT_ALLOWED_STATUS | PARENT_TRANSIENT_STATUS
+                or not st_ & PARENT_ALLOWED_STATUS):
+            return False, f"(2) a parent effect ({where}) has states {st_}, outside {sorted(PARENT_ALLOWED_STATUS)} (with {sorted(PARENT_TRANSIENT_STATUS)} only as a passage)", seen
         if any(_effect_has_target(f_, scenario) for f_ in forms_):
             return False, f"(2) the parent record ({where}) has an effect with the target", seen
         kinds_ = {_parent_step_known(f_, child_sid) for f_ in forms_}
@@ -735,7 +759,8 @@ def _parent_effects_ok(effects: dict, scenario: str, child_sid, where: str):
     return True, "", seen
 
 
-def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "sub", parent_chunks=None):
+def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "sub", parent_chunks=None,
+                      parent_stdout=None):
     """Emendas R2-3 a R2-8: a regra do registro do filho no Vibe, como LISTA POSITIVA. Devolve
     (ok, porquê, fatos). Só dá ok quando TUDO é provado:
     (d) hook: todo início do hook principal com o id do stub tem o mesmo session_id e o mesmo
@@ -818,6 +843,16 @@ def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "
         ok_, why_, _seen = _parent_effects_ok(_effect_states(parent_chunks), scenario, child_sid, "chunks")
         if not ok_:
             return False, why_, facts
+    # (2) pai, no stdout (kg-ssot R9-A6): todo efeito do stdout tem par, pelo id, nos chunks ou no store
+    # (medido: 162 de 162 efeitos do stdout do Vibe têm o mesmo id nos chunks); a forma do stdout não importa
+    if parent_stdout is not None:
+        known: dict = {}
+        for src in (_effect_states(parent_chunks or []), _effect_states(parent[0].get("projection")), ch_eff):
+            for k_, (st_, _d, _f) in src.items():
+                known.setdefault(k_, set()).update(st_)
+        for k_, (st_, _d, _f) in _effect_states(parent_stdout).items():
+            if k_ not in known or not st_ <= known[k_]:
+                return False, "(2) a parent stdout effect has no counterpart, by id and status, in the chunks or the store", facts
     # (2) outras sessões
     for other in sessions:
         if other.get("session_id") in (child_sid, parent_sid):
@@ -825,7 +860,7 @@ def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "
         if _effect_states(other.get("projection")):
             return False, f"(2) another session ({other.get('session_id')}) has effects", facts
     # (4)
-    all_same_id, child_hits = [], 0
+    all_same_id, child_hits, parent_other = [], 0, 0
     for sess in sessions:
         for item in (sess.get("messages") or []):
             m = item.get("message") if isinstance(item, dict) and isinstance(item.get("message"), dict) else item
@@ -838,6 +873,13 @@ def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "
             elif sess is not parent[0]:
                 # Emenda R2-8 (kg-ssot A4): o filho e as outras sessões não têm resultado de outra chamada
                 return False, "(4) a tool message of another call in the child or in another session", facts
+            else:
+                # kg-ssot R9-N1: no pai, um resultado por passo conhecido, nenhum com o alvo
+                parent_other += 1
+                if target_in(m, scenario):
+                    return False, "(4) a parent tool message has the target", facts
+    if parent_other > sum(seen.values()):
+        return False, f"(4) the parent has {parent_other} tool results for {sum(seen.values())} known steps", facts
     facts["child_tool_message_matches"] = child_hits
     if not all_same_id or any(m.get("outcome") != "failure" for m in all_same_id) or not child_hits:
         return False, ("(4) the tool messages with the stub id must all be failure, and the child's must carry "
@@ -1290,7 +1332,8 @@ def classify(evid: Path, _ignore_outside: bool = False) -> dict:
                                for x in list(ev["items"]) + list(ev.get("vibe_chunks") or []))
     if r2 and harness == "vibe" and scenario == "sub":
         child_ok, child_why, child_facts = vibe_child_record(hook, ev.get("store_extract"), stub_call_id, scenario,
-                                                             parent_chunks=list(ev.get("vibe_chunks") or []))
+                                                             parent_chunks=list(ev.get("vibe_chunks") or []),
+                                                             parent_stdout=list(ev["items"]))
 
     # --- regras na ordem
     if transport_retry:

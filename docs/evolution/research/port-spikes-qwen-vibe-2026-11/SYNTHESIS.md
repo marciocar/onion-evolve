@@ -78,7 +78,8 @@ com o dado.
 ## Rodada 2 — resultados (RASCUNHO de 2026-11-04, à espera das revisões)
 
 > Rascunho. O lote `r2` está fechado no braço stub, mas a rodada segue aberta: as células de veto do subagente no
-> Vibe (R2b-S1-V e R2b-M-V) esperam a Emenda R2-10 e a aprovação das duas revisões. Nada aqui foi revisado ainda.
+> Vibe (R2b-S1-V e R2b-M-V) esperam a aprovação das duas revisões. A Emenda R2-10 já pôs a regra delas na forma
+> medida (célula de calibração, lote `r2cal`). Nada aqui foi revisado ainda.
 
 **Como:**
 - `PRE-REGISTRO-R2.md`, com as Emendas R2-1 a R2-8 antes de qualquer célula. A Emenda R2-9 curou duas formas
