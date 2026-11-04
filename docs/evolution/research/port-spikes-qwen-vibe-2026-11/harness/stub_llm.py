@@ -296,6 +296,20 @@ def _assistant_calls(messages: list) -> list[str]:
     return out
 
 
+def _session_already_final(messages: list) -> bool:
+    """True se alguma mensagem do assistant, sem tool_calls, traz exatamente o texto final do stub
+    ("DONE"). Só o próprio stub escreve isso; o pedido que o carrega é posterior ao fim do roteiro."""
+    for m in messages or []:
+        if not isinstance(m, dict) or m.get("role") != "assistant" or m.get("tool_calls"):
+            continue
+        c = m.get("content")
+        if isinstance(c, list):
+            c = "".join(str((x or {}).get("text", "")) for x in c if isinstance(x, dict))
+        if isinstance(c, str) and c.strip() == "DONE":
+            return True
+    return False
+
+
 def _user_text(messages: list) -> str:
     parts = []
     for m in messages or []:
@@ -312,13 +326,22 @@ def _all_text(messages: list) -> str:
 
 def _declared_schema(messages: list, name: str) -> dict | None:
     """O esquema de `name` devolvido pelo tool_search, lido do resultado de ferramenta: o
-    primeiro objeto JSON com "name" == name e "parameters" dentro de uma mensagem role=tool."""
+    primeiro objeto JSON com "name" == name e o esquema dentro de uma mensagem role=tool.
+
+    Emenda R2-9, 2º achado (forma MEDIDA no lote r2, R2b-S0-Q-r1): o Qwen 0.26.6 devolve o
+    conteúdo como LISTA de partes {"type": "text", "text": "<functions><function>{...}"} e o
+    esquema na chave "parametersJsonSchema", não em "parameters". As duas coisas eram forma
+    adivinhada. Lê-se o texto das partes, aceita-se "parametersJsonSchema" ou "parameters" e
+    devolve-se o objeto com o esquema em "parameters"."""
     dec = json.JSONDecoder()
     for m in messages or []:
         if not (isinstance(m, dict) and m.get("role") == "tool"):
             continue
         c = m.get("content")
-        text = c if isinstance(c, str) else json.dumps(c, ensure_ascii=False)
+        if isinstance(c, list):
+            text = "\n".join(str(p.get("text", "")) for p in c if isinstance(p, dict))
+        else:
+            text = c if isinstance(c, str) else json.dumps(c, ensure_ascii=False)
         i = text.find("{")
         while i != -1:
             try:
@@ -326,8 +349,10 @@ def _declared_schema(messages: list, name: str) -> dict | None:
             except json.JSONDecodeError:
                 i = text.find("{", i + 1)
                 continue
-            if isinstance(obj, dict) and obj.get("name") == name and isinstance(obj.get("parameters"), dict):
-                return obj
+            if isinstance(obj, dict) and obj.get("name") == name:
+                schema = obj.get("parametersJsonSchema", obj.get("parameters"))
+                if isinstance(schema, dict):
+                    return {**obj, "parameters": schema}
             i = text.find("{", end)
     return None
 
@@ -500,6 +525,11 @@ def decide_r2(state: StubState, body: dict) -> dict:
     if not tools:
         return {"kind": "aux", "text": "OK", "why": "no tools in request (auxiliary call)"}
     offered = [_tool_fn(t).get("name") for t in tools if isinstance(t, dict)]
+    # Emenda R2-9: pedido DEPOIS do fim da sessão (o histórico já traz o "DONE" final deste stub numa
+    # mensagem do assistant sem tool_calls). Medido no lote r2: o Qwen manda, ao fim, o pedido da
+    # memória gerenciada, com ferramentas próprias (read_file, write_file...). Não é passo do roteiro.
+    if _session_already_final(messages):
+        return {"kind": "aux", "text": "OK", "why": "request after the session's final DONE (post-session auxiliary call)"}
     steps, role, bad = r2_script(state, body)
     done = len(_assistant_calls(messages))
     if steps is not None and done >= len(steps):
@@ -605,11 +635,34 @@ def selftest() -> int:
             ("tcd qwen step1", "tcd", QWEN, [U], "tool_call", "tool_search", False),
             ("tcd qwen step2", "tcd", QWEN, [U, asst("tool_search"), tool(json.dumps(MONITOR_DECL))], "tool_call", "tool_call", True),
             ("aux without tools", "sub", [], [U], "aux", None, None),
+            # Emenda R2-9: o pedido da memória gerenciada do Qwen, depois do DONE
+            ("post-session memory request -> aux", "mcp", QWEN_R[:2] + [QWEN_R[-1]],
+             [U, asst("tool_search"), tool("."), asst("tool_call"), tool("veto"),
+              {"role": "assistant", "content": "DONE"}, {"role": "user", "content": "Managed memory has TWO directories."}],
+             "aux", None, None),
+            ("post-session, DONE as a content list -> aux", "pc", QWEN_R,
+             [U, asst("read_file"), tool("base"), {"role": "assistant", "content": [{"type": "text", "text": "DONE"}]},
+              {"role": "user", "content": "memory"}], "aux", None, None),
+            # Emenda R2-9, 2º achado: a forma MEDIDA do resultado do tool_search no Qwen (lista de partes,
+            # "parametersJsonSchema"), para o agent e para o monitor
+            ("sub qwen step2 from the measured tool_search shape", "sub", QWEN,
+             [U, asst("tool_search"), tool([{"type": "text", "text": "<functions>\n<function>" + json.dumps(
+                 {"name": "agent", "description": "x", "parametersJsonSchema": AGENT_DECL["parameters"]})
+                 + "</function>\n</functions>"}])], "tool_call", "tool_call", False),
+            ("tcd qwen step2 from the measured tool_search shape", "tcd", QWEN,
+             [U, asst("tool_search"), tool([{"type": "text", "text": "<functions>\n<function>" + json.dumps(
+                 {"name": "monitor", "parametersJsonSchema": MONITOR_DECL["parameters"]})
+                 + "</function>\n</functions>"}])], "tool_call", "tool_call", True),
+            ("assistant text other than DONE does not end the session", "pc", QWEN_R,
+             [U, {"role": "assistant", "content": "thinking"}, asst("read_file"), tool("base")],
+             "tool_call", "run_shell_command", True),
         ]
         for name, sc, tools, msgs, kind, tname, target in cases:
             d = decide(st(sc), {"tools": tools, "messages": msgs})
             ok = d["kind"] == kind and (tname is None or d.get("tool_name") == tname) and (target is None or d.get("target") is target)
-            if ok and name == "sub qwen step2 from declared schema":
+            if ok and name == "tcd qwen step2 from the measured tool_search shape":
+                ok = d["arguments"] == {"name": "monitor", "arguments": {"command": PUSH, "description": "onion spike"}}
+            if ok and name in ("sub qwen step2 from declared schema", "sub qwen step2 from the measured tool_search shape"):
                 a = d["arguments"]
                 ok = a.get("name") == "agent" and a["arguments"].get("prompt") == SUBTASK_TEXT
             if ok and name == "tc qwen":
