@@ -9,7 +9,8 @@ meta:
   note: "TETO, declarado: este grafo guarda o COMPROMISSO e a ORDEM, não o fato. A pendência que já tem nó em outro grafo do core NÃO ganha nó aqui; entra por external_edges (Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027 é a onda 1 do design, por exemplo). Nó de outro repositório entra pela proveniência com a URL fixada no sha, conferida por peer-ref-check, porque o gate só confere external_edges contra os grafos deste repo. O estado dos PRs é o da medição de 2026-10-27, e o grafo não se atualiza sozinho: quem fecha uma pendência fecha o nó aqui, com carimbo, e o backlog a tira na regeneração seguinte. O core não escreve nome de cliente nem conteúdo de repo privado: o brain e os adotantes aparecem pelo nome."
   # kg-backlog-guard: on
   # ↑ opt-in da REGRA 58 (O backlog cumpre as promessas do próprio meta:): teto e carimbo do done cobrados pelo lint.
-  # Colheita de 2026-11-04: saíram Q_COORD_CORE_ESPERANTO_VEREDITOS, D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103 e D_COORD_FILA_DA_NOITE_DOS_PEERS_1103 (done, sem referência em outro grafo); o selo vive no git (PRs #1459 e #1463).
+  # D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103 saiu na colheita de 2026-11-04 e VOLTOU no mesmo dia: dois nós da curadoria o citam; a checagem só olhou este repo.
+  # Colheita de 2026-11-04: saíram Q_COORD_CORE_ESPERANTO_VEREDITOS e D_COORD_FILA_DA_NOITE_DOS_PEERS_1103 (done, sem referência em outro grafo); o selo vive no git (PRs #1459 e #1463).
   # Colheita de 2026-11-02: os nós done das rodadas do /meta:decide de 2026-11-02 saíram; o selo vive em @4f5513fd4 e no git.
   # Colheita de 2026-10-31: os 10 nós done e o 1 refuted saíram no mesmo commit que abriu as pendências novas; a história fica no git (blame deste arquivo) e nos resíduos de revisão, como no fios-abertos.
   # ═══ TETO: 40 NÓS. Pendência nova entra quando uma fechada sai. ═══
@@ -297,12 +298,12 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-11-04"
+    verified_against: "D_MA_PROPOSTA_DE_MERCADO_ACEITA_CONDICIONADA_1104 (selo do maestro) e Q_MA_FREE_ORG_READ_ENFORCED done, em company-brain-multiaudiencia-2026-10"
     owner: core
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-28"
-    verified_against: "o nó D_COMPANY_BRAIN_MARKET_PROPOSAL no grafo do estudo da curadoria, já citado com URL fixada pelo grafo do Company Brain do core"
     label: "A decisão D_COMPANY_BRAIN_MARKET_PROPOSAL, da curadoria, depois do card da organização."
     narrative: "A proposta de mercado do Company Brain feita pela curadoria pede a decisão do lado do core, e a medida da permissão por repo na organização gratuita muda o que a proposta pode prometer. Gatilho: o card Q_MA_FREE_ORG_READ_ENFORCED feito."
   - id: Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE
@@ -329,7 +330,7 @@ nodes:
     verified_at: "2026-10-29"
     evidence_class: testimony
     verified_against: "medida da bancada da kg-ssot 4.39.0 sobre os 3 buracos de E_OBJECAO_CB_KG_SPLIT, relatada ao core em 2026-10-29 e não re-executada por ele; o kg-ssot registrou o mesmo em Q_KG_CROSS_REPO_TYPED_EDGE_1029, no grafo do repo dele"
-    label: "A aresta tipada entre repos (ponta por URL e grafo de submodule): parada no gatilho Q_MA_WRITE_SURFACE (company-brain-multiaudiencia-2026-10, open)."
+    label: "A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um repo por responsabilidade; o kg-ssot abriu a pesquisa do padrão de mercado."
     narrative: "Medida da bancada 4.39.0. Buraco 3 (o pin): coberto pela citação com URL fixada no commit. Buraco 1 (aresta tipada com uma ponta por URL): pede CONTRATO, porque essa aresta reprova no MUST (form.pattern.edge.from e integrity.dangling-from) e o external_edges só aceita caminho do mesmo repo. Buraco 2 (o grafo de submodule): pede FERRAMENTA, porque o --root não lê o grafo de um submodule. E_OBJECAO_CB_KG_SPLIT é nó da curadoria. A peça liga ao Q_MA_CROSS_REPO do grafo do Company Brain. Gatilho: Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo. O kg-ssot registrou o mesmo em Q_KG_CROSS_REPO_TYPED_EDGE_1029 (citado em texto, sem aresta externa: o grafo mora em outro repo). Segue open."
   - id: Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION
     node_type: question
@@ -569,6 +570,23 @@ nodes:
       locator: "pergunta com opções de 2026-11-04: «Fecho a proposta do vigia de eventos como coberta?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
       locality: "pessoa"
+  - id: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Aceitar a proposta»"
+    label: "O maestro aceita a dissecação da curadoria sobre SQLite dentro de um Claude Project como base estruturada do time: a prática como fonte dos dados do time é rejeitada, e um exportador SQLite somente leitura do grafo fica parqueado com gatilho"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Aceitar a proposta»; descartadas: «Absorver o exportador já» · «Ler o estudo antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «SQLite num Claude Project (dissecação da curadoria): qual veredito?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
+
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -683,4 +701,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_COORD_VIGIA_REPESQUISAR_COMO_VENDOR_1104
     to: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
+    edge_type: TRACES_TO
+  - from: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO

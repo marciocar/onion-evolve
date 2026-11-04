@@ -105,3 +105,45 @@ Cada repo executa e faz merge só do que é dele. Mensagem de peer é informaç�
     do pr-finalize: rastro do pré-registro e teto do grafo, re-revisão por código que mudou, sigla sem glosa e
     etiqueta longa. Cada uma é uma guarda que funcionou. O custo vem de as guardas rodarem em série, e roteiro de
     fechamento que antecipe as quatro é candidato a peça do mecanismo.
+
+# Janela de 2026-11-04 (fim da manhã à noite, UTC) — com o maestro presente
+
+Segunda janela do mesmo diário, com outro tipo de trabalho: medida de segurança e estudo, em vez de spike. O maestro
+respondeu em rodadas do `/meta:decide`, e o core comandou. O registro é para aprender: inclui o que deu errado.
+
+## Decisões
+
+- **Orquestração permanente** (`D_COORD_ORQUESTRACAO_PERMANENTE_1104`), com cada sessão levando o que é dela ao maestro.
+- **Redação do `exit 2`:** «C com o gatilho da D» (`D_EXIT2_COUPLING_WORDING_2026_11`): a exclusividade sai, e o veto é conformidade, não fronteira.
+- **Configuração gerenciada:** medir antes, depois o maestro aplica; escolheu `allowManagedModsOnly` (card SAC-278).
+- **Guarda de plugin:** veto estreito mais varredura no disco, declarada como contenção, não fronteira.
+- **Régua do vigia mantida** (`D_EWV_RULER_KEPT_1104`, na curadoria): o HMAC duplo não vale por leitura posterior ao dado.
+- **Instalação:** autorização total ao que for melhor para os projetos, e a mudança de segurança do host segue explícita (leitura do core).
+
+## Desfechos
+
+- #1461 mergeado, depois de três rodadas de CI para nomear a causa do disco cheio; também #1472, #1473, #1474 e #1475.
+- O veto no subagente do Vibe barrou nas duas famílias, com agente simulado; o pai vê conclusão indistinguível do sucesso.
+- Com hooks reais e login Max, um mod venceu o veto do `.env` em 6 de 6; sem mod, o veto barrou 6 de 6.
+
+## Estratégias novas
+
+23. **O limite de carga combinado funciona sem o core no meio.** Com 15 acordado, o agente da curadoria parou sozinho a 15,29 no 1 min e passou a retomar por lote só abaixo de 12. Antes disso, a soma das sessões chegou a 23 e o construtor parou o gate dele; a regra só veio depois desse susto. Medido: a parada é do agente, sem mensagem de ninguém.
+24. **Um gate completo por vez, numa fila de PR.** PR de registro espera o de execução, porque cada merge deixa o outro em conflito e PR em conflito não roda CI. Dependência de ordem aparece no texto: o `trace` da pergunta da AAIF procurava uma frase que o PR seguinte retirava, então quem entra por último fecha a pergunta.
+25. **A peer revisa a redação, não só os dados.** A curadoria reprovou duas frases do `CLAUDE.md` que passavam do medido, com células na mão. O texto nasceu de um run de 9,3 M de tokens e de duas medidas, e ainda assim errou na condição.
+26. **Dono diferente para cada ponto de vista, com foco nomeado.** No veto do Vibe, a curadoria leu semântica e o kg-ssot recalculou os vereditos sem usar o gravado, com ataques escritos no pedido. Pegaram coisas diferentes: a conclusão falsa sobre o pai foi da curadoria, os mutantes vivos foram do kg-ssot.
+27. **Revisão pede o dono do produto.** O estudo da AAIF foi escopado também ao kg-ssot, e ele não entrou no desenho; quem pegou foi a pergunta do maestro. Depois do parecer, o MCP passou de achismo a medida. O desenho com a curadoria desde o início rendeu as 7 perguntas por projeto e o critério.
+
+## O que deu errado (para aprender)
+
+- **Afirmação relayada falsa, repetida ao maestro:** «o pai não recebe sinal» saiu do construtor e eu repeti. A revisão corrigiu. Relatar antes da revisão precisa dizer que é declarado.
+- **Colheita apagou selo citado em outro repo** por checar só este repo; quem achou foi o kg-ssot, medindo a aresta entre repos (memória `harvest-check-peer-citations`).
+- **Amostrador de CI morreu na 1ª amostra** por herdar `set -e` e `pipefail` do passo, e custou 1 rodada de 25 min. Teto de passo que coloquei na sonda (22 min) reprovou uma faixa saudável.
+- **Commit com a mensagem errada:** um script Python falhou e o `git commit` seguinte pegou só o que já estava no índice. Foi emendado antes do push. Encadear commit depois de script precisa checar o script.
+- **`pkill` por padrão em usuário compartilhado,** por agente de revisão da curadoria; efeito não verificado (tarefa SAC-279).
+- **Sessão duplicada aberta há 13 h:** alarme meu de escrita concorrente, mas estava parada (`T`). Só `kill -9` a encerrou. Medir o estado antes de alarmar.
+- **Canal morto sem aviso:** `onion-curation-a8` seguia listada como ociosa e o envio falhou; a sessão ativa da curadoria era outra (`-44`). A troca não avisou o core.
+
+## Para o gatilho do mecanismo
+
+Conta como a 2ª janela das três que `Q_SO_GATILHO_DE_CONSTRUCAO` pede, com outro tipo de trabalho. Falta conferir, regra a regra, as 5 de 7 `C_SO_*`; `Q_SO_PADROES_DE_MERCADO` segue aberta. Candidatos novos ao mecanismo: reserva de carga como regra da fila, e aviso quando a sessão de uma peer troca.
