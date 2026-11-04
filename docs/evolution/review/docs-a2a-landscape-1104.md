@@ -29,6 +29,13 @@ Foram 30 claims verificadas: 26 confirmadas e 4 refutadas. Cada refutação veio
 3. a lacuna do Onion é de consulta (`GetTask`), e não de `input_required`;
 4. o suporte do AISIX à 0.3 e à 1.0 é só autodeclarado pelo fornecedor.
 
+Os confirmados de maior impacto que a SYNTHESIS projeta foram conferidos contra o retorno do run:
+- `E_SPEC_101_DEFINES_GETTASK`: GetTask é RPC da spec;
+- `E_SPEC_101_SECURITY_SCHEMES_OAUTH_FLOWS`: os esquemas de segurança do Agent Card;
+- `E_RELEASE_V1_0_0_2026_03_12`: a 1.0 estável;
+- `E_LLMS_REF_THREE_BINDINGS_AND_TASK_RPCS`: os três bindings;
+- `E_AAIF_HOSTS_A2A_2026_08_17`: o projeto passa para a AAIF.
+
 A SYNTHESIS declara 50 claims e 31 fontes cortadas pelo orçamento, e o eixo de cookbooks e SDKs sem achado.
 
 ## Mutantes
