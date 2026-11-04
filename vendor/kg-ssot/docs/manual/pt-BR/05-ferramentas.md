@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:7e2b44f4b1ba585e -->
+<!-- translation-of: docs/manual/05-tools.md sha256:c0f0a08d8e561a77 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -758,6 +758,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem maiúscula nem acento (`verificacao` casa `Verificação`, desde a 4.23); `--in-narrative` procura também na narrative. Quando o texto inteiro é um termo do vocabulário (o `pref` ou um sinônimo de domínio atual, dobrados, ou a `notation`, exata), casam também o termo e todo nó que tenha qualquer forma dele como palavra inteira, e o `expanded` diz qual termo; o sinônimo de caso ou aposentado não expande. Nenhum nó dá um `hint`, que diz quando o zero vem dos outros filtros, para o zero não passar por "não há" |
 | `--semantic PERGUNTA` | Desde a 4.26, com o extra `vector`: ordena os nós que passam nos outros filtros pela semelhança com a pergunta (`--model`, `--model-dir`; ver o `kg_vector.py` abaixo). Sozinho, a ordem é a do vetor; com `--text`, a lista do texto (na ordem do corpus) e a do vetor se fundem por RRF (k=60), com o empate pela posição no vetor. Dê o termo curto ao `--text` e a pergunta inteira ao `--semantic`: é o que a bancada mediu (14 de 20 acertos, contra 12 do vetor e 9 do texto). Os filtros valem para os dois, as duas listas são completas, e o `--limit` só pagina a lista fundida; por isso, no híbrido, o `total` conta todos os candidatos, e o `semantic.text_matches` diz quantos casam o `--text`. O JSON ganha `semantic` (modo, modelo com revisão e sha256, e de onde veio cada vetor: o índice, embutido na hora, a memória do processo, ou sem texto) e um `rank` por nó; sem `--semantic` a saída não muda |
 | `--open` | A fila dos abertos (status `open`) |
+| `--group-by CAMPO` | Desde a 4.41.0: conta os nós por campo em vez de listá-los (`kg-ssot.groups/1`). Veja "Quantos, por campo" abaixo |
 | `--where CHAVE=VALOR` | Desde a 4.39.0: só os nós em que `owner` ou um campo `x_*` (com ponto para chave aninhada) tem o valor; repetível, e todas têm de valer. Veja "A fila de um dono" abaixo |
 | `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
 | `--around ID` | A vizinhança: `<caminho>#<id>`, ou um id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
@@ -935,6 +936,34 @@ o `next_cursor`. Nó sem `owner` não está na fila de ninguém; conte-o à part
 ```bash
 kg-query --root . --open --fields owner --format json --limit 1000
 ```
+
+### Quantos, por campo: `--group-by` (4.41.0)
+
+O `--group-by CAMPO` conta os nós que a consulta acha, pelo valor do campo, em vez de listá-los. O campo é `file` (o
+caminho do grafo), `node_type`, `status`, `plane`, `layer`, `owner`, um campo `x_*` (com ponto para chave aninhada, como
+no `--where`) ou `meta.<chave>`, um campo do `meta` do grafo do nó (`meta.id`, `meta.x_study_destination`). Repita para
+agrupar pela combinação, até 5 campos. O campo que falta vale `null` e forma o próprio grupo; a data sai em ISO, e a
+lista ou o mapa sai como o texto JSON dele, de modo que cada nó cai num grupo só e as contagens somam o `total`. Todos
+os grupos saem, sem página, da contagem maior para a menor. Os filtros valem antes. A saída JSON é o
+`kg-ssot.groups/1` (`spec/groups.schema.json`), e o `kg-ssot.query/1` não muda. Não combina com `--semantic` nem com
+`--cursor`, nem com `--decision`, `--chain` ou `--revisit` (rc 2). A ferramenta `kg_query` do MCP aceita os mesmos
+campos em `group_by`, onde `file` é o nome do grafo no armazém; os grupos não têm página, então a resposta maior que
+o teto de tamanho do servidor é recusada, com o pedido de estreitar os filtros. `true` e `1` são grupos separados, como no
+`--where`. Alguns valores caem num grupo só com o texto que os escreve: `1` e `1.0` são um grupo; uma data e a mesma
+data escrita como texto são um; uma lista ou um mapa e o texto do JSON dele são um; e `.nan` ou `.inf` e o texto `nan`
+ou `inf` são um. Na saída humana, o valor que não é texto sai em JSON (`true`, `1`, `null`), e o texto que é JSON
+válido, vazio, com espaço nas pontas, com dois espaços seguidos ou com caractere de controle sai entre aspas, de modo
+que dois grupos diferentes nunca saem iguais.
+
+```bash
+kg-query --root . --type decision --open --group-by file                  # decisões abertas por grafo
+kg-query --root . --group-by node_type --group-by status                  # a forma do corpus
+kg-query --root . --type evidence --status confirmed --group-by meta.id --format json
+```
+
+Contar é pergunta para o leitor do contrato, não para código sobre o YAML: o leitor pula o vendor e as fixtures, põe em
+`unreadable` o grafo que não parseia em vez de adivinhá-lo e aplica os mesmos filtros de toda consulta. Quantas arestas
+chegam a um nó (o grau de entrada) ainda não está coberto.
 
 ## `kg_diff.py`: o diff por id entre revisões
 

@@ -766,6 +766,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text WORDS` | Words that the label contains, all of them, without case or accents (`verificacao` matches `Verificação`, since 4.23); `--in-narrative` also searches the narrative. When the whole text is a term of the vocabulary (its `pref` or a current domain synonym, folded, or its `notation`, exactly), the term and every node that has any of its forms as a whole word match too, and `expanded` says which term; a case-scoped or retired synonym does not expand. No match gives a `hint`, which says when the zero comes from the other filters, so a zero does not pass for "there is none" |
 | `--semantic QUESTION` | Since 4.26, with the `vector` extra: orders the nodes that pass the other filters by similarity to the question (`--model`, `--model-dir`; see `kg_vector.py` below). Alone, the order is the vector's; with `--text`, the text's list (in corpus order) and the vector's are fused by RRF (k=60), ties going to the vector position. Give the short term to `--text` and the whole question to `--semantic`: that is what the bench measured (14 of 20 hits, against 12 for the vector and 9 for the text). The filters apply to both, both lists are complete, and `--limit` only pages the fused list, so in hybrid mode `total` counts every candidate and `semantic.text_matches` says how many match `--text`. The JSON gains `semantic` (mode, model with revision and sha256, and where each vector came from: the index, embedded now, the process memory, or no text) and a `rank` per node; without `--semantic` the output does not change |
 | `--open` | The open queue (status `open`) |
+| `--group-by FIELD` | Since 4.41.0: count the nodes by field instead of listing them (`kg-ssot.groups/1`). See "How many, by field" below |
 | `--where KEY=VALUE` | Since 4.39.0: only the nodes where `owner` or an `x_*` field (a dot for a nested key) has the value; repeatable, all of them must hold. See "The queue of an owner" below |
 | `--verified-before YYYY-MM-DD` | Nodes with no `verified_at`, or verified before the date |
 | `--around ID` | The neighborhood: `<path>#<id>`, or an id that is unique in the corpus; `--depth`, `--edge-type` (repeatable), `--direction out\|in\|both` |
@@ -943,6 +944,34 @@ that, follow `next_cursor`. A node without `owner` is in nobody's queue; count i
 ```bash
 kg-query --root . --open --fields owner --format json --limit 1000
 ```
+
+### How many, by field: `--group-by` (4.41.0)
+
+`--group-by FIELD` counts the nodes the query finds, by the value of the field, instead of listing them. The field is
+`file` (the graph path), `node_type`, `status`, `plane`, `layer`, `owner`, an `x_*` field (a dot for a nested key, as in
+`--where`) or `meta.<key>`, a field of the `meta` of the node's graph (`meta.id`, `meta.x_study_destination`). Repeat it
+to group by the combination, up to 5 fields. A missing field is `null` and forms its own group; a date comes out in ISO,
+and a list or a map comes out as its JSON text, so each node falls in exactly one group and the counts add up to `total`.
+Every group comes out, without pages, from the largest count to the smallest. All the filters apply first. The JSON
+output is `kg-ssot.groups/1` (`spec/groups.schema.json`), and `kg-ssot.query/1` does not change. It does not combine
+with `--semantic` or `--cursor`, nor with `--decision`, `--chain` or `--revisit` (rc 2). The MCP `kg_query` tool takes
+the same fields in `group_by`, where `file` is the graph name in the store; groups have no pages, so an answer larger
+than the server's size limit is refused with a request to narrow the filters. `true` and `1` are separate groups, as in
+`--where`. A few values do fall in one group with the text that writes them: `1` and `1.0` are one group; a date and
+the same date written as text are one; a list or a map and the text of its JSON are one; and `.nan` or `.inf` and the
+text `nan` or `inf` are one. In the human output, a value that is not text comes out as JSON (`true`, `1`, `null`), and
+a text that is valid JSON, empty, padded with spaces, holding two spaces in a row or a control character comes out in
+quotes, so two different groups never print the same.
+
+```bash
+kg-query --root . --type decision --open --group-by file                  # open decisions per graph
+kg-query --root . --group-by node_type --group-by status                  # the shape of the corpus
+kg-query --root . --type evidence --status confirmed --group-by meta.id --format json
+```
+
+A count is a question for the reader of the contract, not for code over the YAML: the reader skips the vendor and the
+fixtures, reports a graph that does not parse in `unreadable` instead of guessing it, and applies the same filters as
+every other query. The question of how many edges reach a node (in-degree) is not covered yet.
 
 ## `kg_diff.py`: diff by id between revisions
 

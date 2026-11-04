@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:680e49f4596158b8 -->
+<!-- translation-of: ADOPTING.md sha256:319765667a1b4905 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,10 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.40.2` para a `kg-ssot-v4.41.0`, nada muda para um grafo ou um gate: o contrato (v4.18) e os vereditos
+são os mesmos, e o `kg-ssot.query/1` não muda. O `kg_query --group-by` e o `group_by` da ferramenta `kg_query` do MCP
+são novos, com uma saída nova, o `kg-ssot.groups/1` (`spec/groups.schema.json`).
 
 Da `kg-ssot-v4.40.1` para a `kg-ssot-v4.40.2`, nada muda para um grafo ou um gate: o contrato (v4.18), os schemas e
 os vereditos são os mesmos. O manual e o exemplo de vocabulário são novos: os termos do exemplo passam a `confirmed`,
