@@ -1,0 +1,9 @@
+2026-11-04T19:01:30+00:00
+⟨home⟩/.claude/settings.json mtime=1793153151 size=4984
+⟨home⟩/.claude.json mtime=1793818876 size=329811
+ls: cannot access '/etc/claude-code': No such file or directory
+88793c4a9b806d13b0279e9a5fbee15cdec33834
+87814c2ef311e7c1f59a99d035bf64f07628cb5b458ca9310ac5242e069bcd0d  -
+⟨home⟩/.claude/projects/⟨pasta-do-clone⟩
+--clone:
+ M .claude/session-lifecycle.jsonl

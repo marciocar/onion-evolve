@@ -6,8 +6,8 @@
 # expõe: o arquivo inteiro entra no contexto e no transcript. A 1ª cura trocou a prosa e as permissões
 # (40 `Bash(cat .env*)`), e o Elenxo a REPROVOU com razão: `allowed-tools` só PRÉ-APROVA, não proíbe; o
 # `Read` seguia livre, `Bash(grep * .env)` seguia liberado no settings, e sob bypassPermissions nada é
-# restrito. Proibir exige o único mecanismo que barra sob bypass: o exit 2 do PreToolUse — a capacidade
-# que justifica o acoplamento ao Claude Code (CLAUDE.md, postura de acoplamento).
+# restrito. Proibir exige um veto que valha sob bypass: o exit 2 do PreToolUse. É camada de conformidade,
+# não fronteira de segurança: as condições de força estão no CLAUDE.md (identidade canônica, 2026-11-04).
 #
 # ── O QUE VETA ───────────────────────────────────────────────────────────────────────────────
 #   · Read / Grep cujo caminho é um arquivo .env (`.env`, `.env.local`, `.env.prod` …);

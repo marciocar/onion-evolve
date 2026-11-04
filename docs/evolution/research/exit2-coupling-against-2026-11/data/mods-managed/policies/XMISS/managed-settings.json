@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /etc/claude-code/hooks/nao-existe.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

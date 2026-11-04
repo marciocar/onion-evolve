@@ -1,0 +1,9 @@
+{
+  "pluginConfigs": {
+    "cc-plugin-sec-default@builtin": {
+      "options": {
+        "allowManagedModsOnly": true
+      }
+    }
+  }
+}
