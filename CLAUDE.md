@@ -29,7 +29,8 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     carrega vence o veto e a regra `deny`, inclusive sob bypass** (o veto, medido em 2.1.318 com login
     Max, 6 de 6; a `deny`, medida com API simulada). Sob bypass o próprio agente pode gravar o mod em
     `.claude/skills/` e, com aceite de confiança, a sessão seguinte fura; sem aceite ele não carrega dali,
-    mas em `~/.claude/skills/` carregou mesmo sem aceite. O hook, mesmo gerenciado, **falha aberto** sem
+    mas em `~/.claude/skills/` carregou mesmo sem aceite. Nenhum veto do core barra escrita em `.claude/` sob bypass, e sobrescrever a guarda tira o veto na mesma
+    sessão (chamadas roteirizadas, 18 de 18). O hook, mesmo gerenciado, **falha aberto** sem
     `onFailure: block`. E **o que o mod inicia por si não passa pelo gate**: com a guarda de mods sentada,
     o processo do mod ainda leu o `.env`. Só `allowManagedModsOnly` o parou nas duas vias, `--plugin-dir` e
     skills do projeto (nesta, o processo só foi medido com a política em conjunto; sozinha, ela recusou o
