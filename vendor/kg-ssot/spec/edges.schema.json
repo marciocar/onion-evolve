@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:edges.schema.json",
+  "title": "Lista de arestas de uma consulta (kg-ssot.edges/1)",
+  "description": "Saída de `kg_query.py --edges --format json` sem --group-by, e da ferramenta kg_query do servidor MCP com `edges`, desde a 4.42.0. Lista as arestas dos grafos do corpus, as internas (edges, scope internal) e as externas (external_edges, scope external), na ordem do corpus, filtradas pelo --where de campos de aresta (edge_type, scope, file, meta.<chave>, from.<campo> e to.<campo>) e pelo --file. Cada ponta traz o arquivo e o id da referência, se ela existe no corpus (found) e, se existe, o node_type e o status; a que não existe tem os campos de nó nulos. `total` conta todas as arestas achadas; `edges` traz uma página, e `next_cursor` é o cursor da próxima, ou null na última.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "root",
+    "query",
+    "graphs",
+    "unreadable",
+    "total",
+    "next_cursor",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.edges/1"
+    },
+    "root": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "query": {
+      "type": "object",
+      "required": [
+        "edges"
+      ],
+      "properties": {
+        "edges": {
+          "const": true
+        }
+      },
+      "description": "o eco do pedido"
+    },
+    "graphs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edge_type",
+          "scope",
+          "file",
+          "from",
+          "to"
+        ],
+        "properties": {
+          "edge_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope": {
+            "enum": [
+              "internal",
+              "external"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "from": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "found",
+              "node_type",
+              "status"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "null quando a ponta é o grafo inteiro (aresta externa sem from); found diz então se o grafo está no corpus"
+              },
+              "found": {
+                "type": "boolean"
+              },
+              "node_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "to": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "found",
+              "node_type",
+              "status"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "null quando a ponta é o grafo inteiro (aresta externa sem from); found diz então se o grafo está no corpus"
+              },
+              "found": {
+                "type": "boolean"
+              },
+              "node_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

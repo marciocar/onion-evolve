@@ -766,8 +766,9 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text WORDS` | Words that the label contains, all of them, without case or accents (`verificacao` matches `Verificação`, since 4.23); `--in-narrative` also searches the narrative. When the whole text is a term of the vocabulary (its `pref` or a current domain synonym, folded, or its `notation`, exactly), the term and every node that has any of its forms as a whole word match too, and `expanded` says which term; a case-scoped or retired synonym does not expand. No match gives a `hint`, which says when the zero comes from the other filters, so a zero does not pass for "there is none" |
 | `--semantic QUESTION` | Since 4.26, with the `vector` extra: orders the nodes that pass the other filters by similarity to the question (`--model`, `--model-dir`; see `kg_vector.py` below). Alone, the order is the vector's; with `--text`, the text's list (in corpus order) and the vector's are fused by RRF (k=60), ties going to the vector position. Give the short term to `--text` and the whole question to `--semantic`: that is what the bench measured (14 of 20 hits, against 12 for the vector and 9 for the text). The filters apply to both, both lists are complete, and `--limit` only pages the fused list, so in hybrid mode `total` counts every candidate and `semantic.text_matches` says how many match `--text`. The JSON gains `semantic` (mode, model with revision and sha256, and where each vector came from: the index, embedded now, the process memory, or no text) and a `rank` per node; without `--semantic` the output does not change |
 | `--open` | The open queue (status `open`) |
-| `--group-by FIELD` | Since 4.41.0: count the nodes by field instead of listing them (`kg-ssot.groups/1`). See "How many, by field" below |
-| `--where KEY=VALUE` | Since 4.39.0: only the nodes where `owner` or an `x_*` field (a dot for a nested key) has the value; repeatable, all of them must hold. See "The queue of an owner" below |
+| `--group-by FIELD` | Since 4.41.0: count the nodes by field instead of listing them (`kg-ssot.groups/2` since 4.42.0). See "How many, by field" below |
+| `--edges`, `--count-distinct FIELD`, `--min-count N` | Since 4.42.0: edges as the subject, distinct counts and a minimum count. See "Edges as the subject" below |
+| `--where KEY=VALUE` | Since 4.39.0: only the nodes where `owner`, an `x_*` field or (since 4.42.0) `provenance.<key>` (a dot for a nested key) has the value; repeatable, all of them must hold. See "The queue of an owner" below |
 | `--verified-before YYYY-MM-DD` | Nodes with no `verified_at`, or verified before the date |
 | `--around ID` | The neighborhood: `<path>#<id>`, or an id that is unique in the corpus; `--depth`, `--edge-type` (repeatable), `--direction out\|in\|both` |
 | `--sort corpus\|impact\|attention` | Corpus order, declared impact, or attention (impact × confidence × status factor × (1 + degree), the radar's value) |
@@ -953,7 +954,7 @@ kg-query --root . --open --fields owner --format json --limit 1000
 to group by the combination, up to 5 fields. A missing field is `null` and forms its own group; a date comes out in ISO,
 and a list or a map comes out as its JSON text, so each node falls in exactly one group and the counts add up to `total`.
 Every group comes out, without pages, from the largest count to the smallest. All the filters apply first. The JSON
-output is `kg-ssot.groups/1` (`spec/groups.schema.json`), and `kg-ssot.query/1` does not change. It does not combine
+output is `kg-ssot.groups/2` (`spec/groups.schema.json`; `/1` until 4.41.0), and `kg-ssot.query/1` does not change. It does not combine
 with `--semantic` or `--cursor`, nor with `--decision`, `--chain` or `--revisit` (rc 2). The MCP `kg_query` tool takes
 the same fields in `group_by`, where `file` is the graph name in the store; groups have no pages, so an answer larger
 than the server's size limit is refused with a request to narrow the filters. `true` and `1` are separate groups, as in
@@ -971,7 +972,44 @@ kg-query --root . --type evidence --status confirmed --group-by meta.id --format
 
 A count is a question for the reader of the contract, not for code over the YAML: the reader skips the vendor and the
 fixtures, reports a graph that does not parse in `unreadable` instead of guessing it, and applies the same filters as
-every other query. The question of how many edges reach a node (in-degree) is not covered yet.
+every other query. The in-degree of a node and the other edge counts are in "Edges as the subject" below.
+
+### Edges as the subject: `--edges` (4.42.0)
+
+`--edges` makes the query count and list edges instead of nodes: the internal ones (`edges`, scope `internal`) and the
+external ones (`external_edges`, scope `external`), in corpus order. `--where` and `--group-by` then take the edge
+fields: `edge_type`, `scope`, `file` (the graph that declares the edge), `meta.<key>` of that graph, and `from.<field>`
+and `to.<field>`, where the end field is `id`, `file`, `found` (whether the end exists in the corpus), `node_type`,
+`status`, `plane`, `layer`, `owner`, an `x_*` field or `provenance.<key>`. An end outside the corpus keeps its `id` and
+`file` and has the node fields null. Without `--group-by`, the output is the paged list `kg-ssot.edges/1`
+(`spec/edges.schema.json`); with it, `kg-ssot.groups/2` with `subject: edges`. Node filters (`--type`, `--status`,
+`--text`, `--around`, `--chain` and the like) do not combine with `--edges` (rc 2): filter the edges with `--where`.
+In the edge `--where`, a missing key matches `null`, as it groups under `null` (in the node `--where` a missing key
+never matches). An external edge without `from` has the whole graph as its source: `from.id` is null and `from.found`
+says whether that graph is in the corpus. An edge whose ends are not text is left out of the count, as in the graph
+reading of the other commands.
+
+Two counting options work with `--group-by`, for nodes and for edges:
+
+- `--count-distinct FIELD` counts, in each group, the distinct values of the field instead of the rows; repeat it to
+  count distinct combinations (a node is `to.file` plus `to.id`). A null value does not count, as in Cypher's
+  `count(DISTINCT)`; a combination with any null does not count either, as in SQL's `COUNT(DISTINCT a, b)`. The count
+  can then be 0, and `counted` says `distinct:<fields>`.
+- `--min-count N` keeps only the groups with a count from N, like SPARQL's `HAVING`; the counts then no longer add up to
+  `total`.
+
+```bash
+kg-query --root . --edges --group-by edge_type --group-by scope                     # the shape of the edges
+kg-query --root . --edges --where scope=internal --group-by to.file --group-by to.id \
+  --count-distinct from.id --min-count 9                                            # in-degree from 9 distinct sources
+kg-query --root . --edges --where edge_type=SUPERSEDES --where from.status=confirmed \
+  --where to.status=superseded --group-by scope --count-distinct to.file --count-distinct to.id
+kg-query --root . --where provenance.locality=web --group-by file                  # 4.42.0: provenance in nodes too
+```
+
+Since 4.42.0 the node `--where` and `--group-by` also take `provenance.<key>`. Two-hop questions (an evidence that
+constrains a decision that traces to a question) and absence (a node that receives no `SUPPORTS`) are not covered by a
+single query yet.
 
 ## `kg_diff.py`: diff by id between revisions
 

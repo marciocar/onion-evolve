@@ -10,6 +10,25 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.42.0] - 2026-11-04
+
+No contract change (still v4.18), and no verdict changes. `kg-ssot.query/1` does not change.
+
+- `kg_query --edges` counts and lists edges instead of nodes: the internal and the external ones. `--where` and
+  `--group-by` take `edge_type`, `scope`, `file`, `meta.<key>`, and `from.<field>` and `to.<field>` (`id`, `file`,
+  `found`, `node_type`, `status`, `plane`, `layer`, `owner`, `x_*` or `provenance.<key>`). Without `--group-by` it
+  prints the paged list `kg-ssot.edges/1` (`spec/edges.schema.json`).
+- `--count-distinct FIELD` (repeatable) counts the distinct values or combinations in each group; a null value does not
+  count, as in Cypher's `count(DISTINCT)`, and neither does a combination with any null, as in SQL's
+  `COUNT(DISTINCT a, b)`; `--min-count N` keeps the groups from N, as SPARQL's `HAVING`. Both work for nodes and
+  edges. Together they give the in-degree of a node from distinct sources.
+- The node `--where` and `--group-by` take `provenance.<key>`, such as `provenance.locality`.
+- The grouped output moves to `kg-ssot.groups/2`: it gains `subject` (`nodes` or `edges`) and `counted` (`rows` or
+  `distinct:<fields>`), and a distinct count can be 0. A consumer that checks `schema_version` should accept `/2`.
+- The MCP `kg_query` tool takes `edges`, `count_distinct` and `min_count`.
+  Why: in the curation's bench of 15 counting questions over a corpus, five more now come out of `kg_query` alone,
+  equal to the answer key (counts by edge type, in-degree, external targets, provenance and supersession).
+
 ## [4.41.0] - 2026-11-03
 
 No contract change (still v4.18), and no verdict changes. `kg-ssot.query/1` does not change.

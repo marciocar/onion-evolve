@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:cb89ada9659d76fe -->
+<!-- translation-of: README.md sha256:322812051c65115b -->
 <div align="center">
 
 # KG-SSOT
@@ -11,7 +11,7 @@ de citar a fonte, uma decisão registra o que substituiu e em que se apoia, e um
 <sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.41.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.41.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.42.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.42.0-6f42c1)](spec/release.json)
 [![Conformidade: 512/512](https://img.shields.io/badge/conformidade-512%2F512-2ea44f)](spec/conformance/README.pt-BR.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -56,6 +56,7 @@ versionado junto do código, e um **contrato formal** decide no CI o que reprova
 | Quais decisões olhar de novo | `kg_query --revisit`: as que passaram da cadência de revisão, as contestadas e aquelas cujo documento aprovado ou fonte fixada mudou |
 | O que está na mesa de cada dono | `kg_query --open --where owner=X --sort attention` |
 | Quantas decisões abertas cada grafo tem, ou qualquer contagem por campo | `kg_query --type decision --open --group-by file` |
+| Que nós são mais sustentados, e por quantas origens distintas | `kg_query --edges --where edge_type=SUPPORTS --group-by to.file --group-by to.id --count-distinct from.id` |
 | O que disse um e-mail, um chat ou um evento de wiki, e quem enviou | Um nó `evidence` com os nomes do CloudEvents 1.0.2 em `x_event`, fixado no documento aceito no inbox ([receita](docs/manual/pt-BR/08-receitas.md)) |
 
 Conhecimento de negócio, técnico, de compliance e de design pode morar no mesmo formato, no seu repositório. Ele se
@@ -103,7 +104,7 @@ As ferramentas imprimem em inglês por padrão e em português do Brasil quando 
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | o arquivo `.mcpb` da [última release](https://github.com/marciocar/kg-ssot/releases/latest) | O servidor MCP como extensão de um clique |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | O mesmo servidor para qualquer cliente MCP |
 | [Contêiner](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | O servidor MCP como serviço ao lado de um cliente sem Python, como o LibreChat |
-| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.41.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
+| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.42.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
 
 ## Um nó, por dentro
 
@@ -221,7 +222,7 @@ flowchart LR
 
 ## Estado
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.41.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
+- **Vigente:** contrato v4, release `kg-ssot-v4.42.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
 - **Em uso:** três adotantes rodam o gate no CI, um deles em produção.
 - **Próximo:** o v5 vai reprovar um `method` fora da forma `<classe>: <detalhe>`, que hoje só avisa.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) vive em `optional/`, e o leitor de

@@ -343,6 +343,11 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.41.0` to `kg-ssot-v4.42.0`, nothing changes for a graph or a gate: the contract (v4.18) and the
+verdicts are the same, and `kg-ssot.query/1` does not change. `kg_query --edges`, `--count-distinct` and `--min-count`
+are new, with a new output, `kg-ssot.edges/1`. The grouped output moves from `kg-ssot.groups/1` to `kg-ssot.groups/2`
+(the fields `subject` and `counted`); a consumer that checks `schema_version` should accept `/2`.
+
 From `kg-ssot-v4.40.2` to `kg-ssot-v4.41.0`, nothing changes for a graph or a gate: the contract (v4.18) and the
 verdicts are the same, and `kg-ssot.query/1` does not change. `kg_query --group-by` and the `group_by` of the MCP
 `kg_query` tool are new, with a new output, `kg-ssot.groups/1` (`spec/groups.schema.json`).

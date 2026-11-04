@@ -67,6 +67,7 @@ class Corpus:
         self.root = None  # a raiz do --root, contra a qual os caminhos (file) e a ponta externa se resolvem
         self.meta_ids = {}  # arquivo -> meta.id (o kg_vocab monta o IRI do termo com ele, como o kg_prov_export)
         self.metas = {}  # arquivo -> o meta do grafo (o --group-by meta.<chave>, 4.41.0)
+        self.edges = []  # cada aresta: {edge_type, scope, file, from, to}, com as pontas como chave (arquivo, id) (4.42.0)
         self.withs = []  # [(prefixo da URL, pasta local)]: o --with lê o grafo de outro repositório (4.35.0)
         self.external = {}  # URL do grafo lido pelo --with -> {"base": prefixo/ref/, "pinned": bool}
         # o grau da atenção (4.36.0), no escopo do arquivo, como o radar: a aresta conta para as pontas locais do arquivo
@@ -94,6 +95,9 @@ class Corpus:
         for e in doc.get("edges") if isinstance(doc.get("edges"), list) else []:
             if isinstance(e, dict) and isinstance(e.get("from"), str) and isinstance(e.get("to"), str):
                 self._link(e.get("edge_type"), (name, e["from"]), (name, e["to"]), None, None)
+                self.edges.append({"edge_type": e.get("edge_type") if isinstance(e.get("edge_type"), str) else None,
+                                   "scope": "internal", "file": name,
+                                   "from": (name, e["from"]), "to": (name, e["to"])})
                 self.local_degree[(name, e["from"])] += 1
                 self.local_degree[(name, e["to"])] += 1
                 event = e.get("trigger", e.get("on"))
@@ -104,6 +108,8 @@ class Corpus:
                 continue
             src, dst = self._end(name, e.get("from")), self._end(name, e.get("to"))
             self._link(e.get("edge_type"), src, dst, e.get("from"), e.get("to"))
+            self.edges.append({"edge_type": e.get("edge_type") if isinstance(e.get("edge_type"), str) else None,
+                               "scope": "external", "file": name, "from": src, "to": dst})
             for end in (src, dst):
                 if end[0] == name and end[1] is not None:
                     self.local_degree[end] += 1
@@ -996,9 +1002,9 @@ def parse_where(items):
         path = tuple(key.split("."))
         if not key or any(not part for part in path):
             raise ValueError(_("--where {item}: the key is empty or has an empty part").format(item=repr(item)))
-        if not (path == ("owner",) or path[0].startswith("x_")):
-            raise ValueError(_("--where {item}: the key is owner or an x_* field (x_raci.responsible)").format(
-                item=repr(item)))
+        if not (path == ("owner",) or path[0].startswith("x_") or (path[0] == "provenance" and len(path) > 1)):
+            raise ValueError(_("--where {item}: the key is owner, an x_* field (x_raci.responsible) or "
+                               "provenance.<key>").format(item=repr(item)))
         conds.append((path, unicodedata.normalize("NFC", value)))
     return conds
 
@@ -1018,27 +1024,63 @@ def _scalar_text(value):
 
 GROUP_BY_MAX = 5
 GROUP_FIELDS = ("file", "node_type", "status", "plane", "layer", "owner")
-GROUPS_VERSION = "kg-ssot.groups/1"
+GROUPS_VERSION = "kg-ssot.groups/2"
+EDGES_VERSION = "kg-ssot.edges/1"
+EDGE_TOP = ("edge_type", "scope", "file")
+END_FIELDS = ("id", "file", "found", "node_type", "status", "plane", "layer", "owner")
 
 
-def parse_group_by(items):
-    """Os campos do --group-by (4.41.0): file, node_type, status, plane, layer, owner, um x_* (com ponto para a chave
-    aninhada, como no --where) ou meta.<chave> (o meta do grafo do nó). ValueError: campo fora disso."""
+def _node_path_ok(path):
+    """O caminho é um campo de nó que se agrupa: um dos GROUP_FIELDS, um x_* ou provenance.<chave>."""
+    return ((len(path) == 1 and path[0] in GROUP_FIELDS) or path[0].startswith("x_")
+            or (path[0] == "provenance" and len(path) > 1))
+
+
+def _edge_path_ok(path):
+    """O caminho é um campo de aresta: edge_type, scope, file, meta.<chave> do grafo que a declara, ou from.<campo> e
+    to.<campo>, com o campo da ponta em END_FIELDS, um x_* ou provenance.<chave>."""
+    if len(path) == 1:
+        return path[0] in EDGE_TOP
+    if path[0] == "meta":
+        return True
+    if path[0] in ("from", "to"):
+        rest = path[1:]
+        return ((len(rest) == 1 and rest[0] in END_FIELDS) or rest[0].startswith("x_")
+                or (rest[0] == "provenance" and len(rest) > 1))
+    return False
+
+
+def parse_group_by(items, flag="--group-by", edges=False):
+    """Os campos do --group-by (4.41.0) e do --count-distinct (4.42.0). Nos nós: file, node_type, status, plane, layer,
+    owner, um x_* (com ponto para a chave aninhada, como no --where), provenance.<chave> ou meta.<chave> (o meta do
+    grafo do nó). Nas arestas (--edges): os de _edge_path_ok. ValueError: campo fora disso."""
     items = [items] if isinstance(items, str) else list(items or ())
     if len(items) > GROUP_BY_MAX:
-        raise ValueError(_("--group-by takes at most {max} fields").format(max=GROUP_BY_MAX))
+        raise ValueError(_("{flag} takes at most {max} fields").format(flag=flag, max=GROUP_BY_MAX))
     out = []
     for item in items:
         path = tuple(item.split(".")) if isinstance(item, str) else ()
-        if not path or any(not part for part in path) or not (
-                (len(path) == 1 and path[0] in GROUP_FIELDS) or path[0].startswith("x_")
-                or (path[0] == "meta" and len(path) > 1)):
-            raise ValueError(_("--group-by {item}: the field is file, node_type, status, plane, layer, owner, an x_* "
-                               "field (x_raci.responsible) or meta.<key>").format(item=repr(item)))
+        ok = bool(path) and not any(not part for part in path) and (
+            _edge_path_ok(path) if edges else (_node_path_ok(path) or (path[0] == "meta" and len(path) > 1)))
+        if not ok:
+            raise ValueError((_("{flag} {item}: the edge field is edge_type, scope, file, meta.<key>, or from.<field> "
+                                "and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field "
+                                "or provenance.<key>)") if edges else
+                              _("{flag} {item}: the field is file, node_type, status, plane, layer, owner, an x_* "
+                                "field (x_raci.responsible), provenance.<key> or meta.<key>")).format(
+                flag=flag, item=repr(item)))
         if item in out:
-            raise ValueError(_("--group-by {item}: the field is repeated").format(item=repr(item)))
+            raise ValueError(_("{flag} {item}: the field is repeated").format(flag=flag, item=repr(item)))
         out.append(item)
     return out
+
+
+def _walk(cur, parts):
+    for part in parts:
+        if not isinstance(cur, dict) or part not in cur:
+            return None
+        cur = cur[part]
+    return cur
 
 
 def group_value(corpus, key, field):
@@ -1047,11 +1089,37 @@ def group_value(corpus, key, field):
     if field == "file":
         return key[0]
     path = field.split(".")
-    cur = corpus.metas.get(key[0]) if path[0] == "meta" else corpus.nodes[key]
-    for part in path[1:] if path[0] == "meta" else path:
-        if not isinstance(cur, dict) or part not in cur:
-            return None
-        cur = cur[part]
+    if path[0] == "meta":
+        return _group_norm(_walk(corpus.metas.get(key[0]), path[1:]))
+    return _group_norm(_walk(corpus.nodes[key], path))
+
+
+def edge_raw(corpus, edge, field):
+    """O valor cru do campo de uma aresta, antes da normalização: a ponta que não existe no corpus tem os campos de nó
+    nulos, mas o id e o file dela são os da referência, e found diz se ela existe."""
+    path = field.split(".")
+    if len(path) == 1:
+        return edge[field]
+    if path[0] == "meta":
+        return _walk(corpus.metas.get(edge["file"]), path[1:])
+    end, rest = edge[path[0]], path[1:]
+    if rest == ["id"]:
+        return end[1]
+    if rest == ["file"]:
+        return end[0]
+    if rest == ["found"]:  # a origem que é o grafo inteiro existe se o grafo existe, como no query/1
+        return end[0] in corpus.files if end[1] is None else end in corpus.nodes
+    node = corpus.nodes.get(end) if end[1] is not None else None
+    return _walk(node, rest) if node is not None else None
+
+
+def edge_value(corpus, edge, field):
+    return _group_norm(edge_raw(corpus, edge, field))
+
+
+def _group_norm(cur):
+    """A forma do valor na chave do grupo (4.41.0): o escalar como está, 1.0 como 1, a data em ISO, a lista ou o mapa
+    como o texto JSON dele."""
     cur = _plain(cur)
     if isinstance(cur, float) and cur.is_integer():
         cur = int(cur)  # 1.0 e 1 são o mesmo valor JSON: a chave não depende de qual veio primeiro no corpus
@@ -1065,15 +1133,34 @@ def group_value(corpus, key, field):
     return str(cur)
 
 
-def group_counts(corpus, hits, fields):
-    """Os grupos dos nós achados: [{key: {campo: valor}, count}], da contagem maior para a menor e, no empate, pela
-    chave (o null antes do texto)."""
+def aggregate(items, value, fields, distinct=(), min_count=None):
+    """Os grupos dos itens: [{key: {campo: valor}, count}], da contagem maior para a menor e, no empate, pela chave (o
+    null antes do texto). value(item, campo) dá o valor normalizado. Com distinct, a contagem é a das combinações
+    distintas desses campos no grupo, e a combinação com algum null não conta (o count(DISTINCT) do Cypher ignora o
+    null); sem ele, a das linhas, e o grupo null conta (o count(*)). min_count deixa só os grupos a partir dele (o
+    HAVING do SPARQL)."""
     # o booleano leva a marca do tipo: no Python True == 1 e os dois têm o mesmo hash, e o Counter fundiria x: true com
     # x: 1, que o --where separa (achado do Elenxo da 4.41.0)
-    counts = collections.Counter(tuple((type(v) is bool, v) for v in (group_value(corpus, k, f) for f in fields))
-                                 for k in hits)
-    order = sorted(counts.items(), key=lambda kv: (-kv[1], [(v is not None, b, str(v), type(v).__name__) for b, v in kv[0]]))
+    tag = lambda v: (type(v) is bool, v)  # noqa: E731
+    counts, seen = collections.Counter(), collections.defaultdict(set)
+    for it in items:
+        k = tuple((type(v) is bool, v) for v in (value(it, f) for f in fields))
+        if distinct:
+            vals = tuple(value(it, f) for f in distinct)
+            counts[k] += 0
+            if all(v is not None for v in vals):
+                seen[k].add(tuple(tag(v) for v in vals))
+        else:
+            counts[k] += 1
+    if distinct:
+        counts = collections.Counter({k: len(seen[k]) for k in counts})
+    rows = [(k, n) for k, n in counts.items() if min_count is None or n >= min_count]
+    order = sorted(rows, key=lambda kv: (-kv[1], [(v is not None, b, str(v), type(v).__name__) for b, v in kv[0]]))
     return [{"key": dict(zip(fields, (v for _b, v in values))), "count": n} for values, n in order]
+
+
+def group_counts(corpus, hits, fields, distinct=(), min_count=None):
+    return aggregate(hits, lambda k, f: group_value(corpus, k, f), fields, distinct, min_count)
 
 
 def where_matches(node, conds):
@@ -1159,7 +1246,7 @@ def project(corpus, key, narrative=False, fields=()):
 def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=None, layer=None, file=None, text=None,
           in_narrative=False, open_only=False, verified_before=None, around=None, depth=1, edge_types=(),
           direction="both", sort="corpus", limit=50, cursor=None, narrative=False, fields=(), max_bytes=None,
-          semantic=None, ranker=None, where=(), group_by=()):
+          semantic=None, ranker=None, where=(), group_by=(), count_distinct=(), min_count=None):
     """A consulta inteira, no formato kg-ssot.query/1. ValueError: pedido quebrado. max_bytes: o teto da página em bytes
     de JSON (o servidor MCP passa o dele); a página corta antes do limit quando o passa, sempre com ao menos um nó, e o
     next_cursor continua de onde ela parou.
@@ -1169,6 +1256,7 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     if not 1 <= limit <= MAX_LIMIT:
         raise ValueError(_("--limit must be between 1 and {max}").format(max=MAX_LIMIT))
     group_by = parse_group_by(group_by)
+    count_distinct, min_count = _check_counting(group_by, count_distinct, min_count, edges=False)
     if group_by and (semantic is not None or cursor is not None):
         raise ValueError(_("--group-by counts every node the filters find: it does not combine with --semantic or "
                            "--cursor"))
@@ -1219,7 +1307,7 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         sem = {"mode": "hybrid" if text else "semantic", "question": semantic, "k": RRF_K, **used}
         if text:  # o total do híbrido são todos os candidatos; quantos casam o --text sai à parte
             sem["text_matches"] = len(text_hits)
-    grouped = group_counts(corpus, hits, group_by) if group_by else None
+    grouped = group_counts(corpus, hits, group_by, count_distinct, min_count) if group_by else None
     if grouped is not None:
         hits_for_page = hits
         hits = hits[:0]  # os grupos dispensam a página: nada é projetado
@@ -1259,6 +1347,10 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
     if grouped is not None:
         request["group_by"] = list(group_by)
+        if count_distinct:
+            request["count_distinct"] = list(count_distinct)
+        if min_count is not None:
+            request["min_count"] = min_count
         hits = hits_for_page
     res = {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
            "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
@@ -1282,11 +1374,124 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                 res["hint"] += _("; the order comes from --semantic alone")
     if grouped is not None:
         out = {"schema_version": GROUPS_VERSION, "root": res["root"], "query": request, "graphs": res["graphs"],
-               "unreadable": unreadable, "total": res["total"], "groups": grouped}
+               "unreadable": unreadable, "subject": "nodes", "counted": _counted(count_distinct),
+               "total": res["total"], "groups": grouped}
         if res.get("hint"):
             out["hint"] = res["hint"]
         return out
     return res
+
+
+def _counted(distinct):
+    return "distinct:" + ",".join(distinct) if distinct else "rows"
+
+
+def _check_counting(group_by, count_distinct, min_count, edges):
+    """O --count-distinct e o --min-count (4.42.0) só valem com --group-by; o mínimo é um inteiro a partir de 1."""
+    count_distinct = parse_group_by(count_distinct, "--count-distinct", edges)
+    if (count_distinct or min_count is not None) and not group_by:
+        raise ValueError(_("--count-distinct and --min-count count the groups of --group-by: give it too"))
+    if min_count is not None and (isinstance(min_count, bool) or not isinstance(min_count, int) or min_count < 1):
+        raise ValueError(_("--min-count must be an integer from 1"))
+    return count_distinct, min_count
+
+
+def parse_edge_where(items):
+    """As condições do --where com --edges: CAMPO=VALOR, com os campos de aresta de _edge_path_ok."""
+    items = [items] if isinstance(items, str) else list(items or ())
+    if len(items) > WHERE_MAX:
+        raise ValueError(_("--where takes at most {max} conditions").format(max=WHERE_MAX))
+    conds = []
+    for item in items:
+        if not isinstance(item, str) or "=" not in item:
+            raise ValueError(_("--where {item}: write KEY=VALUE").format(item=repr(item)))
+        key, _sep, value = item.partition("=")
+        parse_group_by([key], "--where", edges=True)
+        conds.append((key, unicodedata.normalize("NFC", value)))
+    return conds
+
+
+def edge_matches(corpus, edge, conds):
+    """A aresta casa todas as condições? Como no --where de nós: o escalar casa pelo texto, a lista quando algum item
+    casa, e o que falta (null) só casa com o texto null."""
+    for key, value in conds:
+        cur = _plain(edge_raw(corpus, edge, key))
+        found = cur if isinstance(cur, list) else [cur]
+        if not any(_scalar_text(v) == value for v in found):
+            return False
+    return True
+
+
+def _edge_end_view(corpus, end):
+    node = corpus.nodes.get(end) if end[1] is not None else None
+    return {"file": end[0], "id": end[1], "found": node is not None if end[1] is not None else end[0] in corpus.files,
+            "node_type": _text(node, "node_type") or None if node else None,
+            "status": _text(node, "status") or None if node else None}
+
+
+def edge_query(corpus, *, where=(), file=None, group_by=(), count_distinct=(), min_count=None, limit=50, cursor=None,
+               max_bytes=None):
+    """As arestas como sujeito (4.42.0): a lista paginada kg-ssot.edges/1 ou, com group_by, os grupos kg-ssot.groups/2.
+    As arestas são as internas (edges) e as externas (external_edges) dos grafos do corpus, na ordem do corpus.
+    ValueError: pedido quebrado."""
+    if not 1 <= limit <= MAX_LIMIT:
+        raise ValueError(_("--limit must be between 1 and {max}").format(max=MAX_LIMIT))
+    group_by = parse_group_by(group_by, edges=True)
+    count_distinct, min_count = _check_counting(group_by, count_distinct, min_count, edges=True)
+    conds = parse_edge_where(where)
+    if group_by and cursor is not None:
+        raise ValueError(_("--group-by counts every edge the filters find: it does not combine with --cursor"))
+    offset = 0
+    if cursor is not None:
+        if not (isinstance(cursor, str) and cursor.isascii() and cursor.isdigit() and len(cursor) <= 9):
+            raise ValueError(_("--cursor {cursor} is invalid: use the next_cursor of a previous query").format(cursor=repr(cursor)))
+        offset = int(cursor)
+    hits = [e for e in corpus.edges if (not file or file in e["file"]) and edge_matches(corpus, e, conds)]
+    request = {"edges": True, "file": file, "where": [f"{k}={v}" for k, v in conds], "limit": limit, "cursor": cursor}
+    unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
+    base = {"root": corpus.root, "query": request, "graphs": len(corpus.files), "unreadable": unreadable}
+    if group_by:
+        request["group_by"] = list(group_by)
+        if count_distinct:
+            request["count_distinct"] = list(count_distinct)
+        if min_count is not None:
+            request["min_count"] = min_count
+        groups = aggregate(hits, lambda e, f: edge_value(corpus, e, f), group_by, count_distinct, min_count)
+        return {"schema_version": GROUPS_VERSION, **base, "subject": "edges", "counted": _counted(count_distinct),
+                "total": len(hits), "groups": groups}
+    page, size = [], 0
+    for e in hits[offset:offset + limit]:
+        view = {"edge_type": e["edge_type"] if isinstance(e["edge_type"], str) else None, "scope": e["scope"],
+                "file": e["file"], "from": _edge_end_view(corpus, e["from"]), "to": _edge_end_view(corpus, e["to"])}
+        size += len(json.dumps(view, ensure_ascii=False))
+        if page and max_bytes is not None and size > max_bytes:
+            break
+        page.append(view)
+    end = offset + len(page)
+    return {"schema_version": EDGES_VERSION, **base, "total": len(hits),
+            "next_cursor": str(end) if end < len(hits) else None, "edges": page}
+
+
+def edges_human(res):
+    lines = []
+    for e in res["edges"]:
+        fr, to = e["from"], e["to"]
+        src = _("(the whole graph)") if fr["id"] is None else \
+            (f"{fr['file']}#{fr['id']}" if fr["file"] != e["file"] else fr["id"])
+        dst = f"{to['file']}#{to['id']}" if to["file"] != e["file"] else str(to["id"])
+        miss = "" if to["found"] else "  " + _("(outside the corpus)")
+        lines.append(f"{e['file']}  {src} -{e['edge_type']}-> {dst}  [{e['scope']}]{miss}")
+    for u in res["unreadable"][:5]:
+        lines.append(_("UNREADABLE  {file}: {code}").format(file=u["file"], code=u["code"]))
+    if res["query"].get("where"):
+        lines.append(_("· only the edges where {where}").format(where=" and ".join(res["query"]["where"])))
+    shown = len(res["edges"])
+    first = int(res["query"]["cursor"] or 0)
+    tail = _("; next page: --cursor {cursor}").format(cursor=res["next_cursor"]) if res["next_cursor"] else ""
+    lines.append(_("· {total} edge(s) in {graphs} graph(s)").format(total=res["total"], graphs=res["graphs"])
+                 + (_(", showing {first} to {last}").format(first=first + 1, last=first + shown) if shown else "")
+                 + tail)
+    return "\n".join(lines)
 
 
 def _group_text(v):
@@ -1316,9 +1521,16 @@ def groups_human(res):
                      .format(n=len(res["unreadable"]) - 5))
     if res.get("hint"):
         lines.append("· " + res["hint"])
+    edges = res.get("subject") == "edges"
     if res["query"].get("where"):
-        lines.append(_("· only the nodes where {where}").format(where=" and ".join(res["query"]["where"])))
-    lines.append(_("· {total} node(s) in {graphs} graph(s), in {groups} group(s) by {fields}").format(
+        lines.append((_("· only the edges where {where}") if edges else _("· only the nodes where {where}")).format(
+            where=" and ".join(res["query"]["where"])))
+    if res["counted"] != "rows":
+        lines.append(_("· the count is of distinct {fields}").format(fields=", ".join(res["counted"].split(":", 1)[1].split(","))))
+    if res["query"].get("min_count") is not None:
+        lines.append(_("· only the groups with a count from {n}").format(n=res["query"]["min_count"]))
+    lines.append((_("· {total} edge(s) in {graphs} graph(s), in {groups} group(s) by {fields}") if edges else
+                  _("· {total} node(s) in {graphs} graph(s), in {groups} group(s) by {fields}")).format(
         total=res["total"], graphs=res["graphs"], groups=len(res["groups"]), fields=", ".join(res["query"]["group_by"])))
     return "\n".join(lines)
 
@@ -1408,7 +1620,17 @@ def main(argv=None):
     ap.add_argument("--group-by", action="append", default=[], metavar=_("FIELD"),
                     help=_("count the nodes the filters find, by the value of the field (repeatable, up to 5): file, "
                            "node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or "
-                           "meta.<key> of the node's graph; prints kg-ssot.groups/1, every group, without pages"))
+                           "meta.<key> of the node's graph, or provenance.<key>; prints kg-ssot.groups/2, every group, without pages"))
+    ap.add_argument("--edges", action="store_true",
+                    help=_("count and list edges instead of nodes (internal and external): --where and --group-by take "
+                           "edge_type, scope, file, meta.<key>, and from.<field> and to.<field> (id, file, found, "
+                           "node_type, status, plane, layer, owner, an x_* field or provenance.<key>); without "
+                           "--group-by, prints kg-ssot.edges/1"))
+    ap.add_argument("--count-distinct", action="append", default=[], metavar=_("FIELD"),
+                    help=_("with --group-by, count the distinct values of the field in each group instead of the rows "
+                           "(repeatable: the distinct combinations); null does not count"))
+    ap.add_argument("--min-count", type=int, metavar="N",
+                    help=_("with --group-by, keep only the groups with a count from N"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
@@ -1441,6 +1663,35 @@ def main(argv=None):
         before = kg_validate.iso_date(args.verified_before)
         if before is None:
             return broken(_("--verified-before {value}: the date must be YYYY-MM-DD").format(value=repr(args.verified_before)))
+    if args.edges:
+        node_only = [flag for flag, on in (("--id", args.ids), ("--id-prefix", args.id_prefix), ("--type", args.node_type),
+                                           ("--status", args.status), ("--plane", args.plane), ("--layer", args.layer),
+                                           ("--text", args.text), ("--in-narrative", args.in_narrative),
+                                           ("--open", args.open_only), ("--verified-before", args.verified_before),
+                                           ("--around", args.around), ("--chain", args.chain),
+                                           ("--decision", args.decision), ("--revisit", args.revisit),
+                                           ("--semantic", args.semantic), ("--fields", args.fields),
+                                           ("--narrative", args.narrative), ("--sort", args.sort != "corpus"),
+                                           ("--edge-type", args.edge_types), ("--with", args.withs),
+                                           ("--depth", args.depth != 1), ("--direction", args.direction != "both"),
+                                           ("--model", args.model), ("--model-dir", args.model_dir))
+                     if on not in (None, False, [], "")]
+        if node_only:
+            return broken(_("--edges counts edges: it does not combine with {flags}; filter the edges with --where "
+                            "(edge_type=…, from.status=…)").format(flags=", ".join(node_only)))
+        try:
+            corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
+            res = edge_query(corpus, where=args.where, file=args.file, group_by=args.group_by,
+                             count_distinct=args.count_distinct, min_count=args.min_count, limit=args.limit,
+                             cursor=args.cursor)
+        except (OSError, ValueError, UnicodeDecodeError) as exc:
+            return broken(exc)
+        text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else \
+            (groups_human(res) if args.group_by else edges_human(res))
+        print(text.encode("utf-8", "backslashreplace").decode("utf-8"))
+        return 0
+    if (args.count_distinct or args.min_count is not None) and not args.group_by:
+        return broken(_("--count-distinct and --min-count count the groups of --group-by: give it too"))
     if args.group_by and (args.semantic is not None or args.cursor is not None):
         return broken(_("--group-by counts every node the filters find: it does not combine with --semantic or "
                         "--cursor"))
@@ -1511,7 +1762,8 @@ def main(argv=None):
                     open_only=args.open_only, verified_before=before, around=args.around, depth=args.depth,
                     edge_types=args.edge_types, direction=args.direction, sort=args.sort, limit=args.limit,
                     cursor=args.cursor, narrative=args.narrative, fields=args.fields, semantic=args.semantic,
-                    ranker=ranker, where=args.where, group_by=args.group_by)
+                    ranker=ranker, where=args.where, group_by=args.group_by,
+                    count_distinct=args.count_distinct, min_count=args.min_count)
     except (OSError, ValueError, UnicodeDecodeError) as exc:
         return broken(exc)
     text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else \
