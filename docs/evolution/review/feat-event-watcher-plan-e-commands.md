@@ -2,7 +2,7 @@
 branch: feat/event-watcher-plan-e-commands
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: c30e0f567d7c75583feb97e7e65ce65c0e97b1dc58eb64ad5483cc5f6051cc1e
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 80354978edc696d03764cf7d7791d23a716e748ef5075449ff8557aff2f8fed0
 findings_total: 78
 findings_real: 73
@@ -77,3 +77,9 @@ nível PR caía no modo completo, reprovando o `selector-per-file (i)`. Nenhuma 
 O REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) pediu ainda marcar duas citações
 de `ops/` como `(core-only)` e trocar uma por descrição genérica, só em comentário e mensagem. Conferido pela sessão
 do core: `a2a_accept` e `selector_per_file` passam 208 de 208.
+
+## Re-revisão: sh76 no CI
+
+No CI, o sh76 passava o stderr do `shadow-stats` ao jq (`2>&1`). O jq falhou no parse, e o worker da faixa morreu
+sem somar. A cura manda só o stdout ao jq e protege o jq com `|| true` no sh76 e no sh77. Nenhuma asserção mudou,
+e `a2a_accept` com `selector_per_file` passa 208 de 208.
