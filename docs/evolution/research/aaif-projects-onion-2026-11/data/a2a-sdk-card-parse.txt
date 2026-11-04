@@ -1,0 +1,4 @@
+a2a-sdk 1.3.0 card.protocolVersion 0.3.0
+parse_agent_card: OK AgentCard onion-evolve ifaces 1
+ParseDict estrito v1: ERRO ParseError Message type "lf.a2a.v1.AgentCard" has no field named "protocolVersion" at "AgentCard".
+ Available Fields(except extensions): "['name', 'description', 'supportedInterfaces', 'provider', 'version', 'documentationUrl', 'capabilities', 'securitySchemes', 'securityRequirements', 'defaultInputModes', 'de

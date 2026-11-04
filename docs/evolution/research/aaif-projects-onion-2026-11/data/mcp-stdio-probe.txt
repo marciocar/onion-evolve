@@ -1,0 +1,26 @@
+# kg_mcp.py sem --root (só kg_validate e kg_schema_help)
+{"method": "server/discover", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": ["2026-07-28", "2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"], "tools": null}
+{"method": "tools/list", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": null, "tools": 2}
+{"method": "roots/list", "asked": null, "error": -32601, "protocolVersion": null, "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2026-07-28", "error": null, "protocolVersion": "2025-11-25", "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2025-11-25", "error": null, "protocolVersion": "2025-11-25", "supportedVersions": null, "tools": null}
+# kg_mcp.py --root <vazio> --init --read-only
+{"method": "server/discover", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": ["2026-07-28", "2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"], "tools": null}
+{"method": "tools/list", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": null, "tools": 7}
+{"method": "roots/list", "asked": null, "error": -32601, "protocolVersion": null, "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2026-07-28", "error": null, "protocolVersion": "2025-11-25", "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2025-11-25", "error": null, "protocolVersion": "2025-11-25", "supportedVersions": null, "tools": null}
+# kg_mcp.py --root <vazio> --author <fictício>: tools/list
+{"method": "tools/list", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": null, "tools": 9}
+# a2a-rt-mcp.py
+{"method": "server/discover", "asked": null, "error": -32601, "protocolVersion": null, "supportedVersions": null, "tools": null}
+{"method": "tools/list", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": null, "tools": 2}
+{"method": "roots/list", "asked": null, "error": -32601, "protocolVersion": null, "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2026-07-28", "error": null, "protocolVersion": "2026-07-28", "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2025-11-25", "error": null, "protocolVersion": "2025-11-25", "supportedVersions": null, "tools": null}
+# a2a-rt-mcp.py re-sondado depois do rebase sobre origin/main 1cf173342, que mudou o arquivo mas não o handshake: mesmo resultado
+{"method": "server/discover", "asked": null, "error": -32601, "protocolVersion": null, "supportedVersions": null, "tools": null}
+{"method": "tools/list", "asked": null, "error": null, "protocolVersion": null, "supportedVersions": null, "tools": 2}
+{"method": "roots/list", "asked": null, "error": -32601, "protocolVersion": null, "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2026-07-28", "error": null, "protocolVersion": "2026-07-28", "supportedVersions": null, "tools": null}
+{"method": "initialize", "asked": "2025-11-25", "error": null, "protocolVersion": "2025-11-25", "supportedVersions": null, "tools": null}
