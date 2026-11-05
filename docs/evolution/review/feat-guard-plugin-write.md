@@ -2,7 +2,8 @@
 branch: feat/guard-plugin-write
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1f32772169acbf46eb12934bedf56d8bd8a13350acba0780489f91ed8031128f
+reviewed_code_sha256: 20c77f7f5f409ac7714cf456b065bdc53d783f987db473ec1f4196ec152541de
 findings_total: 29
 findings_real: 29
 tokens: 0
