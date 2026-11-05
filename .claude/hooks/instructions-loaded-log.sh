@@ -16,7 +16,7 @@ input="$(cat 2>/dev/null || true)"
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 log="${ONION_INSTRUCTIONS_LOG:-${root}/.claude/sessions/instructions-loaded.jsonl}"
 mkdir -p "$(dirname "${log}")" 2>/dev/null || exit 0
-ROOT="${root}" printf '%s' "${input}" | ROOT="${root}" python3 -c '
+ROOT="${root}" printf '%s' "${input}" | ROOT="${root}" python3 -I -c '
 import json, sys, os, datetime
 try:
     d = json.load(sys.stdin)

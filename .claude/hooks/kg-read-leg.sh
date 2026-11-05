@@ -337,7 +337,7 @@ except Exception:
     pass
 PY
 )
-target="$(printf '%s' "${payload}" | KG_LEG_ENV_GUARD="$(dirname "${BASH_SOURCE[0]}")/pretooluse-env-guard.sh" python3 -c "${KG_LEG_PY}" 2>/dev/null)"
+target="$(printf '%s' "${payload}" | KG_LEG_ENV_GUARD="$(dirname "${BASH_SOURCE[0]}")/pretooluse-env-guard.sh" python3 -I -c "${KG_LEG_PY}" 2>/dev/null)"
 [ -n "${target}" ] || exit 0
 
 # O índice guarda caminhos RELATIVOS à root; o Read chega com absoluto e o Bash costuma vir relativo.
@@ -383,7 +383,7 @@ ids="$(printf '%s\n' "${rows}" | cut -f2 | LC_ALL=C sort -u | sed -n '1,8p' | tr
 graphs="$(printf '%s\n' "${rows}" | cut -f3 | LC_ALL=C sort -u | sed -n '1,3p' | awk '{ printf "%s%s", (NR>1 ? " · " : ""), $0 }')"
 n="$(printf '%s\n' "${rows}" | wc -l | tr -d ' ')"
 
-python3 - "$rel" "$ids" "$graphs" "$n" <<'PY'
+python3 -I - "$rel" "$ids" "$graphs" "$n" <<'PY'
 import json, sys
 rel, ids, graphs, n = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 msg = (f"🗺️ O CORPUS JÁ FALA DESTE ARQUIVO — {n} nó(s) o apontam por `trace:`.\n"

@@ -8,10 +8,11 @@ input=$(cat)
 # force-push de um checkout sentado na main (Elenxo, 2ª passada, 2026-10-05).
 # `errors=backslashreplace` e `tool_input` não-dict (passada adversarial, 2026-10-11): um surrogate solto no JSON
 # (`\ud800`) derrubava o print, e o hook caía no modo sem python — vetando um push honesto.
-parsed=$(printf '%s' "$input" | python3 -c 'import json,sys
+# JSON ilegível NÃO vira `{}` (hooks em modo isolado, 2026-11-04): `{}` é comando vazio, e comando vazio é exit 0,
+# a falha de análise virando permissão. Agora a leitura falha, e o caminho é o mesmo do python ausente: julga pela forma.
+parsed=$(printf '%s' "$input" | python3 -I -c 'import json,sys
 sys.stdout.reconfigure(errors="backslashreplace")
-try: d=json.load(sys.stdin)
-except Exception: d={}
+d=json.load(sys.stdin)
 d=d if isinstance(d,dict) else {}
 ti=d.get("tool_input"); ti=ti if isinstance(ti,dict) else {}
 print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null) && nopy=0 || nopy=1
@@ -35,7 +36,7 @@ fi
 # SEM python3 não há tokenizador: fecha SÓ o que tem forma de force-push (recorte medido, ver a lib).
 if [ "$nopy" = 1 ]; then
   onion_nopy_touches force-main "$cmd" || exit 0
-  echo "GUARDA-PRETOOLUSE: python3 ausente ou quebrado — o veto não consegue analisar este comando, que tem forma de force-push (git push com --force, -f, +ref ou --mirror). Fechado por segurança: force-push na main é irreversível. Instale python3 (o tokenizador dos vetos); se for deliberado, o maestro roda fora da sessão." >&2
+  echo "GUARDA-PRETOOLUSE: a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível) — o veto não consegue analisar este comando, que tem forma de force-push (git push com --force, -f, +ref ou --mirror). Fechado por segurança: force-push na main é irreversível. Instale python3 (o tokenizador dos vetos); se for deliberado, o maestro roda fora da sessão." >&2
   exit 2
 fi
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")

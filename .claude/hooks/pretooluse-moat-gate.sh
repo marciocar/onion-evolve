@@ -133,10 +133,11 @@ moat_cites_symlink() {
 [ "$hit" = 0 ] && exit 0
 
 # ── leitura exata do JSON + juiz ──────────────────────────────────────────────────────────────────────────
-parsed=$(printf '%s' "$input" | python3 -c 'import json,sys
+# JSON ilegível NÃO vira `{}` (hooks em modo isolado, 2026-11-04): `{}` é comando vazio, e comando vazio é exit 0,
+# a falha de análise virando permissão. Agora a leitura falha, e o caminho é o mesmo do python ausente: julga pela forma.
+parsed=$(printf '%s' "$input" | python3 -I -c 'import json,sys
 sys.stdout.reconfigure(errors="backslashreplace")
-try: d=json.load(sys.stdin)
-except Exception: d={}
+d=json.load(sys.stdin)
 d=d if isinstance(d,dict) else {}
 ti=d.get("tool_input"); ti=ti if isinstance(ti,dict) else {}
 print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null) && nopy=0 || nopy=1
@@ -153,7 +154,7 @@ closed() {  # SEM tokenizador (python ausente/morto): fecha SÓ o que cita alvo 
   echo "GUARDA-PRETOOLUSE (MOAT): $1 — o comando cita um alvo do MOAT (deploy, repo alheio ou relógio) e o veto não consegue analisá-lo. Fechado por segurança. Instale python3 (o tokenizador dos vetos); o deploy segue pelos wrappers de ops/ (core-only), e o resto é do maestro, fora da sessão." >&2
   exit 2
 }
-[ "$nopy" = 1 ] && closed "python3 ausente ou quebrado"
+[ "$nopy" = 1 ] && closed "a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível)"
 out=$(ONION_CWD="$hcwd" ONION_MOAT_JUDGE="${here}/lib/moat-judge.py" ONION_MOAT_TARGETS="$tsv" \
       ONION_MOAT_MEMBERS="$members" onion_invocation_lines "$cmd")
 grep -qx '__ONION_MOAT_OK__' <<< "$out" || closed "a análise não chegou ao fim"

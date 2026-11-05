@@ -43671,6 +43671,246 @@ EOF_MUT
 }
 _family run_veto_onfailure_selftests
 
+# REGRA 115 (Hooks rodam python em modo isolado) — os vetos reais, com módulo sombra no diretório de trabalho.
+# Medido em 2026-11-04 (grafo guard-hooks-python-isolated-2026-11). Roda cada veto de verdade, numa CÓPIA da maquinaria
+# em mktemp: a sombra nunca toca a árvore viva (um `git add -A` concorrente a stajaria). Cada mutante reverte uma cura
+# numa cópia, e só conta depois que a MESMA cópia, sem mutante, deu o resultado certo no mesmo arranjo.
+run_hooks_python_isolated_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/python-isolated-check.sh" o rc
+  [ -f "${chk}" ] || { record_fail "hooks-python-isolated" "guarda ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "hooks-python-isolated: python3 ausente"; return; }
+  # (a) as polaridades da guarda, em LC_ALL=C (o locale do hook)
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 31/31 verdes' <<< "${o}"; then
+    record_pass "hooks-python-isolated: (a) --selftest verde (14 formas acusam, 10 calam, alvo derivado, não julgou)"
+  else record_fail "hooks-python-isolated: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) a árvore real está limpa (quem lê é o alvo derivado do settings.json real)
+  if o="$(LC_ALL=C bash "${chk}" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "hooks-python-isolated: (b) árvore real → rc 0, nenhum python sem -I no alcance dos hooks"
+  else record_fail "hooks-python-isolated: (b) árvore real" "rc=${rc}; $(head -3 <<< "${o}" | cut -c1-200 | tr '\n' '|')"; fi
+  # (c) o alvo não é vazio: um censo que não acha ninguém não prova nada
+  local n; n="$(LC_ALL=C bash "${chk}" "${REPO_ROOT}" --census 2>/dev/null | grep -c $'\tcom-I\t' || true)"
+  if [ "${n:-0}" -ge 25 ]; then record_pass "hooks-python-isolated: (c) o censo enxerga as invocações reais (${n} com -I)"
+  else record_fail "hooks-python-isolated: (c) censo" "só ${n:-0} invocações com -I: o alvo derivado encolheu"; fi
+
+  # (d) o lint de produção emite a REGRA 115 pelo dispatcher: HARD no core, SOFT no derivado, e cala na cópia limpa.
+  # Roda numa cópia de .claude: o hook sujo nunca toca a árvore viva. `--only=` poupa as outras regras.
+  local lc; lc="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${lc}/.claude"
+  cp -r "${REPO_ROOT}/.claude/hooks" "${REPO_ROOT}/.claude/validation" "${lc}/.claude/" 2>/dev/null
+  cp "${REPO_ROOT}/.claude/settings.json" "${lc}/.claude/settings.json"
+  git -C "${lc}" init -q -b feat 2>/dev/null
+  local lo lh="${lc}/.claude/hooks/session-degraded-notice.sh"
+  lo="$(cd "${lc}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${lh}" 2>&1 || true)"
+  if ! grep -q 'REGRA 115' <<< "${lo}"; then record_pass "hooks-python-isolated: (d1) lint na cópia limpa cala a REGRA 115"
+  else record_fail "hooks-python-isolated: (d1) cópia limpa" "$(grep 'REGRA 115' <<< "${lo}" | head -2 | cut -c1-200 | tr '\n' '|')"; fi
+  printf '\npython3 -c "print(1)"\n' >> "${lh}"
+  lo="$(cd "${lc}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${lh}" 2>&1 || true)"
+  if grep -q 'HARD.*REGRA 115\|REGRA 115.*python-sem-isolamento' <<< "${lo}" && ! grep -q 'SOFT.*REGRA 115' <<< "${lo}"; then record_pass "hooks-python-isolated: (d2) lint emite a REGRA 115 HARD no core"
+  else record_fail "hooks-python-isolated: (d2) dispatcher no core" "$(grep -E 'REGRA 115' <<< "${lo}" | head -2 | cut -c1-200 | tr '\n' '|')"; fi
+  printf 'version: 1\nrole: adopted\n' > "${lc}/.claude/.onion-version"
+  lo="$(cd "${lc}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${lh}" 2>&1 || true)"
+  if grep -q 'REGRA 115' <<< "${lo}" && ! grep -q 'HARD.*REGRA 115' <<< "${lo}"; then record_pass "hooks-python-isolated: (d3) no derivado a REGRA 115 é SOFT"
+  else record_fail "hooks-python-isolated: (d3) dispatcher no derivado" "$(grep -E 'REGRA 115' <<< "${lo}" | head -2 | cut -c1-200 | tr '\n' '|')"; fi
+  rm -rf "${lc}"
+
+  # ── o arranjo: cópia dos hooks, projeto git próprio, sombra só em mktemp ──
+  local d; d="$(TMPDIR=/tmp mktemp -d)"
+  local proj="${d}/proj" lab="${d}/lab" empty="${d}/vazio" ppath="${d}/pp" shim="${d}/shim"
+  mkdir -p "${proj}/.claude/utils" "${proj}/ops" "${proj}/docs/onion" "${lab}" "${empty}" "${ppath}" "${shim}"
+  cp -r "${REPO_ROOT}/.claude/hooks" "${proj}/.claude/hooks"
+  cp -r "${REPO_ROOT}/.claude/utils/task-manager" "${proj}/.claude/utils/task-manager"
+  rm -f "${proj}/.claude/utils/task-manager/.env"
+  : > "${proj}/ops/pr-merge-verified.sh"
+  git -C "${proj}" init -q -b feat 2>/dev/null
+  git -C "${proj}" remote add origin https://github.com/onion-bancada/core.git 2>/dev/null
+  printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: 2026-11-04\n    session_models:\n      - claude-opus-5\n' > "${proj}/docs/onion/radar-baselines.yaml"
+  local moat_armed=0
+  if [ -f "${REPO_ROOT}/ops/moat-targets.tsv" ]; then
+    cp "${REPO_ROOT}/ops/moat-targets.tsv" "${proj}/ops/moat-targets.tsv"; moat_armed=1
+  fi
+  # o módulo sombra no diretório de trabalho e o mesmo por PYTHONPATH
+  printf 'def load(*a, **k): return {}\ndef loads(*a, **k): return {}\ndef dumps(*a, **k): return "{}"\nJSONDecodeError = ValueError\n' > "${lab}/json.py"
+  cp "${lab}/json.py" "${ppath}/json.py"
+  printf 'class shlex:\n    def __init__(self, *a, **k): self.whitespace_split = True\n    def __iter__(self): return iter(())\ndef split(*a, **k): return []\ndef quote(s): return s\n' > "${ppath}/shlex.py"
+  : > "${empty}/json.py"
+  # python3 presente e morto: é o caso "ausente ou quebrado", com o shim à frente do PATH
+  printf '#!/usr/bin/env bash\nexit 1\n' > "${shim}/python3"; chmod +x "${shim}/python3"
+
+  local H; H="api.linear"; H="${H}.app"
+  local envdanger; envdanger='cat .e''nv'
+  local apidanger="python3 -c \"import urllib.request; urllib.request.urlopen('https://${H}/graphql')\""
+  # <veto>|<hook>|<comando perigoso>|<comando honesto>
+  local vetos
+  vetos="env|pretooluse-env-guard.sh|${envdanger}|ls -la
+protect|pretooluse-protect-main.sh|git push --force origin main|git status
+merge|pretooluse-merge-gate.sh|gh pr merge 1|git status
+api|pretooluse-direct-provider-api.sh|${apidanger}|git status"
+  [ "${moat_armed}" = 1 ] && vetos="${vetos}
+moat|pretooluse-moat-gate.sh|systemctl restart onion-vps-bridge|systemctl status onion-vps-bridge"
+  [ "${moat_armed}" = 1 ] || record_skip "hooks-python-isolated: moat sem ops/moat-targets.tsv (core-only) → não medido aqui"
+
+  # <dir-projeto> <cwd> <json> [VAR=val…] → imprime o rc do hook; o stderr fica em ${d}/err
+  _hpi_payload() { printf '%s' "$2" | C="$1" python3 -I -c 'import json,os,sys;print(json.dumps({"session_id":"s","cwd":os.environ["C"],"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))'; }
+  _hpi_run() {  # <projeto> <hook> <cwd> <payload> [VAR=val…]
+    local p="$1" h="$2" w="$3" j="$4" r=0; shift 4
+    printf '%s' "${j}" | (cd "${w}" && env LC_ALL=C CLAUDE_PROJECT_DIR="${p}" TASK_MANAGER_PROVIDER=linear TM_ENV_FILE=/nao-existe \
+        ONION_MODEL_SWITCH_LOG="${d}/m.log" ONION_RADAR_BASELINES="${p}/docs/onion/radar-baselines.yaml" "$@" \
+        bash "${p}/.claude/hooks/${h}" >/dev/null 2>"${d}/err") || r=$?
+    printf '%s' "${r}"
+  }
+  _hpi_case() {  # <nome> <esperado> <projeto> <hook> <cwd> <payload> [VAR=val…]
+    local nm="$1" want="$2" p="$3" h="$4" w="$5" j="$6" got; shift 6
+    got="$(_hpi_run "${p}" "${h}" "${w}" "${j}" "$@")"
+    if [ "${got}" = "${want}" ]; then record_pass "hooks-python-isolated: ${nm} (rc=${want})"
+    else record_fail "hooks-python-isolated: ${nm}" "esperava rc=${want}, veio rc=${got}; $(head -c 200 "${d}/err" 2>/dev/null)"; fi
+  }
+
+  local v hook bad good jb jg jd
+  while IFS='|' read -r v hook bad good; do
+    [ -n "${v}" ] || continue
+    jb="$(_hpi_payload "${lab}" "${bad}")"; jg="$(_hpi_payload "${lab}" "${good}")"
+    _hpi_case "${v}: cwd limpo, comando perigoso"        2 "${proj}" "${hook}" "${d}"     "${jb}"
+    _hpi_case "${v}: módulo sombra no cwd, perigoso"     2 "${proj}" "${hook}" "${lab}"   "${jb}"
+    _hpi_case "${v}: módulo sombra vazio no cwd"         2 "${proj}" "${hook}" "${empty}" "${jb}"
+    _hpi_case "${v}: módulo sombra por PYTHONPATH"       2 "${proj}" "${hook}" "${d}"     "${jb}" PYTHONPATH="${ppath}"
+    _hpi_case "${v}: PYTHONHOME inválido não derruba"    2 "${proj}" "${hook}" "${d}"     "${jb}" PYTHONHOME=/nao-existe
+    if ! grep -qF 'análise não rodou' "${d}/err" && ! grep -qF 'não conseguiu analisar' "${d}/err"; then
+      record_pass "hooks-python-isolated: ${v}: sob PYTHONHOME a análise RODOU (a mensagem é do veredito, não do modo degradado)"
+    else record_fail "hooks-python-isolated: ${v}: sob PYTHONHOME" "caiu no modo degradado: $(head -c 160 "${d}/err")"; fi
+    _hpi_case "${v}: sombra no cwd, comando honesto"     0 "${proj}" "${hook}" "${lab}"   "${jg}"
+    # FAIL-CLOSED: a análise falha de verdade. Fecha o que tem forma do objeto; o resto passa, a sessão não trava.
+    _hpi_case "${v}: python3 quebrado, perigoso"         2 "${proj}" "${hook}" "${d}"     "${jb}" PATH="${shim}:${PATH}"
+    jd="$(_hpi_payload "${d}" 'ls -la')"
+    _hpi_case "${v}: python3 quebrado, honesto"          0 "${proj}" "${hook}" "${d}"     "${jd}" PATH="${shim}:${PATH}"
+    _hpi_case "${v}: JSON truncado, perigoso"            2 "${proj}" "${hook}" "${d}"     "${jb%\}\}}"
+    _hpi_case "${v}: JSON truncado, honesto"             0 "${proj}" "${hook}" "${d}"     "${jd%\}\}}"
+  done <<< "${vetos}"
+  # o veto de troca de modelo lê outro formato de JSON
+  local mb mg mh="premodelswitch-guard.sh"
+  mb='{"hook_event_name":"PreModelSwitch","from_model":"claude-opus-5","to_model":"claude-sonnet-5","requested_model":"claude-sonnet-5","source":"picker"}'
+  mg='{"hook_event_name":"PreModelSwitch","from_model":"claude-sonnet-5","to_model":"claude-opus-5","requested_model":"claude-opus-5","source":"picker"}'
+  _hpi_case "model: cwd limpo, downgrade"                2 "${proj}" "${mh}" "${d}"   "${mb}"
+  _hpi_case "model: módulo sombra no cwd, downgrade"     2 "${proj}" "${mh}" "${lab}" "${mb}"
+  _hpi_case "model: sombra no cwd, modelo do lineup"     0 "${proj}" "${mh}" "${lab}" "${mg}"
+  _hpi_case "model: python3 quebrado, downgrade"         2 "${proj}" "${mh}" "${d}"   "${mb}" PATH="${shim}:${PATH}"
+  _hpi_case "model: JSON truncado, downgrade"            2 "${proj}" "${mh}" "${d}"   "${mb%\}}"
+  # Read: a guarda de segredo não trava a leitura legítima com a análise morta
+  local rb rg; rb="$(printf '{"tool_name":"Read","tool_input":{"file_path":"/x/.e%s"}}' 'nv')"; rg='{"tool_name":"Read","tool_input":{"file_path":"/x/modulo.py"}}'
+  _hpi_case "env: python3 quebrado, Read de segredo"     2 "${proj}" pretooluse-env-guard.sh "${d}" "${rb}" PATH="${shim}:${PATH}"
+  _hpi_case "env: python3 quebrado, Read comum"          0 "${proj}" pretooluse-env-guard.sh "${d}" "${rg}" PATH="${shim}:${PATH}"
+  # a API direta: sem python3 NENHUM o hook cala por desenho declarado (o adapter também não roda)
+  local nopy="${d}/nopy" tl; mkdir -p "${nopy}"
+  for tl in bash cat grep head dirname git tr cut awk sed; do ln -s "$(command -v "${tl}")" "${nopy}/${tl}"; done
+  jb="$(_hpi_payload "${lab}" "${apidanger}")"
+  _hpi_case "api: python3 ausente cala (decisão declarada)" 0 "${proj}" pretooluse-direct-provider-api.sh "${d}" "${jb}" PATH="${nopy}"
+
+  # PYTHONSTARTUP: medido em 2026-11-04, com e sem -I, no 3.12 e no 3.15: em `-c` não interativo ele nunca roda. O caso
+  # prende o fato (nada roda), e NÃO tem mutante: tirar o -I não muda o resultado, e dizer outra coisa seria enfeite.
+  printf 'open("%s/startup.hit","w").close()\n' "${d}" > "${d}/startup.py"
+  jb="$(_hpi_payload "${d}" "${envdanger}")"
+  _hpi_case "env: PYTHONSTARTUP plantado" 2 "${proj}" pretooluse-env-guard.sh "${d}" "${jb}" PYTHONSTARTUP="${d}/startup.py" PYTHONINSPECT=1
+  if [ ! -e "${d}/startup.hit" ]; then record_pass "hooks-python-isolated: env: PYTHONSTARTUP não executou"
+  else record_fail "hooks-python-isolated: env: PYTHONSTARTUP" "o arquivo de início rodou dentro do veto"; fi
+  # o SITE DO USUÁRIO: só o python do SO o carrega (um venv já o desliga)
+  local sysdir="${d}/sys" ub="${d}/ub" sysv=""
+  if [ -x /usr/bin/python3 ] && [ "$(cd "${d}" && /usr/bin/python3 -E -c 'import site;print(site.ENABLE_USER_SITE)' 2>/dev/null)" = "True" ] \
+     && sysv="$(/usr/bin/python3 -I -c 'import sys;print("%d.%d"%sys.version_info[:2])')" && [ -n "${sysv}" ]; then
+    mkdir -p "${sysdir}" "${ub}/lib/python${sysv}/site-packages"
+    ln -s /usr/bin/python3 "${sysdir}/python3"
+    printf 'import json\njson.load = lambda *a, **k: {}\n' > "${ub}/lib/python${sysv}/site-packages/usercustomize.py"
+    _hpi_case "env: site do usuário plantado, python do SO" 2 "${proj}" pretooluse-env-guard.sh "${d}" "${jb}" PATH="${sysdir}:${PATH}" PYTHONUSERBASE="${ub}"
+  else
+    record_skip "hooks-python-isolated: sem /usr/bin/python3 fora de venv → site do usuário não medido aqui"
+  fi
+
+  # ── MUTANTES: cópia limpa primeiro, no MESMO arranjo; se ela não der o certo, o harness reprova e nada conta ──
+  local mut="${d}/mut"
+  _hpi_fresh() { rm -rf "${mut}"; cp -r "${proj}" "${mut}"; }
+  _hpi_mutate() {  # <arquivo relativo> <velho> <novo> (exatamente uma ocorrência, ou reprova)
+    python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)<1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+      "${mut}/$1" "$2" "$3"
+  }
+  _hpi_kill() {  # <nome> <arquivo> <velho> <novo> <hook> <cwd> <payload> <rc-limpo> <rc-com-mutante> [VAR=val…]
+    local nm="$1" f="$2" old="$3" new="$4" h="$5" w="$6" j="$7" clean="$8" want="$9" got; shift 9
+    _hpi_fresh
+    got="$(_hpi_run "${mut}" "${h}" "${w}" "${j}" "$@")"
+    [ "${got}" = "${clean}" ] || { record_fail "hooks-python-isolated: (m) cópia limpa: ${nm}" "esperava rc=${clean}, veio rc=${got}: o arranjo do mutante está errado, nada conta"; return; }
+    _hpi_mutate "${f}" "${old}" "${new}" || { record_fail "hooks-python-isolated: (m) mutante não aplicou" "${nm}"; return; }
+    got="$(_hpi_run "${mut}" "${h}" "${w}" "${j}" "$@")"
+    if [ "${got}" = "${want}" ]; then record_pass "hooks-python-isolated: (m) mutante morde: ${nm} (limpa rc=${clean} → mutante rc=${want})"
+    else record_fail "hooks-python-isolated: (m) mutante NÃO morde" "${nm}: limpa rc=${clean}, mutante rc=${got}, esperava ${want}"; fi
+  }
+  local NOI_J="python3 -I -c 'import json,sys" NOI_N="python3 -c 'import json,sys"
+  # (m1-m4) tirar o -I da leitura do JSON reprova o caso
+  while IFS='|' read -r v hook bad good; do
+    [ -n "${v}" ] || continue
+    [ "${v}" = env ] && continue
+    jb="$(_hpi_payload "${lab}" "${bad}")"
+    _hpi_kill "${v}: tirar o -I da leitura do JSON" ".claude/hooks/${hook}" "${NOI_J}" "${NOI_N}" "${hook}" "${lab}" "${jb}" 2 0
+  done <<< "${vetos}"
+  jb="$(_hpi_payload "${lab}" "${envdanger}")"
+  _hpi_kill "env: tirar o -I do analisador" .claude/hooks/pretooluse-env-guard.sh 'python3 -I -c "$GUARD_PY"' 'python3 -c "$GUARD_PY"' pretooluse-env-guard.sh "${lab}" "${jb}" 2 0
+  _hpi_kill "model: tirar o -I da leitura" .claude/hooks/premodelswitch-guard.sh "python3 -I -c '" "python3 -c '" premodelswitch-guard.sh "${lab}" "${mb}" 2 0
+  # (m-lib) o tokenizador roda por /dev/fd: o cwd não entra no caminho dele, o PYTHONPATH entra. A sombra chega por ali.
+  jb="$(_hpi_payload "${d}" "git push --force origin main")"
+  _hpi_kill "lib: tirar o -I do tokenizador" .claude/hooks/lib/invocation-lines.sh 'python3 -I /dev/fd/4' 'python3 /dev/fd/4' pretooluse-protect-main.sh "${d}" "${jb}" 2 0 PYTHONPATH="${ppath}"
+  # (m-fc) devolver o `except → {}` reprova o caso do JSON ilegível (o fechamento por si, sem depender da sombra)
+  local FC_NEW='try: d=json.load(sys.stdin)
+except Exception: d={}'
+  while IFS='|' read -r v hook bad good; do
+    [ -n "${v}" ] || continue
+    case "${v}" in env) continue ;; esac
+    jb="$(_hpi_payload "${d}" "${bad}")"
+    _hpi_kill "${v}: JSON ilegível voltar a ser {}" ".claude/hooks/${hook}" 'd=json.load(sys.stdin)' "${FC_NEW}" "${hook}" "${d}" "${jb%\}\}}" 2 0
+  done <<< "${vetos}"
+  jb="$(_hpi_payload "${d}" "${envdanger}")"
+  _hpi_kill "env: JSON ilegível voltar a ser {}" .claude/hooks/pretooluse-env-guard.sh 'd = json.load(sys.stdin)' 'd = {}' pretooluse-env-guard.sh "${d}" "${jb%\}\}}" 2 0
+  _hpi_kill "model: JSON ilegível voltar a ser {}" .claude/hooks/premodelswitch-guard.sh 'd=json.load(sys.stdin)' "${FC_NEW}" premodelswitch-guard.sh "${d}" "${mb%\}}" 2 0
+  if [ -x "${sysdir}/python3" ]; then
+    jb="$(_hpi_payload "${d}" "${envdanger}")"
+    _hpi_kill "env: site do usuário sem -I" .claude/hooks/pretooluse-env-guard.sh 'python3 -I -c "$GUARD_PY"' 'python3 -c "$GUARD_PY"' pretooluse-env-guard.sh "${d}" "${jb}" 2 0 PATH="${sysdir}:${PATH}" PYTHONUSERBASE="${ub}"
+  fi
+  # (m-corte) o modo degradado da guarda de segredo: abrir sempre deixa passar; fechar sempre trava a sessão
+  jb="$(_hpi_payload "${d}" "${envdanger}")"; jg="$(_hpi_payload "${d}" "ls -la")"
+  _hpi_kill "env degradado: abrir sempre" .claude/hooks/pretooluse-env-guard.sh 'onion_env_may_touch "$input" || exit 0' 'exit 0' pretooluse-env-guard.sh "${d}" "${jb}" 2 0 PATH="${shim}:${PATH}"
+  _hpi_kill "env degradado: fechar sempre" .claude/hooks/pretooluse-env-guard.sh 'onion_env_may_touch "$input" || exit 0' ':' pretooluse-env-guard.sh "${d}" "${jg}" 0 2 PATH="${shim}:${PATH}"
+
+  # (m-guarda) cada mutante da guarda reverte uma polaridade e exige que o caso nomeado reprove no --selftest dela
+  local sb="${d}/guard" s old new want mo mrc
+  mkdir -p "${sb}"; s="${sb}/python-isolated-check.sh"
+  cp "${chk}" "${s}"
+  if ! LC_ALL=C bash "${s}" --selftest >/dev/null 2>&1; then
+    record_fail "hooks-python-isolated: (m-g) cópia limpa da guarda" "o --selftest da cópia não passou, nada conta"
+  else
+    while IFS=$'\x1f' read -r old new want; do
+      [ -n "${old}" ] || continue
+      cp "${chk}" "${s}"
+      if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+           "${s}" "${old}" "${new}"; then
+        record_fail "hooks-python-isolated: (m-g) mutante não aplicou" "${want}"; continue
+      fi
+      if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+      if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "hooks-python-isolated: (m-g) mutante morde → ✗ ${want}"
+      else record_fail "hooks-python-isolated: (m-g) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+    done <<EOF_HPI
+                iso = any("I" in f[1:] for f in flags)$(printf '\x1f')                iso = True$(printf '\x1f')(a1) -c dentro de \$(…) em pipe
+                iso = any("I" in f[1:] for f in flags)$(printf '\x1f')                iso = bool(flags)$(printf '\x1f')(a12) -B sem -I
+            if w == "command" and i + 1 < n and plain(toks[i + 1][1]) in ("-v", "-V"):$(printf '\x1f')            if False:$(printf '\x1f')(c5) command -v
+                    if a in ("--version", "-V", "--help", "-h"):$(printf '\x1f')                    if False:$(printf '\x1f')(c6) --version
+        if c == "#" and not buf:$(printf '\x1f')        if False:$(printf '\x1f')(c3) comentário
+            is_label = i + 1 < n and toks[i + 1][0] == "op" and toks[i + 1][1] in ")("$(printf '\x1f')            is_label = False$(printf '\x1f')(c8) padrão de case e argumento de grep
+                                  and re.fullmatch(r"-[A-Za-z]*I[A-Za-z]*", e.value) for e in a0.elts[1:])$(printf '\x1f')                                  and False for e in a0.elts[1:])$(printf '\x1f')(c9) heredoc python com sys.executable isolado
+                    if hs:$(printf '\x1f')                    if False:$(printf '\x1f')(a13) sys.executable em heredoc python
+        cands = shell_exec_targets(txt)$(printf '\x1f')        cands = []$(printf '\x1f')(d1) script executado pelo hook entra no alvo
+    return None if re.search(r"\s-[A-Za-z]*I[A-Za-z]*(\s|\$)", first) else first$(printf '\x1f')    return None$(printf '\x1f')(d5) shebang python sem -I acusa
+        print(f"python-isolated-check: settings não parseia: {e}", file=sys.stderr)$(printf '\x1f')        return []$(printf '\x1f')(e1) settings ilegível sai 2
+EOF_HPI
+  fi
+  rm -rf "${d}"
+}
+_family run_hooks_python_isolated_selftests
+
 # REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte) — SAC-63, medido em
 # 2026-10-11 depois da Onda 1 de primárias: o CLAUDE.md prescrevia "Bulk-first" pelo /issue/bulk e nenhum adapter
 # implementava lote; a interface publicava um mapa de prioridade "da UI, não medido" no formato das colunas medidas.

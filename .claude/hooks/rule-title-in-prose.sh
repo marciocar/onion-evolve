@@ -28,7 +28,7 @@ BUNDLE="${HERE}/../validation/plugin-bundle-check.sh"
 _check_text() {   # stdin: texto do assistente · stdout: linhas "N|forma-correta" das menções sem título
   # O texto vai por ARQUIVO: `python3 - <<'PY'` já ocupa o stdin com o script (classe medida 3× em 2026-09-04).
   local tf; tf="$(mktemp)"; cat > "${tf}"
-  python3 - "${LINT}" "${tf}" "${BUNDLE}" <<'PY'
+  python3 -I - "${LINT}" "${tf}" "${BUNDLE}" <<'PY'
 import re, sys
 lint, tf, bundle = sys.argv[1], sys.argv[2], sys.argv[3]
 titles = {}
@@ -61,7 +61,7 @@ PY
 # o teto sem achar, relê o arquivo inteiro como antes — falta de leitura nunca vira silêncio.
 # Sem o lib (cópia parcial do .claude/), cai na leitura inteira de antes.
 _last_text() {   # $1 = transcript · stdout: o texto da última resposta com bloco de texto
-  python3 - "$1" "${HERE}/lib/transcript-tail.py" <<'PY'
+  python3 -I - "$1" "${HERE}/lib/transcript-tail.py" <<'PY'
 import json, sys
 tp, lib = sys.argv[1], sys.argv[2]
 try:
@@ -105,7 +105,7 @@ if [ "${1:-}" = "--selftest" ]; then
   # (e) transcript GRANDE sintético (~20 MB, milhares de linhas antes do turno): o MESMO veredito da
   #     leitura inteira, pelo caminho "tail", lendo menos de 2 MiB e mais rápido que um parse inteiro.
   _d="$(mktemp -d)"; _tp="${_d}/t.jsonl"; _tr="${_d}/trace"; _in="${_d}/in.json"
-  python3 - "${_tp}" <<'PY'
+  python3 -I - "${_tp}" <<'PY'
 import json, sys
 # o custo do parse está nas CHAVES e no aninhamento, não nos bytes (blob de 60 KB parseia quase de graça):
 # rows com 25 chaves de metadado, como as do harness, para o parse inteiro custar o que custa de verdade
@@ -124,7 +124,7 @@ PY
   printf '{"transcript_path":"%s","stop_hook_active":false}' "${_tp}" > "${_in}"
   _t0="$(date +%s%N)"; _rc=0; _out="$(ONION_TRANSCRIPT_TAIL_TRACE="${_tr}" bash "${BASH_SOURCE[0]}" < "${_in}" 2>&1)" || _rc=$?; _t1="$(date +%s%N)"
   _hook_ms=$(( (_t1 - _t0) / 1000000 ))
-  _f0="$(date +%s%N)"; python3 -c 'import json,sys
+  _f0="$(date +%s%N)"; python3 -I -c 'import json,sys
 for l in open(sys.argv[1], encoding="utf-8", errors="replace"):
     try: json.loads(l)
     except Exception: pass' "${_tp}"; _f1="$(date +%s%N)"
@@ -137,7 +137,7 @@ for l in open(sys.argv[1], encoding="utf-8", errors="replace"):
 
   # (f) TETO ESTOURADO (a última resposta com texto além do teto): o fail-safe relê o arquivo inteiro e o
   #     veredito NÃO vira silêncio. Teto forçado a 4 KiB; a resposta fica ~150 KB antes do fim.
-  python3 - "${_tp}" <<'PY'
+  python3 -I - "${_tp}" <<'PY'
 import json, sys
 with open(sys.argv[1], "w", encoding="utf-8") as fh:
     fh.write(json.dumps({"type": "user", "message": {"role": "user", "content": "vai"}}) + "\n")
@@ -158,9 +158,9 @@ fi
 
 input="$(cat)"
 command -v python3 >/dev/null 2>&1 || exit 0
-active="$(printf '%s' "${input}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("1" if d.get("stop_hook_active") else "0")' 2>/dev/null || echo 0)"
+active="$(printf '%s' "${input}" | python3 -I -c 'import json,sys; d=json.load(sys.stdin); print("1" if d.get("stop_hook_active") else "0")' 2>/dev/null || echo 0)"
 [ "${active}" = "1" ] && exit 0
-tp="$(printf '%s' "${input}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("transcript_path",""))' 2>/dev/null || true)"
+tp="$(printf '%s' "${input}" | python3 -I -c 'import json,sys; print(json.load(sys.stdin).get("transcript_path",""))' 2>/dev/null || true)"
 [ -n "${tp}" ] && [ -f "${tp}" ] || exit 0
 
 last="$(_last_text "${tp}")"

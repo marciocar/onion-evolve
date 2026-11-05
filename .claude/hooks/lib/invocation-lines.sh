@@ -167,7 +167,7 @@ onion_invocation_lines() {
   root="$(cd "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}" 2>/dev/null && pwd -P)"
   # Python AUSENTE ou morto: só fecha se o texto tem a FORMA do que os vetos guardam — senão todo
   # comando da sessão seria vetado por falta de motor.
-  ONION_ROOT="$root" ONION_CWD="${ONION_CWD:-$PWD}" python3 /dev/fd/4 3<<<"$cmd" 4<<'ONION_TOKENIZER_PY' 2>/dev/null \
+  ONION_ROOT="$root" ONION_CWD="${ONION_CWD:-$PWD}" python3 -I /dev/fd/4 3<<<"$cmd" 4<<'ONION_TOKENIZER_PY' 2>/dev/null \
     || { grep -qE 'mergePullRequest|(^|[^[:alnum:]_])gh([^[:alnum:]_][^;&|]*)?[^[:alnum:]_](merge|api)([^[:alnum:]_]|$)|(^|[^[:alnum:]_])git([^[:alnum:]_][^;&|]*)?[^[:alnum:]_]push([^[:alnum:]_]|$)' <<< "$cmd" \
          && printf '__ONION_UNANALYZABLE__ merge=1 main=1 :: %s\n' "$(printf '%s' "$cmd" | tr '\n' ' ' | cut -c1-400)"; }
 import os, re, shlex, subprocess, sys, codecs

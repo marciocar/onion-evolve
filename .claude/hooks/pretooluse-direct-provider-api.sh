@@ -345,24 +345,40 @@ _onion_dpa_active() {  # $1=raiz $2=cwd
   bash "${tm}/env-check.sh" --env "${envf}" --provider 2>/dev/null || true
 }
 
+# A ANÁLISE FALHOU com python3 presente (crash, JSON ilegível): não é o caso declarado de "sem python3 o hook cala",
+# que existe porque ali o adapter também não roda. Fecha só se o texto cita um host do provider ATIVO; o resto passa.
+_onion_dpa_failed() {  # $1=texto; nunca retorna: sai 2 com o provider ativo citado numa URL, 0 sem
+  local root active word
+  root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+  active="$(_onion_dpa_active "${root}" "${PWD}")"
+  [ -n "${active}" ] || exit 0
+  # sem o motor Python não há como aplicar os padrões do provider-hosts.tsv (são regex de Python): a forma é o nome
+  # do provedor dentro de uma URL. O nome do host do jira é atlassian.
+  word="${active}"; [ "${word}" = "jira" ] && word="atlassian"
+  if printf '%s' "$1" | tr -d '\\' | grep -qiE "//[^[:space:]\"']*${word}"; then
+    echo "GUARDA-PRETOOLUSE (API direta de provedor): a análise não rodou (python3 quebrado ou JSON do hook ilegível) e o texto cita uma URL do ${active} — fechado por segurança. Use 'bash .claude/utils/task-manager/tm.sh <verbo>'." >&2
+    exit 2
+  fi
+  exit 0
+}
+
 _onion_dpa_main() {
   local input parsed hcwd cmd root hits active p form
   input="$(cat)"
   command -v python3 >/dev/null 2>&1 || return 0
   parsed="$(printf '%s' "${input}" | python3 -I -c 'import json,sys
 sys.stdout.reconfigure(errors="backslashreplace")
-try: d=json.load(sys.stdin)
-except Exception: d={}
+d=json.load(sys.stdin)
 d=d if isinstance(d,dict) else {}
 ti=d.get("tool_input"); ti=ti if isinstance(ti,dict) else {}
-print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null)" || return 0
+print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null)" || _onion_dpa_failed "${input}"
   hcwd="${parsed%%$'\n'*}"; cmd="${parsed#*$'\n'}"; [ "${cmd}" = "${parsed}" ] && cmd=""
   [ -n "${cmd}" ] || return 0
   [ -d "${hcwd}" ] || hcwd="${PWD}"
   root="${CLAUDE_PROJECT_DIR:-$(git -C "${hcwd}" rev-parse --show-toplevel 2>/dev/null || pwd)}"
   [ -f "${root}/.claude/utils/task-manager/provider-hosts.tsv" ] || return 0
   hits="$(printf '%s' "${cmd}" | ONION_ROOT="${root}" ONION_CWD="${hcwd}" \
-          ONION_MAP="${root}/.claude/utils/task-manager/provider-hosts.tsv" _onion_dpa_judge 2>/dev/null)" || return 0
+          ONION_MAP="${root}/.claude/utils/task-manager/provider-hosts.tsv" _onion_dpa_judge 2>/dev/null)" || _onion_dpa_failed "${cmd}"
   [ -n "${hits}" ] || return 0
   active="$(_onion_dpa_active "${root}" "${hcwd}")"
   while IFS=$'\t' read -r p form; do

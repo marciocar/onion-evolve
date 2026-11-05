@@ -11,14 +11,14 @@
 set -uo pipefail
 input="$(cat 2>/dev/null || true)"
 sid="${CLAUDE_CODE_SESSION_ID:-}"
-[ -n "${sid}" ] || sid="$(printf '%s' "${input}" | python3 -c 'import json,sys
+[ -n "${sid}" ] || sid="$(printf '%s' "${input}" | python3 -I -c 'import json,sys
 try: print(json.load(sys.stdin).get("session_id",""))
 except Exception: print("")' 2>/dev/null || true)"
 [ -n "${sid}" ] || exit 0
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 log="${ONION_MODEL_SWITCH_LOG:-${root}/.claude/sessions/model-switch.jsonl}"
 [ -s "${log}" ] || exit 0
-state="$(SID="${sid}" python3 - "${log}" <<'PY' 2>/dev/null || true
+state="$(SID="${sid}" python3 -I - "${log}" <<'PY' 2>/dev/null || true
 import json, sys, os
 sid=os.environ["SID"]; last=None
 for line in open(sys.argv[1], encoding="utf-8"):

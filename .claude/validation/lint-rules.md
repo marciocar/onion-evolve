@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**105 regras** no total — **92 HARD**, **46 SOFT**.
+**106 regras** no total — **93 HARD**, **47 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -214,6 +214,7 @@ As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a 
 | 86 | Workflow de CI PARSEIA como YAML | HARD | workflow inexecutável passando por existente, e guarda morta por sintaxe |
 | 88 | Job de workflow que EXECUTA arquivo do repo faz checkout | HARD + SOFT | job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0` |
 | 101 | Veto PreToolUse por exit 2 declara onFailure: block | HARD + SOFT | veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa). |
+| 115 | Hooks rodam python em modo isolado | HARD + SOFT | um hook, ou o que ele executa, rodar python sem `-I` e importar de fora da instalação do interpretador |
 
 ## Aplicabilidade por papel
 

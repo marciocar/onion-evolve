@@ -59,13 +59,13 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.8
     verified_at: "2026-10-11"
     verified_against: "leitura do pretooluse-env-guard.sh: out=$(… python3 -c …) || out=\"o analisador do veto falhou — fechado por segurança\"; matcher Read|Grep|Bash no settings.json"
     label: "o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash quando falta python3"
-    narrative: "Mantido por desenho: Edit e Write seguem livres e a mensagem do env-guard diz o que falhou. O recorte estreito dos dois vetos vale quando eles rodam sem o env-guard (settings.local, porta ou adotante que o tire). Gatilho para revisitar: a primeira máquina real sem python3 numa sessão."
+    narrative: "Mantido por desenho: Edit e Write seguem livres e a mensagem do env-guard diz o que falhou. O recorte estreito dos dois vetos vale quando eles rodam sem o env-guard (settings.local, porta ou adotante que o tire). Gatilho para revisitar: a primeira máquina real sem python3 numa sessão. SUPERADO em 2026-11-05 por D_FALHA_DE_ANALISE_FECHA_PELA_FORMA, do grafo guard-hooks-python-isolated-2026-11: a análise morta agora fecha pela forma, 20,6% dos comandos reais em vez de 100%, e o Read que diagnostica o python passa."
   - id: E_PREMODELSWITCH_ONFAILURE_MEDIDO
     node_type: evidence
     layer: audit

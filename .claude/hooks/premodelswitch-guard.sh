@@ -28,12 +28,12 @@
 set -uo pipefail
 input="$(cat 2>/dev/null)" || input=""
 [ -n "${input}" ] || exit 0
-read -r ev from to req src ctx usd < <(printf '%s' "${input}" | python3 -c '
+read -r ev from to req src ctx usd < <(printf '%s' "${input}" | python3 -I -c '
 import json,sys
-try: d=json.load(sys.stdin)
-except Exception: d={}
+d=json.load(sys.stdin)
 g=lambda k: str(d.get(k,"") or "").replace(" ","_") or "-"
 print(g("hook_event_name"),g("from_model"),g("to_model"),g("requested_model"),g("source"),g("context_tokens"),g("estimated_cache_write_usd"))' 2>/dev/null) || {
+  # JSON ilegível cai aqui também (2026-11-04): o `{}` de antes dava evento vazio e exit 0, a falha virando permissão.
   # SEM python3 (ausente ou morto) o `read` falhava e a guarda saía 0 — downgrade liberado por dentro, que o
   # onFailure block não cobre (passada adversarial de fix/vetos-fail-closed, 2026-10-11). Os campos são
   # strings simples: o leitor de JSON em bash dos vetos basta (os numéricos ficam "-", só vão ao log).

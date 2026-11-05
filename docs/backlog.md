@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**843 itens abertos** em 142 grafo(s) com aberto (de 182 no escopo) · 143 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**847 itens abertos** em 143 grafo(s) com aberto (de 183 no escopo) · 144 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1271,6 +1271,16 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
+## hooks-python-isolated-2026-11 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `C_TETO_EXECUTAVEL_NAO_FIXADO` | hooks-python-isolated-2026-11 | TETO: -I isola os imports do interpretador, não fixa QUAL executável roda, e não cobre a sobrescrita do próprio script de hook |
+| 6.4 | `C_VIAJA_PARA_PORTAS_E_ADOTANTES` | hooks-python-isolated-2026-11 | viajam às 4 portas e aos adotantes: os hooks curados, a guarda, a REGRA 115 e a família; a evidência e a receita não viajam |
+| 4.5 | `C_TETO_GATE_DO_GIT` | hooks-python-isolated-2026-11 | TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da s |
+| 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
+| 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
+
 ## radar-E3-2026-11-03-r22 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1483,13 +1493,6 @@
 | 3.6 | `Q_ADAPTER_LER_STORY_POINTS` | task-progress-story-points-2026-10 | Qual adapter passa primeiro a ler os pontos (estimate.points_read) e com que medição? ClickUp e Linear têm campo nativo ancorad |
 | 3.2 | `C_TETO_STATUS_BINARIO_POR_SUBTASK` | task-progress-story-points-2026-10 | TETO: o status é binário por subtask (meio feita conta como não feita), e numa task-mãe de task-mãe cada filha entra com os p |
 
-## vetos-fail-closed-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
-| 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
-
 ## radar-E3-2026-10-14-r11 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1521,6 +1524,12 @@
 |--:|---|---|---|
 | 2.8 | `C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO` | radar-E3-2026-10-21-r15 | a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo |
 | 2.8 | `C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA` | radar-E3-2026-10-21-r15 | a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto? |
+
+## vetos-fail-closed-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 
