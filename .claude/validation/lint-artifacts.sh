@@ -6441,7 +6441,7 @@ check_act_signature
 
 # ───────────────────────────────────────────────────────────────────────────
 # REGRA 114 — Plugin não mora em .claude/skills no disco [HARD + SOFT]
-# previne: um plugin plantado em .claude/skills, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê.
+# previne: um plugin plantado em .claude/skills/<nome>/.claude-plugin/ ou .claude/skills/<nome>/hooks/, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê. `hooks/` mais fundo é conteúdo.
 #   DEFEITO MEDIDO (2026-11-04, em LABORATÓRIO, não em dano de produção; Claude Code 2.1.318): nenhuma das 129 tentativas
 #   de escrita em .claude/ e ~/.claude/skills foi barrada por veto do core; o plugin gravado sob bypass carregou na sessão
 #   seguinte e venceu o veto do .env (células W1 e W4). É a metade do veto que NÃO depende do vocabulário do Bash: julga o
@@ -6449,7 +6449,8 @@ check_act_signature
 #   adotantes clonados nesta máquina. Por isso nasce HARD no core, sem catraca e SEM registro de exceção: no core não há plugin
 #   local, um arquivo nessa forma trava o gate, e quem quiser um reabre a decisão com o maestro. No derivado (IS_DERIVED) é SOFT: o
 #   adotante pode instalar um plugin ali por escolha dele, e o core não julga o projeto alheio. Só o repo: `~/.claude/skills` é com
-#   o SessionStart, porque o gate não depende do `~` de quem roda. Lógica e teto em plugin-write-scan-check.sh; o veto da
+#   o SessionStart, que só avisa e nunca barra, porque o gate não depende do `~` de quem roda; se o repo mora na pasta de casa, a linha
+#   chega aqui SOFT. Só o 1º nível de cada skill, sem registro de exceção (regra do maestro, 2026-11-05). Lógica e teto em plugin-write-scan-check.sh; o veto da
 #   escrita é o hook pretooluse-plugin-write-guard.sh, peça de teto do grafo guard-plugin-write-2026-11.
 check_plugin_write_scan() {
   local helper="${SCRIPT_DIR}/plugin-write-scan-check.sh"
@@ -6467,7 +6468,10 @@ check_plugin_write_scan() {
   while IFS=$'\t' read -r _sev _code _path _msg; do
     [ -n "${_code:-}" ] || continue
     [ "${IS_DERIVED}" -eq 1 ] && _sev="SOFT"
-    violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}"
+    case "${_path}" in
+      '~/'*) violation "${_sev:-HARD}" "${_path}" "${_R}: [${_code}] ${_msg}" ;;
+      *)     violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}" ;;
+    esac
   done <<< "${_out}"
   if [ "${_hrc}" -ne 0 ]; then
     violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"

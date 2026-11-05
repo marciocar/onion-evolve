@@ -170,22 +170,42 @@ nodes:
 
   - id: D_NO_CORE_NAO_HA_PLUGIN_LOCAL
     node_type: decision
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.7
     trace: ".claude/validation/plugin-write-scan-check.sh"
     label: "No core não há plugin local: um arquivo nessa forma trava o gate pela REGRA 114 (Plugin não mora em .claude/skills no disco), sem registro de exceção; quem quiser um reabre a decisão com o maestro."
-    narrative: "Decidido pela sessão principal, a partir da escolha do maestro de allowManagedModsOnly. Cura de contradição: o veto mandava o maestro instalar fora da sessão, e a regra reprovava o resultado. A decisão foi tomada pela sessão principal de 2026-11-04 por inferência da escolha do maestro, e ele não a selou aqui: confirme no merge. A pasta de skills do usuário não trava gate nenhum: no SessionStart a varredura lista o caminho e diz o que conferir."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «No repo, barrar a escrita só em .claude/skills/<nome>/.claude-plugin/ e .claude/skills/<nome>/hooks/, no 1º nível de cada skill. Na pasta de skills do usuário (.claude/skills da pasta de casa): veto na escrita pela sessão; a varredura de disco só avisa, nunca barra. Sem registro de exceção.»"
+    narrative: |-
+      Decidido pela sessão principal, a partir da escolha do maestro de allowManagedModsOnly. Cura de contradição: o veto mandava o maestro instalar fora da sessão, e a regra reprovava o resultado. A decisão foi tomada pela sessão principal de 2026-11-04 por inferência da escolha do maestro, e ele não a selou aqui: confirme no merge. A pasta de skills do usuário não trava gate nenhum: no SessionStart a varredura lista o caminho e diz o que conferir.
+
+      Selado por /meta:decide em 2026-11-05: escolhida «No repo, barrar a escrita só em .claude/skills/<nome>/.claude-plugin/ e .claude/skills/<nome>/hooks/, no 1º nível de cada skill. Na pasta de skills do usuário (.claude/skills da pasta de casa): veto na escrita pela sessão; a varredura de disco só avisa, nunca barra. Sem registro de exceção.» (resposta livre do maestro, fora das opções oferecidas); descartadas: «registro de exceção para plugin local».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «No core há plugin local, e com que regra de escrita?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
   - id: Q_HOOKS_EM_QUALQUER_PROFUNDIDADE_E_FALSO_POSITIVO
     node_type: question
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.6
     label: "Em aberto, para o maestro: o glob pedido, hooks/ em qualquer profundidade, veta conteúdo honesto como references/hooks e templates/src/hooks de uma skill com React, e a célula S3 mediu que aninhado não carrega. Restringir a skills/<nome>/hooks fecharia o falso positivo."
-    narrative: "Mantive o glob dele, porque é decisão selada. Medido: zero caminhos assim nos transcripts, e nenhum no git. Gatilho para reabrir: a 1ª skill honesta barrada por isso. O teste de cala do refutador (W1 e W2) segue reprovando por esta razão."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «hooks/ em profundidade maior não barra (era falso positivo); só .claude/skills/<nome>/hooks/, no 1º nível de cada skill»"
+    narrative: |-
+      Mantive o glob dele, porque é decisão selada. Medido: zero caminhos assim nos transcripts, e nenhum no git. Gatilho para reabrir: a 1ª skill honesta barrada por isso. O teste de cala do refutador (W1 e W2) segue reprovando por esta razão.
+
+      Selado por /meta:decide em 2026-11-05: escolhida «hooks/ em profundidade maior não barra (era falso positivo); só .claude/skills/<nome>/hooks/, no 1º nível de cada skill»; descartadas: «manter hooks/ em qualquer profundidade».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Restringir o veto a skills/<nome>/hooks fecha o falso positivo de hooks/ em qualquer profundidade?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
   - id: C_TETO_REDIRECIONAMENTO_COMPOSTO
     node_type: claim

@@ -50834,14 +50834,25 @@ PYREG
 
   # (e) o DISPATCHER: a REGRA 114 acusa um repo com plugin; o caso anda por lint-artifacts de verdade
   local dr="${d}/disp"; mkdir -p "${dr}/.claude/skills/x/hooks"; echo '{}' > "${dr}/.claude/skills/x/hooks/hooks.json"
-  out="$(cd "${REPO_ROOT}" && ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'REGRA 114 (Plugin não mora em .claude/skills no disco).*plugin-em-skills'; then
+  local _hard_repo="${d}/hard-repo.txt"
+  : > "${_hard_repo}"
+  out="$(cd "${REPO_ROOT}" && ONION_LINT_HARD_FILE="${_hard_repo}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
+  if grep -q 'REGRA 114 (Plugin não mora em .claude/skills no disco).*plugin-em-skills' "${_hard_repo}"; then
     record_pass "plugin-write-guard: (e) o dispatcher leva o achado à REGRA 114"
   else record_fail "plugin-write-guard: (e) dispatcher" "$(printf '%s\n' "${out}" | tail -3 | tr '\n' '|')"; fi
   out="$(cd "${REPO_ROOT}" && ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
   if printf '%s' "${out}" | grep -q 'plugin-em-skills'; then
     record_fail "plugin-write-guard: (e1) a variável sem a flag" "trocou o repo julgado: $(printf '%s\n' "${out}" | grep -m1 plugin-em-skills)"
   else record_pass "plugin-write-guard: (e1) sem a flag de bancada, a variável não troca o repo julgado"; fi
+
+  # (e1b) a pasta de casa nunca barra: o dispatcher mantém o SOFT que a varredura entrega, num repo que mora na própria pasta de casa
+  # e a lista das HARD é o que se lê: o rc do lint inteiro depende do resto da árvore
+  local _em_casa _hard="${d}/hard-casa.txt"
+  : > "${_hard}"
+  _em_casa="$(cd "${REPO_ROOT}" && HOME="${dr}" ONION_LINT_HARD_FILE="${_hard}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
+  if printf '%s' "${_em_casa}" | grep -qF 'VIOLATION: ~/.claude/skills/x/hooks/hooks.json' && ! grep -q 'plugin-em-skills' "${_hard}"; then
+    record_pass "plugin-write-guard: (e1b) a pasta de casa acusa, sem caminho colado ao repo, e não entra nas HARD"
+  else record_fail "plugin-write-guard: (e1b) pasta de casa" "HARD: $(grep -m1 'plugin-em-skills' "${_hard}") | $(printf '%s\n' "${_em_casa}" | grep -m1 'plugin-em-skills')"; fi
 
   # (e2) o CONTRATO do tsv que o dispatcher lê: severidade, classe e caminho relativo em colunas
   rc=0; out="$(LC_ALL=C bash "${scan}" "${dr}" --format tsv 2>&1)" || rc=$?
@@ -50891,14 +50902,44 @@ if _pw_is_plugin_path "${spelled}" || _pw_is_plugin_path "${real}"; then
 if _pw_is_plugin_path "${real}"; then
 EOF_MUT
   _pw_mut M3-forma-plugin hook 'Write T3' <<'EOF_MUT'
-*/.claude/skills/*/.claude-plugin|*/.claude/skills/*/.claude-plugin/*) return 0 ;;
+local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
 @@@
-*/NADA) return 0 ;;
+local re_plugin='/NADA/'
+EOF_MUT
+  _pw_mut M3b-plugin-fundo hook 'Write em .claude-plugin fundo' <<'EOF_MUT'
+local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+@@@
+local re_plugin='/\.claude/skills/.+/\.claude-plugin(/|$)'
+EOF_MUT
+  _pw_mut M3c-plugin-raiz hook 'Write em .claude-plugin direto em skills' <<'EOF_MUT'
+local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+@@@
+local re_plugin='/\.claude/skills/([^/]+/)?\.claude-plugin(/|$)'
+EOF_MUT
+  _pw_mut M3d-abaixo-plugin hook 'Write abaixo de .claude-plugin do 1º nível' <<'EOF_MUT'
+local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+@@@
+local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin/[^/]*$'
 EOF_MUT
   _pw_mut M4-forma-hooks hook 'Write T4' <<'EOF_MUT'
-*/.claude/skills/*/hooks|*/.claude/skills/*/hooks/*) return 0 ;;
+local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
-*/NADA) return 0 ;;
+local re_hooks='/NADA/'
+EOF_MUT
+  _pw_mut M4b-hooks-fundo hook 'Write em hooks fundo: references/hooks' <<'EOF_MUT'
+local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+@@@
+local re_hooks='/\.claude/skills/.+/hooks(/|$)'
+EOF_MUT
+  _pw_mut M4c-abaixo-hooks hook 'Write abaixo de hooks do 1º nível' <<'EOF_MUT'
+local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+@@@
+local re_hooks='/\.claude/skills/[^/]+/hooks/[^/]*$'
+EOF_MUT
+  _pw_mut M4d-nome-da-skill hook 'Write em skill nomeada hooks' <<'EOF_MUT'
+local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+@@@
+local re_hooks='/\.claude/skills/([^/]+/)?hooks(/|$)'
 EOF_MUT
   _pw_mut M5-exit2 hook 'Edit T3' <<'EOF_MUT'
 rm passa." >&2
@@ -50967,10 +51008,16 @@ EOF_MUT
 @@@
 || true
 EOF_MUT
-  _pw_mut M18-prune hook 'Write em node_modules de skill' <<'EOF_MUT'
-*/.claude/skills/*/node_modules/*|*/.claude/skills/*/.git/*|*/.claude/skills/*/.venv/*|*/.claude/skills/*/venv/*) return 1 ;;
+  _pw_mut M18-prune hook 'Write em node_modules dentro de hooks do 1º nível' <<'EOF_MUT'
+local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
-*/NADA/*) return 1 ;;
+case "$1" in */node_modules/*) return 1 ;; esac
+  local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+EOF_MUT
+  _pw_mut M18b-fechado-fundo hook 'sem python3: Bash em hooks fundo cala' <<'EOF_MUT'
+grep -qE '\.claude/skills/[^/[:space:]]+/(\.claude-plugin|hooks)(/|[[:space:]]|$)' <<<
+@@@
+grep -qE '\.claude/skills/[^[:space:]]*(\.claude-plugin|/hooks)(/|[[:space:]]|$)' <<<
 EOF_MUT
   _pw_mut J1-resolvido judge 'Bash por symlink sem sinal no texto' <<'EOF_MUT'
     for q in (p, os.path.realpath(p)):
@@ -51096,9 +51143,9 @@ _pw_copy_into_skills(base, args, " ".join(raw_words))
 pass
 EOF_MUT
   _pw_mut J9-pasta-qualquer judge 'cp -r de pasta sem plugin para skills' <<'EOF_MUT'
-if sp and _pw_tree_form(os.path.realpath(sp), ex):
+if sp and lands and _pw_tree_form(os.path.realpath(sp), ex):
 @@@
-if sp:
+if sp and lands:
 EOF_MUT
   _pw_mut J9b-so-hooks judge 'cp -r de pasta só com hooks' <<'EOF_MUT'
 for n in (".claude-plugin", "hooks"))
@@ -51120,15 +51167,54 @@ ex.add(v.strip("/"))
 @@@
 pass
 EOF_MUT
-  _pw_mut J10-nome-da-skill judge 'Bash > em skill nomeada hooks' <<'EOF_MUT'
-if c == "hooks" and j >= 1:
+  _pw_mut J9f-dentro-da-skill judge 'cp -r de pasta com plugin para dentro de skill existente' <<'EOF_MUT'
+return merge or not into
 @@@
-if c == "hooks":
+return True
 EOF_MUT
-  _pw_mut J10b-prune judge 'Bash > em node_modules de skill' <<'EOF_MUT'
-if j >= 1 and c in _PW_PRUNE:
+  _pw_mut J9g-fundo judge 'cp -r de pasta com plugin para fundo' <<'EOF_MUT'
+if depth == 1:
+        return merge or not into
+    return False
 @@@
-if False:
+if depth == 1:
+        return merge or not into
+    return True
+EOF_MUT
+  _pw_mut J9h-conteudo-cp judge 'cp -r do conteúdo de pasta com plugin para skill existente' <<'EOF_MUT'
+(base == "cp" and src.rstrip("/").endswith("/."))
+@@@
+False
+EOF_MUT
+  _pw_mut J9i-conteudo-rsync judge 'rsync do conteúdo de pasta com plugin para skill existente' <<'EOF_MUT'
+(base == "rsync" and src.endswith("/"))
+@@@
+False
+EOF_MUT
+  _pw_mut J9j-rsync-por-dentro judge 'rsync de pasta com plugin para dentro de skill' <<'EOF_MUT'
+into = bool(tdir) or base == "rsync" or os.path.isdir(d)
+@@@
+into = bool(tdir) or os.path.isdir(d)
+EOF_MUT
+  _pw_mut J9k-t-por-dentro judge 'cp -t de pasta com plugin para dentro de skill existente' <<'EOF_MUT'
+into = bool(tdir) or base == "rsync" or os.path.isdir(d)
+@@@
+into = False
+EOF_MUT
+  _pw_mut J10-nome-da-skill judge 'Bash > em skill nomeada hooks' <<'EOF_MUT'
+c = parts[i + 3]
+@@@
+c = parts[i + 2]
+EOF_MUT
+  _pw_mut J10c-hooks-fundo judge 'Bash > em hooks fundo' <<'EOF_MUT'
+if c == "hooks":
+@@@
+if "hooks" in parts[i + 3:]:
+EOF_MUT
+  _pw_mut J10d-plugin-fundo judge 'Bash > em .claude-plugin fundo' <<'EOF_MUT'
+if c == ".claude-plugin":
+@@@
+if ".claude-plugin" in parts[i + 2:]:
 EOF_MUT
   _pw_mut J11-classe judge 'crontab que cita' <<'EOF_MUT'
 if cls in ("relogio", "alheio"):
@@ -51139,6 +51225,11 @@ EOF_MUT
 return any(_PW_TEXT_SIG.search(ln) and _PW_SHELL_WRITE.search(ln) for ln in t.split("\n"))
 @@@
 return False
+EOF_MUT
+  _pw_mut J12b-sinal-fundo judge 'eval com hooks fundo no texto' <<'EOF_MUT'
+_PW_TEXT_SIG = re.compile(r"skills/[^/\s]+/(?:\.claude-plugin|hooks)(?:[/\s'\"]|$)")
+@@@
+_PW_TEXT_SIG = re.compile(r"skills/\S*(?:\.claude-plugin|/hooks)")
 EOF_MUT
   _pw_mut J13-sobreacusa-codigo judge 'python3 -c que só cita, escrevendo noutro lugar' <<'EOF_MUT'
  and _pw_code_writes(head, args[k + 1]):
@@ -51169,6 +51260,11 @@ EOF_MUT
 r"|\bFile\.write\(\s*" + _PW_QP +
 @@@
 r"|NUNCA" + _PW_QP +
+EOF_MUT
+  _pw_mut J15e-caminho-fundo judge 'node em hooks fundo' <<'EOF_MUT'
+[^/'\"`\n]+/(?:\.claude-plugin|hooks)(?:/[^'\"`\n]*)?"
+@@@
+[^'\"`\n]*(?:\.claude-plugin|/hooks)(?:/[^'\"`\n]*)?"
 EOF_MUT
   _pw_mut J16-xargs-fora judge 'leitura: xargs cp -I para fora' <<'EOF_MUT'
 if tail and os.path.basename(tail[0]) in ("cp", "mv", "ln", "install", "rsync"):
@@ -51240,34 +51336,64 @@ exempt = {_moat_abspath(pos[0])}
 pass
 EOF_MUT
   _pw_mut S1-segue-link scan 'skill que é link para fora (S6)' <<'EOF_MUT'
+[ -d "${e}" ] || continue
+@@@
+{ [ -d "${e}" ] && [ ! -L "${e}" ]; } || continue
+EOF_MUT
+  _pw_mut S1c-hooks-link scan 'a pasta hooks é link para fora' <<'EOF_MUT'
 find -H "${ents[@]}"
 @@@
-find -P "${ents[@]}"
+find -P "${ents[@]}" -mindepth 1
 EOF_MUT
-  _pw_mut S1b-fundo scan 'link abaixo do 1º nível' <<'EOF_MUT'
+  _pw_mut S1b-fundo scan 'link dentro de hooks acusa o link e não desce' <<'EOF_MUT'
 find -H "${ents[@]}"
 @@@
 find -L "${ents[@]}"
 EOF_MUT
   _pw_mut S2-hooks scan 'hooks.json em skills/x/hooks (W1)' <<'EOF_MUT'
- -o -path './*/hooks/*' \) -print0
+for s in "${e}/.claude-plugin" "${e}/hooks"; do
 @@@
- \) -print0
+for s in "${e}/.claude-plugin"; do
+EOF_MUT
+  _pw_mut S2b-hooks-fundo scan 'hooks aninhado skills/a/b (S3)' <<'EOF_MUT'
+for s in "${e}/.claude-plugin" "${e}/hooks"; do
+@@@
+for s in "${e}/.claude-plugin" "${e}/hooks" "${e}"/*/hooks; do
+EOF_MUT
+  _pw_mut S2c-conteudo scan 'hooks de conteúdo' <<'EOF_MUT'
+for s in "${e}/.claude-plugin" "${e}/hooks"; do
+@@@
+for s in "${e}/.claude-plugin" "${e}/hooks" "${e}"/*/hooks "${e}"/*/*/hooks; do
 EOF_MUT
   _pw_mut S3-plugin scan 'plugin.json em skills/x/.claude-plugin (W1)' <<'EOF_MUT'
- -o -path './*/.claude-plugin/*' -o -path
+for s in "${e}/.claude-plugin" "${e}/hooks"; do
 @@@
- -o -path
+for s in "${e}/hooks"; do
 EOF_MUT
-  _pw_mut S4-prune scan 'hooks dentro de node_modules' <<'EOF_MUT'
-\( -name node_modules -o -name .git -o -name .venv -o -name venv \) -prune -o \
+  _pw_mut S3b-plugin-fundo scan 'plugin aninhado skills/a/b (S3)' <<'EOF_MUT'
+for s in "${e}/.claude-plugin" "${e}/hooks"; do
 @@@
-\
+for s in "${e}/.claude-plugin" "${e}/hooks" "${e}"/*/.claude-plugin; do
+EOF_MUT
+  _pw_mut S3c-raiz scan '.claude-plugin direto em skills' <<'EOF_MUT'
+for e in ./*; do
+@@@
+for e in . ./*; do
+EOF_MUT
+  _pw_mut S4-prune scan 'node_modules dentro de hooks do 1º nível' <<'EOF_MUT'
+find -H "${ents[@]}" \(
+@@@
+find -H "${ents[@]}" -name node_modules -prune -o \(
+EOF_MUT
+  _pw_mut S4b-git-da-pasta scan 'hooks do .git da pasta de skills' <<'EOF_MUT'
+[ "${e}" = ./.git ] && continue
+@@@
+:
 EOF_MUT
   _pw_mut S5-nome-da-skill scan 'skill nomeada hooks' <<'EOF_MUT'
- -o -path './*/hooks/*' \)
+for e in ./*; do
 @@@
- -o -path '*hooks/*' \)
+for e in . ./*; do
 EOF_MUT
   _pw_mut S6-sem-home scan 'com --home' <<'EOF_MUT'
     _scan_dir "${HOME}/.claude/skills" "~/.claude/skills" "${acc}" || rc=$?
@@ -51275,9 +51401,24 @@ EOF_MUT
     :
 EOF_MUT
   _pw_mut S7-gate-no-home scan 'sem --home' <<'EOF_MUT'
-if [ "${home_too}" = 1 ] && [ -n "${HOME:-}" ]; then
+if { [ "${home_too}" = 1 ] || [ "${same}" = 1 ]; } && [ -n "${HOME:-}" ]; then
 @@@
 if [ -n "${HOME:-}" ]; then
+EOF_MUT
+  _pw_mut S11-casa-barra scan 'a pasta de casa sai SOFT' <<'EOF_MUT'
+'~/'*) sev="SOFT"; msg="${msg_home}" ;;
+@@@
+'~/'*) sev="HARD"; msg="${msg_home}" ;;
+EOF_MUT
+  _pw_mut S12-repo-avisa scan 'o repo sai HARD' <<'EOF_MUT'
+*)     sev="HARD"; msg="${msg_repo}" ;;
+@@@
+*)     sev="SOFT"; msg="${msg_repo}" ;;
+EOF_MUT
+  _pw_mut S13-repo-na-casa scan 'repo que mora na pasta de casa sai SOFT, uma vez só' <<'EOF_MUT'
+= "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then same=1; fi
+@@@
+= "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then same=0; fi
 EOF_MUT
   _pw_mut S8-saneia scan 'nome com quebra de linha' <<'EOF_MUT'
 f="$(LC_ALL=C; printf '%s' "${f//[^[:print:]]/?}")"

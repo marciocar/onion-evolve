@@ -12,11 +12,13 @@
 # `moat_command`): renomear um deles quebra esta guarda, e a família plugin_write_guard reprova na hora.
 #
 # ── O QUE MUDA EM RELAÇÃO AO MOAT ─────────────────────────────────────────────────────────────
-#  · alvo: a FORMA do caminho, como escrito E resolvido (`_pw_form`), em vez da lista de ops/moat-targets.tsv (core-only);
+#  · alvo: a FORMA do caminho, como escrito E resolvido (`_pw_form`), em vez da lista de ops/moat-targets.tsv (core-only).
+#    Regra do maestro (2026-11-05): só `.claude/skills/<nome>/.claude-plugin/` e `.claude/skills/<nome>/hooks/`, no 1º nível de cada
+#    skill; a mesma forma vale na pasta de casa. `hooks/` mais fundo é conteúdo e passa, sem registro de exceção;
 #  · remover e ler não é escrever: `rm`, `rmdir`, `unlink`, `find -delete`, `find -exec rm`, `git clean`, `git rm`, a
 #    ORIGEM de um mv, cp ou xargs cp, e a referência de `touch -r` passam. Tirar um plugin plantado é a cura que a varredura manda;
-#  · pasta inteira: `cp -r`, `mv`, `ln -s`, `rsync` de uma pasta que JÁ TEM `.claude-plugin/` ou `hooks/` para dentro
-#    de .claude/skills (S6 da medição: a skill que é link para fora carrega);
+#  · pasta inteira: `cp -r`, `mv`, `ln -s`, `rsync` de uma pasta que JÁ TEM `.claude-plugin/` ou `hooks/`, quando ela cai como
+#    `.claude/skills/<nome>` (S6 da medição: a skill que é link para fora carrega). Caindo mais fundo, passa;
 #  · outra linguagem: em Python, pela árvore sintática e só no argumento DESTINO; nas outras, pela forma, com o caminho literal;
 #  · heredoc: só é código se quem o lê é um interpretador sem script (`python3 - <<E`). Heredoc de documento e `git commit -F -`
 #    são texto, inclusive quando citam um heredoc de python dentro deles;
@@ -29,23 +31,21 @@ import os as _pw_os
 _pw_moat = _pw_os.path.join(_pw_os.path.dirname(_pw_os.path.abspath(_pw_os.environ["ONION_MOAT_JUDGE"])), "moat-judge.py")
 exec(compile(open(_pw_moat, encoding="utf-8").read(), _pw_moat, "exec"))
 
-_PW_FORM_PLUGIN = ".claude/skills/**/.claude-plugin/**"
-_PW_FORM_HOOKS = ".claude/skills/**/hooks/**"
-# o que a varredura não desce: uma skill pode trazer dependência vendorizada, e o `hooks/` dela não é plugin
-_PW_PRUNE = {"node_modules", ".git", ".venv", "venv"}
+_PW_FORM_PLUGIN = ".claude/skills/<nome>/.claude-plugin/"
+_PW_FORM_HOOKS = ".claude/skills/<nome>/hooks/"
 _PW = {"skip": False, "exempt": set(), "noexec": False, "in_script": 0}
 # os motores escritores e os wrappers do MOAT não têm a ver com plugin; vazios, os ramos deles nunca casam
 _MOAT_ARG_WRITERS = {}
 _MOAT_WRAPPER_COPIES = ()
 # o sinal por linha, para o que não se prova (eval, xargs, nome de comando em runtime, script recém-escrito)
-_PW_TEXT_SIG = re.compile(r"skills/\S*(?:\.claude-plugin|/hooks)")
+_PW_TEXT_SIG = re.compile(r"skills/[^/\s]+/(?:\.claude-plugin|hooks)(?:[/\s'\"]|$)")
 _PW_SHELL_WRITE = re.compile(r">|\b(cp|mv|install|tee|ln|mkdir|touch|dd|tar|unzip|rsync|curl|wget)\b")
 _MOAT_SIGNAL = _PW_TEXT_SIG
 _MOAT_MEMBER_SIGNAL = None
 # REPLAY de 2026-11-04 (60.418 comandos Bash únicos dos transcripts): a 1ª redação vetou um `python3 - <<'PY'` honesto que fazia
 # `s.replace(old, '… .claude-plugin/marketplace.json')`. Python agora vai pela árvore; aqui ficam as outras linguagens, com o
 # caminho literal trazendo `.claude/skills/`, e no argumento DESTINO.
-_PW_PATH = r"[^'\"`\n]*\.claude/skills/[^'\"`\n]*(?:\.claude-plugin|/hooks)(?:/[^'\"`\n]*)?"
+_PW_PATH = r"[^'\"`\n]*\.claude/skills/[^/'\"`\n]+/(?:\.claude-plugin|hooks)(?:/[^'\"`\n]*)?"
 _PW_QP = r"[a-zA-Z]*['\"`]" + _PW_PATH + r"['\"`]"
 _PW_CODE_WRITE = re.compile(
     r"\b(?:writeFile|writeFileSync|appendFile|appendFileSync|mkdirSync)\(\s*" + _PW_QP +
@@ -72,24 +72,36 @@ _pw_ambiguous = set()    # NOME com mais de um valor, ou religado por for/select
 
 
 def _pw_form(p):
-    """A forma do caminho. O 1º componente depois de skills/ é o NOME da skill: uma skill chamada `hooks` é honesta, e abaixo
-    de node_modules, .git e venv a forma não conta (é o que a varredura também não desce)."""
+    """A forma do caminho, sempre logo abaixo do NOME da skill: uma skill chamada `hooks` é honesta, e `references/hooks` é conteúdo."""
     parts = str(p).split("/")
-    for i in range(len(parts) - 1):
+    for i in range(len(parts) - 3):
         if parts[i] == ".claude" and parts[i + 1] == "skills":
-            for j, c in enumerate(parts[i + 2:]):
-                if j >= 1 and c in _PW_PRUNE:
-                    return None
-                if c == ".claude-plugin":
-                    return _PW_FORM_PLUGIN
-                if c == "hooks" and j >= 1:
-                    return _PW_FORM_HOOKS
+            c = parts[i + 3]
+            if c == ".claude-plugin":
+                return _PW_FORM_PLUGIN
+            if c == "hooks":
+                return _PW_FORM_HOOKS
     return None
 
 
-def _pw_in_skills(p):
-    parts = str(p).split("/")
-    return any(parts[i] == ".claude" and parts[i + 1] == "skills" for i in range(len(parts) - 1))
+def _pw_skills_depth(p):
+    """Quantos componentes há depois de `.claude/skills`; None fora de lá."""
+    parts = [c for c in str(p).split("/") if c]
+    for i in range(len(parts) - 1):
+        if parts[i] == ".claude" and parts[i + 1] == "skills":
+            return len(parts) - i - 2
+    return None
+
+
+def _pw_lands_as_skill(base, src, dest, into):
+    """A pasta copiada fica como `.claude/skills/<nome>`? Só aí o `hooks/` dela cai no 1º nível. `into` diz que o destino a recebe por dentro."""
+    merge = (base == "rsync" and src.endswith("/")) or (base == "cp" and src.rstrip("/").endswith("/."))
+    depth = _pw_skills_depth(dest)
+    if depth == 0:
+        return not merge
+    if depth == 1:
+        return merge or not into
+    return False
 
 
 def _moat_path_match(p, classes=("deploy", "relogio")):
@@ -399,7 +411,7 @@ def _pw_tree_form(src, excluded=()):
 
 
 def _pw_copy_into_skills(base, args, detail):
-    """Pasta que JÁ TEM a forma de plugin indo para dentro de .claude/skills. O destino sozinho não tem a forma."""
+    """Pasta que JÁ TEM a forma de plugin caindo como `.claude/skills/<nome>`. O destino sozinho não tem a forma."""
     pos = _moat_positionals(args, {"-S", "--suffix", "-e", "--rsh", "--exclude", "--include", "--filter", "-f"})
     tdir = _moat_opt_value(args, {"-t", "--target-directory"}, ("--target-directory",))
     if tdir:
@@ -409,8 +421,9 @@ def _pw_copy_into_skills(base, args, detail):
     else:
         return
     d = _moat_abspath(dest)
-    if not d or not (_pw_in_skills(d) or _pw_in_skills(os.path.realpath(d))):
+    if not d:
         return
+    into = bool(tdir) or base == "rsync" or os.path.isdir(d)
     ex = set()
     if base == "rsync":
         for k, a in enumerate(args):
@@ -419,7 +432,8 @@ def _pw_copy_into_skills(base, args, detail):
                 ex.add(v.strip("/"))
     for s in srcs:
         sp = _moat_abspath(s, os.path.dirname(d) if base == "ln" else None)
-        if sp and _pw_tree_form(os.path.realpath(sp), ex):
+        lands = _pw_lands_as_skill(base, s, d, into) or _pw_lands_as_skill(base, s, os.path.realpath(d), into)
+        if sp and lands and _pw_tree_form(os.path.realpath(sp), ex):
             _moat_emit("plugin", d, "", "%s de uma pasta com a forma de plugin para dentro de .claude/skills — %s" % (base, detail))
 
 
