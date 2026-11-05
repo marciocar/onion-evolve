@@ -1,22 +1,45 @@
 ---
 reviewed_diff_sha256: 256e753f689583b3564a6824d2cfa8dcdfc208325704b8e97f72a5cb98ddc7af
 reviewed_code_sha256: 76841511127dcdcead998c564acd7f54ed63d806faae64bf5c8e983f6472fa79
-findings_total: 0
-findings_real: 0
+findings_total: 9
+findings_real: 9
+findings_fixed: 4
 tokens: 0
 duration_min: 0
-verdict: PENDENTE
-elenxo: nao
+verdict: REPROVADO_E_CURADO
+elenxo: sim
+reviewer: refutador independente (5293ef4aa) + verificação do diferencial pela sessão principal (e0545c889)
 nota: >
-  A passada adversarial NÃO rodou: um refutador independente julga depois, com mandato de achar o falso
-  positivo (nota honesta barrada ou avisada). Os campos acima seguem sem dizer nada sobre o artefato, e
-  quem os preenche é a sessão que rodar a passada, ao fim dela.
+  O refutador independente reprovou 5293ef4aa com 3 BLOQUEIA e 6 itens de teto. Os 3 BLOQUEIA e um item
+  de teto de uma linha viraram cura em e0545c889, cada um com caso que falha antes e passa depois e com
+  mutante; os outros 5 ficaram declarados no cabeçalho do hook. A sessão principal verificou o
+  diferencial rodando o lab.py do refutador sobre git archive e0545c889: os BLOQUEIA viraram rc 2, e
+  os FURO e FP restantes são exatamente os declarados. tokens e duration_min não foram medidos (0).
 ---
 
 # Guarda da escrita na memória do Claude Code e a varredura do disco
 
-**A 1ª passada independente REPROVOU 5293ef4aa com 3 BLOQUEIA**, curados numa volta (nó
-`E_REFUTADOR_REPROVOU_E_CUROU`). A verificação do diferencial está pendente; os campos acima seguem sem veredito.
+## A passada adversarial
+
+**Refutador independente, sobre 5293ef4aa: REPROVADO.** Laboratório dele: `lab.py`, `replay.py`, `mut.sh`,
+`lat.sh`, com a casa falsa, o hook real e o rc lido do processo.
+
+| # | achado | grau | destino |
+|---|---|---|---|
+| 1 | link até a memória passava no caminho quente: o filtro textual "memory" saía com rc 0 antes do realpath | BLOQUEIA | **cura**: sonda de link em bash, num só realpath; casos (v-b), (v-c) e mutante |
+| 2 | `"$HOME"/…`, `~/".claude/…"`, `${HOME:?}` e `${HOME:-…}` não eram reconhecidos | BLOQUEIA | **cura**: aspas fora antes de tokenizar e toda grafia de expansão; casos (xvi-g) a (xvi-i2) e mutantes |
+| 3 | `open(os.path.expanduser('~/…'),'w')` com parênteses aninhados escapava | BLOQUEIA | **cura**: dois níveis de parênteses e o caminho dentro do `open` de escrita; casos (xvi-j), (xvi-k) e mutantes |
+| 4 | autoMemoryDirectory com `$HOME/…` no valor não armava | teto | **cura** de uma linha (`expandvars`); caso (iv-b) e mutante |
+| 5 | conteúdo fora do texto do comando (`cp`, `cat arq >>`, rsync, mv) | teto | **declarado**: a varredura do SessionStart e a REGRA 116 pegam |
+| 6 | envelope dividido em duas escritas | teto | **declarado**: a varredura pega |
+| 7 | grafias que o harness não produz (`summary=` antes de `teammate_id=`, `&lt;`) | teto | **declarado** |
+| 8 | link criado no mesmo comando | teto | **declarado** |
+| 9 | falso positivo HARD em nota que documenta o formato | teto | **declarado**: 0 em 364 notas; a mensagem do HARD orienta a reescrita |
+
+**Verificação do diferencial, pela sessão principal, sobre `git archive e0545c889`:** o `lab.py` do
+refutador deu rc 2 nos três BLOQUEIA (link existente no Write e no Bash, `"$HOME"/…`, `${HOME:?}`, `open`
+com `expanduser`) e no autoMemoryDirectory com `$HOME`. Os FURO e FP que restam são exatamente os
+declarados no teto.
 
 O que uma passada precisa saber antes de começar: o `--selftest` é meu e foi escrito junto com o
 artefato. Três pontos cegos conhecidos. (1) O vocabulário do Bash: só se julga o caminho de memória

@@ -187,7 +187,7 @@ nodes:
     impact: 4
     confidence: 0.5
     trace: "docs/evolution/review/feat-guard-memory-write.md"
-    label: "A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta; a verificação do diferencial está pendente. Enquanto ela não rodar, nada aqui está selado."
+    label: "A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta. Em 2026-11-05 a sessão principal verificou o diferencial com o lab.py do refutador sobre git archive e0545c889: os 3 BLOQUEIA viraram rc 2, e os FURO e FP que restam são os declarados. O selo é o merge humano."
 
   - id: Q_GATILHO_HARD_POR_PROVENIENCIA
     node_type: question
