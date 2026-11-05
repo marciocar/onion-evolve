@@ -2,7 +2,8 @@
 branch: fix/hooks-python-isolated
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1edadd208dd1b769ab471cc851bbf6821aaa210258c9295ebe9b0d047486e26c
+reviewed_code_sha256: 7dcc648035f117eed5f968cf0f4891a341bf26c71f9c06b9ccdbf19ffe83a75a
 findings_total: 12
 findings_real: 12
 tokens: 0
