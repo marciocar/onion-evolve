@@ -6,7 +6,7 @@ meta:
   review_after: "2026-12-05"   # 30d: o tipo DOMINANTE é FERRAMENTA. O que move a decisão são o marketplace do Claude Code,
                                # o Registry em preview e as regras do npm 12, que mudam por release. O eixo de capital (90d)
                                # é secundário e está sem sinal; a reabertura real é o selo do maestro ou um dos gatilhos do D_.
-  # ═══ TETO: 104 NÓS ═══
+  # ═══ TETO: 105 NÓS ═══
   # Justificativa do teto: o modo decisão exige 1 nó por objeção sobrevivente (40) e 1 por superação achada (32);
   # os outros 32 são 1 pergunta, 1 decisão, 8 opções, 19 evidências votadas, 1 medição do Radar Vol. 35, mercado e lacunas.
   purpose: "Decidir por qual forma o Onion se distribui além das quatro portas: npm, PyPI, MCP, MCPB, imagem ou nenhuma, com gatilho e custo por forma."
