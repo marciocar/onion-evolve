@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: 256e753f689583b3564a6824d2cfa8dcdfc208325704b8e97f72a5cb98ddc7af
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 76841511127dcdcead998c564acd7f54ed63d806faae64bf5c8e983f6472fa79
 findings_total: 9
 findings_real: 9
@@ -14,7 +14,9 @@ nota: >
   de teto de uma linha viraram cura em e0545c889, cada um com caso que falha antes e passa depois e com
   mutante; os outros 5 ficaram declarados no cabeçalho do hook. A sessão principal verificou o
   diferencial rodando o lab.py do refutador sobre git archive e0545c889: os BLOQUEIA viraram rc 2, e
-  os FURO e FP restantes são exatamente os declarados. tokens e duration_min não foram medidos (0).
+  os FURO e FP restantes são exatamente os declarados. tokens e duration_min não foram medidos (0). Depois da verificação entrou uma só mudança, na bancada: o caso (b2)
+  passou a ler por here-string (o pré-voo do pr-finalize acusou `produtor | grep -q`, a classe EPIPE sob pipefail);
+  o hook, o juiz e a varredura não mudaram.
 ---
 
 # Guarda da escrita na memória do Claude Code e a varredura do disco
