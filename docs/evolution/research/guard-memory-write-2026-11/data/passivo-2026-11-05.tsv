@@ -1,0 +1,10 @@
+# passivo da proveniência, 2026-11-05: notas .md (exceto MEMORY.md) nas 77 pastas de memória desta máquina
+notas	340
+com_data_iso	322
+com_commit	80
+com_PR	84
+com_comando_em_crase	179
+com_alguma_proveniencia	331
+sem_proveniencia	9
+# envelope de canal (abertura) nas notas: 0 para <<<UNTRUSTED, ‹‹‹, <cross-session-message, <teammate-message, <pasted_content, <system-reminder
+# medido com: python3 -I measure.py e /usr/bin/grep -rlF <marca> nas pastas de memória (scratchpad da sessão)

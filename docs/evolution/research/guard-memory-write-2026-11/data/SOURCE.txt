@@ -1,0 +1,9 @@
+# Proveniência de data/
+
+Derivado em 2026-11-05 dos laboratórios da forja, no scratchpad da sessão (não versionados).
+Saneado: caminhos de laboratório viraram `<LAB>`; nenhum conteúdo de memória nem comando de transcript foi copiado,
+só contagens. Sem credencial: o laboratório ao vivo usou a conta da sessão via `claude -p`, num projeto isolado.
+
+- `passivo-2026-11-05.tsv`: as notas de memória desta máquina medidas por forma de proveniência e por marca de envelope.
+- `replay-2026-11-05.txt`: as 618 escritas na memória achadas nos transcripts, reexecutadas pelo hook real.
+- `live-lab-2026-11-05.txt`: as duas sessões ao vivo (HARD barrou; SOFT chegou como additionalContext).

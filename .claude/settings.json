@@ -43,6 +43,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-beacon-hook.sh\" up",
             "timeout": 5,
             "statusMessage": "Acendendo farol de sessão (Onion)"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/validation/memory-write-scan-check.sh\" --session",
+            "timeout": 5,
+            "statusMessage": "Varrendo a memória por envelope de canal (Onion)"
           }
         ]
       }
@@ -202,6 +208,16 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/house-code-gloss.sh\" tool"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-memory-write-guard.sh\"",
+            "onFailure": "block"
           }
         ]
       }
