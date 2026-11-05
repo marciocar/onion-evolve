@@ -2,7 +2,8 @@
 branch: fix/door-standalone-lint
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9bb1c3df9fca71f19fd07d99fce331c28e7cbe705098854704cd4bb12020d5c7
+reviewed_code_sha256: c8b5c76089376624bb2fa84fe771bb29f14f147c1ff8d1cacb28cd785a041470
 findings_total: 0
 findings_real: 0
 tokens: 0
