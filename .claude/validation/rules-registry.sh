@@ -281,7 +281,7 @@ CATEGORIES = [
      "TODO PR e a mensagem culpava o código revisado. Gate que nunca olhou, acusando. "
      "A REGRA 101 entrou em 2026-10-11 pela versão do veto: o hook que nem roda (script "
      "ausente, rc=127) deixava a ação passar — veto que não executou, contado como veto.",
-     [54, 86, 88, 101]),
+     [54, 86, 88, 101, 115]),
 ]
 
 seen = {}

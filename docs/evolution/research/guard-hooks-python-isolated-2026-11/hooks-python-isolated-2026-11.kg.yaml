@@ -1,0 +1,207 @@
+# kg-backlog-guard: on
+# Forja de guarda (/meta:forge-guard): hooks rodam python em modo isolado. A evidência bruta fica fora da árvore até o
+# maestro decidir; este grafo guarda o defeito em forma neutra, a decisão, a medida e o teto.
+meta:
+  id: guard-hooks-python-isolated-2026-11
+  schema_version: "1"
+  baseline: "2026-11-04"
+  review_after: "2026-12-04"   # 30d: defeito de guarda
+  # ═══ TETO: 12 NÓS ═══
+nodes:
+  - id: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "família hooks_python_isolated verde em dois interpretadores (3.15.2 do venv e 3.12.3 do SO), 99 casos, com a cópia limpa provada antes de cada mutante"
+    label: "os hooks do core e o que eles executam rodam python em modo isolado, e a falha de análise nos vetos fecha pela forma do objeto guardado"
+    narrative: "Fecha o alcance dos hooks da sessão. O gate do git e o executável resolvido pelo PATH ficam nos tetos abaixo. A passada adversarial está pendente no resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)."
+  - id: E_DEFEITO_MODULO_SOMBRA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "hooks da main 940a1d1ff rodados em diretório temporário com módulo sombra no diretório de trabalho; repetido com -I; células guardadas fora da árvore"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "medido: hook que roda python sem -I importa do diretório de trabalho, e o resultado dele dependia do conteúdo dessa pasta"
+    narrative: "Python com -c, - ou -m põe o diretório de trabalho no caminho de importação; com um script, a pasta do script. A causa e a reprodução ficam fora da árvore, por decisão do maestro, enquanto os adotantes não têm a cura. O que importa para quem lê: é classe de ambiente, não de um hook, e a cura é o modo isolado."
+    provenance:
+      source: "bancada do agente de sandbox de 2026-11-04, evidência fora da árvore"
+      locator: "as 5 células do experimento"
+      method: "medição: hook real, JSON do PreToolUse no stdin, rc lido"
+      locality: "repo"
+  - id: E_CENSO_ANTES_E_DEPOIS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "python-isolated-check.sh --census na main 940a1d1ff e no head da branch: alcance dos hooks 32 arquivos, 33 invocações, 25 sem -I em 10 arquivos antes e 0 depois"
+    trace: ".claude/validation/python-isolated-check.sh"
+    label: "censo por token de shell: 25 invocações sem -I no alcance dos hooks, não 43; as outras linhas do grep eram comentário, mensagem, selftest em string e command -v"
+    narrative: "O grep literal contava 43 linhas em 13 arquivos porque não filtra comentário. Antes da cura: 8 com -I (a API direta e o censo de versões) e 25 sem, em house-code-gloss, instructions-loaded-log, kg-read-leg, a lib invocation-lines, premodelswitch-guard, env-guard, merge-gate, moat-gate, protect-main, rule-title-in-prose e session-degraded-notice. Os .githooks não invocam python direto: zero. A guarda de segredo NÃO usava -I em parte: a única invocação dela não tinha, e o -I que o texto do arquivo cita é o que ela JULGA no comando alheio."
+    provenance:
+      source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
+      locator: "python-isolated-check.sh --census, antes e depois"
+      method: "medição: scanner léxico de shell, alvo derivado do settings.json"
+      locality: "repo"
+  - id: D_GUARDA_POR_ALVO_DERIVADO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "guard-census.sh sem guarda da classe; molde veto-onfailure-check.sh (check de lint com alvo vindo do settings.json); REGRA 115 HARD no core e SOFT no derivado, casos d1 a d3 da família"
+    trace: ".claude/validation/lint-artifacts.sh"
+    label: "substrato: check de lint, REGRA 115 (Hooks rodam python em modo isolado), com alvo derivado do settings.json e não lista de arquivos"
+    narrative: "Hook não serve: o defeito é do texto do script, e o gate é onde o texto se julga. O alvo segue o que os hooks EXECUTAM, pelos tokens do shell. A 1ª redação seguia menção em texto e arrastava 212 arquivos, o gate inteiro, por causa de um caminho citado em mensagem. SOFT no derivado: um hook próprio do adotante cai no alcance, e a atualização do core não deve deixar o gate dele vermelho (cláusula 5 da guard-doctrine). O número pulou o 114, que a branch feat/guard-plugin-write já ocupa."
+  - id: E_MODO_ISOLADO_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "matriz com e sem -I, no 3.15.2 do venv e no 3.12.3 do SO: diretório de trabalho, PYTHONPATH, PYTHONHOME, site do usuário, PYTHONSTARTUP, import yaml, codificação"
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    label: "-I cobre diretório de trabalho, PYTHONPATH, PYTHONHOME e site do usuário; PYTHONSTARTUP não age em nenhum dos dois casos fora do modo interativo"
+    narrative: "O site do usuário só age no python do SO: num venv ele já está desligado. PYTHONSTARTUP com -c não rodou com nem sem -I, também com PYTHONINSPECT: o caso prende o fato e não tem mutante, porque tirar o -I não muda o resultado. O tokenizador roda por /dev/fd/4: o diretório de trabalho não entra no caminho dele, o PYTHONPATH entra, e é por ali que o mutante dele morre."
+    provenance:
+      source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
+      locator: "casos da família hooks_python_isolated"
+      method: "medição: interpretador direto, marcador em arquivo, e a família nos dois interpretadores"
+      locality: "repo"
+  - id: E_O_QUE_I_QUEBRA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "nenhum arquivo do alcance importa yaml; lib carregada por importlib com caminho explícito; nenhum hook define PYTHON*; import yaml rc 0 com -I nos dois interpretadores"
+    trace: ".claude/hooks/rule-title-in-prose.sh"
+    label: "no alcance dos hooks o -I não quebrou nada; o que ele tira é pacote no site do usuário, a pasta do script no caminho e variável PYTHON* definida por fora"
+    narrative: "Um venv segue visível sob -I. A pasta do script sair do caminho quebraria import irmão, e o alcance não tem nenhum: as duas libs entram por importlib.spec_from_file_location. PYTHONIOENCODING vindo de fora passa a ser ignorado (medido: sem -I iso8859-1, com -I utf-8), e nenhum hook depende dele. O gate do git importa yaml: quem o curar precisa olhar o pacote instalado com pip --user."
+    provenance:
+      source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
+      locator: "busca por import yaml e PYTHON no alcance; matriz de interpretadores"
+      method: "medição"
+      locality: "repo"
+  - id: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "família: python3 quebrado e JSON truncado barram o comando perigoso e deixam passar o honesto em cada veto; mutantes da forma; corpus de 12.173 comandos dos 10 transcripts mais recentes do core"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "JSON ilegível deixa de virar {} nos vetos, e a guarda de segredo com a análise morta fecha 20,6% dos comandos reais em vez de 100%"
+    narrative: "A leitura do JSON tinha `except Exception: d={}`: comando vazio, exit 0, a falha virando permissão, em 5 vetos. Agora a exceção sobe e cai no modo degradado que merge-gate, protect-main e moat-gate já tinham: fecha pela forma do objeto. A guarda de segredo fechava tudo quando a análise morria, o que também travava o Read do arquivo que diagnosticaria o python; ela herdou a mesma lógica, e isto SUPERA o nó C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON do grafo vetos-fail-closed-2026-10. Medida do corte: 343 comandos citam o nome do arquivo de segredo, 0 fora do corte; numa amostra de 1.500 dos 9.666 fora do corte, o veto inteiro barra 3 (0,2%), todos glob sem ponto (`dir/*`)."
+  - id: C_API_DIRETA_SEM_PYTHON_CALA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "caso 'api: python3 ausente cala (decisão declarada)' da família, e o bloco de teto do pretooluse-direct-provider-api.sh"
+    trace: ".claude/hooks/pretooluse-direct-provider-api.sh"
+    label: "sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fecha se o texto cita URL do provider ativo"
+    narrative: "A razão anterior vale: sem python o adapter também não roda, e barrar o curl tiraria a única via. A forma do modo degradado é o nome do provedor numa URL, porque os padrões do provider-hosts.tsv são regex de Python. Gatilho para revisitar: uso real de sessão sem python3 num projeto com provider ativo."
+  - id: C_TETO_EXECUTAVEL_NAO_FIXADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "leitura dos hooks: `python3`, `jq`, `node` e `bash` resolvidos por PATH; a família prova o caso com um python3 falso à frente do PATH só para o modo degradado"
+    trace: ".claude/validation/python-isolated-check.sh"
+    label: "TETO: -I isola os imports do interpretador, não fixa QUAL executável roda, e não cobre a sobrescrita do próprio script de hook"
+    narrative: "Fora desta cura, sem ampliar o escopo: `python3` e as outras ferramentas por PATH, e o arquivo do hook, que quem escreve no repo pode trocar. Fixar caminho absoluto quebraria o venv de cada adotante; proteger o arquivo é outra guarda. Gatilho: uma medida de PATH ou de escrita em .claude/hooks alcançada dentro de sessão. O desenho candidato é um mod ou veto de escrita naquela pasta, a decidir pelo maestro."
+  - id: C_TETO_GATE_DO_GIT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "ONION_PYISO_ROOTS=all python-isolated-check.sh --census: 149 invocações sem -I em 38 arquivos, 79 delas na própria bancada e 12 no lint"
+    trace: ".githooks/pre-commit"
+    label: "TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da sessão"
+    narrative: "Os .githooks em si têm zero invocação. Tirar o -I do escopo aqui foi corte de risco: esses scripts importam yaml, e fazê-lo às cegas exige a bancada inteira, que esta leva não roda. O efeito do módulo sombra no lint fica NÃO MEDIDO: a rodada de controle, no clone limpo, estourou o teto de 280 s sob carga. O comando para retomar o censo está na guarda: ONION_PYISO_ROOTS=all --census."
+  - id: C_TETO_LEXICO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "cabeçalho de python-isolated-check.sh e casos a1 a a14, c1 a c10 do --selftest"
+    trace: ".claude/validation/python-isolated-check.sh"
+    label: "TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho montado em execução"
+    narrative: "Gatilho para revisitar: uma dessas formas aparecer num hook do core. O corte do modo degradado da guarda de segredo tem teto próprio: nome montado por programa ou variável de fora passa, como no veto inteiro."
+  - id: C_VIAJA_PARA_PORTAS_E_ADOTANTES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "ops/materialize-door.sh leva .claude/hooks e .claude/validation; lint com SOFT no derivado, caso d3"
+    trace: "ops/materialize-door.sh"
+    label: "viajam às 4 portas e aos adotantes: os hooks curados, a guarda, a REGRA 115 e a família; a evidência e a receita não viajam"
+    narrative: "O repo é público e os adotantes herdam os hooks: a cura só protege quem atualizar, e a forma de avisar é decisão do maestro. Fica aberto até a leva sair: o anúncio aos adotantes, a publicação das portas e o que fazer com a evidência fora da árvore."
+edges:
+  - from: E_DEFEITO_MODULO_SOMBRA
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: SUPPORTS
+  - from: E_CENSO_ANTES_E_DEPOIS
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: SUPPORTS
+  - from: E_MODO_ISOLADO_MEDIDO
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: SUPPORTS
+  - from: E_O_QUE_I_QUEBRA
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: SUPPORTS
+  - from: D_GUARDA_POR_ALVO_DERIVADO
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: SUPPORTS
+  - from: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: SUPPORTS
+  - from: C_API_DIRETA_SEM_PYTHON_CALA
+    to: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
+    edge_type: CONSTRAINS
+  - from: C_TETO_EXECUTAVEL_NAO_FIXADO
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: CONSTRAINS
+  - from: C_TETO_GATE_DO_GIT
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: CONSTRAINS
+  - from: C_TETO_LEXICO
+    to: D_GUARDA_POR_ALVO_DERIVADO
+    edge_type: CONSTRAINS
+  - from: C_VIAJA_PARA_PORTAS_E_ADOTANTES
+    to: Q_HOOKS_RODAM_PYTHON_ISOLADO
+    edge_type: CONSTRAINS

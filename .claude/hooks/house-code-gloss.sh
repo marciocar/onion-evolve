@@ -52,7 +52,7 @@ STATE_DIR="${ONION_HOUSE_CODE_STATE_DIR:-${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/oni
 
 _engine() {   # $1=modo (prompt|stop|scan|text|tool) · $2=transcript (ou, nos modos text e tool, o arquivo com o texto ou o payload do hook) · $3=sessão
   command -v python3 >/dev/null 2>&1 || return 0
-  python3 - "$1" "${2:--}" "${HERE}" "${GLOSSARY}" "${VAL}/lint-artifacts.sh" "${VAL}/plugin-bundle-check.sh" "${3:-}" "${STATE_DIR}" <<'PY'
+  python3 -I - "$1" "${2:--}" "${HERE}" "${GLOSSARY}" "${VAL}/lint-artifacts.sh" "${VAL}/plugin-bundle-check.sh" "${3:-}" "${STATE_DIR}" <<'PY'
 import hashlib, importlib.util, json, os, re, subprocess, sys
 # sem bytecode em cache: o .pyc é validado por mtime em SEGUNDOS + tamanho, e uma edição do lib do mesmo
 # tamanho no mesmo segundo roda o código VELHO (medido 2026-10-17: trocar n=8 por n=6 e voltar no mesmo
@@ -437,7 +437,7 @@ if mode == "scan":
 PY
 }
 
-_sid() { printf '%s' "$1" | python3 -c 'import json,sys
+_sid() { printf '%s' "$1" | python3 -I -c 'import json,sys
 try: print(json.load(sys.stdin).get("session_id",""))
 except Exception: print("")' 2>/dev/null || true; }
 
@@ -542,7 +542,7 @@ TXT
   _d="$(mktemp -d)"; _tp="${_d}/t.jsonl"; _in="${_d}/in.json"
   export ONION_HOUSE_CODE_STATE_DIR="${_d}/state"
   _mk() {  # pares "u:texto" (pedido humano), "n:texto" (aviso de tarefa de fundo) ou "a:texto" (resposta)
-    python3 - "${_tp}" "$@" <<'PY'
+    python3 -I - "${_tp}" "$@" <<'PY'
 import json, sys
 with open(sys.argv[1], "w", encoding="utf-8") as fh:
     for s in sys.argv[2:]:
@@ -719,7 +719,7 @@ PY
   # (t11) destinatário com surrogate solto e texto acima do teto: rc 0, nada de Traceback
   _tool '{"tool_name":"SendMessage","tool_input":{"to":"\ud800","message":"Fechei o SAC-256."}}'
   _o11="${_o}${_rc}"
-  _big="$(python3 -c 'print("SAC-256 " * 30000)')"
+  _big="$(python3 -I -c 'print("SAC-256 " * 30000)')"
   _tool "{\"tool_name\":\"SendMessage\",\"tool_input\":{\"to\":\"main\",\"message\":\"${_big}\"}}"
   if ! grep -q Traceback <<< "${_o11}" && grep -q 'SAC-256 →' <<< "${_o11}" && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t11) surrogate no destinatário sem Traceback; texto acima do teto cala (rc 0)"; else _ko "(t11) surrogate [${_o11}] · teto rc=${_rc} [${_o:0:120}]"; fi
   unset ONION_HOUSE_CODE_STATE_DIR
@@ -745,10 +745,10 @@ if [ "${mode}" = "tool" ]; then
   exit 0
 fi
 if [ "${mode}" = "stop" ]; then
-  active="$(printf '%s' "${input}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("1" if d.get("stop_hook_active") else "0")' 2>/dev/null || echo 0)"
+  active="$(printf '%s' "${input}" | python3 -I -c 'import json,sys; d=json.load(sys.stdin); print("1" if d.get("stop_hook_active") else "0")' 2>/dev/null || echo 0)"
   [ "${active}" = "1" ] && exit 0
 fi
-tp="$(printf '%s' "${input}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("transcript_path",""))' 2>/dev/null || true)"
+tp="$(printf '%s' "${input}" | python3 -I -c 'import json,sys; print(json.load(sys.stdin).get("transcript_path",""))' 2>/dev/null || true)"
 [ -n "${tp}" ] && [ -f "${tp}" ] || exit 0
 sid="$(_sid "${input}")"
 case "${mode}" in

@@ -6336,6 +6336,38 @@ check_relay_public_review() {
 }
 check_relay_public_review
 
+# ────────────────────────────────────────────────────────
+# REGRA 115 — Hooks rodam python em modo isolado [HARD + SOFT]
+# previne: um hook, ou o que ele executa, rodar python sem `-I` e importar de fora da instalação do interpretador
+#   DEFEITO MEDIDO (2026-11-04, grafo guard-hooks-python-isolated-2026-11): hook importando de fora da instalação
+#   do python, por módulo sombra no diretório de trabalho. O alvo é DERIVADO do settings.json e segue o que os hooks EXECUTAM,
+#   sem lista de arquivos. HARD no core; SOFT no derivado, onde um hook próprio do adotante cai no mesmo alcance e
+#   não deve deixar o gate dele vermelho por uma atualização (cláusula 5 da guard-doctrine). Sem settings.json não
+#   há alvo e não julga. Lógica e teto em python-isolated-check.sh; "não pôde julgar" (rc 2) sai SOFT nomeado.
+check_python_isolated() {
+  local helper="${SCRIPT_DIR}/python-isolated-check.sh"
+  local st="${REPO_ROOT}/.claude/settings.json"
+  [ -f "${helper}" ] && [ -f "${st}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${st}"|*/python-isolated-check.sh|"${REPO_ROOT}"/.claude/hooks/*) : ;; *) return 0 ;; esac
+  fi
+  local _R="REGRA 115 (Hooks rodam python em modo isolado)"
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    [ "$(_role)" = "source" ] || _sev="SOFT"
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path%:*}" "${_R}: [${_code}] ${_path##*:}: ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "SOFT" "${helper}" "${_R}: [NAO-VERIFICADO] a guarda não pôde julgar (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_python_isolated
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

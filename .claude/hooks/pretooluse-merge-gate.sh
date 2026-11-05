@@ -34,10 +34,11 @@ input=$(cat)
 # force-push de um checkout sentado na main (Elenxo, 2ª passada, 2026-10-05).
 # `errors=backslashreplace` e `tool_input` não-dict (passada adversarial, 2026-10-11): um surrogate solto no JSON
 # (`\ud800`) derrubava o print, e o hook caía no modo sem python — vetando um push honesto.
-parsed=$(printf '%s' "$input" | python3 -c 'import json,sys
+# JSON ilegível NÃO vira `{}` (hooks em modo isolado, 2026-11-04): `{}` é comando vazio, e comando vazio é exit 0,
+# a falha de análise virando permissão. Agora a leitura falha, e o caminho é o mesmo do python ausente: julga pela forma.
+parsed=$(printf '%s' "$input" | python3 -I -c 'import json,sys
 sys.stdout.reconfigure(errors="backslashreplace")
-try: d=json.load(sys.stdin)
-except Exception: d={}
+d=json.load(sys.stdin)
 d=d if isinstance(d,dict) else {}
 ti=d.get("tool_input"); ti=ti if isinstance(ti,dict) else {}
 print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null) && nopy=0 || nopy=1
@@ -61,7 +62,7 @@ advise() {
   local _r; _r="$(printf '%s' "$1" | sed -E 's/ negad[oa]( |$)/\1/; s/ +$//')"   # no adotante nada é negado
   local _m="TRAVA DE MERGE (aviso, não veto) — no core isto seria vetado: ${_r}. Este repo não tem o caminho verificado de merge do core (ele não viaja na adoção), então NADA conferiu o CI antes deste comando, e o host pode não proteger a main. Antes de seguir, rode 'gh pr checks <N>' e confira que todos os checks passaram."
   if [ "$nopy" = 0 ]; then
-    M="$_m" python3 -c 'import json,os; print(json.dumps({"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":os.environ["M"]}}, ensure_ascii=False))'
+    M="$_m" python3 -I -c 'import json,os; print(json.dumps({"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":os.environ["M"]}}, ensure_ascii=False))'
   else
     printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"TRAVA DE MERGE (aviso, não veto): comando com forma de merge ou push e sem python3 para analisá-lo. Este repo não tem o caminho verificado de merge do core, então nada conferiu o CI antes dele. Antes de seguir, rode gh pr checks <N> e confira que todos os checks passaram."}}'
   fi
@@ -71,7 +72,7 @@ advise() {
 if [ "$nopy" = 1 ]; then
   onion_nopy_touches merge-gate "$cmd" || exit 0
   [ "$ADVISE" = 1 ] && advise "sem python3"
-  echo "GUARDA-PRETOOLUSE: python3 ausente ou quebrado — o veto não consegue analisar este comando, que tem forma de merge ou push (git push, gh pr merge, gh api com rota de merge/contents/refs/graphql, gh repo sync). Fechado por segurança: o host não protege a main neste repo. Instale python3 (o tokenizador dos vetos); o merge segue pelo caminho verificado, bash ops/pr-merge-verified.sh <PR> --sync (core-only)." >&2
+  echo "GUARDA-PRETOOLUSE: a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível) — o veto não consegue analisar este comando, que tem forma de merge ou push (git push, gh pr merge, gh api com rota de merge/contents/refs/graphql, gh repo sync). Fechado por segurança: o host não protege a main neste repo. Instale python3 (o tokenizador dos vetos); o merge segue pelo caminho verificado, bash ops/pr-merge-verified.sh <PR> --sync (core-only)." >&2
   exit 2
 fi
 

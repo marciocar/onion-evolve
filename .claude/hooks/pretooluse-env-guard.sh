@@ -61,6 +61,21 @@
 # família kg_read_leg prende o contrato (caso (s): o `segments` pelo `ast` igual ao da guarda executada inteira).
 set -uo pipefail
 input="$(cat)"
+# onion_env_may_touch <json-do-hook> — sem tokenizador: rc 0 quando o texto PODE alcançar um .env. Aspas e `\`
+# saem antes de casar, porque o shell junta `.e""nv` em `.env`. Formas: ponto seguido de `e` ou de metacaractere,
+# leitor recursivo (rg, tar e afins já são recursivos sem flag), escape que monta o nome, e JSON sem campo legível
+# (aí julga o texto cru). TETO: nome montado por variável vinda de fora, ou por programa, passa, como no veto inteiro.
+onion_env_may_touch() {
+  local t f v
+  t=""
+  for f in command file_path path glob; do
+    v="$(printf '%s' "$1" | grep -oE "\"$f\"[[:space:]]*:[[:space:]]*\"([^\"\\\\]|\\\\.)*\"" | head -n1)" || v=""
+    t="${t} ${v#*:}"
+  done
+  [ -n "${t// /}" ] || t="$1"
+  t="$(printf '%s' "$t" | tr -d "\"'\\\\")"
+  grep -qE '\.(e|[*?{[])|(^|[^[:alnum:]_.-])(grep|egrep|fgrep|rgrep|ugrep|rg|ag|ack|cp|scp|tar|zip|rsync|diff)[[:space:]]([^;&|]*[[:space:]])?(-[[:alnum:]]*[rR]|--recursive|--dereference-recursive)|(^|[^[:alnum:]_.-])(rg|ag|ack|rgrep|tar|zip)[[:space:]]|u002e|x2e|056|base64' <<< "$t"
+}
 # o script vai por -c e o JSON do hook pela entrada padrão. A 1ª redação usava `python3 - <<'PY'`, e aí o
 # heredoc ERA a entrada padrão: o JSON nunca chegava e o veto passava tudo (18 de 18 vetos falharam na 1ª
 # bateria — fail-open total, pego antes de registrar o hook).
@@ -1076,10 +1091,9 @@ def judge(cmd, depth=0):
         return "'%s' lendo %s" % (name, envs[0]) + (" (arquivo de trabalho no scratchpad? o veto não isenta *.env nem ali: grave-o com outra extensão, .vars ou .txt)" if scratch_hint(envs[0]) else "")
     return None
 
-try:
-    d = json.load(sys.stdin)
-except Exception:
-    d = {}
+# JSON ilegível não vira `{}`: isso era "nada a julgar", a falha de análise virando permissão (2026-11-04). A
+# exceção sobe, o python sai 1, e o bash abaixo julga pela forma do texto.
+d = json.load(sys.stdin)
 d = d if isinstance(d, dict) else {}
 tool = d.get('tool_name') or ''
 ti = d.get('tool_input') or {}
@@ -1098,7 +1112,14 @@ elif tool == 'Bash':
 print(reason or '')
 PY
 )
-out="$(printf '%s' "$input" | ONION_GUARD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." 2>/dev/null && pwd)" python3 -c "$GUARD_PY")" || out="o analisador do veto falhou — fechado por segurança"
+out="$(printf '%s' "$input" | ONION_GUARD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." 2>/dev/null && pwd)" python3 -I -c "$GUARD_PY")" || {
+  # A ANÁLISE NÃO RODOU (python3 ausente ou quebrado, JSON ilegível). Fechar TUDO travava a sessão inteira: todo
+  # Read, Grep e Bash barrados, inclusive os que diagnosticam o python. Mesma lógica dos vetos de merge e force-push:
+  # fecha só o que tem a FORMA do objeto guardado, e ler o que não tem essa forma passa. Corte e custo medidos no
+  # grafo guard-hooks-python-isolated-2026-11.
+  onion_env_may_touch "$input" || exit 0
+  out="o veto não conseguiu analisar este comando (python3 ausente ou quebrado, ou JSON do hook ilegível), e ele tem forma de quem alcança um .env — fechado por segurança"
+}
 [ -z "${out}" ] && exit 0
 echo "GUARDA-PRETOOLUSE (.env): ${out} — o conteúdo do .env (os segredos) entraria no contexto e no transcript. Use: 'bash .claude/utils/task-manager/env-check.sh --provider|--check|--get <CHAVE-NÃO-SECRETA>', ou carregue no ambiente com 'set -a; source .env; set +a'. Se precisar ver o arquivo, o maestro o abre fora da sessão." >&2
 exit 2

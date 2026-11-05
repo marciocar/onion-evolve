@@ -187,6 +187,7 @@
 .claude/hooks/lib/invocation-lines.sh	E_DEFEITO_QUINZE_FORMAS_E_UM_FALSO_POSITIVO	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_ELENXO_2A_PASSADA_O_DIRETORIO_ERRADO	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_ELENXO_3A_PASSADA_A_ISENCAO_E_A_FALHA_ABERTA	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
+.claude/hooks/lib/invocation-lines.sh	E_MODO_ISOLADO_MEDIDO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_PUSH_OPCAO_ABREVIADA	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_RECORTE_SEM_PYTHON_MEDIDO	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/lib/transcript-tail.py	C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
@@ -198,12 +199,15 @@
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0904	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
+.claude/hooks/pretooluse-direct-provider-api.sh	C_API_DIRETA_SEM_PYTHON_CALA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	C_TETO_O_QUE_O_HOOK_NAO_VE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	E_REEXECUCAO_CONTRA_O_USO_REAL	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	D_FALHA_DE_ANALISE_FECHA_PELA_FORMA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	D_U4_LISTAR_NOMEAR_CITAR_PASSAM	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	E_DEFEITO_MODULO_SOMBRA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_A1_A5_CURADOS_1023	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_HEREDOC_COMPOSTO_CURADO_1023	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_LINEAR	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
@@ -223,6 +227,7 @@
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_MASTER_PASSAVA_RC0_REPRODUZIDO	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
+.claude/hooks/rule-title-in-prose.sh	E_O_QUE_I_QUEBRA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/session-currency-check.sh	C_TETO_CONSERTO_NO_LOCAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/hooks/session-currency-check.sh	D_SUBSTRATO_HOOK_DE_AVISO	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
 .claude/hooks/session-currency-check.sh	D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
@@ -572,6 +577,7 @@
 .claude/validation/lint-artifacts.sh	D_CORRIGIR_R47	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/validation/lint-artifacts.sh	D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/lint-artifacts.sh	D_FASE_F_META_FABRICA_EN	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+.claude/validation/lint-artifacts.sh	D_GUARDA_POR_ALVO_DERIVADO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/validation/lint-artifacts.sh	D_LINT_FRONTMATTER_GUARD	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	D_LINT_LINKS_GUARD	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	D_MOAT_BOUNDARY_IS_MECHANISM	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
@@ -679,6 +685,9 @@
 .claude/validation/projection-safety.sh	E_PRIMITIVE_EXISTS	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety_exists	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
+.claude/validation/python-isolated-check.sh	C_TETO_EXECUTAVEL_NAO_FIXADO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
+.claude/validation/python-isolated-check.sh	C_TETO_LEXICO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
+.claude/validation/python-isolated-check.sh	E_CENSO_ANTES_E_DEPOIS	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/validation/relay-public-review-check.sh	D_INDICE_NAO_ARVORE	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
 .claude/validation/resolve-integration-branch.sh	SY4_prod_resolve_integration_branch	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/resolve-production-branch.sh	SY5_branch_roles_second_resolver	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -718,6 +727,7 @@
 .claude/workflows/onion-research.js	E_N3_SCHEMA_NATIVO_LACUNA	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
 .claude/workflows/onion-research.js	E_R3_F7_WORKFLOW_SCHEMA_E_STALL	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .githooks/pre-commit	C_OPCAO_B_ABSORVER_ORDEM_DERIVADA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.githooks/pre-commit	C_TETO_GATE_DO_GIT	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .githooks/pre-commit	E_OBJECAO_3_FIXPOINT_DO_ESLINT_SUBEXPLORADO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .githooks/pre-commit	E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .githooks/pre-commit	E_gate_declara_1min_e_leva_15	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
@@ -2587,6 +2597,7 @@ ops/bridge-auth/logto-provision.sh	I_PROVISION_FICOU_PARA_TRAS_NO_RENAME	docs/ev
 ops/chat-runner.sh	C_TETO_OPENSANDBOX	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 ops/chat-runner.sh	E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016	docs/evolution/research/radar-E3-2026-10-16-r12/radar-E3-2026-10-16-r12.kg.yaml
 ops/kg-gate-ci.sh	E_KG_SSOT_425_ADOTADA_1024	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+ops/materialize-door.sh	C_VIAJA_PARA_PORTAS_E_ADOTANTES	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 ops/materialize-door.sh	E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/materialize-door.sh	E_MATERIALIZE_DOOR_FAIL_OPEN_NO_REGEN	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
