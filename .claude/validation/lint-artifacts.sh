@@ -1477,6 +1477,7 @@ check_inventory_sync() {
 # ===========================================================================
 # REGRA 62 — Projeção GERADA em sincronia com a fonte (docs/backlog.md) [HARD]
 # previne: projeção gerada que envelhece calada — o item existe no grafo e some da superfície que as sessões leem
+# aplica-se: source
 #
 # Gatilho medido (2026-08-28, PR #700/#701): escrevi uma migalha de diário e não rodei o
 # `diary-index.sh`. A entrada existia no disco e NAO no index.md — o Tier-0 pointer que as
@@ -1492,8 +1493,12 @@ check_inventory_sync() {
 #
 # CORE-ONLY por desenho: um adotante não versiona docs/backlog.md nem o diário do core.
 # "O CORE É O PIOR ORÁCULO DO QUE VIAJA" — 11 falsos-positivos no 1o adotante ensinaram.
+# A PORTA standalone tem IS_DERIVED=0 e por isso a declaração `# aplica-se:` acima, medida em 2026-11-05: ela leva
+# o house-codes.tsv e o gerador, não os grafos de onde os termos vêm. O gerador saía rc 1 por esquema sem termo, e o
+# lint da porta reprovava uma projeção que ela não tem como regenerar. Ela recebe o arquivo pronto, do core.
 # ===========================================================================
 check_generated_projection_sync() {
+  _na_for_role && return 0
   [ "${IS_DERIVED}" -eq 1 ] && return 0
 
   # {arquivo rastreado | gerador | comando de regeneração p/ a mensagem}
@@ -6131,6 +6136,10 @@ check_adoption_graph_pin
 # ===========================================================================
 # REGRA 109 — CLAUDE.md não cresce sem tirar o equivalente ou citar um nó [HARD + SOFT]
 # previne: o arquivo que carrega em TODA sessão e compactação engordar sem ninguém decidir
+# aplica-se: source
+#   A PORTA tem CLAUDE.md próprio e curto, e a standalone tem IS_DERIVED=0: o teto é o número do CLAUDE.md do
+#   core, e o nó citado num `raise:` mora num grafo que não viaja. Medido em 2026-11-05: toda subida legítima do
+#   teto reprovava o lint da porta na publicação seguinte.
 #   DANO MEDIDO (2026-10-19): o CLAUDE.md do core foi de 17.041 B (2026-09-03) para 25.918 B (+52%) em ~20
 #   commits, depois do selo de 2026-09-25 que mandava medir antes de podar (D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS);
 #   decisão do maestro de 2026-10-19: D_PODA_CATRACA_E_L2_DIRIGIDO_1019. Passar do `ceiling:` do baseline é HARD;
@@ -6138,6 +6147,7 @@ check_adoption_graph_pin
 #   Lógica em claude-md-size-check.sh; baseline em claude-md-size-ceiling.txt. Sem baseline, sem objeto.
 # ===========================================================================
 check_claude_md_size() {
+  _na_for_role && return 0
   local helper="${SCRIPT_DIR}/claude-md-size-check.sh"
   [ -f "${helper}" ] || return 0
   [ "${IS_DERIVED}" -eq 1 ] && return 0   # adotante/porta: o CLAUDE.md é do projeto dele, e o baseline não viaja

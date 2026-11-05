@@ -224,5 +224,7 @@ legítima de objeto não é aviso. Toda lista contém `source`, então no core t
 
 | Nº | Regra | Aplica-se a |
 |---:|-------|-------------|
+| 62 | Projeção GERADA em sincronia com a fonte (docs/backlog.md) | source |
 | 85 | Porta pública espelha o core, com catraca | source |
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | source |
+| 109 | CLAUDE.md não cresce sem tirar o equivalente ou citar um nó | source |
