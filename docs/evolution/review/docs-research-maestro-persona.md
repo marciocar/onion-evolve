@@ -2,7 +2,8 @@
 branch: docs/research-maestro-persona
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 389eb3d3626299e7a8a71fa24dacece154247d19532a8dc2669099cf4fc13792
+reviewed_code_sha256: d2c2a566b68a7bac89e305086739e0084435eb183070e1c387f5123028f21a61
 findings_total: 12
 findings_real: 7
 tokens: 138734
