@@ -632,7 +632,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 36.0 | `D_SOFT_PROVENIENCIA_HARD_ENVELOPE` | memory-write-2026-11 | Substrato escolhido pelo censo: hook PreToolUse em Write, Edit, MultiEdit e Bash, molde pretooluse-direct-provider-api.sh (o PreTo |
-| 9.6 | `D_VARREDURA_DO_DISCO_REGRA_116` | memory-write-2026-11 | A metade que não depende do vocabulário do veto: a varredura das notas da memória do projeto (árvore principal e worktree, mai |
+| 9.6 | `D_VARREDURA_DO_DISCO_REGRA_116` | memory-write-2026-11 | A metade que não depende do vocabulário do veto: a varredura das notas da memória do projeto pelo mesmo juiz, no SessionStart e |
 | 9.0 | `C_TETO_NAO_E_FRONTEIRA` | memory-write-2026-11 | TETO (peça 7): é lembrete e contenção de cópia verbatim, NÃO fronteira. Conteúdo de fora parafraseado, ou copiado sem envel |
 | 7.2 | `D_HOOK_NO_SETTINGS_DO_PROJETO` | memory-write-2026-11 | O veto e a varredura moram no .claude/settings.json versionado do projeto, que viaja aos adotantes; o ⟨settings.json de usuário |
 | 6.8 | `C_TETO_BASH_PELO_VOCABULARIO` | memory-write-2026-11 | TETO: no Bash só se julga o comando que CITA o caminho de memória (literal, ~, $HOME, ${CLAUDE_CONFIG_DIR}) como DESTINO de uma  |
