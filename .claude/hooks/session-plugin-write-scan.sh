@@ -14,7 +14,7 @@ if [ "${rc}" -ne 0 ]; then
 fi
 [ -n "${out}" ] || exit 0
 n="$(printf '%s\n' "${out}" | wc -l | tr -d '[:space:]')"
-echo "🧩 ${n} arquivo(s) com FORMA de plugin em .claude/skills. Forma não é carga: pode ter carregado nesta sessão, ou não. O maestro confere estes caminhos: quem escreveu cada um, e se há hooks/hooks.json com módulo. No core não há plugin local: o que não for do maestro sai, fora da sessão ou por rm."
+echo "🧩 ${n} arquivo(s) com FORMA de plugin em .claude/skills. Forma não é carga: pode ter carregado nesta sessão, ou não. O maestro confere estes caminhos: quem escreveu cada um, e se há hooks/hooks.json com módulo. Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace ou --plugin-dir), não escrevendo em skills: o que não for do maestro sai, fora da sessão ou por rm."
 # o caminho já vem saneado pela varredura: um por linha, só imprimíveis
 printf '%s\n' "${out}" | cut -f3 | head -n 20 | sed 's/^/  - /'
 exit 0

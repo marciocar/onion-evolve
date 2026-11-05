@@ -14,7 +14,8 @@
 # ── O QUE MUDA EM RELAÇÃO AO MOAT ─────────────────────────────────────────────────────────────
 #  · alvo: a FORMA do caminho, como escrito E resolvido (`_pw_form`), em vez da lista de ops/moat-targets.tsv (core-only).
 #    Regra do maestro (2026-11-05): só `.claude/skills/<nome>/.claude-plugin/` e `.claude/skills/<nome>/hooks/`, no 1º nível de cada
-#    skill; a mesma forma vale na pasta de casa. `hooks/` mais fundo é conteúdo e passa, sem registro de exceção;
+#    skill, e só na RAIZ de um repo ou worktree (a pasta com `.git`) ou na pasta de casa. `hooks/` mais fundo, `docs/x/.claude/skills`
+#    e pasta solta passam, sem registro de exceção;
 #  · remover e ler não é escrever: `rm`, `rmdir`, `unlink`, `find -delete`, `find -exec rm`, `git clean`, `git rm`, a
 #    ORIGEM de um mv, cp ou xargs cp, e a referência de `touch -r` passam. Tirar um plugin plantado é a cura que a varredura manda;
 #  · pasta inteira: `cp -r`, `mv`, `ln -s`, `rsync` de uma pasta que JÁ TEM `.claude-plugin/` ou `hooks/`, quando ela cai como
@@ -75,12 +76,26 @@ _pw_assign = {}          # NOME → o único valor bruto atribuído na string; c
 _pw_ambiguous = set()    # NOME com mais de um valor, ou religado por for/select/read: a última atribuição não prova nada
 
 
+_PW_HOME = os.path.realpath(os.environ["HOME"]) if os.environ.get("HOME") else None
+
+
+def _pw_is_root(prefix):
+    """A pasta que contém `.claude/skills` é raiz de repo ou worktree, ou a casa? Prefixo vazio é relativo que não se resolveu: não dá para provar que é solto."""
+    if not prefix:
+        return True
+    if os.path.lexists(os.path.join(prefix, ".git")):
+        return True
+    return bool(_PW_HOME) and os.path.realpath(prefix) == _PW_HOME
+
+
 def _pw_form(p):
     """A forma do caminho, sempre logo abaixo do NOME da skill: uma skill chamada `hooks` é honesta, e `references/hooks` é conteúdo."""
     parts = str(p).split("/")
     for i in range(len(parts) - 3):
         if parts[i] == ".claude" and parts[i + 1] == "skills":
             c = parts[i + 3]
+            if c in (".claude-plugin", "hooks") and not _pw_is_root("/".join(parts[:i])):
+                continue
             if c == ".claude-plugin":
                 return _PW_FORM_PLUGIN
             if c == "hooks":
@@ -124,11 +139,11 @@ def _pw_target_split(args, argopts):
 
 
 def _pw_skills_depth(p):
-    """Quantos componentes há depois de `.claude/skills`; None fora de lá."""
-    parts = [c for c in str(p).split("/") if c]
+    """Quantos componentes há depois do `.claude/skills` de uma raiz; None fora de lá."""
+    parts = str(p).rstrip("/").split("/")
     for i in range(len(parts) - 1):
-        if parts[i] == ".claude" and parts[i + 1] == "skills":
-            return len(parts) - i - 2
+        if parts[i] == ".claude" and parts[i + 1] == "skills" and _pw_is_root("/".join(parts[:i])):
+            return len([c for c in parts[i + 2:] if c])
     return None
 
 

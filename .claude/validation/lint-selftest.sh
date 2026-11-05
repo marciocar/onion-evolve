@@ -50814,6 +50814,7 @@ PYREG
 
   # (c) o veto e a mensagem, como o runner: JSON pela entrada padrão, stderr e exit 2
   local w="${d}/limpa/.claude/hooks/pretooluse-plugin-write-guard.sh" msg
+  git init -q "${d}/p"                                  # a forma só vale em raiz de repo ou na casa
   rc=0; msg="$(printf '{"tool_name":"Write","tool_input":{"file_path":"%s/p/.claude/skills/x/hooks/h.json"},"cwd":"%s"}' "${d}" "${d}" | CLAUDE_PROJECT_DIR="${d}" LC_ALL=C bash "${w}" 2>&1 >/dev/null)" || rc=$?
   if [ "${rc}" -eq 2 ] && printf '%s' "${msg}" | grep -q 'GUARDA-PRETOOLUSE (plugin em skills)'; then
     record_pass "plugin-write-guard: (c) exit 2 com a mensagem na saída de erro"
@@ -50887,6 +50888,22 @@ check_plugin_write_scan' 2>&1 || true)"
     chmod 755 "${dc}/.claude/skills/x/hooks"
   fi
 
+  # (e4) a severidade pelo papel: no adotante SOFT; com IS_DERIVED=0, que é o core e a porta clonada, HARD
+  local _od4 _e4
+  _od4="$(python3 -I - "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" <<'PYDER'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+i = s.index("check_plugin_write_scan() {")
+print(s[i:s.index("\ncheck_plugin_write_scan\n", i)])
+PYDER
+)"
+  for _e4 in 1:SOFT 0:HARD; do
+    out="$(cd "${REPO_ROOT}" && IS_DERIVED="${_e4%:*}" ONLY_PATH="" SCRIPT_DIR="${REPO_ROOT}/.claude/validation" REPO_ROOT="${REPO_ROOT}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash -c 'violation() { printf "%s|%s\n" "$1" "$3"; }; '"${_od4}"'
+check_plugin_write_scan' 2>&1 || true)"
+    if printf '%s' "${out}" | grep -q "^${_e4#*:}|.*plugin-em-skills"; then record_pass "plugin-write-guard: (e4) IS_DERIVED=${_e4%:*} dá ${_e4#*:}"
+    else record_fail "plugin-write-guard: (e4) IS_DERIVED=${_e4%:*}" "${out}"; fi
+  done
+
   # (e2) o CONTRATO do tsv que o dispatcher lê: severidade, classe e caminho relativo em colunas
   rc=0; out="$(LC_ALL=C bash "${scan}" "${dr}" --format tsv 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ] && [ "$(printf '%s\n' "${out}" | cut -f1-3)" = "$(printf 'HARD\tplugin-em-skills\t.claude/skills/x/hooks/hooks.json')" ]; then
@@ -50935,44 +50952,44 @@ if _pw_is_plugin_path "${spelled}" || _pw_is_plugin_path "${real}"; then
 if _pw_is_plugin_path "${real}"; then
 EOF_MUT
   _pw_mut M3-forma-plugin hook 'Write T3' <<'EOF_MUT'
-local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+local re_plugin='^(.*)/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
 @@@
 local re_plugin='/NADA/'
 EOF_MUT
   _pw_mut M3b-plugin-fundo hook 'Write em .claude-plugin fundo' <<'EOF_MUT'
-local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+local re_plugin='^(.*)/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
 @@@
-local re_plugin='/\.claude/skills/.+/\.claude-plugin(/|$)'
+local re_plugin='^(.*)/\.claude/skills/.+/\.claude-plugin(/|$)'
 EOF_MUT
   _pw_mut M3c-plugin-raiz hook 'Write em .claude-plugin direto em skills' <<'EOF_MUT'
-local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+local re_plugin='^(.*)/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
 @@@
-local re_plugin='/\.claude/skills/([^/]+/)?\.claude-plugin(/|$)'
+local re_plugin='^(.*)/\.claude/skills/([^/]+/)?\.claude-plugin(/|$)'
 EOF_MUT
   _pw_mut M3d-abaixo-plugin hook 'Write abaixo de .claude-plugin do 1º nível' <<'EOF_MUT'
-local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+local re_plugin='^(.*)/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
 @@@
-local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin/[^/]*$'
+local re_plugin='^(.*)/\.claude/skills/[^/]+/\.claude-plugin/[^/]*$'
 EOF_MUT
   _pw_mut M4-forma-hooks hook 'Write T4' <<'EOF_MUT'
-local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
 local re_hooks='/NADA/'
 EOF_MUT
   _pw_mut M4b-hooks-fundo hook 'Write em hooks fundo: references/hooks' <<'EOF_MUT'
-local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
-local re_hooks='/\.claude/skills/.+/hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/.+/hooks(/|$)'
 EOF_MUT
   _pw_mut M4c-abaixo-hooks hook 'Write abaixo de hooks do 1º nível' <<'EOF_MUT'
-local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
-local re_hooks='/\.claude/skills/[^/]+/hooks/[^/]*$'
+local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks/[^/]*$'
 EOF_MUT
   _pw_mut M4d-nome-da-skill hook 'Write em skill nomeada hooks' <<'EOF_MUT'
-local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
-local re_hooks='/\.claude/skills/([^/]+/)?hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/([^/]+/)?hooks(/|$)'
 EOF_MUT
   _pw_mut M5-exit2 hook 'Edit T3' <<'EOF_MUT'
 rm passa." >&2
@@ -51042,15 +51059,51 @@ EOF_MUT
 || true
 EOF_MUT
   _pw_mut M18-prune hook 'Write em node_modules dentro de hooks do 1º nível' <<'EOF_MUT'
-local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
 @@@
 case "$1" in */node_modules/*) return 1 ;; esac
-  local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
+  local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
 EOF_MUT
   _pw_mut M18b-fechado-fundo hook 'sem python3: Bash em hooks fundo cala' <<'EOF_MUT'
 grep -qE '\.claude/skills/[^/[:space:]]+/(\.claude-plugin|hooks)(/|[[:space:]]|$)' <<<
 @@@
 grep -qE '\.claude/skills/[^[:space:]]*(\.claude-plugin|/hooks)(/|[[:space:]]|$)' <<<
+EOF_MUT
+  _pw_mut M29-raiz-git hook 'Write em worktree' <<'EOF_MUT'
+[ -e "$1/.git" ] && return 0
+@@@
+:
+EOF_MUT
+  _pw_mut M29b-qualquer-raiz hook 'Write fora de raiz: pasta solta' <<'EOF_MUT'
+_pw_is_root "${BASH_REMATCH[1]}" && return 0
+@@@
+return 0
+EOF_MUT
+  _pw_mut M29c-casa hook 'Write T5' <<'EOF_MUT'
+[ "$1" = "${HOME}" ] && return 0
+  [ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${HOME}" 2>/dev/null)" ]
+@@@
+return 1
+EOF_MUT
+  _pw_mut M29d-casa-link hook 'Write na casa, com HOME por link' <<'EOF_MUT'
+[ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${HOME}" 2>/dev/null)" ]
+@@@
+false
+EOF_MUT
+  _pw_mut M29e-ocorrencias hook 'Write em hooks com .claude/skills dentro' <<'EOF_MUT'
+rest="${BASH_REMATCH[1]}"
+@@@
+break
+EOF_MUT
+  _pw_mut M30-alvo-sem-raiz hook 'raiz sem git: o alvo da skill que é link não entra' <<'EOF_MUT'
+_pw_is_root "${base}" || continue
+@@@
+:
+EOF_MUT
+  _pw_mut M31-mensagem hook 'a mensagem do veto diz onde o plugin mora' <<'EOF_MUT'
+Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace ou --plugin-dir), não escrevendo em skills. A REGRA 114
+@@@
+A REGRA 114
 EOF_MUT
   _pw_mut M19-cwd hook 'cwd na skill: mkdir hooks' <<'EOF_MUT'
 case "${hcwd0}" in *.claude*) hit=1 ;; esac
@@ -51386,6 +51439,33 @@ words = [w for w in words if w != "-t"]
 @@@
 pass
 EOF_MUT
+  _pw_mut J29-qualquer-raiz judge 'Bash fora de raiz: pasta solta' <<'EOF_MUT'
+if c in (".claude-plugin", "hooks") and not _pw_is_root("/".join(parts[:i])):
+@@@
+if False:
+EOF_MUT
+  _pw_mut J29b-profundidade-raiz judge 'cp -r de pasta com plugin para pasta solta' <<'EOF_MUT'
+ and _pw_is_root("/".join(parts[:i])):
+            return len(
+@@@
+:
+            return len(
+EOF_MUT
+  _pw_mut J29c-git judge 'Bash em worktree' <<'EOF_MUT'
+if os.path.lexists(os.path.join(prefix, ".git")):
+@@@
+if False:
+EOF_MUT
+  _pw_mut J29d-casa judge 'cat > T5 com ~' <<'EOF_MUT'
+return bool(_PW_HOME) and os.path.realpath(prefix) == _PW_HOME
+@@@
+return False
+EOF_MUT
+  _pw_mut J29e-casa-link judge 'Bash na casa, com HOME por link' <<'EOF_MUT'
+_PW_HOME = os.path.realpath(os.environ["HOME"]) if os.environ.get("HOME") else None
+@@@
+_PW_HOME = os.environ.get("HOME")
+EOF_MUT
   _pw_mut J24-chaves judge 'chaves no mkdir' <<'EOF_MUT'
 words = words[:1] + [e for w in words[1:] for e in brace_expand(w)]
 @@@
@@ -51679,6 +51759,11 @@ EOF_MUT
 *)     sev="HARD"; msg="${msg_repo}" ;;
 @@@
 *)     sev="SOFT"; msg="${msg_repo}" ;;
+EOF_MUT
+  _pw_mut S18-mensagem scan 'a mensagem diz onde o plugin mora' <<'EOF_MUT'
+Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace ou --plugin-dir), não escrevendo em skills. Não há
+@@@
+Não há
 EOF_MUT
   _pw_mut S13-casa-nao-rebaixa scan 'HOME igual ao repo segue HARD' <<'EOF_MUT'
 [ "${home_too}" = 1 ] && [ -n "${HOME:-}" ] && [ "$(realpath -m -- "${repo}/.claude/skills" 2>/dev/null)" != "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then

@@ -18,8 +18,8 @@
 #           aceite de confiança (S2) não carregam. Nunca afirme que carregou a partir daqui.
 #
 # ONDE    : no SessionStart (session-plugin-write-scan.sh, com --home, só avisa) e no lint (REGRA 114, sem --home: o
-#           gate não pode depender da pasta de casa de quem roda). Plugin local no repo trava o gate do core, sem registro de exceção:
-#           no core não há plugin local, e quem quiser um reabre a decisão com o maestro. A pasta de casa só avisa, nunca barra: a
+#           gate não pode depender da pasta de casa de quem roda). Plugin local no repo trava o gate do core e da porta clonada, sem
+#           registro de exceção, e a mensagem diz onde o plugin mora; no adotante, SOFT, quem decide é o dispatcher. A pasta de casa só avisa, nunca barra: a
 #           linha dela sai SOFT. Mas o repo nunca desce a SOFT por causa dela: `HOME=<repo>` ou `~/.claude/skills` como link para o
 #           repo julgam o repo, HARD, uma vez só. Sem permissão de leitura ou timeout: rc 2, com o motivo, porque não houve julgamento.
 # O QUE ELA NÃO VÊ: skill nomeada `hooks` (o 1º componente é o nome, e isso é honesto); `.claude-plugin/` direto em skills;
@@ -88,7 +88,7 @@ _scan_dir() {
 
 _report() {
   local repo="$1" fmt="$2" home_too="$3" p msg sev acc rc=0
-  local msg_repo="arquivo com FORMA de plugin em .claude/skills/<nome>; plugin ali carrega na sessão seguinte e o tool.check dele vence os vetos. No core não há plugin local, e não há registro de exceção: confira quem escreveu e remova, ou reabra a decisão com o maestro"
+  local msg_repo="arquivo com FORMA de plugin em .claude/skills/<nome>; plugin ali carrega na sessão seguinte e o tool.check dele vence os vetos. Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace ou --plugin-dir), não escrevendo em skills. Não há registro de exceção: confira quem escreveu e remova, ou reabra a decisão com o maestro"
   local msg_home="arquivo com FORMA de plugin na pasta de skills do usuário; aqui a varredura só avisa, e quem barra é o veto da escrita pela sessão: confira quem escreveu"
   acc="$(mktemp)"
   _scan_dir "${repo}/.claude/skills" ".claude/skills" "${acc}" || rc=$?
@@ -173,6 +173,11 @@ if [ "${MODE}" = "selftest" ]; then
   r="$(_r repo-limpo)"; mkdir -p "${d}/casa/.claude/skills/x/.claude-plugin"; echo '{}' > "${d}/casa/.claude/skills/x/.claude-plugin/plugin.json"
   HOME="${d}/casa" _c cala "~/.claude/skills sem --home: o gate não depende do ~" "${r}"
   HOME="${d}/casa" _c acusa "~/.claude/skills com --home (W1, T5)" "${r}" --home
+  case "a mensagem diz onde o plugin mora" in *"${PW_SELFTEST_ONLY:-}"*)
+    q="$(_r msg)"; mkdir -p "${q}/.claude/skills/x/hooks"; echo x > "${q}/.claude/skills/x/hooks/h"
+    if bash "$0" "${q}" --format tsv 2>/dev/null | cut -f4 | /usr/bin/grep -qF 'mecanismo próprio'; then echo 'ok   acusa a mensagem diz onde o plugin mora'
+    else printf '✗    acusa a mensagem diz onde o plugin mora\n'; fails=$((fails + 1)); fi ;;
+  esac
   # a pasta de casa só avisa: a severidade é o que o gate lê
   case "a pasta de casa sai SOFT" in *"${PW_SELFTEST_ONLY:-}"*)
     o="$(HOME="${d}/casa" bash "$0" "${r}" --home --format tsv 2>/dev/null | cut -f1)"

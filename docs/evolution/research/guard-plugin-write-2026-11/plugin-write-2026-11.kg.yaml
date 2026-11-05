@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 23 NÓS ═══
+# ═══ TETO: 24 NÓS ═══
 meta:
   id: plugin-write-2026-11
   schema_version: "1"
@@ -96,23 +96,43 @@ nodes:
 
   - id: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
     node_type: decision
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.75
     trace: ".claude/hooks/pretooluse-plugin-write-guard.sh"
-    label: "O veto julga a FORMA do caminho, como escrito e resolvido, em qualquer raiz, sem isenção da pasta temporária nem do scratchpad. A isenção foi pesada e descartada pela medida: nenhum dos 3.929 caminhos de Write e Edit dos transcripts tem a forma."
-    narrative: "E o 1º componente depois de skills/ é o NOME da skill: uma skill chamada hooks cala, o que diverge do glob literal do pedido, de propósito."
+    label: "O veto julga a FORMA do caminho, como escrito e resolvido, só na raiz de um repo ou worktree (toplevel do git) e na pasta de casa. Superou a redação anterior, em qualquer raiz: docs/x/.claude/skills e pasta solta fora de repo passam."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Raiz de repo e casa»"
+    narrative: |-
+      E o 1º componente depois de skills/ é o NOME da skill: uma skill chamada hooks cala, o que diverge do glob literal do pedido, de propósito.
+
+      Selado por /meta:decide em 2026-11-05: escolhida «Raiz de repo e casa»; descartadas: «Qualquer raiz».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Onde a forma da guarda de plugin vale?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
   - id: D_HARD_NO_CORE_SOFT_NO_DERIVADO
     node_type: decision
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.75
     trace: ".claude/validation/lint-artifacts.sh"
-    label: "REGRA 114 (Plugin não mora em .claude/skills no disco): HARD no core, SOFT no derivado, e só o repo, sem a pasta de casa. O adotante pode instalar um plugin ali por escolha dele, e o gate não pode depender da pasta de casa de quem roda."
-    narrative: "A pasta de casa é com o SessionStart, que só avisa. Passada a cláusula 5 da doutrina: quem controla a entrada do check é o próprio repo, então um terceiro não deixa o gate vermelho à distância."
+    label: "REGRA 114 (Plugin não mora em .claude/skills no disco): a varredura é HARD no core, SOFT no adotante, e só o repo, sem a pasta de casa. O veto da escrita vale em todo papel: plugin se instala pelo mecanismo próprio, não escrevendo em skills."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Veto em todos»"
+    narrative: |-
+      A pasta de casa é com o SessionStart, que só avisa. Passada a cláusula 5 da doutrina: quem controla a entrada do check é o próprio repo, então um terceiro não deixa o gate vermelho à distância.
+
+      Selado por /meta:decide em 2026-11-05: escolhida «Veto em todos»; descartadas: «Só avisa no adotante».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «No adotante, a escrita na forma é vetada ou só avisada?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
   - id: E_REPLAY_ACHOU_UM_FALSO_POSITIVO
     node_type: evidence
@@ -286,6 +306,22 @@ nodes:
     confidence: 0.5
     trace: "docs/evolution/review/feat-guard-plugin-write.md"
     label: "O Elenxo não rodou: a passada adversarial é da sessão principal, em revisor novo, com mandato de achar o falso positivo. Enquanto ela não rodar, nada aqui está selado. O resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) ficou com a passada pendente."
+  - id: D_PORTA_CLONADA_MANTEM_HARD
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Manter HARD»"
+    label: "Num projeto clonado da onion-standalone, a REGRA 114 (Plugin não mora em .claude/skills no disco) segue HARD, e a mensagem da regra diz onde o plugin deve morar."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Manter HARD»; descartadas: «SOFT fora da publicação»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «A REGRA 114 dá HARD num projeto clonado da onion-standalone ou só avisa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
 edges:
   - from: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
@@ -354,3 +390,6 @@ edges:
   - from: Q_ELENXO_PENDENTE
     to: D_VETO_ESTREITO_MAIS_VARREDURA
     edge_type: CONSTRAINS
+  - from: D_PORTA_CLONADA_MANTEM_HARD
+    to: D_HARD_NO_CORE_SOFT_NO_DERIVADO
+    edge_type: TRACES_TO

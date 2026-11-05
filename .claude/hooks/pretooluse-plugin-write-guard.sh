@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # PreToolUse(Write|Edit|NotebookEdit|Bash) — VETO (exit 2) à escrita de plugin em .claude/skills e ~/.claude/skills.
 # Decisão do maestro de 2026-11-04: «Veto estreito + varredura no disco». Forma fechada por ele em 2026-11-05: só o 1º nível de cada
-# skill, sem registro de exceção (nó D_NO_CORE_NAO_HA_PLUGIN_LOCAL).
+# skill, sem registro de exceção (nó D_NO_CORE_NAO_HA_PLUGIN_LOCAL), e só na raiz de repo ou worktree e na pasta de casa (nó
+# D_JULGA_A_FORMA_EM_QUALQUER_RAIZ, que esta decisão superou). O veto vale em todo papel: este hook não lê o carimbo.
 #
 # ── O DEFEITO MEDIDO (datado, e em LABORATÓRIO, não em dano de produção) ───────────────────────
 # 2026-11-04, Claude Code 2.1.318, sessões de roteiro fixo contra um stub, sob bypassPermissions: das 129 tentativas
@@ -13,8 +14,8 @@
 #
 # ── O QUE VETA ───────────────────────────────────────────────────────────────────
 #   · Write, Edit e NotebookEdit cujo caminho, COMO ESCRITO ou RESOLVIDO (symlink não contém `.claude` no texto), tem a forma
-#     `.claude/skills/<nome>/.claude-plugin/` ou `.claude/skills/<nome>/hooks/`, com tudo o que há abaixo delas, em qualquer raiz,
-#     inclusive a pasta de casa. `<nome>` é um componente só: é o 1º nível da skill, e nada mais fundo barra;
+#     `.claude/skills/<nome>/.claude-plugin/` ou `.claude/skills/<nome>/hooks/`, com tudo o que há abaixo delas, onde a pasta que contém
+#     `.claude/skills` é raiz de repo ou worktree (tem `.git`) ou a pasta de casa. `<nome>` é um componente só: é o 1º nível da skill;
 #   · Bash que escreve nesse caminho, pelo tokenizador de lib/invocation-lines.sh + lib/plugin-write-judge.py, que compõe o
 #     juiz do MOAT: redirecionamento simples, tee, cp, mv, install, rsync, dd, tar -C, curl -o, sed -i, `cd` antes de `>`, `$HOME`,
 #     `$PWD`, `$(pwd)`, topo do git, variável e pedaços LITERAIS da mesma string, `bash -c`, script não versionado (só a escrita
@@ -31,6 +32,8 @@
 #   · texto que só CITA o caminho: echo, heredoc de documento, `git commit -F -`, string em Python, grep, git log, `python3 x.py <texto>`;
 #   · leitura: cat, ls, Read, `cp <plugin> /tmp`, `xargs cp` para fora, `shutil.copy` para fora, `touch -r`, `tar -xO`, `rsync -n`;
 #   · REMOVER: rm, rmdir, unlink, find -delete, find -exec rm, git clean, git rm e a origem de um mv. É a cura que a varredura manda;
+#   · a forma fora de uma raiz: `docs/x/.claude/skills/y/hooks/z`, pasta solta em /tmp e projeto sem git (decisão do maestro de 2026-11-05,
+#     e o projeto sem git é o custo dela: a partida ainda avisa, porque a varredura julga o projeto que recebe);
 #   · ssh, scp e rsync para OUTRA máquina; `bash -n`; e o script solto em que a escrita não se prova.
 #   A vizinha ensina: em 2026-11-04 a guarda do arquivo de segredos deu dois falsos positivos (relato do maestro), e mais dois
 #   nesta forja. Aqui o veto casa a FORMA de um caminho de ESCRITA, nunca o texto. O replay sobre os transcripts reprovou a 1ª redação,
@@ -48,12 +51,14 @@
 #   `$CLAUDE_CONFIG_DIR` escapa aqui E na varredura, que não conhece essa pasta.
 #   FORMAS DE ESTOURO, também declaradas: 3.000 `$(` na mesma string; `sh -c` aninhado 12 vezes, que só fecha com o sinal no texto; script
 #   solto maior que 512 KiB, que o juiz não lê; e a cláusula 4 da guard-doctrine: sem python ou sem a lib, o Bash só fecha com o
-#   caminho inteiro junto de verbo de escrita, e todo o resto passa. O teste de link olha só as 256 primeiras palavras do comando.
+#   caminho inteiro junto de verbo de escrita, sem provar a raiz, e todo o resto passa. O teste de link olha só as 256 primeiras
+#   palavras do comando. `git init` e a escrita na MESMA string: a raiz ainda não existe quando o juiz olha.
 #   O processo de um mod e um MCP de escrita ficam fora do PreToolUse. O hook é de projeto: cai junto com o settings.json
 #   (a própria medição gravou `.claude/settings.json` e o hook do arquivo de segredos sem barreira nenhuma). A metade que não depende
 #   do vocabulário é a varredura, plugin-write-scan-check.sh, no SessionStart e no lint.
 # ── CONSEQUÊNCIA DECLARADA ──────────────────────────────────────────────────────────
-#   No core não há plugin local: um arquivo nessa forma trava o gate (REGRA 114), sem registro de exceção, e quem quiser um reabre a
+#   Plugin se instala pelo mecanismo próprio, não escrevendo em skills: o veto vale no core, na porta e no adotante.
+#   No core e na porta clonada, um arquivo nessa forma trava o gate (REGRA 114), sem registro de exceção, e quem quiser um reabre a
 #   decisão com o maestro. A sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill embutida
 #   plugin-authoring grava ali. Uma pasta `hooks/` de conteúdo no 1º nível da skill também barra: mude o nome dela ou desça um nível.
 #   Na pasta de casa a sessão é vetada aqui, e a varredura só avisa: o gate não julga `~/.claude/skills`.
@@ -62,11 +67,28 @@
 set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# A pasta que contém `.claude/skills` é raiz de repo ou worktree (`.git` é pasta ou arquivo), ou a casa?
+_pw_is_root() {
+  [ -e "$1/.git" ] && return 0
+  [ -n "${HOME:-}" ] || return 1
+  [ "$1" = "${HOME}" ] && return 0
+  [ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${HOME}" 2>/dev/null)" ]
+}
+
 _pw_is_plugin_path() {
-  # regex e não glob: o `*` do `case` atravessa `/`, e aí `<nome>` viraria qualquer profundidade
-  local re_plugin='/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
-  local re_hooks='/\.claude/skills/[^/]+/hooks(/|$)'
-  [[ "$1" =~ ${re_plugin} ]] || [[ "$1" =~ ${re_hooks} ]]
+  # regex e não glob: o `*` do `case` atravessa `/`, e aí `<nome>` viraria qualquer profundidade. A raiz só se pergunta com a forma
+  # casada, então o caminho quente não paga nada. Toda ocorrência conta: o `(.*)` guloso pega a última, e o laço desce às outras
+  local re_plugin='^(.*)/\.claude/skills/[^/]+/\.claude-plugin(/|$)'
+  local re_hooks='^(.*)/\.claude/skills/[^/]+/hooks(/|$)'
+  local re rest
+  for re in "${re_plugin}" "${re_hooks}"; do
+    rest="$1"
+    while [[ "${rest}" =~ ${re} ]]; do
+      _pw_is_root "${BASH_REMATCH[1]}" && return 0
+      rest="${BASH_REMATCH[1]}"
+    done
+  done
+  return 1
 }
 
 # Leitor próprio do campo do JSON: o Write não pode depender da lib do tokenizador, que falta ou vem vazia sem deixar rastro.
@@ -86,6 +108,7 @@ _pw_link_targets() {
   local base e
   for base in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
     [ -n "${base}" ] && [ -d "${base}/.claude/skills" ] || continue
+    _pw_is_root "${base}" || continue
     for e in "${base}"/.claude/skills/* "${base}"/.claude/skills/.[!.]*; do
       [ -L "${e}" ] && realpath -m -- "${e}" 2>/dev/null
     done
@@ -103,7 +126,7 @@ _pw_is_link_target_form() {  # _pw_is_link_target_form <caminho> <alvos, um por 
 }
 
 _pw_deny() {
-  echo "GUARDA-PRETOOLUSE (plugin em skills): $1. O destino tem a FORMA de plugin (.claude/skills/<nome>/.claude-plugin/ ou .claude/skills/<nome>/hooks/, no 1º nível da skill): plugin ali carrega na sessão seguinte e o tool.check dele vence os vetos (medido em laboratório em 2026-11-04). Negado. No core não há plugin local, e a REGRA 114 reprova esse arquivo, sem registro de exceção: quem quiser um reabre a decisão com o maestro. Se é só uma pasta de conteúdo, mude o nome dela ou desça um nível. Para tirar um que já está lá, rm passa." >&2
+  echo "GUARDA-PRETOOLUSE (plugin em skills): $1. O destino tem a FORMA de plugin (.claude/skills/<nome>/.claude-plugin/ ou .claude/skills/<nome>/hooks/, no 1º nível da skill): plugin ali carrega na sessão seguinte e o tool.check dele vence os vetos (medido em laboratório em 2026-11-04). Negado. Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace ou --plugin-dir), não escrevendo em skills. A REGRA 114 reprova esse arquivo, sem registro de exceção: quem quiser um aqui reabre a decisão com o maestro. Se é só uma pasta de conteúdo, mude o nome dela ou desça um nível. Para tirar um que já está lá, rm passa." >&2
   exit 2
 }
 
@@ -117,6 +140,11 @@ if [ "${1:-}" = "--selftest" ]; then
   # o wrapper VERSIONADO, rastreado pelo git: fronteira do juiz. E o script solto (K4): lido e julgado
   printf 'cat > .claude/skills/x/hooks/h <<E\nE\n' > "${p}/tools/w.sh"
   git -C "${p}" add -A; git -C "${p}" -c user.email=t@t -c user.name=t commit -q -m base
+  git -C "${p}" worktree add -q "${d}/wt" 2>/dev/null                      # worktree: `.git` é arquivo
+  git -C "${p}" worktree add -q "${p}/.claude/worktrees/a" 2>/dev/null     # a de agente, dentro do `.claude` do principal
+  git init -q -b feat "${p}/docs/aninhado"                                 # repo dentro de repo: é raiz
+  mkdir -p "${d}/semgit/.claude/skills" "${d}/fora/alvo-semgit"; ln -s "${d}/fora/alvo-semgit" "${d}/semgit/.claude/skills/l"
+  ln -s "${d}/home" "${d}/home-link"                                       # a casa por link
   printf 'mkdir -p .claude/skills/x/.claude-plugin\nprintf x > .claude/skills/x/.claude-plugin/plugin.json\n' > "${p}/docs/sbx.sh"
   printf 'echo .claude/skills/x/hooks/h\n' > "${p}/scratch/cita.sh"
   # o script solto com uma função que desloca os argumentos: é a forma da própria guarda rodando fora do checkout (M3)
@@ -127,6 +155,7 @@ if [ "${1:-}" = "--selftest" ]; then
   ln -s "${p}/.claude/skills/x/hooks" "${p}/docs/lnk-hooks"                # link que termina no alvo, sem sinal no texto
   ln -s "${d}/fora/vazia" "${p}/.claude/skills/fora"                       # S6: skill que é link para fora
   mkdir -p "${d}/outro/.claude/skills" "${d}/fora/vazia2"; ln -s "${d}/fora/vazia2" "${d}/outro/.claude/skills/l"  # noutra raiz: o alvo não entra na lista
+  git init -q -b feat "${d}/outro"
   ln -s "${p}/.claude/skills/x/hooks/h" "${p}/docs-l"                      # em dois tempos: o link já existe, e a palavra não tem barra
   ln -s "${p}/.claude/skills/x/hooks" "${p}/hk"
   P=".claude/skills/x/.claude-plugin/plugin.json"; H=".claude/skills/x/hooks/hooks.json"
@@ -170,6 +199,14 @@ print(json.dumps({"session_id":"s","hook_event_name":"PreToolUse","tool_name":t,
   _c acusa "Write por symlink (K3)"  Write "${p}/docs/sbx-link/skills/x/.claude-plugin/plugin.json"
   _c acusa "Write por symlink que termina em hooks" Write "${p}/docs/lnk-hooks/register.js"
   _c acusa "Write por skill que é link para fora (S6)" Write "${p}/.claude/skills/fora/.claude-plugin/plugin.json"
+  _c acusa "Write em worktree" Write "${d}/wt/.claude/skills/y/hooks/h.js"
+  _c acusa "Write em worktree de agente" Write "${p}/.claude/worktrees/a/.claude/skills/y/.claude-plugin/plugin.json"
+  _c acusa "Write em repo aninhado" Write "${p}/docs/aninhado/.claude/skills/y/hooks/h.js"
+  _c acusa "Write em hooks com .claude/skills dentro" Write "${p}/.claude/skills/x/hooks/.claude/skills/y/hooks/h"
+  _c acusa "Bash em worktree" Bash "printf x > ${d}/wt/.claude/skills/y/hooks/h"
+  _c acusa "Bash com cwd na worktree" Bash "mkdir -p .claude/skills/y/hooks" "${d}/wt"
+  _c acusa "Bash relativo que sobe até a raiz" Bash "printf x > ../.claude/skills/x/hooks/h" "${p}/docs"
+  _c acusa "cp -r de pasta com plugin para skills da worktree" Bash "cp -r ${d}/fora/ext ${d}/wt/.claude/skills/"
   _c acusa "Write por skill que é link, noutra raiz" Write "${d}/outro/.claude/skills/l/hooks/h.js"
   _c acusa "cat > T3 (verbatim)"     Bash  "mkdir -p .claude/skills/x/.claude-plugin && cat > ${P} <<'SBXEOF'
 {\"name\":\"x\"}
@@ -282,6 +319,16 @@ open(p,'w').write('x')\""
 .claude/skills/x/hooks/h"
   _c acusa "php -r file_put_contents"     Bash  "php -r \"file_put_contents('${H}','x');\""
   # ── CALA: edição honesta, citação, leitura e remoção ──
+  _c cala "Write fora de raiz: docs/x" Write "${p}/docs/x/.claude/skills/y/hooks/z"
+  _c cala "Write fora de raiz: pasta solta" Write "${d}/solta/.claude/skills/y/hooks/z"
+  _c cala "Write fora de raiz: .claude-plugin em pasta solta" Write "${d}/solta/.claude/skills/y/.claude-plugin/plugin.json"
+  _c cala "Write fora de raiz: subpasta da casa" Write "${d}/home/sub/.claude/skills/y/hooks/z"
+  _c cala "Bash fora de raiz: docs/x" Bash "mkdir -p docs/x/.claude/skills/y/hooks && printf x > docs/x/.claude/skills/y/hooks/z"
+  _c cala "Bash fora de raiz: pasta solta" Bash "printf x > ${d}/solta/.claude/skills/y/hooks/z"
+  _c cala "Bash fora de raiz: python" Bash "python3 -c \"open('${d}/solta/.claude/skills/y/hooks/z','w')\""
+  _c cala "cp -r de pasta com plugin para pasta solta" Bash "cp -r ${d}/fora/ext ${d}/solta/.claude/skills/"
+  _c cala "cp -r da pasta chamada hooks para pasta solta" Bash "cp -r ${d}/fora/exth/hooks ${d}/solta/.claude/skills/y/"
+  _c cala "mv -t para pasta solta" Bash "mv -t ${d}/solta/.claude/skills/y/hooks /tmp/a"
   _c cala "mv -t para fora da skill"       Bash  "mv -t /tmp/q ${H}"
   _c cala "mv -ft para fora da skill"      Bash  "mv -ft /tmp/q ${H}"
   _c cala "mv --target-directory= para fora" Bash "mv --target-directory=/tmp/q ${H}"
@@ -416,8 +463,8 @@ echo x > \"\$OUT\""
   _c cala "ln -s de um argumento cria o link no cwd" Bash "cd /tmp && ln -s ${p}/.claude/skills/x/hooks"
   _c cala "rsync que exclui as pastas de plugin" Bash "rsync -a --exclude hooks/ --exclude .claude-plugin/ ${d}/fora/ext/ .claude/skills/nova/"
   _c cala "ssh: outra máquina"             Bash  "ssh host 'grep foo ${H} > /tmp/o'"
-  _c cala "scp: outra máquina"             Bash  "scp /tmp/f host:/h/${H}"
-  _c cala "rsync: outra máquina"           Bash  "rsync -a /tmp/f host:/h/${H}"
+  _c cala "scp: outra máquina"             Bash  "scp /tmp/f u@host:${p}/${H}"
+  _c cala "rsync: outra máquina"           Bash  "rsync -a /tmp/f u@host:${p}/${H}"
   _c cala "remoção: find -exec rm"         Bash  "find .claude/skills/x/hooks -type f -exec rm {} +"
   _c cala "remoção: git -C clean"          Bash  "git -C .claude/skills/x/hooks clean -fd"
   _c cala "quarentena: os.rename para fora" Bash "python3 -c \"import os; os.rename('${H}','/tmp/q')\""
@@ -483,6 +530,7 @@ z=zipfile.ZipFile(d+"/p.zip","w"); z.writestr("x/hooks/h","x"); z.close()' "${d}
   command -v unzip >/dev/null 2>&1 && _tv "unzip" "unzip -q ${d}/p.zip -d .claude/skills"
   _tv "sed w"               "sed -n 'w .claude/skills/x/hooks/h' docs/a"
   _tv "sort -o"             "sort -o .claude/skills/x/hooks/h docs/a"
+  _c TETO "git init e escrita na mesma string" Bash "git init -q ${d}/novo && printf x > ${d}/novo/.claude/skills/y/hooks/h"
   _c TETO "base64 -d | sh"                 Bash  "echo cHJpbnRm | base64 -d | sh"
   _c TETO "git apply"                      Bash  "git apply /tmp/plugin.patch"
   _c TETO "tar -x na pasta de skills, conteúdo opaco" Bash "tar -xf /tmp/p.tar -C .claude/skills"
@@ -493,7 +541,7 @@ E"
   _raw() {  # _raw <esperado rc> <nome> <json> [dir-do-hook] [PATH]
     local want="$1" name="$2" json="$3" hook="${4:-${BASH_SOURCE[0]}}" pth="${5:-${PATH}}" rc=0
     case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
-    printf '%s' "${json}" | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" PATH="${pth}" bash "${hook}" >/dev/null 2>&1 || rc=$?
+    printf '%s' "${json}" | CLAUDE_PROJECT_DIR="${rawproj:-${p}}" HOME="${rawhome:-${d}/home}" PATH="${pth}" bash "${hook}" >/dev/null 2>&1 || rc=$?
     if [ "${rc}" -eq "${want}" ]; then printf 'ok   %-5s %s\n' "$([ "${want}" = 2 ] && echo acusa || echo cala)" "${name}"
     else printf '✗    %-5s %s (rc=%s)\n' "${want}" "${name}" "${rc}"; fails=$((fails + 1)); fi
   }
@@ -510,6 +558,20 @@ E"
   _raw 2 "sem python3: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
   _raw 0 "sem python3: Bash em hooks fundo cala" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/references/hooks/a.md"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
   _raw 0 "sem python3: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
+  # a raiz, com a casa por link e o projeto sem git
+  rawhome="${d}/home-link" _raw 2 "Write na casa, com HOME por link" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/home/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
+  rawhome="${d}/home-link" _raw 2 "Bash na casa, com HOME por link" '{"tool_name":"Bash","tool_input":{"command":"printf x > '"${d}"'/home/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
+  rawproj="${d}/semgit" _raw 0 "raiz sem git: Write passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/semgit/.claude/skills/y/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  rawproj="${d}/semgit" _raw 0 "raiz sem git: Bash passa" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/y/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  rawproj="${d}/semgit" _raw 0 "raiz sem git: o alvo da skill que é link não entra" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/fora/alvo-semgit/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  # a mensagem diz onde o plugin mora: é o que o clone da porta lê quando o gate trava
+  case "a mensagem do veto diz onde o plugin mora" in *"${PW_SELFTEST_ONLY:-}"*)
+    _m="$(printf '%s' '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" bash "${BASH_SOURCE[0]}" 2>&1 >/dev/null)"
+    case "${_m}" in
+      *"mecanismo próprio"*) echo 'ok   acusa a mensagem do veto diz onde o plugin mora' ;;
+      *) printf '✗    acusa a mensagem do veto diz onde o plugin mora (%s)\n' "${_m}"; fails=$((fails + 1)) ;;
+    esac ;;
+  esac
   # a lib do tokenizador ausente ou vazia: o Write não depende dela, e o Bash fecha o caminho com verbo
   sl="${d}/semlib"; mkdir -p "${sl}/lib"; cp "${BASH_SOURCE[0]}" "${sl}/g.sh"; cp "${here}/lib/plugin-write-judge.py" "${sl}/lib/"
   vl="${d}/libvazia"; mkdir -p "${vl}/lib"; cp "${BASH_SOURCE[0]}" "${vl}/g.sh"; : > "${vl}/lib/invocation-lines.sh"
