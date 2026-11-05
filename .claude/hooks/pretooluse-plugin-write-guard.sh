@@ -12,38 +12,48 @@
 #
 # ── O QUE VETA ───────────────────────────────────────────────────────────────────
 #   · Write, Edit e NotebookEdit cujo caminho, COMO ESCRITO ou RESOLVIDO (symlink não contém `.claude` no texto), tem a forma
-#     `.claude/skills/**/.claude-plugin/**` ou `.claude/skills/**/hooks/**`, em qualquer raiz, inclusive `~`;
+#     `.claude/skills/**/.claude-plugin/**` ou `.claude/skills/**/hooks/**`, em qualquer raiz, inclusive a pasta de casa;
 #   · Bash que escreve nesse caminho, pelo tokenizador de lib/invocation-lines.sh + lib/plugin-write-judge.py, que compõe o
-#     juiz do MOAT: redirecionamento, tee, cp, mv, install, rsync, dd, tar -C, curl -o, sed -i, `cd` antes de `>`, variável
-#     e pedaços LITERAIS da mesma string, `bash -c`, script não versionado (lido e julgado), e código embutido em outra
-#     linguagem (`python3 -c`, `python3 - <<EOF`) quando o caminho é literal na chamada que escreve;
+#     juiz do MOAT: redirecionamento simples, tee, cp, mv, install, rsync, dd, tar -C, curl -o, sed -i, `cd` antes de `>`, `$HOME`,
+#     `$PWD`, `$(pwd)`, topo do git, variável e pedaços LITERAIS da mesma string, `bash -c`, script não versionado (só a escrita
+#     provada no corpo), e código em outra linguagem: Python pela árvore sintática, no argumento DESTINO; as outras pela forma;
 #   · `cp -r`, `mv`, `ln -s`, `rsync` de pasta que JÁ TEM a forma de plugin para dentro de .claude/skills.
 #
 # ── O QUE CALA (falso positivo é o defeito dominante aqui) ────────────────────────────────
-#   · qualquer outro caminho: .claude/skills/onion/SKILL.md, .claude/hooks/x.sh, .claude/settings.json, docs/**, e skill NOMEADA
-#     `hooks` (o 1º componente depois de skills/ é o nome; plugin mora um nível abaixo);
-#   · texto que só CITA o caminho: echo, heredoc de documento, grep, git log, `git commit -m`, `python3 x.py <texto>`;
-#   · leitura: cat, ls, Read, `cp <plugin> /tmp`, `open(caminho)` sem modo de escrita;
-#   · REMOVER: rm, rmdir, unlink, find -delete e a origem de um mv. É a cura que a varredura manda fazer.
+#   · tudo o que não é forma listada: .claude/skills/onion/SKILL.md, .claude/hooks/x.sh, .claude/settings.json, docs/**, skill NOMEADA
+#     `hooks` (plugin mora um nível abaixo), e `node_modules`, `.git`, `.venv` e `venv` abaixo de uma skill, como a varredura;
+#   · texto que só CITA o caminho: echo, heredoc de documento, `git commit -F -`, string em Python, grep, git log, `python3 x.py <texto>`;
+#   · leitura: cat, ls, Read, `cp <plugin> /tmp`, `xargs cp` para fora, `shutil.copy` para fora, `touch -r`, `tar -xO`, `rsync -n`;
+#   · REMOVER: rm, rmdir, unlink, find -delete, find -exec rm, git clean, git rm e a origem de um mv. É a cura que a varredura manda;
+#   · ssh, scp e rsync para OUTRA máquina; `bash -n`; e o script solto em que a escrita não se prova.
 #   A vizinha ensina: em 2026-11-04 a guarda do arquivo de segredos deu dois falsos positivos (relato do maestro), e mais dois
-#   nesta forja (um grep em `.claude/utils/*/*` e um python3 com heredoc cujo texto citava o arquivo). Aqui o veto casa a FORMA de
-#   um caminho de ESCRITA, nunca o texto. E o replay sobre os transcripts já reprovou a 1ª redação (ver o juiz).
+#   nesta forja. Aqui o veto casa a FORMA de um caminho de ESCRITA, nunca o texto. O replay sobre os transcripts reprovou a 1ª redação,
+#   e a passada adversarial de 2026-11-04 reprovou a 2ª: 6 achados altos e 7 médios, curados aqui (nó E_ELENXO_REPROVOU_E_CUROU).
+#
 # ── TETO: É CONTENÇÃO DE ACIDENTE E DE INJEÇÃO INGÊNUA, NÃO FRONTEIRA ──────────────────────
-#   Em Bash a lista falha pelo vocabulário. NÃO vê: `python3 x.py`, script versionado, `base64 -d | sh`, `git apply`, `tar`,
-#   `unzip` e `cp -r` cujo destino é só a pasta de skills e cuja origem ainda não existe no disco, nome montado de fora da
-#   string, por `$(…)` ou de pedaços sem `.claude-plugin` nem `skills`+`hooks` no texto, caminho em variável dentro de código
-#   embutido, script em dois tempos que monta o nome, e `cp`/`install` que um programa chama por dentro.
+#   Tudo o que não é forma listada passa. Em Bash a lista falha pelo vocabulário. NÃO vê, com caso TETO no --selftest: script
+#   versionado, `python3 x.py`, `base64 -d | sh`, `git apply`, `git clone`, `git checkout`, `tar` e `unzip` na pasta de skills sem a
+#   forma no destino, nome calculado em runtime, nome com valores distintos na string (ramo de `if`, reatribuição, `for`: a última
+#   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, e
+#   redirecionamento composto (`{ } >`, `( ) >`, `for … done >`, `if … fi >`, `&>`, `>|`, `<>`, `exec 3>`). Também escapam: alias de
+#   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, e programa que escreve por dentro.
 #   O processo de um mod e um MCP de escrita ficam fora do PreToolUse. O hook é de projeto: cai junto com o settings.json
-#   (a própria medição gravou `.claude/settings.json` e o hook do .env sem barreira nenhuma). A metade que não depende do
-#   vocabulário é a varredura, plugin-write-scan-check.sh, no SessionStart e no lint. O `--selftest` imprime o teto como casos.
+#   (a própria medição gravou `.claude/settings.json` e o hook do arquivo de segredos sem barreira nenhuma). A metade que não depende
+#   do vocabulário é a varredura, plugin-write-scan-check.sh, no SessionStart e no lint.
 # ── CONSEQUÊNCIA DECLARADA ──────────────────────────────────────────────────────────
-#   A sessão não forja mod em .claude/skills nem em ~/.claude/skills (a skill embutida plugin-authoring grava ali): quem
-#   instala é o maestro. Escape = fora da sessão (`!` no prompt). Não há variável de bypass, por desenho: escape que o modelo
-#   escreve na própria string é gate textual com outro nome.
+#   No core não há plugin local: um arquivo nessa forma trava o gate (REGRA 114), sem registro de exceção, e quem quiser um reabre a
+#   decisão com o maestro. A sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill embutida
+#   plugin-authoring grava ali. Uma pasta `hooks/` de conteúdo também barra (fixture de React, `references/hooks`): mude o nome dela.
+#   Escape = fora da sessão (`!` no prompt). Não há variável de bypass, por desenho: escape que o modelo escreve na própria
+#   string é gate textual com outro nome.
 set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 _pw_is_plugin_path() {
+  # abaixo de uma skill, dependência vendorizada não é plugin: é o que a varredura também não desce
+  case "$1" in
+    */.claude/skills/*/node_modules/*|*/.claude/skills/*/.git/*|*/.claude/skills/*/.venv/*|*/.claude/skills/*/venv/*) return 1 ;;
+  esac
   case "$1" in
     */.claude/skills/.claude-plugin|*/.claude/skills/.claude-plugin/*) return 0 ;;
     */.claude/skills/*/.claude-plugin|*/.claude/skills/*/.claude-plugin/*) return 0 ;;
@@ -53,7 +63,7 @@ _pw_is_plugin_path() {
 }
 
 _pw_deny() {
-  echo "GUARDA-PRETOOLUSE (plugin em skills): $1. Plugin em .claude/skills carrega na sessão seguinte, e o tool.check dele vence os vetos do core (medido em laboratório em 2026-11-04). Negado. Se é um plugin de verdade, o maestro o instala fora da sessão (\`!\` no prompt)." >&2
+  echo "GUARDA-PRETOOLUSE (plugin em skills): $1. O destino tem a FORMA de plugin em .claude/skills (.claude-plugin/, ou hooks/ abaixo de uma skill): plugin ali carrega na sessão seguinte e o tool.check dele vence os vetos (medido em laboratório em 2026-11-04). Negado. No core não há plugin local, e a REGRA 114 reprova esse arquivo, sem registro de exceção: quem quiser um reabre a decisão com o maestro. Se é só uma pasta de conteúdo, mude o nome dela. Para tirar um que já está lá, rm passa." >&2
   exit 2
 }
 
@@ -61,7 +71,7 @@ _pw_deny() {
 if [ "${1:-}" = "--selftest" ]; then
   export LC_ALL=C
   fails=0; d="$(mktemp -d)"; trap 'rm -rf "${d}"' EXIT
-  p="${d}/proj"; mkdir -p "${p}/.claude/skills/onion" "${p}/.claude/hooks" "${p}/docs" "${p}/tools" "${p}/scratch" "${d}/home/.claude/skills/x" "${d}/fora/ext/.claude-plugin" "${d}/fora/vazia"
+  p="${d}/proj"; mkdir -p "${p}/.claude/skills/onion" "${p}/.claude/hooks" "${p}/docs" "${p}/tools" "${p}/scratch" "${d}/home/.claude/skills/x" "${d}/fora/ext/.claude-plugin" "${d}/fora/exth/hooks" "${d}/fora/vazia"
   git -C "${p}" init -q -b feat
   echo x > "${p}/.claude/skills/onion/SKILL.md"; echo x > "${p}/.claude/hooks/x.sh"; echo '{}' > "${p}/.claude/settings.json"; echo x > "${p}/docs/a.md"; echo '{}' > "${d}/fora/payload"
   # o wrapper VERSIONADO, rastreado pelo git: fronteira do juiz. E o script solto (K4): lido e julgado
@@ -69,6 +79,10 @@ if [ "${1:-}" = "--selftest" ]; then
   git -C "${p}" add -A; git -C "${p}" -c user.email=t@t -c user.name=t commit -q -m base
   printf 'mkdir -p .claude/skills/x/.claude-plugin\nprintf x > .claude/skills/x/.claude-plugin/plugin.json\n' > "${p}/docs/sbx.sh"
   printf 'echo .claude/skills/x/hooks/h\n' > "${p}/scratch/cita.sh"
+  # o script solto com uma função que desloca os argumentos: é a forma da própria guarda rodando fora do checkout (M3)
+  printf 'f(){ shift; bash -c "$1"; }\nf a "echo .claude/skills/x/hooks/h > /dev/null"\n' > "${p}/scratch/desloca.sh"
+  printf 'printf x > .claude/skills/x/hooks/h\n' > "${p}/.env"                     # um juiz que abrisse este arquivo o vetaria
+  ln -s "${p}/.claude/skills/x/hooks" "${d}/home/lnk-hooks"                # o til só se prova com link sob a casa
   ln -s ../.claude "${p}/docs/sbx-link"                                    # K3
   ln -s "${p}/.claude/skills/x/hooks" "${p}/docs/lnk-hooks"                # link que termina no alvo, sem sinal no texto
   ln -s "${d}/fora/vazia" "${p}/.claude/skills/fora"                       # S6: skill que é link para fora
@@ -140,6 +154,35 @@ bash /tmp/sbx.sh"
   _c acusa "ln -s de pasta com plugin (S6)" Bash "ln -s ${d}/fora/ext .claude/skills/ext"
   _c acusa "cp -r de pasta com plugin" Bash "cp -r ${d}/fora/ext .claude/skills/"
   _c acusa "mv de pasta com plugin"  Bash  "mv ${d}/fora/ext .claude/skills/ext"
+  _c acusa "glob no nome da skill"        Bash  "printf x > .claude/skills/*/hooks/h"
+  _c acusa "cp -r de pasta só com hooks"  Bash  "cp -r ${d}/fora/exth .claude/skills/"
+  _c acusa "cp -t de pasta com plugin"    Bash  "cp -r -t .claude/skills/ ${d}/fora/ext"
+  _c acusa "ln -s relativo ao link, de pasta com plugin" Bash "ln -s ../../../fora/ext .claude/skills/ext"
+  _c acusa "Write relativo ao cwd"        Write "x/hooks/h" "${p}/.claude/skills"
+  _c acusa "Write com til, por link sob a casa" Write "~/lnk-hooks/h"
+  _c acusa "\$HOME"                       Bash  "printf x > \"\$HOME/.claude/skills/x/hooks/h\""
+  _c acusa "\${HOME}"                     Bash  "tee \"\${HOME}/.claude/skills/x/.claude-plugin/plugin.json\""
+  _c acusa "\$CLAUDE_PROJECT_DIR"         Bash  "printf x > \"\$CLAUDE_PROJECT_DIR/.claude/skills/x/hooks/h\""
+  _c acusa "\$PWD"                        Bash  "printf x > \"\$PWD/.claude/skills/x/hooks/h\""
+  _c acusa "\$(pwd)"                      Bash  "cp /tmp/a \"\$(pwd)/.claude/skills/x/hooks/hooks.json\""
+  _c acusa "topo do git"                  Bash  "R=\$(git rev-parse --show-toplevel); printf x > \"\$R/.claude/skills/x/.claude-plugin/plugin.json\""
+  _c acusa "cd \$HOME"                    Bash  "cd \"\$HOME/.claude/skills/x/hooks\" && printf x > a"
+  _c acusa "pushd literal"                Bash  "pushd .claude/skills/x/hooks && printf x > a"
+  _c acusa "\$HOME em bash -c"            Bash  "bash -c 'printf x > \"\$HOME/.claude/skills/x/hooks/h\"'"
+  _c acusa "python3 -c com o caminho em variável literal" Bash "python3 -c \"p='${H}'
+open(p,'w').write('x')\""
+  _c acusa "python3 Path com barra"       Bash  "python3 -c \"from pathlib import Path; (Path('.claude/skills/x/hooks')/'h').write_text('x')\""
+  _c acusa "python3 open com file e mode nomeados" Bash "python3 -c \"open(file='${H}',mode='w')\""
+  _c acusa "python3 shutil.copy para dentro" Bash "python3 -c \"import shutil; shutil.copy('/tmp/a','${H}')\""
+  _c acusa "python3 os.rename para dentro" Bash "python3 -c \"import os; os.rename('/tmp/a','${H}')\""
+  _c acusa "node writeFileSync"           Bash  "node -e \"require('fs').writeFileSync('${H}','x')\""
+  _c acusa "node copyFileSync para dentro" Bash "node -e \"require('fs').copyFileSync('/tmp/a','${H}')\""
+  _c acusa "perl open"                    Bash  "perl -e 'open(F,\">${H}\")'"
+  _c acusa "ruby File.write"              Bash  "ruby -e \"File.write('${H}','x')\""
+  _c acusa "xargs com o stdin como destino" Bash "echo ${H} | xargs -I{} cp /tmp/a {}"
+  _c acusa "xargs cp -t para dentro"      Bash  "ls /tmp/a | xargs cp -t .claude/skills/x/hooks"
+  _c acusa "xargs cp -I para dentro"      Bash  "ls /tmp/a | xargs -I{} cp {} .claude/skills/x/hooks/"
+  _c acusa "find -exec sed -i na pasta"   Bash  "find .claude/skills/x/hooks -type f -exec sed -i s/a/b/ {} +"
   # ── CALA: edição honesta, citação, leitura e remoção ──
   _c cala "Write em skills/onion/SKILL.md" Write "${p}/.claude/skills/onion/SKILL.md"
   _c cala "Edit em skills/onion/SKILL.md"  Edit  "${p}/.claude/skills/onion/SKILL.md"
@@ -179,6 +222,62 @@ open('.claude-plugin/marketplace.json', 'w').write('x')
 PY"
   _c cala "Write em .claude-plugin da raiz do repo" Write "${p}/.claude-plugin/marketplace.json"
   _c cala "Bash > em .claude-plugin da raiz do repo" Bash "printf x > .claude-plugin/marketplace.json"
+  _c cala "heredoc de documento que traz um heredoc de python" Bash "cat > docs/a.md <<'E'
+exemplo:
+python3 - <<'PY'
+open('${H}','w')
+PY
+fim
+E"
+  _c cala "git commit -F - com heredoc de python no corpo" Bash "git commit -F - <<'EOF'
+fix: python3 - <<'PY'
+open('${H}','w')
+PY
+EOF"
+  _c cala "string em python que cita a chamada" Bash "python3 - <<'PY'
+doc = \"\"\"use open('${H}','w') é vetado\"\"\"
+print(doc)
+PY"
+  _c cala "python3 tool.py com heredoc de dado" Bash "python3 tool.py <<'E'
+open('${H}','w')
+E"
+  _c cala "python3 -c com string que cita" Bash "python3 -c \"print(\\\"open('${H}','w')\\\")\""
+  _c cala "atribuição dentro de doc não vira destino" Bash "cat > docs/a.md <<'E'
+OUT=${H}
+E
+echo x > \"\$OUT\""
+  _c cala "atribuição citada num echo não vira destino" Bash "echo 'veja OUT=${H} aqui'; echo x > \"\$OUT\""
+  _c cala "valores distintos: escrita antes de reatribuir" Bash "out=/tmp/a; echo x > \"\$out\"; out=${H}; cat \"\$out\""
+  _c cala "valores distintos: ramo de if" Bash "T=/tmp; f=\"\$T/a\"; if [ -d docs ]; then f=docs/a.md; else f=${H}; fi; echo x > \"\$f\""
+  _c cala "for religa o nome"              Bash  "f=${H}; cat \"\$f\"; for f in docs/a.md; do echo x > \"\$f\"; done"
+  _c cala "local na função religa o nome"  Bash  "f=${H}; w() { local f=\"\$1\"; echo x > \"\$f\"; }; w docs/a.md; cat \"\$f\""
+  _c cala "mktemp segue dinâmico"          Bash  "d=\$(mktemp -d); mkdir -p \"\$d/.claude/skills/x/hooks\"; echo x > \"\$d/.claude/skills/x/hooks/h\""
+  _c cala "cd no plugin, cd -, e escreve fora" Bash "cd .claude/skills/x/hooks && ls; cd -; echo x > report.md"
+  _c cala "OLD=\$PWD, cd, volta e escreve fora" Bash "OLD=\$PWD; cd .claude/skills/x/hooks && ls; cd \"\$OLD\"; echo x > report.md"
+  _c cala "pushd, popd e escreve fora"     Bash  "pushd .claude/skills/x/hooks; ls; popd; echo x > report.md"
+  _c cala "Write em node_modules de skill" Write "${p}/.claude/skills/x/node_modules/lib/hooks/i.js"
+  _c cala "Write em .git de skill"         Write "${p}/.claude/skills/x/.git/hooks/pre-commit"
+  _c cala "Bash > em node_modules de skill" Bash "printf x > .claude/skills/x/node_modules/lib/hooks/i.js"
+  _c cala "bash -n de script solto"        Bash  "bash -n docs/sbx.sh"
+  _c cala "script solto cuja escrita não se prova" Bash "bash scratch/desloca.sh"
+  _c cala "source de arquivo de segredos: o juiz não abre" Bash "set -a; source .env; set +a"
+  _c cala "leitura: python3 shutil.copy para fora" Bash "python3 -c \"import shutil; shutil.copy('${H}','/tmp/a')\""
+  _c cala "leitura: node copyFileSync para fora" Bash "node -e \"require('fs').copyFileSync('${H}','/tmp/a')\""
+  _c cala "leitura: xargs cp -I para fora" Bash "grep -l foo .claude/skills/x/hooks/* | xargs -I{} cp {} /tmp/"
+  _c cala "leitura: xargs cp -t para fora" Bash "grep -l foo .claude/skills/x/hooks/* | xargs cp -t /tmp/"
+  _c cala "leitura: find -exec cp para fora" Bash "find .claude/skills/x/hooks -type f -exec cp {} /tmp/ \\;"
+  _c cala "leitura: touch -r"              Bash  "touch -r ${H} /tmp/z"
+  _c cala "leitura: tar -xO"               Bash  "tar -xOf /tmp/a.tar -C .claude/skills/x/hooks"
+  _c cala "leitura: rsync -n"              Bash  "rsync -an ${d}/fora/ext/ .claude/skills/x/hooks/"
+  _c cala "ln -s de um argumento cria o link no cwd" Bash "cd /tmp && ln -s ${p}/.claude/skills/x/hooks"
+  _c cala "rsync que exclui as pastas de plugin" Bash "rsync -a --exclude hooks/ --exclude .claude-plugin/ ${d}/fora/ext/ .claude/skills/nova/"
+  _c cala "ssh: outra máquina"             Bash  "ssh host 'grep foo ${H} > /tmp/o'"
+  _c cala "scp: outra máquina"             Bash  "scp /tmp/f host:/h/${H}"
+  _c cala "rsync: outra máquina"           Bash  "rsync -a /tmp/f host:/h/${H}"
+  _c cala "remoção: find -exec rm"         Bash  "find .claude/skills/x/hooks -type f -exec rm {} +"
+  _c cala "remoção: git -C clean"          Bash  "git -C .claude/skills/x/hooks clean -fd"
+  _c cala "quarentena: os.rename para fora" Bash "python3 -c \"import os; os.rename('${H}','/tmp/q')\""
+  _c cala "quarentena: shutil.move para fora" Bash "python3 -c \"import shutil; shutil.move('.claude/skills/x/hooks','/tmp/q')\""
   _c cala "remoção: rm"                    Bash  "rm -f ${H}"
   _c cala "remoção: rm -rf da pasta"       Bash  "rm -rf .claude/skills/x/hooks"
   _c cala "remoção: find -delete"          Bash  "find .claude/skills/x/hooks -type f -delete"
@@ -190,14 +289,50 @@ PY"
   # ── TETO: não coberto, DECLARADO. Se um destes passar a barrar, o teto mudou e o cabeçalho tem de mudar junto ──
   _c TETO "script versionado (fronteira do juiz)" Bash "bash tools/w.sh"
   _c TETO "python3 x.py"                   Bash  "python3 scratch/qualquer.py"
-  _c TETO "python3 -c com o caminho em variável" Bash "python3 -c \"p='${H}'
-open(p,'w').write('x')\""
+  _c TETO "python3 com import por alias"   Bash  "python3 -c \"import shutil as s; s.copy('/tmp/a','${H}')\""
+  _c TETO "python3 com variável reatribuída" Bash "python3 -c \"p='a'
+p='${H}'
+open(p,'w')\""
+  _c TETO "git clone para dentro"          Bash  "git clone https://exemplo.invalid/r .claude/skills/x"
+  _c TETO "git checkout de caminho"        Bash  "git checkout HEAD -- ${H}"
+  _c TETO "glob no destino, sobre a pasta" Bash  "printf x > .claude/skills/x/ho*/h"
+  _c TETO "chaves no destino"              Bash  "cp /tmp/a .claude/skills/x/{hooks,y}/h"
+  _c TETO "awk print > literal"            Bash  "awk 'BEGIN{print \"x\" > \"${H}\"}'"
+  _c TETO "perl -i"                        Bash  "perl -pi -e s/a/b/ ${H}"
+  _c TETO "for … done > alvo"              Bash  "for i in 1; do echo x; done > ${H}"
+  _c TETO "{ } > alvo"                     Bash  "{ echo x; } > ${H}"
+  _c TETO "( ) > alvo"                     Bash  "( echo x ) > ${H}"
+  _c TETO "&> alvo"                        Bash  "echo x &> ${H}"
+  _c TETO ">| alvo"                        Bash  "echo x >| ${H}"
+  _c TETO "<> alvo"                        Bash  "cat <> ${H}"
+  _c TETO "exec 3> alvo"                   Bash  "exec 3> ${H}"
+  _c TETO "pasta criada e copiada na mesma string" Bash "mkdir -p /tmp/q/hooks; cp -r /tmp/q .claude/skills/q"
   _c TETO "base64 -d | sh"                 Bash  "echo cHJpbnRm | base64 -d | sh"
   _c TETO "git apply"                      Bash  "git apply /tmp/plugin.patch"
   _c TETO "tar -x na pasta de skills, conteúdo opaco" Bash "tar -xf /tmp/p.tar -C .claude/skills"
   _c TETO "nome calculado em runtime"      Bash  "cat > \"\$(cat /tmp/nome)\" <<'E'
 {}
 E"
+  # ── os ramos de fechamento, com JSON escrito à mão, sem python no caminho do caso ──
+  _raw() {  # _raw <esperado rc> <nome> <json> [dir-do-hook] [PATH]
+    local want="$1" name="$2" json="$3" hook="${4:-${BASH_SOURCE[0]}}" pth="${5:-${PATH}}" rc=0
+    case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
+    printf '%s' "${json}" | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" PATH="${pth}" bash "${hook}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq "${want}" ]; then printf 'ok   %-5s %s\n' "$([ "${want}" = 2 ] && echo acusa || echo cala)" "${name}"
+    else printf '✗    %-5s %s (rc=%s)\n' "${want}" "${name}" "${rc}"; fails=$((fails + 1)); fi
+  }
+  _raw 2 "Write com escape unicode no caminho" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.clau\u0064e/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
+  # análise que não chega ao fim: o juiz sem o MOAT que ele compõe
+  sj="${d}/semjuiz"; mkdir -p "${sj}/lib"; cp "${BASH_SOURCE[0]}" "${sj}/g.sh"; cp "${here}/lib/invocation-lines.sh" "${here}/lib/plugin-write-judge.py" "${sj}/lib/"
+  _raw 2 "análise incompleta fecha o caminho com verbo" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${sj}/g.sh"
+  _raw 0 "análise incompleta cala a leitura" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${sj}/g.sh"
+  # sem python3: o Write decide em bash, e o Bash fecha só o caminho inteiro com verbo de escrita
+  np="${d}/nopy"; mkdir -p "${np}"
+  for _b in bash cat grep sed awk head tr realpath dirname git; do _bp="$(command -v "${_b}")" && ln -sf "${_bp}" "${np}/${_b}"; done
+  _raw 0 "sem python3: Write honesto passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/docs/a.md"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
+  _raw 2 "sem python3: Write no alvo barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
+  _raw 2 "sem python3: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
+  _raw 0 "sem python3: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
   if [ "${fails}" -eq 0 ]; then echo "plugin-write-guard --selftest: OK"; exit 0; fi
   echo "plugin-write-guard --selftest: ${fails} falha(s)"; exit 1
 fi
@@ -310,5 +445,5 @@ line="$(printf '%s\n' "${out}" | grep -m1 '^__ONION_MOAT__' || true)"
 IFS=$'\t' read -r _ cls target _ detail <<< "${line}"
 case "${cls}" in
   plugin) _pw_deny "${detail}" ;;
-  *)      _pw_deny "comando que cita um caminho de plugin em .claude/skills e NÃO pode ser analisado com certeza (${detail}). Reescreva sem eval, xargs ou nome de comando em variável" ;;
+  *)      _pw_deny "o texto cita um caminho de plugin em .claude/skills junto de um verbo de escrita, e o destino não se prova (${detail}). Reescreva com o destino literal, sem eval nem nome de comando em variável" ;;
 esac

@@ -9,3 +9,8 @@ arquivos 691 Bash únicos 60418 caminhos únicos de Write/Edit 3929 t 13
 paths na forma 0
 candidatos sinal 371 0.61%
 FIM {0: 371}
+
+Depois da passada adversarial (população amostrada pelo refutador em todos os projetos, sem os comandos que citam arquivo de segredos):
+pop-sig.json n 587 {0: 587}
+pop-wr.json n 1500 {0: 1500}
+pop-scr.json n 2500 {0: 2500}

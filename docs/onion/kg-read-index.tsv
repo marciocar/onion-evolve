@@ -191,6 +191,7 @@
 .claude/hooks/lib/invocation-lines.sh	E_PUSH_OPCAO_ABREVIADA	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_RECORTE_SEM_PYTHON_MEDIDO	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/lib/plugin-write-judge.py	D_MOLDE_COMPOE_O_JUIZ_DO_MOAT	docs/evolution/research/guard-plugin-write-2026-11/plugin-write-2026-11.kg.yaml
+.claude/hooks/lib/plugin-write-judge.py	E_ELENXO_REPROVOU_E_CUROU	docs/evolution/research/guard-plugin-write-2026-11/plugin-write-2026-11.kg.yaml
 .claude/hooks/lib/transcript-tail.py	C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	C_PREMODELSWITCH_ABRE_SEM_PYTHON	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
@@ -684,6 +685,7 @@
 .claude/validation/ops-citation-travel-check.sh	E_REGRA_100_NAO_VIA_O_COMANDO_CORTADO	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/validation/pin-integrity-check.sh	E_pin_integrity_check	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/pipe-verdict-check.sh	E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/plugin-write-scan-check.sh	D_NO_CORE_NAO_HA_PLUGIN_LOCAL	docs/evolution/research/guard-plugin-write-2026-11/plugin-write-2026-11.kg.yaml
 .claude/validation/projection-safety.sh	C_TETO_VOCABULARIO_E_LABEL	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	C_soberania_engajamento	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
