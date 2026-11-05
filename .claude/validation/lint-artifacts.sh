@@ -6447,8 +6447,9 @@ check_act_signature
 #   seguinte e venceu o veto do .env (células W1 e W4). É a metade do veto que NÃO depende do vocabulário do Bash: julga o
 #   RESULTADO no disco, por qualquer caminho que ele tenha vindo. Passivo medido na forja: ZERO arquivos no git, no core e nos
 #   adotantes clonados nesta máquina. Por isso nasce HARD no core, sem catraca e SEM registro de exceção: no core não há plugin
-#   local, um arquivo nessa forma trava o gate, e quem quiser um reabre a decisão com o maestro. No derivado (IS_DERIVED) é SOFT: o
-#   adotante pode instalar um plugin ali por escolha dele, e o core não julga o projeto alheio. Só o repo: `~/.claude/skills` é com
+#   local, um arquivo nessa forma trava o gate, e quem quiser um reabre a decisão com o maestro. No derivado (IS_DERIVED) a VARREDURA é SOFT,
+#   porque o core não trava o gate do projeto alheio; o VETO da escrita vale em todo papel, e o hook não lê carimbo: plugin se
+#   instala pelo mecanismo próprio, não escrevendo em skills. A porta clonada (`role: standalone` com `kind: door`) tem IS_DERIVED=0 e fica HARD. Só o repo: `~/.claude/skills` é com
 #   o SessionStart, que só avisa e nunca barra, porque o gate não depende do `~` de quem roda: `HOME=<repo>` não rebaixa o repo. Só o 1º nível de cada skill, sem registro de exceção (regra do maestro, 2026-11-05). Lógica e teto em plugin-write-scan-check.sh; o veto da
 #   escrita é o hook pretooluse-plugin-write-guard.sh, peça de teto do grafo guard-plugin-write-2026-11.
 check_plugin_write_scan() {

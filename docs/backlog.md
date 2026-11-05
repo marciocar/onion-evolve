@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**862 itens abertos** em 144 grafo(s) com aberto (de 185 no escopo) · 145 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**860 itens abertos** em 144 grafo(s) com aberto (de 185 no escopo) · 145 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -319,19 +319,17 @@
 | 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## plugin-write-2026-11 — 15 item(ns)
+## plugin-write-2026-11 — 13 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 59.5 | `D_VETO_ESTREITO_MAIS_VARREDURA` | plugin-write-2026-11 | Decisão do maestro de 2026-11-04: veto estreito mais varredura no disco. Um hook PreToolUse em Write, Edit, NotebookEdit e Bash c |
 | 27.0 | `C_TETO_NAO_E_FRONTEIRA` | plugin-write-2026-11 | TETO (peça 7): esta guarda é contenção de acidente e de injeção ingênua, NÃO fronteira. Quem quer contornar consegue, e o  |
-| 11.2 | `D_JULGA_A_FORMA_EM_QUALQUER_RAIZ` | plugin-write-2026-11 | O veto julga a FORMA do caminho, como escrito e resolvido, em qualquer raiz, sem isenção da pasta temporária nem do scratchpad. |
 | 9.6 | `D_MOLDE_COMPOE_O_JUIZ_DO_MOAT` | plugin-write-2026-11 | Molde pelo censo: pretooluse-direct-provider-api.sh é o único PreToolUse com --selftest próprio, e é a forma de hook mais chec |
 | 8.0 | `E_ELENXO_REPROVOU_E_CUROU` | plugin-write-2026-11 | A 1ª passada adversarial REPROVOU a guarda em aad2d62d3, com 6 achados altos e 7 médios. O 0 de 371 do replay se sustentou, mas  |
 | 6.8 | `C_TETO_BASH_FALHA_PELO_VOCABULARIO` | plugin-write-2026-11 | TETO: em Bash a lista falha pelo vocabulário. Tudo o que não é forma listada passa. |
 | 6.8 | `C_TETO_CAI_JUNTO_COM_O_SETTINGS` | plugin-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json e com o próprio script, que o veto não protege. A medição g |
 | 6.8 | `C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE` | plugin-write-2026-11 | TETO: o processo de um mod e um MCP de escrita ficam fora do PreToolUse: a escrita deles não é uma chamada de Write nem de Bash  |
-| 6.8 | `D_HARD_NO_CORE_SOFT_NO_DERIVADO` | plugin-write-2026-11 | REGRA 114 (Plugin não mora em .claude/skills no disco): HARD no core, SOFT no derivado, e só o repo, sem a pasta de casa. O adot |
 | 6.4 | `E_BANCADA_CASOS_E_MUTANTES` | plugin-write-2026-11 | Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 80 mutantes, cada  |
 | 5.1 | `C_TETO_PARTIDA_E_DETECCAO` | plugin-write-2026-11 | TETO: no SessionStart o plugin que puder carregar já carregou: o aviso é detecção, não prevenção. |
 | 5.1 | `C_TETO_REDIRECIONAMENTO_COMPOSTO` | plugin-write-2026-11 | TETO: redirecionamento de composto e formas raras passam calados: { } > alvo, ( ) > alvo, for … done > alvo, if … fi > alvo, & |
