@@ -19,7 +19,10 @@
 #     juiz do MOAT: redirecionamento simples, tee, cp, mv, install, rsync, dd, tar -C, curl -o, sed -i, `cd` antes de `>`, `$HOME`,
 #     `$PWD`, `$(pwd)`, topo do git, variável e pedaços LITERAIS da mesma string, `bash -c`, script não versionado (só a escrita
 #     provada no corpo), e código em outra linguagem: Python pela árvore sintática, no argumento DESTINO; as outras pela forma;
-#   · `cp -r`, `mv`, `ln -s`, `rsync` de pasta que JÁ TEM a forma de plugin, quando ela cai como `.claude/skills/<nome>`.
+#   · `cp -r`, `mv`, `ln -s`, `rsync` de pasta que JÁ TEM a forma de plugin, quando ela cai como `.claude/skills/<nome>`, e de pasta
+#     CHAMADA `hooks` ou `.claude-plugin`, quando ela cai dentro de uma skill;
+#   · `-t` em qualquer grafia de mv, cp, ln e install; chaves em mkdir, touch, tee, cp, mv, install, ln e rsync; `&>`, `&>>` e `>|`;
+#   · link: o `cwd` em `.claude`, a palavra sem barra que é link (`> docs-l`), o `cd` para link, e a pasta de fora de uma skill que é link.
 #
 # ── O QUE CALA (falso positivo é o defeito dominante aqui) ────────────────────────────────
 #   · tudo o que não é forma listada: .claude/skills/onion/SKILL.md, .claude/hooks/x.sh, .claude/settings.json, docs/**, skill NOMEADA
@@ -39,8 +42,13 @@
 #   forma no destino, nome calculado em runtime, nome com valores distintos na string (ramo de `if`, reatribuição, `for`: a última
 #   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, e
 #   redirecionamento composto (`{ } >`, `( ) >`, `for … done >`, `if … fi >`, `&>`, `>|`, `<>`, `exec 3>`). Também escapam: alias de
-#   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, pasta chamada `hooks` copiada
-#   para dentro de uma skill, e programa que escreve por dentro.
+#   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, e programa que escreve por dentro.
+#   FAMÍLIAS DECLARADAS, sem perseguir (guarda por lista), com caso que grava de verdade e confere que a varredura acusa o resultado:
+#   python indireto, `git mv`, `git worktree add`, `git submodule add`, `git restore`, `tar -x`, `unzip`, `sed w`, `sort -o`.
+#   `$CLAUDE_CONFIG_DIR` escapa aqui E na varredura, que não conhece essa pasta.
+#   FORMAS DE ESTOURO, também declaradas: 3.000 `$(` na mesma string; `sh -c` aninhado 12 vezes, que só fecha com o sinal no texto; script
+#   solto maior que 512 KiB, que o juiz não lê; e a cláusula 4 da guard-doctrine: sem python ou sem a lib, o Bash só fecha com o
+#   caminho inteiro junto de verbo de escrita, e todo o resto passa. O teste de link olha só as 256 primeiras palavras do comando.
 #   O processo de um mod e um MCP de escrita ficam fora do PreToolUse. O hook é de projeto: cai junto com o settings.json
 #   (a própria medição gravou `.claude/settings.json` e o hook do arquivo de segredos sem barreira nenhuma). A metade que não depende
 #   do vocabulário é a varredura, plugin-write-scan-check.sh, no SessionStart e no lint.
@@ -61,6 +69,39 @@ _pw_is_plugin_path() {
   [[ "$1" =~ ${re_plugin} ]] || [[ "$1" =~ ${re_hooks} ]]
 }
 
+# Leitor próprio do campo do JSON: o Write não pode depender da lib do tokenizador, que falta ou vem vazia sem deixar rastro.
+_pw_json_field() {
+  local pat
+  pat='"'"$1"'"[[:space:]]*:[[:space:]]*"([^"\\]|\\.)*"'
+  grep -oE "$pat" | head -n1 | awk 'BEGIN { RS = "\002"; found = 0 }
+    { found = 1; v = $0; sub(/\n$/, "", v); sub(/^[^:]*:[[:space:]]*"/, "", v); sub(/"$/, "", v)
+      gsub(/\\\\/, "\001", v); gsub(/\\"/, "\"", v); gsub(/\\n/, "\n", v); gsub(/\\t/, "\t", v)
+      gsub(/\\r/, "\r", v); gsub(/\\\//, "/", v); gsub(/\001/, "\\", v)
+      printf "%s", v }
+    END { exit found ? 0 : 1 }'
+}
+
+# O alvo de cada `.claude/skills/<nome>` que é link: a pasta de fora é a skill (S6), e escrever nela não traz `.claude` no texto.
+_pw_link_targets() {
+  local base e
+  for base in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
+    [ -n "${base}" ] && [ -d "${base}/.claude/skills" ] || continue
+    for e in "${base}"/.claude/skills/* "${base}"/.claude/skills/.[!.]*; do
+      [ -L "${e}" ] && realpath -m -- "${e}" 2>/dev/null
+    done
+  done
+  return 0
+}
+
+_pw_is_link_target_form() {  # _pw_is_link_target_form <caminho> <alvos, um por linha>
+  local t
+  while IFS= read -r t; do
+    [ -n "${t}" ] || continue
+    case "$1" in "${t}"/.claude-plugin|"${t}"/.claude-plugin/*|"${t}"/hooks|"${t}"/hooks/*) return 0 ;; esac
+  done <<< "$2"
+  return 1
+}
+
 _pw_deny() {
   echo "GUARDA-PRETOOLUSE (plugin em skills): $1. O destino tem a FORMA de plugin (.claude/skills/<nome>/.claude-plugin/ ou .claude/skills/<nome>/hooks/, no 1º nível da skill): plugin ali carrega na sessão seguinte e o tool.check dele vence os vetos (medido em laboratório em 2026-11-04). Negado. No core não há plugin local, e a REGRA 114 reprova esse arquivo, sem registro de exceção: quem quiser um reabre a decisão com o maestro. Se é só uma pasta de conteúdo, mude o nome dela ou desça um nível. Para tirar um que já está lá, rm passa." >&2
   exit 2
@@ -70,7 +111,7 @@ _pw_deny() {
 if [ "${1:-}" = "--selftest" ]; then
   export LC_ALL=C
   fails=0; d="$(mktemp -d)"; trap 'rm -rf "${d}"' EXIT
-  p="${d}/proj"; mkdir -p "${p}/.claude/skills/onion" "${p}/.claude/hooks" "${p}/docs" "${p}/tools" "${p}/scratch" "${d}/home/.claude/skills/x" "${d}/fora/ext/.claude-plugin" "${d}/fora/exth/hooks" "${d}/fora/vazia"
+  p="${d}/proj"; mkdir -p "${p}/.claude/skills/onion" "${p}/.claude/hooks" "${p}/docs" "${p}/tools" "${p}/scratch" "${d}/home/.claude/skills/x" "${d}/fora/ext/.claude-plugin" "${d}/fora/exth/hooks" "${d}/fora/vazia" "${p}/.claude/skills/w/hooks" "${p}/.claude/skills/x"
   git -C "${p}" init -q -b feat
   echo x > "${p}/.claude/skills/onion/SKILL.md"; echo x > "${p}/.claude/hooks/x.sh"; echo '{}' > "${p}/.claude/settings.json"; echo x > "${p}/docs/a.md"; echo '{}' > "${d}/fora/payload"
   # o wrapper VERSIONADO, rastreado pelo git: fronteira do juiz. E o script solto (K4): lido e julgado
@@ -85,6 +126,9 @@ if [ "${1:-}" = "--selftest" ]; then
   ln -s ../.claude "${p}/docs/sbx-link"                                    # K3
   ln -s "${p}/.claude/skills/x/hooks" "${p}/docs/lnk-hooks"                # link que termina no alvo, sem sinal no texto
   ln -s "${d}/fora/vazia" "${p}/.claude/skills/fora"                       # S6: skill que é link para fora
+  mkdir -p "${d}/outro/.claude/skills" "${d}/fora/vazia2"; ln -s "${d}/fora/vazia2" "${d}/outro/.claude/skills/l"  # noutra raiz: o alvo não entra na lista
+  ln -s "${p}/.claude/skills/x/hooks/h" "${p}/docs-l"                      # em dois tempos: o link já existe, e a palavra não tem barra
+  ln -s "${p}/.claude/skills/x/hooks" "${p}/hk"
   P=".claude/skills/x/.claude-plugin/plugin.json"; H=".claude/skills/x/hooks/hooks.json"
   _run() {  # _run <tool> <valor> [cwd] — o JSON como o runner entrega, pela entrada padrão
     local tool="$1" val="$2" cwd="${3:-${p}}"
@@ -126,6 +170,7 @@ print(json.dumps({"session_id":"s","hook_event_name":"PreToolUse","tool_name":t,
   _c acusa "Write por symlink (K3)"  Write "${p}/docs/sbx-link/skills/x/.claude-plugin/plugin.json"
   _c acusa "Write por symlink que termina em hooks" Write "${p}/docs/lnk-hooks/register.js"
   _c acusa "Write por skill que é link para fora (S6)" Write "${p}/.claude/skills/fora/.claude-plugin/plugin.json"
+  _c acusa "Write por skill que é link, noutra raiz" Write "${d}/outro/.claude/skills/l/hooks/h.js"
   _c acusa "cat > T3 (verbatim)"     Bash  "mkdir -p .claude/skills/x/.claude-plugin && cat > ${P} <<'SBXEOF'
 {\"name\":\"x\"}
 SBXEOF"
@@ -189,7 +234,82 @@ open(p,'w').write('x')\""
   _c acusa "xargs cp -t para dentro"      Bash  "ls /tmp/a | xargs cp -t .claude/skills/x/hooks"
   _c acusa "xargs cp -I para dentro"      Bash  "ls /tmp/a | xargs -I{} cp {} .claude/skills/x/hooks/"
   _c acusa "find -exec sed -i na pasta"   Bash  "find .claude/skills/x/hooks -type f -exec sed -i s/a/b/ {} +"
+  # ── -t em qualquer grafia ──
+  _c acusa "mv -t para dentro"            Bash  "mv -t .claude/skills/x/hooks /tmp/a"
+  _c acusa "mv -ft para dentro"           Bash  "mv -ft .claude/skills/x/hooks /tmp/a"
+  _c acusa "mv --target-directory= para dentro" Bash "mv --target-directory=.claude/skills/x/hooks /tmp/a"
+  _c acusa "mv --target-directory separado" Bash "mv --target-directory .claude/skills/x/hooks /tmp/a"
+  _c acusa "mv --targ= abreviado"         Bash  "mv --targ=.claude/skills/x/hooks /tmp/a"
+  _c acusa "mv -t colado"                 Bash  "mv -t.claude/skills/x/hooks /tmp/a"
+  _c acusa "mv -t . com cd antes"         Bash  "cd .claude/skills/x/hooks && mv -t . /tmp/a"
+  _c acusa "mv -ft relativo com cd antes" Bash  "cd .claude/skills/x && mv -ft hooks /tmp/a"
+  _c acusa "ln -st para dentro"           Bash  "ln -st .claude/skills/x/hooks /tmp/a"
+  _c acusa "cp -ft para dentro"           Bash  "cp -ft .claude/skills/x/hooks /tmp/a"
+  _c acusa "install -Dt para dentro"      Bash  "install -Dt .claude/skills/x/hooks /tmp/a"
+  # ── o cwd: o texto não traz sinal nenhum ──
+  _c acusa "cwd na pasta hooks: > h"      Bash  "echo x > h" "${p}/.claude/skills/w/hooks"
+  _c acusa "cwd na skill: > hooks/h"      Bash  "echo x > hooks/h" "${p}/.claude/skills/x"
+  _c acusa "cwd na skill: mkdir hooks"    Bash  "mkdir hooks" "${p}/.claude/skills/x"
+  _c acusa "cwd na skill: cp para hooks/h" Bash "cp ../../../docs/a.md hooks/h" "${p}/.claude/skills/onion"
+  _c acusa "cwd noutra skill: > ../x/hooks/h" Bash "echo x > ../x/hooks/h" "${p}/.claude/skills/onion"
+  # ── link em dois tempos ──
+  _c acusa "palavra sem barra que é link: >" Bash "echo P > docs-l"
+  _c acusa "palavra sem barra que é link: cp" Bash "cp ${d}/fora/payload docs-l"
+  _c acusa "cd para link"                 Bash  "cd hk && echo x > h"
+  _c acusa "cd seguido até o link"        Bash  "cd docs && cd ../hk && echo x > h"
+  _c acusa "link sob a casa, com til"     Bash  "echo x > ~/lnk-hooks/h"
+  _c acusa "link sob a casa, com \$HOME"  Bash  "echo x > \$HOME/lnk-hooks/h"
+  # ── a pasta de fora de uma skill que é link ──
+  _c acusa "Write em hooks do alvo do link de skill" Write "${d}/fora/vazia/hooks/h.js"
+  _c acusa "Write em .claude-plugin do alvo do link de skill" Write "${d}/fora/vazia/.claude-plugin/plugin.json"
+  _c acusa "Bash em hooks do alvo do link de skill" Bash "printf x > ${d}/fora/vazia/hooks/h"
+  _c acusa "cwd no alvo do link de skill: mkdir hooks" Bash "mkdir hooks" "${d}/fora/vazia"
+  # ── chaves, a pasta chamada hooks e as outras grafias do redirecionamento ──
+  _c acusa "chaves no mkdir"              Bash  "mkdir -p .claude/skills/x/{hooks,.claude-plugin}"
+  _c acusa "chaves com pedaço do nome"    Bash  "mkdir -p .claude/skills/x/ho{oks,x}"
+  _c acusa "chaves além do teto fecham"   Bash  "mkdir -p .claude/skills/x/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}"
+  _c acusa "cp -r da pasta chamada hooks para a skill" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/onion/"
+  _c acusa "cp -r da pasta chamada hooks, destino com barra" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/nova/"
+  _c acusa "cp -r da pasta chamada .claude-plugin para a skill" Bash "cp -r ${d}/fora/ext/.claude-plugin .claude/skills/onion"
+  _c acusa "mv da pasta chamada hooks para a skill" Bash "mv ${d}/fora/exth/hooks .claude/skills/onion/"
+  _c acusa "ln -s da pasta chamada hooks para a skill" Bash "ln -s ${d}/fora/exth/hooks .claude/skills/onion/"
+  _c acusa "rsync da pasta chamada hooks para a skill" Bash "rsync -a ${d}/fora/exth/hooks .claude/skills/onion/"
+  _c acusa "&> alvo"                      Bash  "echo x &> ${H}"
+  _c acusa "&>> alvo"                     Bash  "echo x &>> ${H}"
+  _c acusa ">| alvo"                      Bash  "echo x >| ${H}"
+  # ── o que não se analisa, com o sinal ──
+  _c acusa "aspas não fechadas com o sinal, em outra linha" Bash "cat > /tmp/z <<< 'a
+.claude/skills/x/hooks/h"
+  _c acusa "php -r file_put_contents"     Bash  "php -r \"file_put_contents('${H}','x');\""
   # ── CALA: edição honesta, citação, leitura e remoção ──
+  _c cala "mv -t para fora da skill"       Bash  "mv -t /tmp/q ${H}"
+  _c cala "mv -ft para fora da skill"      Bash  "mv -ft /tmp/q ${H}"
+  _c cala "mv --target-directory= para fora" Bash "mv --target-directory=/tmp/q ${H}"
+  _c cala "ln -st para fora da skill"      Bash  "ln -st /tmp ${H}"
+  _c cala "cp -ft para fora da skill"      Bash  "cp -ft /tmp ${H}"
+  _c cala "mv -t em hooks fundo"           Bash  "mv -t .claude/skills/x/references/hooks /tmp/a"
+  _c cala "mv --target-directory separado para fora" Bash "mv --target-directory /tmp/q ${H}"
+  _c cala "rsync -t do plugin para fora"   Bash  "rsync -t ${H} /tmp/q"
+  _c cala "cwd na skill: > a.md"           Bash  "echo x > a.md" "${p}/.claude/skills/onion"
+  _c cala "cwd na skill: mkdir references" Bash  "mkdir references" "${p}/.claude/skills/x"
+  _c cala "cwd na pasta hooks: leitura"    Bash  "ls -la" "${p}/.claude/skills/w/hooks"
+  _c cala "cwd na pasta hooks: > para fora" Bash "echo x > ../../../../docs/a.md" "${p}/.claude/skills/w/hooks"
+  _c cala "link: leitura"                  Bash  "cat docs-l"
+  _c cala "palavra igual a um link noutra pasta" Bash "cd docs && echo x > docs-l"
+  _c cala "Write em SKILL.md do alvo do link de skill" Write "${d}/fora/vazia/SKILL.md"
+  _c cala "Write em hooks fundo do alvo do link de skill" Write "${d}/fora/vazia/references/hooks/a.md"
+  _c cala "Bash em SKILL.md do alvo do link de skill" Bash "printf x > ${d}/fora/vazia/SKILL.md"
+  _c cala "chaves sem a forma"             Bash  "mkdir -p .claude/skills/x/{refs,docs}"
+  _c cala "chaves além do teto fora de skills" Bash "echo skills; mkdir -p docs/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}"
+  _c cala "cp -r da pasta chamada hooks direto em skills: é o nome da skill" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/"
+  _c cala "cp -r da pasta chamada hooks para fundo" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/a/b/"
+  _c cala "cp -r do conteúdo da pasta chamada hooks" Bash "cp -r ${d}/fora/exth/hooks/. .claude/skills/onion/"
+  _c cala "&> fora"                        Bash  "echo x &> /tmp/z"
+  _c cala "&> citado entre aspas"          Bash  "echo 'a &> ${H}'"
+  _c cala ">| citado entre aspas"          Bash  "echo \"a >| ${H}\""
+  _c cala "aspas não fechadas sem o sinal" Bash  "echo 'skills hooks > /tmp/z"
+  _c cala "php -r só lê"                   Bash  "php -r \"echo file_get_contents('${H}');\""
+  _c cala "php -r grava fora, citando"     Bash  "php -r \"file_put_contents('/tmp/a','${H}');\""
   _c cala "Write em skills/onion/SKILL.md" Write "${p}/.claude/skills/onion/SKILL.md"
   _c cala "Edit em skills/onion/SKILL.md"  Edit  "${p}/.claude/skills/onion/SKILL.md"
   _c cala "Edit em .claude/hooks/x.sh"     Edit  "${p}/.claude/hooks/x.sh"
@@ -326,12 +446,43 @@ open(p,'w')\""
   _c TETO "for … done > alvo"              Bash  "for i in 1; do echo x; done > ${H}"
   _c TETO "{ } > alvo"                     Bash  "{ echo x; } > ${H}"
   _c TETO "( ) > alvo"                     Bash  "( echo x ) > ${H}"
-  _c TETO "&> alvo"                        Bash  "echo x &> ${H}"
-  _c TETO ">| alvo"                        Bash  "echo x >| ${H}"
+  _c TETO ">& alvo"                        Bash  "echo x >& ${H}"
   _c TETO "<> alvo"                        Bash  "cat <> ${H}"
   _c TETO "exec 3> alvo"                   Bash  "exec 3> ${H}"
   _c TETO "pasta criada e copiada na mesma string" Bash "mkdir -p /tmp/q/hooks; cp -r /tmp/q .claude/skills/q"
-  _c TETO "pasta chamada hooks copiada para dentro da skill" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/onion/"
+  _c TETO "\$CLAUDE_CONFIG_DIR, que a varredura também não conhece" Bash "printf x > \"\$CLAUDE_CONFIG_DIR/skills/x/hooks/h\""
+  # ── TETO COM RESULTADO: o veto não vê, a escrita acontece de verdade numa cópia, e a VARREDURA tem de acusar ──
+  _tv() {  # _tv <nome> <comando rodado na raiz da cópia>
+    local name="$1" cmd="$2" r rc=0 o
+    case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
+    tvn=$((${tvn:-0} + 1)); r="${d}/tv${tvn}"
+    mkdir -p "${r}/.claude/skills/x/hooks" "${r}/src/hooks" "${r}/docs" "${r}/.claude/skills/old/hooks"
+    git -C "${r}" init -q -b feat
+    echo x > "${r}/src/hooks/h.json"; echo x > "${r}/docs/a"; echo x > "${r}/.claude/skills/old/hooks/h"
+    printf "open('.claude/skills/x/hooks/h','w').write('x')\n" > "${r}/w.py"
+    git -C "${r}" add -A; git -C "${r}" -c user.email=t@t -c user.name=t commit -q -m a
+    git -C "${r}" rm -q -r .claude/skills/old; git -C "${r}" -c user.email=t@t -c user.name=t commit -q -m b
+    mkdir -p "${r}/.claude/skills/x/hooks"
+    _run Bash "${cmd}" "${r}" >/dev/null; rc=$?
+    ( cd "${r}" && timeout -k 2 30 bash -c "${cmd}" >/dev/null 2>&1 )
+    o="$(bash "${here}/../validation/plugin-write-scan-check.sh" "${r}" --format tsv 2>/dev/null | cut -f3)"
+    if [ "${rc}" -eq 0 ] && [ -n "${o}" ]; then printf 'TETO %-5s %s (a varredura acusa o resultado)\n' "cala" "${name}"
+    else printf '✗    TETO  %s (rc=%s varredura=%s)\n' "${name}" "${rc}" "${o}"; fails=$((fails + 1)); fi
+  }
+  python3 -I -c 'import sys,tarfile,zipfile,io
+d=sys.argv[1]
+t=tarfile.open(d+"/p.tar","w"); i=tarfile.TarInfo("x/hooks/h"); i.size=1; t.addfile(i,io.BytesIO(b"x")); t.close()
+z=zipfile.ZipFile(d+"/p.zip","w"); z.writestr("x/hooks/h","x"); z.close()' "${d}"
+  git init -q -b feat "${d}/sub"; git -C "${d}/sub" -c user.email=t@t -c user.name=t commit -q --allow-empty -m s; echo x > "${d}/sub/f"; git -C "${d}/sub" add -A; git -C "${d}/sub" -c user.email=t@t -c user.name=t commit -q -m f
+  _tv "python indireto"     "python3 w.py"
+  _tv "git mv"              "git mv src/hooks .claude/skills/x/hooks/m"
+  _tv "git worktree add"    "git worktree add -q .claude/skills/y/hooks"
+  _tv "git submodule add"   "git -c protocol.file.allow=always submodule add -q ${d}/sub .claude/skills/y/hooks"
+  _tv "git restore"         "git restore --source=HEAD~1 --worktree -- .claude/skills/old/hooks/h"
+  _tv "tar -x"              "tar -xf ${d}/p.tar -C .claude/skills"
+  command -v unzip >/dev/null 2>&1 && _tv "unzip" "unzip -q ${d}/p.zip -d .claude/skills"
+  _tv "sed w"               "sed -n 'w .claude/skills/x/hooks/h' docs/a"
+  _tv "sort -o"             "sort -o .claude/skills/x/hooks/h docs/a"
   _c TETO "base64 -d | sh"                 Bash  "echo cHJpbnRm | base64 -d | sh"
   _c TETO "git apply"                      Bash  "git apply /tmp/plugin.patch"
   _c TETO "tar -x na pasta de skills, conteúdo opaco" Bash "tar -xf /tmp/p.tar -C .claude/skills"
@@ -359,22 +510,32 @@ E"
   _raw 2 "sem python3: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
   _raw 0 "sem python3: Bash em hooks fundo cala" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/references/hooks/a.md"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
   _raw 0 "sem python3: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
+  # a lib do tokenizador ausente ou vazia: o Write não depende dela, e o Bash fecha o caminho com verbo
+  sl="${d}/semlib"; mkdir -p "${sl}/lib"; cp "${BASH_SOURCE[0]}" "${sl}/g.sh"; cp "${here}/lib/plugin-write-judge.py" "${sl}/lib/"
+  vl="${d}/libvazia"; mkdir -p "${vl}/lib"; cp "${BASH_SOURCE[0]}" "${vl}/g.sh"; : > "${vl}/lib/invocation-lines.sh"
+  _raw 2 "sem lib: Write no alvo barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
+  _raw 0 "sem lib: Write honesto passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/docs/a.md"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
+  _raw 2 "sem lib: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
+  _raw 0 "sem lib: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
+  _raw 2 "lib vazia: Write no alvo barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${vl}/g.sh"
+  _raw 2 "lib vazia: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${vl}/g.sh"
+  # JSON truncado em Bash: o que veio depois da chave é o comando
+  _raw 2 "JSON truncado: Bash no alvo barra" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h'
+  _raw 0 "JSON truncado: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"cat .claude/skills/x/hooks/h'
   if [ "${fails}" -eq 0 ]; then echo "plugin-write-guard --selftest: OK"; exit 0; fi
   echo "plugin-write-guard --selftest: ${fails} falha(s)"; exit 1
 fi
 
 # ───────────────────────────── o veto ─────────────────────────────
 input="$(cat)"
-# shellcheck source=lib/invocation-lines.sh
-. "${here}/lib/invocation-lines.sh"
-tool="$(printf '%s' "${input}" | onion_json_string_field tool_name)" || tool=""
+tool="$(printf '%s' "${input}" | _pw_json_field tool_name)" || tool=""
 
 case "${tool}" in
   Write|Edit|NotebookEdit|MultiEdit)
     # caminho quente: sem python. Toda edição da casa passa aqui
     field=file_path; [ "${tool}" = NotebookEdit ] && field=notebook_path
-    path="$(printf '%s' "${input}" | onion_json_string_field "${field}")" || exit 0
-    hcwd="$(printf '%s' "${input}" | onion_json_string_field cwd)" || hcwd=""
+    path="$(printf '%s' "${input}" | _pw_json_field "${field}")" || exit 0
+    hcwd="$(printf '%s' "${input}" | _pw_json_field cwd)" || hcwd=""
     case "${path}" in
       *'\u'*) path="$(printf '%s' "${input}" | python3 -I -c 'import json,sys
 ti=json.load(sys.stdin).get("tool_input") or {}
@@ -391,12 +552,19 @@ print(ti.get("file_path") or ti.get("notebook_path") or "")' 2>/dev/null)" || ex
     if _pw_is_plugin_path "${spelled}" || _pw_is_plugin_path "${real}"; then
       _pw_deny "${tool} em ${path}"
     fi
+    targets="$(_pw_link_targets)"
+    if [ -n "${targets}" ] && { _pw_is_link_target_form "${spelled}" "${targets}" || _pw_is_link_target_form "${real}" "${targets}"; }; then
+      _pw_deny "${tool} em ${path}, a pasta de fora de uma skill que é link"
+    fi
     exit 0 ;;
   Bash) : ;;
   *) exit 0 ;;
 esac
 
-raw_cmd="$(printf '%s' "${input}" | onion_json_string_field command)" || raw_cmd="${input}"
+# JSON truncado: o campo não fecha, e o que veio depois da chave é o comando
+raw_cmd="$(printf '%s' "${input}" | _pw_json_field command)" || raw_cmd="$(printf '%s' "${input}" | sed -E 's/^.*"command"[[:space:]]*:[[:space:]]*"//')"
+hcwd0="$(printf '%s' "${input}" | _pw_json_field cwd)" || hcwd0=""
+[ -d "${hcwd0}" ] || hcwd0="${PWD}"
 flat="$(printf '%s' "${raw_cmd}" | tr -d "\"'\\\\")"
 
 # ── pré-filtro sem python: SUPERCONJUNTO do que o juiz pode vetar ──────────────────────────────────
@@ -409,12 +577,13 @@ hit=0
 case "${flat}" in
   *.claude-plugin*) hit=1 ;;
   *skills*hooks*|*hooks*skills*) hit=1 ;;
+  *skills*\{*) hit=1 ;;
   *skills*) grep -qE '(^|[^[:alnum:]_-])(cp|mv|ln|rsync)([^[:alnum:]_-]|$)' <<< "${flat}" && hit=1 ;;
 esac
+# (5) o `cwd`: em `.claude/skills/x`, `mkdir hooks` não traz sinal nenhum no texto
+case "${hcwd0}" in *.claude*) hit=1 ;; esac
 pw_unversioned_script() {
-  local t d
-  d="$(printf '%s' "${input}" | onion_json_string_field cwd)" || d=""
-  [ -d "${d}" ] || d="${PWD}"
+  local t d="${hcwd0}"
   grep -qE '\|[[:space:]]*(ba|z|da|k)?sh([[:space:]]|$)' <<< "${raw_cmd}" && return 0
   while IFS= read -r t; do
     [ -z "${t}" ] && continue
@@ -426,20 +595,35 @@ pw_unversioned_script() {
   return 1
 }
 pw_cites_symlink() {
-  local t c
+  # toda palavra, com ou sem barra (`echo x > docs-l`), e seguindo o `cd` literal. Roda num subshell: o `cd` não vaza
+  local t c prev=""
   while IFS= read -r t; do
+    [ -n "${t}" ] || continue
+    case "${t}" in
+      '~/'*) t="${HOME:-}/${t#'~/'}" ;;
+      '$HOME/'*) t="${HOME:-}/${t#'$HOME/'}" ;;
+      '${HOME}/'*) t="${HOME:-}/${t#'${HOME}/'}" ;;
+    esac
     t="${t%/}"; c="${t}"
     while [ -n "${c}" ] && [ "${c}" != "/" ] && [ "${c}" != "." ]; do
       [ -L "${c}" ] && return 0
       case "${c}" in */*) c="${c%/*}" ;; *) break ;; esac
     done
-  done < <(grep -oE '(^|[[:space:]=])[^[:space:];&|<>=]*/[^[:space:];&|<>]*' <<< "${flat}" | sed -E 's/^[[:space:]=]+//' | head -n 64)
+    case "${prev}" in cd|pushd) cd -- "${t}" 2>/dev/null ;; esac
+    prev="${t}"
+  done < <(tr -s '[:space:];&|<>=()' '\n' <<< "${flat}" | head -n 256)
   return 1
 }
 [ "${hit}" = 0 ] && grep -qE "${pw_script}" <<< "${raw_cmd}" && pw_unversioned_script && hit=1
 if [ "${hit}" = 0 ] && grep -qE "${pw_write}" <<< "${flat}"; then
-  hcwd0="$(printf '%s' "${input}" | onion_json_string_field cwd)" || hcwd0=""
-  ( [ -d "${hcwd0}" ] && cd "${hcwd0}" ; pw_cites_symlink ) && hit=1
+  ( cd "${hcwd0}" 2>/dev/null ; pw_cites_symlink ) && hit=1
+fi
+targets="$(_pw_link_targets)"
+if [ "${hit}" = 0 ] && [ -n "${targets}" ]; then
+  while IFS= read -r t; do
+    case "${flat}" in *"${t}"*) hit=1 ;; esac
+    case "${hcwd0}/" in "${t}"/*) hit=1 ;; esac
+  done <<< "${targets}"
 fi
 [ "${hit}" = 0 ] && exit 0
 
@@ -453,10 +637,11 @@ ti=d.get("tool_input"); ti=ti if isinstance(ti,dict) else {}
 print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null)" && nopy=0 || nopy=1
 hcwd="${parsed%%$'\n'*}"; cmd="${parsed#*$'\n'}"; [ "${cmd}" = "${parsed}" ] && cmd=""
 if [ "${nopy}" = 1 ]; then
-  hcwd="$(printf '%s' "${input}" | onion_json_string_field cwd)" || hcwd=""
+  hcwd="${hcwd0}"
   cmd="${raw_cmd}"
 fi
-[ -d "${hcwd}" ] || hcwd="${PWD}"
+[ -d "${hcwd}" ] || hcwd="${hcwd0}"
+[ -z "${cmd}" ] && cmd="${raw_cmd}"                 # JSON truncado: o python não leu, e o texto ainda é o comando
 [ -z "${cmd}" ] && exit 0
 
 _pw_closed() {  # SEM tokenizador: fecha SÓ o caminho inteiro junto de verbo de escrita; o resto cala (cláusula 4)
@@ -464,7 +649,10 @@ _pw_closed() {  # SEM tokenizador: fecha SÓ o caminho inteiro junto de verbo de
   _pw_deny "$1, e o comando cita um caminho de plugin em .claude/skills junto de um verbo de escrita. Fechado por segurança"
 }
 [ "${nopy}" = 1 ] && _pw_closed "python3 ausente ou quebrado"
-out="$(ONION_CWD="${hcwd}" ONION_MOAT_JUDGE="${here}/lib/plugin-write-judge.py" onion_invocation_lines "${cmd}")"
+# shellcheck source=lib/invocation-lines.sh
+. "${here}/lib/invocation-lines.sh" 2>/dev/null
+type onion_invocation_lines >/dev/null 2>&1 || _pw_closed "a lib do tokenizador faltou ou veio vazia"
+out="$(PW_LINK_TARGETS="${targets}" ONION_CWD="${hcwd}" ONION_MOAT_JUDGE="${here}/lib/plugin-write-judge.py" onion_invocation_lines "${cmd}")"
 grep -qx '__ONION_MOAT_OK__' <<< "${out}" || _pw_closed "a análise não chegou ao fim"
 line="$(printf '%s\n' "${out}" | grep -m1 '^__ONION_MOAT__' || true)"
 [ -z "${line}" ] && exit 0

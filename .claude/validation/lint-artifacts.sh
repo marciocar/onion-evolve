@@ -6449,8 +6449,7 @@ check_act_signature
 #   adotantes clonados nesta máquina. Por isso nasce HARD no core, sem catraca e SEM registro de exceção: no core não há plugin
 #   local, um arquivo nessa forma trava o gate, e quem quiser um reabre a decisão com o maestro. No derivado (IS_DERIVED) é SOFT: o
 #   adotante pode instalar um plugin ali por escolha dele, e o core não julga o projeto alheio. Só o repo: `~/.claude/skills` é com
-#   o SessionStart, que só avisa e nunca barra, porque o gate não depende do `~` de quem roda; se o repo mora na pasta de casa, a linha
-#   chega aqui SOFT. Só o 1º nível de cada skill, sem registro de exceção (regra do maestro, 2026-11-05). Lógica e teto em plugin-write-scan-check.sh; o veto da
+#   o SessionStart, que só avisa e nunca barra, porque o gate não depende do `~` de quem roda: `HOME=<repo>` não rebaixa o repo. Só o 1º nível de cada skill, sem registro de exceção (regra do maestro, 2026-11-05). Lógica e teto em plugin-write-scan-check.sh; o veto da
 #   escrita é o hook pretooluse-plugin-write-guard.sh, peça de teto do grafo guard-plugin-write-2026-11.
 check_plugin_write_scan() {
   local helper="${SCRIPT_DIR}/plugin-write-scan-check.sh"
@@ -6468,13 +6467,11 @@ check_plugin_write_scan() {
   while IFS=$'\t' read -r _sev _code _path _msg; do
     [ -n "${_code:-}" ] || continue
     [ "${IS_DERIVED}" -eq 1 ] && _sev="SOFT"
-    case "${_path}" in
-      '~/'*) violation "${_sev:-HARD}" "${_path}" "${_R}: [${_code}] ${_msg}" ;;
-      *)     violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}" ;;
-    esac
+    violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}"
   done <<< "${_out}"
   if [ "${_hrc}" -ne 0 ]; then
-    violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+    _sev="HARD"; [ "${IS_DERIVED}" -eq 1 ] && _sev="SOFT"
+    violation "${_sev}" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
   fi
   [ "${_err}" = /dev/null ] || rm -f "${_err}"
   return 0

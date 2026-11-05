@@ -50845,14 +50845,47 @@ PYREG
     record_fail "plugin-write-guard: (e1) a variável sem a flag" "trocou o repo julgado: $(printf '%s\n' "${out}" | grep -m1 plugin-em-skills)"
   else record_pass "plugin-write-guard: (e1) sem a flag de bancada, a variável não troca o repo julgado"; fi
 
-  # (e1b) a pasta de casa nunca barra: o dispatcher mantém o SOFT que a varredura entrega, num repo que mora na própria pasta de casa
-  # e a lista das HARD é o que se lê: o rc do lint inteiro depende do resto da árvore
+  # (e1b) HOME=<repo> não rebaixa o plugin do repo
   local _em_casa _hard="${d}/hard-casa.txt"
   : > "${_hard}"
   _em_casa="$(cd "${REPO_ROOT}" && HOME="${dr}" ONION_LINT_HARD_FILE="${_hard}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
-  if printf '%s' "${_em_casa}" | grep -qF 'VIOLATION: ~/.claude/skills/x/hooks/hooks.json' && ! grep -q 'plugin-em-skills' "${_hard}"; then
-    record_pass "plugin-write-guard: (e1b) a pasta de casa acusa, sem caminho colado ao repo, e não entra nas HARD"
-  else record_fail "plugin-write-guard: (e1b) pasta de casa" "HARD: $(grep -m1 'plugin-em-skills' "${_hard}") | $(printf '%s\n' "${_em_casa}" | grep -m1 'plugin-em-skills')"; fi
+  if grep -q 'plugin-em-skills' "${_hard}"; then
+    record_pass "plugin-write-guard: (e1b) HOME igual ao repo não tira o plugin das HARD"
+  else record_fail "plugin-write-guard: (e1b) HOME igual ao repo" "$(printf '%s\n' "${_em_casa}" | grep -m1 'plugin-em-skills')"; fi
+
+  # (e3) a varredura que não pôde julgar, no dispatcher: no core é HARD; no derivado segue a severidade dele, com o motivo. Só onde chmod vale
+  if [ "$(id -u)" != 0 ]; then
+    local dc="${d}/cego" _hc _hd _od
+    mkdir -p "${dc}/.claude/skills/x/hooks"; echo '{}' > "${dc}/.claude/skills/x/hooks/hooks.json"; chmod 000 "${dc}/.claude/skills/x/hooks"
+    _hc="${d}/hard-cego.txt"; : > "${_hc}"
+    echo x > "${dc}/.claude/skills/x/SKILL.md"       # o --only precisa existir: dentro da pasta sem permissão, o lint nem chega à guarda
+    out="$(cd "${REPO_ROOT}" && ONION_LINT_HARD_FILE="${_hc}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dc}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dc}/.claude/skills/x/SKILL.md" 2>&1 || true)"
+    if grep -q 'NÃO RODOU.*sem permissão' "${_hc}"; then record_pass "plugin-write-guard: (e3) sem permissão no core: HARD, com o motivo"
+    else record_fail "plugin-write-guard: (e3) sem permissão no core" "$(printf '%s\n' "${out}" | grep -m1 'REGRA 114')"; fi
+    # o derivado: a mesma linha do dispatcher, lida do arquivo e rodada com IS_DERIVED=1
+    _hd="${d}/hard-der.txt"; : > "${_hd}"
+    _od="$(python3 -I - "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" <<'PYDER'
+import re, sys
+s = open(sys.argv[1], encoding="utf-8").read()
+i = s.index("check_plugin_write_scan() {")
+j = s.index("\ncheck_plugin_write_scan\n", i)
+print(s[i:j])
+PYDER
+)"
+    out="$(cd "${REPO_ROOT}" && IS_DERIVED=1 ONLY_PATH="" SCRIPT_DIR="${REPO_ROOT}/.claude/validation" REPO_ROOT="${REPO_ROOT}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dc}" LC_ALL=C bash -c 'violation() { printf "%s|%s\n" "$1" "$3"; }; '"${_od}"'
+check_plugin_write_scan' 2>&1 || true)"
+    if printf '%s' "${out}" | grep -q '^SOFT|.*NÃO RODOU.*sem permissão' && ! printf '%s' "${out}" | grep -q '^HARD|.*NÃO RODOU'; then
+      record_pass "plugin-write-guard: (e3b) sem permissão no derivado: SOFT, com o motivo"
+    else record_fail "plugin-write-guard: (e3b) sem permissão no derivado" "${out}"; fi
+    # e o mutante dessa linha: sem o rebaixamento, o derivado fica HARD
+    local _odm; _odm="$(printf '%s' "${_od}" | sed 's/_sev="HARD"; \[ "${IS_DERIVED}" -eq 1 \] \&\& _sev="SOFT"/_sev="HARD"/')"
+    [ "${_odm}" != "${_od}" ] || record_fail "plugin-write-guard: (e3c) âncora" "mutante do rebaixamento NÃO aplicado"
+    out="$(cd "${REPO_ROOT}" && IS_DERIVED=1 ONLY_PATH="" SCRIPT_DIR="${REPO_ROOT}/.claude/validation" REPO_ROOT="${REPO_ROOT}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dc}" LC_ALL=C bash -c 'violation() { printf "%s|%s\n" "$1" "$3"; }; '"${_odm}"'
+check_plugin_write_scan' 2>&1 || true)"
+    if printf '%s' "${out}" | grep -q '^HARD|.*NÃO RODOU'; then record_pass "plugin-write-guard: (e3c) o mutante do rebaixamento morde"
+    else record_fail "plugin-write-guard: (e3c) mutante do rebaixamento VIVO" "${out}"; fi
+    chmod 755 "${dc}/.claude/skills/x/hooks"
+  fi
 
   # (e2) o CONTRATO do tsv que o dispatcher lê: severidade, classe e caminho relativo em colunas
   rc=0; out="$(LC_ALL=C bash "${scan}" "${dr}" --format tsv 2>&1)" || rc=$?
@@ -50896,7 +50929,7 @@ real="$(realpath -m -- "${path}" 2>/dev/null)" || real="${path}"
 @@@
 real="${path}"
 EOF_MUT
-  _pw_mut M2-como-escrito hook 'Write por skill que é link para fora (S6)' <<'EOF_MUT'
+  _pw_mut M2-como-escrito hook 'Write por skill que é link, noutra raiz' <<'EOF_MUT'
 if _pw_is_plugin_path "${spelled}" || _pw_is_plugin_path "${real}"; then
 @@@
 if _pw_is_plugin_path "${real}"; then
@@ -51018,6 +51051,84 @@ EOF_MUT
 grep -qE '\.claude/skills/[^/[:space:]]+/(\.claude-plugin|hooks)(/|[[:space:]]|$)' <<<
 @@@
 grep -qE '\.claude/skills/[^[:space:]]*(\.claude-plugin|/hooks)(/|[[:space:]]|$)' <<<
+EOF_MUT
+  _pw_mut M19-cwd hook 'cwd na skill: mkdir hooks' <<'EOF_MUT'
+case "${hcwd0}" in *.claude*) hit=1 ;; esac
+@@@
+:
+EOF_MUT
+  _pw_mut M20-palavra-sem-barra hook 'palavra sem barra que é link: >' <<'EOF_MUT'
+<<< "${flat}" | head -n 256)
+@@@
+<<< "${flat}" | grep / | head -n 256)
+EOF_MUT
+  _pw_mut M21-segue-cd hook 'cd seguido até o link' <<'EOF_MUT'
+case "${prev}" in cd|pushd) cd -- "${t}" 2>/dev/null ;; esac
+@@@
+:
+EOF_MUT
+  _pw_mut M22-til hook 'link sob a casa, com til' <<'EOF_MUT'
+'~/'*) t="${HOME:-}/${t#'~/'}" ;;
+@@@
+'NUNCA/'*) : ;;
+EOF_MUT
+  _pw_mut M22b-home hook 'link sob a casa, com $HOME' <<'EOF_MUT'
+'$HOME/'*) t="${HOME:-}/${t#'$HOME/'}" ;;
+@@@
+'NUNCA/'*) : ;;
+EOF_MUT
+  _pw_mut M23-write-alvo hook 'Write em hooks do alvo do link de skill' <<'EOF_MUT'
+targets="$(_pw_link_targets)"
+    if [ -n "${targets}" ]
+@@@
+targets=""
+    if [ -n "${targets}" ]
+EOF_MUT
+  _pw_mut M23b-forma-alvo hook 'Write em SKILL.md do alvo do link de skill' <<'EOF_MUT'
+case "$1" in "${t}"/.claude-plugin|"${t}"/.claude-plugin/*|"${t}"/hooks|"${t}"/hooks/*) return 0 ;; esac
+@@@
+case "$1" in "${t}"/*) return 0 ;; esac
+EOF_MUT
+  _pw_mut M23c-fundo-alvo hook 'Write em hooks fundo do alvo do link de skill' <<'EOF_MUT'
+"${t}"/hooks|"${t}"/hooks/*) return 0 ;; esac
+@@@
+"${t}"/*hooks*) return 0 ;; esac
+EOF_MUT
+  _pw_mut M24-bash-alvo hook 'Bash em hooks do alvo do link de skill' <<'EOF_MUT'
+case "${flat}" in *"${t}"*) hit=1 ;; esac
+@@@
+:
+EOF_MUT
+  _pw_mut M24b-cwd-alvo hook 'cwd no alvo do link de skill: mkdir hooks' <<'EOF_MUT'
+case "${hcwd0}/" in "${t}"/*) hit=1 ;; esac
+@@@
+:
+EOF_MUT
+  _pw_mut M25-chaves-prefiltro hook 'chaves com pedaço do nome' <<'EOF_MUT'
+  *skills*\{*) hit=1 ;;
+@@@
+  *NUNCA\{*) hit=1 ;;
+EOF_MUT
+  _pw_mut M26-sem-lib hook 'sem lib: Bash com verbo fecha' <<'EOF_MUT'
+type onion_invocation_lines >/dev/null 2>&1 || _pw_closed "a lib do tokenizador faltou ou veio vazia"
+@@@
+type onion_invocation_lines >/dev/null 2>&1 || exit 0
+EOF_MUT
+  _pw_mut M26b-lib-cedo hook 'sem lib: Write no alvo barra' <<'EOF_MUT'
+tool="$(printf '%s' "${input}" | _pw_json_field tool_name)" || tool=""
+@@@
+. "${here}/lib/invocation-lines.sh" 2>/dev/null
+tool="$(printf '%s' "${input}" | onion_json_string_field tool_name)" || tool=""
+EOF_MUT
+  _pw_mut M27-truncado hook 'JSON truncado: Bash no alvo barra' <<'EOF_MUT'
+[ -z "${cmd}" ] && cmd="${raw_cmd}"
+@@@
+:
+EOF_MUT
+  _pw_mut M27b-truncado-chave hook 'JSON truncado: Bash de leitura cala' <<'EOF_MUT'
+|| raw_cmd="$(printf '%s' "${input}" | sed -E 's/^.*"command"[[:space:]]*:[[:space:]]*"//')"
+@@@
+|| raw_cmd="${input}"
 EOF_MUT
   _pw_mut J1-resolvido judge 'Bash por symlink sem sinal no texto' <<'EOF_MUT'
     for q in (p, os.path.realpath(p)):
@@ -51200,6 +51311,160 @@ EOF_MUT
 into = bool(tdir) or base == "rsync" or os.path.isdir(d)
 @@@
 into = False
+EOF_MUT
+  _pw_mut J9l-chamada-hooks judge 'cp -r da pasta chamada hooks para a skill' <<'EOF_MUT'
+if sp and _pw_named_form_lands(base, s, sp, d, into or dest.endswith("/")):
+@@@
+if False:
+EOF_MUT
+  _pw_mut J9m-barra-final judge 'cp -r da pasta chamada hooks, destino com barra' <<'EOF_MUT'
+into or dest.endswith("/")):
+@@@
+into):
+EOF_MUT
+  _pw_mut J9n-chamada-raiz judge 'cp -r da pasta chamada hooks direto em skills' <<'EOF_MUT'
+return 1 in (_pw_skills_depth(dest), _pw_skills_depth(os.path.realpath(dest)))
+@@@
+return True
+EOF_MUT
+  _pw_mut J9o-chamada-conteudo judge 'cp -r do conteúdo da pasta chamada hooks' <<'EOF_MUT'
+if (base == "rsync" and src.endswith("/")) or (base == "cp" and src.rstrip("/").endswith("/.")):
+        return False
+    if os.path.basename(sp)
+@@@
+if os.path.basename(sp)
+EOF_MUT
+  _pw_mut J9p-chamada-plugin judge 'cp -r da pasta chamada .claude-plugin para a skill' <<'EOF_MUT'
+if os.path.basename(sp) not in (".claude-plugin", "hooks")
+@@@
+if os.path.basename(sp) not in ("hooks",)
+EOF_MUT
+  _pw_mut J23b-combinado judge 'mv -ft para dentro' <<'EOF_MUT'
+if c == "t":
+@@@
+if c == "t" and i == 1:
+EOF_MUT
+  _pw_mut J23c-colado judge 'mv -t colado' <<'EOF_MUT'
+return a[i + 1:] or (args[k + 1] if k + 1 < len(args) else None)
+@@@
+return args[k + 1] if k + 1 < len(args) else None
+EOF_MUT
+  _pw_mut J23d-longa judge 'mv --target-directory= para dentro' <<'EOF_MUT'
+return v if eq else (args[k + 1] if k + 1 < len(args) else None)
+@@@
+return None if eq else (args[k + 1] if k + 1 < len(args) else None)
+EOF_MUT
+  _pw_mut J23e-separada judge 'mv --target-directory separado para fora' <<'EOF_MUT'
+return v if eq else (args[k + 1] if k + 1 < len(args) else None)
+@@@
+return v if eq else None
+EOF_MUT
+  _pw_mut J23f-prefixo judge 'mv --targ= abreviado' <<'EOF_MUT'
+if len(n) > 2 and "--target-directory".startswith(n):
+@@@
+if n == "--target-directory":
+EOF_MUT
+  _pw_mut J23g-juiz-destino judge 'ln -st para dentro' <<'EOF_MUT'
+    if tdir:
+        _moat_write_path(_moat_abspath(tdir), " ".join(raw_words), base)
+@@@
+    if False:
+        pass
+EOF_MUT
+  _pw_mut J23h-origens judge 'cp -ft para fora da skill' <<'EOF_MUT'
+exempt = {_moat_abspath(s) for s in _pw_target_split(args, {"-S", "--suffix", "-m", "--mode", "-o", "--owner", "-g", "--group"})[1]}
+@@@
+pass
+EOF_MUT
+  _pw_mut J23i-ln-um-arg-t judge 'ln -st para fora da skill' <<'EOF_MUT'
+exempt = {_moat_abspath(s) for s in _pw_target_split(args, {"-S", "--suffix", "-m", "--mode", "-o", "--owner", "-g", "--group"})[1]}
+@@@
+pass
+EOF_MUT
+  _pw_mut J23j-rsync-t judge 'rsync -t do plugin para fora' <<'EOF_MUT'
+words = [w for w in words if w != "-t"]
+@@@
+pass
+EOF_MUT
+  _pw_mut J24-chaves judge 'chaves no mkdir' <<'EOF_MUT'
+words = words[:1] + [e for w in words[1:] for e in brace_expand(w)]
+@@@
+pass
+EOF_MUT
+  _pw_mut J24b-teto judge 'chaves além do teto fecham' <<'EOF_MUT'
+if len(todo) + len(out) > _PW_BRACE_MAX:
+@@@
+if False:
+EOF_MUT
+  _pw_mut J24c-teto-sinal judge 'chaves além do teto fora de skills' <<'EOF_MUT'
+if "skills" in word:
+                _moat_emit
+@@@
+if True:
+                _moat_emit
+EOF_MUT
+  _pw_mut J25-redir-e judge '&> alvo' <<'EOF_MUT'
+_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+@@@
+_PW_REDIR_FORMS = re.compile(r">\|")
+EOF_MUT
+  _pw_mut J25b-redir-ee judge '&>> alvo' <<'EOF_MUT'
+_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+@@@
+_PW_REDIR_FORMS = re.compile(r"&>(?!>)|>\|")
+EOF_MUT
+  _pw_mut J25c-redir-pipe judge '>| alvo' <<'EOF_MUT'
+_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+@@@
+_PW_REDIR_FORMS = re.compile(r"&>")
+EOF_MUT
+  _pw_mut J25e-redir-prepass judge '&> alvo' <<'EOF_MUT'
+return _pw_base_prepass(_pw_norm_redirects(text))
+@@@
+return _pw_base_prepass(text)
+EOF_MUT
+  _pw_mut J26-aspas judge 'aspas não fechadas com o sinal' <<'EOF_MUT'
+if _PW_TEXT_SIG.search(str(seg)):
+            _moat_emit("inanalisavel", str(seg), "", why)
+        return
+@@@
+if False:
+            pass
+        return
+EOF_MUT
+  _pw_mut J26b-aspas-sem-sinal judge 'aspas não fechadas sem o sinal' <<'EOF_MUT'
+if _PW_TEXT_SIG.search(str(seg)):
+            _moat_emit("inanalisavel", str(seg), "", why)
+@@@
+if True:
+            _moat_emit("inanalisavel", str(seg), "", why)
+EOF_MUT
+  _pw_mut J27-php judge 'php -r file_put_contents' <<'EOF_MUT'
+if base == "php":
+@@@
+if False:
+EOF_MUT
+  _pw_mut J27b-php-le judge 'php -r só lê' <<'EOF_MUT'
+and _pw_code_writes(base, args[k + 1]):
+@@@
+:
+EOF_MUT
+  _pw_mut J27c-php-forma judge 'php -r grava fora, citando' <<'EOF_MUT'
+r"|\bfile_put_contents\(\s*" + _PW_QP)
+@@@
+r"|\bfile_put_contents\(.*\.claude/skills")
+EOF_MUT
+  _pw_mut J28-alvo-link judge 'Bash em hooks do alvo do link de skill' <<'EOF_MUT'
+for t in _PW_LINK_TARGETS:
+@@@
+for t in ():
+EOF_MUT
+  _pw_mut J28b-alvo-honesto judge 'Bash em SKILL.md do alvo do link de skill' <<'EOF_MUT'
+c = s[len(t) + 1:].split("/")[0]
+            if c == ".claude-plugin":
+@@@
+c = "hooks"
+            if c == ".claude-plugin":
 EOF_MUT
   _pw_mut J10-nome-da-skill judge 'Bash > em skill nomeada hooks' <<'EOF_MUT'
 c = parts[i + 3]
@@ -51401,9 +51666,9 @@ EOF_MUT
     :
 EOF_MUT
   _pw_mut S7-gate-no-home scan 'sem --home' <<'EOF_MUT'
-if { [ "${home_too}" = 1 ] || [ "${same}" = 1 ]; } && [ -n "${HOME:-}" ]; then
+if [ "${home_too}" = 1 ] && [ -n "${HOME:-}" ] && [ "$(realpath
 @@@
-if [ -n "${HOME:-}" ]; then
+if [ -n "${HOME:-}" ] && [ "$(realpath
 EOF_MUT
   _pw_mut S11-casa-barra scan 'a pasta de casa sai SOFT' <<'EOF_MUT'
 '~/'*) sev="SOFT"; msg="${msg_home}" ;;
@@ -51415,10 +51680,40 @@ EOF_MUT
 @@@
 *)     sev="SOFT"; msg="${msg_repo}" ;;
 EOF_MUT
-  _pw_mut S13-repo-na-casa scan 'repo que mora na pasta de casa sai SOFT, uma vez só' <<'EOF_MUT'
-= "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then same=1; fi
+  _pw_mut S13-casa-nao-rebaixa scan 'HOME igual ao repo segue HARD' <<'EOF_MUT'
+[ "${home_too}" = 1 ] && [ -n "${HOME:-}" ] && [ "$(realpath -m -- "${repo}/.claude/skills" 2>/dev/null)" != "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then
 @@@
-= "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then same=0; fi
+[ "${home_too}" = 1 ] && [ -n "${HOME:-}" ]; then
+EOF_MUT
+  _pw_mut S13b-link-nao-rebaixa scan 'casa como link para o repo segue HARD' <<'EOF_MUT'
+[ "$(realpath -m -- "${repo}/.claude/skills" 2>/dev/null)" != "$(realpath -m -- "${HOME}/.claude/skills" 2>/dev/null)" ]; then
+@@@
+[ "${repo}/.claude/skills" != "${HOME}/.claude/skills" ]; then
+EOF_MUT
+  _pw_mut S14-find-sem-permissao scan 'hooks sem permissão sai rc 2' <<'EOF_MUT'
+[ "${_frc}" -ne 0 ] && exit 3
+@@@
+:
+EOF_MUT
+  _pw_mut S15-skill-sem-permissao scan 'skill sem permissão sai rc 2' <<'EOF_MUT'
+[ -x "${e}" ] || { _blind=1; continue; }
+@@@
+:
+EOF_MUT
+  _pw_mut S16-pasta-sem-permissao scan 'pasta de skills sem permissão sai rc 2' <<'EOF_MUT'
+( cd "${dir}" 2>/dev/null || exit 3
+@@@
+( cd "${dir}" 2>/dev/null || exit 0
+EOF_MUT
+  _pw_mut S17-motivo scan 'hooks sem permissão sai rc 2' <<'EOF_MUT'
+SCAN_WHY="${SCAN_WHY}sem permissão de leitura em ${label} "; return 2;
+@@@
+return 2;
+EOF_MUT
+  _pw_mut S17b-motivo-timeout scan 'timeout sai rc 2' <<'EOF_MUT'
+SCAN_WHY="${SCAN_WHY}timeout em ${label} "; return 2;
+@@@
+return 2;
 EOF_MUT
   _pw_mut S8-saneia scan 'nome com quebra de linha' <<'EOF_MUT'
 f="$(LC_ALL=C; printf '%s' "${f//[^[:print:]]/?}")"
@@ -51426,7 +51721,8 @@ f="$(LC_ALL=C; printf '%s' "${f//[^[:print:]]/?}")"
 :
 EOF_MUT
   _pw_mut S9-timeout scan 'timeout sai rc 2' <<'EOF_MUT'
-[ "${rc}" -eq 124 ] && return 2
+[ "${_frc}" -eq 124 ] && exit 124
+    [ "${_frc}" -ne 0 ] && exit 3
 @@@
 :
 EOF_MUT
