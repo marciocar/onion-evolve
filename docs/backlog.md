@@ -371,10 +371,10 @@
 |--:|---|---|---|
 | 59.5 | `D_VETO_ESTREITO_MAIS_VARREDURA` | plugin-write-2026-11 | Decisão do maestro de 2026-11-04: veto estreito mais varredura no disco. Um hook PreToolUse em Write, Edit, NotebookEdit e Bash c |
 | 27.0 | `C_TETO_NAO_E_FRONTEIRA` | plugin-write-2026-11 | TETO (peça 7): esta guarda é contenção de acidente e de injeção ingênua, NÃO fronteira. Quem quer contornar consegue, e o  |
-| 9.6 | `D_MOLDE_COMPOE_O_JUIZ_DO_MOAT` | plugin-write-2026-11 | Molde pelo censo: pretooluse-direct-provider-api.sh é o único PreToolUse com --selftest próprio, e é a forma de hook mais chec |
+| 16.0 | `D_MOLDE_COMPOE_O_JUIZ_DO_MOAT` | plugin-write-2026-11 | Molde pelo censo: pretooluse-direct-provider-api.sh é o único PreToolUse com --selftest próprio, e é a forma de hook mais chec |
+| 13.6 | `C_TETO_CAI_JUNTO_COM_O_SETTINGS` | plugin-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json e com o próprio script, que o veto não protege. A medição g |
 | 8.0 | `E_ELENXO_REPROVOU_E_CUROU` | plugin-write-2026-11 | A 1ª passada adversarial REPROVOU a guarda em aad2d62d3, com 6 achados altos e 7 médios. O 0 de 371 do replay se sustentou, mas  |
 | 6.8 | `C_TETO_BASH_FALHA_PELO_VOCABULARIO` | plugin-write-2026-11 | TETO: em Bash a lista falha pelo vocabulário. Tudo o que não é forma listada passa. |
-| 6.8 | `C_TETO_CAI_JUNTO_COM_O_SETTINGS` | plugin-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json e com o próprio script, que o veto não protege. A medição g |
 | 6.8 | `C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE` | plugin-write-2026-11 | TETO: o processo de um mod e um MCP de escrita ficam fora do PreToolUse: a escrita deles não é uma chamada de Write nem de Bash  |
 | 6.4 | `E_BANCADA_CASOS_E_MUTANTES` | plugin-write-2026-11 | Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 80 mutantes, cada  |
 | 5.1 | `C_TETO_PARTIDA_E_DETECCAO` | plugin-write-2026-11 | TETO: no SessionStart o plugin que puder carregar já carregou: o aviso é detecção, não prevenção. |
