@@ -43913,12 +43913,16 @@ except Exception: d={}'
   if ! grep -qF '(RuntimeError)' "${d}/err"; then record_pass "hooks-python-isolated: (m) mutante morde: tirar o try perde a razão"
   else record_fail "hooks-python-isolated: (m) mutante NÃO morde" "tirar o try: a razão continuou"; fi
   HPI_INJ_F=""
-  # o teto da expansão de chaves, com o teto baixado na cópia
-  local jb2; jb2="$(_hpi_payload "${d}" 'ls {a,b,c}')"
-  _hpi_case "env: expansão dentro do teto" 0 "${proj}" "${EGN}" "${d}" "${jb2}"
-  HPI_INJ_F="${EG}"; HPI_INJ_OLD='BRACE_CAP = 256'; HPI_INJ_NEW='BRACE_CAP = 2'
-  _hpi_kill "env: a expansão passar do teto sem fechar" "${EG}" "raise BraceLimit('expansão de chaves acima do teto')" 'pass' "${EGN}" "${d}" "${jb2}" 2 0
-  HPI_INJ_F=""
+  # o teto da expansão de chaves, com a fonte como está: uma lista longa fecha, e uma lista abaixo do teto passa
+  local jacima jabaixo
+  jacima="$(_hpi_payload "${d}" "ls x.{$(seq -s, 1 300)}")"; jabaixo="$(_hpi_payload "${d}" "ls x.{$(seq -s, 1 200)}")"
+  _hpi_case "env: lista acima do teto fecha" 2 "${proj}" "${EGN}" "${d}" "${jacima}"
+  if grep -qF '(BraceLimit)' "${d}/err"; then record_pass "hooks-python-isolated: env: a razão do teto chega à mensagem"
+  else record_fail "hooks-python-isolated: env: razão do teto" "$(head -c 160 "${d}/err")"; fi
+  _hpi_case "env: lista abaixo do teto passa" 0 "${proj}" "${EGN}" "${d}" "${jabaixo}"
+  _hpi_kill "teto: passar dele sem fechar" "${EG}" "raise BraceLimit('expansão de chaves acima do teto')" 'pass' "${EGN}" "${d}" "${jacima}" 2 0
+  _hpi_kill "teto: subir o número" "${EG}" 'BRACE_CAP = 256' 'BRACE_CAP = 100000' "${EGN}" "${d}" "${jacima}" 2 0
+  _hpi_kill "teto: baixar o número" "${EG}" 'BRACE_CAP = 256' 'BRACE_CAP = 100' "${EGN}" "${d}" "${jabaixo}" 0 2
 
   # ── a forma do segredo, cada alternativa com o seu caso ──
   local dead="PATH=${shim}:${PATH}" cf c1 c2
@@ -43991,11 +43995,53 @@ except Exception as e:"
     printf '{}' | (cd "${amb}" && env LC_ALL=C CLAUDE_PROJECT_DIR="${mut}" bash "${mut}/.claude/hooks/co-evolution-inbox-check.sh" >/dev/null 2>&1) || true
   }
   if [ -f "${proj}/.claude/hooks/co-evolution-inbox-check.sh" ]; then
-    _hpi_mark_kill "arquivo de ambiente" .claude/hooks/co-evolution-inbox-check.sh '  [ -f .env ] && while IFS= read -r _l; do' '  [ -f .env ] && { set -a; . ./.env 2>/dev/null || true; set +a; }
-  false && while IFS= read -r _l; do' _hpi_inbox
-    rm -f "${d}/inbox.out"; _hpi_fresh; _hpi_inbox; got="$(cat "${d}/inbox.out" 2>/dev/null)"
+    _hpi_mark_kill "arquivo de ambiente" .claude/hooks/co-evolution-inbox-check.sh '  [ -f .env ] && while IFS= read -r _l || [ -n "$_l" ]; do' '  [ -f .env ] && { set -a; . ./.env 2>/dev/null || true; set +a; }
+  false && while IFS= read -r _l || [ -n "$_l" ]; do' _hpi_inbox
+    rm -f "${d}/inbox.out"; _hpi_fresh; _hpi_inbox; got="$(cat "${d}/inbox.out" 2>/dev/null || true)"
     if [ "${got}" = "b|c|acme||${PATH}" ]; then record_pass "hooks-python-isolated: arquivo de ambiente: só as chaves da federação entram, sem aspas, e o PATH não muda"
     else record_fail "hooks-python-isolated: arquivo de ambiente: chaves" "veio: ${got}"; fi
+    # o hook como está na fonte: nada do arquivo executa, com a marca lida na fonte e não só na cópia do mutante
+    rm -f "${marca}"; _hpi_fresh; _hpi_inbox
+    if [ ! -e "${marca}" ]; then record_pass "hooks-python-isolated: arquivo de ambiente: nada do arquivo executa"
+    else record_fail "hooks-python-isolated: arquivo de ambiente: executou" "a marca apareceu com o hook da fonte"; fi
+    rm -f "${marca}"
+    # a forma documentada do arquivo: cada caso com o seu mutante. <nome> <linha do membro, sem quebra final> <esperado>
+    _hpi_member() {  # <conteúdo da última linha> → imprime o membro que chegou ao pull
+      { printf 'ONION_FED_CLIENT_ID=a\nONION_FED_CLIENT_SECRET=b\nONION_FED_ORG_ID=c\n'; printf '%s' "$1"; } > "${amb}/${envname}"
+      rm -f "${d}/inbox.out"; _hpi_inbox
+      local _o; _o="$(cat "${d}/inbox.out" 2>/dev/null || true)"; _o="${_o#b|c|}"; printf '%s' "${_o%%|*}"
+    }
+    local _ic _il _iw _io
+    while IFS=$'\x1f' read -r _ic _il _iw; do
+      [ -n "${_ic}" ] || continue
+      _hpi_fresh; _io="$(_hpi_member "${_il}")"
+      if [ "${_io}" = "${_iw}" ]; then record_pass "hooks-python-isolated: arquivo de ambiente: ${_ic}"
+      else record_fail "hooks-python-isolated: arquivo de ambiente: ${_ic}" "esperava [${_iw}], veio [${_io}]"; fi
+    done <<EOF_HPI_ENV
+comentário no fim da linha$(printf '\x1f')ONION_FED_MEMBER=acme        # nota$(printf '\x1f')acme
+última linha sem quebra$(printf '\x1f')ONION_FED_MEMBER=acme$(printf '\x1f')acme
+aspas duplas com comentário$(printf '\x1f')ONION_FED_MEMBER="acme"   # nota$(printf '\x1f')acme
+aspas simples com comentário$(printf '\x1f')ONION_FED_MEMBER='acme'   # nota$(printf '\x1f')acme
+cerquilha sem espaço preservada$(printf '\x1f')ONION_FED_MEMBER=a#b$(printf '\x1f')a#b
+cerquilha entre aspas preservada$(printf '\x1f')ONION_FED_MEMBER="a # b"$(printf '\x1f')a # b
+EOF_HPI_ENV
+    # <nome> <velho> <novo> <linha> <esperado>: a cópia limpa dá o esperado, o mutante não
+    _hpi_env_kill() {
+      local v0
+      _hpi_fresh; v0="$(_hpi_member "$4")"
+      [ "${v0}" = "$5" ] || { record_fail "hooks-python-isolated: (m) cópia limpa: $1" "veio [${v0}]"; return; }
+      _hpi_mutate .claude/hooks/co-evolution-inbox-check.sh "$2" "$3" || { record_fail "hooks-python-isolated: (m) mutante não aplicou" "$1"; return; }
+      v0="$(_hpi_member "$4")"
+      if [ "${v0}" != "$5" ]; then record_pass "hooks-python-isolated: (m) mutante morde: $1 ([$5] → [${v0}])"
+      else record_fail "hooks-python-isolated: (m) mutante NÃO morde" "$1: seguiu [${v0}]"; fi
+    }
+    _hpi_env_kill "comentário no fim da linha" '_v="${_v%%[[:space:]]#*}"; ' '' 'ONION_FED_MEMBER=acme        # nota' acme
+    _hpi_env_kill "espaço depois do valor" '; _v="${_v%"${_v##*[![:space:]]}"}" ;;' ' ;;' 'ONION_FED_MEMBER=acme        # nota' acme
+    _hpi_env_kill "última linha sem quebra" ' || [ -n "$_l" ]; do' '; do' 'ONION_FED_MEMBER=acme' acme
+    _hpi_env_kill "aspas duplas com comentário" '_v="${_v%%\"*}"' '_v="${_v%\"}"' 'ONION_FED_MEMBER="acme"   # nota' acme
+    _hpi_env_kill "aspas simples com comentário" "_v=\"\${_v%%\\'*}\"" "_v=\"\${_v%\\'}\"" "ONION_FED_MEMBER='acme'   # nota" acme
+    _hpi_env_kill "cerquilha sem espaço" '_v="${_v%%[[:space:]]#*}"' '_v="${_v%%#*}"' 'ONION_FED_MEMBER=a#b' 'a#b'
+    _hpi_env_kill "cerquilha entre aspas" '\"*\"*) _v=' '\"NUNCA\"*) _v=' 'ONION_FED_MEMBER="a # b"' 'a # b'
   else record_skip "hooks-python-isolated: hook do inbox não viaja a esta porta → não medido aqui"; fi
   if [ "${moat_armed}" = 1 ]; then
     local rp="${d}/rp"; mkdir -p "${rp}"

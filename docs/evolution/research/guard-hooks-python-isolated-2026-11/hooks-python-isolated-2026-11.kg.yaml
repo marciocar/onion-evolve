@@ -6,7 +6,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-04"
   review_after: "2026-12-04"   # 30d: defeito de guarda
-  # ═══ TETO: 14 NÓS ═══  (12 + 2 da passada adversarial)
+  # ═══ TETO: 15 NÓS ═══  (12 + 3 das passadas adversariais)
 nodes:
   - id: Q_HOOKS_RODAM_PYTHON_ISOLADO
     node_type: question
@@ -200,6 +200,18 @@ nodes:
       locator: "seção Achados"
       method: "passada adversarial com corpus, mutantes e laboratório próprio; artefatos fora da árvore"
       locality: "repo"
+  - id: C_TETO_DE_CHAVES_FECHA_LEGITIMO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "2ª passada adversarial: formas sintéticas medidas contra o teto de 256; 0 casos em 3.100 comandos reais com chave do corpus"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "TETO: o limite de 256 alternativas fecha comando legítimo em formas raras: JSON aninhado a partir de 8 objetos em echo e 12 em curl -d, jq, gh api, awk com 10 blocos e cp com lista de 300; 0 casos em 3.100 do corpus"
+    narrative: "Fica para o PR seguinte, e a decisão é do maestro. A alternativa é levar o estouro do teto à forma do objeto em vez de fechar tudo, e essa alternativa tem custo: a forma solta parte do que o veto inteiro barra, medido em C_TETO_FORMA_DO_SEGREDO."
 edges:
   - from: E_DEFEITO_MODULO_SOMBRA
     to: Q_HOOKS_RODAM_PYTHON_ISOLADO
@@ -240,3 +252,6 @@ edges:
   - from: E_PASSADA_REPROVOU_A_1A_CURA
     to: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
     edge_type: SUPPORTS
+  - from: C_TETO_DE_CHAVES_FECHA_LEGITIMO
+    to: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
+    edge_type: CONSTRAINS

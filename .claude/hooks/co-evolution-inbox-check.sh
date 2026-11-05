@@ -50,11 +50,16 @@ pull_inbox() {
   [ -f "$sh" ] || return 0
   # .env do adotante é a fonte das credenciais; ausente = não configurado = silêncio.
   # O arquivo é DADO, nunca código: sem `source`, só as chaves ONION_FED_*. Nada mais entra no ambiente do hook.
-  [ -f .env ] && while IFS= read -r _l; do
+  [ -f .env ] && while IFS= read -r _l || [ -n "$_l" ]; do
     _l="${_l%$'\r'}"; _l="${_l#"${_l%%[![:space:]]*}"}"; _l="${_l#export }"; _l="${_l#"${_l%%[![:space:]]*}"}"
     _k="${_l%%=*}"; _v="${_l#*=}"
     case "$_k" in ONION_FED_*[!A-Z0-9_]*|"") continue ;; ONION_FED_*) ;; *) continue ;; esac
-    case "$_v" in \"*\") _v="${_v#\"}"; _v="${_v%\"}" ;; \'*\') _v="${_v#\'}"; _v="${_v%\'}" ;; esac
+    # a forma documentada em docs/evolution/README.md: entre aspas vale até a aspa; sem aspas, `#` só comenta depois de espaço
+    case "$_v" in
+      \"*\"*) _v="${_v#\"}"; _v="${_v%%\"*}" ;;
+      \'*\'*) _v="${_v#\'}"; _v="${_v%%\'*}" ;;
+      *) _v="${_v%%[[:space:]]#*}"; _v="${_v%"${_v##*[![:space:]]}"}" ;;
+    esac
     export "$_k=$_v"
   done < .env
   [ -n "${ONION_FED_CLIENT_ID:-}" ] && [ -n "${ONION_FED_CLIENT_SECRET:-}" ] \
