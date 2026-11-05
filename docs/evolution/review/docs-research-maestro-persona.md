@@ -2,8 +2,7 @@
 branch: docs/research-maestro-persona
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: 0f109e3ea90fef768b18a0c1f9129db529d58cbbf82759d827564d1d5823a8e9
-reviewed_code_sha256: 67a58a6fe4c2df8ba8c291382a298c9be4e8b5f66809e4efe5b33c079243c626
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 7
 tokens: 138734
@@ -15,7 +14,7 @@ reviewer: agente general-purpose separado, que não escreveu a SYNTHESIS nem as 
 nota: >-
   Fechamento do run wf_ded7babd-681 do /onion-research em modo decision (7.377.462 tokens, 106 agentes,
   33,6 min, conferidos no diário do workflow). Grafo novo com 74 nós; D_MAESTRO_PERSONA_SOURCE_2026_11
-  fica OPEN, e quem sela é o maestro. A passada adversarial foi de um agente separado, que julgou a
+  foi selado pelo maestro em 2026-11-05 (A, com a medida antes), gravado pelo kg-decide-seal.sh com rc 0. A passada adversarial foi de um agente separado, que julgou a
   SYNTHESIS contra o grafo e o retorno bruto do run: 12 achados, 7 reais, todos corrigidos, e 5
   falso-positivos que registram o que foi conferido. Tokens e duração são os da passada, não os do run.
   Radar e kg-contract-check com exit 0 depois das correções. Nenhum .kg.yaml existente foi editado,

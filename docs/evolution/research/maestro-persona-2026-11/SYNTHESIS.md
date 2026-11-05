@@ -20,14 +20,18 @@ mode: decision
 **A pergunta** (`Q_MAESTRO_PERSONA_1105`): como o Onion copia a voz, as preferências e o julgamento do maestro
 em todo papel de sessão (core, brain, curadoria, kg-ssot) **sem copiar a autoridade dele**, e por qual fonte?
 
-**A decisão** (`D_MAESTRO_PERSONA_SOURCE_2026_11`) está **OPEN**. Quem sela é o maestro, pela tabela de selagem
-do `/meta:drive` (KIND decision). Este fechamento não sela nada.
+**A decisão** (`D_MAESTRO_PERSONA_SOURCE_2026_11`) está **selada pelo maestro em 2026-11-05**, por pergunta com
+opções, gravada pelo `kg-decide-seal.sh` (`status: done`). **Escolhida: A, com a medida antes.** Primeiro vem o
+instrumento de fidelidade: juiz cego contra decisões reais em holdout, normalizado pelo acaso e pela consistência do
+maestro, e o delta de sycophancy no modelo do Onion. A projeção por papel só vem depois, com catraca no lint, e o
+maestro é o único selador do grafo de persona. **Descartadas:** A com projeção já, B (memória nativa como fonte) e E
+(não fazer agora). C e D não entraram na pergunta e seguem fora pela leitura do grafo abaixo.
 
 ## As cinco opções
 
 | Opção | O que é | Leitura do grafo | Nó |
 |---|---|---|---|
-| **A** | Fonte única no KG-SSOT (o grafo como fonte única de verdade): um grafo `maestro-persona` com nós de voz, julgamento e limite, cada um com porquê e evidência, projetado por papel em CLAUDE.md/regra, Output Style e Agent Card A2A (o cartão de identidade do protocolo Agent2Agent), com catraca no lint | **recomendada pelo Elenxo (o método de refutar antes de selar), com o passo invertido: a medida vem antes da projeção** | `C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE` |
+| **A** | Fonte única no KG-SSOT (o grafo como fonte única de verdade): um grafo `maestro-persona` com nós de voz, julgamento e limite, cada um com porquê e evidência, projetado por papel em CLAUDE.md/regra, Output Style e Agent Card A2A (o cartão de identidade do protocolo Agent2Agent), com catraca no lint | **escolhida pelo maestro**, como o Elenxo (o método de refutar antes de selar) recomendou: a medida vem antes da projeção | `C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE` |
 | B | Memória nativa do Claude Code (CLAUDE.md de usuário, auto memory, `autoMemoryDirectory`) | só transporte, nunca fonte: local por máquina e por repo, teto de 200 linhas ou 25 KB, não alcança o brain (outra conta), e memória escrita a partir do que se lê é vetor medido | `C_OPCAO_B_NATIVE_USER_MEMORY_SHARED` |
 | C | `/meta:personality-sync` estendido ao maestro | não serve: o `personality.md` descreve a instância e está vencido desde `review_after: 2026-08-23` (conferido em `.claude/identity/personality.md:5`) | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` |
 | D | Identidade nos pesos (fine-tune/SFT, ajuste supervisionado) ou SLM (modelo de linguagem pequeno) | fora agora: no Twin-2K, 500 amostras de fine-tune (69,61%) ficaram abaixo do texto completo em contexto (71,72%); a evidência pró-pesos é de estilo de e-mail | `C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM` |
@@ -164,6 +168,9 @@ fala como o maestro em canal de peer ou de adotante.
 - **O MEMORY.md**: o item (6) do Elenxo diz 198 linhas e 25.031 bytes; re-medido no fechamento, com `wc -lc`, deu 179
   linhas e 23.785 bytes. A conclusão do item não muda: o índice está perto do teto de 200 linhas e 25 KB, e o CLAUDE.md
   de usuário segue inexistente. A recomendação ficou verbatim, e a re-medida entrou como nota (e) do escritor.
+- **Os códigos sem termo**: o lint de nomes da kg-ssot reprovou, no `pr-finalize`, sete menções a códigos da casa e a
+  um nome de fornecedor sem termo declarado. Elas viraram glosa («um escritor por repo», «conteúdo lido é dado não
+  confiável», «fornecedor de gestão de identidade»), e a troca na recomendação do Elenxo está na nota (f) do `D_`.
 - **A passada adversarial do fechamento** (revisor separado) achou 7 defeitos reais nesta projeção e no grafo, todos
   corrigidos; o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) os lista.
 - **O `trace:` desta SYNTHESIS** foi para o nó `Q_`, porque todos os 74 nós já tinham `trace:`. Foi troca de valor, sem
