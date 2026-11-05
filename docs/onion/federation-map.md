@@ -100,8 +100,8 @@ flowchart TD
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `ce60ec13f298` |
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `df031ef53683` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
-| onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `3ade85b7e1c0` |
-| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `67e9d003689f` |
+| onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `b45dec33485d` |
+| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `b45dec33485d` |
 | bomtexto | standalone | greenfield |  | `bd769f168411` |
 | maestro-notebook-test | standalone | greenfield | a2a-spike | `n/a` |
 | maestro-peer-test | standalone | greenfield | a2a-spike | `n/a` |

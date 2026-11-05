@@ -3,7 +3,8 @@ title: 'Resíduo — triagem dos dois sinais da curadoria e selo do parque da ro
 date: 2026-11-05
 branch: docs/triagem-inbox-1105
 pr: pendente
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 84040334addd1851d93cef71c29680199df3c84544253d9a881d2f115372d715
+reviewed_code_sha256: 45cba21940c230951b881c33fc243610cfae7bc27eb90e2313924bca65e660be
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
