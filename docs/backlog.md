@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**888 itens abertos** em 144 grafo(s) com aberto (de 185 no escopo) · 145 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**901 itens abertos** em 145 grafo(s) com aberto (de 186 no escopo) · 146 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -364,6 +364,24 @@
 | 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
 | 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
+
+## maestro-persona-2026-11 — 13 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 62.5 | `D_MAESTRO_PERSONA_SOURCE_2026_11` | maestro-persona-2026-11 | Fonte da persona do maestro: A KG-SSOT projetado por papel · B memória nativa · C personality-sync · D pesos/SLM · E não ago |
+| 58.5 | `Q_MAESTRO_PERSONA_1105` | maestro-persona-2026-11 | Como o Onion copia voz, preferências e julgamento do maestro em todo papel de sessão (core, brain, curadoria, kg-ssot) sem copia |
+| 30.0 | `C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE` | maestro-persona-2026-11 | A. Fonte única no KG-SSOT: grafo maestro-persona com nós de voz, julgamento e limite (porquê e evidência em cada um), projetad |
+| 9.8 | `C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM` | maestro-persona-2026-11 | D. Identidade nos pesos (fine-tune/SFT de identidade) ou SLM |
+| 5.4 | `C_SUPERACAO_20261105_GSS_V3_83_PERCENT` | maestro-persona-2026-11 | Correção pela v3 de 2411.10109 (28/06/2026): em itens do GSS fora do treino, agentes de entrevistas de duas horas com 1.052 amer |
+| 5.4 | `C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER` | maestro-persona-2026-11 | O Panza mede fidelidade de ESTILO de e-mail com BLEU e MAUVE (MAUVE 0,6-1,0 no próprio usuário, ~0 nos outros), sem LLM-juiz; a  |
+| 5.4 | `C_SUPERACAO_20261105_RFC8693_ACT_CLAIM` | maestro-persona-2026-11 | RFC 8693 (OAuth 2.0 Token Exchange, Standards Track, jan/2020), seções 1.1 e 4.1: o claim act separa o ator do titular e disting |
+| 5.4 | `C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE` | maestro-persona-2026-11 | Twin-2K (GPT-4.1-mini): resumo 3,7 pp abaixo do texto completo (68,02 contra 71,72; acaso 59,17, reteste 81,72), JSON 1,24 pp abai |
+| 5.4 | `C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY` | maestro-persona-2026-11 | O draft individual WIMSE (-02, sem posição formal) exige que o agente nunca tenha a credencial bruta, guardada em cofre que não |
+| 5.0 | `C_OPCAO_B_NATIVE_USER_MEMORY_SHARED` | maestro-persona-2026-11 | B. Memória de usuário nativa do Claude Code (CLAUDE.md de usuário, auto memory, autoMemoryDirectory) compartilhada entre repos |
+| 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
+| 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
+| 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 

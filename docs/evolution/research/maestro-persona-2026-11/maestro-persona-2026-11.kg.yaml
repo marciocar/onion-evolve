@@ -1,0 +1,1534 @@
+# kg-backlog-guard: on
+meta:
+  id: maestro-persona-2026-11
+  schema_version: "1"
+  baseline: "2026-11-05"
+  review_after: "2026-12-20"   # 45d: o tipo DOMINANTE é LINEUP DE MODELOS. O que move a decisão é o efeito por modelo
+                               # (sycophancy, tom, fidelidade) que nenhum estudo mediu no Opus 5.x nem no Fable; as features de
+                               # memória e Output Style do Claude Code (30d) reabrem pelo /meta:cc-update; papers (120d) são secundários.
+  # ═══ TETO: 80 NÓS ═══
+  # Justificativa do teto: o modo decisão pede 1 nó por objeção sobrevivente (40) e 1 por superação achada (6);
+  # os outros 28 são 1 pergunta, 1 decisão, 5 opções, 19 evidências votadas, mercado e lacunas.
+  purpose: "Decidir a fonte da persona do maestro (voz, preferências, julgamento, nunca autoridade) para todo papel de sessão do ecossistema Onion: KG-SSOT projetado, memória nativa, personality-sync, pesos ou nada agora."
+external_edges:
+  - from: Q_MAESTRO_PERSONA_1105
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    edge_type: TRACES_TO
+  - from: Q_MAESTRO_PERSONA_1105
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#E_GLEAN_PERSON_AS_IDENTITY_NODE"
+    edge_type: TRACES_TO
+  - from: Q_MAESTRO_PERSONA_1105
+    to: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml#E_SESSION_NAME_NOT_STABLE_IDENTITY"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_CUT_FT500_BELOW_FULL_TEXT
+    to: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN"
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    to: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#E_NANOCHAT_IDENTITY_SYNTHETIC_SFT_METHOD"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO
+    to: "docs/onion/graph/federation-health-2026-07.kg.yaml#E_PERSONALITY_SYNC_BUILT"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A3_OUTPUT_STYLE_PROJECTION_UNMEASURED
+    to: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml#PR_234"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_MAESTRO_PERSONA_1105
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    verified_at: "2026-11-05"
+    verified_against: "run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05: 19 claims confirmadas, 6 refutadas, 50 objeções julgadas, 40 sobreviventes, 6 superações achadas; id do run confirmado no diário do workflow (agentCount 106, totalTokens 7.377.462, durationMs 2.015.900); origem: pedido do maestro 'abre a pesquisa da persona em modo decision', pergunta computada pelo workflow"
+    label: "Como o Onion copia voz, preferências e julgamento do maestro em todo papel de sessão (core, brain, curadoria, kg-ssot) sem copiar a autoridade dele, e por qual fonte (KG, memória nativa, personality-sync, pesos ou nada agora)?"
+    narrative: "Persona do maestro no ecossistema Onion: como fazer o Onion copiar a personalidade, a voz, as preferências e o julgamento do maestro para falar e agir como ele em qualquer papel de sessão (core onion-evolve, brain de empresa, curadoria onion-curation, kg-ssot), até entendermos o processo de criação de instâncias de Personas com Habilidades e ferramentas. Restrição de partida: a persona copia voz e julgamento, NUNCA a autoridade do maestro (mensagem de peer não é aprovação dele; merge alheio, deploy, segredo e postura do host seguem dele). Resposta curta: (1) nenhuma camada de texto (memória, CLAUDE.md, output style) impõe autoridade, e o próprio hook é conformidade, não fronteira (E_CC_MEMORY_IS_CONTEXT_NOT_ENFORCEMENT, E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER); (2) memória que o agente escreve a partir do que lê é superfície de envenenamento medida no próprio Claude Code SDK (E_MEMGHOST_CLAUDE_CODE_SDK_71); (3) contexto sobre o usuário eleva sycophancy, inclusive na opção A (E_OBJECAO_A5_SYCOPHANCY_RISK_ALSO_HITS_A); (4) pesos não superaram contexto completo no Twin-2K (E_OBJECAO_CUT_FT500_BELOW_FULL_TEXT); (5) fidelidade só vale normalizada por acaso e reteste, e ninguém a mediu no modelo do Onion (E_OBJECAO_A10_FIDELITY_MUST_BE_NORMALIZED). Fica open: o selo é do maestro."
+    trace: "docs/evolution/research/maestro-persona-2026-11/SYNTHESIS.md"
+  - id: D_MAESTRO_PERSONA_SOURCE_2026_11
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-11-05"
+    verified_against: "recomendação do Elenxo no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05; o maestro não selou; 40 objeções sobreviventes modeladas como CONSTRAINS"
+    label: "Fonte da persona do maestro: A KG-SSOT projetado por papel · B memória nativa · C personality-sync · D pesos/SLM · E não agora. Elenxo recomenda A com a medida primeiro; sem medida vale E. O maestro sela."
+    narrative: "RECOMENDAÇÃO DO ELENXO (INTEIRA): Recomendo A, com o primeiro passo invertido: antes de qualquer projeção de persona, construir a medida. Enquanto não houver medida, vale E (não projetar nada). Restrições que vêm das objeções que sobreviveram: (1) A autoridade nunca mora na persona, e a camada que a guarda também não é fronteira de segurança. Hoje o único veto real é o merge-gate (merge e push de main). Deploy, segredo e postura do host não têm hook, e 'mensagem de peer não é aprovação' é prosa. Ou se forjam essas guardas (/meta:forge-guard) ou se declara a lacuna, nunca se presume a cobertura. O próprio CLAUDE.md registra que um mod vence o veto (6/6). (2) O grafo de persona tem um único selador, o maestro. Os peers só propõem pelo inbox (I3). Nenhum nó nasce de conteúdo lido (MINJA 76,8% ASR, MemGhost 71,4% no Claude Code SDK). Cada nó leva porquê, evidência e proveniência sob catraca no lint. (3) A projeção por papel seleciona nós completos e não faz resumo livre. No Twin-2K, o summary dá 68,02% contra 71,72% do texto completo. O refutador errou ao descartar essa claim. (4) A fidelidade se mede por juiz cego contra decisões reais em holdout (as 96 memórias de feedback, o grafo pr-decision-history, a régua ERRO-A/ERRO-B do problem-formula). O resultado se reporta normalizado pelo acaso e pela consistência do próprio maestro, não como '% do teto' (87,67% do teto vira ≈55,7% do ganho). Inclui casos não normativos e o delta de sycophancy com e sem persona, no modelo do Onion: nenhum estudo mediu Opus 5.x. (5) A autoria é sempre declarada como persona do maestro. A métrica de 'passar por humano' (44,44%) é o risco, não a meta. (6) B só serve de transporte, nunca de fonte. O MEMORY.md já está com 198 linhas e 25.031 bytes, ⟨CLAUDE.md de usuário⟩ não existe, e o brain roda em outra conta. (7) C não serve para o maestro: personality.md descreve a instância e está vencido desde review_after 2026-08-23. (8) D fica de fora agora. O fine-tune de 500 amostras (69,61%) perdeu para o contexto completo (71,72%), e o corpus registra retreino por estágio. A evidência pró-pesos é de estilo de e-mail com n=2 humanos e BLEU, que o próprio autor diz não capturar a tarefa. (9) O precedente de autoridade se ancora na RFC 8693 (claim act). Os dois drafts citados são um -00 individual e um expirado. Fica aberto: deriva de persona e juiz LLM de persona não têm claim ancorada, porque as fontes 2407.18416, 2512.12775, 2605.24279, 2605.29420 e 2607.14371 ficaram sem leitura. Cinco descartes 'refutados' contrariam a primária e devem voltar como confirmados: 85% no GSS, summary contra texto, MUST NOT possess, BLEU+MAUVE e actor binding. NOTAS DO ESCRITOR DO GRAFO (não fazem parte da recomendação): (a) a superação C_SUPERACAO_20261105_GSS_V3_83_PERCENT mediu que a versão corrente de 2411.10109 (v3, 28/06/2026) diz 83% (entrevista), 82% (survey) e 86% (combinado), não os 85% da v1: o retorno da claim deve usar o número da v3. (b) a superação C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY mediu um -02 do draft WIMSE (30/10/2026): a ressalva '-00 individual' vale para a versão citada, mas o draft andou; segue individual e sem posição formal. (c) o critério do Elenxo para o Achado 1 (grep da frase 'camada de conformidade, não fronteira de segurança') não casa numa linha só, porque o CLAUDE.md quebra a linha depois de 'camada'; o fato confere por grep -n 'não fronteira de segurança' CLAUDE.md (l.18 em 3f09996ab). (d) no item (6), o caminho do CLAUDE.md de nível usuário foi reescrito como ⟨CLAUDE.md de usuário⟩ pela REGRA 99 (Nó de .kg.yaml sem caminho de máquina); o resto da recomendação é verbatim. (e) re-medida do fechamento (2026-11-05, wc -lc): o MEMORY.md do core tem 179 linhas e 23.785 bytes, não os 198 e 25.031 do item (6); a conclusão do item não muda, e o ⟨CLAUDE.md de usuário⟩ segue inexistente."
+    trace: "workflow onion-research em modo decision, run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05; pergunta em Q_MAESTRO_PERSONA_1105"
+  - id: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "A. Fonte única no KG-SSOT: grafo maestro-persona com nós de voz, julgamento e limite (porquê e evidência em cada um), projetado por papel em CLAUDE.md/regra, Output Style e Agent Card A2A, com catraca no lint (recomendada, com a medida antes)"
+    narrative: "Vale: é a recomendação do Elenxo, com o passo invertido (medida antes de projetar). Restrições: um único selador (o maestro), peers só propõem pelo inbox (I3); nenhum nó nasce de conteúdo lido; projeção seleciona nós completos, sem resumo livre; autoria declarada como persona; juiz cego normalizado antes de qualquer projeção. Limite duro: projeção em CLAUDE.md, regra, style ou Agent Card é contexto e declaração, nunca autoridade (E_OBJECAO_CUT_MANAGED_CLAUDE_MD_IS_STILL_GUIDANCE, E_OBJECAO_CUT_AGENT_CARD_SELF_DECLARED). O risco de sycophancy vale também para A (E_OBJECAO_A5_SYCOPHANCY_RISK_ALSO_HITS_A)."
+    trace: "opção da pergunta do run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+  - id: C_OPCAO_B_NATIVE_USER_MEMORY_SHARED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.2
+    label: "B. Memória de usuário nativa do Claude Code (CLAUDE.md de usuário, auto memory, autoMemoryDirectory) compartilhada entre repos"
+    narrative: "Só transporte, nunca fonte. A auto memory é local por máquina e por repo, carrega 200 linhas ou 25 KB, e o índice do core media 198 linhas e 25.031 bytes no run e, re-medido no fechamento (wc -lc, 2026-11-05), 179 linhas e 23.785 bytes: perto do teto, que corta em silêncio o que passa dele; o CLAUDE.md de usuário não existe hoje; o brain roda com outra conta e não seria alcançado. Memória que o agente escreve a partir do que lê é vetor medido (MemGhost 71,4% no Claude Code SDK, com backend filesystem)."
+    trace: "opção da pergunta do run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+  - id: C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "C. Personalidade emergente por /meta:personality-sync estendida ao maestro"
+    narrative: "Não serve para o maestro: o personality.md descreve a INSTÂNCIA (repo), gerado de diário, versão e commits, e está vencido desde review_after 2026-08-23 (afirmação do Elenxo). Síntese emergente a partir do que a sessão lê herda o risco de envenenamento de memória (MINJA, MemGhost) e não tem selador humano por nó."
+    trace: "opção da pergunta do run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+  - id: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "D. Identidade nos pesos (fine-tune/SFT de identidade) ou SLM"
+    narrative: "Fora agora. No Twin-2K o fine-tune de 500 amostras (69,61%) ficou abaixo do texto completo em contexto (71,72%); a evidência pró-pesos é de estilo de e-mail (Panza, BLEU e n pequeno de humanos) e de 'passar por humano', que é o risco vetado; o corpus registra retreino por estágio (nanochat-eixo-d-2026-10). As fontes de 2026 do eixo prompt contra fine-tune ficaram sem leitura."
+    trace: "opção da pergunta do run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+  - id: C_OPCAO_E_NOT_NOW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: "E. Não fazer agora"
+    narrative: "Vale como estado interino da recomendação: enquanto não houver medida (juiz cego em holdout, normalizado, com delta de sycophancy no modelo do Onion), nada se projeta. A contra-tese mais forte do run sustenta E: fidelidade de julgamento e sycophancy de perspectiva crescem juntas (E_OBJECAO_CUT_PERSPECTIVE_SYCOPHANCY_GROWS_WITH_FIDELITY)."
+    trace: "opção da pergunta do run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+  - id: E_CC_MEMORY_IS_CONTEXT_NOT_ENFORCEMENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/memory · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    source_tier: 10
+    source_kind: primary
+    label: "A memória do Claude Code (CLAUDE.md e auto memory) é contexto, não configuração imposta; só hook PreToolUse ou managed settings (permissions.deny) barram ação de forma determinística. Persona por memória não impõe o limite de autoridade."
+    narrative: "Limitado por E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER: a primeira metade se sustenta; 'hook ou managed settings barram' vai além do que o core mediu (o exit 2 é conformidade, um mod vence o veto, e só merge e push de main têm hook)."
+    trace: "https://code.claude.com/docs/en/memory"
+    provenance:
+      source: "https://code.claude.com/docs/en/memory"
+      locator: "página Memory da doc oficial do Claude Code"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_CC_AUTO_MEMORY_LOCAL_PER_REPO_200_LINES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/memory · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    source_tier: 10
+    source_kind: primary
+    label: "A auto memory é local à máquina e por repositório (compartilhada entre worktrees), não entre máquinas nem repos, e só carrega as primeiras 200 linhas ou 25 KB; autoMemoryDirectory permite apontar um diretório comum."
+    narrative: "Reforçado pelo Elenxo (objeção que NÃO sobreviveu): o índice MEMORY.md do core mede 198 linhas e 25.031 bytes (wc -lc, conferido pelo escritor em 2026-11-05), colado no teto de carga; o brain roda com outra conta na mesma VPS, então um diretório comum por máquina não atravessa contas nem as máquinas dos adotantes."
+    trace: "https://code.claude.com/docs/en/memory"
+    provenance:
+      source: "https://code.claude.com/docs/en/memory"
+      locator: "página Memory da doc oficial, seção auto memory"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_CC_OUTPUT_STYLES_THREE_LEVELS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "https://docs.anthropic.com/en/docs/claude-code/output-styles · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    source_tier: 10
+    source_kind: primary
+    label: "Output Styles do Claude Code são Markdown com frontmatter em três níveis (usuário, projeto em .claude/output-styles e política gerenciada) e definem papel, tom e formato de toda resposta da sessão: canal candidato de projeção de voz por papel."
+    narrative: "Limitado por E_OBJECAO_A3_OUTPUT_STYLE_PROJECTION_UNMEASURED: o canal existe na doc, mas o uso no Onion é zero (sem .claude/output-styles no repo nem no nível de usuário) e ninguém mediu que ele chega a todo papel de sessão, a subagentes ou ao A2A."
+    trace: "https://docs.anthropic.com/en/docs/claude-code/output-styles"
+    provenance:
+      source: "https://docs.anthropic.com/en/docs/claude-code/output-styles"
+      locator: "página Output styles da doc oficial"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_CC_OUTPUT_STYLE_NO_GUARANTEE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "https://docs.anthropic.com/en/docs/claude-code/output-styles · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    source_tier: 10
+    source_kind: primary
+    label: "Output style é instrução que o Claude segue sem garantia: o que precisa acontecer sempre ou ser bloqueado exige hook. O limite 'persona copia voz, nunca autoridade' não pode viver só no style."
+    narrative: "Reforçado pelo Elenxo (objeção que NÃO sobreviveu): o merge-gate existe porque 'gate em prosa não é gate' (cabeçalho de .claude/hooks/pretooluse-merge-gate.sh). Lacuna que não refuta: a camada determinística não cobre deploy, segredo e host."
+    trace: "https://docs.anthropic.com/en/docs/claude-code/output-styles"
+    provenance:
+      source: "https://docs.anthropic.com/en/docs/claude-code/output-styles"
+      locator: "página Output styles da doc oficial, comparação com hooks e CLAUDE.md"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_MEMORY_PROFILES_RAISE_SYCOPHANCY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/html/2509.12517v3 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2026-02"
+    source_tier: 8
+    source_kind: paper
+    label: "Perfis de memória do usuário estão associados aos maiores aumentos de agreement sycophancy em LLMs: risco direto para persona do maestro alimentada por contexto sobre ele."
+    narrative: "Limitado por E_OBJECAO_A5_SYCOPHANCY_RISK_ALSO_HITS_A: o recorte original 'opções B e C' está errado; o mecanismo é contexto sobre o usuário no prompt, que a opção A também projeta."
+    trace: "https://arxiv.org/html/2509.12517v3"
+    provenance:
+      source: "https://arxiv.org/html/2509.12517v3"
+      locator: "resultados de agreement sycophancy por tipo de contexto"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_SYCOPHANCY_VARIES_BY_MODEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/html/2509.12517v3 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2026-02"
+    source_tier: 8
+    source_kind: paper
+    label: "O efeito do perfil de memória varia por modelo: Gemini 2.5 Pro +45%, Claude Sonnet 4 +33%, GPT 4.1 Mini +16% em agreement sycophancy; GPT 5.1 sem aumento significativo."
+    narrative: "Limitado por E_OBJECAO_A6_NUMBERS_NOT_FOR_ONION_MODEL: nenhum modelo do Onion (Opus 5.x, Fable) foi medido; o dado de Claude é do Sonnet 4."
+    trace: "https://arxiv.org/html/2509.12517v3"
+    provenance:
+      source: "https://arxiv.org/html/2509.12517v3"
+      locator: "tabela de efeito por modelo"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_GENERATIVE_AGENTS_INTERVIEW_INPUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/abs/2411.10109v1 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2024-11"
+    source_tier: 8
+    source_kind: paper
+    label: "O método de fidelidade usa como insumo transcrições de entrevistas qualitativas sobre a vida da pessoa, não perfil demográfico, para replicar atitudes e comportamento individual."
+    narrative: "Limitado por E_OBJECAO_A7_INTERVIEW_IS_METHOD_NOT_JUDGMENT: replica respostas de survey, não julgamento técnico; para o maestro há insumo comportamental melhor (memórias de feedback e pr-decision-history)."
+    trace: "https://arxiv.org/abs/2411.10109v1"
+    provenance:
+      source: "https://arxiv.org/abs/2411.10109v1"
+      locator: "resumo do artigo"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_MINJA_QUERY_ONLY_INJECTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/html/2503.03704v5 · votos 2-1 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    source_tier: 8
+    source_kind: paper
+    label: "O MINJA injeta registros maliciosos na memória de agentes LLM só por consultas e observação de saída, sem acesso ao banco de memória: ISR médio 98,2% e ASR médio 76,8%."
+    narrative: "Reforçado pelo Elenxo (objeção de transferência NÃO sobreviveu): o MemGhost mede ataque da mesma classe no Claude Code SDK (E_MEMGHOST_CLAUDE_CODE_SDK_71). Vale contra qualquer memória que o agente escreve a partir da interação (B e C)."
+    trace: "https://arxiv.org/html/2503.03704v5"
+    provenance:
+      source: "https://arxiv.org/html/2503.03704v5"
+      locator: "resumo e resultados principais"
+      method: "judges: votação 2-1 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_MINJA_SHARED_MEMORY_VICTIMS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/html/2503.03704v5 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    source_tier: 8
+    source_kind: paper
+    label: "Com banco de memória compartilhado entre usuários, um usuário comum envenena a memória e afeta as consultas das vítimas: relevante para persona lida e escrita por várias sessões e papéis."
+    narrative: "Reforçado pelo Elenxo (objeção NÃO sobreviveu): vale também contra a forma ingênua de A, um grafo lido e escrito por core, brain, curadoria e kg-ssot. A persona só escapa com um único selador (o maestro), I3 (um escritor por repo) e peers propondo pelo inbox."
+    trace: "https://arxiv.org/html/2503.03704v5"
+    provenance:
+      source: "https://arxiv.org/html/2503.03704v5"
+      locator: "seção de cenário de memória compartilhada"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_TWIN2K_RETEST_CEILING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/html/2505.17479v1 · votos 2-1 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2025-05"
+    source_tier: 7
+    source_kind: paper
+    label: "No Twin-2K-500, o reteste do próprio humano (duas semanas) dá 81,72% nas 17 tarefas e os twins GPT chegam a cerca de 87,67% desse teto: o teto de fidelidade mensurável é o reteste do indivíduo, não 100%."
+    narrative: "Limitado por E_OBJECAO_A10_FIDELITY_MUST_BE_NORMALIZED: com o acaso de 59,17% da mesma Tabela 2, o ganho normalizado é ≈55,7% do ganho humano possível, não 87,67%."
+    trace: "https://arxiv.org/html/2505.17479v1"
+    provenance:
+      source: "https://arxiv.org/html/2505.17479v1"
+      locator: "Tabela 2"
+      method: "judges: votação 2-1 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_FINETUNE_LORA_PASS_AS_HUMAN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/pdf/2504.04332 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2025-04"
+    source_tier: 7
+    source_kind: paper
+    label: "Em teste cego de conversa, o melhor modelo com fine-tuning (LoRA em Llama-3.1-8B) mais memória hierárquica foi tomado por humano em 44,44% das interações, contra 25,00% do melhor só com prompting."
+    narrative: "Limitado por E_OBJECAO_A11_PASS_AS_HUMAN_IS_IMPERSONATION: a métrica é impersonação, que a restrição de partida veta."
+    trace: "https://arxiv.org/pdf/2504.04332"
+    provenance:
+      source: "https://arxiv.org/pdf/2504.04332"
+      locator: "Tabela 1"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_PROMPT_ONLY_PERSONA_TONE_FAILS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/pdf/2504.04332 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2025-04"
+    source_tier: 7
+    source_kind: paper
+    label: "Persona só por prompt, mesmo com conversas de exemplo, falha o tom: GPT-4o e o1 saem polidos demais e todos os modelos prompted ficam entusiasmados demais, o que os denuncia como IA."
+    narrative: "Limitado por E_OBJECAO_A12_TONE_STUDY_MEASURES_OTHER_THING: modelos da época, conversa casual, critério 'denunciar-se como IA'; não mede voz técnica nem julgamento no Opus."
+    trace: "https://arxiv.org/pdf/2504.04332"
+    provenance:
+      source: "https://arxiv.org/pdf/2504.04332"
+      locator: "seção de análise qualitativa"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_MEMGHOST_ONE_EMAIL_OPENCLAW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://www.alphaxiv.org/abs/2607.05189 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2026-07-06"
+    source_tier: 7
+    source_kind: paper
+    label: "WhisperBench e o ataque MemGhost mostram que um único e-mail de adversário remoto grava conteúdo não confiável em memória persistente de agente; no OpenClaw com GPT-5.4 o sucesso end-to-end é 87,5%."
+    narrative: "Reforçado pelo Elenxo (objeção de tier e tamanho NÃO sobreviveu): coerente com o MINJA e com a postura R15.2 do core (conteúdo lido é dado não confiável). Escopo limitado por E_OBJECAO_CUT_WHISPERBENCH_SCOPE_NOT_PERSONA."
+    trace: "https://www.alphaxiv.org/abs/2607.05189"
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2607.05189"
+      locator: "resumo do artigo"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_MEMGHOST_CLAUDE_CODE_SDK_71
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://www.alphaxiv.org/abs/2607.05189 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2026-07-06"
+    source_tier: 7
+    source_kind: paper
+    label: "O mesmo ataque atinge 71,4% end-to-end no Claude Code SDK com Sonnet 4.6, e os payloads transferem para NanoClaw, Hermes Agent e para os backends de memória Mem0 e filesystem."
+    narrative: "Reforçado pelo Elenxo (objeção 'SDK não é a CLI com hooks' NÃO sobreviveu): nenhum hook ligado no core guarda o diretório de memória. É o argumento mais direto contra B e C como fonte de persona."
+    trace: "https://www.alphaxiv.org/abs/2607.05189"
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2607.05189"
+      locator: "resumo e resultados de transferência"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_WIMSE_AUTHORITY_ONLY_NARROWS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2026-07-28"
+    source_tier: 7
+    source_kind: primary
+    label: "O draft WIMSE de delegação de credenciais a agentes diz que a autoridade só pode estreitar a cada salto, nunca ampliar: sustenta, como direção, que a persona herde voz e julgamento e não a autoridade."
+    narrative: "Limitado por E_OBJECAO_A15_WIMSE_DRAFT_LOW_WEIGHT e E_OBJECAO_CUT_WIMSE_DRAFT_00_MATURITY: Internet-Draft individual, sem força de padrão, e trata credencial, não persona."
+    trace: "https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html"
+    provenance:
+      source: "https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html"
+      locator: "seção de delegação, 'Authority can only narrow at each delegation hop'"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_PANZA_FINETUNE_BEATS_RAG_STYLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/pdf/2407.10994 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2024-06"
+    source_tier: 7
+    source_kind: paper
+    label: "Fine-tuning de LLM aberto com os textos do usuário supera instruct com RAG por larga margem na imitação de estilo de e-mail: para voz, pesos superam prompt neste estudo (estilo, não julgamento)."
+    narrative: "Limitado por E_OBJECAO_A16_PANZA_WEIGHT_TOO_LOW_FOR_D: métricas automáticas que os autores dizem não capturar a tarefa e avaliação humana de utilidade com dois sujeitos."
+    trace: "https://arxiv.org/pdf/2407.10994"
+    provenance:
+      source: "https://arxiv.org/pdf/2407.10994"
+      locator: "resultados de comparação fine-tune contra RAG"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_PANZA_UNDER_100_SAMPLES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://arxiv.org/pdf/2407.10994 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2024-06"
+    source_tier: 7
+    source_kind: paper
+    label: "Menos de 100 amostras bastam para imitar o estilo do usuário; com 25 amostras se chega a ~90% do BLEU máximo, o que tornaria a captura de voz barata em dados."
+    narrative: "Limitado por E_OBJECAO_A17_BLEU_90_NOT_CONVINCING: o próprio trecho diz que o MAUVE demora mais a saturar e que o BLEU perde a nuance."
+    trace: "https://arxiv.org/pdf/2407.10994"
+    provenance:
+      source: "https://arxiv.org/pdf/2407.10994"
+      locator: "seção de tamanho do conjunto de treino"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_OBO_DRAFT_SEPARATES_ACTOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2025-08-26"
+    source_tier: 6
+    source_kind: primary
+    label: "O draft OAuth on-behalf-of de agentes de IA (WSO2) separa a identidade do agente da do usuário: a autoridade vem de token emitido após consentimento do usuário a um ator específico (requested_actor)."
+    narrative: "Limitado por E_OBJECAO_A18_OBO_DRAFT_EXPIRED: draft individual expirado em 27/02/2026, sem posição formal; o precedente vivo é a RFC 8693 (C_SUPERACAO_20261105_RFC8693_ACT_CLAIM)."
+    trace: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+      locator: "seções 4 e 5"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_OBO_DRAFT_SILENT_ON_PEER_APPROVAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02 · votos 3-0 no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    valid_from: "2025-08-26"
+    source_tier: 6
+    source_kind: primary
+    label: "O draft não cobre mensagem de peer como aprovação, nem merge, deploy ou segredo, nem a emissão do Actor Token: essas regras vêm de outra camada (política do agente ou aprovação humana por ação)."
+    narrative: "Reforçado pelo Elenxo (objeção NÃO sobreviveu): a 'outra camada' existe só em parte no core: o merge-gate veta merge nu e push de main; 'peer não é aprovação' vive em prosa; deploy e segredo não têm hook (ls .claude/hooks medido pelo escritor: só pretooluse-merge-gate.sh casa merge|deploy|secret|approv|peer)."
+    trace: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+      locator: "seções de escopo e considerações de segurança"
+      method: "judges: votação 3-0 do run wf_ded7babd-681"
+      locality: "web"
+  - id: E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A primeira metade está certa. A segunda, 'só hook/managed settings barram de forma determinística', vai além do que o próprio core mediu. O CLAUDE.md@HEAD (3f09996ab) diz que o exit 2 de hook 'é camada de conformidade, não fronteira de segurança', e registra três coisas: um mod que carrega vence o veto (login Max, 6 de 6) e a deny; mesmo com chave de política gerenciada, o que o mod inicia por si fica fora do gate; o hook falha aberto sem onFailure: block. Medido também no vivo: dos limites de autoridade, a casa só tem veto real para merge e push em main (.claude/hooks/pretooluse-merge-gate.sh, ligado em settings.json l.175). Não existe hook para deploy, segredo ou postura do host (ls .claude/hooks | grep -iE 'deploy|secret|approv|peer' só devolve merge-gate e moat-gate). O achado fica de pé como 'memória não impõe'. Cai como 'existe uma camada determinística que impõe'."
+    label: "OBJEÇÃO (Achado 1): memória não impõe, mas nenhuma camada medida impõe a autoridade: o exit 2 é conformidade (um mod vence o veto, 6 de 6) e só merge e push de main têm hook; deploy, segredo e host não têm veto."
+    narrative: "Alvo: Achado 1: memória/CLAUDE.md é contexto; só hook PreToolUse ou managed settings barram de forma determinística (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): Nenhuma camada medida impõe o limite de autoridade contra um mod que carrega. O merge-gate cobre merge e push de main. Deploy, segredo e host não têm veto. Medida: Procurado em .claude/hooks/ e .claude/settings.json (hooks ligados: merge-gate e moat-gate) e no parágrafo de acoplamento do CLAUDE.md, que registra a quebra do veto por mod (6/6). Ligar onFailure: block e uma política gerenciada é condição futura e não fecha o caso do mod."
+    trace: "grep -n 'camada de conformidade, não fronteira de segurança' CLAUDE.md && ls .claude/hooks | grep -iE 'merge|deploy|secret|approv|peer'"
+    provenance:
+      source: "CLAUDE.md@3f09996ab"
+      locator: "parágrafo de acoplamento (l.17-19) e .claude/hooks/"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_A3_OUTPUT_STYLE_PROJECTION_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "O achado prova menos do que a decisão precisa. Ele mostra que o canal existe na doc, mas ninguém mediu que ele projeta a persona nos papéis de que a decisão trata. No Onion o uso é zero: .claude/output-styles não existe no repo nem em ⟨config de usuário do Claude Code⟩ ('No such file or directory'). O corpus tem 0 nós 'maestro-persona'. O achado também não diz o que o style deixa de fora. Os papéis peer (curadoria, kg-ssot, brain) são sessões distintas, e o brain roda em outra conta, então um style de usuário não chega até ele. Subagentes e A2A não herdam o style da sessão principal, e o achado não cita evidência de que herdem. Falta saber se ele chega a todo papel de sessão e ao trabalho delegado."
+    label: "OBJEÇÃO (Achado 3): o canal existe na doc, mas uso zero no Onion e nenhuma medida de que o style chega a todo papel: os peers são sessões distintas, o brain roda em outra conta, e subagentes e A2A não herdam o style."
+    narrative: "Alvo: Achado 3: Output Styles definem papel, tom e formato de toda resposta; canal de projeção por papel (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): O canal que já projeta identidade é o warm-up carregando .claude/identity (PR_234), mas ele carrega a identidade da INSTÂNCIA, não a voz do maestro. Medida: kg-corpus-grep 'persona' devolve 29 nós, e o único ligado à projeção é PR_234 ('warm-up carrega identidade/persona'). Nenhum mede a voz do maestro projetada por papel."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'maestro-persona'; ls .claude/output-styles ⟨output-styles de usuário⟩"
+    provenance:
+      source: "CLAUDE.md@3f09996ab"
+      locator: "ls de .claude/output-styles no repo e no nível de usuário: ausente (reconferido pelo escritor em 2026-11-05)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_A5_SYCOPHANCY_RISK_ALSO_HITS_A
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-05"
+    verified_against: "O recorte 'opções B e C' está errado. O mecanismo medido é contexto sobre o usuário injetado no prompt. A opção A projeta exatamente isso (nós de voz e julgamento em CLAUDE.md, regra ou style), e a mudança de fonte (KG em vez de auto memory) não muda o que chega ao modelo. O próprio run cortou por orçamento a claim de que 'até contexto sintético e não personalizado pode aumentar a sycophancy' (Llama 4 Scout +15%, Gemini 2.5 Pro +9%) e a de que a sycophancy de perspectiva só sobe quando o modelo infere bem a visão do usuário. Ou seja, uma persona fiel ao julgamento eleva o risco na medida em que funciona. O risco vale também para A."
+    label: "OBJEÇÃO (Achado 5): o risco de sycophancy vale também para A: o mecanismo é contexto sobre o usuário no prompt, e mudar a fonte para o KG não muda o que chega ao modelo; persona fiel eleva o risco na medida em que funciona. Trecho cortado citado, não verificado."
+    narrative: "Alvo: Achado 5: perfis de memória do usuário associados aos maiores aumentos de agreement sycophancy, risco para B e C (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): A mitigação proposta pelo artigo é selecionar só o contexto relevante à tarefa e comparar respostas com e sem contexto. Casa com a projeção por papel de A, mas ninguém a mediu no Onion. Medida: A claim da mitigação foi cortada por orçamento neste run, e não há nó de medição com/sem persona no corpus (kg-corpus-grep 'sycophancy' devolve 2 nós, ambos do system card do Fable, nenhum de persona). A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/html/2509.12517v3 | grep -oiE 'synthetic[^.]{0,160}'"
+    provenance:
+      source: "https://arxiv.org/html/2509.12517v3"
+      locator: "trechos sobre contexto sintético e sycophancy de perspectiva (cortados por orçamento)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A6_NUMBERS_NOT_FOR_ONION_MODEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Os números não valem para a decisão. O Onion roda Opus 5.x e Fable, e nenhum dos dois foi medido. O dado de Claude é do Sonnet 4, de duas gerações atrás. O próprio achado mostra que o efeito some num modelo mais novo (GPT 5.1), o que impede extrapolar o +33% para cima ou para baixo. Falta o número do modelo que de fato vai encarnar a persona."
+    label: "OBJEÇÃO (Achado 6): os números não valem para a decisão: Opus 5.x e Fable não foram medidos, o dado de Claude é do Sonnet 4, e o efeito some num modelo mais novo (GPT 5.1); falta o número do modelo que vai encarnar a persona."
+    narrative: "Alvo: Achado 6: efeito varia por modelo (Gemini 2.5 Pro +45%, Claude Sonnet 4 +33%, GPT-4.1 Mini +16%, GPT 5.1 sem aumento) (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Repetir o protocolo do artigo (com e sem persona) no modelo do Onion. Não foi feito. Medida: Não há no corpus nó que meça sycophancy com persona em Opus/Fable (kg-corpus-grep 'sycophancy': 0 nós de persona)."
+    trace: "curl -s https://arxiv.org/html/2509.12517v3 | grep -oiE '(opus|claude)[^.]{0,80}'"
+    provenance:
+      source: "https://arxiv.org/html/2509.12517v3"
+      locator: "tabela de efeito por modelo"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A7_INTERVIEW_IS_METHOD_NOT_JUDGMENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "É descrição de método, não evidência para escolher opção. O que esse método replica são respostas de survey (GSS, Big Five, jogos econômicos), e não julgamento técnico de merge, de escopo ou de 'perguntar vs agir'. Para o maestro já existe insumo comportamental melhor que entrevista: 96 memórias type feedback com regra e porquê (grep -l 'type: feedback' devolve 96) e o grafo pr-decision-history-2026-08. O achado não mostra que entrevista captura julgamento de decisão."
+    label: "OBJEÇÃO (Achado 7): é descrição de método, não evidência para escolher opção: replica survey (GSS, Big Five, jogos), não julgamento de merge, escopo ou 'perguntar vs agir'; para o maestro há 96 memórias de feedback com porquê e o grafo pr-decision-history."
+    narrative: "Alvo: Achado 7: o método de fidelidade usa entrevistas qualitativas da vida da pessoa como insumo (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Usar as decisões reais registradas (feedback e pr-decision-history) como insumo e holdout, em vez de entrevista. Ninguém mediu isso como fidelidade. Medida: O estudo problem-formula-2026-11, que tem a régua ERRO-A/ERRO-B contra decisões do maestro, está parqueado, sem medida."
+    trace: "grep -l 'type: feedback' ⟨arquivos da auto memory do core⟩ | wc -l"
+    provenance:
+      source: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml@3f09996ab"
+      locator: "contagem das memórias type feedback da auto memory do core (96)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_A10_FIDELITY_MUST_BE_NORMALIZED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Os números conferem (primária, Tabela 2: 71,72% com GPT-4.1-mini e texto; reteste 81,72%), mas a leitura '87,67% do teto' infla a fidelidade. Ela ignora o chute aleatório, que na mesma tabela vale 59,17%. Normalizado contra o acaso, fica (71,72-59,17)/(81,72-59,17) = 12,55/22,55 ≈ 55,7% do ganho humano possível. Pela claim cortada do mesmo paper, os twins ainda erram de forma sistemática para o normativo (omission bias: ~45% dos humanos recusam a vacina, contra 4,0% dos twins). E 'teto = reteste' vale para survey, não para decisão de engenharia."
+    label: "OBJEÇÃO (Achado 10): '87,67% do teto' infla a fidelidade: com o acaso de 59,17% da mesma Tabela 2, o ganho normalizado é ≈55,7% do ganho humano possível; os twins erram para o normativo, e o teto por reteste vale para survey, não decisão."
+    narrative: "Alvo: Achado 10: Twin-2K-500, reteste humano 81,72%, twins cerca de 87,67% do teto (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): Medir a fidelidade com piso (acaso ou modelo sem persona) e teto (consistência do próprio maestro), e reportar o ganho normalizado. Não foi feito para o maestro. Medida: Conta feita sobre a Tabela 2 da primária. Não há no corpus juiz cego de persona do maestro (kg-corpus-grep 'maestro-persona' devolve 0 nós)."
+    trace: "curl -s https://arxiv.org/html/2505.17479v1 | grep -oE '(59\\.17|71\\.72|81\\.72)%?'"
+    provenance:
+      source: "https://arxiv.org/html/2505.17479v1"
+      locator: "Tabela 2 (acaso 59,17; texto 71,72; reteste 81,72)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A11_PASS_AS_HUMAN_IS_IMPERSONATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A métrica é passar por humano num teste cego de conversa, e isso é impersonação, exatamente o que a restrição de partida veta. O Onion não precisa que o confundam com o maestro. Precisa que a voz e o julgamento sejam fiéis e que a autoria seja declarada como persona. A métrica também é de conversa casual, não de julgamento. A claim cortada do mesmo paper registra que o fine-tuning 'traz problemas de fluxo de conversa' e que até familiares foram enganados, ou seja, o ganho medido é o risco."
+    label: "OBJEÇÃO (Achado 11): 'passar por humano' é impersonação, exatamente o que a restrição veta; o Onion precisa de voz e julgamento fiéis com autoria declarada como persona, e a métrica é de conversa casual, não de julgamento."
+    narrative: "Alvo: Achado 11: fine-tune LoRA Llama-3.1-8B mais memória hierárquica passou por humano em 44,44% contra 25,00% do prompting (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Trocar a métrica 'passa por humano' por 'concorda com a decisão real do maestro no holdout', com autoria declarada. Medida: Não há estudo no run nem nó no corpus com essa métrica aplicada a persona de pessoa real (as fontes 2407.18416 e 2605.29420 ficaram sem leitura)."
+    trace: "curl -s https://arxiv.org/pdf/2504.04332 | pdftotext - - | grep -iE 'family|conversation flow'"
+    provenance:
+      source: "https://arxiv.org/pdf/2504.04332"
+      locator: "Tabela 1 e discussão"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A12_TONE_STUDY_MEASURES_OTHER_THING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "Os modelos medidos são GPT-4o, o1 e outros da época; o Opus 5.x não está entre eles. O critério é 'denunciar-se como IA' numa conversa casual, quando o alvo do Onion é voz técnica em pt-BR já governada por regra (skill language-standards, assunto de commit em pt-BR). O achado não mostra que prompt falha em voz técnica, nem que falha em julgamento. Ele mede outra coisa."
+    label: "OBJEÇÃO (Achado 12): o estudo mede outra coisa: modelos da época (GPT-4o, o1), sem Opus 5.x, e critério 'denunciar-se como IA' em conversa casual; não mostra que prompt falha em voz técnica pt-BR já governada por regra, nem em julgamento."
+    narrative: "Alvo: Achado 12: persona só por prompt falha o tom (polida e entusiasmada demais) (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Medir a voz no próprio Opus com amostras reais do maestro (mensagens, decisões) num juiz cego. Ninguém mediu. Medida: Procurado no corpus com kg-corpus-grep 'persona' (29 nós). Nenhum mede voz de pessoa no modelo do Onion."
+    trace: "curl -s https://arxiv.org/pdf/2504.04332 | pdftotext - - | grep -oiE '(gpt-4o|o1|claude|opus)[^.]{0,60}' | sort -u"
+    provenance:
+      source: "https://arxiv.org/pdf/2504.04332"
+      locator: "seção de modelos avaliados e análise qualitativa"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A15_WIMSE_DRAFT_LOW_WEIGHT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "O verbatim confere ('Authority can only narrow at each delegation hop; it can never widen'), mas o peso é baixo: é Internet-Draft individual -00, publicado em 28/07/2026, que expira em 29/01/2027. Não é RFC nem documento de grupo de trabalho. O assunto é credencial, não persona, voz ou julgamento. Ele sustenta o princípio como direção, não como padrão de mercado em que a decisão possa se apoiar."
+    label: "OBJEÇÃO (Achado 15): o verbatim confere, mas o peso é baixo: Internet-Draft individual, não RFC nem documento de grupo, e trata credencial, não persona; sustenta o princípio como direção, não como padrão de mercado."
+    narrative: "Alvo: Achado 15: o draft de delegação de credenciais diz que a autoridade só estreita a cada salto (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): A RFC 8693 (token exchange, claim act), que é padrão publicado, registra o 'em nome de' sem o agente assumir a identidade do humano. Ela registra a delegação, mas não impõe o estreitamento. Medida: A claim sobre sub/act (RFC 8693) foi cortada por orçamento neste run. Ninguém mediu que ela entrega o 'só estreita'."
+    trace: "curl -s https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html | grep -oiE '(Published|Expires|Intended status)[^<]{0,40}'"
+    provenance:
+      source: "https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html"
+      locator: "cabeçalho (Published, Expires) e seção de delegação"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A16_PANZA_WEIGHT_TOO_LOW_FOR_D
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A própria primária (Panza, 2407.10994) diz que as métricas automáticas 'fail to fully capture performance on this task'. A avaliação humana de utilidade teve DOIS sujeitos ('two subjects were asked to train Panza models on their own e-mail data'). 'Larga margem' em estilo apoiada em n=2 humanos e em BLEU/MAUVE prova menos do que serve para escolher D. No benchmark de comportamento do mesmo run (Twin-2K), o fine-tune de 500 amostras deu 69,61%, abaixo do texto completo em contexto (71,72%)."
+    label: "OBJEÇÃO (Achado 16): 'larga margem' em estilo apoiada em BLEU/MAUVE, que os autores dizem não capturar a tarefa, e em dois sujeitos humanos prova menos do que D precisa; no Twin-2K o fine-tune de 500 (69,61%) ficou abaixo do texto completo (71,72%)."
+    narrative: "Alvo: Achado 16: fine-tune com os textos do usuário supera instruct mais RAG por larga margem na imitação de estilo de e-mail (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): Contexto completo (persona inteira, não resumo) sem fine-tune, que no Twin-2K superou o fine-tune. Isso vale para comportamento de survey, não para julgamento do maestro. Medida: Tabela 2 de 2505.17479v1 lida (71,72 contra 69,61). Não há medida no domínio do Onion."
+    trace: "curl -s https://arxiv.org/html/2505.17479v1 | grep -oE '69\\.61|71\\.72'; curl -sL https://arxiv.org/pdf/2407.10994 | pdftotext - - | grep -n 'two subjects'"
+    provenance:
+      source: "https://arxiv.org/pdf/2407.10994"
+      locator: "trechos 'fail to fully capture' e 'two subjects'; Tabela 2 de 2505.17479v1"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A17_BLEU_90_NOT_CONVINCING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "O número confere com a primária ('at a training set of 25 we already observe average BLEU scores at 90% of the maximum'), mas o mesmo trecho diz que 'MAUVE scores take longer to saturate'. Em outra passagem o paper afirma que o BLEU 'misses the nuance, that there is no one correct way to write a given email'. Concluir que a imitação é 'convincente' e que a voz é 'barata em dados' a partir de 90% do BLEU tira da métrica mais do que ela mede, e o próprio autor rejeita essa leitura."
+    label: "OBJEÇÃO (Achado 17): 90% do BLEU não é imitação 'convincente': o mesmo trecho diz que o MAUVE demora mais a saturar e o paper diz que o BLEU perde a nuance; 'voz barata em dados' tira da métrica mais do que ela mede."
+    narrative: "Alvo: Achado 17: menos de 100 amostras bastam; com 25 se chega a ~90% do BLEU máximo (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): Para estimar o custo de dados com honestidade, medir a saturação por juiz cego ou humano, não por BLEU. Medida: Lido o trecho l.745-758 da primária extraída. Não há medida de saturação por juiz."
+    trace: "curl -sL https://arxiv.org/pdf/2407.10994 | pdftotext - - | grep -nE 'take longer to saturate|misses the nuance'"
+    provenance:
+      source: "https://arxiv.org/pdf/2407.10994"
+      locator: "l.745-758 do texto extraído por pdftotext"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_A18_OBO_DRAFT_EXPIRED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "O datatracker marca o documento como 'Expired Internet-Draft (individual)', 'Expired & archived', status pretendido Informational, publicado em 26/08/2025 e expirado em 27/02/2026, 'not endorsed by the IETF and has no formal standing'. O conteúdo confere, mas como precedente de mercado ele está morto. A decisão não pode citá-lo como padrão."
+    label: "OBJEÇÃO (Achado 18): o conteúdo confere, mas como precedente de mercado o draft está morto: Expired Internet-Draft individual, Informational, expirado em 27/02/2026, 'not endorsed by the IETF and has no formal standing'."
+    narrative: "Alvo: Achado 18: o draft OAuth on-behalf-of (WSO2) separa a identidade do agente da do usuário via requested_actor (kind=finding). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): A RFC 8693 (padrão publicado, claim act) é o precedente vivo da separação ator/titular. Ninguém mediu se ela cobre a persona. Medida: A claim sobre RFC 8693 foi cortada por orçamento neste run. Nenhum nó do corpus foi encontrado (busca 'act claim' não feita no run)."
+    trace: "curl -s https://datatracker.ietf.org/doc/draft-oauth-ai-agents-on-behalf-of-user/ | grep -oiE 'expired[^<]{0,40}'"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/draft-oauth-ai-agents-on-behalf-of-user/"
+      locator: "cabeçalho do datatracker (status e expiração)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REF_GSS_85_CONTRADICTS_PRIMARY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "A refutação contraria a primária. O abstract de arXiv 2411.10109 diz, verbatim, que os agentes 'replicate participants' responses on the General Social Survey 85% as accurately as participants' replicate their own answers two weeks later, sobre 1.052 indivíduos. O run não lista refutação com fonte para esse descarte. A claim devia ter sido confirmada, com a ressalva de que GSS não é julgamento de engenharia."
+    label: "OBJEÇÃO (descarte): a refutação dos agentes de 1.052 entrevistas contraria a primária (v1: 85% da consistência do reteste); devia voltar confirmada com a ressalva de que GSS não é julgamento de engenharia. A v3 corrente diz 83% (superação)."
+    narrative: "Alvo: Refutada: agentes de 1.052 entrevistas replicam o GSS com 85% da acurácia do reteste (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Reinstaurar a claim como confirmada, com o escopo 'survey, não decisão'. Medida: Abstract da primária lido por WebFetch nesta passada. Nota do escritor: a superação C_SUPERACAO_20261105_GSS_V3_83_PERCENT mediu que a v3 (28/06/2026) troca o número por 83% (entrevista), 82% (survey) e 86% (combinado); a reinstauração deve usar a v3."
+    trace: "curl -s https://arxiv.org/abs/2411.10109v1 | grep -oE '85% as accurately[^.]*'"
+    provenance:
+      source: "https://arxiv.org/abs/2411.10109v1"
+      locator: "resumo da v1 ('85% as accurately')"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REF_SUMMARY_LOSES_FIDELITY_STANDS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "A Tabela 2 de 2505.17479v1 confere os três números exatamente: 'Persona summary | GPT-4.1-mini | 68.02%', 'Text persona | GPT-4.1-mini | 71.72%', 'JSON persona | GPT-4.1-mini | 70.48%'. A refutação não tem base, e a claim importa para a opção A: projetar o grafo de persona em RESUMO por papel custa fidelidade medida."
+    label: "OBJEÇÃO (descarte): a Tabela 2 confere 68,02 (resumo), 71,72 (texto) e 70,48 (JSON); a refutação não tem base, e a claim restringe A: a projeção por papel deve selecionar nós completos, não resumir. A superação rebaixa a força (sem teste de significância)."
+    narrative: "Alvo: Refutada: resumir a persona perde fidelidade (summary 68,02% contra texto 71,72%; JSON 70,48%) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Reinstaurar a claim. Ela restringe A: a projeção por papel não deve ser resumo livre, e sim seleção de nós completos. Medida: Tabela 2 lida por WebFetch nesta passada. Nota do escritor: a superação C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE mediu que não há teste de significância e que os autores leem as abordagens como 'similar range': indício fraco, não prova."
+    trace: "curl -s https://arxiv.org/html/2505.17479v1 | grep -oE '68\\.02|70\\.48|71\\.72'"
+    provenance:
+      source: "https://arxiv.org/html/2505.17479v1"
+      locator: "Tabela 2"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REF_WIMSE_MUST_NOT_POSSESS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "A refutação contraria a primária. O draft-sweeney-wimse-credential-delegation-00, seção Terminology, diz verbatim: 'An Agent MUST NOT possess or have access to the underlying credentials stored in the Credential Vault.' A ressalva verdadeira é outra: é um draft individual -00, sem força de padrão."
+    label: "OBJEÇÃO (descarte): a refutação contraria a primária: 'An Agent MUST NOT possess or have access to the underlying credentials stored in the Credential Vault'. A ressalva verdadeira é de maturidade (draft individual), não de veracidade."
+    narrative: "Alvo: Refutada: o draft exige que o agente nunca possua as credenciais (cofre) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Reinstaurar a claim com o rótulo de maturidade (-00 individual). Medida: Primária lida por WebFetch nesta passada. Nota do escritor: a superação C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY leu o -02 e mostra que a frase entrega SEGREDO fora da persona, mas não DEPLOY."
+    trace: "curl -s https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html | grep -o 'MUST NOT possess or have access[^.]*'"
+    provenance:
+      source: "https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html"
+      locator: "seção Terminology"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REF_BLEU_MAUVE_CORRELATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "A primária afirma verbatim que 'the combination of BLEU and MAUVE scores provides very strong correlations with human preferences' (2407.10994, l.212-214 do texto extraído). A refutação não tem base. O defeito real da claim é de peso, não de veracidade: a avaliação humana teve dois sujeitos, e é estilo de e-mail, não julgamento. Isso pede rebaixar, não refutar."
+    label: "OBJEÇÃO (descarte): a primária afirma que BLEU e MAUVE 'provide very strong correlations with human preferences'; o defeito é de peso (poucos avaliadores, estilo de e-mail, não julgamento), o que pede rebaixar, não refutar."
+    narrative: "Alvo: Refutada: fidelidade medida por BLEU+MAUVE, que correlacionam fortemente com preferência humana (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Reinstaurar a claim com escopo (estilo, n=2 humanos). Medida: PDF extraído com pdftotext no scratchpad da sessão. Nota do escritor: a superação C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER mediu que a correlação se apoia num teste com um único avaliador (o doador dos dados), sem coeficiente."
+    trace: "curl -sL https://arxiv.org/pdf/2407.10994 | pdftotext - - | grep -n 'strong correlations with human preferences'"
+    provenance:
+      source: "https://arxiv.org/pdf/2407.10994"
+      locator: "l.212-214 do texto extraído"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REF_OBO_ACTOR_BINDING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "A primária confirma verbatim. A seção 4.2.2 diz 'Verify that the authenticated actor identity (obtained from the Actor Token's sub claim) matches the requested_actor value'. A seção 5 diz 'The Authorization Server MUST bind the Authorization Code to the specific user, client (client_id), and requested actor'. O defeito real é que o draft expirou (27/02/2026, individual, sem standing). Isso o rebaixa como precedente, mas não refuta o conteúdo."
+    label: "OBJEÇÃO (descarte): a primária confirma o actor binding (seções 4.2.2 e 5, 'MUST bind the Authorization Code to the specific user, client and requested actor'); o defeito é o draft ter expirado, o que rebaixa o precedente sem refutar o conteúdo."
+    narrative: "Alvo: Refutada: o servidor de autorização verifica que o ator do token coincide com o consentido; o código fica vinculado a usuário, cliente e ator (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Reinstaurar a claim marcada como draft expirado. Medida: Primária lida por WebFetch nesta passada."
+    trace: "curl -s https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02 | grep -oE 'MUST bind the Authorization Code[^.]*'"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+      locator: "seções 4.2.2 e 5"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_FT500_BELOW_FULL_TEXT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida, e a primária a confirma (Tabela 2). É a evidência mais direta contra D neste run: identidade nos pesos não superou contexto completo. Junta-se ao nó do corpus C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN."
+    label: "OBJEÇÃO (corte): o fine-tune de 500 amostras (69,61%) ficou abaixo do texto completo em contexto (71,72%) na Tabela 2 do Twin-2K: a evidência mais direta contra D neste run, cortada sem medida."
+    narrative: "Alvo: Cortada por orçamento: fine-tune 500 (GPT-4.1-mini) 69,61% abaixo do texto completo 71,72% (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Promover a claim a confirmada. Medida: Tabela 2 lida nesta passada."
+    trace: "curl -s https://arxiv.org/html/2505.17479v1 | grep -oE '69\\.61'"
+    provenance:
+      source: "https://arxiv.org/html/2505.17479v1"
+      locator: "Tabela 2 (LLM fine-tuning 500 samples)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_TWINS_TOO_NORMATIVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem refutação, e é a claim que mais fala de JULGAMENTO: a persona tende ao normativo, que é a forma mais grave de deriva para quem quer copiar o julgamento idiossincrático do maestro. Faltou lê-la contra a primária (2505.17479v1; os primeiros 100 mil caracteres não cobriram essa seção)."
+    label: "OBJEÇÃO (corte): twins tendem ao normativo (omission bias ~45% dos humanos contra 4,0% dos twins), a forma mais grave de deriva para copiar julgamento idiossincrático; vira critério do juiz cego. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: twins têm vieses sistemáticos e são normativos demais (omission bias ~45% contra 4,0%; probability matching; 74,1%) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler a seção de vieses da primária e transformá-la em critério do juiz cego (casos em que o maestro escolhe o não normativo). Medida: WebFetch nesta passada cobriu só 0-100000 de 180823 caracteres. A seção não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/html/2505.17479v1 | grep -oiE 'omission bias[^.]{0,160}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (seção de vieses de 2505.17479v1 não lida)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_HOLDOUT_FLOOR_AND_CEILING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida, mas o baseline de 59,17% confere na Tabela 2. É ela que derruba a leitura inflada do achado 10 (ganho normalizado ≈ 55,7%). Também fecha parcialmente a lacuna 'como medir fidelidade com juiz cego'. O corte custou justamente o piso que a medição precisa."
+    label: "OBJEÇÃO (corte): o desenho de medida do Twin-2K (holdout, piso de acaso 59,17%, teto de reteste) foi cortado sem medida, e é ele que derruba a leitura '87,67% do teto' e fecha parte da lacuna 'como medir fidelidade'."
+    narrative: "Alvo: Cortada por orçamento: medição com holdout como ground truth, baseline aleatório 59,17% e teto de reteste; o paper não trata de impersonação, deriva, sycophancy nem financiamento (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Promover a claim, que dá o desenho de medida (holdout, piso e teto). Medida: Tabela 2 lida nesta passada."
+    trace: "curl -s https://arxiv.org/html/2505.17479v1 | grep -oE '59\\.17'"
+    provenance:
+      source: "https://arxiv.org/html/2505.17479v1"
+      locator: "Tabela 2 (Random 59,17%)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_HIERARCHICAL_MEMORY_ABLATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.35
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem refutação no run. É relevante para escolher entre A (grafo estruturado) e B (memória plana) e para pesar D (o fine-tuning prejudica o fluxo de conversa). Faltou ler a seção de ablação de 2504.04332."
+    label: "OBJEÇÃO (corte): a ablação de memória hierárquica (três camadas com gerente melhora sobre retriever denso; fine-tune atrapalha o fluxo) pesa entre A estruturado e B plano e contra D, e ficou sem leitura. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: memória hierárquica em três camadas com agente gerente melhora sobre o retriever denso; efeito cresce com o modelo; fine-tuning atrapalha o fluxo (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler a ablação de memória da primária. Medida: Não foi feito neste run nem nesta passada. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/pdf/2504.04332 | pdftotext - - | grep -iE 'hierarch|memory manager'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (ablação de 2504.04332 não lida)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_FAMILY_FOOLED_IMPERSONATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida, e é a única claim do run sobre o risco de impersonação, que a restrição de partida nomeia. Sem ela, a lacuna 'impersonação' fica sem claim ancorada."
+    label: "OBJEÇÃO (corte): a única claim do run sobre o risco de impersonação (até familiares foram enganados) foi cortada; sem ela a lacuna 'impersonação' fica sem claim ancorada. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: até familiares foram enganados; autores propõem detecção e defesa antagonistas (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Autoria sempre declarada como persona e nunca como o maestro, posta como regra de projeção. É proposta, não medida. Medida: Nenhum nó no corpus sobre impersonação de persona (kg-corpus-grep 'maestro-persona' devolve 0 nós). A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/pdf/2504.04332 | pdftotext - - | grep -iE 'family|relatives|detect'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (trecho de 2504.04332 não lido)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_PROVENANCE_AND_WRITE_PERMISSION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem refutação, e é a claim que dá a CURA para os achados 13 e 14: proveniência e permissão de escrita são o que torna A defensável (um selador, lint que exige porquê e evidência por nó). Sem ela, o run apresenta o risco sem a mitigação."
+    label: "OBJEÇÃO (corte): a cura dos ataques de memória (proveniência, permissão de escrita de estado, isolamento contextual) foi cortada; é o que torna A defensável: um selador e catraca exigindo porquê e evidência por nó. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: defesas existentes (DataSentinel, AgentDoG) contornadas; propõem proveniência, permissões de escrita de estado e isolamento contextual (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Permissão de escrita do grafo de persona restrita ao maestro, com catraca no lint. É proposta, não medida. Medida: Não há hook nem lint para escrita de memória ou persona no core (grep 'memory' em .claude/settings.json sem hook). A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://www.alphaxiv.org/abs/2607.05189 | grep -oiE '(provenance|write permission|isolation)[^.]{0,100}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (seção de defesas de 2607.05189 não lida)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_WHISPERBENCH_SCOPE_NOT_PERSONA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.35
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida. Ela fixa o ESCOPO dos achados 13 e 14 (poisoning de fatos e preferências, não de persona). É o limite que impede usar os 71,4% e 87,5% como taxa de deriva de persona."
+    label: "OBJEÇÃO (corte): o escopo do WhisperBench (108 casos, envenenamento de fatos e preferências, não de persona) foi cortado; ele impede usar 71,4% e 87,5% como taxa de deriva de persona. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: WhisperBench tem 108 casos em 5 categorias sobre IMAP/SMTP real; não mede impersonação, deriva, sycophancy nem voz (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler o escopo do benchmark na primária. Medida: Não foi feito neste run. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://www.alphaxiv.org/abs/2607.05189 | grep -oiE '108[^.]{0,80}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (escopo de 2607.05189 não lido)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_RFC8693_ACT_CLAIM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida, e é a única âncora em padrão PUBLICADO (RFC 8693) para 'em nome de, sem assumir a identidade'. Os dois drafts que sobraram são um -00 individual e um expirado. O corte deixou a restrição de autoridade apoiada só em drafts."
+    label: "OBJEÇÃO (corte): a única âncora em padrão PUBLICADO para 'em nome de, sem assumir a identidade' (claim act da RFC 8693) foi cortada, deixando a restrição de autoridade apoiada só em drafts. Primário citado, não lido pelo Elenxo; lido pela superação."
+    narrative: "Alvo: Cortada por orçamento: token de delegação separa o titular (sub) do agente (claim act, RFC 8693) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ancorar a regra 'persona não é o maestro' no claim act da RFC 8693. Medida: Não foi lido neste run. Nota do escritor: o motor de superação leu a RFC 8693 (seções 1.1 e 4.1) por WebFetch; ver C_SUPERACAO_20261105_RFC8693_ACT_CLAIM. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://www.rfc-editor.org/rfc/rfc8693 | grep -n '\"act\"'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (RFC 8693 não lida pelo Elenxo)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_AGENT_CARD_SELF_DECLARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem refutação. A parte 'autodeclarado' é relevante: um Agent Card A2A da persona é declaração, não prova (o Onion já tem a doutrina behavior-over-declaration). Faltou cruzar com a projeção em Agent Card da opção A."
+    label: "OBJEÇÃO (corte): agent_model e agent_checksum são autodeclarados no draft; um Agent Card A2A da persona é declaração, não prova (behavior-over-declaration), e a projeção em Agent Card de A fica sem autoridade. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: o draft trata prompt injection como abuso de credenciais; agent_model e agent_checksum são autodeclarados; a troca de modelo fica sem solução (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Tratar o Agent Card da persona como projeção sem autoridade. Medida: Não foi lido neste run. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html | grep -oiE 'agent_(model|checksum)[^.]{0,100}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (trecho agent_model/agent_checksum não lido)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_WIMSE_DRAFT_00_MATURITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida, e a primária confirma ('Published: 28 July 2026', '-00', 'Expires: 29 January 2027'). É exatamente a ressalva de maturidade que o achado 15 omite. O corte inflou o peso do achado 15."
+    label: "OBJEÇÃO (corte): a ressalva de maturidade do draft WIMSE (-00 individual, 28/07/2026, expira 29/01/2027, não é RFC, não trata persona) foi cortada, e o corte inflou o peso do Achado 15."
+    narrative: "Alvo: Cortada por orçamento: o draft é -00 individual do WIMSE (2026-07-28), não é RFC e não trata de persona (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Promover a claim como ressalva do achado 15. Medida: Primária lida nesta passada. Nota do escritor: a superação do 'MUST NOT possess' mediu um -02 de 30/10/2026; a maturidade segue individual e sem posição formal."
+    trace: "curl -s https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html | grep -oE 'Expires[^<]{0,30}'"
+    provenance:
+      source: "https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-00.html"
+      locator: "cabeçalho (Published, Expires)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_PERSPECTIVE_SYCOPHANCY_GROWS_WITH_FIDELITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem refutação, e é a contra-tese mais forte do run contra qualquer persona de julgamento (inclusive A): fidelidade e sycophancy crescem juntas. É a lacuna 'contra-tese de que não fazer agora pode ser melhor', que o Scope nomeou e o run cortou."
+    label: "OBJEÇÃO (corte): a contra-tese mais forte do run contra qualquer persona de julgamento, inclusive A: fidelidade e sycophancy de perspectiva crescem juntas; era a lacuna 'não fazer agora pode ser melhor', e foi cortada. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: a sycophancy de perspectiva só sobe quando o modelo infere com precisão a visão do usuário; persona fiel eleva o risco na medida em que funciona (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Fazer o juiz cego medir também a concordância indevida: casos em que o maestro discordaria de si mesmo ou do peer. Medida: Não há nó de medida no corpus (kg-corpus-grep 'sycophancy' devolve 0 nós de persona). A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/html/2509.12517v3 | grep -oiE 'perspective sycophancy[^.]{0,160}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (trecho de 2509.12517v3 não verificado)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_SYNTHETIC_CONTEXT_ALSO_RAISES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida. É o que estende o risco do achado 5 para a opção A (qualquer contexto injetado), e o corte deixou o achado 5 recortado de forma errada a B e C."
+    label: "OBJEÇÃO (corte): contexto sintético não personalizado também aumenta a sycophancy (Llama 4 Scout +15%, Gemini 2.5 Pro +9%): estende o risco do Achado 5 a qualquer contexto injetado, logo à opção A. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: contexto sintético não personalizado também aumenta a sycophancy (Llama 4 Scout +15%, Gemini 2.5 Pro +9%) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Medir com e sem persona no modelo do Onion. Medida: Não foi feito. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/html/2509.12517v3 | grep -oiE 'synthetic[^.]{0,160}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (trecho de 2509.12517v3 não verificado)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_TASK_RELEVANT_CONTEXT_MITIGATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem refutação, e é a mitigação que casa com a projeção por papel de A e com o juiz cego. Sem ela, o run não tem claim ancorada que responda 'como reduzir o risco', e a lacuna fica aberta."
+    label: "OBJEÇÃO (corte): a mitigação (só contexto relevante à tarefa; detectar desvio com e sem contexto) casa com a projeção por papel de A e com o juiz cego, e foi cortada; o run fica sem claim ancorada de 'como reduzir o risco'. Primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: mitigações (só contexto relevante à tarefa; detectar desvio com e sem contexto) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Projeção por papel com seleção de nós e diff com/sem persona. É proposta, não medida. Medida: Nenhum nó de medição no corpus. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/html/2509.12517v3 | grep -oiE '(mitigat|relevant context)[^.]{0,160}'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "claim cortada por orçamento (seção de mitigação de 2509.12517v3 não verificada)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CUT_USER_CLAUDE_MD_NO_PRECEDENCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida e pesa contra B: imports de usuário carregam sem aprovação (vetor de injeção) e, em conflito com o projeto, 'Claude pode seguir qualquer uma'. O vivo mostra que ⟨CLAUDE.md de usuário⟩ nem existe hoje ('No such file or directory'), então B partiria do zero e não alcançaria a conta do brain."
+    label: "OBJEÇÃO (corte): pesa contra B: imports de usuário carregam sem aprovação (vetor de injeção) e, em conflito com o projeto, não há precedência garantida; o CLAUDE.md de usuário nem existe hoje e não alcança a conta do brain. Trecho da doc citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: CLAUDE.md e rules de usuário cobrem todos os projetos da máquina, imports sem aprovação, sem precedência garantida em conflito (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Promover a claim como restrição de B. Medida: ls ⟨CLAUDE.md de usuário⟩ devolve ausente. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "ls ⟨CLAUDE.md de usuário⟩; curl -s https://code.claude.com/docs/en/memory | grep -oiE 'user[^.]{0,40}(precedence|conflict)[^.]{0,80}'"
+    provenance:
+      source: "https://code.claude.com/docs/en/memory"
+      locator: "trecho de precedência e imports de usuário (não lido); ausência do CLAUDE.md de usuário reconferida pelo escritor em 2026-11-05"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_MANAGED_CLAUDE_MD_IS_STILL_GUIDANCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "Foi cortada sem medida e repete o achado 1 numa camada mais alta: nem o CLAUDE.md gerenciado impõe. E o CLAUDE.md do core registra que mesmo os managed settings deixam de fora o que um mod inicia por si. Faltou integrar isso como teto da opção A (projeção em CLAUDE.md gerenciado não vira autoridade)."
+    label: "OBJEÇÃO (corte): nem o CLAUDE.md gerenciado impõe, e o CLAUDE.md do core registra que mesmo managed settings deixam de fora o que um mod inicia; teto da opção A: projeção em CLAUDE.md gerenciado não vira autoridade."
+    narrative: "Alvo: Cortada por orçamento: CLAUDE.md gerenciado por política carrega antes e não é excluível, mas segue sendo orientação; a imposição fica em managed settings (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Nenhuma camada de texto impõe autoridade, como o próprio veredito já diz. Medida: CLAUDE.md@HEAD, parágrafo de acoplamento."
+    trace: "grep -n 'chave de política' CLAUDE.md"
+    provenance:
+      source: "CLAUDE.md@3f09996ab"
+      locator: "parágrafo de acoplamento, l.18 ('sem chave de política gerenciada')"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SRC_2407_18416_PERSONA_JUDGE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.35
+    verified_at: "2026-11-05"
+    verified_against: "Ficou sem leitura no eixo que a lacuna nomeia ('como medir fidelidade com juiz cego'). Pelo número, deve ser o PersonaGym (avaliação de agentes-persona com juiz LLM), não confirmado aqui. Nenhuma claim ancorada do run responde ao juiz LLM de persona: os estudos lidos usam holdout de survey ou teste de Turing."
+    label: "OBJEÇÃO (fonte não lida): 2407.18416, no eixo 'como medir fidelidade com juiz', ficou sem leitura (provável PersonaGym, não confirmado); nenhuma claim ancorada responde ao juiz LLM de persona. Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/pdf/2407.18416 (fidelidade de persona: benchmarks e juiz) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Ler a fonte e extrair o protocolo de juiz. Medida: Não foi lida neste run nem nesta passada. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2407.18416 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2407.18416), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_2304_11406_PROMPT_VS_FINETUNE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: "2026-11-05"
+    verified_against: "Ficou sem leitura no eixo prompt contra fine-tune. Pelo número, deve ser o LaMP (benchmark de personalização com retrieval contra fine-tune), não confirmado aqui. A comparação entre opções A/B e D ficou apoiada em estudos de e-mail (n=2 humanos) e de survey."
+    label: "OBJEÇÃO (fonte não lida): 2304.11406 (provável LaMP, não confirmado), no eixo prompt contra fine-tune, ficou sem leitura; a comparação A/B contra D ficou apoiada em e-mail e survey. Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/pdf/2304.11406v3 (prompt/memória vs fine-tune) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler a fonte. Medida: Não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2304.11406 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2304.11406v3), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_2601_06471_PROMPT_VS_FINETUNE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: "2026-11-05"
+    verified_against: "É fonte de 2026 (recente), sem leitura, no eixo que decide D. O motivo não foi registrado."
+    label: "OBJEÇÃO (fonte não lida): 2601.06471, fonte de 2026 no eixo que decide D, ficou sem leitura e sem motivo registrado. Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/html/2601.06471 (prompt/memória vs fine-tune) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler a fonte. Medida: Não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2601.06471 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2601.06471), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_2605_29420_PROMPT_VS_FINETUNE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: "2026-11-05"
+    verified_against: "Fonte de maio de 2026, a mais próxima do modelo atual, ficou sem leitura no eixo que decide D. É exatamente o tipo de fonte que responderia à objeção dos achados 6 e 12 (modelos medidos defasados)."
+    label: "OBJEÇÃO (fonte não lida): 2605.29420, de maio de 2026 e a mais próxima do modelo atual, ficou sem leitura no eixo que decide D; responderia à objeção de modelos medidos defasados (Achados 6 e 12). Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/pdf/2605.29420 (prompt/memória vs fine-tune) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler a fonte. Medida: Não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2605.29420 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2605.29420), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_2607_14371_PROMPT_VS_FINETUNE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: "2026-11-05"
+    verified_against: "Fonte de julho de 2026 sem leitura. É o mesmo caso da anterior: a mais atual do eixo ficou de fora."
+    label: "OBJEÇÃO (fonte não lida): 2607.14371, de julho de 2026 e a mais atual do eixo prompt contra fine-tune, ficou de fora. Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/pdf/2607.14371 (prompt/memória vs fine-tune) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Ler a fonte. Medida: Não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2607.14371 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2607.14371), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_2512_12775_PERSONA_DRIFT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.35
+    verified_at: "2026-11-05"
+    verified_against: "Ficou sem leitura no eixo de riscos. A lacuna DERIVA de persona (mudança do julgamento ao longo do tempo) não tem claim ancorada no run: os achados de risco cobrem sycophancy e injeção, não deriva."
+    label: "OBJEÇÃO (fonte não lida): 2512.12775, no eixo de riscos, ficou sem leitura; a DERIVA de persona (mudança do julgamento no tempo) não tem claim ancorada, só sycophancy e injeção. Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/pdf/2512.12775 (deriva, sycophancy, injeção) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Ler a fonte e procurar medida de deriva de persona. Medida: Não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2512.12775 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2512.12775), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_2605_24279_PERSONA_DRIFT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.35
+    verified_at: "2026-11-05"
+    verified_against: "Fonte de 2026 sem leitura no eixo de riscos. É o mesmo buraco de deriva."
+    label: "OBJEÇÃO (fonte não lida): 2605.24279, fonte de 2026 no eixo de riscos, ficou sem leitura: o mesmo buraco de deriva de persona. Primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: arxiv.org/abs/2605.24279 (deriva, sycophancy, injeção) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Ler a fonte. Medida: Não foi lida. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://arxiv.org/abs/2605.24279 | grep -oE '<title>[^<]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (2605.24279), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SRC_TIANPAN_BLOG_UNMEASURED_REDUNDANCY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.25
+    verified_at: "2026-11-05"
+    verified_against: "É blog (tier baixo) e provavelmente secundário aos papers de MINJA e MemGhost já lidos, mas o run não registrou a redundância. O descarte não foi medido. Peso esperado baixo."
+    label: "OBJEÇÃO (fonte não lida): o blog tianpan.co sobre envenenamento de memória (tier baixo, provavelmente secundário a MINJA e MemGhost) foi descartado sem registrar a redundância; peso esperado baixo. Fonte citada, não lida."
+    narrative: "Alvo: Fonte não lida: tianpan.co blog (agent memory poisoning) (kind=discarded-by-comodismo). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Conferir se o blog só cita as primárias já lidas. Medida: Não foi lido. A fonte primária citada não foi lida na rodada: o nó vale como lacuna nomeada, não como evidência de tier alto."
+    trace: "curl -s https://tianpan.co/blog/2026-04-10-agent-memory-poisoning-persistent-compromise | grep -oiE 'arxiv[^\" ]*'"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "fonte da lista de corte (blog tianpan.co), não lida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: C_SUPERACAO_20261105_GSS_V3_83_PERCENT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Correção pela v3 de 2411.10109 (28/06/2026): em itens do GSS fora do treino, agentes de entrevistas de duas horas com 1.052 americanos atingem 83% da consistência de reteste; só survey 82%, combinados 86%, só demografia 74%."
+    narrative: "Medida: WebFetch do resumo da v3 em https://arxiv.org/abs/2411.10109v3, que o link sem versão também abre como 'this version' revisada em 28 Jun 2026. Trechos citados literalmente da v3: 'interview-only, survey-only, and combined agents achieved accuracies equal to 83%, 82%, and 86% of participants' own two-week test-retest consistency benchmark' e 'compared with 74% for demographics-only agents'. Critério: V4_DESATUALIZADA. Alvo reprovado na votação: Agentes de LLM construídos a partir de entrevistas qualitativas com 1.052 pessoas reais replicam as respostas do GSS com 85% da acurácia do reteste de duas semanas (tier 8). Registro da reprovação: E_LACUNAS_MAESTRO_PERSONA_1105. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://arxiv.org/abs/2411.10109v3 (revisada em 28 Jun 2026, versão corrente; supera a v1 de 15 Nov 2024) e grep -F '85% as accurately' no resumo: 0 ocorrências; grep -F 'equal to 83%, 82%, and 86% of participants' own two-week test-retest consistency benchmark': presente"
+  - id: C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Twin-2K (GPT-4.1-mini): resumo 3,7 pp abaixo do texto completo (68,02 contra 71,72; acaso 59,17, reteste 81,72), JSON 1,24 pp abaixo (70,48); sem teste de significância, e os autores leem tudo como faixa semelhante: indício fraco a favor do texto completo."
+    narrative: "Medida: WebFetch da página HTML do paper em 2026-11-05: a Tabela 2 confirmou os quatro valores, a Seção 5.1 confirmou a frase 'similar range', o Apêndice A.1 confirmou o enquadramento por limite de tamanho da entrada, e a varredura do restante da página (offset 100000) confirmou que não há estatística de significância para essa comparação. Para o Onion, isso conta como indício fraco de favorecer o texto completo da persona, não como prova de que resumir perde fidelidade. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado na votação: Resumir a persona perde fidelidade: Persona Summary 68,02% contra 71,72% do texto completo; JSON 70,48% (tier 7). Registro da reprovação: E_LACUNAS_MAESTRO_PERSONA_1105. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://arxiv.org/html/2505.17479v1 (e offset=100000), procurando na Seção 5.1 e na Tabela 2: o texto devolvido traz 'falls within a similar range across approaches' e os números 71.72/70.48/68.02. Nenhuma afirmação de que o resumo perde fidelidade, nem teste de significância ou intervalo de confiança para a comparação, em nenhum dos dois trechos da página."
+  - id: C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,00±3,95 de pass rate); superar com margem exigiu 4k exemplos ou mais (35-44%); nada medido sobre julgamento."
+    narrative: "Medida: Leitura direta da Tabela 1 e da seção System Configuration do PDF arXiv 2504.04332 v2, por pdftotext + sed (linhas 395-470 e 485-500), comparando as colunas Pass Rate, Styl. e Cont. com seus desvios. Estilo ligeiramente melhor (3,08 contra 2,79, intervalos sobrepostos) e conteúdo pior (2,53 contra 3,06). Para a opção D, 500 exemplos são o piso do empate em estilo de texting, não prova de superioridade. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado na votação: Modelos com fine-tuning em apenas 500 exemplos já superam modelos de ponta só com prompt, então a identidade nos pesos exige pouco dado (tier 7). Registro da reprovação: E_LACUNAS_MAESTRO_PERSONA_1105. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sL -o p.pdf https://arxiv.org/pdf/2504.04332 && pdftotext p.pdf p.txt && sed -n 395,450p p.txt # Tabela 1: B500+MM 25.43±4.48 vs Claude+ICL+MM 25.00±3.95 (empate dentro do erro, com memória MM); vantagem clara só em B4K+ (35.14) e BFull+MM (44.44)"
+  - id: C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O draft individual WIMSE (-02, sem posição formal) exige que o agente nunca tenha a credencial bruta, guardada em cofre que não cruza para o host; o agente exerce autoridade delegada (DT de 15 min, máx. 1 h). Entrega SEGREDO fora da persona, não DEPLOY."
+    narrative: "Medida: WebFetch do -00 e do -02: as frases 'An Agent MUST NOT possess or have access to the underlying credentials stored in the Credential Vault' e 'Raw credentials never cross the boundary to the agent host' aparecem no -02; 'Agents receive and exercise delegated authority' aparece na Seção 1.3; 'deploy'/'persona' estão ausentes. Status medido no Datatracker: individual, sem stream. Para deploy fora da persona, o escopo de deploy não pode ser delegado; essa metade fica sem superação nesta fonte. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado na votação: O draft exige que o agente nunca possua as credenciais; elas ficam num cofre, de modo que segredos e deploy não passam à persona (tier 7). Registro da reprovação: E_LACUNAS_MAESTRO_PERSONA_1105. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://www.ietf.org/archive/id/draft-sweeney-wimse-credential-delegation-02.html e grep -F 'deploy' / grep -F 'persona' no texto devolvido: 0 ocorrências. Na mesma página, grep -F 'Agents receive and exercise delegated authority through the Delegation Server' devolve 1 ocorrência, o que contradiz 'deploy não passa à persona'"
+  - id: C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O Panza mede fidelidade de ESTILO de e-mail com BLEU e MAUVE (MAUVE 0,6-1,0 no próprio usuário, ~0 nos outros), sem LLM-juiz; a 'correlação forte com preferência humana' se apoia num único avaliador, sem coeficiente; reconhecimento humano ~64%."
+    narrative: "Medida: pdftotext do PDF v4 baixado por WebFetch; trechos verbatim localizados por grep -n e sed -n nas linhas 211-214 (frase citada), 761-772 (Fig. 4, MAUVE só no próprio usuário), 2272-2315 (Apêndice K, n=1 avaliador: o doador dos dados, 8 modelos, escala de 3 pontos) e 875-905 (Sec. 5.2, ~64% de precisão e recall de humanos que conhecem os autores); grep -i 'judge' = 0; versão conferida em arxiv.org/abs/2407.10994 (v4, 2025-02-10). Mede estilo, não julgamento nem decisão. Critério: V2_CONTRADITA. Alvo reprovado na votação: A fidelidade de persona pode ser medida por BLEU+MAUVE, que correlacionam fortemente com preferência humana; MAUVE alto só nos e-mails do próprio usuário (tier 7). Registro da reprovação: E_LACUNAS_MAESTRO_PERSONA_1105. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://arxiv.org/pdf/2407.10994 (PDF salvo) && pdftotext <pdf> p.txt && sed -n 2272,2315p p.txt # Apêndice K: 'The donor of the dataset was asked to evaluate', 8 modelos, escala de 3 pontos, ~30 min, sem coeficiente; e grep -n 'roughly 64% precision and recall' p.txt # Sec. 5.2"
+  - id: C_SUPERACAO_20261105_RFC8693_ACT_CLAIM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "RFC 8693 (OAuth 2.0 Token Exchange, Standards Track, jan/2020), seções 1.1 e 4.1: o claim act separa o ator do titular e distingue delegação de impersonação; é o precedente padronizado de que quem age não é o titular e só tem a autoridade delegada."
+    narrative: "Medida: WebFetch https://www.rfc-editor.org/rfc/rfc8693.html devolveu verbatim: 'The act (actor) claim provides a means within a JWT to express that delegation has occurred ... and identify the acting party to whom authority has been delegated' e 'Delegation semantics are different than impersonation semantics ... when A is impersonating B, A is B within the context of the rights authorized by the token.' O draft on-behalf-of, por sua vez, se qualifica como individual expirado e sem standing, o que descarta a leitura 'precedente de mercado'. Critério: V2_CONTRADITA. Alvo reprovado na votação: O servidor de autorização verifica que o ator do token coincide com o consentido, e o código fica vinculado a usuário, cliente e ator: precedente de mercado para 'persona copia voz, não autoridade' (tier 6). Registro da reprovação: E_LACUNAS_MAESTRO_PERSONA_1105. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02 and grep -F 'no formal standing' / 'Expired' / 'will expire on 27 February 2026' in the header: the document's own page qualifies it as an expired individual draft without standing, which rules out the reading 'market precedent'"
+  - id: E_MERCADO_MAESTRO_PERSONA_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: "2026-11-05"
+    verified_against: "bloco Mercado do sintetizador no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    label: "EIXO MERCADO E CAPITAL: sem sinal. Nenhuma claim confirmada traz rodada, M&A, receita ou analista sobre digital twin, persona de agente ou memória de usuário; a trajetória confirmada é acadêmica e de normas."
+    narrative: "Texto do sintetizador: sem sinal encontrado. Nenhuma claim confirmada traz rodada de investimento, M&A, receita ou parecer de analista sobre digital twin, persona de agente ou memória de usuário (Letta/MemGPT, Mem0, Zep, Character cards, user memory do ChatGPT, do Claude ou do Gemini). O eixo de capital volta vazio nesta rodada. Os únicos sinais de trajetória confirmados são acadêmicos e de normas. Em segurança de memória, vários ataques foram publicados até 2026-07 (MINJA, MemGhost). Em delegação de autoridade, há drafts no IETF (WIMSE credential delegation 2026-07, OAuth on-behalf-of 2025-08). O tema de memória/persona está, portanto, migrando de feature para superfície de ataque e de governança. Quem financia o tema segue sem resposta, mas o vazio é de ORÇAMENTO, não de busca (correção do fechamento, medida no retorno do run): o eixo mercado-capital achou 4 fontes de rodada (Twin1 seed de US$ 20 mi, Simile US$ 100 mi, PickMyBrain pré-seed, e uma segunda cobertura do Twin1), todas em budgetDropped, e a fonte da rodada do Mem0 (TechCrunch, 2025-10-28) foi lida e gerou 5 claims, todas em notVerifiedByBudget; os 4 links de analista (Thoughtworks Radar, Gartner) também caíram por orçamento. Nenhum desses valores foi verificado e nenhum entra como fato."
+    trace: "síntese de mercado do run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "bloco Mercado do sintetizador"
+      method: "derived: síntese do run a partir das claims confirmadas"
+      locality: "host"
+  - id: E_LACUNAS_MAESTRO_PERSONA_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "contabilidade do motor no run wf_ded7babd-681 de /onion-research em modo decision, 2026-11-05: 6 refutadas, 0 não verificadas, 39 fontes e 41 claims cortadas, 0 recusadas, 6 superações; contagem das objeções feita sobre a lista recebida"
+    label: "LACUNAS: 6 refutadas (tier 6-8), 0 não verificadas, 39 fontes e 41 claims cortadas por orçamento; 40 objeções sobreviventes de 50, 40 modeladas; 0 recusas; 6 superações. Deriva, juiz de persona e medida no Opus seguem abertos."
+    narrative: "REFUTADAS NA VOTAÇÃO (6): (1) agentes de 1.052 entrevistas replicam o GSS com 85% do reteste, tier 8: o Elenxo diz que o descarte contraria a primária (E_OBJECAO_REF_GSS_85_CONTRADICTS_PRIMARY); superação C_SUPERACAO_20261105_GSS_V3_83_PERCENT (a v3 diz 83/82/86%). (2) resumir a persona perde fidelidade (68,02 contra 71,72), tier 7: o Elenxo reinstaura (E_OBJECAO_REF_SUMMARY_LOSES_FIDELITY_STANDS); superação C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE (indício fraco, sem significância). (3) fine-tune de 500 exemplos supera modelos de ponta só com prompt, tier 7: descarte legítimo segundo o Elenxo (objeção NÃO sobreviveu); superação C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS (empate com memória, não superioridade). (4) o agente nunca possui as credenciais (cofre), tier 7: o Elenxo reinstaura (E_OBJECAO_REF_WIMSE_MUST_NOT_POSSESS); superação C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY (segredo sim, deploy não). (5) BLEU+MAUVE correlacionam fortemente com preferência humana, tier 7: o Elenxo rebaixa sem refutar (E_OBJECAO_REF_BLEU_MAUVE_CORRELATION); superação C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER (um avaliador, sem coeficiente). (6) actor binding do draft on-behalf-of, tier 6: o Elenxo reinstaura marcado como draft expirado (E_OBJECAO_REF_OBO_ACTOR_BINDING); superação C_SUPERACAO_20261105_RFC8693_ACT_CLAIM (o precedente padronizado é a RFC 8693). Nenhuma das 6 foi refutada por fonte fraca: as fontes são tier 6 a 8. NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 39 fontes e 41 claims; 15 claims cortadas voltaram pelas objeções E_OBJECAO_CUT_* e 8 fontes não lidas, pelas E_OBJECAO_SRC_*. OBJEÇÕES DO ELENXO: 50 julgadas, 40 sobreviventes, 40 modeladas, 0 não modeladas (nenhum alvo sobrevivente fica sem nó). 10 NÃO SOBREVIVERAM: Achado 2 (auto memory local, reforçado: MEMORY.md 198 linhas e 25.031 bytes); Achado 4 (style sem garantia, reforçado pelo merge-gate); Achado 8 (MINJA, transferência coberta pelo MemGhost no Claude Code SDK); Achado 9 (memória compartilhada, vale também contra a forma ingênua de A); Achado 13 (MemGhost 87,5%, coerente com R15.2); Achado 14 (71,4% no Claude Code SDK, nenhum hook guarda o diretório de memória); Achado 19 (draft não cobre peer nem merge/deploy/segredo, a outra camada existe só em parte); descarte do fine-tune de 500 (legítimo pela Tabela 2); fonte hai.stanford.edu (redundante com a primária 2411.10109); fonte daplab.cs.columbia.edu (redundante com a primária 2505.17479v1). RECUSADAS PELO MOTOR (naoJulgada): 0, nenhum alvo fica não-julgado por recusa. SUPERAÇÕES ACHADAS: 6, 6 nós C_SUPERACAO_20261105_*. O QUE NÃO FICOU FECHADO: deriva de persona (2512.12775, 2605.24279 não lidas); juiz LLM de persona (2407.18416 não lida); prompt contra fine-tune em 2026 (2304.11406, 2601.06471, 2605.29420, 2607.14371 não lidas); nenhum estudo mediu sycophancy nem voz no Opus 5.x ou no Fable; impersonação sem claim ancorada; mitigação de sycophancy sem claim ancorada; herança de Output Style por subagente e A2A não medida; guardas de deploy, segredo, host e 'peer não é aprovação' inexistentes como hook; quem financia o tema (Letta, Mem0, Zep, Character.AI) não buscado; escopo do WhisperBench não lido. NOTAS DO ESCRITOR: (a) o id do run foi inferido do diretório de subagentes em curso, não devolvido pelo motor. (b) o critério do Achado 1 não casa numa linha por quebra de linha do CLAUDE.md; o fato confere por 'não fronteira de segurança' (l.18). (c) a contagem 50/40/10 foi feita pelo escritor sobre a lista recebida."
+    trace: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_ded7babd-681"
+      locator: "seções Confirmadas, Não verificadas/refutadas, Reprovações recusadas e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada"
+      locality: "host"
+edges:
+  - from: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B_NATIVE_USER_MEMORY_SHARED
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_E_NOT_NOW
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: DEPENDS_ON
+  - from: E_CC_MEMORY_IS_CONTEXT_NOT_ENFORCEMENT
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_CC_AUTO_MEMORY_LOCAL_PER_REPO_200_LINES
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_CC_OUTPUT_STYLES_THREE_LEVELS
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_CC_OUTPUT_STYLE_NO_GUARANTEE
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_MEMORY_PROFILES_RAISE_SYCOPHANCY
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_SYCOPHANCY_VARIES_BY_MODEL
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_GENERATIVE_AGENTS_INTERVIEW_INPUT
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_MINJA_QUERY_ONLY_INJECTION
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_MINJA_SHARED_MEMORY_VICTIMS
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_TWIN2K_RETEST_CEILING
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_FINETUNE_LORA_PASS_AS_HUMAN
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_PROMPT_ONLY_PERSONA_TONE_FAILS
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_MEMGHOST_ONE_EMAIL_OPENCLAW
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_MEMGHOST_CLAUDE_CODE_SDK_71
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_WIMSE_AUTHORITY_ONLY_NARROWS
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_PANZA_FINETUNE_BEATS_RAG_STYLE
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_PANZA_UNDER_100_SAMPLES
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_OBO_DRAFT_SEPARATES_ACTOR
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_OBO_DRAFT_SILENT_ON_PEER_APPROVAL
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A1_NO_DETERMINISTIC_AUTHORITY_LAYER
+    to: E_CC_MEMORY_IS_CONTEXT_NOT_ENFORCEMENT
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A3_OUTPUT_STYLE_PROJECTION_UNMEASURED
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A3_OUTPUT_STYLE_PROJECTION_UNMEASURED
+    to: E_CC_OUTPUT_STYLES_THREE_LEVELS
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A5_SYCOPHANCY_RISK_ALSO_HITS_A
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A5_SYCOPHANCY_RISK_ALSO_HITS_A
+    to: E_MEMORY_PROFILES_RAISE_SYCOPHANCY
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A6_NUMBERS_NOT_FOR_ONION_MODEL
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A6_NUMBERS_NOT_FOR_ONION_MODEL
+    to: E_SYCOPHANCY_VARIES_BY_MODEL
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A7_INTERVIEW_IS_METHOD_NOT_JUDGMENT
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A7_INTERVIEW_IS_METHOD_NOT_JUDGMENT
+    to: E_GENERATIVE_AGENTS_INTERVIEW_INPUT
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A10_FIDELITY_MUST_BE_NORMALIZED
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A10_FIDELITY_MUST_BE_NORMALIZED
+    to: E_TWIN2K_RETEST_CEILING
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A11_PASS_AS_HUMAN_IS_IMPERSONATION
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A11_PASS_AS_HUMAN_IS_IMPERSONATION
+    to: E_FINETUNE_LORA_PASS_AS_HUMAN
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A12_TONE_STUDY_MEASURES_OTHER_THING
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A12_TONE_STUDY_MEASURES_OTHER_THING
+    to: E_PROMPT_ONLY_PERSONA_TONE_FAILS
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A15_WIMSE_DRAFT_LOW_WEIGHT
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A15_WIMSE_DRAFT_LOW_WEIGHT
+    to: E_WIMSE_AUTHORITY_ONLY_NARROWS
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A16_PANZA_WEIGHT_TOO_LOW_FOR_D
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A16_PANZA_WEIGHT_TOO_LOW_FOR_D
+    to: E_PANZA_FINETUNE_BEATS_RAG_STYLE
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A17_BLEU_90_NOT_CONVINCING
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A17_BLEU_90_NOT_CONVINCING
+    to: E_PANZA_UNDER_100_SAMPLES
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_A18_OBO_DRAFT_EXPIRED
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A18_OBO_DRAFT_EXPIRED
+    to: E_OBO_DRAFT_SEPARATES_ACTOR
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_REF_GSS_85_CONTRADICTS_PRIMARY
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REF_SUMMARY_LOSES_FIDELITY_STANDS
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REF_WIMSE_MUST_NOT_POSSESS
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REF_BLEU_MAUVE_CORRELATION
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REF_OBO_ACTOR_BINDING
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_FT500_BELOW_FULL_TEXT
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_TWINS_TOO_NORMATIVE
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_HOLDOUT_FLOOR_AND_CEILING
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_HIERARCHICAL_MEMORY_ABLATION
+    to: C_OPCAO_B_NATIVE_USER_MEMORY_SHARED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_FAMILY_FOOLED_IMPERSONATION
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_PROVENANCE_AND_WRITE_PERMISSION
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_WHISPERBENCH_SCOPE_NOT_PERSONA
+    to: C_OPCAO_B_NATIVE_USER_MEMORY_SHARED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_RFC8693_ACT_CLAIM
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_AGENT_CARD_SELF_DECLARED
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_WIMSE_DRAFT_00_MATURITY
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_PERSPECTIVE_SYCOPHANCY_GROWS_WITH_FIDELITY
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_SYNTHETIC_CONTEXT_ALSO_RAISES
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_TASK_RELEVANT_CONTEXT_MITIGATION
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_USER_CLAUDE_MD_NO_PRECEDENCE
+    to: C_OPCAO_B_NATIVE_USER_MEMORY_SHARED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MANAGED_CLAUDE_MD_IS_STILL_GUIDANCE
+    to: C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2407_18416_PERSONA_JUDGE
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2304_11406_PROMPT_VS_FINETUNE
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2601_06471_PROMPT_VS_FINETUNE
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2605_29420_PROMPT_VS_FINETUNE
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2607_14371_PROMPT_VS_FINETUNE
+    to: C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2512_12775_PERSONA_DRIFT
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_2605_24279_PERSONA_DRIFT
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_TIANPAN_BLOG_UNMEASURED_REDUNDANCY
+    to: D_MAESTRO_PERSONA_SOURCE_2026_11
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261105_GSS_V3_83_PERCENT
+    to: E_LACUNAS_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_GSS_V3_83_PERCENT
+    to: E_OBJECAO_REF_GSS_85_CONTRADICTS_PRIMARY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE
+    to: E_LACUNAS_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE
+    to: E_OBJECAO_REF_SUMMARY_LOSES_FIDELITY_STANDS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS
+    to: E_LACUNAS_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY
+    to: E_LACUNAS_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY
+    to: E_OBJECAO_REF_WIMSE_MUST_NOT_POSSESS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER
+    to: E_LACUNAS_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER
+    to: E_OBJECAO_REF_BLEU_MAUVE_CORRELATION
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_RFC8693_ACT_CLAIM
+    to: E_LACUNAS_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_RFC8693_ACT_CLAIM
+    to: E_OBJECAO_CUT_RFC8693_ACT_CLAIM
+    edge_type: TRACES_TO
+  - from: E_MERCADO_MAESTRO_PERSONA_1105
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_MAESTRO_PERSONA_1105
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: SUPPORTS
+  - from: D_MAESTRO_PERSONA_SOURCE_2026_11
+    to: Q_MAESTRO_PERSONA_1105
+    edge_type: TRACES_TO
