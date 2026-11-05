@@ -372,10 +372,11 @@ def _pw_load_assign():
 # se julga, e o `bash -c 'x &> y'` passa por aqui de novo, no nível dele ──
 _PW_REDIR_FORMS = re.compile(r">\||>&(?=\s*[^\s\d])")
 # `> x` sem comando, também depois de palavra de controle ou de atribuição: o lib não julga segmento vazio. Vira `: > x`, que ele julga
-_PW_BARE_REDIR = re.compile(r"(^|;|\||\(|\n|(?:then|do|else|if|elif|while|until|\{|!)[ \t]|&)([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)(?=\d*>)", re.M)
+_PW_BARE_REDIR = re.compile(r"(^|;|\||\(|\n|(?:then|do|else|if|elif|while|until|\{|!)[ \t]|&)([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)(?=\d*[<>])", re.M)
 # o mesmo depois do que FECHA um composto ou de `case …)`, `time` e `coproc`: `( x ) > f`, `{ x; } > f`, `done > f`, `fi > f`, `esac > f`
-# gravam f. O `: ` entra entre o fecho e o `>`, e o lib julga o `: > f` como comando próprio
-_PW_BARE_AFTER_CLOSE = re.compile(r"(\)|(?:time|coproc|fi|done|esac|\})[ \t])([ \t]*)(?=\d*>)")
+# gravam f. O `: ` entra entre o fecho e o 1º redirecionamento, também o de ENTRADA (`done < a > f`), e o lib julga o `: < a > f`
+# como comando próprio. `exec > f` e `exec 3> f` sem comando redirecionam o próprio shell: o mesmo `: ` os leva ao juiz
+_PW_BARE_AFTER_CLOSE = re.compile(r"(\)|(?:time|coproc|fi|done|esac|exec|\})[ \t])([ \t]*)(?=\d*[<>])")
 # fora de aspas, o que não é espaço nem separador antes do `>`: a palavra anterior acabou ali
 _PW_GLUE_FREE = set(" \t\n;|()`")
 
@@ -399,6 +400,8 @@ def _pw_unglue(t):
             out.append(t[i:i + 2]); i += 2; continue
         if c == "$" and t.startswith("$'", i):
             q = "$'"; out.append("$'"); i += 2; continue
+        if c == "$" and t.startswith('$"', i):         # `$"x"` é a tradução de locale: sem catálogo, o bash grava `x`
+            i += 1; continue
         if c in "'\"":
             q = c; out.append(c); i += 1; continue
         if c == "`":
@@ -633,6 +636,29 @@ def _pw_copy_into_skills(base, args, detail):
             _moat_emit("plugin", d, "", "%s de uma pasta com a forma de plugin para dentro de .claude/skills — %s" % (base, detail))
 
 
+# curl e wget com a opção colada (`-so X`, `-fsSLo X`, `-o.claude/…`, `wget -qO X`): o MOAT só lê `-o X` solto. As letras que
+# consomem valor param a leitura do grupo, como no `_pw_tdir`
+_PW_CLUSTER = {"curl": ("o", set("AbcCdDeEFHKmoPQrtTuUwxXyYz")),
+               "wget": ("oOaP", set("oaOPetTwQiBUlARDXI"))}
+
+
+def _pw_cluster_values(args, targets, argletters):
+    vals = []
+    for k, a in enumerate(args):
+        if a == "--":
+            break
+        if a.startswith("-") and not a.startswith("--") and len(a) > 1:
+            for i, c in enumerate(a[1:], 1):
+                if c in targets:
+                    v = a[i + 1:] or (args[k + 1] if k + 1 < len(args) else None)
+                    if v:
+                        vals.append(v)
+                    break
+                if c in argletters:
+                    break
+    return vals
+
+
 def _pw_short_flag(args, letter):
     return any(a.startswith("-") and not a.startswith("--") and letter in a[1:] for a in args)
 
@@ -707,6 +733,12 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     _PW["skip"], _PW["exempt"] = skip, exempt
     if tdir:
         _moat_write_path(_moat_abspath(tdir), " ".join(raw_words), base)
+    if base in _PW_CLUSTER:
+        for v in _pw_cluster_values(args, *_PW_CLUSTER[base]):
+            _moat_write_path(_moat_abspath(v), " ".join(raw_words), base)
+    if base in ("mkfifo", "mknod"):                     # o nó criado é escrita na forma, como o mkdir
+        for v in _moat_positionals(args, {"-m", "--mode", "-Z", "--context"})[:1 if base == "mknod" else None]:
+            _moat_write_path(_moat_abspath(v), " ".join(raw_words), base)
     if base in ("cp", "mv", "ln", "rsync") and not skip:
         _pw_copy_into_skills(base, args, " ".join(raw_words))
     try:

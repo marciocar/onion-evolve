@@ -50792,6 +50792,11 @@ run_plugin_write_guard_selftests() {
     record_fail "plugin-write-guard: (a) cópia limpa do veto" "rc=${rc} acusa=${n_accuse} cala=${n_silent} teto=${n_ceiling}: $(printf '%s\n' "${out}" | grep '^✗' | head -3 | tr '\n' '|')"
     rm -rf "${d}"; return
   fi
+  # (a1b) o --selftest por caminho RELATIVO: o `_raw` muda de pasta, e o hook relativo deixava de ser achado (rc 127, refutador 5)
+  rc=0; out="$(cd "${d}/limpa/.claude/hooks" && PW_SELFTEST_ONLY="JSON truncado: Bash no alvo barra" LC_ALL=C bash pretooluse-plugin-write-guard.sh --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s\n' "${out}" | grep -q '^ok   acusa JSON truncado: Bash no alvo barra'; then
+    record_pass "plugin-write-guard: (a1b) --selftest por caminho relativo verde"
+  else record_fail "plugin-write-guard: (a1b) --selftest por caminho relativo" "rc=${rc}: $(printf '%s\n' "${out}" | tail -2 | tr '\n' '|')"; fi
   rc=0; out="$(LC_ALL=C bash "${d}/limpa/.claude/validation/plugin-write-scan-check.sh" --selftest 2>&1)" || rc=$?
   n_accuse="$(printf '%s\n' "${out}" | grep -c '^ok   acusa' || true)"; n_silent="$(printf '%s\n' "${out}" | grep -c '^ok   cala' || true)"
   if [ "${rc}" -eq 0 ] && [ "${n_accuse}" -ge 6 ] && [ "${n_silent}" -ge 6 ]; then
@@ -51119,6 +51124,11 @@ EOF_MUT
 printf '%s' "${json}" | ( cd "${p}" && CLAUDE_PROJECT_DIR=
 @@@
 printf '%s' "${json}" | ( CLAUDE_PROJECT_DIR=
+EOF_MUT
+  _pw_mut M33-ansi-prefiltro hook 'ANSI-C no caminho' <<'EOF_MUT'
+case "${raw_cmd}" in *skills*"\$'"*|*skills*'$"'*) hit=1 ;; esac
+@@@
+:
 EOF_MUT
   _pw_mut M29h-git-arquivo hook 'Write em worktree' <<'EOF_MUT'
 [ -e "$1/.git" ] && return 0
@@ -51701,34 +51711,34 @@ re.compile(r"(\)|(?:time|
 re.compile(r"((?:time|
 EOF_MUT
   _pw_mut J34c-time judge '> nu depois de time' <<'EOF_MUT'
-(?:time|coproc|fi|done|esac|\})
+(?:time|coproc|fi|done|esac|exec|\})
 @@@
-(?:coproc|fi|done|esac|\})
+(?:coproc|fi|done|esac|exec|\})
 EOF_MUT
   _pw_mut J34d-coproc judge '> nu depois de coproc' <<'EOF_MUT'
-(?:time|coproc|fi|done|esac|\})
+(?:time|coproc|fi|done|esac|exec|\})
 @@@
-(?:time|fi|done|esac|\})
+(?:time|fi|done|esac|exec|\})
 EOF_MUT
   _pw_mut J34e-fi judge 'if … fi > alvo' <<'EOF_MUT'
-(?:time|coproc|fi|done|esac|\})
+(?:time|coproc|fi|done|esac|exec|\})
 @@@
-(?:time|coproc|done|esac|\})
+(?:time|coproc|done|esac|exec|\})
 EOF_MUT
   _pw_mut J34f-done judge 'for … done > alvo' <<'EOF_MUT'
-(?:time|coproc|fi|done|esac|\})
+(?:time|coproc|fi|done|esac|exec|\})
 @@@
-(?:time|coproc|fi|esac|\})
+(?:time|coproc|fi|esac|exec|\})
 EOF_MUT
   _pw_mut J34g-esac judge 'case … esac > alvo' <<'EOF_MUT'
-(?:time|coproc|fi|done|esac|\})
+(?:time|coproc|fi|done|esac|exec|\})
 @@@
-(?:time|coproc|fi|done|\})
+(?:time|coproc|fi|done|exec|\})
 EOF_MUT
   _pw_mut J34h-chave judge '{ } > alvo' <<'EOF_MUT'
-(?:time|coproc|fi|done|esac|\})
+(?:time|coproc|fi|done|esac|exec|\})
 @@@
-(?:time|coproc|fi|done|esac)
+(?:time|coproc|fi|done|esac|exec)
 EOF_MUT
   _pw_mut J35-sequencia judge 'chaves de sequência: {h..h}ooks' <<'EOF_MUT'
 parts = m.group(1).split(",") if "," in m.group(1) else _pw_seq(m.group(1))
@@ -51754,6 +51764,47 @@ EOF_MUT
 _PW_SEQ = re.compile(r"^(?:(-?\d+)\.\.(-?\d+)|([A-Za-z])\.\.([A-Za-z]))
 @@@
 _PW_SEQ = re.compile(r"^(?:(-?\d+)\.\.(-?\d+)|([A-Za-z0-9])\.\.([A-Za-z0-9]))
+EOF_MUT
+  # ── refutador 5: entrada antes do `>`, exec, curl/wget colados, $"…", $'…' no pré-filtro, mkfifo ──
+  _pw_mut J36-entrada-fecho judge 'while … done < a > alvo' <<'EOF_MUT'
+esac|exec|\})[ \t])([ \t]*)(?=\d*[<>])")
+@@@
+esac|exec|\})[ \t])([ \t]*)(?=\d*>)")
+EOF_MUT
+  _pw_mut J36b-entrada-nu judge '< a > alvo nu' <<'EOF_MUT'
+(?=\d*[<>])", re.M)
+@@@
+(?=\d*>)", re.M)
+EOF_MUT
+  _pw_mut J36c-exec judge 'exec 1> alvo' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|exec|\})
+@@@
+(?:time|coproc|fi|done|esac|\})
+EOF_MUT
+  _pw_mut J37-colado-curl judge 'curl -fsSLo alvo' <<'EOF_MUT'
+    if base in _PW_CLUSTER:
+@@@
+    if False:
+EOF_MUT
+  _pw_mut J37b-valor-de-opcao judge 'curl -H colado com o no valor' <<'EOF_MUT'
+set("AbcCdDeEFHKmoPQrtTuUwxXyYz")
+@@@
+set()
+EOF_MUT
+  _pw_mut J37c-wget-O judge 'wget -qO alvo' <<'EOF_MUT'
+"wget": ("oOaP",
+@@@
+"wget": ("o",
+EOF_MUT
+  _pw_mut J38-locale judge 'locale no caminho' <<'EOF_MUT'
+        if c == "$" and t.startswith('$"', i):
+@@@
+        if False:
+EOF_MUT
+  _pw_mut J39-mkfifo judge 'mkfifo na forma' <<'EOF_MUT'
+    if base in ("mkfifo", "mknod"):
+@@@
+    if False:
 EOF_MUT
   _pw_mut J29g-raiz-arquivo judge 'GIT_DIR no ambiente: Bash na worktree barra' <<'EOF_MUT'
 if os.path.lexists(os.path.join(prefix, ".git")):
