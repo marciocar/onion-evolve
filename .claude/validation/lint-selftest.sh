@@ -43750,16 +43750,16 @@ api|pretooluse-direct-provider-api.sh|${apidanger}|git status"
 moat|pretooluse-moat-gate.sh|systemctl restart onion-vps-bridge|systemctl status onion-vps-bridge"
   [ "${moat_armed}" = 1 ] || record_skip "hooks-python-isolated: moat sem ops/moat-targets.tsv (core-only) → não medido aqui"
 
-  # <dir-projeto> <cwd> <json> [VAR=val…] → imprime o rc do hook; o stderr fica em ${d}/err
+  # <dir-projeto> <cwd> <json> [VAR=val ...] → imprime o rc do hook; o stderr fica em ${d}/err
   _hpi_payload() { printf '%s' "$2" | C="$1" python3 -I -c 'import json,os,sys;print(json.dumps({"session_id":"s","cwd":os.environ["C"],"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))'; }
-  _hpi_run() {  # <projeto> <hook> <cwd> <payload> [VAR=val…]
+  _hpi_run() {  # <projeto> <hook> <cwd> <payload> [VAR=val ...]
     local p="$1" h="$2" w="$3" j="$4" r=0; shift 4
     printf '%s' "${j}" | (cd "${w}" && env LC_ALL=C CLAUDE_PROJECT_DIR="${p}" TASK_MANAGER_PROVIDER=linear TM_ENV_FILE=/nao-existe \
         ONION_MODEL_SWITCH_LOG="${d}/m.log" ONION_RADAR_BASELINES="${p}/docs/onion/radar-baselines.yaml" "$@" \
         bash "${p}/.claude/hooks/${h}" >/dev/null 2>"${d}/err") || r=$?
     printf '%s' "${r}"
   }
-  _hpi_case() {  # <nome> <esperado> <projeto> <hook> <cwd> <payload> [VAR=val…]
+  _hpi_case() {  # <nome> <esperado> <projeto> <hook> <cwd> <payload> [VAR=val ...]
     local nm="$1" want="$2" p="$3" h="$4" w="$5" j="$6" got; shift 6
     got="$(_hpi_run "${p}" "${h}" "${w}" "${j}" "$@")"
     if [ "${got}" = "${want}" ]; then record_pass "hooks-python-isolated: ${nm} (rc=${want})"
@@ -43836,7 +43836,7 @@ moat|pretooluse-moat-gate.sh|systemctl restart onion-vps-bridge|systemctl status
     python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)<1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
       "${mut}/$1" "$2" "$3"
   }
-  _hpi_kill() {  # <nome> <arquivo> <velho> <novo> <hook> <cwd> <payload> <rc-limpo> <rc-com-mutante> [VAR=val…]
+  _hpi_kill() {  # <nome> <arquivo> <velho> <novo> <hook> <cwd> <payload> <rc-limpo> <rc-com-mutante> [VAR=val ...]
     local nm="$1" f="$2" old="$3" new="$4" h="$5" w="$6" j="$7" clean="$8" want="$9" got; shift 9
     _hpi_fresh
     got="$(_hpi_run "${mut}" "${h}" "${w}" "${j}" "$@")"
