@@ -146,14 +146,24 @@ nodes:
   - id: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 5
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
     label: "Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. Dono: o maestro, que decide."
-    narrative: "O apontamento é pelo nome do arquivo versionado (.env.test), sem abrir o conteúdo, como manda a regra de segredo. A rotação de chave, se houver, é do maestro, e a rotação segue parada por ordem dele até nova decisão. Ajuste de 2026-10-27: é decisão do MAESTRO, a D_CMP_ENV_TEST_TRACKED_REVIEW de 2026-10-25, no repo do brain. Ele confere o conteúdo, e só depois o arquivo sai do controle de versão e as chaves são trocadas. O nó é citado em texto, sem URL: o peer-ref-check não o alcança (o repo do brain não tem origin/main, e o nó não aparece em origin/develop nem em origin/onion/develop, medidos em 2026-10-27), e a URL do repo levaria o nome do cliente."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Sem segredo: o maestro abriu o arquivo e só há flags booleanas de teste»"
+    narrative: |-
+      O apontamento é pelo nome do arquivo versionado (.env.test), sem abrir o conteúdo, como manda a regra de segredo. A rotação de chave, se houver, é do maestro, e a rotação segue parada por ordem dele até nova decisão. Ajuste de 2026-10-27: é decisão do MAESTRO, a D_CMP_ENV_TEST_TRACKED_REVIEW de 2026-10-25, no repo do brain. Ele confere o conteúdo, e só depois o arquivo sai do controle de versão e as chaves são trocadas. O nó é citado em texto, sem URL: o peer-ref-check não o alcança (o repo do brain não tem origin/main, e o nó não aparece em origin/develop nem em origin/onion/develop, medidos em 2026-10-27), e a URL do repo levaria o nome do cliente.
+
+      verified_against anterior: «censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo»
+      Selado por /meta:decide em 2026-11-05: escolhida «Sem segredo: o maestro abriu o arquivo e só há flags booleanas de teste» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Real, com remoção e troca de chave».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «O arquivo de ambiente de teste versionado no brain tem segredo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
   - id: Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT
     node_type: question
     layer: audit
