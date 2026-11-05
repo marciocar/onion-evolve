@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # PreToolUse(Write|Edit|NotebookEdit|Bash) — VETO (exit 2) à escrita de plugin em .claude/skills e ~/.claude/skills.
 # Decisão do maestro de 2026-11-04: «Veto estreito + varredura no disco». Forma fechada por ele em 2026-11-05: só o 1º nível de cada
-# skill, sem registro de exceção (nó D_NO_CORE_NAO_HA_PLUGIN_LOCAL), e só na raiz de repo ou worktree e na pasta de casa (nó
-# D_JULGA_A_FORMA_EM_QUALQUER_RAIZ, que esta decisão superou). O veto vale em todo papel: este hook não lê o carimbo.
+# skill, sem registro de exceção (nó D_NO_CORE_NAO_HA_PLUGIN_LOCAL), e só na raiz de repo ou worktree, no projeto da sessão e na pasta de casa (nós
+# D_JULGA_A_FORMA_EM_QUALQUER_RAIZ, que esta decisão superou, e D_PROJETO_DA_SESSAO_E_RAIZ_1105). O veto vale em todo papel: este hook não lê o carimbo.
 #
 # ── O DEFEITO MEDIDO (datado, e em LABORATÓRIO, não em dano de produção) ───────────────────────
 # 2026-11-04, Claude Code 2.1.318, sessões de roteiro fixo contra um stub, sob bypassPermissions: das 129 tentativas
@@ -15,7 +15,7 @@
 # ── O QUE VETA ───────────────────────────────────────────────────────────────────
 #   · Write, Edit e NotebookEdit cujo caminho, COMO ESCRITO ou RESOLVIDO (symlink não contém `.claude` no texto), tem a forma
 #     `.claude/skills/<nome>/.claude-plugin/` ou `.claude/skills/<nome>/hooks/`, com tudo o que há abaixo delas, onde a pasta que contém
-#     `.claude/skills` é raiz de repo ou worktree (tem `.git`) ou a pasta de casa. `<nome>` é um componente só: é o 1º nível da skill;
+#     `.claude/skills` é raiz de repo ou worktree (tem `.git`), o projeto da sessão, ou a pasta de casa. `<nome>` é um componente só;
 #   · Bash que escreve nesse caminho, pelo tokenizador de lib/invocation-lines.sh + lib/plugin-write-judge.py, que compõe o
 #     juiz do MOAT: redirecionamento simples, tee, cp, mv, install, rsync, dd, tar -C, curl -o, sed -i, `cd` antes de `>`, `$HOME`,
 #     `$PWD`, `$(pwd)`, topo do git, variável e pedaços LITERAIS da mesma string, `bash -c`, script não versionado (só a escrita
@@ -23,6 +23,7 @@
 #   · `cp -r`, `mv`, `ln -s`, `rsync` de pasta que JÁ TEM a forma de plugin, quando ela cai como `.claude/skills/<nome>`, e de pasta
 #     CHAMADA `hooks` ou `.claude-plugin`, quando ela cai dentro de uma skill;
 #   · `-t` em qualquer grafia de mv, cp, ln e install; chaves em mkdir, touch, tee, cp, mv, install, ln e rsync; `&>`, `&>>` e `>|`;
+#   · `>& nome` e o redirecionamento nu (`> x`), também depois de `then`, `do`, `else`, `{`, `!`, crase e de atribuição (`A=1 > x`); `cd` com flag (`cd -P x`); `ln -s ALVO` de um argumento, que nasce no diretório atual;
 #   · link: o `cwd` em `.claude`, a palavra sem barra que é link (`> docs-l`), o `cd` para link, e a pasta de fora de uma skill que é link.
 #
 # ── O QUE CALA (falso positivo é o defeito dominante aqui) ────────────────────────────────
@@ -32,8 +33,7 @@
 #   · texto que só CITA o caminho: echo, heredoc de documento, `git commit -F -`, string em Python, grep, git log, `python3 x.py <texto>`;
 #   · leitura: cat, ls, Read, `cp <plugin> /tmp`, `xargs cp` para fora, `shutil.copy` para fora, `touch -r`, `tar -xO`, `rsync -n`;
 #   · REMOVER: rm, rmdir, unlink, find -delete, find -exec rm, git clean, git rm e a origem de um mv. É a cura que a varredura manda;
-#   · a forma fora de uma raiz: `docs/x/.claude/skills/y/hooks/z`, pasta solta em /tmp e projeto sem git (decisão do maestro de 2026-11-05,
-#     e o projeto sem git é o custo dela: a partida ainda avisa, porque a varredura julga o projeto que recebe);
+#   · a forma fora de uma raiz: `docs/x/.claude/skills/y/hooks/z` e pasta solta em /tmp (decisão do maestro de 2026-11-05);
 #   · ssh, scp e rsync para OUTRA máquina; `bash -n`; e o script solto em que a escrita não se prova.
 #   A vizinha ensina: em 2026-11-04 a guarda do arquivo de segredos deu dois falsos positivos (relato do maestro), e mais dois
 #   nesta forja. Aqui o veto casa a FORMA de um caminho de ESCRITA, nunca o texto. O replay sobre os transcripts reprovou a 1ª redação,
@@ -44,11 +44,15 @@
 #   versionado, `python3 x.py`, `base64 -d | sh`, `git apply`, `git clone`, `git checkout`, `tar` e `unzip` na pasta de skills sem a
 #   forma no destino, nome calculado em runtime, nome com valores distintos na string (ramo de `if`, reatribuição, `for`: a última
 #   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, e
-#   redirecionamento composto (`{ } >`, `( ) >`, `for … done >`, `if … fi >`, `&>`, `>|`, `<>`, `exec 3>`). Também escapam: alias de
+#   redirecionamento composto (`{ } >`, `( ) >`, `for … done >`, `if … fi >`, `<>`, `exec 3>`). Também escapam: alias de
 #   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, e programa que escreve por dentro.
 #   FAMÍLIAS DECLARADAS, sem perseguir (guarda por lista), com caso que grava de verdade e confere que a varredura acusa o resultado:
 #   python indireto, `git mv`, `git worktree add`, `git submodule add`, `git restore`, `tar -x`, `unzip`, `sed w`, `sort -o`.
 #   `$CLAUDE_CONFIG_DIR` escapa aqui E na varredura, que não conhece essa pasta.
+#   Declarados, sem perseguir: cwd que é link; verbos fora da lista sobre link (`truncate`, `sort -o`, `env -C`); link em código (`python3 -c`,
+#   `perl -e`); link por glob ou variável (`docs-?`, `D=docs; cd $D`); chaves em `curl -o`, `wget -P` e `dd of=`; atribuição com espaço antes de
+#   um redirecionamento nu (`A='a b' > x`). E uma sobreacusação rara:
+#   `.claude/skills/self -> ../..` faz o `hooks/` da raiz barrar, como a S6.
 #   FORMAS DE ESTOURO, também declaradas: 3.000 `$(` na mesma string; `sh -c` aninhado 12 vezes, que só fecha com o sinal no texto; script
 #   solto maior que 512 KiB, que o juiz não lê; e a cláusula 4 da guard-doctrine: sem python ou sem a lib, o Bash só fecha com o
 #   caminho inteiro junto de verbo de escrita, sem provar a raiz, e todo o resto passa. O teste de link olha só as 256 primeiras
@@ -67,12 +71,17 @@
 set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# A pasta que contém `.claude/skills` é raiz de repo ou worktree (`.git` é pasta ou arquivo), ou a casa?
+# A pasta que contém `.claude/skills` é raiz de repo ou worktree (`.git` é pasta ou arquivo), o projeto, ou a casa? Teste de arquivo,
+# sem `git`: o `rev-parse` erra calado com GIT_DIR e GIT_WORK_TREE (medido pelo refutador).
 _pw_is_root() {
+  local b
   [ -e "$1/.git" ] && return 0
-  [ -n "${HOME:-}" ] || return 1
-  [ "$1" = "${HOME}" ] && return 0
-  [ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${HOME}" 2>/dev/null)" ]
+  for b in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
+    [ -n "${b}" ] || continue
+    [ "$1" = "${b}" ] && return 0
+    [ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${b}" 2>/dev/null)" ] && return 0
+  done
+  return 1
 }
 
 _pw_is_plugin_path() {
@@ -108,7 +117,6 @@ _pw_link_targets() {
   local base e
   for base in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
     [ -n "${base}" ] && [ -d "${base}/.claude/skills" ] || continue
-    _pw_is_root "${base}" || continue
     for e in "${base}"/.claude/skills/* "${base}"/.claude/skills/.[!.]*; do
       [ -L "${e}" ] && realpath -m -- "${e}" 2>/dev/null
     done
@@ -314,9 +322,41 @@ open(p,'w').write('x')\""
   _c acusa "&> alvo"                      Bash  "echo x &> ${H}"
   _c acusa "&>> alvo"                     Bash  "echo x &>> ${H}"
   _c acusa ">| alvo"                      Bash  "echo x >| ${H}"
+  _c acusa ">& alvo"                      Bash  "echo x >& ${H}"
+  _c acusa "> nu"                         Bash  "> ${H}"
+  _c acusa ">> nu, depois de ;"           Bash  "cd docs; >> ../${H}"
+  _c acusa "> nu com cwd na skill"        Bash  "> hooks" "${p}/.claude/skills/onion"
+  _c acusa "> nu depois de then"          Bash  "if true; then > ${H}; fi"
+  _c acusa "> nu depois de do"            Bash  "for i in 1; do > ${H}; done"
+  _c acusa "> nu depois de else"          Bash  "if true; then :; else > ${H}; fi"
+  _c acusa "> nu depois de chave"         Bash  "{ > ${H}; }"
+  _c acusa "> nu depois de !"             Bash  "! > ${H}"
+  _c acusa "> nu em subshell"             Bash  "(> ${H})"
+  _c acusa "> nu em crase"                Bash  "echo \`> ${H}\`"
+  _c acusa "> nu em \$( )"                Bash  "echo \$(> ${H})"
+  _c acusa "> nu depois de atribuição"    Bash  "A=1 > ${H}"
+  _c acusa ">> nu depois de duas atribuições" Bash "A=1 B=2 >> ${H}"
+  _c acusa "> nu depois de atribuição, cwd na skill" Bash "A=1 > hooks" "${p}/.claude/skills/x"
+  _c acusa "chaves estouradas não abortam: cd e >" Bash "touch /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; cd .claude/skills/x; echo x > hooks/h"
+  _c acusa "chaves estouradas não abortam: link" Bash "touch /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; echo x > docs/lnk-hooks/r"
+  _c acusa "chaves estouradas não abortam: variável" Bash "mkdir -p /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; N=hooks; touch .claude/skills/x/\$N/h"
+  _c acusa "cd -- e >"                    Bash  "cd -- .claude/skills/x && echo x > hooks/h"
+  _c acusa "cd -P e >"                    Bash  "cd -P .claude/skills/x && echo x > hooks/h"
+  _c acusa "cd -L e >"                    Bash  "cd -L .claude/skills/x && echo x > hooks/h"
+  _c acusa "cd -e e >"                    Bash  "cd -e .claude/skills/x && echo x > hooks/h"
+  _c acusa "cd por variável para link"    Bash  "D=hk; cd \$D && echo x > h"
+  _c acusa "cd -P para link"              Bash  "cd -P hk && echo x > h"
+  _c acusa "cd -P até a pasta do link"    Bash  "cd -P docs && echo x > lnk-hooks/r"
+  _c acusa "cd -P seguido até o link"     Bash  "cd docs && cd -P ../hk && echo x > h"
+  _c acusa "cd -- seguido até o link"     Bash  "cd -- docs && cd ../hk && echo x > h"
+  _c acusa "ln -s de um argumento: pasta chamada hooks" Bash "ln -s ../../../../fora/exth/hooks" "${p}/.claude/skills/onion"
+  _c acusa "ln -sn de um argumento: pasta chamada hooks" Bash "ln -sn ../../../../fora/exth/hooks" "${p}/.claude/skills/onion"
+  _c acusa "ln -s de um argumento depois de cd" Bash "cd .claude/skills/onion && ln -s ${d}/fora/exth/hooks"
+  _c acusa "ln -s de um argumento: pasta com plugin, relativo" Bash "ln -s ../../../fora/ext" "${p}/.claude/skills"
   # ── o que não se analisa, com o sinal ──
   _c acusa "aspas não fechadas com o sinal, em outra linha" Bash "cat > /tmp/z <<< 'a
 .claude/skills/x/hooks/h"
+  _c acusa "aspas não fechadas na forma fria" Bash "cd .claude/skills/x && echo 'oops > hooks/h"
   _c acusa "php -r file_put_contents"     Bash  "php -r \"file_put_contents('${H}','x');\""
   # ── CALA: edição honesta, citação, leitura e remoção ──
   _c cala "Write fora de raiz: docs/x" Write "${p}/docs/x/.claude/skills/y/hooks/z"
@@ -351,10 +391,23 @@ open(p,'w').write('x')\""
   _c cala "cp -r da pasta chamada hooks direto em skills: é o nome da skill" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/"
   _c cala "cp -r da pasta chamada hooks para fundo" Bash "cp -r ${d}/fora/exth/hooks .claude/skills/a/b/"
   _c cala "cp -r do conteúdo da pasta chamada hooks" Bash "cp -r ${d}/fora/exth/hooks/. .claude/skills/onion/"
+  _c cala "chaves estouradas não fecham a leitura" Bash "touch /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; cat ${H}"
+  _c cala "cwd na pasta hooks: >&2"        Bash  "echo x >&2" "${p}/.claude/skills/w/hooks"
+  _c cala ">&- fecha o descritor"          Bash  "echo x >&-" "${p}/.claude/skills/w/hooks"
+  _c cala "2>&1 antes de > fora"           Bash  "echo x 2>&1 >/tmp/z" "${p}/.claude/skills/w/hooks"
+  _c cala "> nu fora da forma"             Bash  "> /tmp/z; echo ${H}"
+  _c cala "> nu depois de do, fora da forma" Bash "for i in 1; do > /tmp/z; done; echo ${H}"
+  _c cala "> nu depois de atribuição, fora da forma" Bash "A=1 > /tmp/z; echo ${H}"
+  _c cala "then só citado antes de >"      Bash  "echo then > /tmp/z; echo ${H}"
+  _c cala "> nu dentro de aspas"           Bash  "echo 'if true; then > ${H}; fi'"
+  _c cala "cd -P noutra pasta e >"         Bash  "cd -P docs && echo x > hooks"
+  _c cala "ln -s de um argumento: pasta sem forma" Bash "ln -s ../../../../fora/vazia" "${p}/.claude/skills/onion"
+  _c cala "cwd em .claude/hooks: >"        Bash  "echo x > a" "${p}/.claude/hooks"
+  _c cala "cwd em worktree de agente: >"   Bash  "echo x > a" "${p}/.claude/worktrees/a"
   _c cala "&> fora"                        Bash  "echo x &> /tmp/z"
   _c cala "&> citado entre aspas"          Bash  "echo 'a &> ${H}'"
   _c cala ">| citado entre aspas"          Bash  "echo \"a >| ${H}\""
-  _c cala "aspas não fechadas sem o sinal" Bash  "echo 'skills hooks > /tmp/z"
+  _c cala "aspas não fechadas sem o sinal" Bash  "cp a /tmp/z; echo 'skills sem o outro pedaço"
   _c cala "php -r só lê"                   Bash  "php -r \"echo file_get_contents('${H}');\""
   _c cala "php -r grava fora, citando"     Bash  "php -r \"file_put_contents('/tmp/a','${H}');\""
   _c cala "Write em skills/onion/SKILL.md" Write "${p}/.claude/skills/onion/SKILL.md"
@@ -493,7 +546,11 @@ open(p,'w')\""
   _c TETO "for … done > alvo"              Bash  "for i in 1; do echo x; done > ${H}"
   _c TETO "{ } > alvo"                     Bash  "{ echo x; } > ${H}"
   _c TETO "( ) > alvo"                     Bash  "( echo x ) > ${H}"
-  _c TETO ">& alvo"                        Bash  "echo x >& ${H}"
+  _c TETO "truncate sobre link"            Bash  "truncate -s0 docs-l"
+  _c TETO "env -C sobre link"              Bash  "env -C hk sh -c 'true'"
+  _c TETO "link por glob"                  Bash  "echo x > docs-?"
+  _c TETO "cd por variável até a pasta do link" Bash "D=docs; cd \$D && echo x > lnk-hooks/r"
+  _c TETO "chaves em curl -o"              Bash  "curl -sS -o .claude/skills/x/{hooks,y}/h https://exemplo.invalid/x"
   _c TETO "<> alvo"                        Bash  "cat <> ${H}"
   _c TETO "exec 3> alvo"                   Bash  "exec 3> ${H}"
   _c TETO "pasta criada e copiada na mesma string" Bash "mkdir -p /tmp/q/hooks; cp -r /tmp/q .claude/skills/q"
@@ -561,9 +618,32 @@ E"
   # a raiz, com a casa por link e o projeto sem git
   rawhome="${d}/home-link" _raw 2 "Write na casa, com HOME por link" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/home/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
   rawhome="${d}/home-link" _raw 2 "Bash na casa, com HOME por link" '{"tool_name":"Bash","tool_input":{"command":"printf x > '"${d}"'/home/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
-  rawproj="${d}/semgit" _raw 0 "raiz sem git: Write passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/semgit/.claude/skills/y/hooks/h"},"cwd":"'"${d}"'/semgit"}'
-  rawproj="${d}/semgit" _raw 0 "raiz sem git: Bash passa" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/y/hooks/h"},"cwd":"'"${d}"'/semgit"}'
-  rawproj="${d}/semgit" _raw 0 "raiz sem git: o alvo da skill que é link não entra" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/fora/alvo-semgit/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  rawproj="${d}/semgit" _raw 2 "projeto sem git: Write barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/semgit/.claude/skills/y/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  rawproj="${d}/semgit" _raw 2 "projeto sem git: Bash barra" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/y/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  rawproj="${d}/semgit" _raw 2 "projeto sem git: o alvo da skill que é link entra" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/fora/alvo-semgit/hooks/h"},"cwd":"'"${d}"'/semgit"}'
+  _raw 0 "raiz sem git que não é o projeto: Write passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/semgit/.claude/skills/y/hooks/h"},"cwd":"'"${p}"'"}'
+  _raw 0 "raiz sem git que não é o projeto: Bash passa" '{"tool_name":"Bash","tool_input":{"command":"printf x > '"${d}"'/semgit/.claude/skills/y/hooks/h"},"cwd":"'"${p}"'"}'
+  # a raiz é teste de arquivo: GIT_DIR e GIT_WORK_TREE no ambiente não mudam nada
+  GIT_DIR=/nada GIT_WORK_TREE=/nada _raw 2 "GIT_DIR no ambiente: Write na worktree barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/wt/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
+  GIT_DIR=/nada GIT_WORK_TREE=/nada _raw 2 "GIT_DIR no ambiente: Bash na worktree barra" '{"tool_name":"Bash","tool_input":{"command":"printf x > '"${d}"'/wt/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
+  # o gatilho por cwd é custo, não veredito: um python falso conta quem o paga
+  gp="${d}/gatilho"; mkdir -p "${gp}" "${p}/.claude/worktrees/a/docs"
+  for _b in bash cat grep sed awk head tr realpath dirname git; do _bp="$(command -v "${_b}")" && ln -sf "${_bp}" "${gp}/${_b}"; done
+  printf '#!/bin/sh\n: > "%s/gatilho.marca"\nexit 1\n' "${d}" > "${gp}/python3"; chmod +x "${gp}/python3"
+  _g() {  # _g <paga|nao> <nome> <comando> <cwd>
+    local want="$1" name="$2" got=nao; shift 2
+    case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
+    rm -f "${d}/gatilho.marca"
+    printf '{"tool_name":"Bash","tool_input":{"command":"%s"},"cwd":"%s"}' "$1" "$2" | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" PATH="${gp}" bash "${BASH_SOURCE[0]}" >/dev/null 2>&1
+    [ -e "${d}/gatilho.marca" ] && got=paga
+    if [ "${got}" = "${want}" ]; then printf 'ok   %-5s %s\n' "$([ "${want}" = paga ] && echo acusa || echo cala)" "${name}"
+    else printf '✗    %-5s %s (%s)\n' "${want}" "${name}" "${got}"; fails=$((fails + 1)); fi
+  }
+  _g nao "gatilho: cwd em .claude/hooks não paga o python" "echo x > a" "${p}/.claude/hooks"
+  _g nao "gatilho: cwd em worktree de agente não paga o python" "git status" "${p}/.claude/worktrees/a/docs"
+  _g nao "gatilho: cwd em .claude/worktrees não paga o python" "echo x > a" "${p}/.claude/worktrees"
+  _g paga "gatilho: cwd em .claude paga o python" "echo x > a" "${p}/.claude"
+  _g paga "gatilho: cwd na skill paga o python" "echo x > a" "${p}/.claude/skills/x"
   # a mensagem diz onde o plugin mora: é o que o clone da porta lê quando o gate trava
   case "a mensagem do veto diz onde o plugin mora" in *"${PW_SELFTEST_ONLY:-}"*)
     _m="$(printf '%s' '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" bash "${BASH_SOURCE[0]}" 2>&1 >/dev/null)"
@@ -643,7 +723,8 @@ case "${flat}" in
   *skills*) grep -qE '(^|[^[:alnum:]_-])(cp|mv|ln|rsync)([^[:alnum:]_-]|$)' <<< "${flat}" && hit=1 ;;
 esac
 # (5) o `cwd`: em `.claude/skills/x`, `mkdir hooks` não traz sinal nenhum no texto
-case "${hcwd0}" in *.claude*) hit=1 ;; esac
+# Só `.claude` e skills: `*.claude*` fazia toda chamada numa worktree de `.claude/worktrees/` pagar o python (38 → 196 ms, medido)
+case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
 pw_unversioned_script() {
   local t d="${hcwd0}"
   grep -qE '\|[[:space:]]*(ba|z|da|k)?sh([[:space:]]|$)' <<< "${raw_cmd}" && return 0
@@ -661,6 +742,7 @@ pw_cites_symlink() {
   local t c prev=""
   while IFS= read -r t; do
     [ -n "${t}" ] || continue
+    case "${prev}:${t}" in cd:--|cd:-[LPe@]*|pushd:--|pushd:-[LPe@]*) continue ;; esac
     case "${t}" in
       '~/'*) t="${HOME:-}/${t#'~/'}" ;;
       '$HOME/'*) t="${HOME:-}/${t#'$HOME/'}" ;;

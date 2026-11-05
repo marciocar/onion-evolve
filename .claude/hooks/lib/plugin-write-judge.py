@@ -76,16 +76,17 @@ _pw_assign = {}          # NOME → o único valor bruto atribuído na string; c
 _pw_ambiguous = set()    # NOME com mais de um valor, ou religado por for/select/read: a última atribuição não prova nada
 
 
-_PW_HOME = os.path.realpath(os.environ["HOME"]) if os.environ.get("HOME") else None
+_PW_ROOTS = {os.path.realpath(v) for v in (os.environ.get("HOME"), os.environ.get("CLAUDE_PROJECT_DIR")) if v}
+_PW_CD_FLAG = re.compile(r"^(--|-[LPe@]+)$")
 
 
 def _pw_is_root(prefix):
-    """A pasta que contém `.claude/skills` é raiz de repo ou worktree, ou a casa? Prefixo vazio é relativo que não se resolveu: não dá para provar que é solto."""
+    """A pasta que contém `.claude/skills` é raiz de repo ou worktree, o projeto, ou a casa? Teste de arquivo: `git rev-parse` erra calado com GIT_DIR e GIT_WORK_TREE. Prefixo vazio é relativo que não se resolveu: não dá para provar que é solto."""
     if not prefix:
         return True
     if os.path.lexists(os.path.join(prefix, ".git")):
         return True
-    return bool(_PW_HOME) and os.path.realpath(prefix) == _PW_HOME
+    return os.path.realpath(prefix) in _PW_ROOTS
 
 
 def _pw_form(p):
@@ -290,8 +291,8 @@ _pw_base_unanalyzable = moat_unanalyzable
 def moat_unanalyzable(seg, why, whole=False):
     head = os.path.basename(str(seg[0])) if isinstance(seg, (list, tuple)) and seg else ""
     if why == "comando que o analisador não conseguiu ler":
-        # aspas não fechadas, aninhamento além do teto: nada do texto foi julgado, então o sinal basta, em qualquer linha
-        if _PW_TEXT_SIG.search(str(seg)):
+        # aspas não fechadas, aninhamento além do teto: nada do texto foi julgado, então os dois pedaços da forma bastam, em qualquer linha
+        if "skills" in str(seg) and re.search(r"hooks|\.claude-plugin", str(seg)):
             _moat_emit("inanalisavel", str(seg), "", why)
         return
     if head == "ssh":
@@ -367,13 +368,16 @@ def _pw_load_assign():
     _pw_scan_interp_heredocs()
 
 
-# ── `&>`, `&>>` e `>|`: o tokenizador parte em `&`/`|` e o destino sairia como comando seguinte. Entre aspas a troca não muda o que
+# ── `>|` e `>& nome`: o tokenizador parte em `|`/`&` e o destino sairia como comando seguinte. `&>` e `&>>` caem no redirecionamento nu. Entre aspas a troca não muda o que
 # se julga, e o `bash -c 'x &> y'` passa por aqui de novo, no nível dele ──
-_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+_PW_REDIR_FORMS = re.compile(r">\||>&(?=\s*[^\s\d])")
+# `> x` sem comando, também depois de palavra de controle ou de atribuição: o lib não julga segmento vazio. Vira `: > x`, que ele julga
+_PW_BARE_REDIR = re.compile(r"(^|;|\||\(|\n|(?:then|do|else|if|elif|while|until|\{|!)[ \t]|&)([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)(?=\d*>)", re.M)
 
 
 def _pw_norm_redirects(t):
-    return _PW_REDIR_FORMS.sub(">", t)
+    t = _PW_REDIR_FORMS.sub(">", t)
+    return _PW_BARE_REDIR.sub(r"\1\2: ", t)
 
 
 _pw_base_prepass = prepass
@@ -395,9 +399,10 @@ def brace_expand(word):
         parts = m.group(1).split(",") if "," in m.group(1) else [m.group(1)]
         todo.extend(w[:m.start()] + p + w[m.end():] for p in reversed(parts))
         if len(todo) + len(out) > _PW_BRACE_MAX:
+            # só esta palavra fica sem expandir: abortar deixaria o resto da string sem julgamento
             if "skills" in word:
                 _moat_emit("inanalisavel", word, "", "expansão de chaves além do teto")
-            raise Unanalyzable("expansão de chaves além do teto")
+            return [word]
     return out
 
 
@@ -499,6 +504,11 @@ def _moat_script(path, depth, words):
         _PW["in_script"] -= 1
 
 
+def _pw_ln_base(d):
+    """O alvo relativo de um link se lê a partir de onde o link nasce: dentro de `d`, se `d` é pasta."""
+    return d if os.path.isdir(d) else os.path.dirname(d)
+
+
 def _pw_named_form_lands(base, src, sp, dest, into):
     """A própria pasta se chama `hooks` ou `.claude-plugin` e cai logo abaixo de uma skill. O conteúdo espalhado (`hooks/.`) não leva o nome."""
     if (base == "rsync" and src.endswith("/")) or (base == "cp" and src.rstrip("/").endswith("/.")):
@@ -523,6 +533,8 @@ def _pw_copy_into_skills(base, args, detail):
         dest, srcs = tdir, pos
     elif len(pos) >= 2:
         dest, srcs = pos[-1], pos[:-1]
+    elif base == "ln" and len(pos) == 1:                # `ln -s ALVO`: o link nasce no diretório atual, com o nome do alvo
+        dest, srcs = ".", pos
     else:
         return
     d = _moat_abspath(dest)
@@ -536,7 +548,7 @@ def _pw_copy_into_skills(base, args, detail):
             if v:
                 ex.add(v.strip("/"))
     for s in srcs:
-        sp = _moat_abspath(s, os.path.dirname(d) if base == "ln" else None)
+        sp = _moat_abspath(s, _pw_ln_base(d) if base == "ln" else None)
         lands = _pw_lands_as_skill(base, s, d, into) or _pw_lands_as_skill(base, s, os.path.realpath(d), into)
         if sp and _pw_named_form_lands(base, s, sp, d, into or dest.endswith("/")):
             _moat_emit("plugin", d, "", "%s de uma pasta chamada %s para dentro de uma skill — %s" % (base, os.path.basename(sp), detail))
@@ -570,6 +582,8 @@ _pw_base_command = moat_command
 
 def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     _pw_load_assign()
+    if base in ("cd", "pushd"):                         # `cd -- X`, `cd -P X`: a flag não é o destino
+        words = words[:1] + [w for w in words[1:] if not _PW_CD_FLAG.match(w)]
     if base == "rsync":                                 # no rsync, `-t` é preservar o horário: o juiz composto o lê como destino
         words = [w for w in words if w != "-t"]
     if base in _PW_BRACE_VERBS:

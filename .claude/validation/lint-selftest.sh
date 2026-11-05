@@ -51080,25 +51080,59 @@ _pw_is_root "${BASH_REMATCH[1]}" && return 0
 return 0
 EOF_MUT
   _pw_mut M29c-casa hook 'Write T5' <<'EOF_MUT'
-[ "$1" = "${HOME}" ] && return 0
-  [ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${HOME}" 2>/dev/null)" ]
+for b in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
 @@@
-return 1
+for b in "${CLAUDE_PROJECT_DIR:-}"; do
+EOF_MUT
+  _pw_mut M29f-projeto hook 'projeto sem git: Write barra' <<'EOF_MUT'
+for b in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
+@@@
+for b in "${HOME:-}"; do
 EOF_MUT
   _pw_mut M29d-casa-link hook 'Write na casa, com HOME por link' <<'EOF_MUT'
-[ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${HOME}" 2>/dev/null)" ]
+[ "$(realpath -m -- "$1" 2>/dev/null)" = "$(realpath -m -- "${b}" 2>/dev/null)" ] && return 0
 @@@
-false
+:
 EOF_MUT
   _pw_mut M29e-ocorrencias hook 'Write em hooks com .claude/skills dentro' <<'EOF_MUT'
 rest="${BASH_REMATCH[1]}"
 @@@
 break
 EOF_MUT
-  _pw_mut M30-alvo-sem-raiz hook 'raiz sem git: o alvo da skill que é link não entra' <<'EOF_MUT'
-_pw_is_root "${base}" || continue
+  _pw_mut M29g-raiz-arquivo hook 'GIT_DIR no ambiente: Write na worktree barra' <<'EOF_MUT'
+[ -e "$1/.git" ] && return 0
 @@@
-:
+[ "$(git -C "$1" rev-parse --show-toplevel 2>/dev/null)" = "$(realpath -m -- "$1")" ] && return 0
+EOF_MUT
+  _pw_mut M29i-solta hook 'raiz sem git que não é o projeto: Write passa' <<'EOF_MUT'
+[ -e "$1/.git" ] && return 0
+@@@
+return 0
+EOF_MUT
+  _pw_mut M29h-git-arquivo hook 'Write em worktree' <<'EOF_MUT'
+[ -e "$1/.git" ] && return 0
+@@@
+[ -d "$1/.git" ] && return 0
+EOF_MUT
+  _pw_mut M19b-cwd-largo hook 'gatilho: cwd em .claude/hooks não paga o python' <<'EOF_MUT'
+case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
+@@@
+case "${hcwd0}" in *.claude*) hit=1 ;; esac
+EOF_MUT
+  _pw_mut M19c-cwd-largo-wt hook 'gatilho: cwd em worktree de agente não paga o python' <<'EOF_MUT'
+case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
+@@@
+case "${hcwd0}" in */.claude|*/.claude/*) hit=1 ;; esac
+EOF_MUT
+  _pw_mut M19d-cwd-raiz hook 'gatilho: cwd em .claude paga o python' <<'EOF_MUT'
+case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
+@@@
+case "${hcwd0}" in */.claude/skills*) hit=1 ;; esac
+EOF_MUT
+  _pw_mut M19e-cwd-skill hook 'gatilho: cwd na skill paga o python' <<'EOF_MUT'
+case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
+@@@
+case "${hcwd0}" in */.claude) hit=1 ;; esac
 EOF_MUT
   _pw_mut M31-mensagem hook 'a mensagem do veto diz onde o plugin mora' <<'EOF_MUT'
 Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace ou --plugin-dir), não escrevendo em skills. A REGRA 114
@@ -51106,7 +51140,7 @@ Plugin se instala pelo mecanismo próprio do Claude Code (/plugin, marketplace o
 A REGRA 114
 EOF_MUT
   _pw_mut M19-cwd hook 'cwd na skill: mkdir hooks' <<'EOF_MUT'
-case "${hcwd0}" in *.claude*) hit=1 ;; esac
+case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
 @@@
 :
 EOF_MUT
@@ -51117,6 +51151,11 @@ EOF_MUT
 EOF_MUT
   _pw_mut M21-segue-cd hook 'cd seguido até o link' <<'EOF_MUT'
 case "${prev}" in cd|pushd) cd -- "${t}" 2>/dev/null ;; esac
+@@@
+:
+EOF_MUT
+  _pw_mut M21b-cd-flag hook 'cd -P até a pasta do link' <<'EOF_MUT'
+case "${prev}:${t}" in cd:--|cd:-[LPe@]*|pushd:--|pushd:-[LPe@]*) continue ;; esac
 @@@
 :
 EOF_MUT
@@ -51322,9 +51361,44 @@ dest, srcs = tdir, pos
 return
 EOF_MUT
   _pw_mut J9d-ln-base judge 'ln -s relativo ao link' <<'EOF_MUT'
-os.path.dirname(d) if base == "ln" else None
+_pw_ln_base(d) if base == "ln" else None
 @@@
 None
+EOF_MUT
+  _pw_mut J31-ln-um-arg judge 'ln -s de um argumento: pasta chamada hooks' <<'EOF_MUT'
+elif base == "ln" and len(pos) == 1:
+@@@
+elif False:
+EOF_MUT
+  _pw_mut J31b-ln-dentro judge 'ln -s de um argumento: pasta com plugin, relativo' <<'EOF_MUT'
+return d if os.path.isdir(d) else os.path.dirname(d)
+@@@
+return os.path.dirname(d)
+EOF_MUT
+  _pw_mut J31c-ln-depois-de-cd judge 'ln -s de um argumento depois de cd' <<'EOF_MUT'
+dest, srcs = ".", pos
+@@@
+return
+EOF_MUT
+  _pw_mut J30-cd-flag judge 'cd -P e >' <<'EOF_MUT'
+words = words[:1] + [w for w in words[1:] if not _PW_CD_FLAG.match(w)]
+@@@
+pass
+EOF_MUT
+  _pw_mut J30b-cd-traco judge 'cd -- e >' <<'EOF_MUT'
+_PW_CD_FLAG = re.compile(r"^(--|-[LPe@]+)$")
+@@@
+_PW_CD_FLAG = re.compile(r"^(-[LPe@]+)$")
+EOF_MUT
+  _pw_mut J30c-cd-e judge 'cd -e e >' <<'EOF_MUT'
+_PW_CD_FLAG = re.compile(r"^(--|-[LPe@]+)$")
+@@@
+_PW_CD_FLAG = re.compile(r"^(--|-[LP@]+)$")
+EOF_MUT
+  _pw_mut J30d-cd-L judge 'cd -L e >' <<'EOF_MUT'
+_PW_CD_FLAG = re.compile(r"^(--|-[LPe@]+)$")
+@@@
+_PW_CD_FLAG = re.compile(r"^(--|-[Pe@]+)$")
 EOF_MUT
   _pw_mut J9e-exclude judge 'rsync que exclui as pastas de plugin' <<'EOF_MUT'
 ex.add(v.strip("/"))
@@ -51457,14 +51531,19 @@ if os.path.lexists(os.path.join(prefix, ".git")):
 if False:
 EOF_MUT
   _pw_mut J29d-casa judge 'cat > T5 com ~' <<'EOF_MUT'
-return bool(_PW_HOME) and os.path.realpath(prefix) == _PW_HOME
+return os.path.realpath(prefix) in _PW_ROOTS
 @@@
 return False
 EOF_MUT
   _pw_mut J29e-casa-link judge 'Bash na casa, com HOME por link' <<'EOF_MUT'
-_PW_HOME = os.path.realpath(os.environ["HOME"]) if os.environ.get("HOME") else None
+_PW_ROOTS = {os.path.realpath(v) for v in (os.environ.get("HOME"), os.environ.get("CLAUDE_PROJECT_DIR")) if v}
 @@@
-_PW_HOME = os.environ.get("HOME")
+_PW_ROOTS = {v for v in (os.environ.get("HOME"), os.environ.get("CLAUDE_PROJECT_DIR")) if v}
+EOF_MUT
+  _pw_mut J29f-projeto judge 'projeto sem git: Bash barra' <<'EOF_MUT'
+(os.environ.get("HOME"), os.environ.get("CLAUDE_PROJECT_DIR")) if v}
+@@@
+(os.environ.get("HOME"),) if v}
 EOF_MUT
   _pw_mut J24-chaves judge 'chaves no mkdir' <<'EOF_MUT'
 words = words[:1] + [e for w in words[1:] for e in brace_expand(w)]
@@ -51483,20 +51562,109 @@ if "skills" in word:
 if True:
                 _moat_emit
 EOF_MUT
+  _pw_mut J24d-aborta judge 'chaves estouradas não abortam: link' <<'EOF_MUT'
+                _moat_emit("inanalisavel", word, "", "expansão de chaves além do teto")
+            return [word]
+@@@
+                _moat_emit("inanalisavel", word, "", "expansão de chaves além do teto")
+            raise Unanalyzable("teto")
+EOF_MUT
+  _pw_mut J24e-fecha-leitura judge 'chaves estouradas não fecham a leitura' <<'EOF_MUT'
+                _moat_emit("inanalisavel", word, "", "expansão de chaves além do teto")
+            return [word]
+@@@
+                _moat_emit("inanalisavel", word, "", "expansão de chaves além do teto")
+            raise Unanalyzable("teto")
+EOF_MUT
   _pw_mut J25-redir-e judge '&> alvo' <<'EOF_MUT'
-_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+!)[ \t]|&)
+@@@
+!)[ \t])
+EOF_MUT
+  _pw_mut J25b-redir-ee judge '&>> alvo' <<'EOF_MUT'
+!)[ \t]|&)
+@@@
+!)[ \t]|&(?!>>))
+EOF_MUT
+  _pw_mut J25c-redir-pipe judge '>| alvo' <<'EOF_MUT'
+_PW_REDIR_FORMS = re.compile(r">\||>&(?=\s*[^\s\d])")
+@@@
+_PW_REDIR_FORMS = re.compile(r">&(?=\s*[^\s\d])")
+EOF_MUT
+  _pw_mut J25f-redir-amp judge '>& alvo' <<'EOF_MUT'
+_PW_REDIR_FORMS = re.compile(r">\||>&(?=\s*[^\s\d])")
 @@@
 _PW_REDIR_FORMS = re.compile(r">\|")
 EOF_MUT
-  _pw_mut J25b-redir-ee judge '&>> alvo' <<'EOF_MUT'
-_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+  _pw_mut J25g-redir-fd judge 'cwd na pasta hooks: >&2' <<'EOF_MUT'
+_PW_REDIR_FORMS = re.compile(r">\||>&(?=\s*[^\s\d])")
 @@@
-_PW_REDIR_FORMS = re.compile(r"&>(?!>)|>\|")
+_PW_REDIR_FORMS = re.compile(r">\||>&")
 EOF_MUT
-  _pw_mut J25c-redir-pipe judge '>| alvo' <<'EOF_MUT'
-_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+  _pw_mut J32-nu judge '> nu' <<'EOF_MUT'
+return _PW_BARE_REDIR.sub(r"\1\2: ", t)
 @@@
-_PW_REDIR_FORMS = re.compile(r"&>")
+return t
+EOF_MUT
+  _pw_mut J32b-nu-separador judge '>> nu, depois de ;' <<'EOF_MUT'
+r"(^|;|\||\(|\n|(?:then
+@@@
+r"(^|\||\(|\n|(?:then
+EOF_MUT
+  _pw_mut J32d-nu-then judge '> nu depois de then' <<'EOF_MUT'
+(?:then|do|else|if|elif|while|until|\{|!)
+@@@
+(?:do|else|if|elif|while|until|\{|!)
+EOF_MUT
+  _pw_mut J32e-nu-do judge '> nu depois de do' <<'EOF_MUT'
+(?:then|do|else|if|elif|while|until|\{|!)
+@@@
+(?:then|else|if|elif|while|until|\{|!)
+EOF_MUT
+  _pw_mut J32f-nu-else judge '> nu depois de else' <<'EOF_MUT'
+(?:then|do|else|if|elif|while|until|\{|!)
+@@@
+(?:then|do|if|elif|while|until|\{|!)
+EOF_MUT
+  _pw_mut J32g-nu-chave judge '> nu depois de chave' <<'EOF_MUT'
+(?:then|do|else|if|elif|while|until|\{|!)
+@@@
+(?:then|do|else|if|elif|while|until|!)
+EOF_MUT
+  _pw_mut J32h-nu-excl judge '> nu depois de !' <<'EOF_MUT'
+(?:then|do|else|if|elif|while|until|\{|!)
+@@@
+(?:then|do|else|if|elif|while|until|\{)
+EOF_MUT
+  _pw_mut J32j-nu-sub judge '> nu em subshell' <<'EOF_MUT'
+(^|;|\||\(|\n|(?:then
+@@@
+(^|;|\||\n|(?:then
+EOF_MUT
+  _pw_mut J32k-nu-atrib judge '> nu depois de atribuição' <<'EOF_MUT'
+([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)
+@@@
+([ \t]*)
+EOF_MUT
+  _pw_mut J32l-nu-atrib-duas judge '>> nu depois de duas atribuições' <<'EOF_MUT'
+([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)
+@@@
+([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)?)
+EOF_MUT
+  _pw_mut J29g-raiz-arquivo judge 'GIT_DIR no ambiente: Bash na worktree barra' <<'EOF_MUT'
+if os.path.lexists(os.path.join(prefix, ".git")):
+@@@
+if __import__("subprocess").run(["git", "-C", prefix, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() == os.path.realpath(prefix):
+EOF_MUT
+  _pw_mut J29i-solta judge 'raiz sem git que não é o projeto: Bash passa' <<'EOF_MUT'
+return os.path.realpath(prefix) in _PW_ROOTS
+@@@
+return True
+EOF_MUT
+  _pw_mut J29h-git-arquivo judge 'Bash em worktree' <<'EOF_MUT'
+if os.path.lexists(os.path.join(prefix, ".git")):
+@@@
+if os.path.isdir(os.path.join(prefix, ".git")):
 EOF_MUT
   _pw_mut J25e-redir-prepass judge '&> alvo' <<'EOF_MUT'
 return _pw_base_prepass(_pw_norm_redirects(text))
@@ -51504,20 +51672,19 @@ return _pw_base_prepass(_pw_norm_redirects(text))
 return _pw_base_prepass(text)
 EOF_MUT
   _pw_mut J26-aspas judge 'aspas não fechadas com o sinal' <<'EOF_MUT'
-if _PW_TEXT_SIG.search(str(seg)):
-            _moat_emit("inanalisavel", str(seg), "", why)
-        return
+if "skills" in str(seg) and re.search(r"hooks|\.claude-plugin", str(seg)):
 @@@
 if False:
-            pass
-        return
+EOF_MUT
+  _pw_mut J26c-aspas-fria judge 'aspas não fechadas na forma fria' <<'EOF_MUT'
+if "skills" in str(seg) and re.search(r"hooks|\.claude-plugin", str(seg)):
+@@@
+if _PW_TEXT_SIG.search(str(seg)):
 EOF_MUT
   _pw_mut J26b-aspas-sem-sinal judge 'aspas não fechadas sem o sinal' <<'EOF_MUT'
-if _PW_TEXT_SIG.search(str(seg)):
-            _moat_emit("inanalisavel", str(seg), "", why)
+if "skills" in str(seg) and re.search(r"hooks|\.claude-plugin", str(seg)):
 @@@
-if True:
-            _moat_emit("inanalisavel", str(seg), "", why)
+if "skills" in str(seg):
 EOF_MUT
   _pw_mut J27-php judge 'php -r file_put_contents' <<'EOF_MUT'
 if base == "php":
