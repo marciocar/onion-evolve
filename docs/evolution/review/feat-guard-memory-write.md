@@ -15,7 +15,8 @@ nota: >
 
 # Guarda da escrita na memória do Claude Code e a varredura do disco
 
-**A passada está pendente.** Nada aqui é veredito de revisão.
+**A 1ª passada independente REPROVOU 5293ef4aa com 3 BLOQUEIA**, curados numa volta (nó
+`E_REFUTADOR_REPROVOU_E_CUROU`). A verificação do diferencial está pendente; os campos acima seguem sem veredito.
 
 O que uma passada precisa saber antes de começar: o `--selftest` é meu e foi escrito junto com o
 artefato. Três pontos cegos conhecidos. (1) O vocabulário do Bash: só se julga o caminho de memória
