@@ -79,6 +79,7 @@ Proibições estruturais, documentação no lugar certo e os contratos de confor
 | 20 | Capability Contract: tier de conformance cumprido | HARD | componente reivindica um tier de conformance que não cumpre |
 | 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD | adotante com .onion-version não-trackeado — 156 falso-HARD |
 | 53 | Regra path-scoped declara `paths:` que casa algo real | HARD | regra em .claude/rules/ que nunca carrega — instrução que o modelo jamais vê |
+| 118 | Veto de repo alheio do adotante registrado e com lista | HARD + SOFT | no adotante, a escrita em repo alheio (git -C <core> commit, Write no core) passar sem veto |
 
 ## SDAAL — abstração de provider
 
