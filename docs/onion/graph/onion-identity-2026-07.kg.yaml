@@ -1493,6 +1493,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-05: «A2A: o que fazemos com o A2A do Onion, sendo a posição do core, ainda não medida, migrar o fio para o padrão?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
       locality: "pessoa"
+  - id: D_ESCADA_NAO_REBAIXA_ELIMINATORIO_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Aceitar as duas»"
+    label: "A escada é a ordem de procura entre o que passa no critério e não rebaixa eliminatório pré-registrado. O forjado do vigia ganha gatilho de superação: um motor pronto comparar assinatura em tempo constante, com evento real sem perda."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Aceitar as duas»; descartadas: «Só a regra» · «Reabrir o vigia»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Refino da curadoria à escada: a escada não rebaixa eliminatório pré-registrado, e o forjado ganha gatilho de superação?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+  - id: D_PUBLICAR_CURA_DOS_VETOS_APOS_MERGE_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Publicar logo, autorizo você»"
+    label: "Depois do merge da cura dos vetos, o core publica pelo /meta:publish as portas prontas, com ensaio e conferência no remoto, por autorização do maestro, e oferece o update aos adotantes com texto neutro; a evidência fica fora do repo até eles atualizarem."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Publicar logo, autorizo você»; descartadas: «Me dê o passo a passo» · «Publicar depois da guarda de plugin» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «O que fazemos depois do merge da cura dos vetos, sobre as portas públicas e os adotantes?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
 edges:
   - from: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
@@ -1860,4 +1892,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_A2A_MEDIR_ANTES_DE_MIGRAR_1105
     to: D_ESCADA_DE_ADOCAO_1105
+    edge_type: TRACES_TO
+  - from: D_ESCADA_NAO_REBAIXA_ELIMINATORIO_1105
+    to: D_ESCADA_DE_ADOCAO_1105
+    edge_type: TRACES_TO
+  - from: D_PUBLICAR_CURA_DOS_VETOS_APOS_MERGE_1105
+    to: C_CORE_NAO_E_FAMILIA
     edge_type: TRACES_TO
