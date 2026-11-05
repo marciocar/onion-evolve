@@ -21,13 +21,13 @@ nodes:
     verified_against: "https://www.alphaxiv.org/abs/2607.05189 · nós E_MEMGHOST_CLAUDE_CODE_SDK_71 e o do achado 13 do grafo maestro-persona-2026-11 (branch docs/research-maestro-persona, votos 3-0 no run wf_ded7babd-681)"
     source_tier: 7
     source_kind: paper
-    label: "O DEFEITO, MEDIDO EM LABORATÓRIO DE TERCEIRO, NÃO EM DANO DESTE CORE: o ataque MemGhost grava conteúdo não confiável em memória persistente de agente a partir de um único e-mail, com 71,4% de ponta a ponta no Claude Code SDK (Sonnet 4.6, backend filesystem) e 87,5% no OpenClaw com GPT-5.4."
-    narrative: "Achados 13 e 14 da pesquisa maestro-persona-2026-11, reforçados pelo Elenxo dela (a objeção 'SDK não é a CLI com hooks' não sobreviveu). O escopo do WhisperBench (envenenamento de fatos e preferências, 108 casos) foi cortado sem leitura naquela pesquisa: os números valem para a classe 'memória escrita a partir do que se lê', não como taxa de deriva de persona. A fonte primária não foi relida nesta forja."
+    label: "O DEFEITO, MEDIDO EM LABORATÓRIO DE TERCEIRO E NÃO EM DANO DESTE CORE: o MemGhost grava conteúdo não confiável em memória persistente de agente a partir de um e-mail, com 71,4% de ponta a ponta no Claude Code SDK e 87,5% no OpenClaw."
+    narrative: "o ataque MemGhost grava conteúdo não confiável em memória persistente de agente a partir de um único e-mail, com 71,4% de ponta a ponta no Claude Code SDK (Sonnet 4.6, backend filesystem) e 87,5% no OpenClaw com GPT-5.4. Achados 13 e 14 da pesquisa maestro-persona-2026-11, reforçados pelo Elenxo dela (a objeção 'SDK não é a CLI com hooks' não sobreviveu). O escopo do WhisperBench (envenenamento de fatos e preferências, 108 casos) foi cortado sem leitura naquela pesquisa: os números valem para a classe 'memória escrita a partir do que se lê', não como taxa de deriva de persona. A fonte primária não foi relida nesta forja."
     trace: "https://www.alphaxiv.org/abs/2607.05189"
     provenance:
       source: "https://www.alphaxiv.org/abs/2607.05189"
       locator: "resumo e resultados de transferência, via o grafo maestro-persona-2026-11"
-      method: "citation: herdado da pesquisa, não relido"
+      method: "reading: herdado do grafo da pesquisa, a primária não foi relida"
       locality: "web"
 
   - id: E_NENHUM_HOOK_OLHAVA_A_MEMORIA
@@ -39,7 +39,8 @@ nodes:
     valid_from: "2026-11-05"
     verified_at: "2026-11-05"
     verified_against: "jq '.hooks.PreToolUse' .claude/settings.json em origin/main 3f09996ab; GUARD_CENSUS_QUERY='memory memória PreToolUse write ' bash .claude/validation/guard-census.sh . --markdown"
-    label: "Em 2026-11-05, nenhum hook do .claude/settings.json do core olhava a pasta de memória, e o censo de guardas não achou guarda da classe. O changelog do Claude Code 2.1.318 confirma o vetor: ele passou a neutralizar no carregamento as tags que imitam a marcação do harness no MEMORY.md e nas notas recuperadas."
+    label: "Em 2026-11-05, nenhum hook do .claude/settings.json do core olhava a pasta de memória, e o censo de guardas não achou guarda da classe. O changelog do Claude Code 2.1.318 confirma o vetor."
+    narrative: "ele passou a neutralizar no carregamento as tags que imitam a marcação do harness no MEMORY.md e nas notas recuperadas."
     provenance:
       source: ".claude/settings.json"
       locator: "hooks.PreToolUse em 3f09996ab; censo: seção 'já existe guarda'"
@@ -71,7 +72,8 @@ nodes:
     valid_from: "2026-11-05"
     verified_at: "2026-11-05"
     verified_against: "docs/evolution/research/guard-memory-write-2026-11/data/replay-2026-11-05.txt"
-    label: "O replay do veto sobre 618 escritas reais na memória (267 Write, 93 Edit, 258 Bash, de 7.995 transcripts) deu zero HARD e zero SOFT na redação final. A 1ª redação do juiz Bash deu 9 avisos, todos falsos (a nota era LIDA e a escrita ia para outro lugar), e a 2ª deu 1 (sed -i de renomeação numa nota que já tinha origem). As duas curas viraram casos (xvi-b) e (xvi-e)."
+    label: "O replay do veto sobre 618 escritas reais na memória (267 Write, 93 Edit, 258 Bash, de 7.995 transcripts) deu zero HARD e zero SOFT na redação final."
+    narrative: "A 1ª redação do juiz Bash deu 9 avisos, todos falsos (a nota era LIDA e a escrita ia para outro lugar), e a 2ª deu 1 (sed -i de renomeação numa nota que já tinha origem). As duas curas viraram casos (xvi-b) e (xvi-e)."
     provenance:
       source: "docs/evolution/research/guard-memory-write-2026-11/data/replay-2026-11-05.txt"
       locator: "contagens por (ferramenta, rc, aviso) e as notas das redações"
@@ -87,8 +89,8 @@ nodes:
     valid_from: "2026-11-05"
     verified_at: "2026-11-05"
     verified_against: "docs/evolution/research/guard-memory-write-2026-11/data/live-lab-2026-11-05.txt"
-    label: "Ao vivo, Claude Code 2.1.318 com claude -p sob bypassPermissions num projeto isolado: o Write de uma nota com a mensagem de teammate inteira no autoMemoryDirectory foi barrado (o arquivo não existe depois), e o Write de uma nota sem proveniência gravou com o aviso SOFT chegando ao modelo como additionalContext, citado verbatim por ele."
-    narrative: "Mediu-se só o autoMemoryDirectory; a pasta padrão ⟨pasta de memória do projeto, sob a configuração do usuário⟩ não foi escrita ao vivo, para não sujar a configuração real. A derivação dela é coberta pelos casos (i), (ii) e (iii) do --selftest, com HOME isolado."
+    label: "Ao vivo, no Claude Code 2.1.318 com claude -p sob bypassPermissions num projeto isolado, o Write de nota com a mensagem de teammate inteira foi barrado, e o Write de nota sem proveniência gravou com o aviso SOFT chegando ao modelo."
+    narrative: "o Write de uma nota com a mensagem de teammate inteira no autoMemoryDirectory foi barrado (o arquivo não existe depois), e o Write de uma nota sem proveniência gravou com o aviso SOFT chegando ao modelo como additionalContext, citado verbatim por ele. Mediu-se só o autoMemoryDirectory; a pasta padrão ⟨pasta de memória do projeto, sob a configuração do usuário⟩ não foi escrita ao vivo, para não sujar a configuração real. A derivação dela é coberta pelos casos (i), (ii) e (iii) do --selftest, com HOME isolado."
     provenance:
       source: "docs/evolution/research/guard-memory-write-2026-11/data/live-lab-2026-11-05.txt"
       locator: "casos p1 e p2, e o disco depois"
@@ -104,7 +106,8 @@ nodes:
     valid_from: "2026-11-05"
     verified_at: "2026-11-05"
     verified_against: "ONION_SELFTEST_FAMILIES=memory_write_guard LC_ALL=C bash .claude/validation/lint-selftest.sh → 24 passaram, 0 falharam"
-    label: "A família memory_write_guard da bancada: 25 casos no --selftest do hook, 6 no da varredura, o registro no settings.json, o dispatcher de produção emitindo a REGRA 116 e 19 mutantes que mordem, depois de a cópia LIMPA dar verde no mesmo arranjo. Na 1ª rodada um mutante ficou VIVO ((xvi-b): o caso lia uma nota que já tinha origem) e um não aplicou (linha múltipla no formato dos mutantes); os dois foram curados."
+    label: "A família memory_write_guard da bancada: 25 casos no --selftest do hook, 6 no da varredura, o registro no settings.json, o dispatcher de produção emitindo a REGRA 116 e 19 mutantes que mordem, depois de a cópia LIMPA dar verde no mesmo arranjo."
+    narrative: "Na 1ª rodada um mutante ficou VIVO ((xvi-b): o caso lia uma nota que já tinha origem) e um não aplicou (linha múltipla no formato dos mutantes); os dois foram curados."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_memory_write_guard_selftests"
@@ -118,8 +121,8 @@ nodes:
     impact: 5
     confidence: 0.8
     trace: ".claude/hooks/pretooluse-memory-write-guard.sh"
-    label: "Substrato escolhido pelo censo: hook PreToolUse em Write, Edit, MultiEdit e Bash, molde pretooluse-direct-provider-api.sh (o PreToolUse mais exercitado), com o juiz em lib/memory-write-judge.py e onFailure block. Grau SOFT (additionalContext, rc 0) para nota sem proveniência checável; grau HARD (exit 2) só para a forma objetiva medida: o envelope de canal ABERTO E FECHADO no texto que vai para a memória."
-    narrative: "A abertura sozinha não barra: o prompt de sistema e as notas que documentam o formato citam a tag (105 citações de <cross-session-message from=…> nos transcripts). O par inteiro é a forma de quem copiou o corpo junto. O desenho de partida do maestro previa 'marca de conteúdo não confiável vindo de WebFetch'; medido que o harness NÃO envolve resultado de WebFetch, MCP nem Read, a forma HARD ficou nos canais que o harness envolve (teammate, outra sessão, colado) e na cerca R15.1 do próprio core. Declarado aqui, não escondido."
+    label: "Substrato escolhido pelo censo: hook PreToolUse em Write, Edit, MultiEdit e Bash, molde pretooluse-direct-provider-api.sh (o PreToolUse mais exercitado), com o juiz em lib/memory-write-judge.py e onFailure block."
+    narrative: "Grau SOFT (additionalContext, rc 0) para nota sem proveniência checável; grau HARD (exit 2) só para a forma objetiva medida: o envelope de canal ABERTO E FECHADO no texto que vai para a memória. A abertura sozinha não barra: o prompt de sistema e as notas que documentam o formato citam a tag (105 citações de <cross-session-message from=…> nos transcripts). O par inteiro é a forma de quem copiou o corpo junto. O desenho de partida do maestro previa 'marca de conteúdo não confiável vindo de WebFetch'; medido que o harness NÃO envolve resultado de WebFetch, MCP nem Read, a forma HARD ficou nos canais que o harness envolve (teammate, outra sessão, colado) e na cerca de conteúdo não confiável do próprio core (onion-untrusted-wrap.sh). Declarado aqui, não escondido."
 
   - id: D_VARREDURA_DO_DISCO_REGRA_116
     node_type: decision
@@ -128,7 +131,8 @@ nodes:
     impact: 4
     confidence: 0.8
     trace: ".claude/validation/memory-write-scan-check.sh"
-    label: "A metade que não depende do vocabulário do veto: a varredura das notas da memória do projeto (árvore principal e worktree, mais o autoMemoryDirectory) pelo mesmo juiz, no SessionStart (aviso antes do turno) e no lint como REGRA 116 (Memória do Claude Code sem envelope de canal não confiável), SOFT sempre. A pasta é da máquina, não do repo: deixar o gate vermelho por ela seria o terceiro disparando a guarda à distância (cláusula 5). Sem pasta (o CI), cala, declarado."
+    label: "A metade que não depende do vocabulário do veto: a varredura das notas da memória do projeto pelo mesmo juiz, no SessionStart e no lint como REGRA 116 (Memória do Claude Code sem envelope de canal não confiável), SOFT sempre."
+    narrative: "a varredura das notas da memória do projeto (árvore principal e worktree, mais o autoMemoryDirectory) pelo mesmo juiz, no SessionStart (aviso antes do turno) e no lint como REGRA 116 (Memória do Claude Code sem envelope de canal não confiável), SOFT sempre. A pasta é da máquina, não do repo: deixar o gate vermelho por ela seria o terceiro disparando a guarda à distância (cláusula 5). Sem pasta (o CI), cala, declarado."
 
   - id: D_HOOK_NO_SETTINGS_DO_PROJETO
     node_type: decision
@@ -145,7 +149,8 @@ nodes:
     status: open
     impact: 5
     confidence: 0.9
-    label: "TETO (peça 7): é lembrete e contenção de cópia verbatim, NÃO fronteira. Conteúdo de fora parafraseado, ou copiado sem envelope (WebFetch, MCP, Read de arquivo de terceiro, que o harness não envolve), passa. A proveniência é TEXTO e o atacante a forja com uma data: o SOFT educa, não protege (caso TETO (xix))."
+    label: "TETO (peça 7): é lembrete e contenção de cópia verbatim, NÃO fronteira. Conteúdo de fora parafraseado, ou copiado sem envelope (WebFetch, MCP, Read de arquivo de terceiro, que o harness não envolve), passa. A proveniência é TEXTO e o atacante a forja com uma data."
+    narrative: "o SOFT educa, não protege (caso TETO (xix))."
 
   - id: C_TETO_BASH_PELO_VOCABULARIO
     node_type: claim
@@ -153,7 +158,8 @@ nodes:
     status: open
     impact: 4
     confidence: 0.85
-    label: "TETO: no Bash só se julga o comando que CITA o caminho de memória (literal, ~, $HOME, ${CLAUDE_CONFIG_DIR}) como DESTINO de uma forma de escrita listada (>, >>, tee, cp, mv, install, ln, rsync, sed -i, dd of=, write_text, open(…,'w')). Caminho montado em runtime, variável vinda de fora (caso TETO (xx)), cd para a pasta e escrita relativa, script versionado que escreve por dentro: passam. Em guarda de lista o defeito dominante é o vocabulário."
+    label: "TETO: no Bash só se julga o comando que CITA o caminho de memória (literal, ~, $HOME, ${CLAUDE_CONFIG_DIR}) como DESTINO de uma forma de escrita listada (>, >>, tee, cp, mv, install, ln, rsync, sed -i, dd of=, write_text, open(…,'w'))."
+    narrative: "Caminho montado em runtime, variável vinda de fora (caso TETO (xx)), cd para a pasta e escrita relativa, script versionado que escreve por dentro: passam. Em guarda de lista o defeito dominante é o vocabulário."
 
   - id: C_TETO_ESCRITA_FORA_DA_SESSAO
     node_type: claim
@@ -178,6 +184,7 @@ nodes:
     impact: 2
     confidence: 0.7
     verified_at: "2026-11-05"
+    verified_against: "laço de 50 chamadas do hook com date +%s%N, Write e Bash, na VPS do core"
     label: "Latência medida em 2026-11-05 nesta VPS (média de 50 chamadas): 10 ms no caminho quente (JSON sem 'memory' e sem autoMemoryDirectory configurado, sem python), 15 ms num Bash comum, 117 ms quando o alvo é a memória e o juiz roda. O caminho quente é o de quase toda chamada."
 
   - id: Q_ELENXO_PENDENTE
@@ -187,7 +194,8 @@ nodes:
     impact: 4
     confidence: 0.5
     trace: "docs/evolution/review/feat-guard-memory-write.md"
-    label: "A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta. Em 2026-11-05 a sessão principal verificou o diferencial com o lab.py do refutador sobre git archive e0545c889: os 3 BLOQUEIA viraram rc 2, e os FURO e FP que restam são os declarados. O selo é o merge humano."
+    label: "A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta. Em 2026-11-05 a sessão principal verificou o diferencial com o lab.py do refutador sobre git archive e0545c889."
+    narrative: "os 3 BLOQUEIA viraram rc 2, e os FURO e FP que restam são os declarados. O selo é o merge humano."
 
   - id: Q_GATILHO_HARD_POR_PROVENIENCIA
     node_type: question
@@ -195,7 +203,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    label: "Gatilho nomeado: se o replay futuro medir uma nota de memória com regra plantada por conteúdo lido de fora SEM envelope (o caso parafraseado), ou se o harness passar a envolver o resultado de WebFetch/MCP numa marca estável, reabre-se a forma HARD. Até lá, a proveniência fica SOFT."
+    label: "Gatilho nomeado: se o replay futuro medir uma nota de memória com regra plantada por conteúdo lido de fora SEM envelope (o caso parafraseado), ou se o harness passar a envolver o resultado de WebFetch/MCP numa marca estável, reabre-se a forma HARD."
+    narrative: "Até lá, a proveniência fica SOFT."
 
   - id: E_ADOTANTE_NA_BANCADA
     node_type: evidence
@@ -206,8 +215,8 @@ nodes:
     valid_from: "2026-11-05"
     verified_at: "2026-11-05"
     verified_against: "ONION_SELFTEST_FAMILIES=memory_write_guard LC_ALL=C bash .claude/validation/lint-selftest.sh → 26 passaram; com o matcher reduzido a Bash, (c) e (e) reprovam"
-    label: "Num adotante (role: adopted), montado só com o que o vendor-manifest do papel leva (sem ops/) e com o registro trazido pelo merge-onion-hooks.sh para um settings.json que já tinha hook próprio: o Write com envelope sai rc 2, o Edit sem proveniência avisa, a nota datada cala, o hook do adotante continua lá e o lint dele emite a REGRA 116. O manifesto dos papéis adopted, standalone, hub e plugins leva os três arquivos; a porta mini não leva hooks nem settings.json."
-    narrative: "Requisito do líder em 2026-11-05, vindo da medida da curadoria: num adotante, 27 de 31 formas de ato passavam por todos os hooks. O hook não lê o carimbo de papel, então o comportamento é o mesmo em todo papel, por desenho. Mutante manual: com o matcher do settings.json reduzido a Bash, os casos (c) e (e) reprovaram; o arquivo foi restaurado."
+    label: "Num adotante (role: adopted), montado só com o que o vendor-manifest do papel leva (sem ops/) e com o registro trazido pelo merge-onion-hooks.sh para um settings.json que já tinha hook próprio."
+    narrative: "o Write com envelope sai rc 2, o Edit sem proveniência avisa, a nota datada cala, o hook do adotante continua lá e o lint dele emite a REGRA 116. O manifesto dos papéis adopted, standalone, hub e plugins leva os três arquivos; a porta mini não leva hooks nem settings.json. Requisito do líder em 2026-11-05, vindo da medida da curadoria: num adotante, 27 de 31 formas de ato passavam por todos os hooks. O hook não lê o carimbo de papel, então o comportamento é o mesmo em todo papel, por desenho. Mutante manual: com o matcher do settings.json reduzido a Bash, os casos (c) e (e) reprovaram; o arquivo foi restaurado."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_memory_write_guard_selftests, caso (e)"
@@ -223,8 +232,8 @@ nodes:
     valid_from: "2026-11-05"
     verified_at: "2026-11-05"
     verified_against: "ONION_SELFTEST_FAMILIES=memory_write_guard LC_ALL=C bash .claude/validation/lint-selftest.sh → 32 passaram, 25 mutantes mordem; os 9 casos novos reprovam com o juiz de 09f99d24b ou sem a sonda de link"
-    label: "O refutador independente reprovou 5293ef4aa com 3 BLOQUEIA, todos dentro do que o cabeçalho prometia: (1) link até a memória passava no caminho quente, porque o filtro textual 'memory' saía antes do realpath; (2) $HOME e ~ entre aspas, ${HOME:?} e ${HOME:-…} não eram reconhecidos; (3) open(…,'w') com parênteses aninhados escapava. Os três foram curados, cada um com caso que falha antes e passa depois e com mutante; o autoMemoryDirectory com $HOME no valor também (uma linha)."
-    narrative: "Cura 1: o caminho quente resolve em bash, num só realpath, os caminhos citados no JSON, e só sai rc 0 se nenhum cai em <config>/projects/*/memory; custo medido sob load 14: +3 ms no Write e +9 ms no Bash. Cura 2: aspas saem do texto antes de tokenizar, e toda grafia de expansão de HOME e do CLAUDE_CONFIG_DIR vira o valor. Cura 3: o open( aceita dois níveis de parênteses, e o caminho tem de estar DENTRO do open que leva o modo de escrita, na mesma instrução: um open de leitura da nota ao lado de um open de escrita noutro arquivo cala (caso (xvi-k)). Declarado no cabeçalho sem curar: conteúdo fora do texto do comando (cp, cat arq >>, rsync, mv), envelope dividido em duas escritas, grafias que o harness não produz, link criado no mesmo comando e o falso positivo HARD em nota que documenta o formato (0 em 364 notas). Rodado o laboratório do refutador sobre a cura: os únicos FURO e FP restantes são os declarados."
+    label: "O refutador independente reprovou 5293ef4aa com 3 BLOQUEIA, todos dentro do que o cabeçalho prometia: (1) link até a memória passava no caminho quente, porque o filtro textual 'memory' saía antes do realpath."
+    narrative: "(2) $HOME e ~ entre aspas, ${HOME:?} e ${HOME:-…} não eram reconhecidos; (3) open(…,'w') com parênteses aninhados escapava. Os três foram curados, cada um com caso que falha antes e passa depois e com mutante; o autoMemoryDirectory com $HOME no valor também (uma linha). Cura 1: o caminho quente resolve em bash, num só realpath, os caminhos citados no JSON, e só sai rc 0 se nenhum cai em <config>/projects/*/memory; custo medido sob load 14: +3 ms no Write e +9 ms no Bash. Cura 2: aspas saem do texto antes de tokenizar, e toda grafia de expansão de HOME e do CLAUDE_CONFIG_DIR vira o valor. Cura 3: o open( aceita dois níveis de parênteses, e o caminho tem de estar DENTRO do open que leva o modo de escrita, na mesma instrução: um open de leitura da nota ao lado de um open de escrita noutro arquivo cala (caso (xvi-k)). Declarado no cabeçalho sem curar: conteúdo fora do texto do comando (cp, cat arq >>, rsync, mv), envelope dividido em duas escritas, grafias que o harness não produz, link criado no mesmo comando e o falso positivo HARD em nota que documenta o formato (0 em 364 notas). Rodado o laboratório do refutador sobre a cura: os únicos FURO e FP restantes são os declarados."
     provenance:
       source: ".claude/hooks/pretooluse-memory-write-guard.sh"
       locator: "casos (iv-b), (v-b), (v-c), (xvi-g) a (xvi-k); mutantes na família run_memory_write_guard_selftests"
