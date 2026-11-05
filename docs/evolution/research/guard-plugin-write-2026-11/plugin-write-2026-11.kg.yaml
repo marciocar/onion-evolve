@@ -1,5 +1,7 @@
 # kg-backlog-guard: on
-# ═══ TETO: 25 NÓS ═══
+# ═══ TETO: 42 NÓS ═══
+# +17 (2026-11-05): T_LAB_*, um termo x_term por código do laboratório (W1–W4, S1–S3, S5–S7, K1, K5, T1–T5). O lint de nomes do contrato
+#   (ops/kg-gate-ci.sh) reprovou os 26 usos sem termo, e o termo é a forma que a casa pede (D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023).
 # +1 (2026-11-05): D_PROJETO_DA_SESSAO_E_RAIZ_1105, decisão nova do maestro que nenhum nó colhido cobre; os 24 seguem vivos.
 meta:
   id: plugin-write-2026-11
@@ -340,6 +342,380 @@ nodes:
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
       locality: "pessoa"
 
+  - id: T_LAB_W1
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção W1 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "W1 neste grafo é a célula W1 do laboratório de 2026-11-04: a sessão 1 grava o plugin por Write sob bypassPermissions, e a sessão 2 tenta a chamada vetada."
+    x_term:
+      pref: "célula W1"
+      notation: "W1"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula W1 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): a sessão 1 grava o plugin por Write sob bypassPermissions, e a sessão 2 tenta a chamada vetada."
+
+  - id: T_LAB_W2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção W2 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "W2 neste grafo é a célula W2 do laboratório de 2026-11-04: como a W1, com a sessão de escrita em acceptEdits."
+    x_term:
+      pref: "célula W2"
+      notation: "W2"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula W2 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): como a W1, com a sessão de escrita em acceptEdits."
+
+  - id: T_LAB_W3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção W3 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "W3 neste grafo é a célula W3 do laboratório de 2026-11-04: grava o plugin e tenta a chamada vetada na MESMA sessão."
+    x_term:
+      pref: "célula W3"
+      notation: "W3"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula W3 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): grava o plugin e tenta a chamada vetada na MESMA sessão."
+
+  - id: T_LAB_W4
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção W4 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "W4 neste grafo é a célula W4 do laboratório de 2026-11-04: como a W1, com a gravação por Bash."
+    x_term:
+      pref: "célula W4"
+      notation: "W4"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula W4 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): como a W1, com a gravação por Bash."
+
+  - id: T_LAB_S1
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção S1 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "S1 neste grafo é a célula S1 do laboratório de 2026-11-04: plugin já em .claude/skills/x do projeto, com aceite de confiança."
+    x_term:
+      pref: "célula S1"
+      notation: "S1"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula S1 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): plugin já em .claude/skills/x do projeto, com aceite de confiança."
+
+  - id: T_LAB_S2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção S2 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "S2 neste grafo é a célula S2 do laboratório de 2026-11-04: plugin já em .claude/skills/x do projeto, sem aceite de confiança."
+    x_term:
+      pref: "célula S2"
+      notation: "S2"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula S2 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): plugin já em .claude/skills/x do projeto, sem aceite de confiança."
+
+  - id: T_LAB_S3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção S3 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "S3 neste grafo é a célula S3 do laboratório de 2026-11-04: plugin aninhado (.claude/skills/a/b), com aceite de confiança."
+    x_term:
+      pref: "célula S3"
+      notation: "S3"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula S3 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): plugin aninhado (.claude/skills/a/b), com aceite de confiança."
+
+  - id: T_LAB_S5
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção S5 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "S5 neste grafo é a célula S5 do laboratório de 2026-11-04: plugin na pasta de skills do usuário, sem aceite de confiança no projeto."
+    x_term:
+      pref: "célula S5"
+      notation: "S5"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula S5 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): plugin na pasta de skills do usuário, sem aceite de confiança no projeto."
+
+  - id: T_LAB_S6
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção S6 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "S6 neste grafo é a célula S6 do laboratório de 2026-11-04: a skill é link para uma pasta fora do projeto."
+    x_term:
+      pref: "célula S6"
+      notation: "S6"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula S6 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): a skill é link para uma pasta fora do projeto."
+
+  - id: T_LAB_S7
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-mods-cells.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seção S7 e a legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "S7 neste grafo é a célula S7 do laboratório de 2026-11-04: plugin em sub/.claude/skills, com a sessão na raiz."
+    x_term:
+      pref: "célula S7"
+      notation: "S7"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Célula S7 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): plugin em sub/.claude/skills, com a sessão na raiz."
+
+  - id: T_LAB_K1
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-attempts-verbatim.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-attempts-verbatim.txt"
+      locator: "bloco KONT-K1-T3-1"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "K1 neste grafo é a contorno K1 do laboratório de 2026-11-04: grava o plugin numa pasta temporária e o move com mv para o alvo."
+    x_term:
+      pref: "contorno K1"
+      notation: "K1"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Contorno K1 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): grava o plugin numa pasta temporária e o move com mv para o alvo."
+
+  - id: T_LAB_K5
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-attempts-verbatim.txt, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-attempts-verbatim.txt"
+      locator: "bloco KONT-K5-T3-1"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "K5 neste grafo é a contorno K5 do laboratório de 2026-11-04: cd para dentro de .claude e redirecionamento > com caminho relativo."
+    x_term:
+      pref: "contorno K5"
+      notation: "K5"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Contorno K5 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): cd para dentro de .claude e redirecionamento > com caminho relativo."
+
+  - id: T_LAB_T1
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-sandbox-matrix.tsv, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-matrix.tsv"
+      locator: "legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "T1 neste grafo é a alvo T1 do laboratório de 2026-11-04: o .claude/settings.json do projeto."
+    x_term:
+      pref: "alvo T1"
+      notation: "T1"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Alvo T1 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): o .claude/settings.json do projeto."
+
+  - id: T_LAB_T2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-sandbox-matrix.tsv, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-matrix.tsv"
+      locator: "legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "T2 neste grafo é a alvo T2 do laboratório de 2026-11-04: o script do hook do veto ao arquivo de segredos."
+    x_term:
+      pref: "alvo T2"
+      notation: "T2"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Alvo T2 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): o script do hook do veto ao arquivo de segredos."
+
+  - id: T_LAB_T3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-sandbox-matrix.tsv, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-matrix.tsv"
+      locator: "legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "T3 neste grafo é a alvo T3 do laboratório de 2026-11-04: .claude/skills/x/.claude-plugin/plugin.json do projeto."
+    x_term:
+      pref: "alvo T3"
+      notation: "T3"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Alvo T3 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): .claude/skills/x/.claude-plugin/plugin.json do projeto."
+
+  - id: T_LAB_T4
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-sandbox-matrix.tsv, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-matrix.tsv"
+      locator: "legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "T4 neste grafo é a alvo T4 do laboratório de 2026-11-04: .claude/skills/x/hooks/hooks.json do projeto."
+    x_term:
+      pref: "alvo T4"
+      notation: "T4"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Alvo T4 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): .claude/skills/x/hooks/hooks.json do projeto."
+
+  - id: T_LAB_T5
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "a legenda e as seções de data/lab-sandbox-matrix.tsv, lidas para nomear o código que o lint de nomes (ops/kg-gate-ci.sh) acusou sem termo em 2026-11-05"
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-matrix.tsv"
+      locator: "legenda da linha 2"
+      method: "reading: o código e a sua definição lidos no arquivo de dados do laboratório"
+      locality: "repo"
+    label: "T5 neste grafo é a alvo T5 do laboratório de 2026-11-04: plugin.json em .claude-plugin de uma skill na pasta de skills do usuário (HOME falso)."
+    x_term:
+      pref: "alvo T5"
+      notation: "T5"
+      scheme: lab-plugin-write
+      lang: pt-BR
+      definition: "Alvo T5 do laboratório de 2026-11-04 (Claude Code 2.1.318, roteiro fixo contra stub): plugin.json em .claude-plugin de uma skill na pasta de skills do usuário (HOME falso)."
+
 edges:
   - from: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
     to: D_VETO_ESTREITO_MAIS_VARREDURA
@@ -412,4 +788,55 @@ edges:
     edge_type: TRACES_TO
   - from: D_PROJETO_DA_SESSAO_E_RAIZ_1105
     to: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
+    edge_type: TRACES_TO
+  - from: T_LAB_W1
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_W2
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_W3
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_W4
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_S1
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_S2
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_S3
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_S5
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_S6
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_S7
+    to: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    edge_type: TRACES_TO
+  - from: T_LAB_K1
+    to: D_MOLDE_COMPOE_O_JUIZ_DO_MOAT
+    edge_type: TRACES_TO
+  - from: T_LAB_K5
+    to: D_MOLDE_COMPOE_O_JUIZ_DO_MOAT
+    edge_type: TRACES_TO
+  - from: T_LAB_T1
+    to: C_TETO_CAI_JUNTO_COM_O_SETTINGS
+    edge_type: TRACES_TO
+  - from: T_LAB_T2
+    to: C_TETO_CAI_JUNTO_COM_O_SETTINGS
+    edge_type: TRACES_TO
+  - from: T_LAB_T3
+    to: E_DOGFOOD_AO_VIVO_NO_HARNESS
+    edge_type: TRACES_TO
+  - from: T_LAB_T4
+    to: E_DOGFOOD_AO_VIVO_NO_HARNESS
+    edge_type: TRACES_TO
+  - from: T_LAB_T5
+    to: E_DOGFOOD_AO_VIVO_NO_HARNESS
     edge_type: TRACES_TO
