@@ -97,7 +97,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
       locator: "busca por import yaml e PYTHON no alcance; matriz de interpretadores"
-      method: "medição"
+      method: "medição: busca no alcance dos hooks e matriz nos dois interpretadores"
       locality: "repo"
   - id: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
     node_type: decision
@@ -198,7 +198,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-hooks-python-isolated.md"
       locator: "seção Achados"
-      method: "passada adversarial com corpus, mutantes e laboratório próprio; artefatos fora da árvore"
+      method: "medição: passada adversarial com corpus, mutantes e laboratório próprio; artefatos fora da árvore"
       locality: "repo"
   - id: C_TETO_DE_CHAVES_FECHA_LEGITIMO
     node_type: claim
