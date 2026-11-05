@@ -1,0 +1,2077 @@
+# kg-backlog-guard: on
+meta:
+  id: onion-distribution-packages-2026-11
+  schema_version: "1"
+  baseline: "2026-11-05"
+  review_after: "2026-12-05"   # 30d: o tipo DOMINANTE é FERRAMENTA. O que move a decisão são o marketplace do Claude Code,
+                               # o Registry em preview e as regras do npm 12, que mudam por release. O eixo de capital (90d)
+                               # é secundário e está sem sinal; a reabertura real é o selo do maestro ou um dos gatilhos do D_.
+  # ═══ TETO: 104 NÓS ═══
+  # Justificativa do teto: o modo decisão exige 1 nó por objeção sobrevivente (40) e 1 por superação achada (32);
+  # os outros 32 são 1 pergunta, 1 decisão, 8 opções, 19 evidências votadas, 1 medição do Radar Vol. 35, mercado e lacunas.
+  purpose: "Decidir por qual forma o Onion se distribui além das quatro portas: npm, PyPI, MCP, MCPB, imagem ou nenhuma, com gatilho e custo por forma."
+external_edges:
+  - from: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_IDENTITY_CANON"
+    edge_type: TRACES_TO
+  - from: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    edge_type: TRACES_TO
+  - from: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
+    edge_type: TRACES_TO
+  - from: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    to: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    to: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    to: "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml#D_PLUGIN_MCP_POSTURE_0904"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_G_MCPB_BUNDLE
+    to: "docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml#E_KG_SSOT_E_MCPB_LICENCAS_LIDAS"
+    edge_type: TRACES_TO
+  - from: E_SHAI_HULUD_VIA_MCP_REGISTRY
+    to: "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml#E_POSTMARK_MCP_MALICIOSO"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    to: "docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml#E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO"
+    edge_type: TRACES_TO
+  - from: E_MERCADO_ONION_DISTRIBUTION_1105
+    to: "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml#E_CANAL_OFICIAL_SEM_TRILHO_DE_COBRANCA"
+    edge_type: TRACES_TO
+  - from: E_RADAR_V34_PLUGIN_MARKETPLACE_TRIAL
+    to: "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml#E_RADAR_PLUGIN_E_SKILLS_EM_TRIAL"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-11-05"
+    verified_against: "run wf_615a4f2b-024 de /onion-research em modo decision, 2026-11-05: 19 claims confirmadas, 6 refutadas, 53 objeções julgadas, 40 sobreviventes"
+    label: "Distribuir o Onion também como pacote npm, pacote Python e servidor MCP, como o kg-ssot, ou manter só as quatro portas e o marketplace de plugins do Claude Code?"
+    narrative: "O Onion deve ser distribuído também como pacote npm, pacote Python e servidor MCP, tal como o kg-ssot faz com seus artefatos, ou manter só as portas públicas (onion-core, onion-standalone, onion-plugins, onion-mini) e o marketplace de plugins do Claude Code? Resposta curta por pergunta. (1) Canal: nenhum concentra adoção medida; as métricas de canais diferentes não se comparam e instalação de plugin não é pública (E_OBJECAO_ACHADO8, E_OBJECAO_ACHADO7). (2) Entrega: plugin dá hook, comando, skill e agente; só a cópia em .claude dá CLAUDE.md, rules e settings; managed settings dão a trava; pacote como instalador só copia (E_OBJECAO_ACHADO6). (3) Cadeia de suprimentos: recorrente, com provenance válida em versão maliciosa, e o escopo do OIDC como controle que manda (E_MINI_SHAI_HULUD, E_PROVENANCE, E_OBJECAO_SRC_VENTUREBEAT). (4) Registry: primária lida, preview, moderação mínima, prova de propriedade e não consumido direto por hosts (E_OBJECAO_ACHADO19, E_OBJECAO_CUT_MCPNAME). (5) Quem paga e o que se premia: sem evidência direta (E_MERCADO, E_LACUNAS). (6) Postura: o pin por sha e o marketplace em git não pedem registro de terceiro (E_OBJECAO_CUT_SHA_PIN). Fica open: o selo é do maestro."
+    trace: "pedido do maestro 'abre a pesquisa em modo decision'; pergunta computada pelo workflow em 2026-11-05"
+  - id: E_TRAFEGO_DAS_PORTAS_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    evidence_class: measurement
+    verified_against: "API de tráfego do GitHub, janela de 14 dias, lida em 2026-11-05; origem dos clones não verificada"
+    label: "Tráfego das portas em 14 dias: onion-core 122 clones e 102 únicos, onion-standalone 119 e 101, onion-plugins 116 e 100, onion-mini 123 e 105; onion-plugins com 4 visitas de 1 visitante. Números quase iguais sugerem robô ou maquinaria própria, não adoção."
+    trace: "docs/evolution/research/onion-distribution-packages-2026-11/SYNTHESIS.md"
+    provenance:
+      source: "repos/marciocar/<porta>/traffic/clones na API do GitHub"
+      locator: "campos count e uniques"
+      method: "measurement: gh api executado em 2026-11-05"
+      locality: repo
+  - id: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    node_type: decision
+    layer: audit
+    impact: 5
+    confidence: 0.55
+    label: "Distribuição do Onion: A status quo · B portas + diretório oficial, pacotes em parque · C npm instalador · D npm conteúdo · E PyPI · F MCP próprio · G MCPB · H imagem. Elenxo recomenda B, confiança média; o maestro sela."
+    trace: "workflow onion-research em modo decision, run wf_615a4f2b-024, 2026-11-05; pergunta em Q_ONION_DISTRIBUTION_PACKAGES_1105"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Diretório e parque»"
+    narrative: |-
+      RECOMENDAÇÃO DO ELENXO (INTEIRA):
+
+      Recomendo a opção B: nenhum pacote agora. Manter as quatro portas e o marketplace, e candidatar onion-plugins ao diretório oficial. A confiança é média, porque a demanda real segue sem medida.
+
+      Por que não vale publicar agora:
+      - O canal não explica a adoção. Dados de 2026-11-05 (npm: semana de 10-29 a 11-04):
+        - OpenSpec: 74.012 estrelas, 1.240.857 npm.
+        - BMAD: 55.023 estrelas, 23.215 npm.
+        - Spec-kit: 147.665 estrelas, sem npm próprio, 41.925 PyPI.
+        - Superpowers: 312.760 estrelas, rota por /plugin, listado no oficial.
+        - SuperClaude: 23.928 estrelas, 61 npm, 2.463 PyPI.
+      - Download não mede adoção. O kg-ssot tem 0 estrelas e 4 visitantes únicos em 14 dias, e mesmo assim 1.834 npm e 3.116 PyPI por semana. O task-master segue com 12.484 por semana após 7 meses sem publicar.
+      - A analogia com o kg-ssot não transfere. Ele publica de fato (o corpus mediu o repo errado, onion-kg-ssot, e não marciocar/kg-ssot), mas é biblioteca que age por import. O veto do Onion age no harness.
+      - Não há demanda medida. As portas têm 100 a 105 clones únicos em 14 dias, com séries quase iguais entre si, o que aponta automação, e de 1 a 8 visitantes únicos.
+      - Em marketplace próprio, o uso é invisível: 'you have no usage signal'.
+
+      Decisão por forma:
+      - **npm com conteúdo: não.** Nenhuma das 315 entradas oficiais usa npm. Soma um pipeline, e um pacote comprometido executa por hook mesmo sem script de install.
+      - **npm instalador fino: parque.** Só copia o que git clone e /meta:adopt já entregam. Gatilho: 2 adotantes frios nomeados que não consigam usar /plugin marketplace add nem git clone, com o bloqueio relatado.
+      - **PyPI: não.** Nenhuma fonte de plugin é PyPI. O kg-ssot já cobre o uso em Python.
+      - **MCP próprio: não por ora.** O veredito sobre grafos já existe em io.github.marciocar/kg-ssot. O Registry está em preview, não é consumido diretamente pelos hosts e tem 'minimal-to-no moderation'. Radar: Caution para MCP por padrão. Gatilho: um cliente fora do Claude Code pedir por escrito o catálogo do framework; ops/mcp-onion-framework é ponto de partida, mas hoje é HTTP com token, voltado ao LibreChat.
+      - **MCPB: parque, junto com o MCP.** O plugin já aceita .mcpb dentro de mcpServers.
+      - **Imagem: parque.** A doc oferece CLAUDE_CODE_PLUGIN_SEED_DIR para contêiner e CI (não testado aqui). Gatilho: frota de adotante sem saída para git, se a semente falhar.
+
+      Restrições para qualquer publicação futura:
+      1. Reusar o molde do release.yml do kg-ssot: OIDC por job, escopo preso a workflow em branch protegida, environment com aprovação humana, sem cache compartilhado, sem pull_request_target com código de fork, ações fixadas por SHA.
+      2. Sem scripts de lifecycle.
+      3. Provenance conta só como controle necessário, não como prova de código limpo.
+      4. Passar pela REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e confirmar o nome antes. npm 'onion' e 'onion-core' já existem (dono não conferido); 'onion-evolve', 'create-onion' e 'onion-framework' estão livres em npm e PyPI.
+      5. Gatilho nunca por downloads, clones ou estrelas; só por pedido nomeado ou por sinal de uso do diretório.
+      6. Antes de tratar repo e plugin como a opção segura, fazer um spike abrindo repo com hook em pasta não confiada: o vetor do OX está em .claude/settings.json, a mesma forma que as portas usam.
+
+      O que invalidaria a recomendação:
+      - O diretório oficial recusar o Onion ou mostrar uso desprezível depois de listado.
+      - O Claude Code implementar marketplace do tipo npm.
+      - Surgirem 2 adotantes frios bloqueados, como no gatilho acima.
+      - Dados de instalação por canal mostrarem que kits de harness único crescem mais por npm do que por plugin.
+      - O Onion passar a ter uma peça que age por import.
+      - O spike mostrar que o repo clonado executa hook sem confiança.
+
+      O que não ficou fechado:
+      - Instalações de plugin não têm número público de fonte primária.
+      - Os downloads não foram decompostos entre humano e automação.
+      - Quem paga e o que investidores premiam nessa categoria segue sem evidência (pergunta 5).
+      - Contraponto autoral não encontrado, só comportamento observado.
+      - Os dois PDFs do Radar deram 503.
+      - Os critérios de aceite do diretório oficial e o painel de uso não foram lidos.
+      - Várias citações vêm de leitura por WebFetch resumido, então confira o trecho antes de selar no grafo.
+
+      NOTA DO ESCRITOR DO GRAFO (não é parte da recomendação): o item 'os dois PDFs do Radar deram 503' valeu para o Elenxo e não se sustenta na hora de escrever. Os dois PDFs responderam 200 em 2026-11-05 e foram lidos com pdftotext; ver E_RADAR_V35_AGENT_PLUGIN_MARKETPLACE_TRIAL_1105, que nomeia um canal de mercado ausente das 8 opções (Agent Plugins e Agent Package Manager).
+
+      verified_against anterior: «recomendação do Elenxo no run wf_615a4f2b-024; o maestro não selou; 40 objeções sobreviventes modeladas como CONSTRAINS»
+      Selado por /meta:decide em 2026-11-05: escolhida «Diretório e parque»; descartadas: «Só medir e parquear» · «npm como fonte agora» · «Servidor MCP agora».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Nenhum canal de pacote tem base medida hoje: o que fazer agora com a distribuição do Onion?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+  - id: C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    label: "A. Manter só portas e marketplace próprio, sem mudar nada (status quo)"
+    narrative: "Custo: zero adicional. Limite: em marketplace próprio não há sinal de uso nem descoberta, e o diretório oficial, única forma medida que resolve os dois juntos, fica de fora. Mantém as quatro portas e o motor ops/publish-door.sh sem mudança."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "B. Manter portas e marketplace, candidatar onion-plugins ao diretório oficial e deixar pacotes em parque com gatilho nomeado (recomendada)"
+    narrative: "Vale: é a recomendação do Elenxo, com confiança média porque a demanda segue sem medida. Custo: submissão e curadoria da entrada; critérios de aceite e painel de uso NÃO lidos, e 'onion-meta' pode pesar no custo de contexto. Escada: adota o canal do mercado (marketplace e diretório), e os pacotes ficam no parque. Gatilho de reabertura de cada pacote nas opções C a H. Antes de tratar repo e plugin como seguros: spike de repo com hook em pasta não confiada."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_C_NPM_THIN_INSTALLER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.2
+    label: "C. Publicar npm só como instalador fino que copia para .claude"
+    narrative: "Parque. Só copia o que git clone e /meta:adopt já entregam, sem capacidade nova. Gatilho: 2 adotantes frios nomeados que não consigam usar /plugin marketplace add nem git clone, com o bloqueio relatado. Custo: pipeline por registro no molde do release.yml do kg-ssot, mais a superfície de credencial do maestro. Nome: 'onion-evolve', 'create-onion' e 'onion-framework' livres em npm e PyPI; 'onion' e 'onion-core' já existem (dono não conferido)."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.1
+    label: "D. Publicar npm com conteúdo, como fonte de plugin"
+    narrative: "Não, segundo o Elenxo. Nenhuma das 315 entradas oficiais usa npm; soma pipeline ao git-subdir que já funciona; um pacote comprometido executa por hook mesmo sem script de install. Reabre se o Claude Code implementar marketplace do tipo npm. Fica open e não refuted: o limite é medido, não morte por evidência, e o selo é do maestro."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_E_PYPI_PACKAGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.1
+    label: "E. Publicar pacote PyPI do Onion"
+    narrative: "Não, segundo o Elenxo. Nenhuma fonte de plugin é PyPI, e o kg-ssot já cobre o uso em Python. O Onion não tem hoje peça que age por import; se passar a ter, reabre. Custo de referência: kg-ssot com 49 releases PyPI desde 2026-10-09."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.2
+    label: "F. Publicar servidor MCP só de leitura e veredito próprio do Onion, com entrada no Registry"
+    narrative: "Não por ora. O veredito sobre grafos já existe em io.github.marciocar/kg-ssot. Registry em preview, não consumido direto por hosts, com moderação mínima; Radar Vol. 34 põe MCP por padrão em Caution. Gatilho: um cliente fora do Claude Code pedir por escrito o catálogo do framework. Ponto de partida: ops/mcp-onion-framework, hoje HTTP com token, voltado ao LibreChat. Antecedente: D_PLUGIN_MCP_POSTURE_0904 selou 'nada agora' em 2026-09-04 como posição de espera, com gatilho próprio."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_G_MCPB_BUNDLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "G. Publicar MCPB do Onion"
+    narrative: "Parque, junto com o MCP. O plugin já aceita .mcpb dentro de mcpServers, e o Registry aceita MCPB com fileSha256. Só faz sentido se F reabrir. O kg-ssot já publica MCPB, e a CLI @anthropic-ai/mcpb é MIT."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: C_OPCAO_H_CONTAINER_IMAGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "H. Publicar imagem de contêiner"
+    narrative: "Parque. A doc oferece CLAUDE_CODE_PLUGIN_SEED_DIR para contêiner e CI (não testado aqui). Gatilho: frota de adotante sem saída para git, se a semente falhar. Custo: mais um registro e rebuild por release."
+    trace: "opção da pergunta do run wf_615a4f2b-024, 2026-11-05"
+  - id: E_MARKETPLACE_GIT_REPO_ONE_COMMAND
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/plugin-marketplaces · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O marketplace de plugins do Claude Code é um repositório git com .claude-plugin/marketplace.json; o usuário registra com um comando (claude plugin marketplace add <owner>/<repo>) e instala por nome, sem npm, PyPI ou MCP no caminho padrão."
+    narrative: "Sobreviveu ao Elenxo: o marketplace oficial medido em 2026-11-05 (anthropics/claude-plugins-official) tem 315 entradas, url 163, git-subdir 99, relative 53, npm 0. A porta usa git-subdir. Prova o caminho, não a adoção."
+    trace: "https://code.claude.com/docs/en/plugin-marketplaces"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "fluxo de registro e instalação"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_NPM_IS_PLUGIN_SOURCE_PYPI_IS_NOT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/plugin-marketplaces · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O marketplace aceita npm como tipo de fonte de plugin (ao lado de github, git-subdir, url, archive e command), logo o npm pode ser transporte dentro do marketplace sem distribuição paralela; PyPI não é listado como fonte."
+    narrative: "Texto integral da claim: 'O próprio marketplace nativo já aceita npm como um dos tipos de fonte de plugin (ao lado de github, git-subdir, url, archive e command), logo o npm pode ser canal de transporte dentro do marketplace sem ser distribuição paralela; PyPI não é listado como fonte.' Limitado por E_OBJECAO_ACHADO2_NPM_CAPABILITY_ONLY."
+    trace: "https://code.claude.com/docs/en/plugin-marketplaces"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "tabela de tipos de fonte"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_MARKETPLACE_GIT_DIRECTORY_NATIVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/plugins/create-marketplace.md · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O marketplace do Claude Code é só um diretório ou repositório git com .claude-plugin/marketplace.json; é registrado com um comando, e a distribuição nativa não exige npm, PyPI nem registro de MCP."
+    narrative: "O Elenxo não derrubou, mas avisa: é o mesmo fato de E_MARKETPLACE_GIT_REPO_ONE_COMMAND, de outra página da mesma doc. Não é evidência independente: os 3 votos não somam a 6. Conte como um fato só; dos 19 achados, 5 (1 a 5) vêm do mesmo conjunto de páginas e cobrem 2 fatos."
+    trace: "https://code.claude.com/docs/en/plugins/create-marketplace.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/create-marketplace.md"
+      locator: "introdução da página"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_SOURCES_INCLUDE_NPM_NOT_SEPARATE_CHANNEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/plugins/create-marketplace.md · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O marketplace aceita fontes por caminho relativo, github e git-subdir, e também url git, archive zip via HTTPS, pacote npm e command; npm é portanto fonte suportada de plugin, não canal separado de instalação."
+    narrative: "O Elenxo não derrubou, mas repete o fato de E_NPM_IS_PLUGIN_SOURCE_PYPI_IS_NOT. O defeito de alcance (0 de 315 entradas usam npm) está registrado lá. Conte como um fato só."
+    trace: "https://code.claude.com/docs/en/plugins/create-marketplace.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/create-marketplace.md"
+      locator: "tabela de plugin sources"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_NPM_SOURCE_NO_INSTALL_SCRIPTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/plugins/marketplace-reference.md · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "O marketplace aceita como fonte de plugin npm (sem executar scripts de install), github, url, git-subdir, archive com sha256 e command; o npm é canal suportado de entrega de um plugin, não um produto separado."
+    narrative: "Limitado por E_OBJECAO_ACHADO5_HOOK_RUNS_WITHOUT_INSTALL_SCRIPT: a execução muda de lugar, para o hook do plugin."
+    trace: "https://code.claude.com/docs/en/plugins/marketplace-reference.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/marketplace-reference.md"
+      locator: "seção Plugin sources"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_PLUGIN_CARRIES_COMPONENTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "https://code.claude.com/docs/en/plugins/marketplace-reference.md · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "Um plugin pode carregar hooks, commands, agents, skills, outputStyles e themes, e a entrada do marketplace é o manifesto quando não há plugin.json; hooks inline na entrada precisam ser objeto evento->matchers, caminho de arquivo nunca roda."
+    narrative: "Limitado por E_OBJECAO_ACHADO6_WHAT_DOES_NOT_TRAVEL: lista o que entra e não o que fica de fora."
+    trace: "https://code.claude.com/docs/en/plugins/marketplace-reference.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/marketplace-reference.md"
+      locator: "seção de componentes do plugin"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_TASK_MASTER_NPM_WEEKLY_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "https://api.npmjs.org/downloads/point/last-week/task-master-ai · votos 3-0"
+    valid_from: "2026-10-29"
+    source_tier: 9
+    source_kind: primary
+    label: "O pacote npm task-master-ai teve 12.484 downloads na semana de 2026-10-29 a 2026-11-04 (API pontual de downloads do npm)."
+    narrative: "O número confere; a leitura como adoção não: ver E_OBJECAO_ACHADO7_DOWNLOADS_NOT_ADOPTION."
+    trace: "https://api.npmjs.org/downloads/point/last-week/task-master-ai"
+    provenance:
+      source: "https://api.npmjs.org/downloads/point/last-week/task-master-ai"
+      locator: "resposta JSON da API, campo downloads"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_BMAD_NPM_WEEKLY_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "https://api.npmjs.org/downloads/point/last-week/bmad-method · votos 3-0"
+    valid_from: "2026-10-29"
+    source_tier: 8
+    source_kind: primary
+    label: "O pacote npm bmad-method teve 23.215 downloads na semana de 2026-10-29 a 2026-11-04, evidência de que um kit de agentes comparável (BMAD) tem adoção mensurável pelo canal npm como instalador."
+    narrative: "O número confere; a inferência sobre o canal, não: ver E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION."
+    trace: "https://api.npmjs.org/downloads/point/last-week/bmad-method"
+    provenance:
+      source: "https://api.npmjs.org/downloads/point/last-week/bmad-method"
+      locator: "resposta JSON da API, campo downloads"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_RADAR_V34_PLUGIN_MARKETPLACE_TRIAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-05"
+    verified_against: "https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf · votos 2-1"
+    valid_from: "2026-04"
+    source_tier: 8
+    source_kind: analyst
+    label: "O Technology Radar Vol. 34 (abril 2026) põe o Claude Code plugin marketplace em Trial: distribuição Git-based de comandos, prompts e skills por marketplaces em GitHub, no lugar do copiar e colar que causava deriva de versão."
+    narrative: "Conferido pelo escritor do grafo: o PDF respondeu 200 em 2026-11-05; blip 72 em Trial, com o trecho 'By hosting internal team marketplaces'. Limitado por E_OBJECAO_ACHADO9_RADAR_IS_INTERNAL_TEAMS. Sucessor no Vol. 35: E_RADAR_V35_AGENT_PLUGIN_MARKETPLACE_TRIAL_1105."
+    trace: "https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf"
+    provenance:
+      source: "https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf"
+      locator: "blip 72, seção Tools"
+      method: "judges: votação 2-1 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_MINI_SHAI_HULUD_MAY_170_PACKAGES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "https://labs.cloudsecurityalliance.org/research/csa-research-note-mini-shai-hulud-supply-chain-sigstore-2026/ · votos 3-0"
+    valid_from: "2026-05-10"
+    source_tier: 7
+    source_kind: analyst
+    label: "Entre 10 e 12 de maio de 2026 o worm Mini Shai-Hulud (TeamPCP) comprometeu mais de 170 pacotes npm e PyPI em 19 namespaces, com mais de 400 versões maliciosas, a maioria publicada em cerca de cinco horas em 11 de maio."
+    narrative: "Sobreviveu ao Elenxo: CSA confirma, Tenable e VentureBeat são coerentes (172 pacotes)."
+    trace: "https://labs.cloudsecurityalliance.org/research/csa-research-note-mini-shai-hulud-supply-chain-sigstore-2026/"
+    provenance:
+      source: "https://labs.cloudsecurityalliance.org/research/csa-research-note-mini-shai-hulud-supply-chain-sigstore-2026/"
+      locator: "trecho 'more than 170 npm and PyPI packages across 19 namespaces'"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_PROVENANCE_NECESSARY_NOT_SUFFICIENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "https://labs.cloudsecurityalliance.org/research/csa-research-note-mini-shai-hulud-supply-chain-sigstore-2026/ · votos 3-0"
+    valid_from: "2026-05-11"
+    source_tier: 7
+    source_kind: analyst
+    label: "Provenance Sigstore válida atesta pipeline e identidade de build, mas não que o código avaliado é o que o mantenedor escreveu; pacote malicioso pode ter provenance válida. É controle necessário mas insuficiente."
+    narrative: "Sobreviveu ao Elenxo (CSA, JFrog e VentureBeat). Nota local: o kg-ssot publica com attestations=True, então essa defesa já existe na casa e, sozinha, não responde ao vetor."
+    trace: "https://labs.cloudsecurityalliance.org/research/csa-research-note-mini-shai-hulud-supply-chain-sigstore-2026/"
+    provenance:
+      source: "https://labs.cloudsecurityalliance.org/research/csa-research-note-mini-shai-hulud-supply-chain-sigstore-2026/"
+      locator: "seção sobre Sigstore"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_SHAI_HULUD_KEYV_CACHEABLE_AUGUST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted · votos 3-0"
+    valid_from: "2026-08-04"
+    source_tier: 6
+    source_kind: vendor-on-competitor
+    label: "Em 2026-08-04 a campanha Shai-Hulud ressurgiu nos ecossistemas keyv e cacheable do npm, afetando 2.225 versões de componentes (contagem parcial)."
+    narrative: "Sobreviveu ao Elenxo: o Sonatype ressalva 'a current snapshot, not a final tally'. Fornecedor que vende a detecção: suspeito por cláusula."
+    trace: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+    provenance:
+      source: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+      locator: "título e introdução do artigo"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_PREINSTALL_WORM_VECTOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted · votos 3-0"
+    valid_from: "2026-08-04"
+    source_tier: 6
+    source_kind: vendor-on-competitor
+    label: "O ataque usa hook preinstall (setup.mjs) que baixa runtime Bun e executa payload; rouba credenciais e usa acesso de publicação roubado para infectar outros pacotes do mantenedor vítima, o que torna o canal npm um vetor de worm."
+    narrative: "Limitado por E_OBJECAO_ACHADO13_NPM12_LIMITS_PREINSTALL: o vetor durável é a credencial roubada."
+    trace: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+    provenance:
+      source: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+      locator: "seção sobre o mecanismo do ataque"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_PROVENANCE_NOT_CLEAN_RUNTIME
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-05"
+    verified_against: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/ · votos 3-0"
+    valid_from: "2026-05"
+    source_tier: 6
+    source_kind: engineer
+    label: "Provenance não prova que o workflow de build estava limpo em tempo de execução, então um pacote malicioso herda a confiança do workflow legítimo."
+    narrative: "Sobreviveu ao Elenxo: a JFrog diz literalmente 'it cannot prove that the build workflow was clean at runtime'."
+    trace: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/"
+    provenance:
+      source: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/"
+      locator: "trecho 'it cannot prove that the build workflow was clean at runtime'"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_SAP_CAP_FOUR_VERSIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-05"
+    verified_against: "https://phoenix.security/mini-shai-hulud-sap-cap-mbt-npm-supply-chain-bun-credential-stealer/ · votos 2-1"
+    valid_from: "2026-04-29"
+    source_tier: 5
+    source_kind: vendor-on-competitor
+    label: "Em 29/04/2026 quatro versões npm (mbt@1.2.48, @cap-js/sqlite@2.2.2, @cap-js/postgres@2.2.2, @cap-js/db-service@2.10.1), somando cerca de 572.000 downloads semanais, foram publicadas com backdoor."
+    narrative: "Sobreviveu ao Elenxo, com leitura: 572 mil é base de exposição dos pacotes, não instalações das versões maliciosas, publicadas por pouco mais de duas horas. Fonte de tier 5, sem segunda fonte lida para o número."
+    trace: "https://phoenix.security/mini-shai-hulud-sap-cap-mbt-npm-supply-chain-bun-credential-stealer/"
+    provenance:
+      source: "https://phoenix.security/mini-shai-hulud-sap-cap-mbt-npm-supply-chain-bun-credential-stealer/"
+      locator: "trecho 'approximately 572,000'"
+      method: "judges: votação 2-1 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_COGNITION_1B_AT_26B
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "https://thenextweb.com/news/cognition-just-raised-1-billion-at-a-26-billion-valuation-and-90-of-its-own-code-is-written-by-its-ai · votos 3-0"
+    valid_from: "2026-05"
+    source_tier: 5
+    source_kind: analyst
+    label: "A Cognition (Devin) levantou mais de US$ 1 bilhão com valuation de US$ 26 bilhões em maio de 2026, mais que dobrando o valor da rodada anterior de US$ 10,2 bilhões."
+    narrative: "O número confere, e não responde à pergunta 5: ver E_OBJECAO_ACHADO16_COGNITION_DOES_NOT_ANSWER_Q5."
+    trace: "https://thenextweb.com/news/cognition-just-raised-1-billion-at-a-26-billion-valuation-and-90-of-its-own-code-is-written-by-its-ai"
+    provenance:
+      source: "https://thenextweb.com/news/cognition-just-raised-1-billion-at-a-26-billion-valuation-and-90-of-its-own-code-is-written-by-its-ai"
+      locator: "título e primeiro parágrafo"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_SHAI_HULUD_440_PACKAGES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-05"
+    verified_against: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/ · votos 2-1"
+    valid_from: "2026-08"
+    source_tier: 5
+    source_kind: analyst
+    label: "A campanha Shai-Hulud comprometeu mais de 440 pacotes npm únicos, com estimativa de mais de 2 bilhões de downloads mensais em projetos dependentes (início de agosto de 2026)."
+    narrative: "Sobreviveu ao Elenxo, com leitura: é alcance a jusante estimado por fornecedor, não medida independente. Não sirva o número como dano."
+    trace: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/"
+    provenance:
+      source: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/"
+      locator: "trechos 'over 440 unique npm packages' e 'estimated total of over 2 billion monthly downloads'"
+      method: "judges: votação 2-1 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_SHAI_HULUD_VIA_MCP_REGISTRY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-11-05"
+    verified_against: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/ · votos 2-1"
+    valid_from: "2026-08"
+    source_tier: 5
+    source_kind: analyst
+    label: "Pela primeira vez um payload Shai-Hulud foi entregue pelo Registro oficial do MCP: a entrada apontava para pacote PyPI limpo, mas o repositório vinculado tinha configurações maliciosas acionadas ao abrir ou clonar no Claude Code ou VS Code."
+    narrative: "Limitado por E_OBJECAO_ACHADO18_VECTOR_IS_CLAUDE_SETTINGS_IN_REPO: o vetor está no repo, na mesma forma de cópia que as portas usam."
+    trace: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/"
+    provenance:
+      source: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/"
+      locator: "trechos 'completely clean to evade automated package scanners' e sobre os settings do workspace"
+      method: "judges: votação 2-1 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_MCP_REGISTRY_NO_REVIEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-05"
+    verified_against: "https://composio.dev/blog/how-to-publish-mcp-server · votos 3-0"
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: "O MCP Registry oficial não revisa submissões: não há aprovação manual, e a publicação depende de schema válido, namespace e prova de propriedade do pacote."
+    narrative: "Fonte fraca, reforçada pela primária em E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS."
+    trace: "https://composio.dev/blog/how-to-publish-mcp-server"
+    provenance:
+      source: "https://composio.dev/blog/how-to-publish-mcp-server"
+      locator: "seção sobre publicação no Registry"
+      method: "judges: votação 3-0 do Verify adversarial do run wf_615a4f2b-024"
+      locality: "web"
+  - id: E_RADAR_V35_AGENT_PLUGIN_MARKETPLACE_TRIAL_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-05"
+    verified_against: "https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/11/tr_technology_radar_vol_35_en.pdf · curl 200 e pdftotext em 2026-11-05; blips 7 e 72 lidos no texto extraído"
+    valid_from: "2026-11"
+    source_tier: 8
+    source_kind: analyst
+    label: "O Radar Vol. 35 generaliza o blip: 'Agent plugin marketplace' em Trial, para distribuir harness numa organização, e Agent Package Manager em Trial. As 8 opções da decisão não avaliam esse formato nem esse gerenciador."
+    narrative: "Medido pelo escritor do grafo ao preparar a escrita, sem votação dos juízes; é o que fecha a lacuna 'permanência do blip na edição atual' do Achado 9. Técnica 7, Trial: 'An agent plugin marketplace is a means of distributing harness assets across an organization', com 'plugins in the Agent Plugins format that coding agents consume directly or that are managed as dependencies with Agent Package Manager'; 'Anthropic popularized the pattern with its Claude Code plugin marketplace'. Ferramenta 72, Trial: dependency manager de código aberto para configuração de agente, com manifesto, lock files com hash e provenance, SBOM e arquivo de política; 'pre-1.0, community-driven project, albeit one sponsored by a major player'. Reforça a objeção do Achado 9: o texto segue falando de distribuição na organização, não de adoção pública. Limita a decisão: pela escada (adotar antes de construir) o Agent Plugins e o Agent Package Manager são candidatos de mercado que o run não mediu, e a recomendação fica sem veredito sobre eles. Nada foi medido sobre compatibilidade do onion-plugins com esse formato."
+    trace: "https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/11/tr_technology_radar_vol_35_en.pdf"
+    provenance:
+      source: "https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/11/tr_technology_radar_vol_35_en.pdf"
+      locator: "técnica 7 'Agent plugin marketplace' e ferramenta 72 'Agent Package Manager'"
+      method: "measurement: curl do PDF e pdftotext, grep do trecho, pelo escritor do grafo"
+      locality: "web"
+  - id: E_MERCADO_ONION_DISTRIBUTION_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-11-05"
+    verified_against: "síntese de mercado do run wf_615a4f2b-024; Cognition tier 5 com 3-0; Radar Vol. 34 tier 8 com 2-1; corpus onda-derivada-e-o-lugar-do-onion-2026-10"
+    source_tier: 5
+    source_kind: analyst
+    label: "EIXO MERCADO E CAPITAL: sinal fraco e indireto. Não há evidência direta de quem paga por distribuição nem de investidor premiando canal de pacote nessa categoria; por dedução, o custo cai sobre o mantenedor do core."
+    narrative: "Texto do sintetizador: sinal fraco e indireto; não encontrei evidência direta de quem paga por distribuição nem de investidor premiando canal de pacote nesta categoria. O único dado de capital confirmado é a Cognition (Devin): mais de US$ 1 bilhão a US$ 26 bilhões em maio de 2026, ante US$ 10,2 bilhões na rodada anterior (tier 5, 3-0). Ela é agente como produto, não framework template, e a leitura de que o mercado premia a camada de agente acima do canal foi refutada. O analista confirmado é o Technology Radar Vol. 34 (abril de 2026), que põe o marketplace de plugins do Claude Code em Trial (tier 8, 2-1). Sem sinal encontrado de M&A, de receita de kits comparáveis ou de financiamento de spec-kit, BMAD, SuperClaude, Agent OS ou Task Master. Quanto a quem paga no Onion, a resposta é por dedução: não há comprador identificado para o canal, e o custo cairia sobre o mantenedor do core. Acréscimo do corpus: E_CANAL_OFICIAL_SEM_TRILHO_DE_COBRANCA (2026-10-01) registrou que o canal oficial não documenta cobrança, preço nem taxa, e o Elenxo aponta o maestro como revisor humano em cada registro do release.yml do kg-ssot. Pista única sobre kits: doação ao BMAD, por espelho de README; GitHub Sponsors e Open Collective não foram olhados."
+    trace: "síntese de mercado do run wf_615a4f2b-024"
+    provenance:
+      source: "https://thenextweb.com/news/cognition-just-raised-1-billion-at-a-26-billion-valuation-and-90-of-its-own-code-is-written-by-its-ai"
+      locator: "bloco Mercado do run; Radar Vol. 34 blip 72"
+      method: "derived: síntese do run a partir de duas claims confirmadas"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO2_NPM_CAPABILITY_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "O texto é fiel à doc, mas prova só capacidade no papel. Nenhuma das 315 entradas do marketplace oficial usa npm (medido em 2026-11-05). O marketplace continua sendo um repo git, então a entrada npm não dispensa git e soma o npm client do usuário e um pipeline de publicação. O tipo de marketplace npm falha com 'NPM marketplace sources not yet implemented'. Falta evidência de valor ganho para quem já tem git-subdir."
+    label: "OBJEÇÃO (Achado 2): npm como fonte de plugin é capacidade no papel: 0 de 315 entradas do marketplace oficial o usam, o catálogo segue sendo repo git e o tipo de marketplace npm não está implementado."
+    narrative: "Alvo: Achado 2: npm é fonte de plugin, logo pode ser transporte sem distribuição paralela; PyPI não é fonte (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Nenhuma variante de npm como fonte entrega algo que git-subdir ou archive com sha256 não entreguem. Medida: Li as 7 fontes em marketplace-reference.md e contei o uso no marketplace oficial (npm 0 de 315). O fim de busca foi esse; não há caso medido de ganho."
+    trace: "gh api repos/anthropics/claude-plugins-official/contents/.claude-plugin/marketplace.json --jq .content | base64 -d | python3 -c \"import sys,json,collections as c; print(c.Counter((p['source'].get('source') if isinstance(p['source'],dict) else 'relative') for p in json.load(sys.stdin)['plugins']))\""
+    provenance:
+      source: "https://github.com/anthropics/claude-plugins-official/blob/main/.claude-plugin/marketplace.json"
+      locator: "contagem das fontes em plugins[]: url 163, git-subdir 99, relative 53, npm 0"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO5_HOOK_RUNS_WITHOUT_INSTALL_SCRIPT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A frase sobre scripts é verdadeira ('install scripts ... never run'), mas sugere uma segurança que não existe em plugin. Um pacote comprometido entrega hooks, e a mesma doc diz em components: 'Claude Code registers them when a session loads the plugin, and they fire on their events from then on'. Monitores: 'runs with your full user permissions and outside the sandbox'. O scan de install some, mas a execução muda de lugar. O sha256 do archive é opcional ('When you set it'), não intrínseco como o achado sugere."
+    label: "OBJEÇÃO (Achado 5): npm sem script de install não dá segurança a plugin: um pacote comprometido entrega hooks, que disparam ao carregar a sessão. A execução muda de lugar, e o sha256 do archive é opcional."
+    narrative: "Alvo: Achado 5: npm entra sem executar scripts de install, logo é canal suportado (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): Nenhuma variante de pacote elimina a execução por hook sem eliminar o próprio Onion, cujo veto é hook. Medida: Li components, marketplace-reference e org. allowManagedHooksOnly restringe hooks, mas 'Doesn't trust hooks from plugins users enable themselves': é política do adotante, não propriedade do pacote."
+    trace: "https://code.claude.com/docs/en/plugins/components: 'A plugin's hooks don't wait for one of the plugin's skills or commands to be used. Claude Code registers them when a session loads the plugin'"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/components"
+      locator: "trecho sobre hooks registrados ao carregar o plugin; seção de monitores"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO6_WHAT_DOES_NOT_TRAVEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "É verdade, mas omite o que a pergunta 2 precisa: o que NÃO viaja. Em components: 'Claude Code doesn't load a CLAUDE.md at the plugin root'; settings do plugin: 'Only two keys take effect from a plugin, agent and subagentStatusLine; every other key is dropped'. Logo, doutrina em CLAUDE.md e permissions não viajam por plugin. Só a cópia em .claude entrega isso. Sem managed settings, o usuário pode desligar o plugin: a doc só garante a trava quando 'managed settings take precedence'."
+    label: "OBJEÇÃO (Achado 6): falta o que NÃO viaja por plugin: CLAUDE.md na raiz do plugin não carrega, e das settings só agent e subagentStatusLine valem; permissions ficam de fora. Só a cópia em .claude entrega isso."
+    narrative: "Alvo: Achado 6: plugin carrega hooks, commands, agents, skills, outputStyles e themes (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules e settings; managed settings dão a trava; npm ou PyPI como instalador só copia e não acrescenta capacidade. Medida: Leitura de components, marketplace-reference e org em 2026-11-05."
+    trace: "https://code.claude.com/docs/en/plugins/components: 'Only two keys take effect from a plugin ... every other key is dropped' (a claim do run lista o que entra e não o que fica de fora)"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/components"
+      locator: "trechos sobre CLAUDE.md na raiz do plugin e sobre as duas chaves de settings"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO7_DOWNLOADS_NOT_ADOPTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "O número confere com a API, mas não mede adoção. Último publish em npm: 2026-03-31; último push no repo: 2026-04-28. São 7 meses parado com 12 mil por semana. Piso de ruído medido na casa: kg-ssot tem 0 estrelas e 4 visitantes únicos em 14 dias, e mesmo assim 1.834 npm e 3.116 PyPI por semana. A contagem mistura CI, espelho e automação, e essa fração não foi decomposta."
+    label: "OBJEÇÃO (Achado 7): download não mede adoção: task-master segue com 12 mil por semana após 7 meses sem publicar, e o kg-ssot, com 0 estrelas e 4 visitantes únicos em 14 dias, faz 1.834 npm e 3.116 PyPI por semana."
+    narrative: "Alvo: Achado 7: task-master-ai teve 12.484 downloads na semana (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Não há métrica pública de usuário único em nenhum canal. Medida: Procurei em npm downloads API, pypistats, GitHub traffic e claude.com/plugins (a página mostra '528 plugins' e nenhuma contagem). Doc measure: 'Claude Code doesn't report a plugin's usage back to its author'."
+    trace: "curl -s https://api.npmjs.org/downloads/point/last-week/kg-ssot; gh api repos/marciocar/kg-ssot --jq .stargazers_count; npm view task-master-ai time.modified; bash .claude/validation/kg-corpus-grep.sh task-master-ai"
+    provenance:
+      source: "https://api.npmjs.org/downloads/point/last-week/kg-ssot"
+      locator: "API de downloads do npm mais gh api de repos/marciocar/kg-ssot"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A inferência sobre o canal não fecha. No mesmo canal e na mesma semana, @fission-ai/openspec fez 1.240.857 (53x). Spec-kit tem 147.665 estrelas sem pacote npm próprio; a rota é git com uv e, desde 2026-07-14, PyPI (specify-cli, 41.925 por semana). Superpowers tem 312.760 estrelas, entra pelo marketplace e está no oficial. SuperClaude tem 23.928 estrelas com npm 61 e PyPI 2.463 por semana. O canal não explica a variação; o kit explica. Nenhum dado mostra causa."
+    label: "OBJEÇÃO (Achado 8): o canal não explica a adoção: openspec faz 53x o bmad no mesmo npm; spec-kit tem 147.665 estrelas sem npm próprio; Superpowers, 312.760 por /plugin; SuperClaude, 61 npm. Nenhum dado mostra causa."
+    narrative: "Alvo: Achado 8: bmad-method com 23.215 downloads é evidência de adoção pelo npm como instalador (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin. Medida: APIs npm, pypistats e GitHub rodadas em 2026-11-05 (períodos de npm 10-29 a 11-04)."
+    trace: "https://api.npmjs.org/downloads/point/last-week/@fission-ai/openspec: {\"downloads\":1240857,\"start\":\"2026-10-29\",\"end\":\"2026-11-04\"}; https://api.npmjs.org/downloads/point/last-week/superclaude: {\"downloads\":61}"
+    provenance:
+      source: "https://api.npmjs.org/downloads/point/last-week/@fission-ai/openspec"
+      locator: "API de downloads do npm, semana de 2026-10-29 a 2026-11-04; pypistats; gh api"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO9_RADAR_IS_INTERNAL_TEAMS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A página do blip confirma 'Trial', mas o texto fala de 'hosting internal team marketplaces': distribuição interna entre times. Não fala de adoção pública de framework. A extrapolação para o caso do Onion não está provada. Também não consegui ler o PDF citado nem o Vol. 35: os dois devolveram 503. A permanência do blip na edição atual segue não medida."
+    label: "OBJEÇÃO (Achado 9): o Trial do Radar fala de marketplaces INTERNOS de times, não de adoção pública de framework; a extrapolação para o Onion não está provada."
+    narrative: "Alvo: Achado 9: Radar coloca o marketplace do Claude Code em Trial (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): Sem fonte de analista sobre canal público de kits de agente. Medida: Tentei o PDF do Vol. 34 e o do Vol. 35 (503 nos dois) e a página do blip."
+    trace: "https://www.thoughtworks.com/radar/tools/claude-code-plugin-marketplace: 'Our teams are now leveraging the Claude Code plugin marketplace to distribute shared commands, prompts and skills' (times internos; falta claim sobre canal público)"
+    provenance:
+      source: "https://www.thoughtworks.com/radar/tools/claude-code-plugin-marketplace"
+      locator: "trecho 'hosting internal team marketplaces'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO13_NPM12_LIMITS_PREINSTALL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A mesma fonte limita o alcance: segundo o Sonatype, o npm 12 bloqueia por padrão scripts de instalação de dependência não aprovados, e o gancho só roda em versões anteriores ou ambientes que permitem. The Hacker News (julho de 2026) corrobora; as fontes divergem no nome da flag. O vetor durável é a credencial roubada, não o preinstall. Esse risco recai sobre quem publica, ou seja, sobre o maestro, e não apenas sobre quem instala."
+    label: "OBJEÇÃO (Achado 13): npm 12 bloqueia script de dependência não aprovado (notas do npm 12: primário citado, não lido); o vetor durável é a credencial roubada, risco de quem publica, ou seja, do maestro."
+    narrative: "Alvo: Achado 13: preinstall com setup.mjs torna o npm vetor de worm (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): O npm 12 reduz o gancho de install, mas não protege contra publicação com credencial roubada nem contra hook de plugin. Medida: Li Sonatype, Phoenix e Tenable. Não achei release notes primárias do npm 12 na busca; a data e as flags seguem por fonte secundária."
+    trace: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted: npm 12 bloqueia scripts de dependência não aprovados por padrão (ler o trecho sobre npm 12)"
+    provenance:
+      source: "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+      locator: "trecho sobre npm 12"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO16_COGNITION_DOES_NOT_ANSWER_Q5
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "O número confere, mas não responde à pergunta 5. O artigo não cita canal de distribuição algum, e Cognition vende produto hospedado, não kit em .claude. Sobre quem paga a distribuição de kits, a única pista achada é BMAD (Buy Me a Coffee e patrocínio por DM, via espelho de README). Na casa, quem paga é o maestro: revisor humano em cada registro no release.yml do kg-ssot."
+    label: "OBJEÇÃO (Achado 16): o valuation da Cognition não responde a pergunta 5: o artigo não cita canal, e ela vende produto hospedado. Pista única sobre kits: doação ao BMAD. Na casa quem paga é o maestro, revisor em cada registro."
+    narrative: "Alvo: Achado 16: Cognition levantou US$ 1 bi a US$ 26 bi (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Sem dado de investidor premiando canal de pacote em kits de agente. Medida: Busquei funding e patrocínio de BMAD, spec-kit, SuperClaude e Agent OS: só a pista de doação do BMAD. Não olhei GitHub Sponsors nem Open Collective de cada um; a lacuna segue aberta."
+    trace: "Nenhuma claim do run responde 'quem paga por essa distribuição'. Conferir: bash .claude/validation/kg-corpus-grep.sh bmad-method (0 nós) e o texto do artigo (sem npm, plugin ou marketplace)"
+    provenance:
+      source: "https://thenextweb.com/news/cognition-just-raised-1-billion-at-a-26-billion-valuation-and-90-of-its-own-code-is-written-by-its-ai"
+      locator: "texto do artigo, sem npm, plugin ou marketplace"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO18_VECTOR_IS_CLAUDE_SETTINGS_IN_REPO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "O fato confere, mas lido como risco do MCP aponta para o lado errado. Segundo o OX, o pacote PyPI estava limpo e a carga vinha de '.vscode/settings.json and .claude/settings.json' do repo vinculado. O vetor é abrir um repo com .claude/settings.json: justamente a forma de cópia que as portas usam. Phoenix e Tenable também citam hooks em .claude/settings.json como persistência. Ficar só em repo e plugin não fica imune a essa classe. O OX afirma que abrir ou clonar dispara, mas a doc do Claude Code descreve diálogo de confiança; não medi como isso se comporta para hooks de projeto."
+    label: "OBJEÇÃO (Achado 18): o vetor do OX é o .claude/settings.json do repo vinculado, a mesma forma de cópia das portas; ficar só em repo e plugin não imuniza. O comportamento em pasta não confiada segue sem spike."
+    narrative: "Alvo: Achado 18: payload Shai-Hulud entregue pelo Registro oficial do MCP (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação procurada e não achada (classe nenhuma): Nenhuma forma de distribuição fecha o vetor; ele depende da confiança na pasta. Medida: Li OX, Phoenix, Tenable e org.md (que trata só de extraKnownMarketplaces em pasta confiável). Falta um spike abrindo repo com hook em pasta não confiada."
+    trace: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/: 'completely clean to evade automated package scanners'; 'embedded malicious execution instructions within the local workspace settings files (.vscode/settings.json and .claude/settings.json ...)'"
+    provenance:
+      source: "https://www.ox.security/blog/shai-hulud-outbreak-debrief-the-worm-evolves-into-mcp/"
+      locator: "trechos 'completely clean to evade automated package scanners' e sobre os arquivos de settings do workspace"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Correto, mas de fonte fraca, e omite o que muda a decisão. Primária: 'consumers should assume minimal-to-no moderation'; 'currently in preview. Breaking changes or data resets may occur'; 'not intended to be directly consumed by host applications'. Logo, listar não entrega o Onion a usuários de Claude Code sem passar por agregadores, e o registro só aceita servidor MCP de verdade, não um template em .claude."
+    label: "OBJEÇÃO (Achado 19): a primária do Registry diz moderação mínima, preview com possível reset de dados e que hosts não o consomem direto; listar não entrega o Onion a quem usa Claude Code, e só aceita servidor MCP de verdade."
+    narrative: "Alvo: Achado 19: Registry oficial não revisa submissões (Composio, tier 4) (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb. Medida: Leitura de registry/about, package-types, moderation-policy, versioning e GET registry.modelcontextprotocol.io/v0/servers?search=kg-ssot&version=latest em 2026-11-05."
+    trace: "https://modelcontextprotocol.io/registry/about: 'The MCP Registry is not intended to be directly consumed by host applications'"
+    provenance:
+      source: "https://modelcontextprotocol.io/registry/about"
+      locator: "trechos sobre moderação, preview e consumo por hosts"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Mediu o repo errado. onion-kg-ssot é privado e não tem publicação nos workflows. O repo público é marciocar/kg-ssot, e o pacote é real: PyPI kg-ssot 4.43.0 (49 releases), npm kg-ssot 4.43.0 (maintainer marciocar) e MCP Registry io.github.marciocar/kg-ssot 4.43.0 com pypi e mcpb. A premissa da pergunta é verdadeira. Mas a analogia não transfere: kg-ssot é biblioteca e validador que age por import, e o Onion age no harness."
+    label: "OBJEÇÃO (corpus): a dúvida sobre o pacote do kg-ssot mediu o repo errado; marciocar/kg-ssot publica de fato em PyPI, npm e Registry. Mas a analogia não transfere: ele age por import, e o Onion, no harness."
+    narrative: "Alvo: Corpus: 'a premissa pacote Python do kg-ssot não está confirmada' (medido em onion-kg-ssot) (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment com o maestro como revisor, sem cache e mcp-publisher com checksum fixado. Medida: Li o arquivo via gh api em 2026-11-05. Isso derruba o custo inicial de publicar, não o custo contínuo: 49 releases PyPI desde 2026-10-09."
+    trace: "npm view kg-ssot maintainers repository.url version; curl -s https://pypi.org/pypi/kg-ssot/json | python3 -c \"import sys,json; print(json.load(sys.stdin)['info']['version'])\"; curl -s 'https://registry.modelcontextprotocol.io/v0/servers?search=kg-ssot&version=latest'"
+    provenance:
+      source: "https://pypi.org/pypi/kg-ssot/json"
+      locator: "info.version 4.43.0; npm view kg-ssot; Registry v0/servers?search=kg-ssot"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CORPUS_DOOR_DEMAND_UNMEASURABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Medi o que dá. Em 14 dias, cada porta tem 100 a 105 clones únicos, e a série diária de onion-plugins e onion-mini é quase igual (10-23: 30 e 32; 10-27: 20 e 21), o que aponta automação e não demanda humana. Visitantes únicos: 1, 1, 2 e 8. Estrelas: 1, 0, 1 e 4. Instalações não são observáveis: 'Claude Code doesn't report a plugin's usage back to its author'; 'Neither: you have no usage signal'. Qualquer gatilho baseado em downloads ou clones é inválido; hoje não existe demanda medida para nenhuma forma."
+    label: "OBJEÇÃO (corpus): portas com 100 a 105 clones únicos em 14 dias e séries quase iguais, o que aponta automação; 1 a 8 visitantes únicos. Instalação de plugin não é observável: gatilho por clone ou download é inválido."
+    narrative: "Alvo: Corpus: 'Não medido: downloads ou instalações das portas' (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Entrar no diretório da Anthropic traria sinal de uso (a doc aponta 'Track published plugin usage' para plugin listado), mas é condição futura: o Onion não está lá e não li a página. Medida: Li measure.md e contei o marketplace oficial: 'onion' tem 0 entradas. Não medi o aceite nem o que esse painel mostra."
+    trace: "for r in onion-plugins onion-core onion-standalone onion-mini; do gh api repos/marciocar/$r/traffic/clones --jq '{count,uniques}'; gh api repos/marciocar/$r/traffic/views --jq '{count,uniques}'; done"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/measure.md"
+      locator: "'Neither: you have no usage signal'; gh api traffic/clones e traffic/views das 4 portas"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SCOPE_NO_AUTHORED_COUNTERPOINT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Nenhum achado do run responde a isso, e os dois descartes mais próximos foram cortados. O contraponto existe como comportamento: Superpowers (312.760 estrelas, listado no oficial, install por /plugin) e 315 plugins oficiais com 0 em npm. Não achei texto de quem defende a posição nem confirmei que Superpowers nunca teve instalador npm. No sentido oposto, OpenSpec e BMAD crescem por npm e servem a muitos harnesses, algo que o Onion recusou para o core."
+    label: "OBJEÇÃO (lacuna do Scope): o contraponto a favor de ficar só em repo e plugin existe como comportamento (Superpowers, 0 npm em 315 entradas), não como argumento autoral datado. OpenSpec e BMAD crescem por npm servindo muitos harnesses."
+    narrative: "Alvo: Lacuna do Scope: contraponto de quem defende ficar só em repo e plugin (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): Sem argumento autoral datado, apenas comportamento observado. Medida: Busca 'drop npm installer move to plugin marketplace' sem resultado sobre a migração; só a rota por plugin apareceu."
+    trace: "gh api repos/obra/superpowers --jq .stargazers_count; nenhuma claim listada no prompt responde a lacuna do contraponto"
+    provenance:
+      source: "https://github.com/obra/superpowers"
+      locator: "stargazers_count pela API do GitHub"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A refutação não para em pé. A página do blip diz 'Caution' e cita 'structured tool contracts, OAuth-based authentication boundaries and governed multi-tenant access'; um CLI bem feito 'can often meet' a necessidade. Ressalva: o texto esclarece que não é rejeição do MCP, então 'só compensa' pesa um pouco a mão. O PDF deu 503 hoje, o que pode explicar a refutação. Importa para a decisão: pesa contra um MCP só para ter MCP."
+    label: "OBJEÇÃO (descarte refutado): 'MCP by default' está em Caution na página do blip; o texto diz que não é rejeição do MCP, mas pesa contra publicar um MCP só para ter MCP."
+    narrative: "Alvo: Descarte refutado: Radar coloca 'MCP by default' em Caution (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): Restaurar a claim citando a página do blip em vez do PDF. Medida: WebFetch da página em 2026-11-05. A página marca o blip como fora da edição atual, datado de 2026-04-15."
+    trace: "https://www.thoughtworks.com/radar/techniques/mcp-by-default: anel 'Caution'; 'structured tool contracts, OAuth-based authentication boundaries and governed multi-tenant access'"
+    provenance:
+      source: "https://www.thoughtworks.com/radar/techniques/mcp-by-default"
+      locator: "anel Caution e trecho sobre contratos estruturados"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_DISCARD_PYPI_NOT_EXEMPT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "JFrog, Apêndice B, lista 'mistralai 2.4.6' e 'guardrails-ai 0.10.1'. Mend e CSA são coerentes com 172 pacotes. A divisão exata 170 + 2 não confirmei (Tenable e CSA não separam), mas nomes e versões estão de pé. Importa porque PyPI não fica de fora, e o vetor lá é import-time."
+    label: "OBJEÇÃO (descarte refutado): mistralai 2.4.6 e guardrails-ai 0.10.1 estão no Apêndice B da JFrog; o PyPI não fica de fora da campanha, e lá o gatilho é import-time. A divisão exata 170 + 2 não foi confirmada."
+    narrative: "Alvo: Descarte refutado: 170+ npm e 2 PyPI, mistralai 2.4.6 e guardrails-ai 0.10.1 (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): Restaurar a claim com nomes e versões, sem afirmar a divisão 170 + 2. Medida: WebFetch JFrog em 2026-11-05."
+    trace: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/ Apêndice B: 'mistralai' 2.4.6, 'guardrails-ai' 0.10.1"
+    provenance:
+      source: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/"
+      locator: "Apêndice B"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_DISCARD_OIDC_EXTRACTED_FROM_RUNNER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "JFrog: 'poisoned a build cache entry'; 'extracted GitHub Actions OIDC material from runner memory', depois trocado por credenciais npm. CSA confirma '/proc/<pid>/mem'. Só a conclusão é imprecisa: OIDC foi o vetor da publicação inicial, e a propagação veio de tokens roubados. Refutar tudo apaga o achado mais relevante da pergunta 3: publicação confiável vira superfície se o escopo estiver frouxo."
+    x_path_is_content: "citação"
+    label: "OBJEÇÃO (descarte refutado): cache envenenado e OIDC extraído da memória do runner estão de pé; só a conclusão erra: OIDC foi a publicação inicial. Publicação confiável vira superfície se o escopo estiver frouxo."
+    narrative: "Alvo: Descarte refutado: cache envenenado e OIDC extraído da memória, trocado por credencial de publicação (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): Restaurar a claim trocando 'propagação' por 'publicação inicial'. Medida: JFrog e CSA lidos em 2026-11-05; VentureBeat: 'OIDC scope is the actual control that matters here'."
+    trace: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/: 'the malware extracted GitHub Actions OIDC material from runner memory'"
+    provenance:
+      source: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/"
+      locator: "trechos 'poisoned a build cache entry' e 'extracted GitHub Actions OIDC material from runner memory'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_DISCARD_SAP_TRUSTED_ANY_WORKFLOW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Phoenix: 'trusted any workflow in cap-js/cds-dbs, not the specific release workflow on the main branch'; SAP: 'publish permissions without any manual approval gate'; correção em cds-dbs PR #1592 com Environment e aprovação manual. Vale para @cap-js; para mbt o vetor 'has not been confirmed publicly'. Esse é o critério operacional de qualquer publicação, e o release.yml do kg-ssot já o segue."
+    label: "OBJEÇÃO (descarte refutado): em @cap-js o Trusted Publishing não tinha portão manual, e o PR #1592 pôs Environment com aprovação; para mbt o vetor não foi confirmado. É critério de qualquer publicação; o kg-ssot já o segue."
+    narrative: "Alvo: Descarte refutado: causa raiz SAP CAP é Trusted Publishing confiando em qualquer workflow (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): Restaurar a claim limitada a @cap-js. Medida: WebFetch Phoenix em 2026-11-05."
+    trace: "https://phoenix.security/mini-shai-hulud-sap-cap-mbt-npm-supply-chain-bun-credential-stealer/: 'trusted any workflow in cap-js/cds-dbs, not the specific release workflow on the main branch'"
+    provenance:
+      source: "https://phoenix.security/mini-shai-hulud-sap-cap-mbt-npm-supply-chain-bun-credential-stealer/"
+      locator: "trecho 'trusted any workflow in cap-js/cds-dbs'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "A crítica estava certa e foi cortada; os achados 7 e 8 ficaram sem ela. Faltou a mesma API para os demais kits, chamada trivial."
+    label: "OBJEÇÃO (corte): um ponto de downloads de uma semana não compara canais; a crítica foi cortada e os achados 7 e 8 ficaram sem ela. Faltou a mesma API para os demais kits, chamada trivial."
+    narrative: "Alvo: Corte por orçamento: um ponto de downloads de uma semana não compara canais (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Tabela multicanal registrada no achado 8. Medida: APIs rodadas em 2026-11-05."
+    trace: "curl -s https://api.npmjs.org/downloads/point/last-week/@fission-ai/openspec; curl -s https://api.npmjs.org/downloads/point/last-week/superclaude"
+    provenance:
+      source: "https://api.npmjs.org/downloads/point/last-week/@fission-ai/openspec"
+      locator: "API de downloads do npm"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Confirmado na doc primária ('sha: a full 40-character lowercase commit SHA'; 'refuses a download that doesn't match'). Dá integridade sem registro de terceiro, justamente o que a postura do Onion pede. Vale nota: o sha256 só protege quem fixa, e o marketplace da raiz do core hoje não mostra pin nas linhas git-subdir que li."
+    label: "OBJEÇÃO (corte): pin por SHA de 40 caracteres e sha256 de archive dão integridade sem registro de terceiro, o que a postura pede; mas as linhas git-subdir vistas no marketplace da raiz do core não mostram pin."
+    narrative: "Alvo: Corte por orçamento: pin por SHA de 40 caracteres e sha256 de archive (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a claim e avaliar pin por sha nas entradas das portas. Medida: Doc lida em 2026-11-05 e 5 entradas do marketplace.json conferidas (ausência de sha nas linhas vistas, sem varredura total)."
+    trace: "https://code.claude.com/docs/en/plugins/marketplace-reference.md seção 'Plugin sources'; sed -n 14p .claude-plugin/marketplace.json"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/marketplace-reference.md"
+      locator: "seção 'Plugin sources'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_MARKETPLACE_ALLOWLIST_POLICY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "org.md confirma strictKnownMarketplaces, blockedMarketplaces, hostPattern e owner/*. Para o ICP empresa, é o gate que um pacote npm não oferece: 'Both lists apply before anything downloads and again at session start'."
+    label: "OBJEÇÃO (corte): strictKnownMarketplaces e blockedMarketplaces valem antes de baixar e de novo ao abrir a sessão; para o ICP empresa, é o gate que um pacote npm não oferece."
+    narrative: "Alvo: Corte por orçamento: allowlist e blocklist de marketplaces por política (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a claim. Medida: Doc lida em 2026-11-05."
+    trace: "https://code.claude.com/docs/en/plugins/org.md seção 'Control matrix'"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/org.md"
+      locator: "seção 'Control matrix'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Confirmado: '`npm`, `pip`, `uv`, `cargo`, `github`, and `gh`: reserved' e 'NPM marketplace sources not yet implemented'. É o limite que qualifica os achados 2, 4 e 5: npm só serve como fonte de plugin, nunca como catálogo. É também gatilho de reabertura se isso mudar."
+    label: "OBJEÇÃO (corte): 'NPM marketplace sources not yet implemented': npm só serve como fonte de plugin, nunca como catálogo. Limita os achados 2, 4 e 5 e é gatilho de reabertura se mudar."
+    narrative: "Alvo: Corte por orçamento: nomes reservados e marketplace npm não implementado (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a claim. Medida: Doc lida em 2026-11-05."
+    trace: "https://code.claude.com/docs/en/plugins/marketplace-reference.md tabela de marketplace sources, linha npm"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/marketplace-reference.md"
+      locator: "tabela de marketplace sources, linha npm"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "VentureBeat: 'a commit with no parent history and no branch association is enough to get a valid publish token'; 'Cache survived PR closure'. CSA confirma o cache pnpm e o gatilho pull_request_target. Faz parte do custo contínuo: cada canal é mais uma superfície a auditar."
+    label: "OBJEÇÃO (corte): commit órfão bastou para obter token de publicação válido, e o cache sobreviveu ao fechamento do PR. Cada canal é mais uma superfície a auditar: é custo contínuo, não só inicial."
+    narrative: "Alvo: Corte por orçamento: workflow órfão com OIDC e cache pnpm via pull_request_target (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a claim. Medida: VentureBeat e CSA lidos em 2026-11-05."
+    trace: "https://venturebeat.com/security/shai-hulud-worm-172-npm-pypi-packages-valid-provenance-ci-cd-audit: 'OIDC scope is the actual control that matters here'"
+    provenance:
+      source: "https://venturebeat.com/security/shai-hulud-worm-172-npm-pypi-packages-valid-provenance-ci-cd-audit"
+      locator: "trecho 'OIDC scope is the actual control that matters here'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_MITIGATIONS_FALL_ON_ADOPTER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Tenable lista 'Disable install scripts by default, pin exact dependency versions ... delaying newly published package versions'; VentureBeat, 'minimum release age'. O número 24 a 48 h não confirmei. Essas medidas recaem em grande parte sobre o adotante, custo que o run não contabilizou."
+    label: "OBJEÇÃO (corte): as mitigações (script desligado, versão fixada, atraso de versão nova) recaem em grande parte sobre o adotante, custo que o run não contou. O número de 24 a 48 h não foi confirmado."
+    narrative: "Alvo: Corte por orçamento: mitigações (ignore-scripts, lockfile, atraso de 24 a 48 h, auditoria de workflows) (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar sem o número de horas. Medida: Tenable e VentureBeat lidos em 2026-11-05."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions seção de mitigações"
+    provenance:
+      source: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+      locator: "seção de mitigações"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_TEAMPCP_PRIOR_SECURITY_TOOL_TARGETS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Parcial. Tenable confirma Trivy em março, Bitwarden CLI em abril e Checkmarx Jenkins em maio, mas 'does not mention KICS or LiteLLM'. Não foi medido no run e segue meio aberto. O alvo é ferramenta de segurança e de IA, o que aproxima a categoria do Onion."
+    label: "OBJEÇÃO (corte): Tenable confirma Trivy, Bitwarden CLI e Checkmarx Jenkins, não KICS nem LiteLLM. O alvo é ferramenta de segurança e de IA, o que aproxima a categoria do Onion; a lista segue meio aberta."
+    narrative: "Alvo: Corte por orçamento: TeamPCP comprometeu Trivy, KICS e LiteLLM em março (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): KICS e LiteLLM seguem sem confirmação. Medida: Li só Tenable para isso; não busquei fonte específica de KICS e LiteLLM."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions (Prior compromises); bash .claude/validation/kg-corpus-grep.sh Shai-Hulud (0 nós)"
+    provenance:
+      source: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+      locator: "seção Prior compromises"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_MCPNAME_OWNERSHIP_VERIFICATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "package-types confirma: 'checking mcpName in package.json'; 'mcp-name: $SERVER_NAME string in the package README'. É o coração da pergunta 4. O run ficou respondendo pela Composio (tier 4) com a primária à mão."
+    label: "OBJEÇÃO (corte): a prova de propriedade no Registry é mcpName no package.json ou a string mcp-name no README do pacote. É o coração da pergunta 4, e o run respondia pela Composio (tier 4) com a primária à mão."
+    narrative: "Alvo: Corte por orçamento: verificação de propriedade por mcpName e mcp-name (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar pela primária. Medida: Doc lida em 2026-11-05."
+    trace: "https://modelcontextprotocol.io/registry/package-types.md seção Ownership Verification"
+    provenance:
+      source: "https://modelcontextprotocol.io/registry/package-types.md"
+      locator: "seção Ownership Verification"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Medido na casa: o release.yml do kg-ssot roda 'mcp-publisher login github-oidc' e 'publish'. package-types lista npm, PyPI, NuGet, Cargo, OCI e MCPB; a claim omitiu Cargo."
+    label: "OBJEÇÃO (corte): o release.yml do kg-ssot já roda mcp-publisher por GitHub OIDC; o Registry aceita npm, PyPI, NuGet, Cargo, OCI e MCPB. A claim cortada omitia Cargo."
+    narrative: "Alvo: Corte por orçamento: mcp-publisher por GitHub OIDC e tipos aceitos (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar com Cargo incluído. Medida: release.yml e package-types lidos em 2026-11-05."
+    trace: "gh api repos/marciocar/kg-ssot/contents/.github/workflows/release.yml --jq .content | base64 -d | grep -n github-oidc"
+    provenance:
+      source: "https://modelcontextprotocol.io/registry/package-types.md"
+      locator: "lista de tipos; marciocar/kg-ssot release.yml, linha de github-oidc"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "versioning: 'Once published, the version string (and other metadata) cannot be changed'. Sobre rollback, a página lida não trata do assunto. Moderation mostra outro mecanismo: 'we set the server's status to deleted'. O registro também está em preview com 'data resets', o que relativiza a durabilidade."
+    label: "OBJEÇÃO (corte): versão publicada no Registry não muda; a página não trata de rollback, a moderação marca o servidor como deleted, e o preview admite reset de dados, o que relativiza a durabilidade."
+    narrative: "Alvo: Corte por orçamento: versões imutáveis no registro, sem rollback formal (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a claim com a ressalva de preview. Medida: Docs lidas em 2026-11-05."
+    trace: "https://modelcontextprotocol.io/registry/versioning.md"
+    provenance:
+      source: "https://modelcontextprotocol.io/registry/versioning.md"
+      locator: "trecho 'Once published, the version string'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_STEALER_TARGETS_AI_CONFIG
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Parcial. Tenable confirma npm, GitHub, nuvem e SSH, mais 'Claude Code hooks in ~/.claude/settings.json'; bypass_2fa não aparece lá. VentureBeat: 'treat AI agent config directories as credential stores'. Toca diretamente o maestro, que publica e usa o Claude Code na mesma máquina."
+    x_path_is_content: "citação"
+    label: "OBJEÇÃO (corte): o stealer mira tokens npm, GitHub, nuvem, SSH e hooks do Claude Code nas configurações do usuário. Toca o maestro, que publica e usa o Claude Code na mesma máquina. bypass_2fa segue sem fonte."
+    narrative: "Alvo: Corte por orçamento: stealer mira tokens, configurações de IA e bypass_2fa (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar sem bypass_2fa até haver fonte. Medida: Tenable e VentureBeat lidos em 2026-11-05."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions: 'Claude Code hooks in ~/.claude/settings.json'"
+    provenance:
+      source: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+      locator: "trecho sobre hooks do Claude Code"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_RECURRING_WAVES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Tenable confirma a linha do tempo e acrescenta '12 de maio de 2026: código do worm publicado'. As contagens 500+ e 1.092 não confirmei. Com a onda de agosto de 2026, são pelo menos 5 eventos em 11 meses: o risco é recorrente, não acidente."
+    label: "OBJEÇÃO (corte): com a onda de agosto de 2026 são pelo menos 5 eventos em 11 meses, e o código do worm foi publicado em 12 de maio: o risco é recorrente, não acidente. As contagens 500+ e 1.092 não foram conferidas."
+    narrative: "Alvo: Corte por orçamento: ondas de setembro e novembro de 2025 mostram recorrência (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a recorrência sem as contagens não conferidas. Medida: Tenable lido em 2026-11-05."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions (Timeline)"
+    provenance:
+      source: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+      locator: "seção Timeline"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_PIN_ENFORCE_AND_SEED_DIR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "org.md: 'disabling one at their own scope doesn't stop it from loading, because managed settings take precedence'. É a resposta à pergunta 2 para o ICP empresa: sem pacote separado, com fonte, pin e trava. Também há CLAUDE_CODE_PLUGIN_SEED_DIR para contêiner e CI, o que enfraquece a defesa de uma imagem."
+    label: "OBJEÇÃO (corte): managed settings impõem o plugin mesmo se o usuário o desligar; é a resposta para o ICP empresa, sem pacote separado. CLAUDE_CODE_PLUGIN_SEED_DIR serve contêiner e CI, o que enfraquece a imagem (semente não testada)."
+    narrative: "Alvo: Corte por orçamento: pin git e imposição do marketplace em toda máquina (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Restaurar a claim e citar a semente como alternativa à imagem. Medida: Doc lida em 2026-11-05; a semente não foi testada aqui."
+    trace: "https://code.claude.com/docs/en/plugins/org.md seções 'Require a marketplace and its plugins' e 'Seed containers and CI'"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/org.md"
+      locator: "seções 'Require a marketplace and its plugins' e 'Seed containers and CI'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_OFFICIAL_DIRECTORY_LEFT_OUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Foi o corte mais caro. Nomes reservados confirmados; claude.com/plugins mostra '528 plugins', com Superpowers em 2º lugar na listagem (critério de ordem não informado). O marketplace oficial em git tem 315 entradas. Measure.md aponta rastreio de uso para plugin listado, e plugin de marketplace próprio 'has no Context cost section'. É a única forma medida que resolve descoberta e sinal juntos, e o run a deixou fora."
+    label: "OBJEÇÃO (corte): o diretório oficial é a única forma medida que resolve descoberta e sinal de uso juntos, e o run a deixou fora. 'Track published plugin usage' e critérios de submissão: primário citado, não lido."
+    narrative: "Alvo: Corte por orçamento: diretório oficial com submissão e nomes reservados (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Submissão do onion-plugins ao diretório, ainda não feita nem medida. Medida: Contei 0 entradas 'onion' no marketplace oficial. Não li os critérios de submissão, e 'onion-meta' pode pesar no custo de contexto; é condição futura, não entrega."
+    trace: "https://code.claude.com/docs/en/plugins/measure.md: 'For usage of a plugin listed in Anthropic's directory, see Track published plugin usage'"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/measure.md"
+      locator: "trecho sobre plugin listado no diretório da Anthropic"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_PYPISTATS_SUPERCLAUDE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: last_week 2.463, last_month 5.193. Com npm 61 por semana e 23.928 estrelas: dois pacotes publicados e tração menor que a do kg-ssot no PyPI (3.116, 0 estrelas). Forte contra pacote como motor de adoção; ressalva: a série do kg-ssot é curta e inclui sua própria automação."
+    label: "OBJEÇÃO (fonte não lida): SuperClaude com 23.928 estrelas faz 2.463 no PyPI e 61 no npm por semana, menos que o kg-ssot (3.116, 0 estrelas). Forte contra pacote como motor de adoção; a série do kg-ssot é curta e tem automação."
+    narrative: "Alvo: Fonte não lida: pypistats superclaude (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Dado incorporado à tabela. Medida: API rodada em 2026-11-05."
+    trace: "curl -s https://pypistats.org/api/packages/superclaude/recent"
+    provenance:
+      source: "https://pypistats.org/api/packages/superclaude/recent"
+      locator: "last_week e last_month"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_SPEC_KIT_REPO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: 147.665 estrelas, 13.250 forks, push em 2026-11-04. O maior dos kits comparados não usa npm; a rota é git com uv, e PR #3516 (mesclado em 2026-07-14) adicionou PyPI como rota suportada. Mudança de canal para PyPI com adoção já alta, ou seja, consequência e não causa, ao menos na ordem das datas."
+    label: "OBJEÇÃO (fonte não lida): spec-kit, o maior dos comparados (147.665 estrelas), não usa npm; a rota é git com uv, e o PyPI só entrou em 2026-07-14 (PR #3516), com adoção já alta: consequência, não causa, ao menos na ordem das datas."
+    narrative: "Alvo: Fonte não lida: api.github.com/repos/github/spec-kit (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Dado incorporado à tabela. Medida: gh api em 2026-11-05."
+    trace: "gh api repos/github/spec-kit --jq .stargazers_count; gh pr view 3516 -R github/spec-kit --json state,mergedAt,title"
+    provenance:
+      source: "https://api.github.com/repos/github/spec-kit"
+      locator: "stargazers_count e forks; PR #3516"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_BMAD_REPO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: 55.023 estrelas, 6.138 forks, push em 2026-11-05, com 23.215 npm por semana. Essa proporção é muito distinta da do OpenSpec (74.012 estrelas e 1.240.857 npm), então nem estrelas nem downloads servem como régua única."
+    label: "OBJEÇÃO (fonte não lida): BMAD tem 55.023 estrelas e 23.215 npm por semana; OpenSpec, 74.012 e 1.240.857. A proporção é tão distinta que nem estrelas nem downloads servem como régua única."
+    narrative: "Alvo: Fonte não lida: api.github.com/repos/bmad-code-org/BMAD-METHOD (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Dado incorporado à tabela. Medida: gh api em 2026-11-05."
+    trace: "gh api repos/bmad-code-org/BMAD-METHOD --jq .stargazers_count"
+    provenance:
+      source: "https://api.github.com/repos/bmad-code-org/BMAD-METHOD"
+      locator: "stargazers_count e forks"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_DEVTO_ROUTES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: confirma as rotas (uv tool install de git, npx bmad-method install, npm install -g). Datada de 23 de abril, com métricas já defasadas (spec-kit 90K+; OpenSpec 77K+ downloads) e sem PyPI. Serve para a mecânica, não para a adoção. Faltou olhar, mas perde pouco."
+    label: "OBJEÇÃO (fonte não lida): o texto do dev.to confirma as rotas (uv de git, npx bmad-method, npm -g), mas é de 23 de abril, com métricas defasadas e sem PyPI: serve para a mecânica, não para a adoção."
+    narrative: "Alvo: Fonte não lida: dev.to spec-kit vs BMAD vs OpenSpec (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Rotas confirmadas e métricas substituídas pelas de hoje. Medida: WebFetch e APIs em 2026-11-05."
+    trace: "https://dev.to/willtorber/spec-kit-vs-bmad-vs-openspec-choosing-an-sdd-framework-in-2026-d3j"
+    provenance:
+      source: "https://dev.to/willtorber/spec-kit-vs-bmad-vs-openspec-choosing-an-sdd-framework-in-2026-d3j"
+      locator: "rotas de instalação de cada kit"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_ORG_MD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: contém a matriz de controle, a semente e as métricas de frota. Era a fonte central da pergunta 2 para o ICP empresa. Não ter lido deixou o run sem nenhuma claim sobre imposição em empresa."
+    label: "OBJEÇÃO (fonte não lida): org.md traz a matriz de controle, a semente e as métricas de frota; era a fonte central da pergunta 2 para o ICP empresa, e o run ficou sem claim sobre imposição."
+    narrative: "Alvo: Fonte não lida: code.claude.com/docs/en/plugins/org.md (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Incorporada nos itens sobre allowlist, imposição e semente. Medida: Leitura integral em 2026-11-05."
+    trace: "https://code.claude.com/docs/en/plugins/org.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/org.md"
+      locator: "leitura integral"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_PLUGIN_OVERVIEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Continua não lida, mas li no lugar dela plugins/components, que é a referência mais específica e traz os limites de CLAUDE.md e settings. A lacuna real foi não abrir nenhuma das duas durante o run."
+    label: "OBJEÇÃO (fonte não lida): plugins/overview: primário citado, não lido. plugins/components foi lida no lugar dela e traz os limites de CLAUDE.md e settings; a lacuna real foi não abrir nenhuma das duas durante o run."
+    narrative: "Alvo: Fonte não lida: code.claude.com/docs/en/plugins/overview (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): plugins/components cobre o que importava da overview. Medida: Leitura em 2026-11-05."
+    trace: "https://code.claude.com/docs/en/plugins/components"
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins/components"
+      locator: "referência de componentes de plugin"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_TENABLE_FAQ
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: linha do tempo, comprometimentos anteriores e a instrução 'Before rotating any credentials, remove the gh-token-monitor daemon', porque o daemon apaga arquivos ao detectar revogação. É custo operacional de resposta a incidente, e o run não tinha nada disso."
+    label: "OBJEÇÃO (fonte não lida): a FAQ da Tenable manda remover o daemon gh-token-monitor antes de girar credencial, porque ele apaga arquivos ao detectar revogação. É custo de resposta a incidente que o run não contava."
+    narrative: "Alvo: Fonte não lida: Tenable FAQ (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Incorporada. Medida: WebFetch em 2026-11-05."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+    provenance:
+      source: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+      locator: "trecho 'Before rotating any credentials'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_VENTUREBEAT_OIDC_SCOPE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: 'OIDC scope is the actual control that matters here, not provenance, not 2FA'; as 84 versões maliciosas de TanStack tinham atestação válida. Dá o controle que manda e é a fonte mais direta para as restrições de qualquer publicação."
+    label: "OBJEÇÃO (fonte não lida): segundo a VentureBeat, o escopo do OIDC é o controle que manda, não provenance nem 2FA; as 84 versões maliciosas de TanStack tinham atestação válida. Fonte mais direta para as restrições de publicação."
+    narrative: "Alvo: Fonte não lida: VentureBeat sobre provenance válida e auditoria de CI (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): Incorporada às restrições da recomendação. Medida: WebFetch em 2026-11-05."
+    trace: "https://venturebeat.com/security/shai-hulud-worm-172-npm-pypi-packages-valid-provenance-ci-cd-audit"
+    provenance:
+      source: "https://venturebeat.com/security/shai-hulud-worm-172-npm-pypi-packages-valid-provenance-ci-cd-audit"
+      locator: "trecho 'OIDC scope is the actual control that matters here'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_SDTIMES_NPM_TOKEN_RULES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-05"
+    verified_against: "Lida agora: 'reduce the lifetime of granular tokens to seven days', 2FA em publicação local, Trusted Publishers. Datada de 2025-09-23 e sem datas de implantação, então não comprova o estado atual; só mostra a direção. Parte da pergunta 3 sobre custo segue dependente de fonte primária do npm."
+    label: "OBJEÇÃO (fonte não lida): tokens granulares de 7 dias, 2FA e Trusted Publishers vêm da SD Times de 2025-09-23, sem data de implantação: mostra a direção, não o estado atual. Doc do npm: primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: SD Times sobre mudanças de segurança do GitHub no npm (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Estado atual das regras de token do npm não confirmado. Medida: Li só SD Times e fontes secundárias sobre npm 12; não abri a doc do npm."
+    trace: "https://sdtimes.com/security/github-details-upcoming-changes-to-improve-security-in-wake-of-shai-hulud-worm-in-npm-ecosystem/"
+    provenance:
+      source: "https://sdtimes.com/security/github-details-upcoming-changes-to-improve-security-in-wake-of-shai-hulud-worm-in-npm-ecosystem/"
+      locator: "trecho 'reduce the lifetime of granular tokens to seven days'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O Radar Vol. 34 pôs 'MCP by default' em Caution: não adotar por padrão; uma CLI bem desenhada muitas vezes basta; MCP agrega valor em contratos estruturados, OAuth e multi-tenant governado. Não é rejeição, e o blip saiu do Vol. 35 por fade."
+    narrative: "Formulação corrigida, sustentada pelo próprio blip primário: 'O Radar Vol. 34 (abr/2026) pôs \"MCP by default\" em Caution: não adotar por padrão; uma CLI bem desenhada muitas vezes basta; MCP agrega valor real em contratos estruturados, fronteiras OAuth e multi-tenant governado, e faz sentido quando os benefícios de governança e integração superam a complexidade e a perda de fidelidade. Não é rejeição do MCP. O blip saiu do Vol. 35 (nov/2026) por fade, sem retratação.' Medida: pdftotext do PDF do Vol. 34, linhas 1397-1412 lidas, com o mesmo blip na reedição _1 (diff vazio). No Vol. 35 (56 páginas), grep -c -F 'MCP by default' dá 0, e a convenção de fade está na seção About the Radar, linhas 78-79 do texto extraído. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado na votação: O Radar coloca \"MCP by default\" em Caution: recomenda não adotar MCP por padrão, pois uma CLI bem desenhada costuma bastar, e MCP só compensa para contratos estruturados, fronteiras OAuth e acesso multi-tenant governado. Registro da reprovação: E_LACUNAS_ONION_DISTRIBUTION_1105."
+    trace: "curl -sL -A 'Mozilla/5.0' -o v34.pdf https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf && pdftotext -layout v34.pdf v34.txt && sed -n 1397,1412p v34.txt | grep -c -i -w -E 'only|exclusively|solely' (dá 0) && grep -n -F 'makes sense when its governance' v34.txt && grep -n -F \"This isn't a rejection\" v34.txt (no PDF o apóstrofo é tipográfico; se não casar, use grep -n 'a rejection of MCP')"
+  - id: C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A 1ª onda da Mini Shai-Hulud (11-12/05/2026) atingiu mais de 170 pacotes npm e 2 PyPI (mistralai 2.4.6, guardrails-ai 0.10.1). Até 21/05, a Socket contava 1.055 versões em 502 pacotes de npm, PyPI e Composer, com durabletask entre os PyPI."
+    narrative: "Formulação corrigida: a 1ª onda da Mini Shai-Hulud/TeamPCP (11-12/05/2026) atingiu mais de 170 pacotes npm e 2 PyPI (mistralai 2.4.6 e guardrails-ai 0.10.1). Até 21/05/2026, a Socket contava 1.055 versões em 502 pacotes únicos de npm, PyPI e Composer, com durabletask 1.4.1-1.4.3 entre os PyPI de maio. Medida: POST em api.osv.dev/v1/query para os 3 pacotes PyPI devolveu MAL-2026-3608 (mistralai), MAL-2026-3607 (guardrails-ai) e MAL-2026-4174 (durabletask). A contagem de 170 npm + 2 PyPI foi lida na JFrog (12/05) e na OpenSourceMalware (13/05). O total de 502 foi lido na Security Boulevard (21/05), que cita a Socket; não foi conferido na página da Socket. A inclusão de durabletask na TeamPCP é atribuição de fornecedor (Gurucul). Critério: V4_DESATUALIZADA. Alvo reprovado na votação: A campanha Shai-Hulud/TeamPCP de maio de 2026 comprometeu mais de 170 pacotes npm e 2 pacotes PyPI (incluindo mistralai 2.4.6 e guardrails-ai 0.10.1). Registro da reprovação: E_LACUNAS_ONION_DISTRIBUTION_1105."
+    trace: "WebFetch https://securityboulevard.com/2026/05/over-320-npm-packages-hit-by-fresh-mini-shai-hulud-supply-chain-attack/ (21/05/2026) e grep -F '1,055 versions across 502 unique packages'; depois curl -s -X POST https://api.osv.dev/v1/query -d '{\"package\":{\"name\":\"durabletask\",\"ecosystem\":\"PyPI\"}}' devolve MAL-2026-4174 (publicado em 2026-05-19, versões 1.4.1 a 1.4.3), um pacote PyPI de maio além dos 2 da claim"
+  - id: C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Postmortem da TanStack: PR de fork via pull_request_target envenenou o cache do pnpm; o release.yml o restaurou; o binário extraiu o OIDC da memória e publicou 84 versões pela identidade legítima. Trusted publishing não protege de código hostil no job."
+    narrative: "Primária: postmortem da TanStack (11/05/2026, atualizado em 15/05/2026). Formulação corrigida: um PR de fork via pull_request_target envenenou o cache do pnpm; o release.yml o restaurou; o binário extraiu o token OIDC da memória do Runner.Worker e publicou 84 versões maliciosas de 42 pacotes pela identidade legítima de trusted publishing, sem roubar token npm. A propagação do worm usa tokens npm coletados OU troca OIDC. Logo, trusted publishing não protege contra código hostil dentro do job com id-token: write, e a procedência SLSA não prova build limpo. Medida: curl e grep -F nas duas páginas em 2026-11-05: TanStack contém 'now-poisoned' (2), 'benchmark-pr' (4), 'Self-propagates' (2) e 'not compromised' (2); JFrog contém 'After collecting npm tokens or trusted-publishing credentials' (1), 'The payload also includes logic for trusted-publishing propagation' (1) e 'propagateWithNpmToken' (1). Os trechos verbatim de OIDC, das 84 versões e de 'No npm tokens were stolen' foram lidos no texto extraído da primária. Critério: V2_CONTRADITA. Alvo reprovado na votação: O ataque envenenou uma entrada de cache de build num ambiente de release confiável do GitHub; o malware extraiu material OIDC da memória do runner e o trocou por credenciais de publicação npm, ou seja, publicação confiável via OIDC foi o vetor de propagação. Registro da reprovação: E_LACUNAS_ONION_DISTRIBUTION_1105."
+    trace: "curl -sL -A 'Mozilla/5.0' https://research.jfrog.com/post/shai-hulud-here-we-go-again/ | grep -cF 'After collecting npm tokens or trusted-publishing credentials' (retorna 1: dois caminhos de propagação); no mesmo corpo, grep -cF 'vector' retorna 0. curl -sL -A 'Mozilla/5.0' https://tanstack.com/blog/npm-supply-chain-compromise-postmortem | grep -cF 'now-poisoned' (retorna 2: envenenado no job benchmark-pr do PR de fork, não no release)"
+  - id: C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Em @cap-js, uma conta com escrita editou o release-please.yml num branch não-main e trocou o OIDC à mão; o nome de arquivo do npm não barra isso. Faltava revisor e política de branch no Environment. Exigir ambiente protegido, além do OIDC."
+    narrative: "Formulação corrigida, sustentada por primárias: nos pacotes @cap-js, uma conta com escrita no repo editou o próprio release-please.yml num branch não-main, manteve o environment npm e trocou o token OIDC à mão. O nome de arquivo exigido pelo npm não barra isso, porque o arquivo é o mesmo e o formulário documentado não traz campo de branch. O controle que faltava estava no GitHub Environment: revisores obrigatórios e política de branch de deployment. A causa declarada pela SAP é a falta do portão manual. A lição para o Onion é exigir ambiente protegido com revisor e política de branch, além do OIDC. Restringir só o nome do workflow não basta. Medida: gh pr view 1592 -R cap-js/cds-dbs (declaração e diff que move a publicação para o job com environment npm); gh api repos/cap-js/cds-dbs/commits/0a3dd44d361c34cd9036eeb3f49601160a636648 (mesmo arquivo, trigger update/releases); gh api repos/cap-js/cds-dbs/environments/npm hoje mostra required_reviewers e branch_policy com custom_branch_policies:true e updated_at 2026-04-29T12:23:26Z, minutos depois do último deployment do ataque (12:13:48), o que sugere endurecimento pós-ataque, sem provar o estado anterior; docs.npmjs.com/trusted-publishers (nome do arquivo obrigatório, ambiente opcional, aprovação via environments). Critério: V2_CONTRADITA. Alvo reprovado na votação: A causa raiz nos pacotes SAP CAP foi um Trusted Publishing (OIDC) confiando em qualquer workflow do repositório, de modo que OIDC e provenance sozinhos não bastam sem restringir workflow e branch e exigir aprovação manual. Registro da reprovação: E_LACUNAS_ONION_DISTRIBUTION_1105."
+    trace: "gh pr view 1592 -R cap-js/cds-dbs --json body; gh api repos/cap-js/cds-dbs/commits/0a3dd44d361c34cd9036eeb3f49601160a636648 --jq '.files[]|select(.filename|endswith(\"release-please.yml\"))|.patch'; gh api 'repos/cap-js/cds-dbs/deployments?environment=npm&ref=update/releases' --jq '.[]|[.created_at,.ref,.sha]|@tsv'; WebFetch https://docs.npmjs.com/trusted-publishers (trecho 'Workflow filename (required)')"
+  - id: C_SUPERACAO_20261105_ACHADO6_WHAT_DOES_NOT_TRAVEL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules e settings; managed settings dão a trava; npm ou PyPI como instalador só copia e não acrescenta capacidade."
+    narrative: "o_que do juiz: Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules e settings; managed settings dão a trava; npm ou PyPI como instalador só copia e não acrescenta capacidade. Medida: Leitura de components, marketplace-reference e org em 2026-11-05. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 6: plugin carrega hooks, commands, agents, skills, outputStyles e themes Registro: E_OBJECAO_ACHADO6_WHAT_DOES_NOT_TRAVEL."
+    trace: "https://code.claude.com/docs/en/plugins/components: 'Only two keys take effect from a plugin ... every other key is dropped' (a claim do run lista o que entra e não o que fica de fora)"
+  - id: C_SUPERACAO_20261105_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin: OpenSpec, BMAD, spec-kit, Superpowers e SuperClaude."
+    narrative: "o_que do juiz: Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin. Medida: APIs npm, pypistats e GitHub rodadas em 2026-11-05 (períodos de npm 10-29 a 11-04). Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Achado 8: bmad-method com 23.215 downloads é evidência de adoção pelo npm como instalador Registro: E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION."
+    trace: "https://api.npmjs.org/downloads/point/last-week/@fission-ai/openspec: {\"downloads\":1240857,\"start\":\"2026-10-29\",\"end\":\"2026-11-04\"}; https://api.npmjs.org/downloads/point/last-week/superclaude: {\"downloads\":61}"
+  - id: C_SUPERACAO_20261105_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb."
+    narrative: "o_que do juiz: Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb. Medida: Leitura de registry/about, package-types, moderation-policy, versioning e GET registry.modelcontextprotocol.io/v0/servers?search=kg-ssot&version=latest em 2026-11-05. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 19: Registry oficial não revisa submissões (Composio, tier 4) Registro: E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS."
+    trace: "https://modelcontextprotocol.io/registry/about: 'The MCP Registry is not intended to be directly consumed by host applications'"
+  - id: C_SUPERACAO_20261105_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment com o maestro como revisor, sem cache e mcp-publisher com checksum fixado."
+    narrative: "o_que do juiz: Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment com o maestro como revisor, sem cache e mcp-publisher com checksum fixado. Medida: Li o arquivo via gh api em 2026-11-05. Isso derruba o custo inicial de publicar, não o custo contínuo: 49 releases PyPI desde 2026-10-09. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Corpus: 'a premissa pacote Python do kg-ssot não está confirmada' (medido em onion-kg-ssot) Registro: E_OBJECAO_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS."
+    trace: "npm view kg-ssot maintainers repository.url version; curl -s https://pypi.org/pypi/kg-ssot/json | python3 -c \"import sys,json; print(json.load(sys.stdin)['info']['version'])\"; curl -s 'https://registry.modelcontextprotocol.io/v0/servers?search=kg-ssot&version=latest'"
+  - id: C_SUPERACAO_20261105_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim de que 'MCP by default' está em Caution no Radar, citando a página do blip em vez do PDF."
+    narrative: "o_que do juiz: Restaurar a claim citando a página do blip em vez do PDF. Medida: WebFetch da página em 2026-11-05. A página marca o blip como fora da edição atual, datado de 2026-04-15. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Descarte refutado: Radar coloca 'MCP by default' em Caution Registro: E_OBJECAO_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS."
+    trace: "https://www.thoughtworks.com/radar/techniques/mcp-by-default: anel 'Caution'; 'structured tool contracts, OAuth-based authentication boundaries and governed multi-tenant access'"
+  - id: C_SUPERACAO_20261105_DISCARD_PYPI_NOT_EXEMPT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim da campanha com nomes e versões (mistralai 2.4.6, guardrails-ai 0.10.1), sem afirmar a divisão 170 + 2."
+    narrative: "o_que do juiz: Restaurar a claim com nomes e versões, sem afirmar a divisão 170 + 2. Medida: WebFetch JFrog em 2026-11-05. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Descarte refutado: 170+ npm e 2 PyPI, mistralai 2.4.6 e guardrails-ai 0.10.1 Registro: E_OBJECAO_DISCARD_PYPI_NOT_EXEMPT."
+    trace: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/ Apêndice B: 'mistralai' 2.4.6, 'guardrails-ai' 0.10.1"
+  - id: C_SUPERACAO_20261105_DISCARD_OIDC_EXTRACTED_FROM_RUNNER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    x_path_is_content: "citação"
+    label: "Restaurar a claim de cache envenenado e OIDC extraído da memória do runner, trocando 'propagação' por 'publicação inicial'."
+    narrative: "o_que do juiz: Restaurar a claim trocando 'propagação' por 'publicação inicial'. Medida: JFrog e CSA lidos em 2026-11-05; VentureBeat: 'OIDC scope is the actual control that matters here'. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Descarte refutado: cache envenenado e OIDC extraído da memória, trocado por credencial de publicação Registro: E_OBJECAO_DISCARD_OIDC_EXTRACTED_FROM_RUNNER."
+    trace: "https://research.jfrog.com/post/shai-hulud-here-we-go-again/: 'the malware extracted GitHub Actions OIDC material from runner memory'"
+  - id: C_SUPERACAO_20261105_DISCARD_SAP_TRUSTED_ANY_WORKFLOW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim de Trusted Publishing confiando em qualquer workflow, limitada a @cap-js."
+    narrative: "o_que do juiz: Restaurar a claim limitada a @cap-js. Medida: WebFetch Phoenix em 2026-11-05. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Descarte refutado: causa raiz SAP CAP é Trusted Publishing confiando em qualquer workflow Registro: E_OBJECAO_DISCARD_SAP_TRUSTED_ANY_WORKFLOW."
+    trace: "https://phoenix.security/mini-shai-hulud-sap-cap-mbt-npm-supply-chain-bun-credential-stealer/: 'trusted any workflow in cap-js/cds-dbs, not the specific release workflow on the main branch'"
+  - id: C_SUPERACAO_20261105_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Tabela multicanal registrada no achado 8, no lugar de um ponto único de downloads de uma semana."
+    narrative: "o_que do juiz: Tabela multicanal registrada no achado 8. Medida: APIs rodadas em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: um ponto de downloads de uma semana não compara canais Registro: E_OBJECAO_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE."
+    trace: "curl -s https://api.npmjs.org/downloads/point/last-week/@fission-ai/openspec; curl -s https://api.npmjs.org/downloads/point/last-week/superclaude"
+  - id: C_SUPERACAO_20261105_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim e avaliar pin por sha nas entradas das portas."
+    narrative: "o_que do juiz: Restaurar a claim e avaliar pin por sha nas entradas das portas. Medida: Doc lida em 2026-11-05 e 5 entradas do marketplace.json conferidas (ausência de sha nas linhas vistas, sem varredura total). Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: pin por SHA de 40 caracteres e sha256 de archive Registro: E_OBJECAO_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY."
+    trace: "https://code.claude.com/docs/en/plugins/marketplace-reference.md seção 'Plugin sources'; sed -n 14p .claude-plugin/marketplace.json"
+  - id: C_SUPERACAO_20261105_CUT_MARKETPLACE_ALLOWLIST_POLICY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim de allowlist e blocklist de marketplaces por política (strictKnownMarketplaces, blockedMarketplaces, hostPattern, owner/*)."
+    narrative: "o_que do juiz: Restaurar a claim. Medida: Doc lida em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: allowlist e blocklist de marketplaces por política Registro: E_OBJECAO_CUT_MARKETPLACE_ALLOWLIST_POLICY."
+    trace: "https://code.claude.com/docs/en/plugins/org.md seção 'Control matrix'"
+  - id: C_SUPERACAO_20261105_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim de nomes reservados (npm, pip, uv, cargo, github, gh) e de marketplace do tipo npm ainda não implementado."
+    narrative: "o_que do juiz: Restaurar a claim. Medida: Doc lida em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: nomes reservados e marketplace npm não implementado Registro: E_OBJECAO_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED."
+    trace: "https://code.claude.com/docs/en/plugins/marketplace-reference.md tabela de marketplace sources, linha npm"
+  - id: C_SUPERACAO_20261105_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim de workflow órfão com OIDC e cache pnpm via pull_request_target."
+    narrative: "o_que do juiz: Restaurar a claim. Medida: VentureBeat e CSA lidos em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: workflow órfão com OIDC e cache pnpm via pull_request_target Registro: E_OBJECAO_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE."
+    trace: "https://venturebeat.com/security/shai-hulud-worm-172-npm-pypi-packages-valid-provenance-ci-cd-audit: 'OIDC scope is the actual control that matters here'"
+  - id: C_SUPERACAO_20261105_CUT_MITIGATIONS_FALL_ON_ADOPTER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar as mitigações (script desligado, lockfile, atraso de versão nova, auditoria de workflows) sem o número de horas."
+    narrative: "o_que do juiz: Restaurar sem o número de horas. Medida: Tenable e VentureBeat lidos em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: mitigações (ignore-scripts, lockfile, atraso de 24 a 48 h, auditoria de workflows) Registro: E_OBJECAO_CUT_MITIGATIONS_FALL_ON_ADOPTER."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions seção de mitigações"
+  - id: C_SUPERACAO_20261105_CUT_MCPNAME_OWNERSHIP_VERIFICATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar pela primária a verificação de propriedade no Registry, por mcpName e pela string mcp-name."
+    narrative: "o_que do juiz: Restaurar pela primária. Medida: Doc lida em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: verificação de propriedade por mcpName e mcp-name Registro: E_OBJECAO_CUT_MCPNAME_OWNERSHIP_VERIFICATION."
+    trace: "https://modelcontextprotocol.io/registry/package-types.md seção Ownership Verification"
+  - id: C_SUPERACAO_20261105_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim do mcp-publisher por GitHub OIDC e dos tipos aceitos, com Cargo incluído."
+    narrative: "o_que do juiz: Restaurar com Cargo incluído. Medida: release.yml e package-types lidos em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: mcp-publisher por GitHub OIDC e tipos aceitos Registro: E_OBJECAO_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES."
+    trace: "gh api repos/marciocar/kg-ssot/contents/.github/workflows/release.yml --jq .content | base64 -d | grep -n github-oidc"
+  - id: C_SUPERACAO_20261105_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim de versões imutáveis no Registry, com a ressalva de preview e sem afirmar nada sobre rollback."
+    narrative: "o_que do juiz: Restaurar a claim com a ressalva de preview. Medida: Docs lidas em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: versões imutáveis no registro, sem rollback formal Registro: E_OBJECAO_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW."
+    trace: "https://modelcontextprotocol.io/registry/versioning.md"
+  - id: C_SUPERACAO_20261105_CUT_STEALER_TARGETS_AI_CONFIG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    x_path_is_content: "citação"
+    label: "Restaurar a claim de que o stealer mira tokens e configurações de IA, sem bypass_2fa até haver fonte."
+    narrative: "o_que do juiz: Restaurar sem bypass_2fa até haver fonte. Medida: Tenable e VentureBeat lidos em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: stealer mira tokens, configurações de IA e bypass_2fa Registro: E_OBJECAO_CUT_STEALER_TARGETS_AI_CONFIG."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions: 'Claude Code hooks in ~/.claude/settings.json'"
+  - id: C_SUPERACAO_20261105_CUT_RECURRING_WAVES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a recorrência das ondas de 2025 e 2026, sem as contagens não conferidas."
+    narrative: "o_que do juiz: Restaurar a recorrência sem as contagens não conferidas. Medida: Tenable lido em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: ondas de setembro e novembro de 2025 mostram recorrência Registro: E_OBJECAO_CUT_RECURRING_WAVES."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions (Timeline)"
+  - id: C_SUPERACAO_20261105_CUT_PIN_ENFORCE_AND_SEED_DIR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Restaurar a claim e citar a semente como alternativa à imagem."
+    narrative: "o_que do juiz: Restaurar a claim e citar a semente como alternativa à imagem. Medida: Doc lida em 2026-11-05; a semente não foi testada aqui. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Corte por orçamento: pin git e imposição do marketplace em toda máquina Registro: E_OBJECAO_CUT_PIN_ENFORCE_AND_SEED_DIR."
+    trace: "https://code.claude.com/docs/en/plugins/org.md seções 'Require a marketplace and its plugins' e 'Seed containers and CI'"
+  - id: C_SUPERACAO_20261105_SRC_PYPISTATS_SUPERCLAUDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Dado incorporado à tabela multicanal: superclaude com last_week 2.463 e last_month 5.193 no PyPI."
+    narrative: "o_que do juiz: Dado incorporado à tabela. Medida: API rodada em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: pypistats superclaude Registro: E_OBJECAO_SRC_PYPISTATS_SUPERCLAUDE."
+    trace: "curl -s https://pypistats.org/api/packages/superclaude/recent"
+  - id: C_SUPERACAO_20261105_SRC_SPEC_KIT_REPO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Dado incorporado à tabela multicanal: spec-kit com 147.665 estrelas, 13.250 forks e PyPI desde o PR #3516."
+    narrative: "o_que do juiz: Dado incorporado à tabela. Medida: gh api em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: api.github.com/repos/github/spec-kit Registro: E_OBJECAO_SRC_SPEC_KIT_REPO."
+    trace: "gh api repos/github/spec-kit --jq .stargazers_count; gh pr view 3516 -R github/spec-kit --json state,mergedAt,title"
+  - id: C_SUPERACAO_20261105_SRC_BMAD_REPO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Dado incorporado à tabela multicanal: BMAD-METHOD com 55.023 estrelas e 6.138 forks."
+    narrative: "o_que do juiz: Dado incorporado à tabela. Medida: gh api em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: api.github.com/repos/bmad-code-org/BMAD-METHOD Registro: E_OBJECAO_SRC_BMAD_REPO."
+    trace: "gh api repos/bmad-code-org/BMAD-METHOD --jq .stargazers_count"
+  - id: C_SUPERACAO_20261105_SRC_DEVTO_ROUTES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Rotas confirmadas e métricas substituídas pelas de hoje."
+    narrative: "o_que do juiz: Rotas confirmadas e métricas substituídas pelas de hoje. Medida: WebFetch e APIs em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: dev.to spec-kit vs BMAD vs OpenSpec Registro: E_OBJECAO_SRC_DEVTO_ROUTES."
+    trace: "https://dev.to/willtorber/spec-kit-vs-bmad-vs-openspec-choosing-an-sdd-framework-in-2026-d3j"
+  - id: C_SUPERACAO_20261105_SRC_ORG_MD
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "org.md incorporada nos itens sobre allowlist, imposição e semente."
+    narrative: "o_que do juiz: Incorporada nos itens sobre allowlist, imposição e semente. Medida: Leitura integral em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: code.claude.com/docs/en/plugins/org.md Registro: E_OBJECAO_SRC_ORG_MD."
+    trace: "https://code.claude.com/docs/en/plugins/org.md"
+  - id: C_SUPERACAO_20261105_SRC_PLUGIN_OVERVIEW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "plugins/components cobre o que importava da overview."
+    narrative: "o_que do juiz: plugins/components cobre o que importava da overview. Medida: Leitura em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: code.claude.com/docs/en/plugins/overview Registro: E_OBJECAO_SRC_PLUGIN_OVERVIEW."
+    trace: "https://code.claude.com/docs/en/plugins/components"
+  - id: C_SUPERACAO_20261105_SRC_TENABLE_FAQ
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "FAQ da Tenable incorporada: linha do tempo, comprometimentos anteriores e a ordem de remover o daemon antes de girar credencial."
+    narrative: "o_que do juiz: Incorporada. Medida: WebFetch em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: Tenable FAQ Registro: E_OBJECAO_SRC_TENABLE_FAQ."
+    trace: "https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions"
+  - id: C_SUPERACAO_20261105_SRC_VENTUREBEAT_OIDC_SCOPE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "VentureBeat incorporada às restrições da recomendação: o escopo do OIDC é o controle que manda."
+    narrative: "o_que do juiz: Incorporada às restrições da recomendação. Medida: WebFetch em 2026-11-05. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: Fonte não lida: VentureBeat sobre provenance válida e auditoria de CI Registro: E_OBJECAO_SRC_VENTUREBEAT_OIDC_SCOPE."
+    trace: "https://venturebeat.com/security/shai-hulud-worm-172-npm-pypi-packages-valid-provenance-ci-cd-audit"
+  - id: E_LACUNAS_ONION_DISTRIBUTION_1105
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "contabilidade do motor no run wf_615a4f2b-024: 6 refutadas, 0 não verificadas, 37 fontes e 38 claims cortadas, 0 recusadas, 32 superações; contagem das objeções feita sobre a lista recebida"
+    label: "LACUNAS: 6 refutadas, 0 não verificadas, 37 fontes e 38 claims cortadas por orçamento; 40 objeções sobreviventes de 53, 40 modeladas; 0 recusas do motor; 32 superações. Demanda real, instalações e quem paga seguem sem medida."
+    narrative: "REFUTADAS NA VOTAÇÃO (6): (1) Radar 'MCP by default' em Caution, tier 8, reprovada por 'só compensa' pesar a mão: superação C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED. (2) 170+ npm e 2 PyPI, JFrog, tier 6, desatualizada: superação C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED. (3) cache envenenado e OIDC como vetor de propagação, JFrog, tier 6: superação C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED. (4) Trusted Publishing confiando em qualquer workflow, Phoenix, tier 5: superação C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED. (5) 'único vetor é preinstall e ignore-scripts bloqueia a cadeia', Phoenix, tier 5: refutação mantida pelo Elenxo, com gatilho import-time no PyPI, optionalDependencies e persistência em .claude/settings.json. (6) 'valor na camada de agente, não no canal', TNW, tier 5: refutação mantida; 'não o canal de pacote' não está no artigo. NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 37 fontes e 38 claims; 14 claims cortadas voltaram pelas objeções E_OBJECAO_CUT_* e 9 fontes não lidas, pelas E_OBJECAO_SRC_*. OBJEÇÕES: 53 julgadas, 40 sobreviventes, 40 modeladas, 0 não modeladas; 13 NÃO SOBREVIVERAM: Achado 1 (marketplace é repo git); Achado 3 (mesmo fato do 1); Achado 4 (mesmo fato do 2); Achado 10 (Mini Shai-Hulud); Achado 11 (provenance insuficiente); Achado 12 (keyv e cacheable); Achado 14 (provenance não prova runtime); Achado 15 (versões SAP); Achado 17 (440+ pacotes); descarte 'único vetor é preinstall' (refutação mantida); descarte 'valor na camada de agente, não no canal' (refutação mantida); corte 'MCPB não vai ao registry' (claim falsa, contradiz package-types); fonte não lida dev.to akaranjkar08 (descarte aceitável). RECUSADAS PELO MOTOR: 0, nenhum alvo fica não-julgado por recusa. O QUE NÃO FICOU FECHADO: instalações de plugin não têm número público de fonte primária; downloads não foram decompostos entre humano e automação; quem paga e o que investidores premiam segue sem evidência (pergunta 5); contraponto autoral não encontrado, só comportamento; critérios de aceite do diretório oficial e painel de uso não lidos; várias citações vêm de WebFetch resumido, confira o trecho antes de selar; KICS e LiteLLM sem confirmação; regras atuais de token do npm sem primária; repo com hook em pasta não confiada sem spike; semente CLAUDE_CODE_PLUGIN_SEED_DIR não testada; Agent Plugins e Agent Package Manager fora das opções e não medidos. NOTAS DO ESCRITOR: (a) a recomendação diz 'os dois PDFs do Radar deram 503', mas o motor de superação já os havia lido e o escritor os baixou com 200 em 2026-11-05: o 503 foi momentâneo. (b) O texto da superação SAP chegou cortado em 600 caracteres na tarefa; o integral foi recuperado do diário do run, não da memória do escritor. (c) Nada foi cortado nas 40 objeções: 40 sobreviventes, 40 modeladas, nenhum alvo não modelado."
+    trace: ".claude/workflows/onion-research.js, modo decision, run wf_615a4f2b-024 de 2026-11-05"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run wf_615a4f2b-024 de 2026-11-05"
+      locator: "seções Confirmadas, Não verificadas/refutadas, Reprovações recusadas e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada"
+      locality: "host"
+edges:
+  - from: E_TRAFEGO_DAS_PORTAS_1105
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: SUPPORTS
+  - from: C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_C_NPM_THIN_INSTALLER
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_E_PYPI_PACKAGE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_G_MCPB_BUNDLE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_H_CONTAINER_IMAGE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: DEPENDS_ON
+  - from: E_MARKETPLACE_GIT_REPO_ONE_COMMAND
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_NPM_IS_PLUGIN_SOURCE_PYPI_IS_NOT
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_MARKETPLACE_GIT_DIRECTORY_NATIVE
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_SOURCES_INCLUDE_NPM_NOT_SEPARATE_CHANNEL
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_NPM_SOURCE_NO_INSTALL_SCRIPTS
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_CARRIES_COMPONENTS
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_TASK_MASTER_NPM_WEEKLY_1105
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_BMAD_NPM_WEEKLY_1105
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_RADAR_V34_PLUGIN_MARKETPLACE_TRIAL
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_MINI_SHAI_HULUD_MAY_170_PACKAGES
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_PROVENANCE_NECESSARY_NOT_SUFFICIENT
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_SHAI_HULUD_KEYV_CACHEABLE_AUGUST
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_PREINSTALL_WORM_VECTOR
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_PROVENANCE_NOT_CLEAN_RUNTIME
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_SAP_CAP_FOUR_VERSIONS
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_COGNITION_1B_AT_26B
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_SHAI_HULUD_440_PACKAGES
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_SHAI_HULUD_VIA_MCP_REGISTRY
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_MCP_REGISTRY_NO_REVIEW
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_MARKETPLACE_GIT_REPO_ONE_COMMAND
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: SUPPORTS
+  - from: E_RADAR_V34_PLUGIN_MARKETPLACE_TRIAL
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: SUPPORTS
+  - from: E_RADAR_V35_AGENT_PLUGIN_MARKETPLACE_TRIAL_1105
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_RADAR_V35_AGENT_PLUGIN_MARKETPLACE_TRIAL_1105
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: SUPPORTS
+  - from: E_RADAR_V35_AGENT_PLUGIN_MARKETPLACE_TRIAL_1105
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_MERCADO_ONION_DISTRIBUTION_1105
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_ACHADO2_NPM_CAPABILITY_ONLY
+    to: E_NPM_IS_PLUGIN_SOURCE_PYPI_IS_NOT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO2_NPM_CAPABILITY_ONLY
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO5_HOOK_RUNS_WITHOUT_INSTALL_SCRIPT
+    to: E_NPM_SOURCE_NO_INSTALL_SCRIPTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO5_HOOK_RUNS_WITHOUT_INSTALL_SCRIPT
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO6_WHAT_DOES_NOT_TRAVEL
+    to: E_PLUGIN_CARRIES_COMPONENTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO6_WHAT_DOES_NOT_TRAVEL
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO7_DOWNLOADS_NOT_ADOPTION
+    to: E_TASK_MASTER_NPM_WEEKLY_1105
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO7_DOWNLOADS_NOT_ADOPTION
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    to: E_BMAD_NPM_WEEKLY_1105
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO9_RADAR_IS_INTERNAL_TEAMS
+    to: E_RADAR_V34_PLUGIN_MARKETPLACE_TRIAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO9_RADAR_IS_INTERNAL_TEAMS
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO13_NPM12_LIMITS_PREINSTALL
+    to: E_PREINSTALL_WORM_VECTOR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO13_NPM12_LIMITS_PREINSTALL
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO13_NPM12_LIMITS_PREINSTALL
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO16_COGNITION_DOES_NOT_ANSWER_Q5
+    to: E_COGNITION_1B_AT_26B
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO16_COGNITION_DOES_NOT_ANSWER_Q5
+    to: E_MERCADO_ONION_DISTRIBUTION_1105
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO16_COGNITION_DOES_NOT_ANSWER_Q5
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO18_VECTOR_IS_CLAUDE_SETTINGS_IN_REPO
+    to: E_SHAI_HULUD_VIA_MCP_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO18_VECTOR_IS_CLAUDE_SETTINGS_IN_REPO
+    to: C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO18_VECTOR_IS_CLAUDE_SETTINGS_IN_REPO
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    to: E_MCP_REGISTRY_NO_REVIEW
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    to: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    to: C_OPCAO_G_MCPB_BUNDLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    to: C_OPCAO_E_PYPI_PACKAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    to: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CORPUS_DOOR_DEMAND_UNMEASURABLE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CORPUS_DOOR_DEMAND_UNMEASURABLE
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCOPE_NO_AUTHORED_COUNTERPOINT
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCOPE_NO_AUTHORED_COUNTERPOINT
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS
+    to: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISCARD_PYPI_NOT_EXEMPT
+    to: C_OPCAO_E_PYPI_PACKAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISCARD_OIDC_EXTRACTED_FROM_RUNNER
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISCARD_SAP_TRUSTED_ANY_WORKFLOW
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    to: E_TASK_MASTER_NPM_WEEKLY_1105
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    to: E_BMAD_NPM_WEEKLY_1105
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    to: C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MARKETPLACE_ALLOWLIST_POLICY
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MARKETPLACE_ALLOWLIST_POLICY
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED
+    to: E_SOURCES_INCLUDE_NPM_NOT_SEPARATE_CHANNEL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MITIGATIONS_FALL_ON_ADOPTER
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MITIGATIONS_FALL_ON_ADOPTER
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_TEAMPCP_PRIOR_SECURITY_TOOL_TARGETS
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MCPNAME_OWNERSHIP_VERIFICATION
+    to: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES
+    to: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES
+    to: C_OPCAO_G_MCPB_BUNDLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW
+    to: C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_STEALER_TARGETS_AI_CONFIG
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_RECURRING_WAVES
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_RECURRING_WAVES
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_PIN_ENFORCE_AND_SEED_DIR
+    to: C_OPCAO_H_CONTAINER_IMAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_PIN_ENFORCE_AND_SEED_DIR
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_OFFICIAL_DIRECTORY_LEFT_OUT
+    to: C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_OFFICIAL_DIRECTORY_LEFT_OUT
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_PYPISTATS_SUPERCLAUDE
+    to: C_OPCAO_E_PYPI_PACKAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_SPEC_KIT_REPO
+    to: C_OPCAO_E_PYPI_PACKAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_SPEC_KIT_REPO
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_BMAD_REPO
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_DEVTO_ROUTES
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_ORG_MD
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_PLUGIN_OVERVIEW
+    to: C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_TENABLE_FAQ
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_VENTUREBEAT_OIDC_SCOPE
+    to: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_SDTIMES_NPM_TOKEN_RULES
+    to: C_OPCAO_C_NPM_THIN_INSTALLER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_SDTIMES_NPM_TOKEN_RULES
+    to: C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED
+    to: E_LACUNAS_ONION_DISTRIBUTION_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED
+    to: E_LACUNAS_ONION_DISTRIBUTION_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED
+    to: E_LACUNAS_ONION_DISTRIBUTION_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED
+    to: E_LACUNAS_ONION_DISTRIBUTION_1105
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_ACHADO6_WHAT_DOES_NOT_TRAVEL
+    to: E_OBJECAO_ACHADO6_WHAT_DOES_NOT_TRAVEL
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    to: E_OBJECAO_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    to: E_OBJECAO_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    to: E_OBJECAO_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS
+    to: E_OBJECAO_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_DISCARD_PYPI_NOT_EXEMPT
+    to: E_OBJECAO_DISCARD_PYPI_NOT_EXEMPT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_DISCARD_OIDC_EXTRACTED_FROM_RUNNER
+    to: E_OBJECAO_DISCARD_OIDC_EXTRACTED_FROM_RUNNER
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_DISCARD_SAP_TRUSTED_ANY_WORKFLOW
+    to: E_OBJECAO_DISCARD_SAP_TRUSTED_ANY_WORKFLOW
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    to: E_OBJECAO_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    to: E_OBJECAO_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_MARKETPLACE_ALLOWLIST_POLICY
+    to: E_OBJECAO_CUT_MARKETPLACE_ALLOWLIST_POLICY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED
+    to: E_OBJECAO_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE
+    to: E_OBJECAO_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_MITIGATIONS_FALL_ON_ADOPTER
+    to: E_OBJECAO_CUT_MITIGATIONS_FALL_ON_ADOPTER
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_MCPNAME_OWNERSHIP_VERIFICATION
+    to: E_OBJECAO_CUT_MCPNAME_OWNERSHIP_VERIFICATION
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES
+    to: E_OBJECAO_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW
+    to: E_OBJECAO_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_STEALER_TARGETS_AI_CONFIG
+    to: E_OBJECAO_CUT_STEALER_TARGETS_AI_CONFIG
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_RECURRING_WAVES
+    to: E_OBJECAO_CUT_RECURRING_WAVES
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_CUT_PIN_ENFORCE_AND_SEED_DIR
+    to: E_OBJECAO_CUT_PIN_ENFORCE_AND_SEED_DIR
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_PYPISTATS_SUPERCLAUDE
+    to: E_OBJECAO_SRC_PYPISTATS_SUPERCLAUDE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_SPEC_KIT_REPO
+    to: E_OBJECAO_SRC_SPEC_KIT_REPO
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_BMAD_REPO
+    to: E_OBJECAO_SRC_BMAD_REPO
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_DEVTO_ROUTES
+    to: E_OBJECAO_SRC_DEVTO_ROUTES
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_ORG_MD
+    to: E_OBJECAO_SRC_ORG_MD
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_PLUGIN_OVERVIEW
+    to: E_OBJECAO_SRC_PLUGIN_OVERVIEW
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_TENABLE_FAQ
+    to: E_OBJECAO_SRC_TENABLE_FAQ
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261105_SRC_VENTUREBEAT_OIDC_SCOPE
+    to: E_OBJECAO_SRC_VENTUREBEAT_OIDC_SCOPE
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_ONION_DISTRIBUTION_1105
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: SUPPORTS
+  - from: D_ONION_DISTRIBUTION_CHANNELS_2026_11
+    to: Q_ONION_DISTRIBUTION_PACKAGES_1105
+    edge_type: TRACES_TO
