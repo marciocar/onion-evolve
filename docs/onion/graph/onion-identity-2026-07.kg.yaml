@@ -1429,6 +1429,70 @@ nodes:
       locator: "gh pr view 126, 89 e 128 (state, mergedAt e body)"
       method: "measurement: gh pr view dos três PRs, com grep no corpo"
       locality: "web"
+  - id: D_ESCADA_DE_ADOCAO_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Escada, ônus de quem cria»"
+    label: "Princípio da casa: adotar, perfil por cima, costurar, vendorizar peça nossa, parque, nessa ordem. Forjar exige dizer, com medida, o que o mercado não faz, e toda peça própria tem gatilho de superação; vale também para o kg-ssot."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Escada, ônus de quem cria»; descartadas: «Avançar padrões Onion» · «Caso a caso, sem regra» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Regra geral para toda peça do Onion que toca formato, protocolo ou ferramenta de mercado: o que vale como princípio da casa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+  - id: D_ESCADA_PORTAO_NO_FORGE_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Portão no forge, sem comando novo»"
+    label: "A escada vira portão no /meta:forge e no /meta:forge-guard, com degrau e gatilho no nó do grafo e lint que começa só avisando, sem comando novo; o /meta:dissect segue como o caminho da medida."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Portão no forge, sem comando novo»; descartadas: «Só doutrina» · «Comando novo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Como a regra vira mecanismo no Onion, sem depender de alguém lembrar?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+  - id: D_ESCADA_CENSO_RETROATIVO_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Censo barato, com gatilho»"
+    label: "O retroativo é um censo barato, peça por padrão de mercado por degrau, com as peers revisando as suas; medida só onde um gatilho disparar ou a tabela apontar duplicação, e decisão selada só reabre com fato novo."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Censo barato, com gatilho»; descartadas: «Só daqui em diante» · «Dissecar tudo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Aplicar a escada ao que já existe (A2A, vigia, kg-ssot, task manager, guardas e o resto)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+  - id: D_A2A_MEDIR_ANTES_DE_MIGRAR_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Medir e levar o plano»"
+    label: "Primeiro caso da escada, o A2A: medir antes de migrar. Rodar o a2a-sdk contra o receptor, testar o agentgateway na frente, buscar quem já entrega o conjunto, com a curadoria desde o desenho, e trazer o que quebra; o receptor não muda agora."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Medir e levar o plano»; descartadas: «Decidir migrar já» · «Manter e completar o nosso»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «A2A: o que fazemos com o A2A do Onion, sendo a posição do core, ainda não medida, migrar o fio para o padrão?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
 edges:
   - from: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
@@ -1785,3 +1849,15 @@ edges:
   - from: C_EXIT2_CONFORMIDADE_SEM_EXCLUSIVIDADE_1104
     to: C_POSTURA_ACOPLAMENTO
     edge_type: CONSTRAINS
+  - from: D_ESCADA_DE_ADOCAO_1105
+    to: C_POSTURA_ACOPLAMENTO
+    edge_type: TRACES_TO
+  - from: D_ESCADA_PORTAO_NO_FORGE_1105
+    to: D_ESCADA_DE_ADOCAO_1105
+    edge_type: TRACES_TO
+  - from: D_ESCADA_CENSO_RETROATIVO_1105
+    to: D_ESCADA_DE_ADOCAO_1105
+    edge_type: TRACES_TO
+  - from: D_A2A_MEDIR_ANTES_DE_MIGRAR_1105
+    to: D_ESCADA_DE_ADOCAO_1105
+    edge_type: TRACES_TO
