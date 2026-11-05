@@ -31,8 +31,17 @@ nota: "A passada adversarial AINDA NÃO RODOU: o portão da forja parou no commi
 - **O caminho do maestro:** o `!` no prompt, que não passa pelos hooks de ferramenta. Medido no corpus: 28 dos 60
   comandos únicos do `!` seriam vetados hoje e rodaram (ex.: `! sudo systemctl restart onion-vps-bridge`, 2026-10-22,
   CC 2.1.308). Não remedido na 2.1.318 (teto).
-- **No adotante:** sem `ops/moat-targets.tsv` não há linha `ato`, e o veto do ato não arma; os wrappers também não
-  viajam. Declarado no hook e provado nos casos `ato16` e `x1`.
+- **No adotante (2ª leva, 2026-11-05):** sem `ops/moat-targets.tsv` o hook não sai mais; entra no MODO DERIVADO.
+  O relógio veta (crontab, at/batch, systemd-run com timer, systemctl que liga `.timer`, escrita em cron e num `.timer`
+  sob systemd/), a publicação só avisa (decisão do maestro pelo kg-ssot, que tem hook local próprio), e deploy, repo
+  alheio e ato ficam desarmados (o merge no adotante é outra forja; o merge-gate não mudou). Casos `der1` a `der9`, `x1`
+  e `ato16`, num repo `role: adopted` e num sem carimbo.
+- **Publicação sem script (2ª leva):** aprovação de ambiente protegido (`POST …/pending_deployments`, por `gh api` e por
+  `curl`), `gh repo edit` em visibilidade/descrição/tópicos (e o PATCH/PUT equivalente pela API) e `git push` de tag.
+  No core vetam; no derivado avisam. Casos `pub1` a `pub8`.
+- **Timer por arquivo:** a unit `.timer` escrita pelo Bash sob systemd/ e o `systemctl --user enable/start` dela já vetam
+  (casos `der2`, `der3`). Fora: a unit escrita pela ferramenta Write e o agendamento nativo do Claude Code (CronCreate,
+  ScheduleWakeup do `/loop`, RemoteTrigger), declarados no grafo com gatilho.
 - **Guarda da lista:** REGRA 117 (Ato de deploy tem assinatura no veto), em `act-signature-check.sh`: wrapper sem linha
   `ato`, linha sem script ou sem assinatura, e palavra da assinatura fora do código do script. `aplica-se: source`.
 - **Superfícies:** `/meta:publish`, a skill `onion-publish` e a `publish-doctrine` passam a entregar a linha do
@@ -42,7 +51,8 @@ nota: "A passada adversarial AINDA NÃO RODOU: o portão da forja parou no commi
 
 | Medida | Resultado |
 |---|---|
-| Famílias `moat_gate` + `act_signature` | 282 casos, 0 falhas, 0 pulados; cada caso com mutante executado |
+| Famílias `moat_gate` + `act_signature` | 316 casos, 0 falhas, 0 pulados; cada caso com mutante executado (eram 282 na 1ª leva) |
+| Replay das formas novas, todos os projetos | core: 1 veto novo (o `gh repo edit --visibility public` de 2026-10-14, sob autorização pontual); derivados: 1 veto novo (um `crontab -` real do sge, 2026-09-29) e 127 avisos no kg-ssot (108 push de tag, 17 aprovações, 2 repo edit), todos atos reais; nenhum veto perdido |
 | Replay do corpus (comandos que citam um script de ato) | nenhum veto perdido. 1ª redação: 1.681 comandos, 144 vetos novos, 39 falsos positivos (26 `bash -n`, 13 argumento de runtime), curados no mesmo laço. Depois: 1.690 comandos, 114 vetos novos, todos atos (34 update-bridge, 24 publish-door, 12 chat-runner, 10 install-caddy-config, 9 a2a-invite-live, 8 update-kg-writer, 5 stt-service, 4 caddy-site-secrets, 3 docker-engine-migrate, 2 bridge-hardening, 2 workspace-adopt-sync, 1 a2a-queue-live) |
 | Latência | ~180 a 300 ms quando o comando cita um script de ato; ~100 ms quando não cita |
 
@@ -50,6 +60,7 @@ nota: "A passada adversarial AINDA NÃO RODOU: o portão da forja parou no commi
 
 - O `!` na 2.1.318 (exige o maestro digitando).
 - A passada adversarial (este resíduo existe para ela).
-- O CI completo: só as duas famílias e o `lint-artifacts.sh` rodaram.
+- O CI completo: só as duas famílias e o `lint-artifacts.sh` rodaram. O 2º commit foi `--no-verify` (CHECKPOINT, por ordem de carga da máquina): o pre-commit roda a bancada das famílias afetadas (192 famílias, ~70 min no 1º commit) e não foi re-rodado sobre o SHA final.
+- Se o hook de PreToolUse dispara para CronCreate/ScheduleWakeup (não medido: fica fora por desenho).
 
 Grafo: [`deploy-acts-2026-11.kg.yaml`](../research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml).

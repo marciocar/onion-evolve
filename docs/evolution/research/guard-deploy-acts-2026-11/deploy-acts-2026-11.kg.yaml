@@ -6,7 +6,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-05"
   review_after: "2026-12-05"   # 30d: defeito de guarda
-  # ═══ TETO: 14 NÓS ═══
+  # ═══ TETO: 21 NÓS ═══  (14 da 1ª leva + 7 do adotante, da publicação sem script e do relógio por arquivo)
 nodes:
   - id: Q_VETO_BARRA_O_ATO_DE_DEPLOY
     node_type: question
@@ -16,7 +16,7 @@ nodes:
     impact: 5
     confidence: 0.8
     verified_at: "2026-11-05"
-    verified_against: "famílias moat_gate e act_signature verdes (282 casos, 0 falhas), com mutante por caso; replay do corpus contra o hook antigo e o novo"
+    verified_against: "famílias moat_gate e act_signature verdes (316 casos, 0 falhas), com mutante por caso; replay do corpus contra o hook antigo e o novo, no core e nos derivados"
     label: "o veto do MOAT barra, pela sessão, o ato de deploy e de publicação que os wrappers de ops/ fazem, e deixa passar o ensaio e a leitura deles"
     narrative: "Aberta até a passada adversarial e o merge, que são do maestro. A guarda estende o pretooluse-moat-gate.sh com a classe ato, lida das linhas `ato script` do ops/moat-targets.tsv (core-only), e a REGRA 117 (Ato de deploy tem assinatura no veto) é a catraca da lista."
   - id: E_DEFEITO_WRAPPER_FRONTEIRA_PARA_TUDO
@@ -165,7 +165,7 @@ nodes:
     verified_against: "matcher do registro no settings.json: Bash; nenhum hook de ato vê MCP nem outro executor"
     trace: ".claude/settings.json"
     label: "teto: o veto só vê o Bash da sessão; um servidor MCP que executa comando, um interpretador que chama o wrapper por subprocess e o próprio wrapper chamado por outro programa ficam fora"
-    narrative: "Mesma fronteira do moat-gate inteiro (CERCA.md: nenhum hook de ato vê Write, Edit nem MCP). No adotante o veto do ato não arma: sem ops/moat-targets.tsv não há linha ato, e os wrappers também não viajam (casos ato16 e x1)."
+    narrative: "Mesma fronteira do moat-gate inteiro (CERCA.md: nenhum hook de ato vê Write, Edit nem MCP). No adotante o veto do ATO não arma: sem ops/moat-targets.tsv não há linha ato, e os wrappers também não viajam (caso ato16); o relógio e a publicação têm regime próprio lá (D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA)."
   - id: C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL
     node_type: claim
     layer: audit
@@ -190,6 +190,100 @@ nodes:
     trace: ".claude/hooks/pretooluse-moat-gate.sh"
     label: "teto: que o `!` não passa pelos hooks foi medido no corpus até a 2.1.308, não na 2.1.318"
     narrative: "Se uma versão nova passar o `!` pelos hooks, o veto do ato barra o maestro também, e o /meta:cc-update deve remedir. Gatilho: o 1º `! bash ops/<wrapper>.sh --apply` do maestro depois do merge."
+  - id: E_DERIVADO_DESARMAVA_O_RELOGIO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "medida da curadoria (27 de 31 formas de ato passavam num adotante) e replay de 290 comandos de agendamento dos projetos derivados contra o hook da main e o da branch: 1 veto novo, um crontab instalado de verdade pela sessão do sge em 2026-09-29"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "medido: sem o tsv o moat-gate saía antes do juiz e derrubava também o relógio, que não depende da máquina; no corpus, a sessão de um adotante instalou um cron a cada 15 min"
+    narrative: "O caso do sge: `(crontab -l | grep -v …; echo '*/15 * * * * … deploy_live.sh --seed') | crontab -`, numa linha que começava por um `docker exec`. Com o modo derivado ele veta; os outros 289 comandos de agendamento dos derivados (crontab -l, systemd-run --scope de laboratório, texto em heredoc) seguem passando."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "replay das formas de relógio de todos os projetos de transcritos"
+      method: "medição: hook real no modo do projeto de origem; comando nunca executado"
+      locality: "repo"
+  - id: D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "casos der1 a der9 e x1 da família moat_gate, num repo `role: adopted` e num sem carimbo de papel"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "sem ops/moat-targets.tsv o hook entra no modo derivado: o relógio veta, a publicação avisa (additionalContext, exit 0), e deploy, repo alheio e ato ficam desarmados"
+    narrative: "O relógio vale lá com os caminhos de agendamento do sistema (os de cron, o spool e o anacrontab) quando o tsv não os traz. A publicação SÓ AVISA no derivado por decisão do maestro pelo kg-ssot: o kg-ssot veta esses atos com um hook local próprio, que exige PR mergeado, a tag citada em spec/release.json e o verify do espelho. Não há ponto de extensão nem predicado por adotante; o gatilho para criar um é um 2º adotante que precise da mesma prova. O merge no adotante é outra forja e o merge-gate não mudou."
+  - id: E_PUBLICACAO_SEM_SCRIPT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "replay das formas no corpus inteiro: core com 0 aprovação de ambiente, 0 push de tag e 1 gh repo edit --visibility (2026-10-14, sob autorização pontual); kg-ssot com 17 aprovações, 108 pushes de tag e 2 gh repo edit, todos atos reais, que no derivado viram aviso"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "aprovação de ambiente, push de tag e o que o público vê do repo não passam por script, e o veto não os via; no core a medida não achou uso da sessão, então eles vetam"
+    narrative: "Formas: `gh api` com POST em actions/runs/<id>/pending_deployments (o -f/-F já faz POST), o mesmo pelo curl na API REST; `gh repo edit` com --visibility, --description, --add-topic ou --remove-topic; PATCH em repos/<o>/<r> com visibility, private, description ou topics, e PUT em …/topics; `git push` de refs/tags/…, --tags, --follow-tags, nome de tag existente (e não branch) ou criada na própria string. Leitura (GET) e --default-branch passam."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "replay das formas de publicação de todos os projetos de transcritos"
+      method: "medição: hook real no modo do projeto de origem; comando nunca executado"
+      locality: "repo"
+  - id: E_TIMER_POR_ARQUIVO_JA_VETADO_PELO_BASH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "probe e casos der2 e der3: cat > <systemd do usuário>/x.timer, tee no mesmo caminho e systemctl --user enable --now / start x.timer vetam no core e no derivado; status e list-timers passam"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "o timer de systemd do usuário criado por arquivo pelo Bash já veta (sufixo .timer sob systemd/), e o ato que o arma (systemctl --user enable/start) também"
+    narrative: "O que fica de fora é a escrita da unit pelas ferramentas Write e Edit, que o matcher Bash não vê; o systemctl que a arma depois, pelo Bash, veta. Ver C_TETO_AGENDAMENTO_NATIVO_E_WRITE."
+  - id: C_TETO_AGENDAMENTO_NATIVO_E_WRITE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "corpus: CronCreate em 17 transcritos, ScheduleWakeup em 127, RemoteTrigger em 0; matcher do moat-gate é Bash"
+    trace: ".claude/settings.json"
+    label: "teto: o agendamento nativo do Claude Code (CronCreate, ScheduleWakeup do /loop, RemoteTrigger) e a unit .timer escrita pela ferramenta Write ficam fora do veto"
+    narrative: "Barrar o ScheduleWakeup quebraria o /loop, que o maestro pede e que aparece em 127 transcritos; o hook não sabe quem pediu. A doutrina do drive já declarava isso. Gatilho: um agendamento nativo que nenhum pedido do maestro explique, medido no transcrito; a forja de Write|Edit (task própria) é onde a unit escrita por arquivo entra."
+  - id: C_TETO_PUBLICACAO_NO_DERIVADO_E_SO_AVISO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "casos der7 a der9; D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "teto: no derivado a publicação só avisa; quem barra é o hook local do adotante, quando ele existe, e um adotante sem esse hook publica com aviso"
+    narrative: "Decisão do maestro, não lacuna de medida. O aviso sai no canal additionalContext, o mesmo do aviso de merge do adotante. Gatilho: um 2º adotante que publique e não tenha hook local."
+  - id: C_TETO_TAG_POR_NOME_AMBIGUO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "_moat_tag_push: nome que é tag e não branch no diretório do push, ou tag criada na própria string"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "teto: push de tag pelo nome só se reconhece se a tag já existe no clone e não há branch homônima, ou se nasceu na mesma string; tag por variável de fora passa"
+    narrative: "Nome com branch homônima é ambíguo também para o git; aí cala (cláusula 4)."
 edges:
   - from: E_DEFEITO_WRAPPER_FRONTEIRA_PARA_TUDO
     to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
@@ -229,4 +323,25 @@ edges:
     edge_type: SUPPORTS
   - from: C_TETO_BANG_NA_VERSAO_ATUAL
     to: E_BANG_NAO_PASSA_PELOS_HOOKS
+    edge_type: CONSTRAINS
+  - from: E_DERIVADO_DESARMAVA_O_RELOGIO
+    to: D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA
+    edge_type: SUPPORTS
+  - from: D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: E_PUBLICACAO_SEM_SCRIPT
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: E_TIMER_POR_ARQUIVO_JA_VETADO_PELO_BASH
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: C_TETO_AGENDAMENTO_NATIVO_E_WRITE
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: CONSTRAINS
+  - from: C_TETO_PUBLICACAO_NO_DERIVADO_E_SO_AVISO
+    to: D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA
+    edge_type: CONSTRAINS
+  - from: C_TETO_TAG_POR_NOME_AMBIGUO
+    to: E_PUBLICACAO_SEM_SCRIPT
     edge_type: CONSTRAINS

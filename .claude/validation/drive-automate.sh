@@ -883,7 +883,7 @@ def cmd_status():
     req = required_checks()
     say("- checks exigidos pelo ruleset: %s" % (", ".join(req) if req else "ILEGÍVEL — gate recusa o merge"))
     moat = os.path.isfile(os.path.join(ROOT, "ops/moat-targets.tsv"))  # (core-only)
-    say("- veto do MOAT por alvo (pretooluse-moat-gate.sh): %s" % ("armado" if moat else "DESARMADO (sem ops/moat-targets.tsv) — MOAT segue prosa aqui"))  # (core-only)
+    say("- veto do MOAT por alvo (pretooluse-moat-gate.sh): %s" % ("armado" if moat else "MODO DERIVADO (sem ops/moat-targets.tsv): só o relógio veta e a publicação avisa; deploy e repo alheio seguem prosa aqui"))  # (core-only)
     # pré-filtro por texto (superconjunto: a chave citada num label também casa), e o veredito por YAML.
     # Ler os ~150 grafos por PyYAML custava 12 s na carga do comando; o filtro deixa só os candidatos.
     rc, out, _ = run(["git", "grep", "-l", "-E", "^[[:space:]]+x_drive_(checkpoint|pass)[[:space:]]*:", "--", "*.kg.yaml"])

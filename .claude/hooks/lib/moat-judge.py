@@ -25,6 +25,11 @@
 #            `--push`, `apply`, sem argumento…). O wrapper versionado é fronteira para o ALVO (o que ele escreve por
 #            dentro), não para o ATO: deploy, publicação e push de porta são do maestro, que roda pelo `!` no prompt.
 #            Ensaio e leitura (`install` sem `--apply`, `--status`, `plan`, `verify`, `--check`) passam.
+#  publicacao · (2026-11-05) atos voltados ao público que não passam por script: aprovar ambiente protegido
+#            (`POST …/actions/runs/<id>/pending_deployments`, pelo `gh api` ou pelo `curl`), mudar visibilidade,
+#            descrição ou tópicos do repo (`gh repo edit`, `PATCH repos/<o>/<r>`, `PUT …/topics`) e empurrar TAG
+#            (`refs/tags/…`, `--tags`, `--follow-tags`, nome de tag existente ou criada na própria string). O hook
+#            decide a severidade: veto no core, aviso no derivado.
 #
 # ── A FRONTEIRA (o que segue CONFIANÇA-NO-MODELO) ─────────────────────────────────────────────────────
 #  · script VERSIONADO deste projeto (rastreado pelo git) é fronteira: é assim que `bash ops/<wrapper>.sh`
@@ -111,6 +116,10 @@ def _moat_load():
     except OSError:
         pass
     members = [x for x in members if x.get("kind") != "source"]
+    # o RELÓGIO não depende da máquina: sem o tsv (adotante, 2026-11-05) os caminhos de agendamento do sistema valem
+    # assim mesmo. Com o tsv, as linhas `relogio path` dele mandam
+    if not any(c == "relogio" for c, _, _ in paths):
+        paths += [("relogio", "/etc/cron*", ""), ("relogio", "/var/spool/cron", ""), ("relogio", "/etc/anacrontab", "")]
     return units, paths, members, acts
 
 
@@ -591,7 +600,10 @@ def _moat_git(words, env, detail):
     lists = any(a in ("-l", "--list", "-a", "--all", "-r", "--remotes", "-v", "-vv", "--contains", "--merged",
                       "--no-merged", "--points-at", "--show-current", "--format") or a.startswith("--format=")
                 for a in rest)
-    if sub not in _MOAT_GIT_WRITE and not (sub == "tag" and _moat_positionals(rest) and not lists) \
+    # o `lists` acima conta `-a` como listagem (é do `git branch`); no `git tag`, `-a` é ANOTAR
+    tag_lists = any(a in ("-l", "--list", "--contains", "--no-contains", "--points-at", "--merged", "--no-merged", "-n")
+                    or a.startswith(("--format", "--sort", "-n")) for a in rest)
+    if sub not in _MOAT_GIT_WRITE and not (sub == "tag" and _moat_positionals(rest) and not tag_lists) \
             and not (sub == "branch" and not lists and (_moat_positionals(rest) or any(a in ("-d", "-D", "-m", "-M", "-f", "-c", "-C") for a in rest))) \
             and not (sub == "config" and not any(a in ("--get", "--get-all", "--get-regexp", "-l", "--list", "--show-origin") for a in rest)):
         return
@@ -607,9 +619,16 @@ def _moat_git(words, env, detail):
     if hit:
         _moat_emit("deploy", where, hit[2], "git %s numa árvore servida (%s) — %s" % (sub, hit[1], detail))
         return
+    if sub == "tag" and not tag_lists and not any(a in ("-d", "--delete", "-v", "--verify") for a in rest):
+        pos = _moat_positionals(rest, {"-m", "--message", "-F", "--file", "-u", "--local-user", "--cleanup"})
+        if pos:
+            _MOAT_TAGS.add(pos[0])                      # `git tag v1 && git push origin v1`: o disco ainda não a tem
     pushing = sub in ("push", "send-pack") or (sub == "subtree" and rest[:1] == ["push"])
     if not pushing:
         return
+    tag = _moat_tag_push(rest, where)
+    if tag:
+        _moat_emit("publicacao", tag, "tag", "git push de TAG (%s) — %s" % (tag, detail))
     # O QUE do repo alheio veta é o push que MUDA A LINHA DE PRODUÇÃO DELE: o ramo protegido (a linha canônica do
     # lib já escreve `main` para o ramo de produção RESOLVIDO no diretório — gitflow, HEAD do remoto, push nu
     # sentado nele), force, delete, mirror/all. Branch de tópico passa: vai virar PR no repo alheio, e o PR é o
@@ -631,6 +650,76 @@ def _moat_git(words, env, detail):
             return
     if risky and not push_dest_ours(where, remote, LAST_CFG[0]):
         _moat_emit("alheio", remote or "(destino do push)", "", "%s num destino de OUTRO repositório — %s" % (what, detail))
+
+
+_MOAT_TAGS = set()        # tags criadas na própria string
+
+
+def _moat_tag_push(rest, where):
+    """-> a tag que o push publica, ou None. Lê os argumentos crus: o canonical_git do lib normaliza a branch."""
+    if any(a in ("--tags", "--follow-tags") for a in rest):
+        return "--tags" if "--tags" in rest else "--follow-tags"
+    pos = _moat_positionals(rest, {"-o", "--push-option", "--repo", "--receive-pack", "--exec"})
+    for r in pos[1:]:                                   # o 1º posicional é o remoto
+        src = r.lstrip("+").split(":", 1)
+        for side in src:
+            if side.startswith("refs/tags/") or side.startswith("tags/"):
+                return side
+        name = src[0]
+        if not name or DYNAMIC.search(name):
+            continue
+        if name in _MOAT_TAGS:
+            return name
+        if where and where != UNKNOWN and _git(["-C", where, "rev-parse", "-q", "--verify", "refs/tags/" + name]) \
+                and not _git(["-C", where, "rev-parse", "-q", "--verify", "refs/heads/" + name]):
+            return name
+    return None
+
+
+_MOAT_PUB_REPO_FIELDS = re.compile(r"^(visibility|private|description|topics(\[\])?|names(\[\])?)=")
+
+
+def _moat_gh(words, detail):
+    """aprovação de ambiente, visibilidade/descrição/tópicos do repo: a classe publicacao."""
+    if len(words) > 2 and words[1] == "repo" and words[2] == "edit":
+        args = words[3:]
+        hits = [a.split("=", 1)[0] for a in args
+                if a.split("=", 1)[0] in ("--visibility", "--description", "-d", "--add-topic", "--remove-topic")]
+        if hits:
+            _moat_emit("publicacao", "gh repo edit", "repo", "gh repo edit %s (o que o público vê do repo) — %s"
+                       % (" ".join(sorted(set(hits))), detail))
+        return
+    if len(words) < 2 or words[1] != "api":
+        return
+    m = re.match(r"^gh api --method (\S+) (\S+)(.*)$", canonical_gh(words))
+    if not m:
+        return
+    meth, ep, vals = m.group(1), m.group(2).lstrip("/"), m.group(3).split()
+    if meth == "POST" and re.search(r"(^|/)actions/runs/[^/]+/pending_deployments$", ep):
+        _moat_emit("publicacao", ep, "ambiente", "aprovação de ambiente protegido (POST pending_deployments) — %s" % detail)
+    elif meth in ("PATCH", "POST") and re.match(r"^repos/[^/]+/[^/]+$", ep) and any(_MOAT_PUB_REPO_FIELDS.match(v) for v in vals):
+        _moat_emit("publicacao", ep, "repo", "PATCH do repo em visibilidade/descrição/tópicos — %s" % detail)
+    elif meth == "PUT" and re.match(r"^repos/[^/]+/[^/]+/topics$", ep):
+        _moat_emit("publicacao", ep, "repo", "PUT dos tópicos do repo — %s" % detail)
+
+
+def _moat_curl_pub(args, detail):
+    """o mesmo pela API REST crua: `curl -X POST https://api.github.com/…/pending_deployments`."""
+    urls = [a for a in args if re.search(r"(^|//)(api\.github\.com|[^/\s]+/api/v3)/", a)]
+    if not urls:
+        return
+    meth = _moat_opt_value(args, {"-X", "--request"}, ("--request",))
+    meth = (meth or ("POST" if any(a in ("-d", "--data", "--data-raw", "--data-binary", "--json", "-F", "--form")
+                                   or a.startswith(("--data", "--json", "-d")) for a in args) else "GET")).upper()
+    body = " ".join(args)
+    for u in urls:
+        path = re.sub(r"^.*?(api\.github\.com|/api/v3)/", "", u).split("?", 1)[0]
+        if meth == "POST" and re.search(r"(^|/)actions/runs/[^/]+/pending_deployments$", path):
+            _moat_emit("publicacao", path, "ambiente", "aprovação de ambiente protegido pela API REST (curl) — %s" % detail)
+        elif meth == "PATCH" and re.match(r"^repos/[^/]+/[^/]+$", path) and re.search(r'"?(visibility|private|description|topics)"?\s*[:=]', body):
+            _moat_emit("publicacao", path, "repo", "PATCH do repo em visibilidade/descrição/tópicos (curl) — %s" % detail)
+        elif meth == "PUT" and re.match(r"^repos/[^/]+/[^/]+/topics$", path):
+            _moat_emit("publicacao", path, "repo", "PUT dos tópicos do repo (curl) — %s" % detail)
 
 
 def _moat_crontab(args, detail):
@@ -777,7 +866,11 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     elif base == "unzip":
         d = _moat_opt_value(args, {"-d"}, ())
         _moat_write_path(_moat_abspath(d) if d else _moat_abspath("."), detail, "unzip")
+    elif base == "gh":
+        _moat_gh(words, detail)
     elif base in ("curl", "wget"):
+        if base == "curl":
+            _moat_curl_pub(args, detail)
         o = _moat_opt_value(args, {"-o", "--output"} if base == "curl" else {"-O", "--output-document"},
                             ("--output",) if base == "curl" else ("--output-document",))
         if o:

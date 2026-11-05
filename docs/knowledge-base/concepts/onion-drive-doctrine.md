@@ -89,6 +89,8 @@ O driver opera num **degrau declarado**, nunca acima:
   | repo alheio (I3) | `git push` num clone de membro registrado; `git push` cujo destino é provadamente outro repositório | commit, branch e config LOCAIS num clone de adotante (é o `/meta:adopt --update`); `gh` escrevendo em repo alheio |
   | relógio (W7) | `crontab` que instala/edita/remove; `at`/`batch`; `systemd-run` com timer; `systemctl` que liga `.timer`; escrita em `/etc/cron*`, `/var/spool/cron` ou num `.timer` | as ferramentas `CronCreate`/`ScheduleWakeup` do Claude Code (o `/loop` é superfície legítima do maestro, e o hook não sabe quem o pediu) |
   | merge de path vendorizado | o merge no main (merge-gate) | o resto segue PARA em prosa |
+  | publicação sem script (2026-11-05) | aprovação de ambiente protegido (`POST …/pending_deployments` por `gh api` ou `curl`); `gh repo edit` em visibilidade, descrição ou tópicos (e o PATCH/PUT da API); `git push` de tag | leitura (GET) e `--default-branch`; no repo derivado só AVISA (o hook local do adotante decide) |
+  | modo derivado (2026-11-05) | sem o tsv, o relógio veta e a publicação avisa | deploy, repo alheio e ato (os alvos são desta máquina); o merge do adotante é outra forja |
   | ato de deploy/publicação (2026-11-05) | invocar pela sessão um script de ato (`ato script` do `ops/moat-targets.tsv` (core-only)) com a assinatura do ato: `--apply`, `--push`, `apply`, ou sem argumento quando o modo padrão é o ato; o caminho, o nome (clone servido, `/tmp`) e o conteúdo (cópia renomeada) reconhecem o script; REGRA 117 (Ato de deploy tem assinatura no veto) é a catraca da lista | o ensaio e a leitura do mesmo script; `ops/pr-merge-verified.sh` (core-only) (o merge verificado, com o "sim" do maestro); cópia mudada e renomeada; o maestro pelo `!` no prompt, que não passa pelos hooks |
 
   **Motor que escreve por argumento (2026-10-15).** O motor de convites A2A (`a2a-invite.sh`) escreve o arquivo que
@@ -117,7 +119,8 @@ O driver opera num **degrau declarado**, nunca acima:
   (`python3 -c`, `perl -e`, `node -e`), `rsync --remove-source-files`, `tar --remove-files` e `sh -c` com o alvo
   em `$0` seguem fora do juiz; e "versionado" quer dizer rastreado, não rastreado e limpo.
 
-  No adotante o hook **se desarma**: sem `ops/moat-targets.tsv` (core-only) não há alvo, e o MOAT do adotante segue
+  No adotante o hook entra no **modo derivado** (desde 2026-11-05; até então se desarmava): sem `ops/moat-targets.tsv` (core-only)
+  não há alvo de deploy nem ato, mas o relógio veta e a publicação avisa; o resto do MOAT do adotante segue
   prosa. Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass: escape que o modelo
   escreve na própria string seria gate textual com outro nome.
 
