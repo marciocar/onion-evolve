@@ -20,6 +20,11 @@
 #            tópico e commit local passam: viram PR no repo alheio, e o PR é o gate de lá.
 #  relogio · crontab que instala/edita/remove; at/batch; systemd-run com timer; systemctl que liga um
 #            .timer; escrita em /etc/cron*, /var/spool/cron ou num .timer sob systemd/.
+#  ato     · (2026-11-05, REGRA 117) a invocação, pela sessão, de um script de ops/ cujo uso É o deploy ou a publicação
+#            (linhas `ato script <caminho> <assinatura>` do tsv), com a assinatura do ato nos argumentos (`--apply`,
+#            `--push`, `apply`, sem argumento…). O wrapper versionado é fronteira para o ALVO (o que ele escreve por
+#            dentro), não para o ATO: deploy, publicação e push de porta são do maestro, que roda pelo `!` no prompt.
+#            Ensaio e leitura (`install` sem `--apply`, `--status`, `plan`, `verify`, `--check`) passam.
 #
 # ── A FRONTEIRA (o que segue CONFIANÇA-NO-MODELO) ─────────────────────────────────────────────────────
 #  · script VERSIONADO deste projeto (rastreado pelo git) é fronteira: é assim que `bash ops/<wrapper>.sh`
@@ -65,7 +70,7 @@ _MOAT_WRITE_DEST = {"cp", "install", "rsync", "scp", "ln"}
 
 def _moat_load():
     tsv = os.environ.get("ONION_MOAT_TARGETS", "")
-    units, paths = [], []
+    units, paths, acts = [], [], {}
     try:
         with open(tsv, encoding="utf-8") as fh:
             for ln in fh:
@@ -76,6 +81,10 @@ def _moat_load():
                     continue
                 cls, kind, pat = f[0].strip(), f[1].strip(), os.path.expanduser(f[2].strip())
                 wrapper = f[3].strip() if len(f) > 3 and f[3].strip() not in ("", "-") else ""
+                if kind == "script":                    # classe `ato`: script + assinatura, nunca alvo de escrita
+                    if cls == "ato" and wrapper:
+                        acts[os.path.normpath(pat)] = set(x.strip() for x in wrapper.split(",") if x.strip())
+                    continue
                 (units if kind == "unit" else paths).append((cls, pat, wrapper))
     except OSError:
         pass
@@ -102,10 +111,10 @@ def _moat_load():
     except OSError:
         pass
     members = [x for x in members if x.get("kind") != "source"]
-    return units, paths, members
+    return units, paths, members, acts
 
 
-MOAT_UNITS, MOAT_PATHS, MOAT_MEMBERS = _moat_load()
+MOAT_UNITS, MOAT_PATHS, MOAT_MEMBERS, MOAT_ACTS = _moat_load()
 
 
 def _moat_emit(cls, target, wrapper, detail):
@@ -380,7 +389,114 @@ def _moat_script_args(p, words):
     return []
 
 
+# ── ATO (2026-11-05, REGRA 117): o script é um dos de ops/ cujo uso é o deploy ou a publicação ─────────────────────
+# Reconhecido de TRÊS jeitos, porque o mesmo ato chega por caminhos diferentes: (1) o caminho relativo a um checkout
+# deste projeto (a raiz ou uma worktree: `bash ops/x.sh`, `./x.sh` depois de `cd ops`, o caminho absoluto); (2) o NOME (core-only)
+# do arquivo, em qualquer lugar (o clone que o bridge serve tem os mesmos ops/, noutra versão; a cópia em /tmp); (3) o
+# CONTEÚDO igual ao de um script da lista (cópia renomeada). A cópia que alguém MUDA e renomeia escapa dos três: o corpo
+# dela segue julgado por alvo, como todo script não versionado.
+_MOAT_ACT_SHA = {}
+
+
+def _moat_act_digest(p):
+    try:
+        if os.path.getsize(p) > _MOAT_MAX_SCRIPT:
+            return None
+        import hashlib
+        with open(p, "rb") as fh:
+            return hashlib.sha256(fh.read()).hexdigest()
+    except OSError:
+        return None
+
+
+def _moat_act_of(p):
+    """-> o caminho relativo (`ops/x.sh`) do ato que o script `p` é, ou None. (core-only)"""
+    if not MOAT_ACTS or not p:
+        return None
+    rp = os.path.realpath(p)
+    for d in sorted(_moat_project_dirs(), key=len, reverse=True):
+        if rp.startswith(d + "/"):
+            rel = os.path.normpath(rp[len(d) + 1:])
+            if rel in MOAT_ACTS:
+                return rel
+            break
+    names = {os.path.basename(r): r for r in MOAT_ACTS}
+    for q in (p, rp):
+        if os.path.basename(q) in names:
+            return names[os.path.basename(q)]
+    if not os.path.isfile(rp):
+        return None
+    if "d" not in _MOAT_ACT_SHA:
+        _MOAT_ACT_SHA["d"] = {}
+        for r in MOAT_ACTS:
+            h = _moat_act_digest(os.path.join(ROOT, r)) if ROOT else None
+            if h:
+                _MOAT_ACT_SHA["d"][h] = r
+    if not _MOAT_ACT_SHA["d"]:
+        return None
+    return _MOAT_ACT_SHA["d"].get(_moat_act_digest(rp))
+
+
+def _moat_act(p, words, src=None):
+    """emite `ato` se o script é da lista e os argumentos trazem a assinatura (ou não se provam)."""
+    rel = _moat_act_of(src) if src else None
+    rel = rel or _moat_act_of(p)
+    if not rel:
+        return
+    # `bash -n x.sh` só confere a sintaxe e não executa nada: no corpus, 26 dos falsos positivos da 1ª redação
+    if words and os.path.basename(words[0]) in SHELLS:
+        pre = []
+        for w in words[1:]:
+            if _moat_abspath(w) == p:
+                break
+            pre.append(w)
+        if any(re.match(r"^-[A-Za-z]*n[A-Za-z]*$", w) for w in pre) or \
+                any(a == "-o" and b == "noexec" for a, b in zip(pre, pre[1:])):
+            return
+    _moat_act_judge(rel, [a for a in _moat_script_args(p, words) if a], " ".join(words))
+
+
+def _moat_act_judge(rel, args, detail):
+    sig = MOAT_ACTS[rel]
+    if "@any" in sig:
+        _moat_emit("ato", rel, "@any", "%s roda o ato em qualquer invocação — %s" % (rel, detail))
+        return
+    if not args and "@none" in sig:
+        _moat_emit("ato", rel, "@none", "%s sem argumento roda o ato (o modo padrão) — %s" % (rel, detail))
+        return
+    for a in args:
+        # argumento só conhecido em runtime CALA (cláusula 4): no corpus, os 13 casos eram nome de serviço, porta ou
+        # registro num laço (`for s in …; do bash x.sh $s verify`), nunca a assinatura. O valor literal na própria string
+        # (`M=--apply; bash x.sh $M`) o lib já resolve; o que vem de fora dela é teto declarado
+        if DYNAMIC.search(a):
+            continue
+        w = a.split("=", 1)[0] if a.startswith("--") else a
+        if w in sig:
+            _moat_emit("ato", rel, w, "%s %s é o ato — %s" % (rel, w, detail))
+            return
+
+
 def _moat_script(path, depth, words):
+    p = _moat_abspath(path)
+    if not p:
+        # caminho só conhecido em runtime: a fronteira do `bash x.sh`, salvo se o texto cita um script de ato
+        # `bash "$R"/ops/x.sh --apply`: o NOME está na palavra, e a assinatura se julga como no caminho literal (core-only)
+        named = [r for r in MOAT_ACTS if str(path).endswith("/" + os.path.basename(r))]
+        if named:
+            k = words.index(path) if path in words else len(words)
+            _moat_act_judge(named[0], [a for a in words[k + 1:] if a], " ".join(words))
+        # `bash $(echo ops/x.sh)`: a palavra vira o marcador da substituição, e o nome só está no texto do trecho (core-only)
+        elif MOAT_ACTS and SUBST in str(path) and any(
+                re.search(r"(?<![\w.-])" + re.escape(os.path.basename(r)), raw) for r in MOAT_ACTS):
+            _moat_emit("inanalisavel", str(path), "", "script de ato (deploy/publicação) por caminho só conhecido em runtime")
+        return
+    _moat_script_body(path, depth, words)
+    # o ATO se julga DEPOIS do corpo: o script versionado é fronteira para o ALVO (o que ele escreve por dentro), não
+    # para o ATO; e numa cópia não versionada o veto por alvo do corpo, quando há, sai primeiro (é o mais específico)
+    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None)
+
+
+def _moat_script_body(path, depth, words):
     p = _moat_abspath(path)
     if not p:
         return                                          # caminho só conhecido em runtime: a fronteira do `bash x.sh`

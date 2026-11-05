@@ -53,8 +53,9 @@ alinhado na leva seguinte (REGRA 92 (Papel da porta no registro concorda com o C
 
 ### 4. O push é confirmação explícita, e a conferência é no remoto
 Sem `--push` a rodada é **ensaio**: monta, verifica, commita num clone descartável e para. A superfície
-só passa `--push` depois de perguntar ao maestro (I3: um escritor por repo, e publicar é ato voltado ao
-público), e passa junto o `--expect-pin` do ensaio: se a integração andou entre o ensaio e o "sim", a
+só entrega o `--push` depois de perguntar ao maestro (I3: um escritor por repo, e publicar é ato voltado ao
+público), e quem o roda é o **maestro**, pelo `!` no prompt: desde 2026-11-05 o veto do MOAT barra o ato
+pela sessão (REGRA 117 (Ato de deploy tem assinatura no veto)). A linha leva junto o `--expect-pin` do ensaio: se a integração andou entre o ensaio e o "sim", a
 rodada recusa, porque o pin publicado tem de ser o pin confirmado. O clone começa **exatamente** em
 `origin/<ramo>` (o do maestro, via `--clone`, só se estiver limpo inclusive do ignorado, em dia e com o
 nome e o origin da porta), e o push leva **exatamente um** commit, o verificado. Depois do push,

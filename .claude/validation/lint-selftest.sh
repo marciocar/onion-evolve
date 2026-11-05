@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -10301,8 +10301,18 @@ members:
     kind: adopter
     local_path: "${d}/adotante"
 EOF
+  # os scripts de ATO (REGRA 117) que a fixture ainda não tem: PLACEHOLDERS de conteúdo distinto, que nunca rodam (o
+  # hook só lê o comando). E um script versionado que NÃO é ato (o corpo do kg-writer com uma linha a mais, para o
+  # conteúdo não casar com o do ato): a fronteira do versionado para o ALVO segue valendo para ele
+  local _ph
+  for _ph in update-bridge deploy-site publish-door pr-merge-verified; do
+    printf '#!/usr/bin/env bash\n# placeholder da bancada (%s): nunca roda\necho placeholder\n' "${_ph}" > "${d}/proj/ops/${_ph}.sh"
+  done
+  { cat "${REPO_ROOT}/ops/update-kg-writer.sh"; echo '# irmão versionado da bancada: não é ato'; } > "${d}/proj/ops/kgw-irmao.sh"
   git -C "${d}/proj" add -A
   git -C "${d}/proj" -c user.email=t@t -c user.name=t commit -q -m base
+  # a cópia RENOMEADA de um script de ato (mesmo conteúdo, nome outro), fora do projeto
+  cp "${d}/proj/ops/update-bridge.sh" "${d}/scratch/ub-renomeado.sh"
   # o mesmo wrapper NÃO rastreado: o rastreio é o que faz dele fronteira
   cp "${REPO_ROOT}/ops/update-kg-writer.sh" "${d}/proj/ops/update-kg-writer-copia.sh"
   # repo de adotante SEM ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/)
@@ -10447,8 +10457,8 @@ PY
   # ── o caso de CAMPO (2026-10-13) ───────────────────────────────────────────────────────────────
   _mgcase "(f1) o script de scratchpad do kg-writer, por arquivo → VETO" "2:MOAT/deploy" "${P}" \
     "bash ${d}/scratch/update-kg-writer.sh" "${J}" '        scoped(heredocs(body), depth + 1)' '        pass'
-  _mgcase "(f2) o wrapper versionado: bash ops/update-kg-writer.sh → passa" 0 "${P}" \
-    'bash ops/update-kg-writer.sh && echo "publicado em /var/www/onion-landing"' "${J}" '    if _moat_versioned(p) and not copied:' '    if False:'
+  _mgcase "(f2) script versionado que NÃO é ato (o corpo do wrapper, outro nome) → passa: fronteira para o alvo" 0 "${P}" \
+    'bash ops/kgw-irmao.sh && echo "publicado em /var/www/onion-landing"' "${J}" '    if _moat_versioned(p) and not copied:' '    if False:'
   _mgcase "(f3) o MESMO wrapper não rastreado → VETO (o rastreio é a fronteira)" "2:MOAT/deploy" "${P}" \
     'bash ops/update-kg-writer-copia.sh' "${J}" '        return bool(_git(["-C", ds[0]' '        return True or bool(_git(["-C", ds[0]'
   _mgcase "(f4) o corpo do script de campo colado na string → VETO no checkout" "2:git checkout numa árvore servida" "${P}" \
@@ -10539,7 +10549,7 @@ PY
       "sudo -u svc bash ${MOT} check --file ${INV}" "${J}" \
       '    if not pos or pos[0] not in subs or "--dry-run" in args:' '    if not pos or "--dry-run" in args:'
     _mgcase "(i9) o wrapper VERSIONADO (com o alvo citado na linha, que leva ao juiz) → passa" 0 "${P}" \
-      "bash ops/a2a-invite-live.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json --apply && echo \"convite em ${INV}\"" "${J}" \
+      "bash ops/a2a-invite-live.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json && echo \"convite em ${INV}\"" "${J}" \
       '    if _moat_versioned(p) and not copied:' '    if False:'
     _mgcase "(i10) CÓPIA do wrapper fora do projeto → FECHA (o corpo chama o motor e cita o alvo)" "2:motor escritor" "${P}" \
       "bash ${d}/scratch/live-copia.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json --apply" "${J}" \
@@ -10660,7 +10670,7 @@ EOF" "${L}" \
     _mgcase "(p2) rm direto num registro da fila de um hub → VETO nomeando o wrapper da fila (mais específico)" "2:ops/a2a-queue-live.sh" "${P}" \
       "sudo -n -u svc rm -f ${QD}/hub-x/s.t.json" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
     _mgcase "(p3) o wrapper VERSIONADO da fila (com o alvo citado na linha, que leva ao juiz) → passa" 0 "${P}" \
-      "bash ops/a2a-queue-live.sh archive s.t.json --apply && echo \"fila em ${QD}\"" "${J}" \
+      "bash ops/a2a-queue-live.sh archive s.t.json && echo \"fila em ${QD}\"" "${J}" \
       '    if _moat_versioned(p) and not copied:' '    if False:'
     _mgcase "(p4) modo de teste do wrapper da fila na linha de comando → FECHA" "2:modo de teste do wrapper da fila" "${P}" \
       "export ONION_A2A_QUEUE_TEST=1; ONION_A2A_QUEUE_BACKUP=/tmp/x.sh bash ops/a2a-queue-live.sh list" "${J}" \
@@ -10690,7 +10700,7 @@ EOF" "${L}" \
     _mgcase "(b2) placeholder do settings.json da conta do serviço escrito à mão → VETO nomeando o wrapper" "2:ops/bridge-hardening.sh" "${P}" \
       "sudo -u svc sh -c 'echo {} > ${BHS}'" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
     _mgcase "(b3) o wrapper VERSIONADO (com o drop-in citado na linha) → passa" 0 "${P}" \
-      "bash ops/bridge-hardening.sh install --apply && echo \"drop-in em ${BHD}\"" "${J}" \
+      "bash ops/bridge-hardening.sh install && echo \"drop-in em ${BHD}\"" "${J}" \
       '    if _moat_versioned(p) and not copied:' '    if False:'
     _mgcase "(b4) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper do drop-in" "${P}" \
       "export ONION_BRIDGE_HARDENING_TEST=1; ONION_BRIDGE_HARDENING_DROPIN_DIR=/tmp/x bash ops/bridge-hardening.sh show" "${J}" \
@@ -10716,7 +10726,7 @@ EOF" "${L}" \
     _mgcase "(m3) restart do socket do runner → VETO nomeando o wrapper" "2:ops/chat-runner.sh" "${P}" \
       'sudo systemctl restart onion-chat.socket' "${J}" $'    if verb not in _MOAT_UNIT_MUTATE:\n        return' $'    if True:\n        return'
     _mgcase "(m4) o wrapper VERSIONADO (com o drop-in citado na linha) → passa" 0 "${P}" \
-      "bash ops/chat-runner.sh install --apply && echo \"drop-in em ${CRD}\"" "${J}" \
+      "bash ops/chat-runner.sh install && echo \"drop-in em ${CRD}\"" "${J}" \
       '    if _moat_versioned(p) and not copied:' '    if False:'
     _mgcase "(m5) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper do runner" "${P}" \
       "export ONION_CHAT_RUNNER_TEST=1; ONION_CHAT_RUNNER_UNIT_DIR=/tmp/x bash ops/chat-runner.sh show" "${J}" \
@@ -10741,7 +10751,7 @@ EOF" "${L}" \
     _mgcase "(s3) restart da unit do STT → VETO nomeando o wrapper" "2:ops/stt-service.sh" "${P}" \
       'sudo systemctl restart onion-vps-stt' "${J}" $'    if verb not in _MOAT_UNIT_MUTATE:\n        return' $'    if True:\n        return'
     _mgcase "(s4) o wrapper VERSIONADO → passa" 0 "${P}" \
-      "bash ops/stt-service.sh install --apply && echo \"unit em ${STU}\"" "${J}" '    if _moat_versioned(p) and not copied:' '    if False:'
+      "bash ops/stt-service.sh install && echo \"unit em ${STU}\"" "${J}" '    if _moat_versioned(p) and not copied:' '    if False:'
     _mgcase "(s5) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper do STT em lote" "${P}" \
       "export ONION_STT_SERVICE_TEST=1; ONION_STT_SERVICE_ROOT=/tmp/x bash ops/stt-service.sh show" "${J}" \
       '_moat_emit("inanalisavel", "ONION_STT_SERVICE_TEST",' '(lambda *a: None)("inanalisavel", "ONION_STT_SERVICE_TEST",'
@@ -10752,7 +10762,74 @@ EOF" "${L}" \
   else
     record_skip "moat-gate: (s*) sem ops/stt-service.sh — casos do STT em lote pulados"
   fi
+  # ── o ATO (2026-11-05, REGRA 117): o wrapper versionado é fronteira para o alvo, não para o ato ─────────
+  # Defeito datado: `bash ops/<wrapper>.sh --apply` e `ops/publish-door.sh --push` passavam com exit 0 (estudo
+  # problem-route, CERCA.md; a sessão rodou deploys assim em 2026-10-19/22/23). Ensaio e leitura seguem passando.
+  _mgcase "(ato1) bash ops/update-bridge.sh (sem argumento, o modo padrão é o ato) → VETO" "2:MOAT/ato" "${P}" \
+    'bash ops/update-bridge.sh' "${J}" '    if not args and "@none" in sig:' '    if False:'
+  _mgcase "(ato2) o ENSAIO do mesmo wrapper (install sem --apply) → passa" 0 "${P}" \
+    'bash ops/stt-service.sh install' "${J}" '        if w in sig:' '        if True:'
+  _mgcase "(ato3) o caso de campo (2026-10-19): timeout + install --apply com redirecionamento → VETO" "2:ops/stt-service.sh --apply é o ato" "${P}" \
+    'timeout 1500 bash ops/stt-service.sh install --apply > /tmp/stt.log 2>&1; echo rc=$?' "${J}" \
+    '    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None)' '    pass'
+  _mgcase "(ato4) sh -c com cd e ./ (outra grafia do mesmo ato) → VETO" "2:MOAT/ato" "${P}" \
+    'sh -c "cd ops && ./chat-runner.sh install --apply"' "${J}" \
+    '    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None)' '    pass'
+  _mgcase "(ato5) publish-door.sh --status (leitura) → passa" 0 "${P}" \
+    'bash ops/publish-door.sh --status' "${J}" '    if "@any" in sig:' '    if True:'
+  _mgcase "(ato6) publish-door.sh --push (push de porta) → VETO" "2:ops/publish-door.sh --push é o ato" "${P}" \
+    'bash ops/publish-door.sh onion-core --push --version 1.2.3' "${J}" \
+    '        w = a.split("=", 1)[0] if a.startswith("--") else a' '        w = None'
+  # (ato7) CALA por decisão (cláusula 4): no corpus os 13 argumentos de runtime eram serviço/porta/registro num laço
+  _mgcase "(ato7) argumento só conhecido em runtime num script de ato → passa (cala, teto declarado)" 0 "${P}" \
+    'for s in a b; do bash ops/chat-runner.sh install "$s"; done' "${J}" \
+    $'        if DYNAMIC.search(a):\n            continue' $'        if DYNAMIC.search(a):\n            _moat_emit("inanalisavel", rel, "", "x"); return'
+  _mgcase "(ato17) bash -n (só confere a sintaxe, não executa) → passa" 0 "${P}" \
+    'bash -n ops/update-bridge.sh' "${J}" '        if any(re.match(r"^-[A-Za-z]*n[A-Za-z]*$", w) for w in pre) or \' '        if False and any(re.match(r"^-[A-Za-z]*n[A-Za-z]*$", w) for w in pre) or \'
+  _mgcase "(ato8) cópia RENOMEADA de um script de ato (mesmo conteúdo) → VETO" "2:MOAT/ato" "${P}" \
+    "bash ${d}/scratch/ub-renomeado.sh" "${J}" '    return _MOAT_ACT_SHA["d"].get(_moat_act_digest(rp))' '    return None'
+  _mgcase "(ato9) o mesmo script no clone servido (fora do projeto, pelo NOME) → VETO" "2:MOAT/ato" "${P}" \
+    'bash /srv/vps-svc/onion-evolve/ops/update-bridge.sh --restart' "${J}" '        if os.path.basename(q) in names:' '        if False:'
+  _mgcase "(ato10) diretório só conhecido em runtime e o nome literal do script → julga a assinatura (VETO)" "2:ops/publish-door.sh --push é o ato" "${P}" \
+    'R=$(pwd); bash "$R/ops/publish-door.sh" onion-core --push' "${J}" \
+    '        named = [r for r in MOAT_ACTS if str(path).endswith("/" + os.path.basename(r))]' '        named = []'
+  _mgcase "(ato11) o mesmo, em ensaio → passa" 0 "${P}" \
+    'R=$(pwd); bash "$R/ops/publish-door.sh" --status' "${J}" \
+    '            _moat_act_judge(named[0], [a for a in words[k + 1:] if a], " ".join(words))' '            _moat_emit("ato", named[0], "", "x")'
+  _mgcase "(ato12) caminho do script só conhecido em runtime, com o nome no texto → FECHA" "2:script de ato" "${P}" \
+    'bash $(echo ops/update-bridge.sh)' "${J}" '        elif MOAT_ACTS and SUBST in str(path) and any(' '        elif False and any('
+  _mgcase "(ato13) script de ato pelo caminho duplo (ops//x.sh), que só o NOME no sinal leva ao juiz → VETO" "2:MOAT/ato" "${P}" \
+    'bash ops//publish-door.sh --all --push --version 1.2.3' "${H}" '          [ "$c" = ato ] && printf' '          false && printf'
+  # o mutante é a guarda por VOCABULÁRIO que o desenho recusa: o nome do script em qualquer lugar do texto veta
+  _mgcase "(ato14) echo e heredoc que CITAM o ato → passam (prosa não é invocação)" 0 "${P}" \
+    $'echo "rode bash ops/update-bridge.sh depois"; cat <<\'X\'\nbash ops/publish-door.sh --all --push\nX' "${J}" \
+    '    detail = " ".join(raw_words)' '    detail = " ".join(raw_words); [_moat_emit("ato", "x", "", "x") for r in MOAT_ACTS if os.path.basename(r) in raw]'
+  # (ato15) pr-merge-verified.sh FICA FORA por desenho (é o caminho verificado de merge, usado com o "sim" do maestro).
+  #       O "mutante" é o DADO: o mesmo hook, com uma linha `ato` dele no tsv, tem de vetar — prova que o passa é a
+  #       ausência da linha, e não um cego do juiz
+  local _pmr _pmm _pmi=1 _pmmrc=1
+  _pmr="$(_mgr "${d}/h" "${P}" "${P}" 'bash ops/pr-merge-verified.sh 1234 --sync')"
+  if _mgok 0 "${_pmr}"; then record_pass "moat-gate: (ato15) bash ops/pr-merge-verified.sh N --sync → passa (fora por desenho) (0)"; _pmi=0
+  else record_fail "moat-gate: (ato15) pr-merge-verified" "esperava 0, veio ${_pmr}"; fi
+  cp "${P}/ops/moat-targets.tsv" "${d}/tsv-intacto"
+  printf 'ato\tscript\tops/pr-merge-verified.sh\t@any\n' >> "${P}/ops/moat-targets.tsv"
+  _pmm="$(_mgr "${d}/h" "${P}" "${P}" 'bash ops/pr-merge-verified.sh 1234 --sync')"
+  _mgok 0 "${_pmm}" && _pmmrc=0
+  cp "${P}/ops/moat-targets.tsv" "${d}/tsv-mutante"; cp "${d}/tsv-intacto" "${P}/ops/moat-targets.tsv"
+  _prove_mutation "moat-gate: (ato15) pr-merge-verified fora (MUT: a linha ato no tsv)" "${d}/tsv-intacto" "${d}/tsv-mutante" "${_pmi}" "${_pmmrc}"
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
+  # (ato16) o ADOTANTE: sem ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/) o veto do ato não arma, e os
+  #       wrappers também não viajam. O "mutante" é o DADO de novo: o mesmo repo com o tsv e a linha `ato` veta
+  local _adr _adm _adi=1 _admrc=1
+  _adr="$(_mgr "${d}/h" "${d}/sem-tsv" "${d}/sem-tsv" 'bash ops/update-bridge.sh')"
+  if _mgok 0 "${_adr}"; then record_pass "moat-gate: (ato16) adotante sem o tsv: bash ops/update-bridge.sh → passa (0)"; _adi=0
+  else record_fail "moat-gate: (ato16) adotante" "esperava 0, veio ${_adr}"; fi
+  mkdir -p "${d}/sem-tsv/ops"; : > "${d}/tsv-adot-intacto"
+  printf 'ato\tscript\tops/update-bridge.sh\t@none\n' > "${d}/sem-tsv/ops/moat-targets.tsv"
+  _adm="$(_mgr "${d}/h" "${d}/sem-tsv" "${d}/sem-tsv" 'bash ops/update-bridge.sh')"
+  _mgok 0 "${_adm}" && _admrc=0
+  cp "${d}/sem-tsv/ops/moat-targets.tsv" "${d}/tsv-adot-mutante"; rm -rf "${d}/sem-tsv/ops"
+  _prove_mutation "moat-gate: (ato16) adotante (MUT: o tsv com a linha ato)" "${d}/tsv-adot-intacto" "${d}/tsv-adot-mutante" "${_adi}" "${_admrc}"
   _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
     'crontab -' "${H}" '[ -f "$tsv" ] || exit 0' 'true' "${d}/sem-tsv"
   local np; np="$(mktemp -d)"; local tl
@@ -10771,7 +10848,9 @@ EOF" "${L}" \
             'run(){ bash -c "$1"; }; run "sudo systemctl restart onion-vps-bridge"' 'f(){ shift; "$@"; }; f x systemctl status onion-vps-bridge' \
             'g() ( echo x ); function h { g "$@"; h; }; h a' "bash -c 'echo \"\$0 \$9 \${10} \$#\"' a b" \
             'gh pr view 1; gh(){ :; }; ( git(){ :; } ); if true; then r(){ echo "}"; }; fi; r; r(){ :; }' \
-            'alias q="bash -c"; q "echo x"; r(){ printf -v c "%s" "$1"; bash; }; echo ls | r x'; do
+            'alias q="bash -c"; q "echo x"; r(){ printf -v c "%s" "$1"; bash; }; echo ls | r x' \
+            'bash $(echo ops/update-bridge.sh)' 'R=$(pwd); bash "$R/ops/publish-door.sh" onion-core --push' \
+            "bash ${d}/scratch/ub-renomeado.sh" 'bash ops/chat-runner.sh install "$MODE"'; do
     _bug+="$(cd "${P}" && . "${d}/h/lib/invocation-lines.sh" && LC_ALL=C CLAUDE_PROJECT_DIR="${P}" ONION_CWD="${P}" ONION_INVOCATION_STRICT=1 \
       ONION_MOAT_JUDGE="${d}/h/lib/moat-judge.py" ONION_MOAT_TARGETS="${P}/ops/moat-targets.tsv" \
       ONION_MOAT_MEMBERS="${P}/docs/evolution/federation/members.yaml" onion_invocation_lines "${_c}" | grep '^__ONION_BUG__' || true)"
@@ -43723,6 +43802,65 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_veto_onfailure_selftests
+
+# ---------------------------------------------------------------------------
+# Modo act-signature (2026-11-05) — REGRA 117 (Ato de deploy tem assinatura no veto). A catraca da LISTA do veto do
+# ato (linhas `ato script` do ops/moat-targets.tsv, core-only): wrapper sem linha `ato`, linha sem script ou sem
+# assinatura, e palavra da assinatura fora do código do script. (a) o --selftest próprio (polaridades); (b) o modo
+# que a produção consome, no tsv REAL: rc 0 e nada; (c) o dispatcher do lint emite a REGRA 117 no tsv sem uma linha;
+# (m) cada cura revertida na cópia da guarda faz o caso nomeado reprovar.
+# ---------------------------------------------------------------------------
+run_act_signature_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/act-signature-check.sh"
+  [ -f "${chk}" ] || { record_fail "act-signature" "guarda ausente"; return; }
+  [ -f "${REPO_ROOT}/ops/moat-targets.tsv" ] || { record_fail "act-signature" "ops/moat-targets.tsv ausente (core-only)"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "act-signature: python3 ausente"; return; }
+  local o rc
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 8/8 verdes' <<< "${o}"; then
+    record_pass "act-signature: (a) --selftest verde (8: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante)"
+  else record_fail "act-signature: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/act-signature-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
+    record_pass "act-signature: (b) tsv real → rc 0, todo wrapper com linha ato e assinatura no código"
+  else record_fail "act-signature: (b) tsv real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
+  # (c) O CAMINHO DE PRODUÇÃO: o lint real, num sandbox com o tsv sem a linha ato do chat-runner, emite a REGRA 117
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/ops" "${sb}/.claude"
+  cp -r "${REPO_ROOT}/.claude/validation" "${sb}/.claude/"
+  cp "${REPO_ROOT}"/ops/*.sh "${sb}/ops/" 2>/dev/null
+  grep -v $'^ato\tscript\tops/chat-runner.sh\t' "${REPO_ROOT}/ops/moat-targets.tsv" > "${sb}/ops/moat-targets.tsv"
+  local l; l="$(cd "${sb}" && LC_ALL=C REPO_ROOT="${sb}" bash .claude/validation/lint-artifacts.sh --only="${sb}/ops/moat-targets.tsv" 2>&1 || true)"
+  if grep -q 'REGRA 117 (Ato de deploy tem assinatura no veto): \[wrapper-sem-ato\].*ops/chat-runner.sh' <<< "${l}"; then
+    record_pass "act-signature: (c) o lint de produção (dispatcher) emite a REGRA 117 quando um wrapper perde a linha ato"
+  else record_fail "act-signature: (c) dispatcher" "$(grep -E 'REGRA 117|HARD' <<< "${l}" | head -3 | cut -c1-200 | tr '\n' '|')"; fi
+  rm -rf "${sb}"
+  # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
+  sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
+  local s="${sb}/.claude/validation/act-signature-check.sh" old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "act-signature: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -ne 0 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "act-signature: (m) mutante morde → ✗ ${want}"
+    else record_fail "act-signature: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+    if w not in acts:$(printf '\x1f')    if False:$(printf '\x1f')(ii) wrapper sem linha ato acusa
+        if not re.search(r"(?<![\w-])" + re.escape(w) + r"(?![\w-])", code):$(printf '\x1f')        if False:$(printf '\x1f')(iii) assinatura que o código não tem acusa
+    if not os.path.isfile(p):$(printf '\x1f')    if False:$(printf '\x1f')(iv) linha ato de script inexistente acusa
+    if not words:$(printf '\x1f')    if False:$(printf '\x1f')(v) linha ato sem assinatura acusa
+        if w in ("@none", "@any"):$(printf '\x1f')        if False:$(printf '\x1f')(vi) @none e palavra do case
+                         if not l.lstrip().startswith("#"))$(printf '\x1f')                         if True)$(printf '\x1f')(vii) palavra só em COMENTÁRIO
+    if cls in ("deploy", "relogio") and col4 not in ("", "-"):$(printf '\x1f')    if cls in ("deploy", "relogio"):$(printf '\x1f')(vi) @none e palavra do case
+    sys.exit(0)                                  # adotante$(printf '\x1f')    pass                                  # adotante$(printf '\x1f')(viii) sem ops/moat-targets.tsv
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_act_signature_selftests
 
 # REGRA 115 (Hooks rodam python em modo isolado) — os vetos reais, com módulo sombra no diretório de trabalho.
 # Medido em 2026-11-04 (grafo guard-hooks-python-isolated-2026-11). Roda cada veto de verdade, numa CÓPIA da maquinaria

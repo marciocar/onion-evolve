@@ -26,8 +26,9 @@ selo no carimbo) vive em [`common:prompts:publish-doctrine`](../../commands/comm
 
 ## A lei (o que esta skill NÃO faz)
 
-- **Não empurra sem o "sim" do maestro.** O `--push` só é passado depois de uma AskUserQuestion
-  explícita (I3: um escritor por repo).
+- **Não empurra: quem empurra é o maestro.** O `--push` só existe depois de uma AskUserQuestion
+  explícita (I3: um escritor por repo), e quem o roda é o maestro, pelo `!` no prompt. Pela sessão, o
+  veto do MOAT barra o ato (REGRA 117 (Ato de deploy tem assinatura no veto)).
 - **Não publica fora da fonte.** Verifique `bash .claude/validation/onion-version.sh | grep '^role:'`.
   Se não for `source`, pare e explique que publicar portas é ato do core.
 
@@ -43,7 +44,8 @@ selo no carimbo) vive em [`common:prompts:publish-doctrine`](../../commands/comm
    PROPOSTA DA FAMÍLIA: o número é único nas quatro portas.
 4. **Confirmação e selo** (AskUserQuestion): porta, papel, pin, resumo do commit ensaiado e a versão.
    Opções: publicar como `onion-v<proposta>` (recomendada) · publicar com outro número · parar.
-5. **Publicação.** `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio> --version <número selado>`
+5. **Publicação, pelo maestro.** Entregue a linha para ele colar no prompt:
+   `! bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio> --version <número selado>`
    (a main que andou desde o ensaio recusa; sem `--version` o push recusa). O motor cria e confere a tag
    `onion-v<número>` na porta. Confira com `--status`.
    Para os plugins, quem instala usa `/plugin marketplace add marciocar/onion-plugins` +

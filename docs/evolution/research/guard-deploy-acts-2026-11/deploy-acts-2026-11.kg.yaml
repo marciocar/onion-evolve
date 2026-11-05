@@ -1,0 +1,232 @@
+# kg-backlog-guard: on
+# Forja de guarda (/meta:forge-guard): o veto do MOAT passa a barrar o ATO de deploy e de publicação, não só a forma.
+# Este grafo guarda o defeito medido, o substrato escolhido, as medidas da forja e o que a guarda não vê.
+meta:
+  id: guard-deploy-acts-2026-11
+  schema_version: "1"
+  baseline: "2026-11-05"
+  review_after: "2026-12-05"   # 30d: defeito de guarda
+  # ═══ TETO: 14 NÓS ═══
+nodes:
+  - id: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "famílias moat_gate e act_signature verdes (282 casos, 0 falhas), com mutante por caso; replay do corpus contra o hook antigo e o novo"
+    label: "o veto do MOAT barra, pela sessão, o ato de deploy e de publicação que os wrappers de ops/ fazem, e deixa passar o ensaio e a leitura deles"
+    narrative: "Aberta até a passada adversarial e o merge, que são do maestro. A guarda estende o pretooluse-moat-gate.sh com a classe ato, lida das linhas `ato script` do ops/moat-targets.tsv (core-only), e a REGRA 117 (Ato de deploy tem assinatura no veto) é a catraca da lista."
+  - id: E_DEFEITO_WRAPPER_FRONTEIRA_PARA_TUDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "hook da main 3f09996ab rodado com o JSON do PreToolUse: bash ops/update-bridge.sh, bash ops/stt-service.sh install --apply e bash ops/publish-door.sh onion-core --push saem rc 0"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "medido: o script versionado era fronteira para tudo, e o ato de deploy pelo wrapper e o push de porta passavam o veto com exit 0"
+    narrative: "Achado por leitura no estudo problem-route (CERCA.md, branch feat/problem-formula, formas P2 e P3: a cerca barra a forma, não o ato) e confirmado executando o hook. No corpus de transcripts a sessão rodou esses atos pelo Bash: stt-service.sh install --apply em 2026-10-19 e 10-20, install-caddy-config.sh e docker-engine-migrate.sh apply em 2026-10-22, update-bridge.sh em 2026-10-23 e --restart em 10-24, publish-door.sh --all --push em 2026-10-23, entre outros. Se cada um teve o sim do maestro, o hook não tinha como saber: é isso que a guarda corrige, mandando o ato para o `!`."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "replay do corpus de transcripts e execução do hook da main"
+      method: "medição: hook real, JSON do PreToolUse no stdin, rc lido; comando nunca executado"
+      locality: "repo"
+  - id: E_BANG_NAO_PASSA_PELOS_HOOKS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "60 comandos únicos do `!` no corpus reexecutados contra os 5 vetos de hoje: 28 vetariam, e os transcritos mostram a saída deles (ex.: `! sudo systemctl restart onion-vps-bridge` em 2026-10-22, CC 2.1.308, com o moat-gate registrado desde 2026-10-13)"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "medido no corpus: o comando que o maestro roda pelo `!` não passa pelos hooks de ferramenta, e por isso é o caminho dele para o ato"
+    narrative: "O `!` grava bash-input e bash-stdout no transcrito, sem rastro de hook. Os vetos que o barrariam hoje já estavam registrados na data: o restart da unidade servida, a escrita no .env do bridge pelo sed e o `gh pr merge` de repos alheios rodaram e deixaram saída. Não foi remedido na versão de hoje (2.1.318): medir exige o maestro digitar o `!`, e isso fica no teto."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "transcritos com bash-input, de 2026-10-08 a 2026-10-27"
+      method: "medição: replay dos comandos do `!` contra os hooks vigentes, saída lida no transcrito"
+      locality: "repo"
+  - id: D_ESTENDER_O_MOAT_GATE_POR_LINHA_ATO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "guard-census.sh: nenhuma guarda da classe; o moat-gate já tem o tokenizador que segue bash x, ./x, sh -c, cd, sudo, timeout, função e cópia; casos ato1 a ato17 da família moat_gate"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "substrato: estender o pretooluse-moat-gate.sh com a classe ato, julgada depois do corpo do script, e não criar hook irmão"
+    narrative: "Um irmão teria de reescrever o tokenizador e ficaria atrás dele em grafia. O ato se julga em _moat_script, depois do corpo: o script versionado continua fronteira para o ALVO, não para o ATO. O script se reconhece pelo caminho num checkout do projeto, pelo nome (o clone servido, a cópia fora do projeto) e pelo conteúdo igual (cópia renomeada). A assinatura é dado do tsv, lida na gramática de cada script: `--apply`, `--yes`, `apply`, `resume`, `--push`, `@none` quando o modo padrão é o ato, `@any`."
+  - id: D_PR_MERGE_VERIFIED_FICA_FORA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "caso ato15 da família (passa, e com a linha ato no tsv veta); merge-gate manda o merge para ops/pr-merge-verified.sh"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "ops/pr-merge-verified.sh fica fora do veto do ato: é o caminho verificado de merge, e a sessão o usa com o sim do maestro para os PRs deste repo"
+    narrative: "Barrá-lo mandaria todo merge para o `!` e tiraria do caminho a leitura do CI que só ele faz. Distinguir PR próprio de PR alheio pede o head do PR, que só a rede sabe, e um hook com rede é lento e falha. O merge alheio segue regra social, nomeada no teto C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL."
+  - id: D_ARGUMENTO_DE_RUNTIME_E_BASH_N_CALAM
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "1ª redação no replay: 144 vetos novos, 26 deles `bash -n` (só sintaxe) e 13 com argumento de runtime que era serviço, porta ou registro num laço; casos ato7 e ato17"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "argumento só conhecido em runtime e `bash -n` calam: a guarda erra para calar (cláusula 4 da guard-doctrine)"
+    narrative: "A 1ª redação fechava argumento de runtime e acusava `bash -n`, os dois falsos positivos medidos no corpus. O valor literal na própria string (`M=--apply; bash x $M`) o tokenizador resolve, e segue vetado."
+  - id: D_REGRA_117_CATRACA_DA_LISTA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "act-signature-check.sh --selftest 8/8; família act_signature com o dispatcher e 8 mutantes; tsv real rc 0 e nenhum achado"
+    trace: ".claude/validation/act-signature-check.sh"
+    label: "REGRA 117 (Ato de deploy tem assinatura no veto): wrapper de deploy sem linha ato, linha sem script ou sem assinatura, e palavra da assinatura fora do código do script são HARD"
+    narrative: "Guarda por lista morre pelo vocabulário: o wrapper novo nasceria fora do veto, e a assinatura com erro de digitação faria o veto calar. A regra confere a palavra no código sem comentário. Aplica-se só ao papel source: o tsv não viaja. O número 117 deixou o 116 livre para a forja irmã de memória, e o 114 está com a feat/guard-plugin-write."
+  - id: E_REPLAY_DO_CORPUS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "comandos Bash únicos do corpus que citam um script de ato, reexecutados contra o hook da main e o da branch: 1ª redação, 1.681 comandos e 144 vetos novos, 39 deles os falsos positivos curados em D_ARGUMENTO_DE_RUNTIME_E_BASH_N_CALAM; depois da cura, 1.690 comandos, 114 vetos novos, todos da classe ato, e nenhum veto perdido"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "replay: a guarda só acrescenta vetos, e os vetos novos que restam são atos de deploy ou push de porta rodados pela sessão"
+    narrative: "Os que restam são, por script: update-bridge, publish-door --push, chat-runner --apply, install-caddy-config, update-kg-writer, a2a-invite-live e a2a-queue-live --apply, stt-service --apply, caddy-site-secrets, docker-engine-migrate apply e resume, bridge-hardening --apply, workspace-adopt-sync apply e reapply. Inclui scripts de scratchpad que chamam o wrapper por dentro."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "replay do corpus, antes e depois da cura dos falsos positivos"
+      method: "medição: os dois hooks, mesmo JSON, mesmo cwd; comando nunca executado"
+      locality: "repo"
+  - id: E_LATENCIA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "probe com o JSON do PreToolUse, 50 formas: ~180 a 300 ms quando o comando cita um script de ato (vai ao juiz), ~100 ms quando não cita"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "latência: o comando que cita o NOME de um script de ato paga o juiz, ~200 ms; o resto segue no pré-filtro sem python"
+    narrative: "O nome entra no sinal do pré-filtro porque o script versionado não ia ao juiz. Custo: grep, git diff e leitura que citam o nome também pagam o juiz, e passam. Medido numa VPS compartilhada, sem isolar a carga."
+  - id: C_TETO_COPIA_MUDADA_E_RENOMEADA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "desenho de _moat_act_of: caminho, nome e conteúdo; cópia com outro nome e outro conteúdo não casa nenhum dos três"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "teto: a cópia de um wrapper que alguém MUDA e renomeia escapa do veto do ato; o corpo dela segue julgado por alvo, e a cópia versionada com outro nome não chega ao juiz"
+    narrative: "É laudering ativo: precisa escrever o script de novo. O veto por alvo cobre o que o corpo escreve quando não versionado. Gatilho para revisitar: um caso desses no corpus."
+  - id: C_TETO_ARGUMENTO_DE_FORA_DA_STRING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "caso ato7: `for s in a b; do bash ops/chat-runner.sh install \"$s\"; done` passa"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "teto: a assinatura que chega por variável de fora da string (arquivo, ambiente, laço) passa calada, por decisão"
+    narrative: "O replay mostrou só falsos positivos nessa forma. Gatilho: um ato real que tenha chegado assim."
+  - id: C_TETO_FORA_DO_BASH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "matcher do registro no settings.json: Bash; nenhum hook de ato vê MCP nem outro executor"
+    trace: ".claude/settings.json"
+    label: "teto: o veto só vê o Bash da sessão; um servidor MCP que executa comando, um interpretador que chama o wrapper por subprocess e o próprio wrapper chamado por outro programa ficam fora"
+    narrative: "Mesma fronteira do moat-gate inteiro (CERCA.md: nenhum hook de ato vê Write, Edit nem MCP). No adotante o veto do ato não arma: sem ops/moat-targets.tsv não há linha ato, e os wrappers também não viajam (casos ato16 e x1)."
+  - id: C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "D_PR_MERGE_VERIFIED_FICA_FORA; caso ato15"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "teto: o merge de PR de outra sessão pelo caminho verificado segue regra social, porque o hook não sabe de quem é o PR"
+    narrative: "Gatilho nomeado: um merge alheio pela sessão sem o sim do maestro, medido. A cura candidata é o próprio pr-merge-verified.sh conferir a autoria do PR, que ele já lê pela rede."
+  - id: C_TETO_BANG_NA_VERSAO_ATUAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-05"
+    verified_against: "E_BANG_NAO_PASSA_PELOS_HOOKS mede até a 2.1.308; a sessão roda a 2.1.318"
+    trace: ".claude/hooks/pretooluse-moat-gate.sh"
+    label: "teto: que o `!` não passa pelos hooks foi medido no corpus até a 2.1.308, não na 2.1.318"
+    narrative: "Se uma versão nova passar o `!` pelos hooks, o veto do ato barra o maestro também, e o /meta:cc-update deve remedir. Gatilho: o 1º `! bash ops/<wrapper>.sh --apply` do maestro depois do merge."
+edges:
+  - from: E_DEFEITO_WRAPPER_FRONTEIRA_PARA_TUDO
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: E_BANG_NAO_PASSA_PELOS_HOOKS
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: E_REPLAY_DO_CORPUS
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: E_LATENCIA
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: D_ESTENDER_O_MOAT_GATE_POR_LINHA_ATO
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: D_PR_MERGE_VERIFIED_FICA_FORA
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: SUPPORTS
+  - from: D_ARGUMENTO_DE_RUNTIME_E_BASH_N_CALAM
+    to: D_ESTENDER_O_MOAT_GATE_POR_LINHA_ATO
+    edge_type: SUPPORTS
+  - from: D_REGRA_117_CATRACA_DA_LISTA
+    to: D_ESTENDER_O_MOAT_GATE_POR_LINHA_ATO
+    edge_type: SUPPORTS
+  - from: C_TETO_COPIA_MUDADA_E_RENOMEADA
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: CONSTRAINS
+  - from: C_TETO_ARGUMENTO_DE_FORA_DA_STRING
+    to: D_ARGUMENTO_DE_RUNTIME_E_BASH_N_CALAM
+    edge_type: SUPPORTS
+  - from: C_TETO_FORA_DO_BASH
+    to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
+    edge_type: CONSTRAINS
+  - from: C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL
+    to: D_PR_MERGE_VERIFIED_FICA_FORA
+    edge_type: SUPPORTS
+  - from: C_TETO_BANG_NA_VERSAO_ATUAL
+    to: E_BANG_NAO_PASSA_PELOS_HOOKS
+    edge_type: CONSTRAINS

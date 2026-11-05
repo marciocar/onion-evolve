@@ -89,6 +89,7 @@ O driver opera num **degrau declarado**, nunca acima:
   | repo alheio (I3) | `git push` num clone de membro registrado; `git push` cujo destino é provadamente outro repositório | commit, branch e config LOCAIS num clone de adotante (é o `/meta:adopt --update`); `gh` escrevendo em repo alheio |
   | relógio (W7) | `crontab` que instala/edita/remove; `at`/`batch`; `systemd-run` com timer; `systemctl` que liga `.timer`; escrita em `/etc/cron*`, `/var/spool/cron` ou num `.timer` | as ferramentas `CronCreate`/`ScheduleWakeup` do Claude Code (o `/loop` é superfície legítima do maestro, e o hook não sabe quem o pediu) |
   | merge de path vendorizado | o merge no main (merge-gate) | o resto segue PARA em prosa |
+  | ato de deploy/publicação (2026-11-05) | invocar pela sessão um script de ato (`ato script` do `ops/moat-targets.tsv` (core-only)) com a assinatura do ato: `--apply`, `--push`, `apply`, ou sem argumento quando o modo padrão é o ato; o caminho, o nome (clone servido, `/tmp`) e o conteúdo (cópia renomeada) reconhecem o script; REGRA 117 (Ato de deploy tem assinatura no veto) é a catraca da lista | o ensaio e a leitura do mesmo script; `ops/pr-merge-verified.sh` (core-only) (o merge verificado, com o "sim" do maestro); cópia mudada e renomeada; o maestro pelo `!` no prompt, que não passa pelos hooks |
 
   **Motor que escreve por argumento (2026-10-15).** O motor de convites A2A (`a2a-invite.sh`) escreve o arquivo que
   recebe em `--file`, e o juiz só via escrita no verbo: medido, o motor chamado direto com `--file` no arquivo de

@@ -39,8 +39,10 @@ pelo `/meta:forge` em 2026-10-10. O caminho antigo de plugins agora passa por aq
 ## Degrau e limites
 
 - **Core-only.** Maestro-invocado. Publicar é ato voltado ao público (I3: um escritor por repo).
-- **O `--push` é a confirmação explícita.** Esta superfície **só** o passa depois de perguntar ao
-  maestro com AskUserQuestion. Sem ele, a rodada é ensaio.
+- **O `--push` é a confirmação explícita, e quem o roda é o maestro.** Esta superfície pergunta com
+  AskUserQuestion e, no "sim", entrega o comando exato para o maestro rodar pelo `!` no prompt. Pela
+  sessão, o veto do MOAT barra `publish-door.sh --push` (REGRA 117 (Ato de deploy tem assinatura no
+  veto)); o `!` não passa pelos hooks. Sem `--push`, a rodada é ensaio, e o ensaio a sessão roda.
 - **Não escreve no core.** Nenhum commit, tag, PR nem edição no `members.yaml`. O `onion_version` do
   registro virou cache, e quem diz a verdade é o carimbo publicado.
 - **Toda publicação é uma release** (cláusula 6 da doutrina, decisão do maestro de 2026-10-11). A
@@ -97,9 +99,9 @@ lido do carimbo remoto (`—` = porta sem release). Numa porta defasada, o estad
    **PROPOSTA DA FAMÍLIA**, porque o número é único nas quatro portas (mesmo numa porta só, a
    proposta já parte do máximo da família, e o motor recusa um número que outra porta usa noutro pin).
    Nunca assuma o número.
-4. **PUBLICAR** só com o "sim":
-   `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio> --version <número selado>`
-   O motor refaz a rodada inteira (verificação inclusa), empurra o ramo, cria a tag anotada
+4. **PUBLICAR** só com o "sim", pelo maestro: entregue a linha pronta para ele colar no prompt,
+   `! bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio> --version <número selado>`
+   (pela sessão o veto do ato barra; desde 2026-11-05). O motor refaz a rodada inteira (verificação inclusa), empurra o ramo, cria a tag anotada
    `onion-v<número>` com o changelog e confere os dois no remoto com `git ls-remote`. Se a verificação
    não pôde ser medida (por exemplo, sem a CLI `claude` nos plugins), o push é recusado. Se o ramo
    subir e a tag não for conferida, o rc é 4: re-rode com o **mesmo** número, que só empurra a tag.
