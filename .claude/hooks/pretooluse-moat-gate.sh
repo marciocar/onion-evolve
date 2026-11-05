@@ -36,8 +36,13 @@
 #    não rastreado, é lido e julgado. O ATO do wrapper (linhas `ato`) é julgado mesmo assim, versionado ou não.
 #  · Leitura: systemctl status/show/cat, journalctl, rsync para /tmp, git log/status/fetch num clone alheio.
 #  · Entrega sem commit num adotante (/meta:co-deliver copia para o inbound/ dele): cópia não é escrita git.
-#  · Sem ops/moat-targets.tsv (core-only) — adotante via /meta:adopt copia .claude/, não ops/ — o hook se
-#    DESARMA: os alvos são desta máquina, e vetar sem eles seria vetar à toa.
+#  · Sem ops/moat-targets.tsv (core-only) — adotante via /meta:adopt copia .claude/, não ops/ — o hook entra no MODO
+#    DERIVADO (2026-11-05, medido na curadoria: num adotante 27 de 31 formas de ato passavam por todos os hooks, e a
+#    saída antecipada derrubava também o relógio, que não depende do tsv). No derivado: o RELÓGIO veta (crontab,
+#    at/batch, systemd-run com timer, systemctl que liga .timer, escrita em /etc/cron* e num .timer sob systemd/);
+#    a PUBLICAÇÃO só AVISA (aprovação de ambiente, push de tag, visibilidade/descrição/tópicos do repo: decisão do
+#    maestro pelo kg-ssot, que veta isso com hook local próprio e as provas dele); deploy, repo alheio e ato ficam
+#    desarmados (os alvos são desta máquina, e o merge no adotante é outra forja).
 #  · Escape = o maestro roda o comando fora da sessão (`!` no prompt). Não há variável de bypass por
 #    desenho: escape que o modelo escreve na própria string é gate textual com outro nome. O `!` não passa
 #    pelos hooks de ferramenta: medido no corpus de transcripts em 2026-11-05, `! sudo systemctl restart
@@ -45,8 +50,10 @@
 input=$(cat)
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 tsv="${root}/ops/moat-targets.tsv"
-[ -f "$tsv" ] || exit 0
+derived=0
+[ -f "$tsv" ] || { derived=1; tsv=/dev/null; }     # modo derivado: ver a fronteira acima
 members="${root}/docs/evolution/federation/members.yaml"
+[ "$derived" = 1 ] && members=/dev/null
 here="$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=lib/invocation-lines.sh
 . "${here}/lib/invocation-lines.sh"
@@ -141,6 +148,9 @@ moat_cites_symlink() {
 [ "$hit" = 0 ] && grep -qE '(^|[;&|(`[:space:]])(at|batch)([[:space:]]|$)' <<< "$flat" && hit=1
 # (4) push: o destino estrangeiro é uma URL ou um remoto, que nenhum sinal literal da lista alcança
 [ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(push|send-pack)([^[:alnum:]_-]|$)' <<< "$flat" && hit=1
+# (6) publicação pela API do forge: aprovação de ambiente, visibilidade, descrição e tópicos do repo
+[ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(gh|curl)([^[:alnum:]_-]|$)' <<< "$flat" \
+  && grep -qE 'pending_deployments|repo[[:space:]]+edit|/topics|visibility|description|private' <<< "$flat" && hit=1
 [ "$hit" = 0 ] && exit 0
 
 # ── leitura exata do JSON + juiz ──────────────────────────────────────────────────────────────────────────
@@ -169,10 +179,22 @@ closed() {  # SEM tokenizador (python ausente/morto): fecha SÓ o que cita alvo 
 out=$(ONION_CWD="$hcwd" ONION_MOAT_JUDGE="${here}/lib/moat-judge.py" ONION_MOAT_TARGETS="$tsv" \
       ONION_MOAT_MEMBERS="$members" onion_invocation_lines "$cmd")
 grep -qx '__ONION_MOAT_OK__' <<< "$out" || closed "a análise não chegou ao fim"
-line=$(printf '%s\n' "$out" | grep -m1 '^__ONION_MOAT__' || true)
+if [ "$derived" = 1 ]; then   # no derivado só o relógio, a publicação e o inanalisável (que só o relógio torna relevante)
+  line=$(printf '%s\n' "$out" | grep -m1 -E $'^__ONION_MOAT__\t(relogio|publicacao|inanalisavel)\t' || true)
+else
+  line=$(printf '%s\n' "$out" | grep -m1 '^__ONION_MOAT__' || true)
+fi
 [ -z "$line" ] && exit 0
 IFS=$'\t' read -r _ cls target wrapper detail <<< "$line"
+if [ "$cls" = publicacao ] && [ "$derived" = 1 ]; then
+  # AVISO, não veto (decisão do maestro de 2026-11-05 pelo kg-ssot): additionalContext e exit 0, o canal do merge-gate
+  M="PUBLICAÇÃO (aviso do veto do MOAT, não veto): ${detail}. Isto é ato voltado ao público (${wrapper}). Neste repo derivado o core não barra; confira que o maestro autorizou e que as provas do próprio repo valem (PR mergeado, release declarada, verificação do espelho) antes de seguir." \
+    python3 -I -c 'import json,os; print(json.dumps({"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":os.environ["M"]}}, ensure_ascii=False))'
+  exit 0
+fi
 case "$cls" in
+  publicacao)
+    echo "GUARDA-PRETOOLUSE (MOAT/publicação): ${detail} — ato voltado ao público (${wrapper}: aprovação de ambiente, push de tag ou o que o público vê do repo) é do maestro. Negado pela sessão; peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks. A release do core sai por /meta:publish, que empurra a tag por dentro." >&2 ;;  # (core-only)
   deploy)
     if [ "$wrapper" != "-" ]; then
       how="o deploy deste alvo tem wrapper: bash ${wrapper} (core-only) — backup antes, conferência depois, rollback impresso"

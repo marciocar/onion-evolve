@@ -10830,8 +10830,86 @@ EOF" "${L}" \
   _mgok 0 "${_adm}" && _admrc=0
   cp "${d}/sem-tsv/ops/moat-targets.tsv" "${d}/tsv-adot-mutante"; rm -rf "${d}/sem-tsv/ops"
   _prove_mutation "moat-gate: (ato16) adotante (MUT: o tsv com a linha ato)" "${d}/tsv-adot-intacto" "${d}/tsv-adot-mutante" "${_adi}" "${_admrc}"
-  _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
-    'crontab -' "${H}" '[ -f "$tsv" ] || exit 0' 'true' "${d}/sem-tsv"
+  # ── a PUBLICAÇÃO sem script (2026-11-05): aprovação de ambiente, o que o público vê do repo, push de tag ──────
+  # No core, veto: o replay do corpus achou 0 aprovação de ambiente e 0 push de tag pela sessão do core.
+  _mgcase "(pub1) gh api POST pending_deployments (aprovar ambiente protegido) → VETO" "2:MOAT/publicação" "${P}" \
+    'gh api -X POST repos/o/r/actions/runs/123/pending_deployments -F environment_ids[]=1 -f state=approved' "${J}" \
+    '    if meth == "POST" and re.search(r"(^|/)actions/runs/[^/]+/pending_deployments$", ep):' '    if meth == "NUNCA" and re.search(r"(^|/)actions/runs/[^/]+/pending_deployments$", ep):'
+  _mgcase "(pub2) gh api GET pending_deployments (ler o que espera) → passa" 0 "${P}" \
+    'gh api repos/o/r/actions/runs/123/pending_deployments' "${J}" \
+    '    if meth == "POST" and re.search(r"(^|/)actions/runs/[^/]+/pending_deployments$", ep):' '    if re.search(r"(^|/)actions/runs/[^/]+/pending_deployments$", ep):'
+  _mgcase "(pub3) a mesma aprovação pela API REST crua (curl -X POST) → VETO" "2:MOAT/publicação" "${P}" \
+    "curl -s -X POST https://api.github.com/repos/o/r/actions/runs/9/pending_deployments -d '{\"state\":\"approved\"}'" "${J}" \
+    '            _moat_curl_pub(args, detail)' '            pass'
+  _mgcase "(pub4) gh repo edit --visibility public → VETO" "2:MOAT/publicação" "${P}" \
+    'gh repo edit o/r --visibility public --accept-visibility-change-consequences' "${J}" \
+    '("--visibility", "--description", "-d", "--add-topic", "--remove-topic")' '("--description", "-d", "--add-topic", "--remove-topic")'
+  _mgcase "(pub5) gh repo edit --default-branch (não é o que o público vê) → passa" 0 "${P}" \
+    'gh repo edit o/r --default-branch trunk' "${J}" \
+    $'        if hits:\n            _moat_emit("publicacao", "gh repo edit"' $'        if True:\n            _moat_emit("publicacao", "gh repo edit"'
+  _mgcase "(pub6) gh api PATCH repos/o/r -f visibility=public → VETO" "2:MOAT/publicação" "${P}" \
+    'gh api -X PATCH repos/o/r -f visibility=public' "${J}" \
+    '_MOAT_PUB_REPO_FIELDS = re.compile(r"^(visibility|private|' '_MOAT_PUB_REPO_FIELDS = re.compile(r"^(private|'
+  _mgcase "(pub7) git push de refs/tags/… → VETO" "2:git push de TAG" "${P}" \
+    'git push -q origin refs/tags/v9.9.9' "${J}" \
+    '            if side.startswith("refs/tags/") or side.startswith("tags/"):' '            if False:'
+  _mgcase "(pub8) tag criada na própria string e empurrada pelo nome → VETO" "2:git push de TAG" "${P}" \
+    'git tag -a v3.0.0 -m x && git push origin v3.0.0' "${J}" \
+    '            _MOAT_TAGS.add(pos[0])' '            pass'
+  # ── o modo DERIVADO (2026-11-05): sem ops/moat-targets.tsv o hook não sai mais; o relógio veta e a publicação avisa ──
+  # Medido na curadoria: num adotante 27 de 31 formas de ato passavam por todos os hooks. Fixture: repo `role: adopted`.
+  local AD="${d}/adot"
+  git init -q -b main "${AD}"; mkdir -p "${AD}/.claude" "${d}/adhome/.config/systemd/user"
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${AD}/.claude/.onion-version"
+  git -C "${AD}" remote add origin https://github.com/onion-bancada/adotado.git
+  git -C "${AD}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base; git -C "${AD}" tag v1.0.0
+  _mgcase "(der1) adotado: crontab -e → VETO (o relógio não depende do tsv)" "2:MOAT/relógio" "${AD}" \
+    'crontab -e' "${H}" '[ -f "$tsv" ] || { derived=1; tsv=/dev/null; }' '[ -f "$tsv" ] || exit 0' "${AD}"
+  _mgcase "(der2) adotado: unit .timer escrita por arquivo em systemd/user → VETO" "2:MOAT/relógio" "${AD}" \
+    "cat > ${d}/adhome/.config/systemd/user/backup.timer < t.txt" "${J}" \
+    '    if "relogio" in classes and any(c.endswith(".timer")' '    if False and any(c.endswith(".timer")' "${AD}"
+  _mgcase "(der3) adotado: systemctl --user enable --now x.timer → VETO" "2:MOAT/relógio" "${AD}" \
+    'systemctl --user enable --now backup.timer' "${J}" \
+    '        if u.endswith(".timer") and verb in _MOAT_TIMER_ARM:' '        if False:' "${AD}"
+  _mgcase "(der4) adotado: escrita em /etc/cron.d (o caminho de agendamento do sistema vale sem o tsv) → VETO" "2:MOAT/relógio" "${AD}" \
+    'sudo tee /etc/cron.d/backup < linha.txt' "${J}" \
+    '    if not any(c == "relogio" for c, _, _ in paths):' '    if False:' "${AD}"
+  _mgcase "(der5) adotado: crontab -l (leitura) → passa" 0 "${AD}" \
+    'crontab -l' "${J}" '    if rest and all(x in ("-l",) for x in rest):' '    if False:' "${AD}"
+  _mgcase "(der6) adotado: systemd-run --scope com teto de memória (o lab da casa, sem timer) → passa" 0 "${AD}" \
+    'systemd-run --user --scope -p MemoryMax=1G bash x.sh' "${J}" \
+    '        if any(a.startswith(_MOAT_TIMER_OPTS) for a in args):' '        if True:' "${AD}"
+  # der7/der8: a PUBLICAÇÃO no derivado AVISA (stdout com additionalContext, exit 0) — decisão do maestro pelo kg-ssot
+  _mgw() {  # <raiz> <comando> → "rc|stdout"
+    local rc=0 o
+    o="$(printf '%s' "$2" | W="$1" python3 -c 'import json,os,sys;print(json.dumps({"cwd":os.environ["W"],"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
+      | (cd "$1" && LC_ALL=C CLAUDE_PROJECT_DIR="$1" bash "$3/pretooluse-moat-gate.sh" 2>/dev/null))" || rc=$?
+    printf '%s|%s' "${rc}" "${o}"
+  }
+  local _wc _wn _wold _wnew _wr _wm _wi _wmr
+  for _wc in \
+    "der7|gh api -X POST repos/o/r/actions/runs/1/pending_deployments -f state=approved|${J}|    if meth == \"POST\" and re.search(r\"(^|/)actions/runs/[^/]+/pending_deployments\$\", ep):|    if False:" \
+    "der8|git push origin v1.0.0|${J}|        if where and where != UNKNOWN and _git([\"-C\", where, \"rev-parse\", \"-q\", \"--verify\", \"refs/tags/\" + name]) \\|        if False and _git([\"-C\", where, \"rev-parse\", \"-q\", \"--verify\", \"refs/tags/\" + name]) \\" \
+    "der9|git push origin v1.0.0|${H}|if [ \"\$cls\" = publicacao ] && [ \"\$derived\" = 1 ]; then|if false; then"; do
+    IFS='|' read -r _wn _wcmd _wrel _wold _wnew <<< "${_wc}"
+    _wr="$(_mgw "${AD}" "${_wcmd}" "${d}/h")"; _wi=1; _wmr=1
+    if [ "${_wr%%|*}" = 0 ] && case "${_wr#*|}" in *'PUBLICAÇÃO (aviso'*) true ;; *) false ;; esac; then
+      record_pass "moat-gate: (${_wn}) adotado: ${_wcmd} → AVISA e não barra (0)"; _wi=0
+    else record_fail "moat-gate: (${_wn}) adotado: ${_wcmd}" "esperava rc 0 com o aviso, veio ${_wr:0:200}"; fi
+    rm -rf "${d}/m"; cp -r "${d}/h" "${d}/m"
+    OLD="${_wold}" NEW="${_wnew}" python3 - "${d}/m/${_wrel}" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _wm="$(_mgw "${AD}" "${_wcmd}" "${d}/m")"
+    { [ "${_wm%%|*}" = 0 ] && case "${_wm#*|}" in *'PUBLICAÇÃO (aviso'*) true ;; *) false ;; esac; } && _wmr=0
+    _prove_mutation "moat-gate: (${_wn}) adotado: ${_wcmd} (MUT)" "${d}/h/${_wrel}" "${d}/m/${_wrel}" "${_wi}" "${_wmr}"
+  done
+  # (x1) até 2026-11-05 o hook se DESARMAVA sem o tsv e este caso dizia "passa"; agora o relógio veta no derivado
+  _mgcase "(x1) adotante SEM ops/moat-targets.tsv e sem carimbo de papel: crontab - → VETO (modo derivado)" "2:MOAT/relógio" "${d}/sem-tsv" \
+    'crontab -' "${H}" '[ -f "$tsv" ] || { derived=1; tsv=/dev/null; }' '[ -f "$tsv" ] || exit 0' "${d}/sem-tsv"
   local np; np="$(mktemp -d)"; local tl
   for tl in bash cat grep head dirname git tr cut awk sed sort paste; do ln -s "$(command -v "${tl}")" "${np}/${tl}"; done
   _mgcase "(x2) SEM python3: restart de unidade servida → FECHA" "2:python3 ausente" "${P}" \
