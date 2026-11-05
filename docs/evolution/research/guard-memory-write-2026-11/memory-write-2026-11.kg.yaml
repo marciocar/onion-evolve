@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 16 NÓS ═══
+# ═══ TETO: 17 NÓS ═══
+# +1 (2026-11-05): E_ADOTANTE_NA_BANCADA, requisito do líder (a guarda tem de valer num repo adotado).
 meta:
   id: memory-write-2026-11
   schema_version: "1"
@@ -195,6 +196,23 @@ nodes:
     confidence: 0.5
     label: "Gatilho nomeado: se o replay futuro medir uma nota de memória com regra plantada por conteúdo lido de fora SEM envelope (o caso parafraseado), ou se o harness passar a envolver o resultado de WebFetch/MCP numa marca estável, reabre-se a forma HARD. Até lá, a proveniência fica SOFT."
 
+  - id: E_ADOTANTE_NA_BANCADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    valid_from: "2026-11-05"
+    verified_at: "2026-11-05"
+    verified_against: "ONION_SELFTEST_FAMILIES=memory_write_guard LC_ALL=C bash .claude/validation/lint-selftest.sh → 26 passaram; com o matcher reduzido a Bash, (c) e (e) reprovam"
+    label: "Num adotante (role: adopted), montado só com o que o vendor-manifest do papel leva (sem ops/) e com o registro trazido pelo merge-onion-hooks.sh para um settings.json que já tinha hook próprio: o Write com envelope sai rc 2, o Edit sem proveniência avisa, a nota datada cala, o hook do adotante continua lá e o lint dele emite a REGRA 116. O manifesto dos papéis adopted, standalone, hub e plugins leva os três arquivos; a porta mini não leva hooks nem settings.json."
+    narrative: "Requisito do líder em 2026-11-05, vindo da medida da curadoria: num adotante, 27 de 31 formas de ato passavam por todos os hooks. O hook não lê o carimbo de papel, então o comportamento é o mesmo em todo papel, por desenho. Mutante manual: com o matcher do settings.json reduzido a Bash, os casos (c) e (e) reprovaram; o arquivo foi restaurado."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_memory_write_guard_selftests, caso (e)"
+      method: "measurement: só a família, com ulimit -v e timeout -k; vendor-manifest.sh --list por papel"
+      locality: "repo"
+
 edges:
   - from: E_DEFEITO_MEMGHOST_NO_CLAUDE_CODE_SDK
     to: D_SOFT_PROVENIENCIA_HARD_ENVELOPE
@@ -232,3 +250,6 @@ edges:
   - from: Q_ELENXO_PENDENTE
     to: D_SOFT_PROVENIENCIA_HARD_ENVELOPE
     edge_type: DEPENDS_ON
+  - from: E_ADOTANTE_NA_BANCADA
+    to: D_HOOK_NO_SETTINGS_DO_PROJETO
+    edge_type: SUPPORTS
