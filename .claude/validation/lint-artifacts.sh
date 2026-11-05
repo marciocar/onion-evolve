@@ -6408,6 +6408,37 @@ check_memory_write_scan() {
 }
 check_memory_write_scan
 
+# REGRA 117 — Ato de deploy tem assinatura no veto [HARD + SOFT]
+# previne: um wrapper de deploy nascer, ou ter a gramática mudada, fora do veto do ATO do pretooluse-moat-gate.sh
+#   DEFEITO MEDIDO (2026-11-05, grafo guard-deploy-acts-2026-11): o wrapper versionado era fronteira para tudo, e
+#   `bash ops/<wrapper>.sh --apply` e `ops/publish-door.sh --push` passavam o veto com exit 0. O veto do ato lê as (core-only)
+#   linhas `ato script` do ops/moat-targets.tsv (core-only); esta regra é a catraca da LISTA: wrapper sem linha `ato`,
+#   linha sem script ou sem assinatura, e palavra da assinatura que o código do script não tem. Sem o tsv (adotante)
+#   não há objeto e não julga. Lógica, polaridades e teto em act-signature-check.sh; "não pôde julgar" (rc 2) sai SOFT.
+# aplica-se: source
+check_act_signature() {
+  local helper="${SCRIPT_DIR}/act-signature-check.sh"
+  local tsv="${REPO_ROOT}/ops/moat-targets.tsv"  # (core-only)
+  [ -f "${helper}" ] && [ -f "${tsv}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${tsv}"|*/act-signature-check.sh|"${REPO_ROOT}"/ops/*.sh) : ;; *) return 0 ;; esac
+  fi
+  local _R="REGRA 117 (Ato de deploy tem assinatura no veto)"
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path%:*}" "${_R}: [${_code}] ${_path##*:}: ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "SOFT" "${helper}" "${_R}: [NAO-VERIFICADO] a guarda não pôde julgar (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_act_signature
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

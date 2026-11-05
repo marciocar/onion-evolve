@@ -20,20 +20,28 @@
 #            PR lá (o /meta:adopt --update e o desenvolvimento do bridge fazem isso da sessão do core).
 #  relogio · crontab que instala/edita; at/batch; systemd-run com timer; systemctl que liga .timer;
 #            escrita em /etc/cron*, /var/spool/cron ou num .timer.
+#  ato     · (2026-11-05, REGRA 117) invocar pela sessão um script de ops/ cujo uso É o deploy ou a publicação, com a
+#            assinatura do ato nos argumentos (`--apply`, `--push`, `apply`, sem argumento…): as linhas `ato script` do
+#            tsv. Medido: o wrapper versionado era fronteira para tudo, e `bash ops/<wrapper>.sh --apply` e (core-only)
+#            `ops/publish-door.sh --push` passavam com exit 0. A cerca barrava a FORMA, não o ATO. Ensaio e leitura (core-only)
+#            do mesmo script passam. `ops/pr-merge-verified.sh` fica fora (é o caminho verificado de merge, usado (core-only)
+#            pela sessão com o "sim" do maestro).
 # O juiz mora em lib/moat-judge.py e roda DENTRO do tokenizador de lib/invocation-lines.sh (linhas de
 # invocação: heredoc inerte, echo e prosa que CITAM o alvo não vetam; `bash -c`, `sudo -u`, `$(…)`,
 # variável literal, `cd`, symlink, script fora do projeto e função definida na própria string — a chamada é
 # emulada com os argumentos dela, SAC-148 — são seguidos).
 #
 # ── O QUE NÃO VETA (fronteira declarada) ─────────────────────────────────────────────────────────────────
-#  · Wrapper versionado: `bash ops/update-kg-writer.sh` (core-only) passa — script RASTREADO pelo git deste
-#    projeto é fronteira, como no merge-gate. Script fora do projeto, ou não rastreado, é lido e julgado.
+#  · Wrapper versionado é fronteira para o ALVO: o que ele escreve por dentro não é julgado. Script fora do projeto, ou
+#    não rastreado, é lido e julgado. O ATO do wrapper (linhas `ato`) é julgado mesmo assim, versionado ou não.
 #  · Leitura: systemctl status/show/cat, journalctl, rsync para /tmp, git log/status/fetch num clone alheio.
 #  · Entrega sem commit num adotante (/meta:co-deliver copia para o inbound/ dele): cópia não é escrita git.
 #  · Sem ops/moat-targets.tsv (core-only) — adotante via /meta:adopt copia .claude/, não ops/ — o hook se
 #    DESARMA: os alvos são desta máquina, e vetar sem eles seria vetar à toa.
 #  · Escape = o maestro roda o comando fora da sessão (`!` no prompt). Não há variável de bypass por
-#    desenho: escape que o modelo escreve na própria string é gate textual com outro nome.
+#    desenho: escape que o modelo escreve na própria string é gate textual com outro nome. O `!` não passa
+#    pelos hooks de ferramenta: medido no corpus de transcripts em 2026-11-05, `! sudo systemctl restart
+#    onion-vps-bridge` (2026-10-22, CC 2.1.308) rodou com este hook registrado desde 2026-10-13, e ele o veta.
 input=$(cat)
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 tsv="${root}/ops/moat-targets.tsv"
@@ -58,6 +66,9 @@ signal=$(
           case "$p" in "$HOME"/*) printf '%s\n' "~/${p#"$HOME"/}" ;; esac
           # o componente só de padrão SEM glob: `onion-` (de /usr/local/sbin/onion-*) casaria a casa inteira
           b="${p%/}"; b="${b##*/}"; [ "$c" = deploy ] && [ "$g" = 0 ] && [ "${#b}" -ge 4 ] && [ "$b" != onion ] && printf '%s\n' "$b"
+          # o script de ATO pelo nome (`cd ops && ./x.sh`, o clone servido, a cópia em /tmp): versionado, ele não
+          # chegaria ao juiz pelo ramo (3), que só manda o que NÃO é rastreado
+          [ "$c" = ato ] && printf '%s\n' "$b"
         done
     # o membro `kind: source` é ESTE projeto: no sinal, ele mandava ao python 15.837 dos 35.092 comandos do corpus
     [ -f "$members" ] && awk '
@@ -175,6 +186,13 @@ case "$cls" in
       *)    how="empurre uma branch de tópico e abra PR lá (o PR é o gate do repo alheio), ou o maestro roda fora da sessão (\`!\` no prompt)" ;;
     esac
     echo "GUARDA-PRETOOLUSE (MOAT/repo alheio): ${detail} — ${target} não é este projeto (I3: a sessão do core não escreve repo alheio). Negado; ${how}." >&2 ;;
+  ato)
+    case "$wrapper" in
+      @any)  how="este script roda o ato em qualquer invocação" ;;
+      @none) how="sem argumento ele roda o modo padrão, que é o ato; o ensaio ou a leitura dele (--help, --check, plan, verify) passa" ;;
+      *)     how="sem ${wrapper} é ensaio ou leitura, e isso passa" ;;
+    esac
+    echo "GUARDA-PRETOOLUSE (MOAT/ato): ${detail} — deploy, publicação e push de porta são do maestro, e o wrapper versionado não os torna da sessão (REGRA 117; alvos em ops/moat-targets.tsv, core-only). Negado pela sessão; ${how}. Peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks: \`! <o mesmo comando>\`. Porta se publica por /meta:publish, que pergunta antes do --push." >&2 ;;  # (core-only)
   relogio)
     echo "GUARDA-PRETOOLUSE (MOAT/relógio): ${detail} — agendar por relógio (${target}) é W7: o Onion é maestro-invocado, nunca cron/timer sobre si. Negado; agendamento é do maestro, fora da sessão (\`!\` no prompt)." >&2 ;;
   *)

@@ -6,6 +6,11 @@
 #   tipo    unit (nome de unidade systemd/container, glob, sem .service) | path (caminho, glob; vale ele e o
 #           que estiver abaixo dele)
 #   wrapper o ops/<script> que faz este deploy com backup e conferência, ou `-` (não há: é do maestro)
+# Classe `ato` (2026-11-05, REGRA 117): tipo `script`, padrão = o script de ops/ cujo uso É o deploy ou a publicação, e a
+#   4ª coluna é a ASSINATURA do ato, palavras separadas por vírgula: o ato acontece se algum argumento for uma delas
+#   (`--apply`, `apply`, `--push`; `--x=v` conta como `--x`), `@none` = invocado sem argumento (o modo padrão é o ato),
+#   `@any` = qualquer invocação. Sem a assinatura, é ensaio ou leitura e passa. O ato é do maestro: pela sessão o veto
+#   barra, e o maestro roda pelo `!` no prompt, que não passa pelos hooks de ferramenta (medido no corpus em 2026-11-05).
 # O alvo mais ESPECÍFICO vence (padrão mais longo), então a linha do wrapper vem junto da genérica.
 #
 # DE ONDE SAEM (medido em 2026-10-13, nunca de memória):
@@ -104,3 +109,22 @@ deploy	path	/usr/local/sbin/onion-*	-
 relogio	path	/etc/cron*	-
 relogio	path	/var/spool/cron	-
 relogio	path	/etc/anacrontab	-
+# ── ATOS (classe ato): o deploy e a publicação são do maestro, e o wrapper versionado não os torna da sessão ──
+#   Medido em 2026-11-05 (estudo problem-route, CERCA.md): com o wrapper sendo fronteira, `bash ops/<wrapper>.sh --apply`
+#   e `ops/publish-door.sh --push` passavam com exit 0. As assinaturas saem da gramática de cada script, lida no código.
+#   caddy-site-secrets.sh não é wrapper de nenhuma linha acima, mas escreve /etc/caddy/secrets (gera segredo): ato.
+#   pr-merge-verified.sh fica FORA de propósito: é o caminho verificado de merge, que a sessão usa com o "sim" do maestro.
+ato	script	ops/update-bridge.sh	@none,--restart
+ato	script	ops/update-kg-writer.sh	@any
+ato	script	ops/deploy-site.sh	@none,deploy
+ato	script	ops/install-caddy-config.sh	@none,install
+ato	script	ops/caddy-site-secrets.sh	@any
+ato	script	ops/docker-engine-migrate.sh	apply,resume
+ato	script	ops/workspace-adopt-sync.sh	apply,reapply
+ato	script	ops/migrate-python-service.sh	--yes
+ato	script	ops/a2a-invite-live.sh	--apply
+ato	script	ops/a2a-queue-live.sh	--apply
+ato	script	ops/bridge-hardening.sh	--apply
+ato	script	ops/chat-runner.sh	--apply
+ato	script	ops/stt-service.sh	--apply
+ato	script	ops/publish-door.sh	--push
