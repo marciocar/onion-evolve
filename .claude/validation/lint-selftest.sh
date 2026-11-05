@@ -44865,7 +44865,8 @@ run_memory_write_guard_selftests() {
   # (b2) O MODO QUE A PRODUÇÃO CONSOME, na árvore real: rc 0, e toda linha (se houver, só numa máquina com memória) é SOFT envelope.
   #      CAMINHO LITERAL: a REGRA 59 casa a invocação para achar o par.
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/memory-write-scan-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && ! grep -v "^SOFT"$'\t'"envelope"$'\t' <<< "${o}" | grep -q .; then
+  local o_bad; o_bad="$(grep -v "^SOFT"$'\t'"envelope"$'\t' <<< "${o}" || true)"
+  if [ "${rc}" -eq 0 ] && [ -z "${o_bad}" ]; then
     record_pass "memory-write-guard: (b2) árvore real no modo --format tsv → rc 0, só linhas SOFT envelope (ou nenhuma)"
   else record_fail "memory-write-guard: (b2) árvore real" "rc=${rc}; [$(head -3 <<< "${o}" | tr '\n' '|')]"; fi
   # (c) REGISTRO: o veto no PreToolUse(Write|Edit|MultiEdit|Bash) com onFailure: block (REGRA 101), e a varredura no SessionStart
