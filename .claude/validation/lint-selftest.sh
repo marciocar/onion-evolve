@@ -34250,6 +34250,30 @@ run_house_codes_gen_selftests() {
      && grep -q '"\.claude/validation/house-codes\.tsv|\${SCRIPT_DIR}/house-codes-gen\.sh|' "${SCRIPT_DIR}/lint-artifacts.sh"; then
     record_pass "house-codes-gen: (e) house-codes.tsv em dia com o vocabulário e listado na REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md))"
   else record_fail "house-codes-gen: (e) catraca" "house-codes.tsv defasado (rode house-codes-gen.sh --write) ou ausente da lista da REGRA 62"; fi
+  # (f) A PORTA standalone: leva o TSV e o gerador, não os grafos. O esquema fica sem termo e o gerador sai rc 1. A
+  #     MESMA árvore na fonte acusa (é o controle), com o carimbo da porta a regra sai 'NÃO SE APLICA'. (f-m) sem a
+  #     declaração `# aplica-se:` a acusação volta.
+  local sd _ctl _door _mut
+  sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  mkdir -p "${sd}/vendor"; cp -r "${root}/vendor/kg-ssot" "${sd}/vendor/kg-ssot"
+  printf 'scheme\tesquema-do-core\talta\tx\tx\tx\n%s\n%s\n' "${B}" "${E}" > "${sd}/.claude/validation/house-codes.tsv"
+  printf 'porta\n' > "${sd}/CLAUDE.md"
+  ( cd "${sd}" && git init -q . && git add .claude/validation/house-codes.tsv ) >/dev/null 2>&1
+  _ctl="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  printf 'framework: onion-standalone\nsource_commit: abc\nrole: standalone\nkind: door\n' > "${sd}/.claude/.onion-version"
+  _door="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'linha scheme sem nenhum termo' <<< "${_ctl}" && grep -q '^NÃO SE APLICA: REGRA 62 ' <<< "${_door}" \
+     && ! grep -q 'linha scheme sem nenhum termo' <<< "${_door}"; then
+    record_pass "house-codes-gen: (f) o esquema sem termo acusa na fonte e a REGRA 62 sai 'NÃO SE APLICA' na porta standalone"
+  else record_fail "house-codes-gen: (f) porta" "fonte: $(grep -c 'linha scheme sem nenhum termo' <<< "${_ctl}") · porta: $(grep -E 'REGRA 62|scheme sem' <<< "${_door}" | head -2 | cut -c1-160 | tr '\n' '|')"; fi
+  # o mutante apaga a declaração só desta regra: a linha logo abaixo do `# previne:` dela
+  sed -i '/^# previne: projeção gerada que envelhece calada/{n;/^# aplica-se: source$/d}' "${sd}/.claude/validation/lint-artifacts.sh"
+  _mut="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'linha scheme sem nenhum termo' <<< "${_mut}"; then
+    record_pass "house-codes-gen: (f-m) mutante sem o '# aplica-se:' da REGRA 62 reprova a porta de novo"
+  else record_fail "house-codes-gen: (f-m) mutante" "a porta seguiu calada sem a declaração: $(grep -E 'REGRA 62' <<< "${_mut}" | head -1 | cut -c1-160)"; fi
+  rm -rf "${sd}"
   unset -f _hcg_tsv _hcg_term
   unset ONION_VOCAB_ROOT ONION_HOUSE_CODES_TSV
 }
@@ -39323,10 +39347,11 @@ run_adopter_shape_selftests() {
   _as_ratchet "(f) mensagem do lint que cita ops/ ausente no adotante" "$(_as_ops "${lo}" "${cl}")" "${_AS_PENDING_OPS}"
 
   # (g) as regras sem objeto no papel saem "NÃO SE APLICA" — contadas à parte, nunca como SOFT
-  if grep -q '^NÃO SE APLICA: REGRA 85 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 92 ' "${lo}" \
-     && grep -qE '^  Não se aplica  : 2 ' "${lo}" && ! grep -qE '^VIOLATION: .*REGRA (85|92) ' "${lo}"; then
-    record_pass "adopter-shape: (g) as REGRAS 85 e 92 saem 'NÃO SE APLICA' no adotante (2, fora do total), sem VIOLATION"
-  else record_fail "adopter-shape: (g)" "$(grep -E 'SE APLICA|REGRA (85|92) |Não se aplica' "${lo}" | head -4 | cut -c1-200 | tr '\n' ' ')"; fi
+  if grep -q '^NÃO SE APLICA: REGRA 62 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 85 ' "${lo}" \
+     && grep -q '^NÃO SE APLICA: REGRA 92 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 109 ' "${lo}" \
+     && grep -qE '^  Não se aplica  : 4 ' "${lo}" && ! grep -qE '^VIOLATION: .*REGRA (62|85|92|109) ' "${lo}"; then
+    record_pass "adopter-shape: (g) as REGRAS 62, 85, 92 e 109 saem 'NÃO SE APLICA' no adotante (4, fora do total), sem VIOLATION"
+  else record_fail "adopter-shape: (g)" "$(grep -E 'SE APLICA|REGRA (62|85|92|109) |Não se aplica' "${lo}" | head -6 | cut -c1-200 | tr '\n' ' ')"; fi
 
   # (h) o que a ADOÇÃO escreve no adotante (não vendorizado: a semente do KG, os starters de docs/evolution,
   #     o .githooks) não manda rodar ops/ sem o marcador (core-only) — a REGRA 100 só varre o que viaja
@@ -42829,6 +42854,32 @@ run_claude_md_size_selftests() {
   if o="$(LC_ALL=C bash "${sd}/.claude/validation/claude-md-size-check.sh" --selftest 2>&1)" || ! grep -q '✗ claude-md-size: (a)' <<< "${o}"; then
     record_fail "claude-md-size: (m) mutante sem o teto" "o --selftest passou com o teto desligado"
   else record_pass "claude-md-size: (m) mutante sem o teto reprova o (a)"; fi
+  rm -rf "${sd}"
+  # (d) A PORTA standalone: a subida do teto citando um nó de grafo que não viaja, contra o teto publicado. A MESMA
+  #     árvore julgada na fonte acusa (é o controle: o arranjo reproduz o defeito), e com o carimbo da porta a regra
+  #     sai 'NÃO SE APLICA'. (d-m) sem a declaração `# aplica-se:` a acusação volta.
+  sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  printf 'ceiling: 90\n' > "${sd}/.claude/validation/claude-md-size-ceiling.txt"
+  printf 'porta\n' > "${sd}/CLAUDE.md"
+  ( cd "${sd}" && git init -q -b main . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base \
+    && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+  printf 'ceiling: 100\nraise: 2026-10-27 +10 D_SO_NO_GRAFO_DO_CORE motivo\n' > "${sd}/.claude/validation/claude-md-size-ceiling.txt"
+  ( cd "${sd}" && git add -A && git -c user.email=t@t -c user.name=t commit -qm teto ) >/dev/null 2>&1
+  local _ctl _door _mut
+  _ctl="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  printf 'framework: onion-standalone\nsource_commit: abc\nrole: standalone\nkind: door\n' > "${sd}/.claude/.onion-version"
+  _door="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'REGRA 109 .*TETO-SUBIU-SEM-NO' <<< "${_ctl}" && grep -q '^NÃO SE APLICA: REGRA 109 ' <<< "${_door}" \
+     && ! grep -q '^VIOLATION: .*REGRA 109 ' <<< "${_door}"; then
+    record_pass "claude-md-size: (d) a subida do teto com nó fora da árvore acusa na fonte e sai 'NÃO SE APLICA' na porta standalone"
+  else record_fail "claude-md-size: (d) porta" "fonte: $(grep -c 'TETO-SUBIU-SEM-NO' <<< "${_ctl}") · porta: $(grep -E 'REGRA 109' <<< "${_door}" | head -2 | cut -c1-160 | tr '\n' '|')"; fi
+  # o mutante apaga a declaração só desta regra: a linha logo abaixo do `# previne:` dela
+  sed -i '/^# previne: o arquivo que carrega em TODA sessão/{n;/^# aplica-se: source$/d}' "${sd}/.claude/validation/lint-artifacts.sh"
+  _mut="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'REGRA 109 .*TETO-SUBIU-SEM-NO' <<< "${_mut}"; then
+    record_pass "claude-md-size: (d-m) mutante sem o '# aplica-se:' da REGRA 109 reprova a porta de novo"
+  else record_fail "claude-md-size: (d-m) mutante" "a porta seguiu calada sem a declaração: $(grep -E 'REGRA 109' <<< "${_mut}" | head -1 | cut -c1-160)"; fi
   rm -rf "${sd}"
 }
 _family run_claude_md_size_selftests
