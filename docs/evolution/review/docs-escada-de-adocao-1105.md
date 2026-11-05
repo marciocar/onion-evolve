@@ -2,7 +2,8 @@
 branch: docs/escada-de-adocao-1105
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6ee7b3c3b9dba8a17477a59d5c344bd6f75a561a6a3b49e66e2e829a83eab906
+reviewed_code_sha256: 53a1d83b63bdb7589568a47f96e0c0c5362bcf843a4bb56392d919abd5b3aa9c
 findings_total: 2
 findings_real: 2
 tokens: 0
