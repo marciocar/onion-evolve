@@ -23,7 +23,13 @@
 #   · `cp -r`, `mv`, `ln -s`, `rsync` de pasta que JÁ TEM a forma de plugin, quando ela cai como `.claude/skills/<nome>`, e de pasta
 #     CHAMADA `hooks` ou `.claude-plugin`, quando ela cai dentro de uma skill;
 #   · `-t` em qualquer grafia de mv, cp, ln e install; chaves em mkdir, touch, tee, cp, mv, install, ln e rsync; `&>`, `&>>` e `>|`;
-#   · `>& nome` e o redirecionamento nu (`> x`), também depois de `then`, `do`, `else`, `{`, `!`, crase e de atribuição (`A=1 > x`); `cd` com flag (`cd -P x`); `ln -s ALVO` de um argumento, que nasce no diretório atual;
+#   · `>& nome` e o redirecionamento nu (`> x`), também depois de `then`, `do`, `else`, `{`, `!`, crase, `case …)`, `time`, `coproc` e de
+#     atribuição (`A=1 > x`); o redirecionamento de composto (`( ) >`, `{ } >`, `for … done >`, `if … fi >`, `case … esac >`); o
+#     redirecionamento COLADO à palavra anterior (`echo x>f`, `ls>f`, `x>>f`, `x>|f`, `x>&f`, `"x">f`, `a1>f`, `` `x`>f ``), fora de aspas;
+#     `cd` com flag (`cd -P x`); `ln -s ALVO` de um argumento, que nasce no diretório atual;
+#   · chaves de sequência (`{h..h}ooks`, `{g..i..1}`), com o mesmo teto de 256 palavras das de vírgula, e chave literal (`{x}`) antes
+#     de uma que expande;
+#   · a raiz cujo `.git` é link quebrado, no Write e no Bash;
 #   · link: o `cwd` em `.claude`, a palavra sem barra que é link (`> docs-l`), o `cd` para link, e a pasta de fora de uma skill que é link.
 #
 # ── O QUE CALA (falso positivo é o defeito dominante aqui) ────────────────────────────────
@@ -43,8 +49,8 @@
 #   Tudo o que não é forma listada passa. Em Bash a lista falha pelo vocabulário. NÃO vê, com caso TETO no --selftest: script
 #   versionado, `python3 x.py`, `base64 -d | sh`, `git apply`, `git clone`, `git checkout`, `tar` e `unzip` na pasta de skills sem a
 #   forma no destino, nome calculado em runtime, nome com valores distintos na string (ramo de `if`, reatribuição, `for`: a última
-#   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, e
-#   redirecionamento composto (`{ } >`, `( ) >`, `for … done >`, `if … fi >`, `<>`, `exec 3>`). Também escapam: alias de
+#   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, `<>`
+#   e `exec 3>`. Também escapam: alias de
 #   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, e programa que escreve por dentro.
 #   FAMÍLIAS DECLARADAS, sem perseguir (guarda por lista), com caso que grava de verdade e confere que a varredura acusa o resultado:
 #   python indireto, `git mv`, `git worktree add`, `git submodule add`, `git restore`, `tar -x`, `unzip`, `sed w`, `sort -o`.
@@ -55,7 +61,8 @@
 #   `.claude/skills/self -> ../..` faz o `hooks/` da raiz barrar, como a S6.
 #   FORMAS DE ESTOURO, também declaradas: 3.000 `$(` na mesma string; `sh -c` aninhado 12 vezes, que só fecha com o sinal no texto; script
 #   solto maior que 512 KiB, que o juiz não lê; e a cláusula 4 da guard-doctrine: sem python ou sem a lib, o Bash só fecha com o
-#   caminho inteiro junto de verbo de escrita, sem provar a raiz, e todo o resto passa. O teste de link olha só as 256 primeiras
+#   caminho inteiro junto de verbo de escrita, sem provar a raiz, e todo o resto passa. JSON truncado: no Bash, o que vem depois da
+#   chave é o comando; no Write, o campo do caminho não fecha e o hook sai rc 0 (caso TETO no --selftest). O teste de link olha só as 256 primeiras
 #   palavras do comando. `git init` e a escrita na MESMA string: a raiz ainda não existe quando o juiz olha.
 #   O processo de um mod e um MCP de escrita ficam fora do PreToolUse. O hook é de projeto: cai junto com o settings.json
 #   (a própria medição gravou `.claude/settings.json` e o hook do arquivo de segredos sem barreira nenhuma). A metade que não depende
@@ -76,6 +83,7 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 _pw_is_root() {
   local b
   [ -e "$1/.git" ] && return 0
+  [ -L "$1/.git" ] && return 0                         # `.git` que é link quebrado: o `-e` o perde, e o juiz (lexists) barra
   for b in "${CLAUDE_PROJECT_DIR:-}" "${HOME:-}"; do
     [ -n "${b}" ] || continue
     [ "$1" = "${b}" ] && return 0
@@ -166,6 +174,7 @@ if [ "${1:-}" = "--selftest" ]; then
   git init -q -b feat "${d}/outro"
   ln -s "${p}/.claude/skills/x/hooks/h" "${p}/docs-l"                      # em dois tempos: o link já existe, e a palavra não tem barra
   ln -s "${p}/.claude/skills/x/hooks" "${p}/hk"
+  mkdir -p "${d}/gitlink/.claude/skills"; ln -s "${d}/nada" "${d}/gitlink/.git"   # `.git` como link quebrado: o bash `-e` o perde
   P=".claude/skills/x/.claude-plugin/plugin.json"; H=".claude/skills/x/hooks/hooks.json"
   _run() {  # _run <tool> <valor> [cwd] — o JSON como o runner entrega, pela entrada padrão
     local tool="$1" val="$2" cwd="${3:-${p}}"
@@ -337,6 +346,48 @@ open(p,'w').write('x')\""
   _c acusa "> nu depois de atribuição"    Bash  "A=1 > ${H}"
   _c acusa ">> nu depois de duas atribuições" Bash "A=1 B=2 >> ${H}"
   _c acusa "> nu depois de atribuição, cwd na skill" Bash "A=1 > hooks" "${p}/.claude/skills/x"
+  _c acusa "> nu depois de case …)"       Bash  "case a in a) > ${H};; esac"
+  _c acusa "> nu depois de time"          Bash  "time > ${H}"
+  _c acusa "> nu depois de coproc"        Bash  "coproc > ${H}"
+  _c acusa "for … done > alvo"            Bash  "for i in 1; do echo x; done > ${H}"
+  _c acusa "{ } > alvo"                   Bash  "{ echo x; } > ${H}"
+  _c acusa "( ) > alvo"                   Bash  "( echo x ) > ${H}"
+  _c acusa "if … fi > alvo"               Bash  "if true; then echo x; fi > ${H}"
+  _c acusa "case … esac > alvo"           Bash  "case a in a) echo x;; esac > ${H}"
+  # ── o redirecionamento COLADO à palavra anterior: o bash o lê igual ao separado ──
+  _c acusa "colado: echo x>alvo"          Bash  "echo x>${H}"
+  _c acusa "colado: ls>alvo"              Bash  "ls>${H}"
+  _c acusa "colado: printf x>>alvo"       Bash  "printf x>>${H}"
+  _c acusa "colado: echo x>|alvo"         Bash  "echo x>|${H}"
+  _c acusa "colado: echo x>&alvo"         Bash  "echo x>&${H}"
+  _c acusa "colado: echo x&>alvo"         Bash  "echo x&>${H}"
+  _c acusa "colado: aspas antes de >"     Bash  "echo \"x\">${H}"
+  _c acusa "colado: cat>alvo com heredoc" Bash  "cat>${H} <<E
+{}
+E"
+  _c acusa "colado: til"                  Bash  "echo x>~/.claude/skills/hs/hooks"
+  _c acusa "colado: .claude-plugin"       Bash  "echo x>.claude/skills/x/.claude-plugin"
+  _c acusa "colado: cd e ; colados"       Bash  "cd .claude/skills/x;echo x>hooks"
+  _c acusa "colado: variável entre aspas" Bash  "F=${H};echo x>\"\$F\""
+  _c acusa "colado: em bash -c"           Bash  "bash -c 'echo x>${H}'"
+  _c acusa "colado: palavra que termina em dígito" Bash "echo a1>${H}"
+  _c acusa "colado: atribuição que termina em dígito" Bash "A=1>${H}"
+  _c acusa "colado: depois de 2>&1"       Bash  "echo x 2>&1>${H}"
+  _c acusa "colado: subshell"             Bash  "(echo x)>${H}"
+  _c acusa "colado: aspa escapada não abre aspas" Bash "echo \\'a>${H}"
+  _c acusa "colado: crase que fecha"      Bash  "echo \`echo x\`>${H}"
+  _c acusa "colado: \$( ) que fecha"      Bash  "echo \"\$(echo x)\">${H}"
+  _c acusa "colado: dentro de crase"      Bash  "echo \`echo x>${H}\`"
+  _c acusa "colado: python com -> segue julgado pela árvore" Bash "python3 -c \"def f()->int: return 1
+open('${H}','w')\""
+  # ── chaves de sequência e chave literal antes da que expande ──
+  _c acusa "chaves de sequência: {h..h}ooks" Bash "mkdir -p .claude/skills/x/{h..h}ooks"
+  _c acusa "chaves de sequência com passo" Bash "mkdir -p .claude/skills/x/{g..i..1}ooks"
+  _c acusa "chaves de sequência além do teto fecham" Bash "mkdir -p .claude/skills/x/{1..999}"
+  _c acusa "chave literal antes da que expande" Bash "mkdir -p .claude/skills/{x}/{hooks,b}"
+  # ── a raiz com `.git` que é link quebrado ──
+  _c acusa ".git como link quebrado: Write" Write "${d}/gitlink/.claude/skills/y/hooks/h"
+  _c acusa ".git como link quebrado: Bash" Bash "printf x > ${d}/gitlink/.claude/skills/y/hooks/h"
   _c acusa "chaves estouradas não abortam: cd e >" Bash "touch /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; cd .claude/skills/x; echo x > hooks/h"
   _c acusa "chaves estouradas não abortam: link" Bash "touch /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; echo x > docs/lnk-hooks/r"
   _c acusa "chaves estouradas não abortam: variável" Bash "mkdir -p /tmp/{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}{a,b}; N=hooks; touch .claude/skills/x/\$N/h"
@@ -400,6 +451,24 @@ open(p,'w').write('x')\""
   _c cala "> nu depois de atribuição, fora da forma" Bash "A=1 > /tmp/z; echo ${H}"
   _c cala "then só citado antes de >"      Bash  "echo then > /tmp/z; echo ${H}"
   _c cala "> nu dentro de aspas"           Bash  "echo 'if true; then > ${H}; fi'"
+  _c cala "colado: fd 2> fora"            Bash  "echo x 2>/tmp/z; echo ${H}"
+  _c cala "colado: > fora"                Bash  "echo x>/tmp/z; echo ${H}"
+  _c cala "colado: entre aspas simples"   Bash  "echo 'a>${H}'"
+  _c cala "colado: entre aspas duplas"    Bash  "echo \"a->${H}\""
+  _c cala "colado: barra invertida"       Bash  "echo a\\>${H}"
+  _c cala "colado: git commit -m com seta" Bash "git commit -m \"a->${H}\""
+  _c cala "colado: corpo de heredoc de documento" Bash "cat > docs/a.md <<'E'
+x>${H}
+E"
+  _c cala "colado: cwd na pasta hooks, x>&2" Bash "echo x>&2" "${p}/.claude/skills/w/hooks"
+  _c cala "colado: cwd na pasta hooks, x>&-" Bash "echo x>&-" "${p}/.claude/skills/w/hooks"
+  _c cala "colado: cwd na pasta hooks, x2>&1" Bash "echo x 2>&1" "${p}/.claude/skills/w/hooks"
+  _c cala "} > fora"                      Bash  "{ echo x; } > /tmp/z; echo ${H}"
+  _c cala "done > fora"                   Bash  "for i in 1; do echo x; done > /tmp/z; echo ${H}"
+  _c cala "chaves de sequência sem a forma" Bash "mkdir -p .claude/skills/x/{1..3}"
+  _c cala "chaves de sequência inválida ficam literais" Bash "mkdir -p .claude/skills/x/{a..}hooks"
+  _c cala "chaves de sequência mista ficam literais" Bash "mkdir -p .claude/skills/x/{h..1}ooks"
+  _c cala "sequência além do teto fora de skills" Bash "echo skills; mkdir -p docs/{1..999}"
   _c cala "cd -P noutra pasta e >"         Bash  "cd -P docs && echo x > hooks"
   _c cala "ln -s de um argumento: pasta sem forma" Bash "ln -s ../../../../fora/vazia" "${p}/.claude/skills/onion"
   _c cala "cwd em .claude/hooks: >"        Bash  "echo x > a" "${p}/.claude/hooks"
@@ -543,9 +612,6 @@ open(p,'w')\""
   _c TETO "chaves no destino"              Bash  "cp /tmp/a .claude/skills/x/{hooks,y}/h"
   _c TETO "awk print > literal"            Bash  "awk 'BEGIN{print \"x\" > \"${H}\"}'"
   _c TETO "perl -i"                        Bash  "perl -pi -e s/a/b/ ${H}"
-  _c TETO "for … done > alvo"              Bash  "for i in 1; do echo x; done > ${H}"
-  _c TETO "{ } > alvo"                     Bash  "{ echo x; } > ${H}"
-  _c TETO "( ) > alvo"                     Bash  "( echo x ) > ${H}"
   _c TETO "truncate sobre link"            Bash  "truncate -s0 docs-l"
   _c TETO "env -C sobre link"              Bash  "env -C hk sh -c 'true'"
   _c TETO "link por glob"                  Bash  "echo x > docs-?"
@@ -598,7 +664,8 @@ E"
   _raw() {  # _raw <esperado rc> <nome> <json> [dir-do-hook] [PATH]
     local want="$1" name="$2" json="$3" hook="${4:-${BASH_SOURCE[0]}}" pth="${5:-${PATH}}" rc=0
     case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
-    printf '%s' "${json}" | CLAUDE_PROJECT_DIR="${rawproj:-${p}}" HOME="${rawhome:-${d}/home}" PATH="${pth}" bash "${hook}" >/dev/null 2>&1 || rc=$?
+    # o hook cai no diretório de quem chama quando o JSON não traz `cwd`: a bancada fixa o projeto, rodando de qualquer pasta
+    printf '%s' "${json}" | ( cd "${p}" && CLAUDE_PROJECT_DIR="${rawproj:-${p}}" HOME="${rawhome:-${d}/home}" PATH="${pth}" bash "${hook}" ) >/dev/null 2>&1 || rc=$?
     if [ "${rc}" -eq "${want}" ]; then printf 'ok   %-5s %s\n' "$([ "${want}" = 2 ] && echo acusa || echo cala)" "${name}"
     else printf '✗    %-5s %s (rc=%s)\n' "${want}" "${name}" "${rc}"; fails=$((fails + 1)); fi
   }
@@ -664,6 +731,8 @@ E"
   # JSON truncado em Bash: o que veio depois da chave é o comando
   _raw 2 "JSON truncado: Bash no alvo barra" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h'
   _raw 0 "JSON truncado: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"cat .claude/skills/x/hooks/h'
+  # TETO: o Write com JSON truncado não tem campo que feche, e sai rc 0 (declarado no cabeçalho)
+  _raw 0 "TETO JSON truncado: Write no alvo passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h'
   if [ "${fails}" -eq 0 ]; then echo "plugin-write-guard --selftest: OK"; exit 0; fi
   echo "plugin-write-guard --selftest: ${fails} falha(s)"; exit 1
 fi

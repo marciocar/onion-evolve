@@ -50782,7 +50782,8 @@ run_plugin_write_guard_selftests() {
   # (a) a CÓPIA LIMPA, no mesmo arranjo dos mutantes e com LC_ALL=C, verde ANTES de contar qualquer morto
   _pw_tree "${d}/limpa"
   local out rc
-  rc=0; out="$(LC_ALL=C bash "${d}/limpa/.claude/hooks/pretooluse-plugin-write-guard.sh" --selftest 2>&1)" || rc=$?
+  # de uma pasta FORA de git: o caso de JSON sem `cwd` media o diretório de quem chama (refutador de 2026-11-05)
+  rc=0; out="$(cd "${d}" && LC_ALL=C bash "${d}/limpa/.claude/hooks/pretooluse-plugin-write-guard.sh" --selftest 2>&1)" || rc=$?
   local n_accuse n_silent n_ceiling
   n_accuse="$(printf '%s\n' "${out}" | grep -c '^ok   acusa' || true)"; n_silent="$(printf '%s\n' "${out}" | grep -c '^ok   cala' || true)"; n_ceiling="$(printf '%s\n' "${out}" | grep -c '^TETO' || true)"
   if [ "${rc}" -eq 0 ] && [ "${n_accuse}" -ge 60 ] && [ "${n_silent}" -ge 60 ] && [ "${n_ceiling}" -ge 20 ]; then
@@ -50933,7 +50934,7 @@ open(p, "w", encoding="utf-8").write(s.replace(a, b))' "${file}"; then
     fi
     local entry="${sb}/.claude/hooks/pretooluse-plugin-write-guard.sh"
     [ "${which}" = scan ] && entry="${sb}/.claude/validation/plugin-write-scan-check.sh"
-    rc=0; out="$(PW_SELFTEST_ONLY="${case_name}" LC_ALL=C bash "${entry}" --selftest 2>&1)" || rc=$?
+    rc=0; out="$(cd "${d}" && PW_SELFTEST_ONLY="${case_name}" LC_ALL=C bash "${entry}" --selftest 2>&1)" || rc=$?
     if [ "${rc}" -ne 0 ] && printf '%s\n' "${out}" | grep '^✗' | grep -qF "${case_name}"; then
       n_mut=$((n_mut + 1)); record_pass "plugin-write-guard: (f) ${id} morde: \"${case_name}\" reprova com a cura revertida"
     else
@@ -51108,6 +51109,16 @@ EOF_MUT
 [ -e "$1/.git" ] && return 0
 @@@
 return 0
+EOF_MUT
+  _pw_mut M29j-git-link-quebrado hook '.git como link quebrado: Write' <<'EOF_MUT'
+  [ -L "$1/.git" ] && return 0
+@@@
+  :
+EOF_MUT
+  _pw_mut M32-raw-fora-de-git hook 'JSON truncado: Bash no alvo barra' <<'EOF_MUT'
+printf '%s' "${json}" | ( cd "${p}" && CLAUDE_PROJECT_DIR=
+@@@
+printf '%s' "${json}" | ( CLAUDE_PROJECT_DIR=
 EOF_MUT
   _pw_mut M29h-git-arquivo hook 'Write em worktree' <<'EOF_MUT'
 [ -e "$1/.git" ] && return 0
@@ -51650,6 +51661,99 @@ EOF_MUT
 ([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)
 @@@
 ([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)?)
+EOF_MUT
+  # ── o redirecionamento colado, o fecho de composto, as chaves de sequência (refutador de 2026-11-05) ──
+  _pw_mut J33-colado judge 'colado: echo x>alvo' <<'EOF_MUT'
+    t = _pw_unglue(t)
+@@@
+    pass
+EOF_MUT
+  _pw_mut J33b-digito-da-palavra judge 'colado: palavra que termina em dígito' <<'EOF_MUT'
+                glued = prev not in _PW_GLUE_FREE and prev not in ("", "&")
+@@@
+                glued = False
+EOF_MUT
+  _pw_mut J33c-aspas judge 'colado: python com -> segue julgado pela árvore' <<'EOF_MUT'
+            q = c; out.append(c); i += 1; continue
+@@@
+            out.append(c); i += 1; continue
+EOF_MUT
+  _pw_mut J33d-crase judge 'colado: crase que fecha' <<'EOF_MUT'
+                glued = bt % 2 == 0
+@@@
+                glued = False
+EOF_MUT
+  _pw_mut J33e-barra judge 'colado: aspa escapada não abre aspas' <<'EOF_MUT'
+        if c == "\\" and i + 1 < n:
+            out.append(t[i:i + 2]); i += 2; continue
+        if c == "$"
+@@@
+        if c == "$"
+EOF_MUT
+  _pw_mut J34-fecho judge '( ) > alvo' <<'EOF_MUT'
+    t = _PW_BARE_AFTER_CLOSE.sub(r"\1\2: ", t)
+@@@
+    pass
+EOF_MUT
+  _pw_mut J34b-case judge '> nu depois de case …)' <<'EOF_MUT'
+re.compile(r"(\)|(?:time|
+@@@
+re.compile(r"((?:time|
+EOF_MUT
+  _pw_mut J34c-time judge '> nu depois de time' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|\})
+@@@
+(?:coproc|fi|done|esac|\})
+EOF_MUT
+  _pw_mut J34d-coproc judge '> nu depois de coproc' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|\})
+@@@
+(?:time|fi|done|esac|\})
+EOF_MUT
+  _pw_mut J34e-fi judge 'if … fi > alvo' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|\})
+@@@
+(?:time|coproc|done|esac|\})
+EOF_MUT
+  _pw_mut J34f-done judge 'for … done > alvo' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|\})
+@@@
+(?:time|coproc|fi|esac|\})
+EOF_MUT
+  _pw_mut J34g-esac judge 'case … esac > alvo' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|\})
+@@@
+(?:time|coproc|fi|done|\})
+EOF_MUT
+  _pw_mut J34h-chave judge '{ } > alvo' <<'EOF_MUT'
+(?:time|coproc|fi|done|esac|\})
+@@@
+(?:time|coproc|fi|done|esac)
+EOF_MUT
+  _pw_mut J35-sequencia judge 'chaves de sequência: {h..h}ooks' <<'EOF_MUT'
+parts = m.group(1).split(",") if "," in m.group(1) else _pw_seq(m.group(1))
+@@@
+parts = m.group(1).split(",") if "," in m.group(1) else None
+EOF_MUT
+  _pw_mut J35b-passo judge 'chaves de sequência com passo' <<'EOF_MUT'
+(?:\.\.(-?\d+))?$")
+@@@
+$")
+EOF_MUT
+  _pw_mut J35c-literal judge 'chave literal antes da que expande' <<'EOF_MUT'
+            todo.append(w[:m.start()] + "\x01" + m.group(1) + "\x02" + w[m.end():])
+@@@
+            out.append(w)
+EOF_MUT
+  _pw_mut J35d-teto-sequencia judge 'chaves de sequência além do teto fecham' <<'EOF_MUT'
+            parts = [""] * (_PW_BRACE_MAX + 1)
+@@@
+            parts = []
+EOF_MUT
+  _pw_mut J35e-mista judge 'chaves de sequência mista ficam literais' <<'EOF_MUT'
+_PW_SEQ = re.compile(r"^(?:(-?\d+)\.\.(-?\d+)|([A-Za-z])\.\.([A-Za-z]))
+@@@
+_PW_SEQ = re.compile(r"^(?:(-?\d+)\.\.(-?\d+)|([A-Za-z0-9])\.\.([A-Za-z0-9]))
 EOF_MUT
   _pw_mut J29g-raiz-arquivo judge 'GIT_DIR no ambiente: Bash na worktree barra' <<'EOF_MUT'
 if os.path.lexists(os.path.join(prefix, ".git")):
