@@ -24,12 +24,15 @@
 #     CHAMADA `hooks` ou `.claude-plugin`, quando ela cai dentro de uma skill;
 #   · `-t` em qualquer grafia de mv, cp, ln e install; chaves em mkdir, touch, tee, cp, mv, install, ln e rsync; `&>`, `&>>` e `>|`;
 #   · `>& nome` e o redirecionamento nu (`> x`), também depois de `then`, `do`, `else`, `{`, `!`, crase, `case …)`, `time`, `coproc` e de
-#     atribuição (`A=1 > x`); o redirecionamento de composto (`( ) >`, `{ } >`, `for … done >`, `if … fi >`, `case … esac >`); o
+#     atribuição (`A=1 > x`); o redirecionamento de composto (`( ) >`, `{ } >`, `for … done >`, `if … fi >`, `case … esac >`), também com
+#     redirecionamento de ENTRADA antes (`done < a > x`, `( ) </dev/null > x`); `exec > x`, `exec 1> x` e `exec 3> x`; o
 #     redirecionamento COLADO à palavra anterior (`echo x>f`, `ls>f`, `x>>f`, `x>|f`, `x>&f`, `"x">f`, `a1>f`, `` `x`>f ``), fora de aspas;
 #     `cd` com flag (`cd -P x`); `ln -s ALVO` de um argumento, que nasce no diretório atual;
 #   · chaves de sequência (`{h..h}ooks`, `{g..i..1}`), com o mesmo teto de 256 palavras das de vírgula, e chave literal (`{x}`) antes
 #     de uma que expande;
 #   · a raiz cujo `.git` é link quebrado, no Write e no Bash;
+#   · `curl` e `wget` com a opção colada (`-so x`, `-fsSLo x`, `-o.claude/…`, `wget -qO x`, `-O.claude/…`); `mkfifo` e `mknod` na forma;
+#     `$'\x68ooks'` (o prepass do lib decodifica) e `$"hooks"` (sem catálogo, o bash grava o texto) no caminho;
 #   · link: o `cwd` em `.claude`, a palavra sem barra que é link (`> docs-l`), o `cd` para link, e a pasta de fora de uma skill que é link.
 #
 # ── O QUE CALA (falso positivo é o defeito dominante aqui) ────────────────────────────────
@@ -49,8 +52,8 @@
 #   Tudo o que não é forma listada passa. Em Bash a lista falha pelo vocabulário. NÃO vê, com caso TETO no --selftest: script
 #   versionado, `python3 x.py`, `base64 -d | sh`, `git apply`, `git clone`, `git checkout`, `tar` e `unzip` na pasta de skills sem a
 #   forma no destino, nome calculado em runtime, nome com valores distintos na string (ramo de `if`, reatribuição, `for`: a última
-#   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, `<>`
-#   e `exec 3>`. Também escapam: alias de
+#   atribuição não prova, então cala, e isto é falso negativo aceito), glob e chaves no destino, `awk`, `perl -i`, `ed`, `patch`, `<>`,
+#   `tar -c`/`--create` com o arquivo na forma e `git -C … init` na forma. Também escapam: alias de
 #   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, e programa que escreve por dentro.
 #   FAMÍLIAS DECLARADAS, sem perseguir (guarda por lista), com caso que grava de verdade e confere que a varredura acusa o resultado:
 #   python indireto, `git mv`, `git worktree add`, `git submodule add`, `git restore`, `tar -x`, `unzip`, `sed w`, `sort -o`.
@@ -58,7 +61,8 @@
 #   Declarados, sem perseguir: cwd que é link; verbos fora da lista sobre link (`truncate`, `sort -o`, `env -C`); link em código (`python3 -c`,
 #   `perl -e`); link por glob ou variável (`docs-?`, `D=docs; cd $D`); chaves em `curl -o`, `wget -P` e `dd of=`; atribuição com espaço antes de
 #   um redirecionamento nu (`A='a b' > x`). E uma sobreacusação rara:
-#   `.claude/skills/self -> ../..` faz o `hooks/` da raiz barrar, como a S6.
+#   `.claude/skills/self -> ../..` faz o `hooks/` da raiz barrar, como a S6. Duas mais, com caso SOBREACUSA no --selftest: o `tee` que só
+#   lê o texto de `<<< "…/hooks"`, e a vírgula escapada nas chaves (`{hooks\,y}`), porque o shlex come a barra antes do juiz.
 #   FORMAS DE ESTOURO, também declaradas: 3.000 `$(` na mesma string; `sh -c` aninhado 12 vezes, que só fecha com o sinal no texto; script
 #   solto maior que 512 KiB, que o juiz não lê; e a cláusula 4 da guard-doctrine: sem python ou sem a lib, o Bash só fecha com o
 #   caminho inteiro junto de verbo de escrita, sem provar a raiz, e todo o resto passa. JSON truncado: no Bash, o que vem depois da
@@ -149,6 +153,7 @@ _pw_deny() {
 # ───────────────────────────── selftest ─────────────────────────────
 if [ "${1:-}" = "--selftest" ]; then
   export LC_ALL=C
+  self="${here}/${BASH_SOURCE[0]##*/}"                  # absoluto: o `_raw` muda de pasta, e `bash x.sh --selftest` relativo dava rc 127
   fails=0; d="$(mktemp -d)"; trap 'rm -rf "${d}"' EXIT
   p="${d}/proj"; mkdir -p "${p}/.claude/skills/onion" "${p}/.claude/hooks" "${p}/docs" "${p}/tools" "${p}/scratch" "${d}/home/.claude/skills/x" "${d}/fora/ext/.claude-plugin" "${d}/fora/exth/hooks" "${d}/fora/vazia" "${p}/.claude/skills/w/hooks" "${p}/.claude/skills/x"
   git -C "${p}" init -q -b feat
@@ -184,7 +189,7 @@ k={"Bash":"command","NotebookEdit":"notebook_path"}.get(t,"file_path")
 ti={k:v}
 if t=="Write": ti["content"]="cita .claude/skills/x/hooks/h e \"file_path\": \"/x/.claude/skills/y/hooks/z\""
 print(json.dumps({"session_id":"s","hook_event_name":"PreToolUse","tool_name":t,"tool_input":ti,"cwd":c}))' "${tool}" "${val}" "${cwd}" \
-      | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" bash "${BASH_SOURCE[0]}" 2>/dev/null
+      | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" bash "${self}" 2>/dev/null
   }
   # _c <acusa|cala|TETO> <nome> <tool> <valor> [cwd]
   _c() {
@@ -354,6 +359,24 @@ open(p,'w').write('x')\""
   _c acusa "( ) > alvo"                   Bash  "( echo x ) > ${H}"
   _c acusa "if … fi > alvo"               Bash  "if true; then echo x; fi > ${H}"
   _c acusa "case … esac > alvo"           Bash  "case a in a) echo x;; esac > ${H}"
+  # ── composto com redirecionamento de ENTRADA antes do `>` (refutador 5) ──
+  _c acusa "while … done < a > alvo"      Bash  "while read l; do echo \$l; done < docs/a.md > ${H}"
+  _c acusa "for … done <a >alvo"          Bash  "for i in 1; do echo x; done <docs/a.md >${H}"
+  _c acusa "{ } < a > alvo"               Bash  "{ cat; } < docs/a.md > ${H}"
+  _c acusa "( ) </dev/null >alvo"         Bash  "( echo x ) </dev/null >${H}"
+  _c acusa "select … done </dev/null > alvo" Bash "select i in a; do break; done </dev/null > ${H}"
+  _c acusa "< a > alvo nu"                Bash  "cd docs; < a.md > ../${H}"
+  # ── curl e wget com a opção colada; \$'…' e \$\"…\" no caminho; mkfifo; exec ──
+  _c acusa "curl -so alvo"                Bash  "curl -so ${H} https://exemplo.invalid/x"
+  _c acusa "curl -fsSLo alvo"             Bash  "curl -fsSLo ${H} https://exemplo.invalid/x"
+  _c acusa "curl -o colado"               Bash  "curl -o${H} https://exemplo.invalid/x"
+  _c acusa "wget -qO alvo"                Bash  "wget -qO ${H} https://exemplo.invalid/x"
+  _c acusa "wget -O colado"               Bash  "wget -O${H} https://exemplo.invalid/x"
+  _c acusa "ANSI-C no caminho: \$'\\x68ooks'" Bash "echo x > .claude/skills/x/\$'\\x68ooks'"
+  _c acusa "locale no caminho: \$\"hooks\"" Bash "echo x > .claude/skills/x/\$\"hooks\""
+  _c acusa "mkfifo na forma"              Bash  "mkfifo .claude/skills/x/hooks"
+  _c acusa "exec > alvo"                  Bash  "exec > ${H}"
+  _c acusa "exec 1> alvo"                 Bash  "exec 1> ${H}"
   # ── o redirecionamento COLADO à palavra anterior: o bash o lê igual ao separado ──
   _c acusa "colado: echo x>alvo"          Bash  "echo x>${H}"
   _c acusa "colado: ls>alvo"              Bash  "ls>${H}"
@@ -469,6 +492,15 @@ E"
   _c cala "chaves de sequência inválida ficam literais" Bash "mkdir -p .claude/skills/x/{a..}hooks"
   _c cala "chaves de sequência mista ficam literais" Bash "mkdir -p .claude/skills/x/{h..1}ooks"
   _c cala "sequência além do teto fora de skills" Bash "echo skills; mkdir -p docs/{1..999}"
+  _c cala "done < plugin > fora: ler não é escrever" Bash "while read l; do :; done < ${H} > /tmp/z"
+  _c cala "curl -so fora"                 Bash  "curl -so /tmp/z https://exemplo.invalid/${H}"
+  _c cala "curl -H colado com o no valor" Bash  "curl -sHo${H} -o /tmp/z https://exemplo.invalid"
+  _c cala "curl -H colado não é destino"  Bash  "curl -sH 'X: .claude/skills/x/hooks' -o /tmp/z https://exemplo.invalid"
+  _c cala "wget -qO- para a saída"        Bash  "wget -qO- https://exemplo.invalid/x; echo ${H}"
+  _c cala "ANSI-C fora da forma"          Bash  "echo \$'a\\tb' > docs/a.md; echo ${H}"
+  _c cala "locale fora da forma"          Bash  "echo \$\"a\" > docs/a.md; echo ${H}"
+  _c cala "exec > fora"                   Bash  "exec > /tmp/z; echo ${H}"
+  _c cala "mkfifo fora"                   Bash  "mkfifo /tmp/z; echo ${H}"
   _c cala "cd -P noutra pasta e >"         Bash  "cd -P docs && echo x > hooks"
   _c cala "ln -s de um argumento: pasta sem forma" Bash "ln -s ../../../../fora/vazia" "${p}/.claude/skills/onion"
   _c cala "cwd em .claude/hooks: >"        Bash  "echo x > a" "${p}/.claude/hooks"
@@ -618,7 +650,13 @@ open(p,'w')\""
   _c TETO "cd por variável até a pasta do link" Bash "D=docs; cd \$D && echo x > lnk-hooks/r"
   _c TETO "chaves em curl -o"              Bash  "curl -sS -o .claude/skills/x/{hooks,y}/h https://exemplo.invalid/x"
   _c TETO "<> alvo"                        Bash  "cat <> ${H}"
-  _c TETO "exec 3> alvo"                   Bash  "exec 3> ${H}"
+  _c TETO "tar -c com o arquivo na forma"  Bash  "tar -cf ${H} docs"
+  _c TETO "tar --create --file= na forma"  Bash  "tar --create --file=${H} docs"
+  _c TETO "git -C … init na forma"         Bash  "git -C .claude/skills/x init -q hooks"
+  # SOBREACUSA declarada: texto lido pelo tee via <<<, e vírgula escapada nas chaves (o shlex come a barra antes do juiz)
+  _c acusa "SOBREACUSA (teto): tee com <<< que cita" Bash "tee docs/o <<< \".claude/skills/x/hooks\""
+  _c acusa "SOBREACUSA (teto): vírgula escapada nas chaves" Bash "mkdir -p .claude/skills/x/{hooks\\,y,z}"
+  _c acusa "exec 3> alvo"                  Bash  "exec 3> ${H}"
   _c TETO "pasta criada e copiada na mesma string" Bash "mkdir -p /tmp/q/hooks; cp -r /tmp/q .claude/skills/q"
   _c TETO "\$CLAUDE_CONFIG_DIR, que a varredura também não conhece" Bash "printf x > \"\$CLAUDE_CONFIG_DIR/skills/x/hooks/h\""
   # ── TETO COM RESULTADO: o veto não vê, a escrita acontece de verdade numa cópia, e a VARREDURA tem de acusar ──
@@ -662,7 +700,7 @@ z=zipfile.ZipFile(d+"/p.zip","w"); z.writestr("x/hooks/h","x"); z.close()' "${d}
 E"
   # ── os ramos de fechamento, com JSON escrito à mão, sem python no caminho do caso ──
   _raw() {  # _raw <esperado rc> <nome> <json> [dir-do-hook] [PATH]
-    local want="$1" name="$2" json="$3" hook="${4:-${BASH_SOURCE[0]}}" pth="${5:-${PATH}}" rc=0
+    local want="$1" name="$2" json="$3" hook="${4:-${self}}" pth="${5:-${PATH}}" rc=0
     case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
     # o hook cai no diretório de quem chama quando o JSON não traz `cwd`: a bancada fixa o projeto, rodando de qualquer pasta
     printf '%s' "${json}" | ( cd "${p}" && CLAUDE_PROJECT_DIR="${rawproj:-${p}}" HOME="${rawhome:-${d}/home}" PATH="${pth}" bash "${hook}" ) >/dev/null 2>&1 || rc=$?
@@ -671,17 +709,17 @@ E"
   }
   _raw 2 "Write com escape unicode no caminho" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.clau\u0064e/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
   # análise que não chega ao fim: o juiz sem o MOAT que ele compõe
-  sj="${d}/semjuiz"; mkdir -p "${sj}/lib"; cp "${BASH_SOURCE[0]}" "${sj}/g.sh"; cp "${here}/lib/invocation-lines.sh" "${here}/lib/plugin-write-judge.py" "${sj}/lib/"
+  sj="${d}/semjuiz"; mkdir -p "${sj}/lib"; cp "${self}" "${sj}/g.sh"; cp "${here}/lib/invocation-lines.sh" "${here}/lib/plugin-write-judge.py" "${sj}/lib/"
   _raw 2 "análise incompleta fecha o caminho com verbo" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${sj}/g.sh"
   _raw 0 "análise incompleta cala a leitura" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${sj}/g.sh"
   # sem python3: o Write decide em bash, e o Bash fecha só o caminho inteiro com verbo de escrita
   np="${d}/nopy"; mkdir -p "${np}"
   for _b in bash cat grep sed awk head tr realpath dirname git; do _bp="$(command -v "${_b}")" && ln -sf "${_bp}" "${np}/${_b}"; done
-  _raw 0 "sem python3: Write honesto passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/docs/a.md"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
-  _raw 2 "sem python3: Write no alvo barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
-  _raw 2 "sem python3: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
-  _raw 0 "sem python3: Bash em hooks fundo cala" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/references/hooks/a.md"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
-  _raw 0 "sem python3: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${BASH_SOURCE[0]}" "${np}"
+  _raw 0 "sem python3: Write honesto passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/docs/a.md"},"cwd":"'"${p}"'"}' "${self}" "${np}"
+  _raw 2 "sem python3: Write no alvo barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${self}" "${np}"
+  _raw 2 "sem python3: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${self}" "${np}"
+  _raw 0 "sem python3: Bash em hooks fundo cala" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/references/hooks/a.md"},"cwd":"'"${p}"'"}' "${self}" "${np}"
+  _raw 0 "sem python3: Bash de leitura cala" '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"'"${p}"'"}' "${self}" "${np}"
   # a raiz, com a casa por link e o projeto sem git
   rawhome="${d}/home-link" _raw 2 "Write na casa, com HOME por link" '{"tool_name":"Write","tool_input":{"file_path":"'"${d}"'/home/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
   rawhome="${d}/home-link" _raw 2 "Bash na casa, com HOME por link" '{"tool_name":"Bash","tool_input":{"command":"printf x > '"${d}"'/home/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}'
@@ -701,7 +739,7 @@ E"
     local want="$1" name="$2" got=nao; shift 2
     case "${name}" in *"${PW_SELFTEST_ONLY:-}"*) : ;; *) return 0 ;; esac
     rm -f "${d}/gatilho.marca"
-    printf '{"tool_name":"Bash","tool_input":{"command":"%s"},"cwd":"%s"}' "$1" "$2" | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" PATH="${gp}" bash "${BASH_SOURCE[0]}" >/dev/null 2>&1
+    printf '{"tool_name":"Bash","tool_input":{"command":"%s"},"cwd":"%s"}' "$1" "$2" | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" PATH="${gp}" bash "${self}" >/dev/null 2>&1
     [ -e "${d}/gatilho.marca" ] && got=paga
     if [ "${got}" = "${want}" ]; then printf 'ok   %-5s %s\n' "$([ "${want}" = paga ] && echo acusa || echo cala)" "${name}"
     else printf '✗    %-5s %s (%s)\n' "${want}" "${name}" "${got}"; fails=$((fails + 1)); fi
@@ -713,15 +751,15 @@ E"
   _g paga "gatilho: cwd na skill paga o python" "echo x > a" "${p}/.claude/skills/x"
   # a mensagem diz onde o plugin mora: é o que o clone da porta lê quando o gate trava
   case "a mensagem do veto diz onde o plugin mora" in *"${PW_SELFTEST_ONLY:-}"*)
-    _m="$(printf '%s' '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" bash "${BASH_SOURCE[0]}" 2>&1 >/dev/null)"
+    _m="$(printf '%s' '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' | CLAUDE_PROJECT_DIR="${p}" HOME="${d}/home" bash "${self}" 2>&1 >/dev/null)"
     case "${_m}" in
       *"mecanismo próprio"*) echo 'ok   acusa a mensagem do veto diz onde o plugin mora' ;;
       *) printf '✗    acusa a mensagem do veto diz onde o plugin mora (%s)\n' "${_m}"; fails=$((fails + 1)) ;;
     esac ;;
   esac
   # a lib do tokenizador ausente ou vazia: o Write não depende dela, e o Bash fecha o caminho com verbo
-  sl="${d}/semlib"; mkdir -p "${sl}/lib"; cp "${BASH_SOURCE[0]}" "${sl}/g.sh"; cp "${here}/lib/plugin-write-judge.py" "${sl}/lib/"
-  vl="${d}/libvazia"; mkdir -p "${vl}/lib"; cp "${BASH_SOURCE[0]}" "${vl}/g.sh"; : > "${vl}/lib/invocation-lines.sh"
+  sl="${d}/semlib"; mkdir -p "${sl}/lib"; cp "${self}" "${sl}/g.sh"; cp "${here}/lib/plugin-write-judge.py" "${sl}/lib/"
+  vl="${d}/libvazia"; mkdir -p "${vl}/lib"; cp "${self}" "${vl}/g.sh"; : > "${vl}/lib/invocation-lines.sh"
   _raw 2 "sem lib: Write no alvo barra" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/.claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
   _raw 0 "sem lib: Write honesto passa" '{"tool_name":"Write","tool_input":{"file_path":"'"${p}"'/docs/a.md"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
   _raw 2 "sem lib: Bash com verbo fecha" '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"'"${p}"'"}' "${sl}/g.sh"
@@ -791,6 +829,8 @@ case "${flat}" in
   *skills*\{*) hit=1 ;;
   *skills*) grep -qE '(^|[^[:alnum:]_-])(cp|mv|ln|rsync)([^[:alnum:]_-]|$)' <<< "${flat}" && hit=1 ;;
 esac
+# (4b) `$'…'` e `$"…"` escondem o nome do texto achatado (`$'\x68ooks'`): com `skills` na string, o juiz decodifica
+case "${raw_cmd}" in *skills*"\$'"*|*skills*'$"'*) hit=1 ;; esac
 # (5) o `cwd`: em `.claude/skills/x`, `mkdir hooks` não traz sinal nenhum no texto
 # Só `.claude` e skills: `*.claude*` fazia toda chamada numa worktree de `.claude/worktrees/` pagar o python (38 → 196 ms, medido)
 case "${hcwd0}" in */.claude|*/.claude/skills*) hit=1 ;; esac
