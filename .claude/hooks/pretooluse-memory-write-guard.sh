@@ -43,6 +43,12 @@
 #   · CLAUDE.md, .claude/rules e o próprio settings.json NÃO são o alvo desta guarda;
 #   · o hook é de PROJETO: cai junto com o .claude/settings.json, e não arma em sessão aberta fora do projeto.
 #
+# ── VALE EM TODO PAPEL (requisito de 2026-11-05: num adotante, 27 de 31 formas de ato passavam por todos os hooks) ──
+#   Não lê o carimbo .claude/.onion-version e não depende de nada core-only (ops/): só deste arquivo, de lib/memory-write-judge.py e
+#   de python3, que o manifesto do papel adopted, standalone, hub e plugins leva; o merge-onion-hooks.sh traz o registro ao
+#   settings.json do adotante sem apagar os hooks dele. A porta mini não leva hooks nem settings.json, então não fica registro órfão.
+#   Caso próprio na bancada: (e) de run_memory_write_guard_selftests.
+#
 # ── FALHA ABERTA, DECLARADA ──────────────────────────────────────────────────────────────
 #   Sem python3, ou com o juiz quebrado, o hook só fecha (exit 2) se o texto bruto cita `/memory` E traz o par de envelope; todo
 #   o resto passa (rc 0). JSON ilegível passa. Erra para CALAR (cláusula 4 da guard-doctrine). Escape: não há variável de bypass,

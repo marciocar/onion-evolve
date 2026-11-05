@@ -25,6 +25,9 @@ que documenta o formato abrindo E fechando a tag dentro de um bloco de código s
 nenhum caso cobre isso. (3) A extração de memória em segundo plano do Claude Code não foi medida
 contra o PreToolUse.
 
+No adotante, o caso (e) monta o repo só com o manifesto do papel adopted e o registro do
+`merge-onion-hooks.sh`; ele não exercita um `/meta:adopt --update` de verdade sobre um adotante clonado.
+
 Os `confirmed` de maior impacto do grafo, que é o que a passada deve tentar refutar:
 `E_DEFEITO_MEMGHOST_NO_CLAUDE_CODE_SDK`, `E_NENHUM_HOOK_OLHAVA_A_MEMORIA`,
 `E_REPLAY_618_ESCRITAS_ZERO_ALARME` e `E_DOGFOOD_AO_VIVO_2_1_318`.
