@@ -205,6 +205,7 @@
 .claude/hooks/pretooluse-direct-provider-api.sh	E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	E_REEXECUCAO_CONTRA_O_USO_REAL	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	C_TETO_DE_CHAVES_FECHA_LEGITIMO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_TETO_FORMA_DO_SEGREDO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	D_FALHA_DE_ANALISE_FECHA_PELA_FORMA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	D_U4_LISTAR_NOMEAR_CITAR_PASSAM	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
