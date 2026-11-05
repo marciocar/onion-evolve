@@ -268,7 +268,8 @@ nodes:
     impact: 5
     confidence: 0.5
     label: "A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, mercado e barreira."
-    narrative: "Nasce open: o maestro sela, com as opções e a recomendação do core. Antes dela, nada se implementa no hub."
+    narrative: "Nasce open: o maestro sela, com as opções e a recomendação do core. Antes dela, nada se implementa no hub. Requisito acrescentado em 2026-11-05, por triagem do maestro sobre a proposta do hub (persona de serviço): (1) identidade de serviço própria, agindo em nome da empresa e nunca como o maestro (o padrão on-behalf-of do RFC 8693, claim act, apontado em docs/evolution/research/maestro-persona-2026-11/); (2) atendimento por menção no chat corporativo; (3) triagem dos canais conectados (e-mail do maestro, chat, gerenciador de tarefas) em card, resposta ou pergunta ao maestro. O runtime (bot próprio por Agent SDK, com o bridge do core como candidato, contra o assistente nativo do chat) se decide por pesquisa em modo decision. A escada de autonomia por tipo de ato nasce pelo /meta:forge e o maestro sela. O piloto começa por rascunhos que o maestro aprova. A conta de serviço é ato do maestro."
+    trace: "docs/evolution/inbox/_processed/2026-11-05-proposal-brain-persona-servico.md"
   - id: E_MA_MCP_LEITURA_MEDIDO_1028
     node_type: evidence
     layer: audit
