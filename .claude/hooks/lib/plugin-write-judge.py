@@ -373,10 +373,57 @@ def _pw_load_assign():
 _PW_REDIR_FORMS = re.compile(r">\||>&(?=\s*[^\s\d])")
 # `> x` sem comando, também depois de palavra de controle ou de atribuição: o lib não julga segmento vazio. Vira `: > x`, que ele julga
 _PW_BARE_REDIR = re.compile(r"(^|;|\||\(|\n|(?:then|do|else|if|elif|while|until|\{|!)[ \t]|&)([ \t]*(?:[A-Za-z_]\w*=\S*[ \t]+)*)(?=\d*>)", re.M)
+# o mesmo depois do que FECHA um composto ou de `case …)`, `time` e `coproc`: `( x ) > f`, `{ x; } > f`, `done > f`, `fi > f`, `esac > f`
+# gravam f. O `: ` entra entre o fecho e o `>`, e o lib julga o `: > f` como comando próprio
+_PW_BARE_AFTER_CLOSE = re.compile(r"(\)|(?:time|coproc|fi|done|esac|\})[ \t])([ \t]*)(?=\d*>)")
+# fora de aspas, o que não é espaço nem separador antes do `>`: a palavra anterior acabou ali
+_PW_GLUE_FREE = set(" \t\n;|()`")
+
+
+def _pw_unglue(t):
+    """Espaço antes do `>` colado à palavra anterior, FORA de aspas: o bash lê `echo x>f` como `echo x >f`, e o REDIR do
+    lib só casa no começo da palavra. Dígito que ABRE a palavra é o descritor (`2>f`, `x 2>&1`); dígito no fim de uma palavra é
+    dela (`a1>f` = `a1 >f`). Entre aspas e depois de barra invertida, `>` é texto, e a aspa escapada (`\\'a>f`) não abre aspas. O texto
+    de `bash -c '…'` e de `$( )` volta aqui no nível dele."""
+    out, i, n, q, bt = [], 0, len(t), None, 0
+    while i < n:
+        c = t[i]
+        if q:
+            if c == "\\" and q != "'" and i + 1 < n:
+                out.append(t[i:i + 2]); i += 2; continue
+            out.append(c); i += 1
+            if c == q[-1]:
+                q = None
+            continue
+        if c == "\\" and i + 1 < n:
+            out.append(t[i:i + 2]); i += 2; continue
+        if c == "$" and t.startswith("$'", i):
+            q = "$'"; out.append("$'"); i += 2; continue
+        if c in "'\"":
+            q = c; out.append(c); i += 1; continue
+        if c == "`":
+            bt += 1
+        if c == ">":                                    # `x&>f`: o `&` separa, e o `> f` nu que sobra o _PW_BARE_REDIR julga
+            j = len(out)
+            while j > 0 and out[j - 1].isdigit():
+                j -= 1
+            prev = out[j - 1] if j else ""
+            if j < len(out):                            # há dígitos antes: descritor só se abrem a palavra. O `>&1` o prepass do lib come
+                glued = prev not in _PW_GLUE_FREE and prev not in ("", "&")
+            else:
+                glued = prev not in _PW_GLUE_FREE and prev not in ("", "<", ">", "&", "|")
+            if prev == "`" and j == len(out):
+                glued = bt % 2 == 0                     # a crase que FECHA é o fim da palavra; a que abre começa o comando
+            if glued:
+                out.append(" ")
+        out.append(c); i += 1
+    return "".join(out)
 
 
 def _pw_norm_redirects(t):
+    t = _pw_unglue(t)
     t = _PW_REDIR_FORMS.sub(">", t)
+    t = _PW_BARE_AFTER_CLOSE.sub(r"\1\2: ", t)
     return _PW_BARE_REDIR.sub(r"\1\2: ", t)
 
 
@@ -387,16 +434,46 @@ def prepass(text):
     return _pw_base_prepass(_pw_norm_redirects(text))
 
 
-# ── chaves: a do lib não tem teto, e `{a,b}` vinte vezes é um milhão de palavras ──
+# ── chaves: a do lib não tem teto, e `{a,b}` vinte vezes é um milhão de palavras. A sequência `{a..b[..p]}` expande como no
+# bash (números, com o zero à esquerda, ou uma letra), e a chave que não expande (`{x}`, `{a..}`, `{a..3}`) fica literal sem parar a
+# palavra: a próxima chave dela ainda expande ──
+_PW_SEQ = re.compile(r"^(?:(-?\d+)\.\.(-?\d+)|([A-Za-z])\.\.([A-Za-z]))(?:\.\.(-?\d+))?$")
+
+
+def _pw_seq(body):
+    """Os itens de `{a..b[..p]}`; None quando a chave é literal; "over" quando passa do teto (sem gerar a lista)."""
+    m = _PW_SEQ.match(body)
+    if not m:
+        return None
+    step = abs(int(m.group(5))) if m.group(5) else 1
+    step = step or 1
+    if m.group(1) is not None:
+        a, b = int(m.group(1)), int(m.group(2))
+        width = max(len(m.group(1)), len(m.group(2))) if re.match(r"-?0\d", m.group(1)) or re.match(r"-?0\d", m.group(2)) else 0
+        fmt = lambda v: ("-" + str(-v).zfill(width - 1)) if v < 0 and width else str(v).zfill(width)
+    else:
+        a, b = ord(m.group(3)), ord(m.group(4))
+        fmt = chr
+    if abs(b - a) // step + 1 > _PW_BRACE_MAX:
+        return "over"
+    d = step if b >= a else -step
+    return [fmt(v) for v in range(a, b + (1 if d > 0 else -1), d)]
+
+
 def brace_expand(word):
     out, todo = [], [word]
     while todo:
         w = todo.pop()
         m = re.search(r"\{([^{}]*)\}", w)
-        if not m or ("," not in m.group(1) and ".." not in m.group(1)):
-            out.append(w)
+        if not m:
+            out.append(w.replace("\x01", "{").replace("\x02", "}"))
             continue
-        parts = m.group(1).split(",") if "," in m.group(1) else [m.group(1)]
+        parts = m.group(1).split(",") if "," in m.group(1) else _pw_seq(m.group(1))
+        if parts is None:                               # chave literal: marca e segue para a próxima chave da palavra
+            todo.append(w[:m.start()] + "\x01" + m.group(1) + "\x02" + w[m.end():])
+            continue
+        if parts == "over":                             # sequência além do teto: cai no ramo do teto abaixo, sem gerar a lista
+            parts = [""] * (_PW_BRACE_MAX + 1)
         todo.extend(w[:m.start()] + p + w[m.end():] for p in reversed(parts))
         if len(todo) + len(out) > _PW_BRACE_MAX:
             # só esta palavra fica sem expandir: abortar deixaria o resto da string sem julgamento
