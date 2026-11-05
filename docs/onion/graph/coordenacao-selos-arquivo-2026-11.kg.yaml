@@ -1,0 +1,113 @@
+meta:
+  schema_version: "1"
+  id: coordenacao-selos-arquivo-2026-11
+  slug: coordenacao-selos-arquivo-2026-11
+  title: "Arquivo dos selos colhidos do grafo de coordenação"
+  date: "2026-11-05"
+  baseline: "2026-11-05"
+  purpose: "Selo do maestro que sai do grafo de coordenação por causa do teto de 40 nós vem para cá, sem mudar o texto, porque outro repositório pode citá-lo. A colheita move a decisão, e não a apaga."
+  note: "Nasceu em 2026-11-05: a colheita havia apagado cinco nós citados pela curadoria, e a checagem só olhava este repo. O texto dos nós é o do grafo de origem. Citação antiga com caminho do grafo de coordenação segue válida no commit fixado; a nova cita este arquivo."
+external_edges:
+  - from: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#E_COORD_CENSO_DAS_PENDENCIAS_1027"
+    edge_type: TRACES_TO
+  - from: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#E_COORD_CENSO_DAS_PENDENCIAS_1027"
+    edge_type: TRACES_TO
+  - from: D_COORD_FILA_DA_NOITE_DOS_PEERS_1103
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103"
+    edge_type: TRACES_TO
+  - from: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#E_COORD_CENSO_DAS_PENDENCIAS_1027"
+    edge_type: TRACES_TO
+  - from: D_COORD_PERSONAS_DE_VERTICAL_ACEITA_1102
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#E_COORD_CENSO_DAS_PENDENCIAS_1027"
+    edge_type: TRACES_TO
+nodes:
+  - id: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Aceitar a proposta»"
+    label: "O maestro aceita a dissecação da curadoria sobre SQLite dentro de um Claude Project como base estruturada do time: a prática como fonte dos dados do time é rejeitada, e um exportador SQLite somente leitura do grafo fica parqueado com gatilho"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Aceitar a proposta»; descartadas: «Absorver o exportador já» · «Ler o estudo antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «SQLite num Claude Project (dissecação da curadoria): qual veredito?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
+  - id: D_COORD_FILA_DA_NOITE_DOS_PEERS_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Mercado da orquestração|kg_query que agrega|Teste do 1º byte»"
+    label: "A fila da noite: a curadoria pesquisa o mercado da orquestração de sessões (Q_SO_PADROES_DE_MERCADO); o kg-ssot avança a agregação no kg_query e planeja, sem rodar, o teste que separa o corte no 1º byte da duração total."
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Mercado da orquestração|kg_query que agrega|Teste do 1º byte»; descartadas: «Nada novo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Até as 23h, onde ponho as sessões peer?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
+  - id: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Nenhum nome curto»"
+    label: "Nome do modelo de operação: nenhum nome curto (D_OPERATING_MODEL_NAME_PROPOSAL) — descrever pelas peças de mercado"
+    narrative: "Selado por /meta:decide em 2026-11-02: escolhida «Nenhum nome curto»; descartadas: «Company Brain» · «Depois de dissecar o Gas Town»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Nome do modelo de operação: qual nome curto fica?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
+  - id: D_COORD_PERSONAS_DE_VERTICAL_ACEITA_1102
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Aceitar a proposta»"
+    label: "Personas de vertical: aceita a proposta da curadoria (D_VERTICAL_PERSONAS_PROPOSAL) — as sessões atuais seguem como personas entre repos, um escritor por repo, com os dois consertos na coordenação; vertical nova só pelo limiar de 3 pendências abertas ou 1 há mais de 14 dias"
+    narrative: "Selado por /meta:decide em 2026-11-02: escolhida «Aceitar a proposta»; descartadas: «Aceitar sem o limiar» · «Adiar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Personas de vertical: como fica?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
+  - id: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
+    node_type: question
+    layer: audit
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    evidence_class: testimony
+    label: "Decidir o --pin <caminho#ID> no kg-decide-seal.sh, que grava o nó E_ irmão com o node_sha256 da versão aprovada; antes do código, o desenho passa pelo kg-ssot."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
+    narrative: |-
+      A curadoria propõe fechar o ciclo do documento controlado com a corrente de hashes que o contrato já tem: o D_ selado com o testemunho e um E_ irmão (aresta E_ SUPPORTS D_) que fixa o node_sha256 do documento aprovado. A peça que falta é o selo gravar esse E_ sem mexer na proveniência do testemunho. Achado medido pela curadoria na 4.39.0, para o kg-ssot: o --revisit do kg_query NÃO acende quando o documento aprovado muda, nem com o hash regravado; ele julga só a cadência vencida e o REFUTES, e o upstream_changed compara o status, não o hash. Só o kg_trace check acusa a mudança, como node-sha256-mismatch. A curadoria propôs ao kg-ssot um motivo de revisita «o hash fixado mudou», para a aprovação entrar na fila de revisão e não só no check. Gatilho: decisão do maestro. Depois do selo, o desenho vai ao kg-ssot e o código é do core.
+
+      verified_against anterior: «sinal da curadoria document-control-2026-10, versionado no inbox do core em docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md (revisado para público), lido inteiro na triagem de 2026-10-29; a medição é do laboratório da curadoria com dados sintéticos, não re-executada no core»
+      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
+edges: []
