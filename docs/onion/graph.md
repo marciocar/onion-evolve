@@ -646,7 +646,7 @@ onion-core	tier	source
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	3ade85b7e1c0	
+onion-curation	pin	b45dec33485d	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
@@ -713,7 +713,7 @@ onion-evolve	specialization	sdaal
 onion-evolve	tier	source	
 onion-kg-ssot	adopts	onion-evolve	
 onion-kg-ssot	mode	greenfield	
-onion-kg-ssot	pin	67e9d003689f	
+onion-kg-ssot	pin	b45dec33485d	
 onion-kg-ssot	specialization	kg-ssot	
 onion-kg-ssot	specialization	produto	
 onion-kg-ssot	specialization	schema	
