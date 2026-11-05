@@ -1,0 +1,188 @@
+# kg-backlog-guard: on
+# Forja de guarda (/meta:forge-guard): o MODO DE ADOTANTE dos vetos. O merge digitado e o push na main passam a vetar no
+# adotante carimbado, e a escrita em repo alheio ganha veto próprio (Bash, Write, Edit). Este grafo guarda o defeito
+# medido, o substrato escolhido, as medidas de falso positivo e os tetos.
+meta:
+  id: guard-adopter-vetoes-2026-11
+  schema_version: "1"
+  baseline: "2026-11-05"
+  review_after: "2026-12-05"   # 30d: defeito de guarda
+  # ═══ TETO: 15 NÓS ═══
+nodes:
+  - id: Q_VETOS_VALEM_NO_ADOTANTE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "família adopter_guard (bancada) e replay dos transcritos de dois adotantes desta máquina contra os hooks da branch"
+    label: "no adotante carimbado, o merge digitado, o push na main e a escrita em repo alheio vetam, e o caminho verificado do adotante passa"
+    narrative: "Aberta até o merge humano e a passada adversarial. A camada nativa (permissions.deny no settings do adotante, com o selo do maestro) é a primeira linha; este hook é a segunda, no que o deny não alcança."
+  - id: E_SONDA_27_DE_31_PASSARAM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "sonda de um adotante: 31 formas de ato contra os 5 hooks com o cwd no repo dele; reproduzida no adotante de bancada montado por ops/materialize-adopter.sh, com os hooks da main 40fe1629d"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "medido: 27 de 31 formas de ato passaram no adotante; merge digitado e push na main viravam aviso, git -C <core> commit, redirecionamento no core e Write/Edit no core passavam calados"
+    narrative: "Reproduzido aqui: B1 a B7 (push na main, merge digitado, merge pela API) saíam como aviso do merge-gate; B8, B9, B26 e as escritas com Write e Edit no core e em outro adotante saíam com exit 0 e nenhum hook. O merge-gate avisava por falta de ops/pr-merge-verified.sh no projeto, o moat-gate sai cedo sem ops/moat-targets.tsv, e nenhum veto tinha Write ou Edit no matcher. O host não protege a main dos adotantes: a proteção de branch dá 403 no plano gratuito."
+    provenance:
+      source: "sonda de hooks de um adotante, 2026-11-05, tabela fora da árvore; reprodução no adotante de bancada"
+      locator: "formas B1-B27, W1-W3, R1"
+      method: "measurement: hook real, JSON do PreToolUse no stdin, rc lido"
+      locality: "repo"
+  - id: E_ADOTANTES_MERGEIAM_PELO_SCRIPT_DO_CORE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "comandos Bash dos transcritos de dois adotantes desta máquina (13.316 e 23.710 únicos), filtrados pela forma de merge"
+    trace: ".claude/hooks/lib/adopter-scope.sh"
+    label: "medido: os dois adotantes mergeiam pelo script do core chamado por caminho absoluto (bash <core>/ops/pr-merge-verified.sh N --repo <dono>/<repo>), e um deles digitou gh pr merge direto duas vezes em 2026-10-08"
+    narrative: "O merge direto de 2026-10-08 foi por merge commit, que o script verificado ainda não fazia; o --merge-commit chegou depois (SAC-80). Com ele, o adotante tem o caminho verificado, e o argumento do aviso (não se veta o único caminho de merge de uma casa) deixou de valer para quem tem o core nesta máquina."
+    provenance:
+      source: "transcritos de sessão de dois adotantes desta máquina, lidos sem escrita"
+      locator: "comandos Bash com pr-merge-verified e gh pr merge"
+      method: "measurement: contagem por regex sobre os comandos únicos"
+      locality: "host"
+  - id: D_MERGE_GATE_VETA_NO_ADOTANTE_CARIMBADO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "casos g1 a g5 da família adopter_guard; os casos adv-a a adv-c da família pretooluse_veto seguem verdes no repo sem carimbo"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "o merge-gate VETA no repo com carimbo role adopted, hub ou standalone, e a recusa aponta o script do core por caminho absoluto; o aviso fica para o repo sem carimbo e sem ops/"
+    narrative: "A linha do ADVISE ficou intacta (o mutante antigo dela segue mordendo) e o carimbo vira o ADOPTER logo abaixo. O caminho verificado passa porque o hook não lê script em arquivo. Sem core resolvido, a recusa manda o maestro declarar o core e diz que o merge é dele, fora da sessão."
+  - id: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "guard-census.sh (nenhuma guarda da classe pelo termo; o ramo alheio do moat-gate exige ops/ e só barra push que muda produção); diffs das forjas em curso feat/guard-deploy-acts, feat/guard-memory-write e feat/guard-plugin-write"
+    trace: ".claude/hooks/pretooluse-adopter-guard.sh"
+    label: "substrato: hook PreToolUse próprio (Bash, Write, Edit, NotebookEdit), com o juiz lib/adopter-judge.py no ponto de extensão do tokenizador dos vetos, em vez de estender o moat-gate"
+    narrative: "O moat-gate é o que a forja de deploy está mudando, e a política é outra: no core o commit num clone de adotante é fluxo normal (o /meta:adopt --update), no adotante nenhuma escrita em repo alheio é. O juiz roda no mesmo ponto de extensão do moat-judge (o lib chama moat_command e moat_unanalyzable), sem tocar o lib nem o moat-judge. A lista vem do members.yaml do core lido por caminho (linha core do .claude/adopter-guard.tsv, ou o adopted_from local do carimbo), mais as linhas repo; allow isenta, e o próprio arquivo da lista só o maestro escreve."
+  - id: E_REPLAY_DOS_ADOTANTES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "replay de 5.105 comandos dos transcritos de dois adotantes no hook novo, num clone raso de cada um com a lista do core e allow do próprio caminho; e de 4.401 comandos com forma de merge ou push no merge-gate"
+    trace: ".claude/hooks/lib/adopter-judge.py"
+    label: "replay: a 1ª redação vetou 10 comandos honestos (cd dinâmico herdando o cd anterior, alvo de grep com >> lido como redirecionamento, o core citado como valor de variável, cd de subshell vazando); curados, sobra 1 veto, e é verdadeiro"
+    narrative: "O veto que sobra é um cp à mão para o inbox do core, por fora do /meta:co-relay (que confere duplicata e a revisão de destino público). No merge-gate, o replay acusou os 2 merges digitados de 2026-10-08 (verdadeiros), 5 fechos que o core também faz (texto que cita merge ou push e não se analisa) e 11 pushes cujo veredito depende de diretórios que não existem mais (worktrees apagadas): artefato do replay, não medida."
+    provenance:
+      source: "transcritos de sessão de dois adotantes, replay contra a branch feat/guard-adopter-vetoes"
+      locator: "saída do replay, fora da árvore"
+      method: "measurement: hook real por comando, JSON do PreToolUse no stdin"
+      locality: "host"
+  - id: C_TETO_SCRIPT_E_OUTRA_LINGUAGEM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "fronteira do lib (script em arquivo não se lê) e casos e2/e3 da família"
+    trace: ".claude/hooks/lib/adopter-judge.py"
+    label: "TETO: script em arquivo não se lê (é por essa fronteira que o co-relay e o merge verificado passam); código de outra linguagem só fecha pela forma de escrita (open com w/a/x, write_text, rmtree…); gh escrevendo no remoto alheio fica fora"
+    narrative: "Um script próprio do adotante que escreve no core passa. A cura disso seria ler o script, como o moat-judge faz para alvos servidos, e o custo é julgar todo bash x.sh da sessão."
+  - id: C_TETO_SO_REPO_REGISTRADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "adopter-scope.sh e a REGRA 118 (lista-ausente)"
+    trace: ".claude/hooks/lib/adopter-scope.sh"
+    label: "TETO: só o repo REGISTRADO é alheio; adotante sem lista (adopted_from por URL e sem .claude/adopter-guard.tsv) cala para tudo, e a REGRA 118 avisa SOFT; clone que nenhuma fonte nomeia passa"
+    narrative: "Os dois adotantes desta máquina gravaram adopted_from como URL, então hoje o hook deles está sem lista até o maestro declarar a linha core. O merge e o push na main vetam mesmo assim."
+  - id: C_TETO_PUSH_NU_DEPOIS_DE_SWITCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "replay do merge-gate: git switch X && … git push nu é julgado pela branch do disco na hora do hook"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "TETO herdado do core: o push nu (sem refspec) se julga pela branch do disco na hora do hook; git switch na mesma string não é seguido, então a sessão sentada na main que troca de branch e empurra nu é vetada"
+    narrative: "No core isso já vale. No adotante é novo, porque antes era aviso. A saída é empurrar com o nome: git push -u origin <branch>."
+  - id: C_TETO_WRAPPER_RTK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-05"
+    verified_against: "sonda de um adotante: rtk git push origin +main e rtk gh pr merge passam no protect-main e no merge-gate"
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    label: "TETO não curado aqui: o invólucro rtk (rtk, rtk run, rtk bypass) não é tirado pelo tokenizador, e o push e o merge escritos atrás dele passam nos dois vetos"
+    narrative: "É vocabulário do lib dos vetos, partilhado pelos três hooks; a cura é uma linha nos invólucros e a forja dela é outra (o rtk não está instalado nesta máquina para medir o caminho real)."
+  - id: C_CAMADA_NATIVA_PRIMEIRO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "cabeçalho do pretooluse-adopter-guard.sh; decisão do adotante de instalar permissions.deny com o selo do maestro"
+    trace: ".claude/hooks/pretooluse-adopter-guard.sh"
+    label: "o permissions.deny do adotante é a 1ª linha; o hook é a 2ª, no que o deny por padrão de caminho e prefixo de comando não alcança: git -C, cd X && git commit, bash -c, a worktree do repo alheio fora do diretório dele, o redirecionamento"
+    narrative: "Não medido aqui: a ordem e a interação do deny com o hook no Claude Code atual. Medir quando o adotante instalar o deny."
+edges:
+  - from: E_SONDA_27_DE_31_PASSARAM
+    to: Q_VETOS_VALEM_NO_ADOTANTE
+    edge_type: SUPPORTS
+  - from: E_ADOTANTES_MERGEIAM_PELO_SCRIPT_DO_CORE
+    to: D_MERGE_GATE_VETA_NO_ADOTANTE_CARIMBADO
+    edge_type: SUPPORTS
+  - from: D_MERGE_GATE_VETA_NO_ADOTANTE_CARIMBADO
+    to: Q_VETOS_VALEM_NO_ADOTANTE
+    edge_type: SUPPORTS
+  - from: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    to: Q_VETOS_VALEM_NO_ADOTANTE
+    edge_type: SUPPORTS
+  - from: E_REPLAY_DOS_ADOTANTES
+    to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    edge_type: SUPPORTS
+  - from: C_TETO_SCRIPT_E_OUTRA_LINGUAGEM
+    to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    edge_type: CONSTRAINS
+  - from: C_TETO_SO_REPO_REGISTRADO
+    to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    edge_type: CONSTRAINS
+  - from: C_TETO_PUSH_NU_DEPOIS_DE_SWITCH
+    to: D_MERGE_GATE_VETA_NO_ADOTANTE_CARIMBADO
+    edge_type: CONSTRAINS
+  - from: C_TETO_WRAPPER_RTK
+    to: Q_VETOS_VALEM_NO_ADOTANTE
+    edge_type: CONSTRAINS
+  - from: C_CAMADA_NATIVA_PRIMEIRO
+    to: Q_VETOS_VALEM_NO_ADOTANTE
+    edge_type: CONSTRAINS

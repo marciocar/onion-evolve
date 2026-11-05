@@ -5855,6 +5855,37 @@ check_veto_onfailure() {
 check_veto_onfailure
 
 # ─────────────────────────────────────────────────────────────────────────────
+# REGRA 118 — Veto de repo alheio do adotante registrado e com lista [HARD + SOFT]
+# previne: no adotante, a escrita em repo alheio (git -C <core> commit, Write no core) passar sem veto
+#   DEFEITO MEDIDO (2026-11-05, grafo guard-adopter-vetoes-2026-11): a curadoria rodou 31 formas de ato com os 5
+#   hooks e o cwd no repo dela, e 27 passaram; nenhum veto tinha Write ou Edit no matcher. O pretooluse-adopter-
+#   guard.sh fecha isso; esta regra cobra o REGISTRO dele (Bash, Write e Edit, com onFailure block) e, no adotante
+#   carimbado, a LISTA de repos (sem ela o veto cala para tudo). HARD só no core (o registro é do settings que
+#   viaja); no derivado tudo é SOFT. Lógica e teto em adopter-veto-check.sh; "não pôde julgar" (rc 2) sai SOFT.
+check_adopter_veto() {
+  local helper="${SCRIPT_DIR}/adopter-veto-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${REPO_ROOT}/.claude/settings.json"|"${REPO_ROOT}/.claude/adopter-guard.tsv"|*/adopter-veto-check.sh|"${REPO_ROOT}"/.claude/hooks/*) : ;; *) return 0 ;; esac
+  fi
+  local _R="REGRA 118 (Veto de repo alheio do adotante registrado e com lista)"
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    [ "$(_role)" = "source" ] || _sev="SOFT"
+    violation "${_sev:-SOFT}" "${REPO_ROOT}/${_path%%:*}" "${_R}: [${_code}] ${_path}: ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "SOFT" "${helper}" "${_R}: [NAO-VERIFICADO] a guarda não pôde julgar (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_adopter_veto
+
+# ─────────────────────────────────────────────────────────────────────────────
 # REGRA 103 — Adapter do task-manager declara todas as capacidades da interface, com fonte [HARD]
 # previne: capacidade declarada que o adapter não exerce, e célula "medida" sem fonte nenhuma.
 #   DANO MEDIDO (SAC-63, 2026-10-11, depois da Onda 1 de primárias, PR #1027): o CLAUDE.md prescrevia

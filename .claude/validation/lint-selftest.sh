@@ -43924,8 +43924,9 @@ run_veto_onfailure_selftests() {
   else record_fail "veto-onfailure: (b) settings.json real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
   # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, sobre o settings de ANTES da cura (o campo removido dos
   #     5 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 6 — e não para o kg-read-leg (aviso)
-  #     (o 6º é o pretooluse-moat-gate.sh, de 2026-10-13; o 7º o pretooluse-memory-write-guard.sh e o 8º o
-  #     pretooluse-plugin-write-guard.sh, os dois de 2026-11-05: o número sobe junto com o settings.json)
+  #     (o 6º é o pretooluse-moat-gate.sh, de 2026-10-13; o 7º o pretooluse-memory-write-guard.sh, o 8º o
+  #     pretooluse-plugin-write-guard.sh e o 9º o pretooluse-adopter-guard.sh, os três de 2026-11-05: o número sobe
+  #     junto com o settings.json)
   #     nem para o PostModelSwitch, que roda o mesmo script mas não veta nada.
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1]))
@@ -43935,12 +43936,13 @@ for ev in ("PreToolUse", "PreModelSwitch"):
 json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
   local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
   local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
-  if [ "${n}" -eq 8 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+  if [ "${n}" -eq 9 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-moat-g' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-memory-w' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-plugin' <<< "${l}" \
+     && grep -q 'REGRA 101.*PreToolUse/pretooluse-adopter-g' <<< "${l}" \
      && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}" && ! grep -q 'REGRA 101.*PostModelSwitch' <<< "${l}"; then
-    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 8 vetos de antes da cura (7 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 9 vetos de antes da cura (8 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
   else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
   rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
@@ -44031,6 +44033,155 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_act_signature_selftests
+
+# REGRA 118 (Veto de repo alheio do adotante registrado e com lista) — o MODO DE ADOTANTE dos vetos (2026-11-05).
+# Defeito datado: a curadoria rodou 31 formas de ato com os 5 hooks e o cwd no repo dela, e 27 passaram. Aqui cada
+# caso é um payload REAL de PreToolUse rodando o hook como o Claude Code o chama (stdin JSON, CLAUDE_PROJECT_DIR,
+# LC_ALL=C), num adotante de BANCADA (carimbo `role: adopted`) com um core, um outro adotante e uma worktree do core
+# — nunca os repos reais. As formas do defeito são as da sonda da curadoria, VERBATIM com os caminhos trocados; os
+# casos honestos incluem os falsos positivos que o replay dos transcritos de curadoria e kg-ssot achou e curou. CADA
+# cura tem mutante: a linha volta ao defeito numa cópia do hook/juiz, e _prove_mutation exige que o caso caia.
+run_adopter_guard_selftests() {
+  local ag="${REPO_ROOT}/.claude/hooks/pretooluse-adopter-guard.sh" mg="${REPO_ROOT}/.claude/hooks/pretooluse-merge-gate.sh"
+  local chk="${REPO_ROOT}/.claude/validation/adopter-veto-check.sh"
+  for _f in "${ag}" "${mg}" "${chk}" "${REPO_ROOT}/.claude/hooks/lib/adopter-judge.py" "${REPO_ROOT}/.claude/hooks/lib/adopter-scope.sh"; do
+    [ -f "${_f}" ] || { record_fail "adopter-guard" "artefato ausente: ${_f}"; return; }
+  done
+  command -v python3 >/dev/null 2>&1 || { record_skip "adopter-guard: python3 ausente → pulado"; return; }
+  local o rc
+  # (a) o --selftest da REGRA 118
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 9/9 verdes' <<< "${o}"; then
+    record_pass "adopter-guard: (a) adopter-veto-check --selftest verde (9: registro sem Write/Edit, completo, sem block, sem lista, core declarado, linha inválida, só o próprio repo, hook ausente, settings ilegível)"
+  else record_fail "adopter-guard: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME (o dispatcher chama com --format tsv), no settings.json REAL: o hook registrado
+  #     para Bash, Write e Edit com block → tsv vazio, rc 0. CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/adopter-veto-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "adopter-guard: (b) settings.json real → registro completo, rc 0"
+  else record_fail "adopter-guard: (b) settings.json real" "rc=${rc}; $(head -2 <<< "${o}" | tr '\n' '|')"; fi
+
+  # ── o adotante de bancada ───────────────────────────────────────────────────────────────────────
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"
+  local r="${sb}/adotante" core="${sb}/core" outro="${sb}/outro" wt="${sb}/core-wt"
+  for _d in "${r}" "${core}" "${outro}"; do
+    git init -q -b main "${_d}" 2>/dev/null || { git init -q "${_d}"; git -C "${_d}" symbolic-ref HEAD refs/heads/main; }
+    git -C "${_d}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base
+  done
+  printf 'x\n' > "${core}/f.md"; git -C "${core}" add f.md; git -C "${core}" -c user.email=t@t -c user.name=t commit -q -m f
+  git -C "${core}" worktree add -q -b feat-wt "${wt}" 2>/dev/null
+  mkdir -p "${core}/ops" "${core}/docs/evolution/federation" "${r}/.claude/hooks/lib" "${r}/src"
+  : > "${core}/ops/pr-merge-verified.sh"
+  printf 'members:\n  - id: core\n    local_path: "%s"\n  - id: adotante\n    local_path: "%s"\n  - id: outro\n    local_path: "%s"\n' \
+    "${core}" "${r}" "${outro}" > "${core}/docs/evolution/federation/members.yaml"
+  printf 'framework: onion-evolve\nrole: adopted\nadopted_from: https://example.invalid/onion-evolve.git\n' > "${r}/.claude/.onion-version"
+  printf '# lista da bancada\ncore\t%s\n' "${core}" > "${r}/.claude/adopter-guard.tsv"
+  git -C "${r}" checkout -q -b feat
+  # os hooks rodam de uma CÓPIA (a do mutante troca só ela); a raiz é sempre o adotante
+  local hd="${sb}/hooks"; mkdir -p "${hd}/lib"
+  cp "${ag}" "${mg}" "${hd}/"; cp "${REPO_ROOT}/.claude/hooks/lib/"*.sh "${REPO_ROOT}/.claude/hooks/lib/"*.py "${hd}/lib/"
+  # _agx <dir-dos-hooks> <hook> <raiz> <ferramenta> <arg> [cwd] → rc do hook; o stderr em ${sb}/err
+  _agx() {
+    local a="$5"; a="${a//@CORE@/${core}}"; a="${a//@OUTRO@/${outro}}"; a="${a//@WT@/${wt}}"; a="${a//@R@/${r}}"
+    local c="${6:-$3}"; c="${c//@CORE@/${core}}"
+    T="$4" A="${a}" C="${c}" python3 -I -c 'import json,os;t=os.environ["T"];a=os.environ["A"]
+print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a} if t=="Bash" else {"file_path":a,"content":"x"})}))' \
+      | (cd "$3" && CLAUDE_PROJECT_DIR="$3" LC_ALL=C bash "$1/$2" >/dev/null 2>"${sb}/err"); printf '%s' "$?"
+  }
+  _agc() {  # <nome> <esperado> <hook> <ferramenta> <arg> [cwd]
+    local got; got="$(_agx "${hd}" "$3" "${r}" "$4" "$5" "${6:-}")"
+    if [ "${got}" = "$2" ]; then record_pass "adopter-guard: $1 (rc=$2)"
+    else record_fail "adopter-guard: $1" "esperava rc=$2, veio rc=${got} — $4 $5 ($(head -c 200 "${sb}/err"))"; fi
+  }
+  local A=pretooluse-adopter-guard.sh M=pretooluse-merge-gate.sh
+  # (c) O DEFEITO, verbatim da sonda da curadoria (B7/B8/B9/B26/W1/W2), com os caminhos da bancada
+  _agc "(c1) git -C <core> commit → VETO"                         2 "${A}" Bash 'git -C @CORE@ commit -m x'
+  _agc "(c2) git -C <core> push origin main → VETO"               2 "${A}" Bash 'git -C @CORE@ push origin main'
+  _agc "(c3) echo x > <core>/NOTE.md → VETO"                      2 "${A}" Bash 'echo x > @CORE@/NOTE.md'
+  _agc "(c4) git -C <outro adotante> push branch → VETO"          2 "${A}" Bash 'git -C @OUTRO@ push origin HEAD:refs/heads/x'
+  _agc "(c5) Write no core → VETO"                                2 "${A}" Write '@CORE@/NOTE.md'
+  _agc "(c6) Edit em outro adotante → VETO"                       2 "${A}" Edit '@OUTRO@/settings.json'
+  # (d) as GRAFIAS que o tokenizador segue
+  _agc "(d1) worktree do core fora do diretório dele → VETO"      2 "${A}" Bash 'git -C @WT@ commit -am x'
+  _agc "(d2) Write na worktree do core → VETO"                    2 "${A}" Write '@WT@/f.md'
+  _agc "(d3) cd <core> && git reset --hard → VETO"                2 "${A}" Bash 'cd @CORE@ && git reset --hard HEAD~1'
+  _agc "(d4) cd .. && cd <core> && git commit (cd condicional) → VETO" 2 "${A}" Bash 'cd .. && cd @CORE@ && git commit -m x'
+  _agc "(d5) bash -c com git -C <outro> commit → VETO"            2 "${A}" Bash 'bash -c "git -C @OUTRO@ commit -m y"'
+  _agc "(d6) eval literal → VETO"                                 2 "${A}" Bash 'eval "git -C @CORE@ commit -m x"'
+  _agc "(d7) GIT_DIR=<core>/.git git commit → VETO"               2 "${A}" Bash 'GIT_DIR=@CORE@/.git git commit -m x'
+  _agc "(d8) sed -i num arquivo do core → VETO"                   2 "${A}" Bash 'sed -i s/a/b/ @CORE@/f.md'
+  _agc "(d9) python -c abrindo para escrita no core → VETO"       2 "${A}" Bash "python3 -c \"open('@CORE@/x.md','w').write('y')\""
+  _agc "(d10) cwd do JSON no core: git commit → VETO"             2 "${A}" Bash 'git commit -m x' '@CORE@'
+  _agc "(d11) a própria lista: echo >> adopter-guard.tsv → VETO"  2 "${A}" Bash 'echo core /tmp >> .claude/adopter-guard.tsv'
+  _agc "(d12) a própria lista: Write → VETO"                      2 "${A}" Write '@R@/.claude/adopter-guard.tsv'
+  # (e) o caso HONESTO (o que impede a guarda de treinar a sessão a ignorá-la), com os falsos positivos do replay
+  _agc "(e1) git -C <core> log → passa"                           0 "${A}" Bash 'git -C @CORE@ log --oneline -1'
+  _agc "(e2) o merge verificado do core por caminho absoluto → passa" 0 "${A}" Bash 'bash @CORE@/ops/pr-merge-verified.sh 12 --repo o/r --merge-commit --sync'
+  _agc "(e3) co-relay entrega no inbox do core → passa"           0 "${A}" Bash 'bash .claude/utils/co-evolution/co-relay.sh s.md --target @CORE@'
+  _agc "(e4) cp do core para /tmp (leitura) → passa"              0 "${A}" Bash 'cp @CORE@/f.md /tmp/x'
+  _agc "(e5) commit no próprio repo citando o core na mensagem → passa" 0 "${A}" Bash 'git commit -m "cita git -C @CORE@ commit e sed -i x @CORE@/f.md"'
+  _agc "(e6) heredoc citando escrita no core → passa"             0 "${A}" Bash $'cat <<EOF > /tmp/s.md\ngit -C @CORE@ commit -m x\nEOF'
+  _agc "(e7) cwd no core: git log → passa"                        0 "${A}" Bash 'git log -1' '@CORE@'
+  _agc "(e8) Write no próprio repo → passa"                       0 "${A}" Write '@R@/src/novo.js'
+  _agc "(e9) Write no scratchpad → passa"                         0 "${A}" Write '/tmp/onion-bancada-x.md'
+  _agc "(e10) replay kg-ssot: KG_CORE_DIR=<core> \$P x.py > \$S/out → passa" 0 "${A}" Bash 'S=/tmp; P=$S/py; KG_CORE_DIR=@CORE@ $P -I tools/kg_hygiene.py > $S/h1.out'
+  _agc "(e10b) nome dinâmico lendo um arquivo do core, saída em /tmp → passa" 0 "${A}" Bash 'S=/tmp; P=$S/py; $P -I tools/kg_check.py @CORE@/f.md > $S/h1.out'
+  _agc "(e11) replay curadoria: cd <core>; cd \$T (mktemp); mkdir → passa" 0 "${A}" Bash 'cd @CORE@; T=$(mktemp -d); cd $T; git init -q .; mkdir -p docs/x'
+  _agc "(e12) replay curadoria: grep -E '>>|jsonl' no core → passa" 0 "${A}" Bash "cd @CORE@; grep -lnE '>>|jsonl|append' f.md"
+  _agc "(e13) replay kg-ssot: (cd <core> && …) > lst; sort > fx.lst → passa" 0 "${A}" Bash 'S=/tmp/x; cd $S; (cd @CORE@ && git ls-files) > core.lst; sort > fx.lst'
+  # (f) a lista e o papel decidem: allow isenta; sem carimbo o hook nem se arma
+  printf 'core\t%s\nallow\t%s\n' "${core}" "${outro}" > "${r}/.claude/adopter-guard.tsv"
+  _agc "(f1) allow <outro>: Write nele → passa"                   0 "${A}" Write '@OUTRO@/x.md'
+  _agc "(f2) allow não isenta o core → VETO"                      2 "${A}" Write '@CORE@/x.md'
+  printf 'core\t%s\n' "${core}" > "${r}/.claude/adopter-guard.tsv"
+  mv "${r}/.claude/.onion-version" "${sb}/stamp"
+  _agc "(f3) sem carimbo (core, porta): Write no outro → passa"   0 "${A}" Write '@OUTRO@/x.md'
+  mv "${sb}/stamp" "${r}/.claude/.onion-version"
+  # (g) o merge-gate no adotante carimbado VETA, e a recusa aponta o script do core por caminho absoluto
+  _agc "(g1) merge-gate: gh pr merge no adotante → VETO"          2 "${M}" Bash 'gh pr merge 1 --merge'
+  if grep -qF "bash ${core}/ops/pr-merge-verified.sh <PR>" "${sb}/err"; then record_pass "adopter-guard: (g1-msg) a recusa nomeia o merge verificado do core por caminho absoluto"
+  else record_fail "adopter-guard: (g1-msg)" "$(head -c 300 "${sb}/err")"; fi
+  _agc "(g2) merge-gate: git push origin main no adotante → VETO" 2 "${M}" Bash 'git push origin main'
+  _agc "(g3) merge-gate: push de branch → passa"                  0 "${M}" Bash 'git push -u origin feat'
+  _agc "(g4) merge-gate: o merge verificado por caminho absoluto → passa" 0 "${M}" Bash 'timeout -s KILL 600 bash @CORE@/ops/pr-merge-verified.sh 12 --repo o/r --merge-commit'
+  : > "${r}/.claude/adopter-guard.tsv"
+  _agc "(g5) merge-gate: sem core resolvido segue VETO"           2 "${M}" Bash 'gh pr merge 1 --merge'
+  if grep -qF "core <caminho>" "${sb}/err" && grep -qF "maestro" "${sb}/err"; then record_pass "adopter-guard: (g5-msg) sem core, a recusa manda declarar o core e diz que o merge é do maestro"
+  else record_fail "adopter-guard: (g5-msg)" "$(head -c 300 "${sb}/err")"; fi
+  printf 'core\t%s\n' "${core}" > "${r}/.claude/adopter-guard.tsv"
+
+  _agc "(e14) replay kg-ssot: o core como VALOR (--with u=<core>) num nome dinâmico → passa" 0 "${A}" Bash '$K --with u=@CORE@ --mode cp'
+  # (m) MUTANTES — a cura volta ao defeito numa cópia; o caso nomeado TEM de cair (a lista leva o allow do (f1))
+  printf 'core\t%s\nallow\t%s\n' "${core}" "${outro}" > "${r}/.claude/adopter-guard.tsv"
+  local md="${sb}/mut" mrc0 mrc1 old new file hook tool arg cwd want name
+  while IFS=$'\x1f' read -r name file old new hook want tool arg cwd; do
+    [ -n "${name}" ] || continue
+    rm -rf "${md}"; cp -r "${hd}" "${md}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${md}/${file}" "${old}" "${new}"; then
+      record_fail "adopter-guard: (m) ${name}" "o mutante não aplicou (a âncora mudou?)"; continue
+    fi
+    # rc 0 = o caso PASSA (o esperado `want` acontece) — no intacto tem de ser 0, no mutante ≠ 0
+    [ "$(_agx "${hd}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc0=0 || mrc0=1
+    [ "$(_agx "${md}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc1=0 || mrc1=1
+    _prove_mutation "adopter-guard: (m) ${name}" "${hd}/${file}" "${md}/${file}" "${mrc0}" "${mrc1}"
+  done <<EOF_MUT
+(g1) o adotante carimbado volta a só avisar$(printf '\x1f')pretooluse-merge-gate.sh$(printf '\x1f')  onion_adopter_role "\$root" >/dev/null && { ADVISE=0; ADOPTER=1; }$(printf '\x1f')  :$(printf '\x1f')${M}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')gh pr merge 1 --merge$(printf '\x1f')
+(c1) git que escreve volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = sub in _ADV_GIT_WRITE \\$(printf '\x1f')    writes = False \\$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ commit -m x$(printf '\x1f')
+(c3) o redirecionamento volta a não se julgar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    _adv_redirects(raw_words, detail)$(printf '\x1f')    pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')echo x > @CORE@/NOTE.md$(printf '\x1f')
+(c5) o Write volta a não comparar o repo$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      if [ "\$(_common "\$(realpath -m -- "\$r")")" = "\$c" ]; then$(printf '\x1f')      if false; then$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@CORE@/NOTE.md$(printf '\x1f')
+(d4) o cd condicional volta a deixar o repo desconhecido$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if where == UNKNOWN and _adv_last_cd() and "-C" not in gw:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')cd .. && cd @CORE@ && git commit -m x$(printf '\x1f')
+(d6) o eval volta a não se analisar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')                scoped(txt, depth + 1)$(printf '\x1f')                pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')eval "git -C @CORE@ commit -m x"$(printf '\x1f')
+(d12) a própria lista volta a ser escrevível$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')    [ "\$p" = "\$(realpath -m -- "\$selftsv" 2>/dev/null)" ] && deny_list "\${tool} em \${fpath}"$(printf '\x1f')    :$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@R@/.claude/adopter-guard.tsv$(printf '\x1f')
+(e11) o cd dinâmico volta a herdar o cd anterior$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')            _ADV_CDS.append((len(CWD), UNKNOWN))$(printf '\x1f')            pass$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')cd @CORE@; T=\$(mktemp -d); cd \$T; git init -q .; mkdir -p docs/x$(printf '\x1f')
+(e12) o alvo com | volta a ser arquivo$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f') and not _ar.search(r"[|;&<>()]", tgt):$(printf '\x1f'):$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')cd @CORE@; grep -lnE '>>|jsonl|append' f.md$(printf '\x1f')
+(e13) o cd da subshell volta a vazar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    while _ADV_CDS and _ADV_CDS[-1][0] > len(CWD):$(printf '\x1f')    while False:$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')S=/tmp/x; cd \$S; (cd @CORE@ && git ls-files) > core.lst; sort > fx.lst$(printf '\x1f')
+(f1) o allow volta a não isentar$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      case "\$p" in "\$a"|"\$a"/*) exit 0 ;; esac$(printf '\x1f')      :$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Write$(printf '\x1f')@OUTRO@/x.md$(printf '\x1f')
+(e10b) o > volta a ser verbo de escrita no texto opaco$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')                        + r")\\b)"$(printf '\x1f')                        + r")\\b)|>"$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')S=/tmp; P=\$S/py; \$P -I tools/kg_check.py @CORE@/f.md > \$S/h1.out$(printf '\x1f')
+(e14) o caminho como valor volta a contar como alvo$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')r"(^|[\\s;&|(\\"'])("$(printf '\x1f')r"()("$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')\$K --with u=@CORE@ --mode cp$(printf '\x1f')
+EOF_MUT
+  rm -rf "${sb}"; unset -f _agx _agc
+}
+_family run_adopter_guard_selftests
 
 # REGRA 115 (Hooks rodam python em modo isolado) — os vetos reais, com módulo sombra no diretório de trabalho.
 # Medido em 2026-11-04 (grafo guard-hooks-python-isolated-2026-11). Roda cada veto de verdade, numa CÓPIA da maquinaria

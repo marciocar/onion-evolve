@@ -25,6 +25,9 @@
 #    adotante): cada caso que vetaria no core vira AVISO injetado no contexto (additionalContext,
 #    exit 0), dizendo que nada conferiu o CI antes do merge. Antes, a sessão do adotante mergeava sem
 #    saber que a trava que ela via citada na doutrina não existia ali.
+#    Desde 2026-11-05 (REGRA 118) o aviso vale só para o repo SEM carimbo de adoção: o adotante carimbado
+#    (`role: adopted|hub|standalone`) VETA, e a recusa aponta o script do core por caminho absoluto
+#    (lib/adopter-scope.sh resolve o core), que é como os adotantes desta máquina mergeiam.
 #  · Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira (heredoc/prosa que CITA `gh pr merge`
 #    não veta — a classe guarda-por-vocabulário, falso-positivo medido no hook irmão em 09-01).
 #  · Escape deliberado = o maestro roda fora da sessão. Não há flag de bypass por desenho.
@@ -56,6 +59,29 @@ fi
 [ -z "$cmd" ] && exit 0
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 ADVISE=0; [ -f "${root}/ops/pr-merge-verified.sh" ] || ADVISE=1   # adotante: avisa em vez de vetar
+# ADOTANTE CARIMBADO VETA (2026-11-05, REGRA 118). O aviso acima nasceu de "não se veta o único caminho de merge de
+# uma casa que não tem o verificado". Medido: os adotantes desta máquina TÊM o caminho — o script do core chamado por
+# caminho absoluto, que o hook não lê (é arquivo) e por isso passa —, e o kg-ssot digitou `gh pr merge` direto em
+# 2026-10-08. Com carimbo `role: adopted|hub|standalone` o merge e o push na main vetam; o aviso fica para o repo SEM
+# carimbo e sem ops/ (a porta clonada, o plugin), que de fato não tem outro caminho.
+ADOPTER=0
+if [ "$ADVISE" = 1 ]; then
+  # shellcheck source=lib/adopter-scope.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/lib/adopter-scope.sh"
+  onion_adopter_role "$root" >/dev/null && { ADVISE=0; ADOPTER=1; }
+fi
+# A recusa do adotante aponta o caminho que ELE tem: o script do core por caminho absoluto, quando o core se resolve.
+deny_adopter() {
+  local core how
+  core="$(onion_adopter_core "$root" 2>/dev/null)" || core=""
+  if [ -n "$core" ] && [ -f "${core}/ops/pr-merge-verified.sh" ]; then
+    how="o merge segue pelo caminho verificado do core, por caminho absoluto: bash ${core}/ops/pr-merge-verified.sh <PR> --repo <dono>/<repo> --sync (lê o CI e o parecer do PR e recusa vermelho)"
+  else
+    how="este adotante não resolve o checkout do core nesta máquina (o maestro declara 'core <caminho>' em ${ONION_ADOPTER_TSV_REL}); sem ele, o merge é do maestro, fora da sessão (\`!\` no prompt), depois de 'gh pr checks <N>' verde"
+  fi
+  echo "GUARDA-PRETOOLUSE (adotante): $1 — num adotante a main só muda por merge de PR verificado, e o host não protege a main dele (a proteção de branch dá 403 no plano gratuito). Negado; ${how}." >&2
+  exit 2
+}
 # O aviso do adotante: JSON de PreToolUse com additionalContext (o mesmo canal do kg-read-leg.sh), exit 0.
 # Não cita o caminho do script do core: ele não viaja, e a frase seria um ponteiro para o que não existe.
 advise() {
@@ -72,6 +98,7 @@ advise() {
 if [ "$nopy" = 1 ]; then
   onion_nopy_touches merge-gate "$cmd" || exit 0
   [ "$ADVISE" = 1 ] && advise "sem python3"
+  [ "$ADOPTER" = 1 ] && deny_adopter "a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível) e o comando tem forma de merge ou push"
   echo "GUARDA-PRETOOLUSE: a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível) — o veto não consegue analisar este comando, que tem forma de merge ou push (git push, gh pr merge, gh api com rota de merge/contents/refs/graphql, gh repo sync). Fechado por segurança: o host não protege a main neste repo. Instale python3 (o tokenizador dos vetos); o merge segue pelo caminho verificado, bash ops/pr-merge-verified.sh <PR> --sync (core-only)." >&2
   exit 2
 fi
@@ -83,7 +110,7 @@ fi
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
 [ -z "$inv" ] && exit 0
 
-deny() { [ "$ADVISE" = 1 ] && advise "$1"; echo "GUARDA-PRETOOLUSE: $1 — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (lê CI + onion-review-verdict e recusa vermelho; o host não protege main neste repo). Se for deliberado, o maestro roda fora da sessão." >&2; exit 2; }  # (core-only): só alcançável depois do teste de presença acima
+deny() { [ "$ADVISE" = 1 ] && advise "$1"; [ "$ADOPTER" = 1 ] && deny_adopter "$1"; echo "GUARDA-PRETOOLUSE: $1 — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (lê CI + onion-review-verdict e recusa vermelho; o host não protege main neste repo). Se for deliberado, o maestro roda fora da sessão." >&2; exit 2; }  # (core-only): só alcançável depois do teste de presença acima
 
 # (0) INANALISÁVEL que tem a forma de merge, ou de push que pode tocar a main → FECHADO. A lib só emite
 #     isto quando não consegue PROVAR o que o shell vai executar; supor que era inofensivo é exatamente
