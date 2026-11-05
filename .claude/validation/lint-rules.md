@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**108 regras** no total — **94 HARD**, **49 SOFT**.
+**107 regras** no total — **94 HARD**, **48 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -153,7 +153,6 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 99 | Nó de .kg.yaml sem caminho de máquina, julgado pela classe | HARD + SOFT | caminho de máquina voltando ao corpus depois de a migração de provenance tirá-lo (com catraca). |
 | 111 | Grafo do design-context: locator de token e ligação do brief | SOFT | o grafo do design-context citar um token que sumiu do JSON, ou o brief nascer sem ligação ao business-context |
 | 112 | Página com projection_of cita ids que existem nos grafos dela | HARD + SOFT | a página de contexto que se declara projeção de grafos citar um id de nó que não existe mais |
-| 116 | Memória do Claude Code sem envelope de canal não confiável | SOFT | conteúdo lido de fora (mensagem de peer, de outra sessão, colado, ou dentro da cerca R15.1) gravado INTEIRO na memória persistente por um caminho que o veto do PreToolUse não vê, e carregado como regra na sessão seguinte |
 
 ## Automação Graduada
 
@@ -215,9 +214,8 @@ As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a 
 | 86 | Workflow de CI PARSEIA como YAML | HARD | workflow inexecutável passando por existente, e guarda morta por sintaxe |
 | 88 | Job de workflow que EXECUTA arquivo do repo faz checkout | HARD + SOFT | job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0` |
 | 101 | Veto PreToolUse por exit 2 declara onFailure: block | HARD + SOFT | veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa). |
-| 114 | Plugin não mora em .claude/skills no disco | HARD + SOFT | um plugin plantado em .claude/skills, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê. |
+| 114 | Plugin não mora em .claude/skills no disco | HARD + SOFT | um plugin plantado em .claude/skills/<nome>/.claude-plugin/ ou .claude/skills/<nome>/hooks/, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê. `hooks/` mais fundo é conteúdo. |
 | 115 | Hooks rodam python em modo isolado | HARD + SOFT | um hook, ou o que ele executa, rodar python sem `-I` e importar de fora da instalação do interpretador |
-| 117 | Ato de deploy tem assinatura no veto | HARD + SOFT | um wrapper de deploy nascer, ou ter a gramática mudada, fora do veto do ATO do pretooluse-moat-gate.sh |
 
 ## Aplicabilidade por papel
 
@@ -231,4 +229,3 @@ legítima de objeto não é aviso. Toda lista contém `source`, então no core t
 | 85 | Porta pública espelha o core, com catraca | source |
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | source |
 | 109 | CLAUDE.md não cresce sem tirar o equivalente ou citar um nó | source |
-| 117 | Ato de deploy tem assinatura no veto | source |

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SessionStart (Onion) — lista os arquivos com FORMA de plugin em .claude/skills e na pasta de skills do usuário. Só avisa: o
-# SessionStart não barra nada. FORMA não é CARGA: as células medidas em 2026-11-04 mostram que pasta aninhada (S3) e projeto sem
+# SessionStart (Onion) — lista os arquivos com FORMA de plugin (`<nome>/.claude-plugin/` e `<nome>/hooks/`, no 1º nível de cada skill)
+# em .claude/skills e na pasta de skills do usuário. Só avisa: o SessionStart não barra nada, e a pasta de casa nunca barra. FORMA não é CARGA: as células medidas em 2026-11-04 mostram que pasta aninhada (S3) e projeto sem
 # aceite de confiança (S2) não carregam, e que a pasta de skills do usuário carrega mesmo sem aceite (S5). Por isso o aviso não
 # afirma que carregou e não manda desconfiar de tudo: ele dá os caminhos e diz o que o maestro confere. Silencioso quando limpo;
 # nunca falha a sessão (exit 0 sempre). Lógica e teto em plugin-write-scan-check.sh; o veto é o pretooluse-plugin-write-guard.sh.
