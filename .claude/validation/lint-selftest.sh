@@ -50785,7 +50785,7 @@ run_plugin_write_guard_selftests() {
   rc=0; out="$(LC_ALL=C bash "${d}/limpa/.claude/hooks/pretooluse-plugin-write-guard.sh" --selftest 2>&1)" || rc=$?
   local n_accuse n_silent n_ceiling
   n_accuse="$(printf '%s\n' "${out}" | grep -c '^ok   acusa' || true)"; n_silent="$(printf '%s\n' "${out}" | grep -c '^ok   cala' || true)"; n_ceiling="$(printf '%s\n' "${out}" | grep -c '^TETO' || true)"
-  if [ "${rc}" -eq 0 ] && [ "${n_accuse}" -ge 30 ] && [ "${n_silent}" -ge 25 ] && [ "${n_ceiling}" -ge 7 ]; then
+  if [ "${rc}" -eq 0 ] && [ "${n_accuse}" -ge 60 ] && [ "${n_silent}" -ge 60 ] && [ "${n_ceiling}" -ge 20 ]; then
     record_pass "plugin-write-guard: (a) cópia limpa do veto verde: ${n_accuse} acusa, ${n_silent} cala, ${n_ceiling} de teto declarado"
   else
     record_fail "plugin-write-guard: (a) cópia limpa do veto" "rc=${rc} acusa=${n_accuse} cala=${n_silent} teto=${n_ceiling}: $(printf '%s\n' "${out}" | grep '^✗' | head -3 | tr '\n' '|')"
@@ -50812,30 +50812,20 @@ PYREG
   then record_pass "plugin-write-guard: (b) registrado: Write|Edit|NotebookEdit|Bash com onFailure block, e varredura no SessionStart"
   else record_fail "plugin-write-guard: (b) registro" "settings.json sem o matcher, o onFailure ou o SessionStart"; fi
 
-  # (c) o veto e a mensagem, como o runner: JSON pela entrada padrão, stderr e exit 2; e o hook quente não chama python
+  # (c) o veto e a mensagem, como o runner: JSON pela entrada padrão, stderr e exit 2
   local w="${d}/limpa/.claude/hooks/pretooluse-plugin-write-guard.sh" msg
   rc=0; msg="$(printf '{"tool_name":"Write","tool_input":{"file_path":"%s/p/.claude/skills/x/hooks/h.json"},"cwd":"%s"}' "${d}" "${d}" | CLAUDE_PROJECT_DIR="${d}" LC_ALL=C bash "${w}" 2>&1 >/dev/null)" || rc=$?
   if [ "${rc}" -eq 2 ] && printf '%s' "${msg}" | grep -q 'GUARDA-PRETOOLUSE (plugin em skills)'; then
     record_pass "plugin-write-guard: (c) exit 2 com a mensagem na saída de erro"
   else record_fail "plugin-write-guard: (c) veto como o runner" "rc=${rc} msg=${msg}"; fi
-  mkdir -p "${d}/nopy/bin"; local _b
-  for _b in bash cat grep sed awk head tr realpath dirname git; do
-    _b="$(command -v "${_b}" || true)"; [ -z "${_b}" ] || ln -sf "${_b}" "${d}/nopy/bin/"
-  done
-  rc=0; printf '{"tool_name":"Write","tool_input":{"file_path":"%s/docs/a.md"},"cwd":"%s"}' "${d}" "${d}" | CLAUDE_PROJECT_DIR="${d}" PATH="${d}/nopy/bin" LC_ALL=C bash "${w}" >/dev/null 2>&1 || rc=$?
-  local rc2=0; printf '{"tool_name":"Write","tool_input":{"file_path":"%s/.claude/skills/x/hooks/h"},"cwd":"%s"}' "${d}" "${d}" | CLAUDE_PROJECT_DIR="${d}" PATH="${d}/nopy/bin" LC_ALL=C bash "${w}" >/dev/null 2>&1 || rc2=$?
-  local rc3=0; printf '{"tool_name":"Bash","tool_input":{"command":"printf x > .claude/skills/x/hooks/h"},"cwd":"%s"}' "${d}" | CLAUDE_PROJECT_DIR="${d}" PATH="${d}/nopy/bin" LC_ALL=C bash "${w}" >/dev/null 2>&1 || rc3=$?
-  local rc4=0; printf '{"tool_name":"Bash","tool_input":{"command":"grep -rn .claude/skills/x/hooks docs"},"cwd":"%s"}' "${d}" | CLAUDE_PROJECT_DIR="${d}" PATH="${d}/nopy/bin" LC_ALL=C bash "${w}" >/dev/null 2>&1 || rc4=$?
-  if [ "${rc}" -eq 0 ] && [ "${rc2}" -eq 2 ] && [ "${rc3}" -eq 2 ] && [ "${rc4}" -eq 0 ]; then
-    record_pass "plugin-write-guard: (c2) sem python3: Write decide em bash; Bash fecha caminho com verbo de escrita e cala a leitura"
-  else record_fail "plugin-write-guard: (c2) sem python3" "Write honesto=${rc} Write alvo=${rc2} Bash escrita=${rc3} Bash leitura=${rc4}"; fi
 
   # (d) o aviso da partida da sessão, em stdout, e silêncio quando limpo; nunca falha a sessão
   local s="${d}/sess"; mkdir -p "${s}/.claude/skills/x/.claude-plugin" "${s}/.claude/validation" "${d}/casa"
   cp "${scan}" "${s}/.claude/validation/"; echo '{}' > "${s}/.claude/skills/x/.claude-plugin/plugin.json"
   rc=0; out="$(CLAUDE_PROJECT_DIR="${s}" HOME="${d}/casa" LC_ALL=C bash "${hello}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'ATENÇÃO: 1 arquivo'; then
-    record_pass "plugin-write-guard: (d) a partida da sessão avisa, com rc 0"
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '1 arquivo(s) com FORMA de plugin' && printf '%s' "${out}" | grep -qF '  - .claude/skills/x/.claude-plugin/plugin.json' \
+     && ! printf '%s' "${out}" | grep -qE 'JÁ|confie'; then
+    record_pass "plugin-write-guard: (d) a partida lista a forma, sem afirmar carga, com rc 0"
   else record_fail "plugin-write-guard: (d) aviso na partida" "rc=${rc} out=${out}"; fi
   rm -f "${s}/.claude/skills/x/.claude-plugin/plugin.json"
   rc=0; out="$(CLAUDE_PROJECT_DIR="${s}" HOME="${d}/casa" LC_ALL=C bash "${hello}" 2>&1)" || rc=$?
@@ -50844,10 +50834,14 @@ PYREG
 
   # (e) o DISPATCHER: a REGRA 114 acusa um repo com plugin; o caso anda por lint-artifacts de verdade
   local dr="${d}/disp"; mkdir -p "${dr}/.claude/skills/x/hooks"; echo '{}' > "${dr}/.claude/skills/x/hooks/hooks.json"
-  out="$(cd "${REPO_ROOT}" && ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
+  out="$(cd "${REPO_ROOT}" && ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
   if printf '%s' "${out}" | grep -q 'REGRA 114 (Plugin não mora em .claude/skills no disco).*plugin-em-skills'; then
     record_pass "plugin-write-guard: (e) o dispatcher leva o achado à REGRA 114"
   else record_fail "plugin-write-guard: (e) dispatcher" "$(printf '%s\n' "${out}" | tail -3 | tr '\n' '|')"; fi
+  out="$(cd "${REPO_ROOT}" && ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'plugin-em-skills'; then
+    record_fail "plugin-write-guard: (e1) a variável sem a flag" "trocou o repo julgado: $(printf '%s\n' "${out}" | grep -m1 plugin-em-skills)"
+  else record_pass "plugin-write-guard: (e1) sem a flag de bancada, a variável não troca o repo julgado"; fi
 
   # (e2) o CONTRATO do tsv que o dispatcher lê: severidade, classe e caminho relativo em colunas
   rc=0; out="$(LC_ALL=C bash "${scan}" "${dr}" --format tsv 2>&1)" || rc=$?
@@ -50886,180 +50880,421 @@ open(p, "w", encoding="utf-8").write(s.replace(a, b))' "${file}"; then
     fi
     rm -rf "${sb}"
   }
-  _pw_mut M1-realpath hook "Write por symlink (K3)" <<'EOF_MUT'
+  _pw_mut M1-realpath hook 'Write por symlink (K3)' <<'EOF_MUT'
 real="$(realpath -m -- "${path}" 2>/dev/null)" || real="${path}"
 @@@
 real="${path}"
 EOF_MUT
-  _pw_mut M2-como-escrito hook "Write por skill que é link para fora (S6)" <<'EOF_MUT'
+  _pw_mut M2-como-escrito hook 'Write por skill que é link para fora (S6)' <<'EOF_MUT'
 if _pw_is_plugin_path "${spelled}" || _pw_is_plugin_path "${real}"; then
 @@@
 if _pw_is_plugin_path "${real}"; then
 EOF_MUT
-  _pw_mut M3-forma-plugin hook "Write T3" <<'EOF_MUT'
+  _pw_mut M3-forma-plugin hook 'Write T3' <<'EOF_MUT'
 */.claude/skills/*/.claude-plugin|*/.claude/skills/*/.claude-plugin/*) return 0 ;;
 @@@
 */NADA) return 0 ;;
 EOF_MUT
-  _pw_mut M4-forma-hooks hook "Write T4" <<'EOF_MUT'
+  _pw_mut M4-forma-hooks hook 'Write T4' <<'EOF_MUT'
 */.claude/skills/*/hooks|*/.claude/skills/*/hooks/*) return 0 ;;
 @@@
 */NADA) return 0 ;;
 EOF_MUT
-  _pw_mut M5-exit2 hook "Edit T3" <<'EOF_MUT'
-(\`!\` no prompt)." >&2
+  _pw_mut M5-exit2 hook 'Edit T3' <<'EOF_MUT'
+rm passa." >&2
   exit 2
 @@@
-(\`!\` no prompt)." >&2
+rm passa." >&2
   exit 0
 EOF_MUT
-  _pw_mut M6-sinal hook "cat > T3 (verbatim)" <<'EOF_MUT'
+  _pw_mut M6-sinal hook 'cat > T3 (verbatim)' <<'EOF_MUT'
   *.claude-plugin*) hit=1 ;;
 @@@
   *.claude-plugin*) : ;;
 EOF_MUT
-  _pw_mut M7-veredito-bash hook "tee T4 (verbatim)" <<'EOF_MUT'
+  _pw_mut M7-veredito-bash hook 'tee T4 (verbatim)' <<'EOF_MUT'
   plugin) _pw_deny "${detail}" ;;
 @@@
   plugin) exit 0 ;;
 EOF_MUT
-  _pw_mut M8-rota-script hook "script solto em dois tempos (K4, verbatim)" <<'EOF_MUT'
+  _pw_mut M8-rota-script hook 'script solto em dois tempos (K4, verbatim)' <<'EOF_MUT'
 pw_unversioned_script && hit=1
 @@@
 false && hit=1
 EOF_MUT
-  _pw_mut M9-rota-symlink hook "Bash por symlink sem sinal no texto" <<'EOF_MUT'
+  _pw_mut M9-rota-symlink hook 'Bash por symlink sem sinal no texto' <<'EOF_MUT'
 pw_cites_symlink ) && hit=1
 @@@
 false ) && hit=1
 EOF_MUT
-  _pw_mut M10-rota-copia hook "ln -s de pasta com plugin (S6)" <<'EOF_MUT'
+  _pw_mut M10-rota-copia hook 'ln -s de pasta com plugin (S6)' <<'EOF_MUT'
   *skills*) grep -qE '(^|[^[:alnum:]_-])(cp|mv|ln|rsync)([^[:alnum:]_-]|$)' <<< "${flat}" && hit=1 ;;
 @@@
   *skills*) : ;;
 EOF_MUT
-  _pw_mut M11-sobreacusa hook "echo que cita" <<'EOF_MUT'
+  _pw_mut M11-sobreacusa hook 'echo que cita' <<'EOF_MUT'
 [ -z "${line}" ] && exit 0
 @@@
 [ -z "${line}" ] && exit 2
 EOF_MUT
-  _pw_mut J1-resolvido judge "Bash por symlink sem sinal no texto" <<'EOF_MUT'
+  _pw_mut M12-analise-abre hook 'análise incompleta fecha o caminho com verbo' <<'EOF_MUT'
+grep -qx '__ONION_MOAT_OK__' <<< "${out}" || _pw_closed "a análise não chegou ao fim"
+@@@
+grep -qx '__ONION_MOAT_OK__' <<< "${out}" || exit 0
+EOF_MUT
+  _pw_mut M13-relativo hook 'Write relativo ao cwd' <<'EOF_MUT'
+*) path="${hcwd:-${CLAUDE_PROJECT_DIR:-$PWD}}/${path}" ;;
+@@@
+*) : ;;
+EOF_MUT
+  _pw_mut M14-til hook 'Write com til, por link sob a casa' <<'EOF_MUT'
+"~/"*) path="${HOME:-}/${path#"~/"}" ;;
+@@@
+"~/"*) : ;;
+EOF_MUT
+  _pw_mut M15-unicode hook 'Write com escape unicode no caminho' <<'EOF_MUT'
+*'\u'*) path=
+@@@
+*'NUNCA-CASA'*) path=
+EOF_MUT
+  _pw_mut M16-sem-python-abre hook 'sem python3: Bash com verbo fecha' <<'EOF_MUT'
+[ "${nopy}" = 1 ] && _pw_closed "python3 ausente ou quebrado"
+@@@
+[ "${nopy}" = 1 ] && exit 0
+EOF_MUT
+  _pw_mut M17-fechado-sobreacusa hook 'análise incompleta cala a leitura' <<'EOF_MUT'
+&& grep -qE "${pw_write}" <<< "${flat}" || exit 0
+@@@
+|| true
+EOF_MUT
+  _pw_mut M18-prune hook 'Write em node_modules de skill' <<'EOF_MUT'
+*/.claude/skills/*/node_modules/*|*/.claude/skills/*/.git/*|*/.claude/skills/*/.venv/*|*/.claude/skills/*/venv/*) return 1 ;;
+@@@
+*/NADA/*) return 1 ;;
+EOF_MUT
+  _pw_mut J1-resolvido judge 'Bash por symlink sem sinal no texto' <<'EOF_MUT'
     for q in (p, os.path.realpath(p)):
 @@@
     for q in (p,):
 EOF_MUT
-  _pw_mut J2-codigo judge "python3 -c T3 (verbatim)" <<'EOF_MUT'
-        if _PW_CODE_WRITE.search(t):
-            _moat_emit("plugin", t, "", "código embutido que escreve no caminho")
+  _pw_mut J2-open judge 'python3 open com file e mode nomeados' <<'EOF_MUT'
+if m and re.search(r"[wax+]", m) and _pw_hits(_pw_lit(target, names) if target is not None else None):
 @@@
-        if False:
-            pass
+if False:
 EOF_MUT
-  _pw_mut J3-heredoc judge "python3 heredoc" <<'EOF_MUT'
-        _pw_scan_interp_heredocs()
+  _pw_mut J2b-destino-rename judge 'quarentena: os.rename para fora' <<'EOF_MUT'
+"os.rename": 1
 @@@
-        pass
+"os.rename": 0
 EOF_MUT
-  _pw_mut J4-pedacos judge "nome montado de pedaços literais (K2, verbatim)" <<'EOF_MUT'
-        w = _pw_expand(w)
+  _pw_mut J2c-destino-copy judge 'leitura: python3 shutil.copy para fora' <<'EOF_MUT'
+"shutil.copy": 1
 @@@
-        pass
+"shutil.copy": 0
 EOF_MUT
-  _pw_mut J5-remocao judge "remoção: rm -rf da pasta" <<'EOF_MUT'
-    _PW["removal"] = base in ("rm", "rmdir", "unlink") or (base == "find" and "-delete" in args)
+  _pw_mut J2d-destino-move judge 'quarentena: shutil.move para fora' <<'EOF_MUT'
+"shutil.move": 1
 @@@
-    _PW["removal"] = (base == "find" and "-delete" in args)
+"shutil.move": 0
 EOF_MUT
-  _pw_mut J6-find-delete judge "remoção: find -delete" <<'EOF_MUT'
- or (base == "find" and "-delete" in args)
+  _pw_mut J3-heredoc judge 'python3 heredoc' <<'EOF_MUT'
+    _pw_scan_interp_heredocs()
+
 @@@
+    pass
 
 EOF_MUT
-  _pw_mut J7-origem-mv judge "quarentena: mv do plugin para fora" <<'EOF_MUT'
-        _PW["exempt"] = {_moat_abspath(s) for s in (pos if tdir else pos[:-1])}
+  _pw_mut J3b-leitor judge 'python3 tool.py com heredoc de dado' <<'EOF_MUT'
+m = _PW_INTERP_READER.search(bare)
+@@@
+m = re.search(r"(python3)", ln)
+EOF_MUT
+  _pw_mut J3c-doc-aninhado judge 'heredoc de documento que traz um heredoc de python' <<'EOF_MUT'
+            i += 1
+            bare = re.sub
+@@@
+            i = i - len(body)
+            bare = re.sub
+EOF_MUT
+  _pw_mut J4-pedacos judge 'nome montado de pedaços literais (K2, verbatim)' <<'EOF_MUT'
+        w = _pw_expand(w)
+
 @@@
         pass
+
 EOF_MUT
-  _pw_mut J8-pasta-com-plugin judge "cp -r de pasta com plugin" <<'EOF_MUT'
-        _pw_copy_into_skills(base, args, " ".join(raw_words))
-@@@
-        pass
-EOF_MUT
-  _pw_mut J9-pasta-qualquer judge "cp -r de pasta sem plugin para skills" <<'EOF_MUT'
-        if sp and _pw_tree_form(os.path.realpath(sp)):
-@@@
-        if sp:
-EOF_MUT
-  _pw_mut J10-nome-da-skill judge "Bash > em skill nomeada hooks" <<'EOF_MUT'
-                if c == "hooks" and j >= 1:
-@@@
-                if c == "hooks":
-EOF_MUT
-  _pw_mut J11-classe judge "crontab que cita" <<'EOF_MUT'
-    if cls in ("relogio", "alheio"):
-        return
-@@@
-    if False:
-        return
-EOF_MUT
-  _pw_mut J12-relevancia judge "eval de texto em runtime" <<'EOF_MUT'
-    return any(_PW_TEXT_SIG.search(ln) and _PW_SHELL_WRITE.search(ln) for ln in t.split("\n"))
-@@@
-    return False
-EOF_MUT
-  _pw_mut J13-sobreacusa-codigo judge "python3 -c que só cita, escrevendo noutro lugar" <<'EOF_MUT'
-        if _PW_CODE_WRITE.search(t):
-            _moat_emit("plugin", t, "", "código embutido que escreve no caminho")
+  _pw_mut J4b-ambiguo judge 'valores distintos: ramo de if' <<'EOF_MUT'
+        if len(s) == 1:
+            _pw_assign[k] = next(iter(s))
 @@@
         if True:
-            _moat_emit("plugin", t, "", "código embutido que escreve no caminho")
+            _pw_assign[k] = sorted(s, key=lambda v: "hooks" not in v)[0]
 EOF_MUT
-  _pw_mut J14-str-replace judge "python3 heredoc com str.replace que cita o caminho do alvo" <<'EOF_MUT'
-os\.(?:rename|replace|symlink|link|makedirs|mkdir)
+  _pw_mut J4c-doc-atribui judge 'atribuição dentro de doc' <<'EOF_MUT'
+text = _pw_blank_quoted(heredocs(raw))
 @@@
-(?:os\.)?(?:rename|replace|symlink|link|makedirs|mkdir)
+text = raw
 EOF_MUT
-  _pw_mut J15-raiz judge "python3 heredoc que grava .claude-plugin da raiz" <<'EOF_MUT'
-_PW_PATH = r"[^'\"`\n]*\.claude/skills/[^'\"`\n]*(?:\.claude-plugin|/hooks)(?:/[^'\"`\n]*)?"
+  _pw_mut J4d-echo-atribui judge 'atribuição citada num echo' <<'EOF_MUT'
+text = _pw_blank_quoted(heredocs(raw))
 @@@
-_PW_PATH = r"[^'\"`\n]*(?:\.claude-plugin|/hooks)(?:/[^'\"`\n]*)?"
+text = heredocs(raw)
 EOF_MUT
-  _pw_mut S1-segue-link scan "skill que é link para fora (S6)" <<'EOF_MUT'
-find -L . -mindepth 2
+  _pw_mut J4e-home judge '$HOME em bash -c' <<'EOF_MUT'
+if name in ("HOME", "CLAUDE_PROJECT_DIR"):
 @@@
-find . -mindepth 2
+if name in ():
 EOF_MUT
-  _pw_mut S2-hooks scan "hooks.json em skills/x/hooks (W1)" <<'EOF_MUT'
- -o -path './*/hooks/*' \)
+  _pw_mut J4f-pwd judge '$PWD' <<'EOF_MUT'
+if with_pwd and name == "PWD":
 @@@
- \)
+if False:
 EOF_MUT
-  _pw_mut S3-plugin scan "plugin.json em skills/x/.claude-plugin (W1)" <<'EOF_MUT'
+  _pw_mut J4g-subst-pwd judge '$(pwd)' <<'EOF_MUT'
+t = _PW_PWD_SUBST.sub("$PWD", t)
+@@@
+pass
+EOF_MUT
+  _pw_mut J4h-topo judge 'topo do git' <<'EOF_MUT'
+return _PW_TOP_SUBST.sub("$__PW_TOP", t)
+@@@
+return t
+EOF_MUT
+  _pw_mut J4i-rebind judge 'for religa o nome' <<'EOF_MUT'
+vals.setdefault(n, set()).update({"\0rebind1", "\0rebind2"})
+@@@
+pass
+EOF_MUT
+  _pw_mut J5-remocao judge 'remoção: rm -rf da pasta' <<'EOF_MUT'
+skip = base in ("rm", "rmdir", "unlink")
+@@@
+skip = False
+EOF_MUT
+  _pw_mut J6-find-rm judge 'remoção: find -exec rm' <<'EOF_MUT'
+skip = not (verbs & {"sed", "chmod", "chown", "touch", "truncate", "tee", "dd"})
+@@@
+skip = "-delete" in args
+EOF_MUT
+  _pw_mut J6b-find-sed judge 'find -exec sed -i na pasta' <<'EOF_MUT'
+skip = not (verbs & {"sed", "chmod", "chown", "touch", "truncate", "tee", "dd"})
+@@@
+skip = True
+EOF_MUT
+  _pw_mut J6c-git-clean judge 'remoção: git -C clean' <<'EOF_MUT'
+skip = bool(pos) and pos[0] in ("clean", "rm")
+@@@
+skip = False
+EOF_MUT
+  _pw_mut J7-origem-mv judge 'quarentena: mv do plugin para fora' <<'EOF_MUT'
+exempt = {_moat_abspath(s) for s in (pos if tdir else pos[:-1])}
+@@@
+pass
+EOF_MUT
+  _pw_mut J8-pasta-com-plugin judge 'cp -r de pasta com plugin' <<'EOF_MUT'
+_pw_copy_into_skills(base, args, " ".join(raw_words))
+@@@
+pass
+EOF_MUT
+  _pw_mut J9-pasta-qualquer judge 'cp -r de pasta sem plugin para skills' <<'EOF_MUT'
+if sp and _pw_tree_form(os.path.realpath(sp), ex):
+@@@
+if sp:
+EOF_MUT
+  _pw_mut J9b-so-hooks judge 'cp -r de pasta só com hooks' <<'EOF_MUT'
+for n in (".claude-plugin", "hooks"))
+@@@
+for n in (".claude-plugin",))
+EOF_MUT
+  _pw_mut J9c-cp-t judge 'cp -t de pasta com plugin' <<'EOF_MUT'
+dest, srcs = tdir, pos
+@@@
+return
+EOF_MUT
+  _pw_mut J9d-ln-base judge 'ln -s relativo ao link' <<'EOF_MUT'
+os.path.dirname(d) if base == "ln" else None
+@@@
+None
+EOF_MUT
+  _pw_mut J9e-exclude judge 'rsync que exclui as pastas de plugin' <<'EOF_MUT'
+ex.add(v.strip("/"))
+@@@
+pass
+EOF_MUT
+  _pw_mut J10-nome-da-skill judge 'Bash > em skill nomeada hooks' <<'EOF_MUT'
+if c == "hooks" and j >= 1:
+@@@
+if c == "hooks":
+EOF_MUT
+  _pw_mut J10b-prune judge 'Bash > em node_modules de skill' <<'EOF_MUT'
+if j >= 1 and c in _PW_PRUNE:
+@@@
+if False:
+EOF_MUT
+  _pw_mut J11-classe judge 'crontab que cita' <<'EOF_MUT'
+if cls in ("relogio", "alheio"):
+@@@
+if False:
+EOF_MUT
+  _pw_mut J12-relevancia judge 'eval de texto em runtime' <<'EOF_MUT'
+return any(_PW_TEXT_SIG.search(ln) and _PW_SHELL_WRITE.search(ln) for ln in t.split("\n"))
+@@@
+return False
+EOF_MUT
+  _pw_mut J13-sobreacusa-codigo judge 'python3 -c que só cita, escrevendo noutro lugar' <<'EOF_MUT'
+ and _pw_code_writes(head, args[k + 1]):
+@@@
+:
+EOF_MUT
+  _pw_mut J14-string-python judge 'string em python que cita a chamada' <<'EOF_MUT'
+return _pw_python_writes(code)
+@@@
+return bool(re.search(r"open\(", code))
+EOF_MUT
+  _pw_mut J15-node judge 'node writeFileSync' <<'EOF_MUT'
+r"\b(?:writeFile|writeFileSync|appendFile|appendFileSync|mkdirSync)\(\s*" + _PW_QP +
+@@@
+r"NUNCA" + _PW_QP +
+EOF_MUT
+  _pw_mut J15b-node-destino judge 'leitura: node copyFileSync para fora' <<'EOF_MUT'
+\(\s*[^,()]*,\s*" + _PW_QP +
+@@@
+\(\s*(?:[^,()]*,\s*)?" + _PW_QP +
+EOF_MUT
+  _pw_mut J15c-perl judge 'perl open' <<'EOF_MUT'
+r"|\bopen\([^,()]*,\s*['\"]>+\s*" + _PW_PATH + r"['\"]" +
+@@@
+r"|NUNCA" +
+EOF_MUT
+  _pw_mut J15d-ruby judge 'ruby File.write' <<'EOF_MUT'
+r"|\bFile\.write\(\s*" + _PW_QP +
+@@@
+r"|NUNCA" + _PW_QP +
+EOF_MUT
+  _pw_mut J16-xargs-fora judge 'leitura: xargs cp -I para fora' <<'EOF_MUT'
+if tail and os.path.basename(tail[0]) in ("cp", "mv", "ln", "install", "rsync"):
+@@@
+if False:
+EOF_MUT
+  _pw_mut J17-ssh judge 'ssh: outra máquina' <<'EOF_MUT'
+if head == "ssh":
+@@@
+if False:
+EOF_MUT
+  _pw_mut J17b-remoto judge 'scp: outra máquina' <<'EOF_MUT'
+skip = remote or (base == "rsync" and (_pw_short_flag(args, "n") or "--dry-run" in args))
+@@@
+skip = False
+EOF_MUT
+  _pw_mut J17c-dry-run judge 'leitura: rsync -n' <<'EOF_MUT'
+skip = remote or (base == "rsync" and (_pw_short_flag(args, "n") or "--dry-run" in args))
+@@@
+skip = remote
+EOF_MUT
+  _pw_mut J18-script-provado judge 'script solto cuja escrita não se prova' <<'EOF_MUT'
+if _PW["in_script"]:
+@@@
+if False:
+EOF_MUT
+  _pw_mut J19-noexec judge 'bash -n de script solto' <<'EOF_MUT'
+if _PW["noexec"] or _PW_ENV_NAME.match(
+@@@
+if _PW_ENV_NAME.match(
+EOF_MUT
+  _pw_mut J20-segredos judge 'source de arquivo de segredos' <<'EOF_MUT'
+if _PW["noexec"] or _PW_ENV_NAME.match(os.path.basename(str(path))):
+@@@
+if _PW["noexec"]:
+EOF_MUT
+  _pw_mut J21-cd-menos judge 'cd no plugin, cd -' <<'EOF_MUT'
+(len(words) < 2 or words[1] == "-")):
+        del _MOAT_CDS[:]
+@@@
+(len(words) < 2 or words[1] == "-")):
+        pass
+EOF_MUT
+  _pw_mut J21b-cd-dinamico judge 'OLD=$PWD, cd, volta' <<'EOF_MUT'
+        if DYNAMIC.search(w):
+            del _MOAT_CDS[:]
+@@@
+        if DYNAMIC.search(w):
+            pass
+EOF_MUT
+  _pw_mut J21c-pushd judge 'pushd literal' <<'EOF_MUT'
+elif base == "pushd":
+@@@
+elif False:
+EOF_MUT
+  _pw_mut J22-touch-r judge 'leitura: touch -r' <<'EOF_MUT'
+exempt.add(_moat_abspath(args[k + 1]))
+@@@
+pass
+EOF_MUT
+  _pw_mut J22b-tar-O judge 'leitura: tar -xO' <<'EOF_MUT'
+skip = _pw_short_flag(args, "O") or "--to-stdout" in args
+@@@
+skip = False
+EOF_MUT
+  _pw_mut J22c-ln-um-arg judge 'ln -s de um argumento' <<'EOF_MUT'
+exempt = {_moat_abspath(pos[0])}
+@@@
+pass
+EOF_MUT
+  _pw_mut S1-segue-link scan 'skill que é link para fora (S6)' <<'EOF_MUT'
+find -H "${ents[@]}"
+@@@
+find -P "${ents[@]}"
+EOF_MUT
+  _pw_mut S1b-fundo scan 'link abaixo do 1º nível' <<'EOF_MUT'
+find -H "${ents[@]}"
+@@@
+find -L "${ents[@]}"
+EOF_MUT
+  _pw_mut S2-hooks scan 'hooks.json em skills/x/hooks (W1)' <<'EOF_MUT'
+ -o -path './*/hooks/*' \) -print0
+@@@
+ \) -print0
+EOF_MUT
+  _pw_mut S3-plugin scan 'plugin.json em skills/x/.claude-plugin (W1)' <<'EOF_MUT'
  -o -path './*/.claude-plugin/*' -o -path
 @@@
  -o -path
 EOF_MUT
-  _pw_mut S4-prune scan "hooks dentro de node_modules" <<'EOF_MUT'
+  _pw_mut S4-prune scan 'hooks dentro de node_modules' <<'EOF_MUT'
 \( -name node_modules -o -name .git -o -name .venv -o -name venv \) -prune -o \
 @@@
 \
 EOF_MUT
-  _pw_mut S5-nome-da-skill scan "skill nomeada hooks" <<'EOF_MUT'
+  _pw_mut S5-nome-da-skill scan 'skill nomeada hooks' <<'EOF_MUT'
  -o -path './*/hooks/*' \)
 @@@
  -o -path '*hooks/*' \)
 EOF_MUT
-  _pw_mut S6-sem-home scan "com --home" <<'EOF_MUT'
-    [ "${home_too}" = 1 ] && [ -n "${HOME:-}" ] && _scan_dir "${HOME}/.claude/skills" "~/.claude/skills"
+  _pw_mut S6-sem-home scan 'com --home' <<'EOF_MUT'
+    _scan_dir "${HOME}/.claude/skills" "~/.claude/skills" "${acc}" || rc=$?
 @@@
     :
 EOF_MUT
-  _pw_mut S7-gate-no-home scan "sem --home" <<'EOF_MUT'
-    [ "${home_too}" = 1 ] && [ -n "${HOME:-}" ] && _scan_dir
+  _pw_mut S7-gate-no-home scan 'sem --home' <<'EOF_MUT'
+if [ "${home_too}" = 1 ] && [ -n "${HOME:-}" ]; then
 @@@
-    [ -n "${HOME:-}" ] && _scan_dir
+if [ -n "${HOME:-}" ]; then
 EOF_MUT
-  if [ "${n_mut}" -ge 33 ]; then record_pass "plugin-write-guard: (f) ${n_mut} mutantes mordem"
+  _pw_mut S8-saneia scan 'nome com quebra de linha' <<'EOF_MUT'
+f="$(LC_ALL=C; printf '%s' "${f//[^[:print:]]/?}")"
+@@@
+:
+EOF_MUT
+  _pw_mut S9-timeout scan 'timeout sai rc 2' <<'EOF_MUT'
+[ "${rc}" -eq 124 ] && return 2
+@@@
+:
+EOF_MUT
+  _pw_mut S10-arquivo-link scan 'arquivo-link dentro' <<'EOF_MUT'
+\( -type f -o -type l \)
+@@@
+-type f
+EOF_MUT
+  if [ "${n_mut}" -ge 80 ]; then record_pass "plugin-write-guard: (f) ${n_mut} mutantes mordem"
   else record_fail "plugin-write-guard: (f) contagem" "só ${n_mut} mutantes morderam"; fi
   unset -f _pw_tree _pw_mut
   rm -rf "${d}"

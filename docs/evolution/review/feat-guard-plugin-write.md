@@ -7,14 +7,14 @@ duration_min: 0
 verdict: PENDENTE
 elenxo: nao
 nota: >
-  A passada adversarial NÃO rodou. A forja saiu de um subagente, que para no resíduo; quem roda o
-  Elenxo é a sessão principal do core, em revisor novo, com mandato de achar o falso positivo
-  (guard-doctrine, cláusula 4). Até lá os campos acima não dizem nada sobre o artefato.
+  A 1ª passada adversarial, da sessão principal, REPROVOU aad2d62d3 com 6 achados altos e 7 médios, e a
+  forja curou sobre origin/main. A releitura sobre a cura está PENDENTE: os campos acima seguem sem
+  dizer nada sobre o artefato, e quem os preenche é a sessão principal ao fim dela.
 ---
 
 # Veto à escrita de plugin em .claude/skills e a varredura do disco
 
-**O Elenxo está pendente.** Nada aqui é veredito de revisão.
+**A releitura está pendente.** Nada aqui é veredito de revisão. O que mudou está no nó `E_ELENXO_REPROVOU_E_CUROU`.
 
 O que uma passada precisa saber antes de começar: o `--selftest` é meu e foi escrito junto com o
 artefato. Ele tem dois pontos cegos conhecidos. Um é o que nem os mutantes nem o replay alcançam: a

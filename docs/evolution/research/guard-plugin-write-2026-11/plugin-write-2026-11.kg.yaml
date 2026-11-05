@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 19 NÓS ═══
+# ═══ TETO: 23 NÓS ═══
 meta:
   id: plugin-write-2026-11
   schema_version: "1"
@@ -137,8 +137,8 @@ nodes:
     impact: 4
     confidence: 0.8
     trace: ".claude/validation/lint-selftest.sh"
-    label: "Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 33 mutantes, cada um revertendo uma cura e exigindo que um caso NOMEADO reprove."
-    narrative: "A 1ª rodada achou dois casos decorativos, e um defeito de âncora no próprio mutante, curados. Os dois casos que passavam verdes com a cura revertida: 'sem --home' não fixava o HOME, então o mutante lia a pasta real, que está limpa; e o caso da raiz estava mascarado pela outra cura. Sem o mutante, os dois davam licença. A polaridade de cala e o teto também são medidos: o --selftest imprime 7 linhas TETO, e um teto que passar a barrar reprova o caso e obriga a mudar o cabeçalho."
+    label: "Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 80 mutantes, cada um revertendo uma cura e exigindo que um caso NOMEADO reprove."
+    narrative: "A 1ª rodada achou dois casos decorativos, e um defeito de âncora no próprio mutante, curados. A 2ª passada subiu a conta: ver E_ELENXO_REPROVOU_E_CUROU. Os dois casos que passavam verdes com a cura revertida: 'sem --home' não fixava o HOME, então o mutante lia a pasta real, que está limpa; e o caso da raiz estava mascarado pela outra cura. Sem o mutante, os dois davam licença. A polaridade de cala e o teto também são medidos: o --selftest imprime 7 linhas TETO, e um teto que passar a barrar reprova o caso e obriga a mudar o cabeçalho."
 
   - id: E_DOGFOOD_AO_VIVO_NO_HARNESS
     node_type: evidence
@@ -156,6 +156,45 @@ nodes:
       method: "measurement: sessões de claude -p contra stub, desfecho pelo sha do alvo e pelo tool_result do stream-json"
       locality: "repo"
 
+  - id: E_ELENXO_REPROVOU_E_CUROU
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "bateria do refutador (casos c1 e c2) reexecutada contra a cura: todos os casos marcados para calar calam, salvo W1 e W2, que seguem por decisão; os de veto seguem barrando, salvo os redirecionamentos compostos, declarados como teto"
+    trace: ".claude/hooks/lib/plugin-write-judge.py"
+    label: "A 1ª passada adversarial REPROVOU a guarda em aad2d62d3, com 6 achados altos e 7 médios. O 0 de 371 do replay se sustentou, mas só sobre o passado: a população futura de comandos tinha as formas que a bancada não nomeava. Curados os altos e os médios, com caso e mutante."
+    narrative: "Os altos: o aviso de partida afirmava carga contra as células S2 e S3; nome de arquivo com quebra de linha virava linha no contexto do modelo; heredoc inerte e string em Python que só citam eram vetados; a cura e a leitura eram vetadas (find -exec rm, git clean, os.rename, shutil.copy, xargs cp); as peças se contradiziam sobre plugin legítimo; e $HOME, $PWD, $(pwd) e o topo do git passavam. Python passou a ser julgado pela árvore sintática, no argumento destino. Os médios: última atribuição vencia, cd antigo contaminava depois de cd -, a guarda vetava rodar a si mesma fora do checkout, a mensagem, o prune, o symlink na varredura e o timeout. Dos 15 mutantes que o refutador trouxe, 12 estavam vivos: 11 viraram caso; o da profundidade de busca da varredura saiu com a reescrita do find. Esta nota é da própria forja: a releitura é da sessão principal."
+
+  - id: D_NO_CORE_NAO_HA_PLUGIN_LOCAL
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: ".claude/validation/plugin-write-scan-check.sh"
+    label: "No core não há plugin local: um arquivo nessa forma trava o gate pela REGRA 114 (Plugin não mora em .claude/skills no disco), sem registro de exceção; quem quiser um reabre a decisão com o maestro."
+    narrative: "Decidido pela sessão principal, a partir da escolha do maestro de allowManagedModsOnly. Cura de contradição: o veto mandava o maestro instalar fora da sessão, e a regra reprovava o resultado. A decisão foi tomada pela sessão principal de 2026-11-04 por inferência da escolha do maestro, e ele não a selou aqui: confirme no merge. A pasta de skills do usuário não trava gate nenhum: no SessionStart a varredura lista o caminho e diz o que conferir."
+
+  - id: Q_HOOKS_EM_QUALQUER_PROFUNDIDADE_E_FALSO_POSITIVO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Em aberto, para o maestro: o glob pedido, hooks/ em qualquer profundidade, veta conteúdo honesto como references/hooks e templates/src/hooks de uma skill com React, e a célula S3 mediu que aninhado não carrega. Restringir a skills/<nome>/hooks fecharia o falso positivo."
+    narrative: "Mantive o glob dele, porque é decisão selada. Medido: zero caminhos assim nos transcripts, e nenhum no git. Gatilho para reabrir: a 1ª skill honesta barrada por isso. O teste de cala do refutador (W1 e W2) segue reprovando por esta razão."
+
+  - id: C_TETO_REDIRECIONAMENTO_COMPOSTO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    label: "TETO: redirecionamento de composto e formas raras passam calados: { } > alvo, ( ) > alvo, for … done > alvo, if … fi > alvo, &> alvo, >| alvo, <> alvo, exec 3> alvo. O tokenizador os descarta, e curá-los é mudar o lib dos outros vetos. A varredura pega o arquivo depois."
+
   - id: C_TETO_NAO_E_FRONTEIRA
     node_type: claim
     plane: DEV
@@ -171,8 +210,8 @@ nodes:
     impact: 4
     confidence: 0.85
     trace: ".claude/hooks/pretooluse-plugin-write-guard.sh"
-    label: "TETO: em Bash a lista falha pelo vocabulário. Sem veto, medidos como caso TETO: script versionado, python3 x.py, python3 -c com o caminho em variável, base64 -d com sh, git apply, tar -x na pasta de skills e nome calculado em runtime."
-    narrative: "Sem caso próprio: unzip e cp -r cuja origem ainda não existe, script em dois tempos que monta o nome, e cp chamado por dentro de um programa. O pedido listava também python3 -c, script em dois tempos, curl -o, dd, install, rsync e nome em variável. Medido: com o caminho literal, o juiz alcança todos, e são casos de acusa. Fica de fora a forma em que o caminho não aparece, e a varredura pega o resultado se ele ficar no disco. Mudar de nome é contornar: um arquivo escrito em .claude/skills/x/.claude-plugin por qualquer dessas rotas só cai na varredura."
+    label: "TETO: em Bash a lista falha pelo vocabulário. Tudo o que não é forma listada passa."
+    narrative: "Sem veto, medidos como caso TETO: script versionado, python3 x.py, base64 -d com sh, git apply, git clone, git checkout, tar -x na pasta de skills, nome calculado em runtime, alias de import e variável reatribuída em Python. Com valores distintos para o mesmo nome (ramo de if, reatribuição, for), a última atribuição não prova nada: cala, e isto é falso negativo aceito. Sem caso próprio: unzip e cp -r cuja origem ainda não existe, script em dois tempos que monta o nome, e cp chamado por dentro de um programa. O pedido listava também python3 -c, script em dois tempos, curl -o, dd, install, rsync e nome em variável. Medido: com o caminho literal, o juiz alcança todos, e são casos de acusa. Fica de fora a forma em que o caminho não aparece, e a varredura pega o resultado se ele ficar no disco. Mudar de nome é contornar: um arquivo escrito em .claude/skills/x/.claude-plugin por qualquer dessas rotas só cai na varredura."
 
   - id: C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE
     node_type: claim
@@ -198,8 +237,8 @@ nodes:
     impact: 3
     confidence: 0.85
     trace: ".claude/hooks/session-plugin-write-scan.sh"
-    label: "TETO: no SessionStart o plugin presente JÁ CARREGOU: o aviso é detecção, não prevenção, e um plugin plantado pode mudar o que a sessão faz a partir daí."
-    narrative: "A varredura não vê sub/.claude/skills, CLAUDE_CONFIG_DIR fora da pasta de casa, --plugin-dir nem node_modules, e na partida usa timeout de 4 s."
+    label: "TETO: no SessionStart o plugin que puder carregar já carregou: o aviso é detecção, não prevenção."
+    narrative: "E forma não é carga: um .gitkeep acusa e não carrega nada, e nem aninhado (S3) nem projeto sem aceite de confiança (S2) carregam, então o aviso lista caminhos e não afirma que carregou. A varredura não vê sub/.claude/skills, CLAUDE_CONFIG_DIR fora da pasta de casa, --plugin-dir nem node_modules, e na partida usa timeout de 4 s."
 
   - id: C_FALSO_POSITIVO_E_O_DEFEITO_DOMINANTE
     node_type: claim
@@ -216,7 +255,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    label: "Consequência declarada: nesta árvore a sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill embutida plugin-authoring grava ali. Quem instala é o maestro, fora da sessão. Não há variável de bypass, por desenho."
+    label: "Consequência declarada: nesta árvore a sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill embutida plugin-authoring grava ali. Não há variável de bypass, por desenho."
     narrative: "Não medido: uma sessão real com a plugin-authoring contra este veto. O laboratório só mostrou que o caminho é o mesmo (mod carregado como x@skills-dir)."
 
   - id: Q_ELENXO_PENDENTE
@@ -255,6 +294,18 @@ edges:
     edge_type: SUPPORTS
   - from: E_BANCADA_CASOS_E_MUTANTES
     to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: E_ELENXO_REPROVOU_E_CUROU
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: D_NO_CORE_NAO_HA_PLUGIN_LOCAL
+    to: D_HARD_NO_CORE_SOFT_NO_DERIVADO
+    edge_type: DEPENDS_ON
+  - from: Q_HOOKS_EM_QUALQUER_PROFUNDIDADE_E_FALSO_POSITIVO
+    to: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
+    edge_type: CONSTRAINS
+  - from: C_TETO_REDIRECIONAMENTO_COMPOSTO
+    to: C_TETO_NAO_E_FRONTEIRA
     edge_type: SUPPORTS
   - from: E_DOGFOOD_AO_VIVO_NO_HARNESS
     to: D_VETO_ESTREITO_MAIS_VARREDURA

@@ -6446,8 +6446,9 @@ check_act_signature
 #   de escrita em .claude/ e ~/.claude/skills foi barrada por veto do core; o plugin gravado sob bypass carregou na sessão
 #   seguinte e venceu o veto do .env (células W1 e W4). É a metade do veto que NÃO depende do vocabulário do Bash: julga o
 #   RESULTADO no disco, por qualquer caminho que ele tenha vindo. Passivo medido na forja: ZERO arquivos no git, no core e nos
-#   adotantes clonados nesta máquina. Por isso nasce HARD no core, sem catraca. No derivado (IS_DERIVED) é SOFT: o adotante
-#   pode instalar um plugin ali por escolha dele, e o core não julga o projeto alheio. Só o repo: `~/.claude/skills` é com
+#   adotantes clonados nesta máquina. Por isso nasce HARD no core, sem catraca e SEM registro de exceção: no core não há plugin
+#   local, um arquivo nessa forma trava o gate, e quem quiser um reabre a decisão com o maestro. No derivado (IS_DERIVED) é SOFT: o
+#   adotante pode instalar um plugin ali por escolha dele, e o core não julga o projeto alheio. Só o repo: `~/.claude/skills` é com
 #   o SessionStart, porque o gate não depende do `~` de quem roda. Lógica e teto em plugin-write-scan-check.sh; o veto da
 #   escrita é o hook pretooluse-plugin-write-guard.sh, peça de teto do grafo guard-plugin-write-2026-11.
 check_plugin_write_scan() {
@@ -6457,7 +6458,9 @@ check_plugin_write_scan() {
     case "${ONLY_PATH}" in */.claude/skills/*|*/plugin-write-scan-check.sh) : ;; *) return 0 ;; esac
   fi
   local _R="REGRA 114 (Plugin não mora em .claude/skills no disco)"
-  local _repo="${ONION_PLUGIN_SCAN_REPO:-${REPO_ROOT}}"   # troca o repo julgado (bancada)
+  local _repo="${REPO_ROOT}"
+  # troca o repo julgado só com a flag de bancada: a variável sozinha não pode tirar o core do gate
+  [ "${ONION_PLUGIN_SCAN_BENCH:-}" = 1 ] && [ -n "${ONION_PLUGIN_SCAN_REPO:-}" ] && _repo="${ONION_PLUGIN_SCAN_REPO}"
   local _out _hrc=0 _err _sev _code _path _msg
   _err="$(mktemp 2>/dev/null || echo /dev/null)"
   if _out="$(LC_ALL=C bash "${helper}" "${_repo}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
