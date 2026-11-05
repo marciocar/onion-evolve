@@ -76,7 +76,7 @@ nodes:
     verified_against: "matriz com e sem -I, no 3.15.2 do venv e no 3.12.3 do SO: diretório de trabalho, PYTHONPATH, PYTHONHOME, site do usuário, PYTHONSTARTUP, import yaml, codificação"
     trace: ".claude/hooks/lib/invocation-lines.sh"
     label: "-I cobre diretório de trabalho, PYTHONPATH, PYTHONHOME e site do usuário; PYTHONSTARTUP não age em nenhum dos dois casos fora do modo interativo"
-    narrative: "O site do usuário só age no python do SO: num venv ele já está desligado. PYTHONSTARTUP com -c não rodou com nem sem -I, também com PYTHONINSPECT: o caso prende o fato e não tem mutante, porque tirar o -I não muda o resultado. O tokenizador roda por /dev/fd/4: o diretório de trabalho não entra no caminho dele, o PYTHONPATH entra, e é por ali que o mutante dele morre."
+    narrative: "O site do usuário só age no python do SO: num venv ele já está desligado. PYTHONSTARTUP com -c não rodou com nem sem -I, também com PYTHONINSPECT: o caso prende o fato e não tem mutante, porque tirar o -I não muda o resultado. O tokenizador roda o script por descritor de arquivo: o diretório de trabalho não entra no caminho dele, o PYTHONPATH entra, e é por ali que o mutante dele morre."
     provenance:
       source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
       locator: "casos da família hooks_python_isolated"
