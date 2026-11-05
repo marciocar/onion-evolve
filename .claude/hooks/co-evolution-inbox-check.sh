@@ -49,7 +49,14 @@ pull_inbox() {
   local sh="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/federation-transport/inbox-pull.sh"
   [ -f "$sh" ] || return 0
   # .env do adotante é a fonte das credenciais; ausente = não configurado = silêncio.
-  [ -f .env ] && { set -a; . ./.env 2>/dev/null || true; set +a; }
+  # O arquivo é DADO, nunca código: sem `source`, só as chaves ONION_FED_*. Nada mais entra no ambiente do hook.
+  [ -f .env ] && while IFS= read -r _l; do
+    _l="${_l%$'\r'}"; _l="${_l#"${_l%%[![:space:]]*}"}"; _l="${_l#export }"; _l="${_l#"${_l%%[![:space:]]*}"}"
+    _k="${_l%%=*}"; _v="${_l#*=}"
+    case "$_k" in ONION_FED_*[!A-Z0-9_]*|"") continue ;; ONION_FED_*) ;; *) continue ;; esac
+    case "$_v" in \"*\") _v="${_v#\"}"; _v="${_v%\"}" ;; \'*\') _v="${_v#\'}"; _v="${_v%\'}" ;; esac
+    export "$_k=$_v"
+  done < .env
   [ -n "${ONION_FED_CLIENT_ID:-}" ] && [ -n "${ONION_FED_CLIENT_SECRET:-}" ] \
     && [ -n "${ONION_FED_ORG_ID:-}" ] && [ -n "${ONION_FED_MEMBER:-}" ] || return 0
   command -v timeout >/dev/null 2>&1 || return 0

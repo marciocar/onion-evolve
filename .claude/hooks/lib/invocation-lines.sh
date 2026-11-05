@@ -169,7 +169,7 @@ onion_invocation_lines() {
   # comando da sessão seria vetado por falta de motor.
   ONION_ROOT="$root" ONION_CWD="${ONION_CWD:-$PWD}" python3 -I /dev/fd/4 3<<<"$cmd" 4<<'ONION_TOKENIZER_PY' 2>/dev/null \
     || { grep -qE 'mergePullRequest|(^|[^[:alnum:]_])gh([^[:alnum:]_][^;&|]*)?[^[:alnum:]_](merge|api)([^[:alnum:]_]|$)|(^|[^[:alnum:]_])git([^[:alnum:]_][^;&|]*)?[^[:alnum:]_]push([^[:alnum:]_]|$)' <<< "$cmd" \
-         && printf '__ONION_UNANALYZABLE__ merge=1 main=1 :: %s\n' "$(printf '%s' "$cmd" | tr '\n' ' ' | cut -c1-400)"; }
+         && printf '__ONION_UNANALYZABLE__ merge=1 main=1 :: %s%s\n' "$(printf '%s' "$cmd" | tr '\n' ' ' | cut -c1-400)" "$(grep -qE '(^|[^[:alnum:]_])push([^[:alnum:]_]|$)' <<< "$cmd" && printf ' [push]')"; }
 import os, re, shlex, subprocess, sys, codecs
 
 ROOT = os.environ.get("ONION_ROOT", "")
@@ -1093,7 +1093,10 @@ def emit_unanalyzable(words, where=None, unknown_target=False):
     is_push = bool(re.search(r"\bpush\b|updateRef|git/refs", t))
     # destino vindo do STDIN (xargs, shell num pipe) é DESCONHECIDO: conta como main (fechado)
     main = unknown_target or (touches_main(t, where) if (is_push or is_merge) else False)
-    OUT.append("__ONION_UNANALYZABLE__ merge=%d main=%d :: %s" % (int(is_merge), int(main), t[:400]))
+    # o corte de 400 não pode levar o verbo embora: o hook de force-push procura `push` neste texto
+    tail = (" [push]" if is_push and not re.search(r"\bpush\b|updateRef|git/refs", t[:400]) else "") + \
+           (" [merge]" if is_merge and not re.search(r"mergePullRequest|enablePullRequestAutoMerge|\bmerge\b", t[:400]) else "")
+    OUT.append("__ONION_UNANALYZABLE__ merge=%d main=%d :: %s%s" % (int(is_merge), int(main), t[:400], tail))
 
 
 def relevant(words):

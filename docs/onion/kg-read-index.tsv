@@ -205,6 +205,7 @@
 .claude/hooks/pretooluse-direct-provider-api.sh	E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	E_REEXECUCAO_CONTRA_O_USO_REAL	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	C_TETO_FORMA_DO_SEGREDO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	D_FALHA_DE_ANALISE_FECHA_PELA_FORMA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	D_U4_LISTAR_NOMEAR_CITAR_PASSAM	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_DEFEITO_MODULO_SOMBRA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
@@ -2383,6 +2384,7 @@ docs/evolution/review/fix-bench-emit-pipe-race.md	E_CURA_HERE_STRING_MEDIDA_0904
 docs/evolution/review/fix-catraca-regra49.md	C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/fix-catraca-regra49.md	C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/fix-catraca-regra49.md	E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+docs/evolution/review/fix-hooks-python-isolated.md	E_PASSADA_REPROVOU_A_1A_CURA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 docs/evolution/review/fix-medidores-que-cortam-em-silencio.md	E_O_ELENXO_REPROVOU_A_GUARDA_E_O_PIOR_ERA_FATAL	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 docs/evolution/review/fix-medidores-que-cortam-em-silencio.md	E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 docs/evolution/review/fix-radar-allowlist-denylist.md	C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE	docs/onion/graph/elenxos-2026-08-07.kg.yaml
