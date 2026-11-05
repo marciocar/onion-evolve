@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**860 itens abertos** em 144 grafo(s) com aberto (de 185 no escopo) · 145 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**913 itens abertos** em 146 grafo(s) com aberto (de 187 no escopo) · 147 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -220,6 +220,52 @@
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248` | a2a-empresa-adotante-2026-10 | Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS, Linux e WSL 2), a 2.1.234 levou ao Wind |
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_SAME_MACHINE_PLUS_REMOTE_CONTROL` | a2a-empresa-adotante-2026-10 | Formulação sustentada pelo CHANGELOG: o cross-session na mesma máquina passou a valer em Bedrock, Vertex e Foundry e com teleme |
 
+## onion-distribution-packages-2026-11 — 41 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 71.5 | `Q_ONION_DISTRIBUTION_PACKAGES_1105` | onion-distribution-packages-2026-11 | Distribuir o Onion também como pacote npm, pacote Python e servidor MCP, como o kg-ssot, ou manter só as quatro portas e o marke |
+| 41.2 | `C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED` | onion-distribution-packages-2026-11 | B. Manter portas e marketplace, candidatar onion-plugins ao diretório oficial e deixar pacotes em parque com gatilho nomeado (rec |
+| 12.0 | `C_OPCAO_C_NPM_THIN_INSTALLER` | onion-distribution-packages-2026-11 | C. Publicar npm só como instalador fino que copia para .claude |
+| 9.0 | `C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY` | onion-distribution-packages-2026-11 | F. Publicar servidor MCP só de leitura e veredito próprio do Onion, com entrada no Registry |
+| 7.5 | `C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE` | onion-distribution-packages-2026-11 | A. Manter só portas e marketplace próprio, sem mudar nada (status quo) |
+| 4.5 | `C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE` | onion-distribution-packages-2026-11 | D. Publicar npm com conteúdo, como fonte de plugin |
+| 3.8 | `C_OPCAO_G_MCPB_BUNDLE` | onion-distribution-packages-2026-11 | G. Publicar MCPB do Onion |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS` | onion-distribution-packages-2026-11 | Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb. |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO6_WHAT_DOES_NOT_TRAVEL` | onion-distribution-packages-2026-11 | Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION` | onion-distribution-packages-2026-11 | Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin: OpenSpec, BMAD, spec |
+| 3.6 | `C_SUPERACAO_20261105_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS` | onion-distribution-packages-2026-11 | Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment  |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MARKETPLACE_ALLOWLIST_POLICY` | onion-distribution-packages-2026-11 | Restaurar a claim de allowlist e blocklist de marketplaces por política (strictKnownMarketplaces, blockedMarketplaces, hostPatter |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MCPNAME_OWNERSHIP_VERIFICATION` | onion-distribution-packages-2026-11 | Restaurar pela primária a verificação de propriedade no Registry, por mcpName e pela string mcp-name. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES` | onion-distribution-packages-2026-11 | Restaurar a claim do mcp-publisher por GitHub OIDC e dos tipos aceitos, com Cargo incluído. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MITIGATIONS_FALL_ON_ADOPTER` | onion-distribution-packages-2026-11 | Restaurar as mitigações (script desligado, lockfile, atraso de versão nova, auditoria de workflows) sem o número de horas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE` | onion-distribution-packages-2026-11 | Restaurar a claim de workflow órfão com OIDC e cache pnpm via pull_request_target. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_PIN_ENFORCE_AND_SEED_DIR` | onion-distribution-packages-2026-11 | Restaurar a claim e citar a semente como alternativa à imagem. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_RECURRING_WAVES` | onion-distribution-packages-2026-11 | Restaurar a recorrência das ondas de 2025 e 2026, sem as contagens não conferidas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW` | onion-distribution-packages-2026-11 | Restaurar a claim de versões imutáveis no Registry, com a ressalva de preview e sem afirmar nada sobre rollback. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED` | onion-distribution-packages-2026-11 | Restaurar a claim de nomes reservados (npm, pip, uv, cargo, github, gh) e de marketplace do tipo npm ainda não implementado. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY` | onion-distribution-packages-2026-11 | Restaurar a claim e avaliar pin por sha nas entradas das portas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE` | onion-distribution-packages-2026-11 | Tabela multicanal registrada no achado 8, no lugar de um ponto único de downloads de uma semana. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_STEALER_TARGETS_AI_CONFIG` | onion-distribution-packages-2026-11 | Restaurar a claim de que o stealer mira tokens e configurações de IA, sem bypass_2fa até haver fonte. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_OIDC_EXTRACTED_FROM_RUNNER` | onion-distribution-packages-2026-11 | Restaurar a claim de cache envenenado e OIDC extraído da memória do runner, trocando 'propagação' por 'publicação inicial'. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_PYPI_NOT_EXEMPT` | onion-distribution-packages-2026-11 | Restaurar a claim da campanha com nomes e versões (mistralai 2.4.6, guardrails-ai 0.10.1), sem afirmar a divisão 170 + 2. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS` | onion-distribution-packages-2026-11 | Restaurar a claim de que 'MCP by default' está em Caution no Radar, citando a página do blip em vez do PDF. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_SAP_TRUSTED_ANY_WORKFLOW` | onion-distribution-packages-2026-11 | Restaurar a claim de Trusted Publishing confiando em qualquer workflow, limitada a @cap-js. |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED` | onion-distribution-packages-2026-11 | A 1ª onda da Mini Shai-Hulud (11-12/05/2026) atingiu mais de 170 pacotes npm e 2 PyPI (mistralai 2.4.6, guardrails-ai 0.10.1). At |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED` | onion-distribution-packages-2026-11 | Postmortem da TanStack: PR de fork via pull_request_target envenenou o cache do pnpm; o release.yml o restaurou; o binário extrai |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED` | onion-distribution-packages-2026-11 | O Radar Vol. 34 pôs 'MCP by default' em Caution: não adotar por padrão; uma CLI bem desenhada muitas vezes basta; MCP agrega va |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED` | onion-distribution-packages-2026-11 | Em @cap-js, uma conta com escrita editou o release-please.yml num branch não-main e trocou o OIDC à mão; o nome de arquivo do n |
+| 3.6 | `C_SUPERACAO_20261105_SRC_BMAD_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: BMAD-METHOD com 55.023 estrelas e 6.138 forks. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_DEVTO_ROUTES` | onion-distribution-packages-2026-11 | Rotas confirmadas e métricas substituídas pelas de hoje. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_ORG_MD` | onion-distribution-packages-2026-11 | org.md incorporada nos itens sobre allowlist, imposição e semente. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_PLUGIN_OVERVIEW` | onion-distribution-packages-2026-11 | plugins/components cobre o que importava da overview. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_PYPISTATS_SUPERCLAUDE` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: superclaude com last_week 2.463 e last_month 5.193 no PyPI. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_SPEC_KIT_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: spec-kit com 147.665 estrelas, 13.250 forks e PyPI desde o PR #3516. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_TENABLE_FAQ` | onion-distribution-packages-2026-11 | FAQ da Tenable incorporada: linha do tempo, comprometimentos anteriores e a ordem de remover o daemon antes de girar credencial. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_VENTUREBEAT_OIDC_SCOPE` | onion-distribution-packages-2026-11 | VentureBeat incorporada às restrições da recomendação: o escopo do OIDC é o controle que manda. |
+| 3.0 | `C_OPCAO_E_PYPI_PACKAGE` | onion-distribution-packages-2026-11 | E. Publicar pacote PyPI do Onion |
+| 2.2 | `C_OPCAO_H_CONTAINER_IMAGE` | onion-distribution-packages-2026-11 | H. Publicar imagem de contêiner |
+
 ## jev-decision-round2-2026-10 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -336,6 +382,23 @@
 | 4.5 | `C_FALSO_POSITIVO_E_O_DEFEITO_DOMINANTE` | plugin-write-2026-11 | A vizinha ensina: a guarda do .env deu dois falsos positivos hoje, relatados pelo maestro, e mais dois nesta forja (um grep em .cl |
 | 4.2 | `C_CONSEQUENCIA_A_SESSAO_NAO_FORJA_MOD` | plugin-write-2026-11 | Consequência declarada: nesta árvore a sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill em |
 | 4.0 | `Q_ELENXO_PENDENTE` | plugin-write-2026-11 | O Elenxo não rodou: a passada adversarial é da sessão principal, em revisor novo, com mandato de achar o falso positivo. Enquan |
+
+## maestro-persona-2026-11 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 58.5 | `Q_MAESTRO_PERSONA_1105` | maestro-persona-2026-11 | Como o Onion copia voz, preferências e julgamento do maestro em todo papel de sessão (core, brain, curadoria, kg-ssot) sem copia |
+| 30.0 | `C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE` | maestro-persona-2026-11 | A. Fonte única no KG-SSOT: grafo maestro-persona com nós de voz, julgamento e limite (porquê e evidência em cada um), projetad |
+| 9.8 | `C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM` | maestro-persona-2026-11 | D. Identidade nos pesos (fine-tune/SFT de identidade) ou SLM |
+| 5.4 | `C_SUPERACAO_20261105_GSS_V3_83_PERCENT` | maestro-persona-2026-11 | Correção pela v3 de 2411.10109 (28/06/2026): em itens do GSS fora do treino, agentes de entrevistas de duas horas com 1.052 amer |
+| 5.4 | `C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER` | maestro-persona-2026-11 | O Panza mede fidelidade de ESTILO de e-mail com BLEU e MAUVE (MAUVE 0,6-1,0 no próprio usuário, ~0 nos outros), sem LLM-juiz; a  |
+| 5.4 | `C_SUPERACAO_20261105_RFC8693_ACT_CLAIM` | maestro-persona-2026-11 | RFC 8693 (OAuth 2.0 Token Exchange, Standards Track, jan/2020), seções 1.1 e 4.1: o claim act separa o ator do titular e disting |
+| 5.4 | `C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE` | maestro-persona-2026-11 | Twin-2K (GPT-4.1-mini): resumo 3,7 pp abaixo do texto completo (68,02 contra 71,72; acaso 59,17, reteste 81,72), JSON 1,24 pp abai |
+| 5.4 | `C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY` | maestro-persona-2026-11 | O draft individual WIMSE (-02, sem posição formal) exige que o agente nunca tenha a credencial bruta, guardada em cofre que não |
+| 5.0 | `C_OPCAO_B_NATIVE_USER_MEMORY_SHARED` | maestro-persona-2026-11 | B. Memória de usuário nativa do Claude Code (CLAUDE.md de usuário, auto memory, autoMemoryDirectory) compartilhada entre repos |
+| 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
+| 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
+| 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
