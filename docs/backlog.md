@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**901 itens abertos** em 145 grafo(s) com aberto (de 186 no escopo) · 146 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**900 itens abertos** em 145 grafo(s) com aberto (de 186 no escopo) · 146 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -365,11 +365,10 @@
 | 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## maestro-persona-2026-11 — 13 item(ns)
+## maestro-persona-2026-11 — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 62.5 | `D_MAESTRO_PERSONA_SOURCE_2026_11` | maestro-persona-2026-11 | Fonte da persona do maestro: A KG-SSOT projetado por papel · B memória nativa · C personality-sync · D pesos/SLM · E não ago |
 | 58.5 | `Q_MAESTRO_PERSONA_1105` | maestro-persona-2026-11 | Como o Onion copia voz, preferências e julgamento do maestro em todo papel de sessão (core, brain, curadoria, kg-ssot) sem copia |
 | 30.0 | `C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE` | maestro-persona-2026-11 | A. Fonte única no KG-SSOT: grafo maestro-persona com nós de voz, julgamento e limite (porquê e evidência em cada um), projetad |
 | 9.8 | `C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM` | maestro-persona-2026-11 | D. Identidade nos pesos (fine-tune/SFT de identidade) ou SLM |
