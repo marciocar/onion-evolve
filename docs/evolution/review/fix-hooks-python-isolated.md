@@ -3,15 +3,15 @@ branch: fix/hooks-python-isolated
 pr: pendente
 date: 2026-11-05
 reviewed_diff_sha256: pendente
-findings_total: 11
-findings_real: 11
+findings_total: 12
+findings_real: 12
 tokens: 0
 duration_min: 0
-findings_fixed: 10
+findings_fixed: 11
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 reviewer: "refutador independente (agente separado, com corpus, mutantes e laboratório próprios)"
-nota: "tokens e duração em 0 = não medidos. O refutador reprovou 76461b38d; a cura está no commit seguinte, e não houve 2ª passada sobre ela. Um achado segue aberto de propósito: o achado 2, em parte, declarado como teto."
+nota: "tokens e duração em 0 = não medidos. O refutador reprovou 76461b38d, e a 2ª passada, sobre 26a54bfa4, achou o bloqueio 12; os dois estão curados nos commits seguintes. Um achado segue aberto de propósito: o achado 2, em parte, declarado como teto."
 ---
 
 # Resíduo: `fix/hooks-python-isolated` — hooks rodam python em modo isolado
@@ -43,10 +43,16 @@ nota: "tokens e duração em 0 = não medidos. O refutador reprovou 76461b38d; a
 | 9 | 2 mutantes vivos no veto da API | caso decorativo | curado, e `none` deixou de contar como provider ativo |
 | 10 | Veto de force-push soltava quando o texto longo cortava o verbo da linha de inanalisável | mesma classe do 1 | curado: o verbo não some no corte |
 | 11 | O teto do executável omitia os caminhos dos achados 3 a 5 | texto | corrigido no grafo |
+| 12 | 2ª passada: a leitura do arquivo de ambiente errava a forma documentada (comentário no fim da linha, última linha sem quebra), e a federação do adotante parava sem aviso | barra o merge | curado, com caso e mutante por forma; dois mutantes da família que morriam pelo arranjo agora morrem por caso real |
 
 ## O que ficou de fora, por decisão
 
 `PYTHONSAFEPATH` no lint e no pre-commit e a forma maiúscula do escape: PR seguinte, pelo pedido.
+
+## Para o PR seguinte
+
+O teto de 256 alternativas fecha comando legítimo em formas raras, com 0 casos em 3.100 do corpus. A alternativa tem
+custo, e a decisão é do maestro: nó `C_TETO_DE_CHAVES_FECHA_LEGITIMO`.
 
 ## Teto
 
