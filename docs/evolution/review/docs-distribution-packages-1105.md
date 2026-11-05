@@ -3,7 +3,8 @@ title: 'Resíduo — pesquisa de distribuição do Onion e selo do maestro'
 date: 2026-11-05
 branch: docs/distribution-packages-1105
 pr: pendente
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 424a8ca093efd81e962f4f8a383855a09ae85213288e09cc32e0ab0bce8d8ca2
+reviewed_code_sha256: 3f4782fbdd791d727687b6c1e39c229da633018536d642df32883707e7727980
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
