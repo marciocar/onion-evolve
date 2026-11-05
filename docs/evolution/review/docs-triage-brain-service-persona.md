@@ -2,7 +2,8 @@
 branch: docs/triage-brain-service-persona
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 788f7f89277776c13a1a9d5ee2905813990d3fc54ef9702371b07ab909935c14
+reviewed_code_sha256: 2f6fbca1e89cf7ac704760d14b7c746c950de4cc3d8ccd476bdcdf76b4951146
 findings_total: 2
 findings_real: 1
 tokens: 0
