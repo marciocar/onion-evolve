@@ -44854,8 +44854,8 @@ run_memory_write_guard_selftests() {
   local o rc
   # (a) o --selftest do hook
   if o="$(LC_ALL=C bash "${hook}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 25/25 verdes' <<< "${o}"; then
-    record_pass "memory-write-guard: (a) hook --selftest verde (25: envelope inteiro em Write/Edit/Bash, autoMemoryDirectory, link | sem proveniência avisa em Write/Edit/Bash/sed -i/write_text | data, commit, nota com origem, índice, citação da abertura, fora da memória, leitura, ponteiro, ler-e-gravar-noutro-lugar, JSON ilegível | TETO: paráfrase, variável de fora)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 34/34 verdes' <<< "${o}"; then
+    record_pass "memory-write-guard: (a) hook --selftest verde (34, com os 9 do refutador: link sem autoMemoryDirectory em Write e Bash, \$HOME entre aspas, ~/\"…\", \${HOME:?}, \${HOME:-…}, open() aninhado, leitura aninhada que cala, autoMemoryDirectory com \$HOME; envelope inteiro em Write/Edit/Bash, autoMemoryDirectory, link | sem proveniência avisa em Write/Edit/Bash/sed -i/write_text | data, commit, nota com origem, índice, citação da abertura, fora da memória, leitura, ponteiro, ler-e-gravar-noutro-lugar, JSON ilegível | TETO: paráfrase, variável de fora)"
   else record_fail "memory-write-guard: (a) hook --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) o --selftest da varredura
   if o="$(LC_ALL=C bash "${scan}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
@@ -44975,8 +44975,8 @@ judge@@@    return bool(ISO.search(text) or @@@    return bool(@@@(ix)
 judge@@@                if disk_prov(p_abs if os.path.isabs(p_abs) else os.path.join(cwd, p_abs)):@@@                if False:@@@(xi)
 judge@@@ and is_target(norm, t)]@@@]@@@(xvi-b)
 judge@@@any(is_note(t) and not disk_prov(t) for t in mem)@@@any(is_note(t) for t in mem)@@@(xvi-e)
-judge@@@    norm = re.sub(r"(?<![\w/~])~(?=/)", HOME, norm)@@@    norm = norm@@@(iii)
-judge@@@        if tok in line and re.search(@@@        if False and re.search(@@@(xvi-d)
+judge@@@        norm = re.sub(r"(?<![\w/~])~(?=/)", lambda m: HOME, norm)@@@        norm = norm@@@(iii)
+judge@@@if re.search(r"write_text|write_bytes", stmt) or any(@@@if any(@@@(xvi-d)
 judge@@@                        m = a.search(t); ln = t.count@@@                        m = None; ln = t.count@@@scan:(b)
 judge@@@        tops.append(os.path.dirname(os.path.realpath(common)))@@@        pass@@@scan:(f)
 judge@@@    print("%s\t%s" % (sev, msg.replace("\n", " ")))@@@    print("%s\t%s" % ("NADA", msg.replace("\n", " ")))@@@(vi)
@@ -44984,6 +44984,12 @@ hook@@@  if [ "${sev}" = HARD ]; then@@@  if false; then@@@(i)
 hook@@@"additionalContext":os.environ["MW_MSG"]@@@"x":os.environ["MW_MSG"]@@@(vi)
 hook@@@[[ "$(<"${f}")" == *autoMemoryDirectory* ]] && st=1@@@false && st=1@@@(iv)
 scan@@@    [ -n "${out}" ] || exit 0@@@    exit 0@@@scan:(e)
+hook@@@[ -n "${st}" ] || _onion_mw_link_probe "${input}" || return 0@@@[ -n "${st}" ] || return 0@@@(v-b)
+judge@@@        norm = cmd.replace('"', "").replace("'", "")@@@        norm = cmd@@@(xvi-g)
+judge@@@        norm = re.sub(r"\$\{HOME(?::?[-?=+][^}]*)?\}|\$HOME\b", lambda m: HOME, norm)@@@        norm = re.sub(r"\$\{HOME\}|\$HOME\b", lambda m: HOME, norm)@@@(xvi-i)
+judge@@@OPEN_W = re.compile(r"\bopen\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*?,@@@OPEN_W = re.compile(r"\bopen\([^()]*?,@@@(xvi-j)
+judge@@@any(tok in m.group(0) for m in OPEN_W.finditer(stmt))@@@bool(OPEN_W.search(stmt))@@@(xvi-k)
+judge@@@            v = os.path.expandvars(os.path.expanduser(v.strip()))@@@            v = os.path.expanduser(v.strip())@@@(iv-b)
 EOF_MUT
   rm -rf "${sb}"
 }

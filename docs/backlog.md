@@ -619,9 +619,9 @@
 | 9.0 | `C_TETO_NAO_E_FRONTEIRA` | memory-write-2026-11 | TETO (peça 7): é lembrete e contenção de cópia verbatim, NÃO fronteira. Conteúdo de fora parafraseado, ou copiado sem envel |
 | 7.2 | `D_HOOK_NO_SETTINGS_DO_PROJETO` | memory-write-2026-11 | O veto e a varredura moram no .claude/settings.json versionado do projeto, que viaja aos adotantes; o ⟨settings.json de usuário |
 | 6.8 | `C_TETO_BASH_PELO_VOCABULARIO` | memory-write-2026-11 | TETO: no Bash só se julga o comando que CITA o caminho de memória (literal, ~, $HOME, ${CLAUDE_CONFIG_DIR}) como DESTINO de uma  |
+| 6.0 | `Q_ELENXO_PENDENTE` | memory-write-2026-11 | A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta; a verifica |
 | 5.1 | `C_TETO_CAI_COM_O_SETTINGS` | memory-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json; falha ABERTA declarada: sem python3 ou com o juiz quebrado, s |
 | 4.8 | `C_TETO_ESCRITA_FORA_DA_SESSAO` | memory-write-2026-11 | NÃO MEDIDO: se a extração de memória que o Claude Code faz por conta própria em segundo plano passa pelo PreToolUse. Também  |
-| 4.0 | `Q_ELENXO_PENDENTE` | memory-write-2026-11 | O Elenxo não rodou: um refutador independente, com mandato de achar o FALSO POSITIVO (nota honesta barrada ou avisada), julga dep |
 | 3.0 | `Q_GATILHO_HARD_POR_PROVENIENCIA` | memory-write-2026-11 | Gatilho nomeado: se o replay futuro medir uma nota de memória com regra plantada por conteúdo lido de fora SEM envelope (o caso  |
 | 2.8 | `C_LATENCIA_MEDIDA` | memory-write-2026-11 | Latência medida em 2026-11-05 nesta VPS (média de 50 chamadas): 10 ms no caminho quente (JSON sem 'memory' e sem autoMemoryDirec |
 

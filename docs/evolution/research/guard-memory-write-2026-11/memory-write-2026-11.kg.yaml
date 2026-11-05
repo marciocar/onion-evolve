@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 17 NÓS ═══
+# ═══ TETO: 18 NÓS ═══
+# +1 (2026-11-05): E_REFUTADOR_REPROVOU_E_CUROU, a passada independente sobre 5293ef4aa.
 # +1 (2026-11-05): E_ADOTANTE_NA_BANCADA, requisito do líder (a guarda tem de valer num repo adotado).
 meta:
   id: memory-write-2026-11
@@ -186,7 +187,7 @@ nodes:
     impact: 4
     confidence: 0.5
     trace: "docs/evolution/review/feat-guard-memory-write.md"
-    label: "O Elenxo não rodou: um refutador independente, com mandato de achar o FALSO POSITIVO (nota honesta barrada ou avisada), julga depois. Enquanto ele não rodar, nada aqui está selado."
+    label: "A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta; a verificação do diferencial está pendente. Enquanto ela não rodar, nada aqui está selado."
 
   - id: Q_GATILHO_HARD_POR_PROVENIENCIA
     node_type: question
@@ -211,6 +212,23 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_memory_write_guard_selftests, caso (e)"
       method: "measurement: só a família, com ulimit -v e timeout -k; vendor-manifest.sh --list por papel"
+      locality: "repo"
+
+  - id: E_REFUTADOR_REPROVOU_E_CUROU
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    valid_from: "2026-11-05"
+    verified_at: "2026-11-05"
+    verified_against: "ONION_SELFTEST_FAMILIES=memory_write_guard LC_ALL=C bash .claude/validation/lint-selftest.sh → 32 passaram, 25 mutantes mordem; os 9 casos novos reprovam com o juiz de 09f99d24b ou sem a sonda de link"
+    label: "O refutador independente reprovou 5293ef4aa com 3 BLOQUEIA, todos dentro do que o cabeçalho prometia: (1) link até a memória passava no caminho quente, porque o filtro textual 'memory' saía antes do realpath; (2) $HOME e ~ entre aspas, ${HOME:?} e ${HOME:-…} não eram reconhecidos; (3) open(…,'w') com parênteses aninhados escapava. Os três foram curados, cada um com caso que falha antes e passa depois e com mutante; o autoMemoryDirectory com $HOME no valor também (uma linha)."
+    narrative: "Cura 1: o caminho quente resolve em bash, num só realpath, os caminhos citados no JSON, e só sai rc 0 se nenhum cai em <config>/projects/*/memory; custo medido sob load 14: +3 ms no Write e +9 ms no Bash. Cura 2: aspas saem do texto antes de tokenizar, e toda grafia de expansão de HOME e do CLAUDE_CONFIG_DIR vira o valor. Cura 3: o open( aceita dois níveis de parênteses, e o caminho tem de estar DENTRO do open que leva o modo de escrita, na mesma instrução: um open de leitura da nota ao lado de um open de escrita noutro arquivo cala (caso (xvi-k)). Declarado no cabeçalho sem curar: conteúdo fora do texto do comando (cp, cat arq >>, rsync, mv), envelope dividido em duas escritas, grafias que o harness não produz, link criado no mesmo comando e o falso positivo HARD em nota que documenta o formato (0 em 364 notas). Rodado o laboratório do refutador sobre a cura: os únicos FURO e FP restantes são os declarados."
+    provenance:
+      source: ".claude/hooks/pretooluse-memory-write-guard.sh"
+      locator: "casos (iv-b), (v-b), (v-c), (xvi-g) a (xvi-k); mutantes na família run_memory_write_guard_selftests"
+      method: "measurement: selftest com o juiz antigo e sem a sonda, família com ulimit -v, laboratório lab.py do refutador"
       locality: "repo"
 
 edges:
@@ -252,4 +270,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: E_ADOTANTE_NA_BANCADA
     to: D_HOOK_NO_SETTINGS_DO_PROJETO
+    edge_type: SUPPORTS
+  - from: E_REFUTADOR_REPROVOU_E_CUROU
+    to: Q_ELENXO_PENDENTE
     edge_type: SUPPORTS

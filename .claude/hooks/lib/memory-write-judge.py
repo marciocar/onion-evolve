@@ -17,7 +17,7 @@ COMMIT = re.compile(r"\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b")
 PRREF = re.compile(r"(?:\bPR\s*#?|#)\d{2,6}\b")
 CMD = re.compile(r"`[^`\n]*(?:\b(?:bash|sh|grep|wc|git|jq|python3?|curl|ls|find|cat|sed|awk|gh|rg|du|ps|systemctl|claude|tm\.sh)\b|\.sh\b)[^`\n]*`")
 WRITE_BASH = re.compile(r"(?<![0-9&<>])>>?(?!&)|&>>?|\btee\b|\bcp\b|\bmv\b|\binstall\b|\bsed\s+(?:-[a-zA-Z]*i|--in-place)|\bdd\b[^\n]*\bof=|"
-                        r"write_text|write_bytes|open\([^)]*['\"][wax]\+?b?['\"]|\bln\b")
+                        r"write_text|write_bytes|\bopen\(.*?,\s*(?:mode\s*=\s*)?['\"][wax]\+?b?['\"]|\bln\b")
 
 def envelope(text):
     for name, a, b in PAIRS:
@@ -45,7 +45,7 @@ def custom_dirs():
         except Exception:
             continue
         if isinstance(v, str) and v.strip():
-            v = os.path.expanduser(v.strip())
+            v = os.path.expandvars(os.path.expanduser(v.strip()))   # `$HOME/…` no valor também arma
             if not os.path.isabs(v) and ROOT:
                 v = os.path.join(ROOT, v)
             out.append(os.path.realpath(v))
@@ -70,6 +70,10 @@ def is_memory(path, cwd):
                 return True
     return False
 
+# `open(` e o modo de escrita na mesma linha, com parênteses aninhados no caminho: open(os.path.expanduser('~/…'),'w')
+# o caminho tem de estar DENTRO do open(…) que leva o modo de escrita; até dois níveis de parênteses aninhados. Julgado no
+# texto SEM aspas, então a aspa do modo é opcional
+OPEN_W = re.compile(r"\bopen\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*?,\s*(?:mode\s*=\s*)?['\"]?[wax]\+?b?['\"]?\s*[,)]")
 SEG = re.compile(r"\n|;|&&|\|\||\||&(?!>)")
 def is_target(cmd, tok):
     t = re.escape(tok)
@@ -79,8 +83,11 @@ def is_target(cmd, tok):
     if re.search(r"\btee\b(?:\s+-\S+)*(?:\s+\S+)*?\s+" + q + t, cmd):        # tee [-a] … <nota>
         return True
     for line in cmd.split("\n"):                                             # código: open(…,'w'), write_text
-        if tok in line and re.search(r"write_text|write_bytes|open\([^)]*['\"][wax]\+?b?['\"]", line):
-            return True
+        for stmt in line.split(";"):                                         # a MESMA instrução
+            if tok not in stmt:
+                continue
+            if re.search(r"write_text|write_bytes", stmt) or any(tok in m.group(0) for m in OPEN_W.finditer(stmt)):
+                return True
     for seg in SEG.split(cmd):
         w = seg.split()
         while w and (w[0] in ("sudo", "command", "env", "nohup", "time") or re.match(r"^[A-Za-z_]\w*=", w[0])):
@@ -152,10 +159,12 @@ def hook_mode():
         if not cmd or not WRITE_BASH.search(cmd):
             sys.exit(0)
         # o caminho de memória CITADO no texto: literal, `~`, `$HOME`, `${CLAUDE_CONFIG_DIR}`
-        norm = cmd
-        for k, v in (("${HOME}", HOME), ("$HOME", HOME), ("${CLAUDE_CONFIG_DIR}", CFG), ("$CLAUDE_CONFIG_DIR", CFG)):
-            norm = norm.replace(k, v)
-        norm = re.sub(r"(?<![\w/~])~(?=/)", HOME, norm)
+        # aspas saem antes de tokenizar (`"$HOME"/x`, `~/".claude/…"`), e toda grafia de expansão de HOME e do
+        # CLAUDE_CONFIG_DIR vira o valor: `${HOME}`, `${HOME:?}`, `${HOME:-…}` (refutador, 2026-11-05)
+        norm = cmd.replace('"', "").replace("'", "")
+        norm = re.sub(r"\$\{HOME(?::?[-?=+][^}]*)?\}|\$HOME\b", lambda m: HOME, norm)
+        norm = re.sub(r"\$\{CLAUDE_CONFIG_DIR(?::?[-?=+][^}]*)?\}|\$CLAUDE_CONFIG_DIR\b", lambda m: CFG, norm)
+        norm = re.sub(r"(?<![\w/~])~(?=/)", lambda m: HOME, norm)
         toks = sorted(set(re.findall(r"/[^\s'\"`;|&<>()$]+", norm)))
         # só conta o caminho de memória que é DESTINO de escrita: ler a nota e gravar noutro lugar na mesma string
         # é o caso comum (replay de 2026-11-05: 9 de 9 avisos da 1ª redação eram `cat <nota>; cat > /tmp/x`)
