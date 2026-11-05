@@ -1,0 +1,8 @@
+# replay do veto sobre os transcripts desta máquina, 2026-11-05 (só contagens; nenhum comando nem conteúdo)
+# fonte: os transcripts locais do Claude Code (7995 arquivos jsonl); 618 chamadas Write/Edit/Bash com alvo na pasta de memória
+# coluna: n  (ferramenta, rc do hook, aviso SOFT)
+258 ('Bash', 0, '-')
+93 ('Edit', 0, '-')
+267 ('Write', 0, '-')
+# 1ª redação do juiz Bash: 9 avisos SOFT, todos falsos (ler a nota e gravar noutro lugar); 2ª: 1 (sed -i de renomeação numa nota com origem); final: 0
+# envelope de canal (par inteiro) nas 618 escritas: 0

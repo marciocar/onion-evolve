@@ -6378,6 +6378,36 @@ check_python_isolated() {
 }
 check_python_isolated
 
+# ────────────────────────────────────────────────────────
+# REGRA 116 — Memória do Claude Code sem envelope de canal não confiável [SOFT]
+# previne: conteúdo lido de fora (mensagem de peer, de outra sessão, colado, ou dentro da cerca R15.1) gravado INTEIRO na memória persistente por um caminho que o veto do PreToolUse não vê, e carregado como regra na sessão seguinte
+#   DEFEITO MEDIDO (2026-11-05, grafo guard-memory-write-2026-11): o MemGhost grava conteúdo não confiável em memória de agente
+#   com 71,4% de ponta a ponta no Claude Code SDK (arXiv 2607.05189, achado 14 da pesquisa maestro-persona-2026-11), e nenhum
+#   hook do core olhava a pasta de memória. O veto é pretooluse-memory-write-guard.sh; esta é a metade que olha o DISCO. SOFT
+#   sempre: a pasta é da máquina, não do repo (cláusula 5 da guard-doctrine), e sem ela (o CI) a regra cala, declarado.
+#   Lógica e teto em memory-write-scan-check.sh; "não pôde julgar" (rc != 0) sai SOFT nomeado.
+check_memory_write_scan() {
+  local helper="${SCRIPT_DIR}/memory-write-scan-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in *"/memory/"*|*/memory-write-scan-check.sh|*/memory-write-judge.py) : ;; *) return 0 ;; esac
+  fi
+  local _R="REGRA 116 (Memória do Claude Code sem envelope de canal não confiável)"
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    violation "SOFT" "${_path%:*}" "${_R}: [${_code}] ${_path##*:}: ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "SOFT" "${helper}" "${_R}: [NAO-VERIFICADO] a varredura não pôde julgar (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_memory_write_scan
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
