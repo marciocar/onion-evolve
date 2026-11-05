@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 24 NÓS ═══
+# ═══ TETO: 25 NÓS ═══
+# +1 (2026-11-05): D_PROJETO_DA_SESSAO_E_RAIZ_1105, decisão nova do maestro que nenhum nó colhido cobre; os 24 seguem vivos.
 meta:
   id: plugin-write-2026-11
   schema_version: "1"
@@ -322,6 +323,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-05: «A REGRA 114 dá HARD num projeto clonado da onion-standalone ou só avisa?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
       locality: "pessoa"
+  - id: D_PROJETO_DA_SESSAO_E_RAIZ_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Incluir o projeto»"
+    label: "O projeto aberto na sessão (CLAUDE_PROJECT_DIR) também conta como raiz do veto, com ou sem .git. Pasta solta e docs/x/.claude/skills seguem passando."
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Incluir o projeto»; descartadas: «Manter como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Incluir o projeto aberto na sessão como raiz?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
 
 edges:
   - from: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
@@ -392,4 +409,7 @@ edges:
     edge_type: CONSTRAINS
   - from: D_PORTA_CLONADA_MANTEM_HARD
     to: D_HARD_NO_CORE_SOFT_NO_DERIVADO
+    edge_type: TRACES_TO
+  - from: D_PROJETO_DA_SESSAO_E_RAIZ_1105
+    to: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
     edge_type: TRACES_TO
