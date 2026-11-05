@@ -33,6 +33,10 @@ exec(compile(open(_pw_moat, encoding="utf-8").read(), _pw_moat, "exec"))
 
 _PW_FORM_PLUGIN = ".claude/skills/<nome>/.claude-plugin/"
 _PW_FORM_HOOKS = ".claude/skills/<nome>/hooks/"
+# o alvo de `.claude/skills/<nome>` quando ele é link: a pasta de fora é a skill (S6). O hook resolve e entrega aqui
+_PW_LINK_TARGETS = [t for t in os.environ.get("PW_LINK_TARGETS", "").split("\n") if t]
+_PW_BRACE_MAX = 256
+_PW_BRACE_VERBS = {"mkdir", "touch", "tee", "cp", "mv", "install", "ln", "rsync"}
 _PW = {"skip": False, "exempt": set(), "noexec": False, "in_script": 0}
 # os motores escritores e os wrappers do MOAT não têm a ver com plugin; vazios, os ramos deles nunca casam
 _MOAT_ARG_WRITERS = {}
@@ -54,7 +58,7 @@ _PW_CODE_WRITE = re.compile(
     r"|\bFile\.open\(\s*" + _PW_QP + r"\s*,\s*['\"][wa]" +
     r"|\bopen\([^,()]*,\s*['\"]>+\s*" + _PW_PATH + r"['\"]" +
     r"|\bfile_put_contents\(\s*" + _PW_QP)
-_PW_INTERPS = {"python", "python3", "perl", "ruby", "node", "php"}
+_PW_INTERPS = {"python", "python3", "perl", "ruby", "node"}
 _PW_PY_DEST = {"os.rename": 1, "os.replace": 1, "os.symlink": 1, "os.link": 1, "os.makedirs": 0, "os.mkdir": 0,
                "shutil.copy": 1, "shutil.copy2": 1, "shutil.copyfile": 1, "shutil.copytree": 1, "shutil.move": 1}
 _PW_PATH_WRITE = {"write_text", "write_bytes", "mkdir", "touch", "symlink_to", "hardlink_to"}
@@ -81,7 +85,42 @@ def _pw_form(p):
                 return _PW_FORM_PLUGIN
             if c == "hooks":
                 return _PW_FORM_HOOKS
+    s = str(p)
+    for t in _PW_LINK_TARGETS:
+        if s.startswith(t + "/"):
+            c = s[len(t) + 1:].split("/")[0]
+            if c == ".claude-plugin":
+                return _PW_FORM_PLUGIN
+            if c == "hooks":
+                return _PW_FORM_HOOKS
     return None
+
+
+def _pw_tdir(args):
+    """O destino de `-t` em qualquer grafia GNU: `-t D`, `-tD`, `-ft D`, `--target-directory=D`, `--target-directory D`, e o prefixo `--targ=D`."""
+    for k, a in enumerate(args):
+        if a == "--":
+            return None
+        if a.startswith("--"):
+            n, eq, v = a.partition("=")
+            if len(n) > 2 and "--target-directory".startswith(n):
+                return v if eq else (args[k + 1] if k + 1 < len(args) else None)
+        elif a.startswith("-") and len(a) > 1:
+            for i, c in enumerate(a[1:], 1):
+                if c == "t":
+                    return a[i + 1:] or (args[k + 1] if k + 1 < len(args) else None)
+                if c in "Smog":                         # opção com argumento: o resto da palavra é o valor dela
+                    break
+    return None
+
+
+def _pw_target_split(args, argopts):
+    """-> (destino de -t ou None, posicionais sem ele)."""
+    tdir = _pw_tdir(args)
+    pos = _moat_positionals(args, set(argopts) | {"-t", "--target-directory"})
+    if tdir and tdir in pos:
+        pos.remove(tdir)
+    return tdir, pos
 
 
 def _pw_skills_depth(p):
@@ -235,6 +274,11 @@ _pw_base_unanalyzable = moat_unanalyzable
 
 def moat_unanalyzable(seg, why, whole=False):
     head = os.path.basename(str(seg[0])) if isinstance(seg, (list, tuple)) and seg else ""
+    if why == "comando que o analisador não conseguiu ler":
+        # aspas não fechadas, aninhamento além do teto: nada do texto foi julgado, então o sinal basta, em qualquer linha
+        if _PW_TEXT_SIG.search(str(seg)):
+            _moat_emit("inanalisavel", str(seg), "", why)
+        return
     if head == "ssh":
         return                                          # outra máquina: não é plugin DESTA sessão (ver o teto)
     if "noutra linguagem" in why and head in _PW_INTERPS:
@@ -306,6 +350,40 @@ def _pw_load_assign():
         else:
             _pw_ambiguous.add(k)
     _pw_scan_interp_heredocs()
+
+
+# ── `&>`, `&>>` e `>|`: o tokenizador parte em `&`/`|` e o destino sairia como comando seguinte. Entre aspas a troca não muda o que
+# se julga, e o `bash -c 'x &> y'` passa por aqui de novo, no nível dele ──
+_PW_REDIR_FORMS = re.compile(r"&>|>\|")
+
+
+def _pw_norm_redirects(t):
+    return _PW_REDIR_FORMS.sub(">", t)
+
+
+_pw_base_prepass = prepass
+
+
+def prepass(text):
+    return _pw_base_prepass(_pw_norm_redirects(text))
+
+
+# ── chaves: a do lib não tem teto, e `{a,b}` vinte vezes é um milhão de palavras ──
+def brace_expand(word):
+    out, todo = [], [word]
+    while todo:
+        w = todo.pop()
+        m = re.search(r"\{([^{}]*)\}", w)
+        if not m or ("," not in m.group(1) and ".." not in m.group(1)):
+            out.append(w)
+            continue
+        parts = m.group(1).split(",") if "," in m.group(1) else [m.group(1)]
+        todo.extend(w[:m.start()] + p + w[m.end():] for p in reversed(parts))
+        if len(todo) + len(out) > _PW_BRACE_MAX:
+            if "skills" in word:
+                _moat_emit("inanalisavel", word, "", "expansão de chaves além do teto")
+            raise Unanalyzable("expansão de chaves além do teto")
+    return out
 
 
 _pw_base_heredocs = heredocs
@@ -406,14 +484,26 @@ def _moat_script(path, depth, words):
         _PW["in_script"] -= 1
 
 
+def _pw_named_form_lands(base, src, sp, dest, into):
+    """A própria pasta se chama `hooks` ou `.claude-plugin` e cai logo abaixo de uma skill. O conteúdo espalhado (`hooks/.`) não leva o nome."""
+    if (base == "rsync" and src.endswith("/")) or (base == "cp" and src.rstrip("/").endswith("/.")):
+        return False
+    if os.path.basename(sp) not in (".claude-plugin", "hooks") or not into:
+        return False
+    return 1 in (_pw_skills_depth(dest), _pw_skills_depth(os.path.realpath(dest)))
+
+
 def _pw_tree_form(src, excluded=()):
     return any(n not in excluded and os.path.isdir(os.path.join(src, n)) for n in (".claude-plugin", "hooks"))
 
 
 def _pw_copy_into_skills(base, args, detail):
-    """Pasta que JÁ TEM a forma de plugin caindo como `.claude/skills/<nome>`. O destino sozinho não tem a forma."""
-    pos = _moat_positionals(args, {"-S", "--suffix", "-e", "--rsh", "--exclude", "--include", "--filter", "-f"})
-    tdir = _moat_opt_value(args, {"-t", "--target-directory"}, ("--target-directory",))
+    """Pasta que JÁ TEM a forma de plugin caindo como `.claude/skills/<nome>`, ou pasta CHAMADA `hooks` caindo dentro de uma skill."""
+    argopts = {"-S", "--suffix", "-e", "--rsh", "--exclude", "--include", "--filter", "-f"}
+    if base == "rsync":                                 # no rsync, `-t` é preservar o horário
+        tdir, pos = None, _moat_positionals(args, argopts)
+    else:
+        tdir, pos = _pw_target_split(args, argopts)
     if tdir:
         dest, srcs = tdir, pos
     elif len(pos) >= 2:
@@ -433,6 +523,8 @@ def _pw_copy_into_skills(base, args, detail):
     for s in srcs:
         sp = _moat_abspath(s, os.path.dirname(d) if base == "ln" else None)
         lands = _pw_lands_as_skill(base, s, d, into) or _pw_lands_as_skill(base, s, os.path.realpath(d), into)
+        if sp and _pw_named_form_lands(base, s, sp, d, into or dest.endswith("/")):
+            _moat_emit("plugin", d, "", "%s de uma pasta chamada %s para dentro de uma skill — %s" % (base, os.path.basename(sp), detail))
         if sp and lands and _pw_tree_form(os.path.realpath(sp), ex):
             _moat_emit("plugin", d, "", "%s de uma pasta com a forma de plugin para dentro de .claude/skills — %s" % (base, detail))
 
@@ -463,6 +555,10 @@ _pw_base_command = moat_command
 
 def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     _pw_load_assign()
+    if base == "rsync":                                 # no rsync, `-t` é preservar o horário: o juiz composto o lê como destino
+        words = [w for w in words if w != "-t"]
+    if base in _PW_BRACE_VERBS:
+        words = words[:1] + [e for w in words[1:] for e in brace_expand(w)]
     args = words[1:]
     saved = (_PW["skip"], _PW["exempt"], _PW["noexec"])
     skip = base in ("rm", "rmdir", "unlink")
@@ -475,12 +571,11 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
         pos = _moat_positionals(args, {"-C", "-c", "--git-dir", "--work-tree"})
         skip = bool(pos) and pos[0] in ("clean", "rm")
     elif base == "mv":
-        pos = _moat_positionals(args, {"-S", "--suffix"})
-        tdir = _moat_opt_value(args, {"-t", "--target-directory"}, ("--target-directory",))
+        tdir, pos = _pw_target_split(args, {"-S", "--suffix"})
         exempt = {_moat_abspath(s) for s in (pos if tdir else pos[:-1])}
     elif base == "ln":
-        pos = _moat_positionals(args, {"-S", "--suffix", "-t", "--target-directory"})
-        if len(pos) == 1:                               # `ln -s ALVO` cria o link no diretório atual
+        tdir, pos = _pw_target_split(args, {"-S", "--suffix"})
+        if len(pos) == 1 and not tdir:                  # `ln -s ALVO` cria o link no diretório atual
             exempt = {_moat_abspath(pos[0])}
     elif base == "touch":
         for k, a in enumerate(args):
@@ -492,10 +587,20 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
         dest = _moat_positionals(args, {"-e", "--rsh", "--exclude", "--include", "--filter", "-f", "-P", "-i", "-F"})[-1:]
         remote = bool(dest) and bool(re.match(r"^[^/:]+:", dest[0]))
         skip = remote or (base == "rsync" and (_pw_short_flag(args, "n") or "--dry-run" in args))
+    if base == "php":
+        for k, a in enumerate(args):
+            if re.match(r"^-[A-Za-z]*r$", a) and k + 1 < len(args) and _pw_code_writes(base, args[k + 1]):
+                _moat_emit("plugin", args[k + 1], "", "código embutido que escreve no caminho")
     if base in SHELLS or base in ("source", "."):
         _PW["noexec"] = _pw_short_flag(args, "n") or "--noexec" in args
     _pw_cd(base, words)
+    tdir = _pw_tdir(args) if base in ("cp", "mv", "ln", "install") else None
+    if tdir:
+        # o lib só conhece `-t D` solto: `-ft D`, `-st D` e `--target-directory=D` caem aqui. As origens são leitura
+        exempt = {_moat_abspath(s) for s in _pw_target_split(args, {"-S", "--suffix", "-m", "--mode", "-o", "--owner", "-g", "--group"})[1]}
     _PW["skip"], _PW["exempt"] = skip, exempt
+    if tdir:
+        _moat_write_path(_moat_abspath(tdir), " ".join(raw_words), base)
     if base in ("cp", "mv", "ln", "rsync") and not skip:
         _pw_copy_into_skills(base, args, " ".join(raw_words))
     try:
