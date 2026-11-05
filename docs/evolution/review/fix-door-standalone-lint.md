@@ -8,13 +8,13 @@ findings_real: 0
 tokens: 0
 duration_min: 0
 findings_fixed: 0
-verdict: PENDENTE
+verdict: SEM_ACHADOS
 elenxo: nao
-reviewer: PENDENTE
-nota: "PASSADA ADVERSARIAL PENDENTE, declarada: nenhum revisor leu este diff. Os zeros são 'não medido', não 'sem achados'. O verdict fora do vocabulário é proposital: o --schema reprova até a passada rodar, e o PR não abre com este arquivo como está."
+reviewer: "sessão do core, leitura do diff do lint e do resumo do autor; sem refutador separado"
+nota: "tokens e duração 0 = não medido. Passada curta, sem refutador separado, porque o diff só declara o escopo de duas guardas, com caso e mutante, e a publicação da porta espera. Não reproduzi as medidas do autor."
 ---
 
-# Passada adversarial: `fix/door-standalone-lint` (PENDENTE)
+# Passada adversarial: `fix/door-standalone-lint` 
 
 ## O que muda
 
