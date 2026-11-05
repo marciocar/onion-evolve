@@ -351,7 +351,7 @@ _onion_dpa_failed() {  # $1=texto; nunca retorna: sai 2 com o provider ativo cit
   local root active word
   root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
   active="$(_onion_dpa_active "${root}" "${PWD}")"
-  [ -n "${active}" ] || exit 0
+  [ -n "${active}" ] && [ "${active}" != none ] || exit 0
   # sem o motor Python não há como aplicar os padrões do provider-hosts.tsv (são regex de Python): a forma é o nome
   # do provedor dentro de uma URL. O nome do host do jira é atlassian.
   word="${active}"; [ "${word}" = "jira" ] && word="atlassian"

@@ -10,7 +10,7 @@
 #           fora da instalação do python. Grafo: docs/evolution/research/guard-hooks-python-isolated-2026-11/.
 #
 # ALVO    : DERIVADO, não listado. Parte de cada comando de hook do `.claude/settings.json` e de
-#           `.claude/hooks/lib/*`, e segue, pelos TOKENS do shell, o que eles EXECUTAM (`bash x.sh`, `. lib.sh`,
+#           `.claude/hooks/lib/*`, inclusive o texto do comando e script fora de `.claude/`, e segue, pelos TOKENS do shell, o que eles EXECUTAM (`bash x.sh`, `. lib.sh`,
 #           `python3 x.py`, `V=…/x.sh` + `bash "$V"`). Caminho citado como dado ou em mensagem não entra.
 #           `ONION_PYISO_ROOTS=all` soma os `.githooks` e o que eles executam: é o censo do gate inteiro, medido
 #           por `--census`; a regra de lint julga só o alcance dos hooks da sessão (teto abaixo).
@@ -478,6 +478,9 @@ def refs_of(rel, txt, idx):
     return out
 
 
+SETTINGS_ROWS = []
+
+
 def closure():
     idx = build_index()
     st = os.path.join(repo, ".claude", "settings.json")
@@ -494,9 +497,18 @@ def closure():
         for g in grps or []:
             for h in (g.get("hooks") or []) if isinstance(g, dict) else []:
                 c = str(h.get("command") or "") if isinstance(h, dict) else ""
-                m = re.search(r"(\.claude/[A-Za-z0-9_./-]+\.(?:sh|py))", c)
-                if m and os.path.isfile(os.path.join(repo, m.group(1))):
-                    seeds.add(m.group(1))
+                # o próprio texto do comando é código: `python3 -c` direto no settings.json também conta
+                hits, embedded = invocations(c)
+                for _, form, iso in hits:
+                    SETTINGS_ROWS.append((".claude/settings.json", 0, iso, f"{ev}: {form}"))
+                for l0, code in embedded:
+                    for _, form, iso in scan_python_code(code, l0):
+                        SETTINGS_ROWS.append((".claude/settings.json", 0, iso, f"{ev}: {form}"))
+                # o script pode morar fora de .claude: o alvo é o que o comando executa, onde estiver
+                for t in shell_exec_targets(c):
+                    t = re.sub(r"^(?:\$\{?CLAUDE_PROJECT_DIR\}?/|\./)", "", t)
+                    if os.path.isfile(os.path.join(repo, t)):
+                        seeds.add(os.path.normpath(t))
     hd = os.path.join(repo, ".claude", "hooks", "lib")
     if os.path.isdir(hd):
         for f in os.listdir(hd):
@@ -526,8 +538,8 @@ def closure():
 if not os.path.isdir(repo):
     print("python-isolated-check: repo inexistente", file=sys.stderr); sys.exit(2)
 
-rows = []
 files = closure()
+rows = list(SETTINGS_ROWS)
 for rel in files:
     txt = read(os.path.join(repo, rel))
     if txt is None:
@@ -647,6 +659,13 @@ PY"
   printf 'import sys\n' > "${tmp}/.claude/hooks/lib/s.py"; sed -i '1i #!/usr/bin/env python3' "${tmp}/.claude/hooks/lib/s.py"; _run
   if grep -q $'^HARD\tpython-sem-isolamento\t.claude/hooks/lib/s.py:1' <<< "${out}"; then _ok "(d5) shebang python sem -I acusa"; else _ko "(d5) shebang python sem -I acusa"; fi
   rm -f "${tmp}/.claude/hooks/lib/s.py"
+  printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"python3 -c \\"print(1)\\""}]}]}}\n' > "${tmp}/.claude/settings.json"; _run
+  if grep -q $'^HARD\tpython-sem-isolamento\t.claude/settings.json:' <<< "${out}"; then _ok "(d6) python no texto do comando acusa"; else _ko "(d6) python no texto do comando acusa"; fi
+  printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"python3 -I -c \\"print(1)\\""}]}]}}\n' > "${tmp}/.claude/settings.json"; _run
+  if [ -z "${out}" ]; then _ok "(d7) python isolado no texto do comando cala"; else _ko "(d7) python isolado no texto do comando cala"; fi
+  mkdir -p "${tmp}/scripts"; _w scripts/fora.sh "python3 -c 'print(1)'"
+  printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash \\"$CLAUDE_PROJECT_DIR/scripts/fora.sh\\""}]}]}}\n' > "${tmp}/.claude/settings.json"; _run
+  if grep -q $'^HARD\tpython-sem-isolamento\tscripts/fora.sh:' <<< "${out}"; then _ok "(d8) hook fora de .claude entra no alvo"; else _ko "(d8) hook fora de .claude entra no alvo"; fi
   # ── NÃO JULGOU ≠ aprovação ──
   printf '{nao json' > "${tmp}/.claude/settings.json"; _run
   if [ "${rc}" -eq 2 ]; then _ok "(e1) settings ilegível sai 2"; else _ko "(e1) settings ilegível sai 2"; fi

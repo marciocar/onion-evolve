@@ -43681,7 +43681,7 @@ run_hooks_python_isolated_selftests() {
   command -v python3 >/dev/null 2>&1 || { record_skip "hooks-python-isolated: python3 ausente"; return; }
   # (a) as polaridades da guarda, em LC_ALL=C (o locale do hook)
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 31/31 verdes' <<< "${o}"; then
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 34/34 verdes' <<< "${o}"; then
     record_pass "hooks-python-isolated: (a) --selftest verde (14 formas acusam, 10 calam, alvo derivado, não julgou)"
   else record_fail "hooks-python-isolated: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) a árvore real está limpa (quem lê é o alvo derivado do settings.json real)
@@ -43826,7 +43826,12 @@ moat|pretooluse-moat-gate.sh|systemctl restart onion-vps-bridge|systemctl status
 
   # ── MUTANTES: cópia limpa primeiro, no MESMO arranjo; se ela não der o certo, o harness reprova e nada conta ──
   local mut="${d}/mut"
-  _hpi_fresh() { rm -rf "${mut}"; cp -r "${proj}" "${mut}"; }
+  # HPI_INJ_*: injeta na cópia uma falha do analisador; a bancada não carrega entrada que o derrube
+  HPI_INJ_F=""; HPI_INJ_OLD=""; HPI_INJ_NEW=""
+  _hpi_fresh() {
+    rm -rf "${mut}"; cp -r "${proj}" "${mut}"
+    if [ -n "${HPI_INJ_F}" ]; then _hpi_mutate "${HPI_INJ_F}" "${HPI_INJ_OLD}" "${HPI_INJ_NEW}" || record_fail "hooks-python-isolated: (m) injeção não aplicou" "${HPI_INJ_F}"; fi
+  }
   _hpi_mutate() {  # <arquivo relativo> <velho> <novo> (exatamente uma ocorrência, ou reprova)
     python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)<1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
       "${mut}/$1" "$2" "$3"
@@ -43876,6 +43881,131 @@ except Exception: d={}'
   _hpi_kill "env degradado: abrir sempre" .claude/hooks/pretooluse-env-guard.sh 'onion_env_may_touch "$input" || exit 0' 'exit 0' pretooluse-env-guard.sh "${d}" "${jb}" 2 0 PATH="${shim}:${PATH}"
   _hpi_kill "env degradado: fechar sempre" .claude/hooks/pretooluse-env-guard.sh 'onion_env_may_touch "$input" || exit 0' ':' pretooluse-env-guard.sh "${d}" "${jg}" 0 2 PATH="${shim}:${PATH}"
 
+  # ── o analisador morre com python vivo: fecha com qualquer comando, e a forma fica só para JSON ilegível e python ausente ──
+  local real_py alive="${d}/alive" jshim="${d}/jshim" EG=.claude/hooks/pretooluse-env-guard.sh EGN=pretooluse-env-guard.sh
+  real_py="$(command -v python3)"
+  mkdir -p "${alive}" "${jshim}"
+  printf '#!/usr/bin/env bash\n[ "$*" = "-I -c pass" ] && exit 0\nexit 1\n' > "${alive}/python3"; chmod +x "${alive}/python3"
+  printf '#!/usr/bin/env bash\ncase "$*" in *" -c "*) exec %s "$@" ;; esac\nexit 1\n' "${real_py}" > "${jshim}/python3"; chmod +x "${jshim}/python3"
+  jd="$(_hpi_payload "${d}" 'ls -la')"
+  _hpi_case "env: analisador morto, python vivo, comando comum" 2 "${proj}" "${EGN}" "${d}" "${jd}" PATH="${alive}:${PATH}"
+  if grep -qF 'analisador do veto falhou' "${d}/err"; then record_pass "hooks-python-isolated: env: a mensagem diz que o analisador falhou"
+  else record_fail "hooks-python-isolated: env: mensagem do analisador morto" "$(head -c 160 "${d}/err")"; fi
+  _hpi_kill "env: analisador morto voltar à forma" "${EG}" 'if [ "${_guard_rc}" -ne 3 ] && python3 -I -c pass >/dev/null 2>&1; then' 'if false; then' "${EGN}" "${d}" "${jd}" 2 0 PATH="${alive}:${PATH}"
+  _hpi_kill "env: JSON ilegível deixar de ir à forma" "${EG}" 'sys.exit(3)' 'sys.exit(1)' "${EGN}" "${d}" "${jd%\}\}}" 0 2
+  local exc
+  for exc in RuntimeError MemoryError RecursionError; do
+    HPI_INJ_F="${EG}"; HPI_INJ_OLD='def judge(cmd, depth=0):'; HPI_INJ_NEW="def judge(cmd, depth=0):
+    raise ${exc}('x')"
+    _hpi_fresh
+    _hpi_case "env: ${exc} dentro do analisador" 2 "${mut}" "${EGN}" "${d}" "${jd}"
+    if grep -qF "(${exc})" "${d}/err"; then record_pass "hooks-python-isolated: env: ${exc}: a razão chega à mensagem"
+    else record_fail "hooks-python-isolated: env: ${exc}: razão" "$(head -c 160 "${d}/err")"; fi
+  done
+  # sem o try e sem a sonda, a mesma falha solta: os dois cinturões, cada um testado
+  HPI_INJ_OLD='def judge(cmd, depth=0):'; HPI_INJ_NEW="def judge(cmd, depth=0):
+    raise RuntimeError('x')"
+  _hpi_fresh
+  _hpi_mutate "${EG#./}" 'except Exception as e:
+    # o analisador morreu' 'except ZeroDivisionError as e:
+    # o analisador morreu'
+  _hpi_case "env: sem o try, a sonda ainda fecha" 2 "${mut}" "${EGN}" "${d}" "${jd}"
+  if ! grep -qF '(RuntimeError)' "${d}/err"; then record_pass "hooks-python-isolated: (m) mutante morde: tirar o try perde a razão"
+  else record_fail "hooks-python-isolated: (m) mutante NÃO morde" "tirar o try: a razão continuou"; fi
+  HPI_INJ_F=""
+  # o teto da expansão de chaves, com o teto baixado na cópia
+  local jb2; jb2="$(_hpi_payload "${d}" 'ls {a,b,c}')"
+  _hpi_case "env: expansão dentro do teto" 0 "${proj}" "${EGN}" "${d}" "${jb2}"
+  HPI_INJ_F="${EG}"; HPI_INJ_OLD='BRACE_CAP = 256'; HPI_INJ_NEW='BRACE_CAP = 2'
+  _hpi_kill "env: a expansão passar do teto sem fechar" "${EG}" "raise BraceLimit('expansão de chaves acima do teto')" 'pass' "${EGN}" "${d}" "${jb2}" 2 0
+  HPI_INJ_F=""
+
+  # ── a forma do segredo, cada alternativa com o seu caso ──
+  local dead="PATH=${shim}:${PATH}" cf c1 c2
+  while IFS='|' read -r c1 cf; do
+    [ -n "${c1}" ] || continue
+    _hpi_case "env degradado: ${cf}" 2 "${proj}" "${EGN}" "${d}" "$(_hpi_payload "${d}" "${c1}")" "${dead}"
+  done <<'EOF_HPI_FORM'
+cat '.'env|aspas somem antes de casar
+grep -r senha dados|leitor recursivo com flag
+rg senha dados|leitor recursivo sem flag
+find . -name '*nv' -exec cat {} +|padrão sem o ponto
+printf '\x2e' |escape hexadecimal
+printf '\056' |escape octal
+printf '\u002e' |escape unicode
+base64 -d arquivo|nome codificado
+EOF_HPI_FORM
+  _hpi_case "env degradado: leitor sem recursão passa" 0 "${proj}" "${EGN}" "${d}" "$(_hpi_payload "${d}" 'grep senha dados')" "${dead}"
+  _hpi_case "env degradado: campo glob" 2 "${proj}" "${EGN}" "${d}" '{"tool_name":"Grep","tool_input":{"pattern":"x","glob":".e*"}}' "${dead}"
+  _hpi_case "env degradado: padrão de busca não é caminho" 0 "${proj}" "${EGN}" "${d}" '{"tool_name":"Grep","tool_input":{"pattern":".e","path":"dados"}}' "${dead}"
+  _hpi_kill "forma sem o escape" "${EG}" '|u002e|x2e|056|base64' '' "${EGN}" "${d}" "$(_hpi_payload "${d}" "printf '\\x2e' ")" 2 0 "${dead}"
+  _hpi_kill "forma sem recursivo com flag" "${EG}" '(-[[:alnum:]]*[rR]|--recursive|--dereference-recursive)' '(--nunca)' "${EGN}" "${d}" "$(_hpi_payload "${d}" 'grep -r senha dados')" 2 0 "${dead}"
+  _hpi_kill "forma sem recursivo sem flag" "${EG}" '|(^|[^[:alnum:]_.-])(rg|ag|ack|rgrep|tar|zip)[[:space:]]' '' "${EGN}" "${d}" "$(_hpi_payload "${d}" 'rg senha dados')" 2 0 "${dead}"
+  _hpi_kill "forma sem o padrão sem ponto" "${EG}" '|[*?]e?nv|' '|' "${EGN}" "${d}" "$(_hpi_payload "${d}" "find . -name '*nv' -exec cat {} +")" 2 0 "${dead}"
+  _hpi_kill "forma sem o campo glob" "${EG}" 'for f in command file_path path glob;' 'for f in command file_path path;' "${EGN}" "${d}" '{"tool_name":"Grep","tool_input":{"pattern":"x","path":"dados","glob":".e*"}}' 2 0 "${dead}"
+  _hpi_kill "forma sem tirar as aspas" "${EG}" "t=\"\$(printf '%s' \"\$t\" | tr -d \"\\\"'\\\\\\\\\")\"" ':' "${EGN}" "${d}" "$(_hpi_payload "${d}" "cat '.'env")" 2 0 "${dead}"
+
+  # ── o veto da API: judge que falha, e falha sem provider ativo ──
+  local DP=.claude/hooks/pretooluse-direct-provider-api.sh DPN=pretooluse-direct-provider-api.sh japi jnone
+  japi="$(_hpi_payload "${d}" "${apidanger}")"
+  _hpi_kill "api: judge que falha abrir" "${DP}" '|| _onion_dpa_failed "${cmd}"' '|| return 0' "${DPN}" "${d}" "${japi}" 2 0 PATH="${jshim}:${PATH}"
+  jnone="$(_hpi_payload "${d}" 'curl -s https://none.exemplo.test/x')"
+  _hpi_kill "api: falha fechar sem provider" "${DP}" '[ -n "${active}" ] && [ "${active}" != none ] || exit 0' ':' "${DPN}" "${d}" "${jnone%\}\}}" 0 2 TASK_MANAGER_PROVIDER=none
+
+  # ── o verbo não some no corte do texto: um comando longo com a análise derrubada na cópia ──
+  local longo jlong LB=.claude/hooks/lib/invocation-lines.sh
+  longo="$(printf 'echo %0500d; git push --force origin main' 0)"
+  jlong="$(_hpi_payload "${d}" "${longo}")"
+  HPI_INJ_F="${LB}"; HPI_INJ_OLD='    analyze(heredocs(raw))
+except Exception as e:'; HPI_INJ_NEW="    raise RuntimeError('x')
+except Exception as e:"
+  _hpi_kill "protect: o verbo sumir no corte" "${LB}" 'main=%d :: %s%s" % (int(is_merge), int(main), t[:400], tail)' 'main=%d :: %s%s" % (int(is_merge), int(main), t[:400], "")' pretooluse-protect-main.sh "${d}" "${jlong}" 2 0
+  HPI_INJ_F=""
+
+  # ── o que vem do diretório de trabalho é dado: script, arquivo de ambiente e config do repo ──
+  local cw="${d}/cw" marca="${d}/marca.hit"
+  _hpi_mark_kill() {  # <nome> <arquivo> <velho> <novo> <função que roda o caso em ${mut}>
+    local nm="$1" f="$2" old="$3" new="$4" fn="$5"
+    _hpi_fresh; rm -f "${marca}"; "${fn}"
+    if [ -e "${marca}" ]; then record_fail "hooks-python-isolated: (m) cópia limpa: ${nm}" "a marca apareceu sem mutante"; return; fi
+    record_pass "hooks-python-isolated: ${nm}: nada do diretório de trabalho rodou"
+    _hpi_mutate "${f}" "${old}" "${new}" || { record_fail "hooks-python-isolated: (m) mutante não aplicou" "${nm}"; return; }
+    rm -f "${marca}"; "${fn}"
+    if [ -e "${marca}" ]; then record_pass "hooks-python-isolated: (m) mutante morde: ${nm}"
+    else record_fail "hooks-python-isolated: (m) mutante NÃO morde" "${nm}: a marca não apareceu"; fi
+    rm -f "${marca}"
+  }
+  rm -rf "${cw}"; mkdir -p "${cw}/.claude/validation"
+  git -C "${cw}" init -q -b feat 2>/dev/null
+  printf '#!/usr/bin/env bash\ntouch %s\n' "${marca}" > "${cw}/.claude/validation/session-beacon.sh"
+  _hpi_beacon() { printf '{"session_id":"s"}' | (cd "${cw}" && env LC_ALL=C CLAUDE_PROJECT_DIR="${mut}" bash "${mut}/.claude/hooks/session-beacon-hook.sh" refresh >/dev/null 2>&1) || true; }
+  if [ -f "${proj}/.claude/hooks/session-beacon-hook.sh" ]; then
+    _hpi_mark_kill "farol" .claude/hooks/session-beacon-hook.sh 'SB="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}/.claude/validation/session-beacon.sh"' 'SB="$REPO/.claude/validation/session-beacon.sh"' _hpi_beacon
+  fi
+  local amb="${d}/amb" envname='.e''nv' got
+  mkdir -p "${amb}"
+  { printf 'touch %s\n' "${marca}"; printf 'PATH=/nao-existe\nOUTRA=1\nONION_FED_CLIENT_ID=a\nexport ONION_FED_CLIENT_SECRET="b"\nONION_FED_ORG_ID='"'"'c'"'"'\nONION_FED_MEMBER=acme\n'; } > "${amb}/${envname}"
+  _hpi_inbox() {
+    mkdir -p "${mut}/.claude/utils/federation-transport"
+    printf '#!/usr/bin/env bash\nprintf "%%s|%%s|%%s|%%s|%%s" "$ONION_FED_CLIENT_SECRET" "$ONION_FED_ORG_ID" "$ONION_FED_MEMBER" "${OUTRA:-}" "$PATH" > %s/inbox.out\n' "${d}" > "${mut}/.claude/utils/federation-transport/inbox-pull.sh"
+    printf '{}' | (cd "${amb}" && env LC_ALL=C CLAUDE_PROJECT_DIR="${mut}" bash "${mut}/.claude/hooks/co-evolution-inbox-check.sh" >/dev/null 2>&1) || true
+  }
+  if [ -f "${proj}/.claude/hooks/co-evolution-inbox-check.sh" ]; then
+    _hpi_mark_kill "arquivo de ambiente" .claude/hooks/co-evolution-inbox-check.sh '  [ -f .env ] && while IFS= read -r _l; do' '  [ -f .env ] && { set -a; . ./.env 2>/dev/null || true; set +a; }
+  false && while IFS= read -r _l; do' _hpi_inbox
+    rm -f "${d}/inbox.out"; _hpi_fresh; _hpi_inbox; got="$(cat "${d}/inbox.out" 2>/dev/null)"
+    if [ "${got}" = "b|c|acme||${PATH}" ]; then record_pass "hooks-python-isolated: arquivo de ambiente: só as chaves da federação entram, sem aspas, e o PATH não muda"
+    else record_fail "hooks-python-isolated: arquivo de ambiente: chaves" "veio: ${got}"; fi
+  else record_skip "hooks-python-isolated: hook do inbox não viaja a esta porta → não medido aqui"; fi
+  if [ "${moat_armed}" = 1 ]; then
+    local rp="${d}/rp"; mkdir -p "${rp}"
+    git -C "${rp}" init -q -b feat 2>/dev/null; printf x > "${rp}/f"; git -C "${rp}" add f 2>/dev/null
+    printf '#!/bin/sh\ntouch %s\nexit 1\n' "${marca}" > "${d}/prog.sh"; chmod +x "${d}/prog.sh"
+    git -C "${rp}" config core.fsmonitor "${d}/prog.sh"
+    _hpi_git() { _hpi_run "${mut}" pretooluse-moat-gate.sh "${rp}" "$(_hpi_payload "${rp}" 'bash x.sh')" >/dev/null; }
+    _hpi_mark_kill "config do repo no veto do MOAT" .claude/hooks/pretooluse-moat-gate.sh 'git -c core.fsmonitor=false -C "$d" ls-files' 'git -C "$d" ls-files' _hpi_git
+  fi
+
   # (m-guarda) cada mutante da guarda reverte uma polaridade e exige que o caso nomeado reprove no --selftest dela
   local sb="${d}/guard" s old new want mo mrc
   mkdir -p "${sb}"; s="${sb}/python-isolated-check.sh"
@@ -43905,6 +44035,8 @@ except Exception: d={}'
         cands = shell_exec_targets(txt)$(printf '\x1f')        cands = []$(printf '\x1f')(d1) script executado pelo hook entra no alvo
     return None if re.search(r"\s-[A-Za-z]*I[A-Za-z]*(\s|\$)", first) else first$(printf '\x1f')    return None$(printf '\x1f')(d5) shebang python sem -I acusa
         print(f"python-isolated-check: settings não parseia: {e}", file=sys.stderr)$(printf '\x1f')        return []$(printf '\x1f')(e1) settings ilegível sai 2
+                hits, embedded = invocations(c)$(printf '\x1f')                hits, embedded = [], []$(printf '\x1f')(d6) python no texto do comando acusa
+                for t in shell_exec_targets(c):$(printf '\x1f')                for t in []:$(printf '\x1f')(d8) hook fora de .claude entra no alvo
 EOF_HPI
   fi
   rm -rf "${d}"

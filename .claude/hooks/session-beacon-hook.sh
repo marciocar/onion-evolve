@@ -20,7 +20,8 @@ fi
 [ -n "${sid:-}" ] || exit 0
 
 REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-SB="$REPO/.claude/validation/session-beacon.sh"
+# o script vem do projeto da sessão, nunca do diretório de trabalho; $REPO segue só como a identidade do farol
+SB="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}/.claude/validation/session-beacon.sh"
 [ -f "$SB" ] || exit 0
 
 # Ponto de partida da sonda de DONO: o pai DESTE hook — o processo que sustenta a

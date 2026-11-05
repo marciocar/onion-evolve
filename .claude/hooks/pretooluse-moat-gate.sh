@@ -105,7 +105,7 @@ moat_unversioned_script() {
   while IFS= read -r t; do
     [ -z "$t" ] && continue
     case "$t" in *'$'*|*'`'*|'~'*) return 0 ;; esac
-    git -C "$d" ls-files --error-unmatch -- "$t" >/dev/null 2>&1 || return 0
+    git -c core.fsmonitor=false -C "$d" ls-files --error-unmatch -- "$t" >/dev/null 2>&1 || return 0
   done < <(printf '%s\n' "$flat" \
              | grep -oE '(^|[;&|(`[:space:]])(bash|sh|zsh|dash|ksh|source|\.)[[:space:]]+[^-[:space:];&|][^[:space:];&|]*|[^[:space:];&|<>]*\.sh([^[:alnum:]_]|$)|(^|[;&|(`[:space:]])\./[^[:space:];&|]+' \
              | sed -E 's/^[;&|(`[:space:]]*//; s/^(bash|sh|zsh|dash|ksh|source|\.)[[:space:]]+//; s/[^[:alnum:]_./~$`-]+$//')

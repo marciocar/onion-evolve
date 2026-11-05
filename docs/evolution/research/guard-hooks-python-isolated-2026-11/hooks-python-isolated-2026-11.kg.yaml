@@ -6,7 +6,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-04"
   review_after: "2026-12-04"   # 30d: defeito de guarda
-  # ═══ TETO: 12 NÓS ═══
+  # ═══ TETO: 14 NÓS ═══  (12 + 2 da passada adversarial)
 nodes:
   - id: Q_HOOKS_RODAM_PYTHON_ISOLADO
     node_type: question
@@ -16,9 +16,9 @@ nodes:
     impact: 5
     confidence: 0.85
     verified_at: "2026-11-05"
-    verified_against: "família hooks_python_isolated verde em dois interpretadores (3.15.2 do venv e 3.12.3 do SO), 99 casos, com a cópia limpa provada antes de cada mutante"
+    verified_against: "família hooks_python_isolated e famílias vizinhas tocadas verdes, com a cópia limpa provada antes de cada mutante"
     label: "os hooks do core e o que eles executam rodam python em modo isolado, e a falha de análise nos vetos fecha pela forma do objeto guardado"
-    narrative: "Fecha o alcance dos hooks da sessão. O gate do git e o executável resolvido pelo PATH ficam nos tetos abaixo. A passada adversarial está pendente no resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)."
+    narrative: "Fecha o alcance dos hooks da sessão. O gate do git e o executável resolvido pelo PATH ficam nos tetos abaixo. A passada adversarial reprovou a 1ª cura, e o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) traz os achados curados."
   - id: E_DEFEITO_MODULO_SOMBRA
     node_type: evidence
     layer: audit
@@ -107,10 +107,10 @@ nodes:
     impact: 5
     confidence: 0.8
     verified_at: "2026-11-05"
-    verified_against: "família: python3 quebrado e JSON truncado barram o comando perigoso e deixam passar o honesto em cada veto; mutantes da forma; corpus de 12.173 comandos dos 10 transcripts mais recentes do core"
+    verified_against: "família: analisador morto com python vivo fecha qualquer comando, python3 quebrado e JSON truncado fecham pela forma; mutantes de cada cinturão; corpus de 14.408 comandos, 68 barrados pelo veto inteiro, 13 soltos pelo degradado; 2.067 comandos reais com chave e vírgula sem nenhum no teto"
     trace: ".claude/hooks/pretooluse-env-guard.sh"
-    label: "JSON ilegível deixa de virar {} nos vetos, e a guarda de segredo com a análise morta fecha 20,6% dos comandos reais em vez de 100%"
-    narrative: "A leitura do JSON tinha `except Exception: d={}`: comando vazio, exit 0, a falha virando permissão, em 5 vetos. Agora a exceção sobe e cai no modo degradado que merge-gate, protect-main e moat-gate já tinham: fecha pela forma do objeto. A guarda de segredo fechava tudo quando a análise morria, o que também travava o Read do arquivo que diagnosticaria o python; ela herdou a mesma lógica, e isto SUPERA o nó C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON do grafo vetos-fail-closed-2026-10. Medida do corte: 343 comandos citam o nome do arquivo de segredo, 0 fora do corte; numa amostra de 1.500 dos 9.666 fora do corte, o veto inteiro barra 3 (0,2%), todos glob sem ponto (`dir/*`)."
+    label: "a falha da análise tem três regimes: python vivo com analisador morto fecha tudo, com a razão; JSON ilegível e python3 ausente ou quebrado fecham pela forma, 20,4% dos comandos reais em vez de 100%"
+    narrative: "A leitura do JSON tinha `except Exception: d={}`: comando vazio, exit 0, a falha virando permissão, em 5 vetos. Agora só o JSON ilegível vai à forma (rc 3). A 1ª redação desta cura mandava também o analisador morto com python vivo para a forma, e a passada adversarial a reprovou: o `try` em volta do juízo e a sonda `python3 -I -c pass` separam os dois casos. A guarda de segredo fechava tudo quando a análise morria, o que também travava o Read que diagnostica o python; com python ausente ou quebrado ela herdou a forma, e isto SUPERA o nó C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON do grafo vetos-fail-closed-2026-10. A medida da forma está em C_TETO_FORMA_DO_SEGREDO. A expansão de chaves ganhou teto de 256 alternativas, passou fecha."
   - id: C_API_DIRETA_SEM_PYTHON_CALA
     node_type: claim
     layer: audit
@@ -131,10 +131,10 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-11-05"
-    verified_against: "leitura dos hooks: `python3`, `jq`, `node` e `bash` resolvidos por PATH; a família prova o caso com um python3 falso à frente do PATH só para o modo degradado"
+    verified_against: "leitura dos hooks; casos de marca na família para o script do farol, o arquivo de ambiente e a config do repo; git rev-parse, config, branch, for-each-ref, symbolic-ref e log medidos sem disparar programa da config"
     trace: ".claude/validation/python-isolated-check.sh"
-    label: "TETO: -I isola os imports do interpretador, não fixa QUAL executável roda, e não cobre a sobrescrita do próprio script de hook"
-    narrative: "Fora desta cura, sem ampliar o escopo: `python3` e as outras ferramentas por PATH, e o arquivo do hook, que quem escreve no repo pode trocar. Fixar caminho absoluto quebraria o venv de cada adotante; proteger o arquivo é outra guarda. Gatilho: uma medida de PATH ou de escrita em .claude/hooks alcançada dentro de sessão. O desenho candidato é um mod ou veto de escrita naquela pasta, a decidir pelo maestro."
+    label: "TETO: -I isola os imports do interpretador, não fixa QUAL executável roda, e não cobre a sobrescrita do próprio script de hook; o que vem do diretório de trabalho foi curado em três pontos, e o resto segue aberto"
+    narrative: "Curados nesta leva, porque têm o mesmo alcance: o script do farol vem do projeto da sessão, o arquivo de ambiente do diretório de trabalho é dado e só as chaves da federação entram, e a leitura de índice no veto do MOAT não obedece à config do repo. Segue aberto: `python3`, `jq`, `node` e `bash` por PATH, o arquivo do hook, que quem escreve no repo pode trocar, e git que lê o índice fora dos vetos, que não foi varrido por inteiro. Fixar caminho absoluto quebraria o venv de cada adotante; proteger o arquivo é outra guarda. Gatilho: uma medida de PATH ou de escrita em .claude/hooks alcançada dentro de sessão. O desenho candidato é um mod ou veto de escrita naquela pasta, a decidir pelo maestro."
   - id: C_TETO_GATE_DO_GIT
     node_type: claim
     layer: audit
@@ -146,7 +146,7 @@ nodes:
     verified_against: "ONION_PYISO_ROOTS=all python-isolated-check.sh --census: 149 invocações sem -I em 38 arquivos, 79 delas na própria bancada e 12 no lint"
     trace: ".githooks/pre-commit"
     label: "TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da sessão"
-    narrative: "Os .githooks em si têm zero invocação. Tirar o -I do escopo aqui foi corte de risco: esses scripts importam yaml, e fazê-lo às cegas exige a bancada inteira, que esta leva não roda. O efeito do módulo sombra no lint fica NÃO MEDIDO: a rodada de controle, no clone limpo, estourou o teto de 280 s sob carga. O comando para retomar o censo está na guarda: ONION_PYISO_ROOTS=all --census."
+    narrative: "Os .githooks em si têm zero invocação. Tirar o -I do escopo aqui foi corte de risco: esses scripts importam yaml, e fazê-lo às cegas exige a bancada inteira, que esta leva não roda. Medido pela passada adversarial, com módulo sombra na raiz: o lint reprova nas três variantes (rc 1 ou 2) e não aprova em silêncio; o pre-commit estourou o teto de tempo e não tem resultado. O passo seguinte é PYTHONSAFEPATH no lint e no pre-commit, em PR próprio. O comando para retomar o censo está na guarda: ONION_PYISO_ROOTS=all --census."
   - id: C_TETO_LEXICO
     node_type: claim
     layer: audit
@@ -155,10 +155,10 @@ nodes:
     impact: 2
     confidence: 0.8
     verified_at: "2026-11-05"
-    verified_against: "cabeçalho de python-isolated-check.sh e casos a1 a a14, c1 a c10 do --selftest"
+    verified_against: "cabeçalho de python-isolated-check.sh e casos a1 a a14, c1 a c10 e d1 a d8 do --selftest"
     trace: ".claude/validation/python-isolated-check.sh"
     label: "TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho montado em execução"
-    narrative: "Gatilho para revisitar: uma dessas formas aparecer num hook do core. O corte do modo degradado da guarda de segredo tem teto próprio: nome montado por programa ou variável de fora passa, como no veto inteiro."
+    narrative: "Gatilho para revisitar: uma dessas formas aparecer num hook do core. O texto do comando no settings.json e o hook fora de .claude já entram no alvo; settings.local.json não."
   - id: C_VIAJA_PARA_PORTAS_E_ADOTANTES
     node_type: claim
     layer: audit
@@ -171,6 +171,35 @@ nodes:
     trace: "ops/materialize-door.sh"
     label: "viajam às 4 portas e aos adotantes: os hooks curados, a guarda, a REGRA 115 e a família; a evidência e a receita não viajam"
     narrative: "O repo é público e os adotantes herdam os hooks: a cura só protege quem atualizar, e a forma de avisar é decisão do maestro. Fica aberto até a leva sair: o anúncio aos adotantes, a publicação das portas e o que fazer com a evidência fora da árvore."
+  - id: C_TETO_FORMA_DO_SEGREDO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "corpus de 14.408 comandos do core, em série: o veto inteiro barra 68 e o modo por forma solta 13 deles; a forma do padrão sem ponto acrescenta 0 fechamentos"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "TETO: o modo por forma fecha 20,4% dos comandos reais e solta 13 dos 68 que o veto inteiro barra: 7 glob sem ponto, 5 padrão duplo em texto de heredoc, 1 nome montado em execução"
+    narrative: "Vale só com python ausente ou quebrado, ou JSON ilegível. A 1ª redação dizia 'todos glob sem ponto', medido em amostra de 1.500: errado, a medida do corpus inteiro corrige. Leitura por padrão sem ponto entrou na forma, e o custo em falso positivo medido é zero no corpus. Nome montado por programa ou variável de fora passa. Fechar também o glob sem ponto foi recusado: ele aparece em comandos comuns e travaria a sessão, que é o que este modo existe para evitar."
+  - id: E_PASSADA_REPROVOU_A_1A_CURA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "passada adversarial independente sobre 76461b38d, reproduzida neste head em laboratório com teto de memória; os casos novos e 7 mutantes antes vivos estão na família hooks_python_isolated"
+    trace: "docs/evolution/review/fix-hooks-python-isolated.md"
+    label: "a 1ª cura foi REPROVADA: -I funcionava, mas a falha da análise soltava em um veto e a família tinha 7 mutantes vivos; curado neste PR"
+    narrative: "O que a família da 1ª cura não via: ela só provava a análise morta com python morto. O caso que faltava é python vivo com analisador morto. Os achados, a cura e o que ficou de fora estão no resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)."
+    provenance:
+      source: "docs/evolution/review/fix-hooks-python-isolated.md"
+      locator: "seção Achados"
+      method: "passada adversarial com corpus, mutantes e laboratório próprio; artefatos fora da árvore"
+      locality: "repo"
 edges:
   - from: E_DEFEITO_MODULO_SOMBRA
     to: Q_HOOKS_RODAM_PYTHON_ISOLADO
@@ -205,3 +234,9 @@ edges:
   - from: C_VIAJA_PARA_PORTAS_E_ADOTANTES
     to: Q_HOOKS_RODAM_PYTHON_ISOLADO
     edge_type: CONSTRAINS
+  - from: C_TETO_FORMA_DO_SEGREDO
+    to: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
+    edge_type: CONSTRAINS
+  - from: E_PASSADA_REPROVOU_A_1A_CURA
+    to: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
+    edge_type: SUPPORTS

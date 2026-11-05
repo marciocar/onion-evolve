@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**847 itens abertos** em 143 grafo(s) com aberto (de 183 no escopo) · 144 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**848 itens abertos** em 143 grafo(s) com aberto (de 183 no escopo) · 144 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1271,12 +1271,13 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
-## hooks-python-isolated-2026-11 — 5 item(ns)
+## hooks-python-isolated-2026-11 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.8 | `C_TETO_EXECUTAVEL_NAO_FIXADO` | hooks-python-isolated-2026-11 | TETO: -I isola os imports do interpretador, não fixa QUAL executável roda, e não cobre a sobrescrita do próprio script de hook |
 | 6.4 | `C_VIAJA_PARA_PORTAS_E_ADOTANTES` | hooks-python-isolated-2026-11 | viajam às 4 portas e aos adotantes: os hooks curados, a guarda, a REGRA 115 e a família; a evidência e a receita não viajam |
+| 5.1 | `C_TETO_FORMA_DO_SEGREDO` | hooks-python-isolated-2026-11 | TETO: o modo por forma fecha 20,4% dos comandos reais e solta 13 dos 68 que o veto inteiro barra: 7 glob sem ponto, 5 padrão dupl |
 | 4.5 | `C_TETO_GATE_DO_GIT` | hooks-python-isolated-2026-11 | TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da s |
 | 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
 | 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
