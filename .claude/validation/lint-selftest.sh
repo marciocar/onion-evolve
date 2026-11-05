@@ -50794,7 +50794,7 @@ run_plugin_write_guard_selftests() {
   fi
   # (a1b) o --selftest por caminho RELATIVO: o `_raw` muda de pasta, e o hook relativo deixava de ser achado (rc 127, refutador 5)
   rc=0; out="$(cd "${d}/limpa/.claude/hooks" && PW_SELFTEST_ONLY="JSON truncado: Bash no alvo barra" LC_ALL=C bash pretooluse-plugin-write-guard.sh --selftest 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s\n' "${out}" | grep -q '^ok   acusa JSON truncado: Bash no alvo barra'; then
+  if [ "${rc}" -eq 0 ] && grep -q '^ok   acusa JSON truncado: Bash no alvo barra' <<< "${out}"; then
     record_pass "plugin-write-guard: (a1b) --selftest por caminho relativo verde"
   else record_fail "plugin-write-guard: (a1b) --selftest por caminho relativo" "rc=${rc}: $(printf '%s\n' "${out}" | tail -2 | tr '\n' '|')"; fi
   rc=0; out="$(LC_ALL=C bash "${d}/limpa/.claude/validation/plugin-write-scan-check.sh" --selftest 2>&1)" || rc=$?
@@ -50822,7 +50822,7 @@ PYREG
   local w="${d}/limpa/.claude/hooks/pretooluse-plugin-write-guard.sh" msg
   git init -q "${d}/p"                                  # a forma só vale em raiz de repo ou na casa
   rc=0; msg="$(printf '{"tool_name":"Write","tool_input":{"file_path":"%s/p/.claude/skills/x/hooks/h.json"},"cwd":"%s"}' "${d}" "${d}" | CLAUDE_PROJECT_DIR="${d}" LC_ALL=C bash "${w}" 2>&1 >/dev/null)" || rc=$?
-  if [ "${rc}" -eq 2 ] && printf '%s' "${msg}" | grep -q 'GUARDA-PRETOOLUSE (plugin em skills)'; then
+  if [ "${rc}" -eq 2 ] && grep -q 'GUARDA-PRETOOLUSE (plugin em skills)' <<< "${msg}"; then
     record_pass "plugin-write-guard: (c) exit 2 com a mensagem na saída de erro"
   else record_fail "plugin-write-guard: (c) veto como o runner" "rc=${rc} msg=${msg}"; fi
 
@@ -50830,8 +50830,8 @@ PYREG
   local s="${d}/sess"; mkdir -p "${s}/.claude/skills/x/.claude-plugin" "${s}/.claude/validation" "${d}/casa"
   cp "${scan}" "${s}/.claude/validation/"; echo '{}' > "${s}/.claude/skills/x/.claude-plugin/plugin.json"
   rc=0; out="$(CLAUDE_PROJECT_DIR="${s}" HOME="${d}/casa" LC_ALL=C bash "${hello}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '1 arquivo(s) com FORMA de plugin' && printf '%s' "${out}" | grep -qF '  - .claude/skills/x/.claude-plugin/plugin.json' \
-     && ! printf '%s' "${out}" | grep -qE 'JÁ|confie'; then
+  if [ "${rc}" -eq 0 ] && grep -q '1 arquivo(s) com FORMA de plugin' <<< "${out}" && grep -qF '  - .claude/skills/x/.claude-plugin/plugin.json' <<< "${out}" \
+     && ! grep -qE 'JÁ|confie' <<< "${out}"; then
     record_pass "plugin-write-guard: (d) a partida lista a forma, sem afirmar carga, com rc 0"
   else record_fail "plugin-write-guard: (d) aviso na partida" "rc=${rc} out=${out}"; fi
   rm -f "${s}/.claude/skills/x/.claude-plugin/plugin.json"
@@ -50848,7 +50848,7 @@ PYREG
     record_pass "plugin-write-guard: (e) o dispatcher leva o achado à REGRA 114"
   else record_fail "plugin-write-guard: (e) dispatcher" "$(printf '%s\n' "${out}" | tail -3 | tr '\n' '|')"; fi
   out="$(cd "${REPO_ROOT}" && ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${dr}/.claude/skills/x/hooks/hooks.json" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'plugin-em-skills'; then
+  if grep -q 'plugin-em-skills' <<< "${out}"; then
     record_fail "plugin-write-guard: (e1) a variável sem a flag" "trocou o repo julgado: $(printf '%s\n' "${out}" | grep -m1 plugin-em-skills)"
   else record_pass "plugin-write-guard: (e1) sem a flag de bancada, a variável não troca o repo julgado"; fi
 
@@ -50881,7 +50881,7 @@ PYDER
 )"
     out="$(cd "${REPO_ROOT}" && IS_DERIVED=1 ONLY_PATH="" SCRIPT_DIR="${REPO_ROOT}/.claude/validation" REPO_ROOT="${REPO_ROOT}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dc}" LC_ALL=C bash -c 'violation() { printf "%s|%s\n" "$1" "$3"; }; '"${_od}"'
 check_plugin_write_scan' 2>&1 || true)"
-    if printf '%s' "${out}" | grep -q '^SOFT|.*NÃO RODOU.*sem permissão' && ! printf '%s' "${out}" | grep -q '^HARD|.*NÃO RODOU'; then
+    if grep -q '^SOFT|.*NÃO RODOU.*sem permissão' <<< "${out}" && ! grep -q '^HARD|.*NÃO RODOU' <<< "${out}"; then
       record_pass "plugin-write-guard: (e3b) sem permissão no derivado: SOFT, com o motivo"
     else record_fail "plugin-write-guard: (e3b) sem permissão no derivado" "${out}"; fi
     # e o mutante dessa linha: sem o rebaixamento, o derivado fica HARD
@@ -50889,7 +50889,7 @@ check_plugin_write_scan' 2>&1 || true)"
     [ "${_odm}" != "${_od}" ] || record_fail "plugin-write-guard: (e3c) âncora" "mutante do rebaixamento NÃO aplicado"
     out="$(cd "${REPO_ROOT}" && IS_DERIVED=1 ONLY_PATH="" SCRIPT_DIR="${REPO_ROOT}/.claude/validation" REPO_ROOT="${REPO_ROOT}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dc}" LC_ALL=C bash -c 'violation() { printf "%s|%s\n" "$1" "$3"; }; '"${_odm}"'
 check_plugin_write_scan' 2>&1 || true)"
-    if printf '%s' "${out}" | grep -q '^HARD|.*NÃO RODOU'; then record_pass "plugin-write-guard: (e3c) o mutante do rebaixamento morde"
+    if grep -q '^HARD|.*NÃO RODOU' <<< "${out}"; then record_pass "plugin-write-guard: (e3c) o mutante do rebaixamento morde"
     else record_fail "plugin-write-guard: (e3c) mutante do rebaixamento VIVO" "${out}"; fi
     chmod 755 "${dc}/.claude/skills/x/hooks"
   fi
@@ -50906,7 +50906,7 @@ PYDER
   for _e4 in 1:SOFT 0:HARD; do
     out="$(cd "${REPO_ROOT}" && IS_DERIVED="${_e4%:*}" ONLY_PATH="" SCRIPT_DIR="${REPO_ROOT}/.claude/validation" REPO_ROOT="${REPO_ROOT}" ONION_PLUGIN_SCAN_BENCH=1 ONION_PLUGIN_SCAN_REPO="${dr}" LC_ALL=C bash -c 'violation() { printf "%s|%s\n" "$1" "$3"; }; '"${_od4}"'
 check_plugin_write_scan' 2>&1 || true)"
-    if printf '%s' "${out}" | grep -q "^${_e4#*:}|.*plugin-em-skills"; then record_pass "plugin-write-guard: (e4) IS_DERIVED=${_e4%:*} dá ${_e4#*:}"
+    if grep -q "^${_e4#*:}|.*plugin-em-skills" <<< "${out}"; then record_pass "plugin-write-guard: (e4) IS_DERIVED=${_e4%:*} dá ${_e4#*:}"
     else record_fail "plugin-write-guard: (e4) IS_DERIVED=${_e4%:*}" "${out}"; fi
   done
 
