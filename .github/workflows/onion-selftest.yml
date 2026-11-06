@@ -224,10 +224,16 @@ jobs:
         # 0 MB») e estourou o teto, deixando um artefato quase vazio — o --report só é escrito no FIM.
         # A sonda grava por família, NA HORA (inicio antes, fim depois), o disco livre do TMPDIR e do
         # workspace e o TMPDIR da família. Família com `inicio` e sem `fim` = a que estava no ar.
-        # ⏱ O TETO DO PASSO (22) FICA ABAIXO DO TETO DO JOB (25) DE PROPÓSITO: estourado o do passo, os
-        # passos `if: always()` abaixo ainda têm 3 min para subir o sumário e o artefato com a sonda.
-        # Com o teto só no job, quem morre é o job inteiro, e a evidência da faixa morta morre junto.
-        timeout-minutes: 22
+        # ⏱ O TETO DO PASSO FICA 2 MIN ABAIXO DO TETO DO JOB DE PROPÓSITO: estourado o do passo, os passos
+        # `if: always()` abaixo ainda sobem o sumário e o artefato com a sonda. Com o teto só no job, quem
+        # morre é o job inteiro, e a evidência da faixa morta morre junto.
+        # A margem é MEDIDA (2026-11-06, 20 faixas dos runs 42209160269, 42205321547, 42174335788 e
+        # 42171564226 da main): antes deste passo o job gasta ~0,5 min (checkout, setup-python, capacidade),
+        # e os dois passos de depois gastam 1 a 2 s. 2 min cobrem os dois com folga; 3 min (o 22 da 1ª
+        # versão, SAC-277) cortariam aos 22 uma faixa que o job deixaria terminar — a faixa 3 já chegou a
+        # 23,5 min antes das 5 faixas; hoje o maior passo medido é 19,6 min. Mexeu no teto do job? Este anda
+        # junto: o caso (t4) da `selftest_lanes` reprova margem diferente de 2.
+        timeout-minutes: 23
         run: |
           set -o pipefail
           bash .claude/validation/lint-selftest.sh --jobs auto \
