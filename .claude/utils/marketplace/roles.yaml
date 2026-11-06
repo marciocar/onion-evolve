@@ -239,6 +239,7 @@ roles:
         .claude/validation/kg-radar.sh: "warm-up, catch-up e engineer:work so o rodam SE houver um .kg.yaml no repo; o mini nao tem grafo, o passo nao dispara"
         .claude/hooks/aside-router-hook.sh: "o warm-up descreve o hook de marcadores; o mini nao leva hook nenhum, e o marcador vira texto comum"
         /meta:co-evolve: "warm-up e catch-up so o sugerem quando o hook de inbox sinaliza mensagem; o mini nao tem inbox nem hook"
+        .claude/commands/common/prompts/review-triage.md: "o engineer:pr a cita para triar os achados da passada adversarial com refutadores; o mini nao tem essa passada, e a regua cita comandos de meta que nao viajam"
         .claude/validation/review-artifact-check.sh: "o engineer:pr so manda gerar o residuo da REGRA 56 no core, onde ela vale; em repo derivado o validador se declara fora de escopo, e o iniciante do mini nao tem passada adversarial a registrar"
         /meta:setup-integration: "os adapters o sugerem quando falta variavel; o mini nao leva meta (a matriz), e as variaveis vao a mao no .env conforme utils/task-manager/README.md — sem elas o mini trabalha offline (provider none)"
         /meta/setup-integration: "a mesma sugestao na forma antiga do nome (engineer:start, product:feature e tres docs do task manager); idem acima"
