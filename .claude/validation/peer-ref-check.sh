@@ -116,7 +116,9 @@ G="${TMP}/peer.kg.${P##*.kg.}"   # a extensão vai junto: o parser escolhe YAML 
 git -C "${PAR}" show "${MAIN}:${P}" > "${G}" 2>/dev/null || _unmeasured "não consegui ler ${P} da origin/main do par"
 
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-KQ="${ONION_KG_QUERY:-${SELF}/vendor/kg-ssot/tools/kg_query.py}"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+_KGT="$(kgssot_tools_dir "${SELF}")" || _KGT="${SELF}/vendor/kg-ssot/tools"
+KQ="${ONION_KG_QUERY:-${_KGT}/kg_query.py}"
 vrc=0
 if [ -f "${KQ}" ]; then
   # o PRODUTO lê: rc dele, JSON dele; `unreadable` não vazio = grafo ilegível = não mediu

@@ -176,7 +176,10 @@ HOJE="$(date -u +%Y-%m-%d)"
 DUE_STATE="skip"; DUE_REPORT=""; DUE_FILE=""
 case "$MODE" in --all|--freshness)
   if grep -qE '^[[:space:]]*(-[[:space:]]+)?reverify_(every|on)[[:space:]]*:' -- "$FILE"; then
-    _due_v="${ONION_KG_DUE_VALIDATOR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/vendor/kg-ssot/tools/kg_validate.py}"
+    _due_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+    _due_t="$(kgssot_tools_dir "${_due_root}")" || _due_t="${_due_root}/vendor/kg-ssot/tools"
+    _due_v="${ONION_KG_DUE_VALIDATOR:-${_due_t}/kg_validate.py}"
     if [ ! -f "${_due_v}" ]; then
       DUE_STATE="unmeasured"; DUE_REPORT="leitor do contrato ausente (${_due_v})"
     elif ! command -v python3 >/dev/null 2>&1; then

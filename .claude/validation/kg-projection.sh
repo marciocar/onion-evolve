@@ -136,8 +136,9 @@ _npages="${_disc%% *}"
 [ "${_npages}" -gt 0 ] 2>/dev/null || exit 0
 [ "${_disc#* }" = git ] || { echo "kg-projection: ${_npages} página(s) com projection_of e a raiz não é a raiz de um repo git: o produto lê as páginas rastreadas e julgaria 0 — não pude julgar" >&2; exit 2; }
 
-KT="${ONION_KG_TRACE:-${ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
-[ -n "${ONION_KG_TRACE:-}" ] || [ -f "${KT}" ] || [ ! -f "${ROOT}/tools/kg_trace.py" ] || KT="${ROOT}/tools/kg_trace.py"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+_KGT="$(kgssot_tools_dir "${ROOT}")" || _KGT="${ROOT}/vendor/kg-ssot/tools"
+KT="${ONION_KG_TRACE:-${_KGT}/kg_trace.py}"
 [ -f "${KT}" ] || { echo "kg-projection: kg_trace.py ausente (${KT}) — o vendor kg-ssot >= 4.35.0 é quem julga a projeção; não pude julgar" >&2; exit 2; }
 
 _kj="$(mktemp)"; _ke="$(mktemp)"; _kp="$(mktemp)"; trap 'rm -f "${_kj}" "${_ke}" "${_kp}"' EXIT

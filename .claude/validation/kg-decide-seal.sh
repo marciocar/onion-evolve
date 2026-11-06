@@ -114,18 +114,24 @@ fi
 ROOT="$(git -C "$(dirname "${GRAPH}")" rev-parse --show-toplevel 2>/dev/null || true)"
 # Leitor do contrato, por ordem: (1) o vendor do KG-SSOT (core e adotantes) pelo kg-contract-check, que mede
 # a piora contra o HEAD; (2) o leitor de referência do PRÓPRIO produto (`tools/kg_validate.py`), num repo que
-# é o KG-SSOT e por isso não o vendoriza — julgamento absoluto do grafo (rc 0 passa, 1 reprova), e o passo 0
+# é o KG-SSOT (o spec/release.json da raiz declara a tag kg-ssot-v*, pelo resolver único) e por isso não o vendoriza — julgamento absoluto do grafo (rc 0 passa, 1 reprova), e o passo 0
 # já recusou o grafo que reprovava antes, então reprovar depois é culpa do selo. Sinal de campo do
 # adotante KG-SSOT, 2026-10-12: lá o selador selava sem conferir o contrato. (3) nenhum: CRC=99, e a mensagem
 # diz qual falta — repo git ou leitor de contrato.
 CONTRACT_READER=""
+# a pasta das ferramentas pelo resolver único (KG_SSOT_TOOLS → vendor/kg-ssot/tools → tools/ do produto). O kind
+# decide o leitor: no PRÓPRIO produto (source) segue o leitor de referência absoluto, como antes; nos outros, o
+# kg-contract-check, que resolve a mesma pasta.
+. "${HERE}/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_resolve() {  # sem o resolver: o vendor de hoje
+  KGSSOT_TOOLS="$1/vendor/kg-ssot/tools"; KGSSOT_TOOLS_KIND=vendor; [ -d "${KGSSOT_TOOLS}" ] && return 0; KGSSOT_TOOLS=""; KGSSOT_TOOLS_KIND=""; return 1; }
+KGSSOT_TOOLS=""; KGSSOT_TOOLS_KIND=""; [ -z "${ROOT}" ] || kgssot_tools_resolve "${ROOT}" || true
 _contract() {  # COUT/CRC do contrato sobre o grafo; CRC=99 quando não há leitor de contrato
-  if [ -n "${ROOT}" ] && [ -f "${ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ]; then
-    CONTRACT_READER="vendor/kg-ssot (kg-contract-check)"
+  if [ -n "${ROOT}" ] && [ "${KGSSOT_TOOLS_KIND}" != source ] && [ -n "${KGSSOT_TOOLS}" ] && [ -f "${KGSSOT_TOOLS}/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ]; then
+    CONTRACT_READER="${KGSSOT_TOOLS_KIND:-vendor} kg-ssot (kg-contract-check)"
     COUT="$(cd "${ROOT}" && bash "${HERE}/kg-contract-check.sh" "${GRAPH}" 2>&1)"; CRC=$?
-  elif [ -n "${ROOT}" ] && [ -f "${ROOT}/tools/kg_validate.py" ]; then
+  elif [ -n "${ROOT}" ] && [ "${KGSSOT_TOOLS_KIND}" = source ] && [ -f "${KGSSOT_TOOLS}/kg_validate.py" ]; then
     CONTRACT_READER="tools/kg_validate.py (leitor de referência do produto)"
-    COUT="$(cd "${ROOT}" && python3 -I -B "${ROOT}/tools/kg_validate.py" "${GRAPH}" 2>&1)"; CRC=$?
+    COUT="$(cd "${ROOT}" && python3 -I -B "${KGSSOT_TOOLS}/kg_validate.py" "${GRAPH}" 2>&1)"; CRC=$?
   else COUT=""; CRC=99; fi
 }
 # e o CONTRATO também no passo 0 (achado 5 do refutador): dívida que o grafo já tinha na árvore seria
@@ -143,9 +149,8 @@ fi
 # porquê em VOCAB_WHY (declarado no fim, nunca calado). A comparação antes×depois é só do grafo tocado.
 VOCAB_READER=""; VOCAB_WHY=""; VOCAB_REL=""; VOCAB_EXT=()
 if [ -z "${ROOT}" ]; then VOCAB_WHY="fora de repo git"
-elif [ -f "${ROOT}/vendor/kg-ssot/tools/kg_vocab.py" ]; then VOCAB_READER="${ROOT}/vendor/kg-ssot/tools/kg_vocab.py"
-elif [ -f "${ROOT}/tools/kg_vocab.py" ]; then VOCAB_READER="${ROOT}/tools/kg_vocab.py"
-else VOCAB_WHY="o repo não tem o kg_vocab.py (nem vendor/kg-ssot/tools nem tools/)"; fi
+elif [ -n "${KGSSOT_TOOLS}" ] && [ -f "${KGSSOT_TOOLS}/kg_vocab.py" ]; then VOCAB_READER="${KGSSOT_TOOLS}/kg_vocab.py"
+else VOCAB_WHY="o repo não tem o kg_vocab.py (nem KG_SSOT_TOOLS, nem vendor/kg-ssot/tools, nem tools/ do produto)"; fi
 if [ -n "${VOCAB_READER}" ]; then
   # o caminho do grafo como o lint o escreve (relativo à raiz); python e não `realpath --relative-to`, que é só GNU
   VOCAB_REL="$(python3 -I -c 'import os, sys; print(os.path.relpath(os.path.realpath(sys.argv[2]), os.path.realpath(sys.argv[1])))' "${ROOT}" "${GRAPH}")"
@@ -380,7 +385,7 @@ else
   if [ -z "${ROOT}" ]; then
     echo "kg-decide-seal: fora de repo git — sem leitor de contrato; gate = só o radar (declarado)" >&2
   else
-    echo "kg-decide-seal: repo git sem leitor de contrato (nem vendor/kg-ssot nem tools/kg_validate.py) — gate = só o radar (declarado)" >&2
+    echo "kg-decide-seal: repo git sem leitor de contrato (nem KG_SSOT_TOOLS, nem vendor/kg-ssot, nem tools/kg_validate.py com spec/release.json do kg-ssot) — gate = só o radar (declarado)" >&2
   fi
 fi
 # O LINT DE NOMES, depois: o achado que o grafo tocado NÃO tinha antes é do selo → desfaz, rc 3, nomeando

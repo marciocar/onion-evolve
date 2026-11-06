@@ -28,15 +28,20 @@
 set -uo pipefail
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "kg-contract-check: fora de um repo git" >&2; exit 2; }
-VENDOR="${KG_CONTRACT_VENDOR:-${ROOT}/vendor/kg-ssot}"
+# a pasta das ferramentas: KG_CONTRACT_VENDOR (a raiz de um vendor) vence; senão o resolver único
+# (KG_SSOT_TOOLS → vendor/kg-ssot/tools → tools/ do próprio produto); nada casou, o vendor de hoje.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+if [ -n "${KG_CONTRACT_VENDOR:-}" ]; then VENDOR="${KG_CONTRACT_VENDOR}"; TOOLS="${VENDOR}/tools"
+elif TOOLS="$(kgssot_tools_dir "${ROOT}")"; then VENDOR="$(dirname "${TOOLS}")"
+else VENDOR="${ROOT}/vendor/kg-ssot"; TOOLS="${VENDOR}/tools"; fi
 [ "$#" -ge 1 ] || { echo "uso: kg-contract-check.sh <arquivo.kg.yaml>..." >&2; exit 2; }
-[ -f "${VENDOR}/tools/kg_gate.py" ] || { echo "kg-contract-check: vendor do contrato ausente em ${VENDOR} — não dá para julgar" >&2; exit 2; }
+[ -f "${TOOLS}/kg_gate.py" ] || { echo "kg-contract-check: vendor do contrato ausente em ${VENDOR} — não dá para julgar" >&2; exit 2; }
 
 # -B: sem bytecode. O leitor importa as ferramentas do vendor; sem -B ele plantava tools/__pycache__ e o
 # `kg_vendor.py check` seguinte reprovava o vendor como divergente da tag (medido 2026-10-08).
 _KG_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg"
 [ -f "${_KG_LIB}/machine_path.py" ] || { echo "kg-contract-check: a classe do caminho de máquina (machine_path.py) não está em ${_KG_LIB} — não dá para julgar" >&2; exit 2; }
-python3 -I -B - "${VENDOR}/tools" "${ROOT}" "${_KG_LIB}" "$@" <<'PY'
+python3 -I -B - "${TOOLS}" "${ROOT}" "${_KG_LIB}" "$@" <<'PY'
 import collections, os, re, subprocess, sys
 tools, root, kglib, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4:]
 sys.path.insert(0, tools)
@@ -46,7 +51,7 @@ _hrx = machine_path.host_re(machine_path.known_hosts(root))
 try:
     import kg_gate
 except Exception as e:  # PyYAML/jsonschema ausentes, vendor quebrado
-    print(f"kg-contract-check: não consegui carregar o leitor do contrato ({e}) — instale vendor/kg-ssot/tools/requirements.txt", file=sys.stderr)
+    print(f"kg-contract-check: não consegui carregar o leitor do contrato ({e}) — instale {os.path.relpath(tools, root)}/requirements.txt", file=sys.stderr)
     sys.exit(2)
 
 HINT = {
