@@ -21,7 +21,7 @@
 # ── O QUE NÃO VÊ (teto) ──────────────────────────────────────────────────────────────────────────────────────
 #  · script em arquivo (`bash x.sh` não é lido: é a fronteira do lib, e é por ela que o /meta:co-relay entrega
 #    no inbox do core sem commit, e que `bash <core>/ops/pr-merge-verified.sh` roda);
-#  · código de outra linguagem (`python3 -c "open(...).write()"`), git/gh chamados por outro programa, caminho só
+#  · código de outra linguagem em ARQUIVO (`python3 x.py`), git/gh chamados por outro programa, caminho só
 #    conhecido em runtime, `gh` escrevendo no repo remoto alheio (a fronteira é o clone local);
 #  · clone que nenhuma fonte registra.
 import os as _ao
@@ -267,7 +267,11 @@ def moat_unanalyzable(seg, why, whole=False):
         # citação que abre palavra (falsos positivos do replay do kg-ssot, 2026-11-05)
         hit = [r for r in _adv_signal_repos()
                if _ar.search(r"(^|[\s;&|(\"'])(" + _ar.escape(r) + "|~/" + _ar.escape(r[len(home) + 1:]) + r")(?![\w.-])", ln)]
-        if hit and _ADV_VERB.search(ln):
+        # código embutido noutra linguagem cita o git como LISTA (`['git','-C',core,'commit']`) ou dentro de string
+        # (`os.system('git commit')`): sem aspas, vírgulas e colchetes, o verbo do git aparece (B2 do refutador
+        # independente: os dois criavam commit no core com rc 0)
+        flat = _ar.sub(r"[\"',\[\]]", " ", ln) if "linguagem" in why else ln
+        if hit and (_ADV_VERB.search(ln) or _ADV_VERB.search(flat)):
             _adv_emit("inanalisavel", hit[0], "%s, citando um repo registrado junto de um verbo de escrita — %s" % (why, ln.strip()))
             return
 

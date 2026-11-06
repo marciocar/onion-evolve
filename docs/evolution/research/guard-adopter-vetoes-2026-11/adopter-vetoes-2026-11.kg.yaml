@@ -105,7 +105,7 @@ nodes:
     verified_at: "2026-11-05"
     verified_against: "fronteira do lib (script em arquivo não se lê) e casos e2/e3 da família"
     trace: ".claude/hooks/lib/adopter-judge.py"
-    label: "TETO: script em arquivo não se lê (é por essa fronteira que o co-relay e o merge verificado passam); código de outra linguagem só fecha pela forma de escrita (open com w/a/x, write_text, rmtree…); gh escrevendo no remoto alheio fica fora"
+    label: "TETO: script em arquivo não se lê (é por essa fronteira que o co-relay e o merge verificado passam); código de outra linguagem embutido (-c/-e) fecha pela forma de escrita (open com w/a/x, write_text, rmtree…) ou pelo verbo de escrita do git citado junto do repo; gh escrevendo no remoto alheio fica fora"
     narrative: "Um script próprio do adotante que escreve no core passa. A cura disso seria ler o script, como o moat-judge faz para alvos servidos, e o custo é julgar todo bash x.sh da sessão."
   - id: C_TETO_SO_REPO_REGISTRADO
     node_type: claim
@@ -207,7 +207,7 @@ nodes:
     verified_against: "156 casos do refutador independente sobre ca37a5ee2, re-rodados no executor dele com os hooks da cura: 16 divergências restantes, todas no teto declarado"
     trace: ".claude/hooks/lib/adopter-judge.py"
     label: "a passada independente reprovou ca37a5ee2 por 3 bloqueantes (o --tags virando veto no adotante, as grafias que o cabeçalho prometia, o pai do carimbo); os três curados, e o vocabulário git de baixo nível também"
-    narrative: "Curados: --tags (i1-i4); cd -P, pushd, env -C, xargs com here-string, >| e exec N> (i5-i11); rm -rf .claude, mv .claude, git rm/mv e git checkout -- do carimbo, com o git merge do update passando (i12-i15, h3); checkout-index, merge-file, pack-refs, rerere, format-patch, hash-object -w e reflog expire (i16, i17). Declarados no cabeçalho: brace e glob no caminho, caminho em runtime, find -exec sh -c com $1, git por python, a remoção do hook e a edição do settings.json, e o heredoc sem terminador que fecha."
+    narrative: "Curados: --tags (i1-i4); cd -P, pushd, env -C, xargs com here-string, >| e exec N> (i5-i11); rm -rf .claude, mv .claude, git rm/mv e git checkout -- do carimbo, com o git merge do update passando (i12-i15, h3); checkout-index, merge-file, pack-refs, rerere, format-patch, hash-object -w e reflog expire (i16, i17). Na mesma volta, o python -c que cita um repo registrado com verbo de escrita do git (subprocess com lista, os.chdir e os.system) fecha (i18, i19; o git log por python passa, i20; 538 comandos python do corpus dos dois adotantes, 0 vetos). Declarados no cabeçalho: brace e glob no caminho e variável ou substituição no nome do repo (o pré-filtro procura o nome literal), find -exec sh -c com $1, python em arquivo, a remoção do hook e a edição do settings.json, e o heredoc sem terminador que fecha."
     provenance:
       source: "relatório do refutador independente, 2026-11-06, bancada fora da árvore"
       locator: "lotes b1 a b10"
