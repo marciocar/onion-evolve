@@ -31572,6 +31572,59 @@ run_adopter_gate_selftests() {
     else record_fail "adopter-gate: (e)" "o instalador carimbaria --gate-proven num alvo que só EXECUTOU — o grafo do adotante afirmaria prova inexistente"; fi
   else record_skip "adopter-gate: (e)" "o adopt.md não consome a string 'GATE VIVO' (acoplamento mudou — re-derive o caso)"; fi
 
+  # (g) GATE ENCADEADO PELO HUSKY — sinal de campo de um adotante, 2026-11-05 (o --update de um monorepo com
+  #     husky v9). `core.hooksPath=.husky/_` → embrulho `. "$(dirname "$0")/h"` → `.husky/pre-commit` →
+  #     `bash .githooks/pre-commit`. O verificador via "✓ EXECUTOU" e "✓ BARRADO — bloqueio provado" e reprovava
+  #     "INERTE OU PARCIAL" porque o embrulho não contém a string `Onion pre-commit`. A fixture usa o TEMPLATE
+  #     REAL em .githooks/ e o embrulho do husky v9 verbatim.
+  _mk_husky() {  # $1=dir  $2=rc do lint fake  $3=corpo do .husky/pre-commit
+    local r="$1"; mkdir -p "${r}/.githooks" "${r}/.claude/validation" "${r}/.husky/_"
+    printf '#!/usr/bin/env bash\nexit %s\n' "$2" > "${r}/.claude/validation/lint-artifacts.sh"
+    cp "${REPO_ROOT}/.claude/utils/adopt/githook-pre-commit-onion.tpl" "${r}/.githooks/pre-commit"; chmod +x "${r}/.githooks/pre-commit"
+    printf '#!/usr/bin/env sh\n. "$(dirname "$0")/h"' > "${r}/.husky/_/pre-commit"; chmod +x "${r}/.husky/_/pre-commit"
+    printf '#!/usr/bin/env sh\nn=$(basename "$0")\ns=$(dirname "$(dirname "$0")")/$n\n[ ! -f "$s" ] && exit 0\nsh -e "$s" "$@"\n' > "${r}/.husky/_/h"
+    printf '*\n' > "${r}/.husky/_/.gitignore"
+    printf '%b' "$3" > "${r}/.husky/pre-commit"
+    git -C "${r}" init -q >/dev/null 2>&1
+    git -C "${r}" config core.hooksPath .husky/_ >/dev/null 2>&1
+    printf 'x\n' > "${r}/a.txt"; git -C "${r}" add -A >/dev/null 2>&1
+    git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base --no-verify >/dev/null 2>&1 || true
+  }
+  local rg="${d}/husky-encadeado"; _mk_husky "${rg}" 1 'echo outro-gate\nbash .githooks/pre-commit\n'
+  local out_g; out_g="$(bash "${v}" "${rg}" 2>&1 || true)"
+  if grep -q 'bloqueio provado' <<< "${out_g}"; then
+    if grep -q 'GATE VIVO' <<< "${out_g}" && ! grep -q '✗' <<< "${out_g}" && grep -q 'ENCADEIA o do Onion' <<< "${out_g}"; then
+      record_pass "adopter-gate: (g) gate ENCADEADO pelo husky que executou e barrou dá GATE VIVO, com aviso e sem ✗"
+    else record_fail "adopter-gate: (g)" "executou e barrou e o veredito reprova pela busca textual no embrulho do husky: ${out_g}"; fi
+    # (g-MUT) a busca textual voltar a decidir sozinha faz (g) reprovar — prova que (g) mede a cura.
+    local mut_g="${d}/v-mut-g.sh"
+    sed 's|^    FOREIGN_HOOK=1$|    FOREIGN_HOOK=1; FAILED=1|' "${v}" > "${mut_g}"
+    if ! cmp -s "${v}" "${mut_g}"; then
+      if grep -q 'GATE VIVO' <<< "$(bash "${mut_g}" "${rg}" 2>&1 || true)"; then
+        record_fail "adopter-gate: (g-MUT)" "com a busca textual reprovando de novo, (g) ainda passou — o caso não morde"
+      else record_pass "adopter-gate: (g-MUT) com a busca textual decidindo, (g) reprova — (g) é load-bearing"; fi
+    else record_fail "adopter-gate: (g-MUT) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"; fi
+  else record_skip "adopter-gate: (g)" "o ambiente não executou a cadeia do husky do sandbox (sem sh?) — sem bloqueio observável"; fi
+
+  # (g2) O OUTRO GESTOR QUE NÃO ENCADEIA continua acusado — a cura não pode virar "outro gestor sempre vale".
+  local rg2="${d}/husky-sem-onion"; _mk_husky "${rg2}" 1 'echo outro-gate\n'
+  local out_g2; out_g2="$(bash "${v}" "${rg2}" 2>&1 || true)"
+  if grep -q 'NÃO é o do Onion' <<< "${out_g2}" && grep -q 'INERTE OU PARCIAL' <<< "${out_g2}"; then
+    record_pass "adopter-gate: (g2) husky que NÃO encadeia o Onion segue INERTE — o aviso de cadeia exige a execução observada"
+  else record_fail "adopter-gate: (g2)" "husky sem o Onion na cadeia deixou de ser acusado — fail-open: ${out_g2}"; fi
+
+  # (h) WORKTREE SEM O `.husky/_` GERADO (o mesmo update): o veredito é INERTE, e certo; o conserto impresso era
+  #     `git config core.hooksPath .githooks`, que muda o config COMPARTILHADO e desliga o husky do principal.
+  local rh="${d}/husky-wt"
+  git -C "${rg}" worktree add -q "${rh}" -b wt-sonda >/dev/null 2>&1 || true
+  if [ -d "${rh}" ] && [ ! -e "${rh}/.husky/_" ]; then
+    local out_h; out_h="$(bash "${v}" "${rh}" 2>&1 || true)"
+    if grep -q 'INERTE OU PARCIAL' <<< "${out_h}" && grep -q 'worktree-hooks-ready.sh' <<< "${out_h}" && ! grep -q 'conserto usual' <<< "${out_h}"; then
+      record_pass "adopter-gate: (h) worktree sem o .husky/_ gerado: INERTE, com o passo do helper e sem o conserto que mexe no config compartilhado"
+    else record_fail "adopter-gate: (h)" "a worktree sem o diretório gerado recebe o diagnóstico errado: ${out_h}"; fi
+  else record_fail "adopter-gate: (h) setup" "a worktree da fixture não nasceu sem .husky/_"; fi
+
+  unset -f _mk_husky
   rm -rf "${d}"
 }
 
@@ -48761,9 +48814,128 @@ run_applied_delta_selftests() {
     if grep -q ': 4 commitados' <<< "${out}"; then record_fail "applied-delta: (m) mutante" "a ponta da integração passou em (a): ${out}"
     else record_pass "applied-delta: (m) mutante (ponta da integração em vez do merge-base) MORDE: conta o commit alheio"; fi
   fi
+
+  # (e) A REF LOCAL DA INTEGRAÇÃO ATRÁS DA REMOTA — sinal de campo de um adotante, 2026-11-05: `develop` local 2
+  #     commits atrás de `origin/develop`, a branch do update com esses 2 commits, e 31 arquivos de PRODUTO
+  #     contados como aplicados (1.403 → 1.434). Fixture: `up` (o remoto) ganha produto (p1, p2) depois do
+  #     clone; o alvo busca sem avançar o `main` local, a branch do update nasce de origin/main e mergeia a
+  #     vendor (1 arquivo). O certo é 1; a ref local dá 3.
+  git init -q -b main "${d}/up" >/dev/null 2>&1; echo b > "${d}/up/base.txt"; _ad_git "${d}/up" add -A; _ad_git "${d}/up" commit -qm base
+  git clone -q "${d}/up" "${d}/al" >/dev/null 2>&1
+  echo p1 > "${d}/up/p1.txt"; echo p2 > "${d}/up/p2.txt"; _ad_git "${d}/up" add -A; _ad_git "${d}/up" commit -qm produto
+  _ad_git "${d}/al" fetch -q origin
+  _ad_git "${d}/al" checkout -q -b onion/vendor main; echo o > "${d}/al/onion.txt"; _ad_git "${d}/al" add -A; _ad_git "${d}/al" commit -qm vendor
+  _ad_git "${d}/al" checkout -q -b chore/onion-update-y origin/main; _ad_git "${d}/al" merge -q --no-ff -m merge onion/vendor
+  rc=0; out="$(bash "${sut}" "${d}/al" main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'merge-base(.*main)..HEAD): 1 commitados + 0 pendentes$' <<< "${out}"; then
+    record_pass "applied-delta: (e) ref local ATRÁS da remota (com upstream): 1 commitado, o produto da remota fica fora"
+  else record_fail "applied-delta: (e)" "rc=${rc}: ${out}"; fi
+  # (e2) o mesmo sem upstream configurado: só `origin/<nome>` acha o ponto certo.
+  _ad_git "${d}/al" branch -q --unset-upstream main
+  rc=0; out="$(bash "${sut}" "${d}/al" main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'merge-base(origin/main)..HEAD): 1 commitados' <<< "${out}"; then
+    record_pass "applied-delta: (e2) sem upstream, origin/<nome> é candidata e a linha diz qual ref mediu"
+  else record_fail "applied-delta: (e2)" "rc=${rc}: ${out}"; fi
+  # (e-MUT) só o nome dado como candidata (o comportamento antigo): (e2) volta a contar o produto.
+  mut="${d}/mut-e.sh"
+  sed 's|^for _c in "\${_cands\[@\]}"; do$|for _c in "${INT}"; do|' "${sut}" > "${mut}"
+  if cmp -s "${sut}" "${mut}"; then record_fail "applied-delta: (e-MUT) setup" "o sed não casou o laço das candidatas"
+  else
+    out="$(bash "${mut}" "${d}/al" main 2>&1)" || true
+    if grep -q ': 1 commitados' <<< "${out}"; then record_fail "applied-delta: (e-MUT)" "só a ref local passou em (e2): ${out}"
+    else record_pass "applied-delta: (e-MUT) só a ref local como candidata MORDE: o produto da remota entra no delta"; fi
+  fi
+  # (e3) local À FRENTE da remota (commit não empurrado na integração, a branch do update nasce dela): vale a local.
+  _ad_git "${d}/al" checkout -q main; _ad_git "${d}/al" merge -q --ff-only origin/main; echo l > "${d}/al/local.txt"; _ad_git "${d}/al" add -A; _ad_git "${d}/al" commit -qm local-nao-empurrado
+  _ad_git "${d}/al" checkout -q -b chore/onion-update-z main; _ad_git "${d}/al" merge -q --no-ff -m merge onion/vendor
+  rc=0; out="$(bash "${sut}" "${d}/al" main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'merge-base(main)..HEAD): 1 commitados' <<< "${out}"; then
+    record_pass "applied-delta: (e3) local À FRENTE da remota: o merge-base mais novo é o da local, 1 commitado"
+  else record_fail "applied-delta: (e3)" "rc=${rc}: ${out}"; fi
   rm -rf "${d}"; unset -f _ad_git
 }
 _family run_applied_delta_selftests
+
+# ── worktree-hooks-ready.sh: o diretório de hooks GERADO existe nesta worktree? (2026-11-05) ────────────
+# O caso medido (o --update de um adotante com husky v9): `core.hooksPath=.husky/_` no .git/config compartilhado,
+# `.husky/_` gerado pelo prepare e ignorado pelo git; a worktree irmã nasce sem ele, e o gate fica INERTE.
+# (a) o principal está pronto (controle); (b) a worktree não está, e a última linha diz o passo; (c) o passo usa o
+# gerenciador DO ALVO; (d) com husky local, --install gera e fica pronto; (e) sem hooksPath não se aplica; (f) sem
+# o diretório nem no principal não é caso de worktree. MUTANTE: resolver o caminho no checkout PRINCIPAL (a
+# mesma leitura que um symlink faria) faz (b) passar como pronto. (w) o --update do adopt.md o chama.
+run_worktree_hooks_ready_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/adopt/worktree-hooks-ready.sh"
+  if [ ! -f "${sut}" ]; then record_fail "worktree-hooks-ready" "SUT ausente: ${sut}"; return; fi
+  local d rc out mut; d="$(mktemp -d)"
+  local p="${d}/principal" w="${d}/irma"
+  mkdir -p "${p}/.husky/_"; git init -q -b main "${p}" >/dev/null 2>&1
+  printf '#!/usr/bin/env sh\nexit 0\n' > "${p}/.husky/_/pre-commit"; chmod +x "${p}/.husky/_/pre-commit"; printf '*\n' > "${p}/.husky/_/.gitignore"
+  printf 'exit 0\n' > "${p}/.husky/pre-commit"; echo x > "${p}/a.txt"
+  git -C "${p}" config core.hooksPath .husky/_
+  git -C "${p}" add -A >/dev/null 2>&1; git -C "${p}" -c user.email=t@t -c user.name=t commit -qm base --no-verify >/dev/null 2>&1
+  git -C "${p}" worktree add -q "${w}" -b upd >/dev/null 2>&1
+  rc=0; out="$(bash "${sut}" "${p}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "worktree-hooks-ready: (a) checkout principal com .husky/_ → pronto (controle)"
+  else record_fail "worktree-hooks-ready: (a)" "rc=${rc}: ${out}"; fi
+  rc=0; out="$(bash "${sut}" "${w}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 3 ] && grep -q 'NÃO PRONTO: .* nesta worktree .*Passo: ' <<< "${out}"; then
+    record_pass "worktree-hooks-ready: (b) worktree sem o .husky/_ gerado → rc=3 com o passo"
+  else record_fail "worktree-hooks-ready: (b)" "rc=${rc}: ${out}"; fi
+  printf '{ "packageManager": "bun@1.2.0" }\n' > "${w}/package.json"
+  out="$(bash "${sut}" "${w}" 2>&1)" || true
+  if grep -q 'bun install' <<< "${out}"; then record_pass "worktree-hooks-ready: (c) o passo usa o gerenciador do ALVO (packageManager: bun)"
+  else record_fail "worktree-hooks-ready: (c)" "${out}"; fi
+  mkdir -p "${w}/node_modules/.bin"
+  printf '#!/usr/bin/env sh\nmkdir -p .husky/_ && printf "#!/usr/bin/env sh\\nexit 0\\n" > .husky/_/pre-commit && chmod +x .husky/_/pre-commit\n' > "${w}/node_modules/.bin/husky"
+  chmod +x "${w}/node_modules/.bin/husky"
+  rc=0; out="$(bash "${sut}" "${w}" --install 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -x "${w}/.husky/_/pre-commit" ] && [ ! -L "${w}/.husky/_" ]; then
+    record_pass "worktree-hooks-ready: (d) --install com husky local gera o .husky/_ NESTA worktree (sem symlink) → pronto"
+  else record_fail "worktree-hooks-ready: (d)" "rc=${rc}: ${out}"; fi
+  rm -rf "${w}/.husky/_"
+  local n="${d}/sem-hp"; git init -q "${n}" >/dev/null 2>&1
+  rc=0; bash "${sut}" "${n}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "worktree-hooks-ready: (e) sem core.hooksPath não se aplica → rc=0"
+  else record_fail "worktree-hooks-ready: (e)" "rc=${rc}"; fi
+  git -C "${n}" config core.hooksPath .nao-existe
+  rc=0; out="$(bash "${sut}" "${n}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 4 ] && grep -q 'não é caso de worktree' <<< "${out}"; then
+    record_pass "worktree-hooks-ready: (f) diretório ausente também no principal → rc=4, não é caso de worktree"
+  else record_fail "worktree-hooks-ready: (f)" "rc=${rc}: ${out}"; fi
+  mut="${d}/mut.sh"
+  sed 's|^if \[ -f "\${TOP}/\${HP}/pre-commit" \]; then|if [ -f "${MAIN}/${HP}/pre-commit" ]; then|' "${sut}" > "${mut}"
+  if cmp -s "${sut}" "${mut}"; then record_fail "worktree-hooks-ready: (m) setup" "o sed não casou a linha da resolução"
+  else
+    rc=0; bash "${mut}" "${w}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq 0 ]; then record_pass "worktree-hooks-ready: (m) mutante (resolver no checkout principal) MORDE: (b) passa como pronto"
+    else record_fail "worktree-hooks-ready: (m)" "o mutante também deu rc=${rc} em (b) — (b) não prova a resolução na worktree"; fi
+  fi
+  # (w) A COSTURA, por comportamento: o dedicated-branch.sh (onde a worktree irmã do --update nasce) PARA com rc=3
+  #     quando ela nasce sem o .husky/_, e a retomada depois do passo segue. Passo de adopt.md se pula; a
+  #     ferramenta que abre a worktree, não.
+  local db="${REPO_ROOT}/.claude/utils/adopt/dedicated-branch.sh"
+  rc=0; out="$(bash "${db}" "${p}" chore/onion-update-w main --worktree 2>&1)" || rc=$?
+  local wt2="${d}/principal-chore-onion-update-w"
+  if [ "${rc}" -eq 3 ] && grep -q 'PARE: a worktree' <<< "${out}" && [ -d "${wt2}" ]; then
+    mkdir -p "${wt2}/node_modules/.bin"; cp "${w}/node_modules/.bin/husky" "${wt2}/node_modules/.bin/husky"
+    rc=0; out="$(bash "${db}" "${p}" chore/onion-update-w main --worktree 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ "$(tail -n 1 <<< "${out}")" = "${wt2}" ] && [ -x "${wt2}/.husky/_/pre-commit" ]; then
+      record_pass "worktree-hooks-ready: (w) dedicated-branch.sh para (rc=3) na worktree sem .husky/_ e a retomada com husky local gera e segue"
+    else record_fail "worktree-hooks-ready: (w) retomada" "rc=${rc}: ${out}"; fi
+  else record_fail "worktree-hooks-ready: (w)" "a worktree irmã sem .husky/_ não parou o dedicated-branch (rc=${rc}): ${out}"; fi
+  # (w-MUT) sem a chamada na criação, a worktree inerte segue em silêncio.
+  # o mutante mora FORA da árvore viva, com o helper ao lado (o HERE dele resolve para lá).
+  mkdir -p "${d}/adopt-mut"; cp "${sut}" "${d}/adopt-mut/worktree-hooks-ready.sh"
+  mut="${d}/adopt-mut/dedicated-branch.sh"; sed 's|^  _wt_ready "\${WT}"$|  : # ONION_MUTANTE|' "${db}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE' "${mut}"; then record_fail "worktree-hooks-ready: (w-MUT) setup" "o sed não casou a chamada"
+  else
+    rc=0; bash "${mut}" "${p}" chore/onion-update-v main --worktree >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq 0 ]; then record_pass "worktree-hooks-ready: (w-MUT) sem a conferência na criação, a worktree inerte sai rc=0 — (w) é load-bearing"
+    else record_fail "worktree-hooks-ready: (w-MUT)" "o mutante também parou (rc=${rc}) — (w) não prova a costura"; fi
+  fi
+  rm -rf "${d}"
+}
+_family run_worktree_hooks_ready_selftests
 
 # ── REGRA 89: a divida de Aufhebung, e as SEIS evasoes que uma passada adversarial provou ─────
 # POR QUE EXISTE (2026-09-23): a 1a versao desta guarda varria so os `kg:` das baselines — a
