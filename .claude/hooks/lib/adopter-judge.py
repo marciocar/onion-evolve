@@ -33,7 +33,8 @@ _ADV_ALLOWS = [_ao.path.realpath(p) for p in _ao.environ.get("ONION_ADOPTER_ALLO
 _ADV_COMMON = {}
 
 # subcomandos do git que escrevem no repositório ou na árvore de trabalho dele (o mesmo vocabulário do
-# moat-judge, menos `init`/`clone`, que criam repo novo: o alvo deles é um caminho, julgado como escrita de shell)
+# moat-judge, menos `init`/`clone`, que criam repo novo: o alvo deles é um caminho, julgado como escrita de shell em
+# `_adv_git`, junto com `worktree add`, `--work-tree`/GIT_WORK_TREE e o push para caminho local)
 _ADV_GIT_WRITE = {"push", "commit", "merge", "rebase", "reset", "checkout", "switch", "pull", "am", "apply",
                   "cherry-pick", "revert", "stash", "clean", "add", "rm", "mv", "restore", "worktree", "notes",
                   "update-ref", "filter-branch", "filter-repo", "submodule", "symbolic-ref", "replace", "gc",
@@ -117,7 +118,13 @@ def _adv_foreign(p):
     return _git(["-C", d, "rev-parse", "--show-toplevel"]) or fm[_adv_common(rp)]
 
 
+def _adv_home(w):
+    """`$HOME/x` e `${HOME}/x` valem `~/x`: o HOME do hook é o da sessão (achado 6 do refutador)."""
+    return _ar.sub(r"^(\$HOME|\$\{HOME\})(?=/|$)", "~", w) if isinstance(w, str) else w
+
+
 def _adv_abspath(w):
+    w = _adv_home(w)
     if not w or DYNAMIC.search(w) or w == "-":
         return None
     w = _ao.path.expanduser(w)
@@ -131,12 +138,14 @@ def _adv_abspath(w):
     return _ao.path.normpath(_ao.path.join(base, w))
 
 
-_ADV_SELF_TSV = _ao.path.realpath(_ao.environ["ONION_ADOPTER_SELF_TSV"]) if _ao.environ.get("ONION_ADOPTER_SELF_TSV") else ""
+# os arquivos que ARMAM a guarda: a lista e o carimbo (uma edição no `role:` desarmava os dois vetos — refutador,
+# achado 9). O update do Onion escreve o carimbo por `git merge` e pelo write-stamp.sh (script em arquivo): passam
+_ADV_SELF_TSV = {_ao.path.realpath(x) for x in _ao.environ.get("ONION_ADOPTER_SELF_TSV", "").split("\n") if x}
 
 
 def _adv_path(w, how, detail):
     p = _adv_abspath(w)
-    if p and _ADV_SELF_TSV and _ao.path.realpath(p) == _ADV_SELF_TSV:
+    if p and _ao.path.realpath(p) in _ADV_SELF_TSV:
         _adv_emit("lista", p, "%s em %s — %s" % (how, w, detail))
         return
     r = _adv_foreign(p)
@@ -159,6 +168,8 @@ def _adv_positionals(args, argopts=()):
 
 
 def _adv_git(words, env, detail):
+    words = [_adv_home(w) if k > 0 and words[k - 1] == "-C" else
+             ("--git-dir=" + _adv_home(w[10:]) if w.startswith("--git-dir=") else w) for k, w in enumerate(words)]
     gw = [_ao.path.expanduser(w) if w.startswith("~") and k > 0 and words[k - 1] == "-C" else
           ("--git-dir=" + _ao.path.expanduser(w[10:]) if w.startswith("--git-dir=~") else w)
           for k, w in enumerate(words)]
@@ -175,7 +186,33 @@ def _adv_git(words, env, detail):
     lists = any(a in ("-l", "--list", "-a", "--all", "-r", "--remotes", "-v", "-vv", "--contains", "--merged",
                       "--no-merged", "--points-at", "--show-current", "--format") or a.startswith("--format=")
                 for a in rest)
-    writes = sub in _ADV_GIT_WRITE \
+    # o ALVO que é caminho (achado 7 do refutador): o repo novo do init/clone, a worktree nova, o --work-tree, o push
+    # para um caminho local — julgados como escrita de shell, onde quer que o git rode
+    pos = _adv_positionals(rest, {"-b", "-B", "--branch", "-o", "--origin", "--depth", "--reference", "-c",
+                                  "--config", "--template", "--separate-git-dir", "-u", "--upload-pack"})
+    if sub == "init" and pos:
+        _adv_path(pos[0], "git init", detail)
+    elif sub == "clone" and len(pos) >= 2:
+        _adv_path(pos[1], "git clone", detail)
+    elif sub == "worktree" and rest[:1] == ["add"] and len(pos) >= 2:
+        _adv_path(pos[1], "git worktree add", detail)
+    elif sub in ("push", "send-pack") and pos[:1] and (pos[0].startswith(("/", "~", "./", "../", "file://"))):
+        _adv_path(pos[0][7:] if pos[0].startswith("file://") else pos[0], "git %s para caminho local" % sub, detail)
+    for w in gw[1:i]:
+        if w.startswith("--work-tree=") and sub in _ADV_GIT_WRITE:
+            _adv_path(w[12:], "git %s com --work-tree" % sub, detail)
+    if "GIT_WORK_TREE" in env and sub in _ADV_GIT_WRITE:
+        _adv_path(str(env["GIT_WORK_TREE"]), "git %s com GIT_WORK_TREE" % sub, detail)
+    # fetch com refspec <a>:<b> escreve a ref <b> no repo onde roda
+    fetch_writes = sub == "fetch" and any(":" in a and not a.startswith(("http", "git@", "ssh:", "file:")) for a in pos[1:])
+    # leitura que mora em subcomando de escrita (achado 3): notes list/show, lfs ls-files, sparse-checkout list,
+    # clean -n, apply --check, tag -n
+    if (sub == "notes" and rest[:1] in (["list"], ["show"])) or (sub == "lfs" and rest[:1] in (["ls-files"], ["status"], ["env"])) \
+            or (sub == "sparse-checkout" and rest[:1] == ["list"]) or (sub == "clean" and any(a in ("-n", "--dry-run") for a in rest)) \
+            or (sub == "apply" and any(a in ("--check", "--stat", "--numstat", "--summary") for a in rest) and "--apply" not in rest) \
+            or (sub == "tag" and any(_ar.match(r"^-n\d*$", a) for a in rest)):
+        return
+    writes = fetch_writes or sub in _ADV_GIT_WRITE \
         or (sub == "tag" and (_adv_positionals(rest) or any(a in ("-d", "--delete") for a in rest)) and not lists) \
         or (sub == "branch" and not lists and (_adv_positionals(rest) or any(a in ("-d", "-D", "-m", "-M", "-f", "-c", "-C") for a in rest))) \
         or (sub == "config" and _adv_positionals(rest)[1:2] != [] and not any(

@@ -44128,6 +44128,19 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
   _agc "(e11) replay curadoria: cd <core>; cd \$T (mktemp); mkdir → passa" 0 "${A}" Bash 'cd @CORE@; T=$(mktemp -d); cd $T; git init -q .; mkdir -p docs/x'
   _agc "(e12) replay curadoria: grep -E '>>|jsonl' no core → passa" 0 "${A}" Bash "cd @CORE@; grep -lnE '>>|jsonl|append' f.md"
   _agc "(e13) replay kg-ssot: (cd <core> && …) > lst; sort > fx.lst → passa" 0 "${A}" Bash 'S=/tmp/x; cd $S; (cd @CORE@ && git ls-files) > core.lst; sort > fx.lst'
+  # (h) a 1ª passada adversarial (refutador, 7788d9178): o carimbo protegido, os alvos que são caminho, leituras e $HOME
+  _agc "(h1) Write no carimbo .onion-version → VETO"              2 "${A}" Write '@R@/.claude/.onion-version'
+  _agc "(h2) sed -i no role: do carimbo → VETO"                   2 "${A}" Bash "sed -i 's/^role: adopted/role: none/' .claude/.onion-version"
+  _agc "(h3) git merge no próprio repo (o update do Onion) → passa" 0 "${A}" Bash 'git merge --no-edit onion/vendor'
+  _agc "(h4) git init dentro do core → VETO"                      2 "${A}" Bash 'git init @CORE@/sub'
+  _agc "(h5) git clone para dentro do core → VETO"                2 "${A}" Bash 'git clone -q https://example.invalid/x.git @CORE@/vendor-x'
+  _agc "(h6) git worktree add dentro do core → VETO"              2 "${A}" Bash 'git worktree add @CORE@/wt-own feat-x'
+  _agc "(h7) git push para o core por caminho local → VETO"       2 "${A}" Bash 'git push @CORE@ HEAD:refs/heads/x'
+  _agc "(h8) git --work-tree=<core> checkout → VETO"              2 "${A}" Bash 'git --work-tree=@CORE@ checkout HEAD -- .'
+  _agc "(h9) git -C <core> fetch origin main:main → VETO"         2 "${A}" Bash 'git -C @CORE@ fetch -q origin main:main'
+  _agc "(h10) git fetch DO core por caminho (leitura) → passa"    0 "${A}" Bash 'git fetch -q @CORE@ main'
+  _agc "(h11) leituras em subcomando de escrita → passa"          0 "${A}" Bash 'git -C @CORE@ notes list; git -C @CORE@ clean -n; git -C @CORE@ tag -n5; git -C @CORE@ sparse-checkout list'
+  HOME="${sb}" _agc "(h12) \$HOME/<core> (HOME do hook = a bancada) → VETO" 2 "${A}" Bash 'git -C $HOME/core commit -m x' 
   # (f) a lista e o papel decidem: allow isenta; sem carimbo o hook nem se arma
   printf 'core\t%s\nallow\t%s\n' "${core}" "${outro}" > "${r}/.claude/adopter-guard.tsv"
   _agc "(f1) allow <outro>: Write nele → passa"                   0 "${A}" Write '@OUTRO@/x.md'
@@ -44135,6 +44148,13 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
   printf 'core\t%s\n' "${core}" > "${r}/.claude/adopter-guard.tsv"
   mv "${r}/.claude/.onion-version" "${sb}/stamp"
   _agc "(f3) sem carimbo (core, porta): Write no outro → passa"   0 "${A}" Write '@OUTRO@/x.md'
+  mv "${sb}/stamp" "${r}/.claude/.onion-version"
+  # (f4) a PORTA pública (o carimbo literal da standalone: role standalone + kind door) não é adotante: o merge-gate
+  #      volta ao aviso (o usuário público não tem caminho verificado) e o veto de repo alheio não se arma
+  cp "${r}/.claude/.onion-version" "${sb}/stamp"
+  printf 'framework: onion-evolve\nrole: standalone\nadopted_from: onion-standalone\nkind: door\n' > "${r}/.claude/.onion-version"
+  _agc "(f4) porta (kind: door): gh pr merge → aviso, rc 0"       0 "${M}" Bash 'gh pr merge 3 --squash'
+  _agc "(f5) porta (kind: door): Write no outro → passa"          0 "${A}" Write '@OUTRO@/x.md'
   mv "${sb}/stamp" "${r}/.claude/.onion-version"
   # (g) o merge-gate no adotante carimbado VETA, e a recusa aponta o script do core por caminho absoluto
   _agc "(g1) merge-gate: gh pr merge no adotante → VETO"          2 "${M}" Bash 'gh pr merge 1 --merge'
@@ -44160,13 +44180,21 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
          "${md}/${file}" "${old}" "${new}"; then
       record_fail "adopter-guard: (m) ${name}" "o mutante não aplicou (a âncora mudou?)"; continue
     fi
-    # rc 0 = o caso PASSA (o esperado `want` acontece) — no intacto tem de ser 0, no mutante ≠ 0
-    [ "$(_agx "${hd}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc0=0 || mrc0=1
-    [ "$(_agx "${md}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc1=0 || mrc1=1
+    # rc 0 = o caso PASSA (o esperado `want` acontece) — no intacto tem de ser 0, no mutante ≠ 0. Marcadores no campo
+    # do cwd: DOOR troca o carimbo pelo da porta durante o par; HOME aponta o HOME do hook para a bancada
+    local _mh="${HOME}"
+    case "${cwd}" in
+      DOOR) cp "${r}/.claude/.onion-version" "${sb}/stamp"
+            printf 'framework: onion-evolve\nrole: standalone\nadopted_from: onion-standalone\nkind: door\n' > "${r}/.claude/.onion-version"; cwd="" ;;
+      HOME) _mh="${sb}"; cwd="" ;;
+    esac
+    [ "$(HOME="${_mh}" _agx "${hd}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc0=0 || mrc0=1
+    [ "$(HOME="${_mh}" _agx "${md}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc1=0 || mrc1=1
+    [ -f "${sb}/stamp" ] && mv "${sb}/stamp" "${r}/.claude/.onion-version"
     _prove_mutation "adopter-guard: (m) ${name}" "${hd}/${file}" "${md}/${file}" "${mrc0}" "${mrc1}"
   done <<EOF_MUT
 (g1) o adotante carimbado volta a só avisar$(printf '\x1f')pretooluse-merge-gate.sh$(printf '\x1f')  onion_adopter_role "\$root" >/dev/null && { ADVISE=0; ADOPTER=1; }$(printf '\x1f')  :$(printf '\x1f')${M}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')gh pr merge 1 --merge$(printf '\x1f')
-(c1) git que escreve volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = sub in _ADV_GIT_WRITE \\$(printf '\x1f')    writes = False \\$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ commit -m x$(printf '\x1f')
+(c1) git que escreve volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = fetch_writes or sub in _ADV_GIT_WRITE \\$(printf '\x1f')    writes = False \\$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ commit -m x$(printf '\x1f')
 (c3) o redirecionamento volta a não se julgar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    _adv_redirects(raw_words, detail)$(printf '\x1f')    pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')echo x > @CORE@/NOTE.md$(printf '\x1f')
 (c5) o Write volta a não comparar o repo$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      if [ "\$(_common "\$(realpath -m -- "\$r")")" = "\$c" ]; then$(printf '\x1f')      if false; then$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@CORE@/NOTE.md$(printf '\x1f')
 (d4) o cd condicional volta a deixar o repo desconhecido$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if where == UNKNOWN and _adv_last_cd() and "-C" not in gw:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')cd .. && cd @CORE@ && git commit -m x$(printf '\x1f')
@@ -44175,6 +44203,11 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
 (e11) o cd dinâmico volta a herdar o cd anterior$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')            _ADV_CDS.append((len(CWD), UNKNOWN))$(printf '\x1f')            pass$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')cd @CORE@; T=\$(mktemp -d); cd \$T; git init -q .; mkdir -p docs/x$(printf '\x1f')
 (e12) o alvo com | volta a ser arquivo$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f') and not _ar.search(r"[|;&<>()]", tgt):$(printf '\x1f'):$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')cd @CORE@; grep -lnE '>>|jsonl|append' f.md$(printf '\x1f')
 (e13) o cd da subshell volta a vazar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    while _ADV_CDS and _ADV_CDS[-1][0] > len(CWD):$(printf '\x1f')    while False:$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')S=/tmp/x; cd \$S; (cd @CORE@ && git ls-files) > core.lst; sort > fx.lst$(printf '\x1f')
+(f4) a porta volta a armar como adotante$(printf '\x1f')lib/adopter-scope.sh$(printf '\x1f')  grep -qE '^kind:[[:space:]]*door([[:space:]]|\$)' "\$f" 2>/dev/null && return 1$(printf '\x1f')  :$(printf '\x1f')${M}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')gh pr merge 3 --squash$(printf '\x1f')DOOR
+(h1) o carimbo volta a ser escrevível$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')    [ "\$p" = "\$(realpath -m -- "\$stamp" 2>/dev/null)" ] && deny_list "\${tool} em \${fpath}"$(printf '\x1f')    :$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@R@/.claude/.onion-version$(printf '\x1f')
+(h4) o init volta a não julgar o caminho$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')        _adv_path(pos[0], "git init", detail)$(printf '\x1f')        pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git init @CORE@/sub$(printf '\x1f')
+(h9) o fetch a:b volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = fetch_writes or sub in _ADV_GIT_WRITE \\$(printf '\x1f')    writes = sub in _ADV_GIT_WRITE \\$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ fetch -q origin main:main$(printf '\x1f')
+(h12) o \$HOME volta a ser dinâmico$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    words = [_adv_home(w) if k > 0 and words[k - 1] == "-C" else$(printf '\x1f')    words = [w if k > 0 and words[k - 1] == "-C" else$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C \$HOME/core commit -m x$(printf '\x1f')HOME
 (f1) o allow volta a não isentar$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      case "\$p" in "\$a"|"\$a"/*) exit 0 ;; esac$(printf '\x1f')      :$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Write$(printf '\x1f')@OUTRO@/x.md$(printf '\x1f')
 (e10b) o > volta a ser verbo de escrita no texto opaco$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')                        + r")\\b)"$(printf '\x1f')                        + r")\\b)|>"$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')S=/tmp; P=\$S/py; \$P -I tools/kg_check.py @CORE@/f.md > \$S/h1.out$(printf '\x1f')
 (e14) o caminho como valor volta a contar como alvo$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')r"(^|[\\s;&|(\\"'])("$(printf '\x1f')r"()("$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')\$K --with u=@CORE@ --mode cp$(printf '\x1f')
