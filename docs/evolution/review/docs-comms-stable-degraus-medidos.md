@@ -2,7 +2,8 @@
 branch: docs/comms-stable-degraus-medidos
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 26b9e08d74a22a0e796ac3b34384780ababd372de8f1e801d5dcec6406b06fa9
+reviewed_code_sha256: 145b1cba8dc6e1ab7c1f7c6b332ecbe304acb6b043130978220d5b3a412b9efd
 findings_total: 4
 findings_real: 3
 findings_blocking: 0

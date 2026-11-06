@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1021 itens abertos** em 153 grafo(s) com aberto (de 194 no escopo) · 152 grupo(s), agrupados por `owner:` (60 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1020 itens abertos** em 153 grafo(s) com aberto (de 194 no escopo) · 152 grupo(s), agrupados por `owner:` (59 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -980,6 +980,39 @@
 | 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
 | 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
 
+## core — 28 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.0 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
+| 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
+| 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 15.0 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
+| 12.0 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
+| 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
+| 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
+| 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
+| 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
+| 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
+| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
+| 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
+| 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
+| 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
+| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 4.2 | `Q_CS_ORIENTACAO_COMPLIANCE_1106` | comms-stable-2026-11 | Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando  |
+| 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
+| 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
+| 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
+| 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
+| 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
+| 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
+| 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
+| 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
+| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
+| 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
+| 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
+
 ## task-manager-capabilities-2026-10 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1058,39 +1091,6 @@
 | 13.5 | `D_PR_DA_ONDA_0` | testes-evidencia-2026-09 | O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura |
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
-
-## core — 28 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 18.0 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
-| 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
-| 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
-| 15.0 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
-| 10.0 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
-| 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
-| 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
-| 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
-| 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
-| 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
-| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
-| 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
-| 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
-| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
-| 4.2 | `Q_CS_ORIENTACAO_COMPLIANCE_1106` | comms-stable-2026-11 | Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando  |
-| 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
-| 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
-| 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
-| 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
-| 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
-| 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
-| 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
-| 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
-| 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
-| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
-| 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
-| 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
 
 ## guard-forge-2026-10 — 4 item(ns)
 
@@ -1351,12 +1351,11 @@
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
 
-## curadoria — 3 item(ns)
+## curadoria — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 10.0 | `Q_MA_MARKET` | company-brain-multiaudiencia-2026-10 | Como o mercado resolve conhecimento multiaudiência: portais de conhecimento com IA, wikis com permissão por espaço e catálogos |
-| 6.0 | `Q_CS_CUR_DISSECAR_CHANNELS_1107` | comms-stable-2026-11 | Dissecação pelo /meta:dissect dos channels do Claude Code (channels.md e channels-reference.md), dos channels da allowlist ofici |
 | 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
 
 ## conductor-2026-10 — 2 item(ns)
