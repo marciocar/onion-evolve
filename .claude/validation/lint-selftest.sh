@@ -19094,9 +19094,9 @@ run_adopter_guard_core_selftests() {
     else record_fail "adopter-guard-core: (g) MUT" "o mutante sobreviveu: a 2ª rodada não mudou o arquivo"; fi
   fi
   # (h) o adopt CHAMA o helper e o relatório tem a seção (helper que ninguém chama é guarda morta)
-  if grep -q 'adopter-guard-core.sh' "${REPO_ROOT}/.claude/commands/meta/adopt.md" && grep -q '^## Veto de repo alheio' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
-    record_pass "adopter-guard-core: (h) o /meta:adopt chama o helper na configuração pós-cópia e o relatório tem a seção"
-  else record_fail "adopter-guard-core: (h)" "o adopt não chama o helper ou o relatório não tem a seção 'Veto de repo alheio'"; fi
+  if grep -q 'adopter-guard-core.sh' "${REPO_ROOT}/.claude/commands/meta/adopt.md" && grep -qF 'a linha `adopter-guard: …` do passo (0.6)' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
+    record_pass "adopter-guard-core: (h) o /meta:adopt chama o helper na configuração pós-cópia e o relatório pede a linha dele"
+  else record_fail "adopter-guard-core: (h)" "o adopt não chama o helper ou o relatório não pede a linha do helper"; fi
   git -C "${t}/core" worktree remove --force "${wt}" >/dev/null 2>&1; rm -rf "${t}"
 }
 _family run_adopter_guard_core_selftests

@@ -155,17 +155,9 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1   # (-1
 bash "$SOURCE_ROOT/.claude/utils/adopt/scope-claude-gitignore.sh" "$DEST"
 bash "$SOURCE_ROOT/.claude/utils/adopt/ensure-secret-gitignore.sh" "$DEST"   # (0b) .gitignore de segredos (por quê: no cabeçalho do helper)
 
-# (0.5) LICENÇAS com NOME PRÓPRIO — nunca `LICENSE` (na raiz rege o REPO INTEIRO). Aqui porque é o
-#     único bloco que Fase 3 E `--update` invocam. Porquê completo: no helper.
+# (0.5) LICENÇAS com NOME PRÓPRIO — nunca `LICENSE` (na raiz rege o REPO INTEIRO). Aqui porque é o único bloco que Fase 3 E `--update` invocam. Porquê completo: no helper.
 bash "$SOURCE_ROOT/.claude/utils/adopt/emit-licenses.sh" "$DEST" "$SOURCE_ROOT"
-
-# (0.6) LINHA `core` do .claude/adopter-guard.tsv — a lista do veto de repo alheio (REGRA 118 (Veto de repo
-#     alheio do adotante registrado e com lista)). O hook veta a sessão do ADOTANTE que escreve o arquivo, e o
-#     adotante por URL não resolve o core pelo carimbo: sem esta linha o veto fica armado e SEM LISTA (medido em
-#     2026-11-06 no kg-ssot e na curadoria). Decisão D_LINHA_CORE_DO_ADOPTER_GUARD_PELO_UPDATE_1106: chega por
-#     aqui, na sessão do core, e ao adotante pelo PR. Idempotente; só a linha core; core válido diferente fica.
-#     A ÚNICA linha que ele imprime vai inteira na seção "Veto de repo alheio" do relatório.
-bash "$SOURCE_ROOT/.claude/utils/adopt/adopter-guard-core.sh" "$DEST" "$SOURCE_ROOT"
+bash "$SOURCE_ROOT/.claude/utils/adopt/adopter-guard-core.sh" "$DEST" "$SOURCE_ROOT"   # (0.6) a linha `core` do .claude/adopter-guard.tsv, lista da REGRA 118 (Veto de repo alheio do adotante registrado e com lista): só ela, idempotente; a linha impressa vai ao relatório (porquê: no helper)
 
 # (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
 #     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
@@ -443,10 +435,7 @@ flow: downstream (core→consumidor / distribuição)
 <colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$DEST" 2>&1 — medido NO ALVO, com o vendor DELE; rc 1 = dívida MUST · rc 4 = não se aplica · rc 3 = NÃO MEDIDO; nunca "lint VERDE" no lugar disto. Uma linha `AVISO kg-index:` no topo diz que o vendor do alvo é anterior à kg-ssot 4.25.1 e o índice de leitura fica sem regerador: vai inteira, e a saída é adotar a kg-ssot junto. Logo abaixo, a migração PLANEJADA: a saída inteira de bash "$SOURCE_ROOT/.claude/utils/adopt/plan-contract-migration.sh" "$DEST" 2>&1 (rc 0 = o plano e a planilha · 2 = falta o perfil, a orientação · 3 = NÃO MEDIDO · 4 = não roda · 5 = o alvo mudou, PARE); o apply é do dono do corpus, nunca do update>
 
 ## Gate do alvo
-<no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6)>
-
-## Veto de repo alheio (REGRA 118)
-<a linha `adopter-guard: …` do passo (0.6) do Procedimento de Configuração (escrita · acrescentada · em dia · mantida · trocada · pulada), inteira; rc 3 = escreveu e a releitura não conferiu, PARE>
+<no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6). E, abaixo, a linha `adopter-guard: …` do passo (0.6) da configuração (REGRA 118), inteira; rc 3 = PARE>
 
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>

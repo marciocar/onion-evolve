@@ -25,8 +25,8 @@
 #  · Confere o próprio efeito: relê o arquivo e exige que a 1ª linha `core` seja o caminho resolvido.
 #
 # TETO: caminho do core com espaço não se declara (a lib não o lê) → pula, dizendo. Não arma o veto sozinho:
-# o `role:` do carimbo e o registro no settings.json seguem sendo de quem os escreve. ops/materialize-adopter.sh
-# (core-only) não chama este helper (a fixture da bancada fica sem a linha, como antes).
+# o `role:` do carimbo e o registro no settings.json seguem sendo de quem os escreve.
+# ops/materialize-adopter.sh (core-only) não chama este helper (a fixture da bancada fica sem a linha, como antes).
 #
 # Uso  : adopter-guard-core.sh <DEST> <SOURCE_ROOT>
 # Saída: uma linha `adopter-guard: <escrita|acrescentada|em dia|mantida|trocada|pulada>: …` — vai inteira no
