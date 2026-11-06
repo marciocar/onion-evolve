@@ -216,7 +216,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -12903,6 +12903,45 @@ PY
 # transcrição; o wrapper confere o binário no GitHub (w23) e o gguf no HF (w24) e passa o fixture de 2 falantes à prova
 # (w25). A montagem do binário (stage_diar_bin: download, digest, extração filtrada) é do --apply, como o stage_hf.
 # ---------------------------------------------------------------------------
+# ── slack-persona (2026-11-06, degrau 2 do comms-stable-2026-11): o wrapper ops/slack-persona.sh (core-only) ──
+# (a) a bancada do wrapper (ops/testing/slack-persona-selftest.sh) passa com a contagem exata; (m) cada peça do wrapper
+# derrubada numa CÓPIA (o original nunca é tocado) faz a bancada reprovar com asserção caída. A cópia limpa passa antes.
+run_slack_persona_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/slack-persona.sh" st="${REPO_ROOT}/ops/testing/slack-persona-selftest.sh"
+  if [ ! -f "${wr}" ] || [ ! -f "${st}" ]; then record_skip "slack-persona: sem ops/slack-persona.sh (core-only) — nada a testar"; return; fi
+  [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
+  local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
+  mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
+  local want=23 o rc
+  if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
+    record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico)"
+  else record_fail "slack-persona: (a) bancada" "rc=${rc}: $(grep -E '✗|^selftest' <<< "${o}" | head -4 | tr '\n' '|')"; rm -rf "${d}"; return; fi
+  local m from to n mo
+  while IFS= read -r m; do
+    [ -n "${m}" ] || continue
+    from="${m%%@@*}"; to="${m#*@@}"
+    n="$(grep -cF -- "${from}" "${wr}" || true)"
+    if [ "${n}" != 1 ]; then record_fail "slack-persona: (m)" "âncora aparece ${n}× (tem de ser 1): ${from:0:70}"; continue; fi
+    FROM="${from}" TO="${to}" perl -pe 's/\Q$ENV{FROM}\E/$ENV{TO}/' "${wr}" > "${d}/ops/slack-persona.sh"
+    if mo="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -ne 0 ] && grep -q '^  ✗' <<< "${mo}"; then record_pass "slack-persona: (m) mutante reprova: ${from:0:60}"
+    else record_fail "slack-persona: (m)" "o mutante SOBREVIVEU (rc=${rc}): ${from:0:70}"; fi
+  done <<'MUT'
+if [ -n "${pre}" ] && [ "${v#"${pre}"}" = "${v}" ]; then@@if false; then
+if [ "${needs_tty}" = 1 ] && ! { : < "${TTY}"; } 2>/dev/null; then@@if false; then
+if priv grep -Eq '"[UC]0000' "${ETC}/config.json"; then@@if false; then
+local ur; ur="$(unreadable_code)"; [ -z "${ur}" ] || die 1@@local ur; ur=""; [ -z "${ur}" ] || die 1
+priv grep -q '^ONION_KG_TOKEN=..' "${MCP_CONF}" || die 1@@true || die 1
+[ "${a}" = s ] || [ "${a}" = S ] || { say "${n}: mantida"; return 0; }@@true
+if [ "${apply}" = 0 ]; then say "ENSAIO@@if false; then say "ENSAIO
+IFS= read -rs v < "${TTY}" || v=""; printf@@IFS= read -rs v < "${TTY}" || v=""; echo "$v" >&2; printf
+miss="$(missing_creds | tr '\n' ' ')"; [ -z "${miss}" ] || die 1@@miss=""; [ -z "${miss}" ] || die 1
+MUT
+  rm -rf "${d}"
+}
+
 run_stt_service_selftests() {
   local -; set +e
   local wr="${REPO_ROOT}/ops/stt-service.sh" st="${REPO_ROOT}/ops/stt" helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
@@ -41207,6 +41246,7 @@ _family run_bridge_hardening_selftests
 _family run_chat_runner_selftests
 _family run_migrate_python_service_selftests
 _family run_stt_service_selftests
+_family run_slack_persona_selftests
 _family run_update_bridge_selftests
 _family run_version_drift_selftests
 _family run_currency_census_selftests

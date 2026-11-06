@@ -191,9 +191,9 @@ nodes:
     owner: core
     x_due: "2026-11-09"
     impact: 5
-    confidence: 0.45
+    confidence: 0.6
     label: "Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode, lê o Company Brain pelo MCP local e responde em rascunho que o maestro aprova."
-    narrative: "Pronto quando: uma menção no canal do piloto vira um rascunho de resposta com fonte no Company Brain, aprovado pelo maestro antes de sair, com as 7 condições do D_PERSONA_RUNTIME_2026_11 cumpridas. Depende do app Slack e do deploy do bridge pelo `!` do maestro."
+    narrative: "Pronto quando: uma menção no canal do piloto vira um rascunho de resposta com fonte no Company Brain, aprovado pelo maestro antes de sair, com as 7 condições do D_PERSONA_RUNTIME_2026_11 cumpridas. Depende do app Slack e do deploy do bridge pelo `!` do maestro. Estado em 2026-11-06: o código e a bancada estão no PR #94 do onion-bridge (empilhado sobre o #93, SDK 0.3.319). A bancada roda o Agent SDK e o CLI reais contra um Slack falso por Socket Mode e uma Messages API falsa: 66 asserções e 26 mutantes mortos, incluindo o veto que lança bloqueado por onFailure 'block'. O wrapper ops/slack-persona.sh do core (creds, install, start, verify) tem 21 asserções na sua bancada. Faltam o merge dos dois PRs, o app Slack e os tokens (Q_CS_APP_SLACK_E_CHANNELS_1106), o e-mail da persona na lista do onion-kg, o deploy pelo `!` e o teste ao vivo no canal do piloto."
   - id: Q_CS_ORIENTACAO_COMPLIANCE_1106
     node_type: question
     layer: audit
