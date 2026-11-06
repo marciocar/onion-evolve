@@ -2,7 +2,7 @@
 branch: feat/review-findings-blocking
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 3ec9141dcf76ac093aafecea2e5d9b8932efe02ec75aff03e0c059972642f918
+reviewed_diff_sha256: f6b3cea10d19fd131bb565233dbf1cf906fa5ba16a708166a98d49a6d6eb39dd
 reviewed_code_sha256: 62bc8a11df3f7488bddbff7283c4177c98b8b60f20d9cdbee64b5ae8155773a3
 findings_total: 6
 findings_real: 6
