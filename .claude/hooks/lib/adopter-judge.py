@@ -143,9 +143,12 @@ def _adv_abspath(w):
 _ADV_SELF_TSV = {_ao.path.realpath(x) for x in _ao.environ.get("ONION_ADOPTER_SELF_TSV", "").split("\n") if x}
 
 
-def _adv_path(w, how, detail):
+def _adv_path(w, how, detail, destroys=False):
     p = _adv_abspath(w)
-    if p and _ao.path.realpath(p) in _ADV_SELF_TSV:
+    rp = _ao.path.realpath(p) if p else ""
+    # `destroys` (rm, mv, git rm/mv): apagar ou mover um ANCESTRAL do carimbo também o derruba — `rm -rf .claude` e
+    # `mv .claude .claude.off` desarmavam as duas guardas (refutador independente, B3, 2026-11-06)
+    if p and (rp in _ADV_SELF_TSV or (destroys and any(x.startswith(rp.rstrip("/") + "/") for x in _ADV_SELF_TSV))):
         _adv_emit("lista", p, "%s em %s — %s" % (how, w, detail))
         return
     r = _adv_foreign(p)
@@ -212,7 +215,10 @@ def _adv_git(words, env, detail):
             or (sub == "apply" and any(a in ("--check", "--stat", "--numstat", "--summary") for a in rest) and "--apply" not in rest) \
             or (sub == "tag" and any(_ar.match(r"^-n\d*$", a) for a in rest)):
         return
-    writes = fetch_writes or sub in _ADV_GIT_WRITE \
+    # vocabulário de baixo nível que escreve (L1 do refutador independente): checkout-index, merge-file, pack-refs,
+    # rerere, format-patch (grava os .patch no diretório), hash-object -w, reflog expire/delete
+    writes = fetch_writes or sub in _ADV_GIT_WRITE or sub in ("checkout-index", "merge-file", "pack-refs", "rerere", "format-patch") \
+        or (sub == "hash-object" and "-w" in rest) or (sub == "reflog" and rest[:1] in (["expire"], ["delete"])) \
         or (sub == "tag" and (_adv_positionals(rest) or any(a in ("-d", "--delete") for a in rest)) and not lists) \
         or (sub == "branch" and not lists and (_adv_positionals(rest) or any(a in ("-d", "-D", "-m", "-M", "-f", "-c", "-C") for a in rest))) \
         or (sub == "config" and _adv_positionals(rest)[1:2] != [] and not any(
@@ -229,6 +235,14 @@ def _adv_git(words, env, detail):
         return
     if sub == "bisect" and rest[:1] in (["log"], ["view"], ["visualize"]):
         return
+    # o carimbo pelo git (B3): `git rm`/`git mv` dele ou do pai, e `git checkout|restore … -- <carimbo>`. O update do
+    # Onion escreve por `git merge`, que não nomeia caminho, e segue passando
+    if sub in ("rm", "mv"):
+        for a in _adv_positionals(rest):
+            _adv_path(a, "git %s" % sub, detail, destroys=True)
+    elif sub in ("checkout", "restore") and "--" in rest:
+        for a in rest[rest.index("--") + 1:]:
+            _adv_path(a, "git %s --" % sub, detail)
     where = git_target(gw, env)
     if where == UNKNOWN and _adv_last_cd() and "-C" not in gw:
         where = _adv_last_cd()
@@ -258,10 +272,74 @@ def moat_unanalyzable(seg, why, whole=False):
             return
 
 
+def _adv_raw_scan():
+    """Uma vez por comando, no texto CRU: o que o tokenizador parte antes de o juiz ver (B2 do refutador
+    independente). `>|` vira `>` e um pipe; `exec 3>arq` some como invólucro. Aproximação por regex: só pesa o
+    alvo dentro de repo alheio, então o texto entre aspas que imita a forma é falso positivo raro."""
+    if _ADV_COMMON.get("raw") or "raw" not in globals():
+        return
+    _ADV_COMMON["raw"] = True
+    # corpo de heredoc é texto (documentação que cita `>|` não escreve nada): sai antes da varredura
+    txt = _ar.sub(r"<<-?\s*(['\"]?)(\w+)\1[^\n]*\n.*?\n[\t]*\2[ \t]*(\n|$)", "\n", raw, flags=_ar.S)
+    for m in _ar.finditer(r">\|\s*([^\s;&|<>()]+)|(?:^|[\s;&|(])exec\s+(?:\d*(?:>>?|<>)\s*([^\s;&|<>()]+)\s*)+", txt):
+        t = m.group(1) or m.group(2)
+        if t:
+            _adv_path(t.strip("'\""), "redirecionamento", m.group(0).strip())
+
+
+# a varredura crua roda ANTES da análise: `exec 3>arq` não chega a `moat_command` (o lib tira o invólucro e o
+# redirecionamento, e não sobra comando). O lib chama `analyze` pelo nome global, então o embrulho o alcança
+_ADV_ANALYZE = analyze
+
+
+def analyze(*a, **k):
+    _adv_raw_scan()
+    return _ADV_ANALYZE(*a, **k)
+
+
 def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     detail = " ".join(raw_words)
+    _adv_raw_scan()
     _adv_redirects(raw_words, detail)
     args = words[1:]
+    # `env -C X git …`/`env --chdir=X`: o lib tira o invólucro e o diretório some (B2)
+    chdir = None
+    for k, w in enumerate(raw_words[:-1]):
+        if _ao.path.basename(w) != "env":
+            continue
+        for j in range(k + 1, len(raw_words)):
+            v = raw_words[j]
+            if v in ("-C", "--chdir") and j + 1 < len(raw_words):
+                chdir = raw_words[j + 1]; break
+            if v.startswith("--chdir="):
+                chdir = v[8:]; break
+            if not v.startswith("-") and "=" not in v:
+                break
+        break
+    if chdir and not DYNAMIC.search(_adv_home(chdir)):
+        CWD.append(_adv_abspath(chdir) or UNKNOWN)
+        try:
+            _adv_dispatch(words, base, depth, env, args, detail)
+        finally:
+            CWD.pop()
+        return
+    # `xargs [-I R] git … <<< <texto>`: com pipe o lib monta o comando; com here-string não (B2)
+    if base == "xargs" and "<<<" in words:
+        k = words.index("<<<")
+        lit, tail = (words[k + 1] if k + 1 < len(words) else ""), words[1:k]
+        rep = None
+        while tail and tail[0].startswith("-"):
+            o = tail.pop(0)
+            if o == "-I" and tail:
+                rep = tail.pop(0)
+            elif o.startswith("-I") and len(o) > 2:
+                rep = o[2:]
+            elif o in ("-n", "-P", "-d", "-L", "-s", "-E", "-a") and tail:
+                tail.pop(0)
+        if tail and not DYNAMIC.search(lit):
+            for item in lit.split():
+                command([x.replace(rep, item) for x in tail] if rep else tail + [item], depth + 1)
+        return
     _adv_dispatch(words, base, depth, env, args, detail)
 
 
@@ -283,10 +361,14 @@ def _adv_dispatch(words, base, depth, env, args, detail):
         # `cd $T` (mktemp, variável) e `pushd`/`popd` não se seguem: o diretório volta a DESCONHECIDO e o juiz cala.
         # A 1ª redação os pulava, e o `cd <core>` anterior seguia valendo: `cd <core>; …; cd $T; git init; mkdir x`
         # vetava a escrita no temporário (replay do corpus da curadoria, 2026-11-05)
-        if base == "cd" and len(words) > 1 and not DYNAMIC.search(words[1]) and words[1] != "-":
+        # `cd -P X`/`cd -L X` e `pushd X` (literal) seguem o diretório; o lib os marca DESCONHECIDO, e para VETAR o
+        # que vem depois só roda em X (refutador independente, B2, 2026-11-06)
+        dirs = [w for w in words[1:] if not _ar.match(r"^-[PLe@]+$", w)]
+        tgt = _adv_home(dirs[0]) if dirs and base in ("cd", "pushd") else None
+        if tgt and not DYNAMIC.search(tgt) and tgt != "-" and not (base == "pushd" and _ar.match(r"^[+-]\d+$", tgt)):
             prev = _adv_last_cd() or (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
-            _ADV_CDS.append((len(CWD), UNKNOWN if prev == UNKNOWN and not _ao.path.isabs(_ao.path.expanduser(words[1]))
-                             else _ao.path.normpath(_ao.path.join(prev, _ao.path.expanduser(words[1])))))
+            _ADV_CDS.append((len(CWD), UNKNOWN if prev == UNKNOWN and not _ao.path.isabs(_ao.path.expanduser(tgt))
+                             else _ao.path.normpath(_ao.path.join(prev, _ao.path.expanduser(tgt)))))
         else:
             _ADV_CDS.append((len(CWD), UNKNOWN))
     if base == "eval":                                # o lib só julga o eval pela forma de merge/push
@@ -320,10 +402,10 @@ def _adv_dispatch(words, base, depth, env, args, detail):
         _adv_git(words, env, detail)
     elif base in _ADV_WRITERS_ALL:
         for a in _adv_positionals(args, {"-m", "--mode", "-s", "--size", "-o", "--owner", "-g", "--group", "--reference"}):
-            _adv_path(a, base, detail)
+            _adv_path(a, base, detail, destroys=base in ("rm", "rmdir", "unlink", "shred"))
     elif base == "mv":
         for a in _adv_positionals(args, {"-t", "--target-directory", "-S", "--suffix"}):
-            _adv_path(a, "mv", detail)
+            _adv_path(a, "mv", detail, destroys=True)
         for j, a in enumerate(args):
             if a in ("-t", "--target-directory") and j + 1 < len(args):
                 _adv_path(args[j + 1], "mv", detail)

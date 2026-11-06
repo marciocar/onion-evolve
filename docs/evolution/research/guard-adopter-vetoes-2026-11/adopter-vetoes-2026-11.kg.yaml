@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-05"
   review_after: "2026-12-05"   # 30d: defeito de guarda
-  # ═══ TETO: 15 NÓS ═══  (11 + 2 da 1ª passada adversarial + 1 do falso positivo de --tags)
+  # ═══ TETO: 15 NÓS ═══  (11 + 2 da 1ª passada + 1 do --tags + 1 da passada independente)
 nodes:
   - id: Q_VETOS_VALEM_NO_ADOTANTE
     node_type: question
@@ -188,14 +188,31 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-06"
     verified_against: "comando da sessão principal vetado em 2026-11-06 (heredoc de casos lido por while read com a linha git push origin --tags); reproduzido no merge-gate num repo sentado na main: git push origin --tags e git push --tags saem rc 2, com refspec de tag rc 0, sentado em feat rc 0; medido com git 2.43.0 num remoto bare: push origin --tags levou a tag e não moveu a branch"
     trace: ".claude/hooks/lib/invocation-lines.sh"
-    label: "TETO não curado aqui: o tokenizador dos vetos lê git push --tags sem refspec como push da branch atual, e sentado na main isso vira 'push na main'; o git real empurra só as tags"
-    narrative: "Falso positivo do lib partilhado pelos três vetos (protect-main, merge-gate, moat-gate), não do modo de adotante; a cura desta forja não o cobre. Cura proposta, para outra forja com bancada e mutante próprios: na canonização do push, --tags sem refspec não herda a branch atual. Atenção ao par perigoso: --tags junto de refspec ou de --all segue julgado pelo refspec."
+    label: "CURADO em 2026-11-06 (tarefa #25): o tokenizador dos vetos lia git push --tags sem refspec como push da branch atual; agora push_dsts_without_spec não herda a branch com --tags, e o push nu com --tags não é push nu na main"
+    narrative: "Entrou nesta forja porque ela passa o adotante de aviso a veto: o falso positivo virava trava. Medido com git 2.43.0 em remoto bare nos modos simple, current e upstream: --tags sem refspec leva só as tags. O modo matching não foi medido (o próprio veto barra o comando de medida) e segue fechado, assim como o remoto-espelho e o remote.<r>.push. Com refspec ou --all, julga pelo refspec (casos i1 a i4, mutante i1). As famílias que partilham o lib seguem verdes."
+  - id: E_REFUTADOR_INDEPENDENTE_3_BLOQUEIA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "156 casos do refutador independente sobre ca37a5ee2, re-rodados no executor dele com os hooks da cura: 16 divergências restantes, todas no teto declarado"
+    trace: ".claude/hooks/lib/adopter-judge.py"
+    label: "a passada independente reprovou ca37a5ee2 por 3 bloqueantes (o --tags virando veto no adotante, as grafias que o cabeçalho prometia, o pai do carimbo); os três curados, e o vocabulário git de baixo nível também"
+    narrative: "Curados: --tags (i1-i4); cd -P, pushd, env -C, xargs com here-string, >| e exec N> (i5-i11); rm -rf .claude, mv .claude, git rm/mv e git checkout -- do carimbo, com o git merge do update passando (i12-i15, h3); checkout-index, merge-file, pack-refs, rerere, format-patch, hash-object -w e reflog expire (i16, i17). Declarados no cabeçalho: brace e glob no caminho, caminho em runtime, find -exec sh -c com $1, git por python, a remoção do hook e a edição do settings.json, e o heredoc sem terminador que fecha."
+    provenance:
+      source: "relatório do refutador independente, 2026-11-06, bancada fora da árvore"
+      locator: "lotes b1 a b10"
+      method: "measurement: hook real, JSON do PreToolUse no stdin, rc lido"
+      locality: "repo"
 edges:
   - from: E_SONDA_27_DE_31_PASSARAM
     to: Q_VETOS_VALEM_NO_ADOTANTE
@@ -236,3 +253,6 @@ edges:
   - from: C_TETO_PUSH_TAGS_LIDO_COMO_MAIN
     to: D_MERGE_GATE_VETA_NO_ADOTANTE_CARIMBADO
     edge_type: CONSTRAINS
+  - from: E_REFUTADOR_INDEPENDENTE_3_BLOQUEIA
+    to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    edge_type: SUPPORTS

@@ -19,7 +19,8 @@
 #          worktrees dele também).
 #  E os arquivos que ARMAM a guarda: a lista (.claude/adopter-guard.tsv) e o carimbo (.claude/.onion-version, cujo
 #  `role:` arma os dois vetos). Quem os escreve é o maestro, fora da sessão, ou o update do Onion (git merge e o
-#  write-stamp.sh, que o hook não julga). `git checkout`/`git clean` sobre eles não são vistos (teto).
+#  write-stamp.sh, que o hook não julga). Apagar ou mover o pai deles (`rm -rf .claude`, `mv .claude …`) e o
+#  `git rm`/`git mv`/`git checkout -- <carimbo>` também vetam; `git clean -fdx .claude` não é visto (teto).
 #  "Registrado" e "este projeto" vêm da lib/adopter-scope.sh: o core local, os `local_path` do members.yaml
 #  dele e as linhas `repo` do arquivo local; o próprio projeto e as worktrees dele nunca são alheios.
 #
@@ -41,6 +42,10 @@
 #    awk -i inplace, rsync --remove-source-files, mktemp em repo alheio e find -delete passam; repo registrado com
 #    nome de menos de 4 letras por caminho relativo (`cd ../abc`) escapa do pré-filtro; leitura em python -c com
 #    `.replace(`/`.remove(` de string fecha como opaco (falso positivo raro: 0 no replay).
+#  · Teto da 2ª passada (refutador independente, 2026-11-06): brace e glob no caminho (`cor[e]`, `rep{o,}a`, `co*`),
+#    caminho só conhecido em runtime (`R=co; …${R}re`, `$(ls -d …)`), `find … -exec sh -c '…"$1"' _ {}`, git chamado
+#    por python (`subprocess.run([...])`, `os.system`), e a remoção do próprio hook ou a edição do settings.json do
+#    adotante passam. O heredoc sem terminador que cita push ou merge FECHA (era aviso; no adotante, veto).
 #  · Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass por desenho.
 input=$(cat)
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
@@ -144,6 +149,8 @@ if [ "$hit" = 0 ] && [ -n "$repos" ]; then
   hc="$(realpath -m -- "$hcwd" 2>/dev/null)"
   case "$hc" in "$rr"|"$rr"/*) : ;; *) hit=1 ;; esac
 fi
+# apagar ou mover o .claude (o pai do carimbo) derruba as duas guardas: vai ao juiz sem citar o carimbo (B3)
+[ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(rm|rmdir|mv|unlink)([^[:alnum:]_-]).*\.claude/?([[:space:];&|)]|$)' <<< "$flat" && hit=1
 [ "$hit" = 0 ] && exit 0
 write_verb='(^|[^[:alnum:]_-])(git|rm|rmdir|touch|mkdir|truncate|chmod|chown|chgrp|unlink|shred|tee|cp|mv|install|rsync|scp|ln|sed|dd|eval|xargs)([^[:alnum:]_-]|$)|>'
 

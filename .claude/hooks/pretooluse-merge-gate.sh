@@ -164,7 +164,9 @@ while IFS= read -r line; do
     deny "'git push' com alvo MAIN negado ($line)"
   fi
   # push NU (só flags) sentado em main
-  if grep -qE '^git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$' <<< "$line"; then
+  # (`--tags` sem refspec empurra SÓ as tags, e a linha canônica já o diz: a branch não vai — medido, 2026-11-06)
+  if grep -qE '^git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$' <<< "$line" \
+     && ! grep -qE '(^|[[:space:]])--tags([[:space:]]|$)' <<< "$line"; then
     onion_on_protected_branch "$hcwd" && deny "'git push' nu sentado no ramo de PRODUÇÃO negado"
   fi
 done <<< "$push_lines"
