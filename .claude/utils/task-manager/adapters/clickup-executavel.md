@@ -4,7 +4,7 @@
 > **Irmão de [`clickup.md`](clickup.md) por *progressive disclosure* ([`sdaal.md` §14.5](../../../../docs/sdaal/sdaal.md)).**
 > O adapter guarda o contrato; este arquivo guarda o que o **executável** faz, como ele foi provado e o que
 > **ninguém mediu ainda**. O executável é [`clickup.py`](clickup.py); a declaração,
-> [`clickup.capabilities.tsv`](clickup.capabilities.tsv); a bancada, `.claude/validation/task-manager-clickup-bench.py`.
+> [`clickup.capabilities.tsv`](clickup.capabilities.tsv); a bancada é a família `run_task_manager_clickup_selftests` (só no core: não viaja para as portas sem lint).
 
 ## Por que nasceu
 
@@ -73,7 +73,7 @@ endpoint de histórico ancorado) e o conteúdo dos anexos, que são listados mas
 
 ## A bancada: o que prova e o que não prova
 
-`task-manager-clickup-bench.py`, pela família `run_task_manager_clickup_selftests`, roda o `tm.sh` de verdade
+A bancada do core, pela família `run_task_manager_clickup_selftests`, roda o `tm.sh` de verdade
 contra um **ClickUp falso em loopback**. A costura é `TM_CLICKUP_ENDPOINT`, que o executável só aceita em
 `127.0.0.1`. O falso reproduz as armadilhas da tabela. São 27 casos (um por verbo, mais as armadilhas e os
 erros: HTTP 500, `err` num 200, token ausente, verbo fora). A árvore copiada roda primeiro os casos-alvo, e
