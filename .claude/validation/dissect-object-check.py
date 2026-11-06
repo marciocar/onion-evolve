@@ -55,8 +55,17 @@ except ImportError:  # sem PyYAML não há medição: 3, nunca 0
     sys.exit(3)
 
 REGISTRY = ".claude/validation/dissect-families.kg.yaml"
-KG_QUERY = "vendor/kg-ssot/tools/kg_query.py"
-KG_CRITERION = "vendor/kg-ssot/tools/kg_criterion.py"
+# as ferramentas do KG-SSOT pelo resolver único (utils/kg/kgssot_tools.py): KG_SSOT_TOOLS, senão o vendor, senão
+# tools/ quando a raiz É o produto (no repo do kg-ssot o caminho fixo no vendor dava rc 3 em toda dissecação).
+# Nada casou: o caminho de hoje, e a ausência segue medida como "não medi". A raiz é o cwd, como o kg_query --root .
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "utils", "kg"))
+try:
+    import kgssot_tools  # noqa: E402
+except ImportError:  # o resolver não viajou: não há como achar as ferramentas, então não meço (rc 3, nunca 0)
+    print("dissect-object-check: o resolver das ferramentas do KG-SSOT (utils/kg/kgssot_tools.py) ausente; não meço (rc 3)", file=sys.stderr)
+    sys.exit(3)
+KG_QUERY = kgssot_tools.tool(".", "kg_query.py")
+KG_CRITERION = kgssot_tools.tool(".", "kg_criterion.py")
 DEST_FIXED = {"core", "panorama", "projeto-novo"}
 DEST_PROJECT = re.compile(r"^projeto:[a-z0-9][a-z0-9-]*$")
 PURSUE = {"estudo", "projeto-novo"}

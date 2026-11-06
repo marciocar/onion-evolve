@@ -30,8 +30,10 @@ TSV="${ONION_HOUSE_CODES_TSV:-${HERE}/house-codes.tsv}"
 mode="${1:-}"
 case "${mode}" in --markdown|--write) ;; *) echo "uso: $0 --markdown | --write" >&2; exit 1 ;; esac
 [ -f "${TSV}" ] || { echo "house-codes-gen: ${TSV} ausente" >&2; exit 1; }
-V="${ROOT}/vendor/kg-ssot/tools/kg_vocab.py"
-[ -f "${V}" ] || { echo "house-codes-gen: ${V} ausente — sem o vendor não há vocabulário" >&2; exit 1; }
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+_KGT="$(kgssot_tools_dir "${ROOT}")" || _KGT="${ROOT}/vendor/kg-ssot/tools"
+V="${_KGT}/kg_vocab.py"
+[ -f "${V}" ] || { echo "house-codes-gen: ${V} ausente — sem as ferramentas do kg-ssot (vendor, tools/ do produto ou KG_SSOT_TOOLS) não há vocabulário" >&2; exit 1; }
 
 # os grafos com x_term, rastreados, fora do vendor, das fixtures e do arquivo do kg-inbox (o mesmo corpus do
 # lint de nomes); passar só estes é a mesma resposta do --root, sem ler os ~190 grafos (a bancada confere)

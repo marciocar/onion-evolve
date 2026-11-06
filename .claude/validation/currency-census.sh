@@ -92,6 +92,11 @@ if [ "${FMT}" = render ]; then [ -t 0 ] && { echo "currency-census: --render lê
 
 [ -d "${REPO}" ] || { echo "currency-census: repo inexistente: ${REPO}" >&2; exit 2; }
 REPO="$(cd "${REPO}" && pwd -P)"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+# o pino do contrato mora na pasta das ferramentas do KG-SSOT (KG_SSOT_TOOLS → vendor → tools/ do próprio produto);
+# nada casou, o caminho de hoje. KGSSOT_REQ_REL é o que os conselhos imprimem (relativo ao repo medido).
+KGSSOT_REQ="$(kgssot_tools_dir "${REPO}")/requirements.txt" || KGSSOT_REQ="${REPO}/vendor/kg-ssot/tools/requirements.txt"
+KGSSOT_REQ_REL="${KGSSOT_REQ#"${REPO}"/}"
 T="${ONION_CURRENCY_TIMEOUT:-4}"
 DEADLINE="${ONION_CURRENCY_DEADLINE:-9}"
 # o hook tem 15 s: prazo de perna acima de 12 s faria o Claude Code matar o hook e o aviso sumir calado; e
@@ -293,7 +298,7 @@ except Exception: pass' "${stamp}" 2>/dev/null | _ver)"
 }
 
 leg_py_one() {  # <pkg>
-  local pkg="$1" req="${REPO}/vendor/kg-ssot/tools/requirements.txt" pin="" inst latest rc=0 pypath
+  local pkg="$1" req="${KGSSOT_REQ}" reqrel="${KGSSOT_REQ_REL}" pin="" inst latest rc=0 pypath
   pypath="$(command -v "${PY}")"
   [ -f "${req}" ] && pin="$(sed -n "s/^${pkg}==\([0-9][0-9.]*\).*/\1/p" "${req}" | awk 'NR==1')"
   inst="$("${PY}" -I -c 'import importlib.metadata as m,sys
@@ -301,7 +306,7 @@ try: print(m.version(sys.argv[1]))
 except Exception: pass' "${pkg}" 2>/dev/null | _ver)"
   # Com pino, o conselho instala pelo requirements.txt INTEIRO com --require-hashes (desde a kg-ssot-v4.7.4 ele
   # traz o sha256 de cada arquivo publicado): `pip install pkg==X` avulso fura a verificação de hash.
-  local hreq="${PY} -m pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt"
+  local hreq="${PY} -m pip install --require-hashes -r ${reqrel}"
   if [ -z "${inst}" ]; then
     if [ -n "${pin}" ]; then _row "python:${pkg}" - "${pin}" ausente "${pkg} não está instalado no python do lint (${pypath}): ${ASK} ${pkg}==${pin} pelo PyPI (${hreq})"
     else _row "python:${pkg}" - - ausente "${pkg} não está instalado no python do lint (${pypath}): ${ASK} ${pkg} pelo PyPI (${PY} -m pip install ${pkg})"; fi
@@ -312,7 +317,7 @@ except Exception: pass' "${pkg}" 2>/dev/null | _ver)"
   [ -n "${latest}" ] || { _row "python:${pkg}" "${inst}" - nao-medida "o PyPI inalcançável pelo pip (rc=${rc})"; return 0; }
   if [ -n "${pin}" ]; then
     if [ "${inst}" != "${pin}" ] && _newer "${inst}" "${pin}"; then _row "python:${pkg}" "${inst}" "${pin}" fora-do-pino "o instalado (${inst}) está À FRENTE do pino do contrato (${pin}) e o CI instala o pino: alinhe com ${hreq}, ou suba o pino no produto kg-ssot"
-    elif [ "${inst}" != "${pin}" ]; then _row "python:${pkg}" "${inst}" "${pin}" defasada "${hreq} (o pino do contrato KG-SSOT, vendor/kg-ssot/tools/requirements.txt; o PyPI está em ${latest})"
+    elif [ "${inst}" != "${pin}" ]; then _row "python:${pkg}" "${inst}" "${pin}" defasada "${hreq} (o pino do contrato KG-SSOT, ${reqrel}; o PyPI está em ${latest})"
     elif [ "${pin}" = "${latest}" ]; then _row "python:${pkg}" "${inst}" "${latest}" em-dia "-"
     elif _newer "${pin}" "${latest}"; then _row "python:${pkg}" "${inst}" "${latest}" nao-medida "o pino (${pin}) está À FRENTE do PyPI (${latest}): registro atrasado ou índice trocado"
     else _row "python:${pkg}" "${inst}" "${latest}" pinada "o pino do contrato KG-SSOT é ${pin}: a subida para ${latest} é do produto kg-ssot e chega pelo re-vendor"; fi
@@ -345,7 +350,7 @@ leg_py_interp() {  # o python3 do lint × o python-version que o setup-python do
   local im="${inst%.*}"
   if [ "${im}" = "${want}" ]; then _row python "${inst}" "${want}" em-dia "-"
   elif _newer "${im}.0" "${want}.0"; then _row python "${inst}" "${want}" fora-do-pino "o python3 do lint ($(command -v "${PY}")) está À FRENTE do ${want} que o CI instala: alinhe o setup-python ou ponha um ${want} à frente do PATH"
-  else _row python "${inst}" "${want}" defasada "o CI roda Python ${want} (setup-python) e o python3 do lint é ${inst} ($(command -v "${PY}")): crie um venv ${want} (uv venv --python ${want} <venv>), instale nele (<venv>/bin/python -m pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt) e ponha <venv>/bin à frente do PATH; o python do SO não se troca"; fi
+  else _row python "${inst}" "${want}" defasada "o CI roda Python ${want} (setup-python) e o python3 do lint é ${inst} ($(command -v "${PY}")): crie um venv ${want} (uv venv --python ${want} <venv>), instale nele (<venv>/bin/python -m pip install --require-hashes -r ${KGSSOT_REQ_REL}) e ponha <venv>/bin à frente do PATH; o python do SO não se troca"; fi
 }
 leg_py() {
   [ -n "${PY}" ] || return 0

@@ -110,7 +110,9 @@ hard=0; total=0; proposta=0; fora=0
 # Arquivo que o contrato não PARSEIA (parse.*) não foi julgado no resto: vai para o radar próprio.
 # Sem o leitor (plugin sem vendor, python3 ausente, rc fora de 0/1 ou JSON ilegível), o laço antigo
 # de um radar por grafo segue inteiro — a mesma régua de antes, declarada, nunca verde por ausência.
-VAL="${ONION_KG_INTEGRITY_VALIDATOR:-${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py}"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+_KGT="$(kgssot_tools_dir "${REPO_ROOT}")" || _KGT="${REPO_ROOT}/vendor/kg-ssot/tools"
+VAL="${ONION_KG_INTEGRITY_VALIDATOR:-${_KGT}/kg_validate.py}"
 GRAPHS="$(git ls-files '*.kg.yaml' | bash "${_KFP}" --filter)"
 CONTRACT_TSV=""
 if [ -n "${GRAPHS}" ] && [ -f "${VAL}" ] && command -v python3 >/dev/null 2>&1; then
@@ -183,7 +185,7 @@ if [ -n "${CONTRACT_TSV}" ]; then
       OK) total=$(( total + 1 )) ;;
       HARD)
         total=$(( total + 1 ))
-        emit HARD CONTRADICAO "${g}" "grafo REPROVA na integridade do contrato KG-SSOT — reconcilie antes de seguir: ${msg} (detalhe: python3 -I -B vendor/kg-ssot/tools/kg_validate.py ${g})"
+        emit HARD CONTRADICAO "${g}" "grafo REPROVA na integridade do contrato KG-SSOT — reconcilie antes de seguir: ${msg} (detalhe: python3 -I -B ${VAL#"${REPO_ROOT}"/} ${g})"
         hard=$(( hard + 1 )) ;;
       PROPOSTA)
         total=$(( total + 1 )); proposta=$(( proposta + 1 ))

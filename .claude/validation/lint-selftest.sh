@@ -41702,6 +41702,147 @@ run_dissect_object_selftests() {
 
 _family run_dissect_object_selftests
 
+# ── O RESOLVER ÚNICO DAS FERRAMENTAS DO KG-SSOT (utils/kg/kgssot-tools.sh + kgssot_tools.py) ─────────────
+# POR QUE EXISTE (2026-11-06): catorze arquivos de .claude/validation fixavam `vendor/kg-ssot/tools/`, e no
+# PRÓPRIO repo do KG-SSOT (ferramentas em tools/, sem vendor/) toda dissecação saía rc 3 e o checador do
+# contrato rc 2 "vendor ausente". A ordem: KG_SSOT_TOOLS (pasta existente) → vendor/kg-ssot/tools → tools/ com
+# spec/release.json de tag kg-ssot-v*; nada casou, vazio e o chamador segue no rc de hoje.
+# Fixtures em mktemp, com as ferramentas REAIS do vendor do core (o produto, não um stub):
+#   fonte   — spec/ e tools/ na raiz (a forma do repo do kg-ssot) · adotante — vendor/kg-ssot/{spec,tools}
+#   nenhum  — repo vazio · env — repo vazio + KG_SSOT_TOOLS · outra — tools/ sem o release.json do produto
+# (a) o resolver bash e o python dão o MESMO veredito por fixture (paridade); (b) ponta a ponta pelo
+# kg-contract-check.sh (rc 0 julgado / rc 2 não julgou) e pelo KG_QUERY do dissect-object-check.py;
+# (c) um mutante por ramo (env, vendor, fonte, vazio), com a cópia LIMPA provada verde no MESMO arranjo antes;
+# (d) catraca: nenhum sítio executável de .claude/validation volta a fixar vendor/kg-ssot/tools/<ferramenta>.
+run_kgssot_tools_selftests() {
+  local lib="${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" pyr="${REPO_ROOT}/.claude/utils/kg/kgssot_tools.py"
+  local kcc="${REPO_ROOT}/.claude/validation/kg-contract-check.sh" doc="${REPO_ROOT}/.claude/validation/dissect-object-check.py"
+  local vend="${REPO_ROOT}/vendor/kg-ssot"
+  local g0="${vend}/spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml"
+  if [ ! -f "${lib}" ] || [ ! -f "${pyr}" ]; then record_fail "kgssot-tools" "resolver ausente: ${lib} · ${pyr}"; return; fi
+  if [ ! -f "${vend}/tools/kg_gate.py" ] || [ ! -f "${g0}" ]; then
+    record_skip "kgssot-tools: o vendor kg-ssot do core (tools + grafo mínimo de conformidade) ausente — as fixtures copiam o produto real"; return
+  fi
+  local d; d="$(mktemp -d)"
+  local f
+  for f in fonte adotante nenhum env outra; do mkdir -p "${d}/${f}"; git -C "${d}/${f}" init -q >/dev/null 2>&1; cp "${g0}" "${d}/${f}/g.kg.yaml"; done
+  cp -r "${vend}/spec" "${vend}/tools" "${d}/fonte/"
+  mkdir -p "${d}/adotante/vendor/kg-ssot"; cp -r "${vend}/spec" "${vend}/tools" "${d}/adotante/vendor/kg-ssot/"
+  cp -r "${vend}/tools" "${d}/outra/"
+  # as duas fixtures "outra" e "env" mostram que tools/ e a variável não se confundem com o produto por acaso
+  local etools="${d}/adotante/vendor/kg-ssot/tools"
+
+  # o veredito "<kind>\t<dir>" do bash e do python, ou "-" (nada casou); o 3º arg é o KG_SSOT_TOOLS
+  _kt_bash() { (unset KG_SSOT_TOOLS; [ -z "$3" ] || export KG_SSOT_TOOLS="$3"; . "$1"; if kgssot_tools_resolve "$2"; then printf '%s\t%s\n' "${KGSSOT_TOOLS_KIND}" "${KGSSOT_TOOLS}"; else echo -; fi); }
+  _kt_py() { (unset KG_SSOT_TOOLS; [ -z "$3" ] || export KG_SSOT_TOOLS="$3"; python3 -I -B "$1" "$2" || echo -); }
+  local want_fonte="source	${d}/fonte/tools" want_adot="vendor	${d}/adotante/vendor/kg-ssot/tools"
+  local want_env="env	${etools}"
+  local c got_b got_p want root env
+  for c in "fonte|${d}/fonte||${want_fonte}" "adotante|${d}/adotante||${want_adot}" "nenhum|${d}/nenhum||-" \
+           "env|${d}/env|${etools}|${want_env}" "outra (tools/ sem release.json)|${d}/outra||-" \
+           "env inexistente cai no vendor|${d}/adotante|${d}/nao-existe|${want_adot}" \
+           "env vence o vendor|${d}/fonte|${etools}|${want_env}"; do
+    IFS='|' read -r f root env want <<< "${c}"
+    got_b="$(_kt_bash "${lib}" "${root}" "${env}")"; got_p="$(_kt_py "${pyr}" "${root}" "${env}")"
+    if [ "${got_b}" = "${want}" ] && [ "${got_p}" = "${want}" ]; then
+      record_pass "kgssot-tools: (a) ${f} → ${want%%	*} (bash = python)"
+    else record_fail "kgssot-tools: (a) ${f}" "esperava '${want}'; bash='${got_b}' python='${got_p}'"; fi
+  done
+
+  # (b) ponta a ponta: o checador do contrato JULGA no repo-fonte, no adotante e com a variável; sem nenhum dos
+  #     três segue rc 2 "não dá para julgar", como hoje. O tree do SUT é a raiz do core (o lib ao lado dele).
+  _kt_kcc() {  # <script> <fixture> <KG_SSOT_TOOLS> → rc
+    local _r=0; (cd "$2" && unset KG_SSOT_TOOLS && { [ -z "$3" ] || export KG_SSOT_TOOLS="$3"; } && bash "$1" g.kg.yaml) >/dev/null 2>&1 || _r=$?; echo "${_r}"
+  }
+  local rc
+  for c in "fonte|${d}/fonte||0" "adotante|${d}/adotante||0" "nenhum|${d}/nenhum||2" "env|${d}/env|${etools}|0" "outra|${d}/outra||2"; do
+    IFS='|' read -r f root env want <<< "${c}"
+    rc="$(_kt_kcc "${kcc}" "${root}" "${env}")"
+    if [ "${rc}" = "${want}" ]; then record_pass "kgssot-tools: (b) kg-contract-check no ${f} → rc ${want}"
+    else record_fail "kgssot-tools: (b) kg-contract-check no ${f}" "esperava rc ${want}, veio ${rc}"; fi
+  done
+  # o KG_QUERY do dissect-object-check.py (o sítio do sinal de campo): tools/ no repo-fonte, o vendor de hoje sem nada
+  _kt_doc() { (cd "$1" && unset KG_SSOT_TOOLS && python3 -I -B -c 'import importlib.util,sys
+s=importlib.util.spec_from_file_location("doc", sys.argv[1]); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.KG_QUERY)' "${doc}" 2>&1); }
+  got_b="$(_kt_doc "${d}/fonte")"; got_p="$(_kt_doc "${d}/nenhum")"
+  if [ "${got_b}" = "tools/kg_query.py" ] && [ "${got_p}" = "vendor/kg-ssot/tools/kg_query.py" ]; then
+    record_pass "kgssot-tools: (b) dissect-object-check acha tools/kg_query.py no repo-fonte e mantém o vendor de hoje sem nada"
+  else record_fail "kgssot-tools: (b) dissect-object-check" "fonte='${got_b}' (esperava tools/kg_query.py) · nenhum='${got_p}' (esperava vendor/kg-ssot/tools/kg_query.py)"; fi
+
+  # (c) MUTANTES. Árvore espelho (validation/ + utils/kg/) para o SUT achar o lib mutado ao lado; a cópia LIMPA
+  #     no mesmo arranjo tem de dar os 4 vereditos verdes ANTES de um morto contar.
+  local m="${d}/m"; mkdir -p "${m}/.claude/validation" "${m}/.claude/utils/kg"
+  cp "${kcc}" "${m}/.claude/validation/"; cp "${REPO_ROOT}/.claude/utils/kg/machine_path.py" "${lib}" "${pyr}" "${m}/.claude/utils/kg/"
+  local mlib="${m}/.claude/utils/kg/kgssot-tools.sh" mkcc="${m}/.claude/validation/kg-contract-check.sh" clean
+  # O placar pela árvore espelho: rc do checador no fonte, no adotante e com a variável · o veredito do resolver
+  # no nenhum · o KIND do resolver no adotante. O 5º existe porque o ramo vendor é EQUIVALENTE ponta a ponta: o
+  # chamador cai no caminho de hoje (o mesmo vendor) quando o resolver devolve vazio, então desligar o ramo não
+  # muda o rc do checador (medido: o mutante sobreviveu ao placar só de rc). Quem o mata é o veredito do resolver.
+  _kt_four() {
+    local _k; _k="$(_kt_bash "${mlib}" "${d}/adotante" "")"
+    printf '%s %s %s %s %s\n' "$(_kt_kcc "${mkcc}" "${d}/fonte" "")" "$(_kt_kcc "${mkcc}" "${d}/adotante" "")" \
+      "$(_kt_kcc "${mkcc}" "${d}/env" "${etools}")" "$(_kt_bash "${mlib}" "${d}/nenhum" "")" "${_k%%	*}"
+  }
+  clean="$(_kt_four)"
+  if [ "${clean}" != "0 0 0 - vendor" ]; then
+    record_fail "kgssot-tools: (c) cópia limpa" "a árvore espelho sem mutação não deu '0 0 0 - vendor' (deu '${clean}'): nenhum morto conta"
+    rm -rf "${d}"; return
+  fi
+  record_pass "kgssot-tools: (c) cópia limpa no arranjo dos mutantes: fonte 0 · adotante 0 · env 0 · nenhum vazio · adotante pelo vendor"
+  local mu name anchor repl wantpos score
+  for mu in 'env|  if [ -n "${KG_SSOT_TOOLS:-}" ]; then|  if false; then|3' \
+            'vendor|  if [ -d "${root}/vendor/kg-ssot/tools" ]; then|  if false; then|5' \
+            'fonte|  if [ -d "${root}/tools" ] && _kgssot_is_source_root "${root}"; then|  if false; then|1' \
+            'vazio|  KGSSOT_TOOLS_WHY="${KGSSOT_TOOLS_WHY:+${KGSSOT_TOOLS_WHY}; }nem|  KGSSOT_TOOLS="${root}"; return 0; KGSSOT_TOOLS_WHY="nem|4'; do
+    IFS='|' read -r name anchor repl wantpos <<< "${mu}"
+    cp "${lib}" "${mlib}"
+    python3 -I -B -c 'import sys
+p,a,r=sys.argv[1:4]; s=open(p).read()
+if s.count(a)!=1: sys.exit(9)
+open(p,"w").write(s.replace(a,r))' "${mlib}" "${anchor}" "${repl}" || { record_fail "kgssot-tools: (c) mutante ${name}" "a âncora não casou 1 vez no lib (mutante não aplicado): ${anchor}"; continue; }
+    score="$(_kt_four)"
+    if [ "$(cut -d' ' -f"${wantpos}" <<< "${score}")" != "$(cut -d' ' -f"${wantpos}" <<< "${clean}")" ]; then
+      record_pass "kgssot-tools: (c) mutante ${name} morto (placar '${score}' ≠ limpo '${clean}')"
+    else record_fail "kgssot-tools: (c) mutante ${name} VIVO" "o caso ${wantpos} não mudou com o ramo ${name} desligado (placar '${score}')"; fi
+  done
+  cp "${lib}" "${mlib}"
+  # o espelho python: os mesmos 3 ramos desligados mudam o veredito dele (a paridade do (a) depende disso)
+  local mpy="${m}/.claude/utils/kg/kgssot_tools.py"
+  for mu in 'env|    if env and os.path.isdir(env):|    if False:|env|ETOOLS' \
+            'vendor|    if os.path.isdir(vendor):|    if False:|adotante|' \
+            'fonte|    if os.path.isdir(tools) and _is_source_root(root):|    if False:|fonte|' \
+            'vazio|    return None, None|    return root, "x"|nenhum|'; do
+    IFS='|' read -r name anchor repl f env <<< "${mu}"
+    [ "${env}" != ETOOLS ] || env="${etools}"
+    cp "${pyr}" "${mpy}"
+    python3 -I -B -c 'import sys
+p,a,r=sys.argv[1:4]; s=open(p).read()
+if s.count(a)!=1: sys.exit(9)
+open(p,"w").write(s.replace(a,r))' "${mpy}" "${anchor}" "${repl}" || { record_fail "kgssot-tools: (c) mutante python ${name}" "a âncora não casou 1 vez: ${anchor}"; continue; }
+    got_p="$(_kt_py "${mpy}" "${d}/${f}" "${env}")"; want="$(_kt_py "${pyr}" "${d}/${f}" "${env}")"
+    if [ "${got_p}" != "${want}" ]; then record_pass "kgssot-tools: (c) mutante python ${name} morto ('${got_p}' ≠ '${want}')"
+    else record_fail "kgssot-tools: (c) mutante python ${name} VIVO" "veredito igual ao limpo: '${got_p}'"; fi
+  done
+
+  # (d) CATRACA: linha executável (não comentário) de .claude/validation que cita vendor/kg-ssot/tools/<arquivo>
+  #     fixa o caminho por fora do resolver. Fora: a bancada (fixtures montam vendor/ de propósito), o
+  #     kg_vendor.py (só existe no vendor, por definição) e a linha que já passa pelo resolver (o fallback).
+  local hits
+  hits="$(cd "${REPO_ROOT}" && git ls-files -- '.claude/validation/*.sh' '.claude/validation/*.py' 2>/dev/null \
+    | grep -v -e '^\.claude/validation/lint-selftest\.sh$' -e '-bench\.py$' \
+    | while IFS= read -r f; do LC_ALL=C grep -nE 'vendor/kg-ssot/tools/[A-Za-z_]+\.(py|txt)' "${f}" 2>/dev/null \
+        | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v -e 'kg_vendor\.py' -e 'kgssot_tools' | sed "s|^|${f}:|" || true; done)"
+  if [ -z "${hits}" ]; then record_pass "kgssot-tools: (d) catraca — nenhum sítio executável fixa vendor/kg-ssot/tools/<ferramenta>"
+  else record_fail "kgssot-tools: (d) catraca" "caminho fixo por fora do resolver (use utils/kg/kgssot-tools.sh): $(_emit "${hits}" | head -c 800)"; fi
+  # o mutante da catraca: uma linha fixa plantada numa cópia tem de ser vista pelo mesmo filtro
+  local plant; plant="$(printf 'KT="${ROOT}/vendor/kg-ssot/tools/kg_trace.py"\n' | LC_ALL=C grep -nE 'vendor/kg-ssot/tools/[A-Za-z_]+\.(py|txt)' | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v -e 'kg_vendor\.py' -e 'kgssot_tools' || true)"
+  if [ -n "${plant}" ]; then record_pass "kgssot-tools: (d) mutante da catraca — a linha fixa plantada é acusada"
+  else record_fail "kgssot-tools: (d) mutante da catraca VIVO" "o filtro não viu KT=\"\${ROOT}/vendor/kg-ssot/tools/kg_trace.py\""; fi
+  rm -rf "${d}"
+}
+
+_family run_kgssot_tools_selftests
+
 # ── CLASSIFICAÇÃO I/O DO GATE (passo 1 da Capacidade 1) ──────────────────────────────────────
 # POR QUE EXISTE: o SUT nasceu SEM bancada, e o custo apareceu no mesmo dia — o seletor
 # `--affected-staged` não achou família que o citasse e RECUSOU estreitar ("tudo, no incerto"),
@@ -50407,7 +50548,10 @@ DEC_PY
   # (s12) repo que É o produto KG-SSOT (sem vendor/kg-ssot, com tools/kg_validate.py): o leitor local é o 2º
   #       gate (sinal de campo do adotante KG-SSOT, 2026-10-12: lá o selador selava sem conferir o contrato). O
   #       leitor falso reprova só o grafo JÁ selado (com «), então o passo 0 passa e a reprovação é do selo.
-  local rk="${sb}/produto"; mkdir -p "${rk}/tools" "${rk}/docs"
+  #       O produto se reconhece pelo spec/release.json da raiz (tag kg-ssot-v*), o mesmo sinal do resolver único
+  #       (utils/kg/kgssot-tools.sh, 2026-11-06): tools/ sem ele é pasta de outra coisa.
+  local rk="${sb}/produto"; mkdir -p "${rk}/tools" "${rk}/docs" "${rk}/spec"
+  printf '{"version": "4.44.0", "tag": "kg-ssot-v4.44.0"}\n' > "${rk}/spec/release.json"
   "${G[@]}" -C "${rk}" init -q . 2>/dev/null
   printf 'import sys\nsys.exit(1 if "\u00ab" in open(sys.argv[-1], encoding="utf-8").read() else 0)\n' > "${rk}/tools/kg_validate.py"
   cp "${r}/docs/a/a.kg.yaml" "${rk}/docs/g.kg.yaml"; h0="$(sha256sum "${rk}/docs/g.kg.yaml" | cut -d' ' -f1)"

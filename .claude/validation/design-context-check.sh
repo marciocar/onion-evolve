@@ -64,6 +64,8 @@ BUSINESS_DIR="$(_dir business)" || exit 2
 # resolve (ONION_KG_TRACE, senão o vendor do alvo) e com o código integrity.trace-locator-missing (kg-ssot >= 4.35.0).
 # Sem ele (adotante com vendor anterior), a vertical segue acusando o token ausente: delegar a quem não julga é calar
 # (passada adversarial da adoção da 4.35.0, achado 2).
-KT="${ONION_KG_TRACE:-${ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+_KGT="$(kgssot_tools_dir "${ROOT}")" || _KGT="${ROOT}/vendor/kg-ssot/tools"
+KT="${ONION_KG_TRACE:-${_KGT}/kg_trace.py}"
 [ -f "${KT}" ] && LC_ALL=C command grep -q 'integrity.trace-locator-missing' "${KT}" 2>/dev/null && PASS+=(--delegate-locator)
 exec python3 -I -B "${HERE}/design-context-check.py" --root "${ROOT}" --design-dir "${DESIGN_DIR}" --business-dir "${BUSINESS_DIR}" ${PASS[@]+"${PASS[@]}"}

@@ -319,11 +319,13 @@ if [ "${1:-}" = "--selftest" ]; then
   # O CONTRATO só julga onde o vendor existe (o core): o caso roda com a raiz do repo do checador, e fora dele
   # sai ⊘ declarado — nunca verde por vacuidade, nunca falha por ambiente.
   CROOT="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || true)"
-  if [ -n "${CROOT}" ] && [ -f "${CROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ] \
+  . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+  _KGT="$(kgssot_tools_dir "${CROOT:-.}")" || _KGT="${CROOT}/vendor/kg-ssot/tools"
+  if [ -n "${CROOT}" ] && [ -f "${_KGT}/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ] \
      && [ -f "${CROOT}/.claude/validation/fixtures/meeting-graph/transcript-ok.txt" ]; then
     _case "contrato reprova o method fora da forma" CONTRATO "s=s.replace('method: \"reading: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}"
     _case "contrato julga também o caminho relativo" CONTRATO "s=s.replace('method: \"reading: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}" rel
-  else echo "⊘ contrato reprova o method fora da forma (vendor/kg-ssot ausente: não julgado aqui)"; fi
+  else echo "⊘ contrato reprova o method fora da forma (ferramentas do kg-ssot ausentes: não julgado aqui)"; fi
   if [ -n "${ONLY}" ] && [ "$((P + F))" -eq 0 ]; then echo "✗ caso inexistente: ${ONLY}"; F=1; fi
   echo "meeting-graph selftest: ${P} passaram, ${F} falharam"
   [ "${F}" -eq 0 ]; exit $?

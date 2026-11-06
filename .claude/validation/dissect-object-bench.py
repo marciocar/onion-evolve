@@ -30,6 +30,7 @@ SRC = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=Tru
 CHECK_PY = ".claude/validation/dissect-object-check.py"
 CHECK_SH = ".claude/validation/dissect-object-check.sh"
 REGISTRY = ".claude/validation/dissect-families.kg.yaml"
+RESOLVER = ".claude/utils/kg/kgssot_tools.py"
 STUDY = "docs/evolution/dissect/fixture-app-2026-10"
 GRAPH = STUDY + "/fixture-app-2026-10.kg.yaml"
 STAGE0 = STUDY + "/STAGE0.md"
@@ -246,8 +247,10 @@ RC3_CASES = [
 
 
 def setup(tmp, checker_src):
-    for d in (STUDY, ".claude/validation", os.path.dirname(REGISTRY)):
+    for d in (STUDY, ".claude/validation", os.path.dirname(REGISTRY), os.path.dirname(RESOLVER)):
         os.makedirs(os.path.join(tmp, d), exist_ok=True)
+    # o checador acha as ferramentas do KG-SSOT pelo resolver único ao lado dele (utils/kg, desde 2026-11-06)
+    shutil.copy(os.path.join(SRC, RESOLVER), os.path.join(tmp, RESOLVER))
     shutil.copy(os.path.join(SRC, REGISTRY), os.path.join(tmp, REGISTRY))
     shutil.copy(os.path.join(SRC, CHECK_SH), os.path.join(tmp, CHECK_SH))
     with open(os.path.join(tmp, CHECK_PY), "w", encoding="utf-8") as fh:

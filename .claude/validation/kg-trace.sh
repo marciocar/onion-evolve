@@ -118,7 +118,9 @@ if [ -n "${OUT}" ]; then
     *) rm -f "${_otmp}"; echo "ERRO kg-trace --out: NAO-GEROU (rc=${_orc}) — ${OUT} INTACTO" >&2; exit "${_orc}" ;;
   esac
 fi
-KT="${ONION_KG_TRACE:-${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+_KGT="$(kgssot_tools_dir "${REPO_ROOT}")" || _KGT="${REPO_ROOT}/vendor/kg-ssot/tools"
+KT="${ONION_KG_TRACE:-${_KGT}/kg_trace.py}"
 _KT_EXCL=()
 if [ -f "${REPO_ROOT}/.kg-ssot/trace-excludes.txt" ]; then
   while IFS= read -r _g || [ -n "${_g}" ]; do
