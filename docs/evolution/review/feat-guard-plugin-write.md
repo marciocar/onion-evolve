@@ -1,9 +1,8 @@
 ---
 branch: feat/guard-plugin-write
-pr: pendente
+pr: 1490
 date: 2026-11-05
-reviewed_diff_sha256: 219a8c94cb6082f49f3e9ef1ea46f6f6c94be87d4d08e7ca07dc203983d716df
-reviewed_code_sha256: 071355ff80ff20c0b2db031ed50e9bded9b70842f1b0bed40444a57aba331bc2
+reviewed_diff_sha256: pendente
 findings_total: 29
 findings_real: 29
 tokens: 0
@@ -17,6 +16,9 @@ nota: >
   refutador 5, sobre f6d65f57a: 10 achados. Todos são reais; 21 viraram cura e 8 viraram teto
   declarado, com caso no --selftest. A verificação do diferencial sobre 039728af3 foi feita pela
   sessão principal. tokens e duration_min ficam 0 porque não foram medidos.
+  Depois da verificação do diferencial entraram três mudanças fora do juiz, nenhuma no veto: os
+  vereditos da família por here-string (pré-voo, REGRA da classe pipefail), os termos T_LAB_* do grafo
+  (contrato KG-SSOT) e o veto-onfailure contando 7 vetos em vez de 6 (CI do PR 1490).
 ---
 
 # Veto à escrita de plugin em .claude/skills e a varredura do disco
