@@ -2,14 +2,13 @@
 branch: feat/slack-persona-ops
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 6f8f555dbb076a5c506d36b6642f8b3f4140977baf1f5fa60543c3fe39829fde
-reviewed_code_sha256: de84ae02cef9761db756a151f140c972a967036687a98147e70f0f677da1e888
-findings_total: 9
-findings_real: 9
+reviewed_diff_sha256: pendente
+findings_total: 10
+findings_real: 10
 findings_blocking: 0
 tokens: 0
 duration_min: 150
-findings_fixed: 9
+findings_fixed: 10
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: agente de execução da sessão do core (passada própria, não independente), com mutantes reais nos dois repos
@@ -51,6 +50,10 @@ SDK e o CLI reais contra um Slack falso e uma Messages API falsa, mutantes nos d
 9. **Dois casos da bancada passavam com o mutante.** "Existente sem confirmação fica" passava porque o mutante caía
    no prefixo errado, e o conf do MCP sem o token não tinha caso. Cura: a asserção exige rc 0 e "mantida", e o caso do
    conf sem token entrou. Os 9 mutantes da família morrem, e a cópia limpa passa antes no mesmo arranjo.
+
+10. **Sobrou um `env | grep -q` na recusa das variáveis de teste**, e o pré-voo do `pr-finalize` pegou: é sítio novo da
+    classe pipefail, acima da catraca. Cura: here-string sobre `$(env)`. A bancada e os 9 mutantes rodaram de novo,
+    verdes.
 
 ## O que não foi verificado
 
