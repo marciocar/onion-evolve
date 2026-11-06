@@ -96,6 +96,8 @@ signal=$(
     printf '%s\n' ONION_CHAT_RUNNER_TEST
     # e do wrapper do STT em lote (ops/stt-service.sh) (core-only)
     printf '%s\n' ONION_STT_SERVICE_TEST
+    # e do wrapper da persona do Slack (ops/slack-persona.sh) (core-only)
+    printf '%s\n' ONION_SLACK_PERSONA_TEST
   } | grep -v '^$' | sed 's/[][\.*^$+?(){}|/]/\\&/g' | sort -u | paste -sd'|' -)
 moat_action='(^|[^[:alnum:]_-])(systemctl|service|docker|rsync|cp|mv|install|tee|ln|rm|mkdir|touch|chmod|chown|dd|tar|unzip|crontab|systemd-run|at|batch|git|eval|xargs|sed|curl|wget)([^[:alnum:]_-]|$)|>'
 # rota dinâmica: SÓ os programas cujo alvo é um NOME (unidade, container, crontab) ou que tornam o texto opaco

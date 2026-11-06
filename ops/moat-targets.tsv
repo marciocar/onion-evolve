@@ -56,6 +56,10 @@
 #     migrate-python-service.sh: o CPython de patch fixo em /opt/onion-python (dono root), os venvs dedicados em
 #     /opt/onion-venvs e o drop-in 50-python.conf das duas units MCP de grafo. O restart dessas units segue com o
 #     wrapper da unit (o do escritor, update-kg-writer.sh; o do leitor, nenhum): o drop-in é o alvo deste.
+#   · a persona do Slack em modo rascunho (2026-11-06, degrau 2 do comms-stable-2026-11, D_PERSONA_RUNTIME_2026_11) tem
+#     wrapper próprio: slack-persona.sh instala a unit onion-slack-persona a partir do bridge servido, guarda os tokens
+#     cifrados em /etc/credstore.encrypted/onion-slack-persona.* (systemd-creds, D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106),
+#     a config em /etc/onion-slack-persona, o backup da unit em /var/backups/onion-slack-persona, e liga provando a conexão.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -70,6 +74,7 @@ deploy	unit	onion-adopt-*	-
 deploy	unit	onion-chat.socket	ops/chat-runner.sh
 deploy	unit	onion-chat@*	ops/chat-runner.sh
 deploy	unit	onion-vps-stt	ops/stt-service.sh
+deploy	unit	onion-slack-persona	ops/slack-persona.sh
 deploy	path	/var/www/onion-landing	ops/deploy-site.sh
 deploy	path	/var/www	-
 deploy	path	/etc/docker	ops/docker-engine-migrate.sh
@@ -94,6 +99,10 @@ deploy	path	/etc/systemd/system/onion-vps-mcp-kg-writer.service.d/50-python.conf
 deploy	path	/etc/systemd/system/onion-vps-mcp-kg-granaai.service.d/50-python.conf	ops/migrate-python-service.sh
 deploy	path	/etc/onion-stt	ops/stt-service.sh
 deploy	path	/var/backups/onion-stt	ops/stt-service.sh
+deploy	path	/etc/systemd/system/onion-slack-persona.service	ops/slack-persona.sh
+deploy	path	/etc/onion-slack-persona	ops/slack-persona.sh
+deploy	path	/etc/credstore.encrypted/onion-slack-persona.*	ops/slack-persona.sh
+deploy	path	/var/backups/onion-slack-persona	ops/slack-persona.sh
 deploy	path	/var/lib/onion-bridge	-
 deploy	path	/var/lib/onion-bridge/chat-homes	ops/chat-runner.sh
 deploy	path	/var/lib/onion-bridge/workspaces	ops/workspace-adopt-sync.sh
@@ -127,4 +136,5 @@ ato	script	ops/a2a-queue-live.sh	--apply
 ato	script	ops/bridge-hardening.sh	--apply
 ato	script	ops/chat-runner.sh	--apply
 ato	script	ops/stt-service.sh	--apply
+ato	script	ops/slack-persona.sh	--apply,creds,start
 ato	script	ops/publish-door.sh	--push
