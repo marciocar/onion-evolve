@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**941 itens abertos** em 149 grafo(s) com aberto (de 190 no escopo) · 150 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**922 itens abertos** em 147 grafo(s) com aberto (de 188 no escopo) · 148 grupo(s), agrupados por `owner:` (47 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -365,24 +365,6 @@
 | 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## plugin-write-2026-11 — 13 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 59.5 | `D_VETO_ESTREITO_MAIS_VARREDURA` | plugin-write-2026-11 | Decisão do maestro de 2026-11-04: veto estreito mais varredura no disco. Um hook PreToolUse em Write, Edit, NotebookEdit e Bash c |
-| 27.0 | `C_TETO_NAO_E_FRONTEIRA` | plugin-write-2026-11 | TETO (peça 7): esta guarda é contenção de acidente e de injeção ingênua, NÃO fronteira. Quem quer contornar consegue, e o  |
-| 16.0 | `D_MOLDE_COMPOE_O_JUIZ_DO_MOAT` | plugin-write-2026-11 | Molde pelo censo: pretooluse-direct-provider-api.sh é o único PreToolUse com --selftest próprio, e é a forma de hook mais chec |
-| 13.6 | `C_TETO_CAI_JUNTO_COM_O_SETTINGS` | plugin-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json e com o próprio script, que o veto não protege. A medição g |
-| 8.0 | `E_ELENXO_REPROVOU_E_CUROU` | plugin-write-2026-11 | A 1ª passada adversarial REPROVOU a guarda em aad2d62d3, com 6 achados altos e 7 médios. O 0 de 371 do replay se sustentou, mas  |
-| 6.8 | `C_TETO_BASH_FALHA_PELO_VOCABULARIO` | plugin-write-2026-11 | TETO: em Bash a lista falha pelo vocabulário. Tudo o que não é forma listada passa. |
-| 6.8 | `C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE` | plugin-write-2026-11 | TETO: o processo de um mod e um MCP de escrita ficam fora do PreToolUse: a escrita deles não é uma chamada de Write nem de Bash  |
-| 6.4 | `E_BANCADA_CASOS_E_MUTANTES` | plugin-write-2026-11 | Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 80 mutantes, cada  |
-| 5.1 | `C_TETO_PARTIDA_E_DETECCAO` | plugin-write-2026-11 | TETO: no SessionStart o plugin que puder carregar já carregou: o aviso é detecção, não prevenção. |
-| 5.1 | `C_TETO_REDIRECIONAMENTO_COMPOSTO` | plugin-write-2026-11 | TETO: redirecionamento de composto e formas raras passam calados: { } > alvo, ( ) > alvo, for … done > alvo, if … fi > alvo, & |
-| 4.5 | `C_FALSO_POSITIVO_E_O_DEFEITO_DOMINANTE` | plugin-write-2026-11 | A vizinha ensina: a guarda do .env deu dois falsos positivos hoje, relatados pelo maestro, e mais dois nesta forja (um grep em .cl |
-| 4.2 | `C_CONSEQUENCIA_A_SESSAO_NAO_FORJA_MOD` | plugin-write-2026-11 | Consequência declarada: nesta árvore a sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill em |
-| 4.0 | `Q_ELENXO_PENDENTE` | plugin-write-2026-11 | O Elenxo não rodou: a passada adversarial é da sessão principal, em revisor novo, com mandato de achar o falso positivo. Enquan |
-
 ## maestro-persona-2026-11 — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -729,7 +711,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 18 item(ns)
+## maestro — 19 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -740,6 +722,7 @@
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
+| 7.2 | `D_SO_LIMITES_DERIVADOS_DO_LEASE_1106` | session-orchestration-2026-11 | Proposta para o maestro selar: a régua do lease de carga muda? Opção 1 (recomendada pela medida): manter 15/12 e ligar o PSI de |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
@@ -847,18 +830,6 @@
 | 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
-
-## adopter-vetoes-2026-11 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 24.0 | `Q_VETOS_VALEM_NO_ADOTANTE` | adopter-vetoes-2026-11 | no adotante carimbado, o merge digitado, o push na main e a escrita em repo alheio vetam, e o caminho verificado do adotante passa |
-| 5.1 | `C_TETO_SCRIPT_E_OUTRA_LINGUAGEM` | adopter-vetoes-2026-11 | TETO: script em arquivo não se lê (por essa fronteira passam o co-relay e o merge verificado); código embutido (-c/-e) fecha pe |
-| 5.1 | `C_TETO_SO_REPO_REGISTRADO` | adopter-vetoes-2026-11 | TETO: só o repo REGISTRADO é alheio; adotante sem lista (adopted_from por URL e sem .claude/adopter-guard.tsv) cala para tudo, e |
-| 4.8 | `C_TETO_PUSH_NU_DEPOIS_DE_SWITCH` | adopter-vetoes-2026-11 | TETO herdado do core: o push nu (sem refspec) se julga pela branch do disco na hora do hook; git switch na mesma string não é se |
-| 4.8 | `C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE` | adopter-vetoes-2026-11 | TETO: escritores por opção (tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, find -delete) e repo de nome |
-| 4.5 | `C_CAMADA_NATIVA_PRIMEIRO` | adopter-vetoes-2026-11 | o permissions.deny do adotante é a 1ª linha; o hook é a 2ª, no que o deny por padrão de caminho e prefixo de comando não alc |
-| 4.2 | `C_TETO_WRAPPER_RTK` | adopter-vetoes-2026-11 | TETO não curado aqui: o invólucro rtk (rtk, rtk run, rtk bypass) não é tirado pelo tokenizador, e o push e o merge escritos at |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 

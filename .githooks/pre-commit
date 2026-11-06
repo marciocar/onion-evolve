@@ -336,7 +336,27 @@ elif [ -f "${SELFTEST}" ] && _bench_touched; then
   else
     echo "🧪 Onion pre-commit — mudança no domínio da bancada → self-test das guardas AFETADAS (faixa local; a completa é do CI)…"
   fi
-  if ! bash "${SELFTEST}" --affected-staged --local --jobs auto; then
+  # LEASE DE CARGA ANTES DA FAIXA (ops/load-lease.sh, 2026-11-06): medido na noite de 11-05, o pre-commit de
+  # uma forja rodou 192 famílias por 70 min com o load entre 13 e 16, porque nada no caminho perguntava pela
+  # carga. Agora a faixa só abre com a régua da máquina (ops/load-lease.conf: ocupado em 15, retoma abaixo de
+  # 12, teto 30 min); teto estourado BLOQUEIA dizendo o load, e não roda a bancada calada na fila. A completa
+  # opt-in (ONION_SELFTEST_FULL=1) pega também a vaga ÚNICA de bancada cheia. Aninhado (o pr-finalize, uma
+  # família da bancada) passa direto; escape declarado: ONION_LOAD_LEASE=off.
+  _LEASE="${REPO_ROOT}/ops/load-lease.sh"; _bench_pre=()
+  if [ -f "${_LEASE}" ]; then
+    if [ "${ONION_SELFTEST_FULL:-0}" = "1" ]; then
+      _bench_pre=(env ONION_LOAD_LEASE_WHO=pre-commit-full bash "${_LEASE}" run --)
+    else
+      _llrc=0; ONION_LOAD_LEASE_WHO=pre-commit bash "${_LEASE}" wait || _llrc=$?
+      if [ "${_llrc}" -ne 0 ]; then
+        echo ""
+        echo "❌ Commit bloqueado: a máquina não liberou a bancada (load-lease rc=${_llrc}; 4 = teto estourado, 2 = não mediu)."
+        echo "   Rode de novo quando a carga cair (bash ops/load-lease.sh status), ou ONION_LOAD_LEASE=off (escape declarado)."
+        exit 1
+      fi
+    fi
+  fi
+  if ! ${_bench_pre[@]+"${_bench_pre[@]}"} bash "${SELFTEST}" --affected-staged --local --jobs auto; then
     echo ""
     echo "❌ Commit bloqueado: self-test das guardas falhou acima. Corrija ou use 'git commit --no-verify' para pular."
     exit 1

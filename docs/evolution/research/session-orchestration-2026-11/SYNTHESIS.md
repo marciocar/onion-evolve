@@ -27,7 +27,7 @@ era dele.
 | Nó | O que vira regra candidata |
 |---|---|
 | `C_SO_TRES_PAPEIS` | Três papéis: orquestrador e construtor, dona da especificação e revisora adversarial, fornecedora de medida e revisora técnica |
-| `C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL` | A CPU compartilhada foi coordenada por lock social declarado, e nada o faz cumprir |
+| `C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL` | A CPU compartilhada foi coordenada por lock social declarado; desde 2026-11-06 a regra de carga é a peça `ops/load-lease.sh` (régua aberta em `D_SO_LIMITES_DERIVADOS_DO_LEASE_1106`) |
 | `C_SO_REVISAO_EM_TRES_CAMADAS` | Desenho, código e processo: o processo reprovou um executor cujo código já tinha passado |
 | `C_SO_REGRA_DO_MEDIDOR` | Instrumento mudou, roda tudo de novo; reclassificar acrescenta, nunca sobrescreve |
 | `C_SO_FRASE_DE_VEREDITO_DO_INSTRUMENTO` | Toda frase de veredito cita o campo que a produz, ou se declara feita à mão |
