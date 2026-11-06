@@ -49,6 +49,39 @@ if [ "${_has_br}" = 0 ] && ! git -C "${TOP}" rev-parse --verify --quiet "${BASE}
   echo "ERRO: base '${BASE}' não resolve para um commit em ${TOP}." >&2; exit 2
 fi
 
+# ── BASE FRESCA: a branch nasce da ponta MAIS NOVA da integração, nunca da ref local defasada ─────────
+# Sinal de campo da curadoria (2026-11-06, PR do update para o pin 4e488f2fef65): a main LOCAL estava atrás da
+# origin, a branch nasceu dela, e o head do PR rodava sem as 67 regras de permissions.deny que já estavam na
+# origin/main — a curadoria leu "67 → 0" como o update apagando o deny. O update não apagou nada; a base é que
+# era velha. Mesma classe que o applied-delta.sh curou em 2026-11-05 (ref local 2 commits atrás).
+# Busca a integração no origin e escolhe, entre o nome dado, o upstream dele e origin/<nome>, a ponta que
+# DESCENDE das outras. Pontas divergentes (a local tem commit que a remota não tem E vice-versa) = rc 2: não há
+# base certa a escolher sem o dono decidir. Só vale para branch NOVA; a retomada segue a branch que existe.
+# Sem rede o fetch falha: segue com o que tem, e diz que a remota NÃO foi buscada.
+# --no-track nos dois `-b` (passada adversarial deste PR): nascer de origin/<base> faria o git gravar origin/<base>
+# como upstream da branch do update, e um `git push` sem argumentos com push.default=upstream iria para a integração.
+START="${BASE}"
+if [ "${_has_br}" = 0 ] && git -C "${TOP}" show-ref --verify --quiet "refs/heads/${BASE}"; then
+  if git -C "${TOP}" remote get-url origin >/dev/null 2>&1; then
+    GIT_TERMINAL_PROMPT=0 git -C "${TOP}" fetch -q origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}" >&2 \
+      || echo "  AVISO: não consegui buscar origin/${BASE} — a base é a melhor ref LOCAL, remota NÃO buscada." >&2
+  fi
+  _cands=("${BASE}")
+  _up="$(git -C "${TOP}" rev-parse --abbrev-ref --symbolic-full-name "${BASE}@{upstream}" 2>/dev/null)" && [ -n "${_up}" ] && _cands+=("${_up}")
+  git -C "${TOP}" rev-parse --verify --quiet "refs/remotes/origin/${BASE}^{commit}" >/dev/null && _cands+=("origin/${BASE}")
+  for _c in "${_cands[@]}"; do
+    [ "${_c}" = "${START}" ] && continue
+    _a="$(git -C "${TOP}" rev-parse "${START}^{commit}")"; _b="$(git -C "${TOP}" rev-parse "${_c}^{commit}")"
+    [ "${_a}" = "${_b}" ] && continue
+    if git -C "${TOP}" merge-base --is-ancestor "${_a}" "${_b}"; then START="${_c}"
+    elif ! git -C "${TOP}" merge-base --is-ancestor "${_b}" "${_a}"; then
+      echo "ERRO: '${START}' e '${_c}' DIVERGEM em ${TOP} — não escolho a base do update por você. Integre as duas (pull/push) e re-rode." >&2
+      exit 2
+    fi
+  done
+  [ "${START}" != "${BASE}" ] && echo "  base fresca: '${BASE}' local estava atrás; a branch nasce de ${START} ($(git -C "${TOP}" rev-parse --short=12 "${START}"))." >&2
+fi
+
 # ── RETOMADA: a branch já está aberta numa worktree? Então é lá, com ou sem farol agora ─────────────
 # Passada adversarial do PR da F1 (D1): 1ª rodada com farol vivo cria a worktree irmã; a outra sessão
 # sai; a retomada (shell novo, WORK não persiste) ia pelo caminho "sem farol", tentava `checkout` da
@@ -83,7 +116,7 @@ if [ "${LIVE}" = 1 ]; then
   elif [ "${_has_br}" = 1 ]; then
     git -C "${TOP}" worktree add -q "${WT}" "${BR}" >&2 || { echo "ERRO: não consegui abrir a worktree de '${BR}' (presa noutra worktree?)." >&2; exit 2; }
   else
-    git -C "${TOP}" worktree add -q -b "${BR}" "${WT}" "${BASE}" >&2 || { echo "ERRO: não consegui criar a worktree de '${BR}'." >&2; exit 2; }
+    git -C "${TOP}" worktree add -q --no-track -b "${BR}" "${WT}" "${START}" >&2 || { echo "ERRO: não consegui criar a worktree de '${BR}'." >&2; exit 2; }
   fi
   [ "${FORCE_WT}" = 1 ] || echo "  farol vivo em ${TOP}: trabalho na worktree ${WT} (branch ${BR}); o checkout do alvo fica intocado." >&2
   _wt_ready "${WT}"
@@ -99,7 +132,7 @@ fi
 _cur="$(git -C "${TOP}" rev-parse --abbrev-ref HEAD 2>/dev/null)"
 if [ "${_cur}" != "${BR}" ]; then
   if [ "${_has_br}" = 1 ]; then git -C "${TOP}" checkout -q "${BR}" >&2
-  else git -C "${TOP}" checkout -q -b "${BR}" "${BASE}" >&2; fi \
+  else git -C "${TOP}" checkout -q --no-track -b "${BR}" "${START}" >&2; fi \
     || { echo "ERRO: checkout de '${BR}' falhou em ${TOP}." >&2; exit 2; }
 fi
 printf '%s\n' "${TOP}"
