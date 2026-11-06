@@ -229,6 +229,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-06: «Como arma a REGRA 118 no kg-ssot e na curadoria, se a linha core do adopter-guard.tsv não pode ser escrita por sessão?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
+  - id: E_ADOPT_ESCREVE_A_LINHA_CORE_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families adopter_guard_core → 8/8 (sucesso, idempotência, mutante morto); git grep adopter-guard.tsv em .claude/utils/adopt e no adopt.md antes da cura: zero escritores"
+    label: "O /meta:adopt passa a escrever a linha core do .claude/adopter-guard.tsv (adopter-guard-core.sh, passo (0.6) da configuração pós-cópia, na adoção e no --update), idempotente e só nessa linha; antes nenhum helper o escrevia."
+    narrative: "Medido em 2026-11-06: o kg-ssot (/home/marcio/onion-kg-ssot) e a curadoria (/home/marcio/onion-curation) têm role: adopted, adopted_from por URL e nenhum adopter-guard.tsv, então o veto de repo alheio estava armado e sem lista. O helper resolve o checkout principal do core pelo git-common-dir (a worktree da fonte some), pula quando a fonte não é o core (hub com carimbo), mantém uma linha core diferente que aponte outro core válido, troca no lugar a que não aponta core nenhum e confere a releitura. A linha impressa vai na seção «Veto de repo alheio» do relatório. Teto: ops/materialize-adopter.sh não chama o helper."
+    provenance:
+      source: ".claude/utils/adopt/adopter-guard-core.sh e run_adopter_guard_core_selftests"
+      locator: ".claude/validation/lint-selftest.sh (família adopter_guard_core)"
+      method: "measurement: bancada da família e leitura dos carimbos dos dois adotantes"
+      locality: "repo"
 edges:
   - from: E_SONDA_27_DE_31_PASSARAM
     to: Q_VETOS_VALEM_NO_ADOTANTE
@@ -275,3 +291,6 @@ edges:
   - from: D_LINHA_CORE_DO_ADOPTER_GUARD_PELO_UPDATE_1106
     to: C_TETO_SO_REPO_REGISTRADO
     edge_type: TRACES_TO
+  - from: E_ADOPT_ESCREVE_A_LINHA_CORE_1106
+    to: D_LINHA_CORE_DO_ADOPTER_GUARD_PELO_UPDATE_1106
+    edge_type: SUPPORTS
