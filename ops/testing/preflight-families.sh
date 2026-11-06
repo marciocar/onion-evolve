@@ -44,4 +44,45 @@ print(",".join(sorted(out)))
     [ -n "${hit}" ] && fams="${fams},${hit}"
   fi
 fi
-printf '%s\n' "${fams}"
+
+# ── A PORTA MINI (2026-11-06, tarefa #31) ────────────────────────────────────────────────────────────
+# POR QUÊ: a família door_mini materializa o onion-mini e roda o door-mini-check (ponteiro morto, allowlist
+# exata). O que a reprova é um arquivo QUE VIAJA ao mini, não uma linha da bancada; por isso o mapa acima nunca
+# a escolhia. Medido: os PRs #1497 (engineer/pr.md passou a citar review-triage.md) e #1501 (o adapter do
+# ClickUp passou a citar a bancada dele) saíram verdes no pré-voo e reprovaram no CI na door_mini (a).
+# A SUPERFÍCIE é DERIVADA do roles.yaml do ÍNDICE (a allowlist, relativa a .claude/, e as fontes dos overlays):
+# arquivo que entrar na allowlist amanhã já nasce coberto. Somam-se só os insumos da própria verificação
+# (o roles.yaml, o resolvedor, o checador, o manifesto e o materializador). Limite declarado: arquivo NOVO
+# fora do mini cujo nome um arquivo do mini já cita (comando, agente) também cria ponteiro morto e não seleciona.
+# Não decidir não vira "não seleciona": roles.yaml presente e resolvedor que falha ⇒ a família entra.
+ROLES_REL=".claude/utils/marketplace/roles.yaml"
+RESOLVER=".claude/utils/marketplace/resolve-role-bundle.sh"
+if git cat-file -e ":${ROLES_REL}" 2>/dev/null && [ -f "${RESOLVER}" ] \
+   && git grep -q --cached -E '^run_door_mini_selftests\(\) \{' -- "${SUT}" 2>/dev/null; then
+  touched="$(git -c core.quotePath=false diff --cached --no-renames --name-only "${BASE}")"
+  if [ -n "${touched}" ]; then
+    _rt="$(mktemp)"; git show ":${ROLES_REL}" > "${_rt}"
+    _al="$(bash "${RESOLVER}" mini --allowlist "${_rt}" 2>/dev/null)"; _al_rc=$?
+    _ov="$(bash "${RESOLVER}" mini --overlays "${_rt}" 2>/dev/null)"; _ov_rc=$?
+    rm -f "${_rt}"
+    if [ "${_al_rc}" != 0 ] || [ "${_ov_rc}" != 0 ] || [ -z "${_al}" ]; then
+      echo "preflight-families: não resolvi a allowlist do mini (rc ${_al_rc}/${_ov_rc}) — door_mini entra" >&2
+      fams="${fams},door_mini"
+    else
+      surf="$( { printf '%s\n' "${_al}" | sed 's#^#.claude/#'; printf '%s\n' "${_ov}" | cut -f2
+                 printf '%s\n' "${ROLES_REL}" "${RESOLVER}" .claude/validation/door-mini-check.sh \
+                   .claude/utils/adopt/vendor-manifest.sh ops/materialize-door.sh; } | sed '/^$/d')"
+      if TOUCHED="${touched}" SURF="${surf}" python3 -c '
+import os, sys
+surf = os.environ["SURF"].split("\n")
+for t in os.environ["TOUCHED"].split("\n"):
+    if t and any(t == s or (s.endswith("/") and t.startswith(s)) for s in surf):
+        sys.exit(0)
+sys.exit(1)'; then
+        fams="${fams},door_mini"
+      fi
+    fi
+  fi
+fi
+# sem repetição (a família pode vir pelos dois caminhos), na ordem em que entrou
+printf '%s\n' "${fams}" | tr ',' '\n' | awk 'NF && !seen[$0]++' | paste -sd, -
