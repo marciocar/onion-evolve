@@ -46692,6 +46692,45 @@ print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
     *)   record_fail "shard-plan: (g) tabela de tempos ilegível" "${_tv} (${_tab})" ;;
   esac
 
+  # (h) O PLANO QUE O CI RODA CABE NO TETO, COM FOLGA (2026-11-06, issue #1488). A faixa 3 foi cancelada aos
+  #     25 min em 4 pushes seguidos à main: tabela velha (89 famílias pela mediana de 1 s) e 4 faixas para uma
+  #     suíte que já pedia ~3800 s de família por faixa. Este caso lê o N e o teto do PRÓPRIO workflow, planeja
+  #     com a tabela versionada e projeta a parede de cada faixa como o runner a mede:
+  #       parede = soma_das_famílias / W + fixtures_total / (N·W) + arranque
+  #     com W=4 workers ("139 famílias em 4 workers"), fixtures_total=3766 s (soma dos ⏱ fixtures das 4 faixas)
+  #     e arranque=130 s (parede − soma/W), todos do run verde 42063417161 de 2026-11-05. O orçamento é 2/3 do
+  #     teto: a variância medida entre dois runs da mesma faixa foi de +22% (20m44s verde, >25 min cancelada),
+  #     e o resto é a folga de crescimento até a próxima re-medição. Reprovou: re-medir a tabela
+  #     (collect-family-times.sh <run>) e, se ainda não couber, somar uma faixa — nunca subir o teto.
+  #     MUTANTE: `selftest-shard-plan.sh 4` no workflow reprova este caso com a tabela de 2026-11-06.
+  local _wf="${ONION_SHARD_WORKFLOW_UNDER_TEST:-${REPO_ROOT}/.github/workflows/onion-selftest.yml}" _pv
+  _pv="$(WF="${_wf}" TAB="${_tab}" SUT="${sut}" ONION_ROOT="${REPO_ROOT}" python3 -c '
+import json, os, re, subprocess
+wf = open(os.environ["WF"], encoding="utf-8").read()
+mn = re.search(r"selftest-shard-plan\.sh (\d+)", wf)
+job = re.search(r"\n  selftest:\n(.*?)\n  [a-z]", wf, re.S)
+mt = re.search(r"\n    timeout-minutes: (\d+)", job.group(1)) if job else None
+if not mn or not mt:
+    print("FALHA não li o N (%s) ou o teto do job selftest (%s) no workflow" % (bool(mn), bool(mt))); raise SystemExit(0)
+n, teto = int(mn.group(1)), int(mt.group(1)) * 60
+W, FIX, ARR = 4, 3766.0, 130.0
+t = {}
+for l in open(os.environ["TAB"], encoding="utf-8"):
+    p = l.rstrip("\n").split("\t")
+    if len(p) == 2 and not p[0].startswith("#"): t[p[0]] = float(p[1])
+med = sorted(t.values())[len(t) // 2]
+e = dict(os.environ); e["ONION_SHARD_TIMES"] = os.environ["TAB"]; e.pop("ONION_SHARD_FAMILIES", None)
+sh = json.loads(subprocess.run(["bash", os.environ["SUT"], str(n)], capture_output=True, text=True, env=e).stdout)
+lanes = [sum(t.get(f, med) for f in s["familias"].split(",") if f != "fixtures") / W + FIX / (n * W) + ARR for s in sh]
+pior, orc = max(lanes), teto * 2 / 3
+msg = "N=%d · pior faixa %.0f s (%.1f min) · orçamento %.0f s (2/3 de %d min)" % (n, pior, pior / 60, orc, teto // 60)
+print(("OK " if len(sh) == n and pior <= orc else "FALHA ") + msg + ("" if len(sh) == n else " · plano com %d faixas" % len(sh)))
+' 2>&1 | tail -1)"
+  case "${_pv}" in
+    OK*) record_pass "shard-plan: (h) o plano do workflow cabe no teto com folga (${_pv#OK })" ;;
+    *)   record_fail "shard-plan: (h) a faixa mais pesada projetada passa do orçamento" "${_pv} (${_wf})" ;;
+  esac
+
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
   #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
   local e; e="$(mktemp -d)"; mkdir -p "$e/ops/testing" "$e/.claude/validation"

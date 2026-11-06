@@ -129,7 +129,7 @@ jobs:
           ONION_SHARD_FAMILIES: ${{ steps.n.outputs.familias }}
         run: |
           set -euo pipefail
-          plano="$(bash ops/testing/selftest-shard-plan.sh 4)"
+          plano="$(bash ops/testing/selftest-shard-plan.sh 5)"
           echo "plano: ${plano}"
           echo "faixas=${plano}" >> "${GITHUB_OUTPUT}"
 
@@ -157,6 +157,18 @@ jobs:
     # cancelamento: a evidência da main mostrou a família `fixtures` com 997 s + 936 s nos 2 workers de UMA
     # faixa — ela inteira cai numa faixa só, qualquer que seja N. Cura: o plano reparte o manifest da
     # `fixtures` entre TODAS as faixas (fixtures_lane i/n). Volta a 4 faixas, teto em 25.
+    # 2026-11-06: A FAIXA 3 ENCOSTOU — cancelada aos 25 min nos 4 pushes à main desde 40fe1629d (issue #1488),
+    # e 24m31s no PR #1490. Duas causas medidas nos logs (runs 42063417161 e 42146679343): (1) a tabela de
+    # tempos do plano era de 2026-10-12: 89 famílias não estavam nela e entravam pela mediana (1 s), somando
+    # 4618 s invisíveis (`selftest_selection` 674 s, `selector_per_file` 380, `stt_service` 372), e
+    # `selftest_lanes` dizia 144 s contra 555 medidos. O LPT empilhou o caro sem saber: as faixas saíram com
+    # 4417/4459/2843/2695 s de
+    # família (1 e 3 a 20m37s e 20m44s no run verde, a 3 cancelada no seguinte). (2) Mesmo rebalanceada, a
+    # suíte pede ~3800 s por faixa em 4: ~18 min projetados, sem folga para a variância medida (+22% entre
+    # dois runs da mesma faixa). Cura pela doutrina, SEM subir o teto: tabela re-medida no runner e 5 faixas
+    # (~15 min projetados). A refutação de 10-05 das "5 faixas" valia com a `fixtures` inteira numa faixa só;
+    # repartida, somar faixa volta a dividir. O caso (h) da `shard_plan` reprova se a faixa mais pesada,
+    # projetada pela tabela versionada no N deste arquivo, passar de 2/3 deste teto.
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
@@ -239,7 +251,7 @@ jobs:
 
   # ── CHECK ESTÁVEL (passo D, 2026-10-13): é ESTE nome que o ruleset do main exige ─────────────────
   # As faixas da matriz se chamam `selftest (N, <famílias>…)` — o nome muda com o plano, e no PR a
-  # matriz tem de 1 a 4 faixas conforme a seleção. Check obrigatório com nome móvel ou nunca casa ou
+  # matriz tem de 1 a N faixas (o N do plano) conforme a seleção. Check obrigatório com nome móvel ou nunca casa ou
   # casa com a faixa errada. `selftest-gate` roda SEMPRE (`if: always()`) e reprova se o plano ou
   # QUALQUER faixa não terminou em `success` — falha, cancelamento, timeout ou matriz que não nasceu.
   # Faixa que o nível PR legitimamente não criou não é faixa pulada: ela não existe na matriz, e o
