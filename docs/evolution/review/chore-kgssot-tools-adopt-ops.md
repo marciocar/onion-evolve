@@ -2,7 +2,7 @@
 branch: chore/kgssot-tools-adopt-ops
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 9282e2fedff15949a5f2400181db9e711def509ed1ab36bd28c18cc75a8dba6c
+reviewed_diff_sha256: 65bb982ecae9b6f7a23af33b2fc1c9fbd8cfdf3e1dd9d74188eab3f5f53f7d81
 reviewed_code_sha256: 8e6148e7dea37cf8f66fbaa02580ec3946849dc008b6748c66098691e935d970
 findings_total: 3
 findings_real: 3
