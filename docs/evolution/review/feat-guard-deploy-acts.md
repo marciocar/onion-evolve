@@ -2,8 +2,7 @@
 branch: feat/guard-deploy-acts
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: 9a5cca12d355051c1a6a3d9542fcf3bc17e0e5743b6aad413e2aad544f53f65c
-reviewed_code_sha256: d664be00bbbbd348b767c4f95035f831a9d1a58f718dba9f4a6f0ba4e1cf7add
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 tokens: 0
