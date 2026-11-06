@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**913 itens abertos** em 146 grafo(s) com aberto (de 187 no escopo) · 147 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**923 itens abertos** em 147 grafo(s) com aberto (de 188 no escopo) · 148 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -644,6 +644,21 @@
 | 4.2 | `D_NAO_MEDIDA_SE_TRATA_COMO_PUBLICA` | relay-public-review-2026-10 | Modo de falha declarado: visibilidade não medida (gh ausente, sem auth, sem rede, repo inacessível, host fora do GitHub) se trat |
 | 3.4 | `C_TETO_LISTA_DE_TERMOS` | relay-public-review-2026-10 | TETO: a lista de termos casa substring sem caixa, só ASCII (acento não se dobra), falha pelo vocabulário e não bloqueia. Ela n |
 | 1.6 | `C_TETO_REGUA_NA_LINHA_1` | relay-public-review-2026-10 | TETO: um --- na linha 1 usado como régua horizontal vira abertura de frontmatter, no carteiro e no check; a marca entra antes do  |
+
+## memory-write-2026-11 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 36.0 | `D_SOFT_PROVENIENCIA_HARD_ENVELOPE` | memory-write-2026-11 | Substrato escolhido pelo censo: hook PreToolUse em Write, Edit, MultiEdit e Bash, molde pretooluse-direct-provider-api.sh (o PreTo |
+| 9.6 | `D_VARREDURA_DO_DISCO_REGRA_116` | memory-write-2026-11 | A metade que não depende do vocabulário do veto: a varredura das notas da memória do projeto pelo mesmo juiz, no SessionStart e |
+| 9.0 | `C_TETO_NAO_E_FRONTEIRA` | memory-write-2026-11 | TETO (peça 7): é lembrete e contenção de cópia verbatim, NÃO fronteira. Conteúdo de fora parafraseado, ou copiado sem envel |
+| 7.2 | `D_HOOK_NO_SETTINGS_DO_PROJETO` | memory-write-2026-11 | O veto e a varredura moram no .claude/settings.json versionado do projeto, que viaja aos adotantes; o ⟨settings.json de usuário |
+| 6.8 | `C_TETO_BASH_PELO_VOCABULARIO` | memory-write-2026-11 | TETO: no Bash só se julga o comando que CITA o caminho de memória (literal, ~, $HOME, ${CLAUDE_CONFIG_DIR}) como DESTINO de uma  |
+| 6.0 | `Q_ELENXO_PENDENTE` | memory-write-2026-11 | A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta. Em 2026-11 |
+| 5.1 | `C_TETO_CAI_COM_O_SETTINGS` | memory-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json; falha ABERTA declarada: sem python3 ou com o juiz quebrado, s |
+| 4.8 | `C_TETO_ESCRITA_FORA_DA_SESSAO` | memory-write-2026-11 | NÃO MEDIDO: se a extração de memória que o Claude Code faz por conta própria em segundo plano passa pelo PreToolUse. Também  |
+| 3.0 | `Q_GATILHO_HARD_POR_PROVENIENCIA` | memory-write-2026-11 | Gatilho nomeado: se o replay futuro medir uma nota de memória com regra plantada por conteúdo lido de fora SEM envelope (o caso  |
+| 2.8 | `C_LATENCIA_MEDIDA` | memory-write-2026-11 | Latência medida em 2026-11-05 nesta VPS (média de 50 chamadas): 10 ms no caminho quente (JSON sem 'memory' e sem autoMemoryDirec |
 
 ## radar-E3-2026-09-04 — 1 item(ns)
 
