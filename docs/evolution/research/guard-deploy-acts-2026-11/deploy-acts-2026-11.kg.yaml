@@ -43,8 +43,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: "2026-11-05"
-    verified_against: "60 comandos únicos do `!` no corpus reexecutados contra os 5 vetos de hoje: 28 vetariam, e os transcritos mostram a saída deles (ex.: `! sudo systemctl restart onion-vps-bridge` em 2026-10-22, CC 2.1.308, com o moat-gate registrado desde 2026-10-13)"
+    verified_at: "2026-11-06"
+    verified_against: "remedido na 2.1.319 em 2026-11-06 (C_TETO_BANG_NA_VERSAO_ATUAL, forma inofensiva: o script recusa o 1º argumento desconhecido); antes, 60 comandos únicos do `!` no corpus reexecutados contra os 5 vetos de hoje: 28 vetariam, e os transcritos mostram a saída deles (ex.: `! sudo systemctl restart onion-vps-bridge` em 2026-10-22, CC 2.1.308, com o moat-gate registrado desde 2026-10-13)"
     trace: ".claude/hooks/pretooluse-moat-gate.sh"
     label: "medido no corpus: o comando que o maestro roda pelo `!` não passa pelos hooks de ferramenta, e por isso é o caminho dele para o ato"
     narrative: "O `!` grava bash-input e bash-stdout no transcrito, sem rastro de hook. Os vetos que o barrariam hoje já estavam registrados na data: o restart da unidade servida, a escrita no .env do bridge pelo sed e o `gh pr merge` de repos alheios rodaram e deixaram saída. Não foi remedido na versão de hoje (2.1.318): medir exige o maestro digitar o `!`, e isso fica no teto."
@@ -187,13 +187,13 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.7
-    verified_at: "2026-11-05"
-    verified_against: "E_BANG_NAO_PASSA_PELOS_HOOKS mede até a 2.1.308; a sessão roda a 2.1.318"
+    verified_at: "2026-11-06"
+    verified_against: "medido na 2.1.319 pelo maestro em 2026-11-06: `! bash ops/update-bridge.sh --probe --restart` rodou o script (recusa do próprio script, «NADA foi feito») sem o moat-gate aparecer; a mesma linha pela sessão sai rc 2 do hook"
     trace: ".claude/hooks/pretooluse-moat-gate.sh"
-    label: "teto: que o `!` não passa pelos hooks foi medido no corpus até a 2.1.308, não na 2.1.318"
+    label: "teto: que o `!` não passa pelos hooks foi medido no corpus até a 2.1.308, não na 2.1.318; fechado em 2026-11-06 pela medida na 2.1.319"
     narrative: "Se uma versão nova passar o `!` pelos hooks, o veto do ato barra o maestro também, e o /meta:cc-update deve remedir. Gatilho: o 1º `! bash ops/<wrapper>.sh --apply` do maestro depois do merge."
   - id: E_DERIVADO_DESARMAVA_O_RELOGIO
     node_type: evidence
