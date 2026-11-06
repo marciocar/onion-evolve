@@ -853,6 +853,27 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: onion-vps-ops
+    name: onion-vps-ops (operação dos serviços da VPS)
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-vps-ops (privado)
+    local_path: /home/marcio/onion-vps-ops
+    onion_version: 6760a7bede50   # pin-integrity-check: pin-ok 6760a7bede50 (2026-11-06, adoção local; a main remota nasce com o PR da adoção)
+    adopted_at: 2026-11-06
+    mode: greenfield
+    personality_summary: "A sessão que OPERA os serviços de ferramenta da VPS e LÊ o resto da máquina (D_SESSAO_OPS_ONION_VPS_OPS_1106). Escritor único dos repos de serviço do Logto, do Vaultwarden, do WAHA e do LibreChat, sempre por branch e PR; mantém o mapa operacional (vps-map.kg.yaml) fresco por medição só leitura; prepara cada mudança com backup, conferência e rollback impresso e entrega o ato ao maestro. Nunca lê segredo, nunca faz deploy sem o ! do maestro, nunca encerra ferramenta de outro dono. O que é do core (bridge, STT, MCPs do core, Caddy, ufw, Docker) ela só lê e sinaliza pelo inbox."
+    specializations: [operacao, infra, vps]
+    personality_last_sync: 2026-11-06
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
