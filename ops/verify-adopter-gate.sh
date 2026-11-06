@@ -35,6 +35,8 @@ REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 # dizendo "não é um repositório git" sobre uma worktree válida. O próprio install-onion-githook.sh,
 # que chama este verificador, já usava a forma correta uma linha acima — as duas pontas discordavam.
 # Classe: a checagem perguntava "o .git é diretório?" quando a pergunta é "isto é um repo git?".
+# o helper do diagnóstico de worktree, resolvido ANTES do `cd` (o BASH_SOURCE pode ser relativo).
+WT_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/adopt/worktree-hooks-ready.sh"
 git -C "${REPO}" rev-parse --git-dir >/dev/null 2>&1 || { echo "✗ '${REPO}' não é um repositório git"; exit 2; }
 cd "$REPO" || exit 2
 
@@ -42,6 +44,9 @@ ok() { printf '  ✓ %s\n' "$*"; }
 no() { printf '  ✗ %s\n' "$*"; }
 info() { printf '  · %s\n' "$*"; }
 FAILED=0
+FOREIGN_HOOK=0      # o pre-commit resolvido não carrega a assinatura (outro gestor) — decide a sonda
+IGNORED_PENDING=0   # há .githooks/ do Onion fora do caminho resolvido — idem
+WT_HINT=""
 
 echo "── gate do Onion em ${REPO}"
 
@@ -57,8 +62,17 @@ else
   if grep -q "Onion pre-commit" "${ABS}/pre-commit" 2>/dev/null; then
     ok "pre-commit em '${DIR}' é o do Onion"
   else
-    no "pre-commit em '${DIR}' NÃO é o do Onion (outro gestor ocupou o caminho — ex.: husky)"
-    FAILED=1
+    # ⚠️ ADIADO, não reprovado — sinal de campo de um adotante, 2026-11-05 (o --update de um monorepo com
+    # husky v9). O `core.hooksPath=.husky/_` aponta para o embrulho do husky (`. "$(dirname "$0")/h"`), que
+    # chama `.husky/pre-commit`, que chama `bash .githooks/pre-commit`: o gate do Onion ENCADEADO. A busca
+    # textual neste arquivo reprovava, e o veredito saía "INERTE OU PARCIAL" logo abaixo de "✓ o hook
+    # EXECUTOU" e "✓ BARRADO — bloqueio provado". É a mesma classe do caso de 2026-09-15 mais abaixo: o
+    # caminho declarado decidindo contra o comportamento observado. Quem decide é a sonda do passo 2.
+    # LIMITE DECLARADO: encadeado, o rc do commit é o da CADEIA. Uma cadeia que faça
+    # `bash .githooks/pre-commit || true` e barre por outro passo daria "bloqueio provado" ao Onion; a sonda
+    # não separa os dois sem mexer no alvo. Não medido em adotante nenhum (a cadeia medida é `sh -e`, que
+    # para no 1º rc≠0); se aparecer, a guarda nasce da recorrência.
+    FOREIGN_HOOK=1
   fi
   [ -x "${ABS}/pre-commit" ] || { no "pre-commit existe mas NÃO é executável"; FAILED=1; }
 fi
@@ -82,9 +96,23 @@ _ONION_HOOKS="${REPO}/.githooks"
 if [ -f "${_ONION_HOOKS}/pre-commit" ] && ! [ "${ABS}" -ef "${_ONION_HOOKS}" ]; then
   if [ -f "${ABS}/pre-commit" ] && cmp -s "${ABS}/pre-commit" "${_ONION_HOOKS}/pre-commit"; then
     printf '  ⚠ %s\n' "hooksPath aponta para '${DIR}', outro diretório com o pre-commit byte-idêntico ao de .githooks/ — o gate é o mesmo agora, mas mudança em .githooks/ desta árvore só vale quando chegar lá. Causa conhecida: o Claude Code grava o caminho absoluto ao criar worktree de agente. Conserto: git config core.hooksPath .githooks"
+  elif [ "${FOREIGN_HOOK}" -eq 1 ]; then
+    # o hook resolvido é de OUTRO gestor: só a sonda diz se ele encadeia o do Onion (adiado, como acima).
+    IGNORED_PENDING=1
   else
     no "há hook do Onion em .githooks/ que o git IGNORA (hooksPath aponta para '${DIR}')"
     FAILED=1
+  fi
+fi
+# ⚠️ WORKTREE SEM O DIRETÓRIO DE HOOKS GERADO (2026-11-05, mesmo update): `.husky/_` é gerado pelo `prepare`
+# do husky e é ignorado pelo git, então uma worktree nova não o tem, e o `core.hooksPath` relativo (no
+# .git/config compartilhado) resolve DENTRO dela para o vazio. O git não roda nada e o gate fica inerte. O
+# conserto antigo ("git config core.hooksPath .githooks") mudaria o config compartilhado e desligaria os gates
+# do husky no checkout principal; o passo certo é gerar o diretório nesta worktree. Diagnóstico, não veredito.
+if [ ! -d "${ABS}" ] && [ -n "${HP}" ] && [ "${HP#/}" = "${HP}" ]; then
+  _main="$(cd "$(git rev-parse --git-common-dir 2>/dev/null)/.." 2>/dev/null && pwd || true)"
+  if [ -n "${_main}" ] && ! [ "${_main}" -ef "${REPO}" ] && [ -d "${_main}/${HP}" ]; then
+    WT_HINT="'${DIR}' existe no checkout principal (${_main}) e NÃO nesta worktree (gerado e ignorado pelo git). Gere-o aqui: bash ${WT_HELPER} ${REPO} (diz o passo exato; nunca symlink para o checkout de outra sessão)"
   fi
 fi
 
@@ -124,6 +152,21 @@ else
   no "o hook NÃO executou — gate INERTE (nenhum sinal do lint no commit)"
   FAILED=1
 fi
+# Resolução adiada: o COMPORTAMENTO decide. Executou → o outro gestor encadeia o Onion (aviso, não ✗).
+# Não executou → as duas acusações de sempre, que agora têm a sonda a favor delas.
+if [ "${FOREIGN_HOOK}" -eq 1 ]; then
+  if [ "${EXECUTOU}" -eq 1 ]; then
+    printf '  ⚠ %s\n' "pre-commit em '${DIR}' é de outro gestor (ex.: husky) e ENCADEIA o do Onion — a sonda o viu executar; a cadeia é do adotante, e quebrá-la desliga o gate"
+  else
+    no "pre-commit em '${DIR}' NÃO é o do Onion (outro gestor ocupou o caminho — ex.: husky) e não o encadeia"
+    FAILED=1
+  fi
+fi
+if [ "${IGNORED_PENDING}" -eq 1 ] && [ "${EXECUTOU}" -eq 0 ]; then
+  no "há hook do Onion em .githooks/ que o git IGNORA (hooksPath aponta para '${DIR}')"
+  FAILED=1
+fi
+[ -n "${WT_HINT}" ] && info "${WT_HINT}"
 
 # ── 3. BLOQUEIO (só afirma o que der para provar) ───────────────────────────────────────
 LINT="${REPO}/.claude/validation/lint-artifacts.sh"
@@ -178,6 +221,11 @@ if [ "$FAILED" -eq 0 ]; then
   exit 0
 fi
 echo "✗ GATE INERTE OU PARCIAL — os pontos com ✗ acima são o que o git realmente faz"
-echo "  conserto usual: git config core.hooksPath .githooks  ·  e reinstalar com"
-echo "  bash .claude/utils/adopt/install-onion-githook.sh (ou /meta:adopt --update)"
+if [ -n "${WT_HINT}" ]; then
+  echo "  conserto: gerar '${DIR}' nesta worktree — bash ${WT_HELPER} ${REPO}"
+else
+  echo "  conserto usual: git config core.hooksPath .githooks (ou encadear 'bash .githooks/pre-commit' no"
+  echo "  gestor que ocupa o caminho)  ·  e reinstalar com"
+  echo "  bash .claude/utils/adopt/install-onion-githook.sh (ou /meta:adopt --update)"
+fi
 exit 1

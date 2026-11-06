@@ -10,6 +10,8 @@
 #   BASE   = de onde a branch nasce (a integração do alvo); ignorada se BRANCH já existe (retomada)
 # stdout: o diretório de trabalho — o próprio TARGET, ou uma WORKTREE dele quando há farol vivo.
 # rc  : 0 pronto · 2 precondição (não-repo, base inexistente, árvore suja, branch presa noutra worktree)
+#       3 worktree aberta, mas sem o diretório de hooks GERADO (`.husky/_`): gate INERTE nela; o stderr diz o
+#         passo (worktree-hooks-ready.sh). Re-rodar depois do passo é retomada e confere de novo.
 #
 # ══ POR QUE EXISTE (F1 das portas, SAC-89, 2026-10-09) ════════════════════════════════════════════
 # Medido no --update de um hub adotante (2026-10): o adopt.md mandava `BR=$INTEGRATION_BRANCH`, o vendor-branch
@@ -26,6 +28,17 @@
 # =============================================================================
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# WORKTREE SEM OS HOOKS GERADOS (sinal de campo de um adotante, 2026-11-05): o husky grava core.hooksPath=.husky/_
+# no config COMPARTILHADO e gera `.husky/_` no prepare, ignorado pelo git; a worktree irmã nasce sem ele e o git não
+# roda hook nenhum, nem o do Onion encadeado. Conferido AQUI, onde a worktree nasce, e não num passo do adopt.md que
+# se pula. --install gera só sem rede (husky já em node_modules/.bin); nunca symlink para o checkout principal.
+_wt_ready() {
+  local _r; _r="$(bash "${HERE}/worktree-hooks-ready.sh" "$1" --install 2>&1)"; local rc=$?
+  [ "${rc}" -eq 3 ] || return 0   # 0 pronto · 4 o hook falta também no principal: o --update o reinstala adiante
+  echo "${_r}" >&2
+  echo "PARE: a worktree ${1} está aberta, mas o gate nela está INERTE — rode o passo acima e re-rode o --update (retomada)." >&2
+  exit 3
+}
 T="${1:-}"; BR="${2:-}"; BASE="${3:-}"; FORCE_WT=0
 case "${4:-}" in --worktree) FORCE_WT=1 ;; "") ;; *) echo "ERRO: 4º argumento desconhecido '${4}' (só --worktree)" >&2; exit 2 ;; esac
 [ -n "${T}" ] && [ -n "${BR}" ] && [ -n "${BASE}" ] || { echo "uso: dedicated-branch.sh <TARGET> <BRANCH> <BASE> [--worktree]" >&2; exit 2; }
@@ -44,6 +57,7 @@ git -C "${TOP}" worktree prune 2>/dev/null || true   # worktree com diretório a
 _existing="$(git -C "${TOP}" worktree list --porcelain | awk -v b="refs/heads/${BR}" '/^worktree /{w=substr($0,10)} $0=="branch " b {print w; exit}')"
 if [ -n "${_existing}" ]; then
   [ "${_existing}" != "${TOP}" ] && echo "  retomada: '${BR}' já está aberta na worktree ${_existing} — trabalho lá." >&2
+  [ "${_existing}" != "${TOP}" ] && _wt_ready "${_existing}"
   printf '%s\n' "${_existing}"
   exit 0
 fi
@@ -72,6 +86,7 @@ if [ "${LIVE}" = 1 ]; then
     git -C "${TOP}" worktree add -q -b "${BR}" "${WT}" "${BASE}" >&2 || { echo "ERRO: não consegui criar a worktree de '${BR}'." >&2; exit 2; }
   fi
   [ "${FORCE_WT}" = 1 ] || echo "  farol vivo em ${TOP}: trabalho na worktree ${WT} (branch ${BR}); o checkout do alvo fica intocado." >&2
+  _wt_ready "${WT}"
   printf '%s\n' "${WT}"
   exit 0
 fi

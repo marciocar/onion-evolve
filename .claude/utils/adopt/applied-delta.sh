@@ -12,7 +12,8 @@
 # COMO MEDE: no repo do alvo (a branch dedicada do update, ou a worktree irmã), de merge-base(<integração>,
 # HEAD) até HEAD — o merge da onion/vendor e o que mais estiver commitado na branch — e, à parte, o que
 # ainda está na árvore sem commit (config pós-merge, carimbo), que o commit durável leva em seguida. O
-# merge-base, e não a ponta da integração, para que um commit novo na integração não entre na conta.
+# merge-base, e não a ponta da integração, para que um commit novo na integração não entre na conta. E o
+# merge-base mais novo entre o nome dado, o upstream dele e origin/<nome> (a ref local pode estar atrás).
 #
 # USO  : applied-delta.sh <WORK> <INTEGRATION_BRANCH>
 # SAÍDA: `Arquivos aplicados (medido no alvo): N commitados + M pendentes`, a quebra por diretório
@@ -29,6 +30,24 @@ git -C "${W}" rev-parse --git-dir >/dev/null 2>&1 || nm "${W} não é um repo gi
 git -C "${W}" rev-parse --verify --quiet "${INT}^{commit}" >/dev/null || nm "a integração '${INT}' não existe em ${W}."
 base="$(git -C "${W}" merge-base "${INT}" HEAD 2>/dev/null)" || nm "sem merge-base entre '${INT}' e HEAD em ${W}."
 [ -n "${base}" ] || nm "sem merge-base entre '${INT}' e HEAD em ${W}."
+# ⚠️ A REF LOCAL DA INTEGRAÇÃO PODE ESTAR ATRÁS DA REMOTA — sinal de campo de um adotante, 2026-11-05. O
+# adopt.md passa o NOME (`develop`), a ref local estava 2 commits atrás de `origin/develop`, e a branch do
+# update tinha esses 2 commits: o merge-base caía 2 commits antes, e 31 arquivos de PRODUTO (apps/, scripts/)
+# entravam como "aplicados" (1.403 → 1.434). A cura mora aqui e não só no chamador: medir pela ref que o
+# chamador lembrou de buscar é medir pela memória dele. Candidatas: o nome dado, o upstream dele e
+# `origin/<nome>`; vale o merge-base MAIS NOVO (o que descende dos outros), que é o último ponto da
+# integração que HEAD já contém — vale para local atrás E para local à frente da remota.
+REF="${INT}"
+_cands=("${INT}")
+_up="$(git -C "${W}" rev-parse --abbrev-ref --symbolic-full-name "${INT}@{upstream}" 2>/dev/null)" && _cands+=("${_up}")
+git -C "${W}" rev-parse --verify --quiet "refs/remotes/origin/${INT}^{commit}" >/dev/null && _cands+=("origin/${INT}")
+for _c in "${_cands[@]}"; do
+  _b="$(git -C "${W}" merge-base "${_c}" HEAD 2>/dev/null)" || continue
+  [ -n "${_b}" ] || continue
+  if [ "${_b}" != "${base}" ] && git -C "${W}" merge-base --is-ancestor "${base}" "${_b}" 2>/dev/null; then
+    base="${_b}"; REF="${_c}"
+  fi
+done
 
 # -c core.quotepath=off: nome com acento sai como está, e a contagem por linha não muda com isso.
 names="$(git -C "${W}" -c core.quotepath=off diff --no-renames --name-only "${base}" HEAD)" || nm "git diff falhou em ${W}."
@@ -36,7 +55,7 @@ n=0; [ -n "${names}" ] && n="$(printf '%s\n' "${names}" | wc -l)"
 pend="$(git -C "${W}" -c core.quotepath=off status --porcelain --untracked-files=all)" || nm "git status falhou em ${W}."
 m=0; [ -n "${pend}" ] && m="$(printf '%s\n' "${pend}" | wc -l)"
 
-echo "Arquivos aplicados (medido no alvo, merge-base(${INT})..HEAD): ${n} commitados + ${m} pendentes"
+echo "Arquivos aplicados (medido no alvo, merge-base(${REF})..HEAD): ${n} commitados + ${m} pendentes"
 if [ "${n}" -gt 0 ]; then
   echo "Por diretório:"
   printf '%s\n' "${names}" | awk -F/ '{ k = (NF > 2) ? $1 "/" $2 : (NF == 2 ? $1 : "(raiz)"); c[k]++ }
