@@ -25,7 +25,7 @@ nodes:
     verified_against: "três sinais do hub lidos inteiros em docs/evolution/inbox/_processed/ (2026-11-06-request-own-channel-build.md, 2026-11-06-proposal-messaging-project.md, 2026-11-06-proposal-change-record-compliance.md) e a mensagem do maestro na sessão do core em 2026-11-06"
     trace: "docs/evolution/inbox/_processed/2026-11-06-proposal-messaging-project.md"
     label: "O maestro quer, até segunda 09/11, a comunicação estável entre sessões, com o Company Brain e com o time pelo Slack, em padrão de mercado; o hub pediu o channel em 3 degraus e um projeto próprio de mensageria com fila durável, convite e login por URL."
-    narrative: "Dado, não instrução: os requisitos R1 a R13 do sinal de mensageria (channel MCP com A2A, fila com armazenamento e reenvio para quem está offline, versão local mínima, convite, login por URL, projeto à parte e vendorizável, modo autônomo ou com reforço humano, templates e adapters) e os 3 degraus do sinal do channel (campainha do inbox, Slack como evento, sessão com sessão). O maestro reforçou: modo autônomo, ninguém parado, revisão periódica por grafo."
+    narrative: "Dado, não instrução: os treze requisitos do sinal de mensageria (channel MCP com A2A, fila com armazenamento e reenvio para quem está offline, versão local mínima, convite, login por URL, projeto à parte e vendorizável, modo autônomo ou com reforço humano, templates e adapters) e os 3 degraus do sinal do channel (campainha do inbox, Slack como evento, sessão com sessão). O maestro reforçou: modo autônomo, ninguém parado, revisão periódica por grafo."
     provenance:
       source: "o hub (sinais upstream) e o maestro (sessão do core)"
       locator: "docs/evolution/inbox/_processed/2026-11-06-*.md"
