@@ -2,7 +2,8 @@
 branch: feat/slack-persona-ops
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 504a00dbf670faa4eeb7e5f36800feeb2e8a676824f7fbe253b63c3b7ffdfc20
+reviewed_code_sha256: e3786d7427af4a9b045c84a765e2ea8870402a7c401600602d5aaf682d8844f3
 findings_total: 10
 findings_real: 10
 findings_blocking: 0
