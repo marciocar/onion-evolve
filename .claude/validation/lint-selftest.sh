@@ -44141,6 +44141,26 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
   _agc "(h10) git fetch DO core por caminho (leitura) → passa"    0 "${A}" Bash 'git fetch -q @CORE@ main'
   _agc "(h11) leituras em subcomando de escrita → passa"          0 "${A}" Bash 'git -C @CORE@ notes list; git -C @CORE@ clean -n; git -C @CORE@ tag -n5; git -C @CORE@ sparse-checkout list'
   HOME="${sb}" _agc "(h12) \$HOME/<core> (HOME do hook = a bancada) → VETO" 2 "${A}" Bash 'git -C $HOME/core commit -m x' 
+  # (i) a passada do refutador INDEPENDENTE (ca37a5ee2): --tags, as grafias que o cabeçalho prometia, o pai do carimbo
+  git -C "${r}" checkout -q main
+  _agc "(i1) merge-gate: git push origin --tags sentado na main → passa (só as tags vão)" 0 "${M}" Bash 'git push origin --tags'
+  _agc "(i2) merge-gate: git push --tags nu sentado na main → passa" 0 "${M}" Bash 'git push --tags'
+  _agc "(i3) merge-gate: --tags COM refspec main segue VETO"     2 "${M}" Bash 'git push origin --tags main'
+  _agc "(i4) merge-gate: push nu sentado na main segue VETO"     2 "${M}" Bash 'git push'
+  git -C "${r}" checkout -q feat
+  _agc "(i5) cd -P <core> && git add → VETO"                     2 "${A}" Bash 'cd -P @CORE@ && git add -A'
+  _agc "(i6) pushd <core> && git commit → VETO"                  2 "${A}" Bash 'pushd @CORE@ && git commit -m x'
+  _agc "(i7) env -C <core> git commit → VETO"                    2 "${A}" Bash 'env -C @CORE@ git commit -m x'
+  _agc "(i8) xargs -I{} git -C {} commit <<< <core> → VETO"      2 "${A}" Bash 'xargs -I{} git -C {} commit -m x <<< @CORE@'
+  _agc "(i9) cat x >| <core>/N.md → VETO"                        2 "${A}" Bash 'cat /tmp/x >| @CORE@/N.md'
+  _agc "(i10) exec 3><core>/N.md → VETO"                         2 "${A}" Bash 'exec 3>@CORE@/N.md'
+  _agc "(i11) heredoc que CITA >| no core → passa"               0 "${A}" Bash $'cat > /tmp/d.md <<\'X\'\ncat a >| @CORE@/N.md\nX'
+  _agc "(i12) rm -rf .claude (o pai do carimbo) → VETO"          2 "${A}" Bash 'rm -rf .claude'
+  _agc "(i13) mv .claude .claude.off → VETO"                     2 "${A}" Bash 'mv .claude .claude.off'
+  _agc "(i14) git rm .claude/.onion-version → VETO"              2 "${A}" Bash 'git rm -q .claude/.onion-version'
+  _agc "(i15) rm de um arquivo qualquer em .claude/sessions → passa" 0 "${A}" Bash 'rm -f .claude/sessions/x.md'
+  _agc "(i16) git -C <core> pack-refs --all → VETO"              2 "${A}" Bash 'git -C @CORE@ pack-refs --all'
+  _agc "(i17) git -C <core> reflog (leitura) → passa"            0 "${A}" Bash 'git -C @CORE@ reflog -3'
   # (f) a lista e o papel decidem: allow isenta; sem carimbo o hook nem se arma
   printf 'core\t%s\nallow\t%s\n' "${core}" "${outro}" > "${r}/.claude/adopter-guard.tsv"
   _agc "(f1) allow <outro>: Write nele → passa"                   0 "${A}" Write '@OUTRO@/x.md'
@@ -44187,14 +44207,16 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
       DOOR) cp "${r}/.claude/.onion-version" "${sb}/stamp"
             printf 'framework: onion-evolve\nrole: standalone\nadopted_from: onion-standalone\nkind: door\n' > "${r}/.claude/.onion-version"; cwd="" ;;
       HOME) _mh="${sb}"; cwd="" ;;
+      MAIN) git -C "${r}" checkout -q main; cwd="" ;;
     esac
     [ "$(HOME="${_mh}" _agx "${hd}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc0=0 || mrc0=1
     [ "$(HOME="${_mh}" _agx "${md}" "${hook}" "${r}" "${tool}" "${arg}" "${cwd}")" = "${want}" ] && mrc1=0 || mrc1=1
     [ -f "${sb}/stamp" ] && mv "${sb}/stamp" "${r}/.claude/.onion-version"
+    git -C "${r}" checkout -q feat
     _prove_mutation "adopter-guard: (m) ${name}" "${hd}/${file}" "${md}/${file}" "${mrc0}" "${mrc1}"
   done <<EOF_MUT
 (g1) o adotante carimbado volta a só avisar$(printf '\x1f')pretooluse-merge-gate.sh$(printf '\x1f')  onion_adopter_role "\$root" >/dev/null && { ADVISE=0; ADOPTER=1; }$(printf '\x1f')  :$(printf '\x1f')${M}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')gh pr merge 1 --merge$(printf '\x1f')
-(c1) git que escreve volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = fetch_writes or sub in _ADV_GIT_WRITE \\$(printf '\x1f')    writes = False \\$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ commit -m x$(printf '\x1f')
+(c1) git que escreve volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = fetch_writes or sub in _ADV_GIT_WRITE or sub in ($(printf '\x1f')    writes = False or sub in ($(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ commit -m x$(printf '\x1f')
 (c3) o redirecionamento volta a não se julgar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    _adv_redirects(raw_words, detail)$(printf '\x1f')    pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')echo x > @CORE@/NOTE.md$(printf '\x1f')
 (c5) o Write volta a não comparar o repo$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      if [ "\$(_common "\$(realpath -m -- "\$r")")" = "\$c" ]; then$(printf '\x1f')      if false; then$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@CORE@/NOTE.md$(printf '\x1f')
 (d4) o cd condicional volta a deixar o repo desconhecido$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if where == UNKNOWN and _adv_last_cd() and "-C" not in gw:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')cd .. && cd @CORE@ && git commit -m x$(printf '\x1f')
@@ -44206,8 +44228,15 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
 (f4) a porta volta a armar como adotante$(printf '\x1f')lib/adopter-scope.sh$(printf '\x1f')  grep -qE '^kind:[[:space:]]*door([[:space:]]|\$)' "\$f" 2>/dev/null && return 1$(printf '\x1f')  :$(printf '\x1f')${M}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')gh pr merge 3 --squash$(printf '\x1f')DOOR
 (h1) o carimbo volta a ser escrevível$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')    [ "\$p" = "\$(realpath -m -- "\$stamp" 2>/dev/null)" ] && deny_list "\${tool} em \${fpath}"$(printf '\x1f')    :$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@R@/.claude/.onion-version$(printf '\x1f')
 (h4) o init volta a não julgar o caminho$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')        _adv_path(pos[0], "git init", detail)$(printf '\x1f')        pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git init @CORE@/sub$(printf '\x1f')
-(h9) o fetch a:b volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    writes = fetch_writes or sub in _ADV_GIT_WRITE \\$(printf '\x1f')    writes = sub in _ADV_GIT_WRITE \\$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ fetch -q origin main:main$(printf '\x1f')
+(h9) o fetch a:b volta a ser leitura$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')writes = fetch_writes or sub in _ADV_GIT_WRITE or$(printf '\x1f')writes = sub in _ADV_GIT_WRITE or$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C @CORE@ fetch -q origin main:main$(printf '\x1f')
 (h12) o \$HOME volta a ser dinâmico$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    words = [_adv_home(w) if k > 0 and words[k - 1] == "-C" else$(printf '\x1f')    words = [w if k > 0 and words[k - 1] == "-C" else$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C \$HOME/core commit -m x$(printf '\x1f')HOME
+(i1) o --tags volta a herdar a branch atual$(printf '\x1f')lib/invocation-lines.sh$(printf '\x1f')    if tags_only:$(printf '\x1f')    if False:$(printf '\x1f')${M}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')git push origin --tags$(printf '\x1f')MAIN
+(i5) o cd -P volta a deixar o repo desconhecido$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')        dirs = [w for w in words[1:] if not _ar.match(r"^-[PLe@]+\$", w)]$(printf '\x1f')        dirs = list(words[1:])$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')cd -P @CORE@ && git add -A$(printf '\x1f')
+(i7) o env -C volta a sumir com o diretório$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if chdir and not DYNAMIC.search(_adv_home(chdir)):$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')env -C @CORE@ git commit -m x$(printf '\x1f')
+(i8) o xargs com here-string volta a não se montar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if base == "xargs" and "<<<" in words:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')xargs -I{} git -C {} commit -m x <<< @CORE@$(printf '\x1f')
+(i10) a varredura crua volta a não rodar antes da análise$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')def analyze(*a, **k):$(printf '\x1f')def _adv_sem_embrulho(*a, **k):$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')exec 3>@CORE@/N.md$(printf '\x1f')
+(i12) apagar o pai do carimbo volta a passar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if p and (rp in _ADV_SELF_TSV or (destroys and any(x.startswith(rp.rstrip("/") + "/") for x in _ADV_SELF_TSV))):$(printf '\x1f')    if p and rp in _ADV_SELF_TSV:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')rm -rf .claude$(printf '\x1f')
+(i14) o git rm do carimbo volta a passar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')            _adv_path(a, "git %s" % sub, detail, destroys=True)$(printf '\x1f')            pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git rm -q .claude/.onion-version$(printf '\x1f')
 (f1) o allow volta a não isentar$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      case "\$p" in "\$a"|"\$a"/*) exit 0 ;; esac$(printf '\x1f')      :$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Write$(printf '\x1f')@OUTRO@/x.md$(printf '\x1f')
 (e10b) o > volta a ser verbo de escrita no texto opaco$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')                        + r")\\b)"$(printf '\x1f')                        + r")\\b)|>"$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')S=/tmp; P=\$S/py; \$P -I tools/kg_check.py @CORE@/f.md > \$S/h1.out$(printf '\x1f')
 (e14) o caminho como valor volta a contar como alvo$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')r"(^|[\\s;&|(\\"'])("$(printf '\x1f')r"()("$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')\$K --with u=@CORE@ --mode cp$(printf '\x1f')

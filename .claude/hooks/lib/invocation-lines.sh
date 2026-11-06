@@ -828,9 +828,13 @@ PUSH_CFG = re.compile(r"^(remote\.[^=]*\.(push|mirror|pushurl|url)|push\.default
                       r"url\.[^=]*\.(pushinsteadof|insteadof))(=|$)", re.I)
 
 
-def push_dsts_without_spec(where, remote, cfg):
+def push_dsts_without_spec(where, remote, cfg, tags_only=False):
     """Destino de um push SEM refspec. O git consulta a config: `remote.<r>.push`/`mirror` e
-    `push.default=upstream|matching` podem mandar a branch para a main (Elenxo, 2ª passada, B8)."""
+    `push.default=upstream|matching` podem mandar a branch para a main (Elenxo, 2ª passada, B8).
+    `tags_only` (`git push [<remoto>] --tags`, 2026-11-06): o git empurra SÓ refs/tags, e a branch atual não vai
+    junto — medido com git 2.43.0 em remoto bare, nos modos simple, current e upstream. A 1ª redação herdava a
+    branch atual e, sentada na main, vetava o push de tags (e no adotante, onde o aviso virou veto, travava).
+    O `matching` não foi medido e segue fechado; o espelho também."""
     base = where or JCWD
     name = remote or "origin"
     def get(key):
@@ -843,6 +847,8 @@ def push_dsts_without_spec(where, remote, cfg):
     mode = (get("push.default") or "simple").lower()
     if mode == "matching":
         return ["main"]
+    if tags_only:
+        return []
     if mode in ("upstream", "tracking") and cur:
         up = get("branch.%s.merge" % cur)
         return [re.sub(r"^refs/heads/", "", up) if up else cur]
@@ -950,7 +956,7 @@ def canonical_git(words, where, env=None):
         elif pushcfg:
             specs = [x for x in pushcfg.split("\n") if x.strip()]
         else:
-            dsts += push_dsts_without_spec(where, remote, cfg)
+            dsts += push_dsts_without_spec(where, remote, cfg, tags_only="--tags" in flags)
     branch = None
     for s in specs:
         if s == "__ALL__" or s == ":":
