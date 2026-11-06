@@ -31,7 +31,7 @@ nodes:
     verified_against: "sonda de um adotante: 31 formas de ato contra os 5 hooks com o cwd no repo dele; reproduzida no adotante de bancada montado por ops/materialize-adopter.sh, com os hooks da main 40fe1629d"
     trace: ".claude/hooks/pretooluse-merge-gate.sh"
     label: "medido: 27 de 31 formas de ato passaram no adotante; merge digitado e push na main viravam aviso, git -C <core> commit, redirecionamento no core e Write/Edit no core passavam calados"
-    narrative: "Reproduzido aqui: B1 a B7 (push na main, merge digitado, merge pela API) saíam como aviso do merge-gate; B8, B9, B26 e as escritas com Write e Edit no core e em outro adotante saíam com exit 0 e nenhum hook. O merge-gate avisava por falta de ops/pr-merge-verified.sh no projeto, o moat-gate sai cedo sem ops/moat-targets.tsv, e nenhum veto tinha Write ou Edit no matcher. O host não protege a main dos adotantes: a proteção de branch dá 403 no plano gratuito."
+    narrative: "Reproduzido aqui: as sete primeiras formas da sonda (push na main, merge digitado, merge pela API) saíam como aviso do merge-gate; o commit e o redirecionamento no core, o push em outro adotante e as escritas com Write e Edit no core e em outro adotante saíam com exit 0 e nenhum hook. O merge-gate avisava por falta de ops/pr-merge-verified.sh no projeto, o moat-gate sai cedo sem ops/moat-targets.tsv, e nenhum veto tinha Write ou Edit no matcher. O host não protege a main dos adotantes: a proteção de branch dá 403 no plano gratuito."
     provenance:
       source: "sonda de hooks de um adotante, 2026-11-05, tabela fora da árvore; reprodução no adotante de bancada"
       locator: "formas B1-B27, W1-W3, R1"
@@ -105,7 +105,7 @@ nodes:
     verified_at: "2026-11-05"
     verified_against: "fronteira do lib (script em arquivo não se lê) e casos e2/e3 da família"
     trace: ".claude/hooks/lib/adopter-judge.py"
-    label: "TETO: script em arquivo não se lê (é por essa fronteira que o co-relay e o merge verificado passam); código de outra linguagem embutido (-c/-e) fecha pela forma de escrita (open com w/a/x, write_text, rmtree…) ou pelo verbo de escrita do git citado junto do repo; gh escrevendo no remoto alheio fica fora"
+    label: "TETO: script em arquivo não se lê (por essa fronteira passam o co-relay e o merge verificado); código embutido (-c/-e) fecha pela forma de escrita ou pelo verbo de escrita do git junto do repo; gh no remoto alheio fica fora"
     narrative: "Um script próprio do adotante que escreve no core passa. A cura disso seria ler o script, como o moat-judge faz para alvos servidos, e o custo é julgar todo bash x.sh da sessão."
   - id: C_TETO_SO_REPO_REGISTRADO
     node_type: claim
