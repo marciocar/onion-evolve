@@ -1,0 +1,1771 @@
+# kg-backlog-guard: on
+meta:
+  id: persona-runtime-2026-11
+  schema_version: "1"
+  baseline: "2026-11-06"
+  review_after: "2026-12-06"   # 30d: o tipo DOMINANTE é FERRAMENTA/PREÇO. O Claude Tag está em beta público,
+                               # o piso do Agent SDK (onFailure 'block' >= 0.3.317) e os limites do Slack mudam por release;
+                               # o mercado (90d) é secundário aqui. A revisita real é o selo do maestro.
+  # ═══ TETO: 92 NÓS ═══
+  # Justificativa do teto: modo decisão exige 1 nó por objeção sobrevivente (41) e 1 por superação achada (24),
+  # mais 1 pergunta, 1 decisão, 5 opções, 16 evidências confirmadas, mercado e lacunas (90 nós escritos).
+external_edges:
+  - from: D_PERSONA_RUNTIME_2026_11
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_RUNTIME_PESQUISAR_ANTES_1104"
+    edge_type: TRACES_TO
+  - from: D_PERSONA_RUNTIME_2026_11
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_EXIT2_NOT_SECURITY_BOUNDARY_TEXT_EXFIL
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION
+    to: "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml#E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_BWRAP_DOCKER_FAIL_ON_THIS_VPS
+    to: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT"
+    edge_type: TRACES_TO
+  - from: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#E_DEGRAU2_EM_PRODUCAO_1016"
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: SUPPORTS
+  - from: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    to: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#C_OPCAO_5_NARROW_CREDENTIAL_BROKER"
+    edge_type: DEPENDS_ON
+  - from: E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM
+    to: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml#C_SUPERACAO_20261105_RFC8693_ACT_CLAIM"
+    edge_type: TRACES_TO
+  - from: E_MERCADO_PERSONA_RUNTIME_1106
+    to: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml#E_MERCADO_MAESTRO_PERSONA_1105"
+    edge_type: SUPPORTS
+  - from: E_SDK_MCP_OUTSIDE_BOUNDARY_MODEL
+    to: "docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml#C_TETO_MCP"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_PERSONA_RUNTIME_2026_11
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "Qual runtime deve servir a persona de serviço do Company Brain de um adotante: A bot próprio no Agent SDK (bridge + kg_mcp), B o assistente nativo do chat (Claude Tag no Slack) ou C um bot de mercado de terceiro?"
+    narrative: "Requisitos já decididos (D_MA_ARCH e D_MA_RUNTIME_PESQUISAR_ANTES_1104, no grafo company-brain-multiaudiencia-2026-10): identidade de serviço própria que age em nome da empresa e nunca como o maestro (on-behalf-of, claim act do RFC 8693); atendimento por menção no chat corporativo; triagem dos canais conectados (e-mail, chat, task manager) em card, resposta ou pergunta ao maestro; piloto em modo rascunho aprovado pelo maestro; escada de autonomia por tipo de ato; sem dependência de serviço externo além de ponte opcional com alternativa local nomeada; vetos determinísticos (hooks com exit 2) valendo no runtime; custo e operação numa VPS compartilhada. Critérios de comparação: vetos e escada, identidade e auditoria, leitura do KG, custo, lock-in, operação, segurança (isolamento e segredos) e maturidade. Fica open: o selo é do maestro."
+    trace: "docs/evolution/research/persona-runtime-2026-11/SYNTHESIS.md"
+  - id: D_PERSONA_RUNTIME_2026_11
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "Runtime da persona de serviço: A bot próprio no Agent SDK/bridge · B-hospedado Claude Tag · B-self-hosted · C bot de mercado · A+ponte B. O Elenxo recomenda A como núcleo, com B só como ponte nomeada (A+ponte B), sob 7 condições. O maestro sela."
+    narrative: "RECOMENDAÇÃO DO ELENXO (INTEIRA; afirmação de UM agente, sem votação): Recomendo a opção A: bot próprio no Agent SDK, hospedado no onion-bridge, com o kg_mcp como ferramenta fora da fronteira do agente. É a única opção em que o veto do adotante roda no runtime. A primária de hooks do SDK diz que os hooks de shell do .claude/settings.json carregam pelo settingSources padrão e que o PreToolUse pode devolver deny, ask ou defer. B não documenta hook do adotante. Em B, a variante self-hosted perde os conectores ('Claude can't use the connectors an admin adds'), então não cumpre ao mesmo tempo 'núcleo local' e 'triagem dos canais conectados'. B também é incompatível com ZDR, CMEK e HIPAA e guarda transcrições sem retenção automática. C sai pela classe Drift: o vendor concentra tokens de muitos clientes, e um bot fora do Marketplace fica limitado a 1 req/min e 15 objetos. A recomendação vale só sob estas condições, tiradas das objeções que sobreviveram: 1. **Veto que não falha aberto (bloqueia).** Subir o SDK do bridge de 0.3.303 para 0.3.317 ou mais e armar os vetos com onFailure:'block'. Antes de declarar o veto, provar com um mutante: um callback que lança precisa bloquear a ferramenta. Sem isso, 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow'. 2. **Exit 2 não é fronteira de segurança.** Vale D_EXIT2_COUPLING_WORDING_2026_11, e a exfiltração pelo texto da resposta não passa por tool call. O post no Slack deve ser uma ferramenta própria atrás de deny/ask, e o modo rascunho com aprovação do maestro é o controle real do piloto. 3. **Um app Slack interno por adotante, nunca um app distribuído pelo core.** Só o app interno escapa do Tier 1 em conversations.history e conversations.replies. 4. **Isolamento pelo degrau 2 já em produção.** Usar o runner com DynamicUser, ProtectHome e IPAddressDeny. Não usar bwrap nem Docker nesta VPS: o bwrap falha por apparmor_restrict_unprivileged_userns, e o Docker fura o ufw. 5. **Credenciais fora da fronteira.** Slack, e-mail e task manager entram por ferramenta ou broker fora da fronteira (opção 5 do grafo chat-agent-isolation), porque o bridge já teve um .env lido por um convidado. 6. **Identidade.** O bot token do Slack é a identidade de serviço. Declarar como lacuna aberta que o claim act do RFC 8693 só existe se o operador rodar um emissor de token exchange, sobre a raiz de confiança A2A do bridge. Nenhuma das três opções o entrega hoje. 7. **Corrigir a matriz antes de levar ao maestro.** B TEM identidade de serviço em canais (a refutação estava errada e foi reinstalada pela primária). A auditoria de B é parcial porque não registra quem pediu cada ato e deixa de fora o tráfego git e MCP. O 'só desconexão e remoção de escopo' do achado 8 está errado. A escada de B é parcialmente expressável por host, caminho e método no Agent Proxy. B fica como ponte opcional nomeada, só para um adotante não regulado e com A como alternativa local, configurada assim: - DMs desligadas, porque no DM o Claude Tag roda na conta de quem enviou; - 'Respond automatically' desligado; - 'Restrict to your organization' ligado; - busca limitada aos canais em que o Claude está; - credenciais só em canais privados. ESTADO: open. Duas condições têm triagem 'bloqueia' (E_OBJECAO_SDK_HOOKS_FAIL_OPEN_BELOW_0_3_317 e E_OBJECAO_REINSTATE_TAG_SERVICE_ACCOUNTS): a 1ª é condição futura não medida no bridge; a 2ª corrige a matriz. A versão 0.3.303 do SDK do bridge vem do relato da tarefa #3 desta sessão, não remedida por este escritor."
+    trace: "workflow onion-research em modo decision, 2026-11-06; origem: D_MA_RUNTIME_PESQUISAR_ANTES_1104"
+  - id: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta fora da fronteira e um app Slack INTERNO por adotante"
+    narrative: "É a recomendação do Elenxo como núcleo. Vantagens medidas por primária: hooks de shell do .claude/settings.json valem no SDK pelo settingSources padrão; PreToolUse devolve deny/ask/defer; MCP ou ferramenta custom fora da fronteira é o modelo da Anthropic para segredos (E_SDK_MCP_OUTSIDE_BOUNDARY_MODEL); app interno isento do corte de rate limit (E_SLACK_INTERNAL_APPS_EXEMPT_RATE_LIMIT). Limites: veto falha aberto abaixo do SDK 0.3.317 sem onFailure:'block'; exit 2 não é fronteira (exfiltração por texto); o bridge já vazou .env para convidado; nenhum STS emite claim act hoje."
+    trace: "opção nomeada da rodada onion-research em modo decision, 2026-11-06"
+  - id: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.35
+    label: "B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthropic sem retenção automática no beta"
+    narrative: "Forte em segredos (credenciais injetadas pelo Agent Proxy, egress default-deny) e TEM identidade de serviço em canais (reinstalada pela primária). Fraco no requisito de veto (nenhum hook do adotante documentado; escada só por host/caminho/método e allow rules do auto mode), em conformidade (indisponível com ZDR, CMEK e HIPAA), em retenção (sem retenção automática no beta) e em auditoria por ato (não registra quem pediu). Memória de canal público é lida por todos os canais do workspace."
+    trace: "opção nomeada da rodada onion-research em modo decision, 2026-11-06"
+  - id: C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.25
+    label: "B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali"
+    narrative: "Variante desdobrada pelo Elenxo (E_OBJECAO_B_TWO_VARIANTS_OPPOSITE_TRADEOFFS). Runtime local, mas 'Claude can't use the connectors an admin adds in those sessions': perde a triagem de e-mail e task manager. Não se mediu se um MCP stdio local (kg_mcp) é aceito no runner self-hosted: hipótese, não entrega."
+    trace: "opção nomeada da rodada onion-research em modo decision, 2026-11-06"
+  - id: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e não há hook do adotante"
+    narrative: "Sai pela classe Drift (Salesloft, ago/2025: tokens OAuth e refresh tokens roubados do bot de terceiro) e pela concentração multi-cliente de tokens. Fora do Marketplace, conversations.history e conversations.replies ficam em 1 req/min e 15 objetos. Não há hook do adotante e a correção de falha depende do vendor. Fica open e não refuted: as objeções LIMITAM, não matam por evidência."
+    trace: "opção nomeada da rodada onion-research em modo decision, 2026-11-06"
+  - id: C_OPCAO_A_PLUS_B_BRIDGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa local"
+    narrative: "Forma final da recomendação do Elenxo. A ponte B só com: DMs desligadas (no DM o Claude Tag roda na conta de quem enviou); 'Respond automatically' desligado; 'Restrict to your organization' ligado; busca limitada aos canais em que o Claude está; credenciais só em canais privados. Cumpre a doutrina D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027: serviço externo como ponte opcional com alternativa local nomeada."
+    trace: "opção nomeada da rodada onion-research em modo decision, 2026-11-06"
+  - id: E_CLAUDE_TAG_CREDENTIALS_OUTSIDE_SANDBOX
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "https://claude.com/docs/claude-tag/concepts/security-and-data.md (votos 3-0)"
+    source_tier: 9
+    source_kind: "primary"
+    label: "No Claude Tag as credenciais ficam fora do sandbox: cada thread roda em sandbox efêmero sem credenciais, e o Agent Proxy as injeta na requisição, com egress default-deny. O ambiente hospedado é da Anthropic."
+    narrative: "Claim votada 3-0. O adjetivo 'isolamento forte' do texto original foi limitado pelo Elenxo: o isolamento é das credenciais, não do conhecimento (E_OBJECAO_TAG_ISOLATION_IS_CREDENTIALS_NOT_KNOWLEDGE)."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "seções Credential storage e Agent Proxy"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_NO_ZDR_CMEK_HIPAA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "https://claude.com/docs/claude-tag/concepts/security-and-data.md (votos 3-0)"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Claude Tag está em beta público, retém memória de canal e transcrições e é indisponível para organizações com ZDR, CMEK ou HIPAA: limite de maturidade e conformidade para adotante regulado."
+    narrative: "Confere palavra por palavra segundo o Elenxo; data-lifecycle confirma que adotar ZDR depois do pareamento faz o Claude parar de responder."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "trecho 'Claude Tag isn't available to organizations with Zero Data Retention (ZDR) enabled'"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_SDK_MCP_OUTSIDE_BOUNDARY_MODEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "https://code.claude.com/docs/en/agent-sdk/secure-deployment (votos 3-0)"
+    source_tier: 9
+    source_kind: "primary"
+    label: "No Agent SDK, acesso autenticado a serviços pode ser dado por MCP server ou ferramenta custom que roda fora da fronteira do agente; é o modelo para o kg_mcp e o adapter do task manager no bot próprio."
+    narrative: "É modelo, não medida no bridge. O Elenxo confirmou a seção 'Custom tools': 'The agent never sees the credentials.'"
+    trace: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
+      locator: "seção Custom tools"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_SLACK_INTERNAL_APPS_EXEMPT_RATE_LIMIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq (votos 3-0)"
+    valid_from: "2025-05-29"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Apps internos construídos pelo cliente (o bot próprio da opção A) não são afetados pelo corte de rate limit e mantêm cerca de 50+ req/min e 1.000 objetos por chamada em conversations.history e replies."
+    narrative: "A isenção só vale se o bot for app INTERNO de cada adotante (E_OBJECAO_INTERNAL_APP_PER_ADOPTER_ONLY). A URL redireciona (302) para docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps."
+    trace: "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq"
+    provenance:
+      source: "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq"
+      locator: "trecho 'Internal customer-built applications are not impacted by these changes'"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_CUSTOM_MCP_REMOTE_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "https://claude.com/docs/claude-tag/admins/connections/custom.md (votos 3-0)"
+    source_tier: 9
+    source_kind: "primary"
+    label: "No Claude Tag hospedado, um MCP customizado precisa ser endpoint remoto por URL; MCP local via stdio não conecta. O kg_mcp só seria lido pelo B hospedado se exposto como endpoint de internet."
+    narrative: "O Elenxo limitou a disjunção: há o ambiente self-hosted, em que o kg_mcp não precisaria ir à internet, mas sem os conectores do admin (E_OBJECAO_SELF_HOSTED_PATH_FOR_KG_MCP)."
+    trace: "https://claude.com/docs/claude-tag/admins/connections/custom.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/connections/custom.md"
+      locator: "seção de MCP customizado"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_SECRETS_AT_EDGE_RUNTIME_ANTHROPIC
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "https://claude.com/docs/claude-tag/admins/connections/custom.md (votos 3-0)"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Na opção B hospedada, o agente roda em sandbox da Anthropic e as credenciais são injetadas na borda pelo Agent Proxy; nem modelo nem sandbox guardam segredos, mas o runtime não é do adotante."
+    narrative: "Vale para o ambiente hospedado; o self-hosted inverte o trade-off (E_OBJECAO_B_TWO_VARIANTS_OPPOSITE_TRADEOFFS)."
+    trace: "https://claude.com/docs/claude-tag/admins/connections/custom.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/connections/custom.md"
+      locator: "seção de credenciais do conector custom"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_DATA_ANTHROPIC_SIDE_NO_RETENTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "https://claude.com/docs/claude-tag/concepts/data-lifecycle (votos 3-0)"
+    valid_from: "2026-11"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Claude Tag guarda transcrições, memória, rotinas e credenciais do lado da Anthropic; no beta não há retenção automática e a retenção da organização não vale para transcrições nem memória."
+    narrative: "Conflita com o requisito de núcleo local sem dependência de serviço externo. Apagar mensagem no Slack não remove do transcript (Elenxo)."
+    trace: "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+      locator: "trecho 'During the beta there is no automatic retention period for Claude Tag data'"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_AUDIT_PARTIAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "https://claude.com/docs/claude-tag/concepts/data-lifecycle (votos 2-1)"
+    valid_from: "2026-11"
+    source_tier: 9
+    source_kind: "primary"
+    label: "A auditoria do Claude Tag é parcial: transcrições só pela Compliance API no Enterprise, a API não apaga sessões e exclusões no Slack não são registradas. O 'só desconexão e remoção de escopo' foi corrigido."
+    narrative: "Texto votado: 'Só desconexão de workspace e remoção de escopo entram no audit log da Compliance API'. O Elenxo contrariou o 'só' com restrict-access.md e audit.md (E_OBJECAO_TAG_AUDIT_GAP_IS_WHO_ASKED): a lacuna real é não registrar quem pediu cada ato e deixar git e MCP fora."
+    trace: "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+      locator: "seção de Compliance API e exclusão"
+      method: "judges: votação 2-1 do run"
+      locality: "web"
+  - id: E_SALESLOFT_DRIFT_BREACH_2025_08
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack (votos 3-0)"
+    valid_from: "2025-08-08"
+    source_tier: 7
+    source_kind: "primary"
+    label: "Em agosto de 2025 a Salesloft sofreu violação de cadeia de suprimentos pela integração do chatbot Drift, com acesso não autorizado entre 8 e 18 de agosto de 2025."
+    narrative: "Fato de incidente, sem inferência acima da fonte."
+    trace: "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack"
+    provenance:
+      source: "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack"
+      locator: "corpo do alerta"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_DRIFT_OAUTH_TOKENS_STOLEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-06"
+    verified_against: "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack (votos 3-0)"
+    valid_from: "2025-08"
+    source_tier: 7
+    source_kind: "primary"
+    label: "Atacantes roubaram tokens OAuth e refresh tokens do bot de terceiro e se passaram pelo app Drift, contornando a MFA: o risco de C é a credencial delegada que o bot guarda nas integrações do cliente."
+    narrative: "O Elenxo limitou a lição: o que distingue C é a CONCENTRAÇÃO de tokens de muitos clientes, não o fato de guardar credencial, que A também faz (E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION)."
+    trace: "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack"
+    provenance:
+      source: "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack"
+      locator: "descrição do vetor"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_RFC8693_DELEGATION_NEEDS_ACTOR_TOKEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/ (votos 3-0)"
+    valid_from: "2020-01"
+    source_tier: 5
+    source_kind: "engineer"
+    label: "No RFC 8693, delegação (agente com identidade própria em nome do usuário) exige actor_token além do subject_token; sem ele o agente vira o próprio usuário (impersonation)."
+    narrative: "Sustenta o requisito 'nunca como o maestro'. Confere com o corpus primário C_SUPERACAO_20261105_RFC8693_ACT_CLAIM (§1.1 e §4.1)."
+    trace: "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/"
+    provenance:
+      source: "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/"
+      locator: "exemplo trabalhado de token exchange"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_RFC8693_ACT_CLAIM_CURRENT_ACTOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/ (votos 3-0)"
+    valid_from: "2020-01"
+    source_tier: 5
+    source_kind: "engineer"
+    label: "O claim act do JWT expressa a delegação: usuário em sub e agente em act.sub. Decisões olham só o ator atual; act aninhados são informativos, trilha de auditoria e não política."
+    narrative: "Confere com RFC 8693 §4.1. O Elenxo objeta que nenhuma das três opções emite esse token pronto (E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM)."
+    trace: "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/"
+    provenance:
+      source: "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/"
+      locator: "seção sobre o claim act"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_PROMPTARMOR_LLM_CANNOT_SEPARATE_INSTRUCTIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection (votos 2-1)"
+    valid_from: "2024-08"
+    source_tier: 5
+    source_kind: "vendor-on-competitor"
+    label: "A causa raiz da exfiltração no Slack AI é que o LLM não distingue instruções do desenvolvedor do resto do contexto; conteúdo ingerido pode comandar o assistente, e veto fora do modelo é necessário."
+    narrative: "vendor-on-competitor, sempre suspeito. O Elenxo limita: no caso PromptArmor a exfiltração saiu pelo texto da resposta, sem tool call, e PreToolUse não a vê (E_OBJECAO_EXIT2_NOT_SECURITY_BOUNDARY_TEXT_EXFIL)."
+    trace: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+    provenance:
+      source: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+      locator: "seção de causa raiz"
+      method: "judges: votação 2-1 do run"
+      locality: "web"
+  - id: E_PUBLIC_CHANNEL_BUNDLE_ACCESS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "https://jp.tenable.com/blog/claude-tag-slack-access-model (votos 3-0)"
+    valid_from: "2026-06-23"
+    source_tier: 5
+    source_kind: "vendor-on-competitor"
+    label: "No Claude Tag, num canal público um bundle de credenciais dá o seu acesso a quem entrar no canal; credenciais elevadas devem ficar em canais privados. É risco de escopo por canal que o piloto trata."
+    narrative: "Corroborado pela primária tier 9 segundo o Elenxo: 'Keep the channel private. Access on a public channel reaches anyone who joins' (security-and-data.md)."
+    trace: "https://jp.tenable.com/blog/claude-tag-slack-access-model"
+    provenance:
+      source: "https://jp.tenable.com/blog/claude-tag-slack-access-model"
+      locator: "seção sobre canais públicos"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_BETA_LAUNCH_2026_06_23
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/ (votos 3-0)"
+    valid_from: "2026-06-23"
+    source_tier: 5
+    source_kind: "analyst"
+    label: "O Claude Tag, da Anthropic, foi lançado em beta em 2026-06-23 no Slack, como funcionário virtual que executa tarefas em etapas nos canais da organização."
+    narrative: "Todas as primárias lidas pelo Elenxo ainda trazem 'Claude Tag is in public beta' em 2026-11-06."
+    trace: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+    provenance:
+      source: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+      locator: "abertura da matéria"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CLAUDE_TAG_ADMIN_SCOPE_SPEND_NOT_VETO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/ (votos 3-0)"
+    valid_from: "2026-06-23"
+    source_tier: 5
+    source_kind: "analyst"
+    label: "Admins do Slack definem ferramentas, informações e memórias que o Claude Tag acessa, com limite de gasto por canal e organização: controle de escopo e custo, não veto determinístico por exit 2."
+    narrative: "Parcialmente contrariado pelo Elenxo: o Agent Proxy é determinístico por host, caminho e método, e há aprovação de ferramenta por membros; o que se sustenta é a ausência de hook com código do adotante (E_OBJECAO_TAG_HAS_PARTIAL_DETERMINISTIC_LADDER)."
+    trace: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+    provenance:
+      source: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+      locator: "trecho sobre controles do admin"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_MERCADO_PERSONA_RUNTIME_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "síntese de mercado da rodada sobre Fortune (analista, tier 5, 3-0) e FINRA (tier 7, 3-0); sem rodada, M&A ou relatório de analista encontrado"
+    source_tier: 5
+    source_kind: "synthesis"
+    label: "MERCADO: sinal só de produto, sem rodada nem M&A. A plataforma (Anthropic e Slack) ocupa o espaço da persona de serviço no chat, o que pressiona C mais que A; o caso Drift marca bot de terceiro como vetor de cadeia de suprimentos."
+    narrative: "Sintetizador: a Anthropic lançou o Claude Tag em beta em 2026-06-23 no Slack como 'funcionário virtual' com limites de gasto por canal e organização (Fortune). Risco: violação Salesloft/Drift (FINRA, ago/2025). Regulatório do Slack: desde 2025-05-29 apps comerciais têm termos e limites novos; apps internos ficam preservados. Sem sinal de rodadas, M&A ou relatório de analista (Gartner, Forrester) sobre bots de serviço com KG no chat corporativo, o que confirma E_MERCADO_MAESTRO_PERSONA_1105 (aresta no topo). Lacuna de preço por assento de B não fechada."
+    trace: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+    provenance:
+      source: "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+      locator: "matéria de lançamento; complementada pelo alerta FINRA da Salesloft/Drift"
+      method: "judges: síntese de mercado da rodada"
+      locality: "web"
+  - id: E_OBJECAO_TAG_ISOLATION_IS_CREDENTIALS_NOT_KNOWLEDGE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md, lido pelo Elenxo em 2026-11-06: 'Isolating a credential doesn't isolate what Claude knows. The workspace notes it saves from a public channel are read by sessions in every channel of the workspace'; também 'Git may still be able to clone public repositories that an admin didn't grant' e 'Allow-all egress is a `*` domain'."
+    label: "OBJEÇÃO (Achado 1): no Claude Tag o isolamento é das credenciais, não do conhecimento: a memória salva de canal público é lida por sessões de todos os canais, e 'isolamento forte' afirma mais que a página."
+    narrative: "Alvo: Achado 1: credenciais fora do sandbox, 'isolamento forte'. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Superação procurada e não achada (classe nenhuma): só existe 'Channels Claude can search' (restrict-access.md, l.208), que limita a busca e não a memória."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E2_PROVA_MENOS da objeção ao alvo 'Achado 1: credenciais fora do sandbox, 'isolamento forte''"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_INTERNAL_APP_PER_ADOPTER_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "docs.slack.dev/changelog/2025/05/29, lido pelo Elenxo: 'Internal customer-built applications are not impacted by these changes' e 'limited to 1 request per minute, unless they are approved for the Slack Marketplace', com 'limit ... reduced to 15 objects'."
+    label: "OBJEÇÃO (Achado 4): a isenção de rate limit só vale para app Slack INTERNO de cada adotante; um app único distribuído pelo core fora do Marketplace cai em 1 req/min e 15 objetos e quebra a triagem de A."
+    narrative: "Alvo: Achado 4: apps internos fora do corte de rate limit. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Sem terceira via (app distribuído isento sem Marketplace). A restrição de empacotamento (manifesto do core, app interno por adotante) faz parte do veredito, não é superação medida."
+    trace: "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+    provenance:
+      source: "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+      locator: "critério E2_PROVA_MENOS da objeção ao alvo 'Achado 4: apps internos fora do corte de rate limit'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SELF_HOSTED_PATH_FOR_KG_MCP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'Sessions in a self-hosted environment run on runners inside your network, and Claude can't use the connectors an admin adds in those sessions.' code.claude.com/docs/en/self-hosted-environments não foi lido: não se mediu se um MCP stdio local é aceito no runner."
+    label: "OBJEÇÃO (Achado 5): 'só se exposto na internet' é falso como disjunção completa: há o ambiente self-hosted na rede do adotante, ao custo de perder os conectores do admin. A página de self-hosted é primário citado, não lido."
+    narrative: "Alvo: Achado 5: MCP custom só remoto; kg_mcp só se exposto na internet. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação procurada e não achada: self-hosted com kg_mcp local é hipótese, não entrega."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Achado 5: MCP custom só remoto; kg_mcp só se exposto na internet'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_B_TWO_VARIANTS_OPPOSITE_TRADEOFFS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'In an Anthropic-hosted environment, requests leave that sandbox through Agent Proxy' e 'Sessions in a self-hosted environment run on runners inside your network'."
+    label: "OBJEÇÃO (Achado 6): B não é um bloco só. Hospedado: segredos isolados, runtime da Anthropic. Self-hosted: runtime do adotante, sem Agent Proxy nem conectores. Nenhuma variante entrega as duas coisas."
+    narrative: "Alvo: Achado 6: B tem segredos na borda, mas o runtime não é do adotante. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. O que se oferece é desdobrar a matriz em B-hospedado e B-self-hosted, feito neste grafo; não há superação."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Achado 6: B tem segredos na borda, mas o runtime não é do adotante'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_TAG_AUDIT_GAP_IS_WHO_ASKED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "restrict-access.md, 'Audit channel manager activity': 'Role channel assignments ... Credential changes ... Configure page changes'; audit.md: 'Network events: An hourly JSON export of the outbound requests Claude made through Agent Proxy', 'actions appear under the service account', 'There is no per-action log of every task and who asked', 'Git and MCP traffic are not included'."
+    label: "OBJEÇÃO (Achado 8): o 'só' é contrariado por primária: há log de admin e export de rede por hora. A lacuna real é não haver log por ato de quem pediu, e o tráfego git e MCP (onde estaria o kg_mcp) fica fora."
+    narrative: "Alvo: Achado 8: auditoria parcial, 'só desconexão e remoção de escopo'. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS."
+    trace: "https://claude.com/docs/claude-tag/admins/audit.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/audit.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Achado 8: auditoria parcial, 'só desconexão e remoção de escopo''"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "Corpus: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO ('Um convidado leu o .env de produção do bridge pelo fluxo real do Agent SDK'); o degrau 2 está em produção (E_DEGRAU2_EM_PRODUCAO_1016), mas o broker de credencial para Slack e task manager não foi medido para a persona."
+    label: "OBJEÇÃO (Achado 10): guardar token OAuth de longa vida não separa C de A; o hospedeiro de A já vazou .env para um convidado. O que distingue C é a CONCENTRAÇÃO de tokens de muitos clientes, e A exige broker estreito."
+    narrative: "Alvo: Achado 10: o risco de C é a credencial delegada guardada pelo bot. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Superação procurada e não achada: reformular como concentração multi-cliente e exigir de A o broker estreito (opção 5 de chat-agent-isolation), não medido."
+    trace: "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml"
+      locator: "critério E2_PROVA_MENOS da objeção ao alvo 'Achado 10: o risco de C é a credencial delegada guardada pelo bot'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'service credentials of its own'; corpus: C_SUPERACAO_20261105_RFC8693_ACT_CLAIM e E_OBO_DRAFT_SEPARATES_ACTOR (draft expirado) são doutrina; nenhum nó mede um STS emitindo act para a persona."
+    label: "OBJEÇÃO (Achado 12): nenhuma das três opções emite token com claim act pronto. O Claude Tag usa credencial de serviço (bot token, não JWT com act) e o Agent SDK não traz STS; o requisito exige um emissor do operador."
+    narrative: "Alvo: Achado 12: claim act; decisões olham só o ator atual. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação procurada e não achada: STS no bridge (jwks/ e trust root A2A) com sub=empresa e act.sub=persona é condição futura."
+    trace: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Achado 12: claim act; decisões olham só o ator atual'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_EXIT2_NOT_SECURITY_BOUNDARY_TEXT_EXFIL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "agent-sdk/hooks, lido pelo Elenxo: 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow' e a linha 'MessageDisplay | No | Yes' (só TypeScript); corpus D_EXIT2_COUPLING_WORDING_2026_11 (exit 2 é conformidade, não fronteira)."
+    label: "OBJEÇÃO (Achado 13): o exit 2 prova menos que parece: no caso PromptArmor a exfiltração saiu pelo TEXTO da resposta, sem tool call, e PreToolUse não dispara. O controle real é o rascunho aprovado e o post como ferramenta."
+    narrative: "Alvo: Achado 13: veto determinístico fora do modelo é necessário. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Superação procurada e não achada: post no Slack como ferramenta própria atrás de deny/ask com onFailure:'block' exige TS SDK >= 0.3.317; o bridge está em 0.3.303 (tarefa #3 da sessão), não medido na persona."
+    trace: "https://code.claude.com/docs/en/agent-sdk/hooks"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-sdk/hooks"
+      locator: "critério E2_PROVA_MENOS da objeção ao alvo 'Achado 13: veto determinístico fora do modelo é necessário'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_TAG_HAS_PARTIAL_DETERMINISTIC_LADDER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'one host, one path prefix, or read-only methods' e 'On the Enterprise plan, an admin can require the user's review of every result before it posts'; restrict-access.md l.200: 'A guest can't approve a tool or permission request'. personal-connectors.md é primário citado, não lido pelo Elenxo."
+    label: "OBJEÇÃO (Achado 16): o Agent Proxy é determinístico (host, prefixo de caminho, métodos só leitura) e há aprovação de ferramenta por membros; falta hook com código do adotante, e a revisão antes do post só vale para conector pessoal."
+    narrative: "Alvo: Achado 16: admin controla escopo e gasto, não veto determinístico. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação procurada e não achada: a revisão por resultado vale só para conector pessoal (identidade do usuário) e não entrega o rascunho da persona de serviço."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Achado 16: admin controla escopo e gasto, não veto determinístico'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REINSTATE_TAG_SERVICE_ACCOUNTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'In channels, Claude acts under service credentials of its own, not under the account of the person who tagged it ... attributable to its own service accounts'; audit.md: 'In channels, Claude acts as itself unless a task uses a member's personal connectors'."
+    label: "OBJEÇÃO (bloqueia): a refutação estava errada; a primária CONFIRMA que em canais o Claude Tag age sob credenciais de serviço próprias. Sem isso a matriz registra B sem identidade de serviço, o que é falso."
+    narrative: "Alvo: Descartado (refutada, tier 9): em canais o Claude age sob service accounts próprias. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: bloqueia. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Descartado (refutada, tier 9): em canais o Claude age sob service accounts própr'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REINSTATE_NON_MARKETPLACE_RATE_LIMIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "docs.slack.dev/changelog/2025/05/29: 'will be limited to 1 request per minute, unless they are approved for the Slack Marketplace' e 'limit parameter has been reduced to 15 objects'; 'effective immediately for applications created on or after May 29, 2025'."
+    label: "OBJEÇÃO: a primária CONFIRMA o limite de 1 req/min e 15 objetos para app comercial fora do Marketplace; a refutação é incoerente, porque o achado 4 vem da mesma página."
+    narrative: "Alvo: Descartado (refutada, tier 9): apps fora do Marketplace em 1 req/min e 15 objetos. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT."
+    trace: "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+    provenance:
+      source: "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Descartado (refutada, tier 9): apps fora do Marketplace em 1 req/min e 15 objeto'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REINSTATE_CONNECTOR_METHOD_PATH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'You can narrow the credential further, to one host, one path prefix, or read-only methods'; nenhuma página lida documenta hook do adotante."
+    label: "OBJEÇÃO: o núcleo factual é confirmado (credencial restrita a host, prefixo de caminho e métodos só leitura); 'sem rascunho' cabe só como ressalva, pela revisão de conector pessoal no Enterprise. A refutação derrubou demais."
+    narrative: "Alvo: Descartado (refutada, tier 9): credenciais por host, método e caminho; sem hooks nem rascunho. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Descartado (refutada, tier 9): credenciais por host, método e caminho; sem hooks'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REINSTATE_TAG_OWN_IDENTITY_BUNDLES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'Connect a dedicated identity you control for each service, such as a claude@yourcompany.example.com seat'."
+    label: "OBJEÇÃO: a refutação contradiz a página oficial: o Claude Tag age com identidade dedicada que o admin controla por serviço, o mesmo fato do descarte tier 9."
+    narrative: "Alvo: Descartado (refutada, tier 6): o Claude Tag age com identidade própria via access bundles. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Descartado (refutada, tier 6): o Claude Tag age com identidade própria via acces'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REINSTATE_SHARED_CHANNEL_CREDENTIAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'A connector's credential belongs to that agent identity and is shared by everyone in the channels where it applies'; conector pessoal 'runs with that user's permissions and is recorded under their name'."
+    label: "OBJEÇÃO: confirmado em essência que a credencial do conector é compartilhada por todos no canal; conector pessoal mapeia o usuário, mas é impersonação e não delegação com act. 'Não é OBO com act' se mantém."
+    narrative: "Alvo: Descartado (refutada, tier 6): credencial compartilhada por canal; não é OBO com act. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Descartado (refutada, tier 6): credencial compartilhada por canal; não é OBO com'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_NO_ADOPTER_HOOK_IN_TAG
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "WebFetch de security-and-data.md, audit.md, restrict-access.md e data-lifecycle.md em 2026-11-06: nenhuma menciona hook do adotante; grep de 'hook' em restrict-access.md = 0 ocorrências relevantes."
+    label: "OBJEÇÃO: nenhuma das quatro primárias lidas do Claude Tag descreve hook do adotante, e a refutação não trouxe fonte; o controle real é escopo, mais método e caminho no proxy."
+    narrative: "Alvo: Descartado (refutada, tier 6): controle de escrita por escopo, sem hooks. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: não há página do Claude Tag que documente hooks."
+    trace: "https://claude.com/docs/claude-tag/admins/restrict-access.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/restrict-access.md"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Descartado (refutada, tier 6): controle de escrita por escopo, sem hooks'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SLACK_AI_EXFIL_IS_RISK_CLASS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "PromptArmor: título e cenário de chave de API em canal privado; nas quatro páginas do Claude Tag lidas só há a frase de projeto 'Claude is designed to take direction from the connector's owner', declaração e não medida."
+    label: "OBJEÇÃO: o relato PromptArmor (ago/2024) sustenta o cenário e a refutação não trouxe contra-evidência; mas é sobre o Slack AI, não o Claude Tag: pesa como classe de risco para todo runtime, não como medida de B."
+    narrative: "Alvo: Descartado (refutada, tier 5): injeção indireta no Slack AI exfiltra canais privados. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: não há medida equivalente contra o Claude Tag."
+    trace: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+    provenance:
+      source: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Descartado (refutada, tier 5): injeção indireta no Slack AI exfiltra canais priv'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REINSTATE_SERVICE_IDENTITY_NOT_OAUTH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md, seção Service accounts."
+    label: "OBJEÇÃO: confirmado pela primária ('not under the account of the person who tagged it'); é a mesma refutação errada dos descartes tier 9 e 6."
+    narrative: "Alvo: Descartado (refutada, tier 5): identidade de serviço, não delegação OAuth por usuário. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Descartado (refutada, tier 5): identidade de serviço, não delegação OAuth por us'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_ANY_WORKSPACE_MEMBER_INVOKES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md, Member access: 'By default, anyone in a connected Slack workspace can invoke Claude in channels, with or without a Claude account'; restrict-access.md l.21."
+    label: "OBJEÇÃO: por padrão qualquer pessoa num workspace Slack conectado invoca o Claude em canais, com ou sem conta Claude; pesa contra B no atendimento por menção, porque quem não é da organização também aciona."
+    narrative: "Alvo: Cortada: credencial compartilhada; por padrão qualquer membro do workspace invoca. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: credencial compartilhada; por padrão qualquer membro do workspace invoc'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SELF_HOSTED_LOSES_ADMIN_CONNECTORS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'Claude can't use the connectors an admin adds in those sessions.'"
+    label: "OBJEÇÃO: confirmado palavra por palavra que no self-hosted o Claude não usa os conectores do admin; é decisivo: a alternativa local de B perde a triagem dos canais conectados."
+    narrative: "Alvo: Cortada: em self-hosted o Claude não usa os conectores do admin. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: em self-hosted o Claude não usa os conectores do admin'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_BWRAP_DOCKER_FAIL_ON_THIS_VPS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT (re-medido no vivo em 2026-10-20): 'hoje o bwrap FALHA na VPS por apparmor_restrict_unprivileged_userns=1', 'docker é equivalente a root e esta VPS tem Docker furando o ufw', sandbox nativo 'vira fail-open em silêncio'; secure-deployment confirma o leque ('Same-host kernel', 'No TLS inspection')."
+    label: "OBJEÇÃO: o 'viável numa VPS compartilhada' é contrariado pelo corpus PARA ESTA VPS: o bwrap falha por apparmor_restrict_unprivileged_userns=1 e o Docker fura o ufw; prescrever sandbox-runtime dá agente sem sandbox, em silêncio."
+    narrative: "Alvo: Cortada: isolamento por sandbox-runtime/bwrap ou Docker viável numa VPS compartilhada. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2."
+    trace: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+      locator: "critério E1_EVIDENCIA_CONTRARIA da objeção ao alvo 'Cortada: isolamento por sandbox-runtime/bwrap ou Docker viável numa VPS comparti'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SDK_HOOKS_FAIL_OPEN_BELOW_0_3_317
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "agent-sdk/hooks, lido pelo Elenxo em 2026-11-06: 'shell command hooks from settings files when the corresponding settingSources ... entry is enabled, which it is for default query() options'; 'permissionDecision: deny|ask|defer'; 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow'; 'Requires TypeScript Agent SDK v0.3.317 or later'."
+    label: "OBJEÇÃO (bloqueia): os hooks de shell do .claude/settings.json VALEM no SDK pelo settingSources padrão, mas um PreToolUse que estoura deixa a ferramenta passar; fail-closed exige onFailure:'block' (TS SDK >= 0.3.317)."
+    narrative: "Alvo: Cortada: o Agent SDK não mencionaria hooks exit 2 fora do Claude Code. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: bloqueia. Superação procurada e não achada: subir o SDK do bridge para >= 0.3.317 e armar os vetos com onFailure:'block', provado por mutante, é condição futura; o bridge está em 0.3.303 (relato da tarefa #3 da sessão)."
+    trace: "https://code.claude.com/docs/en/agent-sdk/hooks"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-sdk/hooks"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: o Agent SDK não mencionaria hooks exit 2 fora do Claude Code'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_PROXY_ALLOWLIST_STILL_EXFILTRATES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "secure-deployment: 'You can set up this proxy to enforce domain allowlists, inject credentials, and log all traffic' e 'Within your proxy's allowlist, the agent can send data to any allowed domain.'"
+    label: "OBJEÇÃO: confirmado pela primária: o proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envia dados a qualquer domínio permitido."
+    narrative: "Alvo: Cortada: proxy fora da fronteira dá auditoria central; dentro da allowlist o agente exfiltra. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL."
+    trace: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: proxy fora da fronteira dá auditoria central; dentro da allowlist o age'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_DELEGATED_AUDIT_SUB_ACT_CLIENT_UNVERIFIED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "fonte securityboulevard 2026/08 cortada por orçamento, sem claim de refutação; o corpus tem C_SUPERACAO_20261105_RFC8693_ACT_CLAIM só sobre §1.1 e §4.1."
+    label: "OBJEÇÃO: cortada sem refutação e é critério direto da linha identidade e auditoria; plausível (RFC 8693 exige autenticação de cliente conforme o RFC 6749), mas não verificada. RFC 8693 §2.1: primário citado, não lido."
+    narrative: "Alvo: Cortada: auditoria de agente delegado registra sub, act.sub e client_id. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: ler RFC 8693 §2.1 como primária."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: auditoria de agente delegado registra sub, act.sub e client_id'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_REVOCATION_OWN_TOKEN_UNVERIFIED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "cortada por orçamento, sem votos de refutação; nenhum nó do corpus mede revogação do token da persona."
+    label: "OBJEÇÃO: cortada sem refutação; relevante para a escada (rebaixar um degrau exige revogar o token da persona). Não verificada; RFC 7009 é primário citado, não lido."
+    narrative: "Alvo: Cortada: revogar a sessão do usuário não derruba o token do agente. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação não procurada nesta passada."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: revogar a sessão do usuário não derruba o token do agente'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_RFC8693_DOES_NOT_DISCRIMINATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "cortada por orçamento, sem refutação; o efeito está em E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM."
+    label: "OBJEÇÃO: a meta-claim é verdadeira e útil: a evidência de identidade é critério, não medida de opção; nas primárias do Claude Tag a identidade é service account, sem token exchange."
+    narrative: "Alvo: Cortada: o artigo RFC 8693 não discrimina entre A, B e C. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: fonte que meça act num dos três runtimes."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: o artigo RFC 8693 não discrimina entre A, B e C'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SLACK_INTENTIONAL_VENDOR_FIX_LOCKIN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "cortada por orçamento; fonte PromptArmor do achado 13, não relida nesta passada."
+    label: "OBJEÇÃO: cortada sem refutação; é sinal de lock-in em B e C (a correção depende do vendor). Não relida."
+    narrative: "Alvo: Cortada: o Slack classificou o comportamento como intencional. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: releitura do relato PromptArmor."
+    trace: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+    provenance:
+      source: "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: o Slack classificou o comportamento como intencional'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_PUBLIC_CHANNELS_INJECTION_SURFACE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "restrict-access.md l.208 (padrão 'All public channels'): 'By default, workspace search covers public channels across the workspace, including ones Claude hasn't been added to'; 'workspace notes it saves from a public channel are read by sessions in every channel'."
+    label: "OBJEÇÃO: reforçada por primária do Claude Tag: a busca padrão cobre todos os canais públicos, inclusive os em que o Claude não está, e a memória de canal público é lida em todos; a superfície de injeção de B é o workspace."
+    narrative: "Alvo: Cortada: canal público é pesquisável por todos e qualquer membro planta injeção. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE."
+    trace: "https://claude.com/docs/claude-tag/admins/restrict-access.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/restrict-access.md"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: canal público é pesquisável por todos e qualquer membro planta injeção'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CITATIONS_MAY_OMIT_MALICIOUS_MSG
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "data-lifecycle lido pelo Elenxo; a claim original não foi verificada."
+    label: "OBJEÇÃO: cortada sem refutação; afeta a auditoria. O transcript guarda 'what Claude retrieved while working', mas só pela Compliance API no Enterprise, então não vale para todo adotante."
+    narrative: "Alvo: Cortada: a citação de fontes pode omitir a mensagem maliciosa. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: transcript completo como trilha só no Enterprise."
+    trace: "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: a citação de fontes pode omitir a mensagem maliciosa'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SLACK_STORAGE_TERMS_MARKETPLACE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.35
+    verified_at: "2026-11-06"
+    verified_against: "cortada por orçamento; changelog de 2025-05-29 lido, termos não relidos."
+    label: "OBJEÇÃO: mesma família da primária de rate limit confirmada; pesa contra C fora do Marketplace e condiciona A ao app interno. API Terms do Slack: primário citado, não lido."
+    narrative: "Alvo: Cortada: o Slack restringe armazenamento por terceiros; Marketplace é o canal comercial. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: ler o texto dos API Terms do Slack."
+    trace: "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+    provenance:
+      source: "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: o Slack restringe armazenamento por terceiros; Marketplace é o canal co'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_REALTIME_SEARCH_API_STATE_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.25
+    verified_at: "2026-11-06"
+    verified_against: "cortada por orçamento; exige busca externa atual."
+    label: "OBJEÇÃO: cortada sem refutação; o estado da Real-time Search API do Slack em 2026-11 não foi medido, e a claim é datada pela página antiga."
+    narrative: "Alvo: Cortada: a Real-time Search API em beta limitado. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação não buscada."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: a Real-time Search API em beta limitado'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_TAG_DM_RUNS_AS_SENDER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "security-and-data.md: 'One-to-one DMs with @Claude from a member who has connected a Claude account run on that member's own claude.ai account instead'; restrict-access.md l.302 ('Allow direct messages')."
+    label: "OBJEÇÃO: confirmado: DM 1:1 com o Claude roda na conta claude.ai do membro; se o maestro mandar DM a persona age como ele, violando 'nunca como o maestro', a menos que o Owner desligue DMs (ligado por padrão)."
+    narrative: "Alvo: Cortada: no DM o Claude Tag roda com a conta claude.ai de quem enviou. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_B_DISABLE_DMS."
+    trace: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: no DM o Claude Tag roda com a conta claude.ai de quem enviou'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_TAG_ROADMAP_FEATURES_UNDELIVERED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "fonte jp.tenable.com cortada por orçamento; release notes atuais do Claude Tag não lidas."
+    label: "OBJEÇÃO: sinal de maturidade de B cortado sem refutação e sem verificação contra o changelog atual; todas as páginas lidas ainda dizem 'public beta'."
+    narrative: "Alvo: Cortada: JIT credential grants e identity-aware overlay ainda não entregues. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: limite. Superação procurada e não achada: release notes atuais."
+    trace: "https://jp.tenable.com/blog/claude-tag-slack-access-model"
+    provenance:
+      source: "https://jp.tenable.com/blog/claude-tag-slack-access-model"
+      locator: "critério E3_DESCARTE_SEM_MEDIDA da objeção ao alvo 'Cortada: JIT credential grants e identity-aware overlay ainda não entregues'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_TAG_AUDIT_PAGE_READ
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "audit.md: 'There is no per-action log of every task and who asked'."
+    label: "OBJEÇÃO: a página de auditoria, lida agora, muda o achado 8: quatro trilhas (Activity com Network events por hora, memória, atribuição por ato, logs do serviço) e nenhum log por ato de quem pediu."
+    narrative: "Alvo: Fonte não lida: claude.com/docs/claude-tag/admins/audit.md. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_AUDIT_PAGE_READ."
+    trace: "https://claude.com/docs/claude-tag/admins/audit.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/audit.md"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: claude.com/docs/claude-tag/admins/audit.md'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_TAG_RESPONDS_WITHOUT_MENTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "restrict-access.md: 'Claude may also respond to a message that doesn't mention it' quando 'it judges a reply is warranted'; audit log de channel manager; aprovação de ferramenta negada a convidados."
+    label: "OBJEÇÃO: restrict-access, lida agora: qualquer um no canal endereça o Claude e 'Respond automatically' (ligado por padrão) responde sem menção, contra o requisito 'atendimento por menção'."
+    narrative: "Alvo: Fonte não lida: claude.com/docs/claude-tag/admins/restrict-access.md. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação ACHADA (classe entrega): C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ."
+    trace: "https://claude.com/docs/claude-tag/admins/restrict-access.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/restrict-access.md"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: claude.com/docs/claude-tag/admins/restrict-access.md'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SLACK_ADMIN_SCOPES_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run com answersGap sobre os escopos Slack do app Claude."
+    label: "OBJEÇÃO: a página dos escopos OAuth do app Slack do Claude, que a linha de segurança de B precisa, é primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: claude.com/docs/claude-tag/admins/for-slack-admins.md. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não procurada: ler a página."
+    trace: "https://claude.com/docs/claude-tag/admins/for-slack-admins.md"
+    provenance:
+      source: "https://claude.com/docs/claude-tag/admins/for-slack-admins.md"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: claude.com/docs/claude-tag/admins/for-slack-admins.md'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CLAUDE_CODE_IN_SLACK_VARIANT_MISSING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run sobre Claude Code in Slack."
+    label: "OBJEÇÃO: o Claude Code no Slack é uma variante de B distinta do Claude Tag, e a matriz não a considera; a página é primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: code.claude.com/docs/en/slack. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não procurada: ler a página."
+    trace: "https://code.claude.com/docs/en/slack"
+    provenance:
+      source: "https://code.claude.com/docs/en/slack"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: code.claude.com/docs/en/slack'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SLACK_CONNECTOR_MCP_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run sobre o conector Slack."
+    label: "OBJEÇÃO: o conector Slack (MCP) que A poderia usar no lugar da Web API direta não foi lido; primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: claude.com/docs/connectors/slack/index. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não procurada: ler a página."
+    trace: "https://claude.com/docs/connectors/slack/index"
+    provenance:
+      source: "https://claude.com/docs/connectors/slack/index"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: claude.com/docs/connectors/slack/index'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_TAG_PRICING_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run sobre custo por assento de B; restrict-access.md só cita '$50 of usage' e limites de gasto."
+    label: "OBJEÇÃO: a lacuna de custo por assento ou uso de B não foi fechada; só há 'spend limits' por canal e '$50 of usage' para DMs sem conta. Página de produto: primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: claude.com/claude-in-slack. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não buscada: página de preço do Claude Tag."
+    trace: "https://claude.com/claude-in-slack"
+    provenance:
+      source: "https://claude.com/claude-in-slack"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: claude.com/claude-in-slack'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_EMAIL_AUDIT_TRAIL_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run sobre auditoria do e-mail triado."
+    label: "OBJEÇÃO: a trilha de auditoria da triagem de e-mail, um dos três canais do requisito, não tem claim; a página de log events do Gmail é primário citado, não lido."
+    narrative: "Alvo: Fonte não lida: knowledge.workspace.google.com, gmail log events. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não procurada: ler a página."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: knowledge.workspace.google.com, gmail log events'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_MULTIHOP_DELEGATION_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run sobre delegação multi-hop."
+    label: "OBJEÇÃO: act aninhado (persona, subagente, kg_mcp) é exatamente a cadeia de A, e a fonte de delegação multi-hop não foi lida."
+    narrative: "Alvo: Fonte não lida: workos.com, delegação OAuth multi-hop. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não procurada: ler a página."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: workos.com, delegação OAuth multi-hop'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_ARCADE_HYBRID_B_C_MISSING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "nenhuma claim do run sobre o Arcade."
+    label: "OBJEÇÃO: um vendor de mercado (C) que se acopla ao Claude Tag é variante híbrida B+C fora da matriz; a fonte não foi lida."
+    narrative: "Alvo: Fonte não lida: arcade.dev, agente Slack com o Claude Tag. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Superação não procurada: ler a página."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "critério E4_LACUNA_ABERTA da objeção ao alvo 'Fonte não lida: arcade.dev, agente Slack com o Claude Tag'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_LACUNAS_PERSONA_RUNTIME_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "contabilidade do motor na rodada: 9 refutadas, 0 não verificadas, 42 fontes e 40 claims cortadas por orçamento, 0 recusas, 24 superações achadas; objeções contadas sobre a lista recebida (50, 41 sobreviventes)"
+    label: "LACUNAS: 9 refutadas (8 por comodismo segundo o Elenxo), 0 não verificadas, 42 fontes e 40 claims cortadas; 41 objeções sobreviventes de 50, 41 modeladas; 0 recusas do motor; 24 superações (9 aqui, 15 nas objeções)."
+    narrative: "REFUTADAS NA VOTAÇÃO (9; todas com superação achada registrada AQUI, em nó C_SUPERACAO_20261106_): (1) em canais o Claude Tag age sob service accounts próprias (tier 9); (2) no Agent SDK o agente nunca vê o segredo por proxy externo (tier 9; refutação LEGÍTIMA segundo o Elenxo: o proxy é recomendação, não padrão); (3) apps fora do Marketplace em 1 req/min e 15 objetos (tier 9); (4) credenciais do conector custom por host, método e caminho, sem hooks nem rascunho (tier 9); (5) identidade própria por access bundles (Tenable, tier 6); (6) credencial compartilhada por canal, não OBO com act (Tenable, tier 6); (7) controle de escrita por escopo, sem hooks (Tenable, tier 6); (8) injeção indireta no Slack AI exfiltra canais privados (PromptArmor, tier 5); (9) identidade de serviço e não delegação OAuth por usuário (jp.tenable, tier 5). NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 42 fontes e 40 claims; a lista individual não chegou a este escritor; 15 claims cortadas reaparecem nas objeções 'Cortada:' e 10 fontes nas objeções 'Fonte não lida:'. OBJEÇÕES: 50 no total, 41 sobreviventes, TODAS modeladas (N=41, M=41, nenhuma de fora); 9 não sobreviveram: achados 2 (ZDR/CMEK/HIPAA), 3 (MCP fora da fronteira), 7 (retenção), 9 (Drift), 11 (actor_token), 14 (canal público), 15 (data do beta), o descarte tier 9 do proxy do Agent SDK (refutação legítima) e a fonte dev.to (superada por primárias). RECUSADAS PELO MOTOR: 0. Triagem 'bloqueia': 2 (SDK hooks fail-open abaixo de 0.3.317; service accounts do Claude Tag). LACUNAS ABERTAS: STS emitindo claim act para a persona; SDK do bridge em >= 0.3.317 com onFailure:'block' provado por mutante; broker estreito de credencial para Slack, e-mail e task manager; MCP stdio no runner self-hosted do Claude Tag; escopos OAuth do app Slack do Claude; Claude Code no Slack; conector Slack MCP; preço de B; auditoria do Gmail; delegação multi-hop; híbrido Arcade; Real-time Search API; revogação do token da persona; API Terms do Slack. LIMITES: citações vieram por WebFetch mediado por modelo; a versão 0.3.303 do SDK do bridge é relato da tarefa #3 da sessão; textos de 5 superações chegaram cortados pelo motor e estão marcados no próprio nó."
+    trace: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js@a9f3f8b0d, modo decision, rodada de 2026-11-06"
+      locator: "seções Confirmadas, Não verificadas/refutadas, Reprovações recusadas e Superações"
+      method: "judges: contabilidade da rodada"
+      locality: "repo"
+  - id: C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No Claude Tag, em canais e group DMs o Claude age por padrão sob identidades de serviço próprias; duas exceções: conector pessoal aprovado pelo solicitante roda em nome dele, e DM 1:1 roda como o usuário."
+    narrative: "Formulação corrigida: o Claude app no Slack, o Claude GitHub App e uma service account por conector; ações nos logs de cada ferramenta sob essas contas; o sandbox não recebe credenciais, que o Agent Proxy injeta. Conector pessoal no canal fica registrado em nome do solicitante, sem chave da organização para desligar isso. DMs 1:1 rodam como o usuário, e o Ow NOTA DO ESCRITOR: o texto chegou cortado pelo motor no fim; não foi completado de memória. Medida: WebFetch em 2026-11-06 de security-and-data.md, agent-identity.md ('Acts as: Its own service accounts | You') e personal-connectors.md ('There is no setting that turns personal connectors in channels off for an organization'). Critério: V2_CONTRADITA. Alvo reprovado: claim tier 9 de service accounts em canais. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/personal-connectors.md e citar 'Attribution: Claude records what it does under your name.' e 'There is no setting that turns personal connectors in channels off for an organization.'; corroborar em https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+  - id: C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No Agent SDK a Anthropic RECOMENDA, para implantação endurecida, fronteira de isolamento e credenciais por proxy fora dela; montado, o agente não vê o segredo mas usa e envia dados à allowlist; por padrão lê ANTHROPIC_API_KEY do ambiente."
+    narrative: "Formulação corrigida: sandbox-runtime, container, gVisor ou VM; ANTHROPIC_BASE_URL para a API do Claude; para outros serviços, ferramenta/MCP custom ou proxy com terminação TLS. Medida: WebFetch de agent-sdk/secure-deployment e agent-sdk/hosting em 2026-11-06, com trechos verbatim. Critério: V2_CONTRADITA. Alvo reprovado: 'o agente nunca vê o segredo' (tier 9). Afirmação de UM juiz."
+    trace: "WebFetch https://code.claude.com/docs/en/agent-sdk/hosting e grep -F 'the subprocess reads `ANTHROPIC_API_KEY` from its environment'; WebFetch https://code.claude.com/docs/en/agent-sdk/secure-deployment e grep -F 'For high-security deployments, you can place sensitive resources'"
+  - id: C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Desde 2025-05-29 apps comerciais fora do Marketplace (novos ou instalação nova) ficam em 1 req/min e 15 objetos; instalações existentes passaram em 2026-03-03; Marketplace e internos isentos; degrada backfill, não a triagem por Events API."
+    narrative: "Medida: WebFetch de docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps e WebSearch que trouxe o changelog com 'existing installations ... on March 3, 2026'. Critério: V1_QUOTE_NAO_SUSTENTA: 'June 30, 2025' se refere aos TERMOS, não ao rate limit, e a página não diz que a triagem fica inviável. Alvo reprovado: claim tier 9 do corte de rate limit. Afirmação de UM juiz."
+    trace: "WebFetch https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps e grep -F 'June 30, 2025' no texto devolvido"
+  - id: C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 allow rules por escopo; (c) hooks do .claude/settings.json NÃO rodam; (d) revisão antes do post só em conector pessoal."
+    narrative: "Medida: WebFetch em 2026-11-06 de custom.md, customize.md, personal-connectors.md e for-claude-code-users.md, localizadas pelo llms.txt. Critério: V2_CONTRADITA. Alvo reprovado: claim tier 9 'escada só como allowlist; sem hooks nem rascunho'. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/admins/customize.md e citar 'Sessions run in auto mode, where Claude's permission checker reviews each action'; WebFetch https://claude.com/docs/claude-tag/concepts/personal-connectors.md e citar 'Allow with review starts the work and shows you every result to approve before it posts to the channel.'"
+  - id: C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Em canal o Claude Tag age por padrão com contas de serviço próprias (agent identity do Owner), com acesso por conector, repo ou plugin direto ou por bundle; exceções: DM roda na conta do usuário e conector pessoal aprovado roda com as permissões dele."
+    narrative: "Para 'nunca como o maestro', esse caminho precisa ser des NOTA DO ESCRITOR: o texto chegou cortado pelo motor no fim; não foi completado de memória. Medida: WebFetch em 2026-11-06 de claude-tag/concepts/agent-identity ('Claude acts with its own service accounts, rather than as a specific user'; 'A DM session runs with your own claude.ai account'; 'Those tasks run with your permissions'). Critério: V2_CONTRADITA. Alvo reprovado: claim Tenable tier 6 de identidade própria por access bundles. Afirmação de UM juiz."
+    trace: "WebFetch https://www.claude.com/docs/claude-tag/concepts/agent-identity e grep -F 'Those tasks run with your permissions' e grep -F 'A DM session runs with your own claude.ai account'"
+  - id: C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona; e conectores pessoais por usuário, com aprovação e atribuição. Nenhum é delegação com claim act."
+    narrative: "A Tenable descreve só o 1º caminho. Texto final: 'Nenhum dos dois caminhos é uma identidade de serviço da empresa com delegação on-behalf-of declarada (claim act do RFC' NOTA DO ESCRITOR: o texto chegou cortado pelo motor no fim; não foi completado de memória. Medida: WebFetch de personal-connectors e glossary do Claude Tag, cruzado com a Tenable. Critério: V2_CONTRADITA. Alvo reprovado: claim Tenable tier 6 de credencial compartilhada. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/personal-connectors e citar 'Access: Claude works with your permissions and reaches only what your account can reach.' e 'Personal connectors in channels are on for every organization on the Team plan'"
+  - id: C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminho e método (veto determinístico de rede) e checker do auto mode em Sonnet 5 (veto por modelo). Nenhuma página fala em hooks."
+    narrative: "Medida: WebFetch em 2026-11-06 de add-connections.md, security-and-data.md, customize.md e restrict-access.md; grep por hook|approve|aren't available: a seção 'Controls that aren't available' não fala em hooks, e a l.200 cita 'approve a tool or permission request'. Critério: V2_CONTRADITA (texto do critério chegou cortado em 'Claude is'). Alvo reprovado: claim Tenable tier 6 'controle de escrita por escopo, sem hooks'. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/admins/add-connections.md e citar 'you can restrict it by HTTP method and path, for example to allow `GET` but not `DELETE`'; WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md e citar 'outbound traffic from a channel session's sandbox is default-deny'"
+  - id: C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Em ago/2024 o Slack AI (Salesforce, não o Claude) teve injeção indireta divulgada pela PromptArmor que exfiltrava canais privados; a Salesforce aplicou patch. Vale como CLASSE de risco contra runtime sem veto, não como falha atual de B."
+    narrative: "Medida: WebFetch das três URLs em 2026-11-06. PromptArmor: citação presente, timeline de 14/08 a 19/08, sem patch. The Register: 'We've deployed a patch...' na atualização de 20/08/2024 15:01 UTC. GovInfoSecurity, 23/08/2024: 'Slack patched a vulnerability'. Critério: V4_DESATUALIZADA. Alvo reprovado: claim PromptArmor tier 5. Afirmação de UM juiz."
+    trace: "WebFetch https://www.theregister.com/2024/08/21/slack_ai_prompt_injection/ e grep -F 'deployed a patch to address the issue' contra WebFetch https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+  - id: C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No Claude Tag, em canais e group DMs o agente age como contas de serviço do Owner, credenciais pelo Agent Proxy; conectores pessoais aprovados e DMs individuais rodam com a identidade do usuário. Nenhum modo descreve token exchange do RFC 8693."
+    narrative: "Os conectores OAuth do bundle podem reusar a credencial do admin que os conectou. Texto final: 'Nenhum modo descreve token exchange do RFC 8693 nem claim act que registre ' NOTA DO ESCRITOR: o texto chegou cortado pelo motor no fim; não foi completado de memória. Medida: WebFetch em 2026-11-06 de agent-identity.md, personal-connectors e das duas cópias da Tenable; contradiz o 'não delegação OAuth por usuário' absoluto. Critério: V2_CONTRADITA. Alvo reprovado: claim jp.tenable tier 5. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/agent-identity.md e citar 'Claude can also use your own claude.ai connectors for a task you hand it in a channel, after you allow it'; WebFetch https://www.tenable.com/blog/claude-tag-slack-access-model"
+  - id: C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Auditoria de B = log de admin + export de rede por hora (sem git nem MCP) + log do serviço conectado sob a conta de serviço; falta o log por ato de quem pediu."
+    narrative: "Medida: WebFetch de restrict-access.md e audit.md em 2026-11-06, trechos verbatim. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: achado 8 ('só desconexão e remoção de escopo'). Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/admins/restrict-access.md, trecho 'The log records: Role channel assignments'; WebFetch https://claude.com/docs/claude-tag/admins/audit.md, trecho 'There is no per-action log of every task and who asked'"
+  - id: C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar a claim de que em canais o Claude Tag age sob service accounts próprias, com a primária security-and-data.md (seção Service accounts)."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: descarte tier 9 de service accounts. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'In channels, Claude acts under service credentials of its own, not under the account of the person who tagged it'"
+  - id: C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar a claim do corte de rate limit para apps fora do Marketplace com a primária redirecionada de docs.slack.dev."
+    narrative: "Medida: WebFetch em 2026-11-06, depois do redirect 302 de api.slack.com. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: descarte tier 9 de 1 req/min e 15 objetos. Afirmação de UM juiz."
+    trace: "WebFetch https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps, trecho 'limited to 1 request per minute, unless they are approved for the Slack Marketplace'"
+  - id: C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar a claim de credencial por host, caminho e método, com a ressalva da revisão de conector pessoal."
+    narrative: "Medida: WebFetch em 2026-11-06, seções Credential storage e Service accounts. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: descarte tier 9 da escada só como allowlist. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'narrow the credential further, to one host, one path prefix, or read-only methods'"
+  - id: C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Fundir o descarte tier 6 de identidade própria por access bundles com o descarte tier 9 reinstalado."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: descarte Tenable tier 6. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'Connect a dedicated identity you control for each service'"
+  - id: C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar a claim de credencial compartilhada por canal, com o reparo dos conectores pessoais (impersonação, não delegação com act)."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: descarte Tenable tier 6 'não é OBO com act'. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'is shared by everyone in the channels where it applies'"
+  - id: C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Fundir o descarte tier 5 de identidade de serviço com o descarte tier 9 reinstalado."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: descarte jp.tenable tier 5. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, seção Service accounts"
+  - id: C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar com a primária: por padrão qualquer membro de workspace Slack conectado invoca o Claude Tag em canais, com ou sem conta Claude."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: claim cortada por orçamento. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'anyone in a connected Slack workspace can invoke Claude'"
+  - id: C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar com a primária: no ambiente self-hosted o Claude Tag não usa os conectores que o admin adiciona."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: claim cortada por orçamento. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'Claude can't use the connectors an admin adds in those sessions'"
+  - id: C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Runner da persona sob o degrau 2 do bridge: unit systemd com DynamicUser, ProtectHome e IPAddressDeny, no lugar de bwrap ou Docker nesta VPS."
+    narrative: "Medida: D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT, re-medido no vivo em 2026-10-20 (systemctl show da unit do bridge e do runner do /chat); E_DEGRAU2_EM_PRODUCAO_1016. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: claim cortada 'sandbox-runtime/bwrap ou Docker viável numa VPS compartilhada'. Afirmação de UM juiz."
+    trace: "grep -n 'bwrap FALHA' docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar com a primária: proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envia dados a qualquer domínio permitido."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: claim cortada por orçamento. Afirmação de UM juiz."
+    trace: "WebFetch https://code.claude.com/docs/en/agent-sdk/secure-deployment, trecho 'Within your proxy's allowlist, the agent can send data to any allowed domain'"
+  - id: C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar com a primária do Claude Tag: a busca padrão cobre todos os canais públicos do workspace, inclusive os em que o Claude não foi adicionado."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: claim cortada por orçamento. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/admins/restrict-access.md, trecho 'workspace search covers public channels across the workspace, including ones Claude hasn't been added to'"
+  - id: C_SUPERACAO_20261106_B_DISABLE_DMS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Reinstalar com a restrição: em B, desligar DMs, porque DM 1:1 roda na conta claude.ai de quem enviou."
+    narrative: "Medida: WebFetch em 2026-11-06 (security-and-data.md e restrict-access.md, l.302). Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: claim cortada por orçamento. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'run on that member's own claude.ai account instead'"
+  - id: C_SUPERACAO_20261106_AUDIT_PAGE_READ
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A página audit.md do Claude Tag, lida: quatro trilhas de auditoria e nenhum log por ato de quem pediu."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E4_LACUNA_ABERTA. Alvo reprovado: fonte não lida. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/admins/audit.md"
+  - id: C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A página restrict-access.md do Claude Tag, lida: resposta sem menção com 'Respond automatically' ligado por padrão, audit log de channel manager e aprovação negada a convidados."
+    narrative: "Medida: WebFetch em 2026-11-06. Critério: E4_LACUNA_ABERTA. Alvo reprovado: fonte não lida. Afirmação de UM juiz."
+    trace: "WebFetch https://claude.com/docs/claude-tag/admins/restrict-access.md, trecho 'Claude may also respond to a message that doesn't mention it'"
+edges:
+  - from: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_A_PLUS_B_BRIDGE
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: DEPENDS_ON
+  - from: D_PERSONA_RUNTIME_2026_11
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: TRACES_TO
+  - from: E_CLAUDE_TAG_CREDENTIALS_OUTSIDE_SANDBOX
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_NO_ZDR_CMEK_HIPAA
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_SDK_MCP_OUTSIDE_BOUNDARY_MODEL
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_SLACK_INTERNAL_APPS_EXEMPT_RATE_LIMIT
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_CUSTOM_MCP_REMOTE_ONLY
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_SECRETS_AT_EDGE_RUNTIME_ANTHROPIC
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_DATA_ANTHROPIC_SIDE_NO_RETENTION
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_AUDIT_PARTIAL
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_SALESLOFT_DRIFT_BREACH_2025_08
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_DRIFT_OAUTH_TOKENS_STOLEN
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_RFC8693_DELEGATION_NEEDS_ACTOR_TOKEN
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_RFC8693_ACT_CLAIM_CURRENT_ACTOR
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_PROMPTARMOR_LLM_CANNOT_SEPARATE_INSTRUCTIONS
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_PUBLIC_CHANNEL_BUNDLE_ACCESS
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_BETA_LAUNCH_2026_06_23
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_ADMIN_SCOPE_SPEND_NOT_VETO
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_SDK_MCP_OUTSIDE_BOUNDARY_MODEL
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: SUPPORTS
+  - from: E_SLACK_INTERNAL_APPS_EXEMPT_RATE_LIMIT
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_CREDENTIALS_OUTSIDE_SANDBOX
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_TAG_NO_ZDR_CMEK_HIPAA
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_CLAUDE_TAG_DATA_ANTHROPIC_SIDE_NO_RETENTION
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_CLAUDE_TAG_CUSTOM_MCP_REMOTE_ONLY
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_DRIFT_OAUTH_TOKENS_STOLEN
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_SALESLOFT_DRIFT_BREACH_2025_08
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_RFC8693_DELEGATION_NEEDS_ACTOR_TOKEN
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_MERCADO_PERSONA_RUNTIME_1106
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_MERCADO_PERSONA_RUNTIME_1106
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_ISOLATION_IS_CREDENTIALS_NOT_KNOWLEDGE
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_ISOLATION_IS_CREDENTIALS_NOT_KNOWLEDGE
+    to: C_OPCAO_A_PLUS_B_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_ISOLATION_IS_CREDENTIALS_NOT_KNOWLEDGE
+    to: E_CLAUDE_TAG_CREDENTIALS_OUTSIDE_SANDBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INTERNAL_APP_PER_ADOPTER_ONLY
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INTERNAL_APP_PER_ADOPTER_ONLY
+    to: E_SLACK_INTERNAL_APPS_EXEMPT_RATE_LIMIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SELF_HOSTED_PATH_FOR_KG_MCP
+    to: C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SELF_HOSTED_PATH_FOR_KG_MCP
+    to: E_CLAUDE_TAG_CUSTOM_MCP_REMOTE_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_B_TWO_VARIANTS_OPPOSITE_TRADEOFFS
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_B_TWO_VARIANTS_OPPOSITE_TRADEOFFS
+    to: E_CLAUDE_TAG_SECRETS_AT_EDGE_RUNTIME_ANTHROPIC
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_AUDIT_GAP_IS_WHO_ASKED
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_AUDIT_GAP_IS_WHO_ASKED
+    to: E_CLAUDE_TAG_AUDIT_PARTIAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION
+    to: E_DRIFT_OAUTH_TOKENS_STOLEN
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM
+    to: E_RFC8693_ACT_CLAIM_CURRENT_ACTOR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXIT2_NOT_SECURITY_BOUNDARY_TEXT_EXFIL
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXIT2_NOT_SECURITY_BOUNDARY_TEXT_EXFIL
+    to: E_PROMPTARMOR_LLM_CANNOT_SEPARATE_INSTRUCTIONS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_HAS_PARTIAL_DETERMINISTIC_LADDER
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_HAS_PARTIAL_DETERMINISTIC_LADDER
+    to: E_CLAUDE_TAG_ADMIN_SCOPE_SPEND_NOT_VETO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_TAG_SERVICE_ACCOUNTS
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_TAG_SERVICE_ACCOUNTS
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_NON_MARKETPLACE_RATE_LIMIT
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_NON_MARKETPLACE_RATE_LIMIT
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_CONNECTOR_METHOD_PATH
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_TAG_OWN_IDENTITY_BUNDLES
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_SHARED_CHANNEL_CREDENTIAL
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_ADOPTER_HOOK_IN_TAG
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_ADOPTER_HOOK_IN_TAG
+    to: C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_AI_EXFIL_IS_RISK_CLASS
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REINSTATE_SERVICE_IDENTITY_NOT_OAUTH
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ANY_WORKSPACE_MEMBER_INVOKES
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ANY_WORKSPACE_MEMBER_INVOKES
+    to: C_OPCAO_A_PLUS_B_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SELF_HOSTED_LOSES_ADMIN_CONNECTORS
+    to: C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BWRAP_DOCKER_FAIL_ON_THIS_VPS
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SDK_HOOKS_FAIL_OPEN_BELOW_0_3_317
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SDK_HOOKS_FAIL_OPEN_BELOW_0_3_317
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PROXY_ALLOWLIST_STILL_EXFILTRATES
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DELEGATED_AUDIT_SUB_ACT_CLIENT_UNVERIFIED
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REVOCATION_OWN_TOKEN_UNVERIFIED
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REVOCATION_OWN_TOKEN_UNVERIFIED
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RFC8693_DOES_NOT_DISCRIMINATE
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_INTENTIONAL_VENDOR_FIX_LOCKIN
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_INTENTIONAL_VENDOR_FIX_LOCKIN
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PUBLIC_CHANNELS_INJECTION_SURFACE
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PUBLIC_CHANNELS_INJECTION_SURFACE
+    to: C_OPCAO_A_PLUS_B_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CITATIONS_MAY_OMIT_MALICIOUS_MSG
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_STORAGE_TERMS_MARKETPLACE
+    to: C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_STORAGE_TERMS_MARKETPLACE
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REALTIME_SEARCH_API_STATE_UNMEASURED
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_DM_RUNS_AS_SENDER
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_DM_RUNS_AS_SENDER
+    to: C_OPCAO_A_PLUS_B_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_ROADMAP_FEATURES_UNDELIVERED
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_AUDIT_PAGE_READ
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_RESPONDS_WITHOUT_MENTION
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_RESPONDS_WITHOUT_MENTION
+    to: C_OPCAO_A_PLUS_B_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_ADMIN_SCOPES_UNREAD
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CLAUDE_CODE_IN_SLACK_VARIANT_MISSING
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_CONNECTOR_MCP_UNREAD
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TAG_PRICING_UNREAD
+    to: C_OPCAO_B_HOSTED_CLAUDE_TAG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EMAIL_AUDIT_TRAIL_UNREAD
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MULTIHOP_DELEGATION_UNREAD
+    to: C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ARCADE_HYBRID_B_C_MISSING
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_PERSONA_RUNTIME_1106
+    to: Q_PERSONA_RUNTIME_2026_11
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_PERSONA_RUNTIME_1106
+    to: D_PERSONA_RUNTIME_2026_11
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION
+    to: E_LACUNAS_PERSONA_RUNTIME_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS
+    to: E_OBJECAO_TAG_AUDIT_GAP_IS_WHO_ASKED
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS
+    to: E_OBJECAO_REINSTATE_TAG_SERVICE_ACCOUNTS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT
+    to: E_OBJECAO_REINSTATE_NON_MARKETPLACE_RATE_LIMIT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH
+    to: E_OBJECAO_REINSTATE_CONNECTOR_METHOD_PATH
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9
+    to: E_OBJECAO_REINSTATE_TAG_OWN_IDENTITY_BUNDLES
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR
+    to: E_OBJECAO_REINSTATE_SHARED_CHANNEL_CREDENTIAL
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9
+    to: E_OBJECAO_REINSTATE_SERVICE_IDENTITY_NOT_OAUTH
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES
+    to: E_OBJECAO_ANY_WORKSPACE_MEMBER_INVOKES
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS
+    to: E_OBJECAO_SELF_HOSTED_LOSES_ADMIN_CONNECTORS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2
+    to: E_OBJECAO_BWRAP_DOCKER_FAIL_ON_THIS_VPS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL
+    to: E_OBJECAO_PROXY_ALLOWLIST_STILL_EXFILTRATES
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE
+    to: E_OBJECAO_PUBLIC_CHANNELS_INJECTION_SURFACE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_B_DISABLE_DMS
+    to: E_OBJECAO_TAG_DM_RUNS_AS_SENDER
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_AUDIT_PAGE_READ
+    to: E_OBJECAO_TAG_AUDIT_PAGE_READ
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ
+    to: E_OBJECAO_TAG_RESPONDS_WITHOUT_MENTION
+    edge_type: TRACES_TO

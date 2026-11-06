@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**944 itens abertos** em 150 grafo(s) com aberto (de 191 no escopo) · 150 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**975 itens abertos** em 151 grafo(s) com aberto (de 192 no escopo) · 151 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -353,6 +353,42 @@
 | 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
 | 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
 | 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
+
+## persona-runtime-2026-11 — 31 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 63.2 | `D_PERSONA_RUNTIME_2026_11` | persona-runtime-2026-11 | Runtime da persona de serviço: A bot próprio no Agent SDK/bridge · B-hospedado Claude Tag · B-self-hosted · C bot de mercado  |
+| 60.0 | `Q_PERSONA_RUNTIME_2026_11` | persona-runtime-2026-11 | Qual runtime deve servir a persona de serviço do Company Brain de um adotante: A bot próprio no Agent SDK (bridge + kg_mcp), B o |
+| 49.5 | `C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE` | persona-runtime-2026-11 | A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta  |
+| 43.8 | `C_OPCAO_B_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthr |
+| 17.5 | `C_OPCAO_A_PLUS_B_BRIDGE` | persona-runtime-2026-11 | A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa lo |
+| 6.8 | `C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT` | persona-runtime-2026-11 | C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e n |
+| 6.2 | `C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali |
+| 3.6 | `C_SUPERACAO_20261106_AUDIT_PAGE_READ` | persona-runtime-2026-11 | A página audit.md do Claude Tag, lida: quatro trilhas de auditoria e nenhum log por ato de quem pediu. |
+| 3.6 | `C_SUPERACAO_20261106_B_DISABLE_DMS` | persona-runtime-2026-11 | Reinstalar com a restrição: em B, desligar DMs, porque DM 1:1 roda na conta claude.ai de quem enviou. |
+| 3.6 | `C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 6 de identidade própria por access bundles com o descarte tier 9 reinstalado. |
+| 3.6 | `C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 5 de identidade de serviço com o descarte tier 9 reinstalado. |
+| 3.6 | `C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2` | persona-runtime-2026-11 | Runner da persona sob o degrau 2 do bridge: unit systemd com DynamicUser, ProtectHome e IPAddressDeny, no lugar de bwrap ou Docker |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES` | persona-runtime-2026-11 | Reinstalar com a primária: por padrão qualquer membro de workspace Slack conectado invoca o Claude Tag em canais, com ou sem con |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH` | persona-runtime-2026-11 | Reinstalar a claim de credencial por host, caminho e método, com a ressalva da revisão de conector pessoal. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT` | persona-runtime-2026-11 | Reinstalar a claim do corte de rate limit para apps fora do Marketplace com a primária redirecionada de docs.slack.dev. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL` | persona-runtime-2026-11 | Reinstalar com a primária: proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envi |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE` | persona-runtime-2026-11 | Reinstalar com a primária do Claude Tag: a busca padrão cobre todos os canais públicos do workspace, inclusive os em que o Clau |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS` | persona-runtime-2026-11 | Reinstalar com a primária: no ambiente self-hosted o Claude Tag não usa os conectores que o admin adiciona. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR` | persona-runtime-2026-11 | Reinstalar a claim de credencial compartilhada por canal, com o reparo dos conectores pessoais (impersonação, não delegação c |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS` | persona-runtime-2026-11 | Reinstalar a claim de que em canais o Claude Tag age sob service accounts próprias, com a primária security-and-data.md (seção |
+| 3.6 | `C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ` | persona-runtime-2026-11 | A página restrict-access.md do Claude Tag, lida: resposta sem menção com 'Respond automatically' ligado por padrão, audit log  |
+| 3.6 | `C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT` | persona-runtime-2026-11 | No Agent SDK a Anthropic RECOMENDA, para implantação endurecida, fronteira de isolamento e credenciais por proxy fora dela; mont |
+| 3.6 | `C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS` | persona-runtime-2026-11 | Em ago/2024 o Slack AI (Salesforce, não o Claude) teve injeção indireta divulgada pela PromptArmor que exfiltrava canais privad |
+| 3.6 | `C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03` | persona-runtime-2026-11 | Desde 2025-05-29 apps comerciais fora do Marketplace (novos ou instalação nova) ficam em 1 req/min e 15 objetos; instalações e |
+| 3.6 | `C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION` | persona-runtime-2026-11 | Em canal o Claude Tag age por padrão com contas de serviço próprias (agent identity do Owner), com acesso por conector, repo ou |
+| 3.6 | `C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS` | persona-runtime-2026-11 | Auditoria de B = log de admin + export de rede por hora (sem git nem MCP) + log do serviço conectado sob a conta de serviço; fal |
+| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o Claude age por padrão sob identidades de serviço próprias; duas exceções: conector pes |
+| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o agente age como contas de serviço do Owner, credenciais pelo Agent Proxy; conectores pesso |
+| 3.6 | `C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT` | persona-runtime-2026-11 | No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona;  |
+| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS` | persona-runtime-2026-11 | Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 all |
+| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC` | persona-runtime-2026-11 | Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminh |
 
 ## nanochat-onion-2026-10 — 6 item(ns)
 
