@@ -39378,11 +39378,29 @@ run_door_mini_selftests() {
   local d; d="$(mktemp -d)"
   local m="${d}/porta/onion-mini" _o _r
   mkdir -p "${d}/porta"
-  if ! _o="$(bash "${mat}" "${m}" --role mini --from HEAD 2>&1)"; then
+  # A FONTE É O ÍNDICE (2026-11-06, tarefa #31): o materializador e o checador leem o HEAD, e o pré-voo do
+  # pr-finalize roda ANTES do commit de conteúdo. Medido: com o ponteiro morto só STAGEADO, esta família saía
+  # 13/13 verde sobre o HEAD velho. Índice ≠ HEAD ⇒ a família mede um commit sintético do índice (pai HEAD,
+  # nenhuma ref o aponta) numa worktree descartável. No CI o índice é o HEAD e nada muda.
+  local src="${REPO_ROOT}" _wt="" _it _ht _ic
+  _it="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null)" || _it=""
+  _ht="$(git -C "${REPO_ROOT}" rev-parse --verify --quiet 'HEAD^{tree}' 2>/dev/null)" || _ht=""
+  if [ -n "${_it}" ] && [ -n "${_ht}" ] && [ "${_it}" != "${_ht}" ]; then
+    _wt="${d}/indice"
+    if _ic="$(git -C "${REPO_ROOT}" -c user.name=door-mini -c user.email=door-mini@invalid commit-tree "${_it}" -p HEAD -m "door-mini: o índice" 2>/dev/null)" \
+       && git -C "${REPO_ROOT}" -c core.hooksPath=/dev/null worktree add -q --detach "${_wt}" "${_ic}" >/dev/null 2>&1; then
+      src="${_wt}"; chk="${_wt}/.claude/validation/door-mini-check.sh"; mat="${_wt}/ops/materialize-door.sh"
+    else
+      record_fail "door-mini: (a) setup" "índice ≠ HEAD e não montei o índice como commit — medir o HEAD aprovaria o que não vai no PR"
+      git -C "${REPO_ROOT}" worktree remove --force "${_wt}" >/dev/null 2>&1; rm -rf "${d}"; return
+    fi
+  fi
+  if ! _o="$(bash "${mat}" "${m}" --role mini --from HEAD 2>&1 < /dev/null)"; then
     record_fail "door-mini: (a) setup" "o materializador recusou o mini: $(printf '%s' "${_o}" | tail -3 | tr '\n' ' ' | cut -c1-300)"
+    [ -z "${_wt}" ] || git -C "${REPO_ROOT}" worktree remove --force "${_wt}" >/dev/null 2>&1
     rm -rf "${d}"; return
   fi
-  _dmc() { if _o="$(bash "${chk}" --bundle "$1" --source "${REPO_ROOT}" 2>&1)"; then _r=0; else _r=$?; fi; }
+  _dmc() { if _o="$(bash "${chk}" --bundle "$1" --source "${src}" 2>&1)"; then _r=0; else _r=$?; fi; }
   _copy() { rm -rf "${d}/c"; cp -r "${m}" "${d}/c"; }
 
   # (a) o mini MATERIALIZADO sai limpo: allowlist exata, raiz própria, e a raiz não manda rodar o que
@@ -39482,6 +39500,7 @@ run_door_mini_selftests() {
   else record_fail "door-mini: (f)" "rc=${_r} — sem SSOT a verificação não pode passar"; fi
 
   unset -f _dmc _copy
+  [ -z "${_wt}" ] || git -C "${REPO_ROOT}" worktree remove --force "${_wt}" >/dev/null 2>&1
   rm -rf "${d}"
 }
 
@@ -46819,6 +46838,69 @@ run_preflight_families_selftests() {
      && grep -q 'ops/testing/preflight-run.sh' "${REPO_ROOT}/ops/pr-finalize.sh"; then
     record_pass "preflight-families: (b) o pr-finalize roda o pré-voo com git sem identidade adivinhada"
   else record_fail "preflight-families: (b)" "o motor não chama o pré-voo no ambiente do runner"; fi
+
+  # (c..f) A PORTA MINI (2026-11-06, tarefa #31): #1497 e #1501 reprovaram no CI na door_mini (a) por ponteiro
+  #   morto num arquivo que viaja ao mini, e o pré-voo não a escolhia. A superfície vem do roles.yaml do
+  #   fixture, NÃO da real: o arquivo `commands/so-no-fixture.md` só existe na allowlist daqui, e selecioná-lo
+  #   prova que a lista é derivada, não escrita à mão no helper.
+  local res="${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  if [ ! -f "${res}" ] || ! python3 -c 'import yaml' 2>/dev/null; then
+    record_skip "preflight-families: (c..f) sem o resolvedor do roles.yaml ou sem PyYAML → pulado"; return
+  fi
+  d="$(mktemp -d)"
+  (
+    cd "${d}" && git init -q -b main && git config user.email t@t && git config user.name t
+    mkdir -p .claude/validation .claude/utils/marketplace .claude/commands/meta ops/door-templates/mini
+    printf 'run_alfa_selftests() {\n  echo a\n}\nrun_door_mini_selftests() {\n  echo m\n}\n' > .claude/validation/lint-selftest.sh
+    cp "${res}" .claude/utils/marketplace/
+    cat > .claude/utils/marketplace/roles.yaml <<'YML'
+roles:
+  mini:
+    allowlist:
+      commands:
+        - commands/so-no-fixture.md
+      support:
+        - utils/pasta/
+      overlays:
+        README.md: ops/door-templates/mini/README.door.md
+YML
+    mkdir -p .claude/utils/pasta
+    for f in .claude/commands/so-no-fixture.md .claude/utils/pasta/a.md .claude/commands/meta/fora.md ops/door-templates/mini/README.door.md; do
+      printf 'x\n' > "${f}"
+    done
+    git add -A && git commit -qm base && git update-ref refs/remotes/origin/main HEAD
+  ) >/dev/null 2>&1
+  _pf_touch() {  # <arquivo> [sut] → a saída do helper com aquele arquivo alterado e STAGEADO (não commitado)
+    ( cd "${d}" && git checkout -q -f main 2>/dev/null && git reset -q --hard && printf 'y\n' >> "$1" && git add -A \
+      && bash "${2:-${sut}}" 2>&1; git reset -q --hard )
+  }
+  if ! (cd "${d}" && bash "${res}" mini --allowlist .claude/utils/marketplace/roles.yaml | grep -qx 'commands/so-no-fixture.md'); then
+    record_fail "preflight-families: (c) setup" "o roles.yaml do fixture não resolveu a allowlist (a forma do roles.yaml mudou?)"
+    rm -rf "${d}"; unset -f _pf_touch; return
+  fi
+  local _c1 _c2 _c3 _c4
+  _c1="$(_pf_touch .claude/commands/so-no-fixture.md)"; _c2="$(_pf_touch .claude/utils/pasta/a.md)"
+  _c3="$(_pf_touch ops/door-templates/mini/README.door.md)"
+  if grep -q 'door_mini' <<< "${_c1}" && grep -q 'door_mini' <<< "${_c2}" && grep -q 'door_mini' <<< "${_c3}"; then
+    record_pass "preflight-families: (c) arquivo da allowlist do mini (derivada do roles.yaml), arquivo sob pasta da allowlist e fonte de overlay ⇒ door_mini"
+  else record_fail "preflight-families: (c)" "arquivo=${_c1} pasta=${_c2} overlay=${_c3}"; fi
+  _c4="$(_pf_touch .claude/commands/meta/fora.md)"
+  if ! grep -q 'door_mini' <<< "${_c4}" && grep -q 'shell_pipefail_robustness' <<< "${_c4}"; then
+    record_pass "preflight-families: (d) arquivo que não viaja ao mini ⇒ door_mini NÃO entra (a família de 20 s não vira imposto de todo PR)"
+  else record_fail "preflight-families: (d)" "saída: ${_c4}"; fi
+  # (e) não decidir não vira "não seleciona": roles.yaml quebrado ⇒ door_mini entra
+  local _c5; _c5="$( cd "${d}" && printf 'roles: [\n' > .claude/utils/marketplace/roles.yaml && git add -A && bash "${sut}" 2>/dev/null; git reset -q --hard )"
+  if grep -q 'door_mini' <<< "${_c5}"; then
+    record_pass "preflight-families: (e) roles.yaml que não resolve ⇒ door_mini entra (falha para o lado de medir)"
+  else record_fail "preflight-families: (e)" "saída: ${_c5}"; fi
+  # (f-MUT) sem o bloco da porta mini o helper volta ao buraco medido: o (c) não seleciona
+  local mut="${d}/../pf-mut-$$.sh"
+  sed '/^# ── A PORTA MINI/,/^# sem repetição/{/^# sem repetição/!d}' "${sut}" > "${mut}"
+  local _c6; _c6="$(_pf_touch .claude/commands/so-no-fixture.md "${mut}")"
+  if ! grep -q 'door_mini' <<< "${_c6}" && grep -q 'shell_pipefail_robustness' <<< "${_c6}"; then
+    record_pass "preflight-families: (f-MUT) sem a seleção da porta mini o arquivo da allowlist não escolhe door_mini — (c) é load-bearing"
+  else record_fail "preflight-families: (f-MUT)" "o mutante ainda selecionou (ou quebrou): ${_c6}"; fi
+  rm -f "${mut}"; rm -rf "${d}"; unset -f _pf_touch
 }
 _family run_preflight_families_selftests
 
