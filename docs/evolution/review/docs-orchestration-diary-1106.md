@@ -2,7 +2,8 @@
 branch: docs/orchestration-diary-1106
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ab4f2e757b53edce76887cb7d71ffa70badb5caafe1df3f322512d04bd38ec08
+reviewed_code_sha256: 51e03ac42ab0925407d549f5675596f66b1e7c0d6f92626a230197464f3b4537
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
