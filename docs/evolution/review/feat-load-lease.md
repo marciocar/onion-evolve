@@ -2,7 +2,7 @@
 branch: feat/load-lease
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 1131a3c3913b487901f9b1ef7159fa523e8c42e8cfc93cf332d13d80bde5a2aa
+reviewed_diff_sha256: 022c87aa48e8ac81ae266eab77e5b8c76de1a08aeee892dba768d21f6a6b9334
 reviewed_code_sha256: af62cfd7665952b0a422c29e681de4a7507d558235abcf524d1ede53cb6c8738
 findings_total: 6
 findings_real: 6
