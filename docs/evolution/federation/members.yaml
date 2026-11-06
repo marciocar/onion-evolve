@@ -874,6 +874,30 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: onion-messaging
+    # Registro no MESMO dia da adoção (2026-11-06): registrar é ato de segurança — a REGRA 36 ignora o
+    # prefixo `onion-`, e só o registro protege um repo assim [[vendor-scrub-blind-spot]].
+    name: onion-messaging (comunicação estável entre sessões)
+    role: standalone            # TIER 3 — adota o core direto; o carimbo vivo diz `adopted` (par da REGRA 92)
+    kind: adopter
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-messaging (privado)
+    local_path: /home/marcio/onion-messaging
+    onion_version: 6760a7bede50   # pin-ok por pin-integrity-check.sh em 2026-11-06 (adoção)
+    integration_branch: main
+    adopted_at: 2026-11-06
+    mode: greenfield
+    personality_summary: "A comunicação estável entre as sessões do Onion, em degraus: o 1º é a campainha (channel MCP que só avisa e aponta, nunca leva o corpo, com fallback por pull); depois a fila e o sinal A2A assinado com CloudEvents. A pilha é decidida no core (messaging-standards-2026-11); aqui ela se executa e se mede em bancada."
+    specializations: [mensageria, channels-mcp, a2a]
+    personality_last_sync: 2026-11-06
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
