@@ -2,8 +2,8 @@
 branch: feat/guard-deploy-acts
 pr: pendente
 date: 2026-11-05
-reviewed_diff_sha256: 0d16a413089f151e1e71927c1083b59e64b46c8de77eaccd11e1588bed0f5345
-reviewed_code_sha256: ac7a97e6921140bf6590107a9ee499b87d6139fe2e59ff3a50bea4dbdd60500e
+reviewed_diff_sha256: pendente
+reviewed_code_sha256: pendente
 findings_total: 4
 findings_real: 4
 tokens: 0
@@ -11,8 +11,8 @@ duration_min: 0
 findings_fixed: 4
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-reviewer: "refutador independente (agente separado, com probes próprias em laboratório)"
-nota: "tokens e duração em 0 = não medidos. O refutador reprovou 159573a60 com 4 furos; os 4 foram curados nesta volta, com caso e mutante cada. A re-verificação do diferencial pelo refutador AINDA NÃO RODOU. Os limites que ele marcou ficaram declarados no grafo."
+reviewer: "refutador independente (agente separado, com probes próprias em laboratório) sobre 159573a60; diferencial verificado pela sessão principal sobre a98262385"
+nota: "tokens e duração em 0 = não medidos. O refutador reprovou 159573a60 com 4 furos; os 4 foram curados em a98262385, com caso e mutante cada. A sessão principal verificou o diferencial em a98262385 com o h.sh do refutador sobre git archive: os 4 furos e o gh release create dão rc 2; leitura, ensaio, pr-merge-verified.sh e o GET de pending_deployments dão rc 0. Os limites que ele marcou ficaram declarados no grafo."
 ---
 
 # Resíduo: `feat/guard-deploy-acts` — o veto do MOAT barra o ATO de deploy e de publicação
@@ -58,6 +58,12 @@ nota: "tokens e duração em 0 = não medidos. O refutador reprovou 159573a60 co
 | L1 | `ops/apply-ruleset-main.sh` fora da 4ª coluna passa | limite | declarado: `C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA` |
 | L2 | A REGRA 117 confere só a presença da palavra | limite | declarado: `C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA` |
 
+## Verificação do diferencial (sessão principal, sobre a98262385)
+
+Com o `h.sh` do refutador numa cópia por `git archive`: os 4 furos acima e `gh release create v9.9.9` saem com rc 2; a
+leitura (`publish-door.sh --status`), o ensaio, `pr-merge-verified.sh N --sync` e o GET de `pending_deployments` saem
+com rc 0. Medido também pela forja na mesma cópia, com o mesmo resultado.
+
 ## Medidas da forja
 
 | Medida | Resultado |
@@ -72,7 +78,6 @@ nota: "tokens e duração em 0 = não medidos. O refutador reprovou 159573a60 co
 ## O que esta forja não mediu
 
 - O `!` na 2.1.318 (exige o maestro digitando).
-- A re-verificação do diferencial pelo refutador (depois desta volta de cura).
 - O CI completo: só as duas famílias e o `lint-artifacts.sh` rodaram. O 2º commit foi `--no-verify` (CHECKPOINT, por ordem de carga da máquina): o pre-commit roda a bancada das famílias afetadas (192 famílias, ~70 min no 1º commit) e não foi re-rodado sobre o SHA final.
 - Se o hook de PreToolUse dispara para CronCreate/ScheduleWakeup (não medido: fica fora por desenho).
 
