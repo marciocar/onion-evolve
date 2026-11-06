@@ -30,7 +30,7 @@ nodes:
     verified_against: "hook da main 3f09996ab rodado com o JSON do PreToolUse: bash ops/update-bridge.sh, bash ops/stt-service.sh install --apply e bash ops/publish-door.sh onion-core --push saem rc 0"
     trace: ".claude/hooks/pretooluse-moat-gate.sh"
     label: "medido: o script versionado era fronteira para tudo, e o ato de deploy pelo wrapper e o push de porta passavam o veto com exit 0"
-    narrative: "Achado por leitura no estudo problem-route (CERCA.md, branch feat/problem-formula, formas P2 e P3: a cerca barra a forma, não o ato) e confirmado executando o hook. No corpus de transcripts a sessão rodou esses atos pelo Bash: stt-service.sh install --apply em 2026-10-19 e 10-20, install-caddy-config.sh e docker-engine-migrate.sh apply em 2026-10-22, update-bridge.sh em 2026-10-23 e --restart em 10-24, publish-door.sh --all --push em 2026-10-23, entre outros. Se cada um teve o sim do maestro, o hook não tinha como saber: é isso que a guarda corrige, mandando o ato para o `!`."
+    narrative: "Achado por leitura no estudo problem-route (CERCA.md, branch feat/problem-formula, as formas do script de deploy e do push de porta: a cerca barra a forma, não o ato) e confirmado executando o hook. No corpus de transcripts a sessão rodou esses atos pelo Bash: stt-service.sh install --apply em 2026-10-19 e 10-20, install-caddy-config.sh e docker-engine-migrate.sh apply em 2026-10-22, update-bridge.sh em 2026-10-23 e --restart em 10-24, publish-door.sh --all --push em 2026-10-23, entre outros. Se cada um teve o sim do maestro, o hook não tinha como saber: é isso que a guarda corrige, mandando o ato para o `!`."
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "replay do corpus de transcripts e execução do hook da main"
@@ -130,6 +130,11 @@ nodes:
     trace: ".claude/hooks/pretooluse-moat-gate.sh"
     label: "latência: o comando que cita o NOME de um script de ato paga o juiz, ~200 ms; o resto segue no pré-filtro sem python"
     narrative: "O nome entra no sinal do pré-filtro porque o script versionado não ia ao juiz. Custo: grep, git diff e leitura que citam o nome também pagam o juiz, e passam. Medido numa VPS compartilhada, sem isolar a carga."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "probe de 50 formas"
+      method: "medição: hook real com o JSON do PreToolUse no stdin; comando nunca executado"
+      locality: "repo"
   - id: C_TETO_COPIA_MUDADA_E_RENOMEADA
     node_type: claim
     layer: audit
@@ -248,6 +253,11 @@ nodes:
     trace: ".claude/hooks/lib/moat-judge.py"
     label: "o timer de systemd do usuário criado por arquivo pelo Bash já veta (sufixo .timer sob systemd/), e o ato que o arma (systemctl --user enable/start) também"
     narrative: "O que fica de fora é a escrita da unit pelas ferramentas Write e Edit, que o matcher Bash não vê; o systemctl que a arma depois, pelo Bash, veta. Ver C_TETO_AGENDAMENTO_NATIVO_E_WRITE."
+    provenance:
+      source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
+      locator: "probe e casos der2 e der3"
+      method: "medição: hook real com o JSON do PreToolUse no stdin; comando nunca executado"
+      locality: "repo"
   - id: C_TETO_AGENDAMENTO_NATIVO_E_WRITE
     node_type: claim
     layer: audit
@@ -299,7 +309,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/feat-guard-deploy-acts.md"
       locator: "achados da passada adversarial sobre 159573a60"
-      method: "refutador independente com probes próprias; curas re-medidas pelas mesmas probes"
+      method: "medição: probes do refutador independente reexecutadas antes e depois da cura"
       locality: "repo"
   - id: C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA
     node_type: claim
