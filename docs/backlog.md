@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1010 itens abertos** em 152 grafo(s) com aberto (de 193 no escopo) · 152 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1017 itens abertos** em 153 grafo(s) com aberto (de 194 no escopo) · 152 grupo(s), agrupados por `owner:` (56 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -805,7 +805,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 19 item(ns)
+## maestro — 21 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -813,6 +813,8 @@
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
+| 9.0 | `Q_CS_APP_SLACK_E_CHANNELS_1106` | comms-stable-2026-11 | O app Slack interno do hub existe, com Socket Mode e escopos mínimos, os tokens de bot e de app guardados pelo maestro fora do ch |
+| 8.4 | `Q_CS_REPO_ONION_MESSAGING_CRIADO_1106` | comms-stable-2026-11 | O repo privado onion-messaging existe, clonado na VPS, com a sessão do core autorizada a escrever nele até a sessão própria na |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
@@ -1084,21 +1086,26 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 23 item(ns)
+## core — 28 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 15.0 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
+| 11.2 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
+| 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
+| 7.5 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 4.2 | `Q_CS_ORIENTACAO_COMPLIANCE_1106` | comms-stable-2026-11 | Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando  |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |

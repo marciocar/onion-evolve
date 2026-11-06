@@ -2,7 +2,7 @@
 title: 'Resíduo — a pilha do onion-messaging selada, com a síntese dos dois runs'
 date: 2026-11-06
 branch: docs/messaging-standards-research
-reviewed_diff_sha256: 514f11777d17bcb6395eeac243d38d42dcaa29cc4642c8fa55f6ce540990b478
+reviewed_diff_sha256: 73d6e56c0aa471ead1948ba2032230196b8362000433091de222e0ff80ce1d53
 reviewed_code_sha256: f065f0419f48384b9d46bbf5c1260efb771e53021ac38487e7ccd45d3f7ce51a
 findings_total: 6
 findings_real: 4
