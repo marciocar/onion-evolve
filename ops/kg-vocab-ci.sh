@@ -33,7 +33,12 @@
 #   rc 0 = nenhum achado novo e nada ilegível · rc 1 = achado novo (impresso) · rc 2 = não deu para julgar
 set -uo pipefail
 
-V=vendor/kg-ssot/tools/kg_vocab.py
+# a pasta das ferramentas do KG-SSOT pelo resolver único (.claude/utils/kg/kgssot-tools.sh: KG_SSOT_TOOLS →
+# vendor/kg-ssot/tools → tools/ do próprio produto), a partir da raiz julgada (o cwd); nada casou, o vendor de hoje.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.claude/utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+KGT="$(kgssot_tools_dir .)" || KGT=./vendor/kg-ssot/tools
+KGT="${KGT#./}"
+V="${KGT}/kg_vocab.py"
 BASE=.kg-ssot/vocab-lint.json
 EXT=.kg-ssot/vocab-externals.tsv
 [ -f "$V" ] || { echo "kg-vocab-ci: $V ausente em $(pwd) — não dá para julgar" >&2; exit 2; }

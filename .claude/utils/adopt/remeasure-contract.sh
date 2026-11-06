@@ -30,7 +30,8 @@
 #        3 = NÃO MEDIDO (vendor quebrado ou anterior, dependência ausente, alvo fora do git, QUALQUER exceção
 #            imprevista) — escreva NÃO MEDIDO, nunca 0. O rc 1 só sai do ramo que contou a dívida: um traceback
 #            nunca se passa por dívida (passada adversarial de 2026-10-20).
-#        4 = não se aplica (alvo sem vendor/kg-ssot, ou sem nenhum .kg.yaml no corpus) — declare, não omita
+#        4 = não se aplica (alvo sem o contrato pelo resolver — vendor/kg-ssot ou tools/ do produto —, ou sem nenhum
+#            .kg.yaml no corpus) — declare, não omita
 # =============================================================================
 set -uo pipefail
 T="${1:?uso: remeasure-contract.sh <TARGET> [--exclude GLOB]...}"; shift
@@ -42,9 +43,21 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -d "${T}" ] || { echo "CONTRATO NÃO MEDIDO: ${T} não é diretório." >&2; exit 3; }
-TOOLS="${T}/vendor/kg-ssot/tools"
+# A pasta do contrato DO ALVO pelo resolver único (../kg/kgssot-tools.sh, 2026-11-06): KG_SSOT_TOOLS (override
+# explícito de quem chama) → <alvo>/vendor/kg-ssot/tools → <alvo>/tools quando o alvo É o produto (spec/release.json
+# com tag kg-ssot-v*). Antes, o próprio repo do kg-ssot como alvo saía "não se aplica" tendo o contrato na raiz.
+# A linha medida diz DE ONDE veio o contrato: com o override, a pasta NÃO é a do alvo, e o relatório tem de dizê-lo.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_resolve() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+KGSSOT_TOOLS_KIND=""
+if kgssot_tools_resolve "${T}"; then TOOLS="${KGSSOT_TOOLS}"; else TOOLS="${T}/vendor/kg-ssot/tools"; fi
+case "${KGSSOT_TOOLS_KIND}" in
+  env) CONTRACT_FROM="a pasta do KG_SSOT_TOOLS=${TOOLS}, NÃO a do alvo" ;;
+  source) CONTRACT_FROM="o próprio produto, tools/ do alvo" ;;
+  *) CONTRACT_FROM="o vendor do alvo" ;;
+esac
+export CONTRACT_FROM
 if [ ! -f "${TOOLS}/kg_gate.py" ]; then
-  echo "CONTRATO não se aplica: ${T} não tem o contrato vendorizado (vendor/kg-ssot/tools/kg_gate.py) — nada a medir."
+  echo "CONTRATO não se aplica: ${T} não tem o contrato do .kg.yaml (o kg_gate.py nem pelo KG_SSOT_TOOLS, nem em vendor/kg-ssot, nem em tools/ do produto) — nada a medir."
   exit 4
 fi
 # O índice de leitura (REGRA 84) sai do kg_trace.py do vendor DO ALVO desde a 4.25.1: vendor anterior (próprio, que o
@@ -102,11 +115,14 @@ def run():
     # as ocorrências com o lugar (where): é o que separa "nós" de "arestas/arquivo" no número do relatório
     places = {name: kg_validate.where(text, must_v, should_v, index) for name, text in items}
 
+    # a versão: o carimbo do vendor (.kg-ssot-version) ou, no próprio produto, o spec/release.json da raiz
     version = "?"
-    try:
-        version = json.loads((pathlib.Path(tools).parent / ".kg-ssot-version").read_text(encoding="utf-8")).get("version", "?")
-    except Exception:
-        pass
+    for stamp in (".kg-ssot-version", "spec/release.json"):
+        try:
+            version = json.loads((pathlib.Path(tools).parent / stamp).read_text(encoding="utf-8")).get("version", "?")
+            break
+        except Exception:
+            pass
 
     failing = sorted(n for n, r in measured.items() if r["must"])
     must_occ, must_graphs, must_nodes = collections.Counter(), collections.defaultdict(set), set()
@@ -130,7 +146,7 @@ def run():
                "as duas leituras do vendor discordam")
 
     g = len(measured)
-    out = [f"CONTRATO medido: kg-ssot {version} (o vendor do alvo) · {g} grafo(s) · {g - len(failing)} passam no MUST · "
+    out = [f"CONTRATO medido: kg-ssot {version} ({os.environ.get('CONTRACT_FROM') or 'o vendor do alvo'}) · {g} grafo(s) · {g - len(failing)} passam no MUST · "
            f"{len(failing)} reprovam",
            f"  corpus os .kg.yaml rastreados, excluídos: {', '.join(exclude)}"]
     out += [f"  MUST   {c}: {must_occ[c]} ocorrência(s) em {len(must_graphs[c])} grafo(s)" for c in sorted(must_occ)]

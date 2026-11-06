@@ -41799,7 +41799,8 @@ _family run_dissect_object_selftests
 # (a) o resolver bash e o python dão o MESMO veredito por fixture (paridade); (b) ponta a ponta pelo
 # kg-contract-check.sh (rc 0 julgado / rc 2 não julgou) e pelo KG_QUERY do dissect-object-check.py;
 # (c) um mutante por ramo (env, vendor, fonte, vazio), com a cópia LIMPA provada verde no MESMO arranjo antes;
-# (d) catraca: nenhum sítio executável de .claude/validation volta a fixar vendor/kg-ssot/tools/<ferramenta>.
+# (d) catraca: nenhum sítio executável de .claude/validation, .claude/utils/adopt nem ops/kg-*-ci.sh volta a fixar
+#     vendor/kg-ssot/tools (com ou sem <ferramenta> no fim).
 run_kgssot_tools_selftests() {
   local lib="${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" pyr="${REPO_ROOT}/.claude/utils/kg/kgssot_tools.py"
   local kcc="${REPO_ROOT}/.claude/validation/kg-contract-check.sh" doc="${REPO_ROOT}/.claude/validation/dissect-object-check.py"
@@ -41854,6 +41855,25 @@ s=importlib.util.spec_from_file_location("doc", sys.argv[1]); m=importlib.util.m
   if [ "${got_b}" = "tools/kg_query.py" ] && [ "${got_p}" = "vendor/kg-ssot/tools/kg_query.py" ]; then
     record_pass "kgssot-tools: (b) dissect-object-check acha tools/kg_query.py no repo-fonte e mantém o vendor de hoje sem nada"
   else record_fail "kgssot-tools: (b) dissect-object-check" "fonte='${got_b}' (esperava tools/kg_query.py) · nenhum='${got_p}' (esperava vendor/kg-ssot/tools/kg_query.py)"; fi
+
+  # (b2) os sítios de utils/adopt e ops/kg-*-ci.sh (2026-11-06, #29), ponta a ponta nas MESMAS fixtures: o
+  #      remeasure-contract mede o contrato do produto (antes: rc 4 "não se aplica" com tools/ na raiz) e diz de onde
+  #      veio; com o override, diz que NÃO é a pasta do alvo; sem nada segue rc 4. O kg-criterion-ci julga no produto
+  #      e com o override, e sem nada segue rc 2. O código da main (caminho fixo) reprova o caso do produto.
+  local rmc="${REPO_ROOT}/.claude/utils/adopt/remeasure-contract.sh" kcr="${REPO_ROOT}/ops/kg-criterion-ci.sh" o
+  for f in fonte nenhum env; do git -C "${d}/${f}" add g.kg.yaml >/dev/null 2>&1; done
+  for c in "fonte||0|o próprio produto" "nenhum||4|não se aplica" "env|${etools}|0|NÃO a do alvo"; do
+    IFS='|' read -r f env want pat <<< "${c}"
+    rc=0; o="$(unset KG_SSOT_TOOLS; [ -z "${env}" ] || export KG_SSOT_TOOLS="${env}"; bash "${rmc}" "${d}/${f}" 2>&1)" || rc=$?
+    if [ "${rc}" = "${want}" ] && grep -qF -- "${pat}" <<< "${o}"; then record_pass "kgssot-tools: (b2) remeasure-contract no ${f} → rc ${want}, '${pat}'"
+    else record_fail "kgssot-tools: (b2) remeasure-contract no ${f}" "esperava rc ${want} com '${pat}'; rc=${rc}: $(head -1 <<< "${o}")"; fi
+  done
+  for c in "fonte||0" "nenhum||2" "env|${etools}|0"; do
+    IFS='|' read -r f env want <<< "${c}"
+    rc=0; (cd "${d}/${f}" && unset KG_SSOT_TOOLS && { [ -z "${env}" ] || export KG_SSOT_TOOLS="${env}"; } && bash "${kcr}") >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" = "${want}" ]; then record_pass "kgssot-tools: (b2) ops/kg-criterion-ci no ${f} → rc ${want}"
+    else record_fail "kgssot-tools: (b2) ops/kg-criterion-ci no ${f}" "esperava rc ${want}, veio ${rc}"; fi
+  done
 
   # (c) MUTANTES. Árvore espelho (validation/ + utils/kg/) para o SUT achar o lib mutado ao lado; a cópia LIMPA
   #     no mesmo arranjo tem de dar os 4 vereditos verdes ANTES de um morto contar.
@@ -41910,20 +41930,38 @@ open(p,"w").write(s.replace(a,r))' "${mpy}" "${anchor}" "${repl}" || { record_fa
     else record_fail "kgssot-tools: (c) mutante python ${name} VIVO" "veredito igual ao limpo: '${got_p}'"; fi
   done
 
-  # (d) CATRACA: linha executável (não comentário) de .claude/validation que cita vendor/kg-ssot/tools/<arquivo>
-  #     fixa o caminho por fora do resolver. Fora: a bancada (fixtures montam vendor/ de propósito), o
-  #     kg_vendor.py (só existe no vendor, por definição) e a linha que já passa pelo resolver (o fallback).
-  local hits
-  hits="$(cd "${REPO_ROOT}" && git ls-files -- '.claude/validation/*.sh' '.claude/validation/*.py' 2>/dev/null \
+  # (d) CATRACA: linha executável (não comentário) de .claude/validation, de .claude/utils/adopt (helpers e o template
+  #     de CI que viaja ao adotante) ou de ops/kg-*-ci.sh que cita vendor/kg-ssot/tools — com <arquivo> no fim ou só
+  #     a pasta (`TOOLS="${T}/vendor/kg-ssot/tools"`, a forma que a 1ª catraca não via; ampliada em 2026-11-06, #29)
+  #     — fixa o caminho por fora do resolver. Fora: a bancada (fixtures montam vendor/ de propósito), o kg_vendor.py
+  #     (só existe no vendor, por definição: confere o carimbo DELE) e a linha que já passa pelo resolver (o
+  #     fallback `|| X=…vendor…` ao lado do kgssot_tools_dir, ou o stub KGSSOT_TOOLS de quando o lib falta).
+  local hits rx='vendor/kg-ssot/tools([/"'"'"'[:space:]]|$)'
+  _kt_ratchet() { LC_ALL=C grep -nE "${rx}" | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v -e 'kg_vendor\.py' -e 'kgssot_tools' -e 'KGSSOT_TOOLS' || true; }
+  hits="$(cd "${REPO_ROOT}" && git ls-files -- '.claude/validation/*.sh' '.claude/validation/*.py' '.claude/utils/adopt/*' 'ops/kg-*-ci.sh' 2>/dev/null \
     | grep -v -e '^\.claude/validation/lint-selftest\.sh$' -e '-bench\.py$' \
-    | while IFS= read -r f; do LC_ALL=C grep -nE 'vendor/kg-ssot/tools/[A-Za-z_]+\.(py|txt)' "${f}" 2>/dev/null \
-        | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v -e 'kg_vendor\.py' -e 'kgssot_tools' | sed "s|^|${f}:|" || true; done)"
-  if [ -z "${hits}" ]; then record_pass "kgssot-tools: (d) catraca — nenhum sítio executável fixa vendor/kg-ssot/tools/<ferramenta>"
+    | while IFS= read -r f; do _kt_ratchet < "${f}" | sed "s|^|${f}:|"; done)"
+  if [ -z "${hits}" ]; then record_pass "kgssot-tools: (d) catraca — nenhum sítio executável (validation, utils/adopt, ops/kg-*-ci.sh) fixa vendor/kg-ssot/tools"
   else record_fail "kgssot-tools: (d) catraca" "caminho fixo por fora do resolver (use utils/kg/kgssot-tools.sh): $(_emit "${hits}" | head -c 800)"; fi
-  # o mutante da catraca: uma linha fixa plantada numa cópia tem de ser vista pelo mesmo filtro
-  local plant; plant="$(printf 'KT="${ROOT}/vendor/kg-ssot/tools/kg_trace.py"\n' | LC_ALL=C grep -nE 'vendor/kg-ssot/tools/[A-Za-z_]+\.(py|txt)' | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v -e 'kg_vendor\.py' -e 'kgssot_tools' || true)"
-  if [ -n "${plant}" ]; then record_pass "kgssot-tools: (d) mutante da catraca — a linha fixa plantada é acusada"
-  else record_fail "kgssot-tools: (d) mutante da catraca VIVO" "o filtro não viu KT=\"\${ROOT}/vendor/kg-ssot/tools/kg_trace.py\""; fi
+  # a catraca enxerga os diretórios novos: a contagem de arquivos de utils/adopt e de ops/kg-*-ci.sh é > 0 (um
+  # pathspec errado deixaria a catraca verde por não ler nada)
+  local nadopt nops
+  nadopt="$(cd "${REPO_ROOT}" && git ls-files -- '.claude/utils/adopt/*' | grep -c .)"; nops="$(cd "${REPO_ROOT}" && git ls-files -- 'ops/kg-*-ci.sh' | grep -c .)"
+  if [ "${nadopt}" -gt 0 ] && [ "${nops}" -ge 3 ]; then record_pass "kgssot-tools: (d) a catraca lê utils/adopt (${nadopt} arquivos) e ops/kg-*-ci.sh (${nops})"
+  else record_fail "kgssot-tools: (d) escopo da catraca" "utils/adopt=${nadopt} ops/kg-*-ci.sh=${nops} (piso 1 e 3)"; fi
+  # os mutantes da catraca: as três formas fixas plantadas têm de ser vistas pelo mesmo filtro; o fallback e o
+  # kg_vendor.py, não
+  local plant form
+  for form in 'KT="${ROOT}/vendor/kg-ssot/tools/kg_trace.py"' 'TOOLS="${T}/vendor/kg-ssot/tools"' 'V=vendor/kg-ssot/tools/kg_vocab.py'; do
+    plant="$(printf '%s\n' "${form}" | _kt_ratchet)"
+    if [ -n "${plant}" ]; then record_pass "kgssot-tools: (d) mutante da catraca — a linha fixa plantada é acusada: ${form}"
+    else record_fail "kgssot-tools: (d) mutante da catraca VIVO" "o filtro não viu ${form}"; fi
+  done
+  for form in 'TOOLS="$(kgssot_tools_dir "${T}")" || TOOLS="${T}/vendor/kg-ssot/tools"' 'python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot'; do
+    plant="$(printf '%s\n' "${form}" | _kt_ratchet)"
+    if [ -z "${plant}" ]; then record_pass "kgssot-tools: (d) a catraca deixa passar o que é deliberado: ${form%% *}…"
+    else record_fail "kgssot-tools: (d) falso positivo da catraca" "acusou ${form}"; fi
+  done
   rm -rf "${d}"
 }
 
@@ -43043,7 +43081,8 @@ _krh_norm() {  # <arquivo> → linhas lógicas, continuação juntada e comentá
 run_kg_ssot_require_hashes_selftests() {
   # selftest-covers: .github/workflows/onion-validate.yml .claude/utils/adopt/ci-workflow-onion.tpl .claude/validation/currency-census.sh vendor/kg-ssot/tools/requirements.txt
   local r="${REPO_ROOT}" f n=0 bad="" ln pat
-  pat='pip3?[[:space:]].*install.*(vendor/kg-ssot/tools/requirements\.txt|[[:space:]](PyYAML|jsonschema)([=<>~! ]|$))'
+  # KGSSOT_REQ: o requirements resolvido pelo resolver único (o template de CI do adotante, desde 2026-11-06)
+  pat='pip3?[[:space:]].*install.*(vendor/kg-ssot/tools/requirements\.txt|KGSSOT_REQ|[[:space:]](PyYAML|jsonschema)([=<>~! ]|$))'
   while IFS= read -r f; do
     while IFS= read -r ln; do
       n=$((n + 1))

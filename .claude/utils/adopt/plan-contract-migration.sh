@@ -83,9 +83,15 @@ DEBT="$(printf '%s\n' "${CONTRACT_OUT}" | sed -n 's/.*reprova no contrato vendor
 DEBT_NODES="${DEBT%% *}" DEBT_GRAPHS="${DEBT##* }"
 [ -n "${DEBT}" ] || no "o remeasure-contract saiu rc 1 sem a linha da dívida (a frase mudou?)."
 
-VENDOR="${T}/vendor/kg-ssot"
-VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "${VENDOR}/.kg-ssot-version" 2>/dev/null | head -1)"
-MIG="${VENDOR}/tools/kg_migrate.py"
+# a pasta do contrato DO ALVO pelo resolver único (../kg/kgssot-tools.sh), a mesma que o remeasure-contract mediu:
+# KG_SSOT_TOOLS → vendor/kg-ssot/tools → tools/ do próprio produto. VENDOR é a pasta-mãe dela (spec/, carimbo).
+. "${HERE}/../kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+TOOLS="$(kgssot_tools_dir "${T}")" || TOOLS="${T}/vendor/kg-ssot/tools"
+VENDOR="$(dirname "${TOOLS}")"
+VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "${VENDOR}/.kg-ssot-version" "${VENDOR}/spec/release.json" 2>/dev/null | head -1)"
+MIG="${TOOLS}/kg_migrate.py"
+# o caminho que o dono roda na RAIZ do alvo: relativo quando a pasta mora nele, absoluto quando veio de fora (env)
+REL_VENDOR="${VENDOR#"${T}/"}"
 [ -f "${MIG}" ] || no "o vendor do alvo (kg-ssot ${VERSION:-?}) não traz o tools/kg_migrate.py, que chegou na kg-ssot 4.13.0; ${DEBT_NODES} nó(s) seguem na dívida MUST (${DEBT_GRAPHS} grafo(s) reprovam), e o --update traz o vendor atual."
 
 # ── 2. o perfil: do dono do corpus, nunca inventado ────────────────────────────────────────────────────────────────
@@ -102,9 +108,9 @@ else
     EXAMPLES="$(cd "${VENDOR}/spec/migrate-examples" 2>/dev/null && ls -1 -- *.profile.yaml 2>/dev/null | head -5 | paste -sd' ' -)"
     echo "MIGRAÇÃO sem perfil: o contrato acusa ${DEBT_NODES} nó(s) na dívida MUST (${DEBT_GRAPHS} grafo(s) reprovam), e o alvo não tem o perfil de migração (procurado em ${CANDIDATES[0]} e ${CANDIDATES[1]})."
     echo "  O core não escreve o perfil: as regras (que trace é código, que pasta é pesquisa, que nó tem fonte irrecuperável) são julgamento do dono do corpus."
-    echo "  Para criar: copie um exemplo do vendor (vendor/kg-ssot/spec/migrate-examples/: ${EXAMPLES:-nenhum exemplo no vendor}) para ${CANDIDATES[0]},"
-    echo "  troque os ids de exemplo pelos do seu grafo e os globs pelas suas pastas (schema: vendor/kg-ssot/spec/kg-migrate-profile.schema.json;"
-    echo "  manual: vendor/kg-ssot/docs/manual/pt-BR/05-ferramentas.md, seção do kg_migrate.py), versione-o e rode o --update (ou este passo) de novo."
+    echo "  Para criar: copie um exemplo do vendor (${REL_VENDOR}/spec/migrate-examples/: ${EXAMPLES:-nenhum exemplo no vendor}) para ${CANDIDATES[0]},"
+    echo "  troque os ids de exemplo pelos do seu grafo e os globs pelas suas pastas (schema: ${REL_VENDOR}/spec/kg-migrate-profile.schema.json;"
+    echo "  manual: ${REL_VENDOR}/docs/manual/pt-BR/05-ferramentas.md, seção do kg_migrate.py), versione-o e rode o --update (ou este passo) de novo."
     exit 2
   else
     PROFILE="${T}/${FOUND[0]}"
@@ -256,7 +262,7 @@ echo "MIGRAÇÃO planejada (dry-run, kg_migrate.py plan do vendor do alvo, kg-ss
 printf '%s\n' "${SUMMARY}"
 echo "  planilha: ${SHEET}"
 echo "  Nada rastreado nem não rastreado do alvo mudou (a foto não lê o conteúdo de arquivo ignorado). Aplicar é do dono do corpus, numa branch, na RAIZ do alvo e DEPOIS de revisar a planilha:"
-printf '    python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile %q' "${REL_PROFILE}"
+printf '    python3 -I -B %q apply --profile %q' "${MIG#"${T}/"}" "${REL_PROFILE}"
 printf ' --exclude %q' "${EXCL[@]:1:1}" "${EXCL[@]:3:1}" "${EXCL[@]:5:1}" "${EXCL[@]:7:1}"
 printf '\n'
 exit 0
