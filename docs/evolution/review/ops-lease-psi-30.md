@@ -2,7 +2,8 @@
 branch: ops/lease-psi-30
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 86ba6f2518aceaa3374b108d1e848144170a15c66fe6d49c589d8592a0f7d4a7
+reviewed_code_sha256: 64456be8a6689f705365a810321f27ee33cba9e52a4638269e2921e062e518e9
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
