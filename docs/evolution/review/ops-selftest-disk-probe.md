@@ -2,7 +2,7 @@
 branch: ops/selftest-disk-probe
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 1e72300af583324b4043cbeeb796547d691583d498a536855ff3893c7dd1a062
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: c19db2a20bd843206422068e7c6f923e1fe51d859702efd9ca907c57cac69472
 findings_total: 4
 findings_real: 1
