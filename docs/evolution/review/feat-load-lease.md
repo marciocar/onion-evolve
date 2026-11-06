@@ -2,8 +2,8 @@
 branch: feat/load-lease
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 159fbbe1d7fc7231d671af1c9e9654e1d418e1af78f3090aaabbcc10e9c0acdc
-reviewed_code_sha256: 29d3e8e854d3a99778059821f5c469575ecfeb8d506a463084d0137f12c2c8c8
+reviewed_diff_sha256: faa00d6d99189c599408eec06105cd2288a25ce11b4eaf99f0f9ce417654c48f
+reviewed_code_sha256: 0b4c456a19bd248d63ac5be63fb52724f904ee054c22e0d79ef7168aab41d999
 findings_total: 5
 findings_real: 5
 tokens: 0
@@ -65,3 +65,10 @@ carga, e a ligação (i) no pre-commit, no pr-finalize e no lab. Rodada isolada:
   social.
 - O CI (`GITHUB_ACTIONS=true`) passa direto: um job por runner.
 - A série do sysstat amostra de 10 em 10 min, então pico curto entre duas amostras não aparece na medida.
+
+## Re-revisão depois do rebase (2026-11-06)
+
+O `--rebase` sobre `origin/main` @ 0a5dcaf39 mudou o hash de código porque o driver de famílias juntou, lado a lado,
+o bloco `plugin_write_guard`, que já estava na main, com o `load_lease`. Conferi: os dois blocos estão inteiros, a
+bancada passa no `bash -n` e o pré-voo do finalize rodou `load_lease` e `shell_pipefail_robustness`, com 29 de 29
+verdes. Nenhuma linha deste PR mudou no rebase.
