@@ -122,7 +122,7 @@ moat_unversioned_script() {
   grep -qE '\|[[:space:]]*(ba|z|da|k)?sh([[:space:]]|$)' <<< "$raw_cmd" && return 0
   while IFS= read -r t; do
     [ -z "$t" ] && continue
-    case "$t" in *'$'*|*'`'*|'~'*) return 0 ;; esac
+    case "$t" in *'$'*|*'`'*|'~'*|*'*'*|*'?'*|*'['*) return 0 ;; esac   # glob: o ls-files o casaria como pathspec
     git -c core.fsmonitor=false -C "$d" ls-files --error-unmatch -- "$t" >/dev/null 2>&1 || return 0
   done < <(printf '%s\n' "$flat" \
              | grep -oE '(^|[;&|(`[:space:]])(bash|sh|zsh|dash|ksh|source|\.)[[:space:]]+[^-[:space:];&|][^[:space:];&|]*|[^[:space:];&|<>]*\.sh([^[:alnum:]_]|$)|(^|[;&|(`[:space:]])\./[^[:space:];&|]+' \
@@ -150,7 +150,7 @@ moat_cites_symlink() {
 [ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(push|send-pack)([^[:alnum:]_-]|$)' <<< "$flat" && hit=1
 # (6) publicação pela API do forge: aprovação de ambiente, visibilidade, descrição e tópicos do repo
 [ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(gh|curl)([^[:alnum:]_-]|$)' <<< "$flat" \
-  && grep -qE 'pending_deployments|repo[[:space:]]+edit|/topics|visibility|description|private' <<< "$flat" && hit=1
+  && grep -qE 'pending_deployments|repo[[:space:]]+edit|release[[:space:]]+(create|edit|delete|upload)|/releases|/topics|visibility|description|private' <<< "$flat" && hit=1
 [ "$hit" = 0 ] && exit 0
 
 # ── leitura exata do JSON + juiz ──────────────────────────────────────────────────────────────────────────

@@ -10785,7 +10785,7 @@ EOF" "${L}" \
     'for s in a b; do bash ops/chat-runner.sh install "$s"; done' "${J}" \
     $'        if DYNAMIC.search(a):\n            continue' $'        if DYNAMIC.search(a):\n            _moat_emit("inanalisavel", rel, "", "x"); return'
   _mgcase "(ato17) bash -n (só confere a sintaxe, não executa) → passa" 0 "${P}" \
-    'bash -n ops/update-bridge.sh' "${J}" '        if any(re.match(r"^-[A-Za-z]*n[A-Za-z]*$", w) for w in pre) or \' '        if False and any(re.match(r"^-[A-Za-z]*n[A-Za-z]*$", w) for w in pre) or \'
+    'bash -n ops/update-bridge.sh' "${J}" $'        if noexec:\n            return' $'        if False:\n            return'
   _mgcase "(ato8) cópia RENOMEADA de um script de ato (mesmo conteúdo) → VETO" "2:MOAT/ato" "${P}" \
     "bash ${d}/scratch/ub-renomeado.sh" "${J}" '    return _MOAT_ACT_SHA["d"].get(_moat_act_digest(rp))' '    return None'
   _mgcase "(ato9) o mesmo script no clone servido (fora do projeto, pelo NOME) → VETO" "2:MOAT/ato" "${P}" \
@@ -10797,7 +10797,7 @@ EOF" "${L}" \
     'R=$(pwd); bash "$R/ops/publish-door.sh" --status' "${J}" \
     '            _moat_act_judge(named[0], [a for a in words[k + 1:] if a], " ".join(words))' '            _moat_emit("ato", named[0], "", "x")'
   _mgcase "(ato12) caminho do script só conhecido em runtime, com o nome no texto → FECHA" "2:script de ato" "${P}" \
-    'bash $(echo ops/update-bridge.sh)' "${J}" '        elif MOAT_ACTS and SUBST in str(path) and any(' '        elif False and any('
+    'bash $(echo ops/update-bridge.sh)' "${J}" '        elif MOAT_ACTS and ((SUBST in str(path) and any(' '        elif False and ((SUBST in str(path) and any('
   _mgcase "(ato13) script de ato pelo caminho duplo (ops//x.sh), que só o NOME no sinal leva ao juiz → VETO" "2:MOAT/ato" "${P}" \
     'bash ops//publish-door.sh --all --push --version 1.2.3' "${H}" '          [ "$c" = ato ] && printf' '          false && printf'
   # o mutante é a guarda por VOCABULÁRIO que o desenho recusa: o nome do script em qualquer lugar do texto veta
@@ -10856,6 +10856,44 @@ EOF" "${L}" \
   _mgcase "(pub8) tag criada na própria string e empurrada pelo nome → VETO" "2:git push de TAG" "${P}" \
     'git tag -a v3.0.0 -m x && git push origin v3.0.0' "${J}" \
     '            _MOAT_TAGS.add(pos[0])' '            pass'
+  _mgcase "(pub9) gh release create (release pública) → VETO" "2:MOAT/publicação" "${P}" \
+    'gh release create v1.0.0 --notes x' "${J}" \
+    'words[2] in ("create", "edit", "delete", "upload"):' 'words[2] in ("edit", "delete", "upload"):'
+  _mgcase "(pub10) gh release view (leitura) → passa" 0 "${P}" \
+    'gh release view v1.0.0 --json description' "${J}" \
+    'words[2] in ("create", "edit", "delete", "upload"):' 'words[2] in ("view", "create", "edit", "delete", "upload"):'
+  _mgcase "(pub11) gh api POST em releases → VETO" "2:MOAT/publicação" "${P}" \
+    'gh api -X POST repos/o/r/releases -f tag_name=v1' "${J}" \
+    '    elif meth in ("POST", "PATCH", "DELETE") and re.match(r"^repos/[^/]+/[^/]+/releases' '    elif meth in ("NUNCA",) and re.match(r"^repos/[^/]+/[^/]+/releases'
+  # ── curas da passada adversarial (2026-11-05): cada forma EXECUTAVA o ato e passava ──────────────────────
+  _mgcase "(cur1) bash -n +n x.sh executa (vale o último toggle) → VETO" "2:MOAT/ato" "${P}" \
+    'bash -n +n ops/publish-door.sh --all --push --version 1.0.0' "${J}" '                noexec = w[0] == "-"' '                noexec = True'
+  _mgcase "(cur1b) -o noexec seguido de +o noexec executa → VETO" "2:MOAT/ato" "${P}" \
+    'bash -o noexec +o noexec ops/update-bridge.sh' "${J}" '                noexec = w == "-o"' '                noexec = True'
+  _mgcase "(cur2) cópia criada na própria string (cat > q.sh) e executada com --push → FECHA" "2:MOAT" "${P}" \
+    "cat ops/publish-door.sh > ${d}/scratch/q.sh; bash ${d}/scratch/q.sh --all --push --version 1.0.0" "${J}" \
+    '        if _MOAT_ACT_NAMES is not None and _MOAT_ACT_NAMES.search(ln) and _MOAT_ACT_RUN.search(ln):' '        if False:'
+  _mgcase "(cur3) xargs -I{} bash {} com o nome do ato no stdin → FECHA" "2:MOAT" "${P}" \
+    'echo ops/update-kg-writer.sh | xargs -I{} bash {}' "${J}" \
+    '        if _MOAT_ACT_NAMES is not None and _MOAT_ACT_NAMES.search(ln) and _MOAT_ACT_RUN.search(ln):' '        if False:'
+  _mgcase "(cur4) find -exec bash {} sobre um script de ato → FECHA" "2:find -exec" "${P}" \
+    'find ops -name update-bridge.sh -exec bash {} \;' "${J}" \
+    '            moat_unanalyzable(words, "find -exec que roda um shell sobre o que achar")' '            pass'
+  _mgcase "(cur5) script -qc com a opção colada → VETO" "2:MOAT/ato" "${P}" \
+    "script -qc 'bash ops/update-bridge.sh' /dev/null" "${J}" \
+    '                    if re.match(r"^-[A-Za-z]*c$", a) and k + 1 < len(args):' '                    if False:'
+  _mgcase "(cur6) shell lendo o texto do ato por pipe que não é cat → FECHA" "2:por pipe" "${P}" \
+    "sed '' ops/update-kg-writer.sh | bash -s" "${J}" \
+    '            elif piped and prev and _MOAT_ACT_NAMES is not None' '            elif False and _MOAT_ACT_NAMES is not None'
+  _mgcase "(cur7) bash <(cat ops/x.sh) → FECHA" "2:MOAT" "${P}" \
+    'bash <(cat ops/update-kg-writer.sh)' "${J}" \
+    '        if _MOAT_ACT_NAMES is not None and _MOAT_ACT_NAMES.search(ln) and _MOAT_ACT_RUN.search(ln):' '        if False:'
+  _mgcase "(cur8) glob no caminho que casa um ato (publish-door.s?) com --push → VETO" "2:MOAT/ato" "${P}" \
+    'bash ops/publish-door.s? --all --push --version 1.0.0' "${J}" '    if re.search(r"[*?\[]", p):' '    if False:'
+  _mgcase "(cur8b) glob [p] que o ls-files do pré-filtro casava como versionado → VETO" "2:MOAT/ato" "${P}" \
+    'bash ops/[p]ublish-door.sh --all --push --version 1.0.0' "${H}" "|*'*'*|*'?'*|*'['*) return 0 ;; esac" ") return 0 ;; esac"
+  _mgcase "(cur9) o mesmo glob em leitura (--status) → passa" 0 "${P}" \
+    'bash ops/publish-door.s? --status' "${J}" '        if w in sig:' '        if True:'
   # ── o modo DERIVADO (2026-11-05): sem ops/moat-targets.tsv o hook não sai mais; o relógio veta e a publicação avisa ──
   # Medido na curadoria: num adotante 27 de 31 formas de ato passavam por todos os hooks. Fixture: repo `role: adopted`.
   local AD="${d}/adot"

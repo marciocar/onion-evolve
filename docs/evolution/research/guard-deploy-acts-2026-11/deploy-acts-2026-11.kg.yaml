@@ -6,7 +6,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-05"
   review_after: "2026-12-05"   # 30d: defeito de guarda
-  # ═══ TETO: 21 NÓS ═══  (14 da 1ª leva + 7 do adotante, da publicação sem script e do relógio por arquivo)
+  # ═══ TETO: 24 NÓS ═══  (14 da 1ª leva + 7 do adotante, da publicação e do relógio + 3 da passada adversarial)
 nodes:
   - id: Q_VETO_BARRA_O_ATO_DE_DEPLOY
     node_type: question
@@ -16,7 +16,7 @@ nodes:
     impact: 5
     confidence: 0.8
     verified_at: "2026-11-05"
-    verified_against: "famílias moat_gate e act_signature verdes (316 casos, 0 falhas), com mutante por caso; replay do corpus contra o hook antigo e o novo, no core e nos derivados"
+    verified_against: "famílias moat_gate e act_signature verdes (344 casos, 0 falhas), com mutante por caso; replay do corpus contra o hook antigo e o novo, no core e nos derivados"
     label: "o veto do MOAT barra, pela sessão, o ato de deploy e de publicação que os wrappers de ops/ fazem, e deixa passar o ensaio e a leitura deles"
     narrative: "Aberta até a passada adversarial e o merge, que são do maestro. A guarda estende o pretooluse-moat-gate.sh com a classe ato, lida das linhas `ato script` do ops/moat-targets.tsv (core-only), e a REGRA 117 (Ato de deploy tem assinatura no veto) é a catraca da lista."
   - id: E_DEFEITO_WRAPPER_FRONTEIRA_PARA_TUDO
@@ -284,6 +284,47 @@ nodes:
     trace: ".claude/hooks/lib/moat-judge.py"
     label: "teto: push de tag pelo nome só se reconhece se a tag já existe no clone e não há branch homônima, ou se nasceu na mesma string; tag por variável de fora passa"
     narrative: "Nome com branch homônima é ambíguo também para o git; aí cala (cláusula 4)."
+  - id: E_REFUTADOR_REPROVOU_159573A60
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-05"
+    verified_against: "probes do refutador independente reexecutadas contra a branch antes e depois da cura; casos cur1 a cur9 da família moat_gate"
+    trace: ".claude/hooks/lib/moat-judge.py"
+    label: "a passada adversarial reprovou o 159573a60 com quatro furos que executavam o ato e passavam: o toggle `-n +n`, a cópia criada na própria string e os executores opacos, o shell lendo o texto por outra fonte, e o glob no caminho"
+    narrative: "Curas: vale o último toggle de noexec (e `+n`/`+o` não são mais lidos como o script); o NOME de um script de ato entra na relevância do inanalisável junto de algo que executa ou copia o texto (cat > q.sh, tee, rsync, xargs -I{} bash {}, find -exec bash {}, tmux new -d); `script -qc` com opção colada é seguido; o shell que lê por pipe o texto de um ato (git show, sed) fecha; glob no caminho casa o ato pelo nome, e o pré-filtro manda glob ao juiz porque o ls-files o lia como pathspec versionado. `gh release create` e POST em releases entraram na publicação. Replay pós-cura (1.709 comandos que citam um ato): 131 vetos novos, 112 da classe ato e 19 fechamentos do inanalisável; estreitada a relevância (só o que EXECUTA conta, e `$X/…` cala), restam 10, dos quais 5 são atos reais (`env $(cat …) bash ops/a2a-queue-live.sh archive … --apply`, o script do bridge tirado da main e rodado) e 5 falsos positivos raros: comando que o analisador não lê, ou harness que monta em texto um JSON citando o ato."
+    provenance:
+      source: "docs/evolution/review/feat-guard-deploy-acts.md"
+      locator: "achados da passada adversarial sobre 159573a60"
+      method: "refutador independente com probes próprias; curas re-medidas pelas mesmas probes"
+      locality: "repo"
+  - id: C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-05"
+    verified_against: "probe do refutador: bash ops/apply-ruleset-main.sh passa; ele não está na 4ª coluna de nenhuma linha do tsv nem tem linha ato"
+    trace: "ops/moat-targets.tsv"
+    label: "teto: script de ops/ que age no forge ou no público e que nenhuma linha do tsv nomeia (apply-ruleset-main.sh) passa; a REGRA 117 só cobra linha ato de wrapper que a 4ª coluna já nomeia"
+    narrative: "Gatilho: o próximo script de ops/ que publique ou mude o host remoto entra com linha ato no mesmo PR que o cria; a lista é dado, e esta é a sua borda medida."
+  - id: C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-05"
+    verified_against: "act-signature-check.sh: confere a palavra no código sem comentário, não a semântica"
+    trace: ".claude/validation/act-signature-check.sh"
+    label: "teto: a REGRA 117 confere só que a palavra da assinatura existe no código do script, não que ela seja o que faz o ato"
+    narrative: "Um modo novo que aplica sem nenhuma das palavras (um --force que também aplica) passa a REGRA e o veto. Gatilho: uma mudança de gramática num wrapper medida no PR."
 edges:
   - from: E_DEFEITO_WRAPPER_FRONTEIRA_PARA_TUDO
     to: Q_VETO_BARRA_O_ATO_DE_DEPLOY
@@ -344,4 +385,13 @@ edges:
     edge_type: CONSTRAINS
   - from: C_TETO_TAG_POR_NOME_AMBIGUO
     to: E_PUBLICACAO_SEM_SCRIPT
+    edge_type: CONSTRAINS
+  - from: E_REFUTADOR_REPROVOU_159573A60
+    to: D_ESTENDER_O_MOAT_GATE_POR_LINHA_ATO
+    edge_type: SUPPORTS
+  - from: C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA
+    to: D_REGRA_117_CATRACA_DA_LISTA
+    edge_type: CONSTRAINS
+  - from: C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA
+    to: D_REGRA_117_CATRACA_DA_LISTA
     edge_type: CONSTRAINS
