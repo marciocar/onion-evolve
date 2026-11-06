@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**108 regras** no total — **94 HARD**, **49 SOFT**.
+**109 regras** no total — **95 HARD**, **50 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -217,6 +217,7 @@ As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a 
 | 101 | Veto PreToolUse por exit 2 declara onFailure: block | HARD + SOFT | veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa). |
 | 114 | Plugin não mora em .claude/skills no disco | HARD + SOFT | um plugin plantado em .claude/skills/<nome>/.claude-plugin/ ou .claude/skills/<nome>/hooks/, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê. `hooks/` mais fundo é conteúdo. |
 | 115 | Hooks rodam python em modo isolado | HARD + SOFT | um hook, ou o que ele executa, rodar python sem `-I` e importar de fora da instalação do interpretador |
+| 117 | Ato de deploy tem assinatura no veto | HARD + SOFT | um wrapper de deploy nascer, ou ter a gramática mudada, fora do veto do ATO do pretooluse-moat-gate.sh |
 
 ## Aplicabilidade por papel
 
@@ -230,3 +231,4 @@ legítima de objeto não é aviso. Toda lista contém `source`, então no core t
 | 85 | Porta pública espelha o core, com catraca | source |
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | source |
 | 109 | CLAUDE.md não cresce sem tirar o equivalente ou citar um nó | source |
+| 117 | Ato de deploy tem assinatura no veto | source |

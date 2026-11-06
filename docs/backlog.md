@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**923 itens abertos** em 147 grafo(s) com aberto (de 188 no escopo) · 148 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**934 itens abertos** em 148 grafo(s) com aberto (de 189 no escopo) · 149 grupo(s), agrupados por `owner:` (46 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -436,6 +436,22 @@
 | 3.6 | `C_SUPERACAO_20261104_HOOKS_PAGE_ANSWERS_PART` | vibe-subagent-2026-11 | A página de agentes não cobre (1)-(4), mas a página oficial de hooks documenta que subagentes herdam os hooks do projeto, o std |
 | 3.6 | `C_SUPERACAO_20261104_README_SESSION_JOURNAL` | vibe-subagent-2026-11 | O README chama o armazenamento atual da sessão de session journal, no diretório de logs de sessão sob VIBE_HOME (journal_dir no |
 | 3.6 | `C_SUPERACAO_20261104_RELEASES_CONFIRM_HOOKS_IN_SUBAGENT` | vibe-subagent-2026-11 | As release notes confirmam hooks dentro do subagente (v3.0.2), parent_session_id, session_id e transcript_path no stdin (v2.26.0), |
+
+## deploy-acts-2026-11 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 52.0 | `Q_VETO_BARRA_O_ATO_DE_DEPLOY` | deploy-acts-2026-11 | o veto do MOAT barra, pela sessão, o ato de deploy e de publicação que os wrappers de ops/ fazem, e deixa passar o ensaio e a l |
+| 4.8 | `C_TETO_COPIA_MUDADA_E_RENOMEADA` | deploy-acts-2026-11 | teto: a cópia de um wrapper que alguém MUDA e renomeia escapa do veto do ato; o corpo dela segue julgado por alvo, e a cópia ve |
+| 4.8 | `C_TETO_FORA_DO_BASH` | deploy-acts-2026-11 | teto: o veto só vê o Bash da sessão; um servidor MCP que executa comando, um interpretador que chama o wrapper por subprocess e |
+| 4.8 | `C_TETO_PUBLICACAO_NO_DERIVADO_E_SO_AVISO` | deploy-acts-2026-11 | teto: no derivado a publicação só avisa; quem barra é o hook local do adotante, quando ele existe, e um adotante sem esse hook |
+| 4.5 | `C_TETO_AGENDAMENTO_NATIVO_E_WRITE` | deploy-acts-2026-11 | teto: o agendamento nativo do Claude Code (CronCreate, ScheduleWakeup do /loop, RemoteTrigger) e a unit .timer escrita pela ferram |
+| 4.5 | `C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL` | deploy-acts-2026-11 | teto: o merge de PR de outra sessão pelo caminho verificado segue regra social, porque o hook não sabe de quem é o PR |
+| 4.5 | `C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA` | deploy-acts-2026-11 | teto: script de ops/ que age no forge ou no público e que nenhuma linha do tsv nomeia (apply-ruleset-main.sh) passa; a REGRA 117  |
+| 4.2 | `C_TETO_BANG_NA_VERSAO_ATUAL` | deploy-acts-2026-11 | teto: que o `!` não passa pelos hooks foi medido no corpus até a 2.1.308, não na 2.1.318 |
+| 3.2 | `C_TETO_ARGUMENTO_DE_FORA_DA_STRING` | deploy-acts-2026-11 | teto: a assinatura que chega por variável de fora da string (arquivo, ambiente, laço) passa calada, por decisão |
+| 3.2 | `C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA` | deploy-acts-2026-11 | teto: a REGRA 117 confere só que a palavra da assinatura existe no código do script, não que ela seja o que faz o ato |
+| 3.0 | `C_TETO_TAG_POR_NOME_AMBIGUO` | deploy-acts-2026-11 | teto: push de tag pelo nome só se reconhece se a tag já existe no clone e não há branch homônima, ou se nasceu na mesma strin |
 
 ## onda-derivada-e-o-lugar-do-onion-2026-10 — 9 item(ns)
 
