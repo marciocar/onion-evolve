@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: a7a559d6aed5193c202a32c0c44f6ec51a1dacd1c28dc5e0f17f346ceda7af0c
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 0a2f0de6b01344febba45c62bd6c386e2bb786b079b6dbdf059e6d5db17977c9
 findings_total: 9
 findings_real: 9
@@ -16,7 +16,8 @@ nota: >
   diferencial rodando o lab.py do refutador sobre git archive e0545c889: os BLOQUEIA viraram rc 2, e
   os FURO e FP restantes são exatamente os declarados. tokens e duration_min não foram medidos (0). Depois da verificação entrou uma só mudança, na bancada: o caso (b2)
   passou a ler por here-string (o pré-voo do pr-finalize acusou `produtor | grep -q`, a classe EPIPE sob pipefail);
-  o hook, o juiz e a varredura não mudaram.
+  o hook, o juiz e a varredura não mudaram. Depois, o CI do PR #1491 reprovou o caso (c) da família veto_onfailure,
+  que conta os vetos do settings.json (6 fixos); o veto novo é o 7º, e a contagem subiu na bancada, sem tocar a guarda.
 ---
 
 # Guarda da escrita na memória do Claude Code e a varredura do disco
