@@ -2,7 +2,7 @@
 branch: fix/adopt-writes-guard-core-line
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: 81dcc7c26cb1e97279bbfdbdabc0f1835becccf21bfef6a7fd0eeab2574d099c
+reviewed_diff_sha256: 3ce1a37c71a44b1b128e9470cca5083d9fd8b3479eec99b374b4eedb7d4d8874
 reviewed_code_sha256: bac019eeb9ce45d9e9c8bd805ea08bf230ce82222d9546efe2ea4340408b5de0
 findings_total: 3
 findings_real: 2
