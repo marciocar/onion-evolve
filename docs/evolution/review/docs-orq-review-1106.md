@@ -2,7 +2,7 @@
 branch: docs/orq-review-1106
 pr: 1511
 date: 2026-11-06
-reviewed_diff_sha256: 7af0724890c0df20f4fe0286bcd6726308c93cf5b71672044ed831a6191fb519
+reviewed_diff_sha256: 187cf5a0d32c9a8fb94c3e458b91c05775c3125e0e52561c35acff43b84f2811
 reviewed_code_sha256: 8c6cfd1842a19472e3e1c773ae3cb31f1525c37139da7aaa9e8f53b51086ccdc
 findings_total: 4
 findings_real: 3
