@@ -35,8 +35,8 @@ com fallback por pull + identidade em dois adapters (Logto e local) + Slack Sock
 A diferença para a recomendação do Elenxo é a fila. O Elenxo recomendou escrever a Fila 1 (SQLite em WAL com
 daemon escritor único). A rodada de primárias achou o honker, uma fila SQLite pronta com teto de tentativas,
 `_honker_dead`, lease com fencing e WAL com um escritor. O maestro escolheu vendorizar o honker em vez de
-reescrever, com a condição de que ele passe pela bancada e pelo mutante antes de valer, porque o README o
-declara alpha.
+reescrever, com a condição de que ele passe pela bancada e pelo mutante antes de valer. O README o declara
+alpha, e ele não foi rodado no core.
 
 | Selo | Escolhida | Descartadas |
 |---|---|---|
@@ -92,7 +92,7 @@ Primárias: 4 fontes nomeadas, todas alcançadas, 15 claims ancoradas, 8 rejeita
   `jti` vale em qualquer escolha.
 - **honker:** fila SQLite at-least-once com retries, visibility timeout, lease com fencing, `_honker_dead` por
   "max attempts exceeded", ack por DELETE, WAL com um escritor; alpha no README, licença Apache-2.0 OR MIT,
-  release v0.6.0 visível só na API do GitHub (`C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060`).
+  release v0.6.0 visível na API do GitHub e não no README (`C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060`).
 - **CloudEvents entre agentes tem prior art:** a ADR 0021 do agent-governance-toolkit adota CloudEvents v1.0
   para exportação de auditoria, e o apache/eventmesh v1.12.0-rc1 lista A2A sobre CloudEvents. Isso basta para
   rever a frase "o mercado não a tem" (`Q_MESSAGING_PRIMARIES_REVIEW_1106`, sem selo).
@@ -125,7 +125,7 @@ estão nomeadas no JSON da varredura (`budgetDropped`, `notVerifiedByBudget`).
 **Lacunas abertas que a pilha selada carrega:**
 
 - **O smoke do channel na 2.1.319** (`E_OBJECAO_F5_PIN_CC_AND_RESMOKE`): o channel do spike não foi
-  repetido na versão atual do Claude Code. A campainha vale só depois dele.
+  repetido na versão atual do Claude Code, e a campainha selada segue sem medida nela.
 - **O valor do teto de tentativas:** o SQS não dá número, o README do honker não dá o padrão, e o evento que
   conta como tentativa (claim, fim de lease ou recebimento) difere entre as fontes. Fica para a bancada do
   honker.
@@ -147,5 +147,5 @@ Valeu, e a rodada de primárias foi o que pagou o conjunto. Por 11% dos tokens e
 JetStream o argumento da dead-letter, achou o honker (o que trocou "escrever a fila" por "vendorizar e medir a
 fila") e achou prior art de CloudEvents entre agentes. A varredura deixou a forma da pilha (envelope C,
 campainha com pull, ack pela tool, pull na volta) e as restrições do channel, mas gastou 3,4 vezes mais por nó
-e deixou sem fonte as três lacunas que as primárias foram buscar. É a mesma razão medida em 2026-09-13:
-primárias nomeadas custam uma fração por nó da varredura.
+e deixou sem fonte as três lacunas que as primárias foram buscar. Vai na mesma direção da medida de 2026-09-13 (291 mil contra 42 mil tokens por nó, quase 7 vezes): primárias
+nomeadas custam uma fração por nó da varredura.
