@@ -16060,7 +16060,7 @@ YML
   if [ "${okbad}" -eq 1 ] && [ ! -e "${sbh}/.claude/fora.jti.state" ] && [ -z "$(find "${sbh}" -name '*fora*' 2>/dev/null)" ]; then record_pass "a2a-verify: (F3.8) receptor fora da forma (../, -x, a/b, .oculto, espaço) → veto receiver-malformed, nada gravado fora da fila"
   else record_fail "a2a-verify: (F3.8) forma do receptor" "out='${out}' rc=${rc}"; fi
   # ── FILA LOCAL (2026-11-06, D_GATE_STANDALONE_FILA_LOCAL_1106): a volta core → curadoria (standalone) do ────
-  # ensaio do onion-messaging era recusada na 0b. Com --channel local-queue o gate aceita o standalone REGISTRADO
+  # ensaio da fila local de mensageria era recusada na 0b. Com --channel local-queue o gate aceita o standalone REGISTRADO
   # cujo local_path existe NESTA máquina e é do uid que roda o gate; pela rede (default) nada muda.
   local lqd; lqd="$(mktemp -d)"
   # o core assina a volta: o kid k1 passa a ser dele NESTE registro (os casos F3 acima já rodaram)
