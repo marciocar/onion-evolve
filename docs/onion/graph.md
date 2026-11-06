@@ -719,6 +719,14 @@ onion-kg-ssot	specialization	produto
 onion-kg-ssot	specialization	schema	
 onion-kg-ssot	tier	standalone	
 onion-kg-ssot	trust-advises	onion-evolve	
+onion-messaging	adopts	onion-evolve	
+onion-messaging	mode	greenfield	
+onion-messaging	pin	6760a7bede50	
+onion-messaging	specialization	a2a	
+onion-messaging	specialization	channels-mcp	
+onion-messaging	specialization	mensageria	
+onion-messaging	tier	standalone	
+onion-messaging	trust-advises	onion-evolve	
 onion-meta	provides	meta-factory	
 onion-meta	provides	self-audit	
 onion-meta	provides	skill-absorption	
