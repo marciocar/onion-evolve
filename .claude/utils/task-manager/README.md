@@ -37,6 +37,7 @@ task-manager/
     ├── jira.md        # Adapter Jira
     ├── linear.md      # Adapter Linear (API-first; MCP opcional)
     ├── linear.py      # Adapter EXECUTÁVEL do Linear (stdlib, GraphQL) — chamado pelo tm.sh
+    ├── clickup.py     # Adapter EXECUTÁVEL do ClickUp (stdlib, REST v2) — chamado pelo tm.sh (2026-11-06)
     ├── zoho.md        # Adapter Zoho Projects (API V3 apenas — sem MCP nativo)
     └── <p>.capabilities.tsv  # O que cada adapter implementa, não implementa e ninguém verificou, com fonte
 ```

@@ -120,7 +120,7 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma
 
 > **Executável (desde 2026-10-11, SAC-65):** `bash .claude/utils/task-manager/tm.sh <capability> [args]`
 > resolve o provider e roda o adapter executável dele (`tm.sh item.read <ID>`, `comment.add`, `status.transition`,
-> `item.create`, `search.query`…; `tm.sh --capabilities` lista os verbos). **Linear é o primeiro** (`adapters/linear.py`);
+> `item.create`, `search.query`…; `tm.sh --capabilities` lista os verbos). Executáveis: `adapters/linear.py`, `clickup.py`;
 > provider sem executável sai com exit 2 nomeando o que falta. Use o `tm.sh` em vez de script avulso de API.
 > A REGRA 104 mantém a lista do executável e o `adapters/<p>.capabilities.tsv` coerentes.
 > **Ler uma task é ler TUDO (desde 2026-10-12, SAC-116):** `tm.sh item.read <ID>` devolve descrição + todos os
