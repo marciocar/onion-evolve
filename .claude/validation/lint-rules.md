@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**109 regras** no total — **95 HARD**, **50 SOFT**.
+**110 regras** no total — **96 HARD**, **51 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
