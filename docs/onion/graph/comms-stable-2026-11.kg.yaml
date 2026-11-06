@@ -169,9 +169,11 @@ nodes:
     owner: core
     x_due: "2026-11-09"
     impact: 5
-    confidence: 0.6
+    confidence: 0.7
+    verified_at: "2026-11-06"
+    verified_against: "gh pr view 2 --repo marciocar/onion-messaging: MERGED 2026-11-06T18:31:05Z (684d0adc4232); gh run list na main: campainha success em 35e0530"
     label: "Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo dela, sem rede, com o aviso como ponteiro e nunca o corpo."
-    narrative: "Pronto quando: o channel está no onion-messaging com bancada e mutante, vendorizado no core, instalado no hub e numa peer, e um sinal entregue pelo carteiro toca a sessão receptora sem ninguém digitar. Conduz: o core."
+    narrative: "Pronto quando: o channel está no onion-messaging com bancada e mutante, vendorizado no core, instalado no hub e numa peer, e um sinal entregue pelo carteiro toca a sessão receptora sem ninguém digitar. Conduz: o core. Estado medido em 2026-11-06: forjada e mergeada no onion-messaging (PR #2, 684d0ad), com bancada, mutantes e CI verdes na main; no degrau 3 ela passou a tocar também na fila (PR #3). Falta o teste ao vivo: ligar numa sessão real pela flag de dev channels (ato do maestro), vendorizar no core e instalar no hub e numa peer. O kit do teste ao vivo é o PR #4 do onion-messaging. Segue open até o teste ao vivo."
   - id: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
     node_type: question
     layer: audit
@@ -180,9 +182,11 @@ nodes:
     owner: core
     x_due: "2026-11-09"
     impact: 5
-    confidence: 0.5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "gh pr view 3 --repo marciocar/onion-messaging: MERGED 2026-11-06T20:08:07Z (35e05303f0fe); gh run list na main: fila success em 35e0530; ensaio tools/live_rehearsal.py do PR #4 rodado na VPS em 2026-11-06, 16/16"
     label: "Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offline, e a campainha da sessão receptora tocando quando a fila anda."
-    narrative: "Pronto quando: duas sessões do Onion (o core e uma peer) trocam ida e volta pela fila, uma delas fechada no meio e recuperando ao abrir, com o gate do A2A intacto e o aceite humano onde a regra pede. Conduz: o core."
+    narrative: "Pronto quando: duas sessões do Onion (o core e uma peer) trocam ida e volta pela fila, uma delas fechada no meio e recuperando ao abrir, com o gate do A2A intacto e o aceite humano onde a regra pede. Conduz: o core. Estado medido em 2026-11-06: forjado e mergeado no onion-messaging (PR #3, 35e0530): daemon por sessão com honker 0.5.0 fixo, gate do core em todo submit, dedupe por remetente, lease, reenvio, teto e dead-letter, ack só pela campainha; bancada, ponta a ponta, mutantes (35 mortos, 0 vivos) e CI verdes na main. O kit do teste ao vivo (PR #4) ensaiou com os ids, o registro e o gate reais e chaves de teste: a ida curadoria → core chega; a volta core → curadoria é recusada pelo gate (receiver-not-a-receiver:role-standalone, a camada 0b do a2a-verify.sh só aceita source ou hub) e só chega com a curadoria como hub numa cópia da política. Falta o teste ao vivo, e antes dele três atos do maestro: os pares de chave dos dois membros com a pública pinada e o kid em a2a.keys, a decisão sobre o receptor standalone e os daemons subidos nas duas sessões. Segue open até o teste ao vivo."
   - id: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
     node_type: question
     layer: audit
@@ -209,13 +213,16 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     x_due: "2026-11-07"
     impact: 5
-    confidence: 0.6
+    confidence: 0.8
+    evidence_class: testimony
+    verified_at: "2026-11-06"
+    verified_against: "gh pr view 228 --repo marciocar/onion-curation: MERGED 2026-11-06T15:36:25Z (169f9e746253), docs(curation): dissecação dos channels do Claude Code e das pontes entre sessões; o conteúdo e as 3 respostas por relato da curadoria"
     label: "Dissecação pelo /meta:dissect dos channels do Claude Code (channels.md e channels-reference.md), dos channels da allowlist oficial e das pontes da comunidade (peerbus, agent-inbox, agent-bridge, claude-mesh), com veredito por família e as 3 respostas pedidas pelo core."
-    narrative: "As 3 respostas: ponte pronta × costura × protótipo próprio; o que os oficiais mudam no desenho; os 3 maiores riscos das pontes. Aceito pela curadoria na repassada de 2026-11-06, até 12h de São Paulo de 07/11. Pronto quando: o grafo da dissecação está na curadoria com radar exit 0 e as 3 respostas chegaram ao core. Linear: SAC-296."
+    narrative: "As 3 respostas: ponte pronta × costura × protótipo próprio; o que os oficiais mudam no desenho; os 3 maiores riscos das pontes. Aceito pela curadoria na repassada de 2026-11-06, até 12h de São Paulo de 07/11. Pronto quando: o grafo da dissecação está na curadoria com radar exit 0 e as 3 respostas chegaram ao core. Linear: SAC-296. Entregue em 2026-11-06, antes do prazo, no PR #228 da curadoria; o degrau 3 usou as referências de desenho dela (peerbus e a2abridge). O core não releu a dissecação inteira: a classe é testemunho."
   - id: Q_CS_KGSSOT_FORMA_X_EVENT_1107
     node_type: question
     layer: audit
