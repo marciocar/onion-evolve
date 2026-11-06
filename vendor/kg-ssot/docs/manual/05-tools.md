@@ -1472,6 +1472,121 @@ projection_ignore:   # names between backticks that are not node ids
   and every graph of `projection_of` read; 1 otherwise; 2 on broken input (a front matter that does not read, a
   `--root` that is not a folder).
 
+### The sources that are absent: `--strict-sources` (4.44.0)
+
+A source with a `provenance.scheme` or a `provenance.sha256` that is not there, in the repository or at the commit of a URL read
+with `--with`, is counted in `skipped.missing_source`, and `check` still gives rc 0: that stays, for compatibility.
+`--strict-sources` lists each one (`SOURCE MISSING`) and gives its own rc, 4, after any finding of rc 1, and the JSON output is
+`kg-ssot.trace/2`, with `schemes.missing_sources`. A source with neither is not judged, with or without the option, and
+that includes a URL with a commit and no hash: to compare those, use `kg_refs.py pins`.
+
+A `provenance.source` in the form `repo#id@commit` is not read here, and `kg_refs.py pins` is what compares it. When the form
+occurs, with or without the option, it is counted in a line of its own in the human output and in `schemes.repo_refs`, and the
+JSON output is `kg-ssot.trace/2`. A corpus without that form and without the option gets the same `kg-ssot.trace/1` as before.
+
+## `kg_refs.py`: citations across repositories (4.44.0)
+
+Who cites this node, before you delete it? And what changed in what you cite? A pinned citation stays valid at its commit,
+so nothing warns the graph that cites it. This tool asks, over a list you declare, and it is a query, not an alarm: **a
+change never alters the exit code**, and no option makes it.
+
+```bash
+kg-refs cited-by billing:D_LIMIT --repo billing=../billing --repo platform=../platform
+kg-refs cited-by billing:D_LIMIT --repo billing=../billing --repo platform=../platform --at billing=abc1234  # an earlier state
+kg-refs pins --repos repos.txt --ignore '*' --format json
+```
+
+The list is `--repo NAME=FOLDER`, repeatable, or `--repos FILE`, with one `NAME=FOLDER` per line (`#` comments, and a relative
+folder starts from the file). Without a list the tool refuses (rc 2): it does not guess repositories. An alias is one more
+name for the same folder: when your graphs write a repository in two ways, repeat `--repo` (`--repo billing=../billing --repo
+billing-old=../billing`), and both names resolve to the same clone, read once. `--known NAME`, repeatable, declares your network,
+with a folder or without one: a name that also has a folder in the list is simply covered, with the owner written or not. A folder is read only from git objects, at its `HEAD` or at the commit of `--at`, without network and
+without the working tree, so what you have not committed does not count. The graphs follow the file rules of `kg_query`
+(the vendor and the fixtures stay out; `--exclude`, `--no-default-excludes`). Only node fields are read.
+
+**The forms it reads**, in any node field:
+
+| Form | Example |
+|---|---|
+| URL, including `raw` | `https://host/owner/repo/blob/<commit>/path.kg.yaml#ID` |
+| Owner and repository | `owner/repo@<sha>:path` |
+| Repository and commit | `repo@<sha>:path#ID`, or `repo@<sha>#ID` |
+| Repository, path, commit | `repo:path@<sha>#ID` |
+| Without a path | `repo#ID@<commit>`, with `provenance.node_sha256` if there is one |
+| Source and locator | `provenance.source` with the commit, and the id in `provenance.locator` |
+
+Without a path, the id is searched in the graphs of that commit, and two nodes give `ambiguous`, never a guess. In a file that
+is not a graph, `#` is a section, not an id. An id or a path that only appears in the prose next to the citation, and exists at that
+commit, is marked `inferred`; an id that also exists in the repository of who cites does not enter: there it names the node of that
+repository. A
+citation without a commit (a branch in a URL, `repo:path`) cannot be compared and is counted in `unpinned`.
+
+**`cited-by REPO:ID`** lists each citing field, with its form and `certainty`: `explicit` (a citation of the node, or an edge in
+its repository), `same_repo` or `by_id` (a mention by id), `local_homonym` (a mention, and the id also exists where it is
+written, so it may name the node there), and `contains_file` (a citation of the whole file that contains the node, in the state
+read). A citation of the same id in another repository of the list is counted in `elsewhere`; a mention next to a citation of
+something else stays a mention. Every pinned commit of a citation of the node or of its file is checked. `target.found_in` empty means the node is not in that state: `--at` reads an earlier one, and the citers still
+appear.
+
+**`pins`** compares each citation, at its pinned commit, against the tip, and hides nothing: `summary.groups` only says what
+to look at first, `gone` and `status` at the top, and `file` appears like the rest. `--from REPO` lists only the citations written
+in that repository, and `--status gone,changed` lists only those statuses. Both only cut the list, and say so in a line: the scan,
+`summary` and the rc stay those of the whole list. The edges of a node are compared across the whole repository, at both commits,
+so an edge that another graph adds, like a `REFUTES`, gives `changed edges`, and a node that moved gives `same`, even when an edge now
+writes it as `path#ID` or stays in the graph it left.
+
+| Status | Meaning |
+|---|---|
+| `same` | Nothing changed in the node or the file, even if it moved (`moved_to`) |
+| `changed` | With `classes`: `status`, `text` (a change only in spaces is here, not in `stamp_only`), `edges`, `other`, `file` (a citation of a file without a node), `stamp_only` (only `verified_at` and the fields of its axis). A node also brings `current_status`, its status today |
+| `gone` | Not at the tip |
+| `ambiguous` | More than one node has the id, at the commit or at the tip; `candidates` lists them |
+| `unchecked` | With `reason`: `commit_missing`, `tip_behind_pin` (the local tip is older than the pin, so comparing would accuse in the wrong direction), `no_access` (the form `repo#ID@commit` of a repository that counts and has no folder here), `no_target` (the whole repository at that commit, with no id or path next to it that exists there), `path_absent_at_commit`, `id_absent_at_commit`, `hash_mismatch_at_commit`, `no_graphs` (a node of a repository with no graph at the tip, or a file that is gone from a tip with no graph and the pin outside its history, which proves nothing about either), a graph that writes the id and does not read, at the commit or at the tip (`graph_unreadable_at_commit`, `graph_unreadable_at_tip`), or objects missing there, as in a partial clone, so nobody can say which graph writes the id (`objects_missing_at_commit`, `objects_missing_at_tip`). A graph that does not read and does not write the id changes nothing |
+
+`relation` says how the pin relates to the tip: `on_history`, or `apart` (outside its history, as after a rebase, and still
+compared). The hash is the `node_digest` of `kg_trace.py digest`.
+
+**Coverage is the central rule, because an empty answer does not prove absence.** Every output has `scanned` and
+`not_scanned`, with the reason, and `rc` repeats the exit code:
+
+| rc | When |
+|---|---|
+| 0 | The scan of the declared list was complete, and everything cited was checked |
+| 2 | Usage error, including no list |
+| 3 | Partial: a folder missing, not the root of a clone, or without the commit; no graph read where one was needed (`no_graphs`: the file rules took them all out, with `--exclude '*'` or only `fixtures/`; `--at` read a state with none; the repository of the `cited-by` target, or one that `pins` cites by a node, has none; or the whole scan has none; an ordinary member, not cited or cited only by a file, of the list with no graph at all is not partial, and stays in `scanned` with `graphs: 0`); a commit or a graph that does not read; a pinned commit missing, in any form (in a shallow clone, `detail: shallow`); a `--known` repository, which has no folder; or a name cited with a commit that is not in the list |
+| 4 | Only in `pins`, on a complete scan: something is `ambiguous` or `unchecked` |
+
+A name outside the list counts only with a commit. With a path or an id, as in `billing@<sha>:path`, it is a repository. A bare
+`name@<sha>` needs an owner in front (not a dot and not a remote, as in `origin/main`) or a hyphen in the name, so `53@<sha>` and
+`tools@<sha>` are just text. Then there are three ways. Without any option, it enters `not_scanned`, which is the safe path: you find
+out who you did not read. With `--known`, only the list and the known repositories count in the rc: the rest goes to
+`mentioned_undeclared`, with its count, and each citation with an id goes to `outside_citations`, with who cites, the field and the id,
+without changing the rc. `--ignore NAME`
+takes out a false one, and takes a glob; `--ignore '*'` declares the list complete. Coverage wins over rc 4. In a corpus with
+whole-repository citations (`repo@<sha>` with no target), `pins` gives rc 4 for those.
+
+The human output puts what the list declared and failed first, in a block of its own, and the names outside the list in one line
+with the count; the names are in the JSON.
+
+**The limit: it finds a wrong citation, not a missing one.** It reads what the graphs wrote, in the folders you listed. A claim
+of absence that cites nothing does not appear, nor does a citation outside a node field, in a comment or in a file that is not a
+graph. It says nothing about a repository you have no folder for, and it has not been tried by a third party without access to
+them. It does not make anyone run it. The MCP server does not have it: it reads other folders.
+
+Five more limits, so you do not read more into the answer than it says:
+
+- **Two homonyms at the other end of an edge count as one.** That end is compared by id only, so an edge of the node that starts or
+  stops pointing to a node with the same id in another file does not change the verdict of the node.
+- **An ordinary member on the wrong branch looks like a member with no graphs.** It stays in `scanned` with `graphs: 0` and rc 0: look at
+  `scanned` if you expected graphs there. Only the repository of the target and `--at` give rc 3 for it.
+- **Identity is by name only.** A fork with another owner and the same repository name resolves to the folder of that name; the
+  tool compares commits, it does not check the owner.
+- **Empty with rc 0 means among the listed ones.** It is a complete answer about the list you declared, not about the world. Rc 0
+  says nothing about a repository outside the list, or one you took out with `--ignore`. In `cited-by`, a `repo@<sha>` with no path
+  and no id stays out too, even with its commit missing: nothing ties it to the node.
+- **A graph that was reordered as a whole gives `changed file`, without changing the rc.** A citation of the file compares the
+  object, so it does not know the nodes are the same; a citation of the node gives `same`, because it compares the node.
+
 ## `kg_vector.py`: the model and the index of the semantic search (4.26.0)
 
 `kg_query --semantic` finds a node when the question uses other words than the label. It is optional: it needs the

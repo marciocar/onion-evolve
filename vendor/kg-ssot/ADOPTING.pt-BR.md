@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:e8a07ae248c974cf -->
+<!-- translation-of: ADOPTING.md sha256:45294e5b493d188c -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,12 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.43.0` para a `kg-ssot-v4.44.0`, nada muda para um grafo ou um gate: o contrato (v4.18) e os vereditos são os
+mesmos, o `kg_query` imprime o mesmo, e o `kg_trace check` mantém os códigos de saída e o `kg-ssot.trace/1`. O `kg_refs.py` é novo,
+com uma saída nova, o `kg-ssot.refs/1`, e o `kg_trace check --strict-sources` é novo, com o `kg-ssot.trace/2` e o rc 4. O corpus que
+escreve uma fonte na forma `repo#id@commit` também recebe o `kg-ssot.trace/2`, com a contagem em `schemes.repo_refs`, e uma linha a mais na
+saída humana: se é o seu caso e você valida a saída contra uma cópia do `spec/trace.schema.json`, atualize a cópia.
 
 Da `kg-ssot-v4.42.0` para a `kg-ssot-v4.43.0`, nada muda para um grafo ou um gate: o contrato (v4.18) e os vereditos
 são os mesmos, e a consulta que já funcionava imprime o mesmo `kg-ssot.query/1`. O `kg_query --due` é novo e imprime o

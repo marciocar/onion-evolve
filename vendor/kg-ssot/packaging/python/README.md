@@ -81,6 +81,7 @@ Only `latest/` sets the exit code. The `optional/` cases are reported and never 
 | `kg-criterion` | The pre-registered criterion: prints the `sha256` of a criterion version and checks each version against its text or file, and each citation of another graph |
 | `kg-audit` | The audit package by question: one row per questionnaire item, with the answer, the verdict, the dated evidence, the gaps, and the owner, in CSV, XLSX, or JSON |
 | `kg-trace` | The trace that does not resolve: each node's `trace:` anchor against the files of the repository, with what is not judged counted apart |
+| `kg-refs` | Who cites a node across repositories, and what changed in what is cited, over a declared list of local clones. A query, not an alarm: it finds a wrong citation, not a missing one |
 | `kg-vector` | The model and the index of `kg-query --semantic`, the search by similarity; needs `pip install "kg-ssot[vector]"` |
 | `kg-prov-export` | Exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD |
 

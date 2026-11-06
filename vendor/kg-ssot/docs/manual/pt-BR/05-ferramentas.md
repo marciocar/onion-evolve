@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:7c1f0d0a5a0f5d04 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:843e1365200df731 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -1452,6 +1452,118 @@ projection_ignore:   # nomes entre crases que não são id de nó
 - **Saída e rc.** `--format json` dá `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 sem `missing` e com
   todo grafo do `projection_of` lido; 1 caso contrário; 2 entrada quebrada (frontmatter que não se lê, `--root` que não
   é pasta).
+
+### As fontes ausentes: `--strict-sources` (4.44.0)
+
+A fonte com `provenance.scheme` ou `provenance.sha256` que não está lá, no repositório ou no commit de uma URL lida com `--with`,
+é contada em `skipped.missing_source`, e o `check` segue dando rc 0: isso fica, por compatibilidade. O `--strict-sources` lista cada
+uma (`FONTE AUSENTE`) e dá rc próprio, o 4, depois de qualquer achado de rc 1, e a saída JSON é o `kg-ssot.trace/2`, com
+`schemes.missing_sources`. A fonte sem nenhum dos dois não se julga, com ou sem a opção, e isso inclui a URL com commit e sem hash:
+para comparar essas, use o `kg_refs.py pins`.
+
+O `provenance.source` na forma `repo#id@commit` não se lê aqui, e quem o compara é o `kg_refs.py pins`. Quando a forma ocorre, com ou
+sem a opção, ela é contada numa linha própria da saída humana e em `schemes.repo_refs`, e a saída JSON é o `kg-ssot.trace/2`. Um
+corpus sem essa forma e sem a opção recebe o mesmo `kg-ssot.trace/1` de antes.
+
+## `kg_refs.py`: as citações entre repositórios (4.44.0)
+
+Quem cita este nó, antes de você apagá-lo? E o que mudou no que você cita? A citação fixada segue válida no commit dela, e por
+isso nada avisa o grafo que cita. Esta ferramenta pergunta, sobre uma lista que você declara, e é consulta, não alarme: **a
+mudança nunca altera o código de saída**, e nenhuma opção faz isso.
+
+```bash
+kg-refs cited-by billing:D_LIMIT --repo billing=../billing --repo platform=../platform
+kg-refs cited-by billing:D_LIMIT --repo billing=../billing --repo platform=../platform --at billing=abc1234  # um estado anterior
+kg-refs pins --repos repos.txt --ignore '*' --format json
+```
+
+A lista é o `--repo NOME=PASTA`, repetível, ou o `--repos ARQUIVO`, com um `NOME=PASTA` por linha (`#` comenta, e a pasta relativa
+parte do arquivo). Sem lista, a ferramenta recusa (rc 2): não adivinha repositórios. Um apelido é mais um nome para a mesma
+pasta: quando os seus grafos escrevem um repositório de dois jeitos, repita o `--repo` (`--repo billing=../billing --repo
+billing-old=../billing`), e os dois nomes dão no mesmo clone, lido uma vez. O `--known NOME`, repetível, declara a sua rede, com pasta
+ou sem: o nome que também tem pasta na lista está simplesmente coberto, com o dono escrito ou não. A pasta é lida só pelos objetos do git, no `HEAD` ou no commit do `--at`, sem rede e sem a árvore de trabalho, e por isso
+o que você não commitou não conta. Os grafos seguem as regras de arquivo do `kg_query` (o vendor e as fixtures ficam de fora;
+`--exclude`, `--no-default-excludes`). Só os campos de nó são lidos.
+
+**As formas lidas**, em qualquer campo de nó:
+
+| Forma | Exemplo |
+|---|---|
+| URL, inclusive `raw` | `https://host/dono/repo/blob/<commit>/caminho.kg.yaml#ID` |
+| Dono e repositório | `dono/repo@<sha>:caminho` |
+| Repositório e commit | `repo@<sha>:caminho#ID`, ou `repo@<sha>#ID` |
+| Repositório, caminho, commit | `repo:caminho@<sha>#ID` |
+| Sem caminho | `repo#ID@<commit>`, com o `provenance.node_sha256`, se houver |
+| Fonte e locator | `provenance.source` com o commit, e o id no `provenance.locator` |
+
+Sem caminho, o id é procurado nos grafos daquele commit, e dois nós dão `ambiguous`, nunca um palpite. Num arquivo que não é
+grafo, o `#` é uma seção, não um id. O id ou o caminho que só aparece na prosa ao lado da citação, e existe naquele commit, fica
+marcado `inferred`; o id que existe também no repositório de quem cita não entra: ali ele nomeia o nó de lá. A citação sem commit (uma branch na URL, `repo:caminho`)
+não se compara, e é contada em `unpinned`.
+
+**O `cited-by REPO:ID`** lista cada campo que cita, com a forma e a `certainty`: `explicit` (uma citação do nó, ou uma aresta no
+repositório dele), `same_repo` ou `by_id` (uma menção pelo id), `local_homonym` (uma menção, e o id existe também onde ela está
+escrita, e pode nomear o nó de lá), e `contains_file` (uma citação do arquivo inteiro que contém o nó, no estado lido). A citação do
+mesmo id em outro repositório da lista é contada em `elsewhere`; a menção ao lado da citação de outra coisa segue sendo menção. Todo
+commit fixado de uma citação do nó ou do arquivo dele se confere. O `target.found_in` vazio quer dizer que o nó não está naquele estado: o `--at` lê um anterior, e quem cita continua aparecendo.
+
+**O `pins`** compara cada citação, no commit fixado, com a ponta, e não esconde nada: o `summary.groups` só diz o que olhar
+primeiro, com `gone` e `status` no alto, e o `file` aparece como o resto. O `--from REPO` lista só as citações escritas naquele
+repositório, e o `--status gone,changed` lista só esses status. Os dois só recortam a lista, e dizem isso numa linha: a varredura, o
+`summary` e o rc seguem os da lista inteira. As arestas do nó se comparam no repositório inteiro, nos dois commits: a aresta que outro
+grafo acrescenta, como um `REFUTES`, dá `changed edges`, e o nó que mudou de lugar dá `same`, mesmo quando uma aresta passa a escrevê-lo
+como `caminho#ID` ou fica no grafo de onde ele saiu.
+
+| Status | O que quer dizer |
+|---|---|
+| `same` | Igual: nada mudou no nó ou no arquivo, mesmo que ele tenha mudado de lugar (`moved_to`) |
+| `changed` | Mudou, com as `classes`: `status`, `text` (a mudança só de espaço fica aqui, não em `stamp_only`), `edges`, `other`, `file` (a citação de um arquivo sem nó), `stamp_only` (só o `verified_at` e os campos do eixo dele). O nó traz também o `current_status`, o status dele hoje |
+| `gone` | Sumiu: não está na ponta |
+| `ambiguous` | Mais de um nó tem o id, no commit ou na ponta; `candidates` os lista |
+| `unchecked` | Não conferido, com o `reason`: `commit_missing`, `tip_behind_pin` (a ponta local é mais velha que o commit fixado, e comparar acusaria na direção errada), `no_access` (a forma `repo#ID@commit` de um repositório que conta e não tem pasta aqui), `no_target` (o repositório inteiro naquele commit, sem id nem caminho ao lado que exista lá), `path_absent_at_commit`, `id_absent_at_commit`, `hash_mismatch_at_commit`, `no_graphs` (um nó de um repositório sem grafo na ponta, ou um arquivo que sumiu de uma ponta sem grafo com o commit fixado fora do histórico dela, o que não prova nada sobre nenhum dos dois), um grafo que escreve o id e não se lê, no commit ou na ponta (`graph_unreadable_at_commit`, `graph_unreadable_at_tip`), ou objetos que faltam ali, como num clone parcial, e por isso ninguém sabe qual grafo escreve o id (`objects_missing_at_commit`, `objects_missing_at_tip`). Um grafo que não se lê e não escreve o id não muda nada |
+
+O `relation` diz como o commit fixado se liga à ponta: `on_history`, ou `apart` (fora do histórico dela, como depois de um rebase,
+e mesmo assim comparado). O hash é o `node_digest` do `kg_trace.py digest`.
+
+**A cobertura é a regra central, porque resposta vazia não prova ausência.** Toda saída traz `scanned` e `not_scanned`, com o
+motivo, e o `rc` repete o código de saída:
+
+| rc | Quando |
+|---|---|
+| 0 | A varredura da lista declarada foi completa, e todo citado foi conferido |
+| 2 | Erro de uso, inclusive sem lista |
+| 3 | Parcial: pasta ausente, que não é a raiz de um clone, ou sem o commit; nenhum grafo lido onde era preciso (`no_graphs`: as regras de arquivo tiraram todos, com `--exclude '*'` ou só `fixtures/`; o `--at` leu um estado sem nenhum; o repositório do alvo do `cited-by`, ou um que o `pins` cita por um nó, não tem nenhum; ou a varredura inteira não tem nenhum; o membro comum da lista, não citado ou citado só por um arquivo, sem grafo nenhum não é parcial, e fica em `scanned` com `graphs: 0`); commit ou grafo que não se lê; commit fixado ausente, em qualquer forma (num clone raso, `detail: shallow`); um repositório do `--known`, que não tem pasta; ou nome citado com commit que não está na lista |
+| 4 | Só no `pins`, numa varredura completa: algo `ambiguous` ou `unchecked` |
+
+O nome fora da lista só conta com commit. Com caminho ou id, como em `billing@<sha>:caminho`, é um repositório. O `nome@<sha>` sozinho
+precisa de um dono na frente (que não seja um ponto nem um remoto, como em `origin/main`) ou de um hífen no nome, e por isso `53@<sha>` e
+`tools@<sha>` são só texto. Daí há três caminhos. Sem opção nenhuma, ele entra em `not_scanned`, o caminho seguro: você fica sabendo quem
+não leu. Com o `--known`, só a lista e os conhecidos contam no rc: o resto vai a `mentioned_undeclared`, com a contagem, e cada citação
+com id vai a `outside_citations`, com quem cita, o campo e o id, sem mudar o rc. O `--ignore NOME` tira o nome falso, e aceita glob; o
+`--ignore '*'` declara a lista completa. A cobertura vence o rc 4. Num corpus com citações do repositório inteiro (`repo@<sha>` sem
+alvo), o `pins` dá rc 4 por elas.
+
+A saída humana põe primeiro, em bloco próprio, o que a lista declarou e falhou, e os nomes de fora numa linha com a contagem; os
+nomes estão no JSON.
+
+**O limite: acha citação errada, não citação que falta.** Lê o que os grafos escreveram, nas pastas da lista. A afirmação de
+ausência que não cita nada não aparece, nem a citação fora de um campo de nó, num comentário ou num arquivo que não é grafo. Não
+diz nada de um repositório de que você não tem a pasta, e não foi testado por um terceiro sem acesso a elas. Não faz ninguém
+rodá-lo. O servidor MCP não o tem: ele lê outras pastas.
+
+Mais cinco limites, para você não ler na resposta mais do que ela diz:
+
+- **Dois homônimos na outra ponta da aresta contam como um.** Essa ponta se compara só pelo id, e por isso a aresta do nó que passa a
+  apontar, ou deixa de apontar, para um nó de mesmo id em outro arquivo não muda o veredito do nó.
+- **Um membro comum na branch errada parece um membro sem grafo.** Ele fica em `scanned` com `graphs: 0` e rc 0: olhe o `scanned` se esperava
+  grafos ali. Só o repositório do alvo e o `--at` dão rc 3 por isso.
+- **A identidade é só pelo nome.** Um fork com outro dono e o mesmo nome de repositório dá na pasta daquele nome; a ferramenta
+  compara commits, não confere o dono.
+- **Vazio com rc 0 quer dizer entre os listados.** É uma resposta completa sobre a lista que você declarou, não sobre o mundo. O rc 0
+  não diz nada de um repositório fora da lista, ou que você tirou com o `--ignore`. No `cited-by`, o `repo@<sha>` sem caminho e sem id
+  também fica de fora, mesmo com o commit ausente: nada o liga ao nó.
+- **Um grafo inteiro reordenado sai `changed file`, sem mudar o rc.** A citação do arquivo compara o objeto, e por isso não sabe que
+  os nós são os mesmos; a citação do nó dá `same`, porque compara o nó.
 
 ## `kg_vector.py`: o modelo e o índice da busca por semelhança (4.26.0)
 

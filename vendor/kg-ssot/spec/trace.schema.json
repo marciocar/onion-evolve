@@ -16,7 +16,11 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "kg-ssot.trace/1"
+      "enum": [
+        "kg-ssot.trace/1",
+        "kg-ssot.trace/2"
+      ],
+      "description": "/2 com --strict-sources ou quando a forma repo#id@commit ocorre, desde a 4.44.0; fora disso, segue /1"
     },
     "graphs": {
       "type": "integer",
@@ -393,8 +397,92 @@
         "node_sha256_checked": {
           "type": "integer",
           "minimum": 0
+        },
+        "repo_refs": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Só em /2, e só quando a forma ocorre: quantos provenance.source têm a forma repo#id@commit, que o kg_trace não lê e o kg_refs compara"
+        },
+        "missing_sources": {
+          "type": "array",
+          "description": "Só com --strict-sources: cada fonte com esquema ou sha256 ausente (a que conta em skipped.missing_source), que dá rc 4",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "target"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "schema_version"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "kg-ssot.trace/2"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "schemes"
+        ],
+        "properties": {
+          "schemes": {
+            "anyOf": [
+              {
+                "required": [
+                  "repo_refs"
+                ]
+              },
+              {
+                "required": [
+                  "missing_sources"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "schemes": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "repo_refs"
+                  ]
+                },
+                {
+                  "required": [
+                    "missing_sources"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
 }

@@ -10,6 +10,29 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.44.0] - 2026-11-05
+
+Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. O `kg_query` imprime o mesmo, e o `kg_trace check` sem `--strict-sources` mantém os códigos de saída e, num corpus sem a forma `repo#id@commit`, o mesmo `kg-ssot.trace/1`.
+
+- O `kg_refs.py` (`kg-refs`) é novo, com uma saída nova, o `kg-ssot.refs/1` (`spec/refs.schema.json`). Lê uma lista declarada de
+  clones locais (`--repo NOME=PASTA`, ou `--repos ARQUIVO`), só pelos objetos do git, sem rede. O `cited-by REPO:ID` diz quem cita
+  um nó, em qualquer campo de nó e em que forma, e o `--at NOME=COMMIT` lê um estado anterior. O `pins` compara cada citação a
+  outro repositório da lista, no commit fixado, com a ponta: `same`, `changed` (`status`, `text`, `edges`, `file`, `stamp_only`,
+  `other`, com o status atual do nó), `gone`, `ambiguous` ou `unchecked`, que cobre também o grafo que escreve o id e não se lê, e os objetos que faltam, como num clone parcial. O `--from REPO` e o `--status gone,changed` só recortam o que
+  se lista; a varredura, o `summary` e o rc seguem os da lista inteira, com `gone` e `status` primeiro.
+- É consulta, não alarme: a mudança nunca altera o código de saída, e nenhuma opção faz isso. Toda saída traz `scanned` e
+  `not_scanned`, porque resposta vazia não prova ausência: rc 0 completa, rc 3 parcial (pasta ausente ou ilegível, nenhum grafo lido onde era preciso, por regras de arquivo que tiraram todos, por um `--at` num estado sem nenhum, por um alvo do `cited-by` sem nenhum ou por uma varredura inteira sem nenhum, commit fixado ausente em qualquer forma, repositório do `--known` sem pasta, nome citado com commit
+  fora da lista), rc 4 só no `pins`, numa varredura completa, com algo `ambiguous` ou `unchecked`, e rc 2 sem lista declarada. O
+  `--known NOME` declara a rede, com pasta ou sem: com ele, os nomes de fora vão a `mentioned_undeclared`, e as citações com id deles a `outside_citations`, sem mudar o rc. O
+  `cited-by` também lista quem cita o arquivo inteiro que contém o nó (`contains_file`).
+- O `kg_trace check` conta o `provenance.source` na forma `repo#id@commit`, sem mudar nenhum rc: quando a forma ocorre, uma linha nova
+  na saída humana e `schemes.repo_refs` no JSON, que passa a ser o `kg-ssot.trace/2`. O `--strict-sources` lista cada fonte com esquema
+  ou sha256 que está ausente e dá rc próprio, o 4, também com o `kg-ssot.trace/2`; a fonte sem nenhum dos dois não se julga, e isso inclui a
+  URL com commit e sem hash.
+- O limite: acha citação errada, não citação que falta. Lê os campos de nó e as pastas da lista, e não diz nada de um repositório
+  de que você não tem a pasta; não foi testado por um terceiro sem acesso a elas.
+  Por quê: as cinco perdas medidas em 157 citações entre três repositórios foram uma resposta que ninguém procurou, não um arquivo quebrado.
+
 ## [4.43.0] - 2026-11-04
 
 Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. A consulta que funcionava na 4.42.0 imprime o mesmo `kg-ssot.query/1`, salvo as duas recusas novas no fim desta lista.
