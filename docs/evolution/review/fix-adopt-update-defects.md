@@ -2,7 +2,7 @@
 branch: fix/adopt-update-defects
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: e4a95f1b0c853cd8966ebed8db192866ace8768f0ffbf8610a9a92a21bd8601d
+reviewed_diff_sha256: eba53ab8866d5d01833956bef4e5ab44a34d036ee95192dfc34a7bf7e0fbb0f2
 reviewed_code_sha256: 0e6c8325e4262eb9cfdf08ec21caa88b624e6bc06f50516b8809b1fdc9049d6f
 findings_total: 7
 findings_real: 7
