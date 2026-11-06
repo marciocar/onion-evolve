@@ -2,8 +2,7 @@
 branch: feat/guard-plugin-write
 pr: 1490
 date: 2026-11-05
-reviewed_diff_sha256: 9e117aedc7188a13e0160b6d639ab7d356a79d127ec8a196b754eec7ff9fd5dd
-reviewed_code_sha256: 55ef7b5823fffa2cc8f9d1360a51253927129aa9535d93b46d940e02a4be2a03
+reviewed_diff_sha256: pendente
 findings_total: 29
 findings_real: 29
 tokens: 0
@@ -20,6 +19,9 @@ nota: >
   Depois da verificação do diferencial entraram três mudanças fora do juiz, nenhuma no veto: os
   vereditos da família por here-string (pré-voo, REGRA da classe pipefail), os termos T_LAB_* do grafo
   (contrato KG-SSOT) e o veto-onfailure contando 7 vetos em vez de 6 (CI do PR 1490).
+  No rebase sobre d0ad1a436 (o veto de memória, cd07e4c4e, entrou na main antes) dois conflitos se
+  resolveram à mão, sem tocar o juiz nem o hook: a REGRA 116 e a 114 ficam lado a lado no
+  lint-artifacts.sh, e o veto-onfailure passa a contar 8 vetos (memória e plugin).
 ---
 
 # Veto à escrita de plugin em .claude/skills e a varredura do disco
