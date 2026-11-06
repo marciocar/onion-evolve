@@ -25,8 +25,9 @@
 #   repo	/home/<u>/outro-repo          ← repo alheio a mais, além dos do members.yaml
 #   allow	/home/<u>/filho-do-hub        ← caminho que a sessão PODE escrever, mesmo registrado
 # Uma diretiva por linha, separada por TAB ou espaço; caminho ABSOLUTO (ou `~/…`), sem espaço no nome. Linha
-# fora disto é ignorada aqui e acusada pela REGRA 118 (adopter-veto-check.sh). O arquivo é do adotante: o
-# /meta:adopt não o traz nem o apaga.
+# fora disto é ignorada aqui e acusada pela REGRA 118 (adopter-veto-check.sh). O arquivo é do adotante; o
+# /meta:adopt (adoção e --update, na sessão do core) só escreve a linha `core` pelo
+# .claude/utils/adopt/adopter-guard-core.sh (decisão de 2026-11-06), nunca as outras, e não o apaga.
 #
 # TETO: só lê o members.yaml do core NESTA máquina, pelo caminho; clone que nenhuma das três fontes nomeia não
 # é registrado (o veto de repo alheio cala para ele). Caminho com espaço não se declara.

@@ -18,8 +18,8 @@
 #  Write/Edit/NotebookEdit · o arquivo dentro de um repo registrado alheio (o mesmo git-common-dir, então as
 #          worktrees dele também).
 #  E os arquivos que ARMAM a guarda: a lista (.claude/adopter-guard.tsv) e o carimbo (.claude/.onion-version, cujo
-#  `role:` arma os dois vetos). Quem os escreve é o maestro, fora da sessão, ou o update do Onion (git merge e o
-#  write-stamp.sh, que o hook não julga). Apagar ou mover o pai deles (`rm -rf .claude`, `mv .claude …`) e o
+#  `role:` arma os dois vetos). Quem os escreve é o maestro, fora da sessão, ou o update do Onion (git merge, o
+#  write-stamp.sh e o adopter-guard-core.sh, que rodam na sessão do core e o hook não julga). Apagar ou mover o pai deles (`rm -rf .claude`, `mv .claude …`) e o
 #  `git rm`/`git mv`/`git checkout -- <carimbo>` também vetam; `git clean -fdx .claude` não é visto (teto).
 #  "Registrado" e "este projeto" vêm da lib/adopter-scope.sh: o core local, os `local_path` do members.yaml
 #  dele e as linhas `repo` do arquivo local; o próprio projeto e as worktrees dele nunca são alheios.

@@ -159,6 +159,14 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/ensure-secret-gitignore.sh" "$DEST"   # (
 #     único bloco que Fase 3 E `--update` invocam. Porquê completo: no helper.
 bash "$SOURCE_ROOT/.claude/utils/adopt/emit-licenses.sh" "$DEST" "$SOURCE_ROOT"
 
+# (0.6) LINHA `core` do .claude/adopter-guard.tsv — a lista do veto de repo alheio (REGRA 118 (Veto de repo
+#     alheio do adotante registrado e com lista)). O hook veta a sessão do ADOTANTE que escreve o arquivo, e o
+#     adotante por URL não resolve o core pelo carimbo: sem esta linha o veto fica armado e SEM LISTA (medido em
+#     2026-11-06 no kg-ssot e na curadoria). Decisão D_LINHA_CORE_DO_ADOPTER_GUARD_PELO_UPDATE_1106: chega por
+#     aqui, na sessão do core, e ao adotante pelo PR. Idempotente; só a linha core; core válido diferente fica.
+#     A ÚNICA linha que ele imprime vai inteira na seção "Veto de repo alheio" do relatório.
+bash "$SOURCE_ROOT/.claude/utils/adopt/adopter-guard-core.sh" "$DEST" "$SOURCE_ROOT"
+
 # (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
 #     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
 #     lint-selftest.sh kind=merge). Preserva hooks/permissions próprios do alvo.
@@ -436,6 +444,9 @@ flow: downstream (core→consumidor / distribuição)
 
 ## Gate do alvo
 <no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6)>
+
+## Veto de repo alheio (REGRA 118)
+<a linha `adopter-guard: …` do passo (0.6) do Procedimento de Configuração (escrita · acrescentada · em dia · mantida · trocada · pulada), inteira; rc 3 = escreveu e a releitura não conferiu, PARE>
 
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>

@@ -19028,6 +19028,74 @@ run_secret_gitignore_selftests() {
 }
 _family run_secret_gitignore_selftests
 
+# ── A linha `core` do .claude/adopter-guard.tsv do adotante (2026-11-06, REGRA 118 (Veto de repo alheio do
+#    adotante registrado e com lista)). Medido: nenhum helper do /meta:adopt escrevia o arquivo, os adotantes
+#    adotados por URL ficavam com o veto SEM LISTA, e o hook veta a sessão do adotante que o escreve. Decisão
+#    D_LINHA_CORE_DO_ADOPTER_GUARD_PELO_UPDATE_1106: a linha chega pelo update. Self-contained (core de fixture).
+run_adopter_guard_core_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/adopter-guard-core.sh"
+  local lib="${REPO_ROOT}/.claude/hooks/lib/adopter-scope.sh"
+  if [ ! -f "${helper}" ] || [ ! -f "${lib}" ]; then record_fail "adopter-guard-core" "helper ou lib ausente"; return; fi
+  local t core wt d tsv out before after got
+  t="$(mktemp -d)"; core="${t}/core"; wt="${t}/core-wt"
+  mkdir -p "${core}/docs/evolution/federation"; printf 'members: []\n' > "${core}/docs/evolution/federation/members.yaml"
+  git -C "${core}" init -q -b main >/dev/null 2>&1; git -C "${core}" -c user.email=f@onion.invalid -c user.name=f \
+    -c commit.gpgsign=false commit -q --allow-empty -m init >/dev/null 2>&1
+  git -C "${core}" worktree add -q "${wt}" -b wt >/dev/null 2>&1
+  core="$(cd "${core}" && pwd -P)"
+  _agc_dest() { d="${t}/a$1"; mkdir -p "${d}/.claude"; printf 'role: adopted\nadopted_from: https://exemplo.invalid/core.git\n' > "${d}/.claude/.onion-version"; tsv="${d}/.claude/adopter-guard.tsv"; }
+  # (a) sem arquivo, fonte = WORKTREE do core → nasce com a linha do checkout PRINCIPAL, e a lib do hook a resolve
+  _agc_dest 1; out="$(bash "${helper}" "${d}" "${wt}" 2>&1)"
+  got="$(bash -c '. "$1"; onion_adopter_core "$2"' _ "${lib}" "${d}" 2>/dev/null)"
+  if grep -q '^adopter-guard: escrita:' <<< "${out}" && [ "${got}" = "${core}" ] && grep -qxF "$(printf 'core\t%s' "${core}")" "${tsv}"; then
+    record_pass "adopter-guard-core: (a) arquivo ausente + fonte em worktree → linha core do checkout principal, e onion_adopter_core a resolve (o veto ganha lista)"
+  else record_fail "adopter-guard-core: (a)" "saída '${out}', lib resolveu '${got}', esperado '${core}'"; fi
+  # (b) IDEMPOTÊNCIA: a 2ª rodada não muda um byte e diz que está em dia
+  before="$(cat "${tsv}")"; out="$(bash "${helper}" "${d}" "${wt}" 2>&1)"; after="$(cat "${tsv}")"
+  if [ "${before}" = "${after}" ] && grep -q '^adopter-guard: em dia:' <<< "${out}"; then
+    record_pass "adopter-guard-core: (b) 2ª rodada é no-op byte a byte e diz 'em dia'"
+  else record_fail "adopter-guard-core: (b)" "o arquivo mudou ou a saída não disse em dia: '${out}'"; fi
+  # (c) arquivo do maestro sem linha core (e sem \n final) → acrescenta, sem tocar as outras
+  _agc_dest 2; printf '# meu\nrepo\t/x\nallow\t/y' > "${tsv}"; bash "${helper}" "${d}" "${core}" >/dev/null 2>&1
+  if [ "$(sed -n 1,3p "${tsv}")" = "$(printf '# meu\nrepo\t/x\nallow\t/y')" ] && [ "$(sed -n 4p "${tsv}")" = "$(printf 'core\t%s' "${core}")" ] && [ "$(wc -l < "${tsv}")" -eq 4 ]; then
+    record_pass "adopter-guard-core: (c) sem linha core → acrescenta no fim; comentário, repo e allow intactos (até sem \\n final)"
+  else record_fail "adopter-guard-core: (c)" "conteúdo: $(tr '\t\n' '>|' < "${tsv}")"; fi
+  # (d) linha core velha que não aponta core → trocada NO LUGAR; (e) linha que aponta outro core válido → mantida
+  _agc_dest 3; printf 'repo\t/x\ncore\t/nao/existe\nallow\t/y\n' > "${tsv}"; bash "${helper}" "${d}" "${core}" >/dev/null 2>&1
+  if [ "$(cat "${tsv}")" = "$(printf 'repo\t/x\ncore\t%s\nallow\t/y' "${core}")" ]; then
+    record_pass "adopter-guard-core: (d) core que não existe → trocado na mesma linha, vizinhas intactas"
+  else record_fail "adopter-guard-core: (d)" "conteúdo: $(tr '\t\n' '>|' < "${tsv}")"; fi
+  mkdir -p "${t}/outro-core/docs/evolution/federation"; : > "${t}/outro-core/docs/evolution/federation/members.yaml"
+  _agc_dest 4; printf 'core\t%s/outro-core\n' "${t}" > "${tsv}"; before="$(cat "${tsv}")"; out="$(bash "${helper}" "${d}" "${core}" 2>&1)"
+  if [ "$(cat "${tsv}")" = "${before}" ] && grep -q '^adopter-guard: mantida:' <<< "${out}"; then
+    record_pass "adopter-guard-core: (e) core diferente mas VÁLIDO nesta máquina → mantido (escolha do maestro), dito"
+  else record_fail "adopter-guard-core: (e)" "sobrescreveu a escolha do maestro: '${out}'"; fi
+  # (f) fonte que não é o core (hub com carimbo) → pula, sem criar arquivo
+  mkdir -p "${t}/hub/.claude" "${t}/hub/docs/evolution/federation"; : > "${t}/hub/docs/evolution/federation/members.yaml"
+  printf 'role: hub\n' > "${t}/hub/.claude/.onion-version"; git -C "${t}/hub" init -q >/dev/null 2>&1
+  _agc_dest 5; out="$(bash "${helper}" "${d}" "${t}/hub" 2>&1)"; local rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -e "${tsv}" ] && grep -q '^adopter-guard: pulada:' <<< "${out}"; then
+    record_pass "adopter-guard-core: (f) fonte hub (com carimbo) → pulada e dita, nada escrito"
+  else record_fail "adopter-guard-core: (f)" "rc=${rc}, saída '${out}', arquivo $( [ -e "${tsv}" ] && echo criado || echo ausente)"; fi
+  # (g) MUTANTE: sem a leitura da linha core existente o helper acrescenta de novo — a idempotência tem de reprovar ele
+  local mut="${t}/mut.sh"
+  sed 's/{ print NR, \$2; exit }/{ next }/' "${helper}" > "${mut}"
+  if cmp -s "${mut}" "${helper}"; then record_fail "adopter-guard-core: (g) MUT" "o sed não trocou a leitura — mutante não plantado"
+  else
+    _agc_dest 6; bash "${mut}" "${d}" "${core}" >/dev/null 2>&1; before="$(cat "${tsv}")"
+    bash "${mut}" "${d}" "${core}" >/dev/null 2>&1; after="$(cat "${tsv}")"
+    if [ "${before}" != "${after}" ]; then
+      record_pass "adopter-guard-core: (g) MUT sem ler a linha core existente a 2ª rodada duplica a linha — a idempotência morde"
+    else record_fail "adopter-guard-core: (g) MUT" "o mutante sobreviveu: a 2ª rodada não mudou o arquivo"; fi
+  fi
+  # (h) o adopt CHAMA o helper e o relatório tem a seção (helper que ninguém chama é guarda morta)
+  if grep -q 'adopter-guard-core.sh' "${REPO_ROOT}/.claude/commands/meta/adopt.md" && grep -q '^## Veto de repo alheio' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
+    record_pass "adopter-guard-core: (h) o /meta:adopt chama o helper na configuração pós-cópia e o relatório tem a seção"
+  else record_fail "adopter-guard-core: (h)" "o adopt não chama o helper ou o relatório não tem a seção 'Veto de repo alheio'"; fi
+  git -C "${t}/core" worktree remove --force "${wt}" >/dev/null 2>&1; rm -rf "${t}"
+}
+_family run_adopter_guard_core_selftests
+
 # EOL fixado em LF no .gitattributes (SAC-107, rodada r9 do radar E3, 2026-10-11). Num checkout Windows com
 # core.autocrlf=true, sem `eol=lf` os 209 .sh e os 2 hooks sem extensão saíam com CRLF (medido por
 # checkout-index com autocrlf: 209/209 antes, 0 depois) e o bash dos hooks quebra. A guarda lê o ATRIBUTO
