@@ -49702,6 +49702,136 @@ run_applied_delta_selftests() {
 }
 _family run_applied_delta_selftests
 
+# ── a BASE do update e o DENY do adotante (2026-11-06, sinal de campo da curadoria) ─────────────────────
+# O head do PR do update da curadoria tinha 0 das 67 regras de permissions.deny da origin/main. Não foi o update
+# que apagou: a branch nasceu da main LOCAL defasada (o deny entrou na origin depois). Duas peças, um caso:
+#   dedicated-branch.sh — a branch NOVA nasce da ponta mais nova (local, upstream, origin/<base>); divergentes = rc 2.
+#   deny-monotonic.sh   — a linha `deny: N no alvo (<ref>) → M no head` do relatório; perdeu regra = rc 1.
+# (f1) a base fresca · (f2) divergentes · (f3) local à frente · (d1) deny do adotante intacto e o do vendor somado
+# · (d2) sem deny · (d3) perdeu tudo · (d4) troca 1 por 1 (N = M) · (d5) o caminho real (merge 3-way do vendor +
+# merge-onion-hooks) preserva deny, allow e `sandbox`. MUTANTES: (f-MUT) a branch nascer do nome local reprova
+# (f1); (d-MUT) contar em vez de comparar regra reprova (d4); (s-MUT) a fusão antiga que SOBRESCREVE o settings
+# com o do vendor é pega pelo deny-monotonic (rc 1).
+run_update_base_and_deny_selftests() {
+  local db="${REPO_ROOT}/.claude/utils/adopt/dedicated-branch.sh"
+  local dm="${REPO_ROOT}/.claude/utils/adopt/deny-monotonic.sh"
+  local mh="${REPO_ROOT}/.claude/utils/adopt/merge-onion-hooks.sh"
+  local f; for f in "${db}" "${dm}" "${mh}"; do [ -f "${f}" ] || { record_fail "update-base-deny" "SUT ausente: ${f}"; return; }; done
+  command -v jq >/dev/null 2>&1 || { record_skip "update-base-deny: jq ausente — família não exercida"; return; }
+  local d rc out mut tip; d="$(mktemp -d)"
+  _ub_git() { git -C "$1" -c user.email=t@t -c user.name=t -c commit.gpgsign=false "${@:2}"; }
+  # origem bare + clone do alvo; depois a origem anda (outro clone empurra) e o alvo NÃO puxa: main local atrás.
+  _ub_setup() {
+    rm -rf "${d}/o.git" "${d}/al" "${d}/ou"
+    git init -q --bare -b main "${d}/o.git"
+    git clone -q "${d}/o.git" "${d}/ou" 2>/dev/null
+    mkdir -p "${d}/ou/.claude"; printf '%s\n' "$1" > "${d}/ou/.claude/settings.json"
+    _ub_git "${d}/ou" add -A; _ub_git "${d}/ou" commit -qm base; _ub_git "${d}/ou" push -q origin main 2>/dev/null
+    git clone -q "${d}/o.git" "${d}/al" 2>/dev/null
+    printf '%s\n' "$2" > "${d}/ou/.claude/settings.json"; _ub_git "${d}/ou" commit -q --allow-empty -am deny-na-origin
+    _ub_git "${d}/ou" push -q origin main 2>/dev/null
+  }
+  local s0='{"hooks":{}}' s1='{"permissions":{"deny":["Bash(git push origin main)","Bash(crontab *)"]},"hooks":{}}'
+
+  # (f1) main local ATRÁS da origin: a branch do update nasce da origin/main (com o deny), não da local.
+  _ub_setup "${s0}" "${s1}"; tip="$(git -C "${d}/ou" rev-parse HEAD)"
+  rc=0; out="$(bash "${db}" "${d}/al" chore/onion-update-x main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(git -C "${d}/al" rev-parse chore/onion-update-x)" = "${tip}" ] && grep -q 'base fresca' <<< "${out}" \
+     && ! git -C "${d}/al" rev-parse --verify --quiet chore/onion-update-x@{upstream} >/dev/null 2>&1; then
+    record_pass "update-base-deny: (f1) main local atrás da origin ⇒ a branch nasce da origin/main, SEM upstream nela, e o stderr diz"
+  else record_fail "update-base-deny: (f1)" "rc=${rc} branch=$(git -C "${d}/al" rev-parse chore/onion-update-x 2>&1) tip=${tip} upstream=$(git -C "${d}/al" rev-parse --abbrev-ref chore/onion-update-x@{upstream} 2>&1): ${out}"; fi
+  # (u-MUT) sem o --no-track a branch do update herda origin/main como upstream: (f1) tem de reprovar.
+  mut="${d}/db-mut-track.sh"; sed 's| --no-track -b | -b |' "${db}" > "${mut}"
+  if ! cmp -s "${mut}" "${db}"; then
+    _ub_setup "${s0}" "${s1}"; bash "${mut}" "${d}/al" chore/onion-update-x main >/dev/null 2>&1 || true
+    if git -C "${d}/al" rev-parse --verify --quiet chore/onion-update-x@{upstream} >/dev/null 2>&1; then
+      record_pass "update-base-deny: (u-MUT) tirar o --no-track MORDE: a branch do update herdaria origin/main como upstream"
+    else record_fail "update-base-deny: (u-MUT)" "sem o --no-track a branch segue sem upstream — (f1) não prova o --no-track"; fi
+  else record_fail "update-base-deny: (u-MUT)" "o sed não casou o --no-track"; fi
+  mut="${d}/db-mut.sh"; sed 's|^if \[ "\${_has_br}" = 0 \] && git -C "\${TOP}" show-ref|if false \&\& git -C "${TOP}" show-ref|' "${db}" > "${mut}"
+  if ! grep -q '^if false && git -C' "${mut}"; then record_fail "update-base-deny: (f-MUT)" "o sed não casou a resolução da base"
+  else
+    _ub_setup "${s0}" "${s1}"; tip="$(git -C "${d}/ou" rev-parse HEAD)"
+    bash "${mut}" "${d}/al" chore/onion-update-x main >/dev/null 2>&1 || true
+    if [ "$(git -C "${d}/al" rev-parse chore/onion-update-x 2>/dev/null)" = "${tip}" ]; then record_fail "update-base-deny: (f-MUT)" "sem a resolução a branch ainda nasceu da origin — (f1) não morde"
+    else record_pass "update-base-deny: (f-MUT) a branch nascer do nome local MORDE: fica sem o commit do deny"; fi
+  fi
+  # (f2) DIVERGENTES: a local tem commit que a origin não tem e vice-versa ⇒ rc 2, nenhuma branch criada.
+  _ub_setup "${s0}" "${s1}"; printf 'l\n' > "${d}/al/l.txt"; _ub_git "${d}/al" add -A; _ub_git "${d}/al" commit -qm local
+  rc=0; out="$(bash "${db}" "${d}/al" chore/onion-update-x main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && ! git -C "${d}/al" rev-parse --verify --quiet refs/heads/chore/onion-update-x >/dev/null && grep -q 'DIVERGEM' <<< "${out}"; then
+    record_pass "update-base-deny: (f2) local e origin divergentes ⇒ rc 2, branch não criada"
+  else record_fail "update-base-deny: (f2)" "rc=${rc}: ${out}"; fi
+  # (f3) local À FRENTE (commit não empurrado sobre a origin): vale a local.
+  _ub_setup "${s0}" "${s1}"; _ub_git "${d}/al" pull -q --ff-only 2>/dev/null; printf 'l\n' > "${d}/al/l.txt"; _ub_git "${d}/al" add -A; _ub_git "${d}/al" commit -qm local
+  tip="$(git -C "${d}/al" rev-parse main)"
+  rc=0; out="$(bash "${db}" "${d}/al" chore/onion-update-x main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(git -C "${d}/al" rev-parse chore/onion-update-x)" = "${tip}" ]; then
+    record_pass "update-base-deny: (f3) local À FRENTE da origin ⇒ a branch nasce da local"
+  else record_fail "update-base-deny: (f3)" "rc=${rc}: ${out}"; fi
+
+  # deny-monotonic: o "antes" é a ponta mais nova da integração; o "depois" é a árvore da branch do update.
+  _ub_dm() {   # $1 = settings da origin/main · $2 = settings do head (árvore) · ecoa "rc|saída"
+    _ub_setup "${s0}" "$1"; _ub_git "${d}/al" fetch -q 2>/dev/null; _ub_git "${d}/al" checkout -q -b chore/onion-update-x
+    if [ -n "$2" ]; then printf '%s\n' "$2" > "${d}/al/.claude/settings.json"; else rm -f "${d}/al/.claude/settings.json"; fi
+    local r=0 o; o="$(bash "${3:-${dm}}" "${d}/al" main 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"
+  }
+  out="$(_ub_dm "${s1}" '{"permissions":{"deny":["Bash(crontab *)","Bash(at *)","Bash(git push origin main)"]},"hooks":{"Stop":[]}}')"
+  if [ "${out%%|*}" = 0 ] && grep -q 'deny: 2 no alvo (origin/main) → 3 no head' <<< "${out}"; then
+    record_pass "update-base-deny: (d1) deny do adotante intacto e o do vendor somado ⇒ rc 0, 2 → 3 (medido contra origin/main)"
+  else record_fail "update-base-deny: (d1)" "${out}"; fi
+  out="$(_ub_dm "${s0}" '{"hooks":{"Stop":[]}}')"
+  if [ "${out%%|*}" = 0 ] && grep -q 'deny: 0 no alvo (origin/main) → 0 no head' <<< "${out}"; then
+    record_pass "update-base-deny: (d2) adotante sem deny ⇒ rc 0, 0 → 0"
+  else record_fail "update-base-deny: (d2)" "${out}"; fi
+  out="$(_ub_dm "${s1}" '{"hooks":{"Stop":[]}}')"
+  if [ "${out%%|*}" = 1 ] && grep -q '2 no alvo (origin/main) → 0 no head' <<< "${out}" && grep -q '^- Bash(crontab \*)$' <<< "${out}"; then
+    record_pass "update-base-deny: (d3) head sem o deny do alvo ⇒ rc 1 (PARE) e cada regra perdida listada"
+  else record_fail "update-base-deny: (d3)" "${out}"; fi
+  local s_swap='{"permissions":{"deny":["Bash(git push origin main)","Bash(rm -rf *)"]}}'
+  out="$(_ub_dm "${s1}" "${s_swap}")"
+  if [ "${out%%|*}" = 1 ] && grep -q '2 no alvo (origin/main) → 2 no head' <<< "${out}"; then
+    record_pass "update-base-deny: (d4) troca 1 regra por outra (N = M) ⇒ rc 1: compara regra, não contagem"
+  else record_fail "update-base-deny: (d4)" "${out}"; fi
+  mut="${d}/dm-mut.sh"; sed 's|^lost="\$(jq .*$|lost="" # ONION_MUTANTE só contagem|' "${dm}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE só contagem' "${mut}"; then record_fail "update-base-deny: (d-MUT)" "o sed não casou a comparação por regra"
+  else
+    out="$(_ub_dm "${s1}" "${s_swap}" "${mut}")"
+    if [ "${out%%|*}" = 0 ]; then record_pass "update-base-deny: (d-MUT) comparar por contagem MORDE: a troca 1 por 1 passaria"
+    else record_fail "update-base-deny: (d-MUT)" "sem a comparação por regra (d4) ainda reprovou — o caso não prova a regra: ${out}"; fi
+  fi
+  # (d5) O CAMINHO REAL: onion/vendor com o settings do vendor (hooks novos, sem deny), alvo com deny + allow +
+  #      sandbox; merge 3-way na branch do update + merge-onion-hooks por cima ⇒ deny, allow e sandbox intactos,
+  #      hook do vendor presente, deny-monotonic rc 0. (s-MUT) a fusão antiga (cp do vendor) ⇒ deny-monotonic rc 1.
+  #      As edições do alvo (permissions, sandbox) e do vendor (hooks) ficam separadas pelo attribution: edição
+  #      ADJACENTE das duas é conflito git real, que o --update devolve ao maestro (rc 10), e não é este caso.
+  local sv0='{"permissions":{"allow":[]},"attribution":{"commit":"x","pr":"y"},"hooks":{}}'
+  local sv1='{"permissions":{"allow":[]},"attribution":{"commit":"x","pr":"y"},"hooks":{"SessionStart":[{"hooks":[{"type":"command","command":"bash .claude/hooks/mail.sh"}]}]}}'
+  local sa='{"permissions":{"allow":["Bash(ls *)"],"deny":["Bash(git push origin main)","Bash(crontab *)"]},"sandbox":{"enabled":true},"attribution":{"commit":"x","pr":"y"},"hooks":{}}'
+  _ub_setup "${s0}" "${s0}"; _ub_git "${d}/al" pull -q --ff-only 2>/dev/null
+  _ub_git "${d}/al" checkout -q -b onion/vendor; printf '%s\n' "${sv0}" | jq . > "${d}/al/.claude/settings.json"; _ub_git "${d}/al" commit -qam v0
+  _ub_git "${d}/al" checkout -q main; _ub_git "${d}/al" merge -q --no-ff -m seed onion/vendor
+  printf '%s\n' "${sa}" | jq . > "${d}/al/.claude/settings.json"; _ub_git "${d}/al" commit -qam deny-local; _ub_git "${d}/al" push -q origin main 2>/dev/null
+  _ub_git "${d}/al" checkout -q onion/vendor; printf '%s\n' "${sv1}" | jq . > "${d}/al/.claude/settings.json"; _ub_git "${d}/al" commit -qam v1
+  cp "${d}/al/.claude/settings.json" "${d}/vendor-settings.json"; mkdir -p "${d}/al/.claude/hooks"; : > "${d}/al/.claude/hooks/mail.sh"
+  _ub_git "${d}/al" checkout -q -b chore/onion-update-x main
+  rc=0; _ub_git "${d}/al" merge -q --no-ff -m upd onion/vendor >/dev/null 2>&1 || rc=$?
+  local merged; merged="$(bash "${mh}" "${d}/vendor-settings.json" "${d}/al/.claude/settings.json" 2>/dev/null)" || rc=$((rc + 100))
+  [ -n "${merged}" ] && printf '%s\n' "${merged}" > "${d}/al/.claude/settings.json"
+  out="$(bash "${dm}" "${d}/al" main 2>&1)" || rc=$((rc + 1000))
+  if [ "${rc}" -eq 0 ] \
+     && [ "$(jq -c '[(.permissions.deny|length), (.permissions.allow|length), .sandbox.enabled, ([.hooks.SessionStart[]?.hooks[]?.command]|index("bash .claude/hooks/mail.sh") != null)]' "${d}/al/.claude/settings.json")" = '[2,1,true,true]' ]; then
+    record_pass "update-base-deny: (d5) merge 3-way do vendor + merge-onion-hooks ⇒ deny 2, allow 1, sandbox e o hook novo intactos; ${out}"
+  else record_fail "update-base-deny: (d5)" "rc=${rc} settings=$(jq -c . "${d}/al/.claude/settings.json" 2>&1): ${out}"; fi
+  cp "${d}/vendor-settings.json" "${d}/al/.claude/settings.json"   # (s-MUT) a fusão antiga: o vendor sobrescreve
+  rc=0; out="$(bash "${dm}" "${d}/al" main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q '2 no alvo (origin/main) → 0 no head' <<< "${out}"; then
+    record_pass "update-base-deny: (s-MUT) a fusão antiga que sobrescreve o settings com o do vendor é PEGA (rc 1)"
+  else record_fail "update-base-deny: (s-MUT)" "a sobrescrita passou pelo deny-monotonic: rc=${rc}: ${out}"; fi
+  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm
+}
+_family run_update_base_and_deny_selftests
+
 # ── worktree-hooks-ready.sh: o diretório de hooks GERADO existe nesta worktree? (2026-11-05) ────────────
 # O caso medido (o --update de um adotante com husky v9): `core.hooksPath=.husky/_` no .git/config compartilhado,
 # `.husky/_` gerado pelo prepare e ignorado pelo git; a worktree irmã nasce sem ele, e o gate fica INERTE.
