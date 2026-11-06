@@ -121,14 +121,13 @@ flat=$(printf '%s' "$cmd" | tr -d "\"'\\\\")
 rr="$(realpath -m -- "$root" 2>/dev/null)"
 allows="$(onion_adopter_allows "$root")"
 # o próprio projeto (o registro o lista) e os `allow` não entram no sinal: o nome do próprio repo está em todo comando
-signal=$( { printf '%s\n' "adopter-guard.tsv" "GIT_DIR" "--git-dir"
-            while IFS= read -r r; do
-              [ -n "$r" ] || continue
-              [ "$r" = "$rr" ] || [ "$r" = "$root" ] && continue
-              grep -qxF -- "$r" <<< "$allows" && continue
-              printf '%s\n' "$r"
-              b="${r##*/}"; [ "${#b}" -ge 4 ] && printf '%s\n' "$b"
-            done <<< "$repos"; } | sed 's/[][\.*^$+?(){}|/]/\\&/g' | sort -u | paste -sd'|' -)
+# um awk só: a 1ª redação abria um grep por repo registrado (28 nesta máquina) e custava ~60 ms a mais por comando
+signal=$(RR="$rr" ROOT="$root" ALLOWS="$allows" awk '
+    BEGIN { n = split(ENVIRON["ALLOWS"], A, "\n"); for (i = 1; i <= n; i++) al[A[i]] = 1
+            print "adopter-guard.tsv"; print "GIT_DIR"; print "--git-dir" }
+    NF && $0 != ENVIRON["RR"] && $0 != ENVIRON["ROOT"] && !($0 in al) {
+            print; b = $0; sub(/.*\//, "", b); if (length(b) >= 4) print b }' <<< "$repos" \
+          | sed 's/[][\.*^$+?(){}|/]/\\&/g' | sort -u | paste -sd'|' -)
 hit=0
 grep -qE -- "$signal" <<< "$flat" && hit=1
 if [ "$hit" = 0 ] && [ -n "$repos" ]; then
