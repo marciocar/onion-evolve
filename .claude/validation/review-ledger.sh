@@ -57,7 +57,9 @@ if not arqs:
     sys.exit(2)
 
 CAMPOS = ("date", "branch", "verdict", "findings_total", "findings_real",
-          "findings_fixed", "tokens", "duration_min", "reviewed_diff_sha256")
+          "findings_fixed", "tokens", "duration_min", "reviewed_diff_sha256",
+          # opcional desde 2026-11-06 (régua: common/prompts/review-triage.md); no fim para não deslocar colunas
+          "findings_blocking")
 linhas, incompletos = [], []
 for a in arqs:
     txt = open(os.path.join(d, a), encoding="utf-8", errors="replace").read()
@@ -127,6 +129,14 @@ print(f"  achados totais                         {ft:>7}")
 print(f"  achados REAIS                          {fr:>7}"
       + (f"   ({100*fr/ft:.0f}% do total — a precisão da rodada)" if ft else ""))
 print(f"  achados corrigidos (quando declarado)  {fx:>7}")
+# `findings_blocking` é opcional: só conta onde foi DECLARADO, e a população vai junto (ausente ≠ zero)
+tri = [r for r in linhas if num(r["findings_blocking"]) is not None]
+if tri:
+    fb = sum(num(r["findings_blocking"]) for r in tri)
+    frt = sum(num(r["findings_real"]) or 0 for r in tri)
+    print(f"  achados que BLOQUEIAM                  {fb:>7}   de {frt} reais, nos {len(tri)} de {tot} resíduos que declaram o campo (não só os de tokens > 0); o resto entrou como LIMITE")
+else:
+    print(f"  achados que BLOQUEIAM                  ⊘ nenhum resíduo triado ainda (findings_blocking ausente em todos)")
 print(f"\n  tokens                            {tk:>12,}".replace(",", "."))
 print(f"  minutos                           {mi:>12,}".replace(",", "."))
 frz = sum(num(r["findings_real"]) or 0 for r in zerados)

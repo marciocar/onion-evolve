@@ -157,7 +157,9 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
 6. **GATE** — `bash .claude/validation/dissect-object-check.sh <grafo>` rc 0 (estudo por família;
    rc 3 é "não mediu", nunca aprovação) · `lint-artifacts.sh` 0 HARD · famílias `run_dissect_selftests` e
    `run_dissect_object_selftests` verdes · resíduo da
-   REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) no PR.
+   REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) no PR, com `findings_blocking`. O Elenxo da
+   pesquisa já devolve `triage` (bloqueia|limite) em toda objeção sobrevivente; o refutador do N3, e toda revisão
+   separada que a dissecação encomendar, leva no brief a régua de [`review-triage.md`](../common/prompts/review-triage.md).
 
 ## O que este comando NÃO faz
 

@@ -99,7 +99,10 @@ nunca qualidade, e **não** sabe se um caso tem mutante.
 10. **ELENXO + PR** — refutador em worktree isolada com mandato de achar o **falso positivo** (não o
    defeito: a cláusula 4 diz que falso positivo treina a sessão a ignorar o veto, e foi assim que a
    1ª guarda forjada por esta superfície quase nasceu vetando todo turno honesto); resíduo da
-   REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial); **merge humano**.
+   REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial), com `findings_blocking`; **merge humano**.
+   O brief do refutador leva a régua de [`review-triage.md`](../common/prompts/review-triage.md): falso
+   positivo que trava turno honesto BLOQUEIA (o veredito sai errado numa direção previsível); estilo,
+   cobertura e n são LIMITE declarado no teto da guarda (peça 7), não volta nova de refutação.
 
 ## Peça 4 (orquestração faseada) — AUSENTE por desenho, declarado
 

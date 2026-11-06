@@ -8029,7 +8029,7 @@ _og_wiring_why() {
   grep -qF "gateNegatives(pElenxo ? pElenxo.objections : [], o => o.survives === true, ELENXO_CRITERIA)" "${wf}" || { echo "Elenxo de primárias sem gate"; return; }
   grep -qF "overcomingWhy(v, ANCHOR_CRITERIA)" "${wf}" || { echo "ancoragem sem gate"; return; }
   n="$(grep -c "criteriaBlock(\(VERIFY\|ELENXO\|ANCHOR\)_CRITERIA)" "${wf}" || true)"; [ "${n:-0}" -ge 4 ] || { echo "critérios pré-registrados fora do prompt (${n:-0} de 4 juízes)"; return; }
-  n="$(grep -c "then: { required: \['superacao', 'criterio'\] }" "${wf}" || true)"; [ "${n:-0}" -ge 4 ] || { echo "schema não exige superação no negativo (${n:-0} de 4)"; return; }
+  n="$(grep -c "then: { required: \['superacao', 'criterio'\(, '[a-z]*'\)*\] }" "${wf}" || true)"   # campos a mais (ex.: 'triage', 2026-11-06) não tiram as duas metades; [ "${n:-0}" -ge 4 ] || { echo "schema não exige superação no negativo (${n:-0} de 4)"; return; }
   grep -qF "sup: supNeed })" "${wf}" && grep -qF "engineOk(kgW.ver, supNeed)" "${wf}" || { echo "write(KG) principal não conta as superações"; return; }
   grep -qF "sup: pSup })" "${wf}" && grep -qF "engineOk(pW.ver, pSup)" "${wf}" || { echo "write(KG) de primárias não conta as superações"; return; }
   echo ""
@@ -8054,6 +8054,16 @@ _judge_overcoming_research_cases() {
   why="$(_og_wiring_why "${wf}")"
   if [ -z "${why}" ]; then record_pass "research-workflow: (og2) gate ligado nos 4 juízes, critérios no prompt, schema if/then e contagem nos 2 write(KG)"
   else record_fail "research-workflow: (og2)" "${why}"; fi
+  # (tri) a TRIAGEM do Elenxo (2026-11-06, régua em common/prompts/review-triage.md): os dois schemas do Elenxo
+  #       exigem `triage` (bloqueia|limite) na objeção que sobrevive, e a régua vai nos dois prompts. Sem isto, o
+  #       Elenxo volta a devolver todo achado sobrevivente como bloqueio — a forma que custou 8 versões de um pré-registro à curadoria.
+  why=""
+  n="$(grep -c "triage: { enum: \['bloqueia', 'limite'\] }" "${wf}" || true)"; [ "${n:-0}" -ge 2 ] || why="${why} enum-triage(${n:-0}/2)"
+  n="$(grep -c "then: { required: \['superacao', 'criterio', 'triage'\] }" "${wf}" || true)"; [ "${n:-0}" -ge 2 ] || why="${why} required-triage(${n:-0}/2)"
+  n="$(grep -c "criteriaBlock(ELENXO_CRITERIA) + TRIAGE_NOTE" "${wf}" || true)"; [ "${n:-0}" -ge 2 ] || why="${why} regua-no-prompt(${n:-0}/2)"
+  grep -q "^const TRIAGE_NOTE = .*ao arbítrio de quem conduz" "${wf}" || why="${why} regua-sem-o-criterio"
+  if [ -z "${why}" ]; then record_pass "research-workflow: (tri) os 2 Elenxos exigem triage (bloqueia|limite) na objeção que sobrevive, com a régua no prompt"
+  else record_fail "research-workflow: (tri) triagem do Elenxo" "faltou:${why}"; fi
   sed "s/const g = gateNegatives(verdicts.filter(Boolean), x => x.refuted === true, VERIFY_CRITERIA)/const g = { kept: verdicts.filter(Boolean), recused: [] } \/\/ mutante/" "${wf}" > "${m}/c.js"
   if [ -z "$(_og_wiring_why "${m}/c.js")" ]; then record_fail "research-workflow: (og2m)" "MUTANTE com o Verify sem gate PASSOU no (og2)"
   else record_pass "research-workflow: (og2m) mutante que desliga o gate do Verify reprova no (og2): $(_og_wiring_why "${m}/c.js")"; fi
@@ -19570,6 +19580,8 @@ run_review_artifact_selftests() {
         # Foi o harness expondo que ele não espelhava mais o runner, exatamente como esta casa já
         # mediu 3× ao trocar uma dependência para fail-closed. [[fail-closed-exposes-incomplete-harness]]
         printf 'findings_total: 3\nfindings_real: 2\ntokens: 118000\nduration_min: 11\nverdict: %s\n' "${4:-CORRIGIDO}"
+        # $5 = linha extra do frontmatter (ex.: `findings_blocking: N`); ausente = resíduo da era anterior ao campo
+        [ -z "${5:-}" ] || printf '%s\n' "$5"
       fi
       printf -- '---\n\n# revisao\n'
     } > "$1/docs/evolution/review/feat-x.md"
@@ -19828,6 +19840,55 @@ run_review_artifact_selftests() {
     record_fail "review-artifact: (p) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
   rm -rf "${mutv}"
+
+  # ═══ `findings_blocking` (2026-11-06) — quantos dos achados REAIS BLOQUEIAM; o resto é LIMITE declarado ═══
+  # Nasceu de 2026-11-05: na curadoria, 8 versões de um pré-registro tratando todo achado como bloqueio; com a
+  # triagem pedida na 7ª rodada, fechou em 2. Régua: .claude/commands/common/prompts/review-triage.md. OPCIONAL (os 912 resíduos de então
+  # não o têm e seguem válidos); presente, número com 0 ≤ blocking ≤ real.
+  # (q) ausente → PASSA: o resíduo antigo não quebra (o caminho feliz (c) também não o tem; aqui é nomeado)
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'FINDINGS-BLOCKING' <<< "${out}"; then
+    record_pass "review-artifact: (q) resíduo SEM findings_blocking passa (era anterior ao campo segue válida)"
+  else record_fail "review-artifact: (q) blocking ausente" "rc=${rc} out=${out} — o campo novo quebrou os resíduos antigos"; fi
+  rm -rf "${d}"
+  # (r) dentro do teto (0 e = real) → PASSA
+  local _okb=""
+  for _b in 0 2; do
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO "findings_blocking: ${_b}"
+    rc=0; out="$(_run "${d}")" || rc=$?; [ "${rc}" -eq 0 ] || _okb="${_okb} ${_b}(rc=${rc})"; rm -rf "${d}"
+  done
+  if [ -z "${_okb}" ]; then record_pass "review-artifact: (r) findings_blocking 0 e = findings_real passam (o teto é inclusivo)"
+  else record_fail "review-artifact: (r) blocking válido" "reprovaram:${_okb}"; fi
+  # (s) acima do real e não numérico → HARD com a tag própria (bloqueio que não é achado real é contagem inventada)
+  local _badb=""
+  for _b in 3 muitos; do
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO "findings_blocking: ${_b}"
+    rc=0; out="$(_run "${d}")" || rc=$?
+    { [ "${rc}" -eq 1 ] && grep -q 'FINDINGS-BLOCKING-INVALIDO' <<< "${out}"; } || _badb="${_badb} ${_b}(rc=${rc})"; rm -rf "${d}"
+  done
+  if [ -z "${_badb}" ]; then record_pass "review-artifact: (s) findings_blocking > findings_real e não numérico → HARD FINDINGS-BLOCKING-INVALIDO"
+  else record_fail "review-artifact: (s) blocking inválido" "passaram ou outra tag:${_badb}"; fi
+  # (t) (MUT) sem o teto, blocking > real PASSA. A CÓPIA LIMPA é provada antes, no MESMO arranjo (a cópia em
+  #     outro diretório, o mesmo fixture): se ela não reprova, o "morto" do mutante não conta nada.
+  local mutb; mutb="$(mktemp -d)"; cp "${helper}" "${mutb}/clean.sh"; cp "${helper}" "${mutb}/m.sh"
+  sed -i 's/^  \[ "$((10#${b}))" -le "$((10#${r}))" \] || echo/  true || echo/' "${mutb}/m.sh"
+  if ! cmp -s "${mutb}/clean.sh" "${mutb}/m.sh"; then
+    local rc_clean=0 rc_mut=0
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO "findings_blocking: 3"
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mutb}/clean.sh" "${d}" >/dev/null 2>&1 ) || rc_clean=$?
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mutb}/m.sh" "${d}" >/dev/null 2>&1 ) || rc_mut=$?
+    if [ "${rc_clean}" -eq 1 ] && [ "${rc_mut}" -eq 0 ]; then
+      record_pass "review-artifact: (t) (MUT) cópia limpa reprova e, sem o teto, blocking > real PASSA — o teto é load-bearing"
+    else record_fail "review-artifact: (t) (MUT)" "limpa rc=${rc_clean} (esperado 1), mutante rc=${rc_mut} (esperado 0)"; fi
+    rm -rf "${d}"
+  else
+    record_fail "review-artifact: (t) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "${mutb}"
 
   # (ovo) o PAR guarda × motor: o rótulo da isenção que a guarda EMITE tem de ser o mesmo que o pr-finalize
   # ACEITA. Se um lado mudar o vocabulário, a isenção quebra calada e o motor volta a morrer pedindo hash
@@ -46795,7 +46856,7 @@ run_residue_schema_selftests() {
     record_pass "residue-schema: (a) o esqueleto cru reprova no esquema, nomeando os campos a preencher"
   else record_fail "residue-schema: (a) esqueleto cru" "rc=${rc} out=[${out}]"; fi
   # (b) preenchido (só os valores, sem mexer no resto), passa — e todo campo do enum vem do validador
-  sed 's/^findings_total: PREENCHA/findings_total: 2/;s/^findings_real: PREENCHA/findings_real: 1/;s/^findings_fixed: PREENCHA/findings_fixed: 1/;s/^tokens: PREENCHA/tokens: 0/;s/^duration_min: PREENCHA/duration_min: 0/;s/^verdict: PREENCHA/verdict: REPROVADO_E_CURADO/;s/^elenxo: PREENCHA/elenxo: sim/;s/^reviewer: PREENCHA/reviewer: x/' "${d}/sk.md" > "${d}/ok.md"
+  sed 's/^findings_total: PREENCHA/findings_total: 2/;s/^findings_real: PREENCHA/findings_real: 1/;s/^findings_blocking: PREENCHA/findings_blocking: 1/;s/^findings_fixed: PREENCHA/findings_fixed: 1/;s/^tokens: PREENCHA/tokens: 0/;s/^duration_min: PREENCHA/duration_min: 0/;s/^verdict: PREENCHA/verdict: REPROVADO_E_CURADO/;s/^elenxo: PREENCHA/elenxo: sim/;s/^reviewer: PREENCHA/reviewer: x/' "${d}/sk.md" > "${d}/ok.md"
   rc=0; out="$(bash "${v}" --schema "${d}/ok.md" 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then record_pass "residue-schema: (b) o esqueleto preenchido passa no esquema"
   else record_fail "residue-schema: (b) preenchido" "rc=${rc} out=[${out}]"; fi
@@ -46833,6 +46894,31 @@ run_residue_schema_selftests() {
       record_pass "residue-schema: (f) pr-finalize com resíduo fora do esquema: para em ms, antes do pré-voo"
     else record_fail "residue-schema: (f) esquema no pr-finalize" "$( { tail -3 "${s}/o2"; ls "${s}/pre.log" 2>/dev/null; } | tr '\n' '|' | cut -c1-240)"; fi
   else record_skip "residue-schema: (e)(f) ops/ ausente (adotante) → pulado"; fi
+  # (g) `findings_blocking` (2026-11-06) no esquema: o esqueleto o traz logo depois de findings_real; ausente
+  #     passa (resíduo antigo); acima de findings_real ou não numérico reprova, nomeando o campo
+  sed '/^findings_blocking:/d' "${d}/ok.md" > "${d}/g0.md"
+  sed 's/^findings_blocking: .*/findings_blocking: 2/' "${d}/ok.md" > "${d}/g1.md"
+  sed 's/^findings_blocking: .*/findings_blocking: PREENCHA/' "${d}/ok.md" > "${d}/g2.md"
+  local gbad=""
+  [ "$(grep -A1 '^findings_real:' "${d}/sk.md" | tail -1)" = "findings_blocking: PREENCHA" ] || gbad="${gbad} esqueleto-sem-o-campo"
+  bash "${v}" --schema "${d}/g0.md" >/dev/null 2>&1 || gbad="${gbad} ausente-reprovou"
+  out="$(bash "${v}" --schema "${d}/g1.md" 2>&1)" && gbad="${gbad} acima-do-real-passou"
+  grep -q 'findings_blocking (2) maior que findings_real (1)' <<< "${out}" || gbad="${gbad} msg-do-teto"
+  out="$(bash "${v}" --schema "${d}/g2.md" 2>&1)" && gbad="${gbad} nao-numerico-passou"
+  grep -q 'findings_blocking tem de ser número' <<< "${out}" || gbad="${gbad} msg-do-numero"
+  if [ -z "${gbad}" ]; then record_pass "residue-schema: (g) findings_blocking: no esqueleto, ausente passa, acima do real e não numérico reprovam"
+  else record_fail "residue-schema: (g) findings_blocking" "falhou:${gbad}"; fi
+  # (h) (MUT) sem a chamada no esquema, blocking > real PASSA no --schema. A cópia LIMPA reprova antes, no mesmo arranjo.
+  cp "${v}" "${d}/clean.sh"; cp "${v}" "${d}/m.sh"
+  sed -i 's/^  _blocking_problem "${f}"$/  : # mutante/' "${d}/m.sh"
+  if ! cmp -s "${d}/clean.sh" "${d}/m.sh"; then
+    local rcc=0 rcm=0
+    bash "${d}/clean.sh" --schema "${d}/g1.md" >/dev/null 2>&1 || rcc=$?
+    bash "${d}/m.sh" --schema "${d}/g1.md" >/dev/null 2>&1 || rcm=$?
+    if [ "${rcc}" -eq 1 ] && [ "${rcm}" -eq 0 ]; then
+      record_pass "residue-schema: (h) (MUT) cópia limpa reprova e, sem a chamada, blocking > real passa no --schema — a ligação é load-bearing"
+    else record_fail "residue-schema: (h) (MUT)" "limpa rc=${rcc} (esperado 1), mutante rc=${rcm} (esperado 0)"; fi
+  else record_fail "residue-schema: (h) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
   rm -rf "${d}"
 }
 _family run_residue_schema_selftests

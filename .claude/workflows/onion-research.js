@@ -200,6 +200,9 @@ const SUP_PREFIX = 'C_SUPERACAO_' + TODAY.replace(/-/g, '') + '_'
 // objeção RECUSADA não some (some = o alvo fica liberado, fail-OPEN — achado do refutador, 2026-10-15): segue na
 // lista, marcada `naoJulgada`, e o escritor a modela como restrição fraca, nunca como liberação do alvo.
 const keepRecused = g => [...g.kept, ...g.recused.map(r => ({ ...r.verdict, naoJulgada: true, recusa: r.why }))]
+// régua da triagem (2026-11-06, fonte: .claude/commands/common/prompts/review-triage.md): objeção que SOBREVIVE diz se
+// BLOQUEIA ou é LIMITE declarado — na curadoria, 8 versões de um pré-registro sem a triagem; pedida na 7ª, fechou em 2
+const TRIAGE_NOTE = '\n- TRIAGEM de toda objeção que SOBREVIVE, no campo `triage`: "bloqueia" SÓ quando o veredito pode sair diferente numa direção previsível, ou ao arbítrio de quem conduz, ou o alvo promete o que não entrega — e então `evidence` traz o CENÁRIO concreto (a entrada ou o estado, e o resultado errado). Sem cenário concreto é "limite": a objeção fica de pé como restrição DECLARADA, não segura a decisão. Na dúvida, escreva o cenário; se ele não sai, é limite.'
 const RECUSA_NOTE = '\n- Objeção com `naoJulgada: true` foi RECUSADA pelo motor (sem critério pré-registrado ou sem superação): modele-a como `E_OBJECAO_…` com status open, confidence ≤ 0.3, o motivo da recusa (`recusa`) no narrative e aresta CONSTRAINS para o alvo — o alvo fica NÃO-JULGADO, nunca liberado por ela ter sido recusada.'
 const SUP_NODES = '\n\n## SUPERAÇÕES (SAC-151 — reprovação que achou o que supera vira NÓ, não comentário)\n' +
   'Para CADA superação listada como achada abaixo, escreva 1 nó `claim` com id `' + SUP_PREFIX + '<SLUG>` (plane DEV, status open, impact 3, confidence ≤ 0.6 — afirmação de UM juiz —, label = o `o_que` em pt-BR, narrative = a `medida` + o critério citado + o alvo reprovado, `trace` = o comando do critério) e 1 aresta `TRACES_TO` dele para o nó que REGISTRA a reprovação (o `E_OBJECAO_…`, o `E_LACUNAS_…` ou o `D_…`). O motor CONTA esses nós pelo prefixo e reprova o grafo que tiver menos que as achadas.'
@@ -227,8 +230,8 @@ const REPORT_SCHEMA = { type: 'object', required: ['summary', 'findings', 'cavea
   market: { type: 'string' }, caveats: { type: 'string' }, unverifiedList: { type: 'array', items: { type: 'string' } }, openQuestions: { type: 'array', items: { type: 'string' } } } }
 const ELENXO_SCHEMA = { type: 'object', required: ['objections', 'recommendation'], properties: {
   objections: { type: 'array', items: { type: 'object', required: ['target', 'kind', 'survives', 'evidence'], properties: {
-    target: { type: 'string' }, kind: { enum: ['finding', 'discarded-by-evidence', 'discarded-by-comodismo'] }, survives: { type: 'boolean' }, evidence: { type: 'string' }, ...OVERCOMING_PROPS },
-    if: { required: ['survives'], properties: { survives: { const: true } } }, then: { required: ['superacao', 'criterio'] } } },
+    target: { type: 'string' }, kind: { enum: ['finding', 'discarded-by-evidence', 'discarded-by-comodismo'] }, survives: { type: 'boolean' }, evidence: { type: 'string' }, triage: { enum: ['bloqueia', 'limite'] }, ...OVERCOMING_PROPS },
+    if: { required: ['survives'], properties: { survives: { const: true } } }, then: { required: ['superacao', 'criterio', 'triage'] } } },
   recommendation: { type: 'string' }, options: { type: 'array', items: { type: 'string' } } } }
 
 // ── a metade que MEDE (a 1a versao desta cura nao media nada) ────────────────────────────────
@@ -347,8 +350,8 @@ if (MODE === 'primaries') {
     recommendation: { type: 'string' },
     gapsClosed: { type: 'array', items: { type: 'string' } }, gapsOpen: { type: 'array', items: { type: 'string' } },
     objections: { type: 'array', items: { type: 'object', required: ['target', 'survives', 'evidence'], properties: {
-      target: { type: 'string' }, survives: { type: 'boolean' }, evidence: { type: 'string' }, ...OVERCOMING_PROPS },
-      if: { required: ['survives'], properties: { survives: { const: true } } }, then: { required: ['superacao', 'criterio'] } } } } }
+      target: { type: 'string' }, survives: { type: 'boolean' }, evidence: { type: 'string' }, triage: { enum: ['bloqueia', 'limite'] }, ...OVERCOMING_PROPS },
+      if: { required: ['survives'], properties: { survives: { const: true } } }, then: { required: ['superacao', 'criterio', 'triage'] } } } } }
   // reaproveita o contrato do write(KG) e acrescenta o total do grafo (este modo APENDA tanto quanto cria)
   const KG_SCHEMA_PRIMARIES = { ...KG_SCHEMA, required: [...KG_SCHEMA.required, 'nodesTotal'],
     properties: { ...KG_SCHEMA.properties, nodesTotal: { type: 'integer' } } }
@@ -452,7 +455,7 @@ if (MODE === 'primaries') {
     '1. Para cada claim ancorada, uma objeção concreta: ela prova o que a rodada precisa, ou prova MENOS? (`survives=true` se a objeção fica de pé).\n' +
     '2. `gapsClosed`: as lacunas NOMEADAS acima que esta rodada fechou COM evidência ancorada. `gapsOpen`: as que continuam abertas — inclusive por fonte inalcançável ou por claim rejeitada na ancoragem.\n' +
     '3. `recommendation`: o que a rodada sustenta e o que ela NÃO sustenta. Descarte por comodismo/orçamento volta como objeção sobrevivente (cláusula 6 da doutrina).' +
-    criteriaBlock(ELENXO_CRITERIA) + '\n- Objeção que SOBREVIVE é veredito negativo: leva as duas metades.\n\n' +
+    criteriaBlock(ELENXO_CRITERIA) + TRIAGE_NOTE + '\n- Objeção que SOBREVIVE é veredito negativo: leva as duas metades.\n\n' +
     'Somente saída estruturada. Evidência específica, citando a fonte ou o id do nó.',
     { label: 'elenxo-primarias', phase: 'Elenxo', schema: PRIMARIES_ELENXO_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
   // SAC-151: objeção sobrevivente sem critério/superação é RECUSADA (o alvo fica não-julgado, nunca liberado)
@@ -461,7 +464,7 @@ if (MODE === 'primaries') {
   const pOvercomings = [...overcomingsFound(rejected.filter(r => r.verdict === 'EXAGERADA' || r.verdict === 'NAO-ENCONTRADA')).map(r => ({ alvo: '[' + r.source + '] ' + webText(r.claim), registro: 'E_LACUNAS_…', superacao: r.superacao, criterio: r.criterio })),
     ...overcomingsFound(pGate.kept).map(o => ({ alvo: webText(o.target), registro: 'o nó que a objeção limita (ou o E_LACUNAS_…)', superacao: o.superacao, criterio: o.criterio }))]
   const pSup = await supBaseline(KG_PATH, { need: pOvercomings.length, prefix: SUP_PREFIX })
-  if (pElenxo) log('Elenxo: ' + pElenxo.objections.length + ' objeções (' + pElenxo.objections.filter(o => o.survives).length + ' sobrevivem) · ' + pGate.recused.length + ' RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: ' + pElenxo.gapsClosed.length + ' · abertas: ' + pElenxo.gapsOpen.length)
+  if (pElenxo) log('Elenxo: ' + pElenxo.objections.length + ' objeções (' + pElenxo.objections.filter(o => o.survives).length + ' sobrevivem, ' + pElenxo.objections.filter(o => o.survives && o.triage === 'bloqueia').length + ' bloqueiam) · ' + pGate.recused.length + ' RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: ' + pElenxo.gapsClosed.length + ' · abertas: ' + pElenxo.gapsOpen.length)
   log('Superação: ' + pOvercomings.length + ' achada(s) → nó obrigatório (' + SUP_PREFIX + '…)')
 
   phase('write(KG)')
@@ -670,14 +673,14 @@ if (MODE === 'decision') {
     '\n\n## Descartados nesta rodada (para cada um: foi por EVIDÊNCIA ou por COMODISMO/hype/orçamento?)\n' + killed.map(c => '- refutada: ' + webText(c.claim) + ' (tier ' + c.sourceTier + ')').join('\n') + '\n' + notVerifiedByBudget.slice(0, 15).map(c => '- cortada por orçamento: ' + webText(c.claim)).join('\n') + '\n' + budgetDropped.slice(0, 10).map(b => '- fonte não lida: ' + webText(b.url) + ' (' + webText(b.angle) + ')').join('\n') +
     '\n\n## O que o corpus já sabia\n' + (CORPUS || '(vazio)') +
     '\n\n## Tarefa\n1. Para cada achado: uma objeção concreta (kind=finding) com evidência; survives=true se a objeção fica de pé.\n2. Para cada descartado: kind=discarded-by-evidence (descarte legítimo, survives=false) OU kind=discarded-by-comodismo (descartado por preguiça/hype/orçamento sem evidência — survives=true, e diga o que faltou olhar).\n3. recommendation: qual opção você recomendaria ao maestro e sob quais CONSTRAINS (as objeções sobreviventes). options: as opções nomeadas.' +
-    criteriaBlock(ELENXO_CRITERIA) + '\n- Objeção que SOBREVIVE é veredito negativo: leva as duas metades. A superação de uma opção reprovada é a VARIANTE ou o caminho que entregaria o valor dela sem o defeito apontado.\n\nSomente saída estruturada. Evidência específica.',
+    criteriaBlock(ELENXO_CRITERIA) + TRIAGE_NOTE + '\n- Objeção que SOBREVIVE é veredito negativo: leva as duas metades. A superação de uma opção reprovada é a VARIANTE ou o caminho que entregaria o valor dela sem o defeito apontado.\n\nSomente saída estruturada. Evidência específica.',
     { label: 'elenxo', phase: 'Elenxo', schema: ELENXO_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
   if (elenxo) {
     // `discarded-by-comodismo` que sobrevive é o juiz pedindo para REABRIR um descarte — voto pró-possibilidade,
     // não reprovação: fica fora do gate (achado do refutador, 2026-10-15: o gate o recusava e o descarte preguiçoso ficava)
     elenxoGate = gateNegatives(elenxo.objections, o => o.survives === true && o.kind !== 'discarded-by-comodismo', ELENXO_CRITERIA)
     elenxo.objections = keepRecused(elenxoGate)
-    log('Elenxo: ' + elenxo.objections.length + ' objeções, ' + elenxo.objections.filter(o => o.survives).length + ' sobreviventes (' + elenxo.objections.filter(o => o.kind === 'discarded-by-comodismo' && o.survives).length + ' descartes por comodismo reabertos) · ' + elenxoGate.recused.length + ' RECUSADA(S) pelo motor sem critério/superação')
+    log('Elenxo: ' + elenxo.objections.length + ' objeções, ' + elenxo.objections.filter(o => o.survives).length + ' sobreviventes (' + elenxo.objections.filter(o => o.survives && o.triage === 'bloqueia').length + ' bloqueiam; ' + elenxo.objections.filter(o => o.kind === 'discarded-by-comodismo' && o.survives).length + ' descartes por comodismo reabertos) · ' + elenxoGate.recused.length + ' RECUSADA(S) pelo motor sem critério/superação')
   }
 }
 // SAC-151: as superações ACHADAS (das refutações que valeram e das objeções sobreviventes) viram nó obrigatório

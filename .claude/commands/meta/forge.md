@@ -96,7 +96,9 @@ O leitor roda na carga e mede as peças do alvo no `forge-census.sh`:
 5. **DOGFOOD** — rode o artefato de verdade, e o **modo-de-falha** também. `bash -n` e lint verde não
    são dogfood: são pré-condição.
 6. **GATE** — `lint-artifacts.sh` 0 HARD · a família nova verde · e o **mutante** de cada caso
-   provado. Resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) no PR.
+   provado. Resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) no PR, com
+   `findings_blocking`: o brief do refutador leva a régua de
+   [`review-triage.md`](../common/prompts/review-triage.md) (BLOQUEIA ou LIMITE declarado).
 
 ## O que este comando NÃO faz
 
