@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**980 itens abertos** em 152 grafo(s) com aberto (de 193 no escopo) · 151 grupo(s), agrupados por `owner:` (56 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1010 itens abertos** em 152 grafo(s) com aberto (de 193 no escopo) · 152 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -353,6 +353,48 @@
 | 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
 | 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
 | 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
+
+## messaging-standards-2026-11 — 37 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 65.0 | `Q_MESSAGING_STANDARDS_1106` | messaging-standards-2026-11 | Qual pilha de padrões de mercado (envelope, fila, campainha, identidade, adapters, prior art) o onion-messaging deve adotar para  |
+| 60.0 | `C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX` | messaging-standards-2026-11 | Fila 1: SQLite em WAL com um daemon escritor, outbox e inbox, ack explícito, tentativas com teto, tabela dead_letter, dedupe por  |
+| 35.0 | `C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE` | messaging-standards-2026-11 | Campainha i: channel próprio derivado do a2a-channel.ts do spike, só em sessão interativa com a flag de dev, sem permission rel |
+| 33.0 | `C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL` | messaging-standards-2026-11 | Envelope C (os dois): CloudEvents 1.0 no corpo do sinal A2A, amarrado pelo body_sha256 assinado; já é a forma de a2a-accept.sh e |
+| 15.0 | `C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE` | messaging-standards-2026-11 | Identidade a: convite A2A por membro com validade e revogação (S6 em produção) (recomendada para os 3 dias) |
+| 13.5 | `C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2` | messaging-standards-2026-11 | Fila 3: NATS JetStream, semântica lida (ack, reentrega, MaxDeliver, at-least-once), SEM dead-letter nativa; a operação mínima  |
+| 8.0 | `C_OPCAO_ADAPTERS_SLACK_SOCKET_MODE_AND_GIT` | messaging-standards-2026-11 | Adapters: Slack por Socket Mode (só conexão de saída) e git assíncrono pelo doc-bridge no dia 1; e-mail depois dos 3 dias (rec |
+| 8.0 | `Q_MESSAGING_PRIMARIES_REVIEW_1106` | messaging-standards-2026-11 | PROPOSTA (não sela): o maestro revisa a frase 'o mercado não a tem' de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS (done) à luz do EventMe |
+| 6.0 | `C_OPCAO_BELL_II_YOU_HAVE_MAIL_HOOK` | messaging-standards-2026-11 | Campainha ii: hook 'you have mail' no início do turno, para sessões headless e Agent SDK |
+| 5.0 | `C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628` | messaging-standards-2026-11 | Identidade b: device flow RFC 8628, que exige servidor de autorização próprio e nunca leva o código no convite |
+| 4.5 | `C_OPCAO_ENVELOPE_A_A2A_ONION_PROFILE_ONLY` | messaging-standards-2026-11 | Envelope A: A2A 1.0 com o perfil Onion (JWS RS256, kid pinado, aud, jti, body_sha256), sem CloudEvents |
+| 3.6 | `C_SUPERACAO_20261106_A2A_PUSH_AUTH_SCHEME_OPEN` | messaging-standards-2026-11 | O A2A 1.0 exige (MUST) autenticar o servidor no webhook e verificar a notificação, mas o esquema é aberto (IANA: Bearer, Basic; |
+| 3.6 | `C_SUPERACAO_20261106_AGENT_INBOX_ACK_IS_TRANSPORT` | messaging-standards-2026-11 | No agent-inbox o 200/202 confirma só a aceitação do transporte; journal antes do 202 e idempotência por ID de cliente existem  |
+| 3.6 | `C_SUPERACAO_20261106_BODY_SHA256_PROFILE` | messaging-standards-2026-11 | Perfil Onion com claim body_sha256 obrigatório no a2a-verify.sh |
+| 3.6 | `C_SUPERACAO_20261106_CHANNEL_ACK_TOOL_BOUND` | messaging-standards-2026-11 | Tool ack/reply do channel do próprio core (a2a-channel.ts do spike), com in_reply_to e body_sha256 conferidos no fetch-replies |
+| 3.6 | `C_SUPERACAO_20261106_CHANNEL_REQUIREMENTS_FULL_LIST` | messaging-standards-2026-11 | Requisitos completos do channel: SDK MCP, runtime Node, capability claude/channel, notifications/claude/channel e stdio; para regi |
+| 3.6 | `C_SUPERACAO_20261106_CORE_CLOUDEVENT_READER` | messaging-standards-2026-11 | Leitor de CloudEvent 1.0 do core (a2a-metrics.py, com specversion, id, source e type obrigatórios) |
+| 3.6 | `C_SUPERACAO_20261106_INVITE_WITHOUT_CODE` | messaging-standards-2026-11 | Convite A2A por membro, sem código no convite (D_CONVITE_POR_MEMBRO_COM_VALIDADE) |
+| 3.6 | `C_SUPERACAO_20261106_INVITE_WITHOUT_CODE_SLACK_EMAIL` | messaging-standards-2026-11 | Convite A2A por membro (com validade e revogação), sem código de login no convite |
+| 3.6 | `C_SUPERACAO_20261106_MARK_DELIVERED_ONLY_ON_ACK` | messaging-standards-2026-11 | Só marcar como entregue com o ack explícito da tool do channel, amarrado ao id e ao body_sha256 (e reenviar enquanto o ack não  |
+| 3.6 | `C_SUPERACAO_20261106_MEMBER_INVITE_FOR_MACHINES` | messaging-standards-2026-11 | O convite A2A por membro, com validade e revogação, já em produção (D_CONVITE_POR_MEMBRO_COM_VALIDADE, E_S6_PONTA_A_PONTA_EM_ |
+| 3.6 | `C_SUPERACAO_20261106_NO_PERMISSION_RELAY` | messaging-standards-2026-11 | Não declarar a capability de permission relay e manter a aprovação no terminal (channel do spike 'sem relay') |
+| 3.6 | `C_SUPERACAO_20261106_OWN_BASE_CHANNEL_ACCEPT` | messaging-standards-2026-11 | Base própria do core: a2a-channel.ts mais accept-to-channel.sh |
+| 3.6 | `C_SUPERACAO_20261106_OWN_CHANNEL_DELIVERY_LATER_VERSION` | messaging-standards-2026-11 | Entrega do channel próprio medida numa versão posterior |
+| 3.6 | `C_SUPERACAO_20261106_OWN_CHANNEL_NO_RELAY` | messaging-standards-2026-11 | docs/evolution/research/a2a-cross-user-spike-2026-10/channel/a2a-channel.ts (channel próprio, sem relay) |
+| 3.6 | `C_SUPERACAO_20261106_PULL_RETURN_TASKS_GET` | messaging-standards-2026-11 | Volta por pull: quem está do lado de fora consulta (fetch-replies.sh / tasks/get), em vez de receber webhook |
+| 3.6 | `C_SUPERACAO_20261106_RFC10027_CROSS_DEVICE_PHISHING` | messaging-standards-2026-11 | Segundo o juiz, a RFC 10027/BCP 247 diz que o RFC 8628 é suscetível a phishing de consentimento entre dispositivos; só se usa s |
+| 3.6 | `C_SUPERACAO_20261106_SENDER_KID_GATE` | messaging-standards-2026-11 | Gate por kid pinado do remetente (iss==from no a2a-verify) antes do channel |
+| 3.6 | `C_SUPERACAO_20261106_SIGNED_ENVELOPE_CROSS_USER` | messaging-standards-2026-11 | Envelope A2A assinado, com kid pinado, entre usuários |
+| 3.3 | `C_SUPERACAO_20261106_ADR0021_ATTRIBUTE_TABLE_LITERAL` | messaging-standards-2026-11 | Tabela da ADR 0021 pela linha literal, sem aspas internas: '· `source` · Agent DID URI ·', com id=entry_id e type=ai.agentmesh. |
+| 3.3 | `C_SUPERACAO_20261106_EIP_DLC_TYPICAL_LOCAL_PER_MACHINE` | messaging-standards-2026-11 | Dead Letter Channel do EIP, pelo próprio parágrafo: o sistema PODE mover a mensagem; tipicamente cada máquina tem seu canal loc |
+| 3.3 | `C_SUPERACAO_20261106_EVENTMESH_A2A_MAPPING_CORRECTED` | messaging-standards-2026-11 | EventMesh A2A pelo README EN: a mensagem entre agentes é um CloudEvent; type marca requisição ou resposta, mcptype a direção, |
+| 3.3 | `C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060` | messaging-standards-2026-11 | honker: alpha declarado no README, licença Apache-2.0 OR MIT, e release v0.6.0 existente fora do README (API do GitHub /releases  |
+| 3.3 | `C_SUPERACAO_20261106_NATS_SYNC_INTERVAL_NO_DEFAULT` | messaging-standards-2026-11 | sync_interval do JetStream, pela própria página: o filestore usa os buffers do SO e o servidor força o sync no intervalo; 'alwa |
+| 3.3 | `C_SUPERACAO_20261106_SQS_DLQ_RETENTION_STANDARD_VS_FIFO` | messaging-standards-2026-11 | Retenção na DLQ do SQS, pelo próprio parágrafo: na fila standard o timestamp de enqueue fica inalterado e a retenção maior n |
+| 2.2 | `C_OPCAO_QUEUE_2_REDIS_STREAMS` | messaging-standards-2026-11 | Fila 2: Redis Streams com consumer groups (nesta VPS o Docker fura o ufw, e já houve Redis sem auth exposto) |
+| 1.5 | `C_OPCAO_ENVELOPE_B_CLOUDEVENTS_ONLY` | messaging-standards-2026-11 | Envelope B: CloudEvents 1.0 puro, fora do A2A |
 
 ## nanochat-onion-2026-10 — 6 item(ns)
 
@@ -763,7 +805,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 21 item(ns)
+## maestro — 19 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -771,8 +813,6 @@
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
-| 9.0 | `Q_CS_APP_SLACK_E_CHANNELS_1106` | comms-stable-2026-11 | O app Slack interno do hub existe, com Socket Mode e escopos mínimos, os tokens de bot e de app guardados pelo maestro fora do ch |
-| 8.4 | `Q_CS_REPO_ONION_MESSAGING_CRIADO_1106` | comms-stable-2026-11 | O repo privado onion-messaging existe, clonado na VPS, com a sessão do core autorizada a escrever nele até a sessão própria na |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
@@ -1044,26 +1084,21 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 28 item(ns)
+## core — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
-| 15.0 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
-| 11.2 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
-| 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
-| 7.5 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
-| 4.2 | `Q_CS_ORIENTACAO_COMPLIANCE_1106` | comms-stable-2026-11 | Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando  |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |

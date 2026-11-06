@@ -1,0 +1,888 @@
+{
+  "run_id": "wf_f1285b27-a06",
+  "summary": "Pesquisa Onion: corpus primeiro, eixos fixos (Claude Code atual, mercado/capital, trajetória, analistas, comunidade) + ângulos do tema, tier de fonte, verificação adversarial 3/2, write(KG) bi-temporal com radar",
+  "agentCount": 12,
+  "logs": [
+    "Corpus: 1 nó(s) já conhecidos entram no Scope, na síntese, no Elenxo e no write(KG)",
+    "Modo PRIMÁRIAS: 4 fonte(s) NOMEADA(S), leitura integral — sem Scope/Search/Fetch/Verify. Medido 2026-09-13 na mesma pergunta: varredura 291k tokens/nó (19 de 25 claims refutadas, a maioria por fonte fraca) × primárias 42k tokens/nó.",
+    "Leitura: 4/4 fontes alcançadas · inalcançáveis: nenhuma",
+    "Ancoragem: 15 claim(s) ANCORADA(S) · 8 rejeitada(s) (exagerada ou não encontrada) · 0 reprovação(ões) RECUSADA(S) pelo motor sem critério/superação",
+    "Elenxo: 16 objeções (10 sobrevivem, 3 bloqueiam) · 0 RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: 1 · abertas: 4",
+    "Superação: 6 achada(s) → nó obrigatório (C_SUPERACAO_20261106_…)",
+    "write(KG): docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml — +34 nós / +57 arestas, total 115, radar exit 0 (pelo motor, 1 tentativa(s))"
+  ],
+  "result": {
+    "mode": "primaries",
+    "question": "Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já existente como alternativa a escrever do zero, e o estado da arte de CloudEvents com agentes e A2A.",
+    "today": "2026-11-06",
+    "kgPath": "docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml",
+    "radarExit": 0,
+    "writeAttempts": [
+      {
+        "attempt": 1,
+        "declaredRadarExit": 0,
+        "radarExit": 0,
+        "contractExit": 0,
+        "overcomingNodes": 24
+      }
+    ],
+    "summary": "Acrescentei 34 nós ao grafo do onion-messaging, sem apagar nada: 15 evidências ancoradas, a contabilidade E_LACUNAS_MESSAGING_PRIMARIES_1106 (8 claims rejeitadas na ancoragem, 0 fontes inalcançáveis, 0 recusas do motor, 3 lacunas ainda abertas mais o smoke da 2.1.319), 10 objeções sobreviventes do Elenxo (E_OBJECAO_P2_*), 6 nós C_SUPERACAO_20261106_*, a opção C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2 e a pergunta Q_MESSAGING_PRIMARIES_REVIEW_1106, que propõe ao maestro rever a frase 'o mercado não a tem' de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS sem selar nada. Foram 55 arestas internas e 2 externas. Quatro nós antigos passaram a superseded: a Fila 3 e a objeção do JetStream, ambas com 'fecharia a dead-letter', e as objeções de fonte não lida do honker e da ADR 0021. O TETO subiu para 115. O radar --integrity --schema saiu com exit 0 e o kg-contract-check com rc 0.",
+    "unreachable": [],
+    "anchored": [
+      {
+        "source": "dead-letter-eip",
+        "gap": "padrão de dead-letter: quando mover, o que guardar, como reprocessar",
+        "claim": "O SQS recomenda teto de tentativas alto o suficiente para resiliência: um teto de 1 move a mensagem na primeira falha.",
+        "verdict": "ANCORADA",
+        "why": "A quote é verbatim. A segunda metade do claim (teto 1 move na primeira falha) está na frase imediatamente anterior do mesmo parágrafo ('if the maxReceiveCount is set to a low value such as 1, one failure to receive a message would cause the message to move to the dead-letter queue').",
+        "corrected": "",
+        "quote": "To ensure that your system is resilient against errors, set the `maxReceiveCount` high enough to allow for sufficient retries.",
+        "locator": "SQS Developer Guide, 'Using dead-letter queues in Amazon SQS', 'Using policies for dead-letter queues'",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "dead-letter-eip",
+        "gap": "padrão de dead-letter: quando mover, o que guardar, como reprocessar",
+        "claim": "A DLQ existe para isolar e diagnosticar mensagens não processadas, e de lá se reprocessa por redrive.",
+        "verdict": "ANCORADA",
+        "why": "A quote é verbatim no parágrafo de abertura. O mesmo parágrafo lista 'Move messages out of the dead-letter queue using dead-letter queue redrive', o que sustenta a segunda metade.",
+        "corrected": "",
+        "quote": "DLQs are useful for debugging your application because you can isolate unconsumed messages to determine why processing did not succeed.",
+        "locator": "SQS Developer Guide, 'Using dead-letter queues in Amazon SQS', parágrafo de abertura",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "nats-jetstream",
+        "gap": "NATS JetStream como alternativa ao SQLite: ack, reentrega, MaxDeliver, advisories, operação mínima",
+        "claim": "JetStream não tem DLQ nativa; há só uma advisory publicada uma vez quando o MaxDeliver se esgota, e a mensagem continua no stream; o dead-letter é montado pelo consumidor da advisory.",
+        "verdict": "ANCORADA",
+        "why": "A frase aparece verbatim na seção da advisory MAX_DELIVERIES. A página também diz que a mensagem permanece no stream ORDERS sob a política de retenção e que a advisory é o único sinal embutido de descarte. 'Montado pelo consumidor da advisory' é a inferência direta de 'não há DLQ'.",
+        "corrected": "",
+        "quote": "There's no dead-letter queue, and the advisory is published once.",
+        "locator": "docs.nats.io/learn/monitoring/advisories-and-events, seção max_deliver"
+      },
+      {
+        "source": "nats-jetstream",
+        "gap": "NATS JetStream como alternativa ao SQLite: ack, reentrega, MaxDeliver, advisories, operação mínima",
+        "claim": "No teto de entregas o servidor remove a mensagem da lista pendente do consumidor e nunca mais a entrega; ela permanece no stream.",
+        "verdict": "ANCORADA",
+        "why": "A frase aparece verbatim, na seção Pitfalls (o locator diz 'seção MaxDeliver', só uma imprecisão de seção). A mesma página diz 'The message stays in the stream', o que sustenta a permanência no stream.",
+        "corrected": "",
+        "quote": "When a message hits the delivery limit, the server removes it from the consumer's pending list and never delivers it again.",
+        "locator": "docs.nats.io/learn/jetstream/acknowledgment, seção Pitfalls (MaxDeliver)"
+      },
+      {
+        "source": "nats-jetstream",
+        "gap": "NATS JetStream como alternativa ao SQLite: ack, reentrega, MaxDeliver, advisories, operação mínima",
+        "claim": "MaxDeliver limita as tentativas e o padrão é ilimitado (-1): sem teto configurado a mensagem é reentregue para sempre.",
+        "verdict": "ANCORADA",
+        "why": "A frase aparece verbatim. A página diz que o padrão do MaxDeliver é -1, ou seja, tentativas ilimitadas. 'Reentregue para sempre' é a consequência de ilimitado combinada com a reentrega por AckWait.",
+        "corrected": "",
+        "quote": "It caps how many times the server will deliver one message before giving up.",
+        "locator": "docs.nats.io/learn/jetstream/acknowledgment, seção MaxDeliver"
+      },
+      {
+        "source": "nats-jetstream",
+        "gap": "NATS JetStream como alternativa ao SQLite: ack, reentrega, MaxDeliver, advisories, operação mínima",
+        "claim": "A reentrega sem ack é automática, com AckWait padrão de 30 s; o BackOff substitui o AckWait e reaproveita a última entrada da lista nas tentativas restantes.",
+        "verdict": "ANCORADA",
+        "why": "A frase aparece verbatim na seção Backoff. 'Its length is AckWait, and it defaults to 30 seconds.' também aparece verbatim. A página diz 'Setting a backoff replaces AckWait', o que sustenta a substituição.",
+        "corrected": "",
+        "quote": "If the list has fewer entries than MaxDeliver allows, the server reuses the last entry for the remaining attempts.",
+        "locator": "docs.nats.io/learn/jetstream/acknowledgment, seção Backoff"
+      },
+      {
+        "source": "nats-jetstream",
+        "gap": "NATS JetStream como alternativa ao SQLite: ack, reentrega, MaxDeliver, advisories, operação mínima",
+        "claim": "A entrega é pelo menos uma vez, então o consumidor deve tolerar duplicatas.",
+        "verdict": "ANCORADA",
+        "why": "O trecho existe, dentro de 'That's the ack/redeliver loop, and it's one of the pieces that give JetStream its at-least-once delivery'. Só conferi essa frase, não uma frase explícita sobre duplicatas; 'tolerar duplicatas' é a consequência definicional de at-least-once, sem acréscimo factual.",
+        "corrected": "",
+        "quote": "it's one of the pieces that give JetStream its at-least-once delivery",
+        "locator": "docs.nats.io/learn/jetstream/delivery-and-acknowledgment",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "sqlite-queue-prior-art",
+        "gap": "fila em SQLite já existente (honker ou equivalente) em vez de escrever do zero",
+        "claim": "honker existe: fila SQLite at-least-once com retries, visibility timeout e linhas dead-letter; alternativa pronta a escrever do zero.",
+        "verdict": "ANCORADA",
+        "why": "README linhas 56-57 (seção 'What It Does'): o texto quebra a linha após 'priority,' mas as palavras coincidem; continua com 'and task result storage'. O repo existe (russellromney/honker) e há bindings publicados (hex 0.6.0, pip). O trecho 'alternativa pronta' é inferência de uso, não afirmação do texto, mas não contradiz.",
+        "corrected": "",
+        "quote": "Durable at-least-once queues with retries, delayed jobs, priority, visibility timeouts, dead-letter rows",
+        "locator": "README, seção What It Does",
+        "sourceTier": 8,
+        "validFrom": ""
+      },
+      {
+        "source": "sqlite-queue-prior-art",
+        "gap": "fila em SQLite já existente (honker ou equivalente) em vez de escrever do zero",
+        "claim": "honker implementa dead-letter com teto de tentativas: lease expirado sem tentativas restantes vai para _honker_dead.",
+        "verdict": "ANCORADA",
+        "why": "Linhas 236-237, passo 3 do housekeeping de honker_claim_batch (seção 'Job states and claim', linha 220). A quebra de linha após 'with' é só formatação. Também confirmado em 'Retry-exhausted jobs move to _honker_dead' (Architecture, l.420). O claim não estica: o teto é max_attempts, que deve ser >= 1.",
+        "corrected": "",
+        "quote": "Move lapsed leases with no attempts left to `_honker_dead` with `'max attempts exceeded'`.",
+        "locator": "README, seção Job states and claim",
+        "sourceTier": 8,
+        "validFrom": ""
+      },
+      {
+        "source": "sqlite-queue-prior-art",
+        "gap": "fila em SQLite já existente (honker ou equivalente) em vez de escrever do zero",
+        "claim": "Ack no honker é um DELETE; lease vencido fica em processing até ser reclamado (ack tardio com fencing ainda vale).",
+        "verdict": "ANCORADA",
+        "why": "Linhas 240-241 contêm a citação (quebra de linha após 'is'). A parte 'ack é um DELETE' não está nesse trecho, mas está no mesmo README: 'Ack is one `DELETE`' (seção Architecture, l.419) e 'honker_ack_batch ... DELETEs' (l.156). 'Fencing' vale só para a forma com token de tentativa (seção Fenced completion); as formas curtas são 'unfenced' (l.213). O claim não afirma o contrário.",
+        "corrected": "",
+        "quote": "A lapsed lease stays `processing` until it is reclaimed, so a fenced late ack still works until then.",
+        "locator": "README, seção Job states and claim",
+        "sourceTier": 8,
+        "validFrom": ""
+      },
+      {
+        "source": "sqlite-queue-prior-art",
+        "gap": "fila em SQLite já existente (honker ou equivalente) em vez de escrever do zero",
+        "claim": "honker usa WAL por padrão (leitores concorrentes, um escritor, fsync em lote).",
+        "verdict": "ANCORADA",
+        "why": "Linhas 423-424 na seção Architecture (l.405). Ressalva do próprio texto, que o claim não nega: o padrão vale para os bindings de linguagem, e 'Correctness and cross-process wake do not depend on WAL'.",
+        "corrected": "",
+        "quote": "The language bindings default to WAL because it gives concurrent readers with one writer and efficient fsync batching.",
+        "locator": "README, seção Architecture",
+        "sourceTier": 8,
+        "validFrom": ""
+      },
+      {
+        "source": "sqlite-queue-prior-art",
+        "gap": "fila em SQLite já existente (honker ou equivalente) em vez de escrever do zero",
+        "claim": "goqite (MIT, Go, estilo SQS) dá visibilidade e extensão de timeout, mas o README não menciona dead-letter e avisa do escritor único no SQLite.",
+        "verdict": "ANCORADA",
+        "why": "README l.294, entre parênteses logo após o benchmark: '(SQLite only allows one writer at a time, so the parallelism just creates write contention.)'. Timeout garantido (l.24) e extensível (l.26, l.105). grep -i 'dead' no README: 0 ocorrências; a única pista afim é o comentário de código 'customize the message redelivery timeout and maximum receive count' (l.76), que sugere um teto de recebimentos mas não é dead-letter. 'MIT' não está no README, mas o arquivo LICENSE do repo é 'MIT License' (Maragu ApS) e a API informa spdx MIT; repo ativo (pushed_at 2026-11-03, não arquivado).",
+        "corrected": "",
+        "quote": "SQLite only allows one writer at a time, so the parallelism just creates write contention.",
+        "locator": "README goqite, seção sobre concorrência/SQLite",
+        "sourceTier": 7,
+        "validFrom": ""
+      },
+      {
+        "source": "cloudevents-agents",
+        "gap": "prior art de CloudEvents com agentes e A2A (EventMesh A2A, ADR 0021)",
+        "claim": "ADR 0021 do Microsoft agent-governance-toolkit adota CloudEvents v1.0 como envelope de exportação de auditoria entre agentes (AgentMesh); prior art para auditoria, não A2A; Status Accepted, sem data.",
+        "verdict": "ANCORADA",
+        "why": "Baixei o HTML da página e removi as tags. A frase 'We adopted CloudEvents v1.0 as the envelope format for mesh audit entry export via AuditEntry.to_cloudevent()' aparece literal na seção Decision. Status é 'Accepted' e não há data na página. O ADR trata só de exportação de entradas de auditoria; não fala de mensagens A2A, então a ressalva do claim é correta.",
+        "corrected": "",
+        "quote": "We adopted CloudEvents v1.0 as the envelope format for mesh audit entry export via `AuditEntry.to_cloudevent()`.",
+        "locator": "ADR-0021, Decision",
+        "sourceTier": 8,
+        "validFrom": ""
+      },
+      {
+        "source": "cloudevents-agents",
+        "gap": "prior art de CloudEvents com agentes e A2A (EventMesh A2A, ADR 0021)",
+        "claim": "O ADR rejeitou JSON próprio e OpenTelemetry LogRecord em favor de CloudEvents, por ser padrão de interoperabilidade de eventos.",
+        "verdict": "ANCORADA",
+        "why": "A citação aparece literal na seção Context, opção 3. As opções 1 (JSON próprio: exige que o consumidor aprenda formato sob medida) e 2 (OpenTelemetry LogRecord: bom para observabilidade, não pensado para arquitetura orientada a eventos) são listadas, e CloudEvents é a adotada na Decision. A rejeição é implícita, mas a justificativa dita pela página é a interoperabilidade.",
+        "corrected": "",
+        "quote": "\"CloudEvents\" (CNCF specification) -- \"industry standard for event interoperability, supported by Azure Event Grid, AWS EventBridge, Knative, and most message brokers\"",
+        "locator": "ADR-0021, Context, opção 3",
+        "sourceTier": 8,
+        "validFrom": ""
+      },
+      {
+        "source": "cloudevents-agents",
+        "gap": "prior art de CloudEvents com agentes e A2A (EventMesh A2A, ADR 0021)",
+        "claim": "A release v1.12.0-rc1 do apache/eventmesh lista A2A com roteamento por tópico e formato CloudEvents 1.0; é release candidate, não versão final.",
+        "verdict": "ANCORADA",
+        "why": "Baixei a página da tag no GitHub: 'feat(a2a): implement MCP over CloudEvents architecture' aparece literal. A mesma nota traz 'Topic-based routing (a2a.tasks.*, a2a.results, a2a.status)' e 'CloudEvents 1.0 compliant message format'. A tag é rc1 (10 Dec). Ressalva de contexto: a busca indica que a v1.12.0 final saiu em 2025-12-29 e lista A2A e MCP, então 'não versão final' vale para esta release e não para o projeto hoje.",
+        "corrected": "",
+        "quote": "feat(a2a): implement MCP over CloudEvents architecture",
+        "locator": "apache/eventmesh, release v1.12.0-rc1, notas",
+        "sourceTier": 8,
+        "validFrom": ""
+      }
+    ],
+    "rejected": [
+      {
+        "source": "dead-letter-eip",
+        "gap": "padrão de dead-letter: quando mover, o que guardar, como reprocessar",
+        "claim": "Critério e teto: a mensagem vai para a dead-letter quando os recebimentos sem sucesso atingem o maxReceiveCount; valor 1 manda à DLQ numa única falha, então deve ser alto o bastante para retentativas.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A quote aparece verbatim em 'Using policies for dead-letter queues'. O mesmo parágrafo diz que com maxReceiveCount baixo como 1 'one failure to receive a message would cause the message to move to the dead-letter queue' e recomenda 'high enough to allow for sufficient retries'. 'Sem sucesso' vem do parágrafo seguinte ('received 3 or more times without being deleted'); é paráfrase razoável, sem esticar.",
+        "corrected": ""
+      },
+      {
+        "source": "dead-letter-eip",
+        "gap": "padrão de dead-letter: quando mover, o que guardar, como reprocessar",
+        "claim": "O que a mensagem leva: o carimbo original de enqueue fica inalterado ao ir para a DLQ (a expiração segue o tempo original), por isso a retenção da DLQ deve ser maior que a da fila de origem.",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe verbatim, mas a seção abre com 'For standard queues, the expiration of a message is always based on its original enqueue timestamp' e termina com 'For FIFO queues, the enqueue timestamp resets when the message is moved to a dead-letter queue'. O claim generaliza para toda fila e omite a exceção FIFO. Além disso, o texto chama a retenção maior de 'best practice', não de obrigação ('deve').",
+        "corrected": "Em filas standard, o carimbo original de enqueue não muda ao ir para a DLQ e a expiração segue esse tempo original; por isso é boa prática (best practice) configurar a retenção da DLQ maior que a da fila de origem. Em filas FIFO o carimbo é reiniciado ao mover para a DLQ.",
+        "quote": "When a message is moved to a dead-letter queue, the enqueue timestamp is unchanged.",
+        "locator": "SQS Developer Guide, 'Understanding message retention periods for dead-letter queues'",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação do próprio parágrafo (standard: timestamp inalterado e retenção da DLQ maior como best practice; FIFO: timestamp reinicia), dada em 'corrected'.",
+          "medida": "Reabri a página da AWS com WebFetch e li a seção 'Understanding message retention periods for dead-letter queues'; o texto traz as duas regras (standard e FIFO) e o exemplo de 1 dia na origem e 4 dias de retenção na DLQ."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html | sed 's/<[^>]*>//g' | grep -F 'For FIFO queues, the enqueue timestamp resets when the message is moved to a dead-letter queue'  # 1 ocorrência: o claim omite a exceção FIFO"
+        }
+      },
+      {
+        "source": "dead-letter-eip",
+        "gap": "padrão de dead-letter: quando mover, o que guardar, como reprocessar",
+        "claim": "Reprocessamento: redrive devolve por padrão à fila de origem (ou outra do mesmo tipo), com taxa controlada; as mensagens voltam como novas (novo ID e novo enqueueTime), sem filtro nem modificação durante o redrive.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A quote é verbatim (Note na página de redrive). O restante está na mesma página: 'By default... moves messages from a dead-letter queue to a source queue... any other queue ... if both queues are the same type', 'configure the redrive velocity' e 'Amazon SQS doesn't support filtering and modifying messages while redriving'. Ressalva menor de locator: a Note citada é a segunda da página, depois do parágrafo de ordenação, não a que vem após o 1º parágrafo; o conteúdo está certo.",
+        "corrected": ""
+      },
+      {
+        "source": "dead-letter-eip",
+        "gap": "padrão de dead-letter: quando mover, o que guardar, como reprocessar",
+        "claim": "EIP define o padrão: quando o sistema não pode ou não deve entregar, move para um canal de mensagens mortas, e o canal registra em que máquina a mensagem morreu.",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe: 'This also records what machine the message died on.' Mas ela depende de 'Typically, each machine the messaging system is installed on has its own local Dead Letter Channel'. O registro da máquina é efeito dessa topologia típica de um DLC local por máquina, não propriedade definidora do padrão. E o EIP diz 'it may elect to move the message', não 'move'. O claim apresenta como definição geral algo que o texto dá como típico e opcional.",
+        "corrected": "O EIP diz que, quando o sistema de mensageria determina que não pode ou não deve entregar uma mensagem, ele pode optar por movê-la para um Dead Letter Channel. Tipicamente cada máquina tem seu DLC local, o que também registra em que máquina a mensagem morreu; ao mover, o sistema pode registrar também o canal original de destino.",
+        "quote": "records what machine the message died on",
+        "locator": "Enterprise Integration Patterns, Dead Letter Channel, trecho sobre DLC local por máquina",
+        "sourceTier": 8,
+        "validFrom": "",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "O parágrafo do próprio EIP ('Typically, each machine ... has its own local Dead Letter Channel ... This also records what machine the message died on ... it may also record the original channel'), que sustenta a versão corrigida.",
+          "medida": "Reabri a página com WebFetch e reconferi com curl, sed e grep: a definição de abertura traz 'it may elect to move' e a frase da quote vem logo após 'Typically, each machine ... local Dead Letter Channel'."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://www.enterpriseintegrationpatterns.com/patterns/messaging/DeadLetterChannel.html | sed 's/<[^>]*>//g' | tr -s ' \\n' ' ' | grep -o 'Typically, each machine.\\{0,260\\}died on\\.'  # mostra 'Typically' e 'local Dead Letter Channel' antes da frase citada"
+        }
+      },
+      {
+        "source": "nats-jetstream",
+        "gap": "NATS JetStream como alternativa ao SQLite: ack, reentrega, MaxDeliver, advisories, operação mínima",
+        "claim": "Em arquivo o servidor não força fsync a cada escrita: confia nos buffers do SO e sincroniza em intervalo (sync_interval, padrão 2 min segundo a busca em docs.nats.io; 'always' força sync por escrita, com custo de vazão). O dimensionamento do servidor único é só orientação, sem números absolutos de memória.",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe e sustenta a parte do 'always' com custo de vazão. A página também diz que o filestore usa os buffers do SO e que o servidor força o sync no intervalo. Mas a página sync_interval NÃO traz valor padrão nem menciona 2 minutos. A página de configuração geral só tem o 2 min como padrão do ping_interval. A afirmação 'sem números absolutos de memória' também não está no documento citado: o locator é a página de sync_interval, que não trata de dimensionamento. O claim mistura trechos sustentados com 'padrão 2 min' e 'dimensionamento só orientação', que o texto não sustenta.",
+        "corrected": "Em arquivo o servidor se apoia nos buffers do sistema de arquivos do SO e força o sync dos dados de stream e consumer no intervalo de sync_interval (duração ou 'always'; alias sync; mudança exige restart). Com 'always' há sync explícito a cada escrita, com custo de vazão. A página de sync_interval não declara o valor padrão nem orienta o dimensionamento de memória.",
+        "quote": "If a value `always` is used, a explicit sync will occur on every write. Do note that this will degrade the max throughput due to the additional I/O calls.",
+        "locator": "docs.nats.io/reference/config/jetstream/sync_interval",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida, tirada do próprio texto da página sync_interval: buffers do SO, sync forçado no intervalo, 'always' = sync por escrita com perda de vazão.",
+          "medida": "Medida por WebFetch da página sync_interval em 2026-11-06, que devolveu esses pontos e confirmou a ausência de valor padrão. A página de configuração geral confirmou que o 2 min é do ping_interval."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://docs.nats.io/reference/config/jetstream/sync_interval e procurar '2 min', 'default' e 'memory': 0 ocorrências. O trecho só traz 'always' e a duração, e a palavra do claim que ele não sustenta é 'padrão 2 min'."
+        }
+      },
+      {
+        "source": "sqlite-queue-prior-art",
+        "gap": "fila em SQLite já existente (honker ou equivalente) em vez de escrever do zero",
+        "claim": "honker é alpha, risco de maturidade; licença Apache-2.0 OR MIT; sem releases listadas na página.",
+        "verdict": "EXAGERADA",
+        "why": "A citação (l.27) e a licença 'Apache-2.0 OR MIT' (l.480) estão corretas. A parte 'sem releases listadas na página' estica: o README de fato não lista releases, mas o repositório TEM release e tag v0.6.0 (API do GitHub /releases e /tags) e o pacote hex 'honker' tem versões 0.1.1 a 0.6.0. Ler 'sem releases' como sinal de imaturidade além do alpha declarado não é sustentado.",
+        "corrected": "honker se declara alpha ('Alpha software. Better than experimental, not beta-quality yet.'); licença Apache-2.0 OR MIT; o README não lista releases, mas o repositório publica a release/tag v0.6.0 e os bindings têm versões numeradas (hex 0.1.1 a 0.6.0).",
+        "quote": "> Alpha software. Better than experimental, not beta-quality yet.",
+        "locator": "README, topo; seção License (Apache-2.0 OR MIT)",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida: alpha declarado + licença dupla + release v0.6.0 existente (fora do README)",
+          "medida": "curl na API do GitHub /releases e /tags de russellromney/honker devolveu v0.6.0; grep -n no README confirmou l.27 (Alpha) e l.480 (License)"
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -s https://api.github.com/repos/russellromney/honker/releases | grep -m1 html_url  # devolve .../releases/tag/v0.6.0, contradizendo 'sem releases'; e grep -n 'Alpha software\\|Apache-2.0 OR MIT' README.md"
+        }
+      },
+      {
+        "source": "cloudevents-agents",
+        "gap": "prior art de CloudEvents com agentes e A2A (EventMesh A2A, ADR 0021)",
+        "claim": "No ADR 0021, id é entry_id, source é o URI DID do agente, type é ai.agentmesh.{event_type}; a página não define subject.",
+        "verdict": "NAO-ENCONTRADA",
+        "why": "O conteúdo do claim bate com a tabela (id=entry_id, source=Agent DID URI, type=\"ai.agentmesh.{event_type}\", sem subject; confirmado por grep de 'subject' no texto: ausente). Mas a citação entregue, com aspas internas em torno de Agent DID URI, não existe: no HTML a célula é <td>Agent DID URI</td> e no markdown de origem a linha é '| `source` | Agent DID URI |', sem aspas. A citação não aparece nessas palavras.",
+        "corrected": "Citação literal do documento: '| `source` | Agent DID URI |' (linha 34 do markdown de origem). O claim sobre id/source/type e a ausência de subject se sustenta.",
+        "quote": "| `source` | \"Agent DID URI\" |",
+        "locator": "ADR-0021, tabela de mapeamento da seção Decision",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A linha literal do mesmo documento, sem aspas internas, '| `source` | Agent DID URI |', que sustenta o mesmo claim.",
+          "medida": "curl do markdown bruto + grep -n 'source' retornou a linha 34 com esse texto; o grep -F da citação com aspas retorna 0."
+        },
+        "criterio": {
+          "id": "A1_QUOTE_AUSENTE",
+          "comando": "curl -sL https://raw.githubusercontent.com/microsoft/agent-governance-toolkit/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md | grep -F '| `source` | \"Agent DID URI\" |' (0 ocorrências; já '| `source` | Agent DID URI |' dá 1)"
+        }
+      },
+      {
+        "source": "cloudevents-agents",
+        "gap": "prior art de CloudEvents com agentes e A2A (EventMesh A2A, ADR 0021)",
+        "claim": "No EventMesh A2A, a mensagem entre agentes é um CloudEvent; o type marca requisição/resposta e mcptype distingue a direção; subject carrega o tópico de broadcast; a página não define source; a correlação vai em extensão (collaborationid), não no id nativo.",
+        "verdict": "EXAGERADA",
+        "why": "Reabri o README EN do apache/eventmesh (master). A frase 'If `jsonrpc: \"2.0\"` is present, it engages the MCP translation engine' é literal (grep -F achou), então as aspas são literais ao contrário do que o relato diz. A tabela confirma type org.apache.eventmesh.a2a.tools.call.req / ...common.response, mcptype request/response e subject como tópico de broadcast; 'source' não aparece no README. O que o texto não sustenta é 'não no id nativo': a linha diz 'Correlation (id) | extension: collaborationid / id', ou seja, a página nomeia a extensão como collaborationid ou id e não afirma nada sobre o id nativo do CloudEvent. Além disso, mcptype marca papel request/response, não 'direção' em sentido de roteamento (que é targetagent).",
+        "corrected": "No EventMesh A2A, o JSON-RPC 2.0/MCP é embrulhado em CloudEvent. O type marca requisição ou resposta (org.apache.eventmesh.a2a.tools.call.req / ...common.response), mcptype (request|response) acompanha o papel, subject carrega o tópico de broadcast e a extensão targetagent o alvo P2P. A correlação resposta-requisição é mapeada para a extensão 'collaborationid / id'; a página não define source e não diz como o id nativo do CloudEvent é usado.",
+        "quote": "If `jsonrpc: \"2.0\"` is present, it engages the MCP translation engine.",
+        "locator": "README EN do A2A, seções Mechanism e Asynchronous RPC Pattern",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação em 'corrected', derivada do mesmo README, que preserva todo o valor do claim (envelope CloudEvent, type/mcptype/subject, ausência de source) sem a inferência sobre o id nativo.",
+          "medida": "grep -niE 'subject|source|collaborationid|mcptype' no README EN: source ausente; subject, mcptype e collaborationid presentes nas linhas 74-78."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://raw.githubusercontent.com/apache/eventmesh/master/docs/a2a-protocol/README_EN.md | grep -n 'Correlation' (linha: '| **Correlation** (`id`) | `extension`: `collaborationid` / `id` | Links Response to Request. |'; nada diz 'não no id nativo')"
+        }
+      }
+    ],
+    "elenxo": {
+      "objections": [
+        {
+          "target": "Claim 1 [dead-letter-eip]: o SQS recomenda maxReceiveCount alto o bastante para retentativas",
+          "survives": true,
+          "evidence": "A quote diz só 'high enough to allow for sufficient retries' e não dá número. O SQS conta RECEBIMENTOS sem DELETE, não falhas de processamento. A Fila 1 (C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX) conta tentativa no claim ou no fim do lease, outra grandeza. A claim irmã que ligava o teto a 'recebimentos sem sucesso' foi REBAIXADA pelo motor (AFIRMADA-SEM-CITACAO). O valor do teto e o evento que conta como tentativa continuam sem fonte. kg-corpus-grep 'dead-letter' dá 0 nós em 227 grafos (reexecutado agora).",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh dead-letter"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Teto concreto e definição de tentativa vindos de uma peça pronta",
+            "medida": "Procurei no README do honker (github.com/russellromney/honker, lido agora): ele move para _honker_dead quando o lease vence sem tentativas restantes, mas não dá o valor padrão do teto. É declaração de README, não rodada no core."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 2 [dead-letter-eip]: a DLQ isola para diagnosticar, e de lá se reprocessa por redrive",
+          "survives": true,
+          "evidence": "A quote sustenta só o 'isolar para diagnosticar'. O redrive não está na quote: a claim de redrive (novo ID, novo enqueueTime) foi REBAIXADA, a de 'o que a mensagem leva' saiu EXAGERADA (omite a exceção FIFO) e a do EIP também saiu EXAGERADA. Ficam sem fonte ancorada duas das três partes da lacuna: o que guardar e como reprocessar. A peça pronta também não cobre: o README do honker (lido agora) não lista as colunas de _honker_dead e não documenta nenhuma API de requeue ou redrive. CENÁRIO: a Fila 1 faz dedupe por (ce_source, ce_id) ou jti. Se o redrive devolve a linha morta com o MESMO ce_id e o receptor gravou o id no recebimento, a mensagem reprocessada é descartada como duplicata, e isso é perda silenciosa. Se o redrive gera id NOVO, a ação na sessão roda duas vezes. A escolha entre as duas leituras fica com quem conduz, porque a fonte que a decidiria foi rejeitada.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh redrive"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Semântica de redrive com identidade definida (SQS: novo ID) ou uma API de requeue numa fila SQLite pronta",
+            "medida": "A página de redrive do SQS foi lida pelo run, mas a claim foi rebaixada sem quote. O README do honker, lido agora, não documenta requeue de _honker_dead. kg-corpus-grep 'redrive' dá 0 nós."
+          },
+          "triage": "bloqueia"
+        },
+        {
+          "target": "Claim 3 [nats-jetstream]: JetStream não tem DLQ nativa e publica a advisory uma vez",
+          "survives": false,
+          "evidence": "A claim prova o que a rodada precisa, e prova contra o próprio grafo. C_OPCAO_QUEUE_3_NATS_JETSTREAM e E_OBJECAO_SRC_JETSTREAM_UNREAD (messaging-standards-2026-11.kg.yaml) dizem que o JetStream 'fecharia a dead-letter'. A quote 'There's no dead-letter queue, and the advisory is published once' refuta isso. Com a advisory publicada uma vez, um consumidor de advisory offline perde o aviso, então o JetStream precisaria da mesma tabela dead_letter que a Fila 1. Essa narrativa do nó deve ser corrigida."
+        },
+        {
+          "target": "Claim 4 [nats-jetstream]: no teto o servidor tira a mensagem da lista pendente e ela fica no stream",
+          "survives": false,
+          "evidence": "A quote é verbatim e sustenta a claim inteira. Ela completa a 3: a mensagem morta só sobrevive enquanto a retenção do stream a guardar, e isso é restrição de desenho, não falha da claim."
+        },
+        {
+          "target": "Claim 5 [nats-jetstream]: MaxDeliver limita as tentativas e o padrão é ilimitado (-1)",
+          "survives": true,
+          "evidence": "A quote ('It caps how many times the server will deliver one message before giving up') sustenta o teto, mas não o padrão -1. A metade 'sem teto, reentrega para sempre' é afirmação do leitor sem trecho citado. Não muda o desenho, porque a recomendação fixaria o teto de qualquer jeito.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh MaxDeliver"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "A página de configuração de consumer do JetStream com o valor padrão de MaxDeliver",
+            "medida": "Não está entre as fontes ancoradas da rodada. kg-corpus-grep 'JetStream' dá 0 nós (reexecutado agora)."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 6 [nats-jetstream]: reentrega automática com AckWait padrão de 30 s; o BackOff reaproveita a última entrada",
+          "survives": true,
+          "evidence": "A quote sustenta só o reaproveitamento da última entrada do BackOff. O padrão de 30 s do AckWait e a frase 'o BackOff substitui o AckWait' não estão na quote. Isso pesa pouco no desenho e fica como restrição declarada.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh AckWait"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Trecho verbatim do AckWait padrão",
+            "medida": "Procurado entre as 15 claims ancoradas e as rejeitadas desta rodada: nenhuma cita o AckWait padrão."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 7 [nats-jetstream]: a entrega é pelo menos uma vez e exige tolerar duplicatas",
+          "survives": false,
+          "evidence": "A quote é verbatim e sustenta a claim. Ela mostra que o JetStream não tira da Fila 1 a dedupe por (ce_source, ce_id) ou jti: as duas opções têm a mesma garantia, e a dedupe entra nas duas."
+        },
+        {
+          "target": "Lacuna [nats-jetstream], parte 'operação mínima'",
+          "survives": true,
+          "evidence": "Nenhuma claim ancorada cobre a operação do nats-server numa VPS compartilhada: RAM, disco do filestore, unidade systemd, backup. A única claim operacional (sync_interval e fsync) saiu EXAGERADA, porque o padrão de 2 min não está na página citada. CENÁRIO: a Fila 1 ganha da Fila 3 pelo critério de simplicidade local. Se o sync padrão do JetStream não for por escrita, uma publicação com ack pode se perder num crash da VPS. O SQLite em WAL com synchronous=NORMAL tem a mesma janela, e nenhuma das duas foi medida. A comparação de durabilidade e de custo operacional sai para um lado ou para o outro ao arbítrio de quem conduz, e a lacuna nomeada pedia exatamente essa medida.",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh JetStream"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "nats-server em loopback na VPS, medindo RSS e disco, mais o padrão de sync_interval lido verbatim",
+            "medida": "E_OBJECAO_SRC_JETSTREAM_UNREAD já pedia rodar em loopback, e isso não foi feito. A claim de sync_interval foi rejeitada na ancoragem. kg-corpus-grep 'JetStream' dá 0 nós."
+          },
+          "triage": "bloqueia"
+        },
+        {
+          "target": "Claim 8 [sqlite-queue-prior-art]: o honker existe como fila SQLite at-least-once com dead-letter, alternativa pronta",
+          "survives": true,
+          "evidence": "A claim prova a existência, não a adequação. O README (github.com/russellromney/honker, lido agora) diz 'Alpha software. Better than experimental, not beta-quality yet.' Ele não foi rodado no core nem na VPS. Também não se mostrou que o ack pela tool do channel, amarrado a id e body_sha256, e a dedupe por (ce_source, ce_id) cabem no modelo de jobs dele. Isso entra como restrição declarada: fixar a versão e ler antes de vendorizar. A existência da peça já fecha 'não reinventar sem olhar'.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh honker"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Binding Node do honker (@russellthehippo/honker-node) rodado contra o daemon do channel em TypeScript",
+            "medida": "O README lido agora lista o binding Node, além de Rust, Python, Ruby, .NET e Elixir. É só declaração; nada foi rodado. kg-corpus-grep 'honker' dá 0 nós."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 9 [sqlite-queue-prior-art]: o honker move para _honker_dead com 'max attempts exceeded'",
+          "survives": true,
+          "evidence": "A claim sustenta o 'quando mover' e um motivo gravado, mas o README não lista as colunas de _honker_dead e não documenta requeue (lido agora). O honker fecha o 'quando mover' da lacuna de dead-letter, e não fecha o 'o que guardar' nem o 'como reprocessar'. O cenário bloqueante já está na objeção da claim 2; aqui fica como limite.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh dead-letter"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Schema de _honker_dead e uma função de requeue",
+            "medida": "Procurados no README do honker e no docs.rs/crate/honker (lidos agora): nenhum dos dois os menciona."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 10 [sqlite-queue-prior-art]: ack no honker é DELETE, e o ack tardio com fencing vale até o lease ser reclamado",
+          "survives": false,
+          "evidence": "A quote é verbatim e a claim é coerente com o desenho: ack por DELETE equivale à poda das linhas entregues (E_OBJECAO_CUT_PRUNE_AND_BACKUP). O fencing atende ao ack amarrado ao id. Ela não prova menos do que pretende."
+        },
+        {
+          "target": "Claim 11 [sqlite-queue-prior-art]: o honker usa WAL por padrão, com um escritor",
+          "survives": false,
+          "evidence": "A quote é verbatim e concorda com E_SQLITE_WAL_SINGLE_WRITER. O README, lido agora, reforça: 'SQLite's locking model is designed for one host writing one database file'. Isso é compatível com o daemon único da Fila 1."
+        },
+        {
+          "target": "Claim 12 [sqlite-queue-prior-art]: o goqite não menciona dead-letter e avisa do escritor único",
+          "survives": true,
+          "evidence": "A quote é sobre contenção de escrita. A ausência de dead-letter no goqite é afirmação de ausência sem trecho que a mostre. O efeito no desenho é nulo, porque o candidato é o honker; fica como restrição.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh goqite"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Busca no README do goqite por dead e por max receive",
+            "medida": "Não reexecutada nesta rodada. kg-corpus-grep 'goqite' dá 0 nós."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 13 [cloudevents-agents]: a ADR 0021 adota CloudEvents v1.0 como envelope de exportação de auditoria da AgentMesh",
+          "survives": true,
+          "evidence": "A claim prova prior art de CloudEvents como envelope de AUDITORIA entre agentes, não de transporte A2A. A tabela de mapeamento (id=entry_id, source=DID, type=ai.agentmesh.*) foi rejeitada na ancoragem (NAO-ENCONTRADA), então não há perfil pronto citável para o shadow log. A ADR não tem data. Ela não contraria 'o mercado não a tem' para a ligação A2A-CloudEvents; só serve de perfil de auditoria.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh ADR-0021"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "A tabela de atributos da ADR 0021 citada verbatim como linha de markdown ('| `source` | Agent DID URI |')",
+            "medida": "O verificador achou o conteúdo, mas não a quote entregue. kg-corpus-grep 'ADR-0021' dá 0 nós."
+          },
+          "triage": "limite"
+        },
+        {
+          "target": "Claim 14 [cloudevents-agents]: a ADR rejeitou JSON próprio e OTel LogRecord em favor de CloudEvents",
+          "survives": false,
+          "evidence": "A quote é verbatim e reforça a escolha do envelope CloudEvents da recomendação (C de Envelope) pelo critério de padrão de mercado. Não prova menos do que pretende."
+        },
+        {
+          "target": "Claim 15 [cloudevents-agents]: o apache/eventmesh v1.12.0-rc1 lista A2A sobre CloudEvents 1.0",
+          "survives": true,
+          "evidence": "A quote é uma linha de changelog de release candidate ('feat(a2a): implement MCP over CloudEvents architecture'). Ela diz MCP sobre CloudEvents sob o escopo a2a, e não prova um mapeamento A2A-CloudEvents estável. A claim de mapeamento do EventMesh (type org.apache.eventmesh.a2a.*, mcptype, extensão collaborationid) saiu EXAGERADA. Mesmo assim, ela basta para contrariar a frase absoluta de docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml@fb2a7d72c l.381: 'a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem'. CENÁRIO: a recomendação mantém 'o mercado não a tem' e o perfil Onion grava type e correlação próprios (ce_id e jti). Se o EventMesh fechar a 1.12 com o type org.apache.eventmesh.a2a.* e a correlação em extensão, uma ponte futura nasce incompatível, e o grafo carrega uma afirmação já contrariada por fonte primária. O alvo promete 'sem prior art', e a fonte entrega um rc que o desmente.",
+          "criterio": {
+            "id": "E1_EVIDENCIA_CONTRARIA",
+            "comando": "github.com/apache/eventmesh/releases/tag/v1.12.0-rc1 'feat(a2a): implement MCP over CloudEvents architecture' contra docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml@fb2a7d72c l.381 (grep -n 'mercado não a tem')"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Mapeamento A2A-CloudEvents do EventMesh lido verbatim no design-document a2a-protocol ou numa versão final",
+            "medida": "A claim de mapeamento foi rejeitada na ancoragem. Só existe o rc1. eventmesh.apache.org/docs/design-document/a2a-protocol segue não ancorado (E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD). kg-corpus-grep 'EventMesh' dá 0 nós."
+          },
+          "triage": "bloqueia"
+        }
+      ],
+      "gapsClosed": [
+        "sqlite-queue-prior-art: o honker existe e foi lido (claims 8-11: at-least-once, retries, visibility timeout, lease com fencing, _honker_dead por 'max attempts exceeded', WAL com um escritor). O README conferido agora lista o binding Node. Ficam declarados: o status alpha, a falta de API de requeue e o fato de não ter sido rodado."
+      ],
+      "gapsOpen": [
+        "dead-letter-eip: só o 'quando mover' está ancorado (teto alto, sem número, claims 1 e 9). 'O que guardar' (claim do enqueue timestamp EXAGERADA, colunas de _honker_dead não documentadas) e 'como reprocessar' (redrive REBAIXADO, honker sem API de requeue) seguem sem fonte. A interação com a dedupe por (ce_source, ce_id) não está decidida.",
+        "nats-jetstream: a semântica fechou (ack, reentrega, MaxDeliver, advisory única, sem DLQ nativa, at-least-once). A 'operação mínima' segue aberta: a claim de sync_interval saiu EXAGERADA, e não há medida de RAM, disco ou durabilidade nem loopback na VPS.",
+        "cloudevents-agents: a ADR 0021 é prior art de auditoria, não de A2A, e a tabela de mapeamento foi rejeitada. Do EventMesh há só uma linha de changelog de rc1 ('MCP over CloudEvents'); o mapeamento A2A foi rejeitado e o design-document a2a-protocol segue não ancorado.",
+        "(fora das lacunas desta rodada, ainda segurando D_MESSAGING_STACK_2026_11) smoke do channel não repetido na 2.1.319 (E_OBJECAO_F5_PIN_CC_AND_RESMOKE)"
+      ],
+      "recommendation": "SUSTENTA: (1) O JetStream NÃO fecha a dead-letter: não há DLQ nativa, a advisory sai uma vez e a mensagem fica no stream (claims 3 e 4). A narrativa de C_OPCAO_QUEUE_3_NATS_JETSTREAM e de E_OBJECAO_SRC_JETSTREAM_UNREAD ('fecharia a dead-letter') está contrariada por fonte primária e deve ser corrigida no grafo. Como as duas filas são at-least-once (claim 7), a dedupe por (ce_source, ce_id) ou jti vale em qualquer escolha, e o JetStream perde o argumento mecânico que se atribuía a ele. (2) Existe prior art de fila SQLite: o honker, com teto de tentativas, _honker_dead, lease com fencing e WAL com um escritor, e com binding Node no README. Antes de escrever a Fila 1 do zero, o desenho deve se medir contra ele. Com o status alpha, ele entra só fixado e lido, nunca como dependência solta. (3) O CloudEvents tem prior art entre agentes: a ADR 0021 para auditoria e o EventMesh rc1 sob a2a. Isso basta para retirar a frase absoluta 'o mercado não a tem' de coordenacao-sessoes-2026-10.kg.yaml l.381. NÃO SUSTENTA: (a) o desenho da tabela dead_letter, isto é, o que guardar e como reprocessar. Esse é o ponto que BLOQUEIA: o redrive com o mesmo ce_id cai na dedupe (perda silenciosa) e com id novo duplica a ação, e nenhuma fonte ancorada decide entre os dois. A peça que falta é uma regra própria, escrita e testada no modo de falha: guardar payload, motivo, tentativas, último erro e ce_id original, e reprocessar com um campo de redrive que a dedupe reconhece. (b) A comparação operacional SQLite contra JetStream, porque falta medir o nats-server em loopback e o padrão de sync. Isso também BLOQUEIA a escolha final da fila, se ela se apoiar em 'simplicidade local'. (c) Qualquer mapeamento A2A-CloudEvents copiado do EventMesh (rejeitado, só rc). A ADR 0021 também não serve como perfil pronto, porque a tabela foi rejeitada. D_MESSAGING_STACK_2026_11 segue open: das quatro lacunas, só a sqlite-queue-prior-art fechou, e o smoke do channel na 2.1.319 continua pendente. Nenhum descarte desta rodada foi aceito por orçamento: os padrões não ancorados (MaxDeliver -1, AckWait 30 s) ficam como limites declarados."
+    },
+    "stats": {
+      "sources": 4,
+      "reached": 4,
+      "anchored": 15,
+      "rejected": 8,
+      "nodesAdded": 34,
+      "edgesAdded": 57,
+      "nodesTotal": 115
+    },
+    "overcoming": {
+      "found": 6,
+      "nodesCounted": 24,
+      "edgesCounted": 24,
+      "base": {
+        "nodes": 18,
+        "edges": 18,
+        "measured": true
+      },
+      "recusedAnchor": 0,
+      "recusedElenxo": 0,
+      "recused": []
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Corpus"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Scope"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Search"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Fetch"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 5,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 6,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 7,
+      "title": "write(KG)"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 8,
+      "title": "Leitura"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "ler:dead-letter-eip",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "ad152f0cb7d0931e3",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975493099,
+      "queuedAt": 1793975493065,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "AWS SQS Developer Guide (dead-letter queues + DLQ redrive) …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975523011,
+      "tokens": 70895,
+      "toolCalls": 5,
+      "durationMs": 29911,
+      "resultPreview": "{\"source\":\"AWS SQS Developer Guide (dead-letter queues + DLQ redrive) e Enterprise Integration Patterns (Dead Letter Channel)\",\"reachable\":true,\"claims\":[{\"claim\":\"Critério e teto: a mensagem vai para a dead-letter quando o número de recebimentos sem sucesso atinge o maxReceiveCount do redrive policy; valor baixo demais (1) manda à DLQ numa única falha, então deve ser alto o bastante para permitir…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ler:nats-jetstream",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "aea1e92f0b790d735",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975493099,
+      "queuedAt": 1793975493065,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "docs.nats.io (NATS JetStream: learn/jetstream/acknowledgmen…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975582170,
+      "tokens": 71383,
+      "toolCalls": 15,
+      "durationMs": 86788,
+      "resultPreview": "{\"source\":\"docs.nats.io (NATS JetStream: learn/jetstream/acknowledgment, learn/jetstream/delivery-and-acknowledgment, learn/monitoring/advisories-and-events, learn/deployment/sizing-and-resources, reference/config/jetstream/sync_interval)\",\"reachable\":true,\"claims\":[{\"claim\":\"JetStream não tem fila de dead-letter nativa; o que existe é uma advisory publicada uma vez quando o MaxDeliver se esgota, …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ler:sqlite-queue-prior-art",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "af9e75baf7bd31d94",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975493100,
+      "queuedAt": 1793975493066,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "github.com/russellromney/honker (README) e github.com/marag…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975536648,
+      "tokens": 65472,
+      "toolCalls": 6,
+      "durationMs": 41264,
+      "resultPreview": "{\"source\":\"github.com/russellromney/honker (README) e github.com/maragudk/goqite (README)\",\"reachable\":true,\"claims\":[{\"claim\":\"honker existe: fila SQLite at-least-once com retries, visibility timeout e linhas dead-letter. É a alternativa pronta a escrever do zero.\",\"quote\":\"Durable at-least-once queues with retries, delayed jobs, priority, visibility timeouts, dead-letter rows\",\"locator\":\"README,…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "ler:cloudevents-agents",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a6ef7587a05500083",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975493100,
+      "queuedAt": 1793975493066,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Microsoft agent-governance-toolkit ADR-0021 (microsoft.gith…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975563076,
+      "tokens": 66813,
+      "toolCalls": 8,
+      "durationMs": 67690,
+      "resultPreview": "{\"source\":\"Microsoft agent-governance-toolkit ADR-0021 (microsoft.github.io); EventMesh A2A README (WeBankFinTech/EventMesh mirror, raw GitHub); apache/eventmesh v1.12.0-rc1 release notes\",\"reachable\":true,\"claims\":[{\"claim\":\"O ADR 0021 do Microsoft agent-governance-toolkit adota CloudEvents v1.0 como envelope de exportação de auditoria entre agentes (AgentMesh). É prior art de CloudEvents com age…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 9,
+      "title": "Ancoragem"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "ancorar:dead-letter-eip",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a2b5a858d8ad43c75",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975523052,
+      "queuedAt": 1793975523020,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "AWS SQS Developer Guide (sqs-dead-letter-queues.html; sqs-c…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975585037,
+      "tokens": 74806,
+      "toolCalls": 6,
+      "durationMs": 61984,
+      "resultPreview": "{\"source\":\"AWS SQS Developer Guide (sqs-dead-letter-queues.html; sqs-configure-dead-letter-queue-redrive.html) e Enterprise Integration Patterns, Dead Letter Channel; reabertos em 2026-11-06\",\"verdicts\":[{\"claim\":\"Critério e teto: a mensagem vai para a dead-letter quando os recebimentos sem sucesso atingem o maxReceiveCount; valor 1 manda à DLQ numa única falha, então deve ser alto o bastante para…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "ancorar:sqlite-queue-prior-art",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a43265ee0a345efb5",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975536656,
+      "queuedAt": 1793975536651,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "README do honker (raw.githubusercontent.com/russellromney/h…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975611961,
+      "tokens": 71394,
+      "toolCalls": 7,
+      "durationMs": 75304,
+      "resultPreview": "{\"source\":\"README do honker (raw.githubusercontent.com/russellromney/honker/main/README.md, baixado e conferido com grep -n), API do GitHub (releases/tags) e README/LICENSE do goqite (maragudk/goqite), 2026-11-06\",\"verdicts\":[{\"claim\":\"honker existe: fila SQLite at-least-once com retries, visibility timeout e linhas dead-letter; alternativa pronta a escrever do zero.\",\"quote\":\"Durable at-least-onc…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "ancorar:cloudevents-agents",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a5517bcaab63cd4e6",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975563081,
+      "queuedAt": 1793975563078,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "ADR-0021 (microsoft.github.io/agent-governance-toolkit/adr/…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975651169,
+      "tokens": 77691,
+      "toolCalls": 11,
+      "durationMs": 88088,
+      "resultPreview": "{\"source\":\"ADR-0021 (microsoft.github.io/agent-governance-toolkit/adr/0021-...; fonte md em microsoft/agent-governance-toolkit/docs/adr), EventMesh A2A README_EN (apache/eventmesh master docs/a2a-protocol/README_EN.md), release apache/eventmesh v1.12.0-rc1\",\"verdicts\":[{\"claim\":\"ADR 0021 do Microsoft agent-governance-toolkit adota CloudEvents v1.0 como envelope de exportação de auditoria entre age…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "ancorar:nats-jetstream",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "abbafaa23aaddafaa",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975582357,
+      "queuedAt": 1793975582303,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "docs.nats.io (acknowledgment, advisories-and-events, delive…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975646488,
+      "tokens": 69734,
+      "toolCalls": 11,
+      "durationMs": 64112,
+      "resultPreview": "{\"source\":\"docs.nats.io (acknowledgment, advisories-and-events, delivery-and-acknowledgment, reference/config/jetstream/sync_interval), reabertas via WebFetch em 2026-11-06\",\"verdicts\":[{\"claim\":\"JetStream não tem DLQ nativa; há só uma advisory publicada uma vez quando o MaxDeliver se esgota, e a mensagem continua no stream; o dead-letter é montado pelo consumidor da advisory.\",\"quoteFound\":true,\"…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 10,
+      "title": "Elenxo"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "elenxo-primarias",
+      "phaseIndex": 10,
+      "phaseTitle": "Elenxo",
+      "agentId": "ae345306cb8294074",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1793975651213,
+      "queuedAt": 1793975651180,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "SUSTENTA: (1) O JetStream NÃO fecha a dead-letter: não há D…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975847363,
+      "tokens": 84573,
+      "toolCalls": 8,
+      "durationMs": 196150,
+      "resultPreview": "{\"objections\":[{\"target\":\"Claim 1 [dead-letter-eip]: o SQS recomenda maxReceiveCount alto o bastante para retentativas\",\"survives\":true,\"evidence\":\"A quote diz só 'high enough to allow for sufficient retries' e não dá número. O SQS conta RECEBIMENTOS sem DELETE, não falhas de processamento. A Fila 1 (C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX) conta tentativa no claim ou no fim do lease, outra grande…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "count-sup",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a65f0f94ae4295897",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793975847407,
+      "queuedAt": 1793975847372,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Contador do motor — NÃO escreva nada. A partir da raiz do repositório rode e copie os números:\n1. grep -c '^[[:space:]]*- id: C_SUPERACAO_20261106_' \"docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml\" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum ou arquivo ausente).\n2. awk -v p='C_SUPERACAO_20261106_' '/^[[:space:]]*- from:/{f=index($0,p)>0} /…",
+      "promptFramed": true,
+      "lastProgressAt": 1793975860749,
+      "tokens": 60433,
+      "toolCalls": 2,
+      "durationMs": 13342,
+      "resultPreview": "{\"overcomingNodes\":18,\"overcomingEdges\":18}"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "write-kg-primarias",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "abf30bd35cd6bb381",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1793975860778,
+      "queuedAt": 1793975860755,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "docs/evolution/research/messaging…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Fechar as lacunas nomeadas que seguram a palavra final da pilha do onion-messaging (D_MESSAGING_STACK_2026_11): o padrão de dead-letter para uma fila SQLite com teto de tentativas, a fila de mercado NATS JetStream como contrária ao SQLite WAL, uma fila em SQLite já exist…",
+      "promptFramed": true,
+      "lastProgressAt": 1793976328513,
+      "tokens": 186646,
+      "toolCalls": 15,
+      "durationMs": 467734,
+      "resultPreview": "{\"kgPath\":\"docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml\",\"radarExit\":0,\"nodes\":34,\"edges\":57,\"nodesTotal\":115,\"summary\":\"Acrescentei 34 nós ao grafo do onion-messaging, sem apagar nada: 15 evidências ancoradas, a contabilidade E_LACUNAS_MESSAGING_PRIMARIES_1106 (8 claims rejeitadas na ancoragem, 0 fontes inalcançáveis, 0 recusas …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "verify-kg-1",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "af5e98b9d3c2d6fdf",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793976328546,
+      "queuedAt": 1793976328519,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\nA partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n1. bash .claude/validation/kg-radar.sh \"docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml\" --integrity --schema; echo \"RC=$?\"\n2. bash .claude/va…",
+      "promptFramed": true,
+      "lastProgressAt": 1793976340301,
+      "tokens": 61142,
+      "toolCalls": 2,
+      "durationMs": 11754,
+      "resultPreview": "{\"radarExit\":0,\"contractExit\":0,\"overcomingNodes\":24,\"overcomingEdges\":24,\"output\":\"\"}"
+    }
+  ],
+  "totalTokens": 960982,
+  "totalToolCalls": 96
+}
