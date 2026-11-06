@@ -2,7 +2,8 @@
 branch: feat/clickup-adapter
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 691cd446ed897c9d12bc062f30d9b9b2d1fe36761f0f44256fa234d19a7a823b
+reviewed_code_sha256: 1cc030629d62a1a829348278fcd01afd35dba726ba04f5cc24ea7321f487215e
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
