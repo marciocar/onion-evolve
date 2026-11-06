@@ -1,0 +1,1440 @@
+{
+ "question": "Qual runtime deve servir a persona de serviço do Company Brain de uma empresa adotante do Onion: (A) bot próprio construído com o Claude Agent SDK, com o onion-bridge do core (Agent SDK, /chat, A2A) como candidato a hospedeiro e o kg_mcp do kg-ssot como leitura do grafo; (B) o assistente nativo do chat corporativo, como o Claude no Slack (Claude Tag / app oficial da Anthropic para Slack) ou equivalente; (C) um bot de mercado de terceiro? Requisitos já decididos: identidade de serviço própria que age em nome da empresa e nunca como o maestro (on-behalf-of, claim act do RFC 8693); atendimento por menção no chat corporativo; triagem dos canais conectados (e-mail, chat, gerenciador de tarefas) em card, resposta ou pergunta ao maestro; piloto em modo rascunho que o maestro aprova; escada de autonomia por tipo de ato; sem dependência de serviço externo além de ponte opcional com alternativa local nomeada; vetos determinísticos (hooks com exit 2) valendo no runtime; custo e operação numa VPS compartilhada. Compare as três opções por: capacidade de impor os vetos e a escada, identidade e auditoria, leitura do KG, custo, lock-in, operação, segurança (isolamento do agente, segredos) e maturidade. Entregue opções nomeadas e uma recomendação.",
+ "today": "2026-11-06",
+ "kgPath": "docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml",
+ "radarExit": 0,
+ "writeAttempts": [
+  {
+   "attempt": 1,
+   "declaredRadarExit": 0,
+   "radarExit": 0,
+   "contractExit": 0,
+   "overcomingNodes": 24
+  }
+ ],
+ "summary": "Recomendação: opção A, a \"Persona no bridge\". É um bot próprio feito com o Claude Agent SDK, hospedado no onion-bridge, que lê o grafo pelo kg_mcp local e entra no Slack como app interno do adotante. Das três opções, só nela os vetos por exit 2 e a escada de autonomia rodam num runtime que o adotante controla, a leitura do KG fica local e os dados não precisam ficar com terceiro. A opção B (Claude Tag, o Claude no Slack) fica como ponte opcional, com a A nomeada como alternativa local. Ela serve só para canais não regulados e sem credencial elevada, porque está em beta, guarda transcrições e memória do lado da Anthropic, só se liga a MCP remoto exposto na internet e não descreve veto determinístico. A opção C (bot de mercado de terceiro) deve ser rejeitada: guarda tokens delegados das integrações do cliente (o caso Salesloft/Drift) e cria lock-in sem ganho de capacidade. A opção A não vem segura de fábrica. O isolamento do agente e os segredos fora da fronteira precisam ser construídos, e o exit 2 continua sendo camada de conformidade, não fronteira de segurança.",
+ "market": "Sinal de mercado limitado a produto, sem rodada ou M&A. A Anthropic lançou o Claude Tag em beta em 2026-06-23 no Slack como \"funcionário virtual\" que executa tarefas em etapas nos canais (Fortune, analista, tier 5, 3-0), com limites de gasto por canal e por organização. A plataforma (Anthropic e Slack) está ocupando o espaço da persona de serviço no chat, o que pressiona C (bots de terceiro) mais do que A. Sinal de risco: a violação da Salesloft/Drift (FINRA, ago/2025) mostra que integrar chatbot de terceiro é vetor de ataque à cadeia de suprimentos. Sinal regulatório do Slack: desde 2025-05-29 apps comerciais têm termos e limites novos, e apps internos ficam preservados. Sem sinal encontrado de rodadas, M&A ou relatório de analista (Gartner, Forrester) sobre bots de serviço com KG no chat corporativo, o que confirma E_MERCADO_MAESTRO_PERSONA_1105 (sem sinal sobre persona de agente ou digital twin).",
+ "findings": [
+  {
+   "claim": "B (Claude Tag) isola bem os segredos, mas o runtime não é do adotante. Cada thread roda num sandbox efêmero sem credenciais, o Agent Proxy injeta a credencial na requisição e a saída de rede é bloqueada por padrão. O ambiente hospedado é da Anthropic.",
+   "confidence": "high",
+   "sources": [
+    "https://claude.com/docs/claude-tag/concepts/security-and-data.md",
+    "https://claude.com/docs/claude-tag/admins/connections/custom.md"
+   ],
+   "evidence": "Fontes primárias tier 9, votos 3-0 nas duas claims. Para o critério de segurança, B é a mais forte das três sem esforço do adotante. No critério de controle do runtime ela perde, e é nesse runtime que os hooks com exit 2 do Onion precisariam rodar.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "B tem limite de maturidade e de conformidade: o Claude Tag está em beta público, retém memória de canal e transcrições de sessão e não está disponível para organizações com ZDR, CMEK ou HIPAA no Claude Code.",
+   "confidence": "high",
+   "sources": [
+    "https://claude.com/docs/claude-tag/concepts/security-and-data.md"
+   ],
+   "evidence": "Fonte primária tier 9, votos 3-0. Isso impede B como runtime único para adotantes regulados (o Onion atende projetos regulados).",
+   "vote": "3-0"
+  },
+  {
+   "claim": "B guarda do lado da Anthropic as transcrições de sessão, a memória, as rotinas e as credenciais. Durante o beta não há retenção automática, e a configuração de retenção da organização não vale para transcrições nem memória. Isso conflita com o requisito de núcleo local sem dependência de serviço externo.",
+   "confidence": "high",
+   "sources": [
+    "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+   ],
+   "evidence": "Fonte primária tier 9, votos 3-0. Por D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027, B só cabe como ponte opcional com alternativa local nomeada, e a alternativa é a A.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "A auditoria de B é parcial. Só a desconexão de workspace e a remoção de escopo entram no audit log da Compliance API. Transcrições só são lidas pela Compliance API no plano Enterprise, a API não apaga sessões, exclusões feitas no Slack não ficam registradas e não há como apagar a transcrição de uma única thread.",
+   "confidence": "medium",
+   "sources": [
+    "https://claude.com/docs/claude-tag/concepts/data-lifecycle"
+   ],
+   "evidence": "Fonte primária tier 9, mas com voto 2-1. Pesa contra B no critério de identidade e auditoria: o adotante não monta uma trilha própria por ato (ator, titular e claim act).",
+   "vote": "2-1"
+  },
+  {
+   "claim": "B só lê o KG se o kg_mcp do kg-ssot virar endpoint remoto acessível pela internet. MCP custom no Claude Tag precisa ser remoto por URL, e MCP local por stdio não conecta porque a sessão roda num sandbox na nuvem da Anthropic.",
+   "confidence": "high",
+   "sources": [
+    "https://claude.com/docs/claude-tag/admins/connections/custom.md"
+   ],
+   "evidence": "Fonte primária tier 9, votos 3-0. Em A, o kg_mcp roda local (stdio) ao lado do agente, sem expor o grafo à internet. O corpus confirma que o kg_mcp funciona fora do Claude Code (C_TETO_MCP: o Goose real conversa com ele).",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Em A, o padrão oficial do Agent SDK para acesso autenticado é um MCP server ou uma ferramenta custom rodando fora da fronteira do agente. Esse é o molde para o kg_mcp e para o adapter do task manager (tm.sh) no bot próprio.",
+   "confidence": "high",
+   "sources": [
+    "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
+   ],
+   "evidence": "Fonte primária tier 9, votos 3-0. Ressalva: a claim de que o SDK já injeta credenciais por proxy foi refutada. Em A, deixar o segredo fora da fronteira é decisão de desenho do adotante, não um recurso pronto.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Em A, a triagem de canais não esbarra no corte de rate limit do Slack. Apps internos construídos pelo próprio cliente não são afetados e mantêm cerca de 50+ requisições por minuto e 1.000 objetos por chamada em conversations.history e conversations.replies.",
+   "confidence": "high",
+   "sources": [
+    "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq"
+   ],
+   "evidence": "Fonte primária tier 9, votos 3-0, válida desde 2025-05-29. Sustenta a operação de triagem por um bot instalado como app interno do workspace do adotante.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "C carrega risco de cadeia de suprimentos pela credencial delegada. Em agosto de 2025, a integração do chatbot Drift, da Salesloft, foi violada (acesso não autorizado entre 8 e 18 de agosto). Os atacantes roubaram tokens OAuth e refresh tokens e se passaram pelo app confiável, contornando a MFA.",
+   "confidence": "high",
+   "sources": [
+    "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack"
+   ],
+   "evidence": "Fonte primária regulatória (FINRA), tier 7, votos 3-0 nas duas claims. É o argumento central contra C: o bot de mercado guarda o acesso delegado a e-mail, chat e task manager, que é justamente o que a triagem exige.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "A identidade de serviço que nunca age como o maestro pede delegação no RFC 8693: um actor_token além do subject_token. O claim act do JWT põe o usuário em sub e o agente em act.sub. Sem actor_token há impersonação. Só o ator atual decide o acesso; os act aninhados servem de trilha de auditoria.",
+   "confidence": "medium",
+   "sources": [
+    "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/"
+   ],
+   "evidence": "Fonte de engenheiro tier 5, votos 3-0, coerente com o nó C_SUPERACAO_20261105_RFC8693_ACT_CLAIM (RFC 8693, seções 1.1 e 4.1). Só em A o adotante emite e registra esse par ator/titular no próprio log. Em B, as claims de identidade do Claude Tag foram todas refutadas, e o modelo de identidade de B segue sem confirmação.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "O veto determinístico fora do modelo é necessário porque o LLM não separa as instruções do desenvolvedor do conteúdo ingerido (mensagens públicas, arquivos). Conteúdo triado pode comandar o assistente.",
+   "confidence": "low",
+   "sources": [
+    "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection"
+   ],
+   "evidence": "Fonte de fornecedor falando de concorrente, tier 5, voto 2-1. Vale como argumento de princípio para a triagem de canais. O caso concreto de exfiltração de canal privado no Slack AI foi refutado.",
+   "vote": "2-1"
+  },
+  {
+   "claim": "B tem risco de escopo por canal: num canal público, o pacote de credenciais dá o seu acesso a qualquer pessoa que entre nele, e credenciais elevadas devem ficar em canais privados.",
+   "confidence": "medium",
+   "sources": [
+    "https://jp.tenable.com/blog/claude-tag-slack-access-model"
+   ],
+   "evidence": "Fonte de fornecedor falando de concorrente, tier 5, votos 3-0. Reforça a decisão D_MA_CANAL_EXTERNO_SO_APOS_CLASSIFICACAO_1104 e limita B a canais sem credencial elevada.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Em B, o controle é de escopo e de custo (o admin define ferramentas, informações e memórias acessíveis, e há limites de gasto em tokens por canal e para a organização), não veto determinístico por exit 2.",
+   "confidence": "medium",
+   "sources": [
+    "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/"
+   ],
+   "evidence": "Fonte de analista tier 5, votos 3-0. Os limites de gasto são uma vantagem operacional de B. A escada de autonomia por tipo de ato e o modo rascunho com aprovação do maestro não estão documentados como recurso nativo.",
+   "vote": "3-0"
+  }
+ ],
+ "caveats": "1) Teams não foi coberto. Há adotante em Teams (gmill), e o equivalente nativo de B ali (Copilot ou outro) não foi pesquisado. É um caso diferente, a desenhar contra o corpus, e não transfere de B no Slack. 2) Custo sem número: não se mediu o preço por sessão do Claude Tag nem o custo de tokens do Agent SDK numa VPS compartilhada, então a comparação de custo é qualitativa (B tem teto de gasto nativo; A tem custo de API mais operação do adotante). 3) Nenhum bot de mercado específico foi avaliado em C; a rejeição se apoia em risco de classe (credencial delegada, lock-in), não em produto. 4) A triagem de e-mail não teve evidência dedicada. 5) Pela decisão D_EXIT2_COUPLING_WORDING_2026_11, o exit 2 é camada de conformidade, não fronteira de segurança: em A, os vetos só valem com o isolamento junto (container ou UID separado, segredos fora da fronteira). O corpus já registrou a sonda que leu o .env de produção do bridge pelo Agent SDK (E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO) e a fuga de sandbox por symlink (CVE-2026-39861). O que vale do corpus: Q_CHAT_AGENT_ISOLATION_2026 (done) passa para a persona e deve ser lido antes de hospedar nela. 6) A ausência de hooks ou de modo rascunho no Claude Tag vem só de claims refutadas e do silêncio das páginas. Não está provado que não existam. 7) O draft OAuth on-behalf-of para agentes expirou (E_OBO_DRAFT_SEPARATES_ACTOR). A base normativa é o RFC 8693 em si; o act é trilha de auditoria, não política. 8) O MCP onion-kg está desligado de propósito no LibreChat (E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO). Religá-lo para a persona é decisão nova, não uma volta ao estado anterior.",
+ "openQuestions": [
+  "O Claude Tag oferece algum gancho antes do ato (aprovação humana, rascunho, política executável) que permita a escada de autonomia, ou B fica só com escopo de pacote e teto de gasto?",
+  "Na opção A, como o token do bot do Slack (identidade de app interno) se liga ao par sub/act.sub no log de auditoria do Onion: o bridge emite um token RFC 8693 próprio por ato, ou só registra ator e titular?",
+  "O que a decisão de Q_CHAT_AGENT_ISOLATION_2026 (UID ou container separado, raiz de confiança do A2A, segredos) prescreve, e ela cobre um agente persistente de triagem com escrita no task manager e no e-mail?",
+  "Qual o custo medido por mês de A (tokens do Agent SDK mais carga na VPS compartilhada, sob a regra de carga) contra B (preço do Claude Tag e limites por canal) num volume real de menções e triagem?",
+  "Qual é o equivalente de B no Microsoft Teams, e A precisa de um adapter de chat (SDAAL) para Slack e Teams desde o piloto?",
+  "O modo rascunho de A vai como DM ao maestro com botões de aprovação no Slack ou como card no task manager, e em que degrau do /meta:forge cada tipo de ato sai do rascunho?",
+  "O kg_mcp precisa de algum filtro de visibilidade (o campo do contrato do kg-ssot exigido por D_MA_CANAL_EXTERNO_SO_APOS_CLASSIFICACAO_1104) antes de responder por menção em canal compartilhado?"
+ ],
+ "refuted": [
+  {
+   "claim": "No Claude Tag, em canais o Claude age sob credenciais de serviço próprias (service accounts), não sob a conta de quem o mencionou; as ações em ferramentas conectadas são atribuíveis a essas contas, o que atende o requisito de identidade de serviço (não o claim act do RFC 8693, que a página não menciona).",
+   "vote": "1-2",
+   "source": "https://claude.com/docs/claude-tag/concepts/security-and-data.md",
+   "tier": 9
+  },
+  {
+   "claim": "No Agent SDK (opção A), o agente roda dentro da fronteira de isolamento (sandbox, container ou VM) e as credenciais ficam fora dela, injetadas por um proxy externo, de modo que o agente nunca vê o segredo.",
+   "vote": "0-3",
+   "source": "https://code.claude.com/docs/en/agent-sdk/secure-deployment",
+   "tier": 9
+  },
+  {
+   "claim": "Desde 2025-05-29 (apps novos) e 2025-06-30 (apps existentes), apps comerciais não listados no Slack Marketplace têm conversations.history e conversations.replies limitados a 1 requisição por minuto e 15 objetos por chamada, o que inviabiliza a triagem de canais por um bot de terceiro (C) fora do Marketplace.",
+   "vote": "0-3",
+   "source": "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq",
+   "tier": 9
+  },
+  {
+   "claim": "As credenciais do conector custom ficam limitadas a hosts permitidos e podem ser restringidas por método HTTP e caminho. A escada de autonomia por tipo de ato é então aplicável só como allowlist de rede, método e caminho. A página não documenta hooks exit 2 do adotante nem modo rascunho com aprovação.",
+   "vote": "0-3",
+   "source": "https://claude.com/docs/claude-tag/admins/connections/custom.md",
+   "tier": 9
+  },
+  {
+   "claim": "No Claude Tag (Slack) o agente age com identidade própria, usando credenciais provisionadas por access bundles, e não como o usuário que o menciona.",
+   "vote": "1-2",
+   "source": "https://www.tenable.com/blog/claude-tag-slack-access-model",
+   "tier": 6
+  },
+  {
+   "claim": "O Claude Tag usa uma credencial compartilhada por canal, sem mapear o usuário que menciona às permissões dele, o que não é delegação on-behalf-of (RFC 8693 act).",
+   "vote": "1-2",
+   "source": "https://www.tenable.com/blog/claude-tag-slack-access-model",
+   "tier": 6
+  },
+  {
+   "claim": "O controle de escrita do Claude Tag é por escopo de bundle e canal, sem hooks ou vetos determinísticos descritos.",
+   "vote": "0-3",
+   "source": "https://www.tenable.com/blog/claude-tag-slack-access-model",
+   "tier": 6
+  },
+  {
+   "claim": "Em Slack AI (assistente nativo de chat corporativo, opção B), prompt injection indireta permite exfiltrar dados de canais privados sem o atacante ter acesso a eles.",
+   "vote": "0-3",
+   "source": "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection",
+   "tier": 5
+  },
+  {
+   "claim": "O Claude Tag usa o padrão de identidade de serviço (o agente atua como ele mesmo em canais compartilhados, com credenciais de bundles configurados pelo admin) e não delegação OAuth por usuário. Isso difere do on-behalf-of do requisito (claim act do RFC 8693), e o artigo não descreve esse claim.",
+   "vote": "1-2",
+   "source": "https://jp.tenable.com/blog/claude-tag-slack-access-model",
+   "tier": 5
+  }
+ ],
+ "unverified": [],
+ "notVerifiedByBudget": [
+  {
+   "claim": "A credencial de um conector é compartilhada por todos nos canais onde se aplica, e por padrão qualquer pessoa do workspace Slack pode invocar o Claude. Não há, na página, mecanismo de hooks com exit 2 nem escada de autonomia por tipo de ato; o controle é por escopo de canal e allowlist de rede, o que sustenta o veto determinístico só de forma parcial.",
+   "source": "https://claude.com/docs/claude-tag/concepts/security-and-data.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Em ambiente self-hosted, o Claude não pode usar os conectores que o admin adiciona no Claude Tag, o que enfraquece a alternativa local para a opção B.",
+   "source": "https://claude.com/docs/claude-tag/concepts/security-and-data.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O isolamento é escolha do operador, com opções de custo baixo (sandbox-runtime com bubblewrap, container Docker endurecido com --cap-drop ALL, --read-only e --network none), viáveis numa VPS compartilhada. O sandbox-runtime compartilha o kernel do host e não inspeciona TLS.",
+   "source": "https://code.claude.com/docs/en/agent-sdk/secure-deployment",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "As permissões do Claude Code/Agent SDK (regras allow/deny/ask, modos de permissão e managed settings) são mecanismo de runtime configurável pelo operador. Isso fala a favor de impor vetos e escada de autonomia em bot próprio, mas a página não menciona hooks com exit 2 nem confirma que valem fora do Claude Code.",
+   "source": "https://code.claude.com/docs/en/agent-sdk/secure-deployment",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O proxy fora da fronteira também dá auditoria central, pois pode registrar todo o tráfego e impor allowlist de domínios. Isso favorece a opção A para auditoria, com a ressalva de que dentro da allowlist o agente pode exfiltrar dados.",
+   "source": "https://code.claude.com/docs/en/agent-sdk/secure-deployment",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A auditoria de agentes delegados deve registrar três identidades (sub, act.sub e client_id). O endpoint de troca deve autenticar o cliente, senão um token comprometido pode ser trocado por outros.",
+   "source": "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A troca de token não liga de forma estreita o token de entrada ao de saída. Revogar a sessão do usuário não derruba o token do agente, então a escada de autonomia precisa de revogação própria, escopo restrito por troca e expiração curta. Isso favorece um runtime em que o operador controla o emissor de tokens.",
+   "source": "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O artigo não trata de Onion, Agent SDK, Claude no Slack nem bots de terceiros, então não discrimina entre as opções A, B e C. Só fornece critérios de identidade e auditoria (RFC 8693) para avaliá-las.",
+   "source": "https://securityboulevard.com/2026/08/oauth-2-0-token-exchange-rfc-8693-for-agent-delegation-a-worked-example/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O vendor (Slack) classificou o comportamento como pretendido e inicialmente julgou a evidência insuficiente, o que indica falta de controle do cliente sobre a correção em assistentes nativos (lock-in/dependência do vendor).",
+   "source": "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Mensagens em canais públicos são pesquisáveis por todos os membros do workspace, de modo que qualquer membro pode plantar a injeção que o assistente indexa.",
+   "source": "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A citação de fontes do assistente pode omitir a mensagem maliciosa, dificultando auditoria e rastreio.",
+   "source": "https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Slack restringe como apps de terceiros armazenam, usam e compartilham dados acessados pelas APIs, e diz que o Marketplace é o único canal apropriado para distribuir comercialmente apps feitos com as APIs do Slack, o que pesa contra bot de mercado (C) que indexe o conteúdo do chat.",
+   "source": "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A Real-time Search API do Slack, que consulta dados sem armazená-los, estava em beta limitado com parceiros selecionados na data da página, então não era alternativa geral ao acesso por history/replies.",
+   "source": "https://api.slack.com/changelog/2025-05-terms-rate-limit-update-and-faq",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Num DM, o Claude Tag roda com a conta claude.ai de quem enviou. Só no DM a identidade é a do próprio usuário. Em canal compartilhado vale a identidade de serviço.",
+   "source": "https://jp.tenable.com/blog/claude-tag-slack-access-model",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag foi lançado em 23/06/2026. Os controles descritos pelo artigo são login claude.ai obrigatório e RBAC. O artigo cita as melhorias just-in-time credential grants e identity-aware overlay como ainda não entregues. Isso indica maturidade recente. O artigo não descreve hooks determinísticos, escada de autonomia nem leitura de KG.",
+   "source": "https://jp.tenable.com/blog/claude-tag-slack-access-model",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O artigo trata só do Claude Tag no Slack (opção B). Não cobre Agent SDK, onion-bridge, kg_mcp nem bots de terceiros. A comparação de A e C com B exige outras fontes.",
+   "source": "https://jp.tenable.com/blog/claude-tag-slack-access-model",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Todos os membros compartilham uma mesma identidade do Claude no Tag, e a atuação em canal é visível a todos. O artigo não descreve identidade de serviço própria nem on-behalf-of (RFC 8693), e não menciona trilha de auditoria.",
+   "source": "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A disponibilidade inicial é em beta, restrita aos planos Claude Enterprise e Team, com preço não informado. Isso indica maturidade baixa e lock-in ao Slack e à Anthropic (opção B).",
+   "source": "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O artigo cita como concorrente em 'virtual employees' a startup Viktor, o que indica existência de bots de mercado de terceiros (opção C). Não há detalhe sobre o Claude Agent SDK ou o KG.",
+   "source": "https://fortune.com/2026/06/23/anthropic-claude-tag-virtual-employee-tool-slack/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Scribble (prime-radiant-inc) é um bot de conhecimento self-hosted para Slack, em TypeScript/Node 24+, construído com Claude Agent SDK, Bolt Socket Mode (sem endpoint HTTP público) e servidores MCP, rodando em Docker Compose, licença MIT — um exemplo concreto de opção A.",
+   "source": "https://github.com/prime-radiant-inc/scribble",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Scribble responde por menção, DM, chamada por nome ou thread ativa, atendendo ao requisito de atendimento por menção.",
+   "source": "https://github.com/prime-radiant-inc/scribble",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Scribble declara não ter fronteiras de convidado, isolamento de Slack Connect, controles de privacidade por canal nem gates de aprovação de admin para memória durável e efeitos colaterais — lacunas de governança e segurança para a opção A.",
+   "source": "https://github.com/prime-radiant-inc/scribble",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Scribble tem maturidade fraca pelos sinais públicos: 219 commits, 2 stars, 0 forks e nenhum release.",
+   "source": "https://github.com/prime-radiant-inc/scribble",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A página não cobre identidade on-behalf-of, modo rascunho, escada de autonomia nem vetos por hook exit 2, e não compara com o Claude nativo no Slack nem com bots de terceiros.",
+   "source": "https://github.com/prime-radiant-inc/scribble",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Gartner recomenda governança de agentes graduada pelo nível de autonomia, e não uma abordagem única para todos (apoia a escada de autonomia por tipo de ato, sem detalhar níveis nem comparar runtimes A/B/C).",
+   "source": "https://www.itpro.com/technology/artificial-intelligence/one-size-fits-all-agent-governance-sets-enterprises-up-to-fail",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Um conector MCP com OAuth faz o agente agir como a conta do admin que autorizou. Isso conflita com o requisito de identidade de serviço própria on-behalf-of (RFC 8693, claim act) e com 'nunca como o maestro', a menos que se use uma conta de serviço dedicada.",
+   "source": "https://claude.com/docs/claude-tag/admins/connections/custom.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag está em beta pública, e seus recursos e comportamento podem mudar antes da disponibilidade geral. Isso pesa contra a opção B no critério maturidade. A verificação de auditoria remete ao log do próprio serviço de destino.",
+   "source": "https://claude.com/docs/claude-tag/admins/connections/custom.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag está em beta público e seu comportamento pode mudar antes da disponibilidade geral, o que limita a maturidade da opção B.",
+   "source": "https://claude.com/docs/claude-tag/concepts/data-lifecycle",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag (B) tem vínculo entre conta Slack e conta Claude de cada membro, com tokens guardados pela Anthropic. A identidade é por membro, não uma identidade de serviço própria da empresa com claim act (RFC 8693). Esse modelo de identidade difere do requisito.",
+   "source": "https://claude.com/docs/claude-tag/concepts/data-lifecycle",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag envia a Anthropic todo o conteúdo que Claude leu, inclusive mensagens de outras pessoas e convidados, e dados de ferramentas conectadas. Esse conteúdo vira dado da organização na transcrição e permanece mesmo que a mensagem seja apagada no Slack.",
+   "source": "https://claude.com/docs/claude-tag/concepts/data-lifecycle",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag (opção B) foi lançado em beta em 23 de junho de 2026 para clientes Enterprise e Team e funciona apenas no Slack. Outras plataformas são só planos futuros, sem prazo, o que indica lock-in de plataforma.",
+   "source": "https://www.datacamp.com/blog/claude-tag",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag tem identidade própria no Slack e no GitHub (app Claude, Claude GitHub App) e usa conta de serviço provisionada pelo admin para bancos. Não age on-behalf-of o usuário e não usa credenciais pessoais.",
+   "source": "https://www.datacamp.com/blog/claude-tag",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A auditoria do Claude Tag cobre tarefas agendadas e pontuais e chamadas de rede feitas com as credenciais do agente. O log de auditoria Enterprise não inclui conteúdo de conversas por padrão, e as memórias podem ser vistas, editadas e apagadas pelo admin.",
+   "source": "https://www.datacamp.com/blog/claude-tag",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Claude Tag não documenta hooks determinísticos, rascunho com aprovação humana nem escada de autonomia. Há só o modo reativo por menção e o modo ambiente opt-in sem aprovação. Os controles são bloqueio de rede para hosts não autorizados e teto de gasto.",
+   "source": "https://www.datacamp.com/blog/claude-tag",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O custo do Claude Tag é cobrado da organização por taxa de API, com limites por org e por canal e alertas em 75% e 95%. Os créditos de lançamento são de US$ 25.000 (Enterprise) e US$ 2.500 (Team). O produto está em beta e sujeito a mudanças de funcionalidades, limites e preço.",
+   "source": "https://www.datacamp.com/blog/claude-tag",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O material exposto foi além de dados de CRM e incluiu segredos de nuvem, o que mostra o raio de explosão de um bot de terceiro conectado a vários sistemas.",
+   "source": "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A FINRA recomenda desconectar as integrações afetadas, rotacionar credenciais expostas e aplicar privilégio mínimo a aplicativos de terceiros.",
+   "source": "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A página não compara runtimes de bot (Agent SDK próprio, assistente nativo do Slack, bot de mercado), não trata de custo, lock-in, vetos determinísticos nem de leitura de KG. Serve só como evidência de risco do eixo C.",
+   "source": "https://www.finra.org/rules-guidance/guidance/salesloft-drift-AI-supply-chain-attack",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Qualquer pessoa do canal pode acionar o Claude Tag por menção, ampliando a superfície de risco; a Tenable recomenda aprovação e log de auditoria nos convites.",
+   "source": "https://www.tenable.com/blog/claude-tag-slack-access-model",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A Anthropic declarou publicamente que planeja reforçar a segurança do Claude Tag (credenciais just-in-time, camada de identidade do usuário), o que indica maturidade incompleta.",
+   "source": "https://www.tenable.com/blog/claude-tag-slack-access-model",
+   "reason": "orçamento maxVerify"
+  }
+ ],
+ "budgetDropped": [
+  {
+   "url": "https://claude.com/docs/claude-tag/admins/audit.md",
+   "title": "Claude Tag: auditoria da atividade (Anthropic, primária)",
+   "angle": "Claude no Slack nativo: controles e limites",
+   "relevance": "high"
+  },
+  {
+   "url": "https://claude.com/docs/claude-tag/admins/restrict-access.md",
+   "title": "Claude Tag: restringir onde e quem aciona (Anthropic, primária)",
+   "angle": "Claude no Slack nativo: controles e limites",
+   "relevance": "high"
+  },
+  {
+   "url": "https://claude.com/docs/claude-tag/admins/for-slack-admins.md",
+   "title": "Claude Tag: o que o app Slack acessa (Anthropic, primária)",
+   "angle": "Claude no Slack nativo: controles e limites",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/slack",
+   "title": "Claude Code in Slack (docs oficiais, produto antecessor)",
+   "angle": "Claude no Slack nativo: controles e limites",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://claude.com/docs/connectors/slack/index",
+   "title": "Claude connector for Slack (docs oficiais)",
+   "angle": "Bot Slack com Agent SDK: arquitetura e hospedagem",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://claude.com/claude-in-slack",
+   "title": "Claude and Slack, better together (Anthropic, fornecedor)",
+   "angle": "Bot Slack com Agent SDK: arquitetura e hospedagem",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://dev.to/austriasoftwaroftwaredeveloper/claude-agent-sdk-build-production-agents-2026-guide-1f6a",
+   "title": "Claude Agent SDK: build production agents, guia 2026 (comunidade)",
+   "angle": "Bot Slack com Agent SDK: arquitetura e hospedagem",
+   "relevance": "low"
+  },
+  {
+   "url": "https://knowledge.workspace.google.com/admin/reports/gmail-log-events",
+   "title": "Gmail log events (Google Workspace Help)",
+   "angle": "Identidade de serviço delegada e auditoria de agentes",
+   "relevance": "high"
+  },
+  {
+   "url": "https://workos.com/blog/oauth-multi-hop-delegation-ai-agents",
+   "title": "AI agents and the multi-hop delegation problem (WorkOS)",
+   "angle": "Identidade de serviço delegada e auditoria de agentes",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.arcade.dev/blog/claude-tag-build-slack-ai-agent/",
+   "title": "Claude Tag: Build Your Own Slack AI Agent (Arcade.dev)",
+   "angle": "Identidade de serviço delegada e auditoria de agentes",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://medium.com/@zaka_intelligence/before-your-team-adopts-claude-tag-understand-what-gets-captured-83602ffc54c6",
+   "title": "Before Your Team Adopts Claude Tag, Understand What Gets Captured",
+   "angle": "Identidade de serviço delegada e auditoria de agentes",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.theregister.com/2024/08/21/slack_ai_prompt_injection/",
+   "title": "The Register: Slack AI prompt injection",
+   "angle": "Bots de mercado de terceiros: risco, custo e lock-in",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://krebsonsecurity.com/tag/salesloft-drift/",
+   "title": "Krebs on Security: Salesloft Drift",
+   "angle": "Bots de mercado de terceiros: risco, custo e lock-in",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.beri.net/article/glean-vs-microsoft-365-copilot-vs-dust-enterprise-search-2026",
+   "title": "Glean vs Copilot vs Dust: Buy the Permission Model",
+   "angle": "Bots de mercado de terceiros: risco, custo e lock-in",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://runbear.io/posts/dust-alternatives-slack",
+   "title": "Runbear: Dust alternatives for building AI agents in Slack (2026)",
+   "angle": "Bots de mercado de terceiros: risco, custo e lock-in",
+   "relevance": "low"
+  },
+  {
+   "url": "https://promptarmor.substack.com/p/data-exfiltration-from-slack-ai-via",
+   "title": "PromptArmor: exfiltração de dados do Slack AI via injeção indireta de prompt",
+   "angle": "Contrarian: por que não construir bot próprio",
+   "relevance": "high"
+  },
+  {
+   "url": "https://api.slack.com/automation/changelog",
+   "title": "Slack developer changelog",
+   "angle": "Contrarian: por que não construir bot próprio",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://vantagepoint.io/blog/ai/claude-tag-slack-admin-setup-migration-guide",
+   "title": "Vantagepoint: guia de setup e migração do Claude Tag (admin)",
+   "angle": "Contrarian: por que não construir bot próprio",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://claude.com/it/blog/claude-and-slack",
+   "title": "Anthropic: Claude and Slack (blog oficial)",
+   "angle": "claude-code-atual",
+   "relevance": "high"
+  },
+  {
+   "url": "https://claudeissues.com/issue/36071-pretooluse-hooks-dont-block-in-headless-p-mode-or-with-allowedtools-wildcard",
+   "title": "Issue: PreToolUse hooks não bloqueiam em modo headless (-p)",
+   "angle": "claude-code-atual",
+   "relevance": "high"
+  },
+  {
+   "url": "https://claudeissues.com/issue/33343-pretooluse-hooks-and-allowedtools-not-enforced-in-headless-p-mode",
+   "title": "Issue: PreToolUse e --allowedTools não aplicados em headless -p",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://rickhigh.substack.com/p/claude-agent-sdk-hooks-permissions",
+   "title": "Claude Agent SDK: hooks e permissões (Substack)",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://slack.com/help/articles/53532192117267-Use-Claude-in-Slack",
+   "title": "Use Claude in Slack (Slack Help, primária)",
+   "angle": "mercado-capital",
+   "relevance": "high"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/agent-sdk/permissions",
+   "title": "Agent SDK Permissions (documentação oficial Claude Code)",
+   "angle": "mercado-capital",
+   "relevance": "high"
+  },
+  {
+   "url": "https://en.cryptonomist.ch/2026/06/23/anthropic-claude-tag-slack/",
+   "title": "Anthropic Claude Tag Slack (Cryptonomist, 2026-06-23)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.inbenta.com/ai-this-week/anthropics-claude-tag-hits-salesforce-slack-turning-ai-into-a-team-player",
+   "title": "Claude Tag hits Salesforce Slack (Inbenta, blog de fornecedor concorrente)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.developersdigest.tech/blog/claude-agent-sdk-whats-new-2026",
+   "title": "Claude Agent SDK in Late 2026: What Is New (DevelopersDigest, secundária)",
+   "angle": "mercado-capital",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/ratacat/minimal-slack-bot",
+   "title": "ratacat/minimal-slack-bot",
+   "angle": "repos-trajetoria",
+   "relevance": "high"
+  },
+  {
+   "url": "https://github.com/jerelvelarde/opentag",
+   "title": "jerelvelarde/opentag",
+   "angle": "repos-trajetoria",
+   "relevance": "high"
+  },
+  {
+   "url": "https://github.com/xcnkx/claude-sdk-slack-bot",
+   "title": "xcnkx/claude-sdk-slack-bot",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/SilasSolivagus/base-servers",
+   "title": "SilasSolivagus/base-servers",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/amitpaz1/agentgate",
+   "title": "amitpaz1/agentgate (Show HN)",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://wso2.com/resources/analyst-reports/forrester-agentic-control-plane-solutions-landscape",
+   "title": "Forrester Agentic Control Plane Solutions Landscape (via WSO2, fornecedor listado)",
+   "angle": "analistas",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.gartner.com/en/documents/8254457",
+   "title": "Gartner Insights Abstract: Decision Framework for Implementing and Governing AI Agents in SAP (Aug 2026)",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://agentmarketcap.ai/blog/2026/04/11/thoughtworks-tech-radar-2026-agent-standards-mcp-a2a-protocol",
+   "title": "Thoughtworks Tech Radar Verdict on AI Agent Standards: MCP, A2A, LangGraph, observability (Vol. 34, abr/2026)",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.pulse.bot/ai/news/agentic-ai-hype-races-ahead-as-enterprises-remain-stuck-in-pilot-mode-e598b3df-20a3-4683-9c11-4face9194c16/",
+   "title": "Agentic AI hype races ahead as enterprises remain stuck in pilot mode (resumo do State of Agentic AI 2026, Forrester)",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://armbruster-brand-astro.pages.dev/articles/stop-building-ai-agents-licensing-2026",
+   "title": "Stop Building AI Agents: The 2026 Case for Licensing (blog de fornecedor, marcado)",
+   "angle": "analistas",
+   "relevance": "low"
+  },
+  {
+   "url": "https://claudeissues.com/issue/43407-pretooluse-hooks-returning-exit-2-deny-json-do-not-block-tool-execution",
+   "title": "Issue: PreToolUse hooks exit 2 + deny JSON do not block tool execution",
+   "angle": "comunidade",
+   "relevance": "high"
+  },
+  {
+   "url": "https://github.com/acip/slack-claude-agent",
+   "title": "acip/slack-claude-agent (bot Slack autohospedado com Claude Agent SDK)",
+   "angle": "comunidade",
+   "relevance": "high"
+  },
+  {
+   "url": "https://claudeissues.com/issue/44534-pretooluse-hook-deny-not-enforced-for-agent-tool-calls",
+   "title": "Issue: PreToolUse hook deny not enforced for Agent tool calls",
+   "angle": "comunidade",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://gist.github.com/nicosuave/fa67f6db95a47568b8c85291e6e15c09",
+   "title": "Gist nicosuave: bot Slack com Agent SDK, uma thread por container descartável",
+   "angle": "comunidade",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://vercel.com/templates/next.js/claude-managed-agents-chat-sdk",
+   "title": "Vercel template: Slack bot com Claude Managed Agents e Chat SDK",
+   "angle": "comunidade",
+   "relevance": "low"
+  }
+ ],
+ "decision": {
+  "options": [
+   "A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta fora da fronteira e um app Slack INTERNO por adotante",
+   "B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthropic sem retenção automática no beta",
+   "B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali",
+   "C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e não há hook do adotante",
+   "A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa local"
+  ],
+  "objections": [
+   {
+    "target": "Achado 1: credenciais fora do sandbox, Agent Proxy, egress default-deny, 'isolamento forte'",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A parte das credenciais confere com a primária. O adjetivo 'isolamento forte' afirma mais do que a página entrega. Na mesma página (security-and-data.md, lida em 2026-11-06): 'Isolating a credential doesn't isolate what Claude knows. The workspace notes it saves from a public channel are read by sessions in every channel of the workspace, and it can search public channels by keyword without being added to them'. Ela também diz: 'Git may still be able to clone public repositories that an admin didn't grant' e 'Allow-all egress is a `*` domain'. O isolamento é das credenciais, não do conhecimento: a memória de canal público vaza para todos os canais.",
+    "criterio": {
+     "id": "E2_PROVA_MENOS",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'Isolating a credential doesn't isolate what Claude knows'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Restringir o achado a 'isolamento de credenciais', com a ressalva da memória de workspace",
+     "medida": "Procurei na seção 'Isolate credentials between channels' da mesma página um controle que isole a memória de workspace. Só existe 'Channels Claude can search' (restrict-access.md, linha 208), que limita a busca e não a memória."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 2: Claude Tag indisponível com ZDR, CMEK ou HIPAA",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Confere palavra por palavra em security-and-data.md: 'Claude Tag isn't available to organizations with Zero Data Retention (ZDR) enabled ... customer-managed encryption (CMEK) ... HIPAA configuration'. data-lifecycle confirma que uma organização que adota ZDR depois do pareamento faz o Claude parar de responder. Não achei contra-evidência."
+   },
+   {
+    "target": "Achado 3: MCP ou ferramenta custom fora da fronteira como modelo para o kg_mcp e o adapter",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Confere na primária secure-deployment, seção 'Custom tools': 'Provide access through an MCP server or custom tool that routes requests to a service running outside the agent's security boundary ... The agent never sees the credentials.' O corpus tem C_TETO_MCP (o kg_mcp falou com um cliente real) e E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO, que trata do LibreChat e não impede o uso no bridge. O achado se apresenta como 'modelo', não como medida, e isso está correto."
+   },
+   {
+    "target": "Achado 4: apps internos fora do corte de rate limit",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Confere na primária redirecionada (docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps): 'Internal customer-built applications are not impacted by these changes.' A isenção só vale se o bot for um app INTERNO de cada adotante. Cenário: o core publica UM app Slack distribuído para várias empresas adotantes fora do Marketplace. Esse app é 'commercially distributed' e passa a 'limited to 1 request per minute' com 'limit ... reduced to 15 objects' em conversations.history e conversations.replies, e a triagem de canais da opção A quebra. O achado não declara essa condição de empacotamento.",
+    "criterio": {
+     "id": "E2_PROVA_MENOS",
+     "comando": "WebFetch https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps, trechos 'Internal customer-built applications are not impacted' e 'limited to 1 request per minute, unless they are approved for the Slack Marketplace'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Restrição de empacotamento: cada adotante cria o próprio app Slack interno a partir de um manifesto do core",
+     "medida": "Procurei na página uma terceira via (app distribuído isento sem Marketplace) e não há. A restrição faz parte do próprio veredito, não é uma superação medida."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 5: MCP custom do Claude Tag só como endpoint remoto; kg_mcp só se exposto na internet",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O achado ignora o ambiente self-hosted. security-and-data.md diz: 'Sessions in a self-hosted environment run on runners inside your network, and Claude can't use the connectors an admin adds in those sessions.' Existe então um caminho de B que roda na rede do adotante, onde o kg_mcp não precisaria ser exposto na internet. O custo é perder os conectores do admin, e com eles a triagem de e-mail e do task manager. A frase 'só se exposto na internet' é falsa como disjunção completa. A conclusão prática (B não lê bem o KG local sem abrir mão de algo) se mantém.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'Sessions in a self-hosted environment run on runners inside your network, and Claude can't use the connectors an admin adds in those sessions'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Self-hosted environment do Claude Tag com kg_mcp local",
+     "medida": "Não li code.claude.com/docs/en/self-hosted-environments, então não se mediu se um MCP stdio local é aceito no runner self-hosted. A variante é hipótese, não entrega."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 6: B tem segredos na borda, mas o runtime não é controlado pelo adotante",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "'Runtime não controlado pelo adotante' vale para o ambiente hospedado. A mesma página nomeia o self-hosted ('runners inside your network'). Nesse caso o runtime é do adotante, mas o Agent Proxy e a injeção de credencial não existem ali ('Claude can't use the connectors'). O achado trata B como um bloco só, quando há duas variantes com trade-offs opostos: segredos isolados com runtime da Anthropic, ou runtime local sem conectores.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trechos 'In an Anthropic-hosted environment, requests leave that sandbox through Agent Proxy' e 'Sessions in a self-hosted environment run on runners inside your network'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Dividir B em B-hospedado e B-self-hosted na matriz",
+     "medida": "Nenhuma das duas variantes entrega ao mesmo tempo segredos fora do agente e runtime do adotante, segundo a mesma página. O que se oferece é desdobrar a matriz, não uma superação."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 7: transcrições e memória do lado da Anthropic, sem retenção automática no beta",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Confere palavra por palavra em data-lifecycle: 'During the beta there is no automatic retention period for Claude Tag data ... Your organization's custom data retention setting doesn't apply to Claude Tag transcripts or memory.' A página também diz que apagar uma mensagem no Slack não remove do transcript, o que reforça o achado."
+   },
+   {
+    "target": "Achado 8: auditoria do Claude Tag parcial ('só desconexão e remoção de escopo entram no audit log')",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O 'só' é contrariado por primária. restrict-access.md, 'Audit channel manager activity': 'Channel manager activity is recorded in your organization's audit log ... Role channel assignments ... Credential changes ... Configure page changes.' Há ainda audit.md: 'Network events: An hourly JSON export of the outbound requests Claude made through Agent Proxy' e 'actions appear under the service account you created for the connector'. A parte que se sustenta: 'There is no per-action log of every task and who asked' (audit.md) e 'Git and MCP traffic are not included'. A auditoria é parcial, mas não pela razão afirmada. A lacuna real é que não se sabe quem pediu cada ato, e o tráfego MCP (onde estaria o kg_mcp) fica fora do log.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/admins/restrict-access.md, trecho 'The log records: Role channel assignments ... Credential changes ... Configure page changes'; WebFetch https://claude.com/docs/claude-tag/admins/audit.md, trecho 'There is no per-action log of every task and who asked'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reescrever com as duas primárias: auditoria de B = log de admin + export de rede por hora (sem git/MCP) + log do serviço conectado sob a conta de serviço; falta o log por ato de quem pediu",
+     "medida": "WebFetch das duas páginas em 2026-11-06, trechos verbatim acima"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 9: violação Salesloft Drift, 8 a 18 de agosto de 2025",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Não reli o FINRA, mas a data e o vetor batem com o que foi amplamente noticiado e não há contra-evidência no corpus. É só um fato de incidente, sem inferência acima do que a fonte diz."
+   },
+   {
+    "target": "Achado 10: o risco de C é a credencial delegada guardada pelo bot de terceiro",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Os fatos conferem, mas a lição não separa C de A: o risco está em quem guarda tokens OAuth de longa vida, e isso não é exclusivo do vendor. O próprio corpus tem E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO: 'Um convidado leu o .env de produção do bridge pelo fluxo real do Agent SDK'. O hospedeiro candidato de A já vazou segredo uma vez. O que distingue C é a CONCENTRAÇÃO, um vendor com tokens de muitos clientes (alvo de cadeia de suprimentos), e não o fato de guardar a credencial.",
+    "criterio": {
+     "id": "E2_PROVA_MENOS",
+     "comando": "bash .claude/validation/kg-corpus-grep.sh 'E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Reformular como 'concentração multi-cliente de refresh tokens' e exigir de A o broker estreito (opção 5 do grafo chat-agent-isolation)",
+     "medida": "Busquei no grafo chat-agent-isolation-2026-10. O degrau 2 (DynamicUser, ProtectHome) está em produção (E_DEGRAU2_EM_PRODUCAO_1016), mas o broker de credencial para Slack e task manager não foi medido para a persona."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 11: RFC 8693, delegação exige actor_token, sem ele é impersonation",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Confere com o corpus primário C_SUPERACAO_20261105_RFC8693_ACT_CLAIM (RFC 8693, §1.1 e §4.1: o claim act distingue delegação de impersonação). A fonte tier 5 só repete a primária."
+   },
+   {
+    "target": "Achado 12: claim act; decisões olham só o ator atual, act aninhado é informativo",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Confere com a RFC 8693 §4.1 ('Prior actors identified by any nested act claims are informational only'). A objeção é outra: o achado sustenta o requisito, mas NENHUMA das três opções emite um token com act pronto para uso. O Claude Tag usa 'service credentials of its own' (security-and-data.md), um bot token do Slack que não é JWT com act. O Agent SDK não traz STS. O requisito 'claim act do RFC 8693' só é atendido se o operador rodar um emissor de token exchange, e isso não foi medido para nenhuma opção. Corpus: E_OBO_DRAFT_SEPARATES_ACTOR fala de um 'draft expirado'.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "bash .claude/validation/kg-corpus-grep.sh 'token exchange' (procurar um nó que meça um STS emitindo act para a persona; os nós existentes são de doutrina, como C_SUPERACAO_20261105_RFC8693_ACT_CLAIM)"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "STS do operador (no bridge, que já tem jwks/ e trust root A2A) emitindo token com sub=empresa ou maestro e act.sub=persona",
+     "medida": "Procurei no grafo chat-agent-isolation-2026-10 (jwks/, members.yaml citados como trust root) e em a2a-empresa-adotante-2026-10. Existe a raiz de confiança, mas nenhum nó mede a emissão de act. É condição futura."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 13: o LLM não distingue instruções; o veto determinístico fora do modelo é necessário",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "'Veto determinístico (exit 2) é necessário' prova menos do que parece. No caso PromptArmor a exfiltração saiu pelo TEXTO da resposta (link renderizado), sem chamada de ferramenta, e um PreToolUse não dispara sem tool call. O corpus já selou D_EXIT2_COUPLING_WORDING_2026_11: o exit 2 é camada de conformidade, não fronteira de segurança. Pela primária de hooks do SDK, 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow' (falha aberto sem onFailure:'block'). Cenário: uma mensagem pública injetada leva a persona a responder com um link markdown contendo dados do KG; nenhum hook de ferramenta vê isso. O controle que fecha esse caminho é o rascunho aprovado pelo maestro no caminho do post, ou o hook MessageDisplay (só TypeScript), não o PreToolUse.",
+    "criterio": {
+     "id": "E2_PROVA_MENOS",
+     "comando": "WebFetch https://code.claude.com/docs/en/agent-sdk/hooks, trechos 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow' e a linha da tabela 'MessageDisplay | No | Yes'; bash .claude/validation/kg-corpus-grep.sh 'D_EXIT2_COUPLING_WORDING_2026_11'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Post no Slack como ferramenta própria (não texto livre) atrás de PreToolUse deny/ask com onFailure:'block' + rascunho humano",
+     "medida": "Lido na primária de hooks que o mecanismo existe ('permissionDecision: deny|ask|defer', onFailure:'block' exige TS SDK >= 0.3.317). O bridge está em 0.3.303 (tarefa #3 desta sessão), abaixo do piso, e não foi medido na persona."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Achado 14: canal público dá o acesso do bundle a quem entrar",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Confere com a primária (security-and-data.md): 'Keep the channel private. Access on a public channel reaches anyone who joins' e 'A connector's credential ... is shared by everyone in the channels where it applies'. A fonte tier 5 bate com a tier 9."
+   },
+   {
+    "target": "Achado 15: Claude Tag lançado em beta em 2026-06-23",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Todas as páginas primárias lidas trazem 'Claude Tag is in public beta'. A data bate com o artigo da Fortune e não há contra-evidência."
+   },
+   {
+    "target": "Achado 16: no Claude Tag, admin controla escopo e gasto, não veto determinístico",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Em parte contrariado. (a) O Agent Proxy é determinístico, fora do modelo: a credencial pode ser restrita 'to one host, one path prefix, or read-only methods' e o que não casa 'is blocked' (security-and-data.md). Uma escada leitura/escrita por tipo de ato é parcialmente expressável por método HTTP. (b) Há aprovação humana: 'A guest can't approve a tool or permission request' (restrict-access.md, linha 200) implica que membros aprovam pedidos de ferramenta. E 'On the Enterprise plan, an admin can require the user's review of every result before it posts' para conectores pessoais. O que se sustenta: não há hook com código do adotante, e a revisão antes do post vale só para conectores pessoais, não para a conta de serviço.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trechos 'one host, one path prefix, or read-only methods' e 'an admin can require the user's review of every result before it posts'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Escada de B por método HTTP + revisão de conector pessoal",
+     "medida": "Não li personal-connectors.md nem a mecânica do 'tool or permission request'. A revisão por resultado só vale para conectores pessoais (identidade do usuário, não a de serviço), então não entrega o rascunho da persona de serviço."
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 9): em canais o Claude age sob service accounts próprias",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A primária CONFIRMA a claim refutada. security-and-data.md: 'In channels, Claude acts under service credentials of its own, not under the account of the person who tagged it ... the actions Claude takes in connected tools are attributable to its own service accounts.' audit.md: 'In channels, Claude acts as itself unless a task uses a member's personal connectors.' Cenário: com a claim descartada, a linha 'identidade' da matriz registra B sem identidade de serviço, o que é falso e subestima B num critério que a pergunta manda comparar. A própria claim já ressalvava que o claim act não é mencionado.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'In channels, Claude acts under service credentials of its own, not under the account of the person who tagged it'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar a claim com a primária security-and-data.md (seção Service accounts)",
+     "medida": "WebFetch em 2026-11-06, trecho verbatim acima"
+    },
+    "triage": "bloqueia"
+   },
+   {
+    "target": "Descartado (refutada, tier 9): no Agent SDK as credenciais ficam fora e são injetadas por proxy, de modo que o agente nunca vê o segredo",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Refutação legítima. A primária secure-deployment apresenta o proxy como opção, não como padrão: 'For high-security deployments, you can place sensitive resources (like credentials) outside the boundary' e 'The recommended approach is to run a proxy'. A claim afirmava como fato que o agente nunca vê o segredo, e no SDK isso só vale se o operador construir o proxy. O corpus mostra que o bridge já falhou nisso (E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO)."
+   },
+   {
+    "target": "Descartado (refutada, tier 9): apps comerciais fora do Marketplace limitados a 1 req/min e 15 objetos desde 2025-05-29/06-30",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A primária CONFIRMA a claim. docs.slack.dev/changelog/2025/05/29: 'will be limited to 1 request per minute, unless they are approved for the Slack Marketplace' e 'limit parameter has been reduced to 15 objects'. Datas: 'effective immediately for applications created on or after May 29, 2025' e 'June 30, 2025 for apps created before'. A página não registra reversão. A claim estava bem delimitada ('fora do Marketplace'). O achado 4 vem da mesma página, o que torna a refutação incoerente.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps, trecho 'limited to 1 request per minute, unless they are approved for the Slack Marketplace'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar a claim com a primária redirecionada",
+     "medida": "WebFetch em 2026-11-06, depois do redirect 302 de api.slack.com"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 9): credenciais do conector limitadas a hosts, método e caminho; a escada só como allowlist; sem hooks nem rascunho",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O núcleo factual é confirmado pela primária: 'You can narrow the credential further, to one host, one path prefix, or read-only methods'. A parte 'sem rascunho' é contrariada em parte pela revisão de resultado só para conectores pessoais no Enterprise. Nenhuma página lida documenta hook do adotante. A refutação derrubou a claim inteira quando no máximo uma ressalva era cabível.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'narrow the credential further, to one host, one path prefix, or read-only methods'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com a ressalva da revisão de conector pessoal",
+     "medida": "WebFetch em 2026-11-06, seção Credential storage e Service accounts"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 6): o Claude Tag age com identidade própria via access bundles",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmado pela primária tier 9 (é o mesmo fato do descarte tier 9 acima): 'Connect a dedicated identity you control for each service, such as a claude@yourcompany.example.com seat'. A refutação contradiz a página oficial.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'Connect a dedicated identity you control for each service'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Fundir com o descarte tier 9 reinstalado",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 6): credencial compartilhada por canal, sem mapear o usuário; não é OBO com act",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmado em essência: 'A connector's credential belongs to that agent identity and is shared by everyone in the channels where it applies.' O único reparo é que conectores pessoais mapeiam o usuário ('runs with that user's permissions and is recorded under their name'), mas isso é impersonação e não delegação com act. A conclusão 'não é OBO com act' se mantém.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'is shared by everyone in the channels where it applies'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com o reparo dos conectores pessoais",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 6): controle de escrita por escopo de bundle e canal, sem hooks",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Nenhuma página primária lida (security-and-data, restrict-access, audit, data-lifecycle) descreve hook do adotante. A refutação não traz evidência listada que mostre hooks no Claude Tag. O controle real é escopo, mais método e caminho no proxy.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "a refutação no prompt não lista fonte nem votos que mostrem hook no Claude Tag; grep -n -i 'hook' no texto salvo de restrict-access.md = 0 ocorrências relevantes"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Página do Claude Tag que documente hooks",
+     "medida": "WebFetch de security-and-data.md, audit.md, restrict-access.md e data-lifecycle.md em 2026-11-06: nenhuma menciona hook do adotante"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 5): no Slack AI, injeção indireta exfiltra dados de canais privados",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O relatório PromptArmor (ago/2024) tem exatamente esse título e o cenário de chave de API num canal privado. A refutação não traz contra-evidência listada. Ainda assim, a claim é sobre o Slack AI e não sobre o Claude Tag, e por isso pesa como classe de risco (achado 13), não como medida de B.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "a refutação não lista fonte contrária; https://promptarmor.com/resources/data-exfiltration-from-slack-ai-via-indirect-prompt-injection é a mesma fonte do achado 13 (votos 2-1)"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Medida equivalente contra o Claude Tag",
+     "medida": "Procurei nas quatro páginas do Claude Tag lidas um teste de injeção indireta; só há a frase de projeto 'Claude is designed to take direction from the connector's owner', que é declaração, não medida"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Descartado (refutada, tier 5): o Claude Tag usa identidade de serviço e não delegação OAuth por usuário",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmado pela primária: 'not under the account of the person who tagged it'. É a mesma refutação errada dos descartes tier 9 e 6.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, seção Service accounts"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Fundir com o descarte tier 9 reinstalado",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: credencial compartilhada; por padrão qualquer membro do workspace invoca; sem hooks nem escada",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmada pela primária: 'By default, anyone in a connected Slack workspace can invoke Claude in channels, with or without a Claude account' (security-and-data.md, Member access) e restrict-access.md, linha 21. Pesa contra B no requisito 'atendimento por menção': no padrão, quem não pertence à organização Claude também aciona.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt, sem refutação; WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'anyone in a connected Slack workspace can invoke Claude'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com a primária",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: em self-hosted o Claude não usa os conectores do admin",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmada palavra por palavra: 'Claude can't use the connectors an admin adds in those sessions.' É decisiva para o requisito 'sem dependência externa além de ponte opcional com alternativa local': a alternativa local de B perde a triagem dos canais conectados.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'Claude can't use the connectors an admin adds in those sessions'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com a primária",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: isolamento por escolha do operador (sandbox-runtime/bwrap, Docker endurecido) viável numa VPS compartilhada",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A primária confirma o leque ('Same-host kernel', 'No TLS inspection'). O 'viável numa VPS compartilhada' é CONTRARIADO pelo corpus para ESTA VPS. D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT: 'hoje o bwrap FALHA na VPS por apparmor_restrict_unprivileged_userns=1', 'docker é equivalente a root e esta VPS tem Docker furando o ufw', e o sandbox nativo 'vira fail-open em silêncio'. O que funciona aqui está em produção: runner com DynamicUser, ProtectHome=yes (E_DEGRAU2_EM_PRODUCAO_1016). Cenário: prescrever sandbox-runtime para a persona nesta VPS dá um agente sem sandbox, em silêncio.",
+    "criterio": {
+     "id": "E1_EVIDENCIA_CONTRARIA",
+     "comando": "grep -n 'bwrap FALHA' docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Runner da persona sob o degrau 2 do bridge (unit systemd com DynamicUser, ProtectHome, IPAddressDeny)",
+     "medida": "D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT, re-medido no vivo em 2026-10-20 (systemctl show da unit do bridge e do runner do /chat)"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: permissões do Agent SDK configuráveis, mas a página não menciona hooks exit 2 fora do Claude Code",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É o discriminador central da pergunta ('vetos determinísticos valendo no runtime'), e o run ficou sem claim primária para A. A primária de hooks do SDK fecha a dúvida: 'shell command hooks from settings files when the corresponding settingSources ... entry is enabled, which it is for default query() options'. PreToolUse devolve 'permissionDecision: deny|ask|defer', e o hook do Onion em .claude/settings.json VALE no SDK. Mas com uma condição: 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow'. O fail-closed exige onFailure:'block' (TS SDK >= v0.3.317). Cenário: a persona no bridge em 0.3.303 (tarefa #3) com um hook de veto que estoura passa a ferramenta adiante, e o veto que a recomendação promete não existe.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "WebFetch https://code.claude.com/docs/en/agent-sdk/hooks, trechos 'shell command hooks from settings files when the corresponding settingSources' e 'Requires TypeScript Agent SDK v0.3.317 or later'"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Subir o SDK do bridge para >= 0.3.317 e armar os vetos da persona com onFailure:'block', provado por mutante (callback que lança, ferramenta bloqueada)",
+     "medida": "Lida a primária em 2026-11-06. Não medido no bridge: a versão atual (0.3.303, tarefa #3) está abaixo do piso. É condição futura."
+    },
+    "triage": "bloqueia"
+   },
+   {
+    "target": "Cortada por orçamento: o proxy fora da fronteira dá auditoria central; dentro da allowlist o agente pode exfiltrar",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmada pela primária secure-deployment: 'You can set up this proxy to enforce domain allowlists, inject credentials, and log all traffic' e 'Within your proxy's allowlist, the agent can send data to any allowed domain.'",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "WebFetch https://code.claude.com/docs/en/agent-sdk/secure-deployment, trecho 'Within your proxy's allowlist, the agent can send data to any allowed domain'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com a primária",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: a auditoria de agente delegado registra sub, act.sub e client_id; o endpoint de troca autentica o cliente",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Foi cortada sem refutação e é critério direto da linha 'identidade e auditoria'. Não verifiquei a fonte. A RFC 8693 exige autenticação de cliente no token endpoint conforme o RFC 6749, o que a torna plausível.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt; fonte securityboulevard 2026/08 sem claim de refutação"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "RFC 8693 §2.1 (client authentication) como primária",
+     "medida": "Não li a RFC nesta passada; o corpus tem C_SUPERACAO_20261105_RFC8693_ACT_CLAIM só sobre §1.1 e §4.1"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: revogar a sessão do usuário não derruba o token do agente; a escada precisa de revogação própria",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cortada sem refutação. É relevante para a escada de autonomia (rebaixar um degrau exige revogar). Não verificada.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt, sem votos de refutação"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "RFC 7009 (revocation) e RFC 8693 lidos para o caso",
+     "medida": "Não procurado nesta passada; nenhum nó do corpus mede revogação do token da persona"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: o artigo RFC 8693 não discrimina entre A, B e C",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A meta-claim é verdadeira e útil: marca que a evidência de identidade é critério e não medida de opção. Foi cortada sem refutação. O efeito dela está na objeção ao achado 12 (nenhuma opção emite act pronto para uso).",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Fonte que meça act num dos três runtimes",
+     "medida": "Procurei nas primárias do Claude Tag lidas: identidade = service account, sem token exchange"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: o Slack classificou o comportamento como intencional (dependência do vendor para corrigir)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cortada sem refutação. É um sinal de lock-in em B e em C (a correção depende do vendor). Não reli.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt; fonte promptarmor do achado 13"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Releitura do relato PromptArmor",
+     "medida": "Não relido nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: mensagens de canal público são pesquisáveis por todos, e qualquer membro pode plantar injeção",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Reforçada por primária do Claude Tag: 'By default, workspace search covers public channels across the workspace, including ones Claude hasn't been added to' (restrict-access.md, linha 208, padrão 'All public channels') e 'workspace notes it saves from a public channel are read by sessions in every channel'. A superfície de injeção de B no padrão é o workspace inteiro.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/admins/restrict-access.md, trecho 'workspace search covers public channels across the workspace, including ones Claude hasn't been added to'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com a primária do Claude Tag",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: a citação de fontes pode omitir a mensagem maliciosa",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cortada sem refutação; afeta a auditoria. Não verificada.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Transcrição completa como trilha (data-lifecycle: o transcript guarda 'what Claude retrieved while working')",
+     "medida": "data-lifecycle lido: o transcript guarda o que foi recuperado, mas só pode ser lido pela Compliance API no Enterprise, então não vale para todo adotante"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: o Slack restringe armazenamento por terceiros; o Marketplace é o único canal comercial apropriado",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Mesma família da primária de rate limit confirmada. Pesa contra C fora do Marketplace e condiciona A ao app interno. Os termos não foram relidos.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt; ver https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Texto dos API Terms do Slack",
+     "medida": "Não lido nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: a Real-time Search API em beta limitado",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cortada sem refutação. O estado em 2026-11 não foi medido, e a claim é datada pela página antiga.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Estado atual da Real-time Search API",
+     "medida": "Não buscado; exige busca externa atual"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: no DM o Claude Tag roda com a conta claude.ai de quem enviou",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Confirmada pela primária: 'One-to-one DMs with @Claude from a member who has connected a Claude account run on that member's own claude.ai account instead'. Para a persona de serviço, o DM em B roda como o maestro se o maestro mandar DM, o que viola 'nunca como o maestro', a menos que o Owner desligue DMs ('Allow direct messages' vem ligado por padrão).",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/concepts/security-and-data.md, trecho 'run on that member's own claude.ai account instead'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "Reinstalar com a restrição: em B, desligar DMs",
+     "medida": "WebFetch em 2026-11-06 (security-and-data.md e restrict-access.md, linha 302)"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Cortada por orçamento: lançado em 23/06/2026; JIT credential grants e identity-aware overlay ainda não entregues",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A data bate com o beta confirmado. A parte das melhorias não entregues é sinal de maturidade e foi cortada sem refutação, sem verificação contra o changelog atual.",
+    "criterio": {
+     "id": "E3_DESCARTE_SEM_MEDIDA",
+     "comando": "cortada por orçamento no prompt; fonte jp.tenable.com sem refutação"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Release notes atuais do Claude Tag",
+     "medida": "Não lidas; todas as páginas lidas ainda dizem 'public beta'"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: claude.com/docs/claude-tag/admins/audit.md",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Lida agora. Ela muda o achado 8: lista quatro trilhas (página Activity com 'Network events' por hora, arquivos de memória, atribuição por ato, logs do serviço conectado) e 'There is no per-action log of every task and who asked'.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/admins/audit.md"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "A própria página, lida",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: claude.com/docs/claude-tag/admins/restrict-access.md",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Lida agora: padrão 'anyone in such a channel can address it'; resposta sem menção 'when it judges a reply is warranted' (contradiz 'atendimento por menção' se Respond automatically ficar ligado, 'on by default'); audit log de channel manager; aprovação de ferramenta negada a convidados.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "WebFetch https://claude.com/docs/claude-tag/admins/restrict-access.md, trecho 'Claude may also respond to a message that doesn't mention it'"
+    },
+    "superacao": {
+     "classe": "entrega",
+     "achada": true,
+     "o_que": "A própria página, lida",
+     "medida": "WebFetch em 2026-11-06"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: claude.com/docs/claude-tag/admins/for-slack-admins.md",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Não lida. Cobre os escopos OAuth do app Slack, que a linha de segurança de B precisa.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run com answersGap sobre os escopos Slack do app Claude"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Ler a página",
+     "medida": "Não lida nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: code.claude.com/docs/en/slack",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Não lida. É o Claude Code no Slack, uma variante de B distinta do Claude Tag, e a matriz não a considera.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run sobre Claude Code in Slack"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Ler a página",
+     "medida": "Não lida nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: claude.com/docs/connectors/slack/index",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Não lida. Seria o conector Slack (MCP) que A poderia usar em vez da Web API direta.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run sobre o conector Slack"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Ler a página",
+     "medida": "Não lida nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: claude.com/claude-in-slack",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Página de produto, de baixo valor diante das docs tier 9 lidas. Mesmo assim, a lacuna de preço por assento de B não foi fechada.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run sobre custo por assento ou uso de B (só 'spend limits' por canal)"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Página de preço do Claude Tag",
+     "medida": "Não buscada; restrict-access.md só cita '$50 of usage' para DMs sem conta e limites de gasto"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: dev.to, guia do Agent SDK 2026",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Fonte secundária de baixo tier, superada pelas primárias lidas agora: code.claude.com/docs/en/agent-sdk/hooks e agent-sdk/secure-deployment cobrem hospedagem, isolamento e hooks com mais autoridade."
+   },
+   {
+    "target": "Fonte não lida: knowledge.workspace.google.com, gmail log events",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Não lida. É a trilha de auditoria da triagem de e-mail, um dos três canais do requisito. Nenhuma claim cobre a auditoria do canal de e-mail.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run sobre auditoria do e-mail triado"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Ler a página",
+     "medida": "Não lida nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: workos.com, delegação OAuth multi-hop",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Não lida. Cobre act aninhado (persona, depois subagente, depois kg_mcp), exatamente a cadeia de A.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run sobre delegação multi-hop"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Ler a página",
+     "medida": "Não lida nesta passada"
+    },
+    "triage": "limite"
+   },
+   {
+    "target": "Fonte não lida: arcade.dev, construir agente Slack com o Claude Tag",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Não lida. É um vendor de mercado (C) que se acopla ao Claude Tag, uma variante híbrida B+C fora da matriz.",
+    "criterio": {
+     "id": "E4_LACUNA_ABERTA",
+     "comando": "nenhuma claim do run sobre o Arcade"
+    },
+    "superacao": {
+     "classe": "nenhuma",
+     "achada": false,
+     "o_que": "Ler a página",
+     "medida": "Não lida nesta passada"
+    },
+    "triage": "limite"
+   }
+  ],
+  "recommendation": "Recomendo a opção A: bot próprio no Agent SDK, hospedado no onion-bridge, com o kg_mcp como ferramenta fora da fronteira do agente. É a única opção em que o veto do adotante roda no runtime. A primária de hooks do SDK diz que os hooks de shell do .claude/settings.json carregam pelo settingSources padrão e que o PreToolUse pode devolver deny, ask ou defer. B não documenta hook do adotante. Em B, a variante self-hosted perde os conectores ('Claude can't use the connectors an admin adds'), então não cumpre ao mesmo tempo 'núcleo local' e 'triagem dos canais conectados'. B também é incompatível com ZDR, CMEK e HIPAA e guarda transcrições sem retenção automática. C sai pela classe Drift: o vendor concentra tokens de muitos clientes, e um bot fora do Marketplace fica limitado a 1 req/min e 15 objetos.\n\nA recomendação vale só sob estas condições, tiradas das objeções que sobreviveram:\n\n1. **Veto que não falha aberto (bloqueia).** Subir o SDK do bridge de 0.3.303 para 0.3.317 ou mais e armar os vetos com onFailure:'block'. Antes de declarar o veto, provar com um mutante: um callback que lança precisa bloquear a ferramenta. Sem isso, 'A PreToolUse guard that crashes then lets the tool call reach the normal permission flow'.\n2. **Exit 2 não é fronteira de segurança.** Vale D_EXIT2_COUPLING_WORDING_2026_11, e a exfiltração pelo texto da resposta não passa por tool call. O post no Slack deve ser uma ferramenta própria atrás de deny/ask, e o modo rascunho com aprovação do maestro é o controle real do piloto.\n3. **Um app Slack interno por adotante, nunca um app distribuído pelo core.** Só o app interno escapa do Tier 1 em conversations.history e conversations.replies.\n4. **Isolamento pelo degrau 2 já em produção.** Usar o runner com DynamicUser, ProtectHome e IPAddressDeny. Não usar bwrap nem Docker nesta VPS: o bwrap falha por apparmor_restrict_unprivileged_userns, e o Docker fura o ufw.\n5. **Credenciais fora da fronteira.** Slack, e-mail e task manager entram por ferramenta ou broker fora da fronteira (opção 5 do grafo chat-agent-isolation), porque o bridge já teve um .env lido por um convidado.\n6. **Identidade.** O bot token do Slack é a identidade de serviço. Declarar como lacuna aberta que o claim act do RFC 8693 só existe se o operador rodar um emissor de token exchange, sobre a raiz de confiança A2A do bridge. Nenhuma das três opções o entrega hoje.\n7. **Corrigir a matriz antes de levar ao maestro.** B TEM identidade de serviço em canais (a refutação estava errada e foi reinstalada pela primária). A auditoria de B é parcial porque não registra quem pediu cada ato e deixa de fora o tráfego git e MCP. O 'só desconexão e remoção de escopo' do achado 8 está errado. A escada de B é parcialmente expressável por host, caminho e método no Agent Proxy.\n\nB fica como ponte opcional nomeada, só para um adotante não regulado e com A como alternativa local, configurada assim:\n- DMs desligadas, porque no DM o Claude Tag roda na conta de quem enviou;\n- 'Respond automatically' desligado;\n- 'Restrict to your organization' ligado;\n- busca limitada aos canais em que o Claude está;\n- credenciais só em canais privados.",
+  "sealedBy": "maestro (nó D_ open no grafo; tabela de selagem do /meta:drive)"
+ },
+ "stats": {
+  "anglesTopic": 5,
+  "anglesFixed": 5,
+  "sources": 15,
+  "claims": 65,
+  "verified": 25,
+  "confirmed": 16,
+  "refuted": 9,
+  "unverified": 0,
+  "dupes": 2,
+  "maxFetch": 15,
+  "maxVerify": 25
+ },
+ "overcoming": {
+  "found": 24,
+  "nodesCounted": 24,
+  "edgesCounted": 24,
+  "base": {
+   "nodes": 0,
+   "edges": 0,
+   "measured": true
+  },
+  "recusedVerifyVotes": 0,
+  "recusedElenxo": 0
+ }
+}
