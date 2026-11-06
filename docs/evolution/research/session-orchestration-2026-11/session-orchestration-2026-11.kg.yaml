@@ -59,14 +59,50 @@ nodes:
     plane: DEV
     status: confirmed
     impact: 3
-    confidence: 0.7
-    verified_at: "2026-11-03"
-    verified_against: "estratégia 1 do DIARIO.md; nenhuma bancada cheia em paralelo foi registrada na janela"
-    label: "A CPU da VPS foi coordenada por um lock social declarado: janela do dono, peers seguram bancada cheia e avisam antes de rodar algo pesado. Funciona com três sessões; não há registro que o faça cumprir."
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "estratégia 1 e item 23 do DIARIO.md; desde 2026-11-06 a regra é a peça ops/load-lease.sh, ligada no pre-commit (antes da faixa de bancada), no pr-finalize (antes do pré-voo) e no run_all.sh do lab, com a família load_lease da bancada (casos a a j, cada um com mutante)"
+    label: "A CPU da VPS era coordenada por um lock social declarado (janela do dono, peers seguram bancada cheia e avisam). Desde 2026-11-06 a regra de carga é mecanismo: ops/load-lease.sh espera o load sair de 15 ou mais até abaixo de 12, com teto de 30 min e saída distinguível, e dá uma vaga única de bancada cheia por flock."
+    narrative: "Antes da peça, medido na noite de 2026-11-05: cada agente escrevia o seu laço de espera com teto diferente, um lab esperava por 16 e seguia calado no teto de 600 s, houve espera por `pgrep -f` que casa o próprio shell, e o pre-commit de uma forja rodou 192 famílias por 70 min com o load entre 13 e 16. A peça mantém os números de hoje (ops/load-lease.conf: HIGH 15, RESUME 12); o que segue social é quem NÃO passa pelos três chamadores (um agente que roda bancada à mão sem o lease). A régua derivada está aberta em D_SO_LIMITES_DERIVADOS_DO_LEASE_1106."
     provenance:
-      source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
-      locator: "estratégia 1"
-      method: "leitura: DIARIO.md desta pasta"
+      source: "ops/load-lease.sh"
+      locator: "cabeçalho (contrato) e família run_load_lease_selftests em .claude/validation/lint-selftest.sh"
+      method: "medição: bancada da família load_lease e dogfood do pr-finalize sob carga sintética, 2026-11-06"
+      locality: "repo"
+  - id: E_SO_PSI_CONTRA_LOAD_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-06"
+    evidence_class: measurement
+    verified_against: "sysstat desta VPS (sar -q ALL, 878 intervalos de 10 min, 2026-10-30 a 2026-11-06, 8 vCPUs); série e script em data/psi-vs-load-2026-11-06.tsv e data/psi-vs-load.py desta pasta"
+    label: "Na VPS, o PSI de CPU do instante (some avg10) prevê a espera por CPU dos 10 min seguintes melhor que o load de 1 min (correlação 0,83 contra 0,68). A régua de hoje (15) pegou só 6 dos 15 intervalos congestionados e 1 dos 7 da janela que derrubou o gate (2026-11-05 22:00 a 23:10 UTC, espera de 24 a 61%)."
+    trace: "docs/evolution/research/session-orchestration-2026-11/data/psi-vs-load.py"
+    narrative: "Alvo: intervalo seguinte com 40% ou mais do tempo com tarefa esperando CPU (15 de 877). Pegam: load 15 → 6 (7 alarmes falsos); load 12 → 13 (19); psi 30 → 13 (22); load 15 OU psi 30 → 13 (22); load 12 OU psi 30 → 14 (27). Com o alvo de 30% (34 casos): load 12 → 22 (10), psi 30 → 25 (10), load 15 OU psi 30 → 25 (10). O dogfood do lease confirmou o atraso do load: com 6 giradores encerrados, o PSI caiu de 64% para 19% no mesmo instante em que o load ainda estava em 11,25. Memória não é o limite hoje: 25 GB disponíveis de 32, PSI de memória 0 (free e ⟨pressão de memória do kernel⟩, 2026-11-06 03:00 UTC). Teto do instrumento: amostra de 10 em 10 min, o pico curto entre duas amostras não aparece."
+    provenance:
+      source: "⟨arquivos diários do sysstat da VPS, de 2026-10-30 a 2026-11-06⟩"
+      locator: "sadf -d -- -q ALL; junção por instante de ldavg-1, runq-sz, %scpu-10 e %scpu"
+      method: "medição: correlação e tabela de acerto por limiar, script versionado"
+      locality: "host"
+  - id: D_SO_LIMITES_DERIVADOS_DO_LEASE_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "E_SO_PSI_CONTRA_LOAD_1106 e `bash ops/load-lease.sh status`; nenhuma opção aplicada: a régua vigente segue 15/12 sem PSI"
+    label: "Proposta para o maestro selar: a régua do lease de carga muda? Opção 1 (recomendada pela medida): manter 15/12 e ligar o PSI de CPU em 30 como 2º sinal (uma linha em ops/load-lease.conf). Opção 2: régua derivada de nproc, HIGH 12 (1,5×nproc) e RESUME 8 (nproc). Opção 3: manter como está."
+    narrative: "Por que a 1: muda o mínimo (os números que as peers já respeitam ficam) e pega 13 dos 15 intervalos congestionados contra 6 de hoje, com 22 alarmes falsos em 877; a 2 pega 13 também, com 19, mas desloca a régua que as sessões aprenderam e não acompanha a fila tão cedo quanto o PSI. A memória entra como teto próprio de labs simultâneos (disponível menos 4 GB, 1 GB por lab: 20 hoje), sem força de bloqueio enquanto o PSI de memória for 0. Refutação: uma semana de série com o PSI ligado em que os alarmes falsos travem trabalho que não congestionaria (mais de 1 em 10 esperas sem espera média de 30% no intervalo seguinte) rebaixa a opção 1."
+    provenance:
+      source: "docs/evolution/research/session-orchestration-2026-11/data/psi-vs-load.py"
+      locator: "saída do script sobre psi-vs-load-2026-11-06.tsv"
+      method: "derivado: proposta do core a partir de E_SO_PSI_CONTRA_LOAD_1106, 2026-11-06"
       locality: "repo"
   - id: C_SO_REVISAO_EM_TRES_CAMADAS
     node_type: claim
@@ -250,3 +286,9 @@ edges:
   - from: D_SO_DIRECAO_ACEITA_E_PASSO_A_PASSO_DO_GATILHO_1104
     to: D_SO_MECANISMO_EM_DEGRAUS
     edge_type: TRACES_TO
+  - from: E_SO_PSI_CONTRA_LOAD_1106
+    to: D_SO_LIMITES_DERIVADOS_DO_LEASE_1106
+    edge_type: SUPPORTS
+  - from: C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL
+    to: D_SO_LIMITES_DERIVADOS_DO_LEASE_1106
+    edge_type: SUPPORTS

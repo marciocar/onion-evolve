@@ -3,9 +3,13 @@
 set -u -o pipefail
 B="$(cd "$(dirname "$0")/.."; pwd)"
 LOG="$B/run_all.log"
+# A espera de carga é a peça única do core (ops/load-lease.sh), com a régua da máquina (ocupado em 15,
+# retoma abaixo de 12). Até 2026-11-06 este lab esperava por 16 por conta própria e, no teto de 600 s,
+# seguia calado. Agora o teto estourado PARA a rodada e diz o load no log.
+LEASE="$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)/ops/load-lease.sh"
 wait_load() {
-  local t=0
-  while [ "$(cut -d. -f1 /proc/loadavg)" -ge 16 ] && [ "$t" -lt 600 ]; do sleep 20; t=$((t+20)); done
+  [ -f "$LEASE" ] || { echo "PARADO: lease de carga ausente ($LEASE)" >> "$LOG"; exit 6; }
+  ONION_LOAD_LEASE_WHO=lab-run_all bash "$LEASE" wait --max 1800 2>> "$LOG" || { echo "PARADO: carga (load-lease rc=$?)" >> "$LOG"; exit 6; }
 }
 disk_ok() { [ "$(df --output=avail -BG "$B" | tail -1 | tr -dc 0-9)" -ge 20 ]; }
 gate() { # gate <celula> <veredito esperado>: confere as 3 repeticoes

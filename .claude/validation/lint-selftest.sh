@@ -58,6 +58,12 @@ set -euo pipefail
 # ainda: `GIT_CONFIG_*` aplica-se a TODA invocação de git na árvore de processos. Desativar o gc
 # num sandbox descartável não custa nada — ele vive segundos e é apagado.
 export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=gc.auto GIT_CONFIG_VALUE_0=0
+# ── A BANCADA JÁ FOI ADMITIDA PELO LEASE DE CARGA (ops/load-lease.sh, 2026-11-06) ────────────────
+# Quem chama a bancada (o pre-commit, o pré-voo do pr-finalize) espera a carga ANTES. Dentro dela, uma
+# família que invoca o hook num sandbox não pode esperar de novo: com a própria bancada pondo o load em
+# 15, o hook de dentro esperaria o teto inteiro (30 min) por uma carga que a mãe dele gera. O lease lê a
+# marca e passa direto, dizendo "aninhado". A família load_lease a tira (env -u) para julgar o lease.
+export ONION_LOAD_LEASE_HELD="${ONION_LOAD_LEASE_HELD:-bench}"
 # ── A BANCADA NÃO PODE MORRER CALADA ───────────────────────────────────────────────────────────
 # Medido em 2026-08-08: reescrevi um mutation test usando `cmd; rc=$?` — padrão que, sob `set -e`,
 # MATA a suíte no `cmd` que retorna != 0, antes da atribuição. A bancada abortou logo depois do caso
@@ -52785,6 +52791,134 @@ EOF_MUT
   rm -rf "${d}"
 }
 _family run_plugin_write_guard_selftests
+
+# ── LEASE DE CARGA DA MÁQUINA (ops/load-lease.sh, 2026-11-06) ──────────────────────────────────────
+# POR QUE EXISTE: a regra de carga da VPS era acordo entre sessões (C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL), e
+# cada agente a reescrevia com um teto diferente; um lab esperava por 16 e seguia calado no teto. A peça é
+# única agora, e a família prova os quatro estados (livre, ocupado, teto estourado, vaga disputada) mais a
+# histerese, o rc do comando, o aninhamento e a ligação nos chamadores — cada caso contra a cópia LIMPA
+# (provada verde no mesmo arranjo) e contra um mutante que tem de reprovar.
+# O SUT roda numa cópia em tmp, com loadavg/PSI/vaga FALSOS (ONION_LOAD_SOURCE, ONION_LOAD_PSI_DIR,
+# ONION_LOAD_LEASE_DIR): a carga real da máquina nunca decide o caso. `env -u` tira a marca de aninhamento
+# da bancada e o GITHUB_ACTIONS do CI, que fariam o lease passar direto.
+run_load_lease_selftests() {
+  echo ""
+  echo "▸ load-lease — espera/checa a carga e a vaga de bancada cheia (ops/load-lease.sh)"
+  local sut="${REPO_ROOT}/ops/load-lease.sh" conf="${REPO_ROOT}/ops/load-lease.conf"
+  if [ ! -f "${sut}" ] || [ ! -f "${conf}" ]; then record_fail "load-lease: SUT ausente" "${sut} ou ${conf} não existe"; return; fi
+  command -v flock >/dev/null 2>&1 || { record_skip "load-lease: flock ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/psi"; printf 'some avg10=1.00 avg60=1.00 avg300=1.00 total=1\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n' > "${d}/psi/cpu"
+  cp "${conf}" "${d}/load-lease.conf"
+  _llset() { printf '%s 1.00 1.00 1/100 1\n' "$1" > "${d}/loadavg.tmp" && mv -f "${d}/loadavg.tmp" "${d}/loadavg"; }
+  # _llr <sut> <args…> → "rc|saída"; LLR_ENV extra
+  _llr() {
+    local w="$1" rc=0 out; shift
+    # shellcheck disable=SC2086
+    out="$(env -u ONION_LOAD_LEASE_HELD -u GITHUB_ACTIONS -u ONION_LOAD_LEASE -u ONION_LOAD_HIGH -u ONION_LOAD_RESUME \
+      -u ONION_LOAD_PSI_HIGH -u ONION_LOAD_WAIT_MAX -u ONION_LOAD_LEASE_CONF LC_ALL=C ONION_LOAD_SOURCE="${d}/loadavg" \
+      ONION_LOAD_PSI_DIR="${d}/psi" ONION_LOAD_LEASE_DIR="${d}/vaga" ONION_LOAD_POLL=1 ${LLR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  # _llcase <nome> <OLD> <NEW> <função> — intacto (cópia limpa ao lado do conf) e mutante (OLD→NEW, 1ª ocorrência)
+  _llcase() {
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    cp "${sut}" "${d}/w.sh"; rm -rf "${d}/vaga"
+    "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "load-lease: ${name}"; else record_fail "load-lease: ${name}" "${LL_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${d}/m.sh"
+    rm -rf "${d}/vaga"
+    "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "load-lease: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # segura a vaga num processo à parte (o "outro dono") até o arquivo de parada aparecer
+  _llhold() { mkdir -p "${d}/vaga"; chmod 700 "${d}/vaga"; rm -f "${d}/held" "${d}/stop"
+    ( exec 8>"${d}/vaga/full-bench.lock"; flock -x 8; : > "${d}/held"; i=0; while [ ! -e "${d}/stop" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i+1)); done ) &
+    LL_HP=$!; local i; for i in $(seq 1 100); do [ -e "${d}/held" ] && return 0; sleep 0.1; done; return 1; }
+  _llunhold() { : > "${d}/stop"; wait "${LL_HP}" 2>/dev/null || true; rm -f "${d}/held" "${d}/stop"; }
+  # (a) livre: load 3 → check rc 0 e wait libera na chegada
+  _c_free() { _llset 3.00; local a b; a="$(_llr "$1" check)"; b="$(_llr "$1" wait --max 5)"
+    LL_WHY="check ${a} · wait ${b}"; [ "${a%%|*}" = 0 ] && [ "${b%%|*}" = 0 ] && [[ "${b#*|}" == *"liberou"*"na chegada"* ]]; }
+  _llcase "(a) livre: load 3 < 15 ⇒ check rc 0, wait libera na chegada" \
+    'if _ll_ge "${l}" "${LL_HIGH}"; then' 'if _ll_ge "${l}" "0"; then' _c_free
+  # (b) ocupado NA BORDA: load 15.00 ≥ 15 ⇒ rc 3 (o ≥ é a regra: "em 15 ou mais")
+  _c_busy() { _llset 15.00; local a; a="$(_llr "$1" check)"; LL_WHY="${a}"; [ "${a%%|*}" = 3 ] && [[ "${a#*|}" == *"OCUPADO"* ]]; }
+  _llcase "(b) ocupado na borda: load 15.00 ⇒ check rc 3" \
+    "'BEGIN { exit !(a >= b) }'" "'BEGIN { exit !(a > b) }'" _c_busy
+  # (c) teto estourado: load 20 o tempo todo, teto 2 s ⇒ rc 4 dizendo o load (nunca segue calado)
+  _c_ceiling() { _llset 20.00; local a; a="$(_llr "$1" wait --max 2)"; LL_WHY="${a}"
+    [ "${a%%|*}" = 4 ] && [[ "${a#*|}" == *"TETO ESTOURADO com load 20.00"* ]]; }
+  _llcase "(c) teto estourado: load 20 por 2 s ⇒ wait rc 4 com o load na frase" \
+    'o trabalho pesado NÃO foi liberado" >&2
+      return 4' 'o trabalho pesado NÃO foi liberado" >&2
+      return 0' _c_ceiling
+  # (d) histerese: chega a 16, cai a 13 (abaixo de 15 mas não de 12: NÃO libera), depois 11 ⇒ libera em 11
+  _c_hyst() { _llset 16.00; ( sleep 1.5; _llset 13.00; sleep 3; _llset 11.00 ) & local wp=$! a
+    a="$(_llr "$1" wait --max 20)"; wait "${wp}" 2>/dev/null || true; LL_WHY="${a}"
+    [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"liberou — load 11.00 < 12"* ]]; }
+  _llcase "(d) histerese: 16 → 13 não libera; libera só abaixo de 12" \
+    'if _ll_lt "${l}" "${LL_RESUME}" && ! _ll_psi_busy; then' 'if _ll_lt "${l}" "${LL_HIGH}" && ! _ll_psi_busy; then' _c_hyst
+  # (e) vaga disputada: outro dono segura a vaga ⇒ run estoura o teto (rc 4) SEM rodar o comando
+  _c_contended() { _llset 3.00; rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
+    local a; a="$(_llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"vaga de bancada cheia"* ]]; }
+  _llcase "(e) vaga disputada: outro dono segura ⇒ run rc 4 e o comando NÃO roda" \
+    'if ! flock -n "${LL_FD}"; then' 'if false; then' _c_contended
+  # (f) run devolve o rc do comando (e roda com a vaga livre)
+  _c_rc() { _llset 3.00; local a; a="$(_llr "$1" run --max 5 -- bash -c 'exit 7')"; LL_WHY="${a}"; [ "${a%%|*}" = 7 ]; }
+  _llcase "(f) run livre roda o comando e devolve o rc dele (7)" \
+    '"$@" {LL_FD}>&-; rc=$?' '"$@" {LL_FD}>&-; rc=0' _c_rc
+  # (g) aninhado: o pai segura a vaga e exporta ONION_LOAD_LEASE_HELD ⇒ o filho NÃO disputa (sem deadlock)
+  _c_nested() { _llset 20.00; rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
+    local a; a="$(LLR_ENV="ONION_LOAD_LEASE_HELD=${d}/vaga/full-bench.lock" _llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [ -e "${d}/ran" ] && [[ "${a#*|}" == *"aninhado"* ]]; }
+  _llcase "(g) aninhado: com a vaga do pai e load 20, o filho roda direto e diz 'aninhado'" \
+    'if [ -n "${ONION_LOAD_LEASE_HELD:-}" ]; then echo' 'if false; then echo' _c_nested
+  # (h) régua inválida (RESUME > HIGH) ⇒ rc 2, nunca julga com histerese ao contrário
+  _c_bad() { _llset 3.00; local a; a="$(LLR_ENV='ONION_LOAD_RESUME=20' _llr "$1" check)"; LL_WHY="${a}"; [ "${a%%|*}" = 2 ]; }
+  _llcase "(h) régua invertida (RESUME 20 > HIGH 15) ⇒ rc 2" \
+    "'BEGIN { exit !(r > h) }'" "'BEGIN { exit 1 }'" _c_bad
+  # (j) PSI como 2º sinal (desligado por default): ligado em 30, load 3 e psi 50 ⇒ ocupado
+  _c_psi() { _llset 3.00; printf 'some avg10=50.00 avg60=1.00 avg300=1.00 total=1\n' > "${d}/psi/cpu"; local a
+    a="$(LLR_ENV='ONION_LOAD_PSI_HIGH=30' _llr "$1" check)"
+    printf 'some avg10=1.00 avg60=1.00 avg300=1.00 total=1\n' > "${d}/psi/cpu"; LL_WHY="${a}"
+    [ "${a%%|*}" = 3 ] && [[ "${a#*|}" == *"psi cpu 50.00% ≥ 30"* ]]; }
+  _llcase "(j) PSI ligado em 30: load 3 com psi 50 ⇒ check rc 3" \
+    '[ -n "${LL_PSI_HIGH:-}" ] || return 1' 'return 1' _c_psi
+  # (i) LIGAÇÃO: o pre-commit espera antes da faixa de bancada; o pr-finalize antes do pré-voo; o lab sem o 16
+  local hook="${REPO_ROOT}/.githooks/pre-commit" fin="${REPO_ROOT}/ops/pr-finalize.sh"
+  local lab="${REPO_ROOT}/docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/lab/run_all.sh" ri rm_
+  _c_wired() { awk '/load-lease\.sh"; _bench_pre/ && !l { l = NR } /_LEASE}" wait/ && !w { w = NR } /--affected-staged --local --jobs auto/ && !b { b = NR } END { exit !(l && w && b && l < w && w < b) }' "$1"; }
+  cp "${hook}" "${d}/h.sh"; sed 's#_LEASE}" wait#_LEASE}" check#' "${hook}" > "${d}/hm.sh"
+  ri=1; rm_=1; _c_wired "${d}/h.sh" && ri=0; _c_wired "${d}/hm.sh" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (i) pre-commit espera a carga ANTES da faixa de bancada"
+  else record_fail "load-lease: (i) pre-commit espera a carga ANTES da faixa de bancada" "chamada ao wait ausente ou depois da bancada"; fi
+  _prove_mutation "load-lease: (i) pre-commit (MUT: wait→check)" "${d}/h.sh" "${d}/hm.sh" "${ri}" "${rm_}"
+  _c_wired_fin() { awk '/load_lease_(wait|acquire) / && !w { w = NR } /^_step "0 pré-voo"/ { p = NR } END { exit !(w && p && w < p) }' "$1"; }
+  cp "${fin}" "${d}/f.sh"; sed -E 's#load_lease_(wait|acquire) #load_lease_none #g' "${fin}" > "${d}/fm.sh"
+  ri=1; rm_=1; _c_wired_fin "${d}/f.sh" && ri=0; _c_wired_fin "${d}/fm.sh" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (i) pr-finalize espera a carga ANTES do pré-voo"
+  else record_fail "load-lease: (i) pr-finalize espera a carga ANTES do pré-voo" "load_lease_wait/acquire ausente ou depois do passo 0"; fi
+  _prove_mutation "load-lease: (i) pr-finalize (MUT: sem a espera)" "${d}/f.sh" "${d}/fm.sh" "${ri}" "${rm_}"
+  if [ -f "${lab}" ]; then
+    _c_lab() { grep -q 'load-lease.sh' "$1" && ! grep -qE 'loadavg\)" -ge [0-9]' "$1"; }
+    cp "${lab}" "${d}/l.sh"; { printf '%s\n' 'while [ "$(cut -d. -f1 /proc/loadavg)" -ge 16 ]; do sleep 20; done'; cat "${lab}"; } > "${d}/lm.sh"
+    ri=1; rm_=1; _c_lab "${d}/l.sh" && ri=0; _c_lab "${d}/lm.sh" && rm_=0
+    if [ "${ri}" = 0 ]; then record_pass "load-lease: (i) lab run_all.sh usa o lease, sem número próprio"
+    else record_fail "load-lease: (i) lab run_all.sh usa o lease, sem número próprio" "o lab ainda espera por número próprio ou não chama o lease"; fi
+    _prove_mutation "load-lease: (i) lab (MUT: espera própria por 16)" "${d}/l.sh" "${d}/lm.sh" "${ri}" "${rm_}"
+  else
+    record_fail "load-lease: (i) lab run_all.sh" "${lab} sumiu — a ligação do lab não foi julgada"
+  fi
+  rm -rf "${d}"
+}
+_family run_load_lease_selftests
 
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
