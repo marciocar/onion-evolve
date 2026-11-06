@@ -2,7 +2,8 @@
 branch: feat/register-onion-vps-ops
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9e8aeeba9f6b0916d0d5c53929d6477854120949c2685f80138944e5c374530f
+reviewed_code_sha256: 7fd086bec3b11fd610d0c1f8605bbf0a3bc74e88bc1f53c49ad45148e192f112
 findings_total: 4
 findings_real: 2
 findings_blocking: 0

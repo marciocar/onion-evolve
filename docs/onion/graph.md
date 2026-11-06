@@ -790,6 +790,14 @@ onion-standalone	specialization	public-distribution
 onion-standalone	specialization	role-scoped-adopt	
 onion-standalone	tier	standalone	
 onion-standalone	trust-advises	onion-evolve	
+onion-vps-ops	adopts	onion-evolve	
+onion-vps-ops	mode	greenfield	
+onion-vps-ops	pin	6760a7bede50	
+onion-vps-ops	specialization	infra	
+onion-vps-ops	specialization	operacao	
+onion-vps-ops	specialization	vps	
+onion-vps-ops	tier	standalone	
+onion-vps-ops	trust-advises	onion-evolve	
 pain-price-specialist	related	product-agent	
 pain-price-specialist	related	research-agent	
 pmbok-specialist	related	/docs/build-compliance-docs	
