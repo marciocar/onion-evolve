@@ -142,7 +142,8 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_against: "2026-11-06: gh repo view marciocar/onion-messaging → PRIVATE; clone em /home/marcio/onion-messaging; adoção greenfield durável no pin 6760a7bede50 (onion/adopt, gate VIVO provado por execução); pin-integrity-check → pin-ok 6760a7bede50; membro onion-messaging no members.yaml (members-validate valid:true). A main do remoto nasce pelo `!` do maestro: a guarda de repo alheio negou o push da main à sessão, corretamente."
     owner: maestro
     x_due: "2026-11-06"
     impact: 4

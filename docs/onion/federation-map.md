@@ -36,6 +36,7 @@ flowchart TD
   maestro_notebook_test["maestro-notebook-test<br/>standalone · greenfield"]:::standalone
   maestro_peer_test["maestro-peer-test<br/>standalone · greenfield"]:::standalone
   onion_vps_ops["onion-vps-ops<br/>standalone · greenfield"]:::standalone
+  onion_messaging["onion-messaging<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -68,6 +69,7 @@ flowchart TD
   maestro_notebook_test -->|adopts| onion_evolve
   maestro_peer_test -->|adopts| onion_evolve
   onion_vps_ops -->|adopts| onion_evolve
+  onion_messaging -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -108,3 +110,4 @@ flowchart TD
 | maestro-notebook-test | standalone | greenfield | a2a-spike | `n/a` |
 | maestro-peer-test | standalone | greenfield | a2a-spike | `n/a` |
 | onion-vps-ops | standalone | greenfield | operacao, infra, vps | `6760a7bede50` |
+| onion-messaging | standalone | greenfield | mensageria, channels-mcp, a2a | `6760a7bede50` |
