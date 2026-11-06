@@ -1066,7 +1066,7 @@
 | 18.0 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
-| 11.2 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
+| 15.0 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
 | 10.0 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
 | 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
