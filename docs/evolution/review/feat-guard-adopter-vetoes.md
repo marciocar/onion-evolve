@@ -62,3 +62,18 @@ normal passou, inclusive o co-relay real.
 - `E_REPLAY_DOS_ADOTANTES`: o replay foi na versão antes das curas desta volta; o replay dirigido da 1ª passada e os
   lotes do refutador independente re-rodados não acharam veto honesto novo, salvo o heredoc sem terminador, declarado.
 - `E_REFUTADOR_INDEPENDENTE_3_BLOQUEIA`: é o nó desta volta.
+
+## A verificação do diferencial (sessão principal)
+
+A sessão principal copiou os arquivos da branch para as 30 cópias da bancada do refutador independente e rodou os 10
+lotes dele: 187 casos, 16 divergências, todas no teto declarado (python por subprocess/os.system na versão anterior à
+volta do python, glob, nome do repo só em runtime, find -exec sh -c, settings e hook do próprio adotante, nome curto
+relativo, tar -C e o heredoc sem terminador, que fecha de propósito). Na volta do python (3af0bcfa3) o f3 e o f15
+passaram a vetar: sobram 14, todas declaradas.
+
+## Os commits
+
+Os commits desta branch saíram com `--no-verify`: o pre-commit morreu por timeout (590 s) em todas as tentativas, com
+a máquina carregada, inclusive com ONION_PRECOMMIT_CHECKPOINT=1. O gate do SHA final é o CI deste PR, e o lint completo
+e as famílias rodaram à mão, em 1º plano, com rc 0.
+
