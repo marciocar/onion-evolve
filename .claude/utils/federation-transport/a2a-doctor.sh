@@ -447,7 +447,7 @@ side_member() {
         bad-signature) nx="a privada local não é a pinada: ver (c) e (d)" ;;
         tooling-absent:*) nx="instale ${reason#tooling-absent:}" ;;
         receiver-unknown) nx="${RECEIVER} não está no registro: confira o --receiver (ou o a2a.sends_to)" ;;
-        receiver-not-a-receiver:*) nx="${RECEIVER} não recebe sinais (só role source ou hub, nunca porta): mande para o seu hub ou para o core" ;;
+        receiver-not-a-receiver:*) nx="${RECEIVER} não recebe sinais pela rede (só role source ou hub, nunca porta; standalone só pela fila local da mesma máquina): mande para o seu hub ou para o core" ;;
         *) nx="leia a camada '${layer}' do gate a2a-verify.sh" ;;
       esac
       put h falha 1 "o gate local VETOU: ${reason} (camada ${layer})" "${nx}"

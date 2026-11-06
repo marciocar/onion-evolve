@@ -32,5 +32,8 @@ Superfície: [`/meta:federation-a2a`](../commands/meta/federation-a2a.md). Doutr
 8. **O receptor é a rota, e é id do registro** (F3): `--receiver` tem forma fechada (1º caractere letra
    ou dígito, sem `/` nem `..`, porque vira nome do arquivo de jti) e só recebe quem é `role: source` ou
    `hub` e não é porta. `aud` é obrigatório: sem ele, o envelope de um receptor valeria no outro.
+   A exceção é a fila local (`--channel local-queue`, 2026-11-06): o standalone registrado recebe se o
+   `local_path` dele existe nesta máquina e é do uid do gate. A prova é o disco, nunca o envelope; o bridge
+   (rota de rede, outra conta) nunca passa a flag.
 7. **Estes motores não viajam para standalone, plugins nem mini** (corte por prefixo no transporte):
    texto que manda o membro rodá-los aponta o pacote de entrada da trilha 2, não o caminho do core.

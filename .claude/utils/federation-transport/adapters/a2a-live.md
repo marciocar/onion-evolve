@@ -37,7 +37,11 @@ Antes de QUALQUER sinal virar ação, delega ao gate obrigatório **`a2a-verify.
 0. **receptor** (desde a F3 do configurador A2A, 2026-10-15): `<self>` tem de RECEBER no registro — `role:
 source` ou `hub`, nunca porta. **Receber pelo canal vivo é só da fonte e dos hubs** (decisão declarada da
 F3): um standalone, regulado ou não, recebe pelo `git-async`, e o `--receiver <standalone>` veta
-`receiver-not-a-receiver`. O never-live-pull (camada 6) vale para o hub regulado. `aud` é obrigatório. ·
+`receiver-not-a-receiver`. **Exceção da fila local** (2026-11-06, `D_GATE_STANDALONE_FILA_LOCAL_1106`): com
+`--channel local-queue`, que só a fila do onion-messaging passa (socket Unix 0600, par de mesmo uid), o
+standalone registrado recebe se o `local_path` dele existe nesta máquina e é do uid que roda o gate; senão
+`receiver-not-local:<motivo>`. Pela rede nada muda. O never-live-pull (camada 6) vale para o hub regulado.
+`aud` é obrigatório. ·
 1. **trust policy** (compõe `trust-topology-check.sh`: origem ∈ policy-as-data do `members.yaml`) ·
 2. **anti-replay** (`jti` single-use) · 3. **janela de timestamp** · 4. **anti-SSRF** (`a2a-ssrf-check.sh` na
 URL do webhook) · 5. **assinatura JWS** (RS256, pubkey pinada por `kid` no JWKS fixture) · 5b. **corpo
