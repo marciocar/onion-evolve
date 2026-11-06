@@ -25,7 +25,7 @@
 #                    FILA LOCAL (2026-11-06, D_GATE_STANDALONE_FILA_LOCAL_1106): com --channel local-queue o gate
 #                    aceita TAMBÉM o receptor role standalone (kind não door), e só se o local_path dele no
 #                    registro for um diretório que EXISTE nesta máquina e PERTENCE ao uid que roda o gate. É a
-#                    fila do onion-messaging (socket Unix 0600, par de mesmo uid) que passa a flag; o remetente
+#                    fila local de mensageria (socket Unix 0600, par de mesmo uid) que passa a flag; o remetente
 #                    não a controla (ela não está no envelope), e o bridge (outro uid, rota de rede) nunca a
 #                    satisfaz. Senão veto receiver-not-local:<motivo>. Pela rede (default --channel network)
 #                    nada muda: standalone segue receiver-not-a-receiver:role-standalone.

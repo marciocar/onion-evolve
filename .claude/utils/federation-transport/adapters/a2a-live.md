@@ -38,7 +38,7 @@ Antes de QUALQUER sinal virar ação, delega ao gate obrigatório **`a2a-verify.
 source` ou `hub`, nunca porta. **Receber pelo canal vivo é só da fonte e dos hubs** (decisão declarada da
 F3): um standalone, regulado ou não, recebe pelo `git-async`, e o `--receiver <standalone>` veta
 `receiver-not-a-receiver`. **Exceção da fila local** (2026-11-06, `D_GATE_STANDALONE_FILA_LOCAL_1106`): com
-`--channel local-queue`, que só a fila do onion-messaging passa (socket Unix 0600, par de mesmo uid), o
+`--channel local-queue`, que só a fila local de mensageria passa (socket Unix 0600, par de mesmo uid), o
 standalone registrado recebe se o `local_path` dele existe nesta máquina e é do uid que roda o gate; senão
 `receiver-not-local:<motivo>`. Pela rede nada muda. O never-live-pull (camada 6) vale para o hub regulado.
 `aud` é obrigatório. ·
