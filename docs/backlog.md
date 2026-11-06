@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**975 itens abertos** em 151 grafo(s) com aberto (de 192 no escopo) · 151 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**973 itens abertos** em 151 grafo(s) com aberto (de 192 no escopo) · 151 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -354,11 +354,21 @@
 | 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
 | 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
 
-## persona-runtime-2026-11 — 31 item(ns)
+## nanochat-onion-2026-10 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 63.2 | `D_PERSONA_RUNTIME_2026_11` | persona-runtime-2026-11 | Runtime da persona de serviço: A bot próprio no Agent SDK/bridge · B-hospedado Claude Tag · B-self-hosted · C bot de mercado  |
+| 63.0 | `Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10` | nanochat-onion-2026-10 | Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina |
+| 30.6 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
+| 16.5 | `C_OPCAO_B_NANOCHAT_STUDY_BENCH` | nanochat-onion-2026-10 | OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e le |
+| 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
+| 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
+| 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
+
+## persona-runtime-2026-11 — 30 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
 | 60.0 | `Q_PERSONA_RUNTIME_2026_11` | persona-runtime-2026-11 | Qual runtime deve servir a persona de serviço do Company Brain de um adotante: A bot próprio no Agent SDK (bridge + kg_mcp), B o |
 | 49.5 | `C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE` | persona-runtime-2026-11 | A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta  |
 | 43.8 | `C_OPCAO_B_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthr |
@@ -389,17 +399,6 @@
 | 3.6 | `C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT` | persona-runtime-2026-11 | No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona;  |
 | 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS` | persona-runtime-2026-11 | Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 all |
 | 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC` | persona-runtime-2026-11 | Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminh |
-
-## nanochat-onion-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 63.0 | `Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10` | nanochat-onion-2026-10 | Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina |
-| 30.6 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
-| 16.5 | `C_OPCAO_B_NANOCHAT_STUDY_BENCH` | nanochat-onion-2026-10 | OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e le |
-| 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
-| 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
-| 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
 ## plugin-write-2026-11 — 13 item(ns)
 
@@ -1043,13 +1042,12 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 24 item(ns)
+## core — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
-| 9.6 | `Q_PS_PESQUISA_DO_RUNTIME_1110` | persona-servico-2026-11 | Pesquisa do runtime da persona de serviço: bot próprio por Agent SDK (com o bridge do core como candidato) contra o assistente n |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |

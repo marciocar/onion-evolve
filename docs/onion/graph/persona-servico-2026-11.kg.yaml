@@ -11,6 +11,9 @@ meta:
   # ═══ TETO: 6 NÓS ═══  (1 sinal + 1 selo das datas + 4 compromissos)
 external_edges:
   - from: Q_PS_PESQUISA_DO_RUNTIME_1110
+    to: "docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml#D_PERSONA_RUNTIME_2026_11"
+    edge_type: TRACES_TO
+  - from: Q_PS_PESQUISA_DO_RUNTIME_1110
     to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_RUNTIME_PESQUISAR_ANTES_1104"
     edge_type: TRACES_TO
   - from: Q_PS_RODADA_DECIDE_D_MA_ARCH_1116
@@ -54,10 +57,12 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-10"
     impact: 4
+    verified_at: "2026-11-06"
+    verified_against: "grafo docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml com radar exit 0 e D_PERSONA_RUNTIME_2026_11 selado pelo maestro em 2026-11-06 (A + ponte B); entregue antes do prazo de 2026-11-10"
     confidence: 0.6
     label: "Pesquisa do runtime da persona de serviço: bot próprio por Agent SDK (com o bridge do core como candidato) contra o assistente nativo do chat corporativo e um bot de mercado, com recomendação."
     narrative: "Pronto quando: um grafo de pesquisa em modo decision pelo /onion-research, com radar exit 0, um nó decision open com as opções nomeadas e a recomendação, e o SYNTHESIS com o contrato de custo, mergeado no core até 2026-11-10. Conduz: a sessão do core."
