@@ -43,9 +43,10 @@
 #    nome de menos de 4 letras por caminho relativo (`cd ../abc`) escapa do pré-filtro; leitura em python -c com
 #    `.replace(`/`.remove(` de string fecha como opaco (falso positivo raro: 0 no replay).
 #  · Teto da 2ª passada (refutador independente, 2026-11-06): brace e glob no caminho (`cor[e]`, `rep{o,}a`, `co*`),
-#    caminho só conhecido em runtime (`R=co; …${R}re`, `$(ls -d …)`), `find … -exec sh -c '…"$1"' _ {}`, git chamado
-#    por python (`subprocess.run([...])`, `os.system`), e a remoção do próprio hook ou a edição do settings.json do
-#    adotante passam. O heredoc sem terminador que cita push ou merge FECHA (era aviso; no adotante, veto).
+#    variável e substituição no NOME do repo (`R=co; …${R}re`, `"$(ls -d …)"`) — o pré-filtro procura o nome
+#    literal e não o acha —, `find … -exec sh -c '…"$1"' _ {}`, python em ARQUIVO, e a remoção do próprio hook ou a
+#    edição do settings.json do adotante passam. O python -c que cita um repo registrado com um verbo de escrita do
+#    git (`subprocess.run(['git','-C',<core>,'commit'])`, `os.chdir(<core>); os.system('git commit')`) FECHA. O heredoc sem terminador que cita push ou merge FECHA (era aviso; no adotante, veto).
 #  · Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass por desenho.
 input=$(cat)
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
