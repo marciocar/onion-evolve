@@ -16756,6 +16756,28 @@ STUB
       keys: [acme-8]' "mínimo 2048"
   _fa_vbad "keys sem sends_to" '    a2a:
       keys: [acme-1]' "exige a2a.sends_to"
+  # a FONTE com keys e sem sends_to é válida (2026-11-06: o core assina a volta para vários receptores);
+  # MUTANTE: sem a exceção do kind source, o mesmo registro reprova
+  _fa_reg "${_fa_pinned}"
+  cp "${jwks}/acme-1.pem" "${jwks}/core-x-1.pem"
+  python3 - "${reg}" <<'SRCPY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+a = "  - id: core-x\n    name: core-x\n    role: source\n    kind: source\n"
+assert s.count(a) == 1
+open(p, "w").write(s.replace(a, a + "    a2a: { keys: [core-x-1] }\n"))
+SRCPY
+  local _src_ri=1 _src_mu=1 _mvm; _mvm="$(mktemp)"
+  rc=0; out="$(bash "${mv}" "${reg}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then _src_ri=0; record_pass "federation-a2a: validador aceita a FONTE com a2a.keys e sem sends_to (assina a volta para vários receptores)"
+  else record_fail "federation-a2a: validador fonte sem sends_to" "rc=${rc} out='${out}'"; fi
+  LC_ALL=C sed -e '/if keys and not st and m.get("kind") != "source":/c\        if keys and not st:  # MUTANTE: a fonte também exige sends_to' "${mv}" > "${_mvm}"
+  [ "$(grep -c '# MUTANTE' "${_mvm}")" = "1" ] || record_fail "federation-a2a: (MUT) âncora da fonte sem sends_to" "o sed não trocou EXATAMENTE uma linha"
+  rc=0; out="$(bash "${_mvm}" "${reg}" 2>&1)" || rc=$?
+  { [ "${rc}" -eq 1 ] && _fa_has "${out}" "exige a2a.sends_to"; } && _src_mu=1 || _src_mu=0
+  [ "${rc}" -eq 0 ] && _src_mu=0
+  _prove_mutation "federation-a2a: (MUT) sem a exceção do kind source, a fonte com keys volta a reprovar" "${mv}" "${_mvm}" "${_src_ri}" "${_src_mu}"
+  rm -f "${_mvm}" "${jwks}/core-x-1.pem"
   _fa_vbad "sends_to que é porta" '    a2a:
       sends_to: door-x
       keys: [acme-1]' "não é receptor"

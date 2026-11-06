@@ -33,7 +33,8 @@
 #               .claude/utils/federation-transport/jwks da raiz do repo do registro. A variável
 #               A2A_JWKS_DIR do ambiente NÃO é lida aqui de propósito: exportada numa shell, ela
 #               dava HARD falso na REGRA 66 ou desviava a checagem (achado do refutador da F1a);
-#             · keys não vazio exige sends_to, e sends_to aponta um membro do registro que é
+#             · keys não vazio exige sends_to (menos a FONTE, kind source, que assina a volta para
+#               vários receptores; 2026-11-06), e sends_to, quando há, aponta um membro do registro que é
 #               receptor: role source ou hub, e NÃO porta (kind door). Medido no spike
 #               (C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA): olhar só o role deixava entrar a porta.
 #
@@ -363,7 +364,9 @@ if isinstance(doc, dict):
         if st is not None and not isinstance(st, str):
             err(f"{tag}: a2a.sends_to tem de ser o id (texto) de um receptor, veio {type(st).__name__}")
             st = None
-        if keys and not st:
+        # a FONTE (kind source) assina a volta para VÁRIOS receptores (cada membro, inclusive standalone pela fila
+        # local, D_GATE_STANDALONE_FILA_LOCAL_1106): ela não tem um receptor único, então dispensa sends_to
+        if keys and not st and m.get("kind") != "source":
             err(f"{tag}: a2a.keys não vazio exige a2a.sends_to (o receptor dos sinais dele)")
         if st:
             rcv = by_id.get(st)
