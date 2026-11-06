@@ -44,6 +44,23 @@ set -euo pipefail
 
 VERDICT_ENUM="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"
 NUMERIC_FIELDS="findings_total findings_real tokens duration_min"
+# `findings_blocking` (2026-11-06): quantos dos achados REAIS BLOQUEIAM — o veredito pode sair diferente numa
+# direção previsível ou ao arbítrio de quem conduz, ou o artefato promete o que não entrega; o resto é LIMITE,
+# que entra declarado. Régua: .claude/commands/common/prompts/review-triage.md. OPCIONAL por desenho: os
+# resíduos anteriores não o têm e seguem válidos (histórico não se reescreve). PRESENTE, tem de ser número e
+# caber em 0 ≤ blocking ≤ findings_real — bloqueio que não é achado real é contagem inventada.
+# Lição de origem (curadoria, 2026-11-05): o pré-registro do problem-route passou por 8 versões em 3 h 28 min,
+# cada rodada tratando todo achado como bloqueio; com a triagem pedida na 7ª rodada, fechou em 2 (nó
+# C_REVIEW_TRIAGE_IN_PATH_1105 e vizinhos, grafo curation-process-2026-11 do repo da curadoria).
+_blocking_problem() {  # $1=arquivo → vazio se ok; senão a frase do problema
+  local b r; b="$(_field_of "$1" findings_blocking)"
+  grep -qE '^findings_blocking:' <(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "$1") || return 0
+  case "${b}" in ''|*[!0-9]*) echo "findings_blocking tem de ser número (quantos dos achados reais BLOQUEIAM; 0 se todos são LIMITE), não '${b}'"; return 0 ;; esac
+  r="$(_field_of "$1" findings_real)"
+  case "${r}" in ''|*[!0-9]*) return 0 ;; esac   # o findings_real inválido já é nomeado pela checagem dele
+  [ "$((10#${b}))" -le "$((10#${r}))" ] || echo "findings_blocking (${b}) maior que findings_real (${r}): só achado REAL pode bloquear"
+  return 0
+}
 
 _field_of() {  # $1=arquivo $2=campo — só o frontmatter, sem aspas
   awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "$1" | sed -n "s/^$2:[[:space:]]*//p" | head -1 | tr -d '"'
@@ -62,6 +79,7 @@ _schema_problems() {  # $1=arquivo → uma linha por problema; vazio = o frontma
   for v in ${NUMERIC_FIELDS}; do
     case "$(_field_of "${f}" "${v}")" in ''|*[!0-9]*) echo "${v} tem de ser número (0 = não medido, e diga isso em 'nota:')" ;; esac
   done
+  _blocking_problem "${f}"
   v="$(_field_of "${f}" verdict)"
   _verdict_ok "${v}" || echo "verdict '${v}' fora do vocabulário fechado (${VERDICT_ENUM})"
   return 0
@@ -71,12 +89,17 @@ case "${1:-}" in
   --skeleton)
     _br="${2:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null)}"
     printf -- '---\nbranch: %s\npr: pendente\ndate: %s\nreviewed_diff_sha256: pendente\n' "${_br}" "$(date +%F)"
-    for _f in ${NUMERIC_FIELDS} findings_fixed; do printf '%s: PREENCHA\n' "${_f}"; done
+    # findings_blocking logo depois de findings_real: é a partição dele (os reais que BLOQUEIAM)
+    for _f in ${NUMERIC_FIELDS} findings_fixed; do printf '%s: PREENCHA\n' "${_f}"
+      [ "${_f}" = findings_real ] && printf 'findings_blocking: PREENCHA\n'; done
     # a orientação vai no CORPO: comentário na linha do campo vira parte do valor quando se preenche só o começo
     printf 'verdict: PREENCHA\nelenxo: PREENCHA\nreviewer: PREENCHA\nnota: ""\n---\n\n'
     printf '# Passada adversarial: `%s`\n\n' "${_br}"
     printf '> Preencha o frontmatter: os campos numéricos são números (0 = não medido, dito em `nota:`); `verdict` é um\n'
     printf '> de: %s; `elenxo` é sim ou nao. `reviewed_diff_sha256: pendente` fica: o pr-finalize carimba.\n' "${VERDICT_ENUM}"
+    printf '> `findings_blocking` = quantos dos reais BLOQUEIAM (0 ≤ blocking ≤ real); o resto é LIMITE e vai em\n'
+    printf '> `## Limites declarados`. Aqui 0 quer dizer "nenhum bloqueia": se a passada não triou, APAGUE a linha\n'
+    printf '> (ausente = não triado). Régua: `.claude/commands/common/prompts/review-triage.md`.\n'
     printf '> Confira com `bash .claude/validation/review-artifact-check.sh --schema <este arquivo>`. Apague este bloco.\n\n'
     printf '## O que muda\n\n## Achados\n\n## Mutantes\n\n## Limites declarados\n'
     exit 0 ;;
@@ -232,7 +255,7 @@ ART="${REVIEW_DIR}/${SLUG}.md"
 # `:${ART}` le o INDICE; `HEAD:${ART}` le o commit. Arvore suja -> indice; limpa -> HEAD.
 if git diff --quiet HEAD 2>/dev/null; then _ART_REF="HEAD:${ART}"; else _ART_REF=":${ART}"; fi
 if ! git cat-file -e "${_ART_REF}" 2>/dev/null; then
-  _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · tokens · duration_min · verdict — este ultimo em vocabulario FECHADO: APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS; a narrativa vai em 'nota:', e 'elenxo: sim|nao' declara se houve passada adversarial). O hash deste diff é ${DIFF_SHA}."
+  _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · findings_blocking (opcional, ≤ real) · tokens · duration_min · verdict — este ultimo em vocabulario FECHADO: APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS; a narrativa vai em 'nota:', e 'elenxo: sim|nao' declara se houve passada adversarial). O hash deste diff é ${DIFF_SHA}."
   [ "${FORMAT}" = tsv ] || printf '  (o verde do onion-review é soft-pass — não substitui esta passada)\n'
   exit 1
 fi
@@ -265,6 +288,11 @@ done
 [ -n "$(_field verdict)" ] || FALTAM="${FALTAM}${FALTAM:+, }verdict"
 if [ -n "${FALTAM}" ]; then
   _out HARD CAMPO-DE-REAVALIACAO-AUSENTE "${ART}" "faltam: ${FALTAM}. São o dado da reavaliação em N=10 — sem eles a cadência 'todo PR' não pode ser julgada, e a falsificação declarada deste mecanismo é justamente chegar ao 10º PR sem os campos."
+  exit 1
+fi
+_BLK="$(_blocking_problem "${ART}")"
+if [ -n "${_BLK}" ]; then
+  _out HARD FINDINGS-BLOCKING-INVALIDO "${ART}" "${_BLK}. O campo é opcional (resíduo sem ele segue válido); presente, conta quantos achados reais BLOQUEIAM — régua em .claude/commands/common/prompts/review-triage.md."
   exit 1
 fi
 

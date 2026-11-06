@@ -105,7 +105,11 @@ Siga estes passos para criar o PR:
    Contrato de cada refutador, e cada cláusula paga por um erro real: mandato de **REFUTAR** ·
    **default REPROVADO na dúvida** · toda afirmação carrega **o comando que rodou e a saída** ·
    `mktemp -d`, **nunca escrever no repo** · **"NÃO MEDIDO" com motivo** é desfecho legítimo,
-   *"parece ok"* não é.
+   *"parece ok"* não é · **triagem em todo achado**: `(blocking)` só com cenário concreto em que o
+   veredito sai diferente numa direção previsível ou ao arbítrio de quem conduz, ou em que o artefato
+   promete o que não entrega; o resto é `(non-blocking)`, LIMITE com a frase declarada. Cole no brief a
+   seção "Para colar" de [`review-triage.md`](../common/prompts/review-triage.md) — na curadoria, um
+   pré-registro passou por 8 versões sem essa triagem; pedida na 7ª rodada, fechou em 2 (2026-11-05).
 
 7. **Triar o que voltou — e o achado entra NESTE PR.**
 
@@ -119,7 +123,8 @@ Siga estes passos para criar o PR:
    conclusão dele sobre o preço só se sustentou pela metade que dava para medir no próprio repo.
 
    O resultado alimenta o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial):
-   `findings_total`/`real`/`fixed`, `tokens`, `duration_min`, e o `elenxo: sim` que **passa a ser
+   `findings_total`/`real`/`fixed`, `findings_blocking` (quantos dos reais BLOQUEIAM, ≤ `findings_real`; os
+   LIMITES vão em `## Limites declarados`), `tokens`, `duration_min`, e o `elenxo: sim` que **passa a ser
    verdadeiro por construção** — antes deste passo ele era declarado antes de a passada existir.
 
    **No core, onde a REGRA 56 vale, o resíduo nasce do gerador, nunca à mão** (SAC-142, 2026-10-15: 12
