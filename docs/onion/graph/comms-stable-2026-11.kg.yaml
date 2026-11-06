@@ -219,13 +219,16 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     x_due: "2026-11-07"
     impact: 4
-    confidence: 0.6
+    confidence: 0.8
+    evidence_class: testimony
+    verified_at: "2026-11-06"
+    verified_against: "relato da sessão do kg-ssot de 2026-11-06: PR #346 mergeado, capítulo 3 do manual nas duas línguas"
     label: "A forma recomendada, não normativa, do x_event no manual e no ADOPTING do kg-ssot: núcleo CloudEvents 1.0 (id, source, type, specversion, subject, time, dataref), integridade em provenance.sha256 e x_received_at separado de time, sem mudar o contrato."
-    narrative: "Contraproposta do kg-ssot na repassada de 2026-11-06, que respeita D_KG_EVENT_PROFILE_1030 (selo do maestro de 2026-10-30, opção «A hoje, B no gatilho»; gatilho: 2 adotantes ou 50 nós com x_event real; medido em 06/11: 0). O core aceitou. Pronto quando: a forma está publicada no manual e no ADOPTING. Linear: SAC-297."
+    narrative: "Contraproposta do kg-ssot na repassada de 2026-11-06, que respeita D_KG_EVENT_PROFILE_1030 (selo do maestro de 2026-10-30, opção «A hoje, B no gatilho»; gatilho: 2 adotantes ou 50 nós com x_event real; medido em 06/11: 0). O core aceitou. Pronto quando: a forma está publicada no manual e no ADOPTING. Entregue em 2026-11-06, antes do prazo, no PR #346 do kg-ssot; o core não releu o capítulo. Linear: SAC-297."
 edges:
   - from: E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106
     to: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
