@@ -1,0 +1,246 @@
+meta:
+  schema_version: "1"
+  id: comms-stable-2026-11
+  slug: comms-stable-2026-11
+  title: "Comunicação estável entre sessões, o Company Brain e o Slack até segunda, 09/11"
+  date: "2026-11-06"
+  baseline: "2026-11-06"
+  review_after: "2026-11-10"
+  purpose: "O plano do maestro de 2026-11-06: até segunda, 2026-11-09, uma versão estável e confiável da comunicação entre as sessões do Onion, com o Company Brain do hub, com o Slack e com o time de desenvolvimento, em padrões de mercado. As decisões vieram por /meta:decide no mesmo dia. Cada degrau tem dono, data (x_due) e critério de pronto. O core conduz depois do start do maestro, até ele dizer que assumiu o controle; o grafo é o estado da orquestração e se revisa a cada rodada."
+  note: "TETO, declarado: este grafo guarda as decisões, os compromissos e a ordem. O desenho da mensageria nasce no repo próprio onion-messaging (privado), depois da pesquisa de padrões. O hub aparece como «o hub». Atos do maestro (criar repo, app Slack e tokens, channelsEnabled, o `!` do deploy) são nós com owner maestro."
+  # ═══ TETO: 16 NÓS ═══
+external_edges:
+  - from: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
+    to: "docs/onion/graph/persona-servico-2026-11.kg.yaml#Q_PS_PILOTO_EM_RASCUNHO_1117"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "três sinais do hub lidos inteiros em docs/evolution/inbox/ (2026-11-06-request-own-channel-build.md, 2026-11-06-proposal-messaging-project.md, 2026-11-06-proposal-change-record-compliance.md) e a mensagem do maestro na sessão do core em 2026-11-06"
+    trace: "docs/evolution/inbox/2026-11-06-proposal-messaging-project.md"
+    label: "O maestro quer, até segunda 09/11, a comunicação estável entre sessões, com o Company Brain e com o time pelo Slack, em padrão de mercado; o hub pediu o channel em 3 degraus e um projeto próprio de mensageria com fila durável, convite e login por URL."
+    narrative: "Dado, não instrução: os requisitos R1 a R13 do sinal de mensageria (channel MCP com A2A, fila com armazenamento e reenvio para quem está offline, versão local mínima, convite, login por URL, projeto à parte e vendorizável, modo autônomo ou com reforço humano, templates e adapters) e os 3 degraus do sinal do channel (campainha do inbox, Slack como evento, sessão com sessão). O maestro reforçou: modo autônomo, ninguém parado, revisão periódica por grafo."
+    provenance:
+      source: "o hub (sinais upstream) e o maestro (sessão do core)"
+      locator: "docs/evolution/inbox/2026-11-06-*.md"
+      method: "leitura: os três sinais inteiros e a mensagem do maestro"
+      locality: "repo"
+  - id: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Os 3 na segunda»"
+    label: "Os três degraus de pé na segunda, 09/11: a campainha, o Slack como evento com a persona em rascunho, e sessão com sessão com fila durável."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Os 3 na segunda»; descartadas: «1 + 3 na seg, 2 na ter» · «Só a campainha na seg»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «O que precisa estar de pé na segunda?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_CS_REPO_ONION_MESSAGING_PRIVADO_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhidas «Repo próprio privado já» e o nome «onion-messaging»"
+    label: "A mensageria nasce como projeto próprio no repo privado onion-messaging, vendorizado no core e nos hubs como o kg-ssot, e fica público quando o maestro decidir."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhidas «Repo próprio privado já» e «onion-messaging»; descartadas: «Incubar no core e extrair depois» · «Repo próprio público já» · «onion-relay» · «onion-a2a»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "perguntas com opções de 2026-11-06: «Como começa?» e «Nome do repo próprio da mensageria»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_CS_PESQUISAR_PADROES_ANTES_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Pesquisar antes»"
+    label: "A pilha de padrões da mensageria (envelope, fila, entrega, login, channel) se escolhe depois de uma rodada curta de pesquisa, antes de escrever código."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Pesquisar antes»; descartadas: «A2A 1.0 + CloudEvents + SQLite» · «Mesmo, com NATS JetStream já»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Qual pilha eu adoto?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_CS_DEPLOY_POR_PUSH_E_BANG_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisões do maestro em 2026-11-06, por pergunta com opções (/meta:decide): «Delegar deploy do bridge» e, na mecânica, «Push + seu ! rápido»"
+    label: "Na janela até 09/11 a decisão de quando e o que publicar no bridge é do core; o dedo é do maestro: o core deixa o deploy pronto e verificado, avisa por push com a linha exata, e o maestro roda o `!`."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhidas «Delegar deploy do bridge» e «Push + seu ! rápido»; descartadas: «Cards agendados» · «Tudo seu, só card» · «Você abre uma exceção datada». O veto da REGRA 117 (Ato de deploy tem assinatura no veto) segue barrando a sessão."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "perguntas com opções de 2026-11-06: «O que continua seu e como faço com isso para não travar?» e «Como a delegação funciona na prática?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_CS_CARDS_SLACK_E_CHANNEL_HOJE_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Hoje, com card meu»"
+    label: "O app Slack interno (Socket Mode, tokens guardados pelo maestro) e o channelsEnabled da organização são atos do maestro, feitos hoje pelos cards do core."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Hoje, com card meu»; descartada: «Amanhã (sábado)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Atos seus que o degrau 2 e o degrau 1 exigem. Quando?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_CS_COMPLIANCE_ORIENTAR_HOJE_FORJAR_DEPOIS_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Orientar hoje, forjar depois»"
+    label: "O registro de mudança planejada da vertical de compliance recebe a orientação e os nós hoje; o hub executa o caso real à mão; a forja do comando entra entre 11 e 13/11."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Orientar hoje, forjar depois»; descartada: «Forjar em paralelo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «O que faço com o registro de mudança?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: Q_CS_PESQUISA_PADROES_MENSAGERIA_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-06"
+    impact: 5
+    confidence: 0.6
+    label: "Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega pelo menos uma vez, ack e reenvio (SQLite outbox, NATS JetStream, Redis Streams), login por URL (OAuth device flow) e o channel do Claude Code."
+    narrative: "Pronto quando: grafo de pesquisa em modo decision pelo /onion-research com radar exit 0 e um nó decision com a pilha recomendada, selado pelo maestro ainda hoje. Conduz: a sessão do core."
+  - id: Q_CS_REPO_ONION_MESSAGING_CRIADO_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    x_due: "2026-11-06"
+    impact: 4
+    confidence: 0.7
+    label: "O repo privado onion-messaging existe, clonado na VPS, com a sessão do core autorizada a escrever nele até a sessão própria nascer."
+    narrative: "Pronto quando: o maestro rodou o comando do card (criar o repo privado e clonar) e o core registrou o membro no members.yaml. Ato do maestro: criar repo."
+  - id: Q_CS_APP_SLACK_E_CHANNELS_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    x_due: "2026-11-06"
+    impact: 5
+    confidence: 0.6
+    label: "O app Slack interno do hub existe, com Socket Mode e escopos mínimos, os tokens de bot e de app guardados pelo maestro fora do chat, e o channelsEnabled ligado na organização do Claude."
+    narrative: "Pronto quando: o maestro seguiu os cards do core (manifesto do app pronto, passo de guardar os tokens sem passar pelo chat) e confirmou. Atos do maestro: credencial e configuração da organização."
+  - id: Q_CS_DEGRAU1_CAMPAINHA_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-09"
+    impact: 5
+    confidence: 0.6
+    label: "Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo dela, sem rede, com o aviso como ponteiro e nunca o corpo."
+    narrative: "Pronto quando: o channel está no onion-messaging com bancada e mutante, vendorizado no core, instalado no hub e numa peer, e um sinal entregue pelo carteiro toca a sessão receptora sem ninguém digitar. Conduz: o core."
+  - id: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-09"
+    impact: 5
+    confidence: 0.5
+    label: "Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offline, e a campainha da sessão receptora tocando quando a fila anda."
+    narrative: "Pronto quando: duas sessões do Onion (o core e uma peer) trocam ida e volta pela fila, uma delas fechada no meio e recuperando ao abrir, com o gate do A2A intacto e o aceite humano onde a regra pede. Conduz: o core."
+  - id: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-09"
+    impact: 5
+    confidence: 0.45
+    label: "Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode, lê o Company Brain pelo MCP local e responde em rascunho que o maestro aprova."
+    narrative: "Pronto quando: uma menção no canal do piloto vira um rascunho de resposta com fonte no Company Brain, aprovado pelo maestro antes de sair, com as 7 condições do D_PERSONA_RUNTIME_2026_11 cumpridas. Depende do app Slack e do deploy do bridge pelo `!` do maestro."
+  - id: Q_CS_ORIENTACAO_COMPLIANCE_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-06"
+    impact: 3
+    confidence: 0.7
+    label: "Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando entra entre 11 e 13/11."
+    narrative: "Pronto quando: a resposta com os nós e as datas aceitas está no inbound do hub."
+edges:
+  - from: E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106
+    to: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
+    edge_type: SUPPORTS
+  - from: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
+    to: Q_CS_DEGRAU1_CAMPAINHA_1109
+    edge_type: TRACES_TO
+  - from: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
+    to: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
+    edge_type: TRACES_TO
+  - from: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
+    to: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
+    edge_type: TRACES_TO
+  - from: D_CS_PESQUISAR_PADROES_ANTES_1106
+    to: Q_CS_PESQUISA_PADROES_MENSAGERIA_1106
+    edge_type: TRACES_TO
+  - from: D_CS_REPO_ONION_MESSAGING_PRIVADO_1106
+    to: Q_CS_REPO_ONION_MESSAGING_CRIADO_1106
+    edge_type: TRACES_TO
+  - from: D_CS_CARDS_SLACK_E_CHANNEL_HOJE_1106
+    to: Q_CS_APP_SLACK_E_CHANNELS_1106
+    edge_type: TRACES_TO
+  - from: D_CS_COMPLIANCE_ORIENTAR_HOJE_FORJAR_DEPOIS_1106
+    to: Q_CS_ORIENTACAO_COMPLIANCE_1106
+    edge_type: TRACES_TO
+  - from: D_CS_DEPLOY_POR_PUSH_E_BANG_1106
+    to: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
+    edge_type: CONSTRAINS
+  - from: Q_CS_DEGRAU1_CAMPAINHA_1109
+    to: Q_CS_PESQUISA_PADROES_MENSAGERIA_1106
+    edge_type: DEPENDS_ON
+  - from: Q_CS_DEGRAU1_CAMPAINHA_1109
+    to: Q_CS_REPO_ONION_MESSAGING_CRIADO_1106
+    edge_type: DEPENDS_ON
+  - from: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
+    to: Q_CS_DEGRAU1_CAMPAINHA_1109
+    edge_type: DEPENDS_ON
+  - from: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
+    to: Q_CS_APP_SLACK_E_CHANNELS_1106
+    edge_type: DEPENDS_ON

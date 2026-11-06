@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**973 itens abertos** em 151 grafo(s) com aberto (de 192 no escopo) · 151 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**951 itens abertos** em 151 grafo(s) com aberto (de 192 no escopo) · 150 grupo(s), agrupados por `owner:` (57 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -364,41 +364,6 @@
 | 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
 | 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
-
-## persona-runtime-2026-11 — 30 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 60.0 | `Q_PERSONA_RUNTIME_2026_11` | persona-runtime-2026-11 | Qual runtime deve servir a persona de serviço do Company Brain de um adotante: A bot próprio no Agent SDK (bridge + kg_mcp), B o |
-| 49.5 | `C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE` | persona-runtime-2026-11 | A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta  |
-| 43.8 | `C_OPCAO_B_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthr |
-| 17.5 | `C_OPCAO_A_PLUS_B_BRIDGE` | persona-runtime-2026-11 | A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa lo |
-| 6.8 | `C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT` | persona-runtime-2026-11 | C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e n |
-| 6.2 | `C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali |
-| 3.6 | `C_SUPERACAO_20261106_AUDIT_PAGE_READ` | persona-runtime-2026-11 | A página audit.md do Claude Tag, lida: quatro trilhas de auditoria e nenhum log por ato de quem pediu. |
-| 3.6 | `C_SUPERACAO_20261106_B_DISABLE_DMS` | persona-runtime-2026-11 | Reinstalar com a restrição: em B, desligar DMs, porque DM 1:1 roda na conta claude.ai de quem enviou. |
-| 3.6 | `C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 6 de identidade própria por access bundles com o descarte tier 9 reinstalado. |
-| 3.6 | `C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 5 de identidade de serviço com o descarte tier 9 reinstalado. |
-| 3.6 | `C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2` | persona-runtime-2026-11 | Runner da persona sob o degrau 2 do bridge: unit systemd com DynamicUser, ProtectHome e IPAddressDeny, no lugar de bwrap ou Docker |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES` | persona-runtime-2026-11 | Reinstalar com a primária: por padrão qualquer membro de workspace Slack conectado invoca o Claude Tag em canais, com ou sem con |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH` | persona-runtime-2026-11 | Reinstalar a claim de credencial por host, caminho e método, com a ressalva da revisão de conector pessoal. |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT` | persona-runtime-2026-11 | Reinstalar a claim do corte de rate limit para apps fora do Marketplace com a primária redirecionada de docs.slack.dev. |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL` | persona-runtime-2026-11 | Reinstalar com a primária: proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envi |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE` | persona-runtime-2026-11 | Reinstalar com a primária do Claude Tag: a busca padrão cobre todos os canais públicos do workspace, inclusive os em que o Clau |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS` | persona-runtime-2026-11 | Reinstalar com a primária: no ambiente self-hosted o Claude Tag não usa os conectores que o admin adiciona. |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR` | persona-runtime-2026-11 | Reinstalar a claim de credencial compartilhada por canal, com o reparo dos conectores pessoais (impersonação, não delegação c |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS` | persona-runtime-2026-11 | Reinstalar a claim de que em canais o Claude Tag age sob service accounts próprias, com a primária security-and-data.md (seção |
-| 3.6 | `C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ` | persona-runtime-2026-11 | A página restrict-access.md do Claude Tag, lida: resposta sem menção com 'Respond automatically' ligado por padrão, audit log  |
-| 3.6 | `C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT` | persona-runtime-2026-11 | No Agent SDK a Anthropic RECOMENDA, para implantação endurecida, fronteira de isolamento e credenciais por proxy fora dela; mont |
-| 3.6 | `C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS` | persona-runtime-2026-11 | Em ago/2024 o Slack AI (Salesforce, não o Claude) teve injeção indireta divulgada pela PromptArmor que exfiltrava canais privad |
-| 3.6 | `C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03` | persona-runtime-2026-11 | Desde 2025-05-29 apps comerciais fora do Marketplace (novos ou instalação nova) ficam em 1 req/min e 15 objetos; instalações e |
-| 3.6 | `C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION` | persona-runtime-2026-11 | Em canal o Claude Tag age por padrão com contas de serviço próprias (agent identity do Owner), com acesso por conector, repo ou |
-| 3.6 | `C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS` | persona-runtime-2026-11 | Auditoria de B = log de admin + export de rede por hora (sem git nem MCP) + log do serviço conectado sob a conta de serviço; fal |
-| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o Claude age por padrão sob identidades de serviço próprias; duas exceções: conector pes |
-| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o agente age como contas de serviço do Owner, credenciais pelo Agent Proxy; conectores pesso |
-| 3.6 | `C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT` | persona-runtime-2026-11 | No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona;  |
-| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS` | persona-runtime-2026-11 | Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 all |
-| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC` | persona-runtime-2026-11 | Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminh |
 
 ## plugin-write-2026-11 — 13 item(ns)
 
@@ -763,7 +728,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 19 item(ns)
+## maestro — 21 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -771,6 +736,8 @@
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
+| 9.0 | `Q_CS_APP_SLACK_E_CHANNELS_1106` | comms-stable-2026-11 | O app Slack interno do hub existe, com Socket Mode e escopos mínimos, os tokens de bot e de app guardados pelo maestro fora do ch |
+| 8.4 | `Q_CS_REPO_ONION_MESSAGING_CRIADO_1106` | comms-stable-2026-11 | O repo privado onion-messaging existe, clonado na VPS, com a sessão do core autorizada a escrever nele até a sessão própria na |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
@@ -1042,21 +1009,27 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 23 item(ns)
+## core — 29 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 15.0 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
+| 11.2 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
+| 9.6 | `Q_PS_PESQUISA_DO_RUNTIME_1110` | persona-servico-2026-11 | Pesquisa do runtime da persona de serviço: bot próprio por Agent SDK (com o bridge do core como candidato) contra o assistente n |
+| 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
+| 7.5 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 4.2 | `Q_CS_ORIENTACAO_COMPLIANCE_1106` | comms-stable-2026-11 | Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando  |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
