@@ -2,8 +2,7 @@
 branch: fix/adopt-writes-guard-core-line
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: d5b028b7aea214dab1f3e8f2f7230255931e31f3cc7f7e5b0f45d93812763604
-reviewed_code_sha256: f8c3b3b0e44da76fe986874a05b81078ba947533affb233cafcf1c15dd04b6a0
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 2
 findings_blocking: 2
@@ -25,7 +24,7 @@ adotante, pelo `.claude/utils/adopt/adopter-guard-core.sh` chamado no passo (0.6
 Configuração pós-cópia. Até aqui nenhum helper escrevia o arquivo (`git grep adopter-guard.tsv` em
 `.claude/utils/adopt` e no `adopt.md`: zero), e o hook do adotante veta a sessão que o escreve. Os adotantes por
 URL (kg-ssot e curadoria) ficavam com a REGRA 118 (Veto de repo alheio do adotante registrado e com lista)
-armada e sem lista. O relatório do update ganha a seção «Veto de repo alheio (REGRA 118)». Bancada nova:
+armada e sem lista. A seção «Gate do alvo» do relatório passa a pedir a linha que o helper imprime. Bancada nova:
 `adopter_guard_core`, 9 casos.
 
 ## Achados
