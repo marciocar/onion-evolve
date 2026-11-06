@@ -2,14 +2,13 @@
 branch: feat/a2a-gate-local-standalone
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: a52c9fae169ef6758c51ad87b29fa0a4ab0fc23ad1689bd13943bb003cce8686
-reviewed_code_sha256: 25f1f1977bc8a8a9103ef6c56f3b6bb8a48a2163f45881ed13e43ed09f0224dc
-findings_total: 3
-findings_real: 2
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 3
 findings_blocking: 0
 tokens: 0
 duration_min: 15
-findings_fixed: 2
+findings_fixed: 3
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: agente de execução da sessão do core (passada própria, não independente; o brief proibiu subagente)
@@ -36,6 +35,7 @@ nota: "tokens 0 = não medido. A passada procurou primeiro o FALSO POSITIVO (a v
 |---|---|---|---|
 | 1 | o 1º mutante "morria" por vacuidade: o envelope da fixture vetava em `kid-not-owned-by-from` e o caso contava como reprovado | real | curado: o core ganhou `a2a.keys` na fixture e o mutante só conta se **verificar**; veto por outro motivo reprova como "não exercido" |
 | 2 | no dogfood com o registro REAL, um `a2a:` novo no topo do bloco do core foi ignorado em silêncio: o core já tem `a2a:` (o endpoint) e o YAML fica com a última chave | real | curado no dogfood (a chave vai DENTRO do bloco existente); vale para o PR das chaves |
+| 4 | a REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação) acusou o id do adotante em três linhas que viajam | real | curado: o texto diz «a fila local de mensageria»; re-revisado (só comentário) |
 | 3 | qualquer processo do mesmo uid pode chamar o gate com `--channel local-queue` | limite | declarado: o mesmo uid já lê as chaves privadas do disco; o gate prova o host e a conta, não qual processo chamou |
 
 ## Dogfood
