@@ -2,18 +2,17 @@
 branch: feat/review-findings-blocking
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: bdfd199fd7811e02b80125dd84b35a24594bdbd185e35de7e3c899ea00b29323
-reviewed_code_sha256: d64c5652af91f8a7f9b4c4976f6922053abc6d07b2728f85c965bdcf33e8f11a
-findings_total: 5
-findings_real: 5
-findings_blocking: 3
+reviewed_diff_sha256: pendente
+findings_total: 6
+findings_real: 6
+findings_blocking: 4
 tokens: 0
 duration_min: 0
-findings_fixed: 3
+findings_fixed: 4
 verdict: REPROVADO_E_CURADO
 elenxo: nao
 reviewer: autor (agente de execução forge-findings-blocking), passada própria sem agente separado
-nota: "Passada própria do autor, sem revisor separado: o brief da sessão principal proibiu abrir agentes. A sessão principal confere o diferencial antes do PR. tokens e duration_min = 0 porque não foram medidos à parte do trabalho. 1º resíduo com findings_blocking: blocking=3 non_blocking=2."
+nota: "Passada própria do autor, sem revisor separado: o brief da sessão principal proibiu abrir agentes. A sessão principal confere o diferencial antes do PR. tokens e duration_min = 0 porque não foram medidos à parte do trabalho. 1º resíduo com findings_blocking: blocking=4 non_blocking=2 (o 4º veio do CI, door-mini (a))."
 ---
 
 # Passada adversarial: `feat/review-findings-blocking`
@@ -43,6 +42,11 @@ nota: "Passada própria do autor, sem revisor separado: o brief da sessão princ
   'criterio'] }` literal, e o campo `triage` o derrubou (pego pela bancada). cenário: a bancada fica vermelha
   em todo PR, ou alguém tira o `triage` para ela voltar a verde. Curado: a regex aceita campos a mais, e o
   caso novo (tri) cobra o `triage` (mutante manual sem a régua num prompt: reprovou `regua-no-prompt(1/2)`).
+- issue (blocking): o `engineer:pr` viaja na porta mini e passou a citar `review-triage.md`, que a allowlist não
+  leva (pego pelo CI, `door-mini (a)`, run 42163288689). cenário: o mini materializado sai com ponteiro morto e a
+  porta reprova no próprio checador. Curado: `known_absent` no `roles.yaml` com o porquê (a régua cita comandos de
+  meta que não viajam, e o iniciante não tem passada adversarial); levar o fragmento ao mini criava 3 ponteiros
+  mortos novos, medido. `door_mini` local: 13 passaram.
 - suggestion (non-blocking): o `findings_blocking` com mais de 19 dígitos estoura a aritmética do bash e pode
   passar o teto. limite: o teto 0 ≤ blocking ≤ real vale para número de até 18 dígitos; valor absurdo não é testado.
 - suggestion (non-blocking): o write(KG) do `onion-research` recebe o `triage` no JSON do Elenxo, mas o prompt
