@@ -2,7 +2,8 @@
 title: 'Resíduo — a branch do update nasce da ponta mais nova e o deny do adotante nunca encolhe'
 date: 2026-11-06
 branch: fix/update-branch-fresh-base
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ff68bb384d673d210b5204627a9b42bc3d983ffab25097f8cd82059d0e1da2ac
+reviewed_code_sha256: acee1b63cb1690ba30a4aeb76659f4ec3fc3f410f95a906d2a8c97aaa05e0863
 findings_total: 4
 findings_real: 2
 findings_blocking: 1
