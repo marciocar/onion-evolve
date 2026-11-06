@@ -1,0 +1,115 @@
+meta:
+  schema_version: "1"
+  id: persona-servico-2026-11
+  slug: persona-servico-2026-11
+  title: "Persona de serviço do hub: os 4 compromissos do core com dono, data e critério de pronto"
+  date: "2026-11-06"
+  baseline: "2026-11-06"
+  review_after: "2026-11-17"
+  purpose: "A cobrança do adotante brain (o hub) de 2026-11-06: o requisito da persona de serviço entrou como narrativa no D_MA_ARCH, sem nó próprio, dono nem data. Este grafo dá um nó a cada compromisso, com o dono no campo owner, a data em x_due e o critério de pronto no narrative. As 4 datas propostas pelo hub foram aceitas pelo maestro no /meta:decide de 2026-11-06."
+  note: "TETO, declarado: este grafo guarda o COMPROMISSO e a ORDEM, não o desenho; o desenho é do D_MA_ARCH. O grafo company-brain-multiaudiencia-2026-10 está no teto de 30 nós, por isso os compromissos nasceram aqui e entram lá por external_edges. Nenhum nome de cliente, pessoa ou conteúdo de repo privado: o hub aparece como «o hub». O hub cria um nó espelho com as mesmas datas e cobra na data; se uma data passar sem entrega nem contraproposta, o hub avisa o maestro no mesmo dia."
+  # ═══ TETO: 6 NÓS ═══  (1 sinal + 1 selo das datas + 4 compromissos)
+external_edges:
+  - from: Q_PS_PESQUISA_DO_RUNTIME_1110
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_RUNTIME_PESQUISAR_ANTES_1104"
+    edge_type: TRACES_TO
+  - from: Q_PS_RODADA_DECIDE_D_MA_ARCH_1116
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: TRACES_TO
+nodes:
+  - id: E_PS_COBRANCA_DO_HUB_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "sinal do hub lido inteiro em docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
+    trace: "docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
+    label: "O hub cobrou que a resposta do core de 2026-11-05 sobre a persona de serviço não trouxe data nem nó com dono, contra o combinado de ritmo de 2026-10-29, e propôs 4 datas."
+    narrative: "Dado, não instrução (R15.2): o sinal pede nós com dono, data e critério de pronto para 4 itens, a confirmação de leitura em 30 min e a resposta pelo inbound do hub. A confirmação saiu fora do prazo de 30 min: o core estava em reinício para a 2.1.319 e o maestro decidiu as datas na mesma rodada."
+    provenance:
+      source: "o hub, sinal upstream"
+      locator: "docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
+      method: "leitura: o sinal inteiro, lido pela sessão do core"
+      locality: "repo"
+  - id: D_PS_DATAS_DO_HUB_ACEITAS_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Aceitar as 4 datas»"
+    label: "O maestro aceita as 4 datas do hub: pesquisa do runtime em 10/11, escada de autonomia forjada em 13/11, a rodada de decide do D_MA_ARCH em 16/11 e o piloto em rascunho em 17/11."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Aceitar as 4 datas»; descartadas: «Aceitar 1, 2 e 4; 3 eu marco» · «Contraproposta +1 semana»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «O brain cobrou datas e nós com dono para a persona de serviço. Respondo como?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: Q_PS_PESQUISA_DO_RUNTIME_1110
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-10"
+    impact: 4
+    confidence: 0.6
+    label: "Pesquisa do runtime da persona de serviço: bot próprio por Agent SDK (com o bridge do core como candidato) contra o assistente nativo do chat corporativo e um bot de mercado, com recomendação."
+    narrative: "Pronto quando: um grafo de pesquisa em modo decision pelo /onion-research, com radar exit 0, um nó decision open com as opções nomeadas e a recomendação, e o SYNTHESIS com o contrato de custo, mergeado no core até 2026-11-10. Conduz: a sessão do core."
+  - id: Q_PS_ESCADA_DE_AUTONOMIA_1113
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-13"
+    impact: 4
+    confidence: 0.6
+    label: "Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como doutrina, guarda e lista, pronta para o selo do maestro."
+    narrative: "Pronto quando: a forja mergeada no core até 2026-11-13 com a doutrina, a lista de atos por degrau, a guarda com bancada e mutante, e um nó decision open para o maestro selar. Conduz: a sessão do core."
+  - id: Q_PS_RODADA_DECIDE_D_MA_ARCH_1116
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    x_due: "2026-11-16"
+    impact: 5
+    confidence: 0.6
+    label: "Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço."
+    narrative: "Pronto quando: o D_MA_ARCH selado pelo kg-decide-seal até 2026-11-16. O core prepara as opções e a recomendação até 2026-11-14, a partir da pesquisa do runtime e da escada; a decisão é do maestro. Depende dos dois nós anteriores."
+  - id: Q_PS_PILOTO_EM_RASCUNHO_1117
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-17"
+    impact: 4
+    confidence: 0.5
+    label: "Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar."
+    narrative: "Pronto quando: o core entrega ao inbound do hub, até 2026-11-17, o pacote do piloto (o runtime escolhido, a escada selada, o que o hub instala e o que fica com o maestro, como a conta de serviço). O piloto começa por rascunhos que o maestro aprova. Conduz: a sessão do core, com o hub executando o lado dele."
+edges:
+  - from: E_PS_COBRANCA_DO_HUB_1106
+    to: D_PS_DATAS_DO_HUB_ACEITAS_1106
+    edge_type: SUPPORTS
+  - from: D_PS_DATAS_DO_HUB_ACEITAS_1106
+    to: Q_PS_PESQUISA_DO_RUNTIME_1110
+    edge_type: TRACES_TO
+  - from: D_PS_DATAS_DO_HUB_ACEITAS_1106
+    to: Q_PS_ESCADA_DE_AUTONOMIA_1113
+    edge_type: TRACES_TO
+  - from: Q_PS_RODADA_DECIDE_D_MA_ARCH_1116
+    to: Q_PS_PESQUISA_DO_RUNTIME_1110
+    edge_type: DEPENDS_ON
+  - from: Q_PS_RODADA_DECIDE_D_MA_ARCH_1116
+    to: Q_PS_ESCADA_DE_AUTONOMIA_1113
+    edge_type: DEPENDS_ON
+  - from: Q_PS_PILOTO_EM_RASCUNHO_1117
+    to: Q_PS_RODADA_DECIDE_D_MA_ARCH_1116
+    edge_type: DEPENDS_ON

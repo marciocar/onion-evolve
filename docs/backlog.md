@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**942 itens abertos** em 149 grafo(s) com aberto (de 190 no escopo) · 150 grupo(s), agrupados por `owner:` (47 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**944 itens abertos** em 150 grafo(s) com aberto (de 191 no escopo) · 150 grupo(s), agrupados por `owner:` (50 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -437,7 +437,7 @@
 | 3.6 | `C_SUPERACAO_20261104_README_SESSION_JOURNAL` | vibe-subagent-2026-11 | O README chama o armazenamento atual da sessão de session journal, no diretório de logs de sessão sob VIBE_HOME (journal_dir no |
 | 3.6 | `C_SUPERACAO_20261104_RELEASES_CONFIRM_HOOKS_IN_SUBAGENT` | vibe-subagent-2026-11 | As release notes confirmam hooks dentro do subagente (v3.0.2), parent_session_id, session_id e transcript_path no stdin (v2.26.0), |
 
-## deploy-acts-2026-11 — 11 item(ns)
+## deploy-acts-2026-11 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -448,7 +448,6 @@
 | 4.5 | `C_TETO_AGENDAMENTO_NATIVO_E_WRITE` | deploy-acts-2026-11 | teto: o agendamento nativo do Claude Code (CronCreate, ScheduleWakeup do /loop, RemoteTrigger) e a unit .timer escrita pela ferram |
 | 4.5 | `C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL` | deploy-acts-2026-11 | teto: o merge de PR de outra sessão pelo caminho verificado segue regra social, porque o hook não sabe de quem é o PR |
 | 4.5 | `C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA` | deploy-acts-2026-11 | teto: script de ops/ que age no forge ou no público e que nenhuma linha do tsv nomeia (apply-ruleset-main.sh) passa; a REGRA 117  |
-| 4.2 | `C_TETO_BANG_NA_VERSAO_ATUAL` | deploy-acts-2026-11 | teto: que o `!` não passa pelos hooks foi medido no corpus até a 2.1.308, não na 2.1.318 |
 | 3.2 | `C_TETO_ARGUMENTO_DE_FORA_DA_STRING` | deploy-acts-2026-11 | teto: a assinatura que chega por variável de fora da string (arquivo, ambiente, laço) passa calada, por decisão |
 | 3.2 | `C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA` | deploy-acts-2026-11 | teto: a REGRA 117 confere só que a palavra da assinatura existe no código do script, não que ela seja o que faz o ato |
 | 3.0 | `C_TETO_TAG_POR_NOME_AMBIGUO` | deploy-acts-2026-11 | teto: push de tag pelo nome só se reconhece se a tag já existe no clone e não há branch homônima, ou se nasceu na mesma strin |
@@ -736,11 +735,11 @@
 | 30.0 | `Q_SPIKE_COPILOT_STUDIO_MCP` | spike-copilot-studio-mcp-2026-10 | O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? INFER |
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
+| 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 7.2 | `D_SO_LIMITES_DERIVADOS_DO_LEASE_1106` | session-orchestration-2026-11 | Para o maestro selar: a régua do lease muda? Opção 1 (recomendada pela medida): manter 15/12 e ligar o PSI de CPU em 30 como 2 |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
@@ -854,8 +853,8 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.0 | `Q_VETOS_VALEM_NO_ADOTANTE` | adopter-vetoes-2026-11 | no adotante carimbado, o merge digitado, o push na main e a escrita em repo alheio vetam, e o caminho verificado do adotante passa |
+| 7.7 | `C_TETO_SO_REPO_REGISTRADO` | adopter-vetoes-2026-11 | TETO: só o repo REGISTRADO é alheio; adotante sem lista (adopted_from por URL e sem .claude/adopter-guard.tsv) cala para tudo, e |
 | 5.1 | `C_TETO_SCRIPT_E_OUTRA_LINGUAGEM` | adopter-vetoes-2026-11 | TETO: script em arquivo não se lê (por essa fronteira passam o co-relay e o merge verificado); código embutido (-c/-e) fecha pe |
-| 5.1 | `C_TETO_SO_REPO_REGISTRADO` | adopter-vetoes-2026-11 | TETO: só o repo REGISTRADO é alheio; adotante sem lista (adopted_from por URL e sem .claude/adopter-guard.tsv) cala para tudo, e |
 | 4.8 | `C_TETO_PUSH_NU_DEPOIS_DE_SWITCH` | adopter-vetoes-2026-11 | TETO herdado do core: o push nu (sem refspec) se julga pela branch do disco na hora do hook; git switch na mesma string não é se |
 | 4.8 | `C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE` | adopter-vetoes-2026-11 | TETO: escritores por opção (tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, find -delete) e repo de nome |
 | 4.5 | `C_CAMADA_NATIVA_PRIMEIRO` | adopter-vetoes-2026-11 | o permissions.deny do adotante é a 1ª linha; o hook é a 2ª, no que o deny por padrão de caminho e prefixo de comando não alc |
@@ -1008,21 +1007,24 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 21 item(ns)
+## core — 24 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 9.6 | `Q_PS_PESQUISA_DO_RUNTIME_1110` | persona-servico-2026-11 | Pesquisa do runtime da persona de serviço: bot próprio por Agent SDK (com o bridge do core como candidato) contra o assistente n |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
+| 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
 | 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
 | 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
