@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-05"
   review_after: "2026-12-05"   # 30d: defeito de guarda
-  # ═══ TETO: 15 NÓS ═══  (11 + 2 da 1ª passada adversarial)
+  # ═══ TETO: 15 NÓS ═══  (11 + 2 da 1ª passada adversarial + 1 do falso positivo de --tags)
 nodes:
   - id: Q_VETOS_VALEM_NO_ADOTANTE
     node_type: question
@@ -184,6 +184,18 @@ nodes:
     trace: ".claude/hooks/pretooluse-adopter-guard.sh"
     label: "TETO: escritores por opção (tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, find -delete) e repo de nome curto por caminho relativo passam; o push na main de uma fixture descartável veta no adotante (herdado do core)"
     narrative: "Cura do vocabulário: alvos por opção no juiz, um por ferramenta. Cura do push de fixture: no ramo do adotante, vetar a main só quando o git-common-dir do alvo é o do projeto; não cabe numa linha porque a linha canônica do lib não carrega o diretório."
+  - id: C_TETO_PUSH_TAGS_LIDO_COMO_MAIN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "comando da sessão principal vetado em 2026-11-06 (heredoc de casos lido por while read com a linha git push origin --tags); reproduzido no merge-gate num repo sentado na main: git push origin --tags e git push --tags saem rc 2, com refspec de tag rc 0, sentado em feat rc 0; medido com git 2.43.0 num remoto bare: push origin --tags levou a tag e não moveu a branch"
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    label: "TETO não curado aqui: o tokenizador dos vetos lê git push --tags sem refspec como push da branch atual, e sentado na main isso vira 'push na main'; o git real empurra só as tags"
+    narrative: "Falso positivo do lib partilhado pelos três vetos (protect-main, merge-gate, moat-gate), não do modo de adotante; a cura desta forja não o cobre. Cura proposta, para outra forja com bancada e mutante próprios: na canonização do push, --tags sem refspec não herda a branch atual. Atenção ao par perigoso: --tags junto de refspec ou de --all segue julgado pelo refspec."
 edges:
   - from: E_SONDA_27_DE_31_PASSARAM
     to: Q_VETOS_VALEM_NO_ADOTANTE
@@ -220,4 +232,7 @@ edges:
     edge_type: SUPPORTS
   - from: C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE
     to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    edge_type: CONSTRAINS
+  - from: C_TETO_PUSH_TAGS_LIDO_COMO_MAIN
+    to: D_MERGE_GATE_VETA_NO_ADOTANTE_CARIMBADO
     edge_type: CONSTRAINS
