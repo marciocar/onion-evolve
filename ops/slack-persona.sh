@@ -39,7 +39,7 @@ die()  { local rc="$1"; shift; printf '[%s] ERRO: %s\n' "${NAME}" "$*" >&2; exit
 usage() { sed -n '/^# USO/,/^# EXIT/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2; exit 3; }
 
 TEST="${ONION_SLACK_PERSONA_TEST:-0}"
-if [ "${TEST}" != 1 ] && env | grep -q '^ONION_SLACK_PERSONA_'; then
+if [ "${TEST}" != 1 ] && grep -q '^ONION_SLACK_PERSONA_' <<< "$(env)"; then
   die 3 "variável ONION_SLACK_PERSONA_* sem o modo de teste: produção não se redireciona por ambiente"
 fi
 R=""
@@ -158,7 +158,7 @@ cmd_install() {
 connected_in_invocation() {
   local inv; inv="$(priv systemctl show -p InvocationID --value "${UNIT}" 2>/dev/null)"
   [ -n "${inv}" ] || return 1
-  # capturado e julgado por here-string: `journalctl | grep -q` sob pipefail pode sair 141 (SIGPIPE) com a linha presente
+  # capturado e julgado por here-string: o par journalctl e grep -q por pipe sob pipefail pode sair 141 (SIGPIPE) com a linha presente
   local log; log="$(priv journalctl -q -o cat _SYSTEMD_INVOCATION_ID="${inv}" 2>/dev/null)"
   grep -q '"msg":"slack persona connected"' <<< "${log}"
 }
