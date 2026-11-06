@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**935 itens abertos** em 148 grafo(s) com aberto (de 189 no escopo) · 149 grupo(s), agrupados por `owner:` (47 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**942 itens abertos** em 149 grafo(s) com aberto (de 190 no escopo) · 150 grupo(s), agrupados por `owner:` (47 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -848,6 +848,18 @@
 | 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
+
+## adopter-vetoes-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 24.0 | `Q_VETOS_VALEM_NO_ADOTANTE` | adopter-vetoes-2026-11 | no adotante carimbado, o merge digitado, o push na main e a escrita em repo alheio vetam, e o caminho verificado do adotante passa |
+| 5.1 | `C_TETO_SCRIPT_E_OUTRA_LINGUAGEM` | adopter-vetoes-2026-11 | TETO: script em arquivo não se lê (por essa fronteira passam o co-relay e o merge verificado); código embutido (-c/-e) fecha pe |
+| 5.1 | `C_TETO_SO_REPO_REGISTRADO` | adopter-vetoes-2026-11 | TETO: só o repo REGISTRADO é alheio; adotante sem lista (adopted_from por URL e sem .claude/adopter-guard.tsv) cala para tudo, e |
+| 4.8 | `C_TETO_PUSH_NU_DEPOIS_DE_SWITCH` | adopter-vetoes-2026-11 | TETO herdado do core: o push nu (sem refspec) se julga pela branch do disco na hora do hook; git switch na mesma string não é se |
+| 4.8 | `C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE` | adopter-vetoes-2026-11 | TETO: escritores por opção (tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, find -delete) e repo de nome |
+| 4.5 | `C_CAMADA_NATIVA_PRIMEIRO` | adopter-vetoes-2026-11 | o permissions.deny do adotante é a 1ª linha; o hook é a 2ª, no que o deny por padrão de caminho e prefixo de comando não alc |
+| 4.2 | `C_TETO_WRAPPER_RTK` | adopter-vetoes-2026-11 | TETO não curado aqui: o invólucro rtk (rtk, rtk run, rtk bypass) não é tirado pelo tokenizador, e o push e o merge escritos at |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
