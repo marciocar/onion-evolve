@@ -19066,6 +19066,11 @@ run_adopter_guard_core_selftests() {
     record_pass "adopter-guard-core: (d) core que não existe → trocado na mesma linha, vizinhas intactas"
   else record_fail "adopter-guard-core: (d)" "conteúdo: $(tr '\t\n' '>|' < "${tsv}")"; fi
   mkdir -p "${t}/outro-core/docs/evolution/federation"; : > "${t}/outro-core/docs/evolution/federation/members.yaml"
+  # (d2) linha core RELATIVA que, do cwd, parece um core → trocada (relativo resolveria contra o cwd de quem roda)
+  _agc_dest 7; printf 'core\toutro-core\n' > "${tsv}"; (cd "${t}" && bash "${helper}" "${d}" "${core}" >/dev/null 2>&1)
+  if [ "$(cat "${tsv}")" = "$(printf 'core\t%s' "${core}")" ]; then
+    record_pass "adopter-guard-core: (d2) core relativo nunca vale como escolha do maestro, nem quando o cwd o faz parecer um core"
+  else record_fail "adopter-guard-core: (d2)" "manteve o relativo: $(tr '\t\n' '>|' < "${tsv}")"; fi
   _agc_dest 4; printf 'core\t%s/outro-core\n' "${t}" > "${tsv}"; before="$(cat "${tsv}")"; out="$(bash "${helper}" "${d}" "${core}" 2>&1)"
   if [ "$(cat "${tsv}")" = "${before}" ] && grep -q '^adopter-guard: mantida:' <<< "${out}"; then
     record_pass "adopter-guard-core: (e) core diferente mas VÁLIDO nesta máquina → mantido (escolha do maestro), dito"

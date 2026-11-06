@@ -43,11 +43,13 @@ TSV="${DEST%/}/.claude/adopter-guard.tsv"
 
 _say() { printf 'adopter-guard: %s\n' "$*"; }
 
-# _is_core <dir> — o checkout do core: sem carimbo, com o registro da federação
-_is_core() { [ -d "$1" ] && [ ! -f "$1/.claude/.onion-version" ] && [ -f "$1/docs/evolution/federation/members.yaml" ]; }
+# _is_core <dir> — o checkout do core: caminho absoluto, sem carimbo, com o registro da federação
+# (relativo nunca vale: resolveria contra o cwd de quem roda o update)
+_is_core() { case "$1" in /*) : ;; *) return 1 ;; esac; [ -d "$1" ] && [ ! -f "$1/.claude/.onion-version" ] && [ -f "$1/docs/evolution/federation/members.yaml" ]; }
 
-# o checkout principal da fonte (a worktree some, o checkout fica)
-common="$(git -C "${SRC}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || common=""
+# o checkout principal da fonte (a worktree some, o checkout fica). Sem `--path-format=absolute` (git ≥ 2.31):
+# o caminho relativo resolve a partir da fonte.
+common="$(cd "${SRC}" 2>/dev/null && g="$(git rev-parse --git-common-dir 2>/dev/null)" && cd "${g}" 2>/dev/null && pwd -P)" || common=""
 case "${common}" in
   */.git) CORE="${common%/.git}" ;;
   *) _say "pulada: a fonte ${SRC} não tem checkout principal resolvível (git-common-dir '${common}')"; exit 0 ;;
