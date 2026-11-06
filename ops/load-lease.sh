@@ -35,8 +35,9 @@
 #   · ANINHADO: quem já foi admitido exporta ONION_LOAD_LEASE_HELD; um chamador de dentro (o pre-commit que
 #     o pr-finalize dispara, uma família da bancada que invoca o hook) não espera de novo nem disputa a vaga
 #     que o pai segura (deadlock). A bancada exporta ONION_LOAD_LEASE_HELD=bench para as famílias.
-#   · DESLIGADO e DITO: ONION_LOAD_LEASE=off (escape declarado) e o runner do CI (GITHUB_ACTIONS=true: um
-#     job por runner, a fila é do GitHub) passam direto, com uma linha dizendo por quê.
+#   · DESLIGADO e DITO: ONION_LOAD_LEASE=off (escape declarado), o runner do CI (GITHUB_ACTIONS=true: um
+#     job por runner, a fila é do GitHub) e a plataforma sem /proc/loadavg passam direto, com uma linha
+#     dizendo por quê. Fonte que existe e não se lê = rc 2 (falha fechada).
 #   · Fontes trocáveis para a bancada: ONION_LOAD_SOURCE (loadavg), ONION_LOAD_PSI_DIR, ONION_LOAD_MEMINFO,
 #     ONION_LOAD_LEASE_DIR (diretório da vaga).
 
@@ -101,6 +102,9 @@ _ll_psi_busy() {
 _ll_bypass() {
   if [ "${ONION_LOAD_LEASE:-on}" = "off" ]; then echo "load-lease: DESLIGADO por ONION_LOAD_LEASE=off (escape declarado; a carga não foi julgada)" >&2; return 0; fi
   if [ "${GITHUB_ACTIONS:-}" = "true" ]; then echo "load-lease: runner do CI (GITHUB_ACTIONS=true) — um job por runner, a carga não é julgada aqui" >&2; return 0; fi
+  # Plataforma SEM a fonte (macOS, BSD: não há /proc/loadavg) não tem o que medir: passa e diz. Fonte que
+  # EXISTE e não se lê (ou lê lixo) segue rc 2, falha fechada: ali a régua deveria valer e não pôde.
+  if [ ! -e "${ONION_LOAD_SOURCE:-/proc/loadavg}" ]; then echo "load-lease: sem fonte de carga (${ONION_LOAD_SOURCE:-/proc/loadavg} não existe nesta plataforma) — a carga não é julgada aqui" >&2; return 0; fi
   if [ -n "${ONION_LOAD_LEASE_HELD:-}" ]; then echo "load-lease: aninhado (admitido por ${ONION_LOAD_LEASE_HELD}) — não espero de novo" >&2; return 0; fi
   return 1
 }

@@ -52891,6 +52891,12 @@ if o in s:
     [ "${a%%|*}" = 3 ] && [[ "${a#*|}" == *"psi cpu 50.00% ≥ 30"* ]]; }
   _llcase "(j) PSI ligado em 30: load 3 com psi 50 ⇒ check rc 3" \
     '[ -n "${LL_PSI_HIGH:-}" ] || return 1' 'return 1' _c_psi
+  # (k) plataforma sem a fonte de carga passa e DIZ; fonte que existe e lê lixo segue rc 2 (falha fechada)
+  _c_nosrc() { local a b; a="$(LLR_ENV="ONION_LOAD_SOURCE=${d}/nao-existe" _llr "$1" check)"
+    printf 'lixo\n' > "${d}/lixo"; b="$(LLR_ENV="ONION_LOAD_SOURCE=${d}/lixo" _llr "$1" check)"; LL_WHY="sem fonte ${a} · lixo ${b}"
+    [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"sem fonte de carga"* ]] && [ "${b%%|*}" = 2 ]; }
+  _llcase "(k) sem /proc/loadavg passa dizendo; fonte com lixo ⇒ rc 2" \
+    'if [ ! -e "${ONION_LOAD_SOURCE:-/proc/loadavg}" ]; then echo' 'if false; then echo' _c_nosrc
   # (i) LIGAÇÃO: o pre-commit espera antes da faixa de bancada; o pr-finalize antes do pré-voo; o lab sem o 16
   local hook="${REPO_ROOT}/.githooks/pre-commit" fin="${REPO_ROOT}/ops/pr-finalize.sh"
   local lab="${REPO_ROOT}/docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/lab/run_all.sh" ri rm_
