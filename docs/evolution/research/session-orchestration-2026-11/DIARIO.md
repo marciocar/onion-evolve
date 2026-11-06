@@ -188,3 +188,42 @@ Das ~01:15 às ~06:30 UTC de 06/11 o maestro dormiu, com a autorização pontual
 ## Para o gatilho do mecanismo
 
 3ª janela registrada pelo mesmo diário, com outro tipo de trabalho (forja de guardas e infraestrutura, com a maior parte sem o maestro). Os três papéis estiveram presentes (core orquestra, curadoria revisa, kg-ssot dono de produto). Conferir regra a regra as `C_SO_*` e a `Q_SO_PADROES_DE_MERCADO` antes de propor o degrau 2.
+
+# Janela de 2026-11-06 (dia, UTC) — com o maestro presente e o pedido de modo autônomo
+
+O maestro pediu modo autônomo até segunda, 09/11, com tudo pela maquinaria e a gestão conjunta no Linear, e pediu esta repassada da orquestração do dia. O plano da comunicação estável entre as sessões nasceu no grafo `comms-stable-2026-11` (PR #1509).
+
+## Decisões
+
+- **Runtime da persona de serviço:** A, com a ponte B (`D_PERSONA_RUNTIME_2026_11`), selado depois da pesquisa do #1507.
+- **Comunicação estável:** os 3 degraus de pé na segunda (campainha, Slack como evento com a persona em rascunho, sessão com sessão); a mensageria nasce no repo privado `onion-messaging`; os padrões se pesquisam antes, e uma rodada de primárias vem antes do selo da pilha.
+- **Deploy do bridge na janela:** a decisão de quando e o que publicar é do core; o dedo é do maestro, por push com a linha exata e o `!`.
+- **Atos do maestro com card do core, hoje:** o app Slack interno e o `channelsEnabled` da organização.
+- **Registro de mudança de compliance:** orientar o hub hoje e forjar o comando entre 11 e 13/11.
+- **Carga da VPS:** a régua fica em 15 e retoma abaixo de 12, com a pressão de CPU em 30% como 2º sinal.
+- **REGRA 118 (vetos no adotante):** a linha core do `adopter-guard.tsv` chega aos adotantes pelo update.
+
+## Desfechos (core)
+
+- **Carga:** #1499 (a regra de carga vira lease) e #1503 (a pressão de CPU em 30% liga como 2º sinal).
+- **Task manager:** #1501, o ClickUp ganha executável no `tm.sh`.
+- **Registro:** #1502 (o decide de 06/11 e as 4 datas da persona de serviço) e #1507 (pesquisa do runtime da persona).
+- **Processo:** #1504 (o pré-voo escolhe a porta mini quando o PR toca o que viaja a ela), #1505 (o adopt escreve a linha core do `adopter-guard.tsv`) e #1506 (os sítios de `utils/adopt` e `ops/kg-*-ci.sh` passam pelo resolver único).
+- **Curadoria:** o sandbox do sistema operacional entrou em loop e o core fez o rollback por ordem do maestro (abaixo).
+- **Respostas das peers:** a curadoria aceitou a dissecação dos channels (`Q_CS_CUR_DISSECAR_CHANNELS_1107`); o kg-ssot contrapropôs a forma não normativa do `x_event`, respeitando o selo `D_KG_EVENT_PROFILE_1030` (`Q_CS_KGSSOT_FORMA_X_EVENT_1107`); o adotante de consultoria não tinha nada em curso e pediu o update (`Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106`).
+
+## Estratégias novas
+
+33. **O selo da peer vence o pedido do core.** O core pediu ao kg-ssot o perfil CloudEvents no contrato; o kg-ssot recusou mudar o contrato contra um selo do maestro (`D_KG_EVENT_PROFILE_1030`, «A hoje, B no gatilho»; gatilho de 2 adotantes ou 50 nós com `x_event` real, medido em 06/11: 0) e propôs a forma recomendada não normativa. O core aceitou: o selo do maestro numa peer só muda pela régua dele.
+34. **O espelho no Linear não substitui o grafo.** Cada pendência nasce como nó com dono e data; a issue do Linear é a projeção para a gestão conjunta, com o id do nó na descrição e o id da issue no narrative do nó.
+35. **Sandbox do sistema operacional exige medir o host antes de ligar com failIfUnavailable.** Nesta VPS o `kernel.apparmor_restrict_unprivileged_userns=1` impede o bwrap de criar o uid map; ligado com failIfUnavailable, cada comando da sessão falhou e a curadoria entrou em loop. A medida do host vem antes, e a decisão da postura é do maestro (`Q_COORD_MAESTRO_APPARMOR_BWRAP_1106`).
+
+## O que deu errado (para aprender)
+
+- **Os 6 nós de decisão do plano foram escritos à mão** em vez de passar pelo `kg-decide-seal.sh`; o maestro lembrou de usar a maquinaria.
+- **O lint barrou o PR do plano duas vezes:** um `trace:` apontando para o inbox (o arquivo já tinha ido para `_processed/`) e códigos de regra na prosa sem o termo por extenso.
+- **O sandbox da curadoria ligado sem medir o host** virou loop (estratégia 35).
+
+## Para o gatilho do mecanismo
+
+4ª janela registrada, a primeira com o pedido explícito de modo autônomo por vários dias e gestão conjunta no Linear. Os três papéis seguem (core orquestra, curadoria revisa, kg-ssot dono de produto), e a estratégia 33 é a primeira em que uma peer recusa o pedido do core por um selo do maestro. Conferir as `C_SO_*` antes de propor o degrau 2.

@@ -204,6 +204,28 @@ nodes:
     confidence: 0.7
     label: "Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando entra entre 11 e 13/11."
     narrative: "Pronto quando: a resposta com os nós e as datas aceitas está no inbound do hub."
+  - id: Q_CS_CUR_DISSECAR_CHANNELS_1107
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    x_due: "2026-11-07"
+    impact: 5
+    confidence: 0.6
+    label: "Dissecação pelo /meta:dissect dos channels do Claude Code (channels.md e channels-reference.md), dos channels da allowlist oficial e das pontes da comunidade (peerbus, agent-inbox, agent-bridge, claude-mesh), com veredito por família e as 3 respostas pedidas pelo core."
+    narrative: "As 3 respostas: ponte pronta × costura × protótipo próprio; o que os oficiais mudam no desenho; os 3 maiores riscos das pontes. Aceito pela curadoria na repassada de 2026-11-06, até 12h de São Paulo de 07/11. Pronto quando: o grafo da dissecação está na curadoria com radar exit 0 e as 3 respostas chegaram ao core. Linear: SAC-296."
+  - id: Q_CS_KGSSOT_FORMA_X_EVENT_1107
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    x_due: "2026-11-07"
+    impact: 4
+    confidence: 0.6
+    label: "A forma recomendada, não normativa, do x_event no manual e no ADOPTING do kg-ssot: núcleo CloudEvents 1.0 (id, source, type, specversion, subject, time, dataref), integridade em provenance.sha256 e x_received_at separado de time, sem mudar o contrato."
+    narrative: "Contraproposta do kg-ssot na repassada de 2026-11-06, que respeita D_KG_EVENT_PROFILE_1030 (selo do maestro de 2026-10-30, opção «A hoje, B no gatilho»; gatilho: 2 adotantes ou 50 nós com x_event real; medido em 06/11: 0). O core aceitou. Pronto quando: a forma está publicada no manual e no ADOPTING. Linear: SAC-297."
 edges:
   - from: E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106
     to: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
@@ -244,3 +266,9 @@ edges:
   - from: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
     to: Q_CS_APP_SLACK_E_CHANNELS_1106
     edge_type: DEPENDS_ON
+  - from: Q_CS_DEGRAU1_CAMPAINHA_1109
+    to: Q_CS_CUR_DISSECAR_CHANNELS_1107
+    edge_type: DEPENDS_ON
+  - from: Q_CS_KGSSOT_FORMA_X_EVENT_1107
+    to: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
+    edge_type: SUPPORTS
