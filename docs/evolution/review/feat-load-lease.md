@@ -2,13 +2,13 @@
 branch: feat/load-lease
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: faa00d6d99189c599408eec06105cd2288a25ce11b4eaf99f0f9ce417654c48f
-reviewed_code_sha256: 0b4c456a19bd248d63ac5be63fb52724f904ee054c22e0d79ef7168aab41d999
-findings_total: 5
-findings_real: 5
+reviewed_diff_sha256: 616c639cd571d98895206d9b8a52a2da41306e6076f1da311ca5a69d27aab4aa
+reviewed_code_sha256: af62cfd7665952b0a422c29e681de4a7507d558235abcf524d1ede53cb6c8738
+findings_total: 6
+findings_real: 6
 tokens: 0
 duration_min: 0
-findings_fixed: 3
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "sessão do core (claude-opus-5-5), passada própria, mais a leitura do diferencial pela sessão principal; NÃO independente"
@@ -72,3 +72,10 @@ O `--rebase` sobre `origin/main` @ 0a5dcaf39 mudou o hash de código porque o dr
 o bloco `plugin_write_guard`, que já estava na main, com o `load_lease`. Conferi: os dois blocos estão inteiros, a
 bancada passa no `bash -n` e o pré-voo do finalize rodou `load_lease` e `shell_pipefail_robustness`, com 29 de 29
 verdes. Nenhuma linha deste PR mudou no rebase.
+
+## Achado do contrato KG-SSOT no 1º finalize (2026-11-06)
+
+O 1º `pr-finalize` sob o lease parou na etapa 4: o contrato KG-SSOT do commit acusou `form.range.node.label` de 2160
+para 2163, porque os três nós deste PR tinham label acima de 280 caracteres. Curado: as labels foram encurtadas e o
+detalhe ficou na `narrative`. O `ops/kg-gate-ci.sh` local voltou a 2160 e saiu com rc 0. É o 6º achado, real e
+curado, e entra na contagem do frontmatter (6 achados, 4 curados).
