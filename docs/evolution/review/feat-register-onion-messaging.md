@@ -2,7 +2,7 @@
 branch: feat/register-onion-messaging
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: f71ef0abe7013ed6f95b36afb267c1791a408476d7daae24a5b2a60cdc12ed4f
+reviewed_diff_sha256: 3c23f9713fc0644d23f0f7807bb1cdb794361654cc3ba5ced2163ba8eefc041b
 reviewed_code_sha256: 55ee795c541a32adbdddba509cd07272595db4af5d31f40fae34ee92091dccd4
 findings_total: 2
 findings_real: 1
