@@ -1,13 +1,13 @@
 ---
-reviewed_diff_sha256: 3288faaa39864a8f2b68d5f8912012ca19c72836e18bafb1a57c00494ec1e7c0
-findings_total: 12
-findings_real: 12
-findings_fixed: 8
+reviewed_diff_sha256: 58e126dfb5466b7e938483127316c7a5733bec0ecfac4d39c273f7f9463d089b
+findings_total: 13
+findings_real: 13
+findings_fixed: 9
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-reviewer: refutador da 1ª passada (7788d9178) + refutador independente (ca37a5ee2) + verificação das curas pela sessão da forja (e3f008af9)
+reviewer: refutador da 1ª passada (7788d9178) + refutador independente (ca37a5ee2) + verificação das curas pela sessão da forja (e3f008af9 e a volta do python)
 nota: >
   O refutador reprovou 7788d9178 com 9 achados reproduzidos, 1 bloqueante. Cinco viraram cura em 60b622b4a,
   cada um com caso na família adopter_guard e mutante; quatro ficaram declarados no cabeçalho do hook e no grafo
@@ -52,8 +52,9 @@ normal passou, inclusive o co-relay real.
 | B1 | `git push origin --tags` sentado na main virou veto falso no adotante (a main remota não muda: medido) | BLOQUEIA | **cura** no `push_dsts_without_spec` do lib e no push nu do merge-gate; casos (i1) a (i4) e mutante |
 | B2 | `cd -P`, `pushd`, `env -C`, `xargs` com here-string, `>|` e `exec N>` que o cabeçalho prometia | BLOQUEIA | **cura**; casos (i5) a (i11), mutantes (i5), (i7), (i8), (i10) |
 | B3 | o carimbo caía pelo pai (`rm -rf .claude`, `mv .claude`) ou pelo git (`git rm`) | BLOQUEIA | **cura**; casos (i12) a (i15), mutantes (i12), (i14); o `git merge` do update passa (h3) |
+| B2b | python -c com `subprocess.run(['git','-C',core,'commit'])` e `os.chdir`+`os.system` criava commit no core, e o hook prometia cobrir python -c | BLOQUEIA | **cura**: o verbo do git sem aspas e colchetes conta; casos (i18) a (i20) e mutante; 538 comandos python do corpus, 0 vetos |
 | L1 | vocabulário git de baixo nível | limite | **cura** de uma linha; (i16), (i17) |
-| L2 e resto | brace e glob no caminho, caminho em runtime, `find -exec sh -c "$1"`, git por python, remoção do hook, edição do settings.json, heredoc sem terminador | limite | **declarado** no cabeçalho do hook |
+| L2 e resto | brace e glob no caminho, variável e substituição no nome do repo, `find -exec sh -c "$1"`, git por python, remoção do hook, edição do settings.json, heredoc sem terminador | limite | **declarado** no cabeçalho do hook |
 
 ## Os confirmed do grafo editado (REGRA 87)
 
