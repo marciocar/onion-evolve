@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-05"
   review_after: "2026-12-05"   # 30d: defeito de guarda
-  # ═══ TETO: 15 NÓS ═══
+  # ═══ TETO: 15 NÓS ═══  (11 + 2 da 1ª passada adversarial)
 nodes:
   - id: Q_VETOS_VALEM_NO_ADOTANTE
     node_type: question
@@ -154,7 +154,36 @@ nodes:
     verified_against: "cabeçalho do pretooluse-adopter-guard.sh; decisão do adotante de instalar permissions.deny com o selo do maestro"
     trace: ".claude/hooks/pretooluse-adopter-guard.sh"
     label: "o permissions.deny do adotante é a 1ª linha; o hook é a 2ª, no que o deny por padrão de caminho e prefixo de comando não alcança: git -C, cd X && git commit, bash -c, a worktree do repo alheio fora do diretório dele, o redirecionamento"
-    narrative: "Não medido aqui: a ordem e a interação do deny com o hook no Claude Code atual. Medir quando o adotante instalar o deny."
+    narrative: "Divisão das camadas: o deny da curadoria (v2, 2026-11-05) barra por prefixo git -C, --git-dir=, --work-tree= em repo alheio e o push na main por refspec; o hook cobre cd <alheio> && git, GIT_DIR= no prefixo, sh -c e python -c (casos d3, d7, d5 e d9), e o merge-gate cobre gh api …/merge. A sobreposição em git -C fica, porque o deny é por adotante. Não medido aqui: a ordem entre deny e hook no Claude Code atual."
+  - id: E_REFUTADOR_9_ACHADOS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "passada adversarial sobre 7788d9178 (9 achados reproduzidos no hook, 1 bloqueante); curas medidas pelos casos h1 a h12, f4 e f5 da família adopter_guard e 5 mutantes novos"
+    trace: ".claude/hooks/lib/adopter-scope.sh"
+    label: "a passada adversarial reprovou 7788d9178 por 1 bloqueante (a porta pública, kind door, armava o veto de merge sem caminho verificado); curados o 1, o 3, o 6, o 7 e o 9, declarados o 2, o 4, o 5 e o 8"
+    narrative: "Curados: a porta não arma (1); leituras em subcomando de escrita (notes list/show, lfs ls-files, sparse-checkout list, clean -n, apply --check, tag -n) passam (3); $HOME vale ~ (6); git init, clone e worktree add no repo alheio, push por caminho local, --work-tree e fetch a:b vetam (7, o cabeçalho prometia); o carimbo .claude/.onion-version entra na proteção da lista, e o git merge do update segue passando (9). Declarados: push na main de fixture descartável (2, herdado do core); falso positivo de python -c com .replace( (4); nome de repo com menos de 4 letras por caminho relativo (5); vocabulário de tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, rsync --remove-source-files e find -delete (8)."
+    provenance:
+      source: "relatório do refutador, 2026-11-06, fora da árvore"
+      locator: "achados 1 a 9"
+      method: "measurement: hook real, JSON do PreToolUse no stdin, rc lido"
+      locality: "repo"
+  - id: C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "achados 2, 4, 5 e 8 do refutador, reproduzidos"
+    trace: ".claude/hooks/pretooluse-adopter-guard.sh"
+    label: "TETO: escritores por opção (tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, find -delete) e repo de nome curto por caminho relativo passam; o push na main de uma fixture descartável veta no adotante (herdado do core)"
+    narrative: "Cura do vocabulário: alvos por opção no juiz, um por ferramenta. Cura do push de fixture: no ramo do adotante, vetar a main só quando o git-common-dir do alvo é o do projeto; não cabe numa linha porque a linha canônica do lib não carrega o diretório."
 edges:
   - from: E_SONDA_27_DE_31_PASSARAM
     to: Q_VETOS_VALEM_NO_ADOTANTE
@@ -185,4 +214,10 @@ edges:
     edge_type: CONSTRAINS
   - from: C_CAMADA_NATIVA_PRIMEIRO
     to: Q_VETOS_VALEM_NO_ADOTANTE
+    edge_type: CONSTRAINS
+  - from: E_REFUTADOR_9_ACHADOS
+    to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
+    edge_type: SUPPORTS
+  - from: C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE
+    to: D_HOOK_PROPRIO_PARA_REPO_ALHEIO
     edge_type: CONSTRAINS

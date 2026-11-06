@@ -38,6 +38,9 @@ onion_adopter_role() {
   local f="${1:-.}/.claude/.onion-version" r
   [ -f "$f" ] || return 1
   r="$(sed -nE 's/^role:[[:space:]]*([A-Za-z_-]+).*$/\1/p' "$f" 2>/dev/null | head -n 1)"
+  # a PORTA pública (kind: door, ex.: a standalone) carimba role: standalone, mas quem a clona não tem caminho verificado
+  # de merge nem lista: não é adotante desta máquina (refutador, achado 1 — o veto travava o usuário público)
+  grep -qE '^kind:[[:space:]]*door([[:space:]]|$)' "$f" 2>/dev/null && return 1
   case "$r" in adopted|hub|standalone) printf '%s\n' "$r" ;; *) return 1 ;; esac
 }
 

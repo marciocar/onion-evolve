@@ -17,22 +17,30 @@
 #          `cd` literal, `git -C`, `--git-dir` e invólucros são seguidos.
 #  Write/Edit/NotebookEdit · o arquivo dentro de um repo registrado alheio (o mesmo git-common-dir, então as
 #          worktrees dele também).
-#  E o próprio arquivo da lista (.claude/adopter-guard.tsv): quem o escreve é o maestro, fora da sessão.
+#  E os arquivos que ARMAM a guarda: a lista (.claude/adopter-guard.tsv) e o carimbo (.claude/.onion-version, cujo
+#  `role:` arma os dois vetos). Quem os escreve é o maestro, fora da sessão, ou o update do Onion (git merge e o
+#  write-stamp.sh, que o hook não julga). `git checkout`/`git clean` sobre eles não são vistos (teto).
 #  "Registrado" e "este projeto" vêm da lib/adopter-scope.sh: o core local, os `local_path` do members.yaml
 #  dele e as linhas `repo` do arquivo local; o próprio projeto e as worktrees dele nunca são alheios.
 #
 # ── O QUE NÃO VETA (fronteira declarada) ──────────────────────────────────────────────────────────────
-#  · Fora do adotante (sem carimbo `role: adopted|hub|standalone`): o core tem o moat-gate, e porta ou repo
+#  · Fora do adotante (sem carimbo `role: adopted|hub|standalone`, ou com `kind: door`): o core tem o moat-gate, e porta ou repo
 #    sem carimbo não têm lista. O hook sai 0 sem ler nada.
 #  · Adotante sem lista resolvida (nem `core` no arquivo local, nem `adopted_from` local, nem `repo`): cala; a
 #    REGRA 118 avisa que o veto está sem lista. Calar é o lado certo (cláusula 4 da guard-doctrine).
 #  · Leitura em repo alheio (git log/show/diff/fetch/status, cat, grep, Read).
 #  · Script em arquivo: `bash .claude/utils/co-evolution/co-relay.sh` entrega no inbox do core SEM commit, e
 #    `bash <core>/ops/pr-merge-verified.sh` (core-only) é o merge verificado do adotante — os dois passam.
-#  · A camada nativa vem primeiro: `permissions.deny` no settings do adotante barra o que ela alcança (Edit/Write
-#    por padrão de caminho, Bash por prefixo de comando) antes de qualquer hook. Este hook é a SEGUNDA linha, no
-#    que o deny não alcança: o caminho dentro de `git -C`, `cd X && git commit`, `bash -c`, a worktree do repo
-#    alheio fora do diretório dele, o redirecionamento.
+#  · A camada nativa vem primeiro: o `permissions.deny` do adotante (a curadoria instalou o dela em 2026-11-05, com
+#    o selo do maestro) barra por prefixo `git -C <alheio>`, `--git-dir=`, `--work-tree=` e o push na main por refspec.
+#    Este hook é a SEGUNDA linha e cobre o que o deny não alcança: `cd <alheio> && git …`, `GIT_DIR=` no prefixo,
+#    `sh -c`/`bash -c`, python -c, a worktree do repo alheio fora do diretório dele, o redirecionamento e a escrita
+#    de shell (o `gh api …/merge` é do merge-gate). A sobreposição em `git -C` é de propósito: o deny é por adotante,
+#    e quem não o instalou fica só com o hook.
+#  · Teto de vocabulário (refutador, 2026-11-05): tar -C/-x, unzip -d, perl -pi, sort -o, curl -o, wget -O, patch -d,
+#    awk -i inplace, rsync --remove-source-files, mktemp em repo alheio e find -delete passam; repo registrado com
+#    nome de menos de 4 letras por caminho relativo (`cd ../abc`) escapa do pré-filtro; leitura em python -c com
+#    `.replace(`/`.remove(` de string fecha como opaco (falso positivo raro: 0 no replay).
 #  · Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass por desenho.
 input=$(cat)
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
@@ -42,6 +50,7 @@ here="$(dirname "${BASH_SOURCE[0]}")"
 onion_adopter_role "$root" >/dev/null || exit 0
 repos="$(onion_adopter_repos "$root")"
 selftsv="${root%/}/${ONION_ADOPTER_TSV_REL}"
+stamp="${root%/}/.claude/.onion-version"   # o carimbo arma as duas guardas: uma edição no `role:` desarmava tudo
 # shellcheck source=lib/invocation-lines.sh
 . "${here}/lib/invocation-lines.sh"
 
@@ -74,7 +83,7 @@ deny() {
   exit 2
 }
 deny_list() {
-  echo "GUARDA-PRETOOLUSE (adotante/lista de repos): $1 — ${ONION_ADOPTER_TSV_REL} é a lista que diz o que é repo alheio, e quem a escreve é o maestro, fora da sessão (\`!\` no prompt). Negado." >&2
+  echo "GUARDA-PRETOOLUSE (adotante/lista de repos): $1 — ${ONION_ADOPTER_TSV_REL} (a lista do que é repo alheio) e .claude/.onion-version (o carimbo, cujo papel arma os vetos) são escritos pelo maestro, fora da sessão (\`!\` no prompt), ou pelo update do Onion (git merge, write-stamp.sh). Negado." >&2
   exit 2
 }
 _common() {  # <caminho> → git-common-dir real do repo que o contém (ancestral existente mais próximo), ou vazio
@@ -93,6 +102,7 @@ case "$tool" in
     p="$(realpath -m -- "$p" 2>/dev/null)" || p=""
     [ -n "$p" ] || exit 0
     [ "$p" = "$(realpath -m -- "$selftsv" 2>/dev/null)" ] && deny_list "${tool} em ${fpath}"
+    [ "$p" = "$(realpath -m -- "$stamp" 2>/dev/null)" ] && deny_list "${tool} em ${fpath}"
     [ -n "$repos" ] || exit 0
     rr="$(realpath -m -- "$root" 2>/dev/null)"
     case "$p" in "$rr"|"$rr"/*) exit 0 ;; esac          # o próprio projeto: o caminho quente, sem git
@@ -124,7 +134,7 @@ allows="$(onion_adopter_allows "$root")"
 # um awk só: a 1ª redação abria um grep por repo registrado (28 nesta máquina) e custava ~60 ms a mais por comando
 signal=$(RR="$rr" ROOT="$root" ALLOWS="$allows" awk '
     BEGIN { n = split(ENVIRON["ALLOWS"], A, "\n"); for (i = 1; i <= n; i++) al[A[i]] = 1
-            print "adopter-guard.tsv"; print "GIT_DIR"; print "--git-dir" }
+            print "adopter-guard.tsv"; print ".onion-version"; print "GIT_DIR"; print "--git-dir"; print "GIT_WORK_TREE"; print "--work-tree" }
     NF && $0 != ENVIRON["RR"] && $0 != ENVIRON["ROOT"] && !($0 in al) {
             print; b = $0; sub(/.*\//, "", b); if (length(b) >= 4) print b }' <<< "$repos" \
           | sed 's/[][\.*^$+?(){}|/]/\\&/g' | sort -u | paste -sd'|' -)
@@ -144,7 +154,7 @@ closed() {  # SEM tokenizador: fecha SÓ o que cita um repo registrado E um verb
 }
 [ "$nopy" = 1 ] && closed "a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível)"
 out=$(ONION_CWD="$hcwd" ONION_MOAT_JUDGE="${here}/lib/adopter-judge.py" ONION_ADOPTER_REPOS="$repos" \
-      ONION_ADOPTER_ALLOWS="$allows" ONION_ADOPTER_SELF_TSV="$selftsv" onion_invocation_lines "$cmd")
+      ONION_ADOPTER_ALLOWS="$allows" ONION_ADOPTER_SELF_TSV="${selftsv}"$'\n'"${stamp}" onion_invocation_lines "$cmd")
 grep -qx '__ONION_MOAT_OK__' <<< "$out" || closed "a análise não chegou ao fim"
 line=$(printf '%s\n' "$out" | grep -m1 '^__ONION_ADOPTER__' || true)
 [ -z "$line" ] && exit 0
