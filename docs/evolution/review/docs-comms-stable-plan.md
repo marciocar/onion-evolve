@@ -2,7 +2,8 @@
 branch: docs/comms-stable-plan
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e3b78b015b91499b89c43c4cca6f45d4317ad4af1d37cf654279f3c008d22a30
+reviewed_code_sha256: 07810f125d770d41c59f3bafde183c35489ad2ab1a20635a19659102be669fce
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
