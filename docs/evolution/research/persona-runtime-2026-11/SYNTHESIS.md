@@ -22,7 +22,7 @@ adotante: A, um bot próprio no Claude Agent SDK hospedado no onion-bridge com o
 nativo do chat (Claude Tag no Slack); ou C, um bot de mercado de terceiro? É o compromisso
 `Q_PS_PESQUISA_DO_RUNTIME_1110` do grafo `docs/onion/graph/persona-servico-2026-11.kg.yaml`, com prazo em 10/11.
 
-**A decisão** (`D_PERSONA_RUNTIME_2026_11`) está **aberta para o maestro selar**. O Elenxo (o método de refutar antes de selar), um agente só e sem
+**A decisão** (`D_PERSONA_RUNTIME_2026_11`) está **selada pelo maestro em 2026-11-06**, por pergunta com opções, gravada pelo `kg-decide-seal.sh`: **escolhida A + ponte B**; descartadas «Só A», «B-hospedado (Claude Tag)» e «Pesquisar mais antes». O Elenxo (o método de refutar antes de selar), um agente só e sem
 votação, recomenda **A como núcleo, com B só como ponte nomeada (A+ponte B)**, sob 7 condições.
 
 ## As opções
