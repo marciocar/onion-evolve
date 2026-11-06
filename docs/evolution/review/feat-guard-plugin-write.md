@@ -2,8 +2,7 @@
 branch: feat/guard-plugin-write
 pr: 1490
 date: 2026-11-05
-reviewed_diff_sha256: 89fcbe475982544552eafd493b0b6aa9570988fd5979fe96afa32d82b09552db
-reviewed_code_sha256: 46b9b16dcc5409c5bfd85da65438e541237a81990aed52ac2be18edef22b7d67
+reviewed_diff_sha256: pendente
 findings_total: 29
 findings_real: 29
 tokens: 0
@@ -23,6 +22,9 @@ nota: >
   No rebase sobre d0ad1a436 (o veto de memória, cd07e4c4e, entrou na main antes) dois conflitos se
   resolveram à mão, sem tocar o juiz nem o hook: a REGRA 116 e a 114 ficam lado a lado no
   lint-artifacts.sh, e o veto-onfailure passa a contar 8 vetos (memória e plugin).
+  No rebase sobre 824c5cb85 (o veto do ato de deploy, REGRA 117, e o moat-judge.py mudado) a REGRA 114
+  fica ao lado da 117 no lint-artifacts.sh e no rules-registry.sh. O juiz de plugin compõe o moat-judge
+  novo sem mudança: plugin_write_guard rc 0 com 230 mutantes, veto_onfailure e memory_write_guard rc 0.
 ---
 
 # Veto à escrita de plugin em .claude/skills e a varredura do disco
