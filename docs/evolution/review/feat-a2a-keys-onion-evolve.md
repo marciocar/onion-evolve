@@ -2,7 +2,8 @@
 branch: feat/a2a-keys-onion-evolve
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 64fe120dccd9386bd42b7dc2a5fa6fc64f71b6b67c4b7e98663b9e8778137576
+reviewed_code_sha256: 735861ddb256df0c7fb349b82951d57fb53d78e1148d5c63c78df6ee8346248a
 findings_total: 3
 findings_real: 2
 findings_blocking: 0
