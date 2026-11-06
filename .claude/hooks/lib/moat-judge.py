@@ -280,6 +280,13 @@ def _moat_signal_re():
 
 
 _MOAT_SIGNAL, _MOAT_MEMBER_SIGNAL = _moat_signal_re()
+# o NOME de um script de ato também é relevante para o que não se prova (refutador, 2026-11-05): a cópia criada na
+# própria string, `xargs -I{} bash {}`, `find -exec bash {}`, `script -qc`, `tmux new -d` fechavam só por alvo e
+# passavam o ato. Pesa junto de algo que EXECUTA ou COPIA o texto, na mesma linha
+_MOAT_ACT_NAMES = re.compile("|".join(r"(?<![\w.-])" + re.escape(os.path.basename(r)) for r in MOAT_ACTS)) if MOAT_ACTS else None
+# só o que EXECUTA: a 1ª redação contava também cp/tee/cat/sed/git/`>` e fechou 19 comandos honestos do corpus (heredoc
+# de python que edita o wrapper, `git show … > /tmp/x` para ler); a cópia criada e executada na mesma linha traz o `bash`
+_MOAT_ACT_RUN = re.compile(r"(?<![\w.-])(bash|sh|zsh|dash|ksh|source|exec|xargs|script|tmux|screen)(?![\w.-])|-exec(dir)?\s|(^|[\s;&|(])\./")
 _MOAT_ACTION = re.compile(r"\b(systemctl|service|docker|rsync|cp|mv|install|tee|ln|rm|mkdir|touch|chmod|chown|dd|"
                           r"tar|unzip|crontab|systemd-run|at|batch|push|commit|checkout|reset|pull|restart|reload|"
                           r"start|stop|enable|disable)\b|>")
@@ -292,6 +299,8 @@ def moat_relevant(text):
         return True
     for ln in t.split("\n"):
         if _MOAT_SIGNAL.search(ln) and _MOAT_ACTION.search(ln):
+            return True
+        if _MOAT_ACT_NAMES is not None and _MOAT_ACT_NAMES.search(ln) and _MOAT_ACT_RUN.search(ln):
             return True
         if _MOAT_MEMBER_SIGNAL is not None and _MOAT_MEMBER_SIGNAL.search(ln) and _MOAT_PUSH.search(ln):
             return True
@@ -422,6 +431,12 @@ def _moat_act_of(p):
     """-> o caminho relativo (`ops/x.sh`) do ato que o script `p` é, ou None. (core-only)"""
     if not MOAT_ACTS or not p:
         return None
+    if re.search(r"[*?\[]", p):
+        # glob no caminho (`ops/publish-door.s?`, `secret?.sh`, `[r]`): o shell o expande; se pode casar um ato, é ele (core-only)
+        for r in MOAT_ACTS:
+            if _fn.fnmatchcase(os.path.basename(r), os.path.basename(p)):
+                return r
+        return None
     rp = os.path.realpath(p)
     for d in sorted(_moat_project_dirs(), key=len, reverse=True):
         if rp.startswith(d + "/"):
@@ -459,8 +474,14 @@ def _moat_act(p, words, src=None):
             if _moat_abspath(w) == p:
                 break
             pre.append(w)
-        if any(re.match(r"^-[A-Za-z]*n[A-Za-z]*$", w) for w in pre) or \
-                any(a == "-o" and b == "noexec" for a, b in zip(pre, pre[1:])):
+        # vale o ÚLTIMO toggle: `bash -n +n x.sh` executa (refutador, medido: imprimiu EXECUTOU)
+        noexec = False
+        for k, w in enumerate(pre):
+            if re.match(r"^[-+][A-Za-z]*n[A-Za-z]*$", w):
+                noexec = w[0] == "-"
+            elif w in ("-o", "+o") and k + 1 < len(pre) and pre[k + 1] == "noexec":
+                noexec = w == "-o"
+        if noexec:
             return
     _moat_act_judge(rel, [a for a in _moat_script_args(p, words) if a], " ".join(words))
 
@@ -495,8 +516,11 @@ def _moat_script(path, depth, words):
             k = words.index(path) if path in words else len(words)
             _moat_act_judge(named[0], [a for a in words[k + 1:] if a], " ".join(words))
         # `bash $(echo ops/x.sh)`: a palavra vira o marcador da substituição, e o nome só está no texto do trecho (core-only)
-        elif MOAT_ACTS and SUBST in str(path) and any(
-                re.search(r"(?<![\w.-])" + re.escape(os.path.basename(r)), raw) for r in MOAT_ACTS):
+        elif MOAT_ACTS and ((SUBST in str(path) and any(
+                re.search(r"(?<![\w.-])" + re.escape(os.path.basename(r)), raw) for r in MOAT_ACTS)) or (
+                PSUBST in str(path) and any(os.path.basename(r) in t for r in MOAT_ACTS for t in PSUBST_TEXTS))):
+            # `$X/…` cala (cláusula 4: o harness que recebe um comando em texto não é o ato); `$(…)` e `<(…)` que citam
+            # um ato, não
             _moat_emit("inanalisavel", str(path), "", "script de ato (deploy/publicação) por caminho só conhecido em runtime")
         return
     _moat_script_body(path, depth, words)
@@ -689,6 +713,9 @@ def _moat_gh(words, detail):
             _moat_emit("publicacao", "gh repo edit", "repo", "gh repo edit %s (o que o público vê do repo) — %s"
                        % (" ".join(sorted(set(hits))), detail))
         return
+    if len(words) > 2 and words[1] == "release" and words[2] in ("create", "edit", "delete", "upload"):
+        _moat_emit("publicacao", "gh release " + words[2], "release", "gh release %s (release pública) — %s" % (words[2], detail))
+        return
     if len(words) < 2 or words[1] != "api":
         return
     m = re.match(r"^gh api --method (\S+) (\S+)(.*)$", canonical_gh(words))
@@ -701,6 +728,8 @@ def _moat_gh(words, detail):
         _moat_emit("publicacao", ep, "repo", "PATCH do repo em visibilidade/descrição/tópicos — %s" % detail)
     elif meth == "PUT" and re.match(r"^repos/[^/]+/[^/]+/topics$", ep):
         _moat_emit("publicacao", ep, "repo", "PUT dos tópicos do repo — %s" % detail)
+    elif meth in ("POST", "PATCH", "DELETE") and re.match(r"^repos/[^/]+/[^/]+/releases(/.*)?$", ep):
+        _moat_emit("publicacao", ep, "release", "%s em releases pela API — %s" % (meth, detail))
 
 
 def _moat_curl_pub(args, detail):
@@ -812,6 +841,9 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             if a.startswith("-") or a in ("!", "(", ")"):
                 break
             roots.append(a)
+        if any(a in ("-exec", "-execdir", "-ok", "-okdir") and k + 1 < len(args) and os.path.basename(args[k + 1]) in SHELLS | {"source"}
+               for k, a in enumerate(args)) and moat_relevant(words):
+            moat_unanalyzable(words, "find -exec que roda um shell sobre o que achar")
         writes = "-delete" in args or any(
             a in ("-exec", "-execdir", "-ok", "-okdir") and k + 1 < len(args) and os.path.basename(args[k + 1]) in
             (_MOAT_WRITE_ALL | _MOAT_WRITE_DEST | {"sed", "truncate", "dd"}) for k, a in enumerate(args))
@@ -891,13 +923,24 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     # script em arquivo: shell com caminho, `source`/`.`, executável por caminho, shell lendo arquivo por `<`
     if base in SHELLS:
         if not any(re.match(r"^-[A-Za-z]*c[A-Za-z]*$", a) for a in args) and "<<<" not in args:
-            pos = _moat_positionals(args, {"-o", "-O", "--rcfile", "--init-file"})
+            # `+n`, `+x`, `+o noexec` são opções do shell (desligam), não o script: sem isto `bash -n +n x.sh` via "+n"
+            sa, k = [], 0
+            while k < len(args):
+                if args[k] in ("+o", "+O") and k + 1 < len(args):
+                    k += 2; continue
+                if re.match(r"^\+[A-Za-z]+$", args[k]):
+                    k += 1; continue
+                sa.append(args[k]); k += 1
+            pos = _moat_positionals(sa, {"-o", "-O", "--rcfile", "--init-file"})
             prev = [resolve(x) for x in (stdin_from or [])]
             if pos and "-s" not in args:                    # `bash -s <args> < x.sh`: os posicionais são argumentos
                 _moat_script(pos[0], depth, words)
             elif piped and prev and os.path.basename(prev[0]) == "cat":
                 for f in _moat_positionals(prev[1:]):         # `cat x.sh | bash`: o shell lê o arquivo
                     _moat_script(f, depth, words)
+            elif piped and prev and _MOAT_ACT_NAMES is not None and _MOAT_ACT_NAMES.search(" ".join(str(x) for x in prev)):
+                # `git show HEAD:ops/x.sh | bash -s`, `sed '' ops/x.sh | bash`: o shell lê o texto de um ato por outra fonte (core-only)
+                _moat_emit("inanalisavel", " ".join(str(x) for x in prev)[:120], "", "shell lendo o texto de um script de ato por pipe — %s" % " ".join(words))
             else:
                 for k, w in enumerate(raw_words):
                     m = REDIR.match(w)
@@ -930,6 +973,10 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
                 break
         if base in ("su", "runuser", "script"):
             v = _moat_opt_value(args, {"-c", "--command"}, ("--command",))
+            if v is None:                                # `script -qc '<texto>'`: opção colada (refutador)
+                for k, a in enumerate(args):
+                    if re.match(r"^-[A-Za-z]*c$", a) and k + 1 < len(args):
+                        v = args[k + 1]; break
             if v:
                 try:
                     scoped(v, depth + 1)
