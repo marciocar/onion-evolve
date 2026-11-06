@@ -1752,6 +1752,7 @@ docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_PRICING_PISO_20_SE
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_PROGRESSO_VISIVEL_3X_RETENCAO	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_QUOTA_GAP_FECHADO_ABRIL_2026	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_TETOS_DA_PESQUISA	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
+docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml	E_OBJECAO_RISK_IS_TOKEN_CONCENTRATION	docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml
 docs/evolution/research/canal-vivo-sessoes-2026-10/SYNTHESIS.md	E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml	C_LIVE_CLASS_DESIGN_CONSTRAINTS	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
@@ -1761,6 +1762,7 @@ docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-1
 docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
 docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_5_NARROW_CREDENTIAL_BROKER	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
 docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	E_OBJECAO_BWRAP_DOCKER_FAIL_ON_THIS_VPS	docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	C_PIECE_SKILLS_LOAD_EQUIVALENT_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	C_RECOMMENDATION_AFTER_SPIKES_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
@@ -2047,6 +2049,7 @@ docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md	Q_email_logto_conector_nu
 docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md	Q_juiz_adversarial_nao_rodou_m8	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv	E_DELTA_ENTRE_ITEM2_E_ITEM3	docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml
 docs/evolution/research/maestro-persona-2026-11/SYNTHESIS.md	Q_MAESTRO_PERSONA_1105	docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml
+docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml	E_OBJECAO_NO_OPTION_EMITS_ACT_CLAIM	docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F0_AGENTES	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F0_COMANDOS_META	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F0_COMANDOS_WORKFLOW	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
@@ -2227,6 +2230,7 @@ docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_EV
 docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_FINETUNE_NARROW	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_Q_OPTION_C	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md	D_ADOPT_REFRAME	docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml
+docs/evolution/research/persona-runtime-2026-11/SYNTHESIS.md	Q_PERSONA_RUNTIME_2026_11	docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml
 docs/evolution/research/playbook-sdaal-2026-10/SYNTHESIS.md	E_LACUNAS_PLAYBOOK_SDAAL_1011	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
 docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml	E_LACUNAS_PLAYBOOK_SDAAL_1012	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
 docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml	E_LACUNAS_SUBDECISAO_3_1012B	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml

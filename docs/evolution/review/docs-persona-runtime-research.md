@@ -2,7 +2,8 @@
 branch: docs/persona-runtime-research
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a4eeb2174f4d849502083084869ad835f179a015c3138bc5cdd3d582a9568109
+reviewed_code_sha256: 6b2ffb14fde6310e341ddc0f9ba1dd90591b9ef96ba1f975e6297899b40ee97a
 findings_total: 3
 findings_real: 2
 findings_blocking: 0
