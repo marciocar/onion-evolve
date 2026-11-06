@@ -156,7 +156,13 @@ class Corpus:
 # os mesmos do kg_migrate.py: o vendor e os fixtures (os da suíte e os de qualquer ferramenta) não são o grafo do
 # adotante; um --root sem eles leu 411 grafos para 29 reais no primeiro adotante que usou (achado de campo, 4.17.1)
 DEFAULT_EXCLUDE = ("vendor/*", "fixtures/*", "*/fixtures/*", "docs/materials/*")
+GRAPH_SUFFIXES = (".kg.yaml", ".kg.json")
 RRF_K = 60  # a constante do RRF (Cormack et al., 2009), a mesma da bancada que mediu o híbrido
+
+
+def file_kept(name, exclude, vendors):
+    """A regra de arquivo do corpus: fora dos padrões de exclude e fora das pastas com o carimbo do vendor."""
+    return not (any(fnmatch.fnmatchcase(name, pat) for pat in exclude) or kg_validate.in_vendor(name, vendors))
 
 
 def load(root=None, files=(), exclude=(), defaults=True):
@@ -179,7 +185,7 @@ def load(root=None, files=(), exclude=(), defaults=True):
                            if ".git" not in p.relative_to(base).parts)
         vendors = kg_validate.find_vendor_dirs(base) if defaults else ()
         for name in names:
-            if any(fnmatch.fnmatchcase(name, pat) for pat in exclude) or kg_validate.in_vendor(name, vendors):
+            if not file_kept(name, exclude, vendors):
                 continue
             path = base / name
             if not path.is_file():
@@ -191,6 +197,33 @@ def load(root=None, files=(), exclude=(), defaults=True):
     for name in files:
         with open(name, encoding="utf-8") as fh:
             corpus.add(pathlib.PurePath(name).as_posix(), fh.read())
+    return corpus
+
+
+def commit_listing(folder, rev):
+    """{caminho: objeto} de todo arquivo de um commit, pelos objetos do git. ValueError: o commit não se lê."""
+    out = _git(folder, "ls-tree", "-r", "-z", "--end-of-options", rev, offline=True)
+    if out.returncode != 0:
+        raise ValueError(_("{folder}: the commit {rev} does not read").format(folder=folder, rev=rev))
+    entries = (line.split("\t", 1) for line in out.stdout.decode("utf-8", "surrogateescape").split("\0") if line)
+    return {path: meta.split()[2] for meta, path in entries}
+
+
+def load_commit(folder, objects, exclude, vendors):
+    """O corpus de um commit (a listagem do commit_listing), sem a árvore de trabalho e sem rede: as mesmas regras de arquivo
+    do load, com exclude já somado aos padrões e o carimbo do vendor lido naquele commit."""
+    corpus = Corpus()
+    corpus.root = str(folder)
+    for name, oid in objects.items():
+        if not name.endswith(GRAPH_SUFFIXES) or not file_kept(name, exclude, vendors):
+            continue
+        raw = _git(folder, "show", "--end-of-options", oid, offline=True)
+        try:
+            if raw.returncode != 0:
+                raise OSError(oid)
+            corpus.add(name, raw.stdout.decode("utf-8"))
+        except (OSError, UnicodeDecodeError) as exc:
+            corpus.unreadable.append({"file": name, "code": f"io.{type(exc).__name__}"})
     return corpus
 
 
@@ -314,11 +347,26 @@ def with_spec(text):
 GIT_ENV_DROP = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")  # um hook de pre-commit os define para o repo dele
 
 
-def _git(folder, *args):
+def _git(folder, *args, offline=False):
     """git -C folder com --end-of-options antes do que vem do grafo: um ref que começa com - nunca vira opção. Sem o
-    GIT_DIR, o GIT_WORK_TREE e o GIT_INDEX_FILE herdados, que apontariam o git para outro repositório."""
+    GIT_DIR, o GIT_WORK_TREE e o GIT_INDEX_FILE herdados, que apontariam o git para outro repositório. Com offline (o
+    kg_refs, 4.44.0), lê só o que o clone tem: sem buscar objeto na rede num clone parcial, sem pedir senha e sem trava; e com
+    as mensagens em inglês, porque o git traduz os prefixos que o kg_refs lê no stderr."""
     env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_DROP}
+    if offline:
+        env.update(GIT_NO_LAZY_FETCH="1", GIT_OPTIONAL_LOCKS="0", GIT_TERMINAL_PROMPT="0", LC_ALL="C")
     return subprocess.run(["git", "-C", folder, *args], capture_output=True, env=env)
+
+
+def commit_of(folder, ref, offline=False):
+    """O commit inteiro que ref nomeia na pasta, ou None."""
+    out = _git(folder, "rev-parse", "--verify", "--quiet", "--end-of-options", f"{ref}^{{commit}}", offline=offline)
+    return out.stdout.decode("utf-8").strip() if out.returncode == 0 else None
+
+
+def commit_fixes(full, ref):
+    """O ref fixa aquele commit? Só se o commit começa por ele: a branch ou a tag de nome hexadecimal anda, e não fixa."""
+    return full.lower().startswith(ref.lower())
 
 
 def load_external(corpus, url):
@@ -667,8 +715,8 @@ def ref_fixed(corpus, url):
         where = _with_of(corpus, url)
         ok = False
         if where is not None and COMMIT_REF.fullmatch(where[1]):
-            out = _git(where[0], "rev-parse", "--verify", "--quiet", "--end-of-options", f"{where[1]}^{{commit}}")
-            ok = out.returncode == 0 and out.stdout.decode("utf-8").strip().lower().startswith(where[1].lower())
+            full = commit_of(where[0], where[1])
+            ok = full is not None and commit_fixes(full, where[1])
         cache[url] = ok
     return cache[url]
 

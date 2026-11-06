@@ -10,6 +10,31 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.44.0] - 2026-11-05
+
+No contract change (still v4.18), and no verdict changes. `kg_query` prints the same, and `kg_trace check` without `--strict-sources` keeps its exit codes and, in a corpus without the form `repo#id@commit`, the same `kg-ssot.trace/1`.
+
+- `kg_refs.py` (`kg-refs`) is new, with a new output, `kg-ssot.refs/1` (`spec/refs.schema.json`). It reads a declared list of
+  local clones (`--repo NAME=FOLDER`, or `--repos FILE`), only from git objects, without network. `cited-by REPO:ID` says who
+  cites a node, in any node field and in which form, and `--at NAME=COMMIT` reads an earlier state. `pins` compares each
+  citation to another repository of the list, at its pinned commit, against the tip: `same`, `changed` (`status`, `text`,
+  `edges`, `file`, `stamp_only`, `other`, with the current status of the node), `gone`, `ambiguous` or `unchecked`, which also covers a graph that writes the id and does not read, and objects missing, as in a partial clone. `--from REPO`
+  and `--status gone,changed` only cut what it lists; the scan, `summary` and the rc stay those of the whole list, with `gone` and
+  `status` first.
+- It is a query, not an alarm: a change never alters the exit code, and no option makes it. Every output has `scanned` and
+  `not_scanned`, because an empty answer does not prove absence: rc 0 complete, rc 3 partial (a folder missing or unreadable, no graph read where one was needed, because the file rules took them all out, an `--at` read a state with none, the `cited-by` target has none or the whole scan has none, a pinned commit missing in any form, a `--known` repository with no folder, a name
+  cited with a commit outside the list), rc 4 only in `pins`, on a complete scan, when something is `ambiguous` or `unchecked`, and
+  rc 2 without a declared list. `--known NAME` declares the network, with a folder or without one: with it, the names outside go to
+  `mentioned_undeclared` and their citations with an id to `outside_citations`, without changing the rc. `cited-by` also lists who cites the whole file that contains the node
+  (`contains_file`).
+- `kg_trace check` counts `provenance.source` in the form `repo#id@commit`, without changing any rc: when the form occurs, a new line
+  in the human output and `schemes.repo_refs` in the JSON, which is then `kg-ssot.trace/2`. `--strict-sources` lists each source with a
+  scheme or a sha256 that is absent and gives its own rc, 4, with `kg-ssot.trace/2` too; a source with neither is not judged, and that
+  includes a URL with a commit and no hash.
+- The limit: it finds a wrong citation, not a missing one. It reads node fields and the folders you list, and it says nothing
+  about a repository you have no folder for; it has not been tried by a third party without access to them.
+  Why: the five losses measured in 157 citations across three repositories were an answer nobody looked up, not a broken file.
+
 ## [4.43.0] - 2026-11-04
 
 No contract change (still v4.18), and no verdict changes. A query that worked in 4.42.0 prints the same `kg-ssot.query/1`, except for the two new refusals at the end of this list.

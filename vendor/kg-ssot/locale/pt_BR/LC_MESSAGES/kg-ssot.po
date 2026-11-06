@@ -3849,3 +3849,195 @@ msgstr "o grau conta só as arestas internas do grafo de cada nó; a aresta vind
 
 msgid "--due takes no date: give the date with --as-of YYYY-MM-DD"
 msgstr "--due não recebe data: dê a data com --as-of AAAA-MM-DD"
+
+#: tools/kg_refs.py
+msgid "(inferred)"
+msgstr "(inferido)"
+
+#: tools/kg_refs.py
+msgid "--at names {names}, which is not in the list"
+msgstr "o --at cita {names}, que não está na lista"
+
+#: tools/kg_refs.py
+msgid "--at takes a commit, not an option"
+msgstr "o --at recebe um commit, não uma opção"
+
+#: tools/kg_refs.py
+msgid "--at {name}: another name of that folder reads another commit"
+msgstr "--at {name}: outro nome dessa pasta lê outro commit"
+
+#: tools/kg_refs.py
+msgid "--ignore names a repository of the list: take it out of the list instead"
+msgstr "o --ignore cita um repositório da lista: tire-o da lista"
+
+#: tools/kg_refs.py
+msgid "NAME"
+msgstr "NOME"
+
+#: tools/kg_refs.py
+msgid "NAME=COMMIT"
+msgstr "NOME=COMMIT"
+
+#: tools/kg_refs.py
+msgid "NAME=FOLDER"
+msgstr "NOME=PASTA"
+
+#: tools/kg_refs.py
+msgid "NOT SCANNED  {repo}: {reason}"
+msgstr "NÃO LIDO  {repo}: {reason}"
+
+#: tools/kg_trace.py
+msgid "SOURCE MISSING  {file}#{id}  → {target}"
+msgstr "FONTE AUSENTE  {file}#{id}  → {target}"
+
+#: tools/kg_refs.py
+msgid "Who cites a node across repositories, and what changed in what is cited. A query, not an alarm: it finds a wrong citation, not a missing one."
+msgstr "Quem cita um nó entre repositórios, e o que mudou no que se cita. É consulta, não alarme: acha citação errada, não citação que falta."
+
+#: tools/kg_refs.py
+msgid "a name cited with a commit that is not a repository that matters, or a glob ('*' declares the list complete)"
+msgstr "um nome citado com commit que não é repositório que importa, ou um glob ('*' declara a lista completa)"
+
+#: tools/kg_refs.py
+msgid "ambiguous"
+msgstr "ambíguo"
+
+#: tools/kg_refs.py
+msgid "changed"
+msgstr "mudou"
+
+#: tools/kg_refs.py
+msgid "gone"
+msgstr "sumiu"
+
+#: tools/kg_refs.py
+msgid "same"
+msgstr "igual"
+
+#: tools/kg_refs.py
+msgid "unchecked"
+msgstr "não conferido"
+
+#: tools/kg_trace.py
+msgid "check: a source with a scheme or a sha256 that is absent, in the repository or at the commit of a URL read with --with, gives rc 4 instead of only being counted, and the JSON output is then kg-ssot.trace/2; a source with neither, a URL with a commit and no hash included, is not judged"
+msgstr "check: uma fonte com esquema ou sha256 que está ausente, no repositório ou no commit de uma URL lida com --with, dá rc 4 em vez de só se contar, e a saída JSON passa a ser o kg-ssot.trace/2; a fonte sem nenhum dos dois, inclusive a URL com commit e sem hash, não se julga"
+
+#: tools/kg_refs.py
+msgid "cited-by takes REPO:ID"
+msgstr "o cited-by recebe REPO:ID"
+
+#: tools/kg_refs.py
+msgid "cited-by: the cited node"
+msgstr "cited-by: o nó citado"
+
+#: tools/kg_refs.py
+msgid "declare the repositories with --repo NAME=FOLDER or --repos FILE: the tool does not guess them"
+msgstr "declare os repositórios com --repo NOME=PASTA ou --repos ARQUIVO: a ferramenta não os adivinha"
+
+#: tools/kg_refs.py
+msgid "each repository name is declared once, for one folder"
+msgstr "cada nome de repositório se declara uma vez, para uma pasta"
+
+#: tools/kg_refs.py
+msgid "pins takes no target"
+msgstr "o pins não recebe alvo"
+
+#: tools/kg_refs.py
+msgid "read that repository at an earlier state, not at HEAD"
+msgstr "lê esse repositório num estado anterior, não no HEAD"
+
+#: tools/kg_refs.py
+msgid "the list in a file, one NAME=FOLDER per line"
+msgstr "a lista num arquivo, um NOME=PASTA por linha"
+
+#: tools/kg_refs.py
+msgid "{flag} {item}: write NAME=VALUE"
+msgstr "{flag} {item}: escreva NOME=VALOR"
+
+#: tools/kg_query.py
+msgid "{folder}: the commit {rev} does not read"
+msgstr "{folder}: o commit {rev} não se lê"
+
+#: tools/kg_refs.py
+msgid "{repo} is not in the declared list"
+msgstr "{repo} não está na lista declarada"
+
+#: tools/kg_trace.py
+msgid "· {n} provenance.source in the form repo#id@commit, not read here: kg_refs pins compares them"
+msgstr "· {n} provenance.source na forma repo#id@commit, não lidos aqui: o kg_refs pins os compara"
+
+#: tools/kg_refs.py
+msgid "--from and --status belong to pins"
+msgstr "o --from e o --status são do pins"
+
+#: tools/kg_refs.py
+msgid "--ignore and --known name the same repository: choose one"
+msgstr "o --ignore e o --known citam o mesmo repositório: escolha um"
+
+#: tools/kg_refs.py
+msgid "--status takes a comma-separated list of {names}"
+msgstr "o --status recebe uma lista separada por vírgula de {names}"
+
+#: tools/kg_refs.py
+msgid "LIST"
+msgstr "LISTA"
+
+#: tools/kg_refs.py
+msgid "a repository of the declared list (repeatable); one more NAME for the same folder is an alias"
+msgstr "um repositório da lista declarada (repetível); mais um NOME para a mesma pasta é um apelido"
+
+#: tools/kg_refs.py
+msgid "a repository of the network with no folder here (repeatable): it gives rc 3, and with it only the list and the known ones count in the rc"
+msgstr "um repositório da rede sem pasta aqui (repetível): dá rc 3, e com ele só a lista e os conhecidos contam no rc"
+
+#: tools/kg_refs.py
+msgid "ignored by --ignore: {names}"
+msgstr "deixados de fora pelo --ignore: {names}"
+
+#: tools/kg_refs.py
+msgid "pins: list only these statuses, as gone,changed; the summary and the rc stay those of the scan"
+msgstr "pins: lista só estes status, como gone,changed; o resumo e o rc seguem os da varredura"
+
+#: tools/kg_refs.py
+msgid "same id, pointing to another repository, not counted: {names}"
+msgstr "o mesmo id, apontando para outro repositório, sem contar: {names}"
+
+#: tools/kg_refs.py
+msgid "scanned {repo} at {commit}: {graphs} graph(s), {nodes} node(s)"
+msgstr "lido {repo} em {commit}: {graphs} grafo(s), {nodes} nó(s)"
+
+#: tools/kg_refs.py
+msgid "the node is not in that state of {repo}: use --at for an earlier one"
+msgstr "o nó não está nesse estado de {repo}: use o --at para um anterior"
+
+#: tools/kg_refs.py
+msgid "the scan is partial: an empty answer here does not prove there is none"
+msgstr "a varredura é parcial: uma resposta vazia aqui não prova que não há"
+
+#: tools/kg_refs.py
+msgid "without a commit, not compared: {names}"
+msgstr "sem commit, sem comparar: {names}"
+
+#: tools/kg_refs.py
+msgid "{names} name(s) outside the list and the --known ones, in {n} citation(s), not counted"
+msgstr "{names} nome(s) fora da lista e dos --known, em {n} citação(ões), sem contar"
+
+#: tools/kg_refs.py
+msgid "{n} citation(s) with a commit; what to look at first:"
+msgstr "{n} citação(ões) com commit; o que olhar primeiro:"
+
+#: tools/kg_refs.py
+msgid "{repo}:{id}: {n} citation(s) from {nodes} node(s)"
+msgstr "{repo}:{id}: {n} citação(ões) de {nodes} nó(s)"
+
+#: tools/kg_refs.py
+msgid "pins: list only the citations written in that repository; the scan, the summary and the rc stay those of the whole list"
+msgstr "pins: lista só as citações escritas nesse repositório; a varredura, o resumo e o rc seguem os da lista inteira"
+
+#: tools/kg_refs.py
+msgid "listing {shown} of {n}, by --from or --status; the summary and the rc are of the whole list"
+msgstr "listando {shown} de {n}, pelo --from ou pelo --status; o resumo e o rc são da lista inteira"
+
+#: tools/kg_refs.py
+msgid "{names} name(s) cited with a commit and not in the list, in {n} citation(s): --known or --ignore says which matter; the names are in the JSON"
+msgstr "{names} nome(s) citado(s) com commit e fora da lista, em {n} citação(ões): o --known ou o --ignore dizem quais importam; os nomes estão no JSON"

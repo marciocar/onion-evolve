@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:83ec10f79355769e -->
+<!-- translation-of: README.md sha256:5d5c645abb430d6d -->
 <div align="center">
 
 # KG-SSOT
@@ -11,7 +11,7 @@ de citar a fonte, uma decisão registra o que substituiu e em que se apoia, e um
 <sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.43.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.43.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.44.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.44.0-6f42c1)](spec/release.json)
 [![Conformidade: 512/512](https://img.shields.io/badge/conformidade-512%2F512-2ea44f)](spec/conformance/README.pt-BR.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -59,6 +59,7 @@ versionado junto do código, e um **contrato formal** decide no CI o que reprova
 | Que nós são mais sustentados, e por quantas origens distintas | `kg_query --edges --where edge_type=SUPPORTS --group-by to.file --group-by to.id --count-distinct from.id` |
 | Que decisões não têm aresta interna `SUPPORTS` no próprio grafo | `kg_query --type decision --where degree.in.SUPPORTS=0`; o `SUPPORTS` de outro grafo não conta, e por isso complete com `kg_query --edges --where edge_type=SUPPORTS --where scope=external` |
 | O que passou da data de reverificação, em qualquer tipo de nó | `kg_query --due`, do mais atrasado para o menos |
+| Quem cita este nó em outros repositórios, antes de você apagá-lo | `kg_refs cited-by repo:ID --repo nome=pasta ...`, com o que foi e o que não foi lido |
 | O que disse um e-mail, um chat ou um evento de wiki, e quem enviou | Um nó `evidence` com os nomes do CloudEvents 1.0.2 em `x_event`, fixado no documento aceito no inbox ([receita](docs/manual/pt-BR/08-receitas.md)) |
 
 Conhecimento de negócio, técnico, de compliance e de design pode morar no mesmo formato, no seu repositório. Ele se
@@ -101,12 +102,12 @@ As ferramentas imprimem em inglês por padrão e em português do Brasil quando 
 
 | Canal | Comando | O que você recebe |
 |---|---|---|
-| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | Os comandos `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-criterion`, `kg-audit`, `kg-trace`, `kg-vector`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro; `pip install "kg-ssot[vector]"` acrescenta a busca por semelhança |
+| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | Os comandos `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-criterion`, `kg-audit`, `kg-trace`, `kg-refs`, `kg-vector`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro; `pip install "kg-ssot[vector]"` acrescenta a busca por semelhança |
 | [npm](https://www.npmjs.com/package/kg-ssot) | `npm install kg-ssot` | O leitor JavaScript com um validador pré-compilado, que roda também no React Native e no Expo |
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | o arquivo `.mcpb` da [última release](https://github.com/marciocar/kg-ssot/releases/latest) | O servidor MCP como extensão de um clique |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | O mesmo servidor para qualquer cliente MCP |
 | [Contêiner](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | O servidor MCP como serviço ao lado de um cliente sem Python, como o LibreChat |
-| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.43.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
+| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.44.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
 
 ## Um nó, por dentro
 
@@ -203,6 +204,7 @@ flowchart LR
 | **Vocabulário de domínio** | O perfil `x_term` dá a cada sinônimo a fonte, a versão do documento e a data de conferência; o `kg_vocab.py` resolve um texto para o termo, lista o que vence e exporta para SKOS-XL e Apache Ossie (`kg-ssot.vocab/1`); o servidor MCP o serve como `kg_terms`. Desde a 4.23, um código curto ganha nome legível no esquema dele (`notation` e `scheme`), e o `kg_vocab.py lint` confere os códigos da prosa, com catraca |
 | **Critério pré-registrado** | O `x_criterion` dá a cada versão de uma régua um nó e um `sha256`, e o `x_measured_under` prende o resultado à versão sob a qual foi medido; trocar a régua depois de ver o dado aparece como aviso post-hoc, e o `kg_criterion.py` confere o `sha256` contra o texto ou o arquivo (`kg-ssot.criterion/1`) |
 | **O trace que resolve** | O `kg_trace.py check --root .` confere a âncora `trace:` de cada nó contra os arquivos do repositório (`integrity.trace-target-missing`, `kg-ssot.trace/1`) e conta à parte o que não julga |
+| **Citações entre repositórios** | O `kg_refs.py` responde quem cita um nó antes de você apagá-lo, e o que mudou no que você cita, sobre uma lista declarada de clones locais. É consulta, não alarme: a mudança nunca altera o código de saída, e a resposta vazia de uma varredura parcial diz isso (`kg-ssot.refs/1`). Acha citação errada, não citação que falta |
 | **Busca por sentido** | O `kg_query.py --text <termo> --semantic "<pergunta>"` acha o nó quando a pergunta usa outras palavras, fundindo a busca por texto e um modelo de embedding multilíngue local por RRF; opcional (`kg-ssot[vector]`), fixado por sha256 e fora de todo veredito |
 | **Pacote de auditoria por pergunta** | O `kg_audit.py` exporta uma linha por item de questionário (o perfil `x_questionnaire`), com a pergunta, a resposta, o veredito, a evidência exigida e a dada, com a data e o vencimento, os pedidos de evidência (`role: evidence_request` e `evidence_requirement`), as contradições, o dono e as lacunas que ele calcula, em CSV, XLSX (sem dependência) ou JSON (`kg-ssot.audit/1`) |
 | **Suíte em dados puros** | 512 casos com metaschema próprio, no estilo da JSON-Schema-Test-Suite |
@@ -224,7 +226,7 @@ flowchart LR
 
 ## Estado
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.43.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
+- **Vigente:** contrato v4, release `kg-ssot-v4.44.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
 - **Em uso:** três adotantes rodam o gate no CI, um deles em produção.
 - **Próximo:** o v5 vai reprovar um `method` fora da forma `<classe>: <detalhe>`, que hoje só avisa.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) vive em `optional/`, e o leitor de

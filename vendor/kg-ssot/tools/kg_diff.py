@@ -66,7 +66,7 @@ def _rev(rev):
     return rev
 
 
-def _decode(raw):
+def decode(raw):
     """(texto, None) do conteúdo em UTF-8, ou (None, "io.not-utf8"): o grafo ilegível sai em unreadable, sem traceback."""
     try:
         return raw.decode("utf-8"), None
@@ -74,7 +74,7 @@ def _decode(raw):
         return None, "io.not-utf8"
 
 
-def _jsonable(v):
+def jsonable(v):
     """O default do json.dumps: o .nan/.inf do YAML (kg_validate.NonFinite) sai como o texto dele."""
     if isinstance(v, kg_validate.NonFinite):
         return v.text
@@ -83,7 +83,7 @@ def _jsonable(v):
 
 def _canon(v):
     """A forma canônica para comparar: 1, 1.0 e true são valores diferentes no grafo, e o == do Python os iguala."""
-    return json.dumps(v, sort_keys=True, default=_jsonable, ensure_ascii=False)
+    return json.dumps(v, sort_keys=True, default=jsonable, ensure_ascii=False)
 
 
 def _git(repo, *args):
@@ -119,11 +119,11 @@ def read_spec(spec, repo):
             raw = target.read_bytes()
         except OSError as exc:
             raise Broken(f"{spec}: {exc}") from None
-        text, code = _decode(raw)
+        text, code = decode(raw)
         if code:
             raise Broken(_("{spec}: not UTF-8").format(spec=spec))
         return name, text
-    text, code = _decode(_git(repo, "show", f"{_rev(rev)}:{name}"))
+    text, code = decode(_git(repo, "show", f"{_rev(rev)}:{name}"))
     if code:
         raise Broken(_("{spec}: not UTF-8").format(spec=spec))
     return name, text
@@ -177,7 +177,7 @@ def field_changes(before, after):
     return out
 
 
-def _parse(name, text):
+def parse(name, text):
     """O documento no modelo do contrato, ou (None, código parse.*)."""
     _, doc, code = kg_validate.parse_v1(kg_validate.as_source(name, text))
     if code or not isinstance(doc, dict):
@@ -185,7 +185,7 @@ def _parse(name, text):
     return doc, None
 
 
-def _nodes(doc):
+def nodes(doc):
     """{id: [nó, ...]}: o id repetido (que o contrato reprova, mas o diff não julga) conta cada ocorrência, na ordem."""
     out = collections.defaultdict(list)
     for n in doc.get("nodes") if isinstance(doc.get("nodes"), list) else []:
@@ -194,13 +194,16 @@ def _nodes(doc):
     return out
 
 
-def _edges(doc, key):
+def edges(doc, key):
     """{(from, to, edge_type): [aresta, ...]}: a mesma chave repetida conta cada vez."""
     out = collections.defaultdict(list)
     for e in doc.get(key) if isinstance(doc.get(key), list) else []:
         if isinstance(e, dict):
             out[tuple(e.get(k) if isinstance(e.get(k), str) else None for k in EDGE_KEY)].append(e)
     return out
+
+
+_decode, _parse, _nodes, _edges, _jsonable = decode, parse, nodes, edges, jsonable  # os nomes de antes da 4.44.0
 
 
 def _edge_view(k, e=None):
@@ -243,7 +246,7 @@ def _node_view(n):
 def diff_docs(before, after):
     """O diff de dois documentos já parseados (qualquer um pode ser None: grafo acrescentado ou removido)."""
     before, after = before or {}, after or {}
-    nb, na = _nodes(before), _nodes(after)
+    nb, na = nodes(before), nodes(after)
     added, removed, changed = [], [], []
     for nid in sorted(set(nb) | set(na)):
         lb, la = nb.get(nid, []), na.get(nid, [])
@@ -260,8 +263,8 @@ def diff_docs(before, after):
         "meta": field_changes({k: v for k, v in before.items() if k not in top},
                               {k: v for k, v in after.items() if k not in top}),
         "nodes": {"added": added, "removed": removed, "changed": changed},
-        "edges": _edge_diff(_edges(before, "edges"), _edges(after, "edges")),
-        "external_edges": _edge_diff(_edges(before, "external_edges"), _edges(after, "external_edges")),
+        "edges": _edge_diff(edges(before, "edges"), edges(after, "edges")),
+        "external_edges": _edge_diff(edges(before, "external_edges"), edges(after, "external_edges")),
     }
 
 
@@ -284,11 +287,11 @@ def diff_pair(name_b, text_b, name_a, text_a):
     if isinstance(text_b, Unreadable):
         codes["before"] = text_b.code
     elif text_b is not None:
-        db, codes["before"] = _parse(name_b, text_b)
+        db, codes["before"] = parse(name_b, text_b)
     if isinstance(text_a, Unreadable):
         codes["after"] = text_a.code
     elif text_a is not None:
-        da, codes["after"] = _parse(name_a, text_a)
+        da, codes["after"] = parse(name_a, text_a)
     bad = {side: c for side, c in codes.items() if c}
     if bad:
         item.update(status="unreadable", unreadable=bad, diff=None)
@@ -346,7 +349,7 @@ def changed_paths(repo, rev_from, rev_to, paths, exclude=()):
 
 
 def _show(repo, rev, name):
-    text, code = _decode(_git(repo, "show", f"{rev}:{name}"))
+    text, code = decode(_git(repo, "show", f"{rev}:{name}"))
     return Unreadable(code) if code else text
 
 
@@ -394,7 +397,7 @@ def diff_revisions(repo, rev_from, rev_to=None, paths=(), exclude=None, skip_ven
             text_a = _show(repo, rev_to, name)
         else:
             try:
-                text_a, code = _decode((top / name).read_bytes())
+                text_a, code = decode((top / name).read_bytes())
                 text_a = Unreadable(code) if code else text_a
             except FileNotFoundError:
                 text_a = None
@@ -410,7 +413,7 @@ def result(before_src, after_src, graphs):
 
 
 def _short(v, n=80):
-    s = "—" if v is None else v if isinstance(v, str) else json.dumps(v, ensure_ascii=False, default=_jsonable)
+    s = "—" if v is None else v if isinstance(v, str) else json.dumps(v, ensure_ascii=False, default=jsonable)
     s = s.replace("\n", " ")
     return s if len(s) <= n else s[:n - 1] + "…"
 
@@ -513,7 +516,7 @@ def _run(args):
     except Broken as exc:
         print(_("BROKEN INPUT  {error}").format(error=exc), file=sys.stderr)
         return 2
-    text = json.dumps(res, ensure_ascii=False, indent=1, default=_jsonable) if args.format == "json" else human(res)
+    text = json.dumps(res, ensure_ascii=False, indent=1, default=jsonable) if args.format == "json" else human(res)
     # o surrogate solto (\ud800, que o contrato só avisa) não é UTF-8: sai como o escape \ud800, que no JSON é o mesmo valor
     print(text.encode("utf-8", "backslashreplace").decode("utf-8"))
     return 0 if all(g["status"] == "unchanged" for g in res["graphs"]) else 1

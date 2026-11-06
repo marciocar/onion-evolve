@@ -30,7 +30,9 @@ Uso:
   kg_trace.py check [--root DIR] [--exclude GLOB]... [--no-default-excludes] [--external-root PREFIXO]...
                     [--format human|json]
 rc: 0 todo trace julgável resolve · 1 integrity.trace-target-missing, ou grafo ilegível · 2 entrada quebrada · 3 nenhum
-grafo lido (desde a 4.27: o corpus vazio não passa por "todo trace resolve" num CI que só olha o rc).
+grafo lido (desde a 4.27: o corpus vazio não passa por "todo trace resolve" num CI que só olha o rc) · 4 só com
+--strict-sources (4.44.0): nenhum dos anteriores, e alguma fonte com esquema ou sha256 ausente. A fonte sem nenhum dos
+dois fica fora, inclusive a URL com commit e sem hash: ela não se julga, nem com a opção.
 """
 import argparse
 import hashlib
@@ -55,6 +57,7 @@ else:  # script ou vendor
 _ = kg_i18n._
 
 SCHEMA_VERSION = "kg-ssot.trace/1"
+EXTENDED_VERSION = "kg-ssot.trace/2"  # desde a 4.44.0, com --strict-sources ou a forma repo#id@commit: o /1 é fechado
 LOCATOR_MISSING = "integrity.trace-locator-missing"
 LOCATOR_UNREADABLE = "integrity.trace-locator-unreadable"
 # desde a 4.37.0 (contrato v4.17): o locator lido pelo provenance.scheme e o provenance.sha256 contra a fonte
@@ -76,6 +79,10 @@ TEXT_LOCATOR = re.compile(r"(line|char)=(?:([0-9]+)(?:,([0-9]*))?|,([0-9]+))"
 _POS = r"(?:[1-9][0-9]*|\*)"
 CSV_LOCATOR = re.compile(rf"(?:row|col)={_POS}(?:-{_POS})?(?:;{_POS}(?:-{_POS})?)*"
                          rf"|cell={_POS},{_POS}(?:-{_POS},{_POS})?(?:;{_POS},{_POS}(?:-{_POS},{_POS})?)*")
+# a citação sem caminho, <repo>#<id>@<commit> (4.44.0): daqui ela é contada; quem a resolve é o kg_refs, que a procura no commit
+REF_HOST = r"(?:https?://)?(?:[\w-]+\.)+[a-zA-Z]{2,}/"
+REF_FORM = re.compile(r"(?<![\w./@:#-])(?:" + REF_HOST + r")?(?:(?P<owner>[\w.-]+)/)?"
+                      r"(?P<name>[A-Za-z0-9][\w.-]*)#(?P<id>[\w.-]+)@(?P<commit>[\w-]+)")
 KG_NODE = re.compile(r"[A-Za-z][A-Za-z0-9_]*")
 # a forma do json-pointer, a mesma do schema SHOULD: /a/b (RFC 6901) ou o fragmento #/a/b, sem espaço cru
 JSON_POINTER = re.compile(r"(?:/(?:[^/~]|~[01])*)*|#(?:/(?:[^/~ \t\n\r]|~[01])*)*")
@@ -305,10 +312,10 @@ def read_source(source, gdir, root, withs, files=None):
             if top.returncode != 0 or pathlib.Path(top.stdout.decode("utf-8").strip()).resolve() != \
                     pathlib.Path(folder).resolve():
                 return "missing", url, None
-            got = kg_query._git(folder, "rev-parse", "--verify", "--quiet", "--end-of-options", f"{ref}^{{commit}}")
-            if got.returncode != 0:
+            full = kg_query.commit_of(folder, ref)
+            if full is None:
                 return "missing", url, None
-            if not got.stdout.decode("utf-8").strip().lower().startswith(ref.lower()):
+            if not kg_query.commit_fixes(full, ref):
                 return "unpinned", url, None  # o ref resolveu para um branch ou tag de nome hexadecimal, que anda
             out = kg_query._git(folder, "show", "--end-of-options", f"{ref}:./{rel}")
             return ("ok", url, out.stdout) if out.returncode == 0 else ("missing", url, None)
@@ -479,7 +486,7 @@ def check_schemes(corpus, root, withs=()):
     keys = ("form_only", "absolute", "missing_source", "not_path", "outside_root", "unpinned", "malformed", "not_json",
             "not_text", "not_canonical")
     res = {"judged": 0, "ok": 0, "sha256_checked": 0, "node_sha256_checked": 0, "failures": [],
-           "skipped": {k: 0 for k in keys}}
+           "skipped": {k: 0 for k in keys}, "repo_refs": 0, "missing_sources": []}
     located = set()
     cache, files = {}, {}
     for key in corpus.order:
@@ -487,6 +494,8 @@ def check_schemes(corpus, root, withs=()):
         prov = node.get("provenance")
         if not isinstance(prov, dict) or not isinstance(prov.get("source"), str):
             continue
+        if REF_FORM.fullmatch(prov["source"].strip()):
+            res["repo_refs"] += 1  # a classe própria (4.44.0), que não muda as outras contas nem o rc
         raw_scheme, raw_sha = prov.get("scheme"), prov.get("sha256")
         if raw_scheme is None and raw_sha is None and prov.get("node_sha256") is None:
             continue
@@ -516,6 +525,8 @@ def check_schemes(corpus, root, withs=()):
         state, target, data = cache[ck]
         if state != "ok":
             res["skipped"]["missing_source" if state == "missing" else state] += 1
+            if state == "missing":
+                res["missing_sources"].append({"file": key[0], "id": key[1], "target": target})
             continue
         raw_locator = prov.get("locator") if isinstance(prov.get("locator"), str) else ""
         locator = raw_locator if scheme == "json-pointer" else raw_locator.strip()
@@ -738,6 +749,10 @@ def main(argv=None):
     ap.add_argument("--no-default-excludes", action="store_true", help=_("also read the vendor and the fixtures"))
     ap.add_argument("--external-root", action="append", default=[], metavar=_("PREFIX"),
                     help=_("a trace prefix that lives outside the repository (repeatable), counted apart"))
+    ap.add_argument("--strict-sources", action="store_true",
+                    help=_("check: a source with a scheme or a sha256 that is absent, in the repository or at the commit of "
+                           "a URL read with --with, gives rc 4 instead of only being counted, and the JSON output is then "
+                           "kg-ssot.trace/2; a source with neither, a URL with a commit and no hash included, is not judged"))
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_intermixed_args(argv)  # as páginas podem vir depois das opções
     kg_validate._utf8_stdio()
@@ -770,9 +785,14 @@ def main(argv=None):
         print(_("BROKEN INPUT  {error}").format(error=exc), file=sys.stderr)
         return 2
     res = check(corpus, args.root, args.external_root, withs)
+    repo_refs, absent = res["schemes"]["repo_refs"], res["schemes"]["missing_sources"]
+    if not repo_refs:  # o campo só existe quando a forma ocorre: fora disso, o kg-ssot.trace/1 é o de sempre
+        del res["schemes"]["repo_refs"]
+    if not args.strict_sources:
+        del res["schemes"]["missing_sources"]
     if args.format == "json":
-        print(json.dumps({"schema_version": SCHEMA_VERSION, **res, "unreadable": corpus.unreadable},
-                         ensure_ascii=False, indent=1))
+        print(json.dumps({"schema_version": EXTENDED_VERSION if args.strict_sources or repo_refs else SCHEMA_VERSION, **res,
+                          "unreadable": corpus.unreadable}, ensure_ascii=False, indent=1))
     else:
         for m in res["missing"]:
             print(f"{CODE}  {m['file']}#{m['id']}  → {m['target']}  {kg_validate.message_of(CODE)}")
@@ -802,6 +822,11 @@ def main(argv=None):
                     "repository").format(judged=loc["judged"], resolved=loc["resolved"], missing=len(loc["missing"]),
                                          unreadable=len(loc["unreadable"]), absolute=ls["absolute"],
                                          nofile=ls["no_json_file"]))
+        if repo_refs:
+            print(_("· {n} provenance.source in the form repo#id@commit, not read here: kg_refs pins compares them").format(n=repo_refs))
+        if args.strict_sources:
+            for m in absent:
+                print(_("SOURCE MISSING  {file}#{id}  → {target}").format(file=m["file"], id=m["id"], target=m["target"]))
         s = res["skipped"]
         if not res["graphs"] and not corpus.unreadable:  # nenhum grafo lido não é "todo trace resolve"
             print(_("· no graph read: git tracks no .kg.yaml or .kg.json under {root} outside the excludes").format(
@@ -814,6 +839,8 @@ def main(argv=None):
     if (res["missing"] or corpus.unreadable or res["locators"]["missing"] or res["locators"]["unreadable"]
             or res["schemes"]["failures"]):
         return 1
+    if args.strict_sources and absent:
+        return 4
     return 3 if not res["graphs"] else 0  # o corpus vazio tem rc próprio: zero lido não é "tudo resolve"
 
 

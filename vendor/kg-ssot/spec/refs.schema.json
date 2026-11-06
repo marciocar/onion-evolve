@@ -1,0 +1,889 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:refs.schema.json",
+  "title": "Citações entre repositórios (kg-ssot.refs/1)",
+  "description": "Saída de `kg_refs.py --format json`, desde a 4.44.0. É consulta, sem alarme: em `pins`, a mudança no citado nunca altera o rc. A regra central é a cobertura, porque vazio não prova ausência: toda saída diz o que leu (`scanned`) e o que não leu (`not_scanned`), com o motivo. `rc` repete o código de saída: 0 varredura completa da lista declarada, com todo citado conferido; 3 parcial, com algo em `not_scanned` (pasta ausente, grafos todos tirados pelo filtro, `--at`, repositório do alvo do `cited-by` ou repositório citado por um nó em `pins` com 0 grafos, a varredura inteira com 0 grafos, commit ou grafo ilegível, commit fixado ausente em qualquer forma, conhecido sem pasta, ou nome citado com commit fora da lista, sem `--known` e sem `--ignore`); 4 só em `pins`, numa varredura completa, com alguma citação `ambiguous` ou `unchecked`. Com `--known`, os nomes de fora só se contam em `mentioned_undeclared`, e as citações exatas deles ficam em `outside_citations`, sem mudar o rc. `--from` e `--status` só recortam `citations`: a varredura, o `summary` e o rc são os de toda a lista. Só os campos de nó são lidos, mais as arestas em `cited-by`. Acha citação errada, não citação que falta.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "command",
+    "summary",
+    "citations",
+    "scanned",
+    "not_scanned",
+    "ignored",
+    "mentioned_undeclared",
+    "outside_citations",
+    "rc"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.refs/1"
+    },
+    "command": {
+      "enum": [
+        "cited-by",
+        "pins"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "id",
+        "found_in"
+      ],
+      "description": "só em cited-by: o nó pedido, e os grafos onde ele está no estado lido; vazio é o nó que não está ali, e o --at lê um estado anterior",
+      "properties": {
+        "repo": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "found_in": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "status"
+      ],
+      "description": "só em pins: o recorte de citations; a varredura, o summary e o rc são os de toda a lista",
+      "properties": {
+        "from": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/status"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "summary": {
+      "type": "object"
+    },
+    "citations": {
+      "type": "array"
+    },
+    "scanned": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repo",
+          "folder",
+          "commit",
+          "graphs",
+          "nodes",
+          "shallow"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40,64}$"
+          },
+          "graphs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nodes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "shallow": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "not_scanned": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repo",
+          "reason"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "folder_missing",
+              "not_git",
+              "no_commit",
+              "commit_unreadable",
+              "at_commit_missing",
+              "no_graphs",
+              "unreadable_graph",
+              "pinned_commit_missing",
+              "known_no_folder",
+              "cited_not_declared"
+            ]
+          },
+          "commit": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "detail": {
+            "enum": [
+              "shallow",
+              "not_in_clone"
+            ]
+          },
+          "citations": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "at_commit_missing"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "commit"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "unreadable_graph"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "file",
+                "code"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "pinned_commit_missing"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "commit",
+                "detail"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "cited_not_declared"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "citations"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ignored": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "description": "os nomes tirados pelo --ignore, com quantas citações cada um"
+    },
+    "mentioned_undeclared": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "description": "com --known, os nomes de fora da lista e dos conhecidos, com quantas citações cada um; não mudam o rc"
+    },
+    "outside_citations": {
+      "type": "array",
+      "description": "com --known, as citações com id de quem está fora da rede: citante, campo, repositório, id e commit; não mudam o rc",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "citer",
+          "field",
+          "repo",
+          "id",
+          "commit"
+        ],
+        "properties": {
+          "citer": {
+            "$ref": "#/$defs/citer"
+          },
+          "field": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "rc": {
+      "enum": [
+        0,
+        3,
+        4
+      ]
+    }
+  },
+  "$defs": {
+    "citer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "file",
+        "id",
+        "status"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "citer",
+        "field",
+        "form",
+        "text",
+        "cited",
+        "status"
+      ],
+      "properties": {
+        "citer": {
+          "$ref": "#/$defs/citer"
+        },
+        "field": {
+          "type": "string"
+        },
+        "form": {
+          "enum": [
+            "url",
+            "owner_repo_sha",
+            "repo_sha",
+            "repo_path_sha",
+            "repo_id_commit",
+            "source_locator"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "cited": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repo",
+            "commit",
+            "path",
+            "id",
+            "id_source"
+          ],
+          "properties": {
+            "repo": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "id_source": {
+              "enum": [
+                "anchor",
+                "locator",
+                "inferred",
+                null
+              ],
+              "description": "de onde veio o id, ou o caminho quando inferred sem id; inferred é a prosa ao lado da citação"
+            }
+          }
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "status",
+              "text",
+              "edges",
+              "other",
+              "file",
+              "stamp_only"
+            ]
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "enum": [
+            "commit_missing",
+            "repo_unreadable",
+            "no_access",
+            "tip_behind_pin",
+            "no_target",
+            "path_absent_at_commit",
+            "id_absent_at_commit",
+            "graph_unreadable_at_commit",
+            "graph_unreadable_at_tip",
+            "objects_missing_at_tip",
+            "objects_missing_at_commit",
+            "no_graphs",
+            "hash_mismatch_at_commit",
+            "many_at_commit",
+            "many_at_tip"
+          ]
+        },
+        "code": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relation": {
+          "enum": [
+            "on_history",
+            "ahead",
+            "apart"
+          ],
+          "description": "apart é o commit fora do histórico da ponta; ahead, a ponta atrás do commit, o clone defasado"
+        },
+        "path_at_commit": {
+          "type": "string"
+        },
+        "moved_to": {
+          "type": "string"
+        },
+        "hash_at_commit": {
+          "enum": [
+            "match",
+            "mismatch"
+          ]
+        },
+        "hash_at_tip": {
+          "enum": [
+            "match",
+            "mismatch"
+          ]
+        },
+        "current_status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "só em changed, de um nó: o status dele hoje, o que mais pesa para quem cita"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "changed"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "classes"
+            ],
+            "properties": {
+              "classes": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "unchecked",
+                  "ambiguous"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "same"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "classes": {
+                "maxItems": 0
+              },
+              "relation": {
+                "enum": [
+                  "on_history",
+                  "apart"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "same",
+                  "changed",
+                  "gone"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "reason"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "mention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "citer",
+        "field",
+        "form",
+        "certainty",
+        "commit",
+        "text"
+      ],
+      "properties": {
+        "citer": {
+          "$ref": "#/$defs/citer"
+        },
+        "field": {
+          "type": "string"
+        },
+        "form": {
+          "enum": [
+            "url",
+            "owner_repo_sha",
+            "repo_sha",
+            "repo_path_sha",
+            "repo_path",
+            "repo_id_commit",
+            "mention",
+            "edge",
+            "external_edge"
+          ]
+        },
+        "certainty": {
+          "enum": [
+            "explicit",
+            "same_repo",
+            "by_id",
+            "local_homonym",
+            "contains_file"
+          ],
+          "description": "local_homonym: o id existe também no repositório de quem menciona, e ali ele nomeia o nó de lá; contains_file: cita o arquivo inteiro que contém o nó, no estado lido"
+        },
+        "commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "same",
+        "changed",
+        "gone",
+        "ambiguous",
+        "unchecked"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "const": "pins"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "citations": {
+            "items": {
+              "$ref": "#/$defs/pin"
+            }
+          },
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "citations",
+              "shown",
+              "unpinned",
+              "own_repo_citations",
+              "groups"
+            ],
+            "properties": {
+              "citations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "unpinned": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "own_repo_citations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status",
+                    "class",
+                    "citations"
+                  ],
+                  "properties": {
+                    "status": {
+                      "$ref": "#/$defs/status"
+                    },
+                    "class": {
+                      "enum": [
+                        "status",
+                        "text",
+                        "edges",
+                        "other",
+                        "file",
+                        "stamp_only",
+                        null
+                      ]
+                    },
+                    "citations": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                }
+              },
+              "shown": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "quantas estão em citations, depois do --from e do --status; citations aqui conta todas"
+              }
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "target"
+          ]
+        },
+        "required": [
+          "filter"
+        ]
+      },
+      "else": {
+        "required": [
+          "target"
+        ],
+        "properties": {
+          "citations": {
+            "items": {
+              "$ref": "#/$defs/mention"
+            }
+          },
+          "rc": {
+            "enum": [
+              0,
+              3
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "citations",
+              "citing_nodes",
+              "elsewhere"
+            ],
+            "properties": {
+              "citations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "citing_nodes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "elsewhere": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "filter"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rc": {
+            "const": 0
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "not_scanned": {
+            "maxItems": 0
+          },
+          "scanned": {
+            "minItems": 1
+          },
+          "citations": {
+            "items": {
+              "properties": {
+                "status": {
+                  "not": {
+                    "enum": [
+                      "ambiguous",
+                      "unchecked"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rc": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "not_scanned": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rc": {
+            "const": 4
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "not_scanned": {
+            "maxItems": 0
+          },
+          "scanned": {
+            "minItems": 1
+          },
+          "summary": {
+            "properties": {
+              "groups": {
+                "contains": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "ambiguous",
+                        "unchecked"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rc": {
+            "const": 4
+          },
+          "filter": {
+            "properties": {
+              "status": {
+                "const": null
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "citations": {
+            "contains": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "ambiguous",
+                    "unchecked"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

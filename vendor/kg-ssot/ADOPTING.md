@@ -343,6 +343,12 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.43.0` to `kg-ssot-v4.44.0`, nothing changes for a graph or a gate: the contract (v4.18) and the verdicts are
+the same, `kg_query` prints the same, and `kg_trace check` keeps its exit codes and its `kg-ssot.trace/1`. `kg_refs.py` is new,
+with a new output, `kg-ssot.refs/1`, and `kg_trace check --strict-sources` is new, with `kg-ssot.trace/2` and rc 4. A corpus that writes a
+source in the form `repo#id@commit` also gets `kg-ssot.trace/2`, with the count in `schemes.repo_refs`, and one more line in the human
+output: if yours does and you validate the output against a copy of `spec/trace.schema.json`, update the copy.
+
 From `kg-ssot-v4.42.0` to `kg-ssot-v4.43.0`, nothing changes for a graph or a gate: the contract (v4.18) and the
 verdicts are the same, and a query that worked before prints the same `kg-ssot.query/1`. `kg_query --due` is new and
 prints `kg-ssot.query/2` (the fields `due_on` and `days_late`); `--has`, `--missing`, the degree and the `^=` and `*=`
