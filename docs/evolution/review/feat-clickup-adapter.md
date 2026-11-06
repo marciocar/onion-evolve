@@ -1,13 +1,12 @@
 ---
 branch: feat/clickup-adapter
-pr: pendente
+pr: 1501
 date: 2026-11-06
-reviewed_diff_sha256: 691cd446ed897c9d12bc062f30d9b9b2d1fe36761f0f44256fa234d19a7a823b
-reviewed_code_sha256: 1cc030629d62a1a829348278fcd01afd35dba726ba04f5cc24ea7321f487215e
-findings_total: 3
-findings_real: 3
-findings_blocking: 0
-findings_fixed: 3
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 4
+findings_blocking: 1
+findings_fixed: 4
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -18,7 +17,8 @@ nota: >
   um a um) e a do team-lead sobre o diferencial 08bb290a1, que aprovou sem achado. Os 3 achados reais são
   da 1ª: três mutantes mordiam pelo motivo errado; os casos foram reforçados e os três passaram a morder
   pelo defeito real (rc 0 sob o mutante). Nenhum bloqueava: a cura de produção estava certa, a bancada é que
-  provava menos do que dizia. O ao vivo NÃO foi medido (LIMITE declarado). tokens e duration_min não medidos (0).
+  provava menos do que dizia. O 4º veio do CI do #1501 e bloqueava: clickup-executavel.md citava a bancada pelo
+  caminho, e a porta onion-mini (que leva o task-manager e não leva a validação) acusou ponteiro morto; curado. O ao vivo NÃO foi medido (LIMITE declarado). tokens e duration_min não medidos (0).
 ---
 
 # Passada adversarial: `feat/clickup-adapter`
@@ -35,7 +35,7 @@ nota: >
 Nenhuma das duas é independente: a 1ª é do autor, e a 2ª é de quem encomendou e leu o relato do autor. Nenhum
 refutador separado rodou.
 
-## Achados (3 reais, 0 bloqueantes, 3 curados)
+## Achados (4 reais, 1 bloqueante, 4 curados)
 
 | # | mutante | mordia por | cura do caso | agora morde por |
 |---|---|---|---|---|
@@ -46,6 +46,13 @@ refutador separado rodou.
 Os três foram achados porque a sessão leu o motivo impresso de cada mutante; a contagem "22/22 mordem", que já
 estava verde, não os mostrava. Nenhum bloqueava: o código de produção curava os três casos, e o defeito era a
 bancada provar menos do que o rótulo dizia.
+
+**4. Do CI do #1501, bloqueante: a bancada citada pelo caminho na porta mini.** A família `door_mini`
+(lane 5) reprovou com ponteiro morto para `.claude/validation/task-manager-clickup-bench.py`, citado por
+`clickup-executavel.md`. A porta onion-mini leva o task-manager e não leva a validação. Nenhuma das duas
+leituras viu isso, e o pré-voo do pr-finalize não selecionou a família `door_mini`. A cura: o doc nomeia a
+bancada pela família (`run_task_manager_clickup_selftests`), sem o caminho nem o nome do arquivo. A família
+`door_mini` foi rodada de novo sobre o commit da cura.
 
 ## Limite declarado (não é achado)
 
