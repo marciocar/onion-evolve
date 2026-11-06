@@ -32793,12 +32793,15 @@ jt = int(re.search(r'^    timeout-minutes: (\d+)$', job, re.M).group(1))
 i = job.index('lint-selftest.sh --jobs auto')
 step = job[job.rindex('      - name:', 0, i):i + 600]   # do início do PASSO da bancada até o comando
 st = re.findall(r'^        timeout-minutes: (\d+)$', step, re.M)
-ok = ('--disk-report "${GITHUB_WORKSPACE}/selftest-disk.tsv"' in step and st and int(st[-1]) < jt
+# a margem job − passo é 2 min, nem mais nem menos (medido em 2026-11-06: ~0,5 min antes do passo, 1–2 s depois):
+# menos que 2 e o job morre antes de os passos `if: always()` subirem a evidência; mais que 2 e o passo corta
+# uma faixa que o job deixaria terminar (o 22 da 1ª versão, SAC-277)
+ok = ('--disk-report "${GITHUB_WORKSPACE}/selftest-disk.tsv"' in step and st and jt - int(st[-1]) == 2
       and re.search(r'upload-artifact[\s\S]*?\n\s+selftest-disk\.tsv\n', job))
 sys.exit(0 if ok else 1)
 PYDWF
-    then record_pass "selftest-lanes: (t4) o workflow passa --disk-report, sobe selftest-disk.tsv no artefato e o teto do passo é menor que o do job"
-    else record_fail "selftest-lanes: (t4) wire-in da sonda" "o workflow não passa --disk-report, não sobe selftest-disk.tsv ou o teto do passo não fica abaixo do teto do job"; fi
+    then record_pass "selftest-lanes: (t4) o workflow passa --disk-report, sobe selftest-disk.tsv no artefato e o teto do passo fica 2 min abaixo do teto do job"
+    else record_fail "selftest-lanes: (t4) wire-in da sonda" "o workflow não passa --disk-report, não sobe selftest-disk.tsv ou o teto do passo não fica EXATAMENTE 2 min abaixo do teto do job (menos: a evidência morre com o job; mais: o passo corta faixa que o job deixaria terminar)"; fi
   else record_skip "selftest-lanes: (t4) workflow ausente (adotante sem .github) — wire-in não verificado"; fi
 
   rm -rf "${d}"
