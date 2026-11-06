@@ -1,0 +1,2455 @@
+# kg-backlog-guard: on
+# Grafo de DECISÃO da pilha de padrões do onion-messaging (pesquisa /onion-research, modo decision, 2026-11-06).
+# O maestro sela o D_; este grafo nunca sela. Os grafos antigos não são editados: as ligações com o corpus
+# vão em external_edges (contrato v4.3).
+meta:
+  id: messaging-standards-2026-11
+  schema_version: "1"
+  baseline: "2026-11-06"
+  review_after: "2026-12-06"   # 30d: o tipo DOMINANTE é FERRAMENTA. O que move a decisão é o contrato do channel do
+                               # Claude Code (prévia de pesquisa, sintaxe da flag e contrato podem mudar entre releases)
+                               # e o a2a.proto da a2aproject; a parte de mercado (90d) volta sem sinal e a doutrina de
+                               # fila (outbox, dead-letter) é estável, mas não move a revisita.
+  # ═══ TETO: 120 NÓS ═══
+  # Subida de 115 para 120 (2026-11-06): os selos do maestro sobre D_MESSAGING_STACK_2026_11 entram como 5 nós
+  # novos de decisão (identidade em dois adapters, device flow do Logto já, segredos no Vaultwarden com credencial do
+  # systemd, spike do claim act no sábado, sessão de operação no repo onion-vps-ops). Cada um é 1 resposta selada.
+  # Justificativa do teto: a rodada de primárias foi EXECUTADA em 2026-11-06 sobre as lacunas que seguram
+  # D_MESSAGING_STACK_2026_11 e APENDEU 34 nós aos 81 da rodada de decisão (Aufhebung, nada apagado): 15 evidências
+  # ancoradas, 1 contabilidade (E_LACUNAS_MESSAGING_PRIMARIES_1106), 1 opção reconciliada (Fila 3 R2), 10 objeções
+  # sobreviventes do Elenxo, 6 superações achadas e 1 pergunta de revisão. 4 nós antigos ficaram superseded.
+  # Rodada de decisão: 1 nó por objeção sobrevivente (28) e 1 por superação achada (18), mais 35 de base (81).
+  purpose: "Decidir a pilha de padrões de mercado do onion-messaging (envelope, fila, campainha, identidade, adapters e o que reaproveitar) para comunicar sessões do Claude Code, pessoas, máquinas e agentes, com versão local mínima na VPS compartilhada em 3 dias."
+external_edges:
+  - from: Q_MESSAGING_STANDARDS_1106
+    to: "docs/evolution/research/a2a-landscape-2026-11/a2a-landscape-2026-11.kg.yaml#Q_A2A_LANDSCAPE_2026_11"
+    edge_type: TRACES_TO
+  - from: Q_MESSAGING_STANDARDS_1106
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_DECIDIR_VIGIA_DE_EVENTOS"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F2_HEADLESS_NEVER_RINGS
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F3_BELL_OPTIONAL_PER_ADOPTER
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_CC_CHANNELS_ENABLED_MASTER_SWITCH"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS
+    to: "docs/evolution/research/a2a-landscape-2026-11/a2a-landscape-2026-11.kg.yaml#C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    to: "docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml#C_TETO_A2A"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#E_F1_CORPO_FORA_DA_ASSINATURA"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF
+    to: "docs/evolution/research/a2a-landscape-2026-11/a2a-landscape-2026-11.kg.yaml#C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_F9_SSE_NEEDS_CURSOR_REPLAY
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_CUT_GATE_BY_SENDER_NOT_ROOM
+    to: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml#E_CC_CHANNELS_SENDER_ALLOWLIST"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_CUT_NO_PERMISSION_RELAY
+    to: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml#E_CC_CHANNELS_PERMISSION_RELAY_APPROVER"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_SRC_EXTERNAL_PLUGINS_UNREAD
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_SLACK_OFFICIAL_MCP_PLUGIN_EXISTS"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_DECIDIR_VIGIA_DE_EVENTOS"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE
+    to: "docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml#D_CONVITE_POR_MEMBRO_COM_VALIDADE"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE
+    to: "docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml#E_S6_PONTA_A_PONTA_EM_PRODUCAO"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022"
+    edge_type: TRACES_TO
+  - from: E_EVENTMESH_V112_RC1_A2A_MCP_OVER_CLOUDEVENTS
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_DECIDIR_VIGIA_DE_EVENTOS"
+    edge_type: CONSTRAINS
+  - from: Q_MESSAGING_PRIMARIES_REVIEW_1106
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_DECIDIR_VIGIA_DE_EVENTOS"
+    edge_type: TRACES_TO
+nodes:
+  # ─── pergunta e decisão ───────────────────────────────────────────────────────────────────────────
+  - id: Q_MESSAGING_STANDARDS_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "run de /onion-research em modo decision de 2026-11-06 (o id do run não veio na tarefa de escrita): 20 claims confirmadas, 5 refutadas, 50 objeções julgadas pelo Elenxo, 28 sobreviventes, 18 superações achadas"
+    label: "Qual pilha de padrões de mercado (envelope, fila, campainha, identidade, adapters, prior art) o onion-messaging deve adotar para ligar sessões do Claude Code, pessoas, máquinas e agentes, local na VPS compartilhada e pronto em 3 dias?"
+    narrative: "Pergunta computada pelo workflow: qual pilha de padrões de mercado de novembro de 2026 o projeto próprio de mensageria do Onion (repo onion-messaging, vendorizável como o kg-ssot) deve adotar para comunicar sessões do Claude Code, pessoas, máquinas e agentes, com versão local mínima numa VPS compartilhada e pronta em 3 dias? Itens: (1) envelope e protocolo: A2A 1.0, CloudEvents 1.0 ou os dois; (2) fila e entrega: SQLite em WAL com outbox/inbox, Redis Streams com consumer groups, NATS JetStream ou outra, com pelo menos uma vez, ack, reenvio a quem estava offline, idempotência e dead-letter; (3) campainha na sessão pelo channel MCP do Claude Code (capability experimental claude/channel, notifications/claude/channel, prévia de pesquisa, sem confirmação de entrega, só com a sessão aberta); (4) identidade e convite: login por URL (device flow RFC 8628) ou outro; (5) adapters: Slack por Socket Mode, e-mail, git assíncrono; (6) projetos abertos que já existem (A2A push e tasks, MCP, AAIF, pontes de channel da comunidade). Critérios: padrão de mercado, simplicidade local, VPS compartilhada de 8 CPUs, sem dependência de serviço externo, segurança (gate A2A, nunca segredo no evento, aceite humano) e prazo de 3 dias. Corpus prévio que pesa: S6 em produção (convite por membro, 2026-10-15), A7-C1 (channel do spike com ack e reply, 2026-10-22), D_PERSONA_RUNTIME_2026_11 (bot próprio no Agent SDK no bridge) e D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106 (campainha, Slack como evento, sessão com sessão), estes dois últimos citados pela tarefa e fora desta árvore. Fica open: o selo é do maestro."
+    trace: "pergunta do run de /onion-research em modo decision de 2026-11-06, computada pelo workflow"
+  - id: D_MESSAGING_STACK_2026_11
+    node_type: decision
+    layer: audit
+    impact: 5
+    confidence: 0.55
+    label: "Pilha do onion-messaging: envelope A/B/C · fila 1/2/3 · campainha i/ii · identidade a/b · adapters Slack Socket Mode + git. Elenxo recomenda C + fila 1 + campainha i com ii de fallback + identidade a + Slack e git. O maestro sela."
+    trace: "workflow onion-research em modo decision, run de 2026-11-06; pergunta em Q_MESSAGING_STANDARDS_1106"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «CloudEvents 1.0 dentro do sinal A2A assinado + fila honker vendorizada (versão fixa, bancada e mutante antes de valer, ack só pela tool do channel, teto e dead-letter do honker) + campainha pelo channel MCP com fallback por pull + identidade em dois adapters (Logto e local) + Slack Socket Mode e git»"
+    narrative: |-
+      RECOMENDAÇÃO DO ELENXO (INTEIRA): Recomendo ao maestro a pilha mais reaproveitada e menos inventada: Envelope C, Fila 1, Campainha i com a ii de fallback, Identidade a, e Slack por Socket Mode mais git assíncrono como adapters dos 3 dias. O envelope é CloudEvents 1.0 dentro do sinal A2A no perfil Onion, que já é o que o a2a-accept.sh e o a2a-metrics.py fazem. A ressalva honesta: o A2A 1.0 só assina o Agent Card. A assinatura de mensagem é do perfil Onion (body_sha256 obrigatório no a2a-verify.sh), e um cliente A2A 1.0 estrito de terceiro não a fala. A fila é um único daemon dono de um SQLite em WAL. Restrições que entram já no desenho: - a linha só sai da outbox com o ack explícito da tool do channel, amarrado ao id e ao body_sha256; o resolver de mcp.notification() nunca conta como entrega; - tentativas com teto, mais uma tabela dead_letter (lacuna aberta: 0 nós no corpus); - dedupe por ce_source+ce_id ou jti; - poda das linhas entregues e backup, porque o disco da VPS é compartilhado; - nada de Redis em Docker nesta VPS. A campainha nasce do channel do spike: sessão interativa, flag de dev, sem permission relay, gate pelo kid do remetente e não pela sala. Ela é opcional por adotante, porque Bedrock, ZDR e channelsEnabled bloqueado a desligam. Sessões headless e a persona no Agent SDK não recebem campainha, então usam pull pelo hook ou por tool. A volta entre usuários é por pull (fetch-replies / tasks/get), nunca por webhook: o NAT e o anti-SSRF o barram. A identidade nos 3 dias é o convite A2A por membro já em produção. O device flow RFC 8628 fica para depois de existir um servidor de autorização próprio, e o código nunca viaja em convite por Slack ou e-mail. Lacunas que seguram a palavra final: - dead-letter: nenhuma peça nem fonte lida; - contrários não lidos para a fila: JetStream e honker; - prior art de CloudEvents com agentes não lida (EventMesh A2A e ADR 0021), que pode contrariar a frase 'o mercado não a tem'; - smoke do channel ainda não repetido na 2.1.319. NOTAS DO ESCRITOR (não fazem parte da recomendação): (a) o id do run não veio na tarefa de escrita; (b) claude --version nesta máquina em 2026-11-06 devolve 2.1.319, como a recomendação diz; (c) o kg-corpus-grep casa só id e label: 'CloudEvent' dá 0 nós, embora a narrative de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS fale de CloudEvents.
+
+      verified_against anterior: «recomendação do Elenxo no run de /onion-research em modo decision de 2026-11-06; o maestro não selou; 28 objeções sobreviventes modeladas como CONSTRAINS»
+      Selado por /meta:decide em 2026-11-06: escolhida «CloudEvents 1.0 dentro do sinal A2A assinado + fila honker vendorizada (versão fixa, bancada e mutante antes de valer, ack só pela tool do channel, teto e dead-letter do honker) + campainha pelo channel MCP com fallback por pull + identidade em dois adapters (Logto e local) + Slack Socket Mode e git»; descartadas: «Fila própria em SQLite» · «NATS JetStream» · «Recomendação sem honker».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Qual pilha de padrões de mercado o onion-messaging adota (envelope, fila, campainha, identidade e adapters)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  # ─── opções (uma claim por opção) ─────────────────────────────────────────────────────────────────
+  - id: C_OPCAO_ENVELOPE_A_A2A_ONION_PROFILE_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    label: "Envelope A: A2A 1.0 com o perfil Onion (JWS RS256, kid pinado, aud, jti, body_sha256), sem CloudEvents"
+    narrative: "Vale como o fio que já roda (S6, A7-C1), mas o descarte 'o A2A basta como envelope único' foi legítimo: o próprio core já lê CloudEvent 1.0 no corpo do sinal (a2a-metrics.py l.161-183) e guarda os ids dele no aceite (a2a-accept.sh l.271). A assinatura de mensagem é do perfil Onion, não do A2A 1.0 (E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE)."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_ENVELOPE_B_CLOUDEVENTS_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "Envelope B: CloudEvents 1.0 puro, fora do A2A"
+    narrative: "Perde o gate que o core já tem em produção (a2a-verify: RS256 com kid pinado, aud obrigatório, jti guardado por receptor, body_sha256). CloudEvents sozinho não assina nem autentica o remetente; cada adapter teria de reinventar o gate."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "Envelope C (os dois): CloudEvents 1.0 no corpo do sinal A2A, amarrado pelo body_sha256 assinado; já é a forma de a2a-accept.sh e a2a-metrics.py (recomendada)"
+    narrative: "Recomendada pelo Elenxo. Restrições: a spec CloudEvents 1.0 não foi lida no run (E_OBJECAO_SRC_CLOUDEVENTS_SPEC_UNREAD, risco baixo porque o core já implementa os atributos obrigatórios); o prior art de CloudEvents com agentes (EventMesh A2A, ADR 0021) não foi lido e pode contrariar 'o mercado não a tem'; um cliente A2A 1.0 estrito de terceiro não fala o fio {jws, signal}. Atributos CloudEvents vão no meta do channel com underscore (ce_id, ce_source), porque chaves com hífen são descartadas."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Fila 1: SQLite em WAL com um daemon escritor, outbox e inbox, ack explícito, tentativas com teto, tabela dead_letter, dedupe por ce_source+ce_id ou jti (recomendada)"
+    narrative: "Recomendada pelo Elenxo. Restrições: só sai da outbox com ack explícito da tool do channel amarrado ao id e ao body_sha256 (E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK); um único daemon dono do arquivo, os outros por socket local, com busy_timeout (E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE); teto de tentativas e dead_letter, que não tem peça nem fonte lida (E_OBJECAO_CUT_DEAD_LETTER_GAP); poda e backup no disco compartilhado (E_OBJECAO_CUT_PRUNE_AND_BACKUP); os contrários JetStream e honker não foram lidos."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_QUEUE_2_REDIS_STREAMS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.15
+    label: "Fila 2: Redis Streams com consumer groups (nesta VPS o Docker fura o ufw, e já houve Redis sem auth exposto)"
+    narrative: "Consumer groups dão ack e reentrega, mas a operação nesta VPS pesa contra: a memória vps-docker-ufw registra que o Docker fura o ufw e já expôs 2 Redis sem auth. Mais um serviço com rede para operar na máquina compartilhada, contra o critério de simplicidade local."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_QUEUE_3_NATS_JETSTREAM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.3
+    label: "Fila 3: NATS JetStream (ack, redelivery e max_deliver nativos; não lido no run)"
+    narrative: "É o contrário mais forte da Fila 1: traria ack, redelivery e max_deliver nativos e fecharia a dead-letter. Não foi lido no run (E_OBJECAO_SRC_JETSTREAM_UNREAD) e o corpus não tem nó de JetStream; a opção fica não-julgada, não descartada."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Campainha i: channel próprio derivado do a2a-channel.ts do spike, só em sessão interativa com a flag de dev, sem permission relay, gate por kid (recomendada, com a ii de fallback)"
+    narrative: "Recomendada pelo Elenxo. Restrições: opcional por adotante (Bedrock, Vertex, Foundry, ZDR e channelsEnabled bloqueado a desligam); sessão headless e Agent SDK nunca tocam; ack só vale amarrado ao id e ao hash do corpo; gate pelo kid do remetente, não pela sala; nunca declarar permission relay; fixar a versão do Claude Code e repetir o smoke a cada /meta:cc-update (smoke ainda não rodado na 2.1.319)."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_BELL_II_YOU_HAVE_MAIL_HOOK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Campainha ii: hook 'you have mail' no início do turno, para sessões headless e Agent SDK"
+    narrative: "Fallback da campainha i na recomendação. O hook de correio do co-evolve está em produção, mas toca na virada do turno, não ao vivo; entrega viva no Agent SDK não foi medida por ninguém (E_OBJECAO_F2_HEADLESS_NEVER_RINGS)."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "Identidade a: convite A2A por membro com validade e revogação (S6 em produção) (recomendada para os 3 dias)"
+    narrative: "Recomendada pelo Elenxo. S6 medido em produção em 2026-10-15: convite, doctor do membro, envio assinado verificado pelo gate, aceite e revogação. Não leva código de login no convite, o que fecha o vetor de phishing por device code via Slack ou e-mail."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.25
+    label: "Identidade b: device flow RFC 8628, que exige servidor de autorização próprio e nunca leva o código no convite"
+    narrative: "Fora dos 3 dias na recomendação. O A2A 1.0 só DECLARA o esquema no Agent Card; o servidor de autorização que emite device codes não vem com ele (E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS). Phishing por device code cresceu 37,5x (CSA via Push Security), e código vindo por Slack ou e-mail é o padrão que a CSA manda tratar como phishing."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  - id: C_OPCAO_ADAPTERS_SLACK_SOCKET_MODE_AND_GIT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Adapters: Slack por Socket Mode (só conexão de saída) e git assíncrono pelo doc-bridge no dia 1; e-mail depois dos 3 dias (recomendada)"
+    narrative: "Recomendada pelo Elenxo. Socket Mode dispensa endpoint público (só conexão de saída). O doc-bridge (co-deliver, co-relay) entrega assíncrono e já roda em produção, mas não toca a campainha. Restrições: o gate do adapter Slack filtra pelo remetente (kid do membro), nunca pela sala; o adapter nunca transporta código de login."
+    trace: "opção da pergunta do run de /onion-research em modo decision de 2026-11-06"
+  # ─── evidências confirmadas pela votação ──────────────────────────────────────────────────────────
+  - id: E_CC_CHANNEL_NO_DELIVERY_ACK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "https://code.claude.com/docs/en/channels-reference · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 10
+    source_kind: primary
+    label: "O channel não confirma entrega: o await de mcp.notification() resolve na escrita no transporte, e o evento cai em silêncio se a sessão não carregou o servidor como channel ou a política bloqueia. Confirmar exige um reply tool que o Claude chame."
+    narrative: "Limitado por E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH: o ack por tool é o MODELO declarando que recebeu; só vale se o servidor do channel o amarrar ao id do evento e ao hash do corpo."
+    trace: "https://code.claude.com/docs/en/channels-reference"
+    provenance:
+      source: "https://code.claude.com/docs/en/channels-reference"
+      locator: "página Channels reference da doc oficial do Claude Code"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CC_CHANNEL_DEV_FLAG_INTERACTIVE_ONLY_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "https://code.claude.com/docs/en/channels-reference · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 10
+    source_kind: primary
+    label: "Channel próprio fica fora da allowlist da prévia: exige --dangerously-load-development-channels, que só vale em sessão interativa (ignorado em -p e no Agent SDK), mostra diálogo e não pula channelsEnabled; Team/Enterprise habilitam ou usam allowedChannelPlugins."
+    narrative: "Limitado por E_OBJECAO_F2_HEADLESS_NEVER_RINGS: sessão headless e a persona no Agent SDK nunca recebem campainha, sem erro nenhum."
+    trace: "https://code.claude.com/docs/en/channels-reference"
+    provenance:
+      source: "https://code.claude.com/docs/en/channels-reference"
+      locator: "seção sobre channels customizados e a flag de desenvolvimento"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CC_CHANNELS_ANTHROPIC_AUTH_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "https://code.claude.com/docs/en/channels · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 10
+    source_kind: primary
+    label: "Channels do Claude Code são prévia de pesquisa, exigem autenticação Anthropic (claude.ai ou chave do Console) e não existem em Bedrock, Google Cloud Agent Platform nem Microsoft Foundry."
+    narrative: "Limitado por E_OBJECAO_F3_BELL_OPTIONAL_PER_ADOPTER: a campainha é opcional por adotante e a entrega nunca pode depender dela."
+    trace: "https://code.claude.com/docs/en/channels"
+    provenance:
+      source: "https://code.claude.com/docs/en/channels"
+      locator: "página Channels da doc oficial do Claude Code, requisitos"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CC_CHANNELS_NO_DURABLE_QUEUE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "https://code.claude.com/docs/en/channels · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 10
+    source_kind: primary
+    label: "Eventos de channel só chegam com a sessão aberta; o Claude Code não tem fila durável, então guardar e reenviar para sessões offline cabe ao projeto de mensageria."
+    narrative: "O Elenxo tentou derrubar pela fila em ordem quando o Claude está ocupado, que só vale dentro da sessão aberta; o achado se sustentou (objeção não sobreviveu). O spike já guarda os registros fora do Claude Code (vps/accept-to-channel.sh, SPIKE-PROTOCOL.md l.49)."
+    trace: "https://code.claude.com/docs/en/channels"
+    provenance:
+      source: "https://code.claude.com/docs/en/channels"
+      locator: "página Channels da doc oficial do Claude Code"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CC_CHANNELS_ALLOWLIST_CONTRACT_MAY_CHANGE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "https://code.claude.com/docs/en/channels · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 10
+    source_kind: primary
+    label: "Na prévia, --channels só aceita plugins da allowlist da Anthropic (ou da organização via allowedChannelPlugins); channel próprio só carrega pela flag de dev, e a sintaxe da flag e o contrato podem mudar."
+    narrative: "Limitado por E_OBJECAO_F5_PIN_CC_AND_RESMOKE: fixar a versão do Claude Code e repetir o smoke do channel a cada /meta:cc-update."
+    trace: "https://code.claude.com/docs/en/channels"
+    provenance:
+      source: "https://code.claude.com/docs/en/channels"
+      locator: "página Channels da doc oficial do Claude Code, prévia de pesquisa"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_A2A_V1_DEVICE_CODE_FLOW_ADDED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "https://a2a-protocol.org/latest/whats-new-v1/ · votos 2-1 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 9
+    source_kind: primary
+    label: "O A2A 1.0 adiciona o fluxo OAuth 2.0 Device Code (RFC 8628) como opção de autenticação compatível com A2A para login de CLI sem tela; a página fala em remover os fluxos implicit e password."
+    narrative: "Voto 2-1. Limitado por E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS: o corpus mediu no a2a.proto v1.0.0 que implicit e password foram DEPRECIADOS e seguem no oneof (C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED), e o A2A só declara o esquema no Agent Card, sem servidor de autorização."
+    trace: "https://a2a-protocol.org/latest/whats-new-v1/"
+    provenance:
+      source: "https://a2a-protocol.org/latest/whats-new-v1/"
+      locator: "página What's new in v1, seção de segurança e OAuth"
+      method: "judges: votação 2-1 do run de 2026-11-06"
+      locality: "web"
+  - id: E_A2A_V1_JWS_SIGNS_AGENT_CARD_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "https://a2a-protocol.org/latest/whats-new-v1/ · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 9
+    source_kind: primary
+    label: "O A2A 1.0 verifica assinatura do Agent Card por JWS com JSON Canonicalization; a assinatura cobre o Agent Card, não cada mensagem."
+    narrative: "Limitado por E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE: a assinatura de mensagem é do perfil Onion, e um cliente A2A 1.0 estrito de terceiro não fala o fio {jws, signal}."
+    trace: "https://a2a-protocol.org/latest/whats-new-v1/"
+    provenance:
+      source: "https://a2a-protocol.org/latest/whats-new-v1/"
+      locator: "página What's new in v1, assinatura do Agent Card"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_A2A_PUSH_WEBHOOK_PER_TASK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "https://a2a-protocol.org/llms-reference.txt · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 8
+    source_kind: primary
+    label: "O A2A 1.0 define push notifications por webhook registrado por tarefa, protegido por tokens ou esquemas de autenticação configurados por tarefa."
+    narrative: "Limitado por E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF: o push é opcional, o bridge não o declara, e o receptor atrás de NAT não tem endpoint (o anti-SSRF vetaria)."
+    trace: "https://a2a-protocol.org/llms-reference.txt"
+    provenance:
+      source: "https://a2a-protocol.org/llms-reference.txt"
+      locator: "referência para LLM do protocolo, push notifications"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_A2A_SSE_STREAMING_ALTERNATIVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "https://a2a-protocol.org/llms-reference.txt · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 8
+    source_kind: primary
+    label: "O A2A 1.0 oferece streaming SSE de atualizações em tempo real por SendStreamingMessage, alternativa simples ao webhook para uso local."
+    narrative: "Limitado por E_OBJECAO_F9_SSE_NEEDS_CURSOR_REPLAY: o SSE só entrega com a conexão aberta; quem estava offline precisa de replay por cursor e armazenamento no servidor."
+    trace: "https://a2a-protocol.org/llms-reference.txt"
+    provenance:
+      source: "https://a2a-protocol.org/llms-reference.txt"
+      locator: "referência para LLM do protocolo, streaming"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_DEVICE_CODE_PHISHING_37X
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-06"
+    verified_against: "https://labs.cloudsecurityalliance.org/research/csa-research-note-oauth-device-code-phishing-surge-20260405/ · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    valid_from: "2026-04-04"
+    source_tier: 7
+    source_kind: analyst
+    label: "Em 4 de abril de 2026, as páginas de phishing por device code (RFC 8628) tinham crescido 37,5x segundo a Push Security (via CSA): o device flow é alvo ativo de phishing em escala."
+    narrative: "O Elenxo tentou a objeção de que o número vem de um fornecedor de anti-phishing; a direção se sustenta de forma independente (campanha EvilTokens, 340+ organizações, claim cortada). Fica como risco do item 4."
+    trace: "https://labs.cloudsecurityalliance.org/research/csa-research-note-oauth-device-code-phishing-surge-20260405/"
+    provenance:
+      source: "https://labs.cloudsecurityalliance.org/research/csa-research-note-oauth-device-code-phishing-surge-20260405/"
+      locator: "nota de pesquisa da CSA de 2026-04-05"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_ZAPIER_OUTBOX_ACK_BEFORE_DELETE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "https://zapier.com/blog/lessons-from-using-outbox-pattern-at-scale · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 6
+    source_kind: engineer
+    label: "O outbox do Zapier buscava entrega pelo menos uma vez e exigia confirmação do broker (Kafka) antes de apagar o evento da outbox: sustenta o padrão ack antes de apagar."
+    narrative: "Limitado por E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK: no onion-messaging o próximo salto é o channel, cujo resolver não é ack."
+    trace: "https://zapier.com/blog/lessons-from-using-outbox-pattern-at-scale"
+    provenance:
+      source: "https://zapier.com/blog/lessons-from-using-outbox-pattern-at-scale"
+      locator: "post de engenharia do Zapier sobre outbox em escala"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_SQLITE_WAL_SINGLE_WRITER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "https://zapier.com/blog/lessons-from-using-outbox-pattern-at-scale · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 6
+    source_kind: engineer
+    label: "SQLite em WAL permite leitura e escrita concorrentes, mas segue com um único escritor por arquivo; para o volume de um onion, um arquivo e um escritor bastam."
+    narrative: "Limitado por E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE: 'um escritor' só vale se UM daemon for dono do arquivo e os outros falarem com ele por socket local."
+    trace: "https://zapier.com/blog/lessons-from-using-outbox-pattern-at-scale"
+    provenance:
+      source: "https://zapier.com/blog/lessons-from-using-outbox-pattern-at-scale"
+      locator: "post de engenharia do Zapier sobre outbox em escala"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CHANNEL_CAPABILITY_STDIO_SILENT_DROP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "https://github.com/panwudi/agent-inbox · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 5
+    source_kind: engineer
+    label: "O channel MCP exige capabilities.experimental['claude/channel'], stdio e eventos notifications/claude/channel; sem a flag de dev o Claude Code descarta as notificações em silêncio, mesmo com HTTP POST bem-sucedido."
+    narrative: "Concorda com a primária e com o passo 4 do SPIKE-PROTOCOL (l.172-176); a objeção do Elenxo não sobreviveu. A fonte está arquivada e sob AGPL (E_OBJECAO_CUT_AGENT_INBOX_ARCHIVED_AGPL)."
+    trace: "https://github.com/panwudi/agent-inbox"
+    provenance:
+      source: "https://github.com/panwudi/agent-inbox"
+      locator: "README do repositório"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_AGENT_BRIDGE_SSH_CHANNEL_POLLING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "https://github.com/EthanSK/agent-bridge · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 5
+    source_kind: engineer
+    label: "O agent-bridge entrega mensagens entre máquinas por bash/ssh/SFTP e as empurra à sessão como notifications/claude/channel, via plugin MCP de channel, com polling de 2 s: precedente comunitário da campainha."
+    narrative: "Limitado por E_OBJECAO_F14_SSH_ONLY_SAME_OWNER: o ssh só vale entre máquinas do mesmo dono."
+    trace: "https://github.com/EthanSK/agent-bridge"
+    provenance:
+      source: "https://github.com/EthanSK/agent-bridge"
+      locator: "README do repositório"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_STDOUT_ACK_NOT_CONTEXT_DELIVERY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "https://github.com/EthanSK/agent-bridge · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 5
+    source_kind: engineer
+    label: "O ack de escrita no stdout não prova que o harness receptor pôs a mensagem no contexto: confirma a ausência de confirmação de entrega fim a fim no channel."
+    narrative: "Concorda com a primária (E_CC_CHANNEL_NO_DELIVERY_ACK); a objeção do Elenxo não sobreviveu, e o ponto que muda o desenho já está nas objeções E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH e E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK."
+    trace: "https://github.com/EthanSK/agent-bridge"
+    provenance:
+      source: "https://github.com/EthanSK/agent-bridge"
+      locator: "README do repositório"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_PEERBUS_CHANNEL_WITH_TOOLS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "https://pkg.go.dev/github.com/nnemirovsky/peerbus@v0.2.1/internal/channel · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    valid_from: "2026-05"
+    source_tier: 4
+    source_kind: engineer
+    label: "Uma ponte comunitária (peerbus v0.2.1, terceiro, não oficial) implementa o channel do Claude Code como servidor MCP stdio que anuncia claude/channel junto com tools."
+    narrative: "Limitado por E_OBJECAO_F16_PEERBUS_EXISTENCE_ONLY: prova só existência; licença e manutenção não lidas."
+    trace: "https://pkg.go.dev/github.com/nnemirovsky/peerbus@v0.2.1/internal/channel"
+    provenance:
+      source: "https://pkg.go.dev/github.com/nnemirovsky/peerbus@v0.2.1/internal/channel"
+      locator: "documentação do pacote internal/channel"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CHANNEL_META_KEYS_IDENTIFIERS_STRINGS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "https://pkg.go.dev/github.com/nnemirovsky/peerbus@v0.2.1/internal/channel · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    valid_from: "2026-05"
+    source_tier: 4
+    source_kind: engineer
+    label: "No push de channel, os parâmetros têm chaves identificadoras (letras, dígitos, underscore) e todos os valores são strings."
+    narrative: "A primária diz o mesmo (hífens descartados em silêncio, claim cortada); a objeção não sobreviveu. Restrição de desenho: atributos CloudEvents mapeados com underscore (ce_id, ce_source), como já faz o a2a-metrics.py (SHADOW_KEYS)."
+    trace: "https://pkg.go.dev/github.com/nnemirovsky/peerbus@v0.2.1/internal/channel"
+    provenance:
+      source: "https://pkg.go.dev/github.com/nnemirovsky/peerbus@v0.2.1/internal/channel"
+      locator: "documentação do pacote internal/channel"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CLAUDE_MESH_SQLITE_WAL_SSE_ULID
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "https://github.com/pouriamrt/claude-mesh · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 4
+    source_kind: engineer
+    label: "O claude-mesh usa SQLite em WAL como armazenamento do relay e replay por cursor SSE com ULIDs ordenados para reenviar a quem estava offline."
+    narrative: "Limitado por E_OBJECAO_F18_CLAUDE_MESH_UNRUN: precedente auto-declarado, sem rodagem no core, licença e maturidade não lidas."
+    trace: "https://github.com/pouriamrt/claude-mesh"
+    provenance:
+      source: "https://github.com/pouriamrt/claude-mesh"
+      locator: "README do repositório"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_CLAUDE_MESH_CHAT_TO_CHANNEL_PREVIEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "https://github.com/pouriamrt/claude-mesh · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    source_tier: 4
+    source_kind: engineer
+    label: "O claude-mesh liga mensagens de chat a notifications/claude/channel, e a própria página declara o protocolo claude/channel como prévia de pesquisa, sujeita a mudança entre releases."
+    narrative: "Coincide com a primária (E_CC_CHANNELS_ALLOWLIST_CONTRACT_MAY_CHANGE); a objeção não sobreviveu."
+    trace: "https://github.com/pouriamrt/claude-mesh"
+    provenance:
+      source: "https://github.com/pouriamrt/claude-mesh"
+      locator: "README do repositório"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_TELEGRAM_PLUGIN_NOT_DELIVERED_2_1_80
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "https://claudeissues.com/issue/36827-mcp-notifications-claude-channel-notifications-not-delivered-to-session-telegram · votos 3-0 no run de /onion-research em modo decision de 2026-11-06"
+    valid_from: "2026-03-20"
+    source_tier: 4
+    source_kind: forum
+    label: "Um servidor MCP (plugin Telegram 0.0.1) declarou claude/channel e enviou notifications/claude/channel com sucesso, mas a sessão do Claude Code 2.1.80/2.1.81 nunca recebeu a mensagem."
+    narrative: "Limitado por E_OBJECAO_F20_REGRESSION_RISK_ONLY: issue antiga, de agregador, em versão superada; o core mediu entrega funcionando depois (A7-C1, 2026-10-22). Fica só o risco de regressão."
+    trace: "https://claudeissues.com/issue/36827-mcp-notifications-claude-channel-notifications-not-delivered-to-session-telegram"
+    provenance:
+      source: "https://claudeissues.com/issue/36827-mcp-notifications-claude-channel-notifications-not-delivered-to-session-telegram"
+      locator: "issue 36827, agregador de issues"
+      method: "judges: votação 3-0 do run de 2026-11-06"
+      locality: "web"
+  - id: E_MERCADO_MESSAGING_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: "2026-11-06"
+    verified_against: "bloco Mercado do sintetizador no run de /onion-research em modo decision de 2026-11-06"
+    label: "EIXO MERCADO E CAPITAL: sem sinal. Nenhuma claim confirmada traz rodada, M&A, avaliação de analista ou movimento de capital sobre mensageria entre agentes, A2A, CloudEvents, NATS ou Redis neste período."
+    narrative: "Texto do sintetizador: sem sinal encontrado. A única fonte de analista é a nota da CSA de 2026-04-04 sobre o crescimento de 37,5x do phishing por device code (via Push Security), e ela é sinal de segurança, não de capital. Quem financia mensageria entre agentes segue sem resposta neste run."
+    trace: "síntese de mercado do run de /onion-research em modo decision de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run de 2026-11-06"
+      locator: "bloco Mercado do sintetizador"
+      method: "derived: síntese do run a partir das claims confirmadas"
+      locality: "host"
+  - id: E_LACUNAS_MESSAGING_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "contabilidade do motor no run de /onion-research em modo decision de 2026-11-06: 5 refutadas, 0 não verificadas, 34 fontes e 39 claims cortadas, 0 recusadas, 18 superações; contagem das objeções feita pelo escritor sobre a lista recebida"
+    label: "LACUNAS: 5 refutadas (tier 5-10), 0 não verificadas, 34 fontes e 39 claims cortadas por orçamento; 50 objeções julgadas, 28 sobreviventes, 28 modeladas; 0 recusas; 18 superações. Dead-letter, JetStream, honker e prior art de CloudEvents seguem abertos."
+    narrative: "REFUTADAS NA VOTAÇÃO (5), nenhuma por fonte fraca (tiers 10, 9, 9, 7 e 5): (1) o channel exige só três coisas (capability, notificação, stdio), tier 10: descarte legítimo, os achados 2, 3 e 5 acrescentam flag de dev, sessão interativa, auth Anthropic e channelsEnabled; superação C_SUPERACAO_20261106_CHANNEL_REQUIREMENTS_FULL_LIST. (2) o A2A basta como envelope único, sem CloudEvents, tier 9: descarte legítimo, o core já lê CloudEvent no corpo do sinal (a2a-metrics.py l.161-183, a2a-accept.sh l.271). (3) o push do A2A é autenticado por JWT/JWKS e sustenta o gate, tier 9: descarte coerente, o gate é o a2a-verify; superação C_SUPERACAO_20261106_A2A_PUSH_AUTH_SCHEME_OPEN. (4) o device flow não tem vulnerabilidade, tier 7: a primeira metade caiu, a regra de desenho sobrevive como objeção (E_OBJECAO_REF_DEVICE_CODE_NEVER_IN_INVITE); superação C_SUPERACAO_20261106_RFC10027_CROSS_DEVICE_PHISHING. (5) o ack HTTP do agent-inbox, o journal antes do 202 e a idempotência por ID de cliente, tier 5: refutada, a fonte está arquivada e sob AGPL; superação C_SUPERACAO_20261106_AGENT_INBOX_ACK_IS_TRANSPORT. NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 34 fontes e 39 claims; 8 claims cortadas voltaram pelas objeções E_OBJECAO_CUT_* e 6 fontes não lidas pelas E_OBJECAO_SRC_*. OBJEÇÕES DO ELENXO: 50 julgadas, 28 sobreviventes, 28 modeladas, 0 não modeladas (nenhum alvo sobrevivente fica sem nó). 22 NÃO SOBREVIVERAM: achados 4, 10, 13, 15, 17 e 19; as refutadas três coisas, A2A basta, push JWT/JWKS e ack do agent-inbox; as cortadas sharding da outbox, a2a.proto normativo, tarefas visíveis e MCP/A2A complementares, EvilTokens, escopo da fonte de device flow, X-Agent-From, agent-inbox não usa A2A, resposta sem correlação; as fontes não lidas code.claude.com/docs/en/mcp, wikidocs.net/345693, andersmurphy (SQLite a 100k TPS) e cf-modkit-db. RECUSADAS PELO MOTOR (naoJulgada): 0, nenhum alvo fica não-julgado por recusa. SUPERAÇÕES ACHADAS: 18 (4 das refutadas, registradas aqui; 14 das objeções, registradas em cada E_OBJECAO_*), 18 nós C_SUPERACAO_20261106_*. O QUE NÃO FICOU FECHADO: dead-letter sem peça nem fonte (kg-corpus-grep 'dead-letter' = 0 nós); contrários da fila não lidos (JetStream, honker); prior art de CloudEvents com agentes não lido (EventMesh A2A, ADR 0021 do agent-governance-toolkit); plugins de channel da allowlist oficial não lidos (external_plugins); smoke do channel não repetido na 2.1.319; entrega viva no Agent SDK não medida; allowedChannelPlugins num managed-settings local não medido; fan-out para pessoa no Slack e sessão na mesma tarefa não medido; poda e backup do SQLite sem medida. NOTAS DO ESCRITOR: (a) o id do run não veio na tarefa de escrita; (b) a contagem 50/28/22 foi feita pelo escritor sobre a lista recebida; (c) o texto da superação C_SUPERACAO_20261106_CHANNEL_REQUIREMENTS_FULL_LIST chegou cortado no motor (termina em 'ou um SDK que não negocie a') e não foi completado de memória."
+    trace: ".claude/workflows/onion-research.js, modo decision, run de 2026-11-06"
+    provenance:
+      source: ".claude/workflows/onion-research.js, modo decision, run de 2026-11-06"
+      locator: "seções Confirmadas, Não verificadas/refutadas, Reprovações recusadas e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada"
+      locality: "host"
+  # ─── objeções sobreviventes do Elenxo (uma por alvo) ──────────────────────────────────────────────
+  - id: E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "A7-C1 no corpus: '[ok] ack e [ok] reply (kid, aud, body_sha256 e in_reply_to conferidos)' e 'judge-attempts.sh VEREDITO AGIU nas duas' (E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022)"
+    label: "OBJEÇÃO (Achado 1): o ack por tool é o modelo declarando que recebeu, e o conteúdo do channel é dado não confiável; o ack só vale amarrado pelo servidor ao id do evento e ao hash do corpo. Texto do modelo nunca conta como ack."
+    narrative: "Alvo: Achado 1, o channel não confirma entrega e a confirmação depende de um reply tool que o Claude chame (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. As mesmas réplicas do A7-C1 que mediram o ack mostraram o receptor AGINDO sob o conteúdo injetado. Superação achada (classe entrega): C_SUPERACAO_20261106_CHANNEL_ACK_TOOL_BOUND."
+    trace: "grep -n -A10 'id: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022 (l.469)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F2_HEADLESS_NEVER_RINGS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "canal-vivo-sessoes-2026-10 l.275 (E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY): 'em -p ou Agent SDK é ignorada e o canal não registra'; kg-corpus-grep 'channel' = 44 nós, nenhum com entrega headless medida (afirmação do Elenxo)"
+    label: "OBJEÇÃO (Achado 2, bloqueia): sessão headless (claude -p, cron) e a persona no Agent SDK ignoram a flag, o channel não registra e a campainha nunca toca, sem erro; um desenho que conte com a campainha para agentes perde mensagens em silêncio."
+    narrative: "Alvo: Achado 2, o channel próprio só carrega com --dangerously-load-development-channels, que exige sessão interativa e é ignorado em -p e no Agent SDK (kind=finding, triagem bloqueia). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. A pergunta quer comunicar sessões, máquinas e agentes, e D_PERSONA_RUNTIME_2026_11 decidiu bot próprio no Agent SDK no bridge. Superação procurada e não achada (classe nenhuma): a variante seria puxar a inbox por tool MCP ou pelo hook 'you have mail' no início do turno. Medida: o hook de correio do co-evolve está em produção, mas toca na virada do turno e não ao vivo; allowedChannelPlugins num managed-settings local da VPS não foi medido; ninguém mediu entrada viva no Agent SDK."
+    trace: "sed -n 270,280p docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml@11a60cf3e"
+      locator: "l.270-280, nó E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F3_BELL_OPTIONAL_PER_ADOPTER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "canal-vivo-sessoes-2026-10 l.293 (E_CC_CHANNELS_ENABLED_MASTER_SWITCH): channelsEnabled vem bloqueado em Team/Enterprise até um Owner habilitar e barra até a flag de dev"
+    label: "OBJEÇÃO (Achado 3): além de Bedrock, Vertex e Foundry, channelsEnabled vem bloqueado em Team/Enterprise e barra até a flag de dev; a campainha é opcional por adotante e a entrega nunca pode depender dela."
+    narrative: "Alvo: Achado 3, channels exigem autenticação Anthropic e não existem em Bedrock, Google Cloud nem Foundry (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Adotante com Bedrock ou org ZDR fica sem campainha. Superação procurada e não achada (classe nenhuma): fallback por git assíncrono ou doc-bridge (co-deliver, co-relay). Medida: o doc-bridge entrega assíncrono em produção, mas não toca a campainha; faz parte do próprio veredito e não supera o achado."
+    trace: "bash .claude/validation/kg-corpus-grep.sh channelsEnabled"
+    provenance:
+      source: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml@11a60cf3e"
+      locator: "l.293, nó E_CC_CHANNELS_ENABLED_MASTER_SWITCH"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F5_PIN_CC_AND_RESMOKE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "claude --version = 2.1.319 (Claude Code) nesta máquina em 2026-11-06, reexecutado pelo escritor; o arquivo a2a-channel.smoke.ts existe; última entrega medida é a do A7-C1 em 2026-10-22"
+    label: "OBJEÇÃO (Achado 5): o contrato do channel pode mudar dentro dos 3 dias, e a entrega já quebrou uma vez (2.1.80/2.1.81); fixar a versão do Claude Code (hoje 2.1.319) e repetir o smoke do channel a cada /meta:cc-update."
+    narrative: "Alvo: Achado 5, na prévia o --channels só aceita a allowlist da Anthropic e a sintaxe e o contrato podem mudar (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): o smoke do channel do spike (a2a-channel.smoke.ts) como teste de regressão. Medida: o arquivo existe, mas não há rodada dele medida na 2.1.319."
+    trace: "claude --version; ls docs/evolution/research/a2a-cross-user-spike-2026-10/channel/a2a-channel.smoke.ts"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/channel/a2a-channel.smoke.ts@11a60cf3e"
+      locator: "existência do smoke e saída de claude --version"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED (a2a-landscape-2026-11): ImplicitOAuthFlow e PasswordOAuthFlow DEPRECIADOS, seguem no oneof com [deprecated = true], DeviceCodeOAuthFlow entrou como device_code = 5, medido por grep no a2a.proto v1.0.0 (primário citado; não relido nesta rodada)"
+    label: "OBJEÇÃO (Achado 6, bloqueia): o corpus contradiz 'remove' (implicit e password foram depreciados, não removidos), e o A2A só declara o esquema no Agent Card; sem servidor de autorização próprio com RFC 8628, o item 4 fica sem entrega no dia 3."
+    narrative: "Alvo: Achado 6, o A2A 1.0 adiciona o device code (RFC 8628) e REMOVE os fluxos implicit e password (kind=finding, triagem bloqueia). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA (curl do a2a.proto v1.0.0 com grep; primário citado, não lido nesta rodada, a medida é do nó do corpus). Cenário: o time conta com login por URL nativo do A2A e no dia 3 não tem AS com RFC 8628 rodando. Superação achada (classe entrega): C_SUPERACAO_20261106_MEMBER_INVITE_FOR_MACHINES."
+    trace: "curl -sL https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/specification/a2a.proto | grep -n -E 'ImplicitOAuthFlow implicit|PasswordOAuthFlow password|device_code = '"
+    provenance:
+      source: "docs/evolution/research/a2a-landscape-2026-11/a2a-landscape-2026-11.kg.yaml@11a60cf3e"
+      locator: "nó C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "a2a-verify.sh l.44-46 (claim body_sha256 OBRIGATÓRIO, senão body-mismatch), reexecutado pelo escritor por sed -n 40,50p; C_TETO_A2A (fio {jws, signal} em PARQUE); E_F1_CORPO_FORA_DA_ASSINATURA (signal.body trocado depois de assinar devolveu verified:true, defeito curado)"
+    label: "OBJEÇÃO (Achado 7): a assinatura de mensagem é do PERFIL Onion, não do A2A 1.0; o perfil já deixou o corpo fora do JWS uma vez (curado com body_sha256 obrigatório), e um cliente A2A 1.0 estrito de terceiro não fala o fio {jws, signal}."
+    narrative: "Alvo: Achado 7, a assinatura JWS do A2A 1.0 cobre o Agent Card, não cada mensagem (kind=finding, triagem limite). Serve de objeção ao enunciado da pergunta ('A2A 1.0, JWS assinado'). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): C_SUPERACAO_20261106_BODY_SHA256_PROFILE."
+    trace: "sed -n 40,50p .claude/utils/federation-transport/a2a-verify.sh; grep -n -A12 'id: C_TETO_A2A' docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh@11a60cf3e"
+      locator: "l.40-50 (passos 5 jws e 5b body)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET: 'O notebook (NAT) não tem endpoint e o webhook seria vetado pelo anti-SSRF'; C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY; D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021"
+    label: "OBJEÇÃO (Achado 8, bloqueia): o push do A2A é opcional e o bridge não o declara; um webhook para tocar a campainha num notebook atrás de NAT não tem endpoint, a URL é vetada pelo anti-SSRF e nada é entregue."
+    narrative: "Alvo: Achado 8, o A2A 1.0 define push por webhook registrado por tarefa (kind=finding, triagem bloqueia). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): C_SUPERACAO_20261106_PULL_RETURN_TASKS_GET."
+    trace: "grep -n -A8 'id: C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F9_SSE_NEEDS_CURSOR_REPLAY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021: o card deixou de declarar streaming até haver tasks/get ou SSE"
+    label: "OBJEÇÃO (Achado 9): o SSE só entrega com a conexão aberta; quem estava offline precisa de replay por cursor e armazenamento no servidor, que o bridge não tem. O SSE sozinho não cobre o item 2."
+    narrative: "Alvo: Achado 9, o streaming SSE (SendStreamingMessage) é alternativa simples ao webhook (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): SSE com replay por cursor ULID sobre SQLite (padrão do claude-mesh). Medida: só declarado pela página do terceiro (tier 4); não rodado no core, kg-corpus-grep 'claude-mesh' = 0 nós."
+    trace: "grep -n -A6 'id: D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "no Zapier o ack vem do Kafka (broker durável); no onion-messaging o próximo salto é o channel, cujo await de mcp.notification() resolve na escrita (E_CC_CHANNEL_NO_DELIVERY_ACK); kg-corpus-grep 'outbox' só devolve nós de anúncio do doc-bridge, nenhum de fila"
+    label: "OBJEÇÃO (Achado 11, bloqueia): se a outbox marcar entregue quando mcp.notification() resolve e a sessão não carregou o channel, o evento cai em silêncio e a linha não volta para reenvio: a garantia 'pelo menos uma vez' fica falsa."
+    narrative: "Alvo: Achado 11, o outbox do Zapier exige ack do broker antes de apagar (kind=finding, triagem bloqueia). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): C_SUPERACAO_20261106_MARK_DELIVERED_ONLY_ON_ACK."
+    trace: "bash .claude/validation/kg-corpus-grep.sh outbox"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'outbox' sobre o corpus"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'sqlite' = 3 nós, nenhum de fila (afirmação do Elenxo; a busca reexecutada pelo escritor devolve nós de outros temas, como E_CISO_ASSISTANT_STATE_SQLITE_OR_POSTGRES); memória vps-docker-ufw: o Docker fura o ufw e já expôs 2 Redis sem auth"
+    label: "OBJEÇÃO (Achado 12): na VPS vários processos querem escrever (um channel por sessão, os adapters, o bridge); 'um escritor' só vale com UM daemon dono do arquivo e os outros por socket local, com busy_timeout. Contra Redis pesa o Docker que fura o ufw."
+    narrative: "Alvo: Achado 12, SQLite em WAL tem um escritor por arquivo e um escritor basta (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Se cada subprocesso abrir o banco, a contenção (SQLITE_BUSY) aparece sob carga. Superação procurada e não achada (classe nenhuma): daemon único escritor (padrão do relay do claude-mesh). Medida: no corpus, sqlite = 3 nós, nenhum de fila; o claude-mesh só é declarado pela página dele."
+    trace: "bash .claude/validation/kg-corpus-grep.sh sqlite"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'sqlite' sobre o corpus"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F14_SSH_ONLY_SAME_OWNER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET: 'O ssh do A6a só vale entre máquinas do mesmo dono'"
+    label: "OBJEÇÃO (Achado 14): o agent-bridge serve de precedente para a campainha, mas o ssh só vale entre máquinas do MESMO dono; não cobre pessoas e agentes de outros usuários, que é o escopo da pergunta."
+    narrative: "Alvo: Achado 14, o agent-bridge entrega por ssh/SFTP e toca a campainha com polling de 2 s (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): C_SUPERACAO_20261106_SIGNED_ENVELOPE_CROSS_USER."
+    trace: "grep -n 'ssh do A6a' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET, trecho 'ssh do A6a'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F16_PEERBUS_EXISTENCE_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'peerbus' = 0 nós, reexecutado pelo escritor em 2026-11-06; licença e manutenção do peerbus não lidas"
+    label: "OBJEÇÃO (Achado 16): o peerbus v0.2.1 prova só existência (tier 4, licença e manutenção não lidas), o que não sustenta vendorizar a peça; o core já tem um channel próprio rodado."
+    narrative: "Alvo: Achado 16, o peerbus v0.2.1 implementa channel com tools (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): C_SUPERACAO_20261106_OWN_CHANNEL_NO_RELAY."
+    trace: "bash .claude/validation/kg-corpus-grep.sh peerbus"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'peerbus' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F18_CLAUDE_MESH_UNRUN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'claude-mesh' = 0 nós, reexecutado pelo escritor em 2026-11-06"
+    label: "OBJEÇÃO (Achado 18): o claude-mesh é precedente auto-declarado (tier 4), sem rodagem no core, com licença e maturidade não lidas: inspiração, não prova de que funciona."
+    narrative: "Alvo: Achado 18, o claude-mesh usa SQLite WAL e replay por cursor SSE com ULIDs (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação procurada e não achada (classe nenhuma): rodar o claude-mesh em loopback na VPS. Medida: não foi rodado."
+    trace: "bash .claude/validation/kg-corpus-grep.sh claude-mesh"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'claude-mesh' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_F20_REGRESSION_RISK_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "A7-C1 em 2026-10-22: 'accept-to-channel push http 200, fetch [ok] ack e [ok] reply' (E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022)"
+    label: "OBJEÇÃO (Achado 20): a issue do Telegram é antiga, de agregador (tier 4) e em versão superada; o core mediu entrega funcionando depois dela (A7-C1). Fica só o risco de regressão, que leva à restrição do Achado 5."
+    narrative: "Alvo: Achado 20, o plugin Telegram 0.0.1 não entregou na 2.1.80/2.1.81 (kind=finding, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA, sobre o alcance. Superação achada (classe entrega): C_SUPERACAO_20261106_OWN_CHANNEL_DELIVERY_LATER_VERSION."
+    trace: "grep -n -A10 'id: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022 (l.469)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_REF_DEVICE_CODE_NEVER_IN_INVITE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "CSA, claim cortada: 'tratar qualquer device code recebido por e-mail, Teams, Slack ou SMS como indicador forte de phishing' (primário citado, não lido nesta rodada); kg-corpus-grep 'RFC 8628'"
+    label: "OBJEÇÃO (refutada, device flow sem vulnerabilidade): a primeira metade caiu por evidência, mas a regra de desenho (código só no dispositivo solicitante, nunca em convite) caiu junto sem refutação, e a própria CSA a apoia."
+    narrative: "Alvo: refutada 'o device flow não tem vulnerabilidade' e, com ela, a mitigação (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): C_SUPERACAO_20261106_INVITE_WITHOUT_CODE."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'RFC 8628'"
+    provenance:
+      source: "https://labs.cloudsecurityalliance.org/research/csa-research-note-oauth-device-code-phishing-surge-20260405/"
+      locator: "recomendações de mitigação da nota da CSA (claim cortada do run)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_GATE_BY_SENDER_NOT_ROOM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "E_CC_CHANNELS_SENDER_ALLOWLIST (a2a-empresa-adotante-2026-10, tier 9): 'only IDs you've added can push messages'; A7-C1 'VEREDITO AGIU nas duas'"
+    label: "OBJEÇÃO (cortada, bloqueia): se o gate filtra pela SALA do Slack e não pelo remetente, qualquer membro da sala injeta texto na sessão; o A7-C1 mediu o receptor AGINDO sob conteúdo de channel. O gate é pelo kid do remetente."
+    narrative: "Alvo: cortada 'a fila em ordem, as chaves com hífen descartadas e o gate por identidade do remetente' (kind=discarded-by-comodismo, triagem bloqueia). Foi cortada por orçamento, embora o corpus tenha a primária. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): C_SUPERACAO_20261106_SENDER_KID_GATE."
+    trace: "grep -n -A12 'id: E_CC_CHANNELS_SENDER_ALLOWLIST' docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó E_CC_CHANNELS_SENDER_ALLOWLIST"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_CUT_NO_PERMISSION_RELAY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "E_CC_CHANNELS_PERMISSION_RELAY_APPROVER (a2a-empresa-adotante-2026-10): 'Anyone who can reply through the channel can approve or deny tool use in your session'"
+    label: "OBJEÇÃO (cortada, bloqueia): quem responde pelo channel pode aprovar ou negar uso de tool na sessão; se o channel do onion-messaging declarar permission relay, outro agente da allowlist aprova Bash na sessão do maestro, contra o aceite humano."
+    narrative: "Alvo: cortada 'o permission relay do channel (claude/channel/permission)' (kind=discarded-by-comodismo, triagem bloqueia). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): C_SUPERACAO_20261106_NO_PERMISSION_RELAY."
+    trace: "grep -n -A12 'id: E_CC_CHANNELS_PERMISSION_RELAY_APPROVER' docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml@11a60cf3e"
+      locator: "nó E_CC_CHANNELS_PERMISSION_RELAY_APPROVER"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_CUT_PRUNE_AND_BACKUP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "a VPS compartilhada já teve incidente de disco (sonda de disco SAC-277 pendente); kg-corpus-grep 'sqlite' = 3 nós, nenhum de operação (afirmação do Elenxo)"
+    label: "OBJEÇÃO (cortada): sem poda das linhas entregues e sem backup, a outbox enche o disco comum de uma VPS que já teve incidente de disco."
+    narrative: "Alvo: cortada 'o volume local foi ponto de falha e o arquivo cresce, por isso backup e poda' (kind=discarded-by-comodismo, triagem limite). Exigência operacional cortada sem medida. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): poda das linhas entregues mais sqlite3 .backup agendado. Medida: nada medido no core para SQLite."
+    trace: "bash .claude/validation/kg-corpus-grep.sh backup"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "buscas 'backup' e 'sqlite' sobre o corpus"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_CUT_DEAD_LETTER_GAP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'dead-letter' = 0 nós em 227 grafos, reexecutado pelo escritor em 2026-11-06; a dedupe por jti está medida (repetição vetada, coordenacao-sessoes-2026-10 l.381)"
+    label: "OBJEÇÃO (cortada, bloqueia): a pergunta pede dead-letter e o corpus não tem nó nenhum; numa entrega 'pelo menos uma vez', a mensagem venenosa volta para reenvio para sempre e repete a campainha e a ação na sessão."
+    narrative: "Alvo: cortada 'o artigo não cobre idempotência nem dead-letter' (kind=discarded-by-comodismo, triagem bloqueia). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): contador de tentativas com teto e tabela dead_letter, mais dedupe por (ce_source, ce_id) ou jti. Medida: a dedupe por jti está medida; a dead-letter não tem peça nem fonte lida."
+    trace: "bash .claude/validation/kg-corpus-grep.sh dead-letter"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'dead-letter' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_CUT_FAN_OUT_CONCURRENT_STREAMS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'StreamResponse' = 0 nós, reexecutado pelo escritor em 2026-11-06; o bridge não declara streaming (D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021)"
+    label: "OBJEÇÃO (cortada): o push do A2A usa StreamResponse e aceita streams concorrentes, o que importa para o leque de entrega: uma pessoa no Slack e uma sessão na mesma tarefa recebem os mesmos eventos em ordem."
+    narrative: "Alvo: cortada 'o push do A2A usa StreamResponse e aceita streams concorrentes' (kind=discarded-by-comodismo, triagem limite). Cortada sem refutação. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): fan-out pela fila própria. Medida: nada medido."
+    trace: "bash .claude/validation/kg-corpus-grep.sh StreamResponse"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'StreamResponse' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_CUT_DEVICE_CODE_VIA_SLACK_IS_PHISHING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "CSA, claim cortada: bloquear o device flow onde não se usa, e device code vindo por Slack ou e-mail é sinal de phishing (primário citado, não lido nesta rodada); kg-corpus-grep 'device code'"
+    label: "OBJEÇÃO (cortada, bloqueia): se o convite do onion-messaging mandar URL e código do device flow pelo adapter Slack ou e-mail, é o padrão que a CSA manda tratar como phishing, e o usuário aprende a aceitar código que chega pelo Slack."
+    narrative: "Alvo: cortada 'as mitigações do device flow (bloquear onde não se usa, e device code vindo por Slack ou e-mail ser sinal de phishing)' (kind=discarded-by-comodismo, triagem bloqueia). Bate de frente com o item 4 mais o adapter Slack/e-mail. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): C_SUPERACAO_20261106_INVITE_WITHOUT_CODE_SLACK_EMAIL."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'device code'"
+    provenance:
+      source: "https://labs.cloudsecurityalliance.org/research/csa-research-note-oauth-device-code-phishing-surge-20260405/"
+      locator: "recomendações de mitigação da nota da CSA (claim cortada do run)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_CUT_AGENT_INBOX_ARCHIVED_AGPL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "claim cortada do run: o agent-inbox foi arquivado em 2026-10-25 e as novas releases são AGPL-3.0 (https://github.com/panwudi/agent-inbox); kg-corpus-grep 'agent-inbox' = 0 nós, reexecutado pelo escritor"
+    label: "OBJEÇÃO (cortada): o item 6 ('não reinventar') precisa saber o que NÃO dá para vendorizar; arquivado em 2026-10-25 e AGPL nas novas releases, o agent-inbox fica desqualificado, e o corte escondia isso."
+    narrative: "Alvo: cortada 'o agent-inbox foi arquivado em 2026-10-25 e as novas releases são AGPL-3.0' (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): C_SUPERACAO_20261106_OWN_BASE_CHANNEL_ACCEPT."
+    trace: "bash .claude/validation/kg-corpus-grep.sh agent-inbox"
+    provenance:
+      source: "https://github.com/panwudi/agent-inbox"
+      locator: "estado do repositório (arquivado) e licença das releases, claim cortada do run"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SRC_EXTERNAL_PLUGINS_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "canal-vivo-sessoes-2026-10 l.885 (E_ELENXO_SLACK_OFFICIAL_MCP_PLUGIN_EXISTS): o corpus só tem o marketplace.json; há plugin MCP Slack oficial, mas não plugin de CANAL; claude-plugins-official/external_plugins: primário citado, não lido"
+    label: "OBJEÇÃO (fonte não lida): os plugins de channel da allowlist oficial (Telegram, Discord, iMessage) são as implementações de referência; lê-los diria o que reaproveitar e como se faz o pareamento de remetente. Primário citado, não lido."
+    narrative: "Alvo: fonte não lida claude-plugins-official/external_plugins (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): ler o external_plugins e o código do plugin Telegram. Medida: não lido."
+    trace: "sed -n 880,890p docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml@11a60cf3e"
+      locator: "l.880-890, nó E_ELENXO_SLACK_OFFICIAL_MCP_PLUGIN_EXISTS"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SRC_HONKER_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'honker' = 0 nós, reexecutado pelo escritor em 2026-11-06; docs.rs/crate/honker: primário citado, não lido"
+    label: "OBJEÇÃO (fonte não lida): o crate honker (fila sobre SQLite, com ack e reenvio) é candidato direto a 'não reinventar' a Fila 1; sem lê-lo, o item 2 fica sem comparação com peça pronta. Primário citado, não lido."
+    narrative: "Alvo: fonte não lida, o crate honker (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): ler o docs.rs/crate/honker e comparar com a tabela própria. Medida: não lido."
+    trace: "bash .claude/validation/kg-corpus-grep.sh honker"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'honker' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SRC_JETSTREAM_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'JetStream' = 0 nós, reexecutado pelo escritor em 2026-11-06; doc do JetStream (consumer max_deliver e advisories): primário citado, não lido"
+    label: "OBJEÇÃO (fonte não lida): o NATS JetStream é o contrário da Fila 1 e traz ack, redelivery e max_deliver nativos (fecharia a dead-letter); descartá-lo sem ler deixa a escolha do SQLite sem o contrário medido. Primário citado, não lido."
+    narrative: "Alvo: fonte não lida, NATS JetStream como fila de jobs (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): ler a doc do JetStream e rodar um nats-server em loopback. Medida: não lido."
+    trace: "bash .claude/validation/kg-corpus-grep.sh JetStream"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'JetStream' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SRC_CLOUDEVENTS_SPEC_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "a2a-metrics.py l.161-183: leitor de CloudEvent 1.0 com specversion '1.0', id, source e type obrigatórios, reexecutado pelo escritor por sed -n 161,170p; spec CloudEvents 1.0: primário citado, não lido"
+    label: "OBJEÇÃO (fonte não lida): a decisão (1) adota CloudEvents sem ter lido a primária no run; o risco é baixo porque o core já implementa os atributos obrigatórios. Primário citado, não lido."
+    narrative: "Alvo: fonte não lida, a spec CloudEvents 1.0 (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação achada (classe entrega): C_SUPERACAO_20261106_CORE_CLOUDEVENT_READER."
+    trace: "sed -n 161,183p .claude/utils/federation-transport/a2a-metrics.py"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-metrics.py@11a60cf3e"
+      locator: "l.161-183, leitor do CloudEvent no corpo do sinal"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "coordenacao-sessoes-2026-10 l.381 (Q_COORD_DECIDIR_VIGIA_DE_EVENTOS): 'a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem'; eventmesh.apache.org/docs/design-document/a2a-protocol: primário citado, não lido"
+    label: "OBJEÇÃO (fonte não lida): o Apache EventMesh (CloudEvents nativo) documenta um desenho de A2A, o que pode contrariar 'o mercado não a tem' e oferecer o mapeamento pronto. Primário citado, não lido."
+    narrative: "Alvo: fonte não lida, Apache EventMesh, protocolo A2A (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): ler eventmesh.apache.org/docs/design-document/a2a-protocol. Medida: não lido; nenhum nó EventMesh no corpus."
+    trace: "grep -n 'o mercado não a tem' docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml"
+    provenance:
+      source: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml@11a60cf3e"
+      locator: "l.381, nó Q_COORD_DECIDIR_VIGIA_DE_EVENTOS"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SRC_ADR_0021_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-11-06"
+    verified_against: "kg-corpus-grep 'cloudevents' = 0 nós por id e label, reexecutado pelo escritor (a narrative de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS fala de CloudEvents, mas a busca não lê narrative); ADR 0021 do agent-governance-toolkit: primário citado, não lido"
+    label: "OBJEÇÃO (fonte não lida): a ADR 0021 do agent-governance-toolkit liga CloudEvents a uma mesh de agentes para auditoria, outra peça contra 'o mercado não a tem'; poderia dar perfil de auditoria pronto para o shadow log. Primário citado, não lido."
+    narrative: "Alvo: fonte não lida, ADR 0021 do agent-governance-toolkit (envelope CloudEvents para auditoria de mesh) (kind=discarded-by-comodismo, triagem limite). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Superação procurada e não achada (classe nenhuma): ler a ADR 0021. Medida: não lida."
+    trace: "bash .claude/validation/kg-corpus-grep.sh cloudevents"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@11a60cf3e"
+      locator: "busca 'cloudevents' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  # ─── superações achadas (SAC-151) ─────────────────────────────────────────────────────────────────
+  - id: C_SUPERACAO_20261106_CHANNEL_REQUIREMENTS_FULL_LIST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Requisitos completos do channel: SDK MCP, runtime Node, capability claude/channel, notifications/claude/channel e stdio; para registrar, flag de dev, sessão interativa, auth claude.ai ou Console, channelsEnabled em Team/Enterprise e MCP_PROTOCOL_NEGOTIATION=legacy."
+    narrative: "Formulação corrigida pelo juiz, sustentada pelas três páginas primárias da Anthropic: o servidor de channel precisa do SDK MCP, de um runtime compatível com Node, da capability claude/channel, de notifications/claude/channel e de stdio; para registrar na sessão precisa ainda de --dangerously-load-development-channels server:<nome> (channel próprio fora da allowlist), sessão interativa aberta (não vale com -p nem com o Agent SDK), autenticação claude.ai ou Console (sem Bedrock, Vertex ou Foundry), channelsEnabled=true em orgs Team/Enterprise e MCP_PROTOCOL_NEGOTIATION=legacy (ou um SDK que não negocie a [texto do motor cortado aqui; não completado de memória]. Medida: três WebFetch em 2026-11-06 de code.claude.com/docs/en/channels-reference, /channels e /mcp, com os trechos verbatim citados; cada requisito aparece literalmente numa das páginas. Critério: V2_CONTRADITA (inclui a citação da /mcp: 'On the v2 runtime, a channel server that negotiates MCP protocol revision 2026-07-28 can't deliver channel messages, so Claude Code doesn't register it as a channel'). Alvo reprovado na votação: um channel do Claude Code exige apenas três coisas (capability, notificação, stdio), sem pré-requisito além do SDK MCP e de um runtime Node (tier 10). Registro da reprovação: E_LACUNAS_MESSAGING_1106. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://code.claude.com/docs/en/mcp, https://code.claude.com/docs/en/channels-reference e https://code.claude.com/docs/en/channels, citando verbatim os trechos da flag de dev, de -p/Agent SDK e da revisão 2026-07-28 do protocolo MCP"
+  - id: C_SUPERACAO_20261106_A2A_PUSH_AUTH_SCHEME_OPEN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O A2A 1.0 exige (MUST) autenticar o servidor no webhook e verificar a notificação, mas o esquema é aberto (IANA: Bearer, Basic; também API key, HMAC, mTLS); JWT com JWKS é o fluxo de EXEMPLO. O gate JWS do bridge é compatível, não obrigatório."
+    narrative: "Formulação corrigida pelo juiz, sustentada pelas duas primárias. Medida: WebFetch em 2026-11-06 de topics/streaming-and-async, com o rótulo 'Example Asymmetric Key Flow (JWT + JWKS)' e as MUSTs de autenticação e verificação, e de specification/ v1.0.0, com a 4.3.2 AuthenticationInfo (scheme do registro IANA) e a 4.3.3 sem menção a JWT/JWKS. Critério: V2_CONTRADITA. Alvo reprovado na votação: as push notifications do A2A são autenticadas por JWT assinado com kid, iss, aud, iat, exp, jti e taskId, verificadas por JWKS, e isso sustenta o gate JWS/JWKS no bridge (tier 9). Registro da reprovação: E_LACUNAS_MESSAGING_1106. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://a2a-protocol.org/latest/specification/ (offset 100000), seções 4.3.2 e 4.3.3; WebFetch https://a2a-protocol.org/latest/topics/streaming-and-async, rótulo 'Example Asymmetric Key Flow (JWT + JWKS)'"
+  - id: C_SUPERACAO_20261106_RFC10027_CROSS_DEVICE_PHISHING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Segundo o juiz, a RFC 10027/BCP 247 diz que o RFC 8628 é suscetível a phishing de consentimento entre dispositivos; só se usa sem outro fluxo viável e com mitigação (proximidade ou dispositivo pré-registrado); o código nunca viaja no convite."
+    narrative: "Formulação corrigida pelo juiz, pela primária RFC 10027/BCP 247 (§6.1, §6.1.2, §6.1.13, §6.2.1.5, §6.2.4): o RFC 8628 é suscetível a phishing de consentimento entre dispositivos (CDCP) pelo canal não autenticado; só se usa quando outro fluxo não é viável e sempre com mitigação adicional (proximidade ou dispositivo pré-registrado), com códigos de vida curta e educação do usuário só como complemento; o código nunca viaja no convite e o convite não pode iniciar o fluxo. Medida: duas chamadas WebFetch à página do datatracker (offset 0 e 100000) devolveram as frases normativas verbatim, com a data de 2026-08-11 e a numeração RFC 10027; uma chamada WebFetch à nota da CSA confirmou que ela recomenda bloquear ou restringir o device code flow. A numeração RFC é declaração do juiz, não conferida pelo escritor. Critério: V2_CONTRADITA. Alvo reprovado na votação: o device code flow não tem vulnerabilidade a corrigir (tier 7). Registro da reprovação: E_LACUNAS_MESSAGING_1106. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://datatracker.ietf.org/doc/draft-ietf-oauth-cross-device-security/ (offset 100000), citando §6.2.1.2 e §6.2.1.5 verbatim"
+  - id: C_SUPERACAO_20261106_AGENT_INBOX_ACK_IS_TRANSPORT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No agent-inbox o 200/202 confirma só a aceitação do transporte; journal antes do 202 e idempotência por ID de cliente existem só no inbox do Codex; no caminho do Claude não há reenvio nem replay. Lição: ack = transporte, confirmação do receptor à parte."
+    narrative: "Formulação corrigida que o README sustenta. Medida: WebFetch do README em 2026-11-06, com citação literal de cada trecho (tabela de status 200/202, 'HTTP 200/202 confirms transport acceptance', 'journaled and durably queued before HTTP 202' na seção Codex, 'Transport failures are not retried, and journals are not replayed automatically'). Critério: V1_QUOTE_NAO_SUSTENTA (grep -F 'Persistent client message IDs' existe só na seção do Codex; grep -F 'idempotency' devolve 0). Alvo reprovado na votação: o ack HTTP do agent-inbox confirma só aceitação de transporte, a mensagem é journaled antes do 202 e a idempotência vem de IDs persistentes de cliente (tier 5). Registro da reprovação: E_LACUNAS_MESSAGING_1106. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://github.com/panwudi/agent-inbox e grep -F 'Persistent client message IDs' · grep -F 'journals are not replayed automatically' · grep -F 'idempotency' no texto devolvido"
+  - id: C_SUPERACAO_20261106_CHANNEL_ACK_TOOL_BOUND
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Tool ack/reply do channel do próprio core (a2a-channel.ts do spike), com in_reply_to e body_sha256 conferidos no fetch-replies"
+    narrative: "Medida: duas réplicas do A7-C1 em produção em 2026-10-22 (réplicas 1 e 2): push 200, depois [ok] ack e [ok] reply conferidos. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 1, o channel não confirma entrega e a confirmação depende de um reply tool que o Claude chame. Registro: E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH. Afirmação de UM juiz."
+    trace: "grep -n -A10 'id: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_MEMBER_INVITE_FOR_MACHINES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O convite A2A por membro, com validade e revogação, já em produção (D_CONVITE_POR_MEMBRO_COM_VALIDADE, E_S6_PONTA_A_PONTA_EM_PRODUCAO), para máquinas e agentes; o device flow para pessoas fica fora dos 3 dias"
+    narrative: "Medida: S6 medido em produção em 2026-10-15: convite, doctor do membro, envio assinado verificado pelo gate, aceite e revogação. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Achado 6, o A2A 1.0 adiciona o device code (RFC 8628) e REMOVE os fluxos implicit e password. Registro: E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS. Afirmação de UM juiz."
+    trace: "curl -sL https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/specification/a2a.proto | grep -n -E 'ImplicitOAuthFlow implicit|PasswordOAuthFlow password|device_code = '"
+  - id: C_SUPERACAO_20261106_BODY_SHA256_PROFILE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Perfil Onion com claim body_sha256 obrigatório no a2a-verify.sh"
+    narrative: "Medida: mutante medido pela curadoria (coordenacao-sessoes-2026-10 l.381): o corpo trocado é vetado, e sem o body_sha256 o adulterado passa. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 7, a assinatura JWS do A2A 1.0 cobre o Agent Card, não cada mensagem. Registro: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE. Afirmação de UM juiz."
+    trace: "sed -n 40,50p .claude/utils/federation-transport/a2a-verify.sh; grep -n -A12 'id: C_TETO_A2A' docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml"
+  - id: C_SUPERACAO_20261106_PULL_RETURN_TASKS_GET
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Volta por pull: quem está do lado de fora consulta (fetch-replies.sh / tasks/get), em vez de receber webhook"
+    narrative: "Medida: A7-C1 em 2026-10-22: a volta funcionou ponta a ponta entre usuários, pelo fetch-replies.sh --me maestro-peer-test, nas réplicas 1 e 2. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 8, o A2A 1.0 define push por webhook registrado por tarefa. Registro: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF. Afirmação de UM juiz."
+    trace: "grep -n -A8 'id: C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_MARK_DELIVERED_ONLY_ON_ACK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Só marcar como entregue com o ack explícito da tool do channel, amarrado ao id e ao body_sha256 (e reenviar enquanto o ack não vier)"
+    narrative: "Medida: ack medido no A7-C1 (réplicas 1 e 2, '[ok] ack' conferido). Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 11, o outbox do Zapier exige ack do broker antes de apagar. Registro: E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK. Afirmação de UM juiz."
+    trace: "bash .claude/validation/kg-corpus-grep.sh outbox"
+  - id: C_SUPERACAO_20261106_SIGNED_ENVELOPE_CROSS_USER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Envelope A2A assinado, com kid pinado, entre usuários"
+    narrative: "Medida: S6 e A7-C1 medidos em produção (2026-10-15 e 2026-10-22). Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 14, o agent-bridge entrega por ssh/SFTP e toca a campainha com polling de 2 s. Registro: E_OBJECAO_F14_SSH_ONLY_SAME_OWNER. Afirmação de UM juiz."
+    trace: "grep -n 'ssh do A6a' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_OWN_CHANNEL_NO_RELAY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "docs/evolution/research/a2a-cross-user-spike-2026-10/channel/a2a-channel.ts (channel próprio, sem relay)"
+    narrative: "Medida: rodado no A7-C1 em produção (2026-10-22): accept-to-channel push http 200, ack e reply ok. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 16, o peerbus v0.2.1 implementa channel com tools. Registro: E_OBJECAO_F16_PEERBUS_EXISTENCE_ONLY. Afirmação de UM juiz."
+    trace: "bash .claude/validation/kg-corpus-grep.sh peerbus"
+  - id: C_SUPERACAO_20261106_OWN_CHANNEL_DELIVERY_LATER_VERSION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Entrega do channel próprio medida numa versão posterior"
+    narrative: "Medida: réplicas 1 e 2 do A7-C1 em 2026-10-22. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Achado 20, o plugin Telegram 0.0.1 não entregou na 2.1.80/2.1.81. Registro: E_OBJECAO_F20_REGRESSION_RISK_ONLY. Afirmação de UM juiz."
+    trace: "grep -n -A10 'id: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_INVITE_WITHOUT_CODE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Convite A2A por membro, sem código no convite (D_CONVITE_POR_MEMBRO_COM_VALIDADE)"
+    narrative: "Medida: S6 em produção em 2026-10-15. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: refutada 'o device flow não tem vulnerabilidade' (e com ela a mitigação: código só no dispositivo solicitante, nunca em convite). Registro: E_OBJECAO_REF_DEVICE_CODE_NEVER_IN_INVITE. Afirmação de UM juiz."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'RFC 8628'"
+  - id: C_SUPERACAO_20261106_SENDER_KID_GATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Gate por kid pinado do remetente (iss==from no a2a-verify) antes do channel"
+    narrative: "Medida: S6 em produção e o kid-binding reverificado no a2a-accept.sh l.337. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: cortada 'a fila em ordem, as chaves com hífen descartadas e o gate por identidade do remetente'. Registro: E_OBJECAO_CUT_GATE_BY_SENDER_NOT_ROOM. Afirmação de UM juiz."
+    trace: "grep -n -A12 'id: E_CC_CHANNELS_SENDER_ALLOWLIST' docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_NO_PERMISSION_RELAY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Não declarar a capability de permission relay e manter a aprovação no terminal (channel do spike 'sem relay')"
+    narrative: "Medida: SPIKE-PROTOCOL.md l.101 e A7-C1 'snapshot-permissions --compare IGUAL'. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: cortada 'o permission relay do channel (claude/channel/permission)'. Registro: E_OBJECAO_CUT_NO_PERMISSION_RELAY. Afirmação de UM juiz."
+    trace: "grep -n -A12 'id: E_CC_CHANNELS_PERMISSION_RELAY_APPROVER' docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml"
+  - id: C_SUPERACAO_20261106_INVITE_WITHOUT_CODE_SLACK_EMAIL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Convite A2A por membro (com validade e revogação), sem código de login no convite"
+    narrative: "Medida: S6 em produção em 2026-10-15 (E_S6_PONTA_A_PONTA_EM_PRODUCAO). Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: cortada 'as mitigações do device flow (bloquear onde não se usa, e device code vindo por Slack ou e-mail ser sinal de phishing)'. Registro: E_OBJECAO_CUT_DEVICE_CODE_VIA_SLACK_IS_PHISHING. Afirmação de UM juiz."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'device code'"
+  - id: C_SUPERACAO_20261106_OWN_BASE_CHANNEL_ACCEPT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Base própria do core: a2a-channel.ts mais accept-to-channel.sh"
+    narrative: "Medida: A7-C1 em produção em 2026-10-22. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: cortada 'o agent-inbox foi arquivado em 2026-10-25 e as novas releases são AGPL-3.0'. Registro: E_OBJECAO_CUT_AGENT_INBOX_ARCHIVED_AGPL. Afirmação de UM juiz."
+    trace: "bash .claude/validation/kg-corpus-grep.sh agent-inbox"
+  - id: C_SUPERACAO_20261106_CORE_CLOUDEVENT_READER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Leitor de CloudEvent 1.0 do core (a2a-metrics.py, com specversion, id, source e type obrigatórios)"
+    narrative: "Medida: a curadoria mediu numa cópia do core que o CloudEvent assinado passa no a2a-verify (coordenacao-sessoes-2026-10 l.381). Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: fonte não lida, a spec CloudEvents 1.0. Registro: E_OBJECAO_SRC_CLOUDEVENTS_SPEC_UNREAD. Afirmação de UM juiz."
+    trace: "sed -n 161,183p .claude/utils/federation-transport/a2a-metrics.py"
+  # ─── rodada de primárias de 2026-11-06: lacunas da palavra final (dead-letter, JetStream, honker, CloudEvents) ─
+  - id: E_SQS_DLQ_MAXRECEIVECOUNT_HIGH_ENOUGH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "'To ensure that your system is resilient against errors, set the maxReceiveCount high enough to allow for sufficient retries.' · SQS Developer Guide, 'Using dead-letter queues in Amazon SQS', 'Using policies for dead-letter queues' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O SQS recomenda teto de tentativas alto o bastante para resiliência: com teto 1 a mensagem vai à dead-letter na primeira falha."
+    narrative: "Fecha o 'quando mover' da lacuna de dead-letter pela prática de mercado: teto de tentativas configurado e alto o bastante. Limitado por E_OBJECAO_P2_SQS_CEILING_NO_NUMBER_COUNTS_RECEIVES: a quote não dá número, e o SQS conta RECEBIMENTOS sem DELETE, que é outra grandeza que a tentativa da Fila 1. Reconferido pelo escritor em 2026-11-06 por curl + sed + grep -c (1 ocorrência)."
+    trace: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+    provenance:
+      source: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      locator: "seção 'Using policies for dead-letter queues', parágrafo do maxReceiveCount"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SQS_DLQ_ISOLATE_FOR_DEBUGGING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "'DLQs are useful for debugging your application because you can isolate unconsumed messages to determine why processing did not succeed.' · SQS Developer Guide, 'Using dead-letter queues in Amazon SQS', parágrafo de abertura · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A dead-letter existe para isolar e diagnosticar as mensagens não processadas; de lá se reprocessa por redrive."
+    narrative: "Limitado por E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE: a quote sustenta só o 'isolar para diagnosticar'. O redrive não está nela, e a claim irmã de redrive foi REBAIXADA na ancoragem (ver E_LACUNAS_MESSAGING_PRIMARIES_1106)."
+    trace: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+    provenance:
+      source: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      locator: "parágrafo de abertura da página"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_NO_NATIVE_DLQ_ADVISORY_ONCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "'There's no dead-letter queue, and the advisory is published once.' · docs.nats.io/learn/monitoring/advisories-and-events, seção max_deliver · ancorada por verificador independente"
+    source_kind: primary
+    label: "O JetStream não tem dead-letter nativa: no MaxDeliver esgotado sai uma advisory publicada uma vez, a mensagem fica no stream, e a dead-letter é montada por quem consome a advisory."
+    narrative: "CORRIGE o grafo: C_OPCAO_QUEUE_3_NATS_JETSTREAM e E_OBJECAO_SRC_JETSTREAM_UNREAD diziam que o JetStream 'fecharia a dead-letter'. Com a advisory publicada uma vez, um consumidor de advisory offline perde o aviso, então o JetStream precisaria da mesma tabela dead_letter da Fila 1. Tier não declarado pelo leitor (documentação do próprio fornecedor sobre o próprio produto). Objeção do Elenxo não sobreviveu."
+    trace: "https://docs.nats.io/learn/monitoring/advisories-and-events"
+    provenance:
+      source: "https://docs.nats.io/learn/monitoring/advisories-and-events"
+      locator: "seção max_deliver"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_MAXDELIVER_REMOVES_FROM_PENDING_KEEPS_IN_STREAM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "'When a message hits the delivery limit, the server removes it from the consumer's pending list and never delivers it again.' · docs.nats.io/learn/jetstream/acknowledgment, seção Pitfalls (MaxDeliver) · ancorada por verificador independente"
+    source_kind: primary
+    label: "No teto de entregas o servidor tira a mensagem da lista pendente do consumidor e nunca mais a entrega; ela segue no stream."
+    narrative: "Completa E_NATS_NO_NATIVE_DLQ_ADVISORY_ONCE: a mensagem morta só sobrevive enquanto a retenção do stream a guardar; é restrição de desenho. Tier não declarado pelo leitor. Objeção do Elenxo não sobreviveu."
+    trace: "https://docs.nats.io/learn/jetstream/acknowledgment"
+    provenance:
+      source: "https://docs.nats.io/learn/jetstream/acknowledgment"
+      locator: "seção Pitfalls (MaxDeliver)"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_MAXDELIVER_CAPS_ATTEMPTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-06"
+    verified_against: "'It caps how many times the server will deliver one message before giving up.' · docs.nats.io/learn/jetstream/acknowledgment, seção MaxDeliver · ancorada por verificador independente"
+    source_kind: primary
+    label: "O MaxDeliver limita quantas vezes o servidor entrega uma mensagem antes de desistir."
+    narrative: "O leitor afirmou também que o padrão é ilimitado (-1) e que sem teto a mensagem é reentregue para sempre; isso NÃO está na quote (E_OBJECAO_P2_MAXDELIVER_DEFAULT_UNQUOTED) e fica como limite declarado. Tier não declarado pelo leitor."
+    trace: "https://docs.nats.io/learn/jetstream/acknowledgment"
+    provenance:
+      source: "https://docs.nats.io/learn/jetstream/acknowledgment"
+      locator: "seção MaxDeliver"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_BACKOFF_REUSES_LAST_ENTRY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-11-06"
+    verified_against: "'If the list has fewer entries than MaxDeliver allows, the server reuses the last entry for the remaining attempts.' · docs.nats.io/learn/jetstream/acknowledgment, seção Backoff · ancorada por verificador independente"
+    source_kind: primary
+    label: "Se a lista de BackOff tem menos entradas que o MaxDeliver permite, o servidor reaproveita a última entrada nas tentativas restantes."
+    narrative: "O leitor afirmou também a reentrega automática sem ack com AckWait padrão de 30 s e que o BackOff substitui o AckWait; isso NÃO está na quote (E_OBJECAO_P2_ACKWAIT_DEFAULT_UNQUOTED). Tier não declarado pelo leitor."
+    trace: "https://docs.nats.io/learn/jetstream/acknowledgment"
+    provenance:
+      source: "https://docs.nats.io/learn/jetstream/acknowledgment"
+      locator: "seção Backoff"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_AT_LEAST_ONCE_DUPLICATES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-06"
+    verified_against: "'it's one of the pieces that give JetStream its at-least-once delivery' · docs.nats.io/learn/jetstream/delivery-and-acknowledgment · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A entrega do JetStream é pelo menos uma vez, então o consumidor tem de tolerar duplicatas."
+    narrative: "O JetStream não tira da Fila 1 a dedupe por (ce_source, ce_id) ou jti: as duas opções têm a mesma garantia, e a dedupe entra nas duas. Objeção do Elenxo não sobreviveu."
+    trace: "https://docs.nats.io/learn/jetstream/delivery-and-acknowledgment"
+    provenance:
+      source: "https://docs.nats.io/learn/jetstream/delivery-and-acknowledgment"
+      locator: "página Delivery and acknowledgment"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HONKER_SQLITE_QUEUE_WITH_DEAD_LETTER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-06"
+    verified_against: "'Durable at-least-once queues with retries, delayed jobs, priority, visibility timeouts, dead-letter rows' · README do honker, seção What It Does · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "O honker existe: fila em SQLite pelo menos uma vez, com retries, visibility timeout e linhas dead-letter; é alternativa pronta a escrever a Fila 1 do zero."
+    narrative: "Fecha a lacuna sqlite-queue-prior-art (gapsClosed do Elenxo) e CORRIGE E_OBJECAO_SRC_HONKER_UNREAD, que dava a fonte como não lida. Limitado por E_OBJECAO_P2_HONKER_EXISTENCE_NOT_FIT: prova existência, não adequação; é alpha, não foi rodado, e o ack pela tool do channel amarrado a id e body_sha256 não foi mostrado cabendo no modelo de jobs dele. O README lista binding Node."
+    trace: "https://github.com/russellromney/honker"
+    provenance:
+      source: "https://github.com/russellromney/honker"
+      locator: "README, seção What It Does"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HONKER_DEAD_ON_MAX_ATTEMPTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-06"
+    verified_against: "'Move lapsed leases with no attempts left to _honker_dead with max attempts exceeded.' · README do honker, seção Job states and claim · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "O honker faz dead-letter com teto de tentativas: lease vencido sem tentativas restantes vai para _honker_dead com o motivo 'max attempts exceeded'."
+    narrative: "Fecha o 'quando mover' e mostra um motivo gravado. Limitado por E_OBJECAO_P2_HONKER_DEAD_SCHEMA_NO_REQUEUE: o README não lista as colunas de _honker_dead nem documenta requeue, então 'o que guardar' e 'como reprocessar' seguem abertos."
+    trace: "https://github.com/russellromney/honker"
+    provenance:
+      source: "https://github.com/russellromney/honker"
+      locator: "README, seção Job states and claim"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HONKER_ACK_IS_DELETE_FENCED_LATE_ACK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-06"
+    verified_against: "'A lapsed lease stays processing until it is reclaimed, so a fenced late ack still works until then.' · README do honker, seção Job states and claim · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "No honker o ack é um DELETE, e o lease vencido fica em processing até ser reclamado; o ack tardio com fencing ainda vale até lá."
+    narrative: "Coerente com o desenho: ack por DELETE equivale à poda das linhas entregues (E_OBJECAO_CUT_PRUNE_AND_BACKUP), e o fencing atende o ack amarrado ao id. Objeção do Elenxo não sobreviveu."
+    trace: "https://github.com/russellromney/honker"
+    provenance:
+      source: "https://github.com/russellromney/honker"
+      locator: "README, seção Job states and claim"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HONKER_WAL_DEFAULT_ONE_WRITER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-06"
+    verified_against: "'The language bindings default to WAL because it gives concurrent readers with one writer and efficient fsync batching.' · README do honker, seção Architecture · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "O honker usa WAL por padrão: leitores concorrentes, um escritor e fsync em lote."
+    narrative: "Concorda com E_SQLITE_WAL_SINGLE_WRITER e é compatível com o daemon único da Fila 1. Objeção do Elenxo não sobreviveu."
+    trace: "https://github.com/russellromney/honker"
+    provenance:
+      source: "https://github.com/russellromney/honker"
+      locator: "README, seção Architecture"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GOQITE_SINGLE_WRITER_NO_DLQ_MENTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    verified_at: "2026-11-06"
+    verified_against: "'SQLite only allows one writer at a time, so the parallelism just creates write contention.' · README do goqite, seção sobre concorrência e SQLite · ancorada por verificador independente"
+    source_tier: 7
+    source_kind: primary
+    label: "O goqite (MIT, Go, estilo SQS) dá visibilidade e extensão de timeout e avisa que o SQLite só aceita um escritor por vez; paralelismo só cria contenção de escrita."
+    narrative: "O leitor afirmou também que o README não menciona dead-letter; é afirmação de ausência sem trecho que a mostre (E_OBJECAO_P2_GOQITE_ABSENCE_UNQUOTED). Efeito nulo no desenho: o candidato é o honker."
+    trace: "https://github.com/maragudk/goqite"
+    provenance:
+      source: "https://github.com/maragudk/goqite"
+      locator: "README, seção sobre concorrência e SQLite"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ADR0021_CLOUDEVENTS_AUDIT_ENVELOPE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-06"
+    verified_against: "'We adopted CloudEvents v1.0 as the envelope format for mesh audit entry export via AuditEntry.to_cloudevent().' · ADR-0021 do microsoft/agent-governance-toolkit, Decision · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "A ADR 0021 do agent-governance-toolkit adota CloudEvents 1.0 como envelope de exportação de auditoria entre agentes (AgentMesh): prior art de auditoria, não de A2A. Status Accepted, sem data."
+    narrative: "CORRIGE E_OBJECAO_SRC_ADR_0021_UNREAD, que dava a ADR como não lida. Limitado por E_OBJECAO_P2_ADR0021_AUDIT_NOT_A2A: a tabela de mapeamento de atributos foi rejeitada na ancoragem (NAO-ENCONTRADA), então não há perfil pronto citável para o shadow log. Sem valid_from: a ADR não tem data."
+    trace: "https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md"
+    provenance:
+      source: "https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md"
+      locator: "seção Decision"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ADR0021_REJECTED_CUSTOM_JSON_AND_OTEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-06"
+    verified_against: "'CloudEvents (CNCF specification) -- industry standard for event interoperability, supported by Azure Event Grid, AWS EventBridge, Knative, and most message brokers' · ADR-0021, Context, opção 3 · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "A ADR 0021 rejeitou JSON próprio e OpenTelemetry LogRecord em favor de CloudEvents, por ser o padrão de interoperabilidade de eventos."
+    narrative: "Reforça a escolha do envelope CloudEvents da recomendação (Envelope C) pelo critério de padrão de mercado. Objeção do Elenxo não sobreviveu."
+    trace: "https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md"
+    provenance:
+      source: "https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md"
+      locator: "seção Context, opção 3"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: E_EVENTMESH_V112_RC1_A2A_MCP_OVER_CLOUDEVENTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "'feat(a2a): implement MCP over CloudEvents architecture' · apache/eventmesh, release v1.12.0-rc1, notas · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "A release v1.12.0-rc1 do apache/eventmesh lista A2A com roteamento por tópico e formato CloudEvents 1.0 ('MCP over CloudEvents'); é release candidate, não versão final."
+    narrative: "Contraria a frase absoluta de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS (coordenacao-sessoes-2026-10 l.381): 'a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem'. Limitado por E_OBJECAO_P2_EVENTMESH_RC_CONTRADICTS_NO_MARKET: é linha de changelog de rc, diz MCP sobre CloudEvents sob o escopo a2a e não prova mapeamento A2A-CloudEvents estável; a claim de mapeamento foi rejeitada (EXAGERADA) e o design-document a2a-protocol segue não ancorado."
+    trace: "https://github.com/apache/eventmesh/releases/tag/v1.12.0-rc1"
+    provenance:
+      source: "https://github.com/apache/eventmesh/releases/tag/v1.12.0-rc1"
+      locator: "notas da release v1.12.0-rc1"
+      method: "reading: leitura da rodada de primárias, ancorada por verificador independente"
+      locality: "web"
+  - id: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    label: "Fila 3: NATS JetStream, semântica lida (ack, reentrega, MaxDeliver, at-least-once), SEM dead-letter nativa; a operação mínima na VPS não foi medida."
+    narrative: "Substitui C_OPCAO_QUEUE_3_NATS_JETSTREAM, cuja narrativa dizia que o JetStream 'fecharia a dead-letter'. Lido em 2026-11-06: não há DLQ nativa e a advisory sai uma vez (E_NATS_NO_NATIVE_DLQ_ADVISORY_ONCE); no teto a mensagem fica no stream (E_NATS_MAXDELIVER_REMOVES_FROM_PENDING_KEEPS_IN_STREAM); a entrega é pelo menos uma vez, igual à Fila 1 (E_NATS_AT_LEAST_ONCE_DUPLICATES). O JetStream perde o argumento mecânico que se atribuía a ele: precisaria da mesma tabela dead_letter e da mesma dedupe. Segue não-julgada no eixo operacional (RAM, disco do filestore, sync, unidade systemd, backup), que E_OBJECAO_P2_JETSTREAM_OPERATION_UNMEASURED mantém aberto."
+    trace: "rodada de primárias de 2026-11-06 sobre D_MESSAGING_STACK_2026_11; https://docs.nats.io/learn/jetstream/acknowledgment"
+  # ─── objeções sobreviventes do Elenxo da rodada de primárias ─────────────────────────────────────
+  - id: E_OBJECAO_P2_SQS_CEILING_NO_NUMBER_COUNTS_RECEIVES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "quote do SQS ('high enough to allow for sufficient retries') sem número; claim irmã 'recebimentos sem sucesso' REBAIXADA (AFIRMADA-SEM-CITACAO); kg-corpus-grep 'dead-letter' = 0 nós em 227 grafos (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 1, limite): a quote do SQS não dá número para o teto e conta RECEBIMENTOS sem DELETE, não falhas; a Fila 1 conta tentativa no claim ou no fim do lease. O valor do teto e o evento que conta como tentativa seguem sem fonte."
+    narrative: "Alvo: E_SQS_DLQ_MAXRECEIVECOUNT_HIGH_ENOUGH. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh dead-letter). Superação procurada e não achada (classe nenhuma): teto concreto e definição de tentativa vindos de peça pronta. Medida: o README do honker move para _honker_dead quando o lease vence sem tentativas, mas não dá o valor padrão do teto; é declaração de README, não rodada no core."
+    trace: "bash .claude/validation/kg-corpus-grep.sh dead-letter"
+    provenance:
+      source: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      locator: "seção 'Using policies for dead-letter queues'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "claim de redrive do SQS REBAIXADA (AFIRMADA-SEM-CITACAO); claim do enqueue timestamp EXAGERADA (omite a exceção FIFO); README do honker sem colunas de _honker_dead e sem API de requeue; kg-corpus-grep 'redrive' = 0 nós (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 2, bloqueia): o redrive com o MESMO ce_id cai na dedupe por (ce_source, ce_id) ou jti e some em silêncio; com id NOVO a ação roda duas vezes. Nenhuma fonte ancorada decide; 'o que guardar' e 'como reprocessar' seguem sem fonte."
+    narrative: "Alvo: E_SQS_DLQ_ISOLATE_FOR_DEBUGGING (a quote sustenta só o isolar para diagnosticar). Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh redrive). Superação procurada e não achada (classe nenhuma): semântica de redrive com identidade definida (SQS: novo ID) ou API de requeue numa fila SQLite pronta. Medida: a página de redrive do SQS foi lida, mas a claim foi rebaixada sem quote; o README do honker não documenta requeue. A peça que falta, segundo o Elenxo, é regra própria escrita e testada no modo de falha: guardar payload, motivo, tentativas, último erro e ce_id original, e reprocessar com um campo de redrive que a dedupe reconheça. Refina E_OBJECAO_CUT_DEAD_LETTER_GAP."
+    trace: "bash .claude/validation/kg-corpus-grep.sh redrive"
+    provenance:
+      source: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      locator: "parágrafo de abertura e página de redrive (claims rebaixada e exagerada)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_MAXDELIVER_DEFAULT_UNQUOTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "quote do MaxDeliver ('It caps how many times...') sem o padrão -1; kg-corpus-grep 'MaxDeliver' (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 5, limite): a quote sustenta o teto do MaxDeliver, não o padrão ilimitado (-1); 'sem teto, reentrega para sempre' é afirmação do leitor sem trecho citado. Não muda o desenho: o teto seria fixado de qualquer jeito."
+    narrative: "Alvo: E_NATS_MAXDELIVER_CAPS_ATTEMPTS. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh MaxDeliver). Superação procurada e não achada (classe nenhuma): a página de configuração de consumer com o valor padrão do MaxDeliver. Medida: não está entre as fontes ancoradas da rodada; kg-corpus-grep 'JetStream' = 0 nós."
+    trace: "bash .claude/validation/kg-corpus-grep.sh MaxDeliver"
+    provenance:
+      source: "https://docs.nats.io/learn/jetstream/acknowledgment"
+      locator: "seção MaxDeliver"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_ACKWAIT_DEFAULT_UNQUOTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "quote do BackOff sustenta só o reaproveitamento da última entrada; nenhuma das 15 ancoradas nem das 8 rejeitadas cita o AckWait padrão (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 6, limite): o AckWait padrão de 30 s e 'o BackOff substitui o AckWait' não estão na quote, que só sustenta o reaproveitamento da última entrada do BackOff. Pesa pouco no desenho."
+    narrative: "Alvo: E_NATS_BACKOFF_REUSES_LAST_ENTRY. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh AckWait). Superação procurada e não achada (classe nenhuma): trecho verbatim do AckWait padrão. Medida: procurado entre as claims ancoradas e as rejeitadas desta rodada; nenhuma o cita."
+    trace: "bash .claude/validation/kg-corpus-grep.sh AckWait"
+    provenance:
+      source: "https://docs.nats.io/learn/jetstream/acknowledgment"
+      locator: "seção Backoff"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_JETSTREAM_OPERATION_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "claim de sync_interval REJEITADA (EXAGERADA: o padrão de 2 min é do ping_interval, não do sync_interval); kg-corpus-grep 'JetStream' = 0 nós; nats-server em loopback não rodado (afirmação do Elenxo)"
+    label: "OBJEÇÃO (lacuna JetStream, bloqueia): a operação mínima do nats-server na VPS compartilhada (RAM, disco do filestore, systemd, backup, sync) não foi medida; sem isso a comparação de durabilidade e custo contra o SQLite WAL sai ao arbítrio de quem conduz."
+    narrative: "Alvo: a lacuna nats-jetstream, parte 'operação mínima'. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA (bash .claude/validation/kg-corpus-grep.sh JetStream). Cenário: a Fila 1 ganha da Fila 3 por simplicidade local; se o sync padrão do JetStream não for por escrita, uma publicação com ack pode se perder num crash da VPS, e o SQLite em WAL com synchronous=NORMAL tem a mesma janela; nenhuma das duas foi medida. Superação procurada e não achada (classe nenhuma): nats-server em loopback na VPS medindo RSS e disco, mais o padrão do sync_interval lido verbatim. Medida: E_OBJECAO_SRC_JETSTREAM_UNREAD já pedia o loopback e ele não foi feito."
+    trace: "bash .claude/validation/kg-corpus-grep.sh JetStream"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@4e488f2fe"
+      locator: "busca 'JetStream' sobre o corpus, 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_P2_HONKER_EXISTENCE_NOT_FIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-06"
+    verified_against: "README do honker: 'Alpha software. Better than experimental, not beta-quality yet.'; não rodado no core nem na VPS; kg-corpus-grep 'honker' = 0 nós (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 8, limite): o honker prova existência, não adequação; é alpha, não foi rodado, e não se mostrou que o ack pela tool do channel (id + body_sha256) e a dedupe por (ce_source, ce_id) cabem no modelo de jobs dele. Entra só fixado e lido."
+    narrative: "Alvo: E_HONKER_SQLITE_QUEUE_WITH_DEAD_LETTER. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh honker). Superação procurada e não achada (classe nenhuma): o binding Node do honker (@russellthehippo/honker-node) rodado contra o daemon do channel em TypeScript. Medida: o README lista o binding Node além de Rust, Python, Ruby, .NET e Elixir; é só declaração, nada foi rodado. A existência da peça já fecha 'não reinventar sem olhar': antes de escrever a Fila 1 do zero, o desenho se mede contra ela."
+    trace: "bash .claude/validation/kg-corpus-grep.sh honker"
+    provenance:
+      source: "https://github.com/russellromney/honker"
+      locator: "README, aviso de status alpha e lista de bindings"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_HONKER_DEAD_SCHEMA_NO_REQUEUE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "README do honker e docs.rs/crate/honker lidos pelo Elenxo: nenhum lista as colunas de _honker_dead nem documenta requeue"
+    label: "OBJEÇÃO (claim 9, limite): o honker fecha o 'quando mover' da dead-letter, mas o README não lista as colunas de _honker_dead nem documenta requeue; 'o que guardar' e 'como reprocessar' seguem abertos."
+    narrative: "Alvo: E_HONKER_DEAD_ON_MAX_ATTEMPTS. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh dead-letter). Superação procurada e não achada (classe nenhuma): schema de _honker_dead e função de requeue. Medida: procurados no README e no docs.rs/crate/honker; nenhum os menciona. O cenário bloqueante está em E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE."
+    trace: "bash .claude/validation/kg-corpus-grep.sh dead-letter"
+    provenance:
+      source: "https://github.com/russellromney/honker"
+      locator: "README, seção Job states and claim"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_GOQITE_ABSENCE_UNQUOTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.4
+    verified_at: "2026-11-06"
+    verified_against: "a quote do goqite é sobre contenção de escrita; a ausência de dead-letter não tem trecho; kg-corpus-grep 'goqite' = 0 nós (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 12, limite): 'o goqite não menciona dead-letter' é afirmação de ausência sem trecho que a mostre; efeito nulo no desenho, porque o candidato é o honker."
+    narrative: "Alvo: E_GOQITE_SINGLE_WRITER_NO_DLQ_MENTION. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh goqite). Superação procurada e não achada (classe nenhuma): busca no README do goqite por dead e por max receive. Medida: não reexecutada nesta rodada."
+    trace: "bash .claude/validation/kg-corpus-grep.sh goqite"
+    provenance:
+      source: "https://github.com/maragudk/goqite"
+      locator: "README"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_ADR0021_AUDIT_NOT_A2A
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "tabela de atributos da ADR 0021 rejeitada na ancoragem (NAO-ENCONTRADA: a quote com aspas internas não existe); a ADR não tem data; kg-corpus-grep 'ADR-0021' = 0 nós (afirmação do Elenxo)"
+    label: "OBJEÇÃO (claim 13, limite): a ADR 0021 é prior art de CloudEvents como envelope de AUDITORIA entre agentes, não de transporte A2A; com a tabela de mapeamento rejeitada, não há perfil pronto citável para o shadow log."
+    narrative: "Alvo: E_ADR0021_CLOUDEVENTS_AUDIT_ENVELOPE. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS (bash .claude/validation/kg-corpus-grep.sh ADR-0021). Superação procurada e não achada (classe nenhuma) pelo Elenxo; o motor de superação achou a linha literal da tabela (C_SUPERACAO_20261106_ADR0021_ATTRIBUTE_TABLE_LITERAL), que fica como afirmação de UM juiz, sem âncora independente."
+    trace: "bash .claude/validation/kg-corpus-grep.sh ADR-0021"
+    provenance:
+      source: "https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md"
+      locator: "tabela de mapeamento de atributos"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_P2_EVENTMESH_RC_CONTRADICTS_NO_MARKET
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-06"
+    verified_against: "github.com/apache/eventmesh/releases/tag/v1.12.0-rc1 'feat(a2a): implement MCP over CloudEvents architecture' contra docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml@fb2a7d72c l.381 ('mercado não a tem'); mapeamento do EventMesh rejeitado (EXAGERADA); kg-corpus-grep 'EventMesh' = 0 nós"
+    label: "OBJEÇÃO (claim 15, bloqueia): o rc1 do EventMesh não prova mapeamento A2A-CloudEvents estável, mas basta para contrariar 'o mercado não a tem'; manter a frase e gravar type e correlação próprios pode fazer uma ponte futura nascer incompatível."
+    narrative: "Alvo: E_EVENTMESH_V112_RC1_A2A_MCP_OVER_CLOUDEVENTS e a frase de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS. Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA (o changelog do rc1 contra grep -n 'mercado não a tem' em coordenacao-sessoes-2026-10.kg.yaml). Cenário: se o EventMesh fechar a 1.12 com o type org.apache.eventmesh.a2a.* e a correlação em extensão, o perfil Onion com ce_id e jti próprios nasce incompatível, e o grafo carrega uma afirmação contrariada por fonte primária. Superação procurada e não achada (classe nenhuma): o mapeamento lido verbatim no design-document a2a-protocol ou numa versão final; só existe o rc1, e eventmesh.apache.org/docs/design-document/a2a-protocol segue não ancorado (E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD)."
+    trace: "grep -n 'mercado não a tem' docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml"
+    provenance:
+      source: "https://github.com/apache/eventmesh/releases/tag/v1.12.0-rc1"
+      locator: "notas da release, linha 'feat(a2a): implement MCP over CloudEvents architecture'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  # ─── contabilidade e proposta de revisão (a rodada não sela) ─────────────────────────────────────
+  - id: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-06"
+    verified_against: "contabilidade da rodada de primárias de 2026-11-06: 15 claims ancoradas, 8 rejeitadas na ancoragem, 0 fontes inalcançáveis, 16 objeções do Elenxo (10 sobreviventes), 0 recusas do motor, 6 superações achadas; contagens feitas pelo escritor sobre as listas recebidas"
+    label: "LACUNAS (primárias 2026-11-06): 15 ancoradas, 8 rejeitadas (5 exageradas, 2 sem citação, 1 não encontrada), 0 inalcançáveis; 16 objeções, 10 sobreviventes (3 bloqueiam); 0 recusas; 6 superações. Fechou só sqlite-queue-prior-art."
+    narrative: "FONTES: lidas as das 15 ancoradas e das 8 rejeitadas: SQS Developer Guide (dead-letter, políticas, redrive), EIP Dead Letter Channel, docs.nats.io (advisories, acknowledgment, delivery-and-acknowledgment, sync_interval, configuração geral), README do honker (e a API de releases do GitHub), README do goqite, ADR 0021 do agent-governance-toolkit, release v1.12.0-rc1 e README EN do a2a-protocol do apache/eventmesh. INALCANÇÁVEIS: 0. ANCORADAS: 15 (dead-letter-eip 2, nats-jetstream 5, sqlite-queue-prior-art 5, cloudevents-agents 3), uma evidência cada. REJEITADAS NA ANCORAGEM (8, nenhuma virou nó): (1) dead-letter-eip, critério e teto por 'recebimentos sem sucesso': AFIRMADA-SEM-CITACAO, rebaixada pelo motor (veredito ANCORADA sem quote/locator); (2) dead-letter-eip, carimbo original de enqueue inalterado na DLQ e retenção maior obrigatória: EXAGERADA, omite a exceção FIFO (o timestamp reinicia) e o texto diz best practice, não 'deve'; superação C_SUPERACAO_20261106_SQS_DLQ_RETENTION_STANDARD_VS_FIFO; (3) dead-letter-eip, redrive devolve à origem com taxa controlada, novo ID e novo enqueueTime, sem filtro: AFIRMADA-SEM-CITACAO, rebaixada pelo motor (ressalva menor de locator); (4) dead-letter-eip, o EIP define que o canal registra a máquina onde a mensagem morreu: EXAGERADA, é efeito da topologia típica de um canal local por máquina e o texto diz 'may elect to move'; superação C_SUPERACAO_20261106_EIP_DLC_TYPICAL_LOCAL_PER_MACHINE; (5) nats-jetstream, sync_interval com padrão de 2 min e dimensionamento só orientação: EXAGERADA, a página não traz padrão nem 2 min (o 2 min é do ping_interval) e não trata de dimensionamento; superação C_SUPERACAO_20261106_NATS_SYNC_INTERVAL_NO_DEFAULT; (6) sqlite-queue-prior-art, honker alpha com licença Apache-2.0 OR MIT e sem releases: EXAGERADA, o repositório tem release e tag v0.6.0 e o pacote hex vai de 0.1.1 a 0.6.0; superação C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060; (7) cloudevents-agents, tabela da ADR 0021 (id=entry_id, source=Agent DID URI, type=ai.agentmesh.{event_type}, sem subject): NAO-ENCONTRADA, o conteúdo bate mas a quote com aspas internas não existe; superação C_SUPERACAO_20261106_ADR0021_ATTRIBUTE_TABLE_LITERAL; (8) cloudevents-agents, mapeamento do EventMesh A2A com correlação 'não no id nativo': EXAGERADA, a linha diz 'extension: collaborationid / id' e nada sobre o id nativo; superação C_SUPERACAO_20261106_EVENTMESH_A2A_MAPPING_CORRECTED. OBJEÇÕES DO ELENXO: 16 julgadas, 10 sobreviventes modeladas como E_OBJECAO_P2_* (3 bloqueiam: redrive contra dedupe, operação do JetStream, rc1 do EventMesh contra 'o mercado não a tem'), 6 não sobreviveram (claims 3, 4, 7, 10, 11 e 14, que viraram evidência e reconciliação). RECUSADAS PELO MOTOR (naoJulgada): 0. SUPERAÇÕES ACHADAS: 6, todas registradas aqui, 6 nós C_SUPERACAO_20261106_* novos. RECONCILIAÇÃO: C_OPCAO_QUEUE_3_NATS_JETSTREAM e E_OBJECAO_SRC_JETSTREAM_UNREAD ('fecharia a dead-letter') ficam superseded; E_OBJECAO_SRC_HONKER_UNREAD e E_OBJECAO_SRC_ADR_0021_UNREAD (fonte não lida) ficam superseded; E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD segue confirmed, porque o design-document a2a-protocol continua não ancorado. LACUNAS FECHADAS: sqlite-queue-prior-art (honker lido; alpha, sem requeue e não rodado ficam declarados). LACUNAS QUE CONTINUAM ABERTAS: (a) dead-letter-eip: só o 'quando mover' está ancorado (teto alto, sem número); 'o que guardar' e 'como reprocessar' seguem sem fonte, e a interação do redrive com a dedupe por (ce_source, ce_id) não está decidida; (b) nats-jetstream: a semântica fechou, a operação mínima não (sync_interval rejeitado, sem medida de RAM, disco ou durabilidade, sem loopback na VPS); (c) cloudevents-agents: a ADR 0021 é prior art de auditoria e a tabela foi rejeitada; do EventMesh só a linha do changelog do rc1; o mapeamento A2A foi rejeitado e o design-document segue não ancorado; (d) fora das lacunas desta rodada, ainda segurando D_MESSAGING_STACK_2026_11: o smoke do channel não repetido na 2.1.319 (E_OBJECAO_F5_PIN_CC_AND_RESMOKE). Nenhum descarte desta rodada foi aceito por orçamento; MaxDeliver -1 e AckWait 30 s ficam como limites declarados. NOTA DO ESCRITOR: o id do run não veio na tarefa de escrita."
+    trace: ".claude/workflows/onion-research.js, rodada de primárias de 2026-11-06 sobre D_MESSAGING_STACK_2026_11"
+    provenance:
+      source: ".claude/workflows/onion-research.js, rodada de primárias de 2026-11-06"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e SUPERAÇÕES da tarefa de escrita"
+      method: "judges: contabilidade da rodada"
+      locality: "host"
+  - id: Q_MESSAGING_PRIMARIES_REVIEW_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-06"
+    verified_against: "E_LACUNAS_MESSAGING_PRIMARIES_1106 e as objeções E_OBJECAO_P2_* desta rodada"
+    label: "PROPOSTA (não sela): o maestro revisa a frase 'o mercado não a tem' de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS (done) à luz do EventMesh rc1 e da ADR 0021, e decide se a regra de redrive da dead_letter vira peça própria antes de selar a pilha?"
+    narrative: "A rodada sugere revisão sem selar: (1) Q_COORD_DECIDIR_VIGIA_DE_EVENTOS, status done em coordenacao-sessoes-2026-10, afirma que a ligação A2A-CloudEvents é solução própria porque o mercado não a tem; o rc1 do EventMesh ('MCP over CloudEvents' sob a2a) e a ADR 0021 (CloudEvents como envelope de auditoria entre agentes) contrariam a forma absoluta. Proposta: trocar por 'há prior art parcial (ADR 0021 para auditoria, EventMesh em rc), sem mapeamento A2A estável' — o grafo de origem é de outro dono e não foi editado aqui. (2) Para D_MESSAGING_STACK_2026_11 (open): a Fila 3 perdeu o argumento da dead-letter nativa; o honker é prior art contra o qual a Fila 1 se mede; a dead_letter pede regra própria de redrive que a dedupe reconheça, escrita e testada no modo de falha. O selo é do maestro."
+    trace: "rodada de primárias de 2026-11-06; recomendação do Elenxo (SUSTENTA 3, NÃO SUSTENTA a-c)"
+  # ─── superações achadas na ancoragem (SAC-151) ───────────────────────────────────────────────────
+  - id: C_SUPERACAO_20261106_SQS_DLQ_RETENTION_STANDARD_VS_FIFO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "Retenção na DLQ do SQS, pelo próprio parágrafo: na fila standard o timestamp de enqueue fica inalterado e a retenção maior na DLQ é best practice; na FIFO o timestamp reinicia ao mover."
+    narrative: "Medida: reaberta a página da AWS com WebFetch e lida a seção 'Understanding message retention periods for dead-letter queues'; o texto traz as duas regras (standard e FIFO) e o exemplo de 1 dia na origem e 4 dias de retenção na DLQ. Critério: A2_CLAIM_ESTICA. Alvo reprovado: '[dead-letter-eip] O que a mensagem leva: o carimbo original de enqueue fica inalterado ao ir para a DLQ, por isso a retenção da DLQ deve ser maior que a da fila de origem' (EXAGERADA). Registro: E_LACUNAS_MESSAGING_PRIMARIES_1106. Afirmação de UM juiz."
+    trace: "curl -sL https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html | sed 's/<[^>]*>//g' | grep -F 'For FIFO queues, the enqueue timestamp resets when the message is moved to a dead-letter queue'"
+  - id: C_SUPERACAO_20261106_EIP_DLC_TYPICAL_LOCAL_PER_MACHINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "Dead Letter Channel do EIP, pelo próprio parágrafo: o sistema PODE mover a mensagem; tipicamente cada máquina tem seu canal local, e por isso o canal registra em que máquina ela morreu e pode registrar o canal original."
+    narrative: "Medida: reaberta a página com WebFetch e reconferida com curl, sed e grep: a definição de abertura traz 'it may elect to move' e a frase da quote vem logo após 'Typically, each machine ... local Dead Letter Channel'. Critério: A2_CLAIM_ESTICA. Alvo reprovado: '[dead-letter-eip] EIP define o padrão: move para um canal de mensagens mortas, e o canal registra em que máquina a mensagem morreu' (EXAGERADA). Registro: E_LACUNAS_MESSAGING_PRIMARIES_1106. Afirmação de UM juiz."
+    trace: "curl -sL https://www.enterpriseintegrationpatterns.com/patterns/messaging/DeadLetterChannel.html | sed 's/<[^>]*>//g' | tr -s ' \\n' ' ' | grep -o 'Typically, each machine.\\{0,260\\}died on\\.'"
+  - id: C_SUPERACAO_20261106_NATS_SYNC_INTERVAL_NO_DEFAULT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "sync_interval do JetStream, pela própria página: o filestore usa os buffers do SO e o servidor força o sync no intervalo; 'always' força sync por escrita, com perda de vazão; a página não traz valor padrão."
+    narrative: "Medida: WebFetch da página sync_interval em 2026-11-06, que devolveu esses pontos e confirmou a ausência de valor padrão; a página de configuração geral confirmou que o 2 min é do ping_interval. Critério: A2_CLAIM_ESTICA (procurar '2 min', 'default' e 'memory' na página: 0 ocorrências; a palavra do claim que o trecho não sustenta é 'padrão 2 min'). Alvo reprovado: '[nats-jetstream] Em arquivo o servidor não força fsync a cada escrita ... sync_interval, padrão 2 min ... dimensionamento só orientação' (EXAGERADA). Registro: E_LACUNAS_MESSAGING_PRIMARIES_1106. Afirmação de UM juiz."
+    trace: "WebFetch https://docs.nats.io/reference/config/jetstream/sync_interval e procurar '2 min', 'default' e 'memory': 0 ocorrências"
+  - id: C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "honker: alpha declarado no README, licença Apache-2.0 OR MIT, e release v0.6.0 existente fora do README (API do GitHub /releases e /tags)."
+    narrative: "Medida: curl na API do GitHub /releases e /tags de russellromney/honker devolveu v0.6.0; grep -n no README confirmou l.27 (Alpha) e l.480 (License). Critério: A2_CLAIM_ESTICA. Alvo reprovado: '[sqlite-queue-prior-art] honker é alpha, risco de maturidade; licença Apache-2.0 OR MIT; sem releases listadas na página' (EXAGERADA). Registro: E_LACUNAS_MESSAGING_PRIMARIES_1106. Afirmação de UM juiz."
+    trace: "curl -s https://api.github.com/repos/russellromney/honker/releases | grep -m1 html_url; grep -n 'Alpha software\\|Apache-2.0 OR MIT' README.md"
+  - id: C_SUPERACAO_20261106_ADR0021_ATTRIBUTE_TABLE_LITERAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "Tabela da ADR 0021 pela linha literal, sem aspas internas: '| `source` | Agent DID URI |', com id=entry_id e type=ai.agentmesh.{event_type}, sem subject."
+    narrative: "Medida: curl do markdown bruto + grep -n 'source' devolveu a linha 34 com esse texto; o grep -F da citação com aspas devolve 0. Critério: A1_QUOTE_AUSENTE. Alvo reprovado: '[cloudevents-agents] No ADR 0021, id é entry_id, source é o URI DID do agente, type é ai.agentmesh.{event_type}; a página não define subject' (NAO-ENCONTRADA). Registro: E_LACUNAS_MESSAGING_PRIMARIES_1106. Afirmação de UM juiz."
+    trace: "curl -sL https://raw.githubusercontent.com/microsoft/agent-governance-toolkit/main/docs/adr/0021-cloudevents-envelope-for-mesh-audit.md | grep -F '| `source` | Agent DID URI |'"
+  - id: C_SUPERACAO_20261106_EVENTMESH_A2A_MAPPING_CORRECTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "EventMesh A2A pelo README EN: a mensagem entre agentes é um CloudEvent; type marca requisição ou resposta, mcptype a direção, subject o tópico de broadcast; source não aparece; a correlação vai em 'extension: collaborationid / id'."
+    narrative: "Medida: grep -niE 'subject|source|collaborationid|mcptype' no README EN: source ausente; subject, mcptype e collaborationid presentes nas linhas 74-78. Critério: A2_CLAIM_ESTICA (a linha 'Correlation (id) | extension: collaborationid / id | Links Response to Request.' não diz 'não no id nativo'). Alvo reprovado: '[cloudevents-agents] No EventMesh A2A ... a correlação vai em extensão (collaborationid), não no id nativo' (EXAGERADA). Registro: E_LACUNAS_MESSAGING_PRIMARIES_1106. Afirmação de UM juiz."
+    trace: "curl -sL https://raw.githubusercontent.com/apache/eventmesh/master/docs/a2a-protocol/README_EN.md | grep -n 'Correlation'"
+  - id: D_MESSAGING_IDENTIDADE_DOIS_ADAPTERS_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Dois adapters, Logto e local»"
+    label: "Identidade do onion-messaging por interface com dois adapters: Logto para pessoas, máquinas e a persona (código de vida curta, convite amarrado a membro, aprovação humana) e local sem servidor (chave A2A e convite por membro) para quem vendoriza sem Logto e para a versão mínima."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Dois adapters, Logto e local»; descartadas: «Só Logto»."
+    trace: "docs/evolution/research/messaging-standards-2026-11/SYNTHESIS.md"
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «A identidade do onion-messaging fica só no Logto ou numa interface com dois adapters (Logto e local)? Medido em 06/11 no Logto 1.42 da VPS: o discovery OIDC anuncia urn:ietf:params:oauth:grant-type:device_code, com device_authorization_endpoint em oidc/device/auth, e urn:ietf:params:oauth:grant-type:token-exchange.»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_MESSAGING_DEVICE_FLOW_LOGTO_JA_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Device flow do Logto já»"
+    label: "O device flow do Logto (RFC 8628) entra já no adapter Logto da identidade do onion-messaging, sem esperar a terça e sem ficar só no convite A2A; o convite A2A segue como o adapter local."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Device flow do Logto já»; descartadas: «Convite A2A agora, Logto na terça» · «Só convite A2A»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Quando o device flow do Logto entra na identidade do onion-messaging?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Vaultwarden + credencial systemd»"
+    label: "Os tokens do Slack, do bridge e da mensageria têm fonte única no Vaultwarden (coleção da organização, guardada pelo humano); um script do maestro rodado com ! copia cada um para uma credencial do systemd só do root, lida por LoadCredential; nunca .env nem chat."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Vaultwarden + credencial systemd»; descartadas: «Só o pass» · «Só o Vaultwarden»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Onde moram os segredos do onion-messaging (tokens do Slack, do bridge e da mensageria) e como chegam ao serviço?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_MESSAGING_SPIKE_CLAIM_ACT_SABADO_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Spike no sábado»"
+    label: "Spike no sábado 07/11 para medir se o token exchange do Logto emite o claim act (ator diferente do titular) para a persona do onion-messaging, sem mexer em produção."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Spike no sábado»; descartadas: «Depois de segunda»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Quando se mede se o token exchange do Logto emite o claim act para a persona?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_SESSAO_OPS_ONION_VPS_OPS_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Repo novo onion-vps-ops»"
+    label: "Repo novo privado onion-vps-ops, adotado como membro do Onion, com uma sessão de operação que é o escritor único dos repos de serviço da VPS (Logto, Vaultwarden, WAHA, LibreChat); o código do bridge segue no core e o veto de deploy segue igual."
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Repo novo onion-vps-ops»; descartadas: «Adotar os 4 repos como estão» · «Depois de segunda»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Quem opera os repos de serviço da VPS (onion-vps-logto, onion-vps-vaultwarden, onion-vps-waha, onion-vps-librechat)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+edges:
+  # ─── opções dependem da decisão; a decisão responde à pergunta ────────────────────────────────────
+  - from: D_MESSAGING_STACK_2026_11
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: TRACES_TO
+  - from: C_OPCAO_ENVELOPE_A_A2A_ONION_PROFILE_ONLY
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_ENVELOPE_B_CLOUDEVENTS_ONLY
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_QUEUE_2_REDIS_STREAMS
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_QUEUE_3_NATS_JETSTREAM
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_BELL_II_YOU_HAVE_MAIL_HOOK
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_ADAPTERS_SLACK_SOCKET_MODE_AND_GIT
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  # ─── evidências sustentam a pergunta ──────────────────────────────────────────────────────────────
+  - from: E_CC_CHANNEL_NO_DELIVERY_ACK
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNEL_DEV_FLAG_INTERACTIVE_ONLY_1106
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_ANTHROPIC_AUTH_ONLY
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_NO_DURABLE_QUEUE
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_ALLOWLIST_CONTRACT_MAY_CHANGE
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_A2A_V1_DEVICE_CODE_FLOW_ADDED
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_A2A_V1_JWS_SIGNS_AGENT_CARD_ONLY
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_A2A_PUSH_WEBHOOK_PER_TASK
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_A2A_SSE_STREAMING_ALTERNATIVE
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_DEVICE_CODE_PHISHING_37X
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_ZAPIER_OUTBOX_ACK_BEFORE_DELETE
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_SQLITE_WAL_SINGLE_WRITER
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CHANNEL_CAPABILITY_STDIO_SILENT_DROP
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_AGENT_BRIDGE_SSH_CHANNEL_POLLING
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_STDOUT_ACK_NOT_CONTEXT_DELIVERY
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_PEERBUS_CHANNEL_WITH_TOOLS
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CHANNEL_META_KEYS_IDENTIFIERS_STRINGS
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_MESH_SQLITE_WAL_SSE_ULID
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_MESH_CHAT_TO_CHANNEL_PREVIEW
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_TELEGRAM_PLUGIN_NOT_DELIVERED_2_1_80
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_MERCADO_MESSAGING_1106
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_MESSAGING_1106
+    to: Q_MESSAGING_STANDARDS_1106
+    edge_type: SUPPORTS
+  # ─── evidências que sustentam opções específicas ──────────────────────────────────────────────────
+  - from: E_CC_CHANNELS_NO_DURABLE_QUEUE
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_ZAPIER_OUTBOX_ACK_BEFORE_DELETE
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_SQLITE_WAL_SINGLE_WRITER
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_MESH_SQLITE_WAL_SSE_ULID
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_CHANNEL_META_KEYS_IDENTIFIERS_STRINGS
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: SUPPORTS
+  - from: E_AGENT_BRIDGE_SSH_CHANNEL_POLLING
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: SUPPORTS
+  - from: E_PEERBUS_CHANNEL_WITH_TOOLS
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNEL_DEV_FLAG_INTERACTIVE_ONLY_1106
+    to: C_OPCAO_BELL_II_YOU_HAVE_MAIL_HOOK
+    edge_type: SUPPORTS
+  - from: E_DEVICE_CODE_PHISHING_37X
+    to: C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE
+    edge_type: SUPPORTS
+  # ─── objeções sobreviventes LIMITAM (CONSTRAINS) ──────────────────────────────────────────────────
+  - from: E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH
+    to: E_CC_CHANNEL_NO_DELIVERY_ACK
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F2_HEADLESS_NEVER_RINGS
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F2_HEADLESS_NEVER_RINGS
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F2_HEADLESS_NEVER_RINGS
+    to: E_CC_CHANNEL_DEV_FLAG_INTERACTIVE_ONLY_1106
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F3_BELL_OPTIONAL_PER_ADOPTER
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F3_BELL_OPTIONAL_PER_ADOPTER
+    to: E_CC_CHANNELS_ANTHROPIC_AUTH_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F5_PIN_CC_AND_RESMOKE
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F5_PIN_CC_AND_RESMOKE
+    to: E_CC_CHANNELS_ALLOWLIST_CONTRACT_MAY_CHANGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS
+    to: C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS
+    to: E_A2A_V1_DEVICE_CODE_FLOW_ADDED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    to: C_OPCAO_ENVELOPE_A_A2A_ONION_PROFILE_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    to: E_A2A_V1_JWS_SIGNS_AGENT_CARD_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF
+    to: E_A2A_PUSH_WEBHOOK_PER_TASK
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F9_SSE_NEEDS_CURSOR_REPLAY
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F9_SSE_NEEDS_CURSOR_REPLAY
+    to: E_A2A_SSE_STREAMING_ALTERNATIVE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK
+    to: E_ZAPIER_OUTBOX_ACK_BEFORE_DELETE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE
+    to: C_OPCAO_QUEUE_2_REDIS_STREAMS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE
+    to: E_SQLITE_WAL_SINGLE_WRITER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F14_SSH_ONLY_SAME_OWNER
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F14_SSH_ONLY_SAME_OWNER
+    to: E_AGENT_BRIDGE_SSH_CHANNEL_POLLING
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F16_PEERBUS_EXISTENCE_ONLY
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F16_PEERBUS_EXISTENCE_ONLY
+    to: E_PEERBUS_CHANNEL_WITH_TOOLS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F18_CLAUDE_MESH_UNRUN
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F18_CLAUDE_MESH_UNRUN
+    to: E_CLAUDE_MESH_SQLITE_WAL_SSE_ULID
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F20_REGRESSION_RISK_ONLY
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F20_REGRESSION_RISK_ONLY
+    to: E_TELEGRAM_PLUGIN_NOT_DELIVERED_2_1_80
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REF_DEVICE_CODE_NEVER_IN_INVITE
+    to: C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_GATE_BY_SENDER_NOT_ROOM
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_GATE_BY_SENDER_NOT_ROOM
+    to: C_OPCAO_ADAPTERS_SLACK_SOCKET_MODE_AND_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_NO_PERMISSION_RELAY
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_PRUNE_AND_BACKUP
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_DEAD_LETTER_GAP
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_FAN_OUT_CONCURRENT_STREAMS
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_DEVICE_CODE_VIA_SLACK_IS_PHISHING
+    to: C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_DEVICE_CODE_VIA_SLACK_IS_PHISHING
+    to: C_OPCAO_ADAPTERS_SLACK_SOCKET_MODE_AND_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUT_AGENT_INBOX_ARCHIVED_AGPL
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_EXTERNAL_PLUGINS_UNREAD
+    to: C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_HONKER_UNREAD
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_JETSTREAM_UNREAD
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_JETSTREAM_UNREAD
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_CLOUDEVENTS_SPEC_UNREAD
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SRC_ADR_0021_UNREAD
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: CONSTRAINS
+  # ─── superações rastreiam à reprovação que as registra ────────────────────────────────────────────
+  - from: C_SUPERACAO_20261106_CHANNEL_REQUIREMENTS_FULL_LIST
+    to: E_LACUNAS_MESSAGING_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_A2A_PUSH_AUTH_SCHEME_OPEN
+    to: E_LACUNAS_MESSAGING_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_RFC10027_CROSS_DEVICE_PHISHING
+    to: E_LACUNAS_MESSAGING_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_AGENT_INBOX_ACK_IS_TRANSPORT
+    to: E_LACUNAS_MESSAGING_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_CHANNEL_ACK_TOOL_BOUND
+    to: E_OBJECAO_F1_ACK_ONLY_IF_BOUND_TO_ID_AND_HASH
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_MEMBER_INVITE_FOR_MACHINES
+    to: E_OBJECAO_F6_DEPRECATED_NOT_REMOVED_NO_AS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_BODY_SHA256_PROFILE
+    to: E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_PULL_RETURN_TASKS_GET
+    to: E_OBJECAO_F8_WEBHOOK_BLOCKED_BY_NAT_SSRF
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_MARK_DELIVERED_ONLY_ON_ACK
+    to: E_OBJECAO_F11_CHANNEL_RESOLVE_IS_NOT_ACK
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_SIGNED_ENVELOPE_CROSS_USER
+    to: E_OBJECAO_F14_SSH_ONLY_SAME_OWNER
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_OWN_CHANNEL_NO_RELAY
+    to: E_OBJECAO_F16_PEERBUS_EXISTENCE_ONLY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_OWN_CHANNEL_DELIVERY_LATER_VERSION
+    to: E_OBJECAO_F20_REGRESSION_RISK_ONLY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_INVITE_WITHOUT_CODE
+    to: E_OBJECAO_REF_DEVICE_CODE_NEVER_IN_INVITE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_SENDER_KID_GATE
+    to: E_OBJECAO_CUT_GATE_BY_SENDER_NOT_ROOM
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_NO_PERMISSION_RELAY
+    to: E_OBJECAO_CUT_NO_PERMISSION_RELAY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_INVITE_WITHOUT_CODE_SLACK_EMAIL
+    to: E_OBJECAO_CUT_DEVICE_CODE_VIA_SLACK_IS_PHISHING
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_OWN_BASE_CHANNEL_ACCEPT
+    to: E_OBJECAO_CUT_AGENT_INBOX_ARCHIVED_AGPL
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_CORE_CLOUDEVENT_READER
+    to: E_OBJECAO_SRC_CLOUDEVENTS_SPEC_UNREAD
+    edge_type: TRACES_TO
+  # ─── rodada de primárias de 2026-11-06 ──────────────────────────────────────────────────────────
+  - from: E_SQS_DLQ_MAXRECEIVECOUNT_HIGH_ENOUGH
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_SQS_DLQ_MAXRECEIVECOUNT_HIGH_ENOUGH
+    to: E_OBJECAO_CUT_DEAD_LETTER_GAP
+    edge_type: SUPPORTS
+  - from: E_SQS_DLQ_ISOLATE_FOR_DEBUGGING
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_NATS_NO_NATIVE_DLQ_ADVISORY_ONCE
+    to: E_OBJECAO_SRC_JETSTREAM_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_NATS_NO_NATIVE_DLQ_ADVISORY_ONCE
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    edge_type: CONSTRAINS
+  - from: E_NATS_MAXDELIVER_REMOVES_FROM_PENDING_KEEPS_IN_STREAM
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    edge_type: CONSTRAINS
+  - from: E_NATS_MAXDELIVER_CAPS_ATTEMPTS
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    edge_type: SUPPORTS
+  - from: E_NATS_BACKOFF_REUSES_LAST_ENTRY
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    edge_type: SUPPORTS
+  - from: E_NATS_AT_LEAST_ONCE_DUPLICATES
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_NATS_AT_LEAST_ONCE_DUPLICATES
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    edge_type: CONSTRAINS
+  - from: E_HONKER_SQLITE_QUEUE_WITH_DEAD_LETTER
+    to: E_OBJECAO_SRC_HONKER_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_HONKER_SQLITE_QUEUE_WITH_DEAD_LETTER
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_HONKER_DEAD_ON_MAX_ATTEMPTS
+    to: E_OBJECAO_CUT_DEAD_LETTER_GAP
+    edge_type: SUPPORTS
+  - from: E_HONKER_DEAD_ON_MAX_ATTEMPTS
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_HONKER_ACK_IS_DELETE_FENCED_LATE_ACK
+    to: E_OBJECAO_CUT_PRUNE_AND_BACKUP
+    edge_type: SUPPORTS
+  - from: E_HONKER_ACK_IS_DELETE_FENCED_LATE_ACK
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: SUPPORTS
+  - from: E_HONKER_WAL_DEFAULT_ONE_WRITER
+    to: E_SQLITE_WAL_SINGLE_WRITER
+    edge_type: SUPPORTS
+  - from: E_GOQITE_SINGLE_WRITER_NO_DLQ_MENTION
+    to: E_OBJECAO_F12_ONE_DAEMON_OWNS_THE_FILE
+    edge_type: SUPPORTS
+  - from: E_ADR0021_CLOUDEVENTS_AUDIT_ENVELOPE
+    to: E_OBJECAO_SRC_ADR_0021_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_ADR0021_CLOUDEVENTS_AUDIT_ENVELOPE
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: SUPPORTS
+  - from: E_ADR0021_REJECTED_CUSTOM_JSON_AND_OTEL
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: SUPPORTS
+  - from: E_EVENTMESH_V112_RC1_A2A_MCP_OVER_CLOUDEVENTS
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: SUPPORTS
+  - from: E_EVENTMESH_V112_RC1_A2A_MCP_OVER_CLOUDEVENTS
+    to: E_OBJECAO_SRC_EVENTMESH_A2A_UNREAD
+    edge_type: SUPPORTS
+  - from: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM
+    edge_type: SUPERSEDES
+  - from: E_OBJECAO_P2_SQS_CEILING_NO_NUMBER_COUNTS_RECEIVES
+    to: E_SQS_DLQ_MAXRECEIVECOUNT_HIGH_ENOUGH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_SQS_CEILING_NO_NUMBER_COUNTS_RECEIVES
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE
+    to: E_SQS_DLQ_ISOLATE_FOR_DEBUGGING
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_REDRIVE_IDENTITY_VS_DEDUPE
+    to: E_OBJECAO_CUT_DEAD_LETTER_GAP
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_P2_MAXDELIVER_DEFAULT_UNQUOTED
+    to: E_NATS_MAXDELIVER_CAPS_ATTEMPTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_ACKWAIT_DEFAULT_UNQUOTED
+    to: E_NATS_BACKOFF_REUSES_LAST_ENTRY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_JETSTREAM_OPERATION_UNMEASURED
+    to: C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_JETSTREAM_OPERATION_UNMEASURED
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_JETSTREAM_OPERATION_UNMEASURED
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_HONKER_EXISTENCE_NOT_FIT
+    to: E_HONKER_SQLITE_QUEUE_WITH_DEAD_LETTER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_HONKER_EXISTENCE_NOT_FIT
+    to: C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_HONKER_DEAD_SCHEMA_NO_REQUEUE
+    to: E_HONKER_DEAD_ON_MAX_ATTEMPTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_GOQITE_ABSENCE_UNQUOTED
+    to: E_GOQITE_SINGLE_WRITER_NO_DLQ_MENTION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_ADR0021_AUDIT_NOT_A2A
+    to: E_ADR0021_CLOUDEVENTS_AUDIT_ENVELOPE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_ADR0021_AUDIT_NOT_A2A
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_EVENTMESH_RC_CONTRADICTS_NO_MARKET
+    to: E_EVENTMESH_V112_RC1_A2A_MCP_OVER_CLOUDEVENTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_EVENTMESH_RC_CONTRADICTS_NO_MARKET
+    to: C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_P2_EVENTMESH_RC_CONTRADICTS_NO_MARKET
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    to: E_LACUNAS_MESSAGING_1106
+    edge_type: TRACES_TO
+  - from: Q_MESSAGING_PRIMARIES_REVIEW_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
+  - from: Q_MESSAGING_PRIMARIES_REVIEW_1106
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_SQS_DLQ_RETENTION_STANDARD_VS_FIFO
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_EIP_DLC_TYPICAL_LOCAL_PER_MACHINE
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_NATS_SYNC_INTERVAL_NO_DEFAULT
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_ADR0021_ATTRIBUTE_TABLE_LITERAL
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261106_EVENTMESH_A2A_MAPPING_CORRECTED
+    to: E_LACUNAS_MESSAGING_PRIMARIES_1106
+    edge_type: TRACES_TO
+  - from: D_MESSAGING_IDENTIDADE_DOIS_ADAPTERS_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
+  - from: D_MESSAGING_DEVICE_FLOW_LOGTO_JA_1106
+    to: D_MESSAGING_IDENTIDADE_DOIS_ADAPTERS_1106
+    edge_type: TRACES_TO
+  - from: D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
+  - from: D_MESSAGING_SPIKE_CLAIM_ACT_SABADO_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
+  - from: D_SESSAO_OPS_ONION_VPS_OPS_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
