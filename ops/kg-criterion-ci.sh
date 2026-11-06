@@ -15,9 +15,14 @@
 #   rc 0 = nenhum achado e nada ilegível · rc 1 = critério com achado (impresso) · rc 2 = não deu para julgar
 set -uo pipefail
 
-[ -f vendor/kg-ssot/tools/kg_criterion.py ] || { echo "kg-criterion-ci: vendor/kg-ssot/tools/kg_criterion.py ausente em $(pwd) — não dá para julgar" >&2; exit 2; }
+# a pasta das ferramentas do KG-SSOT pelo resolver único (.claude/utils/kg/kgssot-tools.sh: KG_SSOT_TOOLS →
+# vendor/kg-ssot/tools → tools/ do próprio produto), a partir da raiz julgada (o cwd); nada casou, o vendor de hoje.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.claude/utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+KGT="$(kgssot_tools_dir .)" || KGT=./vendor/kg-ssot/tools
+KGT="${KGT#./}"
+[ -f "${KGT}/kg_criterion.py" ] || { echo "kg-criterion-ci: ${KGT}/kg_criterion.py ausente em $(pwd) — não dá para julgar" >&2; exit 2; }
 
-out="$(python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root . --format json)"; rc=$?
+out="$(python3 -I -B "${KGT}/kg_criterion.py" check --root . --format json)"; rc=$?
 [ "$rc" -le 1 ] || { echo "kg-criterion-ci: kg_criterion.py check saiu rc=${rc} — não julgou" >&2; exit 2; }
 
 # fail-closed: JSON ilegível, schema inesperado ou chave ausente nunca vira verde

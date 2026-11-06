@@ -52,11 +52,14 @@ jobs:
           # o interpretador é o ambiente, e este workflow é do adotante. Com setup-python aqui, o currency-census.sh
           # do adotante passaria a cobrar o python3 da máquina dele contra o pino deste arquivo; sem, a superfície
           # some no adotante. O python3 da imagem (ubuntu-latest) basta, e o passo abaixo barra a imagem sob o piso.
-          if [ -f vendor/kg-ssot/tools/requirements.txt ]; then
+          # A pasta vem do resolver único (.claude/utils/kg/kgssot-tools.sh, que viaja): vendor/kg-ssot/tools no
+          # adotante e tools/ quando o projeto adotado É o produto kg-ssot (lá não há vendor e o pip era pulado).
+          KGSSOT_REQ="$(. .claude/utils/kg/kgssot-tools.sh 2>/dev/null && kgssot_tools_dir .)/requirements.txt" || KGSSOT_REQ=vendor/kg-ssot/tools/requirements.txt
+          if [ -f "${KGSSOT_REQ}" ]; then
             python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 12) else 1)' \
               || { echo "ERRO: o leitor do contrato KG-SSOT exige Python 3.12 ou mais; o runner tem $(python3 --version 2>&1)"; exit 1; }
-            rh=""; grep -q -- '--hash=sha256:' vendor/kg-ssot/tools/requirements.txt && rh="--require-hashes"
-            python3 -m pip install --quiet ${rh} -r vendor/kg-ssot/tools/requirements.txt
+            rh=""; grep -q -- '--hash=sha256:' "${KGSSOT_REQ}" && rh="--require-hashes"
+            python3 -m pip install --quiet ${rh} -r "${KGSSOT_REQ}"
           fi
 
       - name: Lint determinístico de artefatos Onion

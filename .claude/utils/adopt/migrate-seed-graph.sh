@@ -50,7 +50,12 @@ _pick() {   # o do DEST primeiro (é o que roda lá), depois o da fonte
 }
 RADAR="$(_pick .claude/validation/kg-radar.sh)"
 _KFP="$(_pick .claude/validation/kg-fixture-paths.sh)"
-VENDOR="${KG_CONTRACT_VENDOR:-$(_pick vendor/kg-ssot)}"
+# a pasta do contrato: KG_CONTRACT_VENDOR (o override por ferramenta, que segue vencendo) e, sem ele, o resolver único
+# (../kg/kgssot-tools.sh: KG_SSOT_TOOLS → vendor/kg-ssot/tools → tools/ do produto), no DEST primeiro e na fonte depois
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+if [ -n "${KG_CONTRACT_VENDOR:-}" ]; then TOOLS="${KG_CONTRACT_VENDOR}/tools"
+elif TOOLS="$(kgssot_tools_dir "${DEST}")" || TOOLS="$(kgssot_tools_dir "${SRC}")"; then :
+else TOOLS=""; fi
 # PRÉ-FILTRO TEXTUAL antes de exigir as dependências: sem nenhuma linha `---` nos grafos não há o que migrar,
 # e cobrar PyYAML/vendor aqui faria toda ADOÇÃO nova (que passa por este passo) avisar NAO MEDIDO sobre nada.
 # Só a linha `---` exata vira candidato; o veredito de "quantos documentos" é do parser, abaixo.
@@ -67,7 +72,7 @@ if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
 fi
 [ -n "${RADAR}" ] || { echo "migrate-seed-graph: kg-radar.sh ausente no alvo e na fonte — NAO MEDIDO" >&2; exit 2; }
 [ -n "${_KFP}" ] || { echo "migrate-seed-graph: kg-fixture-paths.sh ausente — NAO MEDIDO" >&2; exit 2; }
-[ -n "${VENDOR}" ] && [ -f "${VENDOR}/tools/kg_gate.py" ] || { echo "migrate-seed-graph: vendor do contrato ausente (vendor/kg-ssot no alvo e na fonte) — NAO MEDIDO" >&2; exit 2; }
+[ -n "${TOOLS}" ] && [ -f "${TOOLS}/kg_gate.py" ] || { echo "migrate-seed-graph: vendor do contrato ausente (nem KG_SSOT_TOOLS, nem vendor/kg-ssot, nem tools/ do produto, no alvo e na fonte) — NAO MEDIDO" >&2; exit 2; }
 python3 -c 'import yaml' 2>/dev/null || { echo "migrate-seed-graph: PyYAML ausente — NAO MEDIDO" >&2; exit 2; }
 
 # A população: rastreados (ou, sem git, os de docs/), sem fixture — o predicado ÚNICO da casa.
@@ -79,7 +84,7 @@ fi
 
 # A lista vai por VARIÁVEL de ambiente: o heredoc abaixo É o stdin do python (o script), e um pipe
 # para ele seria silenciosamente substituído — medido na 1ª redação: "nada a migrar" sobre a semente velha.
-MIGRATE_LIST="${LIST}" python3 -I -B - "${DEST}" "${RADAR}" "${VENDOR}/tools" "${DRY}" <<'PY'
+MIGRATE_LIST="${LIST}" python3 -I -B - "${DEST}" "${RADAR}" "${TOOLS}" "${DRY}" <<'PY'
 import datetime, json, os, re, subprocess, sys, tempfile
 import yaml
 

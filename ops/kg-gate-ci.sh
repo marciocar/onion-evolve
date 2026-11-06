@@ -13,7 +13,12 @@
 # Roda da raiz do repo que se quer julgar (o pr-finalize a chama dentro da worktree do HEAD).
 set -uo pipefail
 
-[ -f vendor/kg-ssot/tools/kg_gate.py ] || { echo "kg-gate-ci: vendor/kg-ssot ausente em $(pwd) — não dá para julgar" >&2; exit 2; }
+# a pasta das ferramentas do KG-SSOT pelo resolver único (.claude/utils/kg/kgssot-tools.sh: KG_SSOT_TOOLS →
+# vendor/kg-ssot/tools → tools/ do próprio produto), a partir da raiz julgada (o cwd); nada casou, o vendor de hoje.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../.claude/utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
+KGT="$(kgssot_tools_dir .)" || KGT=./vendor/kg-ssot/tools
+KGT="${KGT#./}"
+[ -f "${KGT}/kg_gate.py" ] || { echo "kg-gate-ci: ${KGT}/kg_gate.py ausente em $(pwd) (nem KG_SSOT_TOOLS, nem vendor/kg-ssot, nem tools/ do produto) — não dá para julgar" >&2; exit 2; }
 
 # A BANCADA antes da tag (kg-ssot 4.24.0): um vendor trazido por `kg_vendor.py update --ref <commit>` tem o carimbo
 # unreleased, e o check e o kg_gate.py o reprovam sem --allow-unreleased. Sem esta variável a bancada pré-tag não
@@ -27,12 +32,18 @@ if [ "${KG_GATE_ALLOW_UNRELEASED:-}" = 1 ]; then
   allow=(--allow-unreleased)
 fi
 
-python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot "${allow[@]}" || exit $?
+# A integridade do VENDOR só existe onde há vendor: o kg_vendor.py confere o carimbo de vendor/kg-ssot contra os
+# sha256 dele, e no próprio produto (tools/ na raiz) não há vendor a conferir. Por isso fica no caminho fixo.
+if [ -d vendor/kg-ssot ]; then
+  python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot "${allow[@]}" || exit $?
+else
+  echo "kg-gate-ci: sem vendor/kg-ssot (ferramentas em ${KGT}): a integridade do vendor não se aplica" >&2
+fi
 
 # FORA DO CORPUS, explícito (política selada pelo maestro, 2026-10-08): propostas arquivadas do
 # kg-inbox são história. A base tem de ser gravada com os MESMOS --exclude:
 #   bash ops/kg-gate-ci.sh --update
-python3 -I vendor/kg-ssot/tools/kg_gate.py \
+python3 -I "${KGT}/kg_gate.py" \
   --exclude 'docs/evolution/kg-inbox/_rejected/*' \
   --exclude 'docs/evolution/kg-inbox/_sealed/*' \
   "${allow[@]}" "$@"
