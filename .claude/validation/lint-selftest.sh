@@ -46874,7 +46874,8 @@ YML
     ( cd "${d}" && git checkout -q -f main 2>/dev/null && git reset -q --hard && printf 'y\n' >> "$1" && git add -A \
       && bash "${2:-${sut}}" 2>&1; git reset -q --hard )
   }
-  if ! (cd "${d}" && bash "${res}" mini --allowlist .claude/utils/marketplace/roles.yaml | grep -qx 'commands/so-no-fixture.md'); then
+  local _al; _al="$(cd "${d}" && bash "${res}" mini --allowlist .claude/utils/marketplace/roles.yaml 2>&1)"
+  if ! grep -qx 'commands/so-no-fixture.md' <<< "${_al}"; then
     record_fail "preflight-families: (c) setup" "o roles.yaml do fixture não resolveu a allowlist (a forma do roles.yaml mudou?)"
     rm -rf "${d}"; unset -f _pf_touch; return
   fi
