@@ -90,20 +90,25 @@ nodes:
   - id: D_SO_LIMITES_DERIVADOS_DO_LEASE_1106
     node_type: decision
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 4
     confidence: 0.6
-    verified_at: "2026-11-06"
-    verified_against: "E_SO_PSI_CONTRA_LOAD_1106 e `bash ops/load-lease.sh status`; nenhuma opção aplicada: a régua vigente segue 15/12 sem PSI"
     label: "Para o maestro selar: a régua do lease muda? Opção 1 (recomendada pela medida): manter 15/12 e ligar o PSI de CPU em 30 como 2º sinal. Opção 2: régua derivada de nproc, HIGH 12 e RESUME 8. Opção 3: manter como está."
-    narrative: "Por que a 1: muda o mínimo (os números que as peers já respeitam ficam) e pega 13 dos 15 intervalos congestionados contra 6 de hoje, com 22 alarmes falsos em 877; a 2 pega 13 também, com 19, mas desloca a régua que as sessões aprenderam e não acompanha a fila tão cedo quanto o PSI. A memória entra como teto próprio de labs simultâneos (disponível menos 4 GB, 1 GB por lab: 20 hoje), sem força de bloqueio enquanto o PSI de memória for 0. Refutação: uma semana de série com o PSI ligado em que os alarmes falsos travem trabalho que não congestionaria (mais de 1 em 10 esperas sem espera média de 30% no intervalo seguinte) rebaixa a opção 1."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «15/12 + PSI 30»"
+    narrative: |-
+      Por que a 1: muda o mínimo (os números que as peers já respeitam ficam) e pega 13 dos 15 intervalos congestionados contra 6 de hoje, com 22 alarmes falsos em 877; a 2 pega 13 também, com 19, mas desloca a régua que as sessões aprenderam e não acompanha a fila tão cedo quanto o PSI. A memória entra como teto próprio de labs simultâneos (disponível menos 4 GB, 1 GB por lab: 20 hoje), sem força de bloqueio enquanto o PSI de memória for 0. Refutação: uma semana de série com o PSI ligado em que os alarmes falsos travem trabalho que não congestionaria (mais de 1 em 10 esperas sem espera média de 30% no intervalo seguinte) rebaixa a opção 1.
+
+      verified_against anterior: «E_SO_PSI_CONTRA_LOAD_1106 e `bash ops/load-lease.sh status`; nenhuma opção aplicada: a régua vigente segue 15/12 sem PSI»
+      proveniência anterior: source «docs/evolution/research/session-orchestration-2026-11/data/psi-vs-load.py» · locator «saída do script sobre psi-vs-load-2026-11-06.tsv» · method «derivado: proposta do core a partir de E_SO_PSI_CONTRA_LOAD_1106, 2026-11-06» · locality «repo»
+      Selado por /meta:decide em 2026-11-06: escolhida «15/12 + PSI 30»; descartadas: «Baixar para 12/9» · «Manter 15/12 só».
     provenance:
-      source: "docs/evolution/research/session-orchestration-2026-11/data/psi-vs-load.py"
-      locator: "saída do script sobre psi-vs-load-2026-11-06.tsv"
-      method: "derivado: proposta do core a partir de E_SO_PSI_CONTRA_LOAD_1106, 2026-11-06"
-      locality: "repo"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Régua de carga: load ≥ 15 pegou 6 de 15 congestionamentos; load 12 ou PSI de CPU ≥ 30% pegou 13. Qual régua o lease aplica?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
   - id: C_SO_REVISAO_EM_TRES_CAMADAS
     node_type: claim
     layer: audit
