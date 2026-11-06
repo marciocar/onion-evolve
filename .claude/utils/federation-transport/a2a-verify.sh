@@ -22,6 +22,13 @@
 #                    nome do arquivo de jti. Um id inventado já morria no trust-check (rc 2, sem estado); o
 #                    ganho é o membro que EXISTE e não recebe (standalone, porta), que sem esta camada passava
 #                    a ter fila e estado de jti próprios. Receber ao vivo é só da fonte e dos hubs.
+#                    FILA LOCAL (2026-11-06, D_GATE_STANDALONE_FILA_LOCAL_1106): com --channel local-queue o gate
+#                    aceita TAMBÉM o receptor role standalone (kind não door), e só se o local_path dele no
+#                    registro for um diretório que EXISTE nesta máquina e PERTENCE ao uid que roda o gate. É a
+#                    fila do onion-messaging (socket Unix 0600, par de mesmo uid) que passa a flag; o remetente
+#                    não a controla (ela não está no envelope), e o bridge (outro uid, rota de rede) nunca a
+#                    satisfaz. Senão veto receiver-not-local:<motivo>. Pela rede (default --channel network)
+#                    nada muda: standalone segue receiver-not-a-receiver:role-standalone.
 #   0c. from       — (SAC-150 N4) o signal.from tem a MESMA forma fechada do receptor ANTES da camada 1: ele
 #                    era repassado cru ao trust-check, que o gravava no trust-log. Senão veto from-malformed
 #   1. trust       — COMPÕE trust-topology-check.sh (--from signal.from --to receiver --action relay): policy-as-data.
@@ -54,6 +61,10 @@
 #   ecoa o "receiver" julgado (F3): o bridge e o aceite conferem que é o receptor da rota e da fila.
 #
 # Uso : a2a-verify.sh --receiver <member-id> [--envelope <file>|-] [--repo <path>] [--dry-run] [--reverify-at <epoch>]
+#                     [--channel network|local-queue]
+#   --channel (default network): local-queue = entrega pela fila local da MESMA máquina (camada 0b). O veredito
+#     verificado ecoa "channel":"local-queue" só nesse modo, para o chamador conferir que o gate entendeu a flag
+#     (gate antigo recusa a flag com rc 2: fail-closed).
 #   envelope (stdin se '-' ou omitido). --dry-run: repassa ao trust-check (não grava trust-log).
 #   --reverify-at <epoch> (SAC-150 N1): a REVERIFICAÇÃO do aceite. O a2a-accept.sh reverifica o envelope
 #     preservado no registro da fila em vez de confiar no `.verdict.verified` do JSON. Todas as camadas rodam
@@ -84,15 +95,16 @@
 # =============================================================================
 set -uo pipefail
 
-RECEIVER=""; ENVFILE="-"; REPO=""; DRY=""; REVERIFY_AT=""
+RECEIVER=""; ENVFILE="-"; REPO=""; DRY=""; REVERIFY_AT=""; CHANNEL="network"
 while [ "$#" -gt 0 ]; do case "$1" in
   --receiver) RECEIVER="${2:-}"; shift 2 ;;
   --envelope) ENVFILE="${2:-}"; shift 2 ;;
   --repo)     REPO="${2:-}"; shift 2 ;;
   --dry-run)  DRY=1; shift ;;
+  --channel)  CHANNEL="${2:-}"; case "${CHANNEL}" in network|local-queue) ;; *) echo "uso: --channel network|local-queue" >&2; exit 2 ;; esac; shift 2 ;;
   --reverify-at) REVERIFY_AT="${2:-}"; case "${REVERIFY_AT}" in ''|*[!0-9]*) echo "uso: --reverify-at exige epoch inteiro" >&2; exit 2 ;; esac
               [ "${#REVERIFY_AT}" -le 12 ] || { echo "uso: --reverify-at fora de faixa" >&2; exit 2; }; shift 2 ;;
-  *) echo "uso: a2a-verify.sh --receiver <id> [--envelope <file>|-] [--repo <path>] [--dry-run] [--reverify-at <epoch>]" >&2; exit 2 ;;
+  *) echo "uso: a2a-verify.sh --receiver <id> [--envelope <file>|-] [--repo <path>] [--dry-run] [--reverify-at <epoch>] [--channel network|local-queue]" >&2; exit 2 ;;
 esac; done
 [ -n "${RECEIVER}" ] || { echo "uso: a2a-verify.sh --receiver <id> [--envelope <file>|-]" >&2; exit 2; }
 
@@ -196,8 +208,8 @@ HDR_B64="${JWS%%.*}"; REST="${JWS#*.}"; PL_B64="${REST%%.*}"; SIG_B64="${REST#*.
 # Mesmo leitor do kid e do mode (python3 + yaml.safe_load): o spike mediu que o awk e o yaml divergem com
 # comentário na linha do id (C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA). Registro ilegível = VETO.
 command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 || veto "tooling-absent:python-yaml" "receiver"
-RCV_STATE="$(python3 - "${MEMBERS}" "${RECEIVER}" <<'PY'
-import sys, yaml
+RCV_STATE="$(python3 - "${MEMBERS}" "${RECEIVER}" "${CHANNEL}" <<'PY'
+import os, sys, yaml
 try:
     doc = yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}
 except Exception:
@@ -208,7 +220,25 @@ if not isinstance(ms, list):
 for m in ms:
     if isinstance(m, dict) and m.get("id") == sys.argv[2]:
         role, kind = m.get("role"), m.get("kind")
-        if role not in ("source", "hub"):
+        if role == "standalone" and kind != "door" and sys.argv[3] == "local-queue":
+            # fila local: o receptor tem de VIVER nesta máquina, sob o uid que roda o gate (medido, não declarado)
+            lp = m.get("local_path")
+            if not isinstance(lp, str) or not lp.startswith("/"):
+                print("local-no-path")
+            else:
+                try:
+                    st = os.stat(lp)
+                except OSError:
+                    print("local-path-absent")
+                else:
+                    import stat as _st
+                    if not _st.S_ISDIR(st.st_mode):
+                        print("local-path-absent")
+                    elif st.st_uid != os.geteuid():
+                        print("local-path-foreign-owner")
+                    else:
+                        print("ok")
+        elif role not in ("source", "hub"):
             print("role-" + (role if isinstance(role, str) and role.isascii() and role.isalpha() and len(role) <= 32 else "invalid"))
         elif kind == "door":
             print("door")
@@ -223,6 +253,7 @@ case "${RCV_STATE}" in
   ok) ;;
   unknown) veto "receiver-unknown" "receiver" ;;
   door) veto "receiver-not-a-receiver:kind-door" "receiver" ;;
+  local-no-path|local-path-absent|local-path-foreign-owner) veto "receiver-not-local:${RCV_STATE#local-}" "receiver" ;;
   role-*) veto "receiver-not-a-receiver:${RCV_STATE}" "receiver" ;;
   *) veto "receiver-registry-unreadable" "receiver" ;;
 esac
@@ -465,7 +496,9 @@ if [ "${MODE}" = "regulated" ]; then REG="true"; APPLY="propose-only"; else REG=
 if [ -n "${REVERIFY_AT}" ]; then
   jq -cn --argjson reg "${REG}" --arg apply "${APPLY}" --arg rcv "${RECEIVER}" --argjson at "${REVERIFY_AT}" \
     --arg from "${FROM}" --arg jti "${JTI}" --argjson iat "${IAT}" \
-    '{verified:true,reason:"ok",layer_failed:null,gated:true,committed:false,regulated:$reg,apply_mode:$apply,receiver:$rcv,reverified_at:$at,from:$from,jti:$jti,iat:$iat}' \
+    --arg ch "${CHANNEL}" \
+    '{verified:true,reason:"ok",layer_failed:null,gated:true,committed:false,regulated:$reg,apply_mode:$apply,receiver:$rcv,reverified_at:$at,from:$from,jti:$jti,iat:$iat}
+     + (if $ch == "local-queue" then {channel:$ch} else {} end)' \
     || veto "verdict-emit-failed" "reverify"
   exit 0
 fi
@@ -492,5 +525,6 @@ fi
 if [ -z "${DRY}" ] && ! bash "${TRUST_CHECK}" "${tc_args[@]}" >/dev/null 2>&1; then
   echo "a2a-verify: AVISO: o trust-check não gravou a linha do sucesso no trust-log" >&2
 fi
-printf '{"verified":true,"reason":"ok","layer_failed":null,"gated":true,"committed":false,"regulated":%s,"apply_mode":"%s","receiver":"%s"}\n' "${REG}" "${APPLY}" "${RECEIVER}"
+CH_ECHO=""; [ "${CHANNEL}" = "local-queue" ] && CH_ECHO=',"channel":"local-queue"'
+printf '{"verified":true,"reason":"ok","layer_failed":null,"gated":true,"committed":false,"regulated":%s,"apply_mode":"%s","receiver":"%s"%s}\n' "${REG}" "${APPLY}" "${RECEIVER}" "${CH_ECHO}"
 exit 0

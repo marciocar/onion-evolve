@@ -10,7 +10,10 @@ meta:
                                # Claude Code (prévia de pesquisa, sintaxe da flag e contrato podem mudar entre releases)
                                # e o a2a.proto da a2aproject; a parte de mercado (90d) volta sem sinal e a doutrina de
                                # fila (outbox, dead-letter) é estável, mas não move a revisita.
-  # ═══ TETO: 120 NÓS ═══
+  # ═══ TETO: 122 NÓS ═══
+  # Subida de 120 para 122 (2026-11-06): o ensaio do teste ao vivo (onion-messaging PR #4) mediu a volta core → curadoria
+  # recusada na camada 0b do gate (receiver-not-a-receiver:role-standalone), e o maestro respondeu duas perguntas do
+  # /meta:decide sobre ela (o gate aceita standalone na fila local; quem gera as chaves A2A). Cada uma é 1 resposta selada.
   # Subida de 115 para 120 (2026-11-06): os selos do maestro sobre D_MESSAGING_STACK_2026_11 entram como 5 nós
   # novos de decisão (identidade em dois adapters, device flow do Logto já, segredos no Vaultwarden com credencial do
   # systemd, spike do claim act no sábado, sessão de operação no repo onion-vps-ops). Cada um é 1 resposta selada.
@@ -1939,6 +1942,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-06: «Quem opera os repos de serviço da VPS (onion-vps-logto, onion-vps-vaultwarden, onion-vps-waha, onion-vps-librechat)?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
+  - id: D_GATE_STANDALONE_FILA_LOCAL_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Gate aceita standalone no mesmo host»"
+    label: "O gate a2a-verify.sh aceita receptor standalone registrado só pela fila local (--channel local-queue) e só se o local_path dele existe nesta máquina e é do uid que roda o gate; pela rede segue só source ou hub, porta sempre recusada"
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Gate aceita standalone no mesmo host»; descartadas: «Promover a curadoria a hub» · «Testar só a ida na segunda»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «O ensaio do teste ao vivo mostrou a volta core → curadoria recusada pela camada 0b do gate (rejected:receiver-not-a-receiver:role-standalone). Como a volta passa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
+  - id: D_CHAVES_A2A_CORE_E_CURADORIA_1106
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-06"
+    verified_against: "decisão do maestro em 2026-11-06, por pergunta com opções (/meta:decide): escolhida «Eu gero, você confere a impressão»"
+    label: "O par A2A do core é gerado pela sessão do core com a2a-keygen.sh e a pública é pinada no core; o maestro confere a impressão SHA-256 da pública fora de banda antes do merge"
+    narrative: "Selado por /meta:decide em 2026-11-06: escolhida «Eu gero, você confere a impressão»; descartadas: «Você gera com !»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-06: «Quem gera os pares A2A de onion-evolve e onion-curation para o teste ao vivo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
+      locality: "pessoa"
 edges:
   # ─── opções dependem da decisão; a decisão responde à pergunta ────────────────────────────────────
   - from: D_MESSAGING_STACK_2026_11
@@ -2452,4 +2487,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_SESSAO_OPS_ONION_VPS_OPS_1106
     to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
+  - from: D_GATE_STANDALONE_FILA_LOCAL_1106
+    to: D_MESSAGING_STACK_2026_11
+    edge_type: TRACES_TO
+  - from: D_CHAVES_A2A_CORE_E_CURADORIA_1106
+    to: D_GATE_STANDALONE_FILA_LOCAL_1106
     edge_type: TRACES_TO

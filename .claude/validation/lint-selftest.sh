@@ -16059,6 +16059,93 @@ YML
   done
   if [ "${okbad}" -eq 1 ] && [ ! -e "${sbh}/.claude/fora.jti.state" ] && [ -z "$(find "${sbh}" -name '*fora*' 2>/dev/null)" ]; then record_pass "a2a-verify: (F3.8) receptor fora da forma (../, -x, a/b, .oculto, espaço) → veto receiver-malformed, nada gravado fora da fila"
   else record_fail "a2a-verify: (F3.8) forma do receptor" "out='${out}' rc=${rc}"; fi
+  # ── FILA LOCAL (2026-11-06, D_GATE_STANDALONE_FILA_LOCAL_1106): a volta core → curadoria (standalone) do ────
+  # ensaio do onion-messaging era recusada na 0b. Com --channel local-queue o gate aceita o standalone REGISTRADO
+  # cujo local_path existe NESTA máquina e é do uid que roda o gate; pela rede (default) nada muda.
+  local lqd; lqd="$(mktemp -d)"
+  # o core assina a volta: o kid k1 passa a ser dele NESTE registro (os casos F3 acima já rodaram)
+  python3 - "${sbh}/docs/evolution/federation/members.yaml" <<'LQPY'
+import sys
+p = sys.argv[1]; t = open(p, encoding="utf-8").read()
+a = "  - id: onion-evolve\n    role: source\n    kind: source\n"
+assert t.count(a) == 1
+open(p, "w", encoding="utf-8").write(t.replace(a, a + "    a2a: { keys: [k1] }\n"))
+LQPY
+  cat >> "${sbh}/docs/evolution/federation/members.yaml" <<YML
+  - id: solo-l
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    local_path: "${lqd}"
+  - id: solo-gone
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    local_path: "${lqd}/nao-existe"
+  - id: solo-root
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    local_path: "/"
+YML
+  _verify_lq() { rc=0; out="$(PATH="${_A2A_SYNC}:${PATH}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${3:-${helper}}" --receiver "$1" --repo "${sbh}" --dry-run --channel local-queue --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
+  local lq_ok=1
+  _verify_lq solo-l "$(_env "$(_jws onion-evolve solo-l "${NOW}" "$((NOW+300))" jti-lq-ok)" onion-evolve solo-l "")"
+  if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}" && grep -q '"receiver":"solo-l"' <<< "${out}" && grep -q '"channel":"local-queue"' <<< "${out}"; then record_pass "a2a-verify: (LQ.1) standalone registrado, local_path desta máquina e deste uid, pela fila local → verified, ecoa channel:local-queue"
+  else lq_ok=0; record_fail "a2a-verify: (LQ.1) standalone pela fila local" "out='${out}' rc=${rc}"; fi
+  _verify_h solo-l "$(_env "$(_jws onion-evolve solo-l "${NOW}" "$((NOW+300))" jti-lq-net)" onion-evolve solo-l "")"
+  local lq_net_ri=1
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-a-receiver:role-standalone"' <<< "${out}" && ! grep -q '"channel"' <<< "${out}"; then lq_net_ri=0; record_pass "a2a-verify: (LQ.2) o MESMO standalone pela rota de rede (sem --channel) → veto receiver-not-a-receiver:role-standalone"
+  else record_fail "a2a-verify: (LQ.2) standalone pela rede" "out='${out}' rc=${rc}"; fi
+  _verify_lq fantasma "$(_env "$(_jws onion-evolve fantasma "${NOW}" "$((NOW+300))" jti-lq-ghost)" onion-evolve fantasma "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-unknown"' <<< "${out}"; then record_pass "a2a-verify: (LQ.3) receptor não registrado pela fila local → veto receiver-unknown"
+  else record_fail "a2a-verify: (LQ.3) não registrado pela fila local" "out='${out}' rc=${rc}"; fi
+  _verify_lq porta-x "$(_env "$(_jws onion-evolve porta-x "${NOW}" "$((NOW+300))" jti-lq-door)" onion-evolve porta-x "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-a-receiver:kind-door"' <<< "${out}"; then record_pass "a2a-verify: (LQ.4) porta (kind door) pela fila local → veto receiver-not-a-receiver:kind-door"
+  else record_fail "a2a-verify: (LQ.4) porta pela fila local" "out='${out}' rc=${rc}"; fi
+  _verify_lq solo-x "$(_env "$(_jws onion-evolve solo-x "${NOW}" "$((NOW+300))" jti-lq-nopath)" onion-evolve solo-x "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-local:no-path"' <<< "${out}"; then record_pass "a2a-verify: (LQ.5) standalone sem local_path no registro pela fila local → veto receiver-not-local:no-path"
+  else record_fail "a2a-verify: (LQ.5) sem local_path" "out='${out}' rc=${rc}"; fi
+  _verify_lq solo-gone "$(_env "$(_jws onion-evolve solo-gone "${NOW}" "$((NOW+300))" jti-lq-gone)" onion-evolve solo-gone "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-local:path-absent"' <<< "${out}"; then record_pass "a2a-verify: (LQ.6) local_path que não existe nesta máquina → veto receiver-not-local:path-absent"
+  else record_fail "a2a-verify: (LQ.6) local_path ausente" "out='${out}' rc=${rc}"; fi
+  if [ "$(id -u)" -eq 0 ]; then record_skip "a2a-verify: (LQ.7) dono alheio exige rodar fora do root → skip (não-SUT)"
+  else
+    _verify_lq solo-root "$(_env "$(_jws onion-evolve solo-root "${NOW}" "$((NOW+300))" jti-lq-root)" onion-evolve solo-root "")"
+    if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-local:path-foreign-owner"' <<< "${out}"; then record_pass "a2a-verify: (LQ.7) local_path de OUTRO uid (o bridge roda como outra conta) → veto receiver-not-local:path-foreign-owner"
+    else record_fail "a2a-verify: (LQ.7) dono alheio" "out='${out}' rc=${rc}"; fi
+  fi
+  rc=0; out="$(bash "${helper}" --receiver solo-l --repo "${sbh}" --channel qualquer --envelope - <<<'{}' 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "a2a-verify: (LQ.8) --channel fora de network|local-queue → rc 2 (uso)"
+  else record_fail "a2a-verify: (LQ.8) canal desconhecido" "out='${out}' rc=${rc}"; fi
+  # MUTANTE: o standalone aceito em QUALQUER rota (sem a condição do canal) tem de reprovar o LQ.2
+  local lqm; lqm="$(mktemp -d)"; mkdir -p "${lqm}/.claude/validation" "${lqm}/.claude/utils/federation-transport"
+  cp "${REPO_ROOT}/.claude/validation/trust-topology-check.sh" "${lqm}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/federation-transport/a2a-ssrf-check.sh" "${lqm}/.claude/utils/federation-transport/"
+  local lqmut="${lqm}/.claude/utils/federation-transport/a2a-verify.sh"
+  LC_ALL=C sed -e '/if role == "standalone" and kind != "door" and sys.argv\[3\] == "local-queue":/c\        if role == "standalone" and kind != "door":  # MUTANTE: standalone em qualquer rota' "${helper}" > "${lqmut}"
+  [ "$(grep -c '# MUTANTE' "${lqmut}")" = "1" ] || record_fail "a2a-verify: (LQ.MUT) âncora" "o sed não trocou EXATAMENTE uma linha (a linha da cura mudou?)"
+  rc=0; out="$(PATH="${_A2A_SYNC}:${PATH}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${lqmut}" --receiver solo-l --repo "${sbh}" --dry-run --envelope - \
+    <<<"$(_env "$(_jws onion-evolve solo-l "${NOW}" "$((NOW+300))" jti-lq-mut)" onion-evolve solo-l "")" 2>/dev/null)" || rc=$?
+  # o caso (LQ.2) "satisfeito" = veto role-standalone; o mutante tem de VERIFICAR (veto por outro motivo = não exercido)
+  local lq_mu=0
+  if grep -q '"verified":true' <<< "${out}"; then lq_mu=1
+  elif ! grep -q '"reason":"receiver-not-a-receiver:role-standalone"' <<< "${out}"; then record_fail "a2a-verify: (LQ.MUT) não exercido" "vetou por outro motivo: out='${out}'"; fi
+  _prove_mutation "a2a-verify: (LQ.MUT) sem a condição do canal, o standalone pela rede volta a verificar" "${helper}" "${lqmut}" "${lq_net_ri}" "${lq_mu}"
+  # MUTANTE 2: sem a prova do dono, o local_path de OUTRO uid (o do bridge) volta a verificar — tem de reprovar o LQ.7
+  if [ "$(id -u)" -ne 0 ]; then
+    local lqmut2="${lqm}/.claude/utils/federation-transport/a2a-verify-owner.sh"
+    LC_ALL=C sed -e '/elif st.st_uid != os.geteuid():/c\                    elif False:  # MUTANTE: dono não conferido' "${helper}" > "${lqmut2}"
+    [ "$(grep -c '# MUTANTE' "${lqmut2}")" = "1" ] || record_fail "a2a-verify: (LQ.MUT2) âncora" "o sed não trocou EXATAMENTE uma linha"
+    _verify_lq solo-root "$(_env "$(_jws onion-evolve solo-root "${NOW}" "$((NOW+300))" jti-lq-root-m)" onion-evolve solo-root "")" "${lqmut2}"
+    local lq_mu2=0 lq_ri2=1
+    if grep -q '"verified":true' <<< "${out}"; then lq_mu2=1
+    elif ! grep -q '"reason":"receiver-not-local:path-foreign-owner"' <<< "${out}"; then record_fail "a2a-verify: (LQ.MUT2) não exercido" "vetou por outro motivo: out='${out}'"; fi
+    _verify_lq solo-root "$(_env "$(_jws onion-evolve solo-root "${NOW}" "$((NOW+300))" jti-lq-root-i)" onion-evolve solo-root "")"
+    grep -q '"reason":"receiver-not-local:path-foreign-owner"' <<< "${out}" && lq_ri2=0
+    _prove_mutation "a2a-verify: (LQ.MUT2) sem a prova do dono, o local_path de outro uid volta a verificar" "${helper}" "${lqmut2}" "${lq_ri2}" "${lq_mu2}"
+  fi
+  rm -rf "${lqd}" "${lqm}"
   local sbh2; sbh2="$(mktemp -d)"; mkdir -p "${sbh2}/docs/evolution/federation"
   printf 'members: { isto não fecha\n' > "${sbh2}/docs/evolution/federation/members.yaml"
   rc=0; out="$(PATH="${_A2A_SYNC}:${PATH}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver hub-a --repo "${sbh2}" --dry-run --envelope - \
