@@ -13,9 +13,16 @@ meta:
   # Colheita de 2026-11-04: saiu Q_COORD_CORE_ESPERANTO_VEREDITOS (done, sem referência em outro grafo); o selo vive no git (PRs #1459 e #1463).
   # Colheita de 2026-11-02: os nós done das rodadas do /meta:decide de 2026-11-02 saíram; o selo vive em @4f5513fd4 e no git.
   # Colheita de 2026-10-31: os 10 nós done e o 1 refuted saíram no mesmo commit que abriu as pendências novas; a história fica no git (blame deste arquivo) e nos resíduos de revisão, como no fios-abertos.
-  # ═══ TETO: 40 NÓS. Pendência nova entra quando uma fechada sai. ═══
+  # ═══ TETO: 42 NÓS. Pendência nova entra quando uma fechada sai. Subiu de 40 para 42 em 2026-11-06: a repassada da orquestração trouxe 4 pendências novas (3 do maestro, 1 do kg-ssot) e nenhum nó estava fechado para colher. ═══
 # Arestas para nó de OUTRO grafo do core (contrato v4.3): a pendência que já tem nó lá não ganha nó aqui.
 external_edges:
+  # Repassada da orquestração de 2026-11-06: o registro de mudança de compliance do hub e a forma do x_event moram no plano da comunicação estável.
+  - from: Q_COORD_KGSSOT_FORMA_X_CHANGE_1111
+    to: "docs/onion/graph/comms-stable-2026-11.kg.yaml#D_CS_COMPLIANCE_ORIENTAR_HOJE_FORJAR_DEPOIS_1106"
+    edge_type: TRACES_TO
+  - from: Q_COORD_KGSSOT_FORMA_X_CHANGE_1111
+    to: "docs/onion/graph/comms-stable-2026-11.kg.yaml#Q_CS_KGSSOT_FORMA_X_EVENT_1107"
+    edge_type: DEPENDS_ON
   - from: Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES
     to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027"
     edge_type: DEPENDS_ON
@@ -590,6 +597,55 @@ nodes:
       locator: "pergunta com opções de 2026-11-04: «Fecho a proposta do vigia de eventos como coberta?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
       locality: "pessoa"
+  - id: Q_COORD_MAESTRO_APPARMOR_BWRAP_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.6
+    evidence_class: testimony
+    verified_against: "relato da sessão da curadoria e notas da sessão do core à repassada de 2026-11-06; a medida do sysctl e do uid map foi feita pelas duas sessões em 2026-11-06 e não re-executada neste registro"
+    label: "O sandbox do Claude Code (bwrap) não sobe nesta VPS: kernel.apparmor_restrict_unprivileged_userns=1 e o uid map devolve Permission denied. O maestro decide entre um perfil AppArmor só para o binário do bwrap com userns ou seguir sem sandbox."
+    narrative: "Medido pelo core e pela curadoria em 2026-11-06. A curadoria ligou o sandbox com failIfUnavailable e entrou em loop, porque cada comando falhava ao subir o bwrap; o core fez o rollback por ordem do maestro. O perfil AppArmor mexe na postura do host, logo a decisão é do maestro. Linear: SAC-292."
+  - id: Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.6
+    evidence_class: testimony
+    verified_against: "relato da sessão do adotante de consultoria à repassada de 2026-11-06; a versão vendorizada não foi relida pelo core"
+    label: "O adotante de consultoria, fora do members.yaml, tem o kg-ssot vendorizado em 4.39.1 (o atual é 4.44.0) e pede o update do Onion; registrar e atualizar é decisão do maestro."
+    narrative: "Registrar é ato de segurança para a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) enxergar o adotante; o update vem pelo /meta:adopt --update depois do registro. Este nó não escreve o nome do adotante. Linear: SAC-293."
+  - id: Q_COORD_MAESTRO_PVR_KGSSOT_1106
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.6
+    evidence_class: testimony
+    verified_against: "relato da sessão do kg-ssot à repassada de 2026-11-06; a configuração do espelho público não foi lida pelo core"
+    label: "Ligar o Private Vulnerability Reporting no espelho público do kg-ssot antes da tag da próxima release."
+    narrative: "Configuração de repositório público, logo ato do maestro. Gatilho: a próxima tag do kg-ssot. Linear: SAC-294."
+  - id: Q_COORD_KGSSOT_FORMA_X_CHANGE_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    x_due: "2026-11-11"
+    impact: 3
+    confidence: 0.5
+    evidence_class: testimony
+    verified_against: "relato da sessão do kg-ssot à repassada de 2026-11-06; a proposta mora no repo do kg-ssot e não foi relida pelo core"
+    label: "A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) para o registro de mudança de compliance do hub."
+    narrative: "Sem mudar o contrato, como a forma do x_event. Pronto quando: a forma está no manual do kg-ssot e o hub a usa no caso real do registro de mudança. Linear: SAC-295."
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -704,4 +760,16 @@ edges:
     edge_type: TRACES_TO
   - from: D_COORD_VIGIA_REPESQUISAR_COMO_VENDOR_1104
     to: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_APPARMOR_BWRAP_1106
+    to: D_COORD_ORQUESTRACAO_PERMANENTE_1104
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106
+    to: D_COORD_ORQUESTRACAO_PERMANENTE_1104
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_PVR_KGSSOT_1106
+    to: D_COORD_ORQUESTRACAO_PERMANENTE_1104
+    edge_type: TRACES_TO
+  - from: Q_COORD_KGSSOT_FORMA_X_CHANGE_1111
+    to: D_COORD_ORQUESTRACAO_PERMANENTE_1104
     edge_type: TRACES_TO
