@@ -2,7 +2,8 @@
 branch: feat/kgssot-tools-resolver
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4293deb4e4739dbb6d9ca4afe9f2113679e5939a5a2537c94b2dda5004d4aecc
+reviewed_code_sha256: 86c86da4ddfd790a77eb85f3809839bdbfdf4dfaef538b6ffc3f566bfe635f23
 findings_total: 4
 findings_real: 4
 tokens: 0
