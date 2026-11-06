@@ -35,7 +35,8 @@
 #  · A camada nativa vem primeiro: o `permissions.deny` do adotante (a curadoria instalou o dela em 2026-11-05, com
 #    o selo do maestro) barra por prefixo `git -C <alheio>`, `--git-dir=`, `--work-tree=` e o push na main por refspec.
 #    Este hook é a SEGUNDA linha e cobre o que o deny não alcança: `cd <alheio> && git …`, `GIT_DIR=` no prefixo,
-#    `sh -c`/`bash -c`, python -c, a worktree do repo alheio fora do diretório dele, o redirecionamento e a escrita
+#    `sh -c`/`bash -c`, o python -c que grava (`open(…,'w')`, `write_text`) ou chama o git que escreve citando o repo,
+#    a worktree do repo alheio fora do diretório dele, o redirecionamento e a escrita
 #    de shell (o `gh api …/merge` é do merge-gate). A sobreposição em `git -C` é de propósito: o deny é por adotante,
 #    e quem não o instalou fica só com o hook.
 #  · Teto de vocabulário (refutador, 2026-11-05): tar -C/-x, unzip -d, perl -pi, sort -o, curl -o, wget -O, patch -d,
