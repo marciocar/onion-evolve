@@ -7,6 +7,7 @@ findings_total: 1
 findings_real: 1
 findings_blocking: 0
 findings_fixed: 0
+tokens: 0
 duration_min: 5
 verdict: APROVADO
 elenxo: sim
@@ -15,7 +16,7 @@ nota: >-
   Subida do pin da claude-code-action de v1.0.265 (6d5ae526) para v1.0.269 (commit 61a9c274, tag
   anotada 402b5b79), pelo aviso do session-currency-check. O compare v1.0.265...v1.0.269 tem 4 commits,
   todos de bump de versão; nenhum input nem output usado pelo workflow muda. As notas das 4 releases
-  só trazem o link do changelog.
+  só trazem o link do changelog. tokens: 0 = não medido (passada do próprio agente, sem contador).
 ---
 
 # Passada adversarial: `chore/review-action-1.0.269`
