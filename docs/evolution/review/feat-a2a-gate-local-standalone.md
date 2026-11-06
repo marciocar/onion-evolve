@@ -2,7 +2,8 @@
 branch: feat/a2a-gate-local-standalone
 pr: pendente
 date: 2026-11-06
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 494ef2a8b96015c9b5933941e27581991ed74277eced3e1682785b7cf92dc7ee
+reviewed_code_sha256: 853f73ad1705a1f7d71aca78a4b7b1630775a15c1d52204a3ad8a47f0c15cbc6
 findings_total: 4
 findings_real: 3
 findings_blocking: 0
