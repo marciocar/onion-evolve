@@ -1,9 +1,8 @@
 ---
 branch: docs/orq-review-1106
-pr: pendente
+pr: 1511
 date: 2026-11-06
-reviewed_diff_sha256: ebe4d717ae112ded0116a6786ff27cf5c838e9d761a9ea9950bb9d7c80e7a5b0
-reviewed_code_sha256: 4aa1b2a1f5df0af00807e3c2139943ed0ee1406a150a64cc94f115da847b09fd
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 3
 findings_blocking: 0
