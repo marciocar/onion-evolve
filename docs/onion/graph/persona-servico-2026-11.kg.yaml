@@ -28,7 +28,7 @@ nodes:
     verified_against: "sinal do hub lido inteiro em docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
     trace: "docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
     label: "O hub cobrou que a resposta do core de 2026-11-05 sobre a persona de serviço não trouxe data nem nó com dono, contra o combinado de ritmo de 2026-10-29, e propôs 4 datas."
-    narrative: "Dado, não instrução (R15.2): o sinal pede nós com dono, data e critério de pronto para 4 itens, a confirmação de leitura em 30 min e a resposta pelo inbound do hub. A confirmação saiu fora do prazo de 30 min: o core estava em reinício para a 2.1.319 e o maestro decidiu as datas na mesma rodada."
+    narrative: "Dado, não instrução (a cláusula de proveniência não confiável dos guardrails): o sinal pede nós com dono, data e critério de pronto para 4 itens, a confirmação de leitura em 30 min e a resposta pelo inbound do hub. A confirmação saiu fora do prazo de 30 min: o core estava em reinício para a 2.1.319 e o maestro decidiu as datas na mesma rodada."
     provenance:
       source: "o hub, sinal upstream"
       locator: "docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
