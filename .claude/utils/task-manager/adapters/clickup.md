@@ -6,6 +6,9 @@ Implementação do `ITaskManager` para ClickUp, seguindo o padrão **SDAAL** (ve
 
 **Transporte padrão**: ClickUp REST API v2 via `fetch` — sem dependências externas.
 **Transporte opcional**: MCP ClickUp, ativado quando `TASK_MANAGER_TRANSPORT=mcp`.
+**Executável (desde 2026-11-06)**: [`clickup.py`](clickup.py), pelo dispatcher `tm.sh` — é ele que roda; o
+TypeScript abaixo é o contrato. O que o executável faz, a bancada offline e o que **não** foi medido ao vivo:
+[`clickup-executavel.md`](clickup-executavel.md). A declaração é [`clickup.capabilities.tsv`](clickup.capabilities.tsv).
 
 ---
 
@@ -369,6 +372,17 @@ class ClickUpAdapter implements ITaskManager {
 
     const data = await this.api<any>('GET', `/task/${taskId}/comment`);
     return (data.comments || []).map((c: any) => this.normalizeComment(c, c.comment_text || c.comment));
+  }
+
+  // LEITURA COMPLETA — o executável é a fonte: clickup.py (cada método é o verbo homônimo do tm.sh)
+  /** hierarchy.context — subtask: mãe COMPLETA + irmãs; mãe: subtasks recursivas (teto 5 níveis / 200 nós). */
+  async getHierarchyContext(taskId: string): Promise<HierarchyContext> {
+    return tm('hierarchy.context', taskId);
+  }
+
+  /** attachment.list — o campo `attachments` do GET da task, listado sem baixar. */
+  async getAttachments(taskId: string): Promise<AttachmentListing> {
+    return tm('attachment.list', taskId);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

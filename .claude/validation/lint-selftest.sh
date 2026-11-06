@@ -45454,6 +45454,27 @@ EOF_MUT
 }
 _family run_task_manager_dispatcher_selftests
 
+# tm.sh + adapters/clickup.py (2026-11-06) — o 2º executável de provider, OFFLINE: o ClickUp trocado por um servidor
+# FALSO em loopback (costura TM_CLICKUP_ENDPOINT, só 127.0.0.1) que reproduz as armadilhas medidas ao vivo em 2026-10-02
+# (priority string → 400, data sem a flag → dia anterior, tags no corpo → 200 sem efeito, include_subtasks, markdown_content,
+# status da List, comentários paginados por start/start_id, busca que ignora o texto). A bancada é
+# .claude/validation/task-manager-clickup-bench.py: um caso por verbo + as armadilhas, a CÓPIA LIMPA verde no arranjo
+# dos mutantes, e um mutante por cura que tem de reprovar o caso dela. Nenhuma chave real, nenhum .env, nenhuma rede.
+run_task_manager_clickup_selftests() {
+  local bench="${REPO_ROOT}/.claude/validation/task-manager-clickup-bench.py"
+  [ -f "${bench}" ] && [ -f "${REPO_ROOT}/.claude/utils/task-manager/adapters/clickup.py" ] || { record_fail "task-manager-clickup" "bancada ou adapters/clickup.py ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "task-manager-clickup: python3 ausente"; return; }
+  local out rc n_ok n_cases n_kill n_mut
+  if out="$(cd "${REPO_ROOT}" && env -u CLICKUP_API_TOKEN -u CLICKUP_WORKSPACE_ID -u CLICKUP_DEFAULT_LIST_ID timeout 300 python3 -I -B "${bench}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  read -r n_ok n_cases n_kill n_mut <<< "$(sed -nE 's#^task-manager-clickup-bench: ([0-9]+)/([0-9]+) caso\(s\) verdes; ([0-9]+)/([0-9]+) mutante\(s\) mordem; cópia limpa verde$#\1 \2 \3 \4#p' <<< "${out}")"
+  if [ "${rc}" -eq 0 ] && [ -n "${n_cases:-}" ] && [ "${n_ok}" = "${n_cases}" ] && [ "${n_kill}" = "${n_mut}" ] && [ "${n_cases}" -ge 27 ] && [ "${n_mut}" -ge 22 ]; then
+    record_pass "task-manager-clickup: ${n_ok}/${n_cases} casos verdes contra o ClickUp falso, cópia limpa verde, ${n_kill}/${n_mut} mutantes mordem"
+  else
+    record_fail "task-manager-clickup: bancada" "rc=${rc} $(grep -E '^- |^FALHA|bench:' <<< "${out}" | head -4 | tr '\n' '|')"
+  fi
+}
+_family run_task_manager_clickup_selftests
+
 # REGRA 105 (Script rastreado não chama a API do provedor de task manager por fora do adapter) + o veto
 # pretooluse-direct-provider-api.sh — SAC-75, medido em 2026-10-12: 147 comandos Bash únicos das sessões tocaram
 # host de provedor, ~130 com cliente HTTP, e um deles DEPOIS do tm.sh existir (python3 heredoc com urllib direto no

@@ -5,7 +5,7 @@
 # Arquivo auxiliar em adapters/ (não é adapter) declara <!-- adapter-auxiliar: <adapter> --> nas 5 primeiras linhas.
 linear	exe:.claude/utils/task-manager/adapters/linear.py
 jira	validator:.claude/validation/task-manager-capabilities-check.sh
-clickup	validator:.claude/validation/task-manager-capabilities-check.sh
+clickup	exe:.claude/utils/task-manager/adapters/clickup.py
 asana	validator:.claude/validation/task-manager-capabilities-check.sh
 zoho	validator:.claude/validation/task-manager-capabilities-check.sh
 none	none:adaptador nulo, não chama provedor nenhum; gatilho: passar a operar algo além de decompor localmente

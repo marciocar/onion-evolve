@@ -4,33 +4,33 @@
 # adapter: = medição datada registrada no próprio adapter; local = sem chamada ao provedor.
 # unverified = o adapter tem a superfície, mas ninguém ancorou nem mediu o comportamento. Não invente: meça.
 capability	requirement	status	api_version	source	note
-item.create	required	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag;kg:task-manager-vocabulario-2026-10#E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION	medição ao vivo de 2026-10-02 (datas em ms com a flag) e markdown_content ancorado
-item.read	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	include_subtasks=true, medido em 2026-10-02
-item.update	required	unverified	v2	adapter:clickup.md§TAGS NÃO VÃO NO BODY DO PUT	a medição de 2026-10-02 registra o NEGATIVO (tags no PUT devolvem 200 sem efeito); o que o update aplica não foi registrado
+item.create	required	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag;kg:task-manager-vocabulario-2026-10#E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION	medição ao vivo de 2026-10-02 (datas em ms com a flag) e markdown_content ancorado; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: markdown_content, priority inteiro, datas em ms + *_date_time, tags fora do corpo e relidas, data relida (não voltou igual = erro)
+item.read	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	include_subtasks=true, medido em 2026-10-02; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: leitura COMPLETA por padrão (descrição markdown + comentários de todas as páginas por start/start_id + respostas + hierarquia + anexos listados + untrusted); --lean = só a task
+item.update	required	unverified	v2	adapter:clickup.md§TAGS NÃO VÃO NO BODY DO PUT	o executável faz PUT de title/markdown_content/priority/datas/time_estimate e relê; recusa --tags (vai pelo label.set) e --status (vai pelo status.transition). A medição de 2026-10-02 só registra o NEGATIVO das tags no PUT
 item.delete	optional	unverified	v2	-	a medição de 2026-10-02 apagou tasks, mas não registra que foi pelo deleteTask do adapter
-hierarchy.subtask_create	required	implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE	parent na mesma List; níveis máximos não ancorados
-hierarchy.subtask_list	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	
+hierarchy.subtask_create	required	implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE	parent na mesma List; níveis máximos não ancorados; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: manda parent e herda a List da mãe
+hierarchy.subtask_list	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: filhos diretos do include_subtasks=true
 hierarchy.epic	optional	not_implemented	v2	-	hierarquia Space/Folder/List não ancorada
-status.transition	required	unverified	v2	adapter:clickup.md§Status são propriedade da LIST	a medição de 2026-10-02 registra a FALHA (400 Status not found); a cura por sinônimo (resolveStatusForTask) não tem medição registrada
-priority.set	optional	implemented	v2	adapter:clickup.md§só INTEIRO 1–4 é aceito;kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	inteiro 1 (urgent) a 4 (low); string devolve 400
+status.transition	required	unverified	v2	adapter:clickup.md§Status são propriedade da LIST	a medição de 2026-10-02 registra a FALHA (400 Status not found); o executável resolve contra GET /list/{id} (nome exato, depois sinônimo canônico) e, sem equivalente, sai rc 1 com os disponíveis SEM PUT; o status é relido. Ao vivo não medido
+priority.set	optional	implemented	v2	adapter:clickup.md§só INTEIRO 1–4 é aceito;kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	inteiro 1 (urgent) a 4 (low); string devolve 400; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: string recusada antes da rede, inteiro relido
 estimate.points	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	provedor tem points nativo (pré-requisito do ClickApp Sprints não tocado); o adapter não envia
 estimate.points_read	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	provedor tem points nativo; o mapeamento de leitura do adapter não traz o campo: o adapter não lê, então o progresso sai por contagem (progress.sh declara)
-estimate.time	optional	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag	time_estimate em milissegundos
-comment.add	required	unverified	v2	-	comment_text; o formato do comentário não foi ancorado (E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN)
-comment.list	required	unverified	v2	-	
-activity.list	optional	not_implemented	v2	-	histórico de mudanças da task (SAC-116): o adapter não lê; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
-hierarchy.context	optional	not_implemented	v2	-	mãe completa + irmãs + subtasks recursivas (SAC-116): o adapter não monta; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
-attachment.add	optional	not_implemented	v2	-	anexo não ancorado
-attachment.list	optional	not_implemented	v2	-	anexos e arquivos enviados (SAC-116): o adapter não lista; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
-attachment.read	optional	not_implemented	v2	-	download para quarentena (SAC-116): o adapter não baixa; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
-inline.refs	optional	not_implemented	v2	-	imagens/arquivos embutidos no texto (SAC-116): o adapter não extrai; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
-label.set	optional	unverified	v2	-	tags vão no create; no update NÃO (só POST/DELETE /task/{id}/tag/{name}, medido em 2026-10-02), e o adapter não chama esse endpoint
+estimate.time	optional	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag	time_estimate em milissegundos; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: minutos × 60000, relido
+comment.add	required	unverified	v2	-	o executável faz POST /task/{id}/comment com comment_text (texto, não markdown) e notify_all false; --visual monta o formato Unicode (▶ título, ━, corpo, 🕐 timestamp). O formato renderizado não foi ancorado (E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN)
+comment.list	required	unverified	v2	-	o executável segue start/start_id do comentário mais antigo até a página vir menor que 25, e lê as respostas (GET /comment/{id}/reply); a paginação não foi medida ao vivo
+activity.list	optional	not_implemented	v2	-	histórico de mudanças da task: a API v2 não tem endpoint de histórico ancorado; o item.read completo declara o campo em not_read
+hierarchy.context	optional	unverified	v2	-	o executável monta subtask → mãe COMPLETA + irmãs; mãe → subtasks recursivas (um GET por filho, teto de profundidade 5 e de 200 nós, declarado). Se o include_subtasks traz descendentes achatados não foi medido: o executável filtra pelo campo parent
+attachment.add	optional	not_implemented	v2	-	upload não ancorado
+attachment.list	optional	unverified	v2	-	o executável lista o campo attachments do GET da task (título, url, extensão, tamanho), sem baixar; a forma do campo não foi medida ao vivo
+attachment.read	optional	not_implemented	v2	-	download para quarentena: se a url do anexo exige o token (e a que host ele iria) não foi medido; o executável não baixa
+inline.refs	optional	not_implemented	v2	-	imagens/arquivos embutidos no texto: o host das refs no markdown não foi medido; o executável não extrai
+label.set	optional	unverified	v2	-	tags vão SÓ por POST/DELETE /task/{id}/tag/{name} (no PUT devolvem 200 sem efeito, medido em 2026-10-02); o executável usa esses endpoints e relê a task. Se a tag precisa existir no Space não foi medido
 iteration.assign	optional	not_implemented	v2	-	sprint não ancorada
 link.create	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_DEPENDENCY_ONE_DIRECTION	provedor: dependência numa direção por requisição; task links não ancorados
-search.query	required	unverified	v2	-	o adapter usa GET /team/{id}/task com search_text e page_size; a Onda 1 ancorou GET /list/{id}/task (E_CLICKUP_GET_TASKS_PAGE_100), outro endpoint
+search.query	required	unverified	v2	-	o executável percorre GET /team/{id}/task por página (include_closed, subtasks) e FILTRA LOCAL por nome e descrição: o endpoint não tem parâmetro de texto documentado, e filtro aceito-e-ignorado devolveria tudo; teto de 20 páginas declarado em truncated. Ao vivo não medido
 search.paginate	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_GET_TASKS_PAGE_100	provedor pagina por índice (100 por página); o sinal de fim não foi ancorado
 bulk.create	optional	not_implemented	v2	-	clickup-operacao.md documenta create_bulk_tasks pelo MCP (ignora parent), fora da interface; bulk REST não ancorado
 bulk.update	optional	not_implemented	v2	-	
-project.list	required	unverified	v2	-	
-project.read	required	unverified	v2	-	
-id.validate	required	implemented	v2	local	9 caracteres alfanuméricos
+project.list	required	unverified	v2	-	o executável percorre spaces → folders (com lists) → lists soltas do workspace
+project.read	required	unverified	v2	-	o executável lê GET /list/{id} com os status da List
+id.validate	required	implemented	v2	local	id nativo (minúsculas e dígitos, 5-15) ou custom id ABC-123 (resolvido com custom_task_ids=true e o workspace)
