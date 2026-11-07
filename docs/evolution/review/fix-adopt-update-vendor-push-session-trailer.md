@@ -2,18 +2,17 @@
 branch: fix/adopt-update-vendor-push-session-trailer
 pr: 1533
 date: 2026-11-07
-reviewed_diff_sha256: 7b3d52e4db4b33a523186e3aa455a1a49bd60add36d20194cc81245ed0604e8e
-reviewed_code_sha256: 39a75a27575d3e74a370f5ff06ecfab1af9032e57b4fcecc9c5a40b4f8cd051a
-findings_total: 23
-findings_real: 23
-findings_blocking: 7
+reviewed_diff_sha256: pendente
+findings_total: 27
+findings_real: 27
+findings_blocking: 8
 tokens: 0
-duration_min: 140
-findings_fixed: 17
+duration_min: 170
+findings_fixed: 21
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-reviewer: passada própria do agente de execução (Opus 5.5) + refutador externo da sessão principal, que REPROVOU três vezes (2 bloqueios; 1 com 3 ataques; 1 bloqueio e 3 limites)
-nota: "tokens não medidos (0). Passada própria: 5 achados, 1 bloqueio. 1ª refutação: 2 bloqueios e 6 limites. 2ª: o consentimento não ficava preso ao destino (A1-A3), mais A4 e A5. 3ª: várias pushurl (B2, bloqueio), normalização frouxa (B3), registro fabricável (B1/C5) e remote dividido pelo local_path (A5b). Todos curados com caso e mutante, exceto os limites declarados"
+reviewer: passada própria do agente de execução (Opus 5.5) + refutador externo da sessão principal, que REPROVOU quatro vezes (a última só pelo D2, com APROVA_COM_RESSALVAS prometido após a cura)
+nota: "tokens não medidos (0). Passada própria: 5 achados, 1 bloqueio. Refutações: 1ª, 2 bloqueios e 6 limites; 2ª, A1-A3 e A4-A5; 3ª, B2 (bloqueio), B3, B1/C5 e A5b; 4ª, D2 (bloqueio), o fetch do registro e o GIT_SSH_VARIANT. Todos curados com caso e mutante, exceto os limites declarados"
 ---
 
 # Passada adversarial: `fix/adopt-update-vendor-push-session-trailer`
@@ -78,12 +77,26 @@ As fixtures do refutador `t3.sh` e `t4.sh` rodaram numa cópia com os helpers de
 
 Nada rodou em repo de adotante real.
 
+## Achados da 4ª refutação (5ª passada, REPROVOU só pelo D2)
+
+24. (real, BLOQUEAVA, curado) D2: 24 dos 31 membros do registro escrevem o `remote:` sem esquema (`github.com/dono/repo`). A `_member_remote_norm` os normalizava para vazio, a recusa de remote dividido não os via, e o push passava por cima de um irmão sem consentimento. O caso real é um repo dividido por dois membros. Agora o lado do REGISTRO aceita também `host/dono/repo` sem esquema, com os mesmos segmentos estritos: host com ponto, ao menos dono/repo, `[A-Za-z0-9._-]`, sem espaço, `..` nem `/.git`. O lado do ALVO segue estrito, porque lá a forma sem esquema é caminho local. Caso (D2), irmão sem esquema e sem consentimento, com mutante `D_CURE-registry-schemeless`, que morre.
+25. (real, limite, curado) O registro era lido do `origin/main` LOCAL, e um consentimento retirado só valeria depois de um fetch. Agora `git -C <core> fetch -q origin main` vem antes da leitura, com falha fechada. Caso (D1), um `origin/main` forjado por `update-ref` sem remoto, com mutante `D_CURE-registry-fetch`, que morre. TETO que segue declarado: um checkout forjado com remoto próprio alcançável passa, o que foi medido com a variante `t5b` da fixture do refutador. É o mesmo teto do achado 22.
+26. (real, limite, curado) A bancada dava unset em `GIT_SSH_VARIANT` sem restaurar o valor anterior. Agora restaura, como já fazia com `GIT_SSH_COMMAND`.
+27. (real, limite, curado, achado ao rodar a tabela D5 do refutador) Porta fora da padrão (`:8443`, `:2222`) normalizava igual à padrão, e `repo/.git` igual a `repo`. Agora só a porta padrão do esquema é aceita (443 no https, 22 no ssh), e `/.git` no fim é recusado. Os dois foram somados ao caso (B3n).
+
+Fixtura `t5.sh` do refutador, numa cópia com os helpers desta cura:
+- D1 a D4: todos recusados, porque o core forjado dele não tem remoto e o fetch falha;
+- variante `t5b`, com um remoto bare real para o core forjado: D2 e D3 recusam pelo remote dividido, e D4 (membro sem esquema que consentiu) empurra, como deve;
+- D5: só :443 e :22 casam.
+
+Nada rodou em repo de adotante real.
+
 ## Mutantes
 
-Família `vendor_push_trailer` (fixtures em mktemp, bares locais servidos por `ssh://fixture.test`, e um registro de fixture com `origin/main` próprio e papel source; nenhum adotante real nem o registro do core): 19 casos verdes e 14 mutantes que morrem, todos na mesma rodada.
+Família `vendor_push_trailer` (fixtures em mktemp, bares locais servidos por `ssh://fixture.test`, e um registro de fixture com `origin/main` próprio e papel source; nenhum adotante real nem o registro do core): 21 casos verdes e 16 mutantes que morrem, todos na mesma rodada.
 - (a) ← `D_CURE-vendor-ffpush` · (b) ← `D_CURE-vendor-remote-diverged` · (c) ← `D_CURE-vendor-from-remote` · (f) ← `D_CURE-vendor-push-consent` · (g) ← `D_CURE-vendor-verify`
 - (A1) ← `mut:member-id-widens` · (A2) ← `mut:fetch-url` · (A3) ← `mut:origin-fixed`
-- (B1) commit local do registro ← `mut:worktree-registry` · (B2) várias pushurl ← `D_CURE-consent-all-pushurls` · (B3) remoto relativo ← `mut:loose-norm` · (A5b) remote dividido pelo local_path ← `D_CURE-consent-shared-remote`
+- (B1) commit local do registro ← `mut:worktree-registry` · (B2) várias pushurl ← `D_CURE-consent-all-pushurls` · (B3) remoto relativo ← `mut:loose-norm` · (A5b) remote dividido pelo local_path ← `D_CURE-consent-shared-remote` · (D1) origin/main sem remoto real ← `D_CURE-registry-fetch` · (D2) irmão sem esquema ← `D_CURE-registry-schemeless`
 - (d1) e (d2) ← `D_CURE-session-trailer-durable` e `D_CURE-session-trailer-merge`
 - Sem mutante próprio: (A5), (B1r), (B3n), (h) e (e)
 
