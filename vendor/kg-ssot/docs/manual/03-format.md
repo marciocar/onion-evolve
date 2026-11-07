@@ -317,6 +317,477 @@ unknown, the other counts by its day in UTC, and a gap of up to one day cannot t
 not exist (February 30) is not compared. The `sha256` against the text or the file, and a
 citation of another graph, are checked by `kg_criterion.py` (chapter 5).
 
+## Recording an external event (recommended shape, not normative)
+
+An e-mail, a chat message, a wiki edit, a repository webhook or a cloud notification reaches a company brain through
+a collector. This is the shape we recommend for the node that records it. It is **not** a canonical profile: the
+contract does not judge `x_event`, and a graph that writes it another way keeps its verdict. The shape is here so that
+collectors write the same names and readers can count on them.
+
+**The node is an `evidence`.** No new node type: the `event` node type means a domain event that changes a `state`,
+not a message that arrived.
+
+**`x_event` uses the names of the CloudEvents 1.0 core context attributes.**
+
+| Attribute | Required | Rule (from CloudEvents) |
+|---|---|---|
+| `specversion` | yes | `"1.0"`, quoted, so YAML keeps it as text |
+| `id` | yes | a string that is not empty, set by the producer |
+| `source` | yes | a URI-reference that is not empty: where the event happened |
+| `type` | yes | a string that is not empty, with a reverse-DNS prefix (`com.example.wiki.page.updated`) |
+| `subject` | no | a string that is not empty: what, inside the `source`, the event is about |
+| `time` | no | when the event happened, an RFC 3339 date-time with a time zone, **quoted**: without quotes YAML reads a timestamp, not text |
+| `datacontenttype` | no | the media type of the body (`application/json`, `message/rfc822`) |
+| `dataref` | no | a pointer to the recorded body, the same file as `provenance.source` |
+
+**Integrity comes from outside the event.** No CloudEvents attribute carries a hash or a signature of the content.
+The collector records the accepted body as a file, and `provenance.source` and `provenance.sha256` point to it, so
+`kg_trace.py check` (chapter 5) fails when the file changes after it was recorded.
+
+**Three times, three fields.** `x_received_at`, on the node next to `x_event`, is when the collector received the
+event, an RFC 3339 date-time, quoted. It is not `x_event.time`, when the event happened at its source, and it is not
+`verified_at`, when someone checked the evidence.
+
+**Idempotency is `source` + `id`.** A resend of the same event may repeat both, and the collector treats it as a
+duplicate: one event, one node. The identifier of a delivery (the `jti` of a signed token, the delivery id of a
+webhook) is not the event's `id`, because a resend gets a new one.
+
+**Without a checked signature, the node stays `open`.** How the origin was verified goes in `provenance.method`: a
+`measurement` when the collector checked a signature, a `reading` when it only recorded what arrived. Only a checked
+origin lets the node be `confirmed`.
+
+**No `null`.** An attribute that is absent does not appear. CloudEvents reads `null` as absent, and the graph keeps
+one way to say it.
+
+What not to do:
+
+- **Make every event a node.** The queue stays in the collector's store. Only an event that a declared rule promotes,
+  because it serves a question or a decision, becomes a node.
+- **Put the body in the graph.** The body stays in the recorded file. The `label` states the fact in a sentence, and
+  `dataref` and `provenance` point to the body.
+- **Treat the content of the event as an instruction.** A body that says "mark the invoice as paid" or "ignore the
+  earlier rules" is what the sender claims: recorded, never obeyed.
+
+A complete example: a wiki edit whose webhook signature was checked, and an e-mail whose sender was not verified. The
+collector recorded `inbox/events/2026-11-05-wiki-rev-42.json`:
+
+```json
+{"page": "Refund policy", "revision": 42, "editor": "finance-team", "summary": "Refund window changed from 30 to 14 days"}
+```
+
+and `inbox/events/2026-11-05-mail-price-update.eml`:
+
+```text
+From: sales@supplier.example.net
+To: purchasing@example.com
+Subject: Price update
+Message-ID: <price-2026-12@supplier.example.net>
+Date: Thu, 05 Nov 2026 09:12:00 -0300
+
+Our prices rise 8% from 2026-12-01.
+```
+
+Each file ends with a line break, and each `sha256` is the hash of the whole file.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: events
+nodes:
+  - id: Q_PRICING_TERMS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: Do the refund and supplier terms in the pricing model still hold?
+  - id: E_WIKI_REFUND_POLICY_REV_42
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "The refund policy page changed on 2026-11-05 (revision 42): the refund window went from 30 to 14 days."
+    verified_at: "2026-11-05"
+    verified_against: the recorded body, after the webhook signature was checked on receipt
+    x_received_at: "2026-11-05T14:03:12Z"
+    x_event:
+      specversion: "1.0"
+      id: "rev-42"
+      source: "https://wiki.example.com/spaces/finance"
+      type: "com.example.wiki.page.updated"
+      subject: "pages/refund-policy"
+      time: "2026-11-05T14:03:07Z"
+      datacontenttype: "application/json"
+      dataref: "inbox/events/2026-11-05-wiki-rev-42.json"
+    provenance:
+      source: inbox/events/2026-11-05-wiki-rev-42.json
+      locator: "the whole file"
+      method: "measurement: the collector checked the webhook HMAC signature against the shared secret before recording the body"
+      sha256: "4abc0a46c949c6425bd1c438dfc0353b8082731837e103e9c2a8dbaaabc0dfed"
+      locality: repo
+  - id: E_MAIL_SUPPLIER_PRICE_UPDATE
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "An e-mail from the supplier says its prices rise 8% from 2026-12-01; the sender was not verified."
+    x_received_at: "2026-11-05T12:12:41Z"
+    x_event:
+      specversion: "1.0"
+      id: "<price-2026-12@supplier.example.net>"
+      source: "imap://mail.example.com/purchasing"
+      type: "com.example.mail.received"
+      time: "2026-11-05T09:12:00-03:00"
+      datacontenttype: "message/rfc822"
+      dataref: "inbox/events/2026-11-05-mail-price-update.eml"
+    provenance:
+      source: inbox/events/2026-11-05-mail-price-update.eml
+      locator: "the whole file"
+      method: "reading: the collector recorded the message as received; no signature was checked"
+      sha256: "8bd9767d59723248b6acde789c58e2c6d7e1f31f77def0bf949493ca00df7585"
+      locality: repo
+edges:
+  - from: E_WIKI_REFUND_POLICY_REV_42
+    to: Q_PRICING_TERMS
+    edge_type: SUPPORTS
+  - from: E_MAIL_SUPPLIER_PRICE_UPDATE
+    to: Q_PRICING_TERMS
+    edge_type: SUPPORTS
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/events.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .
+```
+
+```text
+PASS docs/events.kg.yaml
+· 1 files; 1 pass the MUST; 0 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 2 source(s) read by scheme or sha256: 2 ok, 0 failed (2 sha256 checked); not judged (counted): 0 form only, 0 URL with no --with, 0 source not found, 0 malformed scheme, locator or hash, 0 other
+· 0 trace(s) judged: 0 resolve, 0 missing; not judged (counted): 0 absolute or URL, 0 external root, 0 not a path, 0 not text
+```
+
+When the event arrives wrapped in a signed envelope that an inbox accepted, the source is the accepted document and
+the body hash goes in `provenance.x_body_sha256`: see the recipe in
+[chapter 8](08-recipes.md#record-an-external-event-that-arrived-by-a-signed-message).
+
+When two adopters, or 50 real nodes, use this shape, it becomes a canonical profile in the SHOULD, judged only when
+present.
+
+## Recording a planned change (recommended shape, not normative)
+
+A change to a system, a policy or a process is planned, told to the people it affects, applied, checked and, sometimes,
+undone. This is the shape we recommend for the nodes that record it, and it is the sibling of the shape of `x_event`
+above. It is **not** a canonical profile either: the contract does not judge `x_change`, and a graph that writes it
+another way keeps its verdict.
+
+**The change is a `decision`, and each transition is an `evidence`.** The `decision` is the choice to change, and its
+`x_change.state` says where the change stands, so `kg_query` lists the changes by state. Each transition past
+`planned` is an `evidence` node with `x_change_transition` and a `SUPPORTS` edge to the decision: the evidence is the
+proof, and the state is only what the proof allows. The history of a change is its evidence nodes in the order of
+`at`, not a list inside the decision, and the earlier values of `state` stay in the git history.
+
+**Five states.** No standard names them. ITIL 4 change enablement assesses the risk, authorizes the change and keeps
+the change schedule, and ISO/IEC 20000-1 also asks that the remedy of an unsuccessful change be planned; neither names
+the states of the record. The OpenTelemetry semantic conventions have `vcs.change.state` (`open`, `wip`, `closed`,
+`merged`), which is about a change of code under review, and `deployment.status` (`succeeded`, `failed`), which is
+the outcome of one deployment; neither covers a change of a policy or a process. So the names are ours:
+
+| State | What it means | What the graph has |
+|---|---|---|
+| `planned` | recorded, with its target, window and rollback plan | the decision with `x_change` |
+| `communicated` | the people it affects were told | an `evidence` with the `x_event` of the notice, and `communicated_by` pointing to it |
+| `applied` | it was done in the target | an `evidence` of the application (a deployment record, a line of a log), and the approval in `sealed_by` |
+| `verified` | a check measured that it took effect | an `evidence` whose `provenance.method` is a `measurement`, with `status: confirmed` |
+| `reverted` | it was undone | an `evidence` of the reversion, with a `SUPERSEDES` edge to the evidence of the application it undoes, which goes to `status: superseded` |
+
+The state moves in that order. `communicated` can be skipped when no one has to be told, as in a standard change, and
+`reverted` comes after `applied` or `verified`. A change dropped before it was applied is none of the five: the
+decision closes with `status: done`, the state stays where it stopped, and `narrative` says why.
+
+**`x_change`, on the decision:**
+
+| Key | Required | Rule |
+|---|---|---|
+| `state` | yes | one of the five. It is `state`, not `status`: some readers read a nested `status` as the status of the node |
+| `target` | yes | what changes: a URI-reference that is not empty, or the id of the node in this graph that stands for it (a `policy`, an `artifact`) |
+| `window` | yes | `start` and `end`, RFC 3339 date-times with a time zone, **quoted**, with `end` after `start`: when the change may be applied. A change without a window is not planned yet |
+| `rollback_plan` | yes | a pointer to the plan (a path in the repository, or a URL), not the plan itself |
+| `kind` | no | `standard` (low risk, authorized in advance), `normal` or `emergency`: the change types of ITIL 4 |
+| `ref` | no | the id of the change in the tool that records it (`CHG-0142`) |
+| `communicated_by` | from `communicated` on | the id, in this graph, of the `evidence` node with the `x_event` of the notice |
+
+**`x_change_transition`, on each evidence:** `to` (required) is `communicated`, `applied`, `verified` or `reverted`,
+and `at` (required) is when the transition happened, an RFC 3339 date-time, quoted. On the node with `x_event`, `at` is
+the `x_event.time`.
+
+**Who approved goes in `sealed_by`, by reference.** The contract already has `sealed_by` and `sealed_at` on a
+decision: here they are the change authority and the date of the authorization. Write a role
+(`role:change-advisory-board`) or a reference that a table outside git resolves to a person (`person:p-0042`), never a
+name: the graph and its git history are a record that does not forget, and a name written there stays in every copy.
+A standard change is authorized once, for its model, and its `sealed_by` and `sealed_at` are those of the model. No
+change is `applied` without `sealed_by`: an emergency change is authorized faster, not skipped.
+
+**Three times, three fields.** `x_change.window` is when the change may happen, `x_change_transition.at` is when a
+transition happened, and `verified_at` is when someone checked the evidence.
+
+**One change, one node.** The tool that writes the graph finds the decision again by `ref` and updates its `state`. It
+does not write a new decision for each state.
+
+**`verified` needs a measurement.** A person who says that it works is a `testimony`, and the log line that the tool
+applied the change is a `reading` that supports `applied`. Only an evidence whose `provenance.method` is a
+`measurement`, with `status: confirmed`, lets the state be `verified`. The decision is `open` while the change is
+`planned`, `communicated` or `applied`, `confirmed` when it is `verified`, and `done` when it is `reverted`: the
+status says whether the record is closed, and the state says how. When the measurement shows that the change did not
+take effect, the state stays `applied`, the evidence `REFUTES` the decision, and `kg_validate` warns
+`integrity.refutes-unreconciled` while the decision is alive. The graph reconciles when the change is reverted and the
+decision goes to `refuted`, or when a new decision, applied and verified, `SUPERSEDES` it.
+
+What not to do:
+
+- **Make every deployment step a node.** The pipeline keeps its steps. A transition becomes a node only when it moves
+  the state: one application, one verification, one reversion.
+- **Put a secret or personal data in the node.** The rollback plan, the log and the output of the check are files
+  the node points to, and none of them carries a credential, a token or a connection string. The people involved
+  enter by reference, as in `sealed_by`.
+- **Treat the state as true without the evidence.** `state` is what the evidence allows. A state with no evidence
+  behind it is a claim, and a reader that counts the changes by state checks the evidence of each one
+  (`kg_query.py --around <id> --direction in --edge-type SUPPORTS`).
+
+A complete example: two changes to a finance app. The first one asks for a second factor at sign-in: it was told to
+the staff, applied and measured. The second one shortens the session timeout, a standard change that was applied and
+reverted. The collector recorded the notice in `inbox/events/2026-10-27-mail-chg-0142-notice.eml`:
+
+```text
+From: it-changes@example.com
+To: finance-staff@example.com
+Subject: CHG-0142: the finance app will ask for a second factor
+Message-ID: <chg-0142-notice@example.com>
+Date: Tue, 27 Oct 2026 10:00:00 +0000
+
+From 2026-10-29 22:00 UTC, signing in to the finance app requires a second factor.
+```
+
+the deployment tool wrote `changes/CHG-0142.log`:
+
+```text
+2026-10-29T22:14:03Z apply CHG-0142 policy=finance-sign-in second_factor=required result=ok
+```
+
+and `changes/CHG-0143.log`:
+
+```text
+2026-10-29T22:20:41Z apply CHG-0143 setting=finance-session-timeout from=8h to=1h result=ok
+2026-10-30T09:05:12Z revert CHG-0143 setting=finance-session-timeout from=1h to=8h result=ok
+```
+
+and the check wrote `changes/CHG-0142-check.json`:
+
+```json
+{"change": "CHG-0142", "measured_at": "2026-10-30T08:00:00Z", "check": "sign-in policy export of the finance app", "accounts": 42, "second_factor_required": 42}
+```
+
+Each file ends with a line break, and each `sha256` is the hash of the whole file. The change records live in the
+change tool, outside the repository (`locality: privado`).
+
+```yaml
+meta:
+  schema_version: "1"
+  id: changes
+nodes:
+  - id: D_CHG_0142_FINANCE_SECOND_FACTOR
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "Signing in to the finance app requires a second factor (change CHG-0142)."
+    verified_at: "2026-10-30"
+    sealed_by: "person:p-0042"
+    sealed_at: "2026-10-26"
+    x_change:
+      state: verified
+      target: "https://finance.example.com/settings/sign-in"
+      kind: normal
+      ref: "CHG-0142"
+      window:
+        start: "2026-10-29T22:00:00Z"
+        end: "2026-10-29T23:00:00Z"
+      rollback_plan: "https://changes.example.com/CHG-0142#rollback"
+      communicated_by: E_CHG_0142_NOTICE
+    provenance:
+      source: "https://changes.example.com/CHG-0142"
+      locator: "the change record, with its approval"
+      method: "reading: the change record in the change tool"
+      locality: privado
+  - id: E_CHG_0142_NOTICE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "The finance staff were told on 2026-10-27 that the finance app would ask for a second factor from 2026-10-29 22:00 UTC."
+    verified_at: "2026-10-27"
+    x_received_at: "2026-10-27T10:00:04Z"
+    x_event:
+      specversion: "1.0"
+      id: "<chg-0142-notice@example.com>"
+      source: "imap://mail.example.com/it-changes"
+      type: "com.example.mail.sent"
+      time: "2026-10-27T10:00:00Z"
+      datacontenttype: "message/rfc822"
+      dataref: "inbox/events/2026-10-27-mail-chg-0142-notice.eml"
+    x_change_transition:
+      to: communicated
+      at: "2026-10-27T10:00:00Z"
+    provenance:
+      source: inbox/events/2026-10-27-mail-chg-0142-notice.eml
+      locator: "the whole file"
+      method: "measurement: the collector checked the DKIM signature of example.com before recording the message"
+      sha256: "f6adb2d2565f84f4d8d09a0eefb3530389d2dd6f7bcdb8a529b8becc15d6e8ad"
+      locality: repo
+  - id: E_CHG_0142_APPLIED
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "The deployment log says the second-factor sign-in policy of the finance app was applied at 2026-10-29 22:14 UTC."
+    verified_at: "2026-10-29"
+    x_change_transition:
+      to: applied
+      at: "2026-10-29T22:14:03Z"
+    provenance:
+      source: changes/CHG-0142.log
+      locator: "line=0"
+      scheme: text
+      method: "reading: the line the deployment tool wrote when it applied the change"
+      sha256: "07888a04da6abf1b52170fe640782f9ed6739d86218d6d4284d7c73a7ecdc755"
+      locality: repo
+  - id: E_CHG_0142_VERIFIED
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    label: "On 2026-10-30, the sign-in policy export of the finance app requires a second factor on all 42 accounts."
+    verified_at: "2026-10-30"
+    x_change_transition:
+      to: verified
+      at: "2026-10-30T08:00:00Z"
+    provenance:
+      source: changes/CHG-0142-check.json
+      locator: "the whole file"
+      method: "measurement: the check exported the sign-in policy and counted the accounts that require a second factor"
+      sha256: "73df0837c693dd0a24c04b2b9fd5f6de2407bd94f3284eceb9a475225b179e35"
+      locality: repo
+  - id: D_CHG_0143_FINANCE_SESSION_TIMEOUT
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.9
+    label: "The finance app session timeout went from 8 hours to 1 hour (change CHG-0143), and the change was reverted."
+    narrative: "The overnight reconciliation job keeps one session open for more than an hour, and it stopped on 2026-10-30. The timeout went back to 8 hours."
+    verified_at: "2026-10-30"
+    sealed_by: "role:change-advisory-board"
+    sealed_at: "2026-09-14"
+    x_change:
+      state: reverted
+      target: "https://finance.example.com/settings/session"
+      kind: standard
+      ref: "CHG-0143"
+      window:
+        start: "2026-10-29T22:00:00Z"
+        end: "2026-10-29T23:00:00Z"
+      rollback_plan: "https://changes.example.com/standard/session-timeout#rollback"
+    provenance:
+      source: "https://changes.example.com/CHG-0143"
+      locator: "the change record, under the standard change model it follows"
+      method: "reading: the change record in the change tool"
+      locality: privado
+  - id: E_CHG_0143_APPLIED
+    node_type: evidence
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.8
+    label: "The deployment log says the finance app session timeout was set to 1 hour at 2026-10-29 22:20 UTC."
+    verified_at: "2026-10-29"
+    x_change_transition:
+      to: applied
+      at: "2026-10-29T22:20:41Z"
+    provenance:
+      source: changes/CHG-0143.log
+      locator: "line=0"
+      scheme: text
+      method: "reading: the line the deployment tool wrote when it applied the change"
+      sha256: "6e732995a0bc52533899832bde3258ff205c497d2d958128cb9002edd2f592a4"
+      locality: repo
+  - id: E_CHG_0143_REVERTED
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "The deployment log says the finance app session timeout went back to 8 hours at 2026-10-30 09:05 UTC."
+    verified_at: "2026-10-30"
+    x_change_transition:
+      to: reverted
+      at: "2026-10-30T09:05:12Z"
+    provenance:
+      source: changes/CHG-0143.log
+      locator: "line=1"
+      scheme: text
+      method: "reading: the line the deployment tool wrote when it ran the rollback plan"
+      sha256: "6e732995a0bc52533899832bde3258ff205c497d2d958128cb9002edd2f592a4"
+      locality: repo
+edges:
+  - from: E_CHG_0142_NOTICE
+    to: D_CHG_0142_FINANCE_SECOND_FACTOR
+    edge_type: SUPPORTS
+  - from: E_CHG_0142_APPLIED
+    to: D_CHG_0142_FINANCE_SECOND_FACTOR
+    edge_type: SUPPORTS
+  - from: E_CHG_0142_VERIFIED
+    to: D_CHG_0142_FINANCE_SECOND_FACTOR
+    edge_type: SUPPORTS
+  - from: E_CHG_0143_APPLIED
+    to: D_CHG_0143_FINANCE_SESSION_TIMEOUT
+    edge_type: SUPPORTS
+  - from: E_CHG_0143_REVERTED
+    to: D_CHG_0143_FINANCE_SESSION_TIMEOUT
+    edge_type: SUPPORTS
+  - from: E_CHG_0143_REVERTED
+    to: E_CHG_0143_APPLIED
+    edge_type: SUPERSEDES
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/changes.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --type decision --has x_change --group-by x_change.state
+```
+
+```text
+PASS docs/changes.kg.yaml
+· 1 files; 1 pass the MUST; 0 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 5 source(s) read by scheme or sha256: 5 ok, 0 failed (5 sha256 checked); not judged (counted): 0 form only, 0 URL with no --with, 0 source not found, 0 malformed scheme, locator or hash, 0 other
+· 0 trace(s) judged: 0 resolve, 0 missing; not judged (counted): 0 absolute or URL, 0 external root, 0 not a path, 0 not text
+     1  x_change.state=reverted
+     1  x_change.state=verified
+· only the nodes that have x_change
+· 2 node(s) in 1 graph(s), in 2 group(s) by x_change.state
+```
+
+`--where x_change.state=applied` lists the changes applied and not yet verified, and `--where x_change.kind=emergency`
+lists the emergency ones.
+
+When two adopters, or 50 real nodes, use this shape, it becomes a canonical profile in the SHOULD, judged only when
+present.
+
 ## Integrity (outside the schema)
 
 The schema cannot express these rules, and every reader must apply them:

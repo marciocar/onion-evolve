@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.12 or later (the floor si
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.44.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.45.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -179,3 +179,31 @@ was verified, and a `TRACES_TO` edge to the code or test that implements it. The
   (`kg_validate.py --format json` returns the JSON verdict of `spec/verdict.schema.json`) or through a model, with
   the MCP server (`kg_mcp.py`). Your own reader proves it agrees with the contract by passing the suite
   ([chapter 7](07-conformance-and-readers.md)).
+
+## Verify a release: provenance and SBOM
+
+Since 4.45.0, every artifact of a release has a software bill of materials (SBOM) in CycloneDX 1.7 JSON, next to the
+provenance attestation it already had. The release on GitHub carries one `<artifact>.cdx.json` for the wheel, the
+sdist, the npm tarball, the MCP Bundle and the OCI image, and each SBOM is also attested with the CycloneDX predicate:
+
+```sh
+gh attestation verify kg-ssot-<version>.mcpb --repo marciocar/kg-ssot                     # provenance
+gh attestation verify kg-ssot-<version>.mcpb --repo marciocar/kg-ssot \
+  --predicate-type https://cyclonedx.org/bom                                             # the SBOM
+gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<version> --repo marciocar/kg-ssot \
+  --predicate-type https://cyclonedx.org/bom
+```
+
+- **What an SBOM lists:** the dependencies that the artifact declares, read from inside it (the wheel's metadata,
+  the npm `package.json`, the bundle's `pyproject.toml` and `uv.lock`). No package embeds third-party code: pip, npm
+  or uv installs the dependencies on your side, so they go with `isExternal: true`, with the declared range in
+  `versionRange` when there is one. The license, the version the release was tested with
+  (`kg-ssot:tested-version`) and the transitive dependencies come from the environment where the suite passed, and
+  for npm from the build lockfile. The MCP Bundle SBOM lists every package of its `uv.lock`, with the hash of each
+  file. The image SBOM lists the base image by digest, its Debian packages, the Python interpreter and every
+  installed Python distribution.
+- **How it is made:** `packaging/sbom/sbom.py`, with the Python standard library only, in the release workflow. It
+  refuses an artifact that embeds third-party code (`node_modules`, `site-packages`, a wheel inside a package), so
+  the SBOM's claim that nothing is bundled is checked on every release.
+- **Reporting a vulnerability:** [SECURITY.md](../../SECURITY.md) has the supported versions, the private channel
+  (GitHub Private Vulnerability Reporting), the response times, the scope and the disclosure policy.

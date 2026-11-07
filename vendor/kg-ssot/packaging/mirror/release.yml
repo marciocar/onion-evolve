@@ -10,6 +10,8 @@
 # - o npm, o MCPB e a release do GitHub só saem depois do PyPI, porque o bundle instala o kg-ssot de lá e um canal
 #   rejeitado não deixa o outro adiante; o MCPB final leva um uv.lock gerado contra o PyPI real;
 # - os artefatos ganham a atestação de proveniência do GitHub, e o servidor entra no MCP Registry pelo OIDC;
+# - cada artefato (o wheel, o sdist, o tarball npm, o MCPB e a imagem) ganha um SBOM CycloneDX (packaging/sbom/sbom.py,
+#   só biblioteca padrão), anexado à release do GitHub e atestado com o predicado CycloneDX;
 # - a imagem OCI do kg-mcp vai para o ghcr.io depois do PyPI, do mesmo wheel, atrás do environment ghcr;
 # - as actions ficam fixadas por SHA de commit.
 name: release
@@ -60,6 +62,11 @@ jobs:
           (cd "$RUNNER_TEMP" && "$RUNNER_TEMP/use/bin/kg-conformance")
           mkdir "$RUNNER_TEMP/npm" && cp packaging/npm/suite.mjs "$RUNNER_TEMP/npm/"
           (cd "$RUNNER_TEMP/npm" && npm init -y > /dev/null && npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/dist/npm/*.tgz && node suite.mjs "$GITHUB_WORKSPACE/spec/conformance/fixtures/latest")
+      - name: SBOM CycloneDX do wheel, do sdist e do tarball npm (as licenças e as transitivas do ambiente testado)
+        # o ambiente é o do passo anterior, onde a suíte passou pelo wheel; as transitivas do npm vêm do lockfile do build
+        run: |
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python -I packaging/sbom/sbom.py dist/pypi/*.whl dist/pypi/*.tar.gz dist/npm/*.tgz \
+            --outdir dist/sbom --env "$RUNNER_TEMP/use/bin/python" --npm-lock tools/runners/ajv/package-lock.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: dist
@@ -143,6 +150,12 @@ jobs:
           python -m pip install --quiet --require-hashes -r packaging/mcpb/requirements-uv.txt
           (cd packaging/mcpb && npm ci --ignore-scripts --no-audit --no-fund)
           rm -rf dist/mcpb && python -I packaging/mcpb/build.py --outdir dist/mcpb --lock
+      - name: SBOM CycloneDX do MCPB final (o uv.lock dele, com as licenças do ambiente do wheel)
+        run: |
+          python -m venv "$RUNNER_TEMP/use" && "$RUNNER_TEMP/use/bin/pip" install --quiet --require-hashes -r tools/requirements.txt
+          "$RUNNER_TEMP/use/bin/pip" install --quiet --no-deps dist/pypi/*.whl
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python -I packaging/sbom/sbom.py dist/mcpb/*.mcpb --outdir dist/sbom --env "$RUNNER_TEMP/use/bin/python"
+          echo "V=$(python3 -c "import json; print(json.load(open('spec/release.json'))['version'])")" >> "$GITHUB_ENV"
       - name: Atestação de proveniência dos artefatos (gh attestation verify <arquivo> --repo marciocar/kg-ssot)
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
         with:
@@ -150,7 +163,27 @@ jobs:
             dist/mcpb/*.mcpb
             dist/pypi/*
             dist/npm/*.tgz
-      - name: Release no GitHub com o MCPB, o wheel, o sdist e o tarball npm
+      - name: SBOM do wheel atestado (gh attestation verify kg_ssot-${{ env.V }}-py3-none-any.whl --repo marciocar/kg-ssot --predicate-type https://cyclonedx.org/bom)
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
+        with:
+          subject-path: dist/pypi/kg_ssot-${{ env.V }}-py3-none-any.whl
+          sbom-path: dist/sbom/kg_ssot-${{ env.V }}-py3-none-any.whl.cdx.json
+      - name: SBOM do sdist atestado (gh attestation verify kg_ssot-${{ env.V }}.tar.gz --repo marciocar/kg-ssot --predicate-type https://cyclonedx.org/bom)
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
+        with:
+          subject-path: dist/pypi/kg_ssot-${{ env.V }}.tar.gz
+          sbom-path: dist/sbom/kg_ssot-${{ env.V }}.tar.gz.cdx.json
+      - name: SBOM do tarball npm atestado (gh attestation verify kg-ssot-${{ env.V }}.tgz --repo marciocar/kg-ssot --predicate-type https://cyclonedx.org/bom)
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
+        with:
+          subject-path: dist/npm/kg-ssot-${{ env.V }}.tgz
+          sbom-path: dist/sbom/kg-ssot-${{ env.V }}.tgz.cdx.json
+      - name: SBOM do MCPB atestado (gh attestation verify kg-ssot-${{ env.V }}.mcpb --repo marciocar/kg-ssot --predicate-type https://cyclonedx.org/bom)
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
+        with:
+          subject-path: dist/mcpb/kg-ssot-${{ env.V }}.mcpb
+          sbom-path: dist/sbom/kg-ssot-${{ env.V }}.mcpb.cdx.json
+      - name: Release no GitHub com o MCPB, o wheel, o sdist, o tarball npm e o SBOM de cada um
         env:
           GH_TOKEN: ${{ github.token }}
         # o corpo sai da seção da versão nos dois CHANGELOGs (tools/kg_release_notes.py, desde a 4.17.1), no esqueleto
@@ -159,7 +192,7 @@ jobs:
           version="${GITHUB_REF_NAME#kg-ssot-v}"
           python -I tools/kg_release_notes.py --version "$version" > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
-            --notes-file "$RUNNER_TEMP/notes.md" --title "KG-SSOT $version" dist/mcpb/*.mcpb dist/pypi/* dist/npm/*.tgz
+            --notes-file "$RUNNER_TEMP/notes.md" --title "KG-SSOT $version" dist/mcpb/*.mcpb dist/pypi/* dist/npm/*.tgz dist/sbom/*.cdx.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: mcpb-final
@@ -211,9 +244,44 @@ jobs:
           subject-name: ghcr.io/marciocar/kg-ssot
           subject-digest: ${{ env.DIGEST }}
           push-to-registry: true  # usa o login do docker do passo anterior: o logout só vem depois
+      - name: SBOM CycloneDX da imagem enviada (a base pelo digest, os pacotes Debian e as distribuições Python)
+        run: |
+          v=$(python3 -c "import json; print(json.load(open('spec/release.json'))['version'])")
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python3 -I packaging/sbom/sbom.py --image "$IMAGE" --out "sbom/kg-ssot-oci-$v.cdx.json"
+          echo "SBOM=sbom/kg-ssot-oci-$v.cdx.json" >> "$GITHUB_ENV"
+      - name: SBOM da imagem atestado, também no registro de imagens
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
+        with:
+          subject-name: ghcr.io/marciocar/kg-ssot
+          subject-digest: ${{ env.DIGEST }}
+          sbom-path: ${{ env.SBOM }}
+          push-to-registry: true
       - name: Logout do ghcr.io
         if: ${{ always() }}
         run: docker logout ghcr.io
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: sbom-oci
+          path: sbom/
+          if-no-files-found: error
+
+  # o SBOM da imagem vai também para a release do GitHub, ao lado dos outros: a release só existe depois do
+  # github-release, e a imagem só depois do ghcr, que correm em paralelo
+  sbom-oci:
+    needs: [ghcr, github-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
+        with:
+          name: sbom-oci
+          path: sbom/
+      - name: O SBOM da imagem na release do GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" sbom/*.cdx.json --repo "$GITHUB_REPOSITORY"
 
   # o servidor no MCP Registry oficial, pelo login OIDC do GitHub (o servidor io.github.marciocar/kg-ssot): o pacote PyPI,
   # cuja posse o registro confere pelo mcp-name do README, e o MCPB da release, com o sha256

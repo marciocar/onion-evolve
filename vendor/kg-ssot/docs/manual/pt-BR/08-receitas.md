@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/08-recipes.md sha256:a8cf797d93000d4c -->
+<!-- translation-of: docs/manual/08-recipes.md sha256:a19ddda1c69860b8 -->
 # 8. Receitas
 
 [English](../08-recipes.md) | **Português (Brasil)**
@@ -366,4 +366,5 @@ integrity.trace-sha256-mismatch  docs/events.kg.yaml#E_INVOICE_4512_PAID  → do
 ```
 
 Um nó sozinho reprova como `integrity.orphan-node`: um evento sempre serve a uma pergunta ou a uma decisão, então
-ligue-o. Quando dois adotantes usarem o `x_event`, ele vira um perfil canônico no contrato, julgado só quando presente.
+ligue-o. A forma recomendada do `x_event`, e quando ela vira perfil canônico, está no
+[capítulo 3](03-formato.md#registrar-um-evento-externo-forma-recomendada-não-normativa).

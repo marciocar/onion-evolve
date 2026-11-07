@@ -363,5 +363,6 @@ If someone edits the accepted document later, `kg_trace.py check` fails (rc 1):
 integrity.trace-sha256-mismatch  docs/events.kg.yaml#E_INVOICE_4512_PAID  → docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md [sha256] the last line  The provenance.sha256 of the node differs from the hash of the file it names: the source changed after it was read.
 ```
 
-A node alone fails as `integrity.orphan-node`: an event always serves a question or a decision, so link it. When two
-adopters use `x_event`, it becomes a canonical profile in the contract, judged only when present.
+A node alone fails as `integrity.orphan-node`: an event always serves a question or a decision, so link it. The
+recommended shape of `x_event`, and when it becomes a canonical profile, is in
+[chapter 3](03-format.md#recording-an-external-event-recommended-shape-not-normative).

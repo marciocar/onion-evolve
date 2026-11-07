@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:45294e5b493d188c -->
+<!-- translation-of: ADOPTING.md sha256:f8300f82fd2bf0b8 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -41,6 +41,14 @@ A lista está em [`spec/release.json`](spec/release.json):
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
 - a licença (`LICENSE`, Apache-2.0) e o `NOTICE`, que diz o escopo dela.
+
+Se um coletor seu registra eventos externos (um e-mail, um webhook, uma mensagem de chat) como nós, escreva-os na
+forma recomendada do `x_event` ([manual, capítulo 3](docs/manual/pt-BR/03-formato.md#registrar-um-evento-externo-forma-recomendada-não-normativa)).
+Ela não é normativa: o gate não a julga, e os seus vereditos não mudam.
+
+Se você registra mudanças planejadas num sistema, numa política ou num processo (planejada, comunicada, aplicada,
+conferida, revertida), escreva-as na forma recomendada do `x_change` ([manual, capítulo 3](docs/manual/pt-BR/03-formato.md#registrar-uma-mudança-planejada-forma-recomendada-não-normativa)),
+irmã do `x_event`. Ela também não é normativa.
 
 Tudo isso é **Apache-2.0**, inclusive os casos `.kg.yaml` da suíte. A Apache-2.0 dá, além do direito autoral,
 uma licença das patentes do autor e dos contribuidores sobre o que eles contribuíram. Essa licença termina para
@@ -342,6 +350,13 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.44.0` para a `kg-ssot-v4.45.0`, nada é obrigatório: o contrato (v4.18), os vereditos e tudo o que um
+leitor, o gate ou o armazém imprime são os mesmos. O vendor traz dois arquivos novos, o `SECURITY.md` e o gerador de SBOM em
+`packaging/sbom/`, e cada artefato da release passa a vir com o seu SBOM em CycloneDX 1.7, atestado ao lado da procedência. As
+formas recomendadas do `x_event` e do `x_change` ([manual, capítulo 3](docs/manual/pt-BR/03-formato.md)) são novas e não
+normativas: o grafo que não as usa fica como está. A seção [Dado pessoal, LGPD e GDPR](#dado-pessoal-lgpd-e-gdpr) é leitura,
+para quem guarda uma pessoa num grafo.
 
 Da `kg-ssot-v4.43.0` para a `kg-ssot-v4.44.0`, nada muda para um grafo ou um gate: o contrato (v4.18) e os vereditos são os
 mesmos, o `kg_query` imprime o mesmo, e o `kg_trace check` mantém os códigos de saída e o `kg-ssot.trace/1`. O `kg_refs.py` é novo,
@@ -906,6 +921,42 @@ inventado. O `kg_migrate.py` faz isso por um perfil que você escreve: o `plan` 
 nada, e o `apply` grava só o que o plano propôs, conferindo que nada mais mudou
 ([cap. 5 do manual](docs/manual/pt-BR/05-ferramentas.md)). Uma chave própria sem `x_` se resolve renomeando para
 `x_<nome>`.
+
+## Dado pessoal, LGPD e GDPR
+
+Um grafo registra quem disse o quê e de onde veio, e por isso pode guardar dado pessoal: a pessoa que deu um
+testemunho, o dono de um documento, o autor de uma decisão. A eliminação tem de entrar no desenho desde o começo,
+porque o histórico do git guarda tudo o que já viu.
+
+- **Você é o controlador.** Quem adota o contrato é o controlador do dado pessoal nos seus grafos e no histórico git
+  deles, pela LGPD e pelo GDPR. As ferramentas rodam na sua máquina e não mandam o grafo a ninguém por si: o
+  `kg_mcp.py` atende só os clientes para os quais você o sobe (stdio, ou HTTP no loopback por padrão, e fora do
+  loopback só com `--allow-remote` e um segredo compartilhado); o `kg_store.py` e o `kg_migrate.py apply` gravam
+  arquivos (o backend git do armazém faz commit local e nunca dá push); e a rede que o kit usa vai no sentido
+  contrário, para baixar a release (`kg_vendor.py`) ou o modelo do extra `vector` (`kg_vector.py fetch`), nunca o
+  grafo. Para onde o grafo vai depois disso (um push, um log de CI, um modelo que você liga ao servidor MCP) é decisão
+  sua.
+- **A pessoa entra por referência.** Escreva uma referência na forma `<esquema>:<id>`, como
+  `provenance.source: "pessoa:p-0042"` com `locality: pessoa`, e não o nome da pessoa. A tabela que liga a referência
+  à pessoa fica fora do git, onde um pedido de eliminação apaga uma linha: o grafo guarda a afirmação e perde a
+  pessoa. Enquanto essa tabela existe, a referência é dado pseudônimo, e o dado pseudônimo segue sendo pessoal. O
+  `label` e a `narrative` também não podem identificar a pessoa.
+- **Um hash publicado pode ser dado pessoal.** O `provenance.node_sha256` e o `provenance.sha256` não têm sal: quem
+  tem ou adivinha o conteúdo recalcula o hash e o casa, e o EDPB (Guidelines 02/2025 sobre blockchain, v2.0, §52) diz
+  que o hash sem sal, em geral, não basta para guardar dado pessoal num registro público. Por isso, um `node_sha256`
+  publicado sobre um nó que pode identificar uma pessoa é ele mesmo dado pessoal: não o publique num espelho público.
+  Salgar o hash ainda não está no contrato.
+- **Nada de espelho público com dado pessoal.** O grafo que guarda dado pessoal fica num repositório privado. Um
+  espelho público, um site publicado ou um pacote o copiam para lugares que você não controla.
+- **Reescrever o histórico não elimina.** Tirar um commit reescrevendo o histórico quebra toda verificação por hash
+  que citava o conteúdo antigo (`provenance.sha256`, `provenance.node_sha256`, um commit fixado), e não alcança forks,
+  clones nem arquivos. Desenhe a eliminação como apagar uma linha fora do git, não como reescrever o git.
+- **O `owner` é um papel, não uma pessoa.** Escreva "o dono da área de crédito", não um nome: o papel sobrevive à troca
+  de equipe e não guarda dado pessoal.
+- **Handle de conta e caminho de máquina com nome de usuário também são dado pessoal.** Um handle de forja de código
+  num `source`, num `label` ou numa `narrative`, e um caminho que leva um nome de usuário, como uma pasta pessoal,
+  apontam para uma pessoa tanto quanto um nome. São os mais fáceis de escapar: numa amostra de 200 nós de grafos reais,
+  um handle de conta apareceu em 15. Troque-os por um papel ou uma referência.
 
 ## Conformidade de outro leitor
 
