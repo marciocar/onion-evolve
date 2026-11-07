@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**110 regras** no total — **96 HARD**, **51 SOFT**.
+**111 regras** no total — **97 HARD**, **52 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -197,6 +197,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 100 | Superfície que viaja não cita ops/ como se o destinatário o tivesse | HARD + SOFT | porta/adotante recebendo instrução que aponta para ops/, que não viaja (com catraca). |
 | 106 | Superfície que viaja passa pela varredura de vazamento da publicação | HARD + SOFT | id de adotante com prefixo onion- ou caminho de máquina entrando por PR verde e só sendo barrado no fim, pelo motor de publicação das portas. |
 | 113 | Sinal relayado a destino público só se commita revisado | HARD + SOFT | sinal de adotante entregue ao inbox de um repo PÚBLICO ser commitado verbatim, com o detalhe do projeto dele (cliente, pessoas, segredo, incidente), antes de a sessão do destino o revisar. |
+| 119 | O diff não acrescenta nome de repo ou de clone de adotante não federado | HARD + SOFT | nome de repo ou de clone de adotante que leva o nome do cliente entrando na árvore PÚBLICA do core por não estar em lista nenhuma |
 
 ## Processo com resíduo
 
@@ -233,3 +234,4 @@ legítima de objeto não é aviso. Toda lista contém `source`, então no core t
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | source |
 | 109 | CLAUDE.md não cresce sem tirar o equivalente ou citar um nó | source |
 | 117 | Ato de deploy tem assinatura no veto | source |
+| 119 | O diff não acrescenta nome de repo ou de clone de adotante não federado | source |
