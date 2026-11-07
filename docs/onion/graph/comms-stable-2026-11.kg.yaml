@@ -1,6 +1,6 @@
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16."
+  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16. Acréscimo: FLIP open→done em Q_CS_APP_SLACK_E_CHANNELS_1106, confirmado pelo maestro (passos 1 a 6 do card feitos)."
   schema_version: "1"
   id: comms-stable-2026-11
   slug: comms-stable-2026-11
@@ -158,11 +158,13 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     x_due: "2026-11-08"
     impact: 5
     confidence: 0.7
+    verified_at: "2026-11-07"
+    verified_against: "o maestro confirmou na sessão do core f00150, em 2026-11-07, por pergunta com opções: passos 1 a 6 do card feitos; systemctl is-active onion-slack-persona = active desde 13:57:54 UTC"
     label: "O app Slack interno do hub existe, com Socket Mode e escopos mínimos, os tokens de bot e de app guardados pelo maestro fora do chat, e o channelsEnabled ligado na organização do Claude."
     narrative: "Pronto quando: o maestro seguiu os cards do core (manifesto do app pronto, passo de guardar os tokens sem passar pelo chat) e confirmou. Atos do maestro: credencial e configuração da organização. Estado em 2026-11-07: o app 'Onion Persona (piloto)' existe no workspace do hub com o manifesto do onion-bridge PR #94 (5 escopos, Socket Mode), criado e ajustado pelo core pelo navegador do maestro; faltam a instalação, os dois tokens e a chave da Anthropic no Vaultwarden. O channelsEnabled não se aplica ao login do core (conta individual, sem configuração de organização); no login do hub, confere-se em claude.ai/admin-settings. Prazo movido de 06/11 para 08/11 (cards entregues ao hub em 07/11); o degrau 2 ainda cabe na segunda se os tokens existirem até 08/11. Em 2026-11-07 o maestro escolheu, na sessão do hub, a recomendação do core nas quatro perguntas do card (sinal docs/evolution/inbox/2026-11-07-decisions-maestro-acts.md): nome «Onion Persona (piloto)» no workspace do hub, os dois tokens na mesma sentada, chave da Anthropic dedicada com teto de gasto e canal novo privado só com ele em allowedUsers. A unidade onion-slack-persona está ativa desde 2026-11-07 13:57:54 UTC (systemctl). O fecho segue do maestro: confirmar os passos 1 a 6 do card até 08/11."
   - id: Q_CS_DEGRAU1_CAMPAINHA_1109
