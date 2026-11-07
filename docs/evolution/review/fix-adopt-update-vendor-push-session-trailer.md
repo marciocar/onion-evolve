@@ -2,8 +2,7 @@
 branch: fix/adopt-update-vendor-push-session-trailer
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 0b32ae791ab5d6a7e6f0719eda1407a7283ff54c517652e4b33478055dfda4d6
-reviewed_code_sha256: 4eed6e52468120865924378e6819fbda789c411fe01d106c721d4ccb7ac5e348
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 1
@@ -22,7 +21,7 @@ nota: "tokens não medidos (0); a passada é do mesmo agente que escreveu o diff
 
 - `vendor-branch.sh update`: lê a `onion/vendor` remota (ls-remote) ANTES de escrever na vendor. Local ausente → nasce da remota. Remota não ancestral da local → rc 13, nada tocado. Depois do commit da vendor e da guarda de BASE CRUZADA, push por fast-forward (sem force) e conferência por ls-remote (rc 14 se não bater; rc 13 se o push for recusado por não-ff). Uma linha diz de onde para onde a remota foi. Sem remoto ou remoto sem a branch: não empurra e diz. `ONION_VENDOR_PUSH=0` desliga, dito.
 - `session-trailer.sh` (novo): `Claude-Session: <URL>` de `ONION_CLAUDE_SESSION_URL` ou de `CLAUDE_CODE_BRIDGE_SESSION_ID`, conferidos pela forma; nada inventado, e a nota é dita quando falta. Usado pelo `durable-commit.sh` (commit da vendor e o durável pós-merge) e pelo merge do `vendor-branch.sh`, logo abaixo da assinatura do alvo e sem duplicar.
-- `adopt.md`: rc 13/14 na tabela do --update e seção "onion/vendor no remoto" no relatório downstream.
+- `adopt.md`: rc 13/14 na tabela do --update e a linha da remota na seção "Arquivos aplicados" do relatório downstream (sem seção nova: o comando está no teto de 800 linhas da REGRA 5 (Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal))).
 
 ## Achados
 
