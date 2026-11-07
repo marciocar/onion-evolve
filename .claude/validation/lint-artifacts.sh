@@ -6515,6 +6515,40 @@ check_plugin_write_scan() {
 }
 check_plugin_write_scan
 
+# ───────────────────────────────────────────────────────────────────────────
+# REGRA 119 — O diff não acrescenta nome de repo ou de clone de adotante não federado [HARD + SOFT]
+# previne: nome de repo ou de clone de adotante que leva o nome do cliente entrando na árvore PÚBLICA do core por não estar em lista nenhuma
+# aplica-se: source
+#   DEFEITO MEDIDO (2026-11-04): um selo no grafo da orquestração de sessões citou o nome do repo de um adotante de
+#   consultoria, que leva o do cliente. A REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação)
+#   e a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) procuram termos DECLARADOS, e o termo não estava
+#   na lista: guarda por lista falha pelo vocabulário. O PR #1522 tirou o nome da árvore; o histórico ficou (decisão (a)
+#   do maestro, 2026-11-07). Esta é a decisão (b): o conjunto proibido é DERIVADO em tempo de execução dos clones
+#   irmãos carimbados e do mapa local de membros, menos o que o members.yaml já federa, mais a lista de termos de
+#   clientes. Julga só as linhas ACRESCENTADAS contra a base (a árvore da main ainda tem ocorrências antigas) e nunca
+#   imprime o termo: arquivo, linha e um hash curto. No CI não há máquina, e a guarda cai para a lista do segredo e o
+#   DIZ (SOFT SO-LISTA). Lógica, casamento e teto em private-name-check.sh; grafo guard-private-names-2026-11.
+check_private_name_diff() {
+  local helper="${SCRIPT_DIR}/private-name-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ -n "${ONLY_PATH}" ] && return 0   # julga o DIFF da branch inteira, não um arquivo avulso
+  local _R="REGRA 119 (O diff não acrescenta nome de repo ou de clone de adotante não federado)"
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path}" "${_R}: [${_code}] ${_msg}"
+  done <<< "${_out}"
+  # rc 1 = achado (já emitido acima); rc >= 2 = a guarda declarou que NÃO pôde julgar, e isso não é aprovação
+  if [ "${_hrc}" -ge 2 ]; then
+    violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_private_name_diff
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
