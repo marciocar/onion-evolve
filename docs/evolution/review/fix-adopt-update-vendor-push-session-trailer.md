@@ -2,7 +2,8 @@
 branch: fix/adopt-update-vendor-push-session-trailer
 pr: 1533
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b3335af2b8dc63d0f70399a313df902fd72978947df569b56b3613153d008cb3
+reviewed_code_sha256: dd7a41a6e283c62f833193f504e9de975b2eec5925d0df9bd27c8365756490a4
 findings_total: 27
 findings_real: 27
 findings_blocking: 8
