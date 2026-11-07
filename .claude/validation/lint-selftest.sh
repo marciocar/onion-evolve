@@ -1417,9 +1417,25 @@ fi
 #     retrato muda (qualquer byte, mtime incluso) ⇒ a chave muda ⇒ recalcula; nunca um número velho.
 #   · Falha em qualquer passo ⇒ o caminho antigo (tar direto da árvore, inventário calculado), declarado.
 # $1 = raiz, $2 = arquivo .tar. rc 0 = retrato gravado. rc 1 do tar ("mudou durante a leitura") é tolerado.
+# _chardev_excludes — um `--exclude=<caminho>` por DISPOSITIVO DE CARACTERE em .claude/ e docs/ da raiz $1.
+# MEDIDO 2026-11-06 (curadoria, Claude Code 2.1.319 com o sandbox ligado; reproduzido aqui por bwrap): o sandbox
+# monta /dev/null sobre .claude/loop.md, .claude/launch.json, .claude/scheduled_tasks.json, .claude/output-styles e
+# .claude/routines. O `tar -c` do retrato arquiva o nó como dispositivo (sem ler), e o `tar -x` no SANDBOX morre com
+# "Cannot mknod: Operation not permitted" rc=2 — a bancada caía antes da 1ª família. Dispositivo não é artefato.
+# `-xtype` (GNU) e não `-type`: o `-type c` do GNU find lê o d_type do ponto de montagem e diz "arquivo regular"
+# (o mesmo achado do _CHARDEV_TYPE do lint-artifacts.sh). Sem `-xtype` (find BSD), `-type` vem do lstat e serve.
+_chardev_excludes() {
+  local _t=(-type c) _p
+  find "$1" -maxdepth 0 -xtype d >/dev/null 2>&1 && _t=(-xtype c)
+  while IFS= read -r _p; do
+    [ -n "${_p}" ] && printf -- '--exclude=%s\n' "${_p#"$1"/}"
+  done < <(find "$1/.claude" "$1/docs" "${_t[@]}" -print 2>/dev/null || true)
+}
+
 _snapshot_create() {
-  local rc=0
-  tar -C "$1" --warning=no-file-changed -cf "$2" --exclude='__*__.*' --exclude='__*__' .claude docs CLAUDE.md 2>/dev/null || rc=$?
+  local rc=0 _cx=()
+  mapfile -t _cx < <(_chardev_excludes "$1")
+  tar -C "$1" --warning=no-file-changed -cf "$2" --exclude='__*__.*' --exclude='__*__' "${_cx[@]}" .claude docs CLAUDE.md 2>/dev/null || rc=$?
   [ "${rc}" -le 1 ] && [ -s "$2" ] || { rm -f "$2"; return 1; }
   chmod a-w "$2" 2>/dev/null || true
 }
@@ -1582,7 +1598,8 @@ elif [ -n "${SELFTEST_SNAPSHOT}" ]; then
   tar -C "${SANDBOX}" -xf "${SELFTEST_SNAPSHOT}"
 else
   # o retrato em arquivo falhou (disco?): o caminho de sempre, direto da árvore viva
-  { tar -C "${REPO_ROOT}" --warning=no-file-changed -cf - --exclude='__*__.*' --exclude='__*__' .claude docs \
+  mapfile -t _CX_LIVE < <(_chardev_excludes "${REPO_ROOT}")   # dispositivo do sandbox não viaja (ver _chardev_excludes)
+  { tar -C "${REPO_ROOT}" --warning=no-file-changed -cf - --exclude='__*__.*' --exclude='__*__' "${_CX_LIVE[@]}" .claude docs \
       || [ "$?" -eq 1 ]; } | tar -C "${SANDBOX}" -xf -
   cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
 fi
@@ -2959,6 +2976,105 @@ run_backtick_ref_selftests() {
     record_pass "backtick-ref: (B) válida/exemplo-não-kebab/fence/allowlist → 0 flag (os 4 filtros de FP)"
   else record_fail "backtick-ref: (B)" "falso-positivo: $(printf '%s' "${out}" | grep 'referência de caminho em backtick' | head -2)"; fi
   rm -f "${tf}"
+}
+
+# ── DISPOSITIVO DE CARACTERE DO SANDBOX (medido pela curadoria em 2026-11-06, Claude Code 2.1.319) ──
+# O sandbox monta /dev/null, sem leitura, sobre caminhos fixos do projeto (.claude/loop.md, .claude/launch.json,
+# .claude/routines…). O lint abria o `loop.md` pelo glob `-name '*.md'` e morria (awk: Permission denied, rc=2):
+# todo commit do adotante com sandbox parava. DUAS formas de reproduzir, na ordem:
+#   bwrap — a MESMA forma do sandbox (bind de /dev/null em montagem nodev; o d_type do ponto de montagem diz
+#           "arquivo regular", que é o que engana `find -type`);
+#   link  — sem bwrap utilizável (o runner do CI), symlink para um dispositivo de caractere ILEGÍVEL do host
+#           (/dev/mem, /dev/port, /dev/console). Mesma morte do awk, outra via; o (d-MUT) prova ali o symlink.
+# Sem nenhuma das duas, ⊘ visível (no CI, STRICT o pinta de vermelho, e é o certo: não verifiquei).
+# Casos: (a) o lint pula e CONTA o dispositivo; (b) arquivo REGULAR ilegível segue reprovando; (c-MUT) sem o
+# filtro no _find o lint volta a morrer; (d-MUT) com `-type c` no lugar de `-xtype c` também morre; (e) o retrato
+# do tar da bancada não carrega o dispositivo, e (e-MUT) sem as exclusões ele viaja (no bwrap, a extração morre em mknod).
+run_sandbox_chardev_selftests() {
+  # selftest-covers: .claude/validation/lint-artifacts.sh
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh" base mode="" dev="" d; base="$(mktemp -d)"
+  [ -f "${lint}" ] || { record_fail "sandbox-chardev" "lint ausente: ${lint}"; return; }
+  : > "${base}/probe"
+  # ONION_SELFTEST_CHARDEV_MODE=link força o ramo do CI numa máquina que tem bwrap (é como o ramo link foi provado aqui)
+  if [ "${ONION_SELFTEST_CHARDEV_MODE:-}" != link ] && command -v bwrap >/dev/null 2>&1 \
+     && bwrap --bind / / --dev-bind /dev /dev --ro-bind /dev/null "${base}/probe" \
+          sh -c '[ -c "$1" ] && ! cat "$1" 2>/dev/null' _ "${base}/probe" >/dev/null 2>&1; then
+    mode=bwrap
+  else
+    for d in /dev/mem /dev/port /dev/console; do
+      [ -c "${d}" ] && [ ! -r "${d}" ] && { mode=link; dev="${d}"; break; }
+    done
+  fi
+  if [ -z "${mode}" ]; then
+    record_skip "sandbox-chardev: sem bwrap utilizável e sem dispositivo de caractere ilegível no host (root?) — a montagem do sandbox NÃO foi reproduzida"
+    rm -rf "${base}"; return
+  fi
+  local _devs=(.claude/loop.md .claude/launch.json .claude/routines)
+  _scd_tree() {  # $1 = destino · $2 = lint a instalar
+    mkdir -p "$1/.claude/validation" && cp "$2" "$1/.claude/validation/lint-artifacts.sh"
+    local x; for x in "${_devs[@]}"; do
+      if [ "${mode}" = bwrap ]; then : > "$1/${x}"; else ln -s "${dev}" "$1/${x}"; fi
+    done
+  }
+  _scd_run() {  # $1 = árvore · resto = comando, rodado com os dispositivos no lugar
+    local t="$1" a=() x; shift
+    if [ "${mode}" = link ]; then ( cd "${t}" && "$@" ); return; fi
+    for x in "${_devs[@]}"; do a+=(--ro-bind /dev/null "${t}/${x}"); done
+    ( cd "${t}" && bwrap --bind / / --dev-bind /dev /dev "${a[@]}" "$@" )
+  }
+  _scd_case() {  # $1 = árvore → 0 se o lint chegou ao sumário sem negação de leitura
+    local o r=0; o="$(_scd_run "$1" bash .claude/validation/lint-artifacts.sh 2>&1)" || r=$?
+    [ "${r}" -ne 2 ] && grep -q '=== Sumário ===' <<< "${o}" && ! grep -q 'Permission denied' <<< "${o}"
+  }
+  local out rc
+  # (a) intacto: chega ao sumário, sem "Permission denied", e diz quantos pulou
+  _scd_tree "${base}/a" "${lint}"
+  rc=0; out="$(_scd_run "${base}/a" bash .claude/validation/lint-artifacts.sh 2>&1)" || rc=$?
+  if [ "${rc}" -ne 2 ] && grep -q '=== Sumário ===' <<< "${out}" && ! grep -q 'Permission denied' <<< "${out}" \
+     && grep -qE 'Pulados +: 3 caminho\(s\) por serem DISPOSITIVO DE CARACTERE' <<< "${out}"; then
+    record_pass "sandbox-chardev: (a) [${mode}] 3 dispositivos em .claude/ → o lint chega ao sumário e conta 3 pulados"
+  else record_fail "sandbox-chardev: (a) [${mode}]" "rc=${rc}: $(grep -E 'denied|MORREU|Pulados' <<< "${out}" | head -2)"; fi
+  # (b) arquivo REGULAR ilegível NÃO é pulado: o lint segue sem poder julgar (rc=2) e nomeia o arquivo
+  _scd_tree "${base}/b" "${lint}"
+  printf -- '---\nname: x\n---\n' > "${base}/b/.claude/ilegivel.md"; chmod 000 "${base}/b/.claude/ilegivel.md"
+  if [ -r "${base}/b/.claude/ilegivel.md" ]; then
+    record_skip "sandbox-chardev: (b) chmod 000 não tira a leitura aqui (root?) — arquivo ilegível NÃO reproduzido"
+  else
+    rc=0; out="$(_scd_run "${base}/b" bash .claude/validation/lint-artifacts.sh 2>&1)" || rc=$?
+    if [ "${rc}" -eq 2 ] && grep -q 'ilegivel.md.*Permission denied' <<< "${out}" && ! grep -q 'loop.md' <<< "${out}"; then
+      record_pass "sandbox-chardev: (b) [${mode}] arquivo regular ilegível → o lint NÃO julga (rc=2) e nomeia o arquivo; o dispositivo segue pulado"
+    else record_fail "sandbox-chardev: (b) [${mode}]" "o ilegível regular foi calado ou o dispositivo vazou: rc=${rc}: $(grep -E 'denied|Pulados' <<< "${out}" | head -2)"; fi
+  fi
+  chmod 644 "${base}/b/.claude/ilegivel.md" 2>/dev/null || true
+  # (c-MUT) o _find volta ao glob sem checagem de tipo → o awk abre o loop.md e o lint morre
+  sed 's/ ! "\${_CHARDEV_TYPE\[@\]}"//' "${lint}" > "${base}/mut-c.sh"
+  _scd_tree "${base}/c" "${base}/mut-c.sh"
+  local ri=0 rm_=0; _scd_case "${base}/a" || ri=$?; _scd_case "${base}/c" || rm_=$?
+  _prove_mutation "sandbox-chardev: (c-MUT) [${mode}] sem o filtro do _find o lint volta a morrer no dispositivo" "${lint}" "${base}/mut-c.sh" "${ri}" "${rm_}"
+  # (d-MUT) `-type c` no lugar de `-xtype c`: no bwrap o d_type do ponto de montagem diz "regular"; no link o tipo é `l`
+  if find "${base}" -maxdepth 0 -xtype d >/dev/null 2>&1; then
+    sed 's/_CHARDEV_TYPE=(-xtype c)/_CHARDEV_TYPE=(-type c)/' "${lint}" > "${base}/mut-d.sh"
+    _scd_tree "${base}/d" "${base}/mut-d.sh"
+    rm_=0; _scd_case "${base}/d" || rm_=$?
+    _prove_mutation "sandbox-chardev: (d-MUT) [${mode}] com -type c no lugar de -xtype c o dispositivo passa por regular" "${lint}" "${base}/mut-d.sh" "${ri}" "${rm_}"
+  else
+    record_skip "sandbox-chardev: (d-MUT) find sem -xtype (BSD) — o ramo -type c é o certo aqui, nada a provar"
+  fi
+  # (e) o retrato da bancada: com as exclusões o dispositivo não viaja e a extração passa; sem elas ele viaja
+  mkdir -p "${base}/e/docs" && _scd_tree "${base}/e" "${lint}"
+  local re=0 rem=0
+  _scd_run "${base}/e" bash -c '. /dev/stdin; mapfile -t x < <(_chardev_excludes "$PWD"); tar -cf "$1" "${x[@]}" .claude docs' _ "${base}/e.tar" \
+    < <(declare -f _chardev_excludes) >/dev/null 2>&1 || re=$?
+  mkdir -p "${base}/ex"; tar -C "${base}/ex" -xf "${base}/e.tar" >/dev/null 2>&1 || re=$?
+  { [ "${re}" -eq 0 ] && [ ! -e "${base}/ex/.claude/loop.md" ] && [ ! -L "${base}/ex/.claude/loop.md" ]; } || re=1
+  _scd_run "${base}/e" tar -cf "${base}/e-mut.tar" .claude docs >/dev/null 2>&1 || true
+  mkdir -p "${base}/exm"; tar -C "${base}/exm" -xf "${base}/e-mut.tar" >/dev/null 2>&1 || rem=$?
+  { [ -e "${base}/exm/.claude/loop.md" ] || [ -L "${base}/exm/.claude/loop.md" ]; } && rem=1
+  if [ "${re}" -eq 0 ] && [ "${rem}" -ne 0 ]; then
+    record_pass "sandbox-chardev: (e) [${mode}] retrato com _chardev_excludes não leva o dispositivo; (e-MUT) sem as exclusões ele viaja"
+  else record_fail "sandbox-chardev: (e) [${mode}]" "com exclusões rc=${re} · sem exclusões rc=${rem} (esperado 0 e ≠0)"; fi
+  unset -f _scd_tree _scd_run _scd_case
+  rm -rf "${base}"
 }
 
 run_site_deeplink_selftests() {
@@ -40752,6 +40868,7 @@ run_role_scope_selftests() {
 # _family run_hook_autofix_selftests — aposentada na F4 das portas (ver o comentário no lugar da função)
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
+_family run_sandbox_chardev_selftests
 _family run_site_deeplink_selftests
 _family run_plugin_private_url_selftests
 _family run_deploy_site_selftests
