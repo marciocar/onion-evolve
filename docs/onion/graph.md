@@ -347,6 +347,14 @@ command-creator-specialist	related	/meta/create-command
 command-creator-specialist	related	agent-creator-specialist	
 command-creator-specialist	related	claude-code-specialist	
 command-creator-specialist	related	gitflow-specialist	
+consultoria-analise-de-caso	adopts	onion-evolve	
+consultoria-analise-de-caso	mode	greenfield	
+consultoria-analise-de-caso	pin	6c4272252528	
+consultoria-analise-de-caso	specialization	consultoria	
+consultoria-analise-de-caso	specialization	extract-meeting	
+consultoria-analise-de-caso	specialization	pain-price	
+consultoria-analise-de-caso	tier	standalone	
+consultoria-analise-de-caso	trust-advises	onion-evolve	
 core	announces	adopter	doc-bridge
 core	co-evolves	adopter	
 corporate-compliance-specialist	related	/docs/build-compliance-docs	

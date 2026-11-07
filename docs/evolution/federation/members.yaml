@@ -901,6 +901,33 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: consultoria-analise-de-caso
+    # ⚠️ SLUG NEUTRO POR DECISÃO (mesma razão de vendas-pdi-enterprise): o id, o `name` e o
+    #    `personality_summary` vão para as superfícies PROJETADAS e o core é PÚBLICO. Quem é o cliente
+    #    vive no CLAUDE.md do adotante e na fonte privada de termos (P8 do projection-safety.sh).
+    #    Registro atrasado (adoção de 2026-10-29), feito em 2026-11-07 por decisão do maestro (/meta:decide).
+    name: consultoria-analise-de-caso (adotante de consultoria — análise de caso)
+    role: standalone            # TIER 3 — adota o core direto; o carimbo vivo diz `adopted` (par da REGRA 92)
+    kind: adopter
+    parent: onion-evolve
+    remote: n/a       # PRIVADO; fica fora daqui porque o nome do repo leva o do cliente (o origin real está no clone)
+    local_path: n/a   # idem: o caminho do clone leva o nome do cliente; a sessão do core o resolve pelo maestro
+    onion_version: 6c4272252528   # pin-ok por pin-integrity-check.sh em 2026-11-07 (antes do update)
+    integration_branch: main
+    adopted_at: 2026-10-29
+    mode: greenfield
+    # ⚠️ material do cliente vive em `_material/`, IGNORADO pelo git; nunca entra em commit/PR/nome de arquivo.
+    personality_summary: "Adotante de consultoria: o cérebro de um caso de consultoria de IA para um cliente real (reuniões extraídas em grafo, análise de dor e preço, proposta). O material bruto não viaja; o que viaja é o que deriva dele."
+    specializations: [consultoria, extract-meeting, pain-price]
+    personality_last_sync: 2026-11-07
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>

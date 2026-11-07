@@ -243,9 +243,9 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-11-04"
-    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Opção 1, com passo a passo para disparar o gatilho de verdade; projetos de outras empresas (brain-granaai, brain-dufrio, sge) contam como externos»"
-    label: "O maestro aceita a direção do degrau 2 da orquestração (proposta de mercado da curadoria) com construção no gatilho, e pede um passo a passo para disparar o gatilho de verdade, tratando como externos os projetos de outras empresas (brain-granaai, brain-dufrio, sge)."
-    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Opção 1, com passo a passo para disparar o gatilho de verdade; projetos de outras empresas (brain-granaai, brain-dufrio, sge) contam como externos» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Aceitar e construir já» · «Ainda não»."
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Opção 1, com passo a passo para disparar o gatilho de verdade; projetos de outras empresas (brain-granaai, consultoria-analise-de-caso, sge) contam como externos»"
+    label: "O maestro aceita a direção do degrau 2 da orquestração (proposta de mercado da curadoria) com construção no gatilho, e pede um passo a passo para disparar o gatilho de verdade, tratando como externos os projetos de outras empresas (brain-granaai, consultoria-analise-de-caso, sge)."
+    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Opção 1, com passo a passo para disparar o gatilho de verdade; projetos de outras empresas (brain-granaai, consultoria-analise-de-caso, sge) contam como externos» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Aceitar e construir já» · «Ainda não»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-04: «O que fazer com a proposta do degrau 2 da orquestração de sessões?»"
