@@ -2,7 +2,8 @@
 branch: fix/merge-verified-repo-without-ci
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3497942c82413b11c01dcc72e16c6d553f201eebfe971bb3d63e82bab0073119
+reviewed_code_sha256: 16fa79f267aec4b47318c8e4024bb9ab166da18b4284927246228ae0cfb17580
 findings_total: 6
 findings_real: 4
 findings_blocking: 0
