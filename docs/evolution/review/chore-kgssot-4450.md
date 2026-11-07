@@ -2,7 +2,8 @@
 branch: chore/kgssot-4450
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7963364708edef306b9fd867c2e07f6aa39d68680ad800b5c6bd11ba37cc8a38
+reviewed_code_sha256: b527f9a75b2536f28f5d3d286124a3a2acfd78f56957f2c00b0d0a986381bdd7
 findings_total: 6
 findings_real: 0
 findings_blocking: 0
