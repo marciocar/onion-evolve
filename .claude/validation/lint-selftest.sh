@@ -7816,8 +7816,9 @@ run_vendor_push_trailer_selftests() {
     else body="$(git -C "$a" log -1 --format=%B "$ib")"; [ "$(git -C "$a" rev-list --parents -1 "$ib" | wc -w)" -eq 3 ] || { rm -rf "$w"; return 1; }; fi
     rm -rf "$w"
     # a linha da sessão vem LOGO abaixo da assinatura, uma vez só
+    local after; after="$(grep -A1 -xF 'Assinado-pelo-adotante-de-teste' <<< "$body")"
     grep -qxF "$want" <<< "$body" && [ "$(grep -c '^Claude-Session:' <<< "$body")" = 1 ] \
-      && grep -A1 -xF 'Assinado-pelo-adotante-de-teste' <<< "$body" | grep -qxF "$want"
+      && grep -qxF "$want" <<< "$after"
   }
   # ── (e) SEM SESSÃO conhecida (ou com forma inválida): nenhuma linha, e a nota é dita ─────────────
   _vpt_case_no_session() {
