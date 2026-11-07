@@ -120,6 +120,8 @@ escada (sem `x_dissect_level`: a ideia não sustenta o veredito de uso, nem prec
     candidate: true            # ideia candidata a entrar
     value: 3                   # valor estimado, 1 a 5 (obrigatório na candidata)
     value_why: "daria aresta à opção descartada, que hoje é prosa"
+    destination: "onion-kg-ssot:docs/onion/graph/kg-ssot-product.kg.yaml#Q_..."  # quem CONSOME a ideia
+    # destination: nenhum  +  destination_why: "..."   (quando nenhum repo, nó ou issue a consome)
     # piece: D_PIECE_X         # obrigatório quando o meta declara x_dissect_pieces
 ```
 
@@ -136,10 +138,26 @@ escada (sem `x_dissect_level`: a ideia não sustenta o veredito de uso, nem prec
   entrar sem o código.
 - **Objeto em peças:** cada peça é um objeto e tem as suas ideias (`piece:`). O veredito de uma peça
   não colhe pelas outras.
+- **Toda ideia tem destino.** `destination` é o que a consome: o nó de um repo
+  (`<repo>:<caminho>#<ID>`, a forma do selo), a issue (`SAC-123`) ou a URL dela. Se nada a consome,
+  vale `destination: nenhum` com `destination_why`. Isso nasce de um censo de 2026-11-07 nos três repos.
+  Nenhum grafo tinha marcador de colheita, e o padrão dominante não era "barrado sem ler". Era "lido até
+  o N2, ideia citada no rótulo do veredito e nunca entregue a quem consome". Os nós `x_dissect_idea` são
+  o marcador contável (`git grep -c 'x_dissect_idea:'`), e o `--context` do checador mostra, por
+  estudo, as ideias e quantas têm destino.
+- **A candidata que o parque nomeia é ponteiro, não prosa.** Um parque que diz "a candidata X o
+  superaria" declara `x_dissect_candidate: [<repo>:]<caminho>.kg.yaml#<ID>`, apontando o veredito ou
+  a peça da candidata. Se a candidata for rejeitada depois (veredito `rejeitar`, ou status `refuted` ou
+  `superseded`), o gatilho do parque ficou **órfão**: espera por quem não vai chegar. Caso real: o
+  parque do canal neutro da curadoria nomeia o MCP Agent Mail, rejeitado pela licença em 2026-11-06.
+  No parque aberto isso reprova (`gatilho-orfao`). No parque já selado sai como aviso, para o destino
+  reabrir, como no gatilho disparado. Candidata em outro repo o checador não lê, e diz isso no aviso
+  `candidata-fora-do-repo`.
 
 **Quem cobra:** o item 9 do `dissect-object-check.sh` (§6), com os códigos `sem-registro-de-ideias`,
-`peca-sem-ideias`, `ideias-tipo-descoberto`, `ideia-sem-comparativo`, `ideia-sem-fonte`,
-`ideia-candidata-sem-valor`, `ideia-tipo-invalido`, `ideia-mal-formada` e `ideia-sem-peca`. Ele
+`peca-sem-ideias`, `ideias-tipo-descoberto`, `ideia-sem-comparativo`, `ideia-sem-fonte`, `ideia-sem-destino`,
+`ideia-candidata-sem-valor`, `ideia-tipo-invalido`, `ideia-mal-formada` e `ideia-sem-peca`, e o
+item 10 com `gatilho-orfao`, `candidata-inexistente` e `candidata-mal-formada`. Ele
 julga **forma e cobertura**. Se a ideia é boa e se o valor está bem estimado, quem julga é o
 Elenxo. **Corte por data:** a régua vale para o estudo cuja Etapa 0 (`x_criterion.registered_at`)
 é de 2026-11-07 em diante. No estudo anterior, a mesma lista sai como `aviso item 9`, com rc 0,
@@ -369,9 +387,9 @@ arestas `SUPERSEDES` em volta de um nó do próprio estudo, nunca `drifted`. O t
 sentido de sempre.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
-mediu, nunca aprovação) confere os 9 itens — família e aresta, veredito da família, destino, quem paga e o não
+mediu, nunca aprovação) confere os 10 itens — família e aresta, veredito da família, destino, quem paga e o não
 verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
-nível 1, e o registro de ideias (§1c) — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
+nível 1, o registro de ideias e a candidata nomeada pelo parque (§1c) — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
 2026-10-24 (sem `x_study_destination`) fica fora por desenho; rodar o checador direto sobre ele lista o que falta
 para migrar. Bancada: `run_dissect_object_selftests`.
