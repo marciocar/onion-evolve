@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1021 itens abertos** em 155 grafo(s) com aberto (de 196 no escopo) · 154 grupo(s), agrupados por `owner:` (58 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1018 itens abertos** em 154 grafo(s) com aberto (de 195 no escopo) · 153 grupo(s), agrupados por `owner:` (56 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -928,7 +928,7 @@
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
 
-## core — 28 item(ns)
+## core — 26 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -937,7 +937,6 @@
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
 | 15.0 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
 | 12.0 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
-| 9.0 | `Q_CS_PESQUISA_PADROES_MENSAGERIA_1106` | comms-stable-2026-11 | Pesquisa curta de padrões da mensageria de agentes em novembro de 2026: envelope e protocolo (A2A, CloudEvents), fila com entrega |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
@@ -947,7 +946,6 @@
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
-| 4.2 | `Q_CS_ORIENTACAO_COMPLIANCE_1106` | comms-stable-2026-11 | Orientação ao hub sobre o registro de mudança planejada (perguntas 1 a 4) com nós no grafo, entregue hoje; a forja do comando  |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
@@ -1300,12 +1298,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 12.0 | `Q_PORT_SPIKES_RODADA_2_LACUNAS_1104` | port-spikes-qwen-vibe-2026-11 | Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen;  |
-
-## private-names-2026-11 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
 
 ## dissect-forge-2026-10 — 2 item(ns)
 
