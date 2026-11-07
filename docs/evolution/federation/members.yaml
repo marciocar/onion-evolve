@@ -22,6 +22,7 @@
 # o de porta, com `ops/door-seal-pin.sh`.
 # `vendor_push: true` (opcional, 2026-11-07): o membro CONSENTE que o `/meta:adopt --update` do core empurre a
 # onion/vendor dele por fast-forward, relatado. Ausente = não consentiu: a remota não é tocada (vendor-branch.sh).
+# O consentimento vale só para o `remote:` do membro: o push tem de ir para a URL de push igual a ele.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
