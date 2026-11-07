@@ -14886,10 +14886,10 @@ run_member_path_selftests() {
   local _with _without
   _with="$(ONION_MEMBER_PATHS_FILE="${tmp}/map.tsv" bash "${REPO_ROOT}/ops/registry-pins.sh" --check --members "${tmp}/members.yaml" --only membro-neutro --no-remote 2>&1 || true)"
   _without="$(ONION_MEMBER_PATHS_FILE="${tmp}/ausente.tsv" bash "${REPO_ROOT}/ops/registry-pins.sh" --check --members "${tmp}/members.yaml" --only membro-neutro --no-remote 2>&1 || true)"
-  if printf '%s\n' "${_with}" | grep -q '^membro-neutro .*clone' && ! printf '%s\n' "${_with}" | grep -q 'ILEGÍVEL: sem remoto'; then
+  if grep -q '^membro-neutro .*clone' <<< "${_with}" && ! grep -q 'ILEGÍVEL: sem remoto' <<< "${_with}"; then
     record_pass "member-path: registry-pins lê o clone pelo mapa quando o registro diz n/a"
   else record_fail "member-path: registry-pins com mapa" "$(printf '%s\n' "${_with}" | grep membro-neutro | head -1)"; fi
-  if printf '%s\n' "${_without}" | grep -q 'ILEGÍVEL'; then
+  if grep -q 'ILEGÍVEL' <<< "${_without}"; then
     record_pass "member-path: sem mapa o membro n/a segue ILEGÍVEL declarado (o resolvedor não inventa)"
   else record_fail "member-path: registry-pins sem mapa" "$(printf '%s\n' "${_without}" | grep membro-neutro | head -1)"; fi
   # (4) REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): com o mapa, o adotante n/a sai do NÃO-MEDIDO
@@ -14897,7 +14897,7 @@ run_member_path_selftests() {
   local _r92w _r92o
   _r92w="$(ONION_MEMBER_PATHS_FILE="${tmp}/map.tsv" bash "${REPO_ROOT}/.claude/validation/door-role-parity-check.sh" "${tmp}/core" 2>&1 || true)"
   _r92o="$(ONION_MEMBER_PATHS_FILE="${tmp}/ausente.tsv" bash "${REPO_ROOT}/.claude/validation/door-role-parity-check.sh" "${tmp}/core" 2>&1 || true)"
-  if ! printf '%s\n' "${_r92w}" | grep -q 'INALCANÇÁVEL' && printf '%s\n' "${_r92o}" | grep -q 'INALCANÇÁVEL'; then
+  if ! grep -q 'INALCANÇÁVEL' <<< "${_r92w}" && grep -q 'INALCANÇÁVEL' <<< "${_r92o}"; then
     record_pass "member-path: REGRA 92 mede o adotante n/a pelo mapa, e sem ele declara NÃO MEDIDA"
   else record_fail "member-path: REGRA 92" "com mapa: $(printf '%s' "${_r92w}" | tr '\n' ' ' | cut -c1-120) · sem: $(printf '%s' "${_r92o}" | tr '\n' ' ' | cut -c1-120)"; fi
   rm -rf "${tmp}"
