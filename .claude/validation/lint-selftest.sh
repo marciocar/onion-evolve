@@ -14903,6 +14903,40 @@ run_member_path_selftests() {
   rm -rf "${tmp}"
 }
 
+# ── REGRA 119 (O diff não acrescenta nome de repo ou de clone de adotante não federado) — private-name-check.sh ──
+# Defeito datado (2026-11-04): o nome do repo de um adotante de consultoria, que leva o do cliente, entrou num selo
+# de grafo do core público, e nenhuma guarda viu, porque o termo não estava em lista nenhuma. A cura DERIVA os nomes
+# da máquina. Esta família roda as polaridades do helper (nomes INVENTADOS) e os DOIS mutantes que o brief pediu:
+# o que não deriva e o que imprime o termo. Cada mutante tem de reprovar o selftest; a âncora que não casa reprova.
+run_private_name_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/private-name-check.sh"
+  if [ ! -f "${helper}" ]; then record_fail "private-name" "helper ausente: ${helper}"; return; fi
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    record_skip "private-name: pulado (sem python+yaml)"; return; fi
+  local _out _rc=0
+  _out="$(LC_ALL=C bash "${helper}" --selftest 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass "private-name: polaridades ($(tail -1 <<< "${_out}"))"
+  else record_fail "private-name: polaridades" "$(grep '✗' <<< "${_out}" | head -3 | tr '\n' ' ')"; fi
+  local tmp; tmp="$(mktemp -d)" || { record_fail "private-name" "mktemp falhou"; return; }
+  # mutante 1: NÃO DERIVA (o conjunto da máquina vazio = a guarda por lista que falhou em 2026-11-04)
+  sed 's/^derived = {c for c in cands if c.lower() not in fed and len(c) >= 4}$/derived = set()/' "${helper}" > "${tmp}/m1.sh"
+  # mutante 2: IMPRIME O TERMO no lugar do hash
+  sed 's/acrescenta um nome privado (hash {h8(t)})"/acrescenta um nome privado (hash {t})"/' "${helper}" > "${tmp}/m2.sh"
+  local _m _name
+  for _m in m1 m2; do
+    case "${_m}" in m1) _name="o mutante que não deriva" ;; m2) _name="o mutante que imprime o termo" ;; esac
+    if cmp -s "${helper}" "${tmp}/${_m}.sh"; then record_fail "private-name: ${_name}" "a âncora do mutante não casou (o sed não mudou nada)"; continue; fi
+    _rc=0; LC_ALL=C bash "${tmp}/${_m}.sh" --selftest >/dev/null 2>&1 || _rc=$?
+    if [ "${_rc}" -ne 0 ]; then record_pass "private-name: ${_name} é morto pelo selftest"
+    else record_fail "private-name: ${_name}" "passou verde — o caso que devia mordê-lo é enfeite"; fi
+  done
+  rm -rf "${tmp}"
+  # o dispatcher do lint registra a guarda (registro é parte da forja)
+  if grep -q '^check_private_name_diff$' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"; then
+    record_pass "private-name: REGRA 119 registrada no dispatcher do lint"
+  else record_fail "private-name: registro" "check_private_name_diff não é chamado no lint-artifacts.sh"; fi
+}
+
 run_resolve_target_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/co-evolution/resolve-target.sh"
   if [ ! -f "${helper}" ]; then record_fail "resolve-target" "helper ausente: ${helper}"; return; fi
@@ -30626,6 +30660,7 @@ _family run_forced_model_selftests
 _family run_pre_push_selftests
 _family run_resolve_target_selftests
 _family run_member_path_selftests
+_family run_private_name_selftests
 
 # Modo reconcile-inputs — insumos determinísticos do /meta:co-announce --reconcile (conciliação de backlog).
 _family run_reconcile_inputs_selftests
