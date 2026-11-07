@@ -2,14 +2,13 @@
 branch: feat/member-paths-local-map
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 6a9a95d6db05ffded8d3740db164121dfe28120959db427a3c6faca2aba9f7d5
-reviewed_code_sha256: 88f7adb2a43bb4641637c8fd3651169b3519c2077c5daf58c82f883fd4b6e33f
-findings_total: 5
-findings_real: 3
+reviewed_diff_sha256: pendente
+findings_total: 6
+findings_real: 4
 findings_blocking: 0
 tokens: 0
 duration_min: 15
-findings_fixed: 3
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: agente de execução da sessão do core (passada própria, não independente; o brief proibiu subagente)
@@ -55,6 +54,10 @@ nota: "tokens 0 = não medido. Nenhum nome de cliente, de repo ou de clone entro
    linha de erro do bash.
 5. **Não é defeito.** No CI e em `env -i` o mapa não existe (sem `HOME` ou sem o arquivo): o resultado é o
    mesmo de antes (ILEGÍVEL e NÃO-MEDIDO declarados), e é determinístico.
+
+6. **Real, curado.** Os dois nós de teto do grafo estavam `confirmed` sem `provenance`, e o contrato
+   KG-SSOT do commit (o passo do CI) reprovou no `pr-finalize`. Ganharam fonte, localizador e método
+   (`reading:`).
 
 ## Bancada
 
