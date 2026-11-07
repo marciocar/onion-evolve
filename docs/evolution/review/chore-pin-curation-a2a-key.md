@@ -2,7 +2,7 @@
 branch: chore/pin-curation-a2a-key
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: cc1d928e80006e3f97895132fc6f1449e7ce7b7c419bb66124f30039541a5028
+reviewed_diff_sha256: 7fee1e32201ee6591f596f9687b832f26e48d6b0d5ca52a5394068458a88ffc3
 reviewed_code_sha256: 15f3dbdd1d8412a726bf297ecdd66229176dad1b52f78036b45d9840803585f5
 findings_total: 1
 findings_real: 1
