@@ -2,8 +2,7 @@
 branch: fix/adopt-update-vendor-push-session-trailer
 pr: 1533
 date: 2026-11-07
-reviewed_diff_sha256: b3335af2b8dc63d0f70399a313df902fd72978947df569b56b3613153d008cb3
-reviewed_code_sha256: dd7a41a6e283c62f833193f504e9de975b2eec5925d0df9bd27c8365756490a4
+reviewed_diff_sha256: pendente
 findings_total: 27
 findings_real: 27
 findings_blocking: 8
@@ -91,6 +90,10 @@ Fixtura `t5.sh` do refutador, numa cópia com os helpers desta cura:
 - D5: só :443 e :22 casam.
 
 Nada rodou em repo de adotante real.
+
+## Re-revisão: âncora morta que reprovou o CI (faixa 4)
+
+O CI no ee80ccf reprovou só em `selftest-lanes: (0) ancora morta`. O caso (B3n) extraía `_norm_remote` por `sed -n '/^_norm_remote()/'`, e a guarda só aceita âncora em `.claude/validation/*.sh` e `.claude/hooks/*.sh`; a função mora em `.claude/utils/adopt/vendor-branch.sh`. A cura não afrouxa a guarda: o helper ganhou o modo `vendor-branch.sh --norm-remote <url>` (rc 1 = recusada), e o (B3n) chama o helper REAL por ele. `LC_ALL=C bash .claude/validation/lint-selftest.sh --families selftest_lanes,vendor_push_trailer`: 67 passaram, 0 falharam.
 
 ## Mutantes
 
