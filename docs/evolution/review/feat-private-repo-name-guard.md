@@ -2,8 +2,7 @@
 branch: feat/private-repo-name-guard
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 12c1eaa0f2f9e778968282b3fb22b2a27ecd3edf3673f5f2dd23e6f0acc5d3b7
-reviewed_code_sha256: e3d46bfb3ad6ff8fe1c7f4ac716c01cac4e8f57a939916462cc15be35aeab824
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 6
 findings_blocking: 2
@@ -75,3 +74,13 @@ A família `private_name` roda o selftest do helper (18 casos com nomes inventad
 mutantes pedidos, com âncora que reprova se não casar: o que não deriva e o que imprime o termo. Os dois
 morrem. Por fim, confere o registro no dispatcher. A família `shell_pipefail_robustness` fica verde: os
 vereditos leem por here-string.
+
+## Re-revisão após o rebase (07/11)
+
+O rebase sobre a origin/main, depois de #1520, #1526 e #1527, deu conflito real em
+`lint-selftest.sh`, no mesmo ponto onde entrou a família `member_path`. Resolvi à mão e mantive as duas
+funções inteiras: `run_member_path_selftests` fechada, e `run_private_name_selftests` em seguida, com as
+duas linhas `_family`. As projeções em conflito ficaram com a versão da main, e o motor as regenera. Os
+selftests das famílias `private_name`, `member_path`, `sandbox_chardev`, `shell_pipefail_robustness` e
+`selector_per_file` passaram (30 passaram, 0 falharam), e o registro de regras está em sincronia. O código
+da guarda não mudou.
