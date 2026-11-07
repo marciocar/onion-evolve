@@ -156,11 +156,11 @@ nodes:
     plane: DEV
     status: open
     owner: maestro
-    x_due: "2026-11-06"
+    x_due: "2026-11-08"
     impact: 5
-    confidence: 0.6
+    confidence: 0.7
     label: "O app Slack interno do hub existe, com Socket Mode e escopos mínimos, os tokens de bot e de app guardados pelo maestro fora do chat, e o channelsEnabled ligado na organização do Claude."
-    narrative: "Pronto quando: o maestro seguiu os cards do core (manifesto do app pronto, passo de guardar os tokens sem passar pelo chat) e confirmou. Atos do maestro: credencial e configuração da organização."
+    narrative: "Pronto quando: o maestro seguiu os cards do core (manifesto do app pronto, passo de guardar os tokens sem passar pelo chat) e confirmou. Atos do maestro: credencial e configuração da organização. Estado em 2026-11-07: o app 'Onion Persona (piloto)' existe no workspace do hub com o manifesto do onion-bridge PR #94 (5 escopos, Socket Mode), criado e ajustado pelo core pelo navegador do maestro; faltam a instalação, os dois tokens e a chave da Anthropic no Vaultwarden. O channelsEnabled não se aplica ao login do core (conta individual, sem configuração de organização); no login do hub, confere-se em claude.ai/admin-settings. Prazo movido de 06/11 para 08/11 (cards entregues ao hub em 07/11); o degrau 2 ainda cabe na segunda se os tokens existirem até 08/11."
   - id: Q_CS_DEGRAU1_CAMPAINHA_1109
     node_type: question
     layer: audit
