@@ -14930,6 +14930,19 @@ run_private_name_selftests() {
     if [ "${_rc}" -ne 0 ]; then record_pass "private-name: ${_name} é morto pelo selftest"
     else record_fail "private-name: ${_name}" "passou verde — o caso que devia mordê-lo é enfeite"; fi
   done
+  # o MODO que o lint consome (--tsv), ponta a ponta, num sandbox com nomes inventados
+  local sb="${tmp}/maq" core="${tmp}/maq/core-neutro" _tsv
+  mkdir -p "${sb}/clone-ficticio-omega/.claude" "${core}/docs/evolution/federation"
+  git -C "${sb}/clone-ficticio-omega" init -q >/dev/null 2>&1; printf 'role: adopted\n' > "${sb}/clone-ficticio-omega/.claude/.onion-version"
+  git -C "${core}" init -q -b main >/dev/null 2>&1; printf 'members:\n  - id: membro-neutro\n' > "${core}/docs/evolution/federation/members.yaml"
+  printf 'base\n' > "${core}/a.md"; git -C "${core}" add -A >/dev/null 2>&1
+  git -C "${core}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1; git -C "${core}" update-ref refs/remotes/origin/main HEAD
+  printf 'base\nveja clone-ficticio-omega\n' > "${core}/a.md"
+  : > "${tmp}/ct.txt"
+  _tsv="$(ONION_SIBLINGS_DIR="${sb}" ONION_MEMBER_PATHS_FILE="${tmp}/sem-mapa.tsv" ONION_CLIENT_TERMS_FILE="${tmp}/ct.txt" LC_ALL=C bash "${REPO_ROOT}/.claude/validation/private-name-check.sh" "${core}" --tsv 2>&1 || true)"
+  if grep -q $'^HARD\tNOME-PRIVADO\ta.md\tlinha 2 ' <<< "${_tsv}" && ! grep -q 'clone-ficticio-omega' <<< "${_tsv}"; then
+    record_pass "private-name: --tsv (o modo do lint) acusa arquivo e linha com hash, sem o termo"
+  else record_fail "private-name: --tsv" "$(head -2 <<< "${_tsv}" | tr '\n' ' ')"; fi
   rm -rf "${tmp}"
   # o dispatcher do lint registra a guarda (registro é parte da forja)
   if grep -q '^check_private_name_diff$' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"; then
