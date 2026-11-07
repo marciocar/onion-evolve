@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dissect-object-check — o checador de forma da dissecação de QUALQUER objeto (família, Etapa 0, veredito, destino).
 
-Cobra, por comando, os 8 itens da §6 da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
+Cobra, por comando, os 9 itens (8 da §6 e o registro de ideias da §1c) da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
 de UM estudo e o git log. Determinístico, sem LLM e sem rede.
 
   item 1  x_dissect_tool, x_dissect_family e a aresta TRACES_TO para o registro existem e concordam
@@ -16,6 +16,12 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
           no parque JÁ SELADO (done + x_dissect_sealed_by válido) o disparo não reprova: sai como AVISO, porque é o
           que o destino precisa ver para reabrir (achado da curadoria em 2026-10-25)
   item 8  app com N2 sem artefato aberto nem uso observado: nível máximo 1 e veredito parquear
+  item 9  o REGISTRO DE IDEIAS, em toda dissecação (estudo, veredito positivo, negativo e a que o eliminatório
+          encerra): nós com x_dissect_idea {kind, onion, why, source}, cobrindo funcionalidade, estratégia e decisão
+          de desenho (ou a lacuna declarada em x_dissect_ideas_gap), e a ideia candidata com valor estimado. O
+          eliminatório barra o USO do código, nunca a colheita (crítica do maestro de 2026-11-07: o quicue-kg saiu
+          rejeitado pelo E1 com as lições medidas "fora da escada", e o imessage e o MCP Agent Mail saíram pelo E1/E2
+          sem uma ideia registrada). Com peças, cada peça é um objeto e tem as SUAS ideias (x_dissect_idea.piece).
 
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
@@ -76,6 +82,15 @@ UNCOMMITTED_CODES = {"stage0-nao-commitado", "n0-nao-commitado"}
 # a lista branca do gatilho: só flags de seleção do kg_query; nada que leia estado transitório
 TRIGGER_FLAGS = {"--id", "--id-prefix", "--type", "--status", "--plane", "--layer", "--file", "--text",
                  "--around", "--depth", "--edge-type", "--direction"}
+# a régua do item 9 vale para o estudo cuja Etapa 0 foi registrada a partir daqui; o anterior sai como AVISO (rc 0) com
+# a mesma lista, para o update não pôr em vermelho o corpus de um adotante que roda o checador sobre TODOS os estudos
+# no CI (a curadoria tem 22) e travar atualizações alheias à colheita. A dívida fica visível e a colheita, a cargo dele.
+IDEAS_SINCE = "2026-11-07T00:00:00+00:00"
+IDEA_KINDS = ("funcionalidade", "estrategia", "decisao-de-desenho")
+IDEA_ONION = {"temos", "nao-temos", "diferente"}
+# a fonte da ideia: arquivo:linha (com pino ou caminho upstream, ex. repo@sha:src/x.py:42 ou core/decision.cue:14-17)
+# ou o doc por URL; texto solto ("o README") não se reencontra
+IDEA_SOURCE = re.compile(r"^(https?://\S+|\S+:\d+(-\d+)?)$")
 TRIGGER_PERSISTENT_STATUS = {"superseded", "done"}  # medido no 1º estudo do adotante: contar estado transitório fazia o gatilho nunca valer
 
 
@@ -236,6 +251,11 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
     if not isinstance(meta.get("x_unverified"), list):
         add(4, "sem-x_unverified", "meta.x_unverified ausente: a lista do que não foi verificado (vazia vale, ausente não)")
 
+    # item 9 — o registro de ideias vem ANTES do veredito: é obrigatório em toda dissecação, e os retornos cedo do item 2
+    # (estudo, veredito ausente, peças mal formadas) não podem pulá-lo
+    legacy = registered_before(by_id.get("S_STAGE0"), IDEAS_SINCE)
+    ideas_check(add if not legacy else (lambda item, code, detail: note(9, code, "Etapa 0 anterior a %s, aviso e não achado: %s" % (IDEAS_SINCE[:10], detail))), meta, nodes, by_id)
+
     # item 2 — um veredito (ou um por peça declarada), do vocabulário da família, e o que o Elenxo sustentou
     for n in nodes:  # o apelido e o campo dizendo coisas diferentes: qual dos dois o destino sela?
         if n.get("x_dissect_verdict") is not None and n.get("x_piece_verdict") is not None and str(n["x_dissect_verdict"]) != str(n["x_piece_verdict"]):
@@ -309,6 +329,70 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
             if any(v != "parquear" for v in verdicts):
                 add(8, "app-sem-artefato-veredito", "N2 sem artefato limita o veredito a parquear; achado %s" % verdicts)
     return findings
+
+
+def registered_before(s0, since):
+    """True só quando o x_criterion.registered_at do S_STAGE0 é legível e anterior a `since`. Ilegível ou ausente não é
+    anterior: a régua vale (o item 5 já acusa o S_STAGE0 que falta)."""
+    import datetime
+    crit = s0.get("x_criterion") if isinstance(s0, dict) else None
+    raw = crit.get("registered_at") if isinstance(crit, dict) else None
+    try:
+        when = datetime.datetime.fromisoformat(str(raw))
+    except (TypeError, ValueError):
+        return False
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=datetime.timezone.utc)
+    return when < datetime.datetime.fromisoformat(since)
+
+
+def ideas_check(add, meta, nodes, by_id):
+    """item 9: a colheita de ideias. Forma, cobertura dos 3 tipos por objeto e valor da candidata; não a qualidade."""
+    ideas = [n for n in nodes if "x_dissect_idea" in n]
+    pieces = meta.get("x_dissect_pieces")
+    piece_ids = [p for p in pieces if isinstance(p, str) and p in by_id] if isinstance(pieces, list) else []
+    if not ideas:
+        add(9, "sem-registro-de-ideias", "nenhum nó com x_dissect_idea: toda dissecação registra as funcionalidades, as estratégias e as decisões de desenho do objeto, com o comparativo ao Onion e a fonte, inclusive a que o eliminatório encerra (ele barra o uso do código, nunca a colheita)")
+        return
+    owners = {}  # objeto (None = o estudo inteiro; ou o id da peça) → tipos cobertos
+    for n in ideas:
+        nid, idea = n.get("id"), n.get("x_dissect_idea")
+        if not isinstance(idea, dict):
+            add(9, "ideia-mal-formada", "%s: x_dissect_idea tem de ser um mapa {kind, onion, why, source}" % nid)
+            continue
+        kind = idea.get("kind")
+        if kind not in IDEA_KINDS:
+            add(9, "ideia-tipo-invalido", "%s: kind=%r; exigido %s" % (nid, kind, " | ".join(IDEA_KINDS)))
+        onion, why = idea.get("onion"), idea.get("why")
+        if onion not in IDEA_ONION or not (isinstance(why, str) and why.strip()):
+            add(9, "ideia-sem-comparativo", "%s: o comparativo ao Onion exige onion: temos | nao-temos | diferente e why (o que a régua faz e por quê); achado onion=%r" % (nid, onion))
+        src = idea.get("source")
+        if not (isinstance(src, str) and IDEA_SOURCE.match(src.strip())):
+            add(9, "ideia-sem-fonte", "%s: source=%r; exigido arquivo:linha (ex. core/decision.cue:14-17) ou a URL do doc" % (nid, src))
+        if idea.get("candidate") is True:
+            v = idea.get("value")
+            if not (isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 5 and isinstance(idea.get("value_why"), str) and idea["value_why"].strip()):
+                add(9, "ideia-candidata-sem-valor", "%s: ideia candidata exige value (inteiro 1 a 5) e value_why; achado value=%r" % (nid, v))
+        owner = None
+        if piece_ids:
+            owner = idea.get("piece")
+            if owner not in piece_ids:
+                add(9, "ideia-sem-peca", "%s: com meta.x_dissect_pieces, a ideia declara piece: <id da peça>; achado %r" % (nid, owner))
+                continue
+        if kind in IDEA_KINDS:
+            owners.setdefault(owner, set()).add(kind)
+    for owner in (piece_ids or [None]):
+        gap_host = by_id[owner] if owner else meta
+        gap = gap_host.get("x_dissect_ideas_gap")
+        gap = gap if isinstance(gap, dict) else {}
+        got = owners.get(owner, set())
+        where = "a peça %s" % owner if owner else "o objeto"
+        if owner and not got:  # a lacuna declarada cobre um tipo, nunca o objeto inteiro: zero ideias reprova sempre
+            add(9, "peca-sem-ideias", "%s não tem nenhuma ideia registrada: cada peça é um objeto, e o veredito dela (nem a lacuna declarada) não substitui a colheita" % where)
+            continue
+        missing = [k for k in IDEA_KINDS if k not in got and not (isinstance(gap.get(k), str) and gap[k].strip())]
+        if missing:
+            add(9, "ideias-tipo-descoberto", "%s sem ideia do(s) tipo(s) %s: registre, ou declare a lacuna com a razão em x_dissect_ideas_gap {%s: \"…\"}%s" % (where, missing, missing[0], " no nó da peça" if owner else " no meta"))
 
 
 def verdict_of(n):
@@ -529,11 +613,12 @@ def context():
                 k3 = "ok" if n == 0 else "%d achado(s)" % n
             except Exception as exc:  # um grafo que o checador não lê não derruba a projeção inteira
                 k3 = "não medido (%s)" % str(exc)[:60]
-        rows.append((f, meta.get("x_dissect_tool"), (legacy.get(fam, fam) if isinstance(fam, str) else fam) or "(sem família)", meta.get("x_study_destination") or "—", verdict, k3))
+        ideas = sum(1 for n in nodes_of(doc) if "x_dissect_idea" in n)
+        rows.append((f, meta.get("x_dissect_tool"), (legacy.get(fam, fam) if isinstance(fam, str) else fam) or "(sem família)", meta.get("x_study_destination") or "—", verdict, ideas, k3))
     print("\n# estudos de dissecação no corpus · %d" % len(rows))
-    print("objeto | família | destino | veredito | forma | grafo")
-    for f, tool, fam, dest, verdict, k3 in rows:
-        print("%s | %s | %s | %s | %s | %s" % (tool, fam, dest, verdict, k3, f))
+    print("objeto | família | destino | veredito | ideias | forma | grafo")
+    for f, tool, fam, dest, verdict, ideas, k3 in rows:
+        print("%s | %s | %s | %s | %d | %s | %s" % (tool, fam, dest, verdict, ideas, k3, f))
     print("\n(o checador só julga estudo por família, o que declara x_study_destination: o anterior a 2026-10-24 fica fora por desenho, e o checador direto")
     print(" sobre ele lista o que falta para migrar. Presença, pertença e ordem no git, não qualidade.)")
     return 0

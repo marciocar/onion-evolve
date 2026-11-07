@@ -5,10 +5,11 @@ meta:
   id: dissect-forge-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
-  review_after: "2026-11-07"   # 30d: programa de trabalho
-  # ═══ TETO: 10 NÓS ═══
+  review_after: "2026-12-07"   # 30d: programa de trabalho
+  # ═══ TETO: 12 NÓS ═══
   #   2 em 2026-10-08; 4 em 2026-10-11 (dogfood do Conductor + desenho da costura);
-  #   3 em 2026-10-14 (selos do /meta:decide); 2 em 2026-10-15 (régua = o próprio repo, SAC-147).
+  #   3 em 2026-10-14 (selos do /meta:decide); 2 em 2026-10-15 (régua = o próprio repo, SAC-147);
+  #   2 em 2026-11-07 (o eliminatório apagava a colheita de ideias: a evidência e o selo do desenho).
 nodes:
   - id: E_DISSECT_QUASE_NAO_USADO
     node_type: evidence
@@ -143,6 +144,39 @@ nodes:
       locator: "função _self_regua e casos g1-g6, k1-k2 de run_dissect_selftests"
       method: "medição: carimbos lidos e censo rodado no core e num adotado de fixture em 2026-10-15"
       locality: "repo"
+  - id: E_ELIMINATORIO_APAGA_A_COLHEITA_1107
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-07"
+    verified_against: "bash .claude/validation/dissect-object-check.sh sobre os dois estudos dos peers em 2026-11-07: na main, 0 achado nos dois; com o item 9, o quicue-kg (Etapa 0 de 2026-11-07) dá 1 achado sem-registro-de-ideias e o de channels (Etapa 0 de 2026-11-06, antes do corte) dá o mesmo código como aviso, rc 0; grep -c x_dissect_idea nos dois grafos dá 0"
+    label: "o eliminatório encerrava a dissecação inteira e a colheita de ideias se perdia: o quicue-kg (repo arquivado), o imessage (só macOS) e o MCP Agent Mail (licença) saíram rejeitados sem nenhuma ideia registrada, e o checador dava rc 0"
+    narrative: "Crítica do maestro em 2026-11-07. No grafo do kg-ssot (docs/evolution/dissect/quicue-kg-2026-11), o nó E_N0_IDENTITY_1107 diz que a capacidade e o mecanismo medidos depois do eliminatório do repo arquivado ficam sem x_dissect_level, fora da escada, por um achado do Elenxo: a doutrina (nível reprovado não sobe; a Etapa 0 pode encerrar o estudo) não tinha onde guardar a lição. No grafo da curadoria (docs/evolution/dissect/claude-code-channels-2026-11), as peças D_PIECE_CH_OFFICIAL_IMESSAGE e D_PIECE_CH_AGENT_MAIL fecham só com o x_dissect_criterion do eliminatório. A cura separa o veredito de uso do registro de ideias (§1c da doutrina, item 9 do checador)."
+    trace: ".claude/validation/dissect-object-check.py"
+    provenance:
+      source: "os grafos de dissecação do kg-ssot e da curadoria, e o checador de forma do core"
+      locator: "onion-kg-ssot:docs/evolution/dissect/quicue-kg-2026-11/quicue-kg-2026-11.kg.yaml#E_N0_IDENTITY_1107 · onion-curation:docs/evolution/dissect/claude-code-channels-2026-11/claude-code-channels-2026-11.kg.yaml#D_PIECE_CH_AGENT_MAIL"
+      method: "measurement: dissect-object-check.sh da main e do ramo sobre os dois estudos, em 2026-11-07"
+      locality: repo
+  - id: D_DISSECT_VEREDITO_DE_USO_SEPARADO_DAS_IDEIAS_1107
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-07"
+    verified_against: "decisão do maestro em 2026-11-07, por pergunta com opções (/meta:decide): escolhida «Separar veredito de uso do registro de ideias; o eliminatório barra o código, nunca a colheita»"
+    label: "a dissecação separa o veredito de uso do registro de ideias: o eliminatório barra o código, nunca a colheita; toda dissecação registra funcionalidades, estratégias e decisões de desenho com comparativo e fonte"
+    narrative: "Selado por /meta:decide em 2026-11-07: escolhida «Separar veredito de uso do registro de ideias; o eliminatório barra o código, nunca a colheita»; descartadas: «Manter o eliminatório encerrando o estudo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-07: «O eliminatório da dissecação encerra o estudo inteiro, ou barra só o uso do código e deixa a colheita de ideias obrigatória?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-07"
+      locality: "pessoa"
 edges:
   - from: E_DISSECT_QUASE_NAO_USADO
     to: Q_COSTURA_DISSECT_FORGE
@@ -168,6 +202,9 @@ edges:
   - from: E_REGUA_PADRAO_DERIVADA_NAO_PELO_FRAMEWORK
     to: D_DISSECT_REGUA_PADRAO_E_O_PROPRIO_REPO
     edge_type: SUPPORTS
+  - from: D_DISSECT_VEREDITO_DE_USO_SEPARADO_DAS_IDEIAS_1107
+    to: E_ELIMINATORIO_APAGA_A_COLHEITA_1107
+    edge_type: TRACES_TO
 
 external_edges:
   - from: E_DOGFOOD_CONDUCTOR_ATE_N4
