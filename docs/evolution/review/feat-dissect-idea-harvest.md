@@ -2,8 +2,7 @@
 branch: feat/dissect-idea-harvest
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 60b87cfd294246f7689efb6f04ca7fe161080efc169162b32a2992aacb9b0a65
-reviewed_code_sha256: 5f51e444f26d717200791adb4f759e330298d8c2735afdd6bee6e4006385c6b0
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 2
 findings_blocking: 0
@@ -66,3 +65,11 @@ nota: "tokens 0 = não medido (passada na própria sessão, sem subagente; o bri
   rc 1 `sem-registro-de-ideias`, e `claude-code-channels-2026-11` (curadoria, de 2026-11-06) sai rc 0 com o aviso.
   Com o checador da `main`, os dois saem 0 achado.
 - Um grafo com o nó de ideia (`x_dissect_idea`) passa no `kg_validate` do contrato vendorizado.
+
+## Re-revisão (2º commit, `fix(kg)`)
+
+O `pr-finalize` reprovou no contrato. O lint de nomes acusou os códigos curtos dos eliminatórios sem termo na prosa
+da evidência `E_ELIMINATORIO_APAGA_A_COLHEITA_1107`, e o `label` dela passava de 280 caracteres. O 2º commit escreve
+os eliminatórios por extenso e encurta o `label`. Ele só mexe na prosa desse nó, e o código não muda. Conferido de
+novo: `kg-vocab-ci.sh` rc 0 (0 códigos novos), `kg-contract-check.sh` rc 0, `kg-radar.sh --integrity --schema` rc 0.
+Nenhum achado novo.
