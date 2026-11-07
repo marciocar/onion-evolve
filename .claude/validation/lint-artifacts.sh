@@ -111,6 +111,19 @@ KGSSOT_TOOLS_REL="$(kgssot_tools_dir "${REPO_ROOT}")" || KGSSOT_TOOLS_REL="${REP
 KGSSOT_TOOLS_REL="${KGSSOT_TOOLS_REL#"${REPO_ROOT}"/}"
 CLAUDE_DIR="${REPO_ROOT}/.claude"
 
+# ── O PREDICADO DE DISPOSITIVO DE CARACTERE, resolvido UMA VEZ (consumido por _find e _count_char_devices) ──
+# MEDIDO 2026-11-06 (bwrap reproduzindo o sandbox do Claude Code 2.1.319, GNU findutils 4.9.0): sobre um
+# `.claude/loop.md` montado como /dev/null, `find -type c` NÃO casa e `find -type f` CASA — o GNU find julga
+# `-type` pelo d_type do readdir, que é o do inode DEBAIXO da montagem (o arquivo vazio que o sandbox criou
+# como ponto de montagem). `stat`, `[ -c ]`, `-printf %y` e `-xtype` enxergam o dispositivo. Por isso a forma
+# óbvia (`find -type f`) NÃO cura: deixaria o dispositivo passar como regular. `-xtype` é GNU; o find BSD não
+# o tem, e lá o `-type` vem do lstat do fts (correto), então cai para `-type c`. Detectado, não presumido.
+if find "${CLAUDE_DIR}" -maxdepth 0 -xtype d >/dev/null 2>&1; then
+  _CHARDEV_TYPE=(-xtype c)
+else
+  _CHARDEV_TYPE=(-type c)
+fi
+
 # ── PAPEL DO REPO, resolvido UMA VEZ (era três predicados divergentes e um grep por arquivo) ──
 # MEDIDO 2026-08-06: o mesmo predicado existia em TRÊS formas neste arquivo — com espaço
 # LITERAL (`'^(role: (adopted|hub)|decoupled_from:)'`, 5 usos), tolerante-a-espaço (2 usos) e
@@ -197,6 +210,8 @@ if [ -n "${ONLY_PATH}" ]; then
   # flag ela herdava o banner `MORREU` dizendo "as violacoes acima sao PARCIAIS" e "rode bash -x" —
   # diagnostico enganoso num caso onde nada foi varrido e a causa e o ARGUMENTO. O rc 2 esta certo
   # (nao pude julgar); errado era o texto. Ligar o flag aqui deixa o trap calado e preserva o rc.
+  # dispositivo de caractere (a montagem do sandbox do Claude Code, ver _CHARDEV_TYPE) não é "inexistente": nomeia a causa
+  [ -c "${ONLY_PATH}" ] && { _LINT_SUMMARY_REACHED=1; echo "ERRO: --only: ${ONLY_PATH} é DISPOSITIVO DE CARACTERE (montagem do sandbox do Claude Code), não artefato — nada a julgar" >&2; exit 2; }
   [ -f "${ONLY_PATH}" ] || { _LINT_SUMMARY_REACHED=1; echo "ERRO: --only: arquivo inexistente: ${ONLY_PATH}" >&2; exit 2; }
 fi
 FIXED_FILES=0
@@ -271,7 +286,7 @@ _find() {
     local r
     for r in "${roots[@]}"; do
       case "${ONLY_PATH}" in
-        "${r}"/*|"${r}") find "${ONLY_PATH}" "${preds[@]}"; return ;;
+        "${r}"/*|"${r}") find "${ONLY_PATH}" ! "${_CHARDEV_TYPE[@]}" "${preds[@]}"; return ;;
       esac
     done
     return 0   # alvo fora das raízes desta regra → nada a varrer
@@ -290,7 +305,29 @@ _find() {
   # NUNCA a si mesmo (de dentro do worktree, ${CLAUDE_DIR}/worktrees nem existe).
   # Guardado por check_scan_sanity() (REGRA 54) — se esta poda voltar a se comer, o
   # gate reprova ALTO em vez de passar verde.
-  find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "${preds[@]}"
+  #
+  # `! -type c` — DISPOSITIVO DE CARACTERE NÃO É ARTEFATO (medido pela curadoria em 2026-11-06, Claude
+  # Code 2.1.319 com o sandbox ligado): o sandbox monta /dev/null, sem permissão de leitura, sobre uma
+  # lista FIXA de caminhos do projeto (.claude/loop.md, .claude/launch.json, .claude/scheduled_tasks.json,
+  # .claude/output-styles, .claude/routines, .mcp.json, .gitconfig…). `-name '*.md'` casa o `loop.md`
+  # dispositivo, o `awk` que o abre morre com "Permission denied" e o lint inteiro sai rc=2 — todo commit
+  # do adotante com sandbox parava. Só o dispositivo é pulado: arquivo REGULAR ilegível segue chegando ao
+  # leitor e reprovando, que é defeito real. O total pulado vira uma linha no sumário (_count_char_devices).
+  # O predicado vem DEPOIS do `-prune -o` (é do lado que imprime) e ANTES dos preds do chamador, que podem
+  # terminar em -print0: o teste falso curto-circuita o E e o caminho não sai. Por que `-xtype` e não
+  # `-type` está em _CHARDEV_TYPE (o `-type c` do GNU find NÃO vê a montagem — medido).
+  find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o ! "${_CHARDEV_TYPE[@]}" "${preds[@]}"
+}
+
+# _count_char_devices — quantos DISPOSITIVOS DE CARACTERE (a assinatura do sandbox do Claude Code) moram no repo
+# varrido, fora de .git/, node_modules/ e .claude/worktrees/ — o mesmo universo das raízes do _find, que pula
+# dispositivo em QUALQUER raiz (não só em .claude/). Pular em silêncio seria a guarda decidir sozinha o que não
+# olhou; a linha "Pulados" no sumário torna o pulo visível e auditável.
+_count_char_devices() {
+  # `|| true` dentro do grupo: sob pipefail, um diretório ilegível em qualquer canto daria rc=1 ao find e mataria
+  # o lint NO SUMÁRIO — a contagem é informativa e não pode virar a morte que ela existe para explicar
+  { find "${REPO_ROOT}" \( -name .git -o -name node_modules -o -path "${CLAUDE_DIR}/worktrees" \) -prune \
+      -o "${_CHARDEV_TYPE[@]}" -print 2>/dev/null || true; } | wc -l | tr -d ' '
 }
 
 # ===========================================================================
@@ -6525,6 +6562,8 @@ echo "  Violações HARD : ${HARD_COUNT}"
 echo "  Violações SOFT : ${SOFT_COUNT}"
 echo "  Total          : ${TOTAL_COUNT}"
 [ "${NA_COUNT}" -gt 0 ] && echo "  Não se aplica  : ${NA_COUNT} (REGRA ${NA_RULES} — papel '$(_role)'; declarado em '# aplica-se:', fora do total)"
+_CHARDEV_SKIPPED="$(_count_char_devices)"
+[ "${_CHARDEV_SKIPPED:-0}" -gt 0 ] && echo "  Pulados        : ${_CHARDEV_SKIPPED} caminho(s) por serem DISPOSITIVO DE CARACTERE (a montagem do sandbox do Claude Code, não artefato) — arquivo regular ilegível NÃO é pulado"
 echo ""
 
 if [ "${HARD_COUNT}" -eq 0 ]; then
