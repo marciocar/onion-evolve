@@ -2,7 +2,8 @@
 branch: fix/adopt-registry-fetch-timeout
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5d32675464b46d7d6ce646d9faae8d047a6929783d2578091777e25a70b9112d
+reviewed_code_sha256: 3e923527558884ceb24cc0ec4c1a32686f7c92a8952dc73e682efc8abc73c359
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
