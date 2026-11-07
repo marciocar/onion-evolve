@@ -619,20 +619,26 @@ nodes:
     confidence: 0.6
     evidence_class: testimony
     verified_against: "relato da sessão do adotante de consultoria à repassada de 2026-11-06; a versão vendorizada não foi relida pelo core"
-    label: "O adotante de consultoria, fora do members.yaml, tem o kg-ssot vendorizado em 4.39.1 (o atual é 4.44.0) e pede o update do Onion; registrar e atualizar é decisão do maestro."
+    label: "O adotante de consultoria, fora do members.yaml, tem o kg-ssot vendorizado em 4.39.1 (o atual é 4.45.0) e pede o update do Onion; registrar e atualizar é decisão do maestro."
     narrative: "Registrar é ato de segurança para a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) enxergar o adotante; o update vem pelo /meta:adopt --update depois do registro. Este nó não escreve o nome do adotante. Linear: SAC-293."
   - id: Q_COORD_MAESTRO_PVR_KGSSOT_1106
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 3
     confidence: 0.6
     evidence_class: testimony
-    verified_against: "relato da sessão do kg-ssot à repassada de 2026-11-06; a configuração do espelho público não foi lida pelo core"
+    verified_at: "2026-11-07"
+    verified_against: "relato da sessão do kg-ssot de 2026-11-07: reporte privado ligado no espelho e 4.45.0 publicada nos 5 canais (tag kg-ssot-v4.45.0, merge 2109073d)"
     label: "Ligar o Private Vulnerability Reporting no espelho público do kg-ssot antes da tag da próxima release."
-    narrative: "Configuração de repositório público, logo ato do maestro. Gatilho: a próxima tag do kg-ssot. Linear: SAC-294."
+    narrative: |-
+      Configuração de repositório público, logo ato do maestro. Gatilho: a próxima tag do kg-ssot. Linear: SAC-294.
+
+      Fechado em 2026-11-07, na subida do vendor do core para a 4.45.0. O core conferiu o relato: `gh api repos/marciocar/kg-ssot/private-vulnerability-reporting` devolveu {"enabled":true}, e o SECURITY.md da 4.45.0 aponta o reporte para security/advisories/new desse repositório.
+
+      verified_against anterior: «relato da sessão do kg-ssot à repassada de 2026-11-06; a configuração do espelho público não foi lida pelo core»
   - id: Q_COORD_KGSSOT_FORMA_X_CHANGE_1111
     node_type: question
     layer: audit
@@ -645,7 +651,10 @@ nodes:
     evidence_class: testimony
     verified_against: "relato da sessão do kg-ssot à repassada de 2026-11-06; a proposta mora no repo do kg-ssot e não foi relida pelo core"
     label: "A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) para o registro de mudança de compliance do hub."
-    narrative: "Sem mudar o contrato, como a forma do x_event. Pronto quando: a forma está no manual do kg-ssot e o hub a usa no caso real do registro de mudança. Linear: SAC-295."
+    narrative: |-
+      Sem mudar o contrato, como a forma do x_event. Pronto quando: a forma está no manual do kg-ssot e o hub a usa no caso real do registro de mudança. Linear: SAC-295.
+
+      Medido pelo core em 2026-11-07: a 1ª metade foi entregue. A forma do x_change está no capítulo 3 do manual da 4.45.0 (vendor/kg-ssot/docs/manual/pt-BR/03-formato.md, seção "Registrar uma mudança planejada"). A 2ª metade não: nenhum .kg.yaml do hub em origin/main tem x_change (git grep, rc 1), e o kg-ssot vendorizado lá segue em 4.15.0. Segue open.
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
