@@ -312,7 +312,7 @@ CASES = [
     ("candidata refutada no mesmo grafo", "gatilho-orfao", lambda g: (D(g).update(x_dissect_candidate=GRAPH + "#E_OVER"), node(g, "E_OVER").update(status="refuted")), "ok", []),
     ("candidata rejeitada noutro estudo do repo (o caso do MCP Agent Mail)", "gatilho-orfao", lambda g: D(g).update(x_dissect_candidate="onion-evolve:" + CAND_GRAPH + "#D_CAND"), "cand-graph", []),
     ("candidata rejeitada com o parque já selado (avisa, rc 0)", "aviso:gatilho-orfao", lambda g: D(g).update(x_dissect_candidate=CAND_GRAPH + "#D_CAND", status="done", x_dissect_sealed_by=SEAL), "cand-graph", []),
-    ("candidata noutro repo (avisa que não mede, rc 0)", "aviso:candidata-fora-do-repo", lambda g: D(g).update(x_dissect_candidate="onion-curation:docs/x/x.kg.yaml#D_X"), "ok", []),
+    ("candidata noutro repo (avisa que não mede, rc 0)", "aviso:candidata-fora-do-repo", lambda g: D(g).update(x_dissect_candidate="outro-repo:docs/x/x.kg.yaml#D_X"), "ok", []),
 ]
 CAND_GRAPH = "docs/evolution/dissect/fixture-cand-2026-11/fixture-cand-2026-11.kg.yaml"
 RC3_CASES = [

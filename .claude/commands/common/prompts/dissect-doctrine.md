@@ -120,7 +120,7 @@ escada (sem `x_dissect_level`: a ideia não sustenta o veredito de uso, nem prec
     candidate: true            # ideia candidata a entrar
     value: 3                   # valor estimado, 1 a 5 (obrigatório na candidata)
     value_why: "daria aresta à opção descartada, que hoje é prosa"
-    destination: "onion-kg-ssot:docs/onion/graph/kg-ssot-product.kg.yaml#Q_..."  # quem CONSOME a ideia
+    destination: "<repo>:docs/onion/graph/<grafo>.kg.yaml#Q_..."  # quem CONSOME a ideia
     # destination: nenhum  +  destination_why: "..."   (quando nenhum repo, nó ou issue a consome)
     # piece: D_PIECE_X         # obrigatório quando o meta declara x_dissect_pieces
 ```
