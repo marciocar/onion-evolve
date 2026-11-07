@@ -2,7 +2,8 @@
 branch: feat/private-repo-name-guard
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ef5ae64af4e3b54ea4ba1a179253a5447d8043ff810fb9e4a3b32d979b4d6e93
+reviewed_code_sha256: d13e7915e74c33036fe484cdfb7e0e07be7aef8cdf1080fcf296d5ffc97689a6
 findings_total: 7
 findings_real: 5
 findings_blocking: 2
