@@ -3,8 +3,8 @@
 # raiz falsa em /tmp, com systemctl, systemd-creds, systemd-analyze, journalctl e sleep falsos no PATH. Nada passa por
 # sudo e nada toca /etc. Prova: o segredo vai do terminal ao systemd-creds pelo stdin e nunca aparece na saída; prefixo
 # trocado recusa sem gravar; credencial existente só troca com confirmação; o kg-token sai do conf do MCP dentro do
-# root; o install é ensaio por padrão; o start recusa config de exemplo e credencial faltando; variável de teste fora do
-# modo de teste é rc 3.
+# root; o install é ensaio por padrão; o start recusa config de exemplo e credencial faltando; o verify espera a conexão
+# até o teto; variável de teste fora do modo de teste é rc 3.
 # Uso: bash ops/testing/slack-persona-selftest.sh   (rc 0 = verde)
 set -uo pipefail
 UNIT=onion-slack-persona
@@ -18,9 +18,12 @@ cat > "${t}/bin/systemd-creds" <<'F'
 #!/usr/bin/env bash
 [ "$1" = encrypt ] || exit 9; n="${2#--name=}"; s="$(cat)"; printf 'ENC:%s:%s\n' "$n" "${#s}" > "$4"; printf '%s' "$s" > "$4.plain-for-test"
 F
-printf '#!/usr/bin/env bash\necho "systemctl $*" >> "%s/calls"\ncase "$1" in show) echo inv-1 ;; is-active|is-failed) exit 1 ;; esac\nexit 0\n' "${t}" > "${t}/bin/systemctl"
+# systemctl falso: ativa só com o marcador ${t}/active; o show responde DynamicUser=yes ou a InvocationID
+printf '#!/usr/bin/env bash\necho "systemctl $*" >> "%s/calls"\ncase "$1" in show) case "$*" in *DynamicUser*) echo yes ;; *) echo inv-1 ;; esac ;; is-active) [ -e "%s/active" ] ;; is-failed) exit 1 ;; esac\n' "${t}" "${t}" > "${t}/bin/systemctl"
 printf '#!/usr/bin/env bash\nexit 0\n' > "${t}/bin/systemd-analyze"
-printf '#!/usr/bin/env bash\necho "{\\"msg\\":\\"slack persona connected\\"}"\n' > "${t}/bin/journalctl"
+# journalctl falso: conta as leituras; com ${t}/jdelay = N, a linha de conexão só sai a partir da leitura N+1 (o atraso
+# real entre o restart e a conexão)
+printf '#!/usr/bin/env bash\nc=$(( $(cat "%s/jcount" 2>/dev/null || echo 0) + 1 )); echo "$c" > "%s/jcount"\nif [ -e "%s/jdelay" ] && [ "$c" -le "$(cat "%s/jdelay")" ]; then exit 0; fi\necho "{\\"msg\\":\\"slack persona connected\\"}"\n' "${t}" "${t}" "${t}" "${t}" > "${t}/bin/journalctl"
 printf '#!/usr/bin/env bash\nexit 0\n' > "${t}/bin/sleep"
 chmod +x "${t}/bin/"*
 S="${t}/root/home/onion/onion-bridge/deploy/slack-persona"
@@ -59,6 +62,13 @@ run start; [ $? = 1 ] && grep -q 'IDs de exemplo' "${t}/out"; chk "start: recusa
 printf '{"approverUserId":"UMARCIO01","allowedChannels":["CPILOTO01"]}\n' > "${t}/root/etc/onion-slack-persona/config.json"
 run start; chk "start: com tudo no lugar, liga e vê a conexão" $?
 grep -q "systemctl restart ${UNIT}" "${t}/calls"; chk "start: religou a unit" $?
+# verify logo após o restart (medido em 2026-11-07): a conexão que sai depois de algumas leituras passa; a que não sai
+# até o teto reprova, depois de ler o teto inteiro, e a falha diz o teto
+touch "${t}/active"; echo 5 > "${t}/jdelay"; rm -f "${t}/jcount"
+run verify; rc=$?; [ "${rc}" = 0 ] && grep -q '✓ ativa e conectada' "${t}/out" && [ "$(cat "${t}/jcount")" = 6 ]; chk "verify: conexão que aparece depois de 5 leituras passa" $?
+echo 999 > "${t}/jdelay"; rm -f "${t}/jcount"
+run verify; rc=$?; [ "${rc}" = 1 ] && grep -q 'sem a linha de conexão desta invocação em 45 s' "${t}/out" && [ "$(cat "${t}/jcount")" -ge 45 ]; chk "verify: conexão ausente até o teto reprova e diz o teto" $?
+rm -f "${t}/active" "${t}/jdelay" "${t}/jcount"
 B="${t}/root/home/onion/onion-bridge"; mkdir -p "${B}/src/slack-persona"; printf 'x\n' > "${B}/src/slack-persona/main.ts"; chmod 0600 "${B}/src/slack-persona/main.ts"
 run start; [ $? = 1 ] && grep -q 'sem leitura para outros' "${t}/out"; chk "start: recusa código que o UID dinâmico não lê" $?
 chmod 0644 "${B}/src/slack-persona/main.ts"

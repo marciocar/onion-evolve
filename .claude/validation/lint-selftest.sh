@@ -13028,10 +13028,10 @@ run_slack_persona_selftests() {
   [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
   local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
   mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
-  local want=23 o rc
+  local want=25 o rc
   if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
-    record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico)"
+    record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico, verify espera a conexão até o teto)"
   else record_fail "slack-persona: (a) bancada" "rc=${rc}: $(grep -E '✗|^selftest' <<< "${o}" | head -4 | tr '\n' '|')"; rm -rf "${d}"; return; fi
   local m from to n mo
   while IFS= read -r m; do
@@ -13048,6 +13048,8 @@ if [ -n "${pre}" ] && [ "${v#"${pre}"}" = "${v}" ]; then@@if false; then
 if [ "${needs_tty}" = 1 ] && ! { : < "${TTY}"; } 2>/dev/null; then@@if false; then
 if priv grep -Eq '"[UC]0000' "${ETC}/config.json"; then@@if false; then
 local ur; ur="$(unreadable_code)"; [ -z "${ur}" ] || die 1@@local ur; ur=""; [ -z "${ur}" ] || die 1
+if wait_connected; then say "✓ ativa e conectada@@if connected_in_invocation; then say "✓ ativa e conectada
+for i in $(seq 1 "${CONNECT_WAIT_S}"); do@@for i in $(seq 1 1); do
 priv grep -q '^ONION_KG_TOKEN=..' "${MCP_CONF}" || die 1@@true || die 1
 [ "${a}" = s ] || [ "${a}" = S ] || { say "${n}: mantida"; return 0; }@@true
 if [ "${apply}" = 0 ]; then say "ENSAIO@@if false; then say "ENSAIO
