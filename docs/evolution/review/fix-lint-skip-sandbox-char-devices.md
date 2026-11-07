@@ -2,7 +2,8 @@
 title: 'Resíduo — o lint pula o dispositivo de caractere do sandbox, e a forma óbvia não curava'
 date: 2026-11-06
 branch: fix/lint-skip-sandbox-char-devices
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dd6c3cdfb7961aa4b6c7fda808605046a86c2ea45862293950851fc39a223b9a
+reviewed_code_sha256: e2667ab41dcf56b1e55e063a5f910450130da8b6c458a5faab87b38f06668934
 findings_total: 7
 findings_real: 5
 findings_fixed: 5
