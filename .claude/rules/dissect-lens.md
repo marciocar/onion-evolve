@@ -14,8 +14,13 @@ O mínimo que não se negocia aqui:
 - **Censo primeiro:** `bash .claude/validation/dissect-census.sh` — nível fresco já pago **entra
   no nível seguinte**; re-derivar é desperdício, e citar dissecação VENCIDA como se fosse de hoje
   é o defeito que o frescor existe para barrar.
-- **A escada é gate, não roteiro.** N0 reprovado **nunca** chega ao N2. `--level N` para onde você
-  pediu.
+- **A escada é gate, não roteiro.** N0 reprovado **nunca** chega ao N2 do **veredito de uso**.
+  `--level N` para onde você pediu.
+- **Veredito de uso ≠ registro de ideias** (§1c da doutrina, 2026-11-07). O eliminatório (arquivado,
+  licença, plataforma) barra o **código**, nunca a colheita: toda dissecação, inclusive a rejeitada no
+  N0, registra as funcionalidades, as estratégias e as decisões de desenho em nós `x_dissect_idea`, com
+  o comparativo à régua (`temos | nao-temos | diferente` + `why`) e a fonte (`arquivo:linha` ou a URL
+  do doc). A candidata leva `value` de 1 a 5. Zero ideias reprova no item 9 do checador.
 - **N0–N2 DESCREVEM. N3 JULGA. Só N4 recomenda.** Nível raso que recomenda é opinião com cara de
   análise.
 - **N2 exige COMPORTAMENTO** (behavior-over-declaration): rodar — em worktree/container isolado,
