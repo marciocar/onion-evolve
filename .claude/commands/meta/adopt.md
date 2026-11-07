@@ -438,7 +438,7 @@ flow: downstream (core→consumidor / distribuição)
 <no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6). E, abaixo, a linha `adopter-guard: …` do passo (0.6) da configuração (REGRA 118), inteira; rc 3 = PARE>
 
 ## onion/vendor no remoto
-<no --update, a linha `onion/vendor remota …` do vendor-branch.sh, inteira (de onde para onde a remota foi, conferida por ls-remote), ou a linha que diz por que não foi empurrada (sem remoto, remoto sem a branch, ONION_VENDOR_PUSH=0); na adoção, "não se aplica">
+<no --update, a linha "onion/vendor remota …" do vendor-branch.sh, inteira (de onde para onde a remota foi, conferida por ls-remote), ou a linha que diz por que não foi empurrada (sem remoto, remoto sem a branch, ONION_VENDOR_PUSH=0); na adoção, "não se aplica">
 
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
