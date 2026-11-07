@@ -372,6 +372,8 @@
 .claude/utils/co-evolution/co-relay.sh	E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/co-evolution/co-relay.sh	E_CO_RELAY_CORE_SE_PROVA	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/co-evolution/mail-receiver.sh	C_ntfy_default_publico	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
+.claude/utils/co-evolution/member-path.sh	C_TETO_MAPA_FORA_DAS_PROJECOES	docs/evolution/research/member-paths-2026-11/member-paths-2026-11.kg.yaml
+.claude/utils/co-evolution/member-path.sh	D_MAPA_LOCAL_E_RESOLVEDOR_UNICO	docs/evolution/research/member-paths-2026-11/member-paths-2026-11.kg.yaml
 .claude/utils/co-evolution/resolve-target.sh	REC_SELECTOR_TARGETING_BUILT	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/design-sink/tokens-to-css-vars.sh	EV_BUILD_THEME	docs/technical-context/technical-context.kg.yaml
 .claude/utils/diagnose/scaffold-diagnose-store.sh	A_helper	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
@@ -382,6 +384,7 @@
 .claude/utils/federation-transport/a2a-rt-mcp.py	C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-send.sh	C_TETO_AGENTGATEWAY	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-ssrf-check.sh	E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+.claude/utils/federation-transport/a2a-verify.sh	C_TETO_GATES_DE_SEGURANCA_SEM_MAPA	docs/evolution/research/member-paths-2026-11/member-paths-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F1_CORPO_FORA_DA_ASSINATURA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F1_F2_CURADOS_NO_GATE_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F2_EXP_OPCIONAL	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
@@ -1577,6 +1580,7 @@ docs/evolution/federation/members.yaml	E_members_yaml	docs/onion/graph/m3-federa
 docs/evolution/federation/members.yaml	E_tres_erros_medidos	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
 docs/evolution/federation/members.yaml	Q_COLD_ADOPTER_0717	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/evolution/federation/members.yaml	Q_CONTAGEM_DE_ADOTANTES_STALE_EM_DOIS_DOCS_DE_BUSINESS	docs/onion/graph/context-freshness-2026-08-12.kg.yaml
+docs/evolution/federation/members.yaml	Q_REGISTRO_DO_CONSULTORIA_DIVERGE_DO_CLONE	docs/evolution/research/member-paths-2026-11/member-paths-2026-11.kg.yaml
 docs/evolution/federation/members.yaml	SY5_movimento1_vendored_pending_commit	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/federation/members.yaml	SY5_product_lineage_not_materialized	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/federation/members.yaml	SY6_ev_federacao_viva	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -2704,6 +2708,7 @@ ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/p
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_EM_REPO_SEM_CI	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/publish-door.sh	C_CHANGELOG_DIZ_NENHUMA_QUEBRA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 ops/publish-door.sh	E_PROPOSTA_CONTAVA_A_RELEASE_NOVA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
+ops/registry-pins.sh	E_LOCAL_PATH_NA_CEGAVA_TRES_FERRAMENTAS	docs/evolution/research/member-paths-2026-11/member-paths-2026-11.kg.yaml
 ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 ops/stt-service.sh	E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
 ops/stt-service.sh	E_MC_STT_INSTALADO_LOOPBACK_1020	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
