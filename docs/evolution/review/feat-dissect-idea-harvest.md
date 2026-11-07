@@ -2,7 +2,8 @@
 branch: feat/dissect-idea-harvest
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3f64c164c778b81a5d8862f82d966d14275f36bd9179ec0caca3b3ab7c031c57
+reviewed_code_sha256: 2f93563dda1e0a5ddde9d489c1a605a3beda66daa039c20e76ebf531d73cd865
 findings_total: 4
 findings_real: 2
 findings_blocking: 0
