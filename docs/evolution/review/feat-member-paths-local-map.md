@@ -2,7 +2,8 @@
 branch: feat/member-paths-local-map
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: eefd16ef90f66cae799fb48f99bf65a167b92869a846cabfb4808ed0359a4f55
+reviewed_code_sha256: 12e6fbaadc1d37b6f57a0eb789274a40e1910e403bbf9a1b1e509064b43822f0
 findings_total: 6
 findings_real: 4
 findings_blocking: 0
