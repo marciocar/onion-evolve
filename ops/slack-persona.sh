@@ -14,7 +14,7 @@
 #   ops/slack-persona.sh creds [--kg-from-mcp-conf] [nome…]   guarda as credenciais (pergunta cada uma, entrada oculta)
 #   ops/slack-persona.sh install [--apply]                    ensaio (padrão) ou instalação da unit e da config
 #   ops/slack-persona.sh start                                liga (enable --now) e prova a conexão DESTA invocação
-#   ops/slack-persona.sh verify                               só leitura: unit, credenciais, config, processo vivo
+#   ops/slack-persona.sh verify                               só leitura: unit, credenciais, config, processo vivo (espera a conexão até 45 s)
 #   (a bancada é ops/testing/slack-persona-selftest.sh: falsos no PATH, sem sudo)
 #
 #   nomes: slack-bot-token (xoxb-…), slack-app-token (xapp-…), anthropic-api-key (sk-ant-…), kg-token.
@@ -163,6 +163,19 @@ connected_in_invocation() {
   grep -q '"msg":"slack persona connected"' <<< "${log}"
 }
 
+# a linha de conexão sai segundos DEPOIS do restart: start e verify esperam por ela até o mesmo teto (o verify logo após
+# um restart dava ✗ falso, medido em 2026-11-07). Sai cedo se a unit falhou. rc 0 = viu a conexão desta invocação
+CONNECT_WAIT_S=45
+wait_connected() {
+  local i
+  for i in $(seq 1 "${CONNECT_WAIT_S}"); do
+    connected_in_invocation && return 0
+    priv systemctl is-failed -q "${UNIT}" && return 1
+    sleep 1
+  done
+  return 1
+}
+
 # o UID dinâmico lê o código só pelo bit "outros" (a home do onion é 0750 e o bind não muda permissão): o que não for
 # o+r sob estes caminhos derruba o processo no boot
 unreadable_code() {
@@ -184,14 +197,9 @@ cmd_start() {
   need_sudo; preflight_start
   priv systemctl enable "${UNIT}" >/dev/null 2>&1 || die 2 "enable falhou"
   priv systemctl restart "${UNIT}" || die 2 "restart falhou (journalctl -u ${UNIT})"
-  local i
-  for i in $(seq 1 45); do
-    if connected_in_invocation; then say "ligada: conectada ao Slack nesta invocação"; say "ROLLBACK: sudo systemctl disable --now ${UNIT}"; return 0; fi
-    priv systemctl is-failed -q "${UNIT}" && break
-    sleep 1
-  done
+  if wait_connected; then say "ligada: conectada ao Slack nesta invocação"; say "ROLLBACK: sudo systemctl disable --now ${UNIT}"; return 0; fi
   priv journalctl -u "${UNIT}" -n 20 --no-pager -o cat 2>/dev/null | sed 's/^/    /'
-  die 1 "não vi a conexão desta invocação em 45 s. ROLLBACK: sudo systemctl disable --now ${UNIT}"
+  die 1 "não vi a conexão desta invocação em ${CONNECT_WAIT_S} s. ROLLBACK: sudo systemctl disable --now ${UNIT}"
 }
 
 cmd_verify() {
@@ -202,7 +210,7 @@ cmd_verify() {
   if [ -z "${miss}" ]; then say "✓ as 4 credenciais cifradas presentes"; else say "✗ faltam credenciais: ${miss}"; bad=1; fi
   cp="$(config_problem)"; if [ -z "${cp}" ]; then say "✓ config sem IDs de exemplo"; else say "✗ config: ${cp}"; bad=1; fi
   if priv systemctl is-active -q "${UNIT}"; then
-    if connected_in_invocation; then say "✓ ativa e conectada nesta invocação"; else say "✗ ativa, mas sem a linha de conexão desta invocação"; bad=1; fi
+    if wait_connected; then say "✓ ativa e conectada nesta invocação"; else say "✗ ativa, mas sem a linha de conexão desta invocação em ${CONNECT_WAIT_S} s"; bad=1; fi
     local dyn; dyn="$(priv systemctl show -p DynamicUser --value "${UNIT}" 2>/dev/null)"
     if [ "${dyn}" = yes ]; then say "✓ DynamicUser=yes no processo vivo"; else say "✗ DynamicUser no vivo: '${dyn}'"; bad=1; fi
   else say "· inativa (start ainda não rodou)"; fi
