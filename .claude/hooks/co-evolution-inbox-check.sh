@@ -69,6 +69,21 @@ pull_inbox() {
 }
 pull_inbox
 
+# ── IMPORTA O SPOOL do carteiro antes de contar (F7, 2026-11-07) ─────────────────────────────────
+# O remetente com o sandbox do Claude Code ligado pode não conseguir escrever no inbox/ daqui (uma regra
+# Edit(//<este repo>/**) no deny dele vira denyWrite e cobre a exceção do inbox); aí o co-relay.sh deixa o
+# sinal num spool fora dos repos, e é esta sessão que o traz. Sem spool, 1 teste de diretório e nada mais.
+# Mesmas exigências do pull: não trava (local, sem rede), não falha (|| true), não custa.
+import_spool() {
+  local sh="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/co-evolution/spool-import.sh" out
+  [ -f "$sh" ] || return 0
+  out="$(bash "$sh" --hook --repo "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null)" || true
+  case "$out" in *"pending="[1-9]*) np="${out##*pending=}" ;; esac
+  return 0
+}
+np=0
+import_spool
+
 nb="$(count_unread docs/evolution/inbox)"     # upstream
 na="$(count_unread docs/evolution/inbound)"   # downstream
 nd="$(count_overdue_diary)"                   # reflexão (diário vencido)
@@ -76,6 +91,7 @@ nd="$(count_overdue_diary)"                   # reflexão (diário vencido)
 msg=""
 [ "${nb:-0}" -gt 0 ] 2>/dev/null && msg="📬 Onion co-evolução: ${nb} mensagem(ns) no inbox (upstream: sinal/feedback)."
 [ "${na:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📥 Onion co-evolução: ${na} entrega(s) do core em inbound/ (downstream: relatório de update/anúncio)."
+[ "${np:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📮 Onion co-evolução: ${np} sinal(is) retido(s) no spool do carteiro (o inbox/ já commitou um homônimo; /meta:co-evolve)."
 [ "${nd:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }⏰ Onion diário: ${nd} migalha(s) com review_after vencido — reflexão pendente (/meta:diary list)."
 
 [ -n "$msg" ] || exit 0

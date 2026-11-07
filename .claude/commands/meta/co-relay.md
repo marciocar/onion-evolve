@@ -100,11 +100,22 @@ guarda a pega. A confirmação é lombada; quem decide é a sua releitura e a re
 ## Passo 3 — Relayar
 
 ```bash
-bash .claude/utils/co-evolution/co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public]
+bash .claude/utils/co-evolution/co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public] [--spool]
 ```
 
 O helper: aplica a guarda de papel (stamp), valida o alvo (git + avisa se não tem `docs/evolution/` na
-árvore atual), e copia never-clobber (sinal já presente no `inbox/` = no-op idempotente).
+árvore atual), e copia never-clobber (sinal já presente no `inbox/` = no-op idempotente). Falha de escrita
+sai **rc 1** (até 2026-11-07 dizia AVISO e saía 0 com 0 entregues).
+
+**Com o sandbox do Claude Code ligado (F7, medido em 2026-11-07 na 2.1.319):** uma regra
+`Edit(//<destino>/**)` no `permissions.deny` deste repo vira `denyWrite` do sandbox, e o bwrap monta o
+destino inteiro em leitura **depois** da exceção do `inbox/` no `sandbox.filesystem.allowWrite`, que fica
+por baixo (um `permissions.allow` do `inbox/` não desfaz). Quando o `inbox/` do destino não é gravável
+daqui, o carteiro entrega, depois das **mesmas** guardas e do mesmo dedup, no **spool**
+`${ONION_SPOOL_DIR:-~/.local/state/onion-spool}/<slug-do-destino>/` (slug = o caminho do destino com todo
+caractere fora de `[A-Za-z0-9]` trocado por `-`), e o hook SessionStart do destino importa para o `inbox/`
+dele, untracked (`.claude/utils/co-evolution/spool-import.sh`). No settings com sandbox, ponha
+`~/.local/state/onion-spool` no `allowWrite` **no lugar** do `inbox/` do destino. `--spool` força o canal.
 
 ## Passo 4 — Marcar relayado no PRÓPRIO repo (ato determinístico) + checkpoint do maestro
 

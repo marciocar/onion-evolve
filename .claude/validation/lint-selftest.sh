@@ -27838,6 +27838,138 @@ open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent
   rm -rf "${d}" "${own}" "${own5}" "${own6}" "${v3_d}" "${v3_own}" "${mutd}" "${_gh_fake}"
   unset CO_RELAY_GH
 }
+# Modo co-relay-spool — a entrega por SPOOL do carteiro e a importação no destino (F7, 2026-11-07).
+# Defeito medido: com o sandbox do Claude Code 2.1.319 ligado no remetente, uma regra
+# Edit(//<destino>/**) do deny vira denyWrite e o bwrap monta o destino em leitura por cima da exceção do
+# inbox/ no allowWrite; o carteiro dizia AVISO e saía 0 com 0 entregues. A bancada não liga sandbox (o CI
+# não tem bwrap com userns): o inbox/ em leitura se simula com chmod 555, que o `[ -w ]` do carteiro lê
+# igual ao EROFS do bind. Root ignora o modo, então como root os casos de chmod saem SKIP, nunca PASS.
+# Os dois lados rodam como o runner: o co-relay.sh do remetente e o HOOK SessionStart no destino.
+# ---------------------------------------------------------------------------
+run_corelay_spool_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/co-relay.sh"
+  local importer="${REPO_ROOT}/.claude/utils/co-evolution/spool-import.sh"
+  local hook="${REPO_ROOT}/.claude/hooks/co-evolution-inbox-check.sh"
+  local x; for x in "${helper}" "${importer}" "${hook}"; do
+    [ -f "${x}" ] || { record_fail "co-relay-spool" "peça ausente: ${x}"; return; }
+  done
+  local SIG="docs/evolution/inbox/2026-01-01-sinal-teste.md" B="2026-01-01-sinal-teste.md"
+  local base ad core sp mutd rc out slug
+  base="$(mktemp -d)"; mutd="${base}/mut"; mkdir -p "${mutd}"
+  local _gh_fake="${base}/gh"; printf '#!/bin/sh\necho private\n' > "${_gh_fake}"; chmod +x "${_gh_fake}"
+  # fixture: adotante com 1 sinal, core de verdade (onion-version.sh real + o importador e o hook do core),
+  # spool próprio por ONION_SPOOL_DIR (nunca o ~/.local/state real de quem roda a bancada)
+  _sp_fixture() {
+    rm -rf "${base}/ad" "${base}/core" "${base}/spool"
+    ad="${base}/ad"; core="${base}/core"; sp="${base}/spool"
+    git -C "${base}" init -q ad; git -C "${base}" init -q core
+    mkdir -p "${ad}/.claude" "${ad}/docs/evolution/inbox" "${core}/.claude/validation" \
+      "${core}/.claude/utils/co-evolution" "${core}/.claude/hooks" "${core}/docs/evolution/inbox/_processed"
+    printf 'role: adopted\n' > "${ad}/.claude/.onion-version"
+    printf '# sinal de teste\n' > "${ad}/${SIG}"
+    cp "${REPO_ROOT}/.claude/validation/onion-version.sh" "${core}/.claude/validation/"
+    cp "${importer}" "${core}/.claude/utils/co-evolution/spool-import.sh"
+    cp "${hook}" "${core}/.claude/hooks/co-evolution-inbox-check.sh"
+    slug="$(printf '%s' "$(cd "${core}" && pwd -P)" | sed 's/[^A-Za-z0-9]/-/g')"
+  }
+  _sp_relay() {  # $1 = carteiro, demais = flags → rc em rc, saída em out
+    local h="$1"; shift
+    rc=0; out="$( ( cd "${ad}" && CO_RELAY_GH="${_gh_fake}" ONION_SPOOL_DIR="${sp}" bash "${h}" --target "${core}" "$@" ) 2>&1)" || rc=$?
+  }
+  _sp_hook() {  # $1 = hook → saída do hook rodado NO DESTINO, como o SessionStart
+    ( cd "${core}" && CLAUDE_PROJECT_DIR="${core}" ONION_SPOOL_DIR="${sp}" bash "$1" ) 2>/dev/null
+  }
+  local root=0; [ "$(id -u)" -eq 0 ] && root=1
+
+  # (S1) inbox/ do destino em leitura → o sinal vai ao spool do destino, rc 0, nada no inbox/
+  local s1_i=1 s1_m=1
+  if [ "${root}" -eq 1 ]; then record_skip "co-relay-spool: (S1) root ignora chmod 555, o inbox em leitura não se simula"
+  else
+    _s1() { _sp_fixture; chmod 555 "${core}/docs/evolution/inbox"; _sp_relay "$1"
+      chmod 755 "${core}/docs/evolution/inbox"
+      [ "${rc}" -eq 0 ] && [ -f "${sp}/${slug}/${B}" ] && [ ! -e "${core}/${SIG}" ]; }
+    _s1 "${helper}" && s1_i=0
+    if [ "${s1_i}" -eq 0 ]; then record_pass "co-relay-spool: (S1) inbox/ do destino em leitura → entrega no spool do destino, rc 0"
+    else record_fail "co-relay-spool: (S1) inbox em leitura" "rc=${rc}: ${out}"; fi
+    sed 's|^if \[ "${FORCE_SPOOL}" -eq 1 \] \|\| ! _inbox_writable; then CHANNEL="spool"; else CHANNEL="inbox"; fi$|CHANNEL="inbox"|' "${helper}" > "${mutd}/s1.sh"
+    _s1 "${mutd}/s1.sh" && s1_m=0
+    _prove_mutation "co-relay-spool: (S-M1) sem o canal de spool, o inbox em leitura volta a perder o sinal — (S1) morde" \
+      "${helper}" "${mutd}/s1.sh" "${s1_i}" "${s1_m}"
+  fi
+
+  # (S2) falha de escrita sai rc 1, nunca 0 (o F7 saía 0 com 0 entregues)
+  if [ "${root}" -eq 1 ]; then record_skip "co-relay-spool: (S2) root lê o arquivo 000, a falha de cópia não se simula"
+  else
+    local s2_i=1 s2_m=1
+    _s2() { _sp_fixture; chmod 000 "${ad}/${SIG}"; _sp_relay "$1"; chmod 644 "${ad}/${SIG}"
+      [ "${rc}" -eq 1 ] && grep -q '1 falha' <<< "${out}"; }
+    _s2 "${helper}" && s2_i=0
+    if [ "${s2_i}" -eq 0 ]; then record_pass "co-relay-spool: (S2) cópia que falha → rc 1 e a falha contada"
+    else record_fail "co-relay-spool: (S2) falha calada" "rc=${rc}: ${out}"; fi
+    sed '/# >>> rc-falha/,/# <<< rc-falha/d' "${helper}" > "${mutd}/s2.sh"
+    _s2 "${mutd}/s2.sh" && s2_m=0
+    _prove_mutation "co-relay-spool: (S-M2) sem o rc da falha, o carteiro volta a dizer 0 com 0 entregues — (S2) morde" \
+      "${helper}" "${mutd}/s2.sh" "${s2_i}" "${s2_m}"
+  fi
+
+  # (S3) inbox/ e spool em leitura → rc 1, e a mensagem manda pôr o spool no allowWrite
+  if [ "${root}" -eq 1 ]; then record_skip "co-relay-spool: (S3) root ignora chmod 555"
+  else
+    _sp_fixture; chmod 555 "${core}/docs/evolution/inbox"; mkdir -p "${sp}"; chmod 555 "${sp}"; _sp_relay "${helper}"
+    chmod 755 "${core}/docs/evolution/inbox" "${sp}"
+    if [ "${rc}" -eq 1 ] && grep -q 'allowWrite' <<< "${out}"; then record_pass "co-relay-spool: (S3) sem inbox nem spool graváveis → rc 1, e diz o que pôr no allowWrite"
+    else record_fail "co-relay-spool: (S3) spool em leitura" "rc=${rc}: ${out}"; fi
+  fi
+
+  # (S4) PONTA A PONTA como o runner: --spool no remetente, o HOOK SessionStart no destino importa, 📬 conta,
+  #      o spool esvazia, o sinal fica UNTRACKED (I3) e uma 2ª entrega igual é no-op
+  local s4_i=1 s4_m=1 hk
+  _s4() { _sp_fixture; _sp_relay "${helper}" --spool; [ "${rc}" -eq 0 ] && [ -f "${sp}/${slug}/${B}" ] || return 1
+    hk="$(_sp_hook "$1")"
+    grep -q '📬.*1 mensagem' <<< "${hk}" && [ -f "${core}/${SIG}" ] && [ ! -e "${sp}/${slug}/${B}" ] \
+      && [ "$(git -C "${core}" status --porcelain -- "${SIG}" | cut -c1-2)" = "??" ]; }
+  _s4 "${hook}" && s4_i=0
+  if [ "${s4_i}" -eq 0 ]; then
+    _sp_relay "${helper}" --spool
+    if [ "${rc}" -eq 0 ] && [ ! -e "${sp}/${slug}/${B}" ] && grep -q 'no-op' <<< "${out}"; then
+      record_pass "co-relay-spool: (S4) ponta a ponta: --spool → o hook do destino importa, 📬 conta, spool vazio, untracked; reentrega igual = no-op"
+    else record_fail "co-relay-spool: (S4) reentrega" "rc=${rc}: ${out}"; fi
+  else record_fail "co-relay-spool: (S4) ponta a ponta" "rc=${rc} hook=${hk}: ${out}"; fi
+  sed 's|^import_spool$|:|' "${hook}" > "${mutd}/s4.sh"
+  _s4 "${mutd}/s4.sh" && s4_m=0
+  _prove_mutation "co-relay-spool: (S-M4) sem a chamada do importador no hook, o sinal mora no spool para sempre — (S4) morde" \
+    "${hook}" "${mutd}/s4.sh" "${s4_i}" "${s4_m}"
+
+  # (I1) homônimo TRACKED com conteúdo novo: fica no spool, o hook avisa 📮, a árvore commitada intacta
+  _sp_fixture; printf '# versao commitada\n' > "${core}/${SIG}"
+  git -C "${core}" add "${SIG}" && git -C "${core}" -c user.name=t -c user.email=t@t commit -qm t
+  mkdir -p "${sp}/${slug}"; printf '# versao nova\n' > "${sp}/${slug}/${B}"
+  hk="$(_sp_hook "${hook}")"
+  if grep -q '📮.*1 sinal' <<< "${hk}" && [ "$(cat "${core}/${SIG}")" = "# versao commitada" ] && [ -f "${sp}/${slug}/${B}" ]; then
+    record_pass "co-relay-spool: (I1) homônimo já commitado → fica no spool, 📮 avisa, a árvore commitada intacta"
+  else record_fail "co-relay-spool: (I1) homônimo tracked" "hook=${hk} inbox=$(cat "${core}/${SIG}")"; fi
+
+  # (I2) homônimo untracked diferente → substitui; byte-idêntico → só apaga do spool; .tmp nunca é lido
+  _sp_fixture; printf '# velha\n' > "${core}/${SIG}"; mkdir -p "${sp}/${slug}"
+  printf '# nova\n' > "${sp}/${slug}/${B}"; printf '# meio\n' > "${sp}/${slug}/.x.md.tmp.1"
+  printf '# igual\n' > "${core}/docs/evolution/inbox/b.md"; printf '# igual\n' > "${sp}/${slug}/b.md"
+  out="$(cd "${core}" && ONION_SPOOL_DIR="${sp}" bash "${importer}" --hook)"
+  if [ "${out}" = "imported=1 pending=0" ] && [ "$(cat "${core}/${SIG}")" = "# nova" ] && [ ! -e "${sp}/${slug}/b.md" ] \
+     && [ -f "${sp}/${slug}/.x.md.tmp.1" ] && [ ! -e "${core}/docs/evolution/inbox/.x.md.tmp.1" ]; then
+    record_pass "co-relay-spool: (I2) untracked diferente → substitui; idêntico → sai do spool; o .tmp do carteiro nunca é importado"
+  else record_fail "co-relay-spool: (I2) importador" "out=${out}"; fi
+
+  # (I3) o hook com o inbox/ em leitura segue exit 0 e o sinal fica no spool (a sessão sempre abre)
+  if [ "${root}" -eq 1 ]; then record_skip "co-relay-spool: (I3) root ignora chmod 555"
+  else
+    _sp_fixture; mkdir -p "${sp}/${slug}"; printf '# s\n' > "${sp}/${slug}/${B}"; chmod 555 "${core}/docs/evolution/inbox"
+    rc=0; ( cd "${core}" && CLAUDE_PROJECT_DIR="${core}" ONION_SPOOL_DIR="${sp}" bash "${hook}" >/dev/null 2>&1 ) || rc=$?
+    chmod 755 "${core}/docs/evolution/inbox"
+    if [ "${rc}" -eq 0 ] && [ -f "${sp}/${slug}/${B}" ]; then record_pass "co-relay-spool: (I3) inbox/ em leitura no destino → hook exit 0, o sinal fica no spool"
+    else record_fail "co-relay-spool: (I3) hook com inbox em leitura" "rc=${rc}"; fi
+  fi
+  chmod -R u+rwX "${base}" 2>/dev/null; rm -rf "${base}"
+}
 
 # ---------------------------------------------------------------------------
 # Modo relay-public — a guarda de DESTINO PÚBLICO do carteiro upstream e a REGRA 113 (Sinal relayado a
@@ -32520,6 +32652,9 @@ _family run_design_tokens_selftests
 
 # Modo co-relay — idem (carteiro upstream; adotante+core em mktemp, sem fixture-file).
 _family run_corelay_selftests
+
+# Modo co-relay-spool — a entrega por spool do carteiro e a importação no destino (F7, sandbox).
+_family run_corelay_spool_selftests
 
 # Modo relay-public — guarda de destino público do carteiro + REGRA 113 no destino (2026-10-29).
 _family run_relay_public_selftests

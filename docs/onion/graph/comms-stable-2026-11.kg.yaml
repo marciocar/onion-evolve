@@ -237,6 +237,21 @@ nodes:
     verified_against: "relato da sessão do kg-ssot de 2026-11-06: PR #346 mergeado, capítulo 3 do manual nas duas línguas"
     label: "A forma recomendada, não normativa, do x_event no manual e no ADOPTING do kg-ssot: núcleo CloudEvents 1.0 (id, source, type, specversion, subject, time, dataref), integridade em provenance.sha256 e x_received_at separado de time, sem mudar o contrato."
     narrative: "Contraproposta do kg-ssot na repassada de 2026-11-06, que respeita D_KG_EVENT_PROFILE_1030 (selo do maestro de 2026-10-30, opção «A hoje, B no gatilho»; gatilho: 2 adotantes ou 50 nós com x_event real; medido em 06/11: 0). O core aceitou. Pronto quando: a forma está publicada no manual e no ADOPTING. Entregue em 2026-11-06, antes do prazo, no PR #346 do kg-ssot; o core não releu o capítulo. Linear: SAC-297."
+  - id: E_CS_F7_SPOOL_DO_CARTEIRO_1107
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-07"
+    verified_against: "claude -p 2.1.319 com --settings de sandbox mínimo em repos de fixture em /tmp, lendo /proc/self/mountinfo e escrevendo em cada alvo de dentro do sandbox (bwrap 0.9.0, Ubuntu 24.04)"
+    label: "O F7 da curadoria tem causa medida: a regra Edit(//<core>/**) do permissions.deny do remetente vira denyWrite do sandbox, e o bwrap monta o core em leitura depois da exceção do inbox/ no allowWrite, que fica por baixo. A cura é o spool do carteiro, fora dos repos, importado pelo hook do destino."
+    narrative: "Medido em 2026-11-07, em fixture: só com o allowWrite do inbox/, a escrita passa (a hipótese de que o repo pai sempre cobre o filho cai); com o deny Edit do destino, o mountinfo mostra o inbox/ rw (id 2176) e, depois dele, o destino inteiro ro (id 2182), e a escrita dá Read-only file system; um permissions.allow Edit do inbox/ não desfaz. A hipótese da ordem de montagem se confirma, com o gatilho no deny v4 da curadoria. O co-relay da main, no mesmo sandbox, dizia AVISO e saía 0 com 0 entregues. Cura no PR fix/co-relay-sandbox-spool: com o inbox/ do destino sem escrita (ou --spool), o carteiro grava em ~/.local/state/onion-spool/<slug>/ depois das mesmas guardas, o SessionStart do destino importa (spool-import.sh), e a falha de escrita passa a sair rc 1. Dogfood com o sandbox real: o sinal chegou ao spool, rc 0, e o hook do destino o importou untracked. A fila do onion-messaging (degrau 3) fica para o teste ao vivo, que ainda espera atos do maestro. A rede (allowedDomains furado) é outro achado: só fura em bypassPermissions, medido no mesmo dia; o relato à Anthropic é do maestro."
+    provenance:
+      source: "fixture /tmp/f7sbx (sbx.json, sbx-a.json, sbx-b.json, sbx-c.json) e a curadoria E_SANDBOX_F2_F7_1106"
+      locator: "probe.out por variante; relay.out (cura) e relay-old.out (main)"
+      method: "claude -p --settings <sandbox mínimo> --allowedTools=Bash; escrita em cada alvo + grep f7sbx /proc/self/mountinfo"
 edges:
   - from: E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106
     to: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
@@ -282,4 +297,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_CS_KGSSOT_FORMA_X_EVENT_1107
     to: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
+    edge_type: SUPPORTS
+  - from: E_CS_F7_SPOOL_DO_CARTEIRO_1107
+    to: Q_CS_DEGRAU1_CAMPAINHA_1109
     edge_type: SUPPORTS
