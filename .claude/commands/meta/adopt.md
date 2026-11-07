@@ -437,6 +437,9 @@ flow: downstream (core→consumidor / distribuição)
 ## Gate do alvo
 <no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6). E, abaixo, a linha `adopter-guard: …` do passo (0.6) da configuração (REGRA 118), inteira; rc 3 = PARE>
 
+## onion/vendor no remoto
+<no --update, a linha `onion/vendor remota …` do vendor-branch.sh, inteira (de onde para onde a remota foi, conferida por ls-remote), ou a linha que diz por que não foi empurrada (sem remoto, remoto sem a branch, ONION_VENDOR_PUSH=0); na adoção, "não se aplica">
+
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
 
@@ -754,7 +757,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   `onion/vendor` (fonte-de-merge, base comum) e faz `git merge` na branch dedicada → a customização local vira
   **conflito git real** (never-clobber estrutural), não diff clobável. **Exit 10 = CONFLITO** → o maestro
   resolve (`git mergetool`/marcadores + `git commit`) **antes** de seguir; **exit 0** = framework atualizado
-  limpo, ou conflito SÓ em projeção gerada (`regen-ssot-projections.sh --list-outputs`), que o helper regenera, commita e declara; **exit 12** = arquivo do core NÃO chegou à vendor (ex.: `.gitignore` cobrindo `.claude/`) — nada mergeado, PARE. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
+  limpo, ou conflito SÓ em projeção gerada (`regen-ssot-projections.sh --list-outputs`), que o helper regenera, commita e declara; **exit 12** = arquivo do core NÃO chegou à vendor (ex.: `.gitignore` cobrindo `.claude/`) — nada mergeado, PARE; **exit 13** = a `onion/vendor` REMOTA não é ancestral da local (outro clone a moveu) ou o push foi recusado por não-ff — nada mergeado, nada forçado, PARE e siga a dica do helper; **exit 14** = remota ilegível, push que falha ou conferência por `ls-remote` que não bate — nada mergeado, PARE. A remota anda por **fast-forward** junto com a local, antes do merge, e a linha `onion/vendor remota (<remoto>): <de> → <para>` vai inteira ao relatório (a seção "onion/vendor no remoto"); remoto sem a branch não ganha a branch (a linha diz o comando), e `ONION_VENDOR_PUSH=0` desliga, declarado. Os commits do helper levam `Claude-Session:` abaixo da assinatura só quando a sessão é conhecida (`session-trailer.sh`: `ONION_CLAUDE_SESSION_URL` ou o id da sessão ligada ao claude.ai); sem ela saem sem a linha, e a nota é dita. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
   o never-clobber por-arquivo (grava `.env.example.onion` se o alvo já tem) — fora do merge, específico do alvo.
 - **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
   (`DEST="$WORK"`). **Crítico:** sem isto, um adotante com

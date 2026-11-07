@@ -166,6 +166,16 @@ if [ -f "${DEST}/.claude/settings.json" ] && command -v python3 >/dev/null 2>&1;
 try: print((json.load(open(sys.argv[1])).get("attribution") or {}).get("commit") or "")
 except Exception: print("")' "${DEST}/.claude/settings.json")"
 fi
+# A LINHA DA SESSÃO (2026-11-07): a assinatura do alvo não diz de qual sessão o commit veio. Ela entra
+# logo abaixo da assinatura, como em todo commit da casa, e SÓ quando a sessão é conhecida no ambiente
+# (session-trailer.sh: nunca inventa; sem sessão, a nota sai no stderr). Já presente na assinatura = não duplica.
+# >>> D_CURE-session-trailer-durable (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+_st="$(dirname "${BASH_SOURCE[0]}")/session-trailer.sh"
+if [ -f "${_st}" ] && ! grep -q '^Claude-Session:' <<< "${_sig}"; then
+  _trailer="$(bash "${_st}" --note)"
+  [ -n "${_trailer}" ] && _sig="${_sig:+${_sig}$'\n'}${_trailer}"
+fi
+# <<< D_CURE-session-trailer-durable <<<
 _msg=(-m "chore(onion): ${_subj}")
 [ -n "${_sig}" ] && _msg+=(-m "${_sig}")
 # ── --no-verify é o DEFAULT, e ONION_DURABLE_VERIFY=1 o desliga (F1 das portas, SAC-89, 2026-10-09) ──
