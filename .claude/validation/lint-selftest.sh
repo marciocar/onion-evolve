@@ -7964,18 +7964,17 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     [ "$rc" -eq 0 ] && [ "$o1" = "$o0" ] && [ "$oc1" = "$oc0" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
   }
   # ── B3 na função: só https://, ssh:// e scp; o resto (e qualquer espaço) é recusado ───────────────
-  _vpt_case_norm() {  # <helperdir>
-    ( source <(sed -n '/^_norm_remote()/,/^}/p' "$1/vendor-branch.sh")
-      local u bad=0
-      for u in "github.com/fixture/cur" "./github.com/fixture/cur" "file://github.com/fixture/cur" "git://github.com/fixture/cur" \
-               "https://github.com/fixture/cur evil" "https://github.com/fixture/cur$(printf '\t')x" "https://github.com/fixture%2Fcur" \
-               "https://evil@github.com@evil.com/fixture/cur" "https://github.com:8443/fixture/cur" "ssh://git@github.com:2222/fixture/cur" \
-               "https://github.com/fixture/cur/.git"; do
-        _norm_remote "$u" >/dev/null && bad=1
-      done
-      [ "$bad" = 0 ] && [ "$(_norm_remote "https://GitHub.com/Fixture/Cur.git/")" = github.com/fixture/cur ] \
-        && [ "$(_norm_remote "git@github.com:fixture/cur.git")" = github.com/fixture/cur ] \
-        && [ "$(_norm_remote "ssh://git@github.com:22/fixture/cur")" = github.com/fixture/cur ] )
+  _vpt_case_norm() {  # <helperdir> — pelo helper REAL (modo --norm-remote), nunca extraindo a função por sed
+    local u bad=0 h="$1/vendor-branch.sh"
+    for u in "github.com/fixture/cur" "./github.com/fixture/cur" "file://github.com/fixture/cur" "git://github.com/fixture/cur" \
+             "https://github.com/fixture/cur evil" "https://github.com/fixture/cur$(printf '\t')x" "https://github.com/fixture%2Fcur" \
+             "https://evil@github.com@evil.com/fixture/cur" "https://github.com:8443/fixture/cur" "ssh://git@github.com:2222/fixture/cur" \
+             "https://github.com/fixture/cur/.git"; do
+      bash "$h" --norm-remote "$u" >/dev/null 2>&1 && bad=1
+    done
+    [ "$bad" = 0 ] && [ "$(bash "$h" --norm-remote "https://GitHub.com/Fixture/Cur.git/")" = github.com/fixture/cur ] \
+      && [ "$(bash "$h" --norm-remote "git@github.com:fixture/cur.git")" = github.com/fixture/cur ] \
+      && [ "$(bash "$h" --norm-remote "ssh://git@github.com:22/fixture/cur")" = github.com/fixture/cur ]
   }
 
   local real m; real="$(mktemp -d)"; _vpt_helpers "$real"

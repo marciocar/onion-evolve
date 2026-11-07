@@ -715,6 +715,8 @@ except Exception: print("")' "$T/.claude/settings.json")"
 
 case "${1:-}" in
   seed)   shift; [ "$#" -ge 2 ] || { echo "uso: vendor-branch.sh seed <TARGET> <INTEGRATION_BRANCH>" >&2; exit 2; }; _seed "$@" ;;
+  # Expõe a normalização de URL que o consentimento usa, para ser MEDIDA pela bancada no helper real (rc 1 = recusada).
+  --norm-remote) shift; _norm_remote "${1:-}" ;;
   update) shift; [ "$#" -ge 4 ] || { echo "uso: vendor-branch.sh update <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>" >&2; exit 2; }; _update "$@" ;;
-  *) echo "uso: vendor-branch.sh {seed|update} ..." >&2; exit 2 ;;
+  *) echo "uso: vendor-branch.sh {seed|update|--norm-remote} ..." >&2; exit 2 ;;
 esac
