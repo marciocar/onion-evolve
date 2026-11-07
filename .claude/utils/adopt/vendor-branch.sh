@@ -19,7 +19,8 @@
 #       projeção gerada, resolvido por regeneração e declarado) · 10 CONFLITO (humano resolve) · 11 BASE CRUZADA · 12 arquivo do core não chegou à vendor (nada mergeado) · 13 onion/vendor
 #       REMOTA não é ancestral da local, ou push recusado por não-ff (nada mergeado, nada forçado) · 14 remota
 #       ilegível, push que falha ou conferência por ls-remote que não bate (nada mergeado) · 2 precondição.
-#       A remota anda por fast-forward junto com a local (ONION_VENDOR_PUSH=0 desliga, e é dito).
+#       A remota anda por fast-forward junto com a local SÓ com `vendor_push: true` no membro do registro do core
+#       (ONION_MEMBERS_FILE; sem ele nada é tocado, e é dito); ONION_VENDOR_PUSH=0 desliga, e é dito.
 #
 # Reusa: durable-commit.sh (commit no vendor) · o manifest L1+L2 (mesma superfície do adopt).
 # Determinístico, sem jq. Exercitado por lint-selftest.sh (run_vendor_branch_selftests).
@@ -232,6 +233,7 @@ _clean_baseline() {  # <SRC> <T> <PIN> <IB>
 #     confere no remoto: ls-remote tem de devolver o sha local. Push recusado por não-ff → rc 13; remoto
 #     ilegível, push que falha por outro motivo ou conferência que não bate → rc 14.
 #   · O que o update diz da remota é UMA linha, para o relatório downstream: de onde para onde ela foi.
+# Tudo isso SÓ com consentimento registrado no core (bloco CONSENTIMENTO abaixo); sem ele, nada é tocado.
 # Não cria a branch num remoto que não a tem (decisão do dono do repo: a linha diz o comando). Sem
 # remoto, nada a empurrar, e é dito. ONION_VENDOR_PUSH=0 desliga, e também é dito.
 _vendor_remote() {  # <TARGET> → nome do remoto da onion/vendor (upstream dela, senão origin), ou vazio
@@ -240,18 +242,50 @@ _vendor_remote() {  # <TARGET> → nome do remoto da onion/vendor (upstream dela
   git -C "$1" remote get-url "$r" >/dev/null 2>&1 && printf '%s\n' "$r"
   return 0
 }
+# Lê pela URL de PUSH (`remote get-url --push`): é para lá que o push vai, e um `remote.<r>.pushurl` diferente
+# da url faria a leitura e a conferência olharem outro repo (passada adversarial do PR, 2026-11-07).
 _remote_vendor_sha() {  # <TARGET> <REMOTE> → sha da onion/vendor no remoto (vazio = ausente) · rc 1 = ilegível
-  local out
-  out="$(GIT_TERMINAL_PROMPT=0 git -C "$1" ls-remote --heads "$2" "refs/heads/${VENDOR}" 2>/dev/null)" || return 1
+  local out url
+  url="$(git -C "$1" remote get-url --push "$2" 2>/dev/null)" || return 1
+  out="$(GIT_TERMINAL_PROMPT=0 git -C "$1" ls-remote --heads "${url}" "refs/heads/${VENDOR}" 2>/dev/null)" || return 1
   awk '{print $1; exit}' <<< "${out}"
 }
+# CONSENTIMENTO REGISTRADO NO CORE (passada adversarial do PR, 2026-11-07): empurrar para o remoto de um
+# adotante é ato no repo DELE, e só um adotante consentiu. Sem `vendor_push: true` no membro do registro
+# (docs/evolution/federation/members.yaml do core), nada é lido nem empurrado: o update segue como antes, e
+# a linha diz por que e dá o comando. Registro: ONION_MEMBERS_FILE, senão o da fonte. Membro: ONION_MEMBER_ID,
+# senão o `local_path` igual ao checkout principal do alvo (a worktree irmã do update resolve para ele),
+# senão o `remote` igual à url do origin (normalizada: sem esquema, sem .git, sem barra final).
+_norm_remote() { sed -E 's#^[a-z+]+://##; s#^[^@/]+@##; s#:#/#; s#\.git$##; s#/+$##; s# .*##' <<< "$1"; }
+_vendor_push_consent() {  # <TARGET> <SOURCE_ROOT> → rc 0 consentiu · 1 não · ecoa o id do membro achado
+  local T="$1" mf="${ONION_MEMBERS_FILE:-$2/docs/evolution/federation/members.yaml}" main url
+  [ -f "${mf}" ] || return 1
+  main="$(cd "$(git -C "$T" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)/.." 2>/dev/null && pwd -P)"
+  url="$(_norm_remote "$(git -C "$T" remote get-url origin 2>/dev/null)")"
+  awk -v want="${ONION_MEMBER_ID:-}" -v main="${main}" -v url="${url}" '
+    function flush() { if (id != "" && ok == 1 && ((want != "" && id == want) || (want == "" && (lp == main || (rm != "" && rm == url))))) { print id; found = 1 } }
+    function val(l) { sub(/^[^:]*:[ \t]*/, "", l); sub(/[ \t]+#.*$/, "", l); gsub(/^["\047]|["\047]$/, "", l); return l }
+    /^  - id:/ { flush(); id = val($0); lp = ""; rm = ""; ok = 0; next }
+    /^    local_path:/ { lp = val($0); next }
+    /^    remote:/ { rm = val($0); sub(/^[a-z+]+:\/\//, "", rm); sub(/ .*$/, "", rm); sub(/\.git$/, "", rm); sub(/\/+$/, "", rm); next }
+    /^    vendor_push:/ { if (val($0) == "true") ok = 1; next }
+    END { flush(); exit(found ? 0 : 1) }' "${mf}"
+}
+
 # Preenche VREMOTE/VREMOTE_OLD. rc 0 segue · 13 divergente · 14 ilegível.
-_vendor_remote_precheck() {  # <TARGET>
-  local T="$1"
+_vendor_remote_precheck() {  # <TARGET> <SOURCE_ROOT>
+  local T="$1" _mid
   VREMOTE=""; VREMOTE_OLD=""
   if [ "${ONION_VENDOR_PUSH:-1}" = 0 ]; then
     echo "Onion: push da $VENDOR DESLIGADO (ONION_VENDOR_PUSH=0) — a remota não é tocada nesta rodada."; return 0
   fi
+  # >>> D_CURE-vendor-push-consent (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  if ! _mid="$(_vendor_push_consent "$T" "$2")"; then
+    echo "Onion: $VENDOR remota não empurrada: sem consentimento registrado (vendor_push: true no membro do members.yaml do core). Para empurrar à mão: git -C \"$T\" push origin $VENDOR"
+    return 0
+  fi
+  echo "Onion: push da $VENDOR consentido pelo membro '${_mid}' (vendor_push: true no registro do core)."
+  # <<< D_CURE-vendor-push-consent <<<
   VREMOTE="$(_vendor_remote "$T")"
   if [ -z "${VREMOTE}" ]; then
     echo "Onion: $VENDOR sem remoto (nem upstream nem 'origin') — fica só local, nada a empurrar."; return 0
@@ -266,7 +300,7 @@ _vendor_remote_precheck() {  # <TARGET>
     VREMOTE=""; return 0
   fi
   if ! git -C "$T" cat-file -e "${VREMOTE_OLD}^{commit}" 2>/dev/null; then
-    GIT_TERMINAL_PROMPT=0 git -C "$T" fetch -q "${VREMOTE}" "refs/heads/${VENDOR}" 2>/dev/null \
+    GIT_TERMINAL_PROMPT=0 git -C "$T" fetch -q "$(git -C "$T" remote get-url --push "${VREMOTE}")" "refs/heads/${VENDOR}" 2>/dev/null \
       || { echo "ERRO: a $VENDOR remota (${VREMOTE_OLD:0:12}) não veio no fetch de '${VREMOTE}' — nada foi tocado." >&2; return 14; }
   fi
   # >>> D_CURE-vendor-from-remote (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
@@ -295,20 +329,24 @@ _vendor_remote_push() {  # <TARGET>
   local T="$1" new now out
   [ -n "${VREMOTE}" ] || return 0
   new="$(git -C "$T" rev-parse "refs/heads/${VENDOR}")"
-  # >>> D_CURE-vendor-push (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  # >>> D_CURE-vendor-ffpush (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
   if [ "${new}" != "${VREMOTE_OLD}" ]; then
     if ! out="$(GIT_TERMINAL_PROMPT=0 git -C "$T" push --porcelain "${VREMOTE}" "refs/heads/${VENDOR}:refs/heads/${VENDOR}" 2>&1)"; then
       echo "ERRO: o push da $VENDOR para '${VREMOTE}' foi recusado — sem force; o merge NÃO foi feito:" >&2
       printf '%s\n' "${out}" | tail -6 | sed 's/^/    /' >&2
-      grep -qE 'non-fast-forward|fetch first|\[rejected\]' <<< "${out}" && return 13
+      echo "      Re-rode quando a causa sumir, ou ONION_VENDOR_PUSH=0 para seguir sem tocar a remota (declarado no relatório)." >&2
+      grep -qE 'non-fast-forward|fetch first|\[rejected\]|failed to update ref|cannot lock ref' <<< "${out}" && return 13
       return 14
     fi
   fi
-  # <<< D_CURE-vendor-push <<<
+  # <<< D_CURE-vendor-ffpush <<<
+  # >>> D_CURE-vendor-verify (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
   if ! now="$(_remote_vendor_sha "$T" "${VREMOTE}")" || [ "${now}" != "${new}" ]; then
     echo "ERRO: conferência no remoto falhou — ls-remote '${VREMOTE}' devolve '${now:-<nada>}', a local é ${new:0:12}. O merge NÃO foi feito." >&2
+    echo "      Ou ONION_VENDOR_PUSH=0 para seguir sem tocar a remota (declarado no relatório)." >&2
     return 14
   fi
+  # <<< D_CURE-vendor-verify <<<
   if [ "${new}" = "${VREMOTE_OLD}" ]; then
     echo "Onion: $VENDOR remota (${VREMOTE}) já em ${new:0:12}, igual à local (conferida por ls-remote)."
   else
@@ -359,7 +397,7 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
 
   # A remota é lida ANTES de qualquer escrita na vendor (bloco "A ONION/VENDOR REMOTA" acima).
   local VREMOTE VREMOTE_OLD _rrc=0
-  _vendor_remote_precheck "$T" || _rrc=$?
+  _vendor_remote_precheck "$T" "$SRC" || _rrc=$?
   [ "${_rrc}" -eq 0 ] || return "${_rrc}"
   # A sessão é resolvida uma vez: a nota de "desconhecida" sai aqui, uma só (o durable-commit a calaria).
   local _trailer=""; [ -f "${HERE}/session-trailer.sh" ] && _trailer="$(bash "${HERE}/session-trailer.sh" --note)"
@@ -550,8 +588,10 @@ except Exception: print("")' "$T/.claude/settings.json")"
   # A linha da sessão (2026-11-07) vai abaixo da assinatura, só quando conhecida (session-trailer.sh, que
   # nunca inventa; a nota de "sessão desconhecida" já saiu no início do update).
   # >>> D_CURE-session-trailer-merge (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
-  if [ -n "${_trailer}" ] && ! grep -q '^Claude-Session:' <<< "${_sig}"; then
-    _sig="${_sig:+${_sig}$'\n'}${_trailer}"
+  # A Claude-Session HERDADA da assinatura (de outra sessão) sai; a atual entra se conhecida.
+  if [ -f "${HERE}/session-trailer.sh" ]; then
+    _sig="$(grep -v '^Claude-Session:' <<< "${_sig}" || true)"
+    [ -n "${_trailer}" ] && _sig="${_sig:+${_sig}$'\n'}${_trailer}"
   fi
   # <<< D_CURE-session-trailer-merge <<<
   [ -n "${_sig}" ] && _mmsg+=(-m "${_sig}")

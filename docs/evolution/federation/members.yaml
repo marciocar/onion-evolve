@@ -20,6 +20,8 @@
 # foram para o grafo docs/onion/graph/door-role-parity-2026-09.kg.yaml (no E_REGISTRO_HONESTO_F15 e
 # vizinhos). O pin de adotante se confere com `ops/registry-pins.sh --check` e se carimba com `--seal`;
 # o de porta, com `ops/door-seal-pin.sh`.
+# `vendor_push: true` (opcional, 2026-11-07): o membro CONSENTE que o `/meta:adopt --update` do core empurre a
+# onion/vendor dele por fast-forward, relatado. Ausente = não consentiu: a remota não é tocada (vendor-branch.sh).
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
@@ -747,6 +749,7 @@ members:
     onion_version: 4e488f2fef65   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-11-07)
     adopted_at: 2026-10-06
     mode: greenfield
+    vendor_push: true   # consente o push ff da onion/vendor pelo --update do core, relatado (10-26, reafirmado 11-07)
     personality_summary: "Nasceu do pedido do maestro por um estudo profundo que disseca plataformas, aplicativos, sites, perfis, ideias, repositórios, ferramentas, arquiteturas, tecnologias, métodos, funcionalidades, concorrentes, modelos e negócios como CURADORIA para o Onion Evolve. Aqui se disseca e se PROPÕE (absorver | costurar | parquear | rejeitar, com evidência); a palavra final é do core, com a lente de Aristóteles, e a proposta sobe pelo inbox."
     specializations: [curadoria, dissecacao, mercado]
     a2a:                        # participa do a2a-live como REMETENTE: assina sinais gated ao core.
