@@ -7743,6 +7743,14 @@ run_vendor_push_trailer_selftests() {
     record_fail "vendor-push-trailer" "helper ausente: vendor-branch.sh ou session-trailer.sh"; return
   fi
   export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  # O consentimento só aceita https://, ssh:// e scp; caminho local é recusado. Os remotos da fixture são
+  # então `ssh://fixture.test<caminho do bare>`, e um "ssh" de fixture roda o comando do git LOCALMENTE
+  # (o último argumento é sempre o `git-upload-pack '<caminho>'`). Nenhuma rede, nenhum host real.
+  local vpt_bin; vpt_bin="$(mktemp -d)"
+  printf '#!/bin/sh\nfor a do last="$a"; done\nexec sh -c "$last"\n' > "${vpt_bin}/ssh-fixture"; chmod +x "${vpt_bin}/ssh-fixture"
+  local _vpt_old_ssh="${GIT_SSH_COMMAND-__unset__}"
+  export GIT_SSH_COMMAND="${vpt_bin}/ssh-fixture" GIT_SSH_VARIANT=simple
+  _vpt_url() { printf 'ssh://fixture.test%s' "$1"; }
 
   # Uma cópia dos helpers, com o bloco $2 (D_CURE-…) removido do arquivo $3, ou intacta (sem $2). Com
   # $2 = mut:<chave>, o mutante é uma SUBSTITUIÇÃO que devolve o defeito medido (âncora única, conferida).
@@ -7757,14 +7765,19 @@ run_vendor_push_trailer_selftests() {
           new='  [ -n "$(awk -F"\037" -v w="${ONION_MEMBER_ID:-}" '"'"'w != "" && $1 == w && $4 == "true"'"'"' <<< "${rows}")" ] && { echo "${ONION_MEMBER_ID}"; return 0; }  # mutante A1
   if [ "${#byp[@]}" -ge 1 ]; then' ;;
         # A2: o destino lido pela url de FETCH, não pela de push
-        fetch-url) anc='purl="$(_norm_remote "$(git -C "$T" remote get-url --push "$R" 2>/dev/null)")"'
-          new='purl="$(_norm_remote "$(git -C "$T" remote get-url "$R" 2>/dev/null)")"  # mutante A2' ;;
+        fetch-url) anc='local urls; urls="$(git -C "$T" remote get-url --push --all "$R" 2>/dev/null)"'
+          new='local urls; urls="$(git -C "$T" remote get-url "$R" 2>/dev/null)"  # mutante A2' ;;
         # A3: o consentimento lido do origin fixo, não do remoto efetivo da vendor
         origin-fixed) anc='_vendor_push_consent "$T" "$2" "${VREMOTE}"'
           new='_vendor_push_consent "$T" "$2" origin' ;;
-        # A4: qualquer arquivo serve de registro
-        any-registry) anc='_trusted_members_file "${mf}" || {'
-          new='true || {' ;;
+        # B1: o registro lido da ÁRVORE do core (commit local vale), não de origin/main
+        worktree-registry) anc='  git -C "${core}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null \'
+          new='  cat "${core}/docs/evolution/federation/members.yaml" 2>/dev/null \' ;;
+        # B3: a normalização frouxa de antes (caminho local passa por host/dono/repo)
+        loose-norm) anc='  else return 1; fi
+  path="${path%/}"'
+          new='  else host="${u%%/*}"; path="${u#*/}"; [ "$host" != "$u" ] || return 1; fi  # mutante B3
+  path="${path%/}"' ;;
         *) return 1 ;;
       esac
       python3 -c 'import sys
@@ -7778,19 +7791,22 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
   }
   _vpt_core() { local d="$1" v="$2"; rm -rf "$d"; mkdir -p "$d/.claude/commands"; git -C "$d" init -q
     printf 'cmd v%s\n' "$v" > "$d/.claude/commands/foo.md"; git -C "$d" add -A; git -C "$d" commit -qm "core v$v"; }
-  # Registro de membros da fixture, como o core o tem: RASTREADO e limpo em docs/evolution/federation/ de
-  # um repo git próprio ($w/reg). Membros: "<id> <local_path|-> <remote|-> <true|false>" por argumento.
+  # Registro de membros da fixture, como o core o tem: um checkout de papel SOURCE ($w/reg, com o
+  # onion-version.sh e sem carimbo) cujo `origin/main` carrega o members.yaml — o que "passou por merge".
+  # Membros: "<id> <local_path|-> <bare|-> <true|false>" por argumento; o bare vira URL ssh da fixture.
   _vpt_members() {  # <w> <membro>...
     local w="$1" d="$1/reg" m id lp rm vp; shift
-    mkdir -p "$d/docs/evolution/federation"; git -C "$d" init -q
+    mkdir -p "$d/docs/evolution/federation" "$d/.claude/validation"; git -C "$d" init -q
+    cp "${REPO_ROOT}/.claude/validation/onion-version.sh" "$d/.claude/validation/"
     { printf 'version: 2\nmembers:\n'
       for m in "$@"; do read -r id lp rm vp <<< "$m"
         printf '  - id: %s\n' "$id"; [ "$lp" = - ] || printf '    local_path: %s\n' "$lp"
-        [ "$rm" = - ] || printf '    remote: %s\n' "$rm"; printf '    vendor_push: %s\n' "$vp"; done
+        [ "$rm" = - ] || printf '    remote: %s (privado)\n' "$(_vpt_url "$rm")"; printf '    vendor_push: %s\n' "$vp"; done
     } > "$d/docs/evolution/federation/members.yaml"
     git -C "$d" add -A; git -C "$d" commit -qm registro
+    git init -q --bare "$w/reg.git"; git -C "$d" remote add origin "$w/reg.git"
+    git -C "$d" push -q origin HEAD:main 2>/dev/null; git -C "$d" fetch -q origin 2>/dev/null
   }
-  _vpt_mf() { printf '%s' "$1/reg/docs/evolution/federation/members.yaml"; }
   # Adotante com remoto BARE: integração e onion/vendor publicadas. A assinatura do alvo carrega uma
   # Claude-Session VELHA, de outra sessão, que o update tem de tirar. Ecoa a integração.
   _vpt_adopter() { local a="$1" c="$2" r="$3" ib
@@ -7798,7 +7814,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     git -C "$c" archive HEAD -- .claude | tar -x -C "$a"
     printf '{"attribution":{"commit":"Assinado-pelo-adotante-de-teste\\nClaude-Session: https://claude.ai/code/session_VELHA9"}}\n' > "$a/.claude/settings.json"
     git -C "$a" add -A; git -C "$a" commit -qm "adopt v1"; ib="$(git -C "$a" rev-parse --abbrev-ref HEAD)"
-    git init -q --bare "$r"; git -C "$a" remote add origin "$r"
+    git init -q --bare "$r"; git -C "$a" remote add origin "$(_vpt_url "$r")"
     bash "${src}/vendor-branch.sh" seed "$a" "$ib" >/dev/null 2>&1
     git -C "$a" push -q origin "$ib" onion/vendor 2>/dev/null
     printf '%s' "$ib"
@@ -7811,7 +7827,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; old="$(git -C "$a" rev-parse onion/vendor)"
     _vpt_members "$w" "fixture-adopter $(cd "$a" && pwd -P) $r true" "outro - - true"
     _vpt_core "$c" 2
-    out="$(ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
+    out="$(ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
     local loc rem; loc="$(git -C "$a" rev-parse onion/vendor)"; rem="$(git --git-dir="$r" rev-parse onion/vendor 2>/dev/null)"
     rm -rf "$w"
     [ "$rc" -eq 0 ] && [ "$loc" != "$old" ] && [ "$loc" = "$rem" ] \
@@ -7826,7 +7842,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     printf 'local\n' > "$a/y"; git -C "$a" checkout -q onion/vendor; git -C "$a" add y; git -C "$a" commit -qm "vendor local"; git -C "$a" checkout -q "$ib"
     v0="$(git -C "$a" rev-parse onion/vendor)"; i0="$(git -C "$a" rev-parse "$ib")"
     _vpt_core "$c" 2
-    ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
     local v1 i1; v1="$(git -C "$a" rev-parse onion/vendor)"; i1="$(git -C "$a" rev-parse "$ib")"
     rm -rf "$w"
     [ "$rc" -eq 13 ] && [ "$v1" = "$v0" ] && [ "$i1" = "$i0" ]
@@ -7836,11 +7852,11 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     local w c a r ib b rc=0 rv; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; b="$w/b"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w" "fixture-adopter - $r true"
     _vpt_core "$c" 2   # o 1º clone atualiza e publica SÓ a vendor (a integração vai por PR, ainda aberto)
-    ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1
+    ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1
     rv="$(git --git-dir="$r" rev-parse onion/vendor)"
-    git clone -q "$r" "$b" 2>/dev/null
+    git clone -q "$(_vpt_url "$r")" "$b" 2>/dev/null
     _vpt_core "$c" 3
-    ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$b" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$b" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
     local ok=1
     [ "$rc" -eq 0 ] && git -C "$b" merge-base --is-ancestor "$rv" onion/vendor 2>/dev/null \
       && [ "$(git -C "$b" rev-parse onion/vendor)" = "$(git --git-dir="$r" rev-parse onion/vendor)" ] && ok=0
@@ -7852,7 +7868,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; old="$(git --git-dir="$r" rev-parse onion/vendor)"
     _vpt_members "$w" "fixture-adopter - $r false"
     _vpt_core "$c" 2
-    out="$(ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
+    out="$(ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
     local rem; rem="$(git --git-dir="$r" rev-parse onion/vendor)"
     rm -rf "$w"
     [ "$rc" -eq 0 ] && [ "$rem" = "$old" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
@@ -7863,7 +7879,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w" "fixture-adopter - $r true"
     printf '#!/bin/sh\nwhile read old new ref; do git update-ref "$ref" "$old"; done\n' > "$r/hooks/post-receive"; chmod +x "$r/hooks/post-receive"
     i0="$(git -C "$a" rev-parse "$ib")"; _vpt_core "$c" 2
-    ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
     local i1; i1="$(git -C "$a" rev-parse "$ib")"
     rm -rf "$w"
     [ "$rc" -eq 14 ] && [ "$i1" = "$i0" ]
@@ -7872,9 +7888,9 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
   _vpt_case_pushurl() {
     local w c a r p ib rc=0 old; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; p="$w/p.git"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w" "fixture-adopter - $p true"
-    git clone -q --bare "$r" "$p" 2>/dev/null; git -C "$a" config remote.origin.pushurl "$p"
+    git clone -q --bare "$r" "$p" 2>/dev/null; git -C "$a" config remote.origin.pushurl "$(_vpt_url "$p")"
     old="$(git --git-dir="$r" rev-parse onion/vendor)"; _vpt_core "$c" 2
-    ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
     local ok=1
     [ "$rc" -eq 0 ] && [ "$(git --git-dir="$p" rev-parse onion/vendor)" = "$(git -C "$a" rev-parse onion/vendor)" ] \
       && [ "$(git --git-dir="$r" rev-parse onion/vendor)" = "$old" ] && ok=0
@@ -7910,36 +7926,52 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     rm -rf "$w"; return "$rc"
   }
 
-  # ── ATAQUES AO CONSENTIMENTO (re-refutação de 2026-11-07): o consentimento é do DESTINO real ──────────
+  # ── ATAQUES AO CONSENTIMENTO (re-refutações de 2026-11-07): o consentimento é do DESTINO real ────────
   # Em todos, o membro "cur" consentiu e registra o bare $w/cur.git; o push nunca pode ir a outro lugar.
-  _vpt_attack() {  # <helperdir> <A1|A2|A3|A4|A5> → 0 se nada foi empurrado e a recusa foi dita
-    local w c a r ib cur o0 out rc=0 extra=() mf; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; cur="$w/cur.git"
+  _vpt_attack() {  # <helperdir> <A1|A2|A3|A5|A5b|B1|B1r|B2|B3> → 0 se nada foi empurrado e a recusa foi dita
+    local w c a r ib cur o0 out rc=0 extra=() oc0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; cur="$w/cur.git"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; git clone -q --bare "$r" "$cur" 2>/dev/null
-    o0="$(git --git-dir="$r" rev-parse onion/vendor)"; mf="$(_vpt_mf "$w")"
+    o0="$(git --git-dir="$r" rev-parse onion/vendor)"; oc0="$(git --git-dir="$cur" rev-parse onion/vendor)"
     case "$2" in
       A1) _vpt_members "$w" "cur - $cur true"; extra=(ONION_MEMBER_ID=cur) ;;          # alvo alheio, id do curador
       A2) _vpt_members "$w" "cur - $cur true"                                          # fetch = curador, push = outro
-          git -C "$a" remote set-url origin "$cur"; git -C "$a" config remote.origin.pushurl "$r" ;;
+          git -C "$a" remote set-url origin "$(_vpt_url "$cur")"; git -C "$a" config remote.origin.pushurl "$(_vpt_url "$r")" ;;
       A3) _vpt_members "$w" "cur - $cur true"                                          # vendor segue o mirror
-          git -C "$a" remote rename origin mirror; git -C "$a" remote add origin "$cur"; git -C "$a" config branch.onion/vendor.remote mirror ;;
-      A4) mkdir -p "$w/solto"; printf 'members:\n  - id: forjado\n    remote: %s\n    vendor_push: true\n' "$r" > "$w/solto/members.yaml"
-          mf="$w/solto/members.yaml" ;;                                                   # registro forjado, fora de git
-      A5) _vpt_members "$w" "dono - $r true" "irmao - $r false" ;;                       # remote dividido, um só consentiu
+          git -C "$a" remote rename origin mirror; git -C "$a" remote add origin "$(_vpt_url "$cur")"; git -C "$a" config branch.onion/vendor.remote mirror ;;
+      A5) _vpt_members "$w" "dono - $r true" "irmao - $r false" ;;                       # remote dividido, casado pelo remote
+      A5b) _vpt_members "$w" "dono $(cd "$a" && pwd -P) $r true" "irmao /outro/clone $r false" ;;   # idem, casado pelo local_path
+      B1) _vpt_members "$w" "fixture-adopter - $r false"                                # consentimento só num commit LOCAL
+          sed -i 's/vendor_push: false/vendor_push: true/' "$w/reg/docs/evolution/federation/members.yaml"
+          git -C "$w/reg" commit -qam "consente sem PR" ;;
+      B1r) _vpt_members "$w" "fixture-adopter - $r true"                                # o checkout do core não é source
+          printf 'role: adopted\n' > "$w/reg/.claude/.onion-version" ;;
+      B2) _vpt_members "$w" "cur - $cur true"                                          # 1ª pushurl = curador, 2ª = alheia
+          git -C "$a" config remote.origin.pushurl "$(_vpt_url "$cur")"; git -C "$a" config --add remote.origin.pushurl "$(_vpt_url "$r")" ;;
+      B3) _vpt_members "$w" "cur - $cur true"                                          # caminho relativo que imita o curador
+          sed -i "s#remote: ssh://fixture.test$cur (privado)#remote: https://github.com/fixture/cur#" "$w/reg/docs/evolution/federation/members.yaml"
+          git -C "$w/reg" commit -qam reg; git -C "$w/reg" push -q origin HEAD:main 2>/dev/null; git -C "$w/reg" fetch -q origin 2>/dev/null
+          mkdir -p "$a/github.com/fixture"; git clone -q --bare "$r" "$a/github.com/fixture/cur" 2>/dev/null
+          printf 'github.com/\n' >> "$a/.git/info/exclude"
+          git -C "$a" remote set-url origin github.com/fixture/cur; r="$a/github.com/fixture/cur"; o0="$(git --git-dir="$r" rev-parse onion/vendor)" ;;
     esac
     _vpt_core "$c" 2
-    out="$(env "${extra[@]}" ONION_MEMBERS_FILE="$mf" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
-    local o1; o1="$(git --git-dir="$r" rev-parse onion/vendor)"
+    out="$(cd "$a" && env "${extra[@]}" ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
+    local o1 oc1; o1="$(git --git-dir="$r" rev-parse onion/vendor)"; oc1="$(git --git-dir="$cur" rev-parse onion/vendor)"
     rm -rf "$w"
-    [ "$rc" -eq 0 ] && [ "$o1" = "$o0" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
+    [ "$rc" -eq 0 ] && [ "$o1" = "$o0" ] && [ "$oc1" = "$oc0" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
   }
-  # ── A5 pelo outro lado: o local_path desempata o remote dividido e o membro dono empurra ─────────────
-  _vpt_case_shared_by_path() {
-    local w c a r ib rc=0 old; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
-    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; old="$(git --git-dir="$r" rev-parse onion/vendor)"
-    _vpt_members "$w" "dono $(cd "$a" && pwd -P) $r true" "irmao /outro/clone $r false"; _vpt_core "$c" 2
-    ONION_MEMBERS_FILE="$(_vpt_mf "$w")" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
-    local ok=1; [ "$rc" -eq 0 ] && [ "$(git --git-dir="$r" rev-parse onion/vendor)" != "$old" ] && ok=0
-    rm -rf "$w"; return "$ok"
+  # ── B3 na função: só https://, ssh:// e scp; o resto (e qualquer espaço) é recusado ───────────────
+  _vpt_case_norm() {  # <helperdir>
+    ( source <(sed -n '/^_norm_remote()/,/^}/p' "$1/vendor-branch.sh")
+      local u bad=0
+      for u in "github.com/fixture/cur" "./github.com/fixture/cur" "file://github.com/fixture/cur" "git://github.com/fixture/cur" \
+               "https://github.com/fixture/cur evil" "https://github.com/fixture/cur$(printf '\t')x" "https://github.com/fixture%2Fcur" \
+               "https://evil@github.com@evil.com/fixture/cur"; do
+        _norm_remote "$u" >/dev/null && bad=1
+      done
+      [ "$bad" = 0 ] && [ "$(_norm_remote "https://GitHub.com/Fixture/Cur.git/")" = github.com/fixture/cur ] \
+        && [ "$(_norm_remote "git@github.com:fixture/cur.git")" = github.com/fixture/cur ] \
+        && [ "$(_norm_remote "ssh://git@github.com:22/fixture/cur")" = github.com/fixture/cur ] )
   }
 
   local real m; real="$(mktemp -d)"; _vpt_helpers "$real"
@@ -7953,7 +7985,10 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     "(A1) ONION_MEMBER_ID do curador num alvo alheio não consente|_vpt_attack|A1|mut:member-id-widens|vendor-branch.sh"
     "(A2) pushurl alheio com a url de fetch do curador não consente|_vpt_attack|A2|mut:fetch-url|vendor-branch.sh"
     "(A3) vendor com upstream num mirror, origin do curador, não consente|_vpt_attack|A3|mut:origin-fixed|vendor-branch.sh"
-    "(A4) registro solto (fora de git) não fabrica consentimento|_vpt_attack|A4|mut:any-registry|vendor-branch.sh"
+    "(B1) consentimento só num commit LOCAL do registro não vale (lê origin/main)|_vpt_attack|B1|mut:worktree-registry|vendor-branch.sh"
+    "(B2) duas URLs de push, a 2ª alheia, não consente|_vpt_attack|B2|D_CURE-consent-all-pushurls|vendor-branch.sh"
+    "(A5b) remote dividido: o local_path acha o dono, mas o irmão não consentiu → recusa|_vpt_attack|A5b|D_CURE-consent-shared-remote|vendor-branch.sh"
+    "(B3) remoto como caminho relativo que imita o curador não consente|_vpt_attack|B3|mut:loose-norm|vendor-branch.sh"
     "(d1) commit da vendor: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|vendor|D_CURE-session-trailer-durable|durable-commit.sh"
     "(d2) commit de merge: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|merge|D_CURE-session-trailer-merge|vendor-branch.sh"
   )
@@ -7974,9 +8009,12 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
   if _vpt_attack "$real" A5; then
     record_pass "vendor-push-trailer: (A5) remote dividido por dois membros e só um consentiu → recusa"
   else record_fail "vendor-push-trailer: (A5) remote dividido" "empurrou sem saber de qual membro é o clone"; fi
-  if _vpt_case_shared_by_path "$real"; then
-    record_pass "vendor-push-trailer: (A5b) remote dividido, mas o local_path acha o dono que consentiu → empurra"
-  else record_fail "vendor-push-trailer: (A5b) local_path" "o local_path não desempatou o remote dividido"; fi
+  if _vpt_attack "$real" B1r; then
+    record_pass "vendor-push-trailer: (B1r) checkout do core sem papel source não serve de registro"
+  else record_fail "vendor-push-trailer: (B1r) papel" "um checkout de papel adopted serviu de registro"; fi
+  if _vpt_case_norm "$real"; then
+    record_pass "vendor-push-trailer: (B3n) _norm_remote recusa caminho relativo, file://, git://, espaço, tab, %2F e @ duplo; aceita https, scp e ssh://"
+  else record_fail "vendor-push-trailer: (B3n) normalização" "aceitou uma forma proibida ou recusou uma aceita"; fi
   if _vpt_case_pushurl "$real"; then
     record_pass "vendor-push-trailer: (h) pushurl ≠ url → lê, empurra e confere na URL de push (a url de fetch fica intocada)"
   else record_fail "vendor-push-trailer: (h) pushurl" "o push ou a conferência não usaram a URL de push"; fi
@@ -7986,8 +8024,10 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
   rm -rf "$real"
 
   unset -f _vpt_helpers _vpt_core _vpt_members _vpt_adopter _vpt_pin _vpt_case_push _vpt_case_diverged _vpt_case_from_remote \
-    _vpt_case_no_consent _vpt_case_verify _vpt_attack _vpt_case_shared_by_path _vpt_mf _vpt_case_pushurl _vpt_case_trailer _vpt_case_no_session
-  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+    _vpt_case_no_consent _vpt_case_verify _vpt_attack _vpt_case_norm _vpt_url _vpt_case_pushurl _vpt_case_trailer _vpt_case_no_session
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL GIT_SSH_VARIANT
+  if [ "${_vpt_old_ssh}" = __unset__ ]; then unset GIT_SSH_COMMAND; else export GIT_SSH_COMMAND="${_vpt_old_ssh}"; fi
+  rm -rf "${vpt_bin}"
 }
 
 # ---------------------------------------------------------------------------
