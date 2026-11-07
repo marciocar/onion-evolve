@@ -306,8 +306,22 @@ _core_registry() {  # <CORE> → o members.yaml de origin/main no stdout · rc 1
   [ "${role}" = source ] || { echo "o checkout ${core} não tem papel source (role: ${role:-?})"; return 1; }
   # o origin/main LOCAL envelhece: um consentimento RETIRADO no remoto só valeria depois de um fetch. O fetch
   # é feito aqui, e falha fechada: sem conseguir atualizar, não há como saber se o consentimento segue de pé.
+  # O fetch tem PRAZO (ressalva da 5ª refutação, 2026-11-07): um ssh que dorme prendia o update inteiro. O
+  # `timeout -k` mata o grupo do git (e o ssh ou o upload-pack que ele chamou, inclusive um prompt de senha
+  # parado), e o http desiste se ficar lento. O ssh do usuário (GIT_SSH_COMMAND, core.sshCommand) NÃO é
+  # trocado: forçar BatchMode por cima dele sobrescreveria a chave que ele escolheu. Prazo vencido ou
+  # `timeout` ausente = falha fechada, como o fetch que falha.
+  # ONION_REGISTRY_FETCH_TIMEOUT (segundos, default 30) existe para a bancada encurtar o caso.
   # >>> D_CURE-registry-fetch (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
-  GIT_TERMINAL_PROMPT=0 git -C "${core}" fetch -q origin main 2>/dev/null \
+  local _to="${ONION_REGISTRY_FETCH_TIMEOUT:-30}" _frc=0
+  [[ "${_to}" =~ ^[1-9][0-9]*$ ]] || _to=30
+  command -v timeout >/dev/null 2>&1 \
+    || { echo "sem o comando timeout para dar prazo ao fetch do registro em ${core} — recuso ler sem prazo"; return 1; }
+  GIT_TERMINAL_PROMPT=0 timeout -k 5 "${_to}" git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=15 -C "${core}" fetch -q origin main 2>/dev/null || _frc=$?
+  if [ "${_frc}" -eq 124 ] || [ "${_frc}" -eq 137 ]; then
+    echo "o fetch do registro em ${core} passou do prazo de ${_to}s — o consentimento pode ter sido retirado"; return 1
+  fi
+  [ "${_frc}" -eq 0 ] \
     || { echo "não consegui atualizar origin/main em ${core} (fetch falhou) — o consentimento pode ter sido retirado"; return 1; }
   # <<< D_CURE-registry-fetch <<<
   git -C "${core}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null \
@@ -357,9 +371,12 @@ _vendor_push_consent() {  # <TARGET> <SOURCE_ROOT> <REMOTE> → rc 0 consentiu (
     pick="${byr[0]}"; by="remote"
   fi
   # REMOTE DIVIDIDO: vale pelos dois caminhos — se algum membro com o mesmo remote não consentiu, recusa.
+  # (Só com 2 membros ou mais: com um só, o motivo certo é o "sem vendor_push: true" logo abaixo.)
   # >>> D_CURE-consent-shared-remote (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
-  nok="$(printf '%s\n' "${byr[@]}" | awk -F'\t' '$3!="true"{k++} END{print k+0}')"
-  [ "${nok}" -eq 0 ] || { echo "o remote ${purl} é dividido por ${#byr[@]} membros e ${nok} não consentiu"; return 1; }
+  if [ "${#byr[@]}" -ge 2 ]; then
+    nok="$(printf '%s\n' "${byr[@]}" | awk -F'\t' '$3!="true"{k++} END{print k+0}')"
+    [ "${nok}" -eq 0 ] || { echo "o remote ${purl} é dividido por ${#byr[@]} membros e ${nok} não consentiu"; return 1; }
+  fi
   # <<< D_CURE-consent-shared-remote <<<
   [ "$(cut -f3 <<< "${pick}")" = true ] || { echo "o membro '$(cut -f1 <<< "${pick}")' não tem vendor_push: true"; return 1; }
   if [ -n "${ONION_MEMBER_ID:-}" ] && [ "$(cut -f1 <<< "${pick}")" != "${ONION_MEMBER_ID}" ]; then
