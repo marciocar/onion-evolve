@@ -16,7 +16,10 @@
 #   vendor-branch.sh update <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
 #       Aplica o framework NOVO do core no onion/vendor (worktree) + durable-commit, depois mergeia na
 #       integração. Bootstrapa o vendor se ausente (legado). Exit: 0 merge limpo (ou conflito SÓ em
-#       projeção gerada, resolvido por regeneração e declarado) · 10 CONFLITO (humano resolve) · 11 BASE CRUZADA · 12 arquivo do core não chegou à vendor (nada mergeado) · 2 precondição.
+#       projeção gerada, resolvido por regeneração e declarado) · 10 CONFLITO (humano resolve) · 11 BASE CRUZADA · 12 arquivo do core não chegou à vendor (nada mergeado) · 13 onion/vendor
+#       REMOTA não é ancestral da local, ou push recusado por não-ff (nada mergeado, nada forçado) · 14 remota
+#       ilegível, push que falha ou conferência por ls-remote que não bate (nada mergeado) · 2 precondição.
+#       A remota anda por fast-forward junto com a local (ONION_VENDOR_PUSH=0 desliga, e é dito).
 #
 # Reusa: durable-commit.sh (commit no vendor) · o manifest L1+L2 (mesma superfície do adopt).
 # Determinístico, sem jq. Exercitado por lint-selftest.sh (run_vendor_branch_selftests).
@@ -219,6 +222,101 @@ _clean_baseline() {  # <SRC> <T> <PIN> <IB>
   return 0
 }
 
+# ── A ONION/VENDOR REMOTA ANDA JUNTO COM A LOCAL (2026-11-07) ──────────────────────────────────────
+# O merge sai da onion/vendor LOCAL, e nada a empurrava: medido no --update de um adotante, a remota
+# estava 4 versões atrás da local (4.40.2 contra 4.44.0). Clone novo, outra máquina ou outra sessão
+# ramificaria do que a remota diz, e a base do 3-way seria a errada. Daqui em diante:
+#   · ANTES de mexer na vendor, lê a remota (ls-remote). Local ausente e remota presente → a local nasce
+#     DELA (não de baseline nem do HEAD). Remota que não é ancestral da local → rc 13, nada tocado.
+#   · DEPOIS do commit da vendor (e da guarda de BASE CRUZADA), empurra por fast-forward, sem force, e
+#     confere no remoto: ls-remote tem de devolver o sha local. Push recusado por não-ff → rc 13; remoto
+#     ilegível, push que falha por outro motivo ou conferência que não bate → rc 14.
+#   · O que o update diz da remota é UMA linha, para o relatório downstream: de onde para onde ela foi.
+# Não cria a branch num remoto que não a tem (decisão do dono do repo: a linha diz o comando). Sem
+# remoto, nada a empurrar, e é dito. ONION_VENDOR_PUSH=0 desliga, e também é dito.
+_vendor_remote() {  # <TARGET> → nome do remoto da onion/vendor (upstream dela, senão origin), ou vazio
+  local r; r="$(git -C "$1" config --get "branch.${VENDOR}.remote" 2>/dev/null)"
+  [ -n "$r" ] || r=origin
+  git -C "$1" remote get-url "$r" >/dev/null 2>&1 && printf '%s\n' "$r"
+  return 0
+}
+_remote_vendor_sha() {  # <TARGET> <REMOTE> → sha da onion/vendor no remoto (vazio = ausente) · rc 1 = ilegível
+  local out
+  out="$(GIT_TERMINAL_PROMPT=0 git -C "$1" ls-remote --heads "$2" "refs/heads/${VENDOR}" 2>/dev/null)" || return 1
+  awk '{print $1; exit}' <<< "${out}"
+}
+# Preenche VREMOTE/VREMOTE_OLD. rc 0 segue · 13 divergente · 14 ilegível.
+_vendor_remote_precheck() {  # <TARGET>
+  local T="$1"
+  VREMOTE=""; VREMOTE_OLD=""
+  if [ "${ONION_VENDOR_PUSH:-1}" = 0 ]; then
+    echo "Onion: push da $VENDOR DESLIGADO (ONION_VENDOR_PUSH=0) — a remota não é tocada nesta rodada."; return 0
+  fi
+  VREMOTE="$(_vendor_remote "$T")"
+  if [ -z "${VREMOTE}" ]; then
+    echo "Onion: $VENDOR sem remoto (nem upstream nem 'origin') — fica só local, nada a empurrar."; return 0
+  fi
+  if ! VREMOTE_OLD="$(_remote_vendor_sha "$T" "${VREMOTE}")"; then
+    echo "ERRO: não consegui ler a $VENDOR em '${VREMOTE}' (ls-remote falhou) — nada foi tocado." >&2
+    echo "      Sem ler a remota não sei se a local está à frente; re-rode com o remoto alcançável, ou ONION_VENDOR_PUSH=0 (declarado no relatório)." >&2
+    return 14
+  fi
+  if [ -z "${VREMOTE_OLD}" ]; then
+    echo "Onion: '${VREMOTE}' não tem a $VENDOR — não crio a branch no remoto do adotante; para publicá-la: git push ${VREMOTE} ${VENDOR}"
+    VREMOTE=""; return 0
+  fi
+  if ! git -C "$T" cat-file -e "${VREMOTE_OLD}^{commit}" 2>/dev/null; then
+    GIT_TERMINAL_PROMPT=0 git -C "$T" fetch -q "${VREMOTE}" "refs/heads/${VENDOR}" 2>/dev/null \
+      || { echo "ERRO: a $VENDOR remota (${VREMOTE_OLD:0:12}) não veio no fetch de '${VREMOTE}' — nada foi tocado." >&2; return 14; }
+  fi
+  # >>> D_CURE-vendor-from-remote (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  if ! git -C "$T" rev-parse --verify -q "refs/heads/${VENDOR}" >/dev/null 2>&1; then
+    git -C "$T" branch "$VENDOR" "${VREMOTE_OLD}" >/dev/null 2>&1 \
+      || { echo "ERRO: falhou ao criar a $VENDOR local a partir da remota." >&2; return 14; }
+    echo "Onion: $VENDOR local ausente — criada da remota '${VREMOTE}' (${VREMOTE_OLD:0:12}), a base que os outros clones também têm."
+    return 0
+  fi
+  # <<< D_CURE-vendor-from-remote <<<
+  # >>> D_CURE-vendor-remote-diverged (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  if ! git -C "$T" merge-base --is-ancestor "${VREMOTE_OLD}" "refs/heads/${VENDOR}" 2>/dev/null; then
+    echo "ERRO: a $VENDOR remota (${VREMOTE}: ${VREMOTE_OLD:0:12}) NÃO é ancestral da local ($(git -C "$T" rev-parse --short=12 "refs/heads/${VENDOR}")) — nada foi tocado, e nada será forçado." >&2
+    if git -C "$T" merge-base --is-ancestor "refs/heads/${VENDOR}" "${VREMOTE_OLD}" 2>/dev/null; then
+      echo "      A remota está À FRENTE (outro clone atualizou). Traga-a: git -C '$T' branch -f $VENDOR ${VREMOTE_OLD}  — e re-rode." >&2
+    else
+      echo "      As duas DIVERGIRAM: compare: git -C "$T" log --oneline --left-right $VENDOR...${VREMOTE_OLD:0:12} — e decida qual é a vendor." >&2
+    fi
+    return 13
+  fi
+  # <<< D_CURE-vendor-remote-diverged <<<
+  return 0
+}
+# Empurra por ff e confere. rc 0 · 13 recusado por não-ff · 14 outra falha ou conferência que não bate.
+_vendor_remote_push() {  # <TARGET>
+  local T="$1" new now out
+  [ -n "${VREMOTE}" ] || return 0
+  new="$(git -C "$T" rev-parse "refs/heads/${VENDOR}")"
+  # >>> D_CURE-vendor-push (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  if [ "${new}" != "${VREMOTE_OLD}" ]; then
+    if ! out="$(GIT_TERMINAL_PROMPT=0 git -C "$T" push --porcelain "${VREMOTE}" "refs/heads/${VENDOR}:refs/heads/${VENDOR}" 2>&1)"; then
+      echo "ERRO: o push da $VENDOR para '${VREMOTE}' foi recusado — sem force; o merge NÃO foi feito:" >&2
+      printf '%s\n' "${out}" | tail -6 | sed 's/^/    /' >&2
+      grep -qE 'non-fast-forward|fetch first|\[rejected\]' <<< "${out}" && return 13
+      return 14
+    fi
+  fi
+  # <<< D_CURE-vendor-push <<<
+  if ! now="$(_remote_vendor_sha "$T" "${VREMOTE}")" || [ "${now}" != "${new}" ]; then
+    echo "ERRO: conferência no remoto falhou — ls-remote '${VREMOTE}' devolve '${now:-<nada>}', a local é ${new:0:12}. O merge NÃO foi feito." >&2
+    return 14
+  fi
+  if [ "${new}" = "${VREMOTE_OLD}" ]; then
+    echo "Onion: $VENDOR remota (${VREMOTE}) já em ${new:0:12}, igual à local (conferida por ls-remote)."
+  else
+    echo "Onion: $VENDOR remota (${VREMOTE}): ${VREMOTE_OLD:0:12} → ${new:0:12} (fast-forward, conferida por ls-remote)."
+  fi
+  return 0
+}
+
 _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   local T="$1" SRC="$2" PIN="$3" IB="$4"
   git -C "$T" rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️  $T não é repo git — update pulado." >&2; return 0; }
@@ -258,6 +356,13 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
     echo "      Resolva a fonte pelo resolve-update-source.sh (ele entrega a raiz cujo HEAD é o pin)." >&2
     return 2
   fi
+
+  # A remota é lida ANTES de qualquer escrita na vendor (bloco "A ONION/VENDOR REMOTA" acima).
+  local VREMOTE VREMOTE_OLD _rrc=0
+  _vendor_remote_precheck "$T" || _rrc=$?
+  [ "${_rrc}" -eq 0 ] || return "${_rrc}"
+  # A sessão é resolvida uma vez: a nota de "desconhecida" sai aqui, uma só (o durable-commit a calaria).
+  local _trailer=""; [ -f "${HERE}/session-trailer.sh" ] && _trailer="$(bash "${HERE}/session-trailer.sh" --note)"
 
   # Bootstrap de legado (sem vendor): ramifica do commit LIMPO (framework == core@pin-ADOTADO), não do HEAD
   # (que pode ter customização commitada → clobber no 1º merge — spec §8). Fresh-adoption já tem vendor.
@@ -427,6 +532,11 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
     return 11
   fi
 
+  # A vendor nova vai ao remoto ANTES do merge: push recusado ou conferência que falha param aqui, com a
+  # integração intocada; re-rodar é seguro (a vendor já tem o commit, o durable-commit diz "nada novo").
+  _rrc=0; _vendor_remote_push "$T" || _rrc=$?
+  [ "${_rrc}" -eq 0 ] || return "${_rrc}"
+
   # Merge do onion/vendor na integração (3-way; base comum). Conflito = never-clobber estrutural.
   # ASSINATURA do adotante também no MERGE (2026-10-07): o durable-commit já assinava desde o #943, e
   # este commit, que é o do framework, seguia sem trailer — a sessão do adotante fazia amend à mão.
@@ -437,6 +547,13 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
 try: print((json.load(open(sys.argv[1])).get("attribution") or {}).get("commit") or "")
 except Exception: print("")' "$T/.claude/settings.json")"
   fi
+  # A linha da sessão (2026-11-07) vai abaixo da assinatura, só quando conhecida (session-trailer.sh, que
+  # nunca inventa; a nota de "sessão desconhecida" já saiu no início do update).
+  # >>> D_CURE-session-trailer-merge (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  if [ -n "${_trailer}" ] && ! grep -q '^Claude-Session:' <<< "${_sig}"; then
+    _sig="${_sig:+${_sig}$'\n'}${_trailer}"
+  fi
+  # <<< D_CURE-session-trailer-merge <<<
   [ -n "${_sig}" ] && _mmsg+=(-m "${_sig}")
   if git -C "$T" merge "$VENDOR" "${_mmsg[@]}" >/dev/null 2>&1; then
     echo "Onion: framework atualizado via merge limpo de $VENDOR (pin ${PIN})."
