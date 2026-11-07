@@ -2,18 +2,17 @@
 branch: feat/dissect-idea-harvest
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 3f64c164c778b81a5d8862f82d966d14275f36bd9179ec0caca3b3ab7c031c57
-reviewed_code_sha256: 2f93563dda1e0a5ddde9d489c1a605a3beda66daa039c20e76ebf531d73cd865
-findings_total: 4
-findings_real: 2
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 4
 findings_blocking: 0
 tokens: 0
-duration_min: 75
-findings_fixed: 2
+duration_min: 120
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "o autor (agente de execução da sessão do core), em passada própria sobre o diff; não é independente"
-nota: "tokens 0 = não medido (passada na própria sessão, sem subagente; o brief proibia lançar subagentes). Os 2 achados reais vieram do dogfood nos estudos dos peers e foram curados no mesmo PR, cada um com caso e mutante. Os 2 restantes são LIMITE declarado."
+nota: "tokens 0 = não medido (passada na própria sessão, sem subagente; o brief proibia lançar subagentes). Os 4 achados reais (2 do dogfood nos estudos dos peers, 2 da passada sobre a extensão do destino e da candidata) foram curados no mesmo PR, cada um com caso e mutante. Os 3 restantes são LIMITE declarado."
 ---
 
 # Passada adversarial: `feat/dissect-idea-harvest`
@@ -74,3 +73,32 @@ da evidência `E_ELIMINATORIO_APAGA_A_COLHEITA_1107`, e o `label` dela passava d
 os eliminatórios por extenso e encurta o `label`. Ele só mexe na prosa desse nó, e o código não muda. Conferido de
 novo: `kg-vocab-ci.sh` rc 0 (0 códigos novos), `kg-contract-check.sh` rc 0, `kg-radar.sh --integrity --schema` rc 0.
 Nenhum achado novo.
+
+## Extensão: o destino da ideia e a candidata órfã (3º lote, pedido da sessão principal)
+
+O censo dos objetos barrados nos três repos (2026-11-07) mediu duas coisas. Não há chave de colheita em nenhum grafo.
+E o padrão dominante não é "barrado sem ler": é "lido até o N2, ideia citada no rótulo do veredito e nunca entregue".
+Daí:
+
+- **item 9, `ideia-sem-destino`**: toda ideia declara `destination` (`<repo>:<caminho>#<ID>`, issue `SAC-123` ou
+  URL) ou `nenhum` com `destination_why`. O `--context` mostra `ideias/com destino` por estudo, e o marcador contável
+  são os próprios nós (`git grep -c 'x_dissect_idea:'`). Uma lista no `meta:` seria declaração paralela aos nós.
+- **item 10**: o parque declara a candidata como ponteiro (`x_dissect_candidate`). Se a candidata foi rejeitada ou
+  refutada depois, sai `gatilho-orfao`: achado no parque aberto, aviso no parque já selado. Ponteiro mal formado ou
+  que não existe reprova. Ponteiro para outro repo sai como aviso `candidata-fora-do-repo`.
+
+Achados desta passada:
+
+5. **REAL, corrigido:** o leitor de cobertura da bancada lia `add\((\d),`, um dígito só. Os códigos do item 10 ficavam
+   invisíveis à cobertura (ela dizia "59 códigos têm caso" e saía verde), e o mutante não os achava. Cura: `\d+` no
+   leitor e no mutante. Agora são 62 códigos, e os casos do item 10 reprovam contra o mutante.
+6. **REAL, corrigido:** `x_dissect_candidate` com caminho absoluto ou com `..` fazia o checador ler um arquivo fora
+   do repo. Cura: esses caminhos saem `candidata-mal-formada`, com caso próprio.
+7. **LIMITE:** a candidata em outro repo não é lida (o checador não lê repo alheio, como no selo). Ela sai como aviso
+   e não é medida. Repo e caminho "dele mesmo" se reconhecem pelo nome do `origin` e da pasta raiz.
+
+Dogfood do item 10 num clone descartável da curadoria (nada escrito no repo dela). Pus no
+`D_AGENT_NEUTRAL_CHANNEL_VERDICT` o ponteiro `onion-curation:…/claude-code-channels-2026-11.kg.yaml#D_PIECE_CH_AGENT_MAIL`
+e rodei o checador do ramo: saiu `aviso item 10 gatilho-orfao`, rc 0 (o parque é selado). Saiu também o
+`aviso item 7 gatilho-disparou-depois-do-selo`, que já existia ali. Bancada: 125 casos + 4 de rc 3 verdes, 62
+códigos cobertos, cada caso contra o mutante do seu código.

@@ -124,7 +124,9 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    **decisões de desenho** como nós `x_dissect_idea` (§1c da doutrina): `kind`, o comparativo à régua
    (`onion: temos | nao-temos | diferente` + `why`, o que a régua faz e por quê) e a `source`
    (`arquivo:linha`, com pino num repo alheio, ou a URL do doc). Ideia candidata leva `candidate: true`,
-   `value` de 1 a 5 e `value_why`. Tipo sem ideia exige `x_dissect_ideas_gap` com a razão, e objeto com
+   `value` de 1 a 5 e `value_why`. Toda ideia declara o `destination` que a consome (`<repo>:<caminho>#<ID>`,
+   issue `SAC-123` ou URL) ou `nenhum` com `destination_why`: ideia citada no rótulo e nunca entregue é o
+   padrão que o censo de 2026-11-07 mediu. Tipo sem ideia exige `x_dissect_ideas_gap` com a razão, e objeto com
    zero ideias reprova sempre. Projeto arquivado se lê no último commit com pino: o conceito se colhe e
    se reescreve, o código não entra.
 4. **VEREDITO** — um dos **vereditos da família** (o registro os lista; `ator` não absorve, `categoria` e
@@ -132,6 +134,8 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    `meta.x_who_pays` e `meta.x_unverified`. A superação de um negativo é buscada **também na web**
    (`x_dissect_overcoming_search` com ao menos uma `where: web` quando ela é `nenhuma`), e o parque leva
    `x_dissect_trigger` (consulta `kg_query` em lista branca que lê o que persiste, abaixo de `min_count`). `parquear` **exige gatilho nomeado**.
+   Parque que nomeia a candidata que o superaria a declara como ponteiro, `x_dissect_candidate: [<repo>:]<caminho>.kg.yaml#<ID>`:
+   candidata rejeitada depois deixa o gatilho órfão, e o item 10 do checador o acusa.
    `rejeitar` e `parquear` são **negativos** e exigem, no nó do veredito, `x_dissect_criterion:` (o
    comando que checa a reprovação) e `x_dissect_overcoming:` (o id do nó deste grafo com o que SUPERA,
    com aresta para a decisão, ou `nenhuma` + `x_dissect_overcoming_measure:` com o que se procurou e

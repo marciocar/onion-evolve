@@ -20,7 +20,10 @@ O mínimo que não se negocia aqui:
   licença, plataforma) barra o **código**, nunca a colheita: toda dissecação, inclusive a rejeitada no
   N0, registra as funcionalidades, as estratégias e as decisões de desenho em nós `x_dissect_idea`, com
   o comparativo à régua (`temos | nao-temos | diferente` + `why`) e a fonte (`arquivo:linha` ou a URL
-  do doc). A candidata leva `value` de 1 a 5. Zero ideias reprova no item 9 do checador.
+  do doc). A candidata leva `value` de 1 a 5, e toda ideia leva o `destination` que a consome (ou
+  `nenhum` com o porquê). Zero ideias reprova no item 9 do checador.
+- **Parque que nomeia candidata a declara como ponteiro** (`x_dissect_candidate`). Candidata rejeitada
+  depois = gatilho órfão, acusado no item 10.
 - **N0–N2 DESCREVEM. N3 JULGA. Só N4 recomenda.** Nível raso que recomenda é opinião com cara de
   análise.
 - **N2 exige COMPORTAMENTO** (behavior-over-declaration): rodar — em worktree/container isolado,

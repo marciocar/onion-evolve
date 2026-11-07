@@ -75,7 +75,10 @@ def ideas_for(piece):
     out = []
     for i, kind in enumerate(IDEA_KINDS):
         idea = {"kind": kind, "onion": ("nao-temos", "temos", "diferente")[i], "why": "o Onion faz assim, e por quê.",
-                "source": ("src/cli.py:42", "https://example.org/doc", "repo@abc1234:core/x.cue:14-17")[i]}
+                "source": ("src/cli.py:42", "https://example.org/doc", "repo@abc1234:core/x.cue:14-17")[i],
+                "destination": ("onion-evolve:docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_IDEIA", "SAC-123", "nenhum")[i]}
+        if i == 2:
+            idea["destination_why"] = "o Onion já faz assim; a ideia confirma o desenho e ninguém precisa consumi-la."
         if i == 0:
             idea.update(candidate=True, value=3, value_why="cobre um buraco medido.")
         if piece:
@@ -297,7 +300,21 @@ CASES = [
     ("estudo com registered_at ilegível sem ideias: a régua vale", "sem-registro-de-ideias", seq(drop_ideas, lambda g: node(g, "S_STAGE0")["x_criterion"].update(registered_at="ontem")), "ok", []),
     ("peças com uma ideia sem a peça", "ideia-sem-peca", seq(pieces, lambda g: idea(g, 0).pop("piece")), "ok", []),
     ("peça rejeitada sem ideia, nem com a lacuna nos 3 tipos (imessage, Agent Mail)", "peca-sem-ideias", seq(pieces, lambda g: (node(g, "D_PIECE_B").update(x_dissect_verdict="rejeitar", x_dissect_criterion="E2: licença", x_dissect_ideas_gap={k: "sem." for k in IDEA_KINDS}), node(g, "D_PIECE_B").pop("x_dissect_trigger")), lambda g: drop_ideas(g, "D_PIECE_B")), "ok", []),
+    # item 9 — o destino de cada ideia (censo de 2026-11-07: lida, citada no rótulo e nunca entregue)
+    ("ideia sem destino", "ideia-sem-destino", lambda g: idea(g).pop("destination"), "ok", []),
+    ("ideia com destino em texto solto", "ideia-sem-destino", lambda g: idea(g).update(destination="o vigia da curadoria"), "ok", []),
+    ("ideia sem destino declarado sem o porquê", "ideia-sem-destino", lambda g: idea(g, 2).pop("destination_why"), "ok", []),
+    # item 10 — a candidata que o parque nomeia não foi rejeitada depois (o gatilho órfão do canal neutro)
+    ("parque com a candidata viva (variante legítima)", None, lambda g: D(g).update(x_dissect_candidate=GRAPH + "#E_OVER"), "ok", []),
+    ("candidata mal formada", "candidata-mal-formada", lambda g: D(g).update(x_dissect_candidate="o MCP Agent Mail"), "ok", []),
+    ("candidata com caminho que sai do repo", "candidata-mal-formada", lambda g: D(g).update(x_dissect_candidate="../outro/x.kg.yaml#D_X"), "ok", []),
+    ("candidata que não existe", "candidata-inexistente", lambda g: D(g).update(x_dissect_candidate=GRAPH + "#E_NAO_EXISTE"), "ok", []),
+    ("candidata refutada no mesmo grafo", "gatilho-orfao", lambda g: (D(g).update(x_dissect_candidate=GRAPH + "#E_OVER"), node(g, "E_OVER").update(status="refuted")), "ok", []),
+    ("candidata rejeitada noutro estudo do repo (o caso do MCP Agent Mail)", "gatilho-orfao", lambda g: D(g).update(x_dissect_candidate="onion-evolve:" + CAND_GRAPH + "#D_CAND"), "cand-graph", []),
+    ("candidata rejeitada com o parque já selado (avisa, rc 0)", "aviso:gatilho-orfao", lambda g: D(g).update(x_dissect_candidate=CAND_GRAPH + "#D_CAND", status="done", x_dissect_sealed_by=SEAL), "cand-graph", []),
+    ("candidata noutro repo (avisa que não mede, rc 0)", "aviso:candidata-fora-do-repo", lambda g: D(g).update(x_dissect_candidate="onion-curation:docs/x/x.kg.yaml#D_X"), "ok", []),
 ]
+CAND_GRAPH = "docs/evolution/dissect/fixture-cand-2026-11/fixture-cand-2026-11.kg.yaml"
 RC3_CASES = [
     ("grafo ilegível", "rc3-yaml", ["@graph"]),
     ("argumento inválido", "rc3-args", ["@graph", "--stage", "meio"]),
@@ -364,6 +381,13 @@ def build(checker_src, mut, order):
         plan(); commit(tmp, "plano"); graph(); sh(tmp, "git", "add", "-A")
     elif order == "n0-before-uncommitted-plan":
         graph(); commit(tmp, "n0 antes"); plan()
+    elif order == "cand-graph":
+        # outro estudo do repo, onde a candidata que o parque nomeia saiu rejeitada (o claude-code-channels da curadoria)
+        write_yaml(tmp, CAND_GRAPH, {"meta": {"id": "fixture-cand-2026-11", "schema_version": "1", "baseline": "2026-11-06", "review_after": "2026-12-06"},
+                                     "nodes": [{"id": "D_CAND", "node_type": "decision", "plane": "DEV", "status": "open", "impact": 2, "confidence": 0.5,
+                                                "label": "rejeitar a candidata pela licença.", "x_dissect_verdict": "rejeitar"}]})
+        sh(tmp, "git", "remote", "add", "origin", "https://github.com/marciocar/onion-evolve.git")  # o <repo>: do ponteiro sai do origin
+        plan(); commit(tmp, "plano"); graph(); commit(tmp, "n0")
     elif order in ("protocol-untracked", "protocol-tracked"):
         plan(); commit(tmp, "plano")
         if order == "protocol-tracked":
@@ -405,7 +429,7 @@ def run(tmp, extra):
 def codes_in(src):
     """os códigos lidos do fonte. Toda chamada add( tem de render um código: se o regex perder alguma, a bancada
     reprova em vez de calar (a 1ª versão deste leitor perdia todo código com `_` e a cobertura saía verde)."""
-    calls = re.findall(r'\badd\((\d), ("[^"]*"[^,]*)', src)
+    calls = re.findall(r'\badd\((\d+), ("[^"]*"[^,]*)', src)  # \d+: o item 10 tem dois dígitos
     found = set()
     for i, lit in calls:
         m = re.fullmatch(r'"([A-Za-z0-9_-]+)"', lit.strip())
@@ -422,7 +446,7 @@ def silence(src, code):
     if code == DYNAMIC:
         out = src.replace('add(5, "stage0-" + ', '(lambda *a: None)(5, "stage0-" + ')
     else:
-        out = re.sub(r'\badd\((\d), "%s"' % re.escape(code), r'(lambda *a: None)(\1, "%s"' % code, src)
+        out = re.sub(r'\badd\((\d+), "%s"' % re.escape(code), r'(lambda *a: None)(\1, "%s"' % code, src)
     assert out != src, "mutante de %s não achou o add" % code
     return out
 
@@ -442,11 +466,15 @@ def one_case(src, item_of, case):
         if code.startswith("aviso:"):
             # o aviso informa sem reprovar: rc 0 COM a linha; o mutante cala o note() e a linha tem de sumir
             acode = code[len("aviso:"):]
-            item = item_of.get(acode, 7)  # o aviso do item 7 sai pelo fired(); o do item 9 é o add do estudo anterior
+            # o aviso do item 7 sai pelo fired(); o do item 9 é o add do estudo anterior; o do item 10, um note() literal
+            lit = re.search(r'\bnote\((\d+), "%s"' % re.escape(acode), src)
+            item = int(lit.group(1)) if lit else item_of.get(acode, 7)
             tag = "aviso item %d %s:" % (item, acode)
             if rc != 0 or tag not in out:
                 return None, "%s: esperado rc 0 com '%s'; veio rc %d:\n%s" % (name, tag, rc, out)
-            if item == 9:
+            if lit:
+                muted = re.sub(r'\bnote\((\d+), "%s"' % re.escape(acode), r'(lambda *a: None)(\1, "%s"' % acode, src)
+            elif item == 9:
                 muted = src.replace("note(9, code, ", "(lambda *a: None)(9, code, ")
                 assert muted != src, "mutante do aviso do item 9 não achou o note(9"
             else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dissect-object-check — o checador de forma da dissecação de QUALQUER objeto (família, Etapa 0, veredito, destino).
 
-Cobra, por comando, os 9 itens (8 da §6 e o registro de ideias da §1c) da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
+Cobra, por comando, os 10 itens (8 da §6, o registro de ideias e a candidata do parque da §1c) da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
 de UM estudo e o git log. Determinístico, sem LLM e sem rede.
 
   item 1  x_dissect_tool, x_dissect_family e a aresta TRACES_TO para o registro existem e concordam
@@ -22,6 +22,11 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
           eliminatório barra o USO do código, nunca a colheita (crítica do maestro de 2026-11-07: o quicue-kg saiu
           rejeitado pelo E1 com as lições medidas "fora da escada", e o imessage e o MCP Agent Mail saíram pelo E1/E2
           sem uma ideia registrada). Com peças, cada peça é um objeto e tem as SUAS ideias (x_dissect_idea.piece).
+          Toda ideia declara o DESTINO que a consome (repo:caminho#ID, issue SAC-123 ou URL) ou `nenhum` com o porquê:
+          o censo de 2026-11-07 achou o padrão "lida até o N2, citada no rótulo do veredito e nunca entregue".
+  item 10 a candidata que o parque nomeia (x_dissect_candidate: [repo:]caminho#ID) existe e não foi rejeitada depois:
+          rejeitada, o gatilho do parque ficou órfão (caso real: o parque do canal neutro da curadoria nomeia o MCP
+          Agent Mail, rejeitado pela licença em 2026-11-06). No parque JÁ SELADO sai como AVISO, para o destino reabrir.
 
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
@@ -88,6 +93,9 @@ TRIGGER_FLAGS = {"--id", "--id-prefix", "--type", "--status", "--plane", "--laye
 IDEAS_SINCE = "2026-11-07T00:00:00+00:00"
 IDEA_KINDS = ("funcionalidade", "estrategia", "decisao-de-desenho")
 IDEA_ONION = {"temos", "nao-temos", "diferente"}
+# o destino que consome a ideia: o nó de um repo (o mesmo formato do selo), uma issue (SAC-123) ou a URL dela
+IDEA_DESTINATION = re.compile(r"^([A-Za-z0-9._-]+:[^\s#]+#[A-Z][A-Z0-9_]*|[A-Z][A-Z0-9]+-\d+|https?://\S+)$")
+CANDIDATE = re.compile(r"^(?:([A-Za-z0-9._-]+):)?([^\s#:]+\.kg\.ya?ml)#([A-Z][A-Z0-9_]*)$")
 # a fonte da ideia: arquivo:linha (com pino ou caminho upstream, ex. repo@sha:src/x.py:42 ou core/decision.cue:14-17)
 # ou o doc por URL; texto solto ("o README") não se reencontra
 IDEA_SOURCE = re.compile(r"^(https?://\S+|\S+:\d+(-\d+)?)$")
@@ -369,6 +377,12 @@ def ideas_check(add, meta, nodes, by_id):
         src = idea.get("source")
         if not (isinstance(src, str) and IDEA_SOURCE.match(src.strip())):
             add(9, "ideia-sem-fonte", "%s: source=%r; exigido arquivo:linha (ex. core/decision.cue:14-17) ou a URL do doc" % (nid, src))
+        dest = idea.get("destination")
+        if dest == "nenhum":
+            if not (isinstance(idea.get("destination_why"), str) and idea["destination_why"].strip()):
+                add(9, "ideia-sem-destino", "%s: destination: nenhum exige destination_why (por que nenhum repo, nó ou issue consome a ideia)" % nid)
+        elif not (isinstance(dest, str) and IDEA_DESTINATION.match(dest.strip())):
+            add(9, "ideia-sem-destino", "%s: destination=%r; exigido o que consome a ideia (<repo>:<caminho>#<ID>, issue SAC-123 ou URL) ou nenhum + destination_why" % (nid, dest))
         if idea.get("candidate") is True:
             v = idea.get("value")
             if not (isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 5 and isinstance(idea.get("value_why"), str) and idea["value_why"].strip()):
@@ -452,6 +466,55 @@ def judge_verdict(add, note, vn, verdict, expect, spec, fam, by_id, path):
         tag = lambda f: (lambda item, code, detail: f(item, code, "%s: %s" % (vid, detail)))
         trigger_check(tag(add), vn.get("x_dissect_trigger"), path, by_id,
                       fired=tag(note) if (vn.get("status") == "done" and seal_ok) else None)
+        candidate_check(add, note, vn, path, by_id, sealed=(vn.get("status") == "done" and seal_ok))
+
+
+def self_repo_names():
+    """os nomes por que este repo se chama: o do remote origin e o da pasta raiz (o ponteiro <repo>: usa um deles)."""
+    names = {os.path.basename(os.getcwd())}
+    rc, url = git("remote", "get-url", "origin")
+    if rc == 0 and url.strip():
+        names.add(re.sub(r"\.git$", "", url.strip().rstrip("/").rsplit("/", 1)[-1].rsplit(":", 1)[-1]))
+    return names
+
+
+def candidate_check(add, note, vn, path, by_id, sealed):
+    """item 10: a candidata que o parque nomeia como a que o superaria ainda existe e não foi rejeitada."""
+    cand = vn.get("x_dissect_candidate")
+    if cand is None:
+        return
+    vid = vn.get("id")
+    m = CANDIDATE.match(cand) if isinstance(cand, str) else None
+    # o caminho é relativo à raiz e fica nela: absoluto ou com ".." leria arquivo fora do repo que o ponteiro nomeia
+    if m and (os.path.isabs(m.group(2)) or os.path.normpath(m.group(2)).startswith("..")):
+        m = None
+    if not m:
+        add(10, "candidata-mal-formada", "%s: x_dissect_candidate=%r; exigido [<repo>:]<caminho>.kg.yaml#<ID> do veredito (ou da peça) da candidata" % (vid, cand))
+        return
+    repo, cpath, cid = m.groups()
+    if repo and repo not in self_repo_names():
+        note(10, "candidata-fora-do-repo", "%s: a candidata %s mora em outro repo; o checador não a lê, e o órfão ali não é medido" % (vid, cand))
+        return
+    if os.path.normpath(cpath) == os.path.normpath(path):
+        target = by_id.get(cid)
+    elif os.path.isfile(cpath):
+        try:
+            target = {n.get("id"): n for n in nodes_of(load(cpath))}.get(cid)
+        except (OSError, ValueError, yaml.YAMLError) as exc:
+            raise NotMeasured("a candidata %s não se lê: %s" % (cand, exc))
+    else:
+        target = None
+    if target is None:
+        add(10, "candidata-inexistente", "%s: x_dissect_candidate %s não é nó existente; o gatilho do parque espera por quem não existe" % (vid, cand))
+        return
+    rejected = str(verdict_of(target)) == "rejeitar" or target.get("status") in ("refuted", "superseded")
+    if not rejected:
+        return
+    why = "%s: a candidata que superaria o parque (%s) foi rejeitada depois (veredito %s, status %s): o gatilho ficou órfão; nomeie outra candidata ou reabra o parque" % (vid, cand, verdict_of(target), target.get("status"))
+    if sealed:
+        note(10, "gatilho-orfao", why + " (parque selado: reabrir no destino)")
+    else:
+        add(10, "gatilho-orfao", why)
 
 
 def plan_check(add, path, ref, crit, allow_uncommitted, stage):
@@ -613,12 +676,14 @@ def context():
                 k3 = "ok" if n == 0 else "%d achado(s)" % n
             except Exception as exc:  # um grafo que o checador não lê não derruba a projeção inteira
                 k3 = "não medido (%s)" % str(exc)[:60]
-        ideas = sum(1 for n in nodes_of(doc) if "x_dissect_idea" in n)
+        idea_nodes = [n["x_dissect_idea"] for n in nodes_of(doc) if "x_dissect_idea" in n]
+        routed = sum(1 for i in idea_nodes if isinstance(i, dict) and i.get("destination") not in (None, "nenhum"))
+        ideas = "%d/%d" % (len(idea_nodes), routed)
         rows.append((f, meta.get("x_dissect_tool"), (legacy.get(fam, fam) if isinstance(fam, str) else fam) or "(sem família)", meta.get("x_study_destination") or "—", verdict, ideas, k3))
     print("\n# estudos de dissecação no corpus · %d" % len(rows))
-    print("objeto | família | destino | veredito | ideias | forma | grafo")
+    print("objeto | família | destino | veredito | ideias/com destino | forma | grafo")
     for f, tool, fam, dest, verdict, ideas, k3 in rows:
-        print("%s | %s | %s | %s | %d | %s | %s" % (tool, fam, dest, verdict, ideas, k3, f))
+        print("%s | %s | %s | %s | %s | %s | %s" % (tool, fam, dest, verdict, ideas, k3, f))
     print("\n(o checador só julga estudo por família, o que declara x_study_destination: o anterior a 2026-10-24 fica fora por desenho, e o checador direto")
     print(" sobre ele lista o que falta para migrar. Presença, pertença e ordem no git, não qualidade.)")
     return 0
