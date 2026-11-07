@@ -1,0 +1,141 @@
+# kg-backlog-guard: on
+# Forja de guarda (/meta:forge-guard): a REGRA 119 deriva da máquina os nomes de repo e de clone de adotante que não
+# estão federados e reprova o diff que os acrescenta. Este grafo guarda o defeito medido, o substrato, as medidas de
+# falso positivo na história da main e os tetos. Nenhum nome real aparece aqui: só hashes curtos e contagens.
+meta:
+  id: guard-private-names-2026-11
+  schema_version: "1"
+  baseline: "2026-11-07"
+  review_after: "2026-12-07"   # 30d: defeito de guarda
+  # ═══ TETO: 8 NÓS ═══
+nodes:
+  - id: Q_DIFF_SEM_NOME_PRIVADO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-07"
+    verified_against: "família private_name da bancada; replay do commit do vazamento de 2026-11-04 com a lista de termos vazia"
+    label: "no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimir o termo"
+    narrative: "Aberta até o merge humano. A guarda é a decisão (b) do maestro de 2026-11-07; a (a) aceitou o histórico e a (c) é o mapa local de membros (grafo member-paths-2026-11)."
+  - id: E_SELO_DE_1104_CITOU_O_REPO_DO_CLIENTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-07"
+    verified_against: "git log -S do commit 9ea6af77e (2026-11-04) e private-name-check.sh --base 9ea6af77e~1 numa worktree destacada nele, com a lista de termos vazia"
+    trace: ".claude/validation/private-name-check.sh"
+    label: "medido: o commit 9ea6af77e de 2026-11-04 acrescentou 3 linhas com o nome da origin do clone do adotante de consultoria; a guarda, com a lista vazia (o estado de então), acusa as 3 (hash 925bcbd1)"
+    narrative: "A REGRA 106 e a REGRA 36 procuram termos declarados, e o termo não estava na lista. O nome vem da origin do clone, não do diretório: derivar só o nome do diretório não teria pegado. O PR #1522 tirou o nome da árvore (mergeado em 2026-11-07)."
+    provenance:
+      source: "replay local do commit do vazamento"
+      locator: "docs/evolution/research/session-orchestration-2026-11, linhas 205 a 207 naquele commit"
+      method: "measurement: guarda real sobre o diff do commit"
+      locality: "repo"
+  - id: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-07"
+    verified_against: "guard-census.sh (nenhuma guarda da classe; o molde de helper com --tsv da REGRA 114 é o mais recente); família private_name"
+    trace: ".claude/validation/private-name-check.sh"
+    label: "substrato: check de lint (REGRA 119, aplica-se só à fonte) com helper próprio; julga as linhas acrescentadas contra o merge-base com origin/main e o caminho dos arquivos novos"
+    narrative: "Conjunto proibido: o nome de cada diretório irmão do checkout principal que é clone git com carimbo do Onion e o nome da origin dele, mais os caminhos do mapa local de membros, menos os ids, remotes e local_paths do members.yaml, com 4 caracteres ou mais; somam-se os termos da lista de clientes, menos as variantes de membro federado. Lint e não hook porque o pre-commit já roda o lint e o CI também: um lugar só. Diff e não árvore porque a árvore da main ainda tem ocorrências antigas, e o histórico foi aceito."
+  - id: E_FALSO_POSITIVO_MEDIDO_NA_HISTORIA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-07"
+    verified_against: "private-name-check.sh --base <primeiro commit antes da data> sobre a origin/main 0a6f15f36, janelas de 2026-08-01, 2026-10-01 e 2026-10-24"
+    trace: ".claude/validation/private-name-check.sh"
+    label: "medido: na 1a redação, 38 achados desde 2026-10-01, 33 deles falso positivo; depois da cura, 5 achados em 4 arquivos, todos nome de clone não federado; desde 2026-10-24 (864 commits), zero"
+    narrative: "Os 33 falsos eram variante de grafia de membro federado na lista e classe CSS com o nome depois de hífen. As duas curas que a medida pediu: a lista perde o termo cuja forma normalizada (só letras e dígitos) é a de um membro federado, e o nome derivado não casa depois de hífen ou sublinhado. Os 5 restantes (hashes 6d7c0eb4, 9965e149 e ca46b099) são passivo da main; a guarda não os cobra porque julga só o diff."
+    provenance:
+      source: "execução local da guarda sobre três janelas da história da main"
+      locator: "contagem por hash"
+      method: "measurement: guarda real sobre o diff acumulado"
+      locality: "repo"
+  - id: C_TETO_SEM_MAQUINA_SO_A_LISTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-07"
+    verified_against: "casos de CI do selftest (sem irmãos carimbados e sem mapa)"
+    trace: ".claude/validation/private-name-check.sh"
+    label: "teto declarado: no CI não há máquina, e a guarda julga só pela lista de termos do segredo, dizendo isso (SOFT SO-LISTA); sem lista também, SOFT NAO-VERIFICADO"
+    narrative: "O nome que só a máquina conhece só é barrado no commit local (pre-commit e pr-finalize). Um commit feito fora desta máquina, sem o termo na lista do segredo, passa no CI. O secret do CI precisa do termo novo, e atualizar o secret é ato do maestro."
+    provenance:
+      source: ".claude/validation/private-name-check.sh, selftest"
+      locator: "casos sem máquina (SO-LISTA) e sem máquina nem lista (NAO-VERIFICADO)"
+      method: "measurement: selftest real"
+      locality: "repo"
+  - id: C_TETO_O_QUE_A_GUARDA_NAO_VE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-07"
+    verified_against: "cabeçalho de private-name-check.sh"
+    trace: ".claude/validation/private-name-check.sh"
+    label: "teto declarado: mensagem de commit e corpo de PR, clone fora do pai do core, repo só remoto, abreviação ou grafia trocada, nome derivado curto (menos de 4), derivado colado depois de hífen, e quem registra o nome real como id o federa"
+    narrative: "O hash curto correlaciona sem esconder: um nome curto e adivinhável é confirmável por quem adivinha. A REGRA 36 segue julgando o registro e as superfícies que viajam."
+    provenance:
+      source: ".claude/validation/private-name-check.sh"
+      locator: "bloco TETO do cabeçalho"
+      method: "reading: leitura do código do juiz"
+      locality: "repo"
+  - id: E_MUTANTES_MORDEM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-07"
+    verified_against: "família private_name com LC_ALL=C"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "os dois mutantes pedidos morrem no selftest: o que não deriva (conjunto da máquina vazio) e o que imprime o termo no lugar do hash"
+    narrative: "Cada mutante é um sed sobre a linha-âncora; âncora que não casa reprova a família, para o mutante não virar enfeite quando a linha mudar."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família private_name, laço dos mutantes m1 e m2"
+      method: "measurement: bancada real com LC_ALL=C"
+      locality: "repo"
+edges:
+  - from: E_SELO_DE_1104_CITOU_O_REPO_DO_CLIENTE
+    to: Q_DIFF_SEM_NOME_PRIVADO
+    edge_type: SUPPORTS
+  - from: E_SELO_DE_1104_CITOU_O_REPO_DO_CLIENTE
+    to: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    edge_type: SUPPORTS
+  - from: E_FALSO_POSITIVO_MEDIDO_NA_HISTORIA
+    to: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    edge_type: SUPPORTS
+  - from: E_MUTANTES_MORDEM
+    to: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    edge_type: SUPPORTS
+  - from: C_TETO_SEM_MAQUINA_SO_A_LISTA
+    to: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    edge_type: SUPPORTS
+  - from: C_TETO_O_QUE_A_GUARDA_NAO_VE
+    to: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    edge_type: SUPPORTS
+  - from: D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF
+    to: Q_DIFF_SEM_NOME_PRIVADO
+    edge_type: SUPPORTS
