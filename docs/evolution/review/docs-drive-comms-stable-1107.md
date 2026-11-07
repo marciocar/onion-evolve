@@ -51,3 +51,5 @@ contrato (rc 0), os dois medidos depois da cura.
 - A mudança de host foi relatada pela sessão que a fez (1c3b4688) e não foi re-medida por esta.
 - O fecho dos dois `Q_` é flip `open→done` com critério de pronto medido. O checkpoint nomeia os dois, e
   o merge é o selo.
+
+- Acréscimo no mesmo PR: o maestro confirmou os passos 1 a 6 do card do Slack, e `Q_CS_APP_SLACK_E_CHANNELS_1106` fecha com a confirmação dele.
