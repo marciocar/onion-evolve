@@ -22,6 +22,10 @@
 #     e `mergedAt` não for nulo. O sucesso é afirmado pelo ESTADO, nunca pelo comando.
 #
 # Uso: bash ops/pr-merge-verified.sh <numero> [--repo owner/nome] [--keep-branch] [--sync]
+#   REPO SEM CI (SAC-302): se o repo do PR não tem workflow nenhum (actions/workflows total_count 0,
+#           LIDO), o modo declarado "repo sem CI" roda o gate LOCAL (o do Onion, ou ops/local-gate.sh do
+#           repo) na árvore de onde o comando roda, que tem de ser o clone do repo do PR, no head do PR e
+#           limpa; registra no PR que não havia CI. Nunca vale para o core. Leitura que falha = recusa.
 #   --sync: após PROVAR o merge pelo estado, faz `git checkout main + pull --ff-only` — o sync
 #           gated que substitui o `checkout main` encadeado à mão (que me deixou em main após um
 #           merge recusado, 2026-08-26). Superação de sync-only-after-merge-succeeds, virada mecanismo.
@@ -115,7 +119,7 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   Ou seja: a lista continua com um membro só, mas agora por um critério declarado aqui em vez
 #   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
-DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""
+DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""; NO_CI_PROVADO=""
 MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0; ALLOW_DRAFT=0
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -793,7 +797,33 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   _behind="$(_behind_base)" \
     || die "depois do auto-rebase não consegui medir se o head ${HEAD_SHA:0:8} está na ponta de '${_BASE_REF}' — não mergeio sem saber"
 done
+# ══ REPO SEM CI ≠ LEITURA QUE FALHOU ≠ JANELA PÓS-PUSH (SAC-302, medido 2x em 06-07/11) ══════════
+# Num repo sem NENHUM workflow (o onion-bridge no PR #93, o adotante de consultoria no PR #2 dele), o
+# script recusava por "ZERO check-runs" e o --ci-inoperante recusava dizendo "não consegui LER os runs",
+# embora a leitura funcionasse: actions/runs e actions/workflows davam total_count 0. Zero runs foi lido
+# como falha de leitura, e o adotante com a guarda de push na main ficou sem caminho de merge.
+# A sonda separa os três estados pelo que MEDE: rc da API ≠ 0 (leitura falhou), total_count de workflows
+# == 0 lido com sucesso (repo sem CI), e total_count > 0 (o CI existe; zero check-runs é a janela).
+# Lida UMA vez e guardada: _WF_RC (rc da leitura), _WF_COUNT (inteiro ou vazio), _WF_MSG (o que o gh disse).
+_WF_RC=""; _WF_COUNT=""; _WF_MSG=""
+_ci_workflow_probe() {
+  [ -n "${_WF_RC}" ] && return 0
+  local _slug="${OWNER_REPO:-}" _e _o; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
+  _e="$(mktemp)"
+  _o="$(gh api "repos/${_slug}/actions/workflows?per_page=1" --jq '.total_count' 2>"${_e}")"; _WF_RC=$?
+  _WF_MSG="$(head -c 300 "${_e}" | tr '\n' ' ')"; rm -f "${_e}"
+  case "${_o}" in ''|*[!0-9]*) [ "${_WF_RC}" -eq 0 ] && { _WF_RC=97; _WF_MSG="total_count ilegível ('${_o}')"; } ;; *) _WF_COUNT="${_o}" ;; esac
+  return 0
+}
+_NO_CI_SKIP_WAIT=0
 if [ "$_rebases" -gt 0 ] && [ "${SKIP_CI}" -eq 0 ]; then
+  _ci_workflow_probe
+  if [ "${_WF_RC}" -eq 0 ] && [ "${_WF_COUNT}" -eq 0 ]; then
+    _NO_CI_SKIP_WAIT=1
+    say "auto-rebase feito — o repo NÃO tem workflow (total_count 0, lido): não há runs para esperar; o gate local julga o head ${HEAD_SHA:0:8} adiante"
+  fi
+fi
+if [ "$_rebases" -gt 0 ] && [ "${SKIP_CI}" -eq 0 ] && [ "${_NO_CI_SKIP_WAIT}" -eq 0 ]; then
   say "auto-rebase feito — esperando as runs do head ${HEAD_SHA:0:8} NASCEREM e terminarem (prazo ${_WAIT_SECS}s)"
   _t0w="$(date +%s)"
   while :; do
@@ -837,6 +867,51 @@ if [ "${_cr_rc}" -ne 0 ]; then
   die "API de checks indisponível (${_cr_http:-rc=${_cr_rc}}) ao ler os check-runs do head ${HEAD_SHA:0:8} — não é janela pós-push nem CI morto; NÃO use --ci-inoperante. ${_cr_acao}. gh disse: ${_cr_msg}"
 fi
 rm -f "${_cr_err}"
+# ── O GATE LOCAL, EXERCIDO (não citado) ─────────────────────────────────────────────────────────
+# Um só corpo para os dois caminhos sem CI: o escape --ci-inoperante (CI morto) e o modo "repo sem CI"
+# (SAC-302). $1 = raiz onde o gate roda, $2 = prefixo das recusas. Deixa em _GATE_DESC o que MEDIU.
+# Ordem: o gate do Onion (.claude/validation/lint-artifacts.sh + lint-selftest.sh), que é o que o
+# --ci-inoperante sempre rodou; sem ele, o gate que o REPO declara em ops/local-gate.sh (rc 0 = verde);
+# sem nenhum dos dois, recusa: merge sem CI e sem gate é merge sem cobertura nenhuma.
+_GATE_DESC=""
+_run_local_gate() {
+  local _root="$1" _px="$2" _lint_out _lint_rc _bench_out _bench_rc _bench_pass _g_out _g_rc
+  if [ -f "${_root}/.claude/validation/lint-artifacts.sh" ] && [ -f "${_root}/.claude/validation/lint-selftest.sh" ]; then
+    say "    rodando o gate determinístico LOCAL em ${_root} (é ele que substitui o CI; não aceito número citado)"
+    _lint_out="$(LC_ALL=C bash "${_root}/.claude/validation/lint-artifacts.sh" 2>&1)"; _lint_rc=$?
+    grep -qF 'MORREU' <<< "${_lint_out}" \
+      && die "${_px}: o lint MORREU antes do sumário — não pude julgar, logo não libero."
+    [ "${_lint_rc}" -eq 0 ] \
+      || die "${_px}: lint local rc=${_lint_rc} (há HARD). A cobertura que substituiria o CI está VERMELHA — recusa. $(printf '%s\n' "${_lint_out}" | grep -m1 'Violações HARD')"
+    _bench_out="$(LC_ALL=C bash "${_root}/.claude/validation/lint-selftest.sh" --jobs auto 2>&1)"; _bench_rc=$?
+    grep -qF 'ABORTOU' <<< "${_bench_out}" \
+      && die "${_px}: a bancada ABORTOU antes da soma — o verde parcial não vale. Recusa."
+    [ "${_bench_rc}" -eq 0 ] \
+      || die "${_px}: bancada local rc=${_bench_rc}. $(printf '%s\n' "${_bench_out}" | grep -m1 'Falharam')"
+    # ⚠️ ÂNCORA NO SUMÁRIO, NÃO NA PRIMEIRA OCORRÊNCIA DA PALAVRA. A 1ª versão era
+    # `awk '/Passaram/{print $3; exit}'` e casou o NOME DE UM CASO — existe um caso chamado
+    # `selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0`, que aparece na linha 61 de
+    # uma corrida de 1516 linhas. O `exit` garantiu que o sumário real (linha 1516) nunca fosse lido, e
+    # o registro do PR #881 saiu com `bancada (h) casos`. O VEREDITO estava certo (veio do rc), o
+    # NÚMERO do rastro de auditoria estava errado — e rastro com número errado é a classe que este
+    # script existe para combater. Ancorado na FORMA do sumário (`Passaram : <n>` no início da linha,
+    # com dois-pontos) e tomando a ÚLTIMA ocorrência, que é a agregada.
+    _bench_pass="$(printf '%s\n' "${_bench_out}" | awk '/^[[:space:]]*Passaram[[:space:]]*:[[:space:]]*[0-9]+[[:space:]]*$/{v=$3} END{print v}')"
+    grep -qE '^[0-9]+$' <<< "${_bench_pass}" \
+      || die "${_px}: não consegui LER a contagem da bancada do sumário (li '${_bench_pass}'). O veredito seria correto pelo rc, mas eu não registro no PR um número que não sei — e registro sem número não audita. Recusa."
+    say "    ✓ gate local EXERCIDO: lint 0 HARD · bancada ${_bench_pass:-?} casos, 0 falhas"
+    _GATE_DESC="lint 0 HARD · bancada ${_bench_pass} casos/0 falhas"
+  elif [ -f "${_root}/ops/local-gate.sh" ]; then
+    say "    sem o gate do Onion em ${_root}: rodando o gate DECLARADO pelo repo (ops/local-gate.sh)"
+    _g_out="$(cd "${_root}" && LC_ALL=C bash ops/local-gate.sh 2>&1)"; _g_rc=$?
+    [ "${_g_rc}" -eq 0 ] \
+      || die "${_px}: o gate declarado do repo (ops/local-gate.sh) saiu rc=${_g_rc} — a cobertura que substituiria o CI está VERMELHA. Recusa. Última linha: $(printf '%s\n' "${_g_out}" | tail -1)"
+    say "    ✓ gate local EXERCIDO: ops/local-gate.sh rc 0"
+    _GATE_DESC="gate declarado do repo (ops/local-gate.sh) rc 0"
+  else
+    die "${_px}: ${_root} não tem gate local — nem o do Onion (.claude/validation/lint-artifacts.sh + lint-selftest.sh) nem um declarado pelo repo (ops/local-gate.sh). Sem CI e sem gate não há cobertura nenhuma: recusa. Declare o gate do repo em ops/local-gate.sh (rc 0 = verde) e rode de novo."
+  fi
+}
 # ══ ZERO CHECK-RUNS: janela pós-push, ou CI MORTO? ═══════════════════════════════════════════
 # A v1 tratava os dois casos como um só e mandava esperar. Em 2026-09-28 o segundo aconteceu: o CI
 # do repositório entrou em `startup_failure` em TODAS as branches (inclusive main), com zero jobs
@@ -852,6 +927,40 @@ rm -f "${_cr_err}"
 #   (3) Exige `--motivo` e REGISTRA no PR antes do merge, dizendo que a cobertura é LOCAL e que a
 #       semântica e o CI não foram medidos.
 if [ -z "$head_runs" ]; then
+  # Os três estados (SAC-302): a sonda de workflows decide qual dos ramos abaixo vale.
+  _ci_workflow_probe
+  [ "${_WF_RC}" -eq 0 ] \
+    || die "ZERO check-runs no head ${HEAD_SHA:0:8} e não consegui LER os workflows do repo (rc=${_WF_RC}: ${_WF_MSG}) — sem essa leitura não sei se é janela pós-push, CI morto ou repo sem CI. Recusa (fail-closed); tente de novo quando a API responder."
+fi
+if [ -z "$head_runs" ] && [ "${_WF_COUNT}" -eq 0 ]; then
+  # ══ MODO DECLARADO "REPO SEM CI" ══════════════════════════════════════════════════════════════
+  # O repo não tem workflow nenhum (lido, não suposto). Esperar checks seria esperar o que nunca nasce,
+  # e o --ci-inoperante (que prova CI MORTO) não se aplica: não há CI para estar morto. O que substitui
+  # o CI é o gate LOCAL do repo, exercido aqui, na árvore de onde o comando roda — e ela tem de ser o
+  # repo do PR, no head do PR, sem mudança rastreada. O merge e o comentário no PR dizem que não havia CI.
+  # NUNCA vale para o core: o core tem CI, e workflow "sumido" ali é defeito a investigar, não modo.
+  _nc_slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _nc_slug="${REPO_ARG[1]}"
+  _slug_of_url() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
+  _core_slug="$(_slug_of_url "$(git -C "${_SKIP_HERE}/.." remote get-url origin 2>/dev/null)")"
+  _nc_target="$(tr '[:upper:]' '[:lower:]' <<< "${_nc_slug}")"
+  _nc_core_die() { die "o repo '${_nc_slug}' leu ZERO workflows, e o modo 'repo sem CI' NUNCA vale para o core ($1; o core tem CI, e workflow sumido aqui é defeito a investigar, não modo). Recusa."; }
+  [ -n "${_core_slug}" ] && [ "${_nc_target}" = "${_core_slug}" ] && _nc_core_die "o alvo é o repo de origem deste script"
+  [ "${CI_INOPERANTE:-0}" -eq 1 ] && { say "ℹ️  --ci-inoperante não se aplica: o repo não tem CI para estar morto — segue o modo 'repo sem CI'"; CI_INOPERANTE=0; }
+  say "⚠️  repo '${_nc_slug}' SEM workflow (actions/workflows total_count 0, lido) — modo declarado 'repo sem CI': o gate LOCAL substitui o CI"
+  [ -n "${_top}" ] || die "modo 'repo sem CI': este comando não roda dentro de um clone — o gate local precisa da árvore do repo do PR. Rode a partir do clone de '${_nc_slug}', no head do PR."
+  _nc_origin="$(_slug_of_url "$(git -C "${_top}" remote get-url origin 2>/dev/null)")"
+  [ "${_nc_origin}" = "${_nc_target}" ] \
+    || die "modo 'repo sem CI': a árvore ${_top} é de '${_nc_origin:-sem origin}', não de '${_nc_slug}' — o gate julgaria outro repo. Rode a partir do clone do repo do PR."
+  [ -f "${_top}/ops/pr-finalize.sh" ] && _nc_core_die "a árvore do PR tem o motor do core, ops/pr-finalize.sh"
+  _nc_head="$(git -C "${_top}" rev-parse HEAD 2>/dev/null)"
+  [ "${_nc_head}" = "${HEAD_SHA}" ] \
+    || die "modo 'repo sem CI': a árvore ${_top} está em ${_nc_head:0:8}, e o head do PR é ${HEAD_SHA:0:8} — o gate tem de rodar NO head do PR. Faça checkout da branch '${HEAD_REF}' atualizada (git fetch origin && git checkout ${HEAD_REF} && git pull --ff-only) e rode de novo."
+  [ -z "$(git -C "${_top}" status --porcelain --untracked-files=no 2>/dev/null)" ] \
+    || die "modo 'repo sem CI': a árvore ${_top} tem mudança rastreada não commitada — o gate julgaria o que NÃO está no PR. Limpe (commit ou stash) e rode de novo."
+  _run_local_gate "${_top}" "modo 'repo sem CI'"
+  _nc_gate_touch="$(grep -E '^(\.claude/validation/lint-artifacts\.sh|\.claude/validation/lint-selftest\.sh|ops/local-gate\.sh)$' <<< "${_PR_FILES}" | paste -sd' ' -)"
+  NO_CI_PROVADO="actions/workflows total_count 0 (lido) · ${_GATE_DESC} no head ${HEAD_SHA:0:8}${_nc_gate_touch:+ · ⚠️ o PR altera o próprio gate: ${_nc_gate_touch}}"
+elif [ -z "$head_runs" ]; then
   if [ "${CI_INOPERANTE:-0}" -ne 1 ]; then
     die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634). Se o CI do repositório estiver MORTO (startup_failure repo-wide, checks que nunca nascem), use --ci-inoperante --motivo \"…\": ele PROVA a inoperância no forge e RODA o gate local antes de deixar passar."
   fi
@@ -866,8 +975,10 @@ if [ -z "$head_runs" ]; then
   # que a casa diz sobre falso negativo: mais seguro que o inverso, e ainda engana.)
   # A pergunta certa é "a sequência MAIS RECENTE é de falha?". `gh run list` devolve do mais novo para
   # o mais velho, então a resposta é o comprimento da RAJADA inicial de `startup_failure`.
-  _recentes="$(gh run list "${REPO_ARG[@]}" --limit 12 --json conclusion --jq '.[].conclusion' 2>/dev/null || true)"
-  [ -n "${_recentes}" ] || die "--ci-inoperante: não consegui LER os runs recentes no forge — sem essa leitura eu não afirmo que o CI está morto. Recusa (fail-closed)."
+  # rc e vazio são coisas diferentes (SAC-302): rc≠0 é a leitura que falhou; rc 0 e vazio é "nenhum run".
+  _recentes="$(gh run list "${REPO_ARG[@]}" --limit 12 --json conclusion --jq '.[].conclusion' 2>/dev/null)"; _rl_rc=$?
+  [ "${_rl_rc}" -eq 0 ] || die "--ci-inoperante: não consegui LER os runs recentes no forge (rc=${_rl_rc}) — sem essa leitura eu não afirmo que o CI está morto. Recusa (fail-closed)."
+  [ -n "${_recentes}" ] || die "--ci-inoperante: o repo tem ${_WF_COUNT} workflow(s) e NENHUM run registrado (lido) — CI que nunca rodou não é CI morto por startup_failure; o escape exige a rajada. Recusa."
   _streak="$(printf '%s\n' "${_recentes}" | awk '$0!="startup_failure"{exit} {n++} END{print n+0}')"
   _topo="$(printf '%s\n' "${_recentes}" | head -1)"
   say "    forge: rajada inicial de ${_streak} startup_failure (run mais recente: ${_topo})"
@@ -877,30 +988,8 @@ if [ -z "$head_runs" ]; then
     || die "--ci-inoperante: rajada de apenas ${_streak} startup_failure no topo (esperado >= 3). Uma ou duas falhas de startup podem ser transitórias — o escape exige padrão, não episódio."
 
   # (2) O GATE LOCAL É EXERCIDO AQUI, não citado. Sem isto o escape seria um --force com nome bonito.
-  say "    rodando o gate determinístico LOCAL (é ele que substitui o CI; não aceito número citado)"
-  _lint_out="$(LC_ALL=C bash "${REPO_ROOT:-$(git rev-parse --show-toplevel)}/.claude/validation/lint-artifacts.sh" 2>&1)"; _lint_rc=$?
-  grep -qF 'MORREU' <<< "${_lint_out}" \
-    && die "--ci-inoperante: o lint MORREU antes do sumário — não pude julgar, logo não libero."
-  [ "${_lint_rc}" -eq 0 ] \
-    || die "--ci-inoperante: lint local rc=${_lint_rc} (há HARD). A cobertura que substituiria o CI está VERMELHA — recusa. $(printf '%s\n' "${_lint_out}" | grep -m1 'Violações HARD')"
-  _bench_out="$(LC_ALL=C bash "${REPO_ROOT:-$(git rev-parse --show-toplevel)}/.claude/validation/lint-selftest.sh" --jobs auto 2>&1)"; _bench_rc=$?
-  grep -qF 'ABORTOU' <<< "${_bench_out}" \
-    && die "--ci-inoperante: a bancada ABORTOU antes da soma — o verde parcial não vale. Recusa."
-  [ "${_bench_rc}" -eq 0 ] \
-    || die "--ci-inoperante: bancada local rc=${_bench_rc}. $(printf '%s\n' "${_bench_out}" | grep -m1 'Falharam')"
-  # ⚠️ ÂNCORA NO SUMÁRIO, NÃO NA PRIMEIRA OCORRÊNCIA DA PALAVRA. A 1ª versão era
-  # `awk '/Passaram/{print $3; exit}'` e casou o NOME DE UM CASO — existe um caso chamado
-  # `selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0`, que aparece na linha 61 de
-  # uma corrida de 1516 linhas. O `exit` garantiu que o sumário real (linha 1516) nunca fosse lido, e
-  # o registro do PR #881 saiu com `bancada (h) casos`. O VEREDITO estava certo (veio do rc), o
-  # NÚMERO do rastro de auditoria estava errado — e rastro com número errado é a classe que este
-  # script existe para combater. Ancorado na FORMA do sumário (`Passaram : <n>` no início da linha,
-  # com dois-pontos) e tomando a ÚLTIMA ocorrência, que é a agregada.
-  _bench_pass="$(printf '%s\n' "${_bench_out}" | awk '/^[[:space:]]*Passaram[[:space:]]*:[[:space:]]*[0-9]+[[:space:]]*$/{v=$3} END{print v}')"
-  grep -qE '^[0-9]+$' <<< "${_bench_pass}" \
-    || die "--ci-inoperante: não consegui LER a contagem da bancada do sumário (li '${_bench_pass}'). O veredito seria correto pelo rc, mas eu não registro no PR um número que não sei — e registro sem número não audita. Recusa."
-  say "    ✓ gate local EXERCIDO: lint 0 HARD · bancada ${_bench_pass:-?} casos, 0 falhas"
-  CI_INOPERANTE_PROVADO="rajada de ${_streak} startup_failure no topo do forge · lint 0 HARD · bancada ${_bench_pass:-?} casos/0 falhas"
+  _run_local_gate "${REPO_ROOT:-$(git rev-parse --show-toplevel)}" "--ci-inoperante"
+  CI_INOPERANTE_PROVADO="rajada de ${_streak} startup_failure no topo do forge · ${_GATE_DESC}"
 else
 printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
   || die "check-run do head ${HEAD_SHA:0:8} ainda não-completo — merge recusado (esperar não é opcional)"
@@ -1074,6 +1163,32 @@ if [ "${CI_INOPERANTE:-0}" -eq 1 ]; then
   gh pr comment "$PR" "${REPO_ARG[@]}" --body "$_reg_ci" >/dev/null 2>&1 \
     || die "não consegui REGISTRAR o escape de CI-inoperante no PR #${PR} — merge abortado. O registro é precondição."
   say "✓ escape de CI-inoperante registrado no PR #${PR}, antes do merge"
+fi
+# ── REGISTRO DO MODO "REPO SEM CI" (SAC-302) — a mesma precondição, pelo mesmo motivo ─────────────
+# Merge sem CI tem de dizer, no PR, que não havia CI, e o que o substituiu. Não exige --motivo: o motivo
+# é o FATO medido (zero workflows), e é ele que o registro carrega. Corpo contado antes de postar.
+if [ -n "${NO_CI_PROVADO}" ]; then
+  _reg_nc="$(printf '%s\n' \
+    "## ⚠️ Merge SEM CI — o repositório não tem workflow" \
+    "" \
+    "Este repositório **não tem CI** (\`actions/workflows\` com \`total_count\` 0, lido no forge), e este" \
+    "merge passou pelo modo declarado **repo sem CI** de \`ops/pr-merge-verified.sh\`, que **exerceu** o" \
+    "gate local do repo no head do PR antes de permitir." \
+    "" \
+    "| | |" \
+    "|---|---|" \
+    "| head | \`${HEAD_SHA}\`" \
+    "| medido no forge + exercido localmente | ${NO_CI_PROVADO} |" \
+    "" \
+    "**O que NÃO foi medido:** CI nenhum (não existe) e a revisão semântica. A cobertura deste merge é o" \
+    "gate local, rodado pelo próprio script na árvore do PR, não citado por quem mergeou." )"
+  for _ex in "Merge SEM CI" "não tem CI" "${HEAD_SHA}" "${_GATE_DESC}"; do
+    grep -qF -- "${_ex}" <<< "${_reg_nc}" \
+      || die "o corpo do registro de 'repo sem CI' saiu INCOMPLETO (falta: ${_ex}) — merge abortado antes de postar."
+  done
+  gh pr comment "$PR" "${REPO_ARG[@]}" --body "$_reg_nc" >/dev/null 2>&1 \
+    || die "não consegui REGISTRAR o modo 'repo sem CI' no PR #${PR} — merge abortado. O registro é precondição."
+  say "✓ modo 'repo sem CI' registrado no PR #${PR}, antes do merge"
 fi
 
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
@@ -1274,6 +1389,7 @@ case "$state" in
     die "estado diz MERGED mas mergedAt é nulo/vazio — inconsistente, não declaro" ;;
   MERGED\|*)
     printf '✓ PR #%s MERGED — provado pelo ESTADO (mergedAt=%s)\n' "$PR" "${state#*|}"
+    [ -n "${NO_CI_PROVADO}" ] && printf '  ⚠️  merge SEM CI (o repo não tem workflow): %s\n' "${NO_CI_PROVADO}"
     # ANCESTRALIDADE PEDIDA (--assert-ancestor): o merge está provado; aqui confiro o que o modo de
     # merge prometia. Falha = rc 3 (distinto do 1 de "não mergeou"), nomeando a ref e a base.
     if [ -n "${ASSERT_ANCESTOR}" ]; then
