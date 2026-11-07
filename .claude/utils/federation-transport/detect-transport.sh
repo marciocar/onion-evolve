@@ -50,6 +50,10 @@ PY
 case "${KIND}" in
   auto)
     lp="$(_member_localpath)"
+    # `n/a` no registro cai no mapa local pelo RESOLVEDOR ÚNICO (.claude/utils/co-evolution/member-path.sh).
+    # shellcheck source=../co-evolution/member-path.sh
+    . "$(dirname "${BASH_SOURCE[0]}")/../co-evolution/member-path.sh"
+    _lp_r="$(onion_member_path "${MEMBER}" "${lp}")" && lp="${_lp_r}"
     if [ -n "${lp}" ] && [ -d "${lp}" ]; then echo "local"; else echo "git-async"; fi ;;
   a2a-live)
     echo "⚠️  a2a-live é GATED: o endpoint está vivo, mas todo sinal entra na fila e só vira inbox por ato humano (a2a-accept.sh). Diagnóstico: a2a-doctor.sh." >&2

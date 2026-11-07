@@ -14852,6 +14852,57 @@ PYM
 # por seletor no alvo:, reusando graph.sh --triples). Asserções ESTRUTURAIS (não fixam nomes de membro
 # → robusto a mudança de roster). Pula o que depende de membros sem python+yaml.
 # ---------------------------------------------------------------------------
+# ── member-path.sh: o RESOLVEDOR ÚNICO do caminho local de um membro (2026-11-07) ──────────────────────
+# Defeito datado: membro com `local_path: n/a` (clone cujo nome leva o do cliente, num core PÚBLICO) dava
+# ILEGÍVEL no registry-pins.sh, NÃO-MEDIDO na REGRA 92 e destino irresolvível no co-deliver. A cura é o
+# mapa local fora da árvore + um resolvedor só. Ids, caminhos e repos desta família são INVENTADOS.
+run_member_path_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/member-path.sh"
+  if [ ! -f "${helper}" ]; then record_fail "member-path" "resolvedor ausente: ${helper}"; return; fi
+  # (1) as polaridades do próprio resolvedor
+  local _out _rc=0
+  _out="$(bash "${helper}" --selftest 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass "member-path: selftest do resolvedor ($(printf '%s\n' "${_out}" | tail -1))"
+  else record_fail "member-path: selftest" "$(printf '%s\n' "${_out}" | grep '✗' | head -3 | tr '\n' ' ')"; fi
+  # (2) MUTANTE: o resolvedor que ignora o mapa (a forma de antes da cura) TEM de reprovar o selftest
+  local tmp; tmp="$(mktemp -d)" || { record_fail "member-path" "mktemp falhou"; return; }
+  sed 's/^  p="$(_onion_member_paths_list | awk/  p="$(: | awk/' "${helper}" > "${tmp}/mutant.sh"
+  if cmp -s "${helper}" "${tmp}/mutant.sh"; then record_fail "member-path: mutante" "a linha-âncora do mutante não casou (o sed não mudou nada)"
+  else
+    _rc=0; bash "${tmp}/mutant.sh" --selftest >/dev/null 2>&1 || _rc=$?
+    if [ "${_rc}" -ne 0 ]; then record_pass "member-path: mutante que ignora o mapa é morto pelo selftest"
+    else record_fail "member-path: mutante" "o resolvedor que ignora o mapa passou verde — o selftest é enfeite"; fi
+  fi
+  # (3) PONTA A PONTA no consumidor que nasceu o defeito: registry-pins.sh --check sobre um membro `n/a`
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    record_skip "member-path: ponta a ponta pulada (sem python+yaml)"; rm -rf "${tmp}"; return; fi
+  local clone="${tmp}/clone-neutro" pin
+  mkdir -p "${clone}/.claude" && git -C "${clone}" init -q -b main >/dev/null 2>&1
+  pin="$(git -C "${REPO_ROOT}" rev-parse HEAD 2>/dev/null | cut -c1-12)"
+  printf 'framework: onion-evolve\nsource_commit: %s\nrole: adopted\n' "${pin}" > "${clone}/.claude/.onion-version"
+  git -C "${clone}" add -A >/dev/null 2>&1 && git -C "${clone}" -c user.email=t@t -c user.name=t commit -qm stamp >/dev/null 2>&1
+  printf 'version: 2\nmembers:\n  - id: membro-neutro\n    kind: adopter\n    role: standalone\n    remote: n/a\n    local_path: n/a\n    onion_version: %s\n    integration_branch: main\n' "${pin}" > "${tmp}/members.yaml"
+  printf 'membro-neutro\t%s\n' "${clone}" > "${tmp}/map.tsv"; chmod 600 "${tmp}/map.tsv"
+  local _with _without
+  _with="$(ONION_MEMBER_PATHS_FILE="${tmp}/map.tsv" bash "${REPO_ROOT}/ops/registry-pins.sh" --check --members "${tmp}/members.yaml" --only membro-neutro --no-remote 2>&1 || true)"
+  _without="$(ONION_MEMBER_PATHS_FILE="${tmp}/ausente.tsv" bash "${REPO_ROOT}/ops/registry-pins.sh" --check --members "${tmp}/members.yaml" --only membro-neutro --no-remote 2>&1 || true)"
+  if printf '%s\n' "${_with}" | grep -q '^membro-neutro .*clone' && ! printf '%s\n' "${_with}" | grep -q 'ILEGÍVEL: sem remoto'; then
+    record_pass "member-path: registry-pins lê o clone pelo mapa quando o registro diz n/a"
+  else record_fail "member-path: registry-pins com mapa" "$(printf '%s\n' "${_with}" | grep membro-neutro | head -1)"; fi
+  if printf '%s\n' "${_without}" | grep -q 'ILEGÍVEL'; then
+    record_pass "member-path: sem mapa o membro n/a segue ILEGÍVEL declarado (o resolvedor não inventa)"
+  else record_fail "member-path: registry-pins sem mapa" "$(printf '%s\n' "${_without}" | grep membro-neutro | head -1)"; fi
+  # (4) REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): com o mapa, o adotante n/a sai do NÃO-MEDIDO
+  mkdir -p "${tmp}/core/docs/evolution/federation" && cp "${tmp}/members.yaml" "${tmp}/core/docs/evolution/federation/members.yaml"
+  local _r92w _r92o
+  _r92w="$(ONION_MEMBER_PATHS_FILE="${tmp}/map.tsv" bash "${REPO_ROOT}/.claude/validation/door-role-parity-check.sh" "${tmp}/core" 2>&1 || true)"
+  _r92o="$(ONION_MEMBER_PATHS_FILE="${tmp}/ausente.tsv" bash "${REPO_ROOT}/.claude/validation/door-role-parity-check.sh" "${tmp}/core" 2>&1 || true)"
+  if ! printf '%s\n' "${_r92w}" | grep -q 'INALCANÇÁVEL' && printf '%s\n' "${_r92o}" | grep -q 'INALCANÇÁVEL'; then
+    record_pass "member-path: REGRA 92 mede o adotante n/a pelo mapa, e sem ele declara NÃO MEDIDA"
+  else record_fail "member-path: REGRA 92" "com mapa: $(printf '%s' "${_r92w}" | tr '\n' ' ' | cut -c1-120) · sem: $(printf '%s' "${_r92o}" | tr '\n' ' ' | cut -c1-120)"; fi
+  rm -rf "${tmp}"
+}
+
 run_resolve_target_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/co-evolution/resolve-target.sh"
   if [ ! -f "${helper}" ]; then record_fail "resolve-target" "helper ausente: ${helper}"; return; fi
@@ -30574,6 +30625,7 @@ _family run_env_exposure_selftests
 _family run_forced_model_selftests
 _family run_pre_push_selftests
 _family run_resolve_target_selftests
+_family run_member_path_selftests
 
 # Modo reconcile-inputs — insumos determinísticos do /meta:co-announce --reconcile (conciliação de backlog).
 _family run_reconcile_inputs_selftests
