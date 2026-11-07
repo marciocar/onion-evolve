@@ -10,6 +10,60 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.45.0] - 2026-11-07
+
+Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. Nada do que um leitor, o gate ou o armazém imprime muda.
+
+- Cada artefato da release tem um SBOM em CycloneDX 1.7 JSON: o wheel e o sdist do PyPI, o tarball npm, o MCP Bundle
+  e a imagem OCI. Cada `<artefato>.cdx.json` vai anexado à release do GitHub e atestado com o predicado CycloneDX
+  (`gh attestation verify <artefato> --repo marciocar/kg-ssot --predicate-type https://cyclonedx.org/bom`); o SBOM da
+  imagem também é atestado no registro. Ele lista as dependências que o artefato declara, lidas de dentro dele, como
+  externas (`isExternal`, com a faixa declarada em `versionRange`), com a licença, a versão testada e as dependências
+  transitivas do ambiente em que a suíte passou. O SBOM do bundle lista todo pacote do `uv.lock` dele, com o hash de
+  cada arquivo, e o da imagem lista a imagem base pelo digest, os pacotes Debian dela, o interpretador Python e toda
+  distribuição Python instalada. O pacote-fonte do Debian vai no qualificador `upstream` do purl, que é por onde um
+  scanner acha o aviso do Debian, e o interpretador leva o CPE. A faixa declarada não leva purl: um purl sem versão
+  casaria qualquer versão num scanner. No grype 0.121.2, o SBOM da imagem dá os mesmos 189 achados do syft, e os do
+  wheel, do sdist, do npm e do bundle não dão nenhum abaixo da faixa declarada.
+- O lockfile do build do leitor JavaScript sobe o `fast-uri` para a 3.1.9, dentro da faixa do ajv.
+- O gerador é o `packaging/sbom/sbom.py`, só com a biblioteca padrão do Python, e viaja na release. Ele recusa o
+  artefato que embute código de terceiros (`node_modules`, `site-packages`, um wheel dentro de um pacote): nenhum
+  embute hoje, e a afirmação do SBOM é conferida a cada release.
+- O `SECURITY.md` é novo: só a release mais recente recebe correção de segurança, o reporte vai pelo GitHub Private
+  Vulnerability Reporting do repositório público (sem e-mail), com confirmação em até 7 dias, primeira avaliação em
+  até 14 e correção em até 90, o escopo e a divulgação coordenada em 90 dias.
+- A higiene da release reprova a release sem o `SECURITY.md` (com as cinco seções e o canal privado), sem o gerador ou
+  com um workflow de publicação que não gera, não anexa ou não atesta o SBOM de cada artefato.
+- O manual ganha uma seção nova, "Conferir uma release: procedência e SBOM", no capítulo 6.
+- **A forma recomendada do `x_event`, não normativa** ([manual, capítulo 3](docs/manual/pt-BR/03-formato.md#registrar-um-evento-externo-forma-recomendada-não-normativa)).
+  Um evento externo é um nó `evidence` cujo `x_event` usa os nomes do núcleo do CloudEvents 1.0 (`id`, `source`,
+  `type`, `specversion: "1.0"` e, opcionais, `subject`, um `time` RFC 3339 entre aspas, `datacontenttype` e `dataref`).
+  O coletor grava o corpo como arquivo, para o qual apontam o `provenance.source` e o `provenance.sha256`; o
+  `x_received_at` fica separado do `time` e do `verified_at`; `source` + `id` é a chave de idempotência; sem assinatura
+  conferida, o nó fica `open`. Com um exemplo completo que passa no `kg_validate` e no `kg_trace check`. O contrato não
+  muda (segue o v4.18): com dois adotantes, ou 50 nós reais nesta forma, ela vira perfil canônico no SHOULD.
+- **A forma recomendada do `x_change`, não normativa** ([manual, capítulo 3](docs/manual/pt-BR/03-formato.md#registrar-uma-mudança-planejada-forma-recomendada-não-normativa)),
+  irmã do `x_event`. Uma mudança planejada num sistema, numa política ou num processo é uma `decision` cujo `x_change`
+  tem `state` (`planned`, `communicated`, `applied`, `verified`, `reverted`), `target`, uma `window` RFC 3339 entre
+  aspas, `rollback_plan` (um ponteiro) e, opcionais, `kind` (os tipos do ITIL 4), `ref` e `communicated_by` (a
+  `evidence` com o `x_event` do aviso). Cada transição é uma `evidence` com `x_change_transition` (`to`, `at`) que faz
+  `SUPPORTS` na decisão; o `verified` pede uma `measurement`, e a reversão faz `SUPERSEDES` na aplicação que desfaz.
+  Quem aprovou vai no `sealed_by`, por referência, nunca por nome. O `kg_query --where x_change.state=applied` lista as
+  mudanças por estado. Com um exemplo completo que passa no `kg_validate` e no `kg_trace check`. O contrato não muda
+  (segue o v4.18): com dois adotantes, ou 50 nós reais nesta forma, ela vira perfil canônico no SHOULD.
+- Por quê: o comprador sujeito ao Cyber Resilience Act da UE deve diligência sobre os componentes livres que integra e
+  vai pedir SBOM e política de vulnerabilidade. O mantenedor de um projeto livre fora de atividade comercial não tem
+  obrigação legal aqui; a release leva os dois mesmo assim.
+- **Dado pessoal, LGPD e GDPR** ([ADOPTING.pt-BR.md](ADOPTING.pt-BR.md#dado-pessoal-lgpd-e-gdpr)): uma seção nova sobre
+  a eliminação desde o desenho, sem mudança de contrato. Quem adota é o controlador do dado pessoal no grafo e no
+  histórico git, e as ferramentas não mandam o grafo a ninguém por si; a pessoa entra por referência, e a tabela que
+  liga a referência à pessoa fica fora do git, e a referência segue sendo dado pessoal pseudônimo enquanto essa tabela
+  existe, então o `label` e a `narrative` também não podem identificar a pessoa; um `node_sha256` publicado sobre um nó
+  que pode identificar uma pessoa é ele mesmo dado pessoal e fica fora de espelho público (salgar o hash ainda não está
+  no contrato); nada de espelho público com dado pessoal; reescrever o histórico quebra a verificação por hash e não
+  alcança forks nem arquivos; o `owner` é um papel; e o handle de conta e o caminho de máquina com nome de usuário
+  também são dado pessoal.
+
 ## [4.44.0] - 2026-11-05
 
 Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. O `kg_query` imprime o mesmo, e o `kg_trace check` sem `--strict-sources` mantém os códigos de saída e, num corpus sem a forma `repo#id@commit`, o mesmo `kg-ssot.trace/1`.

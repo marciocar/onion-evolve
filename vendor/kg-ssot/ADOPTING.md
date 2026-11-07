@@ -40,6 +40,14 @@ The list lives in [`spec/release.json`](spec/release.json):
   release files);
 - the license (`LICENSE`, Apache-2.0) and `NOTICE`, which states its scope.
 
+If a collector of yours records external events (an e-mail, a webhook, a chat message) as nodes, write them in the
+recommended shape of `x_event` ([manual, chapter 3](docs/manual/03-format.md#recording-an-external-event-recommended-shape-not-normative)).
+It is not normative: the gate does not judge it, and your verdicts do not change.
+
+If you record planned changes to a system, a policy or a process (planned, communicated, applied, verified, reverted),
+write them in the recommended shape of `x_change` ([manual, chapter 3](docs/manual/03-format.md#recording-a-planned-change-recommended-shape-not-normative)),
+the sibling of `x_event`. It is not normative either.
+
 All of it is **Apache-2.0**, including the suite's `.kg.yaml` cases. Beyond copyright, Apache-2.0 grants a patent
 license from the author and the contributors over what they contributed. That license ends for anyone who sues
 claiming that the contract infringes a patent. If you write your own reader, you can use the contract and the suite,
@@ -342,6 +350,13 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.44.0` to `kg-ssot-v4.45.0`, nothing is required: the contract (v4.18), the verdicts and everything a
+reader, the gate or the store prints are the same. The vendor brings two new files, `SECURITY.md` and the SBOM generator in
+`packaging/sbom/`, and each release artifact now comes with its CycloneDX 1.7 SBOM, attested next to its provenance. The
+recommended shapes of `x_event` and `x_change` ([manual, chapter 3](docs/manual/03-format.md)) are new and not normative: a
+graph that does not use them stays as it is. The section [Personal data, LGPD and GDPR](#personal-data-lgpd-and-gdpr) is
+reading, for whoever keeps a person in a graph.
 
 From `kg-ssot-v4.43.0` to `kg-ssot-v4.44.0`, nothing changes for a graph or a gate: the contract (v4.18) and the verdicts are
 the same, `kg_query` prints the same, and `kg_trace check` keeps its exit codes and its `kg-ssot.trace/1`. `kg_refs.py` is new,
@@ -920,6 +935,41 @@ migration can propose `provenance` from fields the node already has, but the `me
 it, never invented. `kg_migrate.py` does this from a profile you write: `plan` shows the proposal for each node
 without writing anything, and `apply` writes only what the plan proposed, verifying that nothing else changed
 ([manual, chapter 5](docs/manual/05-tools.md)). A custom key without `x_` is resolved by renaming it to `x_<name>`.
+
+## Personal data, LGPD and GDPR
+
+A graph records who said what and where it came from, so it can hold personal data: a person who testified, the owner
+of a document, the author of a decision. Erasure has to be designed in from the start, because a git history keeps
+everything it ever saw.
+
+- **You are the controller.** Whoever adopts the contract is the controller of the personal data in its graphs and
+  in their git history, under the LGPD and the GDPR. The tools run on your machine and send the graph to no one on
+  their own: `kg_mcp.py` answers only the clients you start it for (stdio, or HTTP on loopback by default, and off
+  loopback only with `--allow-remote` and a shared secret); `kg_store.py` and `kg_migrate.py apply` write files (the
+  git backend of the store commits locally and never pushes); and the network the kit uses goes the other way, to
+  download the release (`kg_vendor.py`) or the model of the `vector` extra (`kg_vector.py fetch`), never the graph.
+  Where the graph goes after that (a push, a CI log, a model you connect to the MCP server) is your decision.
+- **A person enters by reference.** Write a reference in the `<scheme>:<id>` form, such as
+  `provenance.source: "person:p-0042"` with `locality: pessoa`, and not the person's name. The table that maps the
+  reference to the person lives outside git, where an erasure request deletes one row: the graph keeps the claim and
+  loses the person. While that table exists, the reference is pseudonymous data, and pseudonymous data is still
+  personal data. The `label` and the `narrative` must not identify the person either.
+- **A published hash can be personal data.** `provenance.node_sha256` and `provenance.sha256` have no salt: anyone
+  who holds or guesses the hashed content can recompute the hash and match it, and the EDPB (Guidelines 02/2025 on
+  blockchain, v2.0, §52) holds that an unsalted hash is, in general, not enough to keep personal data in a public
+  record. So a `node_sha256` published over a node that can identify a person is itself personal data: do not publish
+  it in a public mirror. A salted hash is not in the contract yet.
+- **No public mirror with personal data.** A graph that holds personal data stays in a private repository. A public
+  mirror, a published site or a package copies it to places you do not control.
+- **Rewriting history does not erase.** Removing a commit by rewriting history breaks every check by hash that cited
+  the old content (`provenance.sha256`, `provenance.node_sha256`, a pinned commit), and it does not reach forks,
+  clones or archives. Design erasure as deleting a row outside git, not as rewriting git.
+- **`owner` is a role, not a person.** Write "the credit area owner", not a name: the role outlives a change of staff
+  and holds no personal data.
+- **An account handle and a machine path with a user name are personal data too.** A code-host handle in a `source`,
+  a `label` or a `narrative`, and a path that carries a user name, such as a home folder, point to a person as much as
+  a name does. They are the easiest to miss: in a sample of 200 nodes of real graphs, an account handle showed up in
+  15. Replace them with a role or a reference.
 
 ## Conformance of another reader
 

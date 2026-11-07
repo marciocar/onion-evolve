@@ -10,6 +10,60 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.45.0] - 2026-11-07
+
+No contract change (still v4.18), and no verdict changes. Nothing that a reader, the gate or the store prints changes.
+
+- Every artifact of the release has an SBOM in CycloneDX 1.7 JSON: the wheel and the sdist on PyPI, the npm tarball, the
+  MCP Bundle and the OCI image. Each `<artifact>.cdx.json` is attached to the GitHub release and attested with the
+  CycloneDX predicate (`gh attestation verify <artifact> --repo marciocar/kg-ssot --predicate-type
+  https://cyclonedx.org/bom`); the image SBOM is also attested in the registry. It lists the dependencies that the
+  artifact declares, read from inside it, as external (`isExternal`, with the declared range in `versionRange`), with
+  the license, the tested version and the transitive dependencies of the environment where the suite passed. The
+  bundle SBOM lists every package of its `uv.lock`, with the hash of each file, and the image SBOM lists the base
+  image by digest, its Debian packages (with the source package in the purl `upstream` qualifier, which is how a scanner
+  finds the Debian advisory), the Python interpreter (with its CPE) and every installed Python distribution. A declared
+  range carries no purl: a purl without a version would match every version in a scanner. On grype 0.121.2 the image
+  SBOM gives the same 189 matches as syft's, and the wheel, sdist, npm and bundle SBOMs give none below the declared
+  range.
+- The build lockfile of the JavaScript reader moves `fast-uri` to 3.1.9, within ajv's range.
+- The generator is `packaging/sbom/sbom.py`, with the Python standard library only, and it ships in the release. It
+  refuses an artifact that embeds third-party code (`node_modules`, `site-packages`, a wheel inside a package): none
+  does today, and the SBOM's claim is checked on every release.
+- `SECURITY.md` is new: only the latest release gets security fixes, reports go through GitHub Private Vulnerability
+  Reporting on the public repository (no e-mail), with acknowledgement within 7 days, a first assessment within 14
+  and a fix within 90, the scope, and a 90-day coordinated disclosure.
+- The release hygiene fails a release without `SECURITY.md` (with its five sections and the private channel), without
+  the generator, or with a release workflow that does not generate, attach and attest the SBOM of each artifact.
+- The manual has a new section, "Verify a release: provenance and SBOM", in chapter 6.
+- **The recommended shape of `x_event`, not normative** ([manual, chapter 3](docs/manual/03-format.md#recording-an-external-event-recommended-shape-not-normative)).
+  An external event is an `evidence` node whose `x_event` uses the CloudEvents 1.0 core names (`id`, `source`, `type`,
+  `specversion: "1.0"`, and optionally `subject`, a quoted RFC 3339 `time`, `datacontenttype` and `dataref`). The
+  collector records the body as a file that `provenance.source` and `provenance.sha256` point to; `x_received_at` is
+  apart from `time` and `verified_at`; `source` + `id` is the idempotency key; without a checked signature the node
+  stays `open`. With a complete example that passes `kg_validate` and `kg_trace check`. The contract does not change
+  (still v4.18): with two adopters, or 50 real nodes in this shape, it becomes a canonical profile in the SHOULD.
+- **The recommended shape of `x_change`, not normative** ([manual, chapter 3](docs/manual/03-format.md#recording-a-planned-change-recommended-shape-not-normative)),
+  the sibling of `x_event`. A planned change to a system, a policy or a process is a `decision` whose `x_change` has
+  `state` (`planned`, `communicated`, `applied`, `verified`, `reverted`), `target`, a quoted RFC 3339 `window`,
+  `rollback_plan` (a pointer), and optionally `kind` (the ITIL 4 types), `ref` and `communicated_by` (the `evidence`
+  with the `x_event` of the notice). Each transition is an `evidence` with `x_change_transition` (`to`, `at`) that
+  `SUPPORTS` the decision; `verified` needs a `measurement`, and a reversion `SUPERSEDES` the application it undoes.
+  Who approved goes in `sealed_by`, by reference, never by name. `kg_query --where x_change.state=applied` lists the
+  changes by state. With a complete example that passes `kg_validate` and `kg_trace check`. The contract does not
+  change (still v4.18): with two adopters, or 50 real nodes in this shape, it becomes a canonical profile in the SHOULD.
+- Why: a buyer subject to the EU Cyber Resilience Act owes due diligence on the free components it integrates, and
+  will ask for an SBOM and a vulnerability policy. The maintainer of a free project outside commercial activity has no
+  legal duty here; the release ships both anyway.
+- **Personal data, LGPD and GDPR** ([ADOPTING.md](ADOPTING.md#personal-data-lgpd-and-gdpr)): a new section on erasure
+  by design, with no contract change. The adopter is the controller of the personal data in the graph and in its git
+  history, and the tools send the graph to no one on their own; a person enters by reference, with the table that maps
+  the reference to the person kept out of git, and the reference stays pseudonymous personal data while that table
+  exists, so `label` and `narrative` must not identify the person either; a `node_sha256` published over a node that
+  can identify a person is itself personal data and stays out of a public mirror (a salted hash is not in the contract
+  yet); no public mirror holds personal data; rewriting history breaks hash verification and does not reach forks or
+  archives; `owner` is a role; and an account handle or a machine path with a user name is personal data too.
+
 ## [4.44.0] - 2026-11-05
 
 No contract change (still v4.18), and no verdict changes. `kg_query` prints the same, and `kg_trace check` without `--strict-sources` keeps its exit codes and, in a corpus without the form `repo#id@commit`, the same `kg-ssot.trace/1`.

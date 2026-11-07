@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:b41c8b2331c70716 -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:f646fd4491fa679a -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.44.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.45.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -184,3 +184,31 @@ que foi conferida e uma aresta `TRACES_TO` até o código ou o teste que a imple
   (`kg_validate.py --format json` devolve o veredito JSON de `spec/verdict.schema.json`) ou por um modelo, com o
   servidor MCP (`kg_mcp.py`). Um leitor próprio prova que concorda com o contrato passando na suíte
   ([capítulo 7](07-conformidade-e-leitores.md)).
+
+## Conferir uma release: procedência e SBOM
+
+Desde a 4.45.0, cada artefato da release tem uma lista de materiais de software (SBOM) em CycloneDX 1.7 JSON, ao lado
+da atestação de proveniência que ele já tinha. A release no GitHub leva um `<artefato>.cdx.json` para o wheel, o
+sdist, o tarball npm, o MCP Bundle e a imagem OCI, e cada SBOM também é atestado com o predicado CycloneDX:
+
+```sh
+gh attestation verify kg-ssot-<versão>.mcpb --repo marciocar/kg-ssot                      # a procedência
+gh attestation verify kg-ssot-<versão>.mcpb --repo marciocar/kg-ssot \
+  --predicate-type https://cyclonedx.org/bom                                             # o SBOM
+gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<versão> --repo marciocar/kg-ssot \
+  --predicate-type https://cyclonedx.org/bom
+```
+
+- **O que o SBOM lista:** as dependências que o artefato declara, lidas de dentro dele (os metadados do wheel, o
+  `package.json` do npm, o `pyproject.toml` e o `uv.lock` do bundle). Nenhum pacote embute código de terceiros: o
+  pip, o npm ou o uv instala as dependências do seu lado, por isso elas vão com `isExternal: true`, com a faixa
+  declarada em `versionRange` quando há uma. A licença, a versão com que a release foi testada
+  (`kg-ssot:tested-version`) e as dependências transitivas vêm do ambiente em que a suíte passou, e, no npm, do
+  lockfile do build. O SBOM do MCP Bundle lista todo pacote do `uv.lock` dele, com o hash de cada arquivo. O da
+  imagem lista a imagem base pelo digest, os pacotes Debian dela, o interpretador Python e toda distribuição Python
+  instalada.
+- **Como sai:** pelo `packaging/sbom/sbom.py`, só com a biblioteca padrão do Python, no workflow da release. Ele
+  recusa o artefato que embute código de terceiros (`node_modules`, `site-packages`, um wheel dentro de um pacote),
+  e assim a afirmação do SBOM de que nada vem embutido é conferida a cada release.
+- **Reportar uma vulnerabilidade:** o [SECURITY.md](../../SECURITY.md) traz as versões suportadas, o canal privado
+  (o GitHub Private Vulnerability Reporting), os prazos de resposta, o escopo e a política de divulgação.
