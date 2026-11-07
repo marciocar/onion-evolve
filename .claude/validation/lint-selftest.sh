@@ -7776,6 +7776,9 @@ run_vendor_push_trailer_selftests() {
         # B3: a normalização frouxa de antes (caminho local passa por host/dono/repo)
         loose-norm) anc='  else return 1; fi'
           new='  else host="${u%%/*}"; path="${u#*/}"; [ "$host" != "$u" ] || return 1; fi  # mutante B3' ;;
+        # D3: o fetch do registro sem prazo
+        no-timeout) anc='GIT_TERMINAL_PROMPT=0 timeout -k 5 "${_to}" git'
+          new='GIT_TERMINAL_PROMPT=0 git' ;;
         *) return 1 ;;
       esac
       python3 -c 'import sys
@@ -7871,7 +7874,9 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     out="$(ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
     local rem; rem="$(git --git-dir="$r" rev-parse onion/vendor)"
     rm -rf "$w"
-    [ "$rc" -eq 0 ] && [ "$rem" = "$old" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
+    # membro ÚNICO que não consentiu: o motivo é "sem vendor_push: true", nunca "dividido por 1 membros"
+    [ "$rc" -eq 0 ] && [ "$rem" = "$old" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out" \
+      && grep -qF "não tem vendor_push: true" <<< "$out" && ! grep -qF 'dividido por' <<< "$out"
   }
   # ── (g) CONFERÊNCIA: o remoto aceita o push e desfaz a ref (post-receive) → rc 14, nada mergeado ──
   _vpt_case_verify() {
@@ -7963,6 +7968,18 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     rm -rf "$w"
     [ "$rc" -eq 0 ] && [ "$o1" = "$o0" ] && [ "$oc1" = "$oc0" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
   }
+  # ── (D3) o fetch do registro tem PRAZO: um upload-pack que dorme não prende o update ──────────────
+  _vpt_case_slow_registry() {  # <helperdir>
+    local w c a r ib old out rc=0 t0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
+    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; old="$(git --git-dir="$r" rev-parse onion/vendor)"
+    _vpt_members "$w" "fixture-adopter - $r true"
+    git -C "$w/reg" config remote.origin.uploadpack 'sleep 20; git-upload-pack'
+    _vpt_core "$c" 2; t0="$SECONDS"
+    out="$(ONION_REGISTRY_FETCH_TIMEOUT=2 ONION_CORE_ROOT="$w/reg" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
+    local dt=$(( SECONDS - t0 )) rem; rem="$(git --git-dir="$r" rev-parse onion/vendor)"
+    rm -rf "$w"
+    [ "$rc" -eq 0 ] && [ "$rem" = "$old" ] && [ "$dt" -lt 15 ] && grep -qF 'passou do prazo de 2s' <<< "$out"
+  }
   # ── B3 na função: só https://, ssh:// e scp; o resto (e qualquer espaço) é recusado ───────────────
   _vpt_case_norm() {  # <helperdir> — pelo helper REAL (modo --norm-remote), nunca extraindo a função por sed
     local u bad=0 h="$1/vendor-branch.sh"
@@ -7992,6 +8009,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     "(B2) duas URLs de push, a 2ª alheia, não consente|_vpt_attack|B2|D_CURE-consent-all-pushurls|vendor-branch.sh"
     "(A5b) remote dividido: o local_path acha o dono, mas o irmão não consentiu → recusa|_vpt_attack|A5b|D_CURE-consent-shared-remote|vendor-branch.sh"
     "(D1) origin/main sem remoto real (o fetch falha) não serve de registro|_vpt_attack|D1|D_CURE-registry-fetch|vendor-branch.sh"
+    "(D3) fetch do registro que dorme → prazo vence, recusa em segundos|_vpt_case_slow_registry||mut:no-timeout|vendor-branch.sh"
     "(D2) remote dividido com o irmão SEM esquema no registro → recusa|_vpt_attack|D2|D_CURE-registry-schemeless|vendor-branch.sh"
     "(B3) remoto como caminho relativo que imita o curador não consente|_vpt_attack|B3|mut:loose-norm|vendor-branch.sh"
     "(d1) commit da vendor: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|vendor|D_CURE-session-trailer-durable|durable-commit.sh"
@@ -8029,7 +8047,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
   rm -rf "$real"
 
   unset -f _vpt_helpers _vpt_core _vpt_members _vpt_adopter _vpt_pin _vpt_case_push _vpt_case_diverged _vpt_case_from_remote \
-    _vpt_case_no_consent _vpt_case_verify _vpt_attack _vpt_case_norm _vpt_url _vpt_case_pushurl _vpt_case_trailer _vpt_case_no_session
+    _vpt_case_no_consent _vpt_case_verify _vpt_attack _vpt_case_norm _vpt_url _vpt_case_slow_registry _vpt_case_pushurl _vpt_case_trailer _vpt_case_no_session
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   if [ "${_vpt_old_ssh}" = __unset__ ]; then unset GIT_SSH_COMMAND; else export GIT_SSH_COMMAND="${_vpt_old_ssh}"; fi
   if [ "${_vpt_old_variant}" = __unset__ ]; then unset GIT_SSH_VARIANT; else export GIT_SSH_VARIANT="${_vpt_old_variant}"; fi
