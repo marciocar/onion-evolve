@@ -272,23 +272,44 @@ _norm_remote() {  # URL de git → host/dono/repo minúsculo (rc 0) · forma nã
   if [[ "$u" =~ ^https://([^/@]+@)?([A-Za-z0-9.-]+)(:[0-9]+)?/(.+)$ ]] \
      || [[ "$u" =~ ^ssh://([^/@]+@)?([A-Za-z0-9.-]+)(:[0-9]+)?/(.+)$ ]]; then
     host="${BASH_REMATCH[2]}"; path="${BASH_REMATCH[4]}"
+    # porta só a padrão do esquema: outra porta é OUTRO serviço, e normalizar as duas iguais as confundiria
+    case "${u%%://*}:${BASH_REMATCH[3]}" in https:|https::443|ssh:|ssh::22) ;; *) return 1 ;; esac
   elif [[ "$u" =~ ^[A-Za-z0-9._-]+@([A-Za-z0-9.-]+):([^/].*)$ ]]; then
     host="${BASH_REMATCH[1]}"; path="${BASH_REMATCH[2]}"
   else return 1; fi
+  case "$path" in */.[gG][iI][tT]|*/.[gG][iI][tT]/) return 1 ;; esac   # "repo/.git" não é "repo"
   path="${path%/}"; path="${path%.[gG][iI][tT]}"; path="${path%/}"
   # dono/repo de verdade: segmentos limpos, sem `..`, sem `%`, sem `@` nem `:` escondidos
   [[ "$path" =~ ^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)+$ ]] || return 1
   case "/$path/" in */../*|*/./*) return 1 ;; esac
   printf '%s/%s\n' "${host}" "${path}" | tr '[:upper:]' '[:lower:]'
 }
+# Do lado do REGISTRO também vale `host/dono/repo` SEM esquema: é a forma de 24 dos 31 membros, e
+# normalizá-la para vazio tirava o irmão da conta do remote dividido (4ª refutação, 2026-11-07). Os
+# segmentos seguem estritos. Do lado do ALVO (a URL de push) a forma sem esquema continua recusada:
+# lá ela é caminho local.
 _member_remote_norm() {  # `remote:` do registro → normalizado (a nota "(privado)" do registro sai antes)
-  local m="$1"; m="${m%%[[:space:]](*}"; _norm_remote "$m"
+  local m="$1" LC_ALL=C; m="${m%%[[:space:]](*}"
+  _norm_remote "$m" && return 0
+  # >>> D_CURE-registry-schemeless (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  case "$m" in *[[:space:]]*|*/.[gG][iI][tT]|*/.[gG][iI][tT]/) return 1 ;; esac
+  m="${m%/}"; m="${m%.[gG][iI][tT]}"; m="${m%/}"
+  [[ "$m" =~ ^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+(/[A-Za-z0-9._-]+){2,}$ ]] || return 1
+  case "/$m/" in */../*|*/./*) return 1 ;; esac
+  printf '%s\n' "$m" | tr '[:upper:]' '[:lower:]'
+  # <<< D_CURE-registry-schemeless <<<
 }
 _core_registry() {  # <CORE> → o members.yaml de origin/main no stdout · rc 1 com o motivo no stdout
   local core="$1" role
   [ -n "${core}" ] && [ -d "${core}" ] || { echo "checkout do core ausente (${core:-vazio})"; return 1; }
   role="$(bash "${core}/.claude/validation/onion-version.sh" 2>/dev/null | awk '/^role:/{print $2; exit}')"
   [ "${role}" = source ] || { echo "o checkout ${core} não tem papel source (role: ${role:-?})"; return 1; }
+  # o origin/main LOCAL envelhece: um consentimento RETIRADO no remoto só valeria depois de um fetch. O fetch
+  # é feito aqui, e falha fechada: sem conseguir atualizar, não há como saber se o consentimento segue de pé.
+  # >>> D_CURE-registry-fetch (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  GIT_TERMINAL_PROMPT=0 git -C "${core}" fetch -q origin main 2>/dev/null \
+    || { echo "não consegui atualizar origin/main em ${core} (fetch falhou) — o consentimento pode ter sido retirado"; return 1; }
+  # <<< D_CURE-registry-fetch <<<
   git -C "${core}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null \
     || { echo "sem docs/evolution/federation/members.yaml em origin/main de ${core}"; return 1; }
 }

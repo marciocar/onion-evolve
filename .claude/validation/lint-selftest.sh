@@ -7748,7 +7748,7 @@ run_vendor_push_trailer_selftests() {
   # (o último argumento é sempre o `git-upload-pack '<caminho>'`). Nenhuma rede, nenhum host real.
   local vpt_bin; vpt_bin="$(mktemp -d)"
   printf '#!/bin/sh\nfor a do last="$a"; done\nexec sh -c "$last"\n' > "${vpt_bin}/ssh-fixture"; chmod +x "${vpt_bin}/ssh-fixture"
-  local _vpt_old_ssh="${GIT_SSH_COMMAND-__unset__}"
+  local _vpt_old_ssh="${GIT_SSH_COMMAND-__unset__}" _vpt_old_variant="${GIT_SSH_VARIANT-__unset__}"
   export GIT_SSH_COMMAND="${vpt_bin}/ssh-fixture" GIT_SSH_VARIANT=simple
   _vpt_url() { printf 'ssh://fixture.test%s' "$1"; }
 
@@ -7774,10 +7774,8 @@ run_vendor_push_trailer_selftests() {
         worktree-registry) anc='  git -C "${core}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null \'
           new='  cat "${core}/docs/evolution/federation/members.yaml" 2>/dev/null \' ;;
         # B3: a normalização frouxa de antes (caminho local passa por host/dono/repo)
-        loose-norm) anc='  else return 1; fi
-  path="${path%/}"'
-          new='  else host="${u%%/*}"; path="${u#*/}"; [ "$host" != "$u" ] || return 1; fi  # mutante B3
-  path="${path%/}"' ;;
+        loose-norm) anc='  else return 1; fi'
+          new='  else host="${u%%/*}"; path="${u#*/}"; [ "$host" != "$u" ] || return 1; fi  # mutante B3' ;;
         *) return 1 ;;
       esac
       python3 -c 'import sys
@@ -7793,7 +7791,8 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     printf 'cmd v%s\n' "$v" > "$d/.claude/commands/foo.md"; git -C "$d" add -A; git -C "$d" commit -qm "core v$v"; }
   # Registro de membros da fixture, como o core o tem: um checkout de papel SOURCE ($w/reg, com o
   # onion-version.sh e sem carimbo) cujo `origin/main` carrega o members.yaml — o que "passou por merge".
-  # Membros: "<id> <local_path|-> <bare|-> <true|false>" por argumento; o bare vira URL ssh da fixture.
+  # Membros: "<id> <local_path|-> <bare|raw:<remote>|-> <true|false>"; o bare vira URL ssh da fixture, e
+  # raw: escreve o remote como está (ex.: sem esquema, a forma de 24 dos 31 membros do registro real).
   _vpt_members() {  # <w> <membro>...
     local w="$1" d="$1/reg" m id lp rm vp; shift
     mkdir -p "$d/docs/evolution/federation" "$d/.claude/validation"; git -C "$d" init -q
@@ -7801,7 +7800,8 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     { printf 'version: 2\nmembers:\n'
       for m in "$@"; do read -r id lp rm vp <<< "$m"
         printf '  - id: %s\n' "$id"; [ "$lp" = - ] || printf '    local_path: %s\n' "$lp"
-        [ "$rm" = - ] || printf '    remote: %s (privado)\n' "$(_vpt_url "$rm")"; printf '    vendor_push: %s\n' "$vp"; done
+        case "$rm" in -) ;; raw:*) printf '    remote: %s\n' "${rm#raw:}" ;; *) printf '    remote: %s (privado)\n' "$(_vpt_url "$rm")" ;; esac
+        printf '    vendor_push: %s\n' "$vp"; done
     } > "$d/docs/evolution/federation/members.yaml"
     git -C "$d" add -A; git -C "$d" commit -qm registro
     git init -q --bare "$w/reg.git"; git -C "$d" remote add origin "$w/reg.git"
@@ -7928,7 +7928,7 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
 
   # ── ATAQUES AO CONSENTIMENTO (re-refutações de 2026-11-07): o consentimento é do DESTINO real ────────
   # Em todos, o membro "cur" consentiu e registra o bare $w/cur.git; o push nunca pode ir a outro lugar.
-  _vpt_attack() {  # <helperdir> <A1|A2|A3|A5|A5b|B1|B1r|B2|B3> → 0 se nada foi empurrado e a recusa foi dita
+  _vpt_attack() {  # <helperdir> <A1|A2|A3|A5|A5b|B1|B1r|B2|B3|D1|D2> → 0 se nada foi empurrado e a recusa foi dita
     local w c a r ib cur o0 out rc=0 extra=() oc0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; cur="$w/cur.git"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; git clone -q --bare "$r" "$cur" 2>/dev/null
     o0="$(git --git-dir="$r" rev-parse onion/vendor)"; oc0="$(git --git-dir="$cur" rev-parse onion/vendor)"
@@ -7945,6 +7945,9 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
           git -C "$w/reg" commit -qam "consente sem PR" ;;
       B1r) _vpt_members "$w" "fixture-adopter - $r true"                                # o checkout do core não é source
           printf 'role: adopted\n' > "$w/reg/.claude/.onion-version" ;;
+      D1) _vpt_members "$w" "fixture-adopter - $r true"                                # origin/main forjado, sem remoto real
+          git -C "$w/reg" remote remove origin; git -C "$w/reg" update-ref refs/remotes/origin/main HEAD ;;
+      D2) _vpt_members "$w" "dono $(cd "$a" && pwd -P) $r true" "irmao /outro/clone raw:fixture.test$r false" ;;   # irmão SEM esquema
       B2) _vpt_members "$w" "cur - $cur true"                                          # 1ª pushurl = curador, 2ª = alheia
           git -C "$a" config remote.origin.pushurl "$(_vpt_url "$cur")"; git -C "$a" config --add remote.origin.pushurl "$(_vpt_url "$r")" ;;
       B3) _vpt_members "$w" "cur - $cur true"                                          # caminho relativo que imita o curador
@@ -7966,7 +7969,8 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
       local u bad=0
       for u in "github.com/fixture/cur" "./github.com/fixture/cur" "file://github.com/fixture/cur" "git://github.com/fixture/cur" \
                "https://github.com/fixture/cur evil" "https://github.com/fixture/cur$(printf '\t')x" "https://github.com/fixture%2Fcur" \
-               "https://evil@github.com@evil.com/fixture/cur"; do
+               "https://evil@github.com@evil.com/fixture/cur" "https://github.com:8443/fixture/cur" "ssh://git@github.com:2222/fixture/cur" \
+               "https://github.com/fixture/cur/.git"; do
         _norm_remote "$u" >/dev/null && bad=1
       done
       [ "$bad" = 0 ] && [ "$(_norm_remote "https://GitHub.com/Fixture/Cur.git/")" = github.com/fixture/cur ] \
@@ -7988,6 +7992,8 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
     "(B1) consentimento só num commit LOCAL do registro não vale (lê origin/main)|_vpt_attack|B1|mut:worktree-registry|vendor-branch.sh"
     "(B2) duas URLs de push, a 2ª alheia, não consente|_vpt_attack|B2|D_CURE-consent-all-pushurls|vendor-branch.sh"
     "(A5b) remote dividido: o local_path acha o dono, mas o irmão não consentiu → recusa|_vpt_attack|A5b|D_CURE-consent-shared-remote|vendor-branch.sh"
+    "(D1) origin/main sem remoto real (o fetch falha) não serve de registro|_vpt_attack|D1|D_CURE-registry-fetch|vendor-branch.sh"
+    "(D2) remote dividido com o irmão SEM esquema no registro → recusa|_vpt_attack|D2|D_CURE-registry-schemeless|vendor-branch.sh"
     "(B3) remoto como caminho relativo que imita o curador não consente|_vpt_attack|B3|mut:loose-norm|vendor-branch.sh"
     "(d1) commit da vendor: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|vendor|D_CURE-session-trailer-durable|durable-commit.sh"
     "(d2) commit de merge: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|merge|D_CURE-session-trailer-merge|vendor-branch.sh"
@@ -8025,8 +8031,9 @@ open(sys.argv[4], "w").write(t.replace(a, b))' "${src}/$3" "$anc" "$new" "$1/$3"
 
   unset -f _vpt_helpers _vpt_core _vpt_members _vpt_adopter _vpt_pin _vpt_case_push _vpt_case_diverged _vpt_case_from_remote \
     _vpt_case_no_consent _vpt_case_verify _vpt_attack _vpt_case_norm _vpt_url _vpt_case_pushurl _vpt_case_trailer _vpt_case_no_session
-  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL GIT_SSH_VARIANT
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   if [ "${_vpt_old_ssh}" = __unset__ ]; then unset GIT_SSH_COMMAND; else export GIT_SSH_COMMAND="${_vpt_old_ssh}"; fi
+  if [ "${_vpt_old_variant}" = __unset__ ]; then unset GIT_SSH_VARIANT; else export GIT_SSH_VARIANT="${_vpt_old_variant}"; fi
   rm -rf "${vpt_bin}"
 }
 
