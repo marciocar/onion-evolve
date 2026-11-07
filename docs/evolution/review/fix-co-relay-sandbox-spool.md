@@ -2,8 +2,7 @@
 title: 'Resíduo — o carteiro entrega pelo spool quando o sandbox do remetente barra o inbox do destino (F7)'
 date: 2026-11-07
 branch: fix/co-relay-sandbox-spool
-reviewed_diff_sha256: e142de9c7c571eb0690978ab8d4bd26e7706a73ca318ad30b7e621464c08aaf5
-reviewed_code_sha256: 0986b7b93ee3fcdc226db05a376aa106f070db045da8a274365bc5b732c39a94
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 2
 findings_blocking: 1
