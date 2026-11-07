@@ -244,7 +244,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-04"
     verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Opção 1, com passo a passo para disparar o gatilho de verdade; projetos de outras empresas (brain-granaai, consultoria-analise-de-caso, sge) contam como externos»"
-    label: "O maestro aceita a direção do degrau 2 da orquestração (proposta de mercado da curadoria) com construção no gatilho, e pede um passo a passo para disparar o gatilho de verdade, tratando como externos os projetos de outras empresas (brain-granaai, consultoria-analise-de-caso, sge)."
+    label: "O maestro aceita a direção do degrau 2 da orquestração (proposta de mercado da curadoria) com construção no gatilho, e pede um passo a passo para disparar o gatilho de verdade, tratando como externos os projetos de outras empresas (o hub, a consultoria, sge)."
     narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Opção 1, com passo a passo para disparar o gatilho de verdade; projetos de outras empresas (brain-granaai, consultoria-analise-de-caso, sge) contam como externos» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Aceitar e construir já» · «Ainda não»."
     provenance:
       source: "maestro, na sessão do /meta:decide"

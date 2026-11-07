@@ -2,8 +2,7 @@
 branch: feat/register-consultoria-adopter
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 4a52d0a733522dcf9a0629ca8396ef45aeab94c641e96811c52f747247f161d5
-reviewed_code_sha256: 97ae689f524eb1a92c1c9e354d0e96804007c45161b1b871b08ffd24f1348b98
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_blocking: 0
