@@ -2,8 +2,7 @@
 branch: docs/drive-comms-stable-1107
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: 29d3632747f89bc4827386c499f56a9b0982b81f6174f3f9d66ed87682457a29
-reviewed_code_sha256: a825e99e8c937ab695070fa281731108b3a929346d98f5fe91860b48d3a23b72
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
