@@ -37,7 +37,7 @@ na main. Falta só o merge do código da persona no `onion-bridge` (PR #94), que
 tem CI.
 
 **Feito pelo core em 06-07/11, pelo navegador do maestro:**
-- o app **"Onion Persona (piloto)"** existe no workspace **Grana.ai**;
+- o app **"Onion Persona (piloto)"** existe no workspace do hub;
 - o manifesto dele é o do `deploy/slack-persona/slack-app-manifest.json` do PR #94: Socket Mode, bot
   `onion-persona` e 5 escopos (`app_mentions:read`, `chat:write`, `im:history`, `im:read`, `im:write`), sem leitura
   de canal nem de usuários.
@@ -69,7 +69,7 @@ tem CI.
 
 **Decisões abertas, para o `/meta:decide` do maestro:**
 1. **Nome do app:** «Onion Persona (piloto)», já aplicado (recomendado), ou outro nome.
-2. **Workspace:** Grana.ai, o único em que o maestro está (recomendado).
+2. **Workspace:** o do hub, o único em que o maestro está (recomendado).
 3. **Tokens:** os dois nascem juntos, na mesma sentada (recomendado, porque o Socket Mode precisa dos dois), ou o de
    bot primeiro.
 4. **Chave da Anthropic:** dedicada, com teto de gasto (recomendado), ou a chave comum.
