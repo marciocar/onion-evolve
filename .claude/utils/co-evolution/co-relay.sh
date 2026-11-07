@@ -35,7 +35,7 @@
 # PAPÉIS:     maestro = humano (autoridade final, Ato-3) · maestro principal = core
 #             (onion-evolve, rege a evolução). A sessão home do destino commita.
 #
-# Uso       : co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public]
+# Uso       : co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public] [--spool]
 #               <signal-file> : basename OU path. Omitido = todos os .md de 1º nível
 #                               da fonte (default docs/evolution/inbox/).
 #               --target <p>  : path LOCAL do CORE (OBRIGATÓRIO — o adotante não tem
@@ -43,8 +43,20 @@
 #                               ou do DONO de um vendor (vendor/<x>/.<x>-version prova).
 #               --from <dir>  : fonte alternativa do(s) sinal(is) (default: o inbox).
 #               --dry-run     : mostra o plano, não escreve nada.
+#               --spool       : entrega pelo SPOOL mesmo com o inbox/ do destino gravável (ver abaixo).
 #               --confirm-public : o remetente releu o sinal e confirma a entrega a um destino que
 #                               PODE ser público (visibilidade medida 'public' ou não medida).
+#
+# SPOOL (F7, 2026-11-07): com o sandbox do Claude Code ligado no remetente, o inbox/ do destino pode ser
+#             LEITURA mesmo no sandbox.filesystem.allowWrite. Medido na 2.1.319 (bwrap 0.9.0): uma regra
+#             `Edit(//<destino>/**)` no permissions.deny do remetente vira denyWrite do sandbox, e o bwrap
+#             monta o destino inteiro em leitura DEPOIS da exceção do inbox/, que fica por baixo; um
+#             permissions.allow `Edit(...inbox/**)` não desfaz. Quando o inbox/ não é gravável (ou com
+#             --spool), o carteiro escreve, depois das MESMAS guardas e do mesmo dedup, em
+#             ${ONION_SPOOL_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/onion-spool}/<slug-do-destino>/,
+#             fora de qualquer repo, e o destino importa na próxima sessão (hook co-evolution-inbox-check.sh
+#             → spool-import.sh) ou pelo /meta:co-evolve. O remetente com sandbox põe o spool no allowWrite
+#             no lugar do inbox/ do destino. <slug> = pwd -P do destino, fora de [A-Za-z0-9] vira '-'.
 #
 # Destino público (guarda de 2026-10-29, ver o bloco "Guarda de DESTINO PÚBLICO" abaixo): o carteiro
 #             mede a visibilidade do destino pelo forge; público ou não medido → sem --confirm-public
@@ -68,15 +80,16 @@ set -uo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 STAMP="${REPO_ROOT}/.claude/.onion-version"
 
-usage() { echo "uso: co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public]" >&2; exit 2; }
+usage() { echo "uso: co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public] [--spool]" >&2; exit 2; }
 
-SIGNAL_ARG="" ; TARGET="" ; FROM_DIR="" ; DRY=0 ; CONFIRM_PUBLIC=0
+SIGNAL_ARG="" ; TARGET="" ; FROM_DIR="" ; DRY=0 ; CONFIRM_PUBLIC=0 ; FORCE_SPOOL=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --target) TARGET="${2:-}"; shift 2 || usage ;;
     --from)   FROM_DIR="${2:-}"; shift 2 || usage ;;
     --dry-run) DRY=1; shift ;;
     --confirm-public) CONFIRM_PUBLIC=1; shift ;;
+    --spool) FORCE_SPOOL=1; shift ;;
     -h|--help) usage ;;
     -*) echo "ERRO: flag desconhecida: $1" >&2; usage ;;
     *) if [ -z "${SIGNAL_ARG}" ]; then SIGNAL_ARG="$1"; else echo "ERRO: argumento extra: $1" >&2; usage; fi; shift ;;
@@ -371,6 +384,16 @@ _risk_report() {  # $1 = sinal → stdout: uma linha por termo que casa (vazio =
 }
 
 DEST_DIR="${TARGET}/docs/evolution/inbox"
+# --- Canal de escrita: o inbox/ do destino ou o SPOOL (F7) ------------------------------------------------------
+# `[ -w ]` responde EROFS do bind em leitura do sandbox (access(2) devolve falso), sem tentar escrever.
+SPOOL_DIR="${ONION_SPOOL_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/onion-spool}/$(printf '%s' "$(cd "${TARGET}" && pwd -P)" | sed 's/[^A-Za-z0-9]/-/g')"
+_inbox_writable() {
+  if [ -d "${DEST_DIR}" ]; then [ -w "${DEST_DIR}" ]; return; fi
+  local p="${DEST_DIR}"; while [ ! -d "${p}" ]; do p="$(dirname "${p}")"; done; [ -w "${p}" ]
+}
+# >>> canal-spool
+if [ "${FORCE_SPOOL}" -eq 1 ] || ! _inbox_writable; then CHANNEL="spool"; else CHANNEL="inbox"; fi
+# <<< canal-spool
 
 # --- Aviso honesto: o core pode não ter o canal nesta árvore (branch atual) ---
 if [ ! -d "${TARGET}/docs/evolution" ]; then
@@ -384,6 +407,7 @@ if [ "${DRY}" -eq 1 ]; then
   echo "  fonte    : ${FROM_DIR}/"
   echo "  alvo     : ${TARGET}  (${T_LABEL})"
   echo "  destino  : ${DEST_DIR}/"
+  [ "${CHANNEL}" = inbox ] || echo "  canal    : SPOOL ${SPOOL_DIR}/ (o inbox/ do destino não é gravável daqui, ou --spool); o destino importa na próxima sessão"
   [ -z "${VENDOR_AUTH}" ] || echo "  autoriza : ${VENDOR_AUTH} (a tag ${VENDOR_TAG} do destino reproduz os ${VENDOR_NFILES} arquivos do carimbo)"
   echo "  visível  : ${T_VIS_SHOW} — ${T_VIS_HOW}"
   for f in "${FILES[@]}"; do echo "  relayar  : $(basename "$f")"; [ "${PUBLIC_GATE}" -eq 0 ] || _risk_report "$f"; done
@@ -502,9 +526,29 @@ if [ "${PUBLIC_GATE}" -eq 1 ]; then
   FILES=("${MARKED[@]}")
 fi
 
-mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${DEST_DIR} (permissão?)." >&2; exit 2; }
+if [ "${CHANNEL}" = inbox ]; then
+  mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${DEST_DIR} (permissão?)." >&2; exit 2; }
+else
+  # 0700 só no que o carteiro CRIA: um spool que já existe guarda o modo que o dono deu (e um chmod de volta
+  # para gravável desfaria a recusa que ele quis)
+  [ -d "${SPOOL_DIR%/*}" ] || mkdir -p -m 700 "${SPOOL_DIR%/*}" 2>/dev/null
+  if ! mkdir -p -m 700 "${SPOOL_DIR}" 2>/dev/null || [ ! -w "${SPOOL_DIR}" ]; then
+    echo "ERRO: o inbox/ do destino não é gravável daqui, e o spool ${SPOOL_DIR}/ também não." >&2
+    echo "      Com o sandbox do Claude Code ligado, ponha o spool (${SPOOL_DIR%/*}) no sandbox.filesystem.allowWrite deste repo." >&2
+    exit 1
+  fi
+  echo "Onion: o inbox/ do destino não é gravável daqui (sandbox?) ou veio --spool: entrega pelo spool ${SPOOL_DIR}/." >&2
+fi
+# Escreve $1 como $2 no canal: inbox/ direto ou o spool, por tmp + rename (o importador nunca lê pela metade).
+_put() {
+  local dir="${DEST_DIR}"; [ "${CHANNEL}" = inbox ] || dir="${SPOOL_DIR}"
+  local tmp="${dir}/.${2}.tmp.$$"
+  if cp "$1" "${tmp}" 2>/dev/null && mv -f "${tmp}" "${dir}/${2}" 2>/dev/null; then return 0; fi
+  rm -f "${tmp}" 2>/dev/null; return 1
+}
+_where() { if [ "${CHANNEL}" = inbox ]; then echo "${TARGET}/docs/evolution/inbox/$1"; else echo "spool ${SPOOL_DIR}/$1 (o destino importa na próxima sessão)"; fi; }
 
-relayed=0 ; skipped=0
+relayed=0 ; skipped=0 ; failed=0
 for i in "${!FILES[@]}"; do
   f="${FILES[$i]}"; orig="${ORIGS[$i]}"
   base="$(basename "$f")"
@@ -514,6 +558,11 @@ for i in "${!FILES[@]}"; do
   # promete. Idêntico → no-op. Diferente e o destino UNTRACKED (o core ainda não triou) → entrega por
   # cima: é a mesma entrega-sem-commit, atualizada. Diferente e o destino TRACKED → o core já commitou
   # aquela versão; sobrescrever mexeria na árvore dele (I3), então recusa e diz como seguir.
+  if [ "${CHANNEL}" = spool ] && [ -e "${SPOOL_DIR}/${base}" ] && _same_signal "$f" "${orig}" "${SPOOL_DIR}/${base}"; then
+    echo "Onion: já no spool, conteúdo idêntico, à espera da importação do destino (no-op): ${base}" >&2
+    skipped=$((skipped + 1))
+    continue
+  fi
   if [ -e "${DEST_DIR}/${base}" ]; then
     if _same_signal "$f" "${orig}" "${DEST_DIR}/${base}"; then
       echo "Onion: já relayado, conteúdo idêntico (no-op): ${base}" >&2
@@ -525,11 +574,12 @@ for i in "${!FILES[@]}"; do
       skipped=$((skipped + 1))
       continue
     fi
-    if cp "$f" "${DEST_DIR}/${base}" 2>/dev/null; then
-      echo "Onion: 📬 ATUALIZADO (o destino era a entrega anterior, ainda não triada) → ${TARGET}/docs/evolution/inbox/${base}" >&2
+    if _put "$f" "${base}"; then
+      echo "Onion: 📬 ATUALIZADO (o destino era a entrega anterior, ainda não triada) → $(_where "${base}")" >&2
       relayed=$((relayed + 1))
     else
-      echo "AVISO: falha ao atualizar ${base} em ${DEST_DIR} (permissão?)." >&2
+      echo "ERRO: falha ao atualizar ${base} ($(_where "${base}"))." >&2
+      failed=$((failed + 1))
     fi
     continue
   fi
@@ -548,19 +598,25 @@ for i in "${!FILES[@]}"; do
     skipped=$((skipped + 1))
     continue
   fi
-  if cp "$f" "${DEST_DIR}/${base}" 2>/dev/null; then
-    echo "Onion: 📬 relayado → ${TARGET}/docs/evolution/inbox/${base}" >&2
+  if _put "$f" "${base}"; then
+    echo "Onion: 📬 relayado → $(_where "${base}")" >&2
     relayed=$((relayed + 1))
   else
-    echo "AVISO: falha ao copiar ${base} para ${DEST_DIR} (permissão?)." >&2
+    echo "ERRO: falha ao copiar ${base} ($(_where "${base}"))." >&2
+    failed=$((failed + 1))
   fi
 done
 
-echo "Onion: Carteiro-local upstream concluído — ${relayed} relayado(s), ${skipped} no-op." >&2
+echo "Onion: Carteiro-local upstream concluído — ${relayed} relayado(s), ${skipped} no-op, ${failed} falha(s)." >&2
 echo "       Próximo (sessão do destino, ${T_LABEL}): ler 📬, commitar + triar (git mv p/ inbox/_processed/)." >&2
 echo "       (entrega-sem-commit: o adotante NÃO commitou no repo alheio — invariante I3)." >&2
 if [ "${PUBLIC_GATE}" -eq 1 ] && [ "${relayed}" -gt 0 ]; then
   echo "       Destino possivelmente PÚBLICO (${T_VIS_SHOW}): o sinal chegou com reviewed_for_public: false." >&2
   echo "       O destino revisa, commita só a forma (um resumo) e grava true; até lá a REGRA 113 barra o commit." >&2
 fi
+# Falha de escrita não é sucesso (até 2026-11-07 o carteiro dizia AVISO e saía 0: no F7 o sandbox barrou a
+# cópia e o rc não contou).
+# >>> rc-falha
+[ "${failed}" -eq 0 ] || exit 1
+# <<< rc-falha
 exit 0
