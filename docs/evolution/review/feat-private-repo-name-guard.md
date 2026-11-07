@@ -2,14 +2,13 @@
 branch: feat/private-repo-name-guard
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: ef5ae64af4e3b54ea4ba1a179253a5447d8043ff810fb9e4a3b32d979b4d6e93
-reviewed_code_sha256: d13e7915e74c33036fe484cdfb7e0e07be7aef8cdf1080fcf296d5ffc97689a6
-findings_total: 7
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 8
+findings_real: 6
 findings_blocking: 2
 tokens: 0
 duration_min: 25
-findings_fixed: 5
+findings_fixed: 6
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: agente de execução da sessão do core (passada própria, não independente; o brief proibiu subagente)
@@ -60,10 +59,13 @@ nota: "tokens 0 = não medido. Nenhum nome real entrou no diff: a bancada usa no
 5. **Real, curado (bancada).** Os casos do selftest vazavam arquivo stageado de um caso para o outro, e um
    caso de caminho contaminava os casos "cala" seguintes. Agora cada caso começa com `reset --hard` e
    `clean`.
-6. **Teto, declarado.** Ficam fora mensagem de commit, corpo de PR, clone fora do pai do core, repo que
+6. **Real, curado (bancada).** A REGRA 59 (Modo que a produção consome é exercitado pela bancada)
+   reprovou no `pr-finalize`: o lint consome `--tsv`, e a bancada só o exercitava por dentro do selftest
+   do helper. A família ganhou o caso ponta a ponta em `--tsv`, com nomes inventados.
+7. **Teto, declarado.** Ficam fora mensagem de commit, corpo de PR, clone fora do pai do core, repo que
    só existe no remoto, abreviação e nome derivado com menos de 4 caracteres. O hash de um nome curto
    correlaciona, mas não esconde.
-7. **Não é defeito.** Um clone novo na máquina, ainda sem registro, tem o nome barrado no core até entrar
+8. **Não é defeito.** Um clone novo na máquina, ainda sem registro, tem o nome barrado no core até entrar
    no `members.yaml` (ou entrar com id neutro, como no #1522). Isso é o desenho.
 
 ## Bancada
