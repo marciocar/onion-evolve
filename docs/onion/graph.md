@@ -277,7 +277,7 @@ agent-skills-specialist	related	claude-code-specialist
 agent-skills-specialist	related	command-creator-specialist	
 arandek	adopts	onion-evolve	
 arandek	mode	legacy	
-arandek	pin	65d8a7501a03	
+arandek	pin	40fe1629d59f	
 arandek	specialization	field-dogfood	
 arandek	specialization	legacy-adoption	
 arandek	specialization	monorepo	
@@ -297,7 +297,7 @@ bomtexto	tier	standalone
 bomtexto	trust-advises	onion-evolve	
 brain-granaai	adopts	onion-evolve	
 brain-granaai	mode	brownfield	
-brain-granaai	pin	1d04d4e24cec	
+brain-granaai	pin	c091dc66cf5c	
 brain-granaai	specialization	clickup	
 brain-granaai	specialization	company-brain	
 brain-granaai	specialization	pesquisa-primaria	
@@ -349,7 +349,7 @@ command-creator-specialist	related	claude-code-specialist
 command-creator-specialist	related	gitflow-specialist	
 consultoria-analise-de-caso	adopts	onion-evolve	
 consultoria-analise-de-caso	mode	greenfield	
-consultoria-analise-de-caso	pin	6c4272252528	
+consultoria-analise-de-caso	pin	e4c954ebad47	
 consultoria-analise-de-caso	specialization	consultoria	
 consultoria-analise-de-caso	specialization	extract-meeting	
 consultoria-analise-de-caso	specialization	pain-price	
@@ -654,7 +654,7 @@ onion-core	tier	source
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	b45dec33485d	
+onion-curation	pin	4e488f2fef65	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
@@ -729,7 +729,7 @@ onion-kg-ssot	tier	standalone
 onion-kg-ssot	trust-advises	onion-evolve	
 onion-messaging	adopts	onion-evolve	
 onion-messaging	mode	greenfield	
-onion-messaging	pin	6760a7bede50	
+onion-messaging	pin	e4c954ebad47	
 onion-messaging	specialization	a2a	
 onion-messaging	specialization	channels-mcp	
 onion-messaging	specialization	mensageria	
