@@ -24938,6 +24938,10 @@ case "$args" in
   *"api "*"check-runs/"*"/annotations"*)
       _cid="${args#*check-runs/}"; _cid="${_cid%%/annotations*}"
       [ -f "${STUB_ANN_DIR:-/nonexistent}/${_cid}" ] && cat "${STUB_ANN_DIR}/${_cid}"; exit 0 ;;
+  # SAC-302: quantos workflows o repo tem (o ramo "repo sem CI" lê isto; 5 = repo com CI, o padrão)
+  *"api "*"actions/workflows"*)
+      [ "${GH_WF_RC:-0}" -ne 0 ] && { echo "gh: Not Found (HTTP 404)" >&2; exit "${GH_WF_RC}"; }
+      echo "${GH_WF_COUNT:-5}"; exit 0 ;;
   *"api "*check-runs*)
       [ -n "${GH_RUNS_EMPTY:-}" ] && exit 0
       if [ -n "${GH_CHECKS_API_500:-}" ]; then
@@ -25156,6 +25160,103 @@ STUB0
      && ! grep -q "API de checks indisponível" <<< "${_mv_out}"; then
     record_pass "pr-merge-verified: (p) API viva com zero runs ⇒ ramo 'espere' intacto (sem falso alarme de API)"
   else record_fail "pr-merge-verified: (p) zero runs virou erro de API" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # ── (nc1)-(nc8) REPO SEM CI ≠ LEITURA QUE FALHOU ≠ JANELA PÓS-PUSH (SAC-302, medido 2x em 06-07/11) ──
+  # Defeito medido no onion-bridge #93 e no PR #2 do adotante de consultoria: repo SEM workflow nenhum, e o
+  # script recusava por "ZERO check-runs" e o --ci-inoperante por "não consegui LER os runs" — zero runs lido
+  # como falha de leitura. Os três estados agora se separam pelo que a sonda MEDE. O sandbox é um clone com
+  # origin = o repo do PR, no head do PR, com um gate do Onion de mentira (rc do lint por FAKE_LINT_RC).
+  local nc="${d}/nc" _ge=(env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_PREFIX -u GIT_OBJECT_DIRECTORY -u REPO_ROOT)
+  mkdir -p "${nc}/.claude/validation"
+  printf '#!/usr/bin/env bash\necho "Violações HARD: ${FAKE_LINT_RC:-0}"; exit "${FAKE_LINT_RC:-0}"\n' > "${nc}/.claude/validation/lint-artifacts.sh"
+  printf '#!/usr/bin/env bash\necho "  Passaram : 7"\necho "  Falharam : 0"\nexit 0\n' > "${nc}/.claude/validation/lint-selftest.sh"
+  ( cd "${nc}" && "${_ge[@]}" git init -q -b feat/x && "${_ge[@]}" git remote add origin https://github.com/owner/repo.git \
+    && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm base --no-verify ) >/dev/null 2>&1
+  _mnc() { # $1 = SUT, $2 = árvore de onde roda, resto = env extra (K=V) → _mv_out/_mv_rc; corpo postado em ${d}/comment
+    local _s="$1" _t="$2"; shift 2
+    echo 0 > "${d}/n"; : > "${d}/comment"
+    _mv_out="$(cd "${_t}" && "${_ge[@]}" PATH="${d}/zero:${d}:${PATH}" GH_REAL_STUB="${d}/gh" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" \
+               STUB_HEAD_FROM="${_t}" GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
+               "$@" bash "${_s}" 999 2>&1)"; _mv_rc=$?
+  }
+  # (nc1) estado 1 — a leitura dos workflows FALHA ⇒ recusa que diz que não leu, nenhum merge, nenhum gate
+  _mnc "${sut}" "${nc}" GH_WF_RC=1
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "não consegui LER os workflows" <<< "${_mv_out}" \
+     && ! grep -q "MERGED — provado" <<< "${_mv_out}" && ! grep -q "gate local EXERCIDO" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc1) leitura dos workflows falha ⇒ recusa nomeada (fail-closed), sem gate e sem merge"
+  else record_fail "pr-merge-verified: (nc1) leitura falha não recusou" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc2) estado 2 — ZERO workflows lido + gate local verde no head ⇒ merge provado, e o PR diz que não havia CI
+  _mnc "${sut}" "${nc}" GH_WF_COUNT=0
+  if [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}" && grep -q "gate local EXERCIDO" <<< "${_mv_out}" \
+     && grep -qF "Merge SEM CI" "${d}/comment" && grep -qF "não tem CI" "${d}/comment" && grep -qF "bancada 7 casos" "${d}/comment"; then
+    record_pass "pr-merge-verified: (nc2) repo SEM workflow + gate local verde ⇒ merge, e o registro no PR diz que não havia CI"
+  else record_fail "pr-merge-verified: (nc2) repo sem CI não mergeou pelo modo declarado" "rc=${_mv_rc} corpo=[$(cat "${d}/comment")] out=${_mv_out}"; fi
+  # (nc3) estado 2 com o gate local VERMELHO ⇒ recusa, nada mergeado
+  _mnc "${sut}" "${nc}" GH_WF_COUNT=0 FAKE_LINT_RC=1
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "lint local rc=1" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc3) repo sem CI com o gate local vermelho ⇒ recusa"
+  else record_fail "pr-merge-verified: (nc3) gate vermelho passou" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc4) estado 3 — o repo TEM workflow e zero check-runs no head ⇒ espera (janela pós-push), sem gate, sem merge
+  _mnc "${sut}" "${nc}" GH_WF_COUNT=3
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "ZERO check-runs registrados" <<< "${_mv_out}" \
+     && ! grep -q "repo sem CI" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc4) repo COM workflow e zero check-runs ⇒ 'espere' (o modo sem CI não se aplica)"
+  else record_fail "pr-merge-verified: (nc4) janela pós-push virou repo sem CI" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc5) estado 2 com a árvore FORA do head do PR ⇒ recusa (o gate julgaria outro commit)
+  _mnc "${sut}" "${nc}" GH_WF_COUNT=0 STUB_HEAD_SHA=0123456789abcdef0123456789abcdef01234567
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "o gate tem de rodar NO head do PR" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc5) repo sem CI com a árvore fora do head do PR ⇒ recusa"
+  else record_fail "pr-merge-verified: (nc5) gate fora do head aceito" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc6) estado 2 num repo SEM gate nenhum ⇒ recusa que nomeia o ops/local-gate.sh; e com ele verde ⇒ merge
+  local nc0="${d}/nc0"; mkdir -p "${nc0}"
+  ( cd "${nc0}" && "${_ge[@]}" git init -q -b feat/x && "${_ge[@]}" git remote add origin git@github.com:owner/repo.git \
+    && echo a > a && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm base --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${nc0}" GH_WF_COUNT=0
+  local _nc6a="rc=${_mv_rc}"; grep -q "ops/local-gate.sh" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}" && _nc6a="${_nc6a}:recusou"
+  mkdir -p "${nc0}/ops"; printf '#!/usr/bin/env bash\nexit 0\n' > "${nc0}/ops/local-gate.sh"
+  ( cd "${nc0}" && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm gate --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${nc0}" GH_WF_COUNT=0
+  if [ "${_nc6a}" = "rc=1:recusou" ] && [ "${_mv_rc}" -eq 0 ] && grep -qF "ops/local-gate.sh) rc 0" "${d}/comment"; then
+    record_pass "pr-merge-verified: (nc6) repo sem CI e sem gate ⇒ recusa; com o ops/local-gate.sh verde ⇒ merge registrado"
+  else record_fail "pr-merge-verified: (nc6) gate declarado" "sem gate: ${_nc6a}; com gate: rc=${_mv_rc} corpo=[$(cat "${d}/comment")] out=${_mv_out}"; fi
+  # (nc7) estado 2 no CORE (a árvore tem o motor ops/pr-finalize.sh) ⇒ recusa: o modo nunca vale para o core
+  local ncc="${d}/ncc"; cp -a "${nc}" "${ncc}"; mkdir -p "${ncc}/ops"; : > "${ncc}/ops/pr-finalize.sh"
+  ( cd "${ncc}" && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm core --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${ncc}" GH_WF_COUNT=0
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "NUNCA vale para o core" <<< "${_mv_out}" && ! grep -q "gate local EXERCIDO" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc7) zero workflows no core ⇒ recusa (o modo 'repo sem CI' nunca vale para o core)"
+  else record_fail "pr-merge-verified: (nc7) o core entrou no modo sem CI" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc8) --ci-inoperante num repo com workflow e NENHUM run ⇒ recusa que diz "nenhum run" (não "não consegui LER")
+  _mv_out="$(cd "${nc}" && echo 0 > "${d}/n" && "${_ge[@]}" PATH="${d}/zero:${d}:${PATH}" GH_REAL_STUB="${d}/gh" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" \
+             STUB_HEAD_FROM="${nc}" GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_WF_COUNT=2 \
+             bash "${sut}" 999 --ci-inoperante --motivo teste 2>&1)"; _mv_rc=$?
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "NENHUM run registrado" <<< "${_mv_out}" && ! grep -q "não consegui LER os runs" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc8) --ci-inoperante com zero runs lidos ⇒ 'nenhum run', não 'falha de leitura'"
+  else record_fail "pr-merge-verified: (nc8) zero runs lido como falha de leitura" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # ── MUTANTES: cada um reintroduz um jeito de errar, e um caso acima tem de MATÁ-LO ───────────────
+  _ncmut() { # $1 = rótulo, $2 = agulha (linha exata do SUT), $3 = troca, $4 = caso que deve reprovar (função), $5 = descrição
+    local _m="${d}/mut-$1.sh"
+    awk -v a="$2" -v b="$3" 'index($0,a)==1 && !x { print b; x=1; next } { print }' "${sut}" > "${_m}"
+    if cmp -s "${sut}" "${_m}"; then record_fail "pr-merge-verified: ($1) âncora do mutante não casou" "reancore: $2"; return; fi
+    if "$4" "${_m}"; then record_pass "pr-merge-verified: ($1) mutante que $5 ⇒ morto"
+    else record_fail "pr-merge-verified: ($1) mutante que $5 SOBREVIVEU" "rc=${_mv_rc} out=${_mv_out}"; fi
+  }
+  _nc_kill2() { _mnc "$1" "${nc}" GH_WF_COUNT=0; ! { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }; }
+  _nc_kill2gate() { _mnc "$1" "${nc}" GH_WF_COUNT=0 FAKE_LINT_RC=1; [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _nc_kill3() { _mnc "$1" "${nc}" GH_WF_COUNT=3; [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  # (ncm0) a CÓPIA LIMPA, no mesmo arranjo dos mutantes (fora do ops/ do core), NÃO é morta por nenhum dos
+  #        três — sem isto, um mutante "morto" pelo arranjo (e não pela mutação) contaria como prova
+  cp "${sut}" "${d}/mut-clean.sh"
+  if ! _nc_kill2 "${d}/mut-clean.sh" && ! _nc_kill2gate "${d}/mut-clean.sh" && ! _nc_kill3 "${d}/mut-clean.sh"; then
+    record_pass "pr-merge-verified: (ncm0) cópia limpa no arranjo dos mutantes sobrevive aos três matadores"
+  else record_fail "pr-merge-verified: (ncm0) o arranjo mata a cópia limpa — os mutantes não provam nada" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (ncm1) trata o estado 2 como o 1: zero workflows vira "não li" ⇒ o (nc2) não mergeia
+  _ncmut ncm1 '  [ "${_WF_RC}" -eq 0 ] \' '  [ "${_WF_RC}" -eq 0 ] && [ "${_WF_COUNT}" -ne 0 ] \' _nc_kill2 "trata zero workflows como leitura falha"
+  # (ncm2) aceita o estado 2 SEM o gate local ⇒ com o lint vermelho, mergeia (o (nc3) o mata)
+  _ncmut ncm2 "  _run_local_gate \"\${_top}\" \"modo 'repo sem CI'\"" '  _GATE_DESC="lint 0 HARD · bancada 0 casos/0 falhas"' _nc_kill2gate "aceita repo sem CI sem rodar o gate local"
+  # (ncm3) aceita o estado 3 como o 2: workflow existe e zero check-runs vira "repo sem CI" ⇒ mergeia (o (nc4) o mata)
+  _ncmut ncm3 'if [ -z "$head_runs" ] && [ "${_WF_COUNT}" -eq 0 ]; then' 'if [ -z "$head_runs" ]; then' _nc_kill3 "aceita repo com CI e zero check-runs como repo sem CI"
+  unset -f _mnc _ncmut _nc_kill2 _nc_kill2gate _nc_kill3
 
   # ── (q)-(v) MODO DE MERGE E ANCESTRALIDADE (SAC-76, 2026-10-08) ──────────────────────────────
   # Defeito medido num adotante: o script só fazia --rebase (fallback --squash); o PR de update, que
