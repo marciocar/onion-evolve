@@ -40,13 +40,26 @@ MEMBERS="${2:-$(cd "${HERE}/../../.." && pwd)/docs/evolution/federation/members.
 # ops/audit-adopters-registry.sh. Mesma classe que a REGRA 92 (Papel da porta no registro concorda com
 # o CARIMBO dela) já curou no door-role-parity-check.sh: um TERCEIRO leitor do members.yaml, menos fiel
 # que o `yaml.safe_load` do members-validate.sh. Sem PyYAML, cai para uma regex que tira o comentário.
+# Uma linha por membro: `<id>\x1f<local_path declarado>`. O caminho passa pelo RESOLVEDOR ÚNICO
+# (member-path.sh): `local_path: n/a` (clone cujo nome leva o do cliente) cai no mapa local, fora da
+# árvore. Sem PyYAML, a regex não sabe o id, e o mapa não é consultado (declarado).
+# shellcheck source=../co-evolution/member-path.sh
+. "${HERE}/../co-evolution/member-path.sh"
 _local_paths() {
-  python3 - "$1" 2>/dev/null <<'PY' && return 0
+  local _rows _id _lp _r
+  if _rows="$(python3 - "$1" 2>/dev/null <<'PY'
 import sys, yaml
 for m in (yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}).get("members") or []:
-    if isinstance(m, dict) and m.get("local_path"):
-        print(str(m["local_path"]).strip())
+    if isinstance(m, dict) and m.get("id"):
+        print(str(m["id"]).strip() + "\x1f" + str(m.get("local_path") or "").strip())
 PY
+)"; then
+    while IFS=$'\x1f' read -r _id _lp; do
+      [ -n "${_id}" ] || continue
+      _r="$(onion_member_path "${_id}" "${_lp}")" && printf '%s\n' "${_r}"
+    done <<< "${_rows}"
+    return 0
+  fi
   sed -n 's/^[[:space:]]*local_path:[[:space:]]*//p' "$1" | sed 's/[[:space:]]#.*$//; s/^"//; s/"[[:space:]]*$//; s/[[:space:]]*$//'
 }
 
