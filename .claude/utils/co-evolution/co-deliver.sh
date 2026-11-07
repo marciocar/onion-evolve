@@ -137,6 +137,10 @@ fi
 # helper buscava só 'path:' e forçava --target mesmo com o registro válido.
 if [ -z "${TARGET}" ]; then
   CFG_PATH="$(member_field "${MEMBER}" local_path)"
+  # `local_path: n/a` (clone cujo nome leva o do cliente) cai no mapa local pelo RESOLVEDOR ÚNICO.
+  # shellcheck source=member-path.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/member-path.sh"
+  _cp_r="$(onion_member_path "${MEMBER}" "${CFG_PATH}")" && CFG_PATH="${_cp_r}"
   [ -n "${CFG_PATH}" ] || CFG_PATH="$(member_field "${MEMBER}" path)"
   if [ -n "${CFG_PATH}" ] && [ "${CFG_PATH}" != "." ]; then
     # path relativo do members.yaml resolve contra a RAIZ DO REPO, não o CWD da invocação
@@ -145,7 +149,8 @@ if [ -z "${TARGET}" ]; then
   fi
   if [ -z "${TARGET}" ]; then
     echo "ERRO: path local do adotante '${MEMBER}' não resolvido. Informe --target <path>" >&2
-    echo "      (members.yaml não traz 'local_path:'/'path:' utilizável para este membro)." >&2
+    echo "      (members.yaml não traz 'local_path:'/'path:' utilizável para este membro, nem o mapa local" >&2
+    echo "       \$(bash .claude/utils/co-evolution/member-path.sh --map-file) tem a linha dele)." >&2
     exit 2
   fi
 fi

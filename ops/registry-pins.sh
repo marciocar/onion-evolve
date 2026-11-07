@@ -51,6 +51,10 @@ done
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CORE="$(cd "${HERE}/.." && pwd)"
+# O caminho do clone passa pelo RESOLVEDOR ÚNICO: `local_path: n/a` (nome de clone que leva o do cliente)
+# cai no mapa local fora da árvore, em vez de virar ILEGÍVEL (decisão do maestro de 07/11).
+# shellcheck source=../.claude/utils/co-evolution/member-path.sh
+. "${CORE}/.claude/utils/co-evolution/member-path.sh"
 : "${MEMBERS:=${CORE}/docs/evolution/federation/members.yaml}"
 [ -f "${MEMBERS}" ] || { echo "ERRO: registro ausente: ${MEMBERS}" >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' 2>/dev/null \
@@ -112,6 +116,7 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole superby; 
     printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "—" "—" "—" "fora (kind ${kind:-?}$([ "${kind}" = door ] && echo ' → ops/door-seal-pin.sh'))"
     n_out=$((n_out + 1)); continue
   fi
+  _lp_r="$(onion_member_path "${mid}" "${lpath}")" && lpath="${_lp_r}"
   clone=""; [ -n "${lpath}" ] && [ -d "${lpath}/.git" -o -f "${lpath}/.git" ] && clone="${lpath}"
   orep="$(_owner_repo "${remote}")"; orep_src="registro"
   if [ -z "${orep}" ] && [ -n "${clone}" ]; then
