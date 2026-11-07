@@ -2,7 +2,8 @@
 branch: docs/hub-reply-maestro-acts
 pr: pendente
 date: 2026-11-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e806dd84a6f37995e287d17d13ce26c47deb9706c27157e873a1072b1c7beb88
+reviewed_code_sha256: b812b8f4439677f69c85d165233afe5bd199c8dbfe1d9a7c0c65fd682fe769c4
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
