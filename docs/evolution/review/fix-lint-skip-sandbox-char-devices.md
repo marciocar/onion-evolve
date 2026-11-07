@@ -4,9 +4,9 @@ date: 2026-11-06
 branch: fix/lint-skip-sandbox-char-devices
 reviewed_diff_sha256: 9708a28c419d986b65673ea1b6559c8e69484443df3ea42ad505ab996ed17967
 reviewed_code_sha256: 22361ed1a433ed4e312c65e185a2922b0a1f956f12bde619b21f210a75a870b0
-findings_total: 5
-findings_real: 3
-findings_fixed: 3
+findings_total: 7
+findings_real: 5
+findings_fixed: 5
 tokens: 0
 duration_min: 20
 verdict: REPROVADO_E_CURADO
@@ -60,6 +60,15 @@ dispositivo. A cura usa `-xtype c` quando o find o tem (detectado, não presumid
 | 3 | `--only` num dispositivo dizia "arquivo inexistente" | curado: mensagem nomeia o dispositivo |
 | 4 | arquivo regular ilegível poderia ser calado junto | confirmação: segue chegando ao leitor e o lint sai rc=2 nomeando o arquivo (caso (b)) |
 | 5 | diretório onde se espera arquivo (`.claude/output-styles`) | confirmação: no sandbox é dispositivo, então pulado; diretório de verdade não é a assinatura e ficou fora do escopo |
+
+## O que o 1º CI achou (run 42368456142) e a cura
+
+| # | achado | destino |
+|---|---|---|
+| 6 | `varredura-sa: (b) MUTATION` reprovou: a mutação da REGRA 54 (A varredura enxerga o que existe) ancorava na linha antiga do `_find`; com o `! "${_CHARDEV_TYPE[@]}"` a âncora sumiu e o mutante virou no-op | curado: âncora na linha nova, e a mutação que não acha a âncora sai 3 e reprova nomeando a causa, em vez de passar por no-op |
+| 7 | `selector-per-file: (a) resíduo` reprovou com n=31 > 30: a anotação `# selftest-covers: lint-artifacts.sh` da família nova puxava o fecho fraco do diretório inteiro, e a família entrava em todo PR de resíduo | curado: anotação removida (o `${SCRIPT_DIR}/lint-artifacts.sh` do corpo já liga a família ao lint); o resíduo volta a 30 |
+
+Os dois escaparam porque não rodei `scan_sanity` nem `selector_per_file` antes do 1º push: rodei as famílias que eu achava tocadas, e não as que citam a linha mudada.
 
 ## A bancada
 

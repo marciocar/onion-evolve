@@ -2991,7 +2991,6 @@ run_backtick_ref_selftests() {
 # filtro no _find o lint volta a morrer; (d-MUT) com `-type c` no lugar de `-xtype c` também morre; (e) o retrato
 # do tar da bancada não carrega o dispositivo, e (e-MUT) sem as exclusões ele viaja (no bwrap, a extração morre em mknod).
 run_sandbox_chardev_selftests() {
-  # selftest-covers: .claude/validation/lint-artifacts.sh
   local lint="${SCRIPT_DIR}/lint-artifacts.sh" base mode="" dev="" d; base="$(mktemp -d)"
   [ -f "${lint}" ] || { record_fail "sandbox-chardev" "lint ausente: ${lint}"; return; }
   : > "${base}/probe"
@@ -20909,14 +20908,19 @@ run_scan_sanity_selftests() {
 
   # (b) MUTATION — devolve a poda por sufixo (o bug original) e exige que a REGRA 54 REPROVE.
   #     Se este caso passar sem a mutacao disparar, a regra e decorativa.
-  python3 - "${wt}/.claude/validation/lint-artifacts.sh" <<'PY'
+  local _mrc=0
+  python3 - "${wt}/.claude/validation/lint-artifacts.sh" <<'PY' || _mrc=$?
 import sys
 p = sys.argv[1]
 s = open(p).read()
-s = s.replace('find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "${preds[@]}"',
-              'find "${roots[@]}" -path \'*/.claude/worktrees/*\' -prune -o "${preds[@]}"', 1)
+# a âncora acompanha o _find atual (o `! "${_CHARDEV_TYPE[@]}"` entrou em 2026-11-06); mutação que não acha a
+# âncora SAI 3, em vez de rodar um no-op que o caso leria como "a regra é decorativa" (foi o que o CI do #1520 viu)
+old = 'find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o ! "${_CHARDEV_TYPE[@]}" "${preds[@]}"'
+if old not in s: sys.exit(3)
+s = s.replace(old, 'find "${roots[@]}" -path \'*/.claude/worktrees/*\' -prune -o ! "${_CHARDEV_TYPE[@]}" "${preds[@]}"', 1)
 open(p, "w").write(s)
 PY
+  [ "${_mrc}" -eq 0 ] || { record_fail "varredura-sa: (b) MUTATION" "a âncora da mutação não existe mais no _find — reescreva-a"; rm -rf "${d}"; return; }
   out="$(bash "${wt}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
   if grep -q 'varredura-sa' <<< "${out}"; then
     record_pass "varredura-sa: (b) MUTATION — poda por sufixo volta a cegar e a REGRA 54 REPROVA"
