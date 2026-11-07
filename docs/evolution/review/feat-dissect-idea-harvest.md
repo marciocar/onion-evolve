@@ -102,3 +102,8 @@ Dogfood do item 10 num clone descartável da curadoria (nada escrito no repo del
 e rodei o checador do ramo: saiu `aviso item 10 gatilho-orfao`, rc 0 (o parque é selado). Saiu também o
 `aviso item 7 gatilho-disparou-depois-do-selo`, que já existia ali. Bancada: 125 casos + 4 de rc 3 verdes, 62
 códigos cobertos, cada caso contra o mutante do seu código.
+
+Re-revisão do 4º commit (`fix(dissect)`): o lint do commit acusou a REGRA 106 (Superfície que viaja passa pela
+varredura de vazamento da publicação) em dois exemplos, um na doutrina e um na bancada, que nomeavam um repo de
+adotante. Os dois viram placeholders (`<repo>:`, `outro-repo:`). A semântica não muda: o caso da bancada segue
+exigindo o aviso `candidata-fora-do-repo`.
