@@ -1,0 +1,88 @@
+# kg-backlog-guard: on
+# O mapa local de id para caminho e o resolvedor único (decisão (c) do maestro de 2026-11-07). Este grafo guarda o
+# defeito medido, a forma escolhida, os consumidores ligados e os tetos.
+meta:
+  id: member-paths-2026-11
+  schema_version: "1"
+  baseline: "2026-11-07"
+  review_after: "2026-12-07"   # 30d: mecanismo novo de leitura do registro
+  # ═══ TETO: 6 NÓS ═══
+nodes:
+  - id: E_LOCAL_PATH_NA_CEGAVA_TRES_FERRAMENTAS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-07"
+    verified_against: "ops/registry-pins.sh --check --no-remote --only <id> e door-role-parity-check.sh, os dois da origin/main 9a82662c6, sobre o members.yaml do PR #1522"
+    trace: "ops/registry-pins.sh"
+    label: "medido: o adotante de consultoria registrado com local_path n/a sai ILEGÍVEL no registry-pins (sem remoto nem clone) e conta como clone INALCANÇÁVEL na REGRA 92; o co-deliver não resolve o destino"
+    narrative: "O registro diz n/a porque o nome do clone leva o do cliente e o core é público. A consequência é que três ferramentas perdem o membro sem errar: o pin não é conferido, a paridade de papel não é medida e o carteiro pede --target. Com o resolvedor, a mesma passada lê o clone e mostra que o pin do registro diverge do carimbo do clone (o update do adotante entrou e o registro ainda não foi selado)."
+    provenance:
+      source: "execução local das duas ferramentas, antes e depois do resolvedor, com o registro do PR #1522"
+      locator: "linha do membro consultoria-analise-de-caso"
+      method: "measurement: saída das ferramentas"
+      locality: "host"
+  - id: D_MAPA_LOCAL_E_RESOLVEDOR_UNICO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-07"
+    verified_against: "família member_path da bancada (selftest do resolvedor, mutante que ignora o mapa, ponta a ponta no registry-pins e na REGRA 92)"
+    trace: ".claude/utils/co-evolution/member-path.sh"
+    label: "o caminho de um membro sai de um resolvedor só: local_path absoluto do registro vence; n/a, vazio ou prosa caem no mapa local da conta (member-paths.tsv, 0600, id<TAB>caminho, fora da árvore); sem linha, vazio e rc 1"
+    narrative: "O registro vence o mapa para não haver duas fontes do mesmo fato com a escondida ganhando. O resolvedor não testa se o diretório existe, porque cada consumidor já tem a régua dele (clone git, carimbo, diretório). Ligados: registry-pins.sh, co-deliver.sh, detect-transport.sh, door-role-parity-check.sh, peer-ref-check.sh e check-member-registered.sh."
+  - id: C_TETO_MAPA_FORA_DAS_PROJECOES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-07"
+    verified_against: "git grep local_path nos scripts: kg-projection.sh, door-leak-scan.sh e publish-door.sh leem o registro para produzir texto público"
+    trace: ".claude/utils/co-evolution/member-path.sh"
+    label: "teto declarado: as superfícies que projetam ou publicam (kg-projection, door-leak-scan, publish-door) não consultam o mapa, por desenho"
+    narrative: "O que elas leem vira texto público ou decide o que viaja. Se lessem o mapa, o caminho que o registro esconde iria para a projeção, que é o vazamento que o mapa existe para evitar."
+  - id: C_TETO_GATES_DE_SEGURANCA_SEM_MAPA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-07"
+    verified_against: "a2a-verify.sh (aceita receptor standalone pelo local_path) e hooks/lib/adopter-scope.sh (repos registrados do veto do adotante)"
+    trace: ".claude/utils/federation-transport/a2a-verify.sh"
+    label: "teto declarado: o gate a2a e o escopo do veto do adotante seguem lendo só o registro; o mapa não amplia o que um gate de segurança aceita"
+    narrative: "Ampliar a aceitação de um gate por um arquivo local da conta é decisão do maestro, não efeito colateral de um resolvedor de leitura. O mapa também é da conta que roda: o bridge, em outra conta, não o vê."
+  - id: Q_REGISTRO_DO_CONSULTORIA_DIVERGE_DO_CLONE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-07"
+    verified_against: "ops/registry-pins.sh --check --no-remote --only consultoria-analise-de-caso com o mapa, sobre o registro do PR #1522"
+    trace: "docs/evolution/federation/members.yaml"
+    label: "com o clone legível, o pin do registro (6c4272252528) diverge do carimbo da origin/main do clone (e4c954ebad47): o --seal do membro espera o merge do #1522"
+    narrative: "Fecha quando o registro do membro for selado pelo ops/registry-pins.sh --seal depois do merge do #1522. O --seal só carimba o que o remoto confirma, e o remoto deste membro sai da origin do clone, que agora o mapa alcança."
+edges:
+  - from: E_LOCAL_PATH_NA_CEGAVA_TRES_FERRAMENTAS
+    to: D_MAPA_LOCAL_E_RESOLVEDOR_UNICO
+    edge_type: SUPPORTS
+  - from: C_TETO_MAPA_FORA_DAS_PROJECOES
+    to: D_MAPA_LOCAL_E_RESOLVEDOR_UNICO
+    edge_type: SUPPORTS
+  - from: C_TETO_GATES_DE_SEGURANCA_SEM_MAPA
+    to: D_MAPA_LOCAL_E_RESOLVEDOR_UNICO
+    edge_type: SUPPORTS
+  - from: D_MAPA_LOCAL_E_RESOLVEDOR_UNICO
+    to: Q_REGISTRO_DO_CONSULTORIA_DIVERGE_DO_CLONE
+    edge_type: SUPPORTS

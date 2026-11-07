@@ -58,6 +58,8 @@ for m in (d.get("members") or []) if isinstance(d, dict) else []:
         print(m["local_path"]); break
 PY
 )"
+    # `local_path: n/a` cai no mapa local pelo RESOLVEDOR ÚNICO (.claude/utils/co-evolution/member-path.sh).
+    _par_r="$(bash "${HERE_ROOT}/.claude/utils/co-evolution/member-path.sh" "${NAME}" "${PAR}" 2>/dev/null)" && PAR="${_par_r}"
     [ -z "${PAR}" ] || [ -d "${PAR}" ] || PAR=""
   fi
   if [ -z "${PAR}" ]; then

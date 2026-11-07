@@ -126,9 +126,14 @@ _norm_role() { printf '%s' "$1" | sed 's/[[:space:]]*#.*$//; s/^[[:space:]]*//; 
 _compat_ok() {  # $1=registro $2=carimbo
   case "$1:$2" in hub:hub|standalone:standalone|standalone:adopted|consumer:adopted) return 0 ;; *) return 1 ;; esac; }
 
+# `local_path: n/a` (clone cujo nome leva o do cliente) cai no mapa local pelo RESOLVEDOR ÚNICO, fora
+# da árvore. No CI o mapa não existe, e o membro segue NÃO-MEDIDO declarado, como antes.
+# shellcheck source=../utils/co-evolution/member-path.sh
+. "$(dirname "${BASH_SOURCE[0]}")/../utils/co-evolution/member-path.sh"
 found=0; unreadable=0; adopter_unreadable=0; mini_pending=0; superseded=0
 while IFS=$'\x1f' read -r mid role path kind superby; do
   [ -n "${mid}" ] || continue
+  _p_r="$(onion_member_path "${mid}" "${path}")" && path="${_p_r}"
   role="$(_norm_role "${role}")"
 
   if [ "${kind}" = "adopter" ]; then
