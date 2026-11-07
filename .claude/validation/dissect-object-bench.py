@@ -51,12 +51,13 @@ def good_graph(sha):
         "nodes": [
             {"id": "S_STAGE0", "node_type": "claim", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5,
              "label": "Etapa 0 pré-registrada.", "trace": STAGE0,
-             "x_criterion": {"id": "FIXTURE_STAGE0", "version": 1, "registered_at": "2026-10-23T00:00:00+00:00", "sha256": sha, "ref": STAGE0}},
+             "x_criterion": {"id": "FIXTURE_STAGE0", "version": 1, "registered_at": "2026-11-07T00:00:00+00:00", "sha256": sha, "ref": STAGE0}},
             {"id": "E_N0", "node_type": "evidence", "plane": "DEV", "status": "open", "impact": 2, "confidence": 0.5, "label": "N0.", "x_dissect_level": 0},
             {"id": "E_N2", "node_type": "evidence", "plane": "DEV", "status": "open", "impact": 2, "confidence": 0.5, "label": "N2.",
              "x_dissect_level": 2, "x_dissect_n2_evidence": "artefato-aberto"},
             {"id": "E_PERSIST", "node_type": "evidence", "plane": "DEV", "status": "open", "impact": 1, "confidence": 0.5, "label": "o que o gatilho conta."},
             {"id": "E_OVER", "node_type": "evidence", "plane": "DEV", "status": "open", "impact": 1, "confidence": 0.5, "label": "superação."},
+            *ideas_for(None),
             {"id": "D_FIXTURE", "node_type": "decision", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5, "label": "parquear.",
              "trace": STAGE0, "x_dissect_level": 3, "x_dissect_verdict": "parquear", "x_dissect_overcoming": "nenhuma",
              "x_dissect_overcoming_search": [{"where": "corpus", "cmd": "kg_query --text fixture"}, {"where": "web", "source": "https://example.org/busca"}],
@@ -64,6 +65,43 @@ def good_graph(sha):
         ],
         "edges": [{"from": "E_N0", "to": "D_FIXTURE", "edge_type": "SUPPORTS"}],
     }
+
+
+IDEA_KINDS = ("funcionalidade", "estrategia", "decisao-de-desenho")
+
+
+def ideas_for(piece):
+    """o registro de ideias do objeto (item 9): uma por tipo, cada uma com o comparativo e a fonte; a 1ª é candidata."""
+    out = []
+    for i, kind in enumerate(IDEA_KINDS):
+        idea = {"kind": kind, "onion": ("nao-temos", "temos", "diferente")[i], "why": "o Onion faz assim, e por quê.",
+                "source": ("src/cli.py:42", "https://example.org/doc", "repo@abc1234:core/x.cue:14-17")[i]}
+        if i == 0:
+            idea.update(candidate=True, value=3, value_why="cobre um buraco medido.")
+        if piece:
+            idea["piece"] = piece
+        out.append({"id": "I_%s_%d" % (piece or "OBJ", i), "node_type": "claim", "plane": "DEV", "status": "open", "impact": 1,
+                    "confidence": 0.5, "label": "ideia %s." % kind, "x_dissect_idea": idea})
+    return out
+
+
+def idea(g, i=0):
+    return [n for n in g["nodes"] if "x_dissect_idea" in n][i]["x_dissect_idea"]
+
+
+def drop_ideas(g, piece="*"):
+    g["nodes"] = [n for n in g["nodes"] if not ("x_dissect_idea" in n and (piece == "*" or n["x_dissect_idea"].get("piece") == piece))]
+
+
+def eliminated(g):
+    """a dissecação que o eliminatório encerra no N0 (o caso do quicue-kg, E1: arquivado): ferramenta, rejeitar no nível 0,
+    sem N2; o registro de ideias segue obrigatório, porque o eliminatório barra o uso do código, não a colheita."""
+    g["meta"]["x_dissect_family"] = "ferramenta"
+    g["external_edges"][0]["to"] = REGISTRY + "#T_FAMILY_FERRAMENTA"
+    g["nodes"] = [n for n in g["nodes"] if n["id"] != "E_N2"]
+    d = D(g)
+    d.update(x_dissect_level=0, x_dissect_verdict="rejeitar", x_dissect_criterion="gh api repos/x/y --jq .archived")
+    d.pop("x_dissect_trigger")
 
 
 def node(g, nid):
@@ -117,6 +155,11 @@ def pieces(g):
                               "x_dissect_trigger": {"kg_query": trig, "min_count": 1}}
     g["nodes"] += [park("D_PIECE_B", ["--id", "E_OVER", "--status", "superseded"]),
                    park("D_PIECE_C", ["--id", "E_PERSIST", "--status", "superseded"])]
+    # cada peça é um objeto e tem as SUAS ideias (item 9): as do objeto passam à 1ª peça, e as outras ganham as delas
+    for n in g["nodes"]:
+        if "x_dissect_idea" in n:
+            n["x_dissect_idea"]["piece"] = "D_FIXTURE"
+    g["nodes"] += ideas_for("D_PIECE_B") + ideas_for("D_PIECE_C")
 
 
 def piece_alias(g):
@@ -237,6 +280,23 @@ CASES = [
     ("expect-verdict para peça que não existe", "veredito-diverge-do-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear,D_PIECE_C=parquear,D_OUTRA=parquear"]),
     ("expect-verdict por peça que deixa uma peça de fora", "veredito-sem-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear"]),
     ("app N2 sem artefato com uma peça que costura", "app-sem-artefato-veredito", seq(pieces, no_art, flatten_to_1), "ok", []),
+    # item 9 — o registro de ideias: obrigatório em toda dissecação, inclusive a que o eliminatório encerra
+    ("rejeição no eliminatório do N0 sem registro de ideias (o caso do quicue-kg)", "sem-registro-de-ideias", seq(eliminated, drop_ideas), "ok", []),
+    ("rejeição no eliminatório do N0 com as ideias registradas (variante legítima)", None, eliminated, "ok", []),
+    ("estudo sem registro de ideias (o estudo também colhe)", "sem-registro-de-ideias", seq(lambda g: (g["meta"].update(x_dissect_mode="study"), D(g).pop("x_dissect_verdict")), drop_ideas), "ok", []),
+    ("ideia que não é mapa", "ideia-mal-formada", lambda g: [n for n in g["nodes"] if "x_dissect_idea" in n][0].update(x_dissect_idea="uma ideia solta"), "ok", []),
+    ("ideia de tipo fora do enum", "ideia-tipo-invalido", lambda g: idea(g).update(kind="feature"), "ok", []),
+    ("ideia sem o comparativo ao Onion", "ideia-sem-comparativo", lambda g: idea(g).pop("onion"), "ok", []),
+    ("ideia com o porquê vazio", "ideia-sem-comparativo", lambda g: idea(g, 1).update(why="  "), "ok", []),
+    ("ideia com fonte solta", "ideia-sem-fonte", lambda g: idea(g).update(source="o README"), "ok", []),
+    ("ideia candidata sem valor estimado", "ideia-candidata-sem-valor", lambda g: idea(g).pop("value"), "ok", []),
+    ("ideia candidata com valor fora de 1 a 5", "ideia-candidata-sem-valor", lambda g: idea(g).update(value=9), "ok", []),
+    ("tipo de ideia sem registro nem lacuna", "ideias-tipo-descoberto", lambda g: idea(g, 1).update(kind="funcionalidade"), "ok", []),
+    ("tipo de ideia com a lacuna declarada (variante legítima)", None, lambda g: (idea(g, 1).update(kind="funcionalidade"), g["meta"].update(x_dissect_ideas_gap={"estrategia": "o objeto não declara estratégia além do código."})), "ok", []),
+    ("estudo anterior à régua sem ideias: avisa, rc 0 (o corpus de um adotante)", "aviso:sem-registro-de-ideias", seq(drop_ideas, lambda g: node(g, "S_STAGE0")["x_criterion"].update(registered_at="2026-11-06T23:59:59+00:00")), "ok", []),
+    ("estudo com registered_at ilegível sem ideias: a régua vale", "sem-registro-de-ideias", seq(drop_ideas, lambda g: node(g, "S_STAGE0")["x_criterion"].update(registered_at="ontem")), "ok", []),
+    ("peças com uma ideia sem a peça", "ideia-sem-peca", seq(pieces, lambda g: idea(g, 0).pop("piece")), "ok", []),
+    ("peça rejeitada sem ideia, nem com a lacuna nos 3 tipos (imessage, Agent Mail)", "peca-sem-ideias", seq(pieces, lambda g: (node(g, "D_PIECE_B").update(x_dissect_verdict="rejeitar", x_dissect_criterion="E2: licença", x_dissect_ideas_gap={k: "sem." for k in IDEA_KINDS}), node(g, "D_PIECE_B").pop("x_dissect_trigger")), lambda g: drop_ideas(g, "D_PIECE_B")), "ok", []),
 ]
 RC3_CASES = [
     ("grafo ilegível", "rc3-yaml", ["@graph"]),
@@ -382,10 +442,15 @@ def one_case(src, item_of, case):
         if code.startswith("aviso:"):
             # o aviso informa sem reprovar: rc 0 COM a linha; o mutante cala o note() e a linha tem de sumir
             acode = code[len("aviso:"):]
-            tag = "aviso item 7 %s:" % acode
+            item = item_of.get(acode, 7)  # o aviso do item 7 sai pelo fired(); o do item 9 é o add do estudo anterior
+            tag = "aviso item %d %s:" % (item, acode)
             if rc != 0 or tag not in out:
                 return None, "%s: esperado rc 0 com '%s'; veio rc %d:\n%s" % (name, tag, rc, out)
-            muted = re.sub(r'\bfired\(7, "%s"' % re.escape(acode), r'(lambda *a: None)(7, "%s"' % acode, src)
+            if item == 9:
+                muted = src.replace("note(9, code, ", "(lambda *a: None)(9, code, ")
+                assert muted != src, "mutante do aviso do item 9 não achou o note(9"
+            else:
+                muted = re.sub(r'\bfired\(7, "%s"' % re.escape(acode), r'(lambda *a: None)(7, "%s"' % acode, src)
             assert muted != src, "mutante do aviso %s não achou o fired" % acode
             t2 = build(muted, mut, order); made.append(t2)
             rc_m, out_m = run(t2, extra)

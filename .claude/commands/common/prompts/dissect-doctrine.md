@@ -17,7 +17,8 @@ escada é refazer o nível 0 e nunca chegar ao 3.
 ## 1. A escada — cinco níveis, e cada um é um GATE
 
 O corte de custo é a escada, não o orçamento: **nível reprovado não sobe**. Uma ferramenta morta
-nunca deve consumir uma análise de mecanismo.
+nunca deve consumir uma análise de mecanismo **para decidir o uso**. A escada é a do **veredito de
+uso**; a **colheita de ideias** (§1c) é obrigatória em toda dissecação e o reprovado não a encerra.
 
 | Nível | Pergunta | O que PROVA a passagem | Reprova quando |
 |---|---|---|---|
@@ -79,6 +80,72 @@ nasce `open` com a lacuna nomeada (§3), como em qualquer dissecação.
   **sem** o marcador continua sendo **interrompida**: a parada só é intencional quando declarada.
 - Modo que o censo não conhece (ex.: `estudo` em vez de `study`) sai **modo-DESCONHECIDO**, nunca
   lido como dissecação normal.
+
+---
+
+## 1c. Veredito de USO ≠ registro de IDEIAS (decisão de 2026-11-07)
+
+Crítica do maestro em 2026-11-07: *"não estamos entendendo as funcionalidades e estratégias dos
+objetos de dissecação de forma correta e com valor. [...] mesmo sendo um projeto que aposentou,
+dissecar ideias é importante."* A falha foi medida em três casos de peers. O kg-ssot rejeitou o
+**quicue-kg** pelo eliminatório E1 (arquivado). As lições que mediu depois ficaram "sem
+`x_dissect_level`, fora da escada", por um achado do Elenxo, porque a escada não tinha onde
+guardá-las. A curadoria rejeitou o channel **imessage** (E1, só macOS) e o **MCP Agent Mail**
+(E2, licença), e as duas peças saíram só com o critério da reprovação, sem nenhuma ideia
+registrada. O eliminatório encerrava o estudo **inteiro**, e a colheita se perdia com ele.
+
+São **dois produtos** da dissecação, e um não substitui o outro:
+
+- **O veredito de USO** (absorver · costurar · perseguir · parquear · rejeitar) decide se o Onion
+  **usa o objeto ou o código dele**. O eliminatório (arquivado, licença, plataforma) barra **só
+  isto**: o código não entra nem por vendor nem por costura.
+- **O REGISTRO DE IDEIAS** é obrigatório em **toda** dissecação: estudo, veredito positivo,
+  negativo, e também a que o eliminatório encerra no N0 ou na Etapa 0. Ideia não tem licença de
+  uso: o que se colhe é o conceito, reescrito na gramática da casa (§2, ABSORVER), nunca a
+  expressão do código. Projeto arquivado se lê no último commit **com pino**.
+
+**A forma do registro.** Cada ideia é um nó do grafo do estudo com `x_dissect_idea`, fora da
+escada (sem `x_dissect_level`: a ideia não sustenta o veredito de uso, nem precisa sustentar):
+
+```yaml
+- id: I_QUICUE_REJECTED_ALTERNATIVE
+  node_type: claim
+  status: open
+  label: "A abordagem rejeitada é tipo de 1ª classe e exige a alternativa escolhida."
+  x_dissect_idea:
+    kind: decisao-de-desenho   # funcionalidade | estrategia | decisao-de-desenho
+    onion: diferente           # temos | nao-temos | diferente  (contra a régua, x_dissect_against)
+    why: "o kg-ssot guarda a descartada na narrative do selo, não como nó tipado; ..."
+    source: "core/rejected.cue:13"   # arquivo:linha (repo@sha:caminho:linha vale) ou a URL do doc
+    candidate: true            # ideia candidata a entrar
+    value: 3                   # valor estimado, 1 a 5 (obrigatório na candidata)
+    value_why: "daria aresta à opção descartada, que hoje é prosa"
+    # piece: D_PIECE_X         # obrigatório quando o meta declara x_dissect_pieces
+```
+
+- **Os três tipos, por objeto:** as **funcionalidades** (o que faz), as **estratégias** (como se
+  posiciona, distribui ou resolve o problema) e as **decisões de desenho** (por que é feito assim).
+  Tipo sem ideia exige a lacuna com a razão em `x_dissect_ideas_gap: {estrategia: "..."}`, no
+  `meta:` ou no nó da peça. A lacuna cobre um tipo, **nunca o objeto inteiro**: objeto ou peça com
+  zero ideias reprova sempre.
+- **O comparativo é com a régua** (`temos` · `nao-temos` · `diferente`) e o `why` diz o que a
+  régua faz e **por quê**. Em `temos`, a ideia confirma o desenho da casa ou mostra que o outro chegou
+  ao mesmo lugar, e isso também é dado.
+- **A candidata leva valor estimado** (1 a 5, com `value_why`). O selo de quem a adota é do
+  destino, como o veredito (§6). Uma candidata de objeto rejeitado é o caminho normal de um conceito
+  entrar sem o código.
+- **Objeto em peças:** cada peça é um objeto e tem as suas ideias (`piece:`). O veredito de uma peça
+  não colhe pelas outras.
+
+**Quem cobra:** o item 9 do `dissect-object-check.sh` (§6), com os códigos `sem-registro-de-ideias`,
+`peca-sem-ideias`, `ideias-tipo-descoberto`, `ideia-sem-comparativo`, `ideia-sem-fonte`,
+`ideia-candidata-sem-valor`, `ideia-tipo-invalido`, `ideia-mal-formada` e `ideia-sem-peca`. Ele
+julga **forma e cobertura**. Se a ideia é boa e se o valor está bem estimado, quem julga é o
+Elenxo. **Corte por data:** a régua vale para o estudo cuja Etapa 0 (`x_criterion.registered_at`)
+é de 2026-11-07 em diante. No estudo anterior, a mesma lista sai como `aviso item 9`, com rc 0,
+porque um adotante que roda o checador sobre todos os estudos no CI (a curadoria tem 22) ficaria
+vermelho no update, e atualizações sem relação com a colheita travariam. A dívida fica visível,
+e a colheita é refeita pelo dono do estudo. Data ilegível não conta como anterior.
 
 ---
 
@@ -197,6 +264,8 @@ Quem preenche mede a origem (N0 com fonte primária); o leitor recusa o plano qu
 - **Não sabe o que ninguém escreveu.** O censo mede dissecações **declaradas no corpus**.
   Ferramenta que nunca foi anotada em lugar nenhum é invisível a ele, e ele diz isso em vez de
   fingir cobertura.
+- **Não julga a ideia.** O registro de ideias (§1c) tem a forma e a cobertura cobradas, não o mérito:
+  `value: 5` numa ideia fraca passa no checador e cabe ao Elenxo refutar.
 - **Não roda sozinha.** Maestro-invocada; sem cron, sem `/loop` (MOAT W7).
 - **Não traz o motor do protótipo de qualquer objeto.** O workflow de 3 agentes está parqueado (§6), com
   gatilho medido; a família, a Etapa 0 e o checador de forma valem sem ele.
@@ -284,8 +353,9 @@ afirmação que cada um testa · (5) critério de corte, eliminatórios e pontua
 o nó `S_STAGE0` com `x_criterion` (`id`, `version`, `registered_at` com fuso, `sha256` do arquivo e `ref` para ele;
 contrato 4.12, o digest sai de `python3 -I vendor/kg-ssot/tools/kg_criterion.py digest --text-file <STAGE0.md>`).
 O commit do plano é **ancestral estrito** do primeiro commit que traz um nó `x_dissect_level: 0`; emenda é versão
-nova do critério (`amends`), nunca edição do arquivo. A Etapa 0 pode encerrar o estudo: um eliminatório que já
-reprova antes do N0 é desfecho.
+nova do critério (`amends`), nunca edição do arquivo. A Etapa 0 pode encerrar o **veredito de uso**: um eliminatório
+que já reprova antes do N0 é desfecho dele. O registro de ideias (§1c) segue obrigatório, porque o eliminatório
+barra o código, nunca a colheita. Os eliminatórios da Etapa 0 se escrevem como barreira de **uso**.
 
 **Superação buscada também fora do repo.** Com superação, o nó dela declara `provenance.locality: web` (ou `repo`).
 Com `x_dissect_overcoming: nenhuma`, o estudo lista as buscas em
@@ -299,9 +369,9 @@ arestas `SUPERSEDES` em volta de um nó do próprio estudo, nunca `drifted`. O t
 sentido de sempre.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
-mediu, nunca aprovação) confere os 8 itens — família e aresta, veredito da família, destino, quem paga e o não
+mediu, nunca aprovação) confere os 9 itens — família e aresta, veredito da família, destino, quem paga e o não
 verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
-nível 1 — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
+nível 1, e o registro de ideias (§1c) — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
 2026-10-24 (sem `x_study_destination`) fica fora por desenho; rodar o checador direto sobre ele lista o que falta
 para migrar. Bancada: `run_dissect_object_selftests`.
