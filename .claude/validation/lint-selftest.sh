@@ -7727,13 +7727,15 @@ run_vendor_baseline_removido_selftests() {
 
 # ---------------------------------------------------------------------------
 # Modo vendor-push-trailer — duas curas do --update medidas em 2026-11-07 num adotante real:
-#   1. a onion/vendor REMOTA ficava para trás (o merge sai da local e nada a empurrava): o update agora lê a
-#      remota antes, nasce dela quando a local falta, para com rc 13 se ela divergiu e empurra por ff
-#      conferindo por ls-remote;
+#   1. a onion/vendor REMOTA ficava para trás (o merge sai da local e nada a empurrava): com CONSENTIMENTO
+#      registrado no core (`vendor_push: true` no membro), o update lê a remota pela URL de push, nasce
+#      dela quando a local falta, para com rc 13 se ela divergiu, empurra por ff e confere por ls-remote
+#      (rc 14 se não bater); sem consentimento, nada é tocado e a linha diz por quê;
 #   2. os commits da vendor e do merge saíam sem a linha `Claude-Session:` (session-trailer.sh, que nunca
-#      inventa a sessão).
-# Fixtures em mktemp, com remoto BARE local — nunca um adotante real. Cada cura tem caso verde e mutante
-# (o bloco D_CURE-* removido numa cópia dos helpers) que tem de reprovar o mesmo caso.
+#      inventa a sessão; a herdada da assinatura sai).
+# Fixtures em mktemp, com remoto BARE local e registro de membros próprio — nunca um adotante real nem o
+# members.yaml do core. Cada cura tem caso verde e mutante (o bloco D_CURE-* removido numa cópia dos
+# helpers) que tem de reprovar o mesmo caso.
 # ---------------------------------------------------------------------------
 run_vendor_push_trailer_selftests() {
   local src="${REPO_ROOT}/.claude/utils/adopt"
@@ -7751,11 +7753,16 @@ run_vendor_push_trailer_selftests() {
   }
   _vpt_core() { local d="$1" v="$2"; rm -rf "$d"; mkdir -p "$d/.claude/commands"; git -C "$d" init -q
     printf 'cmd v%s\n' "$v" > "$d/.claude/commands/foo.md"; git -C "$d" add -A; git -C "$d" commit -qm "core v$v"; }
-  # Adotante com remoto BARE: integração e onion/vendor publicadas. Ecoa a integração.
+  # Registro de membros da fixture: <arquivo> <campo local_path|remote> <valor> <vendor_push true|false>
+  _vpt_members() {
+    printf 'version: 2\nmembers:\n  - id: fixture-adopter\n    %s: %s\n    vendor_push: %s\n  - id: outro\n    vendor_push: true\n' "$2" "$3" "$4" > "$1"
+  }
+  # Adotante com remoto BARE: integração e onion/vendor publicadas. A assinatura do alvo carrega uma
+  # Claude-Session VELHA, de outra sessão, que o update tem de tirar. Ecoa a integração.
   _vpt_adopter() { local a="$1" c="$2" r="$3" ib
     mkdir -p "$a/src" "$a/.claude"; git -C "$a" init -q; printf 'produto\n' > "$a/src/app.js"
     git -C "$c" archive HEAD -- .claude | tar -x -C "$a"
-    printf '{"attribution":{"commit":"Assinado-pelo-adotante-de-teste"}}\n' > "$a/.claude/settings.json"
+    printf '{"attribution":{"commit":"Assinado-pelo-adotante-de-teste\\nClaude-Session: https://claude.ai/code/session_VELHA9"}}\n' > "$a/.claude/settings.json"
     git -C "$a" add -A; git -C "$a" commit -qm "adopt v1"; ib="$(git -C "$a" rev-parse --abbrev-ref HEAD)"
     git init -q --bare "$r"; git -C "$a" remote add origin "$r"
     bash "${src}/vendor-branch.sh" seed "$a" "$ib" >/dev/null 2>&1
@@ -7764,12 +7771,13 @@ run_vendor_push_trailer_selftests() {
   }
   _vpt_pin() { git -C "$1" rev-parse --short=12 HEAD; }
 
-  # ── (a) PUSH: a remota anda por ff até a local e o update diz de onde para onde ──────────────────
+  # ── (a) PUSH com consentimento (casado pelo local_path): a remota anda por ff até a local ─────────
   _vpt_case_push() {  # <helperdir> → 0 se o caso passa
     local w c a r ib old out rc=0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; old="$(git -C "$a" rev-parse onion/vendor)"
+    _vpt_members "$w/m.yaml" local_path "$(cd "$a" && pwd -P)" true
     _vpt_core "$c" 2
-    out="$(bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
+    out="$(ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
     local loc rem; loc="$(git -C "$a" rev-parse onion/vendor)"; rem="$(git --git-dir="$r" rev-parse onion/vendor 2>/dev/null)"
     rm -rf "$w"
     [ "$rc" -eq 0 ] && [ "$loc" != "$old" ] && [ "$loc" = "$rem" ] \
@@ -7778,67 +7786,106 @@ run_vendor_push_trailer_selftests() {
   # ── (b) DIVERGÊNCIA: outro clone empurrou a vendor; o update para com rc 13 e NÃO toca nada ──────
   _vpt_case_diverged() {
     local w c a r ib cl rc=0 v0 i0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; cl="$w/cl"
-    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"
+    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w/m.yaml" remote "$r" true
     git clone -q "$r" "$cl" 2>/dev/null; git -C "$cl" checkout -q onion/vendor
     printf 'x\n' > "$cl/x"; git -C "$cl" add x; git -C "$cl" commit -qm "vendor alheia"; git -C "$cl" push -q origin onion/vendor 2>/dev/null
     printf 'local\n' > "$a/y"; git -C "$a" checkout -q onion/vendor; git -C "$a" add y; git -C "$a" commit -qm "vendor local"; git -C "$a" checkout -q "$ib"
     v0="$(git -C "$a" rev-parse onion/vendor)"; i0="$(git -C "$a" rev-parse "$ib")"
     _vpt_core "$c" 2
-    bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
     local v1 i1; v1="$(git -C "$a" rev-parse onion/vendor)"; i1="$(git -C "$a" rev-parse "$ib")"
     rm -rf "$w"
     [ "$rc" -eq 13 ] && [ "$v1" = "$v0" ] && [ "$i1" = "$i0" ]
   }
-  # ── (c) CLONE NOVO: sem onion/vendor local, ela nasce da REMOTA (que está à frente da integração) ──
+  # ── (c) CLONE NOVO (casado pelo remote): sem onion/vendor local, ela nasce da REMOTA ─────────────
   _vpt_case_from_remote() {
     local w c a r ib b rc=0 rv; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; b="$w/b"
-    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"
+    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w/m.yaml" remote "$r" true
     _vpt_core "$c" 2   # o 1º clone atualiza e publica SÓ a vendor (a integração vai por PR, ainda aberto)
-    bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1
+    ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1
     rv="$(git --git-dir="$r" rev-parse onion/vendor)"
     git clone -q "$r" "$b" 2>/dev/null
     _vpt_core "$c" 3
-    bash "$1/vendor-branch.sh" update "$b" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$b" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
     local ok=1
     [ "$rc" -eq 0 ] && git -C "$b" merge-base --is-ancestor "$rv" onion/vendor 2>/dev/null \
       && [ "$(git -C "$b" rev-parse onion/vendor)" = "$(git --git-dir="$r" rev-parse onion/vendor)" ] && ok=0
     rm -rf "$w"; return "$ok"
   }
-  # ── (d) TRAILER: vendor e merge (não ff) levam a assinatura do adotante E a linha da sessão ───────
+  # ── (f) SEM CONSENTIMENTO (vendor_push: false): nada é empurrado e a linha diz por quê ──────────
+  _vpt_case_no_consent() {
+    local w c a r ib old out rc=0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
+    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; old="$(git --git-dir="$r" rev-parse onion/vendor)"
+    _vpt_members "$w/m.yaml" remote "$r" false
+    _vpt_core "$c" 2
+    out="$(ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)" || rc=$?
+    local rem; rem="$(git --git-dir="$r" rev-parse onion/vendor)"
+    rm -rf "$w"
+    [ "$rc" -eq 0 ] && [ "$rem" = "$old" ] && grep -qF 'onion/vendor remota não empurrada: sem consentimento registrado' <<< "$out"
+  }
+  # ── (g) CONFERÊNCIA: o remoto aceita o push e desfaz a ref (post-receive) → rc 14, nada mergeado ──
+  _vpt_case_verify() {
+    local w c a r ib rc=0 i0; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
+    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w/m.yaml" remote "$r" true
+    printf '#!/bin/sh\nwhile read old new ref; do git update-ref "$ref" "$old"; done\n' > "$r/hooks/post-receive"; chmod +x "$r/hooks/post-receive"
+    i0="$(git -C "$a" rev-parse "$ib")"; _vpt_core "$c" 2
+    ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    local i1; i1="$(git -C "$a" rev-parse "$ib")"
+    rm -rf "$w"
+    [ "$rc" -eq 14 ] && [ "$i1" = "$i0" ]
+  }
+  # ── (h) PUSHURL ≠ URL: lê, empurra e confere no repo da URL de PUSH ─────────────────────────────
+  _vpt_case_pushurl() {
+    local w c a r p ib rc=0 old; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"; p="$w/p.git"
+    _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_members "$w/m.yaml" remote "$r" true
+    git clone -q --bare "$r" "$p" 2>/dev/null; git -C "$a" config remote.origin.pushurl "$p"
+    old="$(git --git-dir="$r" rev-parse onion/vendor)"; _vpt_core "$c" 2
+    ONION_MEMBERS_FILE="$w/m.yaml" bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1 || rc=$?
+    local ok=1
+    [ "$rc" -eq 0 ] && [ "$(git --git-dir="$p" rev-parse onion/vendor)" = "$(git -C "$a" rev-parse onion/vendor)" ] \
+      && [ "$(git --git-dir="$r" rev-parse onion/vendor)" = "$old" ] && ok=0
+    rm -rf "$w"; return "$ok"
+  }
+  # ── (d) TRAILER: vendor e merge (não ff) levam a assinatura do adotante E a linha da sessão ATUAL,
+  #        uma vez só, sem a herdada da assinatura ─────────────────────────────────────────────────
   _vpt_case_trailer() {  # <helperdir> <qual: vendor|merge>
     local w c a r ib body want="Claude-Session: https://claude.ai/code/session_TESTE0123"; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"
     printf 'produto v2\n' > "$a/src/app.js"; git -C "$a" commit -qam "produto anda"   # merge NÃO ff
     _vpt_core "$c" 2
-    env -u CLAUDE_CODE_BRIDGE_SESSION_ID ONION_CLAUDE_SESSION_URL="https://claude.ai/code/session_TESTE0123" \
+    env -u CLAUDE_CODE_BRIDGE_SESSION_ID ONION_CLAUDE_SESSION_URL="https://claude.ai/code/session_TESTE0123" ONION_VENDOR_PUSH=0 \
       bash "$1/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" >/dev/null 2>&1
     if [ "$2" = vendor ]; then body="$(git -C "$a" log -1 --format=%B onion/vendor)"
     else body="$(git -C "$a" log -1 --format=%B "$ib")"; [ "$(git -C "$a" rev-list --parents -1 "$ib" | wc -w)" -eq 3 ] || { rm -rf "$w"; return 1; }; fi
     rm -rf "$w"
-    # a linha da sessão vem LOGO abaixo da assinatura, uma vez só
     local after; after="$(grep -A1 -xF 'Assinado-pelo-adotante-de-teste' <<< "$body")"
     grep -qxF "$want" <<< "$body" && [ "$(grep -c '^Claude-Session:' <<< "$body")" = 1 ] \
       && grep -qxF "$want" <<< "$after"
   }
-  # ── (e) SEM SESSÃO conhecida (ou com forma inválida): nenhuma linha, e a nota é dita ─────────────
+  # ── (e) SEM SESSÃO conhecida: nenhuma linha (nem a herdada), e a nota é dita. URL inválida cai
+  #        para o id; forma inválida do id não vira URL ─────────────────────────────────────────────
   _vpt_case_no_session() {
     local w c a r ib out body rc=1; w="$(mktemp -d)"; c="$w/c"; a="$w/a"; r="$w/r.git"
     _vpt_core "$c" 1; ib="$(_vpt_adopter "$a" "$c" "$r")"; _vpt_core "$c" 2
-    out="$(env -u CLAUDE_CODE_BRIDGE_SESSION_ID -u ONION_CLAUDE_SESSION_URL bash "${src}/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)"
+    out="$(env -u CLAUDE_CODE_BRIDGE_SESSION_ID -u ONION_CLAUDE_SESSION_URL ONION_VENDOR_PUSH=0 bash "${src}/vendor-branch.sh" update "$a" "$c" "$(_vpt_pin "$c")" "$ib" 2>&1)"
     body="$(git -C "$a" log -1 --format=%B onion/vendor)"
-    local bad; bad="$(env -u ONION_CLAUDE_SESSION_URL CLAUDE_CODE_BRIDGE_SESSION_ID='session_x$(id)' bash "${src}/session-trailer.sh")"
-    ! grep -q 'Claude-Session' <<< "$body" && grep -q 'SEM a linha Claude-Session' <<< "$out" && [ -z "$bad" ] && rc=0
+    local bad fb; bad="$(env -u ONION_CLAUDE_SESSION_URL CLAUDE_CODE_BRIDGE_SESSION_ID='session_x$(id)' bash "${src}/session-trailer.sh")"
+    fb="$(ONION_CLAUDE_SESSION_URL='http://evil/x' CLAUDE_CODE_BRIDGE_SESSION_ID=session_ABC9 bash "${src}/session-trailer.sh")"
+    ! grep -q 'Claude-Session' <<< "$body" && grep -q 'SEM a linha Claude-Session' <<< "$out" && [ -z "$bad" ] \
+      && [ "$fb" = "Claude-Session: https://claude.ai/code/session_ABC9" ] && rc=0
     rm -rf "$w"; return "$rc"
   }
 
   local real m; real="$(mktemp -d)"; _vpt_helpers "$real"
   # Cada cura: [nome do caso] [função] [args] [bloco] [arquivo]
   local -a cases=(
-    "(a) push ff + conferência por ls-remote|_vpt_case_push||D_CURE-vendor-push|vendor-branch.sh"
+    "(a) push ff com consentimento + conferência por ls-remote|_vpt_case_push||D_CURE-vendor-ffpush|vendor-branch.sh"
     "(b) remota divergente → rc 13, vendor e integração intactas|_vpt_case_diverged||D_CURE-vendor-remote-diverged|vendor-branch.sh"
     "(c) clone novo: a vendor nasce da remota|_vpt_case_from_remote||D_CURE-vendor-from-remote|vendor-branch.sh"
-    "(d1) commit da vendor leva Claude-Session abaixo da assinatura|_vpt_case_trailer|vendor|D_CURE-session-trailer-durable|durable-commit.sh"
-    "(d2) commit de merge leva Claude-Session abaixo da assinatura|_vpt_case_trailer|merge|D_CURE-session-trailer-merge|vendor-branch.sh"
+    "(f) sem consentimento registrado: nada empurrado, e é dito|_vpt_case_no_consent||D_CURE-vendor-push-consent|vendor-branch.sh"
+    "(g) remoto que desfaz a ref → conferência por ls-remote dá rc 14|_vpt_case_verify||D_CURE-vendor-verify|vendor-branch.sh"
+    "(d1) commit da vendor: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|vendor|D_CURE-session-trailer-durable|durable-commit.sh"
+    "(d2) commit de merge: Claude-Session atual abaixo da assinatura, sem a herdada|_vpt_case_trailer|merge|D_CURE-session-trailer-merge|vendor-branch.sh"
   )
   local entry name fn arg blk file
   for entry in "${cases[@]}"; do
@@ -7854,12 +7901,16 @@ run_vendor_push_trailer_selftests() {
     else record_pass "vendor-push-trailer: ${name} (MUT) — sem ${blk} o caso reprova"; fi
     rm -rf "$m"
   done
+  if _vpt_case_pushurl "$real"; then
+    record_pass "vendor-push-trailer: (h) pushurl ≠ url → lê, empurra e confere na URL de push (a url de fetch fica intocada)"
+  else record_fail "vendor-push-trailer: (h) pushurl" "o push ou a conferência não usaram a URL de push"; fi
   if _vpt_case_no_session; then
-    record_pass "vendor-push-trailer: (e) sessão desconhecida ou inválida → sem a linha, com a nota (nunca inventa)"
-  else record_fail "vendor-push-trailer: (e) sem sessão" "a linha apareceu, a nota faltou, ou a forma inválida virou URL"; fi
+    record_pass "vendor-push-trailer: (e) sessão desconhecida → sem linha (nem a herdada), com a nota; URL inválida cai para o id; id inválido não vira URL"
+  else record_fail "vendor-push-trailer: (e) sem sessão" "a linha apareceu, a nota faltou, a URL inválida não caiu para o id, ou a forma inválida virou URL"; fi
   rm -rf "$real"
 
-  unset -f _vpt_helpers _vpt_core _vpt_adopter _vpt_pin _vpt_case_push _vpt_case_diverged _vpt_case_from_remote _vpt_case_trailer _vpt_case_no_session
+  unset -f _vpt_helpers _vpt_core _vpt_members _vpt_adopter _vpt_pin _vpt_case_push _vpt_case_diverged _vpt_case_from_remote \
+    _vpt_case_no_consent _vpt_case_verify _vpt_case_pushurl _vpt_case_trailer _vpt_case_no_session
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 

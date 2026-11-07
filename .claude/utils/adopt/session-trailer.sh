@@ -10,7 +10,7 @@
 #   1. ONION_CLAUDE_SESSION_URL      — quem chama passa a URL inteira (https://claude.ai/code/session_…);
 #   2. CLAUDE_CODE_BRIDGE_SESSION_ID — o id que o Claude Code exporta numa sessão ligada ao claude.ai
 #                                      (session_…), que vira a mesma URL.
-# Nenhuma presente, ou forma inválida → saída VAZIA e rc 0: o commit sai sem a linha, e quem chama diz
+# Uma inválida não barra a outra (a URL inválida cai para o id). Nenhuma válida → saída VAZIA e rc 0: o commit sai sem a linha, e quem chama diz
 # isso numa nota (`--note` imprime a nota pronta no stderr).
 # O id LOCAL (CLAUDE_CODE_SESSION_ID, um UUID) NÃO serve: ele não é endereço de sessão no claude.ai, e
 # montar uma URL com ele seria escrever no histórico do adotante um link que não abre.
@@ -22,11 +22,9 @@
 set -uo pipefail
 
 _url=""
-if [ -n "${ONION_CLAUDE_SESSION_URL:-}" ]; then
-  if [[ "${ONION_CLAUDE_SESSION_URL}" =~ ^https://claude\.ai/code/session_[A-Za-z0-9]+$ ]]; then
-    _url="${ONION_CLAUDE_SESSION_URL}"
-  fi
-elif [ -n "${CLAUDE_CODE_BRIDGE_SESSION_ID:-}" ]; then
+if [[ "${ONION_CLAUDE_SESSION_URL:-}" =~ ^https://claude\.ai/code/session_[A-Za-z0-9]+$ ]]; then
+  _url="${ONION_CLAUDE_SESSION_URL}"
+elif [ -n "${CLAUDE_CODE_BRIDGE_SESSION_ID:-}" ]; then   # URL ausente OU inválida → cai para o id
   if [[ "${CLAUDE_CODE_BRIDGE_SESSION_ID}" =~ ^session_[A-Za-z0-9]+$ ]]; then
     _url="https://claude.ai/code/${CLAUDE_CODE_BRIDGE_SESSION_ID}"
   fi
