@@ -250,26 +250,70 @@ _remote_vendor_sha() {  # <TARGET> <REMOTE> → sha da onion/vendor no remoto (v
   out="$(GIT_TERMINAL_PROMPT=0 git -C "$1" ls-remote --heads "${url}" "refs/heads/${VENDOR}" 2>/dev/null)" || return 1
   awk '{print $1; exit}' <<< "${out}"
 }
-# CONSENTIMENTO REGISTRADO NO CORE (passada adversarial do PR, 2026-11-07): empurrar para o remoto de um
-# adotante é ato no repo DELE, e só um adotante consentiu. Sem `vendor_push: true` no membro do registro
-# (docs/evolution/federation/members.yaml do core), nada é lido nem empurrado: o update segue como antes, e
-# a linha diz por que e dá o comando. Registro: ONION_MEMBERS_FILE, senão o da fonte. Membro: ONION_MEMBER_ID,
-# senão o `local_path` igual ao checkout principal do alvo (a worktree irmã do update resolve para ele),
-# senão o `remote` igual à url do origin (normalizada: sem esquema, sem .git, sem barra final).
-_norm_remote() { sed -E 's#^[a-z+]+://##; s#^[^@/]+@##; s#:#/#; s#\.git$##; s#/+$##; s# .*##' <<< "$1"; }
-_vendor_push_consent() {  # <TARGET> <SOURCE_ROOT> → rc 0 consentiu · 1 não · ecoa o id do membro achado
-  local T="$1" mf="${ONION_MEMBERS_FILE:-$2/docs/evolution/federation/members.yaml}" main url
-  [ -f "${mf}" ] || return 1
+# CONSENTIMENTO REGISTRADO NO CORE, PRESO AO DESTINO (passadas adversariais do PR, 2026-11-07): empurrar
+# para o remoto de um adotante é ato no repo DELE. O push só sai se o membro do registro do core que tem
+# `vendor_push: true` for o DONO do destino real: a URL de PUSH normalizada do remoto efetivo (o mesmo
+# `_vendor_remote` que o ls-remote e o push usam) tem de ser igual ao `remote` do membro. Ler o origin fixo,
+# ou só a url de fetch, deixava um mirror ou um pushurl alheio herdar o consentimento (medido: 3 ataques).
+#   · MEMBRO: primeiro pelo `local_path` igual ao checkout principal do alvo (a worktree irmã resolve para
+#     ele); sem esse casamento, pelo `remote` igual à URL de push. Remote DIVIDIDO por membros em que nem
+#     todos consentiram → recusa (não há como saber de quem é o clone).
+#   · ONION_MEMBER_ID só RESTRINGE: o membro achado acima tem de ser ele; nunca amplia.
+#   · REGISTRO: o `members.yaml` RASTREADO e SEM alteração em `docs/evolution/federation/` de um repo git
+#     (o da fonte, ou ONION_MEMBERS_FILE apontando para um assim). Um arquivo solto fabricava consentimento.
+# Sem consentimento, nada é lido nem empurrado: o update segue como antes, e a linha diz por que.
+_norm_remote() {  # URL de git → host/dono/repo, minúsculo, sem esquema, usuário, .git, barra final ou nota
+  sed -E 's#[ \t].*$##; s#^[a-z+]+://##; s#^[^@/]+@##; s#^([^/:]+):#\1/#; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'
+}
+_trusted_members_file() {  # <arquivo> → rc 0 se é o registro rastreado e limpo de um repo git
+  local f="$1" d top
+  [ -f "$f" ] || return 1
+  d="$(cd "$(dirname "$f")" 2>/dev/null && pwd -P)" || return 1
+  top="$(git -C "$d" rev-parse --show-toplevel 2>/dev/null)" || return 1
+  [ "$d/$(basename "$f")" = "$top/docs/evolution/federation/members.yaml" ] || return 1
+  git -C "$top" ls-files --error-unmatch -- docs/evolution/federation/members.yaml >/dev/null 2>&1 || return 1
+  git -C "$top" diff --quiet HEAD -- docs/evolution/federation/members.yaml 2>/dev/null
+}
+_vendor_push_consent() {  # <TARGET> <SOURCE_ROOT> <REMOTE> → rc 0 consentiu (ecoa o id) · 1 não (ecoa o motivo)
+  local T="$1" mf="${ONION_MEMBERS_FILE:-$2/docs/evolution/federation/members.yaml}" R="$3" main purl rows by pick n nok
+  _trusted_members_file "${mf}" || { echo "registro de membros não é o members.yaml rastreado e limpo do core (${mf})"; return 1; }
   main="$(cd "$(git -C "$T" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)/.." 2>/dev/null && pwd -P)"
-  url="$(_norm_remote "$(git -C "$T" remote get-url origin 2>/dev/null)")"
-  awk -v want="${ONION_MEMBER_ID:-}" -v main="${main}" -v url="${url}" '
-    function flush() { if (id != "" && ok == 1 && ((want != "" && id == want) || (want == "" && (lp == main || (rm != "" && rm == url))))) { print id; found = 1 } }
+  purl="$(_norm_remote "$(git -C "$T" remote get-url --push "$R" 2>/dev/null)")"
+  [ -n "${purl}" ] || { echo "remoto '${R}' sem URL de push"; return 1; }
+  # id␟local_path␟remote␟vendor_push (separador \037, NÃO tab: o `read` colapsa tabs vazios e um membro sem
+  # local_path deslocava os campos — medido na bancada)
+  rows="$(awk '
     function val(l) { sub(/^[^:]*:[ \t]*/, "", l); sub(/[ \t]+#.*$/, "", l); gsub(/^["\047]|["\047]$/, "", l); return l }
-    /^  - id:/ { flush(); id = val($0); lp = ""; rm = ""; ok = 0; next }
+    function flush() { if (id != "") printf "%s\037%s\037%s\037%s\n", id, lp, rm, vp }
+    /^  - id:/ { flush(); id = val($0); lp = ""; rm = ""; vp = "false"; next }
     /^    local_path:/ { lp = val($0); next }
-    /^    remote:/ { rm = val($0); sub(/^[a-z+]+:\/\//, "", rm); sub(/ .*$/, "", rm); sub(/\.git$/, "", rm); sub(/\/+$/, "", rm); next }
-    /^    vendor_push:/ { if (val($0) == "true") ok = 1; next }
-    END { flush(); exit(found ? 0 : 1) }' "${mf}"
+    /^    remote:/ { rm = val($0); next }
+    /^    vendor_push:/ { vp = val($0); next }
+    END { flush() }' "${mf}")"
+  local id lp rm vp; local -a byp=() byr=()
+  while IFS=$'\037' read -r id lp rm vp; do
+    [ -n "${id}" ] || continue
+    [ -n "${lp}" ] && [ "${lp%/}" = "${main}" ] && byp+=("${id}"$'\t'"${rm}"$'\t'"${vp}")
+    [ -n "${rm}" ] && [ "$(_norm_remote "${rm}")" = "${purl}" ] && byr+=("${id}"$'\t'"${rm}"$'\t'"${vp}")
+  done <<< "${rows}"
+  if [ "${#byp[@]}" -ge 1 ]; then
+    [ "${#byp[@]}" -eq 1 ] || { echo "dois membros declaram o mesmo local_path"; return 1; }
+    pick="${byp[0]}"; by="local_path"
+    # o destino do push tem de ser o remote DESTE membro
+    [ "$(_norm_remote "$(cut -f2 <<< "${pick}")")" = "${purl}" ] \
+      || { echo "o push iria para ${purl}, que não é o remote do membro '$(cut -f1 <<< "${pick}")'"; return 1; }
+  else
+    n="${#byr[@]}"
+    [ "${n}" -ge 1 ] || { echo "nenhum membro do registro tem o remote ${purl}"; return 1; }
+    nok="$(printf '%s\n' "${byr[@]}" | awk -F'\t' '$3=="true"{k++} END{print k+0}')"
+    [ "${nok}" -eq "${n}" ] || { echo "o remote ${purl} é dividido por ${n} membros e só ${nok} consentiu"; return 1; }
+    pick="${byr[0]}"; by="remote"
+  fi
+  [ "$(cut -f3 <<< "${pick}")" = true ] || { echo "o membro '$(cut -f1 <<< "${pick}")' não tem vendor_push: true"; return 1; }
+  if [ -n "${ONION_MEMBER_ID:-}" ] && [ "$(cut -f1 <<< "${pick}")" != "${ONION_MEMBER_ID}" ]; then
+    echo "ONION_MEMBER_ID=${ONION_MEMBER_ID} não é o membro do alvo ('$(cut -f1 <<< "${pick}")')"; return 1
+  fi
+  printf '%s (casado pelo %s; destino %s)\n' "$(cut -f1 <<< "${pick}")" "${by}" "${purl}"
 }
 
 # Preenche VREMOTE/VREMOTE_OLD. rc 0 segue · 13 divergente · 14 ilegível.
@@ -279,17 +323,18 @@ _vendor_remote_precheck() {  # <TARGET> <SOURCE_ROOT>
   if [ "${ONION_VENDOR_PUSH:-1}" = 0 ]; then
     echo "Onion: push da $VENDOR DESLIGADO (ONION_VENDOR_PUSH=0) — a remota não é tocada nesta rodada."; return 0
   fi
-  # >>> D_CURE-vendor-push-consent (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
-  if ! _mid="$(_vendor_push_consent "$T" "$2")"; then
-    echo "Onion: $VENDOR remota não empurrada: sem consentimento registrado (vendor_push: true no membro do members.yaml do core). Para empurrar à mão: git -C \"$T\" push origin $VENDOR"
-    return 0
-  fi
-  echo "Onion: push da $VENDOR consentido pelo membro '${_mid}' (vendor_push: true no registro do core)."
-  # <<< D_CURE-vendor-push-consent <<<
   VREMOTE="$(_vendor_remote "$T")"
   if [ -z "${VREMOTE}" ]; then
     echo "Onion: $VENDOR sem remoto (nem upstream nem 'origin') — fica só local, nada a empurrar."; return 0
   fi
+  # O consentimento se confere contra o DESTINO deste remoto (a URL de push dele), nunca contra o origin fixo.
+  # >>> D_CURE-vendor-push-consent (run_vendor_push_trailer_selftests remove ESTE bloco) >>>
+  if ! _mid="$(_vendor_push_consent "$T" "$2" "${VREMOTE}")"; then
+    echo "Onion: $VENDOR remota não empurrada: sem consentimento registrado (${_mid}). Para empurrar à mão: git -C \"$T\" push ${VREMOTE} $VENDOR"
+    VREMOTE=""; return 0
+  fi
+  echo "Onion: push da $VENDOR consentido pelo membro ${_mid} — vendor_push: true no registro do core."
+  # <<< D_CURE-vendor-push-consent <<<
   if ! VREMOTE_OLD="$(_remote_vendor_sha "$T" "${VREMOTE}")"; then
     echo "ERRO: não consegui ler a $VENDOR em '${VREMOTE}' (ls-remote falhou) — nada foi tocado." >&2
     echo "      Sem ler a remota não sei se a local está à frente; re-rode com o remoto alcançável, ou ONION_VENDOR_PUSH=0 (declarado no relatório)." >&2

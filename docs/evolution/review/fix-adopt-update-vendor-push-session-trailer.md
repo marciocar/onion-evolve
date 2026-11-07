@@ -2,18 +2,17 @@
 branch: fix/adopt-update-vendor-push-session-trailer
 pr: 1533
 date: 2026-11-07
-reviewed_diff_sha256: f085c159bb3b33ad7e3ec13b62cd20f0317169250f6c2539aa5efebb8bdb211c
-reviewed_code_sha256: bc4c5ee1676139f8bf917d6242553c6692b753bd1db0a6834b2eb1f143940b9a
-findings_total: 13
-findings_real: 13
-findings_blocking: 3
+reviewed_diff_sha256: pendente
+findings_total: 19
+findings_real: 19
+findings_blocking: 6
 tokens: 0
-duration_min: 60
-findings_fixed: 8
+duration_min: 100
+findings_fixed: 13
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-reviewer: passada própria do agente de execução (Opus 5.5) + refutador externo da sessão principal, que REPROVOU com 2 bloqueios
-nota: "tokens não medidos (0). 1ª passada própria (5 achados, 1 bloqueio curado); o refutador externo reprovou com 2 bloqueios e 6 limites; os 2 bloqueios e os limites 3, 4, 5, 7 e 8 foram curados; o 6 é declarado"
+reviewer: passada própria do agente de execução (Opus 5.5) + refutador externo da sessão principal, que REPROVOU duas vezes (2 bloqueios, depois 1 bloqueio com 3 ataques)
+nota: "tokens não medidos (0). 1ª passada própria: 5 achados, 1 bloqueio curado. 1ª refutação: 2 bloqueios e 6 limites; curados os bloqueios e os limites 3, 4, 5, 7 e 8; o 6 é declarado. 2ª refutação: o consentimento não ficava preso ao destino (A1, A2, A3, cada um com caso e mutante); A4 e A5 curados; a nota do L4 é declarada"
 ---
 
 # Passada adversarial: `fix/adopt-update-vendor-push-session-trailer`
@@ -43,17 +42,31 @@ nota: "tokens não medidos (0). 1ª passada própria (5 achados, 1 bloqueio cura
 12. (real, limite, curado) A `Claude-Session:` herdada da assinatura do alvo (de outra sessão) sai antes de entrar a atual, no durable-commit e no merge; sem sessão conhecida, sai e nenhuma entra. A fixture da bancada carrega uma herdada (session_VELHA9).
 13. (real, limite, curado) `ONION_CLAUDE_SESSION_URL` inválida cai para `CLAUDE_CODE_BRIDGE_SESSION_ID` (caso (e)).
 
+## Achados da re-refutação (3ª passada, REPROVOU por 1 bloqueio)
+
+14. (real, BLOQUEAVA, curado) A1: `ONION_MEMBER_ID=<curador>` num alvo alheio empurrava, porque o awk só comparava o id. Agora o id só RESTRINGE: o membro tem de casar pelo `local_path` ou pela URL de push, e então ser o do id. Caso (A1) e mutante `mut:member-id-widens`, que devolve o id sozinho consentindo.
+15. (real, BLOQUEAVA, curado) A2: url de fetch do curador com pushurl de outro repo contava como consentido e empurrava para o outro. Agora o destino é a URL de PUSH normalizada do remoto efetivo, e ela tem de ser o `remote` do membro. Caso (A2) e mutante `mut:fetch-url`.
+16. (real, BLOQUEAVA, curado) A3: `branch.onion/vendor.remote=mirror` empurrava para o mirror, porque o consentimento lia o origin fixo. Agora ele lê o mesmo `_vendor_remote` que o ls-remote e o push usam. Caso (A3) e mutante `mut:origin-fixed`.
+17. (real, limite, curado) A4: um ONION_MEMBERS_FILE forjado fabricava consentimento. Agora o registro tem de ser `docs/evolution/federation/members.yaml` rastreado (`ls-files --error-unmatch`) e sem alteração contra o HEAD no topo de um repo git. Não há via própria da bancada: a bancada usa um repo de registro de fixture que cumpre a mesma regra. Caso (A4) e mutante `mut:any-registry`. Teto declarado: quem controla o ambiente consegue montar um repo git com esse caminho, mas quem controla o ambiente já roda o push sozinho.
+18. (real, limite, curado) A5: um remote dividido por membros (o caso real é um repo de dois membros) se resolve primeiro pelo `local_path`. Sem casamento por caminho, o update recusa quando nem todos consentiram. Casos (A5), só fixture, e (A5b), em que o `local_path` desempata e o dono empurra. A normalização ignora caixa e forma (https, ssh scp-like, ssh://, usuário, `.git`, barra final, nota entre parênteses), e foi conferida.
+19. (real, limite, DECLARADO) L4: `failed to update ref` também sai de falha do servidor (disco, permissão), e aí o rc 13 diz "recusado por não-ff" quando a causa é outra. A saída do git vai inteira ao stderr.
+
+Um defeito da própria cura apareceu na bancada antes do push: o `read` com IFS=tab colapsava campos vazios (membro sem `local_path`), e todo casamento por `remote` falhava. O separador virou `\037`. As fixtures do refutador (`t1.sh`), rodadas numa cópia com o registro real rastreado do core, deram SEM push nos três ataques A1, A2 e A3. Nada rodou em repo de adotante real.
+
 ## Mutantes
 
-Família `vendor_push_trailer` (fixtures em mktemp, remoto bare local e registro de membros PRÓPRIO; nenhum adotante real nem o members.yaml do core): 9 casos verdes e 7 mutantes in-bancada que morrem, cada um com o bloco `D_CURE-*` removido numa cópia dos helpers e com a sanidade de que a remoção ocorreu. (O bloco do push foi renomeado para `D_CURE-vendor-ffpush`: o nome antigo era prefixo do `-consent`, e a sanidade por `grep -c` o acusou.)
+Família `vendor_push_trailer` (fixtures em mktemp, remoto bare local e um repo de REGISTRO de fixture com o members.yaml rastreado; nenhum adotante real nem o registro do core): 15 casos verdes e 11 mutantes que morrem. 7 são blocos `D_CURE-*` removidos numa cópia dos helpers, com a sanidade de que a remoção ocorreu. 4 são substituições `mut:*` que devolvem o defeito medido, com âncora única conferida.
 - (a) push ff com consentimento casado pelo local_path ← `D_CURE-vendor-ffpush`
-- (b) remota divergente → rc 13, vendor e integração intactas ← `D_CURE-vendor-remote-diverged`
-- (c) clone novo: a vendor nasce da remota (consentimento casado pelo remote) ← `D_CURE-vendor-from-remote`
-- (f) sem consentimento: nada empurrado, e é dito ← `D_CURE-vendor-push-consent`
+- (b) remota divergente → rc 13 ← `D_CURE-vendor-remote-diverged`
+- (c) clone novo: a vendor nasce da remota ← `D_CURE-vendor-from-remote`
+- (f) sem consentimento ← `D_CURE-vendor-push-consent`
 - (g) remoto que desfaz a ref → rc 14 ← `D_CURE-vendor-verify`
-- (d1) commit da vendor: Claude-Session atual, sem a herdada ← `D_CURE-session-trailer-durable`
-- (d2) merge não-ff idem ← `D_CURE-session-trailer-merge`
-- (h) pushurl ≠ url e (e) sem sessão, com a URL inválida caindo para o id: sem mutante próprio
+- (A1) id do curador num alvo alheio ← `mut:member-id-widens`
+- (A2) pushurl alheio ← `mut:fetch-url`
+- (A3) upstream da vendor num mirror ← `mut:origin-fixed`
+- (A4) registro solto ← `mut:any-registry`
+- (d1) e (d2) Claude-Session atual sem a herdada ← `D_CURE-session-trailer-durable` e `D_CURE-session-trailer-merge`
+- (A5), (A5b), (h) pushurl ≠ url com o membro registrando o destino de push, e (e) sem sessão: sem mutante próprio
 
 Pelo `ops/mutate-and-restore.sh`, contra os arquivos reais: push desligado (morreu), trailer do durable-commit desligado (morreu) e, na 2ª rodada, a conferência trocada por `if false` (o mutante do refutador): morreu no caso (g), com o arquivo restaurado. Rodadas com `LC_ALL=C`: as famílias `vendor_push_trailer,shell_pipefail_robustness,vendor_branch,durable_commit,vendor_baseline_removido` verdes, 0 falhas.
 
