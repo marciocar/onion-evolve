@@ -270,6 +270,7 @@ docs/evolution/review/docs-evolve-cures-closed.md
 docs/evolution/review/docs-evolve-round-2026-10.md
 docs/evolution/review/docs-exit2-coupling-2026-11.md
 docs/evolution/review/docs-fecha-no-revisor-curado.md
+docs/evolution/review/docs-federation-snapshot-scrub-client-name.md
 docs/evolution/review/docs-flip-kg-backlog-classe-b.md
 docs/evolution/review/docs-fork-vs-fresh-agent-test.md
 docs/evolution/review/docs-fork-vs-fresh-pair-1.md

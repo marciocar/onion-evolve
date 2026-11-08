@@ -143,6 +143,34 @@ _verdict_problem() {  # $1=valor $2=legacy|'' → a frase do problema, ou vazio
 # A CATRACA DO LEGADO: a lista só DESCE. Três recusas: entrada que a base não tinha (o legado não
 # ganha membro novo), lista maior que a da base, e entrada órfã (arquivo que não existe mais — a
 # entrada sai junto com ele). Sem lista NÃO há legado, logo não há o que catracar (adotante, sandbox).
+# Os resíduos de <ref> com algum valor na forma antiga (verdict pt-BR ou elenxo/elenxo_isolado sim|nao), lidos como o
+# bash lê (1ª ocorrência, texto cru). É a FONTE da lista congelada e a régua da catraca (lista ⊆ candidatos da base).
+_legacy_candidates() {  # $1=root $2=ref → um caminho por linha, ordenado
+  git -C "$1" archive --format=tar "$2" docs/evolution/review 2>/dev/null | python3 -I -c '
+import sys, tarfile, re
+old = {"APROVADO", "CORRIGIDO", "REPROVADO", "REPROVADO_E_CURADO", "SEM_ACHADOS"}
+out = []
+with tarfile.open(fileobj=sys.stdin.buffer, mode="r|") as tf:
+    for m in tf:
+        if not (m.isfile() and m.name.endswith(".md") and m.name.count("/") == 3):
+            continue
+        lines = tf.extractfile(m).read().decode("utf-8", "replace").split("\n")
+        if lines[0] != "---":
+            continue
+        d = {}
+        for ln in lines[1:]:
+            if ln == "---":
+                break
+            mm = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):[ \t]*(.*)$", ln)
+            if mm and mm.group(1) not in d:
+                d[mm.group(1)] = mm.group(2).replace(chr(34), "").strip()
+        if (d.get("verdict", "").upper().replace("-", "_") in old
+                or d.get("elenxo", "").lower() in ("sim", "nao")
+                or d.get("elenxo_isolado", "").lower() in ("sim", "nao")):
+            out.append(m.name)
+print("\n".join(sorted(out)))
+'
+}
 # CRESCER e ENTRADA NOVA se medem contra o MERGE-BASE (o que o PR mudou), não contra a ponta da origin/main: com
 # a ponta, um PR antigo acusaria "cresceu" só porque a main desceu depois dele. A ÓRFÃ se mede na ÁRVORE.
 _legacy_ratchet_problems() {  # → uma frase por problema
@@ -153,6 +181,11 @@ _legacy_ratchet_problems() {  # → uma frase por problema
   orphan="$(while IFS= read -r l; do [ -z "${l}" ] || [ -f "${root}/${l}" ] || printf '%s ' "${l}"; done < "${LEGACY_LIST}")"
   [ -z "${orphan}" ] || echo "entrada(s) órfã(s) na lista do legado (o arquivo não existe): ${orphan}— tire-as da lista"
   base="$(_base_of "${root}")"; [ -n "${base}" ] || return 0
+  # ⊆ CANDIDATOS DA BASE (refutador do #1541, limite 1): toda entrada tem de ser, no merge-base, um resíduo na forma
+  # antiga. A comparação com a lista da base não pega a lista que NASCE (a base não tem lista) nem a entrada de um
+  # resíduo que já estava no formato novo; esta pega as duas.
+  local notcand; notcand="$(grep -vxF -f <(_legacy_candidates "${root}" "${base}"; printf '\n') "${LEGACY_LIST}" | grep . | tr '\n' ' ' || true)"
+  [ -z "${notcand}" ] || echo "entrada(s) que no merge-base NÃO são resíduo na forma antiga (--legacy-candidates ${base:0:12}): ${notcand}— a lista só contém legado de verdade"
   base_list="$(git -C "${root}" show "${base}:${LEGACY_LIST_REL}" 2>/dev/null)" || return 0
   n_base="$(grep -c . <<< "${base_list}" || true)"
   [ "${n_cur}" -le "${n_base}" ] || echo "a lista do legado CRESCEU (${n_base} → ${n_cur}) — ela só desce: resíduo novo sai no formato novo"
@@ -203,30 +236,7 @@ case "${1:-}" in
     # não cresce — a janela é declarada, não fechada.
     _ref="${2:-origin/main}"; _root="$(_legacy_root)"
     git -C "${_root}" rev-parse -q --verify "${_ref}^{commit}" >/dev/null || { printf 'review-artifact-check: ref inválida: %s\n' "${_ref}" >&2; exit 2; }
-    git -C "${_root}" archive --format=tar "${_ref}" docs/evolution/review | python3 -I -c '
-import sys, tarfile, re
-old = {"APROVADO", "CORRIGIDO", "REPROVADO", "REPROVADO_E_CURADO", "SEM_ACHADOS"}
-out = []
-with tarfile.open(fileobj=sys.stdin.buffer, mode="r|") as tf:
-    for m in tf:
-        if not (m.isfile() and m.name.endswith(".md") and m.name.count("/") == 3):
-            continue
-        lines = tf.extractfile(m).read().decode("utf-8", "replace").split("\n")
-        if lines[0] != "---":
-            continue
-        d = {}
-        for ln in lines[1:]:
-            if ln == "---":
-                break
-            mm = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):[ \t]*(.*)$", ln)
-            if mm and mm.group(1) not in d:
-                d[mm.group(1)] = mm.group(2).replace(chr(34), "").strip()
-        if (d.get("verdict", "").upper().replace("-", "_") in old
-                or d.get("elenxo", "").lower() in ("sim", "nao")
-                or d.get("elenxo_isolado", "").lower() in ("sim", "nao")):
-            out.append(m.name)
-print("\n".join(sorted(out)))
-'
+    _legacy_candidates "${_root}" "${_ref}"
     exit 0 ;;
   --schema)
     [ -f "${2:-}" ] || { printf 'review-artifact-check: --schema <arquivo> (não achei "%s")\n' "${2:-}" >&2; exit 2; }

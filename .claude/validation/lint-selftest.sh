@@ -20712,9 +20712,6 @@ run_review_artifact_selftests() {
   _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"
   rc=0; out="$(_run "${d}")" || rc=$?
   { [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORMA-ANTIGA' <<< "${out}"; } || p2bad="${p2bad} novo-antigo(rc=${rc})"
-  printf 'docs/evolution/review/feat-x.md\n' > "${d}/docs/evolution/review-residue-legacy.txt"
-  rc=0; out="$(_run "${d}")" || rc=$?
-  { [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORMA-ANTIGA' <<< "${out}"; } || p2bad="${p2bad} B1-slug-legado-tocado(rc=${rc})"
   rm -rf "${d}"
   _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "FIXED" "elenxo: sim"
   rc=0; out="$(_run "${d}")" || rc=$?
@@ -20735,6 +20732,13 @@ run_review_artifact_selftests() {
   rc=0; out="$(_run "${d}")" || rc=$?
   [ "${rc}" -eq 0 ] || p2bad="${p2bad} legado-intocado(rc=${rc}:$(tr '\n' ' ' <<< "${out}" | cut -c1-120))"
   rm -rf "${d}"
+  # B1: o MESMO legado (na lista, legítimo na base), reescrito pela branch que reusa o slug → não é mais legado
+  _mk_b1_repo() { _mk_legacy_repo; ( cd "${d}" && printf '\nreescrito por uma branch nova com o mesmo slug\n' >> docs/evolution/review/feat-x.md \
+      && git -c user.email=t@t -c user.name=t commit -qam reescreve ) >/dev/null 2>&1; }
+  _mk_b1_repo
+  rc=0; out="$(_run "${d}")" || rc=$?
+  { [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORMA-ANTIGA' <<< "${out}"; } || p2bad="${p2bad} B1-slug-legado-tocado(rc=${rc}:$(tr '\n' ' ' <<< "${out}" | cut -c1-120))"
+  rm -rf "${d}"
   if [ -z "${p2bad}" ]; then record_pass "review-artifact: (p2) no julgamento do PR: verdict pt-BR, elenxo: sim, chave duplicada e o slug de legado reescrito (B1) reprovam; o legado intocado passa"
   else record_fail "review-artifact: (p2) valores em inglês" "falhou:${p2bad}"; fi
   # (p3) (MUT) cópia LIMPA e mutante no MESMO arranjo, um por trecho:
@@ -20754,7 +20758,7 @@ run_review_artifact_selftests() {
   }
   _p3 "sem-lista" "s/^_ERA=''; _is_legacy .* \&\& _ERA=legacy$/_ERA=''/" '_mk_legacy_repo' 0 1
   _p3 "B1-sem-intocado" 's/^  \[ -n "${base}" \] \&\& \[ -n "${cur}" \] \&\& .* || return 1$/  :/' \
-      '_mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"; printf "docs/evolution/review/feat-x.md\n" > "${d}/docs/evolution/review-residue-legacy.txt"' 1 0
+      '_mk_b1_repo' 1 0
   _p3 "sem-duplicata" 's/^if \[ -n "${_DUP}" \]; then$/if false; then/' '_mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "FIXED" "verdict: APPROVED"' 1 0
   rm -rf "${mute}"
 
@@ -48442,13 +48446,15 @@ run_residue_schema_selftests() {
   #     lista que desceu passa. Pelo caminho que o lint consome (o julgamento do PR, em TSV), não pelo --schema.
   local rg="${d}/rg"; mkdir -p "${rg}/.claude/validation" "${rg}/docs/evolution/review"
   cp "${v}" "${rg}/.claude/validation/review-artifact-check.sh"
-  printf 'x\n' > "${rg}/docs/evolution/review/a.md"; printf 'x\n' > "${rg}/docs/evolution/review/b.md"
+  # os resíduos da base estão na forma ANTIGA: a lista tem de ser ⊆ --legacy-candidates do merge-base
+  local _OLDFM='---\nverdict: APROVADO\nelenxo: sim\n---\n'
+  printf -- "${_OLDFM}" > "${rg}/docs/evolution/review/a.md"; printf -- "${_OLDFM}" > "${rg}/docs/evolution/review/b.md"
   printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\n' > "${rg}/docs/evolution/review-residue-legacy.txt"
   git -C "${rg}" init -q -b main && git -C "${rg}" add -A && git -C "${rg}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
   git -C "${rg}" update-ref refs/remotes/origin/main main && git -C "${rg}" switch -q -c feat/x
   _rgv() { local rc=0; ( cd "${rg}" && GH_CONFIG_DIR="${rg}/nogh" bash "${1:-${rg}/.claude/validation/review-artifact-check.sh}" "${rg}" --format=tsv ) >"${d}/rgo" 2>&1 || rc=$?; echo "${rc}"; }
   local lbad="" L="${rg}/docs/evolution/review-residue-legacy.txt"
-  printf 'x\n' > "${rg}/docs/evolution/review/c.md"; printf 'docs/evolution/review/c.md\n' >> "${L}"
+  printf -- "${_OLDFM}" > "${rg}/docs/evolution/review/c.md"; printf 'docs/evolution/review/c.md\n' >> "${L}"
   { [ "$(_rgv)" = 1 ] && grep -q 'LEGADO-CATRACA.*CRESCEU' "${d}/rgo" && grep -q 'LEGADO-CATRACA.*base não tinha.*c.md' "${d}/rgo"; } || lbad="${lbad} cresceu"
   printf 'docs/evolution/review/a.md\ndocs/evolution/review/c.md\n' > "${L}"
   { [ "$(_rgv)" = 1 ] && grep -q 'LEGADO-CATRACA.*base não tinha.*c.md' "${d}/rgo"; } || lbad="${lbad} troca-mesmo-tamanho"
@@ -48459,7 +48465,7 @@ run_residue_schema_selftests() {
   if [ -z "${lbad}" ]; then record_pass "residue-english: (l) catraca: entrada nova, troca de mesmo tamanho e entrada órfã reprovam; a lista que desce passa"
   else record_fail "residue-english: (l) catraca" "falhou:${lbad} — $(tr '\n' ' ' < "${d}/rgo" | cut -c1-240)"; fi
   # (l-MUT) sem a chamada da catraca no julgamento, a lista que cresce passa
-  printf 'x\n' > "${rg}/docs/evolution/review/b.md"
+  printf -- "${_OLDFM}" > "${rg}/docs/evolution/review/b.md"
   printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\ndocs/evolution/review/c.md\n' > "${L}"
   local mr="${d}/rg-m.sh"; cp "${rg}/.claude/validation/review-artifact-check.sh" "${mr}"
   sed -i 's/^_RATCHET="$(_legacy_ratchet_problems)"$/_RATCHET=""/' "${mr}"
@@ -48488,6 +48494,30 @@ run_residue_schema_selftests() {
     if [ "${rc5}" = 0 ] && [ "${rm5}" = 1 ] && grep -q 'CRESCEU' "${d}/rgo"; then
       record_pass "residue-english: (l5) a main desceu depois do ponto de partida e a branch passa (merge-base); o mutante que mede contra a ponta acusa CRESCEU"
     else record_fail "residue-english: (l5)" "limpa rc=${rc5} (esperado 0: $(tr '\n' ' ' < "${d}/rgo5" | cut -c1-160)), mutante rc=${rm5} (esperado 1)"; fi
+  fi
+  # (l1) ⊆ CANDIDATOS (refutador do #1541, limite 1): a lista que NASCE no PR (a base não tem lista, então "cresceu" e
+  #      "entrada nova" não têm contra o que medir) não pode listar resíduo que na base já está no formato NOVO.
+  local r1="${d}/r1"; mkdir -p "${r1}/.claude/validation" "${r1}/docs/evolution/review"
+  cp "${v}" "${r1}/.claude/validation/review-artifact-check.sh"
+  printf -- "${_OLDFM}" > "${r1}/docs/evolution/review/velho.md"
+  printf -- '---\nverdict: APPROVED\nelenxo: true\n---\n' > "${r1}/docs/evolution/review/novo.md"
+  git -C "${r1}" init -q -b main && git -C "${r1}" add -A && git -C "${r1}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  git -C "${r1}" update-ref refs/remotes/origin/main main && git -C "${r1}" switch -q -c feat/x
+  _r1v() { local rc=0; ( cd "${r1}" && GH_CONFIG_DIR="${r1}/nogh" bash "$1" "${r1}" --format=tsv ) >"${d}/r1o" 2>&1 || rc=$?; echo "${rc}"; }
+  local l1bad=""
+  printf 'docs/evolution/review/velho.md\n' > "${r1}/docs/evolution/review-residue-legacy.txt"
+  [ "$(_r1v "${r1}/.claude/validation/review-artifact-check.sh")" = 0 ] || l1bad="${l1bad} so-legado-reprovou($(tr '\n' ' ' < "${d}/r1o" | cut -c1-140))"
+  printf 'docs/evolution/review/velho.md\ndocs/evolution/review/novo.md\n' > "${r1}/docs/evolution/review-residue-legacy.txt"
+  { [ "$(_r1v "${r1}/.claude/validation/review-artifact-check.sh")" = 1 ] && grep -q 'LEGADO-CATRACA.*NÃO são resíduo na forma antiga.*novo.md' "${d}/r1o"; } || l1bad="${l1bad} novo-na-lista-passou"
+  if [ -z "${l1bad}" ]; then record_pass "residue-english: (l1) a lista que nasce tem de ser ⊆ --legacy-candidates do merge-base: o legado de verdade passa, o resíduo no formato novo listado reprova"
+  else record_fail "residue-english: (l1) ⊆ candidatos" "falhou:${l1bad}"; fi
+  local m1="${d}/r1-m.sh"; cp "${r1}/.claude/validation/review-artifact-check.sh" "${m1}"
+  sed -i 's/^  \[ -z "${notcand}" \] || echo /  true || echo /' "${m1}"
+  if cmp -s "${r1}/.claude/validation/review-artifact-check.sh" "${m1}"; then record_fail "residue-english: (l1) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  else
+    local rc1 rm1; rc1="$(_r1v "${r1}/.claude/validation/review-artifact-check.sh")"; rm1="$(_r1v "${m1}")"
+    if [ "${rc1}" = 1 ] && [ "${rm1}" = 0 ]; then record_pass "residue-english: (l1) (MUT) limpa reprova o resíduo novo na lista; sem a checagem ⊆ candidatos ele passa"
+    else record_fail "residue-english: (l1) (MUT)" "limpa rc=${rc1} (esperado 1), mutante rc=${rm1} (esperado 0)"; fi
   fi
   rm -rf "${d}"
 }
