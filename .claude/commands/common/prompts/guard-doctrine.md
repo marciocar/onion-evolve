@@ -86,15 +86,21 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
 - **O que fica fora de propósito:** o que a casa faz todo dia (`reset --hard`, `branch -D`, `worktree remove
   --force`, `--force-with-lease`, `rm -rf` de pasta de trabalho) e o que já tem veto por hook com caminho verificado
   (merge e push na main: num repo sem o script verificado o hook avisa em vez de vetar, e o deny tiraria essa saída).
-- **Medido em 2.1.319:** a regra `Read` também alcança comando de leitura conhecido no Bash (`cat`, `grep`, `rg`,
-  `sed`, `base64`), e também inspeção (`ls` e `stat` do arquivo: use `test -f`). Vale em `bypassPermissions`.
-  Script chamado pela linha **não** é visto, e é assim que o merge verificado e a publicação de porta seguem andando.
-- **O que ela NÃO cobre, medido:** `bash -c '…'`, `eval`, refspec `+`, `rm -Rf`, `find -delete`, interpretador
-  (`python3 -c`), `tar`, `xxd`, glob (`cat .e*`), sufixo fora da lista (`.env.foo`), e script que faz por dentro. Com
-  sandbox ligado o `cat .env` passa (o `source .env` também), porque a regra `//**/.env` não vira `denyRead` no Linux.
-  Lista de formas não fecha contra variação; o que fecha é o sistema operacional.
-- **Custo:** falso positivo raro em `git -C . log --grep 'x push -f y'` e em `git clean -nx` (o ensaio com `-x` cai
-  junto). Saída: o maestro roda fora da sessão (`!`).
+- **Medido em 2.1.319:** a regra `Read` alcança comando conhecido no Bash **quando o arquivo é nomeado** (`cat`,
+  `grep`, `rg`, `sed`, `base64`), e também inspeção (`ls` e `stat` do arquivo: use `test -f`). Vale em
+  `bypassPermissions`. Script chamado pela linha **não** é visto, e é assim que o merge verificado e a publicação de
+  porta seguem andando.
+- **A regra `Read` do `.env` também barra `Write` e `Edit`, inclusive arquivo novo.** Custo aceito pelo core em nome
+  do maestro (2026-11-08, revogável): criar ou editar `.env` com segredo não é trabalho de agente. `.env.example` segue
+  livre, e o `cp .env.example .env` do setup e o `>> .env` passam pelo Bash.
+- **O que ela NÃO cobre, medido:** busca recursiva sem nomear o arquivo (`grep -rn X pasta` devolve o `.env` de
+  dentro), `bash -c '…'`, `eval`, refspec `+`, `rm -Rf`, `find -delete`, interpretador (`python3 -c`), `tar`, `xxd`,
+  glob (`cat .e*`), sufixo fora da lista (`.env.foo`), script que faz por dentro, `git -C . push origin x -uf` (flag
+  combinada no fim, com `-C`) e `git clean -qfdx` (`-q` antes). Com sandbox ligado, `cat .env` passa, e `source .env`
+  também. Lista de formas não fecha contra variação; o que fecha é o sistema operacional.
+- **Custo:** o curinga atravessa espaços, então a menção dentro de `git -C . …` cai junto: `git -C . commit -m "… git
+  push --force …"`, `-m "… git clean -x …"`, `git -C . log --grep 'x push -f y'` (no `git commit` sem `-C` não cai).
+  E `rm -f my-report /`, porque `-*r*` lê o `r` do nome. Saída: o maestro roda fora da sessão (`!`).
 
 ## O que esta doutrina NÃO promete
 

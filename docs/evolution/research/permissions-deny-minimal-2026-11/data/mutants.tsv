@@ -1,22 +1,48 @@
-# binario 2.1.319 (Claude Code) · regras 38
+# binario 2.1.319 (Claude Code) · regras 64
 id	fase	forma	esperado	medido	veredito	nota
 M	mutante	Bash(git push* --force)	algum-caso-solta	D02	ok	
 M	mutante	Bash(git push* --force *)	algum-caso-solta	D01,D39	ok	
-M	mutante	Bash(git push* -f)	algum-caso-solta	D41	ok	
-M	mutante	Bash(git push* -f *)	algum-caso-solta	D03,D40	ok	
-M	mutante	Bash(git -* push* --force)	algum-caso-solta	D42	ok	
-M	mutante	Bash(git -* push* --force *)	algum-caso-solta	D04	ok	
-M	mutante	Bash(git -* push* -f)	algum-caso-solta	D43	ok	
-M	mutante	Bash(git -* push* -f *)	algum-caso-solta	D05	ok	
+M	mutante	Bash(git push* -f*)	algum-caso-solta	D03,D40,D41,D51	ok	
+M	mutante	Bash(git push* -uf*)	algum-caso-solta	D52	ok	
+M	mutante	Bash(git push* -vf*)	algum-caso-solta	D53	ok	
+M	mutante	Bash(git push* -qf*)	algum-caso-solta	D54	ok	
+M	mutante	Bash(git -* push --force)	algum-caso-solta	D58	ok	
+M	mutante	Bash(git -* push --force *)	algum-caso-solta	D04,C05	ok	
+M	mutante	Bash(git -* push * --force)	algum-caso-solta	D42	ok	
+M	mutante	Bash(git -* push * --force *)	algum-caso-solta	D59	ok	
+M	mutante	Bash(git -* push -f*)	algum-caso-solta	D05	ok	
+M	mutante	Bash(git -* push * -f*)	algum-caso-solta	D43	ok	
+M	mutante	Bash(git -* push -uf*)	algum-caso-solta	D55	ok	
+M	mutante	Bash(git -* push -vf*)	algum-caso-solta	D56	ok	
+M	mutante	Bash(git -* push -qf*)	algum-caso-solta	D57	ok	
 M	mutante	Bash(git push* --mirror*)	algum-caso-solta	D06	ok	
-M	mutante	Bash(git -* push* --mirror*)	algum-caso-solta	D44	ok	
+M	mutante	Bash(git -* push --mirror*)	algum-caso-solta	D44	ok	
+M	mutante	Bash(git -* push * --mirror*)	algum-caso-solta	D60	ok	
 M	mutante	Bash(git filter-branch*)	algum-caso-solta	D07	ok	
 M	mutante	Bash(git filter-repo*)	algum-caso-solta	D08	ok	
 M	mutante	Bash(git -* filter-branch*)	algum-caso-solta	D45	ok	
 M	mutante	Bash(git -* filter-repo*)	algum-caso-solta	D46	ok	
-M	mutante	Bash(git clean -*x*)	algum-caso-solta	D09,D10,D12	ok	
-M	mutante	Bash(git -* clean -*x*)	algum-caso-solta	D11	ok	
-M	mutante	Bash(rm -*r* /)	algum-caso-solta	D13	ok	
+M	mutante	Bash(git clean* -x*)	algum-caso-solta	D10,E01,E10,E12,E14	ok	
+M	mutante	Bash(git clean* -fx*)	algum-caso-solta	E02,E11	ok	
+M	mutante	Bash(git clean* -fdx*)	algum-caso-solta	D09,D12,E16	ok	
+M	mutante	Bash(git clean* -dfx*)	algum-caso-solta	E03	ok	
+M	mutante	Bash(git clean* -dx*)	algum-caso-solta	E04,E13,E15	ok	
+M	mutante	Bash(git clean* -X*)	algum-caso-solta	E05	ok	
+M	mutante	Bash(git clean* -fX*)	algum-caso-solta	E06	ok	
+M	mutante	Bash(git clean* -fdX*)	algum-caso-solta	E07	ok	
+M	mutante	Bash(git clean* -dfX*)	algum-caso-solta	E08	ok	
+M	mutante	Bash(git clean* -dX*)	algum-caso-solta	E09	ok	
+M	mutante	Bash(git -* clean* -x*)	algum-caso-solta	E21,C06	ok	
+M	mutante	Bash(git -* clean* -fx*)	algum-caso-solta	E22	ok	
+M	mutante	Bash(git -* clean* -fdx*)	algum-caso-solta	D11	ok	
+M	mutante	Bash(git -* clean* -dfx*)	algum-caso-solta	E23	ok	
+M	mutante	Bash(git -* clean* -dx*)	algum-caso-solta	E24	ok	
+M	mutante	Bash(git -* clean* -X*)	algum-caso-solta	E25	ok	
+M	mutante	Bash(git -* clean* -fX*)	algum-caso-solta	E26	ok	
+M	mutante	Bash(git -* clean* -fdX*)	algum-caso-solta	E27	ok	
+M	mutante	Bash(git -* clean* -dfX*)	algum-caso-solta	E28	ok	
+M	mutante	Bash(git -* clean* -dX*)	algum-caso-solta	E29	ok	
+M	mutante	Bash(rm -*r* /)	algum-caso-solta	D13,C07	ok	
 M	mutante	Bash(rm -*r* / *)	algum-caso-solta	D14	ok	
 M	mutante	Bash(rm -*r* ~)	algum-caso-solta	D15	ok	
 M	mutante	Bash(rm -*r* ~/)	algum-caso-solta	D16	ok	
@@ -24,14 +50,14 @@ M	mutante	Bash(rm -*r* $HOME)	algum-caso-solta	D17,D18	ok
 M	mutante	Bash(rm -*r* .git)	algum-caso-solta	D19	ok	
 M	mutante	Bash(rm -*r* .git/)	algum-caso-solta	D47	ok	
 M	mutante	Bash(gh repo delete*)	algum-caso-solta	D20	ok	
-M	mutante	Bash(gh release delete*)	algum-caso-solta	D21	ok	
+M	mutante	Bash(gh release delete *)	algum-caso-solta	D21	ok	
 M	mutante	Bash(gh repo edit*--visibility*)	algum-caso-solta	D22	ok	
-M	mutante	Read(//**/.env)	algum-caso-solta	D23,D26,D27,D35,D36,D37,C01,C02	ok	
-M	mutante	Read(//**/.env.local)	algum-caso-solta	D24	ok	
+M	mutante	Read(//**/.env)	algum-caso-solta	D23,D26,D27,D35,D36,D37,W01,W04,C01,C02	ok	
+M	mutante	Read(//**/.env.local)	algum-caso-solta	D24,W02	ok	
 M	mutante	Read(//**/.env.prod)	algum-caso-solta	D48	ok	
 M	mutante	Read(//**/.env.production)	algum-caso-solta	D25	ok	
 M	mutante	Read(//**/.env.staging)	algum-caso-solta	D49	ok	
-M	mutante	Read(//**/.env.development)	algum-caso-solta	D50	ok	
+M	mutante	Read(//**/.env.development)	algum-caso-solta	W03,D50	ok	
 M	mutante	Read(~/.ssh/**)	algum-caso-solta	D28,D38,C03	ok	
 M	mutante	Read(~/.aws/**)	algum-caso-solta	D29	ok	
 M	mutante	Read(~/.gnupg/**)	algum-caso-solta	D30	ok	
