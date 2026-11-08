@@ -884,7 +884,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 26.4 | `C_N3_ROTEADOR_NAO_COMANDO` | problem-formula-2026-11 | Resposta à pergunta de N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta:forge-g |
+| 26.4 | `C_N3_ROTEADOR_NAO_COMANDO` | problem-formula-2026-11 | Resposta à pergunta de dissect:N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta |
 | 9.0 | `C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA` | problem-formula-2026-11 | Sem exceção não se sustenta como está, por leitura e sem medida. |
 | 4.0 | `Q_PF_EXPERIMENTO_AO_VIVO` | problem-formula-2026-11 | A fórmula encaminha problemas ao vivo, com ao menos 3 atos protegidos reais, sem agir demais e com ERRO-B de no máximo 20%? O n |
 
