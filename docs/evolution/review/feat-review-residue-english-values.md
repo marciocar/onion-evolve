@@ -2,7 +2,8 @@
 branch: feat/review-residue-english-values
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2a3ace41308cb63bb329475e1c643a5a1bf5158560945112a33e252e16794b88
+reviewed_code_sha256: 9fe6e98dd03f4f7f6dbd28e69e2b8d013530a36e1e3e06ae5fc8a7b2e78c58e9
 findings_total: 15
 findings_real: 14
 findings_blocking: 4
