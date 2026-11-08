@@ -1484,14 +1484,24 @@ nodes:
   - id: Q_SANDBOX_DENY_LAYER_DECISION_1108
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 4
     confidence: 0.5
     label: "O core adota uma camada de sandbox, e em que forma, depois da medida da curadoria? A metade do deny já foi decidida; o que segue sem decisão é o sandbox."
-    narrative: "Reescrito em 2026-11-08, para perguntar só o que segue sem decisão. A metade do deny foi decidida pelo maestro em 2026-11-08: «Deny mínimo portátil», selo D_MD_DENY_MINIMUM_PORTABLE_1108, selado no PR #1550, mergeado em 2026-11-08; a forja está em curso. Esse selo deixa o sandbox para depois da medida da curadoria, que segue em andamento. O selo D_EXIT2_COUPLING_WORDING_2026_11 também não fala de sandbox. Medido em 2026-11-08 no .claude/settings.json da origin/main: 0 regras deny e nenhum bloco sandbox (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Pronto quando: um D_ selado pelo maestro diz se o core adota o sandbox, e em que forma, ou por que não. Sem data: o gatilho é a medida da curadoria terminar. Linear: SAC-367; a postura do host para o bwrap é outra pergunta, em SAC-292. Esta rodada não sela nada."
     trace: "Elenxo, objeção 16 e 'Não sustenta: a sandbox como decisão, pois nenhum nó a sela'"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Só a curadoria, com limite»; selo D_MD_SANDBOX_CURATION_WITH_LIMIT_1108 em docs/onion/graph/maestro-decisions-1108.kg.yaml"
+    narrative: |-
+      Reescrito em 2026-11-08, para perguntar só o que segue sem decisão. A metade do deny foi decidida pelo maestro em 2026-11-08: «Deny mínimo portátil», selo D_MD_DENY_MINIMUM_PORTABLE_1108, selado no PR #1550, mergeado em 2026-11-08; a forja está em curso. Esse selo deixa o sandbox para depois da medida da curadoria, que segue em andamento. O selo D_EXIT2_COUPLING_WORDING_2026_11 também não fala de sandbox. Medido em 2026-11-08 no .claude/settings.json da origin/main: 0 regras deny e nenhum bloco sandbox (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Pronto quando: um D_ selado pelo maestro diz se o core adota o sandbox, e em que forma, ou por que não. Sem data: o gatilho é a medida da curadoria terminar. Linear: SAC-367; a postura do host para o bwrap é outra pergunta, em SAC-292. Esta rodada não sela nada.
+
+      Selado por /meta:decide em 2026-11-08: escolhida «Só a curadoria, com limite»; descartadas: «Curadoria e core» · «Segurar até medir».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «Depois da medida do update real sob sandbox pela curadoria (sinal docs/evolution/inbox/2026-11-08-signal-sandbox-f8-update-under-sandbox.md, nós E_SANDBOX_F8_UPDATE_MEASURED_1108 e C_SANDBOX_VERDICT_ADOPT_WITH_LIMIT_1108 da curadoria), o que fazer com a camada de sandbox?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
   - id: E_LACUNAS_OUTSIDE_IN_1108
     node_type: evidence
     layer: audit
