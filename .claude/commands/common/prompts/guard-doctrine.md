@@ -82,7 +82,8 @@ Desde 2026-11-08 o `.claude/settings.json` carrega uma lista pequena de atos irr
 segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e nenhuma é fronteira de segurança.
 
 - **O que entra:** regra sem caminho de máquina e sem nome de cliente, porque ela viaja (as portas que levam settings
-  e a adoção nova o copiam; o `--update` soma, e o deny nunca encolhe). Regra local mora em `settings.local.json`.
+  e a adoção nova o copiam; o `--update` soma, e o deny nunca encolhe). Regra local mora em `settings.local.json`. O
+  `--diff` do relatório do `--update` nomeia cada regra nova e os `allow` do alvo que ela anula, por comparação de texto.
 - **O que fica fora de propósito:** o que a casa faz todo dia (`reset --hard`, `branch -D`, `worktree remove
   --force`, `--force-with-lease`, `rm -rf` de pasta de trabalho) e o que já tem veto por hook com caminho verificado
   (merge e push na main: num repo sem o script verificado o hook avisa em vez de vetar, e o deny tiraria essa saída).
@@ -96,8 +97,12 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
 - **O que ela NÃO cobre, medido:** busca recursiva sem nomear o arquivo (`grep -rn X pasta` devolve o `.env` de
   dentro), `bash -c '…'`, `eval`, refspec `+`, `rm -Rf`, `find -delete`, interpretador (`python3 -c`), `tar`, `xxd`,
   glob (`cat .e*`), sufixo fora da lista (`.env.foo`), script que faz por dentro, `git -C . push origin x -uf` (flag
-  combinada no fim, com `-C`) e `git clean -qfdx` (`-q` antes). Com sandbox ligado, `cat .env` passa, e `source .env`
-  também. Lista de formas não fecha contra variação; o que fecha é o sistema operacional.
+  combinada no fim, com `-C`) e `git clean -qfdx` (`-q` antes). Lista de formas não fecha contra variação; o que fecha
+  é o sistema operacional.
+- **Em adotante com sandbox ligado (medido em fixture):** `cat .env` passa, e `source .env` também. `.ssh` e `.aws`
+  somem para o processo: `ssh -i` avisa que a chave não é acessível, então espere falha em push por ssh (por https não
+  muda). Push por ssh de ponta a ponta **não foi medido**. Assinatura gpg falhou no sandbox com e sem o deny, porque o
+  processo não grava no home: o efeito isolado do deny sobre ela **não foi medido**.
 - **Custo:** o curinga atravessa espaços, então a menção dentro de `git -C . …` cai junto: `git -C . commit -m "… git
   push --force …"`, `-m "… git clean -x …"`, `git -C . log --grep 'x push -f y'` (no `git commit` sem `-C` não cai).
   E `rm -f my-report /`, porque `-*r*` lê o `r` do nome. Saída: o maestro roda fora da sessão (`!`).

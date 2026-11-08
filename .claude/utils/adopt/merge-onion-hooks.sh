@@ -24,6 +24,8 @@
 #             hook que o core APOSENTOU (forma do Onion + script ausente na fonte e no alvo), que é
 #             podado e anunciado no stderr (SAC-145, 2026-10-15; ver o bloco antes do jq).
 #             O `permissions.deny` da fonte é somado ao do alvo (só soma, 2026-11-08); o resto de permissions é do alvo.
+#             Alvo com permissions ou deny fora da forma de lista: os hooks chegam, o deny não soma, e o stderr avisa.
+#             O `--diff` nomeia cada regra de deny nova e os allow do alvo que ela anula (comparação de texto).
 #             IDEMPOTENTE: rodar 2× = no-op na 2ª.
 #
 # Uso       : merge-onion-hooks.sh <source-settings.json> <target-settings.json>
@@ -57,7 +59,21 @@ if [ "${1:-}" = "--diff" ]; then
                                    ev: $ev, mt: $mt, h: .} ];
     def hlabel($x): "\($x.ev)\(if $x.mt == null then "" else " [" + $x.mt + "]" end) \($x.h.command // ($x.h.type // "?"))";
     def show($v): if $v == null then "ausente" else ($v | tojson) end;
+    # permissions.deny e allow como lista, ou vazio quando estão fora da forma (o merge recusa somar nesse caso)
+    def plist($s; $k): ($s.permissions? // {}) | if type == "object" and (.[$k] | type) == "array" then .[$k] else [] end;
+    def rx: gsub("(?<c>[.+?^${}()|\\[\\]\\\\])"; "\\\(.c)") | gsub("\\*"; ".*");
+    def rule: (capture("^(?<t>[A-Za-z]+)\\((?<p>.*)\\)$")? // null);
+    # um allow que o deny novo anula. Bash: o texto do allow casa o padrão do deny. Read: o allow nomeia o mesmo arquivo.
+    # TETO: é comparação de texto; allow com curinga que só em parte se sobrepõe ao deny não aparece.
+    def annuls($d; $a): ($d | rule) as $dr | ($a | rule) as $ar
+      | if $dr == null or $ar == null then false
+        elif $dr.t == "Bash" then $ar.t == "Bash" and ($ar.p | test("^" + ($dr.p | rx) + "$"))
+        elif $dr.t == "Read" then
+          ($dr.p | sub("^//\\*\\*/"; "") | sub("^~/"; "") | sub("/\\*\\*$"; "")) as $f
+          | ($ar.t | IN("Read", "Edit", "Bash")) and ($ar.p | test("(^|[/ ~*])" + ($f | rx) + "($|[ /*])"))
+        else false end;
     ($a[0]) as $A | ($b[0]) as $B | flat($A) as $fa | flat($B) as $fb
+    | (plist($B; "deny") - plist($A; "deny")) as $newd | plist($B; "allow") as $alw
     | ($fa | map({key: .k, value: .}) | from_entries) as $ma
     | ($fb | map({key: .k, value: .}) | from_entries) as $mb
     | ([ $fb[] | select($ma[.k] == null) ]) as $add
@@ -71,6 +87,8 @@ if [ "${1:-}" = "--diff" ]; then
           | "~ \(hlabel($x)): " + ([ ([($o | keys[]), ($x.h | keys[])] | unique)[] | select($o[.] != $x.h[.])
                                     | "\(.) \(show($o[.]))→\(show($x.h[.]))" ] | join(", ")) ]
       + (if ($top | length) > 0 then [ "≠ chaves de topo diferentes: \($top | join(", "))" ] else [] end)
+      + [ $newd[] | "+ deny: \(.)" ]
+      + [ $alw[] as $al | $newd[] as $d | select(annuls($d; $al)) | "! allow anulado: \($al) (o deny vence: \($d))" ]
       + [ "── hooks: \($fa | length) → \($fb | length) · \($add | length) adicionado(s) · \($del | length) removido(s) · \($chg | length) alterado(s) · \($same) idêntico(s) (entrada inteira)" ]
       )[]' || { echo "ERRO: diff de hooks falhou (JSON inválido?) — NÃO MEDIDO; não escreva 'idêntico' no relatório." >&2; exit 3; }
   exit 0
@@ -100,6 +118,8 @@ fi
 _div="$(jq -nr --slurpfile s "${SRC}" --slurpfile t "${TGT}" \
   'if ($s[0].attribution != null) and ($t[0].attribution != null) and ($s[0].attribution != $t[0].attribution)
    then "diverge" else "" end' 2>/dev/null || true)"
+_dshape="$(jq -r 'if ((.permissions // {}) | type) != "object" then "permissions" elif (((.permissions // {}).deny // []) | type) != "array" then "permissions.deny" else "" end' "${TGT}" 2>/dev/null || true)"
+[ -n "${_dshape}" ] && echo "AVISO: ${_dshape} do alvo não está na forma esperada — o deny da fonte NÃO foi somado; os hooks foram. Corrija o settings do alvo e rode de novo." >&2
 [ "${_div}" = diverge ] && echo "AVISO: o attribution do alvo difere do da fonte — preservado o do alvo; confira se o padrão de assinatura da família mudou." >&2
 
 # HOOK APOSENTADO PELO CORE (SAC-145, 2026-10-15): o refresh trata "command que a fonte não tem" como hook PRÓPRIO
@@ -175,7 +195,10 @@ jq -n \
   | if ($src.attribution != null) and (.attribution == null) then .attribution = $src.attribution else . end
   # permissions.deny (2026-11-08): a lista portátil da fonte SOMA à do alvo, sem duplicar nem apagar (deny é monotônico,
   # ver deny-monotonic.sh). Só o deny viaja: allow, sandbox e o resto de permissions seguem sendo do alvo.
-  | if (($src.permissions.deny // []) | length) > 0 then
+  # Alvo com permissions ou deny fora da forma (texto, objeto): não mexe, para os hooks chegarem assim mesmo; o aviso sai antes do jq.
+  | if (($src.permissions.deny // []) | length) > 0
+       and (((.permissions // {}) | type) == "object")
+       and (((.permissions // {}).deny // []) | type) == "array" then
       .permissions = (.permissions // {})
       | .permissions.deny = (((.permissions.deny // []) + $src.permissions.deny)
                              | reduce .[] as $r ([]; if index($r) == null then . + [$r] else . end))
