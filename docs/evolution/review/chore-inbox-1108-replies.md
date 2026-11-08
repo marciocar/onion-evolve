@@ -2,8 +2,8 @@
 branch: chore/inbox-1108-replies
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
+reviewed_diff_sha256: cfad08c1e5448285be1c2daed585af4206ca796f22f7f491e853dfd08ae99a34
+reviewed_code_sha256: 19f8e716843c423596623d7b32eadce6c24b3b62ad4b9c087440189dc258586d
 findings_total: 4
 findings_real: 4
 tokens: 0
