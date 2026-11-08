@@ -9,8 +9,8 @@ breadcrumb_for: []
 share_with: []
 next_recommended: "Ao mexer em /meta:adopt --update: após reescrever o .onion-version, GREPAR o repo do adotante pelo pin ANTIGO e reportar a contagem no relatório de update ('N referências ao pin anterior neste repo — revise'). O pin vive DERIVADO em artefatos que o --update não toca — memórias de sessão, frontmatter de sinais em rascunho, docs que citam a versão — e eles envelhecem em silêncio. Custo baixo (um grep), pega a classe inteira. É fix-must-become-mechanism: guarda no comando, não conselho."
 review_after: 2026-10-27
+superseded: true
 conflict_class: dynamic
-significance: "O adotante arandek reportou (upstream, disciplina exemplar: correção como artefato novo, sem editar história arquivada) que /meta:adopt --update atualiza o .onion-version mas deixa vencidos os artefatos DERIVADOS do pin (memórias, frontmatter, docs). É presença-de-campo passando por veracidade-de-campo — a mesma raiz de declarado≠verificado. Candidato de feature barato: grep do pin antigo pós-update. Registrado como BACKLOG (não implementado); decisão do maestro. Análise-par: docs/analysis/onion-adopt-update-pin-staleness-2026-07.md."
 ---
 
 ## Signal
@@ -28,3 +28,5 @@ No `/meta:adopt --update`, após reescrever o `.onion-version`: `grep -rl <pin-a
 ## Fronteira honesta
 
 O custo pode não compensar para uma classe que "só morde quem escreve frontmatter à mão" (palavras do próprio adotante). Por isso é **backlog com decisão do maestro**, não fix imediato. O valor real: é a MESMA família de `declarado≠verificado` que apareceu no bridge (memória stale sobre o próprio estado) — um grep barato que fecha uma porta recorrente.
+
+## Re-testada em 2026-11-08 — INVÁLIDA (superseded): (dynamic, rodei a leitura do código) a proposta de backlog foi construída. `write-stamp.sh` l.17-21 detecta, num update com pin novo, os artefatos que ainda citam o pin antigo (`grep -rl <8 hex>`), com a história excluída (`docs/evolution/inbox|inbound`, `.claude/diary`). A medição em 10 adotantes (`Q_PIN_GREP_WORTH_IT`) mostrou que sem a exclusão o aviso é ruído (19 de 22). Entrou em `37a8144e5` (2026-09-02) e foi endurecido em `d5315a677` (10-15); a família `write_stamp` passou (lote de 152/152). A observação vale como história; quem a supera é o código.

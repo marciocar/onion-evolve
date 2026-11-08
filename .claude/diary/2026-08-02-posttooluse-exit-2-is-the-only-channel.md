@@ -8,7 +8,7 @@ affects: [engineering, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Hook PostToolUse que precisa FALAR com o modelo tem de sair com `exit 2` — com `exit 0` ele roda e o stderr EVAPORA (medido com arquivo-marcador em /tmp: o hook executou, a mensagem não chegou). Consequência de desenho: `exit 2` é o único canal, então todo detector precisa ser determinístico e testado contra falso-positivo, porque cada disparo INTERROMPE. A guarda viva é `.claude/hooks/bash-empty-result-guard.sh` (4 detectores, 9 asserções de selftest, das quais 3 provam ausência de falso-positivo). Re-teste ao subir versão do Claude Code: o canal é comportamento da plataforma, não contrato escrito."
-review_after: 2026-10-31
+review_after: 2027-02-06
 conflict_class: dynamic
 significance: "Descobri por dogfood que `exit 0` num hook PostToolUse executa mas o stderr evapora — só `exit 2` entrega ao modelo. Foi a descoberta que tornou construível a guarda anti-fail-open do shell, que no mesmo dia me pegou duas vezes."
 ---
@@ -55,3 +55,5 @@ Isto é comportamento **medido da plataforma**, não contrato publicado — por 
 dynamic`: re-testar ao subir versão do Claude Code, com o mesmo truque do arquivo-marcador. E a
 guarda cobre **quatro** formas de o shell mentir; existem outras (`set -o pipefail` ausente, `grep`
 sem `-q` em `if`, `read` sem `-r`). Ela reduz a superfície, não a fecha.
+
+## Re-testada em 2026-11-08: (dynamic, observado ao vivo no Claude Code 2.1.319) o canal `exit 2` entrega: a `bash-empty-result-guard.sh` me interrompeu três vezes nesta rodada (2× `EXIT-CODE-DE-PIPE`, 1× `ERRO-ENGOLIDO-VIRANDO-NÚMERO`), e a mensagem chegou ao modelo. NÃO re-medido: a metade "`exit 0` evapora", que exige registrar um hook marcador. A guarda cresceu desde 08-02 (detectores 3b `pgrep` que casa a si mesmo e 3c premissa caída), e a família `empty_result_guard` passou (lote de 152/152).

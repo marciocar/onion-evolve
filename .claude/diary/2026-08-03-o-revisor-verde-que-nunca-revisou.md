@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-11-01
+review_after: 2027-02-06
 conflict_class: dynamic
 valid_when: "o onion-review segue usando claude-code-action com execution_file como único sinal de veredito"
 significance: "O onion-review tinha retry E aviso de soft-pass — máquina completa, comentada em 3 blocos — condicionados a um sinal que NUNCA dispara; 11 PRs mergearam num dia sob um revisor que não leu nada, e o CI dizia verde o tempo todo."
@@ -53,3 +53,5 @@ silêncio bonito de antes.
 E a lição transferível, mais barata que as duas: **fixture derivada de premissa confirma a
 premissa**. Quando o formato vem de fora, o selftest só vale depois de ler a fonte — senão ele
 mede a minha convicção com rigor de teste.
+
+## Re-testada em 2026-11-08 — PARCIAL: (dynamic, rodei) o `valid_when` vale: o veredito sai do `execution_file` julgado por `review-verdict.sh` (`onion-review.yml` l.257-261), e as famílias `review_verdict` e `review_mode` passaram (lote de 152/152). Mudou o contexto: o revisor agora roda por modo (`off` por padrão, ou a label `review:ia`). Os 5 runs mais recentes (08/11) são `success` com `run=false (modo off)`, e o verde-sem-revisão agora se DECLARA (`::notice::onion-review-desligado`), em vez de se esconder.

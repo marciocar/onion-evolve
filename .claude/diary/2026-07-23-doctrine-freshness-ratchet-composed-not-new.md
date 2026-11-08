@@ -8,7 +8,7 @@ affects: [meta, engineering, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao adicionar uma KB world-facing nova (versão/lineup/teto sensível ao tempo), acrescentar o path a DEFAULT_WORLD_FACING em doctrine-freshness.sh + verified_at/source no frontmatter no mesmo commit — nunca deixar acumular passivo fora do baseline. Adotantes que rodarem --update HERDAM o gate; sem baseline emitido do filesystem deles, ele nasce reprovando o passivo alheio (mesmo risco documentado na REGRA 29 — semear baseline é passo obrigatório do anúncio, não opcional)."
-review_after: 2026-10-21
+review_after: 2027-02-06
 conflict_class: conditional
 valid_when: "o gate continua checando só presença+idade de verified_at (nunca tentando confirmar a verdade da afirmação contra a rede em CI)"
 significance: "Quase nada aqui é novo — a REGRA 42 é composição de três peças que a casa já tinha (STALE do radar, catraca da 29, clock-untrusted do a2a-verify) — e é exatamente essa economia que a torna barata de manter e fácil de confiar."
@@ -45,3 +45,5 @@ passivo tolerado vira SOFT, novidade sem tag vira HARD.
 Ver `next_recommended`. A REGRA 42 nasceu e no MESMO DIA passou pelo primeiro uso real — ver
 [[runflow-doctrine-freshness-proves-value-day-one]]. Origem do achado que pariu o gate:
 [[doctrine-fades-declared-not-verified]].
+
+## Re-testada em 2026-11-08: (conditional, só o `valid_when`) a condição vale: o cabeçalho de `doctrine-freshness.sh` l.99 diz "NENHUMA rede: este script não faz curl/wget/fetch", e rodá-lo hoje devolveu rc=0 com 5 docs world-facing. Os 5 estão STALE (108 dias, `verified_at` 2026-07-23), e o gate os deixa SOFT, como desenhado. Quem re-verifica segue sendo a sessão ou o `/meta:kb-freshness`, e isso não aconteceu em 108 dias (ver `2026-07-23-doctrine-fades-declared-not-verified`).

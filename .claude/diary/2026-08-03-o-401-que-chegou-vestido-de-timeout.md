@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-11-01
+review_after: 2027-02-06
 conflict_class: static
 significance: "Três rodadas de diagnóstico em três semanas descartaram 'credencial' pelo MESMO raciocínio correto-mas-inválido — e a causa era a credencial: a action entregava um 401 vestido de timeout de 180s."
 ---
@@ -53,3 +53,5 @@ erro de auth em versão futura, o pré-voo vira redundante e pode encolher. Veri
 E a armadilha que peguei **duas vezes** no mesmo dia: a action **se auto-pula** quando o PR altera
 o próprio `onion-review.yml`. Um PR que mexe no revisor **não consegue medir o revisor**. Quem mede
 é sempre o PR seguinte.
+
+## Re-testada em 2026-11-08: (static) a lição virou mecanismo: `onion-review.yml` tem um pré-voo (`steps.preflight`, l.113-134 e l.221) que testa a credencial ANTES do revisor e imprime a causa ("pré-voo falhou (HTTP …) — …"), porque a action não repassa o erro da API.

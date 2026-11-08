@@ -8,7 +8,7 @@ affects: [engineering, meta, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Toda guarda nova que possa viajar (está em .claude/validation/ e entra no manifesto de vendor) deve ser rodada UMA VEZ dentro de um clone de adotante antes de ser considerada verde — nunca só no core. O core é o pior oráculo para o que viaja, porque é o único repo onde as dependências da própria guarda existem. Checklist mínimo: a guarda depende de algum arquivo que SÓ o core tem (members.yaml, docs/INDEX.md, um baseline)? Se sim, ela precisa de um caminho de degradação gracioso para o adotante — e esse caminho precisa de fixture própria."
-review_after: 2026-10-20
+review_after: 2027-02-06
 conflict_class: static
 significance: "Rodar o lint no core não é rodar o lint — o core é estruturalmente o único repo onde as dependências da guarda existem, então é onde ela mente com mais confiança sobre estar verde."
 ---
@@ -42,3 +42,5 @@ Ver `next_recommended`. Regra curta: **guarda que viaja prova-se num adotante, n
 [[capability-never-met-reality]] (forma × função) — o core é o fixture perfeito, e por isso o pior oráculo.
 Ver também [[admission-rule-blindspot]], de que este é o corolário empírico: o ponto cego recorre entre
 arquivos dentro de um único dia.
+
+## Re-testada em 2026-11-08: (static) a regra segue no código: `projection-safety` tem o caso `(P0-bis) repo SEM federação → silêncio, não HARD (não trava o adotante)`, e as famílias `adopter_guard_core`, `adopter_guard` e `adopter_gate` passaram (lote de 232/232). A REGRA 45 (Links de KB vendorizada para caminho core-privado) é o corolário mecanizado do segundo bug.

@@ -8,7 +8,7 @@ affects: [engineering, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao escrever guarda em script com `set -euo pipefail`: a checagem SÓ roda se a atribuição que a alimenta não puder matar o script. Padrão: `x=$(cmd ... || true)` e SÓ ENTÃO `[ -n \"$x\" ] || { erro; exit N; }`. Para achar as inalcançáveis já existentes: `grep -n 'set -euo pipefail' -A999 script.sh | grep -nE '^\\s*\\w+=\\$\\(' ` e pergunte de cada uma se a checagem seguinte é alcançável quando ela falha. E o teste que revela: rode com `bash -x` — leitura do código NÃO mostra, porque o código está certo."
-review_after: 2026-10-31
+review_after: 2027-02-06
 conflict_class: static
 significance: "Achei uma guarda que existia, estava CORRETA, e nunca rodava — porque `set -euo pipefail` matava o script na atribuição, antes dela. Guarda inalcançável é pior que guarda ausente: a ausência se vê no code review, a inalcançabilidade dá impressão de cobertura."
 ---
@@ -58,3 +58,5 @@ neste repo hoje. Fica como padrão de escrita e como pergunta de review, que é 
 escada `guarda > KB > migalha`. A generalização mecânica (detectar `x=$(...)` sem `|| true` seguido
 de checagem de `$x`) é plausível e **não foi construída**: não passou pelos portões — uma ocorrência
 medida, dono não nomeado.
+
+## Re-testada em 2026-11-08: (static) a cura está no código (`logto-provision.sh` l.164-167: helper `_dk` e `|| true` antes da checagem), e hoje o script falhou FALANDO (rc=6, com causa e conserto). A classe reincidiu em outro arquivo: `injected-cut-check.sh` l.348-353 registra "Guarda inalcancavel e guarda ausente — com o agravante de parecer presente". Segue sem lint geral.

@@ -8,7 +8,7 @@ affects: [meta, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao RETOMAR um trabalho de sessão anterior (o próprio 'onde parei', um spec, um plano, um pin): VERIFIQUE O VIVO ANTES DE AGIR — git log, o filesystem, o gate rodando, a fonte externa. Numa sessão só, 7 declarações (memória/spec/plano/pin/processo) foram refutadas pelo vivo; cada verificação-antes-de-agir evitou duplicar trabalho feito, cravar boundary falso ou embarcar metric morto. A cura nunca é 'lembrar de verificar' (falha) — é o MECANISMO que verifica por você (gate, radar, selftest, hook ativado, branch protegida). Ao construir sobre um spec, trate cada premissa dele como claim a checar, não fato."
-review_after: 2026-10-29
+review_after: 2027-02-06
 conflict_class: static
 significance: "Fechei o D5 (preço/ticket) de ponta a ponta: decisão ratificada (treino=testar, cert=inicial, compliance/SOTA gated) + os 4 sinais de instrumentação valor-por-adotante VIVOS e determinísticos (ciclos #481, frescor+engajamento #482, velocidade #483 — este destravou um metric morto promovendo timestamps de sessão a um ledger tracked sem quebrar 'conteúdo de sessão fica local'). Mas a lição DURÁVEL é o padrão que atravessou a sessão: behavior-over-declaration pagou 7 vezes, sempre igual — uma declaração que o vivo refutou ao ser verificada. É a doutrina que a KB behavior-over-declaration (do próprio core) prega, dogfoodada à exaustão numa sessão real, incluindo contra o meu próprio processo."
 ---
@@ -43,3 +43,5 @@ Nenhuma dessas foi resolvida por "eu lembrar de verificar" (isso falha — é o 
 ## Fronteira honesta
 
 O que fechou é o que dá pra fechar **de dentro**: a decisão e os sinais. O que falta é **campo** — o teste real do day-rate, as 1-2 entrevistas P4 pro compliance-pack, o baseline de semanas que dá sentido às séries temporais. Isso é do maestro no mercado, não do core no repo. E os sinais são **proxies core-side** (o adotante é soberano): medem o dogfood do core + a atividade do doc-bridge, não o uso soberano do adotante — nomeado no código, não escondido.
+
+## Re-testada em 2026-11-08: (static) os 4 medidores existem (`cycle-completion.sh`, `context-freshness-metric.sh`, `federation-engagement.sh`, `session-velocity.sh`), e `.claude/session-lifecycle.jsonl` segue rastreado. O caso 7 mudou de forma: a proteção clássica da `main` devolve 404, e quem barra hoje é o ruleset `onion-main-required-checks` (ativo) e o pre-commit da casa.

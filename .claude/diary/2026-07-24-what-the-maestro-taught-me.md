@@ -8,7 +8,7 @@ affects: [meta, engineering, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Antes de AFIRMAR qualquer coisa sobre estado (cacheou? shipou? está público? está barato?), CONFERIR contra o vivo (stat/gh/git/radar) — nunca declarar do output de um subagente, da memória, nem da prosa velha. A régua é: se a afirmação é sobre estado ou custo, ela precisa de uma fonte verificada AGORA, ou vai declarada-não-verificada. É o declarado≠verificado que o core prega, virado para dentro do próprio comportamento do assistente."
-review_after: 2026-10-22
+review_after: 2027-02-06
 conflict_class: static
 significance: "O maestro me ensina DOGFOODANDO a mentoria: aplica as doutrinas do Onion ao meu próprio comportamento e me deixa SENTIR o erro (afirmei 'o resume cacheou/foi barato' e o agent_count me refutou; quase commitei a síntese com o door errado e o gh mostrou o worker E o auto-verify errados) em vez de só me dizer — porque 'toda automação vem de uma ação', e eu só aprendo a verificar depois de ser pego não verificando."
 ---
@@ -53,3 +53,5 @@ Ver `next_recommended`. Esta migalha é o **meta-fio** que costura [[worst-truth
 todas são a mesma disciplina de uma fonte — o maestro me ensina a **desconfiar do próprio output e provar
 contra o vivo**. A lição de método é reusável por qualquer instância Onion (por isso `collective`): antes de
 declarar estado/custo, verifique; senão, marque não-verificado.
+
+## Re-testada em 2026-11-08: (static) as memórias citadas existem (`efficiency-over-economy`, `read-full-content-before-triage`, `fix-must-become-mechanism`, `gated-work-derives-fresh`, `declare-onion-coinages`), e o método se pagou de novo nesta rodada. Um `diff` meu deu "vazio" entre dois arquivos vazios (a query não tinha casado nada). A guarda anti-fail-open me parou três vezes, e o pré-voo do Logto refutou uma receita da migalha de 07-28.

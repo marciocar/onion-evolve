@@ -8,7 +8,7 @@ affects: [meta, engineering, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Reescrever documentação de terceiro (SDK de parceiro, API externa) NUNCA a partir do cutoff — sempre fan-out sobre a fonte viva (docs.runflow.ai neste caso), sintetizar, e verificar adversarialmente re-fetching um subconjunto (13+ de ~20 páginas aqui). Adicionar a KB reescrita à lista world-facing da REGRA 42 no MESMO commit, para o gate cobrar a próxima re-verificação em vez de deixá-la envelhecer de novo em silêncio."
-review_after: 2026-10-21
+review_after: 2027-02-06
 conflict_class: dynamic
 significance: "A REGRA 42, recém-nascida há horas, pegou no primeiro uso real uma KB de parceiro 8 meses defasada — e a reescrita inteira saiu 100% verificada contra a fonte viva, zero fabricação, no mesmo dia em que o gate nasceu."
 ---
@@ -46,3 +46,5 @@ agora o padrão para reescrever doc de terceiro sem inventar.
 Ver `next_recommended`. Esta migalha fecha o arco do dia — [[doctrine-fades-declared-not-verified]] (o
 achado que pariu o gate) → [[doctrine-freshness-ratchet-composed-not-new]] (o gate) → esta (a prova em
 produção, horas depois, sobre doc de parceiro real).
+
+## Re-testada em 2026-11-08 — PARCIAL: (dynamic, rodei o gate) `runflow.md` segue na lista world-facing (`doctrine-freshness.sh` l.130-139), e o gate o marca `SOFT [STALE]` com 108 dias. O conteúdo envelheceu como a migalha previa: a KB fixa 1.6.2 e o npm publica 1.10.2. O `applies_to` da própria KB declara um drift interno (o corpo ainda cita 1.3). O gate cobrou, mas SOFT não forçou ninguém a re-verificar. A re-verificação da KB contra docs.runflow.ai está pendente.

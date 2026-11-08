@@ -8,7 +8,7 @@ affects: [engineering, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao versionar configuração que já existe viva: NUNCA escreva o conteúdo de memória. Extraia do vivo (`GET` + `jq`), cole verbatim, e deixe o comando de extração no comentário. A prova de que o script REPRODUZ em vez de redefinir é o diff vazio: snapshot antes → aplicar → snapshot depois → `diff` sem saída. Custa 3 comandos e é a única prova honesta. Se o recurso é único por tenant (conector de e-mail do Logto, webhook, DNS), a idempotência é de SEGURANÇA, não de elegância: consulte antes e faça PATCH, porque criar o segundo quebra o canal em silêncio."
-review_after: 2026-10-31
+review_after: 2027-02-06
 conflict_class: static
 kg: docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml
 significance: "Ia sobrescrever produção com texto que escrevi de memória. Os templates que 'lembrava' divergiam do vivo em dois pontos, e um --apply teria trocado os dois em silêncio. Reproduzir ≠ recriar — e a diferença se prova com diff vazio."
@@ -60,3 +60,5 @@ O diff vazio prova que o script **reproduz o estado atual**. Não prova que o es
 **certo** — se o conector vivo tivesse um template errado, o script agora versiona o erro com
 fidelidade. E a ressalva que o próprio modo imprime: **aceite SMTP ≠ entrega**. O Logto é
 fire-and-forget; INBOX-vs-spam nenhuma API mostra.
+
+## Re-testada em 2026-11-08: (static, medi contra o vivo) os 5 templates do conector SMTP do tenant `default` (lidos do Postgres do Logto, só `config->'templates'`) e os 5 de `logto-provision.sh` l.405-409 deram `diff` vazio, com 5 linhas de cada lado. O tenant `admin` tem conector próprio (`admin-smtp-…`), o que é coerente com "1 por tenant". A lição apareceu ao vivo na rodada: minha 1ª comparação deu "DIFF-VAZIO" entre dois arquivos vazios (o filtro não casou nada), e só a contagem de linhas mostrou o vazio-por-ausência.

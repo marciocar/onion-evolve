@@ -8,7 +8,7 @@ affects: [meta, engineering, compliance, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Toda KB que publica lineup/versão/teto sensível ao tempo entra na lista world-facing do doctrine-freshness.sh (REGRA 42) com verified_at + source — nunca confie em 'parece fina, deve estar certa'. Quando encontrar uma citação entre aspas numa KB, tratá-la como suspeita até re-confirmar contra a fonte primária; aspas fabricadas passam despercebidas justamente porque têm a forma de verdade."
-review_after: 2026-10-21
+review_after: 2027-02-06
 conflict_class: static
 significance: "O world-sync de hoje achou um tier de modelo inteiro que a doutrina não sabia existir e aspas fabricadas na própria KB de inferência — e essa descoberta é o que pariu a REGRA 42, não uma auditoria de rotina."
 ---
@@ -39,3 +39,5 @@ Ver `next_recommended`. A lição não é "seja mais cuidadoso" (não escala) �
 precisa de TTL + verified_at obrigatórios, cobrados por mecanismo, não por memória. Ver
 [[doctrine-freshness-ratchet-composed-not-new]] (o gate que nasceu disso) e
 [[runflow-doctrine-freshness-proves-value-day-one]] (a prova em produção, no mesmo dia).
+
+## Re-testada em 2026-11-08: (static, contra o vivo) a lição se confirmou pelo lado incômodo. O gate nascido daqui roda, mas os 5 docs world-facing estão STALE há 108 dias, só SOFT, e nenhum foi re-verificado. O drift de mundo já aconteceu: o ambiente atual traz Opus 5.5 e Fable 5.1, e `agent-orchestration.md` para no Opus 5 (busca por `Opus 5.5|opus-5-5` em `docs/knowledge-base` achou 0 arquivos). Os commits citados (`77b701d`, `44d7e05`) existem na história. Fica uma decisão para o maestro: STALE de doc world-facing continua SOFT, ou passa a HARD?
