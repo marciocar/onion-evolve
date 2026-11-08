@@ -1716,13 +1716,12 @@ nodes:
     plane: DEV
     status: open
     owner: onion-messaging
-    x_due: "2026-11-15"
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-08"
     verified_against: "queue/onion_queue/daemon.py na main ead81baea506 via API, 2026-11-08: _clean_attr confere só str, não vazio, até 256 e isprintable; espaço passa; diffs dos PRs #8, #9 e #10: 0 menções a URI-reference ou urisplit"
     label: "A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma."
-    narrative: "Remedido em 2026-11-08: `_clean_attr` aceita qualquer texto imprimível até 256 caracteres, inclusive com espaço, e `parse_cloudevent` usa o resultado como `source`. Os PRs abertos #8, #9 e #10 não mudam isso. O `parse_cloudevent` de .claude/utils/federation-transport/a2a-metrics.py, no core, tem a mesma régua (medido na mesma data), então a correção olha os dois lados. A dedupe com remetente segue divergência por decisão, fora deste item. Pronto quando: `parse_cloudevent` recusa `source` que não é URI-reference (caso negativo com espaço na bancada queue/test), e a régua do par em a2a-metrics.py fica igual ou a diferença fica declarada. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-361. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Remedido em 2026-11-08: `_clean_attr` aceita qualquer texto imprimível até 256 caracteres, inclusive com espaço, e `parse_cloudevent` usa o resultado como `source`. Os PRs abertos #8, #9 e #10 não mudam isso. O `parse_cloudevent` de .claude/utils/federation-transport/a2a-metrics.py, no core, tem a mesma régua (medido na mesma data), então a correção olha os dois lados. A dedupe com remetente segue divergência por decisão, fora deste item. Pronto quando: `parse_cloudevent` recusa `source` que não é URI-reference (caso negativo com espaço na bancada queue/test), e a régua do par em a2a-metrics.py fica igual ou a diferença fica declarada. Prazo a calibrar: a data 15/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-361. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_CORE_ACTIONS_SHA_PIN_1116
     node_type: question
@@ -1730,13 +1729,12 @@ nodes:
     plane: DEV
     status: open
     owner: core
-    x_due: "2026-11-16"
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-08"
     verified_against: "grep de uses: em .github/workflows na origin/main 8fb21e2f7, 2026-11-08: 19 uses, 7 por SHA e 12 por tag (checkout@v5 8x, upload-artifact@v4 3x, download-artifact@v4 1x), em 4 workflows; .github/dependabot.yml ausente"
     label: "As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada?"
-    narrative: "Remedido em 2026-11-08: 12 de 19 uses por tag móvel, todas actions/* (checkout@v5, upload-artifact@v4, download-artifact@v4), em onion-door-staleness, onion-validate, onion-selftest e onion-review. O onion-messaging exige SHA no CI dele, então o core está atrás do próprio produto. Não há .github/dependabot.yml. Pinar sem atualização cria defasagem, o que a doutrina de versão atual proíbe: o item inclui a atualização. Pronto quando: `grep -rhE 'uses:' .github/workflows | grep -vcE '@[0-9a-f]{40}'` dá 0, a atualização das actions está declarada, e uma guarda impede a volta da tag móvel. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-362. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Remedido em 2026-11-08: 12 de 19 uses por tag móvel, todas actions/* (checkout@v5, upload-artifact@v4, download-artifact@v4), em onion-door-staleness, onion-validate, onion-selftest e onion-review. O onion-messaging exige SHA no CI dele, então o core está atrás do próprio produto. Não há .github/dependabot.yml. Pinar sem atualização cria defasagem, o que a doutrina de versão atual proíbe: o item inclui a atualização. Pronto quando: `grep -rhE 'uses:' .github/workflows | grep -vcE '@[0-9a-f]{40}'` dá 0, a atualização das actions está declarada, e uma guarda impede a volta da tag móvel. Prazo a calibrar: a data 16/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-362. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_CORE_AGENT_CARD_A2A_1_0_1118
     node_type: question
@@ -1744,13 +1742,12 @@ nodes:
     plane: DEV
     status: open
     owner: core
-    x_due: "2026-11-18"
     impact: 4
     confidence: 0.85
     verified_at: "2026-11-08"
     verified_against: "docs/onion/agent-card.json na origin/main 8fb21e2f7 e curl dos authorizationUrl e tokenUrl, 2026-11-08: protocolVersion 0.3.0, sem supportedInterfaces, os dois endpoints 404; gh api repos/a2aproject/A2A/releases/latest: v1.0.1"
     label: "O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem?"
-    narrative: "Remedido em 2026-11-08: o card publicado diz protocolVersion 0.3.0, valor fixado no gerador .claude/validation/a2a-agent-card.sh, e não tem supportedInterfaces; a última release do A2A é v1.0.1. securitySchemes declara oauth2 cujos dois endpoints dão 404 e exige oauth2 ou mutualTLS em `security`. Pela objeção do Elenxo, não remedida aqui, o gate real é JWS RS256 com kid pinado, que o card não declara. Pronto quando: O card declara versão 1.x com supportedInterfaces, ou um D_ selado registra a divergência; toda URL em securitySchemes responde diferente de 404; o esquema real está declarado; regenerar pelo .claude/validation/a2a-agent-card.sh não deixa diff. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-363. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Remedido em 2026-11-08: o card publicado diz protocolVersion 0.3.0, valor fixado no gerador .claude/validation/a2a-agent-card.sh, e não tem supportedInterfaces; a última release do A2A é v1.0.1. securitySchemes declara oauth2 cujos dois endpoints dão 404 e exige oauth2 ou mutualTLS em `security`. Pela objeção do Elenxo, não remedida aqui, o gate real é JWS RS256 com kid pinado, que o card não declara. Pronto quando: O card declara versão 1.x com supportedInterfaces, ou um D_ selado registra a divergência; toda URL em securitySchemes responde diferente de 404; o esquema real está declarado; regenerar pelo .claude/validation/a2a-agent-card.sh não deixa diff. Prazo a calibrar: a data 18/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-363. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_DOORS_ATTESTATION_1130
     node_type: question
@@ -1758,13 +1755,12 @@ nodes:
     plane: DEV
     status: open
     owner: core
-    x_due: "2026-11-30"
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-08"
     verified_against: "gh api nas 4 portas, 2026-11-08: releases 0, .github/workflows 404, tags 11 a 12; grep -c attest em ops/publish-door.sh e ops/materialize-door.sh: 0 e 0; nenhum workflow do core com attest-build-provenance"
     label: "Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit."
-    narrative: "Remedido em 2026-11-08: onion-core, onion-standalone, onion-plugins e onion-mini têm tags (11 a 12), nenhuma release, nenhum workflow e nenhuma atestação; o motor de publicação não menciona atestação. Consequência a resolver no desenho: não há artefato nem plano de controle que hoje assine, e a atestação da release do kg-ssot é outro objeto. Nível SLSA não se afirma: L3 não foi medido. Pronto quando: `gh attestation verify` passa no artefato da última publicação de cada uma das 4 portas, com o `--repo` da porta; ou um D_ selado registra por que a porta fica sem atestação. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-364. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Remedido em 2026-11-08: onion-core, onion-standalone, onion-plugins e onion-mini têm tags (11 a 12), nenhuma release, nenhum workflow e nenhuma atestação; o motor de publicação não menciona atestação. Consequência a resolver no desenho: não há artefato nem plano de controle que hoje assine, e a atestação da release do kg-ssot é outro objeto. Nível SLSA não se afirma: L3 não foi medido. Pronto quando: `gh attestation verify` passa no artefato da última publicação de cada uma das 4 portas, com o `--repo` da porta; ou um D_ selado registra por que a porta fica sem atestação. Prazo a calibrar: a data 30/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-364. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_KG_VENDOR_VERIFY_ATTESTATION_1130
     node_type: question
@@ -1772,13 +1768,12 @@ nodes:
     plane: DEV
     status: open
     owner: kg-ssot
-    x_due: "2026-11-30"
     impact: 4
     confidence: 0.85
     verified_at: "2026-11-08"
     verified_against: "tools/kg_vendor.py na main d3b1cc1fe1b1, que é a tag kg-ssot-v4.46.0, via API, 2026-11-08: 0 menções a attest; leitura por git archive da tag; o carimbo guarda commit e sha256; o vendor do core está em 4.46.0"
     label: "O kg_vendor verifica a atestação do que traz, ou segue confiando na tag?"
-    narrative: "Remedido em 2026-11-08 na 4.46.0, a versão que o core já tem vendorizada: o kg_vendor lê por `git archive` da tag, carimba commit e sha256 de cada arquivo e confere esse carimbo depois, mas nunca verifica atestação. A atestação da release cobre artefatos, e o vendor consome uma árvore que ela não cobre. O digest já existe; o que falta é a procedência do que é consumido. Pronto quando: O update do kg_vendor sai com rc diferente de 0 quando a atestação do que ele traz não verifica, com caso negativo na bancada do kg-ssot; ou o kg-ssot sela por que a tag basta. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-365. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Remedido em 2026-11-08 na 4.46.0, a versão que o core já tem vendorizada: o kg_vendor lê por `git archive` da tag, carimba commit e sha256 de cada arquivo e confere esse carimbo depois, mas nunca verifica atestação. A atestação da release cobre artefatos, e o vendor consome uma árvore que ela não cobre. O digest já existe; o que falta é a procedência do que é consumido. Pronto quando: O update do kg_vendor sai com rc diferente de 0 quando a atestação do que ele traz não verifica, com caso negativo na bancada do kg-ssot; ou o kg-ssot sela por que a tag basta. Prazo a calibrar: a data 30/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-365. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_KG_PROV_AGENT_1208
     node_type: question
@@ -1786,13 +1781,12 @@ nodes:
     plane: DEV
     status: open
     owner: kg-ssot
-    x_due: "2026-12-08"
     impact: 2
     confidence: 0.85
     verified_at: "2026-11-08"
     verified_against: "tools/kg_prov_export.py na main d3b1cc1fe1b1 via API, 2026-11-08: grep -ci agent dá 0"
     label: "O exportador PROV-O do kg-ssot emite o agente, ou declara por que não?"
-    narrative: "Remedido em 2026-11-08: o exportador de PROV-O em JSON-LD existe e emite Entity e Activity, mas `grep -ci agent` dá 0: das três classes centrais de PROV, Agent não sai. O veredito é alinhado por exportador, sem agente; não é 'sem mapeamento'. As arestas fora de wasDerivedFrom são divergência por decisão e ficam fora deste item. Pronto quando: O exportador emite prov:Agent com a relação de atribuição quando o nó nomeia o autor, com caso na bancada; ou o kg-ssot sela por que o contrato não leva agente. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-366. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Remedido em 2026-11-08: o exportador de PROV-O em JSON-LD existe e emite Entity e Activity, mas `grep -ci agent` dá 0: das três classes centrais de PROV, Agent não sai. O veredito é alinhado por exportador, sem agente; não é 'sem mapeamento'. As arestas fora de wasDerivedFrom são divergência por decisão e ficam fora deste item. Pronto quando: O exportador emite prov:Agent com a relação de atribuição quando o nó nomeia o autor, com caso na bancada; ou o kg-ssot sela por que o contrato não leva agente. Prazo a calibrar: a data 08/12 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-366. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
 edges:
   - from: E_A2A_AGENT_CARD_IS_SERVER_MANIFEST
