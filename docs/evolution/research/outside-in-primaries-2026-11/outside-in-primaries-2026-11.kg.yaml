@@ -1,0 +1,2219 @@
+# kg-backlog-guard: on
+# Grafo da rodada de primárias outside-in (/onion-research, leitura interna, 2026-11-08).
+# Compara as escolhas do core, do kg-ssot e do onion-messaging às fontes primárias. Este grafo nunca sela;
+# as ligações com o corpus vão em external_edges (contrato v4.3), sem editar os grafos antigos.
+meta:
+  id: outside-in-primaries-2026-11
+  schema_version: "1"
+  baseline: "2026-11-08"
+  review_after: "2026-12-08"   # 30d: o tipo DOMINANTE é FERRAMENTA. O que move os vereditos são a doc do Claude Code,
+                               # a revisão do MCP, a release do A2A, o PR #8 do vigia e o pin do kg-ssot. As normas
+                               # estáveis (NIST, W3C, SLSA) valeriam 12 meses, mas não movem a revisita.
+  # ═══ TETO: 108 NÓS ═══
+  # Justificativa do teto: rodada de primárias executada em 2026-11-08, grafo novo. 101 nós: 46 evidências ancoradas
+  # (1 por claim), 32 objeções sobreviventes do Elenxo (1 por alvo), 19 superações achadas (16 das rejeitadas na
+  # ancoragem e 3 do Elenxo), 1 contabilidade (E_LACUNAS_OUTSIDE_IN_1108), 1 pergunta raiz, 1 pergunta de revisão de
+  # escopo (Q_SANDBOX_DENY_LAYER_DECISION_1108) e 1 claim com a recomendação íntegra do Elenxo. As 18 claims rejeitadas
+  # não viram nó: entram na contabilidade.
+  # +7 no fechamento da rodada (2026-11-08): um nó question por item ATRÁS que continuou real depois de remedido, com
+  # dono, prazo e critério de pronto. Teto subiu de 101 para 108 só por esses 7.
+  purpose: "Permitir um veredito por escolha (alinhado, diverge por decisão, atrás) para os três produtos do ecossistema Onion contra as fontes primárias, com cada atrás podendo virar item com dono. É a leitura interna; o dissect de fora da curadoria virá depois, sem ler este grafo."
+external_edges:
+  - from: E_CC_HOOK_FAIL_OPEN_ONFAILURE
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: SUPPORTS
+  - from: Q_SANDBOX_DENY_LAYER_DECISION_1108
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: TRACES_TO
+  - from: E_A2A_CARD_SIGNATURE_OPTIONAL_JWS
+    to: "docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml#E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SHACL_JSON_REPORT_EXISTS_NOT_SHACL
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_OUTSIDE_IN_PRIMARIES_1108
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "Comparadas às primárias, onde as escolhas do core, do kg-ssot e do onion-messaging estão ALINHADAS, DIVERGEM por decisão ou estão ATRÁS? Leitura interna; o dissect de fora virá depois, sem ler este grafo."
+    narrative: "Comparadas às fontes primárias, onde as escolhas dos três produtos do ecossistema Onion (o core: hooks determinísticos, permissões, procedência e governança; o kg-ssot: contrato de grafo .kg.yaml, procedência e nomes; o onion-messaging: fila assinada A2A, campainha e vigia de webhooks) estão ALINHADAS ao padrão, DIVERGEM por decisão, ou estão ATRÁS? Cada claim ancorada deve permitir um veredito por escolha, e cada 'atrás' deve poder virar item com dono. Esta rodada é a leitura interna: o dissect de fora da curadoria virá depois, sem ler este grafo."
+    trace: "pergunta original do run /onion-research em modo primárias, 2026-11-08"
+  - id: E_A2A_AGENT_CARD_IS_SERVER_MANIFEST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'A JSON metadata document published by an A2A Server, describing its identity' · A2A v1.0.0 §2.2 Core Concepts (definição de Agent Card, spec l.139 no tag v1.0.0); ordenação em §8.3.1/§8.3.2 (l.1965 e ss.); objeto em §4.4.1 · ancorada por verificador independente"
+    valid_from: "2026-03-12"
+    source_tier: 9
+    source_kind: primary
+    label: "O Agent Card do A2A é o manifesto JSON publicado pelo servidor A2A que descreve a identidade do agente, com lista ordenada de interfaces."
+    narrative: "Claim 1 como ancorada [a2a-spec]: O Agent Card é o manifesto publicado pelo servidor que descreve a identidade do agente, com lista ordenada de interfaces; a identidade é do agente/servidor, não de um membro com kid. Elenxo (alvo 1): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_A2A_CARD_STILL_0_3_0. Correção do escritor pela objeção: 'não de um membro com kid' sai do rótulo, porque a citação não diz isso (leitura do leitor). O leitor não declarou tier nesta claim; 9 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md"
+      locator: "A2A v1.0.0 §2.2 Core Concepts (definição de Agent Card, spec l.139 no tag v1.0.0); ordenação em §8.3.1/§8.3.2 (l.1965 e ss.); objeto em §4.4.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_A2A_CARD_SIGNATURE_OPTIONAL_JWS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Agent Cards MAY be digitally signed using JSON Web Signature (JWS) as defined in RFC 7515' · A2A v1.0.0 §8.4 (l.1979), §8.4.2 (jku, kid), §8.4.3 Security Considerations; AgentCardSignature em §4.4.7 · ancorada por verificador independente"
+    valid_from: "2026-03-12"
+    source_tier: 9
+    source_kind: primary
+    label: "A assinatura do Agent Card é opcional (MAY) via JWS (RFC 7515), com JWKS apontado por URL; o cliente deveria (SHOULD) verificar ao menos uma; chaves expiradas ou revogadas não podem verificar."
+    narrative: "Claim 2 como ancorada [a2a-spec]: A assinatura do Agent Card é opcional (MAY) via JWS (RFC 7515), com JWKS apontado por URL; o cliente deveria (SHOULD) verificar ao menos uma; chaves expiradas/revogadas não podem verificar; análogo de kid+JWKS aplicado ao card, não a cada mensagem. Elenxo (alvo 2): a objeção NÃO sobreviveu. Sustenta o veredito 'diverge por decisão' quando somada ao que já existe: o card não tem signatures (MAY, então não descumpre) e a assinatura por mensagem é perfil Onion, declarada em D_MESSAGING_STACK_2026_11 ('o A2A 1.0 só assina o Agent Card') e em E_OBJECAO_F7_MESSAGE_SIGNATURE_IS_ONION_PROFILE. Os kid pinados são arquivos locais (.claude/utils/federation-transport/jwks/README.md), não jku."
+    trace: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md"
+      locator: "A2A v1.0.0 §8.4 (l.1979), §8.4.2 (jku, kid), §8.4.3 Security Considerations; AgentCardSignature em §4.4.7"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_A2A_AUTH_DECLARED_IN_CARD_OUT_OF_BAND
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The client obtains the necessary credentials through an out-of-band process specific to the required authentication scheme.' · A2A v1.0.0 §7.3 Client Authentication Process (l.1864 do tag v1.0.0); §4.5 Security Objects; §6.9 · ancorada por verificador independente"
+    valid_from: "2026-03-12"
+    source_tier: 9
+    source_kind: primary
+    label: "A autenticação no A2A é declarada no Agent Card (securitySchemes) e as credenciais são obtidas fora de banda; o protocolo não define um esquema único de assinatura de mensagem."
+    narrative: "Claim 3 como ancorada [a2a-spec]: A autenticação no A2A é declarada no Agent Card (securitySchemes) e as credenciais são obtidas fora de banda; o protocolo não define um esquema único de assinatura de mensagem. Elenxo (alvo 3): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_A2A_CARD_DECLARES_DEAD_OAUTH."
+    trace: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md"
+      locator: "A2A v1.0.0 §7.3 Client Authentication Process (l.1864 do tag v1.0.0); §4.5 Security Objects; §6.9"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_A2A_TASK_STATES_TERMINAL_INTERRUPTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Indicates that authentication is required to proceed. This is an interrupted state.' · A2A v1.0.0 §4.1.3 TaskState (tabela gerada de specification/a2a.proto l.206, v1.0.0); §3.2.x Send Message (l.448); §11.7 Streaming (l.2949) · ancorada por verificador independente"
+    valid_from: "2026-03-12"
+    source_tier: 9
+    source_kind: primary
+    label: "O ciclo de tarefa do A2A tem estados terminais (COMPLETED) e interrompidos (INPUT_REQUIRED, AUTH_REQUIRED), e a assinatura de stream encerra em terminal ou interrompido."
+    narrative: "Claim 4 como ancorada [a2a-spec]: O ciclo de tarefa tem estados terminais (COMPLETED) e interrompidos (INPUT_REQUIRED, AUTH_REQUIRED); não há 'ack' explícito do consumidor como tool; o ciclo é de estado da tarefa, e a assinatura de stream encerra em terminal/interrompido. Elenxo (alvo 4): a objeção sobreviveu, triagem limite; ver E_OBJECAO_A2A_TASKSTATE_IS_NOT_DELIVERY_ACK. Correção do escritor pela objeção: 'não há ack explícito' sai do rótulo, porque é negativa sem trecho e compara camadas diferentes."
+    trace: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/specification/a2a.proto"
+    provenance:
+      source: "https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/specification/a2a.proto"
+      locator: "A2A v1.0.0 §4.1.3 TaskState (tabela gerada de specification/a2a.proto l.206, v1.0.0); §3.2.x Send Message (l.448); §11.7 Streaming (l.2949)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_NOTIFICATIONS_VIA_SUBSCRIPTIONS_LISTEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Long-lived change notifications (such as list changes and resource updates) are delivered on the response stream of a [`subscriptions/listen`][subscriptions-listen] request.' · Streamable HTTP, lista de abertura 'At a glance' · ancorada por verificador independente"
+    valid_from: "2026-07-28"
+    source_tier: 10
+    source_kind: primary
+    label: "Na revisão 2026-07-28, notificações de mudança (list_changed, resources/updated) no Streamable HTTP vêm numa requisição subscriptions/listen de longa duração, com opt-in do cliente."
+    narrative: "Claim 5 como ancorada [mcp-spec]: Notificações de mudança (list_changed, resources/updated) são entregues numa requisição subscriptions/listen de longa duração, com opt-in do cliente, não por push espontâneo. Elenxo (alvo 5): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_MCP_LISTEN_DOES_NOT_APPLY_TO_STDIO_BELL. Correção do escritor pela objeção: o rótulo nomeia o binding (Streamable HTTP) e a revisão, porque a campainha é stdio e não negocia 2026-07-28."
+    trace: "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md"
+      locator: "Streamable HTTP, lista de abertura 'At a glance'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_AUTH_OPTIONAL_STDIO_NO_OAUTH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Implementations using an STDIO transport **SHOULD NOT** follow this specification, and instead retrieve credentials from the environment.' · Authorization, 'Protocol Requirements' · ancorada por verificador independente"
+    valid_from: "2026-07-28"
+    source_tier: 10
+    source_kind: primary
+    label: "Autorização é opcional; em stdio o spec manda NÃO seguir o fluxo OAuth e ler credenciais do ambiente; em HTTP é SHOULD OAuth 2.1 com resource indicators e validação de audiência."
+    narrative: "Claim 6 como ancorada [mcp-spec]: Autorização é opcional; em stdio o spec manda NÃO seguir o fluxo OAuth e ler credenciais do ambiente; em HTTP é SHOULD OAuth 2.1 com resource indicators e validação de audiência. Elenxo (alvo 6): a objeção NÃO sobreviveu. Permite veredito medível: a campainha é stdio, sem socket (doorbell/DOCTRINE.md cláusula 4), logo alinhada. kg_mcp.py escuta em 127.0.0.1 por padrão e exige --allow-remote e segredo por header no modo remoto (l.20, l.35, l.436-439), desvio de um SHOULD, não de um MUST."
+    trace: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization.md"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization.md"
+      locator: "Authorization, 'Protocol Requirements'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_TOKEN_AUDIENCE_NO_PASSTHROUGH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'MCP servers **MUST** validate that access tokens were issued specifically for them as the intended audience, according to [RFC 8707 Section 2](https://www.rfc-editor.org/rfc/rfc8707.html#section-2).' · Authorization, 'Access Token Usage' > 'Token Handling' · ancorada por verificador independente"
+    valid_from: "2026-07-28"
+    source_tier: 10
+    source_kind: primary
+    label: "Servidor MCP que aceita tokens deve validá-los para si como audiência e não aceitar nem repassar outros tokens (proibição de token passthrough)."
+    narrative: "Claim 7 como ancorada [mcp-spec]: Servidor MCP que aceita tokens deve validá-los para si como audiência e não aceitar nem repassar outros tokens (proibição de token passthrough). Elenxo (alvo 7): a objeção sobreviveu, triagem limite; ver E_OBJECAO_MCP_AUDIENCE_NOT_APPLICABLE."
+    trace: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization.md"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization.md"
+      locator: "Authorization, 'Access Token Usage' > 'Token Handling'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_PROMPTS_LIST_ONLY_WITH_CAPABILITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Servers that declare the `prompts` capability **MUST** respond to `prompts/list` requests with the set of prompts currently available to the requesting client. This set **MAY** be empty' · Prompts, 'Capabilities' · ancorada por verificador independente"
+    valid_from: "2026-07-28"
+    source_tier: 10
+    source_kind: primary
+    label: "Servidor que declara a capability prompts DEVE responder prompts/list (pode ser vazio); sem declarar a capability, o MUST não nasce e ferramentas em código sem prompts/list são coerentes."
+    narrative: "Claim 8 como ancorada [mcp-spec]: Um servidor com a capability prompts DEVE responder prompts/list (pode ser vazio); a lista não varia por conexão. Ferramentas declaradas em código sem prompts/list são coerentes se a capability prompts não for declarada; o MUST de prompts/list só nasce com a declaração. Elenxo (alvo 8): a objeção NÃO sobreviveu. Fecha o Q. kg_mcp.py l.545 declara só tools, e doorbell/server.ts l.244-246 (origin/main) declara experimental e tools. Sem a capability prompts, o MUST não nasce: alinhado."
+    trace: "https://modelcontextprotocol.io/specification/2026-07-28/server/prompts.md"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2026-07-28/server/prompts.md"
+      locator: "Prompts, 'Capabilities'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_STDWEBHOOKS_THREE_HEADERS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'`webhook-timestamp`: integer unix timestamp (seconds since epoch).' · Standard Webhooks, seção Webhook headers (sw.md l.203-213) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Standard Webhooks exige três cabeçalhos com nomes exatos: webhook-id, webhook-timestamp (inteiro unix em segundos) e webhook-signature; quem emite os envia e quem recebe os lê para verificar."
+    narrative: "Claim 9 como ancorada [cloudevents-standard-webhooks]: Standard Webhooks exige três cabeçalhos webhook-id, webhook-timestamp (inteiro unix em segundos) e webhook-signature; um evento da fila/vigia só conforma se os emitir com esses nomes exatos. Elenxo (alvo 9): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_WATCHER_RECEIVES_AND_IS_IN_OPEN_PR. Correção obrigatória do Elenxo: 'um evento da fila/vigia só conforma se os emitir' erra o papel; o vigia RECEBE e verifica, e a fila transporta sinal A2A, não POST de webhook."
+    trace: "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/spec/standard-webhooks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/spec/standard-webhooks.md"
+      locator: "Standard Webhooks, seção Webhook headers (sw.md l.203-213)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_STDWEBHOOKS_SIGNED_CONTENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The content to be signed is therefore: `msg_id.timestamp.payload`.' · Standard Webhooks, seção Signature scheme (sw.md l.139-143) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A assinatura cobre id, timestamp e corpo concatenados com pontos (msg_id.timestamp.payload); assinar só o corpo diverge do padrão."
+    narrative: "Claim 10 como ancorada [cloudevents-standard-webhooks]: A assinatura cobre id, timestamp e corpo concatenados com pontos (msg_id.timestamp.payload); assinar só o corpo diverge do padrão. Elenxo (alvo 10): a objeção NÃO sobreviveu. Permite veredito: o canal standard usa o pacote oficial e o id é material assinado (channels.py l.95-103). GitHub e WAHA assinam só o corpo, mas é receita do provedor, não escolha da casa. A ressalva de código não mergeado está na objeção 9."
+    trace: "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/spec/standard-webhooks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/spec/standard-webhooks.md"
+      locator: "Standard Webhooks, seção Signature scheme (sw.md l.139-143)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_STDWEBHOOKS_TIMESTAMP_TOLERANCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Make sure to verify the `webhook-timestamp` header has a timestamp that is within some allowable tolerance' · Standard Webhooks, seção Verifying signatures (sw.md l.227-234) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Verificador deve checar que webhook-timestamp está dentro de uma tolerância permitida (o padrão não fixa o número), defesa contra replay."
+    narrative: "Claim 11 como ancorada [cloudevents-standard-webhooks]: Verificador deve checar que webhook-timestamp está dentro de uma tolerância permitida (o padrão não fixa o número), defesa contra replay. Elenxo (alvo 11): a objeção NÃO sobreviveu. Alinhado e medível: janela de 300 s no canal standard (channels.py l.6 e l.103, watcher/DOCTRINE.md l.30). O padrão não fixa o número, como a claim diz."
+    trace: "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/spec/standard-webhooks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/spec/standard-webhooks.md"
+      locator: "Standard Webhooks, seção Verifying signatures (sw.md l.227-234)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CLOUDEVENTS_REQUIRED_ATTRS_SOURCE_ID_UNIQUE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Producers MUST ensure that `source` + `id` is unique for each distinct event.' · CloudEvents spec.md, REQUIRED Attributes: id (ce.md l.244-258) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "CloudEvents 1.0 exige id, source, specversion=1.0 e type; a unicidade é do par source+id, e duplicatas reenviadas podem repetir o id."
+    narrative: "Claim 12 como ancorada [cloudevents-standard-webhooks]: CloudEvents 1.0 exige id, source, specversion=1.0 e type; a unicidade é do par source+id, e duplicatas reenviadas podem repetir o id. Elenxo (alvo 12): a objeção sobreviveu, triagem limite; ver E_OBJECAO_CLOUDEVENTS_SOURCE_FORM_NOT_VALIDATED."
+    trace: "https://raw.githubusercontent.com/cloudevents/spec/main/cloudevents/spec.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/cloudevents/spec/main/cloudevents/spec.md"
+      locator: "CloudEvents spec.md, REQUIRED Attributes: id (ce.md l.244-258)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CC_EXIT2_BLOCKABLE_EVENTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Exit code 2 is the way a hook signals \"stop, don't do this.\" The effect depends on the event, because some events represent actions that can be blocked' · hooks, Exit code 2 (blocking) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "Exit 2 interrompe evento bloqueável e vence o JSON de allow; a garantia de conformidade só existe em evento bloqueável, e PostToolUse e PermissionRequest não bloqueiam."
+    narrative: "Claim 13 como ancorada [claude-code-channels-hooks]: Exit 2 stops a blockable event and wins over JSON allow; conformance guarantee only on blockable events; PostToolUse and PermissionRequest are not blockers. Elenxo (alvo 13): a objeção NÃO sobreviveu. Conferi code.claude.com/docs/en/hooks.md l.1003-1014: PreToolUse bloqueia, PermissionRequest 'No', PostToolUse 'No - Shows stderr to Claude; the tool already ran'. A claim fica de pé, e as guardas de barragem da casa estão em PreToolUse. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://code.claude.com/docs/en/hooks.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks.md"
+      locator: "hooks, Exit code 2 (blocking)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CC_HOOK_FAIL_OPEN_ONFAILURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'A policy hook with a wrong path or a crashing script then lets everything through. To block the action instead, set \"onFailure\": \"block\" on a command or http hook. Requires Claude Code v2.1.295 or later.' · hooks, Block the action when a hook fails (onFailure) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "O hook falha aberto por padrão (crash, caminho errado, exit fora de 0/2, inclusive 1); só onFailure: block (v2.1.295+) o fecha, sem efeito em Stop, SubagentStop, TaskCompleted, TeammateIdle e hooks async."
+    narrative: "Claim 14 como ancorada [claude-code-channels-hooks]: The hook fails open by default (crash, bad path, exit other than 0/2 incl. 1); only onFailure:block (v2.1.295+) closes it, and it has no effect on Stop, SubagentStop, TaskCompleted, TeammateIdle or async command hooks. Elenxo (alvo 14): a objeção NÃO sobreviveu. Doc l.916 confirma. Medi .claude/settings.json: 9 de 31 hooks com onFailure block, cobrindo as guardas de PreToolUse (.env, main, merge, moat, API de provider, plugin, memória, adotante); as 2 PreToolUse sem ele são kg-read-leg e house-code-gloss, que aconselham. Os 2 Stop não dependem do campo. A versão instalada é 2.1.319, acima do piso 2.1.295. Alinhado. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://code.claude.com/docs/en/hooks.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks.md"
+      locator: "hooks, Block the action when a hook fails (onFailure)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CC_PRETOOLUSE_TIMEOUT_NOT_GATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The call continues through the normal [permission flow], so don't count on a stalled hook to act as a gate.' · hooks, PreToolUse timeout / if filter (l.891; exceção de onFailure em l.891 e l.984) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "Um PreToolUse com timeout não é gate e a chamada segue o fluxo de permissão, exceto no hook com onFailure: block, em que o timeout bloqueia. Para allow/deny rígido a doc indica o sistema de permissões, porque o filtro if é melhor esforço."
+    narrative: "Claim 15 como ancorada [claude-code-channels-hooks]: A timed-out PreToolUse hook is not a gate; docs say to use the permission system, not a hook, for a hard allow/deny, since the if filter is best-effort. Elenxo (alvo 15): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_CC_TIMEOUT_EXCEPTION_ONFAILURE. Correção obrigatória do Elenxo: a claim como ancorada omite a exceção de onFailure (hooks.md l.891 e l.984), incluída no rótulo. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://code.claude.com/docs/en/hooks.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks.md"
+      locator: "hooks, PreToolUse timeout / if filter (l.891; exceção de onFailure em l.891 e l.984)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CC_PERMISSIONS_DENY_ASK_ALLOW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Rules are evaluated in order: deny, then ask, then allow. The first match in that order determines the outcome, and rule specificity doesn't change the order.' · permissions, Manage permissions / Bash rule limits / Tips · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "Permissões avaliam deny, ask, allow e a primeira que casa vence; padrão de argumento em Bash é frágil: deny não casa o mesmo programa por caminho nem dentro de sh -c, e a allowlist de rede do sandbox é a saída quando a restrição tem de valer."
+    narrative: "Claim 16 como ancorada [claude-code-channels-hooks]: Permissions are evaluated deny, ask, allow with first match winning; Bash argument patterns are fragile, a deny rule does not match the same program by path or inside sh -c, so the sandbox network allowlist is needed when the restriction must hold. Elenxo (alvo 16): a objeção sobreviveu, triagem limite; ver E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://code.claude.com/docs/en/permissions.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/permissions.md"
+      locator: "permissions, Manage permissions / Bash rule limits / Tips"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CC_CHANNELS_PREVIEW_ALLOWLIST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'An ungated channel is a prompt injection vector. Anyone who can reach your endpoint can put text in front of Claude.' · channels-reference, Gate inbound messages; Notification format; channels, Security · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "Channels são prévia de pesquisa com allowlist de remetente por plugin; evento cai em silêncio sem sessão carregada ou com política contrária, sem ack do Claude Code; channel sem gate é vetor de injeção, e permission relay entrega aprovação a quem responde."
+    narrative: "Claim 17 como ancorada [claude-code-channels-hooks]: Channels are a research preview with a sender allowlist per plugin; events are silently dropped when the session is not loaded or policy blocks it, and Claude Code does not acknowledge notifications; an ungated channel is a prompt injection vector, and permission relay hands approval authority to whoever can reply. Elenxo (alvo 17): a objeção NÃO sobreviveu. Veredito alinhado e medido: doorbell/DOCTRINE.md cláusulas 2, 4 e 5 cobrem moldura de dado não confiável, ausência de rede e de permission relay, e ack por sha256 porque a doc não confirma entrega; doorbell/server.ts l.244-246 (origin/main) não declara claude/channel/permission."
+    trace: "https://code.claude.com/docs/en/channels-reference.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/channels-reference.md"
+      locator: "channels-reference, Gate inbound messages; Notification format; channels, Security"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLSA_BUILD_TRACK_LEVELS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Signed provenance, generated by a hosted build platform' · slsa.dev/spec/v1.1/levels, tabela-resumo, Build L2 · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "Régua da build track: L1 procedência existe; L2 procedência assinada por plataforma hospedada; L3 plataforma endurecida; sem procedência assinada por plataforma hospedada fica em L0/L1."
+    narrative: "Claim 18 como ancorada [slsa]: Régua da build track: L1 procedência existe; L2 procedência assinada por plataforma hospedada; L3 plataforma endurecida; sem procedência assinada por plataforma hospedada fica em L0/L1. Elenxo (alvo 18): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://slsa.dev/spec/v1.1/levels"
+    provenance:
+      source: "https://slsa.dev/spec/v1.1/levels"
+      locator: "slsa.dev/spec/v1.1/levels, tabela-resumo, Build L2"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLSA_L1_PROVENANCE_DIGEST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The build process MUST generate provenance that unambiguously identifies the output package by cryptographic digest' · slsa.dev/spec/v1.2/build-requirements, Provenance generation, Provenance Exists (L1, L2, L3) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "SLSA L1 exige procedência que identifique o pacote por digest criptográfico e descreva como foi produzido."
+    narrative: "Claim 19 como ancorada [slsa]: L1 exige procedência que identifique o pacote por digest criptográfico e descreva como foi produzido; tag/pin sem digest atrelado a procedência não atinge sequer L1. Elenxo (alvo 19): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_SLSA_VENDOR_DIGEST_EXISTS_CONSUMED_TREE_UNATTESTED. Correção obrigatória do Elenxo: 'tag/pin sem digest' ignora o sha256 do carimbo do vendor e o source_commit das portas; o defeito real é a procedência do que é consumido."
+    trace: "https://slsa.dev/spec/v1.2/build-requirements"
+    provenance:
+      source: "https://slsa.dev/spec/v1.2/build-requirements"
+      locator: "slsa.dev/spec/v1.2/build-requirements, Provenance generation, Provenance Exists (L1, L2, L3)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLSA_L3_UNFORGEABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Provenance MUST be strongly resistant to forgery by tenants.' · slsa.dev/spec/v1.2/build-requirements, Provenance is Unforgeable (L3) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "L3 exige procedência inforjável por tenants, com cada campo gerado ou verificado pela plataforma em plano de controle confiável."
+    narrative: "Claim 20 como ancorada [slsa]: L3 exige procedência inforjável por tenants, com cada campo gerado ou verificado pela plataforma em plano de controle confiável. Elenxo (alvo 20): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SLSA_L3_NOT_MEASURED."
+    trace: "https://slsa.dev/spec/v1.2/build-requirements"
+    provenance:
+      source: "https://slsa.dev/spec/v1.2/build-requirements"
+      locator: "slsa.dev/spec/v1.2/build-requirements, Provenance is Unforgeable (L3)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLSA_CONSUMER_VERIFICATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Ensuring that the builder identity is one of those in the map of trusted builder id’s to SLSA level.' · slsa.dev/spec/v1.2/verifying-artifacts, How to verify, passo 1 · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "A verificação SLSA é do lado do consumidor: identidade do builder confiável mapeada a nível, assinatura do envelope e conferência de buildType e externalParameters contra expectativas."
+    narrative: "Claim 21 como ancorada [slsa]: A verificação é do lado do consumidor: identidade do builder confiável mapeada a nível SLSA, assinatura do envelope e conferência de buildType/externalParameters contra expectativas. O adotante do vendor precisa de verificador equivalente. Elenxo (alvo 21): a objeção NÃO sobreviveu. Sustenta um 'atrás' com dono: kg_vendor check compara sha256 contra o carimbo que ele mesmo gravou e tem 0 menções a attestation. O item é do kg-ssot: kg_vendor verificar builder e digest contra a atestação da release."
+    trace: "https://slsa.dev/spec/v1.2/verifying-artifacts"
+    provenance:
+      source: "https://slsa.dev/spec/v1.2/verifying-artifacts"
+      locator: "slsa.dev/spec/v1.2/verifying-artifacts, How to verify, passo 1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SCORECARD_BRANCH_PROTECTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'This check determines whether a project's default and release branches are protected' · checks.md, linhas 57-112, seção Branch-Protection · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Branch-Protection avalia branches default e de release; risco High; pontuação em tiers, com o Tier 1 (3/10) exigindo bloquear force push e deleção de branch."
+    narrative: "Claim 22 como ancorada [openssf-scorecard]: Branch-Protection avalia branches default e de release; risco High; pontuação em tiers, com o Tier 1 (3/10) exigindo bloquear force push e deleção de branch. Elenxo (alvo 22): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_SCORECARD_MAIN_NO_FORCE_PUSH_BLOCK."
+    trace: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+      locator: "checks.md, linhas 57-112, seção Branch-Protection"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SCORECARD_TOKEN_PERMISSIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'This check determines whether the project's automated workflows tokens follow the principle of least privilege.' · checks.md, linhas 661-690, seção Token-Permissions · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Token-Permissions exige privilégio mínimo nos tokens dos workflows; risco High; a nota máxima depende de permissões declaradas em cada workflow."
+    narrative: "Claim 23 como ancorada [openssf-scorecard]: Token-Permissions exige privilégio mínimo nos tokens dos workflows; risco High; a nota máxima depende de permissões declaradas em cada workflow. Elenxo (alvo 23): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SCORECARD_TOPLEVEL_WRITE_TOKENS."
+    trace: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+      locator: "checks.md, linhas 661-690, seção Token-Permissions"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SCORECARD_PINNED_DEPENDENCIES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The check works by looking for unpinned dependencies in Dockerfiles, shell scripts, and GitHub workflows' · checks.md, linhas 480-490, seção Pinned-Dependencies · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Pinned-Dependencies olha Dockerfiles, scripts shell e workflows do GitHub em busca de dependências não fixadas; risco Medium."
+    narrative: "Claim 24 como ancorada [openssf-scorecard]: Pinned-Dependencies olha Dockerfiles, scripts shell e workflows do GitHub em busca de dependências não fixadas; risco Medium. Elenxo (alvo 24): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SCORECARD_12_ACTIONS_UNPINNED."
+    trace: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+      locator: "checks.md, linhas 480-490, seção Pinned-Dependencies"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SCORECARD_SIGNED_RELEASES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'If a SLSA provenance file is found in the assets for each release (*.intoto.jsonl), the maximum score of 10 is given.' · checks.md, linhas 630-655, seção Signed-Releases · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Signed-Releases pontua 8 com assinatura nos assets de cada release e 10 com proveniência SLSA (*.intoto.jsonl); risco High."
+    narrative: "Claim 25 como ancorada [openssf-scorecard]: Signed-Releases pontua 8 com assinatura nos assets de cada release e 10 com proveniência SLSA (*.intoto.jsonl); risco High. Elenxo (alvo 25): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_SCORECARD_ATTESTATION_NOT_IN_ASSETS."
+    trace: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md"
+      locator: "checks.md, linhas 630-655, seção Signed-Releases"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_GOVERN_3_2
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Policies and procedures are in place to define and differentiate roles and responsibilities for human-AI configurations and oversight of AI systems.' · AI 100-1, Core Tables, GOVERN 3.2 (pdftotext, linhas 1096-1099) · ancorada por verificador independente"
+    valid_from: "2023-01"
+    source_tier: 10
+    source_kind: primary
+    label: "GOVERN 3.2 pede política que diferencie papéis e responsabilidades na configuração humano-IA e na supervisão (framework de adesão voluntária)."
+    narrative: "Claim 26 como ancorada [nist-ai-rmf]: GOVERN 3.2 exige política que diferencie papéis e responsabilidades na configuração humano-IA e na supervisão; é o padrão contra o qual se mede o selo humano do core. Elenxo (alvo 26): a objeção sobreviveu, triagem limite; ver E_OBJECAO_NIST_GOVERN_3_2_NOT_COMPARED. Correção do escritor pela objeção: 'exige' vira 'pede' (framework voluntário); a comparação com o selo humano não foi medida."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "AI 100-1, Core Tables, GOVERN 3.2 (pdftotext, linhas 1096-1099)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_MANAGE_2_4
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Mechanisms are in place and applied, and responsibilities are assigned and understood, to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use.' · AI 100-1, Core Tables, MANAGE 2.4 (pdftotext, linhas 1509-1512) · ancorada por verificador independente"
+    valid_from: "2023-01"
+    source_tier: 10
+    source_kind: primary
+    label: "MANAGE 2.4 pede mecanismo aplicado, com responsáveis atribuídos, para suplantar, desengajar ou desativar sistema fora do uso pretendido."
+    narrative: "Claim 27 como ancorada [nist-ai-rmf]: MANAGE 2.4 pede mecanismo aplicado, com responsáveis atribuídos, para suplantar, desengajar ou desativar sistema fora do uso pretendido. Elenxo (alvo 27): a objeção sobreviveu, triagem limite; ver E_OBJECAO_NIST_MANAGE_2_4_NOT_COMPARED."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "AI 100-1, Core Tables, MANAGE 2.4 (pdftotext, linhas 1509-1512)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_MANAGE_4_1
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Post-deployment AI system monitoring plans are implemented, including mechanisms for capturing and evaluating input from users and other relevant AI actors, appeal and override, decommissioning, incident response, recovery, and change management.' · AI 100-1, Core Tables, MANAGE 4.1 (pdftotext, linhas 1529-1533) · ancorada por verificador independente"
+    valid_from: "2023-01"
+    source_tier: 10
+    source_kind: primary
+    label: "MANAGE 4.1 lista monitoramento pós-implantação com apelo e override, descomissionamento, resposta a incidente, recuperação e gestão de mudança."
+    narrative: "Claim 28 como ancorada [nist-ai-rmf]: MANAGE 4.1 lista monitoramento pós-implantação com apelo e override, descomissionamento, resposta a incidente, recuperação e gestão de mudança. Elenxo (alvo 28): a objeção sobreviveu, triagem limite; ver E_OBJECAO_NIST_MANAGE_4_1_NOT_COMPARED."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "AI 100-1, Core Tables, MANAGE 4.1 (pdftotext, linhas 1529-1533)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_MANAGE_4_3
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Incidents and errors are communicated to relevant AI actors, including affected communities. Processes for tracking, responding to, and recovering from incidents and errors are followed and documented.' · AI 100-1, Core Tables, MANAGE 4.3 (pdftotext, linhas 1538-1542) · ancorada por verificador independente"
+    valid_from: "2023-01"
+    source_tier: 10
+    source_kind: primary
+    label: "MANAGE 4.3 pede comunicar incidentes e erros aos atores relevantes, inclusive comunidades afetadas, com processos de rastreio, resposta e recuperação seguidos e documentados."
+    narrative: "Claim 29 como ancorada [nist-ai-rmf]: MANAGE 4.3 exige comunicar incidentes e erros aos atores relevantes, inclusive comunidades afetadas, com processos de rastreio, resposta e recuperação seguidos e documentados. Elenxo (alvo 29): a objeção sobreviveu, triagem limite; ver E_OBJECAO_NIST_MANAGE_4_3_NOT_COMPARED."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "AI 100-1, Core Tables, MANAGE 4.3 (pdftotext, linhas 1538-1542)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_600_POST_INCIDENT_REVIEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Establish organizational policies and procedures for after action reviews of GAI system incident response and incident disclosures, to identify gaps; Update incident response and incident disclosure processes as required.' · AI 600-1, Suggested Actions, GV-1.5-002 (linhas 815-819); MG-2.4-002 (linhas 2284-2290); MG-2.4-004 (linhas 2296-2298) · ancorada por verificador independente"
+    valid_from: "2024-07"
+    source_tier: 10
+    source_kind: primary
+    label: "GV-1.5-002 e MG-2.4-002 pedem procedimentos de revisão pós-incidente, divulgação de incidente e escalonamento à autoridade de risco quando critérios de desativação são atingidos."
+    narrative: "Claim 30 como ancorada [nist-ai-rmf]: GV-1.5-002 e MG-2.4-002 pedem procedimentos de revisão pós-incidente, divulgação de incidente e escalonamento à autoridade de risco quando critérios de desativação são atingidos; dá ao 'atrás' um item com dono. Elenxo (alvo 30): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_NIST_600_NO_OWNER_NO_MEASURE. Correção do escritor pela objeção: 'dá ao atrás um item com dono' sai do rótulo; o texto não nomeia dono e o atraso não foi medido."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "AI 600-1, Suggested Actions, GV-1.5-002 (linhas 815-819); MG-2.4-002 (linhas 2284-2290); MG-2.4-004 (linhas 2296-2298)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DORA_INSTABILITY_CHANGE_FAIL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The ratio of deployments that require immediate intervention following a deployment.' · dora.dev/guides/dora-metrics-four-keys, Instability metrics: Change fail rate · ancorada por verificador independente"
+    valid_from: "2026-01-05"
+    source_tier: 9
+    source_kind: primary
+    label: "Change fail rate é métrica de instabilidade do DORA, definida como a razão de deploys que exigem intervenção imediata."
+    narrative: "Claim 31 como ancorada [dora]: Taxa de falha de mudança e rework rate são as métricas de instabilidade, definidas por razão de deploys. Elenxo (alvo 31): a objeção sobreviveu, triagem limite; ver E_OBJECAO_DORA_NO_METRIC_MEASURED_IN_HOUSE. Correção do escritor pela objeção: a citação define só change fail rate; rework rate e o modelo de cinco métricas caíram na ancoragem e foram para E_LACUNAS_OUTSIDE_IN_1108."
+    trace: "https://dora.dev/guides/dora-metrics-four-keys/"
+    provenance:
+      source: "https://dora.dev/guides/dora-metrics-four-keys/"
+      locator: "dora.dev/guides/dora-metrics-four-keys, Instability metrics: Change fail rate"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DORA_2025_AI_AMPLIFIER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The State of AI-assisted Software Development report reveals AI’s primary role is as an amplifier, magnifying an organization’s existing strengths and weaknesses.' · dora.dev/research/2025/dora-report, texto de abertura · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "O relatório DORA 2025 sobre IA diz que o papel principal da IA é amplificar o que a organização já tem, para o bem e para o mal."
+    narrative: "Claim 32 como ancorada [dora]: O relatório DORA 2025 sobre IA diz que o papel principal da IA é amplificar o que a organização já tem, para o bem e para o mal. Elenxo (alvo 32): a objeção sobreviveu, triagem limite; ver E_OBJECAO_DORA_AMPLIFIER_NO_CHOICE_TO_JUDGE."
+    trace: "https://dora.dev/research/2025/dora-report/"
+    provenance:
+      source: "https://dora.dev/research/2025/dora-report/"
+      locator: "dora.dev/research/2025/dora-report, texto de abertura"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DORA_2025_THROUGHPUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-08"
+    verified_against: "'AI adoption is now linked to higher software delivery throughput' · blog.google/technology/developers/dora-report-2025 (Google, blog oficial) · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "O relatório DORA 2025 liga a adoção de IA a maior vazão de entrega; a fonte oficial lida não traz achado de instabilidade, e esse ponto fica NÃO VERIFICADO."
+    narrative: "Claim 33 como ancorada [dora]: O relatório 2025 liga a adoção de IA a maior vazão de entrega. A adoção chegou a 90%. A fonte oficial lida não traz achado de instabilidade, então esse ponto fica NÃO VERIFICADO. Elenxo (alvo 33): a objeção sobreviveu, triagem limite; ver E_OBJECAO_DORA_BLOG_NOT_REPORT. Correção do escritor pela objeção: '90%' sai do rótulo, porque não está na citação."
+    trace: "https://blog.google/technology/developers/dora-report-2025/"
+    provenance:
+      source: "https://blog.google/technology/developers/dora-report-2025/"
+      locator: "blog.google/technology/developers/dora-report-2025 (Google, blog oficial)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_AAIF_A2A_HOSTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Agent2Agent (A2A) is an open protocol that enables AI agents to communicate, collaborate' · aaif.io/projects/, item Agent2Agent (A2A); repo github.com/a2aproject/A2A · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A2A é protocolo aberto de comunicação entre agentes hospedado na AAIF; é o padrão de referência para comparar a fila A2A do onion-messaging."
+    narrative: "Claim 34 como ancorada [aaif-projects]: A2A é protocolo aberto de comunicação entre agentes hospedado na AAIF; é o padrão de referência para comparar a fila A2A do onion-messaging. Elenxo (alvo 34): a objeção NÃO sobreviveu. Fato simples, e serve de referência para as claims 1-4; a pergunta só pede saber qual projeto é o padrão comparável."
+    trace: "https://aaif.io/projects/"
+    provenance:
+      source: "https://aaif.io/projects/"
+      locator: "aaif.io/projects/, item Agent2Agent (A2A); repo github.com/a2aproject/A2A"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_AAIF_AGENT_SKILLS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'An open format for reusable agent expertise.' · aaif.io/projects/, item Agent Skills; repo github.com/agentskills/agentskills · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Agent Skills é formato aberto para expertise reutilizável de agentes, hospedado na AAIF."
+    narrative: "Claim 35 como ancorada [aaif-projects]: Agent Skills é formato aberto para expertise reutilizável de agentes, hospedado na AAIF. Elenxo (alvo 35): a objeção sobreviveu, triagem limite; ver E_OBJECAO_AAIF_SKILLS_NOT_COMPARED."
+    trace: "https://aaif.io/projects/"
+    provenance:
+      source: "https://aaif.io/projects/"
+      locator: "aaif.io/projects/, item Agent Skills; repo github.com/agentskills/agentskills"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_AAIF_MCP_HOSTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Model Context Protocol (MCP) is a protocol for seamless integration between LLM applications and external data sources.' · aaif.io/projects/, item Model Context Protocol (MCP); repo github.com/modelcontextprotocol · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "MCP está sob a AAIF como protocolo de integração entre aplicações LLM e fontes externas."
+    narrative: "Claim 36 como ancorada [aaif-projects]: MCP está sob a AAIF como protocolo de integração entre aplicações LLM e fontes externas; o Onion o trata como transporte opcional. Elenxo (alvo 36): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_AAIF_MCP_OPTIONAL_ONLY_FOR_TASK_MANAGER. Correção obrigatória do Elenxo: 'o Onion o trata como transporte opcional' só vale para o Task Manager; a campainha depende de MCP para o push."
+    trace: "https://aaif.io/projects/"
+    provenance:
+      source: "https://aaif.io/projects/"
+      locator: "aaif.io/projects/, item Model Context Protocol (MCP); repo github.com/modelcontextprotocol"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_AAIF_WORKING_GROUPS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'Defining portable identity and dynamic trust for autonomous agents' · aaif.io, seção de working groups, Identity & Trust · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Os grupos de trabalho da AAIF incluem Identidade e Confiança, com escopo de identidade portátil e confiança dinâmica para agentes autônomos."
+    narrative: "Claim 37 como ancorada [aaif-projects]: Os grupos de trabalho da AAIF cobrem Identidade e Confiança, Observabilidade e Rastreabilidade, e Governança/Risco/Regulação, sem entregável publicado nesta leitura. Nenhum projeto hospedado padroniza grafo .kg.yaml. Elenxo (alvo 37): a objeção sobreviveu, triagem limite; ver E_OBJECAO_AAIF_NEGATIVES_WITHOUT_QUOTE. Correção do escritor pela objeção: as negativas ('sem entregável', 'nenhum projeto padroniza .kg.yaml') e os outros grupos não têm trecho citado e ficam só aqui, como leitura do leitor."
+    trace: "https://aaif.io/"
+    provenance:
+      source: "https://aaif.io/"
+      locator: "aaif.io, seção de working groups, Identity & Trust"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_PROVO_THREE_CLASSES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'something that occurs over a period of time and acts upon or with entities' · PROV-O, Sec. 3.1 / 4.1, item 2 (Activity) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "PROV-O modela proveniência em três classes (entidade, atividade, agente); source/locator/method do kg-ssot só mapeia se apontar entidade-fonte, atividade-método e agente."
+    narrative: "Claim 38 como ancorada [w3c-prov-shacl]: PROV-O modela proveniência em três classes (entidade, atividade, agente); o source/locator/method do kg-ssot só mapeia se apontar entidade-fonte, atividade-método e agente; hoje é mapeamento nosso, não padrão adotado. Elenxo (alvo 38): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS. Correção obrigatória do Elenxo: 'hoje é mapeamento nosso' ignora o exportador kg_prov_export.py; o certo é 'alinhado por exportador, sem agente'. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://www.w3.org/TR/prov-o/"
+    provenance:
+      source: "https://www.w3.org/TR/prov-o/"
+      locator: "PROV-O, Sec. 3.1 / 4.1, item 2 (Activity)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_PROVO_AGENT_DELEGATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'something that bears some form of responsibility for an activity taking place' · PROV-O, Sec. 3.1 / 4.1, item 3 (Agent) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "PROV-O tem agente com responsabilidade e delegação (actedOnBehalfOf), ausentes como campo tipado do contrato de provenance do kg-ssot."
+    narrative: "Claim 39 como ancorada [w3c-prov-shacl]: PROV-O tem agente com responsabilidade e delegação (actedOnBehalfOf), ausentes como campo tipado do contrato de provenance do kg-ssot. Elenxo (alvo 39): a objeção NÃO sobreviveu. Confirmada pelo artefato: a saída do exportador tem 0 prov:Agent e 0 prov:wasAttributedTo, e o contrato de provenance é source/locator/method (vendor/kg-ssot/docs/manual/02-concepts.md l.131-138). É um 'atrás' ou divergência com dono: kg-ssot."
+    trace: "https://www.w3.org/TR/prov-o/"
+    provenance:
+      source: "https://www.w3.org/TR/prov-o/"
+      locator: "PROV-O, Sec. 3.1 / 4.1, item 3 (Agent)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_PROVO_BUNDLES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The use of bundles enables the creation of provenance of provenance.' · PROV-O, Sec. 3.2 (Bundles) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "PROV-O cobre derivação e proveniência da proveniência (bundles)."
+    narrative: "Claim 40 como ancorada [w3c-prov-shacl]: PROV-O cobre derivação e proveniência da proveniência (bundles), análogos às arestas de derivação e ao carimbo de procedência de nós. Elenxo (alvo 40): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_PROV_DERIVATION_ANALOGY_REFUSED_BY_KG_SSOT. Correção obrigatória do Elenxo: a analogia sai do rótulo, porque o kg-ssot a recusa no docstring de kg_prov_export.py; é divergência deliberada."
+    trace: "https://www.w3.org/TR/prov-o/"
+    provenance:
+      source: "https://www.w3.org/TR/prov-o/"
+      locator: "PROV-O, Sec. 3.2 (Bundles)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SHACL_SEVERITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'For every shape, `sh:Violation` is the default if `sh:severity` is unspecified.' · SHACL, Sec. 2.1.4 (severity); Warning e Info definidos na mesma tabela como 'non-critical constraint violation' · ancorada por verificador independente"
+    valid_from: "2017-07-20"
+    source_tier: 10
+    source_kind: primary
+    label: "No SHACL a severidade tem três níveis e o padrão é Violation; o MUST/SHOULD do kg-ssot corresponde a Violation/Warning, mas sem o nível Info nem relatório de validação padronizado."
+    narrative: "Claim 41 como ancorada [w3c-prov-shacl]: No SHACL a severidade tem três níveis e o padrão é Violation; o MUST/SHOULD do kg-ssot corresponde a Violation/Warning, mas sem o nível Info nem relatório de validação padronizado. Elenxo (alvo 41): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SHACL_JSON_REPORT_EXISTS_NOT_SHACL. O leitor não declarou tier nesta claim; 10 é o tier que ele declarou para outra claim do mesmo documento."
+    trace: "https://www.w3.org/TR/shacl/"
+    provenance:
+      source: "https://www.w3.org/TR/shacl/"
+      locator: "SHACL, Sec. 2.1.4 (severity); Warning e Info definidos na mesma tabela como 'non-critical constraint violation'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SHACL_CONFORMS_FROM_RESULTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'The value of `sh:conforms` is `true` if and only if the validation did not produce any validation results' · SHACL, Sec. 3.6.1.1 (sh:conforms) · ancorada por verificador independente"
+    valid_from: "2017-07-20"
+    source_tier: 10
+    source_kind: primary
+    label: "O relatório SHACL é estruturado: conformidade é derivada da ausência de resultados. Um gate cujo exit 0 é declaração do script difere disso se não emitir resultados por violação."
+    narrative: "Claim 42 como ancorada [w3c-prov-shacl]: O relatório SHACL é estruturado: conformidade é derivada da ausência de resultados. Um gate cujo exit 0 é declaração do script difere disso se não emitir resultados por violação. Elenxo (alvo 42): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SHACL_CONFORMS_CORE_GATES_UNMEASURED."
+    trace: "https://www.w3.org/TR/shacl/"
+    provenance:
+      source: "https://www.w3.org/TR/shacl/"
+      locator: "SHACL, Sec. 3.6.1.1 (sh:conforms)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_RDF12_CR_REIFYING_TRIPLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "'A reifying triple is a triple where the predicate is rdf:reifies and the object is a triple term.' · RDF 1.2 Concepts, Sec. 1.5; status: CR Snapshot 07 April 2026 · ancorada por verificador independente"
+    valid_from: "2026-04-07"
+    source_tier: 10
+    source_kind: primary
+    label: "RDF 1.2 ainda é Candidate Recommendation em 2026-11-08; introduz triple terms e reifying triples para afirmar sobre afirmações, mecanismo padrão futuro para anexar procedência a uma aresta."
+    narrative: "Claim 43 como ancorada [w3c-prov-shacl]: RDF 1.2 ainda é Candidate Recommendation (não Recommendation) em 2026-11-08; introduz triple terms e reifying triples para afirmar sobre afirmações, o mecanismo padrão futuro para anexar procedência a uma aresta. Elenxo (alvo 43): a objeção NÃO sobreviveu. Reconferida: w3.org/TR/rdf12-concepts/ em 2026-11-08 traz 'W3C Candidate Recommendation Snapshot 07 April 2026'."
+    trace: "https://www.w3.org/TR/rdf12-concepts/"
+    provenance:
+      source: "https://www.w3.org/TR/rdf12-concepts/"
+      locator: "RDF 1.2 Concepts, Sec. 1.5; status: CR Snapshot 07 April 2026"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OKF_ONLY_TYPE_REQUIRED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "'`type` is the only always-required key; a concept carrying just `type` is fully conformant (§11).' · SPEC.md §4.1, §11 · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "O OKF v0.2 exige apenas `type` no frontmatter; é um piso mínimo, o oposto de um perfil estrito."
+    narrative: "Claim 44 como ancorada [okf-spec]: O OKF v0.2 exige apenas `type` no frontmatter; é um piso mínimo, o oposto de um perfil estrito. Elenxo (alvo 44): a objeção sobreviveu, triagem limite; ver E_OBJECAO_OKF_V0_3_UNREACHABLE."
+    trace: "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md"
+      locator: "SPEC.md §4.1, §11"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OKF_TOLERATE_UNKNOWN_KEYS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "'Consumers SHOULD preserve unknown keys when round-tripping and MUST NOT reject documents with unrecognized fields.' · SPEC.md §4.1, §11 · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "Consumidores devem preservar e nunca rejeitar campos desconhecidos, ao contrário de um perfil estrito que reprova campo fora do contrato."
+    narrative: "Claim 45 como ancorada [okf-spec]: Consumidores devem preservar e nunca rejeitar campos desconhecidos, ao contrário de um perfil estrito que reprova campo fora do contrato. Elenxo (alvo 45): a objeção NÃO sobreviveu. Divergência medível: vendor/kg-ssot/docs/manual/02-concepts.md l.186-188, chave fora da gramática reprova no topo, em meta, nó e aresta (form.unknown-key), com escape x_, e dentro de provenance só avisa. O 'por decisão' tem a própria gramática como registro."
+    trace: "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md"
+      locator: "SPEC.md §4.1, §11"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OKF_LIGHT_PROVENANCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "'`resource`: REQUIRED within an entry.' · SPEC.md §5.1 · ancorada por verificador independente"
+    source_tier: 8
+    source_kind: primary
+    label: "A procedência no OKF é leve: cada entrada de `sources` exige só `resource`, e o rodapé liga ao id da fonte. Não há tier, data de validade nem bi-temporalidade obrigatórios."
+    narrative: "Claim 46 como ancorada [okf-spec]: A procedência no OKF é leve: cada entrada de `sources` exige só `resource`, e o rodapé liga ao id da fonte. Não há tier, data de validade nem bi-temporalidade obrigatórios. Elenxo (alvo 46): a objeção NÃO sobreviveu. Comparação direta: OKF exige só resource, e o kg-ssot exige source, locator e method em todo nó confirmed ou PROD (vendor/kg-ssot/docs/manual/02-concepts.md l.75, l.85, l.131-138). Divergência clara."
+    trace: "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md"
+      locator: "SPEC.md §5.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OBJECAO_A2A_CARD_STILL_0_3_0
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Procurei supportedInterfaces em docs/onion/agent-card.json e o valor no gerador a2a-agent-card.sh: o gerador emite 0.3.0. Reconferido pelo escritor em 2026-11-08: protocolVersion 0.3.0, supportedInterfaces None. Superação procurada: nenhum card v1.0 no core."
+    label: "OBJEÇÃO: o Agent Card publicado pelo core declara protocolVersion 0.3.0 e não tem supportedInterfaces; a norma ancorada é v1.0.0 e a última release é v1.0.1. É um 'atrás' no próprio objeto que a claim define, não uma divergência por decisão."
+    narrative: "Alvo: 1 [a2a-spec] E_A2A_AGENT_CARD_IS_SERVER_MANIFEST. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação diz só 'describing its identity'; 'não de um membro com kid' é inferência do leitor. O defeito maior é a comparação ausente: docs/onion/agent-card.json declara protocolVersion 0.3.0 e não tem supportedInterfaces, e o gerador fixa esse valor (.claude/validation/a2a-agent-card.sh l.49). A claim ancora v1.0.0, e a última release é v1.0.1 (2026-05-28). CENÁRIO: quem julga a identidade por esta claim dá 'diverge por decisão, kid por membro', mas o card publicado está duas versões maiores atrás no próprio objeto que a claim define. É um 'atrás' sem item e sem dono."
+    trace: "python3 -I -c \"import json;c=json.load(open('docs/onion/agent-card.json'));print(c.get('protocolVersion'),c.get('supportedInterfaces'))\"; gh api 'repos/a2aproject/A2A/releases?per_page=2' --jq '.[].tag_name'"
+    provenance:
+      source: "docs/onion/agent-card.json@8fb21e2f7"
+      locator: "protocolVersion e supportedInterfaces; gerador .claude/validation/a2a-agent-card.sh l.49"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_A2A_CARD_DECLARES_DEAD_OAUTH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li securitySchemes do card e .claude/utils/federation-transport/adapters/a2a-live.md l.115, que repete oauth2(PKCE)+mTLS como desenho. Superação procurada: nenhum esquema no card descreve o JWS por kid."
+    label: "OBJEÇÃO: o card do core declara oauth2 e mutualTLS, mas os endpoints OAuth dão 404 e o gate real é JWS RS256 com kid pinado, que o card não declara. Um cliente que segue o §7.3 falha; o veredito é 'atrás', e a claim sozinha deixaria 'alinhado'."
+    narrative: "Alvo: 3 [a2a-spec] E_A2A_AUTH_DECLARED_IN_CARD_OUT_OF_BAND. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A claim descreve o padrão e não mede a casa, e a medição contraria o que o card promete. O card declara oauth2 (authorizationCode em app.onionevolve.com) e mutualTLS. Medi GET /oauth/authorize = 404 e POST /oauth/token = 404 em 2026-11-08. O gate real é JWS RS256 com kid pinado (a2a-rt-mcp.py l.321, a2a-verify). CENÁRIO: um cliente que segue o §7.3 lê securitySchemes, tenta o fluxo oauth2 e recebe 404, enquanto o esquema que o gate aceita não está declarado. O veredito honesto é 'atrás: card declara o que não existe', e a claim sozinha deixaria 'alinhado'."
+    trace: "curl -sS -o /dev/null -w '%{http_code}\\n' https://app.onionevolve.com/oauth/authorize; curl -sS -o /dev/null -w '%{http_code}\\n' -X POST https://app.onionevolve.com/oauth/token; python3 -I -c \"import json;print(json.load(open('docs/onion/agent-card.json'))['securitySchemes'])\""
+    provenance:
+      source: "docs/onion/agent-card.json@8fb21e2f7"
+      locator: "securitySchemes; .claude/utils/federation-transport/a2a-rt-mcp.py l.321; GET e POST nos endpoints OAuth = 404 em 2026-11-08"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_A2A_TASKSTATE_IS_NOT_DELIVERY_ACK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Procurei nas ancoradas 1-4 de a2a-spec: nenhuma cobre §4.3.3 ou §13.2. Superação procurada: sem claim ancorada sobre entrega por push."
+    label: "OBJEÇÃO: 'não há ack explícito' é negativa sem trecho e compara camadas diferentes: TaskState é ciclo de tarefa, e o ack da fila é entrega de transporte. O análogo correto, o push do §4.3.3, caiu na ancoragem."
+    narrative: "Alvo: 4 [a2a-spec] E_A2A_TASK_STATES_TERMINAL_INTERRUPTED. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação define AUTH_REQUIRED e não sustenta 'não há ack explícito': a afirmação é negativa e sem trecho. Além disso compara camadas diferentes: TaskState é ciclo de tarefa, e o ack da fila é entrega de transporte (queue/DOCTRINE.md, ack amarrado a id e body_sha256). O análogo correto, push com tentativa de entrega do §4.3.3, foi rejeitado na ancoragem por exagero."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'TaskState'; conferir que a claim de push do A2A está na lista de REJEITADAS deste run"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:queue/DOCTRINE.md"
+      locator: "ack amarrado a id e body_sha256"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_MCP_LISTEN_DOES_NOT_APPLY_TO_STDIO_BELL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li a DOCTRINE da campainha e as capabilities em doorbell/server.ts l.244-246 (origin/main). Superação procurada: a cláusula 6 é a razão do veredito, não uma superação."
+    label: "OBJEÇÃO: a claim é do binding Streamable HTTP; a campainha é stdio e não pode negociar 2026-07-28, porque o runtime v2 deixa de registrar o channel. Aplicar a claim à campainha gera um 'atrás' cujo item quebraria o channel."
+    narrative: "Alvo: 5 [mcp-spec] E_MCP_NOTIFICATIONS_VIA_SUBSCRIPTIONS_LISTEN. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O locator é o binding Streamable HTTP. A campainha é stdio e não negocia essa revisão: doorbell/DOCTRINE.md cláusula 6 diz que o runtime v2 não registra channel que negocia 2026-07-28 e que o SDK 1.32.2 vai até 2025-11-25. kg_mcp.py l.545 declara listChanged False. CENÁRIO: aplicar a claim à campainha gera o veredito 'atrás', e cumprir o item faria o channel deixar de registrar, medido pelo caso no_2026_07_28_negotiation."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:doorbell/DOCTRINE.md | grep -n '2026-07-28'; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_mcp.py | grep -n 'listChanged'"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:doorbell/DOCTRINE.md"
+      locator: "cláusula 6; vendor/kg-ssot/tools/kg_mcp.py l.545"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_MCP_AUDIENCE_NOT_APPLICABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Procurei tokens e audiência em kg_mcp.py e em doorbell/server.ts: só segredo compartilhado e stdio. Superação procurada: sem servidor com OAuth para julgar."
+    label: "OBJEÇÃO: o MUST de audiência vale para servidor que aceita access token OAuth, e nenhum servidor da casa aceita: a campainha é stdio e o kg_mcp compara segredo compartilhado. O veredito é 'não se aplica', e a claim não diz isso."
+    narrative: "Alvo: 7 [mcp-spec] E_MCP_TOKEN_AUDIENCE_NO_PASSTHROUGH. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O MUST vale para servidor que aceita access token OAuth. Nenhum servidor da casa aceita: a campainha é stdio, e o kg_mcp compara segredo compartilhado com hmac.compare_digest (l.436-439). A claim não nomeia alvo; o veredito é 'não se aplica' e ela não diz isso."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_mcp.py | grep -n 'compare_digest\\|Bearer\\|audience'"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_mcp.py"
+      locator: "l.436-439"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_WATCHER_RECEIVES_AND_IS_IN_OPEN_PR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li channels.py e a DOCTRINE do vigia no branch; a bancada dele não foi rodada nesta passada. Reconferido pelo escritor em 2026-11-08: PR #8 OPEN, head b0d8b2cc4, 0 entradas watcher na origin/main. Superação procurada: a leitura correta é parte do veredito."
+    label: "OBJEÇÃO: o vigia RECEBE e verifica pela peça oficial, e a fila transporta sinal A2A; julgar pela frase 'só conforma se os emitir' reprova errado. E o 'alinhado' do corpus descreve código não mergeado: o PR #8 está aberto e a main não tem watcher."
+    narrative: "Alvo: 9 [cloudevents-standard-webhooks] E_STDWEBHOOKS_THREE_HEADERS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A segunda metade erra o papel: 'um evento da fila/vigia só conforma se os EMITIR'. O vigia RECEBE; verify_standard lê os três cabeçalhos e chama standardwebhooks.Webhook.verify (channels.py l.92-103, branch feat/event-watcher), e a fila transporta sinal A2A, não POST de webhook. O vigia ainda não está na main: PR #8 aberto, e git ls-tree origin/main não tem watcher. CENÁRIO: julgar pela frase da claim dá 'não conforma' para um verificador que usa a peça oficial, e o veredito 'alinhado' do corpus descreve código não mergeado."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/feat/event-watcher:watcher/onion_watcher/channels.py | sed -n 92,103p; git -C ⟨clone do onion-messaging⟩ ls-tree origin/main --name-only | grep -c watcher; gh pr view 8 -R marciocar/onion-messaging --json state"
+    provenance:
+      source: "marciocar/onion-messaging@b0d8b2cc4:watcher/onion_watcher/channels.py"
+      locator: "l.92-103; https://github.com/marciocar/onion-messaging/pull/8"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_CLOUDEVENTS_SOURCE_FORM_NOT_VALIDATED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li parse_cloudevent e _clean_attr no daemon; só testa tipo, tamanho e imprimível. Superação procurada: sem checagem de URI-reference."
+    label: "OBJEÇÃO: a fila confere presença dos atributos, não a forma: _clean_attr aceita source com espaço, embora o CloudEvents peça URI-reference. A dedupe com remetente é divergência legítima. Item para o onion-messaging: validar a forma de source."
+    narrative: "Alvo: 12 [cloudevents-standard-webhooks] E_CLOUDEVENTS_REQUIRED_ATTRS_SOURCE_ID_UNIQUE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sustenta a presença dos atributos e a unicidade, mas não a forma. _clean_attr em queue/onion_queue/daemon.py l.277-280 aceita qualquer texto imprimível: um source com espaço passa, embora o CloudEvents peça URI-reference (trecho ce.md l.284, que caiu junto com a claim rejeitada). A chave de dedupe com remetente verificado é divergência declarada e legítima (queue/DOCTRINE.md cláusula 4). O veredito 'alinhado' vale para presença, com item de validação de forma para o onion-messaging."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/feat/event-watcher:queue/onion_queue/daemon.py | sed -n 277,296p"
+    provenance:
+      source: "marciocar/onion-messaging@b0d8b2cc4:queue/onion_queue/daemon.py"
+      locator: "l.277-296; queue/DOCTRINE.md cláusula 4"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_CC_TIMEOUT_EXCEPTION_ONFAILURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "settings.json lido: 7 de 9 PreToolUse com block; doc l.891 e l.984 reabertas em 2026-11-08. Reconferido pelo escritor em 2026-11-08 em .claude/settings.json@8fb21e2f7: 8 de 10 PreToolUse com block (env, protect-main, merge-gate, moat-gate, direct-provider-api, plugin-write, memory-write, adopter); os 2 sem o campo são kg-read-leg e house-code-gloss. O '7 de 9' do Elenxo fica registrado como a medida dele e difere da reconferência."
+    label: "OBJEÇÃO: a claim omite a exceção que decide o veredito da casa: com onFailure: block, timeout bloqueia. As guardas de barragem do core têm o campo; sem a exceção, o veredito sairia 'atrás' por engano."
+    narrative: "Alvo: 15 [claude-code-channels-hooks] E_CC_PRETOOLUSE_TIMEOUT_NOT_GATE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A claim omite a exceção que decide o veredito da casa. hooks.md l.891: 'a timed-out ... hook doesn't block the tool call, except for hooks whose failure blocks the action'; l.984: com onFailure block 'a failure or a timeout blocks the call'. CENÁRIO: um juiz lê a claim e conclui que a guarda de .env deixa passar em timeout, quando os 7 PreToolUse de barragem têm onFailure block e bloqueiam. O veredito sai errado na direção 'atrás'. O resto da claim (permissão para deny rígido) segue válido, e está na objeção 16. Superação achada (classe entrega): nó C_SUPERACAO_20261108 que aponta para esta objeção."
+    trace: "curl -sSL https://code.claude.com/docs/en/hooks.md | grep -n 'whose failure blocks the action'; python3 -I -c \"import json;s=json.load(open('.claude/settings.json'));print([k.get('onFailure') for g in s['hooks']['PreToolUse'] for k in g['hooks']])\""
+    provenance:
+      source: ".claude/settings.json@8fb21e2f7"
+      locator: "hooks.PreToolUse[*].hooks[*].onFailure; https://code.claude.com/docs/en/hooks.md l.891 e l.984"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li os dois settings do core; as guardas por hook são status quo, não superação. Superação procurada: sem camada de deny ou sandbox."
+    label: "OBJEÇÃO: a claim descreve a doc e não a casa: o core tem 0 regras deny e sandbox None, e toda barragem é hook por padrão de texto, justamente o que a doc chama de frágil. Pode ser divergência por decisão, mas nenhum nó sela a sandbox."
+    narrative: "Alvo: 16 [claude-code-channels-hooks] E_CC_PERMISSIONS_DENY_ASK_ALLOW. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Descreve a doc e não a posição da casa: permissions.deny tem 0 entradas em settings.json e em settings.local.json, e sandbox é None nos dois. Toda barragem é hook por padrão de texto, justamente o que a doc chama de frágil. Exemplo medido nesta rodada: a guarda de .env barrou um 'for' sobre .github/workflows/*, sem relação com .env. Isso pode ser 'diverge por decisão' (D_EXIT2_COUPLING_WORDING_2026_11), mas o nó não fala de sandbox, e a claim de sandbox foi rejeitada."
+    trace: "python3 -I -c \"import json;[print(f,len(json.load(open(f)).get('permissions',{}).get('deny',[])),json.load(open(f)).get('sandbox')) for f in ('.claude/settings.json','.claude/settings.local.json')]\""
+    provenance:
+      source: ".claude/settings.json@8fb21e2f7"
+      locator: "permissions.deny e sandbox"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "gh attestation verify rc=0 no wheel 4.46.0, 1 atestação com predicate SLSA v1; vale para o artefato de release, não para as portas nem para o vendor."
+    label: "OBJEÇÃO: a régua não diz onde a casa está e mistura objetos: a release kg-ssot-v4.46.0 tem atestação SLSA válida, e as portas não têm atestação nenhuma. O mesmo nível para os dois erra um deles; a trilha Source ficou sem claim."
+    narrative: "Alvo: 18 [slsa] E_SLSA_BUILD_TRACK_LEVELS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A régua não diz onde a casa está e misturaria dois objetos. Medi: a release kg-ssot-v4.46.0 tem atestação válida (gh attestation verify rc=0, predicate https://slsa.dev/provenance/v1, builder .github/workflows/release.yml@refs/tags/kg-ssot-v4.46.0). Portas: nenhum attest em .github/workflows do core nem em ops/publish-door.sh. CENÁRIO: aplicar 'sem procedência assinada fica em L0/L1' ao grupo dá o mesmo nível para os dois e erra um deles. O locator também mistura v1.1 com v1.2, e a trilha Source (L1-L4 em slsa.dev/spec/v1.2/source-requirements), onde tag e pin moram, ficou sem claim. Superação achada (classe entrega): nó C_SUPERACAO_20261108 que aponta para esta objeção."
+    trace: "gh release download kg-ssot-v4.46.0 -R marciocar/kg-ssot -p 'kg_ssot-4.46.0-py3-none-any.whl' -D \"$(mktemp -d)\"; gh attestation verify <wheel> --repo marciocar/kg-ssot --format json; grep -n -iE 'attest|sigstore|slsa' ops/publish-door.sh"
+    provenance:
+      source: "https://github.com/marciocar/kg-ssot/releases/tag/kg-ssot-v4.46.0"
+      locator: "wheel kg_ssot-4.46.0; gh attestation verify; ops/publish-door.sh sem attest"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SLSA_VENDOR_DIGEST_EXISTS_CONSUMED_TREE_UNATTESTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li kg_vendor.py e release.yml; os artefatos atestados são wheel, sdist, npm e mcpb. Reconferido pelo escritor em 2026-11-08: 0 menções a attestation em kg_vendor.py na origin/main e git archive em l.256. Superação procurada: a atestação do wheel não cobre o git archive do vendor."
+    label: "OBJEÇÃO: o digest já existe (o carimbo do vendor tem commit e sha256, o das portas source_commit). O defeito é outro: kg_vendor lê por git archive da tag, sem verificar atestação, e o vendor consome uma árvore que a atestação não cobre."
+    narrative: "Alvo: 19 [slsa] E_SLSA_L1_PROVENANCE_DIGEST. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A condição não descreve os alvos. vendor/kg-ssot/.kg-ssot-version guarda tag, commit e sha256 de cada arquivo, e o carimbo das portas guarda source_commit. O que falta é outra coisa: kg_vendor.py lê por git archive da tag e tem 0 menções a attestation, então o vendor consome uma árvore que a atestação não cobre. CENÁRIO: pela claim, o item vira 'pôr digest', que já existe, e o defeito real (procedência do que é consumido) fica sem item."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/.kg-ssot-version | sed -n 1,14p; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_vendor.py | grep -c attestation; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_vendor.py | grep -n 'archive'"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_vendor.py"
+      locator: "l.5 e l.256 (git archive); 0 menções a attestation; vendor/kg-ssot/.kg-ssot-version"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_SLSA_L3_NOT_MEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li o release.yml; não avaliei o isolamento do builder. Superação procurada: nível L3 não medido."
+    label: "OBJEÇÃO: a norma de L3 está correta, mas sem alvo: nenhuma claim diz se o release.yml do kg-ssot chega a L3 ou fica em L2, e a atestação medida sozinha não decide isso."
+    narrative: "Alvo: 20 [slsa] E_SLSA_L3_UNFORGEABLE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Correta como norma, sem alvo. Nenhuma claim diz se o release.yml do kg-ssot chega a L3 ou fica em L2, e a atestação medida sozinha não decide isso."
+    trace: "gh api repos/marciocar/kg-ssot/contents/.github/workflows/release.yml --jq .content | base64 -d | grep -n -iE 'attest|workflow_call'"
+    provenance:
+      source: "https://api.github.com/repos/marciocar/kg-ssot/contents/.github/workflows/release.yml"
+      locator: "attest e workflow_call"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SCORECARD_MAIN_NO_FORCE_PUSH_BLOCK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li o ruleset e o endpoint de proteção pela API do GitHub; nenhum scorecard foi rodado. Superação procurada: hook local não substitui a regra no remoto."
+    label: "OBJEÇÃO: a main do core não tem proteção de branch e o único ruleset só tem required_status_checks, sem bloqueio de force push nem de deleção; reprova no Tier 1 do Scorecard. O hook é local e não protege o remoto."
+    narrative: "Alvo: 22 [openssf-scorecard] E_SCORECARD_BRANCH_PROTECTION. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: Descreve o check e não roda contra o core. Medi: branches/main/protection = 404 'Branch not protected'; o único ruleset (25001643) contém só required_status_checks, sem non_fast_forward nem deletion, ou seja, sem o Tier 1 que a própria claim cita. CENÁRIO: a narrativa de que o core tem gate de hook (pretooluse-protect-main, merge-gate) leva a 'alinhado', e a régua do Scorecard reprova no primeiro tier, porque o hook é local e não protege o remoto."
+    trace: "gh api repos/marciocar/onion-evolve/branches/main/protection; gh api repos/marciocar/onion-evolve/rulesets/25001643 --jq '[.rules[].type]'"
+    provenance:
+      source: "https://api.github.com/repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "rules[].type = required_status_checks; branches/main/protection = 404"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_SCORECARD_TOPLEVEL_WRITE_TOKENS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li os 5 workflows; não rodei o binário scorecard. Superação procurada: sem nota do Scorecard."
+    label: "OBJEÇÃO: a claim não diz como write no topo pesa, e por ela o core parece passar inteiro. Medido: 5 workflows com permissions no topo, mas onion-review.yml tem pull-requests write e id-token write no topo, e onion-selftest.yml dá write a job."
+    narrative: "Alvo: 23 [openssf-scorecard] E_SCORECARD_TOKEN_PERMISSIONS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sem aplicação. Medi que os 5 workflows têm permissions no topo, 4 só com contents read; onion-review.yml tem pull-requests write e id-token write no topo, e onion-selftest.yml dá write em contents, issues, pull-requests e actions a job. A claim diz que a nota depende de declarar em cada workflow, e não como write no topo pesa; por ela o core parece passar inteiro."
+    trace: "grep -n -A4 '^permissions:' .github/workflows/onion-review.yml; grep -n ': write' .github/workflows/onion-selftest.yml"
+    provenance:
+      source: ".github/workflows/onion-review.yml@8fb21e2f7"
+      locator: "bloco permissions no topo; .github/workflows/onion-selftest.yml"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SCORECARD_12_ACTIONS_UNPINNED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Contei uses em .github/workflows com parser próprio: 7 por SHA, 12 por tag. Reconferido pelo escritor em 2026-11-08: 7 por SHA e 12 por tag. Superação procurada: sem pinagem total no core."
+    label: "OBJEÇÃO: a claim não aplica à casa. Medido: 7 uses pinadas por SHA e 12 por tag móvel. O onion-messaging exige SHA nas ações do CI, então o core está atrás do próprio produto; shell scripts ficaram sem medir."
+    narrative: "Alvo: 24 [openssf-scorecard] E_SCORECARD_PINNED_DEPENDENCIES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sem aplicação na claim. Medi: 7 uses pinadas por SHA e 12 por tag móvel (actions/checkout@v5, upload-artifact@v4 e download-artifact@v4). O onion-messaging exige SHA nas ações do CI (doorbell/DOCTRINE.md cláusula 7), então o core está atrás do próprio produto. Item de dono claro, mas a claim não o carrega, e shell scripts ficaram sem medir."
+    trace: "grep -nE 'uses: *[^ ]+@v[0-9]' .github/workflows/*.yml"
+    provenance:
+      source: ".github/workflows/@8fb21e2f7"
+      locator: "linhas uses: de todos os workflows; doorbell/DOCTRINE.md cláusula 7"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_SCORECARD_ATTESTATION_NOT_IN_ASSETS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Listei os assets da release e rodei gh attestation verify; o Scorecard não foi rodado. Superação procurada: a atestação existe, mas não muda o que o check lê nos assets."
+    label: "OBJEÇÃO: o core tem 0 tags e 0 releases, então o check não julga o repo que a lacuna nomeia. No kg-ssot a release não tem .intoto.jsonl nem .sig nos assets, embora a atestação seja válida: pela regra citada, o veredito sairia pior que o fato."
+    narrative: "Alvo: 25 [openssf-scorecard] E_SCORECARD_SIGNED_RELEASES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O core tem 0 tags e 0 releases (as tags onion-v* moram nas portas), então o check não julga o repo público que a lacuna nomeia. No kg-ssot a release 4.46.0 tem SBOMs, mas nenhum asset .intoto.jsonl ou .sig, embora a atestação seja válida na API do GitHub. CENÁRIO: pela regra citada (arquivo nos assets) o kg-ssot sai como 'não assinado' apesar de verificar com gh attestation, e o veredito sai pior que o fato."
+    trace: "gh api repos/marciocar/onion-evolve/git/matching-refs/tags/ --jq length; gh api 'repos/marciocar/kg-ssot/releases?per_page=1' --jq '.[0].assets|map(.name)'"
+    provenance:
+      source: "https://api.github.com/repos/marciocar/kg-ssot/releases?per_page=1"
+      locator: "assets[].name; matching-refs/tags do core"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_NIST_GOVERN_3_2_NOT_COMPARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Busquei a frase no corpus e nos diretórios de compliance e meta-specs. Superação procurada: sem mapeamento NIST na casa."
+    label: "OBJEÇÃO: só o lado do padrão, e 'exige' sobe o grau de um framework voluntário. Nada compara o selo humano do core ao item; 'NIST AI RMF' dá 0 nós no corpus e 0 arquivos em commands, agents, compliance-context e meta-specs."
+    narrative: "Alvo: 26 [nist-ai-rmf] E_NIST_GOVERN_3_2. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Só o lado do padrão, e 'exige' sobe o grau de um framework de adesão voluntária. Nada compara o selo humano do core (never-fill-blind-human-gate, pretooluse-merge-gate) ao item. A frase 'NIST AI RMF' dá 0 nós no corpus, e o grep em .claude/commands, .claude/agents, docs/compliance-context e docs/meta-specs não acha 'AI RMF'."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'NIST AI RMF'; grep -rln 'AI RMF' .claude/commands .claude/agents docs/compliance-context docs/meta-specs"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@8fb21e2f7"
+      locator: "--phrase 'NIST AI RMF' = 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_NIST_MANAGE_2_4_NOT_COMPARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Busquei o item no corpus e nos diretórios de compliance. Superação procurada: sem peça nomeada."
+    label: "OBJEÇÃO: sem comparação. Nenhuma claim diz qual peça do core desengaja o sistema nem se há responsável atribuído."
+    narrative: "Alvo: 27 [nist-ai-rmf] E_NIST_MANAGE_2_4. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sem comparação. Nenhuma claim diz qual peça do core desengaja o sistema nem se há responsável atribuído."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'MANAGE 2.4'"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@8fb21e2f7"
+      locator: "--phrase 'MANAGE 2.4'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_NIST_MANAGE_4_1_NOT_COMPARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Busquei o item no corpus; as peças citadas existem, mas nenhuma claim as mede contra o texto. Superação procurada: sem confronto."
+    label: "OBJEÇÃO: sem comparação. A lista (apelo, override, descomissionamento, recuperação) não é confrontada com /meta:recover, o registro de decisões ou o rollback da federação."
+    narrative: "Alvo: 28 [nist-ai-rmf] E_NIST_MANAGE_4_1. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sem comparação. A lista (apelo, override, descomissionamento, recuperação) não é confrontada com /meta:recover, registro de decisões ou o rollback da federação."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'MANAGE 4.1'"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@8fb21e2f7"
+      locator: "--phrase 'MANAGE 4.1'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_NIST_MANAGE_4_3_NOT_COMPARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Busquei o item no corpus. Superação procurada: sem processo medido."
+    label: "OBJEÇÃO: sem comparação. O item pede comunicar incidentes a atores e comunidades afetadas, e nada mede se a casa tem esse processo."
+    narrative: "Alvo: 29 [nist-ai-rmf] E_NIST_MANAGE_4_3. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sem comparação. O item pede comunicar incidentes a atores e comunidades afetadas; nada mede se a casa tem esse processo."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'MANAGE 4.3'"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@8fb21e2f7"
+      locator: "--phrase 'MANAGE 4.3'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_NIST_600_NO_OWNER_NO_MEASURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li o trecho citado e busquei o id no corpus. Superação procurada: sem dono nem atraso medido."
+    label: "OBJEÇÃO: a claim promete dono que o texto não entrega; o trecho fala em políticas organizacionais e o 'atrás' não foi medido. O item nasceria sem dono e pode duplicar o que /onion-retro e o registro de erro recorrente já fazem."
+    narrative: "Alvo: 30 [nist-ai-rmf] E_NIST_600_POST_INCIDENT_REVIEW. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A claim promete o que o texto não entrega: o trecho fala em 'organizational policies and procedures' e não nomeia dono, e o 'atrás' não foi medido. CENÁRIO: o item nasce como 'criar revisão pós-incidente' sem dono, e pode estar duplicando o que /onion-retro e o registro de erro recorrente já fazem, porque ninguém os comparou."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'GV-1.5-002'; ls .claude/skills/onion-retro"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@8fb21e2f7"
+      locator: "--phrase 'GV-1.5-002'; .claude/skills/onion-retro"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_DORA_NO_METRIC_MEASURED_IN_HOUSE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Listei as métricas e busquei os termos nos três diretórios. Superação procurada: nenhuma métrica DORA na casa."
+    label: "OBJEÇÃO: a citação define só change fail rate, e o modelo de cinco métricas caiu na ancoragem. A lacuna pergunta o que a casa mede, e nada responde: docs/onion/metrics só tem gtm-* e selftest-runs, sem termo DORA."
+    narrative: "Alvo: 31 [dora] E_DORA_INSTABILITY_CHANGE_FAIL. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: A citação define só change fail rate; a claim sobre rework e o modelo de cinco métricas foi rejeitada na ancoragem. A lacuna pergunta o que a casa mede, e nada responde: docs/onion/metrics tem só gtm-* e selftest-runs, e o grep por change-fail, deploy frequency e lead time em docs/onion/metrics, .claude/validation e ops não acha nada."
+    trace: "ls docs/onion/metrics; grep -rln -iE 'change.fail|deploy.*frequency|lead.time' docs/onion/metrics .claude/validation ops; bash .claude/validation/kg-corpus-grep.sh --phrase 'change fail rate'"
+    provenance:
+      source: "docs/onion/metrics/@8fb21e2f7"
+      locator: "listagem do diretório; grep por termos DORA em docs/onion/metrics, .claude/validation e ops"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_DORA_AMPLIFIER_NO_CHOICE_TO_JUDGE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li o enunciado contra a pergunta da rodada. Superação procurada: sem escolha a julgar."
+    label: "OBJEÇÃO: achado geral, sem ligação com escolha alguma dos três produtos; não permite veredito."
+    narrative: "Alvo: 32 [dora] E_DORA_2025_AI_AMPLIFIER. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Achado geral, sem ligação com escolha alguma dos três produtos; não permite veredito."
+    trace: "conferir que a claim não nomeia core, kg-ssot nem onion-messaging"
+    provenance:
+      source: "https://dora.dev/research/2025/dora-report/"
+      locator: "texto de abertura; enunciado da claim contra a pergunta da rodada"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_DORA_BLOG_NOT_REPORT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Conferi a página de pesquisa e o 404 de 2026; não busquei o PDF. Superação procurada: relatório integral não lido nesta rodada."
+    label: "OBJEÇÃO: a própria claim declara NÃO VERIFICADO o ponto de instabilidade, a fonte é blog e não o relatório, e '90%' não está na citação. 2025 segue o relatório mais recente: dora.dev/research/2026/ dá 404."
+    narrative: "Alvo: 33 [dora] E_DORA_2025_THROUGHPUT. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A própria claim declara NÃO VERIFICADO o ponto de instabilidade, e a fonte é blog, não o relatório. '90%' não está na citação. Confirmei que 2025 segue o mais recente: dora.dev/research lista até 2025, e dora.dev/research/2026/ dá 404."
+    trace: "curl -sSL -o /dev/null -w '%{http_code}\\n' https://dora.dev/research/2026/"
+    provenance:
+      source: "https://dora.dev/research/"
+      locator: "lista até 2025; dora.dev/research/2026/ = 404"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_AAIF_SKILLS_NOT_COMPARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Busquei no corpus; não validei as skills contra a spec de agentskills. Superação procurada: sem conformidade medida."
+    label: "OBJEÇÃO: a claim não compara o formato aberto com as 14 skills de .claude/skills, embora 'agent skills' dê 31 nós no corpus. Sem comparação não há veredito, e a claim de sobreposição foi rebaixada."
+    narrative: "Alvo: 35 [aaif-projects] E_AAIF_AGENT_SKILLS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Não compara com as 14 skills de .claude/skills, embora a frase 'agent skills' dê 31 nós no corpus. Sem comparação não há veredito, e a claim de sobreposição dos 7 projetos foi rebaixada."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'Agent Skills'"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@8fb21e2f7"
+      locator: "--phrase 'Agent Skills' = 31 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_AAIF_MCP_OPTIONAL_ONLY_FOR_TASK_MANAGER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li a DOCTRINE e o pending_signals descrito nela. Reconferido pelo escritor em 2026-11-08: frase presente na origin/main (doorbell/DOCTRINE.md l.58). Superação procurada: o pull é fallback, não substitui o push."
+    label: "OBJEÇÃO: 'MCP opcional' é do Task Manager. A campainha depende de MCP e não roda fora do Claude Code como push, e o kg_mcp é servidor MCP. A generalização daria 'diverge por decisão' a um push que não existe sem MCP."
+    narrative: "Alvo: 36 [aaif-projects] E_AAIF_MCP_HOSTED. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: O texto da casa diz isso só do Task Manager: CLAUDE.md, 'Adapters são API-first; o MCP é um transporte opcional'. A campainha depende do MCP: 'Não roda fora do Claude Code como push' (doorbell/DOCTRINE.md), e o kg_mcp é servidor MCP. CENÁRIO: a generalização dá 'diverge por decisão, MCP opcional' para a campainha, cujo push não existe sem MCP."
+    trace: "grep -n 'transporte' CLAUDE.md | head -3; git -C ⟨clone do onion-messaging⟩ show origin/main:doorbell/DOCTRINE.md | grep -n 'Não roda fora do Claude Code'"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:doorbell/DOCTRINE.md"
+      locator: "l.58 'Não roda fora do Claude Code como push'; CLAUDE.md, seção Task Manager"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_AAIF_NEGATIVES_WITHOUT_QUOTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li a nota do verificador sobre aaif.io/projects; não reabri a página dos grupos. Superação procurada: sem varredura de entregáveis."
+    label: "OBJEÇÃO: a citação cobre só Identity & Trust. 'Sem entregável publicado' e 'nenhum projeto padroniza .kg.yaml' são negativas sem trecho, e a claim que listaria os projetos foi rebaixada pelo motor."
+    narrative: "Alvo: 37 [aaif-projects] E_AAIF_WORKING_GROUPS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação cobre Identity & Trust. 'Sem entregável publicado' e 'nenhum projeto padroniza .kg.yaml' são negativas sem trecho, e a claim que listaria os projetos foi rebaixada pelo motor."
+    trace: "conferir na lista de REJEITADAS a claim dos 10 projetos (AFIRMADA-SEM-CITACAO)"
+    provenance:
+      source: "https://aaif.io/projects/"
+      locator: "nota do verificador sobre a lista de 10 projetos"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Rodado no core em 2026-11-08: rc=0 e JSON-LD com Entity, wasDerivedFrom e Activity. Reconferido pelo escritor em 2026-11-08: rc=0, 73 ocorrências de wasDerivedFrom, 0 de prov:Agent e wasAttributedTo."
+    label: "OBJEÇÃO: 'hoje é mapeamento nosso' ignora kg_prov_export.py, que exporta para PROV-O em JSON-LD. O veredito 'atrás, sem mapeamento' geraria item para algo entregue; o certo é 'alinhado por exportador, sem agente'."
+    narrative: "Alvo: 38 [w3c-prov-shacl] E_PROVO_THREE_CLASSES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: Ignora peça que já existe. vendor/kg-ssot/tools/kg_prov_export.py exporta para PROV-O em JSON-LD. Rodei em onion-identity-2026-07.kg.yaml: rc=0, 104 prov:Entity, 73 prov:wasDerivedFrom, 73 prov:Activity. O kg-corpus-grep dá 0 nós para PROV-O porque casa só id e label, e por isso passou despercebido. CENÁRIO: o veredito sai 'atrás, sem mapeamento' e gera item para algo entregue; o certo é 'alinhado por exportador, sem agente' (claim 39). Superação achada (classe entrega): nó C_SUPERACAO_20261108 que aponta para esta objeção."
+    trace: "python3 -I ⟨clone do onion-messaging⟩/vendor/kg-ssot/tools/kg_prov_export.py docs/onion/graph/onion-identity-2026-07.kg.yaml | grep -c 'prov:wasDerivedFrom'"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_prov_export.py"
+      locator: "saída sobre docs/onion/graph/onion-identity-2026-07.kg.yaml"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_PROV_DERIVATION_ANALOGY_REFUSED_BY_KG_SSOT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "Li o docstring do exportador. Superação procurada: a divergência é o próprio veredito."
+    label: "OBJEÇÃO: o kg-ssot recusa exatamente a analogia com wasDerivedFrom: derivação em PROV é produção, não suporte evidencial, e o carimbo vai como kg:verifiedAt. A analogia daria 'alinhado' a uma divergência deliberada."
+    narrative: "Alvo: 40 [w3c-prov-shacl] E_PROVO_BUNDLES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: O kg-ssot recusa exatamente essa analogia. Docstring de kg_prov_export.py: 'derivação em PROV é relação de produção, e não de suporte evidencial, e exportá-las como wasDerivedFrom diria algo que o grafo não diz'; e o carimbo vai como kg:verifiedAt, 'e não como prov:generatedAtTime'. CENÁRIO: a analogia gera 'alinhado' numa escolha que é divergência deliberada."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_prov_export.py | sed -n 11,20p"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_prov_export.py"
+      locator: "docstring, l.11-20"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_SHACL_JSON_REPORT_EXISTS_NOT_SHACL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Busquei shacl em tools, spec e manual do vendor 4.44; a 4.46 não foi conferida. Superação procurada: sem saída SHACL no vendor medido."
+    label: "OBJEÇÃO: 'sem relatório padronizado' não pesa o que existe: kg_validate --json emite relatório estruturado por arquivo (não sh:ValidationReport), e D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025 prevê pySHACL como leitor. O vendor 4.44 não cita SHACL; a 4.46 não foi medida."
+    narrative: "Alvo: 41 [w3c-prov-shacl] E_SHACL_SEVERITY. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O mapeamento é aceitável, mas 'sem relatório padronizado' não pesa o que existe: kg_validate --json emite relatório estruturado por arquivo (l.2044, schema_version e results), ainda que não seja sh:ValidationReport, e D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025 (done) prevê pySHACL como leitor. O vendor 4.44 não tem a palavra SHACL em tools, spec e manual, então o estado na última release ficou sem medir."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025'; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_validate.py | grep -n 'VERDICT_SCHEMA_VERSION'"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_validate.py"
+      locator: "l.2044 (--json, schema_version, results)"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_SHACL_CONFORMS_CORE_GATES_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Li o kg_validate; não varri .claude/validation. Superação procurada: sem censo das guardas do core."
+    label: "OBJEÇÃO: frase condicional sem alvo. No kg-ssot o rc deriva dos resultados, logo o paralelo vale lá; para as guardas do core ninguém mediu quais emitem resultado por violação."
+    narrative: "Alvo: 42 [w3c-prov-shacl] E_SHACL_CONFORMS_FROM_RESULTS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Frase condicional sem alvo. No kg-ssot o rc deriva dos resultados ('return 1 if any(r[\"verdict\"] == \"FAIL\"...)', kg_validate.py l.2399), logo o paralelo vale lá. Para as guardas do core ninguém mediu quais emitem resultado por violação."
+    trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_validate.py | sed -n 2395,2404p"
+    provenance:
+      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_validate.py"
+      locator: "l.2399"
+      method: "judges: Elenxo, 1 agente sem votação"
+  - id: E_OBJECAO_OKF_V0_3_UNREACHABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-08"
+    verified_against: "Consultei a API do GitHub: 404 em 2026-11-08. Superação procurada: v0.3 inacessível."
+    label: "OBJEÇÃO: a claim ancora v0.2 do repositório do Google, e a lacuna é 'depois da saída do Google'. O repo neutro com spec v0.3 dá 404, então a régua pode ter mudado sem leitura. Tampouco há 'perfil estrito' de OKF como peça do kg-ssot."
+    narrative: "Alvo: 44 [okf-spec] E_OKF_ONLY_TYPE_REQUIRED. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: Ancora v0.2 do repositório do Google, enquanto a lacuna é 'depois da saída do Google'. A nota do verificador cita PR #63 apontando para o repo neutro com spec v0.3, e medi api.github.com/repos/open-knowledge-format/open-knowledge-format = 404. A régua pode ter mudado, sem leitura. Também não há 'perfil estrito' de OKF como peça: 'okf' não aparece no README, no manual nem em tools do vendor."
+    trace: "curl -sS -o /dev/null -w '%{http_code}\\n' https://api.github.com/repos/open-knowledge-format/open-knowledge-format; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/README.md | grep -ic okf"
+    provenance:
+      source: "https://api.github.com/repos/open-knowledge-format/open-knowledge-format"
+      locator: "HTTP 404 em 2026-11-08"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Vereditos que as medidas já permitem, por escolha: ALINHADO em 6 pontos, DIVERGE POR DECISÃO em 4, ATRÁS em 7 com dono proposto (core 4, kg-ssot 2, onion-messaging 1). Afirmação de 1 agente, sem selo."
+    narrative: "Recomendação do Elenxo, íntegra: A rodada sustenta a leitura das normas: 46 claims citadas, das quais 13 não caíram. Ela NÃO sustenta o veredito por escolha nas demais, porque quase toda claim descreve o padrão e não mede a casa. Medi o lado da casa nesta passada, e 13 objeções são bloqueantes, porque o veredito sairia errado. Vereditos que as medidas já permitem. ALINHADO: exit 2 com onFailure nas guardas, channels na campainha, prompts/list, verificador do Standard Webhooks, janela de 300 s, RDF 1.2 ainda em CR. DIVERGE POR DECISÃO: assinatura de mensagem por kid no perfil Onion, dedupe com remetente, gramática fechada contra o OKF, arestas fora de wasDerivedFrom. ATRÁS, com dono proposto: core, Agent Card 0.3.0 e securitySchemes com oauth2 em 404; core, main sem bloqueio de force push e deleção (ruleset só com status checks); core, 12 ações sem pin por SHA; core, portas sem atestação; kg-ssot, kg_vendor sem verificar a atestação e PROV sem agente; onion-messaging, source sem validação de URI-reference. Correções obrigatórias antes de gravar: claim 15 omite a exceção de onFailure; claim 9 trata o vigia como emissor; claim 19 ignora o sha256 do carimbo; claim 36 generaliza 'MCP opcional'; claim 38 ignora kg_prov_export.py; claim 40 afirma analogia que o kg-ssot recusa. Não sustenta: nada sobre NIST, ISO, DORA ou sobreposição AAIF além do texto; nota do Scorecard, que não foi rodado; nível SLSA L3; qualquer 'alinhado' do vigia como estado da main, pois o PR #8 segue aberto; a sandbox como decisão, pois nenhum nó a sela. Limites desta passada: não rodei a bancada do vigia nem o binário do Scorecard, e o vendor medido do kg-ssot é 4.44, com a release já em 4.46. Nota do escritor: a recomendação diz '13 não caíram'; na lista recebida são 14 objeções com survives false e 32 sobreviventes (32 + 14 = 46). Os 13 são as bloqueantes. Os caminhos campainha/DOCTRINE.md e campainha/server.ts do Elenxo são de um branch local antigo; os nós citam doorbell/ na origin/main, conferido em 2026-11-08 (server.ts l.244-246 em vez de l.198-200). Esta é a posição do juiz, não decisão: nenhum nó desta rodada sela."
+    trace: "Elenxo do run /onion-research, 2026-11-08, campo recommendation"
+  - id: Q_SANDBOX_DENY_LAYER_DECISION_1108
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "A ausência de deny e de sandbox no core fica coberta por D_EXIT2_COUPLING_WORDING_2026_11, ou pede decisão própria? O selo não fala de sandbox, e toda barragem hoje é hook por padrão de texto."
+    narrative: "Proposta desta rodada, para o maestro: rever o escopo do selo D_EXIT2_COUPLING_WORDING_2026_11 ou abrir decisão separada sobre a camada de permissions.deny e sandbox. Medido: 0 regras deny e sandbox None nos dois settings do core (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Esta rodada não sela nada."
+    trace: "Elenxo, objeção 16 e 'Não sustenta: a sandbox como decisão, pois nenhum nó a sela'"
+  - id: E_LACUNAS_OUTSIDE_IN_1108
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-08"
+    verified_against: "contabilidade do motor no run /onion-research de 2026-11-08 e contagem do escritor sobre as listas recebidas: 46 ancoradas, 18 rejeitadas, 46 objeções, 19 superações, 0 recusas"
+    label: "LACUNAS: 11 fontes lidas, 1 inalcançável (iso-42001); 46 claims ancoradas, 18 rejeitadas; 46 objeções, 32 sobreviventes (13 bloqueiam), 0 recusadas; 19 superações; 9 lacunas abertas."
+    narrative: "FONTES: lidas (11): a2a-spec, mcp-spec, cloudevents-standard-webhooks, claude-code-channels-hooks, slsa, openssf-scorecard, nist-ai-rmf, dora, aaif-projects, w3c-prov-shacl, okf-spec. Inalcançáveis (1): iso-42001. CLAIMS: 46 ancoradas e viraram nó; 18 REJEITADAS na ancoragem, que nunca viram nó (15 EXAGERADA, 2 AFIRMADA-SEM-CITACAO, 1 NAO-ENCONTRADA). ELENXO: 46 objeções, uma por claim; 32 sobreviventes modeladas como E_OBJECAO (13 bloqueiam, 19 limitam); 14 não sobreviveram e a evidência delas está na narrativa do alvo. Objeções RECUSADAS pelo motor (sobreviveram sem critério pré-registrado ou sem superação): 0, nenhum alvo não-julgado por recusa. SUPERAÇÕES: 19 nós C_SUPERACAO_20261108 (16 das rejeitadas, com TRACES_TO para este nó; 3 das objeções 15, 18 e 38, para o E_OBJECAO respectivo). As duas rejeitadas da AAIF não têm superação. LACUNAS FECHADAS (4): cloudevents-standard-webhooks: claims 9-12 fecham a norma; o vigia só verifica, e está em PR aberto (#8) · mcp-spec: claims 6 e 8 fecham autorização e o Q de prompts/list; resources não se aplicam, pois os dois servidores declaram só tools · claude-code-channels-hooks: exit 2, onFailure, permissões e channels (claim 15 precisa da exceção de onFailure) · w3c-prov-shacl: norma fechada, com a correção de que o exportador PROV-O já existe. LACUNAS QUE CONTINUAM ABERTAS (9): a2a-spec: nenhuma claim sobre o envelope; push foi rejeitado; o card da casa é 0.3.0 e declara oauth2 cujos endpoints dão 404 · claude-code-channels-hooks (parte sandbox): claim rejeitada; a casa tem sandbox None e 0 deny · slsa: sem claim de nível por artefato nem da trilha Source; medido fora das claims: kg-ssot atestado, portas sem atestação, vendor sem verificar · openssf-scorecard: SAST rejeitado e scorecard não rodado; medido fora das claims: sem bloqueio de force push, 12 ações sem pin, sem CodeQL · nist-ai-rmf: só o texto do padrão, zero comparação com as peças da casa · iso-42001: inalcançável; iso.org devolve 403 com desafio do Cloudflare em 3 URLs; nenhuma afirmação pública registrada · dora: nenhuma métrica DORA medida na casa; modelo de cinco métricas rejeitado · aaif-projects: sobreposição com os produtos rebaixada; só a existência de A2A, Skills e MCP está ancorada · okf-spec: v0.3 e repo neutro inacessíveis (404); só v0.2 lida. REJEITADAS NA ANCORAGEM, com o motivo do verificador: (1) [a2a-spec] 5. A entrega por push do A2A é webhook com garantia de ao menos uma tentativa e possível duplicata; o cliente deve validar a autenticidade e processar de forma idempotente; análogo da campainha/vigia, sem dead-letter nem teto de reentrega normatizados. VEREDITO EXAGERADA: A citação existe (§4.3.3, 'Server Guarantees'). O claim estica por fundir níveis normativos: 'deve validar a autenticidade' é MUST (§13.2), mas 'processar de forma idempotente' é SHOULD ('Clients SHOULD process notifications idempotently, as duplicate deliveries may occur'); 'deve' cobre os dois como se fossem do mesmo grau. Além disso, 'sem teto de reentrega normatizado' omite que o texto traz 'Agents MAY stop attempting delivery after a configured number of consecutive failures' (um teto facultativo e configurável). A parte de 'sem dead-letter' é sustentada: grep -in 'dead' no documento não [texto do motor cortado aqui; não completado de memória] (2) [a2a-spec] 6. No push o A2A exige credenciais no webhook e validação pelo cliente, e manda rejeitar faixas de IP privadas (anti-SSRF); mecanismo de autenticação é por AuthenticationInfo (esquema), não por JWKS local por membro. VEREDITO EXAGERADA: A citação existe em §13.2 ('Clients **MUST** validate webhook authenticity using the provided authentication credentials') e 'exige credenciais no webhook' é sustentado ('Agents MUST include authentication credentials in webhook requests'). O que estica é 'manda rejeitar faixas de IP privadas': o texto é 'Agents SHOULD validate webhook URLs to prevent SSRF attacks: Reject private IP ranges...', ou seja, SHOULD, e quem rejeita é o agente (o chamador do webhook), não uma imposição ao protocolo. 'Manda' lê como MUST. Autenticação por AuthenticationInfo e não por JWKS local por membro: sustentado, [texto do motor cortado aqui; não completado de memória] (3) [mcp-spec] A revisão 2026-07-28 removeu sessões de protocolo e o stream GET do Streamable HTTP; notificações de mudança de lista passam a vir só por subscriptions/listen. Servidor que empurra sinal por canal próprio (campainha/doorbell) fica fora do padrão de transporte, e deve ser julgado como divergência por decisão ou atraso. VEREDITO EXAGERADA: A citação existe (com quebra de linha no meio). A primeira metade do claim é sustentada: a lista traz 'Removal of the GET stream endpoint' e 'Removal of protocol-level sessions', e 'Earlier Streamable HTTP Revisions' diz que sessão, GET e Last-Event-ID 'are not part of this revision'. As mudanças de lista e de recurso vêm numa requisição subscriptions/listen. A segunda metade não vem do texto. A página trata só do binding Streamable HTTP. Não diz nada sobre sinal por canal próprio, e a campainha não aparece. A página irmã basic/transports diz que clientes e servidores 'MAY implement additional [texto do motor cortado aqui; não completado de memória] (4) [mcp-spec] Servidores HTTP devem validar Origin (DNS rebinding), ligar só a localhost quando locais e autenticar todas as conexões. VEREDITO EXAGERADA: A citação está verbatim e cobre só o item 1, que é MUST (com 403 quando o Origin presente é inválido). O claim junta os itens 1-3 num mesmo 'devem'. O item 2 é 'SHOULD bind only to localhost (127.0.0.1) rather than all network interfaces (0.0.0.0)'. O item 3 é 'SHOULD implement proper authentication for all connections'. Isso importa para o julgamento por escolha: faltar o Origin é descumprir um MUST, e faltar bind em localhost ou autenticação é desvio de SHOULD. O claim apaga essa diferença. (5) [cloudevents-standard-webhooks] webhook-id deve servir de chave de idempotência no consumidor; o produtor reenvia até sucesso, com backoff exponencial por vários dias. VEREDITO EXAGERADA: A citação existe (sw.md l.234) e sustenta só a metade da idempotência. A metade do reenvio estica o texto (A2_CLAIM_ESTICA). Em 'Deliverability and reliability' (l.252) o produtor reenvia 'until a successful attempt or until it's determined that delivery may not be possible', não incondicionalmente até sucesso. A l.254 diz 'It's recommended to retry ... spanning multiple days, with an exponential backoff', ou seja, é recomendação, não exigência. A l.256 ainda recomenda desativar o endpoint depois de falha prolongada. (6) [cloudevents-standard-webhooks] No CloudEvents, source deve ser URI-reference não vazia e time, se presente, segue RFC 3339; envelope próprio sem esses campos não é CloudEvents. VEREDITO EXAGERADA: A citação existe (ce.md l.284) e vale para source, e time segue RFC 3339 'If present' (l.428). O fecho estica o texto (A2_CLAIM_ESTICA): time é OPTIONAL (ce.md l.427), então a falta de time não tira a conformidade. O que o texto sustenta é que faltar atributo REQUIRED (id, source, specversion, type) não é CloudEvent válido. (7) [claude-code-channels-hooks] The sandbox is the only OS-enforced boundary and covers shell commands only; hooks, MCP servers and file tools run outside it with full access; the escape hatch is closed only by managed settings. VEREDITO EXAGERADA: A citação existe verbatim, mas o claim estica em três pontos. (1) 'the only OS-enforced boundary': a página nunca diz 'only' e aponta contêiner/VM/sandbox runtime como outras fronteiras. (2) 'file tools ... with full access': a página diz 'full access' só para hooks e MCP locais; para as ferramentas de arquivo diz 'follow permission rules instead'. (3) 'closed only by managed settings': allowUnsandboxedCommands:false é configurável em sandbox settings em geral; managed settings é o caminho para exigir para todos, não o único. Também omite que o prompt '!' do usuário roda fora do sandbox. (8) [slsa] L2 exige autenticidade verificável da procedência (assinatura por chave só da plataforma), gerada pelo plano de controle e não pelo tenant; selo escrito pelo próprio script de publicação não cumpre. VEREDITO EXAGERADA: A citação existe, mas é um SHOULD, e o claim a apresenta como exigência entre parênteses. O que é MUST: 'Consumers MUST be able to validate the authenticity of the provenance attestation', 'The provenance MUST be generated by the control plane', 'The data in the provenance MUST be obtained from the build platform' e 'The build platform MUST have some security control to prevent tenants from tampering with the provenance'. A assinatura por chave exclusiva da plataforma é a via recomendada, não obrigatória. A conclusão sobre o selo do script de publicação é inferência do leitor: o texto não a ci [texto do motor cortado aqui; não completado de memória] (9) [slsa] O produtor deve distribuir a procedência aos consumidores, direto ou via ecossistema de pacotes. O vendor do kg-ssot e as portas precisam publicar a procedência junto do artefato. VEREDITO EXAGERADA: A primeira frase do claim está sustentada: a citação é literal e é seguida de 'MAY delegate this responsibility to the package ecosystem'. A segunda frase vai além. O texto exige distribuição da procedência aos consumidores, não publicação 'junto do artefato'. O enquadramento do vendor do kg-ssot e das portas como produtores sujeitos à regra é aplicação do leitor, não texto da spec. (10) [openssf-scorecard] SAST é detectado pela presença de apps conhecidos como CodeQL ou SonarCloud; sem eles o check não pontua, independentemente dos gates próprios do Onion (lint/selftest). VEREDITO EXAGERADA: A citação existe (quebrada em duas linhas, 1 ocorrência normalizada) e sustenta a primeira metade. O trecho completo diz que o check procura os apps 'in the recent (~30) merged PRs, or the use of \"github/codeql-action\" in a GitHub workflow', então há uma segunda via de detecção, o uso da action em workflow. A frase 'sem eles o check não pontua' não tem sustentação. A Note da seção diz o contrário: 'A project that fulfills this criterion with other tools may still receive a low score... A low score is therefore not a definitive indication that the project is at risk.' O documento diz 'low score [texto do motor cortado aqui; não completado de memória] (11) [nist-ai-rmf] No perfil GenAI, MS-2.8-003 pede histórico à prova de adulteração de cada geração, modificação ou compartilhamento de conteúdo, com rastreabilidade e controle de versão. VEREDITO EXAGERADA: A citação existe verbatim; 'tamper-proof' aparece com hífen de quebra de linha (tamper-/proof). O claim estica ao incluir 'controle de versão' como parte do que a ação pede. O texto só diz, em frase separada e opcional: 'Robust version control systems can also be applied to track changes across the AI lifecycle over time.' A ação também não menciona assinatura ou hash encadeado. Isso é verificação sugerida pelo leitor, e não exigência do documento. (12) [dora] DORA tem hoje cinco métricas, não quatro. Vazão: change lead time, deployment frequency e failed deployment recovery time. Instabilidade: change fail rate e deployment rework rate. A casa precisa medir o rework rate e usar o nome novo da recuperação, ou fica atrás. VEREDITO EXAGERADA: A citação existe verbatim, mas é só a definição de change lead time; não sustenta 'cinco métricas', o agrupamento nem o rework rate. O mesmo documento sustenta a parte factual por outros trechos: 'DORA has identified five software delivery performance metrics', 'from the original four keys to the current five-metric model'; Throughput lista lead time, deployment frequency e failed deployment recovery time; Instability lista change fail rate e deployment rework rate. A frase 'a casa precisa medir... ou fica atrás' é conclusão normativa do leitor, ausente do texto (A2_CLAIM_ESTICA). A página tam [texto do motor cortado aqui; não completado de memória] (13) [dora] Recuperação é medida só sobre deploy que falha e exige intervenção imediata (Failed deployment recovery time, que substitui o MTTR genérico). VEREDITO EXAGERADA: A citação existe verbatim e sustenta a primeira metade (recuperação de deploy que falha e exige intervenção imediata). Mas 'substitui o MTTR genérico' não está no texto: a página só diz 'changes like the move from MTTR to Failed Deployment Recovery Time' e remete a um artigo de histórico; não afirma 'substitui' nem classifica o MTTR como 'genérico' (A2_CLAIM_ESTICA). (14) [aaif-projects] A AAIF hospeda 10 projetos em aaif.io/projects; sobrepõem-se ao Onion: MCP, A2A, Agent Skills, AGENTS.md, Goose, agentgateway, OpenSandbox. VEREDITO AFIRMADA-SEM-CITACAO: REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A frase de abertura aparece em aaif.io/projects/. A página lista exatamente 10 projetos: Agent Router, Agent Skills, A2A, AGENTS.md, agentgateway, Goose, MCP, Open Responses, OpenEnv e OpenSandbox. Os 7 citados estão na lista. A sobreposição com o Onion é a leitura do leitor, e o texto não a contradiz. (15) [aaif-projects] AGENTS.md é formato aberto de guia para agentes de código; ponto de comparação com o CLAUDE.md do core. VEREDITO AFIRMADA-SEM-CITACAO: REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página traz 'AGENTS.md is a simple, open format for guiding coding agents.' com repo github.com/agentsmd/agents.md. A menção ao CLAUDE.md é contexto do leitor, não atribuída ao texto. (16) [okf-spec] Os tipos são livres e não há registro central, então nomes de tipo e ids do OKF não são governados. VEREDITO EXAGERADA: A quote existe (SPEC.md l.182) e sustenta só os valores de `type`: produtores SHOULD escolher valores descritivos, consumidores MUST tolerar tipos desconhecidos. A extensão a 'ids do OKF' não é sustentada: o Concept ID é o caminho do arquivo no bundle (l.79) e `sources[].id` é chave estável por entrada, usada pelas notas de rodapé (l.309, 351-363). O trecho não diz nada sobre governança desses ids. (17) [okf-spec] O PR #63 do Google (aberto, nov 2026) deprecia o repositório e leva o desenvolvimento a uma organização neutra, cujo repo estava privado e dava 404. VEREDITO NAO-ENCONTRADA: A string citada não aparece no PR (é paráfrase com aspas, como o próprio leitor admite). O texto real do comentário de amirhormati (2026-11-07 18:54Z) é: 'This repository is tied to Google and Google Cloud. We are moving the code to a repository that's neutral and allow for all industry players to contribute to it.' A substância do claim é sustentada: o PR #63 'Mark the repository as deprecated' está open, criado em 2026-11-06, aponta para open-knowledge-format/open-knowledge-format (spec v0.3); amirhormati escreveu 'The repository is private for now' em resposta a demisx ('I get 404'); hoje o [texto do motor cortado aqui; não completado de memória] (18) [okf-spec] O OKF versiona por `okf_version` no index.md raiz, com quebra permitida em versão maior; o padrão é jovem e instável. VEREDITO EXAGERADA: Quote verbatim em SPEC.md l.776-777 (quebra de linha após 'in a'). Sustenta a declaração opcional (MAY) de `okf_version` no index.md raiz; §12 também diz que major bump 'may make breaking changes'. 'Jovem e instável' não vem desse trecho: o documento é v0.2, o PR cita v0.3, e §13 relata duas quebras deliberadas v0.1→v0.2 dentro de um bump minor, o que sugere imaturidade, mas 'instável' é julgamento do leitor, não afirmação do texto. Também omite que consumidores que não entendem a versão SHOULD tentar consumo best-effort em vez de recusar."
+    trace: "run /onion-research de 2026-11-08, seções Claims ancoradas, Rejeitadas, Fontes inalcançáveis e Elenxo"
+    provenance:
+      source: "run /onion-research de 2026-11-08 (⟨journal do run⟩)"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada, conferida pelo escritor"
+      locality: "host"
+  - id: C_SUPERACAO_20261108_A2A_PUSH_NORMATIVE_DEGREES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A entrega por push do A2A com os graus certos: MUST tentar ao menos uma vez, MAY retry com backoff, MAY parar após falhas seguidas (§4.3.3); cliente MUST validar autenticidade e SHOULD processar idempotente (§13.2)."
+    narrative: "Medida: grep -nE 'at least once|MAY stop attempting|process notifications idempotently|validate webhook authenticity' em docs/specification.md do tag v1.0.0: ocorrências nas l.886-889, 3097-3099; também idênticas no tag v1.0.1 (l.3120 e vizinhas) e na main. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [a2a-spec] 5. A entrega por push do A2A é webhook com garantia de ao menos uma tentativa e possível duplicata; o cliente deve validar a autenticidade e processar de forma idempotente; análogo da campainha/vigia, sem dead-letter nem teto de reentrega normatizados. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sSL https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md | grep -nE 'process notifications idempotently|MAY stop attempting delivery|MUST validate webhook authenticity' # 'SHOULD process...idempotently' (SHOULD, não MUST) e 'MAY stop attempting delivery after a configured number of consecutive failures'"
+  - id: C_SUPERACAO_20261108_A2A_WEBHOOK_SSRF_IS_SHOULD
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O §13.2 do A2A com o grau certo: agentes SHOULD validar URLs de webhook contra SSRF (rejeitar IP privado), agentes MUST incluir credenciais no webhook e clientes MUST validar a autenticidade."
+    narrative: "Medida: grep -nE 'prevent SSRF|Reject private IP|MUST\\*\\* include authentication credentials|MUST\\*\\* validate webhook authenticity' em docs/specification.md do tag v1.0.0: l.3090-3091 e 3097; mesmas linhas, deslocadas, em v1.0.1 (l.3113-3120) e na main. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [a2a-spec] 6. No push o A2A exige credenciais no webhook e validação pelo cliente, e manda rejeitar faixas de IP privadas (anti-SSRF); mecanismo de autenticação é por AuthenticationInfo (esquema), não por JWKS local por membro. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sSL https://raw.githubusercontent.com/a2aproject/A2A/v1.0.0/docs/specification.md | grep -nE -B1 'Reject private IP ranges' | head # linha-mãe: 'Agents **SHOULD** validate webhook URLs to prevent SSRF'"
+  - id: C_SUPERACAO_20261108_MCP_CUSTOM_TRANSPORT_IS_THE_RULER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A régua sustentada para julgar canal próprio no MCP: a seção Custom Transports de basic/transports e as listas 'At a glance' e 'Earlier Streamable HTTP Revisions', sem afirmar que canal próprio está fora do padrão."
+    narrative: "Medida: WebFetch de .../2026-07-28/basic/transports.md e .../2026-07-28/basic/transports/streamable-http.md: o 'MAY implement additional custom transport mechanisms' e o 'None of these mechanisms are part of this revision' aparecem no texto; 'doorbell' e 'campainha' têm 0 ocorrências. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [mcp-spec] A revisão 2026-07-28 removeu sessões de protocolo e o stream GET do Streamable HTTP; notificações de mudança de lista passam a vir só por subscriptions/listen. Servidor que empurra sinal por canal próprio (campainha/doorbell) fica fora do padrão de transporte, e deve ser julgado como divergência por decisão ou atraso. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -s https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md | grep -n -iE 'doorbell|campainha|out-of-band|custom transport' ; curl -s https://modelcontextprotocol.io/specification/2026-07-28/basic/transports.md | grep -n -E 'MAY\\*\\* implement additional custom|transport-agnostic' (a 1ª busca devolve 0 linhas, a 2ª devolve as duas linhas que permitem transporte customizado)"
+  - id: C_SUPERACAO_20261108_MCP_HTTP_SECURITY_MODALS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A seção Security & Endpoint do MCP com os três modais corretos: MUST validar Origin, SHOULD ligar só a localhost e SHOULD autenticar as conexões. Dá uma régua por item para classificar alinhado, divergência ou atraso."
+    narrative: "Medida: WebFetch de .../2026-07-28/basic/transports/streamable-http.md: itens 1, 2 e 3 de 'Security & Endpoint' lidos verbatim, com os modais acima. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [mcp-spec] Servidores HTTP devem validar Origin (DNS rebinding), ligar só a localhost quando locais e autenticar todas as conexões. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -s https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md | grep -n -E 'SHOULD\\*\\* bind only to localhost|SHOULD\\*\\* implement proper authentication|MUST\\*\\* validate the `Origin`' (devolve 3 linhas: MUST só no Origin, SHOULD nos outros dois)"
+  - id: C_SUPERACAO_20261108_SW_RETRY_IS_RECOMMENDATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O reenvio do Standard Webhooks como recomendação (sw.md l.252-254): backoff exponencial por vários dias, até sucesso ou até concluir que a entrega é inviável."
+    narrative: "Medida: grep -nE -i 'retry|exponential|multiple days' em ⟨cópia baixada do standard-webhooks.md⟩: l.252 e l.254 confirmam o texto citado. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [cloudevents-standard-webhooks] webhook-id deve servir de chave de idempotência no consumidor; o produtor reenvia até sucesso, com backoff exponencial por vários dias. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "sed -n 252,254p ⟨cópia baixada do standard-webhooks.md⟩ # 'until a successful attempt or until it's determined that delivery may not be possible' e 'It's recommended to retry ... multiple days, with an exponential backoff'; palavra do claim sem sustentação: 'reenvia até sucesso' como regra firme"
+  - id: C_SUPERACAO_20261108_CE_TIME_IS_OPTIONAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "CloudEvents com a formulação correta (ce.md l.244 e l.416-428): obrigatórios id, source, specversion e type; time opcional, em RFC 3339 quando presente."
+    narrative: "Medida: grep -nE 'REQUIRED Attributes|OPTIONAL|RFC 3339' em ⟨cópia baixada do cloudevents spec.md⟩: l.244, l.427 e l.428 confirmam. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [cloudevents-standard-webhooks] No CloudEvents, source deve ser URI-reference não vazia e time, se presente, segue RFC 3339; envelope próprio sem esses campos não é CloudEvents. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "sed -n 416,428p ⟨cópia baixada do cloudevents spec.md⟩ # 'OPTIONAL' e 'If present, MUST adhere to ... RFC 3339'; palavra do claim sem sustentação: 'sem esses campos' aplicado a time"
+  - id: C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Sandbox com os limites exatos: seção 'What runs outside the sandbox', sandbox.enabled + failIfUnavailable: true + allowUnsandboxedCommands: false via managed settings, e o Claude Code inteiro em contêiner ou VM como fronteira completa."
+    narrative: "Medida: Reabertos os trechos literais por WebFetch em 2026-11-08; a configuração recomendada e a frase 'To put the tools, processes, and commands in this section behind one boundary, run the Claude Code process itself in a container, virtual machine, or the sandbox runtime' estão na página e entregam o valor que o claim prometia (fronteira completa e escape fechado), com os limites exatos. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [claude-code-channels-hooks] The sandbox is the only OS-enforced boundary and covers shell commands only; hooks, MCP servers and file tools run outside it with full access; the escape hatch is closed only by managed settings. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://code.claude.com/docs/en/sandboxing e procurar 'only OS-enforced' e 'full access' junto de 'file tools': 'only' não ocorre; 'run with your full access' qualifica só hooks, MCP locais, monitores, LSP e helpers; ferramentas de arquivo 'follow permission rules instead'"
+  - id: C_SUPERACAO_20261108_SLSA_L2_MUSTS_AND_SHOULD
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "SLSA L2 pelos graus certos da linha 'Provenance is Authentic': MUST validar autenticidade, MUST gerar no plano de controle, MUST impedir adulteração pelo tenant; a assinatura digital é o SHOULD, não a exigência."
+    narrative: "Medida: WebFetch da build-requirements v1.2 listou os MUST e o SHOULD da célula; a formulação corrigida reproduz o que cada palavra de força diz. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [slsa] L2 exige autenticidade verificável da procedência (assinatura por chave só da plataforma), gerada pelo plano de controle e não pelo tenant; selo escrito pelo próprio script de publicação não cumpre. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://slsa.dev/spec/v1.2/build-requirements e localizar a linha 'Provenance is Authentic': a assinatura vem com 'This SHOULD be through a digital signature', e os MUST são 'Consumers MUST be able to validate the authenticity' e 'The provenance MUST be generated by the control plane'. O claim chama de exigência (parênteses) o que é SHOULD."
+  - id: C_SUPERACAO_20261108_SLSA_DISTRIBUTE_PROVENANCE_TO_CONSUMERS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A seção Producer do SLSA com o MUST de distribuir a procedência aos consumidores e o MAY de delegar ao ecossistema de pacotes, sem a extensão 'junto do artefato' nem o enquadramento do vendor e das portas."
+    narrative: "Medida: WebFetch da build-requirements v1.2 devolveu a frase literal e a cláusula de delegação; a formulação corrigida reproduz as duas. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [slsa] O produtor deve distribuir a procedência aos consumidores, direto ou via ecossistema de pacotes. O vendor do kg-ssot e as portas precisam publicar a procedência junto do artefato. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://slsa.dev/spec/v1.2/build-requirements, seção Producer, 'Distribute provenance': o texto diz 'to artifact consumers' e permite delegar ao ecossistema. 'Junto do artefato' e 'precisam' para vendor/portas não aparecem."
+  - id: C_SUPERACAO_20261108_SCORECARD_SAST_DETECTION_AND_LOW_SCORE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O SAST do Scorecard pela seção do próprio documento: detecção por apps em PRs recentes ou por github/codeql-action em workflow; outras ferramentas podem levar nota baixa, não ausência de nota."
+    narrative: "Medida: curl -sL raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md | sed -n 531,550p; a Note e o parágrafo de detecção foram lidos no arquivo baixado e a formulação em 'corrected' deriva só deles. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [openssf-scorecard] SAST é detectado pela presença de apps conhecidos como CodeQL ou SonarCloud; sem eles o check não pontua, independentemente dos gates próprios do Onion (lint/selftest). Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "sed -n 531,550p ⟨cópia baixada do checks.md⟩ # trecho: 'or the use of \"github/codeql-action\" in a GitHub workflow' e 'may still receive a low score'; o claim 'sem eles o check não pontua' não é sustentado (o texto diz 'low score', não zero)"
+  - id: C_SUPERACAO_20261108_NIST_MS_2_8_003_VERSION_CONTROL_OPTIONAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A MS-2.8-003 do perfil GenAI como padrão de procedência à prova de adulteração, com controle de versão como adição opcional ('can also be applied'), sem assinatura nem hash encadeado."
+    narrative: "Medida: pdftotext -layout de NIST.AI.600-1.pdf; grep -n -A3 'MS-2.8-003' devolve as linhas 1884-1888 com a frase 'Robust version control systems can also be applied to track changes across the AI lifecycle over time.' Critério: A2_CLAIM_ESTICA. Alvo reprovado: [nist-ai-rmf] No perfil GenAI, MS-2.8-003 pede histórico à prova de adulteração de cada geração, modificação ou compartilhamento de conteúdo, com rastreabilidade e controle de versão. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "pdftotext -layout NIST.AI.600-1.pdf - | grep -n -A3 'MS-2.8-003' # linha seguinte: 'Robust version control systems can also be applied' — 'can also' é opcional; nenhuma ocorrência de assinatura/hash na ação"
+  - id: C_SUPERACAO_20261108_DORA_FIVE_METRICS_MODEL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O modelo DORA de cinco métricas pelos trechos do mesmo guia ('DORA has identified five software delivery performance metrics', 'the current five-metric model') e a definição de Deployment rework rate, sem o 'fica atrás'."
+    narrative: "Medida: WebFetch duas vezes de dora.dev/guides/dora-metrics-four-keys: listagem dos grupos Throughput e Instability e das definições verbatim, data 5 jan 2026. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [dora] DORA tem hoje cinco métricas, não quatro. Vazão: change lead time, deployment frequency e failed deployment recovery time. Instabilidade: change fail rate e deployment rework rate. A casa precisa medir o rework rate e usar o nome novo da recuperação, ou fica atrás. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://dora.dev/guides/dora-metrics-four-keys e conferir que a citação 'The amount of time it takes for a change to go from committed to version control to deployed in production.' é só a definição de Change lead time, sem 'five', 'rework' ou 'fica atrás'; a contagem está em 'DORA has identified five software delivery performance metrics'"
+  - id: C_SUPERACAO_20261108_DORA_RECOVERY_MOVE_FROM_MTTR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Recuperação DORA medida só sobre deploy com falha, apoiada na frase 'the move from MTTR to Failed Deployment Recovery Time', sem dizer 'substitui' nem 'genérico'."
+    narrative: "Medida: WebFetch de dora.dev/guides/dora-metrics-four-keys perguntando se a página diz que substitui ou renomeia o MTTR: resposta, não diz explicitamente, descreve um 'move'. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [dora] Recuperação é medida só sobre deploy que falha e exige intervenção imediata (Failed deployment recovery time, que substitui o MTTR genérico). Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://dora.dev/guides/dora-metrics-four-keys e buscar 'MTTR': só aparece 'the move from MTTR to Failed Deployment Recovery Time'; nenhuma ocorrência de 'replaces' ou 'generic'"
+  - id: C_SUPERACAO_20261108_OKF_TYPES_FREE_NOT_IDS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "OKF §4.1 e §11 com o alcance correto: tipos sem registro central e consumidores MUST NOT rejeitar tipo desconhecido; a afirmação não se estende aos ids."
+    narrative: "Medida: grep -n 'registered centrally' e leitura de SPEC.md l.180-190 e l.736-760 no arquivo baixado; o trecho entrega o valor real do claim (tipos livres) sem o salto para ids. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [okf-spec] Os tipos são livres e não há registro central, então nomes de tipo e ids do OKF não são governados. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sL https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md | sed -n 180,190p # o trecho fala só de 'Type values'; 'ids' não aparece; ver também grep -n 'Concept ID' (l.79)"
+  - id: C_SUPERACAO_20261108_OKF_PR63_VERBATIM_COMMENT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O comentário verbatim de amirhormati no PR #63 do OKF ('This repository is tied to Google and Google Cloud...') e o 'private for now' entregam o que a claim queria, com citação exata."
+    narrative: "Medida: Baixei o HTML do PR com curl e extraí os comentários; grep -F da frase verbatim: encontrada; curl -w '%{http_code}' em github.com/open-knowledge-format/open-knowledge-format, API e raw SPEC.md: 404 nos três; api.github.com/orgs/open-knowledge-format: 200. Critério: A1_QUOTE_AUSENTE. Alvo reprovado: [okf-spec] O PR #63 do Google (aberto, nov 2026) deprecia o repositório e leva o desenvolvimento a uma organização neutra, cujo repo estava privado e dava 404. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sL https://github.com/GoogleCloudPlatform/open-knowledge-format/pull/63 | grep -c -F 'the current repo is' ; curl -sL https://github.com/GoogleCloudPlatform/open-knowledge-format/pull/63 | grep -o -F 'This repository is tied to Google and Google Cloud'"
+  - id: C_SUPERACAO_20261108_OKF_YOUNG_WITH_BREAKS_NOT_UNSTABLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "OKF §12 e §13 sustentam 'jovem e com quebras já ocorridas' (v0.2, quebras de v0.1 para v0.2, consumo best-effort em versão desconhecida, PR #63 citando v0.3), sem o adjetivo 'instável'."
+    narrative: "Medida: Leitura de SPEC.md l.764-782 e l.815-835 e do corpo do PR via API (menciona 'spec v0.3'); sustenta 'jovem e com quebras já ocorridas', sem o adjetivo 'instável'. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [okf-spec] O OKF versiona por `okf_version` no index.md raiz, com quebra permitida em versão maior; o padrão é jovem e instável. Registro da reprovação: E_LACUNAS_OUTSIDE_IN_1108. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sL https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/main/SPEC.md | sed -n 764,782p # o trecho §12 não contém 'young', 'unstable' nem equivalente; 'instável' é a palavra do claim que ele não sustenta"
+  - id: C_SUPERACAO_20261108_CC_ONFAILURE_BLOCK_CLOSES_TIMEOUT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "onFailure: block nas guardas de PreToolUse fecha o timeout."
+    narrative: "Medida: settings.json lido: 7 de 9 PreToolUse com block; doc l.891 e l.984 reabertas em 2026-11-08. Reconferência do escritor em .claude/settings.json@8fb21e2f7: 8 de 10 com block. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: 15 [claude-code-channels-hooks] hook com timeout não é gate Registro da reprovação: E_OBJECAO_CC_TIMEOUT_EXCEPTION_ONFAILURE. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sSL https://code.claude.com/docs/en/hooks.md | grep -n 'whose failure blocks the action'; python3 -I -c \"import json;s=json.load(open('.claude/settings.json'));print([k.get('onFailure') for g in s['hooks']['PreToolUse'] for k in g['hooks']])\""
+  - id: C_SUPERACAO_20261108_KG_SSOT_RELEASE_ATTESTATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "actions/attest-build-provenance no release.yml do kg-ssot."
+    narrative: "Medida: gh attestation verify rc=0 no wheel 4.46.0, 1 atestação com predicate SLSA v1; vale para o artefato de release, não para as portas nem para o vendor. Critério: E2_PROVA_MENOS. Alvo reprovado: 18 [slsa] régua da build track Registro da reprovação: E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT. Afirmação de UM juiz (motor de superação)."
+    trace: "gh release download kg-ssot-v4.46.0 -R marciocar/kg-ssot -p 'kg_ssot-4.46.0-py3-none-any.whl' -D \"$(mktemp -d)\"; gh attestation verify <wheel> --repo marciocar/kg-ssot --format json; grep -n -iE 'attest|sigstore|slsa' ops/publish-door.sh"
+  - id: C_SUPERACAO_20261108_KG_PROV_EXPORT_DELIVERS_PROV_O
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "kg_prov_export.py entrega a exportação para PROV-O."
+    narrative: "Medida: Rodado no core em 2026-11-08: rc=0 e JSON-LD com Entity, wasDerivedFrom e Activity. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: 38 [w3c-prov-shacl] 'hoje é mapeamento nosso, não padrão adotado' Registro da reprovação: E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS. Afirmação de UM juiz (motor de superação)."
+    trace: "python3 -I ⟨clone do onion-messaging⟩/vendor/kg-ssot/tools/kg_prov_export.py docs/onion/graph/onion-identity-2026-07.kg.yaml | grep -c 'prov:wasDerivedFrom'"
+  - id: Q_MAIN_RULESET_FORCE_PUSH_1112
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    x_due: "2026-11-12"
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "gh api repos/marciocar/onion-evolve/rules/branches/main em 2026-11-08: só required_status_checks; /branches/main/protection: 404 Branch not protected"
+    label: "O ruleset da main do core barra force push e deleção, além dos status checks? Ato do maestro: configuração do repo público."
+    narrative: "Remedido em 2026-11-08: a main não tem proteção de branch (404), e o único ruleset ativo (onion-main-required-checks, alvo a branch default) só tem a regra required_status_checks. O hook local não protege o remoto. Pela leitura do Elenxo isso reprova no Tier 1 do Scorecard; o binário do Scorecard não foi rodado. Pronto quando: `gh api repos/marciocar/onion-evolve/rules/branches/main --jq '[.[].type]'` lista `non_fast_forward` e `deletion`. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-360. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+  - id: Q_MESSAGING_SOURCE_URI_REFERENCE_1115
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: onion-messaging
+    x_due: "2026-11-15"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "queue/onion_queue/daemon.py na main ead81baea506 via API, 2026-11-08: _clean_attr confere só str, não vazio, até 256 e isprintable; espaço passa; diffs dos PRs #8, #9 e #10: 0 menções a URI-reference ou urisplit"
+    label: "A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma."
+    narrative: "Remedido em 2026-11-08: `_clean_attr` aceita qualquer texto imprimível até 256 caracteres, inclusive com espaço, e `parse_cloudevent` usa o resultado como `source`. Os PRs abertos #8, #9 e #10 não mudam isso. O `parse_cloudevent` de .claude/utils/federation-transport/a2a-metrics.py, no core, tem a mesma régua (medido na mesma data), então a correção olha os dois lados. A dedupe com remetente segue divergência por decisão, fora deste item. Pronto quando: `parse_cloudevent` recusa `source` que não é URI-reference (caso negativo com espaço na bancada queue/test), e a régua do par em a2a-metrics.py fica igual ou a diferença fica declarada. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-361. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+  - id: Q_CORE_ACTIONS_SHA_PIN_1116
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-16"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "grep de uses: em .github/workflows na origin/main 8fb21e2f7, 2026-11-08: 19 uses, 7 por SHA e 12 por tag (checkout@v5 8x, upload-artifact@v4 3x, download-artifact@v4 1x), em 4 workflows; .github/dependabot.yml ausente"
+    label: "As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada?"
+    narrative: "Remedido em 2026-11-08: 12 de 19 uses por tag móvel, todas actions/* (checkout@v5, upload-artifact@v4, download-artifact@v4), em onion-door-staleness, onion-validate, onion-selftest e onion-review. O onion-messaging exige SHA no CI dele, então o core está atrás do próprio produto. Não há .github/dependabot.yml. Pinar sem atualização cria defasagem, o que a doutrina de versão atual proíbe: o item inclui a atualização. Pronto quando: `grep -rhE 'uses:' .github/workflows | grep -vcE '@[0-9a-f]{40}'` dá 0, a atualização das actions está declarada, e uma guarda impede a volta da tag móvel. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-362. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+  - id: Q_CORE_AGENT_CARD_A2A_1_0_1118
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-18"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "docs/onion/agent-card.json na origin/main 8fb21e2f7 e curl dos authorizationUrl e tokenUrl, 2026-11-08: protocolVersion 0.3.0, sem supportedInterfaces, os dois endpoints 404; gh api repos/a2aproject/A2A/releases/latest: v1.0.1"
+    label: "O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem?"
+    narrative: "Remedido em 2026-11-08: o card publicado diz protocolVersion 0.3.0, valor fixado no gerador .claude/validation/a2a-agent-card.sh, e não tem supportedInterfaces; a última release do A2A é v1.0.1. securitySchemes declara oauth2 cujos dois endpoints dão 404 e exige oauth2 ou mutualTLS em `security`. Pela objeção do Elenxo, não remedida aqui, o gate real é JWS RS256 com kid pinado, que o card não declara. Pronto quando: O card declara versão 1.x com supportedInterfaces, ou um D_ selado registra a divergência; toda URL em securitySchemes responde diferente de 404; o esquema real está declarado; regenerar pelo .claude/validation/a2a-agent-card.sh não deixa diff. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-363. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+  - id: Q_DOORS_ATTESTATION_1130
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-30"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "gh api nas 4 portas, 2026-11-08: releases 0, .github/workflows 404, tags 11 a 12; grep -c attest em ops/publish-door.sh e ops/materialize-door.sh: 0 e 0; nenhum workflow do core com attest-build-provenance"
+    label: "Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit."
+    narrative: "Remedido em 2026-11-08: onion-core, onion-standalone, onion-plugins e onion-mini têm tags (11 a 12), nenhuma release, nenhum workflow e nenhuma atestação; o motor de publicação não menciona atestação. Consequência a resolver no desenho: não há artefato nem plano de controle que hoje assine, e a atestação da release do kg-ssot é outro objeto. Nível SLSA não se afirma: L3 não foi medido. Pronto quando: `gh attestation verify` passa no artefato da última publicação de cada uma das 4 portas, com o `--repo` da porta; ou um D_ selado registra por que a porta fica sem atestação. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-364. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+  - id: Q_KG_VENDOR_VERIFY_ATTESTATION_1130
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    x_due: "2026-11-30"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "tools/kg_vendor.py na main d3b1cc1fe1b1, que é a tag kg-ssot-v4.46.0, via API, 2026-11-08: 0 menções a attest; leitura por git archive da tag; o carimbo guarda commit e sha256; o vendor do core está em 4.46.0"
+    label: "O kg_vendor verifica a atestação do que traz, ou segue confiando na tag?"
+    narrative: "Remedido em 2026-11-08 na 4.46.0, a versão que o core já tem vendorizada: o kg_vendor lê por `git archive` da tag, carimba commit e sha256 de cada arquivo e confere esse carimbo depois, mas nunca verifica atestação. A atestação da release cobre artefatos, e o vendor consome uma árvore que ela não cobre. O digest já existe; o que falta é a procedência do que é consumido. Pronto quando: O update do kg_vendor sai com rc diferente de 0 quando a atestação do que ele traz não verifica, com caso negativo na bancada do kg-ssot; ou o kg-ssot sela por que a tag basta. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-365. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+  - id: Q_KG_PROV_AGENT_1208
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    x_due: "2026-12-08"
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "tools/kg_prov_export.py na main d3b1cc1fe1b1 via API, 2026-11-08: grep -ci agent dá 0"
+    label: "O exportador PROV-O do kg-ssot emite o agente, ou declara por que não?"
+    narrative: "Remedido em 2026-11-08: o exportador de PROV-O em JSON-LD existe e emite Entity e Activity, mas `grep -ci agent` dá 0: das três classes centrais de PROV, Agent não sai. O veredito é alinhado por exportador, sem agente; não é 'sem mapeamento'. As arestas fora de wasDerivedFrom são divergência por decisão e ficam fora deste item. Pronto quando: O exportador emite prov:Agent com a relação de atribuição quando o nó nomeia o autor, com caso na bancada; ou o kg-ssot sela por que o contrato não leva agente. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-366. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
+edges:
+  - from: E_A2A_AGENT_CARD_IS_SERVER_MANIFEST
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_A2A_CARD_SIGNATURE_OPTIONAL_JWS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_A2A_CARD_SIGNATURE_OPTIONAL_JWS
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_A2A_AUTH_DECLARED_IN_CARD_OUT_OF_BAND
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_A2A_TASK_STATES_TERMINAL_INTERRUPTED
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_MCP_NOTIFICATIONS_VIA_SUBSCRIPTIONS_LISTEN
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_MCP_AUTH_OPTIONAL_STDIO_NO_OAUTH
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_MCP_AUTH_OPTIONAL_STDIO_NO_OAUTH
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_MCP_TOKEN_AUDIENCE_NO_PASSTHROUGH
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_MCP_PROMPTS_LIST_ONLY_WITH_CAPABILITY
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_MCP_PROMPTS_LIST_ONLY_WITH_CAPABILITY
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_STDWEBHOOKS_THREE_HEADERS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_STDWEBHOOKS_SIGNED_CONTENT
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_STDWEBHOOKS_SIGNED_CONTENT
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_STDWEBHOOKS_TIMESTAMP_TOLERANCE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_STDWEBHOOKS_TIMESTAMP_TOLERANCE
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_CLOUDEVENTS_REQUIRED_ATTRS_SOURCE_ID_UNIQUE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_CC_EXIT2_BLOCKABLE_EVENTS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_CC_EXIT2_BLOCKABLE_EVENTS
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_CC_HOOK_FAIL_OPEN_ONFAILURE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_CC_HOOK_FAIL_OPEN_ONFAILURE
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_CC_PRETOOLUSE_TIMEOUT_NOT_GATE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_CC_PERMISSIONS_DENY_ASK_ALLOW
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_CC_CHANNELS_PREVIEW_ALLOWLIST
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_CC_CHANNELS_PREVIEW_ALLOWLIST
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_SLSA_BUILD_TRACK_LEVELS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SLSA_L1_PROVENANCE_DIGEST
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SLSA_L3_UNFORGEABLE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SLSA_CONSUMER_VERIFICATION
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SLSA_CONSUMER_VERIFICATION
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_SCORECARD_BRANCH_PROTECTION
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SCORECARD_TOKEN_PERMISSIONS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SCORECARD_PINNED_DEPENDENCIES
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SCORECARD_SIGNED_RELEASES
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_NIST_GOVERN_3_2
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_NIST_MANAGE_2_4
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_NIST_MANAGE_4_1
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_NIST_MANAGE_4_3
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_NIST_600_POST_INCIDENT_REVIEW
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_DORA_INSTABILITY_CHANGE_FAIL
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_DORA_2025_AI_AMPLIFIER
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_DORA_2025_THROUGHPUT
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_AAIF_A2A_HOSTED
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_AAIF_A2A_HOSTED
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_AAIF_AGENT_SKILLS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_AAIF_MCP_HOSTED
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_AAIF_WORKING_GROUPS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_PROVO_THREE_CLASSES
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_PROVO_AGENT_DELEGATION
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_PROVO_AGENT_DELEGATION
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_PROVO_BUNDLES
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SHACL_SEVERITY
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_SHACL_CONFORMS_FROM_RESULTS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_RDF12_CR_REIFYING_TRIPLE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_RDF12_CR_REIFYING_TRIPLE
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OKF_ONLY_TYPE_REQUIRED
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_OKF_TOLERATE_UNKNOWN_KEYS
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_OKF_TOLERATE_UNKNOWN_KEYS
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OKF_LIGHT_PROVENANCE
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_OKF_LIGHT_PROVENANCE
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_A2A_CARD_STILL_0_3_0
+    to: E_A2A_AGENT_CARD_IS_SERVER_MANIFEST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A2A_CARD_STILL_0_3_0
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_A2A_CARD_DECLARES_DEAD_OAUTH
+    to: E_A2A_AUTH_DECLARED_IN_CARD_OUT_OF_BAND
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A2A_CARD_DECLARES_DEAD_OAUTH
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_A2A_TASKSTATE_IS_NOT_DELIVERY_ACK
+    to: E_A2A_TASK_STATES_TERMINAL_INTERRUPTED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MCP_LISTEN_DOES_NOT_APPLY_TO_STDIO_BELL
+    to: E_MCP_NOTIFICATIONS_VIA_SUBSCRIPTIONS_LISTEN
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MCP_AUDIENCE_NOT_APPLICABLE
+    to: E_MCP_TOKEN_AUDIENCE_NO_PASSTHROUGH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_WATCHER_RECEIVES_AND_IS_IN_OPEN_PR
+    to: E_STDWEBHOOKS_THREE_HEADERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CLOUDEVENTS_SOURCE_FORM_NOT_VALIDATED
+    to: E_CLOUDEVENTS_REQUIRED_ATTRS_SOURCE_ID_UNIQUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CLOUDEVENTS_SOURCE_FORM_NOT_VALIDATED
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_CC_TIMEOUT_EXCEPTION_ONFAILURE
+    to: E_CC_PRETOOLUSE_TIMEOUT_NOT_GATE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE
+    to: E_CC_PERMISSIONS_DENY_ASK_ALLOW
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT
+    to: E_SLSA_BUILD_TRACK_LEVELS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SLSA_VENDOR_DIGEST_EXISTS_CONSUMED_TREE_UNATTESTED
+    to: E_SLSA_L1_PROVENANCE_DIGEST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLSA_VENDOR_DIGEST_EXISTS_CONSUMED_TREE_UNATTESTED
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SLSA_L3_NOT_MEASURED
+    to: E_SLSA_L3_UNFORGEABLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCORECARD_MAIN_NO_FORCE_PUSH_BLOCK
+    to: E_SCORECARD_BRANCH_PROTECTION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCORECARD_MAIN_NO_FORCE_PUSH_BLOCK
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SCORECARD_TOPLEVEL_WRITE_TOKENS
+    to: E_SCORECARD_TOKEN_PERMISSIONS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCORECARD_12_ACTIONS_UNPINNED
+    to: E_SCORECARD_PINNED_DEPENDENCIES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCORECARD_12_ACTIONS_UNPINNED
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SCORECARD_ATTESTATION_NOT_IN_ASSETS
+    to: E_SCORECARD_SIGNED_RELEASES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NIST_GOVERN_3_2_NOT_COMPARED
+    to: E_NIST_GOVERN_3_2
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NIST_MANAGE_2_4_NOT_COMPARED
+    to: E_NIST_MANAGE_2_4
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NIST_MANAGE_4_1_NOT_COMPARED
+    to: E_NIST_MANAGE_4_1
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NIST_MANAGE_4_3_NOT_COMPARED
+    to: E_NIST_MANAGE_4_3
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NIST_600_NO_OWNER_NO_MEASURE
+    to: E_NIST_600_POST_INCIDENT_REVIEW
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DORA_NO_METRIC_MEASURED_IN_HOUSE
+    to: E_DORA_INSTABILITY_CHANGE_FAIL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DORA_AMPLIFIER_NO_CHOICE_TO_JUDGE
+    to: E_DORA_2025_AI_AMPLIFIER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DORA_BLOG_NOT_REPORT
+    to: E_DORA_2025_THROUGHPUT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AAIF_SKILLS_NOT_COMPARED
+    to: E_AAIF_AGENT_SKILLS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AAIF_MCP_OPTIONAL_ONLY_FOR_TASK_MANAGER
+    to: E_AAIF_MCP_HOSTED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AAIF_MCP_OPTIONAL_ONLY_FOR_TASK_MANAGER
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_AAIF_NEGATIVES_WITHOUT_QUOTE
+    to: E_AAIF_WORKING_GROUPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS
+    to: E_PROVO_THREE_CLASSES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_PROV_DERIVATION_ANALOGY_REFUSED_BY_KG_SSOT
+    to: E_PROVO_BUNDLES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PROV_DERIVATION_ANALOGY_REFUSED_BY_KG_SSOT
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SHACL_JSON_REPORT_EXISTS_NOT_SHACL
+    to: E_SHACL_SEVERITY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SHACL_CONFORMS_CORE_GATES_UNMEASURED
+    to: E_SHACL_CONFORMS_FROM_RESULTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OKF_V0_3_UNREACHABLE
+    to: E_OKF_ONLY_TYPE_REQUIRED
+    edge_type: CONSTRAINS
+  - from: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: Q_SANDBOX_DENY_LAYER_DECISION_1108
+    to: E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE
+    edge_type: TRACES_TO
+  - from: Q_SANDBOX_DENY_LAYER_DECISION_1108
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_OUTSIDE_IN_1108
+    to: Q_OUTSIDE_IN_PRIMARIES_1108
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_OUTSIDE_IN_1108
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261108_A2A_PUSH_NORMATIVE_DEGREES
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_A2A_WEBHOOK_SSRF_IS_SHOULD
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_MCP_CUSTOM_TRANSPORT_IS_THE_RULER
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_MCP_HTTP_SECURITY_MODALS
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_SW_RETRY_IS_RECOMMENDATION
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_CE_TIME_IS_OPTIONAL
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_SLSA_L2_MUSTS_AND_SHOULD
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_SLSA_DISTRIBUTE_PROVENANCE_TO_CONSUMERS
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_SCORECARD_SAST_DETECTION_AND_LOW_SCORE
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_NIST_MS_2_8_003_VERSION_CONTROL_OPTIONAL
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_DORA_FIVE_METRICS_MODEL
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_DORA_RECOVERY_MOVE_FROM_MTTR
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_OKF_TYPES_FREE_NOT_IDS
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_OKF_PR63_VERBATIM_COMMENT
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_OKF_YOUNG_WITH_BREAKS_NOT_UNSTABLE
+    to: E_LACUNAS_OUTSIDE_IN_1108
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_CC_ONFAILURE_BLOCK_CLOSES_TIMEOUT
+    to: E_OBJECAO_CC_TIMEOUT_EXCEPTION_ONFAILURE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_KG_SSOT_RELEASE_ATTESTATION
+    to: E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261108_KG_PROV_EXPORT_DELIVERS_PROV_O
+    to: E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS
+    edge_type: TRACES_TO
+  - from: Q_MAIN_RULESET_FORCE_PUSH_1112
+    to: E_OBJECAO_SCORECARD_MAIN_NO_FORCE_PUSH_BLOCK
+    edge_type: TRACES_TO
+  - from: Q_MAIN_RULESET_FORCE_PUSH_1112
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO
+  - from: Q_MESSAGING_SOURCE_URI_REFERENCE_1115
+    to: E_OBJECAO_CLOUDEVENTS_SOURCE_FORM_NOT_VALIDATED
+    edge_type: TRACES_TO
+  - from: Q_MESSAGING_SOURCE_URI_REFERENCE_1115
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO
+  - from: Q_CORE_ACTIONS_SHA_PIN_1116
+    to: E_OBJECAO_SCORECARD_12_ACTIONS_UNPINNED
+    edge_type: TRACES_TO
+  - from: Q_CORE_ACTIONS_SHA_PIN_1116
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO
+  - from: Q_CORE_AGENT_CARD_A2A_1_0_1118
+    to: E_OBJECAO_A2A_CARD_STILL_0_3_0
+    edge_type: TRACES_TO
+  - from: Q_CORE_AGENT_CARD_A2A_1_0_1118
+    to: E_OBJECAO_A2A_CARD_DECLARES_DEAD_OAUTH
+    edge_type: TRACES_TO
+  - from: Q_CORE_AGENT_CARD_A2A_1_0_1118
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO
+  - from: Q_DOORS_ATTESTATION_1130
+    to: E_OBJECAO_SLSA_LEVEL_DIFFERS_BY_ARTIFACT
+    edge_type: TRACES_TO
+  - from: Q_DOORS_ATTESTATION_1130
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO
+  - from: Q_KG_VENDOR_VERIFY_ATTESTATION_1130
+    to: E_OBJECAO_SLSA_VENDOR_DIGEST_EXISTS_CONSUMED_TREE_UNATTESTED
+    edge_type: TRACES_TO
+  - from: Q_KG_VENDOR_VERIFY_ATTESTATION_1130
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO
+  - from: Q_KG_PROV_AGENT_1208
+    to: E_OBJECAO_PROV_EXPORTER_ALREADY_EXISTS
+    edge_type: TRACES_TO
+  - from: Q_KG_PROV_AGENT_1208
+    to: C_ELENXO_VERDICTS_BY_CHOICE_1108
+    edge_type: TRACES_TO

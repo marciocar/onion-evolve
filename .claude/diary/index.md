@@ -1,10 +1,10 @@
-# Diário — diary-review-1108
+# Diário — outside-in-closeout
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 133 entradas · **Stale:** 0 · **Compartilháveis:** 121 · **Com significância:** 55
+**Total:** 134 entradas · **Stale:** 0 · **Compartilháveis:** 122 · **Com significância:** 55
 
 Gerado em: 2026-11-08
 
@@ -12,6 +12,7 @@ Gerado em: 2026-11-08
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-11-08 | learning | public 📤 | primaries-norm-without-house-measure | — | 2027-02-06 | dynamic |
 | 2026-11-03 | innovation | public 📤 | stub-de-modelo-para-medir-harness | Uma matriz de 108 células que não cabia em 9 horas de CPU com um modelo de 9B rodou em minutos, sem falta de tentativa do modelo e sem o limite de transporte de ~900 s. | 2027-02-01 | conditional |
 | 2026-11-03 | reflection | collective 📤 | revisao-cruzada-em-tres-camadas | Mais de 60 achados reais pegos antes de qualquer veredito valer, em três artefatos num só dia; três dariam BARRA falso e um ligaria um gatilho por ausência. | 2027-02-01 | static |
 | 2026-11-03 | decision | collective 📤 | regra-do-medidor-reclassifica-sem-sobrescrever | Separa consertar o instrumento de mudar o critério depois do dado — e o registro de quem classificou e quando passa a ser parte da evidência. | 2027-02-01 | static |
