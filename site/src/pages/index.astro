@@ -5,7 +5,8 @@
 // O QUE MUDOU do legado (e por quê):
 //   · nav → vive no Base.astro (a canônica tem 6 entradas; o legado tinha 8)
 //   · números de INVENTÁRIO → vêm do site-stamp (classe inventario-vivo), nunca hand-coded
-//   · números CONGELADOS (448 PRs, 951 commits, membros/linhagens) → texto + carimbo de data
+//   · números CONGELADOS (PRs, commits, registro da federação) → texto + carimbo de data
+//     (re-medidos em 2026-11-08; os comandos estão no corpo do PR que os trocou)
 //   · faixa "🍞 As migalhas" → render da coleção (o legado tinha 4 posts hand-coded, drifted)
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
@@ -65,11 +66,11 @@ const heroTerm = `
     <strong>grafo vivo e verificável</strong>: o cérebro operacional de onde sai código, compliance e produto —
     com trilha que você <strong>audita</strong>, não um palpite de IA.</p>
     <div class="hero-ctas">
-      <a class="btn btn-p" href="/mini/">▶ Ver funcionando no seu repo · 5 min</a>
+      <a class="btn btn-p" href="https://github.com/marciocar/onion-mini">▶ Começar pelo Onion Mini, no seu repo</a>
       <a class="btn btn-s" href="#prova">A prova viva ↓</a>
     </div>
     <ul class="hero-mech" aria-label="O mecanismo, em provas">
-      <li><b>exit 2</b> — o gate <em>barra a ação</em> antes de executar, provado inclusive sob <code>bypassPermissions</code></li>
+      <li><b>exit 2</b> — o gate <em>barra a ação</em> antes de executar, inclusive sob <code>bypassPermissions</code>. É camada de conformidade, não fronteira de segurança: medimos o que o fura, e publicamos</li>
       <li><b>0 tokens</b> — a verificação é determinística (shell puro): nenhum LLM julgando LLM no caminho crítico</li>
       <li><b>catraca</b> — liga o gate hoje num repo legado: o passivo congela em baseline versionada e <em>só desce</em></li>
     </ul>
@@ -154,7 +155,7 @@ const heroTerm = `
     registrada em cada etapa, não só no código. {inv.comandos} comandos, {inv.agentes} agentes e {inv.skills} skills
     de orquestração, sem mudar uma linha do que você já tem.</p>
     <div class="dims">
-      <div class="dim"><span class="ico" aria-hidden="true">🎯</span><h3>Produto</h3><p>Da descoberta ao backlog: dores viram specs com critérios de aceite testáveis — sincronizadas no seu task manager (Jira, ClickUp, Asana, Linear) por uma única abstração.</p></div>
+      <div class="dim"><span class="ico" aria-hidden="true">🎯</span><h3>Produto</h3><p>Da descoberta ao backlog: dores viram specs com critérios de aceite testáveis — sincronizadas no seu task manager (Jira, ClickUp, Asana, Linear, Zoho Projects) por uma única abstração.</p></div>
       <div class="dim"><span class="ico" aria-hidden="true">⚙️</span><h3>Engenharia</h3><p>Do plano ao PR: workflows faseados e retomáveis — feche o laptop na terça, a sessão continua na quarta do exato ponto em que parou.</p></div>
       <div class="dim"><span class="ico" aria-hidden="true">🛡️</span><h3>Compliance</h3><p>ISO 27001, SOC2, PMBOK e ISO 22301 no mesmo ciclo — documentação de conformidade gerada do estado real, não de um template morto.</p></div>
     </div>
@@ -198,7 +199,7 @@ const heroTerm = `
       <div class="method"><h3>Declarado ≠ Verificado</h3><p>Nenhum carimbo, status ou tabela é aceito como fato sem o artefato que o comprove. Guardas determinísticas fazem a cobrança.</p></div>
       <div class="method"><h3>SDAAL — o adapter do Transformer</h3><p>O contrato que deixa a IA <b>intercambiar ações</b> com qualquer sistema externo sem reaprender nada: a spec define O QUÊ, o adapter resolve O COMO — task manager, forge, grafo e federação inteira.</p></div>
     </div>
-    <p style="text-align:center;margin-top:1.4rem"><a class="mentor-link" href="/doutrinas/">Ver as 8 doutrinas com nome próprio →</a></p>
+    <p style="text-align:center;margin-top:1.4rem"><a class="mentor-link" href="/doutrinas/">Ver as 7 doutrinas com nome próprio →</a></p>
   </div>
 </section>
 
@@ -211,14 +212,14 @@ const heroTerm = `
       <div class="num"><b data-n={inv.agentes}>0</b><span>agentes</span></div>
       <div class="num"><b data-n={inv.kbs}>0</b><span>knowledge bases</span></div>
       <div class="num"><b data-n={inv.skills}>0</b><span>skills de orquestração</span></div>
-      <div class="num"><b data-n="4">0</b><span>membros federados</span></div>
-      <div class="num"><b data-n="7">0</b><span>linhagens vivas</span></div>
-      <div class="num"><b data-n="667">0</b><span>PRs mergeados</span></div>
-      <div class="num"><b data-n="2">0</b><span>produtos federados no ar</span></div>
+      <div class="num"><b data-n="24">0</b><span>adotantes registrados</span></div>
+      <div class="num"><b data-n="6">0</b><span>membros com chave A2A</span></div>
+      <div class="num"><b data-n="1505">0</b><span>PRs mergeados</span></div>
+      <div class="num"><b data-n="4">0</b><span>portas públicas</span></div>
     </div>
-    <p class="num-stamp congelado-no-tempo">contagem derivada do git em 2026-08-26 (667 PRs mergeados, 1384 commits) — os números canônicos vivem no inventário, versionado</p>
+    <p class="num-stamp congelado-no-tempo">contagem derivada do git e do registro da federação em 2026-11-08 (1505 PRs mergeados, 4481 commits) — os números canônicos vivem no inventário, versionado</p>
     <div class="fed-teaser" id="federacao">
-      <div class="fed-stat"><b>4</b><span>membros · 7 linhagens vivas</span></div>
+      <div class="fed-stat"><b>24</b><span>adotantes · 6 com chave A2A</span></div>
       <p style="flex:1; min-width:240px; font-size:.96rem; color:var(--text-body); margin:0">Repositórios que verificam uns aos outros <b>com evidência, não confiança cega</b> — um deles já me refutou publicamente (o card do pin forjado, acima).</p>
       <a class="mentor-link" href="/federacao/">Abrir o console da federação →</a>
     </div>
@@ -254,7 +255,9 @@ const heroTerm = `
     <span class="kick">O ecossistema</span>
     <h2>Uma família inteira,<br><em>cada peça no seu papel.</em></h2>
     <div class="eco">
-      <a class="eco-card" href="/mini/"><span class="ico" aria-hidden="true">🌱</span><h3>Onion Mini</h3><p>A metodologia destilada em 78 linhas. Roda em qualquer IA — até em web chat gratuito. O começo ideal.</p><span class="go">começar agora →</span></a>
+      <a class="eco-card" href="https://github.com/marciocar/onion-mini"><span class="ico" aria-hidden="true">🌱</span><h3>Onion Mini</h3><p>Um caminho só, para quem está começando no Claude Code: da ideia à tarefa, da tarefa ao Pull Request. Gerado do core, sem grafo, meta e compliance.</p><span class="go">começar agora →</span></a>
+      <a class="eco-card" href="https://github.com/marciocar/onion-plugins"><span class="ico" aria-hidden="true">🧩</span><h3>Os plugins</h3><p>O Onion como marketplace do Claude Code: o núcleo e as verticais, instalados por comando e atualizados pelo gerenciador de plugins.</p><span class="go">instalar →</span></a>
+      <a class="eco-card" href="https://github.com/marciocar/onion-core"><span class="ico" aria-hidden="true">🧅</span><h3>O Core, aberto</h3><p>A maquinaria inteira, publicada do core sem a biografia: comandos, agentes, skills, guardas, adoção e federação. MIT no código.</p><span class="go">ver o código →</span></a>
       <a class="eco-card" href="/historia/migalhas/provas/"><span class="ico" aria-hidden="true">⚡</span><h3>O Core, auditável</h3><p>Cada lição carrega prova pública: o que mudou, quando entrou e o tamanho da mudança — datado e auditável, sem abrir o código.</p><span class="go">ver as provas →</span></a>
     </div>
   </div>
@@ -276,24 +279,24 @@ const heroTerm = `
     <h2>Dois caminhos. O mesmo método.</h2>
     <div class="paths">
       <div class="path path-mini">
-        <span class="tagline">5 minutos · qualquer IA · grátis</span>
+        <span class="tagline">para quem está começando · Claude Code · grátis</span>
         <h3>🌱 Onion Mini</h3>
         <ol>
-          <li>Copie 4 arquivos para seu projeto (ou cole 1 prompt no seu web chat)</li>
-          <li>O agente se auto-configura pelo <b>AGENTS.md</b></li>
-          <li>Trabalhe: spec → plano → código, com quadro de tasks embutido</li>
+          <li>Copie a pasta <b>.claude/</b> do Mini para o seu projeto, sem sobrescrever nada seu</li>
+          <li>Rode <b>/warm-up</b>: o Claude lê o projeto antes de mexer nele</li>
+          <li>Trabalhe: ideia → spec → tarefa → plano → código → Pull Request</li>
         </ol>
-        <a class="btn btn-p" href="/mini/">Pegar o Mini →</a>
+        <a class="btn btn-p" href="https://github.com/marciocar/onion-mini">Pegar o Mini →</a>
       </div>
       <div class="path path-full">
         <span class="tagline" style="color:var(--orange)">O framework completo · Claude Code</span>
         <h3>🧅 Adoção plena</h3>
         <ol>
-          <li>Clone o core e rode <b>/meta:adopt</b> no seu repositório</li>
+          <li>Instale pelo marketplace (<b>/plugin marketplace add marciocar/onion-plugins</b>) ou clone o <b>onion-core</b> e rode <b>/meta:adopt</b> no seu repositório</li>
           <li>{inv.comandos} comandos, {inv.agentes} agentes, compliance e federação — sem tocar seu código</li>
-          <li>Tudo que você fez no Mini migra sem retrabalho</li>
+          <li>Os comandos do Mini são os mesmos do core: crescer é ganhar comandos, não reaprender</li>
         </ol>
-        <a class="btn btn-s" href="/historia/migalhas/provas/">Ver as provas →</a>
+        <a class="btn btn-s" href="/estado/#instalavel">Ver como instalar →</a>
       </div>
     </div>
   </div>
@@ -302,7 +305,7 @@ const heroTerm = `
 <footer>
   <div class="logo" aria-hidden="true">🧅</div>
   <p><strong>Onion Evolve</strong> — um framework vivo, <strong>by Marcio Carvalho</strong>.<br>
-  Autobiografia, federação e doutrina: em público. O código: auditável no git, não aberto. · <a href="/historia/">o capítulo novo</a></p>
+  Autobiografia, federação e doutrina: em público. O código: aberto no git — MIT no código, CC BY-NC 4.0 na doutrina. · <a href="/historia/">o capítulo novo</a></p>
 </footer>
 
 <script is:inline>
