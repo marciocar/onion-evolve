@@ -1,0 +1,12 @@
+# binario 2.1.319 (Claude Code) · regras 38
+id	fase	forma	esperado	medido	veredito	nota
+F01	flows-deny	bash ops/pr-merge-verified.sh	pass	exec	ok	 [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]
+F02	flows-deny	bash .claude/utils/adopt/merge-onion-hooks.sh .claude/settings.json .claude/settings.json | head -c 40	pass	exec	ok	{ "$schema": "https://json.schemastore
+F03	flows-deny	bash .claude/utils/adopt/deny-monotonic.sh . main	pass	exec	ok	deny: 0 no alvo (origin/main) → 38 no head
+F04	flows-deny	bash .claude/utils/co-evolution/co-deliver.sh fixture --target {W}/other --dry-run	pass	exec	ok	Exit code 2 ERRO: member-id 'fixture' não existe em members.yaml.
+F05	flows-deny	bash .claude/utils/co-evolution/co-relay.sh --target {W}/other --dry-run	pass	exec	ok	 Sem stamp = core/fonte ou pré-adoção; o core não relaya upstream (use /meta:co-announce).
+F06	flows-deny	bash .claude/validation/kg-radar.sh docs/onion/graph/comms-stable-2026-11.kg.yaml --integrity --schema | tail -3	pass	exec	ok	 gramática do .kg.yaml (✗ reprova na divergência) ══ ✅ schema_version 1 (bate com o radar)
+F07	flows-deny	bash .claude/validation/forge-census.sh . --markdown | head -3	pass	exec	ok	rkflow | 5 destino | 6 lente | 7 bancada 7/7 | dissect | sim | sim | sim | sim | sim | sim
+F08	flows-deny	git push -u origin HEAD:refs/heads/feat/flow-probe	pass	exec	ok	HEAD -> feat/flow-probe branch 'feat/flow-probe' set up to track 'origin/feat/flow-probe'.
+F09	flows-deny	ONION_FINALIZE_CHECKPOINT=1 bash ops/pr-finalize.sh --check	pass	exec	ok	obe.md' e preencha (o --check não escreve) PR-FINALIZE: parou na etapa «preparação» (rc=1)
+F10	flows-deny	bash .claude/utils/task-manager/env-check.sh --provider	pass	exec	ok	ausente

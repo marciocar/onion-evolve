@@ -51045,7 +51045,43 @@ run_update_base_and_deny_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q '2 no alvo (origin/main) → 0 no head' <<< "${out}"; then
     record_pass "update-base-deny: (s-MUT) a fusão antiga que sobrescreve o settings com o do vendor é PEGA (rc 1)"
   else record_fail "update-base-deny: (s-MUT)" "a sobrescrita passou pelo deny-monotonic: rc=${rc}: ${out}"; fi
-  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm
+  # (d6-d9) A LISTA PORTÁTIL VIAJA (2026-11-08): o merge soma o deny da fonte ao do alvo, sem duplicar nem apagar, e só o
+  # deny viaja. (p1) o deny REAL do core é portátil: sem caminho de máquina, porque ele vai para portas e adotantes.
+  # MUTANTES: (j-MUT) o merge sem a soma reprova (d6); (p-MUT) uma regra com caminho de máquina é acusada.
+  _ub_merge() { printf '%s\n' "$1" > "${d}/src.json"; printf '%s\n' "$2" > "${d}/tgt.json"; bash "${3:-${mh}}" "${d}/src.json" "${d}/tgt.json" 2>/dev/null; }
+  _ub_machine() { jq -r '.permissions.deny // [] | .[]' "$1" | LC_ALL=C /usr/bin/grep -E '/home/|/Users/|/root/|^[A-Za-z]+\(//[^*]' || true; }
+  local src_d='{"permissions":{"allow":["Bash(rm *)"],"deny":["Bash(git filter-repo*)","Bash(crontab *)"]},"hooks":{}}'
+  local tgt_d='{"permissions":{"allow":["Bash(ls *)"],"deny":["Bash(crontab *)","Bash(at *)"]},"sandbox":{"enabled":true},"hooks":{}}'
+  local want_d='{"allow":["Bash(ls *)"],"deny":["Bash(crontab *)","Bash(at *)","Bash(git filter-repo*)"]}'
+  out="$(_ub_merge "${src_d}" "${tgt_d}" | jq -c '[.permissions, .sandbox.enabled]')"
+  if [ "${out}" = "[${want_d},true]" ]; then record_pass "update-base-deny: (d6) o deny da fonte SOMA ao do alvo, sem duplicar; allow e sandbox seguem do alvo"
+  else record_fail "update-base-deny: (d6)" "${out}"; fi
+  local once twice; once="$(_ub_merge "${src_d}" "${tgt_d}")"; twice="$(_ub_merge "${src_d}" "${once}")"
+  if [ -n "${once}" ] && [ "${once}" = "${twice}" ]; then record_pass "update-base-deny: (d7) somar duas vezes é no-op na 2ª"
+  else record_fail "update-base-deny: (d7)" "1ª e 2ª passadas diferem"; fi
+  out="$(_ub_merge '{"hooks":{}}' '{"hooks":{}}' | jq -c 'has("permissions")')"
+  if [ "${out}" = "false" ]; then record_pass "update-base-deny: (d8) fonte sem deny não cria permissions no alvo"
+  else record_fail "update-base-deny: (d8)" "${out}"; fi
+  out="$(_ub_merge "${src_d}" '{"hooks":{}}' | jq -c '.permissions')"
+  if [ "${out}" = '{"deny":["Bash(git filter-repo*)","Bash(crontab *)"]}' ]; then record_pass "update-base-deny: (d9) alvo sem permissions recebe só o deny"
+  else record_fail "update-base-deny: (d9)" "${out}"; fi
+  mut="${d}/mh-mut.sh"; sed 's/^  | if ((\$src\.permissions\.deny \/\/ \[\]) | length) > 0 then$/  | if false then # ONION_MUTANTE sem soma/' "${mh}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE sem soma' "${mut}"; then record_fail "update-base-deny: (j-MUT)" "o sed não casou a soma do deny"
+  else
+    out="$(_ub_merge "${src_d}" "${tgt_d}" "${mut}" | jq -c '[.permissions, .sandbox.enabled]')"
+    if [ "${out}" != "[${want_d},true]" ]; then record_pass "update-base-deny: (j-MUT) tirar a soma MORDE: (d6) reprovaria"
+    else record_fail "update-base-deny: (j-MUT)" "sem a soma o resultado seguiu igual: ${out}"; fi
+  fi
+  local real_st="${REPO_ROOT}/.claude/settings.json" hits
+  hits="$(_ub_machine "${real_st}")"
+  if [ -z "${hits}" ] && [ "$(jq '.permissions.deny // [] | length' "${real_st}")" -gt 0 ]; then
+    record_pass "update-base-deny: (p1) o permissions.deny do core existe e não cita caminho de máquina"
+  else record_fail "update-base-deny: (p1)" "deny ausente ou com caminho de máquina: ${hits}"; fi
+  printf '%s\n' '{"permissions":{"deny":["Read(//**/.env)","Edit(//srv/app/**)"]}}' > "${d}/mp.json"
+  hits="$(_ub_machine "${d}/mp.json")"
+  if [ "${hits}" = 'Edit(//srv/app/**)' ]; then record_pass "update-base-deny: (p-MUT) regra com caminho absoluto de máquina é acusada e o '//**/' portátil passa"
+  else record_fail "update-base-deny: (p-MUT)" "acusou: ${hits}"; fi
+  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm _ub_merge _ub_machine
 }
 _family run_update_base_and_deny_selftests
 

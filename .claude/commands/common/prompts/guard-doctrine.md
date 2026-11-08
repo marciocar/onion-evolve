@@ -76,6 +76,26 @@ que estava sendo forjada **naquele instante** na segunda categoria.
 > `bash .claude/validation/judge-verdict-check.sh <vereditos.json>` (rc 1 = reprovação recusada e
 > contada), e a superação achada vira nó.
 
+## A camada nativa: o `permissions.deny` portátil
+
+Desde 2026-11-08 o `.claude/settings.json` carrega uma lista pequena de atos irreversíveis e de leitura de
+segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e nenhuma é fronteira de segurança.
+
+- **O que entra:** regra sem caminho de máquina e sem nome de cliente, porque ela viaja (as portas que levam settings
+  e a adoção nova o copiam; o `--update` soma, e o deny nunca encolhe). Regra local mora em `settings.local.json`.
+- **O que fica fora de propósito:** o que a casa faz todo dia (`reset --hard`, `branch -D`, `worktree remove
+  --force`, `--force-with-lease`, `rm -rf` de pasta de trabalho) e o que já tem veto por hook com caminho verificado
+  (merge e push na main: num repo sem o script verificado o hook avisa em vez de vetar, e o deny tiraria essa saída).
+- **Medido em 2.1.319:** a regra `Read` também alcança comando de leitura conhecido no Bash (`cat`, `grep`, `rg`,
+  `sed`, `base64`), e também inspeção (`ls` e `stat` do arquivo: use `test -f`). Vale em `bypassPermissions`.
+  Script chamado pela linha **não** é visto, e é assim que o merge verificado e a publicação de porta seguem andando.
+- **O que ela NÃO cobre, medido:** `bash -c '…'`, `eval`, refspec `+`, `rm -Rf`, `find -delete`, interpretador
+  (`python3 -c`), `tar`, `xxd`, glob (`cat .e*`), sufixo fora da lista (`.env.foo`), e script que faz por dentro. Com
+  sandbox ligado o `cat .env` passa (o `source .env` também), porque a regra `//**/.env` não vira `denyRead` no Linux.
+  Lista de formas não fecha contra variação; o que fecha é o sistema operacional.
+- **Custo:** falso positivo raro em `git -C . log --grep 'x push -f y'` e em `git clean -nx` (o ensaio com `-x` cai
+  junto). Saída: o maestro roda fora da sessão (`!`).
+
 ## O que esta doutrina NÃO promete
 
 - **Não garante que a guarda pegue a classe** — só que ela pegue a **forma** que o caso descreve. A

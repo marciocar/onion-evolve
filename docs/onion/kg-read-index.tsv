@@ -31,6 +31,7 @@
 .claude/commands/common/prompts/drive-doctrine.md	E_N1_ESCADA_POR_LEITURA	docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml
 .claude/commands/common/prompts/execution-agent-preamble.md	C_TETO_SUBAGENTE_SEM_HOOK	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
 .claude/commands/common/prompts/execution-agent-preamble.md	E_PREAMBULO_SO_NO_SCRATCHPAD	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
+.claude/commands/common/prompts/guard-doctrine.md	C_DENY_IS_NOT_A_BOUNDARY_1108	docs/evolution/research/permissions-deny-minimal-2026-11/permissions-deny-minimal-2026-11.kg.yaml
 .claude/commands/common/prompts/guard-doctrine.md	C_MUTANTE_QUE_NAO_MORDE_TEM_QUATRO_CAUSAS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/commands/common/prompts/guard-doctrine.md	D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/common/prompts/inventory-sync-after-create.md	SY6_ev_inventory_sync_prompt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -291,6 +292,7 @@
 .claude/settings.json	C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/settings.json	D_DOIS_SUBSTRATOS_UMA_FRONTEIRA	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/settings.json	D_HOOK_NO_SETTINGS_DO_PROJETO	docs/evolution/research/guard-memory-write-2026-11/memory-write-2026-11.kg.yaml
+.claude/settings.json	D_MINIMAL_PORTABLE_DENY_1108	docs/evolution/research/permissions-deny-minimal-2026-11/permissions-deny-minimal-2026-11.kg.yaml
 .claude/settings.json	E_D2_SRC	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/settings.json	E_F8_STOP_HOOK_NAO_SE_APLICA	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
@@ -2287,6 +2289,7 @@ docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_EV
 docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_FINETUNE_NARROW	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_Q_OPTION_C	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md	D_ADOPT_REFRAME	docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml
+docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv	E_READ_RULE_REACHES_BASH_1108	docs/evolution/research/permissions-deny-minimal-2026-11/permissions-deny-minimal-2026-11.kg.yaml
 docs/evolution/research/persona-runtime-2026-11/SYNTHESIS.md	Q_PERSONA_RUNTIME_2026_11	docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml
 docs/evolution/research/playbook-sdaal-2026-10/SYNTHESIS.md	E_LACUNAS_PLAYBOOK_SDAAL_1011	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
 docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml	E_LACUNAS_PLAYBOOK_SDAAL_1012	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
@@ -2766,6 +2769,7 @@ ops/stt-service.sh	E_MC_STT_INSTALADO_LOOPBACK_1020	docs/evolution/research/meet
 ops/stt-service.sh	E_MC_STT_SERVICO_CORE_MEDIDO_1017	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
 ops/testing/main-bench-alarm.sh	E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/main-bench-alarm.sh	Q_MERGE_LOTE_COM_BISSECCAO	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+ops/testing/permissions-deny-bench.py	E_BENCH_ON_REAL_ENGINE_1108	docs/evolution/research/permissions-deny-minimal-2026-11/permissions-deny-minimal-2026-11.kg.yaml
 ops/testing/preflight-shadow.sh	Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO	docs/evolution/research/preflight-gap-2026-10/preflight-gap-2026-10.kg.yaml
 ops/testing/selection-replay.sh	E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/selftest-pr-selection.sh	C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml

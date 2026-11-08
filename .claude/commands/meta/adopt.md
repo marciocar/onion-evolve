@@ -161,7 +161,7 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/adopter-guard-core.sh" "$DEST" "$SOURCE_R
 
 # (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
 #     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
-#     lint-selftest.sh kind=merge). Preserva hooks/permissions próprios do alvo.
+#     lint-selftest.sh kind=merge). Preserva hooks/permissions próprios do alvo; soma o permissions.deny portátil.
 if [ -f "$DEST/.claude/settings.json" ]; then
   merged="$(bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" \
              "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json")" \
