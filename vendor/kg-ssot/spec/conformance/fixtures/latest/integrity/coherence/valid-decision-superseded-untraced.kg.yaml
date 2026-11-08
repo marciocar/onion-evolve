@@ -16,7 +16,18 @@ nodes:
     impact: 3
     confidence: 0.9
     label: "Nó sintético D_A."
+  - id: D_B
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    trace: "docs/adr-sintetico.md"
+    label: "A decisão sintética B, que substitui D_A."
 edges:
+  - from: D_B
+    to: D_A
+    edge_type: SUPERSEDES
   - from: D_A
     to: Q_A
     edge_type: SUPPORTS

@@ -10,6 +10,19 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.46.0] - 2026-11-09
+
+Contrato v4.19, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.
+
+- Dois avisos novos nos dois leitores (Python e JavaScript), com 12 casos novos na suíte (524 em `latest/`):
+  `integrity.bare-decision`, a decisão `done` sem `narrative` e sem aresta `SUPPORTS` chegando a ela (fechada sem dizer
+  por quê nem no que se apoia), e `integrity.superseded-without-successor`, o nó `superseded` a que nenhuma aresta
+  `SUPERSEDES` chega (o grafo não diz o que o substituiu). Os dois contam a aresta declarada no próprio grafo, local ou
+  nas `external_edges` com `from` externo, com ou sem o corpus.
+- O `kg_trace projection` lista `superseded_cited`: o id citado por uma página que resolve só em nós `superseded` ou
+  `refuted` dos grafos dela. É aviso, o rc não muda, e a chave é aditiva na `kg-ssot.projection/1`.
+- Seis fixtures antigos da suíte ganharam `narrative` ou um substituto, para cada um seguir testando o que testava.
+
 ## [4.45.0] - 2026-11-07
 
 Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. Nada do que um leitor, o gate ou o armazém imprime muda.

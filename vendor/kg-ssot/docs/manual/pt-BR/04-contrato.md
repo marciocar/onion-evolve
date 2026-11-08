@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:4da477e964e60388 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:f17845937bae7a2a -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -114,7 +114,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 desde a 4.38.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 da 4.38.0 à 4.45.0, v4.19 desde a 4.46.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -149,6 +149,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.46 | Contrato v4.19, só SHOULD: `integrity.bare-decision` (a decisão `done` sem `narrative` e sem `SUPPORTS` chegando a ela) e `integrity.superseded-without-successor` (o nó `superseded` a que nenhuma `SUPERSEDES` chega); o `kg_trace projection` lista `superseded_cited`, a página que cita um nó que os grafos dela trocaram ou derrubaram |
 | 4.40 | Contrato v4.18, sem mudança. O `kg_query --revisit` ganha o `pin-changed`, a decisão cuja versão fixada mudou (`kg-ssot.revisit/2`); o `kg_trace.py digest` aceita um lote em que o arquivo ausente ou não UTF-8 é resultado da própria referência (`kg-ssot.digest/2`) |
 | 4.38 | Contrato v4.18, só SHOULD: `provenance.node_sha256`, o hash canônico do nó citado (RFC 8785); o `kg_query --revisit` e o `--decision` leem o apoio de outro repositório no commit fixado com `--with`, e listam as decisões cujo apoio mudou na origem; `kg_trace.py digest` |
 | 4.37 | Contrato v4.17, só SHOULD: `provenance.scheme` (como ler o locator: `json-pointer`, `text`, `csv`, `pdf`, `media`, `quote`, `html`, `kg-node`) e `provenance.sha256` (o hash do que foi lido, num campo próprio); o `kg_trace check` lê a fonte pelo esquema e pelo hash, também num commit fixado de outro repositório com `--with` |

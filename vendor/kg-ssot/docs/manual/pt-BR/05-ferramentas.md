@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:843e1365200df731 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:b006bfb3d2b106d1 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 512/512 (reprova)
+latest: 524/524 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -1445,6 +1445,9 @@ projection_ignore:   # nomes entre crases que não são id de nó
 - **Quatro baldes.** `resolved` (num grafo do `projection_of`); `elsewhere` (só em outro grafo do repositório: aviso,
   não reprova); `outside` (o `projection_of` nomeia por URL um grafo de outro repositório que o `--with` não leu: não
   julgado, contado); `missing` (`integrity.projection-id-missing`).
+- **O nó citado que os grafos trocaram (4.46.0).** O id que resolve só em nós `superseded` ou `refuted` dos grafos do
+  `projection_of` entra também em `superseded_cited`, com aviso: a página se apoia no que o grafo trocou ou derrubou.
+  Se um desses grafos tem o id vivo, não há aviso. O rc não muda, e a chave é aditiva na `kg-ssot.projection/1`.
 - **`--with PREFIXO=PASTA`** lê esse outro grafo de uma pasta local, no commit da URL quando a pasta é um repositório
   git que o tem, como no `kg_query --chain`. Uma URL que o `--with` cobre e que não se lê (ausente no ref, fora de
   UTF-8, que não é grafo) é erro de grafo (rc 1), nunca `outside`. Um grafo lido da árvore de trabalho, porque o ref da

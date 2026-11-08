@@ -2079,6 +2079,22 @@ msgid "The node receives REFUTES and still stands: the graph asserts and refutes
 msgstr "O nó recebe REFUTES e segue valendo: o grafo afirma e refuta a mesma coisa."
 
 #: tools/kg_validate.py
+msgid "The decision is done but does not say why nor what it rests on: it has no narrative and no SUPPORTS edge reaching it."
+msgstr "A decisão está fechada, mas não diz por quê nem no que se apoia: não tem narrative nem aresta SUPPORTS chegando a ela."
+
+#: tools/kg_validate.py
+msgid "The node is superseded, but no SUPERSEDES edge reaches it: the graph does not say what replaced it."
+msgstr "O nó está superseded, mas nenhuma aresta SUPERSEDES chega a ele: o grafo não diz o que o substituiu."
+
+#: tools/kg_validate.py
+msgid "Write the reason in narrative, or add a SUPPORTS edge from what the decision rests on."
+msgstr "Escreva o porquê em narrative, ou acrescente uma aresta SUPPORTS saindo daquilo em que a decisão se apoia."
+
+#: tools/kg_validate.py
+msgid "Add a SUPERSEDES edge from the node that replaced it; if the successor lives in another graph, declare it here in external_edges (from: <path>#<id>, to: this node)."
+msgstr "Acrescente uma aresta SUPERSEDES saindo do nó que o substituiu; se o substituto mora em outro grafo, declare-o aqui em external_edges (from: <caminho>#<id>, to: este nó)."
+
+#: tools/kg_validate.py
 msgid "The root of the JSON file is not an object (meta, nodes, edges)."
 msgstr "A raiz do arquivo JSON não é um objeto (meta, nodes, edges)."
 
@@ -4041,3 +4057,7 @@ msgstr "listando {shown} de {n}, pelo --from ou pelo --status; o resumo e o rc s
 #: tools/kg_refs.py
 msgid "{names} name(s) cited with a commit and not in the list, in {n} citation(s): --known or --ignore says which matter; the names are in the JSON"
 msgstr "{names} nome(s) citado(s) com commit e fora da lista, em {n} citação(ões): o --known ou o --ignore dizem quais importam; os nomes estão no JSON"
+
+#: tools/kg_trace.py
+msgid "· {page}  `{id}` is {status} in the graph: the page rests on what the graph replaced or overturned"
+msgstr "· {page}  `{id}` está {status} no grafo: a página se apoia no que o grafo trocou ou derrubou"

@@ -3,6 +3,7 @@
   "id": "fila-2026-10-06",
   "must": [],
   "should": {
-    "form.range.node.label": 1
+    "form.range.node.label": 1,
+    "integrity.superseded-without-successor": 2
   }
 }

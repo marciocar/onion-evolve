@@ -27,6 +27,7 @@ nodes:
     impact: 2
     confidence: 0.5
     label: "Nó sintético D_X."
+    narrative: "O porquê sintético da decisão X."
 edges:
   - from: D_X
     to: Q_A

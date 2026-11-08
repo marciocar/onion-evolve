@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.18"
+CONTRACT_VERSION = "4.19"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1275,7 +1275,13 @@ def coherence_located(doc, corpus=None):
       Desde o v4.5, com o corpus (corpus_index), conta também a REFUTES que chega de outro grafo pelas external_edges
       (from externo, to local); sem ele, a ponta externa não foi conferida e a aresta não conta.
     - desde o v4.12, os avisos do critério pré-registrado entre nós do mesmo grafo (criterion_located);
-    - desde o v4.14, a notation repetida no mesmo esquema do vocabulário (term_located).
+    - desde o v4.14, a notation repetida no mesmo esquema do vocabulário (term_located);
+    - desde o v4.19, integrity.bare-decision: decision done sem narrative com texto e sem SUPPORTS chegando a ela (a
+      fechada que não diz por que nem no que se apoia);
+    - desde o v4.19, integrity.superseded-without-successor: nó superseded sem SUPERSEDES chegando a ele (o substituto
+      não está dito). Nas duas, conta a aresta declarada neste grafo: a local (to = o nó) e a external_edges com from
+      externo e to = o nó, com ou sem o corpus, porque é a declaração que falta que o aviso aponta; uma aresta que só
+      outro grafo declara não é lida aqui.
     Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
     """
     out = []
@@ -1285,6 +1291,17 @@ def coherence_located(doc, corpus=None):
               if isinstance(e, dict) and e.get("edge_type") == "TRACES_TO" and isinstance(e.get("from"), str)}
     refuted = {e.get("to") for e in edges
                if isinstance(e, dict) and e.get("edge_type") == "REFUTES" and isinstance(e.get("to"), str)}
+    ext_all = doc.get("external_edges") if isinstance(doc.get("external_edges"), list) else []
+
+    def incoming(kind):  # v4.19: a aresta declarada aqui que chega a um nó local, da lista edges ou das external_edges
+        got = {e.get("to") for e in edges
+               if isinstance(e, dict) and e.get("edge_type") == kind and isinstance(e.get("to"), str)}
+        got |= {e.get("to") for e in ext_all
+                if isinstance(e, dict) and e.get("edge_type") == kind and is_external(e.get("from"))
+                and isinstance(e.get("to"), str) and not is_external(e.get("to"))}
+        return got
+
+    supported, superseded_in = incoming("SUPPORTS"), incoming("SUPERSEDES")
     if corpus is not None:
         ext = doc.get("external_edges") if isinstance(doc.get("external_edges"), list) else []
         refuted |= {e.get("to") for e in ext
@@ -1310,6 +1327,13 @@ def coherence_located(doc, corpus=None):
         if (isinstance(n.get("id"), str) and n["id"] in refuted and status not in ("superseded", "refuted")
                 and not (status == "done" and n.get("node_type") == "question")):
             out.append(("integrity.refutes-unreconciled", place))
+        nid = n.get("id") if isinstance(n.get("id"), str) else None
+        narrative = n.get("narrative")
+        if (n.get("node_type") == "decision" and status == "done"
+                and not (isinstance(narrative, str) and narrative.strip()) and nid not in supported):
+            out.append(("integrity.bare-decision", place))
+        if status == "superseded" and nid not in superseded_in:
+            out.append(("integrity.superseded-without-successor", place))
     return out + criterion_located(doc) + term_located(doc)
 
 
@@ -1683,6 +1707,10 @@ MESSAGES = {
                                    "TRACES_TO edge.",
     "integrity.refutes-unreconciled": "The node receives REFUTES and still stands: the graph asserts and refutes the "
                                       "same thing.",
+    "integrity.bare-decision": "The decision is done but does not say why nor what it rests on: it has no narrative "
+                               "and no SUPPORTS edge reaching it.",
+    "integrity.superseded-without-successor": "The node is superseded, but no SUPERSEDES edge reaches it: the graph "
+                                              "does not say what replaced it.",
     "integrity.criterion-unknown": "The cited criterion is not a node with x_criterion in the graph it names.",
     "integrity.criterion-amends-mismatch": "The amendment points to a version of another criterion (a different "
                                            "x_criterion.id), or its chain of amends comes back to itself.",
@@ -1751,6 +1779,10 @@ HINTS = {
                                       "not, remove the edge or use CONSTRAINS (the dissent that limits without "
                                       "overturning).",
     "integrity.testimony-in-prod": "Keep the node in DEV, or back it with a verified measurement or reading.",
+    "integrity.bare-decision": "Write the reason in narrative, or add a SUPPORTS edge from what the decision rests on.",
+    "integrity.superseded-without-successor": "Add a SUPERSEDES edge from the node that replaced it; if the successor "
+                                              "lives in another graph, declare it here in external_edges "
+                                              "(from: <path>#<id>, to: this node).",
     "integrity.criterion-unknown": "Cite the id of the node that holds the criterion version (x_criterion); a "
                                    "criterion in another graph is <path>#<id>, which kg_criterion.py check verifies.",
     "integrity.criterion-amends-mismatch": "Point amends to the previous version of the same criterion (never to itself "

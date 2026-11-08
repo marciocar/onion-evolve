@@ -10,6 +10,7 @@ nodes:
     confidence: 0.9
     trace: "docs/adr-sintetico.md"
     label: "A decisão sintética A."
+    narrative: "O porquê sintético da decisão A."
   - id: C_COUNTER
     node_type: claim
     plane: DEV

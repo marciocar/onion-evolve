@@ -3,6 +3,7 @@
   "id": "graduated-automation-elenxo-2026-07",
   "must": [],
   "should": {
-    "form.range.node.label": 2
+    "form.range.node.label": 2,
+    "integrity.superseded-without-successor": 1
   }
 }

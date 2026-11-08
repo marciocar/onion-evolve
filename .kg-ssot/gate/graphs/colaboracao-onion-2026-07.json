@@ -5,6 +5,8 @@
   "should": {
     "form.range.node.label": 3,
     "form.required.node.verified_at": 7,
+    "integrity.bare-decision": 3,
+    "integrity.superseded-without-successor": 1,
     "yaml.unquoted-date": 1
   }
 }

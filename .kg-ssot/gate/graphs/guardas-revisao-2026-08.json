@@ -3,6 +3,7 @@
   "id": "guardas-revisao-2026-08",
   "must": [],
   "should": {
-    "form.range.node.label": 16
+    "form.range.node.label": 16,
+    "integrity.bare-decision": 2
   }
 }

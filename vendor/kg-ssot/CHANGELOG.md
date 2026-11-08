@@ -10,6 +10,20 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.46.0] - 2026-11-09
+
+Contract v4.19, SHOULD only: nothing that passed fails, and no MUST verdict changes.
+
+- Two new warnings in both readers (Python and JavaScript), with 12 new cases in the suite (524 in `latest/`):
+  `integrity.bare-decision`, a decision `done` with no `narrative` and no `SUPPORTS` edge reaching it (closed without
+  saying why or on what it rests), and `integrity.superseded-without-successor`, a `superseded` node that no
+  `SUPERSEDES` edge reaches (the graph does not say what replaced it). Both count the edge declared in the graph
+  itself, local or in `external_edges` with an external `from`, with or without the corpus.
+- `kg_trace projection` lists `superseded_cited`: an id cited by a page that resolves only to `superseded` or
+  `refuted` nodes of its graphs. It is a warning, the rc does not change, and the key is additive in
+  `kg-ssot.projection/1`.
+- Six older suite fixtures gained a `narrative` or a successor, so each keeps testing what it tested.
+
 ## [4.45.0] - 2026-11-07
 
 No contract change (still v4.18), and no verdict changes. Nothing that a reader, the gate or the store prints changes.

@@ -599,7 +599,9 @@ def projection(root, pages, withs=(), exclude=(), defaults=True):
     crases, contra os grafos que ela declara. Os baldes: resolved (num grafo do projection_of), elsewhere (em outro
     grafo do corpus, não declarado: aviso), outside (o projection_of declara uma URL de outro repositório que o --with
     não carregou: não julgado) e missing (integrity.projection-id-missing). Ficam fora, contados: o vocabulário do
-    contrato e o projection_ignore da página. ValueError: frontmatter que não se lê ou --root que não é pasta."""
+    contrato e o projection_ignore da página. Desde a 4.46.0, aditivo na projection/1: o id que resolve SÓ em nós
+    superseded ou refuted dos grafos declarados entra também em superseded_cited, como aviso: a página se apoia no que
+    o grafo já trocou ou derrubou. Se algum grafo declarado tem o id vivo, não avisa. O rc não muda. ValueError: frontmatter que não se lê ou --root que não é pasta."""
     root = pathlib.Path(root)
     if not root.is_dir():
         raise ValueError(_("--root {root} is not a directory").format(root=root))
@@ -617,7 +619,7 @@ def projection(root, pages, withs=(), exclude=(), defaults=True):
         explicit = True
     words = contract_words()
     res = {"pages": 0, "cited": 0, "resolved": 0, "elsewhere": [], "outside": [], "missing": [], "graph_errors": [],
-           "unpinned": [], "uncited": [],
+           "unpinned": [], "uncited": [], "superseded_cited": [],
            "skipped": {"contract": 0, "ignored": 0, "no_projection": 0}}
     for page in pages:
         try:
@@ -686,6 +688,10 @@ def projection(root, pages, withs=(), exclude=(), defaults=True):
             entry = {"page": page, "id": cited}
             if cited in known:
                 res["resolved"] += 1
+                states = [corpus.nodes[(f, i)].get("status") for f, i in corpus.order
+                          if i == cited and f in files and isinstance(corpus.nodes.get((f, i)), dict)]
+                if states and all(s in ("superseded", "refuted") for s in states):
+                    res["superseded_cited"].append({**entry, "status": sorted(states)[-1]})
             elif cited in every:
                 res["elsewhere"].append({**entry, "graphs": sorted(set(every[cited]))[:5]})
             elif unloaded:
@@ -933,6 +939,9 @@ def main_projection(args):
         for e in res["elsewhere"]:
             print(_("· {page}  `{id}` is in a graph that projection_of does not list: {graphs}").format(
                 page=e["page"], id=e["id"], graphs=", ".join(e["graphs"])))
+        for e in res["superseded_cited"]:
+            print(_("· {page}  `{id}` is {status} in the graph: the page rests on what the graph replaced or "
+                    "overturned").format(page=e["page"], id=e["id"], status=e["status"]))
         s = res["skipped"]
         print(_("· {pages} page(s), {cited} id(s) cited: {resolved} resolve, {elsewhere} elsewhere, {outside} in "
                 "another repository not read (--with), {missing} missing; not judged (counted): {contract} contract "
