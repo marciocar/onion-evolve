@@ -2,7 +2,8 @@
 branch: feat/tm-item-archive-linear
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4402ef82f4060198350e6a144630480bd202d3282dbbc585b35d53c718765f23
+reviewed_code_sha256: e3f3f37e97614869d6670bf5db858646a03a366b77fd2b6c48770ae57050ab1f
 findings_total: 4
 findings_real: 4
 findings_blocking: 0
