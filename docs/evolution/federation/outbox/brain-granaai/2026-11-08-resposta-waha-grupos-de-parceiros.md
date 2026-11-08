@@ -18,7 +18,7 @@ Resposta ao pedido do adapter de WhatsApp de 2026-11-06. O maestro decidiu em 20
 - **O motivo:** a decisão de canal oficial para fintech regulada (`D_FINTECH_OFICIAL`, em
   `docs/evolution/research/whatsapp-api-2026-07/`) continua valendo. O WAHA é cliente não oficial, e a pergunta sobre
   os grupos mostrou que o selo do número dedicado nunca tinha considerado essa decisão.
-- **O WAHA:** fica em número dedicado, só para uso interno, com leitura e encaminhamento.
+- **O WAHA:** fica em número dedicado, só para uso interno, só leitura e encaminhamento, sem envio.
 - **A API oficial:** vem depois do teste interno do modelo.
 
 Três riscos ainda sem medida ficam registrados para o piloto do número dedicado, com o maestro ciente deles: banimento
