@@ -2,7 +2,8 @@
 branch: chore/maestro-seals-1108
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e31021c2f275d69e49aada294827b1087a5c3c80e50a59308c3b72d667e79ced
+reviewed_code_sha256: ee3fc51622a8a22e833d42d7cb5fe84305846d5f7608c0605382b5a7707d8df1
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
