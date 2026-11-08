@@ -2,14 +2,13 @@
 branch: docs/outside-in-primaries-closeout
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: ae7414d6d3bd111ef368a96de7e605452551c43df8bfc9ec486d599be678db93
-reviewed_code_sha256: a18bba806775a67c2c5edd1c6a7c7ca0b11eaab69f77016fda3cb13dfe95afff
-findings_total: 5
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 7
 findings_blocking: 1
 tokens: 0
 duration_min: 0
-findings_fixed: 5
+findings_fixed: 7
 verdict: FIXED
 elenxo: true
 elenxo_isolado: false
@@ -22,7 +21,7 @@ nota: "tokens e duração da passada de fechamento não medidos (0); o custo do 
 O Elenxo do workflow é a passada separada sobre o conteúdo da rodada. Ele produziu 32 objeções sobreviventes, 13
 bloqueantes, todas no grafo. Elas foram aplicadas pelo escritor do workflow, antes deste diff.
 
-No fechamento, a passada própria achou cinco defeitos, todos corrigidos antes do commit:
+No fechamento, a passada própria achou sete defeitos, todos corrigidos antes do commit:
 
 1. **(bloqueante)** Os 7 itens ATRÁS vinham de heads antigos. Cada um foi medido de novo no vivo; os 7 seguem reais,
    e o comando e o resultado estão em `verified_against`.
@@ -31,6 +30,8 @@ No fechamento, a passada própria achou cinco defeitos, todos corrigidos antes d
 3. A contagem de pins usava `2>/dev/null` sobre um diretório ausente. Refeita sem supressão, com o mesmo 7 e 12.
 4. Duas linhas ALINHADO do vigia descreviam código fora da main. A SYNTHESIS as marca "só no PR #8", ainda aberto.
 5. O lint de nomes reprovou os níveis `L0`, `L1` e `L2` do SLSA como código sem termo. A prosa passou a dizer "nível N".
+6. O item do ruleset ficou velho antes do merge: curado às 22:20Z, depois da medida. O nó fechou com a saída nova, e SAC-360 (a tarefa do ruleset da main) foi para Done.
+7. `Q_SANDBOX_DENY_LAYER_DECISION_1108` ainda perguntava o deny, já decidido no selo do PR #1550. Agora pergunta só o sandbox, citando o selo sem aresta, e tem espelho em SAC-367 (a decisão do sandbox).
 
 Dois limites ficam declarados: as linhas ALINHADO e DIVERGE marcadas "não remedido" continuam sendo posição de 1
 agente, e nada se afirma sobre o binário do Scorecard ou o nível SLSA L3.
