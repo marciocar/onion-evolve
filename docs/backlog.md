@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1018 itens abertos** em 155 grafo(s) com aberto (de 196 no escopo) · 154 grupo(s), agrupados por `owner:` (55 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1017 itens abertos** em 155 grafo(s) com aberto (de 196 no escopo) · 154 grupo(s), agrupados por `owner:` (54 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -927,14 +927,13 @@
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
 
-## core — 26 item(ns)
+## core — 25 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.5 | `Q_CS_DEGRAU1_CAMPAINHA_1109` | comms-stable-2026-11 | Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo |
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
-| 15.0 | `Q_CS_DEGRAU2_SLACK_RASCUNHO_1109` | comms-stable-2026-11 | Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode,  |
 | 12.0 | `Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109` | comms-stable-2026-11 | Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offlin |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
