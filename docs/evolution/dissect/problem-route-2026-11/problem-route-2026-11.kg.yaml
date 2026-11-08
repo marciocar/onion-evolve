@@ -17,7 +17,8 @@ meta:
     - 'Carga do .env com impressão: não medida, por defeito do padrão da contagem.'
     - 'As quatro fontes da curadoria e a medida 839 e 619: não conferidas.'
   # kg-backlog-guard: on
-  # ═══ TETO: 30 NÓS ═══
+  # ═══ TETO: 45 NÓS ═══
+  # 2026-11-08 (decisão da sessão do core): o teto subiu de 30 para 45 só por vocabulário. Os nós acima do teto antigo são entidades x_term (T_*), exigidas pelo contrato KG-SSOT para os códigos locais do estudo; nascem confirmed, fora do backlog, e nunca são onda nova de trabalho.
 
 nodes:
 

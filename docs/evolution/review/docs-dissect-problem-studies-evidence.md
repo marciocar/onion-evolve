@@ -2,13 +2,12 @@
 branch: docs/dissect-problem-studies-evidence
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: e0279356ce5ff065129e020992e55add34e74b3bf19a3994d436b0ac669622ca
-reviewed_code_sha256: 389639b5e920f6dd8c9beae8ef46cf91dd4cfab1b5989789b19986e23602bdd9
-findings_total: 4
-findings_real: 4
+reviewed_diff_sha256: pendente
+findings_total: 5
+findings_real: 5
 tokens: 0
 duration_min: 20
-findings_fixed: 4
+findings_fixed: 5
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "agente de execução da sessão do core (passada própria; o brief proibiu criar agentes, então não houve refutador independente)"
@@ -35,6 +34,14 @@ nota: "tokens 0 = não medido. Evidência trazida da branch local feat/problem-f
 | 2 | os dois grafos entravam com dívida SHOULD do contrato (o `kg-contract-check.sh` cobra grafo novo limpo): 12 `provenance.method` fora da forma `<classe>: <detalhe>` e 18 labels acima de 280 caracteres | **curado por forma, sem mudar o que o nó afirma**: a classe foi explicitada (`leitura:`, `medição:`, `derivado:`) mantendo o detalhe original; cada label longo foi cortado no último limite de frase antes de 280, e o resto foi para o início do `narrative` do mesmo nó. Os dois grafos saem conformes e com `kg-radar.sh --integrity --schema` rc 0 |
 | 3 | duas citações do main apontavam para um arquivo que só existia numa branch local | curado (acima) |
 | 4 | o lint de nomes do contrato KG-SSOT (`ops/kg-gate-ci.sh`, etapa 4 do `pr-finalize`) reprovou 42 códigos novos sem termo (E1–E3, P0–P6, P22, A1/A2, G1/G2, C1/C2, J1/J2, B2, L3, Q9) e, depois, 3 ambíguos (N0–N3, os níveis do dissect) | **curado**: 24 nós `entity` com `x_term` (8 no problem-formula, 16 no problem-route), cada um com a definição lida na Etapa 0, no gabarito ou nas fichas do próprio estudo, e uma aresta `TRACES_TO` ao veredito do grafo (sem ela, `integrity.orphan-node`); P0 e Q9 entram como código de fonte externa. Os N dos três labels viraram `dissect:N…`. Um label que passou de 280 com a qualificação foi cortado como os outros. `kg-gate-ci.sh` rc 0, `novos=0` |
+| 5 | os 24 nós de termo levaram os grafos a 35 e 41 nós, e os dois declaram teto de 30 com `kg-backlog-guard: on`: a REGRA 58 (O backlog cumpre as promessas do próprio `meta:`) deu HARD | **decidido pela sessão do core (opção a)**: o teto subiu para 40 e 45, com uma linha datada no `meta:` dizendo que o excedente é só vocabulário `x_term`, nunca onda nova. Os termos nascem `confirmed`, e o `/meta:backlog` só projeta `status: open`, então ficam fora da fila. `kg-backlog-check.sh`: 35/40 e 41/45, rc 0 |
+
+### Opções descartadas para o item 5
+
+- **(b) termos num grafo de vocabulário à parte, com cada código qualificado na prosa** (`<esquema>:E1`): mexeria em
+  cerca de 42 trechos de label e narrative da evidência selada.
+- **(c) deixar os `.kg.yaml` fora do PR**: as citações do main (`deploy-acts-2026-11.kg.yaml` e o
+  `act-signature-check.sh`) apontariam para um diretório sem o grafo do estudo, e a evidência ficaria pela metade.
 
 ## Varredura de vazamento (REGRA 36, REGRA 106, REGRA 119)
 
