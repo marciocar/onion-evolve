@@ -1,6 +1,6 @@
 ---
 branch: chore/inbox-1108-replies
-pr: pendente
+pr: 1544
 date: 2026-11-08
 reviewed_diff_sha256: cfad08c1e5448285be1c2daed585af4206ca796f22f7f491e853dfd08ae99a34
 reviewed_code_sha256: 19f8e716843c423596623d7b32eadce6c24b3b62ad4b9c087440189dc258586d
@@ -9,8 +9,9 @@ findings_real: 4
 tokens: 0
 duration_min: 15
 findings_fixed: 4
-verdict: CORRIGIDO
-elenxo: nao
+verdict: FIXED
+elenxo: false
+elenxo_isolado: false
 reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes)"
 nota: "tokens = 0: não medido. Passada de uma lente só sobre respostas de federação, nós de grafo e movimentação de inbox; os testes que valem são o radar, o contrato, a REGRA 113 e a varredura de vazamento."
 ---
