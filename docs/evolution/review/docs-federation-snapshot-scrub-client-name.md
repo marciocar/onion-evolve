@@ -10,7 +10,7 @@ tokens: 0
 duration_min: 10
 findings_fixed: 1
 verdict: CORRIGIDO
-elenxo: não
+elenxo: nao
 reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes)"
 nota: "tokens = 0: não medido. Passada de uma lente só sobre uma troca de rótulo em snapshot estático; a varredura de vazamento é o teste que vale."
 ---
