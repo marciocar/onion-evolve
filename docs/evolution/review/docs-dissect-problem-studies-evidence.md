@@ -2,7 +2,8 @@
 branch: docs/dissect-problem-studies-evidence
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8b970c035abeebfff36deeb1b239394671a67fb3968f27340a4de652d685bef1
+reviewed_code_sha256: 7e0c7d707d773250579a9b66496889672b269e64754661aae782ed48fb08973f
 findings_total: 5
 findings_real: 5
 tokens: 0
