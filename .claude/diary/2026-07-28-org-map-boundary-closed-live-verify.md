@@ -7,8 +7,8 @@ tags: [declarado-vs-verificado, behavior-over-declaration, logto, federation-org
 affects: [meta]
 breadcrumb_for: []
 share_with: []
-next_recommended: "Para RE-VERIFICAR o federation-orgs.json contra o Logto vivo a partir da VPS (srv1812846), quando docker exige sudo: crie um shim `docker`→`sudo -n docker` num dir no PATH e rode `PATH=$shim:$PATH bash ops/bridge-auth/logto-provision.sh --write-org-map`. O pré-flight resolve o issuer admin no LOOPBACK (Host forjado p/ 127.0.0.1:3012) — se passar, NÃO precisa ligar o vhost do console (nada de Caddy de produção). É dry-run por default (só imprime o mapa). git diff vazio = bate = verificado. Nunca hand-edite o arquivo — ele é DERIVADO; a fonte é o GET /organizations."
-review_after: 2026-10-28
+next_recommended: "Para RE-VERIFICAR o federation-orgs.json contra o Logto vivo a partir da VPS (srv1812846): o caminho SÓ-LEITURA que funciona hoje é o banco — `sudo -n docker exec onion-vps-logto-postgres psql -U logto -d logto -tAc \"select id, name from organizations where tenant_id='default'\"` — e comparar com o arquivo. O `--write-org-map` pela Management API exige o pré-flight do tenant admin, que desde a re-medição de 2026-11-08 NÃO passa mais no loopback (rc=6) e pede o vhost do console ligado: Caddy de produção, ato que o maestro autoriza nomeando. Nunca hand-edite o arquivo — ele é DERIVADO; a fonte é o GET /organizations (ou a tabela organizations)."
+review_after: 2027-02-06
 conflict_class: dynamic
 significance: "Fechei um boundary declarado≠verificado que EU MESMO declarei no commit e15a657 ('org-ids não re-verificados desta sessão — sem creds'). O maestro mandou verificar; descobri que a máquina É a VPS (srv1812846) com o Logto local vivo, e o secret do m-default vem do Postgres local (não de env). Rodei --write-org-map (shim docker→sudo, pré-flight no loopback, ZERO Caddy tocado): o mapa vivo bateu BYTE-A-BYTE com o commitado. O loop declarado→verificado→match fechou pela ida à fonte viva. Lição-par: o boundary não era pra ficar declarado — era pra ser FECHADO indo ao vivo; o obstáculo (docker sem sudo) era mecânico, não uma barreira real. Contexto: assumi esta sessão como escritora única (I3) após varrer 12 beacons stale + apagar 3 ociosos."
 ---
@@ -33,3 +33,5 @@ Três coisas que a memória-de-sessão declarava e o vivo refutou/confirmou:
 ## Fronteira honesta
 
 A verificação foi um READ (`GET /organizations`) + dry-run. Uma escrita real (com flag de apply) ou ligar o console/Caddy seguem exigindo autorização nomeada do maestro. E este fechamento é dentro do core — o SSOT segue decidindo QUAIS orgs existem; o id é só a alça que o Logto atribuiu (não fere o D5 da projeção).
+
+## Re-testada em 2026-11-08 — PARCIAL: (dynamic, rodei) o mapa vale e a receita caiu. `logto-provision.sh --write-org-map` com o shim saiu rc=6: "o issuer do tenant `admin` não responde no loopback", e o script agora manda ligar o vhost do console (Caddy de produção, ato do maestro). Medi pelo caminho só-leitura: `select id, name from organizations` no `onion-vps-logto-postgres` devolve as 5 orgs do tenant `default`, que batem 1:1 com `docs/onion/federation-orgs.json`. O mapa ganhou `granaai` em `7769f7320` (08-23). O `next_recommended` foi corrigido.

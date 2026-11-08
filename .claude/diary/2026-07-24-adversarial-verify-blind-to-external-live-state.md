@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Quando um verify adversarial orquestrado APROVAR um artefato cujas afirmações incluem ESTADO EXTERNO VIVO (visibilidade de repo, status de deploy, se um serviço está no ar, versão publicada), NÃO confiar no approved sozinho: adicionar uma checagem-de-estado-vivo (gh/curl/stat) como camada extra do verify, OU conferir à mão as afirmações de estado-externo antes de commitar. O verify de texto rastreia fonte e consistência interna; ele não vai ao mundo conferir."
-review_after: 2026-10-22
+review_after: 2027-02-06
 conflict_class: static
 significance: "Um verify adversarial (opus) APROVOU (approved:true) uma síntese que afirmava onion-standalone 'privada/flip-gated' — mas gh repo view mostrou PUBLIC. O verify checou 12+ claims contra arquivos/commits e passou, mas NÃO foi ao gh conferir o estado externo vivo — exatamente onde o worker do synth errou. Só o cheque ao vivo pegou."
 ---
@@ -35,3 +35,5 @@ Ver `next_recommended`. Irmã de [[what-the-maestro-taught-me]] e de [[workflow-
 o `declarado≠verificado` não termina no verify orquestrado — para estado externo, a fonte da verdade é o
 mundo (`gh`/`curl`/`stat`), não a auditoria de texto. Vale um degrau extra no verify quando o artefato afirma
 estado-vivo (candidato à Onda 2 do plano de automação graduada — o degrau monitorado que confere o vivo).
+
+## Re-testada em 2026-11-08: (static) a lição vale. O estado externo citado no Evidence mudou, e é por isso que ele precisa de cheque vivo: `gh repo view` hoje dá `onion-standalone` PUBLIC e `onion-claude` também PUBLIC (o Evidence o dava como privado em 07-24). Nesta rodada, o mesmo tipo de cheque derrubou outra declaração: o pré-voo de loopback do `logto-provision.sh` não passa mais (ver `2026-07-28-org-map-boundary-closed-live-verify`).

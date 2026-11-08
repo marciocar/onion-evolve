@@ -8,7 +8,7 @@ affects: [meta, federation]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao dar personalidade a uma instância (core ou adotante), NUNCA declare à mão — rode /meta:personality-sync: a personalidade EMERGE da evidência de uso (diário + .onion-version + 30 primeiros commits), com âncora obrigatória (afirmação sem fonte no diário/git não entra, mesmo rigor do pin-que-prova-ser-commit). É projeção one-way (a2a_card_projection), não fonte de verdade — nunca derive gate/decisão dela. Cada sync REGENERA. Adotante: gera na PRÓPRIA sessão e relaya o summary upstream (I3); o core nunca sintetiza a personalidade alheia."
-review_after: 2026-10-22
+review_after: 2027-02-06
 conflict_class: static
 significance: "A Fase 2 (personality-sync) shipou virando o declarado≠verificado — a ansiedade central do core — para dentro, sobre a PRÓPRIA identidade: a personalidade do onion-evolve deixou de ser um seed manual e passou a EMERGIR de 74 migalhas do diário, dogfoodada, com as 27 âncoras todas reais. A ferramenta que torna a identidade honesta foi validada tornando a identidade do core honesta."
 ---
@@ -43,3 +43,5 @@ própria identidade, e mais um caso de [[fix-must-become-mechanism]] — só que
 (a identidade emerge, não se declara). Irmã de [[mechanism-beats-prose]] (a durabilidade vem de onde a coisa
 foi parar — aqui, no grafo/diário, não na prosa do seed). Rollout aos adotantes é por-instância (gated na
 sessão de cada um), anunciado downstream.
+
+## Re-testada em 2026-11-08 — PARCIAL: (static, contra o vivo) o comando existe (`.claude/commands/meta/personality-sync.md`), e o método vale. A projeção envelheceu: `.claude/identity/personality.md` foi gerada em 2026-07-24 a partir de 74 migalhas, e o `review_after: 2026-08-23` dela venceu há 77 dias. O diário tem hoje 133 migalhas, e nenhum sync rodou depois de `d7807bf7c`. Regenerar passa pelo gate humano do maestro (RFC-0003 §4).

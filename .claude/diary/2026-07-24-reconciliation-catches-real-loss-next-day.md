@@ -8,7 +8,7 @@ affects: [meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao fechar um nó 'declarado != entregue' de anúncio (C_ANNOUNCE_BACKLOG e família), NÃO assuma pelo status do outbox — rode a reconciliação outbox×inbound (Passo 2.1 do /meta:co-evolve: comm -13 entre o que o core marcou _processed e o que está no inbound do checkout que TRABALHA). O status do core mente sozinho na topologia multi-checkout. Quando achar transportado-mas-ausente, recupere por re-entrega (cp never-clobber / co-deliver, entrega-sem-commit I3) para o local_path do members.yaml, não para o path histórico."
-review_after: 2026-10-22
+review_after: 2027-02-06
 conflict_class: static
 significance: "A reconciliação outbox×inbound (Passo 2.1), mecanizada em 2026-07-23 a partir de um sinal de campo, caçou uma perda REAL menos de 24h depois — 5 anúncios do metagamify marcados transportados mas ausentes do checkout que trabalha — provando o loop fix-becomes-mechanism no menor intervalo possível."
 ---
@@ -42,3 +42,5 @@ nasce dia 1, pega falha dia 2) — irmã de [[pin-enters-proving-itself]] (capac
 reais, não desenhada) e de [[radar-is-runtime-investigations-born-as-graph]] (o grafo dirige: foi o KG-first
 do warm-up que apontou o nó a fechar). O passo maior segue gated: `C_FED_RADAR_ABSENT` (o radar de federação
 unificado — o Passo 2.1 é uma de suas peças vivas).
+
+## Re-testada em 2026-11-08 — PARCIAL: (static, rodei o `comm -13` do Passo 2.1 de `co-evolve.md` l.55-66) o passo segue lá. Contra `rhilo-metagamify` ele acusa hoje 25 anúncios (06-22 a 07-04) "transportados e ausentes", e isso é FALSO-POSITIVO: o checkout está na branch `chore/onion-framework`, e o adotante processa inbound na `develop` (ex.: `2026-06-22-meta-co-announce.md` existe em `develop:docs/evolution/inbound/_processed/`). Ponto cego novo do método: o `ls` lê a árvore da branch em checkout, não a branch onde o adotante trabalha o inbound. Antes de re-entregar, confira a branch (`git -C <adotante> ls-tree -r develop`). Nada foi re-entregue.

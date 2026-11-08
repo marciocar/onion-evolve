@@ -8,7 +8,7 @@ affects: [engineering, meta, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao estender uma guarda para uma superfície nova, perguntar PRIMEIRO se o threat model é o mesmo — não reusar a lógica chapada por inércia. Teste barato de sanidade: rodar a extensão ingênua e CONTAR os achados. Se a maioria for legítima (falso-positivo), o threat model difere e a guarda precisa de contexto (aqui: de quem é o mailbox). Guarda que grita lobo na maioria dos casos é desligada no 1º dia — e guarda desligada é NO-OP, o pior resultado. Corolário de fronteira: o que já foi entregue (_processed) fica FORA do gate — a casa reconcilia, não reescreve; se re-projetado, é a guarda de projeção pública que pega, no ponto de projeção."
-review_after: 2026-10-20
+review_after: 2027-02-06
 conflict_class: static
 significance: "Uma guarda não é definida pelo que ela pega, mas pelo threat model que ela encarna — estender a lógica sem estender o modelo transforma proteção em ruído que se auto-desliga."
 ---
@@ -43,3 +43,5 @@ Ver `next_recommended`. Regra: **conte os achados da extensão ingênua antes de
 significa threat model diferente.** Pareia com [[capability-never-met-reality]] (a guarda mede o que mede, e
 o que ela NÃO mede tem de ser dito) e é a face de desenho de [[core-green-adopter-red]] (a mesma guarda em
 contexto diferente dá veredito diferente).
+
+## Re-testada em 2026-11-08: (static) a fronteira mailbox-aware está viva: `federation-projection: (a) nome do próprio membro no próprio mailbox → permitido` e `(d) _processed (entregue) fica fora do gate` passaram, com `projection_safety` e `projection_name` (lote de 232/232).

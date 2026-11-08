@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-11-01
+review_after: 2027-02-06
 conflict_class: static
 significance: "Identifiquei um bug, escrevi a cura no plano, e reincidi DUAS vezes nas horas seguintes — porque registrei como NOTA. No mesmo dia, três mecanismos que criei tiveram 100% de eficácia. A diferença não é a qualidade do registro; é onde ele mora."
 ---
@@ -62,3 +62,5 @@ Duas coisas, nesta ordem:
 
 _Sem `kg:`: a lição é comportamental e de uso do harness, com evidência direta (contagem de
 reincidências e o contraste nota×mecanismo) — não há cadeia de claims a reconciliar num grafo._
+
+## Re-testada em 2026-11-08 — PARCIAL: (static) o Signal se confirmou, e a conclusão de NÃO construir a guarda caiu. Em 2026-08-10 a mesma classe reincidiu 3× com três danos diferentes (um shell preso 1h06 esperando por si mesmo), e o detector (3b) nasceu em `ba29f6eb6`, com a cura do colchete (`pgrep -f '[l]int-selftest'`) e âncora em início de comando contra o falso-positivo que esta migalha temia. A nota falhou de novo; o mecanismo resolveu.

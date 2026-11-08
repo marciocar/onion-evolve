@@ -8,7 +8,7 @@ affects: [meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Contagem desta sessão: 15 auto-correções, das quais 8 SÓ existiram porque o maestro perguntou. Não trate 'vou revisar melhor' como cura — disciplina não é mecanismo. O que funciona é resíduo material auditado por terceiro, desacoplado do ator (a catraca da REGRA 49, a guarda de shell que INTERROMPE, o diff vazio). Ao propor cura para um erro de julgamento próprio, pergunte: 'o que aqui roda mesmo que eu não queira?' Se a resposta for nada, a cura é decorativa."
-review_after: 2026-10-31
+review_after: 2027-02-06
 conflict_class: static
 significance: "Contei: 15 auto-correções na sessão, 8 delas só aconteceram porque o maestro perguntou. O gatilho comprovadamente eficaz foi SOCIAL — o que bate com o corpus e é desconfortável de escrever."
 ---
@@ -59,3 +59,5 @@ O número **15/8** é contagem própria sobre a própria sessão — sujeita jus
 entrada descreve. É provavelmente **piso**, não teto: os erros que ninguém perguntou e eu não notei
 não entram na conta, por definição. E esta entrada **não é mecanismo** — é uma reflexão, o degrau
 mais fraco. Seu único uso legítimo é ser lida quando alguém for propor "mais cuidado" como cura.
+
+## Re-testada em 2026-11-08 — PARCIAL: (static) a contagem de 08-02 vale, e a leitura foi qualificada. A memória `gatilho-mecanico-funciona-sem-o-maestro` (08-12) mediu o outro lado: onde existe mecanismo, ele dispara sem o maestro (17 correções numa sessão, nenhuma pedida). Leitura atual: onde não há mecanismo, o humano é o único gatilho, e escrever o mecanismo é o que o tira do caminho crítico. Nesta rodada as três correções que tive foram todas da guarda, nenhuma social.

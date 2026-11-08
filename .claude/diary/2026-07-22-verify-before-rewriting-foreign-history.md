@@ -7,8 +7,8 @@ tags: [verification, git, federation, foreign-repo, near-miss, declared-vs-verif
 affects: [meta, engineering, compliance]
 breadcrumb_for: []
 share_with: []
-next_recommended: "Antes de QUALQUER operação destrutiva sobre histórico de terceiro (rebase, filter, force-push, 'limpar' branch), a diagnose tem de ser verificada contra o estado real — não contra a aparência. Para 'vendor poluído com produto': medir `git rev-list --count <integração>..onion/vendor` (commits próprios do vendor) e `<vendor>..<integração>`. Zero commits próprios = ancestralidade compartilhada por design, NÃO pollution. Só agir se a medição confirmar a hipótese. A régua sobe com o custo do erro: destrutivo + repo alheio + irreversível = verificação obrigatória, sem exceção de pressa."
-review_after: 2026-10-20
+next_recommended: "Antes de QUALQUER operação destrutiva sobre histórico de terceiro (rebase, filter, force-push, 'limpar' branch), a diagnose tem de ser verificada contra o estado real — não contra a aparência. Para 'vendor poluído com produto': medir `git rev-list --count <integração>..onion/vendor` (commits próprios do vendor) e `<vendor>..<integração>`. Zero commits próprios = ancestralidade compartilhada por design, NÃO pollution; e commit próprio também não prova pollution — leia-os (no vendor durável eles são `chore(onion): update to pin …`). Só agir se a medição confirmar a hipótese. A régua sobe com o custo do erro: destrutivo + repo alheio + irreversível = verificação obrigatória, sem exceção de pressa."
+review_after: 2027-02-06
 conflict_class: static
 significance: "A disciplina de verificar-antes-de-agir, no seu teste de maior aposta do dia: impediu reescrever 640 commits do repo de outra pessoa para consertar um problema que não existia."
 ---
@@ -40,3 +40,5 @@ Ver `next_recommended`. Regra: **operação destrutiva em repo alheio exige medi
 nunca a aparência que a sugeriu.** Da mesma família de [[worst-truth-is-uncertain]] (a pior verdade é a que
 não temos certeza) e [[read-full-content-before-triage]] (não caracterizar pelo título) — aqui a
 "característica pelo título" era o `git log`, e o custo de errar era máximo.
+
+## Re-testada em 2026-11-08 — PARCIAL: (static, medi de novo no clone rhilo-metagamify, só leitura) o método vale; o número mudou. Hoje `chore/onion-framework..onion/vendor` = 4 e `onion/vendor..chore/onion-framework` = 9, e o vendor NÃO é mais ancestral da integração. Os 4 commits próprios são todos `chore(onion): update to pin …` (07-26 a 08-31), que é o que o modelo de vendor durável produz. Refinamento do `next_recommended`: zero commits próprios prova ancestralidade, mas commit próprio NÃO prova poluição. Leia os commits próprios antes de concluir.

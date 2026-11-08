@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Antes de propor AMPUTAR qualquer peça por 'cerimônia' ou 'zero consumidores': (1) abra a peça e leia inteira — 13 acusadas, ZERO sobreviveram ao exame; (2) se é abstração SDAAL do CORE, o consumidor é o ADOTANTE, não o core — meça com `grep -rl <peça> ~/onion-*/ ` e nos repos de adotante registrados em members.yaml, nunca só em `git grep` daqui. O erro tem forma fixa: contei call-sites no lugar errado e chamei o resultado de fato."
-review_after: 2026-10-31
+review_after: 2027-02-06
 conflict_class: static
 kg: docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml
 significance: "Listei 13 peças de 'cerimônia' a amputar e 3 'dívidas de SDAAL'. Ao examinar uma a uma: das 13, NENHUMA sobreviveu como cerimônia; das 3, só 1 era real. A lista tinha sido montada por inferência e apresentada como medição."
@@ -57,3 +57,5 @@ há mecanismo que exija medição-no-escopo-certo antes de uma proposta de amput
 escrito, degrau mais fraco da escada `guarda > KB > migalha`. A generalização mecânica plausível —
 "proposta de remoção de peça em `.claude/utils/` exige contagem nos repos de adotante" — **não foi
 construída**, e declaro que não foi.
+
+## Re-testada em 2026-11-08: (static) vale, e a classe reincidiu. `.claude/utils/de-identification/` está vendorizado em ~40 clones de `/home/marcio`, e `onion-pessoal-app/deid.ts` existe. Em 2026-11-04 colhi um nó de grafo como "sem referência" depois de olhar só o core, e a curadoria o citava (memória `harvest-check-peer-citations`). Segue sem guarda: a frase "nenhuma guarda impede a próxima" continua verdadeira.

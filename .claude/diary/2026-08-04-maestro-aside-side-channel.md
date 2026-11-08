@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-11-04
+review_after: 2027-02-06
 conflict_class: static
 significance: "Maestro's Aside: 1º protocolo de PREFIXOS TIPADOS de steering (gap aberto no estado-da-arte ago/2026). Marcador pt-BR no início da msg → hook injeta a rota canônica (recall, não gate). Dispatcher, cria zero store. No 1º dogfood, o 'dúvida:' pegou um furo no PRÓPRIO protocolo (o nome violava código=inglês)."
 ---
@@ -37,3 +37,5 @@ aplicado a si mesmo.
 
 **Como aplicar.** Casa canônica: `docs/knowledge-base/agentic-patterns/harness/maestro-aside.md` (vocabulário +
 tabela de roteamento). Registrado como invenção nomeada em `onion-framework-identity.md` §1.5. No `/warm-up` §4.6.
+
+## Re-testada em 2026-11-08: (static, busca externa standard) segue sem padrão de PREFIXOS TIPADOS de steering. O que emergiu foi o MECANISMO de steering no meio do turno: RFD `session/inject` no Agent Client Protocol (PR #1261, aberta) e `_session/steering` nos adaptadores claude-code e codex do Block (PR #3007, mergeada em 2026-07-28). São transporte, não vocabulário. A KB `maestro-aside.md` existe, o hook está em `.claude/settings.json` l.77, e as famílias `aside_router` e `aside_router_hook` passaram (lote de 232/232).

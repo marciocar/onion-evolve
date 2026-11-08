@@ -7,8 +7,8 @@ tags: [vendorization, adopter-oracle, lint, catraca, fonte-vs-derivacao, gloss, 
 affects: [meta, engineering, federation]
 breadcrumb_for: []
 share_with: []
-next_recommended: "Ao citar um artefato core-privado (docs/analysis, docs/onion, docs/evolution, .claude/diary) dentro de uma KB VENDORIZADA, nunca deixe um link vivo — vira texto simples + um gloss que carrega a DIMENSÃO real do artefato. A REGRA 45 (kb-vendored-link-check.sh) reprova o link novo com catraca; o baseline (101 hoje) é dívida a migrar, e a métrica de saúde é ele DIMINUINDO. Quando construir um selftest que faz `child | grep -q`, capture a saída numa VAR primeiro (out=$(child)); sob set -o pipefail o grep -q fecha a pipe no 1º match e o child morre de SIGPIPE(141), fazendo a pipe reportar falso."
-review_after: 2026-10-22
+next_recommended: "Ao citar um artefato core-privado (docs/analysis, docs/onion, docs/evolution, .claude/diary) dentro de uma KB VENDORIZADA, nunca deixe um link vivo — vira texto simples + um gloss que carrega a DIMENSÃO real do artefato. A REGRA 45 (kb-vendored-link-check.sh) reprova o link novo com catraca; o baseline (101 em 2026-07-24) era dívida a migrar, e a métrica de saúde era ele DIMINUINDO — zerou (0 em 2026-11-08). Quando construir um selftest que faz `child | grep -q`, capture a saída numa VAR primeiro (out=$(child)); sob set -o pipefail o grep -q fecha a pipe no 1º match e o child morre de SIGPIPE(141), fazendo a pipe reportar falso."
+review_after: 2027-02-06
 conflict_class: static
 significance: "O lint do core NÃO via um bug que quebrava o adotante: um link vivo de KB vendorizada para caminho core-privado resolve no core (o arquivo existe aqui) e passa — mas 404 no adotante. Só o lint DENTRO do repo do Pedro pegou. Escopo real: 101 links assim em 33 KBs, latentes. Virou REGRA 45 (guard core-side com catraca) + a convenção do gloss — mecanismo, não memória."
 ---
@@ -41,3 +41,5 @@ Lição meta: um gotcha documentado num arquivo não me imuniza; o mecanismo (o 
 ## Por que importa pra rede
 Todo adotante regulado (Pedro/Aura, granaai) lê essas KBs. Um link morto numa KB de compliance é pior que
 ruído: sugere uma fonte auditável que não existe do lado deles. O guard fecha isso na origem, antes de embarcar.
+
+## Re-testada em 2026-11-08 — PARCIAL: (static, rodei a guarda) a dívida foi paga: `kb-vendored-link-check.sh` devolve "Links core-privados: 0 · Baseline: 0 entrada(s)" (eram 101 em 33 KBs). A métrica de saúde que a migalha pedia, o baseline diminuindo, chegou a zero. A família `kb_vendored_link` passou (lote de 232/232). A lição do `pipefail`/SIGPIPE segue viva (família `shell_pipefail_robustness` passou).

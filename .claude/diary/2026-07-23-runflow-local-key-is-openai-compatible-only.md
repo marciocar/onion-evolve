@@ -8,7 +8,7 @@ affects: [engineering, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Para rodar um agente Runflow LOCAL (rf test / tsx) com chave própria sem tocar o tenant: use um provider OpenAI-compatible (openai/groq/xai/openrouter/litellm) e passe { apiKey } inline — só esses aceitam OpenAICompatibleOptions. anthropic/bedrock/gemini (ModelOptions: providerName/legacy) NÃO têm bypass de key local: exigem credencial no portal do tenant (Settings > LLM Providers). Antes de culpar o SDK por 'travar', separe as camadas: (1) valide a key+rede com curl direto ao provider; (2) veja se o processo respondeu rápido e só não ENCERROU (TraceCollector da observabilidade mantém timer aberto — force process.exit após o resultado)."
-review_after: 2026-10-21
+review_after: 2027-02-06
 conflict_class: conditional
 valid_when: "@runflow-ai/sdk mantém a assimetria de tipos — OpenAICompatibleOptions (openai/groq/xai) com apiKey/baseUrl inline vs ModelOptions (anthropic/bedrock/gemini) só providerName/legacy; re-verificar em core/models.d.ts ao subir de major do SDK (achado em 1.6.2)"
 significance: "A demo Runflow só rodou local porque OpenAI é OpenAI-compatible (aceita apiKey inline); Anthropic/Bedrock/Gemini exigem credencial no tenant — uma assimetria da abstração de provider que o plano não previa e só o dogfood do smoke-test revelou, com o falso-'travamento' sendo a observabilidade, não a chamada."
@@ -49,3 +49,5 @@ Ver `next_recommended`. Fecha o arco Runflow do dia junto de
 agente) — aqui a lição é operacional: **a abstração de provider do Runflow não é simétrica**, e dogfoodar o
 artefato (não o plano) foi o que revelou isso. Irmã da [[onion-dogfooding-doctrine]] (rodar o artefato de
 verdade, testar modo-de-falha, não só o happy-path).
+
+## Re-testada em 2026-11-08: (conditional, só o `valid_when`) o SDK publicado hoje é `@runflow-ai/sdk` 1.10.2 (`npm view`, modificado em 2026-11-04). Sem major novo. Em `dist/core/models.d.ts` da 1.10.2, `openai`, `groq` e `xai` seguem recebendo `OpenAICompatibleOptions` (`baseUrl` e `apiKey`), e `anthropic`, `bedrock` e `gemini` seguem só com `ModelOptions` (`providerName` e `legacy`). A assimetria vale.

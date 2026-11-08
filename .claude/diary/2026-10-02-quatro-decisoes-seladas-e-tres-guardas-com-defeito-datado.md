@@ -8,7 +8,7 @@ affects: [meta, validation]
 breadcrumb_for: []
 share_with: []
 next_recommended: "RE-FORJAR O /meta:evolve pelo conjunto das 7 peças — selado pelo maestro em 2026-10-02. ⚠️ CORREÇÃO DE 2026-10-03, leia antes de usar o número: ele é 2/7 (tem a peça 5, destino), EMPATADO com 12 outros, e 37 candidatos estão ABAIXO dele em 1/7 — NÃO é 0/7 nem o menos estruturado. A causa do erro foi instrumento: a projeção markdown do forge-census cortava 12 de 59 EM SILÊNCIO (curado no mesmo dia; hoje ela declara o corte). E o enquadramento certo não vem da contagem, vem do corpus: C_TESE_AUTO_EVOLUCAO (maestro-vivo-2026-08, imp 5) diz, VERBATIM, 'Não estamos atrás do eixo E2 — estamos à frente no PRODUTO do loop e atrás no GATILHO dele.' — o evolve não é fraco de estrutura, é sem gatilho, e são 65 dias sem rodar (não 32: aquele era o número de 2026-08-31). Relógio/cron NÃO está vedado a ele — o W7 escopa o driver, não o auditor read-only. Derive FRESCO contra o vivo (não há plano pré-cozinhado aqui, de propósito): rode o forge-census, leia a cláusula-mãe abaixo, e trate os cinco órgãos (census/radar/drive/onion-research/forjas) como FASES do laço, não como substitutos dele. Os 3 candidatos a guarda também estão selados e cada um tem defeito datado — ordem recomendada: paridade, dogfood-invoke, caso-testa-cópia."
-review_after: 2026-11-02
+review_after: 2027-02-06
 conflict_class: static
 ---
 
@@ -163,3 +163,5 @@ um caso que estava certo.
   família nova em `lint-selftest.sh`.
 - `bash .claude/validation/trust-topology-check.sh --from metagamify --to onion-evolve --action correct`
   e o `role:` dele no `members.yaml` → o 1 achado real do predicado unidirecional ainda existe?
+
+## Re-testada em 2026-11-08 — PARCIAL: (static, rodei os comandos de falsificação) decisão 1 executada: `forge-census.sh --tsv` dá o evolve 7/7, e ele rodou em 2026-10-04 (`docs/analysis/onion-evolution-2026-10-04.md`). Ganhou gatilho, `evolve-staleness-check.sh`, que hoje sai rc=1: 244 artefatos tocados depois da última auditoria (> 40), "rode /meta:evolve". Decisão 2 em parte: a paridade de hub virou família (`hub_role_guard`, passou) e o metagamify foi corrigido para `standalone` em 10-07. "Dogfood é invocar" e "caso que testa cópia" NÃO viraram guarda dedicada. Decisão 3: o `/meta:study` não existe, e o gatilho não abriu.

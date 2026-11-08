@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-11-01
+review_after: 2027-02-06
 conflict_class: static
 significance: "A guarda anti-fail-open nasceu em 02-08 e no PRIMEIRO dia de uso real por outra sessão me pegou 4 vezes — e as 4 foram o MESMO eixo: eu lendo sinal derivado em vez do vivo. O eixo tem forma, e a forma é medível."
 ---
@@ -52,3 +52,5 @@ de imediato).
 
 _Sem `kg:`: nasceu de uso direto, não de investigação multi-round — não há cadeia de claims/evidência
 a reconciliar, só um contador de 4 ocorrências observadas. Modelar como grafo seria cerimônia._
+
+## Re-testada em 2026-11-08: (static) vale: nesta rodada a guarda me pegou no mesmo eixo, lendo `$?` de pipe e `2>/dev/null` antes de contagem. A família `empty_result_guard` passou. Nota: o 5º erro (editar `plugins/` à mão) não tem mais superfície no core, porque o `plugins/` saiu na F4.

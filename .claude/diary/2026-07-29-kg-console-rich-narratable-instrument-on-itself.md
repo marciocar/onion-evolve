@@ -8,7 +8,7 @@ affects: [meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao construir uma SUPERFÍCIE nova sobre um SSOT (visualizador, relatório, narração), grave a fronteira em MECANISMO no mesmo loop, não em promessa: a superfície que 'projeta' o SSOT tende a driftar dele (a narração que cita id morto, o plugin que empacota o script mudado, a contagem que a superfície afirma). Cada drift vira guard determinístico (REGRA/selftest/paridade) OU volta a mentir com cara de fiel. E prove a superfície RODANDO-A (headless + escala real 881 nós + o HTML aberto sem rede), nunca só lendo o código — foi rodando o selftest com o vendor de 461KB embutido que o bug latente pipefail+grep-q+SIGPIPE apareceu."
-review_after: 2026-10-29
+review_after: 2027-02-06
 conflict_class: static
 significance: "Fechei de ponta a ponta o VISUALIZADOR do KG-SSOT: o kg-console.sh saiu de um SVG de círculo estático (ilegível > ~30 nós) para um console Cytoscape rico, NARRÁVEL por IA e self-contained — 4 PRs verdes (#486 F1+F2+F4, #487 F5, #488 F3). O núcleo do pedido do maestro ('visualizar/interagir com o .kg.yaml e ser explicado por um agente de IA, ideal um HTML autocontido') virou recurso vivo do core, promovendo o que o estudo SEED deixara gated. Mas a lição DURÁVEL é a fronteira SSOT×superfície gravada em mecanismo: a narração é o único ponto com IA (o console segue LLM-free) e a REGRA 47 a impede de citar id que o grafo não tem; o que viaja na federação é o CONTRATO JSON, nunca o JS do renderer. E o fecho foi o dogfood auto-referente: o console renderizando e narrando o grafo do PRÓPRIO desenho — o instrumento provado em si mesmo, mostrando na escada de reconciliação onde o próprio plano mudou ao ser construído (fcose→cose, SEED gated→promovido)."
 ---
@@ -59,3 +59,5 @@ O último artefato foi o console renderizando e narrando o grafo do **próprio d
 para si. A escada de reconciliação mostra onde o plano **mudou ao ser construído** (fcose→cose
 embutido; SEED gated→promovido, ambas `SUPERSEDES`) — um grafo honesto não esconde que o próprio
 plano evoluiu. É o dogfood como padrão master: o artefato de verdade, rodado, explicando a si mesmo.
+
+## Re-testada em 2026-11-08: (static, rodei) `kg-console.sh` sobre `kg-console-rich-design-2026-07.kg.yaml` saiu rc=0 com um HTML autocontido de 485 KB (Cytoscape embutido). A REGRA 47 (Narração do KG cita ids que existem no grafo) segue em `lint-artifacts.sh` l.4756, e as famílias `kg_console` e `kg_narrate_validate` passaram (lote de 152/152). Nota: a linha do plugin `onion-work-tools` é história, porque o `plugins/` saiu do core na F4 e o bundle nasce na publicação.

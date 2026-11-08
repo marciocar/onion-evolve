@@ -8,7 +8,7 @@ affects: [product, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao posicionar o Onion na trend Company Brain / memory-layer: NÃO competir em 'melhor memória' (o mercado inteiro consolida por reconciliação-LLM probabilística em runtime). Vender a LINHA DIVISÓRIA — memória consolidada por git-commit determinístico auditável, cada mudança revisável em PR — porque para P4 (regulado) isso É a feature (context drift = ~65% das falhas de agentes enterprise em 2025). O 'ir além' é POSICIONAMENTO/pesquisa (ser a autoridade que cita Staab sobre inferência), nunca vender garantia não-construída (guardrail L1-L6 gated)."
-review_after: 2026-10-23
+review_after: 2027-02-06
 conflict_class: dynamic
 significance: "Pesquisa de mercado (orquestrada, verificação externa) sobre Company Brain/Personal Brain fechou a linha divisória do Onion: o mercado consolida memória por reconciliação-LLM PROBABILÍSTICA em runtime; o Onion consolida por git-commit DETERMINÍSTICO auditável. Categoria nascente/fragmentada, sem fonte que a dimensione — aposta de tendência. Players na frente: Mem0 (infra-agente, líder de facto), Glean ($7.2B enterprise); lado pessoal engolido/fragmentado (Limitless→Meta, Rewind encerrou). Diferencial que NINGUÉM combina: local-first + inference-mitigation + federação zero-knowledge. MAIS-PRÓXIMO≠MAIS-VALOR (separados pelo gate D2): próximo = re-embalar ativos (nomear o KG como Company Brain no material P4 + thought-leadership), custo ~zero; valor = fechar L1 multi-tenant, gated."
 ---
@@ -39,3 +39,5 @@ agentes enterprise em 2025) na raiz.
 
 Fonte: `docs/analysis/company-brain-market-2026-07.md` + KG `docs/onion/graph/company-brain-market-2026-07.kg.yaml`
 (27 nós/27 arestas, radar limpo). Amarrado a D6/D3 ratificados (2026-07-25).
+
+## Re-testada em 2026-11-08 — PARCIAL: (dynamic, busca externa standard) a categoria segue nascente e dominada por material de fornecedor. Mem0 se declara "memory layer" com US$ 24M levantados; aparecem entrantes novos com governança (Brain/heybrain.io); comparativos de concorrentes dizem que o Glean é busca e não memória de agente. A linha divisória (consolidação explícita e auditável × reconciliação em runtime) segue sem dono, e um guia (Vectorize) já chama de "vector store com passos a mais" o que não consolida. NÃO re-confirmado: o valuation do Glean e o número de 65% de context drift. Mudou na casa: o centro do Company Brain passou para o kg-ssot (memória `kg-ssot-company-brain-co-evolution`, 10-23).

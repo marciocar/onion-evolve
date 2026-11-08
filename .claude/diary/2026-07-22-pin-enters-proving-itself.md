@@ -8,7 +8,7 @@ affects: [engineering, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Todo valor que um script GRAVA no histórico de um adotante (pin, stamp, id de membro) deve entrar provando ser o que diz ser, antes da gravação — nunca aceitar string livre. O teste barato de suspeita: 'este campo é validado ANTES de virar registro permanente no repo de outro?'. E o alerta que este achado deu de brinde: fixtures que usam valores fictícios (v2, v3, 'pin-de-mentira') praticam exatamente o hábito que deixa o lixo real passar — quando uma validação nova quebrar fixtures antigas por serem fictícias, isso é sinal, não incômodo: as fixtures estavam ensinando o bug."
-review_after: 2026-10-20
+review_after: 2027-02-06
 conflict_class: dynamic
 significance: "O 'drift silencioso de pin' que o grafo do core registrava só em abstrato ganhou nome (vnextpin), mecanismo de entrada (o pin prova ser commit) e ferramenta de auditoria — porque a capacidade foi exercida contra adotantes reais, não desenhada."
 ---
@@ -41,3 +41,5 @@ quando validação nova quebra fixture antiga por ela ser fictícia, a fixture e
 [[mechanism-beats-prose]] (a refutação virou mecanismo, não ficou prosa) e [[capability-never-met-reality]]
 (achado só apareceu porque a federação foi EXERCIDA — 4 bugs numa tarde de uso, depois de 5 semanas de
 desenho parado).
+
+## Re-testada em 2026-11-08: (dynamic, rodei) `vendor-branch.sh` l.489-507 recusa pin que não é commit da fonte e pin ≠ HEAD da fonte; `pin-integrity-check.sh --audit-vendor` reproduz o passivo: gustavo-pulga `vnextpin` (7 válidos, 1 inválido) e rhilo-metagamify `2026-07-12` (5 válidos, 1 inválido). O passivo segue intocado, como a migalha manda. Famílias `vendor_pin`, `pin_integrity` e `vendor_branch` passaram (lote de 232/232).
