@@ -4,6 +4,7 @@
   "must": [],
   "should": {
     "form.range.node.label": 13,
+    "integrity.bare-decision": 2,
     "yaml.unquoted-date": 1
   }
 }

@@ -27,7 +27,17 @@ nodes:
     impact: 2
     confidence: 0.5
     label: "Nó sintético C_COUNTER."
+  - id: EV_B
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A evidência sintética B, que substitui EV_A."
 edges:
+  - from: EV_B
+    to: EV_A
+    edge_type: SUPERSEDES
   - from: C_COUNTER
     to: EV_A
     edge_type: REFUTES

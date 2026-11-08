@@ -3,6 +3,7 @@
   "id": "compartilhamento-individuo-organizacao-2026-09",
   "must": [],
   "should": {
-    "form.range.node.label": 122
+    "form.range.node.label": 122,
+    "integrity.bare-decision": 1
   }
 }

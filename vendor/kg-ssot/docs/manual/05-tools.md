@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 512/512 (gates the rc)
+latest: 524/524 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -1464,6 +1464,10 @@ projection_ignore:   # names between backticks that are not node ids
 - **Four buckets.** `resolved` (in a graph of `projection_of`); `elsewhere` (only in another graph of the repository: a
   warning, not a failure); `outside` (`projection_of` names a graph of another repository by URL that `--with` did not
   read: not judged, counted); `missing` (`integrity.projection-id-missing`).
+- **A cited node that its graphs replaced (4.46.0).** An id that resolves only to `superseded` or `refuted` nodes of
+  the graphs of `projection_of` is also listed in `superseded_cited`, with a warning: the page rests on what the graph
+  replaced or overturned. If one of those graphs has the id alive, there is no warning. The rc does not change, and the
+  key is additive in `kg-ssot.projection/1`.
 - **`--with PREFIX=FOLDER`** reads that other graph from a local folder, at the commit in the URL when the folder is a
   git repository that has it, as in `kg_query --chain`. A URL that `--with` covers and that does not read (absent at
   the ref, not UTF-8, not a graph) is a graph error (rc 1), never `outside`. A graph read from the working tree because

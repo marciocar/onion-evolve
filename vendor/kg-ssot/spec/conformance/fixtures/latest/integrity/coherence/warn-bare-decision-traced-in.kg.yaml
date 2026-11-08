@@ -1,0 +1,23 @@
+meta:
+  schema_version: "1"
+  id: warn-bare-decision-traced-in
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: D_A
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    trace: "docs/adr-sintetico.md"
+    label: "A decisão sintética A."
+edges:
+  - from: Q_A
+    to: D_A
+    edge_type: TRACES_TO

@@ -3,6 +3,7 @@
   "id": "deck-patterns-2026-09",
   "must": [],
   "should": {
-    "form.range.node.label": 20
+    "form.range.node.label": 20,
+    "integrity.bare-decision": 1
   }
 }

@@ -3,6 +3,7 @@
   "id": "ocr-local-sei-2026-09",
   "must": [],
   "should": {
-    "form.range.node.label": 25
+    "form.range.node.label": 25,
+    "integrity.bare-decision": 1
   }
 }

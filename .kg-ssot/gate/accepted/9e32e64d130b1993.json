@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-08",
+  "reason": "kg-ssot 4.46.0 (contrato v4.19, só SHOULD) traz dois avisos novos que medem dívida antiga do corpus, não regressão deste PR: integrity.bare-decision 736 (decisão done sem narrative e sem SUPPORTS chegando) e integrity.superseded-without-successor 63 (nó superseded sem SUPERSEDES chegando). Medido em 2026-11-08 na origin/main 3a1051d97 + vendor 4.46.0; nenhum outro código mudou. Entra como linha de base para a catraca impedir crescimento; pagar a dívida é trabalho próprio.",
+  "worse": [
+    "✗ PIOROU  debt.integrity.bare-decision: 0 → 736",
+    "✗ PIOROU  debt.integrity.superseded-without-successor: 0 → 63"
+  ]
+}

@@ -4,6 +4,7 @@
   "must": [],
   "should": {
     "form.range.node.label": 15,
+    "integrity.bare-decision": 3,
     "integrity.untraced-decision": 2
   }
 }

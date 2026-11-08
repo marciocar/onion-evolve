@@ -29,6 +29,7 @@ nodes:
     verified_at: "2026-10-08"
     verified_against: "medição sintética"
     label: "Nó sintético D_X."
+    narrative: "O porquê sintético da decisão X."
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"

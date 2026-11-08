@@ -164,6 +164,33 @@
         "type": "string"
       },
       "description": "As páginas que declaram projection_of e não citam nenhum id entre crases: nada foi conferido nelas (aviso, não reprova). O id em texto corrido, fora de crases, não é lido."
+    },
+    "superseded_cited": {
+      "description": "Desde a 4.46.0, aditivo e fora do required: o id citado que resolve só em nós superseded ou refuted dos grafos do projection_of (se algum o tem vivo, não entra). Aviso: o rc não muda.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "page",
+          "id",
+          "status"
+        ],
+        "properties": {
+          "page": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "superseded",
+              "refuted"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
     }
   }
 }

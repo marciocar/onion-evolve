@@ -1,5 +1,5 @@
 {
-  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision. Desde o v4.4, nó que recebe REFUTES e segue vivo (nem superseded nem refuted; a question done já está respondida) alerta integrity.refutes-unreconciled: é a contradição que o radar reprova, como aviso por enquanto. Desde o v4.5, a REFUTES que chega pelas external_edges conta só quando o leitor tem o corpus (latest/integrity/external-corpus/).",
+  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision. Desde o v4.4, nó que recebe REFUTES e segue vivo (nem superseded nem refuted; a question done já está respondida) alerta integrity.refutes-unreconciled: é a contradição que o radar reprova, como aviso por enquanto. Desde o v4.5, a REFUTES que chega pelas external_edges conta só quando o leitor tem o corpus (latest/integrity/external-corpus/). Desde o v4.19, decision done sem narrative com texto e sem SUPPORTS chegando a ela alerta integrity.bare-decision, e nó superseded sem SUPERSEDES chegando a ele alerta integrity.superseded-without-successor; nas duas conta a aresta declarada neste grafo, local ou nas external_edges com from externo, com ou sem o corpus.",
   "layer": "integrity",
   "pending_on": [],
   "cases": [
@@ -185,6 +185,99 @@
       "description": "REFUTES que chega de outro grafo, sem o corpus: a ponta externa não foi conferida, e a aresta não conta para o aviso",
       "valid": true,
       "codes": []
+    },
+    {
+      "file": "warn-bare-decision.kg.yaml",
+      "description": "decision done sem narrative e sem SUPPORTS chegando a ela: a fechada que não diz por quê (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.bare-decision"
+      ]
+    },
+    {
+      "file": "warn-bare-decision-narrative-blank-nel.kg.yaml",
+      "description": "decision done cuja narrative é só um NEL (U+0085): espaço no str.isspace, então não é porquê, e alerta (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.bare-decision"
+      ]
+    },
+    {
+      "file": "warn-bare-decision-supports-outgoing.kg.yaml",
+      "description": "decision done que SAI com SUPPORTS, mas nada chega a ela: o apoio que conta é o que entra (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.bare-decision"
+      ]
+    },
+    {
+      "file": "valid-decision-done-with-narrative.kg.yaml",
+      "description": "decision done com narrative: diz por quê, sem aviso (v4.19)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-done-supported.kg.yaml",
+      "description": "decision done sem narrative, com SUPPORTS chegando a ela: diz no que se apoia, sem aviso (v4.19)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-done-supported-external.kg.yaml",
+      "description": "decision done cujo apoio chega pelas external_edges (from externo): conta mesmo sem o corpus, porque é a declaração que o aviso pede (v4.19)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-open-without-narrative.kg.yaml",
+      "description": "decision open sem narrative: o aviso é só da fechada (v4.19)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-superseded-without-successor.kg.yaml",
+      "description": "nó superseded sem SUPERSEDES chegando a ele: o grafo não diz o que o substituiu (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.superseded-without-successor"
+      ]
+    },
+    {
+      "file": "warn-superseded-outgoing-only.kg.yaml",
+      "description": "EV_A superseded que só SAI com SUPERSEDES para EV_OLD (viva): ela substituiu EV_OLD, mas ninguém a substitui; com a regra errada (contar a que sai) o caso fica sem aviso e reprova (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.superseded-without-successor"
+      ]
+    },
+    {
+      "file": "valid-superseded-with-successor-external.kg.yaml",
+      "description": "nó superseded cujo substituto mora em outro grafo, declarado aqui nas external_edges: sem aviso, mesmo sem o corpus (v4.19)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-superseded-refuted-not-replaced.kg.yaml",
+      "description": "nó superseded que recebe REFUTES, mas nenhuma SUPERSEDES: aresta de outro tipo chegando não é o substituto (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.superseded-without-successor"
+      ]
+    },
+    {
+      "file": "warn-bare-decision-traced-in.kg.yaml",
+      "description": "decision done sem narrative que recebe TRACES_TO, mas nenhum SUPPORTS: aresta de outro tipo chegando não é apoio (v4.19)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.bare-decision"
+      ]
     }
   ]
 }

@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:f8300f82fd2bf0b8 -->
+<!-- translation-of: ADOPTING.md sha256:f9a290942fa33051 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -350,6 +350,15 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.45.0` para a `kg-ssot-v4.46.0`, entra o contrato v4.19, só SHOULD: nenhum grafo que passava reprova.
+Dois avisos novos podem aparecer: `integrity.bare-decision`, a decisão `done` sem `narrative` e sem aresta `SUPPORTS`
+chegando a ela, e `integrity.superseded-without-successor`, o nó `superseded` a que nenhuma aresta `SUPERSEDES` chega.
+Os dois contam a aresta declarada no próprio grafo, local ou nas `external_edges` com `from` externo; quando o
+substituto mora em outro grafo, declare-o ali (`from: <caminho>#<id>`, `to:` o nó). O gate informa a identidade nova
+do contrato; um gate que conta a dívida SHOULD vê os avisos novos como dívida dos grafos antigos, e essa é a rampa: o
+grafo antigo não é cobrado pelo que já tinha, só por piorar (renove a linha de base com `kg_gate.py --update`). O
+`kg_trace projection` ganha `superseded_cited`, aditivo na `kg-ssot.projection/1`.
 
 Da `kg-ssot-v4.44.0` para a `kg-ssot-v4.45.0`, nada é obrigatório: o contrato (v4.18), os vereditos e tudo o que um
 leitor, o gate ou o armazém imprime são os mesmos. O vendor traz dois arquivos novos, o `SECURITY.md` e o gerador de SBOM em

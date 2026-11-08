@@ -4,6 +4,7 @@
   "must": [],
   "should": {
     "form.range.node.label": 9,
+    "integrity.superseded-without-successor": 1,
     "yaml.unquoted-date": 1
   }
 }

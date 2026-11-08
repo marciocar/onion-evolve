@@ -672,7 +672,8 @@ function containsValue(value, hit) {
 /** Os avisos de coerência, que cruzam campos ou arestas (coherence_located da referência), um por ocorrência:
  * integrity.testimony-in-prod, integrity.verified-before-fact, integrity.untraced-decision e
  * integrity.refutes-unreconciled; desde o v4.12, os do critério pré-registrado (criterionCodes); desde o v4.14, a
- * notation repetida no mesmo esquema (termCodes). */
+ * notation repetida no mesmo esquema (termCodes); desde o v4.19, integrity.bare-decision e
+ * integrity.superseded-without-successor, com a aresta declarada neste grafo (local ou external_edges com from externo). */
 export function coherenceCodes(doc, corpus = null) {
   const out = [];
   const edges = Array.isArray(doc.edges) ? doc.edges : [];
@@ -680,6 +681,18 @@ export function coherenceCodes(doc, corpus = null) {
     .map((e) => e.from));
   const refuted = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === 'REFUTES' && typeof get(e, 'to') === 'string')
     .map((e) => e.to));
+  const extAll = Array.isArray(doc.external_edges) ? doc.external_edges : [];
+  const incoming = (kind) => { // v4.19: a aresta declarada aqui que chega a um nó local
+    const got = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === kind && typeof get(e, 'to') === 'string')
+      .map((e) => e.to));
+    for (const e of extAll) {
+      if (isObj(e) && get(e, 'edge_type') === kind && isExternal(get(e, 'from'))
+          && typeof get(e, 'to') === 'string' && !isExternal(get(e, 'to'))) got.add(e.to);
+    }
+    return got;
+  };
+  const supported = incoming('SUPPORTS');
+  const supersededIn = incoming('SUPERSEDES');
   if (corpus !== null && corpus !== undefined) { // v4.5: a REFUTES que chega de outro grafo, só com o corpus (a ponta externa conferida)
     const ext = Array.isArray(doc.external_edges) ? doc.external_edges : [];
     for (const e of ext) {
@@ -711,6 +724,13 @@ export function coherenceCodes(doc, corpus = null) {
         && !(status === 'done' && get(n, 'node_type') === 'question')) {
       out.push('integrity.refutes-unreconciled');
     }
+    const nid = typeof get(n, 'id') === 'string' ? n.id : null;
+    const narrative = get(n, 'narrative');
+    if (get(n, 'node_type') === 'decision' && status === 'done'
+        && !(typeof narrative === 'string' && !PY_BLANK.test(narrative)) && !supported.has(nid)) {
+      out.push('integrity.bare-decision');
+    }
+    if (status === 'superseded' && !supersededIn.has(nid)) out.push('integrity.superseded-without-successor');
   }
   return out.concat(criterionCodes(doc), termCodes(doc));
 }

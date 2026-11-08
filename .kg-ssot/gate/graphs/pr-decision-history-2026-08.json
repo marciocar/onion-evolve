@@ -2,5 +2,7 @@
   "graph": "docs/onion/graph/pr-decision-history-2026-08.kg.yaml",
   "id": "pr-decision-history-2026-08",
   "must": [],
-  "should": {}
+  "should": {
+    "integrity.bare-decision": 671
+  }
 }

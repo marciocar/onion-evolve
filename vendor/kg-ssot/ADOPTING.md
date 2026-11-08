@@ -351,6 +351,15 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.45.0` to `kg-ssot-v4.46.0`, contract v4.19 comes in, SHOULD only: no graph that passed fails. Two
+new warnings may appear: `integrity.bare-decision`, a decision `done` with no `narrative` and no `SUPPORTS` edge reaching
+it, and `integrity.superseded-without-successor`, a `superseded` node that no `SUPERSEDES` edge reaches. Both count the
+edge declared in the graph itself, local or in `external_edges` with an external `from`; when the successor lives in
+another graph, declare it there (`from: <path>#<id>`, `to:` the node). The gate reports the new contract identity; a
+gate that counts SHOULD debt sees the new warnings as debt of the old graphs, which is the ramp: an old graph is not
+charged for what it already had, only for making it worse (refresh the baseline with `kg_gate.py --update`). `kg_trace
+projection` gains `superseded_cited`, additive in `kg-ssot.projection/1`.
+
 From `kg-ssot-v4.44.0` to `kg-ssot-v4.45.0`, nothing is required: the contract (v4.18), the verdicts and everything a
 reader, the gate or the store prints are the same. The vendor brings two new files, `SECURITY.md` and the SBOM generator in
 `packaging/sbom/`, and each release artifact now comes with its CycloneDX 1.7 SBOM, attested next to its provenance. The
