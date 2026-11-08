@@ -2,7 +2,8 @@
 branch: docs/site-refresh-2026-11
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6a0bb6f04df3ca99395f4cd1f76966e00370631f15aac2acc7bb9a8b1c06922b
+reviewed_code_sha256: d662764cd2ea2d014cb1ba154d8723f8b5b7b7303baa294331c75738186c910e
 findings_total: 4
 findings_real: 4
 tokens: 0
