@@ -1,0 +1,65 @@
+meta:
+  schema_version: "1"
+  id: curation-seals-2026-11
+  slug: curation-seals-2026-11
+  title: "Selos do core sobre as peças propostas pela curadoria na onda 2 do quadro"
+  date: "2026-11-08"
+  baseline: "2026-11-08"
+  review_after: "2026-12-08"
+  purpose: "A curadoria propõe e o core sela. O checador de dissecação exige que a peça fechada aponte o nó do selo no core (x_dissect_sealed_by). Este grafo guarda esses nós."
+  note: "TETO, declarado: só selos do core sobre peças da curadoria. A execução de cada nó é da sessão da curadoria. Selados pelo core em nome do maestro (modo autônomo de 2026-11-06), revogáveis por ele."
+  # ═══ TETO: 8 NÓS ═══
+nodes:
+  - id: E_CS_ONDA2_RESPOSTAS_DO_CORE_1108
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "docs/evolution/federation/outbox/onion-curation/2026-11-08-respostas-do-core-onda-2.md, entregue à curadoria pelo carteiro"
+    trace: "docs/evolution/federation/outbox/onion-curation/2026-11-08-respostas-do-core-onda-2.md"
+    label: "O anúncio do core de 2026-11-08 respondeu aos sinais da onda 2 da curadoria e selou o fechamento do mecanismo do channel e os 5 parques YW."
+    narrative: "O anúncio trazia os selos só em prosa. A curadoria mediu que o checador de dissecação exige o nó, e estes nós existem para isso."
+    provenance:
+      source: "anúncio do core à curadoria, 2026-11-08"
+      locator: "tabela «Respostas curtas do core»"
+      method: "leitura: anúncio versionado no outbox do core"
+  - id: D_SEAL_PIECE_CH_MECHANISM_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "a campainha declara a capability claude/channel e tocou ao vivo em 2026-11-07 e 2026-11-08 (Q_CS_DEGRAU1_CAMPAINHA_1109 done em comms-stable-2026-11)"
+    label: "A peça D_PIECE_CH_MECHANISM da curadoria fecha: o costurar já foi feito, porque a campainha é o toque do degrau 1 e declara claude/channel."
+    narrative: "Selado pelo core em nome do maestro, revogável por ele. A curadoria cita este nó em x_dissect_sealed_by e reescreve os nós do gatilho por ponte. A re-âncora da superação pode citar onion-messaging@f67ff00."
+    provenance:
+      source: "sinal channels-trigger-per-bridge da curadoria, respondido pelo core em 2026-11-08"
+      locator: "linha «Canais entre sessões» do anúncio de 2026-11-08"
+      method: "derivado: critério do costurar confrontado com a campainha em produção"
+  - id: D_SEAL_YW_PARKS_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-08"
+    verified_against: "sinal wave2-seen-not-raised da curadoria (em _processed) e o board-consolidated da onda 2, nós YW_CANDIDATE_*"
+    label: "Selo em bloco dos 5 parques YW da curadoria: blast-radius, releitura do context-inspector, dependency-lens, scope-guard e teste por revisão do verify-board, cada um com o gatilho declarado no próprio nó."
+    narrative: "Selado pelo core em nome do maestro, revogável por ele. Parquear não é rejeitar: cada peça volta se o gatilho do nó dela disparar. A curadoria cita este nó em x_dissect_sealed_by."
+    provenance:
+      source: "sinal wave2-seen-not-raised da curadoria, respondido pelo core em 2026-11-08"
+      locator: "linha «Onda 2, os 10 vistos» do anúncio de 2026-11-08"
+      method: "derivado: leitura dos gatilhos propostos pela curadoria"
+edges:
+  - from: E_CS_ONDA2_RESPOSTAS_DO_CORE_1108
+    to: D_SEAL_PIECE_CH_MECHANISM_1108
+    edge_type: SUPPORTS
+  - from: E_CS_ONDA2_RESPOSTAS_DO_CORE_1108
+    to: D_SEAL_YW_PARKS_1108
+    edge_type: SUPPORTS
