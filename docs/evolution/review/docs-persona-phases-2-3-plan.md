@@ -2,7 +2,8 @@
 branch: docs/persona-phases-2-3-plan
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 12e50c944f003f7e7fd0e68664c787edce16d368a4694265da0d314e0cc0d1ab
+reviewed_code_sha256: a3c6c42446bb182eb3e4e576a4899e0bcf278c7ede242b5f80766abe254b329b
 findings_total: 3
 findings_real: 3
 findings_blocking: 1
