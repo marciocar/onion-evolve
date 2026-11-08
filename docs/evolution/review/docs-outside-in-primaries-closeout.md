@@ -2,14 +2,13 @@
 branch: docs/outside-in-primaries-closeout
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: 25e1a7b2aac85b4fce51d989523b989bd82ded25c68cadb7edfad6af24541c92
-reviewed_code_sha256: dea080bb2ffce692877f776f33223cefb98cfc007f2ae940d6cb0cefcc3621e7
-findings_total: 8
-findings_real: 8
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
 findings_blocking: 1
 tokens: 0
 duration_min: 0
-findings_fixed: 8
+findings_fixed: 9
 verdict: FIXED
 elenxo: true
 elenxo_isolado: false
@@ -22,7 +21,7 @@ nota: "tokens e duração da passada de fechamento não medidos (0); o custo do 
 O Elenxo do workflow é a passada separada sobre o conteúdo da rodada. Ele produziu 32 objeções sobreviventes, 13
 bloqueantes, todas no grafo. Elas foram aplicadas pelo escritor do workflow, antes deste diff.
 
-No fechamento, a passada própria achou oito defeitos, todos corrigidos antes do commit:
+No fechamento, a passada própria achou nove defeitos, todos corrigidos antes do commit:
 
 1. **(bloqueante)** Os 7 itens ATRÁS vinham de heads antigos. Cada um foi medido de novo no vivo; os 7 seguem reais,
    e o comando e o resultado estão em `verified_against`.
@@ -34,6 +33,7 @@ No fechamento, a passada própria achou oito defeitos, todos corrigidos antes do
 6. O item do ruleset ficou velho antes do merge: curado às 22:20Z, depois da medida. O nó fechou com a saída nova, e SAC-360 (a tarefa do ruleset da main) foi para Done.
 7. `Q_SANDBOX_DENY_LAYER_DECISION_1108` ainda perguntava o deny, já decidido no selo do PR #1550. Agora pergunta só o sandbox, citando o selo sem aresta, e tem espelho em SAC-367 (a decisão do sandbox).
 8. As datas dos 6 itens abertos não tinham base. Viraram provisórias, a calibrar por story points; os nós perderam o `x_due`, que o contrato não exige, e os títulos no Linear dizem «prazo a calibrar».
+9. O #1550 entrou na main durante o fecho, e o nó do sandbox ainda o dava como não mergeado. A frase foi corrigida, e o selo ganhou a aresta externa que antes não cabia.
 
 Dois limites ficam declarados: as linhas ALINHADO e DIVERGE marcadas "não remedido" continuam sendo posição de 1
 agente, e nada se afirma sobre o binário do Scorecard ou o nível SLSA L3.
