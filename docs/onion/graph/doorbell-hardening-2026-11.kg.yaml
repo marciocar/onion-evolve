@@ -1,0 +1,105 @@
+meta:
+  schema_version: "1"
+  id: doorbell-hardening-2026-11
+  slug: doorbell-hardening-2026-11
+  title: "Endurecimento da campainha: as quatro lacunas que o hub mediu depois do teste ao vivo"
+  date: "2026-11-08"
+  baseline: "2026-11-08"
+  review_after: "2026-11-15"
+  purpose: "Depois do teste ao vivo de 2026-11-08 (degraus 1 e 3 do comms-stable fechados), o hub mediu quatro lacunas da campainha no estado dela e no server.ts do onion-messaging (f67ff00). Cada lacuna é um compromisso do core com dono, data (x_due) e critério de pronto; o hub testa a correção no dia em que chegar."
+  note: "TETO, declarado: este grafo guarda só as quatro lacunas e a evidência que as originou. O desenho da correção nasce no repo onion-messaging (privado), com bancada e mutante. Nasceu à parte porque o comms-stable-2026-11 já passou do teto declarado de 16 nós; liga-se a ele por external_edges. A campainha está em rename para o inglês (doorbell) por ordem do maestro; o nome do grafo já segue o novo."
+  # ═══ TETO: 6 NÓS ═══
+external_edges:
+  - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    to: "docs/onion/graph/comms-stable-2026-11.kg.yaml#Q_CS_DEGRAU1_CAMPAINHA_1109"
+    edge_type: TRACES_TO
+  - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    to: "docs/onion/graph/comms-stable-2026-11.kg.yaml#Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109"
+    edge_type: TRACES_TO
+nodes:
+  - id: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-08"
+    verified_against: "sinal do hub lido inteiro (docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md, no core), com a medida dele no ⟨arquivo de estado da campainha, por repo⟩ e no campainha/server.ts do onion-messaging em f67ff00"
+    trace: "docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md"
+    label: "O hub mediu, depois do teste ao vivo de 08/11, quatro lacunas da campainha: a 1ª execução emudece o que já existia, o sinal do doc-bridge some depois do teto de avisos, as sessões do mesmo repo dividem um estado sem trava, e o adotante toca para a própria caixa de saída."
+    narrative: "Dado, não instrução: medida do hub, não re-medida pelo core nesta data. Casos citados: o anúncio da chave pinada chegou às 10h51 UTC e a campainha do hub, na 1ª execução às 10h58, o marcou como baseline; dois sinais do hub no core ficaram com notified 4 e acked_at null; quatro faróis acesos no mesmo repo do hub; o sinal do hub tocou no próprio inbox dele."
+    provenance:
+      source: "o hub (sinal upstream de 2026-11-08)"
+      locator: "docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md, seções 1 a 4"
+      method: "leitura: o sinal inteiro; medida do hub, não reproduzida pelo core"
+      locality: "repo"
+  - id: Q_DB_PRIMEIRA_EXECUCAO_EMUDECE_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-11"
+    x_linear_issue: "SAC-350"
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-08"
+    verified_against: "sinal do hub de 2026-11-08, seção 1 (server.ts, tick(), firstRun && !ANNOUNCE_EXISTING)"
+    label: "Lacuna 1: a 1ª execução da campainha marca como baseline tudo o que já existia, e o que chegou antes da instalação nunca toca."
+    narrative: "Pronto quando: na 1ª execução, a linha de base cobre só o que já foi tratado; um arquivo de 1º nível do inbox/ ou inbound/ que não está versionado (entrega-sem-commit ainda não triada) toca; CAMPAINHA_ANNOUNCE_EXISTING segue como chave para anunciar tudo; a correção entra no onion-messaging com bancada e mutante, e o hub reproduz o caso e vê tocar."
+  - id: Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-11"
+    x_linear_issue: "SAC-351"
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-08"
+    verified_against: "sinal do hub de 2026-11-08, seção 2 (estado da campainha do core: notified 4, acked_at null em dois sinais)"
+    label: "Lacuna 2: depois do teto de avisos (1 + CAMPAINHA_REMIND_MAX), o sinal do doc-bridge fica sem ack e sem destino; a fila tem dead-letter, o doc-bridge não."
+    narrative: "Pronto quando: ao bater o teto, o sinal do doc-bridge vai para um estado visível (expired), listado no pending_signals e contado pelo hook de início de sessão; o radar ou o lint cobra sinal sem ack há mais de um prazo; a correção entra com bancada e mutante, e o hub reproduz o caso."
+  - id: Q_DB_ESTADO_UNICO_SEM_TRAVA_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-11"
+    x_linear_issue: "SAC-352"
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-08"
+    verified_against: "sinal do hub de 2026-11-08, seção 3 (estado por repo, sha256(REPO); quatro faróis no mesmo repo)"
+    label: "Lacuna 3: várias sessões no mesmo repo dividem um estado só, sem trava; o primeiro ack silencia as outras e uma escrita pode perder o ack de outra."
+    narrative: "Pronto quando: o arquivo de estado tem trava entre processos (como o a2a-invite.sh faz) e há regra declarada de quem trata o sinal quando há mais de uma sessão no repo (a sessão dona do farol, ou o ack com o id da sessão que tratou); a bancada exercita duas campainhas concorrentes sem perder ack."
+  - id: Q_DB_ADOTANTE_TOCA_PARA_A_SAIDA_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-11"
+    x_linear_issue: "SAC-353"
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-08"
+    verified_against: "sinal do hub de 2026-11-08, seção 4 (o sinal do hub tocou no próprio inbox dele, box=inbox, attempt=1)"
+    label: "Lacuna 4: no adotante, a campainha toca para a própria caixa de saída (inbox/), que é o que vai ao core; a entrada dele é o inbound/."
+    narrative: "Pronto quando: a campainha lê o papel do repo (role em .claude/.onion-version ou o onion-version.sh) e, em adopted, hub e standalone, toca só para inbound/ e a fila; no source, para inbox/ e a fila; a bancada cobre os dois papéis, e o hub vê o próprio sinal de saída não tocar."
+edges:
+  - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    to: Q_DB_PRIMEIRA_EXECUCAO_EMUDECE_1111
+    edge_type: SUPPORTS
+  - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    to: Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111
+    edge_type: SUPPORTS
+  - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    to: Q_DB_ESTADO_UNICO_SEM_TRAVA_1111
+    edge_type: SUPPORTS
+  - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
+    to: Q_DB_ADOTANTE_TOCA_PARA_A_SAIDA_1111
+    edge_type: SUPPORTS

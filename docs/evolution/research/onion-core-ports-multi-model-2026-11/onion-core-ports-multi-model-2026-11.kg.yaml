@@ -47,6 +47,9 @@ nodes:
     node_type: question
     plane: DEV
     status: open
+    owner: core
+    x_due: "2026-11-13"
+    x_linear_issue: "SAC-354"
     impact: 5
     confidence: 0.5
     verified_at: "2026-11-02"
