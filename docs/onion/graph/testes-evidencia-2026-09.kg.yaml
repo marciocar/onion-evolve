@@ -163,7 +163,7 @@ nodes:
   - id: D_VOCABULARIO_FECHADO_DO_VEREDITO
     node_type: decision
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.95
     verified_at: '2026-09-08'
@@ -516,6 +516,22 @@ nodes:
       locator: "Medido em 2026-09-27 contra o `harness-inventory.sh` de origin/main, em tres sandboxes construidos com `git archive HEAD` (copia FIEL da arvore rastreada). (1) SEM .git: rc=0, a tabela sai com CINCO contadores zerados, e o stderr traz a mensagem `sem indice git ... Recusa.` CINCO VEZES — contadas com grep -c. (2) Com git e tudo UNTRACKED (o cenario do adotante greenfield): mesmo resultado, rc=0. (3) No repo real: 80 scripts, 16 hooks, correto. Depois da cura: (1) rc=2 recusando ANTES de contar; (2) rc=2 nomeando `CONTRADICAO ... 75 arquivo(s) em disco ... contagem RASTREADA = 0`; (3) inalterado. Mutante que devolve o `_die` para dentro do `_tracked` e remove a assertiva: os dois casos de bancada REPROVAM, com rc=0 e a mensagem Recusa impressa."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
+  - id: D_VALOR_DE_MAQUINA_DO_RESIDUO_EM_INGLES
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «valor de campo de máquina em inglês (verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS; elenxo e elenxo_isolado true|false), legado de 871 resíduos aceito por lista congelada com catraca (PR #1541)»"
+    label: "Valor de campo de maquina do residuo da REGRA 56 (PR carrega residuo adversarial) vai em ingles: verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS, elenxo e elenxo_isolado true|false; legado de 871 por lista congelada com catraca."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «valor de campo de máquina em inglês (verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS; elenxo e elenxo_isolado true|false), legado de 871 resíduos aceito por lista congelada com catraca (PR #1541)»; descartadas: «manter o valor de máquina em pt-BR» · «reescrever os resíduos antigos para o inglês»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «valor de campo de máquina do resíduo da REGRA 56: pt-BR ou inglês, e o que fazer com o legado?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
 
 edges:
   - from: E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA
@@ -636,3 +652,6 @@ edges:
   - from: D_PR_DA_ONDA_0
     to: I_AUSENCIA_LIDA_COMO_RESULTADO
     edge_type: DEPENDS_ON
+  - from: D_VALOR_DE_MAQUINA_DO_RESIDUO_EM_INGLES
+    to: D_VOCABULARIO_FECHADO_DO_VEREDITO
+    edge_type: SUPERSEDES
