@@ -2,17 +2,16 @@
 branch: docs/site-refresh-2026-11
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: 6a0bb6f04df3ca99395f4cd1f76966e00370631f15aac2acc7bb9a8b1c06922b
-reviewed_code_sha256: d662764cd2ea2d014cb1ba154d8723f8b5b7b7303baa294331c75738186c910e
-findings_total: 4
-findings_real: 4
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 7
 tokens: 0
 duration_min: 15
-findings_fixed: 4
+findings_fixed: 7
 verdict: CORRIGIDO
-elenxo: não
-reviewer: "o próprio agente de execução, numa passada com mandato de refutar o diff; sem subagente, porque o brief desta tarefa proíbe criar agentes"
-nota: "tokens = 0: não medido (a passada foi do próprio agente, sem subagente medido pelo harness). Revisão de uma só lente (quem escreveu revisou): vale como passada adversarial declarada, não como Elenxo. Uma segunda lente independente fica recomendada antes do merge."
+elenxo: sim
+reviewer: "1ª passada: o próprio agente de execução, com mandato de refutar; 2ª lente: o refutador independente da sessão do core (refuter-1533), que REPROVOU com 2 bloqueios + 1 erro"
+nota: "tokens = 0: não medido (a passada foi do próprio agente, sem subagente medido pelo harness). A 1ª passada foi de uma lente só; a 2ª lente, independente, reprovou e os 3 achados dela foram curados na mesma branch."
 ---
 
 # Passada adversarial: `docs/site-refresh-2026-11`
@@ -56,6 +55,17 @@ nota: "tokens = 0: não medido (a passada foi do próprio agente, sem subagente 
   rc 0, sem achado.
 - REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente): `site/` não é raiz vendorizada; a família `sub`
   da varredura acima cobre os termos de cliente nas linhas acrescentadas.
+
+## Achados da 2ª lente (refutador independente), curados
+
+5. BLOQUEIO: na home, «24 adotantes · 6 com chave A2A» lia como 6 de 24, mas só 4 ADOTANTES têm chave; os outros 2
+   eram identidades de teste (kind method). Medido: membros `kind: adopter` com `a2a.keys` = 4. Corrigido no tile
+   e no destaque da federação.
+6. BLOQUEIO: no /estado/, «24 adotantes … todos chegaram por relação» inflava o número com peças do próprio autor.
+   Separado em 16 de terceiros + 8 do próprio autor, com o critério escrito no PR (peças do próprio Onion e a empresa
+   do autor, os dois membros com o mesmo remote). O «por relação» vale só para os 16.
+7. ERRADO: a glosa do onion-meta dizia que ele «saiu» do marketplace. Ele ficou FORA por desenho quando o marketplace
+   nasceu e ENTROU por decisão em outubro. Reescrito.
 
 ## Mutantes
 
