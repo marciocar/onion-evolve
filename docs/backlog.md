@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1023 itens abertos** em 156 grafo(s) com aberto (de 200 no escopo) · 155 grupo(s), agrupados por `owner:` (58 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1029 itens abertos** em 157 grafo(s) com aberto (de 201 no escopo) · 156 grupo(s), agrupados por `owner:` (63 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -476,18 +476,22 @@
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
-## core — 29 item(ns)
+## core — 33 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 55.0 | `Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11` | onion-core-ports-multi-model-2026-11 | Como o Onion deve fazer portas do onion-core para outros harnesses e modelos (onion-codex vivo; candidatas onion-mistral, onion-ge |
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
+| 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
+| 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
+| 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 5.6 | `Q_DB_ESTADO_UNICO_SEM_TRAVA_1111` | doorbell-hardening-2026-11 | Lacuna 3: várias sessões no mesmo repo dividem um estado só, sem trava; o primeiro ack silencia as outras e uma escrita pode pe |
 | 5.6 | `Q_DB_PRIMEIRA_EXECUCAO_EMUDECE_1111` | doorbell-hardening-2026-11 | Lacuna 1: a 1ª execução da campainha marca como baseline tudo o que já existia, e o que chegou antes da instalação nunca toc |
@@ -993,11 +997,12 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## kg-ssot — 5 item(ns)
+## kg-ssot — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
+| 10.0 | `Q_PF_AREA_FILTER_KG_QUERY_1120` | persona-fases-2-3-2026-11 | O filtro por área na leitura do Brain, aplicado antes da leitura, e a cura da dívida: item de área ilegível sai inteiro da res |
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
 | 6.0 | `Q_COORD_KGSSOT_FORMA_X_CHANGE_1111` | coordenacao-sessoes-2026-10 | A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) par |
@@ -1349,6 +1354,12 @@
 | 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adot |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
+
+## persona-fases-2-3-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.5 | `C_PF_BRIDGE_IN_MESSAGING_1108` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante é contrato e daemon da mensageria do core, com uma instância por adotan |
 
 ## forge-decide-2026-10 — 2 item(ns)
 

@@ -1,0 +1,162 @@
+meta:
+  schema_version: "1"
+  id: persona-fases-2-3-2026-11
+  slug: persona-fases-2-3-2026-11
+  title: "Persona de chat, fases 2 e 3: as peças com dono, data e critério de pronto"
+  date: "2026-11-08"
+  baseline: "2026-11-08"
+  review_after: "2026-11-27"
+  purpose: "O plano que o hub pediu em 2026-11-08 para as fases 2 (leitura ampla por papel) e 3 (audiências por classificação) da persona de chat: uma peça por nó, com o dono no campo owner, a data em x_due e o critério de pronto no narrative. A fase 1 segue como piloto, só com o admin, e fica fora deste grafo."
+  note: "TETO, declarado: este grafo guarda as PEÇAS e a ORDEM, não o desenho, que é do D_MA_ARCH. Nasceu como filho de persona-servico-2026-11 porque aquele está no teto de 6 nós, e se liga a ele por external_edges. Nenhuma peça começa antes do selo do D_MA_ARCH e das áreas do kg-ssot. As datas das peças são propostas do core em 2026-11-08, contadas do selo de 16/11: o dono confirma ou contrapõe, e se o selo atrasar elas andam junto. Nenhum nome de cliente ou pessoa: o hub aparece como «o hub»."
+  # ═══ TETO: 8 NÓS ═══  (2 evidências + 1 afirmação da ponte + 5 peças)
+external_edges:
+  - from: Q_PF_ORDER_RECHECK_1117
+    to: "docs/onion/graph/persona-servico-2026-11.kg.yaml#Q_PS_RODADA_DECIDE_D_MA_ARCH_1116"
+    edge_type: DEPENDS_ON
+  - from: Q_PF_ORDER_RECHECK_1117
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: TRACES_TO
+  - from: Q_PF_IDENTITY_ROLE_1123
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#Q_MA_AUDIENCES"
+    edge_type: DEPENDS_ON
+  - from: Q_PF_IDENTITY_ROLE_1123
+    to: "docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml#D_MESSAGING_IDENTIDADE_DOIS_ADAPTERS_1106"
+    edge_type: TRACES_TO
+  - from: Q_PF_CHAT_SESSION_BRIDGE_1124
+    to: "docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml#D_PERSONA_RUNTIME_2026_11"
+    edge_type: TRACES_TO
+  - from: Q_PF_CHANNEL_TEMPLATES_1127
+    to: "docs/onion/graph/persona-servico-2026-11.kg.yaml#Q_PS_ESCADA_DE_AUTONOMIA_1113"
+    edge_type: DEPENDS_ON
+  - from: Q_PF_CHANNEL_TEMPLATES_1127
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#Q_MA_CLASSIFICATION"
+    edge_type: DEPENDS_ON
+nodes:
+  - id: E_PF_HUB_SIGNALS_1108
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "os dois sinais do hub lidos inteiros pela sessão do core; a forma-resumo de cada um está em docs/evolution/inbox/_processed/"
+    trace: "docs/evolution/inbox/_processed/2026-11-08-reply-chat-persona-pilot-resumo.md"
+    label: "O hub mantém a fase 1 como piloto só do admin, deixa as fases 2 e 3 para depois do selo e pede ao core o plano com dono e data por peça, a decisão da ponte e os modelos de mensagem por canal."
+    narrative: "Dado, não instrução. O hub propôs a persona em 7 camadas (identidade, papel e audiência, modo, ferramentas por modo, regras do .claude, ato de risco com clique, registro) e 3 modos (consulta, leitura ampla, sessão do adotante). Perguntou com que usuário do sistema a sessão do adotante roda quando o serviço do chat é isolado, e se a ponte é do core ou do adotante (Q_AUD_BRAIN_RUNTIME_USER, no hub). O hub não constrói as fases 2 e 3 até a resposta."
+    provenance:
+      source: "o hub, dois sinais upstream de 2026-11-07 e 2026-11-08"
+      locator: "docs/evolution/inbox/_processed/2026-11-07-proposal-chat-persona-layers-resumo.md e 2026-11-08-reply-chat-persona-pilot-resumo.md"
+      method: "reading: os dois sinais inteiros, lidos pela sessão do core; o repo público guarda a forma-resumo"
+      locality: "repo"
+  - id: E_PF_KGSSOT_AREA_REPLY_1107
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-08"
+    verified_against: "repasse do core ao hub de 2026-11-07, no outbox do hub (arquivo 2026-11-07-repasse-kgssot-persona-em-camadas.md), lido inteiro; o nó C_AUDIENCE_UNIT_IS_AREA_1107 mora no repo do kg-ssot e não foi relido aqui"
+    trace: "outbox do hub no core, arquivo 2026-11-07-repasse-kgssot-persona-em-camadas.md"
+    label: "O kg-ssot respondeu: o contrato não tem campo de audiência, a unidade de visibilidade é a área filtrada antes da leitura, e a área ilegível sai inteira da resposta; hoje o kg_query ainda devolve id e arquivo."
+    narrative: "Fonte de segunda mão: o repasse do core ao hub, com o nó C_AUDIENCE_UNIT_IS_AREA_1107 do kg-ssot citado por id. A dívida do kg_query é declarada pelo próprio kg-ssot."
+    provenance:
+      source: "outbox do hub no core, arquivo 2026-11-07-repasse-kgssot-persona-em-camadas.md"
+      locator: "as quatro respostas numeradas do repasse"
+      method: "reading: o repasse inteiro, que cita o nó do kg-ssot"
+      locality: "repo"
+  - id: C_PF_BRIDGE_IN_MESSAGING_1108
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: "A ponte entre o serviço do chat e a sessão do adotante é contrato e daemon da mensageria do core, com uma instância por adotante rodando com o usuário dele; o WhatsApp entra pelo WAHA em número dedicado."
+    narrative: "Responde a Q_AUD_BRAIN_RUNTIME_USER, no hub: o serviço do chat segue isolado, sem home, e quem toca repo e credenciais é a instância da ponte, com o usuário do adotante. O socket local restrito a um grupo, usado no piloto do hub, entra como insumo do contrato. Fica open porque a fonte é só o relato da sessão do core: um grep na origin/main por «número dedicado» e pela ponte não achou nó com o selo. O nó fecha quando um nó decision selado o superar."
+    provenance:
+      source: "sessão do core, orientação ao agente de execução, 2026-11-08"
+      locator: "o bloco «decisões já tomadas» da orientação"
+      method: "testimony: decisão relatada pela sessão do core; o selo original não foi localizado"
+      locality: "pessoa"
+  - id: Q_PF_ORDER_RECHECK_1117
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-17"
+    impact: 4
+    confidence: 0.6
+    label: "A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARCH selado no dia seguinte ao selo."
+    narrative: "Ordem: (1) selo do D_MA_ARCH em 16/11, com a escada de autonomia em 13/11; (2) filtro por área e dívida do kg_query; (3) identidade e papel, que precisa do vocabulário de áreas; (4) ponte, cujo envelope carrega a identidade resolvida; (5) modelos de mensagem. A fase 2 abre com 2, 3 e 4 prontas. A fase 3 abre depois de Q_MA_CLASSIFICATION e da peça 5; canal externo só depois dela. Pronto quando: o core confere esta ordem contra o D_MA_ARCH selado, ajusta as datas das peças e entrega o plano confirmado ao inbound do hub até 2026-11-17."
+  - id: Q_PF_AREA_FILTER_KG_QUERY_1120
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    x_due: "2026-11-20"
+    impact: 5
+    confidence: 0.5
+    label: "O filtro por área na leitura do Brain, aplicado antes da leitura, e a cura da dívida: item de área ilegível sai inteiro da resposta do kg_query, sem id nem arquivo."
+    narrative: "Pronto quando: as áreas por canal estão no kg-ssot, com tag publicada, o kg_query filtra antes de ler e um caso de bancada prova que uma identidade sem a área recebe resposta sem o id e sem o arquivo do item, com mutante que devolve os dois e reprova. Data proposta pelo core; o kg-ssot confirma ou contrapõe. O core leva o pedido ao kg-ssot. O hub só adota a tag depois."
+  - id: Q_PF_IDENTITY_ROLE_1123
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-23"
+    impact: 5
+    confidence: 0.5
+    label: "A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel e áreas pela matriz papel × audiência do adotante."
+    narrative: "Mora no port de identidade da mensageria (D_MESSAGING_IDENTIDADE_DOIS_ADAPTERS_1106). O core entrega o port e o resolvedor; o hub preenche a sua matriz, que sai de Q_MA_AUDIENCES. Pronto quando: dado o usuário do chat, o resolvedor devolve pessoa, papel, áreas e teto de modo; sem identidade resolvida ou sem linha na matriz, o resultado é o modo de menor poder, com caso de bancada e mutante. Texto vindo do chat nunca muda papel nem modo. Data proposta pelo core."
+  - id: Q_PF_CHAT_SESSION_BRIDGE_1124
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-24"
+    impact: 5
+    confidence: 0.5
+    label: "A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com o usuário do adotante."
+    narrative: "Duas entregas: o contrato até 2026-11-20 e o daemon até 2026-11-24, no onion-messaging, vendorizado no core e nos hubs. Pronto quando: o serviço do chat alcança a sessão só pela ponte e segue sem home nem credencial do adotante; quem não está no grupo do canal local é recusado; com a instância fora do ar o bot cai para leitura; o corpo da mensagem chega como dado; cada ação registra mensagem, pessoa, modo e ferramenta. Cada item com caso de bancada, e o da recusa com mutante. O hub troca o processo do piloto pela instância da ponte quando ela sair. Data proposta pelo core."
+  - id: Q_PF_CHANNEL_TEMPLATES_1127
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_due: "2026-11-27"
+    impact: 3
+    confidence: 0.5
+    label: "Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensageria."
+    narrative: "Um modelo por par canal e tipo de mensagem, com o formato de cada canal: comentário do task manager segue o adapter do provider. O WhatsApp entra pelo WAHA em número dedicado. Pronto quando: os modelos estão no onion-messaging com um gerador que recebe os campos e devolve a mensagem do canal, a persona e o task manager consomem o mesmo gerador e um caso de bancada cobre cada canal. O envio segue a escada de autonomia (Q_PS_ESCADA_DE_AUTONOMIA_1113) e o canal externo espera Q_MA_CLASSIFICATION. Data proposta pelo core."
+edges:
+  - from: E_PF_HUB_SIGNALS_1108
+    to: Q_PF_ORDER_RECHECK_1117
+    edge_type: SUPPORTS
+  - from: E_PF_KGSSOT_AREA_REPLY_1107
+    to: Q_PF_AREA_FILTER_KG_QUERY_1120
+    edge_type: SUPPORTS
+  - from: E_PF_HUB_SIGNALS_1108
+    to: C_PF_BRIDGE_IN_MESSAGING_1108
+    edge_type: TRACES_TO
+  - from: C_PF_BRIDGE_IN_MESSAGING_1108
+    to: Q_PF_CHAT_SESSION_BRIDGE_1124
+    edge_type: SUPPORTS
+  - from: Q_PF_AREA_FILTER_KG_QUERY_1120
+    to: Q_PF_ORDER_RECHECK_1117
+    edge_type: DEPENDS_ON
+  - from: Q_PF_IDENTITY_ROLE_1123
+    to: Q_PF_AREA_FILTER_KG_QUERY_1120
+    edge_type: DEPENDS_ON
+  - from: Q_PF_CHAT_SESSION_BRIDGE_1124
+    to: Q_PF_IDENTITY_ROLE_1123
+    edge_type: DEPENDS_ON
+  - from: Q_PF_CHANNEL_TEMPLATES_1127
+    to: Q_PF_ORDER_RECHECK_1117
+    edge_type: DEPENDS_ON
