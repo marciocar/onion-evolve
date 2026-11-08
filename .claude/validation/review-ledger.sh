@@ -154,13 +154,20 @@ if fr:
 # ESTE LEITOR IMPRIME AS DUAS, e a de LEGADO nunca desaparece do relatório: uma métrica que
 # some quando fica inconveniente é a mesma classe do painel inventado que esta onda apagou.
 # O que muda com o tempo é a proporção — e é isso que se acompanha.
-ENUM = ("APROVADO", "CORRIGIDO", "REPROVADO", "REPROVADO_E_CURADO", "SEM_ACHADOS")
+# 2026-11-08 (decisão do maestro): valor de campo de máquina é código, em INGLÊS. O vocabulário é o
+# mesmo, com outra grafia: a forma pt-BR do enum (os resíduos da lista congelada do legado) se
+# TRADUZ para a inglesa aqui, para a série não se partir em duas por uma troca de grafia.
+ENUM = ("APPROVED", "FIXED", "REJECTED", "REJECTED_AND_FIXED", "NO_FINDINGS")
+ENUM_PT = {"APROVADO": "APPROVED", "CORRIGIDO": "FIXED", "REPROVADO": "REJECTED",
+           "REPROVADO_E_CURADO": "REJECTED_AND_FIXED", "SEM_ACHADOS": "NO_FINDINGS"}
 def _canon(k):
     """Caixa e separador normalizam; a PALAVRA não. `REPROVADO-E-CURADO` e
     `REPROVADO_E_CURADO` são o mesmo veredito escrito em duas épocas — tratá-los como
     formas distintas inflaria a dispersão com um defeito que não existe. Já
-    `CORRIGIDO-E-RE-REVISADO` normaliza para algo que NÃO está no enum, e continua legado."""
-    return k.upper().replace("-", "_")
+    `CORRIGIDO-E-RE-REVISADO` normaliza para algo que NÃO está no enum, e continua legado.
+    A forma pt-BR do enum vira a inglesa (mesmo veredito, outra grafia)."""
+    k = k.upper().replace("-", "_")
+    return ENUM_PT.get(k, k)
 
 canon, legado = {}, {}
 for k, v in ver.items():

@@ -57,7 +57,7 @@ bash $DA plan  <grafo> --root <NODE|ITEM>        # cadeia em ordem topológica; 
 bash $DA begin <grafo> --max-nodes N --budget T [--merge] [--root …]   # abre a passada NO GRAFO, ou RETOMA
 bash $DA next  <grafo>                            # RETOMAR o item em voo, ou o PROXIMO pronto, dentro do teto
 #   … por item: /engineer:start → /engineer:work → /engineer:pr (a maquinaria, nunca à mão), resíduo da
-#   REGRA 56 com Elenxo por agente SEPARADO (elenxo: sim + elenxo_isolado: sim), ops/pr-finalize.sh --push (core-only)
+#   REGRA 56 com Elenxo por agente SEPARADO (elenxo: true + elenxo_isolado: true), ops/pr-finalize.sh --push (core-only)
 bash $DA track <grafo> <NODE> --pr N              # vincula o PR ao nó (estado retomável por item)
 bash $DA charge <grafo> --tokens N                # declara o gasto; no teto, PARA
 bash $DA gate  <grafo> <NODE> [--merge]           # 0 MERGE-OK · 1 PARA · 3 AUDIT (merge desligado)

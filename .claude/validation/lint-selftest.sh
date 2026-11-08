@@ -14844,7 +14844,7 @@ run_pre_push_selftests() {
   local R=docs/evolution/review/feat-x.md sb g
   _new() {  # <nome> → sandbox com o PR stageado e resíduo pendente
     sb="${d}/$1"; _sbmk "${sb}" || { record_fail "pr-finalize: sandbox $1" "não montou"; return 1; }
-    ( cd "${sb}/w" && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+    ( cd "${sb}/w" && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APPROVED\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
   }
   # B1 — o motor NÃO LAVA resíduo
   if _new b1; then
@@ -14925,7 +14925,7 @@ run_pre_push_selftests() {
   _dr_run() {  # $1=motor $2=nome → "rc<TAB>assuntos(3)<TAB>tem-main<TAB>disse-indice-sujo"
     local _m="$1" _s="${d}/$2" _r=0
     _sbmk "${_s}" || { printf 'NOSB\t\t\t\n'; return; }
-    ( cd "${_s}/w" && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+    ( cd "${_s}/w" && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APPROVED\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
     git clone -q "${_s}/remote.git" "${_s}/o" 2>/dev/null
     ( cd "${_s}/o" && git config user.email o@o && git config user.name o && sed -i 2s/.*/MAIN/ c.txt && git commit -qam main2 && git push -q origin main ) >/dev/null 2>&1
     (cd "${_s}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${_m}" --rebase -m "feat: conteudo" > "${_s}/out" 2>&1) || _r=$?
@@ -14958,7 +14958,7 @@ PYM
   _st_run() {  # $1=motor $2=nome → saída do motor
     local _s="${d}/$2"
     _sbmk "${_s}" || { echo NOSB; return; }
-    ( cd "${_s}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && echo 1 > verdict && git add -A ) >/dev/null 2>&1
+    ( cd "${_s}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APPROVED\n---\n' > "${R}" && echo 1 > verdict && git add -A ) >/dev/null 2>&1
     (cd "${_s}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "$1" -m t1 2>&1) || true
   }
   if grep -q 'parou na etapa «3 lint do commit» (rc=1)' <<< "$(_st_run "${pf}" st)"; then
@@ -14975,7 +14975,7 @@ PYM
   _sig_run() {  # $1=motor $2=nome → saída do motor depois do kill do grupo
     local _s="${d}/$2" _p
     _sbmk "${_s}" || { echo NOSB; return; }
-    ( cd "${_s}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" \
+    ( cd "${_s}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APPROVED\n---\n' > "${R}" \
       && printf '#!/bin/bash\nsleep 30\n' > .claude/validation/lint-artifacts.sh && git add -A ) >/dev/null 2>&1
     set -m
     ( cd "${_s}/w" && ONION_FINALIZE_CHECKPOINT=1 exec bash "$1" -m t1 > "${_s}/out" 2>&1 ) &
@@ -15010,7 +15010,7 @@ PYM
       && git add -A && git commit -qm plugbase && git push -q origin main \
       && git switch -q feat/x && git reset -q --hard main \
       && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && echo s1-PR > s1.txt && cat s1.txt s2.txt > plugins/vx/README.md \
-      && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+      && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APPROVED\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
   }
   # (x1) a main mexe em s2.txt (outra FONTE): conflita SÓ plugins/vx/README.md — que não é mais projeção ⇒
   #      RECUSA (rebase abortado, HEAD intacto). Se plugins/ voltar a ONION_GENERATED_DIRS, o motor o
@@ -20440,7 +20440,7 @@ run_review_artifact_selftests() {
         # no instante em que o enum virou HARD, cinco casos verdes ficaram vermelhos de uma vez.
         # Foi o harness expondo que ele não espelhava mais o runner, exatamente como esta casa já
         # mediu 3× ao trocar uma dependência para fail-closed. [[fail-closed-exposes-incomplete-harness]]
-        printf 'findings_total: 3\nfindings_real: 2\ntokens: 118000\nduration_min: 11\nverdict: %s\n' "${4:-CORRIGIDO}"
+        printf 'findings_total: 3\nfindings_real: 2\ntokens: 118000\nduration_min: 11\nverdict: %s\n' "${4:-FIXED}"
         # $5 = linha extra do frontmatter (ex.: `findings_blocking: N`); ausente = resíduo da era anterior ao campo
         [ -z "${5:-}" ] || printf '%s\n' "$5"
       fi
@@ -20652,7 +20652,7 @@ run_review_artifact_selftests() {
   #     sozinho já produzia duas). Reprovar por caixa seria falso-positivo travante sem ganho
   #     nenhum de série — em guarda de lista o defeito dominante é o VOCABULÁRIO, não a caixa.
   _mk_pr_repo
-  _art "${d}" "$(_sha_of "${d}")" 1 "aprovado"
+  _art "${d}" "$(_sha_of "${d}")" 1 "approved"
   rc=0; out="$(_run "${d}")" || rc=$?
   if [ "${rc}" -eq 0 ]; then
     record_pass "review-artifact: (m) verdict em minúscula → PASSA (a caixa normaliza; o vocabulário é que fecha)"
@@ -20674,10 +20674,10 @@ run_review_artifact_selftests() {
   #     entrou no MESMO PR. É a métrica de eficácia da revisão; fundi-la em APROVADO apagaria o
   #     único número que responde "a revisão adversarial fez o PR mudar?".
   _mk_pr_repo
-  _art "${d}" "$(_sha_of "${d}")" 1 "REPROVADO_E_CURADO"
+  _art "${d}" "$(_sha_of "${d}")" 1 "REJECTED_AND_FIXED"
   rc=0; out="$(_run "${d}")" || rc=$?
   if [ "${rc}" -eq 0 ]; then
-    record_pass "review-artifact: (o) REPROVADO_E_CURADO é valor de 1ª classe (a revisão que MUDOU o PR não vira APROVADO)"
+    record_pass "review-artifact: (o) REJECTED_AND_FIXED é valor de 1ª classe (a revisão que MUDOU o PR não vira APPROVED)"
   else record_fail "review-artifact: (o) reprovado-e-curado" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
 
@@ -20686,7 +20686,7 @@ run_review_artifact_selftests() {
   local mutv; mutv="$(mktemp -d)"; cp "${helper}" "${mutv}/m.sh"
   # a âncora acompanha a forma do helper: desde 2026-10-15 (SAC-142) a checagem chama _verdict_ok, a função que
   # o modo --schema também usa (fonte única do enum)
-  sed -i 's/^if ! _verdict_ok "${_VERD}"; then/if false; then/' "${mutv}/m.sh"
+  sed -i 's/^if ! _verdict_ok "${_VERD}" "${_ERA}"; then/if false; then/' "${mutv}/m.sh"
   if grep -q 'if false; then' "${mutv}/m.sh"; then
     _mk_pr_repo
     _art "${d}" "$(_sha_of "${d}")" 1 "FRASE-INTEIRA-NO-SLOT-DA-SERIE"
@@ -20702,13 +20702,48 @@ run_review_artifact_selftests() {
   fi
   rm -rf "${mutv}"
 
+  # (p2) VALORES EM INGLÊS (2026-11-08) pelo caminho que o lint consome (o julgamento do PR, em TSV): o resíduo novo
+  #      com verdict pt-BR reprova com a tag própria; o MESMO resíduo, posto na lista congelada do legado do repo
+  #      julgado, passa; e `elenxo: sim` fora da lista reprova. O --schema tem casos próprios (residue-english).
+  local p2bad=""
+  _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  { [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORMA-ANTIGA' <<< "${out}"; } || p2bad="${p2bad} novo-antigo(rc=${rc})"
+  printf 'docs/evolution/review/feat-x.md\n' > "${d}/docs/evolution/review-residue-legacy.txt"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  [ "${rc}" -eq 0 ] || p2bad="${p2bad} legado(rc=${rc}:$(tr '\n' ' ' <<< "${out}" | cut -c1-120))"
+  rm -rf "${d}"
+  _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "FIXED" "elenxo: sim"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  { [ "${rc}" -eq 1 ] && grep -q 'BOOLEANO-FORA-DO-VOCABULARIO' <<< "${out}"; } || p2bad="${p2bad} elenxo-sim(rc=${rc})"
+  rm -rf "${d}"
+  if [ -z "${p2bad}" ]; then record_pass "review-artifact: (p2) no julgamento do PR, verdict pt-BR e elenxo: sim reprovam no resíduo novo; na lista do legado, o mesmo verdict passa"
+  else record_fail "review-artifact: (p2) valores em inglês" "falhou:${p2bad}"; fi
+  # (p3) (MUT) sem consultar a lista no julgamento do PR, o resíduo do legado reprova. Cópia LIMPA no mesmo arranjo.
+  local mute; mute="$(mktemp -d)"; cp "${helper}" "${mute}/clean.sh"; cp "${helper}" "${mute}/m.sh"
+  sed -i "s/^_ERA=''; _is_legacy \"\${ART}\" \&\& _ERA=legacy$/_ERA=''/" "${mute}/m.sh"
+  if ! cmp -s "${mute}/clean.sh" "${mute}/m.sh"; then
+    local rcc3=0 rcm3=0
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"
+    printf 'docs/evolution/review/feat-x.md\n' > "${d}/docs/evolution/review-residue-legacy.txt"
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mute}/clean.sh" "${d}" >/dev/null 2>&1 ) || rcc3=$?
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mute}/m.sh" "${d}" >/dev/null 2>&1 ) || rcm3=$?
+    if [ "${rcc3}" -eq 0 ] && [ "${rcm3}" -eq 1 ]; then
+      record_pass "review-artifact: (p3) (MUT) limpa aceita o legado da lista; sem consultar a lista no julgamento do PR, ele reprova"
+    else record_fail "review-artifact: (p3) (MUT)" "limpa rc=${rcc3} (esperado 0), mutante rc=${rcm3} (esperado 1)"; fi
+    rm -rf "${d}"
+  else record_fail "review-artifact: (p3) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  rm -rf "${mute}"
+
   # ═══ `findings_blocking` (2026-11-06) — quantos dos achados REAIS BLOQUEIAM; o resto é LIMITE declarado ═══
   # Nasceu de 2026-11-05: na curadoria, 8 versões de um pré-registro tratando todo achado como bloqueio; com a
   # triagem pedida na 7ª rodada, fechou em 2. Régua: .claude/commands/common/prompts/review-triage.md. OPCIONAL (os 912 resíduos de então
   # não o têm e seguem válidos); presente, número com 0 ≤ blocking ≤ real.
   # (q) ausente → PASSA: o resíduo antigo não quebra (o caminho feliz (c) também não o tem; aqui é nomeado)
   _mk_pr_repo
-  _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO
+  _art "${d}" "$(_sha_of "${d}")" 1 FIXED
   rc=0; out="$(_run "${d}")" || rc=$?
   if [ "${rc}" -eq 0 ] && ! grep -q 'FINDINGS-BLOCKING' <<< "${out}"; then
     record_pass "review-artifact: (q) resíduo SEM findings_blocking passa (era anterior ao campo segue válida)"
@@ -20717,7 +20752,7 @@ run_review_artifact_selftests() {
   # (r) dentro do teto (0 e = real) → PASSA
   local _okb=""
   for _b in 0 2; do
-    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO "findings_blocking: ${_b}"
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 FIXED "findings_blocking: ${_b}"
     rc=0; out="$(_run "${d}")" || rc=$?; [ "${rc}" -eq 0 ] || _okb="${_okb} ${_b}(rc=${rc})"; rm -rf "${d}"
   done
   if [ -z "${_okb}" ]; then record_pass "review-artifact: (r) findings_blocking 0 e = findings_real passam (o teto é inclusivo)"
@@ -20725,7 +20760,7 @@ run_review_artifact_selftests() {
   # (s) acima do real e não numérico → HARD com a tag própria (bloqueio que não é achado real é contagem inventada)
   local _badb=""
   for _b in 3 muitos; do
-    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO "findings_blocking: ${_b}"
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 FIXED "findings_blocking: ${_b}"
     rc=0; out="$(_run "${d}")" || rc=$?
     { [ "${rc}" -eq 1 ] && grep -q 'FINDINGS-BLOCKING-INVALIDO' <<< "${out}"; } || _badb="${_badb} ${_b}(rc=${rc})"; rm -rf "${d}"
   done
@@ -20737,7 +20772,7 @@ run_review_artifact_selftests() {
   sed -i 's/^  \[ "$((10#${b}))" -le "$((10#${r}))" \] || echo/  true || echo/' "${mutb}/m.sh"
   if ! cmp -s "${mutb}/clean.sh" "${mutb}/m.sh"; then
     local rc_clean=0 rc_mut=0
-    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 CORRIGIDO "findings_blocking: 3"
+    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 FIXED "findings_blocking: 3"
     ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
         bash "${mutb}/clean.sh" "${d}" >/dev/null 2>&1 ) || rc_clean=$?
     ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
@@ -37469,11 +37504,11 @@ EOF_PLAN
   ( cd "${base}" && git init -q -b main . && git remote add origin https://github.com/acme/core.git \
       && "${_git[@]}" add -A && "${_git[@]}" commit -qm base \
       && git checkout -q -b feat/item-a \
-      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: CORRIGIDO\nelenxo: sim\nelenxo_isolado: sim\n---\n' > docs/evolution/review/feat-item-a.md \
+      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: FIXED\nelenxo: true\nelenxo_isolado: true\n---\n' > docs/evolution/review/feat-item-a.md \
       && printf 'a\n' > docs/analysis/a.md && "${_git[@]}" add -A && "${_git[@]}" commit -qm item-a \
-      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: CORRIGIDO\nelenxo: sim\n---\n' > docs/evolution/review/feat-item-a.md \
+      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: FIXED\nelenxo: true\n---\n' > docs/evolution/review/feat-item-a.md \
       && "${_git[@]}" commit -qam uma-voz \
-      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: REPROVADO\nelenxo: sim\nelenxo_isolado: sim\n---\n' > docs/evolution/review/feat-item-a.md \
+      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: REJECTED\nelenxo: true\nelenxo_isolado: true\n---\n' > docs/evolution/review/feat-item-a.md \
       && "${_git[@]}" commit -qam reprovado \
       && git checkout -q main && git update-ref refs/remotes/origin/main main \
       && git checkout -q -b feat/dec main && mkdir -p docs/evolution/research/q \
@@ -37772,7 +37807,7 @@ EOF_BS
   _da_ready --merge; _da_pr 7 "${OID_PEND:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
   _da_case "(e13c) resíduo com reviewed_diff_sha256 pendente PARA (RESIDUO-PENDENTE)" 1 "RESIDUO-PENDENTE"
   rm -rf "${sb}"
-  _da_new; ( cd "${sb}" && git checkout -q feat/item-a~2 2>/dev/null && sed -i 's/^elenxo: sim$/elenxo: nao/' docs/evolution/review/feat-item-a.md \
+  _da_new; ( cd "${sb}" && git checkout -q feat/item-a~2 2>/dev/null && sed -i 's/^elenxo: true$/elenxo: false/' docs/evolution/review/feat-item-a.md \
       && "${_git[@]}" commit -qam sem-elenxo && git rev-parse HEAD > ../oid-ne.$$ && git checkout -q main ) >/dev/null 2>&1
   local OID_NE; OID_NE="$(cat "${sb}/../oid-ne.$$" 2>/dev/null)"; rm -f "${sb}/../oid-ne.$$"
   _da_ready --merge; _da_pr 7 "${OID_NE:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
@@ -44033,7 +44068,7 @@ run_hook_regen_table_selftests() {
     cd "${_rw}" && git init -q -b main && git config user.email t@t && git config user.name t
     echo base > a.txt && git add a.txt && git commit -qm base && git update-ref refs/remotes/origin/main HEAD
     git checkout -qb pr && echo v1 > a.txt && mkdir -p docs/evolution/review
-    printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > docs/evolution/review/pr.md
+    printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APPROVED\n---\n' > docs/evolution/review/pr.md
     git add -A
     # shellcheck source=/dev/null
     . "${REPO_ROOT}/.claude/validation/onion-regen-lib.sh"
@@ -48198,7 +48233,7 @@ run_residue_schema_selftests() {
     record_pass "residue-schema: (a) o esqueleto cru reprova no esquema, nomeando os campos a preencher"
   else record_fail "residue-schema: (a) esqueleto cru" "rc=${rc} out=[${out}]"; fi
   # (b) preenchido (só os valores, sem mexer no resto), passa — e todo campo do enum vem do validador
-  sed 's/^findings_total: PREENCHA/findings_total: 2/;s/^findings_real: PREENCHA/findings_real: 1/;s/^findings_blocking: PREENCHA/findings_blocking: 1/;s/^findings_fixed: PREENCHA/findings_fixed: 1/;s/^tokens: PREENCHA/tokens: 0/;s/^duration_min: PREENCHA/duration_min: 0/;s/^verdict: PREENCHA/verdict: REPROVADO_E_CURADO/;s/^elenxo: PREENCHA/elenxo: sim/;s/^reviewer: PREENCHA/reviewer: x/' "${d}/sk.md" > "${d}/ok.md"
+  sed 's/^findings_total: PREENCHA/findings_total: 2/;s/^findings_real: PREENCHA/findings_real: 1/;s/^findings_blocking: PREENCHA/findings_blocking: 1/;s/^findings_fixed: PREENCHA/findings_fixed: 1/;s/^tokens: PREENCHA/tokens: 0/;s/^duration_min: PREENCHA/duration_min: 0/;s/^verdict: PREENCHA/verdict: REJECTED_AND_FIXED/;s/^elenxo: PREENCHA/elenxo: true/;s/^reviewer: PREENCHA/reviewer: x/' "${d}/sk.md" > "${d}/ok.md"
   rc=0; out="$(bash "${v}" --schema "${d}/ok.md" 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then record_pass "residue-schema: (b) o esqueleto preenchido passa no esquema"
   else record_fail "residue-schema: (b) preenchido" "rc=${rc} out=[${out}]"; fi
@@ -48261,6 +48296,82 @@ run_residue_schema_selftests() {
       record_pass "residue-schema: (h) (MUT) cópia limpa reprova e, sem a chamada, blocking > real passa no --schema — a ligação é load-bearing"
     else record_fail "residue-schema: (h) (MUT)" "limpa rc=${rcc} (esperado 1), mutante rc=${rcm} (esperado 0)"; fi
   else record_fail "residue-schema: (h) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  # ═══ VALORES EM INGLÊS (decisão do maestro de 2026-11-08) ═══ `verdict` em APPROVED|FIXED|REJECTED|
+  # REJECTED_AND_FIXED|NO_FINDINGS e `elenxo`/`elenxo_isolado` em true|false. A forma antiga só vale para o resíduo
+  # da lista congelada do legado, e a catraca impede a lista de crescer. Sandbox com o validador REAL copiado e uma
+  # lista própria: o legado que vale é o do repo julgado, nunca o do repo que roda a bancada.
+  local lg="${d}/lg"; mkdir -p "${lg}/.claude/validation" "${lg}/docs/evolution/review"
+  cp "${v}" "${lg}/.claude/validation/review-artifact-check.sh"
+  printf 'docs/evolution/review/old.md\n' > "${lg}/docs/evolution/review-residue-legacy.txt"
+  sed 's/^verdict: .*/verdict: APROVADO/;s/^elenxo: .*/elenxo: sim/' "${d}/ok.md" > "${lg}/docs/evolution/review/old.md"
+  printf 'elenxo_isolado: nao\n' > "${d}/iso"; sed -i "/^elenxo: /r ${d}/iso" "${lg}/docs/evolution/review/old.md"
+  cp "${d}/ok.md" "${lg}/docs/evolution/review/new.md"
+  sed -i '/^elenxo: /a elenxo_isolado: false' "${lg}/docs/evolution/review/new.md"
+  sed 's/^verdict: .*/verdict: APROVADO/' "${lg}/docs/evolution/review/new.md" > "${lg}/docs/evolution/review/nv.md"
+  sed 's/^elenxo: .*/elenxo: sim/' "${lg}/docs/evolution/review/new.md" > "${lg}/docs/evolution/review/nb.md"
+  _lgv() { local rc=0; bash "${1}" --schema "${lg}/docs/evolution/review/${2}" >"${d}/lgo" 2>&1 || rc=$?; echo "${rc}"; }
+  local V="${lg}/.claude/validation/review-artifact-check.sh"
+  # (i) o legado da lista é aceito na forma antiga (verdict pt-BR, elenxo e elenxo_isolado sim|nao)
+  if [ "$(_lgv "${V}" old.md)" = 0 ]; then record_pass "residue-english: (i) resíduo da lista congelada passa na forma antiga"
+  else record_fail "residue-english: (i) legado aceito" "$(cat "${d}/lgo")"; fi
+  # (j) o resíduo novo na forma nova passa
+  if [ "$(_lgv "${V}" new.md)" = 0 ]; then record_pass "residue-english: (j) resíduo novo com verdict e booleanos em inglês passa"
+  else record_fail "residue-english: (j) novo aceito" "$(cat "${d}/lgo")"; fi
+  # (k) o resíduo novo com valor antigo reprova, nomeando a forma antiga — o verdict e o booleano, um de cada vez
+  local kbad=""
+  [ "$(_lgv "${V}" nv.md)" = 1 ] && grep -q "verdict 'APROVADO' é a forma ANTIGA" "${d}/lgo" || kbad="${kbad} verdict"
+  [ "$(_lgv "${V}" nb.md)" = 1 ] && grep -q "elenxo: 'sim' é a forma ANTIGA" "${d}/lgo" || kbad="${kbad} elenxo"
+  if [ -z "${kbad}" ]; then record_pass "residue-english: (k) resíduo novo com verdict ou elenxo na forma antiga reprova, nomeando a forma"
+  else record_fail "residue-english: (k) novo com valor antigo" "passou ou sem a mensagem:${kbad}"; fi
+  # Mutantes, cada um com a cópia LIMPA provada no MESMO arranjo antes de contar o morto.
+  _lgm() {  # $1=rótulo $2=sed $3=arquivo $4=rc da limpa $5=rc do mutante
+    local m="${lg}/.claude/validation/m.sh"; cp "${V}" "${m}"; sed -i "$2" "${m}"
+    if cmp -s "${V}" "${m}"; then record_fail "residue-english: $1 (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+    else
+      local rcc rcm; rcc="$(_lgv "${V}" "$3")"; rcm="$(_lgv "${m}" "$3")"
+      if [ "${rcc}" = "$4" ] && [ "${rcm}" = "$5" ]; then record_pass "residue-english: $1 (MUT) limpa rc=$4, mutante rc=$5 — o trecho é load-bearing"
+      else record_fail "residue-english: $1 (MUT)" "limpa rc=${rcc} (esperado $4), mutante rc=${rcm} (esperado $5)"; fi
+    fi; rm -f "${m}"; }
+  # (i-MUT) sem consultar a lista, o legado reprova
+  _lgm "(i)" 's/^  local era=.*; _is_legacy "${f}" \&\& era=legacy$/  local era=/' old.md 0 1
+  # (j-MUT) com o enum novo trocado pelo antigo, o novo reprova
+  _lgm "(j)" 's/^VERDICT_ENUM="APPROVED FIXED REJECTED REJECTED_AND_FIXED NO_FINDINGS"$/VERDICT_ENUM="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"/' new.md 0 1
+  # (k-MUT) com o legado valendo para todo resíduo, o novo com verdict antigo passa
+  _lgm "(k-verdict)" 's/^  local era=.*; _is_legacy "${f}" \&\& era=legacy$/  local era=legacy/' nv.md 1 0
+  # (k-MUT) sem a checagem dos booleanos, `elenxo: sim` num resíduo novo passa
+  _lgm "(k-bool)" 's/^  _bool_problems "${f}" "${era}"$/  : # mutante/' nb.md 1 0
+  # (l) A CATRACA: a lista só desce. Repo git com a lista na origin/main; entrada nova reprova, entrada órfã reprova,
+  #     lista que desceu passa. Pelo caminho que o lint consome (o julgamento do PR, em TSV), não pelo --schema.
+  local rg="${d}/rg"; mkdir -p "${rg}/.claude/validation" "${rg}/docs/evolution/review"
+  cp "${v}" "${rg}/.claude/validation/review-artifact-check.sh"
+  printf 'x\n' > "${rg}/docs/evolution/review/a.md"; printf 'x\n' > "${rg}/docs/evolution/review/b.md"
+  printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\n' > "${rg}/docs/evolution/review-residue-legacy.txt"
+  git -C "${rg}" init -q -b main && git -C "${rg}" add -A && git -C "${rg}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  git -C "${rg}" update-ref refs/remotes/origin/main main && git -C "${rg}" switch -q -c feat/x
+  _rgv() { local rc=0; ( cd "${rg}" && GH_CONFIG_DIR="${rg}/nogh" bash "${1:-${rg}/.claude/validation/review-artifact-check.sh}" "${rg}" --format=tsv ) >"${d}/rgo" 2>&1 || rc=$?; echo "${rc}"; }
+  local lbad="" L="${rg}/docs/evolution/review-residue-legacy.txt"
+  printf 'x\n' > "${rg}/docs/evolution/review/c.md"; printf 'docs/evolution/review/c.md\n' >> "${L}"
+  { [ "$(_rgv)" = 1 ] && grep -q 'LEGADO-CATRACA.*CRESCEU' "${d}/rgo" && grep -q 'LEGADO-CATRACA.*base não tinha.*c.md' "${d}/rgo"; } || lbad="${lbad} cresceu"
+  printf 'docs/evolution/review/a.md\ndocs/evolution/review/c.md\n' > "${L}"
+  { [ "$(_rgv)" = 1 ] && grep -q 'LEGADO-CATRACA.*base não tinha.*c.md' "${d}/rgo"; } || lbad="${lbad} troca-mesmo-tamanho"
+  printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\n' > "${L}"; rm -f "${rg}/docs/evolution/review/b.md"
+  { [ "$(_rgv)" = 1 ] && grep -q 'LEGADO-CATRACA.*órfã.*b.md' "${d}/rgo"; } || lbad="${lbad} orfa"
+  printf 'docs/evolution/review/a.md\n' > "${L}"
+  { [ "$(_rgv)" = 0 ] && ! grep -q 'LEGADO-CATRACA' "${d}/rgo"; } || lbad="${lbad} desceu-reprovou"
+  if [ -z "${lbad}" ]; then record_pass "residue-english: (l) catraca: entrada nova, troca de mesmo tamanho e entrada órfã reprovam; a lista que desce passa"
+  else record_fail "residue-english: (l) catraca" "falhou:${lbad} — $(tr '\n' ' ' < "${d}/rgo" | cut -c1-240)"; fi
+  # (l-MUT) sem a chamada da catraca no julgamento, a lista que cresce passa
+  printf 'x\n' > "${rg}/docs/evolution/review/b.md"
+  printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\ndocs/evolution/review/c.md\n' > "${L}"
+  local mr="${d}/rg-m.sh"; cp "${rg}/.claude/validation/review-artifact-check.sh" "${mr}"
+  sed -i 's/^_RATCHET="$(_legacy_ratchet_problems "origin\/${DEFAULT}")"$/_RATCHET=""/' "${mr}"
+  if cmp -s "${rg}/.claude/validation/review-artifact-check.sh" "${mr}"; then
+    record_fail "residue-english: (l) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  else
+    local rcc rcm; rcc="$(_rgv)"; rcm="$(_rgv "${mr}")"
+    if [ "${rcc}" = 1 ] && [ "${rcm}" = 0 ]; then record_pass "residue-english: (l) (MUT) limpa reprova a lista que cresceu; sem a chamada da catraca ela passa"
+    else record_fail "residue-english: (l) (MUT)" "limpa rc=${rcc} (esperado 1), mutante rc=${rcm} (esperado 0)"; fi
+  fi
   rm -rf "${d}"
 }
 _family run_residue_schema_selftests

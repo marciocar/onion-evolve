@@ -42,7 +42,22 @@
 # rápida (`--schema`) leem as MESMAS constantes que o julgamento do PR: o esquema muda num lugar só.
 set -euo pipefail
 
-VERDICT_ENUM="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"
+# ═══ VALOR DE CAMPO DE MÁQUINA É CÓDIGO, E CÓDIGO É EM INGLÊS (decisão do maestro de 2026-11-08) ═══
+# A prosa do resíduo segue em pt-BR; o VALOR dos campos que um script lê passou ao inglês:
+# `verdict` em APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS e `elenxo`/`elenxo_isolado`
+# em true|false. O LEGADO não se reescreve: a forma antiga (APROVADO…, sim|nao) só vale num resíduo
+# da LISTA CONGELADA (`docs/evolution/review-residue-legacy.txt`, os 867 que existiam na origin/main ao selar, com
+# algum valor na forma antiga). Fora dela, resíduo com valor antigo é recusado. A CATRACA
+# (`_legacy_ratchet_problems`) impede a lista de crescer: só desce, nunca ganha entrada.
+VERDICT_ENUM="APPROVED FIXED REJECTED REJECTED_AND_FIXED NO_FINDINGS"
+VERDICT_ENUM_LEGACY="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"
+BOOL_ENUM="true false"
+BOOL_ENUM_LEGACY="sim nao"
+BOOL_FIELDS="elenxo elenxo_isolado"
+# A LISTA MORA EM docs/evolution/, FORA de .claude/: os nomes dos resíduos carregam nomes de adotante, e .claude/
+# viaja para todo adotante (REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) a barrou ali).
+LEGACY_LIST_REL="docs/evolution/review-residue-legacy.txt"
+LEGACY_LIST="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/${LEGACY_LIST_REL}"
 NUMERIC_FIELDS="findings_total findings_real tokens duration_min"
 # `findings_blocking` (2026-11-06): quantos dos achados REAIS BLOQUEIAM — o veredito pode sair diferente numa
 # direção previsível ou ao arbítrio de quem conduz, ou o artefato promete o que não entrega; o resto é LIMITE,
@@ -65,9 +80,60 @@ _blocking_problem() {  # $1=arquivo → vazio se ok; senão a frase do problema
 _field_of() {  # $1=arquivo $2=campo — só o frontmatter, sem aspas
   awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "$1" | sed -n "s/^$2:[[:space:]]*//p" | head -1 | tr -d '"'
 }
-_verdict_ok() {  # caixa e separador tolerados, palavra inteira
-  local v; v="$(printf '%s' "$1" | tr 'a-z' 'A-Z' | tr '-' '_')"
-  for _v in ${VERDICT_ENUM}; do [ "${v}" = "${_v}" ] && return 0; done; return 1
+_review_rel() {  # $1=caminho → docs/evolution/review/<x>.md (a chave da lista), ou vazio
+  case "$1" in
+    docs/evolution/review/*) printf '%s' "$1" ;;
+    */docs/evolution/review/*) printf 'docs/evolution/review/%s' "${1##*/docs/evolution/review/}" ;;
+  esac
+}
+_is_legacy() {  # $1=caminho → 0 só se o resíduo está na lista congelada do legado
+  local r; r="$(_review_rel "$1")"
+  [ -n "${r}" ] && [ -f "${LEGACY_LIST}" ] && grep -qxF -- "${r}" "${LEGACY_LIST}"
+}
+_verdict_ok() {  # $1=valor [$2=legacy] — caixa e separador tolerados, palavra inteira
+  local v e; v="$(printf '%s' "$1" | tr 'a-z' 'A-Z' | tr '-' '_')"
+  e="${VERDICT_ENUM}"; [ "${2:-}" = legacy ] && e="${e} ${VERDICT_ENUM_LEGACY}"
+  for _v in ${e}; do [ "${v}" = "${_v}" ] && return 0; done; return 1
+}
+_bool_problems() {  # $1=arquivo $2=legacy|'' → uma frase por campo booleano fora do vocabulário
+  local f="$1" k v e
+  e="${BOOL_ENUM}"; [ "${2:-}" = legacy ] && e="${e} ${BOOL_ENUM_LEGACY}"
+  for k in ${BOOL_FIELDS}; do
+    grep -qE "^${k}:" <(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "${f}") || continue
+    v="$(_field_of "${f}" "${k}" | tr 'A-Z' 'a-z' | tr -d '[:space:]')"
+    case " ${e} " in *" ${v} "*) ;; *)
+      case " ${BOOL_ENUM_LEGACY} " in
+        *" ${v} "*) echo "${k}: '${v}' é a forma ANTIGA — resíduo novo usa true|false (a forma antiga só vale nos resíduos de ${LEGACY_LIST_REL})" ;;
+        *) echo "${k} tem de ser true ou false, não '${v}'" ;;
+      esac ;;
+    esac
+  done
+  return 0
+}
+_verdict_problem() {  # $1=valor $2=legacy|'' → a frase do problema, ou vazio
+  _verdict_ok "$1" "${2:-}" && return 0
+  if _verdict_ok "$1" legacy; then
+    echo "verdict '$1' é a forma ANTIGA — resíduo novo usa ${VERDICT_ENUM// / | } (a forma antiga só vale nos resíduos de ${LEGACY_LIST_REL})"
+  else
+    echo "verdict '$1' fora do vocabulário fechado (${VERDICT_ENUM})"
+  fi
+}
+# A CATRACA DO LEGADO: a lista só DESCE. Três recusas: entrada que a base não tinha (o legado não
+# ganha membro novo), lista maior que a da base, e entrada órfã (arquivo que não existe mais — a
+# entrada sai junto com ele). Sem lista NÃO há legado, logo não há o que catracar (adotante, sandbox).
+_legacy_ratchet_problems() {  # $1=ref da base (ex.: origin/main) → uma frase por problema
+  [ -f "${LEGACY_LIST}" ] || return 0
+  local root base_list n_cur n_base added orphan
+  root="$(cd "$(dirname "${LEGACY_LIST}")/../.." && pwd)"   # a lista mora em <root>/docs/evolution/
+  n_cur="$(grep -c . "${LEGACY_LIST}" || true)"
+  orphan="$(while IFS= read -r l; do [ -z "${l}" ] || [ -f "${root}/${l}" ] || printf '%s ' "${l}"; done < "${LEGACY_LIST}")"
+  [ -z "${orphan}" ] || echo "entrada(s) órfã(s) na lista do legado (o arquivo não existe): ${orphan}— tire-as da lista"
+  base_list="$(git -C "${root}" show "$1:${LEGACY_LIST_REL}" 2>/dev/null)" || return 0
+  n_base="$(grep -c . <<< "${base_list}" || true)"
+  [ "${n_cur}" -le "${n_base}" ] || echo "a lista do legado CRESCEU (${n_base} → ${n_cur}) — ela só desce: resíduo novo sai no formato novo"
+  added="$(grep -vxF -f <(printf '%s\n' "${base_list}") "${LEGACY_LIST}" | grep . | tr '\n' ' ' || true)"
+  [ -z "${added}" ] || echo "entrada(s) que a base não tinha na lista do legado: ${added}— resíduo novo não entra no legado"
+  return 0
 }
 _schema_problems() {  # $1=arquivo → uma linha por problema; vazio = o frontmatter cabe no esquema
   local f="$1" v
@@ -80,8 +146,9 @@ _schema_problems() {  # $1=arquivo → uma linha por problema; vazio = o frontma
     case "$(_field_of "${f}" "${v}")" in ''|*[!0-9]*) echo "${v} tem de ser número (0 = não medido, e diga isso em 'nota:')" ;; esac
   done
   _blocking_problem "${f}"
-  v="$(_field_of "${f}" verdict)"
-  _verdict_ok "${v}" || echo "verdict '${v}' fora do vocabulário fechado (${VERDICT_ENUM})"
+  local era=''; _is_legacy "${f}" && era=legacy
+  _verdict_problem "$(_field_of "${f}" verdict)" "${era}"
+  _bool_problems "${f}" "${era}"
   return 0
 }
 
@@ -96,7 +163,7 @@ case "${1:-}" in
     printf 'verdict: PREENCHA\nelenxo: PREENCHA\nreviewer: PREENCHA\nnota: ""\n---\n\n'
     printf '# Passada adversarial: `%s`\n\n' "${_br}"
     printf '> Preencha o frontmatter: os campos numéricos são números (0 = não medido, dito em `nota:`); `verdict` é um\n'
-    printf '> de: %s; `elenxo` é sim ou nao. `reviewed_diff_sha256: pendente` fica: o pr-finalize carimba.\n' "${VERDICT_ENUM}"
+    printf '> de: %s; `elenxo` é true ou false. `reviewed_diff_sha256: pendente` fica: o pr-finalize carimba.\n' "${VERDICT_ENUM}"
     printf '> `findings_blocking` = quantos dos reais BLOQUEIAM (0 ≤ blocking ≤ real); o resto é LIMITE e vai em\n'
     printf '> `## Limites declarados`. Aqui 0 quer dizer "nenhum bloqueia": se a passada não triou, APAGUE a linha\n'
     printf '> (ausente = não triado). Régua: `.claude/commands/common/prompts/review-triage.md`.\n'
@@ -115,6 +182,8 @@ REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)
 FORMAT=human
 for a in "$@"; do case "$a" in tsv|--format=tsv) FORMAT=tsv ;; esac; done
 cd "${REPO_ROOT}"
+# O legado que vale é o do repo JULGADO, não o da cópia do script (a bancada julga sandboxes com o helper real).
+LEGACY_LIST="${REPO_ROOT}/${LEGACY_LIST_REL}"
 
 REVIEW_DIR="docs/evolution/review"
 SKIPS=""
@@ -147,6 +216,13 @@ BRANCH="${GITHUB_HEAD_REF:-}"
 [ -n "${BRANCH}" ] || BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
 DEFAULT="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
 [ -n "${DEFAULT}" ] || DEFAULT=main
+
+# A CATRACA DO LEGADO RODA ANTES DE TODA ISENÇÃO: ela julga a LISTA, não o PR — vale até no branch default.
+_RATCHET="$(_legacy_ratchet_problems "origin/${DEFAULT}")"
+if [ -n "${_RATCHET}" ]; then
+  while IFS= read -r _l; do _out HARD LEGADO-CATRACA "${LEGACY_LIST_REL}" "${_l}"; done <<< "${_RATCHET}"
+  exit 1
+fi
 
 if [ -z "${BRANCH}" ] || [ "${BRANCH}" = "HEAD" ]; then
   _skip "detached-head"; [ "${FORMAT}" = tsv ] || printf '  ⊘ fora de escopo: %s\n' "${SKIPS}"; exit 0
@@ -255,7 +331,7 @@ ART="${REVIEW_DIR}/${SLUG}.md"
 # `:${ART}` le o INDICE; `HEAD:${ART}` le o commit. Arvore suja -> indice; limpa -> HEAD.
 if git diff --quiet HEAD 2>/dev/null; then _ART_REF="HEAD:${ART}"; else _ART_REF=":${ART}"; fi
 if ! git cat-file -e "${_ART_REF}" 2>/dev/null; then
-  _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · findings_blocking (opcional, ≤ real) · tokens · duration_min · verdict — este ultimo em vocabulario FECHADO: APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS; a narrativa vai em 'nota:', e 'elenxo: sim|nao' declara se houve passada adversarial). O hash deste diff é ${DIFF_SHA}."
+  _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · findings_blocking (opcional, ≤ real) · tokens · duration_min · verdict — este ultimo em vocabulario FECHADO: APPROVED | FIXED | REJECTED | REJECTED_AND_FIXED | NO_FINDINGS; a narrativa vai em 'nota:', e 'elenxo: true|false' declara se houve passada adversarial). O hash deste diff é ${DIFF_SHA}."
   [ "${FORMAT}" = tsv ] || printf '  (o verde do onion-review é soft-pass — não substitui esta passada)\n'
   exit 1
 fi
@@ -325,9 +401,20 @@ fi
 # corpus, com hífen, enquanto `APROVADO_APOS_CORRECAO` usava underscore. A grafia mista é do
 # histórico real desta casa — reprovar por `-` vs `_` seria inventar um defeito. A normalização
 # só casa a PALAVRA INTEIRA: `CORRIGIDO-E-RE-REVISADO` continua fora do vocabulário, como deve.
+# VALORES EM INGLÊS (2026-11-08): o resíduo da lista congelada aceita as duas formas; o resto, só a nova.
+_ERA=''; _is_legacy "${ART}" && _ERA=legacy
 _VERD="$(_field verdict | tr 'a-z' 'A-Z' | tr '-' '_')"
-if ! _verdict_ok "${_VERD}"; then
-  _out HARD VERDICT-FORA-DO-VOCABULARIO "${ART}" "verdict: '${_VERD}' nao esta no vocabulario fechado (${VERDICT_ENUM}). Selado em 2026-09-08 porque 262 residuos produziram 72 formas distintas e o campo deixou de sustentar serie. Se o que voce quer dizer nao cabe num dos cinco, o lugar e o campo livre 'nota:' — o veredito continua sendo um dos cinco. REPROVADO_E_CURADO existe para o caso 'a revisao reprovou e a cura entrou neste mesmo PR'."
+if ! _verdict_ok "${_VERD}" "${_ERA}"; then
+  if _verdict_ok "${_VERD}" legacy; then
+    _out HARD VERDICT-FORMA-ANTIGA "${ART}" "verdict: '${_VERD}' e a forma ANTIGA (pt-BR). Desde 2026-11-08 valor de campo de maquina e codigo, em ingles: ${VERDICT_ENUM}. A forma antiga so vale nos residuos de ${LEGACY_LIST_REL}, que nao crescem."
+  else
+    _out HARD VERDICT-FORA-DO-VOCABULARIO "${ART}" "verdict: '${_VERD}' nao esta no vocabulario fechado (${VERDICT_ENUM}). Selado em 2026-09-08 porque 262 residuos produziram 72 formas distintas e o campo deixou de sustentar serie. Se o que voce quer dizer nao cabe num dos cinco, o lugar e o campo livre 'nota:' — o veredito continua sendo um dos cinco. REJECTED_AND_FIXED existe para o caso 'a revisao reprovou e a cura entrou neste mesmo PR'."
+  fi
+  exit 1
+fi
+_BOOLP="$(_bool_problems "${ART}" "${_ERA}")"
+if [ -n "${_BOOLP}" ]; then
+  _out HARD BOOLEANO-FORA-DO-VOCABULARIO "${ART}" "$(printf '%s' "${_BOOLP}" | tr '\n' ';')"
   exit 1
 fi
 

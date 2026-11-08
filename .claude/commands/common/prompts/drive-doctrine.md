@@ -36,7 +36,7 @@ verificado, com o carimbo lido do forge. O LLM é **veto-only**: a sessão execu
 |---|---|---|
 | **1** `E_OPINIAO_EXPANSAO_AINDA_NAO_CONFIAVEL` — o grafo é a SSOT da ordem | expansão pelo grafo, ordem topológica, conferência nó↔item no task manager por `tm.sh` | `CICLO` · `ITEM-SEM-NO` · `NO-SEM-ITEM` · `PAI-FILHO-DIVERGENTE` · `TM-ILEGIVEL`; e em todo passo, não só no `next`: `PREDECESSOR-ABERTO` · `PAI-COM-FILHO-ABERTO` |
 | **2** `E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO` — carimbo pelo que foi lido | `stamp` só com `state MERGED` + `mergedAt` + SHA do merge + run de CI SUCCESS de cada check exigido; `verified_at` = data do `mergedAt` | `PR-NAO-MERGEADO` · `CI-SEM-RUN` · `ITEM-E-DECISION` · `PAI-COM-FILHO-ABERTO` · `PR-MEXE-EM-DECISAO` (o diff não fecha decisão em outro grafo) · `POS-MERGE-FORA-DA-POLITICA` |
-| **3** `E_OPINIAO_RISCOS_QUE_FALTAVAM` | checks do ruleset **presentes** e verdes; resíduo da REGRA 56 com `elenxo: sim` **e** `elenxo_isolado: sim`; passada e PR por item no grafo; insumo STALE de impacto ≥ 4; status do provedor nunca fecha nó; merge desligado por padrão e nunca para `decision` | `CI-VAZIO` · `CI-SEM-CHECK-EXIGIDO` · `CI-VERMELHO` · `ELENXO-UMA-VOZ` · `ELENXO-REPROVADO` · `INSUMO-VENCIDO` · `AUDIT` |
+| **3** `E_OPINIAO_RISCOS_QUE_FALTAVAM` | checks do ruleset **presentes** e verdes; resíduo da REGRA 56 com `elenxo: true` **e** `elenxo_isolado: true`; passada e PR por item no grafo; insumo STALE de impacto ≥ 4; status do provedor nunca fecha nó; merge desligado por padrão e nunca para `decision` | `CI-VAZIO` · `CI-SEM-CHECK-EXIGIDO` · `CI-VERMELHO` · `ELENXO-UMA-VOZ` · `ELENXO-REPROVADO` · `INSUMO-VENCIDO` · `AUDIT` |
 | **4** `E_DOGFOOD_POR_COMANDO_REAL` — usa a maquinaria | task manager só pelo `tm.sh`; merge só pelo `ops/merge-serial.sh` (core-only); checkpoint só pelo `--close-lot`; frescor e integridade pelo `kg-radar.sh` | o script não invoca outra coisa (a bancada lista as invocações) |
 
 ## 3. Invariantes (não se negociam, e cada um tem caso e mutante)
@@ -87,7 +87,7 @@ verificado, com o carimbo lido do forge. O LLM é **veto-only**: a sessão execu
 - **`reviewed_diff_sha256` só é exigido não-pendente aqui.** Quem confere o hash contra o diff é a REGRA 56
   no `lint-onion-artifacts`, que é check exigido: verde dele é a prova.
 - **O budget em tokens é DECLARADO** pela sessão com `charge`. O teto de itens é contado pelo script.
-- **`elenxo_isolado: sim` é auto-atestado.** O script exige a declaração; não sabe se o agente separado
+- **`elenxo_isolado: true` é auto-atestado.** O script exige a declaração; não sabe se o agente separado
   de fato reabriu os artefatos.
 - **O que a sessão faz fora do script** (deploy, push, publicação por wrapper) segue o
   `pretooluse-moat-gate.sh` e o `pretooluse-merge-gate.sh`. `ops/publish-door.sh --push` (core-only) é wrapper
