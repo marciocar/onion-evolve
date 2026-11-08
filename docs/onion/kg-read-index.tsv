@@ -1641,6 +1641,7 @@ docs/evolution/federation/outbox/metagamify/_processed	E_ANNOUNCE_BACKLOG_RECONC
 docs/evolution/federation/outbox/metagamify/_processed/2026-06-27-s1-toolbox-resolvido.md	C_D7_15	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md	C_ANNOUNCE_BACKLOG	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-27-resposta-base-cruzada-vendor.md	C_test_is_ancestry	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
+docs/evolution/federation/outbox/onion-curation/2026-11-08-respostas-do-core-onda-2.md	E_CS_ONDA2_RESPOSTAS_DO_CORE_1108	docs/onion/graph/curation-seals-2026-11.kg.yaml
 docs/evolution/inbox	E_DEZ_SINAIS_TRIADOS_COM_MEDICAO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
 docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md	E_DB_LACUNAS_MEDIDAS_NO_HUB_1108	docs/onion/graph/doorbell-hardening-2026-11.kg.yaml
 docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md	C_D7_14	docs/onion/graph/onion-evolution-2026-07.kg.yaml
