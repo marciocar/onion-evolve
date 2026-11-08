@@ -26,7 +26,7 @@ ATRÁS só vira compromisso depois de medido de novo no vivo.
 - Custo: 2.240.751 tokens, 27 agentes, 22 min; ≈22,2 mil por nó, mas ≈48,7 mil por claim ancorada, porque só 46 dos
   101 nós são evidência. Tokens por nó sozinho engana quando o modo produz objeção e superação.
 - O vendor do kg-ssot lido pelo juiz era 4.44 e o core já estava em 4.46 no fechamento. Os 7 itens ATRÁS sobreviveram à
-  nova medida, feita pela API e pelo vivo; 2 "alinhados" do vigia só valem no PR #8, ainda aberto.
+  nova medida, feita pela API e pelo vivo, e o do ruleset foi curado minutos depois dela: 6 ficaram abertos; 2 "alinhados" do vigia só valem no PR #8, ainda aberto.
 
 ## Next crumb
 Medir, na próxima rodada `primaries`, quantas objeções bloqueantes somem se o leitor receber o caminho da peça da casa

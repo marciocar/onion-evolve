@@ -1143,7 +1143,7 @@ nodes:
     verified_at: "2026-11-08"
     verified_against: "Li o ruleset e o endpoint de proteção pela API do GitHub; nenhum scorecard foi rodado. Superação procurada: hook local não substitui a regra no remoto."
     label: "OBJEÇÃO: a main do core não tem proteção de branch e o único ruleset só tem required_status_checks, sem bloqueio de force push nem de deleção; reprova no Tier 1 do Scorecard. O hook é local e não protege o remoto."
-    narrative: "Alvo: 22 [openssf-scorecard] E_SCORECARD_BRANCH_PROTECTION. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: Descreve o check e não roda contra o core. Medi: branches/main/protection = 404 'Branch not protected'; o único ruleset (25001643) contém só required_status_checks, sem non_fast_forward nem deletion, ou seja, sem o Tier 1 que a própria claim cita. CENÁRIO: a narrativa de que o core tem gate de hook (pretooluse-protect-main, merge-gate) leva a 'alinhado', e a régua do Scorecard reprova no primeiro tier, porque o hook é local e não protege o remoto."
+    narrative: "Alvo: 22 [openssf-scorecard] E_SCORECARD_BRANCH_PROTECTION. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: Descreve o check e não roda contra o core. Medi: branches/main/protection = 404 'Branch not protected'; o único ruleset (25001643) contém só required_status_checks, sem non_fast_forward nem deletion, ou seja, sem o Tier 1 que a própria claim cita. CENÁRIO: a narrativa de que o core tem gate de hook (pretooluse-protect-main, merge-gate) leva a 'alinhado', e a régua do Scorecard reprova no primeiro tier, porque o hook é local e não protege o remoto. Curado no mesmo dia, depois desta medida: ver Q_MAIN_RULESET_FORCE_PUSH_1112, que traz o estado de 2026-11-08T22:41Z. Esta objeção descreve o estado em que foi medida."
     trace: "gh api repos/marciocar/onion-evolve/branches/main/protection; gh api repos/marciocar/onion-evolve/rulesets/25001643 --jq '[.rules[].type]'"
     provenance:
       source: "https://api.github.com/repos/marciocar/onion-evolve/rulesets/25001643"
@@ -1483,10 +1483,11 @@ nodes:
     layer: audit
     plane: DEV
     status: open
+    owner: maestro
     impact: 4
     confidence: 0.5
-    label: "A ausência de deny e de sandbox no core fica coberta por D_EXIT2_COUPLING_WORDING_2026_11, ou pede decisão própria? O selo não fala de sandbox, e toda barragem hoje é hook por padrão de texto."
-    narrative: "Proposta desta rodada, para o maestro: rever o escopo do selo D_EXIT2_COUPLING_WORDING_2026_11 ou abrir decisão separada sobre a camada de permissions.deny e sandbox. Medido: 0 regras deny e sandbox None nos dois settings do core (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Esta rodada não sela nada."
+    label: "O core adota uma camada de sandbox, e em que forma, depois da medida da curadoria? A metade do deny já foi decidida; o que segue sem decisão é o sandbox."
+    narrative: "Reescrito em 2026-11-08, para perguntar só o que segue sem decisão. A metade do deny foi decidida pelo maestro em 2026-11-08: «Deny mínimo portátil», selo D_MD_DENY_MINIMUM_PORTABLE_1108, no PR #1550, ainda não mergeado, e por isso citado aqui sem aresta; a forja está em curso. Esse selo deixa o sandbox para depois da medida da curadoria, que segue em andamento. O selo D_EXIT2_COUPLING_WORDING_2026_11 também não fala de sandbox. Medido em 2026-11-08 no .claude/settings.json da origin/main: 0 regras deny e nenhum bloco sandbox (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Pronto quando: um D_ selado pelo maestro diz se o core adota o sandbox, e em que forma, ou por que não. Sem data: o gatilho é a medida da curadoria terminar. Linear: SAC-367; a postura do host para o bwrap é outra pergunta, em SAC-292. Esta rodada não sela nada."
     trace: "Elenxo, objeção 16 e 'Não sustenta: a sandbox como decisão, pois nenhum nó a sela'"
   - id: E_LACUNAS_OUTSIDE_IN_1108
     node_type: evidence
@@ -1699,15 +1700,15 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     x_due: "2026-11-12"
     impact: 5
     confidence: 0.85
     verified_at: "2026-11-08"
-    verified_against: "gh api repos/marciocar/onion-evolve/rules/branches/main em 2026-11-08: só required_status_checks; /branches/main/protection: 404 Branch not protected"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 em 2026-11-08T22:41Z: enforcement active; regras required_status_checks, non_fast_forward e deletion; updated_at 2026-11-08T22:20:08.919Z. gh api repos/marciocar/onion-evolve/rules/branches/main --jq '[.[].type]': as mesmas três regras"
     label: "O ruleset da main do core barra force push e deleção, além dos status checks? Ato do maestro: configuração do repo público."
-    narrative: "Remedido em 2026-11-08: a main não tem proteção de branch (404), e o único ruleset ativo (onion-main-required-checks, alvo a branch default) só tem a regra required_status_checks. O hook local não protege o remoto. Pela leitura do Elenxo isso reprova no Tier 1 do Scorecard; o binário do Scorecard não foi rodado. Pronto quando: `gh api repos/marciocar/onion-evolve/rules/branches/main --jq '[.[].type]'` lista `non_fast_forward` e `deletion`. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-360. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Fechado em 2026-11-08, no mesmo dia em que a rodada o levantou: o ruleset ativo passou a ter non_fast_forward e deletion às 22:20:08Z, minutos depois da medida que abriu este nó, e o critério de pronto foi medido às 22:41Z. Linear: SAC-360, em Done. Remedido em 2026-11-08: a main não tem proteção de branch (404), e o único ruleset ativo (onion-main-required-checks, alvo a branch default) só tem a regra required_status_checks. O hook local não protege o remoto. Pela leitura do Elenxo isso reprova no Tier 1 do Scorecard; o binário do Scorecard não foi rodado. Pronto quando: `gh api repos/marciocar/onion-evolve/rules/branches/main --jq '[.[].type]'` lista `non_fast_forward` e `deletion`. Data proposta pelo core, por importância; o dono confirma. Linear: SAC-360. Nenhuma mudança aplicada por este nó: é mapa e backlog. verified_against anterior: «gh api repos/marciocar/onion-evolve/rules/branches/main em 2026-11-08: só required_status_checks; /branches/main/protection: 404 Branch not protected»"
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_MESSAGING_SOURCE_URI_REFERENCE_1115
     node_type: question

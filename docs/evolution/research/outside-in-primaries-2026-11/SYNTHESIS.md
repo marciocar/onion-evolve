@@ -10,7 +10,7 @@ verified_at: 2026-11-08
 # Primárias de fora para dentro: core, kg-ssot e onion-messaging (projeção do grafo)
 
 > **SSOT:** [`outside-in-primaries-2026-11.kg.yaml`](./outside-in-primaries-2026-11.kg.yaml). 108 nós: 101 da
-> rodada e 7 do fechamento, um por item ATRÁS que continuou real. Esta página deriva do grafo e não decide nada.
+> rodada e 7 do fechamento, um por item ATRÁS. Esta página deriva do grafo e não decide nada.
 > A revisita vence em 2026-12-08 (`meta.review_after`, cadência de 30 dias: o tipo dominante é ferramenta).
 
 ## O que a rodada responde
@@ -21,7 +21,7 @@ porque quase toda claim descrevia o padrão e não media a casa. Os vereditos ab
 (`C_ELENXO_VERDICTS_BY_CHOICE_1108`) e são **posição de 1 agente**. Nenhum nó desta rodada sela nada.
 
 Antes de virar compromisso, cada item ATRÁS foi medido de novo em 2026-11-08, contra os heads daquele dia. Os
-sete continuaram reais. O grafo havia lido o vendor do kg-ssot em 4.44; o core já está em 4.46.0, e os itens
+sete continuavam reais nessa medida. **Eram 7 ATRÁS na rodada: 1 foi curado no mesmo dia, e 6 seguem abertos.** O grafo havia lido o vendor do kg-ssot em 4.44; o core já está em 4.46.0, e os itens
 do kg-ssot foram remedidos nessa versão.
 
 ## Veredito por escolha
@@ -39,7 +39,7 @@ do kg-ssot foram remedidos nessa versão.
 | 9 | kg-ssot | gramática fechada contra o OKF | DIVERGE POR DECISÃO | não remedido; só a v0.2 do OKF foi lida | `E_OKF_TOLERATE_UNKNOWN_KEYS` |
 | 10 | kg-ssot | arestas fora de `wasDerivedFrom` | DIVERGE POR DECISÃO | não remedido | `E_OBJECAO_PROV_DERIVATION_ANALOGY_REFUSED_BY_KG_SSOT` |
 | 11 | core | Agent Card 0.3.0, `oauth2` em 404 | ATRÁS | **remedido, real** | `Q_CORE_AGENT_CARD_A2A_1_0_1118` |
-| 12 | core | `main` sem bloqueio de force push e deleção | ATRÁS | **remedido, real** | `Q_MAIN_RULESET_FORCE_PUSH_1112` |
+| 12 | core | `main` sem bloqueio de force push e deleção | ATRÁS na rodada, **curado em 08/11** | ruleset com `non_fast_forward` e `deletion` desde 22:20Z | `Q_MAIN_RULESET_FORCE_PUSH_1112` |
 | 13 | core | 12 actions sem pin por SHA | ATRÁS | **remedido, real** | `Q_CORE_ACTIONS_SHA_PIN_1116` |
 | 14 | core | portas sem atestação | ATRÁS | **remedido, real** | `Q_DOORS_ATTESTATION_1130` |
 | 15 | kg-ssot | `kg_vendor` sem verificar atestação | ATRÁS | **remedido, real** | `Q_KG_VENDOR_VERIFY_ATTESTATION_1130` |
@@ -55,7 +55,7 @@ As datas são propostas do core, por importância, e o dono confirma. O grafo é
 
 | Dono | Prazo | Item | O que a medida mostrou | Pronto quando | Linear |
 |---|---|---|---|---|---|
-| maestro | 12/11 | Ruleset da main | ruleset ativo só com `required_status_checks`; proteção de branch em 404 | `rules/branches/main` lista `non_fast_forward` e `deletion` | SAC-360 |
+| maestro | feito em 08/11 | Ruleset da main | só `required_status_checks` na 1ª medida; curado às 22:20Z, com as três regras medidas às 22:41Z | `rules/branches/main` lista `non_fast_forward` e `deletion`: **cumprido** | SAC-360, em Done |
 | onion-messaging | 15/11 | `source` da fila | `_clean_attr` aceita texto com espaço; os PRs #8, #9 e #10 não mudam isso; o par em `a2a-metrics.py` do core tem a mesma régua | recusa `source` que não é URI-reference, com caso negativo na bancada | SAC-361 |
 | core | 16/11 | Pin por SHA | 7 por SHA, 12 por tag móvel, em 4 workflows, todas `actions/*`; sem `.github/dependabot.yml` | 0 `uses:` sem SHA, com atualização declarada e guarda | SAC-362 |
 | core | 18/11 | Agent Card | `protocolVersion` 0.3.0, sem `supportedInterfaces`; A2A em v1.0.1; `authorizationUrl` e `tokenUrl` em 404 | versão 1.x ou divergência selada; nenhuma URL de `securitySchemes` em 404; esquema real declarado | SAC-363 |
@@ -63,8 +63,9 @@ As datas são propostas do core, por importância, e o dono confirma. O grafo é
 | kg-ssot | 30/11 | `kg_vendor` | 0 menções a attest na 4.46.0; lê por `git archive` e carimba commit e sha256 | update recusa o que não verifica, com caso negativo; ou razão selada | SAC-365 |
 | kg-ssot | 08/12 | PROV com agente | `kg_prov_export.py` emite Entity e Activity, com 0 ocorrências de agent | emite `prov:Agent` quando o nó nomeia o autor; ou razão selada | SAC-366 |
 
-**Fica aberto para o maestro:** `Q_SANDBOX_DENY_LAYER_DECISION_1108`, sobre o core seguir sem `permissions.deny` e
-sem sandbox, e o selo `D_EXIT2_COUPLING_WORDING_2026_11` não falar disso. Nenhum `D_` nasce nesta rodada.
+**Fica aberto para o maestro:** `Q_SANDBOX_DENY_LAYER_DECISION_1108`, só a camada de sandbox, em SAC-367 (a decisão
+sobre o sandbox do core), sem data: o gatilho é a medida da curadoria terminar. A metade do deny foi decidida em
+08/11, no selo `D_MD_DENY_MINIMUM_PORTABLE_1108` do PR #1550, ainda não mergeado. Nenhum `D_` nasce nesta rodada.
 
 ## O que a rodada ensinou sobre o método
 
@@ -74,7 +75,8 @@ sem sandbox, e o selo `D_EXIT2_COUPLING_WORDING_2026_11` não falar disso. Nenhu
 - **A ancoragem rejeitou 18 claims.** Foram 15 exageradas, 2 afirmadas sem citação e 1 não encontrada. O padrão
   dominante foi fundir graus normativos, tratando SHOULD como MUST.
 - **Um grafo envelhece no mesmo dia.** O vendor do kg-ssot andou de 4.44 para 4.46 entre a leitura e o fechamento.
-  Por isso nenhum ATRÁS virou compromisso sem nova medida.
+  Por isso nenhum ATRÁS virou compromisso sem nova medida. E a medida também envelhece: o ruleset da main foi curado
+  minutos depois de medido, antes do merge deste fechamento.
 
 ## Mercado
 
@@ -119,5 +121,5 @@ DIVERGE marcadas como não remedidas, e o gate real JWS do Agent Card, que conti
 
 O custo por nó é metade dos ≈42 mil da rodada de primárias anterior, mas o número engana: só 46 dos 101 nós são
 evidência, e o restante é objeção, superação e contabilidade. Pela claim ancorada, ficou próximo. Valeu: os 7 itens
-ATRÁS resistiram à nova medida, e as 13 objeções bloqueantes impediram vereditos errados. Os 7 nós do fechamento
+ATRÁS resistiram à nova medida, um deles já curado no mesmo dia, e as 13 objeções bloqueantes impediram vereditos errados. Os 7 nós do fechamento
 não entram no denominador.
