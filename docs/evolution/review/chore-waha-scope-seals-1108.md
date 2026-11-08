@@ -2,7 +2,8 @@
 branch: chore/waha-scope-seals-1108
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 29a6ecbdfb70324bd18468b741d52cf2f51f4ec1fbe63c8d675c1308e607451b
+reviewed_code_sha256: daaebac4ee640a7eec7c9b5385077b0ee6b322f6ffb96d72e83dab2883cf7a51
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
