@@ -7,8 +7,8 @@ meta:
   baseline: "2026-11-08"
   review_after: "2026-12-08"
   purpose: "Guardar os selos da rodada de perguntas de 2026-11-08 que não têm grafo natural aberto. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
-  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia). Decisão nova de outro dia vai para o grafo do assunto."
-  # ═══ TETO: 10 NÓS ═══
+  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia) mais, na leva seguinte do mesmo dia, 2 selos do escopo e dos riscos do WAHA e 3 perguntas abertas, uma por risco a medir no piloto. Decisão nova de outro dia vai para o grafo do assunto."
+  # ═══ TETO: 15 NÓS ═══
 nodes:
   - id: E_MD_MAESTRO_ROUND_1108
     node_type: evidence
@@ -170,6 +170,68 @@ nodes:
       locator: "pergunta com opções de 2026-11-08: «O nome do adotante hub segue citado em /historia/ e em outros arquivos do repo: o que fazer?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
       locality: "pessoa"
+  - id: D_MD_WAHA_SCOPE_INTERNAL_READ_FORWARD_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «WAHA em número dedicado, só para uso interno, com leitura e encaminhamento; os grupos do hub ficam fora, com rascunho colado à mão; API oficial depois de testar o modelo; D_FINTECH_OFICIAL segue de pé»"
+    label: "O WAHA em número dedicado fica só para uso interno, com leitura e encaminhamento; os grupos de parceiros do hub ficam fora, com rascunho colado à mão; a API oficial vem depois de testar o modelo; a decisão de canal oficial para fintech regulada segue de pé."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «WAHA em número dedicado, só para uso interno, com leitura e encaminhamento; os grupos do hub ficam fora, com rascunho colado à mão; API oficial depois de testar o modelo; D_FINTECH_OFICIAL segue de pé» (resposta livre do maestro, fora das opções oferecidas); descartadas: «WAHA cobre o hub» · «Medir a API oficial antes». Proveniência em três partes: resposta por opções «Separar os dois» na sessão do core; resposta livre na sessão da curadoria, «É para uso interno, só leitura e encaminhamento; depois de testar o modelo, vamos para a API oficial»; e «Concordo» do maestro à versão que junta as duas."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «Os grupos de parceiros do hub cabem no selo do WAHA, dado que D_FINTECH_OFICIAL (canal oficial para fintech regulada, docs/evolution/research/whatsapp-api-2026-07/) nunca foi citada nele?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_WAHA_RISKS_ACK_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Registrar ciência e seguir»"
+    label: "O maestro registra ciência de três riscos do WAHA ainda não medidos e segue com o selo do número dedicado; cada risco vira item a medir no piloto."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Registrar ciência e seguir»; descartadas: «Reabrir o selo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «Três leituras não medidas sobre o WAHA em número dedicado: registrar ciência ou reabrir o selo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: Q_MD_WAHA_NEW_NUMBER_BAN_1108
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    label: "Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado."
+    narrative: "Pronto quando: o piloto registra, com data e hora, quanto tempo o número dedicado ficou ativo e se houve bloqueio. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-369."
+  - id: Q_MD_WAHA_PROJECT_USE_TERMS_1108
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    label: "O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no piloto do número dedicado."
+    narrative: "Pronto quando: o trecho vigente dos termos está citado com data de leitura e o uso real do piloto foi confrontado com ele. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-370."
+  - id: Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    label: "O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado."
+    narrative: "Pronto quando: o piloto registra se o número em leitura e encaminhamento sofreu bloqueio, e o trecho do FAQ está citado com data de leitura. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-371."
 edges:
   - from: D_MD_MAIN_RULESET_NFF_DELETION_1108
     to: E_MD_MAESTRO_ROUND_1108
@@ -198,3 +260,27 @@ edges:
   - from: D_MD_HISTORY_PAGE_KEEPS_NAME_1108
     to: D_MD_FEDERATION_PAGE_SCRUB_1108
     edge_type: CONSTRAINS
+  - from: D_MD_WAHA_SCOPE_INTERNAL_READ_FORWARD_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_WAHA_RISKS_ACK_1108
+    to: D_MD_WAHA_SCOPE_INTERNAL_READ_FORWARD_1108
+    edge_type: TRACES_TO
+  - from: Q_MD_WAHA_NEW_NUMBER_BAN_1108
+    to: D_MD_WAHA_RISKS_ACK_1108
+    edge_type: TRACES_TO
+  - from: Q_MD_WAHA_PROJECT_USE_TERMS_1108
+    to: D_MD_WAHA_RISKS_ACK_1108
+    edge_type: TRACES_TO
+  - from: Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108
+    to: D_MD_WAHA_RISKS_ACK_1108
+    edge_type: TRACES_TO
+external_edges:
+  - from: D_MD_WAHA_SCOPE_INTERNAL_READ_FORWARD_1108
+    to: "docs/onion/graph/persona-fases-2-3-2026-11.kg.yaml#D_PF_WAHA_DEDICATED_NUMBER_1108"
+    edge_type: CONSTRAINS
+    label: "limita o escopo do selo do número dedicado"
+  - from: D_MD_WAHA_SCOPE_INTERNAL_READ_FORWARD_1108
+    to: "docs/evolution/research/whatsapp-api-2026-07/whatsapp-api-2026-07.kg.yaml#D_FINTECH_OFICIAL"
+    edge_type: DEPENDS_ON
+    label: "a decisão de canal oficial para fintech regulada segue de pé"
