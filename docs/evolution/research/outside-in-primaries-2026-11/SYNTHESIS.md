@@ -51,17 +51,17 @@ leitura do Elenxo: as quatro linhas ainda não apontam, aqui, para um selo próp
 
 ## Itens ATRÁS remedidos
 
-As datas são propostas do core, por importância, e o dono confirma. O grafo é a fonte, e o Linear espelha.
+**Prazo a calibrar.** As datas abaixo são provisórias: o core as propôs por importância, sem base. O prazo aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). O dono de cada item fica como está. O grafo é a fonte, e o Linear espelha.
 
 | Dono | Prazo | Item | O que a medida mostrou | Pronto quando | Linear |
 |---|---|---|---|---|---|
 | maestro | feito em 08/11 | Ruleset da main | só `required_status_checks` na 1ª medida; curado às 22:20Z, com as três regras medidas às 22:41Z | `rules/branches/main` lista `non_fast_forward` e `deletion`: **cumprido** | SAC-360, em Done |
-| onion-messaging | 15/11 | `source` da fila | `_clean_attr` aceita texto com espaço; os PRs #8, #9 e #10 não mudam isso; o par em `a2a-metrics.py` do core tem a mesma régua | recusa `source` que não é URI-reference, com caso negativo na bancada | SAC-361 |
-| core | 16/11 | Pin por SHA | 7 por SHA, 12 por tag móvel, em 4 workflows, todas `actions/*`; sem `.github/dependabot.yml` | 0 `uses:` sem SHA, com atualização declarada e guarda | SAC-362 |
-| core | 18/11 | Agent Card | `protocolVersion` 0.3.0, sem `supportedInterfaces`; A2A em v1.0.1; `authorizationUrl` e `tokenUrl` em 404 | versão 1.x ou divergência selada; nenhuma URL de `securitySchemes` em 404; esquema real declarado | SAC-363 |
-| core | 30/11 | Atestação das portas | 4 portas: tags, 0 releases, sem workflow; 0 menções a attest no motor de publicação | `gh attestation verify` passa na última publicação de cada porta, ou divergência selada | SAC-364 |
-| kg-ssot | 30/11 | `kg_vendor` | 0 menções a attest na 4.46.0; lê por `git archive` e carimba commit e sha256 | update recusa o que não verifica, com caso negativo; ou razão selada | SAC-365 |
-| kg-ssot | 08/12 | PROV com agente | `kg_prov_export.py` emite Entity e Activity, com 0 ocorrências de agent | emite `prov:Agent` quando o nó nomeia o autor; ou razão selada | SAC-366 |
+| onion-messaging | a calibrar (provisória: 15/11) | `source` da fila | `_clean_attr` aceita texto com espaço; os PRs #8, #9 e #10 não mudam isso; o par em `a2a-metrics.py` do core tem a mesma régua | recusa `source` que não é URI-reference, com caso negativo na bancada | SAC-361 |
+| core | a calibrar (provisória: 16/11) | Pin por SHA | 7 por SHA, 12 por tag móvel, em 4 workflows, todas `actions/*`; sem `.github/dependabot.yml` | 0 `uses:` sem SHA, com atualização declarada e guarda | SAC-362 |
+| core | a calibrar (provisória: 18/11) | Agent Card | `protocolVersion` 0.3.0, sem `supportedInterfaces`; A2A em v1.0.1; `authorizationUrl` e `tokenUrl` em 404 | versão 1.x ou divergência selada; nenhuma URL de `securitySchemes` em 404; esquema real declarado | SAC-363 |
+| core | a calibrar (provisória: 30/11) | Atestação das portas | 4 portas: tags, 0 releases, sem workflow; 0 menções a attest no motor de publicação | `gh attestation verify` passa na última publicação de cada porta, ou divergência selada | SAC-364 |
+| kg-ssot | a calibrar (provisória: 30/11) | `kg_vendor` | 0 menções a attest na 4.46.0; lê por `git archive` e carimba commit e sha256 | update recusa o que não verifica, com caso negativo; ou razão selada | SAC-365 |
+| kg-ssot | a calibrar (provisória: 08/12) | PROV com agente | `kg_prov_export.py` emite Entity e Activity, com 0 ocorrências de agent | emite `prov:Agent` quando o nó nomeia o autor; ou razão selada | SAC-366 |
 
 **Fica aberto para o maestro:** `Q_SANDBOX_DENY_LAYER_DECISION_1108`, só a camada de sandbox, em SAC-367 (a decisão
 sobre o sandbox do core), sem data: o gatilho é a medida da curadoria terminar. A metade do deny foi decidida em
