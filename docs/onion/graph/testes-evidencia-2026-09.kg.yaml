@@ -526,7 +526,7 @@ nodes:
     verified_at: "2026-11-08"
     verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «valor de campo de máquina em inglês (verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS; elenxo e elenxo_isolado true|false), legado de 871 resíduos aceito por lista congelada com catraca (PR #1541)»"
     label: "Valor de campo de maquina do residuo da REGRA 56 (PR carrega residuo adversarial) vai em ingles: verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS, elenxo e elenxo_isolado true|false; legado de 871 por lista congelada com catraca."
-    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «valor de campo de máquina em inglês (verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS; elenxo e elenxo_isolado true|false), legado de 871 resíduos aceito por lista congelada com catraca (PR #1541)»; descartadas: «manter o valor de máquina em pt-BR» · «reescrever os resíduos antigos para o inglês»."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «valor de campo de máquina em inglês (verdict APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS; elenxo e elenxo_isolado true|false), legado de 871 resíduos aceito por lista congelada com catraca (PR #1541)»; descartadas: «Só os booleanos» · «Migrar tudo de uma vez». (Emenda de 2026-11-08: a 1ª gravação trazia opções reconstruídas, porque o brief não as listava; estas são as que o /meta:decide ofereceu.)"
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-08: «valor de campo de máquina do resíduo da REGRA 56: pt-BR ou inglês, e o que fazer com o legado?»"
