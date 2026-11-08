@@ -51049,7 +51049,9 @@ run_update_base_and_deny_selftests() {
   # deny viaja. (p1) o deny REAL do core é portátil: sem caminho de máquina, porque ele vai para portas e adotantes.
   # MUTANTES: (j-MUT) o merge sem a soma reprova (d6); (p-MUT) uma regra com caminho de máquina é acusada.
   _ub_merge() { printf '%s\n' "$1" > "${d}/src.json"; printf '%s\n' "$2" > "${d}/tgt.json"; bash "${3:-${mh}}" "${d}/src.json" "${d}/tgt.json" 2>/dev/null; }
-  _ub_machine() { jq -r '.permissions.deny // [] | .[]' "$1" | LC_ALL=C /usr/bin/grep -E '/home/|/Users/|/root/|^[A-Za-z]+\(//[^*]' || true; }
+  # p1 julga a FORMA por lista fechada: Read só `//**/.env…` ou dotfile do home; Bash sem `palavra/palavra` (caminho, dono/repo).
+  # Nome de cliente é da REGRA 119 no diff; esta forma não sabe nomes (um `~/.acme/**` passaria aqui).
+  _ub_machine() { jq -r '.permissions.deny // [] | .[]' "$1" | LC_ALL=C awk '/^Read\(\/\/\*\*\/\.env(\.[a-z]+)?\)$/ || /^Read\(~\/\.[A-Za-z0-9_.\/*-]+\)$/ {next} /^Bash\(/ && !/[A-Za-z0-9_.-]\/[A-Za-z0-9_]/ {next} {print}'; }
   local src_d='{"permissions":{"allow":["Bash(rm *)"],"deny":["Bash(git filter-repo*)","Bash(crontab *)"]},"hooks":{}}'
   local tgt_d='{"permissions":{"allow":["Bash(ls *)"],"deny":["Bash(crontab *)","Bash(at *)"]},"sandbox":{"enabled":true},"hooks":{}}'
   local want_d='{"allow":["Bash(ls *)"],"deny":["Bash(crontab *)","Bash(at *)","Bash(git filter-repo*)"]}'
@@ -51065,7 +51067,7 @@ run_update_base_and_deny_selftests() {
   out="$(_ub_merge "${src_d}" '{"hooks":{}}' | jq -c '.permissions')"
   if [ "${out}" = '{"deny":["Bash(git filter-repo*)","Bash(crontab *)"]}' ]; then record_pass "update-base-deny: (d9) alvo sem permissions recebe só o deny"
   else record_fail "update-base-deny: (d9)" "${out}"; fi
-  mut="${d}/mh-mut.sh"; sed 's/^  | if ((\$src\.permissions\.deny \/\/ \[\]) | length) > 0 then$/  | if false then # ONION_MUTANTE sem soma/' "${mh}" > "${mut}"
+  mut="${d}/mh-mut.sh"; sed 's/^  | if ((\$src\.permissions\.deny \/\/ \[\]) | length) > 0$/  | if false # ONION_MUTANTE sem soma/' "${mh}" > "${mut}"
   if ! grep -q 'ONION_MUTANTE sem soma' "${mut}"; then record_fail "update-base-deny: (j-MUT)" "o sed não casou a soma do deny"
   else
     out="$(_ub_merge "${src_d}" "${tgt_d}" "${mut}" | jq -c '[.permissions, .sandbox.enabled]')"
@@ -51077,10 +51079,50 @@ run_update_base_and_deny_selftests() {
   if [ -z "${hits}" ] && [ "$(jq '.permissions.deny // [] | length' "${real_st}")" -gt 0 ]; then
     record_pass "update-base-deny: (p1) o permissions.deny do core existe e não cita caminho de máquina"
   else record_fail "update-base-deny: (p1)" "deny ausente ou com caminho de máquina: ${hits}"; fi
-  printf '%s\n' '{"permissions":{"deny":["Read(//**/.env)","Edit(//srv/app/**)"]}}' > "${d}/mp.json"
-  hits="$(_ub_machine "${d}/mp.json")"
-  if [ "${hits}" = 'Edit(//srv/app/**)' ]; then record_pass "update-base-deny: (p-MUT) regra com caminho absoluto de máquina é acusada e o '//**/' portátil passa"
+  printf '%s\n' '{"permissions":{"deny":["Read(//**/.env)","Read(~/.ssh/**)","Bash(rm -*r* .git/)","Bash(rm -*r* ~/)","Edit(//srv/app/**)","Read(~/clientes/acme/**)","Bash(gh repo delete owner/cliente)","Read(/etc/onion-stt/**)"]}}' > "${d}/mp.json"
+  hits="$(_ub_machine "${d}/mp.json" | tr '\n' ';')"
+  if [ "${hits}" = 'Edit(//srv/app/**);Read(~/clientes/acme/**);Bash(gh repo delete owner/cliente);Read(/etc/onion-stt/**);' ]; then
+    record_pass "update-base-deny: (p-MUT) a forma acusa caminho de máquina, pasta de cliente, dono/repo e /etc; as regras portáteis passam"
   else record_fail "update-base-deny: (p-MUT)" "acusou: ${hits}"; fi
+  # (d10-d11) permissions fora da forma no alvo: os hooks chegam, o deny do alvo fica como está, e o stderr diz. (g-MUT) sem a guarda, o merge quebra.
+  local s_hk='{"permissions":{"deny":["Bash(x)"]},"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash .claude/hooks/h.sh"}]}]}}'
+  local bad_t
+  for bad_t in '{"permissions":{"deny":"Bash(y)"}}' '{"permissions":{"deny":{"a":1}}}' '{"permissions":"x"}'; do
+    printf '%s\n' "${s_hk}" > "${d}/src.json"; printf '%s\n' "${bad_t}" > "${d}/tgt.json"; rc=0
+    out="$(bash "${mh}" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ "$(jq -r '.hooks.Stop[0].hooks[0].command' <<< "${out}")" = 'bash .claude/hooks/h.sh' ] \
+       && [ "$(jq -c '.permissions' <<< "${out}")" = "$(jq -c '.permissions' <<< "${bad_t}")" ] && grep -q 'NÃO foi somado' "${d}/err"; then
+      record_pass "update-base-deny: (d10) alvo ${bad_t} ⇒ rc 0, hooks chegam, permissions intacto e o stderr avisa"
+    else record_fail "update-base-deny: (d10) ${bad_t}" "rc=${rc} out=${out} err=$(cat "${d}/err")"; fi
+  done
+  mut="${d}/mh-mut2.sh"; sed 's/^       and (((\.permissions \/\/ {}) | type) == "object")$/       and (true) # ONION_MUTANTE sem guarda/; s/^       and (((\.permissions \/\/ {})\.deny \/\/ \[\]) | type) == "array" then$/       and true then/' "${mh}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE sem guarda' "${mut}"; then record_fail "update-base-deny: (g-MUT)" "o sed não casou a guarda de forma"
+  else
+    printf '%s\n' "${s_hk}" > "${d}/src.json"; printf '%s\n' '{"permissions":{"deny":"Bash(y)"}}' > "${d}/tgt.json"; rc=0
+    bash "${mut}" "${d}/src.json" "${d}/tgt.json" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -ne 0 ]; then record_pass "update-base-deny: (g-MUT) tirar a guarda de forma MORDE: o merge quebra e os hooks não chegam (rc ${rc})"
+    else record_fail "update-base-deny: (g-MUT)" "sem a guarda o merge seguiu com rc 0"; fi
+  fi
+  # (d12) o --diff do relatório nomeia as regras novas e os allow que elas anulam; (d13) nada novo, nada dito; (n-MUT) sem o laço, (d12) reprova.
+  local a_d='{"permissions":{"allow":["Bash(grep * .env)","Bash(cat .env)","Bash(git clean -fdx)","Bash(git status)","Read","Read(.env.example)"],"deny":["Bash(z)"]},"hooks":{}}'
+  local b_d='{"permissions":{"allow":["Bash(grep * .env)","Bash(cat .env)","Bash(git clean -fdx)","Bash(git status)","Read","Read(.env.example)"],"deny":["Bash(z)","Read(//**/.env)","Bash(git clean* -fdx*)"]},"hooks":{}}'
+  printf '%s\n' "${a_d}" > "${d}/a.json"; printf '%s\n' "${b_d}" > "${d}/b.json"
+  out="$(bash "${mh}" --diff "${d}/a.json" "${d}/b.json" 2>&1)"
+  if grep -qF '+ deny: Read(//**/.env)' <<< "${out}" && grep -qF '+ deny: Bash(git clean* -fdx*)' <<< "${out}" && ! grep -qF '+ deny: Bash(z)' <<< "${out}" \
+     && [ "$(grep -c '^! allow anulado:' <<< "${out}")" -eq 3 ] && grep -qF '! allow anulado: Bash(cat .env) (o deny vence: Read(//**/.env))' <<< "${out}" \
+     && grep -qF '! allow anulado: Bash(git clean -fdx) (o deny vence: Bash(git clean* -fdx*))' <<< "${out}"; then
+    record_pass "update-base-deny: (d12) o --diff nomeia as regras novas e os 3 allow anulados, sem acusar .env.example, Read nu nem regra antiga"
+  else record_fail "update-base-deny: (d12)" "${out}"; fi
+  out="$(bash "${mh}" --diff "${d}/a.json" "${d}/a.json" 2>&1)"
+  if ! grep -qE '^(\+ deny:|! allow anulado:)' <<< "${out}"; then record_pass "update-base-deny: (d13) sem deny novo o --diff não diz nada de deny"
+  else record_fail "update-base-deny: (d13)" "${out}"; fi
+  mut="${d}/mh-mut3.sh"; sed 's/^      + \[ \$alw\[\] as \$al | .*$/      # ONION_MUTANTE sem anulados/' "${mh}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE sem anulados' "${mut}"; then record_fail "update-base-deny: (n-MUT)" "o sed não casou o laço dos anulados"
+  else
+    out="$(bash "${mut}" --diff "${d}/a.json" "${d}/b.json" 2>&1)"
+    if ! grep -q '^! allow anulado:' <<< "${out}"; then record_pass "update-base-deny: (n-MUT) tirar o laço MORDE: (d12) reprovaria"
+    else record_fail "update-base-deny: (n-MUT)" "sem o laço o --diff ainda nomeou"; fi
+  fi
   rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm _ub_merge _ub_machine
 }
 _family run_update_base_and_deny_selftests

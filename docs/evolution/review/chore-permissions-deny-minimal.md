@@ -2,14 +2,13 @@
 branch: chore/permissions-deny-minimal
 pr: 1552
 date: 2026-11-08
-reviewed_diff_sha256: 4a1e878759663e38a92b43cc42dab59e7175d0d676acfc76355b5bdf50aad72a
-reviewed_code_sha256: 7860b81c7dab9899cc729d3c760d1505691f11d713d104ea8d77805c338eae10
-findings_total: 10
-findings_real: 10
+reviewed_diff_sha256: pendente
+findings_total: 15
+findings_real: 15
 findings_blocking: 2
 tokens: 0
 duration_min: 0
-findings_fixed: 8
+findings_fixed: 11
 verdict: FIXED
 elenxo: true
 reviewer: refutador independente sobre o head 4f6429476, chamado pela sessão do core, mais a passada do autor com os mutantes por regra no motor real; as curas do refutador foram medidas pelo autor, sem nova passada independente
@@ -49,10 +48,18 @@ da camada nativa na doutrina de guardas, a bancada no motor real (`ops/testing/p
 - **R3 (reduzido e declarado).** Saíram os casos de `branch push-tmp -f`, `tag push-1 -f`, `fetch origin push-x -f`,
   `log -- push.sh -f`, `checkout … --force` e `gh release delete-asset`. Restam a menção em `git -C . commit -m` e
   `rm -f my-report /`, declaradas como custo.
-- **R4 (curado).** A bancada falhava aberta: sem resultado medido dava ok. Agora é reprovação; com um `claude` falso,
-  mutantes e flows saem rc 1.
+- **R4 (curado).** A bancada falhava aberta: sem resultado medido dava ok. Agora a linha é NÃO MEDIDO e o rc é 3; com
+  um `claude` falso, mutantes e flows não dão verde.
+- **R5 (curado).** O `(p1)` só via caminho `//` e o corpo do PR afirmava mais que isso. Agora julga a forma por lista
+  fechada (`Read` só `.env` em `//**/` ou dotfile do home; `Bash` sem `palavra/palavra`). Nome de cliente é da REGRA 119
+  (O diff não acrescenta nome de repo ou de clone de adotante não federado); o corpo diz isso.
+- **R6 (declarado).** Os 10 flows provam só que o deny não barra a chamada.
+- **R7 (medido em parte).** Em fixture com sandbox: `.ssh` e `.aws` somem, `ssh -i` avisa chave inacessível, gpg falha
+  com e sem o deny. Push por ssh de ponta a ponta não foi medido; declarado.
+- **R8 (curado).** O `--diff` nomeia cada regra nova e os `allow` que ela anula. É comparação de texto: allow com
+  curinga que só em parte se sobrepõe não aparece.
+- **R9 (curado).** `permissions.deny` fora da forma de lista: rc 0, hooks chegam, deny não soma, stderr avisa.
 
 ## O que esta passada não viu
 
-O sandbox no core real, o login real, e a re-revisão independente das curas. F04, F05 e F09 pararam em recusa do
-próprio script no fixture: provam que o deny não barra a chamada, não que o fluxo foi até o fim.
+O sandbox no core real, o login real, e a re-revisão independente das curas.

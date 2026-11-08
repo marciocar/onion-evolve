@@ -3,7 +3,8 @@
 #
 # Uso: python3 -I ops/testing/permissions-deny-bench.py --settings <settings.json> --out <resultado.tsv>
 #          [--flows <checkout>] [--work <pasta>] [--only default,bypass,sandbox,flows]
-#      rc 0 = todo caso bateu com o esperado · 1 = algum caso divergiu · 2 = uso · 3 = NÃO MEDIDO (ambiente)
+#      rc 0 = todo caso bateu com o esperado · 1 = algum caso divergiu · 2 = uso
+#      3 = NÃO MEDIDO (ambiente, ou caso sem resultado: reprova, nunca conta como verde)
 #
 # COMO MEDE: uma Messages API falsa em loopback entrega as chamadas de ferramenta de um roteiro fixo, com chave
 # fictícia, HOME falso e projeto descartável (o molde é o lab do exit2-coupling-against-2026-11). Quem decide
@@ -16,7 +17,9 @@
 #   bypass   só o subconjunto inofensivo no fixture. Mostra que o deny vale em bypassPermissions e que o permitido
 #            roda de verdade (push contra um bare local, gh falso, script que faz por dentro o que a linha não pode).
 #   sandbox  deny + sandbox ligado: a regra Read vira denyRead do sistema e alcança o `source .env`.
-#   flows    os caminhos reais da casa, num clone do checkout dado, com os hooks reais e o deny.
+#   flows    os caminhos reais da casa, num clone do checkout dado, com os hooks reais e o deny. Prova só que o deny
+#            não barra a CHAMADA: a regra vê a linha de cima (`bash x.sh`), não o que o script faz, e o script pode
+#            parar por conta própria (F01 só imprime o uso).
 #   mutants  (só com --only mutants) tira uma regra por vez e exige que algum caso solte: regra sem caso é decorativa.
 #
 # TETO: mede as formas listadas em CASES, na versão do binário instalada. Lista de formas não fecha contra variação:
@@ -200,6 +203,11 @@ SANDBOX_CASES = [
     ("S03", "Bash", "cat {H}/.ssh/id_ed25519"),
     ("S04", "Bash", "git status --short"),
     ("S05", "Bash", "cat .env.example"),
+    # o que a pasta ilegível custa ao adotante com sandbox: chave ssh e assinatura gpg dentro dele
+    ("S06", "Bash", "ssh -o BatchMode=yes -o ConnectTimeout=2 -i {H}/.ssh/id_ed25519 -o IdentitiesOnly=yes 127.0.0.1 true; echo ssh-rc=$?"),
+    ("S07", "Bash", "gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?"),
+    ("S08", "Bash", "git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?"),
+    ("S09", "Bash", "cat {H}/.aws/credentials; echo aws-rc=$?"),
 ]
 
 FLOW_CASES = [
@@ -334,6 +342,12 @@ def build_fixture(W):
     os.makedirs(f"{P}/sub/untracked", exist_ok=True)
     write(f"{P}/sub/untracked/u.txt", "u\n")
     write(f"{H}/.claude.json", json.dumps({"hasCompletedOnboarding": True, "projects": {P: {"hasTrustDialogAccepted": True}}}))
+    # chave gpg do fixture, sem senha: só para ver se a assinatura anda com o .gnupg ilegível no sandbox
+    if shutil.which("gpg"):
+        os.chmod(f"{H}/.gnupg", 0o700)
+        os.remove(f"{H}/.gnupg/private.key")
+        subprocess.run(["gpg", "--batch", "--passphrase", "", "--quick-gen-key", "lab@example.invalid", "default", "default", "never"], env=dict(os.environ, HOME=H), capture_output=True, timeout=120)
+        write(f"{H}/.gnupg/private.key", "fake\n")
     return H, P
 
 
@@ -434,7 +448,7 @@ def main():
         for i, c in enumerate(CASES, 1):
             k = f"toolu_lab{i}"
             if k not in den or k not in ctl:
-                rows.append((c[0], "default", c[2], c[3], "sem-resultado", "DIVERGE", "sem medida do deny ou do controle"))
+                rows.append((c[0], "default", c[2], c[3], "sem-resultado", "NAO-MEDIDO", "sem medida do deny ou do controle"))
                 bad += 1
                 continue
             cv, dv = classify(*ctl[k]), classify(*den[k])
@@ -450,7 +464,7 @@ def main():
         for i, c in enumerate(safe, 1):
             k = f"toolu_lab{i}"
             if k not in den:
-                rows.append((c[0], "bypass", c[2], c[3], "sem-resultado", "DIVERGE", ""))
+                rows.append((c[0], "bypass", c[2], c[3], "sem-resultado", "NAO-MEDIDO", ""))
                 bad += 1
                 continue
             err, txt = den[k]
@@ -471,7 +485,7 @@ def main():
             rc, den = run_session(W, H, P, plan, "bypassPermissions", label)
             for i, c in enumerate(SANDBOX_CASES, 1):
                 if f"toolu_lab{i}" not in den:
-                    rows.append((c[0], label, c[2], "medir", "sem-resultado", "DIVERGE", "sem medida"))
+                    rows.append((c[0], label, c[2], "medir", "sem-resultado", "NAO-MEDIDO", "sem medida"))
                     bad += 1
                     continue
                 err, txt = den[f"toolu_lab{i}"]
@@ -496,7 +510,7 @@ def main():
             for i, c in enumerate(FLOW_CASES, 1):
                 # sem resultado medido é reprovação: um `claude` que sai 0 sem escrever nada não prova nada
                 if f"toolu_lab{i}" not in den:
-                    rows.append((c[0], label, c[1], "pass", "sem-resultado", "DIVERGE", "sem medida"))
+                    rows.append((c[0], label, c[1], "pass", "sem-resultado", "NAO-MEDIDO", "sem medida"))
                     bad += 1
                     continue
                 err, txt = den[f"toolu_lab{i}"]
@@ -516,7 +530,7 @@ def main():
             _, den = run_session(W, H, P, plan, "default", "mut")
             # o mutante só vale com todos os casos medidos: caso sem resultado não é caso que soltou
             if any(f"toolu_lab{i}" not in den for i in range(1, len(cases) + 1)):
-                rows.append(("M", "mutante", r, "algum-caso-solta", "sem-resultado", "DIVERGE", "sem medida"))
+                rows.append(("M", "mutante", r, "algum-caso-solta", "sem-resultado", "NAO-MEDIDO", "sem medida"))
                 bad += 1
                 continue
             flips = [c[0] for i, c in enumerate(cases, 1) if classify(*den[f"toolu_lab{i}"]) != "deny"]
@@ -529,7 +543,14 @@ def main():
             # o corte da nota pode partir o caminho do fixture: nada de caminho de máquina no que se versiona
             f.write(re.sub(r"/home/[^\s\t]*", "<caminho>", "\t".join(r).replace(W, "<fixture>")) + "\n")
     print(f"casos: {len(rows)} · divergentes: {bad} · resultado: {a.out}")
-    sys.exit(1 if bad else 0)
+    # sem linha nenhuma, ou com caso sem resultado, não houve medição: NÃO MEDIDO é reprovação, nunca verde
+    unm = sum(1 for r in rows if r[5] == "NAO-MEDIDO")
+    if bad - unm > 0:
+        sys.exit(1)
+    if unm or not rows:
+        print(f"NAO MEDIDO: {unm} caso(s) sem resultado; {len(rows)} linha(s) no total", file=sys.stderr)
+        sys.exit(3)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
