@@ -18,6 +18,7 @@ priority.set	optional	not_implemented	1.0	-	sem prioridade nativa no adapter (cu
 estimate.points	optional	not_implemented	1.0	-	estimativa não ancorada
 estimate.points_read	optional	not_implemented	1.0	-	estimativa não ancorada; o adapter não lê, então o progresso sai por contagem (progress.sh declara)
 estimate.time	optional	not_implemented	1.0	-	
+due_date.set	optional	not_implemented	1.0	-	verbo próprio ausente neste adapter; só o Linear o tem
 comment.add	required	implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_STORY_TEXT_OR_HTML	story com text; o markdown canônico chega como texto puro (html_text não usado)
 comment.list	required	unverified	1.0	-	
 activity.list	optional	not_implemented	1.0	-	histórico de mudanças da task (SAC-116): o adapter não lê; declarado sem executável até haver demanda (maestro, 2026-10-12)

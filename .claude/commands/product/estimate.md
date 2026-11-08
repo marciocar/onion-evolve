@@ -252,6 +252,14 @@ SE critérios de aceite não claros:
    - Adicionar referência ao épico na descrição
 ```
 
+### Prazo: vem do medidor, não do agente
+
+Com os pontos gravados por `tm.sh estimate.points <ID> <n>`, a data sai de
+`python3 .claude/utils/task-manager/velocity-meter.py propose --issue <ID> --project <P>`. Saída rc 3 =
+amostra insuficiente: **não há data proposta**. A faixa só vira prazo por `tm.sh due_date.set <ID> <data>`.
+`velocity-meter.py report --project <P> --text` mostra pontos, fila, trabalho, erro e amostra por categoria
+(categorias do core em `docs/onion/work-categories.tsv`).
+
 ### Passo 6: Documentar Métricas (Opcional)
 
 ```markdown

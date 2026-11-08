@@ -39,7 +39,7 @@
 # TETO (declarado): o status é binário por subtask — uma subtask meio feita conta como não feita
 #   (sem crédito fracionário); numa task-mãe de task-mãe, cada filha entra com os PRÓPRIOS pontos e o
 #   próprio status, não com o % dela. E o helper só pondera o que recebe: hoje nenhum adapter devolve
-#   storyPoints na leitura (capacidade `estimate.points_read`, not_implemented nos 5), então na prática
+#   storyPoints na leitura (capacidade `estimate.points_read`: desde 2026-11-08 só o Linear a implementa), então nos outros, na prática
 #   ele cai em `count` — e diz isso.
 # =============================================================================
 set -uo pipefail

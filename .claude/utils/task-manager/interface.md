@@ -251,6 +251,7 @@ priority.set	optional	remote	field:priority
 estimate.points	optional	remote	field:storyPoints
 estimate.points_read	optional	remote	field:storyPoints
 estimate.time	optional	remote	field:timeEstimate
+due_date.set	optional	remote	field:dueDate
 comment.add	required	remote	addComment(
 comment.list	required	remote	getComments(
 activity.list	optional	remote	getActivity(
@@ -375,9 +376,9 @@ comentário de progresso**: o número sem o método é a omissão que esta deriv
 
 **A dependência, declarada:** ponderar exige **ler** os pontos, e isso é a capacidade
 `estimate.points_read` — distinta de `estimate.points` (escrever), porque um adapter pode fazer uma e
-não a outra. Hoje ela é `not_implemented` nos cinco adapters (o `TaskOutput` nem carregava o campo até
-esta onda), então **na prática o progresso sai `count`, e diz isso**. Quando um adapter passar a ler os
-pontos, a declaração muda no mesmo commit e o progresso passa a ponderar, sem tocar em comando nenhum.
+não a outra. Desde 2026-11-08 o Linear a implementa; nos outros quatro adapters ela segue `not_implemented`,
+e neles **o progresso sai `count`, e diz isso**. Um consumidor que passe os pontos lidos passa a ponderar
+sem tocar em comando nenhum. O `due_date.set` é irmão dela: verbo próprio para gravar o prazo, com releitura.
 Teto herdado da REGRA 103: a superfície das duas é o mesmo `field:storyPoints`, e a guarda confere só a
 presença da palavra — não distingue ler de escrever. Declarar `estimate.points_read` como `implemented`
 exige fonte que mostre a **leitura**, e isso é juízo da revisão, não da guarda.
@@ -395,7 +396,7 @@ filha entra com os próprios pontos e o próprio status, não com o % dela.
 | **Item** | `createTask`, `getTask`, `updateTask`, `deleteTask?`, `archiveTask?`, `listTasks?` | `item.*` |
 | **Hierarquia** | `createSubtask`, `getSubtasks`, `createEpic?` | `hierarchy.*` |
 | **Status** | `updateStatus` | `status.transition` |
-| **Campos** | `priority`, `storyPoints`, `timeEstimate`, `tags` em Create/UpdateTaskInput | `priority.set`, `estimate.*`, `label.set` |
+| **Campos** | `priority`, `storyPoints`, `timeEstimate`, `dueDate`, `tags` em Create/UpdateTaskInput | `priority.set`, `estimate.*`, `due_date.set`, `label.set` |
 | **Derivação** | `progress` (sobre `getSubtasks` + `storyPoints` lido), executada por [`progress.sh`](./progress.sh) | lê `hierarchy.subtask_list` e `estimate.points_read`; não é capacidade do adapter |
 | **Comentários · Atividade · Contexto** | `addComment`, `getComments`, `getActivity?`, `getHierarchyContext?` | `comment.*`, `activity.list`, `hierarchy.context` |
 | **Anexo · Iteração · Vínculo** | `addAttachment?`, `getAttachments?`, `readAttachment?`, `getInlineRefs?`, `assignIteration?`/`listIterations?`, `createLink?` | `attachment.*`, `inline.refs`, `iteration.assign`, `link.create` |
