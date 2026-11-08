@@ -5,33 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1056 itens abertos** em 158 grafo(s) com aberto (de 203 no escopo) · 157 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
-
-## outside-in-primaries-2026-11 — 21 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 225.0 | `Q_OUTSIDE_IN_PRIMARIES_1108` | outside-in-primaries-2026-11 | Comparadas às primárias, onde as escolhas do core, do kg-ssot e do onion-messaging estão ALINHADAS, DIVERGEM por decisão ou es |
-| 81.6 | `C_ELENXO_VERDICTS_BY_CHOICE_1108` | outside-in-primaries-2026-11 | Vereditos que as medidas já permitem, por escolha: ALINHADO em 6 pontos, DIVERGE POR DECISÃO em 4, ATRÁS em 7 com dono proposto |
-| 3.0 | `C_SUPERACAO_20261108_A2A_PUSH_NORMATIVE_DEGREES` | outside-in-primaries-2026-11 | A entrega por push do A2A com os graus certos: MUST tentar ao menos uma vez, MAY retry com backoff, MAY parar após falhas seguida |
-| 3.0 | `C_SUPERACAO_20261108_A2A_WEBHOOK_SSRF_IS_SHOULD` | outside-in-primaries-2026-11 | O §13.2 do A2A com o grau certo: agentes SHOULD validar URLs de webhook contra SSRF (rejeitar IP privado), agentes MUST incluir c |
-| 3.0 | `C_SUPERACAO_20261108_CC_ONFAILURE_BLOCK_CLOSES_TIMEOUT` | outside-in-primaries-2026-11 | onFailure: block nas guardas de PreToolUse fecha o timeout. |
-| 3.0 | `C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG` | outside-in-primaries-2026-11 | Sandbox com os limites exatos: seção 'What runs outside the sandbox', sandbox.enabled + failIfUnavailable: true + allowUnsandbox |
-| 3.0 | `C_SUPERACAO_20261108_CE_TIME_IS_OPTIONAL` | outside-in-primaries-2026-11 | CloudEvents com a formulação correta (ce.md l.244 e l.416-428): obrigatórios id, source, specversion e type; time opcional, em  |
-| 3.0 | `C_SUPERACAO_20261108_DORA_FIVE_METRICS_MODEL` | outside-in-primaries-2026-11 | O modelo DORA de cinco métricas pelos trechos do mesmo guia ('DORA has identified five software delivery performance metrics', 't |
-| 3.0 | `C_SUPERACAO_20261108_DORA_RECOVERY_MOVE_FROM_MTTR` | outside-in-primaries-2026-11 | Recuperação DORA medida só sobre deploy com falha, apoiada na frase 'the move from MTTR to Failed Deployment Recovery Time', se |
-| 3.0 | `C_SUPERACAO_20261108_KG_PROV_EXPORT_DELIVERS_PROV_O` | outside-in-primaries-2026-11 | kg_prov_export.py entrega a exportação para PROV-O. |
-| 3.0 | `C_SUPERACAO_20261108_KG_SSOT_RELEASE_ATTESTATION` | outside-in-primaries-2026-11 | actions/attest-build-provenance no release.yml do kg-ssot. |
-| 3.0 | `C_SUPERACAO_20261108_MCP_CUSTOM_TRANSPORT_IS_THE_RULER` | outside-in-primaries-2026-11 | A régua sustentada para julgar canal próprio no MCP: a seção Custom Transports de basic/transports e as listas 'At a glance' e |
-| 3.0 | `C_SUPERACAO_20261108_MCP_HTTP_SECURITY_MODALS` | outside-in-primaries-2026-11 | A seção Security & Endpoint do MCP com os três modais corretos: MUST validar Origin, SHOULD ligar só a localhost e SHOULD aute |
-| 3.0 | `C_SUPERACAO_20261108_NIST_MS_2_8_003_VERSION_CONTROL_OPTIONAL` | outside-in-primaries-2026-11 | A MS-2.8-003 do perfil GenAI como padrão de procedência à prova de adulteração, com controle de versão como adição opciona |
-| 3.0 | `C_SUPERACAO_20261108_OKF_PR63_VERBATIM_COMMENT` | outside-in-primaries-2026-11 | O comentário verbatim de amirhormati no PR #63 do OKF ('This repository is tied to Google and Google Cloud...') e o 'private for  |
-| 3.0 | `C_SUPERACAO_20261108_OKF_TYPES_FREE_NOT_IDS` | outside-in-primaries-2026-11 | OKF §4.1 e §11 com o alcance correto: tipos sem registro central e consumidores MUST NOT rejeitar tipo desconhecido; a afirmaç |
-| 3.0 | `C_SUPERACAO_20261108_OKF_YOUNG_WITH_BREAKS_NOT_UNSTABLE` | outside-in-primaries-2026-11 | OKF §12 e §13 sustentam 'jovem e com quebras já ocorridas' (v0.2, quebras de v0.1 para v0.2, consumo best-effort em versão des |
-| 3.0 | `C_SUPERACAO_20261108_SCORECARD_SAST_DETECTION_AND_LOW_SCORE` | outside-in-primaries-2026-11 | O SAST do Scorecard pela seção do próprio documento: detecção por apps em PRs recentes ou por github/codeql-action em workflo |
-| 3.0 | `C_SUPERACAO_20261108_SLSA_DISTRIBUTE_PROVENANCE_TO_CONSUMERS` | outside-in-primaries-2026-11 | A seção Producer do SLSA com o MUST de distribuir a procedência aos consumidores e o MAY de delegar ao ecossistema de pacotes,  |
-| 3.0 | `C_SUPERACAO_20261108_SLSA_L2_MUSTS_AND_SHOULD` | outside-in-primaries-2026-11 | SLSA nível 2 pelos graus certos da linha 'Provenance is Authentic': MUST validar autenticidade, MUST gerar no plano de controle,  |
-| 3.0 | `C_SUPERACAO_20261108_SW_RETRY_IS_RECOMMENDATION` | outside-in-primaries-2026-11 | O reenvio do Standard Webhooks como recomendação (sw.md l.252-254): backoff exponencial por vários dias, até sucesso ou até c |
+**1031 itens abertos** em 158 grafo(s) com aberto (de 202 no escopo) · 155 grupo(s), agrupados por `owner:` (66 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -510,14 +484,11 @@
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
 | 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
-| 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
 | 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
 | 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
-| 7.7 | `Q_CORE_ACTIONS_SHA_PIN_1116` | outside-in-primaries-2026-11 | As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada? |
-| 7.7 | `Q_DOORS_ATTESTATION_1130` | outside-in-primaries-2026-11 | Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit. |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |
@@ -531,6 +502,9 @@
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.2 | `Q_DB_ADOTANTE_TOCA_PARA_A_SAIDA_1111` | doorbell-hardening-2026-11 | Lacuna 4: no adotante, a campainha toca para a própria caixa de saída (inbox/), que é o que vai ao core; a entrada dele é o in |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
+| 4.0 | `Q_MD_WAHA_PROJECT_USE_TERMS_1108` | maestro-decisions-1108 | O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no pi |
+| 4.0 | `Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108` | maestro-decisions-1108 | O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado. |
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
 | 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
@@ -871,7 +845,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 22 item(ns)
+## maestro — 21 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -879,7 +853,6 @@
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
-| 10.0 | `Q_SANDBOX_DENY_LAYER_DECISION_1108` | outside-in-primaries-2026-11 | O core adota uma camada de sandbox, e em que forma, depois da medida da curadoria? A metade do deny já foi decidida; o que segue  |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
@@ -1027,17 +1000,15 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## kg-ssot — 8 item(ns)
+## kg-ssot — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
-| 10.2 | `Q_KG_VENDOR_VERIFY_ATTESTATION_1130` | outside-in-primaries-2026-11 | O kg_vendor verifica a atestação do que traz, ou segue confiando na tag? |
 | 10.0 | `Q_PF_AREA_FILTER_KG_QUERY_1120` | persona-fases-2-3-2026-11 | O filtro por área na leitura do Brain, aplicado antes da leitura, e a cura da dívida: item de área ilegível sai inteiro da res |
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
 | 6.0 | `Q_COORD_KGSSOT_FORMA_X_CHANGE_1111` | coordenacao-sessoes-2026-10 | A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) par |
-| 5.1 | `Q_KG_PROV_AGENT_1208` | outside-in-primaries-2026-11 | O exportador PROV-O do kg-ssot emite o agente, ou declara por que não? |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
@@ -1473,12 +1444,6 @@
 | 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
 | 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
-
-## onion-messaging — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.7 | `Q_MESSAGING_SOURCE_URI_REFERENCE_1115` | outside-in-primaries-2026-11 | A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma. |
 
 ## fila-2026-10-06 — 5 item(ns)
 
