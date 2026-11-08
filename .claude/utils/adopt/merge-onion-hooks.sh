@@ -23,6 +23,7 @@
 #             Hook próprio do alvo (command que a fonte não tem) e chave extra do alvo ficam — EXCETO o
 #             hook que o core APOSENTOU (forma do Onion + script ausente na fonte e no alvo), que é
 #             podado e anunciado no stderr (SAC-145, 2026-10-15; ver o bloco antes do jq).
+#             O `permissions.deny` da fonte é somado ao do alvo (só soma, 2026-11-08); o resto de permissions é do alvo.
 #             IDEMPOTENTE: rodar 2× = no-op na 2ª.
 #
 # Uso       : merge-onion-hooks.sh <source-settings.json> <target-settings.json>
@@ -172,6 +173,13 @@ jq -n \
   # campo. Até 2026-10-05 este merge levava só hooks, e o pr.md do adotante dizia que a assinatura vinha de
   # um campo que o settings.json dele nunca recebia (sinal de campo de um hub).
   | if ($src.attribution != null) and (.attribution == null) then .attribution = $src.attribution else . end
+  # permissions.deny (2026-11-08): a lista portátil da fonte SOMA à do alvo, sem duplicar nem apagar (deny é monotônico,
+  # ver deny-monotonic.sh). Só o deny viaja: allow, sandbox e o resto de permissions seguem sendo do alvo.
+  | if (($src.permissions.deny // []) | length) > 0 then
+      .permissions = (.permissions // {})
+      | .permissions.deny = (((.permissions.deny // []) + $src.permissions.deny)
+                             | reduce .[] as $r ([]; if index($r) == null then . + [$r] else . end))
+    else . end
   # poda do aposentado, em TODO evento do alvo (o evento pode nem existir mais na fonte); grupo que esvazia sai
   | if ($dead | length) > 0 and (.hooks | type) == "object" then
       .hooks |= with_entries(.value |= map(

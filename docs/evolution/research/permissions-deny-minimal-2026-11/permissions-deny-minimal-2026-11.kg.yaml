@@ -1,0 +1,101 @@
+meta:
+  id: permissions-deny-minimal-2026-11
+  schema_version: "1"
+  baseline: "2026-11-08"
+  review_after: "2027-02-08"
+  x_supersedes_none: >
+    Forja nova. O core tinha 0 regras em permissions.deny e nenhum sandbox. Não há nó anterior a reconciliar: a
+    curadoria tem o deny dela (E_DENY_LAYER_PROBE_1105, no repo dela), com outra função (barrar repo alheio e main).
+  x_unverified: >
+    Sem passada adversarial independente nesta forja (o brief proibiu criar agentes): nenhum refutador leu o diff.
+    Medido só em 2.1.319; o /meta:cc-update reabre quando o motor de permissão mudar. Não medido com sandbox ligado no
+    core real, nem com login real (a API é simulada e a chave é fictícia). Nos flows, F04, F05 e F09 pararam em
+    recusa própria do script no fixture (membro inexistente, core que não relaya, resíduo ausente): provam que o deny
+    não barra a chamada, não que o fluxo foi até o fim.
+nodes:
+  - id: E_REAL_FLOW_CENSUS_1108
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-11-08"
+    source_tier: 10
+    label: "O fluxo real usa reset --hard, branch -D, worktree remove --force, --force-with-lease e rm -r de pasta de trabalho; force nu, --mirror, filter-branch e rm na raiz, no home ou no .git quase não aparecem."
+    narrative: "Em 75.223 chamadas Bash dos transcripts do core: git reset --hard 36, git branch -D 354, git worktree remove --force 192, --force-with-lease 16, rm -r 886. Force nu ou -f: 3, em teste. --mirror, filter-branch, filter-repo e rm -r na raiz, no home ou no .git: zero. Por isso a lista barra o segundo grupo e deixa o primeiro."
+    verified_against: "varredura dos .jsonl do projeto em 2026-11-08, só entrada de ferramenta, com heredoc retirado antes de casar"
+    provenance:
+      source: "transcripts do core, entrada da ferramenta Bash"
+      locator: "75.223 chamadas Bash em 2026-11-08"
+      method: "measurement: varredura por regex com o corpo de heredoc retirado"
+  - id: E_BENCH_ON_REAL_ENGINE_1108
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-11-08"
+    source_tier: 10
+    label: "No binário real 2.1.319, com API simulada e .env inventado: 211 linhas sem divergência, 10 flows com hooks reais sem cair em regra, e 38 mutantes por regra, todos soltando ao menos um caso."
+    narrative: "As 211 linhas cobrem controle sem deny, deny com o allow real em default e em bypassPermissions, e sandbox. Rodar os mutantes achou 11 regras decorativas: 10 ganharam caso e 1 saiu, porque o motor já barra rm -rf com $HOME entre aspas pela regra sem aspas."
+    trace: "ops/testing/permissions-deny-bench.py"
+    verified_against: "python3 -I ops/testing/permissions-deny-bench.py com o settings do branch; data/cases.tsv, data/flows.tsv e data/mutants.tsv"
+    provenance:
+      source: "ops/testing/permissions-deny-bench.py"
+      locator: "data/cases.tsv, data/flows.tsv, data/mutants.tsv"
+      method: "measurement: motor real de permissão com roteiro fixo de chamadas"
+  - id: E_READ_RULE_REACHES_BASH_1108
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-11-08"
+    source_tier: 10
+    label: "A regra Read alcança comando de leitura conhecido no Bash, em default e em bypass; por isso a lista não tem regra Bash(cat *.env*). O custo: ls e stat do arquivo também caem."
+    narrative: "Alcança cat, head, grep, rg, sed, awk, base64, cat < arquivo, cat ./arquivo, variável literal e aspas partidas. Passam test -f, source, chmod e >>. Não alcança xxd, tar, cat .e* nem python3 -c."
+    trace: "docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv"
+    verified_against: "linhas D35 a D38, C01 a C03 e L14 a L27 de data/cases.tsv"
+    provenance:
+      source: "docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv"
+      locator: "linhas D35 a D38, C01 a C03 e L14 a L27"
+      method: "measurement: motor real de permissão com roteiro fixo de chamadas"
+  - id: C_DENY_IS_NOT_A_BOUNDARY_1108
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-11-08"
+    label: "A lista é 1ª camada, não fronteira: bash -c, eval, refspec +, rm -Rf, find -delete, interpretador e script chamado pela linha passam, medido."
+    narrative: "Script passar é o que mantém o merge verificado e a publicação de porta. Com sandbox ligado, cat .env passa, source .env também, e a pasta .ssh do home some para o processo. O hook do .env continua sendo a 2ª camada."
+    trace: ".claude/commands/common/prompts/guard-doctrine.md"
+    verified_against: "seção A camada nativa da doutrina; linhas L e S de data/cases.tsv"
+    provenance:
+      source: "docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv"
+      locator: "linhas L e S"
+      method: "measurement: motor real de permissão com roteiro fixo de chamadas"
+  - id: D_MINIMAL_PORTABLE_DENY_1108
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    verified_at: "2026-11-08"
+    label: "Deny mínimo portátil, decidido pelo maestro em 2026-11-08 e relatado no brief da sessão do core: 38 regras no settings, sem caminho de máquina nem nome de cliente. Aberto até o merge do PR."
+    narrative: "Portas e adoção nova copiam o settings, e o --update soma pelo merge-onion-hooks. Merge e push na main ficam fora de propósito: o hook já veta, e num repo sem o script verificado ele avisa, saída que um deny tiraria. Rollback: reverter o commit."
+    trace: ".claude/settings.json"
+    verified_against: "família update-base-deny, casos d6 a d9, p1, j-MUT e p-MUT"
+edges:
+  - from: E_REAL_FLOW_CENSUS_1108
+    to: D_MINIMAL_PORTABLE_DENY_1108
+    edge_type: SUPPORTS
+  - from: E_BENCH_ON_REAL_ENGINE_1108
+    to: D_MINIMAL_PORTABLE_DENY_1108
+    edge_type: SUPPORTS
+  - from: E_READ_RULE_REACHES_BASH_1108
+    to: D_MINIMAL_PORTABLE_DENY_1108
+    edge_type: SUPPORTS
+  - from: E_BENCH_ON_REAL_ENGINE_1108
+    to: C_DENY_IS_NOT_A_BOUNDARY_1108
+    edge_type: SUPPORTS
