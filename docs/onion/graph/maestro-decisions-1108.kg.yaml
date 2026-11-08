@@ -7,8 +7,8 @@ meta:
   baseline: "2026-11-08"
   review_after: "2026-12-08"
   purpose: "Guardar os selos da rodada de perguntas de 2026-11-08 que não têm grafo natural aberto. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
-  note: "TETO, declarado: 2 evidências de origem e 7 selos da rodada. Decisão nova de outro dia vai para o grafo do assunto."
-  # ═══ TETO: 9 NÓS ═══
+  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia). Decisão nova de outro dia vai para o grafo do assunto."
+  # ═══ TETO: 10 NÓS ═══
 nodes:
   - id: E_MD_MAESTRO_ROUND_1108
     node_type: evidence
@@ -154,6 +154,22 @@ nodes:
       source: "API REST do GitHub"
       locator: "repos/marciocar/onion-evolve/rulesets, campo rules[].type"
       method: "reading: API do GitHub em 2026-11-08"
+  - id: D_MD_HISTORY_PAGE_KEEPS_NAME_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Manter em /historia/»"
+    label: "A retirada do nome do adotante hub vale só para /federacao/: a página /historia/ e os demais arquivos do repo ficam como estão."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Manter em /historia/»; descartadas: «Tirar de /historia/ também» · «Site e repo inteiro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «O nome do adotante hub segue citado em /historia/ e em outros arquivos do repo: o que fazer?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
 edges:
   - from: D_MD_MAIN_RULESET_NFF_DELETION_1108
     to: E_MD_MAESTRO_ROUND_1108
@@ -179,3 +195,6 @@ edges:
   - from: E_MD_MAIN_RULESET_READ_1108
     to: D_MD_MAIN_RULESET_NFF_DELETION_1108
     edge_type: SUPPORTS
+  - from: D_MD_HISTORY_PAGE_KEEPS_NAME_1108
+    to: D_MD_FEDERATION_PAGE_SCRUB_1108
+    edge_type: CONSTRAINS
