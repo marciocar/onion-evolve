@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1059 itens abertos** em 159 grafo(s) com aberto (de 203 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1060 itens abertos** em 159 grafo(s) com aberto (de 203 no escopo) · 157 grupo(s), agrupados por `owner:` (74 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -502,7 +502,7 @@
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
-## core — 39 item(ns)
+## core — 40 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -531,6 +531,7 @@
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.2 | `Q_DB_ADOTANTE_TOCA_PARA_A_SAIDA_1111` | doorbell-hardening-2026-11 | Lacuna 4: no adotante, a campainha toca para a própria caixa de saída (inbox/), que é o que vai ao core; a entrada dele é o in |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_MD_SYNC_MAIN_VERIFY_WRITE_1108` | maestro-decisions-1108 | Curar ops/sync-main-worktree.sh para conferir a escrita antes de avançar a main e avisar em vez de quebrar no meio. |
 | 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
 | 4.0 | `Q_MD_WAHA_PROJECT_USE_TERMS_1108` | maestro-decisions-1108 | O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no pi |
 | 4.0 | `Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108` | maestro-decisions-1108 | O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado. |
@@ -874,7 +875,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 22 item(ns)
+## maestro — 21 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -882,7 +883,6 @@
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
-| 10.0 | `Q_SANDBOX_DENY_LAYER_DECISION_1108` | outside-in-primaries-2026-11 | O core adota uma camada de sandbox, e em que forma, depois da medida da curadoria? A metade do deny já foi decidida; o que segue  |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
@@ -1403,12 +1403,13 @@
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
 
-## curadoria — 2 item(ns)
+## curadoria — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 10.0 | `Q_MA_MARKET` | company-brain-multiaudiencia-2026-10 | Como o mercado resolve conhecimento multiaudiência: portais de conhecimento com IA, wikis com permissão por espaço e catálogos |
 | 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
+| 4.0 | `Q_MD_SETTINGS_UPDATE_UNDER_SANDBOX_1108` | maestro-decisions-1108 | Medir, antes de valer como rotina, o update que altera settings.json sob o sandbox da curadoria; o próximo traz o deny do PR #155 |
 
 ## conductor-2026-10 — 2 item(ns)
 
