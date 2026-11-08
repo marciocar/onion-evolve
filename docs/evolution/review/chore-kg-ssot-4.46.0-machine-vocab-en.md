@@ -9,7 +9,7 @@ findings_real: 3
 findings_blocking: 1
 tokens: 0
 duration_min: 25
-findings_fixed: 1
+findings_fixed: 2
 verdict: REJECTED_AND_FIXED
 elenxo: false
 reviewer: agente de execução (passada própria, sem revisor isolado: o brief proibia criar agentes)
@@ -42,10 +42,23 @@ nota: "tokens 0 = não medido. A passada não teve revisor isolado; os vereditos
 2. **Limite: o selo não muda o nó superado.** O `kg-decide-seal.sh --new` cria o nó e a aresta, mas deixa
    `D_VOCABULARIO_FECHADO_DO_VEREDITO` em `confirmed`. Passei o status para `superseded` à mão. Depois disso o radar
    (`--integrity --schema`) e o `kg-contract-check` deram rc 0.
-3. **Limite: as opções descartadas foram reconstruídas.** O brief trazia a escolha do maestro e não as opções
-   descartadas. No selo elas ficaram como «manter o valor de máquina em pt-BR» e «reescrever os resíduos antigos
-   para o inglês». A segunda tem lastro no PR #1541 ("os resíduos antigos não foram reescritos"). A primeira é a
-   alternativa óbvia. Se o `/meta:decide` ofereceu outras, a narrative do nó pede emenda.
+3. **Curado: as opções descartadas tinham sido reconstruídas.** O brief listava a escolha, mas não as opções
+   descartadas. Na 1ª gravação do selo elas foram reconstruídas («manter o valor de máquina em pt-BR» e «reescrever
+   os resíduos antigos para o inglês»). A sessão do core informou as opções reais, «Só os booleanos» e «Migrar tudo
+   de uma vez», e a narrative do nó foi emendada com elas, dizendo que houve emenda. Depois da emenda, radar e
+   contrato dão rc 0.
+
+## Sobras do inbox (pedido da sessão do core; o #1544 entrou sem elas)
+
+- `docs/evolution/inbox/_processed/2026-11-07-reply-hub-chat-persona-promotion.md`: a resposta da curadoria, já
+  repassada ao hub. Relida como publicada, ela traz só ids de nó, o fluxo proposto e o grafo da curadoria, sem
+  cliente, segredo nem incidente. Entra com `reviewed_for_public: true`. A REGRA 113 (Sinal relayado a destino
+  público só se commita revisado) julga o índice e dá rc 0.
+- `docs/evolution/federation/outbox/brain-granaai/2026-11-08-resposta-branch-das-lacunas.md`: a resposta já
+  entregue ao hub. Relida porque o core é público: traz a branch e o prazo (11/11), os 4 nós do grafo
+  `doorbell-hardening-2026-11` e as issues SAC-350..353, sem cliente, segredo nem incidente.
+- O conteúdo dos dois vem do commit `9546c90c1` (branch local `chore/inbox-1108-replies`, que não foi para o
+  remoto). O trecho que esse commit mudava no resíduo daquela branch ficou de fora.
 
 ## Mutantes
 
@@ -61,4 +74,4 @@ nota: "tokens 0 = não medido. A passada não teve revisor isolado; os vereditos
   `kg-ssot.projection/1`: rc 0 com 1 página, 3 ids e 3 resolvidos, saída idêntica byte a byte antes e depois do
   vendor. A chave aditiva `superseded_cited` não muda o rc.
 - As contagens 736 e 63 são o retrato de `origin/main` `3a1051d97` mais este PR. Pagar a dívida é trabalho à parte.
-- Achados 2 e 3 (acima).
+- Achado 2 (acima).
