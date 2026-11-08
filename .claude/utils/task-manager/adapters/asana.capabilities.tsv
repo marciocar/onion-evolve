@@ -8,6 +8,8 @@ item.create	required	unverified	1.0	-
 item.read	required	unverified	1.0	-	
 item.update	required	unverified	1.0	-	
 item.delete	optional	unverified	1.0	-	
+item.archive	optional	not_implemented	1.0	-	adapter sem o verbo; só o Linear o tem
+item.list	optional	not_implemented	1.0	-	adapter sem o verbo; só o Linear o tem
 hierarchy.subtask_create	required	unverified	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_SUBTASK_OWN_ENDPOINT	ACHADO: a primária ancorou o endpoint próprio de subtask; o adapter usa POST /tasks com parent, caminho NÃO ancorado
 hierarchy.subtask_list	required	unverified	1.0	-	
 hierarchy.epic	optional	not_implemented	1.0	-	projects/sections não ancorados

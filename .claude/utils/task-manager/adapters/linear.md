@@ -795,7 +795,39 @@ Nada foi deletado nem arquivado.
 - MEDIDO AO VIVO 2026-10-11 project.list: `teams` + `projects` devolveram 1 team (SAC) e 6 projetos.
 - MEDIDO AO VIVO 2026-10-11 project.read: por id de projeto devolve o Project com seus teams; pela key `SAC` devolve o team.
 - Erro HTTP: chave inválida devolve **HTTP 401** e o executável sai rc 1 com a mensagem do Linear (a chave nunca é impressa).
-- **Não exercitado:** `item.delete` (arquivar exige confirmação do maestro) — segue `unverified` e fora do executável.
+- **Não exercitado:** `item.delete` — segue `unverified` e fora do executável. Arquivar é o `item.archive` (seção abaixo).
+
+---
+
+## 🗄️ Arquivar e listar: `item.archive` e `item.list` (2026-11-08)
+
+Nasceram do sinal da curadoria de 2026-11-07: o `issueCreate` recusou por "usage limit exceeded" com 275 issues não
+arquivadas, e o arquivamento correu por script avulso, porque o `tm.sh` não tinha o verbo.
+
+### `archiveTask(taskId, opts)` — `tm.sh item.archive <ID> [--dry-run]`
+
+Chama `issueArchive(id:) { success }` e relê `archivedAt`.
+
+- **Idempotente:** issue já arquivada volta rc 0 com `already_archived: true`, sem chamar a mutação. Um lote interrompido
+  pode ser repetido.
+- `--dry-run` lê a issue e devolve `would_archive: true`, sem escrever.
+- `success: false`, ou `success: true` com `archivedAt` vazio na releitura, sai rc 1. Se só a releitura falhar, o retorno
+  é rc 0 com `verified: false` e aviso em stderr.
+- **Medição:** o verbo só rodou na bancada offline (`run_task_manager_linear_archive_selftests`) e por isso segue
+  `unverified`. A mutação rodou no workspace real em 2026-11-07, por script avulso da curadoria (169 de 169, relato do
+  sinal, não remedido aqui). Não medido ao vivo: `issue(id:)` achar issue arquivada, de que depende a idempotência; se
+  não achar, a 2ª chamada sai rc 1 por issue não encontrada, sem escrever nada. Promover a `implemented` no primeiro
+  arquivamento real relido.
+
+### `listTasks(filter)` — `tm.sh item.list [filtros]`
+
+Filtros: `--state <nome>`, `--state-type <tipo,...>` (`triage`, `backlog`, `unstarted`, `started`, `completed`,
+`canceled`; fora disso, rc 2), `--older-than-days N` (corte por `updatedAt`, declarado em `updated_before`), `--team KEY`,
+`--include-archived`, `--limit N` (padrão 250). Segue o cursor até o limite; passou dele, `truncated: true` e aviso em stderr.
+
+Medir antes de arquivar: `tm.sh item.list --state-type completed,canceled --older-than-days 30`, depois `item.archive` em cada id.
+
+- MEDIDO AO VIVO 2026-11-08 item.list: `--state-type completed,canceled --include-archived --older-than-days 1 --limit 5` devolveu rc 0, 5 issues concluídas (SAC-297, SAC-296, SAC-295, SAC-294, SAC-291) com `archivedAt` preenchido e `truncated: true`. Só leitura, uma chamada. O `archivedAt` das 5 (2026-11-07 20:52) é posterior ao `updatedAt` delas: nessas 5, arquivar não atualizou o `updatedAt`. A 2ª página não foi exercitada ao vivo.
 
 ---
 

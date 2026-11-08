@@ -14,6 +14,8 @@
 #   tm.sh comment.add SAC-65 "texto em markdown"   (ou --body-file <arquivo>)
 #   tm.sh status.transition SAC-65 <nomeDoEstado|stateId>
 #   tm.sh item.create --title T [--description D] [--project P] [--parent ID]
+#   tm.sh item.archive SAC-65 [--dry-run]   (idempotente: já arquivada não chama a mutação)
+#   tm.sh item.list [--state N] [--state-type completed,canceled] [--older-than-days N] [--team KEY] [--include-archived] [--limit N]
 #   tm.sh search.query "<texto>"   ·   tm.sh project.list   ·   tm.sh hierarchy.subtask_list SAC-65
 # Os verbos são os ids do vocabulário de interface.md §Capacidades.
 #

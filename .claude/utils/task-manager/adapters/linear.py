@@ -14,6 +14,7 @@
 # nunca impresso) — a mesma regra do env-check.sh. A chave vai só no cabeçalho Authorization.
 # Team: LINEAR_TEAM_ID (não-segredo) → --team <KEY|id> → prefixo do identificador → team do projeto →
 # único team do workspace. Nunca adivinha entre vários.
+import datetime
 import hashlib
 import json
 import mimetypes
@@ -37,11 +38,14 @@ _uploads_override = os.environ.get("TM_LINEAR_UPLOADS_BASE", "")
 if re.match(r"^http://127\.0\.0\.1:\d+/", _uploads_override):
     UPLOADS_BASE = _uploads_override
 # Verbos que ESTE executável implementa (ids do vocabulário de interface.md §Capacidades).
-# Só entra aqui o que foi exercitado ao vivo; a declaração (linear.capabilities.tsv) acompanha.
+# Só entra aqui o que foi exercitado ao vivo; a declaração (linear.capabilities.tsv) acompanha. Exceção declarada:
+# item.archive só rodou na bancada offline (mutação de escrita) e por isso a declaração o mantém `unverified`.
 CAPABILITIES = [
     "item.create",
     "item.read",
     "item.update",
+    "item.archive",
+    "item.list",
     "hierarchy.subtask_create",
     "hierarchy.subtask_list",
     "status.transition",
@@ -69,6 +73,10 @@ ISSUE_FIELDS = """
   assignee { id name }
   labels { nodes { id name } }
 """
+
+# Tipos de WorkflowState do Linear; valor fora disto volta rc 2 em vez de lista vazia que parece medição.
+STATE_TYPES = ("triage", "backlog", "unstarted", "started", "completed", "canceled")
+LIST_DEFAULT_LIMIT = 250
 
 ID_RE = re.compile(r"^[A-Z][A-Z0-9]*-\d+$")
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
@@ -729,6 +737,101 @@ def v_item_update(args):
     return _issue_update(_issue(pos[0])["id"], patch)
 
 
+def _archive_view(ident):
+    """Só o que o arquivamento precisa ler. `issue(id:)` é a mesma consulta do item.read."""
+    data = gql("query IssueArchiveState($id:String!){ issue(id:$id){ id identifier title archivedAt state { name type } } }", {"id": ident})
+    if not data.get("issue"):
+        raise TmError(f"issue não encontrada: {ident}")
+    return data["issue"]
+
+
+def v_item_archive(args):
+    usage = "item.archive <ID> [--dry-run]"
+    dry_run = "--dry-run" in args
+    pos = [a for a in args if a != "--dry-run"]
+    if any(a.startswith("--") for a in pos) or len(pos) != 1:
+        raise TmError(f"uso: tm.sh {usage}", 2)
+    if not (ID_RE.match(pos[0]) or UUID_RE.match(pos[0])):
+        raise TmError(f"id de issue inválido: '{pos[0]}' (forma ABC-123 ou UUID)", 2)
+    iss = _archive_view(pos[0])
+    base = {"id": iss["id"], "identifier": iss["identifier"], "title": iss["title"], "state": iss.get("state")}
+    # Idempotente: arquivar de novo não chama a mutação. Quem repete um lote interrompido não vê erro nem duplica escrita.
+    if iss.get("archivedAt"):
+        return {**base, "archived": True, "already_archived": True, "archivedAt": iss["archivedAt"]}
+    if dry_run:
+        return {**base, "archived": False, "already_archived": False, "would_archive": True}
+    data = gql("mutation IssueArchive($id:String!){ issueArchive(id:$id){ success } }", {"id": iss["id"]})
+    if not (data.get("issueArchive") or {}).get("success"):
+        raise TmError(f"issueArchive não confirmou o arquivamento de {iss['identifier']} (success=false)")
+    # `success` é a declaração do provedor; a prova é reler o carimbo.
+    try:
+        after = _archive_view(iss["id"])
+    except TmError as e:
+        print(f"tm (linear): {iss['identifier']} arquivada (success=true), mas a releitura falhou: {e}", file=sys.stderr)
+        return {**base, "archived": True, "already_archived": False, "archivedAt": None, "verified": False}
+    if not after.get("archivedAt"):
+        raise TmError(f"issueArchive disse success=true e a releitura de {iss['identifier']} segue sem archivedAt")
+    return {**base, "archived": True, "already_archived": False, "archivedAt": after["archivedAt"], "verified": True}
+
+
+def _state_types(value):
+    types = [t.strip() for t in value.split(",") if t.strip()]
+    bad = [t for t in types if t not in STATE_TYPES]
+    if not types or bad:
+        raise TmError(f"--state-type inválido: '{value}' (aceitos, separados por vírgula: {', '.join(STATE_TYPES)})", 2)
+    return types
+
+
+def _non_negative_int(flag, value):
+    if not re.match(r"^\d+$", value):
+        raise TmError(f"{flag} exige inteiro não negativo: '{value}'", 2)
+    return int(value)
+
+
+def v_item_list(args):
+    include_archived = "--include-archived" in args
+    rest = [a for a in args if a != "--include-archived"]
+    o, pos = _opts(rest, ["state", "state-type", "older-than-days", "team", "limit"])
+    if pos:
+        raise TmError("uso: tm.sh item.list [--state <nome>] [--state-type <tipo,...>] [--older-than-days N] "
+                      "[--team KEY] [--include-archived] [--limit N]", 2)
+    limit = _non_negative_int("--limit", o.get("limit", str(LIST_DEFAULT_LIMIT)))
+    if limit < 1:
+        raise TmError("--limit exige ao menos 1", 2)
+    flt, state = {}, {}
+    if "state-type" in o:
+        state["type"] = {"in": _state_types(o["state-type"])}
+    if o.get("state"):
+        state["name"] = {"eqIgnoreCase": o["state"]}
+    if state:
+        flt["state"] = state
+    cutoff = None
+    if "older-than-days" in o:
+        days = _non_negative_int("--older-than-days", o["older-than-days"])
+        cutoff = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        flt["updatedAt"] = {"lt": cutoff}
+    if o.get("team"):
+        flt["team"] = {"id": {"eq": _team_id(o["team"])}}
+    nodes, cursor, truncated = [], None, False
+    while True:
+        data = gql("query IssueList($f:IssueFilter,$n:Int!,$after:String,$arch:Boolean){ issues(filter:$f, first:$n, after:$after, includeArchived:$arch){ "
+                   "nodes { id identifier title url createdAt updatedAt archivedAt state { name type } team { key } project { name } } "
+                   "pageInfo { hasNextPage endCursor } } }",
+                   {"f": flt, "n": min(PAGE_SIZE, limit - len(nodes)), "after": cursor, "arch": include_archived})
+        conn = data["issues"]
+        nodes.extend(conn["nodes"])
+        info = conn.get("pageInfo") or {}
+        if not info.get("hasNextPage"):
+            break
+        if len(nodes) >= limit or not info.get("endCursor"):
+            truncated = True
+            print(f"tm (linear): item.list truncado em {len(nodes)} issue(s) — declarado no retorno; suba --limit", file=sys.stderr)
+            break
+        cursor = info["endCursor"]
+    return {"count": len(nodes), "truncated": truncated, "include_archived": include_archived,
+            "updated_before": cutoff, "filter": flt, "issues": nodes}
+
+
 def v_subtask_create(args):
     o, pos = _opts(args, ["title", "description", "priority", "state"])
     _need(pos, 1, "hierarchy.subtask_create <ID-PAI> --title <t> [--description <d>]")
@@ -865,6 +968,8 @@ VERBS = {
     "item.create": v_item_create,
     "item.read": v_item_read,
     "item.update": v_item_update,
+    "item.archive": v_item_archive,
+    "item.list": v_item_list,
     "hierarchy.subtask_create": v_subtask_create,
     "hierarchy.subtask_list": v_subtask_list,
     "status.transition": v_status_transition,
