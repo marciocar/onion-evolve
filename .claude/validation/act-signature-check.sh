@@ -13,7 +13,7 @@
 #                                          aparece no CÓDIGO do script: erro de digitação, ou a gramática do
 #                                          script mudou, e o veto passaria a calar sem ninguém ver.
 #
-# DEFEITO DATADO (2026-11-05, estudo problem-route, CERCA.md, confirmado executando o hook): com o wrapper
+# DEFEITO DATADO (2026-11-05, estudo problem-route, docs/evolution/dissect/problem-route-2026-11/CERCA.md, confirmado executando o hook): com o wrapper
 #           versionado sendo fronteira para tudo, `bash ops/<wrapper>.sh --apply` e `ops/publish-door.sh --push` (core-only)
 #           passavam o veto com exit 0, e a sessão rodou deploys assim (corpus: update-bridge.sh em 2026-10-23,
 #           docker-engine-migrate.sh apply e install-caddy-config.sh em 2026-10-22, stt-service.sh install

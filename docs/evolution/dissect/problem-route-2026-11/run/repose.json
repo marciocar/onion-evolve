@@ -1,0 +1,102 @@
+[
+ {
+  "file": "B-009.txt",
+  "key": "docs/evolution/review/fix-a2a-trust-log-outside-served-clone.md",
+  "queue": "B",
+  "pos": 9,
+  "file_na_fila": "B-009.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-011.txt",
+  "key": "docs/evolution/review/docs-skillsync-live.md",
+  "queue": "B",
+  "pos": 11,
+  "file_na_fila": "B-011.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-014.txt",
+  "key": "docs/evolution/review/feat-site-sections-buyer-aligned.md",
+  "queue": "B",
+  "pos": 14,
+  "file_na_fila": "B-014.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-015.txt",
+  "key": "docs/evolution/review/fix-env-guard-heredoc-data-file.md",
+  "queue": "B",
+  "pos": 15,
+  "file_na_fila": "B-015.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-016.txt",
+  "key": "docs/evolution/review/fix-update-bridge-boot-line-race.md",
+  "queue": "B",
+  "pos": 16,
+  "file_na_fila": "B-016.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-018.txt",
+  "key": "docs/evolution/review/fix-bridge-wrappers-unmeasured-rc.md",
+  "queue": "B",
+  "pos": 18,
+  "file_na_fila": "B-018.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-025.txt",
+  "key": "docs/evolution/review/feat-public-distribution-decisions.md",
+  "queue": "B",
+  "pos": 25,
+  "file_na_fila": "B-025.txt",
+  "classe_g1": "F-FATO",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-026.txt",
+  "key": "docs/evolution/review/fix-review-verdict-caso-benigno.md",
+  "queue": "B",
+  "pos": 26,
+  "file_na_fila": "B-026.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-027.txt",
+  "key": "docs/evolution/review/ops-gpg-key-protect-durable.md",
+  "queue": "B",
+  "pos": 27,
+  "file_na_fila": "B-027.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ },
+ {
+  "file": "B-029.txt",
+  "key": "docs/evolution/review/chore-caddy-sandbox-verify-200.md",
+  "queue": "B",
+  "pos": 29,
+  "file_na_fila": "B-029.txt",
+  "classe_g1": "F-PASSA",
+  "reposto": true,
+  "repor_para": "C"
+ }
+]

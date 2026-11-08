@@ -1,0 +1,1496 @@
+[
+ {
+  "file": "FR-001.txt",
+  "key": "docs/evolution/review/docs-escada-de-adocao-1105.md",
+  "queue": "FR",
+  "pos": 1
+ },
+ {
+  "file": "FR-002.txt",
+  "key": "docs/evolution/review/fix-catraca-regra49.md",
+  "queue": "FR",
+  "pos": 2
+ },
+ {
+  "file": "FR-003.txt",
+  "key": "docs/evolution/review/docs-radar-e3-2026-10-17-r13.md",
+  "queue": "FR",
+  "pos": 3
+ },
+ {
+  "file": "FR-004.txt",
+  "key": "docs/evolution/review/fix-paths-semantics-e-dirty-tree.md",
+  "queue": "FR",
+  "pos": 4
+ },
+ {
+  "file": "FR-005.txt",
+  "key": "docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md",
+  "queue": "FR",
+  "pos": 5
+ },
+ {
+  "file": "FR-006.txt",
+  "key": "docs/evolution/review/feat-provenance-wave-o3-1.md",
+  "queue": "FR",
+  "pos": 6
+ },
+ {
+  "file": "FR-007.txt",
+  "key": "docs/evolution/review/fix-radar-decision-done-in-dev.md",
+  "queue": "FR",
+  "pos": 7
+ },
+ {
+  "file": "FR-008.txt",
+  "key": "docs/evolution/review/chore-seal-composition-questions.md",
+  "queue": "FR",
+  "pos": 8
+ },
+ {
+  "file": "FR-009.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md",
+  "queue": "FR",
+  "pos": 9
+ },
+ {
+  "file": "FR-010.txt",
+  "key": "docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md",
+  "queue": "FR",
+  "pos": 10
+ },
+ {
+  "file": "FR-011.txt",
+  "key": "docs/evolution/review/feat-kg-projection-with.md",
+  "queue": "FR",
+  "pos": 11
+ },
+ {
+  "file": "FR-012.txt",
+  "key": "docs/evolution/review/feat-client-manual-doctrine.md",
+  "queue": "FR",
+  "pos": 12
+ },
+ {
+  "file": "FR-013.txt",
+  "key": "docs/evolution/review/feat-regra59-modo-consumido.md",
+  "queue": "FR",
+  "pos": 13
+ },
+ {
+  "file": "FR-014.txt",
+  "key": "docs/evolution/review/fix-regra58-e-w2-em-campo.md",
+  "queue": "FR",
+  "pos": 14
+ },
+ {
+  "file": "FR-015.txt",
+  "key": "docs/evolution/review/fix-extrator-piso-e-supressao.md",
+  "queue": "FR",
+  "pos": 15
+ },
+ {
+  "file": "FR-016.txt",
+  "key": "docs/evolution/review/drive-open-threads-batch3.md",
+  "queue": "FR",
+  "pos": 16
+ },
+ {
+  "file": "FR-017.txt",
+  "key": "docs/evolution/review/feat-provenance-wave-o2.md",
+  "queue": "FR",
+  "pos": 17
+ },
+ {
+  "file": "FR-018.txt",
+  "key": "docs/evolution/review/feat-kg-seal-check.md",
+  "queue": "FR",
+  "pos": 18
+ },
+ {
+  "file": "FR-019.txt",
+  "key": "docs/evolution/review/chore-door-17-pin.md",
+  "queue": "FR",
+  "pos": 19
+ },
+ {
+  "file": "FR-020.txt",
+  "key": "docs/evolution/review/fix-kg-engine-doutrina-vs-codigo.md",
+  "queue": "FR",
+  "pos": 20
+ },
+ {
+  "file": "FR-021.txt",
+  "key": "docs/evolution/review/chore-pin-after-853.md",
+  "queue": "FR",
+  "pos": 21
+ },
+ {
+  "file": "FR-022.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-16-kg-sdaal-dogfood-ouro.md",
+  "queue": "FR",
+  "pos": 22
+ },
+ {
+  "file": "FR-023.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-27-proposal-projection-with.md",
+  "queue": "FR",
+  "pos": 23
+ },
+ {
+  "file": "FR-024.txt",
+  "key": "docs/evolution/review/docs-a2a-a7c1-stop-and-record.md",
+  "queue": "FR",
+  "pos": 24
+ },
+ {
+  "file": "FR-025.txt",
+  "key": "docs/evolution/review/feat-merge-requires-base-at-tip.md",
+  "queue": "FR",
+  "pos": 25
+ },
+ {
+  "file": "FR-026.txt",
+  "key": "docs/evolution/review/fix-env-guard-currency-kb-index.md",
+  "queue": "FR",
+  "pos": 26
+ },
+ {
+  "file": "FR-027.txt",
+  "key": "docs/evolution/review/fix-kg-freshness-primeiro-dogfood.md",
+  "queue": "FR",
+  "pos": 27
+ },
+ {
+  "file": "FR-028.txt",
+  "key": "docs/evolution/review/refactor-radar-integrity-contract.md",
+  "queue": "FR",
+  "pos": 28
+ },
+ {
+  "file": "FR-029.txt",
+  "key": "docs/evolution/review/feat-adopter-shape-cures.md",
+  "queue": "FR",
+  "pos": 29
+ },
+ {
+  "file": "FR-030.txt",
+  "key": "docs/evolution/review/docs-kg-prova-viva-dirty-tree.md",
+  "queue": "FR",
+  "pos": 30
+ },
+ {
+  "file": "FR-031.txt",
+  "key": "docs/evolution/review/fix-kg-data-defects-and-on-grammar.md",
+  "queue": "FR",
+  "pos": 31
+ },
+ {
+  "file": "FR-032.txt",
+  "key": "docs/evolution/review/research-sharing-criterion-round2.md",
+  "queue": "FR",
+  "pos": 32
+ },
+ {
+  "file": "FR-033.txt",
+  "key": "docs/evolution/review/chore-lineup-opus-5-5.md",
+  "queue": "FR",
+  "pos": 33
+ },
+ {
+  "file": "FR-034.txt",
+  "key": "docs/evolution/review/docs-capability-vs-guard-bar.md",
+  "queue": "FR",
+  "pos": 34
+ },
+ {
+  "file": "FR-035.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.9.0.md",
+  "queue": "FR",
+  "pos": 35
+ },
+ {
+  "file": "FR-036.txt",
+  "key": "docs/evolution/review/worktree-docs+typesafe-ai-desmembramento.md",
+  "queue": "FR",
+  "pos": 36
+ },
+ {
+  "file": "FR-037.txt",
+  "key": "docs/evolution/review/feat-cortex-seal-and-unique-anchor.md",
+  "queue": "FR",
+  "pos": 37
+ },
+ {
+  "file": "FR-038.txt",
+  "key": "docs/evolution/review/feat-kg-read-leg-hook.md",
+  "queue": "FR",
+  "pos": 38
+ },
+ {
+  "file": "FR-039.txt",
+  "key": "docs/evolution/review/fix-residuos-2026-08-18.md",
+  "queue": "FR",
+  "pos": 39
+ },
+ {
+  "file": "FR-040.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-13-marcio-onion-pessoal-intent.md",
+  "queue": "FR",
+  "pos": 40
+ },
+ {
+  "file": "FR-041.txt",
+  "key": "docs/evolution/review/fix-kg-doctrine-matches-engine.md",
+  "queue": "FR",
+  "pos": 41
+ },
+ {
+  "file": "FR-042.txt",
+  "key": "docs/evolution/review/chore-outbox-reconcile-and-<adotante>.md",
+  "queue": "FR",
+  "pos": 42
+ },
+ {
+  "file": "FR-043.txt",
+  "key": "docs/evolution/review/fix-a2a-refutation-pass-2.md",
+  "queue": "FR",
+  "pos": 43
+ },
+ {
+  "file": "FR-044.txt",
+  "key": "docs/evolution/review/fix-door-ratchet-self-exclusion.md",
+  "queue": "FR",
+  "pos": 44
+ },
+ {
+  "file": "FR-045.txt",
+  "key": "docs/evolution/review/fix-dispensation-record-was-a-backslash.md",
+  "queue": "FR",
+  "pos": 45
+ },
+ {
+  "file": "FR-046.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4401.md",
+  "queue": "FR",
+  "pos": 46
+ },
+ {
+  "file": "FR-047.txt",
+  "key": "docs/evolution/review/feat-u1-update-migrate-plan.md",
+  "queue": "FR",
+  "pos": 47
+ },
+ {
+  "file": "FR-048.txt",
+  "key": "docs/evolution/review/fix-adopt-role-aware-manifest.md",
+  "queue": "FR",
+  "pos": 48
+ },
+ {
+  "file": "FR-049.txt",
+  "key": "docs/evolution/review/fix-adopter-born-red-and-git-C-scope.md",
+  "queue": "FR",
+  "pos": 49
+ },
+ {
+  "file": "FR-050.txt",
+  "key": "docs/evolution/review/perf-bench-selector-per-file.md",
+  "queue": "FR",
+  "pos": 50
+ },
+ {
+  "file": "FF-001.txt",
+  "key": "docs/evolution/review/docs-wsync-workspace-updated-1022.md",
+  "queue": "FF",
+  "pos": 1
+ },
+ {
+  "file": "FF-002.txt",
+  "key": "docs/evolution/inbox/_processed/2026-09-08-agente-expo-react-native.md",
+  "queue": "FF",
+  "pos": 2
+ },
+ {
+  "file": "FF-003.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.17.0.md",
+  "queue": "FF",
+  "pos": 3
+ },
+ {
+  "file": "FF-004.txt",
+  "key": "docs/evolution/review/docs-research-postmerge-projection-writer.md",
+  "queue": "FF",
+  "pos": 4
+ },
+ {
+  "file": "FF-005.txt",
+  "key": "docs/evolution/review/feat-plugin-lint-deps-contract.md",
+  "queue": "FF",
+  "pos": 5
+ },
+ {
+  "file": "FF-006.txt",
+  "key": "docs/evolution/review/fix-kg-contract-debt-cheap.md",
+  "queue": "FF",
+  "pos": 6
+ },
+ {
+  "file": "FF-007.txt",
+  "key": "docs/evolution/review/feat-regra60-idioma-identificador.md",
+  "queue": "FF",
+  "pos": 7
+ },
+ {
+  "file": "FF-008.txt",
+  "key": "docs/evolution/review/docs-decide-seals-1025.md",
+  "queue": "FF",
+  "pos": 8
+ },
+ {
+  "file": "FF-009.txt",
+  "key": "docs/evolution/review/docs-canonical-names-1023.md",
+  "queue": "FF",
+  "pos": 9
+ },
+ {
+  "file": "FF-010.txt",
+  "key": "docs/evolution/review/feat-bench-machine-cpu-semaphore.md",
+  "queue": "FF",
+  "pos": 10
+ },
+ {
+  "file": "FF-011.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-company-brain-market.md",
+  "queue": "FF",
+  "pos": 11
+ },
+ {
+  "file": "FF-012.txt",
+  "key": "docs/evolution/review/fix-write-stamp-rebuilds-installed-node.md",
+  "queue": "FF",
+  "pos": 12
+ },
+ {
+  "file": "FF-013.txt",
+  "key": "docs/evolution/review/docs-seal-sharing-criterion.md",
+  "queue": "FF",
+  "pos": 13
+ },
+ {
+  "file": "FF-014.txt",
+  "key": "docs/evolution/review/feat-meta-cc-update.md",
+  "queue": "FF",
+  "pos": 14
+ },
+ {
+  "file": "FF-015.txt",
+  "key": "docs/evolution/review/docs-radar-e3-2026-11-03-r22.md",
+  "queue": "FF",
+  "pos": 15
+ },
+ {
+  "file": "FF-016.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.11.0.md",
+  "queue": "FF",
+  "pos": 16
+ },
+ {
+  "file": "FF-017.txt",
+  "key": "docs/evolution/review/fix-read-leg-reaches-bash.md",
+  "queue": "FF",
+  "pos": 17
+ },
+ {
+  "file": "FF-018.txt",
+  "key": "docs/evolution/review/research-living-method-distribution.md",
+  "queue": "FF",
+  "pos": 18
+ },
+ {
+  "file": "FF-019.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4-28-0.md",
+  "queue": "FF",
+  "pos": 19
+ },
+ {
+  "file": "FF-020.txt",
+  "key": "docs/evolution/review/feat-provenance-wave-o4.md",
+  "queue": "FF",
+  "pos": 20
+ },
+ {
+  "file": "FF-021.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.12.0.md",
+  "queue": "FF",
+  "pos": 21
+ },
+ {
+  "file": "FF-022.txt",
+  "key": "docs/evolution/review/fix-migrate-python-venv-copy-perms.md",
+  "queue": "FF",
+  "pos": 22
+ },
+ {
+  "file": "FF-023.txt",
+  "key": "docs/evolution/review/fix-catraca-regra49.md",
+  "queue": "FF",
+  "pos": 23
+ },
+ {
+  "file": "FF-024.txt",
+  "key": "docs/evolution/review/research-codex-as-core.md",
+  "queue": "FF",
+  "pos": 24
+ },
+ {
+  "file": "FF-025.txt",
+  "key": "docs/evolution/review/docs-radar-e3-2026-10-17-r13.md",
+  "queue": "FF",
+  "pos": 25
+ },
+ {
+  "file": "FF-026.txt",
+  "key": "docs/evolution/review/fix-kg-reverify-worker-contract.md",
+  "queue": "FF",
+  "pos": 26
+ },
+ {
+  "file": "FF-027.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-15-sinal-kg-audit-layer-content-audit.md",
+  "queue": "FF",
+  "pos": 27
+ },
+ {
+  "file": "FF-028.txt",
+  "key": "docs/evolution/review/feat-dissect-object-families.md",
+  "queue": "FF",
+  "pos": 28
+ },
+ {
+  "file": "FF-029.txt",
+  "key": "docs/evolution/review/docs-reverify-dissect-read-only.md",
+  "queue": "FF",
+  "pos": 29
+ },
+ {
+  "file": "FF-030.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4391.md",
+  "queue": "FF",
+  "pos": 30
+ },
+ {
+  "file": "FF-031.txt",
+  "key": "docs/evolution/review/fix-paths-semantics-e-dirty-tree.md",
+  "queue": "FF",
+  "pos": 31
+ },
+ {
+  "file": "FF-032.txt",
+  "key": "docs/evolution/review/feat-meta-realign-phase1.md",
+  "queue": "FF",
+  "pos": 32
+ },
+ {
+  "file": "FF-033.txt",
+  "key": "docs/evolution/review/docs-decide-2026-11-03-r3.md",
+  "queue": "FF",
+  "pos": 33
+ },
+ {
+  "file": "FF-034.txt",
+  "key": "docs/evolution/review/chore-coord-seal-4380.md",
+  "queue": "FF",
+  "pos": 34
+ },
+ {
+  "file": "FF-035.txt",
+  "key": "docs/evolution/review/chore-queue-kg-ssot-signals-triage.md",
+  "queue": "FF",
+  "pos": 35
+ },
+ {
+  "file": "FF-036.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.21.0.md",
+  "queue": "FF",
+  "pos": 36
+ },
+ {
+  "file": "FF-037.txt",
+  "key": "docs/evolution/review/fix-kg-index-atomic-and-old-vendor-warn.md",
+  "queue": "FF",
+  "pos": 37
+ },
+ {
+  "file": "FF-038.txt",
+  "key": "docs/evolution/review/docs-dissect-intelligent-ui.md",
+  "queue": "FF",
+  "pos": 38
+ },
+ {
+  "file": "FF-039.txt",
+  "key": "docs/evolution/review/fix-bridge-wrappers-unmeasured-rc.md",
+  "queue": "FF",
+  "pos": 39
+ },
+ {
+  "file": "FF-040.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.39.0.md",
+  "queue": "FF",
+  "pos": 40
+ },
+ {
+  "file": "FF-041.txt",
+  "key": "docs/evolution/review/feat-provenance-wave-o3-1.md",
+  "queue": "FF",
+  "pos": 41
+ },
+ {
+  "file": "FF-042.txt",
+  "key": "docs/evolution/review/fix-catraca-duas-portas.md",
+  "queue": "FF",
+  "pos": 42
+ },
+ {
+  "file": "FF-043.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-19-kg-guards-id-language-and-label-collision.md",
+  "queue": "FF",
+  "pos": 43
+ },
+ {
+  "file": "FF-044.txt",
+  "key": "docs/evolution/review/chore-compliance-fictional-vendor.md",
+  "queue": "FF",
+  "pos": 44
+ },
+ {
+  "file": "FF-045.txt",
+  "key": "docs/evolution/review/feat-audit-evidence-expiry.md",
+  "queue": "FF",
+  "pos": 45
+ },
+ {
+  "file": "FF-046.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.42.0.md",
+  "queue": "FF",
+  "pos": 46
+ },
+ {
+  "file": "FF-047.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-08-rebase-merge-breaks-kg-provenance.md",
+  "queue": "FF",
+  "pos": 47
+ },
+ {
+  "file": "FF-048.txt",
+  "key": "docs/evolution/review/fix-radar-maestro-decision-in-dev.md",
+  "queue": "FF",
+  "pos": 48
+ },
+ {
+  "file": "FF-049.txt",
+  "key": "docs/evolution/review/feat-public-distribution-decisions.md",
+  "queue": "FF",
+  "pos": 49
+ },
+ {
+  "file": "FF-050.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-09-dissect-census-ignores-quoted-dates.md",
+  "queue": "FF",
+  "pos": 50
+ },
+ {
+  "file": "FV-001.txt",
+  "key": "docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml#D_MANTER_ATUALIZADO_E_ETERNO",
+  "queue": "FV",
+  "pos": 1
+ },
+ {
+  "file": "FV-002.txt",
+  "key": "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml#D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO",
+  "queue": "FV",
+  "pos": 2
+ },
+ {
+  "file": "FV-003.txt",
+  "key": "docs/evolution/research/session-orchestration-2026-11/session-orchestration-2026-11.kg.yaml#D_SO_DIRECAO_ACEITA_E_PASSO_A_PASSO_DO_GATILHO_1104",
+  "queue": "FV",
+  "pos": 3
+ },
+ {
+  "file": "FV-004.txt",
+  "key": "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL",
+  "queue": "FV",
+  "pos": 4
+ },
+ {
+  "file": "FV-005.txt",
+  "key": "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027",
+  "queue": "FV",
+  "pos": 5
+ },
+ {
+  "file": "FV-006.txt",
+  "key": "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#D_ESTACIONAR_SAC182_SEM_GATILHO",
+  "queue": "FV",
+  "pos": 6
+ },
+ {
+  "file": "FV-007.txt",
+  "key": "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH",
+  "queue": "FV",
+  "pos": 7
+ },
+ {
+  "file": "FV-008.txt",
+  "key": "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#A_MARCA_LER_ESPECIFICACAO_DO_933007990",
+  "queue": "FV",
+  "pos": 8
+ },
+ {
+  "file": "FV-009.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT",
+  "queue": "FV",
+  "pos": 9
+ },
+ {
+  "file": "FV-010.txt",
+  "key": "docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml#D_DISSECT_VIAJA_PARA_TODOS_MENOS_MINI",
+  "queue": "FV",
+  "pos": 10
+ },
+ {
+  "file": "FV-011.txt",
+  "key": "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml#D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11",
+  "queue": "FV",
+  "pos": 11
+ },
+ {
+  "file": "FV-012.txt",
+  "key": "docs/onion/graph/door-role-parity-2026-09.kg.yaml#Q_MINI_CONFIGURA_INTEGRACAO_PELO_ENV",
+  "queue": "FV",
+  "pos": 12
+ },
+ {
+  "file": "FV-013.txt",
+  "key": "docs/onion/graph/door-role-parity-2026-09.kg.yaml#Q_PIN_NA_DO_MINI_DEPOIS_DA_PUBLICACAO",
+  "queue": "FV",
+  "pos": 13
+ },
+ {
+  "file": "FV-014.txt",
+  "key": "docs/onion/graph/vps-shared-tools-2026-07.kg.yaml#D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022",
+  "queue": "FV",
+  "pos": 14
+ },
+ {
+  "file": "FV-015.txt",
+  "key": "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#C_MA_PADRAO_DE_MERCADO_PRIMEIRO_1028",
+  "queue": "FV",
+  "pos": 15
+ },
+ {
+  "file": "FV-016.txt",
+  "key": "docs/evolution/research/spike-copilot-studio-mcp-2026-10/spike-copilot-studio-mcp-2026-10.kg.yaml#Q_SPIKE_COPILOT_STUDIO_MCP",
+  "queue": "FV",
+  "pos": 16
+ },
+ {
+  "file": "FV-017.txt",
+  "key": "docs/onion/graph/review-gate-saldo-2026-09.kg.yaml#D_REVIEW_MODE_SWITCH_PADRAO_OFF",
+  "queue": "FV",
+  "pos": 17
+ },
+ {
+  "file": "FV-018.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_DISSECAR_CLAI",
+  "queue": "FV",
+  "pos": 18
+ },
+ {
+  "file": "FV-019.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO",
+  "queue": "FV",
+  "pos": 19
+ },
+ {
+  "file": "FV-020.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#D_COORD_VIGIA_REPESQUISAR_COMO_VENDOR_1104",
+  "queue": "FV",
+  "pos": 20
+ },
+ {
+  "file": "FV-021.txt",
+  "key": "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_FORK_VS_AGENTE_NOVO_MEDIR_ANTES_1023",
+  "queue": "FV",
+  "pos": 21
+ },
+ {
+  "file": "FV-022.txt",
+  "key": "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#C_MA_COORDENACAO_POR_GRAFO_ENTRE_REPOS_1028",
+  "queue": "FV",
+  "pos": 22
+ },
+ {
+  "file": "FV-023.txt",
+  "key": "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN",
+  "queue": "FV",
+  "pos": 23
+ },
+ {
+  "file": "FV-024.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES",
+  "queue": "FV",
+  "pos": 24
+ },
+ {
+  "file": "FV-025.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS",
+  "queue": "FV",
+  "pos": 25
+ },
+ {
+  "file": "FV-026.txt",
+  "key": "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR",
+  "queue": "FV",
+  "pos": 26
+ },
+ {
+  "file": "FV-027.txt",
+  "key": "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#C_MA_MATRIZ_DO_MAESTRO_1028",
+  "queue": "FV",
+  "pos": 27
+ },
+ {
+  "file": "FV-028.txt",
+  "key": "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO",
+  "queue": "FV",
+  "pos": 28
+ },
+ {
+  "file": "FV-029.txt",
+  "key": "docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-2026-11.kg.yaml#D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104",
+  "queue": "FV",
+  "pos": 29
+ },
+ {
+  "file": "B-001.txt",
+  "key": "docs/evolution/research/session-orchestration-2026-11/DIARIO.md::## Desfechos",
+  "queue": "B",
+  "pos": 1
+ },
+ {
+  "file": "B-002.txt",
+  "key": "docs/evolution/review/fix-reconcile-c-p9-admin-oidc.md",
+  "queue": "B",
+  "pos": 2
+ },
+ {
+  "file": "B-003.txt",
+  "key": "docs/evolution/review/docs-escada-de-adocao-1105.md",
+  "queue": "B",
+  "pos": 3
+ },
+ {
+  "file": "B-004.txt",
+  "key": "docs/evolution/review/feat-update-bridge-mechanism.md",
+  "queue": "B",
+  "pos": 4
+ },
+ {
+  "file": "B-005.txt",
+  "key": "docs/evolution/review/docs-promote-adrs-to-knowledge-base.md",
+  "queue": "B",
+  "pos": 5
+ },
+ {
+  "file": "B-006.txt",
+  "key": "docs/evolution/review/docs-diary-superacao-sync-gate.md",
+  "queue": "B",
+  "pos": 6
+ },
+ {
+  "file": "B-007.txt",
+  "key": "docs/evolution/review/feat-meta-cc-update.md",
+  "queue": "B",
+  "pos": 7
+ },
+ {
+  "file": "B-008.txt",
+  "key": "docs/evolution/review/fix-hooks-python-isolated.md",
+  "queue": "B",
+  "pos": 8
+ },
+ {
+  "file": "B-009.txt",
+  "key": "docs/evolution/review/fix-a2a-trust-log-outside-served-clone.md",
+  "queue": "B",
+  "pos": 9
+ },
+ {
+  "file": "B-010.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md",
+  "queue": "B",
+  "pos": 10
+ },
+ {
+  "file": "B-011.txt",
+  "key": "docs/evolution/review/docs-skillsync-live.md",
+  "queue": "B",
+  "pos": 11
+ },
+ {
+  "file": "B-012.txt",
+  "key": "docs/evolution/review/feat-provenance-wave-o4.md",
+  "queue": "B",
+  "pos": 12
+ },
+ {
+  "file": "B-013.txt",
+  "key": "docs/evolution/review/fix-migrate-python-venv-copy-perms.md",
+  "queue": "B",
+  "pos": 13
+ },
+ {
+  "file": "B-014.txt",
+  "key": "docs/evolution/review/feat-site-sections-buyer-aligned.md",
+  "queue": "B",
+  "pos": 14
+ },
+ {
+  "file": "B-015.txt",
+  "key": "docs/evolution/review/fix-env-guard-heredoc-data-file.md",
+  "queue": "B",
+  "pos": 15
+ },
+ {
+  "file": "B-016.txt",
+  "key": "docs/evolution/review/fix-update-bridge-boot-line-race.md",
+  "queue": "B",
+  "pos": 16
+ },
+ {
+  "file": "B-017.txt",
+  "key": "docs/evolution/review/fix-kg-index-atomic-and-old-vendor-warn.md",
+  "queue": "B",
+  "pos": 17
+ },
+ {
+  "file": "B-018.txt",
+  "key": "docs/evolution/review/fix-bridge-wrappers-unmeasured-rc.md",
+  "queue": "B",
+  "pos": 18
+ },
+ {
+  "file": "B-019.txt",
+  "key": "docs/evolution/review/drive-open-threads-batch2.md",
+  "queue": "B",
+  "pos": 19
+ },
+ {
+  "file": "B-020.txt",
+  "key": "docs/evolution/review/chore-compliance-fictional-vendor.md",
+  "queue": "B",
+  "pos": 20
+ },
+ {
+  "file": "B-021.txt",
+  "key": "docs/evolution/inbox/_processed/2026-06-24-sinal-branching-trunk-based-vs-develop.md",
+  "queue": "B",
+  "pos": 21
+ },
+ {
+  "file": "B-022.txt",
+  "key": "docs/evolution/review/docs-free-meta-factory-private-pointers.md",
+  "queue": "B",
+  "pos": 22
+ },
+ {
+  "file": "B-023.txt",
+  "key": "docs/evolution/review/chore-register-<adotante>.md",
+  "queue": "B",
+  "pos": 23
+ },
+ {
+  "file": "B-024.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher.md",
+  "queue": "B",
+  "pos": 24
+ },
+ {
+  "file": "B-025.txt",
+  "key": "docs/evolution/review/feat-public-distribution-decisions.md",
+  "queue": "B",
+  "pos": 25
+ },
+ {
+  "file": "B-026.txt",
+  "key": "docs/evolution/review/fix-review-verdict-caso-benigno.md",
+  "queue": "B",
+  "pos": 26
+ },
+ {
+  "file": "B-027.txt",
+  "key": "docs/evolution/review/ops-gpg-key-protect-durable.md",
+  "queue": "B",
+  "pos": 27
+ },
+ {
+  "file": "B-028.txt",
+  "key": "docs/evolution/review/chore-acolher-<adotante>-logto-d5.md",
+  "queue": "B",
+  "pos": 28
+ },
+ {
+  "file": "B-029.txt",
+  "key": "docs/evolution/review/chore-caddy-sandbox-verify-200.md",
+  "queue": "B",
+  "pos": 29
+ },
+ {
+  "file": "B-030.txt",
+  "key": "docs/evolution/inbox/_processed/2026-06-24-sinal-padrao-toolbox.md",
+  "queue": "B",
+  "pos": 30
+ },
+ {
+  "file": "B-031.txt",
+  "key": "docs/evolution/review/fix-selftest-role-predicate-consumers.md",
+  "queue": "B",
+  "pos": 31
+ },
+ {
+  "file": "B-032.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-01-sinal-verificar-read-path-antes-de-concluir.md",
+  "queue": "B",
+  "pos": 32
+ },
+ {
+  "file": "B-033.txt",
+  "key": "docs/evolution/review/fix-door-seal-pin-reads-remote.md",
+  "queue": "B",
+  "pos": 33
+ },
+ {
+  "file": "B-034.txt",
+  "key": "docs/evolution/review/fix-vetos-fail-closed.md",
+  "queue": "B",
+  "pos": 34
+ },
+ {
+  "file": "B-035.txt",
+  "key": "docs/evolution/review/feat-mcp-onion-kg-email-allowlist.md",
+  "queue": "B",
+  "pos": 35
+ },
+ {
+  "file": "B-036.txt",
+  "key": "docs/evolution/review/feat-mcp-onion-kg-degrau-1.md",
+  "queue": "B",
+  "pos": 36
+ },
+ {
+  "file": "B-037.txt",
+  "key": "docs/evolution/review/feat-site-historia-argument.md",
+  "queue": "B",
+  "pos": 37
+ },
+ {
+  "file": "B-038.txt",
+  "key": "docs/evolution/review/chore-door-18-and-projections.md",
+  "queue": "B",
+  "pos": 38
+ },
+ {
+  "file": "B-039.txt",
+  "key": "docs/evolution/review/feat-caddy-sandbox-ui-pilot.md",
+  "queue": "B",
+  "pos": 39
+ },
+ {
+  "file": "B-040.txt",
+  "key": "docs/evolution/review/fix-door-machine-paths.md",
+  "queue": "B",
+  "pos": 40
+ },
+ {
+  "file": "B-041.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-v4.7.2.md",
+  "queue": "B",
+  "pos": 41
+ },
+ {
+  "file": "B-042.txt",
+  "key": "docs/evolution/review/feat-regra59-modo-consumido.md",
+  "queue": "B",
+  "pos": 42
+ },
+ {
+  "file": "B-043.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher-market.md",
+  "queue": "B",
+  "pos": 43
+ },
+ {
+  "file": "B-044.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.10.0.md",
+  "queue": "B",
+  "pos": 44
+ },
+ {
+  "file": "B-045.txt",
+  "key": "docs/evolution/review/fix-backup-cron-and-plaintext-guard.md",
+  "queue": "B",
+  "pos": 45
+ },
+ {
+  "file": "B-046.txt",
+  "key": "docs/evolution/review/feat-offsite-proven.md",
+  "queue": "B",
+  "pos": 46
+ },
+ {
+  "file": "B-047.txt",
+  "key": "docs/evolution/review/docs-decide-seals-1026.md",
+  "queue": "B",
+  "pos": 47
+ },
+ {
+  "file": "B-048.txt",
+  "key": "docs/evolution/inbox/_processed/2026-08-22-cadeia-de-auth-fechada.md",
+  "queue": "B",
+  "pos": 48
+ },
+ {
+  "file": "B-049.txt",
+  "key": "docs/evolution/inbox/_processed/2026-06-19-sinal-adocao-a0fdf35.md",
+  "queue": "B",
+  "pos": 49
+ },
+ {
+  "file": "B-050.txt",
+  "key": "docs/evolution/review/feat-workspace-adopt-sync.md",
+  "queue": "B",
+  "pos": 50
+ },
+ {
+  "file": "B-051.txt",
+  "key": "docs/evolution/review/feat-radar-e3-0904.md",
+  "queue": "B",
+  "pos": 51
+ },
+ {
+  "file": "B-052.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md",
+  "queue": "B",
+  "pos": 52
+ },
+ {
+  "file": "B-053.txt",
+  "key": "docs/evolution/review/feat-kg-ssot-v4.5.0-writer-json.md",
+  "queue": "B",
+  "pos": 53
+ },
+ {
+  "file": "B-054.txt",
+  "key": "docs/evolution/review/fix-client-names-in-traveling-fixtures.md",
+  "queue": "B",
+  "pos": 54
+ },
+ {
+  "file": "B-055.txt",
+  "key": "docs/evolution/review/docs-delegated-decisions-log-2026-10-14.md",
+  "queue": "B",
+  "pos": 55
+ },
+ {
+  "file": "B-056.txt",
+  "key": "docs/evolution/review/chore-close-paid-nodes-w8.md",
+  "queue": "B",
+  "pos": 56
+ },
+ {
+  "file": "B-057.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-16-kg-sdaal-dogfood-ouro.md",
+  "queue": "B",
+  "pos": 57
+ },
+ {
+  "file": "B-058.txt",
+  "key": "docs/evolution/review/feat-site-vitrines-mechanized.md",
+  "queue": "B",
+  "pos": 58
+ },
+ {
+  "file": "B-059.txt",
+  "key": "docs/evolution/inbox/_processed/2026-08-22-pedido-ao-core-costurar-header-mcp.md",
+  "queue": "B",
+  "pos": 59
+ },
+ {
+  "file": "B-060.txt",
+  "key": "docs/evolution/review/fix-licenca-viaja-never-clobber.md",
+  "queue": "B",
+  "pos": 60
+ },
+ {
+  "file": "A-001.txt",
+  "key": "docs/evolution/review/chore-core-maint-1027.md",
+  "queue": "A",
+  "pos": 1
+ },
+ {
+  "file": "A-002.txt",
+  "key": "docs/evolution/review/chore-ctx-freshness-voice-p6-fix.md",
+  "queue": "A",
+  "pos": 2
+ },
+ {
+  "file": "A-003.txt",
+  "key": "docs/evolution/review/feat-adopt-update-proves-gate-blocks.md",
+  "queue": "A",
+  "pos": 3
+ },
+ {
+  "file": "A-004.txt",
+  "key": "docs/evolution/review/docs-radar-e3-cc-2-1-300.md",
+  "queue": "A",
+  "pos": 4
+ },
+ {
+  "file": "A-005.txt",
+  "key": "docs/evolution/review/docs-co-announce-elenxo-2026-08-18.md",
+  "queue": "A",
+  "pos": 5
+ },
+ {
+  "file": "A-006.txt",
+  "key": "docs/evolution/review/docs-wsync-workspace-updated-1022.md",
+  "queue": "A",
+  "pos": 6
+ },
+ {
+  "file": "A-007.txt",
+  "key": "docs/evolution/review/feat-poda-l1-instructions-loaded.md",
+  "queue": "A",
+  "pos": 7
+ },
+ {
+  "file": "A-008.txt",
+  "key": "docs/evolution/research/session-orchestration-2026-11/DIARIO.md::## Desfechos",
+  "queue": "A",
+  "pos": 8
+ },
+ {
+  "file": "A-009.txt",
+  "key": "docs/evolution/review/fix-merge-gate-warns-in-adopter.md",
+  "queue": "A",
+  "pos": 9
+ },
+ {
+  "file": "A-010.txt",
+  "key": "docs/evolution/inbox/_processed/2026-09-08-agente-expo-react-native.md",
+  "queue": "A",
+  "pos": 10
+ },
+ {
+  "file": "A-011.txt",
+  "key": "docs/evolution/review/fix-drive-checkpoint-in-graph.md",
+  "queue": "A",
+  "pos": 11
+ },
+ {
+  "file": "A-012.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-21-a2a-<adotante>-793157ea69e0e017.md",
+  "queue": "A",
+  "pos": 12
+ },
+ {
+  "file": "A-013.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.17.0.md",
+  "queue": "A",
+  "pos": 13
+ },
+ {
+  "file": "A-014.txt",
+  "key": "docs/evolution/review/fix-reconcile-c-p9-admin-oidc.md",
+  "queue": "A",
+  "pos": 14
+ },
+ {
+  "file": "A-015.txt",
+  "key": "docs/evolution/review/fix-door-kg-read-index.md",
+  "queue": "A",
+  "pos": 15
+ },
+ {
+  "file": "A-016.txt",
+  "key": "docs/evolution/review/docs-escada-de-adocao-1105.md",
+  "queue": "A",
+  "pos": 16
+ },
+ {
+  "file": "A-017.txt",
+  "key": "docs/evolution/review/docs-research-audit-reanchor.md",
+  "queue": "A",
+  "pos": 17
+ },
+ {
+  "file": "A-018.txt",
+  "key": "docs/evolution/review/docs-research-postmerge-projection-writer.md",
+  "queue": "A",
+  "pos": 18
+ },
+ {
+  "file": "A-019.txt",
+  "key": "docs/evolution/review/feat-plugin-lint-deps-contract.md",
+  "queue": "A",
+  "pos": 19
+ },
+ {
+  "file": "A-020.txt",
+  "key": "docs/evolution/review/feat-update-bridge-mechanism.md",
+  "queue": "A",
+  "pos": 20
+ },
+ {
+  "file": "A-021.txt",
+  "key": "docs/evolution/review/fix-kg-contract-debt-cheap.md",
+  "queue": "A",
+  "pos": 21
+ },
+ {
+  "file": "A-022.txt",
+  "key": "docs/evolution/review/fix-kg-premodelswitch-restart-correction.md",
+  "queue": "A",
+  "pos": 22
+ },
+ {
+  "file": "A-023.txt",
+  "key": "docs/evolution/review/feat-regra60-idioma-identificador.md",
+  "queue": "A",
+  "pos": 23
+ },
+ {
+  "file": "A-024.txt",
+  "key": "docs/evolution/review/fix-merge-verified-auto-rebase.md",
+  "queue": "A",
+  "pos": 24
+ },
+ {
+  "file": "A-025.txt",
+  "key": "docs/evolution/review/docs-design-fourth-dimension-direction.md",
+  "queue": "A",
+  "pos": 25
+ },
+ {
+  "file": "A-026.txt",
+  "key": "docs/evolution/review/feat-background-probe-replaces-prose-veto.md",
+  "queue": "A",
+  "pos": 26
+ },
+ {
+  "file": "A-027.txt",
+  "key": "docs/evolution/review/docs-decide-seals-1025.md",
+  "queue": "A",
+  "pos": 27
+ },
+ {
+  "file": "A-028.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-14-branch-model-provisionamento-design-vertical.md",
+  "queue": "A",
+  "pos": 28
+ },
+ {
+  "file": "A-029.txt",
+  "key": "docs/evolution/review/docs-canonical-names-1023.md",
+  "queue": "A",
+  "pos": 29
+ },
+ {
+  "file": "A-030.txt",
+  "key": "docs/evolution/review/feat-bench-machine-cpu-semaphore.md",
+  "queue": "A",
+  "pos": 30
+ },
+ {
+  "file": "A-031.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-company-brain-market.md",
+  "queue": "A",
+  "pos": 31
+ },
+ {
+  "file": "A-032.txt",
+  "key": "docs/evolution/review/docs-promote-adrs-to-knowledge-base.md",
+  "queue": "A",
+  "pos": 32
+ },
+ {
+  "file": "A-033.txt",
+  "key": "docs/evolution/review/fix-protect-main-bare-push-scope.md",
+  "queue": "A",
+  "pos": 33
+ },
+ {
+  "file": "A-034.txt",
+  "key": "docs/evolution/review/feat-doors-decisions-sealed.md",
+  "queue": "A",
+  "pos": 34
+ },
+ {
+  "file": "A-035.txt",
+  "key": "docs/evolution/review/docs-diary-superacao-sync-gate.md",
+  "queue": "A",
+  "pos": 35
+ },
+ {
+  "file": "A-036.txt",
+  "key": "docs/evolution/review/docs-round-elenxo-cured.md",
+  "queue": "A",
+  "pos": 36
+ },
+ {
+  "file": "A-037.txt",
+  "key": "docs/evolution/review/fix-write-stamp-rebuilds-installed-node.md",
+  "queue": "A",
+  "pos": 37
+ },
+ {
+  "file": "A-038.txt",
+  "key": "docs/evolution/review/fix-kg-seed-single-doc-and-constrains.md",
+  "queue": "A",
+  "pos": 38
+ },
+ {
+  "file": "A-039.txt",
+  "key": "docs/evolution/review/docs-seal-sharing-criterion.md",
+  "queue": "A",
+  "pos": 39
+ },
+ {
+  "file": "A-040.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-15-<adotante>-th-20261015-936ada43-nb-00f94d24f82914b66abd7ce9.md",
+  "queue": "A",
+  "pos": 40
+ },
+ {
+  "file": "A-041.txt",
+  "key": "docs/evolution/review/chore-triage-inbox-1029.md",
+  "queue": "A",
+  "pos": 41
+ },
+ {
+  "file": "A-042.txt",
+  "key": "docs/evolution/review/feat-meta-cc-update.md",
+  "queue": "A",
+  "pos": 42
+ },
+ {
+  "file": "A-043.txt",
+  "key": "docs/evolution/review/docs-radar-e3-2026-11-03-r22.md",
+  "queue": "A",
+  "pos": 43
+ },
+ {
+  "file": "A-044.txt",
+  "key": "docs/evolution/review/chore-graph-diary-index-ratchet.md",
+  "queue": "A",
+  "pos": 44
+ },
+ {
+  "file": "A-045.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.11.0.md",
+  "queue": "A",
+  "pos": 45
+ },
+ {
+  "file": "A-046.txt",
+  "key": "docs/evolution/inbox/_processed/2026-09-05-<adotante>-pedido-de-adocao-e-sinais.md",
+  "queue": "A",
+  "pos": 46
+ },
+ {
+  "file": "A-047.txt",
+  "key": "docs/evolution/review/fix-veto-normalize-by-tokens.md",
+  "queue": "A",
+  "pos": 47
+ },
+ {
+  "file": "A-048.txt",
+  "key": "docs/evolution/inbox/_processed/2026-06-19-consulta-retencao-decision-snapshot.md",
+  "queue": "A",
+  "pos": 48
+ },
+ {
+  "file": "A-049.txt",
+  "key": "docs/evolution/review/ci-selftest-family-times.md",
+  "queue": "A",
+  "pos": 49
+ },
+ {
+  "file": "A-050.txt",
+  "key": "docs/evolution/review/fix-hooks-python-isolated.md",
+  "queue": "A",
+  "pos": 50
+ },
+ {
+  "file": "A-051.txt",
+  "key": "docs/evolution/review/feat-wave8-reais.md",
+  "queue": "A",
+  "pos": 51
+ },
+ {
+  "file": "A-052.txt",
+  "key": "docs/evolution/review/fix-read-leg-reaches-bash.md",
+  "queue": "A",
+  "pos": 52
+ },
+ {
+  "file": "A-053.txt",
+  "key": "docs/evolution/review/fix-a2a-trust-log-outside-served-clone.md",
+  "queue": "A",
+  "pos": 53
+ },
+ {
+  "file": "A-054.txt",
+  "key": "docs/evolution/review/research-radar-e3-2026-09-04-r4.md",
+  "queue": "A",
+  "pos": 54
+ },
+ {
+  "file": "A-055.txt",
+  "key": "docs/evolution/review/chore-pin-<adotante>-7a50fc14.md",
+  "queue": "A",
+  "pos": 55
+ },
+ {
+  "file": "A-056.txt",
+  "key": "docs/evolution/review/chore-door-19-pin.md",
+  "queue": "A",
+  "pos": 56
+ },
+ {
+  "file": "A-057.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md",
+  "queue": "A",
+  "pos": 57
+ },
+ {
+  "file": "A-058.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md",
+  "queue": "A",
+  "pos": 58
+ },
+ {
+  "file": "A-059.txt",
+  "key": "docs/evolution/review/docs-co-evolve-triagem-inbox.md",
+  "queue": "A",
+  "pos": 59
+ },
+ {
+  "file": "A-060.txt",
+  "key": "docs/evolution/review/research-living-method-distribution.md",
+  "queue": "A",
+  "pos": 60
+ }
+]

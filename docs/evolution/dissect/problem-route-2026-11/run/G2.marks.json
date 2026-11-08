@@ -1,0 +1,947 @@
+[
+ {
+  "arquivo": "FR-001.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Trazer de volta ao grafo de arquivo os selos que a colheita apagou e passar a mover a decisão em vez de apagá-la",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Atualizar a citação com o caminho antigo no repositório que cita os selos",
+    "dono": "outra sessão",
+    "item": "repo_alheio",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Varrer os nós colhidos nas rodadas anteriores",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'A colheita de 2026-11-02 apagou três selos citados por outro repo. Curado trazendo-os ao arquivo.' Ficam abertos o citador, que só resolve no commit fixado 'até o citador atualizar', e a varredura, que 'não foi feita'."
+ },
+ {
+  "arquivo": "FR-002.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Fechar as três rotas de bypass da catraca: prev ∪ known, aresta entrando e self-edge recusada",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Corrigir o cabeçalho que trazia medição não observada e voltar os identificadores para inglês",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Mudar a convenção de fixtures da casa para que git mv não esvazie o baseline (classe MUDOU-DE-PATH)",
+    "dono": "sessão",
+    "item": "propria_regua",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Decidir se REMOVIDO passa de SOFT a HARD",
+    "dono": "sessão",
+    "item": "propria_regua",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "As três rotas foram reproduzidas ('exit=0 · 0 VIOLATION') e curadas. O git mv 'mexe na convenção grep -v /fixtures/ que é da casa inteira', e REMOVIDO segue como dívida. O defeito de família do GIT_DIR era falso, mas o problema central procede."
+ },
+ {
+  "arquivo": "FR-003.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Aplicar os 5 achados do juiz e do refutador: rebaixar o nó, marcar superseded, trace e contrato de custo",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Ler o arquivo de ambiente do bridge para medir a configuração",
+    "dono": "maestro",
+    "item": "segredo",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Medir um turno real do admin com fork e do /chat no CLI 2.1.302",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'Achados... 4 reais, todos curados'. Nos limites: 'o arquivo de ambiente do bridge, que não foi lido, por regra'."
+ },
+ {
+  "arquivo": "FR-004.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Fazer o parser da REGRA 53 ler as três formas de paths:",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Fazer a árvore suja dar achados = -1, com a detecção antes da contagem",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Alinhar a semântica de casamento (* e braces) ao harness quando o gatilho disparar",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "O parser 'devolvia vazio ⇒ acusava paths: VAZIO em lente VIVA' e o revisor deu 'VEREDITO: conforme' com árvore suja; os dois foram curados. A divergência de casamento ficou 'medida, não curada', com gatilho."
+ },
+ {
+  "arquivo": "FR-005.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Reconciliar o grafo da doutrina graduada e curar links, contagens e emoji",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Decidir se o plugin embarca as 7 irmãs ou converte os links",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Estender kb-vendored-link-check a plugins/**/kb/, mecanismo novo não pedido",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Publicar a doutrina (metade PUBLICAR de Q_PUBLICATION_AREA)",
+    "dono": "maestro",
+    "item": "deploy_publicacao",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'Decisão do maestro se o plugin deve embarcar as 7 irmãs' e 'o maestro autorizou vendorizar, não publicar'. Estender a guarda é 'mecanismo novo que o maestro não pediu'."
+ },
+ {
+  "arquivo": "FR-006.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Substituir a provenance no lugar em vez de empilhar e pôr os resumos no trace",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Selar a mudança semântica de Q_TENANT_WRITE_DESTINATION e o flip de D_INDIVIDUAL",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Tratar o Logto com registro aberto, achado lateral do juiz",
+    "dono": "maestro",
+    "item": "host",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Revisar os 12 REPROVADOS na onda de revisão",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "Achado 1: 'provenance empilhada passaria calada', curado. 'Selada pelo maestro, a mudança é semântica'. Ficou fora 'o Logto com registro aberto'."
+ },
+ {
+  "arquivo": "FR-007.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Pôr no radar o aviso SOFT agregado decision-done-em-DEV e regenerar os plugins",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Triar os 95 casos existentes, grafo por grafo",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "Item 'aprovado pelo maestro'; a cura é o aviso SOFT. 'Os 95 casos existentes não são corrigidos aqui... a triagem deles é por grafo'."
+ },
+ {
+  "arquivo": "FR-008.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Selar as três perguntas pela decisão do maestro",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Curar F1 a F8 nos nós do grafo novo",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Decidir construir a guarda contra substituição em contexto que interpreta",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Curar no gerador o kg-trace-resolve.sh, que não quebra trace multi-caminho",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'O maestro decidiu os três nós question'. O refutador REPROVOU por claims da sessão, curadas. A guarda está 'gated na decisão do maestro'."
+ },
+ {
+  "arquivo": "FR-010.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Alinhar knowledge-graph-sdaal.md ao motor ou implementar as três reprovações que faltam",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Trocar 'PageRank ponderado' por 'grau' na doutrina",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Fazer o radar avisar review_after vencido e consumir ou remover valid_from",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Investigar por que drifted nunca foi usado",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "O adotante mediu onze divergências e 'Nada foi escrito no core (I3)'; 'o adotante propõe; quem decide é o core'."
+ },
+ {
+  "arquivo": "FR-012.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Curar os 4 bloqueantes: regenerar o plugin, mover o sinal, frontmatter e busca com norm()",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Reverter as seções afrouxadas e corrigir a contagem 7 DOMINIO contra 2 GENÉRICO",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Escrever as cláusulas de confidencialidade do material do cliente",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'os quatro bloqueantes eram reais', e a contagem do commit estava 'invertida'. Tudo curado; a decisão do maestro 'segue de pé'."
+ },
+ {
+  "arquivo": "FR-013.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Remover a isenção por delegação e cobrir os pares com casos explícitos",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Tirar as credenciais WAHA do env, o que exige recriar o container",
+    "dono": "maestro",
+    "item": "segredo",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Aplicar o drop-in NoNewPrivileges=yes e ProtectHome=yes no bridge",
+    "dono": "maestro",
+    "item": "host",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Dar catraca de cobertura e piso ao extrator",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'a isenção por delegação MATAVA uma regra HARD' (curado). Do W3: 'Nada foi executado em produção... a execução é do maestro'."
+ },
+ {
+  "arquivo": "FR-014.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Corrigir a contagem em subshell e o escopo da REGRA 58 com marcador próprio",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Criar a catraca (w) nas duas direções e normalizar o carimbo de ar",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Mecanizar 'onda nova exige onda colhida'",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'A regra acusava e NÃO contava' e 'o filtro de escopo ERA o próprio predicado', ambos curados. A promessa da onda 'continua sem guarda'."
+ },
+ {
+  "arquivo": "FR-016.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Remover o nó circular, corrigir os números e regenerar o backlog",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Decidir D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA e fechar uma das duas perguntas duplicadas",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'2 de 2 lentes REPROVARAM. 20 achados reais', corrigidos antes do PR. 'O que fica aberto e é do maestro: D_CENSO...'."
+ },
+ {
+  "arquivo": "FR-018.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Corrigir os três falsos-positivos e os fail-opens da REGRA 57",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Decidir a convenção única do DRIFTED antes de mecanizá-la",
+    "dono": "sessão",
+    "item": "propria_regua",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Comparar o UNVERIFIABLE com um baseline pré-run",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'os três falsos-positivos HARD... disparavam exatamente para quem OBEDECE a doutrina', curados. Sobre a convenção: 'Decidir e depois mecanizar'."
+ },
+ {
+  "arquivo": "FR-019.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Avançar o pin, com os três derivados no mesmo commit e conferência por git ls-remote",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Rematerializar a porta onion-standalone para baixar a catraca",
+    "dono": "maestro",
+    "item": "deploy_publicacao",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "O pin foi 'verificado por git ls-remote'. A catraca 'só cai por re-materialização daquela porta, que exige decisão do maestro'."
+ },
+ {
+  "arquivo": "FR-020.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Curar os 7 achados do motor bi-temporal, com mutantes",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Rematerializar a porta onion-standalone",
+    "dono": "maestro",
+    "item": "deploy_publicacao",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Decidir o destino da versão mais velha de feat-reviewer-findings-block.md na árvore",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'REPROVOU com 7 achados reais, todos reproduzidos antes de curar'. A porta 'só cai por re-materialização, que exige o push do maestro'. O resíduo na árvore 'fica aberto'."
+ },
+ {
+  "arquivo": "FR-021.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Afrouxar o failsafe da bancada para arquivos sem cobertura (revertido)",
+    "dono": "sessão",
+    "item": "enfraquecer",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Mandar para stderr o aviso de abort no --map e reconciliar o pin",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Medir a cobertura por execução real (Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER)",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'A passada adversarial reprovou o afrouxamento do failsafe... Revertido'. A população estava 'errada por 6,6×'. Sobreviveram a limpeza do --map e o pin."
+ },
+ {
+  "arquivo": "FR-022.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Migrar o KG do próprio adotante e reconciliar os nós PROD stale",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Pôr no core schema_version, verified_at e o gate de stale",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Dar robustez ao parser do radar e criar o kg migrate e o doc de footguns",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Promover o ledger docs-as-evidência e o drive-to-verify como método",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'O KG-SSOT não era lido por FERRAMENTA NENHUMA' e 'A SSOT tinha APODRECIDO'. As '7 propostas ao core' são do core."
+ },
+ {
+  "arquivo": "FR-023.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Absorver o --with no kg-projection.sh, com casos na bancada",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Decidir de onde vêm os pares e o NAO-FIXADO no modo estrito",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Levar ao kg-ssot a nota do G7",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'A REGRA 112 não julga essa página'. A triagem do core: 'ABSORVIDO'. 'A nota ao kg-ssot (G7) fica com a curadoria'."
+ },
+ {
+  "arquivo": "FR-024.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Corrigir o method da pergunta para o padrão do contrato",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Decidir se a régua aceita Bash composto de leitura",
+    "dono": "sessão",
+    "item": "enfraquecer",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Medir o relógio do notebook depois do lote",
+    "dono": "maestro",
+    "item": "fato",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'o method da pergunta não casava o padrão do contrato', curado. 'O A7-C1 fica NÃO PASSOU, e a mudança vira pergunta aberta'. 'NÃO MEDIDO: O relógio do notebook'."
+ },
+ {
+  "arquivo": "FF-001.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Reescrever pela forma o localizador que citava o diretório de backup da VPS",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'O localizador citava o diretório de backup da VPS (REGRA 99): reescrito pela forma. Radar e contrato rc 0.'"
+ },
+ {
+  "arquivo": "FF-002.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Criar no core a variante expo-developer ou uma seção RN no react-developer",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "O react-developer 'funcionou... só porque o prompt do condutor carregava toda a doutrina'. Pedido: 'Uma variante expo-developer', que é da vertical do core."
+ },
+ {
+  "arquivo": "FF-005.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Separar menção de dependência funcional e motor duplicado de duplicata de conhecimento",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'Menção não é dependência — a 1ª versão marcava HARD toda citação' e 'Motor duplicado não é duplicata'. Os 3 achados reais foram curados."
+ },
+ {
+  "arquivo": "FF-006.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Citar as datas com kg-migrate-v3, refazer a medição do nó testemunho e travar o ganho",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Reescrever os labels longos, passando o texto para narrative",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'yaml.unquoted-date: de 129 para 58' e 'testimony-in-prod: de 1 para 0', com o ganho travado. O label longo 'exige reescrever... o que é decisão humana'."
+ },
+ {
+  "arquivo": "FF-007.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Curar o split camelCase, as fixtures em pedaços, as aspas antes do comentário e o universo não rastreado",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Dar catraca de tamanho ao baseline",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'O split camelCase nunca funcionou' e as fixtures eram 'a maior fonte de violações', ambos curados. 'O baseline não tem catraca de tamanho'."
+ },
+ {
+  "arquivo": "FF-008.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Selar as três perguntas pelo /meta:decide",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Trocar o código 'r18' pela glosa",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Fazer o selador rodar o lint de nomes antes de dar ✅",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'Três selos do maestro'. O selador 'saiu 0 assim mesmo'; 'A cura de classe é o selador rodar o lint de nomes... fica para o PR seguinte'."
+ },
+ {
+  "arquivo": "FF-010.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Pôr vagas de CPU da máquina e faixa local no pre-commit e no pr-finalize, como o maestro decidiu",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Confirmar no log do CI a espera somada 0.0s",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Pôr o setup do worker dentro da vaga",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "Decisão do maestro 'selada em D_BANCADA_SEMAFORO...'. A passada curou 5 e declarou tetos: 'O setup do worker roda FORA da vaga' e 'Não rodei no runner antes de abrir'."
+ },
+ {
+  "arquivo": "FF-012.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Fazer o escritor do pin refazer label, lista e provenance no molde de update e recusar com rc 4 fora dele",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Consertar à mão o label do hub e do outro adotante recusados",
+    "dono": "outra sessão",
+    "item": "repo_alheio",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Avisar o hub e o adotante depois do merge",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "É a '4ª recorrência seguida'; as 10 da passada foram curadas. O hub e outro adotante 'passam a ser recusados (rc 4)'; 'O aviso a eles fica com o core, depois do merge'."
+ },
+ {
+  "arquivo": "FF-014.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Curar os 7 achados do /meta:cc-update forjado",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Rever a cura do role-cut que outra sessão escreveu na worktree",
+    "dono": "outra sessão",
+    "item": "repo_alheio",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Criar a issue pelo adapter executável (Q_ISSUE_PELO_ADAPTER_EXECUTAVEL)",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'7, todos reais, todos curados'. 'A cura apareceu na worktree escrita por outra sessão... a I3 (um escritor por repo) foi tocada'."
+ },
+ {
+  "arquivo": "FF-015.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Aplicar os 7 vereditos negativos do juiz da r22 e criar os nós de superação",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'Os sete negativos foram aplicados'. 'Radar --integrity --schema rc 0 e contrato rc 0 depois da aplicação'."
+ },
+ {
+  "arquivo": "FF-016.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Subir o vendor kg-ssot para 4.11.0 e regravar a base pelo caminho do CI",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Subir o onion-kg-writer de produção da 4.9.1",
+    "dono": "maestro",
+    "item": "deploy_publicacao",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "O 'PIOROU' vinha do 'instrumento errado'; pelo caminho do CI, rc 0. 'O onion-kg-writer de produção segue na 4.9.1. Subi-lo é decisão separada do maestro'."
+ },
+ {
+  "arquivo": "FF-017.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Pôr a perna de leitura no Bash, com prefiltro mudo, e reverter o sed global vazado",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Decidir promover a REGRA 87 de SOFT a HARD quando houver reincidência",
+    "dono": "sessão",
+    "item": "propria_regua",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'O hook vigiava 0,7% da superfície' e 'um sed global vazou pelo arquivo inteiro', ambos curados. 'Gatilho para promover a HARD: alguém reincidir'."
+ },
+ {
+  "arquivo": "FF-022.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Curar no wrapper o hardlink antes do chown, o discard-venv sem medição e as falhas do sudo -u",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Rodar o apply real da migração Python em produção",
+    "dono": "maestro",
+    "item": "deploy_publicacao",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "Seis achados curados, entre eles 'O hardlink só era detectado depois do chown'. 'A prova Python real em produção é o apply do maestro'."
+ },
+ {
+  "arquivo": "FF-024.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Pôr no baseline da REGRA 99 a isenção da citação ~/.codex/agents/",
+    "dono": "sessão",
+    "item": "enfraquecer",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Instalar o Codex CLI no ambiente do core para rodar os spikes",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Rodar os spikes no ambiente da curadoria, que já tem o Codex",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'O delta novo é uma linha no kg-machine-path-baseline.txt'. Os spikes 'pedem a instalação, que é do maestro, ou o ambiente da curadoria'."
+ },
+ {
+  "arquivo": "FF-026.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Corrigir o required duplicado e as guardas, e fazer o radar reprovar chave repetida",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Provar a validação no substrato real no próximo lote do /meta:kg-freshness",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "'required: declarado duas vezes... 7 campos deixaram de ser obrigatórios', corrigido. 'Não se provou a semântica de validação no substrato real'."
+ },
+ {
+  "arquivo": "FF-028.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Absorver as peças do dissect e curar o rc 2, o registro vazio e a tabela paralela",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Reapontar no repo do adotante a aresta da família ao registro do core",
+    "dono": "outra sessão",
+    "item": "repo_alheio",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Criar a guarda de lint que roda o checador sobre o corpus",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "Achados 1–4 'REAL, curado'. O reapontamento vai no 'rascunho da outbox... como instrução de reapontar a aresta', e 'o repo dele não foi tocado'."
+ },
+ {
+  "arquivo": "A-005.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Entregar o anúncio nos inbound/ dos 12 adotantes sem commit, por ordem do maestro",
+    "dono": "sessão",
+    "item": "repo_alheio",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Regenerar o federation-console.html junto com o CHANGELOG",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Processar os 64 anúncios pendentes no inbound de cada adotante",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Decidir se haverá uma rodada de processamento nas sessões dos adotantes",
+    "dono": "maestro",
+    "item": "valor",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "A ordem foi do maestro, e o console stale 'foi bloqueado' e regenerado. 'processar é da sessão de cada um... para o maestro decidir se quer uma rodada'."
+ }
+]

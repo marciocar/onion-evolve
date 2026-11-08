@@ -1,0 +1,510 @@
+[
+ {
+  "ficha": "H01",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir na própria branch o argumento repetido, o symlink e o rollback que desfaz a revogação, com testes que reprovam sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Escrever testes que reprovem os três desvios no juiz e na revogação, sessão",
+  "fecha_quando": "Os testes de argumento repetido, symlink e revogação reprovam sem o conserto e passam com ele no PR"
+ },
+ {
+  "ficha": "H02",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir os 14 achados, a começar pelo conflito de organização e pelo escape por symlink, com testes que reprovam sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Implantar a correção no serviço",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Transformar as duas sondas críticas em testes que reprovam, sessão",
+  "fecha_quando": "As sondas não reproduzem os críticos no PR com revisão independente e nota escrita, e o maestro decidiu o deploy por /meta:decide"
+ },
+ {
+  "ficha": "H03",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir no resíduo e no nó a afirmação de que o hook vale sem reiniciar, registrando a saída e a retomada e o sinal do id de sessão",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Corrigir o registro no resíduo e no nó da guarda, sessão",
+  "fecha_quando": "Resíduo e nó não afirmam mais a validade sem reinício, salvo se uma medida com o mesmo id de sessão antes e depois a sustentar"
+ },
+ {
+  "ficha": "H04",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Escolher o canal do vigia, incluindo o risco de banimento da conta pessoal",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar as opções por /meta:decide, recomendando a API oficial, sessão",
+  "fecha_quando": "A escolha do maestro sobre o canal está registrada"
+ },
+ {
+  "ficha": "H05",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Encurtar o rótulo no PR até a dívida do grafo voltar ao limite, sem mexer na catraca",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Fazer o fechamento local rodar a catraca de dívida do CI, com teste que reprova sem isso",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Adicionar a catraca ao fechamento local, sessão",
+  "fecha_quando": "O fechamento local reprova o rótulo longo e o CI do PR corrigido passa com a catraca intacta"
+ },
+ {
+  "ficha": "H06",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Limpar os 7 sítios narrativos da superfície que viaja",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Decidir os novos valores dos 14 sítios funcionais, que definem o destino da publicação, e a liberação da fábrica de marketplace para o plugin",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide a tabela dos 14 sítios com opções e recomendação, sessão",
+  "fecha_quando": "A varredura não acha caminho de máquina narrativo, o PR teve revisão independente, e o maestro decidiu os 14 sítios funcionais e a fábrica"
+ },
+ {
+  "ficha": "H07",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Fortalecer por PR a guarda contra `source` do arquivo real de segredos, com teste que reprova sem ela, e informar o desvio ao maestro sem abrir o arquivo",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Informar o desvio ao maestro e escrever o teste da guarda, sessão",
+  "fecha_quando": "O teste mostra `source` do arquivo de segredos barrado com a guarda e permitido sem ela, e o maestro foi informado"
+ },
+ {
+  "ficha": "H08",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Aplicar a tabela de selagem já definida, sem contestar os vereditos, e refazer os carimbos reprovados com a cobertura que o juiz exigiu",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P2",
+  "rota_principal": "R1",
+  "proximo_ato": "Refazer a medição dos 12 carimbos reprovados, sessão",
+  "fecha_quando": "Os 15 carimbos têm veredito do juiz, nenhum item fechou sem aprovação, e o PR traz revisão independente e a nota escrita"
+ },
+ {
+  "ficha": "H09",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Ajustar as fixtures da outra família para fabricar um registro válido, sem afrouxar a regra, e incluir essa família na bancada",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Corrigir as fixtures e rodar a bancada com as duas famílias, sessão",
+  "fecha_quando": "A bancada e o CI passam com a regra intacta, e a bancada reprova sem o ajuste das fixtures"
+ },
+ {
+  "ficha": "H10",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir a troca das vitrines, que muda a página pública e se implanta no merge",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide a seleção do grafo, com a comparação e a recomendação, sessão",
+  "fecha_quando": "O maestro decidiu, e o site publicado corresponde à decisão"
+ },
+ {
+  "ficha": "H11",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir o comando de compliance: etapa de grafo, separação entre produção e desenvolvimento, respeito à pasta configurada e exemplo sem cobertura inventada, com testes",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Reproduzir os quatro defeitos no comando, sessão",
+  "fecha_quando": "Cada defeito reproduzido tem teste que reprova sem o conserto, e o PR traz revisão independente e a nota escrita"
+ },
+ {
+  "ficha": "H12",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Retomar os dois conjuntos a partir do último commit, um pesado por vez, após checar a carga da máquina",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A0 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Levantar o último commit de cada conjunto e retomar o primeiro, sessão",
+  "fecha_quando": "Os dois conjuntos concluíram o trabalho interrompido, medido por seus commits e testes"
+ },
+ {
+  "ficha": "H13",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir entre seguir, terminar só o que está em curso ou encerrar, com autorização nova e datada se houver continuidade",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide o estado das peers e a recomendação de terminar só o que está em curso, sem dar ordens novas enquanto isso, sessão",
+  "fecha_quando": "A decisão do maestro está registrada, com validade escrita se houver continuidade"
+ },
+ {
+  "ficha": "H14",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir a validade do veredito e o destino da amostra aberta diante da emenda aceita e não recebida",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide a linha do tempo, a emenda, as duas corridas e as opções, sessão",
+  "fecha_quando": "A decisão do maestro sobre veredito e amostra está registrada junto ao experimento"
+ },
+ {
+  "ficha": "H15",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Fazer o gatilho contar desde o commit que gravou o relatório, com teste de não regressão",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Corrigir o localizador errado",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Definir qual peça cede entre radar, selador e contrato",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Reproduzir a contradição e levar por /meta:decide as opções com recomendação, sessão",
+  "fecha_quando": "O alarme falso e o localizador têm testes em PR com revisão independente, e uma decisão humana sela sem nenhum dos dois avisos após a escolha do maestro"
+ },
+ {
+  "ficha": "H16",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir escopo, modo de coleta e aceite de eventos do vigia",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Escolher o caminho de OAuth ou senha de app do e-mail",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Resolver o choque entre o aviso automático e a regra de que só o humano envia",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide as opções e a evidência de que só o envelope foi exercitado, sessão",
+  "fecha_quando": "As três decisões estão registradas, e aceite, fila e coletor real foram exercitados dentro delas"
+ },
+ {
+  "ficha": "H17",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se o refino entra na régua e na peça que a própria sessão forjou",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide a proposta da peer, declarando o conflito e a opinião da sessão, sessão",
+  "fecha_quando": "A decisão do maestro sobre o refino está registrada"
+ },
+ {
+  "ficha": "H18",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se a ferramenta pode ser costurada, dado o efeito legal do uso e a licença não confirmada",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levantar o texto da licença e levá-lo com o uso pretendido por /meta:decide, sessão",
+  "fecha_quando": "A decisão do maestro sobre o uso, com a licença identificada, está registrada, e nada foi costurado antes dela"
+ },
+ {
+  "ficha": "H19",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir os 9 achados, incluindo o crítico entre workspaces e a cura de corrida, com testes que carregam o comando de verdade, e forjar guarda contra teste que só lê o comando como prosa",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "Implantar a correção no serviço",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "Reproduzir o crítico e a corrida com o comando carregado no SDK, sessão",
+  "fecha_quando": "Os testes reprovam sem o conserto e passam com ele, a guarda barra o teste de prosa, e o maestro decidiu o deploy por /meta:decide"
+ },
+ {
+  "ficha": "H20",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Rodar o update, que escreve na integração do repo do adotante",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide a autorização, o estado da árvore e o delta de 36 arquivos, sessão",
+  "fecha_quando": "O maestro decidiu, e, se aprovado, a integração do adotante mostra o delta de 36 arquivos aplicado"
+ },
+ {
+  "ficha": "H21",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir na própria branch os 12 achados: recortes dos números, rótulos gerais de janela única, estado descrito como existente e gatilho pouco testável",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A0 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "Conferir cada achado na branch e corrigir os que se reproduzem, sessão",
+  "fecha_quando": "Cada um dos 12 achados está corrigido ou descartado com a medida, e o que for testável tem teste que reprova sem o conserto"
+ },
+ {
+  "ficha": "H22",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Gerar na fonte o anúncio com delta, classe do bump e migração, com teste",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Decidir e ligar a entrega no inbox do adotante, que é comunicação externa e escrita em repo alheio",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide o relato e as opções de entrega com recomendação, sessão",
+  "fecha_quando": "Num update real, o inbox do adotante recebe delta, classe do bump e migração antes de o adotante puxar"
+ },
+ {
+  "ficha": "H23",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Autorizar a criação da organização de teste e o convite à segunda conta",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Rodar a sonda pré-registrada de push nos dois repos, depois da autorização",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar o plano pré-registrado e os riscos de conta por /meta:decide, sessão",
+  "fecha_quando": "A resposta do servidor ao push de quem só tem leitura está medida nos dois repos, ou o maestro recusou a medição"
+ },
+ {
+  "ficha": "H24",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Escolher e executar o destino da chave: mover e apagar, revogar e recomeçar, ou adiar",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide as três opções, recomendando revogar e recomeçar, sem abrir a chave, sessão",
+  "fecha_quando": "A decisão do maestro está registrada e, se ele optar por remover ou revogar, a chave não está mais na produção ou consta como revogada"
+ },
+ {
+  "ficha": "H25",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se o primeiro uso em campo destrava a construção do comando de grafos",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide o relato do adotante e o que ele prova ou não, sessão",
+  "fecha_quando": "A decisão do maestro sobre construir o comando está registrada no nó"
+ },
+ {
+  "ficha": "H26",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se o critério selado muda, diante do contador que identifica quem ofereceu ajuda a três e da falta de orçamento de consultas",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Decidir se o mapeamento do experimento se sustenta, dado que time não é empregador",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "Levar por /meta:decide os quatro resultados de ataque, a objeção ao mapeamento e as opções, sessão",
+  "fecha_quando": "As decisões sobre o selo e o mapeamento estão registradas e, se o critério mudar, a suíte roda de novo contra o novo critério"
+ }
+]

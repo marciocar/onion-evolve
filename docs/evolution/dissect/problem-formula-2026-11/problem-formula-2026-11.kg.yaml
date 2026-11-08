@@ -1,0 +1,636 @@
+meta:
+  id: problem-formula-2026-11
+  schema_version: "1"
+  x_dissect_tool: problem-formula
+  x_dissect_against: onion
+  x_dissect_family: ideia
+  x_study_destination: core
+  baseline: "2026-11-05"
+  review_after: "2026-12-05"
+  x_who_pays: 'Ninguém paga por esta fórmula hoje, e ela não abre via de bilhetagem: é mecanismo interno. O análogo que tem dinheiro é AI SRE (E_N0_AI_SRE_CAPITAL, secundária), e nele quem compra começa só leitura e trata remediação fechada como decisão separada de confiança. Preço não achado.'
+  x_unverified:
+    - 'Os dois eixos do reforço do maestro: só leitura, sem N2.'
+    - 'Horário de envio das mensagens de L6: não medido pela sessão condutora.'
+    - 'Problema ao vivo: só casos históricos, já em forma de relatório.'
+    - 'As rotas do 2º aplicador não têm juiz; contagens dele são à máquina ou de quem conduz.'
+    - 'Se o veto de alvos do core barraria ato protegido na hora de executar: não rodado.'
+    - 'Primárias de ITIL, OODA, PDCA, Cynefin e CAPA não abertas (N0, secundárias).'
+    - 'Nenhuma fonte web mede falha de escalada em agente; só relato e arquitetura.'
+    - 'Na corrida oficial, as fichas foram escritas por quem conhece o desfecho; L1 e L2 têm só o id público.'
+  # kg-backlog-guard: on
+  # ═══ TETO: 30 NÓS ═══
+
+nodes:
+
+  - id: S_STAGE0
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Etapa 0 da dissecação da fórmula do problema, pré-registrada antes do N0, com critério de veredito e protocolo do experimento."
+    trace: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
+    verified_at: "2026-11-05"
+    verified_against: "git log do STAGE0.md: commit 10b69d59 e kg_criterion.py digest"
+    x_criterion:
+      id: PROBLEM_FORMULA_STAGE0
+      version: "1"
+      registered_at: "2026-11-05T13:36:00+00:00"
+      sha256: "b117e71c526abe2058f342ae3b7824f7d9b57e9a7ae16b1a2eb0ea674d45bb5e"
+      ref: docs/evolution/dissect/problem-formula-2026-11/STAGE0.md
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
+      locator: "commit 10b69d59"
+      method: "medição: kg_criterion.py digest sobre o arquivo commitado"
+      locality: "repo"
+
+  - id: S_STAGE0_V2
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 2 da Etapa 0, antes de abrir a amostra: censo de owner maestro e de selos com resposta livre no universo, os dois erros medidos separados com o P5, e o conjunto lembrado à parte."
+    trace: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v2.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_FORMULA_STAGE0
+      version: "2"
+      registered_at: "2026-11-05T13:43:00+00:00"
+      sha256: "490b760104a0d6086a656c7999fdc7d74ae238efc3f488735c9da07e2f7a5b3a"
+      ref: docs/evolution/dissect/problem-formula-2026-11/STAGE0.v2.md
+      amends: S_STAGE0
+      reason: "A revisão da curadoria pediu censo de owner maestro e de selos livres, os dois erros separados e o conjunto lembrado, que a v1 não tem."
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v2.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: S_STAGE0_V3
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "Emenda 3 da Etapa 0, depois de ver as corridas: gabarito por processo separado, alcance, filtro de B, denominador, fichas sem vazamento e correção de ERRO-B. O reforço do maestro entra como 2ª pergunta, sem N2."
+    trace: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v3.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_FORMULA_STAGE0
+      version: "3"
+      registered_at: "2026-11-05T14:30:00+00:00"
+      sha256: "1940fc48bfe26c5b8168ef8aa092f537f8968009e7f5da8aa858b64dcac209f3"
+      ref: docs/evolution/dissect/problem-formula-2026-11/STAGE0.v3.md
+      amends: S_STAGE0_V2
+      reason: "A curadoria objetou a tempo, e a sessão principal aceitou; a mensagem chegou à sessão condutora depois do relato final. Escrita depois de ver o 8 de 9 de E2, e declara isso."
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v3.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: E_L6_AMOSTRA_ABERTA_COM_EMENDA_PENDENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: 'A amostra abriu em f5153f6b3 com a objeção da curadoria já aceita pela sessão principal e a emenda pendente. Na ponta condutora, as mensagens só chegaram depois do relato final de 03d817142; a principal diz que as mandou antes.'
+    narrative: 'É o modo de falha que o estudo mede: agir sem o que foi combinado. Caso do conjunto lembrado, fora das taxas.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/STAGE0.v3.md'
+    verified_at: "2026-11-05"
+    verified_against: 'git reflog da worktree e a ordem de chegada das mensagens na sessão condutora; o horário de envio não foi medido por ela'
+    provenance:
+      source: 'esta sessão e a sessão principal'
+      locator: 'STAGE0.v3.md §1'
+      method: 'medição: reflog; testemunho das duas pontas sobre as mensagens'
+      locality: 'repo'
+
+  - id: E_DESVIO_AMOSTRAS_COM_EMENDA_PENDENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    label: 'As amostras da v1 e do pré-teste da v2 abriram com a objeção da curadoria aceita e a emenda pendente; gabarito de quem conhece a fórmula e o desfecho; 2º aplicador também juiz, contaminado na segunda.'
+    narrative: 'O rejeitar de 03d817142 é a saída da tabela sobre evidência rebaixada: sentido informativo, reprovação não válida como pré-registrada. A corrida posterior, sob STAGE0.v3 em 82ad2e8a6, é separada.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/RESULT.v1.md'
+    verified_at: "2026-11-05"
+    verified_against: 'git reflog da worktree e os arquivos GABARITO.md e pre-teste/GABARITO.v2.md'
+    provenance:
+      source: 'sessão principal e sessão condutora'
+      locator: 'RESULT.v1.md, pre-teste/RESULT.v2.md'
+      method: 'medição: reflog; testemunho das duas pontas sobre a ordem'
+      locality: 'repo'
+
+  - id: E_N0_SEV_PAGERDUTY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    x_dissect_level: 0
+    label: 'Severidade como rota: a PagerDuty classifica em SEV com resposta típica por nível, diz que severidade alta permite movimentos mais arriscados e manda, na dúvida, tratar como o nível mais alto, sem discutir durante o incidente.'
+    trace: 'https://response.pagerduty.com/before/severity_levels/'
+    verified_at: "2026-11-05"
+    verified_against: 'curl da página em 2026-11-05, texto lido'
+    source_tier: 9
+    provenance:
+      source: 'PagerDuty Incident Response Documentation'
+      locator: 'seções Severity Levels e Always Assume The Worst'
+      method: 'leitura: fonte primária'
+      locality: 'web'
+
+  - id: E_N0_ERROR_BUDGET_SRE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    x_dissect_level: 0
+    label: 'Orçamento de erro: o exemplo do Google (Thurgood, 2018-02-19) para mudanças fora de P0 e segurança quando o orçamento estoura, e leva divergência ao CTO. É política escrita antes do incidente, e exige um SLO, que o Onion não tem.'
+    trace: 'https://sre.google/workbook/error-budget-policy/'
+    verified_at: "2026-11-05"
+    verified_against: 'curl da página em 2026-11-05, texto lido'
+    source_tier: 9
+    provenance:
+      source: 'Google SRE Workbook, Apêndice B'
+      locator: 'SLO Miss Policy e Escalation Policy'
+      method: 'leitura: fonte primária'
+      locality: 'web'
+
+  - id: E_N0_CYNEFIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    x_dissect_level: 0
+    label: 'Cynefin (Snowden e Boone, HBR, nov/2007): o primeiro movimento depende do domínio. Claro: categorizar e responder. Complicado: analisar. Complexo: sondar com experimento seguro. Caótico: agir para estabilizar. Lido por resumo de enciclopédia, não no artigo.'
+    trace: 'https://en.wikipedia.org/wiki/Cynefin_framework'
+    verified_at: "2026-11-05"
+    verified_against: 'busca web de 2026-11-05, resumo; o reprint da HBR não foi aberto'
+    source_tier: 5
+    provenance:
+      source: 'Wikipedia, Cynefin framework'
+      locator: 'seção dos domínios'
+      method: 'leitura: fonte secundária'
+      locality: 'web'
+
+  - id: E_N0_ITIL_OODA_PDCA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    x_dissect_level: 0
+    label: 'Três clássicos só por secundária: ITIL combina impacto e urgência numa grade (nenhuma definição oficial achada); OODA é de John Boyd, e o diagrama popular não é o dele; PDCA vem de Shewhart e Deming, que preferia PDSA. São ciclos, nenhum diz quem pode agir.'
+    trace: 'https://en.wikipedia.org/wiki/PDCA'
+    verified_at: "2026-11-05"
+    verified_against: 'busca web de 2026-11-05, resumo; primárias não abertas'
+    source_tier: 4
+    provenance:
+      source: 'Wikipedia e páginas de fornecedor'
+      locator: 'resultados da busca'
+      method: 'leitura: fonte secundária'
+      locality: 'web'
+
+  - id: E_N0_AUTONOMIA_POR_PAPEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    x_dissect_level: 0
+    label: 'Feng, McDonald e Zhang (arXiv 2506.12469, v2 de 2025-07-28) definem 5 níveis de autonomia pelo papel do usuário: operador, colaborador, consultor, aprovador, observador. Autonomia é decisão de desenho, separada de capacidade.'
+    narrative: 'Um guia de 2026-07 diz que não há padrão de mercado (secundária).'
+    trace: 'https://arxiv.org/abs/2506.12469'
+    verified_at: "2026-11-05"
+    verified_against: 'curl do resumo em 2026-11-05'
+    source_tier: 8
+    provenance:
+      source: 'arXiv'
+      locator: 'abstract'
+      method: 'leitura: fonte primária'
+      locality: 'web'
+
+  - id: E_N0_AUTO_MODE_FALSO_NEGATIVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    x_dissect_level: 0
+    label: 'O número do modo de falha: a Anthropic mede que usuários aceitam 93% dos prompts de permissão, que o classificador do auto mode deixa passar 17% das ações excessivas reais, e que 3 negações seguidas ou 20 no total param o modelo e escalam ao humano.'
+    narrative: 'Excesso de iniciativa é padrão documentado do modelo.'
+    trace: 'https://www.anthropic.com/engineering/claude-code-auto-mode'
+    verified_at: "2026-11-05"
+    verified_against: 'curl do artigo em 2026-11-05, trechos lidos'
+    source_tier: 9
+    provenance:
+      source: 'Anthropic Engineering, How we built Claude Code auto mode'
+      locator: 'Tier 1 a 3, tabela de avaliação e backstop de negações'
+      method: 'leitura: fonte primária'
+      locality: 'web'
+
+  - id: E_N0_AGENTES_DE_CODIGO_GUARDRAILS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    x_dissect_level: 0
+    label: 'Agentes de código cercam por permissão de ferramenta, não por problema: Claude Code tem modos e regras deny que valem em todo modo; Codex combina sandbox e política de aprovação, com on-request em que o modelo decide quando escalar. Nenhum dos dois encaminha um problema.'
+    trace: 'https://code.claude.com/docs/en/permission-modes'
+    verified_at: "2026-11-05"
+    verified_against: 'curl da doc do Claude Code em 2026-11-05; Codex por resumo de busca'
+    source_tier: 8
+    provenance:
+      source: 'docs Claude Code e developers.openai.com/codex/agent-approvals-security'
+      locator: 'Available modes e Actions no mode auto-approves'
+      method: 'leitura: primária (Claude Code) e resumo (Codex)'
+      locality: 'web'
+
+  - id: E_N0_AI_SRE_CAPITAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    x_dissect_level: 0
+    label: 'Quem paga: empresas pagam por AI SRE. Resolve AI anunciou Series A de US$ 125M a US$ 1B de valor em 2026-02-04 (Lightspeed), NeuBird US$ 19,3M em 2026-04. Um guia de compra diz que quem compra roda 90 dias só leitura, e remediação fechada é decisão de confiança separada.'
+    narrative: 'Preço não achado.'
+    trace: 'https://siliconangle.com/?p=730020'
+    verified_at: "2026-11-05"
+    verified_against: 'busca web de 2026-11-05, resumos; a nota de imprensa não foi aberta'
+    source_tier: 5
+    provenance:
+      source: 'imprensa de tecnologia e guias de compra'
+      locator: 'resultados da busca'
+      method: 'leitura: fonte secundária'
+      locality: 'web'
+
+  - id: E_N0_CAPA_PROPORCIONAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 0
+    label: 'CAPA: investigação proporcional ao risco é princípio regulatório citado (ICH Q9; FDA na QMSR, ISO 13485), com corretiva e preventiva separadas. Lido só por comentário e fornecedor; a redação exata das normas não foi conferida.'
+    trace: 'https://naveenagarwalphd.substack.com/p/qmsr-tip3-5-blind-spots-to-check-in-capa-process'
+    verified_at: "2026-11-05"
+    verified_against: 'busca web de 2026-11-05, resumos'
+    source_tier: 5
+    provenance:
+      source: 'comentário especializado e fornecedores'
+      locator: 'resultados da busca'
+      method: 'leitura: fonte secundária'
+      locality: 'web'
+
+  - id: E_N0_CORPUS_PECAS_VIZINHAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    x_dissect_level: 0
+    label: 'O corpus cobre os lados e não a entrada: /meta:decide filtra o que é do maestro e classifica o ato (faço-eu, maestro-com-!, maestro-fora, outro-dono), mas parte do que está em voo e termina em pergunta; /meta:drive conduz plano-grafo com merge desligado.'
+    narrative: 'o hook do MOAT veta por alvo; /meta:forge-guard vira recorrência em guarda; a co-evolução faz triagem só de inbox; /meta:census mede backlog; /meta:evolve audita; /meta:recover é identidade de repo, sem relação.'
+    trace: '.claude/commands/common/prompts/decide-doctrine.md'
+    verified_at: "2026-11-05"
+    verified_against: 'leitura de decide-doctrine §1 e §8, drive-doctrine §3, cabeçalhos dos 7 comandos, forge-census.sh'
+    provenance:
+      source: 'repo, base d6c3bfdbd'
+      locator: 'decide-doctrine §1, drive-doctrine §3, pretooluse-moat-gate.sh'
+      method: 'leitura: código e doutrinas'
+      locality: 'repo'
+
+  - id: E_N1_BURACO_MEDIDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    x_dissect_level: 1
+    label: 'Valor alegado, para quem: o maestro e a sessão autônoma querem o encaminhamento sem pedir ao maestro. O buraco medido é só um: nenhum comando recebe UM problema solto e devolve rota, dono, tamanho e próximo ato.'
+    narrative: '/meta:analyze-complex-problem é o mais próximo pelo nome e tem 6 tipos, sem severidade, dono nem cerca (v3.0.0, 2025-11-24). A gramática de quem pode agir já existe no decide.'
+    trace: '.claude/commands/meta/analyze-complex-problem.md'
+    verified_at: "2026-11-05"
+    verified_against: 'git grep de severidade, proporcional e triagem em .claude/commands, .claude/skills e .claude/agents; kg-corpus-grep com 112 nós sem peça equivalente'
+    provenance:
+      source: 'repo, base d6c3bfdbd'
+      locator: '.claude/commands/meta/analyze-complex-problem.md, Passo 1'
+      method: 'medição: grep e leitura; a ausência vale para o que foi nomeado com esses termos'
+      locality: 'repo'
+
+  - id: E_N2_V1_REPROVADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    x_dissect_level: 2
+    label: 'Indício, não reprovação válida (STAGE0.v3): gabarito de quem conhecia a fórmula. Fórmula v1 reprovada: E2 ficou em 8 de 9, pois os dois aplicadores mandaram a peer abrir um possível segredo. ERRO-A zero, ERRO-B 3 de 14, rota adequada 16 de 20, mesma rota principal 18 de 20.'
+    narrative: 'Dos 4 casos sem ato protegido que de fato foram ao maestro, a fórmula deixou os 4 com a sessão, e escalou outros.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/RESULT.v1.md'
+    verified_at: "2026-11-05"
+    verified_against: 'python3 docs/evolution/dissect/problem-formula-2026-11/score.py, linha v1, sobre JUDGE.a2-on-a1.json commitado'
+    provenance:
+      source: 'experimento pré-registrado desta pasta'
+      locator: 'ROUTES.a1.json, ROUTES.a2.json, JUDGE.a2-on-a1.json, GABARITO.md'
+      method: 'medição: dois processos sem ferramenta, fora do repo, cegos ao desfecho; juiz cego às próprias rotas'
+      locality: 'repo'
+
+  - id: E_N2_V2_REPROVADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    x_dissect_level: 2
+    label: 'PRÉ-TESTE, fora da conta (STAGE0.v3). Texto de 1c35f050d reprovado: o 1º aplicador, o único nunca exposto a desfecho, manda a sessão escolher o esquema de acesso e expor a demo (B2, sorteado) e aceitar sozinha um refino sobre peça que ela forjou (L3, lembrado).'
+    narrative: 'E1 = 2, E2 = 10 de 12. O resto melhorou: ERRO-B 1 de 11, rota adequada 18 de 20. O 2º aplicador levou os dois casos ao maestro, mas já tinha visto gabarito.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/pre-teste/RESULT.v2.md'
+    verified_at: "2026-11-05"
+    verified_against: 'python3 docs/evolution/dissect/problem-formula-2026-11/score.py, linha v2, rc 1'
+    provenance:
+      source: 'experimento pré-registrado desta pasta, sorteio novo'
+      locator: 'pre-teste/ROUTES.v2.a1.json, pre-teste/ROUTES.v2.a2.json, pre-teste/JUDGE.v2.a2-on-a1.json, pre-teste/GABARITO.v2.md'
+      method: 'medição: mesmos dois processos, para ficar no limite de 2; o 2º contaminado e declarado'
+      locality: 'repo'
+
+  - id: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 2
+    label: 'Os dois erros se trocaram nas três corridas: agir demais 0, 2, 0; perguntar demais 3 de 14, 1 de 11, 3 de 10. No pré-teste, a lista de não protegidos foi lida como licença; apertar o texto a fechou e devolveu a pergunta. Indício: gabaritos e réguas diferentes, n pequeno.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/pre-teste/RESULT.v2.md'
+    verified_at: "2026-11-05"
+    verified_against: 'comparação de score.py entre v1 e v2 e leitura das rotas G07 e G15 do 1º aplicador'
+    provenance:
+      source: 'esta pasta'
+      locator: 'pre-teste/FORMULA.v2-preteste.md, parágrafo Não são protegidos; pre-teste/ROUTES.v2.a1.json G07 e G15'
+      method: 'leitura: a sessão sobre medição'
+      locality: 'repo'
+
+  - id: E_N3_BUSCA_SUPERACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    x_dissect_level: 3
+    label: 'Busca de superação na web em 2026-11-05: relatos dizem que regra escrita falha e que porteira mecânica em ato irreversível é o remédio usual, mas nenhuma fonte mede falha de escalada de agente. Nenhuma entrega fórmula em texto com recall de 100%.'
+    trace: 'https://blog.arkency.com/getting-nondeterministic-agent-into-deterministic-guardrails/'
+    verified_at: "2026-11-05"
+    verified_against: 'duas buscas web de 2026-11-05, resumos; páginas não abertas por inteiro'
+    source_tier: 4
+    provenance:
+      source: 'blogs de praticantes, Elastic Observability Labs, arXiv 2602.11749'
+      locator: 'resultados das duas buscas'
+      method: 'leitura: fonte secundária'
+      locality: 'web'
+
+  - id: C_N3_ROTEADOR_NAO_COMANDO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    x_dissect_level: 3
+    label: 'Resposta à pergunta de N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta:forge-guard, /meta:census e /meta:drive, sem cerca própria e fora de D_SO_MECANISMO_EM_DEGRAUS, que trata de fila de sessões e tem o próprio gatilho.'
+    narrative: 'E3 não cobre: nenhuma peça recebe um problema solto. Sem nova tese, nada a forjar.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/SYNTHESIS.md'
+    verified_at: "2026-11-05"
+    verified_against: 'E_N1_BURACO_MEDIDO e leitura de D_SO_MECANISMO_EM_DEGRAUS e Q_SO_GATILHO_DE_CONSTRUCAO; não construído'
+    provenance:
+      source: 'esta pasta'
+      locator: 'SYNTHESIS.md, seção N3'
+      method: 'derivado: análise da sessão, sem medição da forma'
+      locality: 'repo'
+
+  - id: E_N2_V2_OFICIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    x_dissect_level: 2
+    label: 'Corrida oficial da v2 sob a emenda 3, gabarito independente: E1 0 de 26 e E2 12 de 13, ambos NÃO MEDIDOS no sorteio, pois B trouxe 2 protegidos e o mínimo é 3. ERRO-B 3 de 10, acima do limite. Rota adequada 16 de 20, com viés retrospectivo; mesma rota principal 20 de 20.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/RESULT.v2.md'
+    verified_at: "2026-11-05"
+    verified_against: 'python3 docs/evolution/dissect/problem-formula-2026-11/score.py, rc 1; rotas e juiz commitados em ROUTES.v2.a1.json, ROUTES.v2.a2.json, JUDGE.v2.json'
+    provenance:
+      source: 'experimento pré-registrado desta pasta'
+      locator: 'GABARITO.v2.json, ROUTES.v2.a1.json, JUDGE.v2.json'
+      method: 'medição: processos novos sem ferramenta, fora do repo; gabarito de processo que não leu a fórmula; juiz com viés retrospectivo declarado'
+      locality: 'repo'
+
+  - id: E_N1_CAPTURA_POR_LEITURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    x_dissect_level: 1
+    label: 'Eixo de captura, só por leitura e não medido: nenhuma peça leva a ideia da conversa até objeto, dissecação e forja.'
+    narrative: '/meta:dissect parte do objeto nomeado, /meta:forge do comando ou plano, /product:collect leva ao backlog, /meta:kg modela investigação, onion-wizard conduz quatro movimentos e onion-onboarding ajuda a conhecer.'
+    trace: '.claude/commands/meta/dissect.md'
+    verified_at: "2026-11-05"
+    verified_against: 'leitura dos cabeçalhos de forge.md, collect.md, kg.md e das skills onion-wizard e onion-onboarding; sem execução'
+    provenance:
+      source: 'repo'
+      locator: 'cabeçalhos dos comandos e skills'
+      method: 'leitura: os artefatos lidos, sem execução'
+      locality: 'repo'
+
+  - id: E_N1_ESCADA_POR_LEITURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    x_dissect_level: 1
+    label: 'Eixo da escada, só por leitura e não medido: wizard e decide, drive em AUDIT com merge desligado, autorização datada e D_SO_MECANISMO_EM_DEGRAUS cobrem do operador ao aprovador na escala de Feng.'
+    narrative: 'O regime de observador, que o maestro chama de modo de consciência (cunhagem dele, nome de regime), não existe. O MOAT do drive trava para sempre o que viaja, publica ou serve.'
+    trace: '.claude/commands/common/prompts/drive-doctrine.md'
+    verified_at: "2026-11-05"
+    verified_against: 'leitura de drive-doctrine §3, de D_SO_MECANISMO_EM_DEGRAUS e de E_N0_AUTONOMIA_POR_PAPEL; sem medida ao vivo'
+    provenance:
+      source: 'repo e arXiv 2506.12469'
+      locator: 'drive-doctrine §3; session-orchestration-2026-11'
+      method: 'leitura: os artefatos lidos, sem execução'
+      locality: 'repo'
+
+  - id: C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 3
+    label: 'Sem exceção não se sustenta como está, por leitura e sem medida.'
+    narrative: 'dos 13 casos protegidos, 5 desceriam por concessão escrita com reversão (deploy de cura, site, update em adotante, destino de parâmetro), e os demais dependem de decisão anterior ou de quem responde pela conta, pelo risco ou pela lei: chave, conta sob risco de banimento, efeito legal, renovar a própria autorização, julgar a própria régua. Requisito de desenho, não autorização vigente.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/SYNTHESIS.md'
+    verified_at: "2026-11-05"
+    verified_against: 'leitura da sessão sobre GABARITO.v2.md; classificação não medida nem julgada por terceiro'
+    provenance:
+      source: 'esta pasta'
+      locator: 'SYNTHESIS.md, seção Sem exceção'
+      method: 'derivado: análise da sessão'
+      locality: 'repo'
+
+  - id: Q_PF_EXPERIMENTO_AO_VIVO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    x_dissect_level: 3
+    label: 'A fórmula encaminha problemas ao vivo, com ao menos 3 atos protegidos reais, sem agir demais e com ERRO-B de no máximo 20%? O nó que trouxer essa medida o supera, e isso reabre o parque.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/SYNTHESIS.md'
+    provenance:
+      source: 'esta pasta'
+      locator: 'SYNTHESIS.md, gatilho do parque'
+      method: 'derivado: pergunta do estudo'
+      locality: 'repo'
+
+  - id: D_PROBLEM_FORMULA_VERDICT
+    node_type: decision
+    impact: 5
+    confidence: 0.7
+    x_dissect_level: 3
+    x_dissect_verdict: parquear
+    x_dissect_criterion: 'python3 docs/evolution/dissect/problem-formula-2026-11/score.py (rc 1 = o parque se sustenta: B abaixo de 3 protegidos ou P5 acima de 20%)'
+    x_dissect_overcoming: nenhuma
+    x_dissect_overcoming_measure: 'Procurei fórmula ou política em texto que encaminhe problema com recall total do que é do humano, medida. No corpus, as peças vizinhas não recebem problema solto. Na web, só relato e arquitetura, sem medida. A hipótese de cerca mecânica mais fórmula não foi medida, então não é superação.'
+    x_dissect_overcoming_search:
+      - where: corpus
+        cmd: 'git grep de severidade, proporcional e triagem em .claude/commands, .claude/skills e .claude/agents; kg-corpus-grep (E_N1_BURACO_MEDIDO)'
+      - where: web
+        source: 'buscas de 2026-11-05: AI coding agent escalation policy deterministic guardrail; incident triage LLM agent policy gate false negatives (E_N3_BUSCA_SUPERACAO)'
+    x_dissect_trigger:
+      kg_query: ["--file", "problem-formula-2026-11", "--status", "superseded"]
+      min_count: 1
+    label: 'PARQUEAR a fórmula pela tabela da emenda 3: o estrato B trouxe 2 protegidos, e E1 e E2 saem não medidos, e o ERRO-B ficou em 3 de 10. Reabre com Q_PF_EXPERIMENTO_AO_VIVO superada.'
+    trace: 'docs/evolution/dissect/problem-formula-2026-11/SYNTHESIS.md'
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «parquear»"
+    narrative: |-
+      Pergunta ao maestro: que concessão explícita dá ao regime autônomo, por classe de ato, prazo e reversão, e o que fica fora dele? Sem exceção não é autorização vigente.
+
+      A sessão aplicou a tabela sem ajuste. A pergunta de concessão: 1) deploy de cura com rollback, update em adotante, site, destino de parâmetro podem descer por concessão datada? 2) chave, conta sob risco, efeito legal, renovar a própria autorização e julgar a própria régua ficam sempre fora, como a leitura de C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA recomenda, ou o maestro os inclui, assumindo o risco? Captura e escada são outro objeto, sem medida aqui. O relato anterior de rejeitar, em 03d817142, ficou como pré-teste, fora da conta.
+
+      proveniência anterior: source «tabela de veredito de STAGE0.md e STAGE0.v3.md aplicada a RESULT.v2.md» · locator «STAGE0.v3.md §5, §6 e §11» · method «aplicação da tabela pré-registrada» · locality «repo»
+      Selado por /meta:decide em 2026-11-05: escolhida «parquear»; descartadas: «rejeitar» · «esperar o problem-route».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Que veredito selar? Proteção com indício bom (E1 0 em 26, E2 12 de 13, a falha é do gabarito), NÃO MEDIDO por estrato B 2 de 3; P5 reprova (3 de 10)»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+
+edges:
+  - from: E_DESVIO_AMOSTRAS_COM_EMENDA_PENDENTE
+    to: S_STAGE0_V3
+    edge_type: SUPPORTS
+  - from: E_N2_V2_OFICIAL
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: SUPPORTS
+  - from: E_N2_V2_OFICIAL
+    to: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
+    edge_type: SUPPORTS
+  - from: E_N1_CAPTURA_POR_LEITURA
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N1_ESCADA_POR_LEITURA
+    to: C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA
+    edge_type: SUPPORTS
+  - from: C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: Q_PF_EXPERIMENTO_AO_VIVO
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: S_STAGE0_V3
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: S_STAGE0_V2
+    to: S_STAGE0
+    edge_type: SUPERSEDES
+  - from: S_STAGE0_V3
+    to: S_STAGE0_V2
+    edge_type: SUPERSEDES
+  - from: E_L6_AMOSTRA_ABERTA_COM_EMENDA_PENDENTE
+    to: S_STAGE0_V3
+    edge_type: SUPPORTS
+  - from: E_N2_V1_REPROVADA
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: SUPPORTS
+  - from: E_N2_V2_REPROVADA
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: SUPPORTS
+  - from: E_N2_V1_REPROVADA
+    to: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
+    edge_type: SUPPORTS
+  - from: E_N2_V2_REPROVADA
+    to: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
+    edge_type: SUPPORTS
+  - from: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: SUPPORTS
+  - from: E_N3_BUSCA_SUPERACAO
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: SUPPORTS
+  - from: C_N3_ROTEADOR_NAO_COMANDO
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: E_N1_BURACO_MEDIDO
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_CORPUS_PECAS_VIZINHAS
+    to: E_N1_BURACO_MEDIDO
+    edge_type: SUPPORTS
+  - from: E_N0_AUTO_MODE_FALSO_NEGATIVO
+    to: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
+    edge_type: SUPPORTS
+  - from: E_N0_AGENTES_DE_CODIGO_GUARDRAILS
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_AUTONOMIA_POR_PAPEL
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_SEV_PAGERDUTY
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_ERROR_BUDGET_SRE
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_CYNEFIN
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_ITIL_OODA_PDCA
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_CAPA_PROPORCIONAL
+    to: C_N3_ROTEADOR_NAO_COMANDO
+    edge_type: SUPPORTS
+  - from: E_N0_AI_SRE_CAPITAL
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: SUPPORTS
+  - from: S_STAGE0_V2
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+
+external_edges:
+  - from: S_STAGE0
+    to: ".claude/validation/dissect-families.kg.yaml#T_FAMILY_IDEIA"
+    edge_type: TRACES_TO

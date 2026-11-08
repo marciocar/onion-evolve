@@ -1,0 +1,1 @@
+(^|[[:space:];&|(`])(source|\.)[[:space:]]+[^[:space:];&|`]*\.env([^[:alnum:]_.-]|$)|(^|[;&|(`])[[:space:]]*set[[:space:]]+(-[[:alpha:]]*a[[:alpha:]]*|-o[[:space:]]+allexport)([[:space:];`)]|$)

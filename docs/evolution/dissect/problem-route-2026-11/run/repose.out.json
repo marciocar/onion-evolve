@@ -1,0 +1,191 @@
+[
+ {
+  "file": "B-008.txt",
+  "key": "docs/evolution/review/fix-hooks-python-isolated.md",
+  "queue": "B",
+  "pos": 8,
+  "motivo": "reposto que caiu em F-VALOR: cota cheia"
+ },
+ {
+  "file": "B-010.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md",
+  "queue": "B",
+  "pos": 10,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "B-017.txt",
+  "key": "docs/evolution/review/fix-kg-index-atomic-and-old-vendor-warn.md",
+  "queue": "B",
+  "pos": 17,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "B-019.txt",
+  "key": "docs/evolution/review/drive-open-threads-batch2.md",
+  "queue": "B",
+  "pos": 19,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "B-020.txt",
+  "key": "docs/evolution/review/chore-compliance-fictional-vendor.md",
+  "queue": "B",
+  "pos": 20,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "B-021.txt",
+  "key": "docs/evolution/inbox/_processed/2026-06-24-sinal-branching-trunk-based-vs-develop.md",
+  "queue": "B",
+  "pos": 21,
+  "motivo": "reposto que caiu em F-VALOR: cota cheia"
+ },
+ {
+  "file": "B-022.txt",
+  "key": "docs/evolution/review/docs-free-meta-factory-private-pointers.md",
+  "queue": "B",
+  "pos": 22,
+  "motivo": "reposto que caiu em F-VALOR: cota cheia"
+ },
+ {
+  "file": "B-023.txt",
+  "key": "docs/evolution/review/chore-register-<adotante>.md",
+  "queue": "B",
+  "pos": 23,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "B-024.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher.md",
+  "queue": "B",
+  "pos": 24,
+  "motivo": "duplicata: Duplica Q_COORD_DECIDIR_VIGIA_DE_EVENTOS, da USED: a proposta do vigia de eventos."
+ },
+ {
+  "file": "B-028.txt",
+  "key": "docs/evolution/review/chore-acolher-<adotante>-logto-d5.md",
+  "queue": "B",
+  "pos": 28,
+  "motivo": "reposto que caiu em F-VALOR: cota cheia"
+ },
+ {
+  "file": "FF-032.txt",
+  "key": "docs/evolution/review/feat-meta-realign-phase1.md",
+  "queue": "FF",
+  "pos": 32,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-033.txt",
+  "key": "docs/evolution/review/docs-decide-2026-11-03-r3.md",
+  "queue": "FF",
+  "pos": 33,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-034.txt",
+  "key": "docs/evolution/review/chore-coord-seal-4380.md",
+  "queue": "FF",
+  "pos": 34,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-035.txt",
+  "key": "docs/evolution/review/chore-queue-kg-ssot-signals-triage.md",
+  "queue": "FF",
+  "pos": 35,
+  "motivo": "reposto que caiu em F-VALOR: cota cheia"
+ },
+ {
+  "file": "FF-036.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.21.0.md",
+  "queue": "FF",
+  "pos": 36,
+  "motivo": "reposto que caiu em F-VALOR: cota cheia"
+ },
+ {
+  "file": "FF-037.txt",
+  "key": "docs/evolution/review/fix-kg-index-atomic-and-old-vendor-warn.md",
+  "queue": "FF",
+  "pos": 37,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-038.txt",
+  "key": "docs/evolution/review/docs-dissect-intelligent-ui.md",
+  "queue": "FF",
+  "pos": 38,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-039.txt",
+  "key": "docs/evolution/review/fix-bridge-wrappers-unmeasured-rc.md",
+  "queue": "FF",
+  "pos": 39,
+  "motivo": "reposto que caiu em F-PASSA: cota cheia"
+ },
+ {
+  "file": "FF-040.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.39.0.md",
+  "queue": "FF",
+  "pos": 40,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-042.txt",
+  "key": "docs/evolution/review/fix-catraca-duas-portas.md",
+  "queue": "FF",
+  "pos": 42,
+  "motivo": "duplicata: Duplica a dívida declarada em FR-002: git mv para fixtures/ esvazia o baseline, e REMOVIDO é SOFT."
+ },
+ {
+  "file": "FF-043.txt",
+  "key": "docs/evolution/inbox/_processed/2026-07-19-kg-guards-id-language-and-label-collision.md",
+  "queue": "FF",
+  "pos": 43,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-044.txt",
+  "key": "docs/evolution/review/chore-compliance-fictional-vendor.md",
+  "queue": "FF",
+  "pos": 44,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-045.txt",
+  "key": "docs/evolution/review/feat-audit-evidence-expiry.md",
+  "queue": "FF",
+  "pos": 45,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-046.txt",
+  "key": "docs/evolution/review/chore-kg-ssot-4.42.0.md",
+  "queue": "FF",
+  "pos": 46,
+  "motivo": "sem problema: Atualização de vendor; a única hipótese foi refutada."
+ },
+ {
+  "file": "FF-047.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-08-rebase-merge-breaks-kg-provenance.md",
+  "queue": "FF",
+  "pos": 47,
+  "motivo": "reposto que caiu em N: cota cheia"
+ },
+ {
+  "file": "FF-048.txt",
+  "key": "docs/evolution/review/fix-radar-maestro-decision-in-dev.md",
+  "queue": "FF",
+  "pos": 48,
+  "motivo": "reposto que caiu em F-PASSA: cota cheia"
+ },
+ {
+  "file": "FF-050.txt",
+  "key": "docs/evolution/inbox/_processed/2026-10-09-dissect-census-ignores-quoted-dates.md",
+  "queue": "FF",
+  "pos": 50,
+  "motivo": "reposto que caiu em N: cota cheia"
+ }
+]

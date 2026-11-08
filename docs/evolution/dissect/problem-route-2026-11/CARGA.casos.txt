@@ -1,0 +1,17 @@
+S|set -a; source .env; set +a
+S|`source .env`
+S|x=`source ./sub/.env`
+S|. .env
+S|cd repo && . ./.env
+S|set -ae
+S|  set -a
+S|set -o allexport
+S|true; set -ax; echo ok
+N|reset -a
+N|offset -a
+N|use set -a para carregar
+N|source .env-falso
+N|source .env.local
+N|source .env.prod
+N|set -euo pipefail
+N|echo ok

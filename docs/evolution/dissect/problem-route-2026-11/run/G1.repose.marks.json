@@ -1,0 +1,246 @@
+[
+ {
+  "arquivo": "FF-032.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Corrigir o binding-drift para enxergar SUPPORTS de entrada e criar a fixture de regressão",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«3 falsos-positivos num só grafo audit... decisões que são ALVO de evidence SUPPORTS decision... eram marcadas nó solto»."
+ },
+ {
+  "arquivo": "FF-033.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Reescrever o rótulo da decisão para dizer a decisão selada",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«o rótulo... seguia DECISÃO ABERTA depois do selo... e quem lia o rótulo concluía errado»."
+ },
+ {
+  "arquivo": "FF-034.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Inserir o nó novo antes da chave edges: de linha inteira",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Arquivar em _processed/ o sinal original com a triagem, declarando que não é idêntico",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«A inserção do nó novo procurou a chave edges: e casou com external_edges:»; o sinal «não era byte a byte igual ao de _processed/»."
+ },
+ {
+  "arquivo": "FF-035.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Selar as decisões da triagem (gate chama o validador, migração em ondas, Brain MCP)",
+    "dono": "sessão",
+    "item": "valor",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Pôr o predicado de fixture nas REGRAS 78 e 82 e corrigir o trace repetido",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«REGRA 78 e REGRA 82 varrem git ls-files sem o predicado de fixture»; «Decisões seladas... selada pelo maestro por pergunta»."
+ },
+ {
+  "arquivo": "FF-036.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Ligar o kg_criterion.py check ao gate do CI",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Corrigir no vendor o sha256 numérico que deixa de contar como critério",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   },
+   {
+    "ato": "Rodar o kg_migrate nest no corpus",
+    "dono": "sessão",
+    "item": "valor",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«a régua editada no lugar só é pega pelo kg_criterion.py check»; «Fail-open do VENDOR... Reportado à sessão par»; «o kg_migrate nest não rodou no corpus (decisão do maestro)»."
+ },
+ {
+  "arquivo": "FF-038.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Trocar node_type: action por claim nos nós de plano",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«Os nós de plano nasceram com node_type: action, que a gramática não tem»."
+ },
+ {
+  "arquivo": "FF-040.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Recuperar o marcador e o teto no meta: do r5",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Encurtar os 13 labels do r5 acima de 280 caracteres",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "O meta: «recupera o # kg-backlog-guard: on e o TETO»; «13 dos 15 labels do r5 passam de 280 caracteres»."
+ },
+ {
+  "arquivo": "FF-042.txt",
+  "pulo": "duplicata",
+  "pulo_motivo": "Duplica a dívida declarada em FR-002: git mv para fixtures/ esvazia o baseline, e REMOVIDO é SOFT.",
+  "atos": [],
+  "falso_alarme": false,
+  "razao": "FR-002: «git mv para qualquer pasta fixtures/ esvazia o baseline em lote» e «REMOVIDO como SOFT»."
+ },
+ {
+  "arquivo": "FF-043.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Ancorar os campos no parser do kg-radar, com aviso para label que contenha token de campo",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Escrever na KB do SDAAL a regra de ids em inglês e labels em pt-BR",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«o conteúdo virou configuração... Radar exit 1, grafo quebrado, e eu já tinha pushado»; «a doutrina do KG e o schema não dizem nada»."
+ },
+ {
+  "arquivo": "FF-045.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Fazer o radar avisar STALE-EXPIRED e cadência malformada, fail-closed",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«Um leitor que sai com rc≠0 e stderr vazio... o radar morria com rc 1 e saída zero»; «O --due descarta calado a cadência fora da forma»."
+ },
+ {
+  "arquivo": "FF-046.txt",
+  "pulo": "sem problema",
+  "pulo_motivo": "Atualização de vendor; a única hipótese foi refutada.",
+  "atos": [],
+  "falso_alarme": false,
+  "razao": "«findings_real: 0... nada no core fora do vendor lê esse schema»."
+ },
+ {
+  "arquivo": "FF-047.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Criar a guarda de que todo @sha da provenance é ancestral da base",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Fazer o pr-merge-verified exigir --merge-commit quando o PR cita commit da própria branch",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«6 provenance na main apontavam para commits fora da main... Nenhum gate acusou»."
+ },
+ {
+  "arquivo": "FF-048.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Tirar do aviso decision-done-em-DEV a decisão selada pelo maestro",
+    "dono": "sessão",
+    "item": "enfraquecer",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«Não havia como selar uma decisão do maestro sem cair num dos dois»; cura por «decisão do maestro: o radar aceita a decisão do maestro em DEV»."
+ },
+ {
+  "arquivo": "FF-050.txt",
+  "pulo": null,
+  "pulo_motivo": null,
+  "atos": [
+   {
+    "ato": "Aceitar aspas opcionais nos dois sed do censo e criar o caso na bancada",
+    "dono": "sessão",
+    "item": "nenhum",
+    "podia_fechar": true
+   },
+   {
+    "ato": "Atualizar o Onion no adotante para o censo ler o x_dissect_tool",
+    "dono": "outra sessão",
+    "item": "nenhum",
+    "podia_fechar": false
+   }
+  ],
+  "falso_alarme": false,
+  "razao": "«Toda dissecação nova escrita conforme a gramática perde o frescor no censo»; «o censo local fica cego a ele até o próximo update»."
+ }
+]

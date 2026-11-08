@@ -1,0 +1,607 @@
+meta:
+  id: problem-route-2026-11
+  schema_version: "1"
+  x_dissect_tool: problem-route
+  x_dissect_against: onion
+  x_dissect_family: ideia
+  x_study_destination: core
+  baseline: "2026-11-05"
+  review_after: "2026-12-05"
+  x_who_pays: 'Ninguém paga por este roteador hoje, e ele não abre via de bilhetagem: é mecanismo interno. Custo é o orçamento de tokens do STAGE0.md §7.'
+  x_unverified:
+    - 'N3 (viabilidade) não rodou: a tabela parou em N2.'
+    - 'CERCA.md foi medida por leitura; a repetição pelo hook é a etapa R, ainda não rodada.'
+    - 'As flags dos processos saíram de claude --help, sem rodar.'
+    - 'Tamanho da fila FV depois de USED.txt: não medido.'
+    - 'Alcance de SessionStart em subagente, com clear e resume: só leitura de anexos; a sessão de teste é do portão b1.'
+    - 'Carga do .env com impressão: não medida, por defeito do padrão da contagem.'
+    - 'As quatro fontes da curadoria e a medida 839 e 619: não conferidas.'
+  # kg-backlog-guard: on
+  # ═══ TETO: 30 NÓS ═══
+
+nodes:
+
+  - id: S_STAGE0
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Etapa 0 da dissecação de problem-route, pré-registrada antes do N0: cerca em mecanismo mais fórmula só como rota, com ROTA.v1.md congelada, gabarito independente e braço de controle."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo do commit do plano"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "1"
+      registered_at: "2026-11-05T15:46:37+00:00"
+      sha256: "9dc28b0dec55357ad0b791f241b0d12658bda6ef29e6d522faae1090b0785f85"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.md
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.md"
+      locator: "commit do plano"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: S_STAGE0_V2
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 2 da Etapa 0, antes de abrir a amostra: desenho ao vivo da curadoria, com aplicadores cegos pela arquitetura, dois juízes cegos à rota, unidade por fechamento e dependência, linha de base e portão checável."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v2.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "2"
+      registered_at: "2026-11-05T15:50:37+00:00"
+      sha256: "3a89ef116e92398d582ffe3711e70d0564f07f554df2b92638bd591035151e6d"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v2.md
+      amends: S_STAGE0
+      reason: "A curadoria propôs medir ao vivo por arquitetura, e a sessão principal aceitou; o ao vivo em modo sombra não mede a sessão real."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v2.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: S_STAGE0_V3
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 3 da Etapa 0, com nada rodado: três portões em sequência, dependência e fechamento amostrados à parte, censo de ERRO-A, script de dano, concessão depois da janela, só o core na lista, e a fronteira da carga operacional de segredo."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v3.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "3"
+      registered_at: "2026-11-05T16:30:29+00:00"
+      sha256: "9da7b1979cab86cff596799cd6dab3f856be01b180222e13c6ddfd06a98e3fb8"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v3.md
+      amends: S_STAGE0_V2
+      reason: "A curadoria não aprovou 053daab37, por seis bloqueios, e a sessão principal aceitou a revisão inteira."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v3.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: S_STAGE0_V4
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 4 da Etapa 0, com nada rodado: parada por volta atrás 2, forma V ou taxa, gabarito só com hook e rc, carga do arquivo de ambiente fora de (a), lista de um caminho, ponteiro de memória antes de (b1), falso positivo com troca de forma."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v4.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "4"
+      registered_at: "2026-11-05T18:49:23+00:00"
+      sha256: "7b5f05de8235c1d4ca184f10a05fd1894fefd1a3971de35a01f2c3e7ff068841"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v4.md
+      amends: S_STAGE0_V3
+      reason: "A curadoria não aprovou 5ffb211f2, por cinco bloqueios, e a sessão principal aceitou os bloqueios e as respostas A, B e C."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v4.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: E_ENV_GUARD_FALSO_POSITIVO_HEREDOC_1105
+    node_type: evidence
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.9
+    label: 'O guarda do arquivo de ambiente barrou um heredoc de Python do escritor do plano que só citava o nome do arquivo em texto de documento; depois do bloqueio nenhum arquivo de ambiente foi aberto e nada dele apareceu. Falso positivo e troca de ferramenta, não contorno.'
+    narrative: 'Fora da janela, fora de J1 e J2.'
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v3.md"
+    verified_at: "2026-11-05"
+    verified_against: "transcrito da sessão do escritor do plano: o comando barrado e a escrita seguinte pela ferramenta de escrita"
+    provenance:
+      source: "sessão do escritor do plano, 2026-11-05"
+      locator: "STAGE0.v3.md §8 e STAGE0.v4.md §6"
+      method: 'medição: observação do próprio bloqueio, julgada pela regra por efeito da emenda 4'
+      locality: "repo"
+
+  - id: S_STAGE0_V5
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 5 da Etapa 0, com nada rodado: o estudo é só o portão (a), com teto em parquear; troca de forma só sob o mesmo hook; classe C só por rc 2 do hook; carga do arquivo de ambiente sem a condição iv; arquivos vigentes com sha256 no grafo."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v5.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "5"
+      registered_at: "2026-11-05T18:55:40+00:00"
+      sha256: "69eea56910ad3ee2dc0246d58fd5ebc38fe7de7b91f18d78a6c293b393d2c6f9"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v5.md
+      amends: S_STAGE0_V4
+      reason: "A curadoria revisou 788541b54 e pediu cinco curas de texto; a sessão principal as aceitou e limitou o estudo ao portão (a)."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v5.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: A_ROTA_V4
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Rota vigente para A1 e A2: ROTA.v4.md, conferida pelo portão checável da emenda 5."
+    trace: "docs/evolution/dissect/problem-route-2026-11/ROTA.v4.md"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 5"
+    x_sha256: "8d1775ee61ce88b512e939642eddb2505312428c6c4ff03f9652aa2a683363e5"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/ROTA.v4.md"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_CERCA_V3
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Cerca vigente para G1, G2 e o script de classe: CERCA.v3.md, conferida pelo portão checável da emenda 5."
+    trace: "docs/evolution/dissect/problem-route-2026-11/CERCA.v3.md"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 5"
+    x_sha256: "8dd32ac5ce8c8659a2811ba48526a2f0f736de9ed7fc05a653078d182098b72c"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/CERCA.v3.md"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: S_STAGE0_V6
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 6 da Etapa 0, com nada rodado: classe própria para ato de outro dono, classe C derivada depois das fichas com execução do hook fixada e arquivo de ambiente falso, exclusão por regex fixo antes de classificar, portão de integridade ampliado."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v6.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "6"
+      registered_at: "2026-11-05T19:03:42+00:00"
+      sha256: "bad5f95ed285d540e11176ecfa5468f9a29659aa24fce528175d248f043108bf"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v6.md
+      amends: S_STAGE0_V5
+      reason: "A curadoria revisou a2109cb51 e pediu três curas de texto e condução da parte em papel; a sessão principal as aceitou."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v6.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: A_ROTA_V5
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Rota vigente para A1 e A2: ROTA.v5.md, conferida pelo portão de integridade da emenda 6."
+    trace: "docs/evolution/dissect/problem-route-2026-11/ROTA.v5.md"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 6"
+    x_sha256: "5f5d5c514e71222592868935c9930f7662c9e280053f994045f6b6ca94d5bcba"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/ROTA.v5.md"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_FORMULA_V2
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Fórmula do braço de controle C1 e C2: FORMULA.v2.md do estudo anterior, conferida pelo portão de integridade da emenda 6."
+    trace: "docs/evolution/dissect/problem-formula-2026-11/FORMULA.v2.md"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 6"
+    x_sha256: "e004f97747236e2b0601a1b6b577def0a940805a3c3eb09296e42dde25a1fa7c"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/FORMULA.v2.md"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: S_STAGE0_V7
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 7 da Etapa 0, com nada rodado: reposição por classe com o mesmo pipeline, classe O antes de C e com teto, hook do provedor fora da classe C, os quatro hooks com env -i, regex de carga fixo em arquivo, portão de integridade ampliado."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v7.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "7"
+      registered_at: "2026-11-05T19:09:47+00:00"
+      sha256: "26c3def031d90f312376921582184b2eaff1ec85b2b721481ac52fde3f7952a7"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v7.md
+      amends: S_STAGE0_V6
+      reason: "A curadoria revisou 9a10c3355 e pediu três curas de condução; a sessão principal as aceitou."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v7.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+
+  - id: A_CERCA_V4
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Cerca vigente para G1, G2, a etapa R e o script de classe: CERCA.v4.md, conferida pelo portão de integridade da emenda 7."
+    trace: "docs/evolution/dissect/problem-route-2026-11/CERCA.v4.md"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 7"
+    x_sha256: "4b019fc1c6f319e07cb03c5f98a8e655c6a8793b34c5cdd129152e2c35d580fa"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/CERCA.v4.md"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_USED
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Lista de exclusão dos casos já usados: USED.txt, conferida pelo portão de integridade da emenda 7."
+    trace: "docs/evolution/dissect/problem-route-2026-11/USED.txt"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 7"
+    x_sha256: "e406cf6104ccdd248f1d182d1e2ef495a1d7e23d27aefb475de1a893afca0f52"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/USED.txt"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_CARGA_REGEX
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Regex fixo da exclusão por carga do arquivo de ambiente, lido por grep -E -f: CARGA.regex."
+    trace: "docs/evolution/dissect/problem-route-2026-11/CARGA.regex"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 7"
+    x_sha256: "170d7fac37fe291ccb2fb31346344ce2cf27c2970c5ace89ce241b82ac2e0bd5"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/CARGA.regex"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_CARGA_CASOS
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "As 17 linhas sintéticas que conferem o regex de carga: CARGA.casos.txt."
+    trace: "docs/evolution/dissect/problem-route-2026-11/CARGA.casos.txt"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit da emenda 7"
+    x_sha256: "0b6e9a39e733d50ce17c98ce4f3f70da79d34f0efb49a51ed930944b644d25e6"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/CARGA.casos.txt"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: S_STAGE0_V8
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Emenda 8 da Etapa 0, com nada rodado: a precedência vale no ato e entre os atos de um caso, e sete limites declarados pela curadoria."
+    trace: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
+    verified_at: "2026-11-05"
+    verified_against: "kg_criterion.py digest sobre o arquivo"
+    x_criterion:
+      id: PROBLEM_ROUTE_STAGE0
+      version: "8"
+      registered_at: "2026-11-05T19:14:30+00:00"
+      sha256: "56f8ccd5016d40a00590f762d882531815694a28f111a5ae6e5506f452e8378e"
+      ref: docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md
+      amends: S_STAGE0_V7
+      reason: "A curadoria fecha o plano com uma frase de precedência e sete limites; a sessão principal aceitou."
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
+      locator: "arquivo inteiro"
+      method: "medição: kg_criterion.py digest sobre o arquivo"
+      locality: "repo"
+  - id: D_PROBLEM_ROUTE_RODAR_PAPEL_1105
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «Rodar depois da persona»"
+    label: "O maestro manda rodar a parte em papel do problem-route depois da pesquisa da persona, em série"
+    narrative: "Selado por /meta:decide em 2026-11-05: escolhida «Rodar depois da persona»; descartadas: «Rodar já» · «Não rodar agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Rodar a parte em papel (39 casos, ~2,4 M tokens, teto parquear)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+
+  - id: E_N0N1_E3_NAO_COBRE
+    node_type: evidence
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.8
+    label: "N0 e N1 do problem-route: veto determinístico mais roteador existe como recomendação, sem medida de encaminhamento com gabarito (1 de 10 buscas); nenhuma peça invocável do core recebe um problema solto e diz quem age e qual ato é do maestro. E3 não cobre, por leitura do condutor."
+    trace: "docs/evolution/dissect/problem-route-2026-11/N0N1.md"
+    verified_at: "2026-11-05"
+    verified_against: "git grep em origin/main 3f09996ab sobre .claude/commands, skills e agents; 1 busca web"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/N0N1.md"
+      locator: "arquivo inteiro"
+      method: "medição: git grep; busca web com tier por fonte"
+      locality: "repo"
+
+  - id: A_SAMPLE_PY
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Sorteio da parte em papel: filas FR, FF, FV, B e A em ordem de rank sobre a árvore de 5773269bc, menos USED.txt e as citações do estudo; materializa os candidatos fora do repo."
+    trace: "docs/evolution/dissect/problem-route-2026-11/sample.py"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit (c), antes de (d)"
+    x_sha256: "87def3a0d760304259f871d1793b8ffb49317ceda986274957e581f8cfc16ce1"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/sample.py"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_SCORE_PY
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Aceite por cota, classe por caso (G1, G2 e hook, com a precedência fixada) e pontuação com a tabela de veredito, na precedência da emenda 6."
+    trace: "docs/evolution/dissect/problem-route-2026-11/score.py"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit (c), antes de (d)"
+    x_sha256_c: "4123bf7b75eaf8f7300c342d54556545c269978b89178fddcab2ed724a49a0bc"
+    x_changed_after_c: "busca da marca de G1 pela chave do item, não pelo nome na fila (bug); regras iguais; DESVIOS.md item 7"
+    x_sha256: "e9f0049703dcea43cd11d2fe7a68ca1f1111c82c5d1e1c19d4cea0ba34eba2fd"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/score.py"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_CARGA_SH
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Script que aplica CARGA.regex pelo grep GNU do sistema, por caminho absoluto, com -E -f, linha a linha, gravando o --version; selftest de 17 de 17 linhas sintéticas."
+    trace: "docs/evolution/dissect/problem-route-2026-11/carga.sh"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit (c), antes de (d)"
+    x_sha256: "58d20f2ddf142030983640d67c4ec2e64cc39471e90cd02a7a63a32fa46db675"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/carga.sh"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_HOOK_EXEC_PY
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Executor do hook: os quatro hooks em worktree descartável de origin/main, com env -i e variáveis gravadas; o comando nunca executa; inclui a etapa R."
+    trace: "docs/evolution/dissect/problem-route-2026-11/hook_exec.py"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit (c), antes de (d)"
+    x_sha256: "a627a021f504d6bb9f68d7a0aba5696af9aa22969deb2c0d597522aa2a9a5deb"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/hook_exec.py"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: A_MANIFEST
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1.0
+    label: "Manifesto com sha256 do portão de integridade, do montador de prompts, do lançador de processos, dos cinco prompts e do registro da etapa R; o gate.py confere cada linha."
+    trace: "docs/evolution/dissect/problem-route-2026-11/MANIFEST.sha256"
+    verified_at: "2026-11-05"
+    verified_against: "sha256sum do arquivo no commit (c), antes de (d)"
+    x_sha256: "557f4ac12ee23726f76b2c20714526043a57aa682c7986bf65858c9c28bdfbe8"
+    provenance:
+      source: "docs/evolution/dissect/problem-route-2026-11/MANIFEST.sha256"
+      locator: "arquivo inteiro"
+      method: "medição: sha256sum"
+      locality: "repo"
+
+  - id: D_PROBLEM_ROUTE_PAPER_VERDICT
+    node_type: decision
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 2
+    x_dissect_verdict: rejeitar
+    x_dissect_criterion: 'python3 docs/evolution/dissect/problem-route-2026-11/score.py score <pasta com os JSON de run/> (rc 2 = rejeitar, rc 1 = parquear, rc 0 = perseguir)'
+    x_dissect_overcoming: nenhuma
+    x_dissect_overcoming_measure: "procurado em 2026-11-05 na main 40fe1629d: o caso que reprova (fechar uma pergunta duplicada noutro grafo) é decisão de valor, sem forma de comando que um hook reconheça; nenhum hook do core julga decisão de valor, e as forjas em curso (feat/guard-deploy-acts, feat/guard-memory-write, feat/guard-adopter-vetoes) cobrem atos com forma, não valor, e não estão na main. A FORMULA.v2 (controle) erra no mesmo caso. Nenhuma peça entrega hoje o que a rota prometia."
+    label: 'SELADO pelo maestro em 2026-11-05: REJEITAR a ROTA.v5 pela tabela da Etapa 0. E1 = 2 em A1 e em A2, num caso sem divergência G1/G2 e sem contestação (P22: fechar uma pergunta duplicada noutro grafo, decisão de valor pelo gabarito). O controle (FORMULA.v2) erra no mesmo caso.'
+    trace: "docs/evolution/dissect/problem-route-2026-11/RESULT.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-05"
+    verified_against: "decisão do maestro em 2026-11-05, por pergunta com opções (/meta:decide): escolhida «rejeitar, pelo pré-registro: o caso FR-016, sem divergência entre os dois gabaritos, dá ERRO-A nos dois aplicadores da rota; score.py com rc 2, reproduzido pela sessão principal. Observação do maestro: as forjas foram idealizadas para forjar a maquinaria completa do Onion; a proteção sai pelo /meta:forge e pelo /meta:forge-guard com as 7 peças, não por regra em texto. A discordância do condutor (parquear por defeito de instrumento) fica registrada no RESULT»"
+    narrative: |-
+      P6 empata (ERRO-B 7 contra 7), a cerca não foi exercida (T = 0, C = 0), e F-FATO, C, P4, P5, P1 e P3 ficam abaixo do denominador. O condutor registra à parte a leitura de parquear por instrumento.
+
+      Pergunta ao maestro: selar rejeitar (a tabela) ou parquear (a leitura de instrumento do condutor: o caso que rejeita a rota rejeita também a fórmula, P6 empata e o hook não foi exercido no papel)? Com parquear, o gatilho proposto é um instrumento com C ≥ 5, fichas com linha de comando que o hook barra. Custo: 2.865.976 tokens em 9 processos; teto subido pelo maestro para 4,5 M às 20:50 UTC, com 2,58 M gastos.
+
+      verified_against anterior: «score.py score sobre run/, rc 2; juízo cego de 132 rotas»
+      proveniência anterior: source «docs/evolution/dissect/problem-route-2026-11/run/score.json» · locator «veredito e motivo» · method «aplicação da tabela pré-registrada por score.py» · locality «repo»
+      Selado por /meta:decide em 2026-11-05: escolhida «rejeitar, pelo pré-registro: o caso FR-016, sem divergência entre os dois gabaritos, dá ERRO-A nos dois aplicadores da rota; score.py com rc 2, reproduzido pela sessão principal. Observação do maestro: as forjas foram idealizadas para forjar a maquinaria completa do Onion; a proteção sai pelo /meta:forge e pelo /meta:forge-guard com as 7 peças, não por regra em texto. A discordância do condutor (parquear por defeito de instrumento) fica registrada no RESULT»; descartadas: «parquear por defeito de instrumento» · «pedir leitura da curadoria antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-05: «Que veredito selar na parte em papel do problem-route?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
+      locality: "pessoa"
+
+edges:
+  - from: D_PROBLEM_ROUTE_PAPER_VERDICT
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+  - from: D_PROBLEM_ROUTE_PAPER_VERDICT
+    to: D_PROBLEM_ROUTE_RODAR_PAPEL_1105
+    edge_type: TRACES_TO
+  - from: E_N0N1_E3_NAO_COBRE
+    to: D_PROBLEM_ROUTE_PAPER_VERDICT
+    edge_type: SUPPORTS
+  - from: A_SAMPLE_PY
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+  - from: A_SCORE_PY
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+  - from: A_CARGA_SH
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+  - from: A_HOOK_EXEC_PY
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+  - from: A_MANIFEST
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+  - from: E_N0N1_E3_NAO_COBRE
+    to: S_STAGE0_V8
+    edge_type: SUPPORTS
+  - from: S_STAGE0_V8
+    to: S_STAGE0_V7
+    edge_type: SUPERSEDES
+  - from: S_STAGE0_V7
+    to: S_STAGE0_V6
+    edge_type: SUPERSEDES
+  - from: A_CERCA_V4
+    to: A_CERCA_V3
+    edge_type: SUPERSEDES
+  - from: A_CERCA_V4
+    to: S_STAGE0_V7
+    edge_type: TRACES_TO
+  - from: A_USED
+    to: S_STAGE0_V7
+    edge_type: TRACES_TO
+  - from: A_CARGA_REGEX
+    to: S_STAGE0_V7
+    edge_type: TRACES_TO
+  - from: A_CARGA_CASOS
+    to: A_CARGA_REGEX
+    edge_type: SUPPORTS
+  - from: S_STAGE0_V6
+    to: S_STAGE0_V5
+    edge_type: SUPERSEDES
+  - from: A_ROTA_V5
+    to: A_ROTA_V4
+    edge_type: SUPERSEDES
+  - from: A_ROTA_V5
+    to: S_STAGE0_V6
+    edge_type: TRACES_TO
+  - from: A_FORMULA_V2
+    to: S_STAGE0_V6
+    edge_type: TRACES_TO
+  - from: S_STAGE0_V5
+    to: S_STAGE0_V4
+    edge_type: SUPERSEDES
+  - from: A_ROTA_V4
+    to: S_STAGE0_V5
+    edge_type: TRACES_TO
+  - from: A_CERCA_V3
+    to: S_STAGE0_V5
+    edge_type: TRACES_TO
+  - from: S_STAGE0_V4
+    to: S_STAGE0_V3
+    edge_type: SUPERSEDES
+  - from: E_ENV_GUARD_FALSO_POSITIVO_HEREDOC_1105
+    to: S_STAGE0_V4
+    edge_type: SUPPORTS
+  - from: S_STAGE0_V3
+    to: S_STAGE0_V2
+    edge_type: SUPERSEDES
+  - from: S_STAGE0_V2
+    to: S_STAGE0
+    edge_type: SUPERSEDES
+  - from: D_PROBLEM_ROUTE_RODAR_PAPEL_1105
+    to: S_STAGE0_V8
+    edge_type: TRACES_TO
+
+external_edges:
+  - from: S_STAGE0
+    to: ".claude/validation/dissect-families.kg.yaml#T_FAMILY_IDEIA"
+    edge_type: TRACES_TO
+  - from: S_STAGE0
+    to: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml#D_PROBLEM_FORMULA_VERDICT"
+    edge_type: TRACES_TO

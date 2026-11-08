@@ -1,0 +1,535 @@
+[
+ {
+  "ficha": "F01",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "trocar o padrão selado do comando ou criar exceção para produto adotado",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide o card com a evidência do produto adotado, as opções e a recomendação, sessão",
+  "fecha_quando": "o maestro responde no /meta:decide, mantendo ou superando o selo, e a resposta fica registrada"
+ },
+ {
+  "ficha": "F02",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "escolher o canal do vigia e autorizar a credencial da conta",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide as duas opções, com o risco de banimento e a recomendação da API oficial, sessão",
+  "fecha_quando": "o maestro escolhe o canal e a escolha fica registrada"
+ },
+ {
+  "ficha": "F03",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "incluir `.claude/workflows/` no manifesto da adoção, com teste e guarda contra skill vendorizada que aponta para script ausente",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "publicar a correção e levá-la aos adotantes",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "reproduzir a adoção em diretório limpo e medir se o diretório e o script faltam, sessão",
+  "fecha_quando": "a adoção limpa traz o script, o teste e a guarda reprovam sem o conserto, o PR está aberto e o maestro decidiu a propagação"
+ },
+ {
+  "ficha": "F04",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "resgatar os 7 arquivos da branch antiga em PR, marcando o que está superado",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "decidir se o estudo volta a rodar",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "comparar os 7 arquivos da branch antiga com a main, sessão",
+  "fecha_quando": "um teste reprova sem os arquivos, o PR está aberto com cada um classificado como vigente ou superado, e o maestro decidiu se o estudo volta a rodar"
+ },
+ {
+  "ficha": "F05",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir se a decisão de privacidade do core passa a cobrir pessoa × empregador",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "decidir o próprio caso sobre dado individual no grafo da empresa",
+    "dono": "outro",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A2 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide o sinal, as três medições do adotante, as opções e a recomendação, sessão",
+  "fecha_quando": "o maestro responde se a decisão aberta ganha esse eixo e a resposta fica registrada"
+ },
+ {
+  "ficha": "F06",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "conferir os leitores do core e da catraca, aplicar a migração oficial e abrir PR",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "achar a causa do 15º grafo, que não passou na medição da par",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "buscar as 76 chaves antigas nos leitores do core e na catraca, sessão",
+  "fecha_quando": "os 15 grafos passam no gate, nenhum leitor depende de nome antigo, e o PR está aberto"
+ },
+ {
+  "ficha": "F07",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "selar o veredito de parquear com gatilho",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "rodar a prova viva de ida e volta entre dois CLIs",
+    "dono": "peer",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide o estudo, avisando que foi só por leitura, com o gatilho proposto e a recomendação, sessão",
+  "fecha_quando": "o maestro sela ou recusa o veredito e o gatilho, se houver, fica escrito como medida"
+ },
+ {
+  "ficha": "F08",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir a regra de contagem para não ler tabela de custo como inventário, com fixture e guarda de regressão",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R3"
+   }
+  ],
+  "nota": "A1 V0 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "rodar o lint na main e reproduzir o aviso na linha de Total, sessão",
+  "fecha_quando": "a fixture da tabela de custo passa, a de inventário divergente reprova, o teste reprova sem o conserto, e o PR está aberto"
+ },
+ {
+  "ficha": "F09",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir o desenho do juiz do veto, incluindo o fecho por vocabulário e as brechas pré-existentes",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "autorizar o merge e o uso do wrapper contra a fila de produção",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "corrigir a corrida do rollback na própria branch, com teste",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "reproduzir os desvios do juiz em teste isolado, sem tocar a produção, e levar o card por /meta:decide, sessão",
+  "fecha_quando": "o maestro decide sobre o juiz e o wrapper, os desvios escolhidos para fechar reprovam em teste, e o teste da corrida passa"
+ },
+ {
+  "ficha": "F10",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir sobre rotação e sobre barrar `source` do arquivo real de segredos",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "auditar a saída e os registros do agente sem abrir o arquivo de segredos",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide o card com o comando registrado, o resultado da auditoria e a recomendação, sessão",
+  "fecha_quando": "a auditoria registra se houve vazamento e o maestro decide sobre rotação e guarda"
+ },
+ {
+  "ficha": "F11",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "abrir o `.env.test`, classificar o conteúdo e tratá-lo no próprio repo",
+    "dono": "peer",
+    "protegido": false,
+    "rota": "R4"
+   },
+   {
+    "ato": "decidir sobre rotação, hoje parada por ordem do maestro, caso haja segredo real",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R4",
+  "proximo_ato": "avisar a sessão dona com o caminho do arquivo e a origem do apontamento, sem abrir nem tocar, sessão",
+  "fecha_quando": "a dona responde se o conteúdo é segredo real; se for, o card vai ao maestro"
+ },
+ {
+  "ficha": "F12",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir se a ferramenta entra, dado o efeito legal da licença",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide o texto da licença, o uso pretendido, as opções e a recomendação, sem costurar antes, sessão",
+  "fecha_quando": "o maestro decide por escrito se o uso está liberado ou recusado"
+ },
+ {
+  "ficha": "F13",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "registrar no grafo desta rodada a evidência ancorada e a contradição, sem afirmar a data da mudança",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "buscar âncora para a data da mudança",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   },
+   {
+    "ato": "reconciliar o outro grafo fora desta rodada",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R7"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "escrever o nó com a evidência ancorada e a contradição explícita, sessão",
+  "fecha_quando": "o grafo desta rodada passa no gate com a contradição explícita, e o nó parqueado tem gatilho: data ancorada ou rodada aberta para o outro grafo"
+ },
+ {
+  "ficha": "F14",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "remover o corte do workflow, com teste usando JSON acima de 7.000 caracteres",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "recuperar as 13 objeções do journal e levá-las ao grafo",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "extrair do journal o JSON completo do juiz e contar as objeções ausentes do grafo, sessão",
+  "fecha_quando": "o teste reprova sem o conserto, as 13 objeções constam no grafo, e o PR está aberto"
+ },
+ {
+  "ficha": "F15",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "mudar o status do nó para `superseded`, conforme a resposta do maestro",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "ler o nó e a aresta no grafo e corrigir o status, sessão",
+  "fecha_quando": "o nó está `superseded`, o radar não repete o aviso, e o PR está aberto"
+ },
+ {
+  "ficha": "F16",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "rastrear o referente de '9 a 1', o apoio e o estado atual do selo, usando o patch antigo só como pista",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   },
+   {
+    "ato": "reabrir ou revisar o selo, se a medida mostrar que ele caiu",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R2",
+  "proximo_ato": "buscar a origem do placar no corpus e no histórico, com tempo marcado, sessão",
+  "fecha_quando": "o referente é achado ou descartado com comando registrado, o estado do selo é medido, e o caso volta à pergunta 1"
+ },
+ {
+  "ficha": "F17",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "mudar a frase doutrinária do CLAUDE.md e a postura de acoplamento apoiada nela",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "sondar em ambiente isolado se um mod carregado vence o veto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "reproduzir as rodagens de spike, sondar o mod e levar o card por /meta:decide, sessão",
+  "fecha_quando": "o maestro decide o novo texto e a postura, com a medida do mod anexada"
+ },
+ {
+  "ficha": "F18",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir o arquivo fora do esquema e criar gerador com guarda de esquema, sem vetar os 41 grafos legítimos",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R3"
+   }
+  ],
+  "nota": "A1 V0 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "medir a guarda candidata contra o arquivo ruim e os 41 grafos legítimos, sessão",
+  "fecha_quando": "o arquivo fora do esquema é reprovado, os 41 grafos passam, o gerador existe, e o PR está aberto"
+ },
+ {
+  "ficha": "F19",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "fazer o lint identificar porta pelo campo `kind: door`, conforme a decisão selada, com teste do carimbo standalone",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "escrever o teste com carimbo standalone sem o campo de porta, que reprova no lint atual, sessão",
+  "fecha_quando": "o teste reprova sem o conserto e passa com ele, a revisão independente foi feita antes do PR, e a nota está escrita no PR"
+ },
+ {
+  "ficha": "F20",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir se o plugin publicado leva o comando de verticais e o motor do marketplace",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a contradição entre a matriz e o lint, o risco ao moat e a recomendação, sem alterar o manifesto, sessão",
+  "fecha_quando": "o maestro decide o que entra, e a matriz e o lint podem ser alinhados a essa decisão"
+ },
+ {
+  "ficha": "F21",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir a nuance por mídia na diretriz de avaliação forçada",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "decidir os modos de aplicação nativo e aditivo",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "decidir o escopo que tira materiais de referência das fases",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide as 3 fricções, com evidência e recomendação para cada uma, sessão",
+  "fecha_quando": "o maestro responde às 3 propostas, cada uma com resposta registrada"
+ },
+ {
+  "ficha": "F22",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "medir o uso vivo e corrigir o 'ZERO' defasado do CLAUDE.md no mesmo fluxo, sob a ordem permanente",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "recontar a própria bancada e achar a causa da diferença entre 79 e 81",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   },
+   {
+    "ato": "corrigir o número do estudo, se o erro estiver do lado da peer",
+    "dono": "peer",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "medir o uso atual da ferramenta e recontar os registros com comando registrado, sessão",
+  "fecha_quando": "a afirmação do CLAUDE.md bate com a medida atual, em PR aberto, e a diferença de contagem tem causa, com a peer avisada se o erro for dela"
+ },
+ {
+  "ficha": "F23",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "citar a síntese em `trace:` no grafo e refazer o commit pelo gate, sem contorná-lo; a guarda que barra a repetição já existe",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R3"
+   }
+  ],
+  "nota": "A0 V0 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "adicionar a síntese ao `trace:` do grafo e rodar o gate de novo, sessão",
+  "fecha_quando": "o gate aprova o commit, a guarda continua reprovando grafo sem o trace, e o PR está aberto"
+ },
+ {
+  "ficha": "F24",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir se o refino entra na régua de critério",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a proposta da peer, as opções e a recomendação, declarando que a sessão forjou a peça afetada, sessão",
+  "fecha_quando": "o maestro aceita ou recusa o refino e a decisão fica registrada"
+ },
+ {
+  "ficha": "F25",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "retomar os dois conjuntos a partir do último commit, um pesado por vez",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A0 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "inventariar o último commit e o trabalho faltante de cada conjunto, depois medir a carga da máquina, sessão",
+  "fecha_quando": "cada conjunto tem o trabalho faltante concluído em commit e verificado, com PR aberto quando houver mudança a integrar"
+ }
+]

@@ -1,0 +1,6 @@
+reviewed_hash: d4a314c2857fb1b1c738b54803020563cb18894a
+reviewed_files: STAGE0.md STAGE0.v2.md STAGE0.v3.md STAGE0.v4.md STAGE0.v5.md STAGE0.v6.md STAGE0.v7.md STAGE0.v8.md ROTA.v5.md CERCA.v4.md USED.txt CARGA.regex CARGA.casos.txt
+reviewed_hash_rule: git log -1 --format=%H -- <reviewed_files>
+curadoria_response: "De acordo da curadoria em problem-route d4a314c2857fb1b1c738b54803020563cb18894a, só para o portão (a), em papel, com teto em parquear e os 7 limites declarados na STAGE0.v8."
+scope: portão (a), parte em papel; (b0), (b1) e (c) fora
+maestro_order: D_PROBLEM_ROUTE_RODAR_PAPEL_1105 (b696a8272)
