@@ -2,8 +2,7 @@
 branch: docs/persona-phases-2-3-plan
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: 73fd2e9dfdcf4ac3dced3fc1f4ed4910748e9aed08504cf6bb50919b0a3f5c24
-reviewed_code_sha256: 7f7592655bb3333e79bff34408391a3355ad2dca5e441922f27fad13ad813e67
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 1
@@ -47,3 +46,5 @@ Não se aplica: o diff é dado de grafo e texto, sem lógica. O gate é o radar 
 ## Acréscimo do core
 
 A ponte e o WAHA foram selados pelo maestro no /meta:decide de 2026-11-08 (`D_PF_BRIDGE_CONTRACT_IN_CORE_1108` e `D_PF_WAHA_DEDICATED_NUMBER_1108`). O agente não tinha achado o selo porque ele não existia no corpus: a escolha estava só na pergunta.
+
+O critério de pronto da peça do kg-ssot foi ampliado com o que ele mediu: o nó traz os 4 itens aceitos.
