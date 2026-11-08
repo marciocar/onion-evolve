@@ -31,7 +31,7 @@
 | 3.0 | `C_SUPERACAO_20261108_OKF_YOUNG_WITH_BREAKS_NOT_UNSTABLE` | outside-in-primaries-2026-11 | OKF §12 e §13 sustentam 'jovem e com quebras já ocorridas' (v0.2, quebras de v0.1 para v0.2, consumo best-effort em versão des |
 | 3.0 | `C_SUPERACAO_20261108_SCORECARD_SAST_DETECTION_AND_LOW_SCORE` | outside-in-primaries-2026-11 | O SAST do Scorecard pela seção do próprio documento: detecção por apps em PRs recentes ou por github/codeql-action em workflo |
 | 3.0 | `C_SUPERACAO_20261108_SLSA_DISTRIBUTE_PROVENANCE_TO_CONSUMERS` | outside-in-primaries-2026-11 | A seção Producer do SLSA com o MUST de distribuir a procedência aos consumidores e o MAY de delegar ao ecossistema de pacotes,  |
-| 3.0 | `C_SUPERACAO_20261108_SLSA_L2_MUSTS_AND_SHOULD` | outside-in-primaries-2026-11 | SLSA L2 pelos graus certos da linha 'Provenance is Authentic': MUST validar autenticidade, MUST gerar no plano de controle, MUST i |
+| 3.0 | `C_SUPERACAO_20261108_SLSA_L2_MUSTS_AND_SHOULD` | outside-in-primaries-2026-11 | SLSA nível 2 pelos graus certos da linha 'Provenance is Authentic': MUST validar autenticidade, MUST gerar no plano de controle,  |
 | 3.0 | `C_SUPERACAO_20261108_SW_RETRY_IS_RECOMMENDATION` | outside-in-primaries-2026-11 | O reenvio do Standard Webhooks como recomendação (sw.md l.252-254): backoff exponencial por vários dias, até sucesso ou até c |
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)

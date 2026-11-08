@@ -2,7 +2,8 @@
 branch: docs/outside-in-primaries-closeout
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ae7414d6d3bd111ef368a96de7e605452551c43df8bfc9ec486d599be678db93
+reviewed_code_sha256: a18bba806775a67c2c5edd1c6a7c7ca0b11eaab69f77016fda3cb13dfe95afff
 findings_total: 5
 findings_real: 5
 findings_blocking: 1
