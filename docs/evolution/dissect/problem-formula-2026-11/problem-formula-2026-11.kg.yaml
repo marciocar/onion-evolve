@@ -18,7 +18,8 @@ meta:
     - 'Nenhuma fonte web mede falha de escalada em agente; só relato e arquitetura.'
     - 'Na corrida oficial, as fichas foram escritas por quem conhece o desfecho; L1 e L2 têm só o id público.'
   # kg-backlog-guard: on
-  # ═══ TETO: 30 NÓS ═══
+  # ═══ TETO: 40 NÓS ═══
+  # 2026-11-08 (decisão da sessão do core): o teto subiu de 30 para 40 só por vocabulário. Os nós acima do teto antigo são entidades x_term (T_*), exigidas pelo contrato KG-SSOT para os códigos locais do estudo; nascem confirmed, fora do backlog, e nunca são onda nova de trabalho.
 
 nodes:
 
