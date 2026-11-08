@@ -6,7 +6,8 @@
 // escura sobre o repo privado, rodapé) veio VERBATIM do legado.
 //
 // CURADORIA: o card usa só `rss` (o resumo já curado) e os metadados OBJETIVOS de `prs`
-// (label/status/meta). Nenhum link de PR, nenhum corpo cru — o repo é privado de propósito.
+// (label/status/meta). Nenhum link de PR, nenhum corpo cru — o padrão nasceu com o repo privado;
+// desde que o core ficou público (medido em 2026-10-13) o texto diz isso, e o card segue igual.
 import Base from '../../../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import '../../../../styles/migalhas.css';
@@ -48,7 +49,7 @@ const cards = posts
 
 <Base
   title="Provas — as migalhas por trás dos números"
-  description="A prova público-segura de cada migalha: o que mudou e os metadados objetivos de cada PR (merged, data, arquivos, linhas). O repositório é privado; aqui a prova é aberta sem abrir o código."
+  description="A prova público-segura de cada migalha: o que mudou e os metadados objetivos de cada PR (merged, data, arquivos, linhas), lidos sem precisar abrir o código."
   path="/historia/migalhas/provas/"
 >
   <div class="provas">
@@ -57,16 +58,16 @@ const cards = posts
         <span class="eyebrow sans">🔎 A prova, aberta</span>
         <h1>As migalhas <em>por trás dos números.</em></h1>
         <p class="sub">Cada lição das <a href="/historia/migalhas/">Migalhas</a> nasceu de mudanças reais, mergeadas
-        e testadas. O repositório é privado — então aqui está a prova sem abrir o código: o que mudou, e para cada
-        PR o que dá para conferir de fora (mergeado, quando, quantos arquivos e linhas).</p>
+        e testadas. Aqui está a prova sem precisar abrir o código: o que mudou, e para cada PR o que dá para
+        conferir de fora (mergeado, quando, quantos arquivos e linhas).</p>
       </section>
 
       <div class="note">
         <div class="note-in">
-          <b>Por que não linkamos direto o PR:</b> o repositório é privado (contém contexto de parceiros que não
-          pode ser público). Em vez de um link que ninguém abre, publicamos o que é <b>seguro e verificável</b>:
-          o status <em>mergeado</em>, a data e o tamanho de cada mudança. O conteúdo sensível fica no repositório;
-          a existência e o tamanho da prova ficam aqui.
+          <b>Por que o card não linka o PR:</b> estas provas nasceram quando o repositório era privado, e o card
+          publicava só o que era <b>seguro e verificável</b>: o status <em>mergeado</em>, a data e o tamanho de
+          cada mudança. Hoje o repositório do core é público (<a href="https://github.com/marciocar/onion-evolve">github.com/marciocar/onion-evolve</a>),
+          e o número de cada PR, ou o hash de cada commit, basta para conferir lá. O card segue enxuto de propósito.
         </div>
       </div>
 
@@ -75,7 +76,7 @@ const cards = posts
 
     <footer class="site">
       <p>Provas das <a href="/historia/migalhas/">Migalhas</a> do <a href="/">Onion Evolve</a>. Metadados
-      objetivos (mergeado, data, tamanho) — o conteúdo sensível fica no repositório privado.
+      objetivos (mergeado, data, tamanho) — o PR inteiro, pelo número, no repositório público do core.
       <a href="/historia/">leia a história completa ←</a></p>
     </footer>
   </div>

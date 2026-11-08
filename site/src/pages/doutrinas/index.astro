@@ -37,7 +37,7 @@ const invencoes = [
   { nome: 'Economy of Motors', oque: 'três motores disponíveis (o modelo grande, o modelo pequeno como ferramenta, o shell determinístico); use o mais barato que dá conta.', casa: 'KB interna', status: 'ativa' },
   { nome: 'SDAAL', oque: 'uma interface, N provedores: a especificação é o artefato e o modelo é o runtime que a executa.', casa: 'KB interna + whitepaper', status: 'ativa' },
   { nome: 'KG SDAAL', oque: 'investigação e domínio modelados como grafo tipado, com verdades reconciliadas por arestas de refutação e superação.', casa: 'KB interna', status: 'ativa — virou infraestrutura (radar, console, comandos, guardas de lint)' },
-  { nome: 'SSOT-as-runtime', oque: 'a fonte é o programa que se executa: ler o grafo, verificar contra o vivo, agir, escrever de volta.', casa: 'KB interna', status: 'ativa — mecanismo na escrita; a leitura fica declarada como conselho' },
+  { nome: 'SSOT-as-runtime', oque: 'a fonte é o programa que se executa: ler o grafo, verificar contra o vivo, agir, escrever de volta.', casa: 'KB interna', status: 'ativa — mecanismo na escrita; desde 2026-09-16 a leitura tem um aviso automático que não bloqueia' },
   { nome: 'gated-until-trigger', oque: 'o artefato nasce do uso que o prove, nunca de simetria nem de plano.', casa: 'KB interna', status: 'ativa' },
   { nome: 'declarado ≠ verificado', oque: 'carimbo, documento e branch são hipótese; só o artefato vivo é prova.', casa: 'KB interna', status: 'ativa' },
   { nome: 'fonte ≠ derivação', oque: 'fonte e nossa leitura dela vivem em artefatos fisicamente separados; a derivação cita, nunca reescreve.', casa: 'KB interna', status: 'ativa' },
@@ -46,7 +46,7 @@ const invencoes = [
   { nome: 'Co-Evolution Protocol', oque: 'sinal bidirecional entre o core e quem o adota, por arquivo versionado — sem runtime acoplado entre repositórios.', casa: 'protocolo interno + comandos', status: 'ativa' },
   { nome: 'Breadcrumbs (migalhas)', oque: 'sinal explícito deixado no artefato que força absorção em vez de acomodação — com prazo de re-teste.', casa: 'KB interna + comando de diário', status: 'ativa' },
   { nome: 'Object-led discovery', oque: 'quem sabe sobre o objeto é o próprio objeto: o maestro dirige com ele, o modelo executa com as peças certas.', casa: 'KB interna + decisão de arquitetura', status: 'ativa' },
-  { nome: 'Autobiographical Marketing', oque: 'o framework conta a própria história; os commits são a autobiografia.', casa: 'manual interno', status: 'só prosa de manual — ainda sem mecanismo' },
+  { nome: 'Autobiographical Marketing', oque: 'o framework conta a própria história; os commits são a autobiografia.', casa: 'manual interno + este site', status: 'ativa desde 2026-08-25 — virou este site, com os números derivados da fonte no build' },
   { nome: "Maestro's Aside", oque: 'entrada lateral tipada: um marcador no início da mensagem injeta a rota canônica — recall, não bloqueio.', casa: 'KB interna + gancho de runtime', status: 'ativa desde 2026-08-04' },
 ];
 ---
@@ -251,6 +251,12 @@ const invencoes = [
         três vezes em sessão real, registrando se o veredito injetado <em>mudou</em> a resposta. Anunciar
         mecanismo onde há conselho seria declarado ≠ verificado aplicado a mim mesmo, e seria a terceira vez
         desta classe.</p>
+        <p><strong>Atualização de 2026-09-16:</strong> a perna da leitura ganhou um gancho. Um sinal de campo
+        mostrou uma sessão publicando quatro teses erradas seguidas num corpus que tinha a resposta em quatro
+        nós de um grafo que ela mesma citava. Desde então, ao abrir um arquivo para o qual algum nó aponta, um
+        gancho avisa <em>quais nós falam dele</em>. Avisa e não bloqueia, de propósito: gate que impede trabalho
+        é contornado na primeira sexta-feira, e aí se perdem o mecanismo e a informação. É catraca, não muro —
+        e a página não chama de mais do que isso.</p>
       </div>
       <p class="bloco limite">A doutrina fica de pé mesmo assim, porque continua certa como norte. O que
       saiu do texto não foi a exigência — foi a afirmação de capacidade entregue.</p>
@@ -440,8 +446,9 @@ const invencoes = [
     dito aqui em vez de escondido, porque é exatamente o que a doutrina 6 exige.</p>
   )}
   <p class="nota-fonte">Transcrita da base de conhecimento interna em 2026-08-25 — classe
-  congelado-no-tempo. A casa canônica de cada invenção é citada como texto, não como link: ela vive em
-  repositório privado.</p>
+  congelado-no-tempo, com os status revistos em 2026-11-08. A casa canônica de cada invenção é citada como
+  texto, não como link: o repositório do core é público hoje, mas as casas mudam de
+  caminho mais depressa do que esta página.</p>
 </section>
 
 <!-- ─────────── fecho ─────────── -->

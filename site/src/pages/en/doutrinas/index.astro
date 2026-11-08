@@ -38,7 +38,7 @@ const inventions = [
   { name: 'Economy of Motors', what: 'three engines are available (the large model, the small model as a tool, the deterministic shell); use the cheapest one that can do the job.', home: 'internal knowledge base', status: 'active' },
   { name: 'SDAAL', what: 'one interface, N providers: the specification is the artifact and the model is the runtime that executes it.', home: 'internal knowledge base + whitepaper', status: 'active' },
   { name: 'KG SDAAL', what: 'investigations and domains modelled as a typed graph, with truths reconciled through refutation and supersession edges.', home: 'internal knowledge base', status: 'active — now infrastructure (radar, console, commands, lint guards)' },
-  { name: 'SSOT-as-runtime', what: 'the source of truth is a program that runs: read the graph, verify against the living artifact, act, write back.', home: 'internal knowledge base', status: 'active — mechanism on the write leg; the read leg is declared as advice' },
+  { name: 'SSOT-as-runtime', what: 'the source of truth is a program that runs: read the graph, verify against the living artifact, act, write back.', home: 'internal knowledge base', status: 'active — mechanism on the write leg; since 2026-09-16 the read leg has an automatic, non-blocking notice' },
   { name: 'gated-until-trigger', what: 'an artifact is born from the use that proves it, never from symmetry or from a plan.', home: 'internal knowledge base', status: 'active' },
   { name: 'declared ≠ verified', what: 'a stamp, a document or a branch is a hypothesis; only the living artifact is proof.', home: 'internal knowledge base', status: 'active' },
   { name: 'source ≠ derivation', what: 'the source and our reading of it live in physically separate artifacts; the derivation cites, it never rewrites.', home: 'internal knowledge base', status: 'active' },
@@ -47,7 +47,7 @@ const inventions = [
   { name: 'Co-Evolution Protocol', what: 'a bidirectional signal between the core and its adopters, carried by versioned files — no coupled runtime between repositories.', home: 'internal protocol + commands', status: 'active' },
   { name: 'Breadcrumbs', what: 'an explicit signal left inside the artifact that forces absorption instead of accommodation — with a re-test deadline.', home: 'internal knowledge base + diary command', status: 'active' },
   { name: 'Object-led discovery', what: 'the thing that knows about the object is the object itself: the maestro steers with it, the model executes with the right parts.', home: 'internal knowledge base + architecture decision', status: 'active' },
-  { name: 'Autobiographical Marketing', what: 'the framework tells its own story; the commits are the autobiography.', home: 'internal manual', status: 'manual prose only — still no mechanism' },
+  { name: 'Autobiographical Marketing', what: 'the framework tells its own story; the commits are the autobiography.', home: 'internal manual + this site', status: 'active since 2026-08-25 — it became this site, with numbers derived from the source at build time' },
   { name: "Maestro's Aside", what: 'a typed side channel: a marker at the start of a message injects the canonical route — recall, not a block.', home: 'internal knowledge base + runtime hook', status: 'active since 2026-08-04' },
 ];
 ---
@@ -257,6 +257,12 @@ const inventions = [
         consultation by hand, two or three times in a real session, recording whether the injected verdict
         actually <em>changed</em> the answer. Announcing a mechanism where there is only advice would be
         declared ≠ verified applied to myself, and it would be the third time in that class.</p>
+        <p><strong>Update, 2026-09-16:</strong> the read leg got a hook. A field signal showed a session
+        publishing four wrong theses in a row over a corpus that held the answer in four nodes of a graph it
+        was itself citing. Since then, when a file that some node points to is opened, a hook says <em>which
+        nodes talk about it</em>. It warns and does not block, on purpose: a gate that stops work gets bypassed
+        on the first Friday, and then both the mechanism and the information are lost. It is a ratchet, not a
+        wall — and this page does not call it more than that.</p>
       </div>
       <p class="bloco limite">The doctrine stands anyway, because it remains correct as a direction. What left
       the text was not the requirement — it was the claim of a delivered capability.</p>
@@ -451,7 +457,8 @@ const inventions = [
     stated here rather than hidden, because that is exactly what doctrine 6 demands.</p>
   )}
   <p class="nota-fonte">Transcribed from the internal knowledge base on 2026-08-25 — frozen-in-time class.
-  Each invention's canonical home is named as text, not linked: it lives in a private repository.</p>
+  Statuses reviewed on 2026-11-08. Each invention's canonical home is named as text, not linked: the core
+  repository is public today, but those homes move faster than this page does.</p>
 </section>
 
 <!-- ─────────── closing ─────────── -->
