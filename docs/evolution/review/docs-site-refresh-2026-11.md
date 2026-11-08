@@ -5,13 +5,13 @@ date: 2026-11-08
 reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
-tokens: n/a
+tokens: 0
 duration_min: 15
 findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: não
 reviewer: "o próprio agente de execução, numa passada com mandato de refutar o diff; sem subagente, porque o brief desta tarefa proíbe criar agentes"
-nota: "Revisão de uma só lente (quem escreveu revisou): vale como passada adversarial declarada, não como Elenxo. Uma segunda lente independente fica recomendada antes do merge."
+nota: "tokens = 0: não medido (a passada foi do próprio agente, sem subagente medido pelo harness). Revisão de uma só lente (quem escreveu revisou): vale como passada adversarial declarada, não como Elenxo. Uma segunda lente independente fica recomendada antes do merge."
 ---
 
 # Passada adversarial: `docs/site-refresh-2026-11`
