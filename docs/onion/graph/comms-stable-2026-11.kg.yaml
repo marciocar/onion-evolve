@@ -1,6 +1,5 @@
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16. Acréscimo: FLIP open→done em Q_CS_APP_SLACK_E_CHANNELS_1106, confirmado pelo maestro (passos 1 a 6 do card feitos). Lote 08/11: FLIP open→done em Q_CS_DEGRAU2_SLACK_RASCUNHO_1109, pela medida dos rascunhos aprovados e postados. Lote 08/11 (2): FLIP open→done em Q_CS_DEGRAU1_CAMPAINHA_1109 e Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109, pelos testes ao vivo com o hub."
+  x_drive_checkpoint: sealed
   schema_version: "1"
   id: comms-stable-2026-11
   slug: comms-stable-2026-11

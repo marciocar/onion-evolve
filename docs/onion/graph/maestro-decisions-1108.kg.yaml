@@ -1,0 +1,181 @@
+meta:
+  schema_version: "1"
+  id: maestro-decisions-1108
+  slug: maestro-decisions-1108
+  title: "Decisões que o maestro tomou em 2026-11-08 por pergunta com opções"
+  date: "2026-11-08"
+  baseline: "2026-11-08"
+  review_after: "2026-12-08"
+  purpose: "Guardar os selos da rodada de perguntas de 2026-11-08 que não têm grafo natural aberto. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
+  note: "TETO, declarado: 2 evidências de origem e 7 selos da rodada. Decisão nova de outro dia vai para o grafo do assunto."
+  # ═══ TETO: 9 NÓS ═══
+nodes:
+  - id: E_MD_MAESTRO_ROUND_1108
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "respostas do maestro às perguntas com opções da sessão do core em 2026-11-08, relatadas no brief deste PR"
+    label: "Em 2026-11-08 o maestro respondeu, por perguntas com opções, a sete questões abertas pela sessão do core."
+    narrative: "Este nó é a origem comum dos selos do grafo. A pergunta, a escolhida e as descartadas ficam em cada selo."
+    provenance:
+      source: "sessão do core, 2026-11-08"
+      locator: "rodada de perguntas com opções ao maestro"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: pessoa
+  - id: D_MD_MAIN_RULESET_NFF_DELETION_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Ligar as duas»"
+    label: "A main do core passa a barrar force push e remoção no ruleset, além dos status checks."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Ligar as duas»; descartadas: «Só force push» · «Não mexer»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «A main do core tem só status checks; ligar non_fast_forward e deletion no ruleset?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_DENY_MINIMUM_PORTABLE_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Deny mínimo portátil»"
+    label: "O core ganha um deny mínimo portátil, forjado pelo /meta:forge, de atos irreversíveis e leitura de segredos; o sandbox fica para depois da medida da curadoria."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Deny mínimo portátil»; descartadas: «Sandbox primeiro» · «Fica como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «0 deny e nenhum sandbox no core: o que fazer?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_R42_UPDATE_KEEP_WARNING_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Atualizar e manter aviso»"
+    label: "Os documentos voltados ao mundo vencidos se atualizam, e o aviso da REGRA 42 (Gate de FRESCOR DOUTRINÁRIO, com catraca) continua aviso."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Atualizar e manter aviso»; descartadas: «Passar a bloquear» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «Documentos voltados ao mundo vencidos há 108 dias: o aviso da REGRA 42 passa a bloquear?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_EVOLVE_AFTER_DOORBELL_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Depois das fases do doorbell»"
+    label: "O /meta:evolve vencido roda depois das fases da campainha (doorbell)."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Depois das fases do doorbell»; descartadas: «Rodar agora» · «Adiar sem data»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «/meta:evolve vencido»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_PERSONALITY_SYNC_RUN_DIFF_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Rodar e te trazer o diff»"
+    label: "O /meta:personality-sync roda, e o diff vai ao maestro."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Rodar e te trazer o diff»; descartadas: «Depois da pesquisa da persona»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «personality-sync»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_FEDERATION_PAGE_SCRUB_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Tirar metagamify, manter pulse-mais»"
+    label: "A página /federacao/ troca o id de um adotante hub por rótulo genérico e mantém o pulse-mais."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Tirar metagamify, manter pulse-mais»; descartadas: «Tirar os dois» · «Manter os dois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «metagamify e pulse-mais em /federacao/»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_PTBR_MACHINE_VALUES_ONLY_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "decisão do maestro em 2026-11-08, por pergunta com opções (/meta:decide): escolhida «Só os lidos por máquina»"
+    label: "O censo de valores de máquina em pt-BR se trata só nos valores lidos por máquina."
+    narrative: "Selado por /meta:decide em 2026-11-08: escolhida «Só os lidos por máquina»; descartadas: «Todos os 15» · «Nenhum por ora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-08: «Censo de valores de máquina em pt-BR»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: E_MD_MAIN_RULESET_READ_1108
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-11-08"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/<id> sobre o ruleset onion-main-required-checks: enforcement active, alvo ~DEFAULT_BRANCH, regras required_status_checks, non_fast_forward e deletion"
+    trace: "gh api repos/marciocar/onion-evolve/rulesets"
+    label: "O ruleset onion-main-required-checks da main do core está ativo com required_status_checks, non_fast_forward e deletion."
+    narrative: "Lido da API do GitHub no dia do selo, por quem escreveu este nó. É o estado depois da decisão de ligar as duas regras."
+    provenance:
+      source: "API REST do GitHub"
+      locator: "repos/marciocar/onion-evolve/rulesets, campo rules[].type"
+      method: "reading: API do GitHub em 2026-11-08"
+edges:
+  - from: D_MD_MAIN_RULESET_NFF_DELETION_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_DENY_MINIMUM_PORTABLE_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_R42_UPDATE_KEEP_WARNING_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_EVOLVE_AFTER_DOORBELL_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_PERSONALITY_SYNC_RUN_DIFF_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_FEDERATION_PAGE_SCRUB_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_PTBR_MACHINE_VALUES_ONLY_1108
+    to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: E_MD_MAIN_RULESET_READ_1108
+    to: D_MD_MAIN_RULESET_NFF_DELETION_1108
+    edge_type: SUPPORTS
