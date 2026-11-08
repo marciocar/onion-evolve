@@ -2,7 +2,8 @@
 branch: chore/permissions-deny-minimal
 pr: 1552
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3c471f6ec082826918b9a2d9496f8c8ad0ef458064afd3764f8b86b0132d9d86
+reviewed_code_sha256: 7d8159d728476d73ebcaf76867743da74cc0154df9bfcf0e9a9b15bc64391797
 findings_total: 15
 findings_real: 15
 findings_blocking: 2
