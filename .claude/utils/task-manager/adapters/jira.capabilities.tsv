@@ -8,6 +8,8 @@ item.create	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-v
 item.read	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	GET /issue não ancorado na Onda 1
 item.update	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	PUT /issue não ancorado; se ele muda status é Q_JIRA_STATUS_BY_PUT_MEASURE
 item.delete	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
+item.archive	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	adapter sem o verbo; só o Linear o tem
+item.list	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	adapter sem o verbo; só o Linear o tem
 hierarchy.subtask_create	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	hierarquia e issue types não ancorados (lacuna da Onda 1)
 hierarchy.subtask_list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
 hierarchy.epic	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	épico não ancorado; o adapter não cria

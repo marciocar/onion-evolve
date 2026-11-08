@@ -8,6 +8,8 @@ item.create	required	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`
 item.read	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	include_subtasks=true, medido em 2026-10-02; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: leitura COMPLETA por padrão (descrição markdown + comentários de todas as páginas por start/start_id + respostas + hierarquia + anexos listados + untrusted); --lean = só a task
 item.update	required	unverified	v2	adapter:clickup.md§TAGS NÃO VÃO NO BODY DO PUT	o executável faz PUT de title/markdown_content/priority/datas/time_estimate e relê; recusa --tags (vai pelo label.set) e --status (vai pelo status.transition). A medição de 2026-10-02 só registra o NEGATIVO das tags no PUT
 item.delete	optional	unverified	v2	-	a medição de 2026-10-02 apagou tasks, mas não registra que foi pelo deleteTask do adapter
+item.archive	optional	not_implemented	v2	-	adapter sem o verbo; só o Linear o tem
+item.list	optional	not_implemented	v2	-	adapter sem o verbo; só o Linear o tem
 hierarchy.subtask_create	required	implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE	parent na mesma List; níveis máximos não ancorados; executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: manda parent e herda a List da mãe
 hierarchy.subtask_list	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	executável clickup.py (2026-11-06) medido só na bancada offline (task-manager-clickup-bench.py); ao vivo NÃO medido: filhos diretos do include_subtasks=true
 hierarchy.epic	optional	not_implemented	v2	-	hierarquia Space/Folder/List não ancorada

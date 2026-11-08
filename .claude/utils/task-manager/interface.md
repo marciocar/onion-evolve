@@ -114,6 +114,12 @@ interface ITaskManager {
   /** item.delete — remove (ou arquiva, onde o provedor só arquiva). */
   deleteTask?(taskId: string): Promise<boolean>;
 
+  /** item.archive — arquiva sem apagar. Idempotente: item já arquivado não repete a escrita. */
+  archiveTask?(taskId: string, opts?: { dryRun?: boolean }): Promise<boolean>;
+
+  /** item.list — lista por filtro de estado e idade, para medir antes de operar em massa. Truncamento declarado no retorno. */
+  listTasks?(filter: { state?: string; stateTypes?: string[]; olderThanDays?: number; team?: string; includeArchived?: boolean; limit?: number }): Promise<TaskOutput[]>;
+
   // ═══════════════════════════════════════════════════════════════════════════
   // HIERARQUIA                                   capacidades hierarchy.*
   // ═══════════════════════════════════════════════════════════════════════════
@@ -235,6 +241,8 @@ item.create	required	remote	createTask(
 item.read	required	remote	getTask(
 item.update	required	remote	updateTask(
 item.delete	optional	remote	deleteTask(
+item.archive	optional	remote	archiveTask(
+item.list	optional	remote	listTasks(
 hierarchy.subtask_create	required	remote	createSubtask(
 hierarchy.subtask_list	required	remote	getSubtasks(
 hierarchy.epic	optional	remote	createEpic(
@@ -384,7 +392,7 @@ filha entra com os próprios pontos e o próprio status, não com o % dela.
 | Categoria | Métodos | Capacidades |
 |-----------|---------|-------------|
 | **Identificação** | `provider`, `isConfigured` | — |
-| **Item** | `createTask`, `getTask`, `updateTask`, `deleteTask?` | `item.*` |
+| **Item** | `createTask`, `getTask`, `updateTask`, `deleteTask?`, `archiveTask?`, `listTasks?` | `item.*` |
 | **Hierarquia** | `createSubtask`, `getSubtasks`, `createEpic?` | `hierarchy.*` |
 | **Status** | `updateStatus` | `status.transition` |
 | **Campos** | `priority`, `storyPoints`, `timeEstimate`, `tags` em Create/UpdateTaskInput | `priority.set`, `estimate.*`, `label.set` |
