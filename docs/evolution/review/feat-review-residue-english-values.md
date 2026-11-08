@@ -2,14 +2,13 @@
 branch: feat/review-residue-english-values
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: c701fe9e9615f4bdbcfe0b3b02360f313294d83705bf5a3363c86a12aaa13c89
-reviewed_code_sha256: ececfe5c71293eb3dffa5cf56ac83ae09f9f746ea0f745d7810666c9818b7905
-findings_total: 11
-findings_real: 10
+reviewed_diff_sha256: pendente
+findings_total: 15
+findings_real: 14
 findings_blocking: 4
 tokens: 0
 duration_min: 0
-findings_fixed: 9
+findings_fixed: 10
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
@@ -24,7 +23,7 @@ nota: "tokens e duração não medidos (0). 1ª passada do próprio agente; a 2�
 Decisão do maestro de 2026-11-08: valor de campo de máquina é código e vai em inglês. No resíduo da REGRA 56
 (PR aberto carrega RESÍDUO da passada adversarial), `verdict` passa a APPROVED | FIXED | REJECTED |
 REJECTED_AND_FIXED | NO_FINDINGS, e `elenxo`/`elenxo_isolado` passam a true|false. A forma antiga só vale
-nos resíduos da lista congelada (870 na geração final de 2026-11-08, depois do merge do #1540 e do #1542) `docs/evolution/review-residue-legacy.txt`. A catraca impede a lista
+nos resíduos da lista congelada (871 na geração final de 2026-11-08, sobre a origin/main com o #1540, o #1542 e o #1543) `docs/evolution/review-residue-legacy.txt`. A catraca impede a lista
 de crescer. Leitores tocados: `review-artifact-check.sh` (o julgamento do PR, o `--schema` e o esqueleto),
 `drive-automate.sh` (o gate do AUTOMATE) e `review-ledger.sh` (traduz a forma antiga para a nova, e a série
 não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico byte a byte antes e depois.
@@ -71,6 +70,16 @@ não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico
 11. **L5, CURADO.** "Cresceu" e "entrada nova" medem contra o merge-base; a órfã segue medida na árvore. Caso (l5)
     com mutante. O achado 3 (falso "cresceu" num PR antigo) morre com ele.
 
+## 3ª passada: refutador separado (APROVOU COM RESSALVAS)
+
+12. **Limite 1, CURADO.** Comparar com a lista da base não pegava a lista que NASCE (a base não tem lista) nem a
+    entrada de um resíduo já no formato novo. A catraca agora exige lista ⊆ `--legacy-candidates <merge-base>`.
+    Caso (l1) com mutante; os casos (l) e (p2/p3 B1) passaram a usar resíduos de base na forma antiga, para que a
+    nova checagem não mascare o que eles isolam.
+13. a 15. **Limites 2 a 4: declarados, não curados neste PR.** Ficaram no parecer da 3ª passada, que está com a
+    sessão do core. O texto deles entra aqui quando o team-lead o repassar. Editar o resíduo não muda o hash
+    revisado, porque o diretório de review fica fora do diff.
+
 ## Mutantes
 
 Todos com a cópia limpa provada no mesmo arranjo:
@@ -84,11 +93,12 @@ Todos com a cópia limpa provada no mesmo arranjo:
 - (p3 sem-duplicata) e (k2-dup): sem a checagem de duplicata, a duplicata passa.
 - (m-sim), (m-sim-B1), (m-yaml) e (m-dup) no drive-automate.
 - (l5): a catraca medida contra a ponta acusa "CRESCEU".
+- (l1): sem a checagem ⊆ candidatos, o resíduo novo listado passa.
 
 ## Limites declarados
 
 - O achado 3 caiu com o L5.
 - Os PRs em voo cujo resíduo ainda não está na `origin/main` e usa a forma antiga passam a reprovar depois
   do merge. Isso é o efeito pedido pela decisão: a cura é trocar os valores no resíduo.
-- O maestro falou em 618 resíduos de legado, e 618 é a contagem do campo `elenxo`. A lista tem 870 (na geração final), os que
+- O maestro falou em 618 resíduos de legado, e 618 é a contagem do campo `elenxo`. A lista tem 871 (na geração final), os que
   têm qualquer valor na forma antiga (verdict ou elenxo).
