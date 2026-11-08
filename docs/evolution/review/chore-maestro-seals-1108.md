@@ -2,8 +2,7 @@
 branch: chore/maestro-seals-1108
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: e31021c2f275d69e49aada294827b1087a5c3c80e50a59308c3b72d667e79ced
-reviewed_code_sha256: ee3fc51622a8a22e833d42d7cb5fe84305846d5f7608c0605382b5a7707d8df1
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
@@ -41,3 +40,10 @@ nota: "tokens e duração não medidos (0). Selo do checkpoint, grafo novo de 10
 - `site/src/pages/historia/index.astro` segue citando o nome e aparece no dist. O maestro decidiu mantê-lo (`D_MD_HISTORY_PAGE_KEEPS_NAME_1108`): a retirada vale só para `/federacao/`, e os demais arquivos do repo ficam como estão.
 - O deploy do site é do maestro.
 - A pergunta e a opção no grafo guardam o id verbatim: selo é testemunho da pergunta feita.
+
+## Re-revisão do delta (nó `D_MD_HISTORY_PAGE_KEEPS_NAME_1108`)
+
+Li o delta inteiro: um nó, uma aresta `CONSTRAINS` para `D_MD_FEDERATION_PAGE_SCRUB_1108` e o teto de 9 para 10. O label
+não vai além da resposta: limita a retirada a `/federacao/` e deixa `/historia/` e o repo como estão. Sem achado novo.
+A redação da pergunta no `locator` é do agente de execução, porque o brief trouxe a escolhida e as descartadas sem o texto
+literal da pergunta. Radar e contrato em rc 0.
