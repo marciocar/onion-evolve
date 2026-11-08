@@ -13,7 +13,7 @@ findings_fixed: 10
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-reviewer: execution agent (1st pass) + separate refuter of the core session (2nd pass, isolated)
+reviewer: execution agent (1st pass) + independent refuter refuter-1541 (2 passes, isolated)
 nota: "tokens e duração não medidos (0). 1ª passada do próprio agente; a 2ª, de um refutador separado, REPROVOU por 1 bloqueio e 5 limites, todos curados neste PR com caso e mutante: por isso elenxo_isolado true. O resíduo sai no formato novo (dogfood)."
 ---
 
@@ -47,7 +47,7 @@ não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico
 5. **Não procede.** A suspeita era o CI sem `origin/main`, o que deixaria a catraca muda. Medido:
    `onion-validate.yml` faz checkout com `fetch-depth: 0`, então a ref existe.
 
-## 2ª passada: refutador separado (REPROVOU; tudo curado aqui)
+## 2ª passada: 1ª do refutador separado (REPROVOU; tudo curado aqui)
 
 6. **B1, BLOQUEIA, CURADO.** A lista do legado era chaveada só pelo caminho. Uma branch nova com o slug de um
    resíduo legado (`feat/decide-painel`) o reescrevia com APROVADO e `sim`, e passava. Slug repetido não é hipótese:
@@ -71,15 +71,25 @@ não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico
 11. **L5, CURADO.** "Cresceu" e "entrada nova" medem contra o merge-base; a órfã segue medida na árvore. Caso (l5)
     com mutante. O achado 3 (falso "cresceu" num PR antigo) morre com ele.
 
-## 3ª passada: refutador separado (APROVOU COM RESSALVAS)
+## 3ª passada: 2ª do refutador separado (APROVOU COM RESSALVAS)
 
 12. **Limite 1, CURADO.** Comparar com a lista da base não pegava a lista que NASCE (a base não tem lista) nem a
     entrada de um resíduo já no formato novo. A catraca agora exige lista ⊆ `--legacy-candidates <merge-base>`.
     Caso (l1) com mutante; os casos (l) e (p2/p3 B1) passaram a usar resíduos de base na forma antiga, para que a
     nova checagem não mascare o que eles isolam.
-13. a 15. **Limites 2 a 4: declarados, não curados neste PR.** Ficaram no parecer da 3ª passada, que está com a
-    sessão do core. O texto deles entra aqui quando o team-lead o repassar. Editar o resíduo não muda o hash
-    revisado, porque o diretório de review fica fora do diff.
+13. **Limite 2, DECLARADO.** A entrada órfã é medida na árvore, antes das isenções. Uma colheita no main que
+    apague um resíduo legado sem tirar a entrada da lista derruba o lint de todos, inclusive no main. A falha é
+    fechada, e a mensagem diz a cura: tirar a entrada da lista.
+14. **Limite 3, DECLARADO.** O `--schema` chamado de um subdiretório com caminho relativo: o `hash-object` resolve
+    o caminho contra a raiz, e um legado intocado passa a ser tratado como novo. A falha é fechada, e o
+    pr-finalize chama da raiz.
+15. **Limite 4, DECLARADO.** `elenxo: não`, com acento, não é aceito em forma nenhuma, e o `--legacy-candidates`
+    não o reconhece. Um resíduo só com `não` e verdict em inglês ficaria fora da lista e reprovaria se fosse
+    julgado de novo. Hoje não existe nenhum.
+
+**Sobre `elenxo_isolado: true` neste resíduo:** ele se sustenta pelas DUAS passadas do refutador independente
+(refuter-1541), um agente separado desta sessão. A 1ª reprovou (achados 6 a 11, todos curados) e a 2ª aprovou
+com ressalvas (achados 12 a 15). A passada do próprio agente executor, sozinha, não sustentaria o `true`.
 
 ## Mutantes
 
