@@ -304,6 +304,9 @@ members:
     personality_summary: "O adotante que mais SINALIZOU em menos tempo, e com a evidência mais forte: três sinais `high` em 48h, um deles com medição ao vivo (24 chamadas REST, tasks criadas e apagadas, limpeza confirmada por 404) e grafo de pesquisa versionado. Achou o que o core não via — o parâmetro de subtasks que devolvia vazio e quebrava quatro comandos em TODO adotante ClickUp — e corrigiu uma correção errada do core antes de ela viajar. Precedente: adotante como refutador do core, não só consumidor."
     specializations: [company-brain, clickup, pesquisa-primaria]
     personality_last_sync: 2026-10-02
+    a2a:                        # participa do a2a-live como REMETENTE: assina sinais gated ao core.
+      sends_to: onion-evolve    # envia p/ o endpoint do core; não hospeda endpoint próprio
+      keys: [brain-granaai-1]   # pública pinada em jwks/brain-granaai-1.pem (sha256:9d47d9ab…0620650f, conferida pelo maestro fora de banda em 2026-11-08)
     trust:
       can_receive_from: [onion-evolve]
       can_advise_to: [onion-evolve]
