@@ -31,6 +31,7 @@
 # Uso  : bash .claude/validation/review-artifact-check.sh [<repo_root>] [--format tsv]
 #        bash .claude/validation/review-artifact-check.sh --skeleton [<branch>]   → o ESQUELETO do resíduo (stdout)
 #        bash .claude/validation/review-artifact-check.sh --schema <arquivo>     → só o frontmatter, em ms
+#        bash .claude/validation/review-artifact-check.sh --legacy-candidates [<ref>] → os resíduos de <ref> na forma antiga
 # Saída: relatório humano (default) ou TSV (severidade·tag·path·mensagem)
 # Exit : 0 = artefato presente e casando, ou fora de escopo · 1 = falta/caducou · 2 = uso inválido
 #
@@ -46,7 +47,7 @@ set -euo pipefail
 # A prosa do resíduo segue em pt-BR; o VALOR dos campos que um script lê passou ao inglês:
 # `verdict` em APPROVED|FIXED|REJECTED|REJECTED_AND_FIXED|NO_FINDINGS e `elenxo`/`elenxo_isolado`
 # em true|false. O LEGADO não se reescreve: a forma antiga (APROVADO…, sim|nao) só vale num resíduo
-# da LISTA CONGELADA (`docs/evolution/review-residue-legacy.txt`, os 867 que existiam na origin/main ao selar, com
+# da LISTA CONGELADA (`docs/evolution/review-residue-legacy.txt`, os que existiam na origin/main no último rebase (gerados por --legacy-candidates), com
 # algum valor na forma antiga). Fora dela, resíduo com valor antigo é recusado. A CATRACA
 # (`_legacy_ratchet_problems`) impede a lista de crescer: só desce, nunca ganha entrada.
 VERDICT_ENUM="APPROVED FIXED REJECTED REJECTED_AND_FIXED NO_FINDINGS"
@@ -86,9 +87,30 @@ _review_rel() {  # $1=caminho → docs/evolution/review/<x>.md (a chave da lista
     */docs/evolution/review/*) printf 'docs/evolution/review/%s' "${1##*/docs/evolution/review/}" ;;
   esac
 }
-_is_legacy() {  # $1=caminho → 0 só se o resíduo está na lista congelada do legado
-  local r; r="$(_review_rel "$1")"
-  [ -n "${r}" ] && [ -f "${LEGACY_LIST}" ] && grep -qxF -- "${r}" "${LEGACY_LIST}"
+_legacy_root() { (cd "$(dirname "${LEGACY_LIST}")/../.." 2>/dev/null && pwd); }   # a lista mora em <root>/docs/evolution/
+_base_of() {  # $1=root → o merge-base com a branch default (a base CONTRA A QUAL o trabalho foi feito), ou vazio
+  local d; d="$(git -C "$1" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
+  [ -n "${d}" ] || d=main
+  git -C "$1" merge-base "origin/${d}" HEAD 2>/dev/null || git -C "$1" merge-base "${d}" HEAD 2>/dev/null || true
+}
+# LEGADO = ESTÁ NA LISTA **E** NÃO FOI TOCADO. A 1ª versão chaveava só pelo CAMINHO, e o refutador mostrou o
+# ataque: uma branch nova com o slug de um resíduo legado (`feat/decide-painel`) reescreve o arquivo com APROVADO e
+# `sim`, e passava. Slug repetido não é hipótese: 6 em 1530 PRs. O que o legado protege é o ARQUIVO HISTÓRICO,
+# byte a byte; o resíduo que o PR toca é trabalho novo e sai no formato novo, esteja ou não na lista.
+_is_legacy() {  # $1=caminho [$2=base] [$3=blob julgado] → 0 só se na lista E idêntico ao da base
+  local r root base cur; r="$(_review_rel "$1")"
+  [ -n "${r}" ] && [ -f "${LEGACY_LIST}" ] && grep -qxF -- "${r}" "${LEGACY_LIST}" || return 1
+  root="$(_legacy_root)"; [ -n "${root}" ] || return 1
+  base="${2:-$(_base_of "${root}")}"
+  cur="${3:-$(git -C "${root}" hash-object -- "$1" 2>/dev/null)}"
+  # INTOCADO: o blob julgado é o da base. Sem base, sem blob ou ausente na base, não se prova — não é legado.
+  [ -n "${base}" ] && [ -n "${cur}" ] && [ "$(git -C "${root}" rev-parse -q --verify "${base}:${r}" 2>/dev/null)" = "${cur}" ] || return 1
+  return 0
+}
+# CHAVE DUPLICADA: o bash lê a 1ª ocorrência e o YAML (drive-automate) leria a última — o mesmo resíduo diria duas
+# coisas a dois leitores. Medido em 2026-11-08: 0 dos 958 resíduos tinham chave repetida, então recusar não quebra nada.
+_dup_keys() {  # $1=arquivo → as chaves de topo repetidas no frontmatter, separadas por espaço
+  awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1 && /^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' "$1"
 }
 _verdict_ok() {  # $1=valor [$2=legacy] — caixa e separador tolerados, palavra inteira
   local v e; v="$(printf '%s' "$1" | tr 'a-z' 'A-Z' | tr '-' '_')"
@@ -121,14 +143,17 @@ _verdict_problem() {  # $1=valor $2=legacy|'' → a frase do problema, ou vazio
 # A CATRACA DO LEGADO: a lista só DESCE. Três recusas: entrada que a base não tinha (o legado não
 # ganha membro novo), lista maior que a da base, e entrada órfã (arquivo que não existe mais — a
 # entrada sai junto com ele). Sem lista NÃO há legado, logo não há o que catracar (adotante, sandbox).
-_legacy_ratchet_problems() {  # $1=ref da base (ex.: origin/main) → uma frase por problema
+# CRESCER e ENTRADA NOVA se medem contra o MERGE-BASE (o que o PR mudou), não contra a ponta da origin/main: com
+# a ponta, um PR antigo acusaria "cresceu" só porque a main desceu depois dele. A ÓRFÃ se mede na ÁRVORE.
+_legacy_ratchet_problems() {  # → uma frase por problema
   [ -f "${LEGACY_LIST}" ] || return 0
-  local root base_list n_cur n_base added orphan
-  root="$(cd "$(dirname "${LEGACY_LIST}")/../.." && pwd)"   # a lista mora em <root>/docs/evolution/
+  local root base_list n_cur n_base added orphan base
+  root="$(_legacy_root)"
   n_cur="$(grep -c . "${LEGACY_LIST}" || true)"
   orphan="$(while IFS= read -r l; do [ -z "${l}" ] || [ -f "${root}/${l}" ] || printf '%s ' "${l}"; done < "${LEGACY_LIST}")"
   [ -z "${orphan}" ] || echo "entrada(s) órfã(s) na lista do legado (o arquivo não existe): ${orphan}— tire-as da lista"
-  base_list="$(git -C "${root}" show "$1:${LEGACY_LIST_REL}" 2>/dev/null)" || return 0
+  base="$(_base_of "${root}")"; [ -n "${base}" ] || return 0
+  base_list="$(git -C "${root}" show "${base}:${LEGACY_LIST_REL}" 2>/dev/null)" || return 0
   n_base="$(grep -c . <<< "${base_list}" || true)"
   [ "${n_cur}" -le "${n_base}" ] || echo "a lista do legado CRESCEU (${n_base} → ${n_cur}) — ela só desce: resíduo novo sai no formato novo"
   added="$(grep -vxF -f <(printf '%s\n' "${base_list}") "${LEGACY_LIST}" | grep . | tr '\n' ' ' || true)"
@@ -146,7 +171,8 @@ _schema_problems() {  # $1=arquivo → uma linha por problema; vazio = o frontma
     case "$(_field_of "${f}" "${v}")" in ''|*[!0-9]*) echo "${v} tem de ser número (0 = não medido, e diga isso em 'nota:')" ;; esac
   done
   _blocking_problem "${f}"
-  local era=''; _is_legacy "${f}" && era=legacy
+  local era='' dup; _is_legacy "${f}" && era=legacy
+  dup="$(_dup_keys "${f}")"; [ -z "${dup}" ] || echo "chave duplicada no frontmatter: ${dup}(o bash lê a 1ª ocorrência e o YAML a última — escreva cada chave uma vez)"
   _verdict_problem "$(_field_of "${f}" verdict)" "${era}"
   _bool_problems "${f}" "${era}"
   return 0
@@ -169,6 +195,38 @@ case "${1:-}" in
     printf '> (ausente = não triado). Régua: `.claude/commands/common/prompts/review-triage.md`.\n'
     printf '> Confira com `bash .claude/validation/review-artifact-check.sh --schema <este arquivo>`. Apague este bloco.\n\n'
     printf '## O que muda\n\n## Achados\n\n## Mutantes\n\n## Limites declarados\n'
+    exit 0 ;;
+  --legacy-candidates)
+    # Os resíduos de <ref> (default origin/main) com algum valor na forma antiga — a lista congelada se GERA daqui
+    # no último rebase antes do merge, e depois só desce. O que a origin/main ganhar DEPOIS dessa geração fica de
+    # fora de propósito: resíduo mergeado não volta a ser julgado (a guarda só julga o do PR corrente), e a lista
+    # não cresce — a janela é declarada, não fechada.
+    _ref="${2:-origin/main}"; _root="$(_legacy_root)"
+    git -C "${_root}" rev-parse -q --verify "${_ref}^{commit}" >/dev/null || { printf 'review-artifact-check: ref inválida: %s\n' "${_ref}" >&2; exit 2; }
+    git -C "${_root}" archive --format=tar "${_ref}" docs/evolution/review | python3 -I -c '
+import sys, tarfile, re
+old = {"APROVADO", "CORRIGIDO", "REPROVADO", "REPROVADO_E_CURADO", "SEM_ACHADOS"}
+out = []
+with tarfile.open(fileobj=sys.stdin.buffer, mode="r|") as tf:
+    for m in tf:
+        if not (m.isfile() and m.name.endswith(".md") and m.name.count("/") == 3):
+            continue
+        lines = tf.extractfile(m).read().decode("utf-8", "replace").split("\n")
+        if lines[0] != "---":
+            continue
+        d = {}
+        for ln in lines[1:]:
+            if ln == "---":
+                break
+            mm = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):[ \t]*(.*)$", ln)
+            if mm and mm.group(1) not in d:
+                d[mm.group(1)] = mm.group(2).replace(chr(34), "").strip()
+        if (d.get("verdict", "").upper().replace("-", "_") in old
+                or d.get("elenxo", "").lower() in ("sim", "nao")
+                or d.get("elenxo_isolado", "").lower() in ("sim", "nao")):
+            out.append(m.name)
+print("\n".join(sorted(out)))
+'
     exit 0 ;;
   --schema)
     [ -f "${2:-}" ] || { printf 'review-artifact-check: --schema <arquivo> (não achei "%s")\n' "${2:-}" >&2; exit 2; }
@@ -218,7 +276,7 @@ DEFAULT="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null
 [ -n "${DEFAULT}" ] || DEFAULT=main
 
 # A CATRACA DO LEGADO RODA ANTES DE TODA ISENÇÃO: ela julga a LISTA, não o PR — vale até no branch default.
-_RATCHET="$(_legacy_ratchet_problems "origin/${DEFAULT}")"
+_RATCHET="$(_legacy_ratchet_problems)"
 if [ -n "${_RATCHET}" ]; then
   while IFS= read -r _l; do _out HARD LEGADO-CATRACA "${LEGACY_LIST_REL}" "${_l}"; done <<< "${_RATCHET}"
   exit 1
@@ -402,7 +460,13 @@ fi
 # histórico real desta casa — reprovar por `-` vs `_` seria inventar um defeito. A normalização
 # só casa a PALAVRA INTEIRA: `CORRIGIDO-E-RE-REVISADO` continua fora do vocabulário, como deve.
 # VALORES EM INGLÊS (2026-11-08): o resíduo da lista congelada aceita as duas formas; o resto, só a nova.
-_ERA=''; _is_legacy "${ART}" && _ERA=legacy
+# Legado só se o PR NÃO tocou o resíduo: o blob julgado (índice ou HEAD, a mesma situação do hash) é o da base.
+_DUP="$(_dup_keys "${ART}")"
+if [ -n "${_DUP}" ]; then
+  _out HARD CHAVE-DUPLICADA "${ART}" "chave duplicada no frontmatter: ${_DUP}— o bash le a 1a ocorrencia e o YAML a ultima; escreva cada chave uma vez."
+  exit 1
+fi
+_ERA=''; _is_legacy "${ART}" "${BASE}" "$(git rev-parse -q --verify "${_ART_REF}" 2>/dev/null)" && _ERA=legacy
 _VERD="$(_field verdict | tr 'a-z' 'A-Z' | tr '-' '_')"
 if ! _verdict_ok "${_VERD}" "${_ERA}"; then
   if _verdict_ok "${_VERD}" legacy; then

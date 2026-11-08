@@ -123,32 +123,42 @@ MERGE_TIMEOUT = 36000                    # acima do envelope do merge-serial (ro
 MOAT_VOCAB = re.compile(r"(?i)(deploy|implant|produ[cç][aã]o|public|publish|release|marketplace|\bporta\b|"
                         r"\bcron|crontab|agend|schedul|\btimer\b|systemctl|systemd|rsync|\bvps\b|--push\b|\bpush\b|"
                         r"co-deliver|adotante|materializ)")
-# Valor de campo de máquina é código, em inglês (decisão do maestro de 2026-11-08). A forma antiga (pt-BR) só vale
-# para o resíduo da lista congelada do legado, que o review-artifact-check.sh catraca (só desce).
+# Valor de campo de máquina é código, em inglês (decisão do maestro de 2026-11-08): `verdict` em inglês e `elenxo`/
+# `elenxo_isolado` em `true`. O AUTOMATE NÃO TEM ERA DE LEGADO, e por construção: `residue()` só aceita o resíduo que
+# o PR TRAZ no diff (SEM-RESIDUO senão), e o legado é, por definição, o arquivo histórico que o PR NÃO tocou (B1 do
+# refutador do #1541: chavear pelo caminho deixava uma branch com o slug de um legado reescrevê-lo com `sim`). Resíduo
+# que o PR toca é trabalho novo — logo aqui só vale a forma nova.
 OK_VERDICTS = ("APPROVED", "FIXED", "REJECTED_AND_FIXED", "NO_FINDINGS")
-OK_VERDICTS_LEGACY = ("APROVADO", "CORRIGIDO", "REPROVADO_E_CURADO", "SEM_ACHADOS")
-LEGACY_RESIDUES = os.path.join(ROOT, "docs/evolution/review-residue-legacy.txt")
 
 
-def residue_is_legacy(rel):
-    try:
-        with open(LEGACY_RESIDUES, encoding="utf-8") as fh:
-            return rel in {ln.strip() for ln in fh}
-    except OSError:
-        return False
+def fm_raw(txt):
+    """O frontmatter lido COMO O BASH LÊ (`_field_of` do review-artifact-check.sh): a 1ª ocorrência da chave, o texto
+    cru sem aspas, e nenhuma coerção. O YAML 1.1 faria de `yes`/`on` um True e leria a ÚLTIMA ocorrência de uma
+    chave duplicada — o mesmo resíduo diria uma coisa à guarda e outra ao gate (L1 e L3 do refutador).
+    Devolve (campos, chaves duplicadas)."""
+    lines = (txt or "").split("\n")
+    if not lines or lines[0] != "---":
+        return {}, []
+    out, dups = {}, []
+    for ln in lines[1:]:
+        if ln == "---":
+            break
+        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):[ \t]*(.*)$", ln)
+        if not m:
+            continue
+        if m.group(1) in out:
+            dups.append(m.group(1))
+            continue
+        out[m.group(1)] = m.group(2).replace('"', "")
+    return out, dups
 
 
-def declares_true(v, legacy):
-    """`true` (o YAML já o devolve booleano); `sim` só no resíduo do legado."""
-    if v is True:
-        return True
-    s = str(v if v is not None else "").strip().lower()
-    return s == "true" or (legacy and s == "sim")
+def declares_true(raw):
+    return (raw or "").strip().lower() == "true"
 
 
-def verdict_ok(v, legacy):
-    s = str(v or "").strip().upper().replace("-", "_")
-    return s in OK_VERDICTS or (legacy and s in OK_VERDICTS_LEGACY)
+def verdict_ok(raw):
+    return (raw or "").strip().upper().replace("-", "_") in OK_VERDICTS
 
 
 class Halt(Exception):
@@ -738,7 +748,7 @@ def residue(pr):
         fm = None
     if not isinstance(fm, dict):
         raise Halt("RESIDUO-ILEGIVEL: %s sem frontmatter YAML" % rel)
-    return rel, fm
+    return rel, fm, out
 
 
 def _decisions(txt):
@@ -850,14 +860,16 @@ def gate(path, nid, want_merge, quiet=False):
     if req is None:
         raise Halt("SEM-RULESET: ops/github-ruleset-main.json ausente ou ilegível — não sei quais checks são exigidos (core-only)")
     runs = checks_verdict(pr, req)
-    rel, fm = residue(pr)
-    legacy = residue_is_legacy(rel)
-    if not declares_true(fm.get("elenxo"), legacy):
-        raise Halt("ELENXO-AUSENTE: %s declara elenxo: %s" % (rel, fm.get("elenxo")))
-    if not declares_true(fm.get("elenxo_isolado"), legacy):
+    rel, fm, rtxt = residue(pr)
+    raw, dups = fm_raw(rtxt)
+    if dups:
+        raise Halt("RESIDUO-CHAVE-DUPLICADA: %s repete %s no frontmatter — a guarda lê a 1ª ocorrência e o YAML a última" % (rel, ", ".join(sorted(set(dups)))))
+    if not declares_true(raw.get("elenxo")):
+        raise Halt("ELENXO-AUSENTE: %s declara elenxo: %s" % (rel, raw.get("elenxo")))
+    if not declares_true(raw.get("elenxo_isolado")):
         raise Halt("ELENXO-UMA-VOZ: %s não declara elenxo_isolado: true — Elenxo do mesmo agente é uma voz só (objeção 3)" % rel)
-    if not verdict_ok(fm.get("verdict"), legacy):
-        raise Halt("ELENXO-REPROVADO: %s tem verdict %s" % (rel, fm.get("verdict")))
+    if not verdict_ok(raw.get("verdict")):
+        raise Halt("ELENXO-REPROVADO: %s tem verdict %s" % (rel, raw.get("verdict")))
     if str(fm.get("reviewed_diff_sha256") or "pendente").lower() in ("pendente", ""):
         raise Halt("RESIDUO-PENDENTE: %s ainda tem reviewed_diff_sha256 pendente — o pr-finalize não fechou o PR" % rel)
     if not want_merge:

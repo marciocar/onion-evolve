@@ -2,19 +2,18 @@
 branch: feat/review-residue-english-values
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: 5f53567dbddcf792b8d61c89f9440d888812116f7a2b3b75a6dfcf53ccc201d9
-reviewed_code_sha256: c4fa8adf2f8f0992f6bac401b895a79795e7ed73d52a66c1fbc46bcf98f60aba
-findings_total: 5
-findings_real: 4
-findings_blocking: 3
+reviewed_diff_sha256: pendente
+findings_total: 11
+findings_real: 10
+findings_blocking: 4
 tokens: 0
 duration_min: 0
-findings_fixed: 3
+findings_fixed: 9
 verdict: REJECTED_AND_FIXED
 elenxo: true
-elenxo_isolado: false
-reviewer: execution agent (same session; no separate agent, creating agents was forbidden by the brief)
-nota: "tokens e duração não medidos (0). Passada adversarial do próprio agente, uma voz só: por isso elenxo_isolado false. Este resíduo é o dogfood da mudança: sai no formato novo."
+elenxo_isolado: true
+reviewer: execution agent (1st pass) + separate refuter of the core session (2nd pass, isolated)
+nota: "tokens e duração não medidos (0). 1ª passada do próprio agente; a 2ª, de um refutador separado, REPROVOU por 1 bloqueio e 5 limites, todos curados neste PR com caso e mutante: por isso elenxo_isolado true. O resíduo sai no formato novo (dogfood)."
 ---
 
 # Passada adversarial: `feat/review-residue-english-values`
@@ -24,7 +23,7 @@ nota: "tokens e duração não medidos (0). Passada adversarial do próprio agen
 Decisão do maestro de 2026-11-08: valor de campo de máquina é código e vai em inglês. No resíduo da REGRA 56
 (PR aberto carrega RESÍDUO da passada adversarial), `verdict` passa a APPROVED | FIXED | REJECTED |
 REJECTED_AND_FIXED | NO_FINDINGS, e `elenxo`/`elenxo_isolado` passam a true|false. A forma antiga só vale
-nos 867 resíduos da lista congelada `docs/evolution/review-residue-legacy.txt`. A catraca impede a lista
+nos resíduos da lista congelada (869 na geração de 2026-11-08) `docs/evolution/review-residue-legacy.txt`. A catraca impede a lista
 de crescer. Leitores tocados: `review-artifact-check.sh` (o julgamento do PR, o `--schema` e o esqueleto),
 `drive-automate.sh` (o gate do AUTOMATE) e `review-ledger.sh` (traduz a forma antiga para a nova, e a série
 não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico byte a byte antes e depois.
@@ -47,6 +46,30 @@ não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico
 5. **Não procede.** A suspeita era o CI sem `origin/main`, o que deixaria a catraca muda. Medido:
    `onion-validate.yml` faz checkout com `fetch-depth: 0`, então a ref existe.
 
+## 2ª passada: refutador separado (REPROVOU; tudo curado aqui)
+
+6. **B1, BLOQUEIA, CURADO.** A lista do legado era chaveada só pelo caminho. Uma branch nova com o slug de um
+   resíduo legado (`feat/decide-painel`) o reescrevia com APROVADO e `sim`, e passava. Slug repetido não é hipótese:
+   houve 6 em 1530 PRs. Cura: legado é **estar na lista e ser idêntico ao blob da base**. O julgamento do PR compara
+   o blob julgado com o do `BASE`, e o `--schema` compara com o merge-base. No gate do AUTOMATE não sobrou era de
+   legado: o `residue()` só aceita o resíduo que o PR traz no diff, que por definição está tocado. A comparação
+   `show(base)==show(head)` pedida seria sempre falsa ali, então o legado saiu do gate. Casos: (p2) pelo PR,
+   (k2) pelo `--schema`, (e14b) pelo AUTOMATE, cada um com mutante.
+7. **L1, CURADO.** Chave duplicada no frontmatter: o bash lê a 1ª ocorrência e o YAML a última. Agora reprova no
+   `--schema`, no julgamento (`CHAVE-DUPLICADA`) e no gate (`RESIDUO-CHAVE-DUPLICADA`). Medido: 0 dos 958 resíduos
+   tinham duplicata, então nada quebra.
+8. **L2, CURADO.** Dois mutantes do refutador sobreviviam na família drive_automate. Os casos novos os matam:
+   (e14a) `elenxo_isolado: sim` num resíduo novo → ELENXO-UMA-VOZ; (e14b) o caminho na lista, reescrito com
+   sim/sim/REPROVADO_E_CURADO → ELENXO-AUSENTE. O caso "legado com `sim` passa no gate", também pedido, não existe
+   mais, porque o gate não tem legado (achado 6).
+9. **L3, CURADO.** O gate lia pelo YAML 1.1, onde `yes`/`on` viram True. Agora lê pelo mesmo extrator do bash
+   (`fm_raw`: 1ª ocorrência, texto cru). Caso (e14c), com mutante.
+10. **L4, CURADO.** A lista se gera por `--legacy-candidates [<ref>]`, regenerada no último rebase sobre a
+    origin/main. O resíduo antigo mergeado DEPOIS da geração fica de fora, e de propósito: resíduo mergeado não
+    volta a ser julgado, e a lista não cresce. A janela é declarada. Caso (k3).
+11. **L5, CURADO.** "Cresceu" e "entrada nova" medem contra o merge-base; a órfã segue medida na árvore. Caso (l5)
+    com mutante. O achado 3 (falso "cresceu" num PR antigo) morre com ele.
+
 ## Mutantes
 
 Todos com a cópia limpa provada no mesmo arranjo:
@@ -56,11 +79,15 @@ Todos com a cópia limpa provada no mesmo arranjo:
 - (k-bool) sem a checagem dos booleanos, `elenxo: sim` passa num resíduo novo;
 - (l) sem a chamada da catraca, a lista que cresce passa;
 - (p3) sem consultar a lista no julgamento do PR, o legado reprova.
+- (p3 B1-sem-intocado) e (k2-B1): sem exigir "intocado", o slug de legado reescrito passa.
+- (p3 sem-duplicata) e (k2-dup): sem a checagem de duplicata, a duplicata passa.
+- (m-sim), (m-sim-B1), (m-yaml) e (m-dup) no drive-automate.
+- (l5): a catraca medida contra a ponta acusa "CRESCEU".
 
 ## Limites declarados
 
-- O achado 3.
+- O achado 3 caiu com o L5.
 - Os PRs em voo cujo resíduo ainda não está na `origin/main` e usa a forma antiga passam a reprovar depois
   do merge. Isso é o efeito pedido pela decisão: a cura é trocar os valores no resíduo.
-- O maestro falou em 618 resíduos de legado, e 618 é a contagem do campo `elenxo`. A lista tem 867, os que
+- O maestro falou em 618 resíduos de legado, e 618 é a contagem do campo `elenxo`. A lista tem 869 (na geração final), os que
   têm qualquer valor na forma antiga (verdict ou elenxo).

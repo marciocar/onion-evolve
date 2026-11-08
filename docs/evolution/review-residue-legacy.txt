@@ -35,6 +35,7 @@ docs/evolution/review/chore-decide-round-2026-10-20b.md
 docs/evolution/review/chore-decide-round-2026-10-21.md
 docs/evolution/review/chore-decide-ui-pilot.md
 docs/evolution/review/chore-diary-index-farol.md
+docs/evolution/review/chore-diary-review-2026-11-08.md
 docs/evolution/review/chore-dissect-forge-node.md
 docs/evolution/review/chore-door-14-and-gate-canary.md
 docs/evolution/review/chore-door-17-pin.md
@@ -242,6 +243,7 @@ docs/evolution/review/docs-decisions-delegated-2026-10-15.md
 docs/evolution/review/docs-deck-ato6-adocao-recem-chegado.md
 docs/evolution/review/docs-deck-spec-watch-e-capabilities.md
 docs/evolution/review/docs-degrau2-slack-proven-1108.md
+docs/evolution/review/docs-degraus-1-3-proven-1108.md
 docs/evolution/review/docs-delegated-decisions-log-2026-10-14.md
 docs/evolution/review/docs-design-fourth-dimension-direction.md
 docs/evolution/review/docs-design-setup-option1-and-context-graph.md

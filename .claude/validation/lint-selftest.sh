@@ -20702,39 +20702,60 @@ run_review_artifact_selftests() {
   fi
   rm -rf "${mutv}"
 
-  # (p2) VALORES EM INGLÊS (2026-11-08) pelo caminho que o lint consome (o julgamento do PR, em TSV): o resíduo novo
-  #      com verdict pt-BR reprova com a tag própria; o MESMO resíduo, posto na lista congelada do legado do repo
-  #      julgado, passa; e `elenxo: sim` fora da lista reprova. O --schema tem casos próprios (residue-english).
+  # (p2) VALORES EM INGLÊS (2026-11-08) pelo caminho que o lint consome (o julgamento do PR, em TSV):
+  #      · resíduo novo com verdict pt-BR → VERDICT-FORMA-ANTIGA; `elenxo: sim` → BOOLEANO-FORA-DO-VOCABULARIO;
+  #      · B1 (refutador do #1541): o MESMO ataque com o caminho NA LISTA do legado — branch nova com o slug de um
+  #        resíduo legado que o reescreve — reprova: resíduo que o PR toca nunca é legado;
+  #      · o legado de verdade (na lista E idêntico ao da base) passa: o resíduo nasce na main, o trabalho é rebaseado.
+  #      · L1: chave duplicada no frontmatter → CHAVE-DUPLICADA.
   local p2bad=""
   _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"
   rc=0; out="$(_run "${d}")" || rc=$?
   { [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORMA-ANTIGA' <<< "${out}"; } || p2bad="${p2bad} novo-antigo(rc=${rc})"
   printf 'docs/evolution/review/feat-x.md\n' > "${d}/docs/evolution/review-residue-legacy.txt"
   rc=0; out="$(_run "${d}")" || rc=$?
-  [ "${rc}" -eq 0 ] || p2bad="${p2bad} legado(rc=${rc}:$(tr '\n' ' ' <<< "${out}" | cut -c1-120))"
+  { [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORMA-ANTIGA' <<< "${out}"; } || p2bad="${p2bad} B1-slug-legado-tocado(rc=${rc})"
   rm -rf "${d}"
   _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "FIXED" "elenxo: sim"
   rc=0; out="$(_run "${d}")" || rc=$?
   { [ "${rc}" -eq 1 ] && grep -q 'BOOLEANO-FORA-DO-VOCABULARIO' <<< "${out}"; } || p2bad="${p2bad} elenxo-sim(rc=${rc})"
   rm -rf "${d}"
-  if [ -z "${p2bad}" ]; then record_pass "review-artifact: (p2) no julgamento do PR, verdict pt-BR e elenxo: sim reprovam no resíduo novo; na lista do legado, o mesmo verdict passa"
+  _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "FIXED" "verdict: APPROVED"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  { [ "${rc}" -eq 1 ] && grep -q 'CHAVE-DUPLICADA.*verdict' <<< "${out}"; } || p2bad="${p2bad} chave-duplicada(rc=${rc})"
+  rm -rf "${d}"
+  # o legado intocado: o resíduo vai para a main com o hash do diff do trabalho, e o trabalho é rebaseado sobre ela
+  _mk_legacy_repo() {
+    _mk_pr_repo; local sh; sh="$(_sha_of "${d}")"
+    ( cd "${d}" && git checkout -q main && _art "${d}" "${sh}" 1 "APROVADO" "elenxo: sim" \
+        && git checkout -q feat/x && git -c user.email=t@t -c user.name=t rebase -q main \
+        && printf 'docs/evolution/review/feat-x.md\n' > docs/evolution/review-residue-legacy.txt ) >/dev/null 2>&1
+  }
+  _mk_legacy_repo
+  rc=0; out="$(_run "${d}")" || rc=$?
+  [ "${rc}" -eq 0 ] || p2bad="${p2bad} legado-intocado(rc=${rc}:$(tr '\n' ' ' <<< "${out}" | cut -c1-120))"
+  rm -rf "${d}"
+  if [ -z "${p2bad}" ]; then record_pass "review-artifact: (p2) no julgamento do PR: verdict pt-BR, elenxo: sim, chave duplicada e o slug de legado reescrito (B1) reprovam; o legado intocado passa"
   else record_fail "review-artifact: (p2) valores em inglês" "falhou:${p2bad}"; fi
-  # (p3) (MUT) sem consultar a lista no julgamento do PR, o resíduo do legado reprova. Cópia LIMPA no mesmo arranjo.
-  local mute; mute="$(mktemp -d)"; cp "${helper}" "${mute}/clean.sh"; cp "${helper}" "${mute}/m.sh"
-  sed -i "s/^_ERA=''; _is_legacy \"\${ART}\" \&\& _ERA=legacy$/_ERA=''/" "${mute}/m.sh"
-  if ! cmp -s "${mute}/clean.sh" "${mute}/m.sh"; then
-    local rcc3=0 rcm3=0
-    _mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"
-    printf 'docs/evolution/review/feat-x.md\n' > "${d}/docs/evolution/review-residue-legacy.txt"
-    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
-        bash "${mute}/clean.sh" "${d}" >/dev/null 2>&1 ) || rcc3=$?
-    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
-        bash "${mute}/m.sh" "${d}" >/dev/null 2>&1 ) || rcm3=$?
-    if [ "${rcc3}" -eq 0 ] && [ "${rcm3}" -eq 1 ]; then
-      record_pass "review-artifact: (p3) (MUT) limpa aceita o legado da lista; sem consultar a lista no julgamento do PR, ele reprova"
-    else record_fail "review-artifact: (p3) (MUT)" "limpa rc=${rcc3} (esperado 0), mutante rc=${rcm3} (esperado 1)"; fi
+  # (p3) (MUT) cópia LIMPA e mutante no MESMO arranjo, um por trecho:
+  #      · sem consultar a lista, o legado intocado reprova;
+  #      · sem exigir "intocado" (o B1 de volta), o slug de legado reescrito passa;
+  #      · sem a checagem de chave duplicada, a duplicata passa.
+  local mute; mute="$(mktemp -d)"; cp "${helper}" "${mute}/clean.sh"
+  _p3() {  # $1=rótulo $2=sed $3=montagem $4=rc limpa $5=rc mutante
+    cp "${helper}" "${mute}/m.sh"; sed -i "$2" "${mute}/m.sh"
+    if cmp -s "${mute}/clean.sh" "${mute}/m.sh"; then record_fail "review-artifact: (p3) $1 (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; return; fi
+    local rcc=0 rcm=0; eval "$3"
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge bash "${mute}/clean.sh" "${d}" >/dev/null 2>&1 ) || rcc=$?
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge bash "${mute}/m.sh" "${d}" >/dev/null 2>&1 ) || rcm=$?
+    if [ "${rcc}" -eq "$4" ] && [ "${rcm}" -eq "$5" ]; then record_pass "review-artifact: (p3) $1 (MUT) limpa rc=$4, mutante rc=$5 — o trecho é load-bearing"
+    else record_fail "review-artifact: (p3) $1 (MUT)" "limpa rc=${rcc} (esperado $4), mutante rc=${rcm} (esperado $5)"; fi
     rm -rf "${d}"
-  else record_fail "review-artifact: (p3) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  }
+  _p3 "sem-lista" "s/^_ERA=''; _is_legacy .* \&\& _ERA=legacy$/_ERA=''/" '_mk_legacy_repo' 0 1
+  _p3 "B1-sem-intocado" 's/^  \[ -n "${base}" \] \&\& \[ -n "${cur}" \] \&\& .* || return 1$/  :/' \
+      '_mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "APROVADO"; printf "docs/evolution/review/feat-x.md\n" > "${d}/docs/evolution/review-residue-legacy.txt"' 1 0
+  _p3 "sem-duplicata" 's/^if \[ -n "${_DUP}" \]; then$/if false; then/' '_mk_pr_repo; _art "${d}" "$(_sha_of "${d}")" 1 "FIXED" "verdict: APPROVED"' 1 0
   rm -rf "${mute}"
 
   # ═══ `findings_blocking` (2026-11-06) — quantos dos achados REAIS BLOQUEIAM; o resto é LIMITE declarado ═══
@@ -37813,6 +37834,58 @@ EOF_BS
   _da_ready --merge; _da_pr 7 "${OID_NE:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
   _da_case "(e13d) resíduo sem Elenxo PARA (ELENXO-AUSENTE)" 1 "ELENXO-AUSENTE"
   rm -rf "${sb}"
+  # ── VALORES EM INGLÊS (2026-11-08) e o refutador do #1541 (L1, L2, L3, B1) ─────────────────────────────────
+  # O AUTOMATE só lê o resíduo que o PR TRAZ no diff, e o legado é o arquivo que o PR NÃO tocou: aqui não há era de
+  # legado. O B1 no gate é o resíduo com o caminho NA LISTA, reescrito com as três formas antigas: tem de PARAR.
+  # A leitura é a do bash (1ª ocorrência, texto cru): `yes` não vira true (L3) e chave duplicada para (L1).
+  _da_res() {  # $1=frontmatter (printf) → imprime o OID do commit com esse resíduo, sobre feat/item-a~2
+    ( cd "${sb}" && git checkout -q feat/item-a~2 2>/dev/null && printf -- "$1" > docs/evolution/review/feat-item-a.md \
+        && "${_git[@]}" commit -qam variante && git rev-parse HEAD && git checkout -q main ) 2>/dev/null | tail -1; }
+  local _FM_SIM='---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: FIXED\nelenxo: true\nelenxo_isolado: sim\n---\n'
+  local _FM_B1='---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: REPROVADO_E_CURADO\nelenxo: sim\nelenxo_isolado: sim\n---\n'
+  local _FM_YES='---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: FIXED\nelenxo: true\nelenxo_isolado: yes\n---\n'
+  local _FM_DUP='---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: FIXED\nelenxo: true\nelenxo_isolado: false\nelenxo_isolado: true\n---\n'
+  local _oid
+  _da_new; _oid="$(_da_res "${_FM_SIM}")"; _da_ready --merge; _da_pr 7 "${_oid:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e14a) L2: resíduo com elenxo_isolado: sim (forma antiga) PARA (ELENXO-UMA-VOZ)" 1 "ELENXO-UMA-VOZ"
+  rm -rf "${sb}"
+  _da_new; _oid="$(_da_res "${_FM_B1}")"; mkdir -p "${sb}/docs/evolution"
+  printf 'docs/evolution/review/feat-item-a.md\n' > "${sb}/docs/evolution/review-residue-legacy.txt"
+  _da_ready --merge; _da_pr 7 "${_oid:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e14b) B1: caminho na lista do legado, reescrito pelo PR com sim/sim/REPROVADO_E_CURADO, PARA (ELENXO-AUSENTE)" 1 "ELENXO-AUSENTE"
+  rm -rf "${sb}"
+  _da_new; _oid="$(_da_res "${_FM_YES}")"; _da_ready --merge; _da_pr 7 "${_oid:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e14c) L3: elenxo_isolado: yes (o YAML 1.1 diria True) PARA (ELENXO-UMA-VOZ)" 1 "ELENXO-UMA-VOZ"
+  rm -rf "${sb}"
+  _da_new; _oid="$(_da_res "${_FM_DUP}")"; _da_ready --merge; _da_pr 7 "${_oid:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e14d) L1: chave duplicada no resíduo PARA (RESIDUO-CHAVE-DUPLICADA)" 1 "RESIDUO-CHAVE-DUPLICADA: docs/evolution/review/feat-item-a.md repete elenxo_isolado"
+  rm -rf "${sb}"
+  # Mutantes no drive-automate.sh da sandbox, cada um com a cópia LIMPA no mesmo arranjo:
+  #   (m-sim)  `sim` volta a valer → (e14a) e (e14b) deixam de parar por Elenxo;
+  #   (m-yaml) o gate volta a ler pelo YAML → `yes` vira True e (e14c) passa do Elenxo;
+  #   (m-dup)  sem a checagem de duplicata → (e14d) não diz RESIDUO-CHAVE-DUPLICADA.
+  _da_mut() {  # $1=rótulo $2=python que muta o arquivo $3=frontmatter $4=token que a limpa dá e o mutante não
+    _da_new; _oid="$(_da_res "$3")"; _da_ready --merge; _da_pr 7 "${_oid:-x}" "${FILES_OK}"
+    local f="${sb}/.claude/validation/drive-automate.sh" okc=0 okm=0; cp "${f}" "${sb}/clean.da"
+    _da gate "${G}" C_TASK_A --merge; grep -qF -- "$4" <<< "${out}" && okc=1
+    python3 - "${f}" "$2" <<'EOF_MUT'
+import sys; p, how = sys.argv[1], sys.argv[2]; t = open(p, encoding="utf-8").read()
+subs = {"sim": ('return (raw or "").strip().lower() == "true"', 'return (raw or "").strip().lower() in ("true", "sim")'),
+        "yaml": ('if not declares_true(raw.get("elenxo_isolado")):', 'if not declares_true(str(fm.get("elenxo_isolado"))):'),
+        "dup": ("    if dups:\n        raise Halt(\"RESIDUO-CHAVE-DUPLICADA", "    if False:\n        raise Halt(\"RESIDUO-CHAVE-DUPLICADA")}
+a, b = subs[how]
+if t.count(a) != 1: sys.exit(3)
+open(p, "w", encoding="utf-8").write(t.replace(a, b))
+EOF_MUT
+    if cmp -s "${f}" "${sb}/clean.da"; then record_fail "drive-automate: $1 (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; rm -rf "${sb}"; return; fi
+    _da gate "${G}" C_TASK_A --merge; grep -qF -- "$4" <<< "${out}" || okm=1
+    if [ "${okc}" = 1 ] && [ "${okm}" = 1 ]; then record_pass "drive-automate: $1 (MUT) a limpa diz '$4' e o mutante não — o trecho é load-bearing"
+    else record_fail "drive-automate: $1 (MUT)" "limpa disse o token? ${okc} · mutante calou? ${okm} — saída: $(tr '\n' ' ' <<< "${out}" | cut -c1-160)"; fi
+    rm -rf "${sb}"; }
+  _da_mut "(m-sim)" sim "${_FM_SIM}" "ELENXO-UMA-VOZ"
+  _da_mut "(m-sim-B1)" sim "${_FM_B1}" "ELENXO-AUSENTE"
+  _da_mut "(m-yaml)" yaml "${_FM_YES}" "ELENXO-UMA-VOZ"
+  _da_mut "(m-dup)" dup "${_FM_DUP}" "RESIDUO-CHAVE-DUPLICADA"
   _da_new; _da begin "${G}" --max-nodes 3 --budget 1000 >/dev/null; sed -i 's/verified_at: "2026-10-14"/verified_at: "2026-09-01"/' "${sb}/${G}"; _da next "${G}"
   _da_case "(e13e) o next não entrega item com insumo vencido (INSUMO-VENCIDO)" 1 "INSUMO-VENCIDO: E_INPUT"
   rm -rf "${sb}"
@@ -48309,6 +48382,16 @@ run_residue_schema_selftests() {
   sed -i '/^elenxo: /a elenxo_isolado: false' "${lg}/docs/evolution/review/new.md"
   sed 's/^verdict: .*/verdict: APROVADO/' "${lg}/docs/evolution/review/new.md" > "${lg}/docs/evolution/review/nv.md"
   sed 's/^elenxo: .*/elenxo: sim/' "${lg}/docs/evolution/review/new.md" > "${lg}/docs/evolution/review/nb.md"
+  # B1: `oldt.md` está na lista e na base, e o trabalho o REESCREVE (o slug de legado reusado) → não é legado
+  cp "${lg}/docs/evolution/review/old.md" "${lg}/docs/evolution/review/oldt.md"
+  printf 'docs/evolution/review/oldt.md\n' >> "${lg}/docs/evolution/review-residue-legacy.txt"
+  # L1: chave duplicada (o bash lê a 1ª, o YAML a última)
+  sed '/^verdict: /a verdict: APPROVED' "${lg}/docs/evolution/review/new.md" > "${lg}/docs/evolution/review/dup.md"
+  # o legado só se prova "intocado" contra a base: o sandbox é um repo com origin/main, e o trabalho numa branch
+  git -C "${lg}" init -q -b main && git -C "${lg}" add -A \
+    && git -C "${lg}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1 \
+    && git -C "${lg}" update-ref refs/remotes/origin/main main && git -C "${lg}" switch -q -c feat/x
+  printf '\nreescrito por uma branch nova com o mesmo slug\n' >> "${lg}/docs/evolution/review/oldt.md"
   _lgv() { local rc=0; bash "${1}" --schema "${lg}/docs/evolution/review/${2}" >"${d}/lgo" 2>&1 || rc=$?; echo "${rc}"; }
   local V="${lg}/.claude/validation/review-artifact-check.sh"
   # (i) o legado da lista é aceito na forma antiga (verdict pt-BR, elenxo e elenxo_isolado sim|nao)
@@ -48323,6 +48406,18 @@ run_residue_schema_selftests() {
   [ "$(_lgv "${V}" nb.md)" = 1 ] && grep -q "elenxo: 'sim' é a forma ANTIGA" "${d}/lgo" || kbad="${kbad} elenxo"
   if [ -z "${kbad}" ]; then record_pass "residue-english: (k) resíduo novo com verdict ou elenxo na forma antiga reprova, nomeando a forma"
   else record_fail "residue-english: (k) novo com valor antigo" "passou ou sem a mensagem:${kbad}"; fi
+  # (k2) B1: o resíduo da lista que o trabalho REESCREVEU reprova na forma antiga; L1: chave duplicada reprova
+  local k2bad=""
+  [ "$(_lgv "${V}" oldt.md)" = 1 ] && grep -q "é a forma ANTIGA" "${d}/lgo" || k2bad="${k2bad} B1-legado-tocado"
+  [ "$(_lgv "${V}" dup.md)" = 1 ] && grep -q "chave duplicada no frontmatter: verdict" "${d}/lgo" || k2bad="${k2bad} chave-duplicada"
+  if [ -z "${k2bad}" ]; then record_pass "residue-english: (k2) resíduo da lista reescrito pelo trabalho (B1) e chave duplicada (L1) reprovam no --schema"
+  else record_fail "residue-english: (k2) B1/L1" "passou ou sem a mensagem:${k2bad}"; fi
+  # (k3) L4: a lista se GERA de uma ref (`--legacy-candidates`), não à mão: na base do sandbox entram os 4 com valor
+  #      na forma antiga (nb, nv, old, oldt); new e dup, no formato novo, não entram.
+  local cand; cand="$(bash "${V}" --legacy-candidates origin/main 2>&1 | tr '\n' ' ')"
+  if [ "${cand}" = "docs/evolution/review/nb.md docs/evolution/review/nv.md docs/evolution/review/old.md docs/evolution/review/oldt.md " ]; then
+    record_pass "residue-english: (k3) --legacy-candidates lista da ref só os resíduos na forma antiga"
+  else record_fail "residue-english: (k3) --legacy-candidates" "saiu [${cand}]"; fi
   # Mutantes, cada um com a cópia LIMPA provada no MESMO arranjo antes de contar o morto.
   _lgm() {  # $1=rótulo $2=sed $3=arquivo $4=rc da limpa $5=rc do mutante
     local m="${lg}/.claude/validation/m.sh"; cp "${V}" "${m}"; sed -i "$2" "${m}"
@@ -48340,6 +48435,9 @@ run_residue_schema_selftests() {
   _lgm "(k-verdict)" 's/^  local era=.*; _is_legacy "${f}" \&\& era=legacy$/  local era=legacy/' nv.md 1 0
   # (k-MUT) sem a checagem dos booleanos, `elenxo: sim` num resíduo novo passa
   _lgm "(k-bool)" 's/^  _bool_problems "${f}" "${era}"$/  : # mutante/' nb.md 1 0
+  # (k2-MUT) sem exigir "intocado", o legado reescrito passa; sem a checagem de duplicata, a duplicata passa
+  _lgm "(k2-B1)" 's/^  \[ -n "${base}" \] \&\& \[ -n "${cur}" \] \&\& .* || return 1$/  :/' oldt.md 1 0
+  _lgm "(k2-dup)" 's/^  dup="$(_dup_keys "${f}")"; /  dup=""; /' dup.md 1 0
   # (l) A CATRACA: a lista só desce. Repo git com a lista na origin/main; entrada nova reprova, entrada órfã reprova,
   #     lista que desceu passa. Pelo caminho que o lint consome (o julgamento do PR, em TSV), não pelo --schema.
   local rg="${d}/rg"; mkdir -p "${rg}/.claude/validation" "${rg}/docs/evolution/review"
@@ -48364,13 +48462,32 @@ run_residue_schema_selftests() {
   printf 'x\n' > "${rg}/docs/evolution/review/b.md"
   printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\ndocs/evolution/review/c.md\n' > "${L}"
   local mr="${d}/rg-m.sh"; cp "${rg}/.claude/validation/review-artifact-check.sh" "${mr}"
-  sed -i 's/^_RATCHET="$(_legacy_ratchet_problems "origin\/${DEFAULT}")"$/_RATCHET=""/' "${mr}"
+  sed -i 's/^_RATCHET="$(_legacy_ratchet_problems)"$/_RATCHET=""/' "${mr}"
   if cmp -s "${rg}/.claude/validation/review-artifact-check.sh" "${mr}"; then
     record_fail "residue-english: (l) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   else
     local rcc rcm; rcc="$(_rgv)"; rcm="$(_rgv "${mr}")"
     if [ "${rcc}" = 1 ] && [ "${rcm}" = 0 ]; then record_pass "residue-english: (l) (MUT) limpa reprova a lista que cresceu; sem a chamada da catraca ela passa"
     else record_fail "residue-english: (l) (MUT)" "limpa rc=${rcc} (esperado 1), mutante rc=${rcm} (esperado 0)"; fi
+  fi
+  # (l5) L5: CRESCER se mede contra o MERGE-BASE, não contra a ponta da origin/main. A main DESCE depois do ponto de
+  #      partida (tira b), a branch segue com a lista do merge-base (a, b): não cresceu nada, passa. O mutante que
+  #      compara com a ponta acusa "CRESCEU" — o falso positivo que o refutador apontou.
+  printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\n' > "${L}"
+  git -C "${rg}" stash -q -u >/dev/null 2>&1 || true
+  ( cd "${rg}" && git checkout -q main && printf 'docs/evolution/review/a.md\n' > "${L}" && git rm -q docs/evolution/review/b.md \
+      && git -c user.email=t@t -c user.name=t commit -qam desce && git update-ref refs/remotes/origin/main main \
+      && git checkout -q feat/x ) >/dev/null 2>&1
+  printf 'docs/evolution/review/a.md\ndocs/evolution/review/b.md\n' > "${L}"
+  local mb="${d}/rg-mb.sh"; cp "${rg}/.claude/validation/review-artifact-check.sh" "${mb}"
+  sed -i 's/^  base="$(_base_of "${root}")"; \[ -n "${base}" \] || return 0$/  base=origin\/main/' "${mb}"
+  if cmp -s "${rg}/.claude/validation/review-artifact-check.sh" "${mb}"; then
+    record_fail "residue-english: (l5) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  else
+    local rc5 rm5; rc5="$(_rgv)"; cp "${d}/rgo" "${d}/rgo5"; rm5="$(_rgv "${mb}")"
+    if [ "${rc5}" = 0 ] && [ "${rm5}" = 1 ] && grep -q 'CRESCEU' "${d}/rgo"; then
+      record_pass "residue-english: (l5) a main desceu depois do ponto de partida e a branch passa (merge-base); o mutante que mede contra a ponta acusa CRESCEU"
+    else record_fail "residue-english: (l5)" "limpa rc=${rc5} (esperado 0: $(tr '\n' ' ' < "${d}/rgo5" | cut -c1-160)), mutante rc=${rm5} (esperado 1)"; fi
   fi
   rm -rf "${d}"
 }
