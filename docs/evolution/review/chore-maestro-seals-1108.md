@@ -13,7 +13,7 @@ findings_fixed: 3
 verdict: FIXED
 elenxo: false
 reviewer: passada própria do agente de execução sobre o próprio diff, sem subagente (o brief proíbe criar agentes); gates mecânicos kg-radar e kg-contract-check, grep no dist
-nota: "tokens e duração não medidos (0). Selo do checkpoint, grafo novo de 9 nós e troca de rótulo em snapshot estático; sem código."
+nota: "tokens e duração não medidos (0). Selo do checkpoint, grafo novo de 10 nós e troca de rótulo em snapshot estático; sem código."
 ---
 
 # Passada adversarial: `chore/maestro-seals-1108`
@@ -22,7 +22,7 @@ nota: "tokens e duração não medidos (0). Selo do checkpoint, grafo novo de 9 
 
 - `docs/onion/graph/comms-stable-2026-11.kg.yaml`: checkpoint selado pelo `kg-drive-project.sh --seal`, com radar e
   contrato em rc 0.
-- `docs/onion/graph/maestro-decisions-1108.kg.yaml`: grafo novo, com 2 evidências e os 7 selos da rodada. Foi grafo
+- `docs/onion/graph/maestro-decisions-1108.kg.yaml`: grafo novo, com 2 evidências e os 8 selos da rodada. Foi grafo
   próprio porque `curation-seals-2026-11` declara teto de 8 nós e escopo só de peças da curadoria.
 - `site/public/federacao/`: o id `metagamify` vira o rótulo «adotante hub (gamificação)», no mesmo molde do PR #1543.
 
@@ -38,7 +38,6 @@ nota: "tokens e duração não medidos (0). Selo do checkpoint, grafo novo de 9 
 
 ## O que fica de fora, por decisão
 
-- `site/src/pages/historia/index.astro` ainda cita o nome em 5 pontos e aparece no dist. A decisão selada é sobre
-  `/federacao/`, então a página de história não entra aqui e vai como pendência no relatório.
+- `site/src/pages/historia/index.astro` segue citando o nome e aparece no dist. O maestro decidiu mantê-lo (`D_MD_HISTORY_PAGE_KEEPS_NAME_1108`): a retirada vale só para `/federacao/`, e os demais arquivos do repo ficam como estão.
 - O deploy do site é do maestro.
 - A pergunta e a opção no grafo guardam o id verbatim: selo é testemunho da pergunta feita.
