@@ -46863,6 +46863,24 @@ run_task_manager_linear_archive_selftests() {
 }
 _family run_task_manager_linear_archive_selftests
 
+# tm.sh + adapters/linear.py (estimate.points, estimate.points_read, due_date.set) e velocity-meter.py (2026-11-08) — OFFLINE:
+# GraphQL FALSO em loopback, medidor pelo tm.sh de verdade. A bancada é .claude/validation/task-manager-velocity-bench.py: casos,
+# CÓPIA LIMPA verde no arranjo dos mutantes, e um mutante por cura. Nenhuma chave real, nenhum .env, nenhuma rede.
+run_task_manager_velocity_selftests() {
+  local bench="${REPO_ROOT}/.claude/validation/task-manager-velocity-bench.py"
+  [ -f "${bench}" ] && [ -f "${REPO_ROOT}/.claude/utils/task-manager/velocity-meter.py" ] || { record_fail "task-manager-velocity" "bancada ou velocity-meter.py ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "task-manager-velocity: python3 ausente"; return; }
+  local out rc n_ok n_cases n_kill n_mut
+  if out="$(cd "${REPO_ROOT}" && env -u LINEAR_API_KEY -u LINEAR_TEAM_ID timeout 500 python3 -I -B "${bench}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  read -r n_ok n_cases n_kill n_mut <<< "$(sed -nE 's#^task-manager-velocity-bench: ([0-9]+)/([0-9]+) caso\(s\) verdes; ([0-9]+)/([0-9]+) mutante\(s\) mordem; cópia limpa verde$#\1 \2 \3 \4#p' <<< "${out}")"
+  if [ "${rc}" -eq 0 ] && [ -n "${n_cases:-}" ] && [ "${n_ok}" = "${n_cases}" ] && [ "${n_kill}" = "${n_mut}" ] && [ "${n_cases}" -ge 47 ] && [ "${n_mut}" -ge 61 ]; then
+    record_pass "task-manager-velocity: ${n_ok}/${n_cases} casos verdes contra o Linear falso, cópia limpa verde, ${n_kill}/${n_mut} mutantes mordem"
+  else
+    record_fail "task-manager-velocity: bancada" "rc=${rc} $(grep -E '^- |^FALHA|bench:' <<< "${out}" | head -4 | tr '\n' '|')"
+  fi
+}
+_family run_task_manager_velocity_selftests
+
 # REGRA 105 (Script rastreado não chama a API do provedor de task manager por fora do adapter) + o veto
 # pretooluse-direct-provider-api.sh — SAC-75, medido em 2026-10-12: 147 comandos Bash únicos das sessões tocaram
 # host de provedor, ~130 com cliente HTTP, e um deles DEPOIS do tm.sh existir (python3 heredoc com urllib direto no

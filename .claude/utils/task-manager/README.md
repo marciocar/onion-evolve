@@ -31,6 +31,7 @@ task-manager/
 ├── detector.md        # Detecção de provedor
 ├── factory.md         # Factory para adapters
 ├── tm.sh              # EXECUTÁVEL: tm.sh <capability> [args] → adapter executável do provider ativo (JSON)
+├── velocity-meter.py  # Planejado × executado por categoria e data proposta com faixa (só leitura, sobre o tm.sh)
 └── adapters/
     ├── clickup.md     # Adapter ClickUp
     ├── asana.md       # Adapter Asana

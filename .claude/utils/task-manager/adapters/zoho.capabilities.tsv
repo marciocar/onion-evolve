@@ -20,6 +20,7 @@ priority.set	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para desc
 estimate.points	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
 estimate.points_read	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	pontos não ancorados; o adapter não lê, então o progresso sai por contagem (progress.sh declara)
 estimate.time	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	owners_and_work traz total_work; não mapeado
+due_date.set	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	verbo próprio ausente neste adapter; só o Linear o tem
 comment.add	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§o campo é `comment`	markdown simples
 comment.list	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§"comments": [...]	
 activity.list	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	histórico de mudanças da task (SAC-116): o adapter não lê; Zoho Projects é a 3ª fatia (ordem do maestro, 2026-10-12)

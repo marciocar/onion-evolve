@@ -8,8 +8,8 @@ Linear é trocado por um servidor GraphQL FALSO em loopback (costura TM_LINEAR_E
   · `issues(...)` esconde arquivadas sem `includeArchived`, e devolve no máximo 2 por página (o cursor tem de ser seguido);
   · chave de filtro que ele não conhece volta como `errors` (filtro de forma errada não passa por lista vazia);
   · `issueArchive` em issue já arquivada volta como `errors`, o que torna visível qualquer repetição da mutação.
-O que esta bancada NÃO prova: que o Linear real se comporta como o falso. O item.archive segue `unverified` na
-declaração até o primeiro arquivamento real relido.
+O que esta bancada NÃO prova: que o Linear real se comporta como o falso. O primeiro arquivamento real relido foi em
+2026-11-08 (SAC-368, registrado no linear.md) e por isso a declaração passou a `implemented`.
 
 Três partes, no molde da bancada do ClickUp:
   1. CASOS: pelo tm.sh, um por comportamento;

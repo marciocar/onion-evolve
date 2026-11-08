@@ -15,7 +15,8 @@
 #   tm.sh status.transition SAC-65 <nomeDoEstado|stateId>
 #   tm.sh item.create --title T [--description D] [--project P] [--parent ID]
 #   tm.sh item.archive SAC-65 [--dry-run]   (idempotente: já arquivada não chama a mutação)
-#   tm.sh item.list [--state N] [--state-type completed,canceled] [--older-than-days N] [--team KEY] [--include-archived] [--limit N]
+#   tm.sh item.list [--state N] [--state-type completed,canceled] [--older-than-days N] [--team KEY] [--project P] [--include-archived] [--with-description] [--limit N]
+#   tm.sh estimate.points SAC-65 5|--clear   ·   tm.sh estimate.points_read SAC-65   ·   tm.sh due_date.set SAC-65 2026-11-30|--clear
 #   tm.sh search.query "<texto>"   ·   tm.sh project.list   ·   tm.sh hierarchy.subtask_list SAC-65
 # Os verbos são os ids do vocabulário de interface.md §Capacidades.
 #
