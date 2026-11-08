@@ -2,8 +2,7 @@
 branch: feat/review-residue-english-values
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: 30d5682abeab0dc78afd2f55294abe3b1518dbe04d6c4578623c9f035f5b8314
-reviewed_code_sha256: f80bec3016d2d89416f8a18548b01da92cafb7c088fd1eb6aac6792ffcfd2a42
+reviewed_diff_sha256: pendente
 findings_total: 11
 findings_real: 10
 findings_blocking: 4
@@ -24,7 +23,7 @@ nota: "tokens e duração não medidos (0). 1ª passada do próprio agente; a 2�
 Decisão do maestro de 2026-11-08: valor de campo de máquina é código e vai em inglês. No resíduo da REGRA 56
 (PR aberto carrega RESÍDUO da passada adversarial), `verdict` passa a APPROVED | FIXED | REJECTED |
 REJECTED_AND_FIXED | NO_FINDINGS, e `elenxo`/`elenxo_isolado` passam a true|false. A forma antiga só vale
-nos resíduos da lista congelada (869 na geração de 2026-11-08) `docs/evolution/review-residue-legacy.txt`. A catraca impede a lista
+nos resíduos da lista congelada (870 na geração final de 2026-11-08, depois do merge do #1540 e do #1542) `docs/evolution/review-residue-legacy.txt`. A catraca impede a lista
 de crescer. Leitores tocados: `review-artifact-check.sh` (o julgamento do PR, o `--schema` e o esqueleto),
 `drive-automate.sh` (o gate do AUTOMATE) e `review-ledger.sh` (traduz a forma antiga para a nova, e a série
 não se parte). O `testing-state.sh` lê o `--env` do ledger, que saiu idêntico byte a byte antes e depois.
@@ -90,5 +89,5 @@ Todos com a cópia limpa provada no mesmo arranjo:
 - O achado 3 caiu com o L5.
 - Os PRs em voo cujo resíduo ainda não está na `origin/main` e usa a forma antiga passam a reprovar depois
   do merge. Isso é o efeito pedido pela decisão: a cura é trocar os valores no resíduo.
-- O maestro falou em 618 resíduos de legado, e 618 é a contagem do campo `elenxo`. A lista tem 869 (na geração final), os que
+- O maestro falou em 618 resíduos de legado, e 618 é a contagem do campo `elenxo`. A lista tem 870 (na geração final), os que
   têm qualquer valor na forma antiga (verdict ou elenxo).

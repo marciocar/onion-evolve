@@ -364,6 +364,7 @@ docs/evolution/review/docs-seal-stt-loopback-diarization.md
 docs/evolution/review/docs-sealed-decisions-2026-10.md
 docs/evolution/review/docs-sec-scan-php-docker-1022.md
 docs/evolution/review/docs-site-menos-e-mais.md
+docs/evolution/review/docs-site-refresh-2026-11.md
 docs/evolution/review/docs-spike-copilot-studio-mcp-plan.md
 docs/evolution/review/docs-spike-value-criterion.md
 docs/evolution/review/docs-stt-installed-measured.md
