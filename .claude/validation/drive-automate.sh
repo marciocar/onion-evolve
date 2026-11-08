@@ -20,7 +20,7 @@
 #      SHA do merge, id do run de CI dos checks exigidos), nunca com o que a sessão diz ter feito; não
 #      fecha `decision`, não faz flip de verdade (→refuted/→superseded) e não fecha pai com filho aberto.
 #  (3) E_OPINIAO_RISCOS_QUE_FALTAVAM — `gate` exige os checks do ruleset PRESENTES e verdes (CI verde
-#      vazio PARA); resíduo da REGRA 56 com Elenxo por agente SEPARADO (`elenxo_isolado: sim`); estado
+#      vazio PARA); resíduo da REGRA 56 com Elenxo por agente SEPARADO (`elenxo_isolado: true`); estado
 #      retomável por item (x_drive_pr no nó, a passada no meta); insumo STALE de impacto alto PARA; o
 #      status do task manager nunca fecha nada (o do Zoho mente por omissão); --merge DESLIGADO por
 #      padrão, e mesmo ligado nunca para item `decision`.
@@ -47,7 +47,7 @@
 #    invocação do /meta:drive. O que é mecânico: o merge não liga por omissão, e a passada que o ligou
 #    fica registrada no grafo e nomeada no checkpoint, que viaja no diff do lote.
 #  · O budget em tokens é DECLARADO pela sessão (`charge`). O teto de itens é contado aqui.
-#  · `elenxo_isolado: sim` é auto-atestado no resíduo; o que o script exige é que a declaração exista.
+#  · `elenxo_isolado: true` é auto-atestado no resíduo; o que o script exige é que a declaração exista.
 #  · O que a sessão faz FORA deste script (deploy, publicação por wrapper, push) segue o
 #    pretooluse-moat-gate.sh e o pretooluse-merge-gate.sh; publicar por ops/publish-door.sh --push é (core-only)
 #    wrapper versionado e passa no hook — o AUTOMATE não o chama, e a parada de nó MOAT existe por isso.
@@ -123,7 +123,32 @@ MERGE_TIMEOUT = 36000                    # acima do envelope do merge-serial (ro
 MOAT_VOCAB = re.compile(r"(?i)(deploy|implant|produ[cç][aã]o|public|publish|release|marketplace|\bporta\b|"
                         r"\bcron|crontab|agend|schedul|\btimer\b|systemctl|systemd|rsync|\bvps\b|--push\b|\bpush\b|"
                         r"co-deliver|adotante|materializ)")
-OK_VERDICTS = ("APROVADO", "CORRIGIDO", "REPROVADO_E_CURADO", "SEM_ACHADOS")
+# Valor de campo de máquina é código, em inglês (decisão do maestro de 2026-11-08). A forma antiga (pt-BR) só vale
+# para o resíduo da lista congelada do legado, que o review-artifact-check.sh catraca (só desce).
+OK_VERDICTS = ("APPROVED", "FIXED", "REJECTED_AND_FIXED", "NO_FINDINGS")
+OK_VERDICTS_LEGACY = ("APROVADO", "CORRIGIDO", "REPROVADO_E_CURADO", "SEM_ACHADOS")
+LEGACY_RESIDUES = os.path.join(ROOT, "docs/evolution/review-residue-legacy.txt")
+
+
+def residue_is_legacy(rel):
+    try:
+        with open(LEGACY_RESIDUES, encoding="utf-8") as fh:
+            return rel in {ln.strip() for ln in fh}
+    except OSError:
+        return False
+
+
+def declares_true(v, legacy):
+    """`true` (o YAML já o devolve booleano); `sim` só no resíduo do legado."""
+    if v is True:
+        return True
+    s = str(v if v is not None else "").strip().lower()
+    return s == "true" or (legacy and s == "sim")
+
+
+def verdict_ok(v, legacy):
+    s = str(v or "").strip().upper().replace("-", "_")
+    return s in OK_VERDICTS or (legacy and s in OK_VERDICTS_LEGACY)
 
 
 class Halt(Exception):
@@ -826,11 +851,12 @@ def gate(path, nid, want_merge, quiet=False):
         raise Halt("SEM-RULESET: ops/github-ruleset-main.json ausente ou ilegível — não sei quais checks são exigidos (core-only)")
     runs = checks_verdict(pr, req)
     rel, fm = residue(pr)
-    if str(fm.get("elenxo") or "").lower() != "sim":
+    legacy = residue_is_legacy(rel)
+    if not declares_true(fm.get("elenxo"), legacy):
         raise Halt("ELENXO-AUSENTE: %s declara elenxo: %s" % (rel, fm.get("elenxo")))
-    if str(fm.get("elenxo_isolado") or "").lower() != "sim":
-        raise Halt("ELENXO-UMA-VOZ: %s não declara elenxo_isolado: sim — Elenxo do mesmo agente é uma voz só (objeção 3)" % rel)
-    if str(fm.get("verdict") or "") not in OK_VERDICTS:
+    if not declares_true(fm.get("elenxo_isolado"), legacy):
+        raise Halt("ELENXO-UMA-VOZ: %s não declara elenxo_isolado: true — Elenxo do mesmo agente é uma voz só (objeção 3)" % rel)
+    if not verdict_ok(fm.get("verdict"), legacy):
         raise Halt("ELENXO-REPROVADO: %s tem verdict %s" % (rel, fm.get("verdict")))
     if str(fm.get("reviewed_diff_sha256") or "pendente").lower() in ("pendente", ""):
         raise Halt("RESIDUO-PENDENTE: %s ainda tem reviewed_diff_sha256 pendente — o pr-finalize não fechou o PR" % rel)

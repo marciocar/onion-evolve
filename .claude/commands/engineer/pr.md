@@ -124,7 +124,7 @@ Siga estes passos para criar o PR:
 
    O resultado alimenta o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial):
    `findings_total`/`real`/`fixed`, `findings_blocking` (quantos dos reais BLOQUEIAM, ≤ `findings_real`; os
-   LIMITES vão em `## Limites declarados`), `tokens`, `duration_min`, e o `elenxo: sim` que **passa a ser
+   LIMITES vão em `## Limites declarados`), `tokens`, `duration_min`, e o `elenxo: true` que **passa a ser
    verdadeiro por construção** — antes deste passo ele era declarado antes de a passada existir.
 
    **No core, onde a REGRA 56 vale, o resíduo nasce do gerador, nunca à mão** (SAC-142, 2026-10-15: 12
