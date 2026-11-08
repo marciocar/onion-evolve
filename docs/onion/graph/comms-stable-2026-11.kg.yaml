@@ -1,6 +1,6 @@
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16. Acréscimo: FLIP open→done em Q_CS_APP_SLACK_E_CHANNELS_1106, confirmado pelo maestro (passos 1 a 6 do card feitos)."
+  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16. Acréscimo: FLIP open→done em Q_CS_APP_SLACK_E_CHANNELS_1106, confirmado pelo maestro (passos 1 a 6 do card feitos). Lote 08/11: FLIP open→done em Q_CS_DEGRAU2_SLACK_RASCUNHO_1109, pela medida dos rascunhos aprovados e postados."
   schema_version: "1"
   id: comms-stable-2026-11
   slug: comms-stable-2026-11
@@ -197,13 +197,15 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-09"
     impact: 5
     confidence: 0.6
+    verified_at: "2026-11-08"
+    verified_against: "metadados dos 13 rascunhos de 07/11 no StateDirectory da unidade onion-slack-persona (sem tokens): 10 postados só depois da aprovação do maestro (approvedBy = o único usuário permitido), 9 deles com fonte no Company Brain (ex.: 21:13 UTC, pergunta sobre clientes, fonte docs/knowledge-base/integrations/cerc/README.md); 3 pendentes sem aprovação não saíram; o rascunho d_650e344d09432b78, criado às 23:31 e aprovado às 00:03 de 08/11, sobreviveu ao restart das 23:37; journalctl: drafted → approved-posted"
     label: "Degrau 2, o Slack como evento: o bot próprio no bridge (runtime A) recebe menção e DM de remetentes da lista pelo Socket Mode, lê o Company Brain pelo MCP local e responde em rascunho que o maestro aprova."
-    narrative: "Pronto quando: uma menção no canal do piloto vira um rascunho de resposta com fonte no Company Brain, aprovado pelo maestro antes de sair, com as 7 condições do D_PERSONA_RUNTIME_2026_11 cumpridas. Depende do app Slack e do deploy do bridge pelo `!` do maestro. Estado em 2026-11-06: o código e a bancada estão no PR #94 do onion-bridge (empilhado sobre o #93, SDK 0.3.319). A bancada roda o Agent SDK e o CLI reais contra um Slack falso por Socket Mode e uma Messages API falsa: 66 asserções e 26 mutantes mortos, incluindo o veto que lança bloqueado por onFailure 'block'. O wrapper ops/slack-persona.sh do core (creds, install, start, verify) tem 21 asserções na sua bancada. Faltam o merge dos dois PRs, o app Slack e os tokens (Q_CS_APP_SLACK_E_CHANNELS_1106), o e-mail da persona na lista do onion-kg, o deploy pelo `!` e o teste ao vivo no canal do piloto. Mudança de host em 2026-11-07, relatada pela sessão que a fez: a identidade de serviço da persona entrou na lista de e-mails permitidos do MCP de leitura do KG do hub, com backup datado do arquivo de ambiente; rollback = restaurar o backup e reiniciar a unidade."
+    narrative: "Pronto quando: uma menção no canal do piloto vira um rascunho de resposta com fonte no Company Brain, aprovado pelo maestro antes de sair, com as 7 condições do D_PERSONA_RUNTIME_2026_11 cumpridas. Depende do app Slack e do deploy do bridge pelo `!` do maestro. Estado em 2026-11-06: o código e a bancada estão no PR #94 do onion-bridge (empilhado sobre o #93, SDK 0.3.319). A bancada roda o Agent SDK e o CLI reais contra um Slack falso por Socket Mode e uma Messages API falsa: 66 asserções e 26 mutantes mortos, incluindo o veto que lança bloqueado por onFailure 'block'. O wrapper ops/slack-persona.sh do core (creds, install, start, verify) tem 21 asserções na sua bancada. Faltam o merge dos dois PRs, o app Slack e os tokens (Q_CS_APP_SLACK_E_CHANNELS_1106), o e-mail da persona na lista do onion-kg, o deploy pelo `!` e o teste ao vivo no canal do piloto. Mudança de host em 2026-11-07, relatada pela sessão que a fez: a identidade de serviço da persona entrou na lista de e-mails permitidos do MCP de leitura do KG do hub, com backup datado do arquivo de ambiente; rollback = restaurar o backup e reiniciar a unidade. Fechado em 2026-11-08 pela medida dos rascunhos: a menção no canal do piloto vira rascunho com fonte no Company Brain, que só sai com a aprovação do maestro, e o rascunho sobrevive ao restart. As 7 condições do D_PERSONA_RUNTIME_2026_11 não foram re-medidas uma a uma nesta passada; as do código seguem provadas pela bancada do PR #94 do onion-bridge."
   - id: Q_CS_ORIENTACAO_COMPLIANCE_1106
     node_type: question
     layer: audit
