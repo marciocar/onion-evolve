@@ -2,8 +2,7 @@
 branch: chore/kg-ssot-4.46.0-machine-vocab-en
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: a60c957f4352498b2029f8b5a1fab0d3d7fea8e05bb6bfe09991b78963e922ad
-reviewed_code_sha256: b99f3662af162ba0e0f2c031a820320e220488cfb515346ee709c6090eb9e532
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 1
