@@ -1,0 +1,187 @@
+[
+ {
+  "codigo": "P01",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P02",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P03",
+  "vaza": true,
+  "o_que": "Desfecho: «para até 5 agentes de execução simultâneos e sem usar nice» é o que foi decidido sobre a proposta (os itens 1 e 2 aprovados sem o nice), e a ficha o apresenta como se fosse parte da proposta."
+ },
+ {
+  "codigo": "P04",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P05",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P06",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P07",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P08",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P09",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P10",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P11",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P12",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P13",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P14",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P15",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P16",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P17",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P18",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P19",
+  "vaza": true,
+  "o_que": "Desfecho: «HEAD com 0» é o resultado depois de corrigidos os dois nós acusados, ou seja, o estado final da cura."
+ },
+ {
+  "codigo": "P20",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P21",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P22",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P23",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P24",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P25",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P26",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P27",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P28",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P29",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P30",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P31",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P32",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P33",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P34",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P35",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P36",
+  "vaza": false,
+  "o_que": null
+ },
+ {
+  "codigo": "P37",
+  "vaza": false,
+  "o_que": null
+ }
+]

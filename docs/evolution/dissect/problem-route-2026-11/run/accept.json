@@ -1,0 +1,754 @@
+{
+ "accepted": [
+  {
+   "file": "FR-001.txt",
+   "key": "docs/evolution/review/docs-escada-de-adocao-1105.md",
+   "queue": "FR",
+   "pos": 1,
+   "file_na_fila": "FR-001.txt",
+   "classe_g1": "O",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-002.txt",
+   "key": "docs/evolution/review/fix-catraca-regra49.md",
+   "queue": "FR",
+   "pos": 2,
+   "file_na_fila": "FR-002.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-003.txt",
+   "key": "docs/evolution/review/docs-radar-e3-2026-10-17-r13.md",
+   "queue": "FR",
+   "pos": 3,
+   "file_na_fila": "FR-003.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-004.txt",
+   "key": "docs/evolution/review/fix-paths-semantics-e-dirty-tree.md",
+   "queue": "FR",
+   "pos": 4,
+   "file_na_fila": "FR-004.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-005.txt",
+   "key": "docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md",
+   "queue": "FR",
+   "pos": 5,
+   "file_na_fila": "FR-005.txt",
+   "classe_g1": "F-VALOR",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-006.txt",
+   "key": "docs/evolution/review/feat-provenance-wave-o3-1.md",
+   "queue": "FR",
+   "pos": 6,
+   "file_na_fila": "FR-006.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-007.txt",
+   "key": "docs/evolution/review/fix-radar-decision-done-in-dev.md",
+   "queue": "FR",
+   "pos": 7,
+   "file_na_fila": "FR-007.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-008.txt",
+   "key": "docs/evolution/review/chore-seal-composition-questions.md",
+   "queue": "FR",
+   "pos": 8,
+   "file_na_fila": "FR-008.txt",
+   "classe_g1": "F-VALOR",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-010.txt",
+   "key": "docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md",
+   "queue": "FR",
+   "pos": 10,
+   "file_na_fila": "FR-010.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-012.txt",
+   "key": "docs/evolution/review/feat-client-manual-doctrine.md",
+   "queue": "FR",
+   "pos": 12,
+   "file_na_fila": "FR-012.txt",
+   "classe_g1": "F-VALOR",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-013.txt",
+   "key": "docs/evolution/review/feat-regra59-modo-consumido.md",
+   "queue": "FR",
+   "pos": 13,
+   "file_na_fila": "FR-013.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-014.txt",
+   "key": "docs/evolution/review/fix-regra58-e-w2-em-campo.md",
+   "queue": "FR",
+   "pos": 14,
+   "file_na_fila": "FR-014.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-016.txt",
+   "key": "docs/evolution/review/drive-open-threads-batch3.md",
+   "queue": "FR",
+   "pos": 16,
+   "file_na_fila": "FR-016.txt",
+   "classe_g1": "F-VALOR",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-018.txt",
+   "key": "docs/evolution/review/feat-kg-seal-check.md",
+   "queue": "FR",
+   "pos": 18,
+   "file_na_fila": "FR-018.txt",
+   "classe_g1": "F-REGUA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-019.txt",
+   "key": "docs/evolution/review/chore-door-17-pin.md",
+   "queue": "FR",
+   "pos": 19,
+   "file_na_fila": "FR-019.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-020.txt",
+   "key": "docs/evolution/review/fix-kg-engine-doutrina-vs-codigo.md",
+   "queue": "FR",
+   "pos": 20,
+   "file_na_fila": "FR-020.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-021.txt",
+   "key": "docs/evolution/review/chore-pin-after-853.md",
+   "queue": "FR",
+   "pos": 21,
+   "file_na_fila": "FR-021.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-022.txt",
+   "key": "docs/evolution/inbox/_processed/2026-07-16-kg-sdaal-dogfood-ouro.md",
+   "queue": "FR",
+   "pos": 22,
+   "file_na_fila": "FR-022.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-023.txt",
+   "key": "docs/evolution/inbox/_processed/2026-10-27-proposal-projection-with.md",
+   "queue": "FR",
+   "pos": 23,
+   "file_na_fila": "FR-023.txt",
+   "classe_g1": "F-REGUA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FR-024.txt",
+   "key": "docs/evolution/review/docs-a2a-a7c1-stop-and-record.md",
+   "queue": "FR",
+   "pos": 24,
+   "file_na_fila": "FR-024.txt",
+   "classe_g1": "F-REGUA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-001.txt",
+   "key": "docs/evolution/review/docs-wsync-workspace-updated-1022.md",
+   "queue": "FF",
+   "pos": 1,
+   "file_na_fila": "FF-001.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-002.txt",
+   "key": "docs/evolution/inbox/_processed/2026-09-08-agente-expo-react-native.md",
+   "queue": "FF",
+   "pos": 2,
+   "file_na_fila": "FF-002.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-005.txt",
+   "key": "docs/evolution/review/feat-plugin-lint-deps-contract.md",
+   "queue": "FF",
+   "pos": 5,
+   "file_na_fila": "FF-005.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-006.txt",
+   "key": "docs/evolution/review/fix-kg-contract-debt-cheap.md",
+   "queue": "FF",
+   "pos": 6,
+   "file_na_fila": "FF-006.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-007.txt",
+   "key": "docs/evolution/review/feat-regra60-idioma-identificador.md",
+   "queue": "FF",
+   "pos": 7,
+   "file_na_fila": "FF-007.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-008.txt",
+   "key": "docs/evolution/review/docs-decide-seals-1025.md",
+   "queue": "FF",
+   "pos": 8,
+   "file_na_fila": "FF-008.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-010.txt",
+   "key": "docs/evolution/review/feat-bench-machine-cpu-semaphore.md",
+   "queue": "FF",
+   "pos": 10,
+   "file_na_fila": "FF-010.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-012.txt",
+   "key": "docs/evolution/review/fix-write-stamp-rebuilds-installed-node.md",
+   "queue": "FF",
+   "pos": 12,
+   "file_na_fila": "FF-012.txt",
+   "classe_g1": "O",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-014.txt",
+   "key": "docs/evolution/review/feat-meta-cc-update.md",
+   "queue": "FF",
+   "pos": 14,
+   "file_na_fila": "FF-014.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-015.txt",
+   "key": "docs/evolution/review/docs-radar-e3-2026-11-03-r22.md",
+   "queue": "FF",
+   "pos": 15,
+   "file_na_fila": "FF-015.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-016.txt",
+   "key": "docs/evolution/review/chore-kg-ssot-4.11.0.md",
+   "queue": "FF",
+   "pos": 16,
+   "file_na_fila": "FF-016.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-017.txt",
+   "key": "docs/evolution/review/fix-read-leg-reaches-bash.md",
+   "queue": "FF",
+   "pos": 17,
+   "file_na_fila": "FF-017.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-022.txt",
+   "key": "docs/evolution/review/fix-migrate-python-venv-copy-perms.md",
+   "queue": "FF",
+   "pos": 22,
+   "file_na_fila": "FF-022.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-024.txt",
+   "key": "docs/evolution/review/research-codex-as-core.md",
+   "queue": "FF",
+   "pos": 24,
+   "file_na_fila": "FF-024.txt",
+   "classe_g1": "F-PASSA",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-026.txt",
+   "key": "docs/evolution/review/fix-kg-reverify-worker-contract.md",
+   "queue": "FF",
+   "pos": 26,
+   "file_na_fila": "FF-026.txt",
+   "classe_g1": "N",
+   "falso_alarme": false
+  },
+  {
+   "file": "FF-028.txt",
+   "key": "docs/evolution/review/feat-dissect-object-families.md",
+   "queue": "FF",
+   "pos": 28,
+   "file_na_fila": "FF-028.txt",
+   "classe_g1": "O",
+   "falso_alarme": false
+  },
+  {
+   "file": "A-005.txt",
+   "key": "docs/evolution/review/docs-co-announce-elenxo-2026-08-18.md",
+   "queue": "A",
+   "pos": 5,
+   "file_na_fila": "A-005.txt",
+   "classe_g1": "O",
+   "falso_alarme": false
+  }
+ ],
+ "skipped": [
+  {
+   "file": "FR-009.txt",
+   "key": "docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md",
+   "queue": "FR",
+   "pos": 9,
+   "motivo": "duplicata: Duplica o incidente de FR-007: o radar não avisa o MU-18, curado lá, e o MU-07 já virou pergunta de pesquisa lá."
+  },
+  {
+   "file": "FR-011.txt",
+   "key": "docs/evolution/review/feat-kg-projection-with.md",
+   "queue": "FR",
+   "pos": 11,
+   "motivo": "sem data: Nem o frontmatter nem o texto trazem data."
+  },
+  {
+   "file": "FR-015.txt",
+   "key": "docs/evolution/review/fix-extrator-piso-e-supressao.md",
+   "queue": "FR",
+   "pos": 15,
+   "motivo": "duplicata: Duplica a dívida do extrator declarada em FR-013 (contador de supressão, supressão invisível no tsv e falta de piso)."
+  },
+  {
+   "file": "FR-017.txt",
+   "key": "docs/evolution/review/feat-provenance-wave-o2.md",
+   "queue": "FR",
+   "pos": 17,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "FF-003.txt",
+   "key": "docs/evolution/review/chore-kg-ssot-4.17.0.md",
+   "queue": "FF",
+   "pos": 3,
+   "motivo": "sem problema: A passada não teve achado; o limite é trabalho seguinte, não defeito."
+  },
+  {
+   "file": "FF-004.txt",
+   "key": "docs/evolution/review/docs-research-postmerge-projection-writer.md",
+   "queue": "FF",
+   "pos": 4,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "FF-009.txt",
+   "key": "docs/evolution/review/docs-canonical-names-1023.md",
+   "queue": "FF",
+   "pos": 9,
+   "motivo": "duplicata: É o selo de D_NOMES_CANONICOS_NASCEM_CERTOS_1023, que já está na USED."
+  },
+  {
+   "file": "FF-011.txt",
+   "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-company-brain-market.md",
+   "queue": "FF",
+   "pos": 11,
+   "motivo": "duplicata: Duplica o incidente de Q_MA_FREE_ORG_READ_ENFORCED, da USED: o card da organização gratuita do Company Brain multiaudiência."
+  },
+  {
+   "file": "FF-013.txt",
+   "key": "docs/evolution/review/docs-seal-sharing-criterion.md",
+   "queue": "FF",
+   "pos": 13,
+   "motivo": "duplicata: Duplica o incidente da fronteira indivíduo × empregador, do sinal 2026-09-13 que está na USED."
+  },
+  {
+   "file": "FF-018.txt",
+   "key": "docs/evolution/review/research-living-method-distribution.md",
+   "queue": "FF",
+   "pos": 18,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "FF-019.txt",
+   "key": "docs/evolution/review/chore-kg-ssot-4-28-0.md",
+   "queue": "FF",
+   "pos": 19,
+   "motivo": "sem problema: Atualização de vendor sem achado."
+  },
+  {
+   "file": "FF-020.txt",
+   "key": "docs/evolution/review/feat-provenance-wave-o4.md",
+   "queue": "FF",
+   "pos": 20,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "FF-021.txt",
+   "key": "docs/evolution/review/chore-kg-ssot-4.12.0.md",
+   "queue": "FF",
+   "pos": 21,
+   "motivo": "sem problema: O único achado foi refutado; os limites repetem trabalho já declarado."
+  },
+  {
+   "file": "FF-023.txt",
+   "key": "docs/evolution/review/fix-catraca-regra49.md",
+   "queue": "FF",
+   "pos": 23,
+   "motivo": "já lido em FR-002.txt"
+  },
+  {
+   "file": "FF-025.txt",
+   "key": "docs/evolution/review/docs-radar-e3-2026-10-17-r13.md",
+   "queue": "FF",
+   "pos": 25,
+   "motivo": "já lido em FR-003.txt"
+  },
+  {
+   "file": "FF-027.txt",
+   "key": "docs/evolution/inbox/_processed/2026-07-15-sinal-kg-audit-layer-content-audit.md",
+   "queue": "FF",
+   "pos": 27,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "FF-029.txt",
+   "key": "docs/evolution/review/docs-reverify-dissect-read-only.md",
+   "queue": "FF",
+   "pos": 29,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "FF-030.txt",
+   "key": "docs/evolution/review/chore-kg-ssot-4391.md",
+   "queue": "FF",
+   "pos": 30,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-001.txt",
+   "key": "docs/evolution/review/chore-core-maint-1027.md",
+   "queue": "A",
+   "pos": 1,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-002.txt",
+   "key": "docs/evolution/review/chore-ctx-freshness-voice-p6-fix.md",
+   "queue": "A",
+   "pos": 2,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-003.txt",
+   "key": "docs/evolution/review/feat-adopt-update-proves-gate-blocks.md",
+   "queue": "A",
+   "pos": 3,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-004.txt",
+   "key": "docs/evolution/review/docs-radar-e3-cc-2-1-300.md",
+   "queue": "A",
+   "pos": 4,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-006.txt",
+   "key": "docs/evolution/review/docs-wsync-workspace-updated-1022.md",
+   "queue": "A",
+   "pos": 6,
+   "motivo": "já lido em FF-001.txt"
+  },
+  {
+   "file": "A-007.txt",
+   "key": "docs/evolution/review/feat-poda-l1-instructions-loaded.md",
+   "queue": "A",
+   "pos": 7,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-008.txt",
+   "key": "docs/evolution/research/session-orchestration-2026-11/DIARIO.md::## Desfechos",
+   "queue": "A",
+   "pos": 8,
+   "motivo": "sem data: O trecho do diário não traz data."
+  },
+  {
+   "file": "A-009.txt",
+   "key": "docs/evolution/review/fix-merge-gate-warns-in-adopter.md",
+   "queue": "A",
+   "pos": 9,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-010.txt",
+   "key": "docs/evolution/inbox/_processed/2026-09-08-agente-expo-react-native.md",
+   "queue": "A",
+   "pos": 10,
+   "motivo": "já lido em FF-002.txt"
+  },
+  {
+   "file": "A-011.txt",
+   "key": "docs/evolution/review/fix-drive-checkpoint-in-graph.md",
+   "queue": "A",
+   "pos": 11,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-012.txt",
+   "key": "docs/evolution/inbox/_processed/2026-10-21-a2a-<adotante>-793157ea69e0e017.md",
+   "queue": "A",
+   "pos": 12,
+   "motivo": "sem problema: Sinal de teste do canal, sem problema."
+  },
+  {
+   "file": "A-013.txt",
+   "key": "docs/evolution/review/chore-kg-ssot-4.17.0.md",
+   "queue": "A",
+   "pos": 13,
+   "motivo": "já lido em FF-003.txt"
+  },
+  {
+   "file": "A-014.txt",
+   "key": "docs/evolution/review/fix-reconcile-c-p9-admin-oidc.md",
+   "queue": "A",
+   "pos": 14,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-015.txt",
+   "key": "docs/evolution/review/fix-door-kg-read-index.md",
+   "queue": "A",
+   "pos": 15,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-016.txt",
+   "key": "docs/evolution/review/docs-escada-de-adocao-1105.md",
+   "queue": "A",
+   "pos": 16,
+   "motivo": "já lido em FR-001.txt"
+  },
+  {
+   "file": "A-017.txt",
+   "key": "docs/evolution/review/docs-research-audit-reanchor.md",
+   "queue": "A",
+   "pos": 17,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-018.txt",
+   "key": "docs/evolution/review/docs-research-postmerge-projection-writer.md",
+   "queue": "A",
+   "pos": 18,
+   "motivo": "já lido em FF-004.txt"
+  },
+  {
+   "file": "A-019.txt",
+   "key": "docs/evolution/review/feat-plugin-lint-deps-contract.md",
+   "queue": "A",
+   "pos": 19,
+   "motivo": "já lido em FF-005.txt"
+  },
+  {
+   "file": "A-020.txt",
+   "key": "docs/evolution/review/feat-update-bridge-mechanism.md",
+   "queue": "A",
+   "pos": 20,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-021.txt",
+   "key": "docs/evolution/review/fix-kg-contract-debt-cheap.md",
+   "queue": "A",
+   "pos": 21,
+   "motivo": "já lido em FF-006.txt"
+  },
+  {
+   "file": "A-022.txt",
+   "key": "docs/evolution/review/fix-kg-premodelswitch-restart-correction.md",
+   "queue": "A",
+   "pos": 22,
+   "motivo": "duplicata: Corrige o carimbo do veto ao vivo do PreModelSwitch, incidente de docs-premodelswitch-guard-live-veto.md, da USED."
+  },
+  {
+   "file": "A-023.txt",
+   "key": "docs/evolution/review/feat-regra60-idioma-identificador.md",
+   "queue": "A",
+   "pos": 23,
+   "motivo": "já lido em FF-007.txt"
+  },
+  {
+   "file": "A-024.txt",
+   "key": "docs/evolution/review/fix-merge-verified-auto-rebase.md",
+   "queue": "A",
+   "pos": 24,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-025.txt",
+   "key": "docs/evolution/review/docs-design-fourth-dimension-direction.md",
+   "queue": "A",
+   "pos": 25,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-026.txt",
+   "key": "docs/evolution/review/feat-background-probe-replaces-prose-veto.md",
+   "queue": "A",
+   "pos": 26,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-027.txt",
+   "key": "docs/evolution/review/docs-decide-seals-1025.md",
+   "queue": "A",
+   "pos": 27,
+   "motivo": "já lido em FF-008.txt"
+  },
+  {
+   "file": "A-028.txt",
+   "key": "docs/evolution/inbox/_processed/2026-07-14-branch-model-provisionamento-design-vertical.md",
+   "queue": "A",
+   "pos": 28,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-029.txt",
+   "key": "docs/evolution/review/docs-canonical-names-1023.md",
+   "queue": "A",
+   "pos": 29,
+   "motivo": "já lido em FF-009.txt"
+  },
+  {
+   "file": "A-030.txt",
+   "key": "docs/evolution/review/feat-bench-machine-cpu-semaphore.md",
+   "queue": "A",
+   "pos": 30,
+   "motivo": "já lido em FF-010.txt"
+  },
+  {
+   "file": "A-031.txt",
+   "key": "docs/evolution/inbox/_processed/2026-10-28-proposal-company-brain-market.md",
+   "queue": "A",
+   "pos": 31,
+   "motivo": "já lido em FF-011.txt"
+  },
+  {
+   "file": "A-032.txt",
+   "key": "docs/evolution/review/docs-promote-adrs-to-knowledge-base.md",
+   "queue": "A",
+   "pos": 32,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-033.txt",
+   "key": "docs/evolution/review/fix-protect-main-bare-push-scope.md",
+   "queue": "A",
+   "pos": 33,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-034.txt",
+   "key": "docs/evolution/review/feat-doors-decisions-sealed.md",
+   "queue": "A",
+   "pos": 34,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-035.txt",
+   "key": "docs/evolution/review/docs-diary-superacao-sync-gate.md",
+   "queue": "A",
+   "pos": 35,
+   "motivo": "sem problema: Registro de aprendizado sem defeito."
+  },
+  {
+   "file": "A-036.txt",
+   "key": "docs/evolution/review/docs-round-elenxo-cured.md",
+   "queue": "A",
+   "pos": 36,
+   "motivo": "cota cheia"
+  },
+  {
+   "file": "A-037.txt",
+   "key": "docs/evolution/review/fix-write-stamp-rebuilds-installed-node.md",
+   "queue": "A",
+   "pos": 37,
+   "motivo": "já lido em FF-012.txt"
+  },
+  {
+   "file": "A-038.txt",
+   "key": "docs/evolution/review/fix-kg-seed-single-doc-and-constrains.md",
+   "queue": "A",
+   "pos": 38,
+   "motivo": "cota cheia (N sem falso alarme; vagas guardadas para falso alarme)"
+  },
+  {
+   "file": "A-039.txt",
+   "key": "docs/evolution/review/docs-seal-sharing-criterion.md",
+   "queue": "A",
+   "pos": 39,
+   "motivo": "já lido em FF-013.txt"
+  },
+  {
+   "file": "A-040.txt",
+   "key": "docs/evolution/inbox/_processed/2026-10-15-<adotante>-th-20261015-936ada43-nb-00f94d24f82914b66abd7ce9.md",
+   "queue": "A",
+   "pos": 40,
+   "motivo": "sem problema: Handshake sem corpo."
+  }
+ ],
+ "stops": {
+  "FR": 24,
+  "FF": 30,
+  "FV": 0,
+  "B": 0,
+  "A": 40
+ },
+ "counts": {
+  "F-VALOR": 4,
+  "F-FATO": 0,
+  "F-REGUA": 3,
+  "F-PASSA": 9,
+  "O": 4,
+  "N": 17
+ },
+ "falsos_alarmes_N": 0
+}

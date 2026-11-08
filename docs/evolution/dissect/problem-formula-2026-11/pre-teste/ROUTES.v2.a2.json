@@ -1,0 +1,469 @@
+[
+ {
+  "ficha": "G01",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir entre publicar o serviço no proxy, instalá-lo só em loopback ou não instalar ainda na máquina de produção",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, opções de instalação e a falta de cliente de captura via /meta:decide, sessão",
+  "fecha_quando": "A escolha do maestro está registrada."
+ },
+ {
+  "ficha": "G02",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Confirmar se, quando e com qual versão o lançamento sai pelas contas do maestro",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Conferir se o GIF corresponde à versão escolhida",
+    "dono": "peer",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A2 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, textos prontos, data de amanhã e mudança de versão via /meta:decide, sessão",
+  "fecha_quando": "O maestro respondeu sobre lançamento, data e versão, e a peer informou se o GIF corresponde à versão escolhida."
+ },
+ {
+  "ficha": "G03",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Fixar regra e guarda que barrem source do arquivo real de segredos, com teste que reprova sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "escrever, teste com comando source do caminho do arquivo de segredos sem abri-lo, sessão",
+  "fecha_quando": "O teste reprova sem a guarda e passa com ela, e o PR está aberto."
+ },
+ {
+  "ficha": "G04",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Regenerar a projeção a partir da fonte em PR, usando a bancada como teste que reprova sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Fechar o PR de revert automático com a evidência de que o merge não causou o drift",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "regenerar, projeção em uma worktree nova, sessão",
+  "fecha_quando": "A bancada passa com a projeção regenerada, o PR de cura está aberto e o PR de revert foi fechado com a evidência."
+ },
+ {
+  "ficha": "G05",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir entre pagar o plano com bloqueio do servidor ou adotar permissão por repositório e detecção",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, comparação entre as barreiras e custo do plano via /meta:decide, sessão",
+  "fecha_quando": "A escolha do maestro está registrada."
+ },
+ {
+  "ficha": "G06",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Tirar da branch o caminho literal e a chave de isenção, descrevendo o arquivo sem citar o caminho, com revisão independente antes do PR e nota escrita no PR",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "remover, caminho literal e chave de isenção do nó, sessão",
+  "fecha_quando": "O CI passa sem isenção nova, o caminho não aparece no diff do PR e a nota está escrita no PR revisado."
+ },
+ {
+  "ficha": "G07",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se o refino entra na régua, com o conflito da sessão declarado",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, proposta da peer e conflito da sessão via /meta:decide, sessão",
+  "fecha_quando": "A decisão do maestro está registrada."
+ },
+ {
+  "ficha": "G08",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Procurar o commit da tag no espelho público da dependência, sem alterar os carimbos",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   },
+   {
+    "ato": "Corrigir o carimbo nos adotantes, se o commit também não existir no espelho",
+    "dono": "outro",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R2",
+  "proximo_ato": "consultar, commit da tag no espelho público, sessão",
+  "fecha_quando": "Há comando registrando se o commit existe no espelho; se não existir, as sessões dos dois adotantes receberam a evidência."
+ },
+ {
+  "ficha": "G09",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Restaurar os 3 nós e remover só os nomes de membros com limpeza dirigida, com teste que reprova na limpeza por regex, revisão independente antes do PR e nota escrita no PR",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "restaurar, 3 nós da versão anterior à limpeza, sessão",
+  "fecha_quando": "Os 3 nós estão íntegros, a guarda não acha nomes, o teste reprova sem o conserto e o PR revisado traz a nota."
+ },
+ {
+  "ficha": "G10",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir o nó com o texto inteiro do run, levar o grafo para a worktree certa e versioná-lo em PR",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "substituir, texto completado do nó pelo retorno inteiro do run, sessão",
+  "fecha_quando": "O nó corresponde ao retorno do run, o grafo está versionado na worktree certa, o gate passa, o PR está aberto e a decisão segue aberta para o maestro."
+ },
+ {
+  "ficha": "G11",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Fazer o setup medir a pasta informada e tratar tokens parciais sem criar aliases órfãos, com testes que reprovam sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "Conferir os 10 achados menores e curar na branch os que se reproduzirem",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "reproduzir, os dois achados principais em testes na branch, sessão",
+  "fecha_quando": "Os testes reprovam sem o conserto e passam com ele, os 10 achados têm desfecho registrado e o PR está aberto."
+ },
+ {
+  "ficha": "G12",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Concluir se o uso da ferramenta é aceitável diante da licença e do efeito legal",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, texto da licença e uso pretendido via /meta:decide, sessão",
+  "fecha_quando": "A decisão do maestro sobre o uso está registrada, sem costura antes dela."
+ },
+ {
+  "ficha": "G13",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se o repo fica congelado ou vira linha mantida, incluindo a doutrina e a lista do CLAUDE.md",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Reproduzir o buraco da guarda do core para achar a causa, com tempo marcado",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R2"
+   },
+   {
+    "ato": "Incluir o repo no registro da varredura de nomes de cliente, com teste que reprova sem a inclusão",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, estado do repo e opções via /meta:decide, sessão",
+  "fecha_quando": "O maestro decidiu o estado do repo, o buraco tem causa medida e a varredura alcança o repo."
+ },
+ {
+  "ficha": "G14",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Registrar no parque o gatilho de ida e volta pela composição, sob a autorização datada de hoje e sem construir nada",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R7"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R7",
+  "proximo_ato": "registrar, novo gatilho no nó parqueado citando a autorização, sessão",
+  "fecha_quando": "O nó segue aberto com o gatilho medível de ida e volta pela composição e a autorização citada."
+ },
+ {
+  "ficha": "G15",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Escolher o mecanismo de senha da demo pública, diante da quebra medida com Basic puro",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, medida do conflito com Bearer e alternativas via /meta:decide, sessão",
+  "fecha_quando": "O maestro escolheu o mecanismo e a escolha está registrada."
+ },
+ {
+  "ficha": "G16",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir a publicação do artigo com o caso anonimizado",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "Estender a guarda de nomes de cliente à pasta do rascunho, com teste que reprova sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, rascunho, varredura manual e lacuna da guarda via /meta:decide, sessão",
+  "fecha_quando": "A guarda cobre a pasta com PR aberto e o maestro decidiu sobre a publicação."
+ },
+ {
+  "ficha": "G17",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Retomar os dois conjuntos a partir do que está em commit, um pesado por vez e após medir a folga da máquina",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A0 V1 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "medir, carga da máquina e agentes em voo, sessão",
+  "fecha_quando": "Os dois conjuntos concluíram o trabalho a partir dos commits e o resultado está em commit."
+ },
+ {
+  "ficha": "G18",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Selar ou não a pesquisa de captura no Windows e transcrição em lote na máquina de produção",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, pesquisa da peer e lista do que não foi medido via /meta:decide, sessão",
+  "fecha_quando": "A decisão do maestro está registrada."
+ },
+ {
+  "ficha": "G19",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir a inclusão dos comandos e da knowledge base e a re-materialização do repo público",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, lista da varredura e prova da guarda do moat via /meta:decide, sessão",
+  "fecha_quando": "A decisão do maestro sobre o que entra e sobre a publicação está registrada."
+ },
+ {
+  "ficha": "G20",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Separar em faixas diferentes a família de 997 + 936 segundos, sem aumentar o teto, com revisão independente antes do PR e nota escrita no PR",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P2",
+  "rota_principal": "R1",
+  "proximo_ato": "separar, família de 997 + 936 segundos em faixas distintas na branch, sessão",
+  "fecha_quando": "Todas as faixas terminam abaixo de 25 minutos no CI, o teto segue igual e o PR revisado traz a nota; se esta segunda tentativa falhar, o caso vai para R6."
+ },
+ {
+  "ficha": "G21",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Escolher o canal do vigia e assumir o risco para a conta",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V2 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, as duas opções com risco e recomendação da API oficial via /meta:decide, sessão",
+  "fecha_quando": "A escolha do maestro está registrada."
+ },
+ {
+  "ficha": "G22",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Corrigir as contagens para 21 e 18 e preencher a verificação dos 18 nós só com verificação feita de fato",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A0 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "recontar, nós colhidos e pendências do diff, sessão",
+  "fecha_quando": "A evidência corresponde às listas, o radar não acusa os 18 nós e o PR está aberto."
+ },
+ {
+  "ficha": "G23",
+  "real": "sim",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Criar fast-forward automático após o merge, que funcione com a main tomada por outra worktree e nunca seja destrutivo, com teste que reprova sem o conserto",
+    "dono": "sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "escrever, teste com checkout atrasado e main tomada por outra worktree, sessão",
+  "fecha_quando": "O teste reprova sem o conserto, passa com ele, o PR está aberto e, após o merge, o checkout alcança a main e o hook aposentado para de disparar."
+ },
+ {
+  "ficha": "G24",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir se existe uma porta MCP do framework e das verticais e qual o escopo dela",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, opções e recomendação de não fundir as portas por risco via /meta:decide, sessão",
+  "fecha_quando": "A resposta do maestro sobre a porta e o escopo está registrada."
+ },
+ {
+  "ficha": "G25",
+  "real": "não medi",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "Decidir a atualização do SDK e do CLI em produção e o destino do degrau de isolamento parqueado",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar, versão medida em produção, piso de CVE e opções via /meta:decide, sessão",
+  "fecha_quando": "A decisão do maestro está registrada com a versão medida e o piso de CVE."
+ }
+]

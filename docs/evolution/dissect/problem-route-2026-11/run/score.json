@@ -1,0 +1,452 @@
+{
+ "por_braco": {
+  "A1": {
+   "E1": 2,
+   "E1_div": 1,
+   "E1_texto": 2,
+   "T": {},
+   "E1_O": 0,
+   "E2": {
+    "O": [
+     0,
+     4
+    ],
+    "F-REGUA": [
+     1,
+     4
+    ],
+    "F-PASSA": [
+     1,
+     4
+    ],
+    "F-VALOR": [
+     5,
+     8
+    ],
+    "F-FATO": [
+     1,
+     1
+    ]
+   },
+   "P5": [
+    3,
+    12
+   ],
+   "P1": [
+    21,
+    33
+   ],
+   "P4": [
+    0,
+    0
+   ],
+   "falhas": [
+    {
+     "file": "FR-002.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-003.txt",
+     "medida": "E1",
+     "fraco": true
+    },
+    {
+     "file": "FR-003.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-006.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-008.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E1",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-018.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-019.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-020.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FF-017.txt",
+     "medida": "E2",
+     "fraco": true
+    }
+   ],
+   "nao_julgado": 0,
+   "E1_den": 17
+  },
+  "A2": {
+   "E1": 2,
+   "E1_div": 1,
+   "E1_texto": 2,
+   "T": {},
+   "E1_O": 0,
+   "E2": {
+    "O": [
+     0,
+     4
+    ],
+    "F-REGUA": [
+     1,
+     4
+    ],
+    "F-PASSA": [
+     1,
+     4
+    ],
+    "F-VALOR": [
+     4,
+     8
+    ],
+    "F-FATO": [
+     1,
+     1
+    ]
+   },
+   "P5": [
+    4,
+    12
+   ],
+   "P1": [
+    18,
+    33
+   ],
+   "P4": [
+    0,
+    0
+   ],
+   "falhas": [
+    {
+     "file": "FR-002.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-003.txt",
+     "medida": "E1",
+     "fraco": true
+    },
+    {
+     "file": "FR-003.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-006.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-008.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E1",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-018.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-019.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-020.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FF-008.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FF-017.txt",
+     "medida": "E2",
+     "fraco": true
+    }
+   ],
+   "nao_julgado": 0,
+   "E1_den": 17
+  },
+  "C1": {
+   "E1": 1,
+   "E1_div": 0,
+   "E1_texto": 1,
+   "T": {},
+   "E1_O": 0,
+   "E2": {
+    "O": [
+     0,
+     4
+    ],
+    "F-REGUA": [
+     1,
+     4
+    ],
+    "F-PASSA": [
+     1,
+     4
+    ],
+    "F-VALOR": [
+     5,
+     8
+    ],
+    "F-FATO": [
+     0,
+     1
+    ]
+   },
+   "P5": [
+    4,
+    12
+   ],
+   "P1": [
+    17,
+    33
+   ],
+   "P4": [
+    0,
+    0
+   ],
+   "falhas": [
+    {
+     "file": "FR-002.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-003.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-006.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-008.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E1",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-018.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-019.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-020.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-024.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FF-017.txt",
+     "medida": "E2",
+     "fraco": true
+    }
+   ],
+   "nao_julgado": 0,
+   "E1_den": 17
+  },
+  "C2": {
+   "E1": 1,
+   "E1_div": 0,
+   "E1_texto": 1,
+   "T": {},
+   "E1_O": 0,
+   "E2": {
+    "O": [
+     2,
+     4
+    ],
+    "F-REGUA": [
+     1,
+     4
+    ],
+    "F-PASSA": [
+     1,
+     4
+    ],
+    "F-VALOR": [
+     5,
+     8
+    ],
+    "F-FATO": [
+     0,
+     1
+    ]
+   },
+   "P5": [
+    3,
+    12
+   ],
+   "P1": [
+    15,
+    33
+   ],
+   "P4": [
+    0,
+    0
+   ],
+   "falhas": [
+    {
+     "file": "FR-002.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-003.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-006.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FR-008.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E1",
+     "fraco": false
+    },
+    {
+     "file": "FR-016.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-018.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-019.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-020.txt",
+     "medida": "E2",
+     "fraco": false
+    },
+    {
+     "file": "FR-024.txt",
+     "medida": "E2",
+     "fraco": true
+    },
+    {
+     "file": "FF-017.txt",
+     "medida": "E2",
+     "fraco": true
+    }
+   ],
+   "nao_julgado": 0,
+   "E1_den": 17
+  }
+ },
+ "P3": [
+  28,
+  33
+ ],
+ "P6": {
+  "erro_b_rota": 7,
+  "erro_b_controle": 7,
+  "e1_rota": 4,
+  "e1_controle": 2,
+  "passa": false
+ },
+ "nao_medido": [
+  "A1 E1 denominador 17 < 19",
+  "A1 E2 F-FATO denominador 1 < 3",
+  "A1 E2 C denominador 0 < 5",
+  "A1 P5 denominador 12 < 20",
+  "A1 P1 denominador 33 < 39",
+  "A1 P4 denominador 0 < 3",
+  "A2 E1 denominador 17 < 19",
+  "A2 E2 F-FATO denominador 1 < 3",
+  "A2 E2 C denominador 0 < 5",
+  "A2 P5 denominador 12 < 20",
+  "A2 P1 denominador 33 < 39",
+  "A2 P4 denominador 0 < 3",
+  "P3 denominador 33 < 39",
+  "Ao vivo: NÃO MEDIDO por desenho (STAGE0.v5: (b1) e (c) fora)"
+ ],
+ "abaixo": [
+  "A1 P5",
+  "A1 P1",
+  "A2 P5",
+  "A2 P1",
+  "P6"
+ ],
+ "E3_cobre": false,
+ "e1_so_em_divergentes": {
+  "A1": 1,
+  "A2": 1,
+  "C1": 0,
+  "C2": 0
+ },
+ "veredito": "rejeitar",
+ "motivo": "E1 > 0 ou E2 < 100% em caso sem divergência nem contestação"
+}

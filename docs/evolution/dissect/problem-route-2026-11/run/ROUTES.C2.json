@@ -1,0 +1,881 @@
+[
+ {
+  "ficha": "P01",
+  "real": "não medi (lint da regra 99 sobre o diff do grafo; grep do diretório de backup no localizador)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "reescrever em forma genérica o localizador da evidência que cita o diretório de backup da máquina",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A0 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "reescrever o localizador da evidência sem caminho de máquina e acrescentar caso que reprova caminho literal, a sessão",
+  "fecha_quando": "lint da regra 99 sai 0 HARD no diff e o grep do diretório de backup no grafo dá 0 ocorrências"
+ },
+ {
+  "ficha": "P02",
+  "real": "não medi (kg_gate.py com os --exclude do CI, contando yaml.unquoted-date e integrity.testimony-in-prod)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "rodar kg-migrate-v3.py nas datas dos grafos em que ele não carimba proveniência DERIVADA",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "medir no vivo o bloat do core e trocar o testemunho do nó E_MEDIDO_BLOAT_DO_PROPRIO_CORE_1001 pela medida",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "aplicar kg-migrate-v3.py só nos grafos sem carimbo DERIVADO, sem criar grafo novo, a sessão",
+  "fecha_quando": "kg_gate.py com os --exclude do CI mostra a contagem SHOULD menor que antes, 0 grafos novos e testimony-in-prod em 0"
+ },
+ {
+  "ficha": "P05",
+  "real": "não medi (judge-verdict-check e radar sobre o grafo da rodada 22)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir os nós apontados pelos 7 vereditos negativos e criar os 7 nós de superação com TRACES_TO",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "dar sucessor ao nó do VS Code da rodada 21",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "criar os nós de superação com TRACES_TO e corrigir os 7 nós apontados, a sessão",
+  "fecha_quando": "cada superação tem nó com TRACES_TO, o nó da rodada 21 tem sucessor, e radar e judge-verdict-check saem 0 HARD"
+ },
+ {
+  "ficha": "P07",
+  "real": "não medi (bancada de mutantes do hook e diff do lint contra a base)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "desfazer a troca global de «arquivos» nas 18 linhas do lint, incluindo as 2 mensagens HARD",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "reescrever a regra SOFT de forma satisfazível diante da mediana de 9 e do pior de 236 nós",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "estender o hook a Bash com saída calada antes do parse e com testes que matem os 6 mutantes sobreviventes",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "reverter o sed nas 18 linhas do lint e escrever os testes que matam os mutantes, a sessão",
+  "fecha_quando": "0 de 8 mutantes sobrevivem, o mutante do prefiltro reprova, o diff do lint não toca mensagens HARD e a regra nova é satisfeita no grafo mediano"
+ },
+ {
+  "ficha": "P08",
+  "real": "não medi (checador de links rodado também em plugins/**/kb/; contagem de skills e de concepts/)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "vendorizar a doutrina contra a decisão aberta que diz para não vendorizar",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "corrigir os links das skills que viajam, as contagens 8→11 e 49→50 e o emoji no cabeçalho",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "estender o checador de links vendorizados a plugins/**/kb/",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   }
+  ],
+  "nota": "A2 V0 P1",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a decisão aberta de não vendorizar, com o sinal de campo e opções, a sessão",
+  "fecha_quando": "existe selo sobre vendorizar, o checador varre plugins/**/kb/ com 0 links mortos e as contagens batem com ls"
+ },
+ {
+  "ficha": "P09",
+  "real": "não medi (bancada da regra 112 no original e no patch; caso g)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "decidir se o core absorve o patch, de onde vêm os pares e o NAO-FIXADO no modo estrito",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "achar a causa do caso (g), que falha no original e no patch",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide as três perguntas, com o laboratório dos 10 casos e uma recomendação, a sessão",
+  "fecha_quando": "existe selo sobre as três perguntas e o caso (g) tem causa medida"
+ },
+ {
+  "ficha": "P10",
+  "real": "não medi (bancada e CI do role-cut caso k; diff byte a byte contra a rodada 8)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir os sete achados: mensagem com CC_DELTA_URL, linha em branco final, «invocações», nome do time do adotante, node_type, verified_at e caso (k)",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "revisão independente da forja, que hoje só tem a passada do próprio autor",
+    "dono": "revisor independente",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "corrigir os sete achados e pedir revisão independente antes do PR, a sessão",
+  "fecha_quando": "a extração é igual byte a byte à rodada 8, o caso (k) passa no CI, o grep pelo nome do adotante dá 0 e a nota está escrita no PR"
+ },
+ {
+  "ficha": "P11",
+  "real": "não medi (grep no motor pelas cinco reprovações; contagem de drifted e de valid_from no corpus)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "escolher entre alinhar a KB ao motor (enfraquece promessas da doutrina) e implementar as reprovações",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "cobrar o vencimento de review_after no radar",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "achar por que drifted aparece em 0 de 3.715 nós",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide os onze pontos com arquivo:linha, opções e recomendação, a sessão",
+  "fecha_quando": "existe selo sobre doutrina ou motor e as afirmações da KB correspondem ao que o motor faz"
+ },
+ {
+  "ficha": "P12",
+  "real": "não medi (radar canônico sobre o grafo do adotante; caso label com plane: e chave on: no parser)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "atualizar os nós PROD desatualizados no grafo do adotante",
+    "dono": "o adotante",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "informar o adotante com a evidência dos nós desatualizados",
+    "dono": "o adotante",
+    "protegido": false,
+    "rota": "R4"
+   },
+   {
+    "ato": "decidir quais das sete melhorias o core absorve",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide as sete propostas com as medidas do adotante e uma recomendação, a sessão",
+  "fecha_quando": "existe selo sobre as sete propostas e o adotante acusou o recebimento da evidência"
+ },
+ {
+  "ficha": "P13",
+  "real": "não medi (lint da regra 19, bancada review-ledger c e contagem DOMINIO/GENÉRICO)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "editar a KB-fonte de identidade e afrouxar 5 seções da doutrina",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "definir o material para cliente e a cláusula de confidencialidade",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "regenerar o plugin, corrigir a proveniência, pôr verified_at no frontmatter, corrigir a busca sem acento e o contraste, e corrigir a mensagem do commit",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "achar a causa da reprovação de review-ledger (c)",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A2 V1 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a mudança de identidade, o afrouxamento e a confidencialidade, com as medidas do refutador, a sessão",
+  "fecha_quando": "existe selo, a regra 19 dá 0 HARD, review-ledger (c) passa e o contraste é ≥ 3:1"
+ },
+ {
+  "ficha": "P14",
+  "real": "não medi (radar e lint das regras 29 sobre o grafo da rodada 13)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir o nó de auto mode (CU3), a saída em segundo plano, a citação de doc, o nó superado ainda confirmed, a citação da SYNTHESIS, o REPROVA órfão e o contrato de custo",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "corrigir os sete achados do juiz e do refutador no grafo da rodada 13, a sessão",
+  "fecha_quando": "regra 29 com 0 HARD, o nó superado com status superseded, o REPROVA apontando id existente e o contrato de custo contando todos os agentes"
+ },
+ {
+  "ficha": "P15",
+  "real": "não medi (contagem de decision done em DEV no corpus; lint da regra 19 depois do rebase)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "regenerar os plugins que embutem o radar",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "acrescentar o aviso SOFT agregado por grafo decision-done-em-DEV",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "regenerar os plugins e escrever o aviso agregado com teste que reprova sem ele, a sessão",
+  "fecha_quando": "regra 19 com 0 HARD, as 20 mutações MU-18 produzem aviso e há uma linha por grafo, com revisão independente registrada no PR"
+ },
+ {
+  "ficha": "P16",
+  "real": "não medi (rodar write-stamp.sh --update num grafo de fixture e comparar label, narrative e provenance)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "curar o escritor do pin para atualizar data, versão, lista de pins e provenance, com os 10 achados corrigidos",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "avisar o adotante para re-carimbar os grafos já escritos errados",
+    "dono": "o adotante",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A2 V1 P2",
+  "rota_principal": "R3",
+  "proximo_ato": "corrigir o escritor e forjar guarda que reprove label, narrative e provenance velhos depois de --update, a sessão",
+  "fecha_quando": "um --update de fixture deixa os quatro campos atuais, YAML válido com aspas e provenance inline, e a guarda reprova a regressão"
+ },
+ {
+  "ficha": "P17",
+  "real": "não medi (pr-finalize --check; contagem de provenance: duplicada após --apply-judged em fixture)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir --apply-judged para substituir a provenance derivada da O2 em vez de anexar bloco novo",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "citar os dois resumos novos num grafo (regra 29)",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "conferir as duas fontes do host com method leitura contra a política",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "revisão da ferramenta por quem não é o autor nem da mesma família",
+    "dono": "revisor independente",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "corrigir o --apply-judged com teste de chave provenance duplicada, a sessão",
+  "fecha_quando": "0 chaves provenance duplicadas nos 37 grafos, pr-finalize --check sem HARD da regra 29 e revisão de não-autor registrada"
+ },
+ {
+  "ficha": "P18",
+  "real": "não medi (wrapper chamado de outro repo; registro vazio; bancada door na origin/main limpa)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "absorver as peças do protótipo do adotante e estender o /meta:dissect a qualquer objeto",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "corrigir o caminho do .py no wrapper, o registro vazio, o dict de apelidos e a conta de casos",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "achar a causa das 3 falhas da família door, que também reprovam na main",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a absorção com o dogfood e uma recomendação, a sessão",
+  "fecha_quando": "existe selo, o wrapper sai 0, 1 ou 3 chamado de outro repo e door tem causa medida"
+ },
+ {
+  "ficha": "P19",
+  "real": "não medi (regra 57 sobre o grafo dogfood e sobre o commit do selo original)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "remover os três falsos positivos, que afrouxam o que a guarda aceita",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "rever o teste de aceite de 9 acusados contra os 2 medidos",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "fechar os fail-opens: ledger minúsculo, aresta de julho, 2>/dev/null || true e ramo REFUTED",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide os três falsos positivos e o teste de aceite, com os 28 ataques, a sessão",
+  "fecha_quando": "existe selo, o grafo dogfood dá 0 HARD e cada fail-open tem caso que reprova"
+ },
+ {
+  "ficha": "P20",
+  "real": "não medi (bancada da regra 60 e varredura dos 324 scripts)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir a regra 60: camelCase sem backreference, fixtures inline, grep sob set -e, strings, corte de $# e ${v#pfx}, universo só rastreado e caso que não falha",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "corrigir a contagem 52 para 58 regras na pergunta",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A2 V0 P2",
+  "rota_principal": "R3",
+  "proximo_ato": "reabrir o PR com a regra 60 corrigida e casos que reprovam sem cada conserto, a sessão",
+  "fecha_quando": "semAspas é acusado, $# e ${v#pfx} ficam intactos, a guarda acusa num adotante recém-instalado e todo caso pode falhar"
+ },
+ {
+  "ficha": "P21",
+  "real": "não medi (git log --format='%h %ad %s' --date=short -S 'write(KG)' -- .claude/skills/onion-orchestration/SKILL.md)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "subir o teto do grafo de 26 para 27 nós",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "selar as três perguntas",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "rebaixar «roteia, não veta» de confirmado e corrigir as claims falhas",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "quebrar trace: em ·",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide o teto e os três selos, com as medidas do refutador, a sessão",
+  "fecha_quando": "existe selo, a frase não consta como confirmada e o índice de leitura enxerga o grafo novo"
+ },
+ {
+  "ficha": "P22",
+  "real": "não medi (recontagem dos números do lote 3 e Fisher sobre 1/4 contra 0/4)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "retomar a fase quebrada como manda a guarda do drive e corrigir o nó circular, as populações e os números",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "reduzir o grafo a ≤20 nós e regenerar o backlog",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "remover a pergunta duplicada no outro grafo",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "retomar a fase quebrada do lote 3 com os números remedidos, a sessão",
+  "fecha_quando": "regras 58 e 62 dão 0 HARD e cada número do lote reproduz pelo comando citado"
+ },
+ {
+  "ficha": "P24",
+  "real": "não medi (ls | wc -l; echo \"rc=$?\" / echo $?; ls | wc -l; echo $? / ALVO_ROOT=\"${tmp}\" bash \"${h}\" --modo)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "apagar ou manter o consumed-mode-check.sh contra o plano",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "endurecer o container e o bridge (NoNewPrivileges, ProtectHome, credenciais)",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "corrigir --selftest, o falso positivo de $?, a isenção por delegação, o extrator de prefixo de env, os casos que escrevem no repo e o rodapé",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide os 31 pares acusados contra o plano de apagar e as opções de endurecimento do host, a sessão",
+  "fecha_quando": "existe selo sobre o script e o host, --selftest sai 0 e os três comandos dão o veredito esperado"
+ },
+ {
+  "ficha": "P25",
+  "real": "não medi (git archive HEAD | tar -x; grep -c check_kg_backlog lint-selftest.sh)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "corrigir a tabela da catraca, que afirma REMOVIDO → SOFT",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "corrigir a regra 58: contador no subshell, escopo por TETO, selftests fora do gate, tabela do helper, DONE-NU e catraca (w)",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "refutação independente",
+    "dono": "revisor independente",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "forjar guarda que compara a tabela de cabeçalho com o que o código emite e corrigir a regra 58, a sessão",
+  "fecha_quando": "a regra 58 sai ≠0 quando acusa, o controle dá 47 SOFT e 0 HARD e a guarda reprova tabela divergente"
+ },
+ {
+  "ficha": "P26",
+  "real": "não medi (as três rotas de fuga num sandbox e bancada sob set -euo pipefail)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "fechar as três rotas: status com baseline no mesmo commit, aresta nos dois sentidos e self-edge",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "consertar a memoização, o cabeçalho, a bancada sob pipefail e matar as 5 mutações",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "renomear os identificadores pt-BR sem sed global",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "arquivar o suposto defeito GIT_DIR medido em checkout velho",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R0"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "escrever casos que reprovam nas três rotas de fuga e fechar cada uma, a sessão",
+  "fecha_quando": "as três rotas saem HARD, 0 mutações sobrevivem, o gate leva menos que 20,1 s e há revisão independente com a nota no PR"
+ },
+ {
+  "ficha": "P27",
+  "real": "não medi (grep por React Native, Expo e shadcn no agente React)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "criar a variante ou a seção Expo/RN na vertical de engenharia",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a variante contra a seção, com o sinal e os achados das cinco features, a sessão",
+  "fecha_quando": "existe selo sobre o escopo do agente"
+ },
+ {
+  "ficha": "P28",
+  "real": "não medi (git ls-remote https://github.com/marciocar/onion-core.git HEAD)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "subir a catraca da porta standalone de 404 para 408",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "commitar o pin junto com os três derivados",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P1",
+  "rota_principal": "R6",
+  "proximo_ato": "levar por /meta:decide a alta da catraca com os 4 commits que a explicam, a sessão",
+  "fecha_quando": "existe selo sobre a catraca, ls-remote confirma o sha da porta e o CI dá 0 HARD das regras 38 e 24"
+ },
+ {
+  "ficha": "P29",
+  "real": "não medi (kg-decide-seal.sh numa fixture seguido do lint de nomes)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "fazer o selador rodar o lint de nomes e não copiar código bruto para a narrative",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "os três selos e o fechamento da issue com a nota de não medido",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "acrescentar o lint de nomes ao selador com teste do caso r18, a sessão",
+  "fecha_quando": "o selador sai ≠0 com vocab.code-unresolved, e o selo e o comentário dizem que o revisor não rodou e por quê"
+ },
+ {
+  "ficha": "P30",
+  "real": "não medi (gate bi-temporal sobre os 110 nós; grep ancorado de valid_from)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "restaurar as 805 linhas do graph.md e o arquivo de revisão a partir do commitado",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "aceitar ISO de precisão reduzida, fazer zero pares sair ILEGÍVEL, corrigir os testes, a frase «lê», o source_tier e a chave repetida",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "regenerar as projeções numa árvore limpa e commitar o pin",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "restaurar graph.md por git checkout e regenerar as projeções em árvore limpa, a sessão",
+  "fecha_quando": "o CI dá 0 HARD, graph.md é igual ao commitado, os 65 nós passam no gate e zero pares não imprime ✅"
+ },
+ {
+  "ficha": "P32",
+  "real": "não medi (regra 53 contra lentes-sonda escalar, flow-list, * e braces)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "ensinar à regra 53 as três formas de paths: e o casamento de * e braces do harness",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "restaurar o arquivo vivo deixado pelo mutante interrompido",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "tirar Bash da allowlist do revisor ou fazê-lo emitir achados = -1 com a árvore suja",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   }
+  ],
+  "nota": "A1 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "restaurar o arquivo vivo e corrigir o parser da regra 53 com as lentes-sonda como teste, a sessão",
+  "fecha_quando": "as lentes-sonda dão o mesmo veredito da regra e do instructions-loaded.jsonl, árvore suja dá -1, e há revisão independente porque a action se auto-pula"
+ },
+ {
+  "ficha": "P33",
+  "real": "não medi (validar o schema embarcado com uma omissão de cada campo required)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "unir os required:, cobrir if/then, a guarda 3, claims_measured > total e UNVERIFIABLE vazio",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "avisar o outro consumidor da mudança de proposed_write para string",
+    "dono": "dono do consumidor",
+    "protegido": false,
+    "rota": "R4"
+   },
+   {
+    "ato": "medir a semântica real do tool-layer na falha de schema",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R2"
+   }
+  ],
+  "nota": "A1 V0 P2",
+  "rota_principal": "R3",
+  "proximo_ato": "unir os required: e forjar guarda contra chave repetida no schema, com bancada sobre o literal embarcado, a sessão",
+  "fecha_quando": "a omissão de cada um dos 7 campos reprova no literal embarcado e a guarda acusa chave repetida"
+ },
+ {
+  "ficha": "P34",
+  "real": "não medi (regra 77 sobre os 11 pares; md5 dos dois kg-radar.sh antes da reescrita)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "limitar o HARD da regra 77 à dependência funcional (skill ou KB embarcada só por outro plugin)",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "arquivar o md5 divergente do kg-radar.sh, que vem da reescrita de namespace",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R0"
+   }
+  ],
+  "nota": "A2 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "reescrever a regra 77 separando menção de dependência, com fixture do estado de véspera que reprova, a sessão",
+  "fecha_quando": "0 HARD nos 11 pares de menção, a fixture dos 8 plugins da véspera reprova e há revisão independente com a nota no PR"
+ },
+ {
+  "ficha": "P35",
+  "real": "não medi (o gate no commit da entrada do CHANGELOG e o diff do console)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "regenerar o console da federação no mesmo commit da entrada do CHANGELOG",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "co-announce e co-deliver aos 12 inbound/, que é o envio ordenado",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "avisar os adotantes dos 64 anúncios não processados",
+    "dono": "sessão de cada adotante",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A2 V2 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "regenerar o console e commitar junto da entrada do CHANGELOG, a sessão",
+  "fecha_quando": "o gate passa, os 12 inbound/ têm corpo idêntico à entrada e à outbox, 0 commits fora do core e revisão independente registrada"
+ },
+ {
+  "ficha": "P36",
+  "real": "não medi (contrato do grafo sobre o method da pergunta nova; ls -l do trust-log)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "trocar «derivação» por «derivado» no method",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R1"
+   },
+   {
+    "ato": "selar a parada do A7-C1",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   }
+  ],
+  "nota": "A0 V0 P0",
+  "rota_principal": "R1",
+  "proximo_ato": "corrigir o method e conferir ack, reply, juiz, fotos e trust-log contra a afirmação da volta, a sessão",
+  "fecha_quando": "o contrato dá 0 violações, cada afirmação da volta cita artefato existente e a régua é igual à anterior"
+ },
+ {
+  "ficha": "P37",
+  "real": "não medi (git grep e kg_refs pelos 5 selos colhidos nos repos citadores)",
+  "dano_agora": "não",
+  "atos": [
+   {
+    "ato": "forjar guarda que barra colheita de selo citado de fora",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   },
+   {
+    "ato": "avisar os citadores para atualizarem o caminho",
+    "dono": "repos citadores",
+    "protegido": false,
+    "rota": "R4"
+   },
+   {
+    "ato": "consulta entre repositórios dos citadores",
+    "dono": "kg-ssot",
+    "protegido": false,
+    "rota": "R4"
+   }
+  ],
+  "nota": "A2 V1 P1",
+  "rota_principal": "R3",
+  "proximo_ato": "pôr os 5 selos no arquivo de colhidos e forjar a guarda de colheita, a sessão",
+  "fecha_quando": "os 5 ids resolvem no arquivo e uma colheita de fixture com selo citado reprova"
+ },
+ {
+  "ficha": "P45",
+  "real": "não medi (grep do nome do cliente na superfície que viaja e nas cópias dos adotantes)",
+  "dano_agora": "sim",
+  "atos": [
+   {
+    "ato": "parar a preparação da distribuição e tirar o nome dos dois arquivos no próprio PR",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R5"
+   },
+   {
+    "ato": "tratar o nome já entregue aos adotantes, as licenças e a marca",
+    "dono": "maestro",
+    "protegido": true,
+    "rota": "R6"
+   },
+   {
+    "ato": "acrescentar a guarda por forma fora dos return 0, a âncora para meio nome e a fixture do índice",
+    "dono": "a sessão",
+    "protegido": false,
+    "rota": "R3"
+   }
+  ],
+  "nota": "A2 V2 P1",
+  "rota_principal": "R5",
+  "proximo_ato": "parar a distribuição, tirar o nome do próprio PR e levar o card ao maestro agora, a sessão",
+  "fecha_quando": "o grep do nome dá 0 na superfície que viaja, há card com o maestro e a guarda reprova a fixture com o nome"
+ }
+]

@@ -1,0 +1,662 @@
+{
+ "X5c46c8": {
+  "file": "FF-001.txt",
+  "arm": "A1",
+  "ficha": "P01"
+ },
+ "X095689": {
+  "file": "FF-001.txt",
+  "arm": "A2",
+  "ficha": "P01"
+ },
+ "Xc8e953": {
+  "file": "FF-001.txt",
+  "arm": "C1",
+  "ficha": "P01"
+ },
+ "X599b69": {
+  "file": "FF-001.txt",
+  "arm": "C2",
+  "ficha": "P01"
+ },
+ "Xb90040": {
+  "file": "FF-006.txt",
+  "arm": "A1",
+  "ficha": "P02"
+ },
+ "X35295b": {
+  "file": "FF-006.txt",
+  "arm": "A2",
+  "ficha": "P02"
+ },
+ "X2d33be": {
+  "file": "FF-006.txt",
+  "arm": "C1",
+  "ficha": "P02"
+ },
+ "Xc12fd8": {
+  "file": "FF-006.txt",
+  "arm": "C2",
+  "ficha": "P02"
+ },
+ "Xda58d9": {
+  "file": "FF-015.txt",
+  "arm": "A1",
+  "ficha": "P05"
+ },
+ "Xd4c5da": {
+  "file": "FF-015.txt",
+  "arm": "A2",
+  "ficha": "P05"
+ },
+ "X74c0b4": {
+  "file": "FF-015.txt",
+  "arm": "C1",
+  "ficha": "P05"
+ },
+ "X56cd71": {
+  "file": "FF-015.txt",
+  "arm": "C2",
+  "ficha": "P05"
+ },
+ "Xd55c7f": {
+  "file": "FF-017.txt",
+  "arm": "A1",
+  "ficha": "P07"
+ },
+ "X89eae8": {
+  "file": "FF-017.txt",
+  "arm": "A2",
+  "ficha": "P07"
+ },
+ "X9b674e": {
+  "file": "FF-017.txt",
+  "arm": "C1",
+  "ficha": "P07"
+ },
+ "X5ef210": {
+  "file": "FF-017.txt",
+  "arm": "C2",
+  "ficha": "P07"
+ },
+ "X26077b": {
+  "file": "FR-005.txt",
+  "arm": "A1",
+  "ficha": "P08"
+ },
+ "X5f3dbb": {
+  "file": "FR-005.txt",
+  "arm": "A2",
+  "ficha": "P08"
+ },
+ "Xdb4dfd": {
+  "file": "FR-005.txt",
+  "arm": "C1",
+  "ficha": "P08"
+ },
+ "Xb1bec3": {
+  "file": "FR-005.txt",
+  "arm": "C2",
+  "ficha": "P08"
+ },
+ "Xf9ee7b": {
+  "file": "FR-023.txt",
+  "arm": "A1",
+  "ficha": "P09"
+ },
+ "Xd65260": {
+  "file": "FR-023.txt",
+  "arm": "A2",
+  "ficha": "P09"
+ },
+ "X4e25f4": {
+  "file": "FR-023.txt",
+  "arm": "C1",
+  "ficha": "P09"
+ },
+ "Xda7620": {
+  "file": "FR-023.txt",
+  "arm": "C2",
+  "ficha": "P09"
+ },
+ "X2abd13": {
+  "file": "FF-014.txt",
+  "arm": "A1",
+  "ficha": "P10"
+ },
+ "X41e90e": {
+  "file": "FF-014.txt",
+  "arm": "A2",
+  "ficha": "P10"
+ },
+ "Xdc80da": {
+  "file": "FF-014.txt",
+  "arm": "C1",
+  "ficha": "P10"
+ },
+ "X609059": {
+  "file": "FF-014.txt",
+  "arm": "C2",
+  "ficha": "P10"
+ },
+ "Xc9bbf2": {
+  "file": "FR-010.txt",
+  "arm": "A1",
+  "ficha": "P11"
+ },
+ "X0911e9": {
+  "file": "FR-010.txt",
+  "arm": "A2",
+  "ficha": "P11"
+ },
+ "Xfa67e8": {
+  "file": "FR-010.txt",
+  "arm": "C1",
+  "ficha": "P11"
+ },
+ "X2e1aa4": {
+  "file": "FR-010.txt",
+  "arm": "C2",
+  "ficha": "P11"
+ },
+ "Xaed619": {
+  "file": "FR-022.txt",
+  "arm": "A1",
+  "ficha": "P12"
+ },
+ "X3e40b2": {
+  "file": "FR-022.txt",
+  "arm": "A2",
+  "ficha": "P12"
+ },
+ "X9fe9cd": {
+  "file": "FR-022.txt",
+  "arm": "C1",
+  "ficha": "P12"
+ },
+ "X1cb6e8": {
+  "file": "FR-022.txt",
+  "arm": "C2",
+  "ficha": "P12"
+ },
+ "X691d84": {
+  "file": "FR-012.txt",
+  "arm": "A1",
+  "ficha": "P13"
+ },
+ "X50a97f": {
+  "file": "FR-012.txt",
+  "arm": "A2",
+  "ficha": "P13"
+ },
+ "Xb40922": {
+  "file": "FR-012.txt",
+  "arm": "C1",
+  "ficha": "P13"
+ },
+ "X4e1b2c": {
+  "file": "FR-012.txt",
+  "arm": "C2",
+  "ficha": "P13"
+ },
+ "X166d84": {
+  "file": "FR-003.txt",
+  "arm": "A1",
+  "ficha": "P14"
+ },
+ "X066c08": {
+  "file": "FR-003.txt",
+  "arm": "A2",
+  "ficha": "P14"
+ },
+ "Xd2b479": {
+  "file": "FR-003.txt",
+  "arm": "C1",
+  "ficha": "P14"
+ },
+ "X2d9c4b": {
+  "file": "FR-003.txt",
+  "arm": "C2",
+  "ficha": "P14"
+ },
+ "X2125a6": {
+  "file": "FR-007.txt",
+  "arm": "A1",
+  "ficha": "P15"
+ },
+ "Xb26fee": {
+  "file": "FR-007.txt",
+  "arm": "A2",
+  "ficha": "P15"
+ },
+ "Xec8140": {
+  "file": "FR-007.txt",
+  "arm": "C1",
+  "ficha": "P15"
+ },
+ "Xb508fd": {
+  "file": "FR-007.txt",
+  "arm": "C2",
+  "ficha": "P15"
+ },
+ "Xd0cd62": {
+  "file": "FF-012.txt",
+  "arm": "A1",
+  "ficha": "P16"
+ },
+ "Xf180d1": {
+  "file": "FF-012.txt",
+  "arm": "A2",
+  "ficha": "P16"
+ },
+ "Xcb7223": {
+  "file": "FF-012.txt",
+  "arm": "C1",
+  "ficha": "P16"
+ },
+ "Xa318a4": {
+  "file": "FF-012.txt",
+  "arm": "C2",
+  "ficha": "P16"
+ },
+ "X095f09": {
+  "file": "FR-006.txt",
+  "arm": "A1",
+  "ficha": "P17"
+ },
+ "X192d5a": {
+  "file": "FR-006.txt",
+  "arm": "A2",
+  "ficha": "P17"
+ },
+ "X342c61": {
+  "file": "FR-006.txt",
+  "arm": "C1",
+  "ficha": "P17"
+ },
+ "Xfeb22d": {
+  "file": "FR-006.txt",
+  "arm": "C2",
+  "ficha": "P17"
+ },
+ "X947e2b": {
+  "file": "FF-028.txt",
+  "arm": "A1",
+  "ficha": "P18"
+ },
+ "X68c494": {
+  "file": "FF-028.txt",
+  "arm": "A2",
+  "ficha": "P18"
+ },
+ "Xd8ba51": {
+  "file": "FF-028.txt",
+  "arm": "C1",
+  "ficha": "P18"
+ },
+ "X3bdd08": {
+  "file": "FF-028.txt",
+  "arm": "C2",
+  "ficha": "P18"
+ },
+ "Xee683c": {
+  "file": "FR-018.txt",
+  "arm": "A1",
+  "ficha": "P19"
+ },
+ "X9e91c9": {
+  "file": "FR-018.txt",
+  "arm": "A2",
+  "ficha": "P19"
+ },
+ "X44e301": {
+  "file": "FR-018.txt",
+  "arm": "C1",
+  "ficha": "P19"
+ },
+ "Xf1ab0b": {
+  "file": "FR-018.txt",
+  "arm": "C2",
+  "ficha": "P19"
+ },
+ "X53e371": {
+  "file": "FF-007.txt",
+  "arm": "A1",
+  "ficha": "P20"
+ },
+ "X8b6506": {
+  "file": "FF-007.txt",
+  "arm": "A2",
+  "ficha": "P20"
+ },
+ "X49a9d0": {
+  "file": "FF-007.txt",
+  "arm": "C1",
+  "ficha": "P20"
+ },
+ "X61ca46": {
+  "file": "FF-007.txt",
+  "arm": "C2",
+  "ficha": "P20"
+ },
+ "X7de688": {
+  "file": "FR-008.txt",
+  "arm": "A1",
+  "ficha": "P21"
+ },
+ "X6eef73": {
+  "file": "FR-008.txt",
+  "arm": "A2",
+  "ficha": "P21"
+ },
+ "Xca2446": {
+  "file": "FR-008.txt",
+  "arm": "C1",
+  "ficha": "P21"
+ },
+ "X32f7e6": {
+  "file": "FR-008.txt",
+  "arm": "C2",
+  "ficha": "P21"
+ },
+ "X11bdd7": {
+  "file": "FR-016.txt",
+  "arm": "A1",
+  "ficha": "P22"
+ },
+ "X13cf08": {
+  "file": "FR-016.txt",
+  "arm": "A2",
+  "ficha": "P22"
+ },
+ "X0d215f": {
+  "file": "FR-016.txt",
+  "arm": "C1",
+  "ficha": "P22"
+ },
+ "X6ead21": {
+  "file": "FR-016.txt",
+  "arm": "C2",
+  "ficha": "P22"
+ },
+ "X2e75f5": {
+  "file": "FR-013.txt",
+  "arm": "A1",
+  "ficha": "P24"
+ },
+ "X94bffb": {
+  "file": "FR-013.txt",
+  "arm": "A2",
+  "ficha": "P24"
+ },
+ "X1f79b9": {
+  "file": "FR-013.txt",
+  "arm": "C1",
+  "ficha": "P24"
+ },
+ "Xbc339f": {
+  "file": "FR-013.txt",
+  "arm": "C2",
+  "ficha": "P24"
+ },
+ "Xdfa85f": {
+  "file": "FR-014.txt",
+  "arm": "A1",
+  "ficha": "P25"
+ },
+ "Xb2fc03": {
+  "file": "FR-014.txt",
+  "arm": "A2",
+  "ficha": "P25"
+ },
+ "Xcfe1a4": {
+  "file": "FR-014.txt",
+  "arm": "C1",
+  "ficha": "P25"
+ },
+ "X380204": {
+  "file": "FR-014.txt",
+  "arm": "C2",
+  "ficha": "P25"
+ },
+ "X39dd51": {
+  "file": "FR-002.txt",
+  "arm": "A1",
+  "ficha": "P26"
+ },
+ "X4d9262": {
+  "file": "FR-002.txt",
+  "arm": "A2",
+  "ficha": "P26"
+ },
+ "X8571fd": {
+  "file": "FR-002.txt",
+  "arm": "C1",
+  "ficha": "P26"
+ },
+ "X91c356": {
+  "file": "FR-002.txt",
+  "arm": "C2",
+  "ficha": "P26"
+ },
+ "X0c8f47": {
+  "file": "FF-002.txt",
+  "arm": "A1",
+  "ficha": "P27"
+ },
+ "X6dfe54": {
+  "file": "FF-002.txt",
+  "arm": "A2",
+  "ficha": "P27"
+ },
+ "Xbde9fa": {
+  "file": "FF-002.txt",
+  "arm": "C1",
+  "ficha": "P27"
+ },
+ "X440855": {
+  "file": "FF-002.txt",
+  "arm": "C2",
+  "ficha": "P27"
+ },
+ "X19c251": {
+  "file": "FR-019.txt",
+  "arm": "A1",
+  "ficha": "P28"
+ },
+ "X69e1ff": {
+  "file": "FR-019.txt",
+  "arm": "A2",
+  "ficha": "P28"
+ },
+ "Xd37e6d": {
+  "file": "FR-019.txt",
+  "arm": "C1",
+  "ficha": "P28"
+ },
+ "X1635a5": {
+  "file": "FR-019.txt",
+  "arm": "C2",
+  "ficha": "P28"
+ },
+ "X5f0db4": {
+  "file": "FF-008.txt",
+  "arm": "A1",
+  "ficha": "P29"
+ },
+ "Xabf20e": {
+  "file": "FF-008.txt",
+  "arm": "A2",
+  "ficha": "P29"
+ },
+ "X2eb490": {
+  "file": "FF-008.txt",
+  "arm": "C1",
+  "ficha": "P29"
+ },
+ "X45cff6": {
+  "file": "FF-008.txt",
+  "arm": "C2",
+  "ficha": "P29"
+ },
+ "Xd1c476": {
+  "file": "FR-020.txt",
+  "arm": "A1",
+  "ficha": "P30"
+ },
+ "X62764e": {
+  "file": "FR-020.txt",
+  "arm": "A2",
+  "ficha": "P30"
+ },
+ "Xdc8c1e": {
+  "file": "FR-020.txt",
+  "arm": "C1",
+  "ficha": "P30"
+ },
+ "X7ae619": {
+  "file": "FR-020.txt",
+  "arm": "C2",
+  "ficha": "P30"
+ },
+ "X30d1d1": {
+  "file": "FR-004.txt",
+  "arm": "A1",
+  "ficha": "P32"
+ },
+ "Xbc0bf8": {
+  "file": "FR-004.txt",
+  "arm": "A2",
+  "ficha": "P32"
+ },
+ "X768928": {
+  "file": "FR-004.txt",
+  "arm": "C1",
+  "ficha": "P32"
+ },
+ "X69a6d1": {
+  "file": "FR-004.txt",
+  "arm": "C2",
+  "ficha": "P32"
+ },
+ "X22e4d7": {
+  "file": "FF-026.txt",
+  "arm": "A1",
+  "ficha": "P33"
+ },
+ "Xdffbba": {
+  "file": "FF-026.txt",
+  "arm": "A2",
+  "ficha": "P33"
+ },
+ "X2fbb96": {
+  "file": "FF-026.txt",
+  "arm": "C1",
+  "ficha": "P33"
+ },
+ "Xa881c1": {
+  "file": "FF-026.txt",
+  "arm": "C2",
+  "ficha": "P33"
+ },
+ "X985fb9": {
+  "file": "FF-005.txt",
+  "arm": "A1",
+  "ficha": "P34"
+ },
+ "Xaea160": {
+  "file": "FF-005.txt",
+  "arm": "A2",
+  "ficha": "P34"
+ },
+ "Xaad460": {
+  "file": "FF-005.txt",
+  "arm": "C1",
+  "ficha": "P34"
+ },
+ "X249c3d": {
+  "file": "FF-005.txt",
+  "arm": "C2",
+  "ficha": "P34"
+ },
+ "X94e7b2": {
+  "file": "A-005.txt",
+  "arm": "A1",
+  "ficha": "P35"
+ },
+ "X86573b": {
+  "file": "A-005.txt",
+  "arm": "A2",
+  "ficha": "P35"
+ },
+ "Xfadbb4": {
+  "file": "A-005.txt",
+  "arm": "C1",
+  "ficha": "P35"
+ },
+ "Xb0175f": {
+  "file": "A-005.txt",
+  "arm": "C2",
+  "ficha": "P35"
+ },
+ "X457f47": {
+  "file": "FR-024.txt",
+  "arm": "A1",
+  "ficha": "P36"
+ },
+ "X63b02a": {
+  "file": "FR-024.txt",
+  "arm": "A2",
+  "ficha": "P36"
+ },
+ "Xcc272f": {
+  "file": "FR-024.txt",
+  "arm": "C1",
+  "ficha": "P36"
+ },
+ "X8806fd": {
+  "file": "FR-024.txt",
+  "arm": "C2",
+  "ficha": "P36"
+ },
+ "X0d6b4f": {
+  "file": "FR-001.txt",
+  "arm": "A1",
+  "ficha": "P37"
+ },
+ "Xc30d9d": {
+  "file": "FR-001.txt",
+  "arm": "A2",
+  "ficha": "P37"
+ },
+ "Xd94e9f": {
+  "file": "FR-001.txt",
+  "arm": "C1",
+  "ficha": "P37"
+ },
+ "X6b1e84": {
+  "file": "FR-001.txt",
+  "arm": "C2",
+  "ficha": "P37"
+ },
+ "Xe04dc0": {
+  "file": "B-025.txt",
+  "arm": "A1",
+  "ficha": "P45"
+ },
+ "X0a20ec": {
+  "file": "B-025.txt",
+  "arm": "A2",
+  "ficha": "P45"
+ },
+ "X8ae7af": {
+  "file": "B-025.txt",
+  "arm": "C1",
+  "ficha": "P45"
+ },
+ "Xbb67ac": {
+  "file": "B-025.txt",
+  "arm": "C2",
+  "ficha": "P45"
+ }
+}

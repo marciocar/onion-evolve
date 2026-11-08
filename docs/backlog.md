@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1017 itens abertos** em 155 grafo(s) com aberto (de 196 no escopo) · 154 grupo(s), agrupados por `owner:` (54 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1020 itens abertos** em 156 grafo(s) com aberto (de 198 no escopo) · 155 grupo(s), agrupados por `owner:` (54 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -879,6 +879,14 @@
 | 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
+
+## problem-formula-2026-11 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 26.4 | `C_N3_ROTEADOR_NAO_COMANDO` | problem-formula-2026-11 | Resposta à pergunta de N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta:forge-g |
+| 9.0 | `C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA` | problem-formula-2026-11 | Sem exceção não se sustenta como está, por leitura e sem medida. |
+| 4.0 | `Q_PF_EXPERIMENTO_AO_VIVO` | problem-formula-2026-11 | A fórmula encaminha problemas ao vivo, com ao menos 3 atos protegidos reais, sem agir demais e com ERRO-B de no máximo 20%? O n |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 

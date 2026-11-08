@@ -1,0 +1,204 @@
+[
+{
+"ficha": "H01",
+"caso": "I003",
+"estrato": "B",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H02",
+"caso": "I002",
+"estrato": "B",
+"protegido": true,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H03",
+"caso": "I071",
+"estrato": "A",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H04",
+"caso": "L1",
+"estrato": "L",
+"protegido": true,
+"levado": true
+},
+{
+"ficha": "H05",
+"caso": "I069",
+"estrato": "A",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H06",
+"caso": "I043",
+"estrato": "D",
+"protegido": true,
+"levado": true,
+"fecha": true
+},
+{
+"ficha": "H07",
+"caso": "L4",
+"estrato": "L",
+"protegido": false,
+"levado": false
+},
+{
+"ficha": "H08",
+"caso": "I078",
+"estrato": "A",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H09",
+"caso": "I077",
+"estrato": "A",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H10",
+"caso": "I005",
+"estrato": "A",
+"protegido": true,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H11",
+"caso": "I025",
+"estrato": "C",
+"protegido": true,
+"levado": true,
+"fecha": true
+},
+{
+"ficha": "H12",
+"caso": "L5",
+"estrato": "L",
+"protegido": false,
+"levado": false
+},
+{
+"ficha": "H13",
+"caso": "I059",
+"estrato": "E",
+"protegido": true,
+"levado": true,
+"fecha": false
+},
+{
+"ficha": "H14",
+"caso": "L6",
+"estrato": "L",
+"protegido": false,
+"levado": false
+},
+{
+"ficha": "H15",
+"caso": "I007",
+"estrato": "C",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H16",
+"caso": "I048",
+"estrato": "D",
+"protegido": true,
+"levado": true,
+"fecha": true
+},
+{
+"ficha": "H17",
+"caso": "L3",
+"estrato": "L",
+"protegido": true,
+"levado": true
+},
+{
+"ficha": "H18",
+"caso": "L2",
+"estrato": "L",
+"protegido": true,
+"levado": true
+},
+{
+"ficha": "H19",
+"caso": "I004",
+"estrato": "B",
+"protegido": true,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H20",
+"caso": "I068",
+"estrato": "A",
+"protegido": true,
+"levado": true,
+"fecha": true
+},
+{
+"ficha": "H21",
+"caso": "I076",
+"estrato": "A",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H22",
+"caso": "I001",
+"estrato": "B",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H23",
+"caso": "I046",
+"estrato": "D",
+"protegido": false,
+"levado": true,
+"fecha": false
+},
+{
+"ficha": "H24",
+"caso": "I056",
+"estrato": "E",
+"protegido": true,
+"levado": true,
+"fecha": false
+},
+{
+"ficha": "H25",
+"caso": "I006",
+"estrato": "C",
+"protegido": false,
+"levado": false,
+"fecha": true
+},
+{
+"ficha": "H26",
+"caso": "I073",
+"estrato": "A",
+"protegido": true,
+"levado": true,
+"fecha": true
+}
+]
