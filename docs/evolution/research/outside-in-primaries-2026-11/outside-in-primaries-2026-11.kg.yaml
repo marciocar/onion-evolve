@@ -19,6 +19,9 @@ meta:
   # dono, prazo e critério de pronto. Teto subiu de 101 para 108 só por esses 7.
   purpose: "Permitir um veredito por escolha (alinhado, diverge por decisão, atrás) para os três produtos do ecossistema Onion contra as fontes primárias, com cada atrás podendo virar item com dono. É a leitura interna; o dissect de fora da curadoria virá depois, sem ler este grafo."
 external_edges:
+  - from: Q_SANDBOX_DENY_LAYER_DECISION_1108
+    to: "docs/onion/graph/maestro-decisions-1108.kg.yaml#D_MD_DENY_MINIMUM_PORTABLE_1108"
+    edge_type: TRACES_TO
   - from: E_CC_HOOK_FAIL_OPEN_ONFAILURE
     to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
     edge_type: SUPPORTS
@@ -1487,7 +1490,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "O core adota uma camada de sandbox, e em que forma, depois da medida da curadoria? A metade do deny já foi decidida; o que segue sem decisão é o sandbox."
-    narrative: "Reescrito em 2026-11-08, para perguntar só o que segue sem decisão. A metade do deny foi decidida pelo maestro em 2026-11-08: «Deny mínimo portátil», selo D_MD_DENY_MINIMUM_PORTABLE_1108, no PR #1550, ainda não mergeado, e por isso citado aqui sem aresta; a forja está em curso. Esse selo deixa o sandbox para depois da medida da curadoria, que segue em andamento. O selo D_EXIT2_COUPLING_WORDING_2026_11 também não fala de sandbox. Medido em 2026-11-08 no .claude/settings.json da origin/main: 0 regras deny e nenhum bloco sandbox (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Pronto quando: um D_ selado pelo maestro diz se o core adota o sandbox, e em que forma, ou por que não. Sem data: o gatilho é a medida da curadoria terminar. Linear: SAC-367; a postura do host para o bwrap é outra pergunta, em SAC-292. Esta rodada não sela nada."
+    narrative: "Reescrito em 2026-11-08, para perguntar só o que segue sem decisão. A metade do deny foi decidida pelo maestro em 2026-11-08: «Deny mínimo portátil», selo D_MD_DENY_MINIMUM_PORTABLE_1108, selado no PR #1550, mergeado em 2026-11-08; a forja está em curso. Esse selo deixa o sandbox para depois da medida da curadoria, que segue em andamento. O selo D_EXIT2_COUPLING_WORDING_2026_11 também não fala de sandbox. Medido em 2026-11-08 no .claude/settings.json da origin/main: 0 regras deny e nenhum bloco sandbox (E_OBJECAO_CC_NO_DENY_NO_SANDBOX_IN_CORE). A claim que caracterizaria a sandbox foi rejeitada na ancoragem por exagero, e C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG guarda a formulação sustentada. Pronto quando: um D_ selado pelo maestro diz se o core adota o sandbox, e em que forma, ou por que não. Sem data: o gatilho é a medida da curadoria terminar. Linear: SAC-367; a postura do host para o bwrap é outra pergunta, em SAC-292. Esta rodada não sela nada."
     trace: "Elenxo, objeção 16 e 'Não sustenta: a sandbox como decisão, pois nenhum nó a sela'"
   - id: E_LACUNAS_OUTSIDE_IN_1108
     node_type: evidence

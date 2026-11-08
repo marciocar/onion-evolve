@@ -65,7 +65,7 @@ leitura do Elenxo: as quatro linhas ainda não apontam, aqui, para um selo próp
 
 **Fica aberto para o maestro:** `Q_SANDBOX_DENY_LAYER_DECISION_1108`, só a camada de sandbox, em SAC-367 (a decisão
 sobre o sandbox do core), sem data: o gatilho é a medida da curadoria terminar. A metade do deny foi decidida em
-08/11, no selo `D_MD_DENY_MINIMUM_PORTABLE_1108` do PR #1550, ainda não mergeado. Nenhum `D_` nasce nesta rodada.
+08/11, no selo `D_MD_DENY_MINIMUM_PORTABLE_1108` do PR #1550, já na main. Nenhum `D_` nasce nesta rodada.
 
 ## O que a rodada ensinou sobre o método
 
