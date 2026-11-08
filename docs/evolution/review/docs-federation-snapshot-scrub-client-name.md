@@ -2,7 +2,8 @@
 branch: docs/federation-snapshot-scrub-client-name
 pr: pendente
 date: 2026-11-08
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9652721e19352a3398840da6ba40dd9a9446de235c4be5f2c173ce84c0a02cad
+reviewed_code_sha256: cbae9667741b29900b6650f40bba7ba9ee5043561f7dfad5953494d34eb31078
 findings_total: 1
 findings_real: 1
 tokens: 0
