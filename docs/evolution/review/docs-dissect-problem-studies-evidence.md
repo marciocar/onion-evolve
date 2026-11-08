@@ -4,11 +4,11 @@ pr: pendente
 date: 2026-11-08
 reviewed_diff_sha256: 068fabcfa70deab98d5295dfb7d41b354e828ed996d21ce4741c250d9541022f
 reviewed_code_sha256: 5007b838eed5b0b21a8e36b92c5c3c90fef7926e85db4b07f7e39c4cb2b95877
-findings_total: 3
-findings_real: 3
+findings_total: 4
+findings_real: 4
 tokens: 0
 duration_min: 20
-findings_fixed: 3
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "agente de execução da sessão do core (passada própria; o brief proibiu criar agentes, então não houve refutador independente)"
@@ -34,6 +34,7 @@ nota: "tokens 0 = não medido. Evidência trazida da branch local feat/problem-f
 | 1 | `problem-route-2026-11/hook_exec.py:20` fixava um caminho de máquina sob a home de uma conta real no `PATH` do hook (o core é PÚBLICO; a `door-leak-scan.sh`, família home, reprovava com rc 1) | **neutralizado**: o prefixo passou a `os.path.expanduser('~/.venvs/onion-core/bin')`, mesmo efeito na máquina de origem; a varredura saiu rc 0. O arquivo não está no `MANIFEST.sha256` do estudo, então o manifesto segue válido (`sha256sum -c` sem falha) |
 | 2 | os dois grafos entravam com dívida SHOULD do contrato (o `kg-contract-check.sh` cobra grafo novo limpo): 12 `provenance.method` fora da forma `<classe>: <detalhe>` e 18 labels acima de 280 caracteres | **curado por forma, sem mudar o que o nó afirma**: a classe foi explicitada (`leitura:`, `medição:`, `derivado:`) mantendo o detalhe original; cada label longo foi cortado no último limite de frase antes de 280, e o resto foi para o início do `narrative` do mesmo nó. Os dois grafos saem conformes e com `kg-radar.sh --integrity --schema` rc 0 |
 | 3 | duas citações do main apontavam para um arquivo que só existia numa branch local | curado (acima) |
+| 4 | o lint de nomes do contrato KG-SSOT (`ops/kg-gate-ci.sh`, etapa 4 do `pr-finalize`) reprovou 42 códigos novos sem termo (E1–E3, P0–P6, P22, A1/A2, G1/G2, C1/C2, J1/J2, B2, L3, Q9) e, depois, 3 ambíguos (N0–N3, os níveis do dissect) | **curado**: 24 nós `entity` com `x_term` (8 no problem-formula, 16 no problem-route), cada um com a definição lida na Etapa 0, no gabarito ou nas fichas do próprio estudo, e uma aresta `TRACES_TO` ao veredito do grafo (sem ela, `integrity.orphan-node`); P0 e Q9 entram como código de fonte externa. Os N dos três labels viraram `dissect:N…`. Um label que passou de 280 com a qualificação foi cortado como os outros. `kg-gate-ci.sh` rc 0, `novos=0` |
 
 ## Varredura de vazamento (REGRA 36, REGRA 106, REGRA 119)
 

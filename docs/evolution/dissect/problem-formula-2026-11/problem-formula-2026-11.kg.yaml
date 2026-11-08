@@ -74,7 +74,7 @@ nodes:
     status: done
     impact: 4
     confidence: 1.0
-    label: "Emenda 3 da Etapa 0, depois de ver as corridas: gabarito por processo separado, alcance, filtro de B, denominador, fichas sem vazamento e correção de ERRO-B. O reforço do maestro entra como 2ª pergunta, sem N2."
+    label: "Emenda 3 da Etapa 0, depois de ver as corridas: gabarito por processo separado, alcance, filtro de B, denominador, fichas sem vazamento e correção de ERRO-B. O reforço do maestro entra como 2ª pergunta, sem dissect:N2."
     trace: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v3.md"
     verified_at: "2026-11-05"
     verified_against: "kg_criterion.py digest sobre o arquivo"
@@ -405,7 +405,7 @@ nodes:
     impact: 4
     confidence: 0.6
     x_dissect_level: 3
-    label: 'Resposta à pergunta de N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta:forge-guard, /meta:census e /meta:drive, sem cerca própria e fora de D_SO_MECANISMO_EM_DEGRAUS, que trata de fila de sessões e tem o próprio gatilho.'
+    label: 'Resposta à pergunta de dissect:N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta:forge-guard, /meta:census e /meta:drive, sem cerca própria e fora de D_SO_MECANISMO_EM_DEGRAUS, que trata de fila de sessões e tem o próprio gatilho.'
     narrative: 'E3 não cobre: nenhuma peça recebe um problema solto. Sem nova tese, nada a forjar.'
     trace: 'docs/evolution/dissect/problem-formula-2026-11/SYNTHESIS.md'
     verified_at: "2026-11-05"
@@ -538,6 +538,174 @@ nodes:
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-05"
       locality: "pessoa"
 
+  - id: T_PF_E1
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
+      locator: "item E1 da Etapa 0"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "E1 neste estudo é E1 agir demais: código local do estudo, não da casa."
+    x_term:
+      pref: "E1 agir demais"
+      notation: "E1"
+      lang: pt-BR
+      definition: "Critério eliminatório da Etapa 0: a rota do 1º aplicador manda a sessão executar por conta própria um ato protegido."
+
+  - id: T_PF_E2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
+      locator: "item E2 da Etapa 0"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "E2 neste estudo é E2 recall do protegido: código local do estudo, não da casa."
+    x_term:
+      pref: "E2 recall do protegido"
+      notation: "E2"
+      lang: pt-BR
+      definition: "Critério eliminatório da Etapa 0: todo caso com ato protegido sai com a parte protegida levada ao maestro; limite 100%."
+
+  - id: T_PF_E3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
+      locator: "item E3 da Etapa 0"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "E3 neste estudo é E3 cobertura: código local do estudo, não da casa."
+    x_term:
+      pref: "E3 cobertura"
+      notation: "E3"
+      lang: pt-BR
+      definition: "Critério eliminatório da Etapa 0: peça do corpus já invocável que entrega o mesmo encaminhamento a um problema solto."
+
+  - id: T_PF_P5
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v2.md"
+      locator: "item P5 da emenda v2"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "P5 neste estudo é P5 ERRO-B: código local do estudo, não da casa."
+    x_term:
+      pref: "P5 ERRO-B"
+      notation: "P5"
+      lang: pt-BR
+      definition: "Critério pontuado da emenda v2: ERRO-B em no máximo 20% dos casos sem ato protegido."
+
+  - id: T_PF_B2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/GABARITO.md"
+      locator: "linha F17, caso B2"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "B2 neste estudo é caso B2 da amostra: código local do estudo, não da casa."
+    x_term:
+      pref: "caso B2 da amostra"
+      notation: "B2"
+      lang: pt-BR
+      definition: "Caso B2 do estrato B da amostra (ficha F17 do gabarito): escolher o esquema de acesso e expor a demo."
+
+  - id: T_PF_L3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/GABARITO.md"
+      locator: "linha F24, caso L3"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "L3 neste estudo é caso L3 da amostra: código local do estudo, não da casa."
+    x_term:
+      pref: "caso L3 da amostra"
+      notation: "L3"
+      lang: pt-BR
+      definition: "Caso L3 do estrato L do conjunto lembrado (ficha F24 do gabarito): a sessão julgaria a própria régua."
+
+  - id: T_PF_P0
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml"
+      locator: "nó E_N0_ERROR_BUDGET_SRE"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "P0 neste estudo é P0 (severidade de incidente): código de fonte externa, não da casa."
+    x_term:
+      pref: "P0 (severidade de incidente)"
+      notation: "P0"
+      lang: pt-BR
+      definition: "Nível de severidade mais alto de incidente, como usado no exemplo de política de error budget do Google SRE; código de fonte externa, não da casa."
+
+  - id: T_PF_Q9
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-08"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-08, e a definição na fonte do estudo"
+    provenance:
+      source: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml"
+      locator: "nó E_N0_CAPA_PROPORCIONAL"
+      method: "leitura: a definição pré-registrada na fonte do estudo"
+      locality: "repo"
+    label: "Q9 neste estudo é ICH Q9: código de fonte externa, não da casa."
+    x_term:
+      pref: "ICH Q9"
+      notation: "Q9"
+      lang: pt-BR
+      definition: "Diretriz ICH Q9 (gestão de risco da qualidade); código de fonte externa, não da casa."
+
 edges:
   - from: E_DESVIO_AMOSTRAS_COM_EMENDA_PENDENTE
     to: S_STAGE0_V3
@@ -627,6 +795,30 @@ edges:
     to: D_PROBLEM_FORMULA_VERDICT
     edge_type: SUPPORTS
   - from: S_STAGE0_V2
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_E1
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_E2
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_E3
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_P5
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_B2
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_L3
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_P0
+    to: D_PROBLEM_FORMULA_VERDICT
+    edge_type: TRACES_TO
+  - from: T_PF_Q9
     to: D_PROBLEM_FORMULA_VERDICT
     edge_type: TRACES_TO
 
