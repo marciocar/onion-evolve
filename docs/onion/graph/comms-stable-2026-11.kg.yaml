@@ -1,6 +1,6 @@
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16. Acréscimo: FLIP open→done em Q_CS_APP_SLACK_E_CHANNELS_1106, confirmado pelo maestro (passos 1 a 6 do card feitos). Lote 08/11: FLIP open→done em Q_CS_DEGRAU2_SLACK_RASCUNHO_1109, pela medida dos rascunhos aprovados e postados."
+  x_drive_checkpoint_note: "Lote 07/11 (sessão f00150): FLIP open→done em Q_CS_PESQUISA_PADROES_MENSAGERIA_1106 (pilha selada no grafo da pesquisa) e Q_CS_ORIENTACAO_COMPLIANCE_1106 (entregue e citada pelo hub); evidência apendada em Q_CS_DEGRAU1_CAMPAINHA_1109 (fila ida e volta ao vivo), Q_CS_APP_SLACK_E_CHANNELS_1106 (as 4 escolhas do maestro; fecho dele) e Q_CS_DEGRAU2_SLACK_RASCUNHO_1109 (mudança de host). Sem nó novo: o grafo já passa do teto declarado de 16. Acréscimo: FLIP open→done em Q_CS_APP_SLACK_E_CHANNELS_1106, confirmado pelo maestro (passos 1 a 6 do card feitos). Lote 08/11: FLIP open→done em Q_CS_DEGRAU2_SLACK_RASCUNHO_1109, pela medida dos rascunhos aprovados e postados. Lote 08/11 (2): FLIP open→done em Q_CS_DEGRAU1_CAMPAINHA_1109 e Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109, pelos testes ao vivo com o hub."
   schema_version: "1"
   id: comms-stable-2026-11
   slug: comms-stable-2026-11
@@ -171,28 +171,28 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-09"
     impact: 5
     confidence: 0.7
-    verified_at: "2026-11-07"
-    verified_against: "pending_signals, read_signal e ack_signal da campainha na sessão do core f00150 (conta nova do Claude), 2026-11-07 ~18:35 UTC: fila/2 e fila/3 de urn:onion:member:onion-curation com verified-crypto=true"
+    verified_at: "2026-11-08"
+    verified_against: "teste ao vivo de 2026-11-08 com o hub: o sinal live-core-hub-1108-1 saiu do core pela fila (fila send, entregue, live e dead vazias); o hub relatou que a campainha tocou sem ninguém digitar (box=fila, path=fila/1, attempt=1, verified-crypto=true) e respondeu pela fila com live-hub-core-1108-1, lido pelo core com read_signal (verified-crypto=true) e confirmado com ack_signal; antes, em 07/11, o mesmo nos dois sentidos com a curadoria"
     label: "Degrau 1, a campainha: um channel MCP (stdio) que avisa a sessão quando chega arquivo no inbox, no inbound ou na fila A2A do repo dela, sem rede, com o aviso como ponteiro e nunca o corpo."
-    narrative: "Pronto quando: o channel está no onion-messaging com bancada e mutante, vendorizado no core, instalado no hub e numa peer, e um sinal entregue pelo carteiro toca a sessão receptora sem ninguém digitar. Conduz: o core. Estado medido em 2026-11-06: forjada e mergeada no onion-messaging (PR #2, 684d0ad), com bancada, mutantes e CI verdes na main; no degrau 3 ela passou a tocar também na fila (PR #3). Falta o teste ao vivo: ligar numa sessão real pela flag de dev channels (ato do maestro), vendorizar no core e instalar no hub e numa peer. O kit do teste ao vivo é o PR #4 do onion-messaging. Segue open até o teste ao vivo. Medido em 2026-11-07, ao vivo e nos dois sentidos entre o core e a curadoria: a ida tocou na curadoria sem ninguém digitar (fila/1, ack registrado, relato live-curation-core-1107-1-reply), e a volta (a resposta e o pedido de update curation-core-1107-update-ask) chegou ao core pela fila com assinatura conferida e foi confirmada pela sessão nova, já na outra conta do Claude. Falta, para fechar: a instalação no hub (prevista para 08/11) e o teste de tocar lá."
+    narrative: "Pronto quando: o channel está no onion-messaging com bancada e mutante, vendorizado no core, instalado no hub e numa peer, e um sinal entregue pelo carteiro toca a sessão receptora sem ninguém digitar. Conduz: o core. Estado medido em 2026-11-06: forjada e mergeada no onion-messaging (PR #2, 684d0ad), com bancada, mutantes e CI verdes na main; no degrau 3 ela passou a tocar também na fila (PR #3). Falta o teste ao vivo: ligar numa sessão real pela flag de dev channels (ato do maestro), vendorizar no core e instalar no hub e numa peer. O kit do teste ao vivo é o PR #4 do onion-messaging. Segue open até o teste ao vivo. Medido em 2026-11-07, ao vivo e nos dois sentidos entre o core e a curadoria: a ida tocou na curadoria sem ninguém digitar (fila/1, ack registrado, relato live-curation-core-1107-1-reply), e a volta (a resposta e o pedido de update curation-core-1107-update-ask) chegou ao core pela fila com assinatura conferida e foi confirmada pela sessão nova, já na outra conta do Claude. Falta, para fechar: a instalação no hub (prevista para 08/11) e o teste de tocar lá. Fechado em 2026-11-08: instalada no core, na curadoria e no hub, e tocando sem ninguém digitar. Limite medido: a sessão do core que é de fundo (aberta pelo daemon) tem as ferramentas mas não recebe o aviso por push; só a sessão aberta com a flag de channels recebe. Os identificadores em pt-BR (servidor campainha, CAMPAINHA_*, fila) entram em rename para o inglês por ordem do maestro."
   - id: Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-09"
     impact: 5
     confidence: 0.6
-    verified_at: "2026-11-06"
-    verified_against: "gh pr view 3 --repo marciocar/onion-messaging: MERGED 2026-11-06T20:08:07Z (35e05303f0fe); gh run list na main: fila success em 35e0530; ensaio tools/live_rehearsal.py do PR #4 rodado na VPS em 2026-11-06, 16/16"
+    verified_at: "2026-11-08"
+    verified_against: "a fila com assinatura A2A, dedupe e ack entregou nos dois sentidos core↔curadoria (07/11) e core↔hub (08/11), com a chave do hub pinada no PR #1538 e conferida pelo maestro fora de banda; a fila de mortos ficou vazia nos dois testes"
     label: "Degrau 3, sessão com sessão: envelope A2A assinado, fila durável com confirmação de entrega e reenvio para quem estava offline, e a campainha da sessão receptora tocando quando a fila anda."
-    narrative: "Pronto quando: duas sessões do Onion (o core e uma peer) trocam ida e volta pela fila, uma delas fechada no meio e recuperando ao abrir, com o gate do A2A intacto e o aceite humano onde a regra pede. Conduz: o core. Estado medido em 2026-11-06: forjado e mergeado no onion-messaging (PR #3, 35e0530): daemon por sessão com honker 0.5.0 fixo, gate do core em todo submit, dedupe por remetente, lease, reenvio, teto e dead-letter, ack só pela campainha; bancada, ponta a ponta, mutantes (35 mortos, 0 vivos) e CI verdes na main. O kit do teste ao vivo (PR #4) ensaiou com os ids, o registro e o gate reais e chaves de teste: a ida curadoria → core chega; a volta core → curadoria é recusada pelo gate (receiver-not-a-receiver:role-standalone, a camada 0b do a2a-verify.sh só aceita source ou hub) e só chega com a curadoria como hub numa cópia da política. Falta o teste ao vivo, e antes dele três atos do maestro: os pares de chave dos dois membros com a pública pinada e o kid em a2a.keys, a decisão sobre o receptor standalone e os daemons subidos nas duas sessões. Segue open até o teste ao vivo."
+    narrative: "Pronto quando: duas sessões do Onion (o core e uma peer) trocam ida e volta pela fila, uma delas fechada no meio e recuperando ao abrir, com o gate do A2A intacto e o aceite humano onde a regra pede. Conduz: o core. Estado medido em 2026-11-06: forjado e mergeado no onion-messaging (PR #3, 35e0530): daemon por sessão com honker 0.5.0 fixo, gate do core em todo submit, dedupe por remetente, lease, reenvio, teto e dead-letter, ack só pela campainha; bancada, ponta a ponta, mutantes (35 mortos, 0 vivos) e CI verdes na main. O kit do teste ao vivo (PR #4) ensaiou com os ids, o registro e o gate reais e chaves de teste: a ida curadoria → core chega; a volta core → curadoria é recusada pelo gate (receiver-not-a-receiver:role-standalone, a camada 0b do a2a-verify.sh só aceita source ou hub) e só chega com a curadoria como hub numa cópia da política. Falta o teste ao vivo, e antes dele três atos do maestro: os pares de chave dos dois membros com a pública pinada e o kid em a2a.keys, a decisão sobre o receptor standalone e os daemons subidos nas duas sessões. Segue open até o teste ao vivo. Fechado em 2026-11-08 pelos dois testes ao vivo, com o hub na outra conta do Claude."
   - id: Q_CS_DEGRAU2_SLACK_RASCUNHO_1109
     node_type: question
     layer: audit
