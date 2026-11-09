@@ -2,8 +2,7 @@
 branch: docs/a2a-p12-result-1109
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: 694812a4a8d857deefc46792dfbe77a58005bc9ca66ad6c935f2b83622aa83d9
-reviewed_code_sha256: 1ec708c0a8a67d62b086d216488dcadf427df2132404e3126138fd99094c3af8
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 1
@@ -32,6 +31,7 @@ Registra o P12 de 09/11 no §10c do pré-registro e no nó `E_IDA_E_VOLTA_P12_CA
 | 3 | O registro dava 21 min à primeira rodada offline, a partir de um «17h15» relatado que a foto desmentiu (20:02 UTC). | Curado por acréscimo: o §10c.1 corrige e o nó ganha a correção; a tabela original fica. |
 
 A re-revisão do reteste confere o veredito contra o S8 e o passo 3 do P12: as duas esperas novas são máquina offline, e o critério segue não cumprido.
+A confirmação do maestro sobre a espera longa entra como relato e não muda o veredito.
 
 ## Mutantes
 

@@ -467,3 +467,7 @@ fechada chegando quando ela abre, e o passo 3 pede reabrir a sessão. Nenhuma ro
 encerrada o envio é recusado, e não há o que chegar. O reteste melhora só o dado da máquina offline, cujas duas
 esperas enfileiraram e chegaram, e a rodada longa ainda não informa «uma vez» nem a não ação. A rodada segue
 INCONCLUSIVA e a pergunta segue aberta, sem SUCESSO declarado. Nenhum modo de falha do §3 apareceu.
+
+**Confirmação da rodada longa, acrescentada em 2026-11-09.** Onde a tabela do §10c.1 diz «não informado», vale o
+relato do maestro: «veio uma vez só e não fez nada». É relato, sem foto nem juiz. O veredito do S8a não muda: o
+arranjo segue sendo máquina offline, e o critério segue não cumprido.
