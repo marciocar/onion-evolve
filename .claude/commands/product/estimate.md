@@ -260,7 +260,9 @@ Com os pontos gravados por `tm.sh estimate.points <ID> <n>`, a data sai de
 ordenam a duração, erram muito, são piores que ignorá-los ou não passam na permutação), `calibration_not_measured` (backtest
 temporal da categoria com n<10), `miscalibrated` (cobertura abaixo de 0,7), `beyond_history` (esperou ou durou mais que o
 histórico; a issue não iniciada traz só `work_hours_if_started_now`, horas e não data) e `not_applicable` (concluída, cancelada
-ou mãe de filhas abertas). A faixa só vira prazo por `tm.sh due_date.set <ID> <data>`.
+ou mãe de filhas abertas). Saída rc 4 = `provisional_team_band`: a categoria não tem base e sai uma faixa do time inteiro, sem
+pontos, em `provisional`, com o acerto medido em `measured_accuracy`. `proposal` segue null; não trate essas datas como prazo calibrado.
+Pontos dados depois da conclusão ficam em `docs/onion/retro-estimates.tsv`. A faixa só vira prazo por `tm.sh due_date.set <ID> <data>`.
 `velocity-meter.py report --project <P> --text` mostra pontos, fila, trabalho, erro e amostra por categoria
 (categorias do core em `docs/onion/work-categories.tsv`).
 

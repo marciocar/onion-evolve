@@ -14,6 +14,7 @@
 # Uso:
 #   velocity-meter.py report  [--project P] [--window N] [--now ISO] [--utc-offset H] [--text]
 #   velocity-meter.py propose (--issue ID | --points N --category C) [--project P]
+#   Retroestimadas: --retro-file <tsv> (padrão docs/onion/retro-estimates.tsv) · --exclude-retro mede sem elas
 #   velocity-meter.py blind-sample --out A --map B [--target 40] [--seed N] [--project P]
 #   Comuns: --categories <tsv> (padrão docs/onion/work-categories.tsv da raiz) · --estimates-overlay <json>
 #           ({"SAC-1": 5}: simula pontos sem gravar no provedor)
@@ -23,6 +24,8 @@
 # motivo no JSON: insufficient_sample, no_points_signal, calibration_not_measured, miscalibrated, beyond_history ou
 # not_applicable. rc 3 nunca traz data: beyond_history de issue não iniciada só traz `work_hours_if_started_now`, horas de
 # trabalho P80, condicionais a iniciar agora. Data sem sustentação seria a data de agente que esta ferramenta aposenta.
+# 4 = faixa provisória do time (`provisional_team_band`, decisão do maestro de 2026-11-09): a categoria não passou nos portões e sai
+# uma faixa do time inteiro, sem pontos, em `provisional`, baixa confiança, com o acerto medido ao lado. `proposal` segue null.
 #
 # Como sai a data: cada issue parecida do histórico vira um cenário (fila dela + pontos pedidos × horas por ponto dela), e a
 # data é a estatística de ordem conformal P80 desses cenários. O `report` publica o backtest dessa mesma conta, em
@@ -52,6 +55,10 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 TM = os.path.join(HERE, "tm.sh")
 DEFAULT_RULES = "docs/onion/work-categories.tsv"
+DEFAULT_RETRO = "docs/onion/retro-estimates.tsv"
+PROVISIONAL_RC = 4
+PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history")
+TEAM_WINDOW = 10 ** 6
 OPEN_STATES = "triage,backlog,unstarted,started"
 UNCATEGORIZED = "other"
 EPOCH = dt.datetime.min.replace(tzinfo=dt.timezone.utc)
@@ -154,6 +161,27 @@ def load_rules(path):
     return rules
 
 
+def load_retro(path):
+    """Issues que receberam pontos depois de concluídas: base prévia, não estimativa feita antes da execução."""
+    if path is None:
+        top = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+        path = os.path.join(top or os.getcwd(), DEFAULT_RETRO)
+        if not os.path.isfile(path):
+            return set()
+    if not os.path.isfile(path):
+        raise MeterError(f"arquivo de retroestimadas não encontrado: {path}")
+    out = set()
+    with open(path, encoding="utf-8") as fh:
+        for n, line in enumerate(fh, 1):
+            if not line.strip() or line.startswith("#") or line.startswith("identifier\t"):
+                continue
+            parts = line.rstrip("\n").split("\t")
+            if len(parts) != 5 or not re.fullmatch(r"[A-Z][A-Z0-9]*-[0-9]+", parts[0]):
+                raise MeterError(f"{path}:{n}: esperado identifier<TAB>points<TAB>confidence<TAB>batch<TAB>applied_on")
+            out.add(parts[0])
+    return out
+
+
 def classify(title, rules):
     """Regra de ato humano lê o título cru (o dono está no colchete); as outras leem sem o colchete, que nomeia o dono e não o trabalho."""
     raw = title or ""
@@ -211,7 +239,7 @@ def batched_ids(issues):
     return out
 
 
-def prepare(issues, rules, overlay):
+def prepare(issues, rules, overlay, retro=frozenset(), exclude_retro=False):
     """Enriquece cada issue com categoria, pontos e relógio; nomeia por que ficou fora."""
     parents = {i["parent"]["identifier"] for i in issues if i.get("parent")}
     batched = batched_ids(issues)
@@ -220,7 +248,8 @@ def prepare(issues, rules, overlay):
         category, calibrate = classify(i.get("title"), rules)
         created = parse_ts(i["createdAt"])
         row = {"id": i["identifier"], "title": i.get("title") or "", "category": category, "calibrate": calibrate,
-               "points": overlay.get(i["identifier"], i.get("estimate")), "queue_h": None, "work_h": None, "exclusion": None, "created": created,
+               "points": None if exclude_retro and i["identifier"] in retro else overlay.get(i["identifier"], i.get("estimate")),
+               "estimate_origin": "retro" if i["identifier"] in retro else "pre_execution", "queue_h": None, "work_h": None, "exclusion": None, "created": created,
                "completed": parse_ts(i["completedAt"]) if i.get("completedAt") else None, "due": None, "due_source": None,
                "raw": i}
         if i.get("dueDate"):
@@ -479,6 +508,11 @@ def limits_with_bias(backtests):
                      f"que passaram do previsto, {extra['coverage_counting_overdue_open']}; contando também as abertas no prazo como acerto, {extra['coverage_open_on_time_as_hit']}"]
 
 
+def origin_counts(rows):
+    pointed = [r for r in rows if r["points"]]
+    return {"retro": sum(1 for r in pointed if r["estimate_origin"] == "retro"), "pre_execution": sum(1 for r in pointed if r["estimate_origin"] == "pre_execution")}
+
+
 def category_stats(rows, category, window, today):
     members, recent = members_of(rows, category, window)
     excluded, warnings = {}, []
@@ -506,6 +540,7 @@ def category_stats(rows, category, window, today):
     return {
         "category": category, "calibrate": bool(members and members[0]["calibrate"]),
         "completed": len(members), "with_points": sum(1 for r in members if r["points"]),
+        "points_origin": origin_counts(members),
         "with_work_clock": sum(1 for r in members if r["work_h"] is not None), "excluded": excluded,
         "window": window, "sample": {"points_and_clock": len(pairs), "level": level},
         "points_total": sum(r["points"] or 0 for r in members if r["exclusion"] != "rollup_parent"),
@@ -531,12 +566,15 @@ def build_report(rows, open_rows, now, window, rules, project, overlay):
     for r in rows:
         if r["exclusion"]:
             excluded[r["exclusion"]] = excluded.get(r["exclusion"], 0) + 1
+    origin = origin_counts(rows)
+    if origin["retro"]:
+        warnings.append({"code": "retro_estimates", "message": f"{origin['retro']} de {origin['retro'] + origin['pre_execution']} issues com pontos foram retroestimadas: base prévia, sem prova de previsão antes da execução; --exclude-retro mede sem elas"})
     if excluded.get("no_started_at"):
         warnings.append({"code": "survivors_only", "message": f"{excluded['no_started_at']} de {len(rows)} concluídas sem startedAt: a calibração usa só as {sum(1 for r in rows if r['work_h'] is not None)} com relógio válido"})
     backtests = all_backtests(rows, open_rows, now, window)
     return {"generated_for": today.isoformat(), "project": project, "completed": len(rows),
             "with_points": sum(1 for r in rows if r["points"]), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None),
-            "with_due": sum(1 for r in rows if r["due"]), "excluded": excluded, "overlay_entries": len(overlay),
+            "with_due": sum(1 for r in rows if r["due"]), "excluded": excluded, "overlay_entries": len(overlay), "estimates_origin": origin,
             "calibration_population": {"completed": len(rows), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None), "without_started_at": excluded.get("no_started_at", 0)},
             "generated_at": now.isoformat(), "team_velocity": velocity(rows, today), "deadline": deadline(rows), "backtest": backtests,
             "open": {"count": len(open_rows), "with_points": sum(1 for r in open_rows if r["points"]), "other": len(open_others), "other_titles": open_others},
@@ -589,7 +627,7 @@ def propose_date(rows, open_rows, now, window, points, category, issue):
     if not stats["completed"]:
         return refusal(f"categoria '{category}' sem nenhuma issue concluída no histórico", category=category)
     if not stats["calibrate"]:
-        return refusal(f"categoria '{category}' não calibra: é ato humano sem relógio de trabalho", category=category)
+        return refusal(f"categoria '{category}' não calibra: é ato humano sem relógio de trabalho", status="not_calibrated", category=category)
     _, recent = members_of(rows, category, window)
     history = clocked(recent, True)
     if len(history) < MIN_SAMPLE:
@@ -637,6 +675,61 @@ def propose_date(rows, open_rows, now, window, points, category, issue):
                       "sample": stats["sample"], "points_signal": signal, "now": now.isoformat(), "backtest_temporal_category": check,
                       "coverage_with_open": backtests["loo"]["history_only"]["with_open"]},
             "warnings": warnings, "limits": limits_with_bias(backtests), "note": "proposta: o medidor não escreve; quem aceita a faixa aplica com due_date.set"}, 0
+
+
+def team_view(rows):
+    return [{**r, "category": "team"} for r in rows if r["calibrate"]]
+
+
+def team_accuracy(view, opened, now):
+    """O acerto da própria faixa do time, não o da conta por categoria."""
+    loo, temporal = backtest(view, TEAM_WINDOW, False, False), backtest(view, TEAM_WINDOW, False, True)
+    return {"method": "team history without points, end of band at P80", "completed_only": loo["coverage_due"], "n": loo["n"],
+            "with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, False),
+            "temporal": {"status": temporal["status"], "n": temporal["n"], "completed_only": temporal["coverage_due"], "with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, True)}}
+
+
+def team_band(rows, open_rows, now, category, issue, gate):
+    """Faixa de baixa confiança quando a categoria não tem base. Nunca preenche `proposal`: quem lê a data calibrada não acha nada."""
+    gate = {k: v for k, v in gate.items() if k != "proposal"}
+    view, opened = team_view(rows), team_view(open_rows)
+    history = clocked(view, False)
+    if len(history) < MIN_SAMPLE:
+        return refusal(f"o time tem {len(history)} issue(s) com fila e trabalho; mínimo {MIN_SAMPLE}", category=category, calibration_gate=gate)
+    max_queue = max(r["queue_h"] for r in history)
+    warnings = [{"code": "low_confidence", "message": "faixa do time inteiro, sem pontos: não é prazo calibrado da categoria"}]
+    started = parse_ts(issue["startedAt"]) if issue and issue.get("startedAt") else None
+    detail = {"max_queue_seen_hours": round3(max_queue), "age_beyond_max_queue": False, "assumes_start_now": False}
+    if started:
+        elapsed = max(0.0, hours(started, now))
+        work = sorted(r["work_h"] - elapsed for r in history if r["work_h"] > elapsed)
+        if len(work) < MIN_SAMPLE:
+            return refusal(f"iniciada há {round3(elapsed)} h, além do que o time já durou: não há faixa", status="beyond_history", category=category, calibration_gate=gate, elapsed_hours=round3(elapsed))
+        queue, totals, basis = None, work, "already_started"
+        detail["elapsed_hours"] = round3(elapsed)
+    else:
+        age = max(0.0, hours(parse_ts(issue["createdAt"]), now)) if issue else 0.0
+        waiting = [r for r in history if r["queue_h"] >= age]
+        detail["age_in_queue_hours"] = round3(age)
+        if len(waiting) >= MIN_SAMPLE:  # idade além da fila máxima deixa waiting vazio e cai no else
+            queue = sorted(r["queue_h"] - age for r in waiting)
+            work = sorted(r["work_h"] for r in waiting)
+            totals, basis = sorted(r["queue_h"] - age + r["work_h"] for r in waiting), "conditional_on_age_in_queue"
+        else:
+            queue, work, totals, basis = None, sorted(r["work_h"] for r in history), sorted(r["work_h"] for r in history), "beyond_queue_history_assumes_start_now"
+            detail["age_beyond_max_queue"] = age > max_queue
+            detail["assumes_start_now"] = True
+            warnings.append({"code": "age_beyond_queue_history", "message": f"{round3(age)} h na fila, e só {len(waiting)} issue(s) do time esperaram tanto (máximo {round3(max_queue)} h): a faixa supõe início agora"})
+    marks = {"earliest": LOW_QUANTILE, "likely": LIKELY_QUANTILE, "latest": DUE_QUANTILE}
+    band = lambda values: {k: round3(conformal(values, q)[0]) for k, q in marks.items()}
+    span = band(totals)
+    return {"status": "provisional_team_band", "proposal": None, "category": category,
+            "provisional": {"confidence": "low", "calibrated": False, "latest_percentile": int(DUE_QUANTILE * 100),
+                            "dates_not_calibrated": {k: local_date(now + dt.timedelta(hours=v)).isoformat() for k, v in span.items()},
+                            "hours_from_now": span, "queue_hours_remaining": band(queue) if queue else None, "work_hours": band(work),
+                            "queue_basis": basis, "sample_used": len(totals), **detail},
+            "measured_accuracy": team_accuracy(view, opened, now), "calibration_gate": gate, "warnings": warnings, "limits": LIMITS,
+            "note": "faixa provisória, não prazo: quando a categoria passar nos portões, o proposed normal assume"}, PROVISIONAL_RC
 
 
 # ── amostra cega ────────────────────────────────────────────────────────────
@@ -773,6 +866,8 @@ def build_parser():
     common.add_argument("--project")
     common.add_argument("--categories")
     common.add_argument("--estimates-overlay")
+    common.add_argument("--retro-file")
+    common.add_argument("--exclude-retro", action="store_true")
     common.add_argument("--now")
     common.add_argument("--utc-offset", type=int, default=DEFAULT_UTC_OFFSET)
     common.add_argument("--window", type=int, default=30)
@@ -798,19 +893,19 @@ def run(args):
     LOCAL[0] = dt.timezone(dt.timedelta(hours=args.utc_offset))
     now = now_of(args.now)
     require_capabilities()
-    rules, overlay = load_rules(args.categories), load_overlay(args.estimates_overlay)
+    rules, overlay, retro = load_rules(args.categories), load_overlay(args.estimates_overlay), load_retro(args.retro_file)
+    load = lambda state, description=False: prepare(list_issues(state, args.project, description), rules, overlay, retro, args.exclude_retro)
     if args.cmd == "blind-sample":
-        return blind_sample(prepare(list_issues("completed", args.project, True), rules, overlay), args.target, args.seed, args.out, args.map), 0
+        return blind_sample(load("completed", True), args.target, args.seed, args.out, args.map), 0
     if args.cmd == "report":
-        rows = prepare(list_issues("completed", args.project), rules, overlay)
-        return build_report(rows, prepare(list_issues(OPEN_STATES, args.project), rules, overlay), now, args.window, rules, args.project, overlay), 0
-    result, rc = run_propose(args, rules, overlay, now)
+        return build_report(load("completed"), load(OPEN_STATES), now, args.window, rules, args.project, overlay), 0
+    result, rc = run_propose(args, rules, overlay, now, load)
     if overlay:
         result["estimates_overlay"] = {"entries": len(overlay), "note": "pontos simulados por --estimates-overlay; nada disso está no provedor"}
     return result, rc
 
 
-def run_propose(args, rules, overlay, now):
+def run_propose(args, rules, overlay, now, load):
     issue, points, category = None, args.points, args.category
     if args.issue:
         if args.points is not None or args.category:
@@ -821,14 +916,18 @@ def run_propose(args, rules, overlay, now):
             return refused
         category, _ = classify(issue.get("title"), rules)
         points = overlay.get(issue["identifier"], issue.get("estimate"))
-        if not points:
-            return refusal(f"{issue['identifier']} sem pontos: estime antes de pedir data", category=category)
     elif points is None or not category:
         raise MeterError("propose exige --issue ou o par --points e --category")
-    if points <= 0:
+    if not args.issue and points <= 0:
         raise MeterError("--points exige valor positivo")
-    rows = prepare(list_issues("completed", args.project), rules, overlay)
-    return propose_date(rows, prepare(list_issues(OPEN_STATES, args.project), rules, overlay), now, args.window, points, category, issue)
+    rows, open_rows = load("completed"), load(OPEN_STATES)
+    if not points:
+        gate = {"status": "no_points", "reason": f"{issue['identifier']} sem pontos: a faixa do time não os usa, a data calibrada precisa deles"}
+        return team_band(rows, open_rows, now, category, issue, gate)
+    result, rc = propose_date(rows, open_rows, now, args.window, points, category, issue)
+    if result["status"] in PROVISIONAL_GATES:
+        return team_band(rows, open_rows, now, category, issue, result)
+    return result, rc
 
 
 def main(argv):
