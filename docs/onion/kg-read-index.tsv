@@ -759,6 +759,7 @@
 .claude/validation/python-isolated-check.sh	C_TETO_LEXICO	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/validation/python-isolated-check.sh	E_CENSO_ANTES_E_DEPOIS	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/validation/relay-public-review-check.sh	D_INDICE_NAO_ARVORE	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
+.claude/validation/relay-public-review-check.sh	D_IT_RELAY_MARK_REQUIRED_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
 .claude/validation/resolve-integration-branch.sh	SY4_prod_resolve_integration_branch	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/resolve-production-branch.sh	SY5_branch_roles_second_resolver	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/review-artifact-check.sh	E_O_VERDICT_GANHOU_VOCABULARIO_MAS_NAO_VERIFICACAO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -1650,7 +1651,6 @@ docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutr
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-27-resposta-base-cruzada-vendor.md	C_test_is_ancestry	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 docs/evolution/federation/outbox/onion-curation/2026-11-08-respostas-do-core-onda-2.md	E_CS_ONDA2_RESPOSTAS_DO_CORE_1108	docs/onion/graph/curation-seals-2026-11.kg.yaml
 docs/evolution/inbox	E_DEZ_SINAIS_TRIADOS_COM_MEDICAO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
-docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md	E_DB_LACUNAS_MEDIDAS_NO_HUB_1108	docs/onion/graph/doorbell-hardening-2026-11.kg.yaml
 docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md	C_D7_14	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md	C_D7_12	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md	C_SIGNAL_DISJOINT	docs/onion/graph/onion-identity-2026-07.kg.yaml
@@ -1742,6 +1742,8 @@ docs/evolution/inbox/_processed/2026-11-05-signal-mods-round-2.md	Q_TRIAGEM_MODS
 docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md	E_PS_COBRANCA_DO_HUB_1106	docs/onion/graph/persona-servico-2026-11.kg.yaml
 docs/evolution/inbox/_processed/2026-11-06-proposal-messaging-project.md	E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106	docs/onion/graph/comms-stable-2026-11.kg.yaml
 docs/evolution/inbox/_processed/2026-11-08-reply-chat-persona-pilot-resumo.md	E_PF_HUB_SIGNALS_1108	docs/onion/graph/persona-fases-2-3-2026-11.kg.yaml
+docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md	D_IT_ADOPTER_SIGNAL_SEAL_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
+docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md	E_IT_SIGNALS_MEASURED_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1059 itens abertos** em 159 grafo(s) com aberto (de 204 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1068 itens abertos** em 160 grafo(s) com aberto (de 204 no escopo) · 157 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -502,7 +502,7 @@
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
-## core — 41 item(ns)
+## core — 47 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -530,6 +530,8 @@
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.2 | `Q_DB_ADOTANTE_TOCA_PARA_A_SAIDA_1111` | doorbell-hardening-2026-11 | Lacuna 4: no adotante, a campainha toca para a própria caixa de saída (inbox/), que é o que vai ao core; a entrada dele é o in |
+| 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
+| 4.2 | `Q_IT_SYNC_MAIN_WRITE_PREFLIGHT` | inbox-triage-1108 | O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebr |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 4.0 | `Q_MD_SYNC_MAIN_VERIFY_WRITE_1108` | maestro-decisions-1108 | Curar ops/sync-main-worktree.sh para conferir a escrita antes de avançar a main e avisar em vez de quebrar no meio. |
 | 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
@@ -538,7 +540,9 @@
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
 | 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
-| 3.6 | `Q_MD_CONSULTING_NEXT_UPDATE_1109` | maestro-decisions-1108 | O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI. |
+| 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | L2 no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
+| 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | L1 e L3: o comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
+| 3.2 | `Q_IT_RESIDUE_GUARD_REMOTE_BRANCH` | inbox-triage-1108 | O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de  |
 | 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
 | 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
@@ -546,6 +550,8 @@
 | 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
 | 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
+| 3.0 | `Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT` | inbox-triage-1108 | A fila do onion-messaging reentrega o job à sessão que já agiu e perdeu o lease: falta o teste, e a decisão de pôr ou não um |
+| 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
 | 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
@@ -876,7 +882,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 19 item(ns)
+## maestro — 22 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -893,12 +899,15 @@
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
+| 3.6 | `Q_COORD_MAESTRO_APPARMOR_BWRAP_1106` | coordenacao-sessoes-2026-10 | O sandbox do Claude Code (bwrap) não sobe nesta VPS: kernel.apparmor_restrict_unprivileged_userns=1 e o uid map devolve Permissio |
+| 3.6 | `Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106` | coordenacao-sessoes-2026-10 | O adotante de consultoria, fora do members.yaml, tem o kg-ssot vendorizado em 4.39.1 (o atual é 4.45.0) e pede o update do Onion; |
 | 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
 | 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
 | 3.0 | `Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL` | coordenacao-sessoes-2026-10 | Ligar ClientAliveInterval e ClientAliveCountMax no sshd da VPS, para a porta de um túnel reverso morto não ficar presa. |
 | 2.0 | `Q_COORD_MAESTRO_DISSECAR_CLAI` | coordenacao-sessoes-2026-10 | A dissecação do clai (baalimago/clai), deixada para depois. |
 | 2.0 | `Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES` | coordenacao-sessoes-2026-10 | As decisões do maestro que o sge tem em espera, em um nó: as 4 ligações «normalizado» da SAEB, as branches antigas de update |
+| 1.6 | `Q_IT_AGENT_MAIL_RIDER_READING` | inbox-triage-1108 | A rider da licença do Agent Mail alcança uma ideia gerada do zero no onion-messaging, ou só o código? |
 
 ## onion-identity-2026-07 — 4 item(ns)
 
