@@ -28794,6 +28794,91 @@ sys.exit(0 if any(h.get("command","").endswith("co-evolution-inbox-check.sh\" pr
     record_pass "co-relay-spool: (P3) o settings.json registra o modo prompt no UserPromptSubmit"
   else record_fail "co-relay-spool: (P3) registro" "UserPromptSubmit sem o co-evolution-inbox-check.sh prompt"; fi
 
+  # (Q) o importador como peça: fixture crua, sinais postos direto no spool. $1 = importador, resto = flags → saída em out
+  _q_imp() { local q="$1"; shift; rc=0; out="$(ONION_SPOOL_DIR="${sp}" bash "${q}" --repo "${core}" "$@" 2>/dev/null)" || rc=$?; }
+  _q_fx() { _sp_fixture; mkdir -p "${sp}/${slug}"; }
+  # (Q1) link simbólico no spool nunca vira o conteúdo do alvo no inbox/
+  local q_i=1 q_m=1
+  _q1() {
+    _q_fx; printf 'segredo\n' > "${base}/alvo-fora"; ln -s "${base}/alvo-fora" "${sp}/${slug}/link.md"
+    _q_imp "$1" --hook
+    [ ! -e "${core}/docs/evolution/inbox/link.md" ] && [ -L "${sp}/${slug}/link.md" ] && [ "${out}" = "imported=0 pending=1" ]
+  }
+  _q1 "${importer}" && q_i=0
+  if [ "${q_i}" -eq 0 ]; then record_pass "co-relay-spool: (Q1) link simbólico fica no spool, conta como retido e o alvo não entra no inbox/"
+  else record_fail "co-relay-spool: (Q1) link" "out=[${out}]"; fi
+  sed 's|^    if \[ -L "${f}" \]; then$|    if false; then|' "${importer}" > "${mutd}/q1.sh"
+  _q1 "${mutd}/q1.sh" && q_m=0
+  _prove_mutation "co-relay-spool: (Q-M1) sem o desvio do link, o alvo volta a entrar no inbox/ — (Q1) morde" "${importer}" "${mutd}/q1.sh" "${q_i}" "${q_m}"
+  # (Q2) teto por chamada com --hook; o resto fica para a seguinte
+  q_i=1; q_m=1
+  _q2() {
+    _q_fx; local n; for n in a b c d e; do printf '%s\n' "$n" > "${sp}/${slug}/$n.md"; done
+    rc=0; out="$(ONION_SPOOL_IMPORT_MAX=2 ONION_SPOOL_DIR="${sp}" bash "$1" --repo "${core}" --hook 2>/dev/null)" || rc=$?
+    [ "${out}" = "imported=2 pending=3" ] && [ "$(find "${sp}/${slug}" -name '*.md' | wc -l)" -eq 3 ]
+  }
+  _q2 "${importer}" && q_i=0
+  if [ "${q_i}" -eq 0 ]; then record_pass "co-relay-spool: (Q2) com --hook importa até o teto e conta o resto como retido"
+  else record_fail "co-relay-spool: (Q2) teto" "out=[${out}]"; fi
+  sed 's/^    if \[ "${HOOK}" -eq 1 \] && \[ "${worked}" -ge "${MAX}" \]; then.*$/    :/' "${importer}" > "${mutd}/q2.sh"
+  _q2 "${mutd}/q2.sh" && q_m=0
+  _prove_mutation "co-relay-spool: (Q-M2) sem o teto, 3000 sinais voltam a matar o hook — (Q2) morde" "${importer}" "${mutd}/q2.sh" "${q_i}" "${q_m}"
+  # (Q3) morte no meio do cp: shim que escreve metade e mata o importador. Nada de nome contável no inbox/, e a passada seguinte recupera
+  local q_shim="${base}/qshim"; mkdir -p "${q_shim}"
+  q_i=1; q_m=1
+  _q3() {
+    _q_fx; printf 'corpo\n' > "${sp}/${slug}/q.md"
+    printf '#!/bin/sh\nprintf meta > "$2"\nkill -9 $PPID\nexit 1\n' > "${q_shim}/cp"; chmod +x "${q_shim}/cp"
+    ( ONION_SPOOL_DIR="${sp}" PATH="${q_shim}:${PATH}" bash "$1" --repo "${core}" --hook ) >/dev/null 2>&1
+    [ -z "$(find "${core}/docs/evolution/inbox" -maxdepth 1 -type f ! -name '.*')" ] || return 1
+    _q_imp "$1" --hook
+    [ "${out}" = "imported=1 pending=0" ] && [ "$(cat "${core}/docs/evolution/inbox/q.md")" = corpo ] \
+      && [ -z "$(find "${core}/docs/evolution/inbox" "${sp}/${slug}" -maxdepth 1 -type f -name '.*')" ]
+  }
+  _q3 "${importer}" && q_i=0
+  if [ "${q_i}" -eq 0 ]; then record_pass "co-relay-spool: (Q3) morte no meio do cp: sem nome visível no inbox/, e a passada seguinte recupera e limpa"
+  else record_fail "co-relay-spool: (Q3) morte no cp" "out=[${out}]"; fi
+  sed 's|^      kill -0 "${c##\*.}" 2>/dev/null \&\& continue$|      continue|' "${importer}" > "${mutd}/q3.sh"
+  _q3 "${mutd}/q3.sh" && q_m=0
+  _prove_mutation "co-relay-spool: (Q-M3) sem recuperar a posse morta, o sinal some para sempre — (Q3) morde" "${importer}" "${mutd}/q3.sh" "${q_i}" "${q_m}"
+  sed 's|tmp="${INBOX}/\.${base}\.spool-tmp\.$$"|tmp="${INBOX}/${base}.spool-tmp.$$.md"|' "${importer}" > "${mutd}/q3b.sh"
+  q_m=1; _q3 "${mutd}/q3b.sh" && q_m=0
+  _prove_mutation "co-relay-spool: (Q-M3b) temporário com nome visível volta a sujar o inbox/ — (Q3) morde" "${importer}" "${mutd}/q3b.sh" "${q_i}" "${q_m}"
+  # (Q4) versão nova chega entre o cp e o fim: ela fica para a próxima passada, nunca é apagada
+  q_i=1; q_m=1
+  _q4() {
+    _q_fx; printf 'v1\n' > "${sp}/${slug}/v.md"
+    printf '#!/bin/sh\n%s "$1" "$2"\nprintf "v2\\n" > "%s/v.md"\n' "$(type -P cp)" "${sp}/${slug}" > "${q_shim}/cp"; chmod +x "${q_shim}/cp"
+    ( ONION_SPOOL_DIR="${sp}" PATH="${q_shim}:${PATH}" bash "$1" --repo "${core}" --hook ) >/dev/null 2>&1
+    [ "$(cat "${core}/docs/evolution/inbox/v.md")" = v1 ] && [ "$(cat "${sp}/${slug}/v.md" 2>/dev/null)" = v2 ]
+  }
+  _q4 "${importer}" && q_i=0
+  if [ "${q_i}" -eq 0 ]; then record_pass "co-relay-spool: (Q4) versão nova que chega durante a cópia sobrevive para a próxima passada"
+  else record_fail "co-relay-spool: (Q4) versão nova" "inbox=[$(cat "${core}/docs/evolution/inbox/v.md" 2>/dev/null)] spool=[$(cat "${sp}/${slug}/v.md" 2>/dev/null)]"; fi
+  sed -e 's|^    claim="${SPOOL}/\.${base}\.claim\.$$"$|    claim="${f}"|' -e 's|^    mv -f "${f}" "${claim}" 2>/dev/null .. continue$|    :|' "${importer}" > "${mutd}/q4.sh"
+  _q4 "${mutd}/q4.sh" && q_m=0
+  _prove_mutation "co-relay-spool: (Q-M4) sem a posse, o rm volta a apagar a versão nova — (Q4) morde" "${importer}" "${mutd}/q4.sh" "${q_i}" "${q_m}"
+  # (Q5) sinal ilegível no modo prompt: avisa uma vez por sessão, e não a cada prompt
+  if [ "${root}" -eq 1 ]; then record_skip "co-relay-spool: (Q5) root lê o arquivo 000"
+  else
+    q_i=1; q_m=1
+    _q5() {
+      _q_fx; printf 'x\n' > "${sp}/${slug}/u.md"; chmod 000 "${sp}/${slug}/u.md"
+      local nd="${base}/notice"; rm -rf "${nd}"
+      local h1 h2
+      h1="$(cd "${core}" && CLAUDE_CODE_SESSION_ID=s1 ONION_SPOOL_NOTICE_DIR="${nd}" CLAUDE_PROJECT_DIR="${core}" ONION_SPOOL_DIR="${sp}" bash "$1" prompt 2>/dev/null)"
+      h2="$(cd "${core}" && CLAUDE_CODE_SESSION_ID=s1 ONION_SPOOL_NOTICE_DIR="${nd}" CLAUDE_PROJECT_DIR="${core}" ONION_SPOOL_DIR="${sp}" bash "$1" prompt 2>/dev/null)"
+      hk="${h1}"; chmod 644 "${sp}/${slug}/u.md"
+      [[ "${h1}" == *"📮"*"1 sinal"* ]] && [ -z "${h2}" ]
+    }
+    _q5 "${hook}" && q_i=0
+    if [ "${q_i}" -eq 0 ]; then record_pass "co-relay-spool: (Q5) sinal ilegível: o modo prompt avisa 📮 uma vez, e o segundo prompt fica em silêncio"
+    else record_fail "co-relay-spool: (Q5) ilegível" "hook=[${hk}]"; fi
+    sed 's/^    \*"pending="\[1-9\]\*)$/    *"pending=NUNCA"*)/' "${hook}" > "${mutd}/q5.sh"
+    _q5 "${mutd}/q5.sh" && q_m=0
+    _prove_mutation "co-relay-spool: (Q-M5) sem o aviso de retido, o ilegível volta a calar para sempre — (Q5) morde" "${hook}" "${mutd}/q5.sh" "${q_i}" "${q_m}"
+  fi
+
   # (I1) homônimo TRACKED com conteúdo novo: fica no spool, o hook avisa 📮, a árvore commitada intacta
   _sp_fixture; printf '# versao commitada\n' > "${core}/${SIG}"
   git -C "${core}" add "${SIG}" && git -C "${core}" -c user.name=t -c user.email=t@t commit -qm t
@@ -49080,9 +49165,18 @@ run_sync_main_worktree_selftests() {
       [ "${r}" -eq 0 ] && [[ "${o}" == *"ÁRVORE PARCIAL"* ]] && [[ "${o}" == *"1 de 2"* ]] \
         && [ "$(git -C "${f}/main" rev-parse HEAD)" = "${before}" ] && [ "$(cat "${f}/main/a.txt")" = v2 ]
     }
-    sed 's|^  if \[ "${moved}" -gt 0 \]; then$|  if false; then|' "${mutd}/no-gate.sh" > "${mutd}/no-partial.sh"
+    sed 's|^  elif \[ "${moved}" -gt 0 \]; then$|  elif false; then|' "${mutd}/no-gate.sh" > "${mutd}/no-partial.sh"
     i_rc=0; _sm_partial "${mutd}/no-gate.sh" h || i_rc=1
     if [ "${i_rc}" -eq 0 ]; then
+      # (h2) o sync seguinte, já com escrita, reconhece o rastro e não finge recusa comum
+      local h2_rc=0 h2m_rc=0
+      _sm_again() { out="$(cd "${d}/h/main" && bash "$1" 2>&1)" || true; [[ "${out}" == *"PARCIAL DE ANTES"* ]] && [[ "${out}" == *"1 de 2"* ]]; }
+      _sm_again "${sut}" || h2_rc=1
+      if [ "${h2_rc}" -eq 0 ]; then record_pass "sync-main: (h2) depois de um parcial real, o sync seguinte diz que há parcial"
+      else record_fail "sync-main: (h2) parcial anterior" "out=[${out}]"; fi
+      sed 's|^if \[ "${prior}" -gt 0 \]; then$|if false; then|' "${sut}" > "${mutd}/no-prior.sh"
+      _sm_again "${mutd}/no-prior.sh" || h2m_rc=1
+      _prove_mutation "sync-main: (h2-M) sem o reconhecimento, o parcial volta a parecer recusa comum — (h2) morde" "${sut}" "${mutd}/no-prior.sh" "${h2_rc}" "${h2m_rc}"
       git -C "${d}/h/main" reset -q --hard origin/main
       if [ "$(git -C "${d}/h/main" rev-parse HEAD)" = "$(git -C "${d}/h/origin.git" rev-parse main)" ] && [ "$(cat "${d}/h/main/ro/c.txt")" = v2 ]; then
         record_pass "sync-main: (h) falha no meio: rc 0, diz ÁRVORE PARCIAL com a conta, e o reset que o aviso indica conclui"
@@ -49091,6 +49185,39 @@ run_sync_main_worktree_selftests() {
     m_rc=0; _sm_partial "${mutd}/no-partial.sh" hm || m_rc=1
     _prove_mutation "sync-main: (h-M) sem a medida, a árvore parcial volta a parecer recusa comum — (h) morde" "${mutd}/no-gate.sh" "${mutd}/no-partial.sh" "${i_rc}" "${m_rc}"
   fi
+  # (j,k,l) sync concorrente: um merge que perde a corrida não pode acusar parcial nem sugerir reset. Shim só no verbo merge.
+  local shimc="${d}/shimc" real_git; real_git="$(type -P git)"; mkdir -p "${shimc}"
+  _sm_shim() {  # $1 = corpo sh, no lugar do merge, com $W (worktree) e $T (alvo)
+    printf '#!/bin/sh\nW="$(pwd)"\nfor a in "$@"; do\n  if [ "$a" = merge ]; then\n    GIT=%s; T="$($GIT -C "$WT" rev-parse origin/main)"\n    %s\n    echo "error: merge perdeu" >&2; exit 1\n  fi\ndone\nexec %s "$@"\n' "${real_git}" "$1" "${real_git}" > "${shimc}/git"
+    chmod +x "${shimc}/git"
+  }
+  _sm_conc() {  # $1 = sut, $2 = fixture, $3 = corpo do shim → aviso de concorrência, sem PARCIAL nem reset
+    _sm_fx "$2"; _sm_shim "$3"
+    out="$(cd "${d}/$2/main" && WT="${d}/$2/main" PATH="${shimc}:${PATH}" bash "$1" 2>&1)" || true
+    rm -f "${d}/$2/main/.git/index.lock"
+    [[ "${out}" != *"PARCIAL"* ]] && [[ "${out}" != *"reset --hard"* ]] && [[ "${out}" == *"$4"* ]]
+  }
+  local sm_lock='printf "v2\n" > "$WT/a.txt"; : > "$WT/.git/index.lock"'
+  local sm_head='$GIT -C "$WT" merge --ff-only -q "$T"'
+  local sm_window='$GIT -C "$WT" read-tree -u -m HEAD "$T"'
+  sed 's|^  local lock; lock=.*$|  local lock=/nonexistent|' "${sut}" > "${mutd}/no-lock.sh"
+  sed 's#^  \[ -e "${lock}" \] || \[ "$(git .*$#  [ -e "${lock}" ]#' "${sut}" > "${mutd}/no-head-moved.sh"
+  sed 's|^  \[ "${idx}" != "${want}" \] \|\| return 1$|  :|' "${sut}" > "${mutd}/no-index.sh"
+  i_rc=0; _sm_conc "${sut}" j "${sm_lock}" "está nesta worktree" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "sync-main: (j) index.lock de outro processo: diz concorrência, sem parcial nem reset"
+  else record_fail "sync-main: (j) index.lock" "out=[${out}]"; fi
+  m_rc=0; _sm_conc "${mutd}/no-lock.sh" jm "${sm_lock}" "está nesta worktree" || m_rc=1
+  _prove_mutation "sync-main: (j-M) sem olhar o index.lock, o arquivo do outro volta a virar parcial — (j) morde" "${sut}" "${mutd}/no-lock.sh" "${i_rc}" "${m_rc}"
+  i_rc=0; _sm_conc "${sut}" k "${sm_head}" "está nesta worktree" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "sync-main: (k) HEAD que andou enquanto o merge perdia: diz concorrência"
+  else record_fail "sync-main: (k) HEAD andou" "out=[${out}]"; fi
+  m_rc=0; _sm_conc "${mutd}/no-head-moved.sh" km "${sm_head}" "está nesta worktree" || m_rc=1
+  _prove_mutation "sync-main: (k-M) sem olhar o HEAD, o avanço do outro vira recusa nossa — (k) morde" "${sut}" "${mutd}/no-head-moved.sh" "${i_rc}" "${m_rc}"
+  i_rc=0; _sm_conc "${sut}" l "${sm_window}" "ff-only recusou" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "sync-main: (l) índice já no alvo com o HEAD para trás (janela do outro): não é parcial"
+  else record_fail "sync-main: (l) janela" "out=[${out}]"; fi
+  m_rc=0; _sm_conc "${mutd}/no-index.sh" lm "${sm_window}" "ff-only recusou" || m_rc=1
+  _prove_mutation "sync-main: (l-M) sem comparar o índice, a janela do outro vira parcial — (l) morde" "${sut}" "${mutd}/no-index.sh" "${i_rc}" "${m_rc}"
   # (i) exit 0 não é a verificação: merge que diz sucesso sem mover o HEAD vira aviso (shim só no verbo merge)
   _sm_fx i; local shimd="${d}/shim"; mkdir -p "${shimd}"
   printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = merge ] && exit 0; done\nexec %s "$@"\n' "$(type -P git)" > "${shimd}/git"; chmod +x "${shimd}/git"

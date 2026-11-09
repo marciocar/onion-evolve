@@ -21,6 +21,9 @@
 #   Limite conservador: arquivo 444 num diretório gravável o git trocaria, e aqui ele pula; o aviso nomeia o arquivo.
 #   A falha no meio continua possível (o alvo perde a escrita entre a sonda e o merge, ou o bind é de escrita e só o
 #   unlink falha), e aí o script mede o que ficou e diz. Ele não desfaz: quem decide é quem lê.
+#   Só conta como parcial o arquivo que está na versão nova com o ÍNDICE ainda na antiga: é o rastro de um ff-only
+#   que quebrou, que não grava o índice. Com index.lock presente ou HEAD que andou, o autor pode ser outro processo,
+#   e o aviso diz concorrência, sem sugerir reset. O sync seguinte reconhece o mesmo rastro e diz que há parcial.
 #
 # CONTRATO: sempre exit 0 (é cortesia depois de um merge PROVADO; o rc de quem chama responde pelo merge).
 #   Uma linha no stdout: "sync-main: <worktree> <antes>→<depois>" · "já em dia" · "sem worktree em main" · "⚠️ …".
@@ -58,20 +61,39 @@ while IFS= read -r -d '' status && IFS= read -r -d '' rel; do
   can_create_in "${dir}" || blocked+=("${rel}")
 done < <(git -C "${wt}" diff --name-status --no-renames -z HEAD "${target}" 2>/dev/null)
 
-if [ "${#blocked[@]}" -gt 0 ]; then
-  echo "sync-main: ⚠️ ${wt} ficou em ${before}, ${behind} commit(s) atrás, sem tocar na árvore — ${#blocked[@]} de ${#targets[@]} alvo(s) sem escrita a partir daqui (ex.: ${blocked[*]:0:3}). Sob sandbox é o esperado; rode fora dele: git -C \"${wt}\" merge --ff-only origin/main"
-  exit 0
-fi
-
-at_target() {  # $1 = caminho → 0 se a árvore já tem a versão do alvo (arquivo ausente conta quando o alvo o apagou)
-  local rel="$1" abs="${wt}/$1" want have
+left_by_failed_ff() {  # $1 = caminho → 0 se a árvore tem a versão do alvo e o índice ainda não (arquivo ausente conta quando o alvo o apagou)
+  local rel="$1" abs="${wt}/$1" want idx have
   want="$(git -C "${wt}" rev-parse -q --verify "${target}:${rel}" 2>/dev/null)"
+  idx="$(git -C "${wt}" rev-parse -q --verify ":${rel}" 2>/dev/null)"
+  [ "${idx}" != "${want}" ] || return 1
   if [ ! -e "${abs}" ] && [ ! -L "${abs}" ]; then [ -z "${want}" ]; return; fi
   [ -n "${want}" ] || return 1
   if [ -L "${abs}" ]; then have="$(printf '%s' "$(readlink "${abs}")" | git -C "${wt}" hash-object --stdin)"
   else have="$(git -C "${wt}" hash-object --path="${rel}" -- "${abs}" 2>/dev/null)"; fi
   [ "${have}" = "${want}" ]
 }
+
+someone_else_here() {  # 0 se outro processo pode estar mexendo: index.lock presente ou HEAD fora de onde o encontramos
+  local lock; lock="$(git -C "${wt}" rev-parse --path-format=absolute --git-path index.lock 2>/dev/null)"
+  [ -e "${lock}" ] || [ "$(git -C "${wt}" rev-parse --short HEAD 2>/dev/null)" != "${before}" ]
+}
+say_concurrent() { echo "sync-main: ⚠️ ${wt}: outro processo está nesta worktree (index.lock presente ou HEAD que andou), então não julgo a árvore. Rode de novo quando ele terminar: bash ops/sync-main-worktree.sh"; }
+
+prior=0
+for rel in "${targets[@]}"; do
+  [ -n "${pre_dirty["${rel}"]+x}" ] || continue
+  left_by_failed_ff "${rel}" && prior=$((prior + 1))
+done
+if [ "${prior}" -gt 0 ]; then
+  if someone_else_here; then say_concurrent; exit 0; fi
+  echo "sync-main: ⚠️ ÁRVORE PARCIAL DE ANTES em ${wt}: ${prior} de ${#targets[@]} arquivo(s) já estão na versão nova com o HEAD em ${before}, rastro de um avanço que quebrou, e o ff-only não retoma sozinho. Confira com git -C \"${wt}\" status e, sem mudança local a guardar, git -C \"${wt}\" reset --hard origin/main conclui."
+  exit 0
+fi
+
+if [ "${#blocked[@]}" -gt 0 ]; then
+  echo "sync-main: ⚠️ ${wt} ficou em ${before}, ${behind} commit(s) atrás, sem tocar na árvore — ${#blocked[@]} de ${#targets[@]} alvo(s) sem escrita a partir daqui (ex.: ${blocked[*]:0:3}). Sob sandbox é o esperado; rode fora dele: git -C \"${wt}\" merge --ff-only origin/main"
+  exit 0
+fi
 
 if out="$(git -C "${wt}" merge --ff-only -q "${target}" 2>&1)"; then
   after="$(git -C "${wt}" rev-parse HEAD 2>/dev/null)"
@@ -84,9 +106,11 @@ else
   moved=0
   for rel in "${targets[@]}"; do
     [ -z "${pre_dirty["${rel}"]+x}" ] || continue
-    at_target "${rel}" && moved=$((moved + 1))
+    left_by_failed_ff "${rel}" && moved=$((moved + 1))
   done
-  if [ "${moved}" -gt 0 ]; then
+  if someone_else_here; then
+    say_concurrent
+  elif [ "${moved}" -gt 0 ]; then
     echo "sync-main: ⚠️ ÁRVORE PARCIAL em ${wt}: o ff-only falhou no meio ($(head -1 <<< "${out}")); o HEAD segue em ${before} e ${moved} de ${#targets[@]} arquivo(s) já estão na versão nova. O ff-only não retoma sozinho: confira com git -C \"${wt}\" status e, sem mudança local a guardar, git -C \"${wt}\" reset --hard origin/main conclui."
   else
     echo "sync-main: ⚠️ ${wt} ficou em ${before}, ${behind} commit(s) atrás — o ff-only recusou: $(head -1 <<< "${out}")"
