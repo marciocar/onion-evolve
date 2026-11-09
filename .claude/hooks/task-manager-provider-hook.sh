@@ -35,6 +35,17 @@ fi
 # (2) FALLBACK .env — declarado no arquivo mas AUSENTE do ambiente: o adapter ficaria cego.
 #     Avisa honesto (não anuncia provider cosmético). Caminho relativo à raiz do projeto.
 ENV_FILE="${CLAUDE_PROJECT_DIR:-.}/.env"
+ENV_HINT=".env"
+# WORKTREE sem .env: o provider vem do checkout principal, como no tm.sh; sem isto o hook anunciava `none` (2026-11-09).
+if [ ! -e "${ENV_FILE}" ]; then
+  _common="$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+  if [ -n "${_common}" ] && [ -e "$(dirname "${_common}")/.env" ]; then ENV_FILE="$(dirname "${_common}")/.env"; ENV_HINT="${ENV_FILE}"; fi
+fi
+# ILEGÍVEL não é "none": abertura de verdade, porque sob sandbox `[ -r ]` responde legível.
+if [ -e "${ENV_FILE}" ] && ! { : < "${ENV_FILE}"; } 2>/dev/null; then
+  emit "Onion: o .env existe mas esta ilegivel (sandbox ou permissao): provider desconhecido, o adapter fica cego"
+  exit 0
+fi
 if [ -f "${ENV_FILE}" ]; then
   # UM parser só: o do env-check.sh, quando presente (o Elenxo mediu que dois parsers "alinhados" divergiam em aspas e
   # comentário). Sem o helper, o awk abaixo; e um valor fora da lista de providers não é ecoado.
@@ -47,7 +58,7 @@ if [ -f "${ENV_FILE}" ]; then
     case "${pf}" in jira|clickup|asana|linear|zoho|none|"") ;; *) pf=invalido ;; esac
   fi
   if [ -n "${pf}" ]; then
-    emit "Onion: TASK_MANAGER_PROVIDER=${pf} declarado no .env mas NAO no ambiente — carregue (set -a; source .env; set +a) senao o adapter fica cego"
+    emit "Onion: TASK_MANAGER_PROVIDER=${pf} declarado no .env mas NAO no ambiente — carregue (set -a; source ${ENV_HINT}; set +a) senao o adapter fica cego"
     exit 0
   fi
 fi

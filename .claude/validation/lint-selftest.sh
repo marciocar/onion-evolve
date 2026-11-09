@@ -14271,6 +14271,99 @@ run_env_exposure_selftests() {
   local h="${REPO_ROOT}/.claude/utils/task-manager/env-check.sh"
   if [ ! -f "${h}" ]; then record_fail "env-exposure" "helper ausente: ${h}"; return; fi
   local d; d="$(mktemp -d)"
+  # (u) ILEGÍVEL ≠ AUSENTE (2026-11-09, medido sob sandbox): existe e não se lê responde `ilegivel`, rc 4; o ambiente vence;
+  # ausente segue `ausente`, rc 0. MUTANTE: tirar a verificação volta a responder `ausente` rc 0.
+  if [ "$(id -u)" -eq 0 ]; then record_skip "env-exposure: (u) root lê arquivo 000 — caso não exercido"
+  else
+    local uout urc umut="${d}/ec-mut.sh"
+    printf 'TASK_MANAGER_PROVIDER=linear\n' > "${d}/u.env"; chmod 000 "${d}/u.env"
+    urc=0; uout="$(env -u TASK_MANAGER_PROVIDER bash "${h}" --env "${d}/u.env" --provider 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 4 ] && [ "${uout}" = ilegivel ]; then record_pass "env-exposure: (u1) .env ilegível ⇒ --provider responde ilegivel, rc 4"
+    else record_fail "env-exposure: (u1)" "rc=${urc}: ${uout}"; fi
+    urc=0; uout="$(TASK_MANAGER_PROVIDER=linear bash "${h}" --env "${d}/u.env" --provider 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 0 ] && [ "${uout}" = linear ]; then record_pass "env-exposure: (u2) provider no ambiente vence o .env ilegível"
+    else record_fail "env-exposure: (u2)" "rc=${urc}: ${uout}"; fi
+    urc=0; uout="$(env -u TASK_MANAGER_PROVIDER -u LINEAR_API_KEY bash "${h}" --env "${d}/u.env" --check linear 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 4 ]; then record_pass "env-exposure: (u3) --check com .env ilegível ⇒ rc 4"
+    else record_fail "env-exposure: (u3)" "rc=${urc}: ${uout}"; fi
+    urc=0; uout="$(env -u TASK_MANAGER_PROVIDER bash "${h}" --env "${d}/nao-existe.env" --provider 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 0 ] && [ "${uout}" = ausente ]; then record_pass "env-exposure: (u4) .env inexistente segue ausente, rc 0"
+    else record_fail "env-exposure: (u4)" "rc=${urc}: ${uout}"; fi
+    sed 's/^env_unreadable() {.*/env_unreadable() { false; } # ONION_MUTANTE ilegivel/' "${h}" > "${umut}"
+    if ! grep -q 'ONION_MUTANTE ilegivel' "${umut}"; then record_fail "env-exposure: (u-MUT)" "o sed não casou env_unreadable"
+    else
+      urc=0; uout="$(env -u TASK_MANAGER_PROVIDER bash "${umut}" --env "${d}/u.env" --provider 2>/dev/null)" || urc=$?
+      if [ "${urc}" -eq 0 ] && [ "${uout}" = ausente ]; then record_pass "env-exposure: (u-MUT) tirar a verificação MORDE: volta a dizer ausente, rc 0"
+      else record_fail "env-exposure: (u-MUT)" "rc=${urc}: ${uout}"; fi
+    fi
+    # (u5-u7) cada modo diz ilegível, e o aviso não vai para o stdout, que `TEAM=$(… --get …)` guardaria como valor
+    urc=0; uout="$(env -u TASK_MANAGER_PROVIDER bash "${h}" --env "${d}/u.env" --get TASK_MANAGER_PROVIDER 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 4 ] && [ -z "${uout}" ]; then record_pass "env-exposure: (u5) --get ilegível ⇒ rc 4, stdout vazio"
+    else record_fail "env-exposure: (u5)" "rc=${urc}: ${uout}"; fi
+    urc=0; uout="$(bash "${h}" --env "${d}/u.env" --lint 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 4 ] && [ -z "${uout}" ]; then record_pass "env-exposure: (u6) --lint ilegível ⇒ rc 4, stdout vazio"
+    else record_fail "env-exposure: (u6)" "rc=${urc}: ${uout}"; fi
+    urc=0; uout="$(bash "${h}" --env "${d}/u.env" --set-provider none 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 4 ]; then record_pass "env-exposure: (u7) --set-provider ilegível ⇒ rc 4, não grava"
+    else record_fail "env-exposure: (u7)" "rc=${urc}: ${uout}"; fi
+    # (t1) o tm.sh real diz ilegível, sem chamar de ausente
+    local tr="${d}/tmr"; git init -q "${tr}"; printf 'TASK_MANAGER_PROVIDER=linear\n' > "${tr}/.env"; chmod 000 "${tr}/.env"
+    urc=0; uout="$(cd "${tr}" && env -u TASK_MANAGER_PROVIDER -u TM_ENV_FILE bash "${REPO_ROOT}/.claude/utils/task-manager/tm.sh" item.read X 2>&1 >/dev/null)" || urc=$?
+    if [ "${urc}" -eq 2 ] && grep -q 'ilegível' <<< "${uout}" && ! grep -q 'ausente' <<< "${uout}"; then record_pass "env-exposure: (t1) tm.sh com .env ilegível ⇒ rc 2 e diz ilegível"
+    else record_fail "env-exposure: (t1)" "rc=${urc}: ${uout}"; fi
+    # (h1-h2) o hook de sessão com .env ilegível, com e sem o helper no projeto
+    local hk="${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh" hout
+    hout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${tr}" bash "${hk}" </dev/null 2>/dev/null)"
+    if grep -q 'ilegivel (sandbox' <<< "${hout}" && ! grep -q 'ativo = none' <<< "${hout}"; then record_pass "env-exposure: (h1) hook sem helper, .env ilegível ⇒ diz ilegível, não none"
+    else record_fail "env-exposure: (h1)" "${hout}"; fi
+    mkdir -p "${tr}/.claude/utils/task-manager"; cp "${h}" "${tr}/.claude/utils/task-manager/"
+    hout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${tr}" bash "${hk}" </dev/null 2>/dev/null)"
+    if grep -q 'ilegivel (sandbox' <<< "${hout}" && ! grep -q 'declarado no .env' <<< "${hout}"; then record_pass "env-exposure: (h2) hook com helper, .env ilegível ⇒ não anuncia como declarado"
+    else record_fail "env-exposure: (h2)" "${hout}"; fi
+    chmod 600 "${tr}/.env"; chmod 600 "${d}/u.env"
+  fi
+  # (v) WORKTREE SEM .env: terceira resposta, distinta de inexistente e de ilegível. MUTANTE: tirar a detecção volta a `ausente`.
+  local wt_m="${d}/wm" wt_l="${d}/wl" vout vrc vmut="${d}/ec-mut2.sh"
+  git init -q -b main "${wt_m}" && git -C "${wt_m}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -q --allow-empty -m b && git -C "${wt_m}" worktree add -q -b l "${wt_l}"
+  printf 'X=1\n' > "${wt_m}/.env"
+  vrc=0; vout="$(cd "${wt_l}" && env -u TASK_MANAGER_PROVIDER bash "${h}" --provider 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 5 ] && [ "${vout}" = worktree-sem-env ]; then record_pass "env-exposure: (v1) worktree sem .env, com um no principal ⇒ worktree-sem-env, rc 5"
+  else record_fail "env-exposure: (v1)" "rc=${vrc}: ${vout}"; fi
+  vrc=0; vout="$(cd "${wt_l}" && env -u TASK_MANAGER_PROVIDER bash "${h}" --env "${wt_l}/.env" --provider 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 0 ] && [ "${vout}" = ausente ]; then record_pass "env-exposure: (v2) com --env explícito responde pelo arquivo pedido: ausente, rc 0"
+  else record_fail "env-exposure: (v2)" "rc=${vrc}: ${vout}"; fi
+  # (v4-v6) os outros modos, a subpasta e o hook de sessão na worktree
+  vrc=0; vout="$(cd "${wt_l}" && env -u TASK_MANAGER_PROVIDER bash "${h}" --get TASK_MANAGER_PROVIDER 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 5 ] && [ -z "${vout}" ]; then record_pass "env-exposure: (v4) --get na worktree sem .env ⇒ rc 5, stdout vazio"
+  else record_fail "env-exposure: (v4)" "rc=${vrc}: ${vout}"; fi
+  vrc=0; vout="$(cd "${wt_l}" && bash "${h}" --lint 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 5 ]; then record_pass "env-exposure: (v5) --lint na worktree sem .env ⇒ rc 5"
+  else record_fail "env-exposure: (v5)" "rc=${vrc}: ${vout}"; fi
+  mkdir -p "${wt_l}/sub"
+  vrc=0; vout="$(cd "${wt_l}/sub" && env -u TASK_MANAGER_PROVIDER bash "${h}" --provider 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 5 ] && [ "${vout}" = worktree-sem-env ]; then record_pass "env-exposure: (v6) subpasta de worktree sem .env na raiz ⇒ worktree-sem-env"
+  else record_fail "env-exposure: (v6)" "rc=${vrc}: ${vout}"; fi
+  printf 'X=1\n' > "${wt_l}/.env"
+  vrc=0; vout="$(cd "${wt_l}/sub" && env -u TASK_MANAGER_PROVIDER bash "${h}" --provider 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 0 ] && [ "${vout}" = ausente ]; then record_pass "env-exposure: (v7) subpasta de worktree COM .env na raiz não é worktree-sem-env"
+  else record_fail "env-exposure: (v7)" "rc=${vrc}: ${vout}"; fi
+  rm -f "${wt_l}/.env"
+  printf 'TASK_MANAGER_PROVIDER=linear\n' > "${wt_m}/.env"
+  vout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${wt_l}" bash "${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh" </dev/null 2>/dev/null)"
+  if grep -q 'TASK_MANAGER_PROVIDER=linear declarado' <<< "${vout}" && ! grep -q 'ativo = none' <<< "${vout}"; then record_pass "env-exposure: (v8) hook de sessão em worktree lê o .env do principal, não diz none"
+  else record_fail "env-exposure: (v8)" "${vout}"; fi
+  rm -f "${wt_m}/.env"
+  vrc=0; vout="$(cd "${wt_l}" && env -u TASK_MANAGER_PROVIDER bash "${h}" --provider 2>/dev/null)" || vrc=$?
+  if [ "${vrc}" -eq 0 ] && [ "${vout}" = ausente ]; then record_pass "env-exposure: (v3) worktree sem .env e principal sem .env ⇒ ausente, rc 0"
+  else record_fail "env-exposure: (v3)" "rc=${vrc}: ${vout}"; fi
+  printf 'X=1\n' > "${wt_m}/.env"
+  sed 's/^  \[ ! -e "\${top}\/\.env" \] && main_checkout_env >\/dev\/null$/  false # ONION_MUTANTE worktree/' "${h}" > "${vmut}"
+  if ! grep -q 'ONION_MUTANTE worktree' "${vmut}"; then record_fail "env-exposure: (v-MUT)" "o sed não casou worktree_without_env"
+  else
+    vrc=0; vout="$(cd "${wt_l}" && env -u TASK_MANAGER_PROVIDER bash "${vmut}" --provider 2>/dev/null)" || vrc=$?
+    if [ "${vrc}" -eq 0 ] && [ "${vout}" = ausente ]; then record_pass "env-exposure: (v-MUT) tirar a detecção MORDE: volta a dizer ausente, rc 0"
+    else record_fail "env-exposure: (v-MUT)" "rc=${vrc}: ${vout}"; fi
+  fi
   printf 'TASK_MANAGER_PROVIDER=jira\nZOHO_CLIENT_ID=SENTINELA-S1\nZOHO_CLIENT_SECRET=SENTINELA-S2\nZOHO_PORTAL_ID=SENTINELA-S3\n' > "${d}/.env"
   local out rc
   rc=0; out="$( { bash "${h}" --env "${d}/.env" --provider; bash "${h}" --env "${d}/.env" --check zoho; } 2>&1)" || rc=$?
@@ -51379,7 +51472,131 @@ run_update_base_and_deny_selftests() {
     if ! grep -q '^! allow anulado:' <<< "${out}"; then record_pass "update-base-deny: (n-MUT) tirar o laço MORDE: (d12) reprovaria"
     else record_fail "update-base-deny: (n-MUT)" "sem o laço o --diff ainda nomeou"; fi
   fi
-  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm _ub_merge _ub_machine
+  # (r1-r6) A RETIRADA DECLARADA (2026-11-09): a regra da lista sai do alvo, só a idêntica; o deny-monotonic não reprova; o
+  # --diff e o stderr nomeiam. (r-MUT) sem a remoção, (r1) reprova. (rm-MUT) sem a lista, a retirada volta a ser PERDA.
+  # a lista mora ao lado do script, sem variável que a troque: a bancada copia os scripts para uma pasta com a lista dela
+  local kit="${d}/kit" kit0="${d}/kit0" lst="${REPO_ROOT}/.claude/utils/adopt/deny-retired-list.sh" kd
+  for kd in "${kit}" "${kit0}"; do mkdir -p "${kd}"; cp "${mh}" "${kd}/mh.sh"; cp "${dm}" "${kd}/dm.sh"; cp "${lst}" "${kd}/deny-retired-list.sh"; done
+  local rr="${kit}/deny-retired.tsv" src_r='{"permissions":{"deny":["Bash(x)"]},"hooks":{}}' tgt_r='{"permissions":{"deny":["Bash(old)","Bash(old *)","Bash(keep)"]},"hooks":{}}'
+  printf '# comentario\nBash(old)\t2026-11-09\tmotivo\n' > "${rr}"
+  printf '%s\n' "${src_r}" > "${d}/src.json"; printf '%s\n' "${tgt_r}" > "${d}/tgt.json"
+  out="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")"; once="${out}"
+  if [ "$(jq -c '.permissions.deny' <<< "${out}")" = '["Bash(old *)","Bash(keep)","Bash(x)"]' ] && grep -qF 'RETIRADA: regra de deny aposentada pelo core, removida do alvo: Bash(old)' "${d}/err"; then
+    record_pass "update-base-deny: (r1) só a regra idêntica à aposentada sai, e o stderr a nomeia"
+  else record_fail "update-base-deny: (r1)" "$(jq -c '.permissions.deny' <<< "${out}") err=$(cat "${d}/err")"; fi
+  printf '%s\n' "${once}" > "${d}/tgt.json"; twice="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>/dev/null)"
+  if [ "${once}" = "${twice}" ]; then record_pass "update-base-deny: (r2) retirar duas vezes é no-op"
+  else record_fail "update-base-deny: (r2)" "1ª e 2ª passadas diferem"; fi
+  local s_old='{"permissions":{"deny":["Bash(old)","Bash(keep)"]}}' s_new='{"permissions":{"deny":["Bash(keep)"]}}' s_gone='{"permissions":{"deny":[]}}'
+  out="$(_ub_dm "${s_old}" "${s_new}" "${kit}/dm.sh")"
+  if [ "${out%%|*}" = 0 ] && grep -q 'retirada declarada pelo core: 1 regra' <<< "${out}" && grep -qF '~ Bash(old)' <<< "${out}"; then
+    record_pass "update-base-deny: (r3) a retirada declarada passa no deny-monotonic e é nomeada"
+  else record_fail "update-base-deny: (r3)" "${out}"; fi
+  out="$(_ub_dm "${s_old}" "${s_gone}" "${kit}/dm.sh")"
+  if [ "${out%%|*}" = 1 ] && grep -qF -- '- Bash(keep)' <<< "${out}" && ! grep -qF -- '- Bash(old)' <<< "${out}"; then
+    record_pass "update-base-deny: (r4) regra NÃO listada que some segue reprovando, junto da declarada"
+  else record_fail "update-base-deny: (r4)" "${out}"; fi
+  printf '%s\n' "${s_old}" > "${d}/a.json"; printf '%s\n' "${s_gone}" > "${d}/b.json"
+  out="$(bash "${kit}/mh.sh" --diff "${d}/a.json" "${d}/b.json" 2>&1)"
+  if grep -qF -- '- deny (retirada declarada): Bash(old)' <<< "${out}" && grep -qF -- '- deny (PERDIDA): Bash(keep)' <<< "${out}"; then
+    record_pass "update-base-deny: (r5) o --diff separa retirada declarada de perda"
+  else record_fail "update-base-deny: (r5)" "${out}"; fi
+  local real_ret="${REPO_ROOT}/.claude/utils/adopt/deny-retired.tsv" both
+  both="$(awk -F'\t' '!/^#/ && NF >= 1 && $1 != "" {print $1}' "${real_ret}" | LC_ALL=C /usr/bin/grep -Fxf <(jq -r '.permissions.deny[]' "${real_st}") || true)"
+  if [ -s "${real_ret}" ] && [ -z "${both}" ]; then record_pass "update-base-deny: (r6) a lista real de aposentadas não cruza com o deny vivo do core"
+  else record_fail "update-base-deny: (r6)" "lista ausente ou regra aposentada ainda viva: ${both}"; fi
+  mut="${kit}/mh-mut4.sh"; sed 's/then \.permissions\.deny -= (\$retired.*$/then . else . end # ONION_MUTANTE sem retirada/' "${mh}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE sem retirada' "${mut}"; then record_fail "update-base-deny: (r-MUT)" "o sed não casou a retirada"
+  else
+    printf '%s\n' "${tgt_r}" > "${d}/tgt.json"; out="$(bash "${mut}" "${d}/src.json" "${d}/tgt.json" 2>/dev/null)"
+    if jq -e '.permissions.deny | index("Bash(old)") != null' <<< "${out}" >/dev/null; then record_pass "update-base-deny: (r-MUT) tirar a retirada MORDE: a regra aposentada fica no alvo"
+    else record_fail "update-base-deny: (r-MUT)" "${out}"; fi
+  fi
+  out="$(_ub_dm "${s_old}" "${s_new}" "${kit0}/dm.sh")"
+  if [ "${out%%|*}" = 1 ]; then record_pass "update-base-deny: (rm-MUT) sem a lista a retirada volta a reprovar: (r3) prova a lista"
+  else record_fail "update-base-deny: (rm-MUT)" "${out}"; fi
+  # (r7-r9) a lista é validada: linha malformada não retira e avisa; regra que a fonte ainda traz fica, com aviso; lista ilegível não custa os hooks
+  printf 'Bash(old) sem-tab\n Bash(old)\t2026-11-09\tm\nBash(o\tld)\t2026-11-09\tm\nBash(old)\t2026-11-09\tm\r\nBash(old)\t2026-11-09\tm\tcoluna-a-mais\n' > "${rr}"
+  printf '%s\n' "${tgt_r}" > "${d}/tgt.json"; printf '%s\n' "${src_r}" > "${d}/src.json"
+  out="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")"
+  if [ "$(jq -c '.permissions.deny | index("Bash(old)") != null' <<< "${out}")" = true ] && [ "$(grep -c 'malformada' "${d}/err")" -eq 5 ]; then
+    record_pass "update-base-deny: (r7) linha sem tab, indentada, com tab na regra, com CR ou com coluna a mais não retira, e cada uma avisa"
+  else record_fail "update-base-deny: (r7)" "$(jq -c '.permissions.deny' <<< "${out}") err=$(cat "${d}/err")"; fi
+  printf 'Bash(x)\t2026-11-09\tm\n' > "${rr}"; printf '%s\n' '{"permissions":{"deny":["Bash(x)"]},"hooks":{}}' > "${d}/tgt.json"
+  out="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")"
+  if [ "$(jq -c '.permissions.deny' <<< "${out}")" = '["Bash(x)"]' ] && grep -q 'ainda na fonte' "${d}/err" && ! grep -q 'RETIRADA' "${d}/err"; then
+    record_pass "update-base-deny: (r8) regra listada que a fonte ainda traz fica no alvo, com aviso"
+  else record_fail "update-base-deny: (r8)" "$(jq -c '.permissions.deny' <<< "${out}") err=$(cat "${d}/err")"; fi
+  if [ "$(id -u)" -ne 0 ]; then
+    printf 'Bash(old)\t2026-11-09\tm\n' > "${rr}"; chmod 000 "${rr}"
+    printf '%s\n' '{"permissions":{"deny":["Bash(x)"]},"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash .claude/hooks/h.sh"}]}]}}' > "${d}/src.json"; printf '%s\n' '{"hooks":{}}' > "${d}/tgt.json"; rc=0
+    out="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")" || rc=$?
+    chmod 600 "${rr}"
+    if [ "${rc}" -eq 0 ] && [ "$(jq -r '.hooks.Stop[0].hooks[0].command' <<< "${out}")" = 'bash .claude/hooks/h.sh' ] && grep -q 'ilegível' "${d}/err"; then
+      record_pass "update-base-deny: (r9) lista ilegível não custa os hooks: rc 0, com aviso"
+    else record_fail "update-base-deny: (r9)" "rc=${rc} err=$(cat "${d}/err")"; fi
+  else record_skip "update-base-deny: (r9) root lê arquivo 000 — caso não exercido"; fi
+  # (a1-a6) O AVISO DE SANDBOX DO --update (2026-11-09): só avisa, nunca escreve no bloco sandbox. (a-MUT) ignorar o allowRead reprova (a3).
+  local adv="${REPO_ROOT}/.claude/utils/adopt/sandbox-deny-advice.sh" A="${d}/adv" advh
+  # o fixture não herda o credential helper global de quem roda a bancada
+  local GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1; export GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+  _ub_adv() { rm -rf "${A}"; mkdir -p "${A}/.claude"; git init -q "${A}"; [ -n "$2" ] && git -C "${A}" remote add origin "$2"; printf '%s\n' "$1" > "${A}/.claude/settings.json"; [ -z "${3:-}" ] || git -C "${A}" config "credential.https://github.com.helper" "$3"; }
+  local sb_off='{"permissions":{"deny":["Read(~/.config/gh/hosts.yml)"]}}'
+  local sb_on='{"sandbox":{"enabled":true},"permissions":{"deny":["Read(~/.config/gh/hosts.yml)","Read(~/.ssh/**)","Read(//**/.env)"]}}'
+  local sb_ok='{"sandbox":{"enabled":true,"filesystem":{"allowRead":["~/.config/gh/hosts.yml"]}},"permissions":{"deny":["Read(~/.config/gh/hosts.yml)","Read(~/.ssh/**)"]}}'
+  _ub_adv "${sb_off}" "https://github.com/o/r.git" ""; out="$(bash "${adv}" "${A}" 2>&1)"; rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'desligado no alvo' <<< "${out}" && ! grep -q 'FALTA' <<< "${out}"; then record_pass "update-base-deny: (a1) sem sandbox não avisa nada"
+  else record_fail "update-base-deny: (a1)" "rc=${rc}: ${out}"; fi
+  _ub_adv "${sb_on}" "https://github.com/o/r.git" "!gh auth git-credential"; advh="$(sha256sum "${A}/.claude/settings.json")"; out="$(bash "${adv}" "${A}" 2>&1)"; rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qF 'FALTA allowRead: ~/.config/gh/hosts.yml — o credential helper é o gh' <<< "${out}" && grep -qF '~/.ssh/**' <<< "${out}" && ! grep -qF '.env' <<< "${out}" && [ "${advh}" = "$(sha256sum "${A}/.claude/settings.json")" ]; then
+    record_pass "update-base-deny: (a2) sandbox + https + helper gh ⇒ nomeia o allowRead que falta, lista as regras do home, ignora o glob e não escreve no settings"
+  else record_fail "update-base-deny: (a2)" "rc=${rc}: ${out}"; fi
+  _ub_adv "${sb_ok}" "https://github.com/o/r.git" "!gh auth git-credential"; out="$(bash "${adv}" "${A}" 2>&1)"; rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'FALTA allowRead' <<< "${out}" && grep -q 'nenhuma exceção allowRead faltando' <<< "${out}"; then record_pass "update-base-deny: (a3) com o allowRead presente não acusa"
+  else record_fail "update-base-deny: (a3)" "rc=${rc}: ${out}"; fi
+  _ub_adv "${sb_ok}" "git@github.com:o/r.git" ""; out="$(bash "${adv}" "${A}" 2>&1)"; rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qF 'FALTA allowRead: ~/.ssh/** — o remote é ssh' <<< "${out}"; then record_pass "update-base-deny: (a4) remote ssh ⇒ avisa a chave ilegível"
+  else record_fail "update-base-deny: (a4)" "rc=${rc}: ${out}"; fi
+  _ub_adv "${sb_on}" "https://github.com/o/r.git" ""; out="$(bash "${adv}" "${A}" 2>&1)"; rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qF 'FALTA allowRead: ~/.config/gh/hosts.yml — o gh lê este arquivo' <<< "${out}"; then record_pass "update-base-deny: (a5) sem helper do gh o aviso diz que é o gh que quebra"
+  else record_fail "update-base-deny: (a5)" "rc=${rc}: ${out}"; fi
+  printf '{nao json' > "${A}/.claude/settings.json"; rc=0; out="$(bash "${adv}" "${A}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 3 ] && grep -q 'NÃO MEDIDO' <<< "${out}"; then record_pass "update-base-deny: (a6) settings inválido ⇒ NÃO MEDIDO, rc 3"
+  else record_fail "update-base-deny: (a6)" "rc=${rc}: ${out}"; fi
+  mut="${d}/adv-mut.sh"; sed 's/^    case "\$1" in "\${a}"|"\${a}"\/\*) return 0 ;; esac$/    : # ONION_MUTANTE sem allowRead/' "${adv}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE sem allowRead' "${mut}"; then record_fail "update-base-deny: (a-MUT)" "o sed não casou is_allowed"
+  else
+    _ub_adv "${sb_ok}" "https://github.com/o/r.git" "!gh auth git-credential"; out="$(bash "${mut}" "${A}" 2>&1)"
+    if grep -q 'FALTA allowRead' <<< "${out}"; then record_pass "update-base-deny: (a-MUT) ignorar o allowRead MORDE: (a3) reprovaria"
+    else record_fail "update-base-deny: (a-MUT)" "${out}"; fi
+  fi
+  # (a7-a12) gpg, pasta acima, forma de remote, sandbox só no local e allowRead com o home expandido
+  local sb_gpg='{"sandbox":{"enabled":true},"permissions":{"deny":["Read(~/.gnupg/**)"]}}'
+  _ub_adv "${sb_gpg}" "https://github.com/o/r.git" ""; git -C "${A}" config commit.gpgsign true; out="$(bash "${adv}" "${A}" 2>&1)"
+  if grep -q 'ATENÇÃO: commit.gpgsign=true' <<< "${out}"; then record_pass "update-base-deny: (a7) gpgsign com ~/.gnupg negado ⇒ avisa"
+  else record_fail "update-base-deny: (a7)" "${out}"; fi
+  local sb_up='{"sandbox":{"enabled":true,"filesystem":{"allowRead":["~/.config/gh"]}},"permissions":{"deny":["Read(~/.config/gh/hosts.yml)"]}}'
+  _ub_adv "${sb_up}" "https://github.com/o/r.git" ""; out="$(bash "${adv}" "${A}" 2>&1)"
+  if ! grep -q 'FALTA allowRead' <<< "${out}"; then record_pass "update-base-deny: (a8) allowRead numa pasta acima cobre o arquivo"
+  else record_fail "update-base-deny: (a8)" "${out}"; fi
+  local u
+  for u in 'github.com:o/r.git' 'org-123@github.com:o/r.git' 'deploy@host:r.git' 'meualias:r.git' 'git+ssh://git@h/r' 'ssh://git@h/r' 'git@github.com:o/r.git'; do
+    _ub_adv "${sb_on}" "${u}" ""; out="$(bash "${adv}" "${A}" 2>&1)"
+    if grep -q 'remote origin: ssh' <<< "${out}"; then record_pass "update-base-deny: (a9) ${u} é ssh"
+    else record_fail "update-base-deny: (a9) ${u}" "${out}"; fi
+  done
+  for u in 'https://github.com/o/r' '/srv/git/r.git' './r.git' 'file:///srv/r.git'; do
+    _ub_adv "${sb_on}" "${u}" ""; out="$(bash "${adv}" "${A}" 2>&1)"
+    if ! grep -q 'remote origin: ssh' <<< "${out}"; then record_pass "update-base-deny: (a10) ${u} não é ssh"
+    else record_fail "update-base-deny: (a10) ${u}" "${out}"; fi
+  done
+  _ub_adv '{"permissions":{"deny":["Read(~/.ssh/**)"]}}' "https://github.com/o/r.git" ""; printf '%s\n' '{"sandbox":{"enabled":true}}' > "${A}/.claude/settings.local.json"; out="$(bash "${adv}" "${A}" 2>&1)"
+  if grep -q 'LIGADO no alvo' <<< "${out}"; then record_pass "update-base-deny: (a11) sandbox só no settings.local vale"
+  else record_fail "update-base-deny: (a11)" "${out}"; fi
+  _ub_adv "{\"sandbox\":{\"enabled\":true,\"filesystem\":{\"allowRead\":[\"${HOME}/.config/gh/hosts.yml\"]}},\"permissions\":{\"deny\":[\"Read(~/.config/gh/hosts.yml)\"]}}" "https://github.com/o/r.git" ""; out="$(bash "${adv}" "${A}" 2>&1)"
+  if ! grep -q 'FALTA allowRead' <<< "${out}"; then record_pass "update-base-deny: (a12) allowRead com o home expandido cobre"
+  else record_fail "update-base-deny: (a12)" "${out}"; fi
+  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm _ub_merge _ub_machine _ub_adv
 }
 _family run_update_base_and_deny_selftests
 

@@ -282,10 +282,10 @@ D50	bypass	{P}/.env.development	deny	deny	ok	<tool_use_error>File is in a direct
 P01	bypass	git push --force-with-lease origin HEAD:refs/heads/feat/lease	pass	exec	ok	To ../bare.git * [new branch] HEAD -> feat/lease
 P02	bypass	git push -u origin HEAD:refs/heads/feat/up	pass	exec	ok	To ../bare.git * [new branch] HEAD -> feat/up branch 'main' set up to 
 P03	bypass	git push origin --delete feat/old	pass	exec	ok	To ../bare.git - [deleted] feat/old
-P04	bypass	git clean -fdn	pass	exec	ok	Would remove .claude/ Would remove build/ Would remove sub/untracked/
+P04	bypass	git clean -fdn	pass	exec	ok	Would remove .claude/settings.json Would remove build/ Would remove su
 P05	bypass	git clean -fd sub/untracked	pass	exec	ok	Removing sub/untracked/
-P06	bypass	git clean -n	pass	exec	ok	(Bash completed with no output)
-P07	bypass	git reset --hard HEAD	pass	exec	ok	HEAD is now at a32eacb base
+P06	bypass	git clean -n	pass	exec	ok	Would remove .claude/settings.json
+P07	bypass	git reset --hard HEAD	pass	exec	ok	HEAD is now at 59bf2d1 base
 P08	bypass	git branch -D tmp	pass	exec	ok	Exit code 1 error: branch 'tmp' not found
 P09	bypass	rm -rf build/tmp	pass	exec	ok	(Bash completed with no output)
 P10	bypass	rm -rf {W}/scratch/x	pass	exec	ok	(Bash completed with no output)
@@ -340,21 +340,66 @@ L29	bypass	rg --hidden FAKE sub	pass	exec	ok	(Bash completed with no output)
 L30	bypass	git -C . push origin HEAD:refs/heads/feat/uf -uf	pass	exec	ok	To ../bare.git * [new branch] HEAD -> feat/uf branch 'main' set up to 
 L31	bypass	git push -ufq origin HEAD:refs/heads/feat/ufq	medir	deny	info	Permission to use Bash with command git push -ufq origin HEAD:refs/hea
 X01	bypass	inner.sh fez push --force por dentro	pass	exec	ok	ref feat/inner no bare
-S01	sandbox-control	set -a; source .env; set +a; test -n "$FAKE_KEY" && echo carregou	medir	exec	info	carregou
-S02	sandbox-control	cat .env	medir	exec	info	canario-no-resultado FAKE_KEY=valor-inventado-da-bancada EXTRA=1
+S01	sandbox-control	set -a; source .env; set +a; test -n "$FAKE_KEY" && echo carregou	anda	exec	ok	carregou
+S02	sandbox-control	cat .env	medir	exec	info	canario-no-resultado FAKE_KEY=valor-inventado-da-bancada TASK_MANAGER_PROVIDER=linear EXTRA=1
 S03	sandbox-control	cat {H}/.ssh/id_ed25519	medir	exec	info	canario-no-resultado FAKE-PRIVATE-KEY
-S04	sandbox-control	git status --short	medir	exec	info	 M .env.example ?? .bash_profile ?? .bashrc ?? .claude/ ?? .gitconfig ?? .gitmodules ?? .i
+S04	sandbox-control	git status --short	medir	exec	info	tmodules ?? .idea ?? .mcp.json ?? .profile ?? .ripgreprc ?? .vscode ?? .zprofile ?? .zshrc
 S05	sandbox-control	cat .env.example	medir	exec	info	X=1
 S06	sandbox-control	ssh -o BatchMode=yes -o ConnectTimeout=2 -i {H}/.ssh/id_ed25519 -o IdentitiesOnly=yes 127.0.0.1 true; echo ssh-rc=$?	medir	exec	info	ssh: connect to host 127.0.0.1 port 22: Connection refused ssh-rc=255
-S07	sandbox-control	gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?	medir	exec	info	gpg: Note: trustdb not writable gpg: checking the trustdb gpg: trustdb rec 31: write faile
-S08	sandbox-control	git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?	medir	exec	info	error: gpg failed to sign the data: gpg: failed to create temporary file '<caminho>
+S07	sandbox-control	gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?	medir	exec	info	<fixture><caminho> failed to append a record: Bad file descriptor gpg-rc=0
+S08	sandbox-control	git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?	medir	exec	info	9 gpg: signing failed: No agent running fatal: failed to write commit object commit-rc=128
 S09	sandbox-control	cat {H}/.aws/credentials; echo aws-rc=$?	medir	exec	info	fake aws-rc=0
-S01	sandbox-deny	set -a; source .env; set +a; test -n "$FAKE_KEY" && echo carregou	medir	exec	info	carregou
-S02	sandbox-deny	cat .env	medir	exec	info	canario-no-resultado FAKE_KEY=valor-inventado-da-bancada EXTRA=1
-S03	sandbox-deny	cat {H}/.ssh/id_ed25519	medir	exec	info	Exit code 1 cat: <fixture><caminho> No suc
-S04	sandbox-deny	git status --short	medir	exec	info	 M .env.example ?? .bash_profile ?? .bashrc ?? .claude/ ?? .gitconfig ?? .gitmodules ?? .i
+S10	sandbox-control	gh auth status; echo gh-rc=$?	anda	exec	ok	FAKEGH auth status gh-rc=0
+S11	sandbox-control	gh pr view 1; echo gh-rc=$?	anda	exec	ok	FAKEGH pr view 1 gh-rc=0
+S12	sandbox-control	printf 'protocol=https\nhost=github.com\n\n' | git credential fill; echo cred-rc=$?	anda	exec	ok	protocol=https host=github.com username=x-access-token password=fake-token cred-rc=0
+S13	sandbox-control	bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?	anda	exec	ok	linear envck-rc=0
+S15	sandbox-control	cat {H}/.ssh/id_ed25519 | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	17 read-rc=0
+S16	sandbox-control	cat {H}/.aws/credentials | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	5 read-rc=0
+S17	sandbox-control	cat {H}/.gnupg/private.key | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	5 read-rc=0
+S18	sandbox-control	cat {H}/.netrc | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	5 read-rc=0
+S19	sandbox-control	cat {H}/.claude/.credentials.json | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	3 read-rc=0
+S20	sandbox-control	cat {H}/.config/gh/hosts.yml | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	8 read-rc=0
+S21	sandbox-control	cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	73 read-rc=0
+S01	sandbox-deny	set -a; source .env; set +a; test -n "$FAKE_KEY" && echo carregou	anda	exec	ok	carregou
+S02	sandbox-deny	cat .env	medir	exec	info	canario-no-resultado FAKE_KEY=valor-inventado-da-bancada TASK_MANAGER_PROVIDER=linear EXTRA=1
+S03	sandbox-deny	cat {H}/.ssh/id_ed25519	medir	exec	info	Exit code 1 cat: <fixture><caminho> No such file or directory
+S04	sandbox-deny	git status --short	medir	exec	info	tmodules ?? .idea ?? .mcp.json ?? .profile ?? .ripgreprc ?? .vscode ?? .zprofile ?? .zshrc
 S05	sandbox-deny	cat .env.example	medir	exec	info	X=1
-S06	sandbox-deny	ssh -o BatchMode=yes -o ConnectTimeout=2 -i {H}/.ssh/id_ed25519 -o IdentitiesOnly=yes 127.0.0.1 true; echo ssh-rc=$?	medir	exec	info	Warning: Identity file <fixture><caminho> n
-S07	sandbox-deny	gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?	medir	exec	info	gpg: WARNING: unsafe permissions on homedir '<fixture>/
-S08	sandbox-deny	git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?	medir	exec	info	error: gpg failed to sign the data: gpg: WARNING: unsafe permissions on homedir '<caminho>
-S09	sandbox-deny	cat {H}/.aws/credentials; echo aws-rc=$?	medir	exec	info	cat: <fixture><caminho> No such file or d
+S06	sandbox-deny	ssh -o BatchMode=yes -o ConnectTimeout=2 -i {H}/.ssh/id_ed25519 -o IdentitiesOnly=yes 127.0.0.1 true; echo ssh-rc=$?	medir	exec	info	h file or directory. ssh: connect to host 127.0.0.1 port 22: Connection refused ssh-rc=255
+S07	sandbox-deny	gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?	medir	exec	info	nupg/pubring.kbx' created gpg: <fixture><caminho> trustdb created gpg-rc=0
+S08	sandbox-deny	git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?	medir	exec	info	n 17 gpg: signing failed: No secret key fatal: failed to write commit object commit-rc=128
+S09	sandbox-deny	cat {H}/.aws/credentials; echo aws-rc=$?	medir	exec	info	cat: <fixture><caminho> No such file or directory aws-rc=1
+S10	sandbox-deny	gh auth status; echo gh-rc=$?	quebra	exec	ok	re><caminho> Permission denied open hosts.yml: permission denied gh-rc=1
+S11	sandbox-deny	gh pr view 1; echo gh-rc=$?	quebra	exec	ok	re><caminho> Permission denied open hosts.yml: permission denied gh-rc=1
+S12	sandbox-deny	printf 'protocol=https\nhost=github.com\n\n' | git credential fill; echo cred-rc=$?	quebra	exec	ok	l: could not read Username for 'https://github.com': No such device or address cred-rc=128
+S13	sandbox-deny	bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?	anda	exec	ok	linear envck-rc=0
+S15	sandbox-deny	cat {H}/.ssh/id_ed25519 | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> No such file or directory 0 read-rc=1
+S16	sandbox-deny	cat {H}/.aws/credentials | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> No such file or directory 0 read-rc=1
+S17	sandbox-deny	cat {H}/.gnupg/private.key | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> No such file or directory 0 read-rc=1
+S18	sandbox-deny	cat {H}/.netrc | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> Permission denied 0 read-rc=1
+S19	sandbox-deny	cat {H}/.claude/.credentials.json | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> Permission denied 0 read-rc=1
+S20	sandbox-deny	cat {H}/.config/gh/hosts.yml | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> Permission denied 0 read-rc=1
+S21	sandbox-deny	cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	73 read-rc=0
+S01	sandbox-allowread	set -a; source .env; set +a; test -n "$FAKE_KEY" && echo carregou	anda	exec	ok	carregou
+S02	sandbox-allowread	cat .env	medir	exec	info	canario-no-resultado FAKE_KEY=valor-inventado-da-bancada TASK_MANAGER_PROVIDER=linear EXTRA=1
+S03	sandbox-allowread	cat {H}/.ssh/id_ed25519	medir	exec	info	Exit code 1 cat: <fixture><caminho> No such file or directory
+S04	sandbox-allowread	git status --short	medir	exec	info	tmodules ?? .idea ?? .mcp.json ?? .profile ?? .ripgreprc ?? .vscode ?? .zprofile ?? .zshrc
+S05	sandbox-allowread	cat .env.example	medir	exec	info	X=1
+S06	sandbox-allowread	ssh -o BatchMode=yes -o ConnectTimeout=2 -i {H}/.ssh/id_ed25519 -o IdentitiesOnly=yes 127.0.0.1 true; echo ssh-rc=$?	medir	exec	info	h file or directory. ssh: connect to host 127.0.0.1 port 22: Connection refused ssh-rc=255
+S07	sandbox-allowread	gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?	medir	exec	info	nupg/pubring.kbx' created gpg: <fixture><caminho> trustdb created gpg-rc=0
+S08	sandbox-allowread	git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?	medir	exec	info	n 17 gpg: signing failed: No secret key fatal: failed to write commit object commit-rc=128
+S09	sandbox-allowread	cat {H}/.aws/credentials; echo aws-rc=$?	medir	exec	info	cat: <fixture><caminho> No such file or directory aws-rc=1
+S10	sandbox-allowread	gh auth status; echo gh-rc=$?	anda	exec	ok	FAKEGH auth status gh-rc=0
+S11	sandbox-allowread	gh pr view 1; echo gh-rc=$?	anda	exec	ok	FAKEGH pr view 1 gh-rc=0
+S12	sandbox-allowread	printf 'protocol=https\nhost=github.com\n\n' | git credential fill; echo cred-rc=$?	anda	exec	ok	protocol=https host=github.com username=x-access-token password=fake-token cred-rc=0
+S13	sandbox-allowread	bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?	anda	exec	ok	linear envck-rc=0
+S15	sandbox-allowread	cat {H}/.ssh/id_ed25519 | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> No such file or directory 0 read-rc=1
+S16	sandbox-allowread	cat {H}/.aws/credentials | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> No such file or directory 0 read-rc=1
+S17	sandbox-allowread	cat {H}/.gnupg/private.key | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> No such file or directory 0 read-rc=1
+S18	sandbox-allowread	cat {H}/.netrc | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> Permission denied 0 read-rc=1
+S19	sandbox-allowread	cat {H}/.claude/.credentials.json | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	cat: <fixture><caminho> Permission denied 0 read-rc=1
+S20	sandbox-allowread	cat {H}/.config/gh/hosts.yml | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	8 read-rc=0
+S21	sandbox-allowread	cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec	info	73 read-rc=0
+A01	sandbox-env-absoluto	test -r .env && echo TEST-R-LE || echo TEST-R-NAO	medir	exec	info	TEST-R-LE
+A02	sandbox-env-absoluto	cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}	read-rc=1	exec	ok	cat: .env: Permission denied 0 read-rc=1
+A03	sandbox-env-absoluto	bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?	envck-rc=4	exec	ok	ilegivel env-check: .env existe mas está ilegível envck-rc=4

@@ -8,7 +8,9 @@
 
 1. **Obter o provider sem ler o `.env`**: `bash .claude/utils/task-manager/env-check.sh --provider` (e `--check` para a
    presença das chaves) — **nunca** abrir o `.env` com a ferramenta de leitura de arquivo, que entrega os segredos ao modelo. Extrair `TASK_MANAGER_PROVIDER`
-   (valores: `jira` | `clickup` | `asana` | `linear` | `zoho` | `none`).
+   (valores: `jira` | `clickup` | `asana` | `linear` | `zoho` | `none`). A resposta `ilegivel` (rc 4) quer dizer que o
+   `.env` existe e não pôde ser lido, em geral por sandbox: avise, **não** trate como ausente nem assuma `none`. A resposta
+   `worktree-sem-env` (rc 5) quer dizer que você está numa worktree e o `.env` mora no checkout principal: rode com `--env`.
 2. **Validar a variável obrigatória do provedor ativo:**
 
    | Provedor | Variável obrigatória | Adapter (transporte: REST API default; MCP opcional) |

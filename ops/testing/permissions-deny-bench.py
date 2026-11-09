@@ -16,7 +16,8 @@
 #            Uma sentinela confere antes que o modo não executa `rm`; se executar, a bancada para (rc 3).
 #   bypass   só o subconjunto inofensivo no fixture. Mostra que o deny vale em bypassPermissions e que o permitido
 #            roda de verdade (push contra um bare local, gh falso, script que faz por dentro o que a linha não pode).
-#   sandbox  deny + sandbox ligado: a regra Read vira denyRead do sistema e alcança o `source .env`.
+#   sandbox  bwrap real. Regra Read de caminho do home vira bloqueio do sistema para o Bash. Três rodadas: sem deny, o deny
+#            inteiro (gh e credential helper têm de quebrar, ou a bancada não vê o defeito) e o deny + allowRead do hosts.yml.
 #   flows    os caminhos reais da casa, num clone do checkout dado, com os hooks reais e o deny. Prova só que o deny
 #            não barra a CHAMADA: a regra vê a linha de cima (`bash x.sh`), não o que o script faz, e o script pode
 #            parar por conta própria (F01 só imprime o uso).
@@ -222,7 +223,24 @@ SANDBOX_CASES = [
     ("S07", "Bash", "gpg --list-secret-keys --with-colons | head -2; echo gpg-rc=$?"),
     ("S08", "Bash", "git -c commit.gpgsign=true -c user.signingkey=lab@example.invalid commit --allow-empty -q -m sig; echo commit-rc=$?"),
     ("S09", "Bash", "cat {H}/.aws/credentials; echo aws-rc=$?"),
+    # o que a maquinaria lê sob sandbox (o gh é falso, lê o hosts.yml como o real; o git é real, com o helper do gh)
+    ("S10", "Bash", "gh auth status; echo gh-rc=$?"),
+    ("S11", "Bash", "gh pr view 1; echo gh-rc=$?"),
+    ("S12", "Bash", "printf 'protocol=https\\nhost=github.com\\n\\n' | git credential fill; echo cred-rc=$?"),
+    ("S13", "Bash", "bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?"),
+    # leitura de verdade: `test -r` responde LE para arquivo que o cat não abre
+    ("S15", "Bash", "cat {H}/.ssh/id_ed25519 | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+    ("S16", "Bash", "cat {H}/.aws/credentials | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+    ("S17", "Bash", "cat {H}/.gnupg/private.key | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+    ("S18", "Bash", "cat {H}/.netrc | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+    ("S19", "Bash", "cat {H}/.claude/.credentials.json | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+    ("S20", "Bash", "cat {H}/.config/gh/hosts.yml | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+    ("S21", "Bash", "cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}"),
 ]
+
+# o que tem de andar em toda rodada, e o que depende do hosts.yml: quebra com o deny, volta com a exceção allowRead
+SANDBOX_ALWAYS = {"S01": "carregou", "S13": "envck-rc=0"}
+SANDBOX_HOSTS = {"S10": "gh-rc=0", "S11": "gh-rc=0", "S12": "cred-rc=0"}
 
 FLOW_CASES = [
     ("F01", "bash ops/pr-merge-verified.sh", 60),
@@ -330,7 +348,7 @@ def build_fixture(W):
     write(f"{H}/.gitconfig", "[user]\n\tname = lab\n\temail = lab@example.invalid\n[commit]\n\tgpgsign = false\n[init]\n\tdefaultBranch = main\n")
     for rel, body in {".ssh/id_ed25519": "FAKE-PRIVATE-KEY\n", ".aws/credentials": "fake\n", ".gnupg/private.key": "fake\n", ".password-store/x.gpg": "fake\n", ".netrc": "fake\n", ".config/gh/hosts.yml": "fake: 1\n", ".claude/.credentials.json": "{}\n"}.items():
         write(f"{H}/{rel}", body)
-    fake_env = "FAKE_KEY=valor-inventado-da-bancada\n"
+    fake_env = "FAKE_KEY=valor-inventado-da-bancada\nTASK_MANAGER_PROVIDER=linear\n"
     write(f"{P}/.env", fake_env)
     write(f"{P}/.env.local", fake_env)
     write(f"{P}/.env.production", fake_env)
@@ -344,7 +362,12 @@ def build_fixture(W):
     write(f"{P}/keys/public-1.pem", "PUBLIC\n")
     write(f"{P}/README.md", "fixture\n")
     write(f"{P}/.gitignore", ".env\n.env.local\n.env.production\n.env.foo\n.env.prod\n.env.staging\n.env.development\nsub/dir/.env\n")
-    write(f"{W}/bin/gh", '#!/bin/sh\necho "FAKEGH $*"\n', 0o755)
+    # gh falso: nas operações autenticadas lê o hosts.yml, como o real, e falha do mesmo jeito se ele estiver ilegível
+    write(f"{W}/bin/gh", '#!/bin/sh\ncase "$1 $2" in "auth status"|"pr view"|"auth git-credential")\n  cat "$HOME/.config/gh/hosts.yml" >/dev/null || { echo "open hosts.yml: permission denied" >&2; exit 1; } ;;\nesac\nif [ "$1 $2" = "auth git-credential" ]; then\n  [ "$3" = get ] && { echo username=x-access-token; echo password=fake-token; }\n  exit 0\nfi\necho "FAKEGH $*"\n', 0o755)
+    write(f"{H}/.gitconfig", open(f"{H}/.gitconfig").read() + '[credential "https://github.com"]\n\thelper = !gh auth git-credential\n')
+    REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    os.makedirs(f"{P}/.claude/utils/task-manager", exist_ok=True)
+    shutil.copy(f"{REPO}/.claude/utils/task-manager/env-check.sh", f"{P}/.claude/utils/task-manager/env-check.sh")
     # o que a linha não pode, um script pode: é assim que pr-merge-verified e publish-door funcionam
     write(f"{P}/inner.sh", "#!/bin/sh\ngit push -q --force origin HEAD:refs/heads/feat/inner && gh pr merge 1 && echo interno-rodou\n", 0o755)
     sh(f"git init -q --bare -b main {W}/bare.git")
@@ -494,8 +517,10 @@ def main():
     if "sandbox" in only:
         plan = plan_of(SANDBOX_CASES, W, H, P)
         base = {"sandbox": {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False, "autoAllowBashIfSandboxed": True}}
-        for label, perms in (("sandbox-control", {}), ("sandbox-deny", {"permissions": {"deny": deny}})):
-            set_settings(P, {**base, **perms})
+        allowed = {"sandbox": {**base["sandbox"], "filesystem": {"allowRead": ["~/.config/gh/hosts.yml"]}}}
+        # 3 rodadas: sem deny; o deny inteiro (o hosts.yml tem de quebrar, ou a bancada não vê o defeito); o deny + allowRead
+        for label, st, hosts_ok in (("sandbox-control", base, True), ("sandbox-deny", {**base, "permissions": {"deny": deny}}, False), ("sandbox-allowread", {**allowed, "permissions": {"deny": deny}}, True)):
+            set_settings(P, st)
             rc, den = run_session(W, H, P, plan, "bypassPermissions", label)
             for i, c in enumerate(SANDBOX_CASES, 1):
                 if f"toolu_lab{i}" not in den:
@@ -503,7 +528,32 @@ def main():
                     bad += 1
                     continue
                 err, txt = den[f"toolu_lab{i}"]
-                rows.append((c[0], label, c[2], "medir", classify(bool(err), txt), "info", ("canario-no-resultado " if "valor-inventado" in txt or "FAKE-PRIVATE-KEY" in txt else "") + re.sub(r"\s+", " ", txt)[:90]))
+                marker = SANDBOX_ALWAYS.get(c[0]) or SANDBOX_HOSTS.get(c[0])
+                if marker is None:
+                    exp, ok = "medir", True
+                else:
+                    want = hosts_ok or c[0] in SANDBOX_ALWAYS
+                    exp, ok = ("anda" if want else "quebra"), (marker in txt) == want
+                bad += 0 if ok else 1
+                rows.append((c[0], label, c[2], exp, classify(bool(err), txt), ("info" if exp == "medir" else "ok") if ok else "DIVERGE", ("canario-no-resultado " if "valor-inventado" in txt or "FAKE-PRIVATE-KEY" in txt else "") + re.sub(r"\s+", " ", txt.replace(W, "<fixture>"))[-90:]))
+
+        # regra de caminho ABSOLUTO no .env: ela nega de verdade, e `test -r` ainda responde legível. O env-check tem de dizer ilegível
+        label = "sandbox-env-absoluto"
+        env_cases = [("A01", "Bash", "test -r .env && echo TEST-R-LE || echo TEST-R-NAO"), ("A02", "Bash", "cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}"),
+                     ("A03", "Bash", "bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?")]
+        env_expect = {"A02": "read-rc=1", "A03": "envck-rc=4"}
+        set_settings(P, {**base, "permissions": {"deny": deny + [f"Read(/{P}/.env)"]}})
+        _, den = run_session(W, H, P, plan_of(env_cases, W, H, P), "bypassPermissions", label)
+        for i, c in enumerate(env_cases, 1):
+            if f"toolu_lab{i}" not in den:
+                rows.append((c[0], label, c[2], "medir", "sem-resultado", "NAO-MEDIDO", "sem medida"))
+                bad += 1
+                continue
+            err, txt = den[f"toolu_lab{i}"]
+            marker = env_expect.get(c[0])
+            ok = marker is None or (marker in txt and (c[0] != "A03" or "ilegivel" in txt))
+            bad += 0 if ok else 1
+            rows.append((c[0], label, c[2], marker or "medir", classify(bool(err), txt), ("info" if marker is None else "ok") if ok else "DIVERGE", re.sub(r"\s+", " ", txt.replace(W, "<fixture>"))[-90:]))
 
     if "flows" in only and a.flows:
         F = f"{W}/flow"

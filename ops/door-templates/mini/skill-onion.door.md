@@ -12,7 +12,7 @@ allowed-tools: Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(ls .cla
 ## Onde a pessoa está agora
 
 Gerenciador de tarefas:
-!`p="$(bash .claude/utils/task-manager/env-check.sh --provider 2>/dev/null)" && echo "TASK_MANAGER_PROVIDER=${p}" || echo "TASK_MANAGER_PROVIDER=não configurado (modo offline)"`
+!`p="$(bash .claude/utils/task-manager/env-check.sh --provider 2>/dev/null)" && echo "TASK_MANAGER_PROVIDER=${p}" || echo "TASK_MANAGER_PROVIDER=${p:-não configurado (modo offline)}"`
 
 Sessões de trabalho abertas:
 !`ls .claude/sessions/ 2>/dev/null || echo "(nenhuma sessão ainda)"`

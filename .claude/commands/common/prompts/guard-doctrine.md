@@ -91,6 +91,15 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   `grep`, `rg`, `sed`, `base64`), e também inspeção (`ls` e `stat` do arquivo: use `test -f`). Vale em
   `bypassPermissions`. Script chamado pela linha **não** é visto, e é assim que o merge verificado e a publicação de
   porta seguem andando.
+- **`Read(...)` de caminho do home vira bloqueio do sistema sob sandbox.** O Claude Code a aplica como negação de leitura
+  do sandbox: o processo do Bash não lê aquele caminho, inclusive quando o leitor é a maquinaria. Com a regra do
+  `hosts.yml` do `gh`, `gh auth status` e o credential helper do git quebram (medido). A exceção
+  `sandbox.filesystem.allowRead` no mesmo caminho vence a negação (medido em fixture e na curadoria, em uso real). A regra
+  com glob do `.env` não mostrou efeito sob sandbox: não conte com ela, em nenhum dos dois sentidos. Regra de caminho absoluto nega de verdade, e `test -r` ainda responde legível: decida por abertura real do arquivo. Decisão do maestro de
+  2026-11-09, «Manter as 12 e avisar sandbox»: a lista fica, e o `--update` avisa quem tem sandbox, sem escrever no bloco
+  dele. O que cada adotante libera é dele.
+- **Retirada:** o deny só soma, então regra errada não sai sozinha. A regra listada em `deny-retired.tsv` sai do adotante no
+  `--update`, nomeada no relatório. Limite: é por texto, então regra do adotante idêntica à aposentada também sai.
 - **A regra `Read` do `.env` também barra `Write` e `Edit`, inclusive arquivo novo.** Custo aceito pelo core em nome
   do maestro (2026-11-08, revogável): criar ou editar `.env` com segredo não é trabalho de agente. `.env.example` segue
   livre, e o `cp .env.example .env` do setup e o `>> .env` passam pelo Bash.
@@ -100,10 +109,11 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   combinada no fim, com `-C`), `git push -uvf`, `-vuf`, `-quf`, `-uqf` e o `-q` no meio do grupo do clean (`-qfdx`,
   `-fqdx`, `-qdfx`, `-fdqx`, `-qfdX`). Lista de formas não fecha contra variação; o que fecha
   é o sistema operacional.
-- **Em adotante com sandbox ligado (medido em fixture):** `cat .env` passa, e `source .env` também. `.ssh` e `.aws`
-  somem para o processo: `ssh -i` avisa que a chave não é acessível, então espere falha em push por ssh (por https não
-  muda). Push por ssh de ponta a ponta **não foi medido**. Assinatura gpg falhou no sandbox com e sem o deny, porque o
-  processo não grava no home: o efeito isolado do deny sobre ela **não foi medido**.
+- **Em adotante com sandbox ligado (medido em fixture com `bwrap` real):** `.ssh`, `.aws` e `.gnupg` somem para o processo;
+  `.netrc` e o `.credentials.json` do Claude dão *Permission denied*; `source .env` e `cat .env` andam. Nada do que viaja em
+  `.claude/` lê os caminhos negados, fora o `hosts.yml`. Em ssh, espere falha no push (`ssh -i` avisa que a chave não é
+  acessível); de ponta a ponta **não foi medido**. Assinatura gpg falhou no sandbox com e sem o deny, porque o processo não
+  grava no home: o efeito isolado do deny sobre ela **não foi medido**.
 - **Custo:** o curinga atravessa espaços, então a menção dentro de `git -C . …` cai junto: `git -C . commit -m "… git
   push --force …"`, `-m "… git clean -x …"`, `git -C . log --grep 'x push -f y'` (no `git commit` sem `-C` não cai).
   E `rm -f my-report /`, porque `-*r*` lê o `r` do nome, e `git -C clean status -x`, com pasta chamada `clean`. Saída: o maestro roda fora da sessão (`!`).

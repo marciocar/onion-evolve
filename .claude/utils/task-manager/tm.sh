@@ -49,6 +49,8 @@ provider="$(bash "${HERE}/env-check.sh" --env "${ENV_FILE}" --provider 2>/dev/nu
 case "${provider}" in
   ""|ausente)
     echo "tm: TASK_MANAGER_PROVIDER ausente (nem no ambiente, nem em ${ENV_FILE}) — rode /meta:setup-integration" >&2; exit 2 ;;
+  ilegivel)
+    echo "tm: ${ENV_FILE} existe mas está ilegível (sandbox ou permissão): não dá para saber o provider. Confira o sandbox, ou declare TASK_MANAGER_PROVIDER no ambiente." >&2; exit 2 ;;
   invalido)
     echo "tm: TASK_MANAGER_PROVIDER inválido — rode /meta:setup-integration" >&2; exit 2 ;;
   none)

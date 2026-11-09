@@ -1,0 +1,9 @@
+# deny-retired.tsv — regras de permissions.deny que o core aposentou. O `merge-onion-hooks.sh` as tira do adotante no
+# `--update`, só as exatas desta lista; o `deny-monotonic.sh` não conta a retirada como regra perdida.
+# Colunas, separadas por TAB: regra exata · data · motivo. Linha com # é comentário.
+#
+# Vazia por decisão: nenhuma regra foi aposentada até agora. Mover uma regra do deny para cá é o caminho de tirá-la do adotante,
+# porque o deny da fonte só soma.
+#
+# LIMITE: a comparação é por texto. Regra que o adotante escreveu com o MESMO texto de uma aposentada também sai.
+# Linha malformada é ignorada com aviso (deny-retired-list.sh). Regra listada que a fonte ainda traz fica no alvo, com aviso.
