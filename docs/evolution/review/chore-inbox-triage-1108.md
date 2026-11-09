@@ -2,7 +2,8 @@
 branch: chore/inbox-triage-1108
 pr: 1555
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7cd50160a6586e73bce44c82feeba2cda0bcb4c59868017e767ef74be31fc3d2
+reviewed_code_sha256: b9b24811cc7bfbec86ba4b7d1170a38fd7623769e0a79e7297c17741bb83337b
 findings_total: 12
 findings_real: 12
 findings_blocking: 1
