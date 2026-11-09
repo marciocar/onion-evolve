@@ -1,18 +1,18 @@
 ---
 branch: feat/linear-estimates-velocity-meter
-date: 2026-11-08
-reviewed_diff_sha256: 9708628a5bd80560c1390c42a41d58bf53b33695c30b1fcf693ad0846dc4723f
-reviewed_code_sha256: e323e7d1a3296d8c346642a148d4ff848320c528cfd4290d3328b6842ceb303c
-findings_total: 7
-findings_real: 7
+pr: 1554
+date: 2026-11-09
+reviewed_diff_sha256: pendente
+findings_total: 17
+findings_real: 17
 tokens: 0
-duration_min: 20
-findings_fixed: 6
-verdict: FIXED
+duration_min: 75
+findings_fixed: 17
+verdict: REJECTED_AND_FIXED
 elenxo: false
 elenxo_isolado: false
-reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes)"
-nota: "tokens = 0: não medido. Uma lente só, sobre verbos, medidor, amostra cega e bancada; o que sustenta é a bancada com mutantes e o dogfood contra o Linear real."
+reviewer: "1ª passada: o próprio agente de execução. 2ª passada: refutador independente do head 941acfecd, que reprovou; as curas deste head são do agente de execução e ainda não foram re-refutadas"
+nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada (73 casos, 102 mutantes), o backtest publicado no report e as reproduções do refutador refeitas."
 ---
 
 # Resíduo: estimativa, prazo e medidor de planejado contra executado
@@ -30,3 +30,20 @@ Passada adversarial feita por quem escreveu, depois da bancada verde na primeira
 | 7 | A taxa de pontos usa só semanas com pontos, e a fila por velocidade sai otimista. | Limite declarado no campo `limits`. |
 
 Limite que segue: o relógio é o do quadro, e 37 das 91 concluídas não têm `startedAt`. A mediana de 0,8 h mede agente, não pessoa.
+
+## 2ª passada: refutador independente (head 941acfecd)
+
+| # | Achado | Destino |
+|---|---|---|
+| 8 | CI: o `--project` quebrou a âncora do mutante `l-team` da bancada de arquivamento. | Curado: âncora nova, 27/27. |
+| 9 | CI: a bancada nova enumerava providers sem citar zoho (paridade). | Curado. |
+| 10 | Faixa descalibrada: `due_date` era p50 e somava marginais; dentro da faixa 31%, real acima do p75 em 38%. | Curado: soma por issue, estatística de ordem conformal, prazo no P80, backtest no `report`. |
+| 11 | `propose` exigia contagem, não sinal: pontos inversos saíam rc 0. | Curado: spearman, erro e comparação com ignorar os pontos; rc 3. |
+| 12 | `points_ahead_over_velocity` errava nos dois sentidos. | Curado: modo removido, porque não dá para testá-lo por backtest. |
+| 13 | Categorias sobreajustadas: 28/83 abertas em `other`; `\bkg\b` casava `[kg-ssot ·`. | Curado: colchete fora do texto classificado, `large_other` olha as abertas, as issues apontadas corrigidas. |
+| 14 | Data falsa com rc 0: concluída, cancelada, mãe de filhas abertas, iniciada há 30 dias. | Curado: `not_applicable` e `beyond_history`, com tempo decorrido condicionando os cenários. |
+| 15 | 17 de 22 mutantes do refutador sobreviviam. | Curado: casos por recusa, relógio real sem `--now`, arquivadas, ordem e permissão da amostra. |
+| 16 | Prazo comparado em UTC e não no fuso de São Paulo. | Curado: `--utc-offset`, padrão -3. |
+| 17 | Lote só por minuto de calendário; `BATCH_CLOSE_MINUTES` morta. | Curado: cadeia de fechamentos a até 60 s. |
+
+Resta: o relógio é o do quadro; depois de corrigir as categorias contra as abertas não sobra conjunto sem ver; leave-one-out cobre perto do nominal por construção, e o corte temporal hoje tem n=6. Issue velha na fila sai `beyond_history` com a data de "se iniciar agora".

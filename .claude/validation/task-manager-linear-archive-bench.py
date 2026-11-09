@@ -507,7 +507,7 @@ MUTANTS = [
     ('        state["type"] = {"in": _state_types(o["state-type"])}', '        pass', "l-type"),
     ('        state["name"] = {"eqIgnoreCase": o["state"]}', '        pass', "l-name"),
     ('        flt["updatedAt"] = {"lt": cutoff}', '        pass', "l-old"),
-    ('        flt["team"] = {"id": {"eq": _team_id(o["team"])}}\n    nodes, cursor, truncated', '        pass\n    nodes, cursor, truncated', "l-team"),
+    ('        flt["team"] = {"id": {"eq": _team_id(o["team"])}}\n    if o.get("project"):', '        pass\n    if o.get("project"):', "l-team"),
     ('    if not types or bad:', '    if False:', "l-badtype"),
     ('    if limit < 1:', '    if False:', "l-badnum"),
     ('    if not re.match(r"^\\d+$", value):', '    if False:', "l-badnum"),
