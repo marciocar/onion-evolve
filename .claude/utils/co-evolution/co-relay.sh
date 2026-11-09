@@ -54,7 +54,7 @@
 #             permissions.allow `Edit(...inbox/**)` não desfaz. Quando o inbox/ não é gravável (ou com
 #             --spool), o carteiro escreve, depois das MESMAS guardas e do mesmo dedup, em
 #             ${ONION_SPOOL_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/onion-spool}/<slug-do-destino>/,
-#             fora de qualquer repo, e o destino importa na próxima sessão (hook co-evolution-inbox-check.sh
+#             fora de qualquer repo, e o destino importa na próxima sessão ou no próximo prompt (hook co-evolution-inbox-check.sh
 #             → spool-import.sh) ou pelo /meta:co-evolve. O remetente com sandbox põe o spool no allowWrite
 #             no lugar do inbox/ do destino. <slug> = pwd -P do destino, fora de [A-Za-z0-9] vira '-'.
 #
@@ -407,7 +407,7 @@ if [ "${DRY}" -eq 1 ]; then
   echo "  fonte    : ${FROM_DIR}/"
   echo "  alvo     : ${TARGET}  (${T_LABEL})"
   echo "  destino  : ${DEST_DIR}/"
-  [ "${CHANNEL}" = inbox ] || echo "  canal    : SPOOL ${SPOOL_DIR}/ (o inbox/ do destino não é gravável daqui, ou --spool); o destino importa na próxima sessão"
+  [ "${CHANNEL}" = inbox ] || echo "  canal    : SPOOL ${SPOOL_DIR}/ (o inbox/ do destino não é gravável daqui, ou --spool); o destino importa no próximo prompt ou na próxima sessão"
   [ -z "${VENDOR_AUTH}" ] || echo "  autoriza : ${VENDOR_AUTH} (a tag ${VENDOR_TAG} do destino reproduz os ${VENDOR_NFILES} arquivos do carimbo)"
   echo "  visível  : ${T_VIS_SHOW} — ${T_VIS_HOW}"
   for f in "${FILES[@]}"; do echo "  relayar  : $(basename "$f")"; [ "${PUBLIC_GATE}" -eq 0 ] || _risk_report "$f"; done
@@ -546,7 +546,7 @@ _put() {
   if cp "$1" "${tmp}" 2>/dev/null && mv -f "${tmp}" "${dir}/${2}" 2>/dev/null; then return 0; fi
   rm -f "${tmp}" 2>/dev/null; return 1
 }
-_where() { if [ "${CHANNEL}" = inbox ]; then echo "${TARGET}/docs/evolution/inbox/$1"; else echo "spool ${SPOOL_DIR}/$1 (o destino importa na próxima sessão)"; fi; }
+_where() { if [ "${CHANNEL}" = inbox ]; then echo "${TARGET}/docs/evolution/inbox/$1"; else echo "spool ${SPOOL_DIR}/$1 (o destino importa no próximo prompt ou na próxima sessão)"; fi; }
 
 relayed=0 ; skipped=0 ; failed=0
 for i in "${!FILES[@]}"; do
