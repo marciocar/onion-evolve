@@ -2,7 +2,8 @@
 branch: feat/doorbell-session-opener
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fa76a249f0cd86fad55d83f08f43fe82fd8522c186c49a552fbb1bbafc865f69
+reviewed_code_sha256: 2570c109e40aee132bfb90c6a3cdda1ab622c8280d5a8ca5329e57fe3be5a05a
 findings_total: 9
 findings_real: 9
 findings_blocking: 0
