@@ -57,12 +57,13 @@ import urllib.parse
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_i18n, kg_query, kg_store, kg_validate, kg_vocab
+    from . import kg_i18n, kg_query, kg_screen, kg_store, kg_validate, kg_vocab
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
     import kg_i18n  # noqa: E402
     import kg_query  # noqa: E402
     import kg_store  # noqa: E402
+    import kg_screen  # noqa: E402
     import kg_validate  # noqa: E402
     import kg_vocab  # noqa: E402
 _ = kg_i18n._
@@ -266,6 +267,34 @@ TOOLS = {
 
 
 UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history", "kg_query", "kg_terms")
+SCREEN_WITHHELD = "[withheld by the kg-ssot screen: concealed text carrying an instruction to a model]"
+
+
+def screen_payload(value, path="$"):
+    """A triagem (kg_screen, 4.47.0) de cada texto do resultado de uma ferramenta que devolve conteúdo de usuários, em
+    qualquer perfil: o texto com veredito block é trocado por SCREEN_WITHHELD; quarantine passa como está. Devolve
+    (o valor triado, os achados com o caminho de cada texto). Ver o que a triagem não confere em tools/kg_screen.py."""
+    found = []
+    if isinstance(value, str):
+        r = kg_screen.screen(value)
+        if r["verdict"] != "pass":  # a frase da diretiva não sai fora do envelope: só a classe e o detalhe dos outros
+            found.append({"path": path, "verdict": r["verdict"],
+                          "findings": [f if f["class"] != "directive" else {"class": "directive"} for f in r["findings"]]})
+        return (SCREEN_WITHHELD if r["verdict"] == "block" else value), found
+    if isinstance(value, dict):
+        out = {}
+        for k, v in value.items():
+            out[k], f = screen_payload(v, f"{path}.{k}")
+            found += f
+        return out, found
+    if isinstance(value, list):
+        out = []
+        for i, v in enumerate(value):
+            x, f = screen_payload(v, f"{path}[{i}]")
+            out.append(x)
+            found += f
+        return out, found
+    return value, found
 
 # As dicas de comportamento de cada ferramenta (annotations do MCP, desde a 2025-03-26), anunciadas no tools/list
 # (4.17.2): o cliente pode pular a confirmação do que só lê e pedir a do que apaga ou sobrescreve. Nenhuma fala com o
@@ -629,8 +658,13 @@ class Server:
             payload, is_error = {"error": str(exc), "reason": "missing"}, True
         except kg_store.StoreError as exc:
             payload, is_error = {"error": str(exc)}, True
+        screened = []
+        if name in UNTRUSTED_TOOLS and not is_error:
+            payload, screened = screen_payload(payload)
         if ctx.untrusted and name in UNTRUSTED_TOOLS and not is_error:
             payload = {"untrusted_data": payload, "notice": UNTRUSTED_NOTICE}
+        if screened and isinstance(payload, dict):  # aditivo, com nome próprio: só aparece quando a triagem achou algo
+            payload = {**payload, "kg_screen": screened}
         return {"content": [{"type": "text", "text": json.dumps(payload, ensure_ascii=False)}],
                 "structuredContent": payload, "isError": is_error}
 

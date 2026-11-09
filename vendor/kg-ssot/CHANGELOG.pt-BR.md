@@ -10,6 +10,29 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.47.0] - 2026-11-09
+
+Sem mudança de contrato (segue o v4.19) e sem mudança de veredito. O que um consumidor pode notar: o `kg-mcp` pode reter
+um texto, a saída padrão do `kg_prov_export.py` passa a levar o valor de `sealed_by` e `owner`, e os anexos da release
+ganham o manifesto do vendor (`<tag>.vendor-manifest.json`). As outras novidades só valem quando pedidas.
+
+- `kg-mcp`: a triagem do conteúdo (`tools/kg_screen.py`). Cada texto devolvido pelas ferramentas que leem conteúdo
+  de usuários é triado; o texto com ocultação e instrução juntas é retido, e o que for achado sai na chave nova `kg_screen`.
+  Um `pass` não cobre homóglifos, conteúdo codificado nem outras línguas.
+- `kg_trace projection`: a página que declara `projection_faithful: true` tem cada bloco de prosa cobrado, e o bloco
+  que não cita id de nó (nem está sob um título que cite) entra em `unanchored` (`integrity.projection-unanchored`) e
+  reprova. Opcional por página; aditivo na `kg-ssot.projection/1`.
+- `kg_prov_export.py` emite `prov:Agent`: `sealed_by` como `prov:wasAttributedTo` (papel `kg:SealerRole`) e `owner` como
+  `prov:wasInfluencedBy` (papel `kg:OwnerRole`), cada um com a forma qualificada. O `owner` não é atribuição porque
+  atribuição em PROV implica participar da geração da entidade. A saída padrão só muda nos nós com esses campos, e passa
+  a levar os valores deles, como o `--full` já levava: mantenha o `sealed_by` como papel ou referência.
+- `kg_vendor.py update --verify-attestation`: a árvore vendorizada tem de bater com um manifesto que a release atestou
+  (`<tag>.vendor-manifest.json`, novo nos anexos da release a partir desta versão); senão, o update dá rc 2 e não toca no
+  vendor. Opcional, porque pede o `gh` e a rede; o carimbo registra e o update seguinte herda.
+- `kg_gate.py --touched <base>`: um modo de CI, sem linha de base, que reprova só quando um nó tocado desde o ancestral
+  comum de `<base>` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor`. A dívida
+  antiga segue aceita até alguém mexer naquele nó, e carimbar só `verified_at` ou `verified_against` não conta. Precisa do histórico do git (`fetch-depth: 0` no GitHub Actions).
+
 ## [4.46.0] - 2026-11-09
 
 Contrato v4.19, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.

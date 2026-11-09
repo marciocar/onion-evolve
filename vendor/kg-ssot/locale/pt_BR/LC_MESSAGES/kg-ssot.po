@@ -334,6 +334,14 @@ msgid ""
 "Usage:\n"
 "  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
 "             [--strict-identity] [--allow-unreleased] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
+"       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]\n"
+"\n"
+"--touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common\n"
+"ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new\n"
+"node, a node with any field changed (verified_at and verified_against alone do not count), and a node that gained the debt in the diff (it lost the SUPPORTS or SUPERSEDES\n"
+"edge reaching it, for example). It compares the working tree node by node; reformatting the YAML touches nothing. A\n"
+"renamed graph is paired by meta.id. A node moved to another graph counts as new there. rc 0: none; rc 2: a BASE that\n"
+"does not resolve (shallow clone) or a changed graph that does not parse. The vendor stamp check works as in the ratchet.\n"
 msgstr ""
 "O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
 "\n"
@@ -359,6 +367,14 @@ msgstr ""
 "Uso:\n"
 "  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
 "             [--strict-identity] [--allow-unreleased] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
+"       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]\n"
+"\n"
+"--touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e\n"
+"HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer\n"
+"campo diferente (verified_at e verified_against sozinhos não contam) e o nó que ganhou a dívida no diff (por exemplo, perdeu a aresta SUPPORTS ou SUPERSEDES que chegava a\n"
+"ele). Compara a árvore de trabalho, nó a nó; reformatar o YAML não toca. O grafo renomeado pareia pelo meta.id. O nó\n"
+"movido para outro grafo conta como novo no destino. rc 0: nenhum; rc 2: BASE que não resolve (clone raso) ou grafo\n"
+"alterado que não parseia. A conferência do carimbo do vendor vale como no modo da catraca.\n"
 
 #: tools/kg_gate.py
 msgid "accepted regression out of format: each one is an object"
@@ -1135,6 +1151,12 @@ msgid ""
 "v4.5), and not as prov:generatedAtTime: in PROV, the generation time marks when the entity exists, not when someone\n"
 "verified it.\n"
 "\n"
+"The contract has no author field, and two fields say who answers. `sealed_by`, who sealed it, becomes a prov:Agent with\n"
+"prov:wasAttributedTo and a qualified prov:Attribution (prov:hadRole kg:SealerRole; `sealed_at` goes as kg:sealedAt). `owner`, the role\n"
+"answerable for the node, becomes a prov:Agent with prov:wasInfluencedBy and a qualified prov:Influence (kg:OwnerRole), not an attribution: in PROV,\n"
+"attribution implies the agent took part in generating the entity, and the graph does not say that of an owner. The agent is the IRI itself only when the whole text is an\n"
+"http(s) URL; otherwise, a blank node labeled with the text, one per distinct text in the document. A node without those fields gets no agent.\n"
+"\n"
 "Node IRIs are <base><meta.id>#<id>, with the base urn:kg-ssot:graph: by default; the kg: vocabulary lives at\n"
 "urn:kg-ssot:vocab#, outside the graph space, so a meta.id cannot collide with it.\n"
 "\n"
@@ -1165,6 +1187,12 @@ msgstr ""
 "documento, para que nós com a mesma fonte apontem para a mesma entidade. O carimbo de verificação vai como\n"
 "kg:verifiedAt (xsd:date quando é uma data), kg:verifiedAgainst e kg:verifiedScope (o alcance, desde o v4.5), e não como prov:generatedAtTime: em PROV, o tempo\n"
 "de geração marca a existência da entidade, não a conferência dela.\n"
+"\n"
+"O contrato não tem campo de autor, e dois campos dizem quem responde. `sealed_by`, quem selou, vira prov:Agent com\n"
+"prov:wasAttributedTo e uma prov:Attribution qualificada (prov:hadRole kg:SealerRole; o `sealed_at` vai como kg:sealedAt). `owner`, o papel\n"
+"que responde pelo nó, vira prov:Agent com prov:wasInfluencedBy e uma prov:Influence qualificada (kg:OwnerRole), e não com atribuição: em PROV, a\n"
+"atribuição implica que o agente participou da geração da entidade, e o grafo não diz isso do dono. O agente é a própria IRI só quando o texto inteiro é uma\n"
+"URL http(s); senão, um nó em branco rotulado, um por texto distinto no documento. Um nó sem esses campos não ganha agente nenhum.\n"
 "\n"
 "As IRIs dos nós são <base><meta.id>#<id>, com base urn:kg-ssot:graph: por padrão; o vocabulário kg: mora em\n"
 "urn:kg-ssot:vocab#, fora do espaço dos grafos, para um meta.id não colidir com ele.\n"
@@ -2414,6 +2442,13 @@ msgid ""
 "      imports and its schema, the vector module and its requirements, requirements, guide and license), without the suite. The stamp\n"
 "      records the profile, check verifies only what the profile brought, and the next update INHERITS the\n"
 "      profile from the stamp; --profile full goes back to the whole release.\n"
+"      --verify-attestation (since 4.47) accepts the tree only if it matches the manifest the release attested: it\n"
+"      downloads the release's <tag>.vendor-manifest.json, verifies its attestation with gh (the repository, the tag\n"
+"      and the release workflow that signed it) and compares the sha256 of every file brought in and of the tag's\n"
+"      spec/release.json. Any failure (no gh, no manifest, an attestation that does not verify, a differing file) gives\n"
+"      rc 2 and leaves DIR untouched. It is optional because it needs gh and the network. --attestation-repo changes the\n"
+"      attesting repository. The stamp records the verification, and the next update INHERITS it;\n"
+"      --no-verify-attestation drops it on purpose.\n"
 "  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]\n"
 "      Only for the bench before a tag (since 4.24): brings the tree of a commit that is not a release yet, with\n"
 "      whatever spec/release.json it has (its version may still be the previous one). The stamp says \"unreleased\"\n"
@@ -2428,10 +2463,13 @@ msgid ""
 "      repository. LIMIT: the stamp vouches for itself; check catches an accidental edit, not someone who edits a\n"
 "      file AND recomputes the stamp. The review of the adopter's PR catches that (the stamp diff is in plain\n"
 "      view).\n"
+"  manifest --tag T --out FILE [--source REPO]\n"
+"      Writes the release manifest: the tag, the commit, the version and the sha256 of every file. The release workflow\n"
+"      attests and attaches it; an adopter does not need to run it.\n"
 "\n"
 "rc: 0 ok · 1 vendor diverges from the stamp · 2 broken input (tag does not exist, release.json missing or not\n"
 "matching the tag, release entry with no file, tag member that is not a regular file, stamp missing, unreadable\n"
-"or malformed, DIR without a stamp or edited without --force).\n"
+"or malformed, DIR without a stamp or edited without --force, an attestation that does not verify).\n"
 "The kit's scripts do not write bytecode (sys.dont_write_bytecode): RUNNING the gate as a script does not dirty\n"
 "the vendor. IMPORTING a kit module from another process does: Python writes the module's .pyc before it runs the\n"
 "module's code. That is why the guide runs everything with `python3 -I -B`, and whoever imports the kit uses -B or\n"
@@ -2456,6 +2494,12 @@ msgstr ""
 "      consulta que ele importa e o schema dele, o módulo vetorial e os requirements dele, requirements, guia e licença), sem a suíte. O carimbo\n"
 "      registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;\n"
 "      --profile full volta à release inteira.\n"
+"      --verify-attestation (desde a 4.47) só aceita a árvore se ela bater com o manifesto que a release atestou: baixa\n"
+"      o <tag>.vendor-manifest.json da release, confere a atestação com o gh (o repositório, a tag e o workflow de\n"
+"      release que assinou) e compara o sha256 de cada arquivo trazido e o do spec/release.json da tag. Qualquer falha\n"
+"      (sem gh, sem manifesto, atestação que não verifica, arquivo diferente) dá rc 2 e não toca em DIR. É opcional porque\n"
+"      pede o gh e a rede. --attestation-repo muda o repositório que atesta. O carimbo registra a verificação, e o update\n"
+"      seguinte a HERDA; --no-verify-attestation a tira de propósito.\n"
 "  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]\n"
 "      Só para a bancada antes da tag (desde a 4.24): traz a árvore de um commit que ainda não é release, com o\n"
 "      spec/release.json que ele tiver (a versão dele pode ser a anterior). O carimbo diz \"unreleased\" no lugar da\n"
@@ -2468,10 +2512,13 @@ msgstr ""
 "      de fim de linha que a árvore de trabalho esconde. O contrato não se customiza no adotante; uma mudança necessária volta ao produto\n"
 "      como issue no repositório público. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um\n"
 "      arquivo E recalcula o carimbo. Isso o review do PR do adotante pega (o diff do carimbo fica à vista).\n"
+"  manifest --tag T --out ARQUIVO [--source REPO]\n"
+"      Escreve o manifesto da release: a tag, o commit, a versão e o sha256 de cada arquivo. É o que o workflow de release\n"
+"      atesta e anexa; o adotante não precisa rodar.\n"
 "\n"
 "rc: 0 ok · 1 vendor divergente do carimbo · 2 entrada quebrada (tag inexistente, release.json ausente ou que\n"
 "não bate com a tag, entrada da release sem arquivo, membro da tag que não é arquivo regular, carimbo ausente,\n"
-"ilegível ou fora do formato, DIR sem carimbo ou editado sem --force).\n"
+"ilegível ou fora do formato, DIR sem carimbo ou editado sem --force, atestação que não verifica).\n"
 "Os scripts do kit não gravam bytecode (sys.dont_write_bytecode): RODAR o gate como script não suja o vendor.\n"
 "IMPORTAR um módulo do kit a partir de outro processo suja: o Python grava o .pyc do módulo antes de executar o\n"
 "código dele. Por isso o guia roda tudo com `python3 -I -B`, e quem importa o kit usa -B ou PYTHONDONTWRITEBYTECODE=1.\n"
@@ -4061,3 +4108,111 @@ msgstr "{names} nome(s) citado(s) com commit e fora da lista, em {n} citação(�
 #: tools/kg_trace.py
 msgid "· {page}  `{id}` is {status} in the graph: the page rests on what the graph replaced or overturned"
 msgstr "· {page}  `{id}` está {status} no grafo: a página se apoia no que o grafo trocou ou derrubou"
+
+#: tools/kg_validate.py
+msgid "A page that declares projection_faithful has a prose block that cites no node id, and the heading of its section cites none either."
+msgstr "Uma página que declara projection_faithful tem um bloco de prosa que não cita id de nó, e o título da seção dele também não cita."
+
+#: tools/kg_validate.py
+msgid "Cite the node the block rests on, between backticks, or move the block under a heading that cites it; if the page is not meant to be faithful, drop projection_faithful."
+msgstr "Cite entre crases o nó em que o bloco se apoia, ou ponha o bloco sob um título que o cite; se a página não é para ser fiel, tire o projection_faithful."
+
+#: tools/kg_trace.py
+msgid "{page}: projection_faithful is true or false"
+msgstr "{page}: projection_faithful é true ou false"
+
+#: tools/kg_vendor.py
+msgid "--verify-attestation needs the GitHub CLI (gh) on the PATH: nothing was changed"
+msgstr "--verify-attestation precisa do GitHub CLI (gh) no PATH: nada foi alterado"
+
+#: tools/kg_vendor.py
+msgid "gh took more than {seconds} s: nothing was changed"
+msgstr "o gh levou mais de {seconds} s: nada foi alterado"
+
+#: tools/kg_vendor.py
+msgid "attestation of {tag}: could not download {name} from {repo} (releases before 4.47.0 have none): {error}"
+msgstr "atestação de {tag}: não deu para baixar {name} de {repo} (as releases antes da 4.47.0 não têm): {error}"
+
+#: tools/kg_vendor.py
+msgid "attestation of {tag} did not verify in {repo}: {error}"
+msgstr "a atestação de {tag} não verificou em {repo}: {error}"
+
+#: tools/kg_vendor.py
+msgid "the manifest of {tag} is not JSON"
+msgstr "o manifesto de {tag} não é JSON"
+
+#: tools/kg_vendor.py
+msgid "the manifest of {tag} is out of shape or names another tag"
+msgstr "o manifesto de {tag} está fora da forma ou nomeia outra tag"
+
+#: tools/kg_vendor.py
+msgid "the tree brought from {tag} differs from the attested manifest: {files}"
+msgstr "a árvore trazida de {tag} difere do manifesto atestado: {files}"
+
+#: tools/kg_vendor.py
+msgid "manifest written: {out} ({n} files)"
+msgstr "manifesto escrito: {out} ({n} arquivos)"
+
+#: tools/kg_vendor.py
+msgid "attestation check inherited from the stamp (--no-verify-attestation drops it)"
+msgstr "conferência da atestação herdada do carimbo (--no-verify-attestation a tira)"
+
+#: tools/kg_vendor.py
+msgid "--verify-attestation needs --tag: a bench commit has no release to attest it"
+msgstr "--verify-attestation precisa de --tag: um commit de bancada não tem release que o ateste"
+
+#: tools/kg_vendor.py
+msgid "--attestation-repo {repo}: expected owner/name"
+msgstr "--attestation-repo {repo}: esperado dono/nome"
+
+#: tools/kg_vendor.py
+msgid "refuses a tree that does not match the manifest the release attested (needs gh)"
+msgstr "recusa a árvore que não bate com o manifesto que a release atestou (pede o gh)"
+
+#: tools/kg_vendor.py
+msgid "the owner/name repository that attests the release"
+msgstr "o repositório dono/nome que atesta a release"
+
+#: tools/kg_vendor.py
+msgid "writes the release manifest that the release workflow attests"
+msgstr "escreve o manifesto que o workflow de release atesta"
+
+#: tools/kg_vendor.py
+msgid "stamp in {dest}: attestation is malformed (--no-verify-attestation replaces it)"
+msgstr "carimbo em {dest}: attestation fora da forma (--no-verify-attestation o substitui)"
+
+#: tools/kg_gate.py
+msgid "another mode: fails only when a node touched since the common ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor"
+msgstr "outro modo: reprova só se um nó tocado desde o ancestral comum de BASE e HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor"
+
+#: tools/kg_gate.py
+msgid "if this is a shallow clone, it needs the history (fetch-depth: 0)"
+msgstr "se for um clone raso, ele precisa do histórico (fetch-depth: 0)"
+
+#: tools/kg_gate.py
+msgid "revision {rev} not found in {repo}: {hint}"
+msgstr "revisão {rev} não encontrada em {repo}: {hint}"
+
+#: tools/kg_gate.py
+msgid "no common ancestor between {rev} and HEAD: {hint}"
+msgstr "sem ancestral comum entre {rev} e HEAD: {hint}"
+
+#: tools/kg_gate.py
+msgid "changed graph does not parse: {name}"
+msgstr "grafo alterado não parseia: {name}"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --touched does not go with --update, --baseline, --granularity, --accept-regression or --strict-identity"
+msgstr "GATE QUEBRADO  --touched não combina com --update, --baseline, --granularity, --accept-regression nem --strict-identity"
+
+#: tools/kg_gate.py
+msgid "✗ touched node carries the debt: {graph}#{node} {code}"
+msgstr "✗ nó tocado carrega a dívida: {graph}#{node} {code}"
+
+#: tools/kg_gate.py
+msgid "✗ --touched: occurrences on nodes touched since {base}: {count}. Cure each one, or leave the node as it was"
+msgstr "✗ --touched: ocorrências em nós tocados desde {base}: {count}. Cure cada um, ou deixe o nó como estava"
+
+#: tools/kg_gate.py
+msgid "· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})"
+msgstr "· --touched: nenhum nó tocado carrega a dívida desde {base} (grafos alterados: {graphs})"

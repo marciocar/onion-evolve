@@ -156,6 +156,8 @@ jobs:
           "$RUNNER_TEMP/use/bin/pip" install --quiet --no-deps dist/pypi/*.whl
           SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python -I packaging/sbom/sbom.py dist/mcpb/*.mcpb --outdir dist/sbom --env "$RUNNER_TEMP/use/bin/python"
           echo "V=$(python3 -c "import json; print(json.load(open('spec/release.json'))['version'])")" >> "$GITHUB_ENV"
+      - name: Manifesto da árvore da release, o que o kg_vendor update --verify-attestation confere
+        run: python -I tools/kg_vendor.py manifest --tag "$GITHUB_REF_NAME" --source . --out "dist/vendor/$GITHUB_REF_NAME.vendor-manifest.json"
       - name: Atestação de proveniência dos artefatos (gh attestation verify <arquivo> --repo marciocar/kg-ssot)
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
         with:
@@ -163,6 +165,7 @@ jobs:
             dist/mcpb/*.mcpb
             dist/pypi/*
             dist/npm/*.tgz
+            dist/vendor/*.vendor-manifest.json
       - name: SBOM do wheel atestado (gh attestation verify kg_ssot-${{ env.V }}-py3-none-any.whl --repo marciocar/kg-ssot --predicate-type https://cyclonedx.org/bom)
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
         with:
@@ -192,7 +195,20 @@ jobs:
           version="${GITHUB_REF_NAME#kg-ssot-v}"
           python -I tools/kg_release_notes.py --version "$version" > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
-            --notes-file "$RUNNER_TEMP/notes.md" --title "KG-SSOT $version" dist/mcpb/*.mcpb dist/pypi/* dist/npm/*.tgz dist/sbom/*.cdx.json
+            --notes-file "$RUNNER_TEMP/notes.md" --title "KG-SSOT $version" dist/mcpb/*.mcpb dist/vendor/*.vendor-manifest.json dist/pypi/* dist/npm/*.tgz dist/sbom/*.cdx.json
+      - name: Prova de ponta a ponta do manifesto atestado (o update real passa, e a árvore alterada dá rc 2)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -I tools/kg_vendor.py update --tag "$GITHUB_REF_NAME" --source . --dest "$RUNNER_TEMP/vendor-ok" --verify-attestation
+          git clone --quiet . "$RUNNER_TEMP/alter"
+          printf '\n# alterado\n' >> "$RUNNER_TEMP/alter/tools/kg_vendor.py"
+          git -C "$RUNNER_TEMP/alter" -c user.name=release -c user.email=release@invalid commit --quiet -am alterado
+          git -C "$RUNNER_TEMP/alter" tag -f "$GITHUB_REF_NAME"
+          rc=0
+          python -I tools/kg_vendor.py update --tag "$GITHUB_REF_NAME" --source "$RUNNER_TEMP/alter" --dest "$RUNNER_TEMP/vendor-bad" --verify-attestation || rc=$?
+          test "$rc" = 2
+          test ! -e "$RUNNER_TEMP/vendor-bad"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: mcpb-final

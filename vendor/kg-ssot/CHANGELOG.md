@@ -10,6 +10,30 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.47.0] - 2026-11-09
+
+No contract change (still v4.19), and no verdict changes. What a consumer can see: `kg-mcp` may withhold a text, the
+default output of `kg_prov_export.py` now carries the value of `sealed_by` and `owner`, and the release assets gain the
+vendor manifest (`<tag>.vendor-manifest.json`). The other additions apply only when you ask for them.
+
+- `kg-mcp`: the content screen (`tools/kg_screen.py`). Every text returned by the tools that read users' content
+  is screened; a text with concealment and an instruction together is withheld, and anything found is listed in a new
+  `kg_screen` key. A `pass` does not cover homoglyphs, encoded payloads or other languages.
+- `kg_trace projection`: a page that declares `projection_faithful: true` has every prose block checked, and a block
+  that cites no node id (nor sits under a heading that cites one) is listed in `unanchored`
+  (`integrity.projection-unanchored`) and fails. Opt-in per page; additive in `kg-ssot.projection/1`.
+- `kg_prov_export.py` emits `prov:Agent`: `sealed_by` as `prov:wasAttributedTo` (role `kg:SealerRole`) and `owner` as
+  `prov:wasInfluencedBy` (role `kg:OwnerRole`), each with its qualified form. `owner` is not an attribution because
+  attribution in PROV implies taking part in generating the entity. The default output changes only for nodes with
+  those fields, and it now carries their values, which `--full` already did: keep `sealed_by` a role or a reference.
+- `kg_vendor.py update --verify-attestation`: the vendored tree must match a manifest the release attested
+  (`<tag>.vendor-manifest.json`, new in the release assets from this version on), or the update gives rc 2 and leaves
+  the vendor untouched. Optional, since it needs `gh` and the network; the stamp records it and the next update
+  inherits it.
+- `kg_gate.py --touched <base>`: a CI mode, with no baseline, that fails only when a node touched since the common
+  ancestor of `<base>` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor`. Old debt
+  stays accepted until someone works on that node, and re-stamping `verified_at` or `verified_against` alone does not count. Needs the git history (`fetch-depth: 0` on GitHub Actions).
+
 ## [4.46.0] - 2026-11-09
 
 Contract v4.19, SHOULD only: nothing that passed fails, and no MUST verdict changes.

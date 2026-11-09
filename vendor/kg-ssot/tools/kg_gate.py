@@ -50,6 +50,14 @@ reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
 Uso:
   kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]
              [--strict-identity] [--allow-unreleased] [--update [--accept-regression MOTIVO] [--granularity graph|node]]
+       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]
+
+--touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e
+HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer
+campo diferente (verified_at e verified_against sozinhos não contam) e o nó que ganhou a dívida no diff (por exemplo, perdeu a aresta SUPPORTS ou SUPERSEDES que chegava a
+ele). Compara a árvore de trabalho, nó a nó; reformatar o YAML não toca. O grafo renomeado pareia pelo meta.id. O nó
+movido para outro grafo conta como novo no destino. rc 0: nenhum; rc 2: BASE que não resolve (clone raso) ou grafo
+alterado que não parseia. A conferência do carimbo do vendor vale como no modo da catraca.
 """
 import argparse
 import collections
@@ -213,6 +221,100 @@ def stamp_problems(allow_unreleased=False):
             out.append(_("✗ vendor contract differs from the stamp: {rel} (run kg_vendor.py check; the schema is not"
                          " the one from the stamped release)").format(rel=rel))
     return out
+
+
+TOUCHED_CODES = ("integrity.bare-decision", "integrity.superseded-without-successor")
+
+
+def _node_debt(text):
+    """(nós por id, {(id, código)} da dívida do --touched) de um grafo, ou (None, None) se ele não parseia."""
+    _head, doc, err = kg_validate.parse_v1(text)
+    if err or not isinstance(doc, dict):
+        return None, None
+    listed = doc.get("nodes") if isinstance(doc.get("nodes"), list) else []
+    by_id, by_place = {}, {}
+    for i, n in enumerate(listed):
+        if isinstance(n, dict) and isinstance(n.get("id"), str) and n["id"]:
+            by_id[n["id"]] = n
+            by_place[kg_validate.item_place("nodes", i, n)] = n["id"]
+    debt = {(by_place[place], code) for code, place in kg_validate.coherence_located(doc)
+            if code in TOUCHED_CODES and place in by_place}
+    return by_id, debt
+
+
+STAMP_FIELDS = ("verified_at", "verified_against")  # uma rodada de frescor carimba em massa e não paga a dívida do nó
+
+
+def _canon(node):
+    """A forma de comparar dois nós, sem o carimbo: 1 e true são campos diferentes, e .nan é igual a si mesmo, o que o ==
+    não dá."""
+    body = {k: v for k, v in node.items() if k not in STAMP_FIELDS}
+    try:
+        return json.dumps(body, sort_keys=True, ensure_ascii=False, default=str)
+    except TypeError:  # chave de tipos misturados, que já reprova no MUST
+        return repr(body)
+
+
+def _git_out(repo, *args):
+    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True)
+
+
+def _common_ancestor(repo, rev):
+    """O ancestral comum de rev e HEAD: comparar com a ponta de rev poria na conta os nós que a main ganhou depois."""
+    if not rev or rev.startswith("-"):
+        raise Broken(_("invalid revision {rev}: it cannot be empty or start with '-'").format(rev=repr(rev)))
+    hint = _("if this is a shallow clone, it needs the history (fetch-depth: 0)")
+    if _git_out(repo, "rev-parse", "--verify", "-q", "--end-of-options", rev + "^{commit}").returncode != 0:
+        raise Broken(_("revision {rev} not found in {repo}: {hint}").format(rev=rev, repo=repo, hint=hint))
+    out = _git_out(repo, "merge-base", "--end-of-options", rev, "HEAD")
+    if out.returncode != 0:
+        raise Broken(_("no common ancestor between {rev} and HEAD: {hint}").format(rev=rev, hint=hint))
+    return out.stdout.decode("ascii").strip()
+
+
+def _base_text(repo, rev, name):
+    # ./ porque o caminho vem relativo a --repo, e o git show sem ele resolve a partir da raiz do repositório; o fim de
+    # linha normalizado é o que o read_text da árvore de trabalho faz
+    out = _git_out(repo, "show", f"{rev}:./{name}")
+    if out.returncode != 0:
+        return None
+    return out.stdout.decode("utf-8", "replace").replace("\r\n", "\n").replace("\r", "\n")
+
+
+def touched_debt(repo, rev, items, exclude, skip_vendor=True):
+    """(sha do ancestral, [(grafo, id, código)], grafos alterados): a dívida nos nós tocados desde o ancestral comum."""
+    sha = _common_ancestor(repo, rev)
+    out = _git_out(repo, "ls-tree", "-r", "-z", "--name-only", sha)
+    if out.returncode != 0:
+        raise Broken(_("{repo} is not a git repository: {err}").format(
+            repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
+    listed = [n for n in out.stdout.decode("utf-8").split("\0") if n]
+    vendors = kg_validate.vendor_dirs(listed)
+    names = {n for n in listed if selected(n, exclude) and not (skip_vendor and kg_validate.in_vendor(n, vendors))}
+    renamed = None  # meta.id → [caminhos da base que sumiram], lido só quando aparece um caminho novo
+    found, changed = [], 0
+    for name, text in items:
+        before = _base_text(repo, sha, name) if name in names else None
+        if before is None:
+            if renamed is None:
+                renamed = collections.defaultdict(list)
+                for old in names:
+                    if not (pathlib.Path(repo) / old).is_file():
+                        renamed[graph_id(_base_text(repo, sha, old) or "")].append(old)
+            twins = renamed.get(graph_id(text), []) if graph_id(text) else []
+            before = _base_text(repo, sha, twins[0]) if len(twins) == 1 else None
+        if before == text:
+            continue
+        changed += 1
+        now_nodes, now_debt = _node_debt(text)
+        if now_nodes is None:
+            raise Broken(_("changed graph does not parse: {name}").format(name=name))
+        old_nodes, old_debt = _node_debt(before) if before is not None else ({}, set())
+        old_nodes, old_debt = old_nodes or {}, old_debt or set()
+        for nid, code in sorted(now_debt):
+            if nid not in old_nodes or _canon(old_nodes[nid]) != _canon(now_nodes[nid]) or (nid, code) not in old_debt:
+                found.append((name, nid, code))
+    return sha, found, changed
 
 
 GRANULARITIES = ("graph", "node")
@@ -583,7 +685,43 @@ fails (rc 1) unless --allow-unreleased is given, and it never writes the baselin
 Usage:
   kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
              [--strict-identity] [--allow-unreleased] [--update [--accept-regression REASON] [--granularity graph|node]]
+       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]
+
+--touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common
+ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new
+node, a node with any field changed (verified_at and verified_against alone do not count), and a node that gained the debt in the diff (it lost the SUPPORTS or SUPERSEDES
+edge reaching it, for example). It compares the working tree node by node; reformatting the YAML touches nothing. A
+renamed graph is paired by meta.id. A node moved to another graph counts as new there. rc 0: none; rc 2: a BASE that
+does not resolve (shallow clone) or a changed graph that does not parse. The vendor stamp check works as in the ratchet.
 """
+
+
+def run_touched(args):
+    """O modo --touched: rc 0 sem dívida em nó tocado, 1 com ela (ou vendor fora do carimbo), 2 entrada quebrada."""
+    if args.update or args.baseline or args.granularity or args.accept_regression or args.strict_identity:
+        print(_("GATE BROKEN  --touched does not go with --update, --baseline, --granularity, --accept-regression or"
+                " --strict-identity"))
+        return 2
+    exclude = (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude)
+    try:
+        items = corpus(args.repo, exclude, skip_vendor=not args.no_default_excludes)
+        sha, found, changed = touched_debt(args.repo, args.touched, items, exclude,
+                                           skip_vendor=not args.no_default_excludes)
+        tampered = stamp_problems(args.allow_unreleased)
+    except (Broken, OSError, ValueError) as exc:
+        print(_("GATE BROKEN  {error}").format(error=exc))
+        return 2
+    for line in tampered:
+        print(line)
+    for name, nid, code in found:
+        print(_("✗ touched node carries the debt: {graph}#{node} {code}").format(graph=name, node=nid, code=code))
+    if found:
+        print(_("✗ --touched: occurrences on nodes touched since {base}: {count}. Cure each one, or leave the node as it was").format(
+            count=len(found), base=sha[:12]))
+    else:
+        print(_("· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})").format(
+            base=sha[:12], graphs=changed))
+    return 1 if found or tampered else 0
 
 
 def main(argv=None):
@@ -607,11 +745,16 @@ def main(argv=None):
                            " before 4.16.0"))
     ap.add_argument("--accept-regression", metavar="REASON",
                     help=_("with --update: accepts a regression, with the reason in the baseline"))
+    ap.add_argument("--touched", metavar="BASE",
+                    help=_("another mode: fails only when a node touched since the common ancestor of BASE and HEAD "
+                           "carries integrity.bare-decision or integrity.superseded-without-successor"))
     ap.add_argument("--granularity", choices=GRANULARITIES,
                     help=_("with --update: changes the granularity of the SHOULD debt (graph, the default, or node);"
                            " without it, the baseline's applies"))
     args = ap.parse_args(argv)
     _utf8_stdio()
+    if args.touched is not None:
+        return run_touched(args)
     if args.granularity and not args.update:
         print(_("GATE BROKEN  --granularity only works with --update (the baseline remembers the granularity)"))
         return 2

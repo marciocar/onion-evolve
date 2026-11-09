@@ -247,6 +247,7 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--accept-regression "<reason>"` | Accepts a regression; the reason is recorded in the baseline |
 | `--exclude GLOB` | Removes paths from the corpus (repeatable). `*/fixtures/*`, `docs/materials/*`, and the KG-SSOT vendor (any folder with the `.kg-ssot-version` stamp, since 4.19.1) are excluded by default; `--no-default-excludes` brings them back |
 | `--granularity node` | With `--update`: counts the SHOULD debt per occurrence, not per graph |
+| `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor` |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |
 
@@ -633,6 +634,15 @@ write or a name that does not exist comes with `isError: true`, so the model can
     "notice": ...}`, so the model treats text written by others as data, never as instructions.
   - **What the profile is not:** it is "behind a proxy", on a private network. It is not the OAuth profile of the MCP
     specification, which waits until there is a measured matrix of clients.
+- **The content screen (4.47.0):** in any profile, every text that `kg_get`, `kg_list`, `kg_history`, `kg_query`, and
+  `kg_terms` return is screened before it reaches the model (`tools/kg_screen.py`, standard library only, a pure
+  function of the text). Three verdicts: `pass` (nothing found); `quarantine` (one signal alone: an invisible
+  character, a hidden region such as an HTML comment or an element hidden by its own attributes, or a phrase aimed at a
+  model), which goes through unchanged; and `block` (concealment and an instruction together), which is replaced by a
+  `[withheld ...]` marker. When anything is found, the result gains a `kg_screen` key with the path, the verdict and the
+  findings of each text. Measured on this repository: 2 of 5,913 node texts in quarantine (template comments), none
+  blocked. What a `pass` does not guarantee: homoglyphs, encoded payloads (base64, hex), directives in languages
+  other than English and Portuguese, and CSS hiding declared outside the element.
 - **The OCI image:** `ghcr.io/marciocar/kg-ssot:<version>` ships `kg-mcp` ready to run as a service next to a client
   without Python, such as LibreChat. It is built from the same wheel as PyPI, with the dependencies pinned by hash and
   the base pinned by digest (`packaging/oci/Dockerfile`), runs as an unprivileged user (uid 10001), and keeps the
@@ -1464,6 +1474,14 @@ projection_ignore:   # names between backticks that are not node ids
 - **Four buckets.** `resolved` (in a graph of `projection_of`); `elsewhere` (only in another graph of the repository: a
   warning, not a failure); `outside` (`projection_of` names a graph of another repository by URL that `--with` did not
   read: not judged, counted); `missing` (`integrity.projection-id-missing`).
+- **A faithful page (4.47.0).** A page that declares `projection_faithful: true` in its front matter has every prose
+  block checked: a paragraph or a list item with eight words or more, outside code, headings, tables and quotes, has
+  to cite, between backticks, a node id that resolves in a graph of `projection_of` (an id in `projection_ignore` or
+  in another graph does not count), or sit under a heading that cites one. A block that does not is listed in
+  `unanchored` (`integrity.projection-unanchored`, with the line and the first 120 characters) and fails (rc 1). It checks that a citation is
+  there, not that the sentence is supported by the node: that part is still a human read. A value other than `true`
+  or `false` is broken input (rc 2). Measured on this repository before the rule: 363 of 878 blocks of the 44
+  projection pages cite nothing, which is why the rule is opt-in per page.
 - **A cited node that its graphs replaced (4.46.0).** An id that resolves only to `superseded` or `refuted` nodes of
   the graphs of `projection_of` is also listed in `superseded_cited`, with a warning: the page rests on what the graph
   replaced or overturned. If one of those graphs has the id alive, there is no warning. The rc does not change, and the
@@ -1472,8 +1490,8 @@ projection_ignore:   # names between backticks that are not node ids
   git repository that has it, as in `kg_query --chain`. A URL that `--with` covers and that does not read (absent at
   the ref, not UTF-8, not a graph) is a graph error (rc 1), never `outside`. A graph read from the working tree because
   the ref of the URL is not in that folder is listed in `unpinned`, with a warning.
-- **Output and rc.** `--format json` gives `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 with no `missing`
-  and every graph of `projection_of` read; 1 otherwise; 2 on broken input (a front matter that does not read, a
+- **Output and rc.** `--format json` gives `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 with no `missing`,
+  no `unanchored` and every graph of `projection_of` read; 1 otherwise; 2 on broken input (a front matter that does not read, a
   `--root` that is not a folder).
 
 ### The sources that are absent: `--strict-sources` (4.44.0)
@@ -1638,6 +1656,17 @@ the source and a `prov:Derivation` whose activity carries the `method`; `locator
 properties. A source that is entirely one http(s) URL becomes the IRI itself; any other source (a path, a command, two
 URLs together) becomes a labeled blank node, one per distinct text, so nodes with the same source point to the same
 entity.
+
+The contract has no author field, and the export does not invent one. Two fields say who answers, and each becomes a
+`prov:Agent`. `sealed_by` goes as `prov:wasAttributedTo` with a qualified `prov:Attribution` (role `kg:SealerRole`,
+with `sealed_at` as `kg:sealedAt`). `owner` goes as `prov:wasInfluencedBy` with a qualified `prov:Influence` (role
+`kg:OwnerRole`), because attribution in PROV implies the agent took part in generating the entity, and the graph does
+not say that of the role that answers for a node. A node without those fields gets no agent, so its output is the same
+as before. A blank-node agent is local to one export: `_:agent0` in two exports is not the same agent.
+
+The value of `sealed_by` goes out in the default output, and an agent that seals several nodes is one resource linked to
+all of them. Keep it a role or a reference (`role:change-advisory-board`), not a name, as in
+[Personal data](../../ADOPTING.md#personal-data-lgpd-and-gdpr).
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \
