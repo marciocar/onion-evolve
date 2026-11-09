@@ -7,8 +7,8 @@ meta:
   baseline: "2026-11-08"
   review_after: "2026-12-08"
   purpose: "Guardar os selos da rodada de perguntas de 2026-11-08 que não têm grafo natural aberto. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
-  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia) mais, na leva seguinte do mesmo dia, 2 selos do escopo e dos riscos do WAHA e 3 perguntas abertas, uma por risco a medir no piloto; por fim, o selo do sandbox e 2 perguntas abertas que nascem dele. Em 2026-11-09 entram aqui, por ordem da sessão do core, a evidência da rodada desse dia, os 4 selos dela e 1 pergunta aberta sobre o próximo update da consultoria. Outra decisão nova vai para o grafo do assunto."
-  # ═══ TETO: 24 NÓS ═══
+  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia) mais, na leva seguinte do mesmo dia, 2 selos do escopo e dos riscos do WAHA e 3 perguntas abertas, uma por risco a medir no piloto; por fim, o selo do sandbox e 2 perguntas abertas que nascem dele. Em 2026-11-09 entram aqui, por ordem da sessão do core, a evidência da rodada desse dia, os 4 selos dela e 1 pergunta aberta sobre o próximo update da consultoria. Na mesma data entram também os 3 selos sobre o diff do /meta:personality-sync, que descendem do selo de 2026-11-08 sobre o mesmo diff. Outra decisão nova vai para o grafo do assunto."
+  # ═══ TETO: 27 NÓS ═══
 nodes:
   - id: E_MD_MAESTRO_ROUND_1108
     node_type: evidence
@@ -105,6 +105,54 @@ nodes:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-08: «personality-sync»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-08"
+      locality: "pessoa"
+  - id: D_MD_PERSONALITY_APPLY_TRIMMED_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções, relatada pela sessão do core no brief deste PR: escolhida «Aplicar sem M10 e M13»"
+    label: "O retrato de 2026-11-09 entra sem as duas mudanças de uma ocorrência só."
+    narrative: "Saem a especialidade de medição com pré-registro e modelo falso e o Aparte do Maestro, cada uma vista uma vez; a menção ao stub no que a instância oferece sai junto. Selado em 2026-11-09: escolhida a aplicação sem essas duas mudanças (a opção literal está em verified_against); descartadas: «Aplicar as 22», «Não aplicar»."
+    provenance:
+      source: "maestro, por pergunta com opções, relatado pela sessão do core"
+      locator: "pergunta com opções de 2026-11-09 sobre o diff do /meta:personality-sync"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MD_ADOPT_UPDATE_OUT_OF_PERSONALITY_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções, relatada pela sessão do core no brief deste PR: escolhida «Tirar da personalidade»"
+    label: "A linha do adopt-update sai da personalidade, porque o erro não foi superado."
+    narrative: "O retrato listava o erro entre os superados, e dois dos três defeitos seguiam abertos no código de 2026-11-09. Selado em 2026-11-09: escolhida «Tirar da personalidade»; descartadas: «Manter como aberto»."
+    provenance:
+      source: "maestro, por pergunta com opções, relatado pela sessão do core"
+      locator: "pergunta com opções de 2026-11-09 sobre o diff do /meta:personality-sync"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MD_PUBLIC_SURFACE_CLEAN_CURRENT_ONLY_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções, relatada pela sessão do core no brief deste PR: escolhida «Limpar o estado atual»"
+    label: "A exposição no repo público se limpa no estado atual, sem reescrever o histórico do git."
+    narrative: "O alvo são os dados de máquina do registro da federação e as entradas do diário apontadas no diff. O histórico segue público, e o PR que executa a limpeza declara isso. Selado em 2026-11-09: escolhida «Limpar o estado atual»; descartadas: «Limpar e reescrever o histórico», «Deixar como está»."
+    provenance:
+      source: "maestro, por pergunta com opções, relatado pela sessão do core"
+      locator: "pergunta com opções de 2026-11-09 sobre o diff do /meta:personality-sync"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
       locality: "pessoa"
   - id: D_MD_FEDERATION_PAGE_SCRUB_1108
     node_type: decision
@@ -373,6 +421,15 @@ edges:
     edge_type: TRACES_TO
   - from: D_MD_PERSONALITY_SYNC_RUN_DIFF_1108
     to: E_MD_MAESTRO_ROUND_1108
+    edge_type: TRACES_TO
+  - from: D_MD_PERSONALITY_APPLY_TRIMMED_1109
+    to: D_MD_PERSONALITY_SYNC_RUN_DIFF_1108
+    edge_type: TRACES_TO
+  - from: D_MD_ADOPT_UPDATE_OUT_OF_PERSONALITY_1109
+    to: D_MD_PERSONALITY_SYNC_RUN_DIFF_1108
+    edge_type: TRACES_TO
+  - from: D_MD_PUBLIC_SURFACE_CLEAN_CURRENT_ONLY_1109
+    to: D_MD_PERSONALITY_SYNC_RUN_DIFF_1108
     edge_type: TRACES_TO
   - from: D_MD_FEDERATION_PAGE_SCRUB_1108
     to: E_MD_MAESTRO_ROUND_1108
