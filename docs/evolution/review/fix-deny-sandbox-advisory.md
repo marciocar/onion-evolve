@@ -2,7 +2,8 @@
 branch: fix/deny-sandbox-advisory
 pr: 1558
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e62c0bdb534bc78f035e47baa0c77dc5febff85d210518cfafbbd3d38c4f5c64
+reviewed_code_sha256: c910badd0a16df0260e51400e181f79268d625567f83911f03bd7c1cfb7e175d
 findings_total: 17
 findings_real: 17
 findings_blocking: 2
