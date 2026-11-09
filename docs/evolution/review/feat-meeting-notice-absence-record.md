@@ -37,6 +37,6 @@ nota: "tokens 0 = não medido. meeting-graph-check --selftest verde; família me
 
 ## Teto
 
-- Não é conformidade, e nenhuma análise jurídica foi feita. `Q_MC_NOTICE_ABSENT_LEGAL_READING_1109` fica aberto.
+- Não é conformidade, e nenhuma análise jurídica foi feita. A pendência da leitura jurídica não tem nó: o grafo da captura está no teto de nós declarado (REGRA 58), e o PR a nomeia para a sessão registrar onde couber.
 - O adotante de consultoria só recebe isto no próximo `--update`; a exceção nomeada no gate dele não foi tocada, e migrar é ato da sessão dele.
 - A linha final do CLI tem caso (c2), sem mutante próprio.
