@@ -64,7 +64,7 @@ PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "ca
 TEAM_WINDOW = 10 ** 6
 SERVED_BASES = ("already_started", "conditional_on_age_in_queue", "assumes_start_now")
 WALK_ORIGINS, WALK_STEP_DAYS = 8, 3   # datas passadas em que a faixa é reconstruída para medir o caminho servido
-SERVED_MIN = 10                       # desfechos mínimos do caminho para ele poder dar data
+SERVED_MIN = 10                       # issues com desfecho para o acerto do caminho contar como medido
 LOW_SERVED_COVERAGE = 0.5
 OPEN_STATES = "triage,backlog,unstarted,started"
 UNCATEGORIZED = "other"
@@ -761,7 +761,9 @@ def served_accuracy(rows, open_rows, now):
         resolved = entry["hit"] + entry["miss"]
         entry["resolved"] = resolved
         entry["coverage"] = round3(entry["hit"] / resolved) if resolved else None
-        entry["measured"] = resolved >= SERVED_MIN
+        # a mesma issue se repete entre as datas: quem decide se o caminho foi medido é o número de issues, não de fotos
+        entry["issues_resolved"] = entry["first_seen_hit"] + entry["first_seen_miss"]
+        entry["measured"] = entry["issues_resolved"] >= SERVED_MIN
     return {"method": f"retroactive walk over {WALK_ORIGINS} dates, {WALK_STEP_DAYS} days apart: the band served at each date, judged by what happened; snapshots of one issue repeat across dates",
             "min_resolved": SERVED_MIN, "latest_percentile": int(DUE_QUANTILE * 100), "by_queue_basis": stats}
 
@@ -795,9 +797,9 @@ def team_band(rows, open_rows, now, category, issue, gate, points):
                                 "queue_hours_remaining": band(scenarios["queue"]) if scenarios["queue"] else None, "why_no_date": why}, **tail,
                 "note": "pontos e horas, sem data"}, PROVISIONAL_RC
     if not this_path["measured"]:
-        warnings.append({"code": "accuracy_not_measured", "message": f"caminho sem desfechos suficientes ({this_path['resolved']} de {SERVED_MIN}): o acerto desta data não foi medido"})
+        warnings.append({"code": "accuracy_not_measured", "message": f"caminho sem desfechos suficientes ({this_path['issues_resolved']} issues de {SERVED_MIN}): o acerto desta data não foi medido"})
     elif this_path["coverage"] < LOW_SERVED_COVERAGE:
-        warnings.append({"code": "low_served_accuracy", "message": f"neste caminho a data final acertou {this_path['coverage']} em {this_path['resolved']} desfechos"})
+        warnings.append({"code": "low_served_accuracy", "message": f"neste caminho a data final acertou {this_path['coverage']} em {this_path['resolved']} desfechos de {this_path['issues_resolved']} issues"})
     span = band(scenarios["totals"])
     return {"status": "provisional_team_band", "proposal": None, "category": category,
             "provisional": {**common, "latest_percentile": int(DUE_QUANTILE * 100), "date_basis": "start of development plus P80 of the durations that lasted at least the elapsed time",

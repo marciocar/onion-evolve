@@ -205,6 +205,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if "commentCreate" in q:
             if s["force"] == "comment_errors":
                 return self._errors("Entity not found: Issue")
+            if s["force"] == "comment_503":
+                self.send_error(503)
+                return None
             s.setdefault("comments", []).append(v["in"])
             return self._reply({"data": {"commentCreate": {"success": s["force"] != "comment_fail", "comment": {"id": "c1"}}}})
         if "issues(" in q:
@@ -396,9 +399,12 @@ def c_note_fails(d):
 
 def c_note_graphql_error(d):
     # medido: comentar em issue arquivada devolve errors, depois de o prazo já ter sido gravado
-    with Fake("comment_errors") as f:
-        rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30", "--set-by", "maestro")
-        return "" if rc == 1 and "o prazo foi gravado" in err and "NÃO" in err else f"rc={rc} {out} {err[:160]}"
+    for force in ("comment_errors", "comment_503"):
+        with Fake(force) as f:
+            rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30", "--set-by", "maestro")
+            if rc != 1 or "o prazo foi gravado" not in err or "NÃO" not in err or "Traceback" in err:
+                return f"{force}: rc={rc} {out} {err[:160]}"
+    return ""
 
 
 def c_set_by_required(d):
@@ -1160,9 +1166,37 @@ def c_served_by_basis(d):
     c, st = by["conditional_on_age_in_queue"], by["already_started"]
     if (c["snapshots"], c["hit"], c["miss"], c["resolved"], c["coverage"], c["measured"]) != (16, 16, 0, 16, 1.0, True):
         return f"{c}"
-    if st["snapshots"] != 14 or not st["measured"] or out["measured_accuracy"]["served_path"]["queue_basis"] != "conditional_on_age_in_queue":
+    served_path = out["measured_accuracy"]["served_path"]
+    if st["snapshots"] != 14 or not st["measured"] or served_path["queue_basis"] != "conditional_on_age_in_queue":
         return f"{st}"
-    return ""
+    return "" if served_path["snapshots"] == c["snapshots"] and served_path["hit"] == c["hit"] and c["issues_resolved"] == 16 else f"{served_path}"
+
+
+def c_served_counts_issues(d):
+    # duas abertas antigas dão 16 fotos: são duas issues, e o caminho segue sem medida
+    rows = team_rows(flows=False) + [issue(40, "alpha antiga", created=NOW_H - 2000, state=("Todo", "unstarted")), issue(41, "alpha antiga 2", created=NOW_H - 2001, state=("Todo", "unstarted"))]
+    with Fake(rows=rows) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        a = out["measured_accuracy"]["served"]["by_queue_basis"]["assumes_start_now"]
+        return "" if a["resolved"] == 16 and a["issues_resolved"] == 2 and a["measured"] is False else f"{a}"
+
+
+def c_served_skips_rollup(d):
+    rows = team_rows(flows=False) + [issue(46, "alpha mãe", created=NOW_H - 73, completed_at=NOW_H - 1), issue(47, "alpha filha", created=-3000, queue=1, work=1, parent=46)]
+    with Fake(rows=rows) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        c = out["measured_accuracy"]["served"]["by_queue_basis"]["conditional_on_age_in_queue"]
+        return "" if c["snapshots"] == 0 else f"mãe medida: {c}"
+
+
+def c_served_uses_p80(d):
+    # o desfecho cai entre o P80 e o P90 da primeira data: errar o percentil troca a errada por acerto
+    origin = NOW_H - 72 * 8
+    rows = team_rows(flows=False) + [issue(45, "alpha entre percentis", created=origin - 1, completed_at=origin + 125)]
+    with Fake(rows=rows) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        c = out["measured_accuracy"]["served"]["by_queue_basis"]["conditional_on_age_in_queue"]
+        return "" if (c["hit"], c["miss"]) == (1, 1) else f"{c}"
 
 
 def c_served_outcomes(d):
@@ -1503,6 +1537,9 @@ CASES = [
     ("t-age", "idade condiciona a fila", c_team_age_conditional),
     ("t-sep2", "fila restante desconta a idade", c_team_queue_after_age),
     ("t-served", "acerto por queue_basis, no caminho servido", c_served_by_basis),
+    ("t-iss", "medida conta issues, não fotos", c_served_counts_issues),
+    ("t-roll", "mãe de filhas fora da medição servida", c_served_skips_rollup),
+    ("t-p80", "medição servida julga o P80", c_served_uses_p80),
     ("t-out", "desfechos: aberta vencida, não resolvida e concluída fora", c_served_outcomes),
     ("t-rep", "report publica o acerto servido", c_served_in_report),
     ("t-unm", "caminho sem medida só dá horas", c_unmeasured_hours_only),
@@ -1681,6 +1718,11 @@ MUTANTS = [
     (V, 'clocked([r for r in view if r["completed"] and r["completed"] < origin], False)', 'clocked([r for r in view if r["completed"]], False)', "t-served"),
     (V, 'scenarios, _ = team_scenarios(history, origin, {"createdAt": raw["createdAt"], "startedAt": known_start})', 'scenarios, _ = team_scenarios(history, origin, None)', "t-served"),
     (V, 'SERVED_MIN = 10 ', "SERVED_MIN = 0 ", "t-unm"),
+    (V, 'SERVED_MIN = 10 ', "SERVED_MIN = 1 ", "t-iss"),
+    (V, 'entry["measured"] = entry["issues_resolved"] >= SERVED_MIN', 'entry["measured"] = resolved >= SERVED_MIN', "t-iss"),
+    (V, 'if r["exclusion"] == "rollup_parent" or r["created"] >= origin or', 'if r["created"] >= origin or', "t-roll"),
+    (V, 'deadline = origin + dt.timedelta(hours=conformal(scenarios["totals"], DUE_QUANTILE)[0])', 'deadline = origin + dt.timedelta(hours=conformal(scenarios["totals"], HIGH_QUANTILE)[0])', "t-p80"),
+    (V, 'this_path = {"queue_basis": basis, **served["by_queue_basis"][basis]}', 'this_path = {"queue_basis": basis, **served["by_queue_basis"]["assumes_start_now"]}', "t-served"),
     (V, '"team_band_served_accuracy": served_view,', '"team_band_served_accuracy": None,', "t-rep"),
     (V, '    view, opened = team_view(rows), team_view(open_rows)\n    history = clocked(view, False)', '    view, opened = [r for r in rows if r["calibrate"]], [r for r in open_rows if r["calibrate"]]\n    history = clocked(view, False)', "t-acc"),
     (V, '"with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, True)}}', '"with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, False)}}', "t-acc"),
