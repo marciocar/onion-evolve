@@ -2,7 +2,8 @@
 branch: feat/linear-estimates-velocity-meter
 pr: 1554
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 241d2705c7b508a6bc78b92a383a19c003c8de13b3f0c4e0a9b5ea4f612d57fb
+reviewed_code_sha256: 5c0b97345d48a28a66b0910a110f13c9dbed551ccceccf37735e99f239cd0feb
 findings_total: 17
 findings_real: 17
 tokens: 0
