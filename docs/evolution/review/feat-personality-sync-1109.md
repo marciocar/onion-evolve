@@ -2,8 +2,7 @@
 branch: feat/personality-sync-1109
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: 8eb33b7996430749ad953dee253a15984c55e26dc2dbde23feff8a3d2cb6b5e2
-reviewed_code_sha256: 134371a8ada58a7d037bc1e93f98bd507eb73438ee56a40fb12e6b3131590313
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 1
@@ -39,6 +38,6 @@ Não se aplica: este PR não traz guarda nova. As checagens foram verificar que 
 
 ## Limites declarados
 
-- O teto do grafo `maestro-decisions-1108` subiu de 18 para 21 por ordem da sessão do core, e a nota do grafo registra isso. O PR #1556 mexe nas mesmas duas linhas do `meta:` e subiria o teto para 23; quem mergear o segundo resolve o conflito somando os dois (26).
+- O teto do grafo `maestro-decisions-1108` foi somado no rebase sobre o #1556: 24 nós dele mais os 3 selos daqui dão 27. A nota do `meta:` guarda o texto dele e acrescenta a exceção destes selos, e nenhum nó dos dois lados saiu.
 - Os selos foram relatados pela sessão do core; o gate humano da RFC-0003 §4 foi o maestro olhando o diff, segundo esse relato.
 - As âncoras do retrato levam a entradas do diário cujo corpo pode nomear adotante. Isso é tratado no PR seguinte.
