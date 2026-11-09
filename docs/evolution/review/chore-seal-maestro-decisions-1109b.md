@@ -2,7 +2,8 @@
 branch: chore/seal-maestro-decisions-1109b
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7059af6feed04483aa68a6d53364355411f4253fa00be48f4ded0933c51a2fc8
+reviewed_code_sha256: 70ef6caf37777878842e4754b1024f34a03f9171368ecc8df25aacfddef180ad
 findings_total: 3
 findings_real: 3
 findings_blocking: 2
