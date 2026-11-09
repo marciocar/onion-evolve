@@ -15,7 +15,8 @@
 # visse isso: o diff de hooks compara a foto tirada DENTRO da branch, que já nascera sem o deny. Aqui o "antes"
 # é a ponta MAIS NOVA da integração (o nome dado, o upstream dele e origin/<nome>, a que descende das outras),
 # lida pelo git, e não a foto. A comparação é por REGRA, não por contagem: trocar uma regra por outra mantém
-# N = M e ainda assim perde a do alvo. Deny é monotônico: o vendor soma, nunca apaga.
+# N = M e ainda assim perde a do alvo. Deny é monotônico: o vendor soma, e só apaga o que está declarado em
+# deny-retired.tsv (2026-11-09); a retirada declarada é nomeada e não reprova.
 # Exercitado por lint-selftest.sh (run_deny_monotonic_selftests).
 # =============================================================================
 set -uo pipefail
@@ -49,6 +50,19 @@ else after='[]'; fi
 n="$(jq 'length' <<< "${before}")"; m="$(jq 'length' <<< "${after}")"
 lost="$(jq -r --argjson a "${after}" '.[] | select(. as $r | $a | index($r) | not)' <<< "${before}")"
 echo "deny: ${n} no alvo (${REF}) → ${m} no head"
+# a retirada DECLARADA em deny-retired.tsv não é perda: é a lista versionada do core, nomeada no relatório
+# a lista e o leitor moram ao lado deste script, sem variável que os troque: lista de fora não pode aprovar perda
+_here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_ret=""
+[ -f "${_here}/deny-retired-list.sh" ] && _ret="$(bash "${_here}/deny-retired-list.sh" "${_here}/deny-retired.tsv")"
+if [ -n "${lost}" ] && [ -n "${_ret}" ]; then
+  _declared="$(grep -Fxf <(printf '%s\n' "${_ret}") <<< "${lost}" || true)"
+  if [ -n "${_declared}" ]; then
+    echo "retirada declarada pelo core: $(printf '%s\n' "${_declared}" | wc -l) regra(s)"
+    printf '%s\n' "${_declared}" | sed 's/^/~ /'
+    lost="$(grep -Fxvf <(printf '%s\n' "${_ret}") <<< "${lost}" || true)"
+  fi
+fi
 if [ -n "${lost}" ]; then
   echo "PARE: o update PERDEU $(printf '%s\n' "${lost}" | wc -l) regra(s) de deny do alvo (deny é monotônico):"
   printf '%s\n' "${lost}" | sed 's/^/- /'

@@ -330,6 +330,9 @@ ONION_DPA_PY
 }
 
 # ── o provider ativo, como o tm.sh o resolve (.env da raiz; numa worktree, o da árvore principal) ──
+# DECISÃO (2026-11-09): `.env` ilegível devolve `ilegivel`, que não é provider da tabela, e a guarda segue aberta. Quem não sabe o
+# provider não acusa (cláusula 4 da doutrina de guardas), e sem o .env o token também não chega à sessão. O --env passado aqui já
+# resolve o checkout principal, então o rc 5 de worktree não acontece neste caminho nem no tm.sh.
 _onion_dpa_active() {  # $1=raiz $2=cwd
   local tm="$1/.claude/utils/task-manager" envf top common
   [ -f "${tm}/env-check.sh" ] || return 0

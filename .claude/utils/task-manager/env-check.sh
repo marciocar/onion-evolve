@@ -21,7 +21,14 @@
 # todas. O caminho sancionado responde a mesma pergunta sem tocar o valor. E o leitor daqui passou a
 # tirar o \r final: uma chave colada de um editor Windows ou do celular saía com o \r e virava HTTP 401.
 #
-# Exit: 0 ok · 1 chave obrigatória ausente / teste reprovado · 2 uso inválido · 3 .env ausente (e nada no ambiente).
+# Exit: 0 ok · 1 chave obrigatória ausente / teste reprovado · 2 uso inválido · 3 .env ausente (e nada no ambiente)
+#       · 4 .env existe e está ILEGÍVEL (o valor pedido não veio do ambiente). --provider responde `ilegivel` nesse caso.
+#       · 5 worktree sem .env, e o checkout principal tem um (só sem --env). --provider responde `worktree-sem-env`.
+#
+# ILEGÍVEL ≠ AUSENTE (2026-11-09, medido na curadoria sob sandbox): `[ -f ]` dava verdadeiro, o awk falhava em silêncio,
+# e `--provider` respondia `ausente` com rc 0 com o provider declarado. O adapter ficava cego sem ninguém saber.
+# WORKTREE SEM .env (2026-11-09, a curadoria corrigiu a própria medida): o `ausente` que ela viu vinha de uma worktree, onde o
+# `.env` não existe e o checkout principal tem um. É a terceira resposta: inexistente, ilegível e worktree sem .env.
 #
 # Fronteiras (achados do Elenxo, 2026-10-06): o ambiente vence o arquivo (adotante com direnv/pass não tem
 # .env); o .env é LIDO como dados, nunca executado (`. .env` rodaria código e interpretaria `$`/espaço);
@@ -29,14 +36,14 @@
 set -uo pipefail
 umask 077
 
-ENV_FILE=".env"; MODE=""; ARG=""
+ENV_FILE=".env"; ENV_EXPLICIT=0; MODE=""; ARG=""
 PROVIDERS=(jira clickup asana linear zoho none)
 # chaves que NÃO são segredo e que comandos precisam ler (ids, hosts, escolhas de transporte)
 SAFE_KEYS_RE='^(TASK_MANAGER_(PROVIDER|TRANSPORT)|FORGE_(PROVIDER|TRANSPORT)|FEDERATION_(LEDGER|MEMBER_ID)|[A-Z]+_DEFAULT_[A-Z_]*ID|[A-Z]+_WORKSPACE_ID|LINEAR_TEAM_ID|JIRA_(PROJECT_KEY|HOST|API_VERSION|AUTH_TYPE)|ZOHO_(PORTAL_ID|ACCOUNTS_HOST)|ASANA_DEFAULT_WORKSPACE)$'
 die() { printf 'env-check: %s\n' "$*" >&2; exit 2; }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --env) shift; ENV_FILE="${1:?--env exige arquivo}" ;;
+    --env) shift; ENV_FILE="${1:?--env exige arquivo}"; ENV_EXPLICIT=1 ;;
     --provider|--check|--set-provider|--test|--get|--lint) MODE="${1#--}"; if [ $# -gt 1 ] && [ "${2#--}" = "$2" ]; then shift; ARG="$1"; fi ;;
     *) die "argumento desconhecido: $1" ;;
   esac
@@ -52,10 +59,12 @@ required() {
     zoho) echo "ZOHO_CLIENT_ID ZOHO_CLIENT_SECRET ZOHO_PORTAL_ID" ;; none) echo "" ;; *) return 1 ;;
   esac
 }
+# abertura de verdade: sob sandbox `[ -r ]` responde legível para arquivo que o processo não consegue abrir (medido com bwrap)
+env_opens() { { : < "${ENV_FILE}"; } 2>/dev/null; }
 # valor de uma chave lido do arquivo COMO DADO: última ocorrência, `export ` opcional, aspas e comentário fora.
 # Uso interno; só sai do script por --provider (validado) e --get (lista fechada).
 file_value() {
-  [ -f "${ENV_FILE}" ] || return 0
+  [ -f "${ENV_FILE}" ] && env_opens || return 0
   awk -v k="$1" '
     { line=$0; sub(/\r$/, "", line); sub(/^[ \t]*export[ \t]+/, "", line) }
     line ~ "^[ \t]*" k "[ \t]*=" {
@@ -70,9 +79,29 @@ file_value() {
 # ambiente primeiro (direnv/pass/source), depois o arquivo
 value_of() { local v="${!1:-}"; [ -n "$v" ] && { printf '%s' "$v"; return; }; file_value "$1"; }
 has_key() { [ -n "$(value_of "$1")" ]; }
+# existe e não dá para ler (sandbox, permissão): é outra resposta que "ausente"
+env_unreadable() { [ -e "${ENV_FILE}" ] && ! env_opens; }
+# os avisos de rc 4 e 5 vão ao stderr: quem captura `--get` numa variável não pode guardar o aviso como valor
+die_unreadable() { echo "⚠️  ${ENV_FILE} existe mas está ilegível (sandbox ou permissão): não dá para saber o que ele declara" >&2; exit 4; }
+# worktree ligada, sem .env aqui, com um no checkout principal (só `test -e` nele; o conteúdo não é lido)
+main_checkout_env() {
+  local gd cd
+  gd="$(git rev-parse --absolute-git-dir 2>/dev/null)" || return 1
+  cd="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || return 1
+  [ "${gd}" != "${cd}" ] && [ -e "$(dirname "${cd}")/.env" ] && printf '%s' "$(dirname "${cd}")/.env"
+}
+# em subpasta, conta o .env da RAIZ da worktree: subpasta de worktree com .env na raiz não é "worktree sem .env"
+worktree_without_env() {
+  local top
+  [ "${ENV_EXPLICIT}" = 0 ] && [ ! -e "${ENV_FILE}" ] || return 1
+  top="$(git rev-parse --show-toplevel 2>/dev/null)" || return 1
+  [ ! -e "${top}/.env" ] && main_checkout_env >/dev/null
+}
+die_worktree() { echo "⚠️  esta worktree não tem ${ENV_FILE}, e o checkout principal tem: rode com --env <checkout-principal>/.env" >&2; exit 5; }
 
 case "${MODE}" in
   set-provider)
+    env_unreadable && die_unreadable
     p="${ARG:-}"; [ -n "${p}" ] || die "--set-provider exige o provider"
     valid_provider "${p}" || die "provider desconhecido: '${p}' (válidos: ${PROVIDERS[*]})"
     [ -f "${ENV_FILE}" ] || : > "${ENV_FILE}"
@@ -90,6 +119,8 @@ case "${MODE}" in
     echo "   Carregue na sessão: set -a; source ${ENV_FILE}; set +a"
     exit 0 ;;
   lint)
+    env_unreadable && die_unreadable
+    worktree_without_env && die_worktree
     [ -f "${ENV_FILE}" ] || { echo "⚠️  ${ENV_FILE} não encontrado"; exit 3; }
     # só NOMES e o tipo do defeito saem daqui; o valor nunca é impresso
     awk '
@@ -109,11 +140,15 @@ case "${MODE}" in
   get)
     k="${ARG:-}"; [ -n "${k}" ] || die "--get exige a chave"
     [[ "${k}" =~ ${SAFE_KEYS_RE} ]] || die "'${k}' não está na lista de chaves NÃO-secretas — segredo não sai por aqui"
+    [ -z "${!k:-}" ] && env_unreadable && die_unreadable
+    [ -z "${!k:-}" ] && worktree_without_env && die_worktree
     # chave da lista pode carregar credencial embutida em URL (`https://user:token@host`): sai mascarada
     value_of "${k}" | sed -E 's#(://)[^/@]*@#\1***@#'; echo; exit 0 ;;
 esac
 
 P="${ARG:-$(value_of TASK_MANAGER_PROVIDER)}"
+if [ -z "${P}" ] && env_unreadable; then [ "${MODE}" = provider ] && { echo "ilegivel"; echo "env-check: ${ENV_FILE} existe mas está ilegível" >&2; exit 4; }; die_unreadable; fi
+if [ -z "${P}" ] && worktree_without_env; then [ "${MODE}" = provider ] && { echo "worktree-sem-env"; echo "env-check: worktree sem ${ENV_FILE}; o checkout principal tem um. Use --env" >&2; exit 5; }; die_worktree; fi
 # --provider responde "ausente" (é resposta, não erro: a skill o injeta no contexto); --check/--test declaram rc=3
 if [ "${MODE}" != provider ] && [ ! -f "${ENV_FILE}" ] && [ -z "${P}" ]; then echo "⚠️  ${ENV_FILE} não encontrado e TASK_MANAGER_PROVIDER ausente do ambiente"; exit 3; fi
 
@@ -129,6 +164,7 @@ case "${MODE}" in
     miss=0
     for k in ${keys}; do if has_key "$k"; then echo "  ✅ $k"; else echo "  ❌ $k"; miss=1; fi; done
     [ -z "${keys}" ] && echo "  (none: modo offline, nenhuma chave exigida)"
+    [ "${miss}" -ne 0 ] && env_unreadable && die_unreadable
     exit "${miss}" ;;
   test)
     valid_provider "${P}" || die "provider desconhecido ou ausente"

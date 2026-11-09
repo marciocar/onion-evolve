@@ -8,7 +8,7 @@ meta:
   review_after: "2026-12-08"
   purpose: "Guardar os selos da rodada de perguntas de 2026-11-08 que não têm grafo natural aberto. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
   note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia) mais, na leva seguinte do mesmo dia, 2 selos do escopo e dos riscos do WAHA e 3 perguntas abertas, uma por risco a medir no piloto; por fim, o selo do sandbox e 2 perguntas abertas que nascem dele. Em 2026-11-09 entram aqui, por ordem da sessão do core, a evidência da rodada desse dia, os 4 selos dela e 1 pergunta aberta sobre o próximo update da consultoria. Na mesma data entram também os 3 selos sobre o diff do /meta:personality-sync, que descendem do selo de 2026-11-08 sobre o mesmo diff. Outra decisão nova vai para o grafo do assunto."
-  # ═══ TETO: 27 NÓS ═══
+  # ═══ TETO: 30 NÓS ═══
 nodes:
   - id: E_MD_MAESTRO_ROUND_1108
     node_type: evidence
@@ -422,7 +422,44 @@ nodes:
     confidence: 0.6
     label: "O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI."
     narrative: "Pronto quando: a SAC-302 está curada e o update seguinte do adotante fecha com merge verificado, com o pin novo na main dele e no members.yaml. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-382."
+  - id: D_MD_DENY_DROP_WHAT_MACHINERY_READS_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, relatada pela sessão do core: escolhida «Tirar o que a maquinaria lê»"
+    label: "Tirar do deny o que a maquinaria lê: decidida sobre uma medida que a curadoria depois corrigiu, e não executada. Substituída no mesmo dia."
+    narrative: "Escolhida «Tirar o que a maquinaria lê»; descartadas: «Pular quem tem sandbox» e «Retirar todas as Read». A base era a medida de que as 7 regras quebravam a maquinaria. A curadoria corrigiu: só o hosts.yml derrubou gh e git, a tabela de montagens não mascara o .env, e o env-check respondeu ausente por rodar numa worktree sem .env."
+    provenance:
+      source: "maestro, por pergunta com opções, relatada pela sessão do core"
+      locator: "mensagem da sessão do core de 2026-11-09: «Tirar o que a maquinaria lê»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+  - id: D_MD_DENY_KEEP_AND_WARN_SANDBOX_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, relatada pela sessão do core: escolhida «Manter as 12 e avisar sandbox»"
+    label: "Manter as 12 regras Read do deny e avisar quem tem sandbox: o --update diz qual allowRead falta, sem escrever no bloco sandbox do adotante."
+    narrative: "Escolhida «Manter as 12 e avisar sandbox»; descartadas: «Levar o allowRead junto» e «Tirar só hosts.yml». Substitui «Tirar o que a maquinaria lê», decidida sobre uma medida que a curadoria corrigiu. Medido em bwrap real e pela curadoria em uso real (E_SANDBOX_SETTINGS_UPDATE_MEASURED_1109, no repo dela): allowRead do hosts.yml faz gh, ls-remote, push e merge passarem com a regra ainda no deny."
+    trace: ".claude/utils/adopt/sandbox-deny-advice.sh"
+    provenance:
+      source: "maestro, por pergunta com opções, relatada pela sessão do core"
+      locator: "mensagem da sessão do core de 2026-11-09: «Manter as 12 e avisar sandbox»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
 edges:
+  - from: D_MD_DENY_KEEP_AND_WARN_SANDBOX_1109
+    to: D_MD_DENY_DROP_WHAT_MACHINERY_READS_1109
+    edge_type: SUPERSEDES
+  - from: D_MD_DENY_KEEP_AND_WARN_SANDBOX_1109
+    to: D_MD_DENY_MINIMUM_PORTABLE_1108
+    edge_type: CONSTRAINS
   - from: E_KG_TOUCHED_BACKTEST_1109
     to: D_MD_GRAPH_HYGIENE_RATCHET_SCOUT_1109
     edge_type: SUPPORTS

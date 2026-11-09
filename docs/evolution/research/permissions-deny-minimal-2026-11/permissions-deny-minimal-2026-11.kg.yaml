@@ -14,6 +14,22 @@ meta:
     chamada: a regra vê a linha de cima, não o que o script faz, e o F01 só imprime o uso. Em adotante com sandbox, não
     foram medidos push por ssh de ponta a ponta nem o efeito isolado do deny sobre a assinatura gpg, que já falha sem ele.
 nodes:
+  - id: E_ALLOWREAD_BEATS_READ_DENY_1109
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-11-09"
+    source_tier: 10
+    label: "Sob bwrap real, a regra Read do hosts.yml do gh quebra gh auth status e o credential helper do git, e a exceção allowRead no mesmo caminho os traz de volta com a regra ainda no deny."
+    narrative: "gh falso que lê o hosts.yml e git real com o helper. Sem deny: tudo anda. Com as 74 regras: gh rc 1 e credential helper rc 128. Com as 74 mais allowRead: gh e helper rc 0. As pastas .ssh, .aws e .gnupg somem; .netrc e .credentials.json dão Permission denied. O glob do .env não mostrou efeito: cat .env e source .env andam nas três rodadas."
+    trace: "docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv"
+    verified_against: "fases sandbox-control, sandbox-deny e sandbox-allowread de data/cases.tsv; a curadoria mediu o mesmo em uso real (E_SANDBOX_SETTINGS_UPDATE_MEASURED_1109, no repo dela)"
+    provenance:
+      source: "docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv"
+      locator: "linhas S10 a S13 e S15 a S21"
+      method: "measurement: motor real de permissão com bwrap real e roteiro fixo de chamadas"
   - id: E_REAL_FLOW_CENSUS_1108
     node_type: evidence
     plane: DEV
@@ -37,8 +53,8 @@ nodes:
     status: confirmed
     verified_at: "2026-11-08"
     source_tier: 10
-    label: "No binário real 2.1.319, com API simulada e .env inventado: 358 linhas sem divergência, 10 chamadas de flow com hooks reais sem cair em regra, e 74 mutantes por regra, todos soltando ao menos um caso."
-    narrative: "As 358 linhas cobrem controle sem deny, deny com o allow real em default e em bypassPermissions, e sandbox. Na 1ª rodada, os mutantes acharam 11 regras decorativas: 10 ganharam caso e 1 saiu, porque o motor já barra rm -rf com $HOME entre aspas pela regra sem aspas. O refutador independente do PR reprovou a 1ª lista: git clean -*x* atravessava espaços e barrava -e e caminho com x, e deixava passar -fdX; as regras Read barravam Write. A cura trocou por grupos explícitos de flags, e a bancada passou a reprovar quando não há resultado medido (com um claude falso, NÃO MEDIDO e rc 3)."
+    label: "No binário real 2.1.319, com API simulada e .env inventado: 403 linhas sem divergência, 10 chamadas de flow com hooks reais sem cair em regra, e 74 mutantes por regra, todos soltando ao menos um caso."
+    narrative: "As 403 linhas cobrem controle sem deny, deny com o allow real em default e em bypassPermissions, e sandbox. Na 1ª rodada, os mutantes acharam 11 regras decorativas: 10 ganharam caso e 1 saiu, porque o motor já barra rm -rf com $HOME entre aspas pela regra sem aspas. O refutador independente do PR reprovou a 1ª lista: git clean -*x* atravessava espaços e barrava -e e caminho com x, e deixava passar -fdX; as regras Read barravam Write. A cura trocou por grupos explícitos de flags, e a bancada passou a reprovar quando não há resultado medido (com um claude falso, NÃO MEDIDO e rc 3)."
     trace: "ops/testing/permissions-deny-bench.py"
     verified_against: "python3 -I ops/testing/permissions-deny-bench.py com o settings do branch; data/cases.tsv, data/flows.tsv e data/mutants.tsv"
     provenance:
@@ -69,7 +85,7 @@ nodes:
     status: confirmed
     verified_at: "2026-11-08"
     label: "A lista é 1ª camada, não fronteira: bash -c, eval, refspec +, rm -Rf, find -delete, interpretador e script chamado pela linha passam, medido."
-    narrative: "Script passar é o que mantém o merge verificado e a publicação de porta. Com sandbox ligado, cat .env passa, source .env também, e as pastas .ssh e .aws do home somem para o processo; assinatura gpg falha no sandbox com e sem o deny. O hook do .env continua sendo a 2ª camada."
+    narrative: "Script passar é o que mantém o merge verificado e a publicação de porta. Com sandbox ligado, cat .env passa, source .env também, e as pastas .ssh, .aws e .gnupg do home somem para o processo; a regra Read de caminho do home vira bloqueio do sistema, e allowRead a abre; assinatura gpg falha no sandbox com e sem o deny. O hook do .env continua sendo a 2ª camada."
     trace: ".claude/commands/common/prompts/guard-doctrine.md"
     verified_against: "seção A camada nativa da doutrina; linhas L e S de data/cases.tsv"
     provenance:
@@ -81,13 +97,20 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
-    verified_at: "2026-11-08"
-    label: "Deny mínimo portátil, decidido pelo maestro em 2026-11-08 e relatado no brief da sessão do core: 74 regras no settings, sem caminho de máquina nem nome de cliente. Aberto até o merge do PR."
+    status: done
+    verified_at: "2026-11-09"
+    provenance:
+      source: "maestro, relatado pela sessão do core"
+      locator: "docs/onion/graph/maestro-decisions-1108.kg.yaml, nós D_MD_DENY_MINIMUM_PORTABLE_1108 e D_MD_DENY_KEEP_AND_WARN_SANDBOX_1109"
+      method: "testimony: decisões do maestro de 2026-11-08 e 2026-11-09, relatadas pela sessão do core"
+    label: "Deny mínimo portátil, decidido pelo maestro em 2026-11-08 e relatado no brief da sessão do core: 74 regras no settings, sem caminho de máquina nem nome de cliente, mergeadas no PR #1552."
     narrative: "Portas e adoção nova copiam o settings, e o --update soma pelo merge-onion-hooks, cujo --diff nomeia as regras novas e os allow do alvo que elas anulam; alvo com deny fora da forma de lista recebe os hooks e não soma. Merge e push na main ficam fora de propósito: o hook já veta, e num repo sem o script verificado ele avisa, saída que um deny tiraria. A regra Read do .env também barra Write e Edit, inclusive arquivo novo: custo aceito pelo core em nome do maestro em 2026-11-08, revogável, porque criar ou editar .env com segredo não é trabalho de agente; .env.example segue livre. Rollback: reverter os commits do PR."
     trace: ".claude/settings.json"
     verified_against: "família update-base-deny, casos d6 a d13, p1, j-MUT, g-MUT, n-MUT e p-MUT"
 edges:
+  - from: E_ALLOWREAD_BEATS_READ_DENY_1109
+    to: D_MINIMAL_PORTABLE_DENY_1108
+    edge_type: CONSTRAINS
   - from: E_REAL_FLOW_CENSUS_1108
     to: D_MINIMAL_PORTABLE_DENY_1108
     edge_type: SUPPORTS

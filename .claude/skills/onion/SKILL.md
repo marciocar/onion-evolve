@@ -18,7 +18,7 @@ allowed-tools: Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(ls .cla
 ## Estado Atual do Projeto
 
 Provider ativo:
-!`p="$(bash .claude/utils/task-manager/env-check.sh --provider 2>/dev/null)" && echo "TASK_MANAGER_PROVIDER=${p}" || echo "TASK_MANAGER_PROVIDER=não configurado"`
+!`p="$(bash .claude/utils/task-manager/env-check.sh --provider 2>/dev/null)" && echo "TASK_MANAGER_PROVIDER=${p}" || echo "TASK_MANAGER_PROVIDER=${p:-não configurado}"`
 
 Sessões abertas:
 !`ls .claude/sessions/ 2>/dev/null || echo "(nenhuma sessão ativa)"`

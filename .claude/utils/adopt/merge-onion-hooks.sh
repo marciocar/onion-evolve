@@ -26,6 +26,8 @@
 #             O `permissions.deny` da fonte é somado ao do alvo (só soma, 2026-11-08); o resto de permissions é do alvo.
 #             Alvo com permissions ou deny fora da forma de lista: os hooks chegam, o deny não soma, e o stderr avisa.
 #             O `--diff` nomeia cada regra de deny nova e os allow do alvo que ela anula (comparação de texto).
+#             Regra listada em deny-retired.tsv sai do alvo, avisada no stderr e nomeada no `--diff`. LIMITE: é por texto,
+#             então regra que o adotante escreveu idêntica à aposentada também sai.
 #             IDEMPOTENTE: rodar 2× = no-op na 2ª.
 #
 # Uso       : merge-onion-hooks.sh <source-settings.json> <target-settings.json>
@@ -40,6 +42,14 @@
 # =============================================================================
 set -euo pipefail
 
+# Regras de deny que o core aposentou (2026-11-09): saem do alvo, só as exatas da lista. Sem isto o deny só somava, e
+# regra errada nunca mais saía do adotante. A lista e o leitor dela moram ao lado deste script, sem variável que os troque.
+_HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_retired_json() {
+  [ -f "${_HERE}/deny-retired-list.sh" ] || { echo "AVISO: leitor da lista de regras aposentadas ausente — nada foi retirado." >&2; echo '[]'; return 0; }
+  bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv" | jq -R . | jq -sc .
+}
+
 # ── MODO --diff <antes.json> <depois.json>: o diff de hooks que o RELATÓRIO do --update cola ─────────
 # Por que existe (2026-10-13, update de um adotante): o relatório comparava só evento, matcher e
 # command, então NÃO via propriedade nova — o `onFailure: block` acrescentado pelo refresh a 4 hooks
@@ -53,7 +63,7 @@ if [ "${1:-}" = "--diff" ]; then
   A="${2:-}"; B="${3:-}"
   [ -f "${A}" ] && [ -f "${B}" ] || { echo "uso: merge-onion-hooks.sh --diff <antes.json> <depois.json>" >&2; exit 2; }
   command -v jq >/dev/null 2>&1 || { echo "AVISO: jq ausente — diff de hooks NÃO MEDIDO." >&2; exit 3; }
-  jq -nr --slurpfile a "${A}" --slurpfile b "${B}" '
+  jq -nr --slurpfile a "${A}" --slurpfile b "${B}" --argjson retired "$(_retired_json)" '
     def flat($s): [ ($s.hooks // {}) | to_entries[] | .key as $ev | .value[]? | (.matcher // null) as $mt
                     | .hooks[]? | {k: ([$ev, $mt, (.command // ((.type // "?") + ":" + ((.prompt // "") | tostring)))] | tojson),
                                    ev: $ev, mt: $mt, h: .} ];
@@ -74,6 +84,7 @@ if [ "${1:-}" = "--diff" ]; then
         else false end;
     ($a[0]) as $A | ($b[0]) as $B | flat($A) as $fa | flat($B) as $fb
     | (plist($B; "deny") - plist($A; "deny")) as $newd | plist($B; "allow") as $alw
+    | (plist($A; "deny") - plist($B; "deny")) as $lostd
     | ($fa | map({key: .k, value: .}) | from_entries) as $ma
     | ($fb | map({key: .k, value: .}) | from_entries) as $mb
     | ([ $fb[] | select($ma[.k] == null) ]) as $add
@@ -88,6 +99,7 @@ if [ "${1:-}" = "--diff" ]; then
                                     | "\(.) \(show($o[.]))→\(show($x.h[.]))" ] | join(", ")) ]
       + (if ($top | length) > 0 then [ "≠ chaves de topo diferentes: \($top | join(", "))" ] else [] end)
       + [ $newd[] | "+ deny: \(.)" ]
+      + [ $lostd[] | . as $r | if ($retired | index($r)) != null then "- deny (retirada declarada): \($r)" else "- deny (PERDIDA): \($r)" end ]
       + [ $alw[] as $al | $newd[] as $d | select(annuls($d; $al)) | "! allow anulado: \($al) (o deny vence: \($d))" ]
       + [ "── hooks: \($fa | length) → \($fb | length) · \($add | length) adicionado(s) · \($del | length) removido(s) · \($chg | length) alterado(s) · \($same) idêntico(s) (entrada inteira)" ]
       )[]' || { echo "ERRO: diff de hooks falhou (JSON inválido?) — NÃO MEDIDO; não escreva 'idêntico' no relatório." >&2; exit 3; }
@@ -143,8 +155,18 @@ while IFS= read -r _c; do
   fi
 done < <(jq -r '[.hooks // {} | .[][]? | .hooks[]? | .command? | select(type == "string")] | unique[]' "${TGT}" 2>/dev/null)
 
+_retired="$(_retired_json)"
+# regra listada que a fonte ainda traz é contradição do core: fica, e o aviso diz
+while IFS= read -r _r; do
+  case "${_r}" in
+    keep:*) echo "AVISO: regra na lista de aposentadas e ainda na fonte, mantida no alvo: ${_r#keep:}" >&2 ;;
+    drop:*) echo "RETIRADA: regra de deny aposentada pelo core, removida do alvo: ${_r#drop:}" >&2 ;;
+  esac
+done < <(jq -r --argjson r "${_retired}" --slurpfile s "${SRC}" '(($s[0].permissions.deny? // []) | if type == "array" then . else [] end) as $sd | (.permissions.deny? // []) | if type == "array" then .[] | select(. as $x | $r | index($x) != null) | (. as $x | if ($sd | index($x)) != null then "keep:" else "drop:" end) + . else empty end' "${TGT}" 2>/dev/null || true)
+
 jq -n \
   --argjson dead "${_dead}" \
+  --argjson retired "${_retired}" \
   --slurpfile s "${SRC}" \
   --slurpfile t "${TGT}" '
   ($s[0]) as $src | ($t[0]) as $tgt |
@@ -203,6 +225,8 @@ jq -n \
       | .permissions.deny = (((.permissions.deny // []) + $src.permissions.deny)
                              | reduce .[] as $r ([]; if index($r) == null then . + [$r] else . end))
     else . end
+  # a retirada declarada: só a regra idêntica à da lista sai, inclusive se o adotante a escreveu com o mesmo texto
+  | if ((.permissions | type) == "object") and ((.permissions.deny | type) == "array") then .permissions.deny -= ($retired - (($src.permissions.deny? // []) | if type == "array" then . else [] end)) else . end
   # poda do aposentado, em TODO evento do alvo (o evento pode nem existir mais na fonte); grupo que esvazia sai
   | if ($dead | length) > 0 and (.hooks | type) == "object" then
       .hooks |= with_entries(.value |= map(

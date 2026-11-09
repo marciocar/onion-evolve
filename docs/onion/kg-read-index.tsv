@@ -2297,6 +2297,7 @@ docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_EV
 docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_FINETUNE_NARROW	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_Q_OPTION_C	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md	D_ADOPT_REFRAME	docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml
+docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv	E_ALLOWREAD_BEATS_READ_DENY_1109	docs/evolution/research/permissions-deny-minimal-2026-11/permissions-deny-minimal-2026-11.kg.yaml
 docs/evolution/research/permissions-deny-minimal-2026-11/data/cases.tsv	E_READ_RULE_REACHES_BASH_1108	docs/evolution/research/permissions-deny-minimal-2026-11/permissions-deny-minimal-2026-11.kg.yaml
 docs/evolution/research/persona-runtime-2026-11/SYNTHESIS.md	Q_PERSONA_RUNTIME_2026_11	docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml
 docs/evolution/research/playbook-sdaal-2026-10/SYNTHESIS.md	E_LACUNAS_PLAYBOOK_SDAAL_1011	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
