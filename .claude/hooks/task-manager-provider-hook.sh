@@ -23,7 +23,12 @@
 # =============================================================================
 set -uo pipefail
 
-emit() { printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$1"; }
+# o texto pode levar um caminho: sem escapar, `"` e `\` geram JSON inválido
+emit() {
+  local s="$1"
+  s="${s//\\/\\\\}"; s="${s//\"/\\\"}"; s="${s//$'\n'/\\n}"; s="${s//$'\t'/\\t}"
+  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "${s}"
+}
 
 # (1) AMBIENTE primeiro — é o que o adapter (process.env) enxerga. Hook e adapter alinhados.
 p="${TASK_MANAGER_PROVIDER:-}"
@@ -39,10 +44,10 @@ ENV_HINT=".env"
 # WORKTREE sem .env: o provider vem do checkout principal, como no tm.sh; sem isto o hook anunciava `none` (2026-11-09).
 if [ ! -e "${ENV_FILE}" ]; then
   _common="$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
-  if [ -n "${_common}" ] && [ -e "$(dirname "${_common}")/.env" ]; then ENV_FILE="$(dirname "${_common}")/.env"; ENV_HINT="${ENV_FILE}"; fi
+  if [ -n "${_common}" ] && [ -e "$(dirname "${_common}")/.env" ]; then ENV_FILE="$(dirname "${_common}")/.env"; ENV_HINT="$(printf '%q' "${ENV_FILE}")"; fi
 fi
-# ILEGÍVEL não é "none": abertura de verdade, porque sob sandbox `[ -r ]` responde legível.
-if [ -e "${ENV_FILE}" ] && ! { : < "${ENV_FILE}"; } 2>/dev/null; then
+# ILEGÍVEL não é "none": abertura de verdade, porque sob sandbox `[ -r ]` responde legível. Só arquivo regular: FIFO penduraria.
+if [ -e "${ENV_FILE}" ] && ! { [ -f "${ENV_FILE}" ] && { : < "${ENV_FILE}"; } 2>/dev/null; }; then
   emit "Onion: o .env existe mas esta ilegivel (sandbox ou permissao): provider desconhecido, o adapter fica cego"
   exit 0
 fi

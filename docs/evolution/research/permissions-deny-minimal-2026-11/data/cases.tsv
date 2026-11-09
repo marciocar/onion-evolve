@@ -285,7 +285,7 @@ P03	bypass	git push origin --delete feat/old	pass	exec	ok	To ../bare.git - [dele
 P04	bypass	git clean -fdn	pass	exec	ok	Would remove .claude/settings.json Would remove build/ Would remove su
 P05	bypass	git clean -fd sub/untracked	pass	exec	ok	Removing sub/untracked/
 P06	bypass	git clean -n	pass	exec	ok	Would remove .claude/settings.json
-P07	bypass	git reset --hard HEAD	pass	exec	ok	HEAD is now at 59bf2d1 base
+P07	bypass	git reset --hard HEAD	pass	exec	ok	HEAD is now at 3bbbbbb base
 P08	bypass	git branch -D tmp	pass	exec	ok	Exit code 1 error: branch 'tmp' not found
 P09	bypass	rm -rf build/tmp	pass	exec	ok	(Bash completed with no output)
 P10	bypass	rm -rf {W}/scratch/x	pass	exec	ok	(Bash completed with no output)
@@ -307,9 +307,9 @@ P26	bypass	git ls-files --error-unmatch .env.example	pass	exec	ok	.env.example
 P27	bypass	chmod 600 .env	pass	exec	ok	(Bash completed with no output)
 P28	bypass	echo EXTRA=1 >> .env	pass	exec	ok	(Bash completed with no output)
 P29	bypass	cp .env.example scratch.env.copy && rm -f scratch.env.copy	pass	exec	ok	(Bash completed with no output)
-P32	bypass	ssh-keygen -lf {H}/.ssh/id_ed25519.pub || true	pass	exec	ok	<fixture><caminho> 
+P32	bypass	ssh-keygen -lf {H}/.ssh/id_ed25519.pub || true	pass	exec	ok	<fixture><caminho>
 P33	bypass	pass ls || true	pass	exec	ok	Password Store └── x
-W10	bypass	{P}/.env.example	pass	exec	ok	The file <fixture>/proj/.env.exampl
+W10	bypass	{P}/.env.example	pass	exec	ok	The file <fixture>/proj/.env.examp
 W11	bypass	cp .env.example sub/.env.copied && rm -f sub/.env.copied	pass	exec	ok	(Bash completed with no output)
 C01	bypass	ls -la .env	deny	deny	ok	Permission to use Bash with command ls -la .env has been denied.
 C02	bypass	stat -c %s .env	deny	deny	ok	Permission to use Bash with command stat -c %s .env has been denied.
@@ -403,3 +403,4 @@ S21	sandbox-allowread	cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}	medir	exec
 A01	sandbox-env-absoluto	test -r .env && echo TEST-R-LE || echo TEST-R-NAO	medir	exec	info	TEST-R-LE
 A02	sandbox-env-absoluto	cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}	read-rc=1	exec	ok	cat: .env: Permission denied 0 read-rc=1
 A03	sandbox-env-absoluto	bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?	envck-rc=4	exec	ok	ilegivel env-check: .env existe mas está ilegível envck-rc=4
+A04	sandbox-env-absoluto	CLAUDE_PROJECT_DIR="$PWD" bash .claude/hooks/task-manager-provider-hook.sh	ilegivel (sandbox	exec	ok	te mas esta ilegivel (sandbox ou permissao): provider desconhecido, o adapter fica cego"}}

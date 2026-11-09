@@ -14320,8 +14320,24 @@ run_env_exposure_selftests() {
     hout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${tr}" bash "${hk}" </dev/null 2>/dev/null)"
     if grep -q 'ilegivel (sandbox' <<< "${hout}" && ! grep -q 'declarado no .env' <<< "${hout}"; then record_pass "env-exposure: (h2) hook com helper, .env ilegível ⇒ não anuncia como declarado"
     else record_fail "env-exposure: (h2)" "${hout}"; fi
+    # (u8) --test com .env ilegível para antes da rede: token vazio viraria um 401 enganoso
+    mkdir -p "${d}/fbin"; printf '#!/bin/sh\ntouch "%s/curl-chamado"\necho 401\n' "${d}" > "${d}/fbin/curl"; chmod +x "${d}/fbin/curl"
+    urc=0; uout="$(env -u TASK_MANAGER_PROVIDER -u LINEAR_API_KEY PATH="${d}/fbin:${PATH}" bash "${h}" --env "${d}/u.env" --test linear 2>/dev/null)" || urc=$?
+    if [ "${urc}" -eq 4 ] && [ ! -e "${d}/curl-chamado" ]; then record_pass "env-exposure: (u8) --test com .env ilegível ⇒ rc 4, sem chamar a rede"
+    else record_fail "env-exposure: (u8)" "rc=${urc}: ${uout}"; fi
     chmod 600 "${tr}/.env"; chmod 600 "${d}/u.env"
   fi
+  # (f1-f2) .env FIFO sem escritor não pendura o helper nem o hook: abre só arquivo regular. (h-src) o hook decide por abertura real, não por -r
+  local ff="${d}/ffp" frc fout
+  mkdir -p "${ff}"; mkfifo "${ff}/.env"
+  frc=0; fout="$(env -u TASK_MANAGER_PROVIDER timeout 10 bash "${h}" --env "${ff}/.env" --provider 2>/dev/null)" || frc=$?
+  if [ "${frc}" -eq 4 ] && [ "${fout}" = ilegivel ]; then record_pass "env-exposure: (f1) .env FIFO ⇒ ilegivel, rc 4, sem pendurar"
+  else record_fail "env-exposure: (f1)" "rc=${frc}: ${fout}"; fi
+  frc=0; fout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${ff}" timeout 10 bash "${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh" </dev/null 2>/dev/null)" || frc=$?
+  if [ "${frc}" -eq 0 ] && grep -q 'ilegivel (sandbox' <<< "${fout}"; then record_pass "env-exposure: (f2) hook com .env FIFO avisa, sem morrer no timeout"
+  else record_fail "env-exposure: (f2)" "rc=${frc}: ${fout}"; fi
+  if grep -qF '{ : < "${ENV_FILE}"; }' "${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh"; then record_pass "env-exposure: (h-src) o hook decide por abertura real do arquivo, não por [ -r ] (sob sandbox -r mente; a prova de bwrap é a bancada do motor)"
+  else record_fail "env-exposure: (h-src)" "o hook não abre o arquivo"; fi
   # (v) WORKTREE SEM .env: terceira resposta, distinta de inexistente e de ilegível. MUTANTE: tirar a detecção volta a `ausente`.
   local wt_m="${d}/wm" wt_l="${d}/wl" vout vrc vmut="${d}/ec-mut2.sh"
   git init -q -b main "${wt_m}" && git -C "${wt_m}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -q --allow-empty -m b && git -C "${wt_m}" worktree add -q -b l "${wt_l}"
@@ -14352,6 +14368,15 @@ run_env_exposure_selftests() {
   vout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${wt_l}" bash "${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh" </dev/null 2>/dev/null)"
   if grep -q 'TASK_MANAGER_PROVIDER=linear declarado' <<< "${vout}" && ! grep -q 'ativo = none' <<< "${vout}"; then record_pass "env-exposure: (v8) hook de sessão em worktree lê o .env do principal, não diz none"
   else record_fail "env-exposure: (v8)" "${vout}"; fi
+  # (v9) caminho com aspas, barra e espaço: o JSON do hook segue válido e a dica de source sai citada
+  local wt_q="${d}/a b\"c\\d" wt_q2="${d}/wq" hint_q
+  git init -q -b main "${wt_q}" && git -C "${wt_q}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -q --allow-empty -m b && git -C "${wt_q}" worktree add -q -b q "${wt_q2}"
+  printf 'TASK_MANAGER_PROVIDER=linear\n' > "${wt_q}/.env"
+  hint_q="source $(printf '%q' "${wt_q}/.env");"
+  vout="$(env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${wt_q2}" bash "${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh" </dev/null 2>/dev/null)"
+  if jq -e . <<< "${vout}" >/dev/null 2>&1 && grep -qF -- "${hint_q}" <<< "$(jq -r '.hookSpecificOutput.additionalContext' <<< "${vout}")"; then
+    record_pass "env-exposure: (v9) caminho com aspas e espaço ⇒ JSON válido e source citado"
+  else record_fail "env-exposure: (v9)" "${vout}"; fi
   rm -f "${wt_m}/.env"
   vrc=0; vout="$(cd "${wt_l}" && env -u TASK_MANAGER_PROVIDER bash "${h}" --provider 2>/dev/null)" || vrc=$?
   if [ "${vrc}" -eq 0 ] && [ "${vout}" = ausente ]; then record_pass "env-exposure: (v3) worktree sem .env e principal sem .env ⇒ ausente, rc 0"
@@ -51516,11 +51541,11 @@ run_update_base_and_deny_selftests() {
   if [ "${out%%|*}" = 1 ]; then record_pass "update-base-deny: (rm-MUT) sem a lista a retirada volta a reprovar: (r3) prova a lista"
   else record_fail "update-base-deny: (rm-MUT)" "${out}"; fi
   # (r7-r9) a lista é validada: linha malformada não retira e avisa; regra que a fonte ainda traz fica, com aviso; lista ilegível não custa os hooks
-  printf 'Bash(old) sem-tab\n Bash(old)\t2026-11-09\tm\nBash(o\tld)\t2026-11-09\tm\nBash(old)\t2026-11-09\tm\r\nBash(old)\t2026-11-09\tm\tcoluna-a-mais\n' > "${rr}"
+  printf 'Bash(old) sem-tab\n Bash(old)\t2026-11-09\tm\nBash(o\tld)\t2026-11-09\tm\nBash(old)\t2026-11-09\tm\r\nBash(old)\t2026-11-09\tm\tcoluna-a-mais\nBash(old)\t\tm\nBash(old)\t2026-11-09\t\n' > "${rr}"
   printf '%s\n' "${tgt_r}" > "${d}/tgt.json"; printf '%s\n' "${src_r}" > "${d}/src.json"
   out="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")"
-  if [ "$(jq -c '.permissions.deny | index("Bash(old)") != null' <<< "${out}")" = true ] && [ "$(grep -c 'malformada' "${d}/err")" -eq 5 ]; then
-    record_pass "update-base-deny: (r7) linha sem tab, indentada, com tab na regra, com CR ou com coluna a mais não retira, e cada uma avisa"
+  if [ "$(jq -c '.permissions.deny | index("Bash(old)") != null' <<< "${out}")" = true ] && [ "$(grep -c 'malformada' "${d}/err")" -eq 7 ]; then
+    record_pass "update-base-deny: (r7) linha sem tab, indentada, com tab na regra, com CR, com coluna a mais ou com coluna vazia não retira, e cada uma avisa"
   else record_fail "update-base-deny: (r7)" "$(jq -c '.permissions.deny' <<< "${out}") err=$(cat "${d}/err")"; fi
   printf 'Bash(x)\t2026-11-09\tm\n' > "${rr}"; printf '%s\n' '{"permissions":{"deny":["Bash(x)"]},"hooks":{}}' > "${d}/tgt.json"
   out="$(bash "${kit}/mh.sh" "${d}/src.json" "${d}/tgt.json" 2>"${d}/err")"
