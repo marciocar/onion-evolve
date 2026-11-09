@@ -1,18 +1,17 @@
 ---
 branch: feat/provisional-team-band
 date: 2026-11-09
-reviewed_diff_sha256: 84c01c5cee17cb77382600f60850637011f89c6cc7fdf0334a64ba0409fa61fc
-reviewed_code_sha256: c0fa5b3fb15c97f59981aa05d06128b74be8e4c2c3429fe2a41b7fb7bdba2aeb
-findings_total: 17
-findings_real: 17
+reviewed_diff_sha256: pendente
+findings_total: 19
+findings_real: 19
 tokens: 0
-duration_min: 165
-findings_fixed: 16
+duration_min: 190
+findings_fixed: 18
 verdict: REJECTED_AND_FIXED
 elenxo: false
 elenxo_isolado: false
-reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes). Refutador independente reprovou o head 59b2ad09e; as curas deste head ainda não foram re-refutadas"
-nota: "tokens = 0: não medido. O que sustenta: bancada (124 casos, 186 mutantes), 40 escritas reais conferidas por leitura separada, e a faixa exercitada contra o Linear real."
+reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes). Refutador independente reprovou o head 59b2ad09e e aprovou o feb45a458, com ressalvas; a regra do compromisso e as ressalvas deste head ainda não foram re-refutadas"
+nota: "tokens = 0: não medido. O que sustenta: bancada (127 casos, 191 mutantes), 40 escritas reais conferidas por leitura separada, e a faixa exercitada contra o Linear real."
 ---
 
 # Resíduo: faixa provisória do time e separação das retroestimadas
@@ -50,3 +49,10 @@ Limite: o caminho `conditional_on_age_in_queue` tem data e acerto medido baixo (
 | 17 | Comentar em issue arquivada devolve `errors` depois de gravar o prazo. | Curado: rc 1 dizendo que o prazo já foi gravado. |
 
 Doutrina em `common:prompts:commitment-date-doctrine`, com citação conferida do Scrum Guide e do Kanban Guide. `already_started` segue sem desfecho no histórico real: a data sai com `accuracy_not_measured`.
+
+## Ressalvas do veredito sobre feb45a458
+
+| # | Achado | Destino |
+|---|---|---|
+| 18 | `SERVED_MIN` contava fotos, e a mesma issue se repete entre as datas. | Curado: `issues_resolved` decide `measured`. |
+| 19 | Mutantes vivos: `SERVED_MIN` 1, mãe na medição, P90 na medição, caminho errado no `served_path`. | Curado: casos e mutantes próprios. |
