@@ -162,7 +162,7 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/co-evolution-inbox-check.sh\" prompt",
             "timeout": 5,
-            "statusMessage": "Importando o spool do carteiro (Onion)"
+            "statusMessage": "Importando o spool e contando sinais (Onion)"
           }
         ]
       },

@@ -241,6 +241,19 @@ sair `falha` em (d) (sem `--kid` o doctor confere só os kids que restam):
 bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id> --kid <kid-revogado>
 ```
 
+## Canal da sessão (adesão opcional)
+
+Para a campainha tocar numa sessão aberta, o `doorbell` precisa estar no `.mcp.json` do repo, e a sessão precisa
+abrir com o canal: não existe chave de settings ou variável que o ligue. Quem aderiu abre assim, na raiz do repo:
+
+```bash
+bash .claude/utils/co-evolution/open-channel-session.sh [--continue | --resume <id>]
+```
+
+O abridor só aceita os dois argumentos de retomada e mantém a tela de confirmação do Claude Code. Quem abre sem ele
+recebe um aviso único com a linha exata, e o `UserPromptSubmit` diz quantos sinais aguardam ack. Em repo sem `doorbell`
+no `.mcp.json` nada disso fala: a adesão é um ato, não vem com o update. A bancada é `run_channel_session_selftests`.
+
 ## Destino (peça 5)
 
 O que muda de verdade é o **registro** (`members.yaml` e o JWKS) e o **arquivo de convites do

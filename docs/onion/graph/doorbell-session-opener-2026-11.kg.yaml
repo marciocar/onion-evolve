@@ -1,0 +1,86 @@
+meta:
+  schema_version: "1"
+  id: doorbell-session-opener-2026-11
+  slug: doorbell-session-opener-2026-11
+  title: "A sessão aberta sem o canal da campainha: aviso, abridor versionado e contagem no prompt"
+  date: "2026-11-09"
+  baseline: "2026-11-09"
+  review_after: "2026-12-09"
+  purpose: "Guardar a decisão do maestro de 09/11 sobre como as sessões ligam o canal da campainha, o que foi medido para construí-la e o que ela não cobre."
+  note: "TETO, declarado: 4 nós. Nasceu à parte porque o maestro-decisions-1108 virou ponto de conflito entre PRs."
+  # ═══ TETO: 4 NÓS ═══
+nodes:
+  - id: E_DSO_CHANNEL_NEEDS_FLAG_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "documentação oficial do Claude Code lida em 09/11 pela sessão do core; medida ao vivo no 2.1.319: sessão no tmux com e sem --dangerously-load-development-channels, e a tela de confirmação antes do SessionStart"
+    label: "Não há chave de settings nem variável para ligar canal: é flag por sessão, com tela de confirmação, e sem a flag o push se perde em silêncio."
+    narrative: "Medido em 09/11 no 2.1.319: o hook de início de sessão roda depois da tela de confirmação; o argv do processo pai carrega a flag; o hook chega ao claude por sh -c, e CLAUDE_PID aponta para ele. Sessão de fundo aparece como `claude bg-spare`."
+    provenance:
+      source: "documentação oficial do Claude Code e sessão interativa no tmux"
+      locator: "docs de channels, lidos em 2026-11-09; sessões dbprobe1, dbprobe2 e dbprobe3 no 2.1.319"
+      method: "measurement: argv do processo pai e tela capturada"
+      locality: "repo"
+  - id: D_DSO_NOTICE_AND_OPENER_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções: escolhida «Aviso mais abertura do Onion»; run_channel_session_selftests verde com os mutantes"
+    label: "A sessão aberta sem o canal recebe um aviso único com a linha exata, e a linha é um abridor versionado de lista fechada; adotante só tem isso depois de aderir."
+    narrative: "Selado em 2026-11-09: escolhida «Aviso mais abertura do Onion»; descartadas: «Só sinais no prompt» · «Deixar como está». Sem mexer em .bashrc, alias ou arquivo do usuário. O abridor (.claude/utils/co-evolution/open-channel-session.sh) só aceita --continue e --resume e exige terminal, porque a tela de confirmação é para uma pessoa. Viaja com o canal upstream para os adotados e fica calado em repo sem doorbell no .mcp.json."
+    provenance:
+      source: "maestro, pergunta com opções na sessão do core"
+      locator: "pergunta com opções de 2026-11-09 sobre o canal da campainha"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: E_DSO_PENDING_COUNT_MEASURED_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "channel-session.py pending contra o estado real da campainha do core e o fila.db real: devolveu 1 e 0, igual ao arquivo de estado; 30 ms em três medidas; claude -p com o hook recebeu a contagem no contexto"
+    label: "A contagem no prompt lê o estado da campainha e a fila em leitura, custa cerca de 30 ms e nunca carrega título nem corpo."
+    narrative: "Fonte do caminho e da chave: o .mcp.json e o server.ts do doorbell (hash do repo, .v2.json antes de .json, legado onion-campainha). Fila: linhas de _honker_live na caixa inbox."
+    provenance:
+      source: "execução do leitor no core e no claude -p"
+      locator: ".claude/utils/co-evolution/channel-session.py, verbo pending"
+      method: "measurement: execução do leitor"
+      locality: "repo"
+  - id: E_DSO_LIMITS_DECLARED_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-09"
+    verified_against: "leitura do channel-session.py e do hook; casos (d), (e), (f) e (j) da família channel_session"
+    label: "O que não cobre: só Linux (lê o procfs), só o servidor chamado doorbell, conta por repo e não por sessão, e a retomada interna por /resume repete o aviso."
+    narrative: "O abridor não prova que a tela foi lida: a checagem de terminal é conformidade, não fronteira de segurança, e um pty a satisfaz. A fila morta (dead-letter) não entra na contagem. Worktree não tem .mcp.json, logo fica em silêncio."
+    provenance:
+      source: "leitura do próprio artefato"
+      locator: ".claude/utils/co-evolution/channel-session.py"
+      method: "reading: o artefato inteiro"
+      locality: "repo"
+edges:
+  - from: D_DSO_NOTICE_AND_OPENER_1109
+    to: E_DSO_CHANNEL_NEEDS_FLAG_1109
+    edge_type: TRACES_TO
+  - from: E_DSO_PENDING_COUNT_MEASURED_1109
+    to: D_DSO_NOTICE_AND_OPENER_1109
+    edge_type: SUPPORTS
+  - from: E_DSO_LIMITS_DECLARED_1109
+    to: D_DSO_NOTICE_AND_OPENER_1109
+    edge_type: TRACES_TO
