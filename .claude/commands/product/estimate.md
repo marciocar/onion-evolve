@@ -260,14 +260,13 @@ Com os pontos gravados por `tm.sh estimate.points <ID> <n>`, a data sai de
 ordenam a duração, erram muito, são piores que ignorá-los ou não passam na permutação), `calibration_not_measured` (backtest
 temporal da categoria com n<10), `miscalibrated` (cobertura abaixo de 0,7), `beyond_history` (esperou ou durou mais que o
 histórico; a issue não iniciada traz só `work_hours_if_started_now`, horas e não data) e `not_applicable` (concluída, cancelada
-ou mãe de filhas abertas) e `not_calibrated` (ato humano: nunca recebe faixa). Saída rc 4 = a categoria não tem base, e sai a
-faixa do time inteiro, sem pontos, com `proposal` null e o acerto do caminho em `measured_accuracy.served_path`: `provisional_team_band`
-traz datas em `provisional.dates_not_calibrated`, só onde o caminho foi medido; `provisional_work_hours_only` traz só horas, porque a
-data dependeria de quando alguém decide começar. Data provisória só entra com `tm.sh due_date.set <ID> <data> --provisional-note "<acerto medido>"`,
-que deixa a marca em comentário; sem a nota, `due_date.set` é para data calibrada (`proposed`). Pontos dados depois da conclusão
-ficam em `docs/onion/retro-estimates.tsv`.
-`velocity-meter.py report --project <P> --text` mostra pontos, fila, trabalho, erro e amostra por categoria
-(categorias do core em `docs/onion/work-categories.tsv`).
+ou mãe de filhas abertas) e `not_calibrated` (ato humano: nunca recebe faixa).
+
+Regra do maestro: **a data nasce no compromisso** ([`common:prompts:commitment-date-doctrine`](../common/prompts/commitment-date-doctrine.md)). Backlog e fila têm pontos
+e horas. Saída rc 4 = sem prazo calibrado, com `proposal` null: `calibrated_hours_only` e `provisional_work_hours_only` trazem só horas;
+`provisional_team_band` só aparece para issue já em desenvolvimento com pontos, com datas em `provisional.dates_not_calibrated` e o acerto
+do caminho em `measured_accuracy.served_path`. Quem fixar uma data usa `tm.sh due_date.set <ID> <data> --set-by "<quem>"`: o verbo registra
+quem fixou em comentário. Pontos dados depois da conclusão ficam em `docs/onion/retro-estimates.tsv`.
 
 ### Passo 6: Documentar Métricas (Opcional)
 
