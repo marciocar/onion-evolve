@@ -2,8 +2,7 @@
 branch: chore/seal-maestro-decisions-1109b
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: 7059af6feed04483aa68a6d53364355411f4253fa00be48f4ded0933c51a2fc8
-reviewed_code_sha256: 70ef6caf37777878842e4754b1024f34a03f9171368ecc8df25aacfddef180ad
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 2
@@ -31,6 +30,8 @@ citando o nó que as responde.
 | 1 | O label do selo dos atos do maestro trazia o código `P12` sem glosa. O selador não julgou nomes, porque o grafo ainda não estava rastreado, e o `kg_vocab.py lint` acusou depois do `git add`. | Curado: o label diz o que o teste é; o locator guarda a pergunta literal. |
 | 2 | A narrativa de `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` dizia que o selo não esperou a pesquisa, mas `Q_PS_PESQUISA_DO_RUNTIME_1110` já estava `done`. | Curado: só a escada segue aberta. |
 | 3 | O `D_MA_ARCH` selado segue com `DEPENDS_ON` para `Q_MA_MARKET`, ainda `open`, que não foi nomeado como portão. | Limite declarado abaixo; o selador não recusa por dependência aberta. |
+
+Re-revisão depois do acréscimo das condições do kg-ssot à narrative do `D_MA_ARCH`: o parágrafo novo diz que é proposta e que não é decisão do maestro; o id citado é de outro repositório e está dito assim. Radar, contrato e lint de nomes verdes no grafo. Sem achado novo.
 
 ## Mutantes
 

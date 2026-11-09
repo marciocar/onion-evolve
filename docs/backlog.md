@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1059 itens abertos** em 161 grafo(s) com aberto (de 207 no escopo) · 157 grupo(s), agrupados por `owner:` (75 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1058 itens abertos** em 161 grafo(s) com aberto (de 207 no escopo) · 157 grupo(s), agrupados por `owner:` (74 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1117,7 +1117,7 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 45 item(ns)
+## core — 44 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1144,7 +1144,6 @@
 | 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
 | 4.2 | `Q_IT_SYNC_MAIN_WRITE_PREFLIGHT` | inbox-triage-1108 | O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebr |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
-| 4.0 | `Q_MD_SYNC_MAIN_VERIFY_WRITE_1108` | maestro-decisions-1108 | Curar ops/sync-main-worktree.sh para conferir a escrita antes de avançar a main e avisar em vez de quebrar no meio. |
 | 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
 | 4.0 | `Q_MD_WAHA_PROJECT_USE_TERMS_1108` | maestro-decisions-1108 | O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no pi |
 | 4.0 | `Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108` | maestro-decisions-1108 | O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado. |
