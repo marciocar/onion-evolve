@@ -28733,6 +28733,223 @@ open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent
 # igual ao EROFS do bind. Root ignora o modo, então como root os casos de chmod saem SKIP, nunca PASS.
 # Os dois lados rodam como o runner: o co-relay.sh do remetente e o HOOK SessionStart no destino.
 # ---------------------------------------------------------------------------
+# Canal da sessão (2026-11-09): o aviso de sessão sem campainha, o abridor com lista fechada e a contagem no prompt.
+# Exercita como o runner: o hook é filho de um processo que se chama `claude` de verdade, e o /proc é o real.
+run_channel_session_selftests() {
+  local py="${REPO_ROOT}/.claude/utils/co-evolution/channel-session.py"
+  local opener="${REPO_ROOT}/.claude/utils/co-evolution/open-channel-session.sh"
+  local hook="${REPO_ROOT}/.claude/hooks/co-evolution-inbox-check.sh"
+  local x; for x in "${py}" "${opener}" "${hook}"; do
+    [ -f "${x}" ] || { record_fail "channel-session" "peça ausente: ${x}"; return; }
+  done
+  local d repo mut cs_out cs_rc i_rc m_rc arg
+  d="$(mktemp -d)"; repo="${d}/repo"; mut="${d}/mut"
+  mkdir -p "${repo}/.claude/hooks" "${repo}/.claude/utils/co-evolution" "${d}/bin" "${d}/obin" "${d}/state" "${d}/q" "${mut}"
+  git -C "${repo}" init -q
+  cp "${hook}" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"
+  # shebang direto em /bin/bash: o comm do processo vira `claude`, como no binário nativo
+  cat > "${d}/bin/claude" <<'FAKE'
+#!/bin/bash
+cd "$CS_REPO" && CLAUDE_PROJECT_DIR="$CS_REPO" CLAUDE_CODE_ENTRYPOINT=cli bash "$CS_REPO/.claude/hooks/co-evolution-inbox-check.sh" < "$CS_PAYLOAD"
+FAKE
+  chmod +x "${d}/bin/claude"
+  printf '#!/bin/sh\nprintf "%%s\\n" "$PWD" "$@" > "$CS_LOG"\n' > "${d}/obin/claude"; chmod +x "${d}/obin/claude"
+  _cs_mcp() {  # $1 = doorbell|none|bad|absent
+    rm -f "${repo}/.mcp.json"
+    case "$1" in
+      doorbell) printf '{"mcpServers":{"doorbell":{"command":"cat","env":{"DOORBELL_STATE_DIR":"%s","DOORBELL_QUEUE_SOCK":"%s"}}}}\n' "${d}/state" "${d}/q/queue.sock" > "${repo}/.mcp.json" ;;
+      none) printf '{"mcpServers":{"other":{"command":"cat"}}}\n' > "${repo}/.mcp.json" ;;
+      bad) printf '{"mcpServers": {' > "${repo}/.mcp.json" ;;
+    esac
+  }
+  _cs_fire() {  # $1 = channel-session.py a usar, $2 = source do SessionStart, $3... = argv do claude
+    local impl="$1" src="$2"; shift 2
+    cp "${impl}" "${repo}/.claude/utils/co-evolution/channel-session.py"
+    printf '{"session_id":"abc-123","source":"%s"}' "${src}" > "${d}/payload"
+    cs_rc=0; cs_out="$(env -u CLAUDE_PID CS_REPO="${repo}" CS_PAYLOAD="${d}/payload" "${d}/bin/claude" "$@" 2>&1)" || cs_rc=$?
+  }
+  _cs_mut_py() { sed -e "$1" "${py}" > "${mut}/$2"; }
+  _cs_silent() { [ "${cs_rc}" -eq 0 ] && [ -z "${cs_out}" ]; }
+  _cs_warned() { [ "${cs_rc}" -eq 0 ] && [[ "${cs_out}" == *'"systemMessage"'* ]] && [[ "${cs_out}" == *"open-channel-session.sh"* ]]; }
+  _cs_case() {  # $1 = nome, $2 = predicado, $3 = mutante, $4 = mcp, $5 = source, $6... = argv
+    local name="$1" pred="$2" m="$3" mcp="$4" src="$5"; shift 5
+    _cs_mcp "${mcp}"; _cs_fire "${py}" "${src}" "$@"; i_rc=0; "${pred}" || i_rc=1
+    if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: ${name}"
+    else record_fail "channel-session: ${name}" "rc=${cs_rc} out=[${cs_out}]"; fi
+    _cs_fire "${m}" "${src}" "$@"; m_rc=0; "${pred}" || m_rc=1
+    _prove_mutation "channel-session: ${name}: o mutante morde" "${py}" "${m}" "${i_rc}" "${m_rc}"
+  }
+  _cs_mcp doorbell
+  local chk='    if argv is None or not interactive(argv) or has_channel(argv, name):'
+  _cs_mut_py "s/^${chk}\$/    if argv is None or not interactive(argv) or True:/" flag-true.py
+  _cs_mut_py "s/^${chk}\$/    if argv is None or not interactive(argv):/" flag-false.py
+  _cs_mut_py 's/if arg.startswith(flag + "=") and /if False and /' flag-eq.py
+  _cs_mut_py 's/return not any(a in ("-p", "--print") for a in args)/return True/' print.py
+  _cs_mut_py 's/if args and (args\[0\] == "daemon" or args\[0\].startswith(("bg-", "--bg"))):/if False:/' bg.py
+  _cs_mut_py 's/^    if source not in ("startup", "resume"):.*/    if False:/' src.py
+  _cs_mut_py 's/^    if source == "resume" and re.fullmatch/    if False and re.fullmatch/' resume.py
+  _cs_mut_py 's/^        if name in names and isinstance(servers\[name\], dict):$/        if True:/; s/^            return name, servers\[name\]$/            return name, {}/' any-server.py
+  _cs_mut_py 's/^        raise Invalid(type(exc).__name__)$/        return "doorbell", {}/' invalid.py
+  sed -e '/except (OSError, ValueError, IndexError):/{n;s/return None/return ["claude"]/}' "${py}" > "${mut}/proc.py"
+
+  _cs_case "(a) sem a flag, avisa com a linha exata" _cs_warned "${mut}/flag-true.py" doorbell startup
+  _cs_case "(b) com a flag, silêncio" _cs_silent "${mut}/flag-false.py" doorbell startup --dangerously-load-development-channels server:doorbell
+  _cs_case "(c) a forma --flag=valor também conta" _cs_silent "${mut}/flag-eq.py" doorbell startup --channels=server:doorbell
+  _cs_case "(d) sessão -p, em que a flag não funciona: silêncio" _cs_silent "${mut}/print.py" doorbell startup -p oi
+  _cs_case "(e) sessão de fundo: silêncio" _cs_silent "${mut}/bg.py" doorbell startup bg-spare --bg-spare /tmp/x.sock
+  _cs_case "(f) /clear e compactação não repetem" _cs_silent "${mut}/src.py" doorbell compact
+  _cs_has_resume() { _cs_warned && [[ "${cs_out}" == *"--resume abc-123"* ]]; }
+  _cs_case "(g) sessão retomada: a linha traz o id" _cs_has_resume "${mut}/resume.py" doorbell resume
+  _cs_case "(h) repo sem campainha: silêncio" _cs_silent "${mut}/any-server.py" none startup
+  _cs_case "(i) .mcp.json inválido: silêncio, sessão de pé" _cs_silent "${mut}/invalid.py" bad startup
+
+  # (j) processo ilegível: /proc nega e o aviso não afirma o que não mediu
+  _cs_unreadable() {  # $1 = channel-session.py
+    printf '{"session_id":"a","source":"startup"}' | python3 -I -S -c '
+import builtins, importlib.util, sys
+spec = importlib.util.spec_from_file_location("cs", sys.argv[1]); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+real = builtins.open
+def deny(p, *a, **k):
+    if str(p).startswith("/proc/"): raise PermissionError(13, "denied")
+    return real(p, *a, **k)
+builtins.open = deny
+m.notice(sys.argv[2])' "$1" "${repo}" 2>&1
+  }
+  _cs_mcp doorbell; cs_out="$(_cs_unreadable "${py}")"; i_rc=0; [ -z "${cs_out}" ] || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (j) processo ilegível: silêncio"
+  else record_fail "channel-session: (j) processo ilegível" "out=[${cs_out}]"; fi
+  cs_out="$(_cs_unreadable "${mut}/proc.py")"; m_rc=0; [ -z "${cs_out}" ] || m_rc=1
+  _prove_mutation "channel-session: (j-M) quem assume o processo volta a avisar sem medir — (j) morde" "${py}" "${mut}/proc.py" "${i_rc}" "${m_rc}"
+
+  # (k) aviso e inbox na mesma saída: o JSON segue válido e leva os dois
+  _cs_both() { python3 -I -S -c 'import json,sys
+d=json.loads(sys.argv[1]); sys.exit(0 if d.get("systemMessage") and d["hookSpecificOutput"]["additionalContext"] else 1)' "${cs_out}" 2>/dev/null; }
+  mkdir -p "${repo}/docs/evolution/inbox"; printf 'x\n' > "${repo}/docs/evolution/inbox/s.md"
+  _cs_mcp doorbell; _cs_fire "${py}" startup; i_rc=0; _cs_both || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (k) aviso e correio saem num JSON só"
+  else record_fail "channel-session: (k) JSON" "out=[${cs_out}]"; fi
+  sed -e 's/^printf .{%s%s%s}.*$/printf "{%s%s}\\n" "$_sys" "$_ctx"/' "${hook}" > "${mut}/hook-json.sh"
+  cp "${mut}/hook-json.sh" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"
+  _cs_fire "${py}" startup; m_rc=0; _cs_both || m_rc=1
+  cp "${hook}" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"
+  _prove_mutation "channel-session: (k-M) sem a vírgula o JSON quebra — (k) morde" "${hook}" "${mut}/hook-json.sh" "${i_rc}" "${m_rc}"
+  rm -rf "${repo}/docs"
+
+  # ── o abridor ──
+  if ! command -v script >/dev/null 2>&1; then
+    record_skip "channel-session: abridor (sem o script do util-linux para simular terminal)"
+  else
+    cp "${py}" "${repo}/.claude/utils/co-evolution/channel-session.py"
+    local osut="${repo}/.claude/utils/co-evolution/open-channel-session.sh" cmdl
+    mkdir -p "${repo}/sub"
+    _op_run() {  # $1 = abridor, $2 = PATH extra (vazio = stub), $3... = args; roda num terminal de verdade
+      local impl="$1" p="$2" q=""; shift 2
+      cp "${impl}" "${osut}"; rm -f "${d}/olog"
+      if [ "$#" -gt 0 ]; then printf -v q '%q ' "$@"; fi
+      cs_rc=0; cs_out="$(cd "${repo}/sub" && CS_LOG="${d}/olog" PATH="${p:-${d}/obin:${PATH}}" script -qec "bash ${osut} ${q}" /dev/null </dev/null 2>&1)" || cs_rc=$?
+    }
+    _op_case() {  # $1 = nome, $2 = predicado, $3 = mutante, $4 = mcp, $5... = args
+      local name="$1" pred="$2" m="$3" mcp="$4"; shift 4
+      _cs_mcp "${mcp}"; _op_run "${opener}" "" "$@"; i_rc=0; "${pred}" || i_rc=1
+      if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: ${name}"
+      else record_fail "channel-session: ${name}" "rc=${cs_rc} out=[${cs_out}]"; fi
+      _op_run "${m}" "" "$@"; m_rc=0; "${pred}" || m_rc=1
+      _prove_mutation "channel-session: ${name}: o mutante morde" "${opener}" "${m}" "${i_rc}" "${m_rc}"
+    }
+    _op_refused() { [ "${cs_rc}" -eq 2 ] && [ ! -e "${d}/olog" ]; }
+    _op_opened() {
+      [ "${cs_rc}" -eq 0 ] && [ "$(cat "${d}/olog" 2>/dev/null)" = "$(printf '%s\n' "${repo}" --dangerously-load-development-channels server:doorbell --continue)" ]
+    }
+    sed -e 's/^exec claude --dangerously-load-development-channels "server:${server}" /exec claude /' "${opener}" > "${mut}/op-noflag.sh"
+    sed -e 's/^    \*) die 2 "argumento recusado.*/    *) args+=("$1"); shift ;;/' "${opener}" > "${mut}/op-open.sh"
+    sed -e '/^        \[\[ "$2" =~ $safe_id \]\]/d' "${opener}" > "${mut}/op-id.sh"
+    sed -e 's/^  3) die 2 .*/  3) server=doorbell ;;/' "${opener}" > "${mut}/op-none.sh"
+    sed -e 's/^  \*) die 2 "não deu para ler.*/  *) server=doorbell ;;/' "${opener}" > "${mut}/op-bad.sh"
+    sed -e '/^\[ -t 0 \] && \[ -t 1 \]/d' "${opener}" > "${mut}/op-tty.sh"
+    sed -e '/^command -v claude/d' "${opener}" > "${mut}/op-noclaude.sh"
+
+    _op_case "(l) abre na raiz com o canal e repassa --continue" _op_opened "${mut}/op-noflag.sh" doorbell --continue
+    for arg in --dangerously-skip-permissions --allow-dangerously-skip-permissions --permission-mode --channels --dangerously-load-development-channels --settings --mcp-config --strict-mcp-config --allowedTools --add-dir -p --print; do
+      _op_case "(m) recusa ${arg}" _op_refused "${mut}/op-open.sh" doorbell "${arg}"
+    done
+    _op_case "(n) --resume com id fora do alfabeto é recusado" _op_refused "${mut}/op-id.sh" doorbell --resume 'abc;touch x'
+    _op_case "(o) repo sem campainha: recusa, sem abrir" _op_refused "${mut}/op-none.sh" none
+    _op_case "(p) .mcp.json inválido: recusa, sem abrir" _op_refused "${mut}/op-bad.sh" bad
+    # (q) sem terminal: a confirmação do canal não pode ser respondida por um pipe
+    _op_notty() {  # $1 = abridor
+      cp "$1" "${osut}"; rm -f "${d}/olog"
+      cs_rc=0; ( cd "${repo}/sub" && printf '\n' | CS_LOG="${d}/olog" PATH="${d}/obin:${PATH}" bash "${osut}" >/dev/null 2>&1 ) || cs_rc=$?
+    }
+    _cs_mcp doorbell; _op_notty "${opener}"; i_rc=0; _op_refused || i_rc=1
+    if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (q) entrada canalizada não abre"
+    else record_fail "channel-session: (q) sem terminal" "rc=${cs_rc}"; fi
+    _op_notty "${mut}/op-tty.sh"; m_rc=0; _op_refused || m_rc=1
+    _prove_mutation "channel-session: (q-M) sem a checagem de terminal, um pipe responderia a tela — (q) morde" "${opener}" "${mut}/op-tty.sh" "${i_rc}" "${m_rc}"
+    # (r) claude fora do PATH: diz o que falta (PATH só com as ferramentas do abridor)
+    local bare="${d}/bare"; mkdir -p "${bare}"
+    for x in bash git python3 dirname script; do ln -s "$(type -P "${x}")" "${bare}/${x}"; done
+    _op_noclaude() { [ "${cs_rc}" -eq 127 ] && [[ "${cs_out}" == *"não está no PATH"* ]]; }
+    _cs_mcp doorbell; _op_run "${opener}" "${bare}"; i_rc=0; _op_noclaude || i_rc=1
+    if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (r) claude fora do PATH: diz o que falta"
+    else record_fail "channel-session: (r) sem claude" "rc=${cs_rc} out=[${cs_out}]"; fi
+    _op_run "${mut}/op-noclaude.sh" "${bare}"; m_rc=0; _op_noclaude || m_rc=1
+    _prove_mutation "channel-session: (r-M) sem a checagem, o erro volta a ser o do shell — (r) morde" "${opener}" "${mut}/op-noclaude.sh" "${i_rc}" "${m_rc}"
+  fi
+
+  # ── a contagem no prompt ──
+  python3 -I -c '
+import hashlib, json, sqlite3, sys
+repo, state, db = sys.argv[1:4]
+h = hashlib.sha256(repo.encode()).hexdigest()[:16]
+json.dump({"repo": repo, "signals": {
+  "a": {"title": "SEGREDO-NO-TITULO", "acked_at": None},
+  "b": {"title": "SEGREDO-NO-TITULO", "acked_at": None, "expired_at": "x"},
+  "c": {"title": "SEGREDO-NO-TITULO", "acked_at": "2026-11-09"}}}, open(f"{state}/{h}.v2.json", "w"))
+c = sqlite3.connect(db)
+c.execute("CREATE TABLE _honker_live (queue TEXT, state TEXT, payload TEXT)")
+c.executemany("INSERT INTO _honker_live VALUES (?,?,?)", [("inbox","pending","SEGREDO-NO-CORPO"),("inbox","processing","SEGREDO-NO-CORPO"),("inbox","pending","SEGREDO-NO-CORPO"),("other","pending","y")])
+c.commit()' "${repo}" "${d}/state" "${d}/q/queue.db"
+  _cs_prompt() {  # $1 = channel-session.py
+    cp "$1" "${repo}/.claude/utils/co-evolution/channel-session.py"
+    cs_rc=0; cs_out="$(cd "${repo}" && CLAUDE_PROJECT_DIR="${repo}" XDG_STATE_HOME="${d}/nowhere" bash "${repo}/.claude/hooks/co-evolution-inbox-check.sh" prompt </dev/null 2>&1)" || cs_rc=$?
+  }
+  _cs_counts() {
+    [ "${cs_rc}" -eq 0 ] && [[ "${cs_out}" == *'"hookEventName":"UserPromptSubmit"'* ]] && [[ "${cs_out}" == *"doc-bridge 2, fila 3"* ]] && [[ "${cs_out}" != *SEGREDO* ]] \
+      && python3 -I -S -c 'import json,sys; json.loads(sys.argv[1])' "${cs_out}" 2>/dev/null
+  }
+  _cs_prompt_case() {  # $1 = nome, $2 = predicado, $3 = mutante
+    _cs_prompt "${py}"; i_rc=0; "$2" || i_rc=1
+    if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: $1"
+    else record_fail "channel-session: $1" "rc=${cs_rc} out=[${cs_out}]"; fi
+    _cs_prompt "$3"; m_rc=0; "$2" || m_rc=1
+    _prove_mutation "channel-session: $1: o mutante morde" "${py}" "$3" "${i_rc}" "${m_rc}"
+  }
+  _cs_mut_py 's/if isinstance(s, dict) and not s.get("acked_at"))/if isinstance(s, dict))/' p-ack.py
+  _cs_mut_py 's/FROM _honker_live WHERE queue=?", (QUEUE_INBOX,))/FROM _honker_live")/' p-queue.py
+  sed -e "s|^    if not entry:\$|    entry = entry or {\"env\": {\"DOORBELL_STATE_DIR\": \"${d}/state\", \"DOORBELL_QUEUE_SOCK\": \"${d}/q/queue.sock\"}}\n    if not entry:|" "${py}" > "${mut}/p-entry.py"
+  _cs_mut_py 's/^    if bell + queue > 0:$/    if True:/' p-zero.py
+  _cs_mcp doorbell
+  _cs_prompt_case "(s) prompt: conta o que não teve ack e a fila, sem título nem corpo" _cs_counts "${mut}/p-ack.py"
+  _cs_prompt_case "(t) prompt: só a caixa de entrada da fila conta" _cs_counts "${mut}/p-queue.py"
+  _cs_mcp none
+  _cs_prompt_case "(u) prompt em repo sem campainha: silêncio, mesmo com estado em disco" _cs_silent "${mut}/p-entry.py"
+  python3 -I -c '
+import json, sqlite3, sys, glob
+for f in glob.glob(sys.argv[1] + "/*.v2.json"):
+    s = json.load(open(f)); s["signals"] = {}; json.dump(s, open(f, "w"))
+c = sqlite3.connect(sys.argv[2]); c.execute("DELETE FROM _honker_live"); c.commit()' "${d}/state" "${d}/q/queue.db"
+  _cs_mcp doorbell
+  _cs_prompt_case "(v) prompt sem pendência: silêncio" _cs_silent "${mut}/p-zero.py"
+  # (w) o registro: sem a linha no settings.json nada disso dispara
+  if python3 -I -S -c 'import json,sys
+hs=json.load(open(sys.argv[1]))["hooks"]
+want={"SessionStart":"co-evolution-inbox-check.sh\"","UserPromptSubmit":"co-evolution-inbox-check.sh\" prompt"}
+sys.exit(0 if all(any(h.get("command","").endswith(w) for g in hs[e] for h in g["hooks"]) for e,w in want.items()) else 1)' "${REPO_ROOT}/.claude/settings.json" 2>/dev/null; then
+    record_pass "channel-session: (w) o settings.json registra o hook nos dois eventos"
+  else record_fail "channel-session: (w) registro" "SessionStart ou UserPromptSubmit sem o co-evolution-inbox-check.sh"; fi
+  rm -rf "${d}"
+}
+
 run_corelay_spool_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/co-evolution/co-relay.sh"
   local importer="${REPO_ROOT}/.claude/utils/co-evolution/spool-import.sh"
@@ -33807,6 +34024,7 @@ _family run_corelay_selftests
 
 # Modo co-relay-spool — a entrega por spool do carteiro e a importação no destino (F7, sandbox).
 _family run_corelay_spool_selftests
+_family run_channel_session_selftests
 
 # Modo relay-public — guarda de destino público do carteiro + REGRA 113 no destino (2026-10-29).
 _family run_relay_public_selftests

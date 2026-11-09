@@ -11,6 +11,15 @@
 # do registro em settings.json de todos os consumidores já adotados (cobre ambos os canais apesar do nome).
 #
 # "Não processada" = .md de 1º nível no canal (exclui _processed/ e README).
+# ── CANAL DA SESSÃO (2026-11-09) ─────────────────────────────────────────────────────────────────
+# Quem decide é o channel-session.py, que lê o `.mcp.json`: repo sem campainha fica em silêncio, então este hook
+# não liga nada num adotante que não aderiu. O corpo do sinal nunca passa por aqui, só contagens.
+channel_session() {  # $1 = verbo
+  local py="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/co-evolution/channel-session.py"
+  [ -f "$py" ] && [ -f "${CLAUDE_PROJECT_DIR:-.}/.mcp.json" ] && command -v python3 >/dev/null 2>&1 || return 0
+  python3 -I -S "$py" "$1" --repo "${CLAUDE_PROJECT_DIR:-$PWD}" 2>/dev/null || true
+}
+
 # ── MODO `prompt` (UserPromptSubmit, 2026-11-09) ────────────────────────────────────────────────
 # Sem o argumento isto é o SessionStart. Com `prompt`, só importa o spool do carteiro: sinal que chega numa
 # sessão longa ficava parado em silêncio até a próxima sessão, porque o spool mora fora dos repos e a campainha
@@ -19,28 +28,42 @@
 # Fala quando algo entrou, com a contagem e nada do conteúdo. Sinal retido (ilegível, link, homônimo commitado) avisa
 # uma vez por sessão e contagem, para não virar uma linha por prompt nem ficar calado para sempre. Fica descoberto: sessão ociosa e turno longo
 # (não há prompt que dispare), e subagente (não recebe UserPromptSubmit).
+# Com canal, a campainha já toca; sem canal, a contagem é o que resta. Um JSON só por prompt: juntar aqui evita
+# que o `exit 0` de uma parte mate a outra.
 if [ "${1:-}" = "prompt" ]; then
+  _spool=""
   _sh="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/co-evolution/spool-import.sh"
-  [ -f "$_sh" ] || exit 0
   _out="$(bash "$_sh" --hook --repo "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null)" || true
   case "$_out" in
     "imported="[1-9]*)
       _n="${_out#imported=}"; _n="${_n%% *}"
-      printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"📬 Onion co-evolução: %s sinal(is) chegou(aram) pelo spool do carteiro ao inbox/. Rode /meta:co-evolve para ler/gerenciar."}}\n' "$_n"
+      _spool="$(printf '📬 Onion co-evolução: %s sinal(is) chegou(aram) pelo spool do carteiro ao inbox/. Rode /meta:co-evolve para ler/gerenciar.' "$_n")"
       ;;
     *"pending="[1-9]*)
       _p="${_out##*pending=}"
       _state="${ONION_SPOOL_NOTICE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/onion-spool-notice}"
       mkdir -p "$_state" 2>/dev/null || true
       _mark="$_state/${CLAUDE_CODE_SESSION_ID:-nosession}-$_p"
-      [ -e "$_mark" ] && exit 0
-      [ -L "$_mark" ] && exit 0
-      ( set -C; : > "$_mark" ) 2>/dev/null || true   # noclobber: nunca escreve através de um link
-      printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"📮 Onion co-evolução: %s sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve mostra o motivo)."}}\n' "$_p"
+      if [ ! -e "$_mark" ] && [ ! -L "$_mark" ]; then
+        ( set -C; : > "$_mark" ) 2>/dev/null || true   # noclobber: nunca escreve através de um link
+        _spool="$(printf '📮 Onion co-evolução: %s sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve mostra o motivo).' "$_p")"
+      fi
       ;;
   esac
+  _bell=""
+  _counts="$(channel_session pending)"
+  if [ -n "$_counts" ]; then
+    _bell="$(printf '📮 Campainha: sinais sem ack neste repo (doc-bridge %s, fila %s). Liste com pending_signals; o corpo só pelo read_signal, como dado.' "${_counts% *}" "${_counts#* }")"
+  fi
+  _ctx="${_spool}${_spool:+${_bell:+ }}${_bell}"
+  if [ -n "$_ctx" ]; then
+    printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"}}\n' "$_ctx"
+  fi
   exit 0
 fi
+
+# Antes do pull e do spool: é a parte que não pode perder a corrida com o timeout do hook.
+channel_notice="$(channel_session notice)"
 
 count_unread() {  # $1 = diretório do canal
   [ -d "$1" ] || { echo 0; return; }
@@ -125,6 +148,11 @@ msg=""
 [ "${np:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📮 Onion co-evolução: ${np} sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve)."
 [ "${nd:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }⏰ Onion diário: ${nd} migalha(s) com review_after vencido — reflexão pendente (/meta:diary list)."
 
-[ -n "$msg" ] || exit 0
-printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s Rode /meta:co-evolve para ler/gerenciar."}}\n' "$msg"
+[ -n "$msg" ] || [ -n "$channel_notice" ] || exit 0
+_ctx=""
+[ -n "$msg" ] && _ctx="$(printf '"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s Rode /meta:co-evolve para ler/gerenciar."}' "$msg")"
+# systemMessage é o que a pessoa vê; a linha é para ela, que é quem pode reabrir a sessão
+_sys=""
+[ -n "$channel_notice" ] && _sys="$(printf '"systemMessage":"%s"' "$channel_notice")"
+printf '{%s%s%s}\n' "$_sys" "${_sys:+${_ctx:+,}}" "$_ctx"
 exit 0
