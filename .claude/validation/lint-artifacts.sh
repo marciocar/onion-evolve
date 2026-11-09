@@ -6430,7 +6430,8 @@ check_kg_projection
 #   --confirm-public e entrega o sinal com `reviewed_for_public: false` no frontmatter; esta regra barra o
 #   commit dele (o ÍNDICE, nunca a árvore: o untracked que o carteiro escreve não deixa o gate vermelho) até a
 #   sessão do destino revisar e gravar `true`. Lógica e teto (paráfrase, marca trocada sem reler, sinal fora
-#   do carteiro) em relay-public-review-check.sh. Sem índice git = SOFT NÃO-VERIFICADO.
+#   do carteiro) em relay-public-review-check.sh. Sem índice git = SOFT NÃO-VERIFICADO. No papel source a regra
+#   exige também a própria chave no sinal novo (classe sem-marca): sinal por A2A ou cópia à mão não traz a marca.
 check_relay_public_review() {
   local helper="${SCRIPT_DIR}/relay-public-review-check.sh"
   [ -f "${helper}" ] || return 0
@@ -6439,9 +6440,10 @@ check_relay_public_review() {
   fi
   local _R="REGRA 113 (Sinal relayado a destino público só se commita revisado)"
   local _repo="${ONION_RELAY_REVIEW_REPO:-${REPO_ROOT}}"   # troca o repo julgado (bancada: o dispatcher sobre um índice de mktemp)
-  local _out _hrc=0 _err _sev _code _path _msg
+  local _out _hrc=0 _err _sev _code _path _msg _req=""
+  [ "$(_role)" = "source" ] && _req=1
   _err="$(mktemp 2>/dev/null || echo /dev/null)"
-  if _out="$(LC_ALL=C bash "${helper}" "${_repo}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  if _out="$(LC_ALL=C bash "${helper}" "${_repo}" --format tsv ${_req:+--require-mark} 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
   while IFS=$'\t' read -r _sev _code _path _msg; do
     [ -n "${_code:-}" ] || continue
     violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}"

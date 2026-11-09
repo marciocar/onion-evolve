@@ -113,7 +113,7 @@ nodes:
     impact: 3
     confidence: 0.85
     label: "TETO: sinal que não passa pelo carteiro (cópia à mão, A2A, colado na sessão) chega sem a marca e a REGRA 113 cala; o inbound/ (canal downstream) e o histórico de commits ficam fora do escopo."
-    narrative: "Gatilho nomeado para estender: um caso medido de sinal com detalhe que chegou ao inbox público por outro caminho e foi commitado."
+    narrative: "Gatilho nomeado para estender: um caso medido de sinal com detalhe que chegou ao inbox público por outro caminho e foi commitado. Estreitado em 2026-11-08, sem o gatilho ter disparado: no core, o sinal novo sem a chave passa a ser HARD (D_IT_RELAY_MARK_REQUIRED_1108, grafo inbox-triage-1108); fora do core, e no nome com data antiga, o teto segue."
 
   - id: C_TETO_CONFIRMACAO_REFLEXA
     node_type: claim

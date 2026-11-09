@@ -28781,6 +28781,17 @@ EOF_RP
   if [ "${n_untracked}" = 0 ] && [ "${n_staged}" = 1 ] && [ "${n_reviewed}" = 0 ]; then
     record_pass "relay-public: (j) dispatcher: o sinal que o carteiro entregou cala untracked, vira HARD da REGRA 113 no índice, e cala revisado"
   else record_fail "relay-public: (j) dispatcher" "untracked=${n_untracked} staged=${n_staged} revisado=${n_reviewed}"; fi
+  # (j2) o dispatcher no papel source liga a exigência: sinal sem carteiro e sem a chave vira sem-marca
+  local SIGNM="docs/evolution/inbox/2099-01-01-sem-carteiro.md" n_nomark
+  printf -- '---\ntitle: t\n---\n\n# corpo\n' > "${W}/c/${SIGNM}"; git -C "${W}/c" add -- "${SIGNM}" >/dev/null 2>&1
+  n_nomark="$( ( cd "${REPO_ROOT}" && ONION_RELAY_REVIEW_REPO="${W}/c" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${W}/c/${SIGNM}" 2>&1 || true ) \
+                 | grep -c 'REGRA 113 (Sinal relayado a destino público só se commita revisado): \[sem-marca\]' || true)"
+  # o dispatcher só liga a exigência no papel source; na cópia vendorizada do adotante o certo é calar
+  local want_nomark=1
+  if grep -qE '^[[:space:]]*(role:[[:space:]]*(adopted|hub|standalone)|kind:[[:space:]]*door)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then want_nomark=0; fi
+  if [ "${n_nomark}" = "${want_nomark}" ]; then record_pass "relay-public: (j2) dispatcher: sinal sem carteiro e sem a chave vira sem-marca só no papel source"
+  else record_fail "relay-public: (j2) dispatcher sem-marca" "n=${n_nomark} esperado=${want_nomark}"; fi
+  git -C "${W}/c" rm -q --cached -- "${SIGNM}" >/dev/null 2>&1; rm -f "${W}/c/${SIGNM}"
 
   # (k) as polaridades do check (--selftest) e os mutantes dele: ler a árvore em vez do índice, e a chave fora do frontmatter
   local o
@@ -28816,6 +28827,9 @@ LC_ALL=C git -C "\${repo}" grep --cached -z -l$(printf '\x1f')LC_ALL=C git -C "\
        fm == 1 && /^reviewed_for_public[ \t]*:/ {$(printf '\x1f')       /^reviewed_for_public[ \t]*:/ {$(printf '\x1f')(vi) corpo cala$(printf '\x1f')       fm == 1 && /^---\r?\$/ { exit }$(printf '\x1f')       fm == 1 && /^---\r?\$/ { fm = 0; next }
       case "\$(printf '%s' "\${v}" | tr '[:upper:]' '[:lower:]')" in true) : ;; *) bad="\${v}" ;; esac$(printf '\x1f')      case "\${v}" in *) : ;; esac$(printf '\x1f')(i) marcado false no índice acusa
     || { echo "relay-public-review-check: \${repo} não é uma árvore git — sem índice, não julguei" >&2; return 3; }$(printf '\x1f')    || return 0$(printf '\x1f')(x) sem árvore git
+  [ "\${REQUIRE_MARK}" = 1 ] || { rm -f "\${tmp}" "\${list}"; return 0; }$(printf '\x1f')  { rm -f "\${tmp}" "\${list}"; return 0; }$(printf '\x1f')(xi) sinal novo sem a chave acusa
+      [[ "\${day}" < "\${MARK_SINCE}" ]] && continue$(printf '\x1f')      :$(printf '\x1f')(xiii) anterior ao corte cala
+    [ -z "\$(_frontmatter_values "\${tmp}")" ] || continue$(printf '\x1f')    :$(printf '\x1f')(xiv) revisado cala
 EOF_RPC
   rm -rf "${W}"
 }
