@@ -2,7 +2,8 @@
 branch: feat/meeting-notice-absence-record
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9badac0decee2e58bfa01fafaf4b555708fe9875c7a55f21bdec2de98050954e
+reviewed_code_sha256: 4016f5d113193bbf849279dffeb909be6b17fedc8bc8eabf72bbe38c29b8d2e4
 findings_total: 18
 findings_real: 17
 findings_blocking: 2
