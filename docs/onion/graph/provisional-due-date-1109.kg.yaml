@@ -1,0 +1,65 @@
+meta:
+  schema_version: "1"
+  id: provisional-due-date-1109
+  slug: provisional-due-date-1109
+  title: "De onde sai a data de uma issue: selos do maestro de 2026-11-09"
+  date: "2026-11-09"
+  baseline: "2026-11-09"
+  review_after: "2026-12-09"
+  purpose: "Guardar as duas decisões do maestro sobre a data de issue, executadas no velocity-meter.py. Grafo próprio para não disputar o de decisões da rodada, que muda a cada leva."
+nodes:
+  - id: E_DD_MAESTRO_ROUND_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "respostas do maestro em 2026-11-09, relatadas pela sessão do core nos briefs do PR #1560"
+    label: "Em 2026-11-09 o maestro decidiu o que o medidor entrega quando a categoria não tem base e quando nasce a data de uma issue."
+    narrative: "Este nó é a origem comum dos dois selos do grafo. A pergunta, a escolhida e as descartadas ficam em cada selo."
+    provenance:
+      source: "sessão do core, 2026-11-09"
+      locator: "briefs do PR #1560"
+      method: "testimony: decisão do maestro relatada pela sessão do core, 2026-11-09"
+      locality: pessoa
+  - id: D_DD_PROVISIONAL_TEAM_BAND_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções, relatada pela sessão do core no brief do PR #1560: escolhida «Faixa provisória do time»"
+    label: "Enquanto a categoria não tem base, o medidor entrega uma resposta do time inteiro, de baixa confiança, com o acerto medido ao lado."
+    narrative: "Selado em 2026-11-09: escolhida «Faixa provisória do time»; descartadas: «Sem data até passar» · «Afrouxar o portão». Sai sem pontos, com fila e trabalho separados, em status próprio de rc 4 e com proposal nulo. Quando a categoria passar nos portões, a conta calibrada assume. A regra da data no compromisso, selada a seguir, restringe onde essa resposta traz data."
+    provenance:
+      source: "maestro, por pergunta com opções, relatado pela sessão do core"
+      locator: "pergunta com opções de 2026-11-09 sobre o que o propose entrega enquanto a categoria não tem base"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: pessoa
+  - id: D_DD_DATE_AT_COMMITMENT_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "regra do maestro em 2026-11-09, relatada pela sessão do core no brief do PR #1560, verbatim: «a data vem quando alguém valida a estimativa e coloca para desenvolvimento, ou alguém fixa a data, como é o padrão usado pelo Onion, padrão de mercado»"
+    label: "A data de uma issue nasce no compromisso: quando alguém valida a estimativa e a põe em desenvolvimento, ou quando alguém a fixa; backlog e fila têm pontos e horas."
+    narrative: "Regra do maestro de 2026-11-09. Executada no velocity-meter.py e em tm.sh due_date.set --set-by, com a doutrina em common:prompts:commitment-date-doctrine. Medido antes de selar: a data para issue em fila acertava perto de 20%."
+    provenance:
+      source: "maestro, relatado pela sessão do core"
+      locator: "brief do PR #1560 de 2026-11-09"
+      method: "testimony: decisão do maestro relatada pela sessão do core, 2026-11-09"
+      locality: pessoa
+edges:
+  - from: D_DD_PROVISIONAL_TEAM_BAND_1109
+    to: E_DD_MAESTRO_ROUND_1109
+    edge_type: TRACES_TO
+  - from: D_DD_DATE_AT_COMMITMENT_1109
+    to: E_DD_MAESTRO_ROUND_1109
+    edge_type: TRACES_TO
