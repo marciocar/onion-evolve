@@ -2,8 +2,7 @@
 branch: fix/deny-sandbox-advisory
 pr: 1558
 date: 2026-11-09
-reviewed_diff_sha256: e62c0bdb534bc78f035e47baa0c77dc5febff85d210518cfafbbd3d38c4f5c64
-reviewed_code_sha256: c910badd0a16df0260e51400e181f79268d625567f83911f03bd7c1cfb7e175d
+reviewed_diff_sha256: pendente
 findings_total: 17
 findings_real: 17
 findings_blocking: 2
@@ -55,6 +54,10 @@ fase sob `bwrap` real com o leitor de verdade.
 - **F2 (curado).** A dica do hook com caminho cru gerava JSON inválido; o texto é escapado e a dica de `source` sai citada.
 - **F3 (curado).** `--test` com `.env` ilegível enviava token vazio; agora sai rc 4 antes da rede.
 - **F4 (curado).** Mutantes vivos (hook com `[ -r ]`, `ENV_HINT` fixo, coluna vazia na lista) morrem por caso; 8 mutantes novos, todos mortos.
+
+## Rebase sobre a main (2026-11-09)
+
+Conflito no grafo das decisões, resolvido com o arquivo da origin/main mais os dois nós deste PR. Conferido: o patch dos outros 18 arquivos é idêntico ao do head aprovado, e o do grafo difere só na linha do teto, de 27 para 30 nós. Sem nova passada independente.
 
 ## O que esta passada não viu
 
