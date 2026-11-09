@@ -38,59 +38,75 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-11"
     x_linear_issue: "SAC-350"
     impact: 4
     confidence: 0.7
-    verified_at: "2026-11-08"
-    verified_against: "sinal do hub de 2026-11-08, seção 1 (server.ts, tick(), firstRun && !ANNOUNCE_EXISTING)"
+    verified_at: "2026-11-09"
+    verified_against: "PR #9 do onion-messaging mergeado (merge 29ab51f763); doorbell/server.ts na main dele: tick() com a linha de base só do que já foi tratado e DOORBELL_FIRST_RUN_MAX"
     label: "Lacuna 1: a 1ª execução da campainha marca como baseline tudo o que já existia, e o que chegou antes da instalação nunca toca."
-    narrative: "Pronto quando: na 1ª execução, a linha de base cobre só o que já foi tratado; um arquivo de 1º nível do inbox/ ou inbound/ que não está versionado (entrega-sem-commit ainda não triada) toca; CAMPAINHA_ANNOUNCE_EXISTING segue como chave para anunciar tudo; a correção entra no onion-messaging com bancada e mutante, e o hub reproduz o caso e vê tocar."
+    narrative: "Pronto quando: na 1ª execução, a linha de base cobre só o que já foi tratado; um arquivo de 1º nível do inbox/ ou inbound/ que não está versionado (entrega-sem-commit ainda não triada) toca; CAMPAINHA_ANNOUNCE_EXISTING segue como chave para anunciar tudo; a correção entra no onion-messaging com bancada e mutante, e o hub reproduz o caso e vê tocar. Fechado em 2026-11-09: a cura entrou na main do onion-messaging pelo PR #9. Não medido pelo core: a reprodução pelo hub."
   - id: Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-11"
     x_linear_issue: "SAC-351"
     impact: 4
     confidence: 0.7
-    verified_at: "2026-11-08"
-    verified_against: "sinal do hub de 2026-11-08, seção 2 (estado da campainha do core: notified 4, acked_at null em dois sinais)"
+    verified_at: "2026-11-09"
+    verified_against: "PR #10 do onion-messaging mergeado (merge 51399b7f32); doorbell/server.ts na main dele: expired_at em tick() e pending_signals"
     label: "Lacuna 2: depois do teto de avisos (1 + CAMPAINHA_REMIND_MAX), o sinal do doc-bridge fica sem ack e sem destino; a fila tem dead-letter, o doc-bridge não."
-    narrative: "Pronto quando: ao bater o teto, o sinal do doc-bridge vai para um estado visível (expired), listado no pending_signals e contado pelo hook de início de sessão; o radar ou o lint cobra sinal sem ack há mais de um prazo; a correção entra com bancada e mutante, e o hub reproduz o caso."
+    narrative: "Pronto quando: ao bater o teto, o sinal do doc-bridge vai para um estado visível (expired), listado no pending_signals e contado pelo hook de início de sessão; o radar ou o lint cobra sinal sem ack há mais de um prazo; a correção entra com bancada e mutante, e o hub reproduz o caso. Fechado em 2026-11-09: a cura entrou na main do onion-messaging pelo PR #10. Não medido pelo core: a reprodução pelo hub. A metade do core (hook de início de sessão e radar lerem o expirado) saiu para Q_DB_EXPIRED_CORE_HALF."
   - id: Q_DB_ESTADO_UNICO_SEM_TRAVA_1111
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-11"
     x_linear_issue: "SAC-352"
     impact: 4
     confidence: 0.7
-    verified_at: "2026-11-08"
-    verified_against: "sinal do hub de 2026-11-08, seção 3 (estado por repo, sha256(REPO); quatro faróis no mesmo repo)"
+    verified_at: "2026-11-09"
+    verified_against: "PR #10 do onion-messaging mergeado (merge 51399b7f32); doorbell/server.ts na main dele: LOCK_FILE e acked_by"
     label: "Lacuna 3: várias sessões no mesmo repo dividem um estado só, sem trava; o primeiro ack silencia as outras e uma escrita pode perder o ack de outra."
-    narrative: "Pronto quando: o arquivo de estado tem trava entre processos (como o a2a-invite.sh faz) e há regra declarada de quem trata o sinal quando há mais de uma sessão no repo (a sessão dona do farol, ou o ack com o id da sessão que tratou); a bancada exercita duas campainhas concorrentes sem perder ack."
+    narrative: "Pronto quando: o arquivo de estado tem trava entre processos (como o a2a-invite.sh faz) e há regra declarada de quem trata o sinal quando há mais de uma sessão no repo (a sessão dona do farol, ou o ack com o id da sessão que tratou); a bancada exercita duas campainhas concorrentes sem perder ack. Fechado em 2026-11-09: a cura entrou na main do onion-messaging pelo PR #10. Não medido pelo core: a reprodução pelo hub."
   - id: Q_DB_ADOTANTE_TOCA_PARA_A_SAIDA_1111
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_due: "2026-11-11"
     x_linear_issue: "SAC-353"
     impact: 3
     confidence: 0.7
-    verified_at: "2026-11-08"
-    verified_against: "sinal do hub de 2026-11-08, seção 4 (o sinal do hub tocou no próprio inbox dele, box=inbox, attempt=1)"
+    verified_at: "2026-11-09"
+    verified_against: "PR #9 do onion-messaging mergeado (merge 29ab51f763); doorbell/server.ts na main dele: a caixa vigiada pelo role do carimbo"
     label: "Lacuna 4: no adotante, a campainha toca para a própria caixa de saída (inbox/), que é o que vai ao core; a entrada dele é o inbound/."
-    narrative: "Pronto quando: a campainha lê o papel do repo (role em .claude/.onion-version ou o onion-version.sh) e, em adopted, hub e standalone, toca só para inbound/ e a fila; no source, para inbox/ e a fila; a bancada cobre os dois papéis, e o hub vê o próprio sinal de saída não tocar."
+    narrative: "Pronto quando: a campainha lê o papel do repo (role em .claude/.onion-version ou o onion-version.sh) e, em adopted, hub e standalone, toca só para inbound/ e a fila; no source, para inbox/ e a fila; a bancada cobre os dois papéis, e o hub vê o próprio sinal de saída não tocar. Fechado em 2026-11-09: a cura entrou na main do onion-messaging pelo PR #9. Não medido pelo core: a reprodução pelo hub."
+  - id: Q_DB_EXPIRED_CORE_HALF
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-383"
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-09"
+    verified_against: "doorbell/DOCTRINE.md na main do onion-messaging: «o hook de início de sessão e o radar são do core e ainda não a leem»"
+    label: "A metade do core na lacuna 2: o hook de início de sessão e o radar ainda não leem o sinal expirado da campainha."
+    narrative: "Pronto quando: o hook de início de sessão conta os expirados e o radar ou o lint cobra sinal sem ack há mais de um prazo, com caso de bancada; o estado vive fora do repo, então sem ele a medida sai como não verificada. Prazo a calibrar."
 edges:
+  - from: Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111
+    to: Q_DB_EXPIRED_CORE_HALF
+    edge_type: TRACES_TO
   - from: E_DB_LACUNAS_MEDIDAS_NO_HUB_1108
     to: Q_DB_PRIMEIRA_EXECUCAO_EMUDECE_1111
     edge_type: SUPPORTS

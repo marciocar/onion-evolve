@@ -28791,6 +28791,22 @@ EOF_RP
   if grep -qE '^[[:space:]]*(role:[[:space:]]*(adopted|hub|standalone)|kind:[[:space:]]*door)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then want_nomark=0; fi
   if [ "${n_nomark}" = "${want_nomark}" ]; then record_pass "relay-public: (j2) dispatcher: sinal sem carteiro e sem a chave vira sem-marca só no papel source"
   else record_fail "relay-public: (j2) dispatcher sem-marca" "n=${n_nomark} esperado=${want_nomark}"; fi
+  # (j3) o papel decide, com mutante: o dispatcher extraído roda sobre o mesmo índice sob três carimbos
+  local D="${W}/disp" lint_f="${REPO_ROOT}/.claude/validation/lint-artifacts.sh" gate='[ "$(_role)" = "source" ] && _req=1' n_src n_adopted n_door n_mut_adopted n_mut_src
+  mkdir -p "${D}/.claude"
+  { printf 'SCRIPT_DIR=%q; REPO_ROOT=%q; ONLY_PATH=""; _ROLE_OF_THIS_REPO=""; export ONION_RELAY_REVIEW_REPO=%q\n' "$(dirname "${chk}")" "${D}" "${W}/c"
+    printf 'violation() { printf "%%s\\n" "$3"; }\n'
+    sed -n '/^_role()/,/^}/p' "${lint_f}"; sed -n '/^check_relay_public_review()/,/^}/p' "${lint_f}"
+    echo check_relay_public_review; } > "${D}/h.sh"
+  local h_src; h_src="$(cat "${D}/h.sh")"
+  printf '%s\n' "${h_src//"${gate}"/_req=1}" > "${D}/m_always.sh"; printf '%s\n' "${h_src//"${gate}"/_req=}" > "${D}/m_never.sh"
+  _j3() { LC_ALL=C bash "${D}/$1" 2>&1 | grep -c '\[sem-marca\]' || true; }
+  rm -f "${D}/.claude/.onion-version"; n_src="$(_j3 h.sh)"; n_mut_src="$(_j3 m_never.sh)"
+  printf 'role: adopted\n' > "${D}/.claude/.onion-version"; n_adopted="$(_j3 h.sh)"; n_mut_adopted="$(_j3 m_always.sh)"
+  printf 'role: source\nkind: door\n' > "${D}/.claude/.onion-version"; n_door="$(_j3 h.sh)"
+  if [ "${n_src}" = 1 ] && [ "${n_adopted}" = 0 ] && [ "${n_door}" = 0 ] && [ "${n_mut_adopted}" = 1 ] && [ "${n_mut_src}" = 0 ]; then
+    record_pass "relay-public: (j3) o papel liga a exigência (source sim; adotante e porta não), e os dois mutantes do portão mordem"
+  else record_fail "relay-public: (j3) papel do dispatcher" "src=${n_src} adopted=${n_adopted} door=${n_door} mut_adopted=${n_mut_adopted} mut_src=${n_mut_src}"; fi
   git -C "${W}/c" rm -q --cached -- "${SIGNM}" >/dev/null 2>&1; rm -f "${W}/c/${SIGNM}"
 
   # (k) as polaridades do check (--selftest) e os mutantes dele: ler a árvore em vez do índice, e a chave fora do frontmatter
@@ -28830,6 +28846,10 @@ LC_ALL=C git -C "\${repo}" grep --cached -z -l$(printf '\x1f')LC_ALL=C git -C "\
   [ "\${REQUIRE_MARK}" = 1 ] || { rm -f "\${tmp}" "\${list}"; return 0; }$(printf '\x1f')  { rm -f "\${tmp}" "\${list}"; return 0; }$(printf '\x1f')(xi) sinal novo sem a chave acusa
       [[ "\${day}" < "\${MARK_SINCE}" ]] && continue$(printf '\x1f')      :$(printf '\x1f')(xiii) anterior ao corte cala
     [ -z "\$(_frontmatter_values "\${tmp}")" ] || continue$(printf '\x1f')    :$(printf '\x1f')(xiv) revisado cala
+    case "\${p}" in */.gitkeep|docs/evolution/inbox/README.md|docs/evolution/inbox/_processed/README.md) continue ;; esac$(printf '\x1f')    case "\${p}" in *.md) : ;; *) continue ;; esac$(printf '\x1f')(xvi) .MD, .markdown, .txt e sem extensão acusam
+    case "\${p}" in */.gitkeep|docs/evolution/inbox/README.md|docs/evolution/inbox/_processed/README.md) continue ;; esac$(printf '\x1f')    case "\${p}" in */.gitkeep) continue ;; esac$(printf '\x1f')(xix) README do inbox isento
+grep --cached -z -l -E$(printf '\x1f')grep --cached -z -l -I -E$(printf '\x1f')(xvii) corpo com NUL acusa
+       END { if (n && closed)$(printf '\x1f')       END { if (n)$(printf '\x1f')(xviii) frontmatter sem fecho não vale
 EOF_RPC
   rm -rf "${W}"
 }

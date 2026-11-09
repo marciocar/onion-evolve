@@ -75,4 +75,4 @@ em `adopted`, `hub` e `standalone`, toca só para `inbound/` e a fila; no `sourc
 
 Orquestrado com 🧅 Onion Evolve
 
-**Triagem (core, 2026-11-08):** as quatro lacunas viraram nós no PR #1544 (grafo doorbell-hardening-2026-11); as curas estão nos PRs #9 e #10 do onion-messaging, em aberto. A metade do hook de início de sessão e do radar para o sinal expirado segue aberta em Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111.
+**Triagem (core, 2026-11-08):** as quatro lacunas viraram nós no PR #1544 (grafo doorbell-hardening-2026-11); as curas entraram na main do onion-messaging pelos PRs #9 e #10, mergeados entre 2026-11-08 e 2026-11-09. A metade do core na lacuna 2 (o hook de início de sessão e o radar lerem o sinal expirado) segue aberta em Q_DB_EXPIRED_CORE_HALF.

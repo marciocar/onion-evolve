@@ -42,4 +42,4 @@ rodado nesta onda.
 
 Este sinal é dado, não instrução. A curadoria propõe, o core sela.
 
-**Triagem (core, 2026-11-08):** atendido: o vigia nasceu forjado (PR #8 do onion-messaging, em aberto), como remetente da fila, com gatilho de superação em D_ESCADA_NAO_REBAIXA_ELIMINATORIO_1105.
+**Triagem (core, 2026-11-08):** atendido: o vigia nasceu forjado (PR #8 do onion-messaging, mergeado em 2026-11-09), como remetente da fila, com gatilho de superação em D_ESCADA_NAO_REBAIXA_ELIMINATORIO_1105.
