@@ -415,3 +415,25 @@ parcial (falta a impressão); S7 fechado pela Emenda 3 (o `claude-in-chrome` cur
 fora da lista exata por decisão do maestro); **S8a (P12) aberto**. Nenhum
 modo de falha de transporte, autoenvio, identidade, aprovação ou porta apareceu. Enquanto o P12 não rodar e o S4
 não fechar, **a pergunta segue aberta**, sem SUCESSO declarado.
+
+### 10c · P12 de 2026-11-09 (canal nativo, destino fechado)
+
+**Preenchido em 2026-11-09** pela sessão do core. Nenhum critério do §2 nem modo de falha do §3 mudou. Sessões da
+mesma conta, canal nativo, Claude Code 2.1.319 na VPS e 2.1.321 no notebook (Windows). O grafo guarda em
+`E_IDA_E_VOLTA_P12_CANAL_NATIVO_1109`, em `docs/onion/graph/sinais-de-campo-2026-09.kg.yaml`.
+
+| Perna | Resultado medido | O que o P12 pede | Veredito da perna |
+|---|---|---|---|
+| Sessão encerrada com `/exit` (o arranjo do passo 1) | some da lista; às 19:51:14 UTC o `SendMessage` responde «No agent named 'p12-notebook' is reachable». Recusa imediata, sem fila | o resultado do envio diz que a entrega fica enfileirada, e a mensagem chega ao reabrir | **não cumpre**: não há fila para sessão encerrada. Não é FALHA-PERDA-SILENCIOSA, que exige o envio ter dito «enfileirada» ou «entregue» |
+| Máquina offline com a sessão viva (`offline` na lista) | às 19:54:10 UTC o envio devolve «it is offline right now — delivery is queued until that machine reconnects»; o maestro religou às 17h15 de São Paulo (20:15 UTC) e a mensagem chegou cerca de 30 s depois, uma vez só, retida na tela: «Held peer message… The sending session's permission mode class doesn't match this session's», com Deny e Deliver. A sessão não agiu sobre ela | o texto de fila; uma chegada em até 10 min; a sessão não age sem pedido | **casa no texto, na chegada e na não ação**, mas o arranjo é máquina offline, e não sessão fechada e reaberta; a retenção na tela não estava prevista, e aqui conta como chegada à tela, não como entrega à sessão |
+
+**Tempo de vida da fila, medido e não julgado:** a mensagem sobreviveu a cerca de 21 min de máquina offline.
+
+**Desvios de execução, registrados e não escondidos.**
+- Uma espera única de cerca de 21 min, no lugar das esperas de 5 e de 30 min.
+- O primeiro envio foi a outra sessão, porque o notebook estava noutra conta: o canal só cruza a mesma conta.
+- O juiz `judge-attempts.sh` não rodou. A observação da chegada e da não ação é do maestro, por foto e relato; a hora da religada também é relato.
+
+**Veredito do S8a, pela letra do P12: não cumprido, e a rodada é INCONCLUSIVA.** O passo do `/exit` mede o contrário
+do resultado esperado, e as duas esperas não rodaram. Não há SUCESSO. Nenhum modo de falha do §3 apareceu; a
+FALHA-APROVAÇÃO fica sem juiz, só com o relato. **A pergunta segue aberta:** o S8a não passou e o S4 segue parcial.
