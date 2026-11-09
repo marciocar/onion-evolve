@@ -154,6 +154,7 @@ def seed():
     closed_mother = issue(87, "lambda mãe de filhas fechadas", created=NOW_H, state=("Todo", "unstarted"), est=8)
     closed_mother["children"] = {"nodes": [{"identifier": "SAC-88", "state": {"type": "completed"}}]}
     rows.append(closed_mother)
+    rows.append(issue(90, "[maestro · 11/11] ato sem pontos", created=NOW_H - 5, state=("Todo", "unstarted"), est=None))
     return {"issues": rows, "log": [], "force": None,
             "team": {"issueEstimationType": "fibonacci", "issueEstimationExtended": True, "issueEstimationAllowZero": False}}
 
@@ -196,9 +197,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 row.update(v["in"])
             if s["force"] == "reread_gone":
                 s["force"] = "gone"
-            if s["force"] == "read_lag":
-                s["stale"] = {**row, **{k: None for k in v["in"]}}
+            if s["force"] in ("read_lag", "read_lag3"):
+                s["stale"], s["stale_n"] = {**row, **{k: None for k in v["in"]}}, 3 if s["force"] == "read_lag3" else 1
             return self._reply({"data": {"issueUpdate": {"success": True, "issue": row}}})
+        if "commentCreate" in q:
+            s.setdefault("comments", []).append(v["in"])
+            return self._reply({"data": {"commentCreate": {"success": s["force"] != "comment_fail", "comment": {"id": "c1"}}}})
         if "issues(" in q:
             rows = s["issues"] if v.get("arch") else [r for r in s["issues"] if not r["archivedAt"]]
             flt = v.get("f") or {}
@@ -221,7 +225,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if "issue(id" in q:
             row = find(s, v["id"])
             if s.get("stale") and row and row["id"] == s["stale"]["id"]:
-                stale, s["stale"] = s["stale"], None
+                stale = s["stale"]
+                s["stale_n"] -= 1
+                if s["stale_n"] <= 0:
+                    s["stale"] = None
                 return self._reply({"data": {"issue": stale}})
             return self._reply({"data": {"issue": row}}) if row else self._errors("Entity not found: Issue")
         return self._errors("consulta desconhecida da bancada")
@@ -345,6 +352,48 @@ def c_read_lag(d):
     with Fake("read_lag") as f:
         rc, out, err = tm(d, f, "estimate.points", "SAC-70", "5")
         return "" if rc == 0 and out["estimate"] == 5 else f"rc={rc} {out} {err[:120]}"
+
+
+def c_read_lag_three(d):
+    with Fake("read_lag3") as f:
+        rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30")
+        return "" if rc == 0 and out["dueDate"] == "2026-11-30" else f"rc={rc} {out} {err[:120]}"
+
+
+def c_reread_real_pause(d):
+    with Fake("read_lag") as f:
+        started = time.time()
+        rc, out, err = tm(d, f, "estimate.points", "SAC-70", "5", extra={"TM_LINEAR_NO_PAUSE": ""})
+        took = time.time() - started
+        return "" if rc == 0 and took >= 0.4 else f"rc={rc} levou {took:.2f} s"
+
+
+def c_note_marks(d):
+    with Fake() as f:
+        rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30", "--provisional-note", "acerto 21%")
+        c = f.store.get("comments") or []
+        return "" if rc == 0 and out["dueDate"] == "2026-11-30" and out["provisional_note"] == "c1" and len(c) == 1 and "provisório" in c[0]["body"] and "acerto 21%" in c[0]["body"] and "2026-11-30" in c[0]["body"] else f"rc={rc} {out} {c}"
+
+
+def c_note_fails(d):
+    with Fake("comment_fail") as f:
+        rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30", "--provisional-note", "x")
+        return "" if rc == 1 and "NÃO" in err else f"rc={rc} {out} {err[:120]}"
+
+
+def c_note_usage(d):
+    with Fake() as f:
+        for args in (["due_date.set", "SAC-70", "2026-11-30", "--provisional-note"], ["due_date.set", "SAC-70", "2026-11-30", "--provisional-note", "  "], ["due_date.set", "SAC-70", "--clear", "--provisional-note", "x"]):
+            rc, out, err = tm(d, f, *args)
+            if rc != 2 or out is not None:
+                return f"{args}: rc={rc} {out}"
+        return "foi à rede" if f.store["log"] else ""
+
+
+def c_no_note_no_comment(d):
+    with Fake() as f:
+        rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30")
+        return "" if rc == 0 and not f.store.get("comments") and "provisional_note" not in out else f"rc={rc} {out}"
 
 
 def c_reread_fails(d):
@@ -916,7 +965,7 @@ def c_null_family_error(d):
 
 
 def provisional_gate(rc, out, status):
-    return rc == 4 and out["status"] == "provisional_team_band" and out["proposal"] is None and out["calibration_gate"]["status"] == status
+    return rc == 4 and out["status"] in ("provisional_team_band", "provisional_work_hours_only") and out["proposal"] is None and out["calibration_gate"]["status"] == status
 
 
 def signal_refused(d, category, reason):
@@ -975,20 +1024,52 @@ def c_propose_not_calibrated(d):
         return "" if rc == 3 and "não calibra" in out["reason"] else f"rc={rc} {out}"
 
 
+def c_human_without_points(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--issue", "SAC-90")
+        return "" if rc == 3 and out["status"] == "not_calibrated" and "provisional" not in out else f"rc={rc} {out}"
+
+
+def c_unknown_category(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "naoexiste")
+        return "" if rc == 2 and out is None and "desconhecida" in err else f"rc={rc} {out} {err[:120]}"
+
+
+def c_proposed_retro(d):
+    with Fake() as f, Meter(d) as m:
+        path = write_retro(m, ["SAC-1200", "SAC-1201"])
+        rc, out, err = m.run(f, "propose", "--points", "8", "--category", "lambda", "--retro-file", path)
+        if rc != 0 or out["basis"]["points_origin"]["retro"] != 2:
+            return f"rc={rc} {out and out.get('basis')}"
+        return "" if any(w["code"] == "retro_points_in_history" for w in out["warnings"]) else f"{out['warnings']}"
+
+
 def c_propose_no_points(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--issue", "SAC-71")
         return "" if provisional_gate(rc, out, "no_points") and "sem pontos" in out["calibration_gate"]["reason"] else f"rc={rc} {out}"
 
 
-def team_rows(extra=()):
-    """Doze issues em categorias sem base: fila 10..120 e trabalho 1..12, totais 11×k."""
-    rows = [issue(1 + k, f"{'alpha' if k % 2 else 'delta'} {k}", created=100 * k, queue=10 * (k + 1), work=k + 1, est=2) for k in range(12)]
+TEAM_OLD = [(10 * k, k) for k in range(1, 13)]
+TEAM_FLOW = [(5, 1)] * 16 + [(2, 20)] * 16
+TEAM_ALL = TEAM_OLD + TEAM_FLOW
+
+
+def team_rows(extra=(), flows=True):
+    """Doze issues antigas em três categorias sem base, mais, em cada data de medição (8 datas, 3 dias), duas recém-criadas e duas em andamento."""
+    rows = [issue(1 + k, f"{['alpha', 'delta', 'beta'][k % 3]} {k}", created=-3000 + 100 * k, queue=10 * (k + 1), work=k + 1, est=2) for k in range(12)]
+    if flows:
+        for k in range(1, 9):
+            origin = NOW_H - 72 * k
+            for j in range(2):
+                rows.append(issue(600 + 10 * k + j, f"alpha nova {k}{j}", created=origin - 1 - j / 10, queue=5, work=1, est=2))
+                rows.append(issue(800 + 10 * k + j, f"delta ativa {k}{j}", created=origin - 10 - j / 10, queue=2, work=20, est=2))
     return rows + list(extra)
 
 
-def team_propose(d, *extra, args=("--points", "3", "--category", "alpha")):
-    with Fake(rows=team_rows(extra)) as f:
+def team_propose(d, *extra, args=("--points", "3", "--category", "alpha"), flows=True):
+    with Fake(rows=team_rows(extra, flows)) as f:
         return propose(d, f, *args)
 
 
@@ -1002,7 +1083,7 @@ def c_team_band_exact(d):
     if rc != 4 or out["status"] != "provisional_team_band":
         return f"rc={rc} {out} {err[:160]}"
     p = out["provisional"]
-    totals = [11 * k for k in range(1, 13)]
+    totals = [a + b for a, b in TEAM_ALL]
     want = {"earliest": conf(totals, .25), "likely": conf(totals, .5), "latest": conf(totals, .8)}
     if p["hours_from_now"] != want or p["dates_not_calibrated"] != {k: date_after(v) for k, v in want.items()}:
         return f"{p['hours_from_now']} {p['dates_not_calibrated']}, esperado {want}"
@@ -1011,23 +1092,79 @@ def c_team_band_exact(d):
 
 def c_team_never_a_due_date(d):
     rc, out, err = team_propose(d)
-    return "" if out["proposal"] is None and "due_date" not in json.dumps(out) and rc not in (0, 3) else f"rc={rc} {json.dumps(out)[:200]}"
+    return "" if out["proposal"] is None and '"due_date"' not in json.dumps(out) and rc not in (0, 3) else f"rc={rc} {json.dumps(out)[:200]}"
 
 
 def c_team_queue_work_separate(d):
     rc, out, err = team_propose(d)
     p = out["provisional"]
-    q, w = [10 * k for k in range(1, 13)], list(range(1, 13))
+    q, w = [a for a, _ in TEAM_ALL], [b for _, b in TEAM_ALL]
     return "" if p["queue_hours_remaining"]["latest"] == conf(q, .8) and p["work_hours"]["latest"] == conf(w, .8) and p["queue_hours_remaining"]["earliest"] == conf(q, .25) else f"{p}"
 
 
 def c_team_accuracy(d):
-    rc, out, err = team_propose(d, issue(20, "alpha sem início", created=700, completed_at=2000), issue(21, "alpha velha", created=NOW_H - 500, state=("Todo", "unstarted")))
-    a = out["measured_accuracy"]
-    if a["n"] != 12 or a["completed_only"] != 0.833:
-        return f"{a}"
+    rc, out, err = team_propose(d, issue(20, "alpha sem início", created=-3500, completed_at=-1000), issue(21, "alpha velha", created=NOW_H - 500, state=("Todo", "unstarted")))
+    a = out["measured_accuracy"]["from_creation_reference"]
+    totals = [x + y for x, y in TEAM_ALL]
+    covered = sum(1 for k, t in enumerate(totals) if t <= conf(totals[:k] + totals[k + 1:], .8))
+    if a["n"] != len(totals) or a["completed_only"] != round(covered / len(totals), 3):
+        return f"{a['n']} {a['completed_only']}, esperado {len(totals)} {round(covered / len(totals), 3)}"
     o = a["with_open"]
-    return "" if (o["completed_miss"], o["open_overdue"]) == (3, 1) and a["temporal"]["status"] == "not_measured" else f"{o}"
+    due = conf(totals, .8)
+    if (o["completed_miss"], o["open_overdue"]) != (len(totals) - covered + 1, 1 if 500 > due else 0):
+        return f"{o} due={due}"
+    t = a["temporal"]["with_open"]
+    return "" if t["completed_hit"] + t["completed_miss"] < o["completed_hit"] + o["completed_miss"] else f"temporal igual ao LOO: {t}"
+
+
+def c_served_by_basis(d):
+    rc, out, err = team_propose(d)
+    by = out["measured_accuracy"]["served"]["by_queue_basis"]
+    c, st = by["conditional_on_age_in_queue"], by["already_started"]
+    if (c["snapshots"], c["hit"], c["miss"], c["resolved"], c["coverage"], c["measured"]) != (16, 16, 0, 16, 1.0, True):
+        return f"{c}"
+    if st["snapshots"] != 14 or not st["measured"] or out["measured_accuracy"]["served_path"]["queue_basis"] != "conditional_on_age_in_queue":
+        return f"{st}"
+    return ""
+
+
+def c_served_outcomes(d):
+    rows = team_rows(flows=False) + [issue(40, "alpha aberta antiga", created=NOW_H - 2000, state=("Todo", "unstarted")),
+                                     issue(41, "alpha aberta recente", created=NOW_H - 73, state=("Todo", "unstarted")),
+                                     issue(43, "alpha sem início antiga", created=-3000, completed_at=-2000),
+                                     issue(42, "alpha demorada", created=NOW_H - 72 * 8 - 1, queue=3, completed_at=NOW_H - 1)]
+    with Fake(rows=rows) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        by = out["measured_accuracy"]["served"]["by_queue_basis"]
+        a, c = by["assumes_start_now"], by["conditional_on_age_in_queue"]
+        return "" if a["miss"] == 8 and a["hit"] == 0 and c["unresolved"] == 1 and c["miss"] >= 1 else f"{a} {c}"
+
+
+def c_served_in_report(d):
+    with Fake(rows=team_rows()) as f:
+        _, out, err = report(d, f)
+        return "" if out["team_band_served_accuracy"]["by_queue_basis"]["conditional_on_age_in_queue"]["resolved"] == 16 else f"{out.get('team_band_served_accuracy')}"
+
+
+def c_unmeasured_hours_only(d):
+    rc, out, err = team_propose(d, flows=False)
+    p = out["provisional"]
+    if rc != 4 or out["status"] != "provisional_work_hours_only" or p["dates_not_calibrated"] is not None or "hours_from_now" in p:
+        return f"rc={rc} {out['status']} {p}"
+    return "" if p["work_hours_if_started_now"]["latest"] == conf(range(1, 13), .8) and "desfecho" in p["why_no_date"] else f"{p}"
+
+
+def c_started_unmeasured_hours(d):
+    rc, out, err = team_propose(d, issue(36, "alpha ativa", created=NOW_H - 10, queue=8, est=3, state=("In Progress", "started")), args=("--issue", "SAC-36"), flows=False)
+    p = out["provisional"]
+    return "" if out["status"] == "provisional_work_hours_only" and "work_hours_remaining" in p and "work_hours_if_started_now" not in p else f"{out['status']} {p}"
+
+
+def c_low_served_warned(d):
+    rows = team_rows() + [issue(50 + k, "alpha sem fim", created=NOW_H - 72 * 8 - 1 - k / 10, queue=3, completed_at=NOW_H - 1 - k / 10) for k in range(40)]
+    with Fake(rows=rows) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        return "" if out["status"] == "provisional_team_band" and any(w["code"] == "low_served_accuracy" for w in out["warnings"]) else f"{out['status']} {out['warnings']}"
 
 
 def c_team_age_conditional(d):
@@ -1046,24 +1183,26 @@ def c_team_queue_after_age(d):
 
 
 def c_team_age_beyond_max(d):
-    rc, out, err = team_propose(d, issue(31, "alpha muito velha", created=NOW_H - 1000, state=("Todo", "unstarted"), est=3), args=("--issue", "SAC-31"))
+    # as duas abertas antigas dão desfechos ao caminho assumes_start_now: medido, e mesmo assim sem data
+    rc, out, err = team_propose(d, issue(31, "alpha muito velha", created=NOW_H - 1000, state=("Todo", "unstarted"), est=3), issue(37, "alpha antiga", created=NOW_H - 3000, state=("Todo", "unstarted")),
+                                issue(38, "alpha antiga 2", created=NOW_H - 3001, state=("Todo", "unstarted")), args=("--issue", "SAC-31"))
     p = out["provisional"]
-    if rc != 4 or p["age_beyond_max_queue"] is not True or p["assumes_start_now"] is not True or p["queue_hours_remaining"] is not None:
-        return f"rc={rc} {p}"
-    return "" if p["hours_from_now"]["latest"] == conf(range(1, 13), .8) and p["max_queue_seen_hours"] == 120 and any(w["code"] == "age_beyond_queue_history" for w in out["warnings"]) else f"{out['warnings']}"
+    if rc != 4 or out["status"] != "provisional_work_hours_only" or p["age_beyond_max_queue"] is not True or p["assumes_start_now"] is not True or p["dates_not_calibrated"] is not None:
+        return f"rc={rc} {out['status']} {p}"
+    return "" if p["work_hours_if_started_now"]["latest"] == conf([b for _, b in TEAM_ALL], .8) and p["max_queue_seen_hours"] == 120 and "começar" in p["why_no_date"] else f"{p}"
 
 
 def c_team_few_waited(d):
     rc, out, err = team_propose(d, issue(32, "alpha", created=NOW_H - 95, state=("Todo", "unstarted"), est=3), args=("--issue", "SAC-32"))
     p = out["provisional"]
-    return "" if rc == 4 and p["age_beyond_max_queue"] is False and p["assumes_start_now"] is True else f"rc={rc} {p}"
+    return "" if rc == 4 and p["age_beyond_max_queue"] is False and p["assumes_start_now"] is True and p["dates_not_calibrated"] is None else f"rc={rc} {p}"
 
 
 def c_team_started(d):
     rc, out, err = team_propose(d, issue(33, "alpha ativa", created=NOW_H - 10, queue=8, est=3, state=("In Progress", "started")), args=("--issue", "SAC-33"))
     p = out["provisional"]
-    rem = [k - 2 for k in range(3, 13)]
-    return "" if rc == 4 and p["queue_basis"] == "already_started" and p["queue_hours_remaining"] is None and p["hours_from_now"]["latest"] == conf(rem, .8) else f"rc={rc} {p}"
+    rem = [b - 2 for _, b in TEAM_ALL if b > 2]
+    return "" if rc == 4 and out["status"] == "provisional_team_band" and p["queue_basis"] == "already_started" and p["queue_hours_remaining"] is None and p["hours_from_now"]["latest"] == conf(rem, .8) else f"rc={rc} {p}"
 
 
 def c_team_started_too_long(d):
@@ -1072,13 +1211,13 @@ def c_team_started_too_long(d):
 
 
 def c_team_too_small(d):
-    with Fake(rows=team_rows()[:3]) as f:
+    with Fake(rows=team_rows(flows=False)[:3]) as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
         return "" if rc == 3 and out["status"] == "insufficient_sample" and "provisional" not in out else f"rc={rc} {out}"
 
 
 def c_team_excludes_human(d):
-    rows = team_rows([issue(40, "[maestro · 12/11] ato", created=10, queue=1000, work=1000, est=2)])
+    rows = team_rows([issue(40, "[maestro · 12/11] ato", created=-3400, queue=1000, work=1000, est=2)])
     with Fake(rows=rows) as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
         return "" if out["provisional"]["max_queue_seen_hours"] == 120 else f"{out['provisional']}"
@@ -1124,8 +1263,8 @@ def c_retro_bad_file(d):
 def c_propose_usage(d):
     with Fake() as f:
         rc, _, err = propose(d, f, "--points", "3")
-        if rc != 2:
-            return f"rc={rc}"
+        if rc != 2 or "exige" not in err:
+            return f"rc={rc} {err[:120]}"
         rc, _, err = propose(d, f, "--issue", "SAC-51", "--points", "3")
         return "" if rc == 2 else f"rc={rc}"
 
@@ -1230,6 +1369,12 @@ CASES = [
     ("e-lie", "retorno da mutação mentindo: a leitura separada acusa", c_estimate_lies),
     ("d-lie", "prazo com retorno mentindo: a leitura separada acusa", c_due_lies),
     ("e-lag", "atraso de leitura não vira falso erro", c_read_lag),
+    ("e-lag3", "atraso de três leituras ainda passa", c_read_lag_three),
+    ("e-pause", "pausas reais de produção entre releituras", c_reread_real_pause),
+    ("d-note", "data provisória deixa marca em comentário", c_note_marks),
+    ("d-nfail", "marca que falha é rc 1 nomeado", c_note_fails),
+    ("d-nuse", "nota vazia ou com --clear é rc 2", c_note_usage),
+    ("d-nonote", "sem nota, sem comentário", c_no_note_no_comment),
     ("e-gone", "releitura que falha é rc 1 nomeado", c_reread_fails),
     ("net-to", "timeout de resposta é rc 1 com mensagem", c_timeout),
     ("e-scale", "valor fora da escala não vai à mutação", c_estimate_out_of_scale),
@@ -1310,6 +1455,15 @@ CASES = [
     ("t-acc", "acerto da própria faixa, com abertas e temporal", c_team_accuracy),
     ("t-age", "idade condiciona a fila", c_team_age_conditional),
     ("t-sep2", "fila restante desconta a idade", c_team_queue_after_age),
+    ("t-served", "acerto por queue_basis, no caminho servido", c_served_by_basis),
+    ("t-out", "desfechos: aberta vencida, não resolvida e concluída fora", c_served_outcomes),
+    ("t-rep", "report publica o acerto servido", c_served_in_report),
+    ("t-unm", "caminho sem medida só dá horas", c_unmeasured_hours_only),
+    ("t-unm2", "iniciada sem medida: horas restantes", c_started_unmeasured_hours),
+    ("t-low", "acerto baixo do caminho é avisado", c_low_served_warned),
+    ("p-human", "ato humano sem pontos: rc 3, sem faixa", c_human_without_points),
+    ("p-unk", "categoria inexistente: rc 2", c_unknown_category),
+    ("p-retro", "proposed declara pontos retroestimados", c_proposed_retro),
     ("t-max", "além da fila máxima: supõe início agora e avisa", c_team_age_beyond_max),
     ("t-few", "poucas esperaram tanto, sem passar do máximo", c_team_few_waited),
     ("t-start", "iniciada: só o trabalho restante", c_team_started),
@@ -1446,31 +1600,58 @@ MUTANTS = [
     (V, '    if len(history) < MIN_SAMPLE:\n        return refusal(f"{len(history)} issue(s)', '    if False:\n        return refusal(f"{len(history)} issue(s)', "p-insuf"),
     (V, '    if len(remaining) < MIN_SAMPLE:', "    if False:", "p-old"),
     (V, 'PROVISIONAL_RC = 4', "PROVISIONAL_RC = 0", "t-nodate"),
+    (V, '"totals": sorted(r["queue_h"] - age + r["work_h"] for r in waiting)}, detail', '"totals": sorted(r["work_h"] for r in waiting)}, detail', "t-age"),
+    (V, 'band(scenarios["queue"]) if scenarios["queue"] else None', 'None', "t-sep"),
+    (V, '"work_hours": band(scenarios["work"])},', '"work_hours": band(scenarios["totals"])},', "t-sep"),
+    (V, '"queue": sorted(r["queue_h"] - age for r in waiting)', '"queue": sorted(r["queue_h"] for r in waiting)', "t-sep2"),
+    (V, '    if len(waiting) >= MIN_SAMPLE:\n        return {"basis"', '    if waiting:\n        return {"basis"', "t-few"),
+    (V, '        if len(work) < MIN_SAMPLE:\n            return None, detail', '        if False:\n            return None, detail', "t-long"),
+    (V, '    if not calibrate:\n', "    if False:\n", "p-human"),
+    (V, '    if not calibrate:\n', "    if False:\n", "p-nocal"),
+    (V, '        if category not in known:', "        if False:", "p-unk"),
+    (V, '"points_origin": origin_counts(history), "points_signal"', '"points_origin": {"retro": 0}, "points_signal"', "p-retro"),
+    (V, '    if retro_used:\n', "    if False:\n", "p-retro"),
+    (V, 'outcome = "hit" if r["completed"] <= deadline else "miss"', 'outcome = "miss" if r["completed"] <= deadline else "hit"', "t-served"),
+    (V, 'outcome = "miss" if now > deadline else "unresolved"', 'outcome = "unresolved"', "t-out"),
+    (V, 'outcome = "miss" if now > deadline else "unresolved"', 'outcome = "miss"', "t-out"),
+    (V, 'r["created"] >= origin or (r["completed"] and r["completed"] <= origin)', '(r["completed"] and r["completed"] <= origin)', "t-served"),
+    (V, 'r["created"] >= origin or (r["completed"] and r["completed"] <= origin)', 'r["created"] >= origin', "t-out"),
+    (V, 'known_start = raw["startedAt"] if raw.get("startedAt") and parse_ts(raw["startedAt"]) <= origin else None', 'known_start = raw.get("startedAt")', "t-served"),
+    (V, 'clocked([r for r in view if r["completed"] and r["completed"] < origin], False)', 'clocked([r for r in view if r["completed"]], False)', "t-served"),
+    (V, 'scenarios, _ = team_scenarios(history, origin, {"createdAt": raw["createdAt"], "startedAt": known_start})', 'scenarios, _ = team_scenarios(history, origin, None)', "t-served"),
+    (V, 'SERVED_MIN = 10 ', "SERVED_MIN = 0 ", "t-unm"),
+    (V, '    if basis == "assumes_start_now" or not this_path["measured"]:', '    if not this_path["measured"]:', "t-max"),
+    (V, '    if basis == "assumes_start_now" or not this_path["measured"]:', '    if basis == "assumes_start_now":', "t-unm"),
+    (V, 'key = "work_hours_remaining" if basis == "already_started" else "work_hours_if_started_now"', 'key = "work_hours_if_started_now"', "t-unm2"),
+    (V, '    if this_path["coverage"] < LOW_SERVED_COVERAGE:', "    if False:", "t-low"),
+    (V, '"team_band_served_accuracy": served_view,', '"team_band_served_accuracy": None,', "t-rep"),
+    (V, '    view, opened = team_view(rows), team_view(open_rows)\n    history = clocked(view, False)', '    view, opened = [r for r in rows if r["calibrate"]], [r for r in open_rows if r["calibrate"]]\n    history = clocked(view, False)', "t-acc"),
+    (V, '"with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, True)}}', '"with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, False)}}', "t-acc"),
+    (L, 'REREAD_PAUSES = (0, 0.5, 1.5, 3.0)', 'REREAD_PAUSES = (0, 0, 0, 0)', "e-pause"),
+    (L, 'REREAD_PAUSES = (0, 0.5, 1.5, 3.0)', 'REREAD_PAUSES = (0,)', "e-lag"),
+    (L, 'REREAD_PAUSES = (0, 0.5, 1.5, 3.0)', 'REREAD_PAUSES = (0, 0.5)', "e-lag3"),
+    (L, '        body = f"Prazo provisório {due}: não calibrado. {note}"', '        body = note', "d-note"),
+    (L, '    if note is not None:\n        # prazo', '    if False:\n        # prazo', "d-note"),
+    (L, 'if not (data.get("commentCreate") or {}).get("success"):\n            raise TmError(f"{iss[\'identifier\']}: a data', 'if False:\n            raise TmError(f"{iss[\'identifier\']}: a data', "d-nfail"),
+    (L, '        if at + 1 >= len(args) or not args[at + 1].strip():', '        if at + 1 >= len(args):', "d-nuse"),
+    (L, '    if note is not None and raw is None:', "    if False:", "d-nuse"),
     (V, 'return {"status": "provisional_team_band", "proposal": None,', 'return {"status": "provisional_team_band", "proposal": {"due_date": "2026-12-01"},', "t-nodate"),
     (V, '"latest": DUE_QUANTILE}', '"latest": HIGH_QUANTILE}', "t-exact"),
-    (V, 'totals, basis = sorted(r["queue_h"] - age + r["work_h"] for r in waiting), "conditional_on_age_in_queue"', 'totals, basis = sorted(r["work_h"] for r in waiting), "conditional_on_age_in_queue"', "t-age"),
-    (V, 'band(queue) if queue else None', 'None', "t-sep"),
-    (V, '"work_hours": band(work),', '"work_hours": band(totals),', "t-sep"),
-    (V, '            queue = sorted(r["queue_h"] - age for r in waiting)', '            queue = sorted(r["queue_h"] for r in waiting)', "t-sep2"),
     (V, 'waiting = [r for r in history if r["queue_h"] >= age]', 'waiting = list(history)', "t-age"),
-    (V, '        if len(waiting) >= MIN_SAMPLE:  # idade', '        if waiting:  # idade', "t-few"),
     (V, 'detail["age_beyond_max_queue"] = age > max_queue', 'detail["age_beyond_max_queue"] = True', "t-few"),
     (V, 'detail["assumes_start_now"] = True', 'pass', "t-max"),
     (V, 'work = sorted(r["work_h"] - elapsed for r in history if r["work_h"] > elapsed)', 'work = sorted(r["work_h"] for r in history if r["work_h"] > elapsed)', "t-start"),
-    (V, '        if len(work) < MIN_SAMPLE:\n            return refusal', '        if False:\n            return refusal', "t-long"),
     (V, '    if len(history) < MIN_SAMPLE:\n        return refusal(f"o time', '    if False:\n        return refusal(f"o time', "t-small"),
     (V, 'return [{**r, "category": "team"} for r in rows if r["calibrate"]]', 'return [{**r, "category": "team"} for r in rows]', "t-human"),
     (V, '"completed_only": loo["coverage_due"]', '"completed_only": 0.857', "t-acc"),
     (V, '"with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, False),', '"with_open": coverage_with_open(view, [], now, TEAM_WINDOW, False),', "t-acc"),
     (V, 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history")', 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "calibration_not_measured", "miscalibrated", "beyond_history")', "s-inv"),
     (V, 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history")', 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history", "proposed")', "t-wins"),
-    (V, 'status="not_calibrated", category=category)', 'category=category)', "p-nocal"),
     (V, '"estimate_origin": "retro" if i["identifier"] in retro else "pre_execution"', '"estimate_origin": "pre_execution"', "r-retro"),
     (V, '"points": None if exclude_retro and i["identifier"] in retro else overlay.get', '"points": overlay.get', "r-retro"),
     (V, '    if origin["retro"]:\n', "    if False:\n", "r-retro"),
     (V, '        raise MeterError(f"arquivo de retroestimadas não encontrado: {path}")', '        return set()', "r-retrobad"),
     (V, 'if len(parts) != 5 or not re.fullmatch(r"[A-Z][A-Z0-9]*-[0-9]+", parts[0]):', 'if False:', "r-retrobad"),
-    (V, '    if not stats["calibrate"]:', "    if False:", "p-nocal"),
     (V, '    if not points:\n        gate = {"status": "no_points"', '    if False:\n        gate = {"status": "no_points"', "p-nopts"),
     (V, '    elif points is None or not category:', "    elif False:", "p-usage"),
     (V, '    return {"status": "proposed",\n', '    tm("due_date.set", "SAC-70", date_for(due))\n    return {"status": "proposed",\n', "ro"),

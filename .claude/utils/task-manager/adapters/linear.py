@@ -39,7 +39,7 @@ if re.match(r"^http://127\.0\.0\.1:\d+/", _override):
     if os.environ.get("TM_LINEAR_TIMEOUT", "").isdigit():  # só com o Linear falso em loopback
         REQUEST_TIMEOUT = int(os.environ["TM_LINEAR_TIMEOUT"])
     if os.environ.get("TM_LINEAR_NO_PAUSE"):  # bancada: sem espera entre releituras
-        REREAD_PAUSES = (0, 0, 0, 0)
+        REREAD_PAUSES = tuple(0 for _ in REREAD_PAUSES)
 # Arquivos ENVIADOS ao Linear (upload) moram neste host e exigem o header Authorization para baixar
 # (medido 2026-10-12: sem header → 401; com a chave crua ou com Bearer → 200). A chave só vai para cá.
 UPLOADS_BASE = "https://uploads.linear.app/"
@@ -964,12 +964,29 @@ def _calendar_date(value):
 
 
 def v_due_date_set(args):
-    usage = "due_date.set <ID> <YYYY-MM-DD>|--clear"
+    usage = 'due_date.set <ID> <YYYY-MM-DD>|--clear [--provisional-note "texto"]'
+    note = None
+    if "--provisional-note" in args:
+        at = args.index("--provisional-note")
+        if at + 1 >= len(args) or not args[at + 1].strip():
+            raise TmError(f"uso: tm.sh {usage} (nota vazia)", 2)
+        note = args[at + 1]
+        args = args[:at] + args[at + 2:]
     ident, raw = _single_target(args, usage)
+    if note is not None and raw is None:
+        raise TmError("--provisional-note marca uma data; não se usa com --clear", 2)
     due = None if raw is None else _calendar_date(raw)
     iss = _issue(ident)
     updated = _verified_update(iss, "dueDate", due)
-    return {"issue": updated["identifier"], "dueDate": updated["dueDate"], "previous": iss.get("dueDate")}
+    out = {"issue": updated["identifier"], "dueDate": updated["dueDate"], "previous": iss.get("dueDate")}
+    if note is not None:
+        # prazo provisório sem marca viraria prazo calibrado para quem só olha o campo
+        body = f"Prazo provisório {due}: não calibrado. {note}"
+        data = gql("mutation($in:CommentCreateInput!){ commentCreate(input:$in){ success comment { id } } }", {"in": {"issueId": iss["id"], "body": body}})
+        if not (data.get("commentCreate") or {}).get("success"):
+            raise TmError(f"{iss['identifier']}: a data {due} foi gravada, e a marca de provisória NÃO: comente antes de seguir")
+        out["provisional_note"] = data["commentCreate"]["comment"]["id"]
+    return out
 
 
 def _comment_opts(args):

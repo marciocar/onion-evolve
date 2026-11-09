@@ -26,6 +26,8 @@
 # trabalho P80, condicionais a iniciar agora. Data sem sustentação seria a data de agente que esta ferramenta aposenta.
 # 4 = faixa provisória do time (`provisional_team_band`, decisão do maestro de 2026-11-09): a categoria não passou nos portões e sai
 # uma faixa do time inteiro, sem pontos, em `provisional`, baixa confiança, com o acerto medido ao lado. `proposal` segue null.
+# Dois status com rc 4: provisional_team_band traz datas não calibradas, só onde o acerto do caminho servido foi medido, e
+# provisional_work_hours_only traz só horas, porque a data dependeria de quando alguém decide começar. not_calibrated (ato humano) é rc 3.
 #
 # Como sai a data: cada issue parecida do histórico vira um cenário (fila dela + pontos pedidos × horas por ponto dela), e a
 # data é a estatística de ordem conformal P80 desses cenários. O `report` publica o backtest dessa mesma conta, em
@@ -59,6 +61,10 @@ DEFAULT_RETRO = "docs/onion/retro-estimates.tsv"
 PROVISIONAL_RC = 4
 PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history")
 TEAM_WINDOW = 10 ** 6
+SERVED_BASES = ("already_started", "conditional_on_age_in_queue", "assumes_start_now")
+WALK_ORIGINS, WALK_STEP_DAYS = 8, 3   # datas passadas em que a faixa é reconstruída para medir o caminho servido
+SERVED_MIN = 10                       # desfechos mínimos do caminho para ele poder dar data
+LOW_SERVED_COVERAGE = 0.5
 OPEN_STATES = "triage,backlog,unstarted,started"
 UNCATEGORIZED = "other"
 EPOCH = dt.datetime.min.replace(tzinfo=dt.timezone.utc)
@@ -567,6 +573,7 @@ def build_report(rows, open_rows, now, window, rules, project, overlay):
         if r["exclusion"]:
             excluded[r["exclusion"]] = excluded.get(r["exclusion"], 0) + 1
     origin = origin_counts(rows)
+    served_view = served_accuracy(rows, open_rows, now)
     if origin["retro"]:
         warnings.append({"code": "retro_estimates", "message": f"{origin['retro']} de {origin['retro'] + origin['pre_execution']} issues com pontos foram retroestimadas: base prévia, sem prova de previsão antes da execução; --exclude-retro mede sem elas"})
     if excluded.get("no_started_at"):
@@ -576,7 +583,7 @@ def build_report(rows, open_rows, now, window, rules, project, overlay):
             "with_points": sum(1 for r in rows if r["points"]), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None),
             "with_due": sum(1 for r in rows if r["due"]), "excluded": excluded, "overlay_entries": len(overlay), "estimates_origin": origin,
             "calibration_population": {"completed": len(rows), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None), "without_started_at": excluded.get("no_started_at", 0)},
-            "generated_at": now.isoformat(), "team_velocity": velocity(rows, today), "deadline": deadline(rows), "backtest": backtests,
+            "generated_at": now.isoformat(), "team_band_served_accuracy": served_view, "team_velocity": velocity(rows, today), "deadline": deadline(rows), "backtest": backtests,
             "open": {"count": len(open_rows), "with_points": sum(1 for r in open_rows if r["points"]), "other": len(open_others), "other_titles": open_others},
             "categories": categories, "uncategorized_titles": others, "warnings": warnings, "limits": limits_with_bias(backtests)}
 
@@ -626,8 +633,6 @@ def propose_date(rows, open_rows, now, window, points, category, issue):
     stats = category_stats(rows, category, window, local_date(now))
     if not stats["completed"]:
         return refusal(f"categoria '{category}' sem nenhuma issue concluída no histórico", category=category)
-    if not stats["calibrate"]:
-        return refusal(f"categoria '{category}' não calibra: é ato humano sem relógio de trabalho", status="not_calibrated", category=category)
     _, recent = members_of(rows, category, window)
     history = clocked(recent, True)
     if len(history) < MIN_SAMPLE:
@@ -642,6 +647,9 @@ def propose_date(rows, open_rows, now, window, points, category, issue):
         return refusal(f"backtest temporal de '{category}' não medido: n={check['n']}, mínimo {BACKTEST_MIN}", status="calibration_not_measured", category=category, backtest=check)
     if check["coverage_due"] < BACKTEST_FLOOR:
         return refusal(f"backtest temporal de '{category}' cobre {check['coverage_due']}; piso {BACKTEST_FLOOR}", status="miscalibrated", category=category, backtest=check)
+    retro_used = origin_counts(history)["retro"]
+    if retro_used:
+        warnings.append({"code": "retro_points_in_history", "message": f"{retro_used} de {len(history)} issues da calibração têm pontos retroestimados, dados depois de concluídas"})
     known = sorted({r["points"] for r in history})
     if not known[0] <= points <= known[-1]:
         warnings.append({"code": "points_extrapolation", "message": f"{points} pontos fora do histórico de '{category}' ({known[0]} a {known[-1]}): a escala linear é suposição"})
@@ -672,7 +680,7 @@ def propose_date(rows, open_rows, now, window, points, category, issue):
                          "range": {"low": date_for(low), "high": date_for(high), "high_is_sample_max": capped}},
             "basis": {"points": points, "category": category, "mode": mode, **detail, "sample_used": len(remaining),
                       "hours_from_now": {"low": round3(low), "likely": round3(likely), "due": round3(due), "high": round3(high)},
-                      "sample": stats["sample"], "points_signal": signal, "now": now.isoformat(), "backtest_temporal_category": check,
+                      "sample": stats["sample"], "points_origin": origin_counts(history), "points_signal": signal, "now": now.isoformat(), "backtest_temporal_category": check,
                       "coverage_with_open": backtests["loo"]["history_only"]["with_open"]},
             "warnings": warnings, "limits": limits_with_bias(backtests), "note": "proposta: o medidor não escreve; quem aceita a faixa aplica com due_date.set"}, 0
 
@@ -682,54 +690,111 @@ def team_view(rows):
 
 
 def team_accuracy(view, opened, now):
-    """O acerto da própria faixa do time, não o da conta por categoria."""
+    """Referência: a soma fila + trabalho a partir da criação. NÃO é o acerto do caminho servido; esse é served_accuracy."""
     loo, temporal = backtest(view, TEAM_WINDOW, False, False), backtest(view, TEAM_WINDOW, False, True)
-    return {"method": "team history without points, end of band at P80", "completed_only": loo["coverage_due"], "n": loo["n"],
+    return {"method": "from creation, age zero, P80: reference only, not the served path", "completed_only": loo["coverage_due"], "n": loo["n"],
             "with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, False),
             "temporal": {"status": temporal["status"], "n": temporal["n"], "completed_only": temporal["coverage_due"], "with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, True)}}
 
 
+def team_scenarios(history, now, issue):
+    """Cenários da faixa do time para este instante e esta issue. None: já durou mais do que o time sustenta."""
+    max_queue = max(r["queue_h"] for r in history)
+    detail = {"max_queue_seen_hours": round3(max_queue), "age_beyond_max_queue": False, "assumes_start_now": False}
+    started = parse_ts(issue["startedAt"]) if issue and issue.get("startedAt") else None
+    if started:
+        elapsed = max(0.0, hours(started, now))
+        detail["elapsed_hours"] = round3(elapsed)
+        work = sorted(r["work_h"] - elapsed for r in history if r["work_h"] > elapsed)
+        if len(work) < MIN_SAMPLE:
+            return None, detail
+        return {"basis": "already_started", "queue": None, "work": work, "totals": work}, detail
+    age = max(0.0, hours(parse_ts(issue["createdAt"]), now)) if issue else 0.0
+    detail["age_in_queue_hours"] = round3(age)
+    waiting = [r for r in history if r["queue_h"] >= age]
+    if len(waiting) >= MIN_SAMPLE:
+        return {"basis": "conditional_on_age_in_queue", "queue": sorted(r["queue_h"] - age for r in waiting), "work": sorted(r["work_h"] for r in waiting),
+                "totals": sorted(r["queue_h"] - age + r["work_h"] for r in waiting)}, detail
+    detail["age_beyond_max_queue"] = age > max_queue
+    detail["assumes_start_now"] = True
+    detail["queue_waiters"] = len(waiting)
+    work = sorted(r["work_h"] for r in history)
+    return {"basis": "assumes_start_now", "queue": None, "work": work, "totals": work}, detail
+
+
+def served_accuracy(rows, open_rows, now):
+    """Simulação retroativa do caminho servido: em cada data passada, a faixa com o que se sabia e a idade que a issue tinha."""
+    view, opened = team_view(rows), team_view(open_rows)
+    stats = {b: {"snapshots": 0, "hit": 0, "miss": 0, "unresolved": 0, "first_seen_hit": 0, "first_seen_miss": 0} for b in SERVED_BASES}
+    seen = set()
+    for k in range(WALK_ORIGINS, 0, -1):
+        origin = now - dt.timedelta(days=WALK_STEP_DAYS * k)
+        history = clocked([r for r in view if r["completed"] and r["completed"] < origin], False)
+        if len(history) < MIN_SAMPLE:
+            continue
+        for r in view + opened:
+            if r["exclusion"] == "rollup_parent" or r["created"] >= origin or (r["completed"] and r["completed"] <= origin):
+                continue
+            raw = r["raw"]
+            known_start = raw["startedAt"] if raw.get("startedAt") and parse_ts(raw["startedAt"]) <= origin else None
+            scenarios, _ = team_scenarios(history, origin, {"createdAt": raw["createdAt"], "startedAt": known_start})
+            if scenarios is None:
+                continue
+            deadline = origin + dt.timedelta(hours=conformal(scenarios["totals"], DUE_QUANTILE)[0])
+            if r["completed"]:
+                outcome = "hit" if r["completed"] <= deadline else "miss"
+            else:
+                outcome = "miss" if now > deadline else "unresolved"
+            entry = stats[scenarios["basis"]]
+            entry["snapshots"] += 1
+            entry[outcome] += 1
+            if (r["id"], scenarios["basis"]) not in seen and outcome != "unresolved":
+                seen.add((r["id"], scenarios["basis"]))
+                entry[f"first_seen_{outcome}"] += 1
+    for entry in stats.values():
+        resolved = entry["hit"] + entry["miss"]
+        entry["resolved"] = resolved
+        entry["coverage"] = round3(entry["hit"] / resolved) if resolved else None
+        entry["measured"] = resolved >= SERVED_MIN
+    return {"method": f"retroactive walk over {WALK_ORIGINS} dates, {WALK_STEP_DAYS} days apart: the band served at each date, judged by what happened; snapshots of one issue repeat across dates",
+            "min_resolved": SERVED_MIN, "latest_percentile": int(DUE_QUANTILE * 100), "by_queue_basis": stats}
+
+
 def team_band(rows, open_rows, now, category, issue, gate):
-    """Faixa de baixa confiança quando a categoria não tem base. Nunca preenche `proposal`: quem lê a data calibrada não acha nada."""
+    """Faixa de baixa confiança quando a categoria não tem base. Nunca preenche `proposal`, e só dá data onde o caminho servido foi medido."""
     gate = {k: v for k, v in gate.items() if k != "proposal"}
     view, opened = team_view(rows), team_view(open_rows)
     history = clocked(view, False)
     if len(history) < MIN_SAMPLE:
         return refusal(f"o time tem {len(history)} issue(s) com fila e trabalho; mínimo {MIN_SAMPLE}", category=category, calibration_gate=gate)
-    max_queue = max(r["queue_h"] for r in history)
-    warnings = [{"code": "low_confidence", "message": "faixa do time inteiro, sem pontos: não é prazo calibrado da categoria"}]
-    started = parse_ts(issue["startedAt"]) if issue and issue.get("startedAt") else None
-    detail = {"max_queue_seen_hours": round3(max_queue), "age_beyond_max_queue": False, "assumes_start_now": False}
-    if started:
-        elapsed = max(0.0, hours(started, now))
-        work = sorted(r["work_h"] - elapsed for r in history if r["work_h"] > elapsed)
-        if len(work) < MIN_SAMPLE:
-            return refusal(f"iniciada há {round3(elapsed)} h, além do que o time já durou: não há faixa", status="beyond_history", category=category, calibration_gate=gate, elapsed_hours=round3(elapsed))
-        queue, totals, basis = None, work, "already_started"
-        detail["elapsed_hours"] = round3(elapsed)
-    else:
-        age = max(0.0, hours(parse_ts(issue["createdAt"]), now)) if issue else 0.0
-        waiting = [r for r in history if r["queue_h"] >= age]
-        detail["age_in_queue_hours"] = round3(age)
-        if len(waiting) >= MIN_SAMPLE:  # idade além da fila máxima deixa waiting vazio e cai no else
-            queue = sorted(r["queue_h"] - age for r in waiting)
-            work = sorted(r["work_h"] for r in waiting)
-            totals, basis = sorted(r["queue_h"] - age + r["work_h"] for r in waiting), "conditional_on_age_in_queue"
-        else:
-            queue, work, totals, basis = None, sorted(r["work_h"] for r in history), sorted(r["work_h"] for r in history), "beyond_queue_history_assumes_start_now"
-            detail["age_beyond_max_queue"] = age > max_queue
-            detail["assumes_start_now"] = True
-            warnings.append({"code": "age_beyond_queue_history", "message": f"{round3(age)} h na fila, e só {len(waiting)} issue(s) do time esperaram tanto (máximo {round3(max_queue)} h): a faixa supõe início agora"})
+    scenarios, detail = team_scenarios(history, now, issue)
+    if scenarios is None:
+        return refusal(f"iniciada há {detail['elapsed_hours']} h, além do que o time já durou: não há faixa", status="beyond_history", category=category, calibration_gate=gate, elapsed_hours=detail["elapsed_hours"])
     marks = {"earliest": LOW_QUANTILE, "likely": LIKELY_QUANTILE, "latest": DUE_QUANTILE}
     band = lambda values: {k: round3(conformal(values, q)[0]) for k, q in marks.items()}
-    span = band(totals)
+    basis = scenarios["basis"]
+    served = served_accuracy(rows, open_rows, now)
+    this_path = {"queue_basis": basis, **served["by_queue_basis"][basis]}
+    accuracy = {"served_path": this_path, "served": served, "from_creation_reference": team_accuracy(view, opened, now)}
+    common = {"confidence": "low", "calibrated": False, "queue_basis": basis, "sample_used": len(scenarios["totals"]), **detail}
+    warnings = [{"code": "low_confidence", "message": "faixa do time inteiro, sem pontos: não é prazo calibrado da categoria"}]
+    tail = {"measured_accuracy": accuracy, "calibration_gate": gate, "warnings": warnings, "limits": LIMITS}
+    if basis == "assumes_start_now" or not this_path["measured"]:
+        why = ("a data depende de quando alguém decide começar: a issue já esperou mais do que o time costuma esperar" if basis == "assumes_start_now"
+               else f"o caminho {basis} tem só {this_path['resolved']} desfecho(s) medido(s); mínimo {SERVED_MIN}")
+        key = "work_hours_remaining" if basis == "already_started" else "work_hours_if_started_now"
+        warnings.append({"code": "hours_only", "message": why})
+        return {"status": "provisional_work_hours_only", "proposal": None, "category": category,
+                "provisional": {**common, "dates_not_calibrated": None, key: band(scenarios["work"]), "why_no_date": why}, **tail,
+                "note": "só horas de trabalho: sem data, porque ela não se sustenta neste caminho"}, PROVISIONAL_RC
+    if this_path["coverage"] < LOW_SERVED_COVERAGE:
+        warnings.append({"code": "low_served_accuracy", "message": f"neste caminho a data final acertou {this_path['coverage']} em {this_path['resolved']} desfechos"})
+    span = band(scenarios["totals"])
     return {"status": "provisional_team_band", "proposal": None, "category": category,
-            "provisional": {"confidence": "low", "calibrated": False, "latest_percentile": int(DUE_QUANTILE * 100),
+            "provisional": {**common, "latest_percentile": int(DUE_QUANTILE * 100),
                             "dates_not_calibrated": {k: local_date(now + dt.timedelta(hours=v)).isoformat() for k, v in span.items()},
-                            "hours_from_now": span, "queue_hours_remaining": band(queue) if queue else None, "work_hours": band(work),
-                            "queue_basis": basis, "sample_used": len(totals), **detail},
-            "measured_accuracy": team_accuracy(view, opened, now), "calibration_gate": gate, "warnings": warnings, "limits": LIMITS,
-            "note": "faixa provisória, não prazo: quando a categoria passar nos portões, o proposed normal assume"}, PROVISIONAL_RC
+                            "hours_from_now": span, "queue_hours_remaining": band(scenarios["queue"]) if scenarios["queue"] else None, "work_hours": band(scenarios["work"])},
+            **tail, "note": "faixa provisória, não prazo: se aplicar com due_date.set, use --provisional-note; quando a categoria passar nos portões, o proposed normal assume"}, PROVISIONAL_RC
 
 
 # ── amostra cega ────────────────────────────────────────────────────────────
@@ -914,12 +979,21 @@ def run_propose(args, rules, overlay, now, load):
         refused = issue_refusal(issue)
         if refused:
             return refused
-        category, _ = classify(issue.get("title"), rules)
+        category, calibrate = classify(issue.get("title"), rules)
         points = overlay.get(issue["identifier"], issue.get("estimate"))
     elif points is None or not category:
         raise MeterError("propose exige --issue ou o par --points e --category")
+    else:
+        known = {c: cal for c, cal, _ in rules}
+        known.setdefault(UNCATEGORIZED, True)
+        if category not in known:
+            raise MeterError(f"categoria desconhecida: '{category}' (aceitas: {', '.join(sorted(known))})")
+        calibrate = known[category]
     if not args.issue and points <= 0:
         raise MeterError("--points exige valor positivo")
+    if not calibrate:
+        # antes do ramo sem pontos: ato humano nunca recebe faixa, com ou sem pontos
+        return refusal(f"categoria '{category}' não calibra: é ato humano sem relógio de trabalho", status="not_calibrated", category=category)
     rows, open_rows = load("completed"), load(OPEN_STATES)
     if not points:
         gate = {"status": "no_points", "reason": f"{issue['identifier']} sem pontos: a faixa do time não os usa, a data calibrada precisa deles"}
