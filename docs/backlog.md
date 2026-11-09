@@ -540,8 +540,8 @@
 | 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
 | 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
 | 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
-| 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | L2 no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
-| 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | L1 e L3: o comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
+| 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | A anonimização no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
+| 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | O comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
 | 3.2 | `Q_IT_RESIDUE_GUARD_REMOTE_BRANCH` | inbox-triage-1108 | O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de  |
 | 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
 | 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
