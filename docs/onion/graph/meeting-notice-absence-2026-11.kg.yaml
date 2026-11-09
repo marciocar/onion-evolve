@@ -1,0 +1,61 @@
+meta:
+  schema_version: "1"
+  id: meeting-notice-absence-2026-11
+  slug: meeting-notice-absence-2026-11
+  title: "Reunião sem aviso de gravação: o registro do fato e a leitura jurídica pendente"
+  date: "2026-11-09"
+  baseline: "2026-11-09"
+  review_after: "2026-12-09"
+  purpose: "Guardar a decisão de registrar a ausência de aviso no grafo da reunião e a pendência jurídica que ela abre. O gate registra o fato; ele não supre a transparência e não declara conformidade."
+  # ═══ TETO: 6 NÓS ═══
+nodes:
+  - id: E_MN_REVIEW_DEFENSIBLE_CONDITIONS_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-09"
+    verified_against: "relatório técnico da curadoria sobre o PR #1569, relatado no brief da sessão do core em 2026-11-09"
+    label: "A revisão técnica da curadoria leu o registro de ausência como defensável com condições: registrar o fato sustenta; o rc 0 valer como liberação do uso seguinte, não. Não é parecer jurídico."
+    narrative: "Dois bloqueios curados no PR #1569: a consolidação retém a reunião sem aviso, e o relatório do extract ganhou estado próprio. Não verificados pela revisão: Constituição, Código Civil, Lei 9.296/1996, CLT, jurisprudência e os fatos de cada adotante."
+    provenance:
+      source: "curadoria, revisão do PR #1569"
+      locator: "relatório de 2026-11-09, seções 1 a 3"
+      method: "testimony: revisão técnica relatada pela sessão do core, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MN_RECORD_AND_REVIEW_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro «Registrar e revisar», relatada no brief da sessão do core em 2026-11-09"
+    label: "A forma do registro de ausência de aviso fica, e o merge do PR #1569 espera a revisão."
+    narrative: "O maestro escolheu «Registrar e revisar». A decisão é sobre a forma do registro e a ordem do merge; não decide a licitude de nenhuma reunião."
+    provenance:
+      source: "maestro, relatado pela sessão do core"
+      locator: "brief de 2026-11-09 à sessão de execução"
+      method: "testimony: decisão do maestro relatada pela sessão do core, 2026-11-09"
+      locality: "pessoa"
+  - id: Q_MN_LEGAL_READING_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    x_linear_issue: "SAC-386"
+    impact: 4
+    confidence: 0.6
+    label: "Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real."
+    narrative: "Pronto quando: quem responde pela privacidade de cada adotante que usar isto leu o que o registro afirma e decidiu base legal, informação aos titulares, e reter, usar ou eliminar. Ficam com o controlador: dado sensível ou de criança, prazo de eliminação (inclusive no histórico git), operador e transferência internacional. Prazo a calibrar."
+edges:
+  - from: D_MN_RECORD_AND_REVIEW_1109
+    to: E_MN_REVIEW_DEFENSIBLE_CONDITIONS_1109
+    edge_type: TRACES_TO
+  - from: Q_MN_LEGAL_READING_1109
+    to: D_MN_RECORD_AND_REVIEW_1109
+    edge_type: TRACES_TO

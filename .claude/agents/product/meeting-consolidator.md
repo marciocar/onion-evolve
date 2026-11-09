@@ -459,6 +459,7 @@ Você identifica e apresenta pontos que:
 
 - **Agente Relacionado**: @extract-meeting-specialist (extração estruturada)
 - **Knowledge Base**: `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
+- **Reunião sem aviso** (`meeting-graph-check.sh --for-use` sai rc 3): retida por padrão; só entra por decisão explícita de quem usa, marcada com `⚠️ reunião sem aviso, risco aberto`.
 - **Reuniões**: `docs/meetings/` — o resumo `<nome>-extract.md` e o grafo `<nome>.kg.yaml` de cada reunião,
   ambos gravados pelo `/product:extract-meeting`; cite o `trace` do grafo (o trecho da transcrição) ao
   apontar divergência ou convergência

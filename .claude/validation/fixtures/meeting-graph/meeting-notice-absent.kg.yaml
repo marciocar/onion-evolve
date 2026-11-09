@@ -27,6 +27,8 @@ nodes:
   - id: NOTICE_ABSENT
     node_type: claim
     x_meeting_role: notice_absent
+    x_notice_remediation: pendente
+    x_owner: NAO_ESPECIFICADO
     x_notice_absent_basis: "Transcrição inteira lida: nenhuma fala avisa da gravação, e o organizador não apontou aviso por outro canal."
     plane: DEV
     status: open

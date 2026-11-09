@@ -50,9 +50,13 @@ Transformar múltiplas reuniões em conhecimento estratégico consolidado, ident
 
 **Onde moram as reuniões:** `docs/meetings/`, o mesmo diretório em que o `/product:extract-meeting` grava o
 resumo (`<nome>-extract.md`) e o grafo da reunião (`<nome>.kg.yaml`). Quando houver o grafo, leia-o junto do
-resumo, depois de passar nele o gate (`bash .claude/validation/meeting-graph-check.sh <grafo>`, rc 0): as
+resumo, depois de passar nele o gate de uso (`bash .claude/validation/meeting-graph-check.sh <grafo> --for-use`, rc 0): as
 decisões, ações e riscos dele trazem `trace` ao trecho da transcrição, e é esse trace que a consolidação deve
-citar. Grafo reprovado no gate (sem tentativa de aviso, por exemplo) não entra na consolidação. A consolidação ainda sai em Markdown; o grafo de consolidação entre reuniões (as
+citar. Grafo reprovado no gate (sem tentativa de aviso, por exemplo) não entra na consolidação.
+
+**Reunião sem aviso (rc 3): retida por padrão.** O registro é válido, mas não libera o uso. Liste cada uma no relatório como retida, com a linha `SOFT:AVISO-AUSENTE`, e não a leia nem a cite. Só entra se quem usa decidir, nesta execução e pelo nome da reunião, depois de ver a linha SOFT, e ele responde por essa decisão. Com dado sensível ou de criança, não ofereça a inclusão: diga que depende de análise jurídica. O que entrar leva `⚠️ reunião sem aviso, risco aberto` no topo do consolidado e em cada decisão, ação e risco dela, e a tarefa derivada carrega a mesma marca.
+
+A consolidação ainda sai em Markdown; o grafo de consolidação entre reuniões (as
 reuniões ligadas por arestas) é trabalho aberto.
 
 ## ⚡ Fluxo de Execução

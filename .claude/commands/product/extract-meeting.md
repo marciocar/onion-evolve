@@ -274,11 +274,14 @@ aviso e a resposta de cada participante a ela. Ele **nunca declara consentimento
 jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_consent`/`consentimento_legal`.
 - **Não houve aviso, e isso se sabe** (transcrição inteira lida e o organizador não aponta aviso por outro
   canal): registre a ausência com um nó `x_meeting_role: notice_absent`, com `x_notice_absent_basis` (como se
-  sabe), `label` com as palavras "não houve aviso", `status: open`, `impact` 4 ou 5 e `trace` na transcrição
-  inteira (`#L1-L<última>`). Cada participante
-  fica em `x_notice_ref: <id do nó>` e `x_notice_response: nao_avisado` (ou `recusou`, com a parada de sempre).
-  O gate sai rc 0 com `SOFT:AVISO-AUSENTE` e a contagem de pessoas. **Isso não é conformidade**: é o risco
-  declarado, e a análise jurídica não foi feita. Mostre a linha SOFT ao usuário, inteira, e nunca chame a reunião de regular.
+  sabe), `label` com as palavras "não houve aviso", `x_notice_remediation: pendente`, `x_owner` (quem responde, ou
+  `NAO_ESPECIFICADO`), `status: open`, `impact` 4 ou 5 e `trace` do início ao fim da transcrição (ou à parada, se
+  houve recusa). Cada participante fica em `x_notice_ref: <id do nó>` e `x_notice_response: nao_avisado` (ou
+  `recusou`, com a parada de sempre). **Isto registra o fato e não supre a transparência devida aos titulares;
+  não é conformidade nem consentimento.** Ausência na reunião também não prova ausência em contrato ou política.
+  Base legal, informação aos titulares e reter, usar ou eliminar são do controlador, e a remediação registra o
+  que ele fez (`titulares_informados`, `analise_feita`, `dados_eliminados`), sem nenhum valor que declare licitude.
+  Pergunte se há dado sensível ou de criança: nesse caso, não use o grafo antes da análise jurídica.
 - Sem aviso na transcrição **e sem saber se houve**, **não invente um**: grave o grafo sem `notice_attempt`, com cada participante em
   `x_notice_ref: "-"` e `x_notice_response: sem_resposta`, e o gate reprova com um motivo só,
   `SEM-TENTATIVA-DE-AVISO`. É o comportamento esperado; o caminho é registrar o aviso na próxima reunião (ou anexar à transcrição o aviso
@@ -301,8 +304,10 @@ jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_co
 bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
 ```
 
-- **rc 0**: conforme (aviso registrado, trace ao trecho, radar verde). Com `SOFT:AVISO-AUSENTE` na saída, a
-  forma passou e o aviso **não aconteceu**: mostre a linha e trate como risco aberto.
+- **rc 0 sem linha SOFT**: conforme (aviso registrado, trace ao trecho, radar verde).
+- **rc 0 com `SOFT:AVISO-AUSENTE`**: estado próprio, **`⚠️ NÃO HOUVE AVISO`**, nunca "conforme". O registro é
+  válido e o aviso **não aconteceu**. Mostre a linha SOFT inteira e use o relatório de ausência abaixo. O uso do
+  grafo fica retido: quem consome pede `--for-use`, que sai rc 3.
 - **rc 1**: reprovado. A saída lista um motivo por linha, `MOTIVO<TAB>nó<TAB>detalhe`; mostre todos. O
   grafo reprovado **fica gravado** em `docs/meetings/` (é o registro do que a transcrição tem e do que falta),
   mas não é apresentado como válido, e quem o consome roda o gate antes. Corrija o que é erro de extração (trace
@@ -312,8 +317,11 @@ bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
 - **rc 2**: o gate não pôde julgar (radar ou python3 ausente). Não é verde: diga isso ao usuário.
 
 > **Dados reais.** O grafo guarda nomes e falas reais, sem anonimização. Não o grave em repositório público.
+> Combine com o controlador o prazo de eliminação: apagar de um repo com histórico exige reescrever o histórico.
 
 ## 📤 Output Esperado
+
+Com `⚠️ NÃO HOUVE AVISO`, o título do bloco é `⚠️ EXTRAÇÃO CONCLUÍDA, NÃO HOUVE AVISO`, e a linha SOFT inteira vem logo abaixo do grafo.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -321,7 +329,7 @@ bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📁 Arquivo: docs/meetings/[nome]-extract.md
-🕸️ Grafo:   docs/meetings/[nome].kg.yaml (gate: ✅ conforme | ✗ MOTIVO)
+🕸️ Grafo:   docs/meetings/[nome].kg.yaml (gate: ✅ conforme | ⚠️ NÃO HOUVE AVISO | ✗ MOTIVO)
 
 📊 Extração EXTRACT:
 ∟ Essência: ✅
