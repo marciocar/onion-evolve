@@ -2,7 +2,7 @@
 date: 2026-07-15
 instance: onion-evolve
 type: error
-classification: protected
+classification: public
 tags: [self-correction, over-assumption, create-vertical, never-clobber, watcher]
 affects: [meta, process]
 breadcrumb_for: [meta:create-vertical, meta:adopt]
@@ -13,7 +13,7 @@ conflict_class: static
 ---
 
 ## Signal
-**Não projetar uma etapa de ferramenta onde ela não se aplica.** Assumi que o gustavo
+**Não projetar uma etapa de ferramenta onde ela não se aplica.** Assumi que o adotante de campo
 pusharia um "scaffold via `/meta:create-vertical`" no ⟨cliente⟩; mas o ⟨cliente⟩ **já é vertical
 construída** — never-clobber tornaria o re-scaffold um **no-op**. Dogfood de campo = iterar
 DENTRO da vertical, não regenerá-la.

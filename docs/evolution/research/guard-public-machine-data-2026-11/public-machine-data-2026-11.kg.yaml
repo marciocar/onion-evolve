@@ -1,0 +1,172 @@
+# kg-backlog-guard: on
+# ═══ TETO: 9 NÓS ═══
+meta:
+  id: public-machine-data-2026-11
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-11-09"
+  review_after: "2027-02-09"
+  # Forja (/meta:forge-guard) da guarda que barra dado de máquina no registro da federação e no diário.
+nodes:
+  - id: E_MACHINE_DATA_TRACKED_IN_PUBLIC_REPO_1109
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-11-09"
+    verified_against: "gh repo view devolveu visibility PUBLIC; a guarda rodada sobre o estado de origin/main dos 6 arquivos acusou 29 ocorrências: 21 de host, 7 de IP e 1 de chave"
+    trace: ".claude/validation/public-machine-data-check.sh"
+    label: "O defeito, datado: com o repo público, o registro da federação e quatro entradas do diário traziam host da VPS, dois IPs públicos e o nome do arquivo de chave SSH."
+    narrative: "O índice do diário herdava um dos dados. Nenhuma guarda lia comentário de YAML ou corpo de diário: a regra de caminho de máquina só lê campos de nó, a varredura de publicação só olha o que viaja, e a de nome comercial julga cliente."
+    provenance:
+      source: "docs/evolution/federation/members.yaml e .claude/diary/ em origin/main 9e0f61c15"
+      locator: "bash .claude/validation/public-machine-data-check.sh <cópia do estado anterior> --tsv"
+      method: "medição: guarda executada sobre o estado anterior em 2026-11-09"
+      locality: "repo"
+  - id: D_GUARD_SUBSTRATE_LINT_CHECK_1109
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: done
+    verified_at: "2026-11-09"
+    verified_against: "guard-census.sh de 2026-11-09: a classe de caminho de máquina em grafo existe em kg-machine-path-check.sh (4 casos), sem cobertura de registro e diário"
+    trace: ".claude/validation/public-machine-data-check.sh"
+    label: "Substrato: check de lint HARD sem baseline, no molde do kg-machine-path-check.sh, com passivo zero, que só julga a fonte."
+    narrative: "Hook não serve: o dado é propriedade do commit, não de uma chamada de ferramenta. Sem baseline porque a limpeza zerou os dois caminhos no mesmo PR. A saída nomeia arquivo, linha e classe e não imprime o valor, porque o log do CI é público. A guarda viaja com a pasta de validação, e cada adotante tem diário e pode ser privado: fora da fonte ela sai calada."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "injeção do /meta:forge-guard em 2026-11-09"
+      method: "medição: censo de guardas executado antes da forja"
+      locality: "repo"
+  - id: D_HOST_FORM_REPLACES_REGISTRY_HOSTS_1109
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: done
+    verified_at: "2026-11-09"
+    verified_against: "machine_path.py lia os host das linhagens do registro; kg-machine-path-check.sh --tsv saiu rc 0 e silencioso depois da troca, e o selftest passou 45 de 45"
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "O host saiu das linhagens do core, e o machine_path.py passou a reconhecer a forma do nome, para a regra de grafo não ficar cega no CI."
+    narrative: "No CI o hostname do processo é o do runner, então só o registro apontava a máquina real. A forma do nome cobre o que o campo cobria sem publicar o valor."
+    provenance:
+      source: ".claude/utils/kg/machine_path.py"
+      locator: "HOST_FORM e host_re"
+      method: "medição: selftest e corpus real em 2026-11-09"
+      locality: "repo"
+  - id: D_LOCAL_PATH_STAYS_1109
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: done
+    verified_at: "2026-11-09"
+    verified_against: "git grep de local_path em 2026-11-09: adopter-scope.sh, moat-judge.py, co-deliver.sh, vendor-branch.sh, check-member-registered.sh, detect-transport.sh e a2a-verify.sh leem o campo"
+    trace: "docs/evolution/federation/members.yaml"
+    label: "O local_path dos membros fica no registro: dois hooks de veto e cinco scripts o leem, e os hooks não passam pelo resolvedor com mapa local."
+    narrative: "Mover exigiria trocar a leitura dos hooks e dar fallback no CI, para reduzir só o nome da conta em caminhos. A guarda não o acusa, e isso está declarado no teto dela. Os comentários com caminhos da máquina ficam pelo mesmo motivo de escopo: o pedido nomeou IP, host, porta e chave."
+    provenance:
+      source: "git grep local_path em .claude e ops"
+      locator: "git grep -n local_path -- .claude/hooks .claude/utils .claude/validation"
+      method: "medição: leitura de consumidores em 2026-11-09"
+      locality: "repo"
+  - id: C_CEILING_GIT_HISTORY_STILL_PUBLIC_1109
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-11-09"
+    verified_against: "selo D_MD_PUBLIC_SURFACE_CLEAN_CURRENT_ONLY_1109: reescrever o histórico foi descartado pelo maestro"
+    label: "Teto: o histórico do git segue público. A guarda e a limpeza valem para a árvore atual, e os valores antigos continuam nos commits."
+    provenance:
+      source: "maestro, por pergunta com opções, relatado pela sessão do core"
+      locator: "selo de 2026-11-09 sobre a exposição no repo público"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: C_CEILING_ONLY_LISTED_PATHS_1109
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-11-09"
+    verified_against: "git grep dos valores antigos depois da limpeza: 34 arquivos rastreados fora do registro, do diário e do espelho do diário"
+    label: "Teto: a guarda só lê o registro, o diário e o espelho do diário. Outros 34 arquivos rastreados ainda citam os mesmos dados, entre resíduos de revisão, sinais e estudos."
+    provenance:
+      source: "git grep na árvore do PR"
+      locator: "git grep -l dos valores, fora de members.yaml, .claude/diary e docs/evolution/outbox/diary"
+      method: "medição: comando executado em 2026-11-09"
+      locality: "repo"
+  - id: C_CEILING_CLASS_FORMS_ONLY_1109
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-11-09"
+    verified_against: "cabeçalho de public-machine-data-check.sh e sonda da classe sobre os .md e .yaml do repo em 2026-11-09"
+    trace: ".claude/validation/public-machine-data-check.sh"
+    label: "Teto: porta de rede, host fora da forma, IPv6, nome de chave sem .ssh no caminho e IP público com um dígito em cada parte não são vistos."
+    narrative: "A isenção de um dígito por parte nasceu da sonda no repo, que achou numeração de seção e de versão no formato de IP. Número de quatro partes com algum octeto maior é acusado, e a saída é o marcador com motivo na própria linha. Porta não é classe porque número de porta é indistinguível de contagem."
+    provenance:
+      source: ".claude/validation/public-machine-data-check.sh"
+      locator: "cabeçalho, seção TETO DECLARADO"
+      method: "medição: sonda da classe executada em 2026-11-09"
+      locality: "repo"
+  - id: D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções, relatada pela sessão do core no brief deste PR: escolhida «Reclassificar públicas»"
+    label: "As 12 entradas protected do diário viram public, depois de tirar nomes e dados de máquina do corpo."
+    narrative: "O rótulo passa a dizer a verdade num repo público, e âncoras e índice seguem de pé. O detalhe de quem foi o adotante sai da árvore e segue no histórico do git. Selado em 2026-11-09: escolhida «Reclassificar públicas»; descartadas: «Repo privado», «Manter e só limpar»."
+    provenance:
+      source: "maestro, por pergunta com opções, relatado pela sessão do core"
+      locator: "pergunta com opções de 2026-11-09 sobre as 12 entradas protected"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: Q_PROTECTED_DIARY_DESTINATION_1109
+    node_type: question
+    plane: DEV
+    status: superseded
+    owner: maestro
+    impact: 4
+    confidence: 0.5
+    label: "Qual o destino das 12 entradas protected do diário, já que a RFC-0003 as declara visíveis só à instância e ao core e o repo é público?"
+    narrative: "Pronto quando: o maestro escolhe entre reclassificar como public depois de limpar nomes e dados do corpo, levar para um repo privado de itens sensíveis, ou manter o rótulo só com a limpeza. Prazo a calibrar. Respondida no mesmo dia pelo selo D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109."
+    provenance:
+      source: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
+      locator: "§2.2, linha de protected"
+      method: "leitura: RFC e estado do repo em 2026-11-09"
+      locality: "repo"
+edges:
+  - from: D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109
+    to: Q_PROTECTED_DIARY_DESTINATION_1109
+    edge_type: SUPERSEDES
+  - from: E_MACHINE_DATA_TRACKED_IN_PUBLIC_REPO_1109
+    to: D_GUARD_SUBSTRATE_LINT_CHECK_1109
+    edge_type: SUPPORTS
+  - from: E_MACHINE_DATA_TRACKED_IN_PUBLIC_REPO_1109
+    to: D_HOST_FORM_REPLACES_REGISTRY_HOSTS_1109
+    edge_type: SUPPORTS
+  - from: E_MACHINE_DATA_TRACKED_IN_PUBLIC_REPO_1109
+    to: D_LOCAL_PATH_STAYS_1109
+    edge_type: SUPPORTS
+  - from: C_CEILING_GIT_HISTORY_STILL_PUBLIC_1109
+    to: D_GUARD_SUBSTRATE_LINT_CHECK_1109
+    edge_type: CONSTRAINS
+  - from: C_CEILING_ONLY_LISTED_PATHS_1109
+    to: D_GUARD_SUBSTRATE_LINT_CHECK_1109
+    edge_type: CONSTRAINS
+  - from: C_CEILING_CLASS_FORMS_ONLY_1109
+    to: D_GUARD_SUBSTRATE_LINT_CHECK_1109
+    edge_type: CONSTRAINS
+  - from: Q_PROTECTED_DIARY_DESTINATION_1109
+    to: E_MACHINE_DATA_TRACKED_IN_PUBLIC_REPO_1109
+    edge_type: TRACES_TO

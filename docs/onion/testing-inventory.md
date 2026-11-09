@@ -16,13 +16,13 @@
 | Linhas do manifesto de fixtures | **121** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **174** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
-| Regras do lint | **111** | `bash .claude/validation/rules-registry.sh --counts` |
-| — das quais HARD | **97** | idem |
+| Regras do lint | **112** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **98** | idem |
 | — das quais SOFT | **52** | idem |
 | — HARD **e** SOFT (contadas nas duas) | **38** | idem |
-| Pares de modo consumido (REGRA 59) | **82** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Pares de modo consumido (REGRA 59) | **83** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
-| Scripts de validação | **128** | `git ls-files '.claude/validation/*.sh'` |
+| Scripts de validação | **129** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **27** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **5** | `git ls-files '.github/workflows/*.yml'` |
 | Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |

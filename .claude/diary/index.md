@@ -4,9 +4,9 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 134 entradas · **Stale:** 0 · **Compartilháveis:** 122 · **Com significância:** 55
+**Total:** 134 entradas · **Stale:** 0 · **Compartilháveis:** 134 · **Com significância:** 55
 
-Gerado em: 2026-11-08
+Gerado em: 2026-11-09
 
 ---
 
@@ -64,7 +64,7 @@ Gerado em: 2026-11-08
 | 2026-07-30 | learning | collective 📤 | pr-500-behavior-over-declaration-turned-inward | PR #500 — e ele carrega a lição da sessão inteira: behavior-over-declaration virado PARA DENTRO, mordendo a própria cauda até o plano recém-aprovado. A sessão fechou o relato de campo de um adotante de ponta a ponta: bug do kg-radar (aspas simples que o prettier gera) corrigido de raiz; retro do processo dele coletada, relayada client-safe e triada; os 7 produtos deriváveis RESOLVIDOS (2 já existiam — behavior-over-declaration; 4 construídos; 1 estendido); e o doctrine-freshness curado de raiz (o guard pula code fences). O #500 é o modo /meta:kg diagnose + a automação parcial do seu pipeline — o KG-SDAAL aplicado ao DIAGNÓSTICO de engajamento de negócio (o radar --domain estado-absorvente = gargalo do cliente), com a PAUSA humana preservada como linha vermelha (scaffold do mecânico, NUNCA um --auto que gere KG caixa-preta). O marco não é o número redondo; é onde a disciplina fechou o círculo: cada verdade dos meus erros ficou registrada NO GRAFO (a triagem tem os REFUTES/SUPERSEDES dos meus vereditos errados), e o dogfood de cada entrega reconcilia contra si mesmo. | 2027-02-06 | static |
 | 2026-07-29 | learning | collective 📤 | kg-console-rich-narratable-instrument-on-itself | Fechei de ponta a ponta o VISUALIZADOR do KG-SSOT: o kg-console.sh saiu de um SVG de círculo estático (ilegível > ~30 nós) para um console Cytoscape rico, NARRÁVEL por IA e self-contained — 4 PRs verdes (#486 F1+F2+F4, #487 F5, #488 F3). O núcleo do pedido do maestro ('visualizar/interagir com o .kg.yaml e ser explicado por um agente de IA, ideal um HTML autocontido') virou recurso vivo do core, promovendo o que o estudo SEED deixara gated. Mas a lição DURÁVEL é a fronteira SSOT×superfície gravada em mecanismo: a narração é o único ponto com IA (o console segue LLM-free) e a REGRA 47 a impede de citar id que o grafo não tem; o que viaja na federação é o CONTRATO JSON, nunca o JS do renderer. E o fecho foi o dogfood auto-referente: o console renderizando e narrando o grafo do PRÓPRIO desenho — o instrumento provado em si mesmo, mostrando na escada de reconciliação onde o próprio plano mudou ao ser construído (fcose→cose, SEED gated→promovido). | 2027-02-06 | static |
 | 2026-07-29 | learning | collective 📤 | d5-closed-verify-live-before-acting | Fechei o D5 (preço/ticket) de ponta a ponta: decisão ratificada (treino=testar, cert=inicial, compliance/SOTA gated) + os 4 sinais de instrumentação valor-por-adotante VIVOS e determinísticos (ciclos #481, frescor+engajamento #482, velocidade #483 — este destravou um metric morto promovendo timestamps de sessão a um ledger tracked sem quebrar 'conteúdo de sessão fica local'). Mas a lição DURÁVEL é o padrão que atravessou a sessão: behavior-over-declaration pagou 7 vezes, sempre igual — uma declaração que o vivo refutou ao ser verificada. É a doutrina que a KB behavior-over-declaration (do próprio core) prega, dogfoodada à exaustão numa sessão real, incluindo contra o meu próprio processo. | 2027-02-06 | static |
-| 2026-07-28 | learning | collective 📤 | org-map-boundary-closed-live-verify | Fechei um boundary declarado≠verificado que EU MESMO declarei no commit e15a657 ('org-ids não re-verificados desta sessão — sem creds'). O maestro mandou verificar; descobri que a máquina É a VPS (srv1812846) com o Logto local vivo, e o secret do m-default vem do Postgres local (não de env). Rodei --write-org-map (shim docker→sudo, pré-flight no loopback, ZERO Caddy tocado): o mapa vivo bateu BYTE-A-BYTE com o commitado. O loop declarado→verificado→match fechou pela ida à fonte viva. Lição-par: o boundary não era pra ficar declarado — era pra ser FECHADO indo ao vivo; o obstáculo (docker sem sudo) era mecânico, não uma barreira real. Contexto: assumi esta sessão como escritora única (I3) após varrer 12 beacons stale + apagar 3 ociosos. | 2027-02-06 | dynamic |
+| 2026-07-28 | learning | collective 📤 | org-map-boundary-closed-live-verify | Fechei um boundary declarado≠verificado que EU MESMO declarei no commit e15a657 ('org-ids não re-verificados desta sessão — sem creds'). O maestro mandou verificar; descobri que a máquina É a VPS (<host-da-vps>) com o Logto local vivo, e o secret do m-default vem do Postgres local (não de env). Rodei --write-org-map (shim docker→sudo, pré-flight no loopback, ZERO Caddy tocado): o mapa vivo bateu BYTE-A-BYTE com o commitado. O loop declarado→verificado→match fechou pela ida à fonte viva. Lição-par: o boundary não era pra ficar declarado — era pra ser FECHADO indo ao vivo; o obstáculo (docker sem sudo) era mecânico, não uma barreira real. Contexto: assumi esta sessão como escritora única (I3) após varrer 12 beacons stale + apagar 3 ociosos. | 2027-02-06 | dynamic |
 | 2026-07-27 | observation | collective 📤 | adopt-update-pin-staleness | — | 2026-10-27 | dynamic |
 | 2026-07-25 | observation | collective 📤 | company-brain-deterministic-vs-probabilistic-memory | Pesquisa de mercado (orquestrada, verificação externa) sobre Company Brain/Personal Brain fechou a linha divisória do Onion: o mercado consolida memória por reconciliação-LLM PROBABILÍSTICA em runtime; o Onion consolida por git-commit DETERMINÍSTICO auditável. Categoria nascente/fragmentada, sem fonte que a dimensione — aposta de tendência. Players na frente: Mem0 (infra-agente, líder de facto), Glean ($7.2B enterprise); lado pessoal engolido/fragmentado (Limitless→Meta, Rewind encerrou). Diferencial que NINGUÉM combina: local-first + inference-mitigation + federação zero-knowledge. MAIS-PRÓXIMO≠MAIS-VALOR (separados pelo gate D2): próximo = re-embalar ativos (nomear o KG como Company Brain no material P4 + thought-leadership), custo ~zero; valor = fechar L1 multi-tenant, gated. | 2027-02-06 | dynamic |
 | 2026-07-24 | learning | collective 📤 | workflow-resume-after-process-death-reexecutes | Afirmei que retomar um workflow interrompido seria barato ('cacheia as 4 leituras + a síntese') — o maestro cobrou, e a evidência me refutou: agent_count 6 (todos) + 461k tokens + mtime do doc reescrito 42s atrás = o resume RE-EXECUTOU o caro. O cache do resume não sobreviveu à morte do processo. | 2026-11-21 | conditional |
@@ -110,31 +110,31 @@ Gerado em: 2026-11-08
 | 2026-07-17 | error | public 📤 | read-full-before-triage | — | 2027-01-18 | static |
 | 2026-07-17 | learning | public 📤 | pr-400-two-homes-under-real-concurrency | — | 2027-01-18 | static |
 | 2026-07-17 | decision | public 📤 | efficiency-over-economy | — | 2027-01-18 | static |
-| 2026-07-17 | error | protected | core-forged-its-own-anti-forgery-doctrine | — | 2027-01-18 | static |
-| 2026-07-17 | error | protected | adopt-update-clobbers-stale-stamped-adopter | — | 2027-01-18 | dynamic |
-| 2026-07-16 | decision | protected | two-homes-origin-and-coexistence | — | 2027-01-18 | static |
-| 2026-07-16 | decision | protected | kg-sdaal-dogfood-gold-backlog | — | 2027-01-18 | conditional |
-| 2026-07-16 | decision | protected | gustavo-omnibus-backlog | — | 2027-01-18 | conditional |
+| 2026-07-17 | error | public 📤 | core-forged-its-own-anti-forgery-doctrine | — | 2027-01-18 | static |
+| 2026-07-17 | error | public 📤 | adopt-update-clobbers-stale-stamped-adopter | — | 2027-01-18 | dynamic |
+| 2026-07-16 | decision | public 📤 | two-homes-origin-and-coexistence | — | 2027-01-18 | static |
+| 2026-07-16 | decision | public 📤 | kg-sdaal-dogfood-gold-backlog | — | 2027-01-18 | conditional |
+| 2026-07-16 | decision | public 📤 | field-adopter-omnibus-backlog | — | 2027-01-18 | conditional |
 | 2026-07-16 | innovation | public 📤 | deterministic-freshness-via-in-file-baseline | — | 2027-01-18 | static |
 | 2026-07-16 | learning | public 📤 | avell-rescue-doc-predicted-session | — | 2027-01-18 | static |
-| 2026-07-15 | error | protected | projected-scaffold-step-nonexistent | — | 2027-01-12 | static |
-| 2026-07-15 | learning | protected | kg-sdaal-crosses-federation | — | 2027-01-12 | dynamic |
-| 2026-07-15 | learning | protected | kg-audit-layer-generalizes-to-content | — | 2026-10-13 | conditional |
+| 2026-07-15 | error | public 📤 | projected-scaffold-step-nonexistent | — | 2027-01-12 | static |
+| 2026-07-15 | learning | public 📤 | kg-sdaal-crosses-federation | — | 2027-01-12 | dynamic |
+| 2026-07-15 | learning | public 📤 | kg-audit-layer-generalizes-to-content | — | 2026-10-13 | conditional |
 | 2026-07-15 | innovation | public 📤 | create-vertical-f2-fino-delega | — | 2027-01-12 | dynamic |
 | 2026-07-11 | decision | public 📤 | knowledge-centric-reframe-and-north-star | — | 2027-01-12 | static |
 | 2026-07-11 | reflection | public 📤 | hegel-limit-kg-boundary | — | 2027-01-12 | static |
 | 2026-07-10 | reflection | public 📤 | the-day-the-loop-ran-both-ways | — | 2027-01-12 | static |
-| 2026-07-10 | error | protected | ssh-alt-port-2222 | — | 2027-01-12 | dynamic |
+| 2026-07-10 | error | public 📤 | ssh-alt-port-socket-activation | — | 2027-01-12 | dynamic |
 | 2026-07-10 | innovation | public 📤 | first-regulated-a2a-handshake | — | 2027-01-12 | static |
 | 2026-07-09 | innovation | public 📤 | security-gate-degrades-to-veto | — | 2027-01-12 | static |
 | 2026-07-09 | decision | public 📤 | scope-inheritance-rfc0005 | — | 2027-01-12 | static |
-| 2026-07-09 | learning | protected | granaai-readonly-field-dogfood | — | 2027-01-12 | conditional |
+| 2026-07-09 | learning | public 📤 | regulated-adopter-readonly-field-dogfood | — | 2027-01-12 | conditional |
 | 2026-07-09 | innovation | public 📤 | first-live-a2a-handshake | — | 2027-01-12 | static |
 | 2026-07-09 | decision | public 📤 | federation-redesign-rfc0004-shipped | — | 2027-01-12 | static |
 | 2026-07-09 | innovation | public 📤 | adopt-vendor-branch-merge | — | 2027-01-12 | static |
-| 2026-07-08 | decision | protected | site-consolidation-kvm8 | — | 2027-01-12 | dynamic |
+| 2026-07-08 | decision | public 📤 | site-consolidation-kvm8 | — | 2027-01-12 | dynamic |
 | 2026-07-08 | innovation | public 📤 | layer1-role-scoped-plugins | — | 2027-01-12 | static |
-| 2026-07-08 | observation | protected | docbridge-gitignore-check-candidate | — | 2027-01-12 | conditional |
+| 2026-07-08 | observation | public 📤 | docbridge-gitignore-check-candidate | — | 2027-01-12 | conditional |
 | 2026-07-05 | learning | public 📤 | vps-lineage-odyssey | — | 2026-10-06 | conditional |
 | 2026-07-03 | learning | public 📤 | workflow-resume-cache-recovery | — | 2027-01-12 | conditional |
 | 2026-07-03 | learning | public 📤 | sandbox-selftest-exposes-latent-bugs | — | 2027-01-12 | static |

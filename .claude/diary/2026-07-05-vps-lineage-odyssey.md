@@ -11,7 +11,7 @@ next_recommended: "2026-07-03-declared-vs-verified-family"
 review_after: 2026-10-06
 superseded: true
 conflict_class: conditional
-valid_when: "o VPS Hostinger (srv1475924) hospeda clone do core + onion-bridge + site onionevolve.com, com acesso via ssh onion-vps"
+valid_when: "o VPS Hostinger (<host-antigo-da-vps>) hospeda clone do core + onion-bridge + site onionevolve.com, com acesso via ssh onion-vps"
 ---
 
 ## Signal
@@ -62,19 +62,19 @@ Divergência em qualquer item → atualizar members.yaml e esta migalha, nunca r
 
 ## Re-tested 2026-07-08 (migração do core p/ KVM 8)
 
-Gatilho: o core migrou do notebook local para uma **nova** Hostinger KVM 8 (`srv1812846`, user
+Gatilho: o core migrou do notebook local para uma **nova** Hostinger KVM 8 (`<host-da-vps>`, user
 marcio) em 2026-07-08 — a linhagem `workstation` autoritativa agora é essa VPS, não mais o notebook.
 Isso disparou o re-teste cedo.
 
-- **valid_when (conditional) SEGUE válido:** a cláusula "srv1475924 hospeda o site onionevolve.com"
+- **valid_when (conditional) SEGUE válido:** a cláusula "<host-antigo-da-vps> hospeda o site onionevolve.com"
   foi **confirmada pelo maestro** (decisão "Coexistem" 2026-07-08) — a VPS do site é OUTRA máquina,
   distinta da nova KVM 8 de trabalho. O re-teste no nível da condição PASSA → migalha permanece válida.
 - **NÃO verificado desta máquina (adiado):** os itens (1)-(3) do re-test acima (`ssh onion-vps` conecta?
   status do clone limpo? health do bridge/site 200?) — a nova KVM 8 **não tem** o alias `onion-vps` nem a
-  chave `hostinger_onion` (não vieram na transferência), e SSH para a produção está fora de escopo sem
+  chave `<chave-da-vps>` (não vieram na transferência), e SSH para a produção está fora de escopo sem
   autorização explícita. Verificação profunda fica pendente até a opção B (deploy-daqui) configurar a chave.
 - **members.yaml atualizado no mesmo dia:** `local_path` do core repathado p/ `/home/marcio/onion-evolve`
-  + `host: srv1812846` na linhagem workstation. Os 3 adotantes ausentes foram re-clonados p/ `/home/marcio/`.
+  + `host: <host-da-vps>` na linhagem workstation. Os 3 adotantes ausentes foram re-clonados p/ `/home/marcio/`.
 - Verdito: **válida** (coexist confirmado); `review_after` renovado p/ 2026-10-06. Ver [[onion-core-home]].
 
-## Re-testada em 2026-10-14 — INVÁLIDA (superseded): (conditional, só o `valid_when`) a condição CAIU. O `valid_when` exige que a VPS srv1475924 hospede o clone do core, o onion-bridge e o site, e hoje nada disso está lá. `hostname` = srv1812846 (KVM 8); `dig +short onionevolve.com` e `app.onionevolve.com` → 179.197.65.94 (a KVM 8); os dois respondem HTTP/2 200; o bridge roda AQUI como `onion-vps-bridge.service` (User=onion, `~onion/onion-bridge`, atrás de `reverse_proxy 127.0.0.1:8787` no Caddy local); o `members.yaml` marca a linhagem `vps-bridge` como `status: retired`. Quem supera esta migalha é `2026-07-08-site-consolidation-kvm8` (a decisão "Coexistem" foi revertida no mesmo dia). As lições de método (linhagem com escritor é meia-instância; docs de deploy são declaração e o servidor é o verificado) seguem vivas na família declarado ≠ verificado e não dependem desta máquina.
+## Re-testada em 2026-10-14 — INVÁLIDA (superseded): (conditional, só o `valid_when`) a condição CAIU. O `valid_when` exige que a VPS <host-antigo-da-vps> hospede o clone do core, o onion-bridge e o site, e hoje nada disso está lá. `hostname` = <host-da-vps> (KVM 8); `dig +short onionevolve.com` e `app.onionevolve.com` → <ip-publico-da-vps> (a KVM 8); os dois respondem HTTP/2 200; o bridge roda AQUI como `onion-vps-bridge.service` (User=onion, `~onion/onion-bridge`, atrás de `reverse_proxy 127.0.0.1:8787` no Caddy local); o `members.yaml` marca a linhagem `vps-bridge` como `status: retired`. Quem supera esta migalha é `2026-07-08-site-consolidation-kvm8` (a decisão "Coexistem" foi revertida no mesmo dia). As lições de método (linhagem com escritor é meia-instância; docs de deploy são declaração e o servidor é o verificado) seguem vivas na família declarado ≠ verificado e não dependem desta máquina.

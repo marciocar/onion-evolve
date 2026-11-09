@@ -2,7 +2,7 @@
 date: 2026-07-16
 instance: onion-evolve
 type: decision
-classification: protected
+classification: public
 tags: [kg-sdaal, dogfood, backlog, verified_at, radar-parser, co-evolution]
 affects: [meta, engineering]
 breadcrumb_for: [meta:kg, meta:co-evolve, meta:evolve]
@@ -10,12 +10,12 @@ share_with: []
 next_recommended: ""
 review_after: 2027-01-18
 conflict_class: conditional
-valid_when: "as propostas #1/#2/#3/#4/#6/#7 do sinal rhilo-metagamify dogfood-ouro (2026-07-16) ainda NÃO estão implementadas no core — quando cada uma entrar, riscar do backlog; quando todas, aposentar"
+valid_when: "as propostas #1/#2/#3/#4/#6/#7 do sinal <adotante> dogfood-ouro (2026-07-16) ainda NÃO estão implementadas no core — quando cada uma entrar, riscar do backlog; quando todas, aposentar"
 ---
 
 ## Signal
-Dogfood mais intenso do KG SDAAL até hoje num adotante (rhilo-metagamify, reconciliação do SSOT
-WRR/Modo Equilíbrio, 165 nós/288 arestas — decidiu arquitetura + gerou código + validação ao vivo).
+Dogfood mais intenso do KG SDAAL até hoje num adotante (<adotante>, reconciliação de um SSOT
+de domínio, 165 nós/288 arestas — decidiu arquitetura + gerou código + validação ao vivo).
 Sinal upstream com **7 propostas ao core**, todas verificadas contra o código real na triagem. Só a
 **#5 (footguns YAML na KB)** foi executada nesta sessão; as outras 6 ficam como **backlog priorizado**.
 
@@ -54,7 +54,7 @@ Ordem por alavanca × custo (dogfood: barato→caro, helper→fiação→campo):
 Seção 7 do sinal (não testado: `kg-console.sh` a fundo, modo `map` F4, domínio cross-repo, fase-2
 semântica por embeddings, escala do radar >1k nós) → informativo/backlog, não acionável.
 
-## Trabalho derivado do 2º sinal rhilo (`ssot-como-runtime`, triado 2026-07-16)
+## Trabalho derivado do 2º sinal desse adotante (`ssot-como-runtime`, triado 2026-07-16)
 Além da F1.1 (feita), o sinal-operação deixou 2 features de desenho próprio:
 - **`kg state`** — projeção de estado-de-trabalho (feito/pendente/próximo), irmão do radar. O adotante
   escreveu um `kg-state.py`. Backlog: um `--state`/`kg-state.sh`. **Desenho próprio.**
@@ -63,7 +63,7 @@ Além da F1.1 (feita), o sinal-operação deixou 2 features de desenho próprio:
 Doutrina **SSOT-as-runtime** (read→verify→act→write; LLM=VM, .kg.yaml=bytecode) absorvida no ADR.
 
 ## Pendente — triagem própria (não desta sessão)
-- **Omnibus do gustavo** (`2026-07-16-treino-vertical-colaboracao-produtos`, ainda no inbox): 8 sinais
+- **Omnibus de um adotante de campo** (`2026-07-16-treino-vertical-colaboracao-produtos`, ainda no inbox): 8 sinais
   (spec→N-artefatos, absorção de skill 3º, retro-as-code, colaborador-visitante+autorização, KB
   colaboração; **KG-SSOT: Sinais 5/6/7** = KG por fronteira de confiança + SSOT com partição de
   visibilidade + gate client-safe determinístico). Entrou aqui só como **evidência convergente** da

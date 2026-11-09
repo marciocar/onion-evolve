@@ -2,7 +2,7 @@
 date: 2026-07-15
 instance: onion-evolve
 type: learning
-classification: protected
+classification: public
 tags: [kg-sdaal, audit-layer, content-audit, field-signal, declared-vs-verified]
 affects: [meta, product]
 breadcrumb_for: [meta:kg, meta:co-evolve]
@@ -20,7 +20,7 @@ auditar CONTEÚDO/documentação**, não só código/sistema — e o grafo **reg
 em vez de sobrescrevê-lo (`declarado ≠ verificado`). Evidência de campo, espontânea, sem o core.
 
 ## Evidence
-- **Uso de campo (gustavo, `<cliente>.kg.yaml` Lote 10):** auditoria de 2 decks (37+17 slides)
+- **Uso de campo (adotante de campo, `<cliente>.kg.yaml` Lote 10):** auditoria de 2 decks (37+17 slides)
   na gramática canônica — `E_SLIDE_AUDIT →SUPPORTS→ 7 claims →TRACES_TO→ artefatos`;
   `D_FIX_SCOPE →DEPENDS_ON→ claims`; **4 `V2 →SUPERSEDES→ V1`** (deck iterado, V1 vira `superseded`).
 - **Auto-correção humana preservada:** `C_TARDE_NUM_15` (conf **0.4**) foi **REFUTED** por
