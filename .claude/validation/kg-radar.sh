@@ -157,7 +157,8 @@ fi
 _radar_doorbell() {  # $1 = full | quiet
   local _root _py _out _line _st _ex _he
   _root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-  _py="${_root}/.claude/utils/co-evolution/doorbell-state.py"
+  # relativo ao radar: num plugin ele viaja sem o leitor, e a resposta é NÃO VERIFICADO
+  _py="$(dirname "${BASH_SOURCE[0]}")/../utils/co-evolution/doorbell-state.py"
   _out=""
   if [ -f "${_py}" ] && command -v python3 >/dev/null 2>&1; then
     _out="$(python3 -I -S -B "${_py}" --repo "${_root}" --list 2>/dev/null)"
