@@ -2,8 +2,7 @@
 branch: fix/doorbell-expired-core-half
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: 6fd30a346a08a89339bdd151f67d241c70805306d90b2da2d9bf2f575f1665d3
-reviewed_code_sha256: 20962dfcf1cce3fe0139437d74f7b6b470502f5c7c0a52da099ad1994caacd65
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 6
 findings_blocking: 0
@@ -34,7 +33,7 @@ nota: "tokens 0 = não medido. Famílias mail_hook e assemble_plugin 38/0, com 5
 | 3 | o estado envelhece sem a campainha rodando: sinal já tratado seguiria cobrado | real | curado: só conta se o arquivo segue lá (caso e mutante) |
 | 4 | retido nunca expira e por isso nunca seria cobrado | real | o radar cobra junto; o hook não, pois o retido já está no `📬` |
 | 5 | o estado é por caminho de repo: numa worktree o leitor vê "sem estado" | limite | declarado; a campainha também é por caminho |
-| 6 | o `kg-radar.sh` viaja no plugin de design, e o caminho `.claude/utils/` dentro dele reprovava `assemble_plugin` no CI (13/1 local) | real | curado: o leitor é achado a partir do próprio radar; no plugin, NÃO VERIFICADO. Re-revisado depois do rebase, que juntou o modo `prompt` novo do hook ao marcador 🔕 |
+| 6 | o `kg-radar.sh` viaja no plugin de design, e o caminho `.claude/utils/` dentro dele reprovava `assemble_plugin` no CI (13/1 local) | real | curado: o leitor é achado a partir do próprio radar; no plugin, NÃO VERIFICADO. Re-revisado a cada rebase: o hook da main ganhou o modo `prompt` e o aviso do canal, e o marcador 🔕 segue no mesmo `msg` (mail_hook 24/0) |
 
 ## Teto
 
