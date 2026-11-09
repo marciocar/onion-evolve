@@ -26,6 +26,8 @@
 #           LIDO), o modo declarado "repo sem CI" roda o gate LOCAL (o do Onion, ou ops/local-gate.sh do
 #           repo) na árvore de onde o comando roda, que tem de ser o clone do repo do PR, no head do PR e
 #           limpa; registra no PR que não havia CI. Nunca vale para o core. Leitura que falha = recusa.
+#           Workflow no head com zero lido é "CI que ainda não rodou" = recusa. Neste modo o ops/local-gate.sh
+#           declarado vence o gate vendorizado.
 #   --sync: após PROVAR o merge pelo estado, faz `git checkout main + pull --ff-only` — o sync
 #           gated que substitui o `checkout main` encadeado à mão (que me deixou em main após um
 #           merge recusado, 2026-08-26). Superação de sync-only-after-merge-succeeds, virada mecanismo.
@@ -873,10 +875,20 @@ rm -f "${_cr_err}"
 # Ordem: o gate do Onion (.claude/validation/lint-artifacts.sh + lint-selftest.sh), que é o que o
 # --ci-inoperante sempre rodou; sem ele, o gate que o REPO declara em ops/local-gate.sh (rc 0 = verde);
 # sem nenhum dos dois, recusa: merge sem CI e sem gate é merge sem cobertura nenhuma.
+# $3 = declared-first (só o modo "repo sem CI"): o gate declarado vence o vendorizado. Medido no PR #2 do
+# adotante de consultoria em 2026-11-07: a bancada VENDORIZADA dele aborta por arquivos que só o core tem,
+# então um adotante sem CI recusava para sempre mesmo com a declaração do repo à mão. O --ci-inoperante não
+# passa este argumento: no CI morto, o gate segue sendo o do Onion.
 _GATE_DESC=""
 _run_local_gate() {
-  local _root="$1" _px="$2" _lint_out _lint_rc _bench_out _bench_rc _bench_pass _g_out _g_rc
-  if [ -f "${_root}/.claude/validation/lint-artifacts.sh" ] && [ -f "${_root}/.claude/validation/lint-selftest.sh" ]; then
+  local _root="$1" _px="$2" _lint_out _lint_rc _bench_out _bench_rc _bench_pass _g_out _g_rc _hint="" _declared=0
+  if [ -f "${_root}/ops/local-gate.sh" ]; then
+    if [ ! -f "${_root}/.claude/validation/lint-artifacts.sh" ] || [ ! -f "${_root}/.claude/validation/lint-selftest.sh" ]; then _declared=1
+    # o porcelain da árvore não vê arquivo não rastreado: só o gate VERSIONADO no head pode vencer o vendorizado
+    elif [ "${3:-}" = "declared-first" ] && git -C "${_root}" ls-files --error-unmatch ops/local-gate.sh >/dev/null 2>&1; then _declared=1; fi
+  fi
+  [ "${3:-}" = "declared-first" ] && _hint=" Se a bancada vendorizada não é satisfazível neste repo, ele declara o próprio gate em ops/local-gate.sh (rc 0 = verde), que vale antes do vendorizado neste modo; o registro no PR diz qual rodou."
+  if [ "${_declared}" -eq 0 ] && [ -f "${_root}/.claude/validation/lint-artifacts.sh" ] && [ -f "${_root}/.claude/validation/lint-selftest.sh" ]; then
     say "    rodando o gate determinístico LOCAL em ${_root} (é ele que substitui o CI; não aceito número citado)"
     _lint_out="$(LC_ALL=C bash "${_root}/.claude/validation/lint-artifacts.sh" 2>&1)"; _lint_rc=$?
     grep -qF 'MORREU' <<< "${_lint_out}" \
@@ -885,9 +897,9 @@ _run_local_gate() {
       || die "${_px}: lint local rc=${_lint_rc} (há HARD). A cobertura que substituiria o CI está VERMELHA — recusa. $(printf '%s\n' "${_lint_out}" | grep -m1 'Violações HARD')"
     _bench_out="$(LC_ALL=C bash "${_root}/.claude/validation/lint-selftest.sh" --jobs auto 2>&1)"; _bench_rc=$?
     grep -qF 'ABORTOU' <<< "${_bench_out}" \
-      && die "${_px}: a bancada ABORTOU antes da soma — o verde parcial não vale. Recusa."
+      && die "${_px}: a bancada ABORTOU antes da soma — o verde parcial não vale. Recusa.${_hint}"
     [ "${_bench_rc}" -eq 0 ] \
-      || die "${_px}: bancada local rc=${_bench_rc}. $(printf '%s\n' "${_bench_out}" | grep -m1 'Falharam')"
+      || die "${_px}: bancada local rc=${_bench_rc}. $(printf '%s\n' "${_bench_out}" | grep -m1 'Falharam')${_hint}"
     # ⚠️ ÂNCORA NO SUMÁRIO, NÃO NA PRIMEIRA OCORRÊNCIA DA PALAVRA. A 1ª versão era
     # `awk '/Passaram/{print $3; exit}'` e casou o NOME DE UM CASO — existe um caso chamado
     # `selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0`, que aparece na linha 61 de
@@ -901,8 +913,8 @@ _run_local_gate() {
       || die "${_px}: não consegui LER a contagem da bancada do sumário (li '${_bench_pass}'). O veredito seria correto pelo rc, mas eu não registro no PR um número que não sei — e registro sem número não audita. Recusa."
     say "    ✓ gate local EXERCIDO: lint 0 HARD · bancada ${_bench_pass:-?} casos, 0 falhas"
     _GATE_DESC="lint 0 HARD · bancada ${_bench_pass} casos/0 falhas"
-  elif [ -f "${_root}/ops/local-gate.sh" ]; then
-    say "    sem o gate do Onion em ${_root}: rodando o gate DECLARADO pelo repo (ops/local-gate.sh)"
+  elif [ "${_declared}" -eq 1 ]; then
+    say "    rodando o gate DECLARADO pelo repo em ${_root} (ops/local-gate.sh)"
     _g_out="$(cd "${_root}" && LC_ALL=C bash ops/local-gate.sh 2>&1)"; _g_rc=$?
     [ "${_g_rc}" -eq 0 ] \
       || die "${_px}: o gate declarado do repo (ops/local-gate.sh) saiu rc=${_g_rc} — a cobertura que substituiria o CI está VERMELHA. Recusa. Última linha: $(printf '%s\n' "${_g_out}" | tail -1)"
@@ -957,7 +969,12 @@ if [ -z "$head_runs" ] && [ "${_WF_COUNT}" -eq 0 ]; then
     || die "modo 'repo sem CI': a árvore ${_top} está em ${_nc_head:0:8}, e o head do PR é ${HEAD_SHA:0:8} — o gate tem de rodar NO head do PR. Faça checkout da branch '${HEAD_REF}' atualizada (git fetch origin && git checkout ${HEAD_REF} && git pull --ff-only) e rode de novo."
   [ -z "$(git -C "${_top}" status --porcelain --untracked-files=no 2>/dev/null)" ] \
     || die "modo 'repo sem CI': a árvore ${_top} tem mudança rastreada não commitada — o gate julgaria o que NÃO está no PR. Limpe (commit ou stash) e rode de novo."
-  _run_local_gate "${_top}" "modo 'repo sem CI'"
+  # O estado "o CI existe e ainda não rodou" também lê zero: o PR que cria o 1º workflow não tem run, e a
+  # API só lista o workflow depois dele. O head do PR, já provado limpo acima, desempata.
+  _nc_wf="$(git -C "${_top}" ls-files -- ':(glob).github/workflows/*.yml' ':(glob).github/workflows/*.yaml' | head -3 | paste -sd' ' -)"
+  [ -z "${_nc_wf}" ] \
+    || die "modo 'repo sem CI': a API leu zero workflows, mas o head ${HEAD_SHA:0:8} traz ${_nc_wf} — o CI existe e ainda não rodou (o PR que cria o 1º workflow, ou as Actions desligadas no repo). Recusa: espere os checks nascerem; com as Actions desligadas, ligue-as ou tire o arquivo do PR."
+  _run_local_gate "${_top}" "modo 'repo sem CI'" declared-first
   _nc_gate_touch="$(grep -E '^(\.claude/validation/lint-artifacts\.sh|\.claude/validation/lint-selftest\.sh|ops/local-gate\.sh)$' <<< "${_PR_FILES}" | paste -sd' ' -)"
   NO_CI_PROVADO="actions/workflows total_count 0 (lido) · ${_GATE_DESC} no head ${HEAD_SHA:0:8}${_nc_gate_touch:+ · ⚠️ o PR altera o próprio gate: ${_nc_gate_touch}}"
 elif [ -z "$head_runs" ]; then

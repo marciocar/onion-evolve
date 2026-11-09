@@ -422,7 +422,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI."
-    narrative: "Pronto quando: a SAC-302 está curada e o update seguinte do adotante fecha com merge verificado, com o pin novo na main dele e no members.yaml. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-382."
+    narrative: "Pronto quando: a SAC-302 está curada e o update seguinte do adotante fecha com merge verificado, com o pin novo na main dele e no members.yaml. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-382. Medido em 2026-11-09: a SAC-302 está curada (PR #1526 e o PR que carrega este texto); o PR #2 do adotante segue aberto porque a bancada vendorizada dele não fica verde, e o caminho agora é ele versionar o ops/local-gate.sh, ato da sessão dele."
   - id: D_MD_DENY_DROP_WHAT_MACHINERY_READS_1109
     node_type: decision
     layer: audit

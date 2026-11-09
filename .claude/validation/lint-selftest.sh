@@ -25665,6 +25665,8 @@ case "$args" in
   *"api "*"check-runs/"*"/annotations"*)
       _cid="${args#*check-runs/}"; _cid="${_cid%%/annotations*}"
       [ -f "${STUB_ANN_DIR:-/nonexistent}/${_cid}" ] && cat "${STUB_ANN_DIR}/${_cid}"; exit 0 ;;
+  *"run list"*"conclusion"*)
+      [ -n "${GH_RUN_CONCLUSIONS:-}" ] && printf '%b' "${GH_RUN_CONCLUSIONS}"; exit 0 ;;
   # SAC-302: quantos workflows o repo tem (o ramo "repo sem CI" lê isto; 5 = repo com CI, o padrão)
   *"api "*"actions/workflows"*)
       [ "${GH_WF_RC:-0}" -ne 0 ] && { echo "gh: Not Found (HTTP 404)" >&2; exit "${GH_WF_RC}"; }
@@ -25960,11 +25962,56 @@ STUB0
   if [ "${_mv_rc}" -ne 0 ] && grep -q "NENHUM run registrado" <<< "${_mv_out}" && ! grep -q "não consegui LER os runs" <<< "${_mv_out}"; then
     record_pass "pr-merge-verified: (nc8) --ci-inoperante com zero runs lidos ⇒ 'nenhum run', não 'falha de leitura'"
   else record_fail "pr-merge-verified: (nc8) zero runs lido como falha de leitura" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc9) zero workflows lido, mas o head TRAZ workflow ⇒ "CI que ainda não rodou": recusa, sem gate e sem merge
+  local ncw="${d}/ncw"; cp -a "${nc}" "${ncw}"; mkdir -p "${ncw}/.github/workflows"; printf 'on: push\n' > "${ncw}/.github/workflows/ci.yml"
+  ( cd "${ncw}" && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm wf --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${ncw}" GH_WF_COUNT=0
+  if [ "${_mv_rc}" -ne 0 ] && grep -qF ".github/workflows/ci.yml" <<< "${_mv_out}" && grep -q "ainda não rodou" <<< "${_mv_out}" \
+     && ! grep -q "gate local EXERCIDO" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc9) zero workflows lido com workflow no head ⇒ recusa (CI que ainda não rodou não é repo sem CI)"
+  else record_fail "pr-merge-verified: (nc9) PR que cria o CI passou como repo sem CI" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc10) repo sem CI com a bancada vendorizada insatisfazível e gate DECLARADO verde ⇒ merge, registrado como o declarado
+  local ncd="${d}/ncd"; cp -a "${nc}" "${ncd}"; mkdir -p "${ncd}/ops"; printf '#!/usr/bin/env bash\nexit 0\n' > "${ncd}/ops/local-gate.sh"
+  printf '#!/usr/bin/env bash\necho "BANCADA VENDORIZADA CORREU"; exit 1\n' > "${ncd}/.claude/validation/lint-selftest.sh"
+  ( cd "${ncd}" && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm decl --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${ncd}" GH_WF_COUNT=0
+  if [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}" && grep -qF "ops/local-gate.sh) rc 0" "${d}/comment" && ! grep -q "bancada local rc" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc10) repo sem CI: o gate declarado vence o vendorizado, e o registro diz qual rodou"
+  else record_fail "pr-merge-verified: (nc10) gate declarado não venceu" "rc=${_mv_rc} corpo=[$(cat "${d}/comment")] out=${_mv_out}"; fi
+  # (nc11) repo sem CI com o gate declarado VERMELHO ⇒ recusa
+  printf '#!/usr/bin/env bash\nexit 1\n' > "${ncd}/ops/local-gate.sh"
+  ( cd "${ncd}" && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm red --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${ncd}" GH_WF_COUNT=0
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "ops/local-gate.sh) saiu rc=1" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc11) gate declarado vermelho ⇒ recusa"
+  else record_fail "pr-merge-verified: (nc11) gate declarado vermelho passou" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc12) --ci-inoperante num repo COM CI morto: o gate declarado NÃO vence o do Onion (a bancada vermelha recusa)
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${ncd}/ops/local-gate.sh"
+  ( cd "${ncd}" && "${_ge[@]}" git add -A && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm green --no-verify ) >/dev/null 2>&1
+  _nci() { # $1 = SUT → _mv_out/_mv_rc: CI morto (rajada de startup_failure), árvore com os dois gates
+    _mv_out="$(cd "${ncd}" && echo 0 > "${d}/n" && "${_ge[@]}" REPO_ROOT="${ncd}" PATH="${d}/zero:${d}:${PATH}" GH_REAL_STUB="${d}/gh" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" \
+               STUB_HEAD_FROM="${ncd}" GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_WF_COUNT=2 \
+               GH_RUN_CONCLUSIONS='startup_failure\nstartup_failure\nstartup_failure\n' bash "$1" 999 --ci-inoperante --motivo teste 2>&1)"; _mv_rc=$?
+  }
+  _nci "${sut}"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "bancada local rc=1" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc12) --ci-inoperante segue julgando pelo gate do Onion, mesmo com ops/local-gate.sh verde"
+  else record_fail "pr-merge-verified: (nc12) o CI morto escapou pelo gate declarado" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (nc13) o gate declarado que NÃO está versionado (o porcelain não o vê) não vence: julga o vendorizado, que recusa
+  local ncu="${d}/ncu"; cp -a "${ncd}" "${ncu}"
+  ( cd "${ncu}" && "${_ge[@]}" git rm -q --cached ops/local-gate.sh && "${_ge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm untrack --no-verify ) >/dev/null 2>&1
+  _mnc "${sut}" "${ncu}" GH_WF_COUNT=0
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "bancada local rc=1" <<< "${_mv_out}" && grep -q "ops/local-gate.sh (rc 0" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (nc13) gate declarado fora do versionamento não vence o vendorizado, e a recusa diz o caminho"
+  else record_fail "pr-merge-verified: (nc13) arquivo não rastreado julgou o merge" "rc=${_mv_rc} out=${_mv_out}"; fi
   # ── MUTANTES: cada um reintroduz um jeito de errar, e um caso acima tem de MATÁ-LO ───────────────
   _ncmut() { # $1 = rótulo, $2 = agulha (linha exata do SUT), $3 = troca, $4 = caso que deve reprovar (função), $5 = descrição
     local _m="${d}/mut-$1.sh"
-    awk -v a="$2" -v b="$3" 'index($0,a)==1 && !x { print b; x=1; next } { print }' "${sut}" > "${_m}"
+    # ENVIRON, e não -v: o -v do awk come a barra final da troca, e o mutante sairia sem parsear. Mutante que não
+    # parseia "morre" em todo matador que só exige não-merge: o (ncm1) era morto assim, sem provar nada.
+    NC_A="$2" NC_B="$3" awk 'BEGIN{a=ENVIRON["NC_A"]; b=ENVIRON["NC_B"]} index($0,a)==1 && !x { print b; x=1; next } { print }' "${sut}" > "${_m}"
     if cmp -s "${sut}" "${_m}"; then record_fail "pr-merge-verified: ($1) âncora do mutante não casou" "reancore: $2"; return; fi
+    if ! bash -n "${_m}" 2>/dev/null; then record_fail "pr-merge-verified: ($1) o mutante não parseia, e não provaria nada" "$(bash -n "${_m}" 2>&1 | head -1)"; return; fi
     if "$4" "${_m}"; then record_pass "pr-merge-verified: ($1) mutante que $5 ⇒ morto"
     else record_fail "pr-merge-verified: ($1) mutante que $5 SOBREVIVEU" "rc=${_mv_rc} out=${_mv_out}"; fi
   }
@@ -25983,7 +26030,19 @@ STUB0
   _ncmut ncm2 "  _run_local_gate \"\${_top}\" \"modo 'repo sem CI'\"" '  _GATE_DESC="lint 0 HARD · bancada 0 casos/0 falhas"' _nc_kill2gate "aceita repo sem CI sem rodar o gate local"
   # (ncm3) aceita o estado 3 como o 2: workflow existe e zero check-runs vira "repo sem CI" ⇒ mergeia (o (nc4) o mata)
   _ncmut ncm3 'if [ -z "$head_runs" ] && [ "${_WF_COUNT}" -eq 0 ]; then' 'if [ -z "$head_runs" ]; then' _nc_kill3 "aceita repo com CI e zero check-runs como repo sem CI"
-  unset -f _mnc _ncmut _nc_kill2 _nc_kill2gate _nc_kill3
+  _nc_kill9() { _mnc "$1" "${ncw}" GH_WF_COUNT=0; [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _nc_kill10() { printf '#!/usr/bin/env bash\nexit 0\n' > "${ncd}/ops/local-gate.sh"; _mnc "$1" "${ncd}" GH_WF_COUNT=0; ! { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }; }
+  _nc_kill12() { _nci "$1"; [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  # (ncm4) tira a recusa do workflow no head ⇒ o PR que cria o CI passa como repo sem CI (o (nc9) o mata)
+  _ncmut ncm4 '  [ -z "${_nc_wf}" ] \' '  true \' _nc_kill9 "aceita workflow no head como repo sem CI"
+  # (ncm5) o modo sem CI deixa de preferir o gate declarado ⇒ o adotante volta a travar na bancada vendorizada (o (nc10) o mata)
+  _ncmut ncm5 "  _run_local_gate \"\${_top}\" \"modo 'repo sem CI'\" declared-first" "  _run_local_gate \"\${_top}\" \"modo 'repo sem CI'\"" _nc_kill10 "volta a julgar o adotante pela bancada vendorizada"
+  # (ncm6) o gate declarado passa a vencer também no CI morto ⇒ o escape fura o gate do Onion (o (nc12) o mata)
+  _ncmut ncm6 '    elif [ "${3:-}" = "declared-first" ] && git' '    else _declared=1; fi' _nc_kill12 "deixa o gate declarado vencer no --ci-inoperante"
+  _nc_kill13() { _mnc "$1" "${ncu}" GH_WF_COUNT=0; [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  # (ncm7) tira a exigência de versionado ⇒ arquivo solto na árvore vence a bancada (o (nc13) o mata)
+  _ncmut ncm7 '    elif [ "${3:-}" = "declared-first" ] && git' '    elif [ "${3:-}" = "declared-first" ]; then _declared=1; fi' _nc_kill13 "deixa arquivo não versionado vencer a bancada"
+  unset -f _mnc _ncmut _nc_kill2 _nc_kill2gate _nc_kill3 _nc_kill9 _nc_kill10 _nc_kill12 _nc_kill13 _nci
 
   # ── (q)-(v) MODO DE MERGE E ANCESTRALIDADE (SAC-76, 2026-10-08) ──────────────────────────────
   # Defeito medido num adotante: o script só fazia --rebase (fallback --squash); o PR de update, que
