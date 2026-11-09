@@ -458,9 +458,12 @@ def build_report(rows, open_rows, now, window, rules, project, overlay):
     for r in rows:
         if r["exclusion"]:
             excluded[r["exclusion"]] = excluded.get(r["exclusion"], 0) + 1
+    if excluded.get("no_started_at"):
+        warnings.append({"code": "survivors_only", "message": f"{excluded['no_started_at']} de {len(rows)} concluídas sem startedAt: a calibração usa só as {sum(1 for r in rows if r['work_h'] is not None)} com relógio válido"})
     return {"generated_for": today.isoformat(), "project": project, "completed": len(rows),
             "with_points": sum(1 for r in rows if r["points"]), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None),
             "with_due": sum(1 for r in rows if r["due"]), "excluded": excluded, "overlay_entries": len(overlay),
+            "calibration_population": {"completed": len(rows), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None), "without_started_at": excluded.get("no_started_at", 0)},
             "team_velocity": velocity(rows, today), "deadline": deadline(rows), "backtest": all_backtests(rows, window),
             "open": {"count": len(open_rows), "with_points": sum(1 for r in open_rows if r["points"]), "other": len(open_others), "other_titles": open_others},
             "categories": categories, "uncategorized_titles": others, "warnings": warnings, "limits": LIMITS}
@@ -718,6 +721,13 @@ def run(args):
     if args.cmd == "report":
         rows = prepare(list_issues("completed", args.project), rules, overlay)
         return build_report(rows, prepare(list_issues(OPEN_STATES, args.project), rules, overlay), now, args.window, rules, args.project, overlay), 0
+    result, rc = run_propose(args, rules, overlay, now)
+    if overlay:
+        result["estimates_overlay"] = {"entries": len(overlay), "note": "pontos simulados por --estimates-overlay; nada disso está no provedor"}
+    return result, rc
+
+
+def run_propose(args, rules, overlay, now):
     issue, points, category = None, args.points, args.category
     if args.issue:
         if args.points is not None or args.category:

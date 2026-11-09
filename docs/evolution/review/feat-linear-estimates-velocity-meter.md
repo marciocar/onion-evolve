@@ -2,18 +2,17 @@
 branch: feat/linear-estimates-velocity-meter
 pr: 1554
 date: 2026-11-09
-reviewed_diff_sha256: 241d2705c7b508a6bc78b92a383a19c003c8de13b3f0c4e0a9b5ea4f612d57fb
-reviewed_code_sha256: 5c0b97345d48a28a66b0910a110f13c9dbed551ccceccf37735e99f239cd0feb
-findings_total: 17
-findings_real: 17
+reviewed_diff_sha256: pendente
+findings_total: 22
+findings_real: 22
 tokens: 0
-duration_min: 75
-findings_fixed: 17
+duration_min: 95
+findings_fixed: 22
 verdict: REJECTED_AND_FIXED
 elenxo: false
 elenxo_isolado: false
 reviewer: "1ª passada: o próprio agente de execução. 2ª passada: refutador independente do head 941acfecd, que reprovou; as curas deste head são do agente de execução e ainda não foram re-refutadas"
-nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada (73 casos, 102 mutantes), o backtest publicado no report e as reproduções do refutador refeitas."
+nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada (79 casos, 109 mutantes), o backtest publicado no report e as reproduções do refutador refeitas."
 ---
 
 # Resíduo: estimativa, prazo e medidor de planejado contra executado
@@ -46,5 +45,12 @@ Limite que segue: o relógio é o do quadro, e 37 das 91 concluídas não têm `
 | 15 | 17 de 22 mutantes do refutador sobreviviam. | Curado: casos por recusa, relógio real sem `--now`, arquivadas, ordem e permissão da amostra. |
 | 16 | Prazo comparado em UTC e não no fuso de São Paulo. | Curado: `--utc-offset`, padrão -3. |
 | 17 | Lote só por minuto de calendário; `BATCH_CLOSE_MINUTES` morta. | Curado: cadeia de fechamentos a até 60 s. |
+| 18 | «Relê» era o retorno da própria mutação. | Curado: leitura separada depois da escrita, exercitada na SAC-368. |
+| 19 | `٣` aceito como 3. | Curado: só ASCII. |
+| 20 | Timeout na leitura da resposta saía em traceback. | Curado: rc 1 com mensagem. |
+| 21 | `--estimates-overlay` não aparecia na saída do `propose`. | Curado: `estimates_overlay`, também na recusa. |
+| 22 | Nome de time igual a membro do registro na fixture; calibração em sobreviventes sem aviso no `report`. | Curado: nome neutro; `calibration_population` e aviso `survivors_only`. |
+
+Já curados no head anterior: `--queue-points` negativo (a opção saiu), `depois de dd/mm` e `29/02`.
 
 Resta: o relógio é o do quadro; depois de corrigir as categorias contra as abertas não sobra conjunto sem ver; leave-one-out cobre perto do nominal por construção, e o corte temporal hoje tem n=6. Issue velha na fila sai `beyond_history` com a data de "se iniciar agora".

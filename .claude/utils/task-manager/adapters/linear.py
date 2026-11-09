@@ -16,6 +16,7 @@
 # único team do workspace. Nunca adivinha entre vários.
 import datetime
 import hashlib
+import http.client
 import json
 import mimetypes
 import os
@@ -29,8 +30,11 @@ import urllib.request
 ENDPOINT = "https://api.linear.app/graphql"
 # Costura de teste da bancada: TM_LINEAR_ENDPOINT só é aceito em loopback (a chave nunca sai para outro host).
 _override = os.environ.get("TM_LINEAR_ENDPOINT", "")
+REQUEST_TIMEOUT = 30
 if re.match(r"^http://127\.0\.0\.1:\d+/", _override):
     ENDPOINT = _override
+    if os.environ.get("TM_LINEAR_TIMEOUT", "").isdigit():  # só com o Linear falso em loopback
+        REQUEST_TIMEOUT = int(os.environ["TM_LINEAR_TIMEOUT"])
 # Arquivos ENVIADOS ao Linear (upload) moram neste host e exigem o header Authorization para baixar
 # (medido 2026-10-12: sem header → 401; com a chave crua ou com Bearer → 200). A chave só vai para cá.
 UPLOADS_BASE = "https://uploads.linear.app/"
@@ -130,13 +134,16 @@ def gql(query, variables=None):
         "User-Agent": "onion-tm/1",
     })
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", "replace")[:500]
         raise TmError(f"HTTP {e.code} do Linear: {detail}")
     except urllib.error.URLError as e:
         raise TmError(f"falha de rede falando com o Linear: {e.reason}")
+    except (TimeoutError, OSError, http.client.HTTPException) as e:
+        # timeout na leitura da resposta não vem embrulhado em URLError
+        raise TmError(f"falha de rede ou tempo esgotado falando com o Linear: {type(e).__name__}: {e}")
     # GraphQL devolve 200 com `errors` — isso é ERRO, nunca sucesso parcial silencioso
     if payload.get("errors"):
         msgs = "; ".join(str(err.get("message", err)) for err in payload["errors"])
@@ -894,6 +901,18 @@ def _team_scale(team_id):
     return {"type": kind, "extended": bool(team.get("issueEstimationExtended")), "allow_zero": bool(team.get("issueEstimationAllowZero")), "values": values}
 
 
+def _verified_update(iss, field, value):
+    """`success` e o retorno da mutação são a declaração do provedor; a prova é uma leitura separada depois da escrita."""
+    _issue_update(iss["id"], {field: value})
+    try:
+        after = _issue(iss["identifier"])
+    except TmError as e:
+        raise TmError(f"{iss['identifier']}: escrita enviada e a releitura falhou ({e}); confira antes de repetir")
+    if after.get(field) != value:
+        raise TmError(f"issueUpdate disse success e a releitura de {iss['identifier']} mostra {field}={after.get(field)}, pedido {value}")
+    return after
+
+
 def _single_target(args, usage):
     """<ID> <valor> ou <ID> --clear. Token extra ou flag desconhecida é erro de uso antes de qualquer rede."""
     if len(args) != 2 or (args[1].startswith("-") and args[1] != "--clear") or args[0].startswith("-"):
@@ -906,17 +925,14 @@ def _single_target(args, usage):
 def v_estimate_points(args):
     usage = "estimate.points <ID> <pontos>|--clear"
     ident, raw = _single_target(args, usage)
-    if raw is not None and not re.match(r"^\d+$", raw):
+    if raw is not None and not re.fullmatch(r"[0-9]+", raw):
         raise TmError(f"pontos têm de ser inteiro não negativo: '{raw}'", 2)
     points = None if raw is None else int(raw)
     iss = _issue(ident)
     scale = _team_scale(iss["team"]["id"])
     if points is not None and points not in scale["values"]:
         raise TmError(f"{points} está fora da escala do time ({scale['type']}, aceitos: {scale['values']})", 2)
-    updated = _issue_update(iss["id"], {"estimate": points})
-    # `success` é a declaração do provedor; a prova é o valor devolvido pelo próprio issue.
-    if updated.get("estimate") != points:
-        raise TmError(f"issueUpdate disse success e {iss['identifier']} ficou com estimate={updated.get('estimate')}, pedido {points}")
+    updated = _verified_update(iss, "estimate", points)
     return {"issue": updated["identifier"], "estimate": updated["estimate"], "previous": iss.get("estimate"), "scale": scale}
 
 
@@ -931,7 +947,7 @@ def v_estimate_points_read(args):
 def _calendar_date(value):
     """Só YYYY-MM-DD de calendário real: é o TimelessDate do Linear, e string fora disso não pode virar prazo."""
     try:
-        if not re.match(r"^\d{4}-\d{2}-\d{2}$", value):
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
             raise ValueError
         datetime.date.fromisoformat(value)
     except ValueError:
@@ -944,9 +960,7 @@ def v_due_date_set(args):
     ident, raw = _single_target(args, usage)
     due = None if raw is None else _calendar_date(raw)
     iss = _issue(ident)
-    updated = _issue_update(iss["id"], {"dueDate": due})
-    if updated.get("dueDate") != due:
-        raise TmError(f"issueUpdate disse success e {iss['identifier']} ficou com dueDate={updated.get('dueDate')}, pedido {due}")
+    updated = _verified_update(iss, "dueDate", due)
     return {"issue": updated["identifier"], "dueDate": updated["dueDate"], "previous": iss.get("dueDate")}
 
 
