@@ -2,7 +2,8 @@
 branch: docs/a2a-p12-result-1109
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 694812a4a8d857deefc46792dfbe77a58005bc9ca66ad6c935f2b83622aa83d9
+reviewed_code_sha256: 1ec708c0a8a67d62b086d216488dcadf427df2132404e3126138fd99094c3af8
 findings_total: 3
 findings_real: 3
 findings_blocking: 1
