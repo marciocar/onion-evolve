@@ -1,4 +1,4 @@
-# Lê o estado da campainha (servidor doorbell, repo onion-messaging) e diz o que ficou sem ack.
+# Lê o estado da campainha (o servidor doorbell) e diz o que ficou sem ack.
 #
 # O estado mora FORA do repo, um arquivo por repo: <XDG_STATE_HOME>/onion-doorbell/<sha256(repo)[:16]>.v2.json.
 # A resolução aqui é a do doorbell/server.ts: DOORBELL_STATE_DIR; senão a pasta antiga, só quando ela tem o
