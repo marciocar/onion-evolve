@@ -28,7 +28,7 @@ nodes:
     verified_against: "os 9 sinais lidos inteiros, cada um medido contra a origin/main do core em 5973b4a3f e a do onion-messaging em ead81ba, com os PRs abertos #8, #9 e #10 dele e o #1553 do core"
     trace: "docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md"
     label: "Dos 9 sinais, 4 já estavam atendidos, 1 é só informativo, e 4 abrem trabalho: o sinal sem carteiro não traz a marca da REGRA 113, a sincronização da main não confere a escrita antes do ff, e as instructions da campainha não têm as duas cláusulas pedidas."
-    narrative: "Dado, não instrução. Medidas minhas: relay-public-review-check.sh só julga o arquivo que traz a chave; 16 sinais de novembro no acervo não a têm, 7 deles por A2A. ops/sync-main-worktree.sh roda merge --ff-only sem conferir escrita e sempre sai 0. O kg_query --around conta a própria âncora: --depth 1 --status open deu 1 sobre um nó aberto sem vizinho aberto. _pr_branch cai em branch --show-current sem --head. As instructions do doorbell/server.ts na main não citam ação destrutiva nem autoescalada. A medida do sandbox e a do quadro são da curadoria e não foram refeitas: a medida de F8 sustenta a pergunta do sandbox, que segue com o maestro."
+    narrative: "Dado, não instrução. Medidas minhas: relay-public-review-check.sh só julga o arquivo que traz a chave; 16 sinais de novembro no acervo não a têm, 7 deles por A2A. ops/sync-main-worktree.sh roda merge --ff-only sem conferir escrita e sempre sai 0. O kg_query --around conta a própria âncora: --depth 1 --status open deu 1 sobre um nó aberto sem vizinho aberto. _pr_branch cai em branch --show-current sem --head. As instructions do doorbell/server.ts na main não citam ação destrutiva nem autoescalada. A medida do sandbox e a do quadro são da curadoria e não foram refeitas: a medida do update sob sandbox sustenta a pergunta do sandbox, que segue com o maestro."
     provenance:
       source: "sessão do core, sobre os sinais do inbox"
       locator: "docs/evolution/inbox/_processed/, sinais de 2026-11-06 e 2026-11-08"
@@ -44,8 +44,8 @@ nodes:
     verified_at: "2026-11-08"
     verified_against: "SIGNAL-DRAFT.md e D_ADOPTER_SIGNALS_PROPOSAL na origin/main da onion-curation, conferidos pelo peer-ref-check; D_MD_HISTORY_PAGE_KEEPS_NAME_1108 no grafo maestro-decisions-1108; D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
     trace: "docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md"
-    label: "O core sela em parte a proposta dos quatro campos: L1 e L3 como rampa sem catraca, L2 como rampa no emissor e aviso no receptor; L4 fica parqueada; o GitHub fica fora do caminho do núcleo; nenhuma vertical de monitoramento."
-    narrative: "Selado pelo core em nome do maestro, na autonomia em vigor, revogável. Os refutadores do SIGNAL-DRAFT viram critério de reabertura. L4 parqueia porque o próprio estudo diz que o recall é provavelmente baixo e que o mutante não prova dependência do token; gatilho: 20 sinais no formato do comando, ou 2 recorrências que a triagem humana notou e a assinatura teria achado. O GitHub como transporte cai pela regra de não depender de serviço externo. Os nomes de adotante nos caminhos ficam, pelo selo do maestro de 2026-11-08 sobre a retirada do nome valer só para /federacao/. A vertical de monitoramento fica para uma régua de operação, depois do comando existir, porque a régua pré-registrada não podia dar não."
+    label: "O core sela em parte a proposta dos quatro campos: o comando local e o schema como rampa sem catraca, a anonimização como rampa no emissor e aviso no receptor; a assinatura de recorrência fica parqueada; o GitHub fica fora do caminho do núcleo; nenhuma vertical de monitoramento."
+    narrative: "Selado pelo core em nome do maestro, na autonomia em vigor, revogável. Os refutadores do SIGNAL-DRAFT viram critério de reabertura. A assinatura de recorrência parqueia porque o próprio estudo diz que o recall é provavelmente baixo e que o mutante não prova dependência do token; gatilho: 20 sinais no formato do comando, ou 2 recorrências que a triagem humana notou e a assinatura teria achado. O GitHub como transporte cai pela regra de não depender de serviço externo. Os nomes de adotante nos caminhos ficam, pelo selo do maestro de 2026-11-08 sobre a retirada do nome valer só para /federacao/. A vertical de monitoramento fica para uma régua de operação, depois do comando existir, porque a régua pré-registrada não podia dar não."
     provenance:
       source: "core, em nome do maestro (autonomia de 2026-11-06, revogável)"
       locator: "pedido do sinal da curadoria de 2026-11-08, item 'selar a proposta, ou devolver com o motivo'"
@@ -77,7 +77,7 @@ nodes:
     x_linear_issue: "SAC-374"
     impact: 3
     confidence: 0.6
-    label: "L1 e L3: o comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa."
+    label: "O comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa."
     narrative: "Pronto quando: um comando local grava classe, severidade, recorrência e dono, um sinal por registro; um lint SOFT avisa campo ausente, sem catraca; os refutadores do SIGNAL-DRAFT têm como ser medidos sobre os sinais que chegarem pelo comando."
   - id: Q_IT_SIGNAL_RECEIVER_WARN
     node_type: question
@@ -88,7 +88,7 @@ nodes:
     x_linear_issue: "SAC-375"
     impact: 3
     confidence: 0.6
-    label: "L2 no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra."
+    label: "A anonimização no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra."
     narrative: "Pronto quando: avisa um sinal com segredo-isca plantado e não avisa mais de 1 em 10 sinais limpos, que é o refutador pré-registrado. É aviso: a REGRA 113 cobra que a revisão aconteceu, e esta peça ajuda a revisão a enxergar."
   - id: Q_IT_SYNC_MAIN_WRITE_PREFLIGHT
     node_type: question
