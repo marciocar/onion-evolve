@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1057 itens abertos** em 161 grafo(s) com aberto (de 208 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1060 itens abertos** em 159 grafo(s) com aberto (de 206 no escopo) · 157 grupo(s), agrupados por `owner:` (74 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -245,6 +245,52 @@
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248` | a2a-empresa-adotante-2026-10 | Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS, Linux e WSL 2), a 2.1.234 levou ao Wind |
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_SAME_MACHINE_PLUS_REMOTE_CONTROL` | a2a-empresa-adotante-2026-10 | Formulação sustentada pelo CHANGELOG: o cross-session na mesma máquina passou a valer em Bedrock, Vertex e Foundry e com teleme |
 
+## onion-distribution-packages-2026-11 — 41 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 71.5 | `Q_ONION_DISTRIBUTION_PACKAGES_1105` | onion-distribution-packages-2026-11 | Distribuir o Onion também como pacote npm, pacote Python e servidor MCP, como o kg-ssot, ou manter só as quatro portas e o marke |
+| 41.2 | `C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED` | onion-distribution-packages-2026-11 | B. Manter portas e marketplace, candidatar onion-plugins ao diretório oficial e deixar pacotes em parque com gatilho nomeado (rec |
+| 12.0 | `C_OPCAO_C_NPM_THIN_INSTALLER` | onion-distribution-packages-2026-11 | C. Publicar npm só como instalador fino que copia para .claude |
+| 9.0 | `C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY` | onion-distribution-packages-2026-11 | F. Publicar servidor MCP só de leitura e veredito próprio do Onion, com entrada no Registry |
+| 7.5 | `C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE` | onion-distribution-packages-2026-11 | A. Manter só portas e marketplace próprio, sem mudar nada (status quo) |
+| 4.5 | `C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE` | onion-distribution-packages-2026-11 | D. Publicar npm com conteúdo, como fonte de plugin |
+| 3.8 | `C_OPCAO_G_MCPB_BUNDLE` | onion-distribution-packages-2026-11 | G. Publicar MCPB do Onion |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS` | onion-distribution-packages-2026-11 | Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb. |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO6_WHAT_DOES_NOT_TRAVEL` | onion-distribution-packages-2026-11 | Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION` | onion-distribution-packages-2026-11 | Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin: OpenSpec, BMAD, spec |
+| 3.6 | `C_SUPERACAO_20261105_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS` | onion-distribution-packages-2026-11 | Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment  |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MARKETPLACE_ALLOWLIST_POLICY` | onion-distribution-packages-2026-11 | Restaurar a claim de allowlist e blocklist de marketplaces por política (strictKnownMarketplaces, blockedMarketplaces, hostPatter |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MCPNAME_OWNERSHIP_VERIFICATION` | onion-distribution-packages-2026-11 | Restaurar pela primária a verificação de propriedade no Registry, por mcpName e pela string mcp-name. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES` | onion-distribution-packages-2026-11 | Restaurar a claim do mcp-publisher por GitHub OIDC e dos tipos aceitos, com Cargo incluído. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MITIGATIONS_FALL_ON_ADOPTER` | onion-distribution-packages-2026-11 | Restaurar as mitigações (script desligado, lockfile, atraso de versão nova, auditoria de workflows) sem o número de horas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE` | onion-distribution-packages-2026-11 | Restaurar a claim de workflow órfão com OIDC e cache pnpm via pull_request_target. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_PIN_ENFORCE_AND_SEED_DIR` | onion-distribution-packages-2026-11 | Restaurar a claim e citar a semente como alternativa à imagem. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_RECURRING_WAVES` | onion-distribution-packages-2026-11 | Restaurar a recorrência das ondas de 2025 e 2026, sem as contagens não conferidas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW` | onion-distribution-packages-2026-11 | Restaurar a claim de versões imutáveis no Registry, com a ressalva de preview e sem afirmar nada sobre rollback. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED` | onion-distribution-packages-2026-11 | Restaurar a claim de nomes reservados (npm, pip, uv, cargo, github, gh) e de marketplace do tipo npm ainda não implementado. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY` | onion-distribution-packages-2026-11 | Restaurar a claim e avaliar pin por sha nas entradas das portas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE` | onion-distribution-packages-2026-11 | Tabela multicanal registrada no achado 8, no lugar de um ponto único de downloads de uma semana. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_STEALER_TARGETS_AI_CONFIG` | onion-distribution-packages-2026-11 | Restaurar a claim de que o stealer mira tokens e configurações de IA, sem bypass_2fa até haver fonte. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_OIDC_EXTRACTED_FROM_RUNNER` | onion-distribution-packages-2026-11 | Restaurar a claim de cache envenenado e OIDC extraído da memória do runner, trocando 'propagação' por 'publicação inicial'. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_PYPI_NOT_EXEMPT` | onion-distribution-packages-2026-11 | Restaurar a claim da campanha com nomes e versões (mistralai 2.4.6, guardrails-ai 0.10.1), sem afirmar a divisão 170 + 2. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS` | onion-distribution-packages-2026-11 | Restaurar a claim de que 'MCP by default' está em Caution no Radar, citando a página do blip em vez do PDF. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_SAP_TRUSTED_ANY_WORKFLOW` | onion-distribution-packages-2026-11 | Restaurar a claim de Trusted Publishing confiando em qualquer workflow, limitada a @cap-js. |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED` | onion-distribution-packages-2026-11 | A 1ª onda da Mini Shai-Hulud (11-12/05/2026) atingiu mais de 170 pacotes npm e 2 PyPI (mistralai 2.4.6, guardrails-ai 0.10.1). At |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED` | onion-distribution-packages-2026-11 | Postmortem da TanStack: PR de fork via pull_request_target envenenou o cache do pnpm; o release.yml o restaurou; o binário extrai |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED` | onion-distribution-packages-2026-11 | O Radar Vol. 34 pôs 'MCP by default' em Caution: não adotar por padrão; uma CLI bem desenhada muitas vezes basta; MCP agrega va |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED` | onion-distribution-packages-2026-11 | Em @cap-js, uma conta com escrita editou o release-please.yml num branch não-main e trocou o OIDC à mão; o nome de arquivo do n |
+| 3.6 | `C_SUPERACAO_20261105_SRC_BMAD_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: BMAD-METHOD com 55.023 estrelas e 6.138 forks. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_DEVTO_ROUTES` | onion-distribution-packages-2026-11 | Rotas confirmadas e métricas substituídas pelas de hoje. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_ORG_MD` | onion-distribution-packages-2026-11 | org.md incorporada nos itens sobre allowlist, imposição e semente. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_PLUGIN_OVERVIEW` | onion-distribution-packages-2026-11 | plugins/components cobre o que importava da overview. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_PYPISTATS_SUPERCLAUDE` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: superclaude com last_week 2.463 e last_month 5.193 no PyPI. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_SPEC_KIT_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: spec-kit com 147.665 estrelas, 13.250 forks e PyPI desde o PR #3516. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_TENABLE_FAQ` | onion-distribution-packages-2026-11 | FAQ da Tenable incorporada: linha do tempo, comprometimentos anteriores e a ordem de remover o daemon antes de girar credencial. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_VENTUREBEAT_OIDC_SCOPE` | onion-distribution-packages-2026-11 | VentureBeat incorporada às restrições da recomendação: o escopo do OIDC é o controle que manda. |
+| 3.0 | `C_OPCAO_E_PYPI_PACKAGE` | onion-distribution-packages-2026-11 | E. Publicar pacote PyPI do Onion |
+| 2.2 | `C_OPCAO_H_CONTAINER_IMAGE` | onion-distribution-packages-2026-11 | H. Publicar imagem de contêiner |
+
 ## jev-decision-round2-2026-10 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -386,6 +432,41 @@
 | 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
+## persona-runtime-2026-11 — 30 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 60.0 | `Q_PERSONA_RUNTIME_2026_11` | persona-runtime-2026-11 | Qual runtime deve servir a persona de serviço do Company Brain de um adotante: A bot próprio no Agent SDK (bridge + kg_mcp), B o |
+| 49.5 | `C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE` | persona-runtime-2026-11 | A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta  |
+| 43.8 | `C_OPCAO_B_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthr |
+| 17.5 | `C_OPCAO_A_PLUS_B_BRIDGE` | persona-runtime-2026-11 | A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa lo |
+| 6.8 | `C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT` | persona-runtime-2026-11 | C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e n |
+| 6.2 | `C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali |
+| 3.6 | `C_SUPERACAO_20261106_AUDIT_PAGE_READ` | persona-runtime-2026-11 | A página audit.md do Claude Tag, lida: quatro trilhas de auditoria e nenhum log por ato de quem pediu. |
+| 3.6 | `C_SUPERACAO_20261106_B_DISABLE_DMS` | persona-runtime-2026-11 | Reinstalar com a restrição: em B, desligar DMs, porque DM 1:1 roda na conta claude.ai de quem enviou. |
+| 3.6 | `C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 6 de identidade própria por access bundles com o descarte tier 9 reinstalado. |
+| 3.6 | `C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 5 de identidade de serviço com o descarte tier 9 reinstalado. |
+| 3.6 | `C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2` | persona-runtime-2026-11 | Runner da persona sob o degrau 2 do bridge: unit systemd com DynamicUser, ProtectHome e IPAddressDeny, no lugar de bwrap ou Docker |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES` | persona-runtime-2026-11 | Reinstalar com a primária: por padrão qualquer membro de workspace Slack conectado invoca o Claude Tag em canais, com ou sem con |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH` | persona-runtime-2026-11 | Reinstalar a claim de credencial por host, caminho e método, com a ressalva da revisão de conector pessoal. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT` | persona-runtime-2026-11 | Reinstalar a claim do corte de rate limit para apps fora do Marketplace com a primária redirecionada de docs.slack.dev. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL` | persona-runtime-2026-11 | Reinstalar com a primária: proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envi |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE` | persona-runtime-2026-11 | Reinstalar com a primária do Claude Tag: a busca padrão cobre todos os canais públicos do workspace, inclusive os em que o Clau |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS` | persona-runtime-2026-11 | Reinstalar com a primária: no ambiente self-hosted o Claude Tag não usa os conectores que o admin adiciona. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR` | persona-runtime-2026-11 | Reinstalar a claim de credencial compartilhada por canal, com o reparo dos conectores pessoais (impersonação, não delegação c |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS` | persona-runtime-2026-11 | Reinstalar a claim de que em canais o Claude Tag age sob service accounts próprias, com a primária security-and-data.md (seção |
+| 3.6 | `C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ` | persona-runtime-2026-11 | A página restrict-access.md do Claude Tag, lida: resposta sem menção com 'Respond automatically' ligado por padrão, audit log  |
+| 3.6 | `C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT` | persona-runtime-2026-11 | No Agent SDK a Anthropic RECOMENDA, para implantação endurecida, fronteira de isolamento e credenciais por proxy fora dela; mont |
+| 3.6 | `C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS` | persona-runtime-2026-11 | Em ago/2024 o Slack AI (Salesforce, não o Claude) teve injeção indireta divulgada pela PromptArmor que exfiltrava canais privad |
+| 3.6 | `C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03` | persona-runtime-2026-11 | Desde 2025-05-29 apps comerciais fora do Marketplace (novos ou instalação nova) ficam em 1 req/min e 15 objetos; instalações e |
+| 3.6 | `C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION` | persona-runtime-2026-11 | Em canal o Claude Tag age por padrão com contas de serviço próprias (agent identity do Owner), com acesso por conector, repo ou |
+| 3.6 | `C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS` | persona-runtime-2026-11 | Auditoria de B = log de admin + export de rede por hora (sem git nem MCP) + log do serviço conectado sob a conta de serviço; fal |
+| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o Claude age por padrão sob identidades de serviço próprias; duas exceções: conector pes |
+| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o agente age como contas de serviço do Owner, credenciais pelo Agent Proxy; conectores pesso |
+| 3.6 | `C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT` | persona-runtime-2026-11 | No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona;  |
+| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS` | persona-runtime-2026-11 | Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 all |
+| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC` | persona-runtime-2026-11 | Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminh |
+
 ## plugin-write-2026-11 — 13 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -420,6 +501,54 @@
 | 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
+
+## core — 43 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 55.0 | `Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11` | onion-core-ports-multi-model-2026-11 | Como o Onion deve fazer portas do onion-core para outros harnesses e modelos (onion-codex vivo; candidatas onion-mistral, onion-ge |
+| 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
+| 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
+| 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
+| 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
+| 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
+| 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
+| 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
+| 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
+| 7.7 | `Q_CORE_ACTIONS_SHA_PIN_1116` | outside-in-primaries-2026-11 | As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada? |
+| 7.7 | `Q_DOORS_ATTESTATION_1130` | outside-in-primaries-2026-11 | Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit. |
+| 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
+| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
+| 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |
+| 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
+| 4.8 | `Q_ADOPTER_VETOES_RESIDUE_1108` | adopter-vetoes-2026-11 | Depois da REGRA 118, sobra um resíduo de classes de ato que ainda passa pelos hooks no adotante; ele vira pergunta própria, aber |
+| 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
+| 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
+| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
+| 4.2 | `Q_IT_SYNC_MAIN_WRITE_PREFLIGHT` | inbox-triage-1108 | O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebr |
+| 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
+| 4.0 | `Q_MD_WAHA_PROJECT_USE_TERMS_1108` | maestro-decisions-1108 | O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no pi |
+| 4.0 | `Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108` | maestro-decisions-1108 | O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado. |
+| 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
+| 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
+| 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
+| 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | A anonimização no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
+| 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | O comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
+| 3.6 | `Q_MD_CONSULTING_NEXT_UPDATE_1109` | maestro-decisions-1108 | O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI. |
+| 3.2 | `Q_IT_RESIDUE_GUARD_REMOTE_BRANCH` | inbox-triage-1108 | O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de  |
+| 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
+| 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
+| 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
+| 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
+| 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
+| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
+| 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
+| 3.0 | `Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT` | inbox-triage-1108 | A fila do onion-messaging reentrega o job à sessão que já agiu e perdeu o lease: falta o teste, e a decisão de pôr ou não um |
+| 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
+| 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
@@ -512,40 +641,6 @@
 | 3.6 | `C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED` | codex-as-core-2026-10 | Formulação sustentada pela página de approvals e segurança: defaults sem rede e escrita no workspace, caminhos protegidos (.gi |
 | 3.6 | `C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN` | codex-as-core-2026-10 | As linhas #26106 e #26167 da 0.137.0 (catálogo de skills por turno e injeção de prompt v1) e #54050 da 0.164.0 (refresh de skil |
 | 3.6 | `C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT` | codex-as-core-2026-10 | Formulação corrigida pela página de subagentes: spawn por pedido direto ou instrução de projeto/skill, agente customizado nom |
-
-## persona-runtime-2026-11 — 29 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 49.5 | `C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE` | persona-runtime-2026-11 | A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta  |
-| 43.8 | `C_OPCAO_B_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthr |
-| 17.5 | `C_OPCAO_A_PLUS_B_BRIDGE` | persona-runtime-2026-11 | A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa lo |
-| 6.8 | `C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT` | persona-runtime-2026-11 | C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e n |
-| 6.2 | `C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali |
-| 3.6 | `C_SUPERACAO_20261106_AUDIT_PAGE_READ` | persona-runtime-2026-11 | A página audit.md do Claude Tag, lida: quatro trilhas de auditoria e nenhum log por ato de quem pediu. |
-| 3.6 | `C_SUPERACAO_20261106_B_DISABLE_DMS` | persona-runtime-2026-11 | Reinstalar com a restrição: em B, desligar DMs, porque DM 1:1 roda na conta claude.ai de quem enviou. |
-| 3.6 | `C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 6 de identidade própria por access bundles com o descarte tier 9 reinstalado. |
-| 3.6 | `C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 5 de identidade de serviço com o descarte tier 9 reinstalado. |
-| 3.6 | `C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2` | persona-runtime-2026-11 | Runner da persona sob o degrau 2 do bridge: unit systemd com DynamicUser, ProtectHome e IPAddressDeny, no lugar de bwrap ou Docker |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES` | persona-runtime-2026-11 | Reinstalar com a primária: por padrão qualquer membro de workspace Slack conectado invoca o Claude Tag em canais, com ou sem con |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH` | persona-runtime-2026-11 | Reinstalar a claim de credencial por host, caminho e método, com a ressalva da revisão de conector pessoal. |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT` | persona-runtime-2026-11 | Reinstalar a claim do corte de rate limit para apps fora do Marketplace com a primária redirecionada de docs.slack.dev. |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL` | persona-runtime-2026-11 | Reinstalar com a primária: proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envi |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE` | persona-runtime-2026-11 | Reinstalar com a primária do Claude Tag: a busca padrão cobre todos os canais públicos do workspace, inclusive os em que o Clau |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS` | persona-runtime-2026-11 | Reinstalar com a primária: no ambiente self-hosted o Claude Tag não usa os conectores que o admin adiciona. |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR` | persona-runtime-2026-11 | Reinstalar a claim de credencial compartilhada por canal, com o reparo dos conectores pessoais (impersonação, não delegação c |
-| 3.6 | `C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS` | persona-runtime-2026-11 | Reinstalar a claim de que em canais o Claude Tag age sob service accounts próprias, com a primária security-and-data.md (seção |
-| 3.6 | `C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ` | persona-runtime-2026-11 | A página restrict-access.md do Claude Tag, lida: resposta sem menção com 'Respond automatically' ligado por padrão, audit log  |
-| 3.6 | `C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT` | persona-runtime-2026-11 | No Agent SDK a Anthropic RECOMENDA, para implantação endurecida, fronteira de isolamento e credenciais por proxy fora dela; mont |
-| 3.6 | `C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS` | persona-runtime-2026-11 | Em ago/2024 o Slack AI (Salesforce, não o Claude) teve injeção indireta divulgada pela PromptArmor que exfiltrava canais privad |
-| 3.6 | `C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03` | persona-runtime-2026-11 | Desde 2025-05-29 apps comerciais fora do Marketplace (novos ou instalação nova) ficam em 1 req/min e 15 objetos; instalações e |
-| 3.6 | `C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION` | persona-runtime-2026-11 | Em canal o Claude Tag age por padrão com contas de serviço próprias (agent identity do Owner), com acesso por conector, repo ou |
-| 3.6 | `C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS` | persona-runtime-2026-11 | Auditoria de B = log de admin + export de rede por hora (sem git nem MCP) + log do serviço conectado sob a conta de serviço; fal |
-| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o Claude age por padrão sob identidades de serviço próprias; duas exceções: conector pes |
-| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o agente age como contas de serviço do Owner, credenciais pelo Agent Proxy; conectores pesso |
-| 3.6 | `C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT` | persona-runtime-2026-11 | No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona;  |
-| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS` | persona-runtime-2026-11 | Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 all |
-| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC` | persona-runtime-2026-11 | Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminh |
 
 ## slm-frameworks-2026-10 — 14 item(ns)
 
@@ -666,51 +761,6 @@
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
 
-## onion-distribution-packages-2026-11 — 40 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 41.2 | `C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED` | onion-distribution-packages-2026-11 | B. Manter portas e marketplace, candidatar onion-plugins ao diretório oficial e deixar pacotes em parque com gatilho nomeado (rec |
-| 12.0 | `C_OPCAO_C_NPM_THIN_INSTALLER` | onion-distribution-packages-2026-11 | C. Publicar npm só como instalador fino que copia para .claude |
-| 9.0 | `C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY` | onion-distribution-packages-2026-11 | F. Publicar servidor MCP só de leitura e veredito próprio do Onion, com entrada no Registry |
-| 7.5 | `C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE` | onion-distribution-packages-2026-11 | A. Manter só portas e marketplace próprio, sem mudar nada (status quo) |
-| 4.5 | `C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE` | onion-distribution-packages-2026-11 | D. Publicar npm com conteúdo, como fonte de plugin |
-| 3.8 | `C_OPCAO_G_MCPB_BUNDLE` | onion-distribution-packages-2026-11 | G. Publicar MCPB do Onion |
-| 3.6 | `C_SUPERACAO_20261105_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS` | onion-distribution-packages-2026-11 | Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb. |
-| 3.6 | `C_SUPERACAO_20261105_ACHADO6_WHAT_DOES_NOT_TRAVEL` | onion-distribution-packages-2026-11 | Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules |
-| 3.6 | `C_SUPERACAO_20261105_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION` | onion-distribution-packages-2026-11 | Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin: OpenSpec, BMAD, spec |
-| 3.6 | `C_SUPERACAO_20261105_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS` | onion-distribution-packages-2026-11 | Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment  |
-| 3.6 | `C_SUPERACAO_20261105_CUT_MARKETPLACE_ALLOWLIST_POLICY` | onion-distribution-packages-2026-11 | Restaurar a claim de allowlist e blocklist de marketplaces por política (strictKnownMarketplaces, blockedMarketplaces, hostPatter |
-| 3.6 | `C_SUPERACAO_20261105_CUT_MCPNAME_OWNERSHIP_VERIFICATION` | onion-distribution-packages-2026-11 | Restaurar pela primária a verificação de propriedade no Registry, por mcpName e pela string mcp-name. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES` | onion-distribution-packages-2026-11 | Restaurar a claim do mcp-publisher por GitHub OIDC e dos tipos aceitos, com Cargo incluído. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_MITIGATIONS_FALL_ON_ADOPTER` | onion-distribution-packages-2026-11 | Restaurar as mitigações (script desligado, lockfile, atraso de versão nova, auditoria de workflows) sem o número de horas. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE` | onion-distribution-packages-2026-11 | Restaurar a claim de workflow órfão com OIDC e cache pnpm via pull_request_target. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_PIN_ENFORCE_AND_SEED_DIR` | onion-distribution-packages-2026-11 | Restaurar a claim e citar a semente como alternativa à imagem. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_RECURRING_WAVES` | onion-distribution-packages-2026-11 | Restaurar a recorrência das ondas de 2025 e 2026, sem as contagens não conferidas. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW` | onion-distribution-packages-2026-11 | Restaurar a claim de versões imutáveis no Registry, com a ressalva de preview e sem afirmar nada sobre rollback. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED` | onion-distribution-packages-2026-11 | Restaurar a claim de nomes reservados (npm, pip, uv, cargo, github, gh) e de marketplace do tipo npm ainda não implementado. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY` | onion-distribution-packages-2026-11 | Restaurar a claim e avaliar pin por sha nas entradas das portas. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE` | onion-distribution-packages-2026-11 | Tabela multicanal registrada no achado 8, no lugar de um ponto único de downloads de uma semana. |
-| 3.6 | `C_SUPERACAO_20261105_CUT_STEALER_TARGETS_AI_CONFIG` | onion-distribution-packages-2026-11 | Restaurar a claim de que o stealer mira tokens e configurações de IA, sem bypass_2fa até haver fonte. |
-| 3.6 | `C_SUPERACAO_20261105_DISCARD_OIDC_EXTRACTED_FROM_RUNNER` | onion-distribution-packages-2026-11 | Restaurar a claim de cache envenenado e OIDC extraído da memória do runner, trocando 'propagação' por 'publicação inicial'. |
-| 3.6 | `C_SUPERACAO_20261105_DISCARD_PYPI_NOT_EXEMPT` | onion-distribution-packages-2026-11 | Restaurar a claim da campanha com nomes e versões (mistralai 2.4.6, guardrails-ai 0.10.1), sem afirmar a divisão 170 + 2. |
-| 3.6 | `C_SUPERACAO_20261105_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS` | onion-distribution-packages-2026-11 | Restaurar a claim de que 'MCP by default' está em Caution no Radar, citando a página do blip em vez do PDF. |
-| 3.6 | `C_SUPERACAO_20261105_DISCARD_SAP_TRUSTED_ANY_WORKFLOW` | onion-distribution-packages-2026-11 | Restaurar a claim de Trusted Publishing confiando em qualquer workflow, limitada a @cap-js. |
-| 3.6 | `C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED` | onion-distribution-packages-2026-11 | A 1ª onda da Mini Shai-Hulud (11-12/05/2026) atingiu mais de 170 pacotes npm e 2 PyPI (mistralai 2.4.6, guardrails-ai 0.10.1). At |
-| 3.6 | `C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED` | onion-distribution-packages-2026-11 | Postmortem da TanStack: PR de fork via pull_request_target envenenou o cache do pnpm; o release.yml o restaurou; o binário extrai |
-| 3.6 | `C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED` | onion-distribution-packages-2026-11 | O Radar Vol. 34 pôs 'MCP by default' em Caution: não adotar por padrão; uma CLI bem desenhada muitas vezes basta; MCP agrega va |
-| 3.6 | `C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED` | onion-distribution-packages-2026-11 | Em @cap-js, uma conta com escrita editou o release-please.yml num branch não-main e trocou o OIDC à mão; o nome de arquivo do n |
-| 3.6 | `C_SUPERACAO_20261105_SRC_BMAD_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: BMAD-METHOD com 55.023 estrelas e 6.138 forks. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_DEVTO_ROUTES` | onion-distribution-packages-2026-11 | Rotas confirmadas e métricas substituídas pelas de hoje. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_ORG_MD` | onion-distribution-packages-2026-11 | org.md incorporada nos itens sobre allowlist, imposição e semente. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_PLUGIN_OVERVIEW` | onion-distribution-packages-2026-11 | plugins/components cobre o que importava da overview. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_PYPISTATS_SUPERCLAUDE` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: superclaude com last_week 2.463 e last_month 5.193 no PyPI. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_SPEC_KIT_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: spec-kit com 147.665 estrelas, 13.250 forks e PyPI desde o PR #3516. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_TENABLE_FAQ` | onion-distribution-packages-2026-11 | FAQ da Tenable incorporada: linha do tempo, comprometimentos anteriores e a ordem de remover o daemon antes de girar credencial. |
-| 3.6 | `C_SUPERACAO_20261105_SRC_VENTUREBEAT_OIDC_SCOPE` | onion-distribution-packages-2026-11 | VentureBeat incorporada às restrições da recomendação: o escopo do OIDC é o controle que manda. |
-| 3.0 | `C_OPCAO_E_PYPI_PACKAGE` | onion-distribution-packages-2026-11 | E. Publicar pacote PyPI do Onion |
-| 2.2 | `C_OPCAO_H_CONTAINER_IMAGE` | onion-distribution-packages-2026-11 | H. Publicar imagem de contêiner |
-
 ## audit-evidence-storage-2026-10 — 16 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -828,19 +878,20 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 19 item(ns)
+## maestro — 20 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 30.0 | `Q_SPIKE_COPILOT_STUDIO_MCP` | spike-copilot-studio-mcp-2026-10 | O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? INFER |
+| 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
+| 15.0 | `Q_PS_RODADA_DECIDE_D_MA_ARCH_1116` | persona-servico-2026-11 | Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço. |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
-| 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
@@ -1117,55 +1168,6 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 44 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
-| 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
-| 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
-| 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
-| 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
-| 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
-| 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
-| 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
-| 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
-| 7.7 | `Q_CORE_ACTIONS_SHA_PIN_1116` | outside-in-primaries-2026-11 | As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada? |
-| 7.7 | `Q_DOORS_ATTESTATION_1130` | outside-in-primaries-2026-11 | Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit. |
-| 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
-| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |
-| 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
-| 4.8 | `Q_ADOPTER_VETOES_RESIDUE_1108` | adopter-vetoes-2026-11 | Depois da REGRA 118, sobra um resíduo de classes de ato que ainda passa pelos hooks no adotante; ele vira pergunta própria, aber |
-| 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
-| 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
-| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
-| 4.2 | `Q_DB_EXPIRED_CORE_HALF` | doorbell-hardening-2026-11 | A metade do core na lacuna 2: o hook de início de sessão e o radar ainda não leem o sinal expirado da campainha. |
-| 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
-| 4.2 | `Q_IT_SYNC_MAIN_WRITE_PREFLIGHT` | inbox-triage-1108 | O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebr |
-| 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
-| 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
-| 4.0 | `Q_MD_WAHA_PROJECT_USE_TERMS_1108` | maestro-decisions-1108 | O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no pi |
-| 4.0 | `Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108` | maestro-decisions-1108 | O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado. |
-| 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
-| 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
-| 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
-| 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | A anonimização no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
-| 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | O comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
-| 3.6 | `Q_MD_CONSULTING_NEXT_UPDATE_1109` | maestro-decisions-1108 | O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI. |
-| 3.2 | `Q_IT_RESIDUE_GUARD_REMOTE_BRANCH` | inbox-triage-1108 | O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de  |
-| 3.2 | `Q_SO_PADROES_DE_MERCADO` | session-orchestration-2026-11 | Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o cicl |
-| 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
-| 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
-| 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
-| 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
-| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
-| 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
-| 3.0 | `Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT` | inbox-triage-1108 | A fila do onion-messaging reentrega o job à sessão que já agiu e perdeu o lease: falta o teste, e a decisão de pôr ou não um |
-| 3.0 | `Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109` | maestro-decisions-1109b | O hook do onion-plugins funciona em pasta não confiada, e quais são os requisitos duros do diretório comunitário? |
-| 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
-| 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
-
 ## ops-citation-travel-2026-10 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1400,6 +1402,14 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
+
+## curadoria — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.0 | `Q_MA_MARKET` | company-brain-multiaudiencia-2026-10 | Como o mercado resolve conhecimento multiaudiência: portais de conhecimento com IA, wikis com permissão por espaço e catálogos |
+| 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
+| 4.0 | `Q_MD_SETTINGS_UPDATE_UNDER_SANDBOX_1108` | maestro-decisions-1108 | Medir, antes de valer como rotina, o update que altera settings.json sob o sandbox da curadoria; o próximo traz o deny do PR #155 |
 
 ## conductor-2026-10 — 2 item(ns)
 
@@ -1687,13 +1697,6 @@
 | 4.5 | `Q_CORTEX_HANDOFF_GATILHO` | cortex-2026-10 | Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cor |
 | 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
 | 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
-
-## curadoria — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
-| 4.0 | `Q_MD_SETTINGS_UPDATE_UNDER_SANDBOX_1108` | maestro-decisions-1108 | Medir, antes de valer como rotina, o update que altera settings.json sob o sandbox da curadoria; o próximo traz o deny do PR #155 |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
 
