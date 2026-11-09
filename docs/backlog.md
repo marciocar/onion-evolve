@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1057 itens abertos** em 161 grafo(s) com aberto (de 208 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1057 itens abertos** em 161 grafo(s) com aberto (de 209 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -844,7 +844,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 19 item(ns)
+## maestro — 20 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -857,6 +857,7 @@
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
+| 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
@@ -1117,7 +1118,7 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 44 item(ns)
+## core — 43 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1140,7 +1141,6 @@
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
-| 4.2 | `Q_DB_EXPIRED_CORE_HALF` | doorbell-hardening-2026-11 | A metade do core na lacuna 2: o hook de início de sessão e o radar ainda não leem o sinal expirado da campainha. |
 | 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
 | 4.2 | `Q_IT_SYNC_MAIN_WRITE_PREFLIGHT` | inbox-triage-1108 | O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebr |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
