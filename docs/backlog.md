@@ -800,6 +800,22 @@
 | 3.2 | `C_TETO_SO_CHAVE_DE_TOPO` | agent-frontmatter-keys-2026-10 | TETO: a guarda julga só a chave de TOPO; chave aninhada (dentro de hooks, mcpServers, experimental) e VALOR ficam com outras regr |
 | 3.0 | `C_TETO_DOC_OFICIAL_ENVELHECE` | agent-frontmatter-keys-2026-10 | TETO: a lista oficial é a da doc em 2026-10-11; chave oficial nova é acusada até entrar no .tsv, e chave que a doc remover cont |
 
+## sinais-de-campo-2026-09 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 34.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
+| 8.0 | `Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027` | sinais-de-campo-2026-09 | O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e d |
+| 8.0 | `Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027` | sinais-de-campo-2026-09 | Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligaçõ |
+| 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
+| 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
+| 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
+| 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
+| 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
+| 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
+| 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
+| 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
+
 ## deck-patterns-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -821,22 +837,6 @@
 | 12.0 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
 | 2.4 | `Q_PADRONIZAR_LLMS_TXT_NO_ONION` | contrato-kg-absorcao-2026-10 | o Onion padroniza um llms.txt e um llms-full.txt gerados (core, portas e site), absorvendo o gerador que o onion-kg-ssot provou? |
 | 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
-
-## sinais-de-campo-2026-09 — 11 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 32.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
-| 8.0 | `Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027` | sinais-de-campo-2026-09 | O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e d |
-| 8.0 | `Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027` | sinais-de-campo-2026-09 | Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligaçõ |
-| 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
-| 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
-| 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
-| 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
-| 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
-| 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
-| 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
-| 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
 
 ## radar-E3-2026-09-03 — 1 item(ns)
 

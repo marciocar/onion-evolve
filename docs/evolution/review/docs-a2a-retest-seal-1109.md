@@ -2,7 +2,8 @@
 branch: docs/a2a-retest-seal-1109
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 81221904f2da8bf96a7f8142d995e4dcea3d6ec3286b4fb9e973bae579cce450
+reviewed_code_sha256: eeafb9234642c111ce02f9c260dcb60eeb2a925e4a5e0ee212c9ecea7ad5da14
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
