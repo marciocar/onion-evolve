@@ -1779,27 +1779,27 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 4
     confidence: 0.85
-    verified_at: "2026-11-08"
-    verified_against: "tools/kg_vendor.py na main d3b1cc1fe1b1, que é a tag kg-ssot-v4.46.0, via API, 2026-11-08: 0 menções a attest; leitura por git archive da tag; o carimbo guarda commit e sha256; o vendor do core está em 4.46.0"
+    verified_at: "2026-11-09"
+    verified_against: "kg_vendor.py update --tag kg-ssot-v4.47.0 --verify-attestation em 2026-11-09: rc 0, carimbo com attestation.manifest_sha256 4141e10af6eb; a árvore adulterada sob a mesma tag (tools/kg_gate.py) deu rc 2 e não criou o destino; caso negativo em tools/test_kg_vendor.py da tag"
     label: "O kg_vendor verifica a atestação do que traz, ou segue confiando na tag?"
-    narrative: "Remedido em 2026-11-08 na 4.46.0, a versão que o core já tem vendorizada: o kg_vendor lê por `git archive` da tag, carimba commit e sha256 de cada arquivo e confere esse carimbo depois, mas nunca verifica atestação. A atestação da release cobre artefatos, e o vendor consome uma árvore que ela não cobre. O digest já existe; o que falta é a procedência do que é consumido. Pronto quando: O update do kg_vendor sai com rc diferente de 0 quando a atestação do que ele traz não verifica, com caso negativo na bancada do kg-ssot; ou o kg-ssot sela por que a tag basta. Prazo a calibrar: a data 30/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-365. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Fechado em 2026-11-09 com a kg-ssot 4.47.0, a primeira release com o manifesto atestado do vendor: o update do core rodou com --verify-attestation (rc 0, atestação gravada no carimbo), e a mesma tag com um arquivo adulterado saiu rc 2 sem tocar o destino. O update seguinte herda a verificação. Remedido em 2026-11-08 na 4.46.0, a versão que o core já tem vendorizada: o kg_vendor lê por `git archive` da tag, carimba commit e sha256 de cada arquivo e confere esse carimbo depois, mas nunca verifica atestação. A atestação da release cobre artefatos, e o vendor consome uma árvore que ela não cobre. O digest já existe; o que falta é a procedência do que é consumido. Pronto quando: O update do kg_vendor sai com rc diferente de 0 quando a atestação do que ele traz não verifica, com caso negativo na bancada do kg-ssot; ou o kg-ssot sela por que a tag basta. Prazo a calibrar: a data 30/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-365. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_KG_PROV_AGENT_1208
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 2
     confidence: 0.85
-    verified_at: "2026-11-08"
-    verified_against: "tools/kg_prov_export.py na main d3b1cc1fe1b1 via API, 2026-11-08: grep -ci agent dá 0"
+    verified_at: "2026-11-09"
+    verified_against: "kg_prov_export.py da 4.47.0 sobre um grafo-sonda com sealed_by e owner, 2026-11-09: rc 0, com prov:Agent, prov:wasAttributedTo no papel kg:SealerRole e prov:wasInfluencedBy no papel kg:OwnerRole; casos em tools/test_kg_prov_export.py da tag"
     label: "O exportador PROV-O do kg-ssot emite o agente, ou declara por que não?"
-    narrative: "Remedido em 2026-11-08: o exportador de PROV-O em JSON-LD existe e emite Entity e Activity, mas `grep -ci agent` dá 0: das três classes centrais de PROV, Agent não sai. O veredito é alinhado por exportador, sem agente; não é 'sem mapeamento'. As arestas fora de wasDerivedFrom são divergência por decisão e ficam fora deste item. Pronto quando: O exportador emite prov:Agent com a relação de atribuição quando o nó nomeia o autor, com caso na bancada; ou o kg-ssot sela por que o contrato não leva agente. Prazo a calibrar: a data 08/12 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-366. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    narrative: "Fechado em 2026-11-09 com a kg-ssot 4.47.0: o exportador emite prov:Agent, com sealed_by como atribuição e owner como influência, porque atribuição em PROV implica participar da geração da entidade. A saída padrão muda só nos nós com esses campos. Remedido em 2026-11-08: o exportador de PROV-O em JSON-LD existe e emite Entity e Activity, mas `grep -ci agent` dá 0: das três classes centrais de PROV, Agent não sai. O veredito é alinhado por exportador, sem agente; não é 'sem mapeamento'. As arestas fora de wasDerivedFrom são divergência por decisão e ficam fora deste item. Pronto quando: O exportador emite prov:Agent com a relação de atribuição quando o nó nomeia o autor, com caso na bancada; ou o kg-ssot sela por que o contrato não leva agente. Prazo a calibrar: a data 08/12 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-366. Nenhuma mudança aplicada por este nó: é mapa e backlog."
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
 edges:
   - from: E_A2A_AGENT_CARD_IS_SERVER_MANIFEST

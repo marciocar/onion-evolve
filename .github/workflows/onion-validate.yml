@@ -8,6 +8,11 @@ on:
   # antiga fica COMENTADA abaixo: cada linha dela é a história de um ponto cego que custou caro, e
   # o que ela ensinava (path novo nasce invisível ao CI) é exatamente o que o fim do filtro cura.
   pull_request:
+  # push na main (2026-11-09, «Catraca e escoteiro»): o `kg_gate.py --touched HEAD^1` do ops/kg-gate-ci.sh só
+  # alcança o que entrou na main se este workflow rodar nela; antes ele só rodava em PR. O run mais novo da
+  # mesma ref cancela o anterior (concurrency abaixo), então uma rajada de pushes julga só o último.
+  push:
+    branches: [main]
   # workflow_dispatch: o alarme do main (ops/testing/main-bench-alarm.sh) dispara o lint na branch
   # `revert/<sha12>` — PR aberto por GITHUB_TOKEN não dispara `pull_request`.
   workflow_dispatch: {}
