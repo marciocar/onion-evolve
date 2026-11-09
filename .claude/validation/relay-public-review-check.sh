@@ -28,7 +28,8 @@
 #   · sinal que não passou pelo carteiro (cópia à mão, A2A, colado na sessão) num repo sem --require-mark: chega
 #     sem a marca e cala. Com --require-mark (o core, que é o destino público; quem passa é o dispatcher, pelo papel
 #     source), sinal datado a partir de MARK_SINCE sem a chave é HARD (classe sem-marca). O corte é pelo NOME do
-#     arquivo: nome com data antiga escapa. O adotante não entra, porque o inbox dele é a caixa de SAÍDA;
+#     arquivo: nome com data antiga escapa. O adotante não entra, porque o inbox dele é a caixa de SAÍDA. Vale para
+#     qualquer extensão, menos .gitkeep e o README.md do inbox e do _processed/;
 #   · marca fora do frontmatter, ou aninhada (indentada): cala;
 #   · `docs/evolution/inbound/` (o canal downstream) e qualquer caminho fora do inbox: fora do escopo;
 #   · o histórico: um commit antigo com a marca não é reescrito; ela julga só o índice de agora.
@@ -47,7 +48,7 @@ while [ $# -gt 0 ]; do
     --format=*) FORMAT="${1#--format=}"; shift ;;
     --selftest) MODE="selftest"; shift ;;
     --require-mark) REQUIRE_MARK=1; shift ;;
-    -h|--help) sed -n '2,39p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) REPO="$1"; shift ;;
   esac
 done
@@ -57,11 +58,13 @@ KEY_RE='^[[:space:]]*reviewed_for_public[[:space:]]*:'
 # $1 = conteúdo do índice num arquivo → stdout: os valores da chave no frontmatter (um por linha; vazio = sem chave)
 _frontmatter_values() {
   awk 'NR == 1 { if ($0 !~ /^---\r?$/) exit; fm = 1; next }
+       fm == 1 && /^---\r?$/ { closed = 1 }
        fm == 1 && /^---\r?$/ { exit }
        fm == 1 && /^reviewed_for_public[ \t]*:/ {
          v = $0; sub(/^reviewed_for_public[ \t]*:[ \t]*/, "", v); sub(/\r$/, "", v)
          sub(/[ \t]+#.*$/, "", v); sub(/[ \t]+$/, "", v); gsub(/["\047]/, "", v)
-         print (v == "" ? "(vazio)" : v) }' "$1"
+         vals[++n] = (v == "" ? "(vazio)" : v) }
+       END { if (n && closed) { for (i = 1; i <= n; i++) print vals[i] } else if (n) print "(sem fecho)" }' "$1"
 }
 
 _scan() {
@@ -72,11 +75,10 @@ _scan() {
   tmp="$(mktemp)" || return 2
   list="$(mktemp)" || { rm -f "${tmp}"; return 2; }
   # >>> le-o-indice
-  LC_ALL=C git -C "${repo}" grep --cached -z -l -I -E "${KEY_RE}" -- 'docs/evolution/inbox/' > "${list}" 2>/dev/null || rc=$?
+  LC_ALL=C git -C "${repo}" grep --cached -z -l -E "${KEY_RE}" -- 'docs/evolution/inbox/' > "${list}" 2>/dev/null || rc=$?
   # <<< le-o-indice
   if [ "${rc}" -gt 1 ]; then rm -f "${tmp}" "${list}"; echo "relay-public-review-check: git grep falhou (rc=${rc})" >&2; return 2; fi
   while IFS= read -r -d '' p; do
-    case "${p}" in *.md) : ;; *) continue ;; esac
     git -C "${repo}" show ":${p}" > "${tmp}" 2>/dev/null || continue
     bad=""
     while IFS= read -r v; do
@@ -95,7 +97,7 @@ _scan() {
   LC_ALL=C git -C "${repo}" ls-files --cached -z -- 'docs/evolution/inbox/' > "${list}" 2>/dev/null \
     || { rm -f "${tmp}" "${list}"; echo "relay-public-review-check: ls-files falhou" >&2; return 2; }
   while IFS= read -r -d '' p; do
-    case "${p}" in *.md) : ;; *) continue ;; esac
+    case "${p}" in */.gitkeep|docs/evolution/inbox/README.md|docs/evolution/inbox/_processed/README.md) continue ;; esac
     base="${p##*/}"; day="${base:0:10}"
     if [[ "${day}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
       [[ "${day}" < "${MARK_SINCE}" ]] && continue
@@ -178,6 +180,19 @@ _selftest() {
   # (xv) nome sem data e _processed/ entram; .gitkeep e não-.md não
   _reset; _nokey docs/evolution/inbox/sem-data.md; _nokey docs/evolution/inbox/_processed/2099-02-02-p.md; : > "${tmp}/docs/evolution/inbox/.gitkeep"; _add docs; _runm
   if grep -q 'inbox/sem-data.md' <<< "${out}" && grep -q '_processed/2099-02-02-p.md' <<< "${out}" && ! grep -q gitkeep <<< "${out}"; then _ok "(xv) sem data e _processed/ acusam, .gitkeep não"; else _ko "(xv) sem data e _processed/: ${out}"; fi
+
+  # (xvi) a extensão não decide: .MD, .markdown, .txt e sem extensão também são sinal
+  _reset; _nokey docs/evolution/inbox/2099-03-01-a.MD; _nokey docs/evolution/inbox/2099-03-01-b.markdown; _nokey docs/evolution/inbox/2099-03-01-c.txt; _nokey docs/evolution/inbox/2099-03-01-d; _add docs; _runm
+  if [ "$(grep -c $'^HARD\tsem-marca\t' <<< "${out}")" = 4 ]; then _ok "(xvi) .MD, .markdown, .txt e sem extensão acusam"; else _ko "(xvi) .MD, .markdown, .txt e sem extensão acusam: ${out}"; fi
+  # (xvii) corpo com NUL: a marca false não some, nem sem o modo novo; sem a chave acusa
+  _reset; printf -- '---\nreviewed_for_public: false\n---\n\na\0b\n' > "${tmp}/docs/evolution/inbox/2099-04-01-f.md"; printf -- '---\ntitle: t\n---\n\na\0b\n' > "${tmp}/docs/evolution/inbox/2099-04-01-n.md"; _add docs; _run; local nul_plain="${out}"; _runm
+  if grep -q $'^HARD\tsem-revisao\tdocs/evolution/inbox/2099-04-01-f.md' <<< "${nul_plain}" && grep -q $'^HARD\tsem-marca\tdocs/evolution/inbox/2099-04-01-n.md' <<< "${out}"; then _ok "(xvii) corpo com NUL acusa"; else _ko "(xvii) corpo com NUL acusa: ${nul_plain} | ${out}"; fi
+  # (xviii) frontmatter sem o --- de fecho: a linha no corpo não vale como revisão; sem a chave é sem-marca
+  _reset; printf -- '---\ntitle: t\n\nreviewed_for_public: true\n' > "${tmp}/docs/evolution/inbox/2099-05-01-t.md"; printf -- '---\ntitle: t\n\n# corpo\n' > "${tmp}/docs/evolution/inbox/2099-05-01-n.md"; _add docs; _runm
+  if grep -q $'^HARD\tsem-revisao\tdocs/evolution/inbox/2099-05-01-t.md' <<< "${out}" && grep -q $'^HARD\tsem-marca\tdocs/evolution/inbox/2099-05-01-n.md' <<< "${out}"; then _ok "(xviii) frontmatter sem fecho não vale como revisão"; else _ko "(xviii) frontmatter sem fecho não vale como revisão: ${out}"; fi
+  # (xix) o README do inbox e do _processed/ fica isento; outro readme não
+  _reset; _nokey docs/evolution/inbox/README.md; _nokey docs/evolution/inbox/_processed/README.md; mkdir -p "${tmp}/docs/evolution/inbox/sub"; _nokey docs/evolution/inbox/sub/README.md; _add docs; _runm
+  if ! grep -qE $'\tdocs/evolution/inbox/(_processed/)?README.md\t' <<< "${out}" && grep -q 'inbox/sub/README.md' <<< "${out}"; then _ok "(xix) README do inbox isento, em subpasta não"; else _ko "(xix) README do inbox isento, em subpasta não: ${out}"; fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1

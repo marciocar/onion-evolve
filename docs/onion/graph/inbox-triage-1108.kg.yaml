@@ -44,8 +44,8 @@ nodes:
     verified_at: "2026-11-08"
     verified_against: "SIGNAL-DRAFT.md e D_ADOPTER_SIGNALS_PROPOSAL na origin/main da onion-curation, conferidos pelo peer-ref-check; D_MD_HISTORY_PAGE_KEEPS_NAME_1108 no grafo maestro-decisions-1108; D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
     trace: "docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md"
-    label: "O core sela em parte a proposta dos quatro campos: o comando local e o schema como rampa sem catraca, a anonimização como rampa no emissor e aviso no receptor; a assinatura de recorrência fica parqueada; o GitHub fica fora do caminho do núcleo; nenhuma vertical de monitoramento."
-    narrative: "Selado pelo core em nome do maestro, na autonomia em vigor, revogável. Os refutadores do SIGNAL-DRAFT viram critério de reabertura. A assinatura de recorrência parqueia porque o próprio estudo diz que o recall é provavelmente baixo e que o mutante não prova dependência do token; gatilho: 20 sinais no formato do comando, ou 2 recorrências que a triagem humana notou e a assinatura teria achado. O GitHub como transporte cai pela regra de não depender de serviço externo. Os nomes de adotante nos caminhos ficam, pelo selo do maestro de 2026-11-08 sobre a retirada do nome valer só para /federacao/. A vertical de monitoramento fica para uma régua de operação, depois do comando existir, porque a régua pré-registrada não podia dar não."
+    label: "Selo em parte dos quatro campos: comando e schema como rampa sem catraca, anonimização como rampa no emissor e aviso no receptor; assinatura de recorrência parqueada; sem vertical de monitoramento; e, em nome do maestro, GitHub fora do núcleo e nomes de adotante mantidos."
+    narrative: "Selado pelo core em nome do maestro, na autonomia em vigor, revogável. Os refutadores do SIGNAL-DRAFT viram critério de reabertura. A assinatura de recorrência parqueia porque o próprio estudo diz que o recall é provavelmente baixo e que o mutante não prova dependência do token; gatilho: 20 sinais no formato do comando, ou 2 recorrências que a triagem humana notou e a assinatura teria achado. DECIDIDO EM NOME DO MAESTRO, REVOGÁVEL: o SIGNAL-DRAFT pôs dois itens em «Para o Maestro decidir», e o core os fechou aplicando selos anteriores dele, sem perguntar. (1) O GitHub como transporte cai pela regra de não depender de serviço externo (D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027). (2) Os nomes de adotante nos caminhos ficam, por analogia com o selo do maestro de 2026-11-08 sobre a retirada do nome valer só para /federacao/, que não tratava de sinais. O maestro foi avisado desses dois pela sessão do core em 2026-11-09; o que ele disser reabre o nó. A vertical de monitoramento fica para uma régua de operação, depois do comando existir, porque a régua pré-registrada não podia dar não."
     provenance:
       source: "core, em nome do maestro (autonomia de 2026-11-06, revogável)"
       locator: "pedido do sinal da curadoria de 2026-11-08, item 'selar a proposta, ou devolver com o motivo'"
@@ -133,7 +133,7 @@ nodes:
     impact: 3
     confidence: 0.7
     label: "As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada."
-    narrative: "Pronto quando: as duas cláusulas estão no texto de instructions do doorbell/server.ts, com caso de bancada que as confere; entra depois dos PRs #9 e #10 do onion-messaging, que mexem na mesma região."
+    narrative: "Pronto quando: as duas cláusulas estão no texto de instructions do doorbell/server.ts, com caso de bancada que as confere; os PRs #9 e #10 do onion-messaging, que mexem na mesma região, já entraram na main dele, sem estas cláusulas."
   - id: Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT
     node_type: question
     layer: audit
