@@ -3,7 +3,6 @@ branch: chore/inbox-triage-1108
 pr: pendente
 date: 2026-11-09
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 5
 findings_real: 5
 tokens: 0
