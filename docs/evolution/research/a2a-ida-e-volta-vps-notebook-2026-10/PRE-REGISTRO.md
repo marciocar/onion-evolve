@@ -437,3 +437,33 @@ mesma conta, canal nativo, Claude Code 2.1.319 na VPS e 2.1.321 no notebook (Win
 **Veredito do S8a, pela letra do P12: não cumprido, e a rodada é INCONCLUSIVA.** O passo do `/exit` mede o contrário
 do resultado esperado, e as duas esperas não rodaram. Não há SUCESSO. Nenhum modo de falha do §3 apareceu; a
 FALHA-APROVAÇÃO fica sem juiz, só com o relato. **A pergunta segue aberta:** o S8a não passou e o S4 segue parcial.
+
+#### 10c.1 · Correção e reteste de 2026-11-09
+
+**Acrescentado em 2026-11-09**, sem mudar critério nem modo de falha. O maestro pediu o reteste quando o critério
+foi posto a ele; a escolha, livre, foi «retestar», e nenhuma emenda foi feita.
+
+**Correção da tabela do §10c.** A primeira rodada com a máquina offline não teve 21 min. A foto mostra o
+processamento às 5:02 PM de São Paulo (20:02 UTC), e o «17h15» relatado estava errado. A espera foi de cerca de
+8 min, do envio às 19:54:10 UTC ao processamento. O «cerca de 30 s depois» e a linha do tempo de vida da fila, no
+§10c, partiam daquela hora errada e não valem; a medida da fila passa a ser a da rodada longa abaixo.
+
+| Rodada | Envio (UTC) · nonce | Religou (UTC) | Espera | Chegada | Uma vez | Não ação |
+|---|---|---|---|---|---|---|
+| 5 min | 21:07:46 · `rt-p12-20261109-fd6a3f20` | 21:13 (18h13, relato corrigido do maestro) | cerca de 5 min | logo depois, como mensagem retida; liberada pelo maestro; processada às 6:14 PM (21:14 UTC) | sim | sim: a sessão escreveu «Também não executei nenhuma ação» (foto) |
+| longa (30 min previstos) | 21:17:52 · `rt-p12-20261109-fafadcf5` | 22:01 (19h01) | cerca de 43 min | 10 s depois (relato) | não informado | não informado |
+
+Em todas as rodadas, o retorno do envio foi «delivery is queued until that machine reconnects», e a sessão levou
+cerca de 2 min para ficar offline depois de desligar a rede. A sessão encerrada segue recusando na hora.
+
+**Tempo de vida da fila, medido e não julgado:** a mensagem sobreviveu a cerca de 43 min de máquina offline.
+
+**Desvios, além dos do §10c.** A espera longa teve cerca de 43 min, no lugar de 30. O arranjo das duas rodadas é
+máquina offline com a sessão viva. O juiz `judge-attempts.sh` não tem saída registrada nesta rodada; a observação
+é foto e relato do maestro.
+
+**Veredito do S8a, pela letra do P12: segue não cumprido.** O S8 pede a mensagem enviada com a sessão de destino
+fechada chegando quando ela abre, e o passo 3 pede reabrir a sessão. Nenhuma rodada fez isso: com a sessão
+encerrada o envio é recusado, e não há o que chegar. O reteste melhora só o dado da máquina offline, cujas duas
+esperas enfileiraram e chegaram, e a rodada longa ainda não informa «uma vez» nem a não ação. A rodada segue
+INCONCLUSIVA e a pergunta segue aberta, sem SUCESSO declarado. Nenhum modo de falha do §3 apareceu.
