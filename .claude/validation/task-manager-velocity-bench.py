@@ -11,9 +11,11 @@ Saída: `ok   …` por caso verde, `FALHA (n):` no fim com `- …` por vermelho;
 """
 import datetime as dt
 import http.server
+import importlib.util
 import json
 import math
 import os
+import random
 import shutil
 import subprocess
 import sys
@@ -43,6 +45,8 @@ inverso\tyes\tinverso
 errado\tyes\terrado
 plano\tyes\tplano
 drift\tyes\tdrift
+curto\tyes\tcurto
+ruido\tyes\truido
 """
 LEAKY_TITLE = "[core · 09/11] alpha revisão SAC-99 em 2026-10-02"
 LEAKY_DESC = """Leva SAC-12 para produção.
@@ -70,9 +74,9 @@ def issue(n, title, created=None, queue=None, work=None, est=None, due=None, par
             "assignee": None, "labels": {"nodes": []}}
 
 
-LAMBDA_POINTS = [1, 2, 3, 5, 8, 13]
-LAMBDA_WORK = [2, 3, 7, 9, 18, 25]
-LAMBDA_QUEUE = [60, 50, 40, 30, 20, 10]
+LAMBDA_POINTS = [1, 2, 3, 5, 8, 13] * 2 + [1, 2, 3, 5]
+LAMBDA_WORK = [p * r * (1 + k / 100) for k, (p, r) in enumerate(zip(LAMBDA_POINTS, [2, 1.5, 7 / 3, 1.8, 2.25, 25 / 13] * 3))]
+LAMBDA_QUEUE = ([60, 50, 40, 30, 20, 10] * 3)[:16]
 
 
 def conformal_k(n, q):
@@ -95,6 +99,17 @@ def drift_population():
             for k, p in enumerate([1, 2, 3, 5, 8, 13] * 3)]
 
 
+def lambda_population():
+    """Pontos ordenam a duração, fila anticorrelacionada, e cada uma fecha antes da próxima nascer."""
+    return [issue(1200 + k, f"lambda {k}", created=NOW_H - 4000 + 240 * k, queue=LAMBDA_QUEUE[k], work=LAMBDA_WORK[k], est=pts) for k, pts in enumerate(LAMBDA_POINTS)]
+
+
+def partial_drift_population():
+    """Estável e depois cada issue pior que todas: a categoria reprova, mas pode sumir na média do time."""
+    pts = ([1, 2, 3, 5, 8, 13] * 3)[:16]
+    return [issue(300 + k, f"drift {k}", created=-90000 + 3000 * k, queue=10 if k < 12 else 10 * 5 ** (k - 11), work=2 * p, est=p) for k, p in enumerate(pts)]
+
+
 def seed():
     rows = []
     for k in range(1, 7):                          # alpha: 2 pontos; fila 10..60 h; trabalho 2..12 h (h/ponto 1..6)
@@ -115,8 +130,11 @@ def seed():
     rows.append(issue(39, "iota do campo", created=315, queue=1, work=3, est=2, due="2026-11-30"))
     for k, n in enumerate(range(40, 44)):          # kappa: semanas distintas para a velocidade
         rows.append(issue(n, f"kappa {n}", created=-1200 + 168 * k, queue=1, work=1, est=5))
-    for k, pts in enumerate(LAMBDA_POINTS):        # lambda: pontos ordenam a duração; fila anticorrelacionada com o trabalho
-        rows.append(issue(61 + k, f"lambda {k}", created=340 + 3 * k, queue=LAMBDA_QUEUE[k], work=LAMBDA_WORK[k], est=pts))
+    rows += lambda_population()
+    for k, (pts, w) in enumerate(zip([1, 2, 3, 5, 8, 13], [2, 4, 6, 10, 16, 26])):   # curto: sinal bom, nenhuma fechou antes de a outra nascer
+        rows.append(issue(1400 + k, f"curto {k}", created=380 + k, queue=1, work=w, est=pts))
+    for k, (pts, w) in enumerate(zip([1, 2, 3, 5, 8, 13], [2, 4, 7, 5, 16, 20])):    # ruido: ordena bem por acaso, a permutação não sustenta
+        rows.append(issue(1450 + k, f"ruido {k}", created=-3000 + 3 * k, queue=1, work=w, est=pts))
     for name, works, base_h in (("inverso", [80, 60, 40, 30, 10, 5], 100), ("errado", [0.1, 20, 0.5, 40, 3, 90], 110), ("plano", [10, 10.1, 10.2, 10.3, 10.4, 10.5], 120)):
         for k, pts in enumerate([1, 2, 3, 5, 8, 13]):
             rows.append(issue(1000 + base_h + k, f"{name} {k}", created=-2000 - base_h * 20 + 7 * k, queue=1 + k * 0.1, work=works[k], est=pts))
@@ -133,6 +151,9 @@ def seed():
     mother = issue(85, "lambda mãe", created=431, state=("Todo", "unstarted"), est=13)
     mother["children"] = {"nodes": [{"identifier": "SAC-86", "state": {"type": "started"}}]}
     rows.append(mother)
+    closed_mother = issue(87, "lambda mãe de filhas fechadas", created=NOW_H, state=("Todo", "unstarted"), est=8)
+    closed_mother["children"] = {"nodes": [{"identifier": "SAC-88", "state": {"type": "completed"}}]}
+    rows.append(closed_mother)
     return {"issues": rows, "log": [], "force": None,
             "team": {"issueEstimationType": "fibonacci", "issueEstimationExtended": True, "issueEstimationAllowZero": False}}
 
@@ -505,7 +526,8 @@ def c_loo_error(d):
 
 
 def c_spearman(d):
-    with Fake() as f:
+    rows = [issue(1 + k, f"lambda {k}", created=10 * k, queue=1, work=2 * p + k, est=p) for k, p in enumerate([1, 2, 3, 5, 8, 13])]
+    with Fake(rows=rows) as f:
         _, out, err = report(d, f)
         r = cat(out, "lambda")["points_vs_hours_spearman"]
         return "" if r == 1.0 else f"spearman: {r}"
@@ -591,13 +613,17 @@ def c_archived_counted(d):
 
 def c_batch_chain(d):
     rows = [issue(1 + k, f"zeta {k}", created=100, queue=1, completed_at=110 + k / 3600) for k in range(3)]
+    rows += [issue(10 + k, f"iota {k}", created=150, queue=1, completed_at=160 + k / 100) for k in range(3)]
     rows += [issue(5, "theta par", created=200, queue=1, completed_at=210), issue(6, "theta par 2", created=200, queue=1, completed_at=210 + 1 / 3600)]
     rows[1]["completedAt"], rows[2]["completedAt"] = "2026-11-05T14:01:00.000Z", "2026-11-05T14:01:01.000Z"
     rows[0]["completedAt"] = "2026-11-05T14:00:59.000Z"
+    rows[3]["completedAt"], rows[4]["completedAt"], rows[5]["completedAt"] = "2026-11-06T14:00:20.000Z", "2026-11-06T14:00:50.000Z", "2026-11-06T14:01:20.000Z"
     with Fake(rows=rows) as f:
         _, out, err = report(d, f)
         if cat(out, "zeta")["excluded"].get("batch_closed") != 3:
             return f"cadeia que cruza o minuto: {cat(out, 'zeta')['excluded']}"
+        if cat(out, "iota")["excluded"].get("batch_closed") != 3:
+            return f"cadeia de 30 s: {cat(out, 'iota')['excluded']}"
         return "" if "batch_closed" not in cat(out, "theta")["excluded"] else "par virou lote"
 
 
@@ -650,6 +676,61 @@ def c_real_clock(d):
         return "" if rc == 0 and out["generated_for"] == today else f"{out and out['generated_for']} != {today}"
 
 
+def c_real_time_of_day(d):
+    with Fake() as f, Meter(d) as m:
+        rc, out, err = parse(m.raw(f, "report", "--categories", m.rules))
+        at = dt.datetime.fromisoformat(out["generated_at"])
+        skew = abs((dt.datetime.now(dt.timezone.utc) - at).total_seconds())
+        return "" if skew < 300 else f"generated_at a {skew:.0f} s do relógio real"
+
+
+def c_temporal_no_leak(d):
+    rows = [issue(1 + k, f"theta {k}", created=1000 * k, queue=0.5, work=0.5) for k in range(4)]
+    rows.append(issue(5, "theta longa", created=4000, queue=1, completed_at=9000))
+    rows.append(issue(6, "theta depois", created=5000, queue=0.5, work=0.5))
+    rows.append(issue(7, "theta final", created=9100, queue=0.5, work=0.5))
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        n = out["backtest"]["temporal"]["history_only"]["n"]
+        return "" if n == 1 else f"temporal usou quem ainda não tinha fechado: n={n}"
+
+
+def censored_rows():
+    rows = [issue(1 + k, f"alpha {k}", created=10 * k, queue=q, work=1) for k, q in enumerate([9, 19, 29, 39, 49, 59])]
+    rows.append(issue(7, "alpha sem início", created=100, completed_at=300))
+    rows.append(issue(8, "alpha aberta velha", created=NOW_H - 100, state=("Todo", "unstarted")))
+    rows.append(issue(9, "alpha aberta nova", created=NOW_H - 1, state=("Todo", "unstarted")))
+    return rows
+
+
+def c_coverage_with_open(d):
+    with Fake(rows=censored_rows()) as f:
+        _, out, err = report(d, f)
+        got = out["backtest"]["loo"]["history_only"]["with_open"]
+        want = {"completed_hit": 5, "completed_miss": 2, "open_overdue": 1, "open_on_time": 1, "coverage_counting_overdue_open": 0.625, "coverage_open_on_time_as_hit": 0.667}
+        return "" if got == want else f"{got}"
+
+
+def c_coverage_temporal_filter(d):
+    with Fake(rows=censored_rows()) as f:
+        _, out, err = report(d, f)
+        got = out["backtest"]["temporal"]["history_only"]["with_open"]
+        return "" if got["completed_hit"] + got["completed_miss"] <= 3 else f"temporal julgou {got}"
+
+
+def c_bias_in_limits(d):
+    with Fake(rows=censored_rows()) as f:
+        _, out, err = report(d, f)
+        text = " ".join(out["limits"])
+        return "" if "viés de sobrevivente" in text and "0.625" in text and "0.667" in text else text[-300:]
+
+
+def c_not_measured_text(d):
+    with Fake(rows=six_distinct()) as f, Meter(d) as m:
+        p = m.raw(f, "report", "--categories", m.rules, "--now", NOW, "--text")
+        return "" if p.returncode == 0 and "temporal/history_only: não medido (n=0, mínimo 10)" in p.stdout else p.stdout[-400:]
+
+
 def c_bracket_stripped(d):
     rows = [issue(1, "[alpha · 11/11] beta item", created=100, queue=1, work=2), issue(2, "[maestro · 11/11] alpha", created=110)]
     with Fake(rows=rows) as f:
@@ -687,7 +768,7 @@ def c_overlay_declared(d):
     with Fake() as f, Meter(d) as m:
         path = os.path.join(m.tmp, "o.json")
         with open(path, "w", encoding="utf-8") as fh:
-            json.dump({"SAC-61": 1}, fh)
+            json.dump({"SAC-1200": 1}, fh)
         for category, want_rc in (("lambda", 0), ("beta", 3)):
             rc, out, err = m.run(f, "propose", "--points", "8", "--category", category, "--estimates-overlay", path)
             if rc != want_rc or out.get("estimates_overlay", {}).get("entries") != 1:
@@ -696,8 +777,12 @@ def c_overlay_declared(d):
         return "" if "estimates_overlay" not in out else "overlay declarado sem overlay"
 
 
+def six_distinct():
+    return [issue(1 + k, f"lambda {k}", created=10 * k, queue=q, work=w, est=2) for k, (q, w) in enumerate([(60, 2), (50, 3), (40, 7), (30, 9), (20, 18), (10, 25)])]
+
+
 def c_backtest_published(d):
-    with Fake() as f:
+    with Fake(rows=six_distinct()) as f:
         _, out, err = report(d, f)
         loo = out["backtest"]["loo"]["history_only"]["per_category"]["lambda"]
         return "" if loo == {"n": 6, "covered_by_due": 5, "inside_band": 3} else f"{loo}"
@@ -720,7 +805,9 @@ def c_propose_history(d):
         h = out["basis"]["hours_from_now"]
         if abs(h["due"] - expected_hours(8, .8)) > 0.01 or abs(h["likely"] - expected_hours(8, .5)) > 0.01:
             return f"horas {h}"
-        if p["due_percentile"] != 80 or out["basis"]["sample_used"] != 6 or p["range"]["high_is_sample_max"] is not True:
+        if any(w["code"] == "points_extrapolation" for w in out["warnings"]):
+            return "extrapolação avisada dentro da escala"
+        if p["due_percentile"] != 80 or out["basis"]["sample_used"] != 16 or p["range"]["high_is_sample_max"] is not False:
             return f"declaração: {p} {out['basis']['sample_used']}"
     return ""
 
@@ -762,7 +849,10 @@ def c_propose_started_old(d):
 def c_propose_aged(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--issue", "SAC-83")
-        return "" if rc == 3 and out["status"] == "beyond_history" and out.get("if_started_now") else f"rc={rc} {out}"
+        work = sorted(3 * w / p for w, p in zip(LAMBDA_WORK, LAMBDA_POINTS))[conformal_k(16, .8) - 1]
+        if rc != 3 or out["status"] != "beyond_history" or out["proposal"] is not None or "if_started_now" in out:
+            return f"rc={rc} {out}"
+        return "" if abs(out["work_hours_if_started_now"] - work) < 0.01 else f"horas {out['work_hours_if_started_now']}, esperado {work}"
 
 
 def c_propose_closed(d):
@@ -778,6 +868,38 @@ def c_propose_parent(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--issue", "SAC-85")
         return "" if rc == 3 and out["status"] == "not_applicable" and out["open_children"] == ["SAC-86"] else f"rc={rc} {out}"
+
+
+def c_propose_mother_closed(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--issue", "SAC-87")
+        return "" if rc == 0 and out["status"] == "proposed" else f"rc={rc} {out}"
+
+
+def c_extrapolation(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--points", "21", "--category", "lambda")
+        return "" if rc == 0 and any(w["code"] == "points_extrapolation" for w in out["warnings"]) else f"rc={rc} {out and out['warnings']}"
+
+
+def c_signal_noise(d):
+    return signal_refused(d, "ruido", "not_significant")
+
+
+def c_null_family_error(d):
+    # pontos sorteados, independentes da duração: 8 categorias por sorteio, nenhuma calibração real por trás
+    spec = importlib.util.spec_from_file_location("vm_bench", os.path.join(d, "velocity-meter.py"))
+    vm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(vm)
+    trials, any_pass = 100, 0
+    for t in range(trials):
+        g = random.Random(t)
+        for _ in range(8):
+            pairs = [(g.choice([1, 2, 3, 5, 8, 13]), g.lognormvariate(0, 1.2)) for _ in range(9)]
+            if vm.points_signal(pairs, vm.leave_one_out_error(pairs), 0.05 / 8, 8)["ok"]:
+                any_pass += 1
+                break
+    return "" if any_pass <= 15 else f"falso positivo familiar {any_pass}/{trials}"
 
 
 def signal_refused(d, category, reason):
@@ -808,10 +930,20 @@ def c_miscalibrated(d):
         return "" if rc == 3 and out["status"] == "miscalibrated" and out["backtest"]["n"] >= 10 else f"rc={rc} {out}"
 
 
-def c_backtest_small_warned(d):
+def c_not_measured(d):
     with Fake() as f:
-        rc, out, err = propose(d, f, "--points", "8", "--category", "lambda")
-        return "" if rc == 0 and any(w["code"] == "backtest_small" for w in out["warnings"]) else f"rc={rc} {out and out['warnings']}"
+        rc, out, err = propose(d, f, "--points", "3", "--category", "curto")
+        return "" if rc == 3 and out["status"] == "calibration_not_measured" and out["proposal"] is None and out["backtest"]["n"] == 0 else f"rc={rc} {out}"
+
+
+def c_gate_by_category(d):
+    with Fake(rows=partial_drift_population() + lambda_population()) as f:
+        _, rep_out, _ = report(d, f)
+        team = rep_out["backtest"]["temporal"]["with_points"]["coverage_due"]
+        if team is None or team < 0.7:
+            return f"fixture: time cobre {team}, devia passar"
+        rc, out, err = propose(d, f, "--points", "3", "--category", "drift")
+        return "" if rc == 3 and out["status"] == "miscalibrated" else f"rc={rc} {out}"
 
 
 def c_propose_insufficient(d):
@@ -999,7 +1131,18 @@ CASES = [
     ("s-err", "erro alto: rc 3", c_signal_error),
     ("s-base", "pior que ignorar os pontos: rc 3", c_signal_baseline),
     ("s-drift", "backtest temporal abaixo do piso: rc 3", c_miscalibrated),
-    ("s-small", "backtest pequeno é avisado", c_backtest_small_warned),
+    ("s-small", "backtest temporal da categoria não medido: rc 3", c_not_measured),
+    ("s-cat", "piso temporal julga a categoria, não o time", c_gate_by_category),
+    ("s-noise", "ordem por acaso não passa na permutação", c_signal_noise),
+    ("s-fp", "erro familiar sob pontos sorteados", c_null_family_error),
+    ("p-mclosed", "mãe de filhas fechadas recebe data", c_propose_mother_closed),
+    ("p-extra", "pontos fora do histórico são avisados", c_extrapolation),
+    ("r-now2", "sem --now vale o instante, não a meia-noite", c_real_time_of_day),
+    ("r-tleak", "corte temporal só usa quem já fechou", c_temporal_no_leak),
+    ("r-open-c", "cobertura com as abertas e as sem relógio", c_coverage_with_open),
+    ("r-open-t", "cobertura com abertas respeita o corte temporal", c_coverage_temporal_filter),
+    ("r-bias", "tamanho do viés no limits", c_bias_in_limits),
+    ("r-nm", "n abaixo do mínimo sai 'não medido'", c_not_measured_text),
     ("p-insuf", "amostra insuficiente: rc 3 e sem data", c_propose_insufficient),
     ("p-nocal", "categoria não calibrada: rc 3", c_propose_not_calibrated),
     ("p-nopts", "issue sem pontos: rc 3", c_propose_no_points),
@@ -1050,7 +1193,7 @@ MUTANTS = [
     (V, 'elif row["completed"] is None or row["completed"] <= started:', "elif False:", "r-excl"),
     (V, 'BATCH_CLOSE_SIZE = 3 ', "BATCH_CLOSE_SIZE = 2 ", "r-batch"),
     (V, 'BATCH_CLOSE_SIZE = 3 ', "BATCH_CLOSE_SIZE = 4 ", "r-excl"),
-    (V, 'BATCH_CLOSE_SECONDS = 60 ', "BATCH_CLOSE_SECONDS = 0 ", "r-batch"),
+    (V, 'BATCH_CLOSE_SECONDS = 60 ', "BATCH_CLOSE_SECONDS = 1 ", "r-batch"),
     (V, 'MIN_SAMPLE = 5 ', "MIN_SAMPLE = 3 ", "r-sample"),
     (V, 'SMALL_SAMPLE = 15 ', "SMALL_SAMPLE = 6 ", "r-sample"),
     (V, "others = [h / p for j, (p, h) in enumerate(pairs) if j != k]", "others = [h / p for j, (p, h) in enumerate(pairs)]", "r-loo"),
@@ -1095,17 +1238,37 @@ MUTANTS = [
     (V, '    date_for = lambda h: local_date(now + dt.timedelta(hours=h)).isoformat()', '    date_for = lambda h: local_date(now.replace(hour=0, minute=0) + dt.timedelta(hours=h)).isoformat()', "p-tod"),
     (V, 'remaining = sorted(x - elapsed for x in scaled if x > elapsed)', 'remaining = sorted(scaled)', "p-started"),
     (V, 'remaining = sorted(x - elapsed for x in scaled if x > elapsed)', 'remaining = sorted(x - elapsed for x in scaled)', "p-old"),
-    (V, '        extra = {"if_started_now"', '        extra = {"_": 1} or {"if_started_now"', "p-aged"),
+    (V, 'extra = {"work_hours_if_started_now": round3(work_only)}', 'extra = {"work_hours_if_started_now": round3(work_only + 1)}', "p-aged"),
+    (V, 'for r in history], DUE_QUANTILE)[0]\n        extra', 'for r in history], HIGH_QUANTILE)[0]\n        extra', "p-aged"),
+    (V, '.get("nodes", []) if (c.get("state") or {}).get("type") not in ("completed", "canceled")]', '.get("nodes", [])]', "p-mclosed"),
+    (V, '    if not known[0] <= points <= known[-1]:', "    if False:", "p-extra"),
+    (V, '    if not known[0] <= points <= known[-1]:', "    if True:", "p-hist"),
+    (V, 'and (not temporal or x["completed"] < held["created"])]', 'and (not temporal or x["created"] < held["created"])]', "r-tleak"),
+    (V, 'FAMILY_ALPHA = 0.05 ', "FAMILY_ALPHA = 1.0 ", "s-noise"),
+    (V, 'return FAMILY_ALPHA / max(tested, 1), tested', 'return FAMILY_ALPHA, tested', "s-noise"),
+    (V, '    if p_value is not None and p_value > alpha:', "    if False:", "s-noise"),
+    (V, '    if p_value is not None and p_value > alpha:', "    if False:", "s-fp"),
+    (V, '        return dt.datetime.now(LOCAL[0])', "        return dt.datetime.now(LOCAL[0]).replace(hour=0, minute=0, second=0, microsecond=0)", "r-now2"),
+    (V, 'late = hours(r["created"], now) > due', "late = False", "r-open-c"),
+    (V, 'overdue, on_time = overdue + late, on_time + (not late)', "overdue, on_time = overdue, on_time + (not late)", "r-open-c"),
+    (V, 'if r["calibrate"] and r["exclusion"] != "rollup_parent" and r["completed"]:', 'if r["work_h"] is not None:', "r-open-c"),
+    (V, 'if x["id"] != row["id"] and (not temporal or x["completed"] < row["created"])]', 'if x["id"] != row["id"]]', "r-open-t"),
+    (V, 'if x["id"] != row["id"] and (not temporal or x["completed"] < row["created"])]', 'if (not temporal or x["completed"] < row["created"])]', "r-open-c"),
+    (V, '"limits": limits_with_bias(backtests)}\n', '"limits": LIMITS}\n', "r-bias"),
+    (V, '            if b["status"] == "not_measured":', "            if False:", "r-nm"),
+    (V, '"status": "measured" if n >= BACKTEST_MIN else "not_measured"', '"status": "measured"', "r-nm"),
+    (V, 'backtest(rows, window, True, True)["per_category"].get(category, {"n": 0, "covered_by_due": 0, "inside_band": 0})', '(lambda b: {k: b[k] for k in ("n", "covered_by_due", "inside_band")})(backtest(rows, window, True, True))', "s-cat"),
     (V, '    if kind in ("completed", "canceled"):', '    if kind in ("canceled",):', "p-closed"),
     (V, '    if kind in ("completed", "canceled"):', '    if kind in ("completed",):', "p-closed"),
     (V, '    if opened:\n', "    if False:\n", "p-mother"),
     (V, '    if not signal["ok"]:\n        return refusal', '    if False:\n        return refusal', "s-inv"),
     (V, '    elif rho is None:\n', '    elif False:\n', "s-var"),
     (V, 'MIN_SPEARMAN = 0.3 ', "MIN_SPEARMAN = -2 ", "s-inv"),
+    (V, 'hits += sum(a * b for a, b in zip(centered, shuffled)) >= observed - 1e-9', 'hits += 0', "s-noise"),
     (V, '    elif err is None or err > MAX_ERROR:', "    elif False:", "s-err"),
     (V, '    elif base is not None and err > base:', "    elif False:", "s-base"),
-    (V, '    elif check["coverage_due"] < BACKTEST_FLOOR:', "    elif False:", "s-drift"),
-    (V, 'BACKTEST_MIN = 10 ', "BACKTEST_MIN = 0 ", "s-small"),
+    (V, '    if check["coverage_due"] < BACKTEST_FLOOR:', "    if False:", "s-drift"),
+    (V, '    if check["n"] < BACKTEST_MIN:\n        return refusal', '    if False:\n        return refusal', "s-small"),
     (V, '    if len(history) < MIN_SAMPLE:\n        return refusal', '    if False:\n        return refusal', "p-insuf"),
     (V, '    if len(remaining) < MIN_SAMPLE:', "    if False:", "p-old"),
     (V, '    if not stats["calibrate"]:', "    if False:", "p-nocal"),

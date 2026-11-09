@@ -20,8 +20,9 @@
 #
 # Saída: JSON em stdout (report --text: tabela) · erros em pt-BR em stderr.
 # Códigos: 0 ok · 1 erro do provedor (o do tm.sh) · 2 uso/configuração · 3 NÃO há data proposta, com `status` e
-# motivo no JSON: insufficient_sample, no_points_signal, miscalibrated, beyond_history ou not_applicable. Data sem
-# sustentação seria a data de agente que esta ferramenta aposenta.
+# motivo no JSON: insufficient_sample, no_points_signal, calibration_not_measured, miscalibrated, beyond_history ou
+# not_applicable. rc 3 nunca traz data: beyond_history de issue não iniciada só traz `work_hours_if_started_now`, horas de
+# trabalho P80, condicionais a iniciar agora. Data sem sustentação seria a data de agente que esta ferramenta aposenta.
 #
 # Como sai a data: cada issue parecida do histórico vira um cenário (fila dela + pontos pedidos × horas por ponto dela), e a
 # data é a estatística de ordem conformal P80 desses cenários. O `report` publica o backtest dessa mesma conta, em
@@ -33,7 +34,8 @@
 #   · issue sem startedAt (foi de backlog a concluída) fica fora do tempo de trabalho e é contada;
 #   · categoria é regex sobre o título: classifica o que o título diz, não o que a issue foi;
 #   · a data é corrida (sem feriado nem fim de semana) e a fila ignora prioridade;
-#   · os limiares de amostra (5 e 15), de sinal (spearman 0,3, erro 1,0) e de cobertura (0,7) são convenção, não medição;
+#   · os limiares de amostra (5 e 15), de sinal (spearman 0,3, erro 1,0, erro familiar 5%) e de cobertura (0,7, n≥10 por
+#     categoria) são convenção, não medição. O erro familiar foi medido: ver a nota de MEDIDO em FAMILY_ALPHA;
 #   · a fila histórica só tem quem foi iniciado: quem segue esperando não entra, e isso encurta a fila.
 import argparse
 import bisect
@@ -64,9 +66,14 @@ BATCH_CLOSE_SIZE = 3     # a partir deste tamanho, o carimbo é da arrumação d
 VELOCITY_WEEKS = 8
 LOW_QUANTILE, LIKELY_QUANTILE, DUE_QUANTILE, HIGH_QUANTILE = 0.25, 0.5, 0.8, 0.9
 MIN_SPEARMAN = 0.3       # abaixo disto os pontos não ordenam a duração
+# MEDIDO 2026-11-09, 400 sorteios de pontos independentes da duração sobre as 53 issues reais com relógio: sinal aceito em 0,21% das
+# categorias e em 1,5% dos sorteios ao menos uma (antes da permutação: 12,8% e 63%).
+FAMILY_ALPHA = 0.05      # falso positivo ao menos uma categoria, dividido (Bonferroni) entre as categorias testadas
+PERMUTATION_DRAWS = 2000
+PERMUTATION_SEED = 20261109
 MAX_ERROR = 1.0          # erro mediano relativo acima disto não sustenta prazo
-BACKTEST_MIN = 10        # abaixo disto o backtest temporal só avisa
-BACKTEST_FLOOR = 0.7     # cobertura mínima do prazo P80 no backtest temporal
+BACKTEST_MIN = 10        # abaixo disto, na categoria, o backtest temporal é «não medido» e não há data
+BACKTEST_FLOOR = 0.7     # cobertura mínima do prazo P80 no backtest temporal da categoria
 LARGE_OTHER = 0.2
 DESCRIPTION_CAP = 2500
 
@@ -301,8 +308,30 @@ def spearman(pairs):
     return round3(cov / (sx * sy)) if sx and sy else None
 
 
-def points_signal(pairs, error):
-    """Contagem não é sinal: pontos só dão data se ordenam a duração e erram menos do que ignorá-los."""
+def permutation_p(pairs):
+    """P unilateral do spearman contra pontos embaralhados. Spearman 0,3 com n<15 aparece em puro ruído."""
+    x, y = ranks([p for p, _ in pairs]), ranks([h for _, h in pairs])
+    mx = sum(x) / len(x)
+    centered = [a - mx for a in x]
+    observed = sum(a * b for a, b in zip(centered, y))
+    rng, shuffled, hits = random.Random(PERMUTATION_SEED), list(y), 0
+    for _ in range(PERMUTATION_DRAWS):
+        rng.shuffle(shuffled)
+        hits += sum(a * b for a, b in zip(centered, shuffled)) >= observed - 1e-9
+    return (hits + 1) / (PERMUTATION_DRAWS + 1)
+
+
+def family_alpha(rows, window):
+    """Cada categoria com amostra é um teste; o nível se divide entre elas para o erro familiar ficar em FAMILY_ALPHA."""
+    tested = 0
+    for category in {r["category"] for r in rows if r["calibrate"]}:
+        _, recent = members_of(rows, category, window)
+        tested += sum(1 for r in recent if r["work_h"] is not None and r["points"]) >= MIN_SAMPLE
+    return FAMILY_ALPHA / max(tested, 1), tested
+
+
+def points_signal(pairs, error, alpha=FAMILY_ALPHA, tested=1):
+    """Contagem não é sinal: pontos só dão data se ordenam a duração, erram menos do que ignorá-los e passam na permutação."""
     rho = spearman(pairs)
     err, base = error["median_abs_pct_error"], error["baseline_abs_pct_error"]
     if len(pairs) < MIN_SAMPLE:
@@ -317,8 +346,12 @@ def points_signal(pairs, error):
         reason = "worse_than_ignoring_points"
     else:
         reason = None
+    p_value = permutation_p(pairs) if reason is None else None
+    if p_value is not None and p_value > alpha:
+        reason = "not_significant"
     return {"ok": reason is None, "reason": reason, "spearman": rho, "median_abs_pct_error": err, "baseline_abs_pct_error": base,
-            "min_spearman": MIN_SPEARMAN, "max_error": MAX_ERROR}
+            "permutation_p": round3(p_value) if p_value is not None else None, "alpha": round(alpha, 5), "categories_tested": tested,
+            "family_alpha": FAMILY_ALPHA, "min_spearman": MIN_SPEARMAN, "max_error": MAX_ERROR}
 
 
 def sample_level(n):
@@ -397,14 +430,53 @@ def backtest(rows, window, use_points, temporal):
         if c_n:
             per_category[category] = {"n": c_n, "covered_by_due": c_cov, "inside_band": c_in}
         n, covered, inside = n + c_n, covered + c_cov, inside + c_in
-    return {"n": n, "due_percentile": int(DUE_QUANTILE * 100), "covered_by_due": covered, "coverage_due": round3(covered / n) if n else None,
+    return {"n": n, "status": "measured" if n >= BACKTEST_MIN else "not_measured", "min_n": BACKTEST_MIN, "due_percentile": int(DUE_QUANTILE * 100), "covered_by_due": covered, "coverage_due": round3(covered / n) if n else None,
             "expected_due": DUE_QUANTILE, "inside_band": inside, "coverage_band": round3(inside / n) if n else None,
             "expected_band": round3(HIGH_QUANTILE - LOW_QUANTILE), "per_category": per_category}
 
 
-def all_backtests(rows, window):
-    return {"loo": {"history_only": backtest(rows, window, False, False), "with_points": backtest(rows, window, True, False)},
-            "temporal": {"history_only": backtest(rows, window, False, True), "with_points": backtest(rows, window, True, True)}}
+def coverage_with_open(rows, open_rows, now, window, temporal):
+    """A cobertura só de quem foi iniciado e concluiu é viés de sobrevivente: aqui entram as sem relógio e as abertas."""
+    history = {c: clocked(members_of(rows, c, window)[1], False) for c in {r["category"] for r in rows if r["calibrate"]}}
+
+    def predicted(row):
+        others = [x for x in history.get(row["category"], []) if x["id"] != row["id"] and (not temporal or x["completed"] < row["created"])]
+        return conformal(simulated_totals(others, None), DUE_QUANTILE)[0] if len(others) >= MIN_SAMPLE else None
+
+    hit = miss = overdue = on_time = 0
+    for r in rows:
+        if r["calibrate"] and r["exclusion"] != "rollup_parent" and r["completed"]:
+            due = predicted(r)
+            if due is not None:
+                real = hours(r["created"], r["completed"])
+                hit, miss = hit + (real <= due), miss + (real > due)
+    for r in open_rows:
+        if r["calibrate"] and r["exclusion"] != "rollup_parent":
+            due = predicted(r)
+            if due is not None:
+                late = hours(r["created"], now) > due
+                overdue, on_time = overdue + late, on_time + (not late)
+    judged = hit + miss + overdue
+    return {"completed_hit": hit, "completed_miss": miss, "open_overdue": overdue, "open_on_time": on_time,
+            "coverage_counting_overdue_open": round3(hit / judged) if judged else None,
+            "coverage_open_on_time_as_hit": round3((hit + on_time) / (judged + on_time)) if judged + on_time else None}
+
+
+def all_backtests(rows, open_rows, now, window):
+    out = {"loo": {"history_only": backtest(rows, window, False, False), "with_points": backtest(rows, window, True, False)},
+           "temporal": {"history_only": backtest(rows, window, False, True), "with_points": backtest(rows, window, True, True)}}
+    for cut, temporal in (("loo", False), ("temporal", True)):
+        out[cut]["history_only"]["with_open"] = coverage_with_open(rows, open_rows, now, window, temporal)
+    return out
+
+
+def limits_with_bias(backtests):
+    loo = backtests["loo"]["history_only"]
+    extra = loo["with_open"]
+    if loo["coverage_due"] is None or extra["coverage_counting_overdue_open"] is None:
+        return list(LIMITS)
+    return LIMITS + [f"viés de sobrevivente: o prazo P80 cobre {loo['coverage_due']} de quem foi iniciado e concluiu; somando as sem relógio e as abertas "
+                     f"que passaram do previsto, {extra['coverage_counting_overdue_open']}; contando também as abertas no prazo como acerto, {extra['coverage_open_on_time_as_hit']}"]
 
 
 def category_stats(rows, category, window, today):
@@ -419,7 +491,8 @@ def category_stats(rows, category, window, today):
     pairs = [(r["points"], r["work_h"]) for r in recent if r["work_h"] is not None and r["points"]]
     level = sample_level(len(pairs))
     error = leave_one_out_error(pairs)
-    signal = points_signal(pairs, error)
+    alpha, tested = family_alpha(rows, window)
+    signal = points_signal(pairs, error, alpha, tested)
     if level == "none":
         warnings.append({"code": "no_estimates", "message": "nenhuma issue com pontos e relógio válido: não há calibração"})
     elif level == "insufficient":
@@ -460,13 +533,14 @@ def build_report(rows, open_rows, now, window, rules, project, overlay):
             excluded[r["exclusion"]] = excluded.get(r["exclusion"], 0) + 1
     if excluded.get("no_started_at"):
         warnings.append({"code": "survivors_only", "message": f"{excluded['no_started_at']} de {len(rows)} concluídas sem startedAt: a calibração usa só as {sum(1 for r in rows if r['work_h'] is not None)} com relógio válido"})
+    backtests = all_backtests(rows, open_rows, now, window)
     return {"generated_for": today.isoformat(), "project": project, "completed": len(rows),
             "with_points": sum(1 for r in rows if r["points"]), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None),
             "with_due": sum(1 for r in rows if r["due"]), "excluded": excluded, "overlay_entries": len(overlay),
             "calibration_population": {"completed": len(rows), "with_work_clock": sum(1 for r in rows if r["work_h"] is not None), "without_started_at": excluded.get("no_started_at", 0)},
-            "team_velocity": velocity(rows, today), "deadline": deadline(rows), "backtest": all_backtests(rows, window),
+            "generated_at": now.isoformat(), "team_velocity": velocity(rows, today), "deadline": deadline(rows), "backtest": backtests,
             "open": {"count": len(open_rows), "with_points": sum(1 for r in open_rows if r["points"]), "other": len(open_others), "other_titles": open_others},
-            "categories": categories, "uncategorized_titles": others, "warnings": warnings, "limits": LIMITS}
+            "categories": categories, "uncategorized_titles": others, "warnings": warnings, "limits": limits_with_bias(backtests)}
 
 
 def render_text(report):
@@ -484,8 +558,11 @@ def render_text(report):
     for kind, label in (("loo", "leave-one-out"), ("temporal", "temporal")):
         for mode in ("history_only", "with_points"):
             b = report["backtest"][kind][mode]
-            lines.append(f"backtest {label}/{mode}: n={b['n']}, cobre o prazo P{b['due_percentile']} em {fmt(b['coverage_due'])} (esperado {b['expected_due']}), "
-                         f"na faixa {fmt(b['coverage_band'])} (esperado {b['expected_band']})")
+            if b["status"] == "not_measured":
+                lines.append(f"backtest {label}/{mode}: não medido (n={b['n']}, mínimo {b['min_n']})")
+            else:
+                lines.append(f"backtest {label}/{mode}: n={b['n']}, cobre o prazo P{b['due_percentile']} em {fmt(b['coverage_due'])} (esperado {b['expected_due']}), "
+                             f"na faixa {fmt(b['coverage_band'])} (esperado {b['expected_band']})")
     lines += [f"aviso: {w['message']}" for w in report["warnings"]]
     lines += [f"teto: {x}" for x in report["limits"]]
     return "\n".join(lines)
@@ -507,7 +584,7 @@ def issue_refusal(issue):
     return None
 
 
-def propose_date(rows, now, window, points, category, issue):
+def propose_date(rows, open_rows, now, window, points, category, issue):
     stats = category_stats(rows, category, window, local_date(now))
     if not stats["completed"]:
         return refusal(f"categoria '{category}' sem nenhuma issue concluída no histórico", category=category)
@@ -520,12 +597,16 @@ def propose_date(rows, now, window, points, category, issue):
     signal = stats["points_signal"]
     if not signal["ok"]:
         return refusal(f"pontos sem sinal em '{category}': {signal['reason']}", status="no_points_signal", category=category, signal=signal)
-    check = backtest(rows, window, True, True)
+    per_category = backtest(rows, window, True, True)["per_category"].get(category, {"n": 0, "covered_by_due": 0, "inside_band": 0})
+    check = {**per_category, "coverage_due": round3(per_category["covered_by_due"] / per_category["n"]) if per_category["n"] else None}
     warnings = list(stats["warnings"])
     if check["n"] < BACKTEST_MIN:
-        warnings.append({"code": "backtest_small", "message": f"backtest temporal com n={check['n']}: abaixo de {BACKTEST_MIN}, a cobertura não é julgada"})
-    elif check["coverage_due"] < BACKTEST_FLOOR:
-        return refusal(f"backtest temporal cobre {check['coverage_due']}; piso {BACKTEST_FLOOR}", status="miscalibrated", category=category, backtest=check)
+        return refusal(f"backtest temporal de '{category}' não medido: n={check['n']}, mínimo {BACKTEST_MIN}", status="calibration_not_measured", category=category, backtest=check)
+    if check["coverage_due"] < BACKTEST_FLOOR:
+        return refusal(f"backtest temporal de '{category}' cobre {check['coverage_due']}; piso {BACKTEST_FLOOR}", status="miscalibrated", category=category, backtest=check)
+    known = sorted({r["points"] for r in history})
+    if not known[0] <= points <= known[-1]:
+        warnings.append({"code": "points_extrapolation", "message": f"{points} pontos fora do histórico de '{category}' ({known[0]} a {known[-1]}): a escala linear é suposição"})
     started = parse_ts(issue["startedAt"]) if issue and issue.get("startedAt") else None
     if started:
         elapsed = max(0.0, hours(started, now))
@@ -538,10 +619,11 @@ def propose_date(rows, now, window, points, category, issue):
         remaining = sorted(r["queue_h"] - age + points * r["work_h"] / r["points"] for r in history if r["queue_h"] >= age)
         mode, detail = "empirical_queue_plus_work", {"age_in_queue_hours": round3(age)}
         work_only = conformal([points * r["work_h"] / r["points"] for r in history], DUE_QUANTILE)[0]
-        extra = {"if_started_now": local_date(now + dt.timedelta(hours=work_only)).isoformat()}
+        extra = {"work_hours_if_started_now": round3(work_only)}
     if len(remaining) < MIN_SAMPLE:
         return refusal(f"o histórico de '{category}' não tem {MIN_SAMPLE} issues que tenham esperado ou durado tanto ({len(remaining)} de {len(history)})",
                        status="beyond_history", category=category, **detail, **extra)
+    backtests = all_backtests(rows, open_rows, now, window)
     date_for = lambda h: local_date(now + dt.timedelta(hours=h)).isoformat()
     due, _ = conformal(remaining, DUE_QUANTILE)
     likely, _ = conformal(remaining, LIKELY_QUANTILE)
@@ -552,8 +634,9 @@ def propose_date(rows, now, window, points, category, issue):
                          "range": {"low": date_for(low), "high": date_for(high), "high_is_sample_max": capped}},
             "basis": {"points": points, "category": category, "mode": mode, **detail, "sample_used": len(remaining),
                       "hours_from_now": {"low": round3(low), "likely": round3(likely), "due": round3(due), "high": round3(high)},
-                      "sample": stats["sample"], "points_signal": signal, "backtest_temporal_with_points": {k: check[k] for k in ("n", "coverage_due", "coverage_band")}},
-            "warnings": warnings, "limits": LIMITS, "note": "proposta: o medidor não escreve; quem aceita a faixa aplica com due_date.set"}, 0
+                      "sample": stats["sample"], "points_signal": signal, "now": now.isoformat(), "backtest_temporal_category": check,
+                      "coverage_with_open": backtests["loo"]["history_only"]["with_open"]},
+            "warnings": warnings, "limits": limits_with_bias(backtests), "note": "proposta: o medidor não escreve; quem aceita a faixa aplica com due_date.set"}, 0
 
 
 # ── amostra cega ────────────────────────────────────────────────────────────
@@ -744,7 +827,8 @@ def run_propose(args, rules, overlay, now):
         raise MeterError("propose exige --issue ou o par --points e --category")
     if points <= 0:
         raise MeterError("--points exige valor positivo")
-    return propose_date(prepare(list_issues("completed", args.project), rules, overlay), now, args.window, points, category, issue)
+    rows = prepare(list_issues("completed", args.project), rules, overlay)
+    return propose_date(rows, prepare(list_issues(OPEN_STATES, args.project), rules, overlay), now, args.window, points, category, issue)
 
 
 def main(argv):
