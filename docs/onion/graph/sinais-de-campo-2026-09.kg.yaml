@@ -1841,6 +1841,22 @@ nodes:
       locator: "PRE-REGISTRO.md §10c.1"
       method: "testimony: retornos do envio e relato e foto do maestro, julgados contra o pré-registro"
       locality: "pessoa"
+  - id: D_A2A_NATIVE_CHANNEL_CRITERION_RETEST_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «retestar»"
+    label: "Diante do critério do destino fechado pelo canal nativo, o maestro escolheu retestar, sem emenda ao pré-registro."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «retestar» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Emenda datada» · «Manter inconclusivo» · «Repetir com 5 e 30 min»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «O que fazer com o critério do P12?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
 edges:
   - from: E_IDA_E_VOLTA_P12_RETESTE_1109
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
@@ -2191,5 +2207,8 @@ edges:
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
   - from: D_A2A_CANAIS_GERENCIADOS_REGISTRAR_E_MEDIR_1103
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_A2A_NATIVE_CHANNEL_CRITERION_RETEST_1109
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
