@@ -47229,7 +47229,7 @@ run_task_manager_velocity_selftests() {
   local out rc n_ok n_cases n_kill n_mut
   if out="$(cd "${REPO_ROOT}" && env -u LINEAR_API_KEY -u LINEAR_TEAM_ID timeout 900 python3 -I -B "${bench}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
   read -r n_ok n_cases n_kill n_mut <<< "$(sed -nE 's#^task-manager-velocity-bench: ([0-9]+)/([0-9]+) caso\(s\) verdes; ([0-9]+)/([0-9]+) mutante\(s\) mordem; cópia limpa verde$#\1 \2 \3 \4#p' <<< "${out}")"
-  if [ "${rc}" -eq 0 ] && [ -n "${n_cases:-}" ] && [ "${n_ok}" = "${n_cases}" ] && [ "${n_kill}" = "${n_mut}" ] && [ "${n_cases}" -ge 106 ] && [ "${n_mut}" -ge 155 ]; then
+  if [ "${rc}" -eq 0 ] && [ -n "${n_cases:-}" ] && [ "${n_ok}" = "${n_cases}" ] && [ "${n_kill}" = "${n_mut}" ] && [ "${n_cases}" -ge 121 ] && [ "${n_mut}" -ge 182 ]; then
     record_pass "task-manager-velocity: ${n_ok}/${n_cases} casos verdes contra o Linear falso, cópia limpa verde, ${n_kill}/${n_mut} mutantes mordem"
   else
     record_fail "task-manager-velocity: bancada" "rc=${rc} $(grep -E '^- |^FALHA|bench:' <<< "${out}" | head -4 | tr '\n' '|')"
