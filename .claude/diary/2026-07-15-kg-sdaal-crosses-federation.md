@@ -2,7 +2,7 @@
 date: 2026-07-15
 instance: onion-evolve
 type: learning
-classification: protected
+classification: public
 tags: [kg-sdaal, radar, federation, dogfood, cross-boundary]
 affects: [meta, federation]
 breadcrumb_for: [meta:kg, meta:evolve]
@@ -19,8 +19,8 @@ adaptação**. Não tratar o KG SDAAL como core-only: o radar vale sobre grafos 
 
 ## Evidence
 - **Re-dogfood geral, todos os modos:** radar+reconcile+integrity+domain+triples em **11
-  grafos** (10 do core + `<cliente>.kg.yaml` do gustavo) → **0 defeito**; integridade limpa em todos.
-- **Cross-federation:** o `kg-radar.sh` do core processou o grafo do gustavo (**107 nós /
+  grafos** (10 do core + `<cliente>.kg.yaml` de um adotante de campo) → **0 defeito**; integridade limpa em todos.
+- **Cross-federation:** o `kg-radar.sh` do core processou o grafo de um adotante de campo (**107 nós /
   172 arestas**), extraído de `origin/onion/adopt@4113a55` — ranqueou atenção, reconciliou
   `SUPERSEDES`/`REFUTES`, pegou 1 estado-absorvente (`ST_CONTRATO`, terminal legítimo).
 - **Único warning recorrente** nos 11: "estado-absorvente" na camada `domain` (⚠ atenção,

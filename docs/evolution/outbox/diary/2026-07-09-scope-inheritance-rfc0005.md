@@ -7,7 +7,7 @@ tags: [scope, rfc-0005, inheritance, settings-cascade, compose-settings, superse
 affects: [scope, config, meta, adoption]
 breadcrumb_for: [meta:adopt, meta:kg, engineer:plan]
 share_with: [collective]
-next_recommended: "2026-07-09-granaai-readonly-field-dogfood"
+next_recommended: "2026-07-09-regulated-adopter-readonly-field-dogfood"
 review_after: 2026-10-07
 conflict_class: static
 ---
@@ -35,5 +35,5 @@ Herança de escopo **framework → empresa → time → pessoa** decidida: **RFC
 ## Next crumb
 Fase 3 (`SUPERSEDES` de escopo) fica **gated atrás de dogfood** — não colar merge-de-arquivo com override-de-verdade.
 Invariante a proteger: **never-clobber** (o compose é merge determinístico + proveniência, não clobber).
-Ver [[2026-07-09-granaai-readonly-field-dogfood]] (validação de campo desta convenção) e
+Ver [[2026-07-09-regulated-adopter-readonly-field-dogfood]] (validação de campo desta convenção) e
 [[2026-07-09-federation-redesign-rfc0004-shipped]] (RFC-irmã).

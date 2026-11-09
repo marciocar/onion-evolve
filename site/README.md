@@ -39,7 +39,7 @@ divergente da prática e deixou o vivo mentir por um mês — a revisão adversa
 história (`docs/evolution/review/feat-site-reform-f0-deploy.md`).
 
 > **Acesso remoto** (se um dia precisar deployar de FORA da KVM 8): o alias `onion-vps` usa
-> **`Port 2222`** no `~/.ssh/config` (2026-07-10; lição no diário `2026-07-10-ssh-alt-port-2222`).
+> **`Port 2222`** no `~/.ssh/config` (2026-07-10; lição no diário `2026-07-10-ssh-alt-port-socket-activation`).
 > O script hoje é local-only por desenho — ele mora onde o webroot mora.
 
 Créditos do site: **by Marcio Carvalho** (definitivo desde 2026-07-06; substituiu "Sacola de Ideias").

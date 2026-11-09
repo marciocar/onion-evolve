@@ -25,7 +25,7 @@ o grafo governante primeiro é a mesma disciplina.
 
 ## ⚠️ Fronteira (seu Sinal 8)
 Você recebe **pela branch** (colaborador-visitante, sem acesso ao core). Formalizar seu perfil está no
-backlog (`gustavo-omnibus-backlog` #8).
+backlog (`field-adopter-omnibus-backlog` #8).
 
 ---
 > **Transporte (maestro):** o Gustavo **recebe pela branch** — entregar committando este arquivo na branch

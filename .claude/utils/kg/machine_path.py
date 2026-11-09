@@ -123,11 +123,14 @@ def _member_hosts(path):
     return out
 
 
+# A FORMA do nome de máquina desta casa, para acusar sem registro nem processo (2026-11-09): os `host:` saíram das
+# linhagens do core, porque o repo é público, e no CI o hostname do processo é o do runner.
+HOST_FORM = r'srv\d{5,}'
+
+
 def host_re(hosts):
-    hosts = [h for h in hosts if h]
-    if not hosts:
-        return None
-    return re.compile(r'(?<![A-Za-z0-9_.-])(?:' + "|".join(re.escape(h) for h in hosts) + r')(?![A-Za-z0-9_-])', re.I)   # hostname não diferencia caixa (F9)
+    alts = [re.escape(h) for h in hosts if h] + [HOST_FORM]
+    return re.compile(r'(?<![A-Za-z0-9_.-])(?:' + "|".join(alts) + r')(?![A-Za-z0-9_-])', re.I)   # hostname não diferencia caixa (F9)
 
 
 def _root_of(token):

@@ -216,7 +216,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature"
+SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -44457,7 +44457,7 @@ run_kg_machine_path_selftests() {
   # (a) o --selftest próprio: acusa cada forma medida e cala em cada isenção selada
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE '^kg-machine-path selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
-    record_pass "kg-machine-path: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos: 19 formas acusadas, 15 isenções caladas, 10 de P4)"
+    record_pass "kg-machine-path: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos: 20 formas acusadas, 15 isenções caladas, 10 de P4)"
   else record_fail "kg-machine-path: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --tsv sai 0 e silencioso (passivo ZERO; os 3 isentos
   #     estão no baseline). CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -44566,6 +44566,163 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_kg_machine_path_selftests
+
+# REGRA 120 — dado de máquina no registro, no diário e no espelho. As polaridades da classe moram no --selftest da
+# guarda; aqui ficam o modo que o lint consome, a fiação, a falha fechada e os MUTANTES (um caso só conta se
+# reprova com a cura revertida).
+run_public_machine_data_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/public-machine-data-check.sh" lib="${REPO_ROOT}/.claude/utils/kg/machine_path.py"
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${chk}" ] || [ ! -f "${lib}" ]; then record_fail "public-machine-data" "guarda ou classe ausente"; return; fi
+  local o rc d n=0; d="$(TMPDIR=/tmp mktemp -d)"
+  local _real_git; _real_git="$(command -v git)"
+  # (a) o --selftest próprio, no locale do hook
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE '^public-machine-data selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
+    record_pass "public-machine-data: (a) --selftest verde em LC_ALL=C"
+  else record_fail "public-machine-data: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no repo real. CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/public-machine-data-check.sh" "${REPO_ROOT}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "public-machine-data: (b) repo real → rc 0 e silencioso no modo tsv"
+  else record_fail "public-machine-data: (b) repo real" "rc=${rc}; [$(head -3 <<< "${o}" | tr '\n' '|')]"; fi
+
+  _pmd_box() {  # $1=guarda $2=classe → caminho de um repo limpo com essa guarda
+    # mktemp, não contador: esta função roda em $( ), e um contador não sobreviveria ao subshell
+    local b; b="$(mktemp -d "${d}/box.XXXXXX")"
+    mkdir -p "${b}/.claude/validation" "${b}/.claude/utils/kg" "${b}/.claude/diary" "${b}/docs/evolution/federation" "${b}/docs/evolution/outbox/diary"
+    cp "$1" "${b}/.claude/validation/public-machine-data-check.sh"; cp "$2" "${b}/.claude/utils/kg/machine_path.py"
+    printf 'members:\n  - id: x   # app em 127.0.0.1:8787\n' > "${b}/docs/evolution/federation/members.yaml"
+    printf '# entrada limpa\n' > "${b}/.claude/diary/2026-01-01-limpa.md"
+    ( cd "${b}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1
+    printf '%s' "${b}"
+  }
+  _pmd_track() { ( cd "$1" && git add -A ) >/dev/null 2>&1; }
+  _pmd_run() { if o="$(bash "$1/.claude/validation/public-machine-data-check.sh" "$1" --tsv 2>&1)"; then rc=0; else rc=$?; fi; }
+  # Um cenário monta o repo, roda a guarda e devolve 0 se o comportamento certo apareceu.
+  _pmd_scen() {  # $1=cenário $2=guarda $3=classe
+    local b; b="$(_pmd_box "$2" "$3")"
+    case "$1" in
+      limpo)    _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      ip-yaml)  printf 'members:\n  - id: x   # rollback (IP antigo 151.101.1.1), depois deletado\n' > "${b}/docs/evolution/federation/members.yaml"; _pmd_track "${b}"; _pmd_run "${b}"
+                [ "${rc}" -eq 1 ] && grep -q $'^HARD\tDADO-DE-MAQUINA\tdocs/evolution/federation/members.yaml\tlinha 2:' <<< "${o}" \
+                  && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${o}")" = "4" ] && ! grep -qF '151.101.1.1' <<< "${o}" ;;
+      diario)   printf 'medido no srv123456\n' > "${b}/.claude/diary/2026-01-02-suja.md"; _pmd_track "${b}"; _pmd_run "${b}"
+                [ "${rc}" -eq 1 ] && grep -q $'\t.claude/diary/2026-01-02-suja.md\tlinha 1:' <<< "${o}" ;;
+      espelho)  printf 'medido no srv123456\n' > "${b}/docs/evolution/outbox/diary/2026-01-02-e.md"; _pmd_track "${b}"; _pmd_run "${b}"
+                [ "${rc}" -eq 1 ] && grep -q $'\tdocs/evolution/outbox/diary/2026-01-02-e.md\tlinha 1:' <<< "${o}" ;;
+      nome)     printf 'ok\n' > "${b}/.claude/diary/2026-01-02-srv123456.md"; _pmd_track "${b}"; _pmd_run "${b}"
+                [ "${rc}" -eq 1 ] && grep -q $'\t.claude/diary/2026-01-02-srv123456.md\tnome do arquivo:' <<< "${o}" ;;
+      naorastr) printf 'medido no srv123456\n' > "${b}/.claude/diary/2026-01-02-solta.md"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      adotado)  printf 'role: adopted\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      porta)    printf 'role: source\nkind: door\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      fonte)    printf 'role: source\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 1 ] ;;
+      ilegivel) printf '\xff\xfe\n' > "${b}/.claude/diary/2026-01-03-bin.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 2 ] && grep -q 'NAO VERIFICADO' <<< "${o}" ;;
+      lsfalha)  mkdir -p "${b}.stub"; printf '#!/bin/sh\ncase "$*" in *ls-files*) exit 1;; esac\nexec %s "$@"\n' "${_real_git}" > "${b}.stub/git"; chmod +x "${b}.stub/git"
+                if o="$(PATH="${b}.stub:${PATH}" bash "${b}/.claude/validation/public-machine-data-check.sh" "${b}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+                [ "${rc}" -eq 2 ] && grep -q 'ls-files falhou' <<< "${o}" ;;
+      sempy)    mkdir -p "${b}.nopy"; local t; for t in git dirname awk grep; do ln -s "$(command -v "${t}")" "${b}.nopy/${t}"; done
+                if o="$(PATH="${b}.nopy" "${BASH}" "${b}/.claude/validation/public-machine-data-check.sh" "${b}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+                [ "${rc}" -eq 2 ] && grep -q 'python3 ausente' <<< "${o}" ;;
+      sem-git)  rm -rf "${b}/.git"; _pmd_run "${b}"; [ "${rc}" -eq 2 ] && grep -q 'reposit' <<< "${o}" ;;
+      vazia)    ( cd "${b}" && git rm -rq --cached docs .claude/diary ) >/dev/null 2>&1; _pmd_run "${b}"; [ "${rc}" -eq 2 ] && grep -q 'lista vazia' <<< "${o}" ;;
+      sem-lib)  rm -f "${b}/.claude/utils/kg/machine_path.py"; _pmd_run "${b}"; [ "${rc}" -eq 2 ] && grep -q 'NAO VERIFICADO' <<< "${o}" ;;
+      *) return 3 ;;
+    esac
+  }
+  local s
+  for s in limpo ip-yaml diario espelho nome naorastr adotado porta fonte ilegivel lsfalha sempy sem-git vazia sem-lib; do
+    if _pmd_scen "${s}" "${chk}" "${lib}"; then record_pass "public-machine-data: cenário ${s}"
+    else record_fail "public-machine-data: cenário ${s}" "rc=${rc}; [$(head -2 <<< "${o}" | tr '\n' '|')]"; fi
+  done
+
+  # FIAÇÃO: a função do lint, extraída como a bancada role_scope faz, com violation e _role de teste.
+  local wire; wire="$(sed -n '/^check_public_machine_data() {/,/^}/p' "${lint}")"
+  if [ -n "${wire}" ] && grep -qx 'check_public_machine_data' "${lint}"; then record_pass "public-machine-data: fiação: a função existe e o despachante a chama"
+  else record_fail "public-machine-data: fiação" "função ou chamada ausente em lint-artifacts.sh"; fi
+  _pmd_wire() {  # $1=corpo da função $2=raiz $3=dir da guarda $4=papel
+    bash -c 'REPO_ROOT="$2"; SCRIPT_DIR="$3"; ONLY_PATH=""; violation() { printf "V %s %s\n" "$1" "$3"; }; _role() { printf "%s" "$4_"; }
+      _role() { printf "%s" "'"$4"'"; }; eval "$1"; check_public_machine_data' _ "$1" "$2" "$3" "$4" 2>&1
+  }
+  local wb; wb="$(_pmd_box "${chk}" "${lib}")"; printf 'srv123456\n' > "${wb}/.claude/diary/2026-01-02-s.md"; _pmd_track "${wb}"
+  o="$(_pmd_wire "${wire}" "${wb}" "${wb}/.claude/validation" source)"
+  if grep -q '^V HARD .*REGRA 120' <<< "${o}"; then record_pass "public-machine-data: fiação: achado da guarda vira HARD da REGRA 120"
+  else record_fail "public-machine-data: fiação (w1)" "[${o}]"; fi
+  o="$(_pmd_wire "${wire}" "${wb}" "${d}/sem-guarda" source)"
+  if grep -q '^V HARD .*REGRA 120' <<< "${o}"; then record_pass "public-machine-data: fiação: a guarda ausente na fonte com registro → HARD"
+  else record_fail "public-machine-data: fiação (w2)" "[${o}]"; fi
+  o="$(_pmd_wire "${wire}" "${wb}" "${d}/sem-guarda" adopted)"
+  if [ -z "${o}" ]; then record_pass "public-machine-data: fiação: guarda ausente em adotante → silêncio"
+  else record_fail "public-machine-data: fiação (w3)" "[${o}]"; fi
+  local mw
+  mw="${wire//violation \"\$\{_sev:-HARD\}\"/: }"
+  o="$(_pmd_wire "${mw}" "${wb}" "${wb}/.claude/validation" source)"
+  if [ "${mw}" != "${wire}" ] && ! grep -q '^V HARD' <<< "${o}"; then record_pass "public-machine-data: mutante w1 (achado não vira violação) morde"
+  else record_fail "public-machine-data: mutante w1 NÃO mordeu" "[${o}]"; fi
+  mw="${wire//\$(_role)/adopted}"
+  o="$(_pmd_wire "${mw}" "${wb}" "${d}/sem-guarda" source)"
+  if [ "${mw}" != "${wire}" ] && ! grep -q '^V HARD' <<< "${o}"; then record_pass "public-machine-data: mutante w2 (guarda ausente volta a calar) morde"
+  else record_fail "public-machine-data: mutante w2 NÃO mordeu" "[${o}]"; fi
+
+  # MUTANTES. Cópia limpa primeiro, no mesmo arranjo: senão morto não prova nada.
+  _pmd_copy() {  # $1=arquivo-fonte $2=destino $3=trecho $4=substituto → 0 se aplicou
+    python3 -I -B -c 'import sys; f,g,o,n=sys.argv[1:5]; t=open(f,encoding="utf-8").read(); sys.exit(1) if o not in t else open(g,"w",encoding="utf-8").write(t.replace(o,n))' "$1" "$2" "$3" "$4" >/dev/null 2>&1
+  }
+  # $1=rótulo $2=guarda|classe $3=trecho $4=substituto $5=cenário, ou "selftest"
+  _pmd_mut() {
+    local mc="${d}/m$((n+=1)).sh" ml="${d}/m${n}.py" src="${chk}" dst
+    cp "${chk}" "${mc}"; cp "${lib}" "${ml}"
+    if [ "$2" = classe ]; then src="${lib}"; dst="${ml}"; else dst="${mc}"; fi
+    if ! _pmd_copy "${src}" "${dst}" "$3" "$4"; then record_fail "public-machine-data: mutante $1" "âncora não casou: o mutante não foi aplicado"; return; fi
+    if [ "$5" = selftest ]; then
+      local b; b="$(_pmd_box "${mc}" "${ml}")"
+      if o="$(LC_ALL=C bash "${b}/.claude/validation/public-machine-data-check.sh" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+      if [ "${rc}" -eq 1 ] && grep -q '✗' <<< "${o}"; then record_pass "public-machine-data: mutante $1 morde"
+      else record_fail "public-machine-data: mutante $1 NÃO mordeu" "rc=${rc}"; fi
+    elif _pmd_scen "$5" "${mc}" "${ml}"; then record_fail "public-machine-data: mutante $1 NÃO mordeu" "cenário $5 seguiu passando"
+    else record_pass "public-machine-data: mutante $1 morde (cenário $5)"; fi
+  }
+  local b0; b0="$(_pmd_box "${chk}" "${lib}")"
+  if o="$(LC_ALL=C bash "${b0}/.claude/validation/public-machine-data-check.sh" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ]; then record_pass "public-machine-data: cópia limpa verde no arranjo dos mutantes"
+  else record_fail "public-machine-data: cópia limpa" "rc=${rc}"; fi
+  local G=guarda
+  # classe e fronteira da regex
+  _pmd_mut "IP global nunca acusa"            ${G} "return ip.is_global or ip in CGNAT" "return ip.is_multicast" selftest
+  _pmd_mut "toda IP acusa"                    ${G} "return ip.is_global or ip in CGNAT" "return True" selftest
+  _pmd_mut "CGNAT some"                       ${G} " or ip in CGNAT" "" selftest
+  _pmd_mut "zero à esquerda não normaliza"    ${G} '".".join(str(v) for v in vals)' '"0.0.0.0"' selftest
+  _pmd_mut "forma com hífens some"            ${G} 'DASH_RE.finditer(text)' 'DASH_RE.finditer("")' selftest
+  _pmd_mut "fronteira esquerda do IP some"    ${G} "(?<![\\w.])(?<![A-Za-z]/)" "(?<![A-Za-z]/)" selftest
+  _pmd_mut "token de produto volta a acusar"  ${G} "(?<![\\w.])(?<![A-Za-z]/)" "(?<![\\w.])" selftest
+  _pmd_mut "IP colado em letra volta a calar" ${G} '(?!\d|\.\d)' '(?![\w]|\.\d)' selftest
+  _pmd_mut "fronteira direita do IP some"     ${G} '(?!\d|\.\d)' '' selftest
+  _pmd_mut "numeração de seção volta a acusar" ${G} 'if all(len(o) == 1 for o in octets):' 'if False:' selftest
+  _pmd_mut "forma do host some da classe"     classe "HOST_FORM = r'srv" "HOST_FORM = r'zzz" selftest
+  _pmd_mut "fronteira esquerda do host some"  ${G} "r'(?<![A-Za-z0-9_.-])' + mp.HOST_FORM" "mp.HOST_FORM" selftest
+  _pmd_mut "fronteira direita do host some"   ${G} "mp.HOST_FORM + r'(?![A-Za-z0-9_-])'" "mp.HOST_FORM" selftest
+  _pmd_mut ".ssh deixa de ser lido"           ${G} "r'\\.ssh/(" "r'\\.sshX/(" selftest
+  _pmd_mut "known_hosts passa a acusar"       ${G} '"known_hosts", ' "" selftest
+  _pmd_mut "cópia de known_hosts volta a acusar" ${G} '.split(".")[0] not in KEY_OK' ' not in KEY_OK' selftest
+  _pmd_mut "marcador sem motivo passa a calar" ${G} "machine-data-ok:\\s*\\S" "machine-data-ok:" selftest
+  _pmd_mut "marcador com motivo não cala"     ${G} "if MARK_RE.search(line):" "if False:" selftest
+  # escopo, papel e falha fechada, no modo que o lint consome
+  _pmd_mut "espelho do diário sai do escopo"  ${G} '"docs/evolution/outbox/diary/*.md"' '"docs/nada/*.md"' espelho
+  _pmd_mut "diário sai do escopo"             ${G} '".claude/diary/*.md", ' '' diario
+  _pmd_mut "nome do arquivo não é julgado"    ${G} 'for cls in sorted(set(classes(f)) | set(classes(re.sub(r"[-_]", " ", f)))):' 'for cls in []:' nome
+  _pmd_mut "saída imprime o valor"            ${G} "print(f\"HARD\\tDADO-DE-MAQUINA\\t{path}\\t{msg}\" if" "print(f\"HARD\\tDADO-DE-MAQUINA\\t{path}\\t{msg} 151.101.1.1\" if" ip-yaml
+  _pmd_mut "adotante volta a ser julgado"     ${G} '[ "${_role_v:-source}" != "source" ]' '[ "x" = "y" ]' adotado
+  _pmd_mut "porta volta a ser julgada"        ${G} '[ "${_door:-0}" != "0" ]' '[ "0" != "0" ]' porta
+  _pmd_mut "arquivo ilegível vira exceção"    ${G} 'except (OSError, UnicodeDecodeError) as e:' 'except OSError as e:' ilegivel
+  _pmd_mut "arquivo ilegível vira verde"      ${G} 'print(f"public-machine-data: {f} ilegível ({type(e).__name__}) — NAO VERIFICADO", file=sys.stderr); sys.exit(2)' 'continue' ilegivel
+  _pmd_mut "ls-files falho passa"             ${G} 'if ls.returncode != 0:' 'if False:' lsfalha
+  _pmd_mut "sem python passa"                 ${G} 'command -v python3 >/dev/null 2>&1 ||' 'true ||' sempy
+  _pmd_mut "fora de git passa"                ${G} '[ -n "${_top}" ] ||' 'true ||' sem-git
+  _pmd_mut "lista vazia passa"                ${G} 'if not files and os.path.exists' 'if False and os.path.exists' vazia
+  _pmd_mut "sem classe passa"                 ${G} '[ -f "${LIB}/machine_path.py" ] ||' 'true ||' sem-lib
+  unset -f _pmd_box _pmd_track _pmd_run _pmd_scen _pmd_wire _pmd_copy _pmd_mut
+  rm -rf "${d}"
+}
+_family run_public_machine_data_selftests
 
 # REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) — SAC-86, medido em 2026-10-09
 # na materialização do onion-standalone (pin 947e69ce): a lente kg-grammar.md descrevia ao adotante o

@@ -35,33 +35,30 @@ members:
     kind: source        # a propria fonte — nao se projeta: e o emissor
     remote: github.com/marciocar/onion-evolve
     path: "."                 # este repo
-    local_path: "/home/marcio/onion-evolve"   # migrado 2026-07-08: notebook local → Hostinger KVM 8 (srv1812846), user marciocar→marcio
+    local_path: "/home/marcio/onion-evolve"   # migrado 2026-07-08 do notebook local para a VPS
     lineages:                 # 2026-07-08: CONSOLIDADO numa máquina só (a decisão "Coexistem" foi revertida p/ consolidação)
-      workstation:            # srv1812846 (Hostinger KVM 8) — lar ÚNICO: dev + site + bridge
-        host: srv1812846      # 8 vCPU/32 GB/387 GB — lar permanente do core desde 2026-07-08
+      workstation:            # a VPS — lar ÚNICO: dev + site + bridge, desde 2026-07-08
         branch: main          # sem pin: a fonte não se carimba — sua versão É a HEAD
         # CONSOLIDAÇÃO 2026-07-08: o site onionevolve.com (+ www, app) e o onion-bridge foram MIGRADOS
-        # pra cá do antigo vps-bridge (srv1475924, KVM 1). Layout nesta máquina:
+        # pra cá do antigo vps-bridge. Layout nesta máquina:
         #  - SITE: estáticos em /var/www/onion-landing (Caddy file_server + TLS Let's Encrypt auto).
         #  - APP: app.onionevolve.com → reverse_proxy 127.0.0.1:8787 → onion-bridge (systemd, User=onion).
         #  - BRIDGE: @anthropic-ai/claude-agent-sdk (bypassPermissions), ONION_CWD=/home/onion/onion-evolve
         #    (clone DEDICADO do core, deploy-key própria — isolado do checkout do maestro /home/marcio/onion-evolve).
-        #  - DNS onionevolve.com @ e app → 179.197.65.94 (via API Hostinger; www CNAME → raiz). TTL 300.
-        #  - ACESSO maestro (2026-07-10): ssh/mosh na porta 2222 (alt — a rede do notebook filtra a 22
-        #    de saída; a 22 segue aberta p/ outras origens). Lição: diário 2026-07-10-ssh-alt-port-2222.
+        #  - DNS onionevolve.com @ e app → IP público da VPS (www CNAME → raiz). TTL 300.
+        #  - ACESSO maestro (2026-07-10): ssh/mosh numa porta alternativa (a rede do notebook filtra a 22
+        #    de saída; a 22 segue aberta p/ outras origens).
       product:                # Q_BRANCH_MAIN respondida (Onda 8, 2026-09-01): a main-PRODUTO no mapa.
-        host: srv1812846      # mesma máquina; o que roda EM PRODUÇÃO a partir da main:
-        branch: main          # site (deploy do site/), app.onionevolve.com (bridge com clone
+        branch: main          # mesma máquina; o que roda EM PRODUÇÃO a partir da main: site (deploy do site/), app.onionevolve.com (bridge com clone
                               # dedicado /home/onion/onion-evolve, deploy-key própria) e o IdP.
                               # Pin: HEAD da main no momento do deploy (bridge atualiza por
                               # ops/update-bridge.sh; site por ops/install-caddy-config.sh + deploy).
-      vps-bridge:             # RETIRADO 2026-07-08 — srv1475924 (KVM 1) mantido como rollback (IP antigo 187.77.236.211), depois deletado.
+      vps-bridge:             # RETIRADO 2026-07-08 — mantido como rollback, depois deletado.
         status: retired       # papel (cwd do bridge + host do site) migrado p/ a workstation acima.
         # Histórico preservado: clone que TRABALHAVA (não espelho passivo); pin c09ae7fb99ed verificado
         # 2026-07-05 via ssh onion-vps. Achado meia-instância — feature/whatsapp-sender @ 17a90cb nascida
         # via bridge/PWA (celular), extraída p/ marciocar/whatsapp-sender (privado). Doutrina "declarado ≠
-        # verificado" (5º membro da família). Acesso era ssh onion-vps (~/.ssh/hostinger_onion); backup em
-        # ~/vps-backup-2026-07-05 na workstation. Ver diário 2026-07-05-vps-lineage-odyssey.
+        # verificado" (5º membro da família). Acesso era por ssh, com chave dedicada. Ver diário 2026-07-05-vps-lineage-odyssey.
     personality_summary: "A fonte (T0) que nasceu integração-pragmática (ClickUp + specialists de stack) e virou um framework obsessivamente auto-verificador, que desconfia também das próprias guardas: declarado≠verificado como ansiedade central, KG-como-runtime, catraca de proveniência/frescor, refutação por lentes independentes (Elenxo), o adotante como oráculo, e a lei de que todo fix vira mecanismo (dogfood como padrão master)"  # EMERGENTE — /meta:personality-sync 2026-11-09, âncora em .claude/identity/personality.md (134 migalhas)
     specializations: [framework-template, sdaal, co-evolution, dogfooding, breadcrumbs]
     personality_last_sync: 2026-11-09   # auto-gerado por /meta:personality-sync (F2) — projeção one-way, âncora no diário

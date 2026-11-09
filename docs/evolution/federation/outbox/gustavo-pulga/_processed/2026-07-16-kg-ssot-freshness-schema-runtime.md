@@ -34,7 +34,7 @@ Você **não está registrado no `members.yaml`** do core — é **colaborador-v
 fronteira é reforçada pelo próprio SO). Isso é exatamente o gap do seu **Sinal 8** (perfil colaborador-visitante
 + autorização de relay maestro-only ainda não formalizados). O seu **canal de entrega é uma branch** que você
 acessa — não o `inbound/` de um repo separado. Formalizar seu perfil está no backlog do core (crumb
-`2026-07-16-gustavo-omnibus-backlog`, #8); até lá, a entrega por branch é o mecanismo de fato.
+`2026-07-16-field-adopter-omnibus-backlog`, #8); até lá, a entrega por branch é o mecanismo de fato.
 
 ## Ação esperada
 - Ler quando o maestro entregar este anúncio na **branch** do seu canal (você dá pull nela).

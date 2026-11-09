@@ -81,6 +81,7 @@ check("acusa: PATH=/usr/bin:/bin", "env -i PATH=/usr/bin:/bin bash", "fs")
 check("acusa: hostname da máquina", "medido no srvteste123 em 10-09", "host")
 # ── curas do Elenxo (2026-10-10): o que a 1ª redação deixava passar ───────────────────────────────────────
 check("acusa: cd para absoluto de um segmento (Elenxo F7)", "rode cd /workspace e depois", "shell")
+check("acusa: host pela forma, sem registro (2026-11-09)", "medido no srv123456 em 11-09", "host")
 check("acusa: hostname em maiúsculas (Elenxo F9)", "o SRVTESTE123 respondeu", "host")
 check("acusa: caminho entre aspas tipográficas simples (Elenxo F8)", "lido em ‘/tmp/x’", "fs")
 check("acusa: caminho entre crases que ABREM", "em `/home/conta/x` e (`/tmp`)", "fs")

@@ -2,7 +2,7 @@
 date: 2026-07-17
 instance: onion-evolve
 type: error
-classification: protected
+classification: public
 tags: [ssot-as-runtime, declared-vs-verified, co-announce, forged-pin, dogfood, kg, changelog]
 affects: [meta, method, federation]
 breadcrumb_for: [meta:co-announce, meta:co-evolve, warm-up, catch-up]
@@ -23,7 +23,7 @@ CHANGELOG, **verifique o artefato**, não a intenção de tê-lo escrito.
 - `git log --oneline --all -S "SSOT-as-runtime" -- docs/knowledge-base/concepts/knowledge-graph-sdaal.md`
   → **vazio**; `git show HEAD:<KB> | grep -c "SSOT-as-runtime"` → **0**. A seção nunca existiu.
 - Quem afirmava o contrário: `docs/evolution/federation/CHANGELOG.md:41-43` (append-only, commitado) +
-  `outbox/{metagamify,gustavo-pulga,marcio-pessoal}/2026-07-16-kg-ssot-freshness-schema-runtime.md:29`.
+  `outbox/<adotante>/2026-07-16-kg-ssot-freshness-schema-runtime.md:29`.
 - **A doutrina existia — no ADR** (`onion-adr-kg-freshness-gate-2026-07.md` §SSOT como runtime), nunca
   promovida à KB. O anúncio raciocinou sobre a decisão (DEV), não sobre o artefato (PROD).
 - **Classe idêntica ao pin forjado** que a própria KB cita (`knowledge-graph-sdaal.md`, §Governança

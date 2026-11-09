@@ -5790,6 +5790,43 @@ check_cited_directive_live() {
 }
 check_cited_directive_live
 
+# ────────────────────────────────────────────────────────
+# REGRA 120 — Registro da federação e diário sem dado de máquina no repo público [HARD]
+# previne: IP público, host da VPS ou arquivo de chave voltando ao `members.yaml` ou ao diário, inclusive em comentário. Só julga a fonte.
+#   DANO MEDIDO (2026-11-09): com o repo público, o registro trazia host, dois IPs e o nome da chave SSH, e 4 entradas
+#   do diário repetiam os dados. A classe mora em public-machine-data-check.sh; a forma do host, em machine_path.py.
+check_public_machine_data() {
+  local helper="${SCRIPT_DIR}/public-machine-data-check.sh"
+  local _R="REGRA 120 (Registro da federação e diário sem dado de máquina no repo público)"
+  if [ ! -f "${helper}" ]; then
+    # na fonte com registro, guarda ausente é guarda morta; porta e adotante podem não recebê-la
+    if [ "$(_role)" = "source" ] && [ -f "${REPO_ROOT}/docs/evolution/federation/members.yaml" ]; then
+      violation "HARD" "${helper}" "${_R}: a guarda sumiu da fonte"
+    fi
+    return 0
+  fi
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */members.yaml|*/.claude/diary/*.md|*/outbox/diary/*.md|*/public-machine-data-check.sh|*/utils/kg/machine_path.py|*/lint-artifacts.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path#./}" "${_R}: [${_code}] ${_msg}"
+  done <<< "${_out}"
+  # helper >=2 ou rc!=0 sem linha: não julgou, e isso nunca é aprovação.
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/public-machine-data-check.sh" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null))"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_public_machine_data
+
 # ─────────────────────────────────────────────────────────────────────────────
 # REGRA 99 — Nó de .kg.yaml sem caminho de máquina, julgado pela classe [HARD + SOFT]
 # previne: caminho de máquina voltando ao corpus depois de a migração de provenance tirá-lo (com catraca).
