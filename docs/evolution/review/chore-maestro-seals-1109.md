@@ -2,8 +2,7 @@
 branch: chore/maestro-seals-1109
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: 843775f10f5b9223213e718b1e628bb7ba1799047d4539000ec61d961ece5c4a
-reviewed_code_sha256: fdf7a5effce8258103248e88fb2fa66009ea1ffa49c4e711f4995fb37a6b54ef
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
@@ -21,7 +20,7 @@ nota: "tokens e duração não medidos (0). Quatro selos, uma evidência e o fec
 ## O que muda
 
 - `docs/onion/graph/maestro-decisions-1108.kg.yaml`: a evidência da rodada de 2026-11-09 e os 4 selos dela. O teto
-  declarado sobe de 18 para 23 nós, com o motivo no `meta:`.
+  declarado sobe de 18 para 24 nós, com o motivo no `meta:`.
 - `docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml`: `Q_COORD_MAESTRO_APPARMOR_BWRAP_1106` fecha por medida.
 
 ## Achados
@@ -38,5 +37,11 @@ nota: "tokens e duração não medidos (0). Quatro selos, uma evidência e o fec
 - `Q_IT_AGENT_MAIL_RIDER_READING` mora em `docs/onion/graph/inbox-triage-1108.kg.yaml`, que só existe no PR #1555, ainda
   aberto. O selo `D_MD_AGENT_MAIL_NO_LEGAL_READING_1109` entra aqui e cita o nó pelo id; o fechamento dele depende do merge
   daquele PR.
-- `Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106` e SAC-293 seguem abertos: o selo decide, e o registro e o update são de outro agente.
 - A redação das quatro perguntas é do agente de execução, porque o brief trouxe o tema e as opções, sem o texto literal.
+
+## Re-revisão do delta (consultoria já feita)
+
+A pergunta do item 2 estava vencida. Conferi as medidas antes de escrever: PR #1522 do core mergeado, membro no ledger, PR #1
+do adotante mergeado em `800b06aa2c10`, e `source_commit` `e4c954ebad47` na main dele. O nome do repo do adotante leva o
+do cliente e não entra em nenhum arquivo deste PR. `D_MD_CONSULTING_ADOPTER_REGISTER_1109` passa a dizer que os atos já estavam feitos, `Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106` fecha por
+medida, e `Q_MD_CONSULTING_NEXT_UPDATE_1109` é o único item aberto, dependente da cura da SAC-302. Radar e contrato em rc 0. Sem achado novo.

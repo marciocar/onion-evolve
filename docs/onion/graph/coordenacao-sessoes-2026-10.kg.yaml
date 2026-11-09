@@ -618,14 +618,19 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 3
     confidence: 0.6
-    evidence_class: testimony
-    verified_against: "relato da sessão do adotante de consultoria à repassada de 2026-11-06; a versão vendorizada não foi relida pelo core"
+    verified_at: "2026-11-09"
+    verified_against: "2026-11-09: PR #1522 do core MERGED em 2026-11-07 (merge 0a6f15f36); membro consultoria-analise-de-caso em docs/evolution/federation/members.yaml, com onion_version e4c954ebad47; PR #1 do repo do adotante MERGED em 2026-11-07 (merge 800b06aa2c10); ⟨.onion-version na main do adotante⟩ com source_commit e4c954ebad47"
     label: "O adotante de consultoria, fora do members.yaml, tem o kg-ssot vendorizado em 4.39.1 (o atual é 4.45.0) e pede o update do Onion; registrar e atualizar é decisão do maestro."
-    narrative: "Registrar é ato de segurança para a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) enxergar o adotante; o update vem pelo /meta:adopt --update depois do registro. Este nó não escreve o nome do adotante. Linear: SAC-293."
+    narrative: "Registrar é ato de segurança para a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) enxergar o adotante; o update vem pelo /meta:adopt --update depois do registro. Este nó não escreve o nome do adotante. Linear: SAC-293. Fechado em 2026-11-09 por medida: o registro e o update já estavam feitos em 2026-11-07. A resposta do maestro está em D_MD_CONSULTING_ADOPTER_REGISTER_1109, e o próximo update em Q_MD_CONSULTING_NEXT_UPDATE_1109."
+    provenance:
+      source: "GitHub e members.yaml do core"
+      locator: "PR #1522 do core; PR #1 do repo do adotante; docs/evolution/federation/members.yaml, membro consultoria-analise-de-caso"
+      method: "measurement: leitura dos dois PRs, do ledger e da versão na main do adotante em 2026-11-09"
+      locality: "repo"
   - id: Q_COORD_MAESTRO_PVR_KGSSOT_1106
     node_type: question
     layer: audit
