@@ -1818,13 +1818,33 @@ nodes:
     verified_against: "textos do SendMessage devolvidos à sessão do core às 19:51:14 e 19:54:10 UTC, foto e relato do maestro no notebook; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md §10c"
     trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
     label: "Teste do destino fechado de 2026-11-09, canal nativo da mesma conta: sessão encerrada recusa o envio sem fila; máquina offline enfileira e entrega uma vez ao religar, retida na tela. O critério do canal não passou; a rodada é inconclusiva."
-    narrative: "Claude Code 2.1.319 na VPS e 2.1.321 no notebook. Com /exit, a sessão some da lista e o SendMessage recusa na hora, o que não é perda silenciosa, mas contraria o resultado que o pré-registro espera. Com a máquina offline e a sessão viva, o envio avisa a fila e a mensagem chega cerca de 30 s depois da religada, ao fim de cerca de 21 min, retida com Deny e Deliver porque a classe do modo de permissão difere; a sessão não agiu. Desvios: espera única em vez de 5 e 30 min; primeiro envio a outra sessão, por o notebook estar noutra conta; o judge-attempts.sh não rodou, e a chegada e a não ação são relato e foto do maestro."
+    narrative: "Claude Code 2.1.319 na VPS e 2.1.321 no notebook. Com /exit, a sessão some da lista e o SendMessage recusa na hora, o que não é perda silenciosa, mas contraria o resultado que o pré-registro espera. Com a máquina offline e a sessão viva, o envio avisa a fila e a mensagem chega cerca de 30 s depois da religada, ao fim de cerca de 21 min, retida com Deny e Deliver porque a classe do modo de permissão difere; a sessão não agiu. Desvios: espera única em vez de 5 e 30 min; primeiro envio a outra sessão, por o notebook estar noutra conta; o judge-attempts.sh não rodou, e a chegada e a não ação são relato e foto do maestro. Correção em 2026-11-09: a espera da primeira rodada offline foi de cerca de 8 min, e não 21; o «17h15» relatado estava errado, e a foto mostra processamento às 20:02 UTC. O reteste está em E_IDA_E_VOLTA_P12_RETESTE_1109."
     provenance:
       source: "sessão do core, que enviou e leu os resultados, e maestro, que observou o notebook"
       locator: "PRE-REGISTRO.md §10c"
       method: "testimony: textos do envio e relato e foto do maestro, julgados contra o pré-registro"
       locality: "pessoa"
+  - id: E_IDA_E_VOLTA_P12_RETESTE_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-09"
+    verified_against: "retornos do SendMessage às 21:07:46 UTC (nonce rt-p12-20261109-fd6a3f20) e 21:17:52 UTC (nonce rt-p12-20261109-fafadcf5), foto e relato do maestro no notebook; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md §10c.1"
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
+    label: "Reteste do destino fechado em 2026-11-09, canal nativo: com a máquina offline, as esperas de cerca de 5 e 43 min enfileiraram e chegaram. O arranjo não é sessão reaberta, e o critério do canal segue não cumprido."
+    narrative: "O maestro pediu o reteste, por escolha livre, sem emenda ao critério. Espera de cerca de 5 min: chegou retida, foi liberada pelo maestro, uma vez só, e a sessão escreveu que não executou nenhuma ação. Espera de cerca de 43 min, no lugar de 30: recebida 10 s depois de religar, por relato; uma vez só e não ação não foram informadas. A sessão encerrada segue recusando na hora. O juiz de tentativas não tem saída registrada. A rodada segue inconclusiva."
+    provenance:
+      source: "sessão do core, que enviou e leu os retornos, e maestro, que observou o notebook"
+      locator: "PRE-REGISTRO.md §10c.1"
+      method: "testimony: retornos do envio e relato e foto do maestro, julgados contra o pré-registro"
+      locality: "pessoa"
 edges:
+  - from: E_IDA_E_VOLTA_P12_RETESTE_1109
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
   - from: E_IDA_E_VOLTA_P12_CANAL_NATIVO_1109
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
