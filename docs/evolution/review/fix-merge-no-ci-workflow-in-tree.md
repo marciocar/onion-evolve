@@ -2,7 +2,8 @@
 branch: fix/merge-no-ci-workflow-in-tree
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8e39ff470d502b60e6b125df81f2692feb61ab447cdbc1f284a9fd43098cc7ff
+reviewed_code_sha256: fa135903d1ab8ae490ffb751bc6f77cdedcebc3d0df7c2ace3366405d15cf2fa
 findings_total: 4
 findings_real: 4
 findings_blocking: 0
