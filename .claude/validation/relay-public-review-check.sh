@@ -25,23 +25,29 @@
 #     (sinal sem a chave cala, pelo item abaixo);
 #   · um `---` na linha 1 usado como régua horizontal é lido como abertura de frontmatter, aqui e no
 #     carteiro (a marca entra antes do 2º `---`); raro, e as duas metades leem igual;
-#   · sinal que não passou pelo carteiro (cópia à mão, A2A, colado na sessão): chega sem a marca e cala;
+#   · sinal que não passou pelo carteiro (cópia à mão, A2A, colado na sessão) num repo sem --require-mark: chega
+#     sem a marca e cala. Com --require-mark (o core, que é o destino público; quem passa é o dispatcher, pelo papel
+#     source), sinal datado a partir de MARK_SINCE sem a chave é HARD (classe sem-marca). O corte é pelo NOME do
+#     arquivo: nome com data antiga escapa. O adotante não entra, porque o inbox dele é a caixa de SAÍDA;
 #   · marca fora do frontmatter, ou aninhada (indentada): cala;
 #   · `docs/evolution/inbound/` (o canal downstream) e qualquer caminho fora do inbox: fora do escopo;
 #   · o histórico: um commit antigo com a marca não é reescrito; ela julga só o índice de agora.
 #
-# USO     : relay-public-review-check.sh [REPO] [--format text|tsv] | --selftest
-# SAÍDA   : <SEV>\t<classe>\t<caminho-relativo>\t<msg>   classe: sem-revisao (HARD) · vazio = limpo
+# USO     : relay-public-review-check.sh [REPO] [--format text|tsv] [--require-mark] | --selftest
+# SAÍDA   : <SEV>\t<classe>\t<caminho-relativo>\t<msg>   classe: sem-revisao · sem-marca (HARD) · vazio = limpo
 # RC      : 0 julgou (as linhas dizem o resto) · 2 = erro, não julgou · 3 = sem índice git, não julgou
 # =============================================================================
 set -uo pipefail
-MODE="check"; FORMAT="text"; REPO=""
+MODE="check"; FORMAT="text"; REPO=""; REQUIRE_MARK=0
+# corte da exigência da marca: o acervo anterior nasceu sem ela (D_IT_RELAY_MARK_REQUIRED_1108, 2026-11-08)
+MARK_SINCE="2026-11-09"
 while [ $# -gt 0 ]; do
   case "$1" in
     --format) FORMAT="${2:-text}"; shift 2 ;;
     --format=*) FORMAT="${1#--format=}"; shift ;;
     --selftest) MODE="selftest"; shift ;;
-    -h|--help) sed -n '2,37p' "$0"; exit 0 ;;
+    --require-mark) REQUIRE_MARK=1; shift ;;
+    -h|--help) sed -n '2,39p' "$0"; exit 0 ;;
     *) REPO="$1"; shift ;;
   esac
 done
@@ -83,6 +89,27 @@ _scan() {
       printf 'HARD [sem-revisao] %s: reviewed_for_public: %s — revise antes do commit e grave true\n' "${p}" "${bad}"
     fi
   done < "${list}"
+  # >>> exige-marca: sinal novo que chegou sem carteiro (A2A, cópia à mão, colado) e não traz a chave
+  [ "${REQUIRE_MARK}" = 1 ] || { rm -f "${tmp}" "${list}"; return 0; }
+  local base day
+  LC_ALL=C git -C "${repo}" ls-files --cached -z -- 'docs/evolution/inbox/' > "${list}" 2>/dev/null \
+    || { rm -f "${tmp}" "${list}"; echo "relay-public-review-check: ls-files falhou" >&2; return 2; }
+  while IFS= read -r -d '' p; do
+    case "${p}" in *.md) : ;; *) continue ;; esac
+    base="${p##*/}"; day="${base:0:10}"
+    if [[ "${day}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+      [[ "${day}" < "${MARK_SINCE}" ]] && continue
+    fi
+    git -C "${repo}" cat-file blob ":${p}" > "${tmp}" 2>/dev/null \
+      || { rm -f "${tmp}" "${list}"; echo "relay-public-review-check: não li ${p} no índice" >&2; return 2; }
+    [ -z "$(_frontmatter_values "${tmp}")" ] || continue
+    if [ "${fmt}" = tsv ]; then
+      printf 'HARD\tsem-marca\t%s\t%s\n' "${p}" "sinal novo no inbox do repo público sem a chave reviewed_for_public (não passou pelo carteiro: A2A, cópia à mão ou colado na sessão) — releia-o como se já estivesse publicado, commite só a forma (um resumo sem cliente, pessoas, segredo, incidente nem postura de segurança) e grave reviewed_for_public: true no frontmatter; ou tire-o do índice (git restore --staged)"
+    else
+      printf 'HARD [sem-marca] %s: sem reviewed_for_public — revise antes do commit e grave true\n' "${p}"
+    fi
+  done < "${list}"
+  # <<< exige-marca
   rm -f "${tmp}" "${list}"
   return 0
 }
@@ -132,6 +159,25 @@ _selftest() {
   # (x) não é árvore git → rc 3, nunca aprovação
   total=$((total+1)); local ng; ng="$(mktemp -d)"; out="$(bash "$0" "${ng}" --format tsv 2>&1)"; rc=$?; rm -rf "${ng}"
   if [ "${rc}" -eq 3 ]; then _ok "(x) sem árvore git sai 3 (não julgou)"; else _ko "(x) sem árvore git: rc=${rc}"; fi
+
+  # --require-mark: sinal sem carteiro (sem a chave) a partir do corte
+  _runm() { total=$((total+1)); out="$(LC_ALL=C bash "$0" "${tmp}" --format tsv --require-mark 2>&1)"; rc=$?; }
+  _nokey() { printf -- '---\ntitle: t\n---\n\n# corpo\n' > "${tmp}/$1"; }
+  # (xi) o defeito: sinal novo sem a chave, com a exigência ligada → HARD sem-marca
+  _reset; _nokey docs/evolution/inbox/2099-01-01-a.md; _add docs; _runm
+  if [ "${rc}" -eq 0 ] && grep -q $'^HARD\tsem-marca\tdocs/evolution/inbox/2099-01-01-a.md\t' <<< "${out}"; then _ok "(xi) sinal novo sem a chave acusa com --require-mark"; else _ko "(xi) sinal novo sem a chave acusa com --require-mark: ${out}"; fi
+  # (xii) o adotante: o mesmo índice sem a exigência → cala (o inbox dele é a caixa de saída)
+  _run
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then _ok "(xii) sem --require-mark o sinal sem a chave cala"; else _ko "(xii) sem --require-mark cala: ${out}"; fi
+  # (xiii) o acervo: sinal anterior ao corte, sem a chave → cala
+  _reset; _nokey docs/evolution/inbox/_processed/2026-11-08-velho.md; _add docs; _runm
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then _ok "(xiii) anterior ao corte cala"; else _ko "(xiii) anterior ao corte cala: ${out}"; fi
+  # (xiv) a cura: novo revisado (true) cala; novo com false sai só como sem-revisao, sem linha dobrada
+  _reset; _sig docs/evolution/inbox/2099-01-01-t.md true; _sig docs/evolution/inbox/2099-01-01-f.md false; _add docs; _runm
+  if ! grep -q 'inbox/2099-01-01-t.md' <<< "${out}" && [ "$(grep -c 'inbox/2099-01-01-f.md' <<< "${out}")" = 1 ] && grep -q $'^HARD\tsem-revisao\tdocs/evolution/inbox/2099-01-01-f.md' <<< "${out}"; then _ok "(xiv) revisado cala e false não dobra"; else _ko "(xiv) revisado cala e false não dobra: ${out}"; fi
+  # (xv) nome sem data e _processed/ entram; .gitkeep e não-.md não
+  _reset; _nokey docs/evolution/inbox/sem-data.md; _nokey docs/evolution/inbox/_processed/2099-02-02-p.md; : > "${tmp}/docs/evolution/inbox/.gitkeep"; _add docs; _runm
+  if grep -q 'inbox/sem-data.md' <<< "${out}" && grep -q '_processed/2099-02-02-p.md' <<< "${out}" && ! grep -q gitkeep <<< "${out}"; then _ok "(xv) sem data e _processed/ acusam, .gitkeep não"; else _ko "(xv) sem data e _processed/: ${out}"; fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1

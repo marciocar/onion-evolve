@@ -132,7 +132,9 @@ escada (sem `x_dissect_level`: a ideia não sustenta o veredito de uso, nem prec
   zero ideias reprova sempre.
 - **O comparativo é com a régua** (`temos` · `nao-temos` · `diferente`) e o `why` diz o que a
   régua faz e **por quê**. Em `temos`, a ideia confirma o desenho da casa ou mostra que o outro chegou
-  ao mesmo lugar, e isso também é dado.
+  ao mesmo lugar, e isso também é dado. O valor é **julgamento declarado de quem conduziu, não medida
+  reprodutível**: dois condutores de famílias diferentes divergiram em 6 de 13 casos mesmo com a lista
+  de mecanismos fixa (curadoria, 2026-11-08). Quem consome o campo lê o `why`, não o rótulo.
 - **A candidata leva valor estimado** (1 a 5, com `value_why`). O selo de quem a adota é do
   destino, como o veredito (§6). Uma candidata de objeto rejeitado é o caminho normal de um conceito
   entrar sem o código.
@@ -383,8 +385,12 @@ Com `x_dissect_overcoming: nenhuma`, o estudo lista as buscas em
 **O gatilho de parque lê o que persiste.** `x_dissect_trigger: {kg_query: [flags…], min_count: N}` — uma consulta
 ao grafo pelo leitor do contrato, numa **lista branca** de flags de seleção, que conta nós `superseded`/`done` ou
 arestas `SUPERSEDES` em volta de um nó do próprio estudo, nunca `drifted`. O total tem de estar **abaixo** de
-`min_count` ao selar: gatilho que já disparou não sustenta o parque. O `x_dissect_criterion` da §2 segue com o
-sentido de sempre.
+`min_count` ao selar: gatilho que já disparou não sustenta o parque. O `--around` conta a própria âncora quando ela
+casa os filtros, e aí o `min_count` útil é **2**: com 1, o gatilho nasce disparado. O `x_dissect_criterion` da §2
+segue com o sentido de sempre.
+
+**Radar e contrato não substituem este checador:** grafo de dissecação roda os três antes do push, porque o radar 0
+e o contrato ok já passaram num grafo que ele reprovou no CI.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
 mediu, nunca aprovação) confere os 10 itens — família e aresta, veredito da família, destino, quem paga e o não

@@ -149,6 +149,8 @@ descarte o original sem commit. Reescrever no mesmo arquivo untracked perde a re
 remetente com corpo diferente cai por cima dele. Então grave `reviewed_for_public: true` no que vai ao
 índice. O comentário da marca traz a visibilidade que o carteiro mediu; `unknown` num repo privado se
 resolve gravando `true`. A guarda só confere a marca; quem decide é esta releitura.
+No core (papel `source`), desde 2026-11-09 o sinal novo tem de trazer a chave: o que chega sem carteiro (A2A, cópia
+à mão, colado) não vem marcado, e o mesmo passo vale para ele, gravando `reviewed_for_public: true` antes do commit.
 
 **Caso residual — duplicata untracked (entrega de carteiro pós-triagem):** se uma mensagem de 1º nível é
 **untracked** (entrega-sem-commit do co-relay/co-deliver) e **byte-idêntica** a uma cópia já em

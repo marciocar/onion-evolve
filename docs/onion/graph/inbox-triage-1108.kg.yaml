@@ -1,0 +1,189 @@
+meta:
+  schema_version: "1"
+  id: inbox-triage-1108
+  slug: inbox-triage-1108
+  title: "Triagem dos nove sinais pendentes do inbox do core em 2026-11-08"
+  date: "2026-11-08"
+  baseline: "2026-11-08"
+  review_after: "2026-11-22"
+  purpose: "Guardar o que a triagem de 2026-11-08 decidiu e o que abriu: o selo em parte da proposta dos quatro campos, a extensão da REGRA 113 (Sinal relayado a destino público só se commita revisado) ao sinal sem carteiro e os itens novos, cada um com dono e issue."
+  note: "TETO, declarado: 1 evidência, 2 selos e 8 perguntas. Sem x_due: o prazo sai de pontos e do histórico planejado contra executado. Sinal já atendido não vira nó; a tabela por sinal está no resíduo do PR."
+  # ═══ TETO: 11 NÓS ═══
+external_edges:
+  - from: D_IT_RELAY_MARK_REQUIRED_1108
+    to: "docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml#C_TETO_FORA_DO_CARTEIRO"
+    edge_type: TRACES_TO
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: "docs/evolution/research/outside-in-primaries-2026-11/outside-in-primaries-2026-11.kg.yaml#Q_SANDBOX_DENY_LAYER_DECISION_1108"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_IT_SIGNALS_MEASURED_1108
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-08"
+    verified_against: "os 9 sinais lidos inteiros, cada um medido contra a origin/main do core em 5973b4a3f e a do onion-messaging em ead81ba, com os PRs abertos #8, #9 e #10 dele e o #1553 do core"
+    trace: "docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md"
+    label: "Dos 9 sinais, 4 já estavam atendidos, 1 é só informativo, e 4 abrem trabalho: o sinal sem carteiro não traz a marca da REGRA 113, a sincronização da main não confere a escrita antes do ff, e as instructions da campainha não têm as duas cláusulas pedidas."
+    narrative: "Dado, não instrução. Medidas minhas: relay-public-review-check.sh só julga o arquivo que traz a chave; 16 sinais de novembro no acervo não a têm, 7 deles por A2A. ops/sync-main-worktree.sh roda merge --ff-only sem conferir escrita e sempre sai 0. O kg_query --around conta a própria âncora: --depth 1 --status open deu 1 sobre um nó aberto sem vizinho aberto. _pr_branch cai em branch --show-current sem --head. As instructions do doorbell/server.ts na main não citam ação destrutiva nem autoescalada. A medida do sandbox e a do quadro são da curadoria e não foram refeitas: a medida de F8 sustenta a pergunta do sandbox, que segue com o maestro."
+    provenance:
+      source: "sessão do core, sobre os sinais do inbox"
+      locator: "docs/evolution/inbox/_processed/, sinais de 2026-11-06 e 2026-11-08"
+      method: "measurement: leitura dos sinais e do código na origin/main, kg_query rodado no core"
+      locality: "repo"
+  - id: D_IT_ADOPTER_SIGNAL_SEAL_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-08"
+    verified_against: "SIGNAL-DRAFT.md e D_ADOPTER_SIGNALS_PROPOSAL na origin/main da onion-curation, conferidos pelo peer-ref-check; D_MD_HISTORY_PAGE_KEEPS_NAME_1108 no grafo maestro-decisions-1108; D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
+    trace: "docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md"
+    label: "O core sela em parte a proposta dos quatro campos: L1 e L3 como rampa sem catraca, L2 como rampa no emissor e aviso no receptor; L4 fica parqueada; o GitHub fica fora do caminho do núcleo; nenhuma vertical de monitoramento."
+    narrative: "Selado pelo core em nome do maestro, na autonomia em vigor, revogável. Os refutadores do SIGNAL-DRAFT viram critério de reabertura. L4 parqueia porque o próprio estudo diz que o recall é provavelmente baixo e que o mutante não prova dependência do token; gatilho: 20 sinais no formato do comando, ou 2 recorrências que a triagem humana notou e a assinatura teria achado. O GitHub como transporte cai pela regra de não depender de serviço externo. Os nomes de adotante nos caminhos ficam, pelo selo do maestro de 2026-11-08 sobre a retirada do nome valer só para /federacao/. A vertical de monitoramento fica para uma régua de operação, depois do comando existir, porque a régua pré-registrada não podia dar não."
+    provenance:
+      source: "core, em nome do maestro (autonomia de 2026-11-06, revogável)"
+      locator: "pedido do sinal da curadoria de 2026-11-08, item 'selar a proposta, ou devolver com o motivo'"
+      method: "testimony: decisão do core sobre proposta da curadoria"
+      locality: "repo"
+  - id: D_IT_RELAY_MARK_REQUIRED_1108
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-08"
+    verified_against: ".claude/validation/relay-public-review-check.sh --selftest 15/15 nesta branch, com a família relay-public da bancada e os mutantes novos"
+    trace: ".claude/validation/relay-public-review-check.sh"
+    label: "No core (papel source), o sinal novo do inbox sem a chave reviewed_for_public passa a ser HARD da REGRA 113, a partir de 2026-11-09; sinal por A2A, cópia à mão ou colado deixa de calar."
+    narrative: "Cura da nota do sinal da curadoria. Corte pelo nome do arquivo, porque o acervo nasceu sem a marca, e sem lista de legado. O adotante fica fora: o inbox dele é a caixa de saída. Limites: nome com data antiga escapa, e a guarda segue vendo a marca, não o conteúdo; quem julga o conteúdo é a releitura, e o aviso de padrão de segredo é Q_IT_SIGNAL_RECEIVER_WARN. O gatilho do C_TETO_FORA_DO_CARTEIRO pedia caso medido de dano, que não houve: a extensão é decisão de custo baixo, com prazo do hub."
+    provenance:
+      source: "core, em nome do maestro (autonomia de 2026-11-06, revogável)"
+      locator: "nota do sinal da curadoria de 2026-11-08 sobre a REGRA 113"
+      method: "testimony: decisão do core, entregue no mesmo PR com bancada e mutantes"
+      locality: "repo"
+  - id: Q_IT_SIGNAL_RECORD_COMMAND
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-374"
+    impact: 3
+    confidence: 0.6
+    label: "L1 e L3: o comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa."
+    narrative: "Pronto quando: um comando local grava classe, severidade, recorrência e dono, um sinal por registro; um lint SOFT avisa campo ausente, sem catraca; os refutadores do SIGNAL-DRAFT têm como ser medidos sobre os sinais que chegarem pelo comando."
+  - id: Q_IT_SIGNAL_RECEIVER_WARN
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-375"
+    impact: 3
+    confidence: 0.6
+    label: "L2 no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra."
+    narrative: "Pronto quando: avisa um sinal com segredo-isca plantado e não avisa mais de 1 em 10 sinais limpos, que é o refutador pré-registrado. É aviso: a REGRA 113 cobra que a revisão aconteceu, e esta peça ajuda a revisão a enxergar."
+  - id: Q_IT_SYNC_MAIN_WRITE_PREFLIGHT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-376"
+    impact: 3
+    confidence: 0.7
+    label: "O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebrar no meio."
+    narrative: "Pronto quando: nenhum arquivo do checkout muda se algum alvo estiver protegido, a linha de saída diz qual, e há caso de bancada e mutante. Limite herdado da medida: numa worktree o access(2) dá os alvos como graváveis, e a cura pedida evita a árvore parcial sem fazer o update passar sob sandbox."
+  - id: Q_IT_RESIDUE_GUARD_REMOTE_BRANCH
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-377"
+    impact: 2
+    confidence: 0.8
+    label: "O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de nomes diferentes."
+    narrative: "Pronto quando: a guarda resolve o upstream antes do nome local, com caso de bancada que falha sem a cura."
+  - id: Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-378"
+    impact: 3
+    confidence: 0.5
+    label: "A fila do onion-messaging reentrega o job à sessão que já agiu e perdeu o lease: falta o teste, e a decisão de pôr ou não um marcador terminal."
+    narrative: "Pronto quando: a bancada reproduz a reentrega por lease vencido depois do efeito, e um D_ diz se a fila ganha marcador terminal ou se a repetição segue com a sessão pelo ce_id. Hoje é leitura de código da curadoria, não teste."
+  - id: Q_IT_DOORBELL_INSTRUCTION_CLAUSES
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-379"
+    impact: 3
+    confidence: 0.7
+    label: "As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada."
+    narrative: "Pronto quando: as duas cláusulas estão no texto de instructions do doorbell/server.ts, com caso de bancada que as confere; entra depois dos PRs #9 e #10 do onion-messaging, que mexem na mesma região."
+  - id: Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-380"
+    impact: 2
+    confidence: 0.5
+    label: "O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico?"
+    narrative: "Backlog, sem dano medido. Pronto quando: um D_ responde às duas perguntas, ou diz por que ficam como estão."
+  - id: Q_IT_AGENT_MAIL_RIDER_READING
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    x_linear_issue: "SAC-381"
+    impact: 2
+    confidence: 0.4
+    label: "A rider da licença do Agent Mail alcança uma ideia gerada do zero no onion-messaging, ou só o código?"
+    narrative: "Leitura jurídica, que ninguém aqui tem competência para fazer. Recomendação do core ao maestro: não buscar parecer agora; se o marcador terminal vier, parte do padrão de mercado de idempotência, sem derivar do Agent Mail. Pronto quando: o maestro aceita a recomendação ou manda buscar a leitura."
+edges:
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: D_IT_ADOPTER_SIGNAL_SEAL_1108
+    edge_type: SUPPORTS
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: D_IT_RELAY_MARK_REQUIRED_1108
+    edge_type: SUPPORTS
+  - from: D_IT_ADOPTER_SIGNAL_SEAL_1108
+    to: Q_IT_SIGNAL_RECORD_COMMAND
+    edge_type: TRACES_TO
+  - from: D_IT_ADOPTER_SIGNAL_SEAL_1108
+    to: Q_IT_SIGNAL_RECEIVER_WARN
+    edge_type: TRACES_TO
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: Q_IT_SYNC_MAIN_WRITE_PREFLIGHT
+    edge_type: SUPPORTS
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: Q_IT_RESIDUE_GUARD_REMOTE_BRANCH
+    edge_type: SUPPORTS
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT
+    edge_type: SUPPORTS
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: Q_IT_DOORBELL_INSTRUCTION_CLAUSES
+    edge_type: SUPPORTS
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT
+    edge_type: SUPPORTS
+  - from: E_IT_SIGNALS_MEASURED_1108
+    to: Q_IT_AGENT_MAIL_RIDER_READING
+    edge_type: SUPPORTS

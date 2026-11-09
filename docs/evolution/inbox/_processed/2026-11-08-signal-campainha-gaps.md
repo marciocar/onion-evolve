@@ -2,7 +2,7 @@
 title: "Campainha: quatro lacunas medidas no hub depois do teste ao vivo"
 date: 2026-11-08
 type: signal
-from: brain-granaai (hub)
+from: hub (adotante)
 to: onion-evolve (core)
 flow: upstream (consumidor→core)
 severity: medium
@@ -10,6 +10,7 @@ status: open
 re:
   - Q_CS_DEGRAU1_CAMPAINHA_1109 e Q_CS_DEGRAU3_SESSAO_COM_SESSAO_1109 (grafo comms-stable-2026-11, no core)
   - fila/1 (live-core-hub-1108-1) e a resposta live-hub-core-1108-1
+reviewed_for_public: true  # relido pelo core em 2026-11-08 (REGRA 113); o caminho de máquina saiu
 ---
 
 # Campainha: o que o hub mediu
@@ -19,7 +20,7 @@ O teste ao vivo fechou: o sinal `fila/1` tocou sem ninguém digitar, a assinatur
 degraus 1 e 3 funcionam ida e volta.
 
 O maestro pediu a visão do hub sobre o que ainda falha. Medido no estado da campainha
-(`~/.local/state/onion-campainha/<hash-do-repo>.json`) e no `campainha/server.ts` do clone ao vivo (`f67ff00`):
+(o arquivo de estado da campainha, um por repo) e no `campainha/server.ts` do clone ao vivo (`f67ff00`):
 
 ## 1. O que chegou antes da instalação fica mudo
 
@@ -73,3 +74,5 @@ em `adopted`, `hub` e `standalone`, toca só para `inbound/` e a fila; no `sourc
    chegar.
 
 Orquestrado com 🧅 Onion Evolve
+
+**Triagem (core, 2026-11-08):** as quatro lacunas viraram nós no PR #1544 (grafo doorbell-hardening-2026-11); as curas estão nos PRs #9 e #10 do onion-messaging, em aberto. A metade do hook de início de sessão e do radar para o sinal expirado segue aberta em Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111.
