@@ -1,19 +1,19 @@
 ---
 branch: chore/inbox-triage-1108
-pr: pendente
+pr: 1555
 date: 2026-11-09
-reviewed_diff_sha256: 1eccbdfeefca78e77266b9103fcb8486db7f98e1b456600b15a103341829467f
-reviewed_code_sha256: 81cc9e57e5d808d87bbcd2da2631ef21e2bdf01fcec20d1ef49c4da1f34988d2
-findings_total: 5
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 12
+findings_real: 12
+findings_blocking: 1
 tokens: 0
 duration_min: 40
-findings_fixed: 5
+findings_fixed: 12
 verdict: FIXED
 elenxo: false
 elenxo_isolado: false
-reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes)"
-nota: "tokens = 0: não medido. Passada de uma lente só. Medidos: --selftest do check 15/15, família relay_public da bancada 33/33 com os mutantes novos, radar 0, contrato ok, varredura de caminho de máquina 0."
+reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador separado, que não escreveu o diff, com 1 bloqueio e 6 ressalvas, curados pelo agente"
+nota: "tokens = 0: não medido. O refutador não é o Elenxo de workflow, por isso elenxo: false. Medidos: --selftest do check 20/20, família relay_public da bancada verde com 8 mutantes novos no check e 2 no portão de papel, radar 0, contrato ok."
 ---
 
 # Passada adversarial: `chore/inbox-triage-1108`
@@ -50,8 +50,19 @@ nota: "tokens = 0: não medido. Passada de uma lente só. Medidos: --selftest do
 4. CONTAGEM ERRADA: a evidência dizia 3 atendidos e 5 com trabalho; a tabela dá 4 e 4. Corrigido.
 5. CONTRATO: `provenance.method` dos dois selos fora do padrão. Corrigido.
 
+## Achados do refutador (2ª passada)
+
+6. BLOQUEIO: o anúncio ao hub dizia «dois PRs abertos» e mandava testar branches que não existem mais; os #9 e #10 entraram. Reescrito para a main do onion-messaging.
+7. Notas de triagem com «em aberto» desatualizado. Corrigidas nas linhas do core; o texto do remetente ficou intacto. Os 4 `Q_DB_*` fechados pelo merge das curas, e a metade do core da lacuna 2 virou `Q_DB_EXPIRED_CORE_HALF`.
+8. Portão de papel do dispatcher sem mutante. Caso (j3), com dispatcher extraído e dois mutantes.
+9. Falsos negativos por extensão: `.MD`, `.markdown`, `.txt` e sem extensão. Todos julgados agora, caso (xvi).
+10. Corpo com NUL e frontmatter sem `---` de fecho. Casos (xvii) e (xviii).
+11. `README.md` do inbox virava HARD. Isento só no inbox e no `_processed/`, caso (xix).
+12. O selo decidia dois itens que a curadoria pôs em «Para o Maestro decidir», sem dizer. O nó diz agora o que foi decidido em nome dele.
+
 ## Limites
 
 - O corte é pelo nome do arquivo: nome com data antiga escapa.
 - A guarda vê a marca, não o conteúdo.
 - Medidas do sandbox, do quadro e da fila são da curadoria, não refeitas.
+- Os 4 `Q_DB_*` fecharam pelo merge das curas e leitura do código; a reprodução pelo hub não foi medida pelo core.
