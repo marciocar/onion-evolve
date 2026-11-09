@@ -1,18 +1,17 @@
 ---
 branch: feat/provisional-team-band
 date: 2026-11-09
-reviewed_diff_sha256: 754f059fabdfc02e41e504cb6c2c83f0ea86c7aa1db91ea659c79dff7fcad1fe
-reviewed_code_sha256: 2799d45d4248ad2a82171331100e68b41e01fabfdc58ee0c42084845100a344d
-findings_total: 13
-findings_real: 13
+reviewed_diff_sha256: pendente
+findings_total: 17
+findings_real: 17
 tokens: 0
-duration_min: 120
-findings_fixed: 12
+duration_min: 165
+findings_fixed: 16
 verdict: REJECTED_AND_FIXED
 elenxo: false
 elenxo_isolado: false
 reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe criar agentes). Refutador independente reprovou o head 59b2ad09e; as curas deste head ainda não foram re-refutadas"
-nota: "tokens = 0: não medido. O que sustenta: bancada (121 casos, 182 mutantes), 40 escritas reais conferidas por leitura separada, e a faixa exercitada contra o Linear real."
+nota: "tokens = 0: não medido. O que sustenta: bancada (124 casos, 186 mutantes), 40 escritas reais conferidas por leitura separada, e a faixa exercitada contra o Linear real."
 ---
 
 # Resíduo: faixa provisória do time e separação das retroestimadas
@@ -39,3 +38,14 @@ nota: "tokens = 0: não medido. O que sustenta: bancada (121 casos, 182 mutantes
 | 13 | Mutantes vivos: acerto por categoria, `with_open` temporal igual ao LOO, `REREAD_PAUSES` de produção. | Curado; o `gate na in` do refutador é equivalente, porque `not_applicable` retorna antes da porta. |
 
 Limite: o caminho `conditional_on_age_in_queue` tem data e acerto medido baixo (ver PR). A data sai, declarada, com o aviso `low_served_accuracy`.
+
+## Regra do maestro de 2026-11-09: a data nasce no compromisso
+
+| # | Achado | Destino |
+|---|---|---|
+| 14 | Fila recebia data com 19,6% de acerto medido. | Curado: backlog e fila dão pontos e horas; só issue iniciada com pontos recebe data. |
+| 15 | Categoria calibrada também daria data para issue em fila. | Curado: `calibrated_hours_only`. |
+| 16 | `due_date.set` não dizia quem fixou. | Curado: `--set-by` obrigatório, registrado em comentário. |
+| 17 | Comentar em issue arquivada devolve `errors` depois de gravar o prazo. | Curado: rc 1 dizendo que o prazo já foi gravado. |
+
+Doutrina em `common:prompts:commitment-date-doctrine`, com citação conferida do Scrum Guide e do Kanban Guide. `already_started` segue sem desfecho no histórico real: a data sai com `accuracy_not_measured`.

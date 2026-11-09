@@ -24,10 +24,11 @@
 # motivo no JSON: insufficient_sample, no_points_signal, calibration_not_measured, miscalibrated, beyond_history ou
 # not_applicable. rc 3 nunca traz data: beyond_history de issue não iniciada só traz `work_hours_if_started_now`, horas de
 # trabalho P80, condicionais a iniciar agora. Data sem sustentação seria a data de agente que esta ferramenta aposenta.
-# 4 = faixa provisória do time (`provisional_team_band`, decisão do maestro de 2026-11-09): a categoria não passou nos portões e sai
-# uma faixa do time inteiro, sem pontos, em `provisional`, baixa confiança, com o acerto medido ao lado. `proposal` segue null.
-# Dois status com rc 4: provisional_team_band traz datas não calibradas, só onde o acerto do caminho servido foi medido, e
-# provisional_work_hours_only traz só horas, porque a data dependeria de quando alguém decide começar. not_calibrated (ato humano) é rc 3.
+# 4 = sem prazo calibrado, `proposal` null. Regra do maestro (2026-11-09): a data nasce no compromisso, quando alguém valida a estimativa e a
+# issue entra em desenvolvimento, ou quando alguém a fixa; backlog e fila têm pontos e horas. Doutrina: common:prompts:commitment-date-doctrine.
+# Três status: provisional_team_band (categoria sem base, issue já em desenvolvimento com pontos: data não calibrada, início mais P80 do time, com o
+# acerto do caminho ao lado), provisional_work_hours_only (sem base e sem início: só horas) e calibrated_hours_only (categoria calibrada, ainda sem início: só horas).
+# not_calibrated (ato humano) é rc 3.
 #
 # Como sai a data: cada issue parecida do histórico vira um cenário (fila dela + pontos pedidos × horas por ponto dela), e a
 # data é a estatística de ordem conformal P80 desses cenários. O `report` publica o backtest dessa mesma conta, em
@@ -675,14 +676,19 @@ def propose_date(rows, open_rows, now, window, points, category, issue):
     likely, _ = conformal(remaining, LIKELY_QUANTILE)
     low, _ = conformal(remaining, LOW_QUANTILE)
     high, capped = conformal(remaining, HIGH_QUANTILE)
-    return {"status": "proposed",
+    result = {"status": "proposed",
             "proposal": {"due_date": date_for(due), "due_percentile": int(DUE_QUANTILE * 100), "likely": date_for(likely),
                          "range": {"low": date_for(low), "high": date_for(high), "high_is_sample_max": capped}},
             "basis": {"points": points, "category": category, "mode": mode, **detail, "sample_used": len(remaining),
                       "hours_from_now": {"low": round3(low), "likely": round3(likely), "due": round3(due), "high": round3(high)},
                       "sample": stats["sample"], "points_origin": origin_counts(history), "points_signal": signal, "now": now.isoformat(), "backtest_temporal_category": check,
                       "coverage_with_open": backtests["loo"]["history_only"]["with_open"]},
-            "warnings": warnings, "limits": limits_with_bias(backtests), "note": "proposta: o medidor não escreve; quem aceita a faixa aplica com due_date.set"}, 0
+            "warnings": warnings, "limits": limits_with_bias(backtests), "note": "proposta: o medidor não escreve; quem aceita a faixa aplica com due_date.set --set-by"}
+    if not started:
+        # a conta está calibrada, mas a issue segue em fila: horas, sem data, até alguém a pôr em desenvolvimento
+        return {"status": "calibrated_hours_only", "proposal": None, "category": category, "basis": result["basis"], "warnings": result["warnings"], "limits": result["limits"],
+                "why_no_date": "backlog e fila não recebem data: ela nasce quando alguém valida a estimativa e a issue entra em desenvolvimento"}, PROVISIONAL_RC
+    return result, 0
 
 
 def team_view(rows):
@@ -760,8 +766,8 @@ def served_accuracy(rows, open_rows, now):
             "min_resolved": SERVED_MIN, "latest_percentile": int(DUE_QUANTILE * 100), "by_queue_basis": stats}
 
 
-def team_band(rows, open_rows, now, category, issue, gate):
-    """Faixa de baixa confiança quando a categoria não tem base. Nunca preenche `proposal`, e só dá data onde o caminho servido foi medido."""
+def team_band(rows, open_rows, now, category, issue, gate, points):
+    """Baixa confiança quando a categoria não tem base. Nunca preenche `proposal`, e só há data depois que alguém pôs a issue em desenvolvimento."""
     gate = {k: v for k, v in gate.items() if k != "proposal"}
     view, opened = team_view(rows), team_view(open_rows)
     history = clocked(view, False)
@@ -776,25 +782,27 @@ def team_band(rows, open_rows, now, category, issue, gate):
     served = served_accuracy(rows, open_rows, now)
     this_path = {"queue_basis": basis, **served["by_queue_basis"][basis]}
     accuracy = {"served_path": this_path, "served": served, "from_creation_reference": team_accuracy(view, opened, now)}
-    common = {"confidence": "low", "calibrated": False, "queue_basis": basis, "sample_used": len(scenarios["totals"]), **detail}
+    common = {"confidence": "low", "calibrated": False, "points": points, "queue_basis": basis, "sample_used": len(scenarios["totals"]), **detail}
     warnings = [{"code": "low_confidence", "message": "faixa do time inteiro, sem pontos: não é prazo calibrado da categoria"}]
     tail = {"measured_accuracy": accuracy, "calibration_gate": gate, "warnings": warnings, "limits": LIMITS}
-    if basis == "assumes_start_now" or not this_path["measured"]:
-        why = ("a data depende de quando alguém decide começar: a issue já esperou mais do que o time costuma esperar" if basis == "assumes_start_now"
-               else f"o caminho {basis} tem só {this_path['resolved']} desfecho(s) medido(s); mínimo {SERVED_MIN}")
+    if basis != "already_started" or not points:
+        why = ("backlog e fila não recebem data: ela nasce quando alguém valida a estimativa e a issue entra em desenvolvimento, ou quando alguém a fixa com due_date.set"
+               if basis != "already_started" else "iniciada sem estimativa: sem pontos validados não há data")
         key = "work_hours_remaining" if basis == "already_started" else "work_hours_if_started_now"
         warnings.append({"code": "hours_only", "message": why})
         return {"status": "provisional_work_hours_only", "proposal": None, "category": category,
-                "provisional": {**common, "dates_not_calibrated": None, key: band(scenarios["work"]), "why_no_date": why}, **tail,
-                "note": "só horas de trabalho: sem data, porque ela não se sustenta neste caminho"}, PROVISIONAL_RC
-    if this_path["coverage"] < LOW_SERVED_COVERAGE:
+                "provisional": {**common, "dates_not_calibrated": None, key: band(scenarios["work"]),
+                                "queue_hours_remaining": band(scenarios["queue"]) if scenarios["queue"] else None, "why_no_date": why}, **tail,
+                "note": "pontos e horas, sem data"}, PROVISIONAL_RC
+    if not this_path["measured"]:
+        warnings.append({"code": "accuracy_not_measured", "message": f"caminho sem desfechos suficientes ({this_path['resolved']} de {SERVED_MIN}): o acerto desta data não foi medido"})
+    elif this_path["coverage"] < LOW_SERVED_COVERAGE:
         warnings.append({"code": "low_served_accuracy", "message": f"neste caminho a data final acertou {this_path['coverage']} em {this_path['resolved']} desfechos"})
     span = band(scenarios["totals"])
     return {"status": "provisional_team_band", "proposal": None, "category": category,
-            "provisional": {**common, "latest_percentile": int(DUE_QUANTILE * 100),
-                            "dates_not_calibrated": {k: local_date(now + dt.timedelta(hours=v)).isoformat() for k, v in span.items()},
-                            "hours_from_now": span, "queue_hours_remaining": band(scenarios["queue"]) if scenarios["queue"] else None, "work_hours": band(scenarios["work"])},
-            **tail, "note": "faixa provisória, não prazo: se aplicar com due_date.set, use --provisional-note; quando a categoria passar nos portões, o proposed normal assume"}, PROVISIONAL_RC
+            "provisional": {**common, "latest_percentile": int(DUE_QUANTILE * 100), "date_basis": "start of development plus P80 of the durations that lasted at least the elapsed time",
+                            "dates_not_calibrated": {k: local_date(now + dt.timedelta(hours=v)).isoformat() for k, v in span.items()}, "hours_from_now": span},
+            **tail, "note": "faixa provisória, não prazo: quem aplicar usa due_date.set --set-by; quando a categoria passar nos portões, o proposed normal assume"}, PROVISIONAL_RC
 
 
 # ── amostra cega ────────────────────────────────────────────────────────────
@@ -997,10 +1005,10 @@ def run_propose(args, rules, overlay, now, load):
     rows, open_rows = load("completed"), load(OPEN_STATES)
     if not points:
         gate = {"status": "no_points", "reason": f"{issue['identifier']} sem pontos: a faixa do time não os usa, a data calibrada precisa deles"}
-        return team_band(rows, open_rows, now, category, issue, gate)
+        return team_band(rows, open_rows, now, category, issue, gate, None)
     result, rc = propose_date(rows, open_rows, now, args.window, points, category, issue)
     if result["status"] in PROVISIONAL_GATES:
-        return team_band(rows, open_rows, now, category, issue, result)
+        return team_band(rows, open_rows, now, category, issue, result, points)
     return result, rc
 
 

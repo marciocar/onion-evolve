@@ -963,30 +963,37 @@ def _calendar_date(value):
     return value
 
 
+def _named_flag(args, flag):
+    """Tira `flag valor` de args. Devolve (valor ou None, resto). Valor em branco é erro de uso antes de qualquer rede."""
+    if flag not in args:
+        return None, args
+    at = args.index(flag)
+    if at + 1 >= len(args) or not args[at + 1].strip():
+        raise TmError(f"{flag} exige valor", 2)
+    return args[at + 1], args[:at] + args[at + 2:]
+
+
 def v_due_date_set(args):
-    usage = 'due_date.set <ID> <YYYY-MM-DD>|--clear [--provisional-note "texto"]'
-    note = None
-    if "--provisional-note" in args:
-        at = args.index("--provisional-note")
-        if at + 1 >= len(args) or not args[at + 1].strip():
-            raise TmError(f"uso: tm.sh {usage} (nota vazia)", 2)
-        note = args[at + 1]
-        args = args[:at] + args[at + 2:]
+    # Regra do maestro (2026-11-09): data fixada à mão registra quem fixou. A marca vai em comentário porque a API só guarda o dono da chave.
+    usage = 'due_date.set <ID> <YYYY-MM-DD>|--clear --set-by "<quem>" [--note "texto"]'
+    who, args = _named_flag(args, "--set-by")
+    note, args = _named_flag(args, "--note")
+    if who is None:
+        raise TmError(f"uso: tm.sh {usage} (--set-by é obrigatório)", 2)
     ident, raw = _single_target(args, usage)
-    if note is not None and raw is None:
-        raise TmError("--provisional-note marca uma data; não se usa com --clear", 2)
     due = None if raw is None else _calendar_date(raw)
     iss = _issue(ident)
     updated = _verified_update(iss, "dueDate", due)
-    out = {"issue": updated["identifier"], "dueDate": updated["dueDate"], "previous": iss.get("dueDate")}
-    if note is not None:
-        # prazo provisório sem marca viraria prazo calibrado para quem só olha o campo
-        body = f"Prazo provisório {due}: não calibrado. {note}"
+    body = f"Prazo {due} fixado à mão por {who}." if due else f"Prazo removido por {who}."
+    if note:
+        body += f" {note}"
+    try:
         data = gql("mutation($in:CommentCreateInput!){ commentCreate(input:$in){ success comment { id } } }", {"in": {"issueId": iss["id"], "body": body}})
-        if not (data.get("commentCreate") or {}).get("success"):
-            raise TmError(f"{iss['identifier']}: a data {due} foi gravada, e a marca de provisória NÃO: comente antes de seguir")
-        out["provisional_note"] = data["commentCreate"]["comment"]["id"]
-    return out
+    except TmError as e:
+        raise TmError(f"{iss['identifier']}: o prazo foi gravado, e o registro de quem fixou NÃO ({e}): comente antes de seguir")
+    if not (data.get("commentCreate") or {}).get("success"):
+        raise TmError(f"{iss['identifier']}: o prazo foi gravado, e o registro de quem fixou NÃO: comente antes de seguir")
+    return {"issue": updated["identifier"], "dueDate": updated["dueDate"], "previous": iss.get("dueDate"), "set_by": who, "comment": data["commentCreate"]["comment"]["id"]}
 
 
 def _comment_opts(args):
