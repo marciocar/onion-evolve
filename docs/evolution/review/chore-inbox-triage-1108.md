@@ -2,8 +2,7 @@
 branch: chore/inbox-triage-1108
 pr: 1555
 date: 2026-11-09
-reviewed_diff_sha256: 69c1ef331c059858c53da0b0ae83d0fa1dcbe41f9ac3cea1e10efe15f9767829
-reviewed_code_sha256: 5e624934e929bcd2f97c69b338c1cfb099fa572eeda04b2fbba6d5ab20bc1ffb
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 12
 findings_blocking: 1
@@ -59,7 +58,7 @@ nota: "tokens = 0: não medido. O refutador não é o Elenxo de workflow, por is
 9. Falsos negativos por extensão: `.MD`, `.markdown`, `.txt` e sem extensão. Todos julgados agora, caso (xvi).
 10. Corpo com NUL e frontmatter sem `---` de fecho. Casos (xvii) e (xviii).
 11. `README.md` do inbox virava HARD. Isento só no inbox e no `_processed/`, caso (xix).
-12. O selo decidia dois itens que a curadoria pôs em «Para o Maestro decidir», sem dizer. O nó diz agora o que foi decidido em nome dele.
+12. O selo decidia dois itens que a curadoria pôs em «Para o Maestro decidir», sem dizer. Levados ao maestro, que confirmou os dois em 2026-11-09, e o nó registra a escolha e a opção descartada.
 
 ## Limites
 
