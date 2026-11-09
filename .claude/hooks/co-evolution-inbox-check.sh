@@ -30,11 +30,12 @@ if [ "${1:-}" = "prompt" ]; then
       ;;
     *"pending="[1-9]*)
       _p="${_out##*pending=}"
-      _state="${ONION_SPOOL_NOTICE_DIR:-${XDG_RUNTIME_DIR:-/tmp}/onion-spool-notice}"
+      _state="${ONION_SPOOL_NOTICE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/onion-spool-notice}"
       mkdir -p "$_state" 2>/dev/null || true
       _mark="$_state/${CLAUDE_CODE_SESSION_ID:-nosession}-$_p"
       [ -e "$_mark" ] && exit 0
-      : > "$_mark" 2>/dev/null || true
+      [ -L "$_mark" ] && exit 0
+      ( set -C; : > "$_mark" ) 2>/dev/null || true   # noclobber: nunca escreve através de um link
       printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"📮 Onion co-evolução: %s sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve mostra o motivo)."}}\n' "$_p"
       ;;
   esac
