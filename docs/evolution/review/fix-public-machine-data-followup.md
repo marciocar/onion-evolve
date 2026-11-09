@@ -2,7 +2,8 @@
 branch: fix/public-machine-data-followup
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 156c728db2363e38137a1dba65e779bb79f3d35243a67db6963169bed7b823b3
+reviewed_code_sha256: b091d7ba2c0c75ee3d95e50bbccd6a483a0e9a00b04aaca347e6012acfd2c787
 findings_total: 6
 findings_real: 6
 findings_blocking: 0
