@@ -1,7 +1,8 @@
 ---
 branch: feat/provisional-team-band
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 11c59d6d319513a4c03b16081433f02be66e380377c022b16ed0168447cc169d
+reviewed_code_sha256: b3d98b246e09d1213fb81910f4b1b1a12939c29c16c93de4cf2787eef54fe3ca
 findings_total: 19
 findings_real: 19
 tokens: 0
