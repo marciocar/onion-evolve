@@ -18,7 +18,8 @@
 #   key  caminho sob `.ssh/` que nomeia arquivo, menos known_hosts, config e authorized_keys e suas cópias.
 # O NOME DO ARQUIVO também é julgado, e a forma do host e do IP vale nele.
 #
-# A SAÍDA PARA FALSO POSITIVO: `machine-data-ok: <motivo>` na própria linha cala a linha. Sem motivo não cala.
+# A SAÍDA PARA FALSO POSITIVO: `machine-data-ok: <motivo>` na própria linha cala só a classe `ip` dela, a única
+# em que um número ambíguo se confunde com o dado. Host e chave seguem acusados. Sem motivo não cala.
 #
 # QUEM CONTROLA A ENTRADA: só commit neste repo. O registro e o diário são escritos pela sessão do core;
 # sinal de adotante não chega a estes caminhos, então terceiro não dispara o veto à distância.
@@ -37,7 +38,8 @@
 #   · IP depois de letra e barra (`x/151.101.1.1`) cala como token de produto; IP público com um dígito em cada
 #     parte, como 8.8.8.8, também;
 #   · número de 4 partes com algum octeto de 2 dígitos ou mais (`12.3.4.1`) é acusado: use o marcador;
-#   · o marcador é honra visível no diff: não há contagem nem catraca dele;
+#   · o marcador é honra visível no diff: aceita qualquer motivo, e não há contagem nem catraca dele;
+#   · só dado de máquina: nomes de adotante seguem em entradas do diário e no espelho, e esta guarda não os busca;
 #   · não vê `local_path` nem caminho de home: esses têm consumidor de código e ficam, por decisão registrada no grafo.
 set -uo pipefail
 
@@ -53,8 +55,6 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-command -v python3 >/dev/null 2>&1 || { echo "public-machine-data: python3 ausente — NAO VERIFICADO" >&2; exit 2; }
-[ -f "${LIB}/machine_path.py" ] || { echo "public-machine-data: machine_path.py não está em ${LIB} — NAO VERIFICADO" >&2; exit 2; }
 if [ "${MODE}" != "selftest" ]; then
   [ -n "${ROOT}" ] || ROOT="$(pwd)"
   command -v git >/dev/null 2>&1 || { echo "public-machine-data: git ausente — NAO VERIFICADO" >&2; exit 2; }
@@ -63,14 +63,25 @@ if [ "${MODE}" != "selftest" ]; then
   ROOT="${_top}"
   _stamp="${ROOT}/.claude/.onion-version"
   if [ -f "${_stamp}" ]; then
-    _role_v="$(awk '/^role:/{print $2; exit}' "${_stamp}")"
-    _door="$(grep -cE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${_stamp}" || true)"
-    if [ "${_role_v:-source}" != "source" ] || [ "${_door:-0}" != "0" ]; then
+    # aspas e CR não mudam o papel; o vocabulário é o que write-stamp.sh aceita
+    _clean="$(tr -d "\r\"'" < "${_stamp}")"
+    _role_v="$(awk '/^role:/{print $2; exit}' <<< "${_clean}")"
+    _door="$(grep -cE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' <<< "${_clean}" || true)"
+    case "${_role_v:-source}" in
+      source) _judge=1 ;;
+      adopted|hub|standalone|plugins|mini) _judge=0 ;;
+      *) _judge=0
+         printf 'SOFT\tPAPEL-NAO-RECONHECIDO\t.claude/.onion-version\to papel do carimbo não é do vocabulário: a guarda não julgou este repo\n' ;;
+    esac
+    if [ "${_judge}" = "0" ] || [ "${_door:-0}" != "0" ]; then
       [ "${MODE}" = "tsv" ] || echo "public-machine-data: ISENCAO — só a fonte é julgada (papel '${_role_v:-?}')"
       exit 0
     fi
   fi
 fi
+
+command -v python3 >/dev/null 2>&1 || { echo "public-machine-data: python3 ausente — NAO VERIFICADO" >&2; exit 2; }
+[ -f "${LIB}/machine_path.py" ] || { echo "public-machine-data: machine_path.py não está em ${LIB} — NAO VERIFICADO" >&2; exit 2; }
 
 python3 -I -B - "${LIB}" "${ROOT:-.}" "${MODE}" <<'PY'
 import ipaddress, os, re, subprocess, sys
@@ -114,9 +125,10 @@ def classes(text):
 
 
 def judge(line):
+    found = classes(line)
     if MARK_RE.search(line):
-        return []
-    return classes(line)
+        return [c for c in found if c != "ip"]  # host e chave não têm número ambíguo: o marcador não os alcança
+    return found
 
 
 if mode == "selftest":
@@ -143,6 +155,11 @@ if mode == "selftest":
     check("acusa: arquivo de chave sob home absoluto", "ssh -i /home/conta/.ssh/id_ed25519 alvo", ["key"])
     check("acusa: as três classes na mesma linha", "srv123456 em 151.101.1.1 com ~/.ssh/chave", ["host", "ip", "key"])
     check("acusa: marcador sem motivo não cala", "151.101.1.1 machine-data-ok:", ["ip"])
+    check("acusa: marcador não cala host", "srv123456 machine-data-ok: é exemplo", ["host"])
+    check("acusa: marcador não cala chave", "~/.ssh/chave machine-data-ok: é exemplo", ["key"])
+    check("acusa: marcador cala só o IP da linha", "151.101.1.1 em srv123456 machine-data-ok: é exemplo", ["host"])
+    check("acusa: host com o mínimo de dígitos da forma", "o srv12345 respondeu", ["host"])
+    check("acusa: forma com hífens em maiúsculas", "o nó IP-151-101-1-1 respondeu", ["ip"])
     # Cala: o que é honesto nestes arquivos.
     check("cala: loopback", "reverse_proxy 127.0.0.1:8787 → bridge", [])
     check("cala: rede privada e bind geral", "lan 192.168.0.10 e 10.0.0.1; escuta em 0.0.0.0", [])
@@ -161,6 +178,9 @@ if mode == "selftest":
     check("cala: forma do host colada à esquerda", "o mysrv123456 da doc", [])
     check("cala: forma do host colada à direita", "o srv123456x da doc", [])
     check("cala: placeholder do host", "a máquina é <host-da-vps>", [])
+    check("cala: host abaixo do mínimo de dígitos da forma", "o srv1234 e o srv1 da doc", [])
+    check("cala: forma com hífens colada à esquerda", "o xip-151-101-1-1 da doc", [])
+    check("cala: forma com hífens seguida de mais dígitos", "o ip-151-101-1-1234 da doc", [])
     check("cala: marcador com motivo", "versão 12.3.4.1 do pacote  <!-- machine-data-ok: é versão -->", [])
     print(f"public-machine-data selftest: {ok} passaram, {bad} falharam")
     sys.exit(1 if bad else 0)
