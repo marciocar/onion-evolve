@@ -36,7 +36,9 @@
 #             sem --hook, exit 1 se algum sinal não pôde ser importado por erro de escrita.
 #             `pending` soma o retido por homônimo, por link, por erro e, com --hook, o que passou do teto.
 # Teto      : com --hook, no máximo ONION_SPOOL_IMPORT_MAX (padrão 100) sinais por chamada: o hook tem 5 s
-#             de timeout, e 3000 sinais o mataram em rc 124 sem aviso. O resto fica para a próxima chamada.
+#             de timeout, e 3000 sinais o mataram em rc 124 sem aviso. Só conta o que SAI do spool, senão 100
+#             retidos no começo da lista barram para sempre o sinal novo. Como retido custa um `git ls-files`,
+#             há também um orçamento de ONION_SPOOL_IMPORT_SECS segundos (padrão 3). O resto fica para a próxima.
 # Limite    : quem escreve no spool sem o carteiro (cp à mão) pula as guardas do remetente; é o mesmo
 #             limite de quem copia direto no inbox/, que existe desde o 1º dia. O spool nasce 0700.
 # Uso       : spool-import.sh [--repo <raiz>] [--hook] [--dry-run]
@@ -63,6 +65,27 @@ INBOX="${REPO}/docs/evolution/inbox"
 
 imported=0 ; pending=0 ; failed=0 ; worked=0
 MAX="${ONION_SPOOL_IMPORT_MAX:-100}"
+BUDGET="${ONION_SPOOL_IMPORT_SECS:-3}"
+
+take_claim() {  # $1 = sinal, $2 = nome de posse → 0 se a posse é de um arquivo regular; senão já contou o que houve
+  if ! mv -f "$1" "$2" 2>/dev/null; then
+    # sumiu = outra sessão levou. Ainda lá = spool sem escrita, que não pode ficar mudo.
+    if [ -e "$1" ] || [ -L "$1" ]; then
+      echo "AVISO: não consegui tomar ${1##*/} no spool (sem escrita?) — o sinal fica em ${SPOOL}/." >&2
+      pending=$((pending + 1)); failed=$((failed + 1))
+    fi
+    return 1
+  fi
+  # o teste de link do laço vem antes do rename: quem troca o arquivo por link nesse intervalo é pego aqui, antes do cp
+  if [ -L "$2" ]; then
+    echo "AVISO: ${1##*/} virou link simbólico no spool — não importo; fica em ${SPOOL}/." >&2
+    mv -n "$2" "$1" 2>/dev/null
+    rm -f "$2"
+    pending=$((pending + 1))
+    return 1
+  fi
+}
+
 if [ -d "${SPOOL}" ]; then
   # o que uma passada morta deixou: `kill -0` é builtin, e processo vivo (outra sessão) mantém o que é seu
   if [ "${DRY}" -eq 0 ]; then
@@ -89,14 +112,20 @@ if [ -d "${SPOOL}" ]; then
     fi
     [ -f "${f}" ] || continue
     if [ "${HOOK}" -eq 1 ] && [ "${worked}" -ge "${MAX}" ]; then pending=$((pending + 1)); continue; fi
-    worked=$((worked + 1))
+    if [ "${HOOK}" -eq 1 ] && [ "${SECONDS}" -ge "${BUDGET}" ]; then pending=$((pending + 1)); continue; fi
     dest="${INBOX}/${base}"
+    # pasta no lugar do sinal: o `mv` colocaria o arquivo DENTRO dela, e a contagem diria importado
+    if [ -d "${dest}" ]; then
+      echo "AVISO: ${dest} é uma pasta — não importo; o sinal fica em ${SPOOL}/." >&2
+      pending=$((pending + 1))
+      continue
+    fi
     if [ -e "${dest}" ]; then
       if cmp -s "${f}" "${dest}"; then
         [ "${DRY}" -eq 1 ] && continue
         c="${SPOOL}/.${base}.claim.$$"
-        mv -f "${f}" "${c}" 2>/dev/null || continue
-        if cmp -s "${c}" "${dest}"; then rm -f "${c}"; else mv -n "${c}" "${f}" 2>/dev/null; [ -e "${c}" ] && rm -f "${c}"; fi
+        take_claim "${f}" "${c}" || continue
+        if cmp -s "${c}" "${dest}"; then rm -f "${c}"; worked=$((worked + 1)); else mv -n "${c}" "${f}" 2>/dev/null; [ -e "${c}" ] && rm -f "${c}"; fi
         continue
       fi
       if git -C "${REPO}" ls-files --error-unmatch "docs/evolution/inbox/${base}" >/dev/null 2>&1; then
@@ -109,10 +138,10 @@ if [ -d "${SPOOL}" ]; then
     mkdir -p "${INBOX}" 2>/dev/null
     claim="${SPOOL}/.${base}.claim.$$"
     tmp="${INBOX}/.${base}.spool-tmp.$$"
-    mv -f "${f}" "${claim}" 2>/dev/null || continue
+    take_claim "${f}" "${claim}" || continue
     if cp "${claim}" "${tmp}" 2>/dev/null && mv -f "${tmp}" "${dest}" 2>/dev/null; then
       rm -f "${claim}"
-      imported=$((imported + 1))
+      imported=$((imported + 1)); worked=$((worked + 1))
     else
       rm -f "${tmp}" 2>/dev/null
       mv -n "${claim}" "${f}" 2>/dev/null

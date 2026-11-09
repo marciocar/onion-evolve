@@ -1,18 +1,17 @@
 ---
 branch: fix/sync-main-writable-and-spool-import
 date: 2026-11-09
-reviewed_diff_sha256: 984f8902466d8bfe7d63179a96b7675bb4a76cf0b42042bc5c5474489570797c
-reviewed_code_sha256: 7a9ebb97aa7eb481b8c01ebee069c8b92c0db9fb73e61f88123bef31c003266b
-findings_total: 11
-findings_real: 9
+reviewed_diff_sha256: pendente
+findings_total: 18
+findings_real: 16
 tokens: 0
-duration_min: 45
-findings_fixed: 9
+duration_min: 60
+findings_fixed: 16
 verdict: REJECTED_AND_FIXED
 elenxo: false
 elenxo_isolado: false
-reviewer: "1ª passada: o próprio agente de execução. 2ª passada: refutador independente, que reprovou o head 76d0bbdf5 com 2 bloqueios e 5 ressalvas. As curas deste head são do agente de execução."
-nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada das 3 famílias tocadas (51 casos, 14 mutantes novos) e o dogfood com bind em leitura real no bwrap 0.9.0."
+reviewer: "1ª passada: o próprio agente de execução. 2ª passada: refutador independente, que reprovou o head 76d0bbdf5 com 2 bloqueios e 5 ressalvas, e o head 76018df41 com 1 bloqueio e 6 pontos. As curas deste head são do agente de execução."
+nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada das 3 famílias tocadas (69 casos, 24 mutantes novos) e o dogfood com bind em leitura real no bwrap 0.9.0."
 ---
 
 # Resíduo: o sync da main não quebra mais no meio, e o spool entra na sessão aberta
@@ -52,6 +51,16 @@ Ressalvas:
 9. Posse por rename no spool antes da cópia: versão nova que chega durante a cópia fica no nome original (Q4), e posse de processo morto volta ao nome original (Q3).
 10. Sinal ilegível, link ou homônimo commitado: o modo `prompt` avisa 📮 uma vez por sessão e contagem (Q5).
 11. Depois de um parcial real, o sync seguinte diz `ÁRVORE PARCIAL DE ANTES` e não tenta o merge (h2).
+
+## Reprovação do refutador no head 76018df41, curada
+
+12. **Bloqueio.** O teste de link vinha antes da posse, e numa corrida real o conteúdo do alvo chegou ao `inbox/` em 76 de 300 passadas. A posse agora é conferida depois do rename, e o link volta ao spool como retido (Q6, mutante `sem-link-posse`).
+13. Spool sem escrita não fica mais mudo: conta como retido, com aviso (Q7).
+14. O teto de 100 só conta o que sai do spool, para retidos não barrarem o sinal novo. Retido custa um `git ls-files`, então entrou um orçamento de 3 s por chamada (Q8, Q9).
+15. `inbox/x.md` como pasta deixava o `mv` pôr o sinal dentro dela e contar como importado. Agora fica retido (Q10).
+16. A marca do aviso saiu do caminho previsível de `/tmp` para o state dir do usuário e não segue link (Q11, Q12).
+17. Mutante `recupera-sobrescreve` (Q13): posse morta não troca a versão nova pela velha.
+18. Mutante `sync-prior-sem-concorrencia` (m): concorrência também no caminho do parcial anterior.
 
 ## O que continua descoberto
 
