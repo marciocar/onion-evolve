@@ -46871,9 +46871,9 @@ run_task_manager_velocity_selftests() {
   [ -f "${bench}" ] && [ -f "${REPO_ROOT}/.claude/utils/task-manager/velocity-meter.py" ] || { record_fail "task-manager-velocity" "bancada ou velocity-meter.py ausente"; return; }
   command -v python3 >/dev/null 2>&1 || { record_skip "task-manager-velocity: python3 ausente"; return; }
   local out rc n_ok n_cases n_kill n_mut
-  if out="$(cd "${REPO_ROOT}" && env -u LINEAR_API_KEY -u LINEAR_TEAM_ID timeout 500 python3 -I -B "${bench}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(cd "${REPO_ROOT}" && env -u LINEAR_API_KEY -u LINEAR_TEAM_ID timeout 900 python3 -I -B "${bench}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
   read -r n_ok n_cases n_kill n_mut <<< "$(sed -nE 's#^task-manager-velocity-bench: ([0-9]+)/([0-9]+) caso\(s\) verdes; ([0-9]+)/([0-9]+) mutante\(s\) mordem; cópia limpa verde$#\1 \2 \3 \4#p' <<< "${out}")"
-  if [ "${rc}" -eq 0 ] && [ -n "${n_cases:-}" ] && [ "${n_ok}" = "${n_cases}" ] && [ "${n_kill}" = "${n_mut}" ] && [ "${n_cases}" -ge 47 ] && [ "${n_mut}" -ge 61 ]; then
+  if [ "${rc}" -eq 0 ] && [ -n "${n_cases:-}" ] && [ "${n_ok}" = "${n_cases}" ] && [ "${n_kill}" = "${n_mut}" ] && [ "${n_cases}" -ge 73 ] && [ "${n_mut}" -ge 102 ]; then
     record_pass "task-manager-velocity: ${n_ok}/${n_cases} casos verdes contra o Linear falso, cópia limpa verde, ${n_kill}/${n_mut} mutantes mordem"
   else
     record_fail "task-manager-velocity: bancada" "rc=${rc} $(grep -E '^- |^FALHA|bench:' <<< "${out}" | head -4 | tr '\n' '|')"

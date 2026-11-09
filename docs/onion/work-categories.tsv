@@ -1,15 +1,18 @@
 # Categorias de trabalho do core, lidas por .claude/utils/task-manager/velocity-meter.py.
-# Derivadas em 2026-11-08 da população real das 91 issues concluídas do projeto «Onion — core: próximas levas»,
-# lendo os títulos (não há labels: 0 de 91) e agrupando por TIPO de trabalho, porque é ele que muda o esforço.
-# category<TAB>calibrate(yes|no)<TAB>regex, a primeira que casar vence, por isso as específicas vêm antes.
-# calibrate=no: ato do maestro, sem relógio de trabalho no quadro. A sobra cai em `other` e o medidor a lista.
+# Derivadas em 2026-11-08 da população das 91 concluídas do projeto «Onion — core: próximas levas», lendo os títulos (0 labels),
+# e corrigidas em 2026-11-09 contra as 83 abertas, depois que o refutador mediu 28/83 em `other` com 0/91 nas concluídas: sobreajuste.
+# Agrupa por TIPO de trabalho, porque é ele que muda o esforço. Depois dessa correção não resta conjunto sem ver; a catraca é o
+# aviso `large_other` do medidor, sobre concluídas e abertas.
+# category<TAB>calibrate(yes|no)<TAB>regex, a primeira que casar vence. Regra calibrate=no lê o título cru (o dono está no
+# colchete); as outras leem o título SEM o colchete inicial. calibrate=no: ato do maestro, sem relógio de trabalho no quadro.
 category	calibrate	regex
 maestro-act	no	^\[maestro\b|^Card do maestro
-substrate-upgrade	yes	subir o agent sdk|2\.1\.\d{3}|re-extrair|fora do censo|\bcc-update\b|cc-delta|\bonfailure\b|eol=lf
-research-spike	yes	^pesquisa|^\[[^\]]*\]\s*(pesquisa|spike|dissecar)|\bdissecar\b|^medir\b|^re-medir|^absorver\b
-adoption-doors	yes	^portas\b|\badopt\b|adotante|\bvendor\b|^achados do|tirar plugins|offer-onion-ci|core-only|merge-onion-hooks
-federation-messaging	yes	\ba2a\b|\bhub\b|convite|^S\d —|^F\d —|^\[[^\]]*\]\s*degrau|bridge|channel|x_event|x_change|mensageria|registro de mudança
-guard-gate	yes	^guarda\b|\bveto\b|^regra \d+|^hooks?\b|^bancada\b|\bgate\b
-tooling-feature	yes	/meta:|tm\.sh|task manager|auto-drive
-delivery-pipeline	yes	pr-finalize|pr-merge|esteira de pr|\bmerge\b|\brebase\b|merge-serial|resíduo da regra|pre-commit escolhe|âncora do lint-selftest
-kg-contract	yes	\bcontrato|provenance|\bcorpus\b|\bkg\b|\.kg\.yaml|\bx_|\bgrafo|narrative|\bradar\b|\bnós? de\b|ids de nó|^trace:
+substrate-upgrade	yes	subir o (agent )?sdk|\b2\.1\.\d{3}|re-extrair|fora do censo|\bcc-update\b|cc-delta|\bonfailure\b|^radar e3
+research-spike	yes	^pesquisa|^spike\b|\bdissecar\b|\bmedir\b|^re-medir|^absorver\b|^estudar\b|^avaliar\b|^proposta\b|\bideias do\b|^\d+ ideias
+ops-hardening	yes	\bmcp .*(inactive|disabled)|^origin do\b|\.gitattributes|eol=lf|\bsystemd\b|hardening|\bpinar\b|\bstt\b|localstorage
+guard-gate	yes	^guarda\b|^guardas\b|\bveto\b|^regra \d+|^hooks?\b|^bancada\b|^o gate\b
+federation-messaging	yes	\ba2a\b|\bhub\b|convite|^S\d —|^F\d —|^degrau|\bbridge\b|channel|campainha|\bpersona\b|agent card|x_event|x_change|mensageria|registro de mudança|\bfila\b|/chat\b
+adoption-doors	yes	\bportas\b|\badopt\b|adotante|\bvendor\b|^achados do|tirar plugins|offer-onion-ci|core-only|merge-onion-hooks
+tooling-feature	yes	/meta:|tm\.sh|task manager|auto-drive|\bskills?\b|^censo\b|^preâmbulo|^agentes de
+delivery-pipeline	yes	pr-finalize|pr-merge|esteira de pr|\bmerge\b|\brebase\b|merge-serial|resíduo da regra|pre-commit escolhe|âncora do lint-selftest|sync-main-worktree
+kg-contract	yes	\bcontrato|provenance|\bcorpus\b|\bkg\b|\bkg[_-]|\.kg\.yaml|\bx_|\bgrafo|narrative|\bradar\b|\bprov-o\b|\bnós? de\b|ids de nó|^trace:

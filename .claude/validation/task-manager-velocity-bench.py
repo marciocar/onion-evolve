@@ -12,6 +12,7 @@ Saída: `ok   …` por caso verde, `FALHA (n):` no fim com `- …` por vermelho;
 import datetime as dt
 import http.server
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -22,7 +23,8 @@ import threading
 ROOT = (sys.argv[1] if len(sys.argv) > 1 else
         subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() or os.getcwd())
 TM_DIR = os.path.join(ROOT, ".claude/utils/task-manager")
-TODAY = "2026-11-20"
+NOW = "2026-11-20T00:00:00-03:00"
+NOW_H = 459  # horas de BASE até NOW
 BASE = dt.datetime(2026, 11, 1, tzinfo=dt.timezone.utc)
 RULES = """category\tcalibrate\tregex
 maestro-act\tno\t^\\[maestro\\b
@@ -36,6 +38,10 @@ theta\tyes\ttheta
 iota\tyes\tiota
 kappa\tyes\tkappa
 lambda\tyes\tlambda
+inverso\tyes\tinverso
+errado\tyes\terrado
+plano\tyes\tplano
+drift\tyes\tdrift
 """
 LEAKY_TITLE = "[core · 09/11] alpha revisão SAC-99 em 2026-10-02"
 LEAKY_DESC = """Leva SAC-12 para produção.
@@ -63,6 +69,31 @@ def issue(n, title, created=None, queue=None, work=None, est=None, due=None, par
             "assignee": None, "labels": {"nodes": []}}
 
 
+LAMBDA_POINTS = [1, 2, 3, 5, 8, 13]
+LAMBDA_WORK = [2, 3, 7, 9, 18, 25]
+LAMBDA_QUEUE = [60, 50, 40, 30, 20, 10]
+
+
+def conformal_k(n, q):
+    return min(math.ceil((n + 1) * q), n)
+
+
+def expected_hours(points, q):
+    totals = sorted(a + points * w / p for a, w, p in zip(LAMBDA_QUEUE, LAMBDA_WORK, LAMBDA_POINTS))
+    return totals[conformal_k(len(totals), q) - 1]
+
+
+def date_after(hours_from_now, now=NOW):
+    start = dt.datetime.fromisoformat(now)
+    return (start + dt.timedelta(hours=hours_from_now)).date().isoformat()
+
+
+def drift_population():
+    """Fila cresce a cada issue e cada uma fecha antes da próxima nascer: o corte temporal nunca a cobre."""
+    return [issue(200 + k, f"drift {k}", created=-90000 + 3000 * k, queue=10 * (k + 1) ** 2, work=2 * p, est=p)
+            for k, p in enumerate([1, 2, 3, 5, 8, 13] * 3)]
+
+
 def seed():
     rows = []
     for k in range(1, 7):                          # alpha: 2 pontos; fila 10..60 h; trabalho 2..12 h (h/ponto 1..6)
@@ -83,13 +114,24 @@ def seed():
     rows.append(issue(39, "iota do campo", created=315, queue=1, work=3, est=2, due="2026-11-30"))
     for k, n in enumerate(range(40, 44)):          # kappa: semanas distintas para a velocidade
         rows.append(issue(n, f"kappa {n}", created=-1200 + 168 * k, queue=1, work=1, est=5))
-    for k, pts in enumerate([1, 2, 3, 5, 8, 13]):  # lambda: pontos ordenam a duração (spearman 1)
-        rows.append(issue(61 + k, f"lambda {k}", created=340 + 3 * k, queue=1, work=pts * 1.5, est=pts))
+    for k, pts in enumerate(LAMBDA_POINTS):        # lambda: pontos ordenam a duração; fila anticorrelacionada com o trabalho
+        rows.append(issue(61 + k, f"lambda {k}", created=340 + 3 * k, queue=LAMBDA_QUEUE[k], work=LAMBDA_WORK[k], est=pts))
+    for name, works, base_h in (("inverso", [80, 60, 40, 30, 10, 5], 100), ("errado", [0.1, 20, 0.5, 40, 3, 90], 110), ("plano", [10, 10.1, 10.2, 10.3, 10.4, 10.5], 120)):
+        for k, pts in enumerate([1, 2, 3, 5, 8, 13]):
+            rows.append(issue(1000 + base_h + k, f"{name} {k}", created=-2000 - base_h * 20 + 7 * k, queue=1 + k * 0.1, work=works[k], est=pts))
     rows.append(issue(60, "sem regra nenhuma", created=420, queue=1, work=2, est=1))
     rows.append(issue(50, "alpha aberta sem pontos", created=430, state=("Todo", "unstarted")))
     rows.append(issue(51, "alpha em andamento", created=431, queue=1, est=3, state=("In Progress", "started")))
     rows.append(issue(70, "alpha issue de escrita", created=432, state=("Todo", "unstarted"), est=None))
     rows.append(issue(71, "sem pontos", created=433, state=("Todo", "unstarted"), est=None))
+    rows.append(issue(80, "lambda aberta nova", created=NOW_H, state=("Todo", "unstarted"), est=8))
+    rows.append(issue(81, "lambda iniciada agora", created=NOW_H - 10, queue=8, est=3, state=("In Progress", "started")))
+    rows.append(issue(82, "lambda iniciada há um mês", created=NOW_H - 800, queue=80, est=3, state=("In Progress", "started")))
+    rows.append(issue(83, "lambda velha na fila", created=NOW_H - 1400, state=("Todo", "unstarted"), est=3))
+    rows.append(issue(84, "lambda cancelada", created=430, state=("Canceled", "canceled"), est=3))
+    mother = issue(85, "lambda mãe", created=431, state=("Todo", "unstarted"), est=13)
+    mother["children"] = {"nodes": [{"identifier": "SAC-86", "state": {"type": "started"}}]}
+    rows.append(mother)
     return {"issues": rows, "log": [], "force": None,
             "team": {"issueEstimationType": "fibonacci", "issueEstimationExtended": True, "issueEstimationAllowZero": False}}
 
@@ -125,7 +167,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 row.update(v["in"])
             return self._reply({"data": {"issueUpdate": {"success": True, "issue": row}}})
         if "issues(" in q:
-            rows = s["issues"]
+            rows = s["issues"] if v.get("arch") else [r for r in s["issues"] if not r["archivedAt"]]
             flt = v.get("f") or {}
             if "state" in flt:
                 rows = [r for r in rows if r["state"]["type"] in flt["state"]["type"]["in"]]
@@ -150,11 +192,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 
 class Fake:
-    def __init__(self, force=None, team=None):
-        self.force, self.team = force, team
+    def __init__(self, force=None, team=None, rows=None):
+        self.force, self.team, self.rows = force, team, rows
 
     def __enter__(self):
         self.store = seed()
+        if self.rows is not None:
+            self.store["issues"] = self.rows
         self.store["force"] = self.force
         if self.team:
             self.store["team"].update(self.team)
@@ -173,7 +217,7 @@ class Fake:
 
 
 def env_for(fake, provider="linear", extra=None):
-    env = {k: v for k, v in os.environ.items() if not k.startswith(("LINEAR_", "TM_", "CLICKUP_", "TASK_MANAGER"))}
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("LINEAR_", "TM_", "CLICKUP_", "ZOHO_", "JIRA_", "ASANA_", "TASK_MANAGER"))}  # chaves de linear, clickup, zoho, jira e asana fora
     env.update({"TASK_MANAGER_PROVIDER": provider, "TM_ENV_FILE": "/nao-existe.env", "LINEAR_API_KEY": "lin_fake_bench", "LC_ALL": "C.UTF-8",
                 "TM_LINEAR_ENDPOINT": f"http://127.0.0.1:{fake.port}/graphql"})
     env.update(extra or {})
@@ -215,8 +259,8 @@ class Meter:
         except subprocess.TimeoutExpired:
             return subprocess.CompletedProcess(cmd, 124, "", "timeout")
 
-    def run(self, fake, cmd, *args, **kw):
-        return parse(self.raw(fake, cmd, "--categories", self.rules, "--today", TODAY, *args, **kw))
+    def run(self, fake, cmd, *args, now=NOW, **kw):
+        return parse(self.raw(fake, cmd, "--categories", self.rules, "--now", now, *args, **kw))
 
 
 def cat(report, name):
@@ -465,7 +509,7 @@ def c_other_listed(d):
 
 def c_no_rules(d):
     with Fake() as f, Meter(d) as m:
-        rc, out, err = parse(m.raw(f, "report", "--today", TODAY))
+        rc, out, err = parse(m.raw(f, "report", "--now", NOW))
         codes = [w["code"] for w in out["warnings"]] if out else []
         return "" if rc == 0 and "no_category_rules" in codes and [c["category"] for c in out["categories"]] == ["other"] else f"rc={rc} {codes} {err[:120]}"
 
@@ -490,50 +534,234 @@ def c_bad_categories(d):
         return "" if rc == 2 and "regex inválida" in err else f"rc={rc} {err[:160]}"
 
 
+# ── medidor: recortes em população própria ────────────────────────────────
+def c_velocity_exact(d):
+    h = NOW_H
+    rows = [issue(1, "theta feita", created=h - 30, queue=1, work=2, est=3), issue(2, "theta mãe", created=h - 40, queue=1, work=3, est=8),
+            issue(3, "theta filha", created=h - 45, queue=1, work=4, est=2, parent=2), issue(4, "[maestro · 12/11] ato", created=h - 50, queue=1, work=1, est=13),
+            issue(5, "theta na borda", created=-888 - 3, queue=1, work=2, est=5), issue(6, "theta dentro", created=-864, queue=1, work=2, est=2)]
+    rows[4]["completedAt"] = "2026-09-25T15:00:00.000Z"
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        v = out["team_velocity"]
+        return "" if v["points_completed"] == 7 and v["issues_completed"] == 3 and v["points_per_week"] == 0.875 and v["weeks_with_points"] >= 2 else f"velocidade: {v}"
+
+
+def c_archived_counted(d):
+    with Fake() as f:
+        f.store["issues"][0]["archivedAt"] = "2026-11-02T00:00:00.000Z"
+        _, out, err = report(d, f)
+        return "" if cat(out, "alpha")["completed"] == 6 else f"arquivada sumiu: {cat(out, 'alpha')['completed']}"
+
+
+def c_batch_chain(d):
+    rows = [issue(1 + k, f"zeta {k}", created=100, queue=1, completed_at=110 + k / 3600) for k in range(3)]
+    rows += [issue(5, "theta par", created=200, queue=1, completed_at=210), issue(6, "theta par 2", created=200, queue=1, completed_at=210 + 1 / 3600)]
+    rows[1]["completedAt"], rows[2]["completedAt"] = "2026-11-05T14:01:00.000Z", "2026-11-05T14:01:01.000Z"
+    rows[0]["completedAt"] = "2026-11-05T14:00:59.000Z"
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        if cat(out, "zeta")["excluded"].get("batch_closed") != 3:
+            return f"cadeia que cruza o minuto: {cat(out, 'zeta')['excluded']}"
+        return "" if "batch_closed" not in cat(out, "theta")["excluded"] else "par virou lote"
+
+
+def c_spearman_small(d):
+    rows = [issue(1 + k, f"lambda {k}", created=10 * k, queue=1, work=k + 1, est=k + 1) for k in range(4)]
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        r = cat(out, "lambda")["points_vs_hours_spearman"]
+        return "" if r is None else f"spearman com n=4: {r}"
+
+
+def c_negative_queue(d):
+    rows = [issue(1, "theta", created=100, queue=-5, work=20, est=2)]
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        return "" if cat(out, "theta")["queue_hours"]["n"] == 0 else f"fila negativa: {cat(out, 'theta')['queue_hours']}"
+
+
+def c_zero_clock(d):
+    rows = [issue(1, "theta", created=100, queue=1, work=0, est=2)]
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        return "" if cat(out, "theta")["excluded"].get("negative_clock") == 1 else f"{cat(out, 'theta')['excluded']}"
+
+
+def c_title_forms(d):
+    rows = [issue(1, "[core · depois de 09/11] iota", created=100, queue=1, work=2), issue(2, "[core · 29/02] iota", created=110, queue=1, work=2),
+            issue(3, "[core · seg 09/11] iota", created=120, queue=1, work=2)]
+    with Fake(rows=rows) as f:
+        rc, out, err = report(d, f)
+        if rc != 0:
+            return f"rc={rc} {err[:160]}"
+        return "" if cat(out, "iota")["deadline"]["n"] == 1 else f"{cat(out, 'iota')['deadline']}"
+
+
+def c_timezone(d):
+    rows = [issue(1, "theta", created=100, queue=1, work=2, due="2026-11-10")]
+    rows[0]["completedAt"] = "2026-11-11T01:30:00.000Z"
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        local = out["deadline"]["median_slip_days"]
+        _, out, err = report(d, f, "--utc-offset", "0")
+        return "" if local == 0 and out["deadline"]["median_slip_days"] == 1 else f"local {local}, utc {out['deadline']['median_slip_days']}"
+
+
+def c_real_clock(d):
+    with Fake() as f, Meter(d) as m:
+        rc, out, err = parse(m.raw(f, "report", "--categories", m.rules))
+        today = dt.datetime.now(dt.timezone(dt.timedelta(hours=-3))).date().isoformat()
+        return "" if rc == 0 and out["generated_for"] == today else f"{out and out['generated_for']} != {today}"
+
+
+def c_bracket_stripped(d):
+    rows = [issue(1, "[alpha · 11/11] beta item", created=100, queue=1, work=2), issue(2, "[maestro · 11/11] alpha", created=110)]
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        got = {c["category"] for c in out["categories"]}
+        return "" if got == {"beta", "maestro-act"} else f"{got}"
+
+
+def c_large_other_open(d):
+    rows = [issue(1, "alpha", created=100, queue=1, work=2)] + [issue(2 + k, f"sem regra {k}", created=120, state=("Todo", "unstarted")) for k in range(3)]
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        codes = [w["message"] for w in out["warnings"] if w["code"] == "large_other"]
+        return "" if any("abertas" in x for x in codes) and out["open"]["other"] == 3 else f"{codes} {out['open']}"
+
+
+def c_backtest_per_issue_sum(d):
+    # fila e trabalho anticorrelacionados: somar por issue dá total quase constante; somar marginais ordenadas, não
+    rows = [issue(1 + k, f"lambda {k}", created=10 * k, queue=q, work=w, est=2) for k, (q, w) in enumerate([(100, 1), (80, 21), (60, 41), (40, 61), (20, 81), (1, 100), (70, 70)])]
+    with Fake(rows=rows) as f:
+        _, out, err = report(d, f)
+        b = out["backtest"]["loo"]["with_points"]["per_category"]["lambda"]
+        return "" if b["n"] == 7 and b["covered_by_due"] == 6 and b["inside_band"] == 6 else f"{b}"
+
+
+def c_backtest_published(d):
+    with Fake() as f:
+        _, out, err = report(d, f)
+        loo = out["backtest"]["loo"]["history_only"]["per_category"]["lambda"]
+        return "" if loo == {"n": 6, "covered_by_due": 5, "inside_band": 3} else f"{loo}"
+
+
 # ── medidor: data proposta ───────────────────────────────────────────────────
-def propose(d, f, *args):
+def propose(d, f, *args, **kw):
     with Meter(d) as m:
-        return m.run(f, "propose", *args)
+        return m.run(f, "propose", *args, **kw)
 
 
 def c_propose_history(d):
     with Fake() as f:
-        rc, out, err = propose(d, f, "--points", "8", "--category", "alpha")
+        rc, out, err = propose(d, f, "--points", "8", "--category", "lambda")
         if rc != 0:
             return f"rc={rc} {out} {err[:160]}"
-        p = out["proposal"]
-        if p != {"due_date": "2026-11-22", "range": {"low": "2026-11-21", "high": "2026-11-23"}} or out["basis"]["queue_mode"] != "category_queue_history":
-            return f"{p} {out['basis']['queue_mode']}"
+        p, want = out["proposal"], {k: date_after(expected_hours(8, q)) for k, q in (("low", .25), ("likely", .5), ("due", .8), ("high", .9))}
+        if p["due_date"] != want["due"] or p["likely"] != want["likely"] or p["range"]["low"] != want["low"] or p["range"]["high"] != want["high"]:
+            return f"{p} esperado {want}"
+        h = out["basis"]["hours_from_now"]
+        if abs(h["due"] - expected_hours(8, .8)) > 0.01 or abs(h["likely"] - expected_hours(8, .5)) > 0.01:
+            return f"horas {h}"
+        if p["due_percentile"] != 80 or out["basis"]["sample_used"] != 6 or p["range"]["high_is_sample_max"] is not True:
+            return f"declaração: {p} {out['basis']['sample_used']}"
     return ""
 
 
-def c_propose_ahead(d):
+def c_propose_time_of_day(d):
+    late = "2026-11-20T23:00:00-03:00"
     with Fake() as f:
-        _, rep, _ = report(d, f)
-        rate = rep["team_velocity"]["points_per_active_week"]
-        rc, out, err = propose(d, f, "--points", "2", "--category", "alpha", "--queue-points", "20")
-        if rc != 0 or out["basis"]["queue_mode"] != "points_ahead_over_velocity":
-            return f"rc={rc} {out} {err[:160]}"
-        got = out["basis"]["queue_hours"]["p50"]
-        want = round(20 / rate["p50"] * 168, 3)
-        return "" if abs(got - want) < 0.01 else f"fila {got}, esperado {want}"
+        rc, out, err = propose(d, f, "--points", "8", "--category", "lambda", now=late)
+        want = date_after(expected_hours(8, .8), now=late)
+        return "" if rc == 0 and out["proposal"]["due_date"] == want else f"rc={rc} {out and out['proposal']} esperado {want}"
 
 
 def c_propose_started(d):
     with Fake() as f:
-        rc, out, err = propose(d, f, "--issue", "SAC-51")
-        if rc != 0 or out["basis"]["queue_mode"] != "already_started" or out["basis"]["queue_hours"]["p50"] != 0:
+        rc, out, err = propose(d, f, "--issue", "SAC-81")
+        if rc != 0 or out["basis"]["mode"] != "work_remaining_after_start":
+            return f"rc={rc} {out} {err[:160]}"
+        if out["basis"]["elapsed_hours"] != 2:
+            return f"decorrido: {out['basis']['elapsed_hours']}"
+        rem = sorted(3 * w / p - 2 for w, p in zip(LAMBDA_WORK, LAMBDA_POINTS) if 3 * w / p > 2)
+        got, want = out["basis"]["hours_from_now"]["due"], rem[conformal_k(len(rem), .8) - 1]
+        return "" if abs(got - want) < 0.01 else f"restante {got}, esperado {want}"
+
+
+def c_propose_new_issue(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--issue", "SAC-80")
+        if rc != 0 or out["basis"]["mode"] != "empirical_queue_plus_work" or out["proposal"]["due_date"] != date_after(expected_hours(8, .8)):
             return f"rc={rc} {out} {err[:160]}"
     return ""
+
+
+def c_propose_started_old(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--issue", "SAC-82")
+        return "" if rc == 3 and out["status"] == "beyond_history" and out["proposal"] is None else f"rc={rc} {out}"
+
+
+def c_propose_aged(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--issue", "SAC-83")
+        return "" if rc == 3 and out["status"] == "beyond_history" and out.get("if_started_now") else f"rc={rc} {out}"
+
+
+def c_propose_closed(d):
+    with Fake() as f:
+        for ident in ("SAC-1", "SAC-84"):
+            rc, out, err = propose(d, f, "--issue", ident)
+            if rc != 3 or out["status"] != "not_applicable" or out["proposal"] is not None:
+                return f"{ident}: rc={rc} {out}"
+    return ""
+
+
+def c_propose_parent(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--issue", "SAC-85")
+        return "" if rc == 3 and out["status"] == "not_applicable" and out["open_children"] == ["SAC-86"] else f"rc={rc} {out}"
+
+
+def signal_refused(d, category, reason):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", category)
+        return "" if rc == 3 and out["status"] == "no_points_signal" and out["signal"]["reason"] == reason else f"rc={rc} {out}"
+
+
+def c_signal_no_variance(d):
+    return signal_refused(d, "alpha", "points_without_variance")
+
+
+def c_signal_inverse(d):
+    return signal_refused(d, "inverso", "points_do_not_order_duration")
+
+
+def c_signal_error(d):
+    return signal_refused(d, "errado", "error_too_large")
+
+
+def c_signal_baseline(d):
+    return signal_refused(d, "plano", "worse_than_ignoring_points")
+
+
+def c_miscalibrated(d):
+    with Fake(rows=drift_population()) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "drift")
+        return "" if rc == 3 and out["status"] == "miscalibrated" and out["backtest"]["n"] >= 10 else f"rc={rc} {out}"
+
+
+def c_backtest_small_warned(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--points", "8", "--category", "lambda")
+        return "" if rc == 0 and any(w["code"] == "backtest_small" for w in out["warnings"]) else f"rc={rc} {out and out['warnings']}"
 
 
 def c_propose_insufficient(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", "beta")
-        if rc != 3 or out["proposal"] is not None or out["status"] != "insufficient_sample":
-            return f"rc={rc} {out}"
-        rc, out, err = propose(d, f, "--points", "3", "--category", "beta", "--queue-points", "20")  # a fila não pode suprir a calibração
-        return "" if rc == 3 and out["proposal"] is None else f"com fila dada: rc={rc} {out}"
+        return "" if rc == 3 and out["proposal"] is None and out["status"] == "insufficient_sample" else f"rc={rc} {out}"
 
 
 def c_propose_not_calibrated(d):
@@ -560,7 +788,7 @@ def c_propose_usage(d):
 def c_read_only(d):
     with Fake() as f:
         report(d, f)
-        propose(d, f, "--points", "8", "--category", "alpha")
+        propose(d, f, "--points", "8", "--category", "lambda")
         return f"medidor escreveu: {f.writes()}" if f.writes() else ""
 
 
@@ -573,7 +801,7 @@ def sample(d, f, m, *args):
 
 def c_blind_no_leak(d):
     with Fake() as f, Meter(d) as m:
-        (rc, out, err), a, b = sample(d, f, m)
+        (rc, out, err), a, b = sample(d, f, m, "--target", "500")
         if rc != 0:
             return f"rc={rc} {err[:160]}"
         doc = json.load(open(a, encoding="utf-8"))
@@ -620,6 +848,20 @@ def c_blind_deterministic(d):
         first = open(a, encoding="utf-8").read()
         (_, _, _), a, b = sample(d, f, m, "--target", "14")
         return "" if first == open(a, encoding="utf-8").read() else "semente não reproduz"
+
+
+def c_blind_order(d):
+    with Fake() as f, Meter(d) as m:
+        (_, _, _), a, b = sample(d, f, m)
+        ids = [i["id"] for i in json.load(open(a, encoding="utf-8"))["issues"]]
+        return "" if ids == sorted(ids) else "ordem da amostra não é a do hash"
+
+
+def c_blind_mode(d):
+    with Fake() as f, Meter(d) as m:
+        (_, _, _), a, b = sample(d, f, m)
+        modes = {oct(os.stat(x).st_mode & 0o777) for x in (a, b)}
+        return "" if modes == {"0o600"} else f"permissões {modes}"
 
 
 def c_blind_refuses_repo(d):
@@ -669,9 +911,33 @@ CASES = [
     ("r-trunc", "lista truncada não vira medição", c_truncated),
     ("r-gap", "provider sem verbo é rc 2 nomeado", c_provider_gap),
     ("r-badcat", "regex inválida é rc 2", c_bad_categories),
-    ("p-hist", "data com faixa pela fila da categoria", c_propose_history),
-    ("p-ahead", "data por pontos à frente sobre velocidade", c_propose_ahead),
-    ("p-started", "issue já iniciada não tem fila", c_propose_started),
+    ("r-vel", "velocidade: janela fechada, sem mãe e sem ato humano", c_velocity_exact),
+    ("r-arch", "concluída arquivada entra no histórico", c_archived_counted),
+    ("r-batch", "lote por cadeia, par não é lote", c_batch_chain),
+    ("r-rho-n", "spearman exige amostra", c_spearman_small),
+    ("r-negq", "fila negativa fica fora", c_negative_queue),
+    ("r-zero", "relógio de duração zero fica fora", c_zero_clock),
+    ("r-title", "'depois de' não é prazo; 29/02 não derruba", c_title_forms),
+    ("r-tz", "prazo comparado no fuso local", c_timezone),
+    ("r-now", "sem --now vale o relógio real", c_real_clock),
+    ("r-brack", "colchete é dono, não trabalho; ato humano lê o cru", c_bracket_stripped),
+    ("r-open", "large_other olha as abertas", c_large_other_open),
+    ("r-bt", "backtest publicado com a conta certa", c_backtest_published),
+    ("r-hold", "backtest soma por issue", c_backtest_per_issue_sum),
+    ("p-hist", "data P80 pela soma por issue, faixa declarada", c_propose_history),
+    ("p-tod", "a conta parte do instante, não da meia-noite", c_propose_time_of_day),
+    ("p-new", "issue nova: fila e trabalho", c_propose_new_issue),
+    ("p-started", "iniciada: só o trabalho que resta", c_propose_started),
+    ("p-old", "iniciada há mais que a história: rc 3", c_propose_started_old),
+    ("p-aged", "velha na fila: rc 3 com data se iniciar agora", c_propose_aged),
+    ("p-closed", "concluída e cancelada: rc 3", c_propose_closed),
+    ("p-mother", "mãe de filhas abertas: rc 3", c_propose_parent),
+    ("s-var", "pontos sem variação: rc 3", c_signal_no_variance),
+    ("s-inv", "pontos inversos à duração: rc 3", c_signal_inverse),
+    ("s-err", "erro alto: rc 3", c_signal_error),
+    ("s-base", "pior que ignorar os pontos: rc 3", c_signal_baseline),
+    ("s-drift", "backtest temporal abaixo do piso: rc 3", c_miscalibrated),
+    ("s-small", "backtest pequeno é avisado", c_backtest_small_warned),
     ("p-insuf", "amostra insuficiente: rc 3 e sem data", c_propose_insufficient),
     ("p-nocal", "categoria não calibrada: rc 3", c_propose_not_calibrated),
     ("p-nopts", "issue sem pontos: rc 3", c_propose_no_points),
@@ -682,6 +948,8 @@ CASES = [
     ("b-elig", "só entra quem tem relógio e calibra", c_blind_eligibility),
     ("b-strat", "piso por categoria", c_blind_stratified),
     ("b-det", "mesma semente, mesma amostra", c_blind_deterministic),
+    ("b-order", "ordem da amostra é a do hash", c_blind_order),
+    ("b-mode", "amostra e mapa com 0600", c_blind_mode),
     ("b-repo", "recusa escrever dentro de repo git", c_blind_refuses_repo),
     ("b-same", "recusa amostra e mapa no mesmo arquivo", c_blind_same_path),
 ]
@@ -711,30 +979,69 @@ MUTANTS = [
     (V, '            row["exclusion"] = "rollup_parent"', "            pass", "r-excl"),
     (V, '            row["exclusion"] = "no_started_at"', '            continue', "r-excl"),
     (V, '                row["exclusion"] = "batch_closed"', "                pass", "r-excl"),
-    (V, '            elif row["completed"] is None or row["completed"] < started:', "            elif False:", "r-excl"),
+    (V, 'elif row["completed"] is None or row["completed"] <= started:', "elif False:", "r-excl"),
+    (V, 'BATCH_CLOSE_SIZE = 3 ', "BATCH_CLOSE_SIZE = 2 ", "r-batch"),
     (V, 'BATCH_CLOSE_SIZE = 3 ', "BATCH_CLOSE_SIZE = 4 ", "r-excl"),
+    (V, 'BATCH_CLOSE_SECONDS = 60 ', "BATCH_CLOSE_SECONDS = 0 ", "r-batch"),
     (V, 'MIN_SAMPLE = 5 ', "MIN_SAMPLE = 3 ", "r-sample"),
     (V, 'SMALL_SAMPLE = 15 ', "SMALL_SAMPLE = 6 ", "r-sample"),
-    (V, "for j, (p, h) in enumerate(pairs) if j != k]", "for j, (p, h) in enumerate(pairs)]", "r-loo"),
+    (V, "others = [h / p for j, (p, h) in enumerate(pairs) if j != k]", "others = [h / p for j, (p, h) in enumerate(pairs)]", "r-loo"),
     (V, "    cov = sum((a - mx) * (b - my) for a, b in zip(x, y))", "    cov = -sum((a - mx) * (b - my) for a, b in zip(x, y))", "r-rho"),
-    (V, 'TITLE_DUE = re.compile(r"^\\s*\\[[^\\]]*·', 'TITLE_DUE = re.compile(r"^\\s*\\[XX[^\\]]*·', "r-dead"),
-    (V, '    recent = members[:window]', "    recent = members", "r-win"),
+    (V, 'r"^\\s*\\[[^\\]]*·\\s*(?:(?:hoje', 'r"^\\s*\\[XX[^\\]]*·\\s*(?:(?:hoje', "r-dead"),
+    (V, '(?:(?:hoje|seg|ter|qua|qui|sex|s[áa]b|dom)\\s+)?(\\d{1,2})', '(?:[^\\]]*\\s+)?(\\d{1,2})', "r-title"),
+    (V, '            due = dt.date(year, int(m.group(2)), int(m.group(1)))\n        except ValueError:\n            continue', '            due = dt.date(year, int(m.group(2)), int(m.group(1)))\n        except ZeroDivisionError:\n            continue', "r-title"),
+    (V, '    return members, members[:window]', "    return members, members", "r-win"),
     (V, '"points": overlay.get(i["identifier"], i.get("estimate"))', '"points": i.get("estimate")', "r-over"),
     (V, '    others = [r["title"] for r in rows if r["category"] == UNCATEGORIZED]', "    others = []", "r-other"),
     (V, '    if not rules:\n        warnings.append', "    if False:\n        warnings.append", "r-norules"),
     (V, '    if data.get("truncated"):', "    if False:", "r-trunc"),
     (V, '    missing = {"item.list", "estimate.points_read"} - verbs\n    if run.returncode != 0 or missing:', "    missing = set()\n    if False:", "r-gap"),
     (V, '                rules.append((parts[0], parts[1] == "yes", re.compile(parts[2], re.I)))', '                rules.append((parts[0], parts[1] == "yes", re.compile("x", re.I)))', "r-badcat"),
-    (V, 'return {"status": "proposed", "proposal": {"due_date": date_for("p50")', 'return {"status": "proposed", "proposal": {"due_date": date_for("p25")', "p-hist"),
-    (V, "lambda k: (base + dt.timedelta(hours=queue[k] + work[k]))", "lambda k: (base + dt.timedelta(hours=work[k]))", "p-hist"),
-    (V, '"high": date_for("p75")', '"high": date_for("p50")', "p-hist"),
-    (V, '"p50": ahead / rate["p50"] * 168', '"p50": ahead / rate["p75"] * 168', "p-ahead"),
-    (V, '    if issue and issue.get("startedAt"):', "    if False:", "p-started"),
-    (V, '    if hpp["n"] < MIN_SAMPLE:', "    if False:", "p-insuf"),
+    (V, '        if not start < day <= today:', "        if not start <= day <= today:", "r-vel"),
+    (V, '    start = today - dt.timedelta(weeks=VELOCITY_WEEKS)', "    start = today - dt.timedelta(weeks=1)", "r-vel"),
+    (V, 'if r["exclusion"] == "rollup_parent" or not r["completed"] or not r["calibrate"]:', 'if not r["completed"] or not r["calibrate"]:', "r-vel"),
+    (V, 'if r["exclusion"] == "rollup_parent" or not r["completed"] or not r["calibrate"]:', 'if r["exclusion"] == "rollup_parent" or not r["completed"]:', "r-vel"),
+    (V, '"--state-type", state_type, "--include-archived", "--limit"', '"--state-type", state_type, "--limit"', "r-arch"),
+    (V, 'if len(pairs) < MIN_SAMPLE:\n        return None', 'if len(pairs) < 2:\n        return None', "r-rho-n"),
+    (V, '            if started >= created:\n                row["queue_h"]', '            if True:\n                row["queue_h"]', "r-negq"),
+    (V, 'elif row["completed"] is None or row["completed"] <= started:', 'elif row["completed"] is None or row["completed"] < started:', "r-zero"),
+    (V, '    return when.astimezone(LOCAL[0]).date()', "    return when.astimezone(dt.timezone.utc).date()", "r-tz"),
+    (V, '    LOCAL[0] = dt.timezone(dt.timedelta(hours=args.utc_offset))', "    pass", "r-tz"),
+    (V, '        return dt.datetime.now(LOCAL[0])', "        return dt.datetime(2000, 1, 1, tzinfo=LOCAL[0])", "r-now"),
+    (V, 'if rx.search(stripped if calibrate else raw):', "if rx.search(raw):", "r-brack"),
+    (V, 'if rx.search(stripped if calibrate else raw):', "if rx.search(stripped):", "r-brack"),
+    (V, '(("concluídas", rows, others), ("abertas", open_rows, open_others))', '(("concluídas", rows, others),)', "r-open"),
+    (V, 'others = [x for j, x in enumerate(history) if j != k and (not temporal or x["completed"] < held["created"])]', 'others = [x for j, x in enumerate(history) if (not temporal or x["completed"] < held["created"])]', "r-bt"),
+    (V, 'others = [x for j, x in enumerate(history) if j != k and (not temporal or x["completed"] < held["created"])]', 'others = [x for j, x in enumerate(history) if j != k]', "s-drift"),
+    (V, 'LOW_QUANTILE, LIKELY_QUANTILE, DUE_QUANTILE, HIGH_QUANTILE = 0.25, 0.5, 0.8, 0.9', 'LOW_QUANTILE, LIKELY_QUANTILE, DUE_QUANTILE, HIGH_QUANTILE = 0.25, 0.5, 0.5, 0.9', "p-hist"),
+    (V, 'LOW_QUANTILE, LIKELY_QUANTILE, DUE_QUANTILE, HIGH_QUANTILE = 0.25, 0.5, 0.8, 0.9', 'LOW_QUANTILE, LIKELY_QUANTILE, DUE_QUANTILE, HIGH_QUANTILE = 0.5, 0.5, 0.8, 0.9', "p-hist"),
+    (V, '    k = math.ceil((len(v) + 1) * q)', "    k = math.ceil(len(v) * q)", "p-hist"),
+    (V, 'return sorted(r["queue_h"] + points * r["work_h"] / r["points"] for r in history)', 'return sorted(a + b for a, b in zip(sorted(r["queue_h"] for r in history), sorted(points * r["work_h"] / r["points"] for r in history)))', "r-hold"),
+    (V, 'remaining = sorted(r["queue_h"] - age + points * r["work_h"] / r["points"] for r in history if r["queue_h"] >= age)', 'remaining = sorted(a - age + b for a, b in zip(sorted(r["queue_h"] for r in history), sorted(points * r["work_h"] / r["points"] for r in history)))', "p-hist"),
+    (V, 'remaining = sorted(r["queue_h"] - age + points * r["work_h"] / r["points"] for r in history if r["queue_h"] >= age)', 'remaining = sorted(r["queue_h"] - age + points * r["work_h"] / r["points"] for r in history)', "p-aged"),
+    (V, '"proposal": {"due_date": date_for(due)', '"proposal": {"due_date": date_for(likely)', "p-hist"),
+    (V, '"likely": date_for(likely)', '"likely": date_for(due)', "p-hist"),
+    (V, '"high": date_for(high)', '"high": date_for(due + 99)', "p-hist"),
+    (V, '    date_for = lambda h: local_date(now + dt.timedelta(hours=h)).isoformat()', '    date_for = lambda h: local_date(now.replace(hour=0, minute=0) + dt.timedelta(hours=h)).isoformat()', "p-tod"),
+    (V, 'remaining = sorted(x - elapsed for x in scaled if x > elapsed)', 'remaining = sorted(scaled)', "p-started"),
+    (V, 'remaining = sorted(x - elapsed for x in scaled if x > elapsed)', 'remaining = sorted(x - elapsed for x in scaled)', "p-old"),
+    (V, '        extra = {"if_started_now"', '        extra = {"_": 1} or {"if_started_now"', "p-aged"),
+    (V, '    if kind in ("completed", "canceled"):', '    if kind in ("canceled",):', "p-closed"),
+    (V, '    if kind in ("completed", "canceled"):', '    if kind in ("completed",):', "p-closed"),
+    (V, '    if opened:\n', "    if False:\n", "p-mother"),
+    (V, '    if not signal["ok"]:\n        return refusal', '    if False:\n        return refusal', "s-inv"),
+    (V, '    elif rho is None:\n', '    elif False:\n', "s-var"),
+    (V, 'MIN_SPEARMAN = 0.3 ', "MIN_SPEARMAN = -2 ", "s-inv"),
+    (V, '    elif err is None or err > MAX_ERROR:', "    elif False:", "s-err"),
+    (V, '    elif base is not None and err > base:', "    elif False:", "s-base"),
+    (V, '    elif check["coverage_due"] < BACKTEST_FLOOR:', "    elif False:", "s-drift"),
+    (V, 'BACKTEST_MIN = 10 ', "BACKTEST_MIN = 0 ", "s-small"),
+    (V, '    if len(history) < MIN_SAMPLE:\n        return refusal', '    if False:\n        return refusal', "p-insuf"),
+    (V, '    if len(remaining) < MIN_SAMPLE:', "    if False:", "p-old"),
     (V, '    if not stats["calibrate"]:', "    if False:", "p-nocal"),
-    (V, '        if not points:\n            return insufficient', "        if False:\n            return insufficient", "p-nopts"),
+    (V, '        if not points:\n            return refusal', "        if False:\n            return refusal", "p-nopts"),
     (V, '    elif points is None or not category:', "    elif False:", "p-usage"),
-    (V, '    return {"status": "proposed", "proposal"', '    tm("due_date.set", "SAC-70", date_for("p50"))\n    return {"status": "proposed", "proposal"', "ro"),
+    (V, '    return {"status": "proposed",\n', '    tm("due_date.set", "SAC-70", date_for(due))\n    return {"status": "proposed",\n', "ro"),
     (V, '        t = re.sub(r"^\\s*\\[[^\\]]*\\]\\s*", "", t)', "        pass", "b-leak"),
     (V, '        t = "\\n".join(line for line in t.splitlines() if not _SCRUB_LINES.search(line))', "        pass", "b-leak"),
     (V, '    (re.compile(r"\\b[A-Z]{2,}-\\d+\\b"), "[ref]"),\n', "", "b-leak"),
@@ -748,6 +1055,8 @@ MUTANTS = [
     (V, 'if r["calibrate"] and r["work_h"] is not None:', 'if r["work_h"] is not None or not r["calibrate"]:', "b-elig"),
     (V, "alloc = {c: min(n, max(3, int(target * n / total))) for c, n in sizes.items()}", "alloc = {c: min(n, int(target * n / total)) for c, n in sizes.items()}", "b-strat"),
     (V, "    rng = random.Random(seed)", "    rng = random.Random()", "b-det"),
+    (V, '    entries.sort(key=lambda e: e["id"])  # a ordem', "    pass  # a ordem", "b-order"),
+    (V, "os.O_TRUNC, 0o600)", "os.O_TRUNC, 0o644)", "b-mode"),
     (V, "        if inside_repo(p):", "        if False:", "b-repo"),
     (V, '    if os.path.realpath(out) == os.path.realpath(map_path):', "    if False:", "b-same"),
 ]
