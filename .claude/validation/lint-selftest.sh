@@ -44616,11 +44616,20 @@ run_public_machine_data_selftests() {
       adotado)  printf 'role: adopted\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
       porta)    printf 'role: source\nkind: door\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
       fonte)    printf 'role: source\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 1 ] ;;
+      aspas)    printf 'role: "source"\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 1 ] && grep -q '^HARD' <<< "${o}" ;;
+      crlf)     printf 'role: source\r\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 1 ] && grep -q '^HARD' <<< "${o}" ;;
+      adot-crlf) printf 'role: adopted\r\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      porta-aspas) printf 'role: source\nkind: "door"\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      invalido) printf 'role: bogus\n' > "${b}/.claude/.onion-version"; printf 'srv123456\n' > "${b}/.claude/diary/2026-01-02-s.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && grep -q $'^SOFT\tPAPEL-NAO-RECONHECIDO\t' <<< "${o}" ;;
+      adot-sempy) printf 'role: adopted\n' > "${b}/.claude/.onion-version"; mkdir -p "${b}.nopy"; local t2; for t2 in git dirname awk grep tr; do ln -s "$(command -v "${t2}")" "${b}.nopy/${t2}"; done
+                if o="$(PATH="${b}.nopy" "${BASH}" "${b}/.claude/validation/public-machine-data-check.sh" "${b}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+                [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
+      adot-semlib) printf 'role: adopted\n' > "${b}/.claude/.onion-version"; rm -f "${b}/.claude/utils/kg/machine_path.py"; _pmd_run "${b}"; [ "${rc}" -eq 0 ] && [ -z "${o}" ] ;;
       ilegivel) printf '\xff\xfe\n' > "${b}/.claude/diary/2026-01-03-bin.md"; _pmd_track "${b}"; _pmd_run "${b}"; [ "${rc}" -eq 2 ] && grep -q 'NAO VERIFICADO' <<< "${o}" ;;
       lsfalha)  mkdir -p "${b}.stub"; printf '#!/bin/sh\ncase "$*" in *ls-files*) exit 1;; esac\nexec %s "$@"\n' "${_real_git}" > "${b}.stub/git"; chmod +x "${b}.stub/git"
                 if o="$(PATH="${b}.stub:${PATH}" bash "${b}/.claude/validation/public-machine-data-check.sh" "${b}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
                 [ "${rc}" -eq 2 ] && grep -q 'ls-files falhou' <<< "${o}" ;;
-      sempy)    mkdir -p "${b}.nopy"; local t; for t in git dirname awk grep; do ln -s "$(command -v "${t}")" "${b}.nopy/${t}"; done
+      sempy)    mkdir -p "${b}.nopy"; local t; for t in git dirname awk grep tr; do ln -s "$(command -v "${t}")" "${b}.nopy/${t}"; done
                 if o="$(PATH="${b}.nopy" "${BASH}" "${b}/.claude/validation/public-machine-data-check.sh" "${b}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
                 [ "${rc}" -eq 2 ] && grep -q 'python3 ausente' <<< "${o}" ;;
       sem-git)  rm -rf "${b}/.git"; _pmd_run "${b}"; [ "${rc}" -eq 2 ] && grep -q 'reposit' <<< "${o}" ;;
@@ -44630,7 +44639,7 @@ run_public_machine_data_selftests() {
     esac
   }
   local s
-  for s in limpo ip-yaml diario espelho nome naorastr adotado porta fonte ilegivel lsfalha sempy sem-git vazia sem-lib; do
+  for s in limpo ip-yaml diario espelho nome naorastr adotado porta fonte aspas crlf adot-crlf porta-aspas invalido adot-sempy adot-semlib ilegivel lsfalha sempy sem-git vazia sem-lib; do
     if _pmd_scen "${s}" "${chk}" "${lib}"; then record_pass "public-machine-data: cenário ${s}"
     else record_fail "public-machine-data: cenário ${s}" "rc=${rc}; [$(head -2 <<< "${o}" | tr '\n' '|')]"; fi
   done
@@ -44705,12 +44714,25 @@ run_public_machine_data_selftests() {
   _pmd_mut "cópia de known_hosts volta a acusar" ${G} '.split(".")[0] not in KEY_OK' ' not in KEY_OK' selftest
   _pmd_mut "marcador sem motivo passa a calar" ${G} "machine-data-ok:\\s*\\S" "machine-data-ok:" selftest
   _pmd_mut "marcador com motivo não cala"     ${G} "if MARK_RE.search(line):" "if False:" selftest
+  _pmd_mut "marcador volta a calar a linha"   ${G} 'return [c for c in found if c != "ip"]' 'return []' selftest
+  _pmd_mut "host exige 6 dígitos"             classe 'srv\d{5,}' 'srv\d{6,}' selftest
+  _pmd_mut "host aceita 4 dígitos"            classe 'srv\d{5,}' 'srv\d{4,}' selftest
+  _pmd_mut "host aceita 1 dígito"             classe 'srv\d{5,}' 'srv\d{1,}' selftest
+  _pmd_mut "hífens sem borda esquerda"        ${G} '(?<![A-Za-z0-9])ip-' 'ip-' selftest
+  _pmd_mut "hífens sem borda direita"         ${G} "(\d{1,3})(?!\d)', re.I)" "(\d{1,3})', re.I)" selftest
+  _pmd_mut "hífens sem re.I"                  ${G} "(?!\d)', re.I)" "(?!\d)')" selftest
   # escopo, papel e falha fechada, no modo que o lint consome
   _pmd_mut "espelho do diário sai do escopo"  ${G} '"docs/evolution/outbox/diary/*.md"' '"docs/nada/*.md"' espelho
   _pmd_mut "diário sai do escopo"             ${G} '".claude/diary/*.md", ' '' diario
   _pmd_mut "nome do arquivo não é julgado"    ${G} 'for cls in sorted(set(classes(f)) | set(classes(re.sub(r"[-_]", " ", f)))):' 'for cls in []:' nome
   _pmd_mut "saída imprime o valor"            ${G} "print(f\"HARD\\tDADO-DE-MAQUINA\\t{path}\\t{msg}\" if" "print(f\"HARD\\tDADO-DE-MAQUINA\\t{path}\\t{msg} 151.101.1.1\" if" ip-yaml
-  _pmd_mut "adotante volta a ser julgado"     ${G} '[ "${_role_v:-source}" != "source" ]' '[ "x" = "y" ]' adotado
+  _pmd_mut "adotante volta a ser julgado"     ${G} 'adopted|hub|standalone|plugins|mini) _judge=0 ;;' 'adopted|hub|standalone|plugins|mini) _judge=1 ;;' adotado
+  _pmd_mut "aspas no papel voltam a isentar"  ${G} "tr -d \"\\r\\\"'\"" "tr -d \"\\r\"" aspas
+  _pmd_mut "CR no papel volta a isentar"      ${G} "tr -d \"\\r\\\"'\"" "tr -d \"\\\"'\"" crlf
+  _pmd_mut "papel estranho é julgado"         ${G} '*) _judge=0' '*) _judge=1' invalido
+  _pmd_mut "papel estranho volta a calar"     ${G} "printf 'SOFT\\tPAPEL-NAO-RECONHECIDO" ": 'SOFT\\tPAPEL-NAO-RECONHECIDO" invalido
+  _pmd_mut "python volta a vir antes do papel" ${G} '_stamp="${ROOT}/.claude/.onion-version"' 'command -v python3 >/dev/null 2>&1 || exit 2; _stamp="${ROOT}/.claude/.onion-version"' adot-sempy
+  _pmd_mut "classe volta a vir antes do papel" ${G} '_stamp="${ROOT}/.claude/.onion-version"' '[ -f "${LIB}/machine_path.py" ] || exit 2; _stamp="${ROOT}/.claude/.onion-version"' adot-semlib
   _pmd_mut "porta volta a ser julgada"        ${G} '[ "${_door:-0}" != "0" ]' '[ "0" != "0" ]' porta
   _pmd_mut "arquivo ilegível vira exceção"    ${G} 'except (OSError, UnicodeDecodeError) as e:' 'except OSError as e:' ilegivel
   _pmd_mut "arquivo ilegível vira verde"      ${G} 'print(f"public-machine-data: {f} ilegível ({type(e).__name__}) — NAO VERIFICADO", file=sys.stderr); sys.exit(2)' 'continue' ilegivel

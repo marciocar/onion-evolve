@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 9 NÓS ═══
+# ═══ TETO: 10 NÓS ═══
 meta:
   id: public-machine-data-2026-11
   schema_version: "1"
@@ -116,6 +116,21 @@ nodes:
       locator: "cabeçalho, seção TETO DECLARADO"
       method: "medição: sonda da classe executada em 2026-11-09"
       locality: "repo"
+  - id: C_CEILING_ADOPTER_NAMES_REMAIN_1109
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-11-09"
+    verified_against: "varredura dos nomes de adotante em 2026-11-09: 36 de 134 entradas do diário, o índice do diário e 8 de 19 arquivos do espelho"
+    label: "Teto: só as 12 entradas reclassificadas foram limpas de nomes. Nomes de adotante seguem em 36 entradas do diário, no índice e em 8 arquivos do espelho do diário."
+    narrative: "A decisão do maestro alcançou as 12 entradas protected. As outras já eram public ou collective, e a REGRA 120 não busca nome. Tirar os nomes delas é decisão à parte, e o histórico do git seguiria com eles."
+    provenance:
+      source: ".claude/diary e docs/evolution/outbox/diary"
+      locator: "busca dos nomes de adotante nos arquivos .md dos dois diretórios"
+      method: "medição: varredura executada em 2026-11-09"
+      locality: "repo"
   - id: D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109
     node_type: decision
     plane: DEV
@@ -146,6 +161,9 @@ nodes:
       method: "leitura: RFC e estado do repo em 2026-11-09"
       locality: "repo"
 edges:
+  - from: C_CEILING_ADOPTER_NAMES_REMAIN_1109
+    to: D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109
+    edge_type: CONSTRAINS
   - from: D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109
     to: Q_PROTECTED_DIARY_DESTINATION_1109
     edge_type: SUPERSEDES

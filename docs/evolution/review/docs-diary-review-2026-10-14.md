@@ -35,8 +35,8 @@ branch, + 2 defeitos de maquinaria (abaixo), NÃO curados aqui por estarem fora 
 
 ## Inválidas (nomeadas)
 
-- `2026-07-05-vps-lineage-odyssey`: o `valid_when` (a srv1475924 hospeda core, bridge e site) caiu.
-  Tudo está na KVM 8 (DNS → 179.197.65.94, `onion-vps-bridge.service` local, `vps-bridge` com
+- `2026-07-05-vps-lineage-odyssey`: o `valid_when` (a VPS antiga hospeda core, bridge e site) caiu.
+  Tudo está na KVM 8 (DNS → IP público da VPS, `onion-vps-bridge.service` local, `vps-bridge` com
   `status: retired`). Quem a supera é `2026-07-08-site-consolidation-kvm8`.
 - `2026-07-15-kg-audit-layer-generalizes-to-content`: o `valid_when` caiu. A KB
   `knowledge-graph-sdaal.md` documenta o content-audit (l.140-147). O re-teste de 07-16 já a dava como
@@ -57,7 +57,7 @@ e `first-regulated-a2a-handshake` (formato de julho vetado desde `f9d9f939`) ·
 ## Sem re-teste completo (declarado)
 
 Todas as 29 tiveram re-teste. Três têm um item que ficou NÃO medido, e cada migalha diz qual:
-- `ssh-alt-port-2222`: o lado do notebook do maestro (a rede ainda filtra a 22?) só se mede de lá.
+- `ssh-alt-port-socket-activation`: o lado do notebook do maestro (a rede ainda filtra a 22?) só se mede de lá.
 - `first-regulated-a2a-handshake`: o estado da branch remetente no repo regulado da granaai, que não li por git.
 - `sovereign-lazy-triggers-research` e `intelligent-breadcrumbs-research`: os números externos (Routines,
   LongMemEval-V2, MemConflict) não foram re-medidos. O STALE foi re-confirmado por busca externa.
