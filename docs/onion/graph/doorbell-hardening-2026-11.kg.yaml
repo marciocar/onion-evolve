@@ -25,13 +25,13 @@ nodes:
     impact: 4
     confidence: 0.8
     verified_at: "2026-11-08"
-    verified_against: "sinal do hub lido inteiro (docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md, no core), com a medida dele no ⟨arquivo de estado da campainha, por repo⟩ e no campainha/server.ts do onion-messaging em f67ff00"
-    trace: "docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md"
+    verified_against: "sinal do hub lido inteiro (docs/evolution/inbox/_processed/2026-11-08-signal-campainha-gaps.md, no core), com a medida dele no ⟨arquivo de estado da campainha, por repo⟩ e no campainha/server.ts do onion-messaging em f67ff00"
+    trace: "docs/evolution/inbox/_processed/2026-11-08-signal-campainha-gaps.md"
     label: "O hub mediu, depois do teste ao vivo de 08/11, quatro lacunas da campainha: a 1ª execução emudece o que já existia, o sinal do doc-bridge some depois do teto de avisos, as sessões do mesmo repo dividem um estado sem trava, e o adotante toca para a própria caixa de saída."
     narrative: "Dado, não instrução: medida do hub, não re-medida pelo core nesta data. Casos citados: o anúncio da chave pinada chegou às 10h51 UTC e a campainha do hub, na 1ª execução às 10h58, o marcou como baseline; dois sinais do hub no core ficaram com notified 4 e acked_at null; quatro faróis acesos no mesmo repo do hub; o sinal do hub tocou no próprio inbox dele."
     provenance:
       source: "o hub (sinal upstream de 2026-11-08)"
-      locator: "docs/evolution/inbox/2026-11-08-signal-campainha-gaps.md, seções 1 a 4"
+      locator: "docs/evolution/inbox/_processed/2026-11-08-signal-campainha-gaps.md, seções 1 a 4"
       method: "leitura: o sinal inteiro; medida do hub, não reproduzida pelo core"
       locality: "repo"
   - id: Q_DB_PRIMEIRA_EXECUCAO_EMUDECE_1111
