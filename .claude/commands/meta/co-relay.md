@@ -113,7 +113,7 @@ destino inteiro em leitura **depois** da exceção do `inbox/` no `sandbox.files
 por baixo (um `permissions.allow` do `inbox/` não desfaz). Quando o `inbox/` do destino não é gravável
 daqui, o carteiro entrega, depois das **mesmas** guardas e do mesmo dedup, no **spool**
 `${ONION_SPOOL_DIR:-~/.local/state/onion-spool}/<slug-do-destino>/` (slug = o caminho do destino com todo
-caractere fora de `[A-Za-z0-9]` trocado por `-`), e o hook SessionStart do destino importa para o `inbox/`
+caractere fora de `[A-Za-z0-9]` trocado por `-`), e o hook do destino (no SessionStart e, em sessão aberta, a cada prompt) importa para o `inbox/`
 dele, untracked (`.claude/utils/co-evolution/spool-import.sh`). No settings com sandbox, ponha
 `~/.local/state/onion-spool` no `allowWrite` **no lugar** do `inbox/` do destino. `--spool` força o canal.
 

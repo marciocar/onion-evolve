@@ -11,6 +11,26 @@
 # do registro em settings.json de todos os consumidores já adotados (cobre ambos os canais apesar do nome).
 #
 # "Não processada" = .md de 1º nível no canal (exclui _processed/ e README).
+# ── MODO `prompt` (UserPromptSubmit, 2026-11-09) ────────────────────────────────────────────────
+# Sem o argumento isto é o SessionStart. Com `prompt`, só importa o spool do carteiro: sinal que chega numa
+# sessão longa ficava parado em silêncio até a próxima sessão, porque o spool mora fora dos repos e a campainha
+# só olha inbox/ e inbound/. Depois da importação o arquivo está no inbox/, e a campainha o vê no tick seguinte.
+# Sai ANTES do pull do bridge e das contagens: 1 teste de diretório com o spool vazio (~25 ms medidos, sem rede).
+# Só fala quando algo entrou, com a contagem e nada do conteúdo. Fica descoberto: sessão ociosa e turno longo
+# (não há prompt que dispare), e subagente (não recebe UserPromptSubmit).
+if [ "${1:-}" = "prompt" ]; then
+  _sh="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/co-evolution/spool-import.sh"
+  [ -f "$_sh" ] || exit 0
+  _out="$(bash "$_sh" --hook --repo "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null)" || true
+  case "$_out" in
+    "imported="[1-9]*)
+      _n="${_out#imported=}"; _n="${_n%% *}"
+      printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"📬 Onion co-evolução: %s sinal(is) chegou(aram) pelo spool do carteiro ao inbox/. Rode /meta:co-evolve para ler/gerenciar."}}\n' "$_n"
+      ;;
+  esac
+  exit 0
+fi
+
 count_unread() {  # $1 = diretório do canal
   [ -d "$1" ] || { echo 0; return; }
   find "$1" -maxdepth 1 -type f -name '*.md' ! -iname 'readme.md' 2>/dev/null | wc -l | tr -d '[:space:]'

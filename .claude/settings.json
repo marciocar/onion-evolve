@@ -160,6 +160,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/co-evolution-inbox-check.sh\" prompt",
+            "timeout": 5,
+            "statusMessage": "Importando o spool do carteiro (Onion)"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/background-task-probe.sh\"",
             "timeout": 5,
             "statusMessage": "Medindo tarefas de fundo (Onion)"

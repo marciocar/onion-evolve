@@ -9,7 +9,7 @@
 #             leitura DEPOIS da exceção do inbox, que fica por baixo (medido em 2026-11-07, Claude Code
 #             2.1.319, bwrap 0.9.0; ver o SPOOL no cabeçalho do co-relay.sh). Aí o carteiro escreve num
 #             diretório FORA dos repos, um por destinatário, e esta peça, rodando NA SESSÃO DO DESTINO
-#             (hook SessionStart e /meta:co-evolve), traz o sinal para o inbox/ dela.
+#             (hook SessionStart, hook UserPromptSubmit e /meta:co-evolve), traz o sinal para o inbox/ dela.
 #
 # Spool     : ${ONION_SPOOL_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/onion-spool}/<slug>/
 #             <slug> = o caminho físico (pwd -P) da raiz do destino, com todo caractere fora de

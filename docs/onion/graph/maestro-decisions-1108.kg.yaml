@@ -300,12 +300,13 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-11-09"
     owner: core
     impact: 4
     confidence: 0.5
     label: "Curar ops/sync-main-worktree.sh para conferir a escrita antes de avançar a main e avisar em vez de quebrar no meio."
-    narrative: "Pronto quando: o script testa a escrita no checkout antes do avanço, e um teste de modo de falha com a árvore sem escrita mostra o aviso e a main intacta. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-372."
+    narrative: "Pronto quando: o script testa a escrita no checkout antes do avanço, e um teste de modo de falha com a árvore sem escrita mostra o aviso e a main intacta. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-372. Cura de 2026-11-09 no PR fix/sync-main-writable-and-spool-import: antes do avanço cada alvo passa por abertura real (arquivo em append sem escrever, diretório com sonda que nasce e morre), e um alvo sem escrita pula tudo com aviso. Bancada run_sync_main_worktree_selftests com fixture e mutantes; dogfood com bind em leitura real no bwrap 0.9.0 reproduziu o EBUSY na main antiga e o pulo na nova. A falha no meio ainda pode ocorrer se o alvo perder a escrita depois da sonda: o script mede e diz ÁRVORE PARCIAL."
   - id: Q_MD_SETTINGS_UPDATE_UNDER_SANDBOX_1108
     node_type: question
     layer: audit

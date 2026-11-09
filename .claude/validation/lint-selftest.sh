@@ -28768,6 +28768,32 @@ run_corelay_spool_selftests() {
   _prove_mutation "co-relay-spool: (S-M4) sem a chamada do importador no hook, o sinal mora no spool para sempre — (S4) morde" \
     "${hook}" "${mutd}/s4.sh" "${s4_i}" "${s4_m}"
 
+  # (P1) a sessão LONGA: o hook em modo prompt, como o settings o registra, traz o sinal; a campainha lê o inbox/ e passa a vê-lo
+  local p1_i=1 p1_m=1
+  _p1() {  # $1 = hook
+    _sp_fixture; _sp_relay "${helper}" --spool; [ "${rc}" -eq 0 ] && [ -f "${sp}/${slug}/${B}" ] || return 1
+    hk="$( cd "${core}" && CLAUDE_PROJECT_DIR="${core}" ONION_SPOOL_DIR="${sp}" bash "$1" prompt 2>/dev/null )"
+    [ -f "${core}/${SIG}" ] && [ ! -f "${sp}/${slug}/${B}" ] && [[ "${hk}" == *'"hookEventName":"UserPromptSubmit"'* ]] && [[ "${hk}" == *"1 sinal"* ]]
+  }
+  _p1 "${hook}" && p1_i=0
+  if [ "${p1_i}" -eq 0 ]; then record_pass "co-relay-spool: (P1) modo prompt importa o spool e avisa a sessão longa"
+  else record_fail "co-relay-spool: (P1) modo prompt" "hook=[${hk}]"; fi
+  sed 's|^  _out="$(bash "$_sh" --hook --repo .*$|  _out=""|' "${hook}" > "${mutd}/p1.sh"
+  _p1 "${mutd}/p1.sh" && p1_m=0
+  _prove_mutation "co-relay-spool: (P-M1) sem a importação no modo prompt, o sinal volta a dormir no spool — (P1) morde" \
+    "${hook}" "${mutd}/p1.sh" "${p1_i}" "${p1_m}"
+  # (P2) spool vazio: silêncio total, e o modo prompt não conta o inbox/ (uma linha por prompt seria o motd repetido)
+  _p1 "${hook}"   # refaz com o hook íntegro: o mutante acima deixou o spool cheio
+  hk="$( cd "${core}" && CLAUDE_PROJECT_DIR="${core}" ONION_SPOOL_DIR="${sp}" bash "${hook}" prompt 2>/dev/null )"
+  if [ -z "${hk}" ]; then record_pass "co-relay-spool: (P2) modo prompt sem nada novo fica em silêncio, com o inbox/ cheio"
+  else record_fail "co-relay-spool: (P2) silêncio" "hook=[${hk}]"; fi
+  # (P3) o registro: sem a linha no settings.json nada disso dispara
+  if python3 -I -c 'import json,sys
+hs=json.load(open(sys.argv[1]))["hooks"]["UserPromptSubmit"]
+sys.exit(0 if any(h.get("command","").endswith("co-evolution-inbox-check.sh\" prompt") for g in hs for h in g["hooks"]) else 1)' "${REPO_ROOT}/.claude/settings.json" 2>/dev/null; then
+    record_pass "co-relay-spool: (P3) o settings.json registra o modo prompt no UserPromptSubmit"
+  else record_fail "co-relay-spool: (P3) registro" "UserPromptSubmit sem o co-evolution-inbox-check.sh prompt"; fi
+
   # (I1) homônimo TRACKED com conteúdo novo: fica no spool, o hook avisa 📮, a árvore commitada intacta
   _sp_fixture; printf '# versao commitada\n' > "${core}/${SIG}"
   git -C "${core}" add "${SIG}" && git -C "${core}" -c user.name=t -c user.email=t@t commit -qm t
@@ -49007,6 +49033,74 @@ run_sync_main_worktree_selftests() {
      && awk '/sync-main-worktree.sh/{f=NR} /if \[ "\$\{DO_SYNC:-0\}" = 1 \]; then/{s=NR} END{exit !(f && s && f < s)}' "${pmv}"; then
     record_pass "sync-main: (e) o pr-merge-verified o chama antes (e fora) do ramo --sync"
   else record_fail "sync-main: (e) ligação" "o merge verificado não chama a sincronização, ou só sob --sync"; fi
+  # ÁRVORE SEM ESCRITA (SAC-372): fixture com 2 alvos. a.txt na raiz gravável vem antes de ro/c.txt na ordem do git,
+  # então um avanço cego escreve a.txt e quebra em ro/c.txt: a árvore parcial medida pela curadoria, com git de verdade.
+  _sm_fx() {  # $1 = subpasta → main 1 commit atrás do origin, alvos a.txt e ro/c.txt
+    local f="${d}/$1"; mkdir -p "${f}"
+    git init -q --bare -b main "${f}/origin.git"
+    git clone -q "${f}/origin.git" "${f}/main" 2>/dev/null
+    ( cd "${f}/main" && printf 'v1\n' > a.txt && mkdir ro && printf 'v1\n' > ro/c.txt && git add -A && git "${g[@]}" commit -qm base && git push -q origin main ) >/dev/null 2>&1
+    git clone -q "${f}/origin.git" "${f}/other" 2>/dev/null
+    ( cd "${f}/other" && printf 'v2\n' > a.txt && printf 'v2\n' > ro/c.txt && git add -A && git "${g[@]}" commit -qm next && git push -q origin main ) >/dev/null 2>&1
+  }
+  # o caso de pulo: $1 = sut, $2 = fixture, $3 = texto no aviso. rc 0, aviso, HEAD parado e árvore limpa (sem resíduo de sonda)
+  _sm_skipped() {
+    local f="${d}/$2" before o r=0; before="$(git -C "${f}/main" rev-parse HEAD)"
+    o="$(cd "${f}/main" && bash "$1" 2>&1)" || r=$?
+    sm_out="${o}"
+    [ "${r}" -eq 0 ] && [[ "${o}" == *"sem tocar na árvore"* ]] && [[ "${o}" == *"$3"* ]] \
+      && [ "$(git -C "${f}/main" rev-parse HEAD)" = "${before}" ] && [ "$(cat "${f}/main/a.txt")" = v1 ] \
+      && [ -z "$(git -C "${f}/main" status --porcelain)" ]
+  }
+  local sm_out="" i_rc m_rc mutd="${d}/mut"; mkdir -p "${mutd}"
+  sed 's|^if \[ "${#blocked\[@\]}" -gt 0 \]; then$|if false; then|' "${sut}" > "${mutd}/no-gate.sh"
+  sed 's|^  if \[ -f "${abs}" \] .*blocked.*$|  :|' "${sut}" > "${mutd}/no-open.sh"
+  if [ "$(id -u)" -eq 0 ]; then
+    record_skip "sync-main: (f,g,h) root ignora chmod, o alvo sem escrita não se simula"
+  else
+    # (f) diretório do alvo sem escrita: pula tudo, com aviso que nomeia o alvo
+    _sm_fx f; chmod 555 "${d}/f/main/ro"; i_rc=0; _sm_skipped "${sut}" f "ro/c.txt" || i_rc=1
+    chmod 755 "${d}/f/main/ro"
+    if [ "${i_rc}" -eq 0 ]; then record_pass "sync-main: (f) alvo em diretório sem escrita: pula o avanço inteiro, com aviso, e a árvore não muda"
+    else record_fail "sync-main: (f) sem escrita" "out=[${sm_out}]"; fi
+    _sm_fx fm; chmod 555 "${d}/fm/main/ro"; m_rc=0; _sm_skipped "${mutd}/no-gate.sh" fm "ro/c.txt" || m_rc=1
+    chmod 755 "${d}/fm/main/ro"
+    _prove_mutation "sync-main: (f-M) sem o portão, o avanço volta a escrever metade da árvore — (f) morde" "${sut}" "${mutd}/no-gate.sh" "${i_rc}" "${m_rc}"
+    # (g) o arquivo não abre para escrita, num diretório que aceita: a abertura real é quem vê
+    _sm_fx g; chmod 444 "${d}/g/main/ro/c.txt"; i_rc=0; _sm_skipped "${sut}" g "ro/c.txt" || i_rc=1
+    if [ "${i_rc}" -eq 0 ]; then record_pass "sync-main: (g) arquivo que não abre para escrita: pula pela abertura real"
+    else record_fail "sync-main: (g) abertura real" "out=[${sm_out}]"; fi
+    _sm_fx gm; chmod 444 "${d}/gm/main/ro/c.txt"; m_rc=0; _sm_skipped "${mutd}/no-open.sh" gm "ro/c.txt" || m_rc=1
+    _prove_mutation "sync-main: (g-M) sem a abertura do arquivo, o alvo que não abre passa pelo portão — (g) morde" "${sut}" "${mutd}/no-open.sh" "${i_rc}" "${m_rc}"
+    # (h) falha NO MEIO (alvo perde a escrita depois da sonda; o portão desligado reproduz com merge real): mede e diz o que ficou
+    _sm_partial() {  # $1 = sut, $2 = fixture
+      local f="${d}/$2" before o r=0; _sm_fx "$2"; before="$(git -C "${f}/main" rev-parse HEAD)"
+      chmod 555 "${f}/main/ro"; o="$(cd "${f}/main" && bash "$1" 2>&1)" || r=$?; chmod 755 "${f}/main/ro"
+      sm_out="${o}"
+      [ "${r}" -eq 0 ] && [[ "${o}" == *"ÁRVORE PARCIAL"* ]] && [[ "${o}" == *"1 de 2"* ]] \
+        && [ "$(git -C "${f}/main" rev-parse HEAD)" = "${before}" ] && [ "$(cat "${f}/main/a.txt")" = v2 ]
+    }
+    sed 's|^  if \[ "${moved}" -gt 0 \]; then$|  if false; then|' "${mutd}/no-gate.sh" > "${mutd}/no-partial.sh"
+    i_rc=0; _sm_partial "${mutd}/no-gate.sh" h || i_rc=1
+    if [ "${i_rc}" -eq 0 ]; then
+      git -C "${d}/h/main" reset -q --hard origin/main
+      if [ "$(git -C "${d}/h/main" rev-parse HEAD)" = "$(git -C "${d}/h/origin.git" rev-parse main)" ] && [ "$(cat "${d}/h/main/ro/c.txt")" = v2 ]; then
+        record_pass "sync-main: (h) falha no meio: rc 0, diz ÁRVORE PARCIAL com a conta, e o reset que o aviso indica conclui"
+      else record_fail "sync-main: (h) recuperação" "o reset indicado no aviso não concluiu"; fi
+    else record_fail "sync-main: (h) falha no meio" "out=[${sm_out}]"; fi
+    m_rc=0; _sm_partial "${mutd}/no-partial.sh" hm || m_rc=1
+    _prove_mutation "sync-main: (h-M) sem a medida, a árvore parcial volta a parecer recusa comum — (h) morde" "${mutd}/no-gate.sh" "${mutd}/no-partial.sh" "${i_rc}" "${m_rc}"
+  fi
+  # (i) exit 0 não é a verificação: merge que diz sucesso sem mover o HEAD vira aviso (shim só no verbo merge)
+  _sm_fx i; local shimd="${d}/shim"; mkdir -p "${shimd}"
+  printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = merge ] && exit 0; done\nexec %s "$@"\n' "$(type -P git)" > "${shimd}/git"; chmod +x "${shimd}/git"
+  _sm_i() { out="$(cd "${d}/i/main" && PATH="${shimd}:${PATH}" bash "$1" 2>&1)" || true; [[ "${out}" == *"disse sucesso"* ]]; }
+  i_rc=0; _sm_i "${sut}" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "sync-main: (i) merge que diz sucesso sem mover o HEAD vira aviso"
+  else record_fail "sync-main: (i) HEAD conferido" "out=[${out}]"; fi
+  sed 's|^  if \[ "${after}" = "${target}" \]; then$|  if true; then|' "${sut}" > "${mutd}/no-head.sh"
+  m_rc=0; _sm_i "${mutd}/no-head.sh" || m_rc=1
+  _prove_mutation "sync-main: (i-M) sem conferir o HEAD, o exit 0 do merge volta a ser a palavra final — (i) morde" "${sut}" "${mutd}/no-head.sh" "${i_rc}" "${m_rc}"
   rm -rf "${d}"
 }
 _family run_sync_main_worktree_selftests
