@@ -1,7 +1,8 @@
 ---
 branch: fix/sync-main-writable-and-spool-import
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 984f8902466d8bfe7d63179a96b7675bb4a76cf0b42042bc5c5474489570797c
+reviewed_code_sha256: 7a9ebb97aa7eb481b8c01ebee069c8b92c0db9fb73e61f88123bef31c003266b
 findings_total: 11
 findings_real: 9
 tokens: 0
