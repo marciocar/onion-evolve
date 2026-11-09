@@ -94,15 +94,15 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     x_linear_issue: "SAC-383"
     impact: 3
-    confidence: 0.7
+    confidence: 0.9
     verified_at: "2026-11-09"
-    verified_against: "doorbell/DOCTRINE.md na main do onion-messaging: «o hook de início de sessão e o radar são do core e ainda não a leem»"
+    verified_against: "branch fix/doorbell-expired-core-half: família mail_hook da bancada, com o hook e o kg-radar.sh --doorbell lendo o estado num sandbox e 5 mutantes mortos; server.ts na main do onion-messaging, de onde vem a resolução do caminho"
     label: "A metade do core na lacuna 2: o hook de início de sessão e o radar ainda não leem o sinal expirado da campainha."
-    narrative: "Pronto quando: o hook de início de sessão conta os expirados e o radar ou o lint cobra sinal sem ack há mais de um prazo, com caso de bancada; o estado vive fora do repo, então sem ele a medida sai como não verificada. Prazo a calibrar."
+    narrative: "Pronto quando: o hook de início de sessão conta os expirados e o radar ou o lint cobra sinal sem ack há mais de um prazo, com caso de bancada; o estado vive fora do repo, então sem ele a medida sai como não verificada. Prazo a calibrar. Fechado em 2026-11-09: o hook conta e marca os expirados, e `kg-radar.sh --doorbell` cobra expirados e retidos, com NÃO VERIFICADO quando não há estado. O prazo usado é o teto de avisos da própria campainha; não há prazo calibrado além dele."
 edges:
   - from: Q_DB_TETO_DE_AVISOS_SEM_DESTINO_1111
     to: Q_DB_EXPIRED_CORE_HALF

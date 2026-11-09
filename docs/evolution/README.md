@@ -127,7 +127,8 @@ Você não precisa lembrar de checar — o **SessionStart hook** avisa no boot:
   da sessão conta as mensagens não-processadas e injeta o aviso. **Bidirecional** — cobre os dois canais,
   cada um com sua label: `📬 … inbox (upstream: sinal/feedback)` + `📥 … inbound/ (downstream: relatório de
   update/anúncio)`. **Silencioso quando 0** em ambos (disciplina de *motd*). É o primitivo "you have mail on
-  login" — o único que dispara sozinho (memória e `/warm-up` não). _(O nome do arquivo mantém `inbox-check`
+  login" — o único que dispara sozinho (memória e `/warm-up` não). Sinal que esgotou os avisos da campainha sem ack
+  continua contado e ganha a marca `🔕 … EXPIRADO`; o `kg-radar.sh <grafo> --doorbell` lista os expirados e os retidos. _(O nome do arquivo mantém `inbox-check`
   por estabilidade do registro nos consumidores já adotados; o comportamento cobre os dois canais.)_
 - **Comando [`/meta:co-evolve`](../../.claude/commands/meta/co-evolve.md)**: lê e gerencia — detecta o papel
   do repo (`.onion-version`), resume as mensagens, orienta conforme core/consumidor.
