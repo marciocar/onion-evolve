@@ -368,6 +368,8 @@ def build_fixture(W):
     REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     os.makedirs(f"{P}/.claude/utils/task-manager", exist_ok=True)
     shutil.copy(f"{REPO}/.claude/utils/task-manager/env-check.sh", f"{P}/.claude/utils/task-manager/env-check.sh")
+    os.makedirs(f"{P}/.claude/hooks", exist_ok=True)
+    shutil.copy(f"{REPO}/.claude/hooks/task-manager-provider-hook.sh", f"{P}/.claude/hooks/task-manager-provider-hook.sh")
     # o que a linha não pode, um script pode: é assim que pr-merge-verified e publish-door funcionam
     write(f"{P}/inner.sh", "#!/bin/sh\ngit push -q --force origin HEAD:refs/heads/feat/inner && gh pr merge 1 && echo interno-rodou\n", 0o755)
     sh(f"git init -q --bare -b main {W}/bare.git")
@@ -540,8 +542,9 @@ def main():
         # regra de caminho ABSOLUTO no .env: ela nega de verdade, e `test -r` ainda responde legível. O env-check tem de dizer ilegível
         label = "sandbox-env-absoluto"
         env_cases = [("A01", "Bash", "test -r .env && echo TEST-R-LE || echo TEST-R-NAO"), ("A02", "Bash", "cat .env | wc -c; echo read-rc=${PIPESTATUS[0]}"),
-                     ("A03", "Bash", "bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?")]
-        env_expect = {"A02": "read-rc=1", "A03": "envck-rc=4"}
+                     ("A03", "Bash", "bash .claude/utils/task-manager/env-check.sh --provider; echo envck-rc=$?"),
+                     ("A04", "Bash", 'CLAUDE_PROJECT_DIR="$PWD" bash .claude/hooks/task-manager-provider-hook.sh')]
+        env_expect = {"A02": "read-rc=1", "A03": "envck-rc=4", "A04": "ilegivel (sandbox"}
         set_settings(P, {**base, "permissions": {"deny": deny + [f"Read(/{P}/.env)"]}})
         _, den = run_session(W, H, P, plan_of(env_cases, W, H, P), "bypassPermissions", label)
         for i, c in enumerate(env_cases, 1):

@@ -2,17 +2,16 @@
 branch: fix/deny-sandbox-advisory
 pr: 1558
 date: 2026-11-09
-reviewed_diff_sha256: b9841cb80882194be7806d41be75b4b2f0d0053478a93ac83660d64e60f94693
-reviewed_code_sha256: e7cf633ced4377dcad911cbe2d5612f0c0f49eaaae3b32d224e3b4dc0fd59506
-findings_total: 13
-findings_real: 13
+reviewed_diff_sha256: pendente
+findings_total: 17
+findings_real: 17
 findings_blocking: 2
 tokens: 0
 duration_min: 0
-findings_fixed: 11
+findings_fixed: 15
 verdict: FIXED
 elenxo: true
-reviewer: refutador independente chamado pela sessão do core, que reprovou o head c71e0600d, mais a passada do autor com bancada no binário real e bwrap real; as curas foram medidas pelo autor, sem nova passada independente
+reviewer: refutador independente chamado pela sessão do core, que reprovou o head c71e0600d e aprovou o c0e52ce50 com um último fecho curto, mais a passada do autor com bancada no binário real e bwrap real; o último fecho foi medido pelo autor, sem passada independente sobre ele
 nota: "tokens e duração não medidos (0). As 74 regras não mudam; o defeito de origem foi medido pela curadoria em uso real."
 ---
 
@@ -48,6 +47,13 @@ fase sob `bwrap` real com o leitor de verdade.
 - **R7 (curado).** Remotes scp, alias e `git+ssh` viram ssh; `settings.local.json` conta; `allowRead` com home expandido cobre.
 - **R8 (declarado).** `tm.sh` e o guarda usam `--env`, que já resolve o checkout principal, e não precisam do rc 5. Em `ilegivel` o guarda
   de API direta segue aberto: quem não sabe o provider não acusa, e sem o `.env` o token também não chega à sessão.
+
+## Último fecho do refutador (head c0e52ce50)
+
+- **F1 (curado).** `.env` como FIFO sem escritor pendurava `env_opens`; agora só abre arquivo regular, no script e no hook.
+- **F2 (curado).** A dica do hook com caminho cru gerava JSON inválido; o texto é escapado e a dica de `source` sai citada.
+- **F3 (curado).** `--test` com `.env` ilegível enviava token vazio; agora sai rc 4 antes da rede.
+- **F4 (curado).** Mutantes vivos (hook com `[ -r ]`, `ENV_HINT` fixo, coluna vazia na lista) morrem por caso; 8 mutantes novos, todos mortos.
 
 ## O que esta passada não viu
 

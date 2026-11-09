@@ -53,8 +53,8 @@ nodes:
     status: confirmed
     verified_at: "2026-11-08"
     source_tier: 10
-    label: "No binário real 2.1.319, com API simulada e .env inventado: 403 linhas sem divergência, 10 chamadas de flow com hooks reais sem cair em regra, e 74 mutantes por regra, todos soltando ao menos um caso."
-    narrative: "As 403 linhas cobrem controle sem deny, deny com o allow real em default e em bypassPermissions, e sandbox. Na 1ª rodada, os mutantes acharam 11 regras decorativas: 10 ganharam caso e 1 saiu, porque o motor já barra rm -rf com $HOME entre aspas pela regra sem aspas. O refutador independente do PR reprovou a 1ª lista: git clean -*x* atravessava espaços e barrava -e e caminho com x, e deixava passar -fdX; as regras Read barravam Write. A cura trocou por grupos explícitos de flags, e a bancada passou a reprovar quando não há resultado medido (com um claude falso, NÃO MEDIDO e rc 3)."
+    label: "No binário real 2.1.319, com API simulada e .env inventado: 404 linhas sem divergência, 10 chamadas de flow com hooks reais sem cair em regra, e 74 mutantes por regra, todos soltando ao menos um caso."
+    narrative: "As 404 linhas cobrem controle sem deny, deny com o allow real em default e em bypassPermissions, e sandbox. Na 1ª rodada, os mutantes acharam 11 regras decorativas: 10 ganharam caso e 1 saiu, porque o motor já barra rm -rf com $HOME entre aspas pela regra sem aspas. O refutador independente do PR reprovou a 1ª lista: git clean -*x* atravessava espaços e barrava -e e caminho com x, e deixava passar -fdX; as regras Read barravam Write. A cura trocou por grupos explícitos de flags, e a bancada passou a reprovar quando não há resultado medido (com um claude falso, NÃO MEDIDO e rc 3)."
     trace: "ops/testing/permissions-deny-bench.py"
     verified_against: "python3 -I ops/testing/permissions-deny-bench.py com o settings do branch; data/cases.tsv, data/flows.tsv e data/mutants.tsv"
     provenance:

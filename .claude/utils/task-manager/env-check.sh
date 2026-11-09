@@ -60,11 +60,12 @@ required() {
   esac
 }
 # abertura de verdade: sob sandbox `[ -r ]` responde legível para arquivo que o processo não consegue abrir (medido com bwrap)
-env_opens() { { : < "${ENV_FILE}"; } 2>/dev/null; }
+# só arquivo regular: abrir um FIFO sem escritor penduraria o script, e o hook morreria no timeout sem aviso
+env_opens() { [ -f "${ENV_FILE}" ] && { : < "${ENV_FILE}"; } 2>/dev/null; }
 # valor de uma chave lido do arquivo COMO DADO: última ocorrência, `export ` opcional, aspas e comentário fora.
 # Uso interno; só sai do script por --provider (validado) e --get (lista fechada).
 file_value() {
-  [ -f "${ENV_FILE}" ] && env_opens || return 0
+  env_opens || return 0
   awk -v k="$1" '
     { line=$0; sub(/\r$/, "", line); sub(/^[ \t]*export[ \t]+/, "", line) }
     line ~ "^[ \t]*" k "[ \t]*=" {
@@ -169,6 +170,12 @@ case "${MODE}" in
   test)
     valid_provider "${P}" || die "provider desconhecido ou ausente"
     [ "${P}" = none ] && { echo "none: nada a testar (modo offline)"; exit 0; }
+    # sem ler o .env o token sairia vazio e a resposta seria um 401 enganoso: pare antes da rede
+    for k in $(required "${P}"); do
+      has_key "$k" && continue
+      env_unreadable && die_unreadable
+      worktree_without_env && die_worktree
+    done
     command -v curl >/dev/null || die "curl ausente — teste de conexão impossível"
     v() { value_of "$1"; }
     # cfg vai ao curl pela entrada padrão (-K -): o segredo nunca aparece na linha de comando
