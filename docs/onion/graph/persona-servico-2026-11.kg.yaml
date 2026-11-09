@@ -81,13 +81,15 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     x_due: "2026-11-16"
     impact: 5
     confidence: 0.6
+    verified_at: "2026-11-09"
+    verified_against: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH com status done, selado em 2026-11-09 com a escolha «Selo condicionado hoje»"
     label: "Rodada do /meta:decide com o maestro para selar o D_MA_ARCH com o requisito da persona de serviço."
-    narrative: "Pronto quando: o D_MA_ARCH selado pelo kg-decide-seal até 2026-11-16. O core prepara as opções e a recomendação até 2026-11-14, a partir da pesquisa do runtime e da escada; a decisão é do maestro. Depende dos dois nós anteriores."
+    narrative: "Pronto quando: o D_MA_ARCH selado pelo kg-decide-seal até 2026-11-16. O core prepara as opções e a recomendação até 2026-11-14, a partir da pesquisa do runtime e da escada; a decisão é do maestro. Depende dos dois nós anteriores. Fechada em 2026-11-09, antes do prazo: o maestro selou o D_MA_ARCH sem esperar a escada, e por isso o selo é condicionado. Q_PS_ESCADA_DE_AUTONOMIA_1113 segue aberta como portão do selo."
   - id: Q_PS_PILOTO_EM_RASCUNHO_1117
     node_type: question
     layer: audit

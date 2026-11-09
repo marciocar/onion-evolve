@@ -13,6 +13,10 @@ meta:
   # ═══ TETO: 30 NÓS. Pendência nova entra quando uma fechada sai. ═══
 # Arestas para nó de OUTRO grafo do core (contrato v4.3).
 external_edges:
+  - from: D_MA_ARCH
+    to: "docs/onion/graph/persona-servico-2026-11.kg.yaml#Q_PS_ESCADA_DE_AUTONOMIA_1113"
+    edge_type: DEPENDS_ON
+    label: "portão do selo condicionado: leitura ao negócio, canal externo e fase 3 esperam a escada"
   - from: E_MA_IDA_E_VOLTA_R3_SEM_CANAL_DO_HARNESS_1028
     to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028"
     edge_type: TRACES_TO
@@ -262,14 +266,24 @@ nodes:
   - id: D_MA_ARCH
     node_type: decision
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 5
     confidence: 0.5
     label: "A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, mercado e barreira."
-    narrative: "Nasce open: o maestro sela, com as opções e a recomendação do core. Antes dela, nada se implementa no hub. Requisito acrescentado em 2026-11-05, por triagem do maestro sobre a proposta do hub (persona de serviço): (1) identidade de serviço própria, agindo em nome da empresa e nunca como o maestro (o padrão on-behalf-of do RFC 8693, claim act, apontado em docs/evolution/research/maestro-persona-2026-11/); (2) atendimento por menção no chat corporativo; (3) triagem dos canais conectados (e-mail do maestro, chat, gerenciador de tarefas) em card, resposta ou pergunta ao maestro. O runtime (bot próprio por Agent SDK, com o bridge do core como candidato, contra o assistente nativo do chat) se decide por pesquisa em modo decision. A escada de autonomia por tipo de ato nasce pelo /meta:forge e o maestro sela. O piloto começa por rascunhos que o maestro aprova. A conta de serviço é ato do maestro."
     trace: "docs/evolution/inbox/_processed/2026-11-05-proposal-brain-persona-servico.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Selo condicionado hoje»"
+    narrative: |-
+      Nasce open: o maestro sela, com as opções e a recomendação do core. Antes dela, nada se implementa no hub. Requisito acrescentado em 2026-11-05, por triagem do maestro sobre a proposta do hub (persona de serviço): (1) identidade de serviço própria, agindo em nome da empresa e nunca como o maestro (o padrão on-behalf-of do RFC 8693, claim act, apontado em docs/evolution/research/maestro-persona-2026-11/); (2) atendimento por menção no chat corporativo; (3) triagem dos canais conectados (e-mail do maestro, chat, gerenciador de tarefas) em card, resposta ou pergunta ao maestro. O runtime (bot próprio por Agent SDK, com o bridge do core como candidato, contra o assistente nativo do chat) se decide por pesquisa em modo decision. A escada de autonomia por tipo de ato nasce pelo /meta:forge e o maestro sela. O piloto começa por rascunhos que o maestro aprova. A conta de serviço é ato do maestro. Selo condicionado, por decisão do maestro em 2026-11-09, na forma do precedente D_MA_PROPOSTA_DE_MERCADO_ACEITA_CONDICIONADA_1104: os portões são Q_PS_ESCADA_DE_AUTONOMIA_1113, em docs/onion/graph/persona-servico-2026-11.kg.yaml, e Q_MA_CLASSIFICATION, neste grafo. Até os dois fecharem, ficam barrados a leitura aberta ao negócio, o canal externo e a fase 3. Os detalhes de promoção e o atrito entre CODEOWNERS e permissão por repositório seguem abertos em Q_MD_BRAIN_PROMOTION_DETAILS_1109, em docs/onion/graph/maestro-decisions-1109b.kg.yaml.
+
+      Selado por /meta:decide em 2026-11-09: escolhida «Selo condicionado hoje»; descartadas: «Manter 16/11» · «Só com tudo fechado».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «Como selar a arquitetura do Company Brain multiaudiência, com dois pontos ainda sem medir?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
   - id: E_MA_MCP_LEITURA_MEDIDO_1028
     node_type: evidence
     layer: audit

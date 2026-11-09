@@ -1,0 +1,159 @@
+meta:
+  schema_version: "1"
+  id: maestro-decisions-1109b
+  slug: maestro-decisions-1109b
+  title: "Decisões que o maestro tomou em 2026-11-09 pelo /meta:decide, segunda leva"
+  date: "2026-11-09"
+  baseline: "2026-11-09"
+  review_after: "2026-12-09"
+  purpose: "Guardar os selos da rodada do /meta:decide de 2026-11-09 num grafo próprio, porque o grafo de selos anterior virou ponto de conflito entre sessões. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
+  note: "TETO, declarado: 1 evidência de origem, 5 selos da rodada e 2 perguntas abertas que nascem dela. Outra decisão nova vai para o grafo do assunto."
+  # ═══ TETO: 10 NÓS ═══
+nodes:
+  - id: E_MD_MAESTRO_ROUND_1109B
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "respostas do maestro às perguntas com opções do /meta:decide em 2026-11-09, relatadas no brief deste PR"
+    label: "Em 2026-11-09 o maestro respondeu, por perguntas com opções, a quatro questões do /meta:decide."
+    narrative: "Este nó é a origem comum dos selos do grafo. A pergunta, a escolhida e as descartadas ficam em cada selo."
+    provenance:
+      source: "sessão do core, 2026-11-09"
+      locator: "rodada de perguntas com opções do /meta:decide"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: pessoa
+  - id: D_MD_EVOLUTION_FIRST_BLOCK_BATUTA_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Batuta primeiro»"
+    label: "O primeiro bloco da evolução do Onion é a Batuta, antes das portas e do /meta:evolve."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Batuta primeiro»; descartadas: «Portas primeiro» · «/meta:evolve primeiro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «Qual é o primeiro bloco da evolução?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MD_BIG_DECISIONS_RUN_ASAP_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Hoje se der, o mais breve possivel»"
+    label: "As decisões grandes de impacto 5 rodam ainda em 2026-11-09 se der, o mais breve possível."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Hoje se der, o mais breve possivel» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Depois de quinta» · «Rodada amanhã»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «Quando rodar as decisões grandes de impacto 5?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MD_WORK_LEFTOVERS_MEASURE_CLEAN_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Medir e limpar»"
+    label: "Os restos de trabalho são medidos e limpos, e o que parecer de sessão ativa se pergunta a ela antes."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Medir e limpar»; descartadas: «Apagar tudo» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «O que fazer com os restos de trabalho?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MD_MAESTRO_ACTS_TODAY_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Os dois hoje»"
+    label: "O maestro faz ainda em 2026-11-09 os dois atos pendentes dele: o auditd e, no notebook, o teste de mensagem com a sessão de destino fechada pelo canal nativo."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Os dois hoje»; descartadas: «Só o auditd» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «Dos seus atos pendentes, quais você faz ainda hoje? O auditd e o teste P12 no notebook (cerca de 40 min).»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: D_MD_PLUGINS_DIRECTORY_COMMUNITY_1109
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Medir e ir ao comunitário»"
+    label: "A candidatura do onion-plugins vai ao diretório comunitário, o único que a medida de setembro diz aceitar submissão, medindo antes o que falta."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Medir e ir ao comunitário»; descartadas: «Pesquisar os critérios antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-09: «Como levar a candidatura do onion-plugins ao diretório oficial, se a medida de setembro diz que só o comunitário aceita submissão?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+      locality: "pessoa"
+  - id: Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    label: "O hook do onion-plugins funciona em pasta não confiada, e quais são os requisitos duros do diretório comunitário?"
+    narrative: "Pronto quando: o teste do hook em pasta não confiada está medido e os requisitos duros do diretório comunitário estão listados com a fonte, antes da submissão. Sem data: o prazo sai quando o trabalho for pego. Espelho no Linear: SAC-385."
+  - id: Q_MD_BRAIN_PROMOTION_DETAILS_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 4
+    confidence: 0.5
+    label: "Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório?"
+    narrative: "Ficaram de fora do selo condicionado do D_MA_ARCH: executor separado do agente, aprovador diferente de quem pede, donos de duas áreas, prazos de 7 e 14 dias, frescor por área. Pronto quando: cada detalhe tem resposta selada e o atrito entre CODEOWNERS e permissão por repositório tem saída escolhida."
+edges:
+  - from: D_MD_EVOLUTION_FIRST_BLOCK_BATUTA_1109
+    to: E_MD_MAESTRO_ROUND_1109B
+    edge_type: TRACES_TO
+  - from: D_MD_BIG_DECISIONS_RUN_ASAP_1109
+    to: E_MD_MAESTRO_ROUND_1109B
+    edge_type: TRACES_TO
+  - from: D_MD_WORK_LEFTOVERS_MEASURE_CLEAN_1109
+    to: E_MD_MAESTRO_ROUND_1109B
+    edge_type: TRACES_TO
+  - from: D_MD_MAESTRO_ACTS_TODAY_1109
+    to: E_MD_MAESTRO_ROUND_1109B
+    edge_type: TRACES_TO
+  - from: D_MD_PLUGINS_DIRECTORY_COMMUNITY_1109
+    to: E_MD_MAESTRO_ROUND_1109B
+    edge_type: TRACES_TO
+  - from: Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109
+    to: D_MD_PLUGINS_DIRECTORY_COMMUNITY_1109
+    edge_type: TRACES_TO
+  - from: Q_MD_BRAIN_PROMOTION_DETAILS_1109
+    to: E_MD_MAESTRO_ROUND_1109B
+    edge_type: TRACES_TO
+external_edges:
+  - from: D_MD_PLUGINS_DIRECTORY_COMMUNITY_1109
+    to: "docs/evolution/research/onion-distribution-packages-2026-11/onion-distribution-packages-2026-11.kg.yaml#D_ONION_DISTRIBUTION_CHANNELS_2026_11"
+    edge_type: TRACES_TO
+    label: "o selo escolhe como executar o canal de diretório já decidido"
+  - from: Q_MD_BRAIN_PROMOTION_DETAILS_1109
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: TRACES_TO
+    label: "a pergunta guarda o que ficou fora do selo condicionado"
