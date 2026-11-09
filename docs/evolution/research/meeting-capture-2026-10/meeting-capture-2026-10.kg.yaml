@@ -108,6 +108,17 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
 
+  - id: Q_MC_NOTICE_ABSENT_LEGAL_READING_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.6
+    label: "O registro notice_absent do meeting-graph-check deixa a reunião sem aviso passar na forma, como SOFT: falta leitura jurídica de LGPD sobre o tratamento dos dados dessas reuniões."
+    narrative: "Pronto quando: quem responde pela privacidade do adotante leu o que o registro afirma e decidiu o tratamento das reuniões já marcadas notice_absent. O gate declara o risco, não o resolve. Nasceu em 2026-11-09, porque um adotante de consultoria precisou de exceção nomeada no gate dele para uma reunião em que de fato não houve aviso. Prazo a calibrar."
+
   - id: Q_MEETING_CONSOLIDATION_GRAPH
     node_type: question
     plane: DEV
@@ -319,6 +330,9 @@ nodes:
       locality: "host"
 
 edges:
+  - from: Q_MC_NOTICE_ABSENT_LEGAL_READING_1109
+    to: P_CONSENT_EVIDENCE_REWRITE
+    edge_type: TRACES_TO
 
   - from: E_MEETING_GRAPH_GATE_1016
     to: P_CONSENT_EVIDENCE_REWRITE
