@@ -316,7 +316,8 @@ decisão, ação e risco, **cada um com `trace` ao trecho** (`<transcrição>#L<
 **Aviso ≠ consentimento.** Registre cada tentativa de aviso (canal e texto verbatim) e a resposta de cada
 participante (`ciente`, `recusou`, `sem_resposta`, `autora_do_aviso`). Nunca declare consentimento legal,
 que é juízo jurídico e não fato da transcrição. Sem aviso na transcrição, não invente um: o gate reprova, e
-é esse o resultado certo. Se alguém recusou, a captura para na linha da recusa (`x_capture_stopped_at`), e
+é esse o resultado certo. Só quando se sabe que não houve aviso, registre `notice_absent`: o gate sai SOFT com a
+contagem de pessoas, o que é risco de compliance declarado e nunca conformidade. Se alguém recusou, a captura para na linha da recusa (`x_capture_stopped_at`), e
 nada depois dela entra no grafo.
 
 ## 🎯 Exemplos de Aplicação

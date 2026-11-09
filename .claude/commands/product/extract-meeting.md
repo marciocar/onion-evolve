@@ -272,7 +272,14 @@ Todo nó com `x_meeting_role` leva os campos que o `MEETING` mostra acima: `plan
 **O registro de aviso (aviso ≠ consentimento).** O grafo registra **o que aconteceu**: cada tentativa de
 aviso e a resposta de cada participante a ela. Ele **nunca declara consentimento legal**: isso é juízo
 jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_consent`/`consentimento_legal`.
-- Sem aviso na transcrição, **não invente um**: grave o grafo sem `notice_attempt`, com cada participante em
+- **Não houve aviso, e isso se sabe** (transcrição inteira lida e o organizador não aponta aviso por outro
+  canal): registre a ausência com um nó `x_meeting_role: notice_absent`, com `x_notice_absent_basis` (como se
+  sabe), `label` com as palavras "não houve aviso", `status: open`, `impact` 4 ou 5 e `trace` na transcrição
+  inteira (`#L1-L<última>`). Cada participante
+  fica em `x_notice_ref: <id do nó>` e `x_notice_response: nao_avisado` (ou `recusou`, com a parada de sempre).
+  O gate sai rc 0 com `SOFT:AVISO-AUSENTE` e a contagem de pessoas. **Isso não é conformidade**: é o risco
+  declarado, e a análise jurídica não foi feita. Mostre a linha SOFT ao usuário, inteira, e nunca chame a reunião de regular.
+- Sem aviso na transcrição **e sem saber se houve**, **não invente um**: grave o grafo sem `notice_attempt`, com cada participante em
   `x_notice_ref: "-"` e `x_notice_response: sem_resposta`, e o gate reprova com um motivo só,
   `SEM-TENTATIVA-DE-AVISO`. É o comportamento esperado; o caminho é registrar o aviso na próxima reunião (ou anexar à transcrição o aviso
   que foi dado por outro canal, como o convite, e citar essa linha).
@@ -294,7 +301,8 @@ jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_co
 bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
 ```
 
-- **rc 0**: conforme (aviso registrado, trace ao trecho, radar verde).
+- **rc 0**: conforme (aviso registrado, trace ao trecho, radar verde). Com `SOFT:AVISO-AUSENTE` na saída, a
+  forma passou e o aviso **não aconteceu**: mostre a linha e trate como risco aberto.
 - **rc 1**: reprovado. A saída lista um motivo por linha, `MOTIVO<TAB>nó<TAB>detalhe`; mostre todos. O
   grafo reprovado **fica gravado** em `docs/meetings/` (é o registro do que a transcrição tem e do que falta),
   mas não é apresentado como válido, e quem o consome roda o gate antes. Corrija o que é erro de extração (trace

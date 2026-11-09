@@ -54428,6 +54428,13 @@ run_meeting_graph_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q $'^SEM-TENTATIVA-DE-AVISO\t' <<< "${o}" && [ "$(grep -c $'\t' <<< "${o}")" -eq 1 ]; then
     record_pass "meeting-graph: (c) reunião sem tentativa de aviso → rc 1, só SEM-TENTATIVA-DE-AVISO"
   else record_fail "meeting-graph: (c) sem aviso" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
+  # (c2) a ausência registrada, como o comando invoca: rc 0, SOFT no STDOUT com a contagem, e a linha final não diz "aviso registrado"
+  local _sout _serr; _serr="$(mktemp)"
+  if _sout="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/meeting-graph-check.sh" "${fx}/meeting-notice-absent.kg.yaml" 2>"${_serr}")"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q $'^SOFT:AVISO-AUSENTE\tNOTICE_ABSENT\t2 pessoa(s)' <<< "${_sout}" && grep -qF 'SEM AVISO' "${_serr}" && ! grep -qF 'aviso registrado' "${_serr}"; then
+    record_pass "meeting-graph: (c2) ausência registrada → rc 0, SOFT no stdout com a contagem, sem dizer que houve aviso"
+  else record_fail "meeting-graph: (c2) ausência" "rc=${rc}; stdout=${_sout}; stderr=$(head -3 "${_serr}" | tr '\n' '|')"; fi
+  rm -f "${_serr}"
   # (e) a seleção por caso não é verde por vacuidade: nome inexistente → rc 1
   if o="$(LC_ALL=C bash "${chk}" --selftest "caso que não existe" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 1 ] && grep -qF '✗ caso inexistente' <<< "${o}"; then record_pass "meeting-graph: (e) --selftest de caso inexistente → rc 1"
@@ -54460,11 +54467,23 @@ run_meeting_graph_selftests() {
     if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "meeting-graph: (m) mutante morde → ✗ ${want}"
     else record_fail "meeting-graph: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
   done <<EOF_MUT
-if not notices:$(printf '\x1f')if 0:$(printf '\x1f')sem tentativa de aviso reprova
+if not notices and not absences:$(printf '\x1f')if 0:$(printf '\x1f')sem tentativa de aviso reprova
+if not notices and not absences:$(printf '\x1f')if not notices and 0:$(printf '\x1f')ausência tirada do grafo volta a reprovar
+if notices and absences:$(printf '\x1f')if 0:$(printf '\x1f')ausência com aviso reprova
+    if len(norm(n.get("x_notice_absent_basis", ""))) < 20:$(printf '\x1f')    if 0:$(printf '\x1f')ausência sem base reprova
+    if "não houve aviso" not in n.get("label", "").lower():$(printf '\x1f')    if 0:$(printf '\x1f')ausência que não diz que não houve aviso reprova
+    if n.get("status") != "open":$(printf '\x1f')    if 0:$(printf '\x1f')ausência encerrada reprova
+if absent_mode:$(printf '\x1f')if 0:$(printf '\x1f')ausência registrada passa como SOFT, com a contagem
+    if n.get("impact") not in ("4", "5"):$(printf '\x1f')    if 0:$(printf '\x1f')ausência de impacto baixo reprova
+    if "_from" in n and nlines is not None and (n["_from"] != 1 or n["_to"] != nlines):$(printf '\x1f')    if 0:$(printf '\x1f')ausência sobre um trecho só reprova
+        elif absent_mode and resp not in ABSENT_RESP:$(printf '\x1f')        elif 0:$(printf '\x1f')ciente sem aviso reprova
+        elif not absent_mode and resp == "nao_avisado":$(printf '\x1f')        elif 0:$(printf '\x1f')aviso de verdade com nao_avisado reprova
+        if absent_mode and roles.get(ref) != "notice_absent":$(printf '\x1f')        if 0:$(printf '\x1f')participante fora da ausência reprova
+    people = sum(1 for r in roles.values() if r == "participant")$(printf '\x1f')    people = 0$(printf '\x1f')ausência registrada passa como SOFT, com a contagem
     if n.get("x_notice_channel") not in CHAN or not txt:$(printf '\x1f')    if 0:$(printf '\x1f')aviso sem texto reprova
     txt = norm(n.get("x_notice_text", ""))$(printf '\x1f')    txt = n.get("x_notice_text", "")$(printf '\x1f')aviso só com espaço reprova
         if not resp: fail($(printf '\x1f')        if 0: fail($(printf '\x1f')participante sem resposta reprova
-RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso"}$(printf '\x1f')RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "consentiu"}$(printf '\x1f')resposta 'consentiu' reprova
+RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "nao_avisado"}$(printf '\x1f')RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "nao_avisado", "consentiu"}$(printf '\x1f')resposta 'consentiu' reprova
         if notices and roles.get(ref) != "notice_attempt": fail($(printf '\x1f')        if 0: fail($(printf '\x1f')ref de aviso inexistente reprova
 if notices and roles.get(ref) != "notice_attempt": fail($(printf '\x1f')if roles.get(ref) != "notice_attempt": fail($(printf '\x1f')sem aviso, com refs '-', reprova por um motivo só
     if re.search(r"consent", k.lower()): consent_keys.append(k)$(printf '\x1f')    pass$(printf '\x1f')consentimento legal declarado reprova
@@ -54473,10 +54492,10 @@ re.search(r"consent", k.lower())$(printf '\x1f')re.search(r"consent", k)$(printf
 if refusal_lines and stop_line is None:$(printf '\x1f')if 0:$(printf '\x1f')recusa sem parada reprova
 if refusal_lines and stop_line is not None and stop_line > min(refusal_lines):$(printf '\x1f')if 0:$(printf '\x1f')parada depois da recusa reprova
 stop_line > min(refusal_lines)$(printf '\x1f')stop_line > max(refusal_lines)$(printf '\x1f')duas recusas: a parada vale pela 1ª
-        if r != "meeting" and by[i].get("_to", 0) > stop_line:$(printf '\x1f')        if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
+        if r not in ("meeting", "notice_absent") and by[i].get("_to", 0) > stop_line:$(printf '\x1f')        if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_from", 0) > stop_line$(printf '\x1f')faixa que atravessa a parada reprova
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_to", 0) >= stop_line$(printf '\x1f')fato que termina na linha da parada passa
-if r != "meeting" and by[i]$(printf '\x1f')if r in FACTS and by[i]$(printf '\x1f')participante depois da parada reprova
+if r not in ("meeting", "notice_absent") and by[i]$(printf '\x1f')if r in FACTS and by[i]$(printf '\x1f')participante depois da parada reprova
 (nlines is None or int(m.group(1)) <= nlines)$(printf '\x1f')(True)$(printf '\x1f')parada além do fim do arquivo reprova
 if m and int(m.group(1)) >= 1 and$(printf '\x1f')if m and$(printf '\x1f')parada na linha 0 reprova
     if r is None: fail("PAPEL-AUSENTE", n["id"], "nó sem x_meeting_role num grafo de reunião"); continue$(printf '\x1f')    if r is None: continue$(printf '\x1f')nó sem papel reprova
