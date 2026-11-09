@@ -993,7 +993,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), passa no critério pré-registrado?"
-    narrative: "Nasce porque o selo da pergunta da ida e volta viva, em 2026-10-27, a fechou como decidida (vira critério e linha de base da pesquisa de canal para empresas), e decidir não é medir: a medida ainda não foi feita. Fecha com um teste só: pré-registro commitado antes do dado, com o critério e os negativos; envio da VPS para o notebook e resposta de volta do notebook para a VPS pela composição (HTTP A2A do bridge e MCP local cuja ferramenta de envio só grava rascunho); nenhum envio automático, nem com o cliente em bypass nem com o Always allow; nenhuma ferramenta de aceitar exposta ao modelo; e a identidade do remetente estável nas duas pernas, conferida pela assinatura e pela chave pinada. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar. · 2026-10-28: três rodadas rodaram (rodada 1 INCONCLUSIVO nas duas pontas; rodada 2 DADO no notebook e INCONCLUSIVO na VPS; rodada 3 DADO nas duas pontas) e a pergunta SEGUE ABERTA pelos critérios critérios 1 a 8 do §2: falta um par de rodadas limpas com reinício no meio (critério 1 e critério 4), os negativos passo 8, passo 10 e passo 9 (critério 3 e critério 5), as portas do notebook (critério 6), os destinos fechados passo 12 e passo 13 (critério 8), e a decisão do maestro sobre o EndConversation do harness frente à medida do critério 7."
+    narrative: "Nasce porque o selo da pergunta da ida e volta viva, em 2026-10-27, a fechou como decidida (vira critério e linha de base da pesquisa de canal para empresas), e decidir não é medir: a medida ainda não foi feita. Fecha com um teste só: pré-registro commitado antes do dado, com o critério e os negativos; envio da VPS para o notebook e resposta de volta do notebook para a VPS pela composição (HTTP A2A do bridge e MCP local cuja ferramenta de envio só grava rascunho); nenhum envio automático, nem com o cliente em bypass nem com o Always allow; nenhuma ferramenta de aceitar exposta ao modelo; e a identidade do remetente estável nas duas pernas, conferida pela assinatura e pela chave pinada. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar. · 2026-10-28: três rodadas rodaram (rodada 1 INCONCLUSIVO nas duas pontas; rodada 2 DADO no notebook e INCONCLUSIVO na VPS; rodada 3 DADO nas duas pontas) e a pergunta SEGUE ABERTA pelos critérios critérios 1 a 8 do §2: falta um par de rodadas limpas com reinício no meio (critério 1 e critério 4), os negativos passo 8, passo 10 e passo 9 (critério 3 e critério 5), as portas do notebook (critério 6), os destinos fechados passo 12 e passo 13 (critério 8), e a decisão do maestro sobre o EndConversation do harness frente à medida do critério 7. Em 2026-11-09 rodou o teste do destino fechado pelo canal nativo (E_IDA_E_VOLTA_P12_CANAL_NATIVO_1109): o critério desse canal não passou e a rodada é inconclusiva; com a identidade do remetente depois do reinício ainda parcial, a pergunta segue aberta."
   - id: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
     node_type: evidence
     layer: audit
@@ -1807,7 +1807,27 @@ nodes:
       locator: "pergunta com opções de 2026-11-03: «Canais ligados pelas configurações gerenciadas: o que fazer?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
       locality: "pessoa"
+  - id: E_IDA_E_VOLTA_P12_CANAL_NATIVO_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-09"
+    verified_against: "textos do SendMessage devolvidos à sessão do core às 19:51:14 e 19:54:10 UTC, foto e relato do maestro no notebook; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md §10c"
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
+    label: "Teste do destino fechado de 2026-11-09, canal nativo da mesma conta: sessão encerrada recusa o envio sem fila; máquina offline enfileira e entrega uma vez ao religar, retida na tela. O critério do canal não passou; a rodada é inconclusiva."
+    narrative: "Claude Code 2.1.319 na VPS e 2.1.321 no notebook. Com /exit, a sessão some da lista e o SendMessage recusa na hora, o que não é perda silenciosa, mas contraria o resultado que o pré-registro espera. Com a máquina offline e a sessão viva, o envio avisa a fila e a mensagem chega cerca de 30 s depois da religada, ao fim de cerca de 21 min, retida com Deny e Deliver porque a classe do modo de permissão difere; a sessão não agiu. Desvios: espera única em vez de 5 e 30 min; primeiro envio a outra sessão, por o notebook estar noutra conta; o judge-attempts.sh não rodou, e a chegada e a não ação são relato e foto do maestro."
+    provenance:
+      source: "sessão do core, que enviou e leu os resultados, e maestro, que observou o notebook"
+      locator: "PRE-REGISTRO.md §10c"
+      method: "testimony: textos do envio e relato e foto do maestro, julgados contra o pré-registro"
+      locality: "pessoa"
 edges:
+  - from: E_IDA_E_VOLTA_P12_CANAL_NATIVO_1109
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
   - from: Q_META_VELHO_EM_GRAFO_SELADO_1028
     to: D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028
     edge_type: TRACES_TO
