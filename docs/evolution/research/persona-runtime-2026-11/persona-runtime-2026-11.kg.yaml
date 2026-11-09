@@ -45,11 +45,13 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.6
+    verified_at: "2026-11-09"
+    verified_against: "docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml#D_PERSONA_RUNTIME_2026_11 com status done, selado em 2026-11-06 com a escolha «A + ponte B»"
     label: "Qual runtime deve servir a persona de serviço do Company Brain de um adotante: A bot próprio no Agent SDK (bridge + kg_mcp), B o assistente nativo do chat (Claude Tag no Slack) ou C um bot de mercado de terceiro?"
-    narrative: "Requisitos já decididos (D_MA_ARCH e D_MA_RUNTIME_PESQUISAR_ANTES_1104, no grafo company-brain-multiaudiencia-2026-10): identidade de serviço própria que age em nome da empresa e nunca como o maestro (on-behalf-of, claim act do RFC 8693); atendimento por menção no chat corporativo; triagem dos canais conectados (e-mail, chat, task manager) em card, resposta ou pergunta ao maestro; piloto em modo rascunho aprovado pelo maestro; escada de autonomia por tipo de ato; sem dependência de serviço externo além de ponte opcional com alternativa local nomeada; vetos determinísticos (hooks com exit 2) valendo no runtime; custo e operação numa VPS compartilhada. Critérios de comparação: vetos e escada, identidade e auditoria, leitura do KG, custo, lock-in, operação, segurança (isolamento e segredos) e maturidade. Fica open: o selo é do maestro."
+    narrative: "Requisitos já decididos (D_MA_ARCH e D_MA_RUNTIME_PESQUISAR_ANTES_1104, no grafo company-brain-multiaudiencia-2026-10): identidade de serviço própria que age em nome da empresa e nunca como o maestro (on-behalf-of, claim act do RFC 8693); atendimento por menção no chat corporativo; triagem dos canais conectados (e-mail, chat, task manager) em card, resposta ou pergunta ao maestro; piloto em modo rascunho aprovado pelo maestro; escada de autonomia por tipo de ato; sem dependência de serviço externo além de ponte opcional com alternativa local nomeada; vetos determinísticos (hooks com exit 2) valendo no runtime; custo e operação numa VPS compartilhada. Critérios de comparação: vetos e escada, identidade e auditoria, leitura do KG, custo, lock-in, operação, segurança (isolamento e segredos) e maturidade. Fica open: o selo é do maestro. Fechada em 2026-11-09: a resposta é D_PERSONA_RUNTIME_2026_11, já selado."
     trace: "docs/evolution/research/persona-runtime-2026-11/SYNTHESIS.md"
   - id: D_PERSONA_RUNTIME_2026_11
     node_type: decision
