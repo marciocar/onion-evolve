@@ -312,7 +312,7 @@ explícito, sem duplicar autoridade.
 
 ### 6.5 O próprio core — também multi-linhagem
 `role: source`, T0. Sem bloco `trust:` (lê tudo por papel, não por concessão). Seu
-`personality_summary` é hoje **emergente** (`/meta:personality-sync`, 74 migalhas do diário), não mais
+`personality_summary` é hoje **emergente** (`/meta:personality-sync`, 134 migalhas do diário no sync de 2026-11-09), não mais
 seed manual. Vive num lar consolidado (a KVM 8), que serve dev + site + o `onion-bridge` (o host do
 endpoint `a2a-live`) — o clone do bridge é dedicado, isolado do checkout do maestro.
 
