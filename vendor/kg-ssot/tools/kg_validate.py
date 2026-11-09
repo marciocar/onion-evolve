@@ -1737,6 +1737,8 @@ MESSAGES = {
     "integrity.trace-node-sha256-mismatch": "The provenance.node_sha256 of the node differs from the canonical hash of "
                                             "the node it cites: that node changed after it was read.",
     "integrity.projection-id-missing": "A context page cites a node id that no graph of its projection_of has.",
+    "integrity.projection-unanchored": "A page that declares projection_faithful has a prose block that cites no "
+                                       "node id, and the heading of its section cites none either.",
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
                                           "a value with no JSON form.",
@@ -1815,6 +1817,9 @@ HINTS = {
                                        "version that was read.",
     "integrity.trace-node-sha256-mismatch": "Read the cited node again and record its new hash (kg_trace.py digest "
                                             "FILE#ID), or cite the commit that has the version that was read.",
+    "integrity.projection-unanchored": "Cite the node the block rests on, between backticks, or move the block under a "
+                                       "heading that cites it; if the page is not meant to be faithful, drop "
+                                       "projection_faithful.",
     "integrity.projection-id-missing": "Fix the id, add the graph that has it to projection_of (a URL pinned to the "
                                        "commit for another repository), or list the name in projection_ignore if it "
                                        "is not a node id.",

@@ -17,6 +17,12 @@
       rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo
       registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;
       --profile full volta à release inteira.
+      --verify-attestation (desde a 4.47) só aceita a árvore se ela bater com o manifesto que a release atestou: baixa
+      o <tag>.vendor-manifest.json da release, confere a atestação com o gh (o repositório, a tag e o workflow de
+      release que assinou) e compara o sha256 de cada arquivo trazido e o do spec/release.json da tag. Qualquer falha
+      (sem gh, sem manifesto, atestação que não verifica, arquivo diferente) dá rc 2 e não toca em DIR. É opcional porque
+      pede o gh e a rede. --attestation-repo muda o repositório que atesta. O carimbo registra a verificação, e o update
+      seguinte a HERDA; --no-verify-attestation a tira de propósito.
   update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]
       Só para a bancada antes da tag (desde a 4.24): traz a árvore de um commit que ainda não é release, com o
       spec/release.json que ele tiver (a versão dele pode ser a anterior). O carimbo diz "unreleased" no lugar da
@@ -29,10 +35,13 @@
       de fim de linha que a árvore de trabalho esconde. O contrato não se customiza no adotante; uma mudança necessária volta ao produto
       como issue no repositório público. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um
       arquivo E recalcula o carimbo. Isso o review do PR do adotante pega (o diff do carimbo fica à vista).
+  manifest --tag T --out ARQUIVO [--source REPO]
+      Escreve o manifesto da release: a tag, o commit, a versão e o sha256 de cada arquivo. É o que o workflow de release
+      atesta e anexa; o adotante não precisa rodar.
 
 rc: 0 ok · 1 vendor divergente do carimbo · 2 entrada quebrada (tag inexistente, release.json ausente ou que
 não bate com a tag, entrada da release sem arquivo, membro da tag que não é arquivo regular, carimbo ausente,
-ilegível ou fora do formato, DIR sem carimbo ou editado sem --force).
+ilegível ou fora do formato, DIR sem carimbo ou editado sem --force, atestação que não verifica).
 Os scripts do kit não gravam bytecode (sys.dont_write_bytecode): RODAR o gate como script não suja o vendor.
 IMPORTAR um módulo do kit a partir de outro processo suja: o Python grava o .pyc do módulo antes de executar o
 código dele. Por isso o guia roda tudo com `python3 -I -B`, e quem importa o kit usa -B ou PYTHONDONTWRITEBYTECODE=1.
@@ -71,6 +80,10 @@ RELEASE = "spec/release.json"
 VENDOR = "tools/kg_vendor.py"  # se a release o leva, todo perfil leva: sem ele não há check nem update
 DEFAULT_DEST = "vendor/kg-ssot"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+MANIFEST_SCHEMA = "kg-ssot.vendor-manifest/1"
+ATTESTATION_REPO = "marciocar/kg-ssot"  # o espelho público, onde a release é construída e atestada
+REPO_NAME = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+GH_TIMEOUT = 120  # segundos por chamada: a verificação vai à rede, e um gh pendurado não pode travar o update
 
 class Broken(Exception):
     """Entrada quebrada: rc 2."""
@@ -183,17 +196,104 @@ FULL = "full"
 UNRELEASED = "unreleased"
 
 
-def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False):
+def _stamped(dest):
+    """O carimbo que já está em dest, como dicionário; {} se não há ou se não dá para ler (o check é quem reclama)."""
+    try:
+        loaded = json.loads((pathlib.Path(dest) / STAMP).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
+
+def _gh(*args):
+    exe = shutil.which("gh")
+    if not exe:
+        raise Broken(_("--verify-attestation needs the GitHub CLI (gh) on the PATH: nothing was changed"))
+    try:
+        return subprocess.run([exe, *args], capture_output=True, timeout=GH_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        raise Broken(_("gh took more than {seconds} s: nothing was changed").format(seconds=GH_TIMEOUT)) from None
+
+
+def _gh_error(out):
+    return (out.stderr or out.stdout).decode("utf-8", "replace").strip()[:300]
+
+
+def verify_attestation(tag, hashes, release_blob, repo, workdir, expected):
+    """Confere o que o update trouxe contra o manifesto atestado da tag. Levanta Broken em qualquer falha.
+    expected(caminhos) → os arquivos que este update deveria trazer, se a tag tivesse exatamente esses caminhos."""
+    name = f"{tag}.vendor-manifest.json"
+    folder = pathlib.Path(workdir) / "attestation"
+    folder.mkdir()
+    out = _gh("release", "download", tag, "--repo", repo, "--pattern", name, "--dir", str(folder))
+    if out.returncode != 0 or not (folder / name).is_file():
+        raise Broken(_("attestation of {tag}: could not download {name} from {repo} (releases before 4.47.0 have none): {error}")
+                     .format(tag=tag, name=name, repo=repo, error=_gh_error(out)))
+    # o manifesto tem de ter nascido na release DESTA tag, pelo workflow de release, e não só em algum run do repositório
+    # a identidade exata: --signer-workflow é regex sem âncora, e .../workflows/rel passaria
+    out = _gh("attestation", "verify", str(folder / name), "--repo", repo, "--source-ref", f"refs/tags/{tag}",
+              "--cert-identity", f"https://github.com/{repo}/.github/workflows/release.yml@refs/tags/{tag}",
+              "--deny-self-hosted-runners")
+    if out.returncode != 0:
+        raise Broken(_("attestation of {tag} did not verify in {repo}: {error}").format(tag=tag, repo=repo, error=_gh_error(out)))
+    data = (folder / name).read_bytes()
+    try:
+        manifest = json.loads(data)
+    except ValueError:
+        raise Broken(_("the manifest of {tag} is not JSON").format(tag=tag)) from None
+    listed = manifest.get("files") if isinstance(manifest, dict) else None
+    if not isinstance(listed, dict) or manifest.get("schema") != MANIFEST_SCHEMA or manifest.get("tag") != tag:
+        raise Broken(_("the manifest of {tag} is out of shape or names another tag").format(tag=tag))
+    # o release.json entra sempre: é ele que define a lista e os perfis, e num perfil ele pode não vir entre os arquivos
+    wrong = {f for f, digest in {**hashes, RELEASE: sha256(release_blob)}.items() if listed.get(f) != digest}
+    # e o que falta: uma entrada de diretório do release.json continua igual se a fonte tira um arquivo de dentro dela
+    wrong |= set(expected(sorted(listed))) - set(hashes)
+    wrong = sorted(wrong)
+    if wrong:
+        raise Broken(_("the tree brought from {tag} differs from the attested manifest: {files}").format(
+            tag=tag, files=", ".join(wrong[:5])))
+    return {"repo": repo, "manifest_sha256": sha256(data)}
+
+
+def write_manifest(tag, source, out):
+    """O manifesto da release, feito pelo próprio caminho do update: o que se atesta é o que o update traz."""
+    with tempfile.TemporaryDirectory(prefix=".kg-ssot-manifest-") as tmp:
+        dest = pathlib.Path(tmp) / "vendor"
+        update(dest, tag, source, profile=FULL, verify=False)
+        stamp = json.loads((dest / STAMP).read_text(encoding="utf-8"))
+    payload = {"schema": MANIFEST_SCHEMA, "tag": stamp["tag"], "commit": stamp["commit"], "version": stamp["version"],
+               "files": stamp["files"]}
+    out = pathlib.Path(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(payload, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    print(_("manifest written: {out} ({n} files)").format(out=out, n=len(payload["files"])))
+    return 0
+
+
+def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False, verify=None, attestation_repo=None):
     """mirror True (só o kg_mirror.py) traz também os arquivos de mirror_only, que o adotante nunca recebe. profile None herda o perfil do carimbo que já existe (um update não tira o adotante do perfil em silêncio);
-    'full' traz a release inteira. ref (no lugar de tag): o commit de bancada, que o carimbo marca como unreleased."""
+    'full' traz a release inteira. ref (no lugar de tag): o commit de bancada, que o carimbo marca como unreleased.
+    verify None herda do carimbo (quem verificou não deixa de verificar em silêncio); True exige a atestação; False não confere."""
     dest = pathlib.Path(dest)
     if profile is not None and not profile.strip():
         raise Broken(_("empty --profile: name the profile, or full for the whole release"))
-    if profile is None and (dest / STAMP).is_file():
-        try:
-            inherited = json.loads((dest / STAMP).read_text(encoding="utf-8")).get("profile")
-        except (OSError, json.JSONDecodeError, AttributeError):
-            inherited = None
+    stamped = _stamped(dest)
+    attested = stamped.get("attestation")
+    if attested is not None and not isinstance(attested, dict):
+        if verify is not False:  # um carimbo estragado não pode desligar a conferência em silêncio
+            raise Broken(_("stamp in {dest}: attestation is malformed (--no-verify-attestation replaces it)").format(dest=dest))
+        attested = None
+    if verify is None:
+        verify = attested is not None and ref is None and not mirror
+        if verify:
+            print(_("attestation check inherited from the stamp (--no-verify-attestation drops it)"))
+    if verify and ref is not None:
+        raise Broken(_("--verify-attestation needs --tag: a bench commit has no release to attest it"))
+    attestation_repo = attestation_repo or (attested or {}).get("repo") or ATTESTATION_REPO
+    if verify and not (isinstance(attestation_repo, str) and REPO_NAME.match(attestation_repo)):
+        raise Broken(_("--attestation-repo {repo}: expected owner/name").format(repo=repr(attestation_repo)))
+    if profile is None:
+        inherited = stamped.get("profile")
         if isinstance(inherited, str) and inherited:
             profile = inherited
             print(_("profile {profile} inherited from the stamp (--profile {full} brings the whole release)").format(
@@ -218,8 +318,10 @@ def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False)
     dest.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=dest.parent, prefix=".kg-ssot-tmp-") as tmp:
         repo = pathlib.Path(source)
-        if not repo.is_dir():  # URL: clone nu, descartável; "--" impede que a URL vire opção do git
-            git(tmp, "clone", "--quiet", "--bare", "--", str(source), "src.git")
+        # URL: clone nu, descartável; "--" impede que a URL vire opção do git. Sob verificação, o caminho local também:
+        # o git archive aplica os filtros do .git/config da fonte, e uma fonte hostil rodaria código antes da conferência
+        if not repo.is_dir() or verify:
+            git(tmp, "clone", "--quiet", "--bare", "--", str(repo.resolve()) if repo.is_dir() else str(source), "src.git")
             repo = pathlib.Path(tmp) / "src.git"
         try:
             git(repo, "rev-parse", "--git-dir")
@@ -253,7 +355,8 @@ def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False)
         # comando do Windows (32.767 caracteres, WinError 206) desde a 4.13.0; o que a entrada cobre e o perfil tira
         # é descartado abaixo
         specs = sorted({e.rstrip("/") for e in entries})
-        tar = tarfile.open(fileobj=io.BytesIO(git(repo, "archive", "--format=tar", commit, "--", *specs, binary=True)))
+        # sem conversão de fim de linha: com autocrlf (o padrão do Git no Windows), o archive reescreveria os bytes da release
+        tar = tarfile.open(fileobj=io.BytesIO(git(repo, "-c", "core.autocrlf=false", "-c", "core.eol=lf", "archive", "--format=tar", commit, "--", *specs, binary=True)))
         wanted = set(files)
         staged = pathlib.Path(tmp) / "staged"
         staged.mkdir()
@@ -276,6 +379,13 @@ def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False)
         if set(hashes) != set(files):
             raise Broken(_("the tag brought {got} files and the release lists {want}: {diff}").format(
                 got=len(hashes), want=len(files), diff=", ".join(sorted(set(files) ^ set(hashes))[:5])))
+        attestation = None
+        if verify:
+            def expected(paths):
+                full = release_files(paths, release["files"])
+                return profile_files(release, full, paths, profile) if profile else full
+            attestation = verify_attestation(tag, hashes, git(repo, "show", f"{commit}:{RELEASE}", binary=True),
+                                             attestation_repo, tmp, expected)
         stamp = {"product": "kg-ssot", "tag": tag, "commit": commit, "version": release.get("version"),
                  "contract": release["contract"], "vendored_at": datetime.date.today().isoformat(),
                  "files": dict(sorted(hashes.items()))}
@@ -283,6 +393,8 @@ def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False)
             stamp["profile"] = profile
         if ref is not None:
             stamp["unreleased"] = True
+        if attestation:
+            stamp["attestation"] = attestation
         if _version(release.get("version")) >= ATTRS_SINCE:
             # só nas releases que o conhecem: o kit vendorizado de uma tag anterior acusaria o arquivo como sobrando
             (staged / ATTRS).write_bytes(ATTRS_TEXT.encode("utf-8"))
@@ -431,6 +543,13 @@ DESCRIPTION = """Vendor KG-SSOT by pin: the adopter brings in the release by TAG
       imports and its schema, the vector module and its requirements, requirements, guide and license), without the suite. The stamp
       records the profile, check verifies only what the profile brought, and the next update INHERITS the
       profile from the stamp; --profile full goes back to the whole release.
+      --verify-attestation (since 4.47) accepts the tree only if it matches the manifest the release attested: it
+      downloads the release's <tag>.vendor-manifest.json, verifies its attestation with gh (the repository, the tag
+      and the release workflow that signed it) and compares the sha256 of every file brought in and of the tag's
+      spec/release.json. Any failure (no gh, no manifest, an attestation that does not verify, a differing file) gives
+      rc 2 and leaves DIR untouched. It is optional because it needs gh and the network. --attestation-repo changes the
+      attesting repository. The stamp records the verification, and the next update INHERITS it;
+      --no-verify-attestation drops it on purpose.
   update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]
       Only for the bench before a tag (since 4.24): brings the tree of a commit that is not a release yet, with
       whatever spec/release.json it has (its version may still be the previous one). The stamp says "unreleased"
@@ -445,10 +564,13 @@ DESCRIPTION = """Vendor KG-SSOT by pin: the adopter brings in the release by TAG
       repository. LIMIT: the stamp vouches for itself; check catches an accidental edit, not someone who edits a
       file AND recomputes the stamp. The review of the adopter's PR catches that (the stamp diff is in plain
       view).
+  manifest --tag T --out FILE [--source REPO]
+      Writes the release manifest: the tag, the commit, the version and the sha256 of every file. The release workflow
+      attests and attaches it; an adopter does not need to run it.
 
 rc: 0 ok · 1 vendor diverges from the stamp · 2 broken input (tag does not exist, release.json missing or not
 matching the tag, release entry with no file, tag member that is not a regular file, stamp missing, unreadable
-or malformed, DIR without a stamp or edited without --force).
+or malformed, DIR without a stamp or edited without --force, an attestation that does not verify).
 The kit's scripts do not write bytecode (sys.dont_write_bytecode): RUNNING the gate as a script does not dirty
 the vendor. IMPORTING a kit module from another process does: Python writes the module's .pyc before it runs the
 module's code. That is why the guide runs everything with `python3 -I -B`, and whoever imports the kit uses -B or
@@ -467,6 +589,13 @@ def main(argv=None):
     up.add_argument("--source", help=_("git repo (path or URL) that has the tag (default: this script's clone)"))
     up.add_argument("--force", action="store_true", help=_("replaces a vendor that diverges from the stamp"))
     up.add_argument("--profile", help=_("brings only one profile of the release (e.g. gate, without the suite)"))
+    up.add_argument("--verify-attestation", action=argparse.BooleanOptionalAction, default=None,
+                    help=_("refuses a tree that does not match the manifest the release attested (needs gh)"))
+    up.add_argument("--attestation-repo", help=_("the owner/name repository that attests the release"))
+    man = sub.add_parser("manifest", help=_("writes the release manifest that the release workflow attests"))
+    man.add_argument("--tag", required=True)
+    man.add_argument("--source", help=_("git repo (path or URL) that has the tag (default: this script's clone)"))
+    man.add_argument("--out", required=True)
     ck = sub.add_parser("check", help=_("verifies the destination against the stamp"))
     ck.add_argument("--dest", default=DEFAULT_DEST)
     ck.add_argument("--index", action="store_true", help=_("verifies the git index blobs, not the working tree"))
@@ -476,7 +605,10 @@ def main(argv=None):
     _utf8_stdio()
     try:
         if args.cmd == "update":
-            return update(args.dest, args.tag, args.source, args.force, args.profile, args.ref)
+            return update(args.dest, args.tag, args.source, args.force, args.profile, args.ref,
+                          verify=args.verify_attestation, attestation_repo=args.attestation_repo)
+        if args.cmd == "manifest":
+            return write_manifest(args.tag, args.source, args.out)
         return check(args.dest, args.index, allow_unreleased=args.allow_unreleased)
     except (Broken, OSError, tarfile.TarError) as exc:
         print(_("BROKEN VENDOR  {error}").format(error=exc))

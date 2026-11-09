@@ -191,6 +191,35 @@
         },
         "additionalProperties": false
       }
+    },
+    "unanchored": {
+      "description": "Desde a 4.47.0, aditivo e fora do required: na página que declara projection_faithful: true, o bloco de prosa que não cita id (nem o título da seção dele). Reprova (rc 1).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "page",
+          "line",
+          "text"
+        ],
+        "properties": {
+          "code": {
+            "const": "integrity.projection-unanchored"
+          },
+          "page": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
     }
   }
 }

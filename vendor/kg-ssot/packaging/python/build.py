@@ -25,7 +25,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 # as citações entre repositórios,
 # a busca por semelhança (o extra vector), o servidor MCP e o exportador PROV-O.
 # O kg_vendor.py fica de fora: ele serve ao vendor por pin, que é outro canal.
-MODULES = ["kg_validate", "kg_conformance", "kg_gate", "kg_store", "kg_query", "kg_diff", "kg_vocab", "kg_criterion", "kg_audit", "kg_trace", "kg_refs", "kg_vector", "kg_mcp", "kg_prov_export"]
+MODULES = ["kg_validate", "kg_conformance", "kg_gate", "kg_store", "kg_screen", "kg_query", "kg_diff", "kg_vocab", "kg_criterion", "kg_audit", "kg_trace", "kg_refs", "kg_vector", "kg_mcp", "kg_prov_export"]
 # kg-ssot é o servidor MCP (o mesmo kg-mcp): o MCP Registry e os clientes rodam `uvx kg-ssot` pelo nome do pacote
 SCRIPTS = {"kg-ssot": "kg_mcp", "kg-validate": "kg_validate", "kg-conformance": "kg_conformance", "kg-gate": "kg_gate",
            "kg-store": "kg_store", "kg-query": "kg_query", "kg-diff": "kg_diff", "kg-vocab": "kg_vocab", "kg-criterion": "kg_criterion", "kg-audit": "kg_audit", "kg-trace": "kg_trace", "kg-refs": "kg_refs", "kg-vector": "kg_vector", "kg-mcp": "kg_mcp", "kg-prov-export": "kg_prov_export"}
@@ -89,7 +89,7 @@ include = ["src/kg_ssot", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
 
 INIT = '''"""KG-SSOT: the formal contract of the verifiable knowledge graph.
 
-The modules are the adoption kit's (kg_validate, kg_conformance, kg_gate, kg_store, kg_query, kg_diff, kg_vocab,
+The modules are the adoption kit's (kg_validate, kg_conformance, kg_gate, kg_store, kg_screen, kg_query, kg_diff, kg_vocab,
 kg_criterion, kg_audit, kg_trace, kg_refs, kg_vector, kg_mcp, kg_prov_export), and the contract, the suite and the output schemas live in
 kg_ssot/spec. The commands kg-validate, kg-conformance, kg-gate, kg-store, kg-query, kg-diff, kg-vocab, kg-criterion,
 kg-audit, kg-trace, kg-refs, kg-vector, kg-mcp and kg-prov-export are the same scripts as the kit's. The vector search

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:3c6998d9fb4f5238 -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:7d958281bc844ce8 -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.46.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.47.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -212,3 +212,18 @@ gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<versão> --repo marciocar
   e assim a afirmação do SBOM de que nada vem embutido é conferida a cada release.
 - **Reportar uma vulnerabilidade:** o [SECURITY.md](../../SECURITY.md) traz as versões suportadas, o canal privado
   (o GitHub Private Vulnerability Reporting), os prazos de resposta, o escopo e a política de divulgação.
+
+### Conferir o que você vendoriza (desde a 4.47.0)
+
+`kg_vendor.py update --tag T --verify-attestation` só aceita a árvore se ela bater com o manifesto que a release
+atestou. Cada release a partir da 4.47.0 leva o `<tag>.vendor-manifest.json`, com o sha256 de cada arquivo, e uma
+atestação de proveniência do GitHub para ele. O update baixa o manifesto, confere a atestação com o `gh` (o repositório,
+a tag e o workflow de release que assinou) e compara cada arquivo trazido. Qualquer falha dá rc 2 e não toca no vendor.
+Um `--source` em que você não confia não muda os bytes: só passam os atestados, e com esta opção uma fonte local é lida
+por um clone nu, então a configuração git dela não roda.
+
+É opcional porque pede o `gh`, autenticação e rede, e uma tag anterior à 4.47.0 não tem manifesto para conferir. O
+carimbo registra a verificação, e o update seguinte a herda; `--no-verify-attestation` a tira de propósito. O
+`kg_vendor.py check` continua sem rede e compara só com o carimbo. A conferência roda no kit que faz o update, então a
+primeira ida à 4.47.0 a partir de um kit antigo não é conferida: rode de novo o `update --verify-attestation` com o kit
+novo para conferir.

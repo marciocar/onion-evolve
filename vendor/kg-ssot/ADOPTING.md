@@ -269,6 +269,17 @@ At the MUST level, the comparison is per graph: fixing one graph does not make u
 debt is per code, a total across graphs. Removing a warning from one graph and adding the same warning to another is
 a tie.
 
+**Touched nodes.** `kg_gate.py --touched <base>` is a separate mode for CI, next to the ratchet: it needs no baseline
+and fails (rc 1) only when a node touched since the common ancestor of `<base>` and `HEAD` carries
+`integrity.bare-decision` or `integrity.superseded-without-successor`. Touched means a new node, a node with any field
+changed (`verified_at` and `verified_against` alone do not count, so a freshness round pays no debt), and a node that gained the debt in the diff, by losing the edge that reached it. So
+old debt stays accepted until someone works on that node. It reads the working tree and needs the history: on GitHub
+Actions, `fetch-depth: 0`; otherwise rc 2. A graph renamed with its `meta.id` is not touched; a node moved to another
+graph counts as new there. In a pull request, pass the target branch (`origin/main`); on a push to the default branch,
+`HEAD^1`, because there `origin/main` is `HEAD` and nothing is measured. It reads tracked `.kg.yaml` files only, and it
+does not replace the ratchet: a graph that already fails the MUST level can hide a node (a repeated id, no id). If a
+graph did not parse at the base, all of its nodes count as new. In a criss-cross merge, git picks one of the ancestors.
+
 **Debt per node.** Per graph, a spread-out improvement shows up as a regression: fixing 3 occurrences in one graph and
 creating 1 in another counts as +1 graph. Since `contract-v4.2.0`, `kg_gate.py --update --granularity node` counts and
 locks the SHOULD debt per occurrence, summed across all graphs. The baseline keeps the granularity, and the gate uses
@@ -321,6 +332,9 @@ The PR that changes the tag does three things:
 3. writes the baseline with `--update` when the contract changes its identity. Since 4.16.0, this is not required:
    with no changed verdict, the gate passes with a `· identity` warning, and the `--update` can come later.
 
+From 4.47.0 on, add `--verify-attestation` to the update to refuse a tree that does not match the manifest the release
+attested; it needs `gh` and the network ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)).
+
 A new SHOULD warning raises the debt by design. The contract's ramps (SHOULD today, MUST later) arrive this way, as a
 measured commitment.
 
@@ -351,6 +365,14 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.46.0` to `kg-ssot-v4.47.0`, nothing is required: the contract (v4.19) and the verdicts are the same. The
+vendor brings one new file, `tools/kg_screen.py`. Two outputs can differ. `kg-mcp` screens the text it returns from users'
+content: a text with concealment and an instruction together is withheld, and anything found is listed in a new `kg_screen`
+key. The default output of `kg_prov_export.py` now carries the value of `sealed_by` and `owner` on the nodes that have
+them, so keep `sealed_by` a role or a reference. Three things are opt-in: `projection_faithful: true` on a page,
+`kg_gate.py --touched <base>` in CI, and `kg_vendor.py update --verify-attestation`, which works from this tag on, since
+earlier releases have no attested manifest.
+
 From `kg-ssot-v4.45.0` to `kg-ssot-v4.46.0`, contract v4.19 comes in, SHOULD only: no graph that passed fails. Two
 new warnings may appear: `integrity.bare-decision`, a decision `done` with no `narrative` and no `SUPPORTS` edge reaching
 it, and `integrity.superseded-without-successor`, a `superseded` node that no `SUPERSEDES` edge reaches. Both count the
@@ -358,7 +380,10 @@ edge declared in the graph itself, local or in `external_edges` with an external
 another graph, declare it there (`from: <path>#<id>`, `to:` the node). The gate reports the new contract identity; a
 gate that counts SHOULD debt sees the new warnings as debt of the old graphs, which is the ramp: an old graph is not
 charged for what it already had, only for making it worse (refresh the baseline with `kg_gate.py --update`). `kg_trace
-projection` gains `superseded_cited`, additive in `kg-ssot.projection/1`.
+projection` gains `superseded_cited`, additive in `kg-ssot.projection/1`. Measured on the first adopter: a gate that
+keeps a SHOULD baseline per node fails on the new codes (in the core, `integrity.bare-decision` went from 0 to 736
+and `integrity.superseded-without-successor` from 0 to 63). Accept them as baseline with the reason, which keeps the
+ratchet against growth: `kg_gate.py --update`, or your own gate's equivalent.
 
 From `kg-ssot-v4.44.0` to `kg-ssot-v4.45.0`, nothing is required: the contract (v4.18), the verdicts and everything a
 reader, the gate or the store prints are the same. The vendor brings two new files, `SECURITY.md` and the SBOM generator in
@@ -975,6 +1000,9 @@ everything it ever saw.
   clones or archives. Design erasure as deleting a row outside git, not as rewriting git.
 - **`owner` is a role, not a person.** Write "the credit area owner", not a name: the role outlives a change of staff
   and holds no personal data.
+- **`sealed_by` is a role or a reference, not a name.** Write `role:change-advisory-board` or `person:p-0042`. The
+  PROV export carries it by default since 4.47.0, as one agent linked to every node it sealed, which makes a name an
+  index of what that person approved. A pseudonymous reference is still personal data if you hold the key.
 - **An account handle and a machine path with a user name are personal data too.** A code-host handle in a `source`,
   a `label` or a `narrative`, and a path that carries a user name, such as a home folder, point to a person as much as
   a name does. They are the easiest to miss: in a sample of 200 nodes of real graphs, an account handle showed up in

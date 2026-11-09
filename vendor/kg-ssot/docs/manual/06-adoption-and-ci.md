@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.12 or later (the floor si
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.46.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.47.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -207,3 +207,18 @@ gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<version> --repo marciocar
   the SBOM's claim that nothing is bundled is checked on every release.
 - **Reporting a vulnerability:** [SECURITY.md](../../SECURITY.md) has the supported versions, the private channel
   (GitHub Private Vulnerability Reporting), the response times, the scope and the disclosure policy.
+
+### Verifying what you vendor (since 4.47.0)
+
+`kg_vendor.py update --tag T --verify-attestation` accepts the tree only if it matches the manifest the release
+attested. Each release from 4.47.0 on carries `<tag>.vendor-manifest.json`, with the sha256 of every file, and a GitHub
+provenance attestation for it. The update downloads the manifest, verifies the attestation with `gh` (the repository,
+the tag and the release workflow that signed it) and compares every file it brought. Any failure gives rc 2 and leaves
+the vendor untouched. A `--source` you do not trust cannot change the bytes: only the attested ones pass, and under
+this option a local source is read through a bare clone, so its git configuration does not run.
+
+It is optional because it needs `gh`, authentication and the network, and a tag before 4.47.0 has no manifest to check.
+The stamp records the verification, and the next update inherits it; `--no-verify-attestation` drops it on purpose.
+`kg_vendor.py check` stays offline and still compares only against the stamp. The check runs in the kit that does the
+update, so the first move to 4.47.0 from an older kit is unverified: run the same `update --verify-attestation` again
+with the new kit to verify it.

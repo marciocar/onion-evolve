@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:f9a290942fa33051 -->
+<!-- translation-of: ADOPTING.md sha256:563795306753595d -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -270,6 +270,17 @@ recalcula o carimbo. Isso o review do PR do adotante pega, porque o diff do cari
 No MUST, a comparação é por grafo: consertar um grafo não compensa quebrar outro. A dívida SHOULD é por código,
 um total de grafos. Tirar um aviso de um grafo e pôr o mesmo em outro empata.
 
+**Nós tocados.** `kg_gate.py --touched <base>` é um modo separado para o CI, ao lado da catraca: não usa linha de base
+e reprova (rc 1) só quando um nó tocado desde o ancestral comum de `<base>` e `HEAD` carrega `integrity.bare-decision`
+ou `integrity.superseded-without-successor`. Tocado é o nó novo, o nó com qualquer campo diferente (`verified_at`
+e `verified_against` sozinhos não contam, então uma rodada de frescor não paga dívida) e o nó que ganhou a dívida no diff, ao perder a aresta que chegava a ele. Assim a dívida antiga segue aceita
+até alguém mexer naquele nó. Ele lê a árvore de trabalho e precisa do histórico: no GitHub Actions, `fetch-depth: 0`;
+sem isso, rc 2. O grafo renomeado com o mesmo `meta.id` não é tocado; o nó movido para outro grafo conta como novo lá.
+Num pull request, passe a branch de destino (`origin/main`); num push na branch padrão, `HEAD^1`, porque ali
+`origin/main` é o `HEAD` e nada é medido. Ele lê só os `.kg.yaml` rastreados e não substitui a catraca: um grafo que já
+reprova no MUST pode esconder um nó (id repetido, nó sem id). Se o grafo não parseava na base, todos os nós dele contam
+como novos. Em merge cruzado, o git escolhe um dos ancestrais.
+
 **Dívida por nó.** Por grafo, uma melhora espalhada aparece como piora: consertar 3 ocorrências num grafo e criar 1
 em outro conta como +1 grafo. Desde a `contract-v4.2.0`, `kg_gate.py --update --granularity node` passa a contar e
 travar a dívida SHOULD por ocorrência, somada em todos os grafos. A base guarda a granularidade, e o gate a usa sem
@@ -322,6 +333,9 @@ O PR que muda a tag faz três coisas:
    veredito trocado, o gate passa com um aviso `· identidade` (em inglês, `· identity`), e o `--update` pode vir
    depois.
 
+A partir da 4.47.0, acrescente `--verify-attestation` ao update para recusar a árvore que não bate com o manifesto que a
+release atestou; pede o `gh` e a rede ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)).
+
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
 
@@ -351,6 +365,14 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
 
+Da `kg-ssot-v4.46.0` para a `kg-ssot-v4.47.0`, nada é obrigatório: o contrato (v4.19) e os vereditos são os mesmos. O
+vendor traz um arquivo novo, `tools/kg_screen.py`. Duas saídas podem mudar. O `kg-mcp` faz a triagem do texto que devolve do
+conteúdo de usuários: o texto com ocultação e instrução juntas é retido, e o que for achado sai na chave nova `kg_screen`. A
+saída padrão do `kg_prov_export.py` passa a levar o valor de `sealed_by` e `owner` nos nós que os têm, então mantenha o
+`sealed_by` como papel ou referência. Três coisas são opcionais: `projection_faithful: true` numa página,
+`kg_gate.py --touched <base>` no CI e `kg_vendor.py update --verify-attestation`, que funciona a partir desta tag, porque as
+releases anteriores não têm manifesto atestado.
+
 Da `kg-ssot-v4.45.0` para a `kg-ssot-v4.46.0`, entra o contrato v4.19, só SHOULD: nenhum grafo que passava reprova.
 Dois avisos novos podem aparecer: `integrity.bare-decision`, a decisão `done` sem `narrative` e sem aresta `SUPPORTS`
 chegando a ela, e `integrity.superseded-without-successor`, o nó `superseded` a que nenhuma aresta `SUPERSEDES` chega.
@@ -358,7 +380,10 @@ Os dois contam a aresta declarada no próprio grafo, local ou nas `external_edge
 substituto mora em outro grafo, declare-o ali (`from: <caminho>#<id>`, `to:` o nó). O gate informa a identidade nova
 do contrato; um gate que conta a dívida SHOULD vê os avisos novos como dívida dos grafos antigos, e essa é a rampa: o
 grafo antigo não é cobrado pelo que já tinha, só por piorar (renove a linha de base com `kg_gate.py --update`). O
-`kg_trace projection` ganha `superseded_cited`, aditivo na `kg-ssot.projection/1`.
+`kg_trace projection` ganha `superseded_cited`, aditivo na `kg-ssot.projection/1`. Medido no primeiro adotante: um
+gate que guarda linha de base SHOULD por nó reprova nos códigos novos (no core, `integrity.bare-decision` foi de 0 a
+736 e `integrity.superseded-without-successor` de 0 a 63). Aceite-os como linha de base, com o motivo, o que mantém
+a catraca contra o crescimento: `kg_gate.py --update`, ou o equivalente do seu gate.
 
 Da `kg-ssot-v4.44.0` para a `kg-ssot-v4.45.0`, nada é obrigatório: o contrato (v4.18), os vereditos e tudo o que um
 leitor, o gate ou o armazém imprime são os mesmos. O vendor traz dois arquivos novos, o `SECURITY.md` e o gerador de SBOM em
@@ -962,6 +987,9 @@ porque o histórico do git guarda tudo o que já viu.
   clones nem arquivos. Desenhe a eliminação como apagar uma linha fora do git, não como reescrever o git.
 - **O `owner` é um papel, não uma pessoa.** Escreva "o dono da área de crédito", não um nome: o papel sobrevive à troca
   de equipe e não guarda dado pessoal.
+- **O `sealed_by` é um papel ou uma referência, não um nome.** Escreva `role:comite-de-mudancas` ou `person:p-0042`. A
+  exportação PROV o leva por padrão desde a 4.47.0, como um agente só ligado a todo nó que ele selou, o que faz de um
+  nome um índice do que aquela pessoa aprovou. Uma referência pseudônima segue sendo dado pessoal se você guarda a chave.
 - **Handle de conta e caminho de máquina com nome de usuário também são dado pessoal.** Um handle de forja de código
   num `source`, num `label` ou numa `narrative`, e um caminho que leva um nome de usuário, como uma pasta pessoal,
   apontam para uma pessoa tanto quanto um nome. São os mais fáceis de escapar: numa amostra de 200 nós de grafos reais,

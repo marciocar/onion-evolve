@@ -29,7 +29,7 @@ other channel. There is no security e-mail address: the private report is the on
 
 A useful report says:
 
-- the affected package, version and command (for example the `kg-mcp` command of `kg-ssot` 4.46.0 from PyPI, or the
+- the affected package, version and command (for example the `kg-mcp` command of `kg-ssot` 4.47.0 from PyPI, or the
   image digest);
 - what an attacker can do, and under which configuration (stdio, HTTP on loopback, the "behind a proxy" profile);
 - the steps to reproduce, ideally with a minimal `.kg.yaml` or request;
@@ -90,6 +90,9 @@ Every artifact of a release carries a provenance attestation from GitHub, and an
 gh attestation verify kg-ssot-<version>.mcpb --repo marciocar/kg-ssot
 gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<version> --repo marciocar/kg-ssot
 ```
+
+A release from 4.47.0 on also attests the manifest of its source tree (`<tag>.vendor-manifest.json`), so an adopter
+who vendors by tag can check what it brought with `kg_vendor.py update --verify-attestation`.
 
 The SBOM of each artifact (`<artifact>.cdx.json`) is attached to the GitHub release and attested with the
 CycloneDX predicate, so `gh attestation verify <artifact> --repo marciocar/kg-ssot --predicate-type

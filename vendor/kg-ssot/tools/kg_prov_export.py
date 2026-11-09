@@ -11,6 +11,12 @@ documento, para que nós com a mesma fonte apontem para a mesma entidade. O cari
 kg:verifiedAt (xsd:date quando é uma data), kg:verifiedAgainst e kg:verifiedScope (o alcance, desde o v4.5), e não como prov:generatedAtTime: em PROV, o tempo
 de geração marca a existência da entidade, não a conferência dela.
 
+O contrato não tem campo de autor, e dois campos dizem quem responde. `sealed_by`, quem selou, vira prov:Agent com
+prov:wasAttributedTo e uma prov:Attribution qualificada (prov:hadRole kg:SealerRole; o `sealed_at` vai como kg:sealedAt). `owner`, o papel
+que responde pelo nó, vira prov:Agent com prov:wasInfluencedBy e uma prov:Influence qualificada (kg:OwnerRole), e não com atribuição: em PROV, a
+atribuição implica que o agente participou da geração da entidade, e o grafo não diz isso do dono. O agente é a própria IRI só quando o texto inteiro é uma
+URL http(s); senão, um nó em branco rotulado, um por texto distinto no documento. Um nó sem esses campos não ganha agente nenhum.
+
 As IRIs dos nós são <base><meta.id>#<id>, com base urn:kg-ssot:graph: por padrão; o vocabulário kg: mora em
 urn:kg-ssot:vocab#, fora do espaço dos grafos, para um meta.id não colidir com ele.
 
@@ -59,6 +65,10 @@ STANDARD = {"SUPPORTS": "cito:supports", "REFUTES": "cito:refutes", "SUPERSEDES"
 IRI = re.compile(r"https?://[^\s<>\"{}|\\^`]+")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 NODE_ID = re.compile(r"[A-Za-z][A-Za-z0-9_]*")  # o padrão de id de nó do contrato v4 ($defs.nodeId)
+# o que o contrato tem de responsável; autor, não tem. O selo é atribuição; o dono é influência, porque atribuição em PROV
+# implica participação na geração (PROV-CONSTRAINTS, inferência 13), e o grafo não diz isso do papel que responde pelo nó
+AGENT_FIELDS = (("sealed_by", "kg:SealerRole", "prov:wasAttributedTo", "prov:qualifiedAttribution", "prov:Attribution", "prov:agent"),
+                ("owner", "kg:OwnerRole", "prov:wasInfluencedBy", "prov:qualifiedInfluence", "prov:Influence", "prov:influencer"))
 
 
 # O help em inglês, a língua-fonte; a docstring acima é a versão pt-BR, que o catálogo traz de volta.
@@ -74,6 +84,12 @@ one per distinct text in the document, so nodes with the same source point to th
 stamp goes as kg:verifiedAt (xsd:date when it is a date), kg:verifiedAgainst and kg:verifiedScope (the scope, since
 v4.5), and not as prov:generatedAtTime: in PROV, the generation time marks when the entity exists, not when someone
 verified it.
+
+The contract has no author field, and two fields say who answers. `sealed_by`, who sealed it, becomes a prov:Agent with
+prov:wasAttributedTo and a qualified prov:Attribution (prov:hadRole kg:SealerRole; `sealed_at` goes as kg:sealedAt). `owner`, the role
+answerable for the node, becomes a prov:Agent with prov:wasInfluencedBy and a qualified prov:Influence (kg:OwnerRole), not an attribution: in PROV,
+attribution implies the agent took part in generating the entity, and the graph does not say that of an owner. The agent is the IRI itself only when the whole text is an
+http(s) URL; otherwise, a blank node labeled with the text, one per distinct text in the document. A node without those fields gets no agent.
 
 Node IRIs are <base><meta.id>#<id>, with the base urn:kg-ssot:graph: by default; the kg: vocabulary lives at
 urn:kg-ssot:vocab#, outside the graph space, so a meta.id cannot collide with it.
@@ -122,7 +138,7 @@ def export(doc, base, edges=False, full=False):
     if not isinstance(nodes, list):
         raise Broken(_("nodes is not a list"))
     prefix = f"{base}{urllib.parse.quote(str(meta.get('id') or 'grafo'))}#"
-    sources, out = {}, []
+    sources, agents, out = {}, {}, []
 
     def source_ref(text):
         if IRI.fullmatch(text):
@@ -131,6 +147,15 @@ def export(doc, base, edges=False, full=False):
             sources[text] = f"_:source{len(sources)}"
             return {"@id": sources[text], "rdfs:label": text}
         return {"@id": sources[text]}
+
+    def agent_ref(text):
+        if text in agents:
+            return {"@id": agents[text]}
+        if IRI.fullmatch(text):  # sem rótulo: a IRI pode ser a de um recurso que já tem o dele
+            agents[text] = text
+            return {"@id": text, "@type": "prov:Agent"}
+        agents[text] = f"_:agent{len(agents)}"
+        return {"@id": agents[text], "@type": "prov:Agent", "rdfs:label": text}
 
     for node in nodes:
         if not isinstance(node, dict) or "id" not in node:
@@ -156,6 +181,16 @@ def export(doc, base, edges=False, full=False):
                     derivation[f"kg:{key}"] = str(prov[key])
             entity["prov:wasDerivedFrom"] = {"@id": src["@id"]}
             entity["prov:qualifiedDerivation"] = derivation
+        for key, role, relation, qualified, kind, holder in AGENT_FIELDS:
+            if not isinstance(node.get(key), str) or not node[key].strip():  # o contrato diz texto; o resto não é agente
+                continue
+            who = agent_ref(node[key].strip())
+            detail = {"@type": kind, holder: who, "prov:hadRole": {"@id": role}}
+            if key == "sealed_by" and node.get("sealed_at"):
+                when = str(node["sealed_at"])
+                detail["kg:sealedAt"] = {"@value": when, "@type": "xsd:date"} if DATE.fullmatch(when) else when
+            entity[relation] = {"@id": who["@id"]}
+            entity[qualified] = detail
         if full:  # todo campo do nó, inclusive os que já saem por outro termo: a volta lê só estes
             for key, value in node.items():
                 entity[_field(key)] = _value(value, f"{node['id']}.{key}")

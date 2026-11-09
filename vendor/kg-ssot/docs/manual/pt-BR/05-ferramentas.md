@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:b006bfb3d2b106d1 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:8c7b46ad5710fe32 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -250,6 +250,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--accept-regression "<motivo>"` | Aceita uma piora; o motivo fica gravado na base |
 | `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*`, `docs/materials/*` e o vendor do KG-SSOT (qualquer pasta com o carimbo `.kg-ssot-version`, desde a 4.19.1) já saem por padrão; o `--no-default-excludes` os traz de volta |
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
+| `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor` |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
 
@@ -626,6 +627,15 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     "notice": ...}`, para o modelo tratar o texto gravado por outros como dado, nunca como instrução.
   - **O que o perfil não é:** é "atrás de proxy", numa rede privada. Não é o perfil OAuth da especificação MCP, que
     espera até haver uma matriz medida de clientes.
+- **A triagem do conteúdo (4.47.0):** em qualquer perfil, cada texto que `kg_get`, `kg_list`, `kg_history`, `kg_query`
+  e `kg_terms` devolvem é triado antes de chegar ao modelo (`tools/kg_screen.py`, só biblioteca padrão, uma função pura
+  do texto). Três vereditos: `pass` (nada achado); `quarantine` (um sinal sozinho: caractere invisível, região
+  escondida como comentário HTML ou elemento escondido pelo próprio atributo, ou frase dirigida a um modelo), que passa
+  sem mudança; e `block` (ocultação e instrução juntas), trocado por um marcador `[withheld ...]`. Quando algo é achado,
+  o resultado ganha a chave `kg_screen`, com o caminho, o veredito e os achados de cada texto. Medido neste repositório: 2
+  de 5.913 textos de nó em quarentena (comentários de modelo de documento), nenhum bloqueado. O que um `pass` não
+  garante: homóglifos, conteúdo codificado (base64, hex), diretivas em outra língua além de inglês e português, e o
+  esconder declarado em CSS fora do elemento.
 - **A imagem OCI:** `ghcr.io/marciocar/kg-ssot:<version>` traz o `kg-mcp` pronto, para rodar como serviço ao lado de
   um cliente sem Python, como o LibreChat. Ela é construída do mesmo wheel do PyPI, com as dependências fixadas por
   hash e a base fixada por digest (`packaging/oci/Dockerfile`), roda com um usuário sem privilégio (uid 10001) e
@@ -1445,6 +1455,14 @@ projection_ignore:   # nomes entre crases que não são id de nó
 - **Quatro baldes.** `resolved` (num grafo do `projection_of`); `elsewhere` (só em outro grafo do repositório: aviso,
   não reprova); `outside` (o `projection_of` nomeia por URL um grafo de outro repositório que o `--with` não leu: não
   julgado, contado); `missing` (`integrity.projection-id-missing`).
+- **A página fiel (4.47.0).** A página que declara `projection_faithful: true` no frontmatter tem cada bloco de prosa
+  cobrado: o parágrafo ou o item de lista com oito palavras ou mais, fora de código, título, tabela e citação, tem de
+  citar entre crases um id de nó que resolve num grafo do `projection_of` (o id do `projection_ignore` ou de outro
+  grafo não conta), ou estar sob um título que cite um. O bloco que não cita entra em `unanchored`
+  (`integrity.projection-unanchored`, com a linha e os 120 primeiros caracteres) e reprova (rc 1). Confere que a citação está lá, não que a frase
+  se apoia no nó: isso segue sendo leitura humana. Um valor que não é `true` nem `false` é entrada quebrada (rc 2).
+  Medido neste repositório antes da regra: 363 de 878 blocos das 44 páginas de projeção não citam nada, e por isso a
+  regra é opcional por página.
 - **O nó citado que os grafos trocaram (4.46.0).** O id que resolve só em nós `superseded` ou `refuted` dos grafos do
   `projection_of` entra também em `superseded_cited`, com aviso: a página se apoia no que o grafo trocou ou derrubou.
   Se um desses grafos tem o id vivo, não há aviso. O rc não muda, e a chave é aditiva na `kg-ssot.projection/1`.
@@ -1452,7 +1470,7 @@ projection_ignore:   # nomes entre crases que não são id de nó
   git que o tem, como no `kg_query --chain`. Uma URL que o `--with` cobre e que não se lê (ausente no ref, fora de
   UTF-8, que não é grafo) é erro de grafo (rc 1), nunca `outside`. Um grafo lido da árvore de trabalho, porque o ref da
   URL não está naquela pasta, sai em `unpinned`, com um aviso.
-- **Saída e rc.** `--format json` dá `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 sem `missing` e com
+- **Saída e rc.** `--format json` dá `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 sem `missing`, sem `unanchored` e com
   todo grafo do `projection_of` lido; 1 caso contrário; 2 entrada quebrada (frontmatter que não se lê, `--root` que não
   é pasta).
 
@@ -1613,6 +1631,17 @@ para a fonte e uma `prov:Derivation` cuja atividade carrega o `method`; o `locat
 propriedades `kg:`. Uma fonte que é inteira uma URL http(s) vira a própria IRI; qualquer outra fonte (um caminho, um
 comando, duas URLs juntas) vira um nó em branco rotulado, um por texto distinto, para que nós com a mesma fonte
 apontem para a mesma entidade.
+
+O contrato não tem campo de autor, e a exportação não inventa um. Dois campos dizem quem responde, e cada um vira um
+`prov:Agent`. O `sealed_by` vai como `prov:wasAttributedTo` com uma `prov:Attribution` qualificada (papel
+`kg:SealerRole`, com o `sealed_at` como `kg:sealedAt`). O `owner` vai como `prov:wasInfluencedBy` com uma `prov:Influence`
+qualificada (papel `kg:OwnerRole`), porque atribuição em PROV implica que o agente participou da geração da entidade, e
+o grafo não diz isso do papel que responde pelo nó. Um nó sem esses campos não ganha agente, e a saída dele é a mesma de
+antes. Um agente em nó em branco é local a uma exportação: `_:agent0` em duas exportações não é o mesmo agente.
+
+O valor do `sealed_by` sai na saída padrão, e um agente que sela vários nós é um recurso só, ligado a todos eles. Mantenha
+um papel ou uma referência (`role:comite-de-mudancas`), não um nome, como em
+[Dados pessoais](../../../ADOPTING.pt-BR.md#dados-pessoais-lgpd-e-gdpr).
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \

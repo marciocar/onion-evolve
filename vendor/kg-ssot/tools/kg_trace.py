@@ -92,6 +92,8 @@ QUOTES = ("\"\"", "''", "“”", "«»", "‘’")
 INDEX = re.compile(r"0|[1-9][0-9]*")
 PROJECTION_SCHEMA = "kg-ssot.projection/1"
 PROJECTION_MISSING = "integrity.projection-id-missing"
+PROJECTION_UNANCHORED = "integrity.projection-unanchored"  # desde a 4.47.0: o bloco de prosa sem id, na página fiel
+FAITHFUL_MIN_WORDS = 8  # o bloco mais curto que isso (rótulo, rodapé, frase de transição) não é afirmação a ancorar
 CITED_ID = re.compile(r"`([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)`")
 FRONTMATTER = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|\Z)", re.S)
 PATH_CHARS = re.compile(r"[A-Za-z0-9_./-]+")
@@ -594,6 +596,54 @@ def contract_words():
     return words
 
 
+def prose_blocks(body, anchored):
+    """Os blocos de prosa de uma página, para a fidelidade (4.47.0): (linha, texto, o título da seção ancora). Bloco é o
+    parágrafo ou o item de lista; ficam fora o código cercado (a cerca fecha só com o mesmo caractere, comprimento igual
+    ou maior e nada depois), o código indentado em quatro espaços, o título ATX (# seguido de espaço) e o setext (=== ou
+    --- sob a linha), a linha de tabela, a citação (>), o HTML e o comentário. anchored(texto) diz se o texto cita um id
+    que resolve. A linha conta só o \\n, como o arquivo (U+2028 não quebra linha aqui)."""
+    out, cur, start, heading_ok, fence = [], [], 0, False, None
+
+    def flush():
+        if cur:
+            out.append((start, " ".join(cur), heading_ok))
+            cur.clear()
+
+    for n, raw in enumerate(body.split("\n"), 1):
+        line = raw.rstrip("\r")
+        s = line.strip()
+        if fence:
+            m = re.match(r"(`{3,}|~{3,})\s*$", s)
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence):
+                fence = None
+            continue
+        m = re.match(r"(`{3,}|~{3,})", s)
+        if m:
+            flush()
+            fence = m.group(1)
+            continue
+        if re.match(r"#{1,6}(?:\s|$)", s):
+            flush()
+            heading_ok = anchored(s)
+            continue
+        if cur and re.fullmatch(r"=+|-+", s):  # setext: a linha de cima vira título
+            heading_ok = anchored(" ".join(cur))
+            cur.clear()
+            continue
+        if not cur and (line.startswith("    ") or line.startswith("\t")):
+            continue  # código indentado
+        if not s or s.startswith(("|", ">", "<")) or re.fullmatch(r"(?:[-*_]\s*){3,}", s):
+            flush()
+            continue
+        if re.match(r"(?:[-*+]|\d+[.)])\s", s):
+            flush()
+        if not cur:
+            start = n
+        cur.append(s)
+    flush()
+    return out
+
+
 def projection(root, pages, withs=(), exclude=(), defaults=True):
     """O checador de projeção (4.35.0): cada página .md com projection_of no frontmatter, e cada id que ela cita entre
     crases, contra os grafos que ela declara. Os baldes: resolved (num grafo do projection_of), elsewhere (em outro
@@ -601,7 +651,12 @@ def projection(root, pages, withs=(), exclude=(), defaults=True):
     não carregou: não julgado) e missing (integrity.projection-id-missing). Ficam fora, contados: o vocabulário do
     contrato e o projection_ignore da página. Desde a 4.46.0, aditivo na projection/1: o id que resolve SÓ em nós
     superseded ou refuted dos grafos declarados entra também em superseded_cited, como aviso: a página se apoia no que
-    o grafo já trocou ou derrubou. Se algum grafo declarado tem o id vivo, não avisa. O rc não muda. ValueError: frontmatter que não se lê ou --root que não é pasta."""
+    o grafo já trocou ou derrubou. Se algum grafo declarado tem o id vivo, não avisa. O rc não muda. Desde a 4.47.0, a página que
+    declara projection_faithful: true tem cada bloco de prosa (parágrafo ou item de lista, com FAITHFUL_MIN_WORDS
+    palavras ou mais, fora de código, título, tabela, citação e HTML) cobrado: ele cita entre crases um id que resolve num
+    grafo do projection_of (o ignorado e o de outro grafo não ancoram), ou o título da seção dele cita. O texto vai
+    cortado em 120 caracteres. O que falta entra em unanchored (integrity.projection-unanchored) e reprova (rc 1). É presença de
+    citação, não prova de que a frase se apoia no nó: isso é leitura humana. ValueError: frontmatter que não se lê ou --root que não é pasta."""
     root = pathlib.Path(root)
     if not root.is_dir():
         raise ValueError(_("--root {root} is not a directory").format(root=root))
@@ -619,7 +674,7 @@ def projection(root, pages, withs=(), exclude=(), defaults=True):
         explicit = True
     words = contract_words()
     res = {"pages": 0, "cited": 0, "resolved": 0, "elsewhere": [], "outside": [], "missing": [], "graph_errors": [],
-           "unpinned": [], "uncited": [], "superseded_cited": [],
+           "unpinned": [], "uncited": [], "superseded_cited": [], "unanchored": [],
            "skipped": {"contract": 0, "ignored": 0, "no_projection": 0}}
     for page in pages:
         try:
@@ -674,6 +729,18 @@ def projection(root, pages, withs=(), exclude=(), defaults=True):
                 unloaded.append(d)  # idem: o erro do grafo reprova a página, e o id fica sem veredito
         known = {i for f, i in corpus.order if f in files}
         body = text[m.end():] if m else text
+        faithful = meta.get("projection_faithful")
+        if faithful not in (None, True, False):
+            raise ValueError(_("{page}: projection_faithful is true or false").format(page=page))
+        if faithful:
+            offset = text[:m.end()].count("\n") if m else 0
+            def anchored(text):  # só o id que resolve num grafo declarado ancora: nem o ignorado nem o de outro grafo
+                return any(c in known and c not in ignore and c not in words for c in CITED_ID.findall(text))
+
+            for line, block, covered in prose_blocks(body, anchored):
+                if len(block.split()) >= FAITHFUL_MIN_WORDS and not covered and not anchored(block):
+                    res["unanchored"].append({"code": PROJECTION_UNANCHORED, "page": page, "line": line + offset,
+                                              "text": block[:120]})
         found = list(dict.fromkeys(CITED_ID.findall(body)))
         if not found:  # declara projeção e não cita id entre crases: nada foi conferido, e isso não passa calado
             res["uncited"].append(page)
@@ -915,7 +982,8 @@ def main_digest(args):
 
 
 def main_projection(args):
-    """rc 0 sem missing · 1 com missing, ou com grafo do projection_of que não existe ou não se lê · 2 entrada quebrada."""
+    """rc 0 sem missing · 1 com missing, com bloco sem âncora numa página fiel (4.47.0), ou com grafo do projection_of
+    que não existe ou não se lê · 2 entrada quebrada."""
     try:
         withs = [kg_query.with_spec(w) for w in args.withs]
         fixtures = [] if args.no_default_excludes else [p for seg in sorted(FIXTURE_SEGMENTS)
@@ -939,6 +1007,9 @@ def main_projection(args):
         for e in res["elsewhere"]:
             print(_("· {page}  `{id}` is in a graph that projection_of does not list: {graphs}").format(
                 page=e["page"], id=e["id"], graphs=", ".join(e["graphs"])))
+        for u in res["unanchored"]:
+            print(f"{PROJECTION_UNANCHORED}  {u['page']}:{u['line']}  {kg_validate.message_of(PROJECTION_UNANCHORED)}  "
+                  f"«{u['text']}»")
         for e in res["superseded_cited"]:
             print(_("· {page}  `{id}` is {status} in the graph: the page rests on what the graph replaced or "
                     "overturned").format(page=e["page"], id=e["id"], status=e["status"]))
@@ -949,7 +1020,7 @@ def main_projection(args):
                     pages=res["pages"], cited=res["cited"], resolved=res["resolved"],
                     elsewhere=len(res["elsewhere"]), outside=len(res["outside"]), missing=len(res["missing"]),
                     contract=s["contract"], ignored=s["ignored"]))
-    return 1 if res["missing"] or res["graph_errors"] else 0
+    return 1 if res["missing"] or res["graph_errors"] or res["unanchored"] else 0
 
 
 if __name__ == "__main__":
