@@ -2,18 +2,17 @@
 branch: feat/linear-estimates-velocity-meter
 pr: 1554
 date: 2026-11-09
-reviewed_diff_sha256: e90b65c3f02674c74ed72a2c707157953617c8b7cab82e4ef23fdfda629eac5d
-reviewed_code_sha256: 617166bf20e40971b3fe38c11c19689913486a1db21356688ff50fd558ba7069
-findings_total: 22
-findings_real: 22
+reviewed_diff_sha256: pendente
+findings_total: 30
+findings_real: 30
 tokens: 0
-duration_min: 95
-findings_fixed: 22
+duration_min: 135
+findings_fixed: 30
 verdict: REJECTED_AND_FIXED
 elenxo: false
 elenxo_isolado: false
-reviewer: "1ª passada: o próprio agente de execução. 2ª passada: refutador independente do head 941acfecd, que reprovou; as curas deste head são do agente de execução e ainda não foram re-refutadas"
-nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada (79 casos, 109 mutantes), o backtest publicado no report e as reproduções do refutador refeitas."
+reviewer: "1ª passada: o próprio agente de execução. 2ª e 3ª passadas: refutador independente, que reprovou os heads 941acfecd e 8a9e3c372; as curas deste head são do agente de execução e ainda não foram re-refutadas"
+nota: "tokens = 0: não medido. elenxo: false porque a re-refutação do head curado cabe à sessão que encomendou. O que sustenta são a bancada (90 casos, 129 mutantes), o backtest publicado no report e as reproduções do refutador refeitas."
 ---
 
 # Resíduo: estimativa, prazo e medidor de planejado contra executado
@@ -53,5 +52,18 @@ Limite que segue: o relógio é o do quadro, e 37 das 91 concluídas não têm `
 | 22 | Nome de time igual a membro do registro na fixture; calibração em sobreviventes sem aviso no `report`. | Curado: nome neutro; `calibration_population` e aviso `survivors_only`. |
 
 Já curados no head anterior: `--queue-points` negativo (a opção saiu), `depois de dd/mm` e `29/02`.
+
+## 3ª passada: refutador independente (head 8a9e3c372)
+
+| # | Achado | Destino |
+|---|---|---|
+| 23 | O portão de sinal aceitava ruído: 12,8% das categorias e 63% dos sorteios. | Curado: permutação com Bonferroni, erro familiar 5%; medido 0,21% e 1,5%. |
+| 24 | A cobertura publicada só valia para sobreviventes. | Curado: `with_open` com as duas coberturas e o tamanho do viés no `limits`. |
+| 25 | Temporal com n abaixo do mínimo passava. | Curado: `not_measured`; no `propose`, recusa `calibration_not_measured`. |
+| 26 | `if_started_now` era data dentro de rc 3. | Curado: virou `work_hours_if_started_now`, horas e não data; `estimate.md` alinhado e com os seis status. |
+| 27 | Extrapolação de pontos sem aviso. | Curado: `points_extrapolation`. |
+| 28 | Portão temporal olhava o time. | Curado: olha a categoria. |
+| 29 | 4 mutantes vivos. | Curado: vazamento temporal, mãe com filhas fechadas, cadeia de 30 s, horas P80. |
+| 30 | Meia-noite sem `--now` não era detectada. | Curado: `generated_at` e `basis.now` medidos contra o relógio real. |
 
 Resta: o relógio é o do quadro; depois de corrigir as categorias contra as abertas não sobra conjunto sem ver; leave-one-out cobre perto do nominal por construção, e o corte temporal hoje tem n=6. Issue velha na fila sai `beyond_history` com a data de "se iniciar agora".
