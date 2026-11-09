@@ -53,6 +53,8 @@
 #                     A data vem do `kg_validate.py --due` (kg-ssot.due/1), nunca deste radar;
 #                     NÃO MEDIDO quando o leitor falta ou não tem --due. Ver o bloco VENCIMENTO.
 #                     O --freshness-tsv NÃO o carrega (11 colunas exatas, consumidores por coluna).
+#   CAMPAINHA       = (--doorbell; no --all só quando há o que cobrar) sinal do doc-bridge sem ack além do
+#                     teto de avisos da campainha, lido do estado dela na máquina. ⚠ atenção, NÃO reprova.
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
@@ -122,7 +124,7 @@ if [ "$#" -gt 2 ]; then
     # ⚠️ ALLOWLIST: modo desconhecido era fail-open SILENCIOSO — `--schemaa` sumia e somava rc=0.
     #    A classe curada aqui estava a um typo de distância de voltar pela porta ao lado.
     case "${_m}" in
-      --radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples|--validade|--all) : ;;
+      --radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples|--validade|--doorbell|--all) : ;;
       *) printf 'kg-radar: modo desconhecido: %s\n' "${_m}" >&2; exit 2 ;;
     esac
   done
@@ -143,8 +145,44 @@ fi
   printf '%s\n' 'uso: kg-radar.sh <arquivo.kg.yaml> [<modo>...]' \
     '      os modos COMPÕEM: "--integrity --schema" roda os dois e reprova se qualquer um reprovar' \
     '      modos: --radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness' \
-    '             --freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples|--validade' >&2
+    '             --freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples|--validade|--doorbell' >&2
   exit 2; }
+
+# ══ CAMPAINHA: SINAL SEM ACK ALÉM DO TETO (SAC-383) ══════════════════════════════════════════════
+# O prazo é o teto da própria campainha: ela marca `expired_at` quando esgota os avisos sem ack. Retido
+# (`held`) é o excesso da 1ª execução, que nunca toca e por isso nunca expira: entra na cobrança junto.
+# O estado é da MÁQUINA e por repo, não do grafo, então o arquivo do argumento não pesa aqui. No `--all`
+# só fala quando há o que cobrar (rodam dezenas por sessão, e no CI não há estado); pedido por nome,
+# diz também quando não pôde medir. Nunca muda o rc: é atenção, como o FRESCOR.
+_radar_doorbell() {  # $1 = full | quiet
+  local _root _py _out _line _st _ex _he
+  _root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  _py="${_root}/.claude/utils/co-evolution/doorbell-state.py"
+  _out=""
+  if [ -f "${_py}" ] && command -v python3 >/dev/null 2>&1; then
+    _out="$(python3 -I -S -B "${_py}" --repo "${_root}" --list 2>/dev/null)"
+  fi
+  _line="${_out%%$'\n'*}"; _st="${_line#state=}"; _st="${_st%% *}"
+  _ex="${_line##*expired=}"; _ex="${_ex%% *}"; _he="${_line##*held=}"; _he="${_he%% *}"
+  case "${_st}" in
+    read)
+      if [ "${_ex}" -gt 0 ] || [ "${_he}" -gt 0 ] || [ "$1" = full ]; then
+        printf '🔕 CAMPAINHA: %s expirado(s) e %s retido(s) sem ack neste repo\n' "${_ex}" "${_he}"
+        printf '%s\n' "${_out}" | awk -F'\t' 'NR>1 && NF==3 { printf "   · %-8s %s  %s\n", ($1=="expired" ? "expirado" : "retido"), $2, $3 }'
+      fi ;;
+    absent)
+      [ "$1" = full ] && printf '🔕 CAMPAINHA: NÃO VERIFICADO (não há estado dela nesta máquina para este repo)\n' ;;
+    unreadable)
+      printf '🔕 CAMPAINHA: NÃO VERIFICADO (o estado dela existe e não se lê)\n' ;;
+    *)
+      [ "$1" = full ] && printf '🔕 CAMPAINHA: NÃO VERIFICADO (leitor ausente ou python3 indisponível)\n' ;;
+  esac
+  return 0
+}
+case "$MODE" in
+  --doorbell) _radar_doorbell full; exit 0 ;;
+  --all) _radar_doorbell quiet ;;
+esac
 
 # `hoje` entra como VARIÁVEL e não por `systime()` para tornar o veredito REPRODUTÍVEL — dá para
 # fixá-la num teste em vez de esperar o relógio. (A 1ª redação justificava também com "o `mawk` não

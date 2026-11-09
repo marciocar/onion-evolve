@@ -31562,6 +31562,78 @@ run_mail_hook_selftests() {
   if [ "${rc}" -eq 0 ]; then record_pass "mail-hook: exit 0 sempre"
   else record_fail "mail-hook: exit" "esperava 0, veio ${rc}"; fi
   rm -rf "${d}"
+
+  # ── (db) SINAL EXPIRADO DA CAMPAINHA (SAC-383) ─ exercita o hook e o radar como o runner: cwd no repo, estado fora dele
+  local dbr; dbr="$(mktemp -d)"
+  local repo="${dbr}/repo" xdg="${dbr}/xdg" reader="${REPO_ROOT}/.claude/utils/co-evolution/doorbell-state.py" radar="${REPO_ROOT}/.claude/validation/kg-radar.sh"
+  mkdir -p "${repo}/docs/evolution/inbox" "${repo}/.claude/utils/co-evolution" "${repo}/.claude/hooks" "${repo}/.claude/validation"
+  cp "${reader}" "${repo}/.claude/utils/co-evolution/"; cp "${hook}" "${repo}/.claude/hooks/"; cp "${radar}" "${repo}/.claude/validation/"; cp -r "${REPO_ROOT}/.claude/validation/lib" "${repo}/.claude/validation/"
+  printf '# s\n' > "${repo}/docs/evolution/inbox/2026-11-01-a.md"
+  local _h; _h="$(printf %s "${repo}" | sha256sum | cut -c1-16)"
+  _db_state() { # $1 = pasta, $2 = sufixo do arquivo, $3 = JSON dos sinais
+    rm -rf "${xdg}"; mkdir -p "${xdg}/$1"
+    printf '{"repo":"%s","baselined":true,"signals":%s}' "${repo}" "$3" > "${xdg}/$1/${_h}.$2"
+  }
+  _db_hook() { (cd "${repo}" && env -u DOORBELL_STATE_DIR XDG_STATE_HOME="${xdg}" CLAUDE_PROJECT_DIR="${repo}" bash "${repo}/.claude/hooks/co-evolution-inbox-check.sh" 2>&1); }
+  _db_radar() { (cd "${repo}" && env -u DOORBELL_STATE_DIR XDG_STATE_HOME="${xdg}" bash "${repo}/.claude/validation/kg-radar.sh" "${REPO_ROOT}/.claude/validation/fixtures/kg-freshness/reverify-due.kg.yaml" "$1" 2>&1); }
+  local P='docs/evolution/inbox/2026-11-01-a.md' EXP ACK
+  EXP="{\"${P}\":{\"path\":\"${P}\",\"acked_at\":null,\"expired_at\":\"2026-11-02T00:00:00Z\"}}"
+  ACK="{\"${P}\":{\"path\":\"${P}\",\"acked_at\":\"2026-11-03T00:00:00Z\",\"expired_at\":\"2026-11-02T00:00:00Z\"}}"
+  _db_case() { # $1 = rótulo, $2 = padrão que TEM de casar, $3 = padrão que NÃO pode casar ('' = nenhum)
+    if grep -q -- "$2" <<< "${out}" && { [ -z "$3" ] || ! grep -q -- "$3" <<< "${out}"; }; then record_pass "mail-hook: (db) $1"
+    else record_fail "mail-hook: (db) $1" "out='${out}'"; fi
+  }
+  _db_state onion-doorbell v2.json "${EXP}"; out="$(_db_hook)"
+  _db_case "expirado sem ack: segue na contagem E ganha a marca" '📬.*1 mensagem.*🔕.*1 sinal(is) EXPIRADO' ''
+  _db_state onion-doorbell v2.json "${ACK}"; out="$(_db_hook)"
+  _db_case "expirado com ack não é cobrado" '📬.*1 mensagem' '🔕'
+  _db_state onion-doorbell v2.json '{"docs/evolution/inbox/saiu.md":{"path":"docs/evolution/inbox/saiu.md","acked_at":null,"expired_at":"x"}}'; out="$(_db_hook)"
+  _db_case "arquivo que saiu da caixa não é cobrado (estado velho)" '📬.*1 mensagem' '🔕'
+  _db_state onion-doorbell v2.json "{\"${P}\":{\"path\":\"${P}\",\"acked_at\":null}}"; out="$(_db_hook)"
+  _db_case "sem ack e ainda não expirado: sem marca" '📬.*1 mensagem' '🔕'
+  _db_state onion-campainha json "${EXP}"; out="$(_db_hook)"
+  _db_case "estado na pasta antiga e no .json é lido (o caso medido em 09/11)" '🔕.*1 sinal(is) EXPIRADO' ''
+  rm -rf "${xdg}"; out="$(_db_hook)"
+  _db_case "sem estado (adotante sem campainha): silêncio sobre a campainha" '📬.*1 mensagem' '🔕'
+  mkdir -p "${xdg}/onion-doorbell"; printf '{nao-json' > "${xdg}/onion-doorbell/${_h}.v2.json"; out="$(_db_hook)"
+  _db_case "estado que não se lê: diz que não verificou" 'estado ilegível' 'EXPIRADO'
+  printf '{"repo":"/outro","signals":{}}' > "${xdg}/onion-doorbell/${_h}.v2.json"; out="$(_db_hook)"
+  _db_case "estado de outro repo não vira contagem" 'estado ilegível' 'EXPIRADO'
+  _db_state onion-doorbell v2.json "{\"${P}\":{\"path\":\"${P}\",\"acked_at\":null,\"held\":true,\"first_seen\":\"2026-11-01T00:00:00Z\"}}"; out="$(_db_radar --doorbell || true)"
+  _db_case "radar --doorbell lista o retido, que nunca expira" '0 expirado(s) e 1 retido(s)' ''
+  _db_case "radar --doorbell imprime o caminho do retido" "retido .*${P}" ''
+  _db_state onion-doorbell v2.json "${EXP}"; if out="$(_db_radar --doorbell)"; then rc=0; else rc=$?; fi
+  _db_case "radar --doorbell cobra o expirado" '1 expirado(s) e 0 retido(s)' ''
+  if [ "${rc}" -eq 0 ]; then record_pass "mail-hook: (db) radar --doorbell não muda o rc"; else record_fail "mail-hook: (db) rc do radar" "rc=${rc}"; fi
+  out="$(_db_radar --all || true)"; _db_case "radar --all cobra quando há expirado" '🔕 CAMPAINHA: 1 expirado' ''
+  rm -rf "${xdg}"; out="$(_db_radar --doorbell || true)"; _db_case "radar --doorbell sem estado: NÃO VERIFICADO, nunca zero" 'NÃO VERIFICADO' 'expirado(s)'
+  out="$(_db_radar --all || true)"; _db_case "radar --all sem estado: calado" 'grafo\|RADAR\|ESTADO\|Nós\|nós' '🔕'
+  # ── MUTANTES: cada um reverte um pedaço da cura em cópia; o caso correspondente tem de reprovar ─────────
+  _db_mut() { # $1 = rótulo, $2 = arquivo no repo, $3 = âncora (início da linha), $4 = troca da linha, $5 = o que tem de sair na saída do mutante
+    local f="${repo}/$2" keep="${dbr}/keep"
+    cp "${f}" "${keep}"
+    NC_A="$3" NC_B="$4" awk 'BEGIN{a=ENVIRON["NC_A"]; b=ENVIRON["NC_B"]} index($0,a)==1 && !x { print b; x=1; next } { print }' "${keep}" > "${f}"
+    if cmp -s "${keep}" "${f}"; then record_fail "mail-hook: (dbm) $1: âncora não casou" "$3"; cp "${keep}" "${f}"; return; fi
+    "${6:-_db_hook}" > "${dbr}/mut.out" 2>&1
+    if grep -q -- "$5" "${dbr}/mut.out"; then record_pass "mail-hook: (dbm) $1 ⇒ morto"
+    else record_fail "mail-hook: (dbm) $1 SOBREVIVEU" "$(cat "${dbr}/mut.out")"; fi
+    cp "${keep}" "${f}"
+  }
+  _db_state onion-doorbell v2.json "${ACK}"
+  _db_mut "o leitor volta a contar sinal com ack" .claude/utils/co-evolution/doorbell-state.py '        if not isinstance(sig, dict) or sig.get("acked_at"):' '        if not isinstance(sig, dict):' '🔕.*EXPIRADO'
+  _db_state onion-doorbell v2.json '{"docs/evolution/inbox/saiu.md":{"path":"docs/evolution/inbox/saiu.md","acked_at":null,"expired_at":"x"}}'
+  _db_mut "o leitor volta a contar arquivo que saiu" .claude/utils/co-evolution/doorbell-state.py '        elif not os.path.isfile(' '        elif False:' '🔕.*EXPIRADO'
+  _db_state onion-campainha json "${EXP}"
+  _db_mut "o leitor ignora a pasta antiga" .claude/utils/co-evolution/doorbell-state.py '        root = os.path.join(xdg, OLD_DIR' '        root = os.path.join(xdg, CURRENT_DIR)' '^$\|📬'
+  grep -q '🔕' "${dbr}/mut.out" && record_fail "mail-hook: (dbm) pasta antiga: o mutante ainda achou o estado" "$(cat "${dbr}/mut.out")"
+  _db_state onion-doorbell v2.json "${EXP}"
+  _db_mut "o hook deixa de ler a campainha" .claude/hooks/co-evolution-inbox-check.sh 'ne=0; nu=0' 'ne=0; nu=0; read_doorbell() { :; }' '📬.*1 mensagem'
+  grep -q '🔕' "${dbr}/mut.out" && record_fail "mail-hook: (dbm) hook sem leitor: a marca ainda saiu" "$(cat "${dbr}/mut.out")"
+  rm -rf "${xdg}"
+  _db_radar_full() { local r; r="$(_db_radar --doorbell || true)"; grep -q 'NÃO VERIFICADO' <<< "${r}" || echo CALOU; return 0; }
+  _db_mut "o radar cala quando não mediu" .claude/validation/kg-radar.sh '      [ "$1" = full ] && printf '"'"'🔕 CAMPAINHA: NÃO VERIFICADO (não há estado' '      :' CALOU _db_radar_full
+  unset -f _db_state _db_hook _db_radar _db_case _db_mut _db_radar_full
+  rm -rf "${dbr}"
 }
 
 # ---------------------------------------------------------------------------

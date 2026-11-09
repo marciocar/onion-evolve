@@ -138,6 +138,23 @@ import_spool() {
 np=0
 import_spool
 
+# ── SINAL EXPIRADO DA CAMPAINHA (SAC-383) ─────────────────────────────────────────────────────────
+# A campainha para de tocar depois do teto de avisos sem ack e marca `expired_at`, num estado FORA do repo. O
+# arquivo segue na caixa, então segue no 📬/📥; aqui ele ganha a marca. Sem o estado (o adotante sem campainha,
+# outra máquina): silêncio, disciplina de motd. Estado que existe e não se lê: dizer que não verificou.
+# Só contagens entram no contexto: nome de sinal é escolhido por quem escreve.
+read_doorbell() {
+  local py="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/co-evolution/doorbell-state.py" out
+  [ -f "$py" ] && command -v python3 >/dev/null 2>&1 || return 0
+  out="$(python3 -I -S -B "$py" --repo "$PWD" 2>/dev/null)" || return 0
+  case "$out" in "state=unreadable"*) nu=1 ;; esac
+  ne="${out##*expired=}"; ne="${ne%% *}"
+  case "$ne" in ''|*[!0-9]*) ne=0 ;; esac
+  return 0
+}
+ne=0; nu=0
+read_doorbell
+
 nb="$(count_unread docs/evolution/inbox)"     # upstream
 na="$(count_unread docs/evolution/inbound)"   # downstream
 nd="$(count_overdue_diary)"                   # reflexão (diário vencido)
@@ -146,6 +163,8 @@ msg=""
 [ "${nb:-0}" -gt 0 ] 2>/dev/null && msg="📬 Onion co-evolução: ${nb} mensagem(ns) no inbox (upstream: sinal/feedback)."
 [ "${na:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📥 Onion co-evolução: ${na} entrega(s) do core em inbound/ (downstream: relatório de update/anúncio)."
 [ "${np:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📮 Onion co-evolução: ${np} sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve)."
+[ "${ne:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }🔕 Campainha: ${ne} sinal(is) EXPIRADO(S): sem ack até o teto de avisos, ela parou de tocar; seguem na caixa e no pending_signals."
+[ "${nu:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }🔕 Campainha: estado ilegível nesta máquina; sinal expirado NÃO verificado."
 [ "${nd:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }⏰ Onion diário: ${nd} migalha(s) com review_after vencido — reflexão pendente (/meta:diary list)."
 
 [ -n "$msg" ] || [ -n "$channel_notice" ] || exit 0
