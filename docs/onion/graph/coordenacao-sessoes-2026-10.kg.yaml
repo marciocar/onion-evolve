@@ -601,14 +601,19 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 3
     confidence: 0.6
-    evidence_class: testimony
-    verified_against: "relato da sessão da curadoria e notas da sessão do core à repassada de 2026-11-06; a medida do sysctl e do uid map foi feita pelas duas sessões em 2026-11-06 e não re-executada neste registro"
+    verified_at: "2026-11-09"
+    verified_against: "2026-11-09: ⟨perfil AppArmor do bwrap no host⟩ existe, unconfined e com userns; ⟨execução do bwrap com unshare de user e pid⟩ sai 0 com kernel.apparmor_restrict_unprivileged_userns=1; ⟨settings do Claude Code na curadoria⟩ declara sandbox enabled e failIfUnavailable true"
     label: "O sandbox do Claude Code (bwrap) não sobe nesta VPS: kernel.apparmor_restrict_unprivileged_userns=1 e o uid map devolve Permission denied. O maestro decide entre um perfil AppArmor só para o binário do bwrap com userns ou seguir sem sandbox."
-    narrative: "Medido pelo core e pela curadoria em 2026-11-06. A curadoria ligou o sandbox com failIfUnavailable e entrou em loop, porque cada comando falhava ao subir o bwrap; o core fez o rollback por ordem do maestro. O perfil AppArmor mexe na postura do host, logo a decisão é do maestro. Linear: SAC-292."
+    narrative: "Medido pelo core e pela curadoria em 2026-11-06. A curadoria ligou o sandbox com failIfUnavailable e entrou em loop, porque cada comando falhava ao subir o bwrap; o core fez o rollback por ordem do maestro. O perfil AppArmor mexe na postura do host, logo a decisão é do maestro. Linear: SAC-292. Fechado em 2026-11-09 por medida: o perfil só para o binário do bwrap está no host, desde 2026-11-06, e o bwrap sobe com a restrição do kernel ainda ligada, logo a falha de 2026-11-06 deixou de valer."
+    provenance:
+      source: "host da VPS e settings.json da curadoria"
+      locator: "⟨perfil AppArmor do bwrap no host⟩; ⟨chave sandbox do settings da curadoria⟩"
+      method: "measurement: execução do bwrap e leitura dos dois arquivos em 2026-11-09"
+      locality: "host"
   - id: Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106
     node_type: question
     layer: audit
