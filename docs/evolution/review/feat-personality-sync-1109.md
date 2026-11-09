@@ -2,7 +2,8 @@
 branch: feat/personality-sync-1109
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8eb33b7996430749ad953dee253a15984c55e26dc2dbde23feff8a3d2cb6b5e2
+reviewed_code_sha256: 134371a8ada58a7d037bc1e93f98bd507eb73438ee56a40fb12e6b3131590313
 findings_total: 5
 findings_real: 5
 findings_blocking: 1
