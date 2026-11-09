@@ -11,7 +11,9 @@
 # transcrição). Este script cobra as duas e roda o radar por cima.
 #
 # Uso:  bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> [--root <dir>]
+#       bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> --for-use [--root <dir>]
 #       bash .claude/validation/meeting-graph-check.sh --selftest ["<nome de um caso>"]
+#   --for-use  a pergunta de quem vai CONSUMIR o grafo (consolidar, virar tarefa): reunião sem aviso sai rc 3, uso retido.
 #   --root  diretório a que `meta.x_meeting_source` e os `trace:` são relativos (padrão: a raiz git do
 #           grafo; sem git, o diretório corrente).
 #
@@ -21,17 +23,21 @@
 #   nó:    x_meeting_role: meeting | participant | notice_attempt | notice_absent | decision | action | risk
 #          todo nó com papel leva trace: "<x_meeting_source>#L<a>[-L<b>]", linhas dentro do arquivo
 #          notice_attempt: x_notice_channel (chat|voz|convite|outro) · x_notice_text (o texto do aviso)
-#          notice_absent:  o registro de que NÃO HOUVE aviso. x_notice_absent_basis (como se sabe), status: open,
-#                          impact 4 ou 5, trace cobrindo a transcrição inteira; exclui notice_attempt
+#          notice_absent:  o registro de que NÃO HOUVE aviso. x_notice_absent_basis (como se sabe), impact 4 ou 5,
+#                          x_owner, x_notice_remediation (pendente | titulares_informados | analise_feita |
+#                          dados_eliminados), status open (done só fora de pendente), trace do início da
+#                          transcrição ao fim dela, ou à parada por recusa; exclui notice_attempt
 #          participant:    x_notice_ref (id de um notice_attempt, ou do notice_absent) ·
 #                          x_notice_response (ciente | recusou | sem_resposta | autora_do_aviso;
 #                          com notice_absent, só nao_avisado | recusou)
 #          action:         x_owner (id de um participant, ou NAO_ESPECIFICADO)
 #
 # AUSÊNCIA DE AVISO: reunião em que de fato não houve aviso não pode inventar um `notice_attempt`. O registro
-# `notice_absent` passa na forma (rc 0) e sai como SOFT no stdout, `SOFT:AVISO-AUSENTE\t<nó>\t<n> pessoa(s)…`.
-# Não é conformidade nem consentimento: é o risco declarado, e o nó fica aberto no corpus. Quem não registrou
-# nada segue em SEM-TENTATIVA-DE-AVISO.
+# `notice_absent` é registro válido (rc 0) e sai como SOFT no stdout, `SOFT:AVISO-AUSENTE\t<nó>\t<n> pessoa(s)…`.
+# rc 0 só diz que o REGISTRO é válido, nunca que o uso está liberado: quem consome pede `--for-use` e recebe
+# rc 3. Registrar o fato não supre a transparência devida aos titulares, não é consentimento nem conformidade
+# legal; base legal, informação aos titulares e reter, usar ou eliminar são do controlador. Quem não registrou
+# nada segue em SEM-TENTATIVA-DE-AVISO. O campo de remediação diz o que foi feito, e nenhum valor declara licitude.
 #
 # O que REPROVA (rc 1, um motivo por linha `MOTIVO\t<nó>\t<detalhe>` no stdout):
 #   aviso:   SEM-TENTATIVA-DE-AVISO · AVISO-INCOMPLETO · AVISO-FORA-DO-TRECHO (o texto não está na linha
@@ -39,7 +45,7 @@
 #            AVISO-REF-INEXISTENTE · SEM-PARTICIPANTE · CONSENTIMENTO-LEGAL-DECLARADO (qualquer chave com
 #            "consent" no nome, em qualquer grafia)
 #   ausência: AUSENCIA-COM-AVISO · AUSENCIA-DUPLICADA · AUSENCIA-SEM-BASE · AUSENCIA-SEM-DECLARACAO · AUSENCIA-FECHADA ·
-#            AUSENCIA-IMPACTO-BAIXO · AUSENCIA-SEM-VARREDURA · RESPOSTA-SEM-AVISO · NAO-AVISADO-SEM-AUSENCIA
+#            AUSENCIA-REMEDIACAO-INVALIDA · AUSENCIA-SEM-DONO · AUSENCIA-IMPACTO-BAIXO · AUSENCIA-SEM-VARREDURA · RESPOSTA-SEM-AVISO · NAO-AVISADO-SEM-AUSENCIA
 #   recusa:  RECUSA-SEM-PARADA · PARADA-DEPOIS-DA-RECUSA · CAPTURA-APOS-RECUSA (fato cujo trecho TERMINA
 #            depois da parada)
 #   trecho:  TRACE-AUSENTE · TRACE-FORA-DA-FONTE · TRACE-FORA-DO-ARQUIVO · TRANSCRICAO-AUSENTE ·
@@ -50,7 +56,7 @@
 #            onde ele mora ao lado e o contrato está vendorizado; sem ele, o "não julgado" é declarado)
 # O leitor: comentário (`#`, qualquer coluna) nunca abre seção; as chaves de um nó são as da indentação do
 # `- id:` + 2, qualquer que seja ela.
-# Exit: 0 conforme · 1 reprovado · 2 NÃO PUDE JULGAR (grafo ou radar ausente, python3 ausente,
+# Exit: 0 conforme (ou, com o SOFT, registro válido) · 3 uso retido (só com --for-use) · 1 reprovado · 2 NÃO PUDE JULGAR (grafo ou radar ausente, python3 ausente,
 #       argumento errado). rc 2 nunca é verde.
 # Determinístico, sem LLM. Lê o formato estrito do radar (uma chave por linha, `- id:`), sem PyYAML.
 # Exercitado por lint-selftest.sh (run_meeting_graph_selftests).
@@ -73,6 +79,7 @@ g, root = sys.argv[1], sys.argv[2]
 ROLES = {"meeting", "participant", "notice_attempt", "notice_absent", "decision", "action", "risk"}
 FACTS = ("decision", "action", "risk")
 RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "nao_avisado"}
+REMEDIATION = {"pendente", "titulares_informados", "analise_feita", "dados_eliminados"}  # o que foi feito; nunca "lícito"
 ABSENT_RESP = {"nao_avisado", "recusou"}  # sem aviso, ninguém ficou ciente dele nem deixou de responder a ele
 CHAN = {"chat", "voz", "convite", "outro"}
 # VOCABULÁRIO FECHADO das extensões `x_` (2ª passada do refutador, achado 6): negar por substring deixava
@@ -80,7 +87,7 @@ CHAN = {"chat", "voz", "convite", "outro"}
 # do .kg.yaml, que o radar e o contrato julgam.
 META_X = {"x_meeting_date", "x_meeting_source", "x_capture_stopped_at", "x_cost_tokens"}
 NODE_X = {"x_meeting_role", "x_notice_channel", "x_notice_text", "x_notice_ref", "x_notice_response",
-          "x_owner", "x_due", "x_path_is_content", "x_notice_absent_basis"}
+          "x_owner", "x_due", "x_path_is_content", "x_notice_absent_basis", "x_notice_remediation"}
 bad = []
 def fail(code, nid, why): bad.append(f"{code}\t{nid}\t{why}")
 nfc = lambda x: unicodedata.normalize("NFC", x)
@@ -191,13 +198,19 @@ for i in absences:
     # o próprio nó diz o que aconteceu: lido sozinho no corpus, ele não passa por regularidade
     if "não houve aviso" not in n.get("label", "").lower():
         fail("AUSENCIA-SEM-DECLARACAO", i, "o label diz, nestas palavras, que não houve aviso")
-    if n.get("status") != "open":
-        fail("AUSENCIA-FECHADA", i, f"status {n.get('status', '(ausente)')}: reunião sem aviso é risco aberto, nunca assunto encerrado")
+    rem = n.get("x_notice_remediation", "")
+    if rem not in REMEDIATION:
+        fail("AUSENCIA-REMEDIACAO-INVALIDA", i, f"x_notice_remediation {rem or '(ausente)'} (enum: {'|'.join(sorted(REMEDIATION))})")
+    if not n.get("x_owner"):
+        fail("AUSENCIA-SEM-DONO", i, "x_owner: quem responde pela remediação, ou NAO_ESPECIFICADO")
+    if not (n.get("status") == "open" or (n.get("status") == "done" and rem in REMEDIATION - {"pendente"})):
+        fail("AUSENCIA-FECHADA", i, f"status {n.get('status', '(ausente)')} com remediação {rem or '(ausente)'}: o risco só fecha depois que algo foi feito")
     if n.get("impact") not in ("4", "5"):
         fail("AUSENCIA-IMPACTO-BAIXO", i, f"impact {n.get('impact', '(ausente)')}: de 4 a 5, para o risco não afundar no radar")
-    # ausência é afirmação sobre a fonte inteira: quem leu um trecho não sabe se houve aviso no resto
-    if "_from" in n and nlines is not None and (n["_from"] != 1 or n["_to"] != nlines):
-        fail("AUSENCIA-SEM-VARREDURA", i, f"trace cobre #L{n['_from']}-L{n['_to']}: a ausência cita a transcrição inteira, #L1-L{nlines}")
+    # ausência é afirmação sobre a fonte: quem leu um trecho não sabe se houve aviso no resto. Com recusa, a leitura para nela.
+    last = stop_line or nlines
+    if "_from" in n and nlines is not None and (n["_from"] != 1 or n["_to"] != last):
+        fail("AUSENCIA-SEM-VARREDURA", i, f"trace cobre #L{n['_from']}-L{n['_to']}: a ausência cita a transcrição de #L1 a #L{last}")
 for i in notices:
     n = by[i]
     txt = norm(n.get("x_notice_text", ""))
@@ -244,12 +257,12 @@ if refusal_lines and stop_line is not None and stop_line > min(refusal_lines):
     fail("PARADA-DEPOIS-DA-RECUSA", "meta", f"a captura parou em #L{stop_line}, depois da 1ª recusa em #L{min(refusal_lines)}")
 if stop_line is not None:
     for i, r in roles.items():
-        if r not in ("meeting", "notice_absent") and by[i].get("_to", 0) > stop_line:  # os dois falam da fonte, não capturam fato
+        if r != "meeting" and by[i].get("_to", 0) > stop_line:
             fail("CAPTURA-APOS-RECUSA", i, f"trecho vai até a linha {by[i]['_to']}, depois da parada em #L{stop_line}")
 lines_out = list(bad)
 if absent_mode:
     people = sum(1 for r in roles.values() if r == "participant")
-    lines_out.append(f"SOFT:AVISO-AUSENTE\t{absences[0]}\t{people} pessoa(s) na reunião SEM aviso de gravação: risco de compliance aberto (LGPD). Este registro não é conformidade nem consentimento, e a análise jurídica não foi feita")
+    lines_out.append(f"SOFT:AVISO-AUSENTE\t{absences[0]}\tNÃO HOUVE aviso de gravação: {people} pessoa(s) registrada(s) como participante (quem calou ou só foi citado pode estar fora da conta). Risco de compliance aberto (LGPD), remediação: {by[absences[0]].get('x_notice_remediation', '(ausente)')}. Registra o fato e não supre a transparência; não é conformidade nem consentimento. Não libera o uso: o controlador define a base legal, informa os titulares e decide reter, usar ou eliminar")
 print("\n".join(lines_out))
 sys.exit(1 if bad else 0)
 PY
@@ -364,7 +377,13 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "aviso de verdade com nao_avisado reprova" NAO-AVISADO-SEM-AUSENCIA "s=s.replace('x_notice_response: ciente','x_notice_response: nao_avisado',1)"
   BASE="${FIX}/meeting-notice-absent.kg.yaml"
   NA_TXT='.claude/validation/fixtures/meeting-graph/transcript-no-notice.txt'
-  _case "ausência registrada passa como SOFT, com a contagem" "SOFT:2 pessoa(s) na reunião SEM aviso" "pass"
+  _case "ausência registrada passa como SOFT, com a contagem" "SOFT:2 pessoa(s) registrada(s)" "pass"
+  _case "a linha SOFT diz que não libera o uso" "SOFT:Não libera o uso" "pass"
+  _case "remediação fora do enum reprova" AUSENCIA-REMEDIACAO-INVALIDA "s=s.replace('x_notice_remediation: pendente','x_notice_remediation: regularizado',1)"
+  _case "ausência sem dono reprova" AUSENCIA-SEM-DONO "import re; s=re.sub(r'(x_meeting_role: notice_absent\n(?:    [^\n]*\n)*?)    x_owner: [^\n]*\n',r'\1',s,1)"
+  _case "ausência remediada pode fechar, e segue SOFT" "SOFT:remediação: dados_eliminados" "import re; s=s.replace('x_notice_remediation: pendente','x_notice_remediation: dados_eliminados',1); s=re.sub(r'(x_meeting_role: notice_absent\n(?:    [^\n]*\n)*?    status: )open',r'\1done\n    verified_at: \"2026-11-09\"\n    verified_against: \"registro fictício da eliminação\"',s,1)"
+  _case "recusa: a ausência cita até a parada" "SOFT:remediação: pendente" "s=s.replace('x_notice_response: nao_avisado','x_notice_response: recusou',1).replace('transcript-no-notice.txt#L3\"','transcript-no-notice.txt#L7\"',1).replace('transcript-no-notice.txt#L1-L8','transcript-no-notice.txt#L1-L7',1).replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L7\"',1)"
+  _case "recusa antes do fim: a ausência não lê o que veio depois" CAPTURA-APOS-RECUSA "s=s.replace('x_notice_response: nao_avisado','x_notice_response: recusou',1).replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L4\"',1)"
   _case "ausência tirada do grafo volta a reprovar" SEM-TENTATIVA-DE-AVISO "s=s.replace('x_meeting_role: notice_absent','x_meeting_role: risk',1)"
   _case "ausência sem base reprova" AUSENCIA-SEM-BASE "import re; s=re.sub(r'\n    x_notice_absent_basis:[^\n]*','',s,1)"
   _case "ausência com base curta reprova" AUSENCIA-SEM-BASE "import re; s=re.sub(r'x_notice_absent_basis: \"[^\"]*\"','x_notice_absent_basis: \"nada\"',s,1)"
@@ -395,10 +414,11 @@ if [ "${1:-}" = "--selftest" ]; then
   [ "${F}" -eq 0 ]; exit $?
 fi
 
-G=""; ROOT=""
+G=""; ROOT=""; FOR_USE=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --root) [ -n "${2:-}" ] || { echo "meeting-graph-check: --root exige um diretório" >&2; exit 2; }; ROOT="$2"; shift ;;
+    --for-use) FOR_USE=1 ;;
     --*) echo "meeting-graph-check: opção desconhecida: $1" >&2; exit 2 ;;
     *) [ -z "${G}" ] || { echo "meeting-graph-check: argumento a mais: $1" >&2; exit 2; }; G="$1" ;;
   esac
@@ -408,10 +428,12 @@ done
 [ -f "${G}" ] || { echo "meeting-graph-check: grafo inexistente: ${G}" >&2; exit 2; }
 if [ -z "${ROOT}" ]; then ROOT="$(git -C "$(dirname "${G}")" rev-parse --show-toplevel 2>/dev/null || pwd)"; fi
 [ -d "${ROOT}" ] || { echo "meeting-graph-check: raiz inexistente: ${ROOT}" >&2; exit 2; }
+NOTICE_ABSENT=0
 _check "${G}" "${ROOT}"; rc=$?
 case "${rc}" in
-  0) if [ "${NOTICE_ABSENT:-0}" -eq 1 ]; then
-       echo "meeting-graph-check: ⚠️ ${G} forma conforme, MAS SEM AVISO aos participantes: risco de compliance aberto, não é conformidade (trace ao trecho, radar verde)" >&2
+  0) if [ "${NOTICE_ABSENT}" -eq 1 ]; then
+       echo "meeting-graph-check: ⚠️ ${G} NÃO HOUVE AVISO aos participantes: registro válido do fato (trace ao trecho, radar verde), risco de compliance aberto, uso retido por padrão" >&2
+       if [ "${FOR_USE}" -eq 1 ]; then echo "meeting-graph-check: uso RETIDO: reunião sem aviso não entra por este gate; só por decisão explícita de quem usa, e com a marca" >&2; exit 3; fi
      else echo "meeting-graph-check: ✅ ${G} conforme (aviso registrado, trace ao trecho, radar verde)" >&2; fi ;;
   1) echo "meeting-graph-check: ✗ ${G} REPROVADO" >&2 ;;
 esac

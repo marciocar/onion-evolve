@@ -54431,10 +54431,22 @@ run_meeting_graph_selftests() {
   # (c2) a ausência registrada, como o comando invoca: rc 0, SOFT no STDOUT com a contagem, e a linha final não diz "aviso registrado"
   local _sout _serr; _serr="$(mktemp)"
   if _sout="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/meeting-graph-check.sh" "${fx}/meeting-notice-absent.kg.yaml" 2>"${_serr}")"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -q $'^SOFT:AVISO-AUSENTE\tNOTICE_ABSENT\t2 pessoa(s)' <<< "${_sout}" && grep -qF 'SEM AVISO' "${_serr}" && ! grep -qF 'aviso registrado' "${_serr}"; then
-    record_pass "meeting-graph: (c2) ausência registrada → rc 0, SOFT no stdout com a contagem, sem dizer que houve aviso"
+  if [ "${rc}" -eq 0 ] && grep -q $'^SOFT:AVISO-AUSENTE\tNOTICE_ABSENT\tNÃO HOUVE aviso de gravação: 2 pessoa(s)' <<< "${_sout}" && grep -qF 'NÃO HOUVE AVISO' "${_serr}" && ! grep -qF 'aviso registrado' "${_serr}" && ! grep -qF 'conforme' "${_serr}"; then
+    record_pass "meeting-graph: (c2) ausência registrada → rc 0, SOFT no stdout com a contagem, sem dizer aviso registrado nem conforme"
   else record_fail "meeting-graph: (c2) ausência" "rc=${rc}; stdout=${_sout}; stderr=$(head -3 "${_serr}" | tr '\n' '|')"; fi
   rm -f "${_serr}"
+  # (c3) --for-use: o rc 0 é do registro, não do uso. Ausência → rc 3; reunião com aviso segue rc 0; reprovado segue rc 1
+  local _c3=""
+  if (cd "${REPO_ROOT}" && LC_ALL=C bash "${chk}" "${fx}/meeting-notice-absent.kg.yaml" --for-use >/dev/null 2>&1); then _c3="0"; else _c3="$?"; fi
+  if (cd "${REPO_ROOT}" && LC_ALL=C bash "${chk}" "${fx}/meeting-ok.kg.yaml" --for-use >/dev/null 2>&1); then _c3="${_c3},0"; else _c3="${_c3},$?"; fi
+  if (cd "${REPO_ROOT}" && LC_ALL=C bash "${chk}" "${fx}/meeting-no-notice.kg.yaml" --for-use >/dev/null 2>&1); then _c3="${_c3},0"; else _c3="${_c3},$?"; fi
+  if [ "${_c3}" = "3,0,1" ]; then record_pass "meeting-graph: (c3) --for-use: ausência retém (3), com aviso libera (0), sem registro reprova (1)"
+  else record_fail "meeting-graph: (c3) --for-use" "rcs=${_c3}; esperado 3,0,1"; fi
+  # (c4) os dois consumidores escritos carregam o estado: o relatório do extract e a retenção da consolidação
+  local _ex="${REPO_ROOT}/.claude/commands/product/extract-meeting.md" _co="${REPO_ROOT}/.claude/commands/product/consolidate-meetings.md"
+  if grep -qF '⚠️ NÃO HOUVE AVISO' "${_ex}" && grep -qF 'rc 0 com `SOFT:AVISO-AUSENTE`' "${_ex}" && grep -qF -- '--for-use' "${_co}" && grep -qF 'reunião sem aviso, risco aberto' "${_co}"; then
+    record_pass "meeting-graph: (c4) o relatório tem o estado próprio, e a consolidação retém e marca"
+  else record_fail "meeting-graph: (c4) consumidores" "extract ou consolidate perderam o estado da ausência"; fi
   # (e) a seleção por caso não é verde por vacuidade: nome inexistente → rc 1
   if o="$(LC_ALL=C bash "${chk}" --selftest "caso que não existe" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 1 ] && grep -qF '✗ caso inexistente' <<< "${o}"; then record_pass "meeting-graph: (e) --selftest de caso inexistente → rc 1"
@@ -54453,6 +54465,15 @@ run_meeting_graph_selftests() {
   cp -r "${REPO_ROOT}/.claude/utils/kg" "${sb}/.claude/utils/"
   ln -s "${REPO_ROOT}/vendor" "${sb}/vendor"
   ( cd "${sb}" && git init -q . ) >/dev/null 2>&1
+  # (m-u) o --for-use na mesma cópia: a limpa retém (rc 3), e a sem a retenção devolve rc 0
+  local _fx_sb="${sb}/.claude/validation/fixtures/meeting-graph/meeting-notice-absent.kg.yaml" _muc
+  cp "${chk}" "${s}"
+  if (cd "${sb}" && LC_ALL=C bash "${s}" "${_fx_sb}" --for-use --root "${sb}" >/dev/null 2>&1); then _muc=0; else _muc=$?; fi
+  python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' \
+    "${s}" 'if [ "${FOR_USE}" -eq 1 ]; then echo' 'if false; then echo' || _muc=x
+  if (cd "${sb}" && LC_ALL=C bash "${s}" "${_fx_sb}" --for-use --root "${sb}" >/dev/null 2>&1); then _muc="${_muc}-0"; else _muc="${_muc}-$?"; fi
+  if [ "${_muc}" = "3-0" ]; then record_pass "meeting-graph: (m-u) mutante sem a retenção do --for-use volta a liberar (cópia limpa retinha)"
+  else record_fail "meeting-graph: (m-u) mutante do --for-use" "limpa-mutante=${_muc}; esperado 3-0"; fi
   # (m) MUTANTES — reverte cada cura na CÓPIA e EXIGE que o caso nomeado do --selftest reprove
   local old new want mo mrc
   while IFS=$'\x1f' read -r old new want; do
@@ -54472,10 +54493,13 @@ if not notices and not absences:$(printf '\x1f')if not notices and 0:$(printf '\
 if notices and absences:$(printf '\x1f')if 0:$(printf '\x1f')ausência com aviso reprova
     if len(norm(n.get("x_notice_absent_basis", ""))) < 20:$(printf '\x1f')    if 0:$(printf '\x1f')ausência sem base reprova
     if "não houve aviso" not in n.get("label", "").lower():$(printf '\x1f')    if 0:$(printf '\x1f')ausência que não diz que não houve aviso reprova
-    if n.get("status") != "open":$(printf '\x1f')    if 0:$(printf '\x1f')ausência encerrada reprova
+    if not (n.get("status") == "open" or (n.get("status") == "done" and rem in REMEDIATION - {"pendente"})):$(printf '\x1f')    if 0:$(printf '\x1f')ausência encerrada reprova
+    if rem not in REMEDIATION:$(printf '\x1f')    if 0:$(printf '\x1f')remediação fora do enum reprova
+    if not n.get("x_owner"):$(printf '\x1f')    if 0:$(printf '\x1f')ausência sem dono reprova
+    last = stop_line or nlines$(printf '\x1f')    last = nlines$(printf '\x1f')recusa: a ausência cita até a parada
 if absent_mode:$(printf '\x1f')if 0:$(printf '\x1f')ausência registrada passa como SOFT, com a contagem
     if n.get("impact") not in ("4", "5"):$(printf '\x1f')    if 0:$(printf '\x1f')ausência de impacto baixo reprova
-    if "_from" in n and nlines is not None and (n["_from"] != 1 or n["_to"] != nlines):$(printf '\x1f')    if 0:$(printf '\x1f')ausência sobre um trecho só reprova
+    if "_from" in n and nlines is not None and (n["_from"] != 1 or n["_to"] != last):$(printf '\x1f')    if 0:$(printf '\x1f')ausência sobre um trecho só reprova
         elif absent_mode and resp not in ABSENT_RESP:$(printf '\x1f')        elif 0:$(printf '\x1f')ciente sem aviso reprova
         elif not absent_mode and resp == "nao_avisado":$(printf '\x1f')        elif 0:$(printf '\x1f')aviso de verdade com nao_avisado reprova
         if absent_mode and roles.get(ref) != "notice_absent":$(printf '\x1f')        if 0:$(printf '\x1f')participante fora da ausência reprova
@@ -54492,10 +54516,10 @@ re.search(r"consent", k.lower())$(printf '\x1f')re.search(r"consent", k)$(printf
 if refusal_lines and stop_line is None:$(printf '\x1f')if 0:$(printf '\x1f')recusa sem parada reprova
 if refusal_lines and stop_line is not None and stop_line > min(refusal_lines):$(printf '\x1f')if 0:$(printf '\x1f')parada depois da recusa reprova
 stop_line > min(refusal_lines)$(printf '\x1f')stop_line > max(refusal_lines)$(printf '\x1f')duas recusas: a parada vale pela 1ª
-        if r not in ("meeting", "notice_absent") and by[i].get("_to", 0) > stop_line:$(printf '\x1f')        if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
+        if r != "meeting" and by[i].get("_to", 0) > stop_line:$(printf '\x1f')        if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_from", 0) > stop_line$(printf '\x1f')faixa que atravessa a parada reprova
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_to", 0) >= stop_line$(printf '\x1f')fato que termina na linha da parada passa
-if r not in ("meeting", "notice_absent") and by[i]$(printf '\x1f')if r in FACTS and by[i]$(printf '\x1f')participante depois da parada reprova
+if r != "meeting" and by[i]$(printf '\x1f')if r in FACTS and by[i]$(printf '\x1f')participante depois da parada reprova
 (nlines is None or int(m.group(1)) <= nlines)$(printf '\x1f')(True)$(printf '\x1f')parada além do fim do arquivo reprova
 if m and int(m.group(1)) >= 1 and$(printf '\x1f')if m and$(printf '\x1f')parada na linha 0 reprova
     if r is None: fail("PAPEL-AUSENTE", n["id"], "nó sem x_meeting_role num grafo de reunião"); continue$(printf '\x1f')    if r is None: continue$(printf '\x1f')nó sem papel reprova
