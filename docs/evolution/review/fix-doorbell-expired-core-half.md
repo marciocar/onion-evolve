@@ -2,18 +2,17 @@
 branch: fix/doorbell-expired-core-half
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: d9476cd91f43f211ad079c96c27119c7054b37e711e640b63cb2c2dd5a33ddf7
-reviewed_code_sha256: 6b648103352eba1ba6304627012a77d3ab422461b2f47ef0653049399cf91dc0
-findings_total: 5
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 6
+findings_real: 6
 findings_blocking: 0
 tokens: 0
 duration_min: 25
-findings_fixed: 3
+findings_fixed: 4
 verdict: FIXED
 elenxo: false
 reviewer: "o próprio agente de execução (passada própria, não independente; o brief proibiu criar agentes)"
-nota: "tokens 0 = não medido. Família mail_hook 24/0, com 5 mutantes mortos; hooks_python_isolated verde depois de tirar o shebang do leitor."
+nota: "tokens 0 = não medido. Famílias mail_hook e assemble_plugin 38/0, com 5 mutantes mortos; hooks_python_isolated verde depois de tirar o shebang do leitor."
 ---
 
 # Passada adversarial: `fix/doorbell-expired-core-half`
@@ -34,6 +33,7 @@ nota: "tokens 0 = não medido. Família mail_hook 24/0, com 5 mutantes mortos; h
 | 3 | o estado envelhece sem a campainha rodando: sinal já tratado seguiria cobrado | real | curado: só conta se o arquivo segue lá (caso e mutante) |
 | 4 | retido nunca expira e por isso nunca seria cobrado | real | o radar cobra junto; o hook não, pois o retido já está no `📬` |
 | 5 | o estado é por caminho de repo: numa worktree o leitor vê "sem estado" | limite | declarado; a campainha também é por caminho |
+| 6 | o `kg-radar.sh` viaja no plugin de design, e o caminho `.claude/utils/` dentro dele reprovava `assemble_plugin` no CI (13/1 local) | real | curado: o leitor é achado a partir do próprio radar; no plugin, NÃO VERIFICADO. Re-revisado depois do rebase, que juntou o modo `prompt` novo do hook ao marcador 🔕 |
 
 ## Teto
 
