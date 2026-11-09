@@ -1,8 +1,8 @@
-# binario 2.1.319 (Claude Code) · regras 64
+# binario 2.1.319 (Claude Code) · regras 74
 id	fase	forma	esperado	medido	veredito	nota
 F01	flows-deny	bash ops/pr-merge-verified.sh	pass	exec	ok	 [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]
 F02	flows-deny	bash .claude/utils/adopt/merge-onion-hooks.sh .claude/settings.json .claude/settings.json | head -c 40	pass	exec	ok	{ "$schema": "https://json.schemastore
-F03	flows-deny	bash .claude/utils/adopt/deny-monotonic.sh . main	pass	exec	ok	- Bash(git -* push* -f) - Bash(git clean -*x*) - Bash(git push* -f *) - Bash(git push* -f)
+F03	flows-deny	bash .claude/utils/adopt/deny-monotonic.sh . main	pass	exec	ok	n* -fdX*) - Bash(git -* clean* -fdx*) - Bash(git -* clean* -fx*) - Bash(git -* clean* -x*)
 F04	flows-deny	bash .claude/utils/co-evolution/co-deliver.sh fixture --target {W}/other --dry-run	pass	exec	ok	Exit code 2 ERRO: member-id 'fixture' não existe em members.yaml.
 F05	flows-deny	bash .claude/utils/co-evolution/co-relay.sh --target {W}/other --dry-run	pass	exec	ok	 Sem stamp = core/fonte ou pré-adoção; o core não relaya upstream (use /meta:co-announce).
 F06	flows-deny	bash .claude/validation/kg-radar.sh docs/onion/graph/comms-stable-2026-11.kg.yaml --integrity --schema | tail -3	pass	exec	ok	 gramática do .kg.yaml (✗ reprova na divergência) ══ ✅ schema_version 1 (bate com o radar)

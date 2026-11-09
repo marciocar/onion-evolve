@@ -97,7 +97,8 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
 - **O que ela NÃO cobre, medido:** busca recursiva sem nomear o arquivo (`grep -rn X pasta` devolve o `.env` de
   dentro), `bash -c '…'`, `eval`, refspec `+`, `rm -Rf`, `find -delete`, interpretador (`python3 -c`), `tar`, `xxd`,
   glob (`cat .e*`), sufixo fora da lista (`.env.foo`), script que faz por dentro, `git -C . push origin x -uf` (flag
-  combinada no fim, com `-C`) e `git clean -qfdx` (`-q` antes). Lista de formas não fecha contra variação; o que fecha
+  combinada no fim, com `-C`), `git push -uvf`, `-vuf`, `-quf`, `-uqf` e o `-q` no meio do grupo do clean (`-qfdx`,
+  `-fqdx`, `-qdfx`, `-fdqx`, `-qfdX`). Lista de formas não fecha contra variação; o que fecha
   é o sistema operacional.
 - **Em adotante com sandbox ligado (medido em fixture):** `cat .env` passa, e `source .env` também. `.ssh` e `.aws`
   somem para o processo: `ssh -i` avisa que a chave não é acessível, então espere falha em push por ssh (por https não
@@ -105,7 +106,7 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   processo não grava no home: o efeito isolado do deny sobre ela **não foi medido**.
 - **Custo:** o curinga atravessa espaços, então a menção dentro de `git -C . …` cai junto: `git -C . commit -m "… git
   push --force …"`, `-m "… git clean -x …"`, `git -C . log --grep 'x push -f y'` (no `git commit` sem `-C` não cai).
-  E `rm -f my-report /`, porque `-*r*` lê o `r` do nome. Saída: o maestro roda fora da sessão (`!`).
+  E `rm -f my-report /`, porque `-*r*` lê o `r` do nome, e `git -C clean status -x`, com pasta chamada `clean`. Saída: o maestro roda fora da sessão (`!`).
 
 ## O que esta doutrina NÃO promete
 
