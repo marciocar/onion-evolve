@@ -160,12 +160,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 4
     confidence: 0.5
+    verified_at: "2026-11-09"
+    verified_against: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_PROPOSTA_DE_MERCADO_ACEITA_CONDICIONADA_1104 com status done, selado em 2026-11-04; a condição do card foi cumprida em Q_MA_FREE_ORG_READ_ENFORCED, done em 2026-11-04"
     label: "Como o mercado resolve conhecimento multiaudiência: portais de conhecimento com IA, wikis com permissão por espaço e catálogos de engenharia?"
-    narrative: "Estudo de campo da curadoria, no método dela (/onion-research ou /meta:dissect, em .kg.yaml com radar exit 0), com o mercado e o capital como eixo invariante. Pergunta-guia: quem separa a escrita por audiência e mantém a leitura cruzada, como faz a barreira (permissão por espaço, papel, aprovação) e como trata sensibilidade. Alimenta Q_MA_WRITE_SURFACE, Q_MA_ENFORCEMENT e a rodada de padrão de mercado da classificação. Pauta inicial do maestro (2026-10-28) para a curadoria verificar; são CANDIDATOS, não fatos verificados: domain ownership e governança federada do Data Mesh; Team Topologies e a lei de Conway; InnerSource; docs-as-code com dono por repo (por exemplo, o TechDocs do Backstage); git subtree e submodule contra vendorização com pin; policy-as-code para a permissão de escrita."
+    narrative: "Estudo de campo da curadoria, no método dela (/onion-research ou /meta:dissect, em .kg.yaml com radar exit 0), com o mercado e o capital como eixo invariante. Pergunta-guia: quem separa a escrita por audiência e mantém a leitura cruzada, como faz a barreira (permissão por espaço, papel, aprovação) e como trata sensibilidade. Alimenta Q_MA_WRITE_SURFACE, Q_MA_ENFORCEMENT e a rodada de padrão de mercado da classificação. Pauta inicial do maestro (2026-10-28) para a curadoria verificar; são CANDIDATOS, não fatos verificados: domain ownership e governança federada do Data Mesh; Team Topologies e a lei de Conway; InnerSource; docs-as-code com dono por repo (por exemplo, o TechDocs do Backstage); git subtree e submodule contra vendorização com pin; policy-as-code para a permissão de escrita. Fechada em 2026-11-09: a resposta é a proposta de mercado de E_MA_MARKET_CURADORIA_PROPOSTA_1028, aceita em D_MA_PROPOSTA_DE_MERCADO_ACEITA_CONDICIONADA_1104, cuja condição Q_MA_FREE_ORG_READ_ENFORCED registra como cumprida: push recusado com Read e aceito com Write. Não é portão do selo de D_MA_ARCH. O passo de desligar o fork não rodou e segue fora dessa medida."
   - id: Q_MA_ENFORCEMENT
     node_type: question
     layer: audit
