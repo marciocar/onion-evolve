@@ -251,7 +251,7 @@ bash .claude/utils/co-evolution/open-channel-session.sh [--continue | --resume <
 ```
 
 O abridor só aceita os dois argumentos de retomada e mantém a tela de confirmação do Claude Code. Quem abre sem ele
-recebe um aviso único com a linha exata, e o `UserPromptSubmit` diz quantos sinais aguardam ack. Em repo sem `doorbell`
+recebe um aviso único com a linha exata, e, nas sessões sem canal, o `UserPromptSubmit` diz quantos sinais aguardam ack. Em repo sem `doorbell`
 no `.mcp.json` nada disso fala: a adesão é um ato, não vem com o update. A bancada é `run_channel_session_selftests`.
 
 ## Destino (peça 5)

@@ -51,8 +51,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-09"
     verified_against: "channel-session.py pending contra o estado real da campainha do core e o fila.db real: devolveu 1 e 0, igual ao arquivo de estado; 30 ms em três medidas; claude -p com o hook recebeu a contagem no contexto"
-    label: "A contagem no prompt lê o estado da campainha e a fila em leitura, custa cerca de 30 ms e nunca carrega título nem corpo."
-    narrative: "Fonte do caminho e da chave: o .mcp.json e o server.ts do doorbell (hash do repo, .v2.json antes de .json, legado onion-campainha). Fila: linhas de _honker_live na caixa inbox."
+    label: "A contagem no prompt só fala em sessão sem canal, lê o estado da campainha e a fila, custa cerca de 30 ms e nunca carrega título nem corpo."
+    narrative: "Fonte do caminho e da chave: o .mcp.json e o server.ts do doorbell (hash do repo, .v2.json antes de .json, legado onion-campainha). Fila: linhas de _honker_live na caixa inbox. Fica de fora o sinal expirado (seguiria em todo prompt) e o cujo arquivo já saiu (estado morto, sem campainha rodando)."
     provenance:
       source: "execução do leitor no core e no claude -p"
       locator: ".claude/utils/co-evolution/channel-session.py, verbo pending"
@@ -67,7 +67,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-11-09"
     verified_against: "leitura do channel-session.py e do hook; casos (d), (e), (f) e (j) da família channel_session"
-    label: "O que não cobre: só Linux (lê o procfs), só o servidor chamado doorbell, conta por repo e não por sessão, e a retomada interna por /resume repete o aviso."
+    label: "O que não cobre: só Linux (lê o procfs), só o servidor chamado doorbell, conta por repo e não por sessão, e a retomada interna por /resume repete o aviso; o sinal retido segue contando até o ack."
     narrative: "O abridor não prova que a tela foi lida: a checagem de terminal é conformidade, não fronteira de segurança, e um pty a satisfaz. A fila morta (dead-letter) não entra na contagem. Worktree não tem .mcp.json, logo fica em silêncio."
     provenance:
       source: "leitura do próprio artefato"
