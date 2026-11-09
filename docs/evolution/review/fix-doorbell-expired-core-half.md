@@ -2,7 +2,8 @@
 branch: fix/doorbell-expired-core-half
 pr: pendente
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d9476cd91f43f211ad079c96c27119c7054b37e711e640b63cb2c2dd5a33ddf7
+reviewed_code_sha256: 6b648103352eba1ba6304627012a77d3ab422461b2f47ef0653049399cf91dc0
 findings_total: 5
 findings_real: 5
 findings_blocking: 0
