@@ -3,16 +3,16 @@ branch: feat/doorbell-session-opener
 pr: pendente
 date: 2026-11-09
 reviewed_diff_sha256: pendente
-findings_total: 4
-findings_real: 4
+findings_total: 9
+findings_real: 9
 findings_blocking: 0
 tokens: 0
 duration_min: 40
-findings_fixed: 4
+findings_fixed: 9
 verdict: FIXED
-elenxo: false
-reviewer: agente de execução da sessão do core, por comando e dogfood, sem revisor independente (o brief proibiu criar agentes)
-nota: "tokens 0 = não medido. A passada é do próprio autor, contra bancada com mutantes e sessões reais do Claude Code 2.1.319 no tmux."
+elenxo: true
+reviewer: refutador da sessão do core (aprovou com cinco ressalvas, relatadas pelo condutor) e o agente de execução, por comando e dogfood
+nota: "tokens 0 = não medido. Os quatro primeiros achados são da passada do autor; os cinco seguintes, do refutador, que o autor recebeu por relato e não leu no original."
 ---
 
 # Passada adversarial: `feat/doorbell-session-opener`
@@ -31,11 +31,17 @@ já viajam para adotados e ficam fora das portas. Em repo sem `doorbell` no `.mc
 3. A bancada do abridor passava `''` quando chamada sem argumentos, e os casos (o) e (p) passavam pelo motivo errado.
    O mutante denunciou; corrigida a montagem dos argumentos.
 4. Array vazio sob `set -u` quebra no bash 3.2 do macOS. O `exec` passou a usar a forma com `+`.
+5. Refutador: no rebase sobre o #1563, o `exit 0` de um modo `prompt` mataria o outro. Agora é um bloco só, um JSON e uma
+   entrada no `settings.json`. Caso (t7). O mutante Q-M12 do #1563 mudou de âncora com o bloco.
+6. Refutador: a contagem aparecia também em sessão com canal, e o sinal expirado voltava em todo prompt. Casos (t4) e (t2).
+7. Refutador: estado morto contava sinal cujo arquivo já saiu. Caso (t3).
+8. Refutador: mutantes vivos em `st_uid != me`, `state.repo == target` e `-I -S`. Casos (j2), (t6) e (t8).
+9. Refutador: `-cp x` e `--print=x` passavam por interativos, e `session_id: null` sugeria `--resume None`. Casos (d2), (d3) e (g2).
 
 ## Mutantes
 
-Cada caso, exceto o (w) do registro, tem mutante que reprova: 33 dos 34 casos, inclusive as doze
-flags recusadas. Rodados `channel_session` (67 casos), `mail_hook` e `corelay_spool`.
+Cada caso, exceto o (w) do registro, tem mutante que reprova, inclusive as doze flags recusadas. Rodados
+`channel_session`, `mail_hook` e `corelay_spool`.
 
 Dogfood: sessão real sem a flag mostra o aviso; pelo abridor a tela de confirmação aparece e, depois dela, a sessão abre
 com o canal e sem aviso; `claude -p` recebeu a contagem no contexto; 30 ms contra o estado real.
@@ -46,4 +52,5 @@ com o canal e sem aviso; `claude -p` recebeu a contagem no contexto; 30 ms contr
 - Só o servidor chamado `doorbell`; canal novo entra na lista do `channel-session.py`.
 - A contagem é por repo, não por sessão, e não inclui a dead-letter da fila.
 - O `/resume` dentro da sessão repete o aviso, por ser outra sessão.
+- Sinal retido (held) e sinal da fila aparecem a cada prompt enquanto a sessão não tiver canal.
 - A checagem de terminal do abridor é conformidade, não fronteira de segurança: um pty a satisfaz.

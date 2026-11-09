@@ -28750,7 +28750,10 @@ run_channel_session_selftests() {
   # shebang direto em /bin/bash: o comm do processo vira `claude`, como no binário nativo
   cat > "${d}/bin/claude" <<'FAKE'
 #!/bin/bash
-cd "$CS_REPO" && CLAUDE_PROJECT_DIR="$CS_REPO" CLAUDE_CODE_ENTRYPOINT=cli bash "$CS_REPO/.claude/hooks/co-evolution-inbox-check.sh" < "$CS_PAYLOAD"
+cd "$CS_REPO" || exit 1
+export CLAUDE_PROJECT_DIR="$CS_REPO" CLAUDE_CODE_ENTRYPOINT=cli
+if [ -n "${CS_HARNESS:-}" ]; then python3 -I -S -c "$CS_HARNESS" "$CS_IMPL"; exit $?; fi
+bash "$CS_REPO/.claude/hooks/co-evolution-inbox-check.sh" ${CS_MODE:-} < "${CS_PAYLOAD:-/dev/null}"
 FAKE
   chmod +x "${d}/bin/claude"
   printf '#!/bin/sh\nprintf "%%s\\n" "$PWD" "$@" > "$CS_LOG"\n' > "${d}/obin/claude"; chmod +x "${d}/obin/claude"
@@ -28784,10 +28787,13 @@ FAKE
   _cs_mut_py "s/^${chk}\$/    if argv is None or not interactive(argv) or True:/" flag-true.py
   _cs_mut_py "s/^${chk}\$/    if argv is None or not interactive(argv):/" flag-false.py
   _cs_mut_py 's/if arg.startswith(flag + "=") and /if False and /' flag-eq.py
-  _cs_mut_py 's/return not any(a in ("-p", "--print") for a in args)/return True/' print.py
+  _cs_mut_py 's/^    return not any(a == "--print" or a.startswith("--print=") or re.fullmatch(r"-\[A-Za-z\]\*p\[A-Za-z\]\*", a) for a in args)$/    return True/' print.py
+  _cs_mut_py 's/ or re.fullmatch(r"-\[A-Za-z\]\*p\[A-Za-z\]\*", a) for a in args/ for a in args/' print-cluster.py
+  _cs_mut_py 's/a == "--print" or a.startswith("--print=") or /a == "--print" or /' print-eq.py
   _cs_mut_py 's/if args and (args\[0\] == "daemon" or args\[0\].startswith(("bg-", "--bg"))):/if False:/' bg.py
   _cs_mut_py 's/^    if source not in ("startup", "resume"):.*/    if False:/' src.py
-  _cs_mut_py 's/^    if source == "resume" and re.fullmatch/    if False and re.fullmatch/' resume.py
+  _cs_mut_py 's/^    if source == "resume" and isinstance(session, str) and re.fullmatch/    if False and re.fullmatch/' resume.py
+  _cs_mut_py 's/^    if source == "resume" and isinstance(session, str) and re.fullmatch(r"\(.*\)", session):$/    if source == "resume" and re.fullmatch(r"\1", str(session)):/' resume-null.py
   _cs_mut_py 's/^        if name in names and isinstance(servers\[name\], dict):$/        if True:/; s/^            return name, servers\[name\]$/            return name, {}/' any-server.py
   _cs_mut_py 's/^        raise Invalid(type(exc).__name__)$/        return "doorbell", {}/' invalid.py
   sed -e '/except (OSError, ValueError, IndexError):/{n;s/return None/return ["claude"]/}' "${py}" > "${mut}/proc.py"
@@ -28796,10 +28802,23 @@ FAKE
   _cs_case "(b) com a flag, silêncio" _cs_silent "${mut}/flag-false.py" doorbell startup --dangerously-load-development-channels server:doorbell
   _cs_case "(c) a forma --flag=valor também conta" _cs_silent "${mut}/flag-eq.py" doorbell startup --channels=server:doorbell
   _cs_case "(d) sessão -p, em que a flag não funciona: silêncio" _cs_silent "${mut}/print.py" doorbell startup -p oi
+  _cs_case "(d2) -cp junto: silêncio" _cs_silent "${mut}/print-cluster.py" doorbell startup -cp oi
+  _cs_case "(d3) --print=valor: silêncio" _cs_silent "${mut}/print-eq.py" doorbell startup --print=oi
   _cs_case "(e) sessão de fundo: silêncio" _cs_silent "${mut}/bg.py" doorbell startup bg-spare --bg-spare /tmp/x.sock
   _cs_case "(f) /clear e compactação não repetem" _cs_silent "${mut}/src.py" doorbell compact
   _cs_has_resume() { _cs_warned && [[ "${cs_out}" == *"--resume abc-123"* ]]; }
   _cs_case "(g) sessão retomada: a linha traz o id" _cs_has_resume "${mut}/resume.py" doorbell resume
+  _cs_case_null() {
+    _cs_mcp doorbell; cp "$1" "${repo}/.claude/utils/co-evolution/channel-session.py"
+    printf '{"session_id":null,"source":"resume"}' > "${d}/payload"
+    cs_rc=0; cs_out="$(env -u CLAUDE_PID CS_REPO="${repo}" CS_PAYLOAD="${d}/payload" "${d}/bin/claude" 2>&1)" || cs_rc=$?
+    _cs_warned && [[ "${cs_out}" != *"--resume"* ]]
+  }
+  i_rc=0; _cs_case_null "${py}" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (g2) session_id null não vira --resume None"
+  else record_fail "channel-session: (g2) id nulo" "out=[${cs_out}]"; fi
+  m_rc=0; _cs_case_null "${mut}/resume-null.py" || m_rc=1
+  _prove_mutation "channel-session: (g2-M) sem a checagem de tipo, a linha volta a sugerir None — (g2) morde" "${py}" "${mut}/resume-null.py" "${i_rc}" "${m_rc}"
   _cs_case "(h) repo sem campainha: silêncio" _cs_silent "${mut}/any-server.py" none startup
   _cs_case "(i) .mcp.json inválido: silêncio, sessão de pé" _cs_silent "${mut}/invalid.py" bad startup
 
@@ -28820,6 +28839,21 @@ m.notice(sys.argv[2])' "$1" "${repo}" 2>&1
   else record_fail "channel-session: (j) processo ilegível" "out=[${cs_out}]"; fi
   cs_out="$(_cs_unreadable "${mut}/proc.py")"; m_rc=0; [ -z "${cs_out}" ] || m_rc=1
   _prove_mutation "channel-session: (j-M) quem assume o processo volta a avisar sem medir — (j) morde" "${py}" "${mut}/proc.py" "${i_rc}" "${m_rc}"
+
+  # (j2) ancestral de outro dono: a subida para sem ler. O uid é o único jeito de simular sem root; o processo `claude` é real
+  _cs_other_owner() {  # $1 = channel-session.py
+    env -u CLAUDE_PID CS_REPO="${repo}" CS_IMPL="$1" CS_HARNESS='
+import importlib.util, os, sys
+spec = importlib.util.spec_from_file_location("cs", sys.argv[1]); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+os.getuid = lambda: 99999
+print(m.ancestors_claude())' "${d}/bin/claude" 2>&1
+  }
+  sed -e 's/if pid <= 1 or os.stat(f"\/proc\/{pid}").st_uid != me:/if pid <= 1:/' "${py}" > "${mut}/uid.py"
+  cs_out="$(_cs_other_owner "${py}")"; i_rc=0; [ "${cs_out}" = "None" ] || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (j2) ancestral de outro dono não é lido"
+  else record_fail "channel-session: (j2) outro dono" "out=[${cs_out}]"; fi
+  cs_out="$(_cs_other_owner "${mut}/uid.py")"; m_rc=0; [ "${cs_out}" = "None" ] || m_rc=1
+  _prove_mutation "channel-session: (j2-M) sem conferir o dono, a subida lê processo alheio — (j2) morde" "${py}" "${mut}/uid.py" "${i_rc}" "${m_rc}"
 
   # (k) aviso e inbox na mesma saída: o JSON segue válido e leva os dois
   _cs_both() { python3 -I -S -c 'import json,sys
@@ -28902,16 +28936,20 @@ import hashlib, json, sqlite3, sys
 repo, state, db = sys.argv[1:4]
 h = hashlib.sha256(repo.encode()).hexdigest()[:16]
 json.dump({"repo": repo, "signals": {
-  "a": {"title": "SEGREDO-NO-TITULO", "acked_at": None},
-  "b": {"title": "SEGREDO-NO-TITULO", "acked_at": None, "expired_at": "x"},
-  "c": {"title": "SEGREDO-NO-TITULO", "acked_at": "2026-11-09"}}}, open(f"{state}/{h}.v2.json", "w"))
+  "a": {"title": "SEGREDO-NO-TITULO", "path": "docs/evolution/inbox/a.md", "acked_at": None},
+  "b": {"title": "SEGREDO-NO-TITULO", "path": "docs/evolution/inbox/a.md", "acked_at": None, "held": True},
+  "c": {"title": "SEGREDO-NO-TITULO", "path": "docs/evolution/inbox/a.md", "acked_at": "2026-11-09"},
+  "d": {"title": "SEGREDO-NO-TITULO", "path": "docs/evolution/inbox/a.md", "acked_at": None, "expired_at": "x"},
+  "e": {"title": "SEGREDO-NO-TITULO", "path": "docs/evolution/inbox/saiu.md", "acked_at": None}}}, open(f"{state}/{h}.v2.json", "w"))
 c = sqlite3.connect(db)
 c.execute("CREATE TABLE _honker_live (queue TEXT, state TEXT, payload TEXT)")
 c.executemany("INSERT INTO _honker_live VALUES (?,?,?)", [("inbox","pending","SEGREDO-NO-CORPO"),("inbox","processing","SEGREDO-NO-CORPO"),("inbox","pending","SEGREDO-NO-CORPO"),("other","pending","y")])
 c.commit()' "${repo}" "${d}/state" "${d}/q/queue.db"
-  _cs_prompt() {  # $1 = channel-session.py
-    cp "$1" "${repo}/.claude/utils/co-evolution/channel-session.py"
-    cs_rc=0; cs_out="$(cd "${repo}" && CLAUDE_PROJECT_DIR="${repo}" XDG_STATE_HOME="${d}/nowhere" bash "${repo}/.claude/hooks/co-evolution-inbox-check.sh" prompt </dev/null 2>&1)" || cs_rc=$?
+  mkdir -p "${repo}/docs/evolution/inbox"; printf 'x\n' > "${repo}/docs/evolution/inbox/a.md"
+  _cs_prompt() {  # $1 = channel-session.py, $2... = argv do claude
+    local impl="$1"; shift
+    cp "${impl}" "${repo}/.claude/utils/co-evolution/channel-session.py"
+    cs_rc=0; cs_out="$(env -u CLAUDE_PID CS_REPO="${repo}" CS_MODE=prompt ONION_SPOOL_DIR="${d}/nospool" ONION_SPOOL_NOTICE_DIR="${d}/nonotice" XDG_STATE_HOME="${d}/nowhere" "${d}/bin/claude" "$@" 2>&1)" || cs_rc=$?
   }
   _cs_counts() {
     [ "${cs_rc}" -eq 0 ] && [[ "${cs_out}" == *'"hookEventName":"UserPromptSubmit"'* ]] && [[ "${cs_out}" == *"doc-bridge 2, fila 3"* ]] && [[ "${cs_out}" != *SEGREDO* ]] \
@@ -28924,13 +28962,90 @@ c.commit()' "${repo}" "${d}/state" "${d}/q/queue.db"
     _cs_prompt "$3"; m_rc=0; "$2" || m_rc=1
     _prove_mutation "channel-session: $1: o mutante morde" "${py}" "$3" "${i_rc}" "${m_rc}"
   }
-  _cs_mut_py 's/if isinstance(s, dict) and not s.get("acked_at"))/if isinstance(s, dict))/' p-ack.py
+  _cs_mut_py 's/ or signal.get("acked_at") or signal.get("expired_at"):/ or signal.get("expired_at"):/' p-ack.py
+  _cs_mut_py 's/ or signal.get("acked_at") or signal.get("expired_at"):/ or signal.get("acked_at"):/' p-expired.py
+  _cs_mut_py 's/^            and os.path.isfile(os.path.join(repo, path)))$/            )/' p-gone.py
+  _cs_mut_py 's/isinstance(state, dict) and state.get("repo") == target and isinstance/isinstance(state, dict) and isinstance/' p-repo.py
+  _cs_mut_py 's/^    if argv is None or has_channel(argv, name):$/    if argv is None:/' p-chan.py
+  _cs_mut_py 's/^    if argv is None or has_channel(argv, name):$/    if argv is not None and has_channel(argv, name):/' p-unread.py
   _cs_mut_py 's/FROM _honker_live WHERE queue=?", (QUEUE_INBOX,))/FROM _honker_live")/' p-queue.py
   sed -e "s|^    if not entry:\$|    entry = entry or {\"env\": {\"DOORBELL_STATE_DIR\": \"${d}/state\", \"DOORBELL_QUEUE_SOCK\": \"${d}/q/queue.sock\"}}\n    if not entry:|" "${py}" > "${mut}/p-entry.py"
   _cs_mut_py 's/^    if bell + queue > 0:$/    if True:/' p-zero.py
   _cs_mcp doorbell
   _cs_prompt_case "(s) prompt: conta o que não teve ack e a fila, sem título nem corpo" _cs_counts "${mut}/p-ack.py"
   _cs_prompt_case "(t) prompt: só a caixa de entrada da fila conta" _cs_counts "${mut}/p-queue.py"
+  _cs_prompt_case "(t2) prompt: sinal expirado não conta" _cs_counts "${mut}/p-expired.py"
+  _cs_prompt_case "(t3) prompt: sinal cujo arquivo saiu não conta" _cs_counts "${mut}/p-gone.py"
+  # (t4) sessão com canal: a campainha já toca
+  _cs_with_channel() {  # $1 = channel-session.py
+    _cs_prompt "$1" --dangerously-load-development-channels server:doorbell; _cs_silent
+  }
+  i_rc=0; _cs_with_channel "${py}" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (t4) sessão com canal: a contagem cala"
+  else record_fail "channel-session: (t4) com canal" "rc=${cs_rc} out=[${cs_out}]"; fi
+  m_rc=0; _cs_with_channel "${mut}/p-chan.py" || m_rc=1
+  _prove_mutation "channel-session: (t4-M) sem olhar o canal, a contagem vira ruído em todo prompt — (t4) morde" "${py}" "${mut}/p-chan.py" "${i_rc}" "${m_rc}"
+  # (t5) processo que não se mede: não afirma nada
+  _cs_pending_unreadable() {  # $1 = channel-session.py
+    cp "$1" "${repo}/.claude/utils/co-evolution/channel-session.py"
+    python3 -I -S -c '
+import builtins, importlib.util, sys
+spec = importlib.util.spec_from_file_location("cs", sys.argv[1]); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+real = builtins.open
+def deny(p, *a, **k):
+    if str(p).startswith("/proc/"): raise PermissionError(13, "denied")
+    return real(p, *a, **k)
+builtins.open = deny
+m.pending(sys.argv[2])' "$1" "${repo}" 2>&1
+  }
+  cs_out="$(_cs_pending_unreadable "${py}")"; i_rc=0; [ -z "${cs_out}" ] || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (t5) processo ilegível: a contagem cala"
+  else record_fail "channel-session: (t5) ilegível" "out=[${cs_out}]"; fi
+  cs_out="$(_cs_pending_unreadable "${mut}/p-unread.py")"; m_rc=0; [ -z "${cs_out}" ] || m_rc=1
+  _prove_mutation "channel-session: (t5-M) sem o teste do processo, a contagem afirma sem medir — (t5) morde" "${py}" "${mut}/p-unread.py" "${i_rc}" "${m_rc}"
+  # (t6) o estado de outro repo com o mesmo hash não vale
+  _cs_foreign_state() {  # $1 = channel-session.py; devolve 0 se calou
+    python3 -I -S -c 'import glob,json,sys
+for f in glob.glob(sys.argv[1]+"/*.v2.json"):
+    s=json.load(open(f)); s["repo"]=sys.argv[2]; json.dump(s,open(f,"w"))' "${d}/state" "$2"
+    _cs_prompt "$1"
+  }
+  _cs_foreign_state "${py}" /outro/repo; i_rc=0; [[ "${cs_out}" != *"doc-bridge 2"* ]] || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (t6) estado cujo repo não bate não conta"
+  else record_fail "channel-session: (t6) outro repo" "out=[${cs_out}]"; fi
+  _cs_foreign_state "${mut}/p-repo.py" /outro/repo; m_rc=0; [[ "${cs_out}" != *"doc-bridge 2"* ]] || m_rc=1
+  _cs_foreign_state "${py}" "${repo}"
+  _prove_mutation "channel-session: (t6-M) sem conferir o repo, o estado alheio volta a contar — (t6) morde" "${py}" "${mut}/p-repo.py" "${i_rc}" "${m_rc}"
+  # (t7) spool e contagem no mesmo prompt: um JSON só, os dois textos. É o `exit 0` da primeira parte que mataria a segunda
+  _cs_spool_stub() {  # o importador real exige o carteiro inteiro; aqui importa a saída que ele imprime
+    printf '#!/bin/sh\necho "imported=1 pending=0"\n' > "${repo}/.claude/utils/co-evolution/spool-import.sh"
+  }
+  _cs_both_prompt() {  # $1 = hook
+    cp "$1" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"; _cs_prompt "${py}"
+    [[ "${cs_out}" == *"pelo spool do carteiro"* ]] && [[ "${cs_out}" == *"doc-bridge 2, fila 3"* ]] \
+      && python3 -I -S -c 'import json,sys; json.loads(sys.argv[1])' "${cs_out}" 2>/dev/null
+  }
+  _cs_spool_stub
+  sed -e 's/^      _spool="$(printf .📬\(.*\)$/      printf "{}\\n"; exit 0/' "${hook}" > "${mut}/hook-spool-exit.sh"
+  i_rc=0; _cs_both_prompt "${hook}" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (t7) spool e contagem saem num JSON só"
+  else record_fail "channel-session: (t7) os dois" "out=[${cs_out}]"; fi
+  m_rc=0; _cs_both_prompt "${mut}/hook-spool-exit.sh" || m_rc=1
+  _prove_mutation "channel-session: (t7-M) a saída antecipada do spool volta a matar a contagem — (t7) morde" "${hook}" "${mut}/hook-spool-exit.sh" "${i_rc}" "${m_rc}"
+  cp "${hook}" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"; rm -f "${repo}/.claude/utils/co-evolution/spool-import.sh"
+  # (t8) módulo plantado ao lado do leitor não executa: a chamada do hook é isolada
+  _cs_planted() {  # $1 = hook
+    printf 'open("%s", "w").close()\nraise SystemExit(0)\n' "${d}/planted" > "${repo}/.claude/utils/co-evolution/json.py"
+    rm -f "${d}/planted"; cp "$1" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"; _cs_prompt "${py}"
+    rm -f "${repo}/.claude/utils/co-evolution/json.py"; [ ! -e "${d}/planted" ]
+  }
+  sed -e 's/^  python3 -I -S "$py" "$1" --repo /  python3 "$py" "$1" --repo /' "${hook}" > "${mut}/hook-noiso.sh"
+  i_rc=0; _cs_planted "${hook}" || i_rc=1
+  if [ "${i_rc}" -eq 0 ]; then record_pass "channel-session: (t8) módulo plantado ao lado do leitor não executa"
+  else record_fail "channel-session: (t8) isolamento" "o json.py plantado rodou"; fi
+  m_rc=0; _cs_planted "${mut}/hook-noiso.sh" || m_rc=1
+  cp "${hook}" "${repo}/.claude/hooks/co-evolution-inbox-check.sh"
+  _prove_mutation "channel-session: (t8-M) sem -I, o módulo plantado volta a executar — (t8) morde" "${hook}" "${mut}/hook-noiso.sh" "${i_rc}" "${m_rc}"
   _cs_mcp none
   _cs_prompt_case "(u) prompt em repo sem campainha: silêncio, mesmo com estado em disco" _cs_silent "${mut}/p-entry.py"
   python3 -I -c '
@@ -29252,7 +29367,7 @@ sys.exit(0 if any(h.get("command","").endswith("co-evolution-inbox-check.sh\" pr
   _q12 "${hook}" && q_i=0
   if [ "${q_i}" -eq 0 ]; then record_pass "co-relay-spool: (Q12) link plantado no lugar da marca não é seguido"
   else record_fail "co-relay-spool: (Q12) no-follow" "a marca escreveu através do link"; fi
-  sed -e '/^      \[ -L "$_mark" \] && exit 0$/d' -e 's/( set -C; : > "$_mark" )/( : > "$_mark" )/' "${hook}" > "${mutd}/q12.sh"
+  sed -e 's/^      if \[ ! -e "$_mark" \] && \[ ! -L "$_mark" \]; then$/      if [ ! -e "$_mark" ]; then/' -e 's/( set -C; : > "$_mark" )/( : > "$_mark" )/' "${hook}" > "${mutd}/q12.sh"
   _q12 "${mutd}/q12.sh" && q_m=0
   _prove_mutation "co-relay-spool: (Q-M12) sem a guarda, a marca volta a escrever através do link — (Q12) morde" "${hook}" "${mutd}/q12.sh" "${q_i}" "${q_m}"
   # (Q13) posse morta não sobrescreve a versão mais nova que já chegou
