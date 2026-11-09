@@ -1,0 +1,44 @@
+# Issues que receberam pontos DEPOIS de concluídas: base prévia, não estimativa feita antes da execução.
+# Lida por .claude/utils/task-manager/velocity-meter.py (o adapter não escreve rótulo: label.set é not_implemented). Amostra cega de 2026-11-08,
+# estimada por agente que só viu título e descrição sem datas nem durações; aplicada em 2026-11-09. Só o medidor separa; o Linear guarda só os pontos.
+identifier	points	confidence	batch	applied_on
+SAC-70	5	medium	blind-2026-11-08	2026-11-09
+SAC-73	13	medium	blind-2026-11-08	2026-11-09
+SAC-75	3	medium	blind-2026-11-08	2026-11-09
+SAC-76	5	medium	blind-2026-11-08	2026-11-09
+SAC-77	8	low	blind-2026-11-08	2026-11-09
+SAC-78	5	medium	blind-2026-11-08	2026-11-09
+SAC-79	5	medium	blind-2026-11-08	2026-11-09
+SAC-81	2	high	blind-2026-11-08	2026-11-09
+SAC-83	3	medium	blind-2026-11-08	2026-11-09
+SAC-84	3	medium	blind-2026-11-08	2026-11-09
+SAC-85	2	high	blind-2026-11-08	2026-11-09
+SAC-86	5	medium	blind-2026-11-08	2026-11-09
+SAC-88	3	medium	blind-2026-11-08	2026-11-09
+SAC-91	8	medium	blind-2026-11-08	2026-11-09
+SAC-92	8	medium	blind-2026-11-08	2026-11-09
+SAC-96	3	high	blind-2026-11-08	2026-11-09
+SAC-98	5	medium	blind-2026-11-08	2026-11-09
+SAC-99	5	medium	blind-2026-11-08	2026-11-09
+SAC-100	5	low	blind-2026-11-08	2026-11-09
+SAC-103	5	medium	blind-2026-11-08	2026-11-09
+SAC-105	2	high	blind-2026-11-08	2026-11-09
+SAC-106	5	medium	blind-2026-11-08	2026-11-09
+SAC-108	8	medium	blind-2026-11-08	2026-11-09
+SAC-111	2	high	blind-2026-11-08	2026-11-09
+SAC-116	13	medium	blind-2026-11-08	2026-11-09
+SAC-123	8	medium	blind-2026-11-08	2026-11-09
+SAC-124	8	medium	blind-2026-11-08	2026-11-09
+SAC-126	2	high	blind-2026-11-08	2026-11-09
+SAC-127	3	medium	blind-2026-11-08	2026-11-09
+SAC-129	3	low	blind-2026-11-08	2026-11-09
+SAC-133	5	medium	blind-2026-11-08	2026-11-09
+SAC-135	8	medium	blind-2026-11-08	2026-11-09
+SAC-136	3	high	blind-2026-11-08	2026-11-09
+SAC-137	5	medium	blind-2026-11-08	2026-11-09
+SAC-139	3	high	blind-2026-11-08	2026-11-09
+SAC-140	8	medium	blind-2026-11-08	2026-11-09
+SAC-142	5	medium	blind-2026-11-08	2026-11-09
+SAC-149	8	low	blind-2026-11-08	2026-11-09
+SAC-156	5	medium	blind-2026-11-08	2026-11-09
+SAC-277	5	low	blind-2026-11-08	2026-11-09

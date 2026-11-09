@@ -23,6 +23,7 @@ import os
 import re
 import stat
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -31,10 +32,14 @@ ENDPOINT = "https://api.linear.app/graphql"
 # Costura de teste da bancada: TM_LINEAR_ENDPOINT só é aceito em loopback (a chave nunca sai para outro host).
 _override = os.environ.get("TM_LINEAR_ENDPOINT", "")
 REQUEST_TIMEOUT = 30
+# Pausas antes de cada releitura: medido 2026-11-09, 3 de 40 leituras logo após a escrita ainda vieram com o valor velho.
+REREAD_PAUSES = (0, 0.5, 1.5, 3.0)
 if re.match(r"^http://127\.0\.0\.1:\d+/", _override):
     ENDPOINT = _override
     if os.environ.get("TM_LINEAR_TIMEOUT", "").isdigit():  # só com o Linear falso em loopback
         REQUEST_TIMEOUT = int(os.environ["TM_LINEAR_TIMEOUT"])
+    if os.environ.get("TM_LINEAR_NO_PAUSE"):  # bancada: sem espera entre releituras
+        REREAD_PAUSES = (0, 0, 0, 0)
 # Arquivos ENVIADOS ao Linear (upload) moram neste host e exigem o header Authorization para baixar
 # (medido 2026-10-12: sem header → 401; com a chave crua ou com Bearer → 200). A chave só vai para cá.
 UPLOADS_BASE = "https://uploads.linear.app/"
@@ -904,13 +909,16 @@ def _team_scale(team_id):
 def _verified_update(iss, field, value):
     """`success` e o retorno da mutação são a declaração do provedor; a prova é uma leitura separada depois da escrita."""
     _issue_update(iss["id"], {field: value})
-    try:
-        after = _issue(iss["identifier"])
-    except TmError as e:
-        raise TmError(f"{iss['identifier']}: escrita enviada e a releitura falhou ({e}); confira antes de repetir")
-    if after.get(field) != value:
-        raise TmError(f"issueUpdate disse success e a releitura de {iss['identifier']} mostra {field}={after.get(field)}, pedido {value}")
-    return after
+    after = iss
+    for pause in REREAD_PAUSES:
+        time.sleep(pause)
+        try:
+            after = _issue(iss["identifier"])
+        except TmError as e:
+            raise TmError(f"{iss['identifier']}: escrita enviada e a releitura falhou ({e}); confira antes de repetir")
+        if after.get(field) == value:
+            return after
+    raise TmError(f"issueUpdate disse success e a releitura de {iss['identifier']} mostra {field}={after.get(field)}, pedido {value}")
 
 
 def _single_target(args, usage):

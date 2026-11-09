@@ -196,6 +196,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 row.update(v["in"])
             if s["force"] == "reread_gone":
                 s["force"] = "gone"
+            if s["force"] == "read_lag":
+                s["stale"] = {**row, **{k: None for k in v["in"]}}
             return self._reply({"data": {"issueUpdate": {"success": True, "issue": row}}})
         if "issues(" in q:
             rows = s["issues"] if v.get("arch") else [r for r in s["issues"] if not r["archivedAt"]]
@@ -218,6 +220,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self._reply({"data": {"team": s["team"]}})
         if "issue(id" in q:
             row = find(s, v["id"])
+            if s.get("stale") and row and row["id"] == s["stale"]["id"]:
+                stale, s["stale"] = s["stale"], None
+                return self._reply({"data": {"issue": stale}})
             return self._reply({"data": {"issue": row}}) if row else self._errors("Entity not found: Issue")
         return self._errors("consulta desconhecida da bancada")
 
@@ -250,7 +255,7 @@ class Fake:
 def env_for(fake, provider="linear", extra=None):
     env = {k: v for k, v in os.environ.items() if not k.startswith(("LINEAR_", "TM_", "CLICKUP_", "ZOHO_", "JIRA_", "ASANA_", "TASK_MANAGER"))}  # chaves de linear, clickup, zoho, jira e asana fora
     env.update({"TASK_MANAGER_PROVIDER": provider, "TM_ENV_FILE": "/nao-existe.env", "LINEAR_API_KEY": "lin_fake_bench", "LC_ALL": "C.UTF-8",
-                "TM_LINEAR_ENDPOINT": f"http://127.0.0.1:{fake.port}/graphql"})
+                "TM_LINEAR_ENDPOINT": f"http://127.0.0.1:{fake.port}/graphql", "TM_LINEAR_NO_PAUSE": "1"})
     env.update(extra or {})
     return env
 
@@ -333,6 +338,13 @@ def c_due_lies(d):
     with Fake("update_lies") as f:
         rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30")
         return "" if rc == 1 and out is None and "releitura" in err else f"rc={rc} {out} {err[:120]}"
+
+
+def c_read_lag(d):
+    # leitura logo após a escrita devolve o valor velho (medido em 3 de 40): a releitura repete, não acusa
+    with Fake("read_lag") as f:
+        rc, out, err = tm(d, f, "estimate.points", "SAC-70", "5")
+        return "" if rc == 0 and out["estimate"] == 5 else f"rc={rc} {out} {err[:120]}"
 
 
 def c_reread_fails(d):
@@ -769,7 +781,7 @@ def c_overlay_declared(d):
         path = os.path.join(m.tmp, "o.json")
         with open(path, "w", encoding="utf-8") as fh:
             json.dump({"SAC-1200": 1}, fh)
-        for category, want_rc in (("lambda", 0), ("beta", 3)):
+        for category, want_rc in (("lambda", 0), ("beta", 4)):
             rc, out, err = m.run(f, "propose", "--points", "8", "--category", category, "--estimates-overlay", path)
             if rc != want_rc or out.get("estimates_overlay", {}).get("entries") != 1:
                 return f"{category}: rc={rc} {out}"
@@ -850,9 +862,10 @@ def c_propose_aged(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--issue", "SAC-83")
         work = sorted(3 * w / p for w, p in zip(LAMBDA_WORK, LAMBDA_POINTS))[conformal_k(16, .8) - 1]
-        if rc != 3 or out["status"] != "beyond_history" or out["proposal"] is not None or "if_started_now" in out:
+        if not provisional_gate(rc, out, "beyond_history") or "if_started_now" in out["calibration_gate"]:
             return f"rc={rc} {out}"
-        return "" if abs(out["work_hours_if_started_now"] - work) < 0.01 else f"horas {out['work_hours_if_started_now']}, esperado {work}"
+        got = out["calibration_gate"]["work_hours_if_started_now"]
+        return "" if abs(got - work) < 0.01 else f"horas {got}, esperado {work}"
 
 
 def c_propose_closed(d):
@@ -902,10 +915,14 @@ def c_null_family_error(d):
     return "" if any_pass <= 15 else f"falso positivo familiar {any_pass}/{trials}"
 
 
+def provisional_gate(rc, out, status):
+    return rc == 4 and out["status"] == "provisional_team_band" and out["proposal"] is None and out["calibration_gate"]["status"] == status
+
+
 def signal_refused(d, category, reason):
     with Fake() as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", category)
-        return "" if rc == 3 and out["status"] == "no_points_signal" and out["signal"]["reason"] == reason else f"rc={rc} {out}"
+        return "" if provisional_gate(rc, out, "no_points_signal") and out["calibration_gate"]["signal"]["reason"] == reason else f"rc={rc} {out}"
 
 
 def c_signal_no_variance(d):
@@ -927,13 +944,13 @@ def c_signal_baseline(d):
 def c_miscalibrated(d):
     with Fake(rows=drift_population()) as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", "drift")
-        return "" if rc == 3 and out["status"] == "miscalibrated" and out["backtest"]["n"] >= 10 else f"rc={rc} {out}"
+        return "" if provisional_gate(rc, out, "miscalibrated") and out["calibration_gate"]["backtest"]["n"] >= 10 else f"rc={rc} {out}"
 
 
 def c_not_measured(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", "curto")
-        return "" if rc == 3 and out["status"] == "calibration_not_measured" and out["proposal"] is None and out["backtest"]["n"] == 0 else f"rc={rc} {out}"
+        return "" if provisional_gate(rc, out, "calibration_not_measured") and out["calibration_gate"]["backtest"]["n"] == 0 else f"rc={rc} {out}"
 
 
 def c_gate_by_category(d):
@@ -943,13 +960,13 @@ def c_gate_by_category(d):
         if team is None or team < 0.7:
             return f"fixture: time cobre {team}, devia passar"
         rc, out, err = propose(d, f, "--points", "3", "--category", "drift")
-        return "" if rc == 3 and out["status"] == "miscalibrated" else f"rc={rc} {out}"
+        return "" if provisional_gate(rc, out, "miscalibrated") else f"rc={rc} {out}"
 
 
 def c_propose_insufficient(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--points", "3", "--category", "beta")
-        return "" if rc == 3 and out["proposal"] is None and out["status"] == "insufficient_sample" else f"rc={rc} {out}"
+        return "" if provisional_gate(rc, out, "insufficient_sample") else f"rc={rc} {out}"
 
 
 def c_propose_not_calibrated(d):
@@ -961,7 +978,147 @@ def c_propose_not_calibrated(d):
 def c_propose_no_points(d):
     with Fake() as f:
         rc, out, err = propose(d, f, "--issue", "SAC-71")
-        return "" if rc == 3 and "sem pontos" in out["reason"] else f"rc={rc} {out}"
+        return "" if provisional_gate(rc, out, "no_points") and "sem pontos" in out["calibration_gate"]["reason"] else f"rc={rc} {out}"
+
+
+def team_rows(extra=()):
+    """Doze issues em categorias sem base: fila 10..120 e trabalho 1..12, totais 11×k."""
+    rows = [issue(1 + k, f"{'alpha' if k % 2 else 'delta'} {k}", created=100 * k, queue=10 * (k + 1), work=k + 1, est=2) for k in range(12)]
+    return rows + list(extra)
+
+
+def team_propose(d, *extra, args=("--points", "3", "--category", "alpha")):
+    with Fake(rows=team_rows(extra)) as f:
+        return propose(d, f, *args)
+
+
+def conf(values, q):
+    v = sorted(values)
+    return v[conformal_k(len(v), q) - 1]
+
+
+def c_team_band_exact(d):
+    rc, out, err = team_propose(d)
+    if rc != 4 or out["status"] != "provisional_team_band":
+        return f"rc={rc} {out} {err[:160]}"
+    p = out["provisional"]
+    totals = [11 * k for k in range(1, 13)]
+    want = {"earliest": conf(totals, .25), "likely": conf(totals, .5), "latest": conf(totals, .8)}
+    if p["hours_from_now"] != want or p["dates_not_calibrated"] != {k: date_after(v) for k, v in want.items()}:
+        return f"{p['hours_from_now']} {p['dates_not_calibrated']}, esperado {want}"
+    return "" if p["confidence"] == "low" and p["calibrated"] is False and p["latest_percentile"] == 80 else f"{p}"
+
+
+def c_team_never_a_due_date(d):
+    rc, out, err = team_propose(d)
+    return "" if out["proposal"] is None and "due_date" not in json.dumps(out) and rc not in (0, 3) else f"rc={rc} {json.dumps(out)[:200]}"
+
+
+def c_team_queue_work_separate(d):
+    rc, out, err = team_propose(d)
+    p = out["provisional"]
+    q, w = [10 * k for k in range(1, 13)], list(range(1, 13))
+    return "" if p["queue_hours_remaining"]["latest"] == conf(q, .8) and p["work_hours"]["latest"] == conf(w, .8) and p["queue_hours_remaining"]["earliest"] == conf(q, .25) else f"{p}"
+
+
+def c_team_accuracy(d):
+    rc, out, err = team_propose(d, issue(20, "alpha sem início", created=700, completed_at=2000), issue(21, "alpha velha", created=NOW_H - 500, state=("Todo", "unstarted")))
+    a = out["measured_accuracy"]
+    if a["n"] != 12 or a["completed_only"] != 0.833:
+        return f"{a}"
+    o = a["with_open"]
+    return "" if (o["completed_miss"], o["open_overdue"]) == (3, 1) and a["temporal"]["status"] == "not_measured" else f"{o}"
+
+
+def c_team_age_conditional(d):
+    rc, out, err = team_propose(d, issue(30, "alpha nova", created=NOW_H - 25, state=("Todo", "unstarted"), est=3), args=("--issue", "SAC-30"))
+    p = out["provisional"]
+    totals = [10 * k - 25 + k for k in range(3, 13)]
+    if rc != 4 or p["queue_basis"] != "conditional_on_age_in_queue" or p["sample_used"] != 10:
+        return f"rc={rc} {p}"
+    return "" if p["hours_from_now"]["latest"] == conf(totals, .8) and p["assumes_start_now"] is False else f"{p}"
+
+
+def c_team_queue_after_age(d):
+    rc, out, err = team_propose(d, issue(35, "alpha nova", created=NOW_H - 25, state=("Todo", "unstarted"), est=3), args=("--issue", "SAC-35"))
+    q = [10 * k - 25 for k in range(3, 13)]
+    return "" if out["provisional"]["queue_hours_remaining"]["latest"] == conf(q, .8) else f"{out['provisional']}"
+
+
+def c_team_age_beyond_max(d):
+    rc, out, err = team_propose(d, issue(31, "alpha muito velha", created=NOW_H - 1000, state=("Todo", "unstarted"), est=3), args=("--issue", "SAC-31"))
+    p = out["provisional"]
+    if rc != 4 or p["age_beyond_max_queue"] is not True or p["assumes_start_now"] is not True or p["queue_hours_remaining"] is not None:
+        return f"rc={rc} {p}"
+    return "" if p["hours_from_now"]["latest"] == conf(range(1, 13), .8) and p["max_queue_seen_hours"] == 120 and any(w["code"] == "age_beyond_queue_history" for w in out["warnings"]) else f"{out['warnings']}"
+
+
+def c_team_few_waited(d):
+    rc, out, err = team_propose(d, issue(32, "alpha", created=NOW_H - 95, state=("Todo", "unstarted"), est=3), args=("--issue", "SAC-32"))
+    p = out["provisional"]
+    return "" if rc == 4 and p["age_beyond_max_queue"] is False and p["assumes_start_now"] is True else f"rc={rc} {p}"
+
+
+def c_team_started(d):
+    rc, out, err = team_propose(d, issue(33, "alpha ativa", created=NOW_H - 10, queue=8, est=3, state=("In Progress", "started")), args=("--issue", "SAC-33"))
+    p = out["provisional"]
+    rem = [k - 2 for k in range(3, 13)]
+    return "" if rc == 4 and p["queue_basis"] == "already_started" and p["queue_hours_remaining"] is None and p["hours_from_now"]["latest"] == conf(rem, .8) else f"rc={rc} {p}"
+
+
+def c_team_started_too_long(d):
+    rc, out, err = team_propose(d, issue(34, "alpha eterna", created=NOW_H - 900, queue=50, est=3, state=("In Progress", "started")), args=("--issue", "SAC-34"))
+    return "" if rc == 3 and out["status"] == "beyond_history" and out["proposal"] is None and "provisional" not in out else f"rc={rc} {out}"
+
+
+def c_team_too_small(d):
+    with Fake(rows=team_rows()[:3]) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        return "" if rc == 3 and out["status"] == "insufficient_sample" and "provisional" not in out else f"rc={rc} {out}"
+
+
+def c_team_excludes_human(d):
+    rows = team_rows([issue(40, "[maestro · 12/11] ato", created=10, queue=1000, work=1000, est=2)])
+    with Fake(rows=rows) as f:
+        rc, out, err = propose(d, f, "--points", "3", "--category", "alpha")
+        return "" if out["provisional"]["max_queue_seen_hours"] == 120 else f"{out['provisional']}"
+
+
+def c_calibrated_wins(d):
+    with Fake() as f:
+        rc, out, err = propose(d, f, "--points", "8", "--category", "lambda")
+        return "" if rc == 0 and out["status"] == "proposed" and "provisional" not in out else f"rc={rc} {out and out['status']}"
+
+
+def write_retro(m, ids):
+    path = os.path.join(m.tmp, "retro.tsv")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("identifier\tpoints\tconfidence\tbatch\tapplied_on\n")
+        for i in ids:
+            fh.write(f"{i}\t2\thigh\tblind\t2026-11-09\n")
+    return path
+
+
+def c_retro_separated(d):
+    with Fake() as f, Meter(d) as m:
+        path = write_retro(m, ["SAC-1", "SAC-2"])
+        rc, out, err = m.run(f, "report", "--retro-file", path)
+        if rc != 0 or cat(out, "alpha")["points_origin"] != {"retro": 2, "pre_execution": 4} or not any(w["code"] == "retro_estimates" for w in out["warnings"]):
+            return f"rc={rc} {out and cat(out, 'alpha')['points_origin']}"
+        rc, out, err = m.run(f, "report", "--retro-file", path, "--exclude-retro")
+        return "" if rc == 0 and cat(out, "alpha")["with_points"] == 4 else f"sem retro: {cat(out, 'alpha')['with_points']}"
+
+
+def c_retro_bad_file(d):
+    with Fake() as f, Meter(d) as m:
+        rc, _, err = m.run(f, "report", "--retro-file", os.path.join(m.tmp, "nao.tsv"))
+        if rc != 2 or "retroestimadas" not in err:
+            return f"rc={rc} {err[:120]}"
+        path = os.path.join(m.tmp, "ruim.tsv")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("lixo\n")
+        rc, _, err = m.run(f, "report", "--retro-file", path)
+        return "" if rc == 2 and "esperado" in err else f"rc={rc} {err[:120]}"
 
 
 def c_propose_usage(d):
@@ -1072,6 +1229,7 @@ CASES = [
     ("e-noop", "provedor que ignora a escrita vira erro", c_estimate_noop),
     ("e-lie", "retorno da mutação mentindo: a leitura separada acusa", c_estimate_lies),
     ("d-lie", "prazo com retorno mentindo: a leitura separada acusa", c_due_lies),
+    ("e-lag", "atraso de leitura não vira falso erro", c_read_lag),
     ("e-gone", "releitura que falha é rc 1 nomeado", c_reread_fails),
     ("net-to", "timeout de resposta é rc 1 com mensagem", c_timeout),
     ("e-scale", "valor fora da escala não vai à mutação", c_estimate_out_of_scale),
@@ -1146,6 +1304,21 @@ CASES = [
     ("p-insuf", "amostra insuficiente: rc 3 e sem data", c_propose_insufficient),
     ("p-nocal", "categoria não calibrada: rc 3", c_propose_not_calibrated),
     ("p-nopts", "issue sem pontos: rc 3", c_propose_no_points),
+    ("t-exact", "faixa do time: P25, P50 e P80 da soma por issue", c_team_band_exact),
+    ("t-nodate", "faixa nunca vira due_date nem rc de calibrada", c_team_never_a_due_date),
+    ("t-sep", "fila e trabalho separados", c_team_queue_work_separate),
+    ("t-acc", "acerto da própria faixa, com abertas e temporal", c_team_accuracy),
+    ("t-age", "idade condiciona a fila", c_team_age_conditional),
+    ("t-sep2", "fila restante desconta a idade", c_team_queue_after_age),
+    ("t-max", "além da fila máxima: supõe início agora e avisa", c_team_age_beyond_max),
+    ("t-few", "poucas esperaram tanto, sem passar do máximo", c_team_few_waited),
+    ("t-start", "iniciada: só o trabalho restante", c_team_started),
+    ("t-long", "iniciada além do que o time durou: rc 3", c_team_started_too_long),
+    ("t-small", "time sem amostra: rc 3", c_team_too_small),
+    ("t-human", "ato humano fora da faixa", c_team_excludes_human),
+    ("t-wins", "categoria que passa nos portões sai proposed", c_calibrated_wins),
+    ("r-retro", "retroestimadas separadas e excluíveis", c_retro_separated),
+    ("r-retrobad", "arquivo de retroestimadas inválido é rc 2", c_retro_bad_file),
     ("p-usage", "uso errado do propose", c_propose_usage),
     ("ro", "medidor nunca escreve", c_read_only),
     ("b-leak", "amostra sem data, duração, referência", c_blind_no_leak),
@@ -1162,7 +1335,8 @@ CASES = [
 L = "adapters/linear.py"
 V = "velocity-meter.py"
 MUTANTS = [
-    (L, '    if after.get(field) != value:', "    if False:", "e-noop"),
+    (L, '        if after.get(field) == value:', "        if True:", "e-noop"),
+    (L, '    for pause in REREAD_PAUSES:', "    for pause in REREAD_PAUSES[:1]:", "e-lag"),
     (L, '        after = _issue(iss["identifier"])\n', '        after = {**iss, field: value}\n', "e-lie"),
     (L, '        after = _issue(iss["identifier"])\n', '        after = _issue_update(iss["id"], {field: value})\n', "d-lie"),
     (L, 'raise TmError(f"{iss[\'identifier\']}: escrita enviada e a releitura falhou ({e}); confira antes de repetir")', 'raise', "e-gone"),
@@ -1176,7 +1350,7 @@ MUTANTS = [
     (L, '    if raw is not None and not re.fullmatch(r"[0-9]+", raw):', '    if raw is not None and not re.match(r"^\\d+$", raw):', "e-bad"),
     (L, '    if len(args) != 2 or (args[1].startswith("-") and args[1] != "--clear") or args[0].startswith("-"):', "    if len(args) < 1:", "usage"),
     (L, 'return {"issue": iss["identifier"], "estimate": iss.get("estimate"), "scale"', 'return {"issue": iss["identifier"], "estimate": None, "scale"', "p-read"),
-    (L, '    if after.get(field) != value:', "    if False:", "d-noop"),
+    (L, '        if after.get(field) == value:', "        if True:", "d-noop"),
     (L, '        datetime.date.fromisoformat(value)\n', "        pass\n", "d-bad"),
     (L, '        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):\n            raise ValueError\n', "", "d-bad"),
     # sem mutante \\d na data: date.fromisoformat recusa os mesmos valores, e o mutante seria equivalente
@@ -1202,7 +1376,7 @@ MUTANTS = [
     (V, '(?:(?:hoje|seg|ter|qua|qui|sex|s[áa]b|dom)\\s+)?(\\d{1,2})', '(?:[^\\]]*\\s+)?(\\d{1,2})', "r-title"),
     (V, '            due = dt.date(year, int(m.group(2)), int(m.group(1)))\n        except ValueError:\n            continue', '            due = dt.date(year, int(m.group(2)), int(m.group(1)))\n        except ZeroDivisionError:\n            continue', "r-title"),
     (V, '    return members, members[:window]', "    return members, members", "r-win"),
-    (V, '"points": overlay.get(i["identifier"], i.get("estimate"))', '"points": i.get("estimate")', "r-over"),
+    (V, 'else overlay.get(i["identifier"], i.get("estimate")),', 'else i.get("estimate"),', "r-over"),
     (V, '    others = [r["title"] for r in rows if r["category"] == UNCATEGORIZED]', "    others = []", "r-other"),
     (V, '    if not rules:\n        warnings.append', "    if False:\n        warnings.append", "r-norules"),
     (V, '    if data.get("truncated"):', "    if False:", "r-trunc"),
@@ -1269,10 +1443,35 @@ MUTANTS = [
     (V, '    elif base is not None and err > base:', "    elif False:", "s-base"),
     (V, '    if check["coverage_due"] < BACKTEST_FLOOR:', "    if False:", "s-drift"),
     (V, '    if check["n"] < BACKTEST_MIN:\n        return refusal', '    if False:\n        return refusal', "s-small"),
-    (V, '    if len(history) < MIN_SAMPLE:\n        return refusal', '    if False:\n        return refusal', "p-insuf"),
+    (V, '    if len(history) < MIN_SAMPLE:\n        return refusal(f"{len(history)} issue(s)', '    if False:\n        return refusal(f"{len(history)} issue(s)', "p-insuf"),
     (V, '    if len(remaining) < MIN_SAMPLE:', "    if False:", "p-old"),
+    (V, 'PROVISIONAL_RC = 4', "PROVISIONAL_RC = 0", "t-nodate"),
+    (V, 'return {"status": "provisional_team_band", "proposal": None,', 'return {"status": "provisional_team_band", "proposal": {"due_date": "2026-12-01"},', "t-nodate"),
+    (V, '"latest": DUE_QUANTILE}', '"latest": HIGH_QUANTILE}', "t-exact"),
+    (V, 'totals, basis = sorted(r["queue_h"] - age + r["work_h"] for r in waiting), "conditional_on_age_in_queue"', 'totals, basis = sorted(r["work_h"] for r in waiting), "conditional_on_age_in_queue"', "t-age"),
+    (V, 'band(queue) if queue else None', 'None', "t-sep"),
+    (V, '"work_hours": band(work),', '"work_hours": band(totals),', "t-sep"),
+    (V, '            queue = sorted(r["queue_h"] - age for r in waiting)', '            queue = sorted(r["queue_h"] for r in waiting)', "t-sep2"),
+    (V, 'waiting = [r for r in history if r["queue_h"] >= age]', 'waiting = list(history)', "t-age"),
+    (V, '        if len(waiting) >= MIN_SAMPLE:  # idade', '        if waiting:  # idade', "t-few"),
+    (V, 'detail["age_beyond_max_queue"] = age > max_queue', 'detail["age_beyond_max_queue"] = True', "t-few"),
+    (V, 'detail["assumes_start_now"] = True', 'pass', "t-max"),
+    (V, 'work = sorted(r["work_h"] - elapsed for r in history if r["work_h"] > elapsed)', 'work = sorted(r["work_h"] for r in history if r["work_h"] > elapsed)', "t-start"),
+    (V, '        if len(work) < MIN_SAMPLE:\n            return refusal', '        if False:\n            return refusal', "t-long"),
+    (V, '    if len(history) < MIN_SAMPLE:\n        return refusal(f"o time', '    if False:\n        return refusal(f"o time', "t-small"),
+    (V, 'return [{**r, "category": "team"} for r in rows if r["calibrate"]]', 'return [{**r, "category": "team"} for r in rows]', "t-human"),
+    (V, '"completed_only": loo["coverage_due"]', '"completed_only": 0.857', "t-acc"),
+    (V, '"with_open": coverage_with_open(view, opened, now, TEAM_WINDOW, False),', '"with_open": coverage_with_open(view, [], now, TEAM_WINDOW, False),', "t-acc"),
+    (V, 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history")', 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "calibration_not_measured", "miscalibrated", "beyond_history")', "s-inv"),
+    (V, 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history")', 'PROVISIONAL_GATES = ("insufficient_sample", "no_points", "no_points_signal", "calibration_not_measured", "miscalibrated", "beyond_history", "proposed")', "t-wins"),
+    (V, 'status="not_calibrated", category=category)', 'category=category)', "p-nocal"),
+    (V, '"estimate_origin": "retro" if i["identifier"] in retro else "pre_execution"', '"estimate_origin": "pre_execution"', "r-retro"),
+    (V, '"points": None if exclude_retro and i["identifier"] in retro else overlay.get', '"points": overlay.get', "r-retro"),
+    (V, '    if origin["retro"]:\n', "    if False:\n", "r-retro"),
+    (V, '        raise MeterError(f"arquivo de retroestimadas não encontrado: {path}")', '        return set()', "r-retrobad"),
+    (V, 'if len(parts) != 5 or not re.fullmatch(r"[A-Z][A-Z0-9]*-[0-9]+", parts[0]):', 'if False:', "r-retrobad"),
     (V, '    if not stats["calibrate"]:', "    if False:", "p-nocal"),
-    (V, '        if not points:\n            return refusal', "        if False:\n            return refusal", "p-nopts"),
+    (V, '    if not points:\n        gate = {"status": "no_points"', '    if False:\n        gate = {"status": "no_points"', "p-nopts"),
     (V, '    elif points is None or not category:', "    elif False:", "p-usage"),
     (V, '    return {"status": "proposed",\n', '    tm("due_date.set", "SAC-70", date_for(due))\n    return {"status": "proposed",\n', "ro"),
     (V, '        t = re.sub(r"^\\s*\\[[^\\]]*\\]\\s*", "", t)', "        pass", "b-leak"),
