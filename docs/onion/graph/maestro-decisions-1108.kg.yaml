@@ -7,8 +7,8 @@ meta:
   baseline: "2026-11-08"
   review_after: "2026-12-08"
   purpose: "Guardar os selos da rodada de perguntas de 2026-11-08 que não têm grafo natural aberto. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
-  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia) mais, na leva seguinte do mesmo dia, 2 selos do escopo e dos riscos do WAHA e 3 perguntas abertas, uma por risco a medir no piloto; por fim, o selo do sandbox e 2 perguntas abertas que nascem dele. Em 2026-11-09 entram aqui, por ordem da sessão do core, a evidência da rodada desse dia e os 4 selos dela. Outra decisão nova vai para o grafo do assunto."
-  # ═══ TETO: 23 NÓS ═══
+  note: "TETO, declarado: 2 evidências de origem e 8 selos da rodada (o 8º, sobre o escopo da retirada do nome, veio da mesma leva do mesmo dia) mais, na leva seguinte do mesmo dia, 2 selos do escopo e dos riscos do WAHA e 3 perguntas abertas, uma por risco a medir no piloto; por fim, o selo do sandbox e 2 perguntas abertas que nascem dele. Em 2026-11-09 entram aqui, por ordem da sessão do core, a evidência da rodada desse dia, os 4 selos dela e 1 pergunta aberta sobre o próximo update da consultoria. Outra decisão nova vai para o grafo do assunto."
+  # ═══ TETO: 24 NÓS ═══
 nodes:
   - id: E_MD_MAESTRO_ROUND_1108
     node_type: evidence
@@ -309,8 +309,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-09"
     verified_against: "decisão do maestro em 2026-11-09, por pergunta com opções (/meta:decide): escolhida «Registrar e atualizar»"
-    label: "O adotante de consultoria é registrado com id neutro e atualizado. O registro é de outro agente; aqui só o selo."
-    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Registrar e atualizar»; descartadas: «Só atualizar» · «Deixar para depois»."
+    label: "O adotante de consultoria é registrado com id neutro e atualizado; os dois atos já estavam feitos em 2026-11-07, antes da pergunta."
+    narrative: "Selado por /meta:decide em 2026-11-09: escolhida «Registrar e atualizar»; descartadas: «Só atualizar» · «Deixar para depois». A pergunta levada ao maestro em 2026-11-09 estava vencida: o registro e o update já tinham sido feitos em 2026-11-07, e a medida está em Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106. A resposta fica registrada; o que falta é o próximo update, em Q_MD_CONSULTING_NEXT_UPDATE_1109."
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-09: «Adotante de consultoria, fora do members.yaml e com o kg-ssot defasado: o que fazer?»"
@@ -348,6 +348,16 @@ nodes:
       locator: "pergunta com opções de 2026-11-09: «Teste da campainha entre máquinas: quando?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
       locality: "pessoa"
+  - id: Q_MD_CONSULTING_NEXT_UPDATE_1109
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.6
+    label: "O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI."
+    narrative: "Pronto quando: a SAC-302 está curada e o update seguinte do adotante fecha com merge verificado, com o pin novo na main dele e no members.yaml. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-382."
 edges:
   - from: D_MD_MAIN_RULESET_NFF_DELETION_1108
     to: E_MD_MAESTRO_ROUND_1108
@@ -412,6 +422,9 @@ edges:
   - from: D_MD_DOORBELL_CROSS_MACHINE_AFTER_10_1109
     to: E_MD_MAESTRO_ROUND_1109
     edge_type: TRACES_TO
+  - from: Q_MD_CONSULTING_NEXT_UPDATE_1109
+    to: D_MD_CONSULTING_ADOPTER_REGISTER_1109
+    edge_type: TRACES_TO
 external_edges:
   - from: D_MD_WAHA_SCOPE_INTERNAL_READ_FORWARD_1108
     to: "docs/onion/graph/persona-fases-2-3-2026-11.kg.yaml#D_PF_WAHA_DEDICATED_NUMBER_1108"
@@ -428,4 +441,4 @@ external_edges:
   - from: D_MD_CONSULTING_ADOPTER_REGISTER_1109
     to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_UPDATE_CONSULTORIA_1106"
     edge_type: SUPPORTS
-    label: "o selo responde à pergunta; o nó fecha com o registro e o update, feitos por outro agente"
+    label: "o selo registra a resposta; a pergunta fecha pela medida do que já estava feito"
