@@ -348,6 +348,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-09: «Higiene dos grafos, com 736 decisões sem porquê e 63 superados sem substituto: o que fazer?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
       locality: "pessoa"
+  - id: E_KG_TOUCHED_BACKTEST_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-09"
+    verified_against: "kg_gate.py --touched da kg-ssot 4.47.0 sobre as cabeças dos 60 PRs mergeados mais recentes, 2026-11-09: 34 mexem em grafo do corpus, 34 com rc 0 e nenhum rc 1 ou 2"
+    label: "O gate --touched não reprovaria nenhum dos 34 PRs recentes que mexeram em grafo, e dispara quando um nó da dívida é tocado de verdade."
+    narrative: "Medido antes de ligar no CI: cabeça de cada PR contra a base dele, com as exclusões do ops/kg-gate-ci.sh. Nenhum PR legítimo reprovaria. O mutante que muda o label de D_FIX_GAP2, decisão da dívida antiga, sai rc 1 e o nomeia; o que muda só o verified_at do mesmo nó sai rc 0. Teto: 34 PRs de um período em que a dívida já existia, e quem tocar um dos 736 ou 63 nós passa a pagar, que é o efeito pedido."
+    provenance:
+      source: "ops/kg-gate-ci.sh e kg_gate.py --touched, na branch do vendor 4.47.0"
+      locator: "PRs mergeados até 2026-11-09, via refs/pull/N/head"
+      method: "measurement: backtest por PR e dois mutantes, 2026-11-09"
+      locality: "repo"
   - id: D_MD_CONSULTING_ADOPTER_REGISTER_1109
     node_type: decision
     layer: audit
@@ -407,6 +423,9 @@ nodes:
     label: "O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI."
     narrative: "Pronto quando: a SAC-302 está curada e o update seguinte do adotante fecha com merge verificado, com o pin novo na main dele e no members.yaml. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-382."
 edges:
+  - from: E_KG_TOUCHED_BACKTEST_1109
+    to: D_MD_GRAPH_HYGIENE_RATCHET_SCOUT_1109
+    edge_type: SUPPORTS
   - from: D_MD_MAIN_RULESET_NFF_DELETION_1108
     to: E_MD_MAESTRO_ROUND_1108
     edge_type: TRACES_TO

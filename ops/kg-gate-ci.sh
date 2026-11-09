@@ -49,6 +49,24 @@ python3 -I "${KGT}/kg_gate.py" \
   "${allow[@]}" "$@"
 gate_rc=$?
 
+# O ESCOTEIRO (kg-ssot 4.47.0, «Catraca e escoteiro», maestro 2026-11-09): a dívida antiga de decisão sem porquê e
+# de nó superado sem substituto segue aceita na base; o nó TOCADO desde a base paga. Fora do --update (ele grava a
+# base, não julga o diff). Base: origin/main em PR, no pr-finalize e no dispatch; HEAD^1 no push (a origin/main já
+# é o próprio HEAD ali, e o diff sairia vazio). Exige história (fetch-depth: 0); sem ela o gate sai rc 2, não verde.
+touched_rc=0
+case " $* " in
+  *" --update "*) ;;
+  *)
+    touched_base=origin/main
+    [ "${GITHUB_EVENT_NAME:-}" = push ] && touched_base='HEAD^1'
+    python3 -I "${KGT}/kg_gate.py" --touched "${touched_base}" \
+      --exclude 'docs/evolution/kg-inbox/_rejected/*' \
+      --exclude 'docs/evolution/kg-inbox/_sealed/*' \
+      "${allow[@]}"
+    touched_rc=$?
+    ;;
+esac
+
 # O critério pré-registrado por HASH (kg-ssot 4.21.0): o leitor não calcula hash, então a régua editada no lugar
 # só é pega aqui. Roda sempre (inclusive com --update), e o rc final é o pior dos dois; 2 (não julgou) vence.
 bash "$(dirname "${BASH_SOURCE[0]}")/kg-criterion-ci.sh"; crit_rc=$?
@@ -57,7 +75,8 @@ bash "$(dirname "${BASH_SOURCE[0]}")/kg-criterion-ci.sh"; crit_rc=$?
 # base .kg-ssot/vocab-lint.json, com as externas de .kg-ssot/vocab-externals.tsv. Roda sempre e SEM --update
 # (a base dele se regrava só por `bash ops/kg-vocab-ci.sh --update`, no PR que nomeia).
 bash "$(dirname "${BASH_SOURCE[0]}")/kg-vocab-ci.sh"; vocab_rc=$?
-[ "$gate_rc" -eq 2 ] || [ "$crit_rc" -eq 2 ] || [ "$vocab_rc" -eq 2 ] && exit 2
+[ "$gate_rc" -eq 2 ] || [ "$touched_rc" -eq 2 ] || [ "$crit_rc" -eq 2 ] || [ "$vocab_rc" -eq 2 ] && exit 2
 [ "$gate_rc" -ne 0 ] && exit "$gate_rc"
+[ "$touched_rc" -ne 0 ] && exit "$touched_rc"
 [ "$crit_rc" -ne 0 ] && exit "$crit_rc"
 exit "$vocab_rc"
