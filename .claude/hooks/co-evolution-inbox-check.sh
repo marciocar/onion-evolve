@@ -16,7 +16,8 @@
 # sessão longa ficava parado em silêncio até a próxima sessão, porque o spool mora fora dos repos e a campainha
 # só olha inbox/ e inbound/. Depois da importação o arquivo está no inbox/, e a campainha o vê no tick seguinte.
 # Sai ANTES do pull do bridge e das contagens: 1 teste de diretório com o spool vazio (~25 ms medidos, sem rede).
-# Só fala quando algo entrou, com a contagem e nada do conteúdo. Fica descoberto: sessão ociosa e turno longo
+# Fala quando algo entrou, com a contagem e nada do conteúdo. Sinal retido (ilegível, link, homônimo commitado) avisa
+# uma vez por sessão e contagem, para não virar uma linha por prompt nem ficar calado para sempre. Fica descoberto: sessão ociosa e turno longo
 # (não há prompt que dispare), e subagente (não recebe UserPromptSubmit).
 if [ "${1:-}" = "prompt" ]; then
   _sh="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/co-evolution/spool-import.sh"
@@ -26,6 +27,15 @@ if [ "${1:-}" = "prompt" ]; then
     "imported="[1-9]*)
       _n="${_out#imported=}"; _n="${_n%% *}"
       printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"📬 Onion co-evolução: %s sinal(is) chegou(aram) pelo spool do carteiro ao inbox/. Rode /meta:co-evolve para ler/gerenciar."}}\n' "$_n"
+      ;;
+    *"pending="[1-9]*)
+      _p="${_out##*pending=}"
+      _state="${ONION_SPOOL_NOTICE_DIR:-${XDG_RUNTIME_DIR:-/tmp}/onion-spool-notice}"
+      mkdir -p "$_state" 2>/dev/null || true
+      _mark="$_state/${CLAUDE_CODE_SESSION_ID:-nosession}-$_p"
+      [ -e "$_mark" ] && exit 0
+      : > "$_mark" 2>/dev/null || true
+      printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"📮 Onion co-evolução: %s sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve mostra o motivo)."}}\n' "$_p"
       ;;
   esac
   exit 0
@@ -111,7 +121,7 @@ nd="$(count_overdue_diary)"                   # reflexão (diário vencido)
 msg=""
 [ "${nb:-0}" -gt 0 ] 2>/dev/null && msg="📬 Onion co-evolução: ${nb} mensagem(ns) no inbox (upstream: sinal/feedback)."
 [ "${na:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📥 Onion co-evolução: ${na} entrega(s) do core em inbound/ (downstream: relatório de update/anúncio)."
-[ "${np:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📮 Onion co-evolução: ${np} sinal(is) retido(s) no spool do carteiro (o inbox/ já commitou um homônimo; /meta:co-evolve)."
+[ "${np:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }📮 Onion co-evolução: ${np} sinal(is) retido(s) no spool do carteiro (homônimo já commitado, link ou erro de leitura; /meta:co-evolve)."
 [ "${nd:-0}" -gt 0 ] 2>/dev/null && msg="${msg:+$msg }⏰ Onion diário: ${nd} migalha(s) com review_after vencido — reflexão pendente (/meta:diary list)."
 
 [ -n "$msg" ] || exit 0
