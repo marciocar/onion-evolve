@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 
 ROOT = (sys.argv[1] if len(sys.argv) > 1 else
         subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() or os.getcwd())
@@ -64,7 +65,7 @@ def issue(n, title, created=None, queue=None, work=None, est=None, due=None, par
             "priorityLabel": "None", "estimate": est, "createdAt": ts(created), "updatedAt": ts(created),
             "startedAt": None if started is None else ts(started), "completedAt": None if completed is None else ts(completed), "canceledAt": None,
             "dueDate": due, "archivedAt": None, "state": {"id": "s1", "name": state[0], "type": state[1]},
-            "team": {"id": "team-sac", "key": "SAC", "name": "Sacola"}, "project": {"id": "proj-1", "name": "Core"},
+            "team": {"id": "team-sac", "key": "SAC", "name": "Core Team"}, "project": {"id": "proj-1", "name": "Core"},
             "parent": {"id": f"uuid-{parent}", "identifier": f"SAC-{parent}", "title": "mae"} if parent else None,
             "assignee": None, "labels": {"nodes": []}}
 
@@ -161,10 +162,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
         req = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)).decode("utf-8"))
         q, v, s = req["query"], req.get("variables") or {}, self.store
         s["log"].append({"query": q, "variables": v})
+        if s["force"] == "hang":
+            time.sleep(2.5)
+            return None
+        if s["force"] == "gone":
+            return self._errors("Entity not found: Issue")
         if "issueUpdate" in q:
             row = find(s, v["id"])
+            if s["force"] == "update_lies":
+                return self._reply({"data": {"issueUpdate": {"success": True, "issue": {**row, **v["in"]}}}})
             if s["force"] != "update_noop":
                 row.update(v["in"])
+            if s["force"] == "reread_gone":
+                s["force"] = "gone"
             return self._reply({"data": {"issueUpdate": {"success": True, "issue": row}}})
         if "issues(" in q:
             rows = s["issues"] if v.get("arch") else [r for r in s["issues"] if not r["archivedAt"]]
@@ -232,8 +242,8 @@ def parse(p):
     return p.returncode, out, p.stderr.strip()
 
 
-def tm(d, fake, *args):
-    return parse(subprocess.run(["bash", os.path.join(d, "tm.sh"), *args], capture_output=True, text=True, env=env_for(fake), timeout=20, cwd=d))
+def tm(d, fake, *args, extra=None):
+    return parse(subprocess.run(["bash", os.path.join(d, "tm.sh"), *args], capture_output=True, text=True, env=env_for(fake, extra=extra), timeout=20, cwd=d))
 
 
 class Meter:
@@ -288,7 +298,32 @@ def c_estimate_write(d):
 def c_estimate_noop(d):
     with Fake("update_noop") as f:
         rc, out, err = tm(d, f, "estimate.points", "SAC-70", "5")
-        return "" if rc == 1 and out is None and "ficou com estimate" in err else f"rc={rc} {out} {err[:120]}"
+        return "" if rc == 1 and out is None and "releitura" in err and "estimate=None" in err else f"rc={rc} {out} {err[:120]}"
+
+
+def c_estimate_lies(d):
+    # o retorno da mutação diz que gravou; só a leitura separada mostra que não
+    with Fake("update_lies") as f:
+        rc, out, err = tm(d, f, "estimate.points", "SAC-70", "5")
+        return "" if rc == 1 and out is None and "releitura" in err else f"rc={rc} {out} {err[:120]}"
+
+
+def c_due_lies(d):
+    with Fake("update_lies") as f:
+        rc, out, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30")
+        return "" if rc == 1 and out is None and "releitura" in err else f"rc={rc} {out} {err[:120]}"
+
+
+def c_reread_fails(d):
+    with Fake("reread_gone") as f:
+        rc, out, err = tm(d, f, "estimate.points", "SAC-70", "5")
+        return "" if rc == 1 and out is None and "a releitura falhou" in err and "Traceback" not in err else f"rc={rc} {out} {err[:160]}"
+
+
+def c_timeout(d):
+    with Fake("hang") as f:
+        rc, out, err = tm(d, f, "estimate.points_read", "SAC-70", extra={"TM_LINEAR_TIMEOUT": "1"})
+        return "" if rc == 1 and out is None and "tempo esgotado" in err and "Traceback" not in err else f"rc={rc} {out} {err[:200]}"
 
 
 def c_estimate_out_of_scale(d):
@@ -328,7 +363,7 @@ def c_estimate_clear(d):
 
 def c_estimate_bad_value(d):
     with Fake() as f:
-        for v in ("abc", "1.5"):
+        for v in ("abc", "1.5", "٣", "5\n"):
             rc, _, err = tm(d, f, "estimate.points", "SAC-70", v)
             if rc != 2 or "inteiro" not in err:
                 return f"{v}: rc={rc} {err[:120]}"
@@ -362,12 +397,12 @@ def c_due_write(d):
 def c_due_noop(d):
     with Fake("update_noop") as f:
         rc, _, err = tm(d, f, "due_date.set", "SAC-70", "2026-11-30")
-        return "" if rc == 1 and "ficou com dueDate" in err else f"rc={rc} {err[:120]}"
+        return "" if rc == 1 and "releitura" in err else f"rc={rc} {err[:120]}"
 
 
 def c_due_bad_date(d):
     with Fake() as f:
-        for v in ("2026-02-30", "30/11", "2026-11-30T10:00", "20261130"):
+        for v in ("2026-02-30", "30/11", "2026-11-30T10:00", "20261130", "٢٠٢٦-١١-٣٠", "2026-11-30\n"):
             rc, _, err = tm(d, f, "due_date.set", "SAC-70", v)
             if rc != 2 or "data inválida" not in err:
                 return f"{v}: rc={rc} {err[:120]}"
@@ -640,6 +675,27 @@ def c_backtest_per_issue_sum(d):
         return "" if b["n"] == 7 and b["covered_by_due"] == 6 and b["inside_band"] == 6 else f"{b}"
 
 
+def c_survivors_declared(d):
+    with Fake() as f:
+        _, out, err = report(d, f)
+        pop = out["calibration_population"]
+        codes = [w["code"] for w in out["warnings"]]
+        return "" if pop["without_started_at"] >= 1 and pop["with_work_clock"] < pop["completed"] and "survivors_only" in codes else f"{pop} {codes}"
+
+
+def c_overlay_declared(d):
+    with Fake() as f, Meter(d) as m:
+        path = os.path.join(m.tmp, "o.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump({"SAC-61": 1}, fh)
+        for category, want_rc in (("lambda", 0), ("beta", 3)):
+            rc, out, err = m.run(f, "propose", "--points", "8", "--category", category, "--estimates-overlay", path)
+            if rc != want_rc or out.get("estimates_overlay", {}).get("entries") != 1:
+                return f"{category}: rc={rc} {out}"
+        rc, out, err = m.run(f, "propose", "--points", "8", "--category", "lambda")
+        return "" if "estimates_overlay" not in out else "overlay declarado sem overlay"
+
+
 def c_backtest_published(d):
     with Fake() as f:
         _, out, err = report(d, f)
@@ -882,6 +938,10 @@ CASES = [
     ("caps", "--capabilities lista os verbos novos", c_caps),
     ("e-write", "estimate.points grava e devolve", c_estimate_write),
     ("e-noop", "provedor que ignora a escrita vira erro", c_estimate_noop),
+    ("e-lie", "retorno da mutação mentindo: a leitura separada acusa", c_estimate_lies),
+    ("d-lie", "prazo com retorno mentindo: a leitura separada acusa", c_due_lies),
+    ("e-gone", "releitura que falha é rc 1 nomeado", c_reread_fails),
+    ("net-to", "timeout de resposta é rc 1 com mensagem", c_timeout),
     ("e-scale", "valor fora da escala não vai à mutação", c_estimate_out_of_scale),
     ("e-ext-off", "13 recusado sem escala estendida", c_estimate_extended_off),
     ("e-ext-on", "21 aceito com escala estendida", c_estimate_extended_on),
@@ -923,6 +983,8 @@ CASES = [
     ("r-brack", "colchete é dono, não trabalho; ato humano lê o cru", c_bracket_stripped),
     ("r-open", "large_other olha as abertas", c_large_other_open),
     ("r-bt", "backtest publicado com a conta certa", c_backtest_published),
+    ("r-surv", "report declara que calibra só nas sobreviventes", c_survivors_declared),
+    ("p-over", "propose declara o overlay, também na recusa", c_overlay_declared),
     ("r-hold", "backtest soma por issue", c_backtest_per_issue_sum),
     ("p-hist", "data P80 pela soma por issue, faixa declarada", c_propose_history),
     ("p-tod", "a conta parte do instante, não da meia-noite", c_propose_time_of_day),
@@ -957,18 +1019,24 @@ CASES = [
 L = "adapters/linear.py"
 V = "velocity-meter.py"
 MUTANTS = [
-    (L, '    if updated.get("estimate") != points:', "    if False:", "e-noop"),
+    (L, '    if after.get(field) != value:', "    if False:", "e-noop"),
+    (L, '        after = _issue(iss["identifier"])\n', '        after = {**iss, field: value}\n', "e-lie"),
+    (L, '        after = _issue(iss["identifier"])\n', '        after = _issue_update(iss["id"], {field: value})\n', "d-lie"),
+    (L, 'raise TmError(f"{iss[\'identifier\']}: escrita enviada e a releitura falhou ({e}); confira antes de repetir")', 'raise', "e-gone"),
+    (L, '    except (TimeoutError, OSError, http.client.HTTPException) as e:', "    except ZeroDivisionError as e:", "net-to"),
     (L, '    if points is not None and points not in scale["values"]:', "    if False:", "e-scale"),
     (L, 'base + (extended if team.get("issueEstimationExtended") else [])', "base + extended", "e-ext-off"),
     (L, '    "fibonacci": ([1, 2, 3, 5, 8], [13, 21]),', '    "fibonacci": ([1, 2, 3, 5, 8], [13]),', "e-ext-on"),
     (L, '    if kind == "notUsed" or kind is None:', "    if False:", "e-off"),
-    (L, '_issue_update(iss["id"], {"estimate": points})', '_issue_update(iss["id"], {"estimate": points or 0})', "e-clear"),
-    (L, '    if raw is not None and not re.match(r"^\\d+$", raw):', "    if False:", "e-bad"),
+    (L, '_verified_update(iss, "estimate", points)', '_verified_update(iss, "estimate", points or 0)', "e-clear"),
+    (L, '    if raw is not None and not re.fullmatch(r"[0-9]+", raw):', "    if False:", "e-bad"),
+    (L, '    if raw is not None and not re.fullmatch(r"[0-9]+", raw):', '    if raw is not None and not re.match(r"^\\d+$", raw):', "e-bad"),
     (L, '    if len(args) != 2 or (args[1].startswith("-") and args[1] != "--clear") or args[0].startswith("-"):', "    if len(args) < 1:", "usage"),
     (L, 'return {"issue": iss["identifier"], "estimate": iss.get("estimate"), "scale"', 'return {"issue": iss["identifier"], "estimate": None, "scale"', "p-read"),
-    (L, '    if updated.get("dueDate") != due:', "    if False:", "d-noop"),
+    (L, '    if after.get(field) != value:', "    if False:", "d-noop"),
     (L, '        datetime.date.fromisoformat(value)\n', "        pass\n", "d-bad"),
-    (L, '        if not re.match(r"^\\d{4}-\\d{2}-\\d{2}$", value):\n            raise ValueError\n', "", "d-bad"),
+    (L, '        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):\n            raise ValueError\n', "", "d-bad"),
+    # sem mutante \\d na data: date.fromisoformat recusa os mesmos valores, e o mutante seria equivalente
     (L, '    due = None if raw is None else _calendar_date(raw)', '    due = "2026-01-01" if raw is None else _calendar_date(raw)', "d-clear"),
     (L, "  estimate startedAt completedAt canceledAt dueDate\n", "\n", "f-read"),
     (L, 'url priority estimate createdAt updatedAt startedAt completedAt canceledAt dueDate archivedAt "', 'url priority createdAt updatedAt archivedAt "', "f-list"),
@@ -1007,6 +1075,8 @@ MUTANTS = [
     (V, 'elif row["completed"] is None or row["completed"] <= started:', 'elif row["completed"] is None or row["completed"] < started:', "r-zero"),
     (V, '    return when.astimezone(LOCAL[0]).date()', "    return when.astimezone(dt.timezone.utc).date()", "r-tz"),
     (V, '    LOCAL[0] = dt.timezone(dt.timedelta(hours=args.utc_offset))', "    pass", "r-tz"),
+    (V, '    if excluded.get("no_started_at"):\n        warnings.append', "    if False:\n        warnings.append", "r-surv"),
+    (V, '    if overlay:\n        result["estimates_overlay"]', '    if False:\n        result["estimates_overlay"]', "p-over"),
     (V, '        return dt.datetime.now(LOCAL[0])', "        return dt.datetime(2000, 1, 1, tzinfo=LOCAL[0])", "r-now"),
     (V, 'if rx.search(stripped if calibrate else raw):', "if rx.search(raw):", "r-brack"),
     (V, 'if rx.search(stripped if calibrate else raw):', "if rx.search(stripped):", "r-brack"),
