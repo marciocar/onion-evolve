@@ -2,17 +2,16 @@
 branch: chore/permissions-deny-minimal
 pr: 1552
 date: 2026-11-08
-reviewed_diff_sha256: 3c471f6ec082826918b9a2d9496f8c8ad0ef458064afd3764f8b86b0132d9d86
-reviewed_code_sha256: 7d8159d728476d73ebcaf76867743da74cc0154df9bfcf0e9a9b15bc64391797
-findings_total: 15
-findings_real: 15
+reviewed_diff_sha256: pendente
+findings_total: 17
+findings_real: 17
 findings_blocking: 2
 tokens: 0
 duration_min: 0
-findings_fixed: 11
+findings_fixed: 13
 verdict: FIXED
 elenxo: true
-reviewer: refutador independente sobre o head 4f6429476, chamado pela sessão do core, mais a passada do autor com os mutantes por regra no motor real; as curas do refutador foram medidas pelo autor, sem nova passada independente
+reviewer: refutador independente chamado pela sessão do core, que reprovou o head 4f6429476 e aprovou o e49e884f4; os complementos dele e o token exato do clean vieram depois dessa aprovação e foram medidos pelo autor, com os mutantes por regra no motor real, sem passada independente sobre eles
 nota: "tokens e duração não medidos (0). B2 não é cura de código: é custo aceito pelo core em nome do maestro, revogável, declarado na doutrina e no nó de decisão."
 ---
 
@@ -20,7 +19,7 @@ nota: "tokens e duração não medidos (0). B2 não é cura de código: é custo
 
 ## O que muda
 
-64 regras de `permissions.deny` em `.claude/settings.json`, a soma do deny da fonte no `merge-onion-hooks.sh`, a seção
+74 regras de `permissions.deny` em `.claude/settings.json`, a soma do deny da fonte no `merge-onion-hooks.sh`, a seção
 da camada nativa na doutrina de guardas, a bancada no motor real (`ops/testing/permissions-deny-bench.py`) e o grafo
 `docs/evolution/research/permissions-deny-minimal-2026-11/`.
 
@@ -61,6 +60,13 @@ da camada nativa na doutrina de guardas, a bancada no motor real (`ops/testing/p
   curinga que só em parte se sobrepõe não aparece.
 - **R9 (curado).** `permissions.deny` fora da forma de lista: rc 0, hooks chegam, deny não soma, stderr avisa.
 
+- **R10 (curado).** `git -* clean*` casava prefixo: `cherry-pick cleanup -x`, `log clean.sh -x` e `diff clean.sh -X`
+  caíam. Agora é token exato (`clean -x*` e `clean * -x*`). Resta como custo `git -C clean status -x`, com pasta chamada
+  `clean`.
+- **R11 (curado em parte).** `-ffx`, `-ffdx`, `-ffX` e `-ffdX` caem, nus e com `git -C`. O `-q` no meio do grupo do clean
+  (`-qfdx`, `-fqdx`, `-qdfx`, `-fdqx`, `-qfdX`) e `git push -uvf`, `-vuf`, `-quf`, `-uqf` ficam declarados: cobrir todas as
+  permutações incharia a lista.
+
 ## O que esta passada não viu
 
-O sandbox no core real, o login real, e a re-revisão independente das curas.
+O sandbox no core real, o login real, e a passada independente sobre o que veio depois do head e49e884f4.

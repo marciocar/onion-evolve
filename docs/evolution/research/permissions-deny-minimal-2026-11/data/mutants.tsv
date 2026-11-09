@@ -1,4 +1,4 @@
-# binario 2.1.319 (Claude Code) · regras 64
+# binario 2.1.319 (Claude Code) · regras 74
 id	fase	forma	esperado	medido	veredito	nota
 M	mutante	Bash(git push* --force)	algum-caso-solta	D02	ok	
 M	mutante	Bash(git push* --force *)	algum-caso-solta	D01,D39	ok	
@@ -32,16 +32,26 @@ M	mutante	Bash(git clean* -fX*)	algum-caso-solta	E06	ok
 M	mutante	Bash(git clean* -fdX*)	algum-caso-solta	E07	ok	
 M	mutante	Bash(git clean* -dfX*)	algum-caso-solta	E08	ok	
 M	mutante	Bash(git clean* -dX*)	algum-caso-solta	E09	ok	
-M	mutante	Bash(git -* clean* -x*)	algum-caso-solta	E21,C06	ok	
-M	mutante	Bash(git -* clean* -fx*)	algum-caso-solta	E22	ok	
-M	mutante	Bash(git -* clean* -fdx*)	algum-caso-solta	D11	ok	
-M	mutante	Bash(git -* clean* -dfx*)	algum-caso-solta	E23	ok	
-M	mutante	Bash(git -* clean* -dx*)	algum-caso-solta	E24	ok	
-M	mutante	Bash(git -* clean* -X*)	algum-caso-solta	E25	ok	
-M	mutante	Bash(git -* clean* -fX*)	algum-caso-solta	E26	ok	
-M	mutante	Bash(git -* clean* -fdX*)	algum-caso-solta	E27	ok	
-M	mutante	Bash(git -* clean* -dfX*)	algum-caso-solta	E28	ok	
-M	mutante	Bash(git -* clean* -dX*)	algum-caso-solta	E29	ok	
+M	mutante	Bash(git clean* -ffx*)	algum-caso-solta	E31	ok	
+M	mutante	Bash(git clean* -ffdx*)	algum-caso-solta	E32	ok	
+M	mutante	Bash(git clean* -ffX*)	algum-caso-solta	E33	ok	
+M	mutante	Bash(git clean* -ffdX*)	algum-caso-solta	E34	ok	
+M	mutante	Bash(git -* clean -x*)	algum-caso-solta	E21,C06	ok	
+M	mutante	Bash(git -* clean -fx*)	algum-caso-solta	E22	ok	
+M	mutante	Bash(git -* clean -fdx*)	algum-caso-solta	D11	ok	
+M	mutante	Bash(git -* clean -dfx*)	algum-caso-solta	E23	ok	
+M	mutante	Bash(git -* clean -dx*)	algum-caso-solta	E24	ok	
+M	mutante	Bash(git -* clean -X*)	algum-caso-solta	E25	ok	
+M	mutante	Bash(git -* clean -fX*)	algum-caso-solta	E26	ok	
+M	mutante	Bash(git -* clean -fdX*)	algum-caso-solta	E27	ok	
+M	mutante	Bash(git -* clean -dfX*)	algum-caso-solta	E28	ok	
+M	mutante	Bash(git -* clean -dX*)	algum-caso-solta	E29	ok	
+M	mutante	Bash(git -* clean -ffx*)	algum-caso-solta	E35	ok	
+M	mutante	Bash(git -* clean -ffdx*)	algum-caso-solta	E36	ok	
+M	mutante	Bash(git -* clean -ffX*)	algum-caso-solta	E37	ok	
+M	mutante	Bash(git -* clean -ffdX*)	algum-caso-solta	E38	ok	
+M	mutante	Bash(git -* clean * -x*)	algum-caso-solta	E39,C08	ok	
+M	mutante	Bash(git -* clean * -X*)	algum-caso-solta	E40	ok	
 M	mutante	Bash(rm -*r* /)	algum-caso-solta	D13,C07	ok	
 M	mutante	Bash(rm -*r* / *)	algum-caso-solta	D14	ok	
 M	mutante	Bash(rm -*r* ~)	algum-caso-solta	D15	ok	

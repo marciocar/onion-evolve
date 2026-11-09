@@ -102,6 +102,11 @@ CASES = [
     ("E25", "Bash", "git -C . clean -X", "deny", 1), ("E26", "Bash", "git -C . clean -fX", "deny", 1),
     ("E27", "Bash", "git -C . clean -fdX", "deny", 1), ("E28", "Bash", "git -C . clean -dfX", "deny", 1),
     ("E29", "Bash", "git -C . clean -dX", "deny", 1),
+    ("E31", "Bash", "git clean -ffx", "deny", 1), ("E32", "Bash", "git clean -ffdx", "deny", 1),
+    ("E33", "Bash", "git clean -ffX", "deny", 1), ("E34", "Bash", "git clean -ffdX", "deny", 1),
+    ("E35", "Bash", "git -C . clean -ffx", "deny", 1), ("E36", "Bash", "git -C . clean -ffdx", "deny", 1),
+    ("E37", "Bash", "git -C . clean -ffX", "deny", 1), ("E38", "Bash", "git -C . clean -ffdX", "deny", 1),
+    ("E39", "Bash", "git -C . clean -f -d -x", "deny", 1), ("E40", "Bash", "git -C . clean -f -X", "deny", 1),
     # B2: a regra Read também barra escrita no .env, inclusive arquivo novo; custo aceito (.env.example segue livre)
     ("W01", "Write", "{P}/brand/new/.env", "deny", 1),
     ("W02", "Write", "{P}/brand/new/.env.local", "deny", 1),
@@ -159,6 +164,10 @@ CASES = [
     ("N13", "Bash", "git -C . checkout -B push-x origin/main --force", "pass", 0),
     ("N14", "Bash", "gh release delete-asset v1 file --yes", "pass", 0),
     ("N15", "Bash", "git -C . push --force-with-lease origin feat/x", "pass", 0),
+    # token exato: `clean` como prefixo de outra palavra não cai
+    ("N16", "Bash", "git -C . cherry-pick cleanup -x", "pass", 0),
+    ("N17", "Bash", "git -C . log clean.sh -x", "pass", 0),
+    ("N18", "Bash", "git -C . diff clean.sh -X", "pass", 0),
     ("W10", "Write", "{P}/.env.example", "pass", 1),
     ("W11", "Bash", "cp .env.example sub/.env.copied && rm -f sub/.env.copied", "pass", 1),
     # ── custo declarado: a regra Read também pega inspeção de metadado no Bash; `test -f` é a saída ──
@@ -168,6 +177,7 @@ CASES = [
     ("C05", "Bash", 'git -C . commit --allow-empty -m "docs: proibe git push --force e afins"', "deny", 0),
     ("C06", "Bash", 'git -C . commit --allow-empty -m "docs: o git clean -x some"', "deny", 0),
     ("C07", "Bash", "rm -f my-report /", "deny", 0),
+    ("C08", "Bash", "git -C clean status -x", "deny", 0),
     # ── limite medido: o deny NÃO alcança (o esperado é passar; se passar a barrar, a declaração muda) ──
     ("L04", "Bash", "python3 -c \"print(open('.env').read())\"", "pass", 1),
     ("L06", "Bash", "bash -c 'git push --force origin HEAD:refs/heads/feat/bc'", "pass", 1),
@@ -195,6 +205,10 @@ CASES = [
     ("L30", "Bash", "git -C . push origin HEAD:refs/heads/feat/uf -uf", "pass", 1),
     ("L31", "Bash", "git push -ufq origin HEAD:refs/heads/feat/ufq", "medir", 1),
     ("L32", "Bash", "git clean -qfdx", "pass", 0),
+    ("L33", "Bash", "git clean -fqdx", "pass", 0), ("L34", "Bash", "git clean -qdfx", "pass", 0),
+    ("L35", "Bash", "git clean -fdqx", "pass", 0), ("L36", "Bash", "git clean -qfdX", "pass", 0),
+    ("L37", "Bash", "git push -uvf origin feat/x", "pass", 0), ("L38", "Bash", "git push -vuf origin feat/x", "pass", 0),
+    ("L39", "Bash", "git push -quf origin feat/x", "pass", 0), ("L40", "Bash", "git push -uqf origin feat/x", "pass", 0),
 ]
 
 SANDBOX_CASES = [
