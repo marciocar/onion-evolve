@@ -2,7 +2,8 @@
 branch: fix/public-surface-machine-data
 pr: 1559
 date: 2026-11-09
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8f60b663f9ddcebf645d6243098162cedc06d1e40a03995bb67da54e020859e8
+reviewed_code_sha256: 23d11678278685f4691d625e1c34b135ff4b0413642ec24c28b8227543f4cc3d
 findings_total: 14
 findings_real: 14
 findings_blocking: 4
