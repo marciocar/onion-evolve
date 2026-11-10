@@ -1,0 +1,198 @@
+# kg-backlog-guard: on
+# Grafo do PERFIL DE INTERCONEXÃO v1 (Parte A) do Onion, selado pelo maestro em 2026-11-10.
+# Fonte em prosa: PROFILE.md ao lado (projeção pública do rascunho refutado pela curadoria). A SYNTHESIS projeta este grafo.
+# Os selos D_* nascem pelo kg-decide-seal.sh, nunca à mão. Ligações com grafos antigos vão em external_edges.
+meta:
+  id: interconnect-profile-2026-11
+  schema_version: "1"
+  baseline: "2026-11-10"
+  review_after: "2026-12-10"   # 30d: a Parte A vira execução (leitor único, dialeto único, envelope v1) e a Parte B
+                               # abre estudo; os dois mexem no perfil antes de 90 dias.
+  # ═══ TETO: 12 NÓS ═══
+  # Justificativa: 1 tese + 5 seções (A1 a A5) + 1 pergunta aberta da Parte B + 4 selos do maestro = 11; folga de 1.
+  purpose: "Registrar o perfil de interconexão v1 (Parte A) do Onion: um envelope único para todo sinal ou evento entre membros, com versão, validade por canal, dedupe, recibo de aceite e classe de confidencialidade, sob o modelo de confiança de hoje; e abrir a Parte B como estudo."
+external_edges:
+  - from: Q_INTERCONNECT_PART_B_STUDY_1110
+    to: "docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml#D_MESSAGING_DEVICE_FLOW_LOGTO_JA_1106"
+    edge_type: TRACES_TO
+nodes:
+  - id: C_INTERCONNECT_PROFILE_THESIS_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md desta pasta, rascunho do core refutado pela curadoria em rodadas sucessivas e selado pelo maestro em 2026-11-10"
+    label: "Não existe contrato único para as 32 ligações do Onion; existe um envelope único para tudo o que é sinal ou evento (as quatro vias de sinal entre membros, o watcher e a campainha), e o resto segue o padrão próprio de cada camada."
+    narrative: "Tese do perfil de interconexão, Parte A. As quatro vias de sinal entre membros são git-async, HTTP com aceite, fila com lease e pull HTTPS da outbox. A Parte A vale sob o modelo de confiança de hoje: registro e chaves públicas lidos do clone, só em máquinas nossas, sem proxy com inspeção TLS no caminho. A Parte B é pré-condição declarada para máquina de cliente ou atrás de proxy com inspeção, e a Parte A não depende de código dela. Régua do maestro (2026-11-10): o problema maior é a padronização, a interconexão e a evolução com eficiência e eficácia, não o esforço de construção."
+    trace: "docs/evolution/research/interconnect-profile-2026-11/SYNTHESIS.md (seção A tese) e docs/evolution/research/interconnect-profile-2026-11/PROFILE.md (Tese, Escopo e modelo de confiança)"
+  - id: C_INTERCONNECT_A1_ENVELOPE_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md, seção A1; claims obrigatórios conferidos contra a2a-verify.sh:393-396 do core"
+    label: "A1 Envelope: CloudEvent 1.0.2 em JSON assinado por JWS compacto com os bytes do evento como payload, sem canonicalização; typ explícito, um algoritmo por chave, rotação por kid; claims iss, aud, iat, exp e jti obrigatórios."
+    narrative: "RS256 hoje, Ed25519 (RFC 9864) como rampa; o DSSE do CloudEvents fica de vigia. A autoria vem só do JWS: o jti identifica a entrega e o id do CloudEvent identifica o evento. Os claims seguem o que o gate já exige (RFC 8725 §3.9)."
+    trace: "PROFILE.md, seção A1"
+  - id: C_INTERCONNECT_A2_VERSIONING_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md, seção A2; forma fechada conferida contra a2a-verify.sh:460-466 do core"
+    label: "A2 Versão: a major vive no type (dev.onion.<x>.v1) com um JSON Schema 2020-12 por major; o legado é a major 0 por binding; o receptor aceita N e N-1 e recusa explicitamente major desconhecida."
+    narrative: "Major 0 no HTTP e no socket é o envelope A2A de hoje, sem type; no git é o sinal do doc-bridge sem JWS, cuja autoria vem da revisão do commit no destino. A partir da v1 o co-relay e o co-deliver assinam. Campo desconhecido só é tolerado dentro do payload assinado, preservando a defesa de forma fechada do gate; sem crit na Parte A. As duas cópias do gate (core e fila) mudam no mesmo movimento com conferência byte a byte no CI. Antes do schema, o registro de membros ganha leitor único no core no lugar dos 24 parsers."
+    trace: "PROFILE.md, seção A2"
+  - id: C_INTERCONNECT_A3_BINDINGS_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md, seção A3; a medida de 10 de 35 sinais processados um dia depois ou mais é da curadoria"
+    label: "A3 Bindings: validade de entrega por canal (HTTP vivo e socket local até 1 h, git-async e pull até 7 dias), exp julgado só no aceite, recibo de aceite assinado pelo receptor e dedupe por (iss, source, id) com retenção de 8 dias."
+    narrative: "O recibo assina iss, source, id, body_sha256, accepted_at e o kid usado; a verificação histórica confere recibo e hash, nunca o iat do remetente. Kid revogado antes do accepted_at é recusa; depois não invalida o que entrou. Sinal antigo sem recibo fica marcado histórico sem recibo. O jti vira proveniência e o arquivo só de append do gate migra para a dedupe. O frontmatter do doc-bridge mapeia os atributos do CloudEvent (dialeto único)."
+    trace: "PROFILE.md, seção A3"
+  - id: C_INTERCONNECT_A4_CLASSIFICATION_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md, seção A4; campo não assinado de hoje conferido contra a2a-verify.sh:80 do core"
+    label: "A4 Classe: onionclass (public, internal, confidential, unclassified) vira extensão dentro do evento assinado; legado vale unclassified; confidential só circula no mesmo host pela fila até a Parte B, nunca entre máquinas nem por git."
+    narrative: "A classe é obrigatória a partir da v1 e uma catraca conta os unclassified, número que só pode cair. Para confidential: o gate veta no binding git sem a exceção por repo privado, uma guarda de lint recusa commit com a classe, o aceite grava só um ponteiro num razão local fora do repo, e o corpo é apagado da fila no ack mais 8 dias, ficando o recibo."
+    trace: "PROFILE.md, seção A4"
+  - id: C_INTERCONNECT_A5_STATES_OPS_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md, seção A5"
+    label: "A5 Estados e operação: cada mensagem passa por enfileirada, entregue, lida (testemunho do par), processada e dead-letter; mensagem é dado, nunca ordem; um comando mostra o estado, sem painel web."
+    narrative: "Mensagem é dado com as quatro condições: remetente autenticado, marcada como não-usuário, sem autoridade e portões mantidos."
+    trace: "PROFILE.md, seção A5"
+  - id: Q_INTERCONNECT_PART_B_STUDY_1110
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 5
+    confidence: 0.4
+    verified_at: "2026-11-10"
+    verified_against: "PROFILE.md, seção Parte B; aberta pela decisão do maestro de 2026-11-10"
+    label: "Parte B do perfil de interconexão: qual cifra do corpo, qual raiz de confiança e registro assinado (medindo TUF e sigstore contra o desenho manual), qual transporte entre máquinas e qual pareamento pela RFC 10027 o Onion adota?"
+    narrative: "Estudo próprio antes de qualquer código. Itens: cifra do corpo (JWE ECDH-ES ou HPKE no JWE); raiz de confiança e registro assinado com versão monotônica, validade contra rollback e freeze, limiar, raiz offline e rotação, medindo TUF e sigstore/gitsign; transporte de saída com proxy e CA corporativa, private_key_jwt mais DPoP; pareamento pela RFC 10027, escolhido pela sessão (code com PKCE e loopback havendo navegador, device flow sem ele); duas chaves por máquina com rotação de 90 dias e recusa de rebaixamento. A Parte B revisa D_MESSAGING_DEVICE_FLOW_LOGTO_JA_1106 (aresta externa TRACES_TO). Condução: curadoria. Decisão de arquitetura: core. Selo: maestro."
+    trace: "PROFILE.md, seção Parte B"
+  - id: D_INTERCONNECT_PROFILE_A_V1_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Selar com os compromissos (Recomendado)»"
+    label: "Parte A selada como perfil de interconexão v1, com os compromissos: confidential só no mesmo host até a Parte B; teto de validade do gate por binding (7 dias no git); co-relay e co-deliver assinam o sinal a partir da v1; as duas cópias do gate mudam juntas."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Selar com os compromissos (Recomendado)»; descartadas: «Esperar a Parte B» · «Quero ler antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Perfil de interconexão, Parte A: envelope único (CloudEvent assinado por JWS, versão no tipo, validade por canal, dedupe, recibo de aceite, classe de confidencialidade), só nas nossas máquinas, sem proxy corporativo. Selar como perfil v1?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_INTERCONNECT_MAJOR0_EXIT_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Por condição medida (Recomendado)»"
+    label: "O envelope legado (major 0) deixa de ser aceito por condição medida, sem data fixa: quando a catraca de emissores já atualizados que ainda emitem major 0 ficar em zero por 30 dias, alinhada à doutrina de prazo por pontos."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Por condição medida (Recomendado)»; descartadas: «Data fixada agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Quando o envelope legado (major 0) deixa de ser aceito?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_INTERCONNECT_EXEC_ORDER_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Arrumar o que existe primeiro (Recomendado)»"
+    label: "A Parte A executa arrumando o que existe primeiro: leitor único do registro de membros e dialeto único do doc-bridge; depois o envelope v1 com onionclass, a dedupe e o recibo de aceite."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Arrumar o que existe primeiro (Recomendado)»; descartadas: «Envelope v1 primeiro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Qual a ordem de execução da Parte A?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_INTERCONNECT_PART_B_OPEN_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Abrir agora (Recomendado)»"
+    label: "A Parte B do perfil de interconexão abre agora como estudo próprio, antes de qualquer código: a curadoria conduz, o core decide a arquitetura e o maestro sela."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Abrir agora (Recomendado)»; descartadas: «Depois da Parte A»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Abrir a Parte B como estudo, com a curadoria conduzindo e o core decidindo a arquitetura?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+edges:
+  - from: C_INTERCONNECT_A1_ENVELOPE_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: SUPPORTS
+  - from: C_INTERCONNECT_A2_VERSIONING_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: SUPPORTS
+  - from: C_INTERCONNECT_A3_BINDINGS_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: SUPPORTS
+  - from: C_INTERCONNECT_A4_CLASSIFICATION_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: SUPPORTS
+  - from: C_INTERCONNECT_A5_STATES_OPS_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: SUPPORTS
+  - from: Q_INTERCONNECT_PART_B_STUDY_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: TRACES_TO
+  - from: D_INTERCONNECT_PROFILE_A_V1_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: TRACES_TO
+  - from: D_INTERCONNECT_MAJOR0_EXIT_1110
+    to: C_INTERCONNECT_A2_VERSIONING_1110
+    edge_type: TRACES_TO
+  - from: D_INTERCONNECT_EXEC_ORDER_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: TRACES_TO
+  - from: D_INTERCONNECT_PART_B_OPEN_1110
+    to: Q_INTERCONNECT_PART_B_STUDY_1110
+    edge_type: TRACES_TO
