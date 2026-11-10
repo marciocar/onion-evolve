@@ -56278,7 +56278,7 @@ _prc_case_scope() {  # $1=guarda → 0 se SÓ o tocado é julgado (o velho, fora
   rm -rf "${sb}"
   grep -q 'g/novo.kg.yaml' <<< "${o}" && ! grep -q 'velho.kg.yaml' <<< "${o}"
 }
-_prc_case_catraca() {  # $1=guarda $2=cenário (nova|troca|fechou) → imprime "rc<TAB>saída"
+_prc_case_ratchet() {  # $1=guarda $2=cenário (nova|troca|fechou) → imprime "rc<TAB>saída"
   local sb o rc b; sb="$(_prc_box "$1")" || { printf '9\tsandbox'; return; }
   b="${sb}/docs/evolution/federation/private-repo-cite-baseline.txt"
   case "$2" in
@@ -56292,11 +56292,11 @@ _prc_case_catraca() {  # $1=guarda $2=cenário (nova|troca|fechou) → imprime "
   rm -rf "${sb}"
   printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
 }
-_prc_catraca_ok() {  # $1=guarda → 0 se os três cenários dão o veredito certo
+_prc_ratchet_ok() {  # $1=guarda → 0 se os três cenários dão o veredito certo
   local r
-  r="$(_prc_case_catraca "$1" nova)";   [ "${r%%$'\t'*}" = 1 ] && grep -q 'HARD	CATRACA-VIOLADA' <<< "${r}" || return 1
-  r="$(_prc_case_catraca "$1" troca)";  [ "${r%%$'\t'*}" = 1 ] && grep -q 'HARD	CATRACA-VIOLADA' <<< "${r}" || return 1
-  r="$(_prc_case_catraca "$1" fechou)"; [ "${r%%$'\t'*}" = 0 ] && grep -q 'SOFT	CATRACA-POR-VISIBILIDADE' <<< "${r}" && ! grep -q 'HARD' <<< "${r}" || return 1
+  r="$(_prc_case_ratchet "$1" nova)";   [ "${r%%$'\t'*}" = 1 ] && grep -q 'HARD	CATRACA-VIOLADA' <<< "${r}" || return 1
+  r="$(_prc_case_ratchet "$1" troca)";  [ "${r%%$'\t'*}" = 1 ] && grep -q 'HARD	CATRACA-VIOLADA' <<< "${r}" || return 1
+  r="$(_prc_case_ratchet "$1" fechou)"; [ "${r%%$'\t'*}" = 0 ] && grep -q 'SOFT	CATRACA-POR-VISIBILIDADE' <<< "${r}" && ! grep -q 'HARD' <<< "${r}" || return 1
 }
 _prc_case_door() {  # $1=guarda $2=lint-artifacts → 0 se a porta sem a lista NÃO é reprovada e diz que não se aplica
   local sd o rc l; sd="$(TMPDIR=/tmp mktemp -d)" || return 2
@@ -56357,9 +56357,9 @@ run_private_repo_cite_selftests() {
   else record_fail "private-repo-cite: (e)" "rc=${rc}/${rc2}; [${o}] [${o2}]"; fi
   # (f) CATRACA por CONJUNTO contra o merge-base: entrada nova → HARD; troca de uma velha por uma nova (número igual)
   #     → HARD; repo que saiu da lista com a citação já no grafo na base → SOFT CATRACA-POR-VISIBILIDADE
-  if _prc_catraca_ok "${chk}"; then
+  if _prc_ratchet_ok "${chk}"; then
     record_pass "private-repo-cite: (f) catraca: entrada nova e troca → HARD CATRACA-VIOLADA; repo que fechou → SOFT"
-  else record_fail "private-repo-cite: (f) catraca" "nova=[$(_prc_case_catraca "${chk}" nova)] troca=[$(_prc_case_catraca "${chk}" troca)] fechou=[$(_prc_case_catraca "${chk}" fechou)]"; fi
+  else record_fail "private-repo-cite: (f) catraca" "nova=[$(_prc_case_ratchet "${chk}" nova)] troca=[$(_prc_case_ratchet "${chk}" troca)] fechou=[$(_prc_case_ratchet "${chk}" fechou)]"; fi
   # (h) sem a lista pública, na FONTE → rc 2 (NAO VERIFICADO), nunca verde
   rm -f "${sb}/docs/evolution/federation/public-repos.tsv"
   if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
@@ -56436,7 +56436,7 @@ EOF_MUT
     if ! _prc_mutate "${chk}" "${mt}" "${pold}" "${pnew}"; then record_fail "private-repo-cite: (p) mutante não aplicou" "${pname}"; continue; fi
     case "${pcase}" in
       scope)   if _prc_case_scope "${mt}"; then mrc=0; else mrc=1; fi ;;
-      catraca) if _prc_catraca_ok "${mt}"; then mrc=0; else mrc=1; fi ;;
+      catraca) if _prc_ratchet_ok "${mt}"; then mrc=0; else mrc=1; fi ;;
       door)    if _prc_case_door "${mt}" "${lint}"; then mrc=0; else mrc=1; fi ;;
     esac
     if [ "${mrc}" -eq 1 ]; then record_pass "private-repo-cite: (p) mutante morde → ${pname}"
