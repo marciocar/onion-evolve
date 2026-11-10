@@ -48695,8 +48695,8 @@ run_kg_migrate_v3_selftests() {
     record_pass "kg-migrate-v3: (a) datas sem aspas ganham aspas (valid_from inteiro vira \"2026\") e o comentário fica"
   else record_fail "kg-migrate-v3: (a)" "datas não citadas: rc=${rc} ${out}"; fi
   # (b) provenance derivada do trace, com o método declarando a derivação
-  if python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and p["locator"]=="medição X no commit abc" and re.match(r"derivado: \S", p["method"])' "${y}" 2>/dev/null; then
-    record_pass "kg-migrate-v3: (b) provenance derivada do trace do nó, locator = verified_against, method na forma canônica 'derivado: …' (contrato v4)"
+  if python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and p["locator"]=="medição X no commit abc" and re.match(r"derived: \S", p["method"])' "${y}" 2>/dev/null; then
+    record_pass "kg-migrate-v3: (b) provenance derivada do trace do nó, locator = verified_against, method gravado na forma canônica em inglês 'derived: …' (contrato v4.16; D_PROVENANCE_METHOD_VOCAB_PLAN_1110)"
   else record_fail "kg-migrate-v3: (b)" "provenance do trace ausente/errada: ${y}"; fi
   # (c2) sem trace, fonte = URL citada no verified_against
   if python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; assert n["E_COM_URL"]["provenance"]["source"]=="https://exemplo.org/doc#sec-2"' "${y}" 2>/dev/null; then
@@ -48740,10 +48740,10 @@ run_kg_migrate_v3_selftests() {
   if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --routing "${tsv}" "${gr}" 2>&1)"; then rc=0; else rc=$?; fi
   y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gr}" 2>&1)" || true
   if [ "${rc}" -eq 0 ] \
-     && python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and re.match(r"medição: \S", p["method"]) and "não reverificado" in p["method"]; assert "provenance" not in n["E_COM_URL"] and "provenance" not in n["E_SEM_FONTE"] and "provenance" not in n["E_CIRCULAR"]; assert n["E_HOST"]["provenance"]["method"].startswith("testemunho: leitura do arquivo /etc/algum.conf no host")' "${y}" 2>/dev/null \
+     && python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and re.match(r"measurement: \S", p["method"]) and "não reverificado" in p["method"]; assert "provenance" not in n["E_COM_URL"] and "provenance" not in n["E_SEM_FONTE"] and "provenance" not in n["E_CIRCULAR"]; assert n["E_HOST"]["provenance"]["method"].startswith("testimony: leitura do arquivo /etc/algum.conf no host")' "${y}" 2>/dev/null \
      && grep -q 'FORA DA ROTA A1/A2.*E_COM_URL (R)' <<< "${out}" && grep -q 'FONTE CIRCULAR.*E_CIRCULAR' <<< "${out}" \
      && grep -q '  baseline: 2026-10-08$' "${gr}"; then
-    record_pass "kg-migrate-v3: (h) --routing escreve só no id A1/A2 com a classe de method do routing ('medição: …'); o id em R e o de trace circular ficam intocados e são reportados; fonte no host vira testemunho; datas não mudam"
+    record_pass "kg-migrate-v3: (h) --routing escreve só no id A1/A2 com a classe de method do routing gravada em inglês ('medição' do routing vira 'measurement: …'); o id em R e o de trace circular ficam intocados e são reportados; fonte no host vira testemunho; datas não mudam"
   else record_fail "kg-migrate-v3: (h)" "routing ignorado ou classe errada: rc=${rc} ${out} ${y}"; fi
   # (i) onda O2 do SAC-73: nó A1/A2 com trace e SEM verified_against recebe o trace como source e locator, com
   #     method "derivado: trace do nó, sem registro de medição". Recusa (intocado, vai para a O3): trace circular,
@@ -48770,12 +48770,12 @@ run_kg_migrate_v3_selftests() {
   if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --routing "${t2}" "${go}" 2>&1)"; then rc=0; else rc=$?; fi
   y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${go}" 2>&1)" || true
   if [ "${rc}" -eq 0 ] \
-     && python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_O2_TRACE"]["provenance"]; assert p=={"source":"ops/real.sh","locator":"ops/real.sh","method":"derivado: trace do nó, sem registro de medição"}, p; assert n["E_O2_HOST"]["provenance"]["method"].startswith("testemunho: leitura do arquivo /etc/algum.conf no host"); assert all("provenance" not in n[k] for k in ("E_O2_SUMIDO","E_O2_CIRC","E_O2_CMD","E_O2_TEXTO","E_O2_R"))' "${y}" 2>/dev/null \
+     && python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_O2_TRACE"]["provenance"]; assert p=={"source":"ops/real.sh","locator":"ops/real.sh","method":"derived: trace do nó, sem registro de medição"}, p; assert n["E_O2_HOST"]["provenance"]["method"].startswith("testimony: leitura do arquivo /etc/algum.conf no host"); assert all("provenance" not in n[k] for k in ("E_O2_SUMIDO","E_O2_CIRC","E_O2_CMD","E_O2_TEXTO","E_O2_R"))' "${y}" 2>/dev/null \
      && grep -q 'TRACE SUMIDO.*E_O2_SUMIDO (ops/sumiu.sh)' <<< "${out}" && grep -q 'FONTE CIRCULAR.*E_O2_CIRC' <<< "${out}" \
      && grep -q 'REGISTRO DE COMANDO.*E_O2_CMD' <<< "${out}" && grep -q 'SEM LOCALIZADOR.*E_O2_TEXTO' <<< "${out}" \
      && grep -q 'FORA DA ROTA A1/A2.*E_O2_R (R)' <<< "${out}" \
      && PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --routing "${t2}" "${go}" >/dev/null 2>&1; then
-    record_pass "kg-migrate-v3: (i) onda O2: A2 com trace e sem verified_against ganha o trace como locator e 'derivado: trace do nó, sem registro de medição'; circular, sumido, registro de comando e citação sem localizador ficam intocados; host vira testemunho; R intocado; 2ª passada no-op"
+    record_pass "kg-migrate-v3: (i) onda O2: A2 com trace e sem verified_against ganha o trace como locator e 'derived: trace do nó, sem registro de medição'; circular, sumido, registro de comando e citação sem localizador ficam intocados; host vira testemunho; R intocado; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (i)" "onda O2 inventou locator, recusou o válido ou não é idempotente: rc=${rc} ${out} ${y}"; fi
   # (j) onda O3 (--apply-judged): aplica a planilha JULGADA. Só APROVADO/CORRIGIDO; REPROVADO e proposta de
   #     selo do maestro (dev-dúvida) ficam intocados. corrigir/testemunho escreve OU SUBSTITUI no lugar o bloco
@@ -48822,10 +48822,10 @@ run_kg_migrate_v3_selftests() {
      && python3 -I -B -c '
 import json,sys
 g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}
-assert n["E_J_CORR"]["provenance"]=={"source":"ops/a.sh","locator":"ops/a.sh l.3, \"x\"","method":"leitura: ops/a.sh"}, n["E_J_CORR"]
-assert n["E_J_SUBST"]["provenance"]=={"source":"ops/novo.sh","locator":"ops/novo.sh l.9","method":"medição: bash ops/novo.sh"}, n["E_J_SUBST"]
+assert n["E_J_CORR"]["provenance"]=={"source":"ops/a.sh","locator":"ops/a.sh l.3, \"x\"","method":"reading: ops/a.sh"}, n["E_J_CORR"]
+assert n["E_J_SUBST"]["provenance"]=={"source":"ops/novo.sh","locator":"ops/novo.sh l.9","method":"measurement: bash ops/novo.sh"}, n["E_J_SUBST"]
 assert n["E_J_SUBST"]["verified_at"]=="2026-10-01"
-assert n["E_J_TEST"]["provenance"]["method"]=="testemunho: medição da sessão"
+assert n["E_J_TEST"]["provenance"]["method"]=="testimony: medição da sessão"
 assert n["E_J_REB"]["status"]=="unverifiable" and "provenance" not in n["E_J_REB"]
 assert n["E_J_REB_OPEN"]["status"]=="open"
 assert n["D_J_DEV"]["plane"]=="DEV" and n["D_J_DEV"]["status"]=="done" and "provenance" not in n["D_J_DEV"]
@@ -48887,7 +48887,7 @@ assert n["E_K_LBL"]["label"]=="label novo" and n["E_K_LBL"]["narrative"]=="conte
 assert n["E_K_LBL"]["provenance"]["locator"]=="ops/a.sh l.1"
 assert n["E_K_NONARR"]["label"]=="label curto" and n["E_K_NONARR"]["narrative"]=="label anterior: sem narrative"
 assert n["E_K_LONG"]["label"]=="fica" and "provenance" not in n["E_K_LONG"] and "narrative" not in n["E_K_LONG"]
-assert n["E_K_REF"]["status"]=="refuted" and "o run mostra is_error" in n["E_K_REF"]["narrative"] and n["E_K_REF"]["provenance"]["method"].startswith("medição: ")
+assert n["E_K_REF"]["status"]=="refuted" and "o run mostra is_error" in n["E_K_REF"]["narrative"] and n["E_K_REF"]["provenance"]["method"].startswith("measurement: ")
 assert n["E_K_UNV"]["status"]=="confirmed" and n["E_K_UNV"]["label"]=="label corrigido do unverifiable"
 assert n["D_K_DUV"]["plane"]=="PROD" and n["D_K_DUV"]["provenance"]["source"]=="commit abc"
 ' "${y}" 2>/dev/null \
@@ -48938,7 +48938,7 @@ assert n["E_M_JA"]["plane"]=="DEV"
 assert n["Q_M_OPEN"]["plane"]=="DEV" and n["Q_M_OPEN"]["status"]=="open"
 assert n["E_M_REPROV"]["plane"]=="PROD" and n["E_M_REPROV"]["provenance"]==t
 assert n["E_M_MANTER"]["plane"]=="PROD" and n["E_M_MANTER"]["verified_at"]=="2026-10-09"
-assert n["E_M_MANTER"]["provenance"]=={"source":"ops/a.sh","locator":"l.3","method":"medição: grep -n x ops/a.sh → l.3","locality":"repo"}, n["E_M_MANTER"]
+assert n["E_M_MANTER"]["provenance"]=={"source":"ops/a.sh","locator":"l.3","method":"measurement: grep -n x ops/a.sh → l.3","locality":"repo"}, n["E_M_MANTER"]
 assert n["E_M_MANTER_RUIM"]["provenance"]==t and n["E_M_MANTER_RUIM"]["verified_at"]=="2026-09-01"
 assert n["E_M_FORA"]["plane"]=="PROD"
 ' "${y}" 2>/dev/null \
@@ -49018,11 +49018,11 @@ assert n["E_M2_EN_RUIM"]["provenance"]["method"]=="testemunho: relato da sessão
 import json,sys
 n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
 old={"source":"/home/x/repo-x @abc:README.md","locator":"abc:README.md l.7","method":"leitura: README do repo /home/x/repo-x"}
-assert n["E_N_ABS"]["provenance"]=={"source":"repo-x@abc:README.md (host)","locator":"abc:README.md l.7","method":"testemunho: leitura do README do repo-x no host","locality":"host"}, n["E_N_ABS"]
+assert n["E_N_ABS"]["provenance"]=={"source":"repo-x@abc:README.md (host)","locator":"abc:README.md l.7","method":"testimony: leitura do README do repo-x no host","locality":"host"}, n["E_N_ABS"]
 assert n["E_N_DUAS"]["plane"]=="DEV" and n["E_N_DUAS"]["provenance"]["locator"]=="abc:README.md l.8" and n["E_N_DUAS"]["provenance"]["locality"]=="host"
 assert n["E_N_LOCRUIM"]["provenance"]==old and n["E_N_AINDA_ABS"]["provenance"]==old
 assert n["E_N_ROTA"]["provenance"]["source"]=="GET /threads contra o bridge em produção (host)"
-assert n["E_N_CML"]["provenance"]=={"source":"binário do Claude Code 2.1.258","locator":"teto 200","method":"medição: re.finditer sobre o binário 2.1.258","locality":"host"}
+assert n["E_N_CML"]["provenance"]=={"source":"binário do Claude Code 2.1.258","locator":"teto 200","method":"measurement: re.finditer sobre o binário 2.1.258","locality":"host"}
 assert "provenance" not in n["E_N_SEMPROV"]
 assert all(x["verified_at"]=="2026-09-01" for x in n.values() if "verified_at" in x)
 ' "${y}" 2>/dev/null \
@@ -49078,7 +49078,7 @@ o={x["id"]:x for x in json.loads(sys.argv[2])["nodes"]}
 n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
 src="binário do Claude Code 2.1.258 (host)"
 assert n["E_O_REESC"]["provenance"]=={"source":src,"locator":"grep em <clone do repo> l.3","method":"leitura: README","locality":"host"}, n["E_O_REESC"]
-assert n["E_O_PRODBIN"]["plane"]=="PROD" and n["E_O_PRODBIN"]["provenance"]=={"source":"binário do Claude Code 2.1.258","locator":"re.finditer sobre os bytes","method":"medição: re.finditer sobre o binário 2.1.258","locality":"web"}
+assert n["E_O_PRODBIN"]["plane"]=="PROD" and n["E_O_PRODBIN"]["provenance"]=={"source":"binário do Claude Code 2.1.258","locator":"re.finditer sobre os bytes","method":"measurement: re.finditer sobre o binário 2.1.258","locality":"web"}
 assert n["E_O_DEVBIN"]["plane"]=="DEV" and n["E_O_DEVBIN"]["provenance"]=={"source":"binário do Claude Code 2.1.259","locator":"offset 12","method":"derivado: x","locality":"web"}
 assert n["E_O_SEMVER"]["plane"]=="DEV" and n["E_O_SEMVER"]["provenance"]["source"]=="binário do Claude Code 2.1.286" and n["E_O_SEMVER"]["provenance"]["locality"]=="web"
 assert n["E_O_HIST"]["plane"]=="DEV" and n["E_O_HIST"]["provenance"]==o["E_O_HIST"]["provenance"]
@@ -49160,7 +49160,7 @@ assert n["E_P_VA"]["verified_against"]=="grep em <clone do repo> l.1"
 assert n["E_P_TRACE"]["trace"]=="onion-bridge@abc1234:src/a.ts"
 assert "trace" not in n["E_P_RM"] and n["E_P_RM"]["narrative"]=="n0 · trace anterior (só no host): o Caddyfile do host (fora de repo)."
 assert n["E_P_MARK"]["x_path_is_content"]=="citação" and isinstance(n["E_P_MARK"]["x_path_is_content"],str) and n["E_P_MARK"]["narrative"]=="Caminho como conteúdo: citação verbatim."
-assert n["E_P_BIN"]["plane"]=="DEV" and n["E_P_BIN"]["provenance"]["method"].startswith("medição: strings") and n["E_P_BIN"]["provenance"]["locality"]=="web"
+assert n["E_P_BIN"]["plane"]=="DEV" and n["E_P_BIN"]["provenance"]["method"].startswith("measurement: strings") and n["E_P_BIN"]["provenance"]["locality"]=="web"
 assert n["E_P_OLD"]["status"]=="superseded" and n["E_P_OLD"]["plane"]=="DEV" and n["E_P_NEW"]["status"]=="confirmed"
 e={(x["from"],x["to"],x["edge_type"]) for x in g["edges"]}
 assert e=={("E_P_OLD","E_P_VA","CONSTRAINS"),("E_P_NEW","E_P_OLD","SUPERSEDES")}, e
@@ -49360,6 +49360,91 @@ assert n["D_LIMITADA"]["narrative"].endswith(" · desde o contrato v4.3 (SAC-98)
   if [ "${_xn}" -eq 12 ] && [[ " ${_xseen} " == *" PASS "* ]] && [[ " ${_xseen} " == *" PASSA "* ]]; then
     record_pass "kg-migrate-v3: (xl) o veredito do contrato é o rc: kg_validate real 4.18.0 em inglês e em português (C.UTF-8 e pt_BR.UTF-8 × KG_SSOT_LANG ausente, en e pt-BR), o conforme passa e o reprovado reprova (12 de 12, as duas línguas vistas)"
   else record_fail "kg-migrate-v3: (xl)" "o predicado do contrato dependeu da língua ou do locale (${_xn} de 12):${_xbad}; 1ª palavra vista:${_xseen}"; fi
+  # (en) D_PROVENANCE_METHOD_VOCAB_PLAN_1110 (2026-11-10, «primeiro o que escreve»): todo method que a ferramenta
+  #      GRAVA sai com a classe em inglês — o v3 ('derived: na migração…'), a O1 ('medição' do routing vira
+  #      'measurement: …', a política 4 vira 'testimony: …'), a O2 ('derived: trace do nó…' e 'testimony: leitura do
+  #      arquivo…') e a tabela julgada (o alias 'juízes: …' do juiz vira 'judges: …'); o detalhe depois de ': ' não
+  #      muda, e o valor MANTIDO (method_final vazio) fica em português (migrar o corpus é outra onda). A cópia LIMPA
+  #      prova verde no mesmo arranjo; cada mutante volta um escritor ao português (ou canoniza o mantido) e reprova.
+  _kmv_en_probe() {  # <tool> <dir>: imprime o que falhou; vazio = tudo em inglês e o mantido intacto
+    local t="$1" w="$2" bad="" yy
+    rm -rf "${w}"; mkdir -p "${w}/docs/x" "${w}/ops"; printf '#!/bin/sh\n' > "${w}/ops/real.sh"
+    _kmv_graph > "${w}/v3.kg.yaml"
+    PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${t}" "${w}/v3.kg.yaml" >/dev/null 2>&1 || bad="${bad} v3-rc"
+    grep -q '      method: "derived: na migração ao contrato v3' "${w}/v3.kg.yaml" || bad="${bad} v3"
+    {
+      printf 'meta:\n  id: en\n  schema_version: "1"\n  baseline: "2026-11-10"\nnodes:\n'
+      printf '  - id: Q_EN\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "pergunta"\n'
+      for _n in "E_EN_O1:ops/real.sh:medição X" "E_EN_O1H:/etc/algum.conf:lido no host" "E_EN_O2:ops/real.sh:" "E_EN_O2H:/etc/algum.conf:"; do
+        printf '  - id: %s\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    trace: "%s"\n    label: "e %s"\n' \
+          "${_n%%:*}" "$(cut -d: -f2 <<< "${_n}")" "${_n%%:*}"
+        [ -n "${_n##*:}" ] && printf '    verified_against: "%s"\n' "${_n##*:}"
+      done
+      printf 'edges:\n  - from: E_EN_O1\n    to: Q_EN\n    edge_type: SUPPORTS\n'
+    } > "${w}/docs/x/en.kg.yaml"
+    {
+      printf 'graph\tid\tstatus\tplane\tclass\tsubclass\tfinal\tmethod_class\ttool_derives\n'
+      printf 'docs/x/en.kg.yaml\tE_EN_O1\tconfirmed\tDEV\tA1\tcaminho-lido\tA1\tmedição\tderivavel\n'
+      printf 'docs/x/en.kg.yaml\tE_EN_O1H\tconfirmed\tDEV\tA2\tfora-do-repo\tA2\tjuízes\tderivavel\n'
+      printf 'docs/x/en.kg.yaml\tE_EN_O2\tconfirmed\tDEV\tA2\tcaminho-trace+sem-va\tA2\tderivado\tsem-fonte\n'
+      printf 'docs/x/en.kg.yaml\tE_EN_O2H\tconfirmed\tDEV\tA2\tcaminho-trace+sem-va\tA2\tderivado\tsem-fonte\n'
+    } > "${w}/routing.tsv"
+    PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${t}" --routing "${w}/routing.tsv" "${w}/docs/x/en.kg.yaml" >/dev/null 2>&1 || bad="${bad} rot-rc"
+    {
+      printf 'meta:\n  id: en5\n  schema_version: "1"\n  baseline: "2026-11-10"\nnodes:\n'
+      for _n in E_EN_NOVO E_EN_MANTIDO; do
+        printf '  - id: %s\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "x"\n    label: "%s"\n    provenance:\n      source: "ops/real.sh"\n      locator: "l.1"\n      method: "leitura: ops/real.sh"\n      locality: "repo"\n' "${_n}" "${_n}"
+      done
+      printf 'edges:\n  - from: E_EN_NOVO\n    to: E_EN_MANTIDO\n    edge_type: SUPPORTS\n'
+    } > "${w}/docs/x/en5.kg.yaml"
+    {
+      printf 'id,grafo,regra,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,locality_final,motivo,confianca\n'
+      printf 'E_EN_NOVO,docs/x/en5.kg.yaml,1,reescrever-locator-method,APROVADO,reescrever-locator-method,,l.2,juízes: painel 3/2 do run,,novo,0.9\n'
+      printf 'E_EN_MANTIDO,docs/x/en5.kg.yaml,1,reescrever-locator-method,APROVADO,reescrever-locator-method,,l.3,,,mantido,0.9\n'
+    } > "${w}/o5.csv"
+    LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${t}" --apply-judged "${w}/o5.csv" "${w}/docs/x/en5.kg.yaml" >/dev/null 2>&1 || bad="${bad} o5-rc"
+    yy="$(python3 -I -B - "${w}/docs/x/en.kg.yaml" "${w}/docs/x/en5.kg.yaml" <<'KMV_EN_PY' 2>&1
+import sys, yaml
+n = {x["id"]: x for f in sys.argv[1:] for x in yaml.safe_load(open(f))["nodes"]}
+m = lambda k: str((n[k].get("provenance") or {}).get("method", ""))
+want = {"E_EN_O1": "measurement: provenance derivada na migração", "E_EN_O1H": "testimony: leitura do arquivo /etc/algum.conf",
+        "E_EN_O2": "derived: trace do nó, sem registro de medição", "E_EN_O2H": "testimony: leitura do arquivo /etc/algum.conf",
+        "E_EN_NOVO": "judges: painel 3/2 do run"}
+bad = [k for k, v in want.items() if not m(k).startswith(v)]
+if m("E_EN_MANTIDO") != "leitura: ops/real.sh" or n["E_EN_MANTIDO"]["provenance"]["locator"] != "l.3":
+    bad.append("E_EN_MANTIDO")
+print(" ".join(bad))
+KMV_EN_PY
+)" || bad="${bad} probe-py"
+    printf '%s' "${bad}${yy:+ ${yy}}"
+  }
+  local _en_w="${d}/en-probe" _en_clean _en_dead=0 _en_alive="" _en_why="" _en_out _en_mut _en_sed _en_name
+  # a cópia LIMPA roda no MESMO arranjo dos mutantes (pasta própria com o machine_path.py ao lado): verde nela é
+  # o que prova que o mutante morre pela troca, não pelo arranjo (a 1ª versão deste caso «matou» os 7 por import)
+  mkdir -p "${d}/mut-en-limpa"; cp "${tool}" "$(dirname "${tool}")/machine_path.py" "${d}/mut-en-limpa/"
+  _en_clean="$(_kmv_en_probe "${d}/mut-en-limpa/kg-migrate-v3.py" "${_en_w}")"
+  local -a _en_muts=(
+    'canon-identidade|s|^    return METHOD_CLASS_EN\[cls\] + sep + rest if sep and cls in METHOD_CLASS_EN else method$|    return method|'
+    'rota-alias|s|cls = "testimony" if host else METHOD_CLASS_EN.get(route\[1\], route\[1\])|cls = "testimony" if host else route[1]|'
+    'o1-host-pt|s|cls = "testimony" if host else|cls = "testemunho" if host else|'
+    'o2-derivado|s|if host else "derived: trace do nó, sem registro de medição")|if host else "derivado: trace do nó, sem registro de medição")|'
+    'o2-host-pt|s|method = (f"testimony: leitura do arquivo|method = (f"testemunho: leitura do arquivo|'
+    'v3-derivado|s|q(f"derived: na migração ao contrato v3|q(f"derivado: na migração ao contrato v3|'
+    'canoniza-mantido|s|^    if method != cur_method:$|    if True:|'
+  )
+  for _en_mut in "${_en_muts[@]}"; do
+    _en_name="${_en_mut%%|*}"; _en_sed="${_en_mut#*|}"
+    mkdir -p "${d}/mut-en-${_en_name}"; cp "${tool}" "$(dirname "${tool}")/machine_path.py" "${d}/mut-en-${_en_name}/"
+    sed -i "${_en_sed}" "${d}/mut-en-${_en_name}/kg-migrate-v3.py"
+    if cmp -s "${tool}" "${d}/mut-en-${_en_name}/kg-migrate-v3.py"; then _en_alive="${_en_alive} ${_en_name}(âncora-não-casou)"; continue; fi
+    _en_out="$(_kmv_en_probe "${d}/mut-en-${_en_name}/kg-migrate-v3.py" "${_en_w}")"
+    # morto só pelo motivo certo: o probe acusa um nó (nunca só o rc, que seria o mutante quebrar a ferramenta)
+    if [ -n "${_en_out}" ] && ! grep -qE -- '-rc|probe-py' <<< "${_en_out}"; then _en_dead=$((_en_dead + 1)); _en_why="${_en_why} ${_en_name}→${_en_out# }"
+    else _en_alive="${_en_alive} ${_en_name}(${_en_out:-verde})"; fi
+  done
+  if [ -z "${_en_clean}" ] && [ "${_en_dead}" -eq "${#_en_muts[@]}" ]; then
+    record_pass "kg-migrate-v3: (en) o que a ferramenta grava sai com a classe em inglês (v3 derived, O1 measurement/testimony, O2 derived/testimony, tabela julgada judges) e o method mantido fica em português; (MUT) ${_en_dead} de ${#_en_muts[@]} mutantes reprovam:${_en_why}"
+  else record_fail "kg-migrate-v3: (en)" "cópia limpa:${_en_clean:- verde} · mutantes mortos ${_en_dead} de ${#_en_muts[@]} · vivos:${_en_alive:- nenhum}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
@@ -53903,6 +53988,30 @@ DEC_PY
       record_pass "decide: (s1) o selador escreve status/plane DEV/verified_at/method/escolhida+descartadas e o radar sai 0"
     else record_fail "decide: (s1)" "o grafo selado reprova no radar"; fi
   else record_fail "decide: (s1)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s1m) D_PROVENANCE_METHOD_VOCAB_PLAN_1110 (2026-11-10): o selo novo grava a classe em inglês, `testimony: …`.
+  #       A cópia LIMPA e o mutante rodam no MESMO arranjo (selador e resolver copiados para fora da árvore, radar por repasse);
+  #       o mutante volta o selador ao alias `testemunho:` e o caso tem de reprovar só por isso.
+  local _sm="${sb}/seal-en" _smv _smm _smres=""
+  for _smv in limpa mut; do
+    rm -rf "${_sm}/${_smv}"; mkdir -p "${_sm}/${_smv}/validation" "${_sm}/${_smv}/utils/kg"
+    cp "${seal}" "${_sm}/${_smv}/validation/"
+    # o radar vizinho é um repasse ao radar REAL (copiado, ele perde o lib/ e o resolver que acha pelo próprio caminho)
+    printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "${REPO_ROOT}/.claude/validation/kg-radar.sh" > "${_sm}/${_smv}/validation/kg-radar.sh"
+    cp "${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" "${_sm}/${_smv}/utils/kg/"
+    if [ "${_smv}" = mut ]; then
+      sed -i "s|^method = f'testimony: decisão do maestro|method = f'testemunho: decisão do maestro|" "${_sm}/${_smv}/validation/kg-decide-seal.sh"
+      cmp -s "${seal}" "${_sm}/${_smv}/validation/kg-decide-seal.sh" && { _smres="${_smres} mut:âncora-não-casou"; continue; }
+    fi
+    cp "${r}/docs/a/a.kg.yaml" "${_sm}/${_smv}/s.kg.yaml"
+    # verde = o selador saiu 0 E gravou; o método gravado é o veredito (o mutante tem de gravar o alias, nunca quebrar)
+    if bash "${_sm}/${_smv}/validation/kg-decide-seal.sh" "${_sm}/${_smv}/s.kg.yaml" D_VELHO --chosen "caminho um" --rejected "caminho dois" --date 2026-11-10 --question "qual?" > "${_sm}/${_smv}.out" 2>&1; then
+      _smm="$(python3 -I -B -c 'import sys,yaml; print([x for x in yaml.safe_load(open(sys.argv[1]))["nodes"] if x["id"]=="D_VELHO"][0]["provenance"]["method"])' "${_sm}/${_smv}/s.kg.yaml" 2>&1)"
+      _smres="${_smres} ${_smv}:${_smm%%:*}"
+    else _smres="${_smres} ${_smv}:rc($(tail -1 "${_sm}/${_smv}.out"))"; fi
+  done
+  if [ "${_smres}" = " limpa:testimony mut:testemunho" ] && grep -q "^testimony: decisão do maestro por pergunta com opções, 2026-11-10$" <<< "$(python3 -I -B -c 'import sys,yaml; print([x for x in yaml.safe_load(open(sys.argv[1]))["nodes"] if x["id"]=="D_VELHO"][0]["provenance"]["method"])' "${_sm}/limpa/s.kg.yaml" 2>&1)"; then
+    record_pass "decide: (s1m) o selo novo grava 'testimony: decisão do maestro…' (classe em inglês); (MUT) o selador de volta ao alias 'testemunho:' reprova, a cópia limpa no mesmo arranjo passa"
+  else record_fail "decide: (s1m)" "esperava a cópia limpa gravando testimony e o mutante gravando testemunho (classe gravada por cópia):${_smres}"; fi
   # (s2) nó inexistente → rc 2 e o arquivo intacto
   h0="$(sha256sum "${g}" | cut -d' ' -f1)"
   if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
