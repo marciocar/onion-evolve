@@ -8,8 +8,9 @@ meta:
   baseline: "2026-11-10"
   review_after: "2026-12-10"   # 30d: a Parte A vira execução (leitor único, dialeto único, envelope v1) e a Parte B
                                # abre estudo; os dois mexem no perfil antes de 90 dias.
-  # ═══ TETO: 12 NÓS ═══
-  # Justificativa: 1 tese + 5 seções (A1 a A5) + 1 pergunta aberta da Parte B + 4 selos do maestro = 11; folga de 1.
+  # ═══ TETO: 14 NÓS ═══
+  # Justificativa: 1 tese + 5 seções (A1 a A5) + 1 pergunta aberta da Parte B + 4 selos do maestro = 11; mais a
+  # coluna de estado das peças (PIECES.md, 2026-11-10) e o selo da doutrina do estado da peça = 13; folga de 1.
   purpose: "Registrar o perfil de interconexão v1 (Parte A) do Onion: um envelope único para todo sinal ou evento entre membros, com versão, validade por canal, dedupe, recibo de aceite e classe de confidencialidade, sob o modelo de confiança de hoje; e abrir a Parte B como estudo."
 external_edges:
   - from: Q_INTERCONNECT_PART_B_STUDY_1110
@@ -195,6 +196,39 @@ nodes:
       locator: "pergunta com opções de 2026-11-10: «Abrir a Parte B como estudo, com a curadoria conduzindo e o core decidindo a arquitetura?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
       locality: "pessoa"
+  - id: E_INTERCONNECT_PIECES_COLUMN_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "PIECES.md desta pasta: estado e transição proposta de 10 peças, medidos por git sem fetch nas refs que o arquivo declara (core em origin/main de 2026-11-10, mensageria b9b7f5c, bridge 92079ae); contagens refeitas por comando simples nesta passada"
+    label: "A coluna de estado das peças propõe adotar o bridge e a mensageria, vendorizar com carimbo o gate A2A para a fila, fixar a fila por versão nos membros, adotar a operação da persona no hub depois do piloto, e deixar o kg-ssot como está."
+    narrative: "Gatilhos medidos: o bridge roda em produção pelo core (15 arquivos de operação o citam), fora do registro, com 34 de 34 commits próprios da janela de 30 dias vindos de sessão do core; a mensageria tem 25 de 25; o gate A2A tem blob idêntico nas duas cópias e é lido pelo código do bridge; o daemon da fila roda em três membros sem versão publicada. A persona só muda depois do selo da arquitetura multiaudiência e do piloto de 17/11, com o risco do modo hub nomeado. Nenhuma transição é ato: cada uma passa pelo /meta:decide."
+    trace: "docs/evolution/research/interconnect-profile-2026-11/PIECES.md"
+    provenance:
+      source: "docs/evolution/research/interconnect-profile-2026-11/PIECES.md"
+      locator: "tabela «estado da peça e transição proposta»"
+      method: "medição: git grep, git log e git rev-parse nos clones locais, só leitura, 2026-11-10"
+      locality: repo
+  - id: D_PIECE_STATE_DOCTRINE_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Siga com doutrina e coluna no mapa, nos criterios da doutrina deve também entrar a opção de promoção ou troca, afinal, uma peça exclusiva pode virar para outros adotantes ou clientes ou funções com o tempo ou se mostrar diferente? entende e concorda?»"
+    label: "Identificar peças a adotar ou vendorizar vira doutrina do estado da peça, com promoção, rebaixamento e troca por padrão de mercado, cada uma só com gatilho medido, aplicada numa coluna do mapa de interconexão."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Siga com doutrina e coluna no mapa, nos criterios da doutrina deve também entrar a opção de promoção ou troca, afinal, uma peça exclusiva pode virar para outros adotantes ou clientes ou funções com o tempo ou se mostrar diferente? entende e concorda?» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Forja completa com medidor, bancada e grafo próprios»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Mecanismo para identificar peças a adotar ou vendorizar: seguir com doutrina e coluna no mapa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
 edges:
   - from: C_INTERCONNECT_A1_ENVELOPE_1110
     to: C_INTERCONNECT_PROFILE_THESIS_1110
@@ -225,4 +259,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_INTERCONNECT_PART_B_OPEN_1110
     to: Q_INTERCONNECT_PART_B_STUDY_1110
+    edge_type: TRACES_TO
+  - from: E_INTERCONNECT_PIECES_COLUMN_1110
+    to: C_INTERCONNECT_PROFILE_THESIS_1110
+    edge_type: SUPPORTS
+  - from: D_PIECE_STATE_DOCTRINE_1110
+    to: E_INTERCONNECT_PIECES_COLUMN_1110
     edge_type: TRACES_TO
