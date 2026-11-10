@@ -79,11 +79,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.6
-    verified_at: "2026-10-30"
-    verified_against: "proposta da rodada 21 do radar do Claude Code: subir o Agent SDK do bridge de 0.3.310 para 0.3.314 pelo ops/update-bridge.sh (deploy do maestro, repo alheio); a metade do pin da SAC-261 já foi feita (v1.0.265, commit 5320d49ae) e a do SDK não; a razão é a paridade (três versões publicadas atrás); a linha 36 (--setting-sources) NÃO tem o que vazar hoje: medido como a conta do serviço, só lendo, a home do /chat não tem settings.json e nenhum workspace tem settings.local.json (só o .claude/settings.json de projeto, que é fonte incluída); candidata não medida: a linha 62 (prompt com tags como <bash-stdout> não reconhecido por host stream-json local), porque o /chat é host stream-json (ops/chat-runner.sh linha 634) no CLI 2.1.310; a linha 71 não se aplica, porque o runner nega Task e Agent (linha 629); nada sobe nesta rodada; issue SAC-262, que substitui o alvo da SAC-261 (comentada); reescrito após o EXAGERA do juiz"
+    verified_at: "2026-11-10"
+    verified_against: "cumprida: currency-census.sh em 2026-11-10 mede o SDK do bridge em 0.3.319 e a action em 1.0.271, ambos além do alvo desta pergunta; a subida seguinte é Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110"
     label: "o SDK do bridge deve subir para 0.3.314 por paridade (três versões atrás); o alvo da SAC-261 envelheceu, só a metade do pin dela foi feita, e nenhuma correção da 2.1.314 tem efeito medido no /chat"
     provenance:
       source: "https://linear.app/sacola/issue/SAC-262"

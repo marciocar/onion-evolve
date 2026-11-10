@@ -81,11 +81,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.6
-    verified_at: "2026-10-26"
-    verified_against: "proposta da rodada 19 do radar do Claude Code: subir o Agent SDK do bridge para 0.3.311 pelo ops/update-bridge.sh (deploy do maestro, repo alheio) e o pin do revisor para a tag v1.0.263 (8041f1d1); a razão medida é a linha 11 (ordem do transcript em sessões de SDK com resume); o pin do revisor é paridade, porque ele está desligado; nada sobe nesta rodada; issue SAC-259"
+    verified_at: "2026-11-10"
+    verified_against: "cumprida: currency-census.sh em 2026-11-10 mede o SDK do bridge em 0.3.319 e a action em 1.0.271, ambos além do alvo desta pergunta; a subida seguinte é Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110"
     label: "o SDK do bridge deve subir para 0.3.311, pela ordem do transcript nas sessões retomadas (linha 11), e o pin do revisor do CI para v1.0.263, por paridade"
     provenance:
       source: "https://linear.app/sacola/issue/SAC-259"

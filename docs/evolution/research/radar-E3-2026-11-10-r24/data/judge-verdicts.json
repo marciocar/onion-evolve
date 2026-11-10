@@ -1,0 +1,330 @@
+{
+  "criteria": [
+    {
+      "id": "CU1_CITACAO_DIVERGE",
+      "when": "data/<versão>.txt não bate byte a byte com a seção do CHANGELOG oficial, ou um nó cita entre «» texto do item que não está lá",
+      "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '$0==\"## <versão>\"{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-11-10-r24/data/<versão>.txt; e grep -F de cada trecho entre «» em data/"
+    },
+    {
+      "id": "CU2_MEDICAO_NAO_REPRODUZ",
+      "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+      "check": "re-executar: claude --version; npm view do SDK; currency-census.sh; os hooks reais com payload forjado por script python (sem executar o comando); readlink dos processos; as famílias cited_directive e channel_session"
+    },
+    {
+      "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+      "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+      "check": "ler label e verified_against e conferir no core por grep -n ou leitura do hook"
+    },
+    {
+      "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+      "when": "a rodada supera nó da r23 que não existe ou cujo estado ainda vale, ou deixa de superar nó cujo estado a medição derrubou",
+      "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml e comparar o estado afirmado com a medição de hoje"
+    },
+    {
+      "id": "CU5_OMISSAO_DO_DELTA",
+      "when": "um item do delta toca superfície real do core e a rodada não o mediu nem o declarou em NÃO-VERIFICADOS",
+      "check": "ler data/*.txt inteiros e, para cada candidato ausente, medir a superfície no core"
+    },
+    {
+      "id": "CU6_VAZAMENTO_EM_REPO_PUBLICO",
+      "when": "o grafo ou a SYNTHESIS trazem nome de repo de adotante não federado, caminho de máquina, IP ou hostname",
+      "check": "grep -n -E '/home/|/tmp/claude' nos arquivos da rodada; REGRA 119"
+    }
+  ],
+  "verdicts": [
+    {
+      "alvo": "CU1: cópias e citações",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU1_CITACAO_DIVERGE",
+        "comando": "curl do CHANGELOG oficial, awk da seção e cmp contra data/2.1.319.txt, 2.1.321.txt e 2.1.322.txt → rc 0 nas três; script python com os trechos entre «» do grafo buscados em data/ → 12 de 13 achados; o 13º é a saída do /model de E_FABLE_5_2, declarada como saída de ferramenta"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "149, 121 e 4 linhas; 146, 118 e 1 itens por grep -c '^- '; 265 no total"
+      }
+    },
+    {
+      "alvo": "E_DELTA_DA_RODADA",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "bash .claude/validation/cc-delta-census.sh --tsv → DELTA 3 versões, baseline 2.1.318, disco 2.1.322, processo 2.1.322, SDK bridge 2.1.319"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "não existe seção 2.1.320 no CHANGELOG; o delta tem três versões"
+      }
+    },
+    {
+      "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU5_OMISSAO_DO_DELTA",
+        "comando": "leitura dos três data/*.txt contra verified_against do nó → «os candidatos foram medidos» não vale enquanto os itens do veredito CU5 não forem medidos ou nomeados; a SYNTHESIS citada ainda não existe"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada medido que feche a pergunta hoje",
+        "medida": "procurei um fecho já medido: a SYNTHESIS não existe e os itens do CU5 não estão no grafo; fechar depois de aplicá-los é condição futura, não entrega. Enquanto isso o nó deve dizer que parte dos candidatos segue sem medida"
+      }
+    },
+    {
+      "alvo": "E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "npm view @anthropic-ai/claude-agent-sdk versions --json → ... 0.3.318, 0.3.319, 0.3.321, 0.3.322, sem 0.3.320; cc-delta-census.sh --tsv → «o CLI do SDK bridge (2.1.319, SDK 0.3.319) está 2 versão(ões) publicada(s) atrás do host»"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a contagem correta: DUAS versões publicadas atrás (0.3.321 e 0.3.322), não três; a 0.3.320 não foi publicada",
+        "medida": "aviso do cc-delta-census: 2 versão(ões) publicada(s) atrás; lista do npm sem 0.3.320. O resto reproduz: claude --version 2.1.322; action 1.0.271 em-dia; bridge 0.3.319 defasada; commits/v1.0.271 → 4fa93a88; package.json da action pede ^0.3.322; a persona do Slack importa o SDK"
+      }
+    },
+    {
+      "alvo": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "npm view @anthropic-ai/claude-agent-sdk version → 0.3.322; git show origin/main:package.json no checkout do bridge → ^0.3.319, com origin/main igual ao ls-remote; pin do revisor em dia pelo currency-census"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "pergunta aberta, com alvo atual"
+      }
+    },
+    {
+      "alvo": "E_FABLE_5_2_VETADO_PELA_GUARDA_DE_MODELO_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "claude -p '/model fable' em projeto descartável com hook que grava a entrada → «Set model to `Fable 5.2` for this session only», to_model claude-fable-5-2, requested_model fable, source command; r24_judge_probe.py com essa entrada no guarda real → rc 2; claude-fable-5-1 pelo nome completo → rc 0"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "grep -n no guarda: l.89 é o grep do lineup e l.91 a mensagem do veto; radar-baselines.yaml l.47-50 lista os três modelos; os comentários l.42-45 confirmam o caso de 2026-10-03"
+      }
+    },
+    {
+      "alvo": "Q_E6_ADMITE_O_FABLE_5_2_NO_LINEUP_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "leitura de docs/onion/radar-baselines.yaml l.37-56 → reorganização por rodada E6, selos diretos do maestro em 2026-10-03 e 2026-10-05; guarda real com claude-fable-5-2 → rc 2"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "a decisão segue do maestro, como o nó diz"
+      }
+    },
+    {
+      "alvo": "E_VETOS_RESISTEM_A_CLASSE_DOS_BYPASS_DE_BASH_1110",
+      "veredito": "REPROVA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "python3 -I r24_judge_probe.py e r24_judge_probe2.py no scratchpad, payload forjado nos hooks reais → pretooluse-merge-gate.sh rc 0 em git push origin main e em gh pr merge 1 com os prefixos A=$'b\\nc', A=$'b\\x0ac', A='b<LF>c', A=\"b<LF>c\" e A=1 B=$'b\\nc'; pretooluse-plugin-write-guard.sh rc 0 em mkdir -p .claude/skills/x/hooks com os mesmos prefixos; pretooluse-env-guard.sh rc 0 em cat $'.env', cat $'.e'nv, cat .$'env', cat $\".env\", cp $'.env' /tmp/d/ e sed -n p $'.env'. A=$'b\\nc' printenv A imprime as duas linhas: é um único comando simples para o bash"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o mapa medido no lugar da afirmação geral: os vetos barram aspas na palavra, caminho absoluto, env, timeout e substituição dentro do prefixo; NÃO barram prefixo com quebra de linha no valor citado (merge-gate e plugin-write) nem nome em ANSI-C (env-guard). Curar o tokenizador é trabalho futuro e não entra como superação",
+        "medida": "sonda 1: fora o prefixo com quebra de linha, as formas de merge-gate deram rc 2, exceto xargs git push origin main </dev/null (rc 0); sonda 2: A=$'b' e A=$'b;c' rc 2, A=$'b\\nc' rc 0. As contagens do nó reproduzem (11, 6, 8, 7, controles rc 0). O CHANGELOG não publica o texto do bypass, logo «as mesmas formas» não é verificável"
+      }
+    },
+    {
+      "alvo": "E_BANCADA_DO_DENY_VERDE_NA_2_1_322_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "releitura do r24-deny.tsv e r24-deny.log, sem re-rodar por ordem do coordenador → 340 casos, 310 ok e 30 info, 0 divergentes, default 189 e bypass 151, 74 regras; .claude/settings.json com 74 entradas em deny"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "o teto é o declarado: sem caso de palavra entre aspas e sem /bin/cp ou /bin/mv na bancada, o que reforça os NÃO-VERIFICADOS planejados"
+      }
+    },
+    {
+      "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_322_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0; --families channel_session → rc 0, cada um sozinho, sem pipe"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "as duas famílias passaram na 2.1.322"
+      }
+    },
+    {
+      "alvo": "E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "leitura de pretooluse-plugin-write-guard.sh l.8-11 e l.51-52 e de plugin-write-2026-11.kg.yaml l.24 → na 2.1.318 o plugin gravado sob bypass já carregava na sessão seguinte sem pergunta; o próprio guarda se declara contenção de acidente, não fronteira; 2.1.319 l.55 e l.76 mostram recarga em sessão antes da 2.1.321"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a datação medida: na carga da sessão seguinte, sob bypass, o veto já era a única barreira na 2.1.318 (células W1 e W4); o que a 2.1.321 muda, segundo o item, é a carga no meio da sessão, ainda não medida (Q_RERODAR). O veto tem teto declarado, então «barreira» precisa da ressalva",
+        "medida": "plugin-write-2026-11.kg.yaml l.24; configuração do usuário defaultMode bypassPermissions; gerenciada só com pluginConfigs; --selftest rc 0. Sondas do juiz: A=$'b\\nc' mkdir, sed -n 'w …' e env --chdir=.claude/skills/x mkdir hooks → rc 0 no veto"
+      }
+    },
+    {
+      "alvo": "Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "ls de exit2-coupling-against-2026-11/data/mods-managed/ → results.jsonl, lab, policies; grep -n 117 na SYNTHESIS desse laboratório → l.55 e l.156, 117 repetições"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "laboratório existe e a rodada declara que não o re-rodou"
+      }
+    },
+    {
+      "alvo": "E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "readlink do executável por processo, pstree dos bg-pty-host e registro em ~/.claude/sessions/*.json → na 2.1.319 há 2 conversas, 1 attach, 2 bg-pty-host e 2 bg-spare; os 2 bg-spare têm filhos e constam no registro como kind bg com pasta de projeto: são sessões de fundo vivas, não reservas"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a contagem correta: nove executáveis atrasados, sete sem os dois bg-pty-host; as «2 reservas» são duas sessões de fundo vivas, uma delas a curadoria. Quem está na 2.1.319 já tem as correções da 2.1.319; só as 2 conversas na 2.1.318 precisam delas, e às demais falta a 2.1.321",
+        "medida": "2 conversas na 2.1.318 com 5d+ conferem; 0 executáveis com (deleted); a única reserva de fato é o par recém-lançado na 2.1.322, sob o daemon. O texto /restart isn't available over Remote Control está no binário 2.1.322, sustentando a narrativa"
+      }
+    },
+    {
+      "alvo": "E_SANDBOX_DA_CURADORIA_E_SKILLS_ANINHADAS_1110",
+      "veredito": "REPROVA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "registro em ~/.claude/sessions/*.json e readlink do executável → a sessão da curadoria é kind bg, version 2.1.319, com filho socat do proxy do sandbox; o único processo na 2.1.322 com essa pasta como cwd é a visão claude agents, que não é sessão"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o estado medido: a sessão da curadoria roda a 2.1.319. A correção do escape ao criar worktree a alcança porque é da própria 2.1.319; a correção da 2.1.321 l.6 (Bash de leitura fora do sandbox) NÃO a alcança. O rótulo também omite o `/cd`, que o item admite",
+        "medida": "settings.json da curadoria com sandbox.enabled true, allowUnsandboxedCommands false e autoAllowBashIfSandboxed true; core e os outros dois peers sem sandbox; 8 worktrees, 8 com .claude/skills; socat do proxy do sandbox é filho da sessão na 2.1.319"
+      }
+    },
+    {
+      "alvo": "E_LOOP_AUTOPACED_TERMINA_SEM_REAGENDAR_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "git grep de /loop e ScheduleWakeup em .claude, ops e docs/knowledge-base → só proibição W7 e listas de sandbox; settings do usuário sem CLAUDE_CODE_LOOP_KEEPALIVE; r24_judge_loop.py nos transcripts do core → uma invocação em 2026-11-03, args começando em orquestrar, sem intervalo"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "o uso pelo maestro existe, uma vez; verified_against poderia citá-lo"
+      }
+    },
+    {
+      "alvo": "E_POSTTOOLUSE_EM_CHAMADA_INTERROMPIDA_CABE_NO_PRAZO_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "r24_judge_post2.py: 64.717 comandos Bash reais dos transcripts do core, passados ao hook → p50 0,101 s, p99 (67 linhas) 0,311 s, p999 0,157 s, maior (608 linhas) 0,233 s; settings.json confirma um único PostToolUse"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "teto: entrada sintética sem heredoc, 780 linhas com pipe e $?, levou 78 s (r24_judge_post.py); não apareceu nos transcripts"
+      }
+    },
+    {
+      "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1110",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "grep capabilities no doorbell/server.ts em execução → experimental, sem tasks; git grep de afkTimeoutMs, denyInsteadOfPrompting e CLAUDE_CODE_AUTO_MODE_SERVER no core e no bridge → sem uso; .claude/settings.json sem ask e deny só de Read e Bash; git grep claude remote-control em ops e .claude/utils → sem uso"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "o bridge cita OAuth também em web/src/auth/oidc.ts, além dos dois lugares do nó; nenhum é MCP remoto com OAuth, então a conclusão fica de pé"
+      }
+    },
+    {
+      "alvo": "CU4: os três SUPERSEDES de external_edges",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+        "comando": "grep -n 'id: <NO>' no grafo da r23 → l.57, l.72, l.98 existem; as versões de quem serve mudaram, a pergunta da subida tinha alvo velho e a guarda de deriva foi re-medida na 2.1.322"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "os três estados caíram pela medição de hoje"
+      }
+    },
+    {
+      "alvo": "CU4: nós da r23 que caíram e não foram superados",
+      "veredito": "REPROVA",
+      "criterio": {
+        "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+        "comando": "comparação do grafo da r23 com a medição de hoje → E_PROCESSOS_EM_BINARIO_DELETADO_NO_HOST_1104 afirma seis processos em binário apagado, e readlink acha zero, como o próprio E_SESSOES_LONGAS diz; E_CORRECOES_HEADLESS_NAO_CHEGAM_AO_CHAT_DO_BRIDGE_1104 afirma que não chegam enquanto o bridge seguir na 2.1.310, e ele está na 2.1.319, que já as contém; E_DICA_DO_HOOK_DE_DERIVA_MANDA_CONTINUE_1104 afirma uma conversa viva na 2.1.316, e não há processo entre 2.1.314 e 2.1.317; E_EXTENSAO_VSCODE_NA_2_1_306_E_O_CLI_NAO_A_SOBE_MAIS_1104 não reproduz, pois ls -d ~/.vscode* não acha nada; E_FIM_DO_LOGIN_LEGIVEL_NO_AUTH_STATUS_1104 diz 22 dias, e hoje são 26"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o censo medido do que caiu: binário apagado (seis → zero), correções headless (já chegam: bridge na 2.1.319), dica do --continue (nenhuma conversa na janela) e extensão do VS Code (não reproduz). São os alvos que faltam em external_edges; Q_CENSO_DE_SESSOES pede o carimbo refeito (zero, não seis) e o comentário l.14 pede o número certo",
+        "medida": "readlink por processo; cc-delta-census sdk bridge 2.1.319; ls -d ~/.vscode* sem resultado; claude auth status → 26 dias (lido só o prazo); grep -c status: open na r23 → 5, menos a superada = 4 perguntas abertas, não três. A r23 superou a extensão da r22 só pela contagem de versões, então a régua existe"
+      }
+    },
+    {
+      "alvo": "CU5: omissões do delta",
+      "veredito": "REPROVA",
+      "criterio": {
+        "id": "CU5_OMISSAO_DO_DELTA",
+        "comando": "leitura integral de data/*.txt contra o grafo e os NÃO-VERIFICADOS planejados → sem medida nem nome: 2.1.321 l.6 (Bash de leitura fora do sandbox; curadoria na 2.1.319 com autoAllowBashIfSandboxed true); 2.1.321 l.7 (escrita julgada da pasta errada; env --chdir=.claude/skills/x mkdir hooks → rc 0 no veto); 2.1.319 l.80 (sed sem checagem; sed -n 'w .claude/skills/x/hooks/h' → rc 0, TETO declarado no guarda l.59); 2.1.321 l.52 (Bash na pasta errada em lote; os vetos resolvem caminho relativo pelo cwd do payload); 2.1.321 l.21 (skills e comandos somem depois de git stash ou worktree; o core é .claude/); 2.1.321 l.77 (Claude não sabia de workflow parado; 2 workflows em .claude/workflows, e a r23 mediu o item irmão da retomada)"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "as ligações medidas que faltavam: l.6 alcança a curadoria na 2.1.319; l.7 e l.80 têm forma que passa o veto de escrita (env --chdir e sed w). l.52, l.21 e l.77 têm superfície, mas o juiz só as nomeou: vão a nó ou aos NÃO-VERIFICADOS",
+        "medida": "sondas r24_judge_probe.py e registro de sessões. Descartados por medida, sem superfície: 2.1.321 l.63 (nenhum hook UserPromptSubmit do core barra); l.114 (a sonda de fundo lê output-file e status, não o comando); 2.1.319 l.53 e l.93 (nenhum plugin.json da porta declara dependencies); Monitor por WebSocket; --add-dir e --resume em ops"
+      }
+    },
+    {
+      "alvo": "CU6: vazamento em repo público",
+      "veredito": "SUSTENTA",
+      "criterio": {
+        "id": "CU6_VAZAMENTO_EM_REPO_PUBLICO",
+        "comando": "r24_judge_cu6.py nos arquivos da rodada, com caminhos, IP, hostname, infra e os nomes das pastas da casa → no grafo, 2 casos da palavra comum worktrees; em judge-verdicts.json, só o texto do próprio critério CU6; nenhum caminho, IP, hostname nem repo de adotante"
+      },
+      "superacao": {
+        "classe": "nenhuma",
+        "achada": false,
+        "o_que": "nada a superar",
+        "medida": "as cópias do CHANGELOG também limpas; a SYNTHESIS ainda não existe e precisa da mesma varredura"
+      }
+    }
+  ]
+}
