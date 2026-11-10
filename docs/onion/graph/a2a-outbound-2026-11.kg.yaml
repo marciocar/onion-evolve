@@ -128,18 +128,12 @@ nodes:
     node_type: decision
     layer: audit
     plane: DEV
-    status: done
+    status: open
+    owner: maestro
     impact: 3
-    confidence: 0.9
-    verified_at: "2026-11-10"
-    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Fase 2 só com iroh»"
-    label: "A Fase 2 da conexão A2A VPS↔notebook segue só com iroh, que passou nos eliminatórios (pontuação: caminho próprio 31, com iroh 26)."
-    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Fase 2 só com iroh»; descartadas: «Caminho próprio» · «Parquear tudo»."
-    provenance:
-      source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-10: «Na conexão VPS↔notebook, qual caminho? iroh passou nos eliminatórios; próprio 31 pts, com iroh 26»"
-      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
-      locality: "pessoa"
+    confidence: 0.5
+    label: "Caminho do transporte VPS↔notebook: Fase 2 com iroh, caminho próprio ou parquear; aguarda validação das estimativas (próprio 19 ou 31 pts)."
+    narrative: "Opções: «Fase 2 só com iroh» (passou nos eliminatórios), «Caminho próprio», «Parquear tudo». Reaberto em 2026-11-10: um selo com «Fase 2 só com iroh» saiu no commit anterior desta branch, e o maestro pediu antes a revisão das estimativas (o caminho próprio aparece com 19 ou 31 pontos). Pronto quando: as estimativas forem revistas e o maestro escolher; o selo sai pelo kg-decide-seal.sh, citando a pergunta."
   - id: D_QUEUE_HARVEST_OPENCLAW_NOW_1110
     node_type: decision
     layer: audit
