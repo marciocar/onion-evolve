@@ -2,7 +2,8 @@
 branch: feat/private-repo-cite-guard
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6b089803043ab09bfe43ed4eb39f7f2db8c3e398669ad714962c86294ac4bd2c
+reviewed_code_sha256: dc79c4ce851966bac6529780ddb16a99df72083aeed873d70f64ee693484f3e0
 findings_total: 6
 findings_real: 6
 findings_blocking: 1
