@@ -340,8 +340,10 @@ elif [ -f "${SELFTEST}" ] && _bench_touched; then
   # uma forja rodou 192 famílias por 70 min com o load entre 13 e 16, porque nada no caminho perguntava pela
   # carga. Agora a faixa só abre com a régua da máquina (ops/load-lease.conf: ocupado em 15, retoma abaixo de
   # 12, teto 30 min); teto estourado BLOQUEIA dizendo o load, e não roda a bancada calada na fila. A completa
-  # opt-in (ONION_SELFTEST_FULL=1) pega também a vaga ÚNICA de bancada cheia. Aninhado (o pr-finalize, uma
-  # família da bancada) passa direto; escape declarado: ONION_LOAD_LEASE=off.
+  # opt-in (ONION_SELFTEST_FULL=1) pega também a vaga ÚNICA de bancada cheia. Desde 2026-11-10 (a batuta) a faixa
+  # parcial também a pega: a bancada chamada sem pai admitido passa pela porta de admissão dela mesma, e dois
+  # commits com bancada na máquina rodam um depois do outro. Aninhado (o pr-finalize, uma família da bancada)
+  # passa direto; escape declarado: ONION_LOAD_LEASE=off.
   _LEASE="${REPO_ROOT}/ops/load-lease.sh"; _bench_pre=()
   if [ -f "${_LEASE}" ]; then
     if [ "${ONION_SELFTEST_FULL:-0}" = "1" ]; then

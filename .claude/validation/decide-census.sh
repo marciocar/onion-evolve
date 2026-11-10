@@ -17,6 +17,16 @@
 #   merge alheio  com --foreign-repo <dono/nome> (repetível): os PRs abertos DAQUELE repo, que a sessão
 #               não mergeia (a trava de merge veta `gh pr merge`, inclusive com -R) — é do maestro com `!`
 #   access      o gh que falha por CREDENCIAL vira linha, não só aviso: o conserto é um login interativo
+#   signal      sinais da campainha SEM ACK neste repo (o leitor .claude/utils/co-evolution/doorbell-state.py)
+#   ask         reservas de PERGUNTA AO MAESTRO desta máquina (.claude/utils/orchestration/maestro-ask.sh): chave, dona, prazo,
+#               viva ou vencida. A linha seal cujo nó já tem dona em outra sessão passa a `outro-dono`
+#
+# ── PARADO (a batuta, 2026-11-10) ─────────────────────────────────────────────────────────────
+# O maestro: «tem gente parado e tarefa pela metade». O mercado julga ociosidade por PRAZO desde a última prova
+# de progresso (heartbeat timeout do Temporal, visibility timeout do SQS, task heartbeat do Airflow), nunca pela
+# frase de quem trabalha. Aqui a prova é o que o git e o forge registram: thread e merge levam a IDADE da última
+# atividade (commit ou arquivo tocado na worktree; updatedAt do PR) e, a partir de --idle-hours (default 4),
+# o estado diz PARADO. É medida de idade, não de intenção: quem espera o maestro também envelhece.
 #
 # ── QUEM EXECUTA (coluna actor, pedido do maestro em 2026-10-19) ─────────────────────────────
 # Cada linha diz QUEM faz o ato seguinte e o comando pronto (coluna action). A classe só é dada onde a
@@ -44,10 +54,13 @@
 #
 # Uso:  bash .claude/validation/decide-census.sh [<repo>] [--markdown|--tsv] [--cite <arquivo|->]
 #                                               [--theme "<termos>"] [--window <dias>] [--no-gh]
-#                                               [--foreign-repo <dono/nome>]...
+#                                               [--foreign-repo <dono/nome>]... [--idle-hours <h>] [--self <sessão>]
+#   --self <sessão>  a dona que esta sessão usa no .claude/utils/orchestration/maestro-ask.sh: a reserva DELA vira faço-eu
 # Env (bancada e sandbox; NUNCA para fingir medição — todo override ativo é declarado na saída):
 #   DECIDE_TODAY=<AAAA-MM-DD>   data de referência da janela (default: date +%F)
 #   DECIDE_GH=<binário>         o `gh` a usar (default: gh)
+#   DECIDE_NOW=<epoch>          relógio da IDADE (parado), default: agora
+#   ONION_ASK_DIR=<dir>         registro de perguntas ao maestro (default: o do .claude/utils/orchestration/maestro-ask.sh)
 #   DECIDE_CENSUS_TOP=<n>       teto de linhas da projeção markdown (default 40); o RESTO é NOMEADO,
 #                               nunca cortado em silêncio. O --tsv não corta.
 # Exit: 0 = medido (inclusive "nada em voo", e com avisos nomeados) · 2 = entrada quebrada (sem índice
@@ -55,7 +68,7 @@
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_decide_selftests).
 # ===========================================================================
 set -uo pipefail
-REPO=""; FMT="--markdown"; CITE=""; THEME=""; WINDOW="7"; NOGH="0"; FOREIGN=""
+REPO=""; FMT="--markdown"; CITE=""; THEME=""; WINDOW="7"; NOGH="0"; FOREIGN=""; IDLE="4"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "decide-census: $1 exige um valor" >&2; exit 2; }; }   # rc 2, nunca o 1 do ${:?}
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -64,6 +77,8 @@ while [ $# -gt 0 ]; do
     --theme) _need "$@"; shift; THEME="$1" ;;
     --window) _need "$@"; shift; WINDOW="$1" ;;
     --no-gh) NOGH="1" ;;
+    --idle-hours) _need "$@"; shift; IDLE="$1" ;;
+    --self) _need "$@"; shift; SELF="$1" ;;
     --foreign-repo) _need "$@"; shift
       # dono/nome, sem `-` inicial (viraria flag dentro do card), sem `..`; repetido entra uma vez
       LC_ALL=C grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9._-]+$' <<< "$1" && ! LC_ALL=C grep -q '\.\.' <<< "$1" \
@@ -74,6 +89,8 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+case "${IDLE}" in ''|*[!0-9]*|0) echo "decide-census: --idle-hours inválido (${IDLE}) — inteiro >= 1" >&2; exit 2 ;; esac
+case "${DECIDE_NOW:-0}" in *[!0-9]*) echo "decide-census: DECIDE_NOW inválido (${DECIDE_NOW}) — epoch em segundos" >&2; exit 2 ;; esac
 case "${WINDOW}" in ''|*[!0-9]*) echo "decide-census: --window inválido (${WINDOW}) — inteiro >= 0 (0 desliga a janela)" >&2; exit 2 ;; esac
 TOP="${DECIDE_CENSUS_TOP:-40}"
 case "${TOP}" in ''|*[!0-9]*|0) echo "decide-census: DECIDE_CENSUS_TOP inválido (${TOP}) — inteiro >= 1. Recuso." >&2; exit 2 ;; esac
@@ -92,15 +109,21 @@ elif [ -n "${CITE}" ]; then
 else CITE_LABEL=""; fi
 
 # Override ativo é DECLARADO (lição do cc-delta-census, 2026-10-08: a causa herdada parecia a fonte).
-OVR="$(env | LC_ALL=C grep -oE '^DECIDE_(TODAY|GH|CENSUS_TOP)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
+OVR="$(env | LC_ALL=C grep -oE '^(DECIDE_(TODAY|GH|CENSUS_TOP|NOW)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 TODAY="${DECIDE_TODAY:-$(date +%F)}"
 GH="${DECIDE_GH:-gh}"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${CITE}" "${CITE_LABEL}" "${THEME}" "${WINDOW}" \
-  "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" "${FOREIGN}" <<'PY'
-import sys, os, re, json, subprocess, datetime
-repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr, foreign = sys.argv[1:13]
-window, top = int(window), int(top)
+  "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" "${FOREIGN}" "${IDLE}" "${SELF}" <<'PY'
+import sys, os, re, json, subprocess, datetime, time
+repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr, foreign, idle_h, self_who = sys.argv[1:15]
+window, top, idle_h = int(window), int(top), int(idle_h)
+now_s = int(os.environ.get('DECIDE_NOW') or time.time())
+def age_txt(ts):
+    """idade desde o epoch ts → ('3h', parado?); ts None → ('idade não medida', False)"""
+    if ts is None: return 'idade não medida', False
+    h = max(0, now_s - int(ts)) / 3600
+    return (f'{h:.0f}h' if h >= 1 else f'{h * 60:.0f}min'), h >= idle_h
 try:
     import yaml
 except ImportError:
@@ -324,7 +347,7 @@ has_verified = bool(_ls.strip()) and os.path.isfile(os.path.join(repo, VERIFIED)
 access_rows = []
 def gh_prs(target):
     """→ (lista de PRs, motivo da falha). target '' = este repo; senão dono/nome."""
-    cmd = [gh, 'pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,title,headRefName,isDraft,statusCheckRollup']
+    cmd = [gh, 'pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,title,headRefName,isDraft,statusCheckRollup,updatedAt']
     if target: cmd += ['-R', target]
     try:
         r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=45)
@@ -347,6 +370,12 @@ def gh_prs(target):
     except subprocess.TimeoutExpired: return None, 'timeout de 45 s'
     except ValueError as e: return None, f'JSON ilegível: {clip(e, 120)}'
 BAD = {'FAILURE', 'CANCELLED', 'TIMED_OUT', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'ERROR'}
+def pr_age(p):
+    """updatedAt do PR → (texto, parado?); o gh sem o campo (versão velha, stub) diz que não mediu"""
+    u = p.get('updatedAt')
+    if not u: return age_txt(None)
+    try: return age_txt(datetime.datetime.fromisoformat(str(u).replace('Z', '+00:00')).timestamp())
+    except ValueError: return age_txt(None)
 def checks_of(p):
     ok = fail = pend = 0; fails = []
     for c in p.get('statusCheckRollup') or []:
@@ -406,6 +435,8 @@ else:
                 mf, why = merge_flag('', p.get('headRefName'))
                 act = (f'depois do "sim": `gh pr checks {n}` (todos verdes) e `gh pr merge {n} {mf}`{why} — este repo não tem caminho verificado de merge'
                        if mf else f'não mergeio: {why.strip(" ()")}')
+            at, stopped = pr_age(p)
+            st = ('PARADO · ' if stopped else '') + st + f' · sem movimento há {at}'
             merge_rows.append({'kind': 'merge', 'ref': f"PR#{n}", 'origin': p.get('headRefName') or '',
                                'label': clip(p.get('title') or '', 200), 'state': st, 'via': 'gh', 'options': '',
                                'pri': 1 if fail else 4, 'imp': 0, 'actor': 'faço-eu', 'action': act})
@@ -462,6 +493,18 @@ for blk in wl.strip().split('\n\n') if wl.strip() else []:
         rc2, cnt = git('rev-list', '--count', 'HEAD', '--not', '--remotes', cwd=path)
         unp = int(cnt.strip()) if rc2 == 0 and cnt.strip().isdigit() else -1
     if dirty == 0 and unp == 0: continue
+    # IDADE da última atividade: o mais novo entre o commit do HEAD e os arquivos tocados (até 200, para não
+    # varrer árvore enorme); nenhum dos dois legível → "idade não medida", nunca "parado"
+    stamps = []
+    rc3, ct = git('log', '-1', '--format=%ct', cwd=path)
+    if rc3 == 0 and ct.strip().isdigit(): stamps.append(int(ct.strip()))
+    if rc1 == 0:
+        for x in [x for x in st.split('\n') if x.strip()][:200]:
+            fp = os.path.join(path, x[3:].split(' -> ')[-1].strip('"'))
+            try: stamps.append(int(os.lstat(fp).st_mtime))
+            except OSError: pass
+    at, stopped = age_txt(max(stamps) if stamps else None)
+    tstate = f"{'PARADO' if stopped else 'em voo'} · última atividade há {at}"
     lab = f"{'?' if dirty < 0 else dirty} arquivo(s) não commitado(s) · {'?' if unp < 0 else unp} commit(s) não empurrado(s)"
     # DONO: só a worktree onde o medidor roda é provadamente desta sessão. A de agente (`.claude/worktrees/agent-*`)
     # é do agente enquanto ele roda (I3, medido em 2026-09-02: um amend colidiu com o commit dele), e qualquer
@@ -474,7 +517,7 @@ for blk in wl.strip().split('\n\n') if wl.strip() else []:
         actor = 'outro-dono'
         act = (f"é de outra sessão ou agente (I3): não toco. Confiro o dono: `git -C {path} log -1 --format='%h %cr %s'`"
                ' · abandonada? quem a abriu empurra ou remove')
-    thread_rows.append({'kind': 'thread', 'ref': br, 'origin': rel, 'label': lab, 'state': 'em voo', 'via': 'git',
+    thread_rows.append({'kind': 'thread', 'ref': br, 'origin': rel, 'label': lab, 'state': tstate, 'via': 'git',
                         'options': '', 'pri': 5, 'imp': 0, 'actor': actor, 'action': act})
 
 # ── inbox/inbound/kg-inbox de 1º nível ──────────────────────────────────────────────────────
@@ -489,19 +532,84 @@ for sub in ('docs/evolution/inbox', 'docs/evolution/inbound', 'docs/evolution/kg
                             'state': f'{len(items)}', 'via': 'fs', 'options': '', 'pri': 6, 'imp': 0,
                             'actor': 'faço-eu', 'action': f'trio pelo comando da casa: `{cmdt}`'})
 
+# ── sinais da campainha sem ack (o leitor da casa; o estado mora fora do repo) ──────────────────
+signal_rows = []; bell_desc = 'leitor ausente'
+_bell = os.path.join(repo, '.claude/utils/co-evolution/doorbell-state.py')
+if os.path.isfile(_bell):
+    try:
+        # o estado é indexado pela raiz em que a SESSÃO roda (a principal); numa worktree, a raiz dela daria "absent"
+        _bc, _bg = git('rev-parse', '--path-format=absolute', '--git-common-dir')
+        _broot = os.path.dirname(_bg.strip()) if _bc == 0 and _bg.strip().endswith('/.git') else os.path.abspath(repo)
+        r = subprocess.run([sys.executable, '-I', _bell, '--repo', _broot, '--list'], capture_output=True, text=True, timeout=20)
+        blines = (r.stdout or '').strip().split('\n')
+    except (OSError, subprocess.TimeoutExpired): blines = ['state=unreadable']
+    m = re.match(r'state=(\w+) expired=(\d+) held=(\d+) unacked=(\d+)', blines[0] if blines else '')
+    if not m:
+        avisos.append('campainha: o leitor não respondeu na forma esperada — sinais sem ack NÃO medidos'); bell_desc = 'NÃO MEDIDA'
+    else:
+        bstate, nexp, nheld, nun = m.group(1), int(m.group(2)), int(m.group(3)), int(m.group(4))
+        bell_desc = f'{bstate}, {nun} sem ack'
+        if bstate == 'unreadable': avisos.append('campainha: estado ILEGÍVEL — sinais sem ack NÃO medidos')
+        if nun:
+            listed = [l.split('\t') for l in blines[1:] if l.count('\t') == 2]
+            signal_rows.append({'kind': 'signal', 'ref': 'campainha', 'origin': 'doorbell',
+                                'label': clip(f'{nun} sinal(is) sem ack ({nexp} vencido(s) de reaviso, {nheld} retido(s)): '
+                                              + (', '.join(f'{x[2]} ({x[0]} {x[1]})' for x in listed) or 'ainda no reaviso'), 220),
+                                'state': f'{nun} sem ack', 'via': 'doorbell', 'options': '', 'pri': 5 if not nexp else 3, 'imp': 0,
+                                'actor': 'faço-eu', 'action': 'leio pela campainha (`read_signal`), trio e dou `ack_signal`; o arquivo sai da caixa por `/meta:co-evolve`'})
+
+# ── perguntas ao maestro reservadas (.claude/utils/orchestration/maestro-ask.sh): chave, dona, prazo ─────────────
+ask_rows = []; asks = {}; ask_desc = 'registro ausente'
+_ask_tool = os.path.isfile(os.path.join(repo, '.claude/utils/orchestration/maestro-ask.sh'))   # porta antiga sem o utilitário: a linha seal não oferece o comando
+_ask_dir = os.environ.get('ONION_ASK_DIR') or os.path.join(os.environ.get('XDG_STATE_HOME') or os.path.join(os.path.expanduser('~'), '.local', 'state'), 'onion', 'maestro-asks')
+_rcg, _gcd = git('rev-parse', '--path-format=absolute', '--git-common-dir')
+repo_name = os.path.basename(os.path.dirname(_gcd.strip())) if _rcg == 0 and _gcd.strip() else os.path.basename(os.path.abspath(repo))
+if os.path.isdir(_ask_dir):
+    try:
+        for fn in sorted(os.listdir(_ask_dir)):
+            if not fn.endswith('.ask'): continue
+            try: f5 = open(os.path.join(_ask_dir, fn), encoding='utf-8').read().rstrip('\n').split('\t')
+            except OSError: avisos.append(f'pergunta reservada ilegível: {fn}'); continue
+            if len(f5) < 4 or not f5[2].isdigit() or not f5[3].isdigit():
+                avisos.append(f'pergunta reservada fora da forma (chave, dona, desde, prazo): {fn}'); continue
+            asks[f5[0]] = {'owner': f5[1], 'since': int(f5[2]), 'deadline': int(f5[3]), 'q': f5[4] if len(f5) > 4 else ''}
+        ask_desc = f'{len(asks)} reservada(s)'
+    except OSError as e:
+        avisos.append(f'registro de perguntas ao maestro ilegível ({clip(e, 80)}) — donas NÃO medidas'); ask_desc = 'NÃO MEDIDO'
+def _iso(t): return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
+for k, a in sorted(asks.items()):
+    live = a['deadline'] > now_s
+    mine = bool(self_who) and a['owner'] == self_who
+    if live and mine: actor, act = 'faço-eu', f'é sua: pergunte ao maestro e, selado, feche com `bash .claude/utils/orchestration/maestro-ask.sh release {k} --owner {a["owner"]} --resolution "…"`'
+    elif live: actor, act = 'outro-dono', ''
+    else: actor, act = 'faço-eu', f'VENCIDA: confiro com {a["owner"]} se ainda está com ela; sem resposta, assumo com `bash .claude/utils/orchestration/maestro-ask.sh claim {k} --owner <sessão> --takeover`'
+    ask_rows.append({'kind': 'ask', 'ref': k, 'origin': a['owner'],
+                     'label': clip(f"pergunta ao maestro de {a['owner']} desde {_iso(a['since'])}, prazo {_iso(a['deadline'])}" + (f": {a['q']}" if a['q'] else ''), 220),
+                     'state': 'viva' if live else 'VENCIDA', 'via': 'ask', 'options': '', 'pri': 6 if live else 2, 'imp': 0,
+                     'actor': actor, 'action': act})
+# a linha seal diz a DONA da pergunta: com dona viva em outra sessão, não se pergunta de novo — leva-se o id
+for r in seal_rows:
+    a = asks.get(f"{repo_name}#{r['ref']}")
+    if a and a['deadline'] > now_s and not (self_who and a['owner'] == self_who):
+        r['actor'] = 'outro-dono'; r['ask'] = f"reservada por {a['owner']} até {_iso(a['deadline'])}: não pergunte, leve o id a ela"
+    elif a:
+        r['ask'] = f"reservada por {a['owner']}" + (' (VENCIDA)' if a['deadline'] <= now_s else ' (sua)')
+    elif _ask_tool:
+        r['ask'] = f"SEM DONA: antes de perguntar, `bash .claude/utils/orchestration/maestro-ask.sh claim {repo_name}#{r['ref']} --owner <sessão>` (rc 3 = já tem dona)"
+
 # o PR cuja branch está na worktree de OUTRA sessão é dela (I3): consertar ou mergear daqui colide com quem empurra
 for r in merge_rows:
     if r['via'] == 'gh' and r['origin'] in other_branches:
         r['actor'] = 'outro-dono'
         r['action'] = f"a branch está na worktree {other_branches[r['origin']]}, de outra sessão ou agente (I3): não toco antes de ela fechar"
 for r in checkpoints: r.update(pri=0, imp=0)
-rows = checkpoints + access_rows + merge_rows + seal_rows + thread_rows + triage_rows
-KORD = {'checkpoint': 0, 'access': 1, 'merge': 2, 'seal': 3, 'thread': 4, 'triage': 5}
+rows = checkpoints + access_rows + merge_rows + seal_rows + ask_rows + thread_rows + signal_rows + triage_rows
+KORD = {'checkpoint': 0, 'access': 1, 'merge': 2, 'seal': 3, 'ask': 4, 'thread': 5, 'signal': 6, 'triage': 7}
 rows.sort(key=lambda r: (r['pri'], KORD.get(r['kind'], 9), -int(r['imp'] or 0), r['ref']))
 
 def tsvc(s): return str(s).replace('\t', ' ').replace('\n', ' ')
 if fmt == '--tsv':
-    COLS = ('kind', 'ref', 'origin', 'label', 'state', 'via', 'options', 'incoming', 'actor', 'action', 'hint')
+    COLS = ('kind', 'ref', 'origin', 'label', 'state', 'via', 'options', 'incoming', 'actor', 'action', 'hint', 'ask')
     print('\t'.join(COLS))
     for r in rows: print('\t'.join(tsvc(r.get(k, '')) for k in COLS))
     for a in avisos: print(f'warn\t-\t-\t{tsvc(a)}' + '\t' * (len(COLS) - 4))
@@ -512,10 +620,13 @@ KH = {'checkpoint': 'checkpoint pendente — BLOQUEIA (P0.5 do /meta:drive: o lo
       'merge': 'merge — PRs abertos e o CI (deste repo: a sessão oferece o caminho verificado; de outro repo: o maestro, com o prefixo `! `)',
       'seal': 'seal — nós decision/question abertos (candidatos a selo; o FILTRO decide se são do maestro)',
       'thread': 'thread — worktrees com trabalho não commitado ou não empurrado',
-      'triage': 'triage — inbox/inbound/kg-inbox com itens não processados'}
+      'triage': 'triage — inbox/inbound/kg-inbox com itens não processados',
+      'ask': 'ask — perguntas ao maestro com dona (uma sessão por chave; a vencida se assume com --takeover; sem --self <dona>, a reserva desta sessão também sai outro-dono)',
+      'signal': 'signal — sinais da campainha sem ack'}
 print(f'# decide-census · {today} · {len(rows)} linha(s) em voo')
 print(f'fontes: grafos={len(graphs)} · nós decision/question open={len(open_nodes)} · janela={base_desc} · '
-      f'cite={cite_label or "—"} · tema={(chr(34) + theme + chr(34)) if terms else "—"} · PRs={pr_desc}')
+      f'cite={cite_label or "—"} · tema={(chr(34) + theme + chr(34)) if terms else "—"} · PRs={pr_desc} · '
+      f'parado={idle_h}h · campainha={bell_desc} · perguntas={ask_desc}')
 # quem executa, contado: a sessão lê isto antes de compor (o que é "faço-eu" vira oferta, o "maestro-*" vira card)
 ACT = {'faço-eu': '🤖 faço-eu', 'maestro-com-!': '⌨️ maestro-com-!', 'maestro-fora': '🙋 maestro-fora', 'outro-dono': '↪️ outro-dono'}
 cnt = {}; nseal = 0
@@ -543,10 +654,14 @@ for r in shown:
         print(f"  - trechos com forma de opção (cópia literal; podem não ser as opções): {('«' + r['options'].replace(' ⟂ ', '» · «') + '»') if r['options'] else '(nenhum trecho com forma de opção no nó — compor com embasamento, ou a opção é pesquisar antes)'}")
         if r['incoming']:
             print(f"  - chegam por aresta (leia-os: opções e objeções às vezes vivem aqui): {r['incoming']}")
+        if r.get('ask'):
+            print(f"  - dona da pergunta: {r['ask']}")
         if r.get('hint'):
             print(f"  - pista de ATO MANUAL depois do selo (cópia literal; leia o nó, o card é seu): «{r['hint'].replace(' ⟂ ', '» · «')}»")
     elif r['kind'] == 'merge':
         print(f"- {badge(r)} {r['ref']} `{r['origin']}` — {r['label']} · {r['state']}")
+    elif r['kind'] in ('thread', 'ask'):
+        print(f"- {badge(r)} `{r['ref']}` — {r['origin']} — {r['label']} · {r['state']}")
     else:
         print(f"- {badge(r)} `{r['ref']}` — {r['origin']} — {r['label']}")
     if r['kind'] != 'seal' and r.get('actor') != 'outro-dono':

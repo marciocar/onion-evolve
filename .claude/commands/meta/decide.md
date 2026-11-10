@@ -103,7 +103,11 @@ conta as quatro classes. A classe só sai onde a medição a prova; a **pista de
    **"Me dê o passo a passo (Recomendado)"**, **"Já fiz, confira"** (você roda a conferência do card)
    e **"Depois"**. Decisão cuja execução é do maestro carrega isso na própria opção ("selar e receber
    o card"), em vez de gastar uma 2ª pergunta.
-4. **PERGUNTAR** com `AskUserQuestion`. Uma rodada por vez.
+4. **PERGUNTAR** com `AskUserQuestion`. Uma rodada por vez. **Antes**, reserve cada pergunta pela chave do
+   nó (cláusula 3 da [doutrina da batuta](../common/prompts/batuta-doctrine.md)):
+   `bash .claude/utils/orchestration/maestro-ask.sh claim <repo>#<NODE_ID> --owner <sessão>`. Com rc 3 a pergunta
+   já tem dona viva noutra sessão: não pergunte, leve o id a ela. O censo já marca essa linha como
+   `outro-dono`; rode-o com `--self <sessão>` para a sua reserva sair `faço-eu`. Selado o nó, feche com `release <chave> --owner <sessão>`.
 5. **SELAR** (cláusulas 5 a 7), resposta a resposta, **antes** da rodada seguinte, sempre pelo selador
    (peça 5), nunca editando o grafo à mão:
    - nó existente (`decision`/`question` `open`):

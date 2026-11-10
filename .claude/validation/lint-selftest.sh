@@ -40,6 +40,18 @@
 
 set -euo pipefail
 
+# ── PORTA DE ADMISSÃO: a bancada chamada DIRETO espera a carga e a vaga única (a batuta, 2026-11-10) ──────
+# Antes, só o pre-commit e o pr-finalize esperavam; a bancada chamada à mão por um agente se marcava "já
+# admitida" mais abaixo e rodava com qualquer carga (medido em 2026-11-10: três agentes, load 16–19). Aqui,
+# ANTES do `unset GITHUB_ACTIONS` abaixo (o runner do CI passa direto pelo lease e dizendo), ela se re-executa
+# sob `ops/load-lease.sh run`. Já admitida pelo pai (ONION_LOAD_LEASE_HELD), segue sem esperar.
+_ONION_LEASE_SH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/ops/load-lease.sh"
+if [ -z "${ONION_LOAD_LEASE_HELD:-}" ] && [ -r "${_ONION_LEASE_SH}" ]; then
+  # shellcheck source=/dev/null
+  . "${_ONION_LEASE_SH}"
+  load_lease_reexec "lint-selftest (direto)" "${BASH_SOURCE[0]}" "$@" || exit $?
+fi
+
 
 # ══ AUTO-GC DESLIGADO EM TODO SANDBOX — a causa da morte do worker 0 no CI ════════════════════
 # Medido 2026-09-16, com QUATRO reprovações seguidas no CI e a bancada inteira VERDE localmente
@@ -53710,7 +53722,7 @@ DEC_PY
   : > "${sb}/wt2/novo.txt"; "${G[@]}" -C "${sb}/wt2" add novo.txt; "${G[@]}" -C "${sb}/wt2" commit -q -m wt2
   if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" bash "${sut}" "${r}" --tsv --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
   [ "${rc}" -eq 0 ] || _lb="${_lb} rc=${rc}"
-  grep -q "${T}incoming${T}actor${T}action${T}hint\$" <<< "${out%%$'\n'*}" || _lb="${_lb} cabecalho"
+  grep -q "${T}incoming${T}actor${T}action${T}hint${T}ask\$" <<< "${out%%$'\n'*}" || _lb="${_lb} cabecalho"   # ask: a batuta, 2026-11-10
   grep -q "^merge${T}PR#7${T}.*${T}faço-eu${T}investigo e conserto o check vermelho: \`gh pr checks 7\`" <<< "${out}" || _lb="${_lb} merge-vermelho"
   grep -q "^checkpoint${T}docs/b/b.kg.yaml${T}.*${T}faço-eu${T}depois do \"selar\": \`bash .claude/validation/kg-drive-project.sh docs/b/b.kg.yaml --seal\`" <<< "${out}" || _lb="${_lb} checkpoint"
   grep -q "^triage${T}docs/evolution/inbox${T}.*${T}faço-eu${T}trio pelo comando da casa: \`/meta:co-evolve\`" <<< "${out}" || _lb="${_lb} triagem"
@@ -53787,7 +53799,7 @@ GHM
   if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r3}" --tsv --no-gh --cite "${sb}/cite3.txt" 2>&1)"; then rc=0; else rc=$?; fi
   [ "${rc}" -eq 0 ] || _ob="${_ob} rc=${rc}"
   grep -q "^seal${T}D_MANUAL${T}.*${T}faço-eu${T}depois da resposta: \`bash .claude/validation/kg-decide-seal.sh docs/m.kg.yaml D_MANUAL .*${T}.*depois roda com \`!\` no prompt o wrapper" <<< "${out}" || _ob="${_ob} sem-pista"
-  grep -q "^seal${T}D_LIMPO${T}.*${T}faço-eu${T}[^${T}]*${T}\$" <<< "${out}" || _ob="${_ob} pista-espuria"
+  grep -q "^seal${T}D_LIMPO${T}.*${T}faço-eu${T}[^${T}]*${T}${T}\$" <<< "${out}" || _ob="${_ob} pista-espuria"   # hint vazio, depois a coluna ask (vazia: o fixture não tem o registro)
   if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r3}" --markdown --no-gh --cite "${sb}/cite3.txt" 2>&1)"; then rc=0; else rc=$?; fi
   grep -q '^  - pista de ATO MANUAL depois do selo (cópia literal; leia o nó, o card é seu): «.*com `!` no prompt' <<< "${out}" || _ob="${_ob} md-sem-pista"
   [ "$(grep -c 'pista de ATO MANUAL' <<< "${out}")" = 1 ] || _ob="${_ob} md-pista-conta"
@@ -56261,6 +56273,63 @@ if o in s:
   else
     record_fail "load-lease: (i) lab run_all.sh" "${lab} sumiu — a ligação do lab não foi julgada"
   fi
+  # ── PORTA DE ADMISSÃO (a batuta, 2026-11-10): o passo pesado chamado DIRETO se re-executa sob `run` ─────────
+  # t.sh imita a bancada/o harness: sourça o lease sob teste, chama a porta e anota o que segurava ao rodar
+  printf '%s\n' '#!/usr/bin/env bash' '. "${LEASE}"' 'load_lease_reexec teste "$0" "$@" || exit $?' \
+    'printf "%s\n" "${ONION_LOAD_LEASE_HELD:-sem}" >> "${RAN}"' > "${d}/t.sh"
+  _llx() {  # $1 = lease sob teste → "rc|saída"; LLX_ENV extra
+    local w="$1" rc=0 out
+    # shellcheck disable=SC2086
+    out="$(env -u ONION_LOAD_LEASE_HELD -u ONION_LOAD_LEASE_REEXEC -u GITHUB_ACTIONS -u ONION_LOAD_LEASE -u ONION_LOAD_HIGH \
+      -u ONION_LOAD_RESUME -u ONION_LOAD_PSI_HIGH -u ONION_LOAD_WAIT_MAX -u ONION_LOAD_LEASE_CONF LC_ALL=C \
+      ONION_LOAD_SOURCE="${d}/loadavg" ONION_LOAD_PSI_DIR="${d}/psi" ONION_LOAD_LEASE_DIR="${d}/vaga" ONION_LOAD_POLL=1 \
+      LEASE="${w}" RAN="${d}/ran" ${LLX_ENV:-} timeout 10 bash "${d}/t.sh" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  # (l) vaga livre: roda UMA vez segurando a vaga; vaga com outro dono: teto (rc 4) e NÃO roda
+  _c_reexec() { _llset 3.00; rm -f "${d}/ran"; local a b n
+    a="$(_llx "$1")"; n="$(grep -c 'full-bench.lock' "${d}/ran" 2>/dev/null || true)"
+    rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
+    b="$(LLX_ENV='ONION_LOAD_WAIT_MAX=2' _llx "$1")"; _llunhold
+    LL_WHY="livre ${a} (com a vaga: ${n}) · disputada ${b}"
+    [ "${a%%|*}" = 0 ] && [ "${n}" = 1 ] && [ "${b%%|*}" = 4 ] && [ ! -e "${d}/ran" ]; }
+  _llcase "(l) porta de admissão: chamado direto roda sob a vaga; com a vaga alheia, rc 4 sem rodar" \
+    'exec bash "${BASH_SOURCE[0]}" run -- bash "$@"' 'return 0 #' _c_reexec
+  # (m) GUARDA DO LAÇO: lease desligado não exporta HELD; sem a guarda o script se re-executaria para sempre
+  _c_loop() { _llset 3.00; rm -f "${d}/ran"; local a n; a="$(LLX_ENV='ONION_LOAD_LEASE=off' _llx "$1")"
+    n="$(wc -l < "${d}/ran" 2>/dev/null || echo 0)"; LL_WHY="${a} · rodou ${n}×"; [ "${a%%|*}" = 0 ] && [ "${n}" = 1 ]; }
+  _llcase "(m) lease desligado: a porta roda o script uma vez e termina (guarda do laço)" \
+    '[ -n "${ONION_LOAD_LEASE_REEXEC:-}" ] && return 0' 'false && return 0' _c_loop
+  # (n) LIGAÇÃO da porta: a bancada antes do `unset GITHUB_ACTIONS` (o CI segue passando direto e dizendo),
+  #     o harness de mutantes antes de plantar, e o pr-finalize pega a vaga SEMPRE (não só com bancada cheia)
+  local stf="${REPO_ROOT}/.claude/validation/lint-selftest.sh" mrf="${REPO_ROOT}/ops/mutate-and-restore.sh"
+  _c_w_st() { awk '/^  load_lease_reexec / && !r { r = NR } /^unset GITHUB_HEAD_REF/ && !u { u = NR } END { exit !(r && u && r < u) }' "$1"; }
+  head -200 "${stf}" > "${d}/s.sh"; sed '/^  load_lease_reexec /d' "${d}/s.sh" > "${d}/sm.sh"
+  ri=1; rm_=1; _c_w_st "${d}/s.sh" && ri=0; _c_w_st "${d}/sm.sh" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (n) a bancada direta passa pela porta ANTES de desarmar GITHUB_ACTIONS"
+  else record_fail "load-lease: (n) a bancada direta passa pela porta ANTES de desarmar GITHUB_ACTIONS" "load_lease_reexec ausente ou depois do unset"; fi
+  _prove_mutation "load-lease: (n) bancada (MUT: sem a porta)" "${d}/s.sh" "${d}/sm.sh" "${ri}" "${rm_}"
+  _c_w_mr() { awk '/^  load_lease_reexec / && !r { r = NR } /^_BACKUP="\$\(mktemp\)"/ && !b { b = NR } END { exit !(r && b && r < b) }' "$1"; }
+  cp "${mrf}" "${d}/mr.sh"; sed '/^  load_lease_reexec /d' "${mrf}" > "${d}/mrm.sh"
+  ri=1; rm_=1; _c_w_mr "${d}/mr.sh" && ri=0; _c_w_mr "${d}/mrm.sh" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (n) o harness de mutantes passa pela porta ANTES de plantar"
+  else record_fail "load-lease: (n) o harness de mutantes passa pela porta ANTES de plantar" "load_lease_reexec ausente ou depois do backup"; fi
+  _prove_mutation "load-lease: (n) mutantes (MUT: sem a porta)" "${d}/mr.sh" "${d}/mrm.sh" "${ri}" "${rm_}"
+  _c_w_fa() { grep -qx '  load_lease_acquire || _ll_rc=\$?' "$1"; }
+  cp "${fin}" "${d}/fa.sh"; sed 's#^  load_lease_acquire || _ll_rc=\$?$#  if [ "${ONION_SELFTEST_FULL:-0}" = 1 ]; then load_lease_acquire || _ll_rc=$?; else load_lease_wait || _ll_rc=$?; fi#' "${fin}" > "${d}/fam.sh"
+  ri=1; rm_=1; _c_w_fa "${d}/fa.sh" && ri=0; _c_w_fa "${d}/fam.sh" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (n) o pr-finalize pega a vaga única sempre"
+  else record_fail "load-lease: (n) o pr-finalize pega a vaga única sempre" "a vaga voltou a ser só da bancada cheia"; fi
+  _prove_mutation "load-lease: (n) pr-finalize (MUT: vaga só com ONION_SELFTEST_FULL)" "${d}/fa.sh" "${d}/fam.sh" "${ri}" "${rm_}"
+  # o pré-voo roda a bancada sob `env -i`: sem repassar ONION_LOAD_LEASE_HELD, ela disputaria a vaga que o
+  # pr-finalize (o pai) segura, e esperaria o teto inteiro (deadlock de 30 min, achado da passada de 2026-11-10)
+  local pfr="${REPO_ROOT}/ops/testing/preflight-run.sh"
+  _c_w_pf() { awk '/env -i / { e = NR } e && NR <= e + 3 && index($0, "ONION_LOAD_LEASE_HELD=\"${ONION_LOAD_LEASE_HELD}\"") { f = 1 } END { exit !f }' "$1"; }
+  cp "${pfr}" "${d}/pf.sh"; grep -vF 'ONION_LOAD_LEASE_HELD="${ONION_LOAD_LEASE_HELD}"' "${pfr}" > "${d}/pfm.sh"
+  ri=1; rm_=1; _c_w_pf "${d}/pf.sh" && ri=0; _c_w_pf "${d}/pfm.sh" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (n) o pré-voo repassa a vaga do pai pelo env -i (sem deadlock)"
+  else record_fail "load-lease: (n) o pré-voo repassa a vaga do pai pelo env -i (sem deadlock)" "o env -i do preflight-run.sh apaga ONION_LOAD_LEASE_HELD"; fi
+  _prove_mutation "load-lease: (n) pré-voo (MUT: env -i sem a vaga do pai)" "${d}/pf.sh" "${d}/pfm.sh" "${ri}" "${rm_}"
   rm -rf "${d}"
 }
 _family run_load_lease_selftests
@@ -56478,6 +56547,156 @@ EOF_PMUT
   rm -rf "${sb}"
 }
 _family run_private_repo_cite_selftests
+
+# ---------------------------------------------------------------------------
+# maestro-ask — dono único por pergunta ao maestro (a batuta, 2026-11-10;
+# .claude/utils/orchestration/maestro-ask.sh). Cada caso reprova contra o mutante dele.
+run_maestro_ask_selftests() {
+  echo ""
+  echo "▸ maestro-ask — chave, uma dona, prazo e assunção do vencido (.claude/utils/orchestration/maestro-ask.sh)"
+  local sut="${REPO_ROOT}/.claude/utils/orchestration/maestro-ask.sh"
+  [ -f "${sut}" ] || { record_fail "maestro-ask: SUT ausente" "${sut} não existe"; return; }
+  command -v flock >/dev/null 2>&1 || { record_skip "maestro-ask: flock ausente → pulado"; return; }
+  local d; d="$(TMPDIR=/tmp mktemp -d)"; chmod 700 "${d}"
+  local K='r#Q_X' FUT; FUT=$(( $(date +%s) + 48 * 3600 ))
+  _mar() {  # $1 = SUT sob teste, resto = args → "rc|saída"; MAR_ENV extra
+    local w="$1" rc=0 out; shift
+    # shellcheck disable=SC2086
+    out="$(env -u ONION_ASK_NOW LC_ALL=C ONION_ASK_DIR="${d}/a" ${MAR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  _macase() {  # <nome> <OLD> <NEW> <função>
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    cp "${sut}" "${d}/w.sh"; rm -rf "${d}/a"
+    "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "maestro-ask: ${name}"; else record_fail "maestro-ask: ${name}" "${MA_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${d}/m.sh"
+    rm -rf "${d}/a"
+    "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "maestro-ask: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # (a) a 1ª reserva é da dona; a 2ª sessão recebe rc 3 e o nome dela, nunca uma 2ª dona
+  _ma_a() { local a b; a="$(_mar "$1" claim "${K}" --owner curadoria --question 'escopo?')"; b="$(_mar "$1" claim "${K}" --owner core)"
+    MA_WHY="1ª ${a} · 2ª ${b}"; [ "${a%%|*}" = 0 ] && [ "${b%%|*}" = 3 ] && [[ "${b#*|}" == *"JÁ TEM DONA"*"curadoria"* ]]; }
+  _macase "(a) a 2ª sessão recebe rc 3 com o nome da dona" \
+    'Não pergunte: leve só o id a ela." >&2; exit 3' 'Não pergunte: leve só o id a ela." >&2; exit 0' _ma_a
+  # (b) vencida: sem --takeover segue rc 3 (não troca de dona sozinha); com --takeover assume e registra a escalada
+  _ma_b() { local a b c; _mar "$1" claim "${K}" --owner curadoria >/dev/null
+    a="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" claim "${K}" --owner core)"
+    b="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" claim "${K}" --owner core --takeover)"
+    c="$(cat "${d}/a/resolved.log" 2>/dev/null)"; MA_WHY="sem ${a} · com ${b} · log ${c}"
+    [ "${a%%|*}" = 3 ] && [[ "${a#*|}" == *"VENCIDA"* ]] && [ "${b%%|*}" = 0 ] && [[ "${c}" == *"escalada"*"curadoria"*"assumida por core"* ]]; }
+  _macase "(b) vencida não troca de dona sem --takeover; com ele assume e o log diz a escalada" \
+    'if [ "${takeover}" != 1 ]; then' 'if false; then' _ma_b
+  # (c) só a dona fecha; fechada, o arquivo some e o log diz «fechada»
+  _ma_c() { local a b; _mar "$1" claim "${K}" --owner curadoria >/dev/null
+    a="$(_mar "$1" release "${K}" --owner core)"; b="$(_mar "$1" release "${K}" --owner curadoria --resolution selado)"
+    MA_WHY="alheia ${a} · dona ${b}"; [ "${a%%|*}" = 3 ] && [ "${b%%|*}" = 0 ] && [ ! -e "${d}/a/${K}.ask" ] && grep -q 'fechada' "${d}/a/resolved.log"; }
+  _macase "(c) só a dona fecha a reserva" \
+    'if [ "${OWNER}" != "${owner}" ]; then echo' 'if false; then echo' _ma_c
+  # (d) chave fora do alfabeto (barra = caminho) é rc 2, e nada é gravado fora do registro
+  _ma_d() { local a; a="$(_mar "$1" claim 'a/b' --owner core)"; MA_WHY="${a}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"alfabeto"* ]]; }
+  _macase "(d) chave com barra é recusada (rc 2)" \
+    "grep -qE '^[A-Za-z0-9][A-Za-z0-9._:#-]{0,200}\$'" "grep -qE '.*'" _ma_d
+  # (e) list --tsv julga viva|vencida pelo relógio
+  _ma_e() { local a; _mar "$1" claim "${K}" --owner curadoria >/dev/null; a="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" list --tsv)"
+    MA_WHY="${a}"; [ "${a%%|*}" = 0 ] && grep -q "^${K}$(printf '\t')curadoria$(printf '\t').*$(printf '\t')vencida$(printf '\t')" <<< "${a#*|}"; }
+  _macase "(e) list --tsv marca a reserva vencida" \
+    'st=viva; [ "${DEADLINE:-0}" -gt "${NOW}" ] 2>/dev/null || st=vencida' 'st=viva' _ma_e
+  rm -rf "${d}"
+}
+_family run_maestro_ask_selftests
+
+# ---------------------------------------------------------------------------
+# batuta-census — o medidor do /meta:decide diz o PARADO, a dona da pergunta e o sinal sem ack
+# (a batuta, 2026-11-10; .claude/validation/decide-census.sh). Cada caso reprova contra o mutante dele.
+run_batuta_census_selftests() {
+  echo ""
+  echo "▸ batuta-census — parado, dona da pergunta e sinal sem ack no decide-census.sh"
+  local sut="${REPO_ROOT}/.claude/validation/decide-census.sh" bell="${REPO_ROOT}/.claude/utils/co-evolution/doorbell-state.py"
+  [ -f "${sut}" ] && [ -f "${bell}" ] || { record_fail "batuta-census: SUT ausente" "${sut} ou ${bell}"; return; }
+  command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
+    || { record_skip "batuta-census: python3/PyYAML ausentes (SUT não exercido)"; return; }
+  local sb r T G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
+  T="$(printf '\t')"; sb="$(TMPDIR=/tmp mktemp -d)"; "${G[@]}" -C "${sb}" init -q r; r="$(cd "${sb}/r" && pwd -P)"
+  mkdir -p "${r}/docs" "${r}/docs/evolution/inbox" "${r}/.claude/utils/co-evolution"; cp "${bell}" "${r}/.claude/utils/co-evolution/"
+  printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: D_X\n    node_type: decision\n    status: open\n    impact: 3\n    label: "decidir x"\n  - id: D_Y\n    node_type: decision\n    status: open\n    impact: 3\n    label: "decidir y"\n' > "${r}/docs/g.kg.yaml"
+  "${G[@]}" -C "${r}" add -A
+  GIT_AUTHOR_DATE="2026-09-01T12:00:00" GIT_COMMITTER_DATE="2026-09-01T12:00:00" "${G[@]}" -C "${r}" commit -q -m c1
+  : > "${r}/docs/sujo.txt"; touch -d '2026-09-01 12:00' "${r}/docs/sujo.txt"
+  : > "${r}/docs/evolution/inbox/s.md"; touch -d '2026-09-01 12:00' "${r}/docs/evolution/inbox/s.md" "${r}/docs/evolution/inbox" "${r}/docs/evolution"   # a idade é a do mais novo (a pasta não rastreada entra pelo mtime dela)
+  local NOW=1791800000
+  printf 'D_X D_Y\n' > "${sb}/cite.txt"
+  printf '#!/usr/bin/env bash\nprintf %%s %s\n' "'[{\"number\":1,\"title\":\"velho\",\"headRefName\":\"feat/v\",\"isDraft\":false,\"updatedAt\":\"2026-09-01T00:00:00Z\",\"statusCheckRollup\":[]},{\"number\":2,\"title\":\"sem campo\",\"headRefName\":\"feat/s\",\"isDraft\":false,\"statusCheckRollup\":[]}]'" > "${sb}/gh"
+  chmod +x "${sb}/gh"
+  mkdir -p "${sb}/asks"; chmod 700 "${sb}/asks"
+  printf 'r#D_X\tcuradoria\t%s\t%s\tescopo de x?\n' "$((NOW - 600))" "$((NOW + 3600))" > "${sb}/asks/r#D_X.ask"
+  printf 'r#D_Y\tkg-ssot\t%s\t%s\t\n' "$((NOW - 90000))" "$((NOW - 3600))" > "${sb}/asks/r#D_Y.ask"
+  mkdir -p "${sb}/bell"
+  python3 - "${r}" "${sb}/bell" <<'BC_PY'
+import hashlib, json, os, sys
+repo, d = sys.argv[1], sys.argv[2]
+p = os.path.join(d, hashlib.sha256(repo.encode()).hexdigest()[:16] + '.v2.json')
+json.dump({'repo': repo, 'schema': 2, 'signals': {'docs/evolution/inbox/s.md': {'path': 'docs/evolution/inbox/s.md', 'held': True,
+          'first_seen': '2026-10-11T00:00:00Z', 'acked_at': None}}}, open(p, 'w'))
+BC_PY
+  _bcr() {  # $1 = census sob teste, resto = args → saída TSV (rc no fim, linha «rc=N»)
+    local w="$1" rc=0 out; shift
+    out="$(env -u ONION_ASK_DIR -u DOORBELL_STATE_DIR LC_ALL=C DECIDE_TODAY=2026-10-12 DECIDE_NOW="${NOW}" DECIDE_GH="${sb}/gh" \
+      ONION_ASK_DIR="${sb}/asks" DOORBELL_STATE_DIR="${sb}/bell" bash "${w}" "${r}" --tsv --cite "${sb}/cite.txt" "$@" 2>&1)" || rc=$?
+    printf '%s\nrc=%s' "${out}" "${rc}"
+  }
+  _bccase() {  # <nome> <OLD> <NEW> <função>
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    cp "${sut}" "${sb}/c.sh"; "${fn}" "${sb}/c.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "batuta-census: ${name}"; else record_fail "batuta-census: ${name}" "${BC_WHY:-caso não satisfeito}"; fi
+    cp "${sb}/c.sh" "${sb}/m.sh"
+    OLD="${old}" NEW="${new}" python3 -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${sb}/m.sh"
+    "${fn}" "${sb}/m.sh" && rc_m=0
+    _prove_mutation "batuta-census: ${name} (MUT)" "${sb}/c.sh" "${sb}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # (a) worktree com pendência e sem atividade há mais que o prazo ⇒ PARADO; com prazo enorme ⇒ em voo
+  _bc_a() { local a b; a="$(_bcr "$1")"; b="$(_bcr "$1" --idle-hours 100000)"
+    BC_WHY="$(grep '^thread' <<< "${a}" | tr '\t' ' ') ‖ $(grep '^thread' <<< "${b}" | tr '\t' ' ')"
+    grep -q "^thread${T}.*${T}PARADO · última atividade há [0-9]*h${T}" <<< "${a}" && grep -q "^thread${T}.*${T}em voo · última atividade há" <<< "${b}"; }
+  _bccase "(a) worktree parada além do prazo sai PARADO; dentro do prazo, em voo" \
+    'return (f'"'"'{h:.0f}h'"'"' if h >= 1 else f'"'"'{h * 60:.0f}min'"'"'), h >= idle_h' 'return (f'"'"'{h:.0f}h'"'"' if h >= 1 else f'"'"'{h * 60:.0f}min'"'"'), False' _bc_a
+  # (b) PR sem movimento além do prazo ⇒ PARADO; PR sem updatedAt ⇒ «idade não medida», nunca PARADO
+  _bc_b() { local a; a="$(_bcr "$1")"; BC_WHY="$(grep '^merge' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^merge${T}PR#1${T}.*${T}PARADO · .* · sem movimento há [0-9]*h${T}" <<< "${a}" \
+      && grep -q "^merge${T}PR#2${T}.*sem movimento há idade não medida${T}" <<< "${a}" && ! grep -q "^merge${T}PR#2${T}.*PARADO" <<< "${a}"; }
+  _bccase "(b) PR parado sai PARADO; PR sem updatedAt diz que não mediu" \
+    "st = ('PARADO · ' if stopped else '') + st" 'st = st' _bc_b
+  # (c) pergunta com dona viva em OUTRA sessão: linha ask e linha seal são outro-dono; com --self da dona, faço-eu
+  _bc_c() { local a b; a="$(_bcr "$1")"; b="$(_bcr "$1" --self curadoria)"
+    BC_WHY="$(grep -E '^(ask|seal)' <<< "${a}" | tr '\t' ' ') ‖ $(grep '^seal.D_X' <<< "${b}" | tr '\t' ' ')"
+    grep -q "^ask${T}r#D_X${T}curadoria${T}.*${T}viva${T}.*${T}outro-dono${T}" <<< "${a}" \
+      && grep -q "^seal${T}D_X${T}.*${T}outro-dono${T}.*${T}reservada por curadoria até .*: não pergunte, leve o id a ela\$" <<< "${a}" \
+      && grep -q "^seal${T}D_X${T}.*${T}faço-eu${T}.*${T}reservada por curadoria (sua)\$" <<< "${b}"; }
+  _bccase "(c) a pergunta com dona viva noutra sessão vira outro-dono na linha seal" \
+    "r['actor'] = 'outro-dono'; r['ask'] = f\"reservada por" "r['ask'] = f\"reservada por" _bc_c
+  # (d) reserva vencida: linha ask VENCIDA, faço-eu, com o comando de assumir
+  _bc_d() { local a; a="$(_bcr "$1")"; BC_WHY="$(grep '^ask.r#D_Y' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^ask${T}r#D_Y${T}kg-ssot${T}.*${T}VENCIDA${T}.*${T}faço-eu${T}VENCIDA: confiro com kg-ssot.*--takeover" <<< "${a}"; }
+  _bccase "(d) reserva vencida sai VENCIDA com o comando de assumir" \
+    "'state': 'viva' if live else 'VENCIDA'" "'state': 'viva'" _bc_d
+  # (e) sinal da campainha sem ack vira linha signal com o caminho
+  _bc_e() { local a; a="$(_bcr "$1")"; BC_WHY="$(grep -E '^(signal|warn)' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^signal${T}campainha${T}doorbell${T}1 sinal(is) sem ack (0 vencido(s) de reaviso, 1 retido(s)): docs/evolution/inbox/s.md (held" <<< "${a}"; }
+  _bccase "(e) sinal sem ack vira linha signal com o caminho" \
+    '        if nun:' '        if False:' _bc_e
+  rm -rf "${sb}"
+}
+_family run_batuta_census_selftests
 
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 

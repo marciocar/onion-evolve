@@ -53,7 +53,12 @@ else
   echo "pré-voo no ambiente do runner — famílias: ${fams} (a completa é do CI; ONION_SELFTEST_FULL=1 a pede aqui)"
 fi
 home="$(mktemp -d)"; printf '[user]\n\tuseConfigOnly = true\n' > "${home}/.gitconfig"
+# ONION_LOAD_LEASE_HELD ATRAVESSA o `env -i` (a batuta, 2026-11-10): a bancada chamada sem ele passa pela porta de
+# admissão e disputa a vaga única da máquina, e o pr-finalize que dispara este pré-voo JÁ a segura. Apagada aqui, a
+# bancada esperaria a vaga do próprio pai até o teto (30 min) e o pré-voo sairia rc 4. Sem pai admitido (o pre-push
+# de um push à mão), a variável não existe e a bancada pega a vaga ela mesma.
 out="$(env -i PATH="${PATH}" HOME="${home}" GIT_CONFIG_NOSYSTEM=1 LC_ALL=C TERM=dumb ONION_IN_PREFLIGHT=1 \
+  ${ONION_LOAD_LEASE_HELD:+ONION_LOAD_LEASE_HELD="${ONION_LOAD_LEASE_HELD}"} \
   bash .claude/validation/lint-selftest.sh ${sel[@]+"${sel[@]}"} 2>&1)"; rc=$?
 rm -rf "${home}"
 if [ "${rc}" != 0 ] || grep -q 'ABORTOU' <<< "${out}"; then
