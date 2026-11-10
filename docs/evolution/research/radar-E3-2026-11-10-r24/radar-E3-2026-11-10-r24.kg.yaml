@@ -1,0 +1,451 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.319 a 2.1.322 contra a baseline 2.1.318.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-11-10-r24
+  schema_version: "1"
+  baseline: "2026-11-10"
+  review_after: "2026-12-10"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-11-10); 14 da rodada; 24 após o juiz (1 pergunta nova e 7 superações).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   DECIDIDO (2026-11-10, juiz no CU4): (a). Caíram pela medição de hoje sete nós da r23: as versões de quem serve, a pergunta
+#   da subida (alvo velho), a guarda de deriva, o binário apagado, as correções sem terminal, a dica do --continue e a
+#   extensão do VS Code. Os demais seguem valendo, inclusive as quatro perguntas abertas.
+external_edges:
+  - from: E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#E_HOST_NA_2_1_318_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1104"
+    edge_type: SUPERSEDES
+  - from: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_318_E_PIN_DO_REVISOR_PARA_V1_0_268_1104"
+    edge_type: SUPERSEDES
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_322_1110
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_318_1104"
+    edge_type: SUPERSEDES
+  - from: C_SUPERACAO_20261110_NOS_DA_R23_QUE_CAIRAM
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#E_PROCESSOS_EM_BINARIO_DELETADO_NO_HOST_1104"
+    edge_type: SUPERSEDES
+  - from: C_SUPERACAO_20261110_NOS_DA_R23_QUE_CAIRAM
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#E_CORRECOES_HEADLESS_NAO_CHEGAM_AO_CHAT_DO_BRIDGE_1104"
+    edge_type: SUPERSEDES
+  - from: C_SUPERACAO_20261110_NOS_DA_R23_QUE_CAIRAM
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#E_DICA_DO_HOOK_DE_DERIVA_MANDA_CONTINUE_1104"
+    edge_type: SUPERSEDES
+  - from: C_SUPERACAO_20261110_NOS_DA_R23_QUE_CAIRAM
+    to: "docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml#E_EXTENSAO_VSCODE_NA_2_1_306_E_O_CLI_NAO_A_SOBE_MAIS_1104"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "CHANGELOG oficial: seções 2.1.319 (149 linhas, 146 itens), 2.1.321 (121 linhas, 118 itens), 2.1.322 (4 linhas, 1 itens); baseline 2.1.318, disco 2.1.322, processo 2.1.322, SDK bridge 2.1.319"
+    label: "o delta desde a baseline 2.1.318 são 3 versão(ões), de 2.1.319 a 2.1.322, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.319 a ## 2.1.322 (cópias em docs/evolution/research/radar-E3-2026-11-10-r24/data/)"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-10"
+    verified_against: "fechada em 2026-11-10 pela rodada 24 do radar do Claude Code: 265 itens; os candidatos foram medidos no vivo, o que não pôde ser medido está em NÃO-VERIFICADOS na SYNTHESIS, e o juiz refutou em data/judge-verdicts.json"
+    label: "quais itens de 2.1.319 a 2.1.322 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "claude --version → 2.1.322; currency-census.sh → action:anthropics/claude-code-action 1.0.271 em-dia e agent-sdk:bridge 0.3.319 → 0.3.322 defasada; o pin 4fa93a88 em onion-review.yml é a tag v1.0.271 (gh api tags), cujo package.json pede @anthropic-ai/claude-agent-sdk ^0.3.322; cc-delta-census: SDK bridge binário 2.1.319"
+    label: "quem serve o Onion em 2026-11-10: o host na 2.1.322, o revisor do CI em dia na action v1.0.271, e o bridge na 2.1.319 (SDK 0.3.319), duas versões do SDK publicadas atrás no npm (0.3.321 e 0.3.322; a 0.3.320 não foi publicada)"
+    narrative: "O que entrou na 2.1.321 e na 2.1.322 não chega ao /chat nem à persona do Slack enquanto o SDK do bridge não subir."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "cc-delta-census.sh; currency-census.sh; onion-review.yml; package.json da action na tag v1.0.271"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-10"
+    verified_against: "npm view @anthropic-ai/claude-agent-sdk version → 0.3.322; package.json do bridge em origin/main pede ^0.3.319; o pin do revisor já está em dia"
+    label: "o SDK do bridge sobe para 0.3.322, com o lock, e re-implanta pelo caminho declarado; o deploy é do maestro"
+  - id: E_FABLE_5_2_VETADO_PELA_GUARDA_DE_MODELO_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-11-10"
+    verified_against: "CHANGELOG 2.1.321: «Added Claude Fable 5.2 (`claude-fable-5-2`), now the default Fable model»; claude -p com /model fable num projeto descartável com um hook PreModelSwitch que grava a entrada → «Set model to `Fable 5.2` for this session only», e o hook recebeu to_model claude-fable-5-2, requested_model fable, source command; essa mesma entrada no premodelswitch-guard.sh real → rc 2; session_models do eixo E6 em radar-baselines.yaml lista claude-fable-5-1, claude-opus-5-5 e claude-opus-5"
+    label: "a partir da 2.1.321 o alias fable resolve para claude-fable-5-2, que não está em session_models: a guarda de modelo veta a troca do maestro para o Fable atual"
+    narrative: "É a repetição do caso de 2026-10-03, quando a guarda vetou o Opus 5.5 logo depois de ele virar padrão. A guarda fez o que deve: barrou o que não está declarado. A lista precisa mudar por rodada E6 ou por selo do maestro, nunca por /model. O item «Changed saved Fable 5.1 model picks to move to `fable`» também empurra para o 5.2 quem tinha o 5.1 salvo; claude-fable-5-1 segue aceito se pedido pelo nome completo."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.321; premodelswitch-guard.sh l.89 e l.91; radar-baselines.yaml, eixo E6"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_E6_ADMITE_O_FABLE_5_2_NO_LINEUP_1110
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-10"
+    verified_against: "premodelswitch-guard.sh real com to_model claude-fable-5-2 → rc 2; o comentário do eixo E6 em radar-baselines.yaml diz que a lista muda só por rodada E6, e registra selos diretos do maestro em 2026-10-03 e 2026-10-05"
+    label: "claude-fable-5-2 entra em session_models como primário, por rodada E6 ou selo direto do maestro; decisão do maestro"
+  - id: E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-10"
+    verified_against: "payloads forjados nos hooks reais, sem executar o comando, pela rodada e pelo juiz: pretooluse-merge-gate.sh rc 2 em 11 formas de push na main e 6 de gh pr merge, rc 0 com prefixo de valor citado contendo quebra de linha e com xargs; pretooluse-plugin-write-guard.sh rc 2 em 7 formas, rc 0 com o mesmo prefixo, com env --chdir e com sed -n w; pretooluse-env-guard.sh rc 2 em 8 formas, rc 0 com o nome do arquivo em ANSI-C"
+    label: "o mapa medido dos vetos por exit 2: barram palavra com aspas, caminho absoluto, env, timeout e substituição no prefixo; não barram prefixo com quebra de linha no valor citado (merge-gate e plugin-write), nome de arquivo em ANSI-C (env-guard), xargs, env --chdir e sed com w"
+    narrative: "O CHANGELOG não publica o texto dos bypasses, então não dá para afirmar que são as mesmas formas; ele só aponta a classe: «Fixed a case where Bash deny and ask rules missed commands written with quoted words» e «Fixed a Bash permission bypass where a crafted environment prefix could hide part of a command from permission checks». Os itens 2.1.321 sobre escrita julgada da pasta errada e 2.1.319 sobre sed têm forma equivalente que passa o veto de escrita. O veto se declara contenção de acidente, não fronteira de segurança. pretooluse-protect-main.sh não entrou: ele só nega force-push."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.319 e ## 2.1.321; pretooluse-merge-gate.sh; pretooluse-env-guard.sh; pretooluse-plugin-write-guard.sh"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_BANCADA_DO_DENY_VERDE_NA_2_1_322_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass → rc 0, binário 2.1.322, 74 regras, 340 casos, 0 divergentes"
+    label: "o permissions.deny do core, medido no motor real da 2.1.322 com API simulada, segue barrando e deixando passar o esperado nas fases default e bypass"
+    narrative: "As mudanças de regra da 2.1.319 e da 2.1.321 não abriram divergência. As fases sandbox e flows não rodaram nesta rodada."
+    provenance:
+      source: "execução de ops/testing/permissions-deny-bench.py"
+      locator: "ops/testing/permissions-deny-bench.py, fases default e bypass"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_322_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0; --families channel_session → rc 0; ambas em 2026-11-10 com o Claude Code 2.1.322"
+    label: "as guardas de deriva de binário (cited_directive e channel_session) seguem verdes na 2.1.322"
+    provenance:
+      source: "execução das famílias da bancada"
+      locator: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive e channel_session"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "CHANGELOG 2.1.321: «Changed mods Claude writes to turn on without asking in auto and bypass modes» e «Changed mods' own tool calls (`$.tool.call`, `$.mcp.call`) to raise no permission prompt»; a configuração do usuário no host tem permissions.defaultMode bypassPermissions; a configuração gerenciada do host só tem a chave pluginConfigs; pretooluse-plugin-write-guard.sh --selftest → rc 0 na 2.1.322"
+    label: "na carga da sessão seguinte, sob bypass, o veto de escrita em .claude/skills já era a única barreira desde a 2.1.318; o que a 2.1.321 acrescenta, segundo o item, é a carga no meio da sessão, ainda sem medida, e o veto é contenção de acidente, com teto declarado"
+    narrative: "O cabeçalho da guarda diz que o plugin gravado carrega na sessão seguinte; a 2.1.321 acrescenta recarga em sessão sem terminal («Changed headless sessions to reload mods in `.claude/skills` when their files change»). O item diz que regra deny e política seguem valendo para a chamada do próprio mod; o CLAUDE.md afirma que um mod carregado vence o veto e a deny pelo tool.check. São caminhos diferentes, e a medida do laboratório é anterior a esta versão."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.321; pretooluse-plugin-write-guard.sh l.11; docs/evolution/research/exit2-coupling-against-2026-11/"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-10"
+    verified_against: "o laboratório docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/ tem 117 repetições em contêiner, medidas em 2026-11-04; não foi re-rodado nesta rodada"
+    label: "re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram, e corrigir o CLAUDE.md e o cabeçalho da guarda se mudaram"
+  - id: E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-10"
+    verified_against: "readlink do executável de cada processo claude da conta do maestro, árvore de processos dos hospedeiros e registro de sessões do usuário: 2 conversas na 2.1.318 com mais de 5 dias; na 2.1.319, 2 conversas, 1 attach, 2 hospedeiros e 2 sessões de fundo; nenhum executável apagado; CHANGELOG 2.1.319: «Fixed a sandbox escape when creating a worktree»; CHANGELOG 2.1.321: «Fixed MCP OAuth requests sending secrets such as refresh tokens to another host when a server redirected them»"
+    label: "nove executáveis do Claude Code seguem atrasados, sete sem contar os dois hospedeiros de terminal: 2 conversas na 2.1.318 não têm as correções da 2.1.319 nem da 2.1.321; quem está na 2.1.319, inclusive duas sessões de fundo vivas, só não tem as da 2.1.321"
+    narrative: "O reinício é de quem é dono de cada sessão. O Remote Control conectado impede o /restart: é preciso sair e usar /resume."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.319 e ## 2.1.321; readlink do executável de cada processo"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_SANDBOX_DA_CURADORIA_E_SKILLS_ANINHADAS_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "o settings.json da curadoria tem sandbox.enabled true, allowUnsandboxedCommands false e autoAllowBashIfSandboxed true; o registro de sessões do usuário dá a sessão dela como fundo, versão 2.1.319; 8 worktrees com .claude/skills; CHANGELOG 2.1.319: «Changed nested skill loading: with the Bash sandbox on, skills in `.claude/skills` folders below the starting folder load only if you start Claude Code there or `/cd` there»; CHANGELOG 2.1.321: «Fixed a case where a read-only Bash command ran outside the sandbox without a permission prompt»; o settings.json do core e dos outros dois peers conferidos não têm sandbox"
+    label: "a curadoria é a única sessão medida com sandbox e roda a 2.1.319: tem a correção do escape ao criar worktree, não tem a da 2.1.321 sobre Bash de leitura fora do sandbox, e as skills nas worktrees dela só carregam se a sessão começar nelas ou entrar por /cd"
+    narrative: "A visão claude agents naquela pasta roda a 2.1.322, mas não é a sessão. Reiniciar a sessão é da dona dela."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.319; settings.json da curadoria"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_LOOP_AUTOPACED_TERMINA_SEM_REAGENDAR_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "CHANGELOG 2.1.319: «Changed self-paced `/loop` to end when a turn finishes without rescheduling, instead of scheduling a fallback wakeup»; git grep em .claude, ops e docs/knowledge-base acha o /loop só como proibição de auto-início (MOAT W7), sem dependência da batida de reserva; o env da configuração do usuário não define CLAUDE_CODE_LOOP_KEEPALIVE"
+    label: "o /loop sem intervalo agora morre se o turno terminar sem reagendar; nenhuma peça do core depende da batida de reserva, mas o maestro já usou o /loop assim em orquestração longa"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.319; git grep de /loop e ScheduleWakeup"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_POSTTOOLUSE_EM_CHAMADA_INTERROMPIDA_CABE_NO_PRAZO_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-11-10"
+    verified_against: "CHANGELOG 2.1.319: «Changed PostToolUse hooks to run, with up to 10 seconds to finish, on tool calls that finish after a new message interrupts the turn»; bash-empty-result-guard.sh, o único PostToolUse do core, levou 0,118 s numa entrada mínima"
+    label: "o único hook PostToolUse do core cabe com folga nos 10 segundos da chamada interrompida"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.319; .claude/hooks/bash-empty-result-guard.sh"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "doorbell/server.ts declara capabilities experimental e tools, sem tasks; o bridge só cita OAuth na troca de token do PAT e nas credenciais do Slack, sem MCP remoto com OAuth; git grep de afkTimeoutMs, denyInsteadOfPrompting e CLAUDE_CODE_AUTO_MODE_SERVER no core e no bridge → sem uso; .claude/settings.json sem permissions.ask e sem regras Edit ou Write em deny; git grep de claude remote-control em ops e .claude/utils → sem uso"
+    label: "sem superfície medida no core: MCP tasks, afkTimeoutMs, auto mode por gateway, deny por cp ou mv de escrita, --settings do remote-control, gateway, runner, nuvem, VS Code, Claude Tag e Code Review"
+    narrative: "permissions.denyInsteadOfPrompting é novidade que não usamos: o host roda em bypass e o bridge decide por canUseTool. Pode interessar a adotante em modo padrão, e entra no desenho do deny quando ele for retomado."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.319, ## 2.1.321 e ## 2.1.322"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "sondas com payload forjado nos hooks reais: rc 0 no merge-gate e no plugin-write com prefixo de valor citado contendo quebra de linha; rc 0 no env-guard com nome em ANSI-C; rc 0 com xargs, env --chdir e sed -n w"
+    label: "o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita a resolver env --chdir e sed w, com caso na bancada e mutante; pela forja de guardas"
+  - id: C_SUPERACAO_20261110_DUAS_VERSOES_DO_SDK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110"
+    label: "são duas versões do SDK publicadas atrás, não três: a 0.3.320 não foi publicada"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261110_MAPA_DOS_VETOS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110"
+    label: "no lugar da afirmação geral, o mapa medido do que os vetos barram e do que passa"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: REPROVA de E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261110_DATACAO_DOS_MODS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110"
+    label: "na carga da sessão seguinte o veto já era a única barreira na 2.1.318; só a carga no meio da sessão é novidade"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261110_CONTAGEM_DAS_SESSOES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110"
+    label: "são nove executáveis atrasados, e as duas supostas reservas são sessões de fundo vivas"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261110_CURADORIA_NA_2_1_319
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_SANDBOX_DA_CURADORIA_E_SKILLS_ANINHADAS_1110"
+    label: "a sessão da curadoria roda a 2.1.319; o processo na 2.1.322 naquela pasta é a visão claude agents"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: REPROVA de E_SANDBOX_DA_CURADORIA_E_SKILLS_ANINHADAS_1110"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261110_NOS_DA_R23_QUE_CAIRAM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em Q_O_QUE_O_DELTA_TOCA_NO_ONION"
+    label: "caíram quatro nós da r23: binário apagado (de seis para zero), correções sem terminal (já chegam ao bridge), dica do --continue (nenhuma conversa na janela) e extensão do VS Code (não reproduz); a pergunta do censo segue válida como mecanismo, com zero processos hoje"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: REPROVA de CU4"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261110_OMISSOES_DO_DELTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em Q_O_QUE_O_DELTA_TOCA_NO_ONION"
+    label: "as omissões medidas: a 2.1.321 sobre Bash de leitura fora do sandbox alcança a curadoria, e os itens de escrita julgada da pasta errada e de sed têm forma que passa o veto de escrita; três outros itens vão a NÃO-VERIFICADOS"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: REPROVA de CU5"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110
+    edge_type: SUPPORTS
+  - from: E_FABLE_5_2_VETADO_PELA_GUARDA_DE_MODELO_1110
+    to: Q_E6_ADMITE_O_FABLE_5_2_NO_LINEUP_1110
+    edge_type: SUPPORTS
+  - from: E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110
+    to: Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_FABLE_5_2_VETADO_PELA_GUARDA_DE_MODELO_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_BANCADA_DO_DENY_VERDE_NA_2_1_322_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_322_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SANDBOX_DA_CURADORIA_E_SKILLS_ANINHADAS_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_LOOP_AUTOPACED_TERMINA_SEM_REAGENDAR_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_POSTTOOLUSE_EM_CHAMADA_INTERROMPIDA_CABE_NO_PRAZO_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_SEM_SUPERFICIE_NO_CORE_1110
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110
+    to: Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261110_DUAS_VERSOES_DO_SDK
+    to: E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261110_MAPA_DOS_VETOS
+    to: E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261110_DATACAO_DOS_MODS
+    to: E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261110_CONTAGEM_DAS_SESSOES
+    to: E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261110_CURADORIA_NA_2_1_319
+    to: E_SANDBOX_DA_CURADORIA_E_SKILLS_ANINHADAS_1110
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261110_NOS_DA_R23_QUE_CAIRAM
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261110_OMISSOES_DO_DELTA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: TRACES_TO

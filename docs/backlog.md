@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1060 itens abertos** em 164 grafo(s) com aberto (de 213 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1059 itens abertos** em 164 grafo(s) com aberto (de 214 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1436,16 +1436,6 @@
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
 | 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
 
-## radar-E3-2026-11-04-r23 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.4 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_318_E_PIN_DO_REVISOR_PARA_V1_0_268_1104` | radar-E3-2026-11-04-r23 | o SDK do bridge sobe para 0.3.318 e o pin do revisor para v1.0.268 (sha c0949c50); o deploy do bridge é do maestro, o pin é PR d |
-| 4.0 | `Q_CENSO_DE_SESSOES_EM_BINARIO_DELETADO_1104` | radar-E3-2026-11-04-r23 | a casa lista os processos da conta em binário apagado, achados pelo executável (readlink no procfs) e não pelo nome claude: hoj |
-| 2.0 | `Q_CENSO_AVISA_O_FIM_DO_LOGIN_1104` | radar-E3-2026-11-04-r23 | o censo de frescor (currency-census.sh) ou o hook de início de sessão passa a ler loginExpiresAt e avisa o maestro antes do cort |
-| 2.0 | `Q_PREAMBULO_NOMEIA_O_CORTE_DE_3_MIN_1104` | radar-E3-2026-11-04-r23 | o preâmbulo do agente de execução nomeia o corte de 3 minutos e exige o rc do gate lido do arquivo de log, nunca a resposta do  |
-| 1.0 | `Q_SUBIR_A_EXTENSAO_DO_VSCODE_PELO_EDITOR_1104` | radar-E3-2026-11-04-r23 | o maestro sobe a extensão do VS Code pela visão de extensões do editor, ou a casa passa a medi-la no censo de frescor, que hoje |
-
 ## company-brain-market-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1523,14 +1513,6 @@
 | 7.2 | `C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE` | forge-cc-update-2026-10 | teto declarado: o medidor não decide se um item do CHANGELOG toca o Onion; casar por palavra-chave fabricaria as ligações que a |
 | 3.6 | `Q_ISSUE_PELO_ADAPTER_EXECUTAVEL` | forge-cc-update-2026-10 | quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão? |
 
-## radar-E3-2026-10-30-r21 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.2 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030` | radar-E3-2026-10-30-r21 | o SDK do bridge deve subir para 0.3.314 por paridade (três versões atrás); o alvo da SAC-261 envelheceu, só a metade do pin de |
-| 2.2 | `Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030` | radar-E3-2026-10-30-r21 | a cobertura dos vetos sobre o Monitor deve virar caso da guarda de deriva de binário, ou ficar só declarada? |
-| 2.0 | `Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030` | radar-E3-2026-10-30-r21 | o veto nativo de escrita fora do diretório de trabalho cabe na casa (ou num adotante regulado), com as escritas legítimas declar |
-
 ## rito-task-manager-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1558,13 +1540,14 @@
 | 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
 | 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
 
-## radar-E3-2026-11-03-r22 — 3 item(ns)
+## radar-E3-2026-11-10-r24 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 6.3 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103` | radar-E3-2026-11-03-r22 | o SDK do bridge sobe para 0.3.317 e o pin do revisor para v1.0.267 (sha 4845bacb); o deploy do bridge é do maestro, o pin é PR d |
-| 3.0 | `Q_AGENTES_DECLARAM_O_ESFORCO_1103` | radar-E3-2026-11-03-r22 | os agentes cujo modelo difere do da sessão de quem os chama devem declarar effort no frontmatter, ou a casa fixa CLAUDE_CODE_SUBA |
-| 2.4 | `Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103` | radar-E3-2026-11-03-r22 | o card do teste A2A deve proibir retomar a sessão de teste pela dica de saída e mandar sempre a linha de comando inteira |
+| 6.4 | `Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110` | radar-E3-2026-11-10-r24 | o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita  |
+| 6.3 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110` | radar-E3-2026-11-10-r24 | o SDK do bridge sobe para 0.3.322, com o lock, e re-implanta pelo caminho declarado; o deploy é do maestro |
+| 5.6 | `Q_E6_ADMITE_O_FABLE_5_2_NO_LINEUP_1110` | radar-E3-2026-11-10-r24 | claude-fable-5-2 entra em session_models como primário, por rodada E6 ou selo direto do maestro; decisão do maestro |
+| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
 
 ## ai-front-2026-10 — 1 item(ns)
 
@@ -1687,12 +1670,6 @@
 |--:|---|---|---|
 | 4.8 | `Q_REGISTRO_DO_CONSULTORIA_DIVERGE_DO_CLONE` | member-paths-2026-11 | com o clone legível, o pin do registro (6c4272252528) diverge do carimbo da origin/main do clone (e4c954ebad47): o --seal do memb |
 
-## radar-E3-2026-10-28-r20 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.8 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028` | radar-E3-2026-10-28-r20 | o SDK do bridge deve subir para 0.3.312 e o pin do revisor do CI para v1.0.264; o alvo da SAC-259 envelheceu, e só a metade do pi |
-
 ## cortex-2026-10 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1755,19 +1732,21 @@
 |--:|---|---|---|
 | 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
 
+## radar-E3-2026-11-04-r23 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_CENSO_DE_SESSOES_EM_BINARIO_DELETADO_1104` | radar-E3-2026-11-04-r23 | a casa lista os processos da conta em binário apagado, achados pelo executável (readlink no procfs) e não pelo nome claude: hoj |
+| 2.0 | `Q_CENSO_AVISA_O_FIM_DO_LOGIN_1104` | radar-E3-2026-11-04-r23 | o censo de frescor (currency-census.sh) ou o hook de início de sessão passa a ler loginExpiresAt e avisa o maestro antes do cort |
+| 2.0 | `Q_PREAMBULO_NOMEIA_O_CORTE_DE_3_MIN_1104` | radar-E3-2026-11-04-r23 | o preâmbulo do agente de execução nomeia o corte de 3 minutos e exige o rc do gate lido do arquivo de log, nunca a resposta do  |
+| 1.0 | `Q_SUBIR_A_EXTENSAO_DO_VSCODE_PELO_EDITOR_1104` | radar-E3-2026-11-04-r23 | o maestro sobe a extensão do VS Code pela visão de extensões do editor, ou a casa passa a medi-la no censo de frescor, que hoje |
+
 ## fios-abertos — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
 | 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
-
-## radar-E3-2026-10-26-r19 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.6 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026` | radar-E3-2026-10-26-r19 | o SDK do bridge deve subir para 0.3.311, pela ordem do transcript nas sessões retomadas (linha 11), e o pin do revisor do CI para |
-| 2.0 | `Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026` | radar-E3-2026-10-26-r19 | a extensão do VS Code do host deve entrar como fonte declarada no censo de versões, ou basta atualizá-la quando for usada |
 
 ## task-progress-story-points-2026-10 — 2 item(ns)
 
@@ -1781,6 +1760,13 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 3.0 | `Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO` | radar-E3-2026-10-14-r11 | o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em |
+
+## radar-E3-2026-11-03-r22 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_AGENTES_DECLARAM_O_ESFORCO_1103` | radar-E3-2026-11-03-r22 | os agentes cujo modelo difere do da sessão de quem os chama devem declarar effort no frontmatter, ou a casa fixa CLAUDE_CODE_SUBA |
+| 2.4 | `Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103` | radar-E3-2026-11-03-r22 | o card do teste A2A deve proibir retomar a sessão de teste pela dica de saída e mandar sempre a linha de comando inteira |
 
 ## superpowers-2026-10 — 2 item(ns)
 
@@ -1839,6 +1825,13 @@
 |--:|---|---|---|
 | 2.4 | `Q_ALARME_DE_AUSENCIA_DE_AGENDADO` | residuos-2026-08-18 | GATED por Teste do Gatilho — alarme para agendado que PARA de rodar. GATILHO NOMEADO: a 1a vez que um run com event=schedule for |
 
+## radar-E3-2026-10-30-r21 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.2 | `Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030` | radar-E3-2026-10-30-r21 | a cobertura dos vetos sobre o Monitor deve virar caso da guarda de deriva de binário, ou ficar só declarada? |
+| 2.0 | `Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030` | radar-E3-2026-10-30-r21 | o veto nativo de escrita fora do diretório de trabalho cabe na casa (ou num adotante regulado), com as escritas legítimas declar |
+
 ## kg-console-rich-design-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1850,6 +1843,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.0 | `Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL` | radar-E3-2026-10-17-r13 | medir um turno real do admin do /chat com o fork ligado (custo da cópia de contexto e saída em segundo plano antes do fim do tur |
+
+## radar-E3-2026-10-26-r19 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026` | radar-E3-2026-10-26-r19 | a extensão do VS Code do host deve entrar como fonte declarada no censo de versões, ou basta atualizá-la quando for usada |
 
 ## vendor-multi-branch-2026-07 — 1 item(ns)
 

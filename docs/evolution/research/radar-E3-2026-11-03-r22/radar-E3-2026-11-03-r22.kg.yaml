@@ -73,11 +73,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.7
-    verified_at: "2026-11-03"
-    verified_against: "npm view @anthropic-ai/claude-agent-sdk version → 0.3.317; o pin v1.0.267 da claude-code-action instala o CLI 2.1.317 (session-currency-check de 2026-11-03)"
+    verified_at: "2026-11-10"
+    verified_against: "cumprida: currency-census.sh em 2026-11-10 mede o SDK do bridge em 0.3.319 e a action em 1.0.271, ambos além do alvo desta pergunta; a subida seguinte é Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110"
     label: "o SDK do bridge sobe para 0.3.317 e o pin do revisor para v1.0.267 (sha 4845bacb); o deploy do bridge é do maestro, o pin é PR do core, provado no PR seguinte"
   - id: E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103
     node_type: evidence

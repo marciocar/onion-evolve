@@ -75,11 +75,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.6
-    verified_at: "2026-10-28"
-    verified_against: "proposta da rodada 20 do radar do Claude Code: subir o Agent SDK do bridge de 0.3.310 para 0.3.312 pelo ops/update-bridge.sh (deploy do maestro, repo alheio) e o pin do revisor para a tag v1.0.264 (d70510b1); a metade do pin da SAC-259 já foi feita (v1.0.263, commit 3892b25d7) e a do SDK não; a razão medida segue sendo a ordem do transcript nas sessões retomadas (linha 11 da 2.1.311); a linha 9 da 2.1.312 (comando com nome inválido deixando claude -p sem saída) dá ao pin uma razão além da paridade, porque o revisor roda o CLI 2.1.311 headless no checkout do PR com os 166 comandos (omissão apontada pelo juiz), e o alcance no bridge e na action não foi medido; nada sobe nesta rodada; issue SAC-261, que substitui o alvo da SAC-259 (comentada)"
+    verified_at: "2026-11-10"
+    verified_against: "cumprida: currency-census.sh em 2026-11-10 mede o SDK do bridge em 0.3.319 e a action em 1.0.271, ambos além do alvo desta pergunta; a subida seguinte é Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110"
     label: "o SDK do bridge deve subir para 0.3.312 e o pin do revisor do CI para v1.0.264; o alvo da SAC-259 envelheceu, e só a metade do pin dela foi feita"
     provenance:
       source: "https://linear.app/sacola/issue/SAC-261"
