@@ -2,7 +2,8 @@
 branch: fix/adopter-shape-na-derived
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 488221020693e9033d659388ab7a46dd83046a44c168b9f55a44a9c24ea7972f
+reviewed_code_sha256: bcdd5f9c39f4b4df3cac730cd883949f3a36c1aea5ece211f599479ed114ab2b
 findings_total: 2
 findings_real: 2
 findings_blocking: 1
