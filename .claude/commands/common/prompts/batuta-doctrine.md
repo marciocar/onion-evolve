@@ -15,9 +15,12 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 
 ## Cláusulas
 
-1. **Passo pesado passa pela porta de admissão.** Bancada, mutantes e fechamento de PR esperam a carga e a
-   **vaga única** da máquina pelo lease de carga do core: a bancada e o harness de mutantes chamados direto se
-   re-executam sob ele, e o `pr-finalize` pega a vaga sempre. Espera própria (`until load < N`, `flock` num arquivo
+1. **Passo pesado passa pela porta de admissão.** Bancada, mutantes e fechamento de PR esperam a carga e uma das
+   **N vagas de passo pesado** da máquina pelo lease de carga do core. A bancada e o harness de mutantes chamados
+   direto se re-executam sob ele, e o `pr-finalize` pega uma vaga sempre. **N se deriva da carga** a cada tentativa:
+   N = piso((12 − load) / 2), entre 1 e 4, com 12 sendo a retomada da régua selada. Com carga baixa entram vários
+   juntos; perto de 12, um só; na régua, nenhum novo entra, nem quando uma vaga se solta durante a espera. Vaga
+   única serializava demais: às 13:35 UTC de 2026-11-10 havia 4 na fila com load 3,5 em 8 CPUs. Espera própria (`until load < N`, `flock` num arquivo
    do scratchpad) é a regra repetida à mão que diverge. A régua (15, retoma abaixo de 12, PSI de CPU 30) é decisão
    do maestro (`D_SO_LIMITES_DERIVADOS_DO_LEASE_1106`), e a forma é a de mercado: `flock` do kernel mais admissão
    por carga, como o `parallel --load` e os slots por recurso do Temporal. A trava é de **eficiência**, não de

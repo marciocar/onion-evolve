@@ -40,7 +40,7 @@
 
 set -euo pipefail
 
-# ── PORTA DE ADMISSÃO: a bancada chamada DIRETO espera a carga e a vaga única (a batuta, 2026-11-10) ──────
+# ── PORTA DE ADMISSÃO: a bancada chamada DIRETO espera a carga e uma vaga de passo pesado (a batuta, 2026-11-10) ──────
 # Antes, só o pre-commit e o pr-finalize esperavam; a bancada chamada à mão por um agente se marcava "já
 # admitida" mais abaixo e rodava com qualquer carga (medido em 2026-11-10: três agentes, load 16–19). Aqui,
 # ANTES do `unset GITHUB_ACTIONS` abaixo (o runner do CI passa direto pelo lease e dizendo), ela se re-executa
@@ -56154,7 +56154,7 @@ _family run_plugin_write_guard_selftests
 # da bancada e o GITHUB_ACTIONS do CI, que fariam o lease passar direto.
 run_load_lease_selftests() {
   echo ""
-  echo "▸ load-lease — espera/checa a carga e a vaga de bancada cheia (ops/load-lease.sh)"
+  echo "▸ load-lease — espera/checa a carga e as N vagas de passo pesado (ops/load-lease.sh)"
   local sut="${REPO_ROOT}/ops/load-lease.sh" conf="${REPO_ROOT}/ops/load-lease.conf"
   if [ ! -f "${sut}" ] || [ ! -f "${conf}" ]; then record_fail "load-lease: SUT ausente" "${sut} ou ${conf} não existe"; return; fi
   command -v flock >/dev/null 2>&1 || { record_skip "load-lease: flock ausente → pulado"; return; }
@@ -56190,7 +56190,7 @@ if o in s:
   }
   # segura a vaga num processo à parte (o "outro dono") até o arquivo de parada aparecer
   _llhold() { mkdir -p "${d}/vaga"; chmod 700 "${d}/vaga"; rm -f "${d}/held" "${d}/stop"
-    ( exec 8>"${d}/vaga/full-bench.lock"; flock -x 8; : > "${d}/held"; i=0; while [ ! -e "${d}/stop" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i+1)); done ) &
+    ( exec 8>"${d}/vaga/slot.0.lock"; flock -x 8; : > "${d}/held"; i=0; while [ ! -e "${d}/stop" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i+1)); done ) &
     LL_HP=$!; local i; for i in $(seq 1 100); do [ -e "${d}/held" ] && return 0; sleep 0.1; done; return 1; }
   _llunhold() { : > "${d}/stop"; wait "${LL_HP}" 2>/dev/null || true; rm -f "${d}/held" "${d}/stop"; }
   # (a) livre: load 3 → check rc 0 e wait libera na chegada
@@ -56217,10 +56217,10 @@ if o in s:
     'if _ll_lt "${l}" "${LL_RESUME}" && ! _ll_psi_busy; then' 'if _ll_lt "${l}" "${LL_HIGH}" && ! _ll_psi_busy; then' _c_hyst
   # (e) vaga disputada: outro dono segura a vaga ⇒ run estoura o teto (rc 4) SEM rodar o comando
   _c_contended() { _llset 3.00; rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
-    local a; a="$(_llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
-    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"vaga de bancada cheia"* ]]; }
-  _llcase "(e) vaga disputada: outro dono segura ⇒ run rc 4 e o comando NÃO roda" \
-    'if ! flock -n "${LL_FD}"; then' 'if false; then' _c_contended
+    local a; a="$(LLR_ENV='ONION_LOAD_SLOTS_MAX=1' _llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"vaga de passo pesado"* ]]; }
+  _llcase "(e) vaga disputada (N=1): outro dono segura ⇒ run rc 4 e o comando NÃO roda" \
+    '      if flock -n "${fd}"; then' '      if true; then' _c_contended
   # (f) run devolve o rc do comando (e roda com a vaga livre)
   _c_rc() { _llset 3.00; local a; a="$(_llr "$1" run --max 5 -- bash -c 'exit 7')"; LL_WHY="${a}"; [ "${a%%|*}" = 7 ]; }
   _llcase "(f) run livre roda o comando e devolve o rc dele (7)" \
@@ -56273,6 +56273,36 @@ if o in s:
   else
     record_fail "load-lease: (i) lab run_all.sh" "${lab} sumiu — a ligação do lab não foi julgada"
   fi
+  # ── N VAGAS DERIVADAS DA CARGA (medida do maestro às 13:35 UTC de 2026-11-10: 4 na fila de uma vaga só, load 3,5 em 8 CPUs) ──
+  # (o) carga BAIXA: load 3 ⇒ N = piso((12 − 3)/2) = 4 — duas tarefas pesadas entram JUNTAS. A tarefa A só sai 0 se a B
+  #     rodar enquanto A ainda segura a vaga dela; serializado, B estoura o teto e A sai 9.
+  _c_two() { _llset 3.00; rm -f "${d}/a.in" "${d}/b.ran" "${d}/a.out"; local b i
+    ( _llr "$1" run --max 10 -- bash -c 'touch "$0/a.in"; for i in $(seq 1 80); do [ -e "$0/b.ran" ] && exit 0; sleep 0.1; done; exit 9' "${d}" > "${d}/a.out" ) &
+    local ap=$!; for i in $(seq 1 50); do [ -e "${d}/a.in" ] && break; sleep 0.1; done
+    b="$(_llr "$1" run --max 3 -- touch "${d}/b.ran")"; wait "${ap}" 2>/dev/null || true
+    LL_WHY="A $(cat "${d}/a.out" 2>/dev/null | tr '\n' ' ') · B ${b}"
+    [ "${b%%|*}" = 0 ] && [ "$(head -1 "${d}/a.out" 2>/dev/null | cut -d'|' -f1)" = 0 ] && [[ "${b#*|}" == *"(2 de 4"* ]]; }
+  _llcase "(o) carga baixa (load 3): N=4 e duas tarefas pesadas rodam juntas" \
+    'if (k > m) k = m; print k }' 'print 1 }' _c_two
+  # (p) carga ALTA: nenhuma nova entra, nem quando uma vaga SE SOLTA durante a espera. A espera pela vaga re-julga a
+  #     carga: aqui ela sobe a 16 enquanto B espera, e o dono solta a vaga; B não pode entrar até o teto.
+  _c_high() { _llset 16.00; rm -f "${d}/ran"; local a b
+    a="$(_llr "$1" run --max 2 -- touch "${d}/ran")"
+    _llset 3.00; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
+    ( sleep 1.5; _llset 16.00; sleep 0.5; : > "${d}/stop" ) &
+    local hp=$!
+    b="$(LLR_ENV='ONION_LOAD_SLOTS_MAX=1' _llr "$1" run --max 6 -- touch "${d}/ran")"
+    wait "${hp}" 2>/dev/null || true; _llunhold; _llset 3.00
+    LL_WHY="na chegada ${a} · durante a espera ${b}"
+    [ "${a%%|*}" = 4 ] && [ "${b%%|*}" = 4 ] && [ ! -e "${d}/ran" ]; }
+  _llcase "(p) carga alta: nenhuma nova entra, nem com vaga solta durante a espera" \
+    'if _ll_ge "${l}" "${LL_HIGH}" || _ll_psi_busy; then' 'if false; then' _c_high
+  # (q) carga MÉDIA: load 10,5 ⇒ N = piso(1,5/2) cai a 1; com a vaga 1 tomada, a 2ª NÃO entra (o N é medido, não fixo)
+  _c_mid() { _llset 10.50; rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
+    local a; a="$(_llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"as 1 vagas de load 10.50"* ]]; }
+  _llcase "(q) carga média (load 10,5): N=1 e a 2ª tarefa espera" \
+    'k = int((n - l) / c);' 'k = m;' _c_mid
   # ── PORTA DE ADMISSÃO (a batuta, 2026-11-10): o passo pesado chamado DIRETO se re-executa sob `run` ─────────
   # t.sh imita a bancada/o harness: sourça o lease sob teste, chama a porta e anota o que segurava ao rodar
   printf '%s\n' '#!/usr/bin/env bash' '. "${LEASE}"' 'load_lease_reexec teste "$0" "$@" || exit $?' \
@@ -56288,9 +56318,9 @@ if o in s:
   }
   # (l) vaga livre: roda UMA vez segurando a vaga; vaga com outro dono: teto (rc 4) e NÃO roda
   _c_reexec() { _llset 3.00; rm -f "${d}/ran"; local a b n
-    a="$(_llx "$1")"; n="$(grep -c 'full-bench.lock' "${d}/ran" 2>/dev/null || true)"
+    a="$(_llx "$1")"; n="$(grep -c '/slot\.[0-9]*\.lock$' "${d}/ran" 2>/dev/null || true)"
     rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
-    b="$(LLX_ENV='ONION_LOAD_WAIT_MAX=2' _llx "$1")"; _llunhold
+    b="$(LLX_ENV='ONION_LOAD_WAIT_MAX=2 ONION_LOAD_SLOTS_MAX=1' _llx "$1")"; _llunhold
     LL_WHY="livre ${a} (com a vaga: ${n}) · disputada ${b}"
     [ "${a%%|*}" = 0 ] && [ "${n}" = 1 ] && [ "${b%%|*}" = 4 ] && [ ! -e "${d}/ran" ]; }
   _llcase "(l) porta de admissão: chamado direto roda sob a vaga; com a vaga alheia, rc 4 sem rodar" \
@@ -56318,8 +56348,8 @@ if o in s:
   _c_w_fa() { grep -qx '  load_lease_acquire || _ll_rc=\$?' "$1"; }
   cp "${fin}" "${d}/fa.sh"; sed 's#^  load_lease_acquire || _ll_rc=\$?$#  if [ "${ONION_SELFTEST_FULL:-0}" = 1 ]; then load_lease_acquire || _ll_rc=$?; else load_lease_wait || _ll_rc=$?; fi#' "${fin}" > "${d}/fam.sh"
   ri=1; rm_=1; _c_w_fa "${d}/fa.sh" && ri=0; _c_w_fa "${d}/fam.sh" && rm_=0
-  if [ "${ri}" = 0 ]; then record_pass "load-lease: (n) o pr-finalize pega a vaga única sempre"
-  else record_fail "load-lease: (n) o pr-finalize pega a vaga única sempre" "a vaga voltou a ser só da bancada cheia"; fi
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (n) o pr-finalize pega uma vaga sempre"
+  else record_fail "load-lease: (n) o pr-finalize pega uma vaga sempre" "a vaga voltou a ser só da bancada cheia"; fi
   _prove_mutation "load-lease: (n) pr-finalize (MUT: vaga só com ONION_SELFTEST_FULL)" "${d}/fa.sh" "${d}/fam.sh" "${ri}" "${rm_}"
   # o pré-voo roda a bancada sob `env -i`: sem repassar ONION_LOAD_LEASE_HELD, ela disputaria a vaga que o
   # pr-finalize (o pai) segura, e esperaria o teto inteiro (deadlock de 30 min, achado da passada de 2026-11-10)
