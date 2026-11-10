@@ -2,8 +2,9 @@
 # =============================================================================
 # install-a2a-rt.sh — monta a sessão de TESTE da ida e volta VPS ↔ notebook (PRE-REGISTRO.md §4 e §5, item 9).
 #
-# Copia a peça de rascunho (a2a-rt-mcp.py), a moldura R15.2 e o gravador de tentativas para FORA da árvore de
-# trabalho (~/.local/share/onion/a2a-rt/) e gera os dois arquivos que a linha de comando da sessão de teste usa:
+# Copia a peça de rascunho (a2a-rt-mcp.py), o registro de rascunhos que ela importa (a2a-metrics.py), a moldura
+# R15.2 e o gravador de tentativas para FORA da árvore de trabalho (~/.local/share/onion/a2a-rt/) e gera os
+# dois arquivos que a linha de comando da sessão de teste usa:
 #   ~/.local/share/onion/a2a-rt/mcp.json       a config do MCP a2a-rt (o único servidor da sessão)
 #   ~/.local/share/onion/a2a-rt/settings.json  o gravador de tentativas em todo evento de ferramenta
 # Nenhum segredo é lido, copiado ou gerado aqui: a peça não abre chave nem token.
@@ -31,22 +32,26 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --side) [ "$#" -ge 2 ] || die "--side exige valor"; SIDE="$2"; shift 2 ;;
   --core) [ "$#" -ge 2 ] || die "--core exige valor"; CORE="$2"; shift 2 ;;
   --endpoint) [ "$#" -ge 2 ] || die "--endpoint exige valor"; EP="$2"; shift 2 ;;
-  -h|--help) sed -n '2,27p' "$0"; exit 0 ;;
+  -h|--help) sed -n '2,28p' "$0"; exit 0 ;;
   *) die "argumento desconhecido: $1" ;;
 esac; done
 case "${SIDE}" in notebook|vps) ;; *) die "--side notebook|vps obrigatório" ;; esac
 command -v jq >/dev/null 2>&1 || die "jq ausente"
 MCP="${CORE}/.claude/utils/federation-transport/a2a-rt-mcp.py"
+# o MCP importa o a2a-metrics.py do PRÓPRIO diretório (o registro de rascunhos): sem ele o draft_message recusa
+# (atrito da ida e volta de 2026-11-09). Os imports do MCP fora da stdlib são só estes dois: a2a-metrics.py e a moldura
+METRICS="${CORE}/.claude/utils/federation-transport/a2a-metrics.py"
 WRAP="${CORE}/.claude/utils/guardrails/onion-untrusted-wrap.sh"
 REC="${CORE}/docs/evolution/research/a2a-cross-user-spike-2026-10/hooks/record-tool-attempts.sh"
 PUB="${CORE}/docs/evolution/research/a2a-cross-user-spike-2026-10/keys/onion-evolve-spike-1.pub.pem"
 SEND="$(cd "${CORE}/.claude/utils/federation-transport" 2>/dev/null && pwd)/a2a-rt-send.sh"
 case "${EP}" in https://*) ;; *) die "--endpoint precisa ser https://" ;; esac
-for f in "${MCP}" "${WRAP}" "${REC}" "${PUB}" "${SEND}"; do [ -f "${f}" ] || die "ausente: ${f}"; done
+for f in "${MCP}" "${METRICS}" "${WRAP}" "${REC}" "${PUB}" "${SEND}"; do [ -f "${f}" ] || die "ausente: ${f}"; done
 
 D="${HOME}/.local/share/onion/a2a-rt"; S="${HOME}/.local/state/onion/a2a-rt"
 install -d -m 700 "${D}" "${S}" "${S}/inbox"
 install -m 600 "${MCP}" "${D}/a2a-rt-mcp.py"
+install -m 600 "${METRICS}" "${D}/a2a-metrics.py"
 install -m 600 "${WRAP}" "${D}/onion-untrusted-wrap.sh"
 install -m 700 "${REC}" "${D}/record-tool-attempts.sh"
 install -m 644 "${PUB}" "${D}/onion-evolve-spike-1.pub.pem"
@@ -76,4 +81,4 @@ echo "montado (${SIDE}) em ${D}:"
 echo "  mcp.json      → servidor a2a-rt, A2A_RT_ME=$(jq -r '.mcpServers["a2a-rt"].env.A2A_RT_ME' "${D}/mcp.json"), caixa $(jq -r '.mcpServers["a2a-rt"].env.A2A_RT_INBOX' "${D}/mcp.json")"
 echo "  settings.json → gravador de tentativas em ${A2A_SPIKE_STATE:-${HOME}/.local/state/onion/a2a-spike}/tool-attempts.jsonl"
 echo "sessão de teste (numa pasta VAZIA própria, fora do checkout do core; ex.: mkdir -p ~/rt-sessao-${SIDE} && cd ~/rt-sessao-${SIDE}); nunca escolha \"não perguntar de novo\":"
-echo "  claude --tools \"\" --strict-mcp-config --mcp-config ${D}/mcp.json --settings ${D}/settings.json --permission-mode default"
+echo "  claude --tools \"\" --strict-mcp-config --no-chrome --mcp-config ${D}/mcp.json --settings ${D}/settings.json --permission-mode default"

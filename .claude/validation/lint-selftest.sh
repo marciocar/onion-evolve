@@ -18063,6 +18063,43 @@ PY
     else record_pass "a2a-rt (d-razão) mutante 2: a linha corrompida ignorada em silêncio reprova (corrompido tem de recusar)"; fi
   fi
 
+  # ─────────────────── (d-censo) o read_inbox VAZIO diz o censo, e o que não mede daqui ───────────────────
+  # Atrito da ida e volta de 2026-11-09: "0 nova(s)" não dizia se a caixa estava vazia, se tudo já tinha sido entregue
+  # ou se o aceite nem tinha acontecido. O cabeçalho vazio traz arquivos na caixa, já entregues (seen), reprovados, os
+  # caminhos da caixa e do razão, as linhas do razão com o doc fora desta caixa, e nomeia a fila sem aceite como NÃO medida.
+  _rt_census() {  # $1 = mcp → 0 se a 1ª leitura (com nova) não traz censo e a 2ª (vazia) traz o censo certo
+    local cs="${sb}/census-state" L3="${sb}/census.ledger" o1 o2 oe
+    cp "${LED}" "${L3}"; chmod 600 "${L3}"
+    printf '%s task-2 2026-11-09-a2a-onion-peer-0123456789abcdef.md\n' "$(printf 'fora' | openssl dgst -sha256 | awk '{print $NF}')" >> "${L3}"
+    rm -rf "${cs}"
+    o1="$(HOME="${H}" A2A_RT_STATE="${cs}" A2A_RT_ME=onion-evolve A2A_RT_INBOX_MODE=inbox-doc A2A_RT_INBOX="${DI}" A2A_RT_ACCEPT_LEDGER="${L3}" python3 -I "$1" < "${sb}/vps.req")"
+    o2="$(HOME="${H}" A2A_RT_STATE="${cs}" A2A_RT_ME=onion-evolve A2A_RT_INBOX_MODE=inbox-doc A2A_RT_INBOX="${DI}" A2A_RT_ACCEPT_LEDGER="${L3}" python3 -I "$1" < "${sb}/vps.req")"
+    o1="$(_rt_text "${o1}" 1)"; o2="$(_rt_text "${o2}" 1)"
+    _rt_has "${o1}" "RESPOSTA-ACEITA" && ! _rt_has "${o1}" "censo (0 novas)" || return 1
+    _rt_has "${o2}" "read_inbox: 0 nova(s), 1 reprovada(s)" || return 1
+    _rt_has "${o2}" "censo (0 novas): 2 arquivo(s) na caixa · 1 já entregue(s) (cursor seen) · 1 reprovado(s)" || return 1
+    _rt_has "${o2}" "  caixa: ${DI}" && _rt_has "${o2}" "  cursor: ${cs}/inbox-seen.json" || return 1
+    _rt_has "${o2}" "razão de aceites: ${L3} · 2 linha(s), 1 com o doc fora desta caixa" || return 1
+    _rt_has "${o2}" "NÃO MEDIDO daqui: o que está na fila do bridge SEM aceite" && _rt_has "${o2}" "ops/a2a-queue-live.sh list" || return 1
+    # modo envelope (notebook): sem razão, e o censo diz que ele não se aplica
+    rm -f "${ST}/inbox-seen.json"; _rt_read "$1" >/dev/null; oe="$(_rt_read "$1")"
+    _rt_has "${oe}" "censo (0 novas): " && _rt_has "${oe}" "razão de aceites: não se aplica (modo envelope" || return 1
+    _rt_has "${oe}" "ops/a2a-queue-live.sh list" || return 1
+    return 0
+  }
+  if _rt_census "${mcp}"; then record_pass "a2a-rt (d-censo): o read_inbox vazio traz o censo (arquivos na caixa, já entregues pelo cursor, reprovados, caixa, cursor, razão e linhas dele com o doc fora da caixa) e nomeia a fila sem aceite como não medida daqui (ops/a2a-queue-live.sh list); com nova, sem censo"
+  else record_fail "a2a-rt (d-censo)" "$(_rt_vps "${mcp}" "${LED}" | head -c 500)"; fi
+  python3 - "${mcp}" "${mut}/census.py" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = '    if not new:\n        head += "\\n" + _census('
+assert s.count(a) == 1
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '    if False:  # MUTANTE: o vazio calado\n        head += "\\n" + _census(', 1))
+PY
+  if [ ! -f "${mut}/census.py" ]; then record_fail "a2a-rt (d-censo) mutante" "a âncora do censo sumiu"
+  elif _rt_census "${mut}/census.py"; then record_fail "a2a-rt (d-censo) mutante" "o read_inbox vazio sem censo (a forma de 2026-11-09) passou"
+  else record_pass "a2a-rt (d-censo) mutante: o '0 nova(s)' calado, sem censo (a forma de 2026-11-09), reprova"; fi
+
   # ─────────────────── (c) o envio exige a confirmação digitada ───────────────────
   if ! command -v script >/dev/null 2>&1 || ! command -v setsid >/dev/null 2>&1; then
     record_skip "a2a-rt (c): script/setsid (util-linux) ausente → sem terminal falso para o caso"
@@ -18114,6 +18151,44 @@ PY
     rc=0; HOME="${H}" bash "${snd}" --side core --draft q1 --state "${CS}" --yes > /dev/null 2>&1 || rc=$?
     if [ "${rc}" = 2 ]; then record_pass "a2a-rt (c): não existe flag que pule a confirmação (--yes = erro de uso)"
     else record_fail "a2a-rt (c): --yes" "rc=${rc}"; fi
+    # (c-próximo) atrito da ida e volta de 2026-11-09: depois de "gravado no outbox" o maestro montou a retirada à mão.
+    # A saída tem de dar o prazo (iat do payload assinado + exp-offset) e a retirada do outro lado com --until-jti <jti>
+    _rt_req "${sb}/n.req" x '{"name":"draft_message","arguments":{"to":"membro-x","text":"pergunta do proximo passo","idempotency_key":"n1"}}' \
+      '{"name":"draft_message","arguments":{"to":"membro-x","text":"pergunta do proximo passo, mutante","idempotency_key":"n2"}}'
+    HOME="${H}" A2A_RT_STATE="${CS}" python3 -I "${mcp}" < "${sb}/n.req" >/dev/null
+    _rt_next() {  # $1 = send script · $2 = rascunho → 0 se a saída traz o prazo do payload e a retirada com o jti do envelope
+      local code e pl jti iat iso
+      code="$(jq -r .body_sha256 "${CS}/drafts/$2.json")"; code="${code: -6}"
+      printf 'ENVIAR %s\n' "${code}" | env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT HOME="${H}" XDG_CONFIG_HOME= PATH="${STUB}:${PATH}" \
+        script -qec "bash '$1' --side core --draft $2 --state '${CS}' --outbox '${sb}/outbox-$2'" /dev/null > "${sb}/n.out" 2>&1 || return 1
+      e="$(find "${sb}/outbox-$2" -maxdepth 1 -name '*-question-*.json' 2>/dev/null | head -1)"; [ -n "${e}" ] || return 1
+      pl="$(jq -r .jws "${e}" | cut -d. -f2 | tr '_-' '/+' | { s="$(cat)"; case $(( ${#s} % 4 )) in 2) s="${s}==";; 3) s="${s}=";; esac; printf '%s' "$s"; } | openssl base64 -d -A)"
+      jti="$(jq -r .jti <<< "${pl}")"; iat="$(jq -r '.iat|floor' <<< "${pl}")"
+      iso="$(python3 -I -c 'import sys, datetime as d; print(d.datetime.fromtimestamp(int(sys.argv[1]), d.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))' "$((iat + 3600))")"
+      grep -qF "válido até ${iso} (iat ${iat} + 3600 s)" "${sb}/n.out" || return 1
+      grep -qF "fetch-replies.sh --me membro-x --watch --until-jti ${jti} --timeout 600" "${sb}/n.out" || return 1
+      return 0
+    }
+    if _rt_next "${snd}" n1; then record_pass "a2a-rt (c-próximo): depois de 'gravado no outbox' a saída dá o prazo (iat assinado + 3600 s) e a retirada do outro lado (fetch-replies.sh --me <aud> --until-jti <jti do envelope>), pronta para colar"
+    else record_fail "a2a-rt (c-próximo): próximo passo" "$(tr -d '\r' < "${sb}/n.out" | tail -n 5 | head -c 500)"; fi
+    local fr="${REPO_ROOT}/docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.sh"
+    if [ ! -f "${fr}" ]; then record_skip "a2a-rt (c-próximo): fetch-replies.sh ausente nesta árvore (cortado pelo papel) → o comando impresso não se confere aqui"
+    elif grep -qF -- '--until-jti J' "${fr}" && grep -qF -- '--me ID' "${fr}"; then record_pass "a2a-rt (c-próximo): o comando impresso existe e aceita --me e --until-jti (não é nome inventado)"
+    else record_fail "a2a-rt (c-próximo): comando impresso" "o fetch-replies.sh não declara --me/--until-jti: a saída aponta comando que não existe"; fi
+    local nft="${sb}/nft"; rm -rf "${nft}"; cp -r "${ft}" "${nft}"
+    python3 - "${snd}" "${nft}/a2a-rt-send.sh" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = '  echo "válido até ${EXP_ISO}'
+b = '  echo "  bash docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.sh'
+assert s.count(a) == 1 and s.count(b) == 1
+s = "\n".join(ln for ln in s.split("\n") if not (ln.startswith(a) or ln.startswith(b)))
+open(sys.argv[2], "w", encoding="utf-8").write(s)
+PY
+    if cmp -s "${snd}" "${nft}/a2a-rt-send.sh"; then record_fail "a2a-rt (c-próximo) mutante" "as âncoras do próximo passo sumiram"
+    elif _rt_next "${nft}/a2a-rt-send.sh" n2; then record_fail "a2a-rt (c-próximo) mutante" "o envio calado depois do outbox (a forma de 2026-11-09) passou"
+    elif [ -z "$(find "${sb}/outbox-n2" -maxdepth 1 -name '*-question-*.json' 2>/dev/null)" ]; then record_fail "a2a-rt (c-próximo) mutante" "o mutante nem gravou no outbox: o caso não prova o próximo passo"
+    else record_pass "a2a-rt (c-próximo) mutante: o envio que grava no outbox e cala o próximo passo (a forma de 2026-11-09) reprova"; fi
     # lado member: o a2a-send.sh fala com o curl (falso), o token só por arquivo
     local TOK="${H}/.config/onion/a2a/bridge-token" MK="${H}/.config/onion/a2a/membro-x-1.key.pem"
     ( umask 077; printf 'TOKEN-SECRETO-DA-BANCADA\n' > "${TOK}"; openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "${MK}" 2>/dev/null )
@@ -18506,6 +18581,45 @@ PY
     'append_line(gap, {"logged_at": utc_stamp(), "event": line["event"]' 'append_line(gap, {"logged_at": "2000-01-01T00:00:00Z", "event": line["event"]'
   _dscase "(g9) draft-stats --since-stage-on 2026-13-45 → rc 3, uso inválido (M2)" _dsbad \
     '        if since is not None and not _valid_day(since):' '        if since is not None and not DAY_RE.fullmatch(since):'
+
+  # ─────────────────── (i) o instalador da sessão de teste monta uma peça que FUNCIONA ───────────────────
+  # Atrito da ida e volta de 2026-11-09: o install-a2a-rt.sh não copiava o a2a-metrics.py, que o MCP importa do próprio
+  # diretório, e o draft_message da sessão montada recusava; a linha impressa da sessão não trazia --no-chrome. O caso
+  # roda o MCP INSTALADO (não o da árvore) e confere a linha.
+  local inst="${REPO_ROOT}/docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh"
+  if [ ! -f "${inst}" ]; then record_skip "a2a-rt (i): install-a2a-rt.sh ausente nesta árvore (cortado pelo papel) → sem SUT"
+  else
+    _rt_inst() {  # $1 = instalador → 0 se o MCP instalado grava rascunho e a linha da sessão traz --no-chrome
+      local ih="${sb}/inst-home" o d
+      rm -rf "${ih}"; mkdir -p "${ih}"
+      o="$(HOME="${ih}" bash "$1" --side vps --core "${REPO_ROOT}" 2>&1)" || return 1
+      d="${ih}/.local/share/onion/a2a-rt"
+      [ -f "${d}/a2a-metrics.py" ] || return 1
+      grep -q '^  claude --tools "" --strict-mcp-config --no-chrome --mcp-config ' <<< "${o}" || return 1
+      printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"draft_message","arguments":{"to":"membro-x","text":"rascunho da peça instalada","idempotency_key":"i1"}}}' > "${sb}/i.req"
+      o="$(HOME="${ih}" A2A_RT_STATE="${ih}/state" A2A_RT_ME=onion-evolve A2A_RT_INBOX_MODE=inbox-doc python3 -I "${d}/a2a-rt-mcp.py" < "${sb}/i.req")"
+      [ "$(_rt_iserr "${o}" 1)" != "true" ] && [ -f "${ih}/state/drafts/i1.json" ] || return 1
+      return 0
+    }
+    if _rt_inst "${inst}"; then record_pass "a2a-rt (i): o install-a2a-rt.sh copia o a2a-metrics.py junto, o draft_message do MCP INSTALADO grava o rascunho, e a linha da sessão traz --no-chrome"
+    else record_fail "a2a-rt (i): instalador" "$(HOME="${sb}/inst-home" bash "${inst}" --side vps --core "${REPO_ROOT}" 2>&1 | head -c 400)"; fi
+    python3 - "${inst}" "${sb}/inst-m1.sh" "${sb}/inst-m2.sh" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = 'install -m 600 "${METRICS}" "${D}/a2a-metrics.py"\n'
+b = '--strict-mcp-config --no-chrome --mcp-config ${D}'
+assert s.count(a) == 1 and s.count(b) == 1
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, "", 1))
+open(sys.argv[3], "w", encoding="utf-8").write(s.replace(b, '--strict-mcp-config --mcp-config ${D}', 1))
+PY
+    if [ ! -f "${sb}/inst-m1.sh" ] || [ ! -f "${sb}/inst-m2.sh" ]; then record_fail "a2a-rt (i) mutantes" "as âncoras do instalador sumiram"
+    else
+      if _rt_inst "${sb}/inst-m1.sh"; then record_fail "a2a-rt (i) mutante" "o instalador sem o a2a-metrics.py passou"
+      else record_pass "a2a-rt (i) mutante: o instalador que não copia o a2a-metrics.py (a forma de 2026-11-09) reprova: o MCP instalado não grava rascunho"; fi
+      if _rt_inst "${sb}/inst-m2.sh"; then record_fail "a2a-rt (i) mutante 2" "a linha da sessão sem --no-chrome passou"
+      else record_pass "a2a-rt (i) mutante 2: a linha da sessão sem --no-chrome reprova"; fi
+    fi
+  fi
   rm -rf "${sb}"
 }
 
@@ -18622,6 +18736,52 @@ PY
   _acc "${rec}" --inbox "${ib}"
   if [ "${rc}" -eq 0 ] && grep -q 'já aceito' <<< "${out}" && [ "$(find "${ib}" -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')" = "0" ]; then record_pass "a2a-accept: (SAC-150 N6) já triado (_processed) → não recria"
   else record_fail "a2a-accept: (SAC-150 N6) _processed" "rc=${rc} out='${out}'"; fi
+  # (2b) atrito da ida e volta de 2026-11-09: o aceite não dizia de quem nem há quanto tempo o sinal esperava, e o "já
+  # aceito" saía rc 0 sem dizer quando. Depois da reverificação: remetente, receivedAt e idade; ALARME acima de
+  # A2A_ACCEPT_WARN_AGE sem recusar; o "já aceito" diz quando e o razão; o "aceito →" traz o razão ao lado
+  local rqa="${d}/r-quando.json"
+  _arec acme onion-evolve jti-quando-1 "$((NOW-60))" "corpo do caso quando" "${rqa}"
+  _acc_when() {  # $1 = helper · $2 = rótulo → 0 se as quatro saídas aparecem e o alarme não recusa
+    local ibx="${d}/inbox-quando-$2" L="${d}/ledger-quando-$2" o1 o2
+    rm -rf "${ibx}" "${L}"; mkdir -p "${ibx}"
+    o1="$(A2A_ACCEPT_WARN_AGE=10 bash "$1" "${rqa}" --inbox "${ibx}" --trust-repo "${tr}" --ledger "${L}" 2>&1)" || return 1
+    grep -qF "reverificado: remetente acme · receivedAt $(jq -r .receivedAt "${rqa}") · idade " <<< "${o1}" || return 1
+    grep -qF " na fila · assinado há " <<< "${o1}" || return 1
+    grep -qF "ALARME: o sinal de acme espera na fila há " <<< "${o1}" && grep -qF "acima de A2A_ACCEPT_WARN_AGE=10 s. O aceite SEGUE" <<< "${o1}" || return 1
+    grep -qF "aceito → ${ibx}/" <<< "${o1}" && grep -qF " · razão ${L}" <<< "${o1}" || return 1
+    [ -n "$(find "${ibx}" -maxdepth 1 -name '*-a2a-acme-*.md')" ] || return 1   # o alarme não recusa
+    o2="$(bash "$1" "${rqa}" --inbox "${ibx}" --trust-repo "${tr}" --ledger "${L}" 2>&1)" || return 1
+    ! grep -qF "ALARME" <<< "${o2}" || return 1                                # default 3600 s: ~55 s não alarma
+    grep -qE "já aceito \(não sobrescreve\): .* · aceito em [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z \(mtime do doc\) · recebido em $(jq -r .receivedAt "${rqa}") · razão " <<< "${o2}" || return 1
+    grep -qF "· razão ${L}" <<< "${o2}" || return 1
+    return 0
+  }
+  if _acc_when "${helper}" real; then record_pass "a2a-accept: (2b) depois da reverificação diz remetente, receivedAt e idade; acima de A2A_ACCEPT_WARN_AGE alarma SEM recusar; o 'já aceito' diz quando (mtime do doc) e o razão; o 'aceito →' traz o razão"
+  else record_fail "a2a-accept: (2b) quem e quando" "$(A2A_ACCEPT_WARN_AGE=10 bash "${helper}" "${rqa}" --inbox "${d}/inbox-quando-dbg" --trust-repo "${tr}" --ledger "${d}/ledger-quando-dbg" 2>&1 | head -c 500)"; fi
+  local mfd="${mft}/.claude/utils/federation-transport"
+  python3 - "${helper}" "${mfd}/a2a-accept-mq1.sh" "${mfd}/a2a-accept-mq2.sh" "${mfd}/a2a-accept-mq3.sh" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = 'if [ "${RECV_AGE}" -gt "${ACCEPT_WARN_AGE}" ]; then\n'
+b = '    echo "já aceito (não sobrescreve): ${EXIST:-doc fora do inbox} · aceito em ${WHEN} · recebido em ${RECVAT} · razão ${LEDGER}" >&2; exit 0\n'
+c = 'echo "aceito → ${OUT} · ${LEDGER_NOTE}"\n'
+assert s.count(a) == 1 and s.count(b) == 1 and s.count(c) == 1
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, 'if false; then  # MUTANTE: sem alarme\n', 1))
+open(sys.argv[3], "w", encoding="utf-8").write(s.replace(b, '    echo "já aceito (não sobrescreve): ${EXIST:-razão ${LEDGER}}" >&2; exit 0\n', 1))
+open(sys.argv[4], "w", encoding="utf-8").write(s.replace(c, 'echo "aceito → ${OUT}"\n', 1))
+PY
+  local mq
+  for mq in 1 2 3; do
+    if [ ! -f "${mfd}/a2a-accept-mq${mq}.sh" ]; then record_fail "a2a-accept: (2b) mutante ${mq}" "as âncoras do quem-e-quando sumiram"
+    elif _acc_when "${mfd}/a2a-accept-mq${mq}.sh" "mq${mq}"; then record_fail "a2a-accept: (2b) mutante ${mq}" "a forma de 2026-11-09 passou no caso"
+    else
+      case "${mq}" in
+        1) record_pass "a2a-accept: (2b) mutante 1: o aceite sem o alarme de idade reprova" ;;
+        2) record_pass "a2a-accept: (2b) mutante 2: o 'já aceito' que não diz quando (a forma de 2026-11-09) reprova" ;;
+        3) record_pass "a2a-accept: (2b) mutante 3: o 'aceito →' sem o caminho do razão reprova" ;;
+      esac
+    fi
+  done
   # (3) MESMO jti com OUTRO taskId (registro forjado reaproveitando um envelope) → colisão = RECUSA
   jq --arg t "00000000-0000-4000-8000-000000000001" '.taskId=$t' "${rec}" > "${d}/r1b.json"
   _acc "${d}/r1b.json" --inbox "${ib}"

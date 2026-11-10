@@ -10,7 +10,9 @@
 # Dois lados (PRE-REGISTRO.md §5, item 6, docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/):
 #   --side core    (VPS) assina com o kid do core e GRAVA o envelope no outbox que a retirada do membro lê
 #                  por ssh; nada vai à rede daqui. Defaults: --from onion-evolve, --kid onion-evolve-spike-1,
-#                  kind question, exp de 3600 s, outbox ~/.local/state/onion/a2a-spike/outbox
+#                  kind question, exp de 3600 s, outbox ~/.local/state/onion/a2a-spike/outbox. Depois de gravar,
+#                  imprime o PRÓXIMO PASSO: o prazo (iat + exp-offset) e a retirada do outro lado
+#                  (fetch-replies.sh --until-jti <jti>), pronta para colar
 #   --side member  (notebook) envia ao /a2a do receptor pelo a2a-send.sh, com o --thread do rascunho (ou o
 #                  --thread dado). Exige --endpoint (sem default: nada sai por acidente)
 #
@@ -52,7 +54,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --thread) need "$@"; THREAD="$2"; shift 2 ;;
   --outbox) need "$@"; OUTBOX="$2"; shift 2 ;;
   --exp-offset) need "$@"; EXP_OFF="$2"; shift 2 ;;
-  -h|--help) sed -n '2,31p' "$0"; exit 0 ;;
+  -h|--help) sed -n '2,33p' "$0"; exit 0 ;;
   *) die "argumento desconhecido: $1 (não existe flag que pule a confirmação)" ;;
 esac; done
 
@@ -144,13 +146,24 @@ if [ "${SIDE}" = core ]; then
     --exp-offset "${EXP_OFF}" "${TARGS[@]}" --body-file "${WORK}/body" --dry-run --out "${WORK}/env.json" >/dev/null 2> "${WORK}/build.err" \
     || { cat "${WORK}/build.err" >&2; die "o a2a-send.sh não montou o envelope"; }
   grep -v '^(dry-run: ' "${WORK}/build.err" >&2 || [ "$?" -eq 1 ] || die "não consegui ler o stderr da montagem (${WORK}/build.err)"
-  JTI="$(jq -r '.jws' "${WORK}/env.json" | cut -d. -f2 | tr '_-' '/+' | { s="$(cat)"; case $(( ${#s} % 4 )) in 2) s="${s}==";; 3) s="${s}=";; esac; printf '%s' "$s"; } | openssl base64 -d -A | jq -r '.jti')"
+  PL="$(jq -r '.jws' "${WORK}/env.json" | cut -d. -f2 | tr '_-' '/+' | { s="$(cat)"; case $(( ${#s} % 4 )) in 2) s="${s}==";; 3) s="${s}=";; esac; printf '%s' "$s"; } | openssl base64 -d -A)"
+  JTI="$(jq -r '.jti' <<< "${PL}")"
+  # o prazo de validade sai do PAYLOAD assinado (iat + EXP_OFF): é o que a retirada do outro lado confere
+  P_IAT="$(jq -r 'if (.iat|type)=="number" then (.iat|floor|tostring) else "" end' <<< "${PL}")"
+  case "${P_IAT}" in ''|*[!0-9]*) die "o envelope montado não traz iat numérico" ;; esac
+  P_EXP=$(( P_IAT + EXP_OFF ))
+  EXP_ISO="$(python3 -I -c 'import sys, datetime as d; print(d.datetime.fromtimestamp(int(sys.argv[1]), d.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))' "${P_EXP}")"
   TH="$(jq -r '.signal.thread' "${WORK}/env.json")"
   ( umask 077; mkdir -p "${OUTBOX}" )
   MS="$(python3 -c 'import time;print(int(time.time()*1000))' 2>/dev/null || echo "$(( $(date +%s) * 1000 ))")"
   ( umask 077; cp "${WORK}/env.json" "${OUTBOX}/${MS}-question-${JTI}.json" )
   THREAD="${TH}"; record_sent "${JTI}"
   echo "gravado no outbox: ${OUTBOX}/${MS}-question-${JTI}.json · kid ${KID} · aud ${TO} · jti ${JTI} · thread ${TH} · iat ${MS%???}"
+  # PRÓXIMO PASSO (atrito da ida e volta de 2026-11-09: o maestro teve de montar a retirada à mão). Nada sai da VPS
+  # sozinho: o outro lado RETIRA por ssh com o fetch-replies.sh, parando no jti deste envelope, antes do prazo
+  echo "válido até ${EXP_ISO} (iat ${P_IAT} + ${EXP_OFF} s); depois disso a retirada reprova o envelope."
+  echo "próximo passo, no OUTRO lado (notebook, num terminal, a partir do checkout do core):"
+  echo "  bash docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.sh --me ${TO} --watch --until-jti ${JTI} --timeout 600"
   exit "${REC_RC}"
 fi
 
