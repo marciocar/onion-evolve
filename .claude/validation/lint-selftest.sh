@@ -42013,9 +42013,10 @@ run_adopter_shape_selftests() {
   # (g) as regras sem objeto no papel saem "NÃO SE APLICA" — contadas à parte, nunca como SOFT
   if grep -q '^NÃO SE APLICA: REGRA 62 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 85 ' "${lo}" \
      && grep -q '^NÃO SE APLICA: REGRA 92 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 109 ' "${lo}" \
-     && grep -qE '^  Não se aplica  : 4 ' "${lo}" && ! grep -qE '^VIOLATION: .*REGRA (62|85|92|109) ' "${lo}"; then
-    record_pass "adopter-shape: (g) as REGRAS 62, 85, 92 e 109 saem 'NÃO SE APLICA' no adotante (4, fora do total), sem VIOLATION"
-  else record_fail "adopter-shape: (g)" "$(grep -E 'SE APLICA|REGRA (62|85|92|109) |Não se aplica' "${lo}" | head -6 | cut -c1-200 | tr '\n' ' ')"; fi
+     && grep -q '^NÃO SE APLICA: REGRA 121 ' "${lo}" \
+     && grep -qE '^  Não se aplica  : 5 ' "${lo}" && ! grep -qE '^VIOLATION: .*REGRA (62|85|92|109|121) ' "${lo}"; then
+    record_pass "adopter-shape: (g) as REGRAS 62, 85, 92, 109 e 121 saem 'NÃO SE APLICA' no adotante (5, fora do total), sem VIOLATION"
+  else record_fail "adopter-shape: (g)" "$(grep -E 'SE APLICA|REGRA (62|85|92|109|121) |Não se aplica' "${lo}" | head -6 | cut -c1-200 | tr '\n' ' ')"; fi
 
   # (h) o que a ADOÇÃO escreve no adotante (não vendorizado: a semente do KG, os starters de docs/evolution,
   #     o .githooks) não manda rodar ops/ sem o marcador (core-only) — a REGRA 100 só varre o que viaja
