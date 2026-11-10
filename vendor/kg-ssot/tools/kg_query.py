@@ -61,6 +61,13 @@ NODE_FIELDS = ("node_type", "status", "plane", "layer", "impact", "confidence", 
 DEGREE_SIDES = ("in", "out", "total")
 
 
+# o ponteiro para um grafo dentro de um valor: o caminho, e o resto (?ref, #id) até um separador de prosa
+GRAPH_POINTER = re.compile(r"""([^\s"'<>(),;]*\.kg\.(?:ya?ml|json))([?#][^\s"'<>(),;]*)?""", re.IGNORECASE)
+# os campos do contrato que ancoram em outro lugar
+POINTER_FIELDS = ("trace", "verified_against", "verified_scope", "reverify_on", "trigger", "on")
+PROVENANCE_POINTER = ("source", "scheme", "locator", "node_sha256", "sha256")  # o ponteiro inteiro: o hash e o id também contam
+
+
 class Corpus:
     """Os grafos lidos: os nós por (arquivo, id) na ordem do corpus, e as arestas locais e externas dos dois lados."""
 
@@ -84,6 +91,7 @@ class Corpus:
         # self.edges na hora de ler, para alcançar também o que o --with trouxer depois
         self._degree = {"in": collections.defaultdict(collections.Counter), "out": collections.defaultdict(collections.Counter)}
         self._degree_seen = 0
+        self.end_path = None  # (arquivo que cita, caminho) -> caminho no corpus: só o filtro por área do kg_mcp liga
 
     def internal_degree(self, key, side, edge_type=None):
         """Quantas arestas internas do grafo do nó tocam o nó, em in, out ou total, de um tipo ou de todos. A linha repetida
@@ -117,18 +125,21 @@ class Corpus:
         for e in doc.get("edges") if isinstance(doc.get("edges"), list) else []:
             if isinstance(e, dict) and isinstance(e.get("from"), str) and isinstance(e.get("to"), str):
                 self._link(e.get("edge_type"), (name, e["from"]), (name, e["to"]), None, None)
+                event = e.get("trigger", e.get("on"))
                 self.edges.append({"edge_type": e.get("edge_type") if isinstance(e.get("edge_type"), str) else None,
                                    "scope": "internal", "file": name,
-                                   "from": (name, e["from"]), "to": (name, e["to"])})
+                                   "from": (name, e["from"]), "to": (name, e["to"]),
+                                   "event": event if isinstance(event, str) and event else None})
                 self.local_degree[(name, e["from"])] += 1
                 self.local_degree[(name, e["to"])] += 1
-                event = e.get("trigger", e.get("on"))
                 if isinstance(event, str) and event:
                     self.local_degree[(name, event)] += 1
         for e in doc.get("external_edges") if isinstance(doc.get("external_edges"), list) else []:
             if not isinstance(e, dict):
                 continue
-            src, dst = self._end(name, e.get("from")), self._end(name, e.get("to"))
+            if self.end_path and not all(isinstance(e.get(k), (str, type(None))) for k in ("from", "to")):
+                continue  # só chega por gravação fora do armazém: sem isto, contaria em total sem ter ponta
+            src, dst = self._resolved_end(name, e.get("from")), self._resolved_end(name, e.get("to"))
             self._link(e.get("edge_type"), src, dst, e.get("from"), e.get("to"))
             self.edges.append({"edge_type": e.get("edge_type") if isinstance(e.get("edge_type"), str) else None,
                                "scope": "external", "file": name, "from": src, "to": dst})
@@ -144,6 +155,86 @@ class Corpus:
             path, nid = ref.rsplit("#", 1)
             return (path, nid)
         return (name, ref if isinstance(ref, str) else None)
+
+    def _resolved_end(self, name, ref):
+        """A ponta como _end a dá e, com o filtro por área, com o caminho de quem cita traduzido para o nome no corpus."""
+        end = self._end(name, ref)
+        return (self.end_path(name, end[0]), end[1]) if self.end_path and kg_validate.is_external(ref) else end
+
+    def end_hidden(self, name, ref, local=()):
+        """A ponta que nenhum nó legível resolve, em qualquer forma: área ilegível, grafo que não existe, URL e o texto
+        que nem é referência bem formada, que o leitor guardaria como id local. local: os ids de uma versão antiga."""
+        if ref is None or (isinstance(ref, str) and ref in local):
+            return False
+        return not isinstance(ref, str) or self._resolved_end(name, ref) not in self.nodes
+
+    def pointer_hidden(self, here, value, local=(), bare=True):
+        """O valor aponta para um grafo, ou para um nó, que nada legível resolve: com ou sem #, com URL, no meio de prosa
+        e no homônimo do meta.id. Vale cada ponteiro do valor: um só que não resolve já conta. bare=False: o #id solto não
+        conta, porque o locator é relativo ao source."""
+        if isinstance(value, (list, dict)):
+            items = [*value.keys(), *value.values()] if isinstance(value, dict) else value  # a chave também carrega ponteiro
+            return any(self.pointer_hidden(here, v, local, bare) for v in items)
+        if not isinstance(value, str):
+            return False
+        pointers = list(GRAPH_POINTER.finditer(value))
+        for m in pointers:
+            path = self.end_path(here, m.group(1)) if self.end_path else m.group(1)
+            tail = m.group(2) or ""
+            frag = tail.rpartition("#")[2] if "#" in tail else ""
+            if frag and frag in local and path == here:
+                continue
+            if ((path, frag) not in self.nodes) if frag else (path not in self.files):
+                return True
+        if pointers or not bare or "#" not in value:
+            return False
+        found = _source_target(self, here, value)  # o #id, sem caminho de grafo: o do próprio arquivo ou o do meta.id
+        return found is not None and found[0] not in self.nodes and found[0][1] not in local
+
+    def scrubbed(self, here, item, local=()):
+        """O nó ou a aresta sem os ponteiros que nada legível resolve. Devolve uma cópia rasa quando corta: o mapa é do
+        cache do parse_v1, compartilhado entre as identidades, e nunca se altera."""
+        out = {k: v for k, v in item.items() if not (k in POINTER_FIELDS and self.pointer_hidden(here, v, local))}
+        prov = out.get("provenance")
+        if isinstance(prov, dict):
+            hidden = self.pointer_hidden(here, prov.get("source"), local) or \
+                self.pointer_hidden(here, [v for k, v in prov.items() if k != "source"], local, bare=False)
+        else:
+            hidden = self.pointer_hidden(here, prov, local)
+        if hidden:  # qualquer campo decide, e o ponteiro sai inteiro
+            kept = {k: v for k, v in prov.items()
+                    if k not in PROVENANCE_POINTER and not self.pointer_hidden(here, v, local, bare=False)} \
+                if isinstance(prov, dict) else None
+            out.pop("provenance")
+            if kept:  # o mapa vazio denunciaria o corte: sai, como o de quem nunca o teve
+                out["provenance"] = kept
+        return out
+
+    def hide_unreadable(self):
+        """Corta do corpus a ponta que quem lê não alcança, antes de qualquer resposta: é o único ponto do corte, e por
+        isso nós, arestas, chain, grupos, totais, grau e termos saem iguais aos de um grafo que nunca teve a ponta."""
+        def gone(end):
+            return end[1] is not None and end not in self.nodes
+
+        kept = []
+        for e in self.edges:
+            if gone(e["from"]) or gone(e["to"]):
+                for end in (e["from"], e["to"]):  # o grau da atenção contou a aresta: sem isto, a contagem vazaria
+                    if end[0] == e["file"] and end[1] is not None:
+                        self.local_degree[end] -= 1
+                if e.get("event"):
+                    self.local_degree[(e["file"], e["event"])] -= 1
+                continue
+            kept.append(e)
+        self.edges = kept
+        for side in (self.out, self.into):
+            for key in list(side):
+                if key not in self.nodes:
+                    del side[key]
+                else:
+                    side[key] = [link for link in side[key] if not gone(link[1])]
+        for key, node in list(self.nodes.items()):
+            self.nodes[key] = self.scrubbed(key[0], node)
 
     def _link(self, edge_type, src, dst, src_ref, dst_ref):
         et = edge_type if isinstance(edge_type, str) else None
@@ -414,11 +505,15 @@ def _source_ref(corpus, key):
     source = prov.get("source") if isinstance(prov, dict) else None
     if not isinstance(source, str) or "#" not in source:
         return None
+    return _source_target(corpus, key[0], source)
+
+
+def _source_target(corpus, here, source):
+    """O passo de um provenance.source com #, citado do arquivo here; a regra está em _source_ref."""
     path, frag = source.rsplit("#", 1)
     if not frag:
         return None
     path = path.split("?", 1)[0]  # a query string (?ref=main) não muda o arquivo que a URL nomeia
-    here = key[0]
     if here in corpus.external and path.endswith((".kg.yaml", ".kg.json")) and "://" not in path:
         rel = path
         while rel.startswith("./"):
@@ -435,7 +530,7 @@ def _source_ref(corpus, key):
     if path in ("", here) or (corpus.meta_ids.get(here) and last == corpus.meta_ids[here]):
         target = (here, frag)
     elif path in corpus.files or path.endswith((".kg.yaml", ".kg.json")):
-        target = (path, frag)
+        target = (corpus.end_path(here, path) if corpus.end_path else path, frag)
     else:
         return None
     return (target, source)  # o nó que cita a si mesmo é um ciclo, não uma origem

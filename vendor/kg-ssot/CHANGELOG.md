@@ -10,6 +10,18 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.48.0] - 2026-11-09
+
+No contract change (still v4.19), and no verdicts change. Everything here applies only when you ask for it.
+
+- `kg-mcp`: the area filter (`--area-policy FILE`, on top of `--identity-header`). A JSON file outside the root names the
+  shared areas each identity reads: the canonical one and the groups it belongs to. Reading is the union of the identity's
+  own area and those areas, whose graphs appear as `@<area>/<graph>`, and only those areas are opened. An edge with an end
+  that no readable node resolves leaves `kg_get`, `kg_list`, `kg_history`, `kg_query`, and `kg_terms` whole, with no id, no
+  file, and no count, and so does a pointer to such a graph in `provenance`, `trace`, `verified_against`, `verified_scope`,
+  or `reverify_on`. Writing stays in the identity's own area. Without the flag, nothing changes. An id written in free text,
+  in an `x_` field, or in a commit message is not filtered.
+
 ## [4.47.0] - 2026-11-09
 
 No contract change (still v4.19), and no verdict changes. What a consumer can see: `kg-mcp` may withhold a text, the

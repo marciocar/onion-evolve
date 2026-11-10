@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1057 itens abertos** em 161 grafo(s) com aberto (de 209 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1056 itens abertos** em 161 grafo(s) com aberto (de 209 no escopo) · 157 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -982,12 +982,11 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## kg-ssot — 6 item(ns)
+## kg-ssot — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
-| 10.0 | `Q_PF_AREA_FILTER_KG_QUERY_1120` | persona-fases-2-3-2026-11 | O filtro por área na leitura do Brain, aplicado antes da leitura, e a cura da dívida: item de área ilegível sai inteiro da res |
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
 | 6.0 | `Q_COORD_KGSSOT_FORMA_X_CHANGE_1111` | coordenacao-sessoes-2026-10 | A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) par |

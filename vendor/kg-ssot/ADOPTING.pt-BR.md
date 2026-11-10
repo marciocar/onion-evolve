@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:563795306753595d -->
+<!-- translation-of: ADOPTING.md sha256:2e1f35fe441054cf -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -364,6 +364,10 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.47.0` para a `kg-ssot-v4.48.0`, nada é obrigatório: o contrato (v4.19) e os vereditos são os mesmos, e o
+vendor não traz arquivo novo. Uma coisa é opcional: `kg-mcp --area-policy ARQUIVO`, sobre `--identity-header`, para uma
+identidade ler áreas compartilhadas além da própria.
 
 Da `kg-ssot-v4.46.0` para a `kg-ssot-v4.47.0`, nada é obrigatório: o contrato (v4.19) e os vereditos são os mesmos. O
 vendor traz um arquivo novo, `tools/kg_screen.py`. Duas saídas podem mudar. O `kg-mcp` faz a triagem do texto que devolve do

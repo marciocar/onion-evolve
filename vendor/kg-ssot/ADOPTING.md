@@ -365,6 +365,10 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.47.0` to `kg-ssot-v4.48.0`, nothing is required: the contract (v4.19) and the verdicts are the same, and
+the vendor brings no new file. One thing is opt-in: `kg-mcp --area-policy FILE`, on top of `--identity-header`, for an
+identity to read shared areas as well as its own.
+
 From `kg-ssot-v4.46.0` to `kg-ssot-v4.47.0`, nothing is required: the contract (v4.19) and the verdicts are the same. The
 vendor brings one new file, `tools/kg_screen.py`. Two outputs can differ. `kg-mcp` screens the text it returns from users'
 content: a text with concealment and an instruction together is withheld, and anything found is listed in a new `kg_screen`

@@ -97,11 +97,18 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-11-10"
+    verified_against: "medido pela sessão do core em 2026-11-10, parte por parte: (1) e (2) o kg_mcp.py e o kg_query.py da tag kg-ssot-v4.48.0 (git archive do onion-kg-ssot) são byte a byte os do vendor do core, e o kg_mcp.py do vendor expõe --area-policy no --help; (3) a bancada AreaFilterTests (tools/test_kg_mcp.py da tag) rodou 25 testes, rc 0, entre eles test_cinco_ferramentas_sem_id_e_sem_arquivo (kg_get com e sem ref, kg_list, kg_history, kg_query em nós, --edges com e sem group_by e chain, kg_terms), test_um_mutante_por_ferramenta_reprova e test_igual_ao_grafo_que_nunca_teve_a_ponta; o nó E_AREA_FILTER_BENCH_1109 existe na origin/main do kg-ssot (peer-ref-check rc 0); (4) a tag kg-ssot-v4.48.0 está no git (onion-kg-ssot) e no espelho (marciocar/kg-ssot, ls-remote), o vendor do core subiu dela, e o PyPI e o npm latest dão 4.48.0. O registro do dono (E_RELEASE_4480_PUBLISHED_1110 e o done do Q_AREA_FILTER_READ_SURFACE_1120) ainda está no PR #386 aberto do kg-ssot e não na origin/main dele (peer-ref-check rc 1 no primeiro, open no segundo), por isso não serve de prova aqui."
     owner: kg-ssot
     x_due: "2026-11-20"
     impact: 5
-    confidence: 0.5
+    confidence: 0.9
+    provenance:
+      source: "kg-ssot-v4.48.0 (tag) e o vendor do core em vendor/kg-ssot"
+      locator: "tools/test_kg_mcp.py, classe AreaFilterTests; tools/kg_mcp.py, flag --area-policy"
+      method: "measurement: bancada rodada, diff byte a byte do vendor contra a tag, ls-remote da tag no espelho e versões no PyPI e no npm, em 2026-11-10"
+      locality: "repo"
     label: "O filtro por área na leitura do Brain, aplicado antes da leitura, e a cura da dívida: item de área ilegível sai inteiro da resposta do kg_query, sem id nem arquivo."
     narrative: "Pronto quando: as áreas por canal estão no kg-ssot, com tag publicada, o kg_query filtra antes de ler e um caso de bancada prova que uma identidade sem a área recebe resposta sem o id e sem o arquivo do item, com mutante que devolve os dois e reprova. Data proposta pelo core; o kg-ssot confirma ou contrapõe. O core leva o pedido ao kg-ssot. O hub só adota a tag depois. Critério de pronto aceito pelo kg-ssot em 2026-11-08, que substitui o anterior: (1) a área é filtrada antes da leitura, e a leitura é a união das áreas legíveis da identidade (a própria u-*, as g-<canal> de que é membro, a canônica só de leitura); (2) a ponta de área ilegível sai inteira nas cinco ferramentas de leitura, kg_get (inclusive com ref), kg_list, kg_history, kg_query (nós, --edges, chain) e kg_terms: sem id, sem arquivo e sem contar em total nem em group_by; (3) bancada em que uma identidade sem a área recebe resposta sem o id e sem o arquivo em cada uma das cinco, com um mutante por ferramenta; (4) tag kg-ssot-v4.x publicada no git e no espelho, que é o que o vendor do core e o hub trazem. A medida do kg-ssot em 2026-11-08 mostrou que kg_query --edges devolve a ponta externa e que kg_get devolve o grafo cru. A data de 20/11 anda dia a dia com o selo da D_MA_ARCH e se renegocia se ela pedir campo de contrato. Fora da peça: gravação em área de grupo, promoção para canônico e header de grupos assinado."
   - id: Q_PF_IDENTITY_ROLE_1123
