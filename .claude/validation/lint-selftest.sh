@@ -56240,6 +56240,137 @@ if o in s:
 }
 _family run_load_lease_selftests
 
+# REGRA 121 (Grafo novo ou tocado não cita repositório não conferível por terceiro) — 2026-11-10. O kg-ssot mediu 43 nós
+# do core público com provenance.source em URL de repo privado ou inalcançável (E_CORE_PUBLIC_CITES_PRIVATE_REPOS_1110);
+# o maestro decidiu «Guarda + omitir no futuro». A classe, o vocabulário e o teto moram em private-repo-cite-check.sh;
+# a visibilidade e o passivo, em docs/evolution/federation/ (public-repos.tsv e private-repo-cite-baseline.txt: não viajam).
+# Casos: (a) as duas polaridades verbatim · (b) o modo do lint no corpus real · (c)–(f) escopo e catraca num
+# repo-sandbox · (g) o dispatcher de produção · (h) sem a lista → rc 2 · (m) UM MUTANTE POR FORMA DO VOCABULÁRIO.
+run_private_repo_cite_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/private-repo-cite-check.sh"
+  [ -f "${chk}" ] || { record_fail "private-repo-cite" "guarda ausente: ${chk}"; return; }
+  python3 -c 'import yaml' >/dev/null 2>&1 || { record_skip "private-repo-cite: PyYAML ausente (SUT não exercido)"; return; }
+  local o rc
+  # (a) o --selftest próprio
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE '^private-repo-cite selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
+    record_pass "private-repo-cite: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos: acusa cada forma, cala cada vizinha)"
+  else record_fail "private-repo-cite: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: sem HARD, e o corpus inteiro julgável (rc 0).
+  #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/private-repo-cite-check.sh" "${REPO_ROOT}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  local o2 rc2; if o2="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${chk}" "${REPO_ROOT}" --all 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${o}" && [ "${rc2}" -eq 0 ] && grep -q 'grafo(s) do corpus' <<< "${o2}"; then
+    record_pass "private-repo-cite: (b) corpus real → --tsv sem HARD e --all rc 0 ($(tail -1 <<< "${o2}" | grep -oE '[0-9]+ no passivo'))"
+  else record_fail "private-repo-cite: (b) corpus real" "rc=${rc}/${rc2}; [$(head -2 <<< "${o}" | tr '\n' '|')] [$(tail -1 <<< "${o2}")]"; fi
+  # repo-sandbox com a guarda COMO O RUNNER A INVOCA (script + lista + predicado de fixture)
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/g" "${sb}/docs/evolution/federation"
+  cp "${chk}" "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sb}/.claude/validation/"
+  printf 'owner\tdonoteste\npublic\tdonoteste/repo-publico\t2026-11-10\n' > "${sb}/docs/evolution/federation/public-repos.tsv"
+  printf 'members:\n  - repo: https://github.com/donoteste/repo-registrado\n' > "${sb}/docs/evolution/federation/members.yaml"
+  _prc() {  # $1=id do grafo $2=source do nó E_A
+    printf 'meta:\n  id: %s\nnodes:\n  - id: E_A\n    provenance:\n      source: "%s"\n' "$1" "$2"
+  }
+  _prc velho "https://github.com/donoteste/repo-secreto/blob/abc1234/x.md" > "${sb}/g/velho.kg.yaml"
+  _prc limpo "https://github.com/donoteste/repo-publico/blob/abc1234/x.md" > "${sb}/g/limpo.kg.yaml"
+  ( cd "${sb}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm base \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 \
+    || { record_skip "private-repo-cite: git init falhou"; rm -rf "${sb}"; return; }
+  local s="${sb}/.claude/validation/private-repo-cite-check.sh" b="${sb}/docs/evolution/federation/private-repo-cite-baseline.txt"
+  # (c) grafo NOVO com o repo privado → SOFT NAO-CONFERIVEL, rc 0, tsv de 4 campos, SEM o nome do repo na saída
+  _prc novo "https://github.com/donoteste/repo-secreto/blob/abc1234/y.md" > "${sb}/g/novo.kg.yaml"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q $'^SOFT\tNAO-CONFERIVEL\tg/novo.kg.yaml\tnó E_A cita repo#' <<< "${o}" \
+     && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${o}")" = "4" ] && ! grep -q 'repo-secreto' <<< "${o}"; then
+    record_pass "private-repo-cite: (c) grafo novo com repo privado → SOFT NAO-CONFERIVEL (rc 0, 4 campos, repo por hash)"
+  else record_fail "private-repo-cite: (c)" "rc=${rc}; [${o}]"; fi
+  # (d) SÓ O TOCADO É JULGADO: o velho.kg.yaml (na base, fora do baseline) não aparece
+  if ! grep -q 'velho.kg.yaml' <<< "${o}" && [ "$(grep -c . <<< "${o}")" = "1" ]; then
+    record_pass "private-repo-cite: (d) grafo que o diff não toca não é julgado (o histórico fica)"
+  else record_fail "private-repo-cite: (d) escopo" "[${o}]"; fi
+  # (e) grafo TOCADO cuja citação está no baseline → silêncio; e repo@sha nu de repo do members.yaml → acusa
+  rm -f "${sb}/g/novo.kg.yaml"
+  ( cd "${sb}" && LC_ALL=C bash "${s}" "${sb}" --emit-baseline > "${b}" && git add -A \
+      && git -c user.email=t@t -c user.name=t commit -qm baseline && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+  printf '# tocado\n' >> "${sb}/g/velho.kg.yaml"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  _prc nu "repo-registrado@0a1b2c3:docs/x.md" > "${sb}/g/nu.kg.yaml"
+  if o2="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ] && [ "${rc2}" -eq 0 ] && grep -q $'^SOFT\tNAO-CONFERIVEL\tg/nu.kg.yaml\tnó E_A cita repo#[0-9a-f]* por hash' <<< "${o2}"; then
+    record_pass "private-repo-cite: (e) passivo do baseline cala no grafo tocado; repo@sha nu do registro acusa"
+  else record_fail "private-repo-cite: (e)" "rc=${rc}/${rc2}; [${o}] [${o2}]"; fi
+  rm -f "${sb}/g/nu.kg.yaml"; ( cd "${sb}" && git checkout -q -- g/velho.kg.yaml ) >/dev/null 2>&1
+  # (f) CATRACA: o baseline cresce vs origin/main → HARD CATRACA-VIOLADA (rc 1); com a lista perdendo repo no
+  #     mesmo diff (um repo virou privado) → SOFT CATRACA-POR-VISIBILIDADE (rc 0)
+  _prc limpo "https://github.com/donoteste/repo-publico-que-fechou/blob/abc1234/x.md" > "${sb}/g/limpo.kg.yaml"
+  LC_ALL=C bash "${s}" "${sb}" --emit-baseline > "${b}"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  _prc limpo "https://github.com/donoteste/repo-publico/blob/abc1234/x.md" > "${sb}/g/limpo.kg.yaml"
+  printf 'owner\tdonoteste\n' > "${sb}/docs/evolution/federation/public-repos.tsv"
+  LC_ALL=C bash "${s}" "${sb}" --emit-baseline > "${b}"
+  if o2="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tCATRACA-VIOLADA\tdocs/evolution/federation/private-repo-cite-baseline.txt\to passivo CRESCEU: 1 → 2' <<< "${o}" \
+     && [ "${rc2}" -eq 0 ] && grep -q $'^SOFT\tCATRACA-POR-VISIBILIDADE\t' <<< "${o2}" && ! grep -q '^HARD' <<< "${o2}"; then
+    record_pass "private-repo-cite: (f) baseline que cresce → HARD CATRACA-VIOLADA; com a lista perdendo repo → SOFT"
+  else record_fail "private-repo-cite: (f) catraca" "rc=${rc}/${rc2}; [${o}] [${o2}]"; fi
+  # (h) sem a lista pública → rc 2 (NAO VERIFICADO), nunca verde
+  rm -f "${sb}/docs/evolution/federation/public-repos.tsv"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "private-repo-cite: (h) sem a lista pública → rc 2 (não julga, não passa)"
+  else record_fail "private-repo-cite: (h)" "sem a lista saiu rc=${rc}"; fi
+  # (g) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, num repo com o defeito tocado, emite a REGRA 121
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; mkdir -p "${sd}/docs/x" "${sd}/docs/evolution/federation"
+  printf 'owner\tdonoteste\n' > "${sd}/docs/evolution/federation/public-repos.tsv"
+  ( cd "${sd}" && git init -q -b main . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+  _prc lintfx "https://github.com/donoteste/repo-secreto/blob/abc1234/x.md" > "${sd}/docs/x/fx.kg.yaml"
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/docs/x/fx.kg.yaml" 2>&1 || true)"
+  if grep -q 'REGRA 121 (Grafo novo ou tocado não cita repositório não conferível por terceiro): \[NAO-CONFERIVEL\] nó E_A cita repo#' <<< "${l}"; then
+    record_pass "private-repo-cite: (g) o lint de produção (dispatcher) emite a REGRA 121 sobre o grafo tocado"
+  else record_fail "private-repo-cite: (g) dispatcher" "$(grep -E 'REGRA 121|private-repo' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
+  # (m) MUTANTES — um por forma do vocabulário e um por vizinha calada: reverte a cura na CÓPIA da guarda e EXIGE
+  #     que o caso nomeado reprove. Mutante que não se aplica (o texto mudou) é FALHA, nunca verde por vacuidade.
+  local old new want mo mrc mt="${sb}/mut.sh"
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${mt}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' \
+         "${mt}" "${old}" "${new}"; then
+      record_fail "private-repo-cite: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${mt}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "private-repo-cite: (m) mutante morde → ✗ ${want}"
+    else record_fail "private-repo-cite: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+r"(?<![A-Za-z0-9.\-])"$(printf '\x1f')r"(?<![A-Za-z0-9\-])"$(printf '\x1f')cala: gist (teto declarado)
+(?:github\.com[/:]|$(printf '\x1f')(?:github\.com/|$(printf '\x1f')acusa: git@github.com:
+|raw\.githubusercontent\.com/|$(printf '\x1f')|$(printf '\x1f')acusa: raw.githubusercontent.com
+|api\.github\.com/repos/|$(printf '\x1f')|$(printf '\x1f')acusa: api.github.com/repos/
+|codeload\.github\.com/)$(printf '\x1f'))$(printf '\x1f')acusa: codeload.github.com
+o, r = m.group(1).lower(), norm(m.group(2))$(printf '\x1f')o, r = m.group(1), norm(m.group(2))$(printf '\x1f')acusa: caixa diferente
+r = repo.lower().rstrip(".")$(printf '\x1f')r = repo.rstrip(".")$(printf '\x1f')cala: público em caixa diferente
+r = repo.lower().rstrip(".")$(printf '\x1f')r = repo.lower()$(printf '\x1f')cala: público com ponto final
+    if r.endswith(".git"):$(printf '\x1f')    if False:$(printf '\x1f')cala: público com .git
+if r and o in owners and f"{o}/{r}" not in public:$(printf '\x1f')if r and o in owners:$(printf '\x1f')cala: repo público da lista
+if r and o in owners and f"{o}/{r}" not in public:$(printf '\x1f')if r and f"{o}/{r}" not in public:$(printf '\x1f')cala: repo de terceiro
+    owners |= {o for o, _ in mrep}$(printf '\x1f')    owners |= set()$(printf '\x1f')acusa: dono derivado do members.yaml
+mrep |= {(o, r) for o, r in url_repos(corpus_text) if o in owners}$(printf '\x1f')mrep |= set()$(printf '\x1f')acusa: repo@sha nu de repo que o corpus cita por URL
+url_repos(corpus_text) if o in owners}$(printf '\x1f')url_repos(corpus_text)}$(printf '\x1f')cala: nome@sha de terceiro visto no corpus
+ or nhash(r) in self.phash$(printf '\x1f')$(printf '\x1f')acusa: repo@sha nu de nome privado medido
+                out.append(("hash", f"{o}/{r}"))$(printf '\x1f')                pass$(printf '\x1f')acusa: dono/repo@sha:caminho
+r"(?:([A-Za-z0-9](?:[A-Za-z0-9\-]{0,38}))/)?([A-Za-z0-9_.\-]+?)@$(printf '\x1f')r"(?<![/])(?:([A-Za-z0-9](?:[A-Za-z0-9\-]{0,38}))/)?([A-Za-z0-9_.\-]+?)@$(printf '\x1f')acusa: caminho do clone com sha
+([0-9a-f]{7,40})(?![0-9A-Za-z])"$(printf '\x1f')([0-9a-f]{7,40})"$(printf '\x1f')cala: @ seguido de hex e letra não é sha
+    for form, repo in find(txt, owners, public, private_names):$(printf '\x1f')    for form, repo in []:$(printf '\x1f')comentário — veio
+nid = str(n.get("id", "?")) if isinstance(n, dict) else "?"$(printf '\x1f')nid = "?"$(printf '\x1f')grafo — veio
+return set(), f"YAML inválido: {str(e).splitlines()[0]}"$(printf '\x1f')return set(), None$(printf '\x1f')YAML inválido passou sem erro
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_private_repo_cite_selftests
+
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------

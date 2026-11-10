@@ -1,0 +1,43 @@
+# public-repos.tsv — a fonte de VISIBILIDADE da REGRA 121 (Grafo novo ou tocado não cita repositório não conferível por terceiro).
+#
+# O CI não consulta a rede: esta lista versionada é a fonte. Repo de um dono JULGADO que NÃO está aqui é tratado como
+# "não conferível por terceiro" (privado, inalcançável ou não conferido). Os donos julgados são os `owner` abaixo MAIS os
+# donos das URLs do docs/evolution/federation/members.yaml (derivados na execução: adotante novo entra sozinho).
+# Repo de terceiro (dono fora desse conjunto) não é julgado: é teto declarado da guarda.
+#
+# Formato (TAB): owner<TAB><dono>  ·  public<TAB><dono>/<repo><TAB><AAAA-MM-DD em que a visibilidade foi medida>
+#                private<TAB>nome#<hash><TAB><AAAA-MM-DD> — nome NU de repo privado ou inalcançável, medido, que o corpus cita
+#                como `<nome>@<sha>` sem dono. Vai por hash para o nome não ser gravado em claro; o hash curto é enumerável
+#                (não esconde de quem procura), só não publica. Gere a linha com --hash-name <nome>.
+# Para acrescentar: meça antes, com `gh repo view <dono>/<repo> --json visibility` (PUBLIC), e date a linha.
+# Para reconferir a lista inteira contra o GitHub (modo ONLINE, fora do CI):
+#   bash .claude/validation/private-repo-cite-check.sh --verify-allowlist
+owner	marciocar
+public	marciocar/onion-evolve	2026-11-10
+public	marciocar/onion	2026-11-10
+public	marciocar/onion-core	2026-11-10
+public	marciocar/onion-standalone	2026-11-10
+public	marciocar/onion-plugins	2026-11-10
+public	marciocar/onion-mini	2026-11-10
+public	marciocar/onion-codex	2026-11-10
+public	marciocar/onion-architect	2026-11-10
+public	marciocar/onion-cursor	2026-11-10
+public	marciocar/onion-antigravity	2026-11-10
+public	marciocar/onion-copilot	2026-11-10
+public	marciocar/kg-ssot	2026-11-10
+public	marciocar/bomtexto	2026-11-10
+public	marciocar/gmill	2026-11-10
+# nomes nus medidos em 2026-11-10 (gh repo view: privado ou não resolve), citados como <nome>@<sha> no corpus
+private	nome#422b6b02dd45	2026-11-10
+private	nome#6d477469d571	2026-11-10
+private	nome#2b8f2ef00db6	2026-11-10
+private	nome#d15e43ff50be	2026-11-10
+private	nome#4b8059eb90a2	2026-11-10
+private	nome#a82e1e38725d	2026-11-10
+private	nome#cb66b01dd1ed	2026-11-10
+private	nome#2586dec9777f	2026-11-10
+private	nome#680a153b8c1f	2026-11-10
+private	nome#2dc7a1c19589	2026-11-10
+private	nome#716ccaddfd9d	2026-11-10
+private	nome#a755d8da770f	2026-11-10
+private	nome#522608a1d2e7	2026-11-10
