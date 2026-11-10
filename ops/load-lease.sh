@@ -94,12 +94,17 @@ _ll_psi() {  # cpu some avg10, ou "?"
 _ll_ge() { LC_ALL=C awk -v a="$1" -v b="$2" 'BEGIN { exit !(a >= b) }'; }
 _ll_lt() { LC_ALL=C awk -v a="$1" -v b="$2" 'BEGIN { exit !(a < b) }'; }
 # PSI como 2º sinal é OPCIONAL (ONION_LOAD_PSI_HIGH vazio = desligado, o default de hoje). Ligado, ocupa
-# também com psi ≥ PSI_HIGH e só retoma com psi abaixo dele. PSI ilegível com o sinal ligado = ocupado
-# (falha fechada: o maestro ligou o sinal para ele ser julgado).
+# também com psi ≥ PSI_HIGH e só retoma com psi abaixo dele. PSI ILEGÍVEL com o sinal ligado = NÃO MEDIDO, e a
+# admissão cai só na carga, dizendo (achado da revisão independente de 2026-11-10): a 1ª forma tratava como
+# "ocupado", e num kernel sem /proc/pressure (CONFIG_PSI desligado, psi=0 no boot) todo fechamento morria no teto.
+_LL_PSI_SAID=0
 _ll_psi_busy() {
   [ -n "${LL_PSI_HIGH:-}" ] || return 1
   local v; v="$(_ll_psi)"
-  [ "${v}" = "?" ] && return 0
+  if [ "${v}" = "?" ]; then
+    [ "${_LL_PSI_SAID}" = 1 ] || { _LL_PSI_SAID=1; echo "load-lease: psi de CPU ilegível (${ONION_LOAD_PSI_DIR:-/proc/pressure}/cpu) — 2º sinal NÃO MEDIDO, julgo só pela carga" >&2; }
+    return 1
+  fi
   _ll_ge "${v}" "${LL_PSI_HIGH}"
 }
 
@@ -187,7 +192,7 @@ _ll_holders() {  # quem segura as vagas, numa linha
 # Só serve SOURÇADO: a vaga vive enquanto o shell que a pegou viver (é fd, não arquivo).
 load_lease_acquire() {
   _ll_load_settings || return 2
-  local max="${1:-${LL_MAX}}" t0=${SECONDS} rc d l k i fd said=0 left
+  local max="${1:-${LL_MAX}}" t0=${SECONDS} rc d l k i fd afd busy cand ci said=0 left
   case "${max}" in ''|*[!0-9]*) echo "load-lease: teto '${max}' não é inteiro de segundos" >&2; return 2 ;; esac
   _ll_bypass && return 0
   command -v flock >/dev/null 2>&1 || { echo "load-lease: flock ausente (util-linux) — não há vaga para dar" >&2; return 2; }
@@ -206,23 +211,35 @@ load_lease_acquire() {
       continue
     fi
     k="$(_ll_slots "${l}")"
-    for (( i = 0; i < k; i++ )); do
-      exec {fd}>>"${d}/slot.${i}.lock" || { echo "load-lease: não abri ${d}/slot.${i}.lock" >&2; return 2; }
+    # CONTA OS DONOS, não o índice (achado da revisão independente de 2026-11-10, REJECTED no a19e127): a 1ª forma
+    # tentava só as vagas 0..N−1, e com as vagas 1 a 3 tomadas e N=1 uma 4ª entrava na vaga 0 — 4 passos juntos.
+    # Agora, sob a trava de ADMISSÃO (admit.lock: contar e pegar é um ato só), varro TODAS as SLOTS_MAX vagas, conto
+    # as tomadas e só entro se tomadas < N, na 1ª livre.
+    exec {afd}>>"${d}/admit.lock" || { echo "load-lease: não abri ${d}/admit.lock" >&2; return 2; }
+    flock -w 10 "${afd}" || { exec {afd}>&-; echo "load-lease: a trava de admissão ficou presa 10 s" >&2; return 2; }
+    busy=0; cand=""; ci=""
+    for (( i = 0; i < LL_SLOTS_MAX; i++ )); do
+      exec {fd}>>"${d}/slot.${i}.lock" || { exec {afd}>&-; echo "load-lease: não abri ${d}/slot.${i}.lock" >&2; return 2; }
       if flock -n "${fd}"; then
-        LL_FD="${fd}"; LL_LOCK="${d}/slot.${i}.lock"
-        printf 'pid %s · %s · desde %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" > "${d}/slot.${i}.holder" 2>/dev/null || true
-        export ONION_LOAD_LEASE_HELD="${LL_LOCK}"
-        echo "load-lease: vaga de passo pesado PEGA ($(( i + 1 )) de ${k}: N derivado de load ${l}; ${LL_LOCK})" >&2
-        return 0
-      fi
-      exec {fd}>&-
+        if [ -z "${cand}" ]; then cand="${fd}"; ci="${i}"; else exec {fd}>&-; fi
+      else busy=$(( busy + 1 )); exec {fd}>&-; fi
     done
+    if [ -n "${cand}" ] && [ "${busy}" -lt "${k}" ]; then
+      exec {afd}>&-
+      LL_FD="${cand}"; LL_LOCK="${d}/slot.${ci}.lock"
+      printf 'pid %s · %s · desde %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" > "${d}/slot.${ci}.holder" 2>/dev/null || true
+      export ONION_LOAD_LEASE_HELD="${LL_LOCK}"
+      echo "load-lease: vaga de passo pesado PEGA ($(( busy + 1 )) de ${k}: N derivado de load ${l}; ${LL_LOCK})" >&2
+      return 0
+    fi
+    [ -n "${cand}" ] && exec {cand}>&-
+    exec {afd}>&-
     if [ "$(( SECONDS - t0 ))" -ge "${max}" ]; then
-      echo "load-lease: TETO ESTOURADO esperando vaga de passo pesado (as ${k} vagas de load ${l} ocupadas: $(_ll_holders "${d}")) após $(( SECONDS - t0 ))s — NÃO rodei" >&2
+      echo "load-lease: TETO ESTOURADO esperando vaga de passo pesado (${busy} donos para ${k} vagas de load ${l}: $(_ll_holders "${d}")) após $(( SECONDS - t0 ))s — NÃO rodei" >&2
       return 4
     fi
     if [ "${said}" = 0 ]; then said=1
-      echo "load-lease: ⏳ vagas de passo pesado OCUPADAS (${k} de load ${l}: $(_ll_holders "${d}")) — espero (teto $(( max - (SECONDS - t0) ))s)" >&2
+      echo "load-lease: ⏳ vagas de passo pesado OCUPADAS (${busy} donos para ${k} vagas de load ${l}: $(_ll_holders "${d}")) — espero (teto $(( max - (SECONDS - t0) ))s)" >&2
     fi
     # a vaga se sonda a cada 2 s no máximo: o dogfood real esperou 20 s a mais (a sondagem da CARGA) depois de a vaga soltar
     sleep "$(( LL_POLL < 2 ? LL_POLL : 2 ))"

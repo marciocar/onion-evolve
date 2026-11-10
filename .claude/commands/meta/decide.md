@@ -107,7 +107,7 @@ conta as quatro classes. A classe só sai onde a medição a prova; a **pista de
    nó (cláusula 3 da [doutrina da batuta](../common/prompts/batuta-doctrine.md)):
    `bash .claude/utils/orchestration/maestro-ask.sh claim <repo>#<NODE_ID> --owner <sessão>`. Com rc 3 a pergunta
    já tem dona viva noutra sessão: não pergunte, leve o id a ela. O censo já marca essa linha como
-   `outro-dono`; rode-o com `--self <sessão>` para a sua reserva sair `faço-eu`. Selado o nó, feche com `release <chave> --owner <sessão>`.
+   `outro-dono`; a dona é o id da sessão (`CLAUDE_CODE_SESSION_ID`, ou `--self <id>`), e a sua reserva sai `faço-eu`. Selado o nó, feche com `release <chave> --owner <sessão>`.
 5. **SELAR** (cláusulas 5 a 7), resposta a resposta, **antes** da rodada seguinte, sempre pelo selador
    (peça 5), nunca editando o grafo à mão:
    - nó existente (`decision`/`question` `open`):

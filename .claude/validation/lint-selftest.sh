@@ -45,8 +45,12 @@ set -euo pipefail
 # admitida" mais abaixo e rodava com qualquer carga (medido em 2026-11-10: três agentes, load 16–19). Aqui,
 # ANTES do `unset GITHUB_ACTIONS` abaixo (o runner do CI passa direto pelo lease e dizendo), ela se re-executa
 # sob `ops/load-lease.sh run`. Já admitida pelo pai (ONION_LOAD_LEASE_HELD), segue sem esperar.
-_ONION_LEASE_SH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/ops/load-lease.sh"
-if [ -z "${ONION_LOAD_LEASE_HELD:-}" ] && [ -r "${_ONION_LEASE_SH}" ]; then
+# MODO SEM EXECUÇÃO passa direto (achado da revisão independente, REJECTED no a19e127): `--list`, `--map`, `--dry-run` e
+# `--checkpoint` só leem e selecionam, e com a vaga cheia saíam rc 4 depois do teto, sem rodar nada; o checkpoint do
+# pre-commit (`|| true`) esperaria até 30 min por uma seleção que não roda bancada.
+_ONION_LEASE_SH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/ops/load-lease.sh"; _onion_noexec=0
+for _onion_a in "$@"; do case "${_onion_a}" in --list|--map|--dry-run|--checkpoint) _onion_noexec=1 ;; esac; done
+if [ "${_onion_noexec}" = 0 ] && [ -z "${ONION_LOAD_LEASE_HELD:-}" ] && [ -r "${_ONION_LEASE_SH}" ]; then
   # shellcheck source=/dev/null
   . "${_ONION_LEASE_SH}"
   load_lease_reexec "lint-selftest (direto)" "${BASH_SOURCE[0]}" "$@" || exit $?
@@ -56189,8 +56193,8 @@ if o in s:
     _prove_mutation "load-lease: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
   }
   # segura a vaga num processo à parte (o "outro dono") até o arquivo de parada aparecer
-  _llhold() { mkdir -p "${d}/vaga"; chmod 700 "${d}/vaga"; rm -f "${d}/held" "${d}/stop"
-    ( exec 8>"${d}/vaga/slot.0.lock"; flock -x 8; : > "${d}/held"; i=0; while [ ! -e "${d}/stop" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i+1)); done ) &
+  _llhold() { mkdir -p "${d}/vaga"; chmod 700 "${d}/vaga"; rm -f "${d}/held" "${d}/stop"   # LL_HOLD = vagas a segurar (default 0)
+    ( for _s in ${LL_HOLD:-0}; do exec {_f}>"${d}/vaga/slot.${_s}.lock"; flock -x "${_f}"; done; : > "${d}/held"; i=0; while [ ! -e "${d}/stop" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i+1)); done ) &
     LL_HP=$!; local i; for i in $(seq 1 100); do [ -e "${d}/held" ] && return 0; sleep 0.1; done; return 1; }
   _llunhold() { : > "${d}/stop"; wait "${LL_HP}" 2>/dev/null || true; rm -f "${d}/held" "${d}/stop"; }
   # (a) livre: load 3 → check rc 0 e wait libera na chegada
@@ -56300,9 +56304,38 @@ if o in s:
   # (q) carga MÉDIA: load 10,5 ⇒ N = piso(1,5/2) cai a 1; com a vaga 1 tomada, a 2ª NÃO entra (o N é medido, não fixo)
   _c_mid() { _llset 10.50; rm -f "${d}/ran"; _llhold || { LL_WHY="o dono de teste não pegou a vaga"; return 1; }
     local a; a="$(_llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
-    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"as 1 vagas de load 10.50"* ]]; }
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"1 donos para 1 vagas de load 10.50"* ]]; }
   _llcase "(q) carga média (load 10,5): N=1 e a 2ª tarefa espera" \
     'k = int((n - l) / c);' 'k = m;' _c_mid
+  # (r) N limita os DONOS, não o índice (achado da revisão independente, REJECTED no a19e127): com as vagas 1 a 3
+  #     tomadas e load 10,5 (N=1), uma 4ª NÃO entra na vaga 0 livre
+  _c_owners() { _llset 10.50; rm -f "${d}/ran"; LL_HOLD="1 2 3" _llhold || { LL_WHY="o dono de teste não pegou as vagas"; return 1; }
+    local a; a="$(_llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"3 donos para 1 vagas"* ]]; }
+  _llcase "(r) com 3 donos e N=1 (load 10,5), a 4ª não entra na vaga 0 livre" \
+    'if [ -n "${cand}" ] && [ "${busy}" -lt "${k}" ]; then' 'if [ -n "${cand}" ]; then' _c_owners
+  # (s) PSI ILEGÍVEL com o sinal ligado é NÃO MEDIDO e cai na carga (kernel sem /proc/pressure não morre no teto)
+  _c_nopsi() { _llset 3.00; local a; a="$(LLR_ENV="ONION_LOAD_PSI_HIGH=30 ONION_LOAD_PSI_DIR=${d}/sem-psi" _llr "$1" check)"
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"NÃO MEDIDO"* ]]; }
+  _llcase "(s) psi ilegível com o sinal ligado: não medido, julga só a carga" \
+    'julgo só pela carga" >&2; }
+    return 1' 'julgo só pela carga" >&2; }
+    return 0' _c_nopsi
+  # (t) a bancada em MODO SEM EXECUÇÃO (--list) não espera vaga: com a única vaga tomada sai rc 0 na hora; o mutante
+  #     sem a exceção espera o teto e sai rc 4 sem listar (achado da revisão independente)
+  local tsb="${d}/tsb"; mkdir -p "${tsb}/w/.claude/validation" "${tsb}/w/ops" "${tsb}/m/.claude/validation" "${tsb}/m/ops"
+  cp "${REPO_ROOT}/.claude/validation/lint-selftest.sh" "${tsb}/w/.claude/validation/"; cp "${sut}" "${conf}" "${tsb}/w/ops/"
+  sed 's/case "${_onion_a}" in --list|--map|/case "${_onion_a}" in --map|/' "${REPO_ROOT}/.claude/validation/lint-selftest.sh" > "${tsb}/m/.claude/validation/lint-selftest.sh"
+  cp "${sut}" "${conf}" "${tsb}/m/ops/"
+  _c_noexec() { _llset 3.00; rm -rf "${d}/vaga"; _llhold || return 1; local rc=0
+    env -u ONION_LOAD_LEASE_HELD -u ONION_LOAD_LEASE_REEXEC -u GITHUB_ACTIONS -u ONION_LOAD_LEASE LC_ALL=C ONION_LOAD_SOURCE="${d}/loadavg" \
+      ONION_LOAD_PSI_DIR="${d}/psi" ONION_LOAD_LEASE_DIR="${d}/vaga" ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_WAIT_MAX=2 ONION_LOAD_POLL=1 \
+      timeout 60 bash "$1/.claude/validation/lint-selftest.sh" --list > "${d}/t.out" 2>&1 || rc=$?
+    _llunhold; [ "${rc}" = 0 ] && grep -qx 'load_lease' "${d}/t.out"; }
+  ri=1; rm_=1; _c_noexec "${tsb}/w" && ri=0; _c_noexec "${tsb}/m" && rm_=0
+  if [ "${ri}" = 0 ]; then record_pass "load-lease: (t) --list não espera vaga (modo sem execução)"
+  else record_fail "load-lease: (t) --list não espera vaga (modo sem execução)" "$(head -3 "${d}/t.out" | tr '\n' ' ')"; fi
+  _prove_mutation "load-lease: (t) --list (MUT: sem a exceção)" "${tsb}/w/.claude/validation/lint-selftest.sh" "${tsb}/m/.claude/validation/lint-selftest.sh" "${ri}" "${rm_}"
   # ── PORTA DE ADMISSÃO (a batuta, 2026-11-10): o passo pesado chamado DIRETO se re-executa sob `run` ─────────
   # t.sh imita a bancada/o harness: sourça o lease sob teste, chama a porta e anota o que segurava ao rodar
   printf '%s\n' '#!/usr/bin/env bash' '. "${LEASE}"' 'load_lease_reexec teste "$0" "$@" || exit $?' \
@@ -56592,7 +56625,7 @@ run_maestro_ask_selftests() {
   _mar() {  # $1 = SUT sob teste, resto = args → "rc|saída"; MAR_ENV extra
     local w="$1" rc=0 out; shift
     # shellcheck disable=SC2086
-    out="$(env -u ONION_ASK_NOW LC_ALL=C ONION_ASK_DIR="${d}/a" ${MAR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    out="$(env -u ONION_ASK_NOW -u CLAUDE_CODE_SESSION_ID LC_ALL=C ONION_ASK_DIR="${d}/a" ${MAR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
   _macase() {  # <nome> <OLD> <NEW> <função>
@@ -56611,33 +56644,42 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     _prove_mutation "maestro-ask: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
   }
   # (a) a 1ª reserva é da dona; a 2ª sessão recebe rc 3 e o nome dela, nunca uma 2ª dona
-  _ma_a() { local a b; a="$(_mar "$1" claim "${K}" --owner curadoria --question 'escopo?')"; b="$(_mar "$1" claim "${K}" --owner core)"
+  _ma_a() { local a b; a="$(_mar "$1" claim "${K}" --owner curadoria --session s-cur --question 'escopo?')"; b="$(_mar "$1" claim "${K}" --owner core --session s-core)"
     MA_WHY="1ª ${a} · 2ª ${b}"; [ "${a%%|*}" = 0 ] && [ "${b%%|*}" = 3 ] && [[ "${b#*|}" == *"JÁ TEM DONA"*"curadoria"* ]]; }
   _macase "(a) a 2ª sessão recebe rc 3 com o nome da dona" \
     'Não pergunte: leve só o id a ela." >&2; exit 3' 'Não pergunte: leve só o id a ela." >&2; exit 0' _ma_a
   # (b) vencida: sem --takeover segue rc 3 (não troca de dona sozinha); com --takeover assume e registra a escalada
-  _ma_b() { local a b c; _mar "$1" claim "${K}" --owner curadoria >/dev/null
-    a="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" claim "${K}" --owner core)"
-    b="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" claim "${K}" --owner core --takeover)"
+  _ma_b() { local a b c; _mar "$1" claim "${K}" --owner curadoria --session s-cur >/dev/null
+    a="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" claim "${K}" --owner core --session s-core)"
+    b="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" claim "${K}" --owner core --session s-core --takeover)"
     c="$(cat "${d}/a/resolved.log" 2>/dev/null)"; MA_WHY="sem ${a} · com ${b} · log ${c}"
     [ "${a%%|*}" = 3 ] && [[ "${a#*|}" == *"VENCIDA"* ]] && [ "${b%%|*}" = 0 ] && [[ "${c}" == *"escalada"*"curadoria"*"assumida por core"* ]]; }
   _macase "(b) vencida não troca de dona sem --takeover; com ele assume e o log diz a escalada" \
     'if [ "${takeover}" != 1 ]; then' 'if false; then' _ma_b
   # (c) só a dona fecha; fechada, o arquivo some e o log diz «fechada»
-  _ma_c() { local a b; _mar "$1" claim "${K}" --owner curadoria >/dev/null
-    a="$(_mar "$1" release "${K}" --owner core)"; b="$(_mar "$1" release "${K}" --owner curadoria --resolution selado)"
+  _ma_c() { local a b; _mar "$1" claim "${K}" --owner curadoria --session s-cur >/dev/null
+    a="$(_mar "$1" release "${K}" --owner core --session s-core)"; b="$(_mar "$1" release "${K}" --owner curadoria --session s-cur --resolution selado)"
     MA_WHY="alheia ${a} · dona ${b}"; [ "${a%%|*}" = 3 ] && [ "${b%%|*}" = 0 ] && [ ! -e "${d}/a/${K}.ask" ] && grep -q 'fechada' "${d}/a/resolved.log"; }
   _macase "(c) só a dona fecha a reserva" \
-    'if [ "${OWNER}" != "${owner}" ]; then echo' 'if false; then echo' _ma_c
+    'if [ "${SESSION}" != "${session}" ]; then echo' 'if false; then echo' _ma_c
   # (d) chave fora do alfabeto (barra = caminho) é rc 2, e nada é gravado fora do registro
-  _ma_d() { local a; a="$(_mar "$1" claim 'a/b' --owner core)"; MA_WHY="${a}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"alfabeto"* ]]; }
+  _ma_d() { local a; a="$(_mar "$1" claim 'a/b' --owner core --session s-core)"; MA_WHY="${a}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"alfabeto"* ]]; }
   _macase "(d) chave com barra é recusada (rc 2)" \
     "grep -qE '^[A-Za-z0-9][A-Za-z0-9._:#-]{0,200}\$'" "grep -qE '.*'" _ma_d
   # (e) list --tsv julga viva|vencida pelo relógio
-  _ma_e() { local a; _mar "$1" claim "${K}" --owner curadoria >/dev/null; a="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" list --tsv)"
+  _ma_e() { local a; _mar "$1" claim "${K}" --owner curadoria --session s-cur >/dev/null; a="$(MAR_ENV="ONION_ASK_NOW=${FUT}" _mar "$1" list --tsv)"
     MA_WHY="${a}"; [ "${a%%|*}" = 0 ] && grep -q "^${K}$(printf '\t')curadoria$(printf '\t').*$(printf '\t')vencida$(printf '\t')" <<< "${a#*|}"; }
   _macase "(e) list --tsv marca a reserva vencida" \
     'st=viva; [ "${DEADLINE:-0}" -gt "${NOW}" ] 2>/dev/null || st=vencida' 'st=viva' _ma_e
+  # (f) IDENTIDADE é a sessão, não o nome: duas sessões chamadas `core` — a 2ª recebe rc 3, nunca RENOVADA
+  _ma_f() { local a b; a="$(_mar "$1" claim "${K}" --owner core --session s-um)"; b="$(_mar "$1" claim "${K}" --owner core --session s-dois)"
+    MA_WHY="1ª ${a} · 2ª ${b}"; [ "${a%%|*}" = 0 ] && [ "${b%%|*}" = 3 ] && [[ "${b#*|}" == *"JÁ TEM DONA"*"sessão s-um"* ]]; }
+  _macase "(f) duas sessões com o mesmo nome: a 2ª recebe rc 3" \
+    'if [ "${SESSION}" = "${session}" ]; then' 'if [ "${OWNER}" = "${owner}" ]; then' _ma_f
+  # (g) sem id de sessão (fora do Claude Code, sem --session) é rc 2: o nome sozinho não distingue duas sessões
+  _ma_g() { local a; a="$(_mar "$1" claim "${K}" --owner core)"; MA_WHY="${a}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"sem id de sessão"* ]]; }
+  _macase "(g) reserva sem id de sessão é recusada (rc 2)" \
+    '[ -n "${session}" ] || die2 "${cmd} sem id de sessão' 'session=anon; [ -n "${session}" ] || die2 "${cmd} sem id de sessão' _ma_g
   rm -rf "${d}"
 }
 _family run_maestro_ask_selftests
@@ -56657,7 +56699,8 @@ run_batuta_census_selftests() {
   mkdir -p "${r}/docs" "${r}/docs/evolution/inbox" "${r}/.claude/utils/co-evolution"; cp "${bell}" "${r}/.claude/utils/co-evolution/"
   printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: D_X\n    node_type: decision\n    status: open\n    impact: 3\n    label: "decidir x"\n  - id: D_Y\n    node_type: decision\n    status: open\n    impact: 3\n    label: "decidir y"\n' > "${r}/docs/g.kg.yaml"
   "${G[@]}" -C "${r}" add -A
-  GIT_AUTHOR_DATE="2026-09-01T12:00:00" GIT_COMMITTER_DATE="2026-09-01T12:00:00" "${G[@]}" -C "${r}" commit -q -m c1
+  # o COMMITTER é de agora (um rebase renova a data dele) e o AUTOR é velho: a idade é a do autor
+  GIT_AUTHOR_DATE="2026-09-01T12:00:00" GIT_COMMITTER_DATE="1791799940 +0000" "${G[@]}" -C "${r}" commit -q -m c1
   : > "${r}/docs/sujo.txt"; touch -d '2026-09-01 12:00' "${r}/docs/sujo.txt"
   : > "${r}/docs/evolution/inbox/s.md"; touch -d '2026-09-01 12:00' "${r}/docs/evolution/inbox/s.md" "${r}/docs/evolution/inbox" "${r}/docs/evolution"   # a idade é a do mais novo (a pasta não rastreada entra pelo mtime dela)
   local NOW=1791800000
@@ -56665,8 +56708,8 @@ run_batuta_census_selftests() {
   printf '#!/usr/bin/env bash\nprintf %%s %s\n' "'[{\"number\":1,\"title\":\"velho\",\"headRefName\":\"feat/v\",\"isDraft\":false,\"updatedAt\":\"2026-09-01T00:00:00Z\",\"statusCheckRollup\":[]},{\"number\":2,\"title\":\"sem campo\",\"headRefName\":\"feat/s\",\"isDraft\":false,\"statusCheckRollup\":[]}]'" > "${sb}/gh"
   chmod +x "${sb}/gh"
   mkdir -p "${sb}/asks"; chmod 700 "${sb}/asks"
-  printf 'r#D_X\tcuradoria\t%s\t%s\tescopo de x?\n' "$((NOW - 600))" "$((NOW + 3600))" > "${sb}/asks/r#D_X.ask"
-  printf 'r#D_Y\tkg-ssot\t%s\t%s\t\n' "$((NOW - 90000))" "$((NOW - 3600))" > "${sb}/asks/r#D_Y.ask"
+  printf 'r#D_X\tcuradoria\ts-cur\t%s\t%s\tescopo de x?\n' "$((NOW - 600))" "$((NOW + 3600))" > "${sb}/asks/r#D_X.ask"
+  printf 'r#D_Y\tkg-ssot\ts-kg\t%s\t%s\t\n' "$((NOW - 90000))" "$((NOW - 3600))" > "${sb}/asks/r#D_Y.ask"
   mkdir -p "${sb}/bell"
   python3 - "${r}" "${sb}/bell" <<'BC_PY'
 import hashlib, json, os, sys
@@ -56677,7 +56720,7 @@ json.dump({'repo': repo, 'schema': 2, 'signals': {'docs/evolution/inbox/s.md': {
 BC_PY
   _bcr() {  # $1 = census sob teste, resto = args → saída TSV (rc no fim, linha «rc=N»)
     local w="$1" rc=0 out; shift
-    out="$(env -u ONION_ASK_DIR -u DOORBELL_STATE_DIR LC_ALL=C DECIDE_TODAY=2026-10-12 DECIDE_NOW="${NOW}" DECIDE_GH="${sb}/gh" \
+    out="$(env -u ONION_ASK_DIR -u DOORBELL_STATE_DIR -u CLAUDE_CODE_SESSION_ID LC_ALL=C DECIDE_TODAY=2026-10-12 DECIDE_NOW="${NOW}" DECIDE_GH="${sb}/gh" \
       ONION_ASK_DIR="${sb}/asks" DOORBELL_STATE_DIR="${sb}/bell" bash "${w}" "${r}" --tsv --cite "${sb}/cite.txt" "$@" 2>&1)" || rc=$?
     printf '%s\nrc=%s' "${out}" "${rc}"
   }
@@ -56707,7 +56750,7 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
   _bccase "(b) PR parado sai PARADO; PR sem updatedAt diz que não mediu" \
     "st = ('PARADO · ' if stopped else '') + st" 'st = st' _bc_b
   # (c) pergunta com dona viva em OUTRA sessão: linha ask e linha seal são outro-dono; com --self da dona, faço-eu
-  _bc_c() { local a b; a="$(_bcr "$1")"; b="$(_bcr "$1" --self curadoria)"
+  _bc_c() { local a b; a="$(_bcr "$1")"; b="$(_bcr "$1" --self s-cur)"
     BC_WHY="$(grep -E '^(ask|seal)' <<< "${a}" | tr '\t' ' ') ‖ $(grep '^seal.D_X' <<< "${b}" | tr '\t' ' ')"
     grep -q "^ask${T}r#D_X${T}curadoria${T}.*${T}viva${T}.*${T}outro-dono${T}" <<< "${a}" \
       && grep -q "^seal${T}D_X${T}.*${T}outro-dono${T}.*${T}reservada por curadoria até .*: não pergunte, leve o id a ela\$" <<< "${a}" \
@@ -56724,6 +56767,9 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     grep -q "^signal${T}campainha${T}doorbell${T}1 sinal(is) sem ack (0 vencido(s) de reaviso, 1 retido(s)): docs/evolution/inbox/s.md (held" <<< "${a}"; }
   _bccase "(e) sinal sem ack vira linha signal com o caminho" \
     '        if nun:' '        if False:' _bc_e
+  # (f) a idade é a do AUTOR (%at): o commit rebaseado agora segue velho; com %ct ele sairia em voo
+  _bccase "(f) rebase não remoça a worktree: a idade vem da data de autor" \
+    "'--format=%at'" "'--format=%ct'" _bc_a
   rm -rf "${sb}"
 }
 _family run_batuta_census_selftests
