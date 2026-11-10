@@ -14,15 +14,19 @@
 # comentário) é varrido por duas formas de citação de repo de um DONO JULGADO que não está na lista pública:
 #   url  — github.com/<dono>/<repo> com ou sem scheme, git@github.com:, ssh://, www., raw.githubusercontent.com,
 #          api.github.com/repos/, codeload.github.com; .git e ponto final de frase normalizados; sem caixa;
-#   hash — <dono>/<repo>@<sha 7-40> e <repo>@<sha> nu, este só para repo que o members.yaml registra.
+#   hash — <dono>/<repo>@<sha 7-40>; e, para nome do registro, <repo>@<sha> nu, depois de caminho
+#          (worktrees/<repo>@<sha>), <repo> @ <sha> e <repo> (HEAD <sha>);
+#   ref  — <dono>/<repo> sem URL nem sha: nu, com #N (PR ou issue) ou como argumento de -R.
+# O "registro" do nome nu: o members.yaml, as URLs de dono julgado no corpus e os `private nome#<hash>` da lista.
 # VISIBILIDADE: docs/evolution/federation/public-repos.tsv, versionada e offline (o CI não consulta a rede). Os
 # donos julgados são os `owner` da lista mais os donos das URLs do members.yaml. Repo de dono julgado fora
 # da lista é "não conferível por terceiro" (privado, inalcançável ou não medido): a guarda não distingue.
 #
 # SEVERIDADE: citação nova sai SOFT (NAO-CONFERIVEL) — é aviso, por decisão do maestro. A CATRACA é HARD:
-# o baseline (docs/evolution/federation/private-repo-cite-baseline.txt) é o passivo contado, e o número dele só cai;
-# crescer vs origin/main é afrouxar a régua (CATRACA-VIOLADA), salvo quando a lista pública perdeu repo no
-# mesmo diff (um repo virou privado: SOFT CATRACA-POR-VISIBILIDADE). O baseline e a saída tsv guardam o
+# o baseline (docs/evolution/federation/private-repo-cite-baseline.txt) é o passivo contado e só encolhe. Ela
+# compara o CONJUNTO de entradas com o do merge-base: entrada nova é HARD (CATRACA-VIOLADA), inclusive a que
+# troca uma velha mantendo o número; só sai SOFT (CATRACA-POR-VISIBILIDADE) a entrada cuja citação JÁ estava
+# no grafo na base e que a guarda passou a ver (repo que saiu da lista, ou vocabulário que cresceu). O baseline e a saída tsv guardam o
 # repo por HASH curto, nunca o nome: a saída do CI de um repo público é pública.
 #
 # Uso : bash private-repo-cite-check.sh [<raiz>] [--tsv | --all | --emit-baseline] [--base <ref>] [--show-names]
@@ -32,7 +36,7 @@
 # Exit: 0 = ok (ou só aviso) · 1 = catraca violada · 2 = não pôde julgar (NAO VERIFICADO; nunca é verde).
 #
 # TETO (o que ela não vê): repo de terceiro (dono fora da lista e do members.yaml) que sumiu ou fechou;
-#   `<repo>@<sha>` nu de repo que o members.yaml não registra; outras formas de citar (gist, GitLab, nome
+#   nome nu de repo fora do registro; grafo renomeado (as entradas dele contam como novas: cure, não re-emita); outras formas de citar (gist, GitLab, nome
 #   seguido de "commit abc1234" em prosa, sha sem nome); grafo que o diff não toca; mensagem de commit e
 #   corpo de PR; e se a lista pública ainda está certa (isso é o --verify-allowlist, que só roda com rede).
 set -uo pipefail
@@ -71,6 +75,12 @@ if [ "${MODE}" != "selftest" ] && [ "${MODE}" != "hashname" ]; then
   _top="$(git -C "${ROOT}" rev-parse --show-toplevel 2>/dev/null || true)"
   [ -n "${_top}" ] || { echo "private-repo-cite: '${ROOT}' não é repositório git — NAO VERIFICADO" >&2; exit 2; }
   ROOT="${_top}"
+  # PORTA (kind: door, ex.: a onion-core com role: source): não leva docs/evolution/, e o objeto desta guarda (o corpus
+  # do core e a lista) não chega lá. Ausência LEGÍTIMA, dita como tal; a lista ausente na fonte segue rc 2.
+  if [ ! -f "${ROOT}/${ALLOW_REL}" ] && grep -qE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${ROOT}/.claude/.onion-version" 2>/dev/null; then
+    [ "${HUMAN}" = 1 ] && echo "private-repo-cite: NÃO SE APLICA — porta (kind: door) não recebe ${ALLOW_REL}; a REGRA 121 é da fonte"
+    exit 0
+  fi
   [ -f "${ROOT}/${ALLOW_REL}" ] || { echo "private-repo-cite: a lista pública (${ALLOW_REL}) não existe — NAO VERIFICADO" >&2; exit 2; }
   _KFP="${_HERE}/kg-fixture-paths.sh"
   [ -f "${_KFP}" ] || { echo "private-repo-cite: predicado de fixture ausente (${_KFP}) — NAO VERIFICADO" >&2; exit 2; }
@@ -94,12 +104,14 @@ if [ "${MODE}" != "selftest" ] && [ "${MODE}" != "hashname" ]; then
   git -C "${ROOT}" ls-files -z -- '*.kg.yaml' > "${_TMP}/all_files" 2>"${_TMP}/err" \
     || { echo "private-repo-cite: git ls-files falhou — NAO VERIFICADO" >&2; exit 2; }
   [ "${MODE}" = "touched" ] || cp "${_TMP}/all_files" "${_TMP}/files"
-  # a catraca compara com a ponta de origin/main (não com o merge-base), como a REGRA 99
-  if git -C "${ROOT}" rev-parse --verify --quiet origin/main >/dev/null 2>&1; then
-    git -C "${ROOT}" show "origin/main:${BASE_REL}" > "${_TMP}/prev_base" 2>/dev/null || : > "${_TMP}/prev_base"
-    git -C "${ROOT}" show "origin/main:${ALLOW_REL}" > "${_TMP}/prev_allow" 2>/dev/null || : > "${_TMP}/prev_allow"
-    git -C "${ROOT}" cat-file -e "origin/main:${BASE_REL}" 2>/dev/null && echo 1 > "${_TMP}/has_prev"
+  # a catraca compara o CONJUNTO de entradas com o do merge-base (o que a branch herdou), não a contagem
+  # da ponta: trocar uma entrada velha por uma nova mantém o número e é afrouxar do mesmo jeito
+  if [ -n "${base}" ] && git -C "${ROOT}" cat-file -e "${base}:${BASE_REL}" 2>/dev/null; then
+    git -C "${ROOT}" show "${base}:${BASE_REL}" > "${_TMP}/prev_base" 2>"${_TMP}/err" \
+      || { echo "private-repo-cite: git show do baseline da base falhou — NAO VERIFICADO" >&2; exit 2; }
+    echo 1 > "${_TMP}/has_prev"
   fi
+  export PRC_BASE="${base}"
 fi
 
 KG_FIXTURE_RE="${KG_FIXTURE_RE:-x^}" python3 -I -B - "${ROOT:-.}" "${MODE}" "${ALLOW_REL}" "${BASE_REL}" "${MEMBERS_REL}" "${_TMP}" "${SHOW}" "${HUMAN}" <<'PY'
@@ -116,6 +128,13 @@ URL_RE = re.compile(
     r"([A-Za-z0-9](?:[A-Za-z0-9\-]{0,38}))/([A-Za-z0-9_.\-]+)", re.I)
 HASH_RE = re.compile(
     r"(?:([A-Za-z0-9](?:[A-Za-z0-9\-]{0,38}))/)?([A-Za-z0-9_.\-]+?)@([0-9a-f]{7,40})(?![0-9A-Za-z])", re.I)   # sem lookbehind: a gula do motor já começa no token inteiro
+# dono/repo SEM URL e sem sha: nu, com #N (PR/issue) ou como argumento de -R. Fora de caminho (não depois de / ou :)
+# e nunca colado num @sha (esse é o HASH_RE). dono/repo/caminho sem host também é ref. A posse do token vem do lookahead.
+REF_RE = re.compile(
+    r"(?<![A-Za-z0-9_.\-/:@])([A-Za-z0-9](?:[A-Za-z0-9\-]{0,38}))/([A-Za-z0-9_.\-]+)(?![A-Za-z0-9_.\-@])", re.I)
+# <nome> @ <sha> e <nome> (HEAD <sha>) — só para nome nu do registro (é prosa: sem o registro seria ruído)
+HASH_SP_RE = re.compile(
+    r"([A-Za-z0-9_.\-]+)(?:\s*@\s+|\s+@\s*|\s+\(\s*(?:HEAD\s+|commit\s+|sha\s+)?)([0-9a-f]{7,40})(?![0-9A-Za-z])", re.I)
 
 def norm(repo):
     r = repo.lower().rstrip(".")                             # ponto final de frase
@@ -132,11 +151,19 @@ def find(text, owners, public, private_names):
             out.append(("url", f"{o}/{r}"))
     for m in HASH_RE.finditer(text):
         o, r = (m.group(1) or "").lower(), norm(m.group(2))
-        if o:
-            if o in owners and f"{o}/{r}" not in public:
+        if o and o in owners:
+            if f"{o}/{r}" not in public:
                 out.append(("hash", f"{o}/{r}"))
-        elif r in private_names:
+        elif r in private_names:                             # nu, ou depois de caminho/dono de terceiro
             out.append(("hash", private_names[r]))
+    for m in HASH_SP_RE.finditer(text):
+        r = norm(m.group(1))
+        if r in private_names:
+            out.append(("hash", private_names[r]))
+    for m in REF_RE.finditer(text):
+        r, o = norm(m.group(2)), m.group(1).lower()
+        if o in owners and r and f"{o}/{r}" not in public:
+            out.append(("ref", f"{o}/{r}"))
     return out
 
 def walk(obj):
@@ -263,7 +290,29 @@ if mode == "selftest":
     check("cala: gist (teto declarado)", "https://gist.github.com/donoteste/abc123", None)
     check("cala: nome@sha de terceiro visto no corpus (dono não julgado)", "lib-alheia@abc1234", None)
     check("cala: público em caixa diferente", "https://github.com/DonoTeste/Repo-Publico", None)
-    check("cala: terceiro/<nome do registro>@sha (o dono é outro)", "x/repo-secreto@abc1234", None)
+    check("acusa: caminho antes do nome do registro (worktrees/<nome>@sha)", "em worktrees/repo-secreto@abc1234", "hash")
+    check("acusa: caminho absoluto antes do nome do registro", "lido em /srv/x/repo-secreto@abc1234:docs/a.md", "hash")
+    check("acusa: <nome> @ <sha> com espaço", "repo-secreto @ abc1234", "hash")
+    check("acusa: <nome> (HEAD <sha>)", "repo-secreto (HEAD abc1234)", "hash")
+    check("acusa: dono/repo nu", "o código mora em donoteste/repo-secreto, na main", "ref")
+    check("acusa: dono/repo#N (PR ou issue)", "fechado em donoteste/repo-secreto#65", "ref")
+    check("acusa: gh -R dono/repo", "gh pr view 3 -R donoteste/repo-secreto", "ref")
+    check("acusa: dono/repo nu com ponto final", "veja donoteste/repo-secreto.", "ref")
+    check("acusa: dono/repo/caminho sem host", "lido em donoteste/repo-secreto/docs/x.md", "ref")
+    def exact(name, text, want):
+        global ok, bad
+        got = sorted(f for f, _ in find(text, owners, public, pn))
+        if got == want:
+            ok += 1; print(f"  ✅ {name}")
+        else:
+            bad += 1; print(f"  ✗ {name} — esperava {want}, veio {got}")
+    exact("exato: dono/repo@sha é só hash, não vira também ref", "donoteste/repo-secreto@abc1234:x", ["hash"])
+    exact("exato: git@github.com:dono/repo é só url, não vira também ref", "git@github.com:donoteste/repo-secreto.git", ["url"])
+    check("cala: dono/repo nu público", "ver donoteste/repo-publico#12 e -R donoteste/repo-publico", None)
+    check("cala: caminho com dono julgado no meio (não é ref)", "docs/donoteste/repo-secreto/x.md", None)
+    check("cala: outro host com dono julgado (GitLab, teto declarado)", "https://gitlab.com/donoteste/repo-secreto", None)
+    check("cala: terceiro/repo nu", "anthropics/claude-code#1 e terceiro/lib", None)
+    check("cala: palavra @ sha que não é nome do registro", "main @ abc1234 e versão (HEAD 0a1b2c3)", None)
     check("cala: @ seguido de hex e letra não é sha", "repo-secreto@abcdef1234zz", None)
     check("cala: palavra@sha que não é nome medido (grafo@, core@, develop@)", "grafo@abc1234 core@0a1b2c3 develop@1234567", None)
     # ── o grafo: campo, fora de campo e chave do nó ─────────────────────────────────────────────────────
@@ -339,7 +388,7 @@ for f in files:
 if mode == "emit":
     print("# private-repo-cite-baseline — o PASSIVO contado da REGRA 121 (citação de repo não conferível por terceiro).")
     print("# Gerado por: bash .claude/validation/private-repo-cite-check.sh --emit-baseline")
-    print("# passivo<TAB>grafo<TAB>nó<TAB>forma<TAB>repo por hash — o número só CAI (crescer vs origin/main é HARD).")
+    print("# passivo<TAB>grafo<TAB>nó<TAB>forma<TAB>repo por hash — só ENCOLHE (entrada nova vs o merge-base é HARD).")
     print("# O repo vai por hash: este arquivo é público. Para o nome, rode a guarda com --all --show-names localmente.")
     for f, n, form, repo in sorted(set(acc)):
         print(f"passivo\t{f}\t{n}\t{form}\t{rhash(repo)}")
@@ -356,16 +405,27 @@ for line in rd(os.path.join(root, base_rel)).splitlines():
         base.add(tuple(c[1:]))
 
 rc = 0
-prev_base = rd(os.path.join(tmp, "prev_base"))
-prev_n = sum(1 for l in prev_base.splitlines() if l.startswith("passivo\t"))
-if os.path.exists(os.path.join(tmp, "has_prev")) and len(base) > prev_n:
-    _, prev_public, _ = load_allow(rd(os.path.join(tmp, "prev_allow")))
-    lost = prev_public - public
-    if lost:
-        out("SOFT", "CATRACA-POR-VISIBILIDADE", base_rel, f"o passivo cresceu ({prev_n} → {len(base)}) e a lista pública perdeu {len(lost)} repo(s) no mesmo diff — confira que viraram privados (--verify-allowlist)")
-    else:
+def entries(text):
+    return {tuple(l.split("\t")[1:]) for l in text.splitlines() if l.startswith("passivo\t") and len(l.split("\t")) == 5}
+prev = entries(rd(os.path.join(tmp, "prev_base")))
+armed = os.path.exists(os.path.join(tmp, "has_prev"))
+if armed and base - prev:
+    # entrada nova no baseline só é legítima se a citação JÁ ESTAVA no grafo na base, e a guarda só passou a
+    # vê-la (um repo saiu da lista pública, ou o vocabulário cresceu). Citação nova não entra no baseline.
+    seen_at_base, cache = set(), {}
+    for f, n, form, rh in sorted(base - prev):
+        if f not in cache:
+            g = subprocess.run(["git", "-C", root, "show", f"{os.environ.get('PRC_BASE', '')}:{f}"], capture_output=True, text=True)
+            cache[f] = scan_text(g.stdout, owners, public, pn)[0] if g.returncode == 0 else set()
+        if (n, form, rh) in {(a, b, rhash(c)) for a, b, c in cache[f]}:
+            seen_at_base.add((f, n, form, rh))
+    grew = (base - prev) - seen_at_base
+    if seen_at_base:
+        out("SOFT", "CATRACA-POR-VISIBILIDADE", base_rel, f"{len(seen_at_base)} entrada(s) nova(s) no baseline de citação que já estava no grafo na base (repo que saiu da lista ou forma que a guarda passou a ver) — confira com --verify-allowlist")
+    if grew:
         rc = 1
-        out("HARD", "CATRACA-VIOLADA", base_rel, f"o passivo CRESCEU: {prev_n} → {len(base)} vs origin/main — citação nova não entra no baseline; omita URL e hash no grafo")
+        fs = ", ".join(sorted({f for f, _, _, _ in grew})[:3])
+        out("HARD", "CATRACA-VIOLADA", base_rel, f"{len(grew)} entrada(s) nova(s) no baseline vs o merge-base para citação que NÃO estava no grafo na base ({fs}) — citação nova não entra no baseline; omita URL e hash no grafo")
 if not has_base and acc and mode == "all":
     out("SOFT", "NO-BASELINE", base_rel, "há citação não conferível e NÃO existe baseline — a catraca não está armada (emita com --emit-baseline)")
 
@@ -375,7 +435,7 @@ for f, n, form, repo in acc:
         passivo += 1; continue
     novo += 1
     shown = repo if show else rhash(repo)
-    what = "URL" if form == "url" else "hash (repo@sha)"
+    what = {"url": "URL", "hash": "hash (repo@sha)", "ref": "referência dono/repo"}[form]
     out("SOFT", "NAO-CONFERIVEL", f,
         f"nó {n} cita {shown} por {what}, e esse repo não está na lista pública ({allow_rel}): terceiro não confere. "
         "Omita URL e hash e escreva a classe na fonte: source: \"não conferível por terceiro: <o que foi lido, sem URL nem hash>\". "
@@ -385,6 +445,6 @@ for f, err in unread:
 if human:
     escopo = "tocado(s) pelo diff" if mode == "touched" else "do corpus"
     print(f"private-repo-cite: {len(files)} grafo(s) {escopo}, {novo} citação(ões) nova(s) não conferível(is), "
-          f"{passivo} no passivo, baseline com {len(base)} (origin/main: {prev_n}), {len(unread)} não julgado(s)")
+          f"{passivo} no passivo, baseline com {len(base)} (merge-base: {len(prev) if armed else 'sem baseline'}), {len(unread)} não julgado(s)")
 sys.exit(rc)
 PY

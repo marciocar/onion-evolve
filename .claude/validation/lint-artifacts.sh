@@ -6633,8 +6633,8 @@ check_private_name_diff
 #   43 nós com provenance.source em URL de repo privado ou inalcançável (47 com trace e narrative), e nada barrava o
 #   próximo. Decisão do maestro, «Guarda + omitir no futuro»: AVISO no grafo novo ou tocado; citação futura omite URL
 #   e hash, com a classe «não conferível por terceiro»; o histórico fica. Visibilidade pela lista versionada
-#   docs/evolution/federation/public-repos.tsv (o CI não usa rede; fica fora do que viaja); o passivo (209 pares nó/repo, por URL e por repo@sha) está no baseline e
-#   só cai: crescer vs origin/main é HARD. Lógica, vocabulário e teto em private-repo-cite-check.sh; grafo
+#   docs/evolution/federation/public-repos.tsv (o CI não usa rede; fica fora do que viaja); o passivo (255 pares nó/repo, por URL, por repo@sha e por dono/repo) está no baseline e
+#   só encolhe: entrada nova vs o merge-base é HARD. Na porta (kind: door) não se aplica: ela não leva docs/evolution/. Lógica, vocabulário e teto em private-repo-cite-check.sh; grafo
 #   guard-private-repo-cite-2026-11.
 check_private_repo_cite() {
   _na_for_role && return 0

@@ -1,18 +1,17 @@
 ---
 branch: feat/private-repo-cite-guard
-pr: pendente
+pr: 1576
 date: 2026-11-10
-reviewed_diff_sha256: 6b089803043ab09bfe43ed4eb39f7f2db8c3e398669ad714962c86294ac4bd2c
-reviewed_code_sha256: dc79c4ce851966bac6529780ddb16a99df72083aeed873d70f64ee693484f3e0
-findings_total: 6
-findings_real: 6
-findings_blocking: 1
+reviewed_diff_sha256: pendente
+findings_total: 13
+findings_real: 13
+findings_blocking: 3
 tokens: 0
-duration_min: 60
-findings_fixed: 5
-verdict: FIXED
-elenxo: false
-reviewer: agente de execução da sessão do core (passada própria, não independente; o brief proibiu subagente)
+duration_min: 120
+findings_fixed: 12
+verdict: REJECTED_AND_FIXED
+elenxo: true
+reviewer: "revisão independente do PR #1576 (REJECTED, 2 bloqueios + 5 não bloqueantes), curada pelo agente de execução; antes, passada própria"
 nota: "tokens 0 = não medido. Nenhum nome de repo privado entra em claro no diff: a lista guarda o nome nu por hash, o baseline guarda o repo por hash, e a bancada usa nomes inventados."
 ---
 
@@ -69,3 +68,29 @@ Repo de terceiro que fechou ou sumiu; nome nu fora das três fontes; gist, GitLa
 nome; grafo que o diff não toca; commit e corpo de PR. O hash curto do nome se enumera (o kg-ssot mediu menos de 1 s
 para 365 mil candidatos): ele não esconde o nome, só evita gravá-lo em claro. Hoje a classe «não conferível por
 terceiro» é só texto; nenhum leitor do kg-ssot a imprime ainda (`C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR`).
+
+## Revisão independente (REJECTED) e as curas
+
+A revisão independente do #1576 rejeitou a 1ª versão. Cada ponto ganhou caso de bancada e mutante; a família
+`private_repo_cite` passa 46 de 46 (9 casos de produção, 30 mutantes de vocabulário, 7 de produção).
+
+7. **BLOQUEANTE, curado (porta).** A `onion-core` tem `role: source` e `kind: door` e não leva `docs/evolution/`.
+   Medido numa cópia dela com a validação da branch, o lint já dava NÃO SE APLICA à REGRA 121 (papel
+   `source-door`), mas o helper chamado direto saía rc 2. E a família de bancada ficava vermelha na porta, porque lá
+   `SELFTEST_ROLE` é `source` e a lista core-only não a pula. Cura: o helper reconhece `kind: door` sem a lista e diz
+   NÃO SE APLICA (rc 0); o caso (b) pula visível na porta; o caso (g) tira o carimbo do sandbox; o caso novo (i)
+   prova helper e lint no papel source-porta, com um mutante para cada.
+8. **BLOQUEANTE, curado (vocabulário).** Passavam calados `dono/repo#N`, `-R dono/repo`, `dono/repo` nu, o nome do
+   registro depois de caminho (`worktrees/<nome>@sha`, que virava dono de terceiro), `<nome> @ sha` e
+   `<nome> (HEAD sha)`. Entraram a forma `ref` (dono julgado, sem URL nem sha, inclusive `dono/repo/caminho` sem
+   host) e as duas formas de prosa, só para nome do registro. O passivo foi de 209 a 255 (36 `ref`).
+9. **Real, curado (catraca por contagem).** Trocar uma entrada velha por uma nova mantinha o número e passava. Agora
+   a catraca compara o conjunto de entradas com o do merge-base.
+10. **Real, curado (rebaixe largo).** Tirar qualquer repo da lista rebaixava qualquer crescimento a SOFT. Agora só sai
+    SOFT a entrada cuja citação já estava no grafo na base; citação nova é HARD mesmo com repo saindo da lista.
+11. **Real, curado.** A catraca compara com o merge-base, não com a ponta da origin/main. Teto: não há mutante que
+    distinga as duas nos cenários da bancada.
+12. **Real, curado.** Mutantes de produção para o escopo «touched» e para a catraca (contagem, rebaixe total,
+    rebaixe nenhum, rc).
+13. **Real, conferido sem mudança.** Os 13 nomes guardados por hash aparecem todos em claro na árvore, no mínimo 9
+    vezes cada: nenhum é segredo que o hash exporia à confirmação por dicionário.
