@@ -2,14 +2,13 @@
 branch: docs/interconnect-profile-v1
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: a147edefb15ea7b0c73e44074270e0d995d5c7a9480d2bd5c3285c0a99d7d9f8
-reviewed_code_sha256: 09f4f946bab70459377e21923398a970d8bec531576751b790f57cb92065f084
-findings_total: 6
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 6
 findings_blocking: 0
 tokens: 0
 duration_min: 20
-findings_fixed: 4
+findings_fixed: 5
 verdict: FIXED
 elenxo: false
 reviewer: passada própria sobre o próprio artefato (sem subagente); gate mecânico pelo kg-radar, kg-contract-check, kg-decide-seal, door-leak-scan e private-name-check
@@ -46,6 +45,10 @@ pelo `kg-decide-seal.sh`, a `SYNTHESIS.md` como projeção e o `docs/backlog.md`
 6. **PROFILE.md sem nó que o cite pelo caminho (REAL, curado).** A REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO, com
    catraca) barrou o 1º commit: os `trace:` diziam só "PROFILE.md". O `trace:` da tese passou a citar o caminho
    inteiro; radar e contrato seguiram verdes e o lint completo deu 0 HARD.
+
+7. **Códigos de seção sem termo (REAL, curado).** O contrato KG-SSOT do `pr-finalize` reprovou `A3`, `A4` e
+   `A5` nos labels (`vocab.code-unresolved`). Cada nó de seção ganhou o próprio `x_term` (notation `A1` a `A5`,
+   scheme `interconnect-profile`), sem nó novo; o lint de nomes deu 0 código novo sem termo.
 
 ## Mutantes
 
