@@ -7,7 +7,7 @@ findings_real: 5
 findings_fixed: 5
 tokens: 180000
 duration_min: 70
-verdict: REPROVADO_E_CURADO
+verdict: REJECTED_AND_FIXED
 reviewer: passada própria sobre o próprio artefato (sem subagente) — gate mecânico: bancada kg_migrate_v3 e decide com mutantes, lint-artifacts
 ---
 
