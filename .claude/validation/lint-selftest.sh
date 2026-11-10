@@ -32906,6 +32906,16 @@ run_role_cut_selftests() {
      && ! grep -q 'unbound variable' "${d}/m-orfa.err"; then
     record_pass "role-cut: (m-órfã) peça da zona sem citador não desliga a derivação: os companheiros do cortado seguem saindo e a órfã fica"
   else record_fail "role-cut: (m-órfã)" "${_fobad:- a órfã foi cortada ou o derivador estourou: $(tr '\n' ' ' < "${d}/m-orfa.err" | head -c 300)}"; fi
+  # (m-rc) o CHAMADOR lê o rc do derivador: uma falha injetada na função faz o manifesto sair rc 3 nomeando-a,
+  #     nunca um pacote com os companheiros (revisão do PR #1578: `< <(…)` engolia o estouro).
+  local mut4="${d}/vm-derivador-falha.sh" _fr=0 _fx
+  sed 's|^_emit_companion_excludes() {.*|_emit_companion_excludes() { cat >/dev/null; return 5; }\n_desligado() {|' "${vm}" > "${mut4}"
+  if ! cmp -s "${vm}" "${mut4}"; then
+    if _fx="$(bash "${mut4}" --role standalone --repo "${rf}" 2>"${d}/m-rc.err")"; then _fr=0; else _fr=$?; fi
+    if [ "${_fr}" = 3 ] && grep -q '_emit_companion_excludes) falhou' "${d}/m-rc.err" && [ -z "${_fx}" ]; then
+      record_pass "role-cut: (m-rc) falha no derivador de companheiros ⇒ manifesto rc 3 nomeando-o, sem pacote"
+    else record_fail "role-cut: (m-rc)" "rc=${_fr} saída=$(grep -c . <<< "${_fx}") linha(s): $(tr '\n' ' ' < "${d}/m-rc.err" | head -c 200)"; fi
+  else record_fail "role-cut: (m-rc) setup" "a falha não foi injetada"; fi
   unset -f _m_check
 
   # ── A MATRIZ DAS PORTAS (2026-10-10, F2 = SAC-91; nó D_MATRIZ_DE_PORTAS_2026_10) ──────────────────
