@@ -70,6 +70,16 @@ case "${MUT_EXPR#*|||}" in *"${MARKER}"*) : ;; *)
   exit 2 ;;
 esac
 
+# PORTA DE ADMISSÃO (a batuta, 2026-11-10): mutante é passo pesado (o comando roda duas vezes, a linha de base e a
+# mutada) e, chamado à mão por um agente, não perguntava pela carga; três agentes com bancada e mutantes juntos
+# puseram o load em 16–19. Antes de plantar qualquer coisa, re-executa sob `ops/load-lease.sh run` (carga + vaga
+# única). Chamado de dentro da bancada ou de um pai já admitido (ONION_LOAD_LEASE_HELD), segue sem esperar.
+if [ -z "${ONION_LOAD_LEASE_HELD:-}" ] && [ -r "$(dirname "$0")/load-lease.sh" ]; then
+  # shellcheck source=/dev/null
+  . "$(dirname "$0")/load-lease.sh"
+  load_lease_reexec "mutate-and-restore (direto)" "$0" "${TARGET}" "${MUT_EXPR}" "$@" || exit $?
+fi
+
 # o backup tem de EXISTIR antes do trap: com o `cp` falho (alvo sem leitura), a 1ª versão armava a
 # restauração com um backup vazio e, no EXIT, podia truncar o alvo por cima.
 _BACKUP="$(mktemp)"

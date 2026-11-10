@@ -17,6 +17,7 @@
 #                                             (pela carga ou pela vaga), sem rodar o <cmd>
 #   bash ops/load-lease.sh status             load, PSI, memória, a régua vigente e a sugestão derivada
 #   . ops/load-lease.sh                       (sourçado) define load_lease_check/_wait/_acquire/_release
+#                                             e load_lease_reexec (porta de admissão do passo pesado direto)
 #
 # Contrato:
 #   · A RÉGUA vem de configuração: ops/load-lease.conf (chave=valor, LIDO, nunca executado) e a variável
@@ -194,6 +195,26 @@ load_lease_release() {
   flock -u "${LL_FD}" 2>/dev/null || true
   exec {LL_FD}>&-
   LL_FD=""; unset ONION_LOAD_LEASE_HELD
+}
+
+# load_lease_reexec <quem> <script> [args…] — PORTA DE ADMISSÃO do passo pesado chamado DIRETO (a batuta, 2026-11-10).
+# Medido em 2026-11-10: três agentes rodaram bancada (`lint-selftest.sh --only …`) e mutantes
+# (`ops/mutate-and-restore.sh`) juntos, chamados à mão, e a carga foi a 16–19. Nenhum dos dois passava pelo
+# lease: a bancada se marcava "já admitida" (ONION_LOAD_LEASE_HELD=bench) supondo que quem a chama esperou
+# antes, e o harness de mutantes não perguntava nada. A cura improvisada foi um `flock` num arquivo do
+# scratchpad mais "esperar a carga cair": a mesma regra repetida à mão, que diverge.
+# Chamada no topo do script pesado, ela o RE-EXECUTA sob `run` (espera a carga E a vaga única, que é
+# exclusiva na máquina) e não volta; já admitido (o pai segura a vaga: pre-commit, pr-finalize, a própria
+# bancada), ela volta 0 e o script segue no mesmo processo. ONION_LOAD_LEASE_REEXEC é a GUARDA DO LAÇO:
+# quando o lease passa direto (desligado, CI, sem fonte) o `run` não exporta HELD, e sem a guarda o
+# script se re-executaria para sempre.
+load_lease_reexec() {
+  local who="${1:-?}"; shift || true
+  [ -n "${ONION_LOAD_LEASE_HELD:-}" ] && return 0
+  [ -n "${ONION_LOAD_LEASE_REEXEC:-}" ] && return 0
+  [ "$#" -ge 1 ] || { echo "load-lease: reexec sem script" >&2; return 2; }
+  export ONION_LOAD_LEASE_REEXEC=1 ONION_LOAD_LEASE_WHO="${who}"
+  exec bash "${BASH_SOURCE[0]}" run -- bash "$@"   # o PRÓPRIO arquivo do lease (a cópia da bancada também)
 }
 
 load_lease_status() {

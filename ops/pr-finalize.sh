@@ -371,8 +371,8 @@ fi
 
 # LEASE DE CARGA (ops/load-lease.sh, 2026-11-06): o pré-voo e o lint são o pesado desta rodada, e na VPS
 # compartilhada eles só abrem com a régua da máquina (ops/load-lease.conf). A rodada ESPERA a carga cair, e não
-# falha por ela; só o teto estourado (30 min, rc 4) recusa, dizendo o load, sem nada commitado. Com
-# ONION_SELFTEST_FULL=1 ela pega também a vaga única de bancada cheia e a segura até o fim. Admitida, exporta
+# falha por ela; só o teto estourado (30 min, rc 4) recusa, dizendo o load, sem nada commitado. Ela pega
+# também a vaga única de passo pesado (a mesma da bancada direta e dos mutantes) e a segura até o fim. Admitida, exporta
 # ONION_LOAD_LEASE_HELD: o pre-commit do commit de conteúdo, disparado daqui, não espera de novo nem disputa a
 # vaga que esta rodada segura. Escape declarado: ONION_LOAD_LEASE=off.
 if [ -r ops/load-lease.sh ]; then
@@ -380,8 +380,10 @@ if [ -r ops/load-lease.sh ]; then
   . ops/load-lease.sh
   export ONION_LOAD_LEASE_WHO=pr-finalize
   _ll_rc=0
-  if [ "${ONION_SELFTEST_FULL:-0}" = 1 ]; then load_lease_acquire || _ll_rc=$?
-  else load_lease_wait || _ll_rc=$?; fi
+  # SEMPRE a vaga única desde 2026-11-10 (a batuta): só com ONION_SELFTEST_FULL=1 ela era pega, e três
+  # fechamentos com pré-voo, mais agentes com bancada e mutantes, rodaram juntos (load 16–19). A cura
+  # improvisada foi um `flock` à mão em volta do pr-finalize; agora é a mesma vaga da bancada e dos mutantes.
+  load_lease_acquire || _ll_rc=$?
   [ "${_ll_rc}" = 0 ] || die "carga: a máquina não liberou a rodada (load-lease rc=${_ll_rc}; 4 = teto estourado, 2 = não mediu) — nada rodou; veja bash ops/load-lease.sh status"
   [ -n "${ONION_LOAD_LEASE_HELD:-}" ] || export ONION_LOAD_LEASE_HELD=pr-finalize
 fi

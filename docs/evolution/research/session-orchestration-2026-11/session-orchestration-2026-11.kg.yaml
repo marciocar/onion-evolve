@@ -16,6 +16,9 @@ external_edges:
   - from: D_SO_MECANISMO_EM_DEGRAUS
     to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#E_COORD_CENSO_DAS_PENDENCIAS_1027"
     edge_type: TRACES_TO
+  - from: C_SO_BATUTA_V1_1110
+    to: "docs/onion/graph/maestro-decisions-1109b.kg.yaml#D_MD_EVOLUTION_FIRST_BLOCK_BATUTA_1109"
+    edge_type: TRACES_TO
   - from: C_SO_REGRA_DO_MEDIDOR
     to: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-2026-11.kg.yaml#C_PORT_SPIKE_CRITERIO_DA_PORTA_1103"
     edge_type: TRACES_TO
@@ -60,10 +63,10 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: "2026-11-06"
-    verified_against: "estratégia 1 e item 23 do DIARIO.md; desde 2026-11-06 a regra é a peça ops/load-lease.sh, ligada no pre-commit (antes da faixa de bancada), no pr-finalize (antes do pré-voo) e no run_all.sh do lab, com a família load_lease da bancada (casos a a k, cada um com mutante)"
+    verified_at: "2026-11-10"
+    verified_against: "estratégia 1 e item 23 do DIARIO.md; desde 2026-11-06 a regra é a peça ops/load-lease.sh, ligada no pre-commit (antes da faixa de bancada), no pr-finalize (antes do pré-voo) e no run_all.sh do lab; desde 2026-11-10 também na bancada e no harness de mutantes chamados direto (porta de admissão load_lease_reexec), com o pr-finalize pegando a vaga sempre; família load_lease da bancada, casos a a n, cada um com mutante"
     label: "A CPU da VPS era coordenada por lock social declarado. Desde 2026-11-06 a regra de carga é mecanismo: ops/load-lease.sh espera o load sair de 15 ou mais até abaixo de 12, com teto de 30 min, e dá uma vaga única de bancada cheia por flock."
-    narrative: "Antes da peça, medido na noite de 2026-11-05: cada agente escrevia o seu laço de espera com teto diferente, um lab esperava por 16 e seguia calado no teto de 600 s, houve espera por `pgrep -f` que casa o próprio shell, e o pre-commit de uma forja rodou 192 famílias por 70 min com o load entre 13 e 16. A peça mantém os números de hoje (ops/load-lease.conf: HIGH 15, RESUME 12); o que segue social é quem NÃO passa pelos três chamadores (um agente que roda bancada à mão sem o lease). A régua derivada está aberta em D_SO_LIMITES_DERIVADOS_DO_LEASE_1106."
+    narrative: "Antes da peça, medido na noite de 2026-11-05: cada agente escrevia o seu laço de espera com teto diferente, um lab esperava por 16 e seguia calado no teto de 600 s, houve espera por `pgrep -f` que casa o próprio shell, e o pre-commit de uma forja rodou 192 famílias por 70 min com o load entre 13 e 16. A peça mantém os números de hoje (ops/load-lease.conf: HIGH 15, RESUME 12, PSI 30). Em 2026-11-10 a falha voltou por um caminho que a peça não cobria: três agentes rodaram a bancada e o harness de mutantes à mão (load 16 a 19), porque a bancada direta se dava por admitida e o harness não perguntava. Os dois passaram pela porta de admissão. O que segue social é o passo pesado que não passa por nenhum dos chamadores. A régua derivada está aberta em D_SO_LIMITES_DERIVADOS_DO_LEASE_1106."
     provenance:
       source: "ops/load-lease.sh"
       locator: "cabeçalho (contrato) e família run_load_lease_selftests em .claude/validation/lint-selftest.sh"
@@ -209,10 +212,10 @@ nodes:
     owner: core
     impact: 4
     confidence: 0.5
-    verified_at: "2026-11-03"
-    verified_against: "N=1 janela registrada (E_SO_JANELA_DE_2026_11_03)"
+    verified_at: "2026-11-10"
+    verified_against: "conferência pela letra do DIARIO.md em 2026-11-10: 4 janelas (03, 04, 05-06 e 06/11); outro tipo de trabalho na 2ª e na 3ª; os 3 papéis nas 4; Q_SO_PADROES_DE_MERCADO respondida em 2026-11-10. Falta a cláusula das 5 de 7 C_SO_* por janela: nas janelas 2, 3 e 4 o diário mostra 4 regras claras e 2 parciais (contagem na narrativa)"
     label: "Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três papéis e ao menos 5 das 7 regras C_SO_* observadas, mais Q_SO_PADROES_DE_MERCADO respondida."
-    narrative: "Refutação: numa janela de outro tipo de trabalho, papéis diferentes rebaixam C_SO_TRES_PAPEIS a específico do trabalho, e o degrau 2 volta a desenho."
+    narrative: "Refutação: numa janela de outro tipo de trabalho, papéis diferentes rebaixam C_SO_TRES_PAPEIS a específico do trabalho, e o degrau 2 volta a desenho. Conferência regra a regra (2026-11-10, só pelo texto do DIARIO.md). Janela 2 (04/11): claras TRES_PAPEIS (estratégias 26 e 27), RODIZIO (23), FRASE_DE_VEREDITO (25 e a afirmação relayada falsa) e DONO_DA_ESPEC (26 e a régua do vigia mantida na curadoria); parciais REVISAO_EM_TRES_CAMADAS (25: a redação reprovou texto que a medida aprovara, sem as três camadas nomeadas) e REGRA_DO_MEDIDOR (régua do vigia mantida por leitura posterior ao dado); ausente RITMO_POR_EVENTO. Janela 3 (05-06/11): claras TRES_PAPEIS, RODIZIO (o lease), FRASE_DE_VEREDITO (números dados sem medir, corrigidos) e RITMO_E_AUTORIZACAO (autorização pontual durante o sono, estratégia 29); parciais REVISAO (28) e MEDIDOR (28: re-rodar os lotes do refutador sobre o código final); ausente DONO_DA_ESPEC. Janela 4 (06/11): claras TRES_PAPEIS, RODIZIO (régua selada), DONO_DA_ESPEC (33: o selo da peer vence o pedido do core) e RITMO_E_AUTORIZACAO (modo autônomo até 09/11); ausentes as outras três. A batuta v1 (C_SO_BATUTA_V1_1110) não é o degrau 2: não rascunha fila; mede, e o maestro a pediu por decisão própria (D_MD_EVOLUTION_FIRST_BLOCK_BATUTA_1109)."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «Gatilho»"
@@ -222,14 +225,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
-    confidence: 0.4
-    verified_at: "2026-11-03"
-    verified_against: "nenhuma busca feita nesta rodada"
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "duas colheitas: a da curadoria de 2026-11-04 (onion-curation@ce1bba2, docs/evolution/research/session-orchestration-market-2026-11/session-orchestration-market-2026-11.kg.yaml#Q_SESSION_ORCHESTRATION_MARKET, status done: papéis, lease e passagem com aceite) e a de 2026-11-10 (E_SO_MERCADO_SUPERVISAO_1110: ociosidade, dona da pergunta e carga); lacunas declaradas em E_SO_MERCADO_SUPERVISAO_1110"
     label: "Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o ciclo de tarefa do A2A aberto, entre outros)? Pesquisar pelo /onion-research antes de desenhar o degrau 2."
-    narrative: "O perfil do Onion vai por cima do padrão de mercado, e cunhagem só onde o mercado não tiver (market-standards-first)."
+    narrative: "O perfil do Onion vai por cima do padrão de mercado, e cunhagem só onde o mercado não tiver (market-standards-first). Respondida em duas partes. Papéis: nenhuma spec aberta tem campo de papel, e a AAIF tem o vocabulário em rascunho (classe parcial, C_SOM_E1_ROLES_PARTIAL na curadoria). Passagem com aceite: o A2A 1.0.0 cobre pausa e fim, sem aceite assinado padrão (parcial, C_SOM_E3_HANDOFF_PARTIAL). Reserva de recurso: lease com TTL, cumprido pelo SO via cgroup (parcial, C_SOM_E2_LEASE_PARTIAL), e a colheita de 2026-11-10 acrescenta flock mais admissão por carga. Ociosidade: heartbeat com prazo julgado pelo supervisor. Dona da pergunta: chave do produtor com no máximo uma aberta e ack com prazo que escala (PagerDuty, Opsgenie). A batuta v1 (C_SO_BATUTA_V1_1110) usa as três formas da colheita. Fechar esta pergunta NÃO dispara o gatilho: Q_SO_GATILHO_DE_CONSTRUCAO segue aberto pela letra."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «Gatilho»"
@@ -251,7 +254,53 @@ nodes:
       locator: "pergunta com opções de 2026-11-04: «O que fazer com a proposta do degrau 2 da orquestração de sessões?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
       locality: "pessoa"
+  - id: E_SO_MERCADO_SUPERVISAO_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    evidence_class: observation
+    verified_against: "colheita da curadoria de 2026-11-10: 36 páginas baixadas por curl e o trecho conferido no texto; cópia em data/market-supervision-2026-11-10.md desta pasta"
+    label: "Mercado (2026-11-10): ociosidade é heartbeat com prazo julgado pelo supervisor; pergunta ao humano é chave do produtor com no máximo uma aberta e ack com prazo que escala; carga entre sessões é flock mais teto do SO e admissão por carga, sem limite pronto entre sessões."
+    narrative: "Ociosidade: Temporal (heartbeat timeout), SQS e Celery (visibility timeout), Airflow (task heartbeat), k8s (liveness), systemd (WatchdogSec). No Claude Code, o Notification/idle_prompt não dispara com agente de fundo vivo; o Stop traz background_tasks, e há SubagentStop e TeammateIdle. Pergunta: dedup_key do PagerDuty, alias do Opsgenie, Workflow Id do Temporal; escalation policy com timeout de ack de 30 min por padrão; ack não é resolução. Carga: flock(1) do kernel, solto na morte do processo; parallel --load; slots do Temporal; cgroup v2 e systemd (CPUQuota, MemoryHigh); trava de eficiência dispensa fencing token (Kleppmann). Lacunas declaradas na colheita: orquestradores de agente de terceiros, timeout de interrupt no LangGraph, o contraponto de antirez e o fim de suporte do Opsgenie."
+    trace: "docs/evolution/research/session-orchestration-2026-11/data/market-supervision-2026-11-10.md"
+    provenance:
+      source: "docs/evolution/research/session-orchestration-2026-11/data/market-supervision-2026-11-10.md"
+      locator: "seções 1 a 4 e a lista de URLs"
+      method: "leitura: colheita de fontes primárias feita pela curadoria em 2026-11-10"
+      locality: "repo"
+  - id: C_SO_BATUTA_V1_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-10"
+    verified_against: "bancada: load_lease (l, m, n), maestro_ask (a a e) e batuta_census (a a e), cada caso reprovando contra o mutante; dogfood no repo real (censo com 78 linhas, reserva alheia virando outro-dono numa linha seal real, mutante direto sob a vaga e com a vaga alheia rc 4)"
+    label: "A batuta v1 é mecanismo: o passo pesado chamado direto passa pela vaga única da máquina, o censo do /meta:decide diz PARADO por idade e lista sinal sem ack, e cada pergunta ao maestro tem uma sessão dona por chave."
+    narrative: "Três peças. (1) A porta de admissão load_lease_reexec em ops/load-lease.sh: a bancada e ops/mutate-and-restore.sh chamados direto se re-executam sob run, e o pr-finalize pega a vaga sempre. (2) .claude/validation/decide-census.sh: idade da última atividade em thread e merge, PARADO a partir de --idle-hours (4 h), mais as linhas signal (campainha sem ack) e ask (reservas). (3) .claude/utils/orchestration/maestro-ask.sh: chave <repo>#<ID>, uma dona, prazo de 24 h, o vencido assumido só com --takeover e registrado. Doutrina em .claude/commands/common/prompts/batuta-doctrine.md. Fora da v1, por postura: cgroup e timer do systemd (decisão do maestro), despacho entre sessões (degrau 3) e painel. Refutação: uma semana com a vaga única travando trabalho leve que não congestionaria (fila de espera acima de 10 min em mais de 1 de cada 5 passos pesados, medida pelo holder) rebaixa a vaga única a vagas por recurso."
+    provenance:
+      source: ".claude/commands/common/prompts/batuta-doctrine.md"
+      locator: "cláusulas 1 a 5 e a fronteira; bancada em .claude/validation/lint-selftest.sh (run_maestro_ask_selftests, run_batuta_census_selftests, run_load_lease_selftests)"
+      method: "medição: bancada com mutante e dogfood no repo real, 2026-11-10"
+      locality: "repo"
 edges:
+  - from: E_SO_MERCADO_SUPERVISAO_1110
+    to: C_SO_BATUTA_V1_1110
+    edge_type: SUPPORTS
+  - from: E_SO_MERCADO_SUPERVISAO_1110
+    to: Q_SO_PADROES_DE_MERCADO
+    edge_type: SUPPORTS
+  - from: C_SO_BATUTA_V1_1110
+    to: C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL
+    edge_type: SUPPORTS
+  - from: C_SO_BATUTA_V1_1110
+    to: D_SO_MECANISMO_EM_DEGRAUS
+    edge_type: SUPPORTS
   - from: E_SO_JANELA_DE_2026_11_03
     to: C_SO_TRES_PAPEIS
     edge_type: SUPPORTS
