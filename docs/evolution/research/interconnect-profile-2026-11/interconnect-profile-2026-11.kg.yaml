@@ -40,6 +40,12 @@ nodes:
     label: "A1 Envelope: CloudEvent 1.0.2 em JSON assinado por JWS compacto com os bytes do evento como payload, sem canonicalização; typ explícito, um algoritmo por chave, rotação por kid; claims iss, aud, iat, exp e jti obrigatórios."
     narrative: "RS256 hoje, Ed25519 (RFC 9864) como rampa; o DSSE do CloudEvents fica de vigia. A autoria vem só do JWS: o jti identifica a entrega e o id do CloudEvent identifica o evento. Os claims seguem o que o gate já exige (RFC 8725 §3.9)."
     trace: "PROFILE.md, seção A1"
+    x_term:
+      pref: "Seção A1 do perfil de interconexão: Envelope"
+      notation: "A1"
+      scheme: interconnect-profile
+      lang: pt-BR
+      definition: "Seção A1 (Envelope) da Parte A do perfil de interconexão v1 do Onion, em PROFILE.md desta pasta."
   - id: C_INTERCONNECT_A2_VERSIONING_1110
     node_type: claim
     layer: audit
@@ -52,6 +58,12 @@ nodes:
     label: "A2 Versão: a major vive no type (dev.onion.<x>.v1) com um JSON Schema 2020-12 por major; o legado é a major 0 por binding; o receptor aceita N e N-1 e recusa explicitamente major desconhecida."
     narrative: "Major 0 no HTTP e no socket é o envelope A2A de hoje, sem type; no git é o sinal do doc-bridge sem JWS, cuja autoria vem da revisão do commit no destino. A partir da v1 o co-relay e o co-deliver assinam. Campo desconhecido só é tolerado dentro do payload assinado, preservando a defesa de forma fechada do gate; sem crit na Parte A. As duas cópias do gate (core e fila) mudam no mesmo movimento com conferência byte a byte no CI. Antes do schema, o registro de membros ganha leitor único no core no lugar dos 24 parsers."
     trace: "PROFILE.md, seção A2"
+    x_term:
+      pref: "Seção A2 do perfil de interconexão: Versão e evolução"
+      notation: "A2"
+      scheme: interconnect-profile
+      lang: pt-BR
+      definition: "Seção A2 (Versão e evolução) da Parte A do perfil de interconexão v1 do Onion, em PROFILE.md desta pasta."
   - id: C_INTERCONNECT_A3_BINDINGS_1110
     node_type: claim
     layer: audit
@@ -64,6 +76,12 @@ nodes:
     label: "A3 Bindings: validade de entrega por canal (HTTP vivo e socket local até 1 h, git-async e pull até 7 dias), exp julgado só no aceite, recibo de aceite assinado pelo receptor e dedupe por (iss, source, id) com retenção de 8 dias."
     narrative: "O recibo assina iss, source, id, body_sha256, accepted_at e o kid usado; a verificação histórica confere recibo e hash, nunca o iat do remetente. Kid revogado antes do accepted_at é recusa; depois não invalida o que entrou. Sinal antigo sem recibo fica marcado histórico sem recibo. O jti vira proveniência e o arquivo só de append do gate migra para a dedupe. O frontmatter do doc-bridge mapeia os atributos do CloudEvent (dialeto único)."
     trace: "PROFILE.md, seção A3"
+    x_term:
+      pref: "Seção A3 do perfil de interconexão: Bindings, validade, dedupe e recibo"
+      notation: "A3"
+      scheme: interconnect-profile
+      lang: pt-BR
+      definition: "Seção A3 (Bindings, validade, dedupe e recibo) da Parte A do perfil de interconexão v1 do Onion, em PROFILE.md desta pasta."
   - id: C_INTERCONNECT_A4_CLASSIFICATION_1110
     node_type: claim
     layer: audit
@@ -76,6 +94,12 @@ nodes:
     label: "A4 Classe: onionclass (public, internal, confidential, unclassified) vira extensão dentro do evento assinado; legado vale unclassified; confidential só circula no mesmo host pela fila até a Parte B, nunca entre máquinas nem por git."
     narrative: "A classe é obrigatória a partir da v1 e uma catraca conta os unclassified, número que só pode cair. Para confidential: o gate veta no binding git sem a exceção por repo privado, uma guarda de lint recusa commit com a classe, o aceite grava só um ponteiro num razão local fora do repo, e o corpo é apagado da fila no ack mais 8 dias, ficando o recibo."
     trace: "PROFILE.md, seção A4"
+    x_term:
+      pref: "Seção A4 do perfil de interconexão: Classe de confidencialidade"
+      notation: "A4"
+      scheme: interconnect-profile
+      lang: pt-BR
+      definition: "Seção A4 (Classe de confidencialidade) da Parte A do perfil de interconexão v1 do Onion, em PROFILE.md desta pasta."
   - id: C_INTERCONNECT_A5_STATES_OPS_1110
     node_type: claim
     layer: audit
@@ -88,6 +112,12 @@ nodes:
     label: "A5 Estados e operação: cada mensagem passa por enfileirada, entregue, lida (testemunho do par), processada e dead-letter; mensagem é dado, nunca ordem; um comando mostra o estado, sem painel web."
     narrative: "Mensagem é dado com as quatro condições: remetente autenticado, marcada como não-usuário, sem autoridade e portões mantidos."
     trace: "PROFILE.md, seção A5"
+    x_term:
+      pref: "Seção A5 do perfil de interconexão: Estados e operação"
+      notation: "A5"
+      scheme: interconnect-profile
+      lang: pt-BR
+      definition: "Seção A5 (Estados e operação) da Parte A do perfil de interconexão v1 do Onion, em PROFILE.md desta pasta."
   - id: Q_INTERCONNECT_PART_B_STUDY_1110
     node_type: question
     layer: audit
