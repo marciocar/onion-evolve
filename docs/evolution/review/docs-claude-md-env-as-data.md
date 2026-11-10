@@ -2,7 +2,8 @@
 branch: docs/claude-md-env-as-data
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dcb1d989bc345e81cc93f1214f38f7c0adc088a8b29a719407467586d1c77cb6
+reviewed_code_sha256: 511261daa398e87387bc754c3bfa4314641d531d0d53c7078d630e9a4f8fbcba
 findings_total: 3
 findings_real: 2
 findings_blocking: 0
