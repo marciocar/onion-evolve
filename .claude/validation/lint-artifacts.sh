@@ -6625,6 +6625,45 @@ check_private_name_diff() {
 }
 check_private_name_diff
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 121 — Grafo novo ou tocado não cita repositório não conferível por terceiro [SOFT + HARD na catraca]
+# previne: o core público ganhar mais uma citação, por URL ou por repo@sha, de repositório privado ou inalcançável.
+# aplica-se: source
+#   DANO MEDIDO (2026-11-10, kg-ssot, E_CORE_PUBLIC_CITES_PRIVATE_REPOS_1110): público desde 2026-10-13, o core tinha
+#   43 nós com provenance.source em URL de repo privado ou inalcançável (47 com trace e narrative), e nada barrava o
+#   próximo. Decisão do maestro, «Guarda + omitir no futuro»: AVISO no grafo novo ou tocado; citação futura omite URL
+#   e hash, com a classe «não conferível por terceiro»; o histórico fica. Visibilidade pela lista versionada
+#   docs/evolution/federation/public-repos.tsv (o CI não usa rede; fica fora do que viaja); o passivo (209 pares nó/repo, por URL e por repo@sha) está no baseline e
+#   só cai: crescer vs origin/main é HARD. Lógica, vocabulário e teto em private-repo-cite-check.sh; grafo
+#   guard-private-repo-cite-2026-11.
+check_private_repo_cite() {
+  _na_for_role && return 0
+  local helper="${SCRIPT_DIR}/private-repo-cite-check.sh"
+  local _R="REGRA 121 (Grafo novo ou tocado não cita repositório não conferível por terceiro)"
+  if [ ! -f "${helper}" ]; then violation "HARD" "${helper}" "${_R}: a guarda sumiu da fonte"; return 0; fi
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/private-repo-cite-check.sh|*/public-repos.tsv|*/private-repo-cite-baseline.txt|*/lint-artifacts.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    case "${_path}" in /*) : ;; *) _path="${REPO_ROOT}/${_path#./}" ;; esac
+    violation "${_sev:-SOFT}" "${_path}" "${_R}: [${_code}] ${_msg}"
+  done <<< "${_out}"
+  # rc 1 = catraca (já emitida acima); rc >= 2 = a guarda declarou que NÃO pôde julgar, e isso não é aprovação
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_private_repo_cite
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
