@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1057 itens abertos** em 163 grafo(s) com aberto (de 211 no escopo) · 157 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1060 itens abertos** em 164 grafo(s) com aberto (de 212 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1350,6 +1350,14 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
+
+## private-repo-cite-2026-11 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA` | private-repo-cite-2026-11 | no core público, grafo novo ou tocado que cita repo privado ou inalcançável por URL ou repo@sha sai com aviso no lint, e o pass |
+| 4.5 | `C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA` | private-repo-cite-2026-11 | teto: repo de terceiro que fechou, nome nu fora do registro, gist, GitLab, 'commit abc1234' em prosa, sha sem nome, grafo fora do  |
+| 4.2 | `C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR` | private-repo-cite-2026-11 | a classe «não conferível por terceiro» hoje é texto no provenance.source; nenhum leitor do kg-ssot a imprime nem a conta, e o |
 
 ## dissect-forge-2026-10 — 2 item(ns)
 
