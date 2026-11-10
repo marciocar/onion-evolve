@@ -26,7 +26,9 @@
 # de progresso (heartbeat timeout do Temporal, visibility timeout do SQS, task heartbeat do Airflow), nunca pela
 # frase de quem trabalha. Aqui a prova é o que o git e o forge registram: thread e merge levam a IDADE da última
 # atividade (commit ou arquivo tocado na worktree; updatedAt do PR) e, a partir de --idle-hours (default 4),
-# o estado diz PARADO. É medida de idade, não de intenção: quem espera o maestro também envelhece.
+# o estado diz PARADO. É medida de idade, não de intenção: quem espera o maestro também envelhece. Teto declarado: só
+# conta o que o git VÊ — agente vivo que escreve só em arquivo ignorado ou fora da worktree sai PARADO falso, e o
+# updatedAt do PR sobe também com bot e CI (PR parado pode sair em voo).
 #
 # ── QUEM EXECUTA (coluna actor, pedido do maestro em 2026-10-19) ─────────────────────────────
 # Cada linha diz QUEM faz o ato seguinte e o comando pronto (coluna action). A classe só é dada onde a
@@ -55,7 +57,7 @@
 # Uso:  bash .claude/validation/decide-census.sh [<repo>] [--markdown|--tsv] [--cite <arquivo|->]
 #                                               [--theme "<termos>"] [--window <dias>] [--no-gh]
 #                                               [--foreign-repo <dono/nome>]... [--idle-hours <h>] [--self <sessão>]
-#   --self <sessão>  a dona que esta sessão usa no .claude/utils/orchestration/maestro-ask.sh: a reserva DELA vira faço-eu
+#   --self <id>      o id de SESSÃO desta sessão (default: CLAUDE_CODE_SESSION_ID): a reserva dela vira faço-eu
 # Env (bancada e sandbox; NUNCA para fingir medição — todo override ativo é declarado na saída):
 #   DECIDE_TODAY=<AAAA-MM-DD>   data de referência da janela (default: date +%F)
 #   DECIDE_GH=<binário>         o `gh` a usar (default: gh)
@@ -117,6 +119,9 @@ PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${CITE}" "${CITE_L
   "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" "${FOREIGN}" "${IDLE}" "${SELF}" <<'PY'
 import sys, os, re, json, subprocess, datetime, time
 repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr, foreign, idle_h, self_who = sys.argv[1:15]
+# «EU» é a SESSÃO (o id que o .claude/utils/orchestration/maestro-ask.sh grava), não o nome: --self <id> ou, por padrão, o
+# CLAUDE_CODE_SESSION_ID do Claude Code. Sem nenhum, nenhuma reserva é "minha" (todas saem outro-dono, com o nome)
+self_who = self_who or os.environ.get('CLAUDE_CODE_SESSION_ID', '')
 window, top, idle_h = int(window), int(top), int(idle_h)
 now_s = int(os.environ.get('DECIDE_NOW') or time.time())
 def age_txt(ts):
@@ -496,7 +501,9 @@ for blk in wl.strip().split('\n\n') if wl.strip() else []:
     # IDADE da última atividade: o mais novo entre o commit do HEAD e os arquivos tocados (até 200, para não
     # varrer árvore enorme); nenhum dos dois legível → "idade não medida", nunca "parado"
     stamps = []
-    rc3, ct = git('log', '-1', '--format=%ct', cwd=path)
+    # %at (data de AUTOR), não %ct: rebase e amend renovam a do committer e fariam trabalho velho parecer fresco (achado da
+    # revisão independente de 2026-11-10). O mtime do índice NÃO entra: o próprio `git status` acima o reescreve.
+    rc3, ct = git('log', '-1', '--format=%at', cwd=path)
     if rc3 == 0 and ct.strip().isdigit(): stamps.append(int(ct.strip()))
     if rc1 == 0:
         for x in [x for x in st.split('\n') if x.strip()][:200]:
@@ -570,27 +577,27 @@ if os.path.isdir(_ask_dir):
             if not fn.endswith('.ask'): continue
             try: f5 = open(os.path.join(_ask_dir, fn), encoding='utf-8').read().rstrip('\n').split('\t')
             except OSError: avisos.append(f'pergunta reservada ilegível: {fn}'); continue
-            if len(f5) < 4 or not f5[2].isdigit() or not f5[3].isdigit():
-                avisos.append(f'pergunta reservada fora da forma (chave, dona, desde, prazo): {fn}'); continue
-            asks[f5[0]] = {'owner': f5[1], 'since': int(f5[2]), 'deadline': int(f5[3]), 'q': f5[4] if len(f5) > 4 else ''}
+            if len(f5) < 5 or not f5[3].isdigit() or not f5[4].isdigit():
+                avisos.append(f'pergunta reservada fora da forma (chave, dona, sessão, desde, prazo): {fn}'); continue
+            asks[f5[0]] = {'owner': f5[1], 'session': f5[2], 'since': int(f5[3]), 'deadline': int(f5[4]), 'q': f5[5] if len(f5) > 5 else ''}
         ask_desc = f'{len(asks)} reservada(s)'
     except OSError as e:
         avisos.append(f'registro de perguntas ao maestro ilegível ({clip(e, 80)}) — donas NÃO medidas'); ask_desc = 'NÃO MEDIDO'
 def _iso(t): return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
 for k, a in sorted(asks.items()):
     live = a['deadline'] > now_s
-    mine = bool(self_who) and a['owner'] == self_who
+    mine = bool(self_who) and a['session'] == self_who
     if live and mine: actor, act = 'faço-eu', f'é sua: pergunte ao maestro e, selado, feche com `bash .claude/utils/orchestration/maestro-ask.sh release {k} --owner {a["owner"]} --resolution "…"`'
     elif live: actor, act = 'outro-dono', ''
     else: actor, act = 'faço-eu', f'VENCIDA: confiro com {a["owner"]} se ainda está com ela; sem resposta, assumo com `bash .claude/utils/orchestration/maestro-ask.sh claim {k} --owner <sessão> --takeover`'
     ask_rows.append({'kind': 'ask', 'ref': k, 'origin': a['owner'],
-                     'label': clip(f"pergunta ao maestro de {a['owner']} desde {_iso(a['since'])}, prazo {_iso(a['deadline'])}" + (f": {a['q']}" if a['q'] else ''), 220),
+                     'label': clip(f"pergunta ao maestro de {a['owner']} (sessão {a['session']}) desde {_iso(a['since'])}, prazo {_iso(a['deadline'])}" + (f": {a['q']}" if a['q'] else ''), 220),
                      'state': 'viva' if live else 'VENCIDA', 'via': 'ask', 'options': '', 'pri': 6 if live else 2, 'imp': 0,
                      'actor': actor, 'action': act})
 # a linha seal diz a DONA da pergunta: com dona viva em outra sessão, não se pergunta de novo — leva-se o id
 for r in seal_rows:
     a = asks.get(f"{repo_name}#{r['ref']}")
-    if a and a['deadline'] > now_s and not (self_who and a['owner'] == self_who):
+    if a and a['deadline'] > now_s and not (self_who and a['session'] == self_who):
         r['actor'] = 'outro-dono'; r['ask'] = f"reservada por {a['owner']} até {_iso(a['deadline'])}: não pergunte, leve o id a ela"
     elif a:
         r['ask'] = f"reservada por {a['owner']}" + (' (VENCIDA)' if a['deadline'] <= now_s else ' (sua)')
@@ -621,7 +628,7 @@ KH = {'checkpoint': 'checkpoint pendente — BLOQUEIA (P0.5 do /meta:drive: o lo
       'seal': 'seal — nós decision/question abertos (candidatos a selo; o FILTRO decide se são do maestro)',
       'thread': 'thread — worktrees com trabalho não commitado ou não empurrado',
       'triage': 'triage — inbox/inbound/kg-inbox com itens não processados',
-      'ask': 'ask — perguntas ao maestro com dona (uma sessão por chave; a vencida se assume com --takeover; sem --self <dona>, a reserva desta sessão também sai outro-dono)',
+      'ask': 'ask — perguntas ao maestro com dona (uma sessão por chave; a vencida se assume com --takeover; «eu» é o id da sessão, de --self ou do CLAUDE_CODE_SESSION_ID)',
       'signal': 'signal — sinais da campainha sem ack'}
 print(f'# decide-census · {today} · {len(rows)} linha(s) em voo')
 print(f'fontes: grafos={len(graphs)} · nós decision/question open={len(open_nodes)} · janela={base_desc} · '

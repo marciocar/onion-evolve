@@ -2,18 +2,17 @@
 branch: feat/batuta-mechanical
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: a61a27416046269aefb77984a99808dcb3fb1e70b1cf898f289efacf810ce785
-reviewed_code_sha256: 23470c74821a416995f6e27f50052cc00504307370b66a46bda32b2b5574e93e
-findings_total: 15
-findings_real: 15
-findings_blocking: 1
+reviewed_diff_sha256: pendente
+findings_total: 21
+findings_real: 21
+findings_blocking: 3
 tokens: 0
-duration_min: 82
-findings_fixed: 10
-verdict: FIXED
-elenxo: false
-reviewer: "a própria sessão construtora, em passada adversarial sobre o diff e sobre os chamadores (o brief proíbe criar agentes, então não houve refutador independente)"
-nota: "tokens não medido (0): a sessão não tem o contador do próprio run; duration_min medido pela idade da worktree (82 min, com a re-revisão das N vagas). Sem refutador independente: o brief do maestro proíbe criar agentes, e a passada é da construtora, o que pesa contra ela."
+duration_min: 140
+findings_fixed: 16
+verdict: REJECTED_AND_FIXED
+elenxo: true
+reviewer: "revisão independente encomendada pela sessão principal (REJECTED no a19e127, 2 bloqueios e 4 pontos), mais a passada da própria construtora antes dela"
+nota: "tokens não medido (0): a sessão não tem o contador do próprio run; duration_min pela idade da worktree (140 min, com as duas re-revisões). A 1ª passada foi da construtora; a 2ª, independente, reprovou e foi curada ponto a ponto, com caso e mutante."
 ---
 
 # Passada adversarial: `feat/batuta-mechanical`
@@ -92,14 +91,39 @@ Diff novo depois do 1º fechamento. A sessão principal mediu às 13:35 UTC: 4 p
 `ONION_LOAD_SLOT_CPUS=2` é estimativa inicial, sem medida: calibra-se pela série dos donos, e a refutação está no
 nó. A régua de admissão (15/12 + PSI 30) não mudou.
 
+## Re-revisão: revisão independente, REJECTED no `a19e127`
+
+16. **BLOQUEIA, curado.** O N limitava o **índice** da vaga, não o número de donos. Com as vagas 1 a 3 tomadas e
+    N = 1, uma 4ª entrava na vaga 0, e 4 passos rodavam juntos. A cura varre todas as `SLOTS_MAX` vagas sob uma trava
+    de admissão (`admit.lock`), conta as tomadas e só entra com tomadas < N. O caso `(r)` segura as vagas 1 a 3. A
+    medida do revisor foi reproduzida já curada: rc 4 com N = 1, e com N = 4 o 4º dono entra.
+17. **BLOQUEIA, curado.** A admissão da bancada rodava antes de ler os argumentos, então `--list`, `--checkpoint` e
+    `--dry-run` esperavam vaga e saíam rc 4 sem rodar nada. O checkpoint do pre-commit esperaria até 30 min. Agora o
+    modo sem execução (`--list`, `--map`, `--dry-run`, `--checkpoint`) passa direto. O caso `(t)` roda a bancada real
+    copiada para uma sandbox, com a vaga tomada.
+18. **Real, curado.** Pressão de CPU ilegível com o sinal ligado era «ocupado para sempre»: num kernel sem
+    `/proc/pressure`, todo fechamento morreria no teto. Agora é «não medido», dito, e a admissão cai na carga (caso `(s)`).
+19. **Real, curado.** A idade da worktree usava `%ct`, que rebase e amend renovam. Passou a usar `%at` (caso `(f)` do
+    `batuta_census`). O mtime do índice ficou de fora, porque o próprio `git status` do censo o reescreve. O falso
+    PARADO de arquivo ignorado e o `updatedAt` mexido por bot ficam declarados na doutrina e no cabeçalho do censo.
+20. **Real, curado.** A dona era nome livre, e duas sessões `core` se renovavam uma à outra. A identidade passou a ser
+    o id da sessão (`--session` ou `CLAUDE_CODE_SESSION_ID`); sem ele, rc 2 (casos `(f)` e `(g)` do `maestro_ask`). O
+    censo usa o mesmo id como «eu». Medido: o subagente herda o id da sessão-mãe, então a identidade separa sessões,
+    não agentes. Isso está declarado.
+21. **Real, curado na doutrina.** A vaga é por uid e vale para toda sessão deste usuário nesta máquina. Esse custo
+    está declarado.
+
+O achado 6 da 1ª passada (a reserva própria saindo `outro-dono`) ficou superado pelo 20.
+
 ## Mutantes
 
 Cada caso reprova contra o mutante dele (`_prove_mutation`):
 - `load_lease`: `(o)` duas juntas com carga baixa; `(p)` nenhuma nova com carga alta, nem com vaga solta durante a
   espera; `(q)` N cai a 1 com carga média; `(l)` porta sob a vaga e com a vaga alheia; `(m)` guarda do laço; `(n)` ligação da bancada, dos
   mutantes, do `pr-finalize` e do pré-voo;
-- `maestro_ask`: casos `(a)` a `(e)`;
-- `batuta_census`: casos `(a)` a `(e)`.
+- `maestro_ask`: casos `(a)` a `(g)`;
+- `batuta_census`: casos `(a)` a `(f)`;
+- `load_lease`, depois da revisão independente: `(r)` donos contados, `(s)` pressão de CPU ilegível e `(t)` `--list` sem esperar vaga.
 
 A família `decide` segue verde, com os casos `(l)` e `(o)` ajustados à coluna `ask` nova no fim do TSV. Nenhum
 consumidor lê esse TSV por posição (medido por grep).
