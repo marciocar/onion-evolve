@@ -2,7 +2,8 @@
 branch: docs/maestro-decisions-1110
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 53362d33694e506cf27994630233d78f8b6b5822639a305a7f8b72fb4ba6ca84
+reviewed_code_sha256: 26d06bbac46472c311d17ee206f76545abd36c411da2b1e315f5a9c0df8e13d3
 findings_total: 4
 findings_real: 3
 findings_blocking: 0
