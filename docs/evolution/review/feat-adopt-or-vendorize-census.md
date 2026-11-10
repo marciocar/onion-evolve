@@ -3,11 +3,10 @@ title: 'Resíduo — doutrina do estado da peça e a coluna de peças do mapa de
 branch: feat/adopt-or-vendorize-census
 pr: 1578
 date: 2026-11-10
-reviewed_diff_sha256: 1405a3619f23a171db1da415934ca64af7bc5f58d8c796487ad0c68ad7927978
-reviewed_code_sha256: c7643fa69903ff0f0402a0d580d0d719e7dec6d0d7de947e66f077e42ef9bc7f
-findings_total: 5
-findings_real: 5
-findings_blocking: 2
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
+findings_blocking: 6
 tokens: 60000
 duration_min: 35
 verdict: FIXED
@@ -30,6 +29,22 @@ nota: >-
 2. **O `/meta:adopt` passava de 800 linhas** com a linha que citava a doutrina (REGRA 5 (Limites de
    linhas)). A linha saiu; a doutrina é citada pela `PIECES.md` e pelo nó
    `E_INTERCONNECT_PIECES_COLUMN_1110`.
+
+## Revisão do PR #1578 (revisor separado): quatro curas antes do merge, todas feitas
+
+6. **Postura de segurança no público.** A `PIECES.md` levava o detalhe do modo hub da persona com
+   arquivo e linha de um repo privado, o `proto: 1` não conferido com linhas, e a contagem de unidades
+   da fila por usuário com o nome antigo. Trocados por «risco nomeado no mapa local», sem arquivo:linha.
+7. **Número do custo do kg-ssot.** O «63» saiu de `git log --since=2026-10-10`, que sem hora corta na
+   hora atual do dia e por isso muda ao longo do dia (61 às 15:20 UTC). Com a meia-noite explícita
+   (`--since='2026-10-10 00:00:00 +0000'`, `origin/main`) são **64**; a doutrina e a `PIECES.md` levam o
+   64 com o comando ao lado.
+8. **Lacuna da doutrina.** O «se mostrar diferente» do maestro não tinha gatilho próprio: entrou a
+   **reclassificação** (evidência medida de que a peça é outra coisa do que se pensava), distinta de
+   função nova.
+9. **Locator do selo.** O locator de `D_PIECE_STATE_DOCTRINE_1110` passou a ser a pergunta literal feita
+   ao maestro: «Sigo com doutrina mais coluna no mapa, nessa forma enxuta, ou você quer outra forma?». A
+   resposta verbatim ficou como estava.
 
 ## LIMITE declarado (não bloqueia)
 

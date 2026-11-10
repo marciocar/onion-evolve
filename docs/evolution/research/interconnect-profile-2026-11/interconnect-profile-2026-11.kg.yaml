@@ -206,7 +206,7 @@ nodes:
     verified_at: "2026-11-10"
     verified_against: "PIECES.md desta pasta: estado e transição proposta de 10 peças, medidos por git sem fetch nas refs que o arquivo declara (core em origin/main de 2026-11-10, mensageria b9b7f5c, bridge 92079ae); contagens refeitas por comando simples nesta passada"
     label: "A coluna de estado das peças propõe adotar o bridge e a mensageria, vendorizar com carimbo o gate A2A para a fila, fixar a fila por versão nos membros, adotar a operação da persona no hub depois do piloto, e deixar o kg-ssot como está."
-    narrative: "Gatilhos medidos: o bridge roda em produção pelo core (15 arquivos de operação o citam), fora do registro, com 34 de 34 commits próprios da janela de 30 dias vindos de sessão do core; a mensageria tem 25 de 25; o gate A2A tem blob idêntico nas duas cópias e é lido pelo código do bridge; o daemon da fila roda em três membros sem versão publicada. A persona só muda depois do selo da arquitetura multiaudiência e do piloto de 17/11, com o risco do modo hub nomeado. Nenhuma transição é ato: cada uma passa pelo /meta:decide."
+    narrative: "Gatilhos medidos: o bridge roda em produção pelo core (15 arquivos de operação o citam), fora do registro, com 34 de 34 commits próprios da janela de 30 dias vindos de sessão do core; a mensageria tem 25 de 25; o gate A2A tem blob idêntico nas duas cópias e é lido pelo código do bridge; o daemon da fila roda em três membros sem versão publicada. A persona só muda depois do selo da arquitetura multiaudiência e do piloto de 17/11, com o risco do modo hub nomeado no mapa local. Nenhuma transição é ato: cada uma passa pelo /meta:decide."
     trace: "docs/evolution/research/interconnect-profile-2026-11/PIECES.md"
     provenance:
       source: "docs/evolution/research/interconnect-profile-2026-11/PIECES.md"
@@ -226,7 +226,7 @@ nodes:
     narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Siga com doutrina e coluna no mapa, nos criterios da doutrina deve também entrar a opção de promoção ou troca, afinal, uma peça exclusiva pode virar para outros adotantes ou clientes ou funções com o tempo ou se mostrar diferente? entende e concorda?» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Forja completa com medidor, bancada e grafo próprios»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-10: «Mecanismo para identificar peças a adotar ou vendorizar: seguir com doutrina e coluna no mapa?»"
+      locator: "pergunta com opções de 2026-11-10: «Sigo com doutrina mais coluna no mapa, nessa forma enxuta, ou você quer outra forma?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
       locality: "pessoa"
 edges:

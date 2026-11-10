@@ -41,6 +41,7 @@ Os estados se combinam: o kg-ssot é **adotado** (repo e sessão próprios) e ch
 | **função nova** | adotada ou porta | a peça passa a cumprir um papel que não tinha (outro canal, outro público) |
 | **padrão de mercado que cobre** | troca | o padrão faz o mesmo papel medido na bancada da peça, com ida e volta |
 | **dívida sem dono** | adotada | a peça roda em produção ou tem dívida aberta, e quem escreve nela não é o dono da especificação (commits da peça vindos de sessão do core) |
+| **reclassificação** | o estado que a evidência mostrar, nos dois sentidos | evidência medida de que a peça **é outra coisa** do que se pensava (o «se mostrar diferente» do maestro): não ganhou função, foi mal classificada. Ex.: o que se tratava como ferramenta interna é na verdade um contrato que três repos consomem |
 | **perda de consumidores** | rebaixamento | o último consumidor saiu |
 
 **Sem gatilho, a peça fica como está.** O estado não muda por simetria, por elegância nem por antecipação.
@@ -51,8 +52,8 @@ ato, que é do `/meta:adopt`, de uma publicação ou de um PR de vendor.
 
 O kg-ssot nasceu como maquinaria do core e foi **promovido**: repo e sessão próprios desde 2026-10-06,
 semver, schemas e suíte de conformidade, e a volta ao core por `vendor/kg-ssot/tools/kg_vendor.py`, com o
-carimbo `vendor/kg-ssot/.kg-ssot-version` (sha256 por arquivo) e check. **O custo, declarado:** 63 commits
-de vendor no core desde 2026-10-10 (`git log --since=2026-10-10 -- vendor/kg-ssot`), uma sessão a mais para
+carimbo `vendor/kg-ssot/.kg-ssot-version` (sha256 por arquivo) e check. **O custo, declarado:** 64 commits
+de vendor no core desde 2026-10-10 (`git log --oneline --since='2026-10-10 00:00:00 +0000' origin/main -- vendor/kg-ssot | wc -l`, medido em 2026-11-10; sem a hora, o `--since` corta na hora atual do dia e devolve menos), uma sessão a mais para
 manter, e a diretriz de independência do produto (`D_KG_SSOT_INDEPENDENTE_DE_HARNESS`, no grafo do próprio
 kg-ssot), que proíbe o contrato de depender do Claude Code. A promoção se paga quando os consumidores pagam
 esse custo; quando não pagam, o rebaixamento é a resposta certa, não a vergonha.
