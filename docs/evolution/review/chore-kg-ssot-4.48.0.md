@@ -1,9 +1,8 @@
 ---
 branch: chore/kg-ssot-4.48.0
-pr: pendente
+pr: 1572
 date: 2026-11-10
-reviewed_diff_sha256: aa4c4dd8c0a81b29b797070ad2ef9b277ea9c131dc54f34401b4b0fd045f6952
-reviewed_code_sha256: 1def9cb80fbe844bf9e10a66dcade807076c3d13d5db287f4b6011b3fb3f78ea
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
@@ -35,6 +34,9 @@ nota: "tokens 0 = não medido. Vendor do kg-ssot 4.48.0 e o fechamento por medi�
    medição própria: a bancada `AreaFilterTests` da tag rodou 25 testes com rc 0 (as cinco ferramentas e um
    mutante por ferramenta); `E_AREA_FILTER_BENCH_1109` existe na `main` do par (rc 0); `kg_mcp.py` e `kg_query.py`
    do vendor são byte a byte os da tag; a tag está no git e no espelho; o PyPI e o npm latest dão 4.48.0.
+   **Atualização (2026-11-10):** o PR #386 entrou na `main` do kg-ssot (merge `e6cdc3d2`). Depois do `git fetch`,
+   o `peer-ref-check` dá rc 0 nos dois nós, na `origin/main` @ `653597d8`, e `Q_AREA_FILTER_READ_SURFACE_1120` está
+   `done`. Os dois entraram no nó como prova do par, ao lado da medição, e saiu a frase sobre o PR aberto.
 2. **Grafo que já reprovava o contrato.** `kg-contract-check.sh` sobre `docs/onion/graph/*.kg.yaml` reprova
    `inference-contract-audit-2026-07.kg.yaml` (nó confirmed sem provenance). A reprovação é a mesma com o vendor
    4.47.0 na `main`, então não vem desta subida. Fica fora do escopo e está registrada aqui.
