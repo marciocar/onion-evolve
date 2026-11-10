@@ -283,6 +283,7 @@
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/rules/dissect-lens.md	C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
+.claude/rules/kg-grammar.md	C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/rules/kg-grammar.md	C_TETO_DATAS_ISO_SEM_ASPAS	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/rules/kg-grammar.md	C_TETO_PERFIL_YAML_E_DO_CONTRATO	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/rules/research-lens.md	E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
@@ -704,6 +705,7 @@
 .claude/validation/lint-selftest.sh	E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_JUIZES_SEM_SUPERACAO_MEDIDO	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_MAPA_SEM_MERGE_ONION_HOOKS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
+.claude/validation/lint-selftest.sh	E_MUTANTES_DO_VOCABULARIO_MORDEM	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTANTES_MORDEM	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTANTES_MORDEM	docs/evolution/research/guard-private-names-2026-11/private-names-2026-11.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
@@ -746,6 +748,8 @@
 .claude/validation/private-name-check.sh	D_DERIVA_DA_MAQUINA_E_JULGA_O_DIFF	docs/evolution/research/guard-private-names-2026-11/private-names-2026-11.kg.yaml
 .claude/validation/private-name-check.sh	E_FALSO_POSITIVO_MEDIDO_NA_HISTORIA	docs/evolution/research/guard-private-names-2026-11/private-names-2026-11.kg.yaml
 .claude/validation/private-name-check.sh	E_SELO_DE_1104_CITOU_O_REPO_DO_CLIENTE	docs/evolution/research/guard-private-names-2026-11/private-names-2026-11.kg.yaml
+.claude/validation/private-repo-cite-check.sh	C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
+.claude/validation/private-repo-cite-check.sh	D_CHECK_DE_LINT_COM_CATRACA_E_LISTA_OFFLINE	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/validation/projection-safety.sh	C_TETO_VOCABULARIO_E_LABEL	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	C_soberania_engajamento	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
@@ -1654,6 +1658,7 @@ docs/evolution/federation/outbox/metagamify/_processed/2026-06-27-s1-toolbox-res
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md	C_ANNOUNCE_BACKLOG	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-27-resposta-base-cruzada-vendor.md	C_test_is_ancestry	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 docs/evolution/federation/outbox/onion-curation/2026-11-08-respostas-do-core-onda-2.md	E_CS_ONDA2_RESPOSTAS_DO_CORE_1108	docs/onion/graph/curation-seals-2026-11.kg.yaml
+docs/evolution/federation/public-repos.tsv	D_VOCABULARIO_DO_NOME_NU_POR_TRES_FONTES	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 docs/evolution/inbox	E_DEZ_SINAIS_TRIADOS_COM_MEDICAO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md	C_D7_14	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md	C_D7_12	docs/onion/graph/onion-evolution-2026-07.kg.yaml
