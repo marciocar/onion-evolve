@@ -143,11 +143,11 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-10"
     verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Sim, já»"
-    label: "A colheita das ideias do OpenClaw para a fila A2A começa já, sem esperar a Fase 2 da conexão VPS↔notebook."
+    label: "As três regras colhidas do OpenClaw (reconexão que só estreita o escopo, allowlist que falha fechada, aprovação que exige o escopo de quem aprova) entram já no onion-queue, com teste de mutante, sem esperar a Fase 2."
     narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Sim, já»; descartadas: «Junto da Fase 2»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-10: «Colher agora as ideias do OpenClaw para a fila A2A, ou junto da Fase 2?»"
+      locator: "pergunta com opções de 2026-11-10: «A colheita do OpenClaw serve para qualquer caminho: reconexão que só estreita o escopo, allowlist que falha fechada e aprovação que exige o escopo de quem aprova. Entram já como regra do onion-queue, com teste de mutante?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
       locality: "pessoa"
 edges:
