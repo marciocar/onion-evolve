@@ -9,8 +9,8 @@ findings_blocking: 1
 tokens: 0
 duration_min: 60
 findings_fixed: 5
-verdict: CORRIGIDO
-elenxo: nao
+verdict: FIXED
+elenxo: false
 reviewer: agente de execução da sessão do core (passada própria, não independente; o brief proibiu subagente)
 nota: "tokens 0 = não medido. Nenhum nome de repo privado entra em claro no diff: a lista guarda o nome nu por hash, o baseline guarda o repo por hash, e a bancada usa nomes inventados."
 ---
