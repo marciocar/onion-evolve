@@ -695,9 +695,14 @@ if [ "${MODE}" = "manifest" ]; then
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done <<< "${_cmd_out}"
   # Os companheiros SÓ podem ser derivados DEPOIS dos dois cortes acima: eles são definidos pelo que
   # já saiu. Ordem invertida = nenhum comando cortado ainda = nenhum companheiro achado, em silêncio.
-  while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(
-    for local_p in "${_spec[@]}"; do case "${local_p}" in ':(exclude)'*) printf '%s\n' "${local_p#:(exclude)}" ;; esac; done \
-      | _emit_companion_excludes "${REPO}" "${ROLE}")
+  # O rc dos companheiros também É LIDO (2026-11-10, revisão do PR #1578): `< <(…)` engolia o estouro da
+  # função, e qualquer falha nela (`set -u`, git, array) soltava TODOS os companheiros sem aviso — a mesma
+  # classe do corte de comandos acima, medida aqui quando uma peça órfã derrubou o derivador.
+  _comp_out="$(for local_p in "${_spec[@]}"; do case "${local_p}" in ':(exclude)'*) printf '%s\n' "${local_p#:(exclude)}" ;; esac; done \
+      | _emit_companion_excludes "${REPO}" "${ROLE}")" || {
+    echo "ERRO: a derivação dos companheiros (_emit_companion_excludes) falhou para o papel '${ROLE}' — o manifesto NÃO sai sem ela: um pacote assim levaria os companheiros de todo comando cortado" >&2
+    exit 3; }
+  while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done <<< "${_comp_out}"
   # A exclusão de IDENTIDADE vale nos três papéis: quem o bundle NOMEIA não é assunto de quanta
   # fábrica ele leva. Mas a POSIÇÃO dela não é estética — ela entra DEPOIS da guarda de
   # precondição abaixo, e a razão é um fail-open que a bancada pegou em 2026-09-17.

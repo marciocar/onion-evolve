@@ -3,11 +3,10 @@ title: 'Resíduo — doutrina do estado da peça e a coluna de peças do mapa de
 branch: feat/adopt-or-vendorize-census
 pr: 1578
 date: 2026-11-10
-reviewed_diff_sha256: b79380cdfdcf6f1ecba05148c684f14ea0a1e3f5a6ffeaf11bc43d59f81380d1
-reviewed_code_sha256: 247fbd0eccdade1004b782dd9481527d24b4fe3ca37bd17815638f3af97a7050
-findings_total: 10
-findings_real: 10
-findings_blocking: 7
+reviewed_diff_sha256: pendente
+findings_total: 11
+findings_real: 11
+findings_blocking: 8
 tokens: 60000
 duration_min: 35
 verdict: FIXED
@@ -57,6 +56,19 @@ nota: >-
     nenhum companheiro de comando cortado saía. Cura: `:-` nas três leituras. Caso novo (m-órfã) na família
     `role_cut`, que reprova contra o manifesto antigo (mutante morto: só ele cai) e passa curado; `role_cut`
     e `publish_release` 77 de 77.
+
+11. **A classe seguia aberta no chamador** (revisão do PR #1578). O manifesto lia os companheiros por
+    `< <( … | _emit_companion_excludes)`, que engole o rc: qualquer outro estouro da função voltaria a soltar
+    todos os companheiros sem aviso. Cura: o rc é lido como o do corte de comandos (`_comp_out="$(…)" ||
+    exit 3`, com mensagem que nomeia a função). Caso (m-rc) na `role_cut`: falha injetada na função ⇒
+    manifesto rc 3 e sem pacote; mutante com o rc engolido morto (só ele cai). `role_cut` e
+    `publish_release` 78 de 78; o manifesto real do standalone segue sem as duas peças de publicação, e o
+    da source com elas.
+
+**Dano em produção, medido pelo revisor:** nenhum pacote publicado desde 2026-11-05 saiu com companheiro
+indevido: o standalone e o onion-core deram diff de 0 linhas contra o manifesto curado. O fail-open era
+latente: só acendia com uma peça órfã na zona, e a 1ª foi a doutrina deste PR, barrada no CI antes do
+merge.
 
 ## LIMITE declarado (não bloqueia)
 
