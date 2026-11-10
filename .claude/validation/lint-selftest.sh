@@ -56735,17 +56735,19 @@ BC_PY
     printf '%s\nrc=%s' "${out}" "${rc}"
   }
   _bccase() {  # <nome> <OLD> <NEW> <função>
-    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
-    cp "${sut}" "${sb}/c.sh"; "${fn}" "${sb}/c.sh" && rc_i=0
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1 k="${sb}/k/.claude/validation"
+    # a cópia em teste mora numa árvore com o leitor da campainha AO LADO (../utils/co-evolution), como na fonte
+    mkdir -p "${k}" "${sb}/k/.claude/utils/co-evolution"; cp "${bell}" "${sb}/k/.claude/utils/co-evolution/"
+    cp "${sut}" "${k}/c.sh"; "${fn}" "${k}/c.sh" && rc_i=0
     if [ "${rc_i}" = 0 ]; then record_pass "batuta-census: ${name}"; else record_fail "batuta-census: ${name}" "${BC_WHY:-caso não satisfeito}"; fi
-    cp "${sb}/c.sh" "${sb}/m.sh"
+    cp "${k}/c.sh" "${k}/m.sh"
     OLD="${old}" NEW="${new}" python3 -c '
 import os, sys
 p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
 if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
-' "${sb}/m.sh"
-    "${fn}" "${sb}/m.sh" && rc_m=0
-    _prove_mutation "batuta-census: ${name} (MUT)" "${sb}/c.sh" "${sb}/m.sh" "${rc_i}" "${rc_m}"
+' "${k}/m.sh"
+    "${fn}" "${k}/m.sh" && rc_m=0
+    _prove_mutation "batuta-census: ${name} (MUT)" "${k}/c.sh" "${k}/m.sh" "${rc_i}" "${rc_m}"
   }
   # (a) worktree com pendência e sem atividade há mais que o prazo ⇒ PARADO; com prazo enorme ⇒ em voo
   _bc_a() { local a b; a="$(_bcr "$1")"; b="$(_bcr "$1" --idle-hours 100000)"
@@ -56780,6 +56782,17 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
   # (f) a idade é a do AUTOR (%at): o commit rebaseado agora segue velho; com %ct ele sairia em voo
   _bccase "(f) rebase não remoça a worktree: a idade vem da data de autor" \
     "'--format=%at'" "'--format=%ct'" _bc_a
+  # (g) a cópia do censo que viaja SEM o leitor da campainha ao lado (o bundle do plugin) diz «não disponível neste
+  #     papel» e não inventa linha signal — sem citar caminho do core (REGRA 74, CI do PR #1577)
+  local nb="${sb}/nb/.claude/validation" gi=1 gm=1; mkdir -p "${nb}"
+  cp "${sut}" "${nb}/c.sh"; sed "s/^if os.path.isfile(_bell):\$/if True:/" "${sut}" > "${nb}/m.sh"
+  _bc_g() { local a; a="$(env -u ONION_ASK_DIR -u DOORBELL_STATE_DIR -u CLAUDE_CODE_SESSION_ID LC_ALL=C DECIDE_TODAY=2026-10-12 DECIDE_NOW="${NOW}" \
+      DOORBELL_STATE_DIR="${sb}/bell" bash "$1" "${r}" --markdown --no-gh 2>&1)"
+    BC_WHY="$(grep '^fontes' <<< "${a}")"; grep -q 'campainha=não disponível neste papel' <<< "${a}" && ! grep -q '^## signal' <<< "${a}"; }
+  _bc_g "${nb}/c.sh" && gi=0; _bc_g "${nb}/m.sh" && gm=0
+  if [ "${gi}" = 0 ]; then record_pass "batuta-census: (g) sem o leitor ao lado, a campainha é «não disponível neste papel»"
+  else record_fail "batuta-census: (g) sem o leitor ao lado, a campainha é «não disponível neste papel»" "${BC_WHY}"; fi
+  _prove_mutation "batuta-census: (g) sem o leitor (MUT: roda o leitor ausente)" "${nb}/c.sh" "${nb}/m.sh" "${gi}" "${gm}"
   rm -rf "${sb}"
 }
 _family run_batuta_census_selftests
