@@ -1,8 +1,7 @@
 ---
 branch: fix/a2a-notice-cures
 date: 2026-11-10
-reviewed_diff_sha256: 2fd3334beea332233676ae3e4015be4672a4840185200e044f194bfbe3ea609a
-reviewed_code_sha256: 2a3db8f73487eaf8dfde458fb5b8358f585a40385a0ce87fb3880110a64c6732
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 1
 findings_fixed: 1
@@ -38,5 +37,8 @@ antiga fica como está para não mudar a forma que outras leituras conhecem.
   Doc fora do inbox dá «não medido»: o razão não guarda o instante.
 - As duas primárias do grafo (cross-session-messaging e mcp) não foram relidas por esta sessão; vêm do brief. O
   pino 1.32.2 do SDK no doorbell foi lido no `package.json`.
+- Reaberto num commit novo (sem reescrever histórico): `D_A2A_OUTBOUND_IROH_PHASE2_1110` tinha sido selada
+  com «Fase 2 só com iroh»; o maestro pediu a revisão das estimativas antes do selo. O nó volta a `open`, com as
+  três opções nomeadas e sem escolha. Re-revisado: só o grafo mudou; radar 0 e contrato verdes.
 - A pergunta da decisão `D_QUEUE_HARVEST_OPENCLAW_NOW_1110` foi redigida a partir das opções do brief, que não
   trazia o texto exato dela.
