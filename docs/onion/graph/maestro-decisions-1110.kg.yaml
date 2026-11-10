@@ -7,8 +7,8 @@ meta:
   baseline: "2026-11-10"
   review_after: "2026-12-10"
   purpose: "Guardar os selos da rodada do /meta:decide de 2026-11-10 num grafo próprio, no molde do grafo de selos de 2026-11-09. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
-  note: "TETO, declarado: 1 evidência de origem e 6 selos da rodada. Outra decisão nova vai para o grafo do assunto."
-  # ═══ TETO: 8 NÓS ═══
+  note: "TETO, declarado: 1 evidência de origem e 10 selos da rodada (6 da primeira leva e 4 respondidos depois, no mesmo dia). Outra decisão nova vai para o grafo do assunto."
+  # ═══ TETO: 11 NÓS ═══
 nodes:
   - id: E_MD_MAESTRO_ROUND_1110
     node_type: evidence
@@ -19,7 +19,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-10"
     verified_against: "respostas do maestro às perguntas com opções do /meta:decide em 2026-11-10, relatadas no brief deste PR"
-    label: "Em 2026-11-10 o maestro respondeu, por perguntas com opções, a seis questões do /meta:decide."
+    label: "Em 2026-11-10 o maestro respondeu, por perguntas com opções, a dez questões do /meta:decide, em duas levas."
     narrative: "Este nó é a origem comum dos selos do grafo. A pergunta, a escolhida e as descartadas ficam em cada selo."
     provenance:
       source: "sessão do core, 2026-11-10"
@@ -122,6 +122,70 @@ nodes:
       locator: "pergunta com opções de 2026-11-10: «O CLAUDE.md manda carregar o .env com «set -a; source .env», o que EXECUTA o arquivo. O tm.sh diz que nunca carrega nem executa o .env e só o lê como dado. Como resolver a contradição?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
       locality: "pessoa"
+  - id: D_THINKING_METHODS_CATALOG_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Depois»"
+    label: "A forma do catálogo de métodos de pensamento (catálogo fino no core, uma skill por método, execução gravada no grafo por versão) fica para depois."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Depois»; descartadas: «Selar o catálogo fino (Recomendado)» · «Incluir os de gestão já». A forma do catálogo fica para depois; o estudo da curadoria (methods-as-contracts-2026-11, no repositório dela, não conferível por terceiro) fica como registro das 3 rodadas medidas."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Métodos de pensamento, após 3 rodadas medidas com a curadoria: catálogo fino no core, uma skill por método, com família, força da evidência com referência, saída verificável e brief pronto para subagente; a execução vai no grafo por x_method «<id>@<versão>». Selar essa forma?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_THINKING_METHODS_GATE_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Repensar depois»"
+    label: "O gate antes de o catálogo de métodos de pensamento crescer não foi aprovado: o maestro respondeu que vai repensá-lo depois."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Repensar depois» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Aprovar o gate (Recomendado)» · «Só o caso do hub» · «Sem gate»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Gate antes de o catálogo crescer: os casos do hub (fonte → reenquadramento → ângulos → rascunho) e da consultoria (preço) contra a forma livre, com 3 ou mais réplicas por braço, juiz cego e critério pré-registrado, medindo resultado e custo. Ficha que empata e custa mais perde. Aprova?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_PROVENANCE_METHOD_VOCAB_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «discussão de 3 rodadas entre Core KG-SSOT e Curation»"
+    label: "O conserto do vocabulário do provenance.method passa antes por uma discussão de 3 rodadas entre o core, o kg-ssot e a curadoria, conduzida pelo core."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «discussão de 3 rodadas entre Core KG-SSOT e Curation» (resposta livre do maestro, fora das opções oferecidas); descartadas: «kg-ssot define, cada dono migra (Recomendado)» · «Core define e migra tudo» · «Depois». As três sessões (core, kg-ssot e curadoria) discutem em 3 rodadas antes de qualquer mudança no vocabulário ou no corpus; o core conduz a discussão."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «O campo provenance.method dos grafos é texto livre e bilíngue (derivado 44 e derived 251, medição 133 e measurement 235) e 387 nós não têm método. Como consertar?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_PROVENANCE_METHOD_VOCAB_PLAN_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Selar e começar pelo seletor (Recomendado)»"
+    label: "O plano do vocabulário do provenance.method está selado e começa pelo seletor: primeiro quem escreve grava a classe em inglês, depois avisos SHOULD na v4.21 do kg-ssot, o apelido sai no v5.0 e cada dono migra o próprio corpus por lotes."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Selar e começar pelo seletor (Recomendado)»; descartadas: «Selar, sem migrar o corpus» · «Depois». É o fecho da discussão de D_PROVENANCE_METHOD_VOCAB_1110: na rodada 3 as três sessões (core, kg-ssot e curadoria) concordaram com a proposta. O kg-ssot fez dois ajustes, ambos na proposta selada: a ferramenta da migração é o kg_migrate.py, que já existe (nenhuma ferramenta nova), e o kg-ssot migra primeiro, como primeiro adotante."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Vocabulário do provenance.method, após 3 rodadas entre core, kg-ssot e curadoria, com as três de acordo: a lista fechada já existe desde a v4.16 (5 classes, com apelidos em português). Proposta: (1) primeiro o que escreve — o seletor e os geradores do core gravam a classe em inglês; (2) depois, a v4.21 do kg-ssot com avisos SHOULD (apelido em português, proveniência sempre em evidence e decision concluída), MUST só no v5; (3) o apelido sai no v5.0, piso 2027-03-31, só com zero medido no core e na curadoria; (4) cada dono migra o próprio corpus por lotes com o kg_migrate.py (kg-ssot ~1.230, curadoria 7 lotes, core ~5.300 nós em ~10 lotes). Selar?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
 edges:
   - from: D_BROWSER_PHASE1_1110
     to: E_MD_MAESTRO_ROUND_1110
@@ -140,6 +204,18 @@ edges:
     edge_type: TRACES_TO
   - from: D_ENV_FOLLOW_TMSH_1110
     to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_THINKING_METHODS_CATALOG_1110
+    to: D_THINKING_METHODS_RESEARCH_1110
+    edge_type: TRACES_TO
+  - from: D_THINKING_METHODS_GATE_1110
+    to: D_THINKING_METHODS_CATALOG_1110
+    edge_type: TRACES_TO
+  - from: D_PROVENANCE_METHOD_VOCAB_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_PROVENANCE_METHOD_VOCAB_PLAN_1110
+    to: D_PROVENANCE_METHOD_VOCAB_1110
     edge_type: TRACES_TO
 external_edges:
   - from: D_DOC_CONVERTER_PANDOC_1110

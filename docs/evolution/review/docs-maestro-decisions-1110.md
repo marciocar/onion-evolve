@@ -2,26 +2,26 @@
 branch: docs/maestro-decisions-1110
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: d5ba2329235cb38e2f3a2488bda13d72ad1181c5dcbf58185902bc3b29c27ee0
-reviewed_code_sha256: 99ffaa5a334757c968c2b183b242a81e8ab128058fc1963ac7cb2d89e448f3de
-findings_total: 3
-findings_real: 2
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 3
 findings_blocking: 0
 tokens: 0
 duration_min: 0
-findings_fixed: 2
+findings_fixed: 3
 verdict: FIXED
 elenxo: false
 reviewer: passada própria do agente de execução sobre o próprio diff, sem subagente (o brief proíbe criar agentes); gates mecânicos kg-decide-seal (radar --integrity --schema, kg-contract-check, lint de nomes antes×depois), private-repo-cite-check
-nota: "tokens e duração não medidos (0). Seis selos e uma evidência num grafo novo; sem código."
+nota: "tokens e duração não medidos (0). Dez selos e uma evidência num grafo novo, em duas levas; sem código."
 ---
 
 # Passada adversarial: `docs/maestro-decisions-1110`
 
 ## O que muda
 
-- `docs/onion/graph/maestro-decisions-1110.kg.yaml` (novo): a evidência da rodada de 2026-11-10 e os seis selos dela,
-  todos escritos pelo `kg-decide-seal.sh --new`, nunca à mão. Teto declarado de 8 nós.
+- `docs/onion/graph/maestro-decisions-1110.kg.yaml` (novo): a evidência da rodada de 2026-11-10 e os dez selos dela
+  (seis na primeira leva, quatro respondidos depois no mesmo dia), todos escritos pelo `kg-decide-seal.sh --new`, nunca
+  à mão. Teto declarado de 11 nós.
 - `docs/backlog.md`: projeção regenerada (213 grafos no escopo; nenhum aberto novo, porque o grafo só tem selos).
 
 ## Achados
@@ -36,6 +36,13 @@ nota: "tokens e duração não medidos (0). Seis selos e uma evidência num graf
 3. COMPLEMENTO À MÃO NAS NARRATIVES (curado e declarado): o selador não recebe narrative extra. O texto da opção 1 e o
    que a resposta livre acrescenta (D5), e a premissa do pandoc (D2), foram anexados depois do selo, sem tocar a
    escolhida, as descartadas nem a proveniência. Radar e contrato re-rodados depois: rc 0.
+
+4. SEGUNDA LEVA (curado e declarado): quatro selos novos (D7 a D10). D7 liga a `D_THINKING_METHODS_RESEARCH_1110`, D8 a
+   D7, D9 à evidência e D10 a D9, cada um ao nó de onde nasce. D8 e D9 são resposta livre (`--other`). O teto subiu de
+   8 para 11 e o rótulo da evidência passou de seis para dez questões, ambos à mão e declarados no `meta:`. Os
+   complementos de narrative de D7, D9 e D10 entraram depois do selo, nas mesmas regras do achado 3. O estudo da
+   curadoria em D7 é citado só pelo nome, sem URL nem `repo@sha`. Gates re-rodados: radar 0, contrato 0, REGRA 121 sem
+   citação nova, lint de nomes sem achado.
 
 ## Conferências
 
