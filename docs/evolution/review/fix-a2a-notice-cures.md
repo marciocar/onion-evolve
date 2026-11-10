@@ -1,7 +1,8 @@
 ---
 branch: fix/a2a-notice-cures
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 19ce4772bdcbef3b03780330acaf73c42b48cb12b2649a3ea55e470ae1bc5c8b
+reviewed_code_sha256: 5d70043e874a2463b3900db8167c1935421d59770078bc9f0a7ce0343051b63d
 findings_total: 2
 findings_real: 1
 findings_fixed: 1
