@@ -60,7 +60,11 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 - **A vaga é por uid, e esse é o custo.** As vagas moram em `/run/user/<uid>/` (ou `/tmp/…-<uid>`) e valem para
   **toda sessão deste usuário** nesta máquina: core, peers e agentes dividem as mesmas N. Outro usuário (uma equipe
   com conta própria) não entra na conta dela, e a carga que ele gera só aparece pelo load. Outra máquina não vê nada.
-- **A dona separa sessões, não agentes.** Medido: um subagente herda o `CLAUDE_CODE_SESSION_ID` da sessão-mãe.
+- **A dona separa sessões, não agentes.** Medido: um subagente herda o `CLAUDE_CODE_SESSION_ID` da sessão-mãe. Por
+  isso renovar e fechar exigem o mesmo nome e a mesma sessão. Um agente que se apresenta com outro nome na mesma
+  sessão recebe «já tem dona» (rc 3), mas o id sozinho não o separa da mãe: o nome é o que separa.
+- **A contagem de donos vale entre versões novas.** Um `load-lease.sh` da versão anterior, noutra worktree, não pega a
+  `admit.lock` e só tenta as vagas 0 a N−1. Ele pode furar a contagem até todas as worktrees subirem para a `main`.
 - **Parado só vê o que o git vê.** Um agente vivo que escreve só em arquivo ignorado ou fora da worktree sai PARADO
   falso. O `updatedAt` do PR sobe também com bot e CI, e um PR parado pode sair «em voo».
 - **Não junta perguntas iguais com chaves diferentes.** A identidade é a chave escolhida por quem reserva, como no
