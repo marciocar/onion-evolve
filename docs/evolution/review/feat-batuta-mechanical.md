@@ -2,10 +2,9 @@
 branch: feat/batuta-mechanical
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: 91301e07faf5c334c8d4b57f1ff1941ca2ed193cd39304f1ea2e26aa593f9220
-reviewed_code_sha256: 4be2774e35c1eded0b54ccf455a0e883fb8907daea29d2291761f1a9f563439a
-findings_total: 23
-findings_real: 23
+reviewed_diff_sha256: pendente
+findings_total: 24
+findings_real: 24
 findings_blocking: 3
 tokens: 0
 duration_min: 140
@@ -125,6 +124,22 @@ O achado 6 da 1ª passada (a reserva própria saindo `outro-dono`) ficou superad
     nos dois, e a mãe fechou.
 23. **Limite declarado.** Um `load-lease.sh` da versão anterior, noutra worktree, não pega a `admit.lock` e pode furar
     a contagem de donos até todas as worktrees subirem para a `main`.
+
+## Re-revisão: o conflito do auto-rebase no merge
+
+24. **Real, sem defeito.** O auto-rebase do merge parou na base `3994f6f`. O driver das famílias resolveu sozinho um
+    conflito de encaixe no `lint-selftest.sh`: a família nova da `main` (`run_private_repo_cite_selftests`) e as
+    minhas (`run_maestro_ask_selftests`, `run_batuta_census_selftests`) entravam no mesmo ponto, logo depois de
+    `_family run_load_lease_selftests`. A revisão mediu:
+    - o meu diff no arquivo é idêntico, linha a linha, ao revisado;
+    - as cinco famílias envolvidas estão definidas e registradas uma vez cada, sem duplicata nas 332;
+    - as outras peças da branch não mudaram.
+
+    Como a `main` tinha andado mais 10 commits, um deles na família `role_cut`, rebaseei de novo sobre a
+    `origin/main` atual. O único conflito foi a projeção gerada `testing-inventory.md`, regenerada da árvore. O meu
+    diff seguiu idêntico. As 4 famílias da batuta, mais `private_repo_cite` (a vizinha do conflito) e `role_cut` (a que
+    a `main` mudou), passam 213 de 213. As duas projeções que a tentativa de merge deixou no índice foram devolvidas
+    ao estado do commit, porque são regeneráveis e o `pr-finalize` as refaz. Não houve `reset --soft`.
 
 ## Mutantes
 
