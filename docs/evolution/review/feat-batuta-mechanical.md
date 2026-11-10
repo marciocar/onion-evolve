@@ -2,14 +2,13 @@
 branch: feat/batuta-mechanical
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: f960d1230fef04f0026f9ba4626ffe6bfa59f50dade9a2653a2708c5f7db5ca8
-reviewed_code_sha256: a81795d1c5b3c2c2b999bb77e8ba86e7c3fc582242ee1ecddc611325647c4a8b
-findings_total: 24
-findings_real: 24
-findings_blocking: 3
+reviewed_diff_sha256: pendente
+findings_total: 26
+findings_real: 26
+findings_blocking: 4
 tokens: 0
 duration_min: 140
-findings_fixed: 18
+findings_fixed: 20
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: "revisão independente encomendada pela sessão principal (REJECTED no a19e127, 2 bloqueios e 4 pontos), mais a passada da própria construtora antes dela"
@@ -142,6 +141,25 @@ O achado 6 da 1ª passada (a reserva própria saindo `outro-dono`) ficou superad
     a `main` mudou), passam 213 de 213. As duas projeções que a tentativa de merge deixou no índice foram devolvidas
     ao estado do commit, porque são regeneráveis e o `pr-finalize` as refaz. Não houve `reset --soft`.
 
+## Re-revisão: o CI reprovou a `plugin_bundle` (shard 2)
+
+25. **BLOQUEIA, curado.** O `decide-census.sh` estendido citava o leitor da campainha pelo caminho do core
+    (`.claude/utils/co-evolution/...`, nas linhas 22 e 546 do bundle), e o bundle do plugin `onion` leva o censo sem
+    o `co-evolution`. A REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) deu HARD NOVO.
+    A cura segue a 2ª opção da sessão principal. Embarcar foi descartado porque o manifesto só aceita diretório
+    inteiro, e o `co-evolution` levaria junto os carteiros da federação. Agora o censo acha o leitor AO LADO de si
+    mesmo (`../utils/co-evolution/`), e a cópia que viaja sem ele diz «campainha não disponível neste papel». O caso
+    `(g)` do `batuta_census` roda o censo sem o leitor ao lado, e o mutante que roda o leitor ausente cai em «NÃO
+    MEDIDA». Os casos `(a)` a `(f)` passaram a rodar a cópia numa árvore com o leitor ao lado, como na fonte.
+26. **Real, diagnóstico corrigido.** O «novas: `plugins/onion/skills/onion/SKILL.md`» do `(b2)` não veio deste PR. É a
+    última linha da baseline, que o próprio caso remove de propósito para simular a catraca crescendo. O `(b2)`
+    reprovava porque a comparação com a baseline igual saía rc 1, por causa do HARD do achado 25. Este PR não toca o
+    `SKILL.md` nem a baseline (diff de 0 linhas contra a `main`), e a catraca segue em 81.
+
+Na reprodução, a carga da máquina chegou a 35,9 com testes de outro projeto. O lease esperou 181 s e só admitiu a
+bancada com load 11,4: a peça funcionando de verdade. Um defeito meu na adaptação (o aplicador do mutante apontava para
+o caminho velho) abortou a 1ª rodada antes da soma e foi curado.
+
 ## Mutantes
 
 Cada caso reprova contra o mutante dele (`_prove_mutation`):
@@ -149,7 +167,7 @@ Cada caso reprova contra o mutante dele (`_prove_mutation`):
   espera; `(q)` N cai a 1 com carga média; `(l)` porta sob a vaga e com a vaga alheia; `(m)` guarda do laço; `(n)` ligação da bancada, dos
   mutantes, do `pr-finalize` e do pré-voo;
 - `maestro_ask`: casos `(a)` a `(h)`;
-- `batuta_census`: casos `(a)` a `(f)`;
+- `batuta_census`: casos `(a)` a `(g)`;
 - `load_lease`, depois da revisão independente: `(r)` donos contados, `(s)` pressão de CPU ilegível e `(t)` `--list` sem esperar vaga.
 
 A família `decide` segue verde, com os casos `(l)` e `(o)` ajustados à coluna `ask` nova no fim do TSV. Nenhum

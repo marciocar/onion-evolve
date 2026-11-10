@@ -17,7 +17,9 @@
 #   merge alheio  com --foreign-repo <dono/nome> (repetível): os PRs abertos DAQUELE repo, que a sessão
 #               não mergeia (a trava de merge veta `gh pr merge`, inclusive com -R) — é do maestro com `!`
 #   access      o gh que falha por CREDENCIAL vira linha, não só aviso: o conserto é um login interativo
-#   signal      sinais da campainha SEM ACK neste repo (o leitor .claude/utils/co-evolution/doorbell-state.py)
+#   signal      sinais da campainha SEM ACK neste repo (o leitor doorbell-state.py do co-evolution, achado AO LADO
+#               deste medidor, em ../utils/co-evolution/; a cópia do censo que viaja sem ele diz que a campainha
+#               não está disponível naquele papel, em vez de citar um caminho que só resolve no core)
 #   ask         reservas de PERGUNTA AO MAESTRO desta máquina (.claude/utils/orchestration/maestro-ask.sh): chave, dona, prazo,
 #               viva ou vencida. A linha seal cujo nó já tem dona em outra sessão passa a `outro-dono`
 #
@@ -116,9 +118,9 @@ TODAY="${DECIDE_TODAY:-$(date +%F)}"
 GH="${DECIDE_GH:-gh}"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${CITE}" "${CITE_LABEL}" "${THEME}" "${WINDOW}" \
-  "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" "${FOREIGN}" "${IDLE}" "${SELF}" <<'PY'
+  "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" "${FOREIGN}" "${IDLE}" "${SELF}" "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" <<'PY'
 import sys, os, re, json, subprocess, datetime, time
-repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr, foreign, idle_h, self_who = sys.argv[1:15]
+repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr, foreign, idle_h, self_who, dc_dir = sys.argv[1:16]
 # «EU» é a SESSÃO (o id que o .claude/utils/orchestration/maestro-ask.sh grava), não o nome: --self <id> ou, por padrão, o
 # CLAUDE_CODE_SESSION_ID do Claude Code. Sem nenhum, nenhuma reserva é "minha" (todas saem outro-dono, com o nome)
 self_who = self_who or os.environ.get('CLAUDE_CODE_SESSION_ID', '')
@@ -540,8 +542,11 @@ for sub in ('docs/evolution/inbox', 'docs/evolution/inbound', 'docs/evolution/kg
                             'actor': 'faço-eu', 'action': f'trio pelo comando da casa: `{cmdt}`'})
 
 # ── sinais da campainha sem ack (o leitor da casa; o estado mora fora do repo) ──────────────────
-signal_rows = []; bell_desc = 'leitor ausente'
-_bell = os.path.join(repo, '.claude/utils/co-evolution/doorbell-state.py')
+signal_rows = []; bell_desc = 'não disponível neste papel (o leitor da campainha não viaja com esta cópia do censo)'
+# o leitor se acha AO LADO deste medidor (../utils/co-evolution/), nunca por caminho do core: o bundle do plugin leva o
+# censo sem o co-evolution, e lá a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca)
+# barrou a 1ª forma (CI do PR #1577, 2026-11-10)
+_bell = os.path.join(os.path.dirname(dc_dir), 'utils', 'co-evolution', 'doorbell-state.py')
 if os.path.isfile(_bell):
     try:
         # o estado é indexado pela raiz em que a SESSÃO roda (a principal); numa worktree, a raiz dela daria "absent"
