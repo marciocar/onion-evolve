@@ -27,7 +27,8 @@
 # IDENTIDADE = o ID DA SESSÃO, não o nome (achado da revisão independente de 2026-11-10): com o nome livre, duas sessões
 # chamadas `core` davam RENOVADA uma à outra — justamente o caso que a peça resolve. A dona é o --session <id> ou, por
 # padrão, o CLAUDE_CODE_SESSION_ID do Claude Code; o --owner é só o rótulo legível. Medido: um subagente HERDA o id da
-# sessão-mãe, então a identidade separa SESSÕES (core, peers), não os agentes de uma mesma sessão.
+# sessão-mãe, então a identidade separa SESSÕES (core, peers), não os agentes de uma mesma sessão. Por isso RENOVAR e
+# FECHAR exigem o MESMO nome E a MESMA sessão: dentro de uma sessão, o nome é o que separa a mãe dos agentes dela.
 #
 # Contrato:
 #   · O REGISTRO é por usuário, FORA do repo, comum a toda sessão e repo desta máquina (o core e as peers
@@ -106,7 +107,12 @@ case "${cmd}" in
     if [ "${cmd}" = claim ]; then
       dl=$(( NOW + ttl * 3600 ))
       if _read "${key}"; then
-        if [ "${SESSION}" = "${session}" ]; then
+        # RENOVA só a MESMA dona na MESMA sessão (achado do revisor de 2026-11-10): o subagente herda o id da sessão-mãe,
+        # e com o id só um agente de outro nome renovava a reserva e reescrevia o nome da dona
+        if [ "${SESSION}" = "${session}" ] && [ "${OWNER}" != "${owner}" ]; then
+          echo "maestro-ask: JÁ TEM DONA — ${key} é de ${OWNER} nesta sessão (${SESSION}); você se apresentou como ${owner}. Não pergunte: leve o id a ela." >&2; exit 3
+        fi
+        if [ "${SESSION}" = "${session}" ] && [ "${OWNER}" = "${owner}" ]; then
           _write "${key}" "${owner}" "${session}" "${SINCE}" "${dl}" "${question:-${QUESTION}}"
           echo "maestro-ask: RENOVADA — ${key} segue com ${owner}, prazo $(iso "${dl}")"; exit 0
         fi
@@ -125,7 +131,7 @@ case "${cmd}" in
     fi
     # release
     if ! _read "${key}"; then echo "maestro-ask: ${key} não está reservada — nada a fechar" >&2; exit 4; fi
-    if [ "${SESSION}" != "${session}" ]; then echo "maestro-ask: ${key} é de ${OWNER} (sessão ${SESSION}), não desta sessão (${session}) — só a dona fecha" >&2; exit 3; fi
+    if [ "${SESSION}" != "${session}" ] || [ "${OWNER}" != "${owner}" ]; then echo "maestro-ask: ${key} é de ${OWNER} (sessão ${SESSION}), não de ${owner} (sessão ${session}) — só a dona fecha, com o mesmo nome e a mesma sessão" >&2; exit 3; fi
     printf '%s\tfechada\t%s\t%s\t%s\t%s\n' "$(iso "${NOW}")" "${key}" "${OWNER}" "$(one "${QUESTION}")" "$(one "${resolution}")" >> "${ASK_DIR}/resolved.log"
     rm -f -- "${f}"
     echo "maestro-ask: FECHADA — ${key} (${OWNER})"; exit 0 ;;

@@ -2,14 +2,13 @@
 branch: feat/batuta-mechanical
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: bf5f6e10b08d07407d0bcff0a587c3306507fea7b407a311e96a83e65989c7b8
-reviewed_code_sha256: a67ea702ea32a4c538df506898de4c4f3a7e908b2427e7d5372563cbd7636e94
-findings_total: 21
-findings_real: 21
+reviewed_diff_sha256: pendente
+findings_total: 23
+findings_real: 23
 findings_blocking: 3
 tokens: 0
 duration_min: 140
-findings_fixed: 16
+findings_fixed: 18
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: "revisão independente encomendada pela sessão principal (REJECTED no a19e127, 2 bloqueios e 4 pontos), mais a passada da própria construtora antes dela"
@@ -116,13 +115,23 @@ nó. A régua de admissão (15/12 + PSI 30) não mudou.
 
 O achado 6 da 1ª passada (a reserva própria saindo `outro-dono`) ficou superado pelo 20.
 
+## Re-revisão: a cura barata pedida na aprovação
+
+22. **Real, curado.** O subagente herda o id da sessão-mãe. Com o mesmo id e outro `--owner`, a renovação reescrevia o
+    nome da dona, e o `release` fechava a reserva da mãe. Agora renovar e fechar exigem o mesmo nome e a mesma sessão;
+    com a mesma sessão e outro nome, a resposta é «já tem dona (… nesta sessão)», rc 3. O caso `(h)` tem dois
+    mutantes, um no claim e um no release. Dogfood com o id real desta sessão (herdado da mãe): o agente recebeu rc 3
+    nos dois, e a mãe fechou.
+23. **Limite declarado.** Um `load-lease.sh` da versão anterior, noutra worktree, não pega a `admit.lock` e pode furar
+    a contagem de donos até todas as worktrees subirem para a `main`.
+
 ## Mutantes
 
 Cada caso reprova contra o mutante dele (`_prove_mutation`):
 - `load_lease`: `(o)` duas juntas com carga baixa; `(p)` nenhuma nova com carga alta, nem com vaga solta durante a
   espera; `(q)` N cai a 1 com carga média; `(l)` porta sob a vaga e com a vaga alheia; `(m)` guarda do laço; `(n)` ligação da bancada, dos
   mutantes, do `pr-finalize` e do pré-voo;
-- `maestro_ask`: casos `(a)` a `(g)`;
+- `maestro_ask`: casos `(a)` a `(h)`;
 - `batuta_census`: casos `(a)` a `(f)`;
 - `load_lease`, depois da revisão independente: `(r)` donos contados, `(s)` pressão de CPU ilegível e `(t)` `--list` sem esperar vaga.
 

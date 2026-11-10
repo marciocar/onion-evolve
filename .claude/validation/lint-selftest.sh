@@ -56661,7 +56661,7 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     a="$(_mar "$1" release "${K}" --owner core --session s-core)"; b="$(_mar "$1" release "${K}" --owner curadoria --session s-cur --resolution selado)"
     MA_WHY="alheia ${a} · dona ${b}"; [ "${a%%|*}" = 3 ] && [ "${b%%|*}" = 0 ] && [ ! -e "${d}/a/${K}.ask" ] && grep -q 'fechada' "${d}/a/resolved.log"; }
   _macase "(c) só a dona fecha a reserva" \
-    'if [ "${SESSION}" != "${session}" ]; then echo' 'if false; then echo' _ma_c
+    'if [ "${SESSION}" != "${session}" ] || [ "${OWNER}" != "${owner}" ]; then echo' 'if false; then echo' _ma_c
   # (d) chave fora do alfabeto (barra = caminho) é rc 2, e nada é gravado fora do registro
   _ma_d() { local a; a="$(_mar "$1" claim 'a/b' --owner core --session s-core)"; MA_WHY="${a}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"alfabeto"* ]]; }
   _macase "(d) chave com barra é recusada (rc 2)" \
@@ -56675,11 +56675,21 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
   _ma_f() { local a b; a="$(_mar "$1" claim "${K}" --owner core --session s-um)"; b="$(_mar "$1" claim "${K}" --owner core --session s-dois)"
     MA_WHY="1ª ${a} · 2ª ${b}"; [ "${a%%|*}" = 0 ] && [ "${b%%|*}" = 3 ] && [[ "${b#*|}" == *"JÁ TEM DONA"*"sessão s-um"* ]]; }
   _macase "(f) duas sessões com o mesmo nome: a 2ª recebe rc 3" \
-    'if [ "${SESSION}" = "${session}" ]; then' 'if [ "${OWNER}" = "${owner}" ]; then' _ma_f
+    'if [ "${SESSION}" = "${session}" ] && [ "${OWNER}" = "${owner}" ]; then' 'if [ "${OWNER}" = "${owner}" ]; then' _ma_f
   # (g) sem id de sessão (fora do Claude Code, sem --session) é rc 2: o nome sozinho não distingue duas sessões
   _ma_g() { local a; a="$(_mar "$1" claim "${K}" --owner core)"; MA_WHY="${a}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"sem id de sessão"* ]]; }
   _macase "(g) reserva sem id de sessão é recusada (rc 2)" \
     '[ -n "${session}" ] || die2 "${cmd} sem id de sessão' 'session=anon; [ -n "${session}" ] || die2 "${cmd} sem id de sessão' _ma_g
+  # (h) MESMA sessão, OUTRO nome (o subagente herda o id da mãe): renovar é rc 3 e não reescreve a dona; fechar é rc 3 e
+  #     a reserva da mãe fica (achado do revisor de 2026-11-10)
+  _ma_h() { local a b c; _mar "$1" claim "${K}" --owner core --session s-mae >/dev/null
+    a="$(_mar "$1" claim "${K}" --owner agente-x --session s-mae)"; b="$(_mar "$1" release "${K}" --owner agente-x --session s-mae)"
+    c="$(cut -f2 "${d}/a/${K}.ask" 2>/dev/null)"; MA_WHY="renova ${a} · fecha ${b} · dona ${c}"
+    [ "${a%%|*}" = 3 ] && [[ "${a#*|}" == *"nesta sessão"* ]] && [ "${b%%|*}" = 3 ] && [ "${c}" = core ]; }
+  _macase "(h) mesma sessão com outro nome não renova nem fecha a reserva da mãe" \
+    'if [ "${SESSION}" = "${session}" ] && [ "${OWNER}" != "${owner}" ]; then' 'if false; then' _ma_h
+  _macase "(h) mesma sessão com outro nome não fecha a reserva da mãe (MUT do release)" \
+    'if [ "${SESSION}" != "${session}" ] || [ "${OWNER}" != "${owner}" ]; then echo' 'if [ "${SESSION}" != "${session}" ]; then echo' _ma_h
   rm -rf "${d}"
 }
 _family run_maestro_ask_selftests
