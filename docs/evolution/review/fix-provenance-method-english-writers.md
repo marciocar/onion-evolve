@@ -1,7 +1,8 @@
 ---
 branch: fix/provenance-method-english-writers
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 89097b9e11fc8c008761d6d9103005b5733a7b5b46a6a701e0f9d83d5674906d
+reviewed_code_sha256: 04c96213e4e4d4c71422836dadc07d77ee6a347dd2b70453947d2a785f339ce9
 findings_total: 5
 findings_real: 5
 findings_fixed: 5
