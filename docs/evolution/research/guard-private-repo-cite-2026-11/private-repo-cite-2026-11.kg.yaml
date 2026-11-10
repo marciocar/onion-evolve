@@ -70,8 +70,8 @@ nodes:
     verified_at: "2026-11-10"
     verified_against: "lint-selftest.sh --families run_private_repo_cite_selftests com LC_ALL=C"
     trace: ".claude/validation/lint-selftest.sh"
-    label: "medido: 21 mutantes, um por forma do vocabulário e por vizinha calada; cada um reprova o caso nomeado do --selftest. Na 1ª passada, três não mordiam como previsto: o lookbehind do repo@sha era redundante e calava ~/<nome>@sha, e dois esperavam o caso errado"
-    narrative: "Mutantes: fronteira do host (quem cai sem o ponto é gist.github.com; docs.github.com/en/... já cala por ter dono de terceiro), git@github.com:, raw, api/repos, codeload, caixa do dono e do repo, ponto final, .git, lista pública, dono de terceiro, dono do registro, nomes do corpus e da lista por hash, dono/repo@sha, nome nu depois de barra, lookahead do sha, texto fora de campo, id do nó e YAML inválido. O lookbehind saiu, e o caso ~/<nome>@sha entrou com mutante que o recoloca."
+    label: "medido: 21 mutantes, um por forma do vocabulário e por vizinha calada, e cada um reprova o caso nomeado do --selftest; na 1ª passada três não mordiam como previsto"
+    narrative: "Mutantes: fronteira do host (quem cai sem o ponto é gist.github.com; docs.github.com/en/... já cala por ter dono de terceiro), git@github.com:, raw, api/repos, codeload, caixa do dono e do repo, ponto final, .git, lista pública, dono de terceiro, dono do registro, nomes do corpus e da lista por hash, dono/repo@sha, nome nu depois de barra, lookahead do sha, texto fora de campo, id do nó e YAML inválido. O lookbehind saiu, e o caso o caminho do clone no home seguido de <nome>@sha entrou com mutante que o recoloca."
     provenance:
       source: "família run_private_repo_cite_selftests na branch feat/private-repo-cite-guard"
       locator: "caso (m) da família"
