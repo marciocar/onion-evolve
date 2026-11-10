@@ -3,7 +3,8 @@ title: 'Resíduo — doutrina do estado da peça e a coluna de peças do mapa de
 branch: feat/adopt-or-vendorize-census
 pr: 1578
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f522541741fbca615ba05060b2723361bd6ac4047782cb1be992ed887e69c4f5
+reviewed_code_sha256: d0f76b7ee19f1942f3d9a698b52dec45552b69be769d2b441c52a0929a5a8d5d
 findings_total: 11
 findings_real: 11
 findings_blocking: 8
