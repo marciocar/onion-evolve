@@ -109,11 +109,11 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 
 ## 🔌 Task Manager - Detecção e Roteamento
 
-O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma **instância do padrão SDAAL** (ver [integrations.md](docs/meta-specs/integrations.md)). Adapters são **API-first**; o MCP é um transporte **opcional**. Antes de operar com tasks, **sempre verifique qual provider está ativo** lendo `TASK_MANAGER_PROVIDER` em `.env`.
+O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma **instância do padrão SDAAL** (ver [integrations.md](docs/meta-specs/integrations.md)). Adapters são **API-first**; o MCP é um transporte **opcional**. Antes de operar com tasks, **sempre verifique qual provider está ativo**.
 
 ### Fluxo obrigatório antes de operar com tasks
 
-1. **Carregar** variáveis do `.env` (ex: `set -a; source .env; set +a`)
+1. **Ler** `.env` como dado, nunca `source`: `.claude/utils/task-manager/env-check.sh --provider|--check|--get`
 2. **Ler** `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`) e `TASK_MANAGER_TRANSPORT` (`api` default | `mcp` opcional)
 3. **Conferir** variáveis específicas do provider ativo (tabela abaixo)
 4. **Delegar** ao agente correto — via API (default) ou MCP (se ativado) — e usar formatação adequada
