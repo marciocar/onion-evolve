@@ -3,11 +3,10 @@ title: 'Resíduo — doutrina do estado da peça e a coluna de peças do mapa de
 branch: feat/adopt-or-vendorize-census
 pr: 1578
 date: 2026-11-10
-reviewed_diff_sha256: 270b2d3701b22b869a2e4091ec97513371b7c37dd37d88445994a415f6834dca
-reviewed_code_sha256: b30d8993910467cb9fcfb357137b05c964a7e0fd508d1d32b448e7c2221fe0fe
-findings_total: 9
-findings_real: 9
-findings_blocking: 6
+reviewed_diff_sha256: pendente
+findings_total: 10
+findings_real: 10
+findings_blocking: 7
 tokens: 60000
 duration_min: 35
 verdict: FIXED
@@ -46,6 +45,17 @@ nota: >-
 9. **Locator do selo.** O locator de `D_PIECE_STATE_DOCTRINE_1110` passou a ser a pergunta literal feita
    ao maestro: «Sigo com doutrina mais coluna no mapa, nessa forma enxuta, ou você quer outra forma?». A
    resposta verbatim ficou como estava.
+
+## CI do PR #1578: fail-open latente no `vendor-manifest.sh` (curado)
+
+10. **Peça órfã desligava o corte de companheiros.** O merge foi recusado: o caso (r14) da `publish_release`
+    viu a `publish-lens` e a `publish-doctrine` viajarem para o standalone. A causa não era citação core-only
+    da doutrina nova: **qualquer** `*-doctrine.md` sem citador fazia o mesmo (testado com arquivo vazio e
+    três nomes). Em `_emit_companion_excludes`, uma peça órfã não tem entrada em `_refs`, a leitura
+    `${_refs[${_z}]}` sem `:-` estourava `set -u` dentro do process substitution, a função morria calada e
+    nenhum companheiro de comando cortado saía. Cura: `:-` nas três leituras. Caso novo (m-órfã) na família
+    `role_cut`, que reprova contra o manifesto antigo (mutante morto: só ele cai) e passa curado; `role_cut`
+    e `publish_release` 77 de 77.
 
 ## LIMITE declarado (não bloqueia)
 

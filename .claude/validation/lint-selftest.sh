@@ -32892,6 +32892,20 @@ run_role_cut_selftests() {
       record_pass "role-cut: (m-MUT) sem a derivação por referência os companheiros voltam a viajar — (m) é load-bearing"
     else record_fail "role-cut: (m-MUT)" "o mutante ainda corta os companheiros — (m) não prova que o corte vem da derivação"; fi
   else record_fail "role-cut: (m-MUT) setup" "a mutação não foi aplicada"; fi
+  # (m-órfã) uma peça da zona SEM citador nenhum não pode desligar a derivação. Dano medido em 2026-11-10
+  #     (CI do PR #1578): uma doutrina nova, ainda órfã, fazia `${_refs[...]}` estourar `set -u` dentro do
+  #     process substitution, o derivador morria calado e todo companheiro de comando cortado viajava.
+  #     A órfã fica (não é assunto do corte); os companheiros do cortado continuam saindo.
+  printf 'doutrina nova, ainda sem citador\n' > "${rf}/${_P}/orfa-doctrine.md"
+  git -C "${rf}" add -A >/dev/null 2>&1
+  git -C "${rf}" -c user.email=t@t -c user.name=t commit -qm orfa >/dev/null 2>&1
+  local _fo _fobad
+  _fo="$(bash "${vm}" --role standalone --repo "${rf}" 2>"${d}/m-orfa.err")"
+  _fobad="$(_m_check "${_fo}")"
+  if [ -n "${_fo}" ] && [ -z "${_fobad}" ] && ! grep -qxF ":(exclude)${_P}/orfa-doctrine.md" <<< "${_fo}" \
+     && ! grep -q 'unbound variable' "${d}/m-orfa.err"; then
+    record_pass "role-cut: (m-órfã) peça da zona sem citador não desliga a derivação: os companheiros do cortado seguem saindo e a órfã fica"
+  else record_fail "role-cut: (m-órfã)" "${_fobad:- a órfã foi cortada ou o derivador estourou: $(tr '\n' ' ' < "${d}/m-orfa.err" | head -c 300)}"; fi
   unset -f _m_check
 
   # ── A MATRIZ DAS PORTAS (2026-10-10, F2 = SAC-91; nó D_MATRIZ_DE_PORTAS_2026_10) ──────────────────
