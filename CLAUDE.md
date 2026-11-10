@@ -21,7 +21,7 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   reabre quando outro harness passar nos 5 vetos reais na mesma bancada, ou quando o `/meta:cc-update`
   mudar a regra da guarda.
 
-  O exemplo antigo, `SendMessage`, caiu: zero uso. **O shell agnóstico
+  O exemplo antigo, `SendMessage`, caiu: zero uso em 2026-08; hoje é usado, mas uso não é exclusividade. **O shell agnóstico
   REPROVA** e **o markdown acoplado ACONSELHA**: o fosso não precisa de acoplamento.
   SSOT: `docs/evolution/research/exit2-coupling-against-2026-11/`.
 - **A postura de acoplamento** (o critério que decide toda adoção de substrato): *acoplado ao Claude
