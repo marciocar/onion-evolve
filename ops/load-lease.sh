@@ -12,8 +12,8 @@
 #   bash ops/load-lease.sh check              rc 0 livre · rc 3 ocupado (load ≥ HIGH) · rc 2 não mediu
 #   bash ops/load-lease.sh wait [--max S]     rc 0 liberou · rc 4 teto estourado (diz o load) · rc 2 não mediu
 #   bash ops/load-lease.sh run [--max S] -- <cmd…>
-#                                             espera a carga E a vaga única de BANCADA CHEIA (flock) e roda
-#                                             <cmd> segurando a vaga; rc = o do <cmd>, ou 4 se o teto estourou
+#                                             espera a carga E uma das N vagas de PASSO PESADO (flock; N
+#                                             derivado da carga, ver load_lease_acquire) e roda <cmd> segurando a vaga; rc = o do <cmd>, ou 4 se o teto estourou
 #                                             (pela carga ou pela vaga), sem rodar o <cmd>
 #   bash ops/load-lease.sh status             load, PSI, memória, a régua vigente e a sugestão derivada
 #   . ops/load-lease.sh                       (sourçado) define load_lease_check/_wait/_acquire/_release
@@ -62,12 +62,16 @@ _ll_load_settings() {
   LL_MAX="$(_ll_conf ONION_LOAD_WAIT_MAX 1800)"
   LL_POLL="$(_ll_conf ONION_LOAD_POLL 20)"
   LL_PSI_HIGH="$(_ll_conf ONION_LOAD_PSI_HIGH '')"
+  LL_SLOTS_MAX="$(_ll_conf ONION_LOAD_SLOTS_MAX 4)"
+  LL_SLOT_CPUS="$(_ll_conf ONION_LOAD_SLOT_CPUS 2)"
   local bad=""
   if [ -n "${LL_PSI_HIGH}" ]; then _ll_num "${LL_PSI_HIGH}" || bad="ONION_LOAD_PSI_HIGH='${LL_PSI_HIGH}'"; fi
   _ll_num "${LL_HIGH}" || bad="ONION_LOAD_HIGH='${LL_HIGH}'"
   _ll_num "${LL_RESUME}" || bad="${bad:+${bad} }ONION_LOAD_RESUME='${LL_RESUME}'"
   case "${LL_MAX}" in ''|*[!0-9]*) bad="${bad:+${bad} }ONION_LOAD_WAIT_MAX='${LL_MAX}'" ;; esac
   case "${LL_POLL}" in ''|*[!0-9]*|0) bad="${bad:+${bad} }ONION_LOAD_POLL='${LL_POLL}'" ;; esac
+  case "${LL_SLOTS_MAX}" in ''|*[!0-9]*|0) bad="${bad:+${bad} }ONION_LOAD_SLOTS_MAX='${LL_SLOTS_MAX}'" ;; esac
+  _ll_num "${LL_SLOT_CPUS}" && LC_ALL=C awk -v c="${LL_SLOT_CPUS}" 'BEGIN { exit !(c > 0) }' || bad="${bad:+${bad} }ONION_LOAD_SLOT_CPUS='${LL_SLOT_CPUS}'"
   if [ -n "${bad}" ]; then echo "load-lease: régua inválida (${bad}) — não julgo carga com número que não é número" >&2; return 2; fi
   if LC_ALL=C awk -v r="${LL_RESUME}" -v h="${LL_HIGH}" 'BEGIN { exit !(r > h) }'; then
     echo "load-lease: régua inválida (RESUME ${LL_RESUME} > HIGH ${LL_HIGH}) — a histerese ficaria ao contrário" >&2; return 2
@@ -159,39 +163,74 @@ _ll_lockdir() {
 }
 
 LL_FD=""; LL_LOCK=""
+# ── VAGAS DE PASSO PESADO: semáforo de N, com N DERIVADO DA CARGA (a batuta, 2026-11-10) ───────────────────────
+# Medido às 13:35 UTC de 2026-11-10: com UMA vaga, a fila tinha 4 passos pesados (mutantes, pr-finalize, lint,
+# revisor) esperando um ao outro com o load em 3,5 numa máquina de 8 CPUs — o mutex serializava o que cabia
+# junto. Agora há N vagas (arquivos slot.<i>.lock, um flock cada), e N se mede A CADA tentativa:
+#   N = piso((RESUME − load1) / ONION_LOAD_SLOT_CPUS), entre 1 e ONION_LOAD_SLOTS_MAX
+# A folga é medida até a RÉGUA SELADA (abaixo de RESUME a máquina está livre, D_SO_LIMITES_DERIVADOS_DO_LEASE_1106),
+# não até nproc: a 1ª versão usava nproc, e o dogfood real deu N=1 já com load 5,3 em 8 CPUs, serializando de novo
+# o que a régua do maestro chama de livre. Com carga baixa entram vários juntos; perto de RESUME, N cai a 1; com a carga na régua (load ≥ HIGH
+# ou psi ≥ PSI_HIGH) NENHUM novo entra, quantas vagas houver livres: a admissão por carga vem antes da vaga, e é
+# re-julgada enquanto se espera vaga. É a forma de mercado da admissão por recurso (`parallel --load`, os slots por
+# recurso do Temporal). Quem já entrou não sai se N encolher: a vaga é de admissão, não de preempção.
+_ll_slots() {  # $1 = load1 → N
+  LC_ALL=C awk -v n="${LL_RESUME}" -v l="$1" -v c="${LL_SLOT_CPUS}" -v m="${LL_SLOTS_MAX}" \
+    'BEGIN { k = int((n - l) / c); if (k < 1) k = 1; if (k > m) k = m; print k }'
+}
+_ll_holders() {  # quem segura as vagas, numa linha
+  local d="$1" f out=""
+  for f in "${d}"/slot.*.holder; do [ -s "${f}" ] && out="${out:+${out} | }$(basename "${f}" .holder): $(cat "${f}")"; done
+  printf '%s' "${out:-nenhum dono registrado}"
+}
 # load_lease_acquire [teto] → rc 0 com a vaga em LL_FD (exporta ONION_LOAD_LEASE_HELD) · 4 teto · 2 erro
 # Só serve SOURÇADO: a vaga vive enquanto o shell que a pegou viver (é fd, não arquivo).
 load_lease_acquire() {
   _ll_load_settings || return 2
-  local max="${1:-${LL_MAX}}" t0=${SECONDS} rc d holder
+  local max="${1:-${LL_MAX}}" t0=${SECONDS} rc d l k i fd said=0 left
   case "${max}" in ''|*[!0-9]*) echo "load-lease: teto '${max}' não é inteiro de segundos" >&2; return 2 ;; esac
   _ll_bypass && return 0
-  command -v flock >/dev/null 2>&1 || { echo "load-lease: flock ausente (util-linux) — não há vaga exclusiva para dar" >&2; return 2; }
+  command -v flock >/dev/null 2>&1 || { echo "load-lease: flock ausente (util-linux) — não há vaga para dar" >&2; return 2; }
   d="$(_ll_lockdir)"
   if [ ! -d "${d}" ]; then ( umask 077; mkdir -p "${d}" ) 2>/dev/null || { echo "load-lease: não criei ${d}" >&2; return 2; }; fi
   if [ -L "${d}" ] || [ ! -O "${d}" ] || [ -n "$(find "${d}" -maxdepth 0 -perm /022 2>/dev/null)" ]; then
     echo "load-lease: ${d} é link, não é meu ou aceita escrita de outros — recuso usar como vaga" >&2; return 2
   fi
   load_lease_wait "${max}"; rc=$?; [ "${rc}" = 0 ] || return "${rc}"
-  LL_LOCK="${d}/full-bench.lock"
-  exec {LL_FD}>>"${LL_LOCK}" || { echo "load-lease: não abri ${LL_LOCK}" >&2; LL_FD=""; return 2; }
-  if ! flock -n "${LL_FD}"; then
-    holder="$(cat "${d}/full-bench.holder" 2>/dev/null || echo '?')"
-    echo "load-lease: ⏳ vaga de bancada cheia OCUPADA (${holder}) — espero (teto $(( max - (SECONDS - t0) ))s)" >&2
-    local left=$(( max - (SECONDS - t0) )); [ "${left}" -ge 0 ] || left=0
-    if ! flock -w "${left}" "${LL_FD}"; then
-      echo "load-lease: TETO ESTOURADO esperando a vaga de bancada cheia (segura: ${holder}) após $(( SECONDS - t0 ))s — NÃO rodei" >&2
-      exec {LL_FD}>&-; LL_FD=""; return 4
+  while :; do
+    l="$(_ll_load1)" || return 2
+    # a carga voltou à régua enquanto eu esperava vaga: nenhum novo entra; volto a esperar a CARGA no teto que resta
+    if _ll_ge "${l}" "${LL_HIGH}" || _ll_psi_busy; then
+      left=$(( max - (SECONDS - t0) )); [ "${left}" -gt 0 ] || left=0
+      load_lease_wait "${left}"; rc=$?; [ "${rc}" = 0 ] || return "${rc}"
+      continue
     fi
-  fi
-  printf 'pid %s · %s · desde %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" > "${d}/full-bench.holder" 2>/dev/null || true
-  export ONION_LOAD_LEASE_HELD="${LL_LOCK}"
-  echo "load-lease: vaga de bancada cheia PEGA (${LL_LOCK})" >&2
-  return 0
+    k="$(_ll_slots "${l}")"
+    for (( i = 0; i < k; i++ )); do
+      exec {fd}>>"${d}/slot.${i}.lock" || { echo "load-lease: não abri ${d}/slot.${i}.lock" >&2; return 2; }
+      if flock -n "${fd}"; then
+        LL_FD="${fd}"; LL_LOCK="${d}/slot.${i}.lock"
+        printf 'pid %s · %s · desde %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" > "${d}/slot.${i}.holder" 2>/dev/null || true
+        export ONION_LOAD_LEASE_HELD="${LL_LOCK}"
+        echo "load-lease: vaga de passo pesado PEGA ($(( i + 1 )) de ${k}: N derivado de load ${l}; ${LL_LOCK})" >&2
+        return 0
+      fi
+      exec {fd}>&-
+    done
+    if [ "$(( SECONDS - t0 ))" -ge "${max}" ]; then
+      echo "load-lease: TETO ESTOURADO esperando vaga de passo pesado (as ${k} vagas de load ${l} ocupadas: $(_ll_holders "${d}")) após $(( SECONDS - t0 ))s — NÃO rodei" >&2
+      return 4
+    fi
+    if [ "${said}" = 0 ]; then said=1
+      echo "load-lease: ⏳ vagas de passo pesado OCUPADAS (${k} de load ${l}: $(_ll_holders "${d}")) — espero (teto $(( max - (SECONDS - t0) ))s)" >&2
+    fi
+    # a vaga se sonda a cada 2 s no máximo: o dogfood real esperou 20 s a mais (a sondagem da CARGA) depois de a vaga soltar
+    sleep "$(( LL_POLL < 2 ? LL_POLL : 2 ))"
+  done
 }
 load_lease_release() {
   [ -n "${LL_FD}" ] || return 0
-  : > "$(dirname "${LL_LOCK}")/full-bench.holder" 2>/dev/null || true
+  : > "${LL_LOCK%.lock}.holder" 2>/dev/null || true
   flock -u "${LL_FD}" 2>/dev/null || true
   exec {LL_FD}>&-
   LL_FD=""; unset ONION_LOAD_LEASE_HELD
@@ -203,8 +242,8 @@ load_lease_release() {
 # lease: a bancada se marcava "já admitida" (ONION_LOAD_LEASE_HELD=bench) supondo que quem a chama esperou
 # antes, e o harness de mutantes não perguntava nada. A cura improvisada foi um `flock` num arquivo do
 # scratchpad mais "esperar a carga cair": a mesma regra repetida à mão, que diverge.
-# Chamada no topo do script pesado, ela o RE-EXECUTA sob `run` (espera a carga E a vaga única, que é
-# exclusiva na máquina) e não volta; já admitido (o pai segura a vaga: pre-commit, pr-finalize, a própria
+# Chamada no topo do script pesado, ela o RE-EXECUTA sob `run` (espera a carga E uma das N vagas de passo
+# pesado da máquina) e não volta; já admitido (o pai segura a vaga: pre-commit, pr-finalize, a própria
 # bancada), ela volta 0 e o script segue no mesmo processo. ONION_LOAD_LEASE_REEXEC é a GUARDA DO LAÇO:
 # quando o lease passa direto (desligado, CI, sem fonte) o `run` não exporta HELD, e sem a guarda o
 # script se re-executaria para sempre.
@@ -245,7 +284,8 @@ load_lease_status() {
   echo "    · derivada de nproc: HIGH ${sh} (1,5×nproc) · RESUME ${sr} (nproc)"
   echo "    · derivada da memória: labs simultâneos ≤ ${labs} (disponível − ${reserve_gb} GB, ${lab_gb} GB cada)"
   local d; d="$(_ll_lockdir)"
-  if [ -s "${d}/full-bench.holder" ]; then echo "  vaga de bancada cheia: segura por $(cat "${d}/full-bench.holder")"; else echo "  vaga de bancada cheia: livre (${d})"; fi
+  local k; k="$(_ll_slots "${l}" 2>/dev/null || echo '?')"
+  echo "  vagas de passo pesado: ${k} agora (piso((RESUME ${LL_RESUME} − load) / ${LL_SLOT_CPUS}), entre 1 e ${LL_SLOTS_MAX}) · donos: $(_ll_holders "${d}")"
   return 0
 }
 
