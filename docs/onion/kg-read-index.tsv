@@ -750,6 +750,7 @@
 .claude/validation/private-name-check.sh	E_SELO_DE_1104_CITOU_O_REPO_DO_CLIENTE	docs/evolution/research/guard-private-names-2026-11/private-names-2026-11.kg.yaml
 .claude/validation/private-repo-cite-check.sh	C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/validation/private-repo-cite-check.sh	D_CHECK_DE_LINT_COM_CATRACA_E_LISTA_OFFLINE	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
+.claude/validation/private-repo-cite-check.sh	E_REVISAO_INDEPENDENTE_REJEITOU_E_FOI_CURADA	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/validation/projection-safety.sh	C_TETO_VOCABULARIO_E_LABEL	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	C_soberania_engajamento	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
