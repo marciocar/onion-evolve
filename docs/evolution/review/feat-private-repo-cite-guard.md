@@ -2,14 +2,13 @@
 branch: feat/private-repo-cite-guard
 pr: 1576
 date: 2026-11-10
-reviewed_diff_sha256: 84f5fa87e8fd3e21b3009511979b6e65f2c4847609202294b6abfa52022c41c7
-reviewed_code_sha256: bff69bf6d194730f98bd72654686f40618b2ea99bef07e1e8dc58c3a66c1c9a8
-findings_total: 13
-findings_real: 13
+reviewed_diff_sha256: pendente
+findings_total: 14
+findings_real: 14
 findings_blocking: 3
 tokens: 0
 duration_min: 120
-findings_fixed: 12
+findings_fixed: 13
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: "revisão independente do PR #1576 (REJECTED, 2 bloqueios + 5 não bloqueantes), curada pelo agente de execução; antes, passada própria"
@@ -95,3 +94,6 @@ A revisão independente do #1576 rejeitou a 1ª versão. Cada ponto ganhou caso 
     rebaixe nenhum, rc).
 13. **Real, conferido sem mudança.** Os 13 nomes guardados por hash aparecem todos em claro na árvore, no mínimo 9
     vezes cada: nenhum é segredo que o hash exporia à confirmação por dicionário.
+14. **Real, curado (CI).** O CI do #1576 reprovou o `adopter-shape: (g)`. O caso fixava em 4 as regras que saem NÃO
+    SE APLICA no adotante, e a REGRA 121 (`aplica-se: source`) faz 5. O caso passou a exigir a 121 e o total 5; a
+    família `adopter_shape` passa 36 de 36. Revisei este diff (só o caso) antes do recarimbo.
