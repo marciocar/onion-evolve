@@ -9,8 +9,8 @@ findings_blocking: 0
 findings_fixed: 0
 tokens: 0
 duration_min: 15
-verdict: APROVADO
-elenxo: sim
+verdict: APPROVED
+elenxo: true
 reviewer: "o próprio agente de execução, uma passada adversarial curta (o brief proíbe criar agentes)"
 nota: >-
   Corrige uma frase do CLAUDE.md: o «zero uso» do SendMessage foi medido em 2026-08 e hoje não vale.
