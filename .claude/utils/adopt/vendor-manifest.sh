@@ -372,6 +372,10 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
     done < <(git -C "${_repo}" -c core.quotePath=false grep -o -E "commands/meta/[a-z0-9-]+\.md|/meta:[a-z0-9-]+" HEAD -- "${_lenses[@]}" 2>/dev/null || true)
   fi
 
+  # ⚠️ PEÇA ÓRFÃ NÃO TEM ENTRADA EM `_refs` (2026-11-10): ler `${_refs[${_z}]}` sem `:-` estourava `set -u`
+  #    dentro do process substitution, a função morria calada e NENHUM companheiro saía — o standalone
+  #    voltou a receber a publish-lens e a publish-doctrine porque uma doutrina nova, ainda sem citador,
+  #    entrou na zona (CI do PR #1578, caso r14 da publish_release). Toda leitura de `_refs` leva `:-`.
   # VIVA: fecho transitivo a partir das âncoras. A lente forçada nunca é viva (nem empresta vida).
   _changed=1
   while [ "${_changed}" -eq 1 ]; do
@@ -386,7 +390,7 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
         if [ -z "${_zone[${_r}]:-}" ] || [ -n "${_alive[${_r}]:-}" ]; then
           _alive["${_z}"]=1; _changed=1; break
         fi
-      done <<< "${_refs[${_z}]}"
+      done <<< "${_refs[${_z}]:-}"
     done
   done
 
@@ -402,7 +406,7 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
         if [ -n "${_cut[${_r}]:-}" ] || [ -n "${_gone[${_r}]:-}" ]; then
           _gone["${_z}"]=1; _changed=1; break
         fi
-      done <<< "${_refs[${_z}]}"
+      done <<< "${_refs[${_z}]:-}"
     done
   done
 
@@ -413,7 +417,7 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
       [ -n "${_cut[${_r}]:-}" ] || [ -n "${_gone[${_r}]:-}" ] && continue
       _is_anchor "${_r}" || continue
       echo "AVISO: a lente '${_z}' sai do papel '${_role}' (cita comando cortado), mas '${_r}' a cita e viaja — ponteiro morto." >&2
-    done <<< "${_refs[${_z}]}"
+    done <<< "${_refs[${_z}]:-}"
   done
 
   for _z in "${!_gone[@]}"; do printf ':(exclude)%s\n' "${_z}"; done | LC_ALL=C sort
