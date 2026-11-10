@@ -1,7 +1,7 @@
 ---
 title: 'Resíduo — doutrina do estado da peça e a coluna de peças do mapa de interconexão'
 branch: feat/adopt-or-vendorize-census
-pr: pendente
+pr: 1578
 date: 2026-11-10
 reviewed_diff_sha256: 1405a3619f23a171db1da415934ca64af7bc5f58d8c796487ad0c68ad7927978
 reviewed_code_sha256: c7643fa69903ff0f0402a0d580d0d719e7dec6d0d7de947e66f077e42ef9bc7f
