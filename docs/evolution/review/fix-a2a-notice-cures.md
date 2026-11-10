@@ -1,7 +1,7 @@
 ---
 branch: fix/a2a-notice-cures
 date: 2026-11-10
-reviewed_diff_sha256: 344b1dc0f0dec10ea81f9e62c514725533288e38929c19fe2e89184cee591299
+reviewed_diff_sha256: 3d5002ca776858e83f436c113f88d0d6f91bd765fa7251117bfe39c45851a703
 reviewed_code_sha256: 2b48e981749a6d407ba27fc138ce02cd38ae6490c99c08c6bebeb0f8bd7c6f1e
 findings_total: 3
 findings_real: 2
