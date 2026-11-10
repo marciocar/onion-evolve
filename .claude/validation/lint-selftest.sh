@@ -42050,13 +42050,46 @@ run_adopter_shape_selftests() {
   # (f) mensagem que o lint IMPRIME no adotante não manda rodar ops/ (catraca do passivo do PR 2)
   _as_ratchet "(f) mensagem do lint que cita ops/ ausente no adotante" "$(_as_ops "${lo}" "${cl}")" "${_AS_PENDING_OPS}"
 
-  # (g) as regras sem objeto no papel saem "NÃO SE APLICA" — contadas à parte, nunca como SOFT
-  if grep -q '^NÃO SE APLICA: REGRA 62 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 85 ' "${lo}" \
-     && grep -q '^NÃO SE APLICA: REGRA 92 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 109 ' "${lo}" \
-     && grep -q '^NÃO SE APLICA: REGRA 121 ' "${lo}" \
-     && grep -qE '^  Não se aplica  : 5 ' "${lo}" && ! grep -qE '^VIOLATION: .*REGRA (62|85|92|109|121) ' "${lo}"; then
-    record_pass "adopter-shape: (g) as REGRAS 62, 85, 92, 109 e 121 saem 'NÃO SE APLICA' no adotante (5, fora do total), sem VIOLATION"
-  else record_fail "adopter-shape: (g)" "$(grep -E 'SE APLICA|REGRA (62|85|92|109|121) |Não se aplica' "${lo}" | head -6 | cut -c1-200 | tr '\n' ' ')"; fi
+  # (g) as regras sem objeto no papel saem "NÃO SE APLICA" — contadas à parte, nunca como SOFT. O esperado vem das
+  #     declarações `# aplica-se:` do PRÓPRIO lint que rodou no clone, não de uma lista fixa: regra nova com
+  #     `aplica-se: source` entra sozinha (medido em 2026-11-10: a REGRA 121 reprovou este caso, que fixava 62, 85, 92
+  #     e 109 e o total 4). O comportamento cobrado: (1) a regra declarada fora do papel cuja função começa por
+  #     `_na_for_role` SAI "NÃO SE APLICA"; (2) nenhuma regra declarada fora do papel sai VIOLATION; (3) toda linha
+  #     "NÃO SE APLICA" é de regra declarada; (4) o total do sumário é o número dessas linhas. A regra declarada que não
+  #     chama `_na_for_role` só imprime a linha se tentar acusar; ela é cobrada por (2), não por (1).
+  local _na_decl _na_must _na_got _na_ok=1 _na_r _na_miss=""
+  _as_na_rules() {  # $1=lint-artifacts.sh $2=decl|must → números de REGRA, um por linha
+    python3 -I -B - "$1" "$2" <<'PY'
+import re, sys
+path, what = sys.argv[1], sys.argv[2]
+pend = None; decl = {}; fn_rule = None; must = set()
+for line in open(path, encoding="utf-8"):
+    m = re.match(r"# REGRA (\d+) [—-]", line)
+    if m:
+        pend = m.group(1); fn_rule = None; continue
+    m = re.match(r"# aplica-se:(.*)", line)
+    if m and pend:
+        if "adopted" not in m.group(1).replace(",", " ").split():
+            decl[pend] = True
+        continue
+    if re.match(r"[A-Za-z_][A-Za-z0-9_]*\(\) \{", line):
+        fn_rule = pend if pend in decl else None; continue
+    if fn_rule and line.strip().startswith("_na_for_role && return 0"):
+        must.add(fn_rule); fn_rule = None
+print("\n".join(sorted(decl if what == "decl" else must, key=int)))
+PY
+  }
+  _na_decl="$(_as_na_rules "${cl}/.claude/validation/lint-artifacts.sh" decl)"
+  _na_must="$(_as_na_rules "${cl}/.claude/validation/lint-artifacts.sh" must)"
+  _na_got="$(sed -nE 's/^NÃO SE APLICA: REGRA ([0-9]+) .*/\1/p' "${lo}")"
+  [ -n "${_na_must}" ] || { _na_ok=0; _na_miss="nenhuma regra com _na_for_role derivada — a derivação não leu o lint;"; }
+  while IFS= read -r _na_r; do [ -z "${_na_r}" ] || grep -qx "${_na_r}" <<< "${_na_got}" || { _na_ok=0; _na_miss="${_na_miss} (1) sem NÃO SE APLICA: ${_na_r};"; }; done <<< "${_na_must}"
+  while IFS= read -r _na_r; do [ -z "${_na_r}" ] || ! grep -qE "^VIOLATION: .*REGRA ${_na_r} " "${lo}" || { _na_ok=0; _na_miss="${_na_miss} (2) VIOLATION da ${_na_r};"; }; done <<< "${_na_decl}"
+  while IFS= read -r _na_r; do [ -z "${_na_r}" ] || grep -qx "${_na_r}" <<< "${_na_decl}" || { _na_ok=0; _na_miss="${_na_miss} (3) NÃO SE APLICA da ${_na_r}, que não declara;"; }; done <<< "${_na_got}"
+  grep -qE "^  Não se aplica  : $(grep -c . <<< "${_na_got}") " "${lo}" || { _na_ok=0; _na_miss="${_na_miss} (4) total do sumário ≠ $(grep -c . <<< "${_na_got}");"; }
+  if [ "${_na_ok}" = 1 ]; then
+    record_pass "adopter-shape: (g) as regras declaradas fora do papel adopted com _na_for_role ($(paste -sd, <<< "${_na_must}")) saem 'NÃO SE APLICA', fora do total; nenhuma declarada sai VIOLATION"
+  else record_fail "adopter-shape: (g)" "${_na_miss} | $(grep -E 'Não se aplica' "${lo}" | head -2 | cut -c1-200 | tr '\n' ' ')"; fi
 
   # (h) o que a ADOÇÃO escreve no adotante (não vendorizado: a semente do KG, os starters de docs/evolution,
   #     o .githooks) não manda rodar ops/ sem o marcador (core-only) — a REGRA 100 só varre o que viaja
