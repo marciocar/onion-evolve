@@ -9,8 +9,8 @@ findings_blocking: 0
 findings_fixed: 0
 tokens: 0
 duration_min: 5
-verdict: APROVADO
-elenxo: sim
+verdict: APPROVED
+elenxo: true
 reviewer: "o próprio agente de execução, uma passada adversarial curta (o brief proíbe criar agentes)"
 nota: >-
   Subida do pin da claude-code-action de v1.0.269 (61a9c274) para v1.0.271 (commit 4fa93a88, tag
