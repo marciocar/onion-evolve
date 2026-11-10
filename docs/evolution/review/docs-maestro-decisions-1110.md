@@ -1,0 +1,42 @@
+---
+branch: docs/maestro-decisions-1110
+pr: pendente
+date: 2026-11-10
+reviewed_diff_sha256: pendente
+findings_total: 3
+findings_real: 2
+findings_blocking: 0
+tokens: 0
+duration_min: 0
+findings_fixed: 2
+verdict: FIXED
+elenxo: false
+reviewer: passada própria do agente de execução sobre o próprio diff, sem subagente (o brief proíbe criar agentes); gates mecânicos kg-decide-seal (radar --integrity --schema, kg-contract-check, lint de nomes antes×depois), private-repo-cite-check
+nota: "tokens e duração não medidos (0). Seis selos e uma evidência num grafo novo; sem código."
+---
+
+# Passada adversarial: `docs/maestro-decisions-1110`
+
+## O que muda
+
+- `docs/onion/graph/maestro-decisions-1110.kg.yaml` (novo): a evidência da rodada de 2026-11-10 e os seis selos dela,
+  todos escritos pelo `kg-decide-seal.sh --new`, nunca à mão. Teto declarado de 8 nós.
+- `docs/backlog.md`: projeção regenerada (213 grafos no escopo; nenhum aberto novo, porque o grafo só tem selos).
+
+## Achados
+
+1. VERBATIM APARADO (declarado, não curado): a resposta livre do maestro em `D_ADOPTER_DATA_COLLECTOR_1110` terminava
+   com um espaço («…incluindo saidas »). O selador apara as bordas da opção; o texto, com os erros de digitação
+   («nuncao», «usuario», «saidas»), ficou como o maestro escreveu. Só o espaço final saiu.
+2. LIGAÇÃO AO REPO DA CURADORIA (curado antes do commit): `D_MARKITDOWN_2610` mora num repo não conferível por terceiro.
+   Em vez de URL ou `repo@sha` (REGRA 121, Grafo novo ou tocado não cita repositório não conferível por terceiro), a
+   narrative cita o id e a aresta externa vai ao caso-modelo `E_MARKITDOWN_REJEITAR_COM_SUPERACAO`, que já está no core.
+   `private-repo-cite-check.sh`: 0 citação nova.
+3. COMPLEMENTO À MÃO NAS NARRATIVES (curado e declarado): o selador não recebe narrative extra. O texto da opção 1 e o
+   que a resposta livre acrescenta (D5), e a premissa do pandoc (D2), foram anexados depois do selo, sem tocar a
+   escolhida, as descartadas nem a proveniência. Radar e contrato re-rodados depois: rc 0.
+
+## Conferências
+
+- Os dois alvos das `external_edges` existem nos grafos citados (`grep -n "id: <ID>"`).
+- Lint de nomes sobre o corpus: zero achado no grafo novo.

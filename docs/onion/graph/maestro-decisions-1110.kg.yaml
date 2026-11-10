@@ -1,0 +1,152 @@
+meta:
+  schema_version: "1"
+  id: maestro-decisions-1110
+  slug: maestro-decisions-1110
+  title: "Decisões que o maestro tomou em 2026-11-10 pelo /meta:decide"
+  date: "2026-11-10"
+  baseline: "2026-11-10"
+  review_after: "2026-12-10"
+  purpose: "Guardar os selos da rodada do /meta:decide de 2026-11-10 num grafo próprio, no molde do grafo de selos de 2026-11-09. Cada selo diz o que foi escolhido e o que foi descartado; a execução de cada decisão é do trabalho que a pega."
+  note: "TETO, declarado: 1 evidência de origem e 6 selos da rodada. Outra decisão nova vai para o grafo do assunto."
+  # ═══ TETO: 8 NÓS ═══
+nodes:
+  - id: E_MD_MAESTRO_ROUND_1110
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "respostas do maestro às perguntas com opções do /meta:decide em 2026-11-10, relatadas no brief deste PR"
+    label: "Em 2026-11-10 o maestro respondeu, por perguntas com opções, a seis questões do /meta:decide."
+    narrative: "Este nó é a origem comum dos selos do grafo. A pergunta, a escolhida e as descartadas ficam em cada selo."
+    provenance:
+      source: "sessão do core, 2026-11-10"
+      locator: "rodada de perguntas com opções do /meta:decide"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: pessoa
+  - id: D_BROWSER_PHASE1_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Fase 1: print e leitura (Recomendado)»"
+    label: "O navegador do ecossistema começa pela fase 1, print e leitura, com a fronteira de segurança fora do MCP e um Playwright MCP fixado por versão."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Fase 1: print e leitura (Recomendado)»; descartadas: «Já com login pelo bridge» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Navegador do ecossistema: a fronteira de segurança fica fora do MCP (usuário por adotante, proxy de saída com a lista de domínios, trilha própria), com um Playwright MCP fixado por versão. Como seguir?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_DOC_CONVERTER_PANDOC_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Pandoc + peça que viaja (Recomendado)»"
+    label: "O conversor de documentos é o pandoc, instalado na VPS e levado como peça que viaja; o markitdown segue rejeitado."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Pandoc + peça que viaja (Recomendado)»; descartadas: «Só instalar o pandoc» · «Depois». A rejeição do markitdown é a decisão D_MARKITDOWN_2610, que mora no repositório da curadoria (não conferível por terceiro); no core ela chega pelo caso-modelo E_MARKITDOWN_REJEITAR_COM_SUPERACAO do grafo da doutrina, ligado por aresta externa. A premissa dela era ter o pandoc à mão, e o pandoc não está na VPS: este selo instala o pandoc e o leva como peça que viaja, sem reabrir a rejeição."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Conversor de documentos: o markitdown segue rejeitado, mas o pandoc, que era a premissa da rejeição, não está na VPS. O que fazer?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_ACK_PROTOCOL_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Sim: fragmento + persona (Recomendado)»"
+    label: "O protocolo de ciência é pedido do maestro: a sessão diz na hora que leu e o que vai fazer, faz sem esperar confirmação e dá retorno a cada etapa; entra como fragmento e na persona."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Sim: fragmento + persona (Recomendado)»; descartadas: «Só na persona @brain» · «Não foi meu pedido»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Protocolo de ciência: o hub diz que é pedido seu — a sessão diz na hora que leu e o que vai fazer, faz sem esperar confirmação e dá retorno a cada etapa (no Slack com reações 👀 ⏳ ✅ 🔒). É seu pedido?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_THINKING_METHODS_RESEARCH_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Consulta + pesquisa (Recomendado)»"
+    label: "Métodos de pensamento como contratos executáveis, compostos em jornadas, seguem por consulta ao corpus e pesquisa antes de desenhar qualquer método."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Consulta + pesquisa (Recomendado)»; descartadas: «Desenhar já 3 métodos e 1 jornada» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Métodos de pensamento como contratos executáveis (maiêutica, reenquadramento, análise estruturada…), compostos em jornadas: método = skill, jornada = Workflow, saída no grafo. Como seguir?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_ADOPTER_DATA_COLLECTOR_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Opção 1, o padrão é nuncao banco diretamente, mas poder montar e fazer consultas e relatórios complexos de forma fácil, organizada (o usuario precisa ser ajudado) e interativa, incluindo saidas»"
+    label: "O coletor de dados do produto do adotante é peça nova com regra de segredo: nunca o banco direto, e consultas e relatórios complexos fáceis, guiados, interativos e com saídas."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Opção 1, o padrão é nuncao banco diretamente, mas poder montar e fazer consultas e relatórios complexos de forma fácil, organizada (o usuario precisa ser ajudado) e interativa, incluindo saidas» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Peça nova, segredo depois» · «Depois». A resposta parte da opção 1, «Peça nova + regra de segredo (Recomendado)», que dizia: «Código do core, instância e credencial do hub. Estende a regra da mensageria: Vaultwarden como fonte e LoadCredential na entrega, credencial só de leitura, usuário que só enxerga o schema de visões.» E acrescenta duas coisas: nunca o banco direto, como padrão; e consultas e relatórios complexos montados de forma fácil, organizada, guiada (o usuário precisa ser ajudado) e interativa, com saídas. A regra de segredo que ela estende é D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106, ligada por aresta externa."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Coletor de dados do produto do adotante (agregados datados no Company Brain, com proveniência; a persona e as sessões respondem do KG, nunca consultam o banco ao vivo). A réplica e a mudança no banco são do dono do produto. Como seguir?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_ENV_FOLLOW_TMSH_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Seguir o tm.sh, por PR (Recomendado)»"
+    label: "O CLAUDE.md passa a seguir o tm.sh: o .env se lê como dado e nunca se executa; a troca vem por PR."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Seguir o tm.sh, por PR (Recomendado)»; descartadas: «Manter o source» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «O CLAUDE.md manda carregar o .env com «set -a; source .env», o que EXECUTA o arquivo. O tm.sh diz que nunca carrega nem executa o .env e só o lê como dado. Como resolver a contradição?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+edges:
+  - from: D_BROWSER_PHASE1_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_DOC_CONVERTER_PANDOC_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_ACK_PROTOCOL_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_THINKING_METHODS_RESEARCH_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_ADOPTER_DATA_COLLECTOR_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+  - from: D_ENV_FOLLOW_TMSH_1110
+    to: E_MD_MAESTRO_ROUND_1110
+    edge_type: TRACES_TO
+external_edges:
+  - from: D_DOC_CONVERTER_PANDOC_1110
+    to: "docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml#E_MARKITDOWN_REJEITAR_COM_SUPERACAO"
+    edge_type: TRACES_TO
+    label: "o selo cumpre a premissa da rejeição do markitdown (D_MARKITDOWN_2610, no repositório da curadoria)"
+  - from: D_ADOPTER_DATA_COLLECTOR_1110
+    to: "docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml#D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106"
+    edge_type: TRACES_TO
+    label: "a regra de segredo do coletor estende a regra da mensageria"
