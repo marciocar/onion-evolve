@@ -2,7 +2,8 @@
 branch: chore/claude-code-action-1.0.271
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 376631ebb1108b9581ec62a8d1b3d4d50b1b1cf78426bb784876e2d17a5a2433
+reviewed_code_sha256: 85f828089691837681518cea7eec91ab122d289f12ffe8755c4bb8c264a093b4
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
