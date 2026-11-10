@@ -10,7 +10,7 @@ findings_blocking: 0
 tokens: 0
 duration_min: 40
 findings_fixed: 0
-verdict: CLEAN
+verdict: APPROVED
 elenxo: false
 reviewer: agente de execução da sessão do core, por comando, sem revisor independente
 nota: "tokens 0 = não medido. Vendor do kg-ssot 4.48.0 e o fechamento por medição de Q_PF_AREA_FILTER_KG_QUERY_1120. A passada é do próprio autor (contrato, radar, bancada do produto, diff do vendor contra a tag); nenhum agente separado foi criado, por ordem da tarefa."
