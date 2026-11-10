@@ -2,14 +2,13 @@
 branch: docs/interconnect-profile-v1
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: cd0a387bbd0e874efe37387ccb7297c46ba1279b74f67b3c56707f903a8aac27
-reviewed_code_sha256: 5100c471fc7857847caf1164ea5b219238105466456a928dde3f5b0c647dda05
-findings_total: 5
-findings_real: 4
+reviewed_diff_sha256: pendente
+findings_total: 6
+findings_real: 5
 findings_blocking: 0
 tokens: 0
 duration_min: 20
-findings_fixed: 3
+findings_fixed: 4
 verdict: FIXED
 elenxo: false
 reviewer: passada própria sobre o próprio artefato (sem subagente); gate mecânico pelo kg-radar, kg-contract-check, kg-decide-seal, door-leak-scan e private-name-check
@@ -42,6 +41,10 @@ pelo `kg-decide-seal.sh`, a `SYNTHESIS.md` como projeção e o `docs/backlog.md`
    da refutação da curadoria e não foram re-medidas aqui.
 5. **Label do 1º selo acima do teto (NÃO é achado do artefato).** O selador recusou 293 caracteres (teto 280),
    sem escrever nada; reescrevi o label mantendo os quatro compromissos.
+
+6. **PROFILE.md sem nó que o cite pelo caminho (REAL, curado).** A REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO, com
+   catraca) barrou o 1º commit: os `trace:` diziam só "PROFILE.md". O `trace:` da tese passou a citar o caminho
+   inteiro; radar e contrato seguiram verdes e o lint completo deu 0 HARD.
 
 ## Mutantes
 
