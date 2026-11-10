@@ -30,7 +30,7 @@ nodes:
     verified_at: "2026-11-10"
     verified_against: "leitura do nó E_CORE_PUBLIC_CITES_PRIVATE_REPOS_1110 na main do kg-ssot (merge 653597d8) e private-repo-cite-check.sh --all --show-names na HEAD ccd34171d do core"
     label: "medido pelo kg-ssot e reconferido aqui: o core, público desde 2026-10-13, tem 43 nós com provenance.source em URL de repo privado ou inalcançável (47 com trace e narrative); a guarda conta os mesmos 47 pares nó/repo por URL"
-    narrative: "O kg-ssot contou por git grep e gh repo view. A guarda, com a lista pública medida no mesmo dia, achou 47 pares nó/repo por URL em 17 arquivos (o kg-ssot diz 15 arquivos para o provenance.source; a guarda varre todos os campos e o texto fora de campo). Somada a forma repo@sha sem URL, que o kg-ssot deixou fora da conta, o passivo do baseline é 209 pares nó/repo."
+    narrative: "O kg-ssot contou por git grep e gh repo view. A guarda, com a lista pública medida no mesmo dia, achou 47 pares nó/repo por URL em 17 arquivos (o kg-ssot diz 15 arquivos para o provenance.source; a guarda varre todos os campos e o texto fora de campo). Somada a forma repo@sha sem URL, que o kg-ssot deixou fora da conta, o passivo era 209; a passada adversarial de 2026-11-10 achou mais formas (dono/repo nu e com #N, nome depois de caminho, nome @ sha) e o baseline foi a 255 pares nó/repo: 47 por URL, 172 por hash e 36 por referência."
     provenance:
       source: "https://github.com/marciocar/kg-ssot/blob/main/docs/evolution/research/private-cite-salt-url-2026-11/private-cite-salt-url-2026-11.kg.yaml"
       locator: "nós E_CORE_PUBLIC_CITES_PRIVATE_REPOS_1110 e E_SALT_KEY_OMIT_LOCAL_PROOF_1110"
@@ -68,14 +68,31 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-11-10"
-    verified_against: "lint-selftest.sh --families run_private_repo_cite_selftests com LC_ALL=C"
+    verified_against: "lint-selftest.sh --families private_repo_cite com LC_ALL=C: 46 de 46"
     trace: ".claude/validation/lint-selftest.sh"
-    label: "medido: 21 mutantes, um por forma do vocabulário e por vizinha calada, e cada um reprova o caso nomeado do --selftest; na 1ª passada três não mordiam como previsto"
+    label: "medido: 30 mutantes de vocabulário reprovam o caso nomeado do --selftest, e 7 de produção (escopo, catraca, porta) reprovam o caso de produção; a revisão independente rejeitou a 1ª versão"
     narrative: "Mutantes: fronteira do host (quem cai sem o ponto é gist.github.com; docs.github.com/en/... já cala por ter dono de terceiro), git@github.com:, raw, api/repos, codeload, caixa do dono e do repo, ponto final, .git, lista pública, dono de terceiro, dono do registro, nomes do corpus e da lista por hash, dono/repo@sha, nome nu depois de barra, lookahead do sha, texto fora de campo, id do nó e YAML inválido. O lookbehind saiu, e o caso o caminho do clone no home seguido de <nome>@sha entrou com mutante que o recoloca."
     provenance:
       source: "família run_private_repo_cite_selftests na branch feat/private-repo-cite-guard"
       locator: "caso (m) da família"
       method: "measurement: bancada com a cura revertida na cópia da guarda"
+      locality: "repo"
+  - id: E_REVISAO_INDEPENDENTE_REJEITOU_E_FOI_CURADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-10"
+    verified_against: "veredito REJECTED da revisão independente do PR #1576, reproduzido numa cópia da onion-core com a validação da branch, e a família private_repo_cite (46 de 46)"
+    trace: ".claude/validation/private-repo-cite-check.sh"
+    label: "a revisão independente rejeitou o #1576 por dois bloqueios, a porta onion-core e 34 citações caladas pelo vocabulário, e por uma catraca que contava em vez de comparar; os três foram curados com caso e mutante"
+    narrative: "Porta: medido numa cópia da onion-core, o lint da branch já dava NÃO SE APLICA à REGRA 121 (papel source-door), mas o helper chamado direto saía rc 2 e a família de bancada ficava vermelha na porta, onde a lista core-only não protege (SELFTEST_ROLE é source). Cura: o helper reconhece kind: door sem a lista e diz NÃO SE APLICA; o caso (b) pula visível; o caso (i) prova helper e lint na porta, com mutante em cada um. Vocabulário: dono/repo nu, com #N e no -R; nome do registro depois de caminho; nome @ sha e nome (HEAD sha). Catraca: compara o conjunto de entradas com o do merge-base; só rebaixa a SOFT a entrada cuja citação já estava no grafo na base. Os 13 nomes por hash aparecem todos em claro na árvore (no mínimo 9 vezes): nenhum é segredo que o hash exporia a dicionário."
+    provenance:
+      source: "revisão independente do PR #1576 na branch feat/private-repo-cite-guard"
+      locator: "veredito REJECTED com dois bloqueios e cinco pontos não bloqueantes, em 2026-11-10"
+      method: "measurement: reprodução na cópia da porta e bancada com mutantes"
       locality: "repo"
   - id: C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA
     node_type: claim
@@ -87,8 +104,8 @@ nodes:
     verified_at: "2026-11-10"
     verified_against: "cabeçalho de private-repo-cite-check.sh"
     trace: ".claude/validation/private-repo-cite-check.sh"
-    label: "teto: repo de terceiro que fechou ou sumiu, nome nu fora das três fontes, gist, GitLab, 'commit abc1234' em prosa, sha sem nome, grafo que o diff não toca, commit e corpo de PR não são vistos"
-    narrative: "E a lista pública só é tão certa quanto a última medida: o --verify-allowlist reconfere com rede e não roda no CI. Gatilho para reabrir: um repo da lista virar privado, ou uma citação nova numa dessas formas aparecer no corpus."
+    label: "teto: repo de terceiro que fechou, nome nu fora do registro, gist, GitLab, 'commit abc1234' em prosa, sha sem nome, grafo fora do diff, commit e corpo de PR; grafo renomeado tem as entradas contadas como novas"
+    narrative: "A troca da ponta da origin/main pelo merge-base na catraca não tem mutante próprio: os cenários da bancada não distinguem as duas. E a lista pública só é tão certa quanto a última medida: o --verify-allowlist reconfere com rede e não roda no CI. Gatilho para reabrir: um repo da lista virar privado, ou uma citação nova numa dessas formas aparecer no corpus."
   - id: C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR
     node_type: claim
     layer: audit
@@ -102,6 +119,12 @@ nodes:
     label: "a classe «não conferível por terceiro» hoje é texto no provenance.source; nenhum leitor do kg-ssot a imprime nem a conta, e o contrato segue exigindo source, locator e method"
     narrative: "O kg-ssot mediu que, omitida a URL, somem a conferência de versão e a de locator. Que o leitor imprima a classe é trabalho do kg-ssot, não deste PR. Gatilho: o kg-ssot ganhar campo ou leitor para a classe, e aí a gramática e esta guarda migram para ele."
 edges:
+  - from: E_REVISAO_INDEPENDENTE_REJEITOU_E_FOI_CURADA
+    to: D_CHECK_DE_LINT_COM_CATRACA_E_LISTA_OFFLINE
+    edge_type: SUPPORTS
+  - from: E_REVISAO_INDEPENDENTE_REJEITOU_E_FOI_CURADA
+    to: D_VOCABULARIO_DO_NOME_NU_POR_TRES_FONTES
+    edge_type: SUPPORTS
   - from: E_KGSSOT_MEDIU_43_NOS_DO_CORE_CITANDO_PRIVADO
     to: Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA
     edge_type: SUPPORTS
