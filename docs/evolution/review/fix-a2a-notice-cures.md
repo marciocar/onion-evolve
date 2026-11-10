@@ -1,17 +1,16 @@
 ---
 branch: fix/a2a-notice-cures
 date: 2026-11-10
-reviewed_diff_sha256: 19ce4772bdcbef3b03780330acaf73c42b48cb12b2649a3ea55e470ae1bc5c8b
-reviewed_code_sha256: 5d70043e874a2463b3900db8167c1935421d59770078bc9f0a7ce0343051b63d
-findings_total: 2
-findings_real: 1
-findings_fixed: 1
+reviewed_diff_sha256: pendente
+findings_total: 3
+findings_real: 2
+findings_fixed: 2
 tokens: 0
 duration_min: 10
-verdict: FIXED
-elenxo: false
-reviewer: "passada própria sobre o próprio diff, sem subagente (o brief proibiu criar agentes); gate mecânico: bancada a2a_rt e a2a_accept, kg-radar e selador"
-nota: "elenxo false: não houve leitor independente. A bancada prova cada cura com caso e mutante; a passada própria achou 1 defeito real (curado) e 1 cosmético (declarado)."
+verdict: REJECTED_AND_FIXED
+elenxo: true
+reviewer: "revisão adversarial independente, conduzida pela sessão do core sobre o PR #1571, mais a passada própria do autor; gate mecânico: bancada a2a_rt e a2a_accept, kg-radar, contrato e selador"
+nota: "a revisão independente deu REJECTED leve por um defeito: o locator de D_QUEUE_HARVEST_OPENCLAW_NOW_1110 citava uma pergunta que não foi feita. Curado num commit novo com a pergunta literal. Código, bancada (288/0) e o nó do iroh open aprovados. A passada própria achou 1 defeito real (curado) e 1 cosmético (declarado)."
 ---
 
 # Avisos do A2A que dizem o próximo passo
@@ -32,6 +31,14 @@ A linha `gravado no outbox` já trazia `iat` do relógio local (`MS`), e a nova 
 payload assinado. Podem diferir em 1 s. O prazo vale pelo assinado, que é o que a retirada confere; a linha
 antiga fica como está para não mudar a forma que outras leituras conhecem.
 
+## Achado 3, da revisão independente: o locator citava uma pergunta que não foi feita (REAL, curado)
+
+O brief não trazia a pergunta de `D_QUEUE_HARVEST_OPENCLAW_NOW_1110`, e a 1ª redação a reconstruiu a partir das
+opções («Colher agora as ideias do OpenClaw para a fila A2A, ou junto da Fase 2?»). O selo citava, como prova,
+uma pergunta que o maestro nunca viu. Curado num commit novo: o locator traz a pergunta literal, e o label foi
+alinhado a ela (as três regras do OpenClaw entram já no onion-queue, com teste de mutante). Escolhida «Sim, já»
+e rejeitada «Junto da Fase 2» não mudam. Radar 0, contrato verde.
+
 ## O que não foi medido
 
 - O «quando» do «já aceito» vem do mtime do doc: um clone novo zera o mtime, e o rótulo da fonte vai na saída.
@@ -41,5 +48,3 @@ antiga fica como está para não mudar a forma que outras leituras conhecem.
 - Reaberto num commit novo (sem reescrever histórico): `D_A2A_OUTBOUND_IROH_PHASE2_1110` tinha sido selada
   com «Fase 2 só com iroh»; o maestro pediu a revisão das estimativas antes do selo. O nó volta a `open`, com as
   três opções nomeadas e sem escolha. Re-revisado: só o grafo mudou; radar 0 e contrato verdes.
-- A pergunta da decisão `D_QUEUE_HARVEST_OPENCLAW_NOW_1110` foi redigida a partir das opções do brief, que não
-  trazia o texto exato dela.
