@@ -2,7 +2,8 @@
 branch: docs/claude-md-stale-claims
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 518b1160accc8bb2a3172e69371b7226de508a33b84cd4dfe2dfceff425bb6e5
+reviewed_code_sha256: fa20000418443d7326e0d0ac4e00e7541ef46cd4dc38696bb170789133c0fdd9
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
