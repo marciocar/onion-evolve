@@ -56,6 +56,9 @@
 #
 # Uso : a2a-accept.sh <pending-record.json> [--inbox <dir>] [--receiver <id>] [--trust-repo <path>]
 #                     [--invites <a2a-invites.json>] [--ledger <arquivo>] [--shadow-log <arquivo>]
+# Saída (stderr): depois da reverificação, remetente, receivedAt e idade na fila; ALARME (sem recusar) quando a idade
+#       passa de A2A_ACCEPT_WARN_AGE (default 3600 s). O "já aceito" diz quando (mtime do doc) e o razão; o "aceito →"
+#       (stdout) traz o caminho do razão ao lado do doc.
 # Exit: 0 = aceito (ou já existia) · 1 = recusado (reverificação vetou/divergiu, malformado, revogado) ·
 #       2 = uso incorreto. O log de sombra nunca muda o rc do aceite (falha de linha e de marcador vão alto ao stderr).
 # Exercitado por lint-selftest.sh (run_a2a_accept_selftests).
@@ -73,6 +76,9 @@ ACCEPT_MAX_AGE_CAP=604800
 ACCEPT_MAX_AGE="${A2A_ACCEPT_MAX_AGE:-${ACCEPT_MAX_AGE_CAP}}"
 case "${ACCEPT_MAX_AGE}" in ''|*[!0-9]*) echo "ERRO: A2A_ACCEPT_MAX_AGE não inteiro" >&2; exit 2 ;; esac
 [ "${ACCEPT_MAX_AGE}" -le "${ACCEPT_MAX_AGE_CAP}" ] || { echo "ERRO: A2A_ACCEPT_MAX_AGE acima do teto de ${ACCEPT_MAX_AGE_CAP} s (o env só aperta)" >&2; exit 2; }
+# ALARME de idade na fila (não recusa): default 3600 s, o exp padrão do envelope do a2a-rt-send.sh
+ACCEPT_WARN_AGE="${A2A_ACCEPT_WARN_AGE:-3600}"
+case "${ACCEPT_WARN_AGE}" in ''|*[!0-9]*) echo "ERRO: A2A_ACCEPT_WARN_AGE não inteiro" >&2; exit 2 ;; esac
 while [ "$#" -gt 0 ]; do case "$1" in
   --inbox) INBOX="${2:-}"; [ -n "${INBOX}" ] || { echo "uso: --inbox exige valor" >&2; exit 2; }; shift 2 ;;
   --receiver) RECEIVER="${2:-}"; [ -n "${RECEIVER}" ] || { echo "uso: --receiver exige valor" >&2; exit 2; }; shift 2 ;;
@@ -189,6 +195,16 @@ IAT="$(printf '%s' "${RV}" | jq -r 'if (.iat|type)=="number" then (.iat|floor|to
 case "${IAT}" in ''|*[!0-9]*) refuse "a reverificação não ecoou o iat." ;; esac
 [ "$(( $(date +%s) - IAT ))" -le "${ACCEPT_MAX_AGE}" ] \
   || refuse "envelope assinado há mais de $(( ACCEPT_MAX_AGE / 86400 )) dia(s) (iat ${IAT}): o receivedAt do registro não é assinado, e envelope velho não se reapresenta pela fila. Arquive o registro."
+# QUEM e QUANDO, logo depois da reverificação (atrito da ida e volta de 2026-11-09: o aceite não dizia de quem nem
+# há quanto tempo o sinal esperava na fila). A idade é medida do receivedAt (campo do bridge, forma conferida acima).
+# Passou de A2A_ACCEPT_WARN_AGE (default 3600 s = o exp padrão do envelope do a2a-rt-send): ALARME alto, sem recusar;
+# quem recusa por idade é o teto assinado de cima (ACCEPT_MAX_AGE, pelo iat).
+AGE_NOW="$(date +%s)"; RECV_AGE=$(( AGE_NOW - RECV_EPOCH )); IAT_AGE=$(( AGE_NOW - IAT ))
+_age_h() { if [ "$1" -lt 0 ]; then printf '%s s (no futuro: relógio?)' "$1"; elif [ "$1" -lt 120 ]; then printf '%s s' "$1"; elif [ "$1" -lt 7200 ]; then printf '%s s (%s min)' "$1" $(( $1 / 60 )); else printf '%s s (%s h)' "$1" $(( $1 / 3600 )); fi; }
+echo "reverificado: remetente ${FROM} · receivedAt ${RECVAT} · idade $(_age_h "${RECV_AGE}") na fila · assinado há $(_age_h "${IAT_AGE}")" >&2
+if [ "${RECV_AGE}" -gt "${ACCEPT_WARN_AGE}" ]; then
+  echo "ALARME: o sinal de ${FROM} espera na fila há $(_age_h "${RECV_AGE}"), acima de A2A_ACCEPT_WARN_AGE=${ACCEPT_WARN_AGE} s. O aceite SEGUE (não recusa); confira se ainda é pertinente e se o remetente não reenviou." >&2
+fi
 REGULATED="$(printf '%s' "${RV}" | jq -r 'if .regulated == true then "true" else "false" end')"
 APPLY="$(printf '%s' "${RV}" | jq -r '.apply_mode')"
 case "${APPLY}" in gated|propose-only) ;; *) refuse "apply_mode reverificado inesperado." ;; esac
@@ -316,7 +332,14 @@ if [ -n "${EXIST}" ] || [ -n "${LEDGER_TASK}" ]; then
     # cura B1: o aceite anterior pode ter nascido sem a linha de sombra (antes do log existir, ou com lacuna): ela
     # é gravada agora, se faltar; a que já existe não se repete
     shadow_record --if-absent
-    echo "já aceito (não sobrescreve): ${EXIST:-razão ${LEDGER}}" >&2; exit 0
+    # QUANDO (atrito de 2026-11-09: o rc 0 calado não dizia se o aceite era de agora ou de dias atrás). O razão não
+    # guarda o instante; o doc guarda, pelo mtime (git mv preserva; um clone novo zera — por isso o rótulo da fonte)
+    WHEN="não medido (doc fora do inbox; o razão não guarda o instante)"
+    if [ -n "${EXIST}" ]; then
+      WHEN="$(python3 -I -c 'import os, sys, datetime as d; print(d.datetime.fromtimestamp(int(os.stat(sys.argv[1]).st_mtime), d.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))' "${EXIST}" 2>/dev/null)" \
+        && WHEN="${WHEN} (mtime do doc)" || WHEN="não medido (mtime ilegível)"
+    fi
+    echo "já aceito (não sobrescreve): ${EXIST:-doc fora do inbox} · aceito em ${WHEN} · recebido em ${RECVAT} · razão ${LEDGER}" >&2; exit 0
   fi
   refuse "o jti deste envelope já foi aceito por OUTRO registro (${EXIST:-razão de aceites}) — replay ou registro forjado reaproveitando o jti; nada sobrescrito."
 fi
@@ -387,8 +410,9 @@ mkdir -p "$(dirname "${LEDGER}")" 2>/dev/null
 # conteúdo antes de dizer que o envelope foi provado. O razão nasce 0600 (umask 077): ele é a prova do aceite.
 DOC_SHA="$(openssl dgst -sha256 < "${TMP}/doc.md" | awk '{print $NF}')"
 ( umask 077; printf '%s %s %s %s\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" "${DOC_SHA}" >> "${LEDGER}" ) 2>/dev/null \
-  || echo "AVISO: o doc foi criado, mas o razão de aceites (${LEDGER}) não foi gravado: o dedupe fica só pelo nome." >&2
+  && LEDGER_NOTE="razão ${LEDGER}" \
+  || { LEDGER_NOTE="razão NÃO gravado (${LEDGER})"; echo "AVISO: o doc foi criado, mas o razão de aceites (${LEDGER}) não foi gravado: o dedupe fica só pelo nome." >&2; }
 
 shadow_record
-echo "aceito → ${OUT}"
+echo "aceito → ${OUT} · ${LEDGER_NOTE}"
 echo "  (próximo: /meta:co-evolve p/ triar, lendo o DOC — nunca o JSON da fila; e limpar o registro da fila do bridge — ato humano)" >&2

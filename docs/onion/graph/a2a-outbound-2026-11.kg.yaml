@@ -1,0 +1,183 @@
+meta:
+  schema_version: "1"
+  id: a2a-outbound-2026-11
+  slug: a2a-outbound-2026-11
+  title: "A2A de saída VPS↔notebook: o atrito medido, as quatro curas e o caminho da Fase 2"
+  date: "2026-11-10"
+  baseline: "2026-11-10"
+  review_after: "2026-12-10"
+  purpose: "Guardar o atrito de uma ida e volta A2A real, as curas dos avisos que o causaram (cada uma com caso e mutante na bancada), a pesquisa de UX do aceite automático, o alerta do SDK do MCP e as decisões do maestro sobre a Fase 2."
+nodes:
+  - id: E_A2A_RT_FRICTION_1109
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-10"
+    verified_against: "relato da ida e volta A2A VPS↔notebook de 2026-11-09 no brief da sessão do core à sessão de execução, 2026-11-10"
+    label: "Uma ida e volta A2A VPS↔notebook em 2026-11-09 custou cerca de 8 atos manuais e 22 minutos: os avisos das peças não diziam o próximo passo, a idade do sinal, o censo da caixa vazia, e o instalador montava uma sessão que não gravava rascunho."
+    narrative: "Os quatro pontos de atrito: (1) o a2a-rt-send.sh gravava no outbox e calava a retirada do outro lado e o prazo; (2) o a2a-accept.sh não dizia remetente, recebimento nem idade, e o «já aceito» saía rc 0 sem dizer quando; (3) o read_inbox vazio dizia só «0 nova(s)», sem distinguir caixa vazia, tudo entregue e aceite que não aconteceu; (4) o install-a2a-rt.sh não copiava o a2a-metrics.py que o MCP importa, e a linha da sessão não trazia --no-chrome."
+    provenance:
+      source: "sessão do core, brief de execução"
+      locator: "brief de 2026-11-10, contexto da tarefa fix/a2a-notice-cures"
+      method: "testimony: medição da ida e volta relatada pela sessão do core, 2026-11-10"
+      locality: "pessoa"
+  - id: A_A2A_SEND_NEXT_STEP_1110
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "bancada run_a2a_rt_selftests, caso (c-próximo) e o mutante dele, verdes em 2026-11-10"
+    label: "Cura 1: depois de «gravado no outbox», o a2a-rt-send.sh imprime o prazo (iat assinado + exp-offset) e a retirada do outro lado, fetch-replies.sh --me <aud> --watch --until-jti <jti>."
+    narrative: "O prazo sai do payload assinado do envelope, não do relógio do script. O caso da bancada confere o prazo e o jti contra o envelope gravado, e confere que o fetch-replies.sh declara --me e --until-jti; o mutante que grava e cala o próximo passo reprova."
+    trace: ".claude/utils/federation-transport/a2a-rt-send.sh"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-rt-send.sh"
+      locator: "bloco do lado core, depois de «gravado no outbox»"
+      method: "measurement: bancada lint-selftest.sh, família a2a_rt, 2026-11-10"
+      locality: "repo"
+  - id: A_A2A_ACCEPT_WHO_WHEN_1110
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "bancada run_a2a_accept_selftests, caso (2b) e os três mutantes dele, verdes em 2026-11-10"
+    label: "Cura 2: o a2a-accept.sh diz remetente, receivedAt e idade logo depois da reverificação, alarma sem recusar acima de A2A_ACCEPT_WARN_AGE (default 3600 s), diz quando no «já aceito» e imprime o razão ao lado do «aceito →»."
+    narrative: "O default de 3600 s é o exp padrão do envelope do a2a-rt-send.sh. O «quando» do «já aceito» vem do mtime do doc, com a fonte rotulada; doc fora do inbox dá «não medido», porque o razão não guarda o instante. Quem recusa por idade segue sendo o teto assinado pelo iat (7 dias)."
+    trace: ".claude/utils/federation-transport/a2a-accept.sh"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-accept.sh"
+      locator: "bloco depois da reverificação, ramo do «já aceito» e linha final do «aceito →»"
+      method: "measurement: bancada lint-selftest.sh, família a2a_accept, 2026-11-10"
+      locality: "repo"
+  - id: A_A2A_INBOX_CENSUS_1110
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "bancada run_a2a_rt_selftests, caso (d-censo) e o mutante dele, verdes em 2026-11-10"
+    label: "Cura 3: o read_inbox vazio do a2a-rt-mcp.py traz o censo: arquivos na caixa, já entregues pelo cursor, reprovados, caminhos da caixa, do cursor e do razão, e linhas do razão com o doc fora da caixa."
+    narrative: "O censo diz que a fila do bridge sem aceite NÃO é medida daqui e nomeia ops/a2a-queue-live.sh list. No modo envelope (notebook) diz que o razão não se aplica. Com mensagem nova, o cabeçalho segue sem censo."
+    trace: ".claude/utils/federation-transport/a2a-rt-mcp.py"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-rt-mcp.py"
+      locator: "read_inbox e _census"
+      method: "measurement: bancada lint-selftest.sh, família a2a_rt, 2026-11-10"
+      locality: "repo"
+  - id: A_A2A_RT_INSTALLER_1110
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "bancada run_a2a_rt_selftests, caso (i) e os dois mutantes dele, verdes em 2026-11-10"
+    label: "Cura 4: o install-a2a-rt.sh copia o a2a-metrics.py junto com o MCP e imprime a linha da sessão com --no-chrome; o caso roda o draft_message do MCP INSTALADO."
+    narrative: "Comparado com os imports do MCP: fora da stdlib ele usa só o a2a-metrics.py (do próprio diretório) e a moldura onion-untrusted-wrap.sh, que já era copiada; o a2a-metrics.py só usa a stdlib. Nada mais faltava."
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh"
+    provenance:
+      source: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh"
+      locator: "as cópias para o diretório de dados do a2a-rt e a linha final impressa"
+      method: "measurement: bancada lint-selftest.sh, família a2a_rt, 2026-11-10"
+      locality: "repo"
+  - id: C_A2A_AUTO_ACCEPT_AS_DATA_FOUR_CONDITIONS_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-10"
+    verified_against: "pesquisa de UX de 2026-11-10 relatada no brief, fonte https://code.claude.com/docs/en/cross-session-messaging; a página não foi relida por esta sessão"
+    label: "Aceite automático de mensagem entre sessões como DADO só é padrão com quatro condições: remetente autenticado, mensagem marcada como não-usuário, sem autoridade de instrução, e os portões de permissão mantidos."
+    narrative: "Leitura para o A2A do Onion: a fila pode deixar de exigir o aceite manual só se as quatro condições valerem juntas. Falta uma e o aceite segue humano. Fonte primária: a documentação de mensagens entre sessões do Claude Code."
+    provenance:
+      source: "https://code.claude.com/docs/en/cross-session-messaging"
+      locator: "documentação de mensagens entre sessões (cross-session messaging)"
+      method: "testimony: pesquisa de primárias relatada no brief da sessão do core, 2026-11-10"
+      locality: "pessoa"
+  - id: C_A2A_SDK_V2_CHANNEL_BREAK_1110
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-10"
+    verified_against: "alerta da documentação https://code.claude.com/docs/en/mcp relatado no brief; o pino 1.32.2 do @modelcontextprotocol/sdk no package.json do doorbell medido por leitura em 2026-11-10"
+    label: "Num cliente v2, canal que negocia o protocolo MCP 2026-07-28 não entrega mensagem; o doorbell usa o SDK 1.32.2 (protocolo até 2025-11-25), então subir o SDK para 2.x quebra a campainha."
+    narrative: "Consequência: o doorbell fica no SDK 1.x até o canal ter caminho de entrega no protocolo novo. Subir o SDK pede antes a re-medição do canal num cliente v2. O pino foi lido no package.json do doorbell; o alerta não foi relido por esta sessão."
+    provenance:
+      source: "https://code.claude.com/docs/en/mcp"
+      locator: "documentação de MCP do Claude Code, alerta sobre canais e a versão de protocolo 2026-07-28"
+      method: "testimony: pesquisa de primárias relatada no brief da sessão do core, 2026-11-10; pino do SDK medido por leitura"
+      locality: "pessoa"
+  - id: D_A2A_OUTBOUND_IROH_PHASE2_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Fase 2 só com iroh»"
+    label: "A Fase 2 da conexão A2A VPS↔notebook segue só com iroh, que passou nos eliminatórios (pontuação: caminho próprio 31, com iroh 26)."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Fase 2 só com iroh»; descartadas: «Caminho próprio» · «Parquear tudo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Na conexão VPS↔notebook, qual caminho? iroh passou nos eliminatórios; próprio 31 pts, com iroh 26»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+  - id: D_QUEUE_HARVEST_OPENCLAW_NOW_1110
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-10"
+    verified_against: "decisão do maestro em 2026-11-10, por pergunta com opções (/meta:decide): escolhida «Sim, já»"
+    label: "A colheita das ideias do OpenClaw para a fila A2A começa já, sem esperar a Fase 2 da conexão VPS↔notebook."
+    narrative: "Selado por /meta:decide em 2026-11-10: escolhida «Sim, já»; descartadas: «Junto da Fase 2»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-10: «Colher agora as ideias do OpenClaw para a fila A2A, ou junto da Fase 2?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
+      locality: "pessoa"
+edges:
+  - from: A_A2A_SEND_NEXT_STEP_1110
+    to: E_A2A_RT_FRICTION_1109
+    edge_type: TRACES_TO
+  - from: A_A2A_ACCEPT_WHO_WHEN_1110
+    to: E_A2A_RT_FRICTION_1109
+    edge_type: TRACES_TO
+  - from: A_A2A_INBOX_CENSUS_1110
+    to: E_A2A_RT_FRICTION_1109
+    edge_type: TRACES_TO
+  - from: A_A2A_RT_INSTALLER_1110
+    to: E_A2A_RT_FRICTION_1109
+    edge_type: TRACES_TO
+  - from: C_A2A_AUTO_ACCEPT_AS_DATA_FOUR_CONDITIONS_1110
+    to: E_A2A_RT_FRICTION_1109
+    edge_type: TRACES_TO
+  - from: C_A2A_SDK_V2_CHANNEL_BREAK_1110
+    to: C_A2A_AUTO_ACCEPT_AS_DATA_FOUR_CONDITIONS_1110
+    edge_type: CONSTRAINS
+  - from: D_A2A_OUTBOUND_IROH_PHASE2_1110
+    to: C_A2A_AUTO_ACCEPT_AS_DATA_FOUR_CONDITIONS_1110
+    edge_type: TRACES_TO
+  - from: D_QUEUE_HARVEST_OPENCLAW_NOW_1110
+    to: C_A2A_AUTO_ACCEPT_AS_DATA_FOUR_CONDITIONS_1110
+    edge_type: TRACES_TO
