@@ -2,7 +2,8 @@
 branch: feat/batuta-mechanical
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f960d1230fef04f0026f9ba4626ffe6bfa59f50dade9a2653a2708c5f7db5ca8
+reviewed_code_sha256: a81795d1c5b3c2c2b999bb77e8ba86e7c3fc582242ee1ecddc611325647c4a8b
 findings_total: 24
 findings_real: 24
 findings_blocking: 3
