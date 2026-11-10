@@ -4216,3 +4216,15 @@ msgstr "✗ --touched: ocorrências em nós tocados desde {base}: {count}. Cure 
 #: tools/kg_gate.py
 msgid "· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})"
 msgstr "· --touched: nenhum nó tocado carrega a dívida desde {base} (grafos alterados: {graphs})"
+
+#: tools/kg_mcp.py
+msgid "JSON file, outside the root, naming the shared areas each identity reads; requires --identity-header"
+msgstr "arquivo JSON, fora da raiz, com as áreas compartilhadas que cada identidade lê; exige --identity-header"
+
+#: tools/kg_mcp.py
+msgid "--area-policy only applies with --identity-header"
+msgstr "--area-policy só vale com --identity-header"
+
+#: tools/kg_mcp.py
+msgid "--area-policy did not load: {error}"
+msgstr "--area-policy não carregou: {error}"

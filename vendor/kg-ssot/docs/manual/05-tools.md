@@ -566,6 +566,7 @@ A client configuration over stdio, with a versioned store outside the repository
 | `--http PORT` · `--host H` · `--allow-remote` | HTTP instead of stdio; off the loopback, only with `--allow-remote`, which requires `--secret-env` |
 | `--secret-env VAR` · `--secret-header H` | The shared secret, read from the variable `VAR`, that each HTTP request carries in header `H` (default `X-Api-Key`), compared with hmac |
 | `--identity-header H` | The "behind a proxy" profile: each request's identity comes from header `H` (an email address), with its own area and author; requires `--secret-env` |
+| `--area-policy FILE` | JSON file, outside `--root`, naming the shared areas each identity reads; requires `--identity-header` |
 | `--max-bytes N` | The maximum size of a graph (default 2,000,000) |
 | `--max-graphs N` | Graphs per store, or per area in the profile; past that, a new name is refused |
 | `--max-concurrent N` | HTTP requests at the same time; past that, 503 |
@@ -634,6 +635,33 @@ write or a name that does not exist comes with `isError: true`, so the model can
     "notice": ...}`, so the model treats text written by others as data, never as instructions.
   - **What the profile is not:** it is "behind a proxy", on a private network. It is not the OAuth profile of the MCP
     specification, which waits until there is a measured matrix of clients.
+- **The area filter (4.48.0, `--area-policy`):** read access to shared areas, on top of the "behind a proxy" profile. Without
+  the flag, nothing changes.
+  - **The policy file:** JSON, outside `--root`, written only by the operator:
+    `{"schema_version": 1, "canonical": "c-company", "groups": {"g-finance": ["ana@x.org"]}}`. Canonical areas are named
+    `c-<name>` and groups `g-<name>`, each a directory under `--root`. Everyone reads the canonical area, and a group is
+    read by its members. The file is read again when it changes, so removing someone takes effect on the next request.
+    After startup, a file that disappears or breaks closes reading: each identity keeps only its own area until the file
+    is valid again.
+  - **What an identity reads:** the union of its own area, with the usual names, and the areas it may read, whose graphs
+    appear as `@<area>/<graph>`. Only those areas are opened, so the filter comes before the read. Writing stays in the
+    identity's own area, and `kg_write` or `kg_delete` on an `@` name is refused.
+  - **The end that cannot be reached:** an edge with an end that no readable node resolves leaves `kg_get` (with `ref`
+    too), `kg_list`, `kg_history`, `kg_query` (nodes, `edges`, and `chain`), and `kg_terms` whole: no id, no file, and
+    not counted in a total, a group, or a degree. The same goes for a pointer to such a graph in `provenance` (the whole
+    pointer: `source`, `scheme`, `locator`, and the hashes), `trace`, `verified_against`, `verified_scope`,
+    `reverify_on`, or an edge's `trigger`, with or without `#`, as a URL, or in the middle of a sentence. A test compares the answers of `kg_list`,
+    `kg_get`, `kg_query`, and `kg_terms` with those of a graph that never had the end, and they are equal.
+  - **No way to tell:** an unreadable area answers exactly like an area that does not exist. A graph from another area
+    always comes back normalized, as JSON (which is also YAML) and without comments, whether or not something was cut.
+    A graph from the identity's own area comes back as written, because only that identity writes there and the
+    `sha256` must still work for writing it back.
+  - **It fails closed:** a pointer in a form the filter cannot resolve, such as one inside backticks or a publisher's URL,
+    is cut even if the graph it names is readable.
+  - **What it does not see:** an id or a path written in free text (`label`, `narrative`, the `meta` section, an `x_` field,
+    which includes the `x_term` labels that `kg_terms` returns, or a commit message in `kg_history`) stays, and so do a
+    `provenance.source` pointing at a file that is not a graph and a path spelled with percent-encoding. To keep something apart, keep it in a graph of an area
+    that the reader cannot read, and do not name it in text that others can read.
 - **The content screen (4.47.0):** in any profile, every text that `kg_get`, `kg_list`, `kg_history`, `kg_query`, and
   `kg_terms` return is screened before it reaches the model (`tools/kg_screen.py`, standard library only, a pure
   function of the text). Three verdicts: `pass` (nothing found); `quarantine` (one signal alone: an invisible

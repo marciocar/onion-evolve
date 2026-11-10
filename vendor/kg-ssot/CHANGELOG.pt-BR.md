@@ -10,6 +10,18 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.48.0] - 2026-11-09
+
+Sem mudança de contrato (segue v4.19) e sem mudança de veredito. Tudo aqui só vale quando você pede.
+
+- `kg-mcp`: o filtro por área (`--area-policy ARQUIVO`, sobre `--identity-header`). Um arquivo JSON fora da raiz diz quais
+  áreas compartilhadas cada identidade lê: a canônica e os grupos de que é membro. A leitura é a união da própria área com
+  essas, cujos grafos aparecem como `@<área>/<grafo>`, e só essas áreas são abertas. A aresta com uma ponta que nenhum nó
+  legível resolve sai inteira de `kg_get`, `kg_list`, `kg_history`, `kg_query` e `kg_terms`, sem id, sem arquivo e sem contar,
+  assim como um ponteiro a um grafo assim em `provenance`, `trace`, `verified_against`, `verified_scope` ou `reverify_on`.
+  Gravar continua sendo só na própria área. Sem a opção, nada muda. Id escrito em texto livre, em campo `x_` ou em mensagem de
+  commit não é filtrado.
+
 ## [4.47.0] - 2026-11-09
 
 Sem mudança de contrato (segue o v4.19) e sem mudança de veredito. O que um consumidor pode notar: o `kg-mcp` pode reter

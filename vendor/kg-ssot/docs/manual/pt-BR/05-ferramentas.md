@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:8c7b46ad5710fe32 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:77275a58eb3b373d -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -562,6 +562,7 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 | `--http PORT` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote`, que exige `--secret-env` |
 | `--secret-env VAR` · `--secret-header H` | O segredo compartilhado, lido da variável `VAR`, que cada requisição HTTP traz no header `H` (padrão `X-Api-Key`), comparado por hmac |
 | `--identity-header H` | O perfil "atrás de proxy": a identidade de cada requisição vem do header `H` (um e-mail), com área e autor próprios; exige `--secret-env` |
+| `--area-policy ARQUIVO` | Arquivo JSON, fora de `--root`, com as áreas compartilhadas que cada identidade lê; exige `--identity-header` |
 | `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
 | `--max-graphs N` | Grafos por armazém, ou por área no perfil; além disso, um nome novo é recusado |
 | `--max-concurrent N` | Requisições HTTP ao mesmo tempo; além disso, 503 |
@@ -627,6 +628,31 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     "notice": ...}`, para o modelo tratar o texto gravado por outros como dado, nunca como instrução.
   - **O que o perfil não é:** é "atrás de proxy", numa rede privada. Não é o perfil OAuth da especificação MCP, que
     espera até haver uma matriz medida de clientes.
+- **O filtro por área (4.48.0, `--area-policy`):** leitura de áreas compartilhadas, sobre o perfil "atrás de proxy". Sem a
+  opção, nada muda.
+  - **O arquivo de política:** JSON, fora de `--root`, escrito só pelo operador:
+    `{"schema_version": 1, "canonical": "c-empresa", "groups": {"g-financeiro": ["ana@x.org"]}}`. A área canônica se chama
+    `c-<nome>` e os grupos `g-<nome>`, cada um numa pasta sob `--root`. Todos leem a canônica, e o grupo é lido por seus
+    membros. O arquivo é relido quando muda, e a remoção de alguém vale na requisição seguinte. Depois de subir, um
+    arquivo que some ou quebra fecha a leitura: cada identidade fica só com a própria área, até ele voltar a valer.
+  - **O que uma identidade lê:** a união da própria área, com os nomes de sempre, e das áreas que ela pode ler, cujos
+    grafos aparecem como `@<área>/<grafo>`. Só essas áreas são abertas: o filtro vem antes da leitura. Gravar continua
+    sendo só na própria área, e `kg_write` ou `kg_delete` num nome com `@` é recusado.
+  - **A ponta que não se alcança:** a aresta com uma ponta que nenhum nó legível resolve sai inteira de `kg_get`
+    (também com `ref`), `kg_list`, `kg_history`, `kg_query` (nós, `edges` e `chain`) e `kg_terms`: sem id, sem arquivo e
+    sem contar em total, grupo ou grau. O mesmo vale para um ponteiro a um grafo assim em `provenance` (o ponteiro inteiro:
+    `source`, `scheme`, `locator` e os hashes), `trace`, `verified_against`, `verified_scope`, `reverify_on` ou o `trigger` de uma aresta, com ou sem
+    `#`, como URL ou no meio de uma frase. Um teste compara as respostas de `kg_list`, `kg_get`, `kg_query` e `kg_terms` com
+    as de um grafo que nunca teve a ponta, e elas são iguais.
+  - **Sem como perceber:** a área ilegível responde igual à área que não existe. O grafo de outra área sai sempre
+    normalizado, como JSON (que também é YAML) e sem comentários, tenha ou não havido corte. O grafo da própria área sai
+    como foi escrito, porque só aquela identidade escreve ali e o `sha256` precisa servir para gravar de volta.
+  - **Falha fechado:** um ponteiro numa forma que o filtro não resolve, como entre crases ou na URL de quem publica, é cortado
+    mesmo que o grafo citado seja legível.
+  - **O que ele não vê:** id ou caminho escrito em texto livre (`label`, `narrative`, a seção `meta`, campo `x_`, o que inclui os
+    rótulos de `x_term` que o `kg_terms` devolve, ou mensagem de commit no `kg_history`) continua lá, assim como o
+    `provenance.source` que aponta para um arquivo que não é grafo e o caminho escrito com percent-encoding. Para manter algo separado, deixe-o num grafo de uma área
+    que quem lê não alcança, e não o cite em texto que outros leem.
 - **A triagem do conteúdo (4.47.0):** em qualquer perfil, cada texto que `kg_get`, `kg_list`, `kg_history`, `kg_query`
   e `kg_terms` devolvem é triado antes de chegar ao modelo (`tools/kg_screen.py`, só biblioteca padrão, uma função pura
   do texto). Três vereditos: `pass` (nada achado); `quarantine` (um sinal sozinho: caractere invisível, região
