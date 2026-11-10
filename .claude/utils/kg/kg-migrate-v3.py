@@ -15,14 +15,15 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
   · COM --routing <tsv> (onda O1 do SAC-73, 2026-10-09): a ferramenta SÓ escreve provenance, e só nos nós que
     o routing da triagem (data/provenance-triage/routing-v4.tsv do grafo contrato-kg-absorcao-2026-10) manda
     para A1 ou A2 (coluna `final`). O `method` usa a classe que o routing propôs (coluna `method_class`):
-    "<classe>: provenance derivada na migração …; não reverificado". Datas NÃO são citadas neste modo (a onda
+    "<classe>: provenance derivada na migração …; não reverificado", com a classe gravada na forma canônica em
+    inglês (o alias em português do routing vira measurement/reading/judges/derived/testimony). Datas NÃO são citadas neste modo (a onda
     é só de provenance). Nó fora de A1/A2 (resíduo R, ou ausente do routing) fica intocado e sai no relatório;
     nó roteado com classe de method fora do contrato também, e nó cujo trace é o PRÓPRIO grafo (fonte circular).
-    Fonte em caminho absoluto do host vira "testemunho: leitura do arquivo <x> no host; …" (política 4 selada).
+    Fonte em caminho absoluto do host vira "testimony: leitura do arquivo <x> no host; …" (política 4 selada).
     Sem --routing, nada muda.
   · ONDA O2 (2026-10-09, dentro do --routing): nó A1/A2 com `trace:` e SEM `verified_against` (o registro do que
     foi medido não existe, então não há locator a copiar) recebe o trace como source E como locator, com
-    `method: "derivado: trace do nó, sem registro de medição"` (política selada da O2). Recusa, e deixa para a
+    `method: "derived: trace do nó, sem registro de medição"` (política selada da O2). Recusa, e deixa para a
     O3: trace circular (o próprio grafo) e trace com caminho do repo que não existe mais (resolvido a partir da
     raiz que o routing implica: o arquivo termina com o caminho do grafo no routing) e trace sem localizador
     (citação textual: memória, histórico de outro repo — sem URL nem caminho) e trace que registra um comando
@@ -111,10 +112,14 @@ CMD_TRACE_RE = re.compile(r'\b(grep|ls|find)\s|\bgit\s+(show|log|ls-files|ls-tre
 LABEL_MAX = 280
 # as classes de method do contrato v4 (SHOULD: ^(medição|leitura|juízes|derivado|testemunho): \S). Desde o v4.16
 # (kg-ssot 4.32.0) a forma canônica é em inglês e as cinco em português seguem como alias: a LEITURA das tabelas de
-# decisão aceita as dez. O que esta ferramenta ESCREVE por conta própria fica em português de propósito: as ondas
-# O1 a O4 já foram seladas com essa saída, e a bancada kg_migrate_v3 a fixa.
+# decisão aceita as dez. A ESCRITA grava a classe em inglês (D_PROVENANCE_METHOD_VOCAB_PLAN_1110, 2026-11-10: primeiro
+# o que escreve, depois o aviso SHOULD do kg-ssot, depois os corpus por lotes). Até lá esta ferramenta gravava em
+# português de propósito, porque as ondas O1 a O4 foram seladas com essa saída; os nós já gravados não mudam aqui:
+# o valor MANTIDO (campo vazio ou `(inalterado)` na tabela) segue como está, só o valor NOVO sai em inglês.
 METHOD_CLASSES = ("medição", "leitura", "juízes", "derivado", "testemunho",
                   "measurement", "reading", "judges", "derived", "testimony")
+METHOD_CLASS_EN = {"medição": "measurement", "leitura": "reading", "juízes": "judges",
+                   "derivado": "derived", "testemunho": "testimony"}
 MEASURED_PREFIXES = ("medição: ", "measurement: ")
 ROUTED = ("A1", "A2")
 ROUTING_COLS = ("graph", "id", "final", "method_class")
@@ -290,6 +295,14 @@ def scalar(raw):
     return v if isinstance(v, str) else (str(v) if v is not None else None)
 
 
+def canon_method(method):
+    """A classe do method na forma canônica em inglês; o detalhe depois de `: ` não muda. Fora das classes, intacto."""
+    if not isinstance(method, str):
+        return method
+    cls, sep, rest = method.partition(": ")
+    return METHOD_CLASS_EN[cls] + sep + rest if sep and cls in METHOD_CLASS_EN else method
+
+
 def q(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -391,8 +404,8 @@ def migrate(text, routes=None, graph=None, root=None, lroot=None):
                 elif not located:
                     rep["nolocator"].append(nid)
                 else:
-                    method = (f"testemunho: leitura do arquivo {s.split()[0]} no host; trace do nó, sem registro de medição"
-                              if host else "derivado: trace do nó, sem registro de medição")
+                    method = (f"testimony: leitura do arquivo {s.split()[0]} no host; trace do nó, sem registro de medição"
+                              if host else "derived: trace do nó, sem registro de medição")
                     block = block + [
                         "    provenance:",
                         "      source: " + q(src),
@@ -404,7 +417,7 @@ def migrate(text, routes=None, graph=None, root=None, lroot=None):
                 # política 4 selada (D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE): fonte em caminho do host, fora do repo,
                 # é testemunho da leitura no host — a CI não alcança o arquivo; a classe do routing não vale aqui
                 host = src.strip().startswith("/")
-                cls = "testemunho" if host else route[1]
+                cls = "testimony" if host else METHOD_CLASS_EN.get(route[1], route[1])
                 detail = (f"leitura do arquivo {src.strip().split()[0]} no host; " if host else "") + \
                     f"provenance derivada na migração ao contrato v4 ({how}; rota {route[0]} da triagem); não reverificado"
                 block = block + [
@@ -419,7 +432,7 @@ def migrate(text, routes=None, graph=None, root=None, lroot=None):
                     "    provenance:",
                     "      source: " + q(src),
                     "      locator: " + q(va),
-                    "      method: " + q(f"derivado: na migração ao contrato v3 ({how}); não reverificado"),
+                    "      method: " + q(f"derived: na migração ao contrato v3 ({how}); não reverificado"),
                 ] + _loc_line(src, lroot)
                 rep["prov"].append(nid)
             else:
@@ -507,6 +520,9 @@ def _put_provenance(block, src, loc, method, lroot=None, locality=None, derive=T
     determina (contrato v4.2) ou, na O4, a que o juiz escreveu (`locality`). derive=False (O5): sem locality do juiz
     e sem locality atual, o nó continua sem a chave (campo vazio = inalterado). (bloco, mudou?)."""
     loc_val = locality or (locality_of(src, lroot) if derive else None)
+    cur_method = (_get_provenance(block) or {}).get("method")
+    if method != cur_method:
+        method = canon_method(method)  # valor NOVO sai em inglês; o mantido (igual ao atual) fica como está
     new = ["    provenance:", "      source: " + q(src), "      locator: " + q(loc), "      method: " + q(method)] \
         + (["      locality: " + q(loc_val)] if loc_val else [])
     want = {"source": src, "locator": loc, "method": method}
