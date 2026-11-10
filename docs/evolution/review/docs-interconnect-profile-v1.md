@@ -2,7 +2,8 @@
 branch: docs/interconnect-profile-v1
 pr: pendente
 date: 2026-11-10
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a147edefb15ea7b0c73e44074270e0d995d5c7a9480d2bd5c3285c0a99d7d9f8
+reviewed_code_sha256: 09f4f946bab70459377e21923398a970d8bec531576751b790f57cb92065f084
 findings_total: 6
 findings_real: 5
 findings_blocking: 0
