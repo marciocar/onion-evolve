@@ -2,7 +2,8 @@
 branch: docs/a2a-gpu-edge-case
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8fc00df1114493e84adbfc0ce772eb04e7b2775a526d3691c706367ec9054cab
+reviewed_code_sha256: c05bc0ada441a16325954b470b7a9b58bf30026f6914b1e9fe11e1362a2f436f
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
