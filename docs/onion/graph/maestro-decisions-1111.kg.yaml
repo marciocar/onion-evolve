@@ -1,0 +1,96 @@
+meta:
+  schema_version: "1"
+  id: maestro-decisions-1111
+  slug: maestro-decisions-1111
+  title: "Decisões que o maestro tomou em 2026-11-11 pelo /meta:decide, sem nó de origem com folga"
+  date: "2026-11-11"
+  baseline: "2026-11-11"
+  review_after: "2026-12-11"
+  purpose: "Guardar os selos da 2ª rodada do /meta:decide de 2026-11-11 cujos grafos de tema estão no teto, no molde do grafo de selos de 2026-11-10."
+  note: "TETO, declarado: 1 evidência de origem e 3 selos. Decisão nova vai para o grafo do assunto."
+  # ═══ TETO: 4 NÓS ═══
+external_edges:
+  - from: D_ESTUDO_COMPANY_BRAIN_NAO_DEVS_1111
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: TRACES_TO
+  - from: D_BOT_SLACK_DENTRO_DO_ESTUDO_1111
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: TRACES_TO
+  - from: D_A2A_REFAZER_QUANDO_O_MAESTRO_TIVER_TEMPO_1111
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO"
+    edge_type: TRACES_TO
+nodes:
+  - id: E_MD_MAESTRO_ROUND_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "respostas do maestro às perguntas com opções da 2ª rodada do /meta:decide em 2026-11-11, na sessão do core"
+    label: "Em 2026-11-11 o maestro respondeu, por perguntas com opções, a três questões da 2ª rodada do /meta:decide."
+    narrative: "Origem comum dos selos deste grafo. Os grafos do Company Brain e da coordenação entre sessões estão no teto; os selos ficam aqui e apontam para os nós de lá."
+    provenance:
+      source: "sessão do core, 2026-11-11"
+      locator: "2ª rodada de perguntas com opções do /meta:decide"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: pessoa
+  - id: D_ESTUDO_COMPANY_BRAIN_NAO_DEVS_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Em paralelo, primaries agora»"
+    label: "O estudo definitivo de como os não-devs consultam o Company Brain por Slack e Claude abre já, em paralelo à cura dos vetos, com as fontes primárias e as perguntas às sessões do ecossistema."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Em paralelo, primaries agora»; descartadas: «Depois da cura dos vetos» · «Antes de tudo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «O estudo do Company Brain para os não-devs: onde entra na fila?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_BOT_SLACK_DENTRO_DO_ESTUDO_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Respondo já, dentro do estudo»"
+    label: "O core responde já às três rodadas sobre o @brain postar no Slack como bot, como primeira peça do estudo do Company Brain, ouvindo a curadoria."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Respondo já, dentro do estudo»; descartadas: «Respondo já, separado» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «As três rodadas sobre o @brain postar no Slack como bot: como o core participa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_A2A_REFAZER_QUANDO_O_MAESTRO_TIVER_TEMPO_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Quando você tiver 30 min»"
+    label: "A ida e volta A2A entre VPS e notebook se refaz quando o maestro tiver 30 minutos com o notebook, conduzida passo a passo; a réplica de 2026-11-09, sem a flag que desliga o Chrome, fica em dúvida."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Quando você tiver 30 min»; descartadas: «Encerrar o teste» · «Só depois do Company Brain»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Quando refazemos o teste A2A de ida e volta?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+edges:
+  - from: D_ESTUDO_COMPANY_BRAIN_NAO_DEVS_1111
+    to: E_MD_MAESTRO_ROUND_1111
+    edge_type: TRACES_TO
+  - from: D_BOT_SLACK_DENTRO_DO_ESTUDO_1111
+    to: E_MD_MAESTRO_ROUND_1111
+    edge_type: TRACES_TO
+  - from: D_A2A_REFAZER_QUANDO_O_MAESTRO_TIVER_TEMPO_1111
+    to: E_MD_MAESTRO_ROUND_1111
+    edge_type: TRACES_TO
