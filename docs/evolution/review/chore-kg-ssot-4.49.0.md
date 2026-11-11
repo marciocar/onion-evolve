@@ -2,8 +2,7 @@
 branch: chore/kg-ssot-4.49.0
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: 1b9b8f7ac6a0f4e528eeae51691d092dc6cec4099519186e9f612ab7e5d30f2b
-reviewed_code_sha256: a6b6d82eb1e3fcb4951e2f8aab7f71fee812002d46e675ffc968fd6dc16885ad
+reviewed_diff_sha256: pendente
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
@@ -60,3 +59,7 @@ Só `.claude/validation/lint-selftest.sh` mudou; o `vendor/` segue intocado.
 Observação: (g) e (l) de `decide` falham só nesta máquina, porque o censo lê o registro local de perguntas ao
 maestro (`ONION_ASK_DIR`, padrão `~/.local/state/onion/maestro-asks`) que a bancada não isola. Com `ONION_ASK_DIR`
 num diretório vazio passam (38/38). Não é efeito da 4.49.0 e não foi alterado aqui.
+
+## Re-revisão 2
+
+O CI reprovou o caso `method-classe-ingles-e-alias-aprovam-sem-aviso` do selftest do escritor MCP (`ops/mcp-onion-kg-writer/selftest.py`): desde o contrato v4.21 os aliases em português seguem aprovados, mas com o aviso SHOULD de depreciação. O caso agora exige zero aviso só das classes inglesas, e um caso novo exige que os aliases aprovem COM o aviso. Rodado local: 66 de 66.
