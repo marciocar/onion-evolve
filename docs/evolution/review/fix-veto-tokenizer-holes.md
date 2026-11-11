@@ -2,7 +2,8 @@
 branch: fix/veto-tokenizer-holes
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ca596f18d68e6d2e3f9142a69d77265ec5e35277f56e5e977c31614ce2892b85
+reviewed_code_sha256: af5b80209d7277d2a4e3df17b3b43aa2db0d4fbebaabf6370332d64c6a65f9dc
 findings_total: 3
 findings_real: 3
 findings_blocking: 2
