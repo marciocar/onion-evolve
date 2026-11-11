@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-10"
   review_after: "2026-12-10"   # 30d: cadência de ferramenta
-  # ═══ TETO: 25 NÓS ═══
+  # ═══ TETO: 30 NÓS ═══ (subido em 2026-11-11 de 25: a cura dos furos dos vetos entrou na rodada como evidência própria)
   #   2 no esqueleto (2026-11-10); 14 da rodada; 24 após o juiz (1 pergunta nova e 7 superações).
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   DECIDIDO (2026-11-10, juiz no CU4): (a). Caíram pela medição de hoje sete nós da r23: as versões de quem serve, a pergunta
