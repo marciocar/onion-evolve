@@ -2,7 +2,8 @@
 branch: docs/company-brain-non-devs-study
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9811cba9cd83fb9d07700694f8ede1c47acc4058ead30ded46ec1d825654015f
+reviewed_code_sha256: a971c3c29d47c81186b643671baed84d5f0cc4a7e0887f626d36c61fcf18e175
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
