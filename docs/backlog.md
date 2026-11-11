@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1062 itens abertos** em 164 grafo(s) com aberto (de 218 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1061 itens abertos** em 164 grafo(s) com aberto (de 218 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1422,13 +1422,6 @@
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETERM |
 
-## radar-E3-2026-11-10-r24 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 9.6 | `Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110` | radar-E3-2026-11-10-r24 | o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita  |
-| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
-
 ## session-2026-07-18-evolve-review-triage — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1585,6 +1578,12 @@
 | 4.2 | `Q_ENXUGAR_O_CLAUDE_MD_1111` | model-compare-onion-2026-11 | auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito |
 | 4.2 | `Q_REVISOR_DE_OUTRO_FORNECEDOR_1111` | model-compare-onion-2026-11 | ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa  |
 | 4.2 | `Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111` | model-compare-onion-2026-11 | curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada |
+
+## radar-E3-2026-11-10-r24 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
 
 ## a2a-landscape-2026-11 — 4 item(ns)
 
