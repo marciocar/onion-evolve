@@ -488,6 +488,10 @@ export function formCodes(err, doc) {
   let kind = FORM_TYPE[err.keyword] || err.keyword;
   if (err.keyword === 'not' && isObj(err.schema) && 'pattern' in err.schema) kind = 'pattern';
   if (err.keyword === 'not' && isObj(err.schema) && 'required' in err.schema) kind = 'exclusive'; // v4.12: ref e text
+  // v4.20: a chave fora do lugar (x_classification no nó), por not com o schema vazio, que nada satisfaz
+  if (err.keyword === 'not' && isObj(err.schema) && Object.keys(err.schema).length === 0) kind = 'misplaced';
+  // v4.21: a forma aceita e em retirada (o apelido em português do method), por not com deprecated: true
+  if (err.keyword === 'not' && isObj(err.schema) && err.schema.deprecated === true) kind = 'deprecated';
   if (err.keyword === 'required') return [`form.${kind}.${scope}.${[...prefix, err.params.missingProperty].join('.')}`];
   if (err.keyword === 'additionalProperties') {
     return [`form.${kind}.${scope}.${[...prefix, err.params.additionalProperty].join('.')}`];
@@ -614,12 +618,23 @@ export function docCodes(doc, validate, corpus = null, format = 'yaml') {
   return docCodesWithForm(doc, validate, corpus, format).codes;
 }
 
-// docCodes e, à parte, os form.* que o próprio validador MUST acusou (o `must` do warning_counts da referência, sem
-// os do .nan nem os do inteiro inseguro).
+// A ocorrência de um código: o código e o caminho do erro. O aviso se deduplica contra o MUST por ocorrência, não por
+// documento: o que o MUST acusa em OUTRO nó segue avisando (v4.21; o `must` do warning_counts da referência).
+const occurrenceKey = (err, code) => `${err.instancePath}\u0000${code}`;
+
+// docCodes e, à parte, as ocorrências form.* que o próprio validador MUST acusou (sem as do .nan nem as do inteiro
+// inseguro).
 function docCodesWithForm(doc, validate, corpus, format) {
+  const out = new Set();
   const mustForm = new Set();
-  if (!validate(doc)) for (const err of validate.errors || []) for (const c of formCodes(err, doc)) mustForm.add(c);
-  const out = new Set(mustForm);
+  if (!validate(doc)) {
+    for (const err of validate.errors || []) {
+      for (const c of formCodes(err, doc)) {
+        out.add(c);
+        mustForm.add(occurrenceKey(err, c));
+      }
+    }
+  }
   for (const c of nonFiniteCodes(doc)) out.add(c);
   if (format === 'json') for (const c of unsafeIntegerCodes(doc)) out.add(c);
   for (const c of integrity(doc, corpus)) out.add(c);
@@ -951,17 +966,17 @@ export function warnings(text, validate, validateShould, { format = 'yaml', corp
   return parsed.code ? [] : warningsOf(parsed, validate, validateShould, format, null, corpus);
 }
 
-// Os avisos de um texto já parseado. mustCodes: os form.* do MUST, se quem chama já os tem (o verdictOf, para não
-// validar duas vezes).
-function warningsOf(parsed, validate, validateShould, format, mustCodes = null, corpus = null) {
+// Os avisos de um texto já parseado. mustOccurrences: as ocorrências form.* do MUST, se quem chama já as tem (o
+// verdictOf, para não validar duas vezes).
+function warningsOf(parsed, validate, validateShould, format, mustOccurrences = null, corpus = null) {
   const { doc } = parsed;
-  let must = mustCodes;
+  let must = mustOccurrences;
   if (must === null) {
     must = new Set();
-    if (!validate(doc)) for (const err of validate.errors || []) for (const c of formCodes(err, doc)) must.add(c);
+    if (!validate(doc)) for (const err of validate.errors || []) for (const c of formCodes(err, doc)) must.add(occurrenceKey(err, c));
   }
   const out = new Set();
-  if (!validateShould(doc)) for (const err of validateShould.errors || []) for (const c of formCodes(err, doc)) if (!must.has(c)) out.add(c);
+  if (!validateShould(doc)) for (const err of validateShould.errors || []) for (const c of formCodes(err, doc)) if (!must.has(occurrenceKey(err, c))) out.add(c);
   if (format !== 'json') {
     if (parsed.unquotedDate) out.add('yaml.unquoted-date');
     for (const c of yamlProfileCodes(doc)) out.add(c);

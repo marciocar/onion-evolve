@@ -3,6 +3,7 @@
   "id": "radar-E3-2026-10-16-r12",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 14,
     "integrity.superseded-without-successor": 1
   }
 }

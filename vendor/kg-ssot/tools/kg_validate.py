@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.19"
+CONTRACT_VERSION = "4.21"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -720,6 +720,11 @@ def form_codes(error):
         kind = "pattern"  # o v4 diz "não pode casar com placeholder" por not+pattern, sem lookahead (portável a RE2)
     if error.validator == "not" and isinstance(error.validator_value, dict) and "required" in error.validator_value:
         kind = "exclusive"  # v4.12: campos que se excluem (ref e text no x_criterion), por not+required
+    if error.validator == "not" and error.validator_value == {}:
+        kind = "misplaced"  # v4.20: a chave fora do lugar (x_classification no nó), por not com o schema vazio
+    if (error.validator == "not" and isinstance(error.validator_value, dict)
+            and error.validator_value.get("deprecated") is True):
+        kind = "deprecated"  # v4.21: a forma aceita e em retirada (o apelido em português do method), por not+deprecated
     if error.validator in ("additionalProperties", "required"):
         # O erro é do OBJETO (o topo, o meta, um nó, uma aresta ou um objeto dentro deles).
         if error.validator == "required":
@@ -1521,9 +1526,11 @@ def warning_counts(text, validator, should_validator, corpus=None):
     raw, doc, parse_code = parse_v1(text)
     if parse_code:
         return collections.Counter()
-    must = {c for err in validator.iter_errors(doc) for c in form_codes(err)}
-    should = collections.Counter(c for err in should_validator.iter_errors(doc) for c in form_codes(err))
-    out = collections.Counter({c: n for c, n in should.items() if c not in must})
+    # por ocorrência (código e caminho), não por documento: o aviso que o MUST acusa em OUTRO nó segue contado, senão a
+    # base gravaria 0 e quem paga a dívida MUST levaria uma piora SHOULD
+    must = {(c, tuple(err.absolute_path)) for err in validator.iter_errors(doc) for c in form_codes(err)}
+    out = collections.Counter(c for err in should_validator.iter_errors(doc) for c in form_codes(err)
+                              if (c, tuple(err.absolute_path)) not in must)
     if _has_unquoted_date(raw):
         out["yaml.unquoted-date"] += 1
     out.update(yaml_profile_warnings(text, raw))
@@ -1825,13 +1832,25 @@ HINTS = {
                                        "is not a node id.",
     "integrity.measured-order-unknown": "Give registered_at and measured_at a time with a time zone (RFC 3339).",
     "form.required.node.provenance": "Add provenance with source, locator, and method; with no recoverable source, "
-                                     "change the status to unverifiable.",
+                                     "change the status to unverifiable (on a decision, cite who decided, as "
+                                     "testimony).",
     "form.required.node.label": "Add label: the node's short claim, up to 280 characters.",
     "form.range.node.label": "Shorten the label to 280 characters and move the rest to narrative.",
     "form.pattern.node.provenance.method": "Use the form '<class>: <detail>', with class measurement, reading, judges, "
                                            "derived, or testimony.",
+    "form.deprecated.node.provenance.method": "Write the class in English: measurement, reading, judges, derived, or "
+                                              "testimony (v4.21). The Portuguese alias still passes and leaves in v5.",
     "form.pattern.node.provenance.source": "Write the source of truth (URL, path, command); with no recoverable source, "
                                            "remove provenance and change the status to unverifiable.",
+}
+# v4.21: a dica de form.required.node.provenance pelo tipo do nó. Mandar uma decision done para unverifiable sugeriria
+# desfazer a decisão; o que falta nela é dizer em que se apoiou.
+PROVENANCE_HINTS = {
+    "decision": "Add provenance with source, locator, and method: what this decision rests on. With no document to "
+                "cite, the source is who decided, with method testimony. Keep the status: a closed decision stays "
+                "closed.",
+    "evidence": "Add provenance with source, locator, and method: where this evidence was read or measured; with no "
+                "recoverable source, change the status to unverifiable.",
 }
 # A frase montada de form.<tipo>.<escopo>.<campo>: {field} é o campo e {scope} vem de SCOPE_TEXT.
 KIND_TEXT = {"required": 'Missing required field "{field}" {scope}.',
@@ -1841,7 +1860,9 @@ KIND_TEXT = {"required": 'Missing required field "{field}" {scope}.',
              "range": 'Value out of bounds in "{field}" {scope}.',
              "const": 'Value differs from the required one in "{field}" {scope}.',
              "unknown-key": 'Key outside the grammar (no x_ prefix): "{field}" {scope}.',
-             "exclusive": 'Fields that exclude each other in "{field}" {scope}.'}
+             "exclusive": 'Fields that exclude each other in "{field}" {scope}.',
+             "misplaced": 'Key out of place: "{field}" {scope}.',
+             "deprecated": 'Accepted form on its way out in "{field}" {scope}.'}
 SCOPE_TEXT = {"node": "in the node", "edge": "in the edge", "meta": "in meta", "top": "at the top level"}
 
 
@@ -1868,6 +1889,11 @@ PROFILE_HINTS = {
     ("edge", "x_confidence"): "x_confidence on an edge is a number from 0 to 1 (v4.11).",
     ("edge", "x_provisional"): "x_provisional on an edge is true or false (v4.11).",
     ("meta", "slug"): "slug is lowercase words joined by hyphens, like my-graph (v4.11).",
+    ("meta", "x_classification"): "x_classification is the sensitivity level of the whole graph (v4.20): one slug "
+                                  "(lowercase, digits, hyphen), like confidential; the levels and their order are the "
+                                  "organization's, in the policy of the server that serves the graph.",
+    ("node", "x_classification"): "x_classification belongs in meta (v4.20): the unit is the graph, not the node. Move "
+                                  "the node to a graph of its own and declare the level in that graph's meta.",
 }
 
 
@@ -1887,10 +1913,25 @@ def message_of(code, json_text=False):
     return _("Violation {code}.").format(code=code)
 
 
-def hint_of(code, place=None):
+def _node_type_at(doc, path):
+    """O node_type do nó em nodes[i] (o caminho da ocorrência), ou None."""
+    nodes = doc.get("nodes") if isinstance(doc, dict) and isinstance(doc.get("nodes"), list) else []
+    if (isinstance(path, (list, tuple)) and len(path) >= 2 and path[0] == "nodes" and isinstance(path[1], int)
+            and 0 <= path[1] < len(nodes) and isinstance(nodes[path[1]], dict)):
+        node_type = nodes[path[1]].get("node_type")
+        return node_type if isinstance(node_type, str) else None
+    return None
+
+
+def hint_of(code, place=None, doc=None, path=None):
     """A correção do código, na língua do ambiente; no integrity.orphan-node com o lugar 'nó X', a dica traz o id do
     nó. Um nó sem id ('nó #2', o índice) fica com a dica genérica: não há id para citar. O lugar segue em pt-BR (é
-    vocabulário de dados)."""
+    vocabulário de dados). Com o documento e o caminho da ocorrência (nodes[i]), form.required.node.provenance ganha a
+    dica do tipo do nó (v4.21). O nó é o do caminho, nunca o do id: com id repetido, o lugar 'nó X' é ambíguo."""
+    if code == "form.required.node.provenance" and doc is not None:
+        node_type = _node_type_at(doc, path)
+        if node_type in PROVENANCE_HINTS:
+            return _(PROVENANCE_HINTS[node_type])
     if (code == "integrity.orphan-node" and isinstance(place, str) and place.startswith("nó ")
             and not place.startswith("nó #")):
         nid = place[3:]
@@ -1920,7 +1961,7 @@ def occurrences(text, validator, should_validator=None, corpus=None):
         path = list(err.absolute_path)
         for code in form_codes(err):
             out.append(("MUST", code, schema_place(doc, path), path))
-            must.add(code)
+            must.add((code, tuple(path)))
     typed = non_finite_codes(doc) | (unsafe_integer_codes(doc) if isinstance(text, JsonText) else set())
     out += [("MUST", code, "arquivo", []) for code in sorted(typed)]
     out += [("MUST", code, place, place_path(doc, place))
@@ -1930,12 +1971,21 @@ def occurrences(text, validator, should_validator=None, corpus=None):
     if should_validator is not None:
         for err in should_validator.iter_errors(doc):
             path = list(err.absolute_path)
-            out += [("SHOULD", code, schema_place(doc, path), path) for code in form_codes(err) if code not in must]
+            out += [("SHOULD", code, schema_place(doc, path), path) for code in form_codes(err)
+                    if (code, tuple(path)) not in must]
         if _has_unquoted_date(raw):
             out.append(("SHOULD", "yaml.unquoted-date", "arquivo", []))
         out += [("SHOULD", code, "arquivo", []) for code in yaml_profile_warnings(text, raw)]
         out += [("SHOULD", code, place, place_path(doc, place)) for code, place in coherence_located(doc, corpus)]
     return out
+
+
+def _hint_doc(text, found):
+    """O documento para a dica por tipo de nó, só quando alguma ocorrência é form.required.node.provenance (o parse custa)."""
+    if not any(item[1] == "form.required.node.provenance" for item in found):
+        return None
+    _raw, doc, parse_code = parse_v1(text)
+    return None if parse_code or not isinstance(doc, dict) else doc
 
 
 def verdict(text, validator, should_validator=None, corpus=None, source=None, limit=50):
@@ -1950,12 +2000,13 @@ def verdict(text, validator, should_validator=None, corpus=None, source=None, li
     for level, code, _, _ in occ:
         summary[level][code] += 1
     items = []
+    doc = _hint_doc(text, occ)
     for level, code, place, path in occ[:limit]:
         item = {"level": level, "code": code, "place": place, "path": path_text(path),
                 "line": (parse_line if code.startswith("parse.") else line_of(tree, path) if tree is not None and path
                          else None),
                 "message": message_of(code, isinstance(text, JsonText))}
-        hint = hint_of(code, place)
+        hint = hint_of(code, place, doc, path)
         if hint:
             item["hint"] = hint
         items.append(item)
@@ -2448,10 +2499,20 @@ def main(argv=None):
         warned += bool(should)
         lines += report(name, must, should, isinstance(text, JsonText))
         if args.where:  # a mesma ocorrência repetida (os ramos if/then do schema) vira uma linha com ×n
-            found = collections.Counter(where(text, validator, should_v, corpus))
+            occ = occurrences(text, validator, should_v, corpus)
+            found = collections.Counter((level, code, place) for level, code, place, _ in occ)
+            hint_doc = _hint_doc(text, found)
+            # os nós de cada linha, pelo caminho: com id repetido, uma linha 'nó X' junta nós de tipos diferentes, e aí
+            # a dica é a genérica
+            paths = collections.defaultdict(list)
+            for level, code, place, path in occ:
+                paths[(level, code, place)].append(path)
             for (level, code, place), n in sorted(found.items(), key=lambda x: (x[0][0] != "MUST", x[0][1:])):
                 lines.append(f"    {level:<6} {code}  {place}" + (f" ×{n}" if n > 1 else ""))
-                hint = hint_of(code, place) if level == "MUST" else None  # no MUST, a correção ao lado do lugar
+                same = paths[(level, code, place)]
+                one = {_node_type_at(hint_doc, x) for x in same} if hint_doc is not None else {None}
+                path = same[0] if len(one) == 1 else None
+                hint = hint_of(code, place, hint_doc, path) if level == "MUST" else None  # no MUST, a correção ao lado do lugar
                 if hint:
                     lines.append(f"           → {hint}")
     summary = summarize(results)

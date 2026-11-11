@@ -3,6 +3,7 @@
   "id": "pr-decision-history-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 681,
     "integrity.bare-decision": 671
   }
 }

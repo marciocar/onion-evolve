@@ -17,6 +17,10 @@ nodes:
     confidence: 0.9
     trace: "docs/adr-sintetico.md"
     label: "A decisão sintética A."
+    provenance:
+      source: "Fonte D_A"
+      locator: "caso de conformidade"
+      method: "measurement: caso sintético"
     narrative: "O porquê sintético."
 edges:
   - from: D_A

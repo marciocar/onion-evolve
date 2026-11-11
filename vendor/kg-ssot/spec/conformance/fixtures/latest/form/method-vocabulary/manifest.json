@@ -1,5 +1,5 @@
 {
-  "description": "O vocabulário de provenance.method no v4: '<classe>: <detalhe>'. Desde o v4.16, a classe canônica é em inglês (measurement, reading, judges, derived, testimony), e as cinco em português (medição, leitura, juízes, derivado, testemunho) seguem aceitas como alias, sem aviso. SHOULD no v4, MUST no v5.",
+  "description": "O vocabulário de provenance.method no v4: '<classe>: <detalhe>'. Desde o v4.16, a classe canônica é em inglês (measurement, reading, judges, derived, testimony). As cinco em português (medição, leitura, juízes, derivado, testemunho) seguem válidas, mas desde o v4.21 alertam como form.deprecated.node.provenance.method; o valor que já falha a forma fica só com form.pattern.node.provenance.method. O apelido sai no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro adotante e no repositório de curadoria dele der zero. SHOULD no v4, MUST no v5.",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -34,34 +34,49 @@
       "codes": []
     },
     {
-      "file": "valid-method-medicao.kg.yaml",
-      "description": "classe medição (alias em português, aceito sem aviso desde o v4.16)",
+      "file": "warn-method-alias-medicao.kg.yaml",
+      "description": "classe medição (apelido em português): segue válida e alerta, use a classe em inglês (v4.21)",
       "valid": true,
-      "codes": []
+      "codes": [],
+      "warnings": [
+        "form.deprecated.node.provenance.method"
+      ]
     },
     {
-      "file": "valid-method-leitura.kg.yaml",
-      "description": "classe leitura (alias em português, aceito sem aviso desde o v4.16)",
+      "file": "warn-method-alias-leitura.kg.yaml",
+      "description": "classe leitura (apelido em português): segue válida e alerta, use a classe em inglês (v4.21)",
       "valid": true,
-      "codes": []
+      "codes": [],
+      "warnings": [
+        "form.deprecated.node.provenance.method"
+      ]
     },
     {
-      "file": "valid-method-juizes.kg.yaml",
-      "description": "classe juízes (alias em português, aceito sem aviso desde o v4.16)",
+      "file": "warn-method-alias-juizes.kg.yaml",
+      "description": "classe juízes (apelido em português): segue válida e alerta, use a classe em inglês (v4.21)",
       "valid": true,
-      "codes": []
+      "codes": [],
+      "warnings": [
+        "form.deprecated.node.provenance.method"
+      ]
     },
     {
-      "file": "valid-method-derivado.kg.yaml",
-      "description": "classe derivado (alias em português, aceito sem aviso desde o v4.16)",
+      "file": "warn-method-alias-derivado.kg.yaml",
+      "description": "classe derivado (apelido em português): segue válida e alerta, use a classe em inglês (v4.21)",
       "valid": true,
-      "codes": []
+      "codes": [],
+      "warnings": [
+        "form.deprecated.node.provenance.method"
+      ]
     },
     {
-      "file": "valid-method-testemunho-terceiro.kg.yaml",
-      "description": "medição de terceiro lida aqui é testemunho (alias em português, aceito sem aviso desde o v4.16)",
+      "file": "warn-method-alias-testemunho-terceiro.kg.yaml",
+      "description": "classe testemunho (apelido em português, medição de terceiro lida aqui): segue válida e alerta, use a classe em inglês (v4.21)",
       "valid": true,
-      "codes": []
+      "codes": [],
+      "warnings": [
+        "form.deprecated.node.provenance.method"
+      ]
     },
     {
       "file": "warn-method-free-text.kg.yaml",
@@ -88,6 +103,39 @@
       "codes": [],
       "warnings": [
         "form.pattern.node.provenance.method"
+      ]
+    },
+    {
+      "file": "warn-method-alias-embedded-quote.kg.yaml",
+      "description": "o apelido entre aspas embutidas já falha a forma: só form.pattern, sem o aviso do apelido (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.method"
+      ]
+    },
+    {
+      "file": "warn-method-alias-no-space.kg.yaml",
+      "description": "o apelido sem o espaço depois dos dois-pontos já falha a forma: só form.pattern (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.method"
+      ]
+    },
+    {
+      "file": "valid-method-alias-word-in-detail.kg.yaml",
+      "description": "a palavra do apelido no detalhe não conta: só a classe é julgada (v4.21)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-method-alias-and-canonical.kg.yaml",
+      "description": "um nó com o apelido e outro com a canônica: o aviso do apelido, uma vez (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.deprecated.node.provenance.method"
       ]
     }
   ]

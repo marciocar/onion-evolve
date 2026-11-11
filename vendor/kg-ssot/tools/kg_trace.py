@@ -23,7 +23,11 @@ grafo não está na raiz). Um alvo que sai da raiz (`../irmão/x`) não resolve:
 Lê os .kg.yaml e .kg.json que o git rastreia sob a raiz, fora do vendor, de docs/materials/ e das pastas de fixture
 (fixture/, fixtures/, __fixtures__/, testdata/, __snapshots__/, em qualquer nível); --exclude soma padrões, e
 --no-default-excludes tira os padrões. Um corpus que ancora numa pasta de fora (a memória de uma sessão) fica
-vermelho até que ela seja declarada com --external-root. O trace que não é texto sai em not_text, e o nó com id
+vermelho até que ela seja declarada com --external-root. A fonte do provenance (o source que o scheme ou o sha256 leem) só é lida
+quando o git a rastreia (4.49.0), pelo blob do índice e nunca pelo disco: a fonte fora do índice é ausente, exista ou
+não no disco (o arquivo gerado no CI ou ignorado inclusive); a do submódulo não baixado, o link que sai da raiz ou vai ao
+.git e o caminho com segmento .git (em qualquer caixa), . ou .. contam como não conferidos e nunca são lidos, para nenhum
+nó virar um oráculo do que o CI tem no disco. A edição local sem git add é julgada pela versão do índice. O trace que não é texto sai em not_text, e o nó com id
 repetido ou fora de texto, que o gate já reprova no MUST, não é lido aqui.
 
 Uso:
@@ -179,11 +183,75 @@ def resolve_pointer(doc, locator):
     return True
 
 
-def locate_source(source, graph_dir, root):
+_UNSET = object()
+
+
+class TrackedIndex:
+    """O que o git rastreia sob a raiz (4.49.0), com o caminho relativo a ela: é a fronteira do que a fonte pode ler. O
+    arquivo não rastreado (o que o CI cria, o ignorado, o .git/config onde o actions/checkout grava o token) nunca é
+    lido, e o disco não decide nada: o conteúdo lido é o blob do índice, e um link é seguido pelo blob dele. O que não
+    está no índice é ausente, sem olhar o disco nem o histórico."""
+
+    def __init__(self, root, entries):
+        self.root = str(root)
+        self.modes = entries  # caminho -> modo
+        self.files = {n for n, m in entries.items() if m != "160000"}
+        self.gitlinks = {n for n, m in entries.items() if m == "160000"}
+        self.dirs = {"/".join(n.split("/")[:k]) for n in entries for k in range(1, n.count("/") + 1)}
+
+    def follow(self, rel):
+        """O arquivo regular rastreado que rel nomeia, com os links do índice seguidos (até 8), ou None: o link que
+        sai da raiz, que passa por .git, ou que chega a algo não rastreado não é seguido."""
+        import posixpath
+        for _hop in range(8):
+            mode = self.modes.get(rel)
+            if mode is None or mode == "160000":
+                return None
+            if mode != "120000":
+                return rel
+            out = kg_query._git(self.root, "show", "--end-of-options", f":./{rel}", offline=True)
+            if out.returncode != 0:
+                return None
+            link = out.stdout.decode("utf-8", "surrogateescape")
+            if link.startswith("/"):
+                return None
+            rel = posixpath.normpath(posixpath.join(posixpath.dirname(rel), link))
+            if rel == ".." or rel.startswith("../") or unsafe_target(rel):
+                return None
+        return None
+
+    def in_gitlink(self, rel):
+        return any(rel.startswith(g + "/") for g in self.gitlinks)
+
+
+def tracked_index(root):
+    """O TrackedIndex da raiz, ou None fora de um repo git (aí vale a regra de antes, só o disco)."""
+    out = kg_query._git(str(root), "ls-files", "-s", "-z")
+    if out.returncode != 0:
+        return None
+    entries = {}
+    for rec in out.stdout.decode("utf-8", "surrogateescape").split("\0"):
+        meta, tab, name = rec.partition("\t")
+        if tab and name:
+            entries[name] = meta.split(" ", 1)[0]
+    return TrackedIndex(root, entries)
+
+
+def unsafe_target(target):
+    """O alvo com segmento vazio, . ou .., ou com um segmento .git em qualquer caixa (e com o ponto ou o espaço do fim
+    que o Windows descarta): não se lê, porque só resolveria normalizando o caminho, ou cairia dentro do .git."""
+    return any(seg in ("", ".", "..") or seg.rstrip(". ").casefold() == ".git" for seg in target.split("/"))
+
+
+def locate_source(source, graph_dir, root, tracked=_UNSET):
     """(classe, alvo, caminho) do provenance.source como caminho do repo, para o locator: diferente do trace, o nome
     solto com extensão (gone.json) é caminho, porque a fonte não é prosa; absolute para URL ou caminho absoluto;
-    not_path para o texto que não parece arquivo (a fala de alguém); outside_root para o que sai da raiz (contado,
-    não julgado); resolved ou missing contra a raiz, a pasta do grafo e a pasta pai dele."""
+    not_path para o texto que não parece arquivo (a fala de alguém); outside_root para o que sai da raiz ou não é um
+    caminho limpo (segmento ., .. ou .git; contado, não julgado); resolved, missing ou untracked contra a raiz, a pasta
+    do grafo e a pasta pai dele. Num repo git, só o índice decide (4.49.0): resolved é o arquivo rastreado (o link do
+    índice seguido até um arquivo rastreado), untracked é o que mora num submódulo ou o link do índice que não se segue
+    (contado, nunca lido), e missing é todo o resto, o que não está no índice, exista ou não no disco. Fora do git, o
+    disco, como antes. tracked: o tracked_index() já lido, para não chamar o git por nó."""
     text = source.strip().strip("\"'").strip()
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
@@ -192,16 +260,32 @@ def locate_source(source, graph_dir, root):
         target = target[2:]
     if not target or not PATH_CHARS.fullmatch(target) or "." not in target.rsplit("/", 1)[-1]:
         return "not_path", target, None
-    base = pathlib.Path(root).resolve()
+    if unsafe_target(target):
+        return "outside_root", target, None
+    if tracked is _UNSET:
+        tracked = tracked_index(root)
     gdir = pathlib.PurePosixPath(graph_dir)
-    candidates = [root / target, root / gdir / target] + ([root / gdir.parent / target] if str(gdir) != "." else [])
+    rels = [pathlib.PurePosixPath(target)] + ([gdir / target] if str(gdir) != "." else []) + \
+        ([gdir.parent / target] if str(gdir) != "." and str(gdir.parent) != "." else [])
+    rels = list(dict.fromkeys(r.as_posix() for r in rels))
+    if tracked is not None:  # num repo git, só o índice decide: o disco (um stat, um arquivo do CI) não muda o resultado
+        for rel in rels:
+            real = tracked.follow(rel)
+            if real is not None:
+                return "resolved", target, (real, "file")
+            if rel in tracked.dirs and rel not in tracked.modes:
+                return "resolved", target, (rel, "dir")
+        if any(rel in tracked.modes or tracked.in_gitlink(rel) for rel in rels):
+            return "untracked", target, None  # no índice e não se segue (link para fora ou para o .git), ou num submódulo
+        return "missing", target, None  # fora do índice: ausente, exista ou não no disco (nem stat, nem histórico)
+    base = pathlib.Path(root).resolve()  # fora do git (uma pasta solta): a regra de antes, só o disco
     inside = False
-    for c in candidates:
+    for rel in rels:
         try:
-            full = pathlib.Path(c).resolve()
+            full = (base / rel).resolve()
         except (OSError, RuntimeError):
             continue
-        if full != base and base not in full.parents:
+        if full == base or base not in full.parents:
             continue
         inside = True
         if full.exists():
@@ -217,6 +301,7 @@ def check_locators(corpus, root, root_files, external_roots=(), located=frozense
     res = {"judged": 0, "resolved": 0, "missing": [], "unreadable": [],
            "skipped": {"not_pointer": 0, "absolute": 0, "no_json_file": 0, "outside_root": 0}}
     cache = {}
+    tracked = tracked_index(root)
     for key in corpus.order:
         node = corpus.nodes[key]
         prov = node.get("provenance")
@@ -235,7 +320,7 @@ def check_locators(corpus, root, root_files, external_roots=(), located=frozense
             if not isinstance(anchor, str) or not anchor.strip():
                 continue  # o locator é da fonte: o source manda quando é caminho, e o trace só vale sem ele
             if which == "source":
-                kind, target, found = locate_source(anchor, gdir, root)
+                kind, target, found = locate_source(anchor, gdir, root, tracked)
             else:
                 kind, target, found = locate(anchor, gdir, root, root_files, external_roots)
             if kind == "absolute":
@@ -244,8 +329,12 @@ def check_locators(corpus, root, root_files, external_roots=(), located=frozense
             if kind == "outside_root":
                 outside = True
                 break
+            if kind == "untracked":
+                break  # existe, mas o git não rastreia: nunca é lido (4.49.0), e conta como sem .json do repo
             if kind == "resolved":
-                if found[1] == "file" and found[0].lower().endswith(".json"):
+                # o trace resolve pelo disco: o .json lido tem de ser rastreado, como a fonte (4.49.0)
+                if found[1] == "file" and found[0].lower().endswith(".json") and \
+                        (tracked is None or found[0] in tracked.files) and not unsafe_target(found[0]):
                     path = found[0]
                 break  # um caminho do repo que existe e não é .json: o locator não é JSON Pointer dele
             if kind == "missing":
@@ -265,7 +354,7 @@ def check_locators(corpus, root, root_files, external_roots=(), located=frozense
         res["judged"] += 1
         if path not in cache:
             try:
-                cache[path] = (True, json.loads((pathlib.Path(root) / path).read_text(encoding="utf-8-sig")))
+                cache[path] = (True, json.loads(repo_bytes(root, path).decode("utf-8-sig")))  # o blob, no git
             except (OSError, ValueError, UnicodeDecodeError):
                 cache[path] = (False, None)
         ok, doc = cache[path]
@@ -288,7 +377,7 @@ def scheme_of(prov):
     return value if value in READ_SCHEMES | FORM_SCHEMES else None
 
 
-def read_source(source, gdir, root, withs, files=None):
+def read_source(source, gdir, root, withs, files=None, tracked=_UNSET):
     """(estado, alvo, bytes) da fonte que o provenance.source nomeia: ok com os bytes, absolute (URL ou caminho
     absoluto sem --with que case), missing (o arquivo não está no repo, ou não está no commit da URL), outside_root, ou
     not_path. Pelo --with, a URL <prefixo>/<ref>/<caminho> é lida no ref, de uma pasta git, com o mesmo cuidado do
@@ -323,7 +412,7 @@ def read_source(source, gdir, root, withs, files=None):
             return ("ok", url, out.stdout) if out.returncode == 0 else ("missing", url, None)
         except OSError:
             return "missing", url, None
-    kind, target, found = locate_source(text, gdir, root)
+    kind, target, found = locate_source(text, gdir, root, tracked)
     if kind != "resolved":
         return kind, target, None
     if found[1] != "file":
@@ -335,26 +424,22 @@ def read_source(source, gdir, root, withs, files=None):
 
 
 def repo_bytes(root, path, cache=None):
-    """Os bytes de uma fonte do repo, como o git a guarda: quando o arquivo rastreado tem o mesmo id de objeto que o
-    índice (git hash-object --path, que aplica o filtro de limpeza, contra o git ls-files -s), ele é lido do blob (git
-    show :caminho), e não da árvore de trabalho, porque um checkout com autocrlf (o padrão do git no Windows) troca as
-    quebras de linha e o sha256 mudaria de sistema para sistema; é o mesmo conteúdo que o --with lê e que o git show dá
-    a quem calcula o hash. O id é comparado, e não o git diff, que respeita os bits assume-unchanged e skip-worktree e
-    calaria uma mudança no disco. O arquivo com mudança, ou fora do git, é lido do disco: a mudança é real e aparece no
-    hash. cache guarda a leitura por caminho."""
+    """Os bytes de uma fonte do repo, como o git a versiona: num repo git, sempre o blob do índice (git show :caminho),
+    nunca o disco (4.49.0). O arquivo rastreado que o CI reescreve antes dos testes (um segredo no lugar do
+    placeholder) não pode virar um sim ou não no log, e um checkout com autocrlf (o padrão do git no Windows) não muda o
+    sha256 de sistema para sistema. A edição local sem git add não é julgada até entrar no índice. OSError quando o
+    índice não tem o blob (um conflito de merge sem o estágio 0). Fora de um repo git, o disco. cache guarda a leitura
+    por caminho."""
     if cache is not None and path in cache:
         return cache[path]
     rel = "./" + path
-    data = None
     staged = kg_query._git(str(root), "ls-files", "-s", "--", rel)
-    fields = staged.stdout.decode("utf-8", "replace").split() if staged.returncode == 0 else []
-    if len(fields) >= 3 and fields[2] == "0":  # um só estágio: sem conflito de merge
-        mine = kg_query._git(str(root), "hash-object", f"--path={path}", "--", rel)
-        if mine.returncode == 0 and mine.stdout.decode("utf-8").strip() == fields[1]:
-            out = kg_query._git(str(root), "show", "--end-of-options", f":{rel}")
-            if out.returncode == 0:
-                data = out.stdout
-    if data is None:
+    if staged.returncode == 0:
+        out = kg_query._git(str(root), "show", "--end-of-options", f":0:{rel}", offline=True)
+        if out.returncode != 0:
+            raise OSError(path)
+        data = out.stdout
+    else:
         data = (pathlib.Path(root) / path).read_bytes()
     if cache is not None:
         cache[path] = data
@@ -486,11 +571,12 @@ def check_schemes(corpus, root, withs=()):
     o scheme fora da tabela ou o sha256 fora da forma, que o schema SHOULD já alerta), not_json e not_text. Devolve
     também, fora da saída, o conjunto dos nós cujo locator foi julgado aqui (o check_locators não os julga de novo)."""
     keys = ("form_only", "absolute", "missing_source", "not_path", "outside_root", "unpinned", "malformed", "not_json",
-            "not_text", "not_canonical")
+            "not_text", "not_canonical", "untracked")
     res = {"judged": 0, "ok": 0, "sha256_checked": 0, "node_sha256_checked": 0, "failures": [],
-           "skipped": {k: 0 for k in keys}, "repo_refs": 0, "missing_sources": []}
+           "skipped": {k: 0 for k in keys}, "repo_refs": 0, "missing_sources": [], "absolute_urls": 0}
     located = set()
     cache, files = {}, {}
+    tracked = tracked_index(root)  # uma leitura do índice por rodada
     for key in corpus.order:
         node = corpus.nodes[key]
         prov = node.get("provenance")
@@ -523,10 +609,12 @@ def check_schemes(corpus, root, withs=()):
         gdir = pathlib.PurePosixPath(key[0]).parent.as_posix()
         ck = (prov["source"], gdir)
         if ck not in cache:
-            cache[ck] = read_source(prov["source"], gdir, root, withs, files)
+            cache[ck] = read_source(prov["source"], gdir, root, withs, files, tracked)
         state, target, data = cache[ck]
         if state != "ok":
             res["skipped"]["missing_source" if state == "missing" else state] += 1
+            if state == "absolute" and "://" in target:
+                res["absolute_urls"] += 1  # fora da saída JSON: o gate separa a URL do caminho absoluto
             if state == "missing":
                 res["missing_sources"].append({"file": key[0], "id": key[1], "target": target})
             continue
@@ -859,6 +947,9 @@ def main(argv=None):
         return 2
     res = check(corpus, args.root, args.external_root, withs)
     repo_refs, absent = res["schemes"]["repo_refs"], res["schemes"]["missing_sources"]
+    del res["schemes"]["absolute_urls"]
+    if not res["schemes"]["skipped"]["untracked"]:  # só quando ocorre: a saída de antes segue válida no schema da 4.48
+        del res["schemes"]["skipped"]["untracked"]
     if not repo_refs:  # o campo só existe quando a forma ocorre: fora disso, o kg-ssot.trace/1 é o de sempre
         del res["schemes"]["repo_refs"]
     if not args.strict_sources:
@@ -887,7 +978,7 @@ def main(argv=None):
                         form=ss["form_only"], absolute=ss["absolute"], missing=ss["missing_source"],
                         malformed=ss["malformed"],
                         other=ss["not_path"] + ss["outside_root"] + ss["unpinned"] + ss["not_json"]
-                        + ss["not_text"] + ss["not_canonical"]))
+                        + ss["not_text"] + ss["not_canonical"] + ss.get("untracked", 0)))
         if loc["judged"] or loc["skipped"]["no_json_file"] or loc["skipped"]["absolute"]:
             ls = loc["skipped"]
             print(_("· {judged} JSON locator(s) judged: {resolved} resolve, {missing} missing, {unreadable} unreadable "

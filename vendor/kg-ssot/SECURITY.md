@@ -29,7 +29,7 @@ other channel. There is no security e-mail address: the private report is the on
 
 A useful report says:
 
-- the affected package, version and command (for example the `kg-mcp` command of `kg-ssot` 4.48.0 from PyPI, or the
+- the affected package, version and command (for example the `kg-mcp` command of `kg-ssot` 4.49.0 from PyPI, or the
   image digest);
 - what an attacker can do, and under which configuration (stdio, HTTP on loopback, the "behind a proxy" profile);
 - the steps to reproduce, ideally with a minimal `.kg.yaml` or request;

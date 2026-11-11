@@ -3,6 +3,7 @@
   "id": "jev-decision-round2-2026-10",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 22,
     "form.range.node.label": 33
   }
 }

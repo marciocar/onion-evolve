@@ -1,0 +1,111 @@
+{
+  "description": "Proveniência sempre (v4.21), só no SHOULD: o nó evidence sem provenance, em qualquer status exceto unverifiable, e a decision done sem provenance alertam como form.required.node.provenance, o mesmo código que o MUST dá ao nó confirmed ou PROD. O MUST não muda. No nó em que o MUST já acusa o código, o leitor não o repete como aviso; em outro nó do mesmo documento, o aviso segue valendo.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "warn-evidence-open-without-provenance.kg.yaml",
+      "description": "evidence open sem provenance alerta: a evidência sem fonte não é evidência (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-evidence-drifted-without-provenance.kg.yaml",
+      "description": "evidence drifted sem provenance alerta (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-evidence-refuted-without-provenance.kg.yaml",
+      "description": "evidence refuted sem provenance alerta: qualquer status exceto unverifiable (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-evidence-superseded-without-provenance.kg.yaml",
+      "description": "evidence superseded sem provenance alerta, mesmo com o substituto dito (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "valid-evidence-unverifiable-without-provenance.kg.yaml",
+      "description": "evidence unverifiable sem provenance não alerta: é o destino do nó sem fonte recuperável (v4.21)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-evidence-open-with-provenance.kg.yaml",
+      "description": "evidence open com provenance não alerta (v4.21)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-evidence-confirmed-without-provenance-not-repeated.kg.yaml",
+      "description": "evidence confirmed sem provenance reprova no MUST, e o SHOULD não repete o código como aviso (v4.21)",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "bad-must-provenance-keeps-should-on-other-node.kg.yaml",
+      "description": "o MUST acusa form.required.node.provenance num nó, e a evidence open sem provenance, em outro nó, segue avisando: a deduplicação é por ocorrência, para quem paga a dívida MUST não levar uma piora SHOULD (v4.21)",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance"
+      ],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-decision-done-without-provenance.kg.yaml",
+      "description": "decision done sem provenance alerta, mesmo com trace e narrative (v4.21)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-decision-done-untraced-without-provenance.kg.yaml",
+      "description": "decision done sem provenance e sem origem nenhuma alerta duas vezes: a provenance que falta (v4.21) e a origem que falta (integrity.untraced-decision)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance",
+        "integrity.untraced-decision"
+      ]
+    },
+    {
+      "file": "valid-decision-done-with-provenance.kg.yaml",
+      "description": "decision done com provenance não alerta (v4.21)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-open-without-provenance.kg.yaml",
+      "description": "decision open sem provenance não alerta: o aviso é da decision done (v4.21)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-claim-open-without-provenance.kg.yaml",
+      "description": "claim open sem provenance não alerta: o aviso é da evidence e da decision done (v4.21)",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

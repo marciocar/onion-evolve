@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "testemunho: relato de terceiro"
+      method: "testimony: relato de terceiro"
 edges:
   - from: EV_A
     to: Q_A

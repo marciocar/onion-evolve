@@ -3,6 +3,7 @@
   "id": "onion-evolution-2026-07-30",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 7,
     "form.range.node.label": 4,
     "yaml.unquoted-date": 1
   }

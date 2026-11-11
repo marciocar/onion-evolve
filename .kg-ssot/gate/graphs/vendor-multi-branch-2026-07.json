@@ -3,6 +3,7 @@
   "id": "vendor-multi-branch-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 9,
     "form.range.node.label": 10
   }
 }

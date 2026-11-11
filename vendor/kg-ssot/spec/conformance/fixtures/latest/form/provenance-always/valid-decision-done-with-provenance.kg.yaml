@@ -1,0 +1,27 @@
+meta:
+  schema_version: "1"
+  id: valid-decision-done-with-provenance
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: D_A
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    narrative: "Por que a decisão sintética A foi tomada."
+    label: "A decisão sintética A."
+    provenance:
+      source: "Fonte A"
+      locator: "caso de conformidade"
+      method: "measurement: contagem no corpus A"
+edges:
+  - from: D_A
+    to: Q_A
+    edge_type: SUPPORTS

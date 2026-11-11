@@ -3,7 +3,9 @@
   "id": "m2-bridge-logto-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 102,
     "form.range.node.label": 112,
+    "form.required.node.provenance": 10,
     "form.required.node.verified_at": 1,
     "integrity.bare-decision": 6,
     "integrity.superseded-without-successor": 12,

@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: valid-method-leitura
+  id: warn-evidence-open-without-provenance
 nodes:
   - id: Q_A
     node_type: question
@@ -12,14 +12,10 @@ nodes:
   - id: EV_A
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: open
     impact: 3
     confidence: 0.9
     label: "A evidência sintética que sustenta A."
-    provenance:
-      source: "Fonte A"
-      locator: "caso de conformidade"
-      method: "leitura: seção 3 do documento A"
 edges:
   - from: EV_A
     to: Q_A

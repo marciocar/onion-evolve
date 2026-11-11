@@ -1,0 +1,6 @@
+{
+  "graph": "docs/onion/graph/inbox-triage-1108.kg.yaml",
+  "id": "inbox-triage-1108",
+  "must": [],
+  "should": {}
+}

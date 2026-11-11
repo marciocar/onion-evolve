@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml",
   "id": "claude-md-size-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 8
+  }
 }

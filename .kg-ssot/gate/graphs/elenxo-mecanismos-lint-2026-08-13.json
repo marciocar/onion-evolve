@@ -3,6 +3,7 @@
   "id": "elenxo-mecanismos-lint-2026-08-13",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 15,
     "form.range.node.label": 10,
     "yaml.unquoted-date": 1
   }

@@ -3,7 +3,9 @@
   "id": "company-brain-market-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 27,
     "form.range.node.label": 19,
+    "form.required.node.provenance": 1,
     "integrity.bare-decision": 1,
     "yaml.unquoted-date": 1
   }

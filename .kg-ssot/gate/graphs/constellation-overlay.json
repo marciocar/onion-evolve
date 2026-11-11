@@ -3,6 +3,7 @@
   "id": "constellation-overlay",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 7,
     "yaml.unquoted-date": 1
   }
 }

@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml",
   "id": "postmerge-projection-writer-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 93
+  }
 }

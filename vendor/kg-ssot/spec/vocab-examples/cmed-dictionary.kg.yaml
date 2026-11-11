@@ -20,7 +20,7 @@ nodes:
     provenance:
       source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
       locator: "itens 6, 9, 10, 11 e 12; tabela De/Para (TA_PRECOS_MEDICAMENTOS anterior, TA_PRECO_MEDICAMENTO e TA_PRECO_MEDICAMENTO_GOV atuais)"
-      method: "leitura: o PDF baixado e convertido em texto, verbete a verbete"
+      method: "reading: o PDF baixado e convertido em texto, verbete a verbete"
       locality: web
   - id: T_EAN
     node_type: entity

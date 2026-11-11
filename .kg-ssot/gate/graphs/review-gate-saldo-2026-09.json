@@ -3,6 +3,7 @@
   "id": "review-gate-saldo-2026-09",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 6,
     "yaml.unquoted-date": 1
   }
 }

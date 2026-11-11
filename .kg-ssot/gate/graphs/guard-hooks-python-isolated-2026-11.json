@@ -2,5 +2,8 @@
   "graph": "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml",
   "id": "guard-hooks-python-isolated-2026-11",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 5,
+    "form.required.node.provenance": 2
+  }
 }

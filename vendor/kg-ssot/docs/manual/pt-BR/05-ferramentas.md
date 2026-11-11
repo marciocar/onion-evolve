@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:77275a58eb3b373d -->
+<!-- translation-of: docs/manual/05-tools.md sha256:28136a0f2c691184 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 524/524 (reprova)
+latest: 555/555 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -251,6 +251,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*`, `docs/materials/*` e o vendor do KG-SSOT (qualquer pasta com o carimbo `.kg-ssot-version`, desde a 4.19.1) já saem por padrão; o `--no-default-excludes` os traz de volta |
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
 | `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor` |
+| `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. O `.kg.json` não é conferido aqui. Não combina com `--update` |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
 
@@ -653,6 +654,41 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     rótulos de `x_term` que o `kg_terms` devolve, ou mensagem de commit no `kg_history`) continua lá, assim como o
     `provenance.source` que aponta para um arquivo que não é grafo e o caminho escrito com percent-encoding. Para manter algo separado, deixe-o num grafo de uma área
     que quem lê não alcança, e não o cite em texto que outros leem.
+  - **O teto por área (contrato v4.20):** três chaves que vêm juntas, `levels` (os níveis da organização em ordem, do
+    menos ao mais sensível, cada um um slug e nenhum repetido), `ceilings` (cada área compartilhada, `c-<nome>` ou
+    `g-<nome>`, para o nível mais alto que ela entrega) e `default_level` (o nível do grafo cujo `meta` não tem
+    `x_classification`, capítulo 3). Numa área com teto, o grafo cujo nível passa dele, ou cujo `x_classification` não
+    está em `levels` (nível desconhecido, valor que não é texto ou arquivo que não parseia), não é entregue: sai do
+    `kg_list`, do `kg_get` (com `ref` também), do `kg_history`, do `kg_query` (nós, `edges` e `chain`) e do `kg_terms`, e
+    responde igual ao grafo que não existe. Ele nunca entra no corpus, e por isso as arestas e os ponteiros para ele saem
+    dos outros grafos pelo corte acima, sem id, sem arquivo e sem contar. Com `ref`, a versão atual e a pedida são
+    julgadas, e a mais restritiva vence: a versão antiga com nível mais baixo não abre o grafo cuja versão atual passa do
+    teto. O grafo apagado não tem versão atual, e por isso a última versão gravada decide, no `kg_history` e no `kg_get`
+    com `ref`: a versão antiga `public` de um grafo cuja última versão era `restricted` segue oculta depois de apagado.
+    A forma do `ref` é conferida antes de qualquer coisa sobre o nome, e por isso o `ref` malformado tem a mesma recusa
+    no grafo oculto, no que não existe e no visível, em qualquer caixa do nome. Sem `ref`, o nome que difere de um grafo
+    oculto só pela caixa, ou a pasta em outra caixa que só tem grafos ocultos, responde como o grafo numa pasta que não
+    existe; a recusa por caixa só sai quando a outra grafia tem um grafo que quem lê alcança. A própria área da identidade não tem teto,
+    a área sem teto não é julgada, e sem `ceilings` nada muda. A política é lida de forma estrita: teto fora de
+    `levels`, área que não é a canônica nem um grupo ou `default_level` ausente invalidam o arquivo, e o arquivo
+    inválido fecha a leitura, como acima.
+
+    ```json
+    {"schema_version": 1, "canonical": "c-empresa",
+     "groups": {"g-financeiro": ["ana@x.org"], "g-diretoria": ["bia@x.org"]},
+     "levels": ["public", "internal", "confidential", "restricted"],
+     "ceilings": {"c-empresa": "internal", "g-financeiro": "confidential"},
+     "default_level": "internal"}
+    ```
+
+    Aqui a `c-empresa` entrega até `internal`, o `g-financeiro` até `confidential`, o `g-diretoria` não tem teto, e o
+    grafo sem nível conta como `internal`. O rótulo é marcação que esta política faz valer, não controle de acesso nó a
+    nó: a unidade é o grafo, e o nó mais sensível que o grafo vai para um grafo próprio (capítulo 3). O histórico do git
+    da área ainda guarda o nó que foi movido para outro arquivo, e o `ref` alcança a versão antiga onde o nível dela
+    deixa: mova-o antes de compartilhar o grafo, ou deixe o histórico antigo fora da área compartilhada. O mesmo limite
+    vale no outro sentido: o `kg_history` de um grafo visível lista todas as versões antigas, as acima do teto também,
+    com o `ref` e a mensagem do commit, e o `kg_get` dessa versão responde como o grafo que não existe. O conteúdo fica
+    de fora, mas a lista mostra que houve uma versão mais sensível.
 - **A triagem do conteúdo (4.47.0):** em qualquer perfil, cada texto que `kg_get`, `kg_list`, `kg_history`, `kg_query`
   e `kg_terms` devolvem é triado antes de chegar ao modelo (`tools/kg_screen.py`, só biblioteca padrão, uma função pura
   do texto). Três vereditos: `pass` (nada achado); `quarantine` (um sinal sozinho: caractere invisível, região
@@ -908,7 +944,8 @@ refutação guarda o nó refutado, e nada é apagado. Três visões tornam essa 
 - **`--revisit`** lista as decisões vivas (nem `superseded` nem `refuted`) que pedem revisão, pela atenção, cada uma com
   os motivos: `pin-changed` (desde a 4.40.0: um apoio, ou o nó que ele cita pelo `kg-node`, a um salto, não bate mais
   com a versão que fixou, pelo `provenance.node_sha256` ou pelo `provenance.sha256`; é a mesma conferência do
-  `kg_trace check`, e o item traz `changed`, `pin`, `source`, `recorded` e `current`), `evidence-due` (algo em que ela se apoia passou do `reverify_every`), `review-due` (a própria decisão passou do
+  `kg_trace check`, e o item traz `changed`, `pin`, `source`, `recorded` e `current`; desde a 4.49.0 ele julga pelo
+  índice do git, então a edição ou a deleção local sem `git add` não aparece como `pin-changed`), `evidence-due` (algo em que ela se apoia passou do `reverify_every`), `review-due` (a própria decisão passou do
   `reverify_every`) e `contested` (ela recebe `REFUTES` e segue viva). A decisão com só `reverify_on` espera o evento e
   sai à parte; a decisão com cadência e sem `verified_at` sai em `unstamped`, e o apoio fora do corpus em `unresolved`,
   para nada sumir em silêncio. O apoio refutado ou substituído não é motivo:
@@ -1508,6 +1545,16 @@ uma (`FONTE AUSENTE`) e dá rc próprio, o 4, depois de qualquer achado de rc 1,
 `schemes.missing_sources`. A fonte sem nenhum dos dois não se julga, com ou sem a opção, e isso inclui a URL com commit e sem hash:
 para comparar essas, use o `kg_refs.py pins`.
 
+Desde a 4.49.0, dentro de um repositório git, a fonte só é lida quando o git a rastreia, e o que se lê é o blob dela no
+índice, nunca o disco: a edição local não é julgada até o `git add`, e o arquivo rastreado reescrito no disco (um segredo no
+lugar do placeholder) é julgado pelo conteúdo versionado. O `sha256` a citar é o do blob (`git show :<caminho>`), como na
+4.48.0, não o de um checkout com `autocrlf`. A fonte que não está no índice é `missing_source`, exista ou não
+o arquivo no disco (o arquivo citado sem `git add`, o gerado ou o ignorado); o arquivo de um submódulo não baixado, ou o link
+rastreado que sai da raiz ou aponta para dentro do `.git`, conta em `schemes.skipped.untracked` e nunca é lido; o caminho com
+segmento `.git` em qualquer caixa, ou com segmento `.` ou `..`, conta em `outside_root`. O locator JSON alcançado pelo `trace:` segue a mesma regra. A chave `untracked` só
+aparece quando passa de 0, então a saída sem nenhum segue válida no schema da 4.48. Fora de um repositório git, lê-se o disco,
+como antes.
+
 O `provenance.source` na forma `repo#id@commit` não se lê aqui, e quem o compara é o `kg_refs.py pins`. Quando a forma ocorre, com ou
 sem a opção, ela é contada numa linha própria da saída humana e em `schemes.repo_refs`, e a saída JSON é o `kg-ssot.trace/2`. Um
 corpus sem essa forma e sem a opção recebe o mesmo `kg-ssot.trace/1` de antes.
@@ -1671,13 +1718,13 @@ um papel ou uma referência (`role:comite-de-mudancas`), não um nome, como em
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \
-  vendor/kg-ssot/spec/conformance/fixtures/latest/form/method-vocabulary/valid-method-leitura.kg.yaml
+  vendor/kg-ssot/spec/conformance/fixtures/latest/form/method-vocabulary/valid-method-reading.kg.yaml
 ```
 
 Trecho da saída, o nó com `provenance`:
 
 ```text
-   "@id": "urn:kg-ssot:graph:valid-method-leitura#EV_A",
+   "@id": "urn:kg-ssot:graph:valid-method-reading#EV_A",
    "@type": "prov:Entity",
    ...
    "prov:wasDerivedFrom": {
@@ -1691,7 +1738,7 @@ Trecho da saída, o nó com `provenance`:
     },
     "prov:hadActivity": {
      "@type": "prov:Activity",
-     "rdfs:label": "leitura: seção 3 do documento A"
+     "rdfs:label": "reading: section 3 of document A"
     },
     "kg:locator": "caso de conformidade"
    }
@@ -1882,3 +1929,41 @@ chaves movidas e os perfis novos, e o arquivo não pode ganhar código MUST nem 
 comentários fora das chaves movidas ficam, e rodar de novo não muda nada. Medido numa cópia dos dois grafos de um
 adotante (108 nós com 168 dessas chaves): 106 perfis montados, 2 para quem revisa (dois `x_in_force` com texto livre que
 o mapa não cobria), os dois arquivos gravados com o mesmo veredito de antes.
+
+### `methods`: o apelido em português da classe vira o canônico em inglês
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods plan                                  # o que mudaria, e a cauda
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods apply --confirmed-out confirmed.tsv   # grava as trocas
+```
+
+Desde o v4.16, a classe de `provenance.method` tem a forma canônica em inglês (`measurement`, `reading`, `judges`,
+`derived`, `testimony`), e as cinco em português (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) seguem
+aceitas como apelido, sem aviso. Uma versão futura do contrato vai avisar o apelido; o `methods` deixa cada dono migrar
+o próprio corpus antes disso, mecanicamente. Ele troca só a classe no começo do valor: o detalhe depois de `: ` fica
+byte a byte, com os dois-pontos e os acentos, e os comentários e o estilo de aspas da linha também. O conjunto das dez
+classes é conferido contra o pattern do schema SHOULD da release, e um contrato que mude a lista faz da rodada entrada
+quebrada (rc 2), nunca uma troca adivinhada.
+
+- **A cauda é só apontada, nunca reescrita:** o valor que começa com aspa dentro do texto (`"'medição: x'"`), a classe
+  fora da lista, a falta de `: ` depois da classe, a maiúscula na classe (`Medição: x`), o detalhe vazio ou começando
+  com espaço (`leitura:  x`) e a classe com o acento decomposto (NFD). O plano a conta por motivo.
+- **Vão para quem revisa, sem ser tocados,** o nó em estilo flow (`{...}`), a âncora (`&p`) ou o alias (`*p`) no
+  `method`, na `provenance` inteira, no nó ou na lista `nodes`, a chave de merge (`<<`) no nó ou na `provenance`, o escalar em bloco (`|`
+  ou `>`) e o valor cujo texto não traz o apelido como escrito (um escape como `\u00e7`): ali uma edição no texto
+  mudaria mais de um nó, e o plano tem de prever o apply.
+- **O `plan` não grava nada** e imprime cada troca, as contagens por classe e por grafo, a cauda e o que vai para quem
+  revisa; o `--json` dá o mesmo como dado, com o código da cauda em `reason` e a frase legível em `message`. O universo é o que os outros subcomandos leem, com os mesmos excludes.
+- **O `apply` grava arquivo por arquivo, pelo texto,** sob as mesmas conferências do `keys`: a releitura tem de ser o
+  documento de antes com só o `provenance.method` mudado, cada valor novo tem de ser o antigo com o prefixo trocado, só
+  linhas de `method` podem mudar, e o arquivo não pode ganhar código MUST nem aviso SHOULD. O relatório conta os avisos
+  SHOULD que caem (nenhum no contrato vigente, que aceita o apelido). A quebra de linha fica, e rodar de novo não muda
+  nada.
+- **O `--confirmed-out ARQ.tsv`** grava `graph`, `id` e `status` de cada nó `confirmed` tocado (no `plan`, as trocas
+  propostas; no `apply`, as gravadas), a lista que o pull request que edita um grafo mostra.
+
+rc 0 quando o plano sai ou o `apply` termina; rc 1 quando um arquivo foi recusado (pelo `apply`, ou por qualquer um dos
+dois por quebras de linha misturadas, com o motivo em `refused` no `--json`); rc 2 com entrada quebrada.
+Rodado numa cópia do corpus do próprio produto (37 grafos lidos): 1.230 apelidos trocados em 21 grafos (412
+`testemunho`, 333 `leitura`, 264 `juízes`, 157 `medição`, 64 `derivado`), 1 valor na cauda, 1.138 nós `confirmed`
+tocados, e a suíte de conformidade e o veredito de cada grafo iguais.

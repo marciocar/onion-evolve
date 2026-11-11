@@ -3,6 +3,7 @@
   "id": "slm-frameworks-2026-10",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 45,
     "form.range.node.label": 49
   }
 }

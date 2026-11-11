@@ -3,6 +3,7 @@
   "id": "session-2026-07-18-evolve-review-triage",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 19,
     "form.required.node.verified_against": 7,
     "yaml.unquoted-date": 1
   }

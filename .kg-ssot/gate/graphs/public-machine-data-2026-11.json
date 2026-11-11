@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-public-machine-data-2026-11/public-machine-data-2026-11.kg.yaml",
+  "id": "public-machine-data-2026-11",
+  "must": [],
+  "should": {
+    "form.deprecated.node.provenance.method": 8
+  }
+}

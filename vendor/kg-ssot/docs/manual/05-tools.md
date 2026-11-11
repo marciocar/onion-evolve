@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 524/524 (gates the rc)
+latest: 555/555 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -248,6 +248,7 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--exclude GLOB` | Removes paths from the corpus (repeatable). `*/fixtures/*`, `docs/materials/*`, and the KG-SSOT vendor (any folder with the `.kg-ssot-version` stamp, since 4.19.1) are excluded by default; `--no-default-excludes` brings them back |
 | `--granularity node` | With `--update`: counts the SHOULD debt per occurrence, not per graph |
 | `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor` |
+| `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. `.kg.json` is not checked here. Not with `--update` |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |
 
@@ -662,6 +663,42 @@ write or a name that does not exist comes with `isError: true`, so the model can
     which includes the `x_term` labels that `kg_terms` returns, or a commit message in `kg_history`) stays, and so do a
     `provenance.source` pointing at a file that is not a graph and a path spelled with percent-encoding. To keep something apart, keep it in a graph of an area
     that the reader cannot read, and do not name it in text that others can read.
+  - **The ceiling by area (contract v4.20):** three keys that come together, `levels` (the organization's levels in
+    order, from the least to the most sensitive, each a slug and none repeated), `ceilings` (each shared area, `c-<name>`
+    or `g-<name>`, to the highest level it serves) and `default_level` (the level of a graph whose `meta` has no
+    `x_classification`, chapter 3). In an area with a ceiling, a graph whose level is above it, or whose
+    `x_classification` is not one of `levels` (an unknown level, a value that is not text, or a file that does not
+    parse), is not served: it leaves `kg_list`, `kg_get` (with `ref` too), `kg_history`, `kg_query` (nodes, `edges`, and
+    `chain`), and `kg_terms`, and answers exactly like a graph that does not exist. It never enters the corpus, so the
+    edges and pointers to it leave the other graphs by the cut above, with no id, no file, and no count. With `ref`, the
+    current version and the asked one are both judged, and the more restrictive wins: an old version with a lower level
+    does not open a graph whose current version is above the ceiling. A deleted graph has no current version, so its
+    last written version decides, for `kg_history` and for `kg_get` with `ref`: an old `public` version of a graph whose
+    last version was `restricted` stays hidden after the delete. The form of `ref` is checked before anything about the
+    name, so a malformed `ref` gets the same refusal for a hidden graph, a missing one, and a visible one, whatever the
+    case of the name. Without `ref`, a name that differs from a hidden graph only by case, or a folder in another case
+    that holds only hidden graphs, answers like a graph in a folder that does not exist; the refusal by case comes only
+    when the other spelling holds a graph the reader can see. The identity's own area has no ceiling, an area without a ceiling is not judged, and without
+    `ceilings` nothing changes. The policy is parsed strictly: a ceiling outside `levels`, an area that is neither the
+    canonical one nor a group, or a missing `default_level` makes the file invalid, and an invalid file closes reading,
+    as above.
+
+    ```json
+    {"schema_version": 1, "canonical": "c-company",
+     "groups": {"g-finance": ["ana@x.org"], "g-board": ["bia@x.org"]},
+     "levels": ["public", "internal", "confidential", "restricted"],
+     "ceilings": {"c-company": "internal", "g-finance": "confidential"},
+     "default_level": "internal"}
+    ```
+
+    Here `c-company` serves up to `internal`, `g-finance` up to `confidential`, `g-board` has no ceiling, and a graph
+    with no level counts as `internal`. The label is a marking that this policy enforces, not access control node by
+    node: the unit is the graph, so a node more sensitive than its graph goes to a graph of its own (chapter 3). The git
+    history of the area still holds a node that was moved to another file, and `ref` reaches the old version wherever
+    its level allows: move it before the graph is shared, or keep the old history out of the shared area. The same limit
+    works the other way: `kg_history` of a visible graph lists every old version, those above the ceiling too, with
+    their `ref` and commit message, and `kg_get` on such a version answers like a graph that does not exist. The content
+    stays out, but the list shows that a more sensitive version once existed.
 - **The content screen (4.47.0):** in any profile, every text that `kg_get`, `kg_list`, `kg_history`, `kg_query`, and
   `kg_terms` return is screened before it reaches the model (`tools/kg_screen.py`, standard library only, a pure
   function of the text). Three verdicts: `pass` (nothing found); `quarantine` (one signal alone: an invisible
@@ -919,7 +956,8 @@ a refutation keeps the refuted node, and nothing is deleted. Three views make th
 - **`--revisit`** lists the live decisions (not `superseded` nor `refuted`) that ask for a review, by attention, each
   with its reasons: `pin-changed` (since 4.40.0: a support, or the node it cites by `kg-node`, one step away, no longer
   matches the version it was pinned to, by `provenance.node_sha256` or by `provenance.sha256`; the same check as
-  `kg_trace check`, and the item carries `changed`, `pin`, `source`, `recorded` and `current`), `evidence-due` (something it rests on is past its `reverify_every`), `review-due` (the decision itself is past its
+  `kg_trace check`, and the item carries `changed`, `pin`, `source`, `recorded` and `current`; since 4.49.0 it judges by
+  the git index, so a local edit or deletion without `git add` does not show as `pin-changed`), `evidence-due` (something it rests on is past its `reverify_every`), `review-due` (the decision itself is past its
   `reverify_every`) and `contested` (it receives a `REFUTES` and is still live). A decision with only `reverify_on`
   waits for its event and is listed apart; a decision with a cadence but no `verified_at` is listed in `unstamped`, and
   a support outside the corpus in `unresolved`, so nothing is dropped in silence. A support that was refuted or
@@ -1530,6 +1568,17 @@ with `--with`, is counted in `skipped.missing_source`, and `check` still gives r
 `kg-ssot.trace/2`, with `schemes.missing_sources`. A source with neither is not judged, with or without the option, and
 that includes a URL with a commit and no hash: to compare those, use `kg_refs.py pins`.
 
+Since 4.49.0, inside a git repository, a source is read only when git tracks it, and what is read is its blob in the
+index, never the disk: a local edit is not judged until `git add`, and a tracked file rewritten on disk (a secret in place
+of the placeholder) is judged by its versioned content. The `sha256` to cite is the one of the blob (`git show :<path>`),
+as in 4.48.0, not the one of a checkout with `autocrlf`. A source that is not in the index is `missing_source`, whether
+or not the file exists on disk (a cited file without `git add`, a generated or ignored file); a file in a submodule that
+is not checked out, or a tracked link that leaves the root or points into `.git`, is counted in
+`schemes.skipped.untracked` and never read; a path with a `.git` segment in any case, or with a `.` or `..` segment, is
+counted in `outside_root`. A JSON locator reached through `trace:` follows
+the same rule. The `untracked` key appears only when it is above 0, so an output with none still validates against the
+4.48 schema. Outside a git repository, the disk is read, as before.
+
 A `provenance.source` in the form `repo#id@commit` is not read here, and `kg_refs.py pins` is what compares it. When the form
 occurs, with or without the option, it is counted in a line of its own in the human output and in `schemes.repo_refs`, and the
 JSON output is `kg-ssot.trace/2`. A corpus without that form and without the option gets the same `kg-ssot.trace/1` as before.
@@ -1698,13 +1747,13 @@ all of them. Keep it a role or a reference (`role:change-advisory-board`), not a
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \
-  vendor/kg-ssot/spec/conformance/fixtures/latest/form/method-vocabulary/valid-method-leitura.kg.yaml
+  vendor/kg-ssot/spec/conformance/fixtures/latest/form/method-vocabulary/valid-method-reading.kg.yaml
 ```
 
 An excerpt of the output, the node with `provenance`:
 
 ```text
-   "@id": "urn:kg-ssot:graph:valid-method-leitura#EV_A",
+   "@id": "urn:kg-ssot:graph:valid-method-reading#EV_A",
    "@type": "prov:Entity",
    ...
    "prov:wasDerivedFrom": {
@@ -1718,7 +1767,7 @@ An excerpt of the output, the node with `provenance`:
     },
     "prov:hadActivity": {
      "@type": "prov:Activity",
-     "rdfs:label": "leitura: seção 3 do documento A"
+     "rdfs:label": "reading: section 3 of document A"
     },
     "kg:locator": "caso de conformidade"
    }
@@ -1909,3 +1958,43 @@ the moved keys and the new profiles, and the file must gain no MUST code or SHOU
 comments outside the moved keys stay, and running it again changes nothing. Measured on a copy of an adopter's two
 graphs (108 nodes with 168 such keys): 106 profiles built, 2 left for the reviewer (two `x_in_force` values with free
 text the map did not cover), both files written with the same verdict as before.
+
+### `methods`: the Portuguese class alias becomes the English one
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods plan                                  # what would change, and the tail
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods apply --confirmed-out confirmed.tsv   # writes the swaps
+```
+
+Since v4.16 the class of `provenance.method` has a canonical English form (`measurement`, `reading`, `judges`,
+`derived`, `testimony`), and the five Portuguese ones (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) are
+accepted as aliases without a warning. A future version of the contract will warn on the alias; `methods` lets each
+owner migrate their own corpus before that, mechanically. It swaps only the class at the start of the value: the detail
+after `: ` stays byte for byte, colons and accents included, and so do comments and the line's quoting style. The set of
+ten classes is checked against the pattern of the release's SHOULD schema, and a contract that changes the list makes
+the run broken input (rc 2), never a guessed swap.
+
+- **The tail is only pointed out, never rewritten:** a value that starts with a quote inside the string
+  (`"'medição: x'"`), a class outside the list, no `: ` after the class, uppercase in the class (`Medição: x`), a
+  detail that is empty or starts with a space (`leitura:  x`), and a class with a decomposed accent (NFD). The plan
+  counts it by reason.
+- **The reviewer gets, untouched,** a node in flow style (`{...}`), an anchor (`&p`) or alias (`*p`) on the
+  `method`, on the whole `provenance`, on the node or on the `nodes` list, a merge key (`<<`) in the node or in the `provenance`, a block
+  scalar (`|` or `>`), and a value whose text does not carry the alias as written (an escape such as `\u00e7`): one
+  text edit there would change more than one node, and the plan has to predict the apply.
+- **`plan` writes nothing** and prints each swap, the counts by class and by graph, the tail, and what goes to the
+  reviewer; `--json` gives the same as data, with the tail's code in `reason` and the readable sentence in
+  `message`. The universe is the one the other subcommands read, with the same excludes.
+- **`apply` writes file by file, by text,** under the same checks as `keys`: the reread document must equal the old one
+  with only `provenance.method` changed, each new value must be the old one with the prefix swapped, only `method` lines
+  may change, and the file must gain no MUST code or SHOULD warning. The report counts the SHOULD warnings that fall
+  (none under the current contract, which accepts the alias). The line ending is kept, and running it again changes
+  nothing.
+- **`--confirmed-out FILE.tsv`** writes `graph`, `id`, and `status` of each `confirmed` node touched (in `plan`, the
+  proposed swaps; in `apply`, the ones written), the list a pull request that edits a graph shows.
+
+rc 0 when the plan comes out or `apply` finishes; rc 1 when a file was refused (by `apply`, or by either one for mixed
+line endings, with the reason in `refused` in the `--json`); rc 2 on broken input. Run on a copy
+of this product's own corpus (37 graphs read): 1,230 aliases swapped in 21 graphs (412 `testemunho`, 333 `leitura`,
+264 `juízes`, 157 `medição`, 64 `derivado`), 1 value in the tail, 1,138 `confirmed` nodes touched, and the conformance
+suite and every graph's verdict unchanged.

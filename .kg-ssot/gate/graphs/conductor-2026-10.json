@@ -2,5 +2,8 @@
   "graph": "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml",
   "id": "conductor-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 9,
+    "form.required.node.provenance": 1
+  }
 }

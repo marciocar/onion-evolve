@@ -2,5 +2,7 @@
   "graph": "docs/onion/graph/comms-stable-2026-11.kg.yaml",
   "id": "comms-stable-2026-11",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 8
+  }
 }

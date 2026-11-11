@@ -1,0 +1,32 @@
+meta:
+  schema_version: "1"
+  id: bad-must-provenance-keeps-should-on-other-node
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EV_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "A evidência sintética que sustenta A."
+  - id: EV_B
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "A evidência sintética B."
+edges:
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS
+  - from: EV_B
+    to: Q_A
+    edge_type: SUPPORTS

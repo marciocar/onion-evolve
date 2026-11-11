@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:f17845937bae7a2a -->
+<!-- translation-of: docs/manual/04-contract.md sha256:f2d07df1cfa20637 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -33,7 +33,7 @@ Toda violação tem um código estável, com a forma da camada:
 | integrity | `integrity.<regra>` | `integrity.orphan-node`, `integrity.dangling-to` |
 | yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 
-`<tipo>` é um de `required`, `enum`, `type`, `pattern`, `range`, `const` ou `unknown-key`. `<escopo>` é um de
+`<tipo>` é um de `required`, `enum`, `type`, `pattern`, `range`, `const`, `unknown-key`, `exclusive` (dois campos que se excluem, v4.12), `misplaced` (a chave fora do lugar, v4.20) ou `deprecated` (a forma aceita e em retirada, v4.21). `<escopo>` é um de
 `top`, `meta`, `node` ou `edge`. Num campo aninhado, o caminho leva ponto: `form.required.node.provenance.locator`.
 Nas `external_edges`, o escopo é `top` e o campo leva o nome da lista
 (`form.enum.top.external_edges.edge_type`). Uma data fora do calendário (`format: date`) reprova como `form.pattern.<escopo>.<campo>`.
@@ -109,12 +109,16 @@ O v4 é uma versão **maior**: o que alertava passou a reprovar.
 | `form.pattern.node.provenance.source` (`source` marcador) | — | **MUST** |
 | `form.pattern.node.provenance.method` (fora de `<classe>: <detalhe>`) | — | SHOULD (MUST no v5) |
 
+Desde o v4.21, dois avisos SHOULD preparam o v5. `form.deprecated.node.provenance.method`: a classe de `provenance.method` em português (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) segue passando, e o leitor pede a em inglês. No JSON Schema, é um `not` com a forma do apelido e a palavra `deprecated` do vocabulário de metadados do 2020-12, que só anota; o valor que já falha a forma fica só com `form.pattern.node.provenance.method`. O apelido sai no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro adotante e no repositório de curadoria dele der zero. E `form.required.node.provenance` no nível SHOULD (proveniência sempre): o nó `evidence` sem `provenance` em qualquer status exceto `unverifiable`, e a `decision` `done` sem ela. É o código da regra MUST acima, de propósito: o campo e o conserto são os mesmos, e o código não muda quando o v5 promover a regra. O MUST não muda, e no nó em que o MUST já acusa o código, o leitor não o repete como aviso; em outro nó do mesmo documento o aviso segue valendo, porque a deduplicação é por ocorrência. Rebaixar um nó sem lhe dar fonte troca o MUST por um SHOULD no mesmo nó: a `evidence` `confirmed` que vai para `open`, ou a `decision` `done` que sai de PROD, segue sem `provenance`, e o gate acusa `form.required.node.provenance` como dívida SHOULD nova e pede `--accept-regression`. O caminho das dicas passa limpo: `unverifiable` para a `evidence` sem fonte recuperável, e, na decisão, a fonte é quem decidiu, com method `testimony`.
+
+Um limite conhecido: o U+2028 literal dentro de um texto YAML é quebra de linha para o parser da referência em Python e texto comum para o leitor JavaScript. Logo depois de `<classe>: `, a referência alerta `form.pattern.node.provenance.method`, e o leitor JavaScript não (com um apelido, alerta `form.deprecated.node.provenance.method`). Os dois mantêm o arquivo válido, e já divergiam antes do v4.21. Escrito como o escape `\u2028`, os dois leem o mesmo valor.
+
 As versões menores da linha 4.x acrescentaram recursos sem mudar o veredito MUST de um grafo bem escrito, com uma exceção
 registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções raras do YAML (o perfil estrito). Foram
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 da 4.38.0 à 4.45.0, v4.19 desde a 4.46.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 da 4.38.0 à 4.45.0, v4.19 da 4.46.0 à 4.48.0, v4.20 e v4.21 desde a 4.49.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -149,6 +153,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.49 | Contratos v4.20 e v4.21, só SHOULD: `x_classification` no `meta` (`form.misplaced.node.x_classification` no nó); a classe de `provenance.method` em português alerta como `form.deprecated.node.provenance.method`, e a `evidence` que não é `unverifiable` ou a `decision` `done` sem `provenance` alerta como `form.required.node.provenance` |
 | 4.46 | Contrato v4.19, só SHOULD: `integrity.bare-decision` (a decisão `done` sem `narrative` e sem `SUPPORTS` chegando a ela) e `integrity.superseded-without-successor` (o nó `superseded` a que nenhuma `SUPERSEDES` chega); o `kg_trace projection` lista `superseded_cited`, a página que cita um nó que os grafos dela trocaram ou derrubaram |
 | 4.40 | Contrato v4.18, sem mudança. O `kg_query --revisit` ganha o `pin-changed`, a decisão cuja versão fixada mudou (`kg-ssot.revisit/2`); o `kg_trace.py digest` aceita um lote em que o arquivo ausente ou não UTF-8 é resultado da própria referência (`kg-ssot.digest/2`) |
 | 4.38 | Contrato v4.18, só SHOULD: `provenance.node_sha256`, o hash canônico do nó citado (RFC 8785); o `kg_query --revisit` e o `--decision` leem o apoio de outro repositório no commit fixado com `--with`, e listam as decisões cujo apoio mudou na origem; `kg_trace.py digest` |

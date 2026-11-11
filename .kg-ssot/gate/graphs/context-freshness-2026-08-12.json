@@ -3,6 +3,7 @@
   "id": "context-freshness-2026-08-12",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 13,
     "form.range.node.label": 13,
     "integrity.bare-decision": 2,
     "yaml.unquoted-date": 1

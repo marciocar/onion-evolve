@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-11",
+  "reason": "contrato v4.21: o apelido em português do method e a proveniência sempre, dívida que já existia",
+  "worse": [
+    "✗ PIOROU  debt.form.deprecated.node.provenance.method: 0 → 5327",
+    "✗ PIOROU  debt.form.required.node.provenance: 0 → 159"
+  ]
+}

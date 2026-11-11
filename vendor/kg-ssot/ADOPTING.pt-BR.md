@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:2e1f35fe441054cf -->
+<!-- translation-of: ADOPTING.md sha256:d620bf138fc6ca64 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -281,6 +281,34 @@ Num pull request, passe a branch de destino (`origin/main`); num push na branch 
 reprova no MUST pode esconder um nó (id repetido, nó sem id). Se o grafo não parseava na base, todos os nós dele contam
 como novos. Em merge cruzado, o git escolhe um dos ancestrais.
 
+**Fontes citadas.** `kg_gate.py --sources` roda também a conferência de fonte do `kg_trace.py check --strict-sources`
+sobre os grafos `.kg.yaml` que o gate mede, com os excludes do gate (não os do `kg_trace`: o gate não deixa de fora
+`testdata/` nem `__snapshots__/`, por exemplo) e sem o vendor. O `.kg.json` não é conferido aqui; para ele, rode o
+`kg_trace.py check --strict-sources`. Reprova (rc 1) quando um `provenance.sha256` não confere com os bytes do arquivo
+citado, quando um `node_sha256` não confere com o nó citado, quando um locator lido pelo `scheme` não acha o trecho, ou
+quando o arquivo citado sumiu do git. No modo da catraca, confere o corpus inteiro; com `--touched`, só os grafos
+alterados e os nós, de qualquer grafo, cuja fonte citada mudou desde o ancestral, então um hash velho num grafo que
+ninguém tocou, com uma fonte que ninguém tocou, não reprova o pull request.
+
+Só o arquivo que o git rastreia é lido, e o que se lê é o blob dele no índice, nunca o disco, então o `sha256` que você
+cita é o do blob (`git show :<caminho> | sha256sum`), como na 4.48.0, e não o de um checkout com `autocrlf`: o arquivo rastreado que o
+CI reescreve antes dos testes é julgado pelo conteúdo versionado, e a edição local não é julgada até o `git add`. A
+fonte que não está no índice é ausente, exista ou não o arquivo no disco, então o rc nunca diz se um caminho existe: o
+arquivo citado que você esqueceu de dar `git add` reprova, e também o arquivo que o CI gera e o arquivo ignorado (deixe
+esses grafos de fora com `--exclude`). O arquivo de um submódulo não baixado, o link rastreado que sai da raiz ou aponta
+para dentro do `.git` e o caminho com segmento `.git` em qualquer caixa ou com segmento `.` ou `..` contam como não
+conferidos. Nenhum deles é lido, para que um nó não transforme um arquivo criado no CI, ou o `.git/config`, num sim ou
+não no log. A fonte que o pull request apaga ou renomeia também é ausente. Se uma fonte que você cita mora num submódulo ou numa pasta ignorada, deixe
+esses grafos de fora com `--exclude`. O gate não vai à rede: a fonte que é URL não é lida (o `kg_trace.py check --with` lê
+uma num commit fixado). A linha `· --sources` conta cada tipo à parte: URL, caminho absoluto, não legível pelo git (submódulo, link),
+esquema só de forma, fora da forma (esquema, locator ou hash) e outras. O nó sem `scheme`, `sha256` e `node_sha256` não é
+julgado.
+
+Vem desligado, então o adotante que não liga não paga nada; quem liga paga uma leitura de cada arquivo citado. Não há
+linha de base para ele, e ele não combina com `--update`: um hash que já está velho reprova o modo da catraca na primeira
+rodada, então rode uma vez na máquina antes de ligar. No passo de CI acima, a última linha vira
+`python3 -I -B vendor/kg-ssot/tools/kg_gate.py --sources`.
+
 **Dívida por nó.** Por grafo, uma melhora espalhada aparece como piora: consertar 3 ocorrências num grafo e criar 1
 em outro conta como +1 grafo. Desde a `contract-v4.2.0`, `kg_gate.py --update --granularity node` passa a contar e
 travar a dívida SHOULD por ocorrência, somada em todos os grafos. A base guarda a granularidade, e o gate a usa sem
@@ -364,6 +392,19 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.48.0` para a `kg-ssot-v4.49.0`, entram os contratos v4.20 e v4.21, só SHOULD: nenhum grafo que
+passava reprova, e nenhum veredito MUST muda. O v4.20 traz o perfil `x_classification` no `meta`. O v4.21 traz dois
+avisos: `form.deprecated.node.provenance.method`, a classe de `provenance.method` em português (`medição`, `leitura`,
+`juízes`, `derivado`, `testemunho`), que segue passando e sai no v5, nunca antes de 2027-03-31 (escreva `measurement`,
+`reading`, `judges`, `derived` ou `testimony`); e `form.required.node.provenance` no nível SHOULD, o nó `evidence` que
+não é `unverifiable` ou a `decision` `done` sem `provenance`. Quando os seus grafos os têm, os dois são códigos novos de
+dívida SHOULD, e o `kg_gate.py` reprova depois da atualização, com linha de base por grafo ou por nó
+(`--granularity node`). Medido no primeiro adotante, na versão que
+este repositório fixa: o apelido em 5318 ocorrências e a proveniência sempre em 157 nós.
+Aceite-os como linha de base, com o motivo, o que mantém a catraca contra o crescimento: `python3 -I -B
+vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contrato v4.21: o apelido em português do method e a
+proveniência sempre, dívida que já existia"`, ou o equivalente do seu gate. Para pagar o apelido em vez disso, o `kg_migrate.py methods apply` o troca pela classe em inglês. Rebaixar um nó sem lhe dar fonte troca o MUST por um SHOULD no mesmo nó: a `evidence` `confirmed` que vai para `open`, ou a `decision` `done` que sai de PROD, segue sem `provenance`, e o gate acusa `form.required.node.provenance` como dívida SHOULD nova e pede `--accept-regression`. O caminho das dicas passa limpo: `unverifiable` para a `evidence` sem fonte recuperável, e, na decisão, a fonte é quem decidiu, com method `testimony`.
 
 Da `kg-ssot-v4.47.0` para a `kg-ssot-v4.48.0`, nada é obrigatório: o contrato (v4.19) e os vereditos são os mesmos, e o
 vendor não traz arquivo novo. Uma coisa é opcional: `kg-mcp --area-policy ARQUIVO`, sobre `--identity-header`, para uma

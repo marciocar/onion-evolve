@@ -3,6 +3,7 @@
   "id": "passada-adversarial-2026-09",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 53,
     "form.range.node.label": 54,
     "integrity.bare-decision": 2
   }

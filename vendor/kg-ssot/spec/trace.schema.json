@@ -391,6 +391,11 @@
             "not_canonical": {
               "type": "integer",
               "minimum": 0
+            },
+            "untracked": {
+              "description": "Since 4.49.0, and only when above 0: a source in a submodule that is not checked out, or a tracked link that leaves the root or points into .git. It is never read; a source that is not in the git index is missing_source instead.",
+              "type": "integer",
+              "minimum": 0
             }
           }
         },

@@ -3,6 +3,7 @@
   "id": "onion-slm-2026-10",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 66,
     "form.range.node.label": 39
   }
 }

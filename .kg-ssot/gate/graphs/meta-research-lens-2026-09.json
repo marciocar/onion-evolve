@@ -3,6 +3,7 @@
   "id": "meta-research-lens-2026-09",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 23,
     "form.range.node.label": 26
   }
 }

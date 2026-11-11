@@ -3,6 +3,7 @@
   "id": "guardrails-2nd-pr-state-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 14,
     "form.range.node.label": 12,
     "form.required.node.verified_against": 3,
     "yaml.unquoted-date": 1

@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:ee10340b3eb55342 -->
+<!-- translation-of: spec/conformance/README.md sha256:10802c8b8e966ab0 -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -71,7 +71,7 @@ Cada código é um slug estável por camada, e o metaschema confere a forma.
 | yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked` e os `semantic.domain-*` da camada domain (SHOULD), só em `optional/` |
 
-`<tipo>` ∈ `required enum type pattern range const unknown-key exclusive`. `<escopo>` ∈ `top meta node edge`.
+`<tipo>` ∈ `required enum type pattern range const unknown-key exclusive misplaced deprecated`. `<escopo>` ∈ `top meta node edge`.
 Num objeto aninhado, `<campo>` é o caminho com ponto: `form.required.node.provenance.locator`.
 `range` cobre também o tamanho de texto: `label: ""` (MUST) e `label` acima de 280 caracteres (SHOULD, porque a
 narrativa vai para `narrative`). O tamanho conta code points, como o `maxLength` do JSON Schema: um emoji vale 1, não
@@ -93,7 +93,7 @@ O que o v4 mudou de severidade, e o que entrou:
 | `form.unknown-key.<escopo>.<chave>` (chave fora da gramática e sem `x_`, no topo, no meta, no nó ou na aresta) | SHOULD | **MUST** |
 | `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
 | `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue dando `form.range`) |
-| `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` ou, desde o v4.16, nos alias em português `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST no v5) |
+| `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` ou, desde o v4.16, nos alias em português `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, que alertam como `form.deprecated.node.provenance.method` desde o v4.21) | — | SHOULD (MUST no v5) |
 | `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
 
 O v4.1 acrescenta quatro avisos SHOULD (nenhum veredito muda; `latest/form/unanchored/` e
@@ -245,6 +245,15 @@ O v4.14 põe o `scheme` no perfil `x_term` (um slug; sem ele, o esquema é o gra
 `refuted`) com a mesma `notation` no mesmo esquema, entre nós do mesmo grafo. A notation se compara exata. O corpus
 inteiro e os códigos da prosa são do `kg_vocab.py lint`, que não faz parte da suíte.
 
+O v4.20 põe o perfil `x_classification` no SHOULD (`latest/form/classification/`): o nível de sensibilidade do grafo
+inteiro, no `meta`, em texto com a forma de slug (minúsculas, dígitos e hífen). Fora dessa forma alerta como
+`form.pattern.meta.x_classification`, e o valor que não é texto como `form.type.meta.x_classification`. Os níveis e a
+ordem deles são da organização, na política de quem entrega o grafo, não no grafo. No nó, `x_classification` não é
+perfil e alerta como `form.misplaced.node.x_classification`, com qualquer valor: a unidade é o grafo. Na aresta, segue
+chave `x_` livre. Nada que passava reprova.
+
+O v4.21 põe dois avisos no SHOULD. Em `latest/form/method-vocabulary/`, a classe de `provenance.method` em português (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) segue passando e alerta como `form.deprecated.node.provenance.method` (um `not` com a palavra `deprecated`, que só anota); o valor que já falha a forma fica só com `form.pattern.node.provenance.method`, e o apelido sai no v5, nunca antes de 2027-03-31. Em `latest/form/provenance-always/`, o nó `evidence` sem `provenance` em qualquer status exceto `unverifiable`, e a `decision` `done` sem ela, alertam como `form.required.node.provenance`, o código da regra MUST; no nó em que o MUST já o acusa, o leitor não o repete como aviso, e em outro nó do mesmo documento o aviso segue valendo (a deduplicação é por ocorrência). Nada que passava reprova.
+
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 
 ## Pastas
@@ -266,11 +275,11 @@ estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `sp
 (por exemplo, `trigger` em `integrity-trigger`). O PR da promoção esvazia `pending_on` e cita o nó selado. Nada
 antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 438 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 555 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
-v4 muda viraram casos `bad-*`. Todo caso usa `method` válido (`medição: caso de conformidade`, o alias em português), para que o aviso de
-vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
+v4 muda viraram casos `bad-*`. Todo caso usa `method` válido na classe canônica em inglês (`measurement: caso de conformidade`, desde o v4.21), para que os avisos de
+vocabulário só apareçam onde o caso os pede. `proposals/` está vazia.
 
 ## Rodar
 

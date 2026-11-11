@@ -29,6 +29,10 @@ nodes:
     impact: 3
     confidence: 0.8
     label: "O resultado sintético R."
+    provenance:
+      source: "Fonte E_R"
+      locator: "caso de conformidade"
+      method: "measurement: caso sintético"
     x_measured_under:
       measured_at: "1900-02-01"
       criteria:

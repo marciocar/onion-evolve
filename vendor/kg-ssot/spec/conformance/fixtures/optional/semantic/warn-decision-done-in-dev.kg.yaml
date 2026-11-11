@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição: caso de conformidade"
+      method: "measurement: caso de conformidade"
   - id: D_X
     node_type: decision
     plane: DEV
@@ -28,6 +28,10 @@ nodes:
     confidence: 0.5
     label: "Nó sintético D_X."
     narrative: "O porquê sintético da decisão X."
+    provenance:
+      source: "Fonte D_X"
+      locator: "caso de conformidade"
+      method: "measurement: caso sintético"
 edges:
   - from: D_X
     to: Q_A

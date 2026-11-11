@@ -10,6 +10,95 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.49.0] - 2026-11-11
+
+Contracts v4.20 and v4.21, SHOULD only: no graph that passed fails.
+
+### Contract v4.21
+
+The plan for the `provenance.method` vocabulary, agreed with the first adopter and its curation repository. Two new
+warnings, the same codes in both readers (Python and JavaScript), and 17 new cases in the suite (555 in `latest/`).
+
+- The Portuguese class of `provenance.method` (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) still passes,
+  and now warns as `form.deprecated.node.provenance.method`: write the class in English (`measurement`, `reading`,
+  `judges`, `derived`, `testimony`). `form.deprecated` is a new kind of form code: in the JSON Schema, a `not` with the
+  alias form and the `deprecated` keyword of the 2020-12 meta-data vocabulary, which only annotates. A value that
+  already fails the form (an embedded quote, a class outside the list, no `: <detail>`) keeps only
+  `form.pattern.node.provenance.method`, with no second warning, and `testemunho` still counts like `testimony` for
+  `integrity.testimony-in-prod`. The alias leaves in v5, not before 2027-03-31, and only when the measurement on the
+  first adopter and on its curation repository reaches zero.
+- Provenance always: an `evidence` node without `provenance`, in any status except `unverifiable`, and a `decision`
+  `done` without `provenance` warn as `form.required.node.provenance`, the code the MUST already gives a `confirmed` or
+  `PROD` node. Same field, same fix, and the code stays the same when v5 promotes the rule. The MUST does not change. On a node where the MUST already flags that
+  code, the reader does not repeat it as a warning; on another node of the same document it still warns, because
+  the deduplication is per occurrence (code and path), so paying the MUST debt does not show up as new SHOULD debt.
+- The suite fixtures that are not about the alias now write the class in English (293 files, only the `method` line
+  changes), and 45 fixtures gained a `provenance`, so each case keeps testing what it tested. The five alias cases are now `warn-method-alias-*`.
+- `kg_migrate.py plan` writes the English class when the profile still names the Portuguese one (`class:
+  leitura` becomes `reading: <detail>`): a proposal with the alias would carry the new warning and go to review.
+- The new debt, measured with `kg_validate` on the `.kg.yaml` graphs that the gate measures: on this repository (37
+  graphs), the alias in 0 graphs and 0 occurrences (the 1230 aliases went to the English class with
+  `kg_migrate.py methods apply`), and provenance always in 10 graphs and 102 nodes (98 `evidence`,
+  4 `decision` `done`); on the first adopter, at the version this repository pins (239
+  graphs), the alias in 205 graphs and 5318 occurrences, and provenance always in 60 graphs and 157 nodes (42 `evidence`,
+  115 `decision` `done`); on its curation repository (75 graphs), the
+  alias in 41 graphs and 433 occurrences, and provenance always in 29 graphs and 97 nodes (83 `evidence`, 14 `decision`
+  `done`). No other code changes on the three, and no MUST verdict changes.
+- **Your gate sees new debt.** When your graphs carry them, both are new SHOULD debt codes, so `kg_gate.py` fails
+  after the update, with a baseline per graph or per node (`--granularity node`). Accept them as baseline with the reason, which keeps the
+  ratchet against growth: `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.21:
+  the Portuguese method alias and provenance always, debt that already existed"`, or your own gate's equivalent. To pay the alias
+  instead, `kg_migrate.py methods apply` swaps it for the English class. Demoting a node without giving it a source
+  (a `confirmed` `evidence` to `open`, a `decision` `done` out of PROD) trades the MUST for this SHOULD on the same
+  node and asks for `--accept-regression`; the path of the hints (`unverifiable`, or the decision's source as
+  `testimony`) passes clean.
+
+### Contract v4.20 and the rest
+
+- Contract: the canonical profile `x_classification`, in `meta` only and judged only when present. It is the
+  sensitivity level of the whole graph, as text in slug form (lowercase, digits, and hyphens), such as `confidential`.
+  Outside that form it warns as `form.pattern.meta.x_classification`, and a value that is not text as
+  `form.type.meta.x_classification`. The levels and their order belong to the organization and live in the policy of
+  the server, not in the graph; the TLP 2.0 of FIRST is an example of mapping in the manual, not the standard. On a node,
+  `x_classification` warns as `form.misplaced.node.x_classification`, a new kind of form code: the unit is the graph, and
+  a node more sensitive than its graph goes to a graph of its own. Both readers emit the same codes, and the suite has
+  14 new cases (538).
+- `kg-mcp`: the ceiling by area. The area policy takes three optional keys that come together: `levels` (the ordered
+  levels), `ceilings` (each shared area to its highest level), and `default_level` (the level of a graph without
+  `x_classification`). In an area with a ceiling, a graph above it, or with a level that `levels` does not know, leaves
+  `kg_list`, `kg_get` (with `ref` too, where the current and the asked version are both judged), `kg_history`,
+  `kg_query`, and `kg_terms`, and answers like a graph that does not exist; the edges and pointers to it leave with the
+  area filter's cut. The identity's own area has no ceiling, and without `ceilings` nothing changes. The label is a
+  marking the policy enforces, not access control node by node, and the git history still holds a node that was moved
+  to another file.
+- `kg_gate.py --sources`: the gate also runs the source check of `kg_trace.py check --strict-sources` on the `.kg.yaml`
+  graphs it measures, with its own excludes, and fails (rc 1) when a cited `sha256` or `node_sha256` does not match, a
+  locator read by its `scheme` is not found, or the cited file is gone from git. With `--touched`, only the changed graphs
+  and the nodes whose cited source changed. No network: a URL source is counted as not checked. Off by default, so
+  nothing changes for an adopter that does not turn it on.
+- Security fix in `kg_trace.py`: inside a git repository, a `provenance.source` is read only from the index. Before, a
+  node could name `.git/config/.` (where `actions/checkout` keeps the token), a file the CI created, or a tracked file the
+  CI rewrote, and a `quote` locator turned it into a yes or no in the log. Now what is read is the blob in the index, never
+  the disk, and a source that is not in the index is missing, whether or not the file exists on disk, with no look at the
+  history. A path with a `.git` segment in any case, or with a `.` or `..` segment, is counted in `outside_root`, and a
+  file in a submodule that is not checked out, or a tracked link that leaves the root or points into `.git`, is counted in
+  `schemes.skipped.untracked`; none of them is read, and the same goes for a JSON locator reached through `trace:`. The
+  `untracked` key appears only when it is above 0, so an output without one still validates against the 4.48 schema.
+  What a local user can see change: a cited source that has not gone through `git add` now counts as missing (rc 4 with
+  `--strict-sources`; before, it was read from the disk), a generated or ignored file counts as missing too (leave those
+  graphs out with `--exclude`), and a file edited without `git add` is judged by its version in the index, which also
+  applies to the pins that `kg_query --revisit` compares. Measured with the 4.48.0 `kg_trace check` against this one, with
+  and without `--strict-sources`: on this repository, with the default excludes and with `--no-default-excludes`
+  (1 source read, 30 missing, 5 JSON locators missing), and on the first adopter (4 JSON locators read), the rc and every
+  count are the same, because every cited source there is tracked and unchanged on disk. The check reads the index once
+  per run: on the first adopter it took 6.9 to 7.9 s against 6.4 to 6.8 s before.
+- `kg_migrate.py methods plan|apply`: swaps the Portuguese alias of the `provenance.method` class (`medição`,
+  `leitura`, `juízes`, `derivado`, `testemunho`) for the canonical English one, by text, so a graph pays the alias that contract v4.21 now
+  warns on. Only the class changes; the detail after `: ` stays byte for byte, and comments and quoting stay. The
+  tail (a value that starts with a quote inside the string, a class outside the list, no `: ` after the class,
+  uppercase in the class) is only pointed out. `apply` writes under the same checks as `keys`, and `--confirmed-out`
+  lists the `confirmed` nodes touched. No contract change, and no verdicts change.
+
 ## [4.48.0] - 2026-11-09
 
 No contract change (still v4.19), and no verdicts change. Everything here applies only when you ask for it.

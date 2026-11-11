@@ -3,6 +3,8 @@
   "id": "cedar-2026-10",
   "must": [],
   "should": {
-    "form.range.node.label": 10
+    "form.deprecated.node.provenance.method": 7,
+    "form.range.node.label": 10,
+    "form.required.node.provenance": 1
   }
 }

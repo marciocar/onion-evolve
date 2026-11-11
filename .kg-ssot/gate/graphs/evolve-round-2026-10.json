@@ -3,6 +3,7 @@
   "id": "evolve-round-2026-10",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 16,
     "form.range.node.label": 16,
     "integrity.superseded-without-successor": 7
   }

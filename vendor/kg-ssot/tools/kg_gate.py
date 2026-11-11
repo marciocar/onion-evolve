@@ -49,8 +49,8 @@ reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
 
 Uso:
   kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]
-             [--strict-identity] [--allow-unreleased] [--update [--accept-regression MOTIVO] [--granularity graph|node]]
-       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]
+             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression MOTIVO] [--granularity graph|node]]
+       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
 
 --touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e
 HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer
@@ -58,6 +58,14 @@ campo diferente (verified_at e verified_against sozinhos não contam) e o nó qu
 ele). Compara a árvore de trabalho, nó a nó; reformatar o YAML não toca. O grafo renomeado pareia pelo meta.id. O nó
 movido para outro grafo conta como novo no destino. rc 0: nenhum; rc 2: BASE que não resolve (clone raso) ou grafo
 alterado que não parseia. A conferência do carimbo do vendor vale como no modo da catraca.
+
+--sources, nos dois modos, confere também cada fonte citada dos grafos medidos, como o kg_trace check --strict-sources,
+com os excludes do gate: o provenance.sha256 ou node_sha256 que não confere, o locator lido pelo esquema que não acha o
+trecho, ou a fonte rastreada que sumiu do git reprova (rc 1). Com --touched, só os grafos alterados e os nós cuja fonte
+citada mudou desde o ancestral são conferidos. Só o arquivo que o git rastreia é lido, pelo blob do índice e nunca
+pelo disco (a edição local conta depois do git add); a fonte que não está no índice é ausente, e o submódulo não
+baixado, o link rastreado que não se segue, o segmento .git e o segmento . ou .. contam como não conferidos, como a URL:
+o gate não vai à rede. Desligado por padrão; não combina com --update.
 """
 import argparse
 import collections
@@ -152,6 +160,75 @@ def tracked_graphs(repo):
         raise Broken(_("{repo} is not a git repository: {err}").format(
             repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
     return [n for n in out.stdout.decode("utf-8").split("\0") if n and (pathlib.Path(repo) / n).is_file()]
+
+
+def source_check(repo, items, changed=None):
+    """O --sources (opt-in): a conferência de fonte do kg_trace (check_schemes, a mesma do kg_trace check
+    --strict-sources) sobre os grafos que o gate mede, com os excludes e o skip do vendor dele. Devolve (linhas,
+    reprovou). Reprova o sha256 ou o node_sha256 que não confere, o locator lido pelo esquema que não acha o trecho, e a
+    fonte que não está no índice do git. Sem rede: não há --with, e a URL (ou o caminho absoluto) fica fora, contada como
+    não conferida, como o esquema só de forma, o locator fora da forma, a fonte que não é caminho e a que o git não
+    rastreia como não seguível (o submódulo, o link para fora; 4.49.0: nunca é lida). O conteúdo julgado é o blob do
+    índice, não o disco, e a fonte fora do índice é ausente. changed (o --touched): os caminhos alterados desde o
+    ancestral; só entram os nós dos grafos alterados e os nós, de qualquer grafo, cuja fonte citada está entre eles."""
+    if __package__:
+        from . import kg_query, kg_trace
+    else:
+        import kg_query  # noqa: E402
+        import kg_trace  # noqa: E402
+    graphs = kg_query.Corpus()
+    graphs.root = str(repo)
+    for name, text in items:
+        graphs.add(name, text)
+    if changed is not None:
+        tracked = kg_trace.tracked_index(repo)
+        graphs.order = [k for k in graphs.order
+                        if k[0] in changed or _source_paths(kg_trace, graphs.nodes[k], k[0], repo, tracked) & changed]
+    res, _located = kg_trace.check_schemes(graphs, pathlib.Path(repo))
+    lines = []
+    for f in res["failures"]:
+        lines.append(_("✗ cited source does not match: {graph}#{node} {code} → {target}").format(
+            graph=f["file"], node=f["id"], code=f["code"], target=f["target"]))
+    for m in res["missing_sources"]:
+        lines.append(_("✗ cited source not found in the repository: {graph}#{node} → {target}").format(
+            graph=m["file"], node=m["id"], target=m["target"]))
+    sk = res["skipped"]
+    shown = ("absolute", "missing_source", "untracked", "form_only", "malformed")
+    lines.append(_("· --sources: {judged} source(s) checked ({sha} sha256, {node_sha} node_sha256): {ok} ok, {failed} "
+                   "failed, {missing} not found; not checked (counted): {url} URL (the gate does not go to the "
+                   "network), {abspath} absolute path, {untracked} not readable from git (submodule or link), "
+                   "{form} form-only scheme, "
+                   "{malformed} out of form (scheme, locator or hash), {other} other").format(
+                       judged=res["judged"], sha=res["sha256_checked"], node_sha=res["node_sha256_checked"],
+                       ok=res["ok"], failed=len(res["failures"]), missing=len(res["missing_sources"]),
+                       url=res["absolute_urls"], abspath=sk["absolute"] - res["absolute_urls"],
+                       untracked=sk["untracked"], form=sk["form_only"], malformed=sk["malformed"],
+                       other=sum(v for k, v in sk.items() if k not in shown)))
+    return lines, bool(res["failures"] or res["missing_sources"])
+
+
+def _source_paths(kg_trace, node, graph, repo, tracked):
+    """Os caminhos do repo que o provenance.source de um nó pode nomear: o resolvido e, para a fonte que sumiu, os três
+    candidatos (a raiz, a pasta do grafo e a pasta pai dela), para casar com o git diff."""
+    prov = node.get("provenance")
+    if not isinstance(prov, dict) or not isinstance(prov.get("source"), str):
+        return set()
+    gdir = pathlib.PurePosixPath(graph).parent
+    kind, target, found = kg_trace.locate_source(prov["source"], gdir.as_posix(), pathlib.Path(repo), tracked)
+    if kind == "resolved":
+        return {found[0]}
+    if kind not in ("missing", "untracked"):
+        return set()
+    return {pathlib.PurePosixPath(target).as_posix(), (gdir / target).as_posix(), (gdir.parent / target).as_posix()}
+
+
+def changed_paths(repo, sha):
+    """Os caminhos (relativos a --repo) que mudaram entre o ancestral e a árvore de trabalho, os apagados inclusive."""
+    out = _git_out(repo, "diff", "--name-only", "--relative", "--no-renames", "-z", sha, "--")
+    if out.returncode != 0:
+        raise Broken(_("{repo} is not a git repository: {err}").format(
+            repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
+    return {n for n in out.stdout.decode("utf-8").split("\0") if n}
 
 
 def contract_identity():
@@ -684,8 +761,8 @@ fails (rc 1) unless --allow-unreleased is given, and it never writes the baselin
 
 Usage:
   kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
-             [--strict-identity] [--allow-unreleased] [--update [--accept-regression REASON] [--granularity graph|node]]
-       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]
+             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression REASON] [--granularity graph|node]]
+       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
 
 --touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common
 ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new
@@ -693,6 +770,15 @@ node, a node with any field changed (verified_at and verified_against alone do n
 edge reaching it, for example). It compares the working tree node by node; reformatting the YAML touches nothing. A
 renamed graph is paired by meta.id. A node moved to another graph counts as new there. rc 0: none; rc 2: a BASE that
 does not resolve (shallow clone) or a changed graph that does not parse. The vendor stamp check works as in the ratchet.
+
+--sources, in both modes, also checks each cited source of the measured graphs, as kg_trace check --strict-sources
+does, with the gate's excludes: a provenance.sha256 or node_sha256 that does not match, a locator read by its scheme
+that is not found, or a tracked source that is gone from git fails (rc 1). With --touched, only the changed graphs and
+the nodes whose cited source changed since the ancestor are checked. Only files that git tracks are read, from the
+index blob and never from the disk (a local edit counts after git add); a source that is not in the index is missing,
+and a submodule that is not checked out, a tracked link that cannot be followed, a .git segment, and a . or .. segment
+are counted as not checked, as is a URL: the gate does not go to the network. Off by default; it does not go with
+--update.
 """
 
 
@@ -708,6 +794,8 @@ def run_touched(args):
         sha, found, changed = touched_debt(args.repo, args.touched, items, exclude,
                                            skip_vendor=not args.no_default_excludes)
         tampered = stamp_problems(args.allow_unreleased)
+        sources, sources_failed = (source_check(args.repo, items, changed_paths(args.repo, sha)) if args.sources
+                                   else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -721,7 +809,9 @@ def run_touched(args):
     else:
         print(_("· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})").format(
             base=sha[:12], graphs=changed))
-    return 1 if found or tampered else 0
+    for line in sources:
+        print(line)
+    return 1 if found or tampered or sources_failed else 0
 
 
 def main(argv=None):
@@ -751,8 +841,17 @@ def main(argv=None):
     ap.add_argument("--granularity", choices=GRANULARITIES,
                     help=_("with --update: changes the granularity of the SHOULD debt (graph, the default, or node);"
                            " without it, the baseline's applies"))
+    ap.add_argument("--sources", action="store_true",
+                    help=_("also checks each cited source of the measured graphs, as kg_trace check --strict-sources "
+                           "does: a provenance.sha256 or node_sha256 that does not match, a locator read by its scheme "
+                           "that is not found, or a source that is not in the git index fails (rc 1); with --touched, "
+                           "only what the change touches; a URL is not read and is counted as not checked; off by "
+                           "default"))
     args = ap.parse_args(argv)
     _utf8_stdio()
+    if args.sources and args.update:
+        print(_("GATE BROKEN  --sources does not go with --update (the sources are not part of the baseline)"))
+        return 2
     if args.touched is not None:
         return run_touched(args)
     if args.granularity and not args.update:
@@ -784,6 +883,7 @@ def main(argv=None):
         g_base = (base or {}).get("granularity", "graph")
         now = numbers(measured, args.granularity or g_base)
         debt_now = numbers(measured, g_base)["debt"] if base is not None and args.granularity not in (None, g_base) else None
+        sources, sources_failed = source_check(args.repo, items) if args.sources else ([], False)
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -804,9 +904,9 @@ def main(argv=None):
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
             print("\n".join(lines + [_("✗ --update refused: the vendor does not pass its stamp (see above)")]))
             return 1
-    print("\n".join(lines + detail(base, now)))
+    print("\n".join(lines + detail(base, now) + sources))
     if not args.update:
-        return rc
+        return 1 if sources_failed else rc
     if worse and not args.accept_regression:
         print(_("✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\""
                 " (it stays in the baseline)"))

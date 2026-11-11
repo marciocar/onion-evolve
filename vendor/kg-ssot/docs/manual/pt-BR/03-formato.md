@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:7e8142b7d872ae87 -->
+<!-- translation-of: docs/manual/03-format.md sha256:875b13aa9924e6da -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -85,7 +85,7 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 | `impact` | inteiro | obr. 1 a 5 |
 | `confidence` | número | obr. 0 a 1 |
 | `label` | texto | obr. Não vazio. SHOULD: até 280 caracteres |
-| `provenance` | mapa | **obr. quando `status: confirmed` ou `plane: PROD`, exceto com `status: unverifiable`** |
+| `provenance` | mapa | **obr. quando `status: confirmed` ou `plane: PROD`, exceto com `status: unverifiable`**. SHOULD desde o v4.21 (proveniência sempre): no nó `evidence` em qualquer status exceto `unverifiable`, e na `decision` `done`, alerta como `form.required.node.provenance`, o mesmo código no nível SHOULD |
 | `trace` | texto | onde a afirmação aparece (arquivo, caminho) |
 | `verified_at` | *data* | SHOULD em nó PROD |
 | `verified_against` | texto | SHOULD em `claim` com `verified_at` |
@@ -109,7 +109,7 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 |---|---|---|
 | `source` | texto | obr. Não vazio e não marcador (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | texto | obr. Não vazio |
-| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, com a classe entre `measurement`, `reading`, `judges`, `derived` e `testimony` (os em português, `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, são alias aceitos desde o v4.16) |
+| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, com a classe entre `measurement`, `reading`, `judges`, `derived` e `testimony` (desde o v4.21, os apelidos em português, `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, seguem passando e alertam como `form.deprecated.node.provenance.method`; saem no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro adotante e no repositório de curadoria dele der zero. O valor que já falha a forma alerta só como `form.pattern.node.provenance.method`) |
 | `locality` | enum | opcional. `repo` `web` `host` `pessoa` `privado`; fora do enum alerta. Descreve onde está a cópia que você leu, não a classificação do documento |
 | `x_*` | qualquer | outra chave alerta, não reprova |
 
@@ -161,6 +161,7 @@ livre, e qualquer outra chave alerta. Os valores de enum são códigos, em ingl�
 | `x_measured_under` | nó | as versões de critério sob as quais um resultado foi medido (v4.12) |
 | `x_confidence` | aresta | a certeza da ligação, de 0 a 1 |
 | `x_provisional` | aresta | `true` quando a ligação ainda espera conferência |
+| `x_classification` | meta | o nível de sensibilidade do grafo inteiro, um nível do esquema próprio da organização (v4.20) |
 
 ### `x_term`
 
@@ -316,6 +317,32 @@ comparam o dia escrito, o que supõe as duas escritas no mesmo fuso, e o mesmo d
 dia em UTC, e a distância de até um dia também não diz a ordem. Só o mesmo `round` decide (a rodada que motivou a
 emenda): rodadas são rótulos, não uma ordem. A data num dia que não existe (30 de fevereiro) não é comparada. O `sha256` contra o texto ou o arquivo, e a citação de outro
 grafo, são conferidos pelo `kg_criterion.py` (capítulo 5).
+
+### `x_classification` (v4.20)
+
+`meta.x_classification` marca o quanto o grafo inteiro é sensível: um nível, escrito como slug (letras minúsculas,
+dígitos e hífen), como `confidential`. O contrato fixa só a forma. Os níveis e a ordem deles são da organização e moram
+na política do servidor que entrega o grafo, nunca no grafo: no `kg-mcp`, os `levels` da política de áreas (capítulo
+5). O nível fora da forma alerta como `form.pattern.meta.x_classification`, e o valor que não é texto como
+`form.type.meta.x_classification`.
+
+```yaml
+meta:
+  id: folha-2026
+  x_classification: confidential
+```
+
+A unidade é o grafo. O nó mais sensível que o resto do grafo vai para um grafo próprio, com o nível no `meta` dele. Por
+isso `x_classification` no nó não é perfil, e alerta como `form.misplaced.node.x_classification`, com qualquer valor.
+Na aresta, é uma chave `x_` livre.
+
+O rótulo é marcação que a política do servidor faz valer na leitura, não controle de acesso nó a nó: um leitor que
+ignora a política vê o grafo como qualquer outro. Mover um nó para outro arquivo não o tira do histórico do git, onde a
+versão antiga ainda o guarda.
+
+Como exemplo de mapeamento, não como padrão: o TLP 2.0 da FIRST nomeia audiências (`clear`, `green`, `amber`,
+`amber-strict`, `red`) para a troca entre organizações, e declara que não é um esquema formal de classificação. A
+organização que o usa escreve esses nomes como os seus `levels`, nessa ordem.
 
 ## Registrar um evento externo (forma recomendada, não normativa)
 

@@ -3,6 +3,8 @@
   "id": "nanochat-onion-2026-10",
   "must": [],
   "should": {
-    "form.range.node.label": 28
+    "form.deprecated.node.provenance.method": 42,
+    "form.range.node.label": 28,
+    "form.required.node.provenance": 3
   }
 }

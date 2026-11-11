@@ -3,6 +3,7 @@
   "id": "onion-vps-consolidation-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 4,
     "form.range.node.label": 4,
     "yaml.unquoted-date": 1
   }

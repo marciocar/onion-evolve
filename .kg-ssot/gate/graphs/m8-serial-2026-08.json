@@ -3,6 +3,7 @@
   "id": "m8-serial-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 5,
     "form.range.node.label": 6
   }
 }

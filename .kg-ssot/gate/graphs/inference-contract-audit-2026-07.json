@@ -4,5 +4,7 @@
   "must": [
     "form.required.node.provenance"
   ],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 8
+  }
 }

@@ -3,6 +3,8 @@
   "id": "agent-command-composition-2026-09",
   "must": [],
   "should": {
-    "form.range.node.label": 25
+    "form.deprecated.node.provenance.method": 24,
+    "form.range.node.label": 25,
+    "form.required.node.provenance": 1
   }
 }

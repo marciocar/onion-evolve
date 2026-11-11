@@ -3,6 +3,7 @@
   "id": "onion-doctrine-elenxo-bulbo-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 30,
     "form.range.node.label": 7,
     "yaml.unquoted-date": 1
   }

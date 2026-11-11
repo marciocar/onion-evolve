@@ -60,7 +60,7 @@ kg-conformance | tail -2
 ```
 
 ```text
-latest: 524/524 (gates the rc)
+latest: 555/555 (gates the rc)
 optional: 10/24 (report only)
 ```
 

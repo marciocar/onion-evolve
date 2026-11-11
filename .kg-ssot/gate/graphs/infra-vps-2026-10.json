@@ -3,6 +3,8 @@
   "id": "infra-vps-2026-10",
   "must": [],
   "should": {
-    "form.range.node.label": 20
+    "form.deprecated.node.provenance.method": 35,
+    "form.range.node.label": 20,
+    "form.required.node.provenance": 1
   }
 }
