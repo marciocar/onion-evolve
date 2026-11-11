@@ -34,7 +34,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-11-11"
     verified_against: "teste exato de Fisher sobre 9 de 16 contra 6 de 16: p 0,48; três casos sem acerto de nenhum modelo e dois com acerto de todos; o custo informado do Haiku 5.5 não bate com os tokens gastos, parecidos com os do Fable"
-    label: "a diferença de acerto entre os modelos não é significativa, só três dos oito casos discriminam, e a tarefa não mede orquestração longa"
+    label: "a diferença de acerto não é significativa, a métrica conta só o defeito do gabarito, sem gravidade, e a auditoria só leitura não exercita a maquinaria do Onion: é linha de base, não dogfood"
     provenance:
       source: "docs/evolution/research/model-compare-onion-2026-11/data/runs.tsv"
       locator: "data/runs.tsv; SYNTHESIS.md, seção Limites"
@@ -125,6 +125,70 @@ nodes:
     verified_at: "2026-11-11"
     verified_against: "medido nesta rodada: rc 0 com um de cinco modelos"
     label: "curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada"
+  - id: D_LINEUP_FABLE_5_2_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «5.2 no lugar do 5.1»"
+    label: "O Fable 5.2 entra no lineup da sessão no lugar do 5.1, com base na comparação dentro do Onion; a escada de fallback não muda."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «5.2 no lugar do 5.1»; descartadas: «5.2 e manter o 5.1» · «Não mudar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Fable 5.2 no lineup de modelos da sessão: como fica?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «As quatro opções, e o comparativo completo dos modelos usando o Onion e o KG-SSOT»"
+    label: "Entram na fila: bancada de modelo e revisor, bancada do veto por versão, enxugar o CLAUDE.md, revisor de outro fornecedor e o comparativo completo com o Onion e o KG-SSOT."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «As quatro opções, e o comparativo completo dos modelos usando o Onion e o KG-SSOT» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Nenhuma»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «O que entra na fila do core, vindo da revisão dos 10 updates e das comunidades?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_BATUTA_CLAUSULA_DE_DONO_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Cláusula na doutrina»"
+    label: "O dono do resultado entra como cláusula da doutrina da batuta, com a ressalva de que firmeza nunca é contornar veto."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Cláusula na doutrina»; descartadas: «Skill própria no Onion» · «Deixar só na sua conta»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Batuta como dono do resultado: como levar ao Onion?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_DADOS_EM_REPO_PRIVADO_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Repo privado, e no futuro usar datasets de testes e aprender a buscar no Hugging Face»"
+    label: "Os dados brutos da comparação ficam num repositório privado, e no futuro a bancada usa datasets de teste, com busca no Hugging Face."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Repo privado, e no futuro usar datasets de testes e aprender a buscar no Hugging Face» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Só local por enquanto» · «Bundle para o notebook»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Dados brutos da comparação de modelos: onde fica a cópia externa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
 edges:
   - from: E_LIMITES_DA_COMPARACAO_1111
     to: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
@@ -141,21 +205,24 @@ edges:
   - from: E_SONDA_DO_LINEUP_SO_TESTA_O_PRIMEIRO_1111
     to: Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111
     edge_type: SUPPORTS
-  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+  - from: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     to: Q_BANCADA_DO_VETO_POR_VERSAO_1111
-    edge_type: TRACES_TO
-  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    edge_type: SUPPORTS
+  - from: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     to: Q_ENXUGAR_O_CLAUDE_MD_1111
-    edge_type: TRACES_TO
-  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    edge_type: SUPPORTS
+  - from: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     to: Q_REVISOR_DE_OUTRO_FORNECEDOR_1111
+    edge_type: SUPPORTS
+  - from: D_LINEUP_FABLE_5_2_1111
+    to: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     edge_type: TRACES_TO
   - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
-    to: Q_BANCADA_DE_MODELO_E_REVISOR_1111
+    to: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     edge_type: TRACES_TO
-  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
-    to: Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111
+  - from: D_BATUTA_CLAUSULA_DE_DONO_1111
+    to: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     edge_type: TRACES_TO
   - from: D_DADOS_EM_REPO_PRIVADO_1111
-    to: Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111
+    to: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
     edge_type: TRACES_TO

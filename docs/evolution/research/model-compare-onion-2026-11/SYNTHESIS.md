@@ -42,11 +42,13 @@ type: research
 ## O que se conclui
 
 - **O Fable 5.2 supera o 5.1 em tudo que foi medido:** acerto, precisão, 17% menos custo e 22% menos tempo. Selado: `D_LINEUP_FABLE_5_2_1111`.
-- **O Sonnet 5.5 empata com o Fable 5.2 no acerto a cerca de um oitavo do custo.** Confirma o Sonnet como modelo dos agentes para esse tipo de tarefa.
+- **O Sonnet 5.5 empata com o Fable 5.2 no acerto a cerca de um oitavo do custo.** Em auditoria delimitada; para orquestração segue hipótese.
 - **O Haiku 5.5 acerta razoavelmente, mas é o único com achados falsos.**
 
 ## Limites
 
+- **Não é dogfood.** O Onion estava carregado, mas os modelos só liam arquivos: sem comandos, hooks disparando, gates ou grafo. Esta rodada é linha de base; o teste da maquinaria em ação é `Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111`.
+- **"Acertou o defeito" mede só o defeito do gabarito.** Cada auditoria listava até 5 achados, e os arquivos têm outros defeitos reais. Quem trouxe achados verdadeiros e talvez mais graves contou como erro. A gravidade não foi medida.
 - **A diferença de acerto não é significativa:** 9 de 16 contra 6 de 16 dá p = 0,48. Só três casos discriminam.
 - **Mede auditoria de um arquivo.** Não mede orquestração longa, onde um modelo maior pode render mais.
 - **Custo é o valor informado pelo CLI;** rodou pelo plano. O do Haiku não bate com os tokens gastos.

@@ -1436,18 +1436,6 @@
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
 | 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
 
-## model-compare-onion-2026-11 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.4 | `Q_BANCADA_DE_MODELO_E_REVISOR_1111` | model-compare-onion-2026-11 | forjar a comparação como peça: incidente real vira caso de avaliação, e toda versão nova de modelo roda nela, com mais casos |
-| 8.4 | `Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111` | model-compare-onion-2026-11 | estender a comparação de modelos a tarefas com o Onion completo e com o KG-SSOT, e decidir a fila com base nesse comparativo |
-| 6.3 | `Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111` | model-compare-onion-2026-11 | usar datasets de teste na bancada de modelos e aprender a buscá-los no Hugging Face |
-| 5.6 | `Q_BANCADA_DO_VETO_POR_VERSAO_1111` | model-compare-onion-2026-11 | a cada atualização do Claude Code, disparar um veto real por Bash e por Monitor, e reprovar se o tool_name recebido mudar |
-| 4.2 | `Q_ENXUGAR_O_CLAUDE_MD_1111` | model-compare-onion-2026-11 | auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito |
-| 4.2 | `Q_REVISOR_DE_OUTRO_FORNECEDOR_1111` | model-compare-onion-2026-11 | ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa  |
-| 4.2 | `Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111` | model-compare-onion-2026-11 | curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada |
-
 ## company-brain-market-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1586,6 +1574,18 @@
 |--:|---|---|---|
 | 6.0 | `Q_VEXA_PORTAO_MEET` | vexa-2026-10 | Portão do Meet: num teste consentido, sem dado real, a extensão + desktop da Vexa produz 1 segmento ou mais com speaker não vaz |
 | 3.0 | `Q_VEXA_TEAMS_PARQUEADO` | vexa-2026-10 | O Teams fica parqueado dentro do veredito enquanto o join autenticado da Vexa for admitido sem áudio (issue #1795 aberta). |
+
+## model-compare-onion-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.6 | `Q_BANCADA_DE_MODELO_E_REVISOR_1111` | model-compare-onion-2026-11 | forjar a comparação como peça: incidente real vira caso de avaliação, e toda versão nova de modelo roda nela, com mais casos |
+| 5.6 | `Q_BANCADA_DO_VETO_POR_VERSAO_1111` | model-compare-onion-2026-11 | a cada atualização do Claude Code, disparar um veto real por Bash e por Monitor, e reprovar se o tool_name recebido mudar |
+| 5.6 | `Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111` | model-compare-onion-2026-11 | estender a comparação de modelos a tarefas com o Onion completo e com o KG-SSOT, e decidir a fila com base nesse comparativo |
+| 4.2 | `Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111` | model-compare-onion-2026-11 | usar datasets de teste na bancada de modelos e aprender a buscá-los no Hugging Face |
+| 4.2 | `Q_ENXUGAR_O_CLAUDE_MD_1111` | model-compare-onion-2026-11 | auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito |
+| 4.2 | `Q_REVISOR_DE_OUTRO_FORNECEDOR_1111` | model-compare-onion-2026-11 | ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa  |
+| 4.2 | `Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111` | model-compare-onion-2026-11 | curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada |
 
 ## a2a-landscape-2026-11 — 4 item(ns)
 
