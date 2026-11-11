@@ -46342,6 +46342,8 @@ PY
 import json, sys
 p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
 PY
+  # (4.49.0) o kg_trace lê a fonte pelo ÍNDICE do git, nunca pelo disco: a edição sem git add não é julgada
+  _dc_commit "${c}" "o token sai"
   if o="$(ONION_KG_TRACE="${KT435}" bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ -f "${KT435}" ] && grep -q 'LOCATOR_MISSING' "${KT435}"; then
     if kto="$(ONION_KG_TRACE="${KT435}" bash "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${c}" --format tsv 2>&1)"; then krc=0; else krc=$?; fi
@@ -46474,6 +46476,8 @@ PY
 import json, sys
 p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
 PY
+  # (4.49.0) o kg_trace lê a fonte pelo ÍNDICE do git, nunca pelo disco: a edição sem git add não é julgada
+  _dc_commit "${c4}" "o token sai"
     # o print vira `pass` com a MESMA indentação: apagar a linha deixava o `for` sem corpo, o Python do heredoc
     # dava IndentationError e o caso passava pelo ramo errado (JSON ilegível), não pela guarda do rc 1 (achado 1)
     sed '/LOCATOR-MISSING")$/s/^\( *\)print(.*$/\1pass/' "${kts}" > "${mdir}/m4.sh"
@@ -54248,12 +54252,14 @@ DEC_ORF2
     local rv="${sb}/nomes" gv _kv=""; mkdir -p "${rv}/docs" "${rv}/vendor"; "${G[@]}" -C "${rv}" init -q . 2>/dev/null
     ln -s "${REPO_ROOT}/vendor/kg-ssot" "${rv}/vendor/kg-ssot"
     _dec_vnode() {  # $1=id $2=verified_against anterior
-      printf '  - id: %s\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-10-01"\n    verified_against: "%s"\n    label: "decidir %s"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "leitura: M"\n      locality: "repo"' "$1" "$2" "$1"
+      printf '  - id: %s\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-10-01"\n    verified_against: "%s"\n    label: "decidir %s"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "reading: M"\n      locality: "repo"' "$1" "$2" "$1"
     }
     gv="${rv}/docs/g.kg.yaml"
     _dec_graph nomes "$(_dec_vnode D_SOLTO 'lido na rodada r99 do radar')" "$(_dec_vnode D_GLOSADO 'lido no nível dissect:N2')" \
       "$(_dec_vnode D_EXTERNA 'conforme o critério AB12 de fora')" \
-      "$(printf '  - id: T_DISSECT_N2\n    node_type: entity\n    layer: audit\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    verified_at: "2026-10-01"\n    verified_against: "medido"\n    label: "nível 2 do dissect"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "medição: M"\n      locality: "repo"\n    x_term:\n      pref: "nível 2 do dissect"\n      notation: "N2"\n      scheme: dissect\n      lang: pt-BR')" > "${gv}"
+      "$(printf '  - id: T_DISSECT_N2\n    node_type: entity\n    layer: audit\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    verified_at: "2026-10-01"\n    verified_against: "medido"\n    label: "nível 2 do dissect"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "measurement: M"\n      locality: "repo"\n    x_term:\n      pref: "nível 2 do dissect"\n      notation: "N2"\n      scheme: dissect\n      lang: pt-BR')" > "${gv}"
+    # (v4.21) a âncora evidence sem provenance vira SHOULD form.required.node.provenance; no grafo novo não há base que o isente
+    sed -i '/^    label: "ancora"$/a\    provenance:\n      source: "S"\n      locator: "L"\n      method: "reading: M"\n      locality: "repo"' "${gv}"
     "${G[@]}" -C "${rv}" add docs/g.kg.yaml
     "${G[@]}" -C "${rv}" commit -q -m c1
     h0="$(sha256sum "${gv}" | cut -d' ' -f1)"
