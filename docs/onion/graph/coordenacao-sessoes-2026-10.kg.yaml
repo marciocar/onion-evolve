@@ -195,14 +195,24 @@ nodes:
   - id: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 4
     confidence: 0.5
-    verified_against: "gh pr list em 2026-10-27: 1405 MERGED"
     label: "Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no light-arch e no engineer:start, o Canva no design:identity, o Runflow e o revisor do CI sem par local nomeado."
-    narrative: "O PR 1405 selou D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027: serviço externo só como ponte opcional declarada, com alternativa local nomeada. Cada candidata pede o veredito do maestro (vira ponte opcional, ganha par local ou sai)."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Todas viram ponte opcional»"
+    narrative: |-
+      O PR 1405 selou D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027: serviço externo só como ponte opcional declarada, com alternativa local nomeada. Cada candidata pede o veredito do maestro (vira ponte opcional, ganha par local ou sai).
+
+      verified_against anterior: «gh pr list em 2026-10-27: 1405 MERGED»
+      Selado por /meta:decide em 2026-11-11: escolhida «Todas viram ponte opcional»; descartadas: «Uma por uma» · «Depois».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «As cinco dependências de serviço externo sem veredito: como decidir?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
   - id: Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR
     node_type: question
     layer: audit
@@ -362,16 +372,25 @@ nodes:
   - id: Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 4
     confidence: 0.5
-    verified_at: "2026-10-28"
     evidence_class: testimony
-    verified_against: "relato do kg-ssot ao censo cruzado de 2026-10-28; a posição prévia é o nó E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 do grafo do Company Brain"
     label: "A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot."
-    narrative: "A pergunta mora no grafo do Company Brain e não se duplica aqui: este nó guarda só o ato do maestro e a ordem. Gatilho: uma rodada com o padrão de mercado antes do selo. A posição prévia do kg-ssot é o campo no meta (o padrão do grafo) e no nó (a exceção), como SHOULD, com vocabulário de mercado."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Rodada de mercado agora, depois dupla validação com o kg-ssot»"
+    narrative: |-
+      A pergunta mora no grafo do Company Brain e não se duplica aqui: este nó guarda só o ato do maestro e a ordem. Gatilho: uma rodada com o padrão de mercado antes do selo. A posição prévia do kg-ssot é o campo no meta (o padrão do grafo) e no nó (a exceção), como SHOULD, com vocabulário de mercado.
+
+      verified_against anterior: «relato do kg-ssot ao censo cruzado de 2026-10-28; a posição prévia é o nó E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 do grafo do Company Brain»
+      Selado por /meta:decide em 2026-11-11: escolhida «Rodada de mercado agora, depois dupla validação com o kg-ssot» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Selar a posição do kg-ssot» · «Depois».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Classificação de sensibilidade no grafo: como seguimos?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
   - id: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
     node_type: question
     layer: audit
@@ -460,15 +479,25 @@ nodes:
   - id: Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 4
     confidence: 0.5
     evidence_class: testimony
-    verified_against: "mensagem do kg-ssot de 2026-10-31, repassada pela sessão principal do core; o LAUNCH.md mora no repo do kg-ssot e não foi relido pelo core"
     label: "O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto."
-    narrative: "A forma C é a camada de confiança gerenciada, com preço e bilhetagem; o plano dela não foi aberto. O dia zero do lançamento (2026-11-04) não ganha nó aqui: atualizou no lugar Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT, que já era a mesma pendência."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Combinar com o kg-ssot o que ele pode ajudar, interagindo com a orquestração do core, para montar o Company Brain»"
+    narrative: |-
+      A forma C é a camada de confiança gerenciada, com preço e bilhetagem; o plano dela não foi aberto. O dia zero do lançamento (2026-11-04) não ganha nó aqui: atualizou no lugar Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT, que já era a mesma pendência.
+
+      verified_against anterior: «mensagem do kg-ssot de 2026-10-31, repassada pela sessão principal do core; o LAUNCH.md mora no repo do kg-ssot e não foi relido pelo core»
+      Selado por /meta:decide em 2026-11-11: escolhida «Combinar com o kg-ssot o que ele pode ajudar, interagindo com a orquestração do core, para montar o Company Brain» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Depois do Company Brain» · «Abrir agora» · «Descartar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «O plano da forma C do kg-ssot: quando?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
   - id: Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE
     node_type: question
     layer: audit
