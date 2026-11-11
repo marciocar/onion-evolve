@@ -4,7 +4,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-11"
   review_after: "2026-12-11"
-  x_supersedes_none: "estudo novo; reabre o valor W7 do ADR de topologias de sessão pela porta que o próprio ADR deixou, sem derrubar nó"
+  x_supersedes_none: "estudo novo; reabre o sétimo valor do eixo de topologia de sessão no ADR de modelos de trabalho pela porta que o próprio ADR deixou, sem derrubar nó"
   purpose: "Decidir a divisão de segurança, compliance e custo de nuvem entre o Onion e o kg-ssot, e o modelo de automação com níveis, catraca e agendamento, a partir da proposta de checagens operacionais do hub do primeiro cliente."
   # ═══ TETO: 20 NÓS ═══
 nodes:
@@ -28,7 +28,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-11-11"
     verified_against: "levantamento só leitura do corpus do core e do kg-ssot por grep, relatório em data/corpus.md"
-    label: "o nunca agendado vem do valor W7 do ADR de topologias de sessão, que prevê a própria reabertura para necessidade nomeada em modo que só propõe; a escada de automação já existe, sem nenhum item no degrau automático"
+    label: "o nunca agendado vem do sétimo valor do eixo de topologia de sessão no ADR de modelos de trabalho, que prevê a própria reabertura para necessidade nomeada em modo que só propõe; a escada de automação já existe, sem nenhum item no degrau automático"
     narrative: "O CI de selftest já roda por relógio uma vez por dia; o veto de agendamento barra crontab, at e timer do systemd pela sessão. A escada humano, estrutural, monitorado, dinâmico, automático e MOAT tem 7 itens estruturais, 1 monitorado e 2 MOAT. Em 2026-11-06 o maestro descartou cards agendados."
     trace: "docs/evolution/research/automation-levels-2026-11/data/market.md"
     provenance:
@@ -116,6 +116,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-11: «Onde roda o que é agendado?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
       locality: "pessoa"
+  - id: D_VPS_SERVICE_EDGE_WITH_TWO_BLOCKING_GATES_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Selar com os 2 portões»"
+    label: "O serviço Onion na VPS é borda e transporte, um kg-mcp por adotante, atalho de agendador nos níveis 0 a 2 e monitoração por adotante; não é dono do dado, juiz nem dependência; terceiros só depois da bancada de isolamento e do pacote LGPD."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Selar com os 2 portões»; descartadas: «Selar sem os portões bloqueantes» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Serviço Onion na VPS, depois de 3 rodadas Delphi: sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_LGPD_OPERATOR_LEGAL_ENTITY_RESEARCH_FIRST_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Pesquisar antes»"
+    label: "Antes de decidir se o papel de operador de dados pela LGPD pede pessoa jurídica para o primeiro adotante externo, pesquisar como operadores pequenos no Brasil fazem; até lá, nenhum adotante externo entra no serviço hospedado."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Pesquisar antes»; descartadas: «Decidir no 1º externo» · «Constituir agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «O papel de operador de dados pela LGPD pede pessoa jurídica antes do 1º adotante externo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
 edges:
   - from: E_AUTOMATION_CORPUS_1111
     to: Q_AUTOMATION_LEVELS_1111
@@ -133,5 +165,11 @@ edges:
     to: Q_AUTOMATION_LEVELS_1111
     edge_type: TRACES_TO
   - from: D_SCHEDULER_ADOPTER_SCRIPT_AND_VPS_SERVICE_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_VPS_SERVICE_EDGE_WITH_TWO_BLOCKING_GATES_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_LGPD_OPERATOR_LEGAL_ENTITY_RESEARCH_FIRST_1111
     to: Q_AUTOMATION_LEVELS_1111
     edge_type: TRACES_TO
