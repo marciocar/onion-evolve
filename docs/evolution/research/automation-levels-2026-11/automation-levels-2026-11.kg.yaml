@@ -1,0 +1,137 @@
+# kg-backlog-guard: on
+meta:
+  id: automation-levels-2026-11
+  schema_version: "1"
+  baseline: "2026-11-11"
+  review_after: "2026-12-11"
+  x_supersedes_none: "estudo novo; reabre o valor W7 do ADR de topologias de sessão pela porta que o próprio ADR deixou, sem derrubar nó"
+  purpose: "Decidir a divisão de segurança, compliance e custo de nuvem entre o Onion e o kg-ssot, e o modelo de automação com níveis, catraca e agendamento, a partir da proposta de checagens operacionais do hub do primeiro cliente."
+  # ═══ TETO: 20 NÓS ═══
+nodes:
+  - id: Q_AUTOMATION_LEVELS_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "proposta do hub de 2026-11-11 (checagens operacionais) e pedido do maestro no /meta:decide do mesmo dia"
+    label: "como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e agendamento que serve ao core e ao ecossistema"
+    trace: "docs/evolution/research/automation-levels-2026-11/data/corpus.md"
+  - id: E_AUTOMATION_CORPUS_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "levantamento só leitura do corpus do core e do kg-ssot por grep, relatório em data/corpus.md"
+    label: "o nunca agendado vem do valor W7 do ADR de topologias de sessão, que prevê a própria reabertura para necessidade nomeada em modo que só propõe; a escada de automação já existe, sem nenhum item no degrau automático"
+    narrative: "O CI de selftest já roda por relógio uma vez por dia; o veto de agendamento barra crontab, at e timer do systemd pela sessão. A escada humano, estrutural, monitorado, dinâmico, automático e MOAT tem 7 itens estruturais, 1 monitorado e 2 MOAT. Em 2026-11-06 o maestro descartou cards agendados."
+    trace: "docs/evolution/research/automation-levels-2026-11/data/market.md"
+    provenance:
+      source: "docs/evolution/research/automation-levels-2026-11/data/corpus.md"
+      locator: "seções 1 a 5"
+      method: "measurement: grep no corpus do core e do kg-ssot por agente de leitura"
+      locality: "repo"
+  - id: E_AUTOMATION_MARKET_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "pesquisa web de novembro de 2026, relatório em data/market.md, com citação e URL por afirmação"
+    label: "o mercado escala o enforcement em observar, avisar e bloquear, com a catraca como baseline que só desce, e mantém segurança operacional, compliance e custo de nuvem como funções distintas sobre os mesmos dados"
+    narrative: "Gatekeeper dryrun, warn e deny; Kyverno Audit e Enforce; Sentinel advisory, soft e hard. OSCAL trata o monitoramento contínuo como fatias de tempo, e o FedRAMP 20x usa indicadores legíveis por máquina. O agendamento de nuvem do Claude Code segue em preview, em modo automático por padrão. A evidência de comunidade é fraca e está marcada no relatório."
+    provenance:
+      source: "docs/evolution/research/automation-levels-2026-11/data/market.md"
+      locator: "seções 1 a 6"
+      method: "reading: leitura de fontes web por agente, com citação"
+      locality: "web"
+  - id: E_KG_SSOT_FRONTIER_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "resposta da sessão do kg-ssot à consulta do core de 2026-11-11"
+    label: "o kg-ssot julga e guarda e nunca agenda nem age; o Onion decide quando roda, quais checagens existem e o que significam; níveis 0 medir, 1 propor na área própria, 2 abrir card, 3 agir fora da área sempre por PR"
+    narrative: "A checagem periódica com veredito é uma atestação, peça aberta no kg-ssot. O executor agendado é membro com papel e teto próprios, a catraca vale para ele e um interruptor desliga tudo. Recomendação dele: uma vertical de compliance com segurança dentro, confiança 0,7."
+    provenance:
+      source: "sessão do kg-ssot"
+      locator: "resposta de 2026-11-11, itens 1 a 4"
+      method: "testimony: leitura do dono do substrato de evidência"
+      locality: "pessoa"
+  - id: D_COMPLIANCE_THREE_DOMAINS_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Compliance com 3 domínios, nomes em inglês»"
+    label: "Uma vertical de compliance com três domínios de nome inglês, security, conformance e cloud-cost, cada um com dono e controles, sobre uma evidência só no kg-ssot, que julga e guarda; o Onion decide o que roda e o que significa."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Compliance com 3 domínios, nomes em inglês» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Vertical de segurança separada» · «Três verticais»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Divisão de segurança e compliance entre o Onion e o kg-ssot: qual modelo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Níveis 0 a 2 agendados»"
+    label: "Agendado só nos níveis 0 medir, 1 propor na área própria e 2 abrir card; agir fora da área segue por PR com merge humano; executor com papel e teto, catraca, orçamento, interruptor e rollout observar, avisar e bloquear."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Níveis 0 a 2 agendados»; descartadas: «Só níveis 0 e 1» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Modelo de automação com níveis, catraca e agendamento: qual?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SCHEDULER_ADOPTER_SCRIPT_AND_VPS_SERVICE_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Script do adotante com cron opcional, e um serviço Onion VPS subscrevível como direção do ecossistema, a combinar com as sessões por Delphi»"
+    label: "A base é um script determinístico só leitura, agendado pelo adotante com cron opcional; a direção do ecossistema é um serviço Onion na VPS, subscrevível, que liga A2A, mensageria, monitoração e eventos, e quem não tem usa o da VPS ou sobe a sua."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Script do adotante com cron opcional, e um serviço Onion VPS subscrevível como direção do ecossistema, a combinar com as sessões por Delphi» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Agendamento de nuvem do Claude» · «Os dois, por nível»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Onde roda o que é agendado?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+edges:
+  - from: E_AUTOMATION_CORPUS_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: SUPPORTS
+  - from: E_AUTOMATION_MARKET_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_FRONTIER_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: SUPPORTS
+  - from: D_COMPLIANCE_THREE_DOMAINS_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_SCHEDULER_ADOPTER_SCRIPT_AND_VPS_SERVICE_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
