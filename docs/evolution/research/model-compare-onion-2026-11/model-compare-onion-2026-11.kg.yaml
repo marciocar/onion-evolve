@@ -18,7 +18,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-11-11"
     verified_against: "80 execuções em 8 defeitos reais já curados, 2 repetições, 2 juízes às cegas com concordância de 80 em 80: Fable 5.2 acertou 9 de 16, Sonnet 5.5 9, Haiku 5.5 7, Fable 5.1 6 e Opus 5.5 6; custo informado por execução 2,38, 0,31, 0,04, 2,87 e 1,37 dólares"
-    label: "dentro do Onion, em auditoria de um arquivo, o Fable 5.2 supera o 5.1 em acerto, custo e tempo, e o Sonnet 5.5 empata com o Fable 5.2 no acerto a cerca de um oitavo do custo"
+    label: "em auditoria de um arquivo com o Onion carregado, o Fable 5.2 custa menos e é mais rápido que o 5.1, sem diferença comprovada em acerto, e o Sonnet 5.5 empata com o Fable 5.2 a cerca de um oitavo do custo"
     narrative: "Achados reais sobre o total: Fable 5.2 79 de 79, Opus 5.5 78 de 78, Sonnet 5.5 76 de 79, Fable 5.1 72 de 76, Haiku 5.5 62 de 73 com 3 falsos."
     provenance:
       source: "docs/evolution/research/model-compare-onion-2026-11/data/runs.tsv"
@@ -33,7 +33,7 @@ nodes:
     impact: 3
     confidence: 0.8
     verified_at: "2026-11-11"
-    verified_against: "teste exato de Fisher sobre 9 de 16 contra 6 de 16: p 0,48; três casos sem acerto de nenhum modelo e dois com acerto de todos; o custo informado do Haiku 5.5 não bate com os tokens gastos, parecidos com os do Fable"
+    verified_against: "teste pareado por caso entre Fable 5.2 e 5.1: 2 casos discordantes, p 0,50; três casos sem acerto de nenhum modelo e dois com acerto de todos; o custo informado do Haiku 5.5 não bate com os tokens gastos, parecidos com os do Fable"
     label: "a diferença de acerto não é significativa, a métrica conta só o defeito do gabarito, sem gravidade, e a auditoria só leitura não exercita a maquinaria do Onion: é linha de base, não dogfood"
     provenance:
       source: "docs/evolution/research/model-compare-onion-2026-11/data/runs.tsv"
