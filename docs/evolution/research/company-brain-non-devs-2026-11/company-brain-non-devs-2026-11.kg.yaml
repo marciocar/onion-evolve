@@ -37,6 +37,7 @@ nodes:
     verified_at: "2026-11-11"
     verified_against: "15 páginas primárias lidas (documentação da Slack, especificação MCP 2026-07-28, ajuda da Anthropic, documentação do Agent SDK e do Managed Agents, OpenFGA), licenças conferidas por gh api; relatório em data/primaries.md"
     label: "as fontes primárias sustentam três escolhas: bot do Slack por eventos com confirmação e deduplicação, MCP remoto público com login por pessoa e papel lido do token no servidor, e permissão por área num motor de política"
+    trace: "docs/evolution/research/company-brain-non-devs-2026-11/data/primaries.md"
     narrative: "Bot token é identidade de serviço; user token age como a pessoa. O Socket Mode dispensa URL pública, e a entrega é best-effort, com ack em 3 s, 3 retentativas e dedupe por event_id. O conector personalizado do claude.ai existe em todos os planos e exige servidor alcançável pela internet; a spec MCP exige validar a audiência do token e proíbe repassá-lo. O pré-filtro por ListObjects do OpenFGA serve quando a pessoa enxerga poucas áreas."
     provenance:
       source: "docs/evolution/research/company-brain-non-devs-2026-11/data/primaries.md"
@@ -213,6 +214,7 @@ nodes:
     verified_at: "2026-11-11"
     verified_against: "12 buscas e 10 páginas, com preço oficial, ajuda da Anthropic, uma issue de praticante e o anúncio do auth gerenciado; relatório em data/claude-community.md"
     label: "o Claude desktop e celular vale como 2ª tela do mesmo servidor, com a permissão no servidor: no Team a URL do conector é visível a todos, o celular instala conector em beta, e os túneis MCP não chegam ao claude.ai"
+    trace: "docs/evolution/research/company-brain-non-devs-2026-11/data/claude-community.md"
     narrative: "Quase não há relato independente de produção com não-devs. Audit log da Anthropic só no Enterprise. O ativo é o servidor com permissão por área; a tela se troca."
     provenance:
       source: "docs/evolution/research/company-brain-non-devs-2026-11/data/claude-community.md"
