@@ -357,8 +357,15 @@ def main():
                                              'juízes: painel do selftest', 'derivado: soma do selftest',
                                              'testemunho: relato do selftest',
                                              'medicao: sem acento nao e classe')}
+        # Desde o contrato v4.21 (kg-ssot 4.49.0) os aliases em português seguem APROVADOS, mas ganham o aviso
+        # SHOULD form.deprecated.node.provenance.method: a classe canônica é a inglesa. O caso das classes
+        # inglesas continua exigindo zero aviso; o dos aliases exige aprovação COM o aviso de depreciação.
+        _en = ('measurement:', 'reading:', 'judges:', 'derived:', 'testimony:')
         case('method-classe-ingles-e-alias-aprovam-sem-aviso',
-             all(v == ('APROVADO', []) for k, v in vm.items() if not k.startswith('medicao')), vm)
+             all(v == ('APROVADO', []) for k, v in vm.items() if k.startswith(_en)), vm)
+        case('method-alias-pt-aprova-com-aviso-de-depreciacao',
+             all(v[0] == 'APROVADO' and any('deprecated' in c for c in v[1])
+                 for k, v in vm.items() if not k.startswith(_en) and not k.startswith('medicao')), vm)
         case('method-sem-classe-avisa', vm['medicao: sem acento nao e classe'][0] == 'APROVADO'
              and vm['medicao: sem acento nao e classe'][1] != [], vm)
         case('envelope-nao-confiavel', ph.get('untrusted_data') is True and 'DADO' in ph.get('aviso', '')
