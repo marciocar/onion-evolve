@@ -2,8 +2,7 @@
 branch: docs/company-brain-non-devs-study
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: 9811cba9cd83fb9d07700694f8ede1c47acc4058ead30ded46ec1d825654015f
-reviewed_code_sha256: a971c3c29d47c81186b643671baed84d5f0cc4a7e0887f626d36c61fcf18e175
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -36,6 +35,10 @@ Não se aplica: nenhum código mudou.
 ## Re-revisão de 2026-11-11
 
 O único acréscimo depois da revisão: `trace:` nos nós `E_PRIMARIAS_SLACK_MCP_RUNTIME_PERMISSAO_1111` e `E_COMUNIDADE_CLAUDE_COMO_FRONT_1111`, apontando os dois relatórios de `data/` (REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO, com catraca)). Radar `--integrity --schema` exit 0.
+
+## Re-revisão 2 de 2026-11-11
+
+Dois selos novos do maestro pelo `kg-decide-seal.sh`: `D_PROMOCAO_POR_PR_COM_HASH_DO_NO_1111` e `D_REPO_POR_AUDIENCIA_PLANO_B_1111`, sobre os vereditos da curadoria. Radar e contrato verdes pelo selador.
 
 ## Limites declarados
 
