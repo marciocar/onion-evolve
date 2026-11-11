@@ -45,6 +45,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-10"
     verified_against: "CHANGELOG oficial: seções 2.1.319 (149 linhas, 146 itens), 2.1.321 (121 linhas, 118 itens), 2.1.322 (4 linhas, 1 itens); baseline 2.1.318, disco 2.1.322, processo 2.1.322, SDK bridge 2.1.319"
+    trace: "docs/evolution/research/radar-E3-2026-11-10-r24/SYNTHESIS.md"
     label: "o delta desde a baseline 2.1.318 são 3 versão(ões), de 2.1.319 a 2.1.322, extraídas do CHANGELOG oficial"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
