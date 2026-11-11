@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1059 itens abertos** em 164 grafo(s) com aberto (de 214 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1065 itens abertos** em 165 grafo(s) com aberto (de 215 no escopo) · 159 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1436,6 +1436,18 @@
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
 | 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
 
+## model-compare-onion-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `Q_BANCADA_DE_MODELO_E_REVISOR_1111` | model-compare-onion-2026-11 | forjar a comparação como peça: incidente real vira caso de avaliação, e toda versão nova de modelo roda nela, com mais casos |
+| 8.4 | `Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111` | model-compare-onion-2026-11 | estender a comparação de modelos a tarefas com o Onion completo e com o KG-SSOT, e decidir a fila com base nesse comparativo |
+| 6.3 | `Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111` | model-compare-onion-2026-11 | usar datasets de teste na bancada de modelos e aprender a buscá-los no Hugging Face |
+| 5.6 | `Q_BANCADA_DO_VETO_POR_VERSAO_1111` | model-compare-onion-2026-11 | a cada atualização do Claude Code, disparar um veto real por Bash e por Monitor, e reprovar se o tool_name recebido mudar |
+| 4.2 | `Q_ENXUGAR_O_CLAUDE_MD_1111` | model-compare-onion-2026-11 | auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito |
+| 4.2 | `Q_REVISOR_DE_OUTRO_FORNECEDOR_1111` | model-compare-onion-2026-11 | ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa  |
+| 4.2 | `Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111` | model-compare-onion-2026-11 | curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada |
+
 ## company-brain-market-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1540,13 +1552,12 @@
 | 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
 | 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
 
-## radar-E3-2026-11-10-r24 — 4 item(ns)
+## radar-E3-2026-11-10-r24 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.4 | `Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110` | radar-E3-2026-11-10-r24 | o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita  |
 | 6.3 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110` | radar-E3-2026-11-10-r24 | o SDK do bridge sobe para 0.3.322, com o lock, e re-implanta pelo caminho declarado; o deploy é do maestro |
-| 5.6 | `Q_E6_ADMITE_O_FABLE_5_2_NO_LINEUP_1110` | radar-E3-2026-11-10-r24 | claude-fable-5-2 entra em session_models como primário, por rodada E6 ou selo direto do maestro; decisão do maestro |
 | 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
 
 ## ai-front-2026-10 — 1 item(ns)

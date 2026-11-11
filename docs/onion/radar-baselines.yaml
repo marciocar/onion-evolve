@@ -46,7 +46,9 @@ axes:
     # eixo E3 medir que `claude-opus-5-5` virou o Opus default na 2.1.280 e nao estava neste lineup.
     # A guarda funcionou: barrou o que nao estava declarado, em vez de deixar passar em silencio.
     session_models:
-      - claude-fable-5-1      # primario: sempre o maximo (doutrina)
+      # SELO DIRETO DO MAESTRO (2026-11-11), NAO rodada E6: o Fable 5.2 entra no lugar do 5.1, com base na comparacao
+      # dentro do Onion (docs/evolution/research/model-compare-onion-2026-11/). O 5.1 sai para o fallback nao mudar.
+      - claude-fable-5-2      # primario: sempre o maximo (doutrina)
       - claude-opus-5-5       # novo Opus DEFAULT da plataforma (2.1.280; 1M de contexto)
       - claude-opus-5         # degrau anterior, MANTIDO: ordem = degradacao, e remover degrau fecha
                               # fallback que hoje funciona (guarda-por-lista-falha-pelo-vocabulario:
