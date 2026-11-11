@@ -108,11 +108,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.7
-    verified_at: "2026-11-10"
-    verified_against: "premodelswitch-guard.sh real com to_model claude-fable-5-2 → rc 2; o comentário do eixo E6 em radar-baselines.yaml diz que a lista muda só por rodada E6, e registra selos diretos do maestro em 2026-10-03 e 2026-10-05"
+    verified_at: "2026-11-11"
+    verified_against: "decidida em 2026-11-11 pelo maestro, com a comparação dentro do Onion: D_LINEUP_FABLE_5_2_1111 em docs/evolution/research/model-compare-onion-2026-11/model-compare-onion-2026-11.kg.yaml"
     label: "claude-fable-5-2 entra em session_models como primário, por rodada E6 ou selo direto do maestro; decisão do maestro"
   - id: E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110
     node_type: evidence

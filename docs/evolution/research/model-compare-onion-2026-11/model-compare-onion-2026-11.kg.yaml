@@ -1,0 +1,161 @@
+# kg-backlog-guard: on
+# Comparação de modelos dentro do Onion: 8 defeitos reais curados, 5 modelos, 2 repetições, julgamento às cegas.
+meta:
+  id: model-compare-onion-2026-11
+  schema_version: "1"
+  baseline: "2026-11-11"
+  review_after: "2026-12-11"
+  x_supersedes_none: "primeira comparação com gabarito; não derruba nó anterior"
+  # ═══ TETO: 16 NÓS ═══
+nodes:
+  - id: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
+    trace: "docs/evolution/research/model-compare-onion-2026-11/SYNTHESIS.md"
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "80 execuções em 8 defeitos reais já curados, 2 repetições, 2 juízes às cegas com concordância de 80 em 80: Fable 5.2 acertou 9 de 16, Sonnet 5.5 9, Haiku 5.5 7, Fable 5.1 6 e Opus 5.5 6; custo informado por execução 2,38, 0,31, 0,04, 2,87 e 1,37 dólares"
+    label: "dentro do Onion, em auditoria de um arquivo, o Fable 5.2 supera o 5.1 em acerto, custo e tempo, e o Sonnet 5.5 empata com o Fable 5.2 no acerto a cerca de um oitavo do custo"
+    narrative: "Achados reais sobre o total: Fable 5.2 79 de 79, Opus 5.5 78 de 78, Sonnet 5.5 76 de 79, Fable 5.1 72 de 76, Haiku 5.5 62 de 73 com 3 falsos."
+    provenance:
+      source: "docs/evolution/research/model-compare-onion-2026-11/data/runs.tsv"
+      locator: "data/runs.tsv, uma linha por execução"
+      method: "measurement: execução real pelo plano, julgada às cegas"
+      locality: "repo"
+  - id: E_LIMITES_DA_COMPARACAO_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "teste exato de Fisher sobre 9 de 16 contra 6 de 16: p 0,48; três casos sem acerto de nenhum modelo e dois com acerto de todos; o custo informado do Haiku 5.5 não bate com os tokens gastos, parecidos com os do Fable"
+    label: "a diferença de acerto entre os modelos não é significativa, só três dos oito casos discriminam, e a tarefa não mede orquestração longa"
+    provenance:
+      source: "docs/evolution/research/model-compare-onion-2026-11/data/runs.tsv"
+      locator: "data/runs.tsv; SYNTHESIS.md, seção Limites"
+      method: "measurement: execução real pelo plano, julgada às cegas"
+      locality: "repo"
+  - id: E_SONDA_DO_LINEUP_SO_TESTA_O_PRIMEIRO_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "ops/model-lineup-probe.sh com 5 modelos saiu rc 0 tendo medido 1: o claude -p dentro do laço consome a entrada do here-string, e os demais modelos não são lidos; modelo a modelo, os 5 responderam ok"
+    label: "a sonda de acesso aos modelos dá verde falso: mede só o primeiro degrau da escada"
+    provenance:
+      source: "docs/evolution/research/model-compare-onion-2026-11/data/runs.tsv"
+      locator: "ops/model-lineup-probe.sh, laço final"
+      method: "measurement: execução real pelo plano, julgada às cegas"
+      locality: "repo"
+  - id: Q_BANCADA_DE_MODELO_E_REVISOR_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "esta comparação foi feita por script avulso; nada no core mede se o revisor discrimina; decisão do maestro em 2026-11-11"
+    label: "forjar a comparação como peça: incidente real vira caso de avaliação, e toda versão nova de modelo roda nela, com mais casos que discriminem"
+  - id: Q_BANCADA_DO_VETO_POR_VERSAO_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "o veto que não barrava voltou em três versões do Claude Code, e as guardas de deriva de binário não disparam um veto de verdade; decisão do maestro em 2026-11-11"
+    label: "a cada atualização do Claude Code, disparar um veto real por Bash e por Monitor, e reprovar se o tool_name recebido mudar"
+  - id: Q_ENXUGAR_O_CLAUDE_MD_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "wc -l CLAUDE.md: 346 linhas, sempre carregadas; decisão do maestro em 2026-11-11"
+    label: "auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito"
+  - id: Q_REVISOR_DE_OUTRO_FORNECEDOR_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "o revisor do CI é Claude; padrão relatado em comunidade em novembro de 2026; decisão do maestro em 2026-11-11"
+    label: "ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa local nomeada"
+  - id: Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "esta comparação cobre só auditoria de arquivo; resposta livre do maestro em 2026-11-11"
+    label: "estender a comparação de modelos a tarefas com o Onion completo e com o KG-SSOT, e decidir a fila com base nesse comparativo"
+  - id: Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "resposta livre do maestro em 2026-11-11, junto com a decisão do repositório dos dados"
+    label: "usar datasets de teste na bancada de modelos e aprender a buscá-los no Hugging Face"
+  - id: Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "medido nesta rodada: rc 0 com um de cinco modelos"
+    label: "curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada"
+edges:
+  - from: E_LIMITES_DA_COMPARACAO_1111
+    to: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
+    edge_type: CONSTRAINS
+  - from: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
+    to: Q_BANCADA_DE_MODELO_E_REVISOR_1111
+    edge_type: SUPPORTS
+  - from: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
+    to: Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111
+    edge_type: SUPPORTS
+  - from: E_COMPARACAO_DE_CINCO_MODELOS_NO_ONION_1111
+    to: Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111
+    edge_type: SUPPORTS
+  - from: E_SONDA_DO_LINEUP_SO_TESTA_O_PRIMEIRO_1111
+    to: Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111
+    edge_type: SUPPORTS
+  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    to: Q_BANCADA_DO_VETO_POR_VERSAO_1111
+    edge_type: TRACES_TO
+  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    to: Q_ENXUGAR_O_CLAUDE_MD_1111
+    edge_type: TRACES_TO
+  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    to: Q_REVISOR_DE_OUTRO_FORNECEDOR_1111
+    edge_type: TRACES_TO
+  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    to: Q_BANCADA_DE_MODELO_E_REVISOR_1111
+    edge_type: TRACES_TO
+  - from: D_FILA_DA_REVISAO_E_DAS_COMUNIDADES_1111
+    to: Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111
+    edge_type: TRACES_TO
+  - from: D_DADOS_EM_REPO_PRIVADO_1111
+    to: Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111
+    edge_type: TRACES_TO
