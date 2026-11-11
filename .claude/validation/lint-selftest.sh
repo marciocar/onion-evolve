@@ -53769,6 +53769,11 @@ run_decide_selftests() {
     || { record_skip "decide: python3/PyYAML ausentes (SUT não exercido)"; return; }
   local sb r out rc g h0 G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
   sb="$(TMPDIR=/tmp mktemp -d)"; r="${sb}/r"
+  # SAC-411: os casos (g) e (l) contam linhas e classes, e o censo lê o registro REAL de perguntas ao maestro
+  # (~/.local/state/onion/maestro-asks): uma reserva viva na VPS mudava a contagem e reprovava a família. A família
+  # inteira roda com um registro vazio próprio, e o valor de fora volta no fim.
+  local _dec_ask_prev="${ONION_ASK_DIR:-}" _dec_ask_was_set="${ONION_ASK_DIR+x}"
+  mkdir -p "${sb}/asks"; chmod 700 "${sb}/asks"; export ONION_ASK_DIR="${sb}/asks"
   mkdir -p "${r}/docs/a" "${r}/docs/b" "${r}/docs/c" "${r}/x/fixtures" "${r}/vendor/kg" "${r}/docs/evolution/inbox/_processed"
   "${G[@]}" -C "${sb}" init -q r
   _dec_graph a "$(_dec_node D_VELHO decision open 'decidir o velho')" \
@@ -54483,7 +54488,144 @@ PN_FORGE
   else record_fail "decide: (pn4)" "${_p4}"; fi
   fi
   fi
+  # ── MODO TRIAGEM EM LOTE (cláusula 10, D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111, 2026-11-11) ───────────────
+  # Cada caso roda o SUT limpo e um MUTANTE (cópia com a âncora trocada, no mesmo arranjo); o caso só passa se o
+  # limpo passa E o mutante reprova. Âncora que não casa (cópia igual ao SUT) reprova o caso: mutante que não muda
+  # nada não prova nada.
+  local tri="${REPO_ROOT}/.claude/validation/decide-triage.sh" trr="${sb}/tri" tmd="${sb}/tri-mut" _tb _tg _tu _tl _tsha T2
+  T2="$(printf '\t')"
+  if [ ! -f "${tri}" ]; then record_fail "decide: (t)" "medidor da triagem ausente: ${tri}"; else
+  _tri_mut() {  # $1=SUT $2=nome da cópia $3=âncora (string literal) $4=troca → caminho da cópia em stdout; rc 1 se a âncora não casou
+    mkdir -p "${tmd}/validation" "${tmd}/utils/kg"
+    local dst="${tmd}/validation/$2"
+    python3 -I -B -c 'import sys; s=open(sys.argv[1],encoding="utf-8").read(); a=sys.argv[3]; sys.exit(1) if s.count(a)!=1 else open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,sys.argv[4]))' "$1" "${dst}" "$3" "$4" || return 1
+    printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "${REPO_ROOT}/.claude/validation/kg-radar.sh" > "${tmd}/validation/kg-radar.sh"
+    cp "${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" "${tmd}/utils/kg/"
+    printf '%s' "${dst}"
+  }
+  "${G[@]}" -C "${sb}" init -q tri; mkdir -p "${trr}/docs/t" "${trr}/docs/u"
+  { _dec_graph t "$(_dec_node D_VELHO_T decision open 'decidir o velho sem carimbo')" \
+      "$(printf '  - id: Q_NOVO_T\n    node_type: question\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-11-01"\n    label: "pergunta nova"')" \
+      "$(printf '  - id: D_SUPERADO_T\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-08-01"\n    label: "decisão superada"')" \
+      "$(printf '  - id: D_SUPERADOR_T\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: done\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-09-10"\n    label: "decisão que supera"')" \
+      "$(printf '  - id: Q_RESERVADO_T\n    node_type: question\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-08-01"\n    label: "pergunta com dona"')"
+    printf '  - from: D_SUPERADOR_T\n    to: D_SUPERADO_T\n    edge_type: SUPERSEDES\n'; } > "${trr}/docs/t/t.kg.yaml"
+  { _dec_graph u "$(printf '  - id: D_U\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-08-01"\n    label: "decidir u"')"; } > "${trr}/docs/u/u.kg.yaml"
+  "${G[@]}" -C "${trr}" add -A
+  GIT_AUTHOR_DATE="2026-08-01T12:00:00" GIT_COMMITTER_DATE="2026-08-01T12:00:00" "${G[@]}" -C "${trr}" commit -q -m t1
+  mkdir -p "${sb}/tri-asks"; chmod 700 "${sb}/tri-asks"
+  printf 'tri#Q_RESERVADO_T\tsessao-x\tsid-x\t1\t9999999999\tq\n' > "${sb}/tri-asks/tri#Q_RESERVADO_T.ask"
+  _tri_run() { ( cd "${trr}" && DECIDE_TODAY=2026-11-11 ONION_ASK_DIR="${sb}/tri-asks" bash "$1" . --tsv "${@:2}" 2>&1 ); }
+  # (t1) nó NOVO (verified_at abaixo do teto) não entra; o velho sem verified_at entra com a idade por COMMIT.
+  #      Mutante: sem o corte do teto, o novo entra.
+  _tb=""; out="$(_tri_run "${tri}")" || _tb="${_tb} rc=$?"
+  grep -q "^Q_NOVO_T${T2}" <<< "${out}" && _tb="${_tb} novo-entrou"
+  grep -q "^D_VELHO_T${T2}docs/t/t.kg.yaml:[0-9]*${T2}102${T2}commit${T2}" <<< "${out}" || _tb="${_tb} velho-sem-idade-por-commit"
+  if _tg="$(_tri_mut "${tri}" decide-triage.sh "if age <= maxage and not" "if False and not")"; then
+    grep -q "^Q_NOVO_T${T2}" <<< "$(_tri_run "${_tg}")" || _tb="${_tb} MUT-t1-sobreviveu"
+  else _tb="${_tb} MUT-t1-ancora"; fi
+  if [ -z "${_tb}" ]; then record_pass "decide: (t1) triagem: nó abaixo do teto não entra; velho sem verified_at entra com idade por commit; (MUT) sem o teto, o novo entra"
+  else record_fail "decide: (t1)" "${_tb} :: $(_emit "${out}" | head -4 | tr '\t\n' '  ')"; fi
+  # (t2) nó VELHO com reserva VIVA no maestro-ask não entra, e sai NOMEADO como excluído. Mutante: sem o filtro, entra.
+  _tb=""; out="$(_tri_run "${tri}")" || _tb="${_tb} rc=$?"
+  grep -q "^Q_RESERVADO_T${T2}" <<< "${out}" && _tb="${_tb} reservado-entrou"
+  grep -q "^excluded${T2}Q_RESERVADO_T (sessao-x)${T2}-${T2}-${T2}dona viva" <<< "${out}" || _tb="${_tb} exclusao-calada"
+  if _tg="$(_tri_mut "${tri}" decide-triage.sh "if f'{repo_name}#{nid}' in live_asks:" "if False:")"; then
+    grep -q "^Q_RESERVADO_T${T2}" <<< "$(_tri_run "${_tg}")" || _tb="${_tb} MUT-t2-sobreviveu"
+  else _tb="${_tb} MUT-t2-ancora"; fi
+  if [ -z "${_tb}" ]; then record_pass "decide: (t2) triagem: nó velho com dona viva não entra e sai nomeado; (MUT) sem o filtro, entra"
+  else record_fail "decide: (t2)" "${_tb}"; fi
+  # (t3) nó com SUPERSEDES chegando aparece com a dica obsoleto e o superador nomeado; teto inválido e grafo que não
+  #      parseia saem rc 2. Mutante: sem a regra da dica, ele cai em maestro.
+  _tb=""; out="$(_tri_run "${tri}")" || _tb="${_tb} rc=$?"
+  grep -q "^D_SUPERADO_T${T2}.*${T2}D_SUPERADOR_T SUPERSEDES (done)${T2}${T2}${T2}obsoleto${T2}" <<< "${out}" || _tb="${_tb} sem-dica-obsoleto"
+  if _tg="$(_tri_mut "${tri}" decide-triage.sh "if sup: hint, why = 'obsoleto'" "if False: hint, why = 'obsoleto'")"; then
+    grep -q "^D_SUPERADO_T${T2}.*${T2}obsoleto${T2}" <<< "$(_tri_run "${_tg}")" && _tb="${_tb} MUT-t3-sobreviveu"
+  else _tb="${_tb} MUT-t3-ancora"; fi
+  if out="$(_tri_run "${tri}" --max-age-days -3)"; then _tb="${_tb} teto-negativo-rc0"; fi
+  grep -q 'max-age-days inválido' <<< "${out}" || _tb="${_tb} teto-sem-mensagem"
+  printf 'meta:\n  id: q\nnodes: [\n' > "${trr}/docs/u/quebrado.kg.yaml"; "${G[@]}" -C "${trr}" add docs/u/quebrado.kg.yaml
+  if out="$(_tri_run "${tri}")"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'NÃO PARSEIA (YAML ou UTF-8): docs/u/quebrado.kg.yaml' <<< "${out}"; } || _tb="${_tb} quebrado-rc${rc}"
+  "${G[@]}" -C "${trr}" rm -q --cached docs/u/quebrado.kg.yaml; rm -f "${trr}/docs/u/quebrado.kg.yaml"
+  if [ -z "${_tb}" ]; then record_pass "decide: (t3) triagem: superado tem dica obsoleto com o superador; teto inválido e grafo quebrado → rc 2; (MUT) sem a regra, cai em maestro"
+  else record_fail "decide: (t3)" "${_tb}"; fi
+  # ── o SELO EM LOTE ──
+  _tl="${sb}/lote.tsv"
+  printf 'docs/t/t.kg.yaml\tD_SUPERADO_T\tobsolete\tD_SUPERADOR_T\t-\tsuperada pela de setembro\ndocs/u/u.kg.yaml\tD_U\trequest\tjuridico\t2026-12-01\tparecer antes\n' > "${_tl}"
+  _tsha="$(sha256sum "${_tl}" | cut -d' ' -f1)"
+  _lot() { ( cd "${trr}" && DECIDE_SEAL_TODAY=2026-11-11 bash "$@" 2>&1 ); }
+  _h2() { cat "${trr}/docs/t/t.kg.yaml" "${trr}/docs/u/u.kg.yaml" | sha256sum | cut -d' ' -f1; }
+  h0="$(_h2)"
+  # (t4) sem --approve → rc 2 nomeando a falta; lote mudado depois da aprovação (item a mais) → rc 2, nada escrito.
+  #      Mutantes: sem a conferência do sha o lote mudado passa; sem a da falta, a mensagem não diz o que falta.
+  _tb=""
+  if out="$(_lot "${seal}" --batch "${_tl}" --date 2026-11-11 --question q)"; then _tb="${_tb} sem-approve-rc0"; fi
+  grep -q 'falta --approve' <<< "${out}" || _tb="${_tb} sem-approve-mensagem"
+  cp "${_tl}" "${sb}/lote-mais.tsv"; printf 'docs/t/t.kg.yaml\tD_VELHO_T\tobsolete\t-\t-\tentrou depois\n' >> "${sb}/lote-mais.tsv"
+  if out="$(_lot "${seal}" --batch "${sb}/lote-mais.tsv" --approve "${_tsha}" --date 2026-11-11 --question q)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'o lote mudou depois da aprovação' <<< "${out}"; } || _tb="${_tb} lote-mudado-rc${rc}"
+  [ "$(_h2)" = "${h0}" ] || _tb="${_tb} escreveu"
+  if _tg="$(_tri_mut "${seal}" kg-decide-seal.sh "    if approve.strip().lower() != sha:" "    if False:")"; then
+    _tu="$(_lot "${_tg}" --batch "${sb}/lote-mais.tsv" --approve "${_tsha}" --date 2026-11-11 --question q)" || _tb="${_tb} MUT-t4a-sobreviveu($(_emit "${_tu}" | tail -1))"
+    ( cd "${trr}" && git checkout -q -- docs )
+  else _tb="${_tb} MUT-t4a-ancora"; fi
+  if _tg="$(_tri_mut "${seal}" kg-decide-seal.sh "    if not approve: die(" "    if False: die(")"; then
+    grep -q 'falta --approve' <<< "$(_lot "${_tg}" --batch "${_tl}" --date 2026-11-11 --question q)" && _tb="${_tb} MUT-t4b-sobreviveu"
+  else _tb="${_tb} MUT-t4b-ancora"; fi
+  [ "$(_h2)" = "${h0}" ] || _tb="${_tb} arvore-suja-depois-dos-mutantes"
+  if [ -z "${_tb}" ]; then record_pass "decide: (t4) selo em lote: sem aprovação e lote mudado depois dela → rc 2, nada escrito; (MUT) sem as conferências, o lote mudado grava"
+  else record_fail "decide: (t4)" "${_tb} :: $(_emit "${out}" | tail -1)"; fi
+  # (t5) o lote NUNCA grava destino (a) nem (d): measure → rc 2 apontando o /meta:kg-freshness; maestro → rc 2.
+  #      Mutante: sem a recusa de (a), a mensagem não manda para o kg-freshness.
+  _tb=""
+  printf 'docs/u/u.kg.yaml\tD_U\tmeasure\t-\t-\tum grep responde\n' > "${sb}/lote-a.tsv"
+  if out="$(_lot "${seal}" --batch "${sb}/lote-a.tsv" --approve "$(sha256sum "${sb}/lote-a.tsv" | cut -d' ' -f1)" --date 2026-11-11 --question q)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'FECHA POR MEDIÇÃO e vai para o /meta:kg-freshness' <<< "${out}"; } || _tb="${_tb} measure-rc${rc}"
+  printf 'docs/u/u.kg.yaml\tD_U\tmaestro\t-\t-\tescopo\n' > "${sb}/lote-d.tsv"
+  if out="$(_lot "${seal}" --batch "${sb}/lote-d.tsv" --approve "$(sha256sum "${sb}/lote-d.tsv" | cut -d' ' -f1)" --date 2026-11-11 --question q)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'rodada NORMAL' <<< "${out}"; } || _tb="${_tb} maestro-rc${rc}"
+  [ "$(_h2)" = "${h0}" ] || _tb="${_tb} escreveu"
+  if _tg="$(_tri_mut "${seal}" kg-decide-seal.sh "    if dest in ('measure', 'medição', 'medicao', 'a', '(a)'):" "    if False:")"; then
+    grep -q 'kg-freshness' <<< "$(_lot "${_tg}" --batch "${sb}/lote-a.tsv" --approve "$(sha256sum "${sb}/lote-a.tsv" | cut -d' ' -f1)" --date 2026-11-11 --question q)" && _tb="${_tb} MUT-t5-sobreviveu"
+  else _tb="${_tb} MUT-t5-ancora"; fi
+  if [ -z "${_tb}" ]; then record_pass "decide: (t5) selo em lote recusa destino (a) medição (manda ao kg-freshness) e (d) maestro, nada escrito; (MUT) sem a recusa, o kg-freshness some"
+  else record_fail "decide: (t5)" "${_tb} :: $(_emit "${out}" | tail -1)"; fi
+  # (t6) um grafo do lote REPROVA no radar depois da escrita → rc 3 e os DOIS grafos voltam byte a byte (o que passou
+  #      também). Mutante: sem a restauração do lote, o 1º grafo fica escrito.
+  _tb=""
+  printf '#!/usr/bin/env bash\ncase "$1" in */u.kg.yaml) grep -q "triagem em lote" "$1" && exit 1 ;; esac\nexec bash "%s" "$@"\n' "${REPO_ROOT}/.claude/validation/kg-radar.sh" > "${sb}/radar-reprova-u.sh"
+  if out="$(DECIDE_SEAL_RADAR="${sb}/radar-reprova-u.sh" _lot "${seal}" --batch "${_tl}" --approve "${_tsha}" --date 2026-11-11 --question q)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 3 ] && grep -q 'voltaram byte a byte' <<< "${out}"; } || _tb="${_tb} rc${rc}"
+  [ "$(_h2)" = "${h0}" ] || { _tb="${_tb} nao-desfez"; ( cd "${trr}" && git checkout -q -- docs ); }
+  if _tg="$(_tri_mut "${seal}" kg-decide-seal.sh '      _gi=$((_gi + 1)); cp -p "${LOTBK}/${_gi}" "${_g}"' '      _gi=$((_gi + 1)); cp -p "${_g}" "${LOTBK}/${_gi}"')"; then
+    DECIDE_SEAL_RADAR="${sb}/radar-reprova-u.sh" _lot "${_tg}" --batch "${_tl}" --approve "${_tsha}" --date 2026-11-11 --question q >/dev/null || true
+    [ "$(_h2)" = "${h0}" ] && _tb="${_tb} MUT-t6-sobreviveu"
+    ( cd "${trr}" && git checkout -q -- docs )
+  else _tb="${_tb} MUT-t6-ancora"; fi
+  if [ -z "${_tb}" ]; then record_pass "decide: (t6) selo em lote: um grafo reprova → rc 3 e o lote inteiro volta byte a byte; (MUT) sem a restauração, o 1º grafo fica escrito"
+  else record_fail "decide: (t6)" "${_tb} :: $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (t7) o lote aprovado grava: obsoleto vira superseded com motivo e a aresta SUPERSEDES que já existia NÃO duplica;
+  #      o pedido segue open com owner/x_due; radar real exit 0 nos dois; e a triagem seguinte tira o pedido (em curso).
+  _tb=""
+  if out="$(_lot "${seal}" --batch "${_tl}" --approve "${_tsha}" --date 2026-11-11 --question "aprova o lote?")"; then rc=0; else rc=$?; _tb="${_tb} rc${rc}"; fi
+  python3 -I -B - "${trr}/docs/t/t.kg.yaml" "${trr}/docs/u/u.kg.yaml" <<'DEC_PY' || _tb="${_tb} campos"
+import sys, yaml
+t = yaml.safe_load(open(sys.argv[1])); u = yaml.safe_load(open(sys.argv[2]))
+s = [n for n in t['nodes'] if n['id'] == 'D_SUPERADO_T'][0]; r = [n for n in u['nodes'] if n['id'] == 'D_U'][0]
+ok = (s['status'] == 'superseded' and s['plane'] == 'DEV' and 'superada pela de setembro.' in s['narrative']
+      and s['provenance']['method'].startswith('testimony: aprovação do maestro, em lote')
+      and sum(1 for e in t['edges'] if e['to'] == 'D_SUPERADO_T' and e['edge_type'] == 'SUPERSEDES') == 1
+      and r['status'] == 'open' and r['owner'] == 'juridico' and str(r['x_due']) == '2026-12-01' and 'parecer antes.' in r['narrative'])
+sys.exit(0 if ok else 1)
+DEC_PY
+  for _tu in t/t u/u; do bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${trr}/docs/${_tu}.kg.yaml" --integrity --schema >/dev/null 2>&1 || _tb="${_tb} radar-${_tu##*/}"; done
+  grep -q "^excluded${T2}D_U (juridico até 2026-12-01)${T2}-${T2}-${T2}pedido em curso" <<< "$(cd "${trr}" && "${G[@]}" add -A && GIT_AUTHOR_DATE="2026-08-02T12:00:00" GIT_COMMITTER_DATE="2026-08-02T12:00:00" "${G[@]}" commit -q -m t7 && _tri_run "${tri}")" || _tb="${_tb} pedido-nao-saiu"
+  if [ -z "${_tb}" ]; then record_pass "decide: (t7) lote aprovado grava obsoleto (superseded, motivo, aresta sem duplicar) e pedido (open, owner, x_due); radar 0; a triagem seguinte tira o pedido em curso"
+  else record_fail "decide: (t7)" "${_tb} :: $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  fi
   rm -rf "${sb}"
+  if [ -n "${_dec_ask_was_set}" ]; then export ONION_ASK_DIR="${_dec_ask_prev}"; else unset ONION_ASK_DIR; fi
 }
 _family run_decide_selftests
 
