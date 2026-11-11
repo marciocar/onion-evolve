@@ -2,8 +2,7 @@
 branch: fix/veto-tokenizer-holes
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: 1639b97e2480e2e4c5879d72d3637a3e216bed8dee9449a082d7bc24838362e5
-reviewed_code_sha256: dba3bc3e6fe06bb1fdf40924a3f1a472dc373b22a25a94c229b471e221972d2e
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 2
@@ -57,6 +56,10 @@ Pela bancada (cópia, `_pvmut`, `_pw_mut`, tabela do adopter e mutantes do U4): 
 L1, L2, J1, J2 (plugin_write_guard), i7 e i7b (adopter_guard), M35 (env_exposure). Pelo `ops/mutate-and-restore.sh`
 sobre a sonda de SAC-390: `re.S` (8 divergências), xargs (1), `env -C` (1), `sed w` (1), ANSI-C do env-guard (6), todos
 rc 1; o controle positivo sem efeito sobreviveu (rc 0).
+
+## Re-revisão de 2026-11-11
+
+Depois do rebase, o único código novo no diff é a linha do teto do grafo da rodada r24 (de 25 para 30 nós, com a razão: a evidência da cura entrou como nó próprio). Conferido: radar `--integrity --schema` exit 0 e o diff toca os mesmos arquivos de código que o refutador revisou (rebase sem conflito).
 
 ## Limites declarados
 
