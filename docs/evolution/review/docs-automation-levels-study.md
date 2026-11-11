@@ -2,8 +2,7 @@
 branch: docs/automation-levels-study
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: 4bf83f37b9f6805a3a0c2529c34254260f6de4d0cfbf4e052514e549faaf764f
-reviewed_code_sha256: 988e5e89e531a849ec037a0bb039f61cfbf943dd7f924da5f7d56b0389c90877
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
