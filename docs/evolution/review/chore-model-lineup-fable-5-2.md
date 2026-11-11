@@ -2,7 +2,8 @@
 branch: chore/model-lineup-fable-5-2
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 008a44e71410762adf469f0e8d0fadbf39e77692657bd3173cbd3552ac62a7c0
+reviewed_code_sha256: bba5b6f00e47b56b32999d53c774aa158f6ac87176d187b6ceb4251e964a5285
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
