@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1068 itens abertos** em 165 grafo(s) com aberto (de 219 no escopo) · 159 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1069 itens abertos** em 166 grafo(s) com aberto (de 221 no escopo) · 160 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1020,6 +1020,12 @@
 |--:|---|---|---|
 | 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
 | 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
+
+## automation-levels-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
 
 ## task-manager-capabilities-2026-10 — 6 item(ns)
 
