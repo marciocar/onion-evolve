@@ -2,8 +2,7 @@
 branch: docs/company-brain-non-devs-study
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: cd894433b42a03cd6b083f448b5cf19462cbb3d2b594d44912819affb37ea202
-reviewed_code_sha256: bf9b069c2405b0bace0a22aafaea5e26b14e59828484bfb04e4ed375201f4c38
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -32,6 +31,10 @@ resposta do maestro na rodada.
 ## Mutantes
 
 Não se aplica: nenhum código mudou.
+
+## Re-revisão de 2026-11-11
+
+O único acréscimo depois da revisão: `trace:` nos nós `E_PRIMARIAS_SLACK_MCP_RUNTIME_PERMISSAO_1111` e `E_COMUNIDADE_CLAUDE_COMO_FRONT_1111`, apontando os dois relatórios de `data/` (REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO, com catraca)). Radar `--integrity --schema` exit 0.
 
 ## Limites declarados
 
