@@ -3,6 +3,7 @@
   "id": "onion-market-kg-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 28,
     "form.range.node.label": 35,
     "yaml.unquoted-date": 1
   }

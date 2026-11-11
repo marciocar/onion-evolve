@@ -333,8 +333,8 @@ msgid ""
 "\n"
 "Usage:\n"
 "  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
-"             [--strict-identity] [--allow-unreleased] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
-"       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]\n"
+"             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
+"       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
 "\n"
 "--touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common\n"
 "ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new\n"
@@ -342,6 +342,15 @@ msgid ""
 "edge reaching it, for example). It compares the working tree node by node; reformatting the YAML touches nothing. A\n"
 "renamed graph is paired by meta.id. A node moved to another graph counts as new there. rc 0: none; rc 2: a BASE that\n"
 "does not resolve (shallow clone) or a changed graph that does not parse. The vendor stamp check works as in the ratchet.\n"
+"\n"
+"--sources, in both modes, also checks each cited source of the measured graphs, as kg_trace check --strict-sources\n"
+"does, with the gate's excludes: a provenance.sha256 or node_sha256 that does not match, a locator read by its scheme\n"
+"that is not found, or a tracked source that is gone from git fails (rc 1). With --touched, only the changed graphs and\n"
+"the nodes whose cited source changed since the ancestor are checked. Only files that git tracks are read, from the\n"
+"index blob and never from the disk (a local edit counts after git add); a source that is not in the index is missing,\n"
+"and a submodule that is not checked out, a tracked link that cannot be followed, a .git segment, and a . or .. segment\n"
+"are counted as not checked, as is a URL: the gate does not go to the network. Off by default; it does not go with\n"
+"--update.\n"
 msgstr ""
 "O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
 "\n"
@@ -366,8 +375,8 @@ msgstr ""
 "\n"
 "Uso:\n"
 "  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
-"             [--strict-identity] [--allow-unreleased] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
-"       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased]\n"
+"             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
+"       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
 "\n"
 "--touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e\n"
 "HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer\n"
@@ -375,6 +384,34 @@ msgstr ""
 "ele). Compara a árvore de trabalho, nó a nó; reformatar o YAML não toca. O grafo renomeado pareia pelo meta.id. O nó\n"
 "movido para outro grafo conta como novo no destino. rc 0: nenhum; rc 2: BASE que não resolve (clone raso) ou grafo\n"
 "alterado que não parseia. A conferência do carimbo do vendor vale como no modo da catraca.\n"
+"\n"
+"--sources, nos dois modos, confere também cada fonte citada dos grafos medidos, como o kg_trace check --strict-sources,\n"
+"com os excludes do gate: o provenance.sha256 ou node_sha256 que não confere, o locator lido pelo esquema que não acha o\n"
+"trecho, ou a fonte rastreada que sumiu do git reprova (rc 1). Com --touched, só os grafos alterados e os nós cuja fonte\n"
+"citada mudou desde o ancestral são conferidos. Só o arquivo que o git rastreia é lido, pelo blob do índice e nunca\n"
+"pelo disco (a edição local conta depois do git add); a fonte que não está no índice é ausente, e o submódulo não\n"
+"baixado, o link rastreado que não se segue, o segmento .git e o segmento . ou .. contam como não conferidos, como a URL:\n"
+"o gate não vai à rede. Desligado por padrão; não combina com --update.\n"
+
+#: tools/kg_gate.py
+msgid "✗ cited source does not match: {graph}#{node} {code} → {target}"
+msgstr "✗ fonte citada não confere: {graph}#{node} {code} → {target}"
+
+#: tools/kg_gate.py
+msgid "✗ cited source not found in the repository: {graph}#{node} → {target}"
+msgstr "✗ fonte citada não encontrada no repositório: {graph}#{node} → {target}"
+
+#: tools/kg_gate.py
+msgid "· --sources: {judged} source(s) checked ({sha} sha256, {node_sha} node_sha256): {ok} ok, {failed} failed, {missing} not found; not checked (counted): {url} URL (the gate does not go to the network), {abspath} absolute path, {untracked} not readable from git (submodule or link), {form} form-only scheme, {malformed} out of form (scheme, locator or hash), {other} other"
+msgstr "· --sources: {judged} fonte(s) conferida(s) ({sha} sha256, {node_sha} node_sha256): {ok} ok, {failed} reprovada(s), {missing} não encontrada(s); não conferidas (contadas): {url} URL (o gate não vai à rede), {abspath} caminho absoluto, {untracked} não legível(is) pelo git (submódulo ou link), {form} com esquema só de forma, {malformed} fora da forma (esquema, locator ou hash), {other} outras"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --sources does not go with --update (the sources are not part of the baseline)"
+msgstr "GATE QUEBRADO  --sources não combina com --update (as fontes não fazem parte da linha de base)"
+
+#: tools/kg_gate.py
+msgid "also checks each cited source of the measured graphs, as kg_trace check --strict-sources does: a provenance.sha256 or node_sha256 that does not match, a locator read by its scheme that is not found, or a source that is not in the git index fails (rc 1); with --touched, only what the change touches; a URL is not read and is counted as not checked; off by default"
+msgstr "confere também cada fonte citada dos grafos medidos, como o kg_trace check --strict-sources: o provenance.sha256 ou node_sha256 que não confere, o locator lido pelo esquema que não acha o trecho, ou a fonte que não está no índice do git reprova (rc 1); com --touched, só o que a mudança toca; a URL não é lida e conta como não conferida; desligado por padrão"
 
 #: tools/kg_gate.py
 msgid "accepted regression out of format: each one is an object"
@@ -721,6 +758,114 @@ msgid "REVIEW"
 msgstr "REVISAR"
 
 #: tools/kg_migrate.py
+msgid "; nothing was written (plan)"
+msgstr "; nada foi gravado (plan)"
+
+#: tools/kg_migrate.py
+msgid "; {n} file(s) written, {fallen} SHOULD warning(s) fewer"
+msgstr "; {n} arquivo(s) gravado(s), {fallen} aviso(s) SHOULD a menos"
+
+#: tools/kg_migrate.py
+msgid "SWAP"
+msgstr "TROCAR"
+
+#: tools/kg_migrate.py
+msgid "TAIL"
+msgstr "CAUDA"
+
+#: tools/kg_migrate.py
+msgid "cannot write {path}: {exc}"
+msgstr "não foi possível gravar {path}: {exc}"
+
+#: tools/kg_migrate.py
+msgid "lists the swaps and the tail without writing anything"
+msgstr "lista as trocas e a cauda sem gravar nada"
+
+#: tools/kg_migrate.py
+msgid "no ': ' after the class"
+msgstr "sem ': ' depois da classe"
+
+#: tools/kg_migrate.py
+msgid "swaps the Portuguese alias of the provenance.method class for the English one"
+msgstr "troca o apelido em português da classe de provenance.method pela canônica em inglês"
+
+#: tools/kg_migrate.py
+msgid "the SHOULD pattern for provenance.method is not in the form the migrator reads"
+msgstr "o pattern SHOULD de provenance.method não está na forma que o migrador lê"
+
+#: tools/kg_migrate.py
+msgid "the SHOULD schema has no pattern for provenance.method"
+msgstr "o schema SHOULD não tem pattern para provenance.method"
+
+#: tools/kg_migrate.py
+msgid "the class is outside the list"
+msgstr "a classe está fora da lista"
+
+#: tools/kg_migrate.py
+msgid "the classes of provenance.method in the SHOULD schema are not the ones the migrator knows: {classes}"
+msgstr "as classes de provenance.method no schema SHOULD não são as que o migrador conhece: {classes}"
+
+#: tools/kg_migrate.py
+msgid "the method has an anchor (&) or an alias (*)"
+msgstr "o method tem âncora (&) ou alias (*)"
+
+#: tools/kg_migrate.py
+msgid "the method is a block scalar (| or >): edit it by hand"
+msgstr "o method é um escalar em bloco (| ou >): edite à mão"
+
+#: tools/kg_migrate.py
+msgid "the method is written in a form the migrator does not edit"
+msgstr "o method está escrito numa forma que o migrador não edita"
+
+#: tools/kg_migrate.py
+msgid "the reread document differs from the old one beyond the swapped methods"
+msgstr "o documento relido difere do antigo além dos methods trocados"
+
+#: tools/kg_migrate.py
+msgid "the text diff touched a line without a swapped method"
+msgstr "o diff do texto tocou uma linha sem method trocado"
+
+#: tools/kg_migrate.py
+msgid "the value starts with a quote inside the string"
+msgstr "o valor começa com aspa dentro do texto"
+
+#: tools/kg_migrate.py
+msgid "uppercase in the class"
+msgstr "maiúscula na classe"
+
+#: tools/kg_migrate.py
+msgid "the detail after ': ' is empty or starts with a space"
+msgstr "o detalhe depois de ': ' está vazio ou começa com espaço"
+
+#: tools/kg_migrate.py
+msgid "the class has a decomposed accent (NFD)"
+msgstr "a classe tem o acento decomposto (NFD)"
+
+#: tools/kg_migrate.py
+msgid "writes graph, id and status of the confirmed nodes touched, as TSV"
+msgstr "grava grafo, id e status dos nós confirmed tocados, em TSV"
+
+#: tools/kg_migrate.py
+msgid "writes the swaps, with invariance and gate per file"
+msgstr "grava as trocas, com invariância e gate por arquivo"
+
+#: tools/kg_migrate.py
+msgid "· by class:"
+msgstr "· por classe:"
+
+#: tools/kg_migrate.py
+msgid "· by graph:"
+msgstr "· por grafo:"
+
+#: tools/kg_migrate.py
+msgid "· tail (only pointed out, never rewritten):"
+msgstr "· cauda (só apontada, nunca reescrita):"
+
+#: tools/kg_migrate.py
+msgid "· {swaps} method(s) to swap in {files} file(s), {review} for the reviewer, {tail} in the tail, {confirmed} confirmed node(s) touched{written}"
+msgstr "· {swaps} method(s) a trocar em {files} arquivo(s), {review} para quem revisa, {tail} na cauda, {confirmed} nó(s) confirmed tocado(s){written}"
+
+#: tools/kg_migrate.py
 msgid ""
 "The official KG-SSOT migrator: proposes the provenance the contract asks for, from the adopter's declared profile.\n"
 "\n"
@@ -728,6 +873,14 @@ msgid ""
 "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
 "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
 "  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"  kg_migrate.py methods plan|apply [--json] [--confirmed-out FILE.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"\n"
+"methods swaps the Portuguese alias of the provenance.method class (medição, leitura, juízes, derivado, testemunho)\n"
+"for the canonical English one (measurement, reading, judges, derived, testimony), by text: only the class changes,\n"
+"the detail after ': ' stays byte for byte, and comments and quoting stay. The tail (a value that starts with a quote\n"
+"inside the string, a class outside the list, no ': ' after the class, uppercase in the class) is only pointed out,\n"
+"and a node in flow style, an anchored method or a block scalar goes to the reviewer. apply writes under the same\n"
+"checks as keys and counts the SHOULD warnings that fall; --confirmed-out writes the confirmed nodes touched.\n"
 "\n"
 "nest (4.21.0) moves the adopter's own x_ keys into a canonical node profile (x_mirror, x_doc_cycle, x_questionnaire),\n"
 "by text, as the map says (spec/kg-migrate-nest.schema.json): each profile field comes from a constant, from an x_ key\n"
@@ -769,6 +922,14 @@ msgstr ""
 "  kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py nest --map MAPA.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"  kg_migrate.py methods plan|apply [--json] [--confirmed-out ARQ.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"\n"
+"methods troca o apelido em português da classe de provenance.method (medição, leitura, juízes, derivado, testemunho)\n"
+"pela canônica em inglês (measurement, reading, judges, derived, testimony), pelo texto: só a classe muda, o detalhe\n"
+"depois de ': ' fica byte a byte, e os comentários e as aspas ficam. A cauda (valor que começa com aspa dentro do\n"
+"texto, classe fora da lista, sem ': ' depois da classe, maiúscula na classe) é só apontada, e o nó em estilo flow,\n"
+"o method com âncora e o escalar em bloco vão para quem revisa. O apply grava sob as mesmas conferências do keys e\n"
+"conta os avisos SHOULD que caem; --confirmed-out grava os nós confirmed tocados.\n"
 "\n"
 "nest (4.21.0) leva as chaves x_ próprias do adotante para um perfil canônico de nó (x_mirror, x_doc_cycle,\n"
 "x_questionnaire), pelo texto, como o mapa diz (spec/kg-migrate-nest.schema.json): cada campo do perfil vem de uma\n"
@@ -1895,8 +2056,28 @@ msgid "Add label: the node's short claim, up to 280 characters."
 msgstr "Acrescente label: a afirmação curta do nó, até 280 caracteres."
 
 #: tools/kg_validate.py
-msgid "Add provenance with source, locator, and method; with no recoverable source, change the status to unverifiable."
-msgstr "Acrescente provenance com source, locator e method; sem fonte recuperável, mude o status para unverifiable."
+msgid ""
+"Add provenance with source, locator, and method; with no recoverable source, change the status to unverifiable (on a "
+"decision, cite who decided, as testimony)."
+msgstr ""
+"Acrescente provenance com source, locator e method; sem fonte recuperável, mude o status para unverifiable (na "
+"decisão, cite quem decidiu, como testemunho)."
+
+#: tools/kg_validate.py
+msgid ""
+"Add provenance with source, locator, and method: what this decision rests on. With no document to cite, the source "
+"is who decided, with method testimony. Keep the status: a closed decision stays closed."
+msgstr ""
+"Acrescente provenance com source, locator e method: em que esta decisão se apoia. Sem documento a citar, a fonte é "
+"quem decidiu, com method testimony. Mantenha o status: a decisão fechada segue fechada."
+
+#: tools/kg_validate.py
+msgid ""
+"Add provenance with source, locator, and method: where this evidence was read or measured; with no recoverable "
+"source, change the status to unverifiable."
+msgstr ""
+"Acrescente provenance com source, locator e method: onde esta evidência foi lida ou medida; sem fonte recuperável, "
+"mude o status para unverifiable."
 
 #: tools/kg_validate.py
 msgid "Add trace, provenance, or a TRACES_TO edge leaving the decision."
@@ -2144,7 +2325,7 @@ msgstr "SEM CARIMBO"
 
 #: tools/kg_validate.py
 msgid "Use the form '<class>: <detail>', with class measurement, reading, judges, derived, or testimony."
-msgstr "Use a forma '<classe>: <detalhe>', com classe measurement, reading, judges, derived ou testimony (ou o alias em português: medição, leitura, juízes, derivado ou testemunho)."
+msgstr "Use a forma '<classe>: <detalhe>', com classe measurement, reading, judges, derived ou testimony (o apelido em português, medição, leitura, juízes, derivado ou testemunho, ainda passa, com aviso, até o v5)."
 
 #: tools/kg_validate.py
 msgid "Value differs from the required one in \"{field}\" {scope}."
@@ -2303,6 +2484,22 @@ msgid "slug is lowercase words joined by hyphens, like my-graph (v4.11)."
 msgstr "slug é feito de palavras em minúsculas ligadas por hífen, como meu-grafo (v4.11)."
 
 #: tools/kg_validate.py
+msgid ""
+"x_classification is the sensitivity level of the whole graph (v4.20): one slug (lowercase, digits, hyphen), like "
+"confidential; the levels and their order are the organization's, in the policy of the server that serves the graph."
+msgstr ""
+"x_classification é o nível de sensibilidade do grafo inteiro (v4.20): um slug (minúsculas, dígitos, hífen), como "
+"confidential; os níveis e a ordem deles são da organização, na política do servidor que entrega o grafo."
+
+#: tools/kg_validate.py
+msgid ""
+"x_classification belongs in meta (v4.20): the unit is the graph, not the node. Move the node to a graph of its own "
+"and declare the level in that graph's meta."
+msgstr ""
+"x_classification fica no meta (v4.20): a unidade é o grafo, não o nó. Mova o nó para um grafo próprio e declare o "
+"nível no meta desse grafo."
+
+#: tools/kg_validate.py
 msgid "synced on {verified_at}, every {every}, due on {due_on}"
 msgstr "sincronizado em {verified_at}, a cada {every}, venceu em {due_on}"
 
@@ -2329,6 +2526,22 @@ msgstr "Não edite o critério no lugar: registre uma emenda (um nó novo com am
 #: tools/kg_validate.py
 msgid "Fields that exclude each other in \"{field}\" {scope}."
 msgstr "Campos que se excluem em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Key out of place: \"{field}\" {scope}."
+msgstr "Chave fora do lugar: «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Accepted form on its way out in \"{field}\" {scope}."
+msgstr "Forma aceita e em retirada em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid ""
+"Write the class in English: measurement, reading, judges, derived, or testimony (v4.21). The Portuguese alias still "
+"passes and leaves in v5."
+msgstr ""
+"Escreva a classe em inglês: measurement, reading, judges, derived ou testimony (v4.21). O apelido em português ainda "
+"passa e sai no v5."
 
 #: tools/kg_validate.py
 msgid "If the criterion changed, register an amendment (a new node with amends and reason) instead of editing it in place; if not, write the sha256 that kg_criterion.py digest prints."

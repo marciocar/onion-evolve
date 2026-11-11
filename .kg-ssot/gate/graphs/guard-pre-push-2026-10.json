@@ -3,6 +3,8 @@
   "id": "guard-pre-push-2026-10",
   "must": [],
   "should": {
-    "form.range.node.label": 8
+    "form.deprecated.node.provenance.method": 5,
+    "form.range.node.label": 8,
+    "form.required.node.provenance": 1
   }
 }

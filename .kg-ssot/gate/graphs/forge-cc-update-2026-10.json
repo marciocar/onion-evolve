@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/forge-cc-update-2026-10/forge-cc-update-2026-10.kg.yaml",
   "id": "forge-cc-update-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 6
+  }
 }

@@ -3,7 +3,9 @@
   "id": "ocr-local-sei-2026-09",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 16,
     "form.range.node.label": 25,
+    "form.required.node.provenance": 1,
     "integrity.bare-decision": 1
   }
 }

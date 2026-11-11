@@ -2,5 +2,8 @@
   "graph": "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml",
   "id": "guard-deploy-acts-2026-11",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 8,
+    "form.required.node.provenance": 5
+  }
 }

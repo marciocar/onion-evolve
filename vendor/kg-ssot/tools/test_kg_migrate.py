@@ -623,7 +623,9 @@ class AdopterHub(unittest.TestCase):
         wrong = []
         for key, e in self.expected.items():
             g = got.get(key)
-            if g is None or g[2] != (e["status_depois"] == "unverifiable") or (e["method_class"] and g[0] != e["method_class"]) \
+            # o gabarito guarda a classe do perfil; desde o v4.21 o plan grava a classe em inglês (o apelido avisa)
+            want = kg_migrate.METHOD_ALIASES.get(e["method_class"], e["method_class"])
+            if g is None or g[2] != (e["status_depois"] == "unverifiable") or (e["method_class"] and g[0] != want) \
                     or (e["locality"] and g[1] != e["locality"]):
                 wrong.append((key, e, g))
         self.assertEqual(wrong, [])
@@ -1291,6 +1293,392 @@ class Nest(unittest.TestCase):
         rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json")
         files = {r["file"] for r in json.loads(out)["rows"]}
         self.assertEqual((rc, files), (0, {"g.kg.yaml"}))
+
+
+
+def mnode(nid, method, status="confirmed", tail=""):
+    return (f"  - id: {nid}\n    node_type: claim\n    plane: DEV\n    status: {status}\n    impact: 3\n"
+            f"    confidence: 0.9\n    label: \"Afirmação {nid}.\"\n    provenance:\n      source: \"src/a.py\"\n"
+            f"      locator: \"src/a.py:1\"\n      method: {method}{tail}\n")
+
+
+METHODS = ("# comentário do topo\n" + HEAD
+           + mnode("C_MED", '"medição: rodada 1: ação, ção"', tail="  # comentário na linha do method")
+           + mnode("C_LEI", "'leitura: código: é'")
+           + mnode("C_JUI", '"juízes: três juízes"', status="open")
+           + mnode("C_DER", '"derivado: soma"')
+           + mnode("C_TES", '"testemunho: relato da pessoa"')
+           + mnode("C_CAN", '"measurement: já canônico"')
+           + "  # comentário entre nós\n"
+           + mnode("C_QUO", "\"'medição: entre aspas'\"")
+           + mnode("C_UNK", '"proposta: classe fora"')
+           + mnode("C_SEP", '"medição - sem separador"')
+           + mnode("C_UPP", '"Medição: maiúscula"')
+           + '  - {id: C_FLOW, node_type: claim, plane: DEV, status: confirmed, impact: 3, confidence: 0.9, '
+             'label: "Flow.", provenance: {source: "s", locator: "l", method: "leitura: em flow"}}\n'
+           + mnode("C_BLK", ">-\n        medição: em bloco")
+           + mnode("C_ESC", '"medi\\u00e7\\u00e3o: escapado"'))
+
+
+class Methods(unittest.TestCase):
+    """kg_migrate.py methods plan|apply: o apelido em português da classe de provenance.method vira a canônica em
+    inglês, pelo texto, só o prefixo, com invariância; a cauda é só apontada."""
+
+    def run_main(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = kg_migrate.main([str(a) for a in argv])
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = pathlib.Path(self.tmp.name)
+        self.path = self.dir / "g.kg.yaml"
+        self.path.write_text(METHODS, encoding="utf-8")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def plan(self, *extra):
+        rc, out, _ = self.run_main("methods", "plan", "--json", "--root", self.dir, *extra, self.path)
+        self.assertEqual(rc, 0, out)
+        res = json.loads(out)
+        return res, {r["id"]: r for r in res["rows"]}
+
+    def apply(self, *extra):
+        rc, out, _ = self.run_main("methods", "apply", "--json", "--root", self.dir, *extra, self.path)
+        return rc, json.loads(out), self.path.read_text(encoding="utf-8")
+
+    def method_of(self, text, nid):
+        return next(n for n in kg_validate.parse_v1(text)[1]["nodes"] if n["id"] == nid)["provenance"]["method"]
+
+    def test_o_fixture_nao_tem_codigo_must_de_provenance(self):
+        # o fixture não tem arestas (o apply compara o antes e o depois); a provenance de cada nó passa no MUST
+        must = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+        self.assertEqual(set(kg_validate.codes(METHODS, must)), {"form.required.top.edges", "integrity.orphan-node"})
+
+    def test_troca_cada_um_dos_cinco_apelidos(self):
+        _res, rows = self.plan()
+        want = {"C_MED": "measurement: rodada 1: ação, ção", "C_LEI": "reading: código: é",
+                "C_JUI": "judges: três juízes", "C_DER": "derived: soma", "C_TES": "testimony: relato da pessoa"}
+        for nid, new in want.items():
+            self.assertEqual((rows[nid]["action"], rows[nid]["new"]), ("swap", new), nid)
+        rc, res, text = self.apply()
+        self.assertEqual(rc, 0, res)
+        for nid, new in want.items():
+            self.assertEqual(self.method_of(text, nid), new, nid)
+
+    def test_detalhe_byte_a_byte_com_dois_pontos_e_acentos(self):
+        rc, _res, text = self.apply()
+        self.assertEqual(rc, 0)
+        self.assertIn('      method: "measurement: rodada 1: ação, ção"  # comentário na linha do method\n', text)
+        self.assertIn("      method: 'reading: código: é'\n", text)  # a aspa simples fica simples
+
+    def test_so_as_linhas_de_method_mudam(self):
+        rc, _res, text = self.apply()
+        self.assertEqual(rc, 0)
+        old, new = METHODS.splitlines(), text.splitlines()
+        self.assertEqual(len(old), len(new))
+        changed = [(a, b) for a, b in zip(old, new) if a != b]
+        self.assertEqual(len(changed), 5)
+        self.assertTrue(all(a.lstrip().startswith("method:") for a, _b in changed))
+        self.assertTrue(text.startswith("# comentário do topo\n"))
+        self.assertIn("  # comentário entre nós\n", text)
+
+    def test_cauda_so_apontada(self):
+        res, rows = self.plan()
+        self.assertEqual({nid: rows[nid]["reason"] for nid in ("C_QUO", "C_UNK", "C_SEP", "C_UPP")},
+                         {"C_QUO": "quoted", "C_UNK": "unknown-class", "C_SEP": "no-separator", "C_UPP": "uppercase"})
+        self.assertTrue(all(rows[n]["action"] == "tail" and rows[n]["new"] is None
+                            for n in ("C_QUO", "C_UNK", "C_SEP", "C_UPP")))
+        self.assertEqual(res["counts"]["tail"], {"no-separator": 1, "quoted": 1, "unknown-class": 1, "uppercase": 1})
+        rc, _r, text = self.apply()
+        self.assertEqual(rc, 0)
+        for nid, old in (("C_QUO", "'medição: entre aspas'"), ("C_UNK", "proposta: classe fora"),
+                         ("C_SEP", "medição - sem separador"), ("C_UPP", "Medição: maiúscula")):
+            self.assertEqual(self.method_of(text, nid), old, nid)
+
+    def test_canonica_fica_fora_do_plano(self):
+        _res, rows = self.plan()
+        self.assertNotIn("C_CAN", rows)
+
+    def test_flow_bloco_e_escape_vao_para_revisao(self):
+        _res, rows = self.plan()
+        self.assertEqual(rows["C_FLOW"]["action"], "review")
+        self.assertIn("flow", rows["C_FLOW"]["message"])
+        self.assertEqual(rows["C_BLK"]["action"], "review")
+        self.assertIn("| ou >", rows["C_BLK"]["message"])
+        self.assertEqual(rows["C_ESC"]["action"], "review")
+        rc, _r, text = self.apply()
+        self.assertEqual(rc, 0)
+        self.assertIn('method: "leitura: em flow"}}', text)
+        self.assertEqual(self.method_of(text, "C_BLK"), "medição: em bloco")
+        self.assertIn('"medi\\u00e7\\u00e3o: escapado"', text)
+
+    def test_ancora_vai_para_revisao(self):
+        text = (HEAD + mnode("C_A", '&m "leitura: compartilhado"') + mnode("C_B", "*m"))
+        self.path.write_text(text, encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual((rows["C_A"]["action"], rows["C_B"]["action"]), ("review", "review"))
+        self.assertIn("&", rows["C_A"]["message"])
+
+    def test_idempotente(self):
+        rc, _r, first = self.apply()
+        self.assertEqual(rc, 0)
+        rc, res, second = self.apply()
+        self.assertEqual((rc, first), (0, second))
+        self.assertEqual(res["counts"]["swaps"], 0)
+        self.assertEqual(res["applied"], [])
+
+    def test_crlf_fica_crlf(self):
+        rc, _r, lf = self.apply()  # o esperado: o mesmo apply sobre o LF, com a quebra trocada
+        self.assertEqual(rc, 0)
+        self.path.write_bytes(METHODS.replace("\n", "\r\n").encode("utf-8"))
+        rc, _r, _t = self.apply()
+        raw = self.path.read_bytes().decode("utf-8")
+        self.assertEqual(rc, 0)
+        self.assertNotIn("\r\r\n", raw)
+        self.assertEqual(raw, lf.replace("\n", "\r\n"))
+
+    def test_quebra_mista_e_recusada(self):
+        mixed = METHODS.replace("\n", "\r\n", 3)
+        self.path.write_bytes(mixed.encode("utf-8"))
+        rc, res, _t = self.apply()
+        self.assertEqual(rc, 1)
+        self.assertEqual(self.path.read_bytes().decode("utf-8"), mixed)
+        self.assertIn("misturadas", res["applied"][0]["reasons"][0])
+
+    def test_ancora_na_provenance_inteira(self):
+        prov = ("    provenance: &p\n      source: \"s\"\n      locator: \"l\"\n      method: \"medição: compartilhada\"\n")
+        node = ("  - id: {nid}\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 3\n"
+                "    confidence: 0.9\n    label: \"A {nid}.\"\n")
+        text = HEAD + node.format(nid="C_P1") + prov + node.format(nid="C_P2") + "    provenance: *p\n"
+        self.path.write_text(text, encoding="utf-8")
+        tsv = self.dir / "c.tsv"
+        res, rows = self.plan("--confirmed-out", tsv)
+        self.assertEqual((rows["C_P1"]["action"], rows["C_P2"]["action"]), ("review", "review"))
+        self.assertEqual((res["counts"]["swaps"], res["counts"]["confirmed"]), (0, 0))
+        self.assertEqual(tsv.read_text(encoding="utf-8").splitlines(), ["graph\tid\tstatus"])
+        rc, res, after = self.apply()
+        self.assertEqual((rc, after, res["applied"]), (0, text, []))  # o plano previu o apply: nada a gravar
+
+    def test_merge_na_provenance(self):
+        text = (HEAD + "  - id: C_BASE\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n"
+                "    confidence: 0.9\n    label: \"Base.\"\n    x_base: &b\n      source: \"s\"\n      locator: \"l\"\n"
+                + mnode("C_M", '"medição: com merge"').replace('      source: "src/a.py"\n', "      <<: *b\n")
+                .replace('      locator: "src/a.py:1"\n', ""))
+        self.path.write_text(text, encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual(rows["C_M"]["action"], "review")
+        rc, res, after = self.apply()
+        self.assertEqual((rc, after), (0, text))
+
+    def test_detalhe_ruim_e_nfd_vao_para_a_cauda(self):
+        import unicodedata
+        nfd_med, nfd_jui = unicodedata.normalize("NFD", "medição"), unicodedata.normalize("NFD", "juízes")
+        text = (HEAD + mnode("C_SP2", '"leitura:  dois espaços"') + mnode("C_EMPTY", '"leitura: "')
+                + mnode("C_NFD1", f'"{nfd_med}: decomposto"') + mnode("C_NFD2", f'"{nfd_jui}: decomposto"'))
+        self.path.write_text(text, encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual({n: (r["action"], r["reason"]) for n, r in rows.items()},
+                         {"C_SP2": ("tail", "bad-detail"), "C_EMPTY": ("tail", "bad-detail"),
+                          "C_NFD1": ("tail", "nfd"), "C_NFD2": ("tail", "nfd")})
+        self.assertTrue(all(r["message"] for r in rows.values()))
+        rc, _r, after = self.apply()
+        self.assertEqual((rc, after), (0, text))
+
+    def test_ancora_na_lista_inteira(self):
+        for text in (HEAD.replace("nodes:\n", "nodes: &n\n") + mnode("C_L", '"medição: na lista"') + "x_copy: *n\n",
+                     "x_a: &n\n" + mnode("C_L", '"medição: na lista"') + HEAD.replace("nodes:\n", "nodes: *n\n")):
+            self.path.write_text(text, encoding="utf-8")
+            res, rows = self.plan()
+            self.assertEqual((rows["C_L"]["action"], res["counts"]["swaps"], res["counts"]["review"]), ("review", 0, 1))
+            rc, res, after = self.apply()
+            self.assertEqual((rc, after, res["applied"]), (0, text, []))
+
+    def test_ancora_no_item(self):
+        node = mnode("C_I", '"medição: no item"').replace("  - id: C_I\n", "  - &i\n    id: C_I\n")
+        text = HEAD + node + "x_copy: *i\n"
+        self.path.write_text(text, encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual(rows["C_I"]["action"], "review")
+        rc, res, after = self.apply()
+        self.assertEqual((rc, after, res["applied"]), (0, text, []))
+
+    def test_merge_no_no(self):
+        text = (HEAD + "  - id: C_BASE\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n"
+                "    confidence: 0.9\n    label: \"Base.\"\n    x_base: &b\n      x_k: 1\n"
+                + mnode("C_M", '"medição: nó com merge"').replace("    impact: 3\n", "    <<: *b\n    impact: 3\n"))
+        self.path.write_text(text, encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual(rows["C_M"]["action"], "review")
+        rc, _r, after = self.apply()
+        self.assertEqual((rc, after), (0, text))
+
+    def test_detalhe_com_tab_e_quebra_vai_para_a_cauda(self):
+        text = (HEAD + mnode("C_TAB", '"leitura: \\tcom tab"') + mnode("C_LF", '"leitura: \\ncom quebra"')
+                + mnode("C_CR", '"leitura: \\rcom retorno"'))
+        self.path.write_text(text, encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual({n: (r["action"], r["reason"]) for n, r in rows.items()},
+                         {n: ("tail", "bad-detail") for n in ("C_TAB", "C_LF", "C_CR")})
+
+    def test_nfd_com_maiuscula(self):
+        import unicodedata
+        self.path.write_text(HEAD + mnode("C_N", '"' + unicodedata.normalize("NFD", "Medição") + ': x"'), encoding="utf-8")
+        _res, rows = self.plan()
+        self.assertEqual((rows["C_N"]["action"], rows["C_N"]["reason"]), ("tail", "nfd"))
+
+    def test_retorno_solto_e_recusado(self):
+        lone = METHODS.replace("\n", "\r", 1)
+        self.path.write_bytes(lone.encode("utf-8"))
+        rc, res, _t = self.apply()
+        self.assertEqual(rc, 1)
+        self.assertEqual(self.path.read_bytes().decode("utf-8"), lone)
+        self.assertIn("misturadas", res["applied"][0]["reasons"][0])
+
+    def test_plan_json_diz_a_recusa_da_quebra_mista(self):
+        self.path.write_bytes(METHODS.replace("\n", "\r\n", 3).encode("utf-8"))
+        rc, out, _ = self.run_main("methods", "plan", "--json", "--root", self.dir, self.path)
+        res = json.loads(out)
+        self.assertEqual((rc, res["applied"], res["rows"]), (1, None, []))
+        self.assertEqual(res["refused"][0]["file"], "g.kg.yaml")
+        self.assertIn("misturadas", res["refused"][0]["reasons"][0])
+
+    def test_mesmo_arquivo_duas_vezes_conta_uma(self):
+        link = self.dir / "link.kg.yaml"
+        link.symlink_to(self.path)
+        rc, out, _ = self.run_main("methods", "plan", "--json", "--root", self.dir, self.path, self.path, link)
+        res = json.loads(out)
+        self.assertEqual((rc, res["counts"]["swaps"], res["counts"]["by_graph"]), (0, 5, {"g.kg.yaml": 5}))
+
+    def test_json_separa_codigo_e_frase(self):
+        _res, rows = self.plan()
+        self.assertEqual(rows["C_UNK"]["reason"], "unknown-class")
+        self.assertEqual(rows["C_UNK"]["message"], "a classe está fora da lista")
+        self.assertIsNone(rows["C_FLOW"]["reason"])
+        self.assertIsNone(rows["C_MED"]["reason"])
+
+    def test_confirmed_out_do_apply_so_lista_o_gravado(self):
+        other = self.dir / "h.kg.yaml"
+        other.write_text(HEAD + mnode("C_RECUSA", '"medição: arquivo recusado"'), encoding="utf-8")
+        real = kg_validate.codes
+
+        def fake(text, validator, *a, **k):
+            return real(text, validator, *a, **k) + (["form.fake"] if "measurement: arquivo recusado" in text else [])
+        tsv = self.dir / "c.tsv"
+        with mock.patch.object(kg_validate, "codes", side_effect=fake):
+            rc, out, _ = self.run_main("methods", "apply", "--json", "--root", self.dir, "--confirmed-out", tsv,
+                                       self.path, other)
+        self.assertEqual(rc, 1, out)
+        rows = [ln.split("\t") for ln in tsv.read_text(encoding="utf-8").splitlines()[1:]]
+        self.assertEqual(sorted(r[1] for r in rows), ["C_DER", "C_LEI", "C_MED", "C_TES"])
+        self.assertTrue(all(r[0] == "g.kg.yaml" for r in rows))
+
+    def test_plan_nao_grava(self):
+        self.plan()
+        self.assertEqual(self.path.read_text(encoding="utf-8"), METHODS)
+
+    def test_arquivo_que_ganharia_must_e_recusado(self):
+        real = kg_validate.codes
+
+        def fake(text, validator, *a, **k):
+            return real(text, validator, *a, **k) + (["form.fake"] if "measurement: rodada" in text else [])
+        with mock.patch.object(kg_validate, "codes", side_effect=fake):
+            rc, res, text = self.apply()
+        self.assertEqual(rc, 1)
+        self.assertEqual(text, METHODS)
+        self.assertIn("form.fake", res["applied"][0]["reasons"][0])
+
+    def test_arquivo_que_ganharia_should_e_recusado(self):
+        real = kg_validate.warning_counts
+
+        def fake(text, *a, **k):
+            c = real(text, *a, **k)
+            if "measurement: rodada" in text:
+                c = c + collections.Counter({"form.fake-should": 1})
+            return c
+        with mock.patch.object(kg_validate, "warning_counts", side_effect=fake):
+            rc, res, text = self.apply()
+        self.assertEqual(rc, 1)
+        self.assertEqual(text, METHODS)
+        self.assertIn("form.fake-should", res["applied"][0]["reasons"][0])
+
+    def test_conta_os_avisos_should_que_caem(self):
+        real = kg_validate.warning_counts
+
+        def fake(text, *a, **k):
+            c = real(text, *a, **k)
+            if "medição: rodada" in text:
+                c = c + collections.Counter({"form.pattern.node.provenance.method": 5})
+            return c
+        with mock.patch.object(kg_validate, "warning_counts", side_effect=fake):
+            rc, res, _t = self.apply()
+        self.assertEqual(rc, 0)
+        # os 5 do fake e, desde o v4.21, os 5 form.deprecated.node.provenance.method dos apelidos trocados
+        self.assertEqual(res["applied"][0]["should_fallen"], 10)
+
+    def test_invariancia_do_dado(self):
+        text = METHODS
+        doc = kg_validate.parse_v1(text)[1]
+        rows = kg_migrate.method_plan(text, doc)
+        bad = [r[:5] + ("derived: outra coisa",) + r[6:] if r[1] == "C_DER" else r for r in rows]
+        _new, problem = kg_migrate.methods_apply_text(text, doc, bad)
+        self.assertIn("além dos methods trocados", problem)
+        self.assertIsNone(kg_migrate.methods_apply_text(text, doc, rows)[1])
+
+    def test_invariancia_do_diff(self):
+        # a troca que quebra a linha dentro das aspas duplas (a barra no fim escapa a quebra) relê o mesmo dado e
+        # muda o número de linhas: só a conferência do diff a pega
+        text = METHODS
+        doc = kg_validate.parse_v1(text)[1]
+        rows = [r for r in kg_migrate.method_plan(text, doc) if r[1] == "C_DER"]
+        with mock.patch.dict(kg_migrate.METHOD_ALIASES, {"derivado": "deri\\\n        ved"}):
+            _new, problem = kg_migrate.methods_apply_text(text, doc, rows)
+        self.assertIn("diff", problem)
+
+    def test_confirmed_out(self):
+        tsv = self.dir / "confirmed.tsv"
+        _res, _rows = self.plan("--confirmed-out", tsv)
+        with open(tsv, encoding="utf-8", newline="") as fh:
+            rows = list(csv.reader(fh, delimiter="\t"))
+        self.assertEqual(rows[0], ["graph", "id", "status"])
+        self.assertEqual(sorted(r[1] for r in rows[1:]), ["C_DER", "C_LEI", "C_MED", "C_TES"])  # C_JUI é open
+        self.assertTrue(all(r[0] == "g.kg.yaml" and r[2] == "confirmed" for r in rows[1:]))
+        rc, _r, _t = self.apply("--confirmed-out", tsv)
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(tsv.read_text(encoding="utf-8").splitlines()), 5)
+        rc, _r, _t = self.apply("--confirmed-out", tsv)  # nada mais a trocar: só o cabeçalho
+        self.assertEqual(tsv.read_text(encoding="utf-8").splitlines(), ["graph\tid\tstatus"])
+
+    def test_contagens_por_classe_e_por_grafo(self):
+        res, _rows = self.plan()
+        c = res["counts"]
+        self.assertEqual(c["by_class"], {"derivado → derived": 1, "juízes → judges": 1, "leitura → reading": 1,
+                                         "medição → measurement": 1, "testemunho → testimony": 1})
+        self.assertEqual((c["by_graph"], c["swaps"], c["graphs"], c["review"], c["confirmed"]),
+                         ({"g.kg.yaml": 5}, 5, 1, 3, 4))
+
+    def test_classes_fora_do_schema_e_entrada_quebrada(self):
+        with mock.patch.object(kg_migrate, "method_classes", return_value={"measurement", "medição"}):
+            rc, out, _ = self.run_main("methods", "plan", "--json", "--root", self.dir, self.path)
+        self.assertEqual(rc, 2)
+        self.assertEqual(json.loads(out)["reason"], "broken_input")
+
+    def test_as_classes_do_schema_vigente(self):
+        should = json.loads(kg_validate.CONTRACT_SHOULD.read_text(encoding="utf-8"))
+        self.assertEqual(kg_migrate.method_classes(should), kg_migrate.METHOD_ALL)
+
+    def test_saida_humana(self):
+        rc, out, _ = self.run_main("methods", "plan", "--root", self.dir, self.path)
+        self.assertEqual(rc, 0)
+        self.assertIn("TROCAR", out)
+        self.assertIn("CAUDA", out)
+        self.assertIn("medição → measurement", out)
+        self.assertIn("nada foi gravado", out)
 
 
 if __name__ == "__main__":

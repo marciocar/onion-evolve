@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml",
   "id": "relay-public-review-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.required.node.provenance": 2
+  }
 }

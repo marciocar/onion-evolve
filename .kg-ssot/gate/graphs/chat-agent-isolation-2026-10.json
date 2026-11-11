@@ -2,5 +2,8 @@
   "graph": "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml",
   "id": "chat-agent-isolation-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 94,
+    "form.required.node.provenance": 1
+  }
 }

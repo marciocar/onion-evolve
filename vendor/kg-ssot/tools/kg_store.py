@@ -754,8 +754,12 @@ class DiskStore:
             raise NotFound(_("{name} does not exist").format(name=name))
         return text
 
-    def _read_ref(self, name, ref):
+    def check_ref(self, ref):
+        """A forma do ref, sem olhar nome nenhum: a recusa sai igual para qualquer grafo. No disco, todo ref é recusado."""
         raise StoreError(_("the {backend} store keeps no earlier version").format(backend=self.backend))
+
+    def _read_ref(self, name, ref):
+        self.check_ref(ref)
 
     def history(self, name):
         check_name(name)
@@ -1205,9 +1209,12 @@ class GitStore(DiskStore):
         self._git(*args, "--", *names)
         return self._git("rev-parse", "HEAD").stdout.decode().strip()
 
-    def _read_ref(self, name, ref):
+    def check_ref(self, ref):
         if not re.fullmatch(r"[0-9a-fA-F]{4,64}", str(ref)):  # fullmatch: o $ aceitaria um \n final
             raise StoreError(_("invalid ref: {ref!r} (a commit sha)").format(ref=ref))
+
+    def _read_ref(self, name, ref):
+        self.check_ref(ref)
         out = self._git("show", f"{ref}:{name}", check=False)
         if out.returncode != 0:
             raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
@@ -1302,11 +1309,14 @@ class VersionedStore(DiskStore):
         return [{"ref": e["seq"], "op": e["op"], "author": e["author"], "ts": e["ts"], "message": e["message"],
                  "sha256": e["sha256"]} for e in reversed(self._events()) if e["name"] == name]
 
-    def _read_ref(self, name, ref):
+    def check_ref(self, ref):
         try:
-            seq = int(ref)
+            return int(ref)
         except (TypeError, ValueError):
-            raise StoreError(_("invalid ref: {ref!r} (the seq of an event)").format(ref=ref))
+            raise StoreError(_("invalid ref: {ref!r} (the seq of an event)").format(ref=ref)) from None
+
+    def _read_ref(self, name, ref):
+        seq = self.check_ref(ref)
         event = next((e for e in self._events() if e["seq"] == seq and e["name"] == name), None)
         if event is None or event["sha256"] is None:
             raise NotFound(_("{name} has no version at event {ref}").format(name=name, ref=ref))

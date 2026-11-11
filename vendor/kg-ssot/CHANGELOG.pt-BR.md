@@ -10,6 +10,95 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.49.0] - 2026-11-11
+
+Contratos v4.20 e v4.21, só SHOULD: nenhum grafo que passava reprova.
+
+### Contrato v4.21
+
+O plano do vocabulário de `provenance.method`, acordado com o primeiro adotante e com o repositório de curadoria dele.
+Dois avisos novos, os mesmos códigos nos dois leitores (Python e JavaScript), e 17 casos novos na suíte (555 em
+`latest/`).
+
+- A classe de `provenance.method` em português (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) segue
+  passando, e agora alerta como `form.deprecated.node.provenance.method`: escreva a classe em inglês (`measurement`,
+  `reading`, `judges`, `derived`, `testimony`). `form.deprecated` é um tipo novo de código de forma: no JSON Schema, um
+  `not` com a forma do apelido e a palavra `deprecated` do vocabulário de metadados do 2020-12, que só anota. O valor que
+  já falha a forma (aspa embutida, classe fora da lista, sem `: <detalhe>`) fica só com
+  `form.pattern.node.provenance.method`, sem um segundo aviso, e `testemunho` segue valendo como `testimony` para
+  `integrity.testimony-in-prod`. O apelido sai no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro
+  adotante e no repositório de curadoria dele der zero.
+- Proveniência sempre: o nó `evidence` sem `provenance`, em qualquer status exceto `unverifiable`, e a `decision` `done`
+  sem `provenance` alertam como `form.required.node.provenance`, o código que o MUST já dá ao nó `confirmed` ou `PROD`.
+  O campo é o mesmo, o conserto é o mesmo, e o código fica igual quando o v5 promover a regra. O MUST não muda. No nó em que o MUST já acusa esse
+  código, o leitor não o repete como aviso; em outro nó do mesmo documento o aviso segue valendo, porque a deduplicação
+  é por ocorrência (código e caminho), e pagar a dívida MUST não aparece como dívida SHOULD nova.
+- Os fixtures da suíte que não tratam do apelido passam a escrever a classe em inglês (293 arquivos, só a linha do
+  `method` muda), e 45 fixtures ganharam uma `provenance`, para cada caso seguir testando o que testava. Os cinco casos do apelido agora são `warn-method-alias-*`.
+- O `kg_migrate.py plan` grava a classe em inglês quando o perfil ainda nomeia a em português (`class:
+  leitura` vira `reading: <detalhe>`): a proposta com o apelido levaria o aviso novo e iria para revisão.
+- A dívida nova, medida com o `kg_validate` nos grafos `.kg.yaml` que o gate mede: neste repositório (37 grafos), o
+  apelido em 0 grafos e 0 ocorrências (os 1230 apelidos foram para a classe em inglês com o
+  `kg_migrate.py methods apply`), e a proveniência sempre em 10 grafos e 102 nós (98 `evidence`, 4 `decision`
+  `done`); no primeiro adotante, na versão que este repositório fixa (239
+  grafos), o apelido em 205 grafos e 5318 ocorrências, e a proveniência sempre em 60 grafos e 157 nós (42 `evidence`,
+  115 `decision` `done`); no repositório de curadoria dele (75 grafos), o apelido em 41
+  grafos e 433 ocorrências, e a proveniência sempre em 29 grafos e 97 nós (83 `evidence`, 14 `decision` `done`). Nenhum
+  outro código muda nos três, e nenhum veredito MUST muda.
+- **O seu gate vê dívida nova.** Quando os seus grafos os têm, os dois são códigos novos de dívida SHOULD, e o
+  `kg_gate.py` reprova depois da atualização, com linha de base por grafo ou por nó (`--granularity node`). Aceite-os como linha de base, com o motivo,
+  o que mantém a catraca contra o crescimento: `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+  --accept-regression "contrato v4.21: o apelido em português do method e a proveniência sempre, dívida que já
+  existia"`, ou o equivalente do seu gate. Para pagar o apelido em vez disso, o
+  `kg_migrate.py methods apply` o troca pela classe em inglês. Rebaixar um nó sem lhe dar fonte (a `evidence`
+  `confirmed` para `open`, a `decision` `done` fora de PROD) troca o MUST por este SHOULD no mesmo nó e pede
+  `--accept-regression`; o caminho das dicas (`unverifiable`, ou a fonte da decisão como `testimony`) passa limpo.
+
+### Contrato v4.20 e o resto
+
+- Contrato: o perfil canônico `x_classification`, só no `meta` e julgado só quando presente. É o nível de sensibilidade
+  do grafo inteiro, em texto com a forma de slug (minúsculas, dígitos e hífen), como `confidential`. Fora dessa forma
+  alerta como `form.pattern.meta.x_classification`, e o valor que não é texto como `form.type.meta.x_classification`.
+  Os níveis e a ordem deles são da organização e moram na política do servidor, não no grafo; o TLP 2.0 da FIRST é um
+  exemplo de mapeamento no manual, não o padrão. No nó, `x_classification` alerta como
+  `form.misplaced.node.x_classification`, um tipo novo de código de forma: a unidade é o grafo, e o nó mais sensível que
+  o grafo vai para um grafo próprio. Os dois leitores emitem os mesmos códigos, e a suíte ganha 14 casos (538).
+- `kg-mcp`: o teto por área. A política de áreas ganha três chaves opcionais que vêm juntas: `levels` (os níveis em
+  ordem), `ceilings` (cada área compartilhada para o nível mais alto dela) e `default_level` (o nível do grafo sem
+  `x_classification`). Numa área com teto, o grafo acima dele, ou com um nível que `levels` não conhece, sai do
+  `kg_list`, do `kg_get` (com `ref` também, em que a versão atual e a pedida são julgadas), do `kg_history`, do
+  `kg_query` e do `kg_terms`, e responde como o grafo que não existe; as arestas e os ponteiros para ele saem pelo corte
+  do filtro por área. A própria área da identidade não tem teto, e sem `ceilings` nada muda. O rótulo é marcação que a
+  política faz valer, não controle de acesso nó a nó, e o histórico do git ainda guarda o nó que foi movido para outro
+  arquivo.
+- `kg_gate.py --sources`: o gate roda também a conferência de fonte do `kg_trace.py check --strict-sources` sobre os
+  grafos `.kg.yaml` que mede, com os excludes dele, e reprova (rc 1) quando um `sha256` ou `node_sha256` citado não
+  confere, um locator lido pelo `scheme` não acha o trecho, ou o arquivo citado sumiu do git. Com `--touched`, só os
+  grafos alterados e os nós cuja fonte citada mudou. Sem rede: a fonte que é URL conta como não conferida. Vem
+  desligado, então nada muda para o adotante que não liga.
+- Correção de segurança no `kg_trace.py`: dentro de um repositório git, o `provenance.source` só é lido pelo índice.
+  Antes, um nó podia nomear `.git/config/.` (onde o `actions/checkout` guarda o token), um arquivo criado no CI ou um
+  arquivo rastreado que o CI reescreveu, e um locator `quote` virava um sim ou não no log. Agora o que se lê é o blob do
+  índice, nunca o disco, e a fonte que não está no índice é ausente, exista ou não o arquivo no disco, sem olhar o
+  histórico. O caminho com segmento `.git` em qualquer caixa, ou com segmento `.` ou `..`, conta em `outside_root`, e o
+  arquivo de um submódulo não baixado, ou o link rastreado que sai da raiz ou aponta para dentro do `.git`, conta em
+  `schemes.skipped.untracked`; nenhum deles é lido, e o mesmo vale para o locator JSON alcançado pelo `trace:`. A chave
+  `untracked` só aparece quando passa de 0, então a saída sem nenhum segue válida no schema da 4.48. O que um uso local
+  pode ver mudar: a fonte citada que ainda não passou por `git add` agora conta como ausente (rc 4 com
+  `--strict-sources`; antes, era lida do disco), o arquivo gerado ou ignorado conta como ausente também (deixe esses grafos
+  de fora com `--exclude`), e o arquivo editado sem `git add` é julgado pela versão do índice, o que vale também para os
+  pins que o `kg_query --revisit` compara. Medido com o `kg_trace check` da 4.48.0 contra este, com e sem
+  `--strict-sources`: neste repositório, com os excludes padrão e com `--no-default-excludes` (1 fonte lida, 30 ausentes,
+  5 locators JSON ausentes), e no primeiro adotante (4 locators JSON lidos), o rc e todas as contagens são os mesmos,
+  porque toda fonte citada ali é rastreada e está igual no disco. A conferência lê o índice uma vez por rodada: no
+  primeiro adotante, levou de 6,9 a 7,9 s, contra 6,4 a 6,8 s antes.
+- `kg_migrate.py methods plan|apply`: troca o apelido em português da classe de `provenance.method` (`medição`,
+  `leitura`, `juízes`, `derivado`, `testemunho`) pela canônica em inglês, pelo texto, para o grafo pagar o apelido que o contrato v4.21
+  agora avisa. Só a classe muda; o detalhe depois de `: ` fica byte a byte, e os comentários e as aspas ficam. A cauda (valor
+  que começa com aspa dentro do texto, classe fora da lista, sem `: ` depois da classe, maiúscula na classe) é só
+  apontada. O `apply` grava sob as mesmas conferências do `keys`, e o `--confirmed-out` lista os nós `confirmed`
+  tocados. Sem mudança no contrato, e nenhum veredito muda.
+
 ## [4.48.0] - 2026-11-09
 
 Sem mudança de contrato (segue v4.19) e sem mudança de veredito. Tudo aqui só vale quando você pede.

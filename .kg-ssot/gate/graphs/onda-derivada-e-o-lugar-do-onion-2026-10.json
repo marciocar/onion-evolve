@@ -5,6 +5,7 @@
     "form.required.node.provenance"
   ],
   "should": {
+    "form.deprecated.node.provenance.method": 32,
     "form.range.node.label": 41,
     "yaml.unquoted-date": 1
   }

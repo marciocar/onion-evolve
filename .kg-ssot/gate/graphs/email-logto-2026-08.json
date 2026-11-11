@@ -3,6 +3,7 @@
   "id": "email-logto-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 15,
     "form.range.node.label": 19,
     "yaml.unquoted-date": 1
   }

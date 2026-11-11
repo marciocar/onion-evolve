@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/interconnect-profile-2026-11/interconnect-profile-2026-11.kg.yaml",
+  "id": "interconnect-profile-2026-11",
+  "must": [],
+  "should": {
+    "form.deprecated.node.provenance.method": 1
+  }
+}

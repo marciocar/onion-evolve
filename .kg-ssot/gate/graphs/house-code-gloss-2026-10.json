@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml",
   "id": "house-code-gloss-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 12
+  }
 }

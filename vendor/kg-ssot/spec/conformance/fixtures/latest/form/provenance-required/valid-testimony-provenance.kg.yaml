@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "Pessoa A, sessão de trabalho de 2026-10-08"
       locator: "caso de conformidade"
-      method: "testemunho: declaração da Pessoa A na sessão 1"
+      method: "testimony: declaração da Pessoa A na sessão 1"
 edges:
   - from: EV_A
     to: Q_A

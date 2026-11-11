@@ -3,6 +3,7 @@
   "id": "stack-harmonia-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 18,
     "form.range.node.label": 17,
     "yaml.unquoted-date": 1
   }

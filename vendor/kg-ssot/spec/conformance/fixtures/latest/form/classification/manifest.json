@@ -1,0 +1,125 @@
+{
+  "description": "O perfil canônico x_classification (v4.20): o nível de sensibilidade do grafo inteiro, no meta, em texto com a forma de slug. É SHOULD: julgado só quando a chave está presente, nunca reprova. Os níveis e a ordem são da organização, na política de quem serve o grafo, e não no grafo. No nó, x_classification não é perfil e alerta como form.misplaced.node.x_classification: a unidade é o grafo, e o nó mais sensível vai para um grafo próprio. Na aresta, segue chave x_ livre.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-meta-classification.kg.yaml",
+      "description": "o nível do grafo inteiro no meta, em forma de slug (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-classification-digits.kg.yaml",
+      "description": "o nível com dígito e hífen, de um esquema próprio da organização (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-classification-quoted.kg.yaml",
+      "description": "o nível entre aspas é o mesmo texto (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-edge-classification-free.kg.yaml",
+      "description": "x_classification na aresta não é perfil: segue chave x_ livre (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-classification-uppercase.kg.yaml",
+      "description": "o nível com maiúscula, fora da forma de slug (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-meta-classification-space.kg.yaml",
+      "description": "o nível com espaço, fora da forma de slug (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-meta-classification-empty.kg.yaml",
+      "description": "o nível vazio (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-meta-classification-trailing-hyphen.kg.yaml",
+      "description": "o nível que termina em hífen (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-meta-classification-integer.kg.yaml",
+      "description": "o nível em número, não texto (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-meta-classification-list.kg.yaml",
+      "description": "dois níveis numa lista: o grafo tem um nível só (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-meta-classification-null.kg.yaml",
+      "description": "o nível nulo (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_classification"
+      ]
+    },
+    {
+      "file": "warn-node-classification.kg.yaml",
+      "description": "x_classification no nó não é perfil: o nó mais sensível vai para um grafo próprio (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_classification"
+      ]
+    },
+    {
+      "file": "warn-node-classification-with-meta.kg.yaml",
+      "description": "o nível no meta e a exceção no nó: só o do nó alerta (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_classification"
+      ]
+    },
+    {
+      "file": "warn-node-classification-any-value.kg.yaml",
+      "description": "no nó, qualquer valor alerta, até o que seria válido no meta ou o nulo (v4.20)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_classification"
+      ]
+    }
+  ]
+}

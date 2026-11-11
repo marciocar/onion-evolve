@@ -3,6 +3,7 @@
   "id": "engenharia-de-corpus-de-regras-2026-10",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 36,
     "form.range.node.label": 43
   }
 }

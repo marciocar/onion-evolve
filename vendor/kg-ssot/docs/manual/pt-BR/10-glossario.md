@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:df2c7eb3e6f783cc -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:6569c11cc216c355 -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -14,7 +14,7 @@
 | **Carimbo de verificação** | O par `verified_at` e `verified_against` de um nó |
 | **Carimbo do vendor** | O arquivo `.kg-ssot-version` com a tag, o commit, a versão, o contrato e o sha256 de cada arquivo trazido |
 | **Catraca** | Uma conferência que só deixa a medida melhorar ou ficar igual. O gate é a catraca por grafo |
-| **Classe (de `method`)** | `measurement`, `reading`, `judges`, `derived` ou `testimony`; desde o v4.16, os em português, `medição`, `leitura`, `juízes`, `derivado` e `testemunho`, são alias aceitos, sem aviso |
+| **Classe (de `method`)** | `measurement`, `reading`, `judges`, `derived` ou `testimony`; desde o v4.16, os em português, `medição`, `leitura`, `juízes`, `derivado` e `testemunho`, são alias aceitos; desde o v4.21 alertam como `form.deprecated.node.provenance.method`, e saem no v5 |
 | **Código** | O identificador estável de uma violação, como `form.required.node.label` |
 | **Contrato** | Os schemas MUST e SHOULD, mais as regras de perfil YAML e as regras de integridade |
 | **Corpus** | O conjunto de grafos (`.kg.yaml` e `.kg.json`) de um repositório |
@@ -29,10 +29,10 @@
 | **Nó** | Uma afirmação tipada do grafo |
 | **Órfão** | Um nó sem nenhuma aresta. Reprova |
 | **Pacote de auditoria** | Uma linha por item de questionário, com a pergunta, a resposta, o veredito, a evidência datada, os pedidos de evidência, o dono e as lacunas calculadas, em CSV, XLSX ou JSON (`kg_audit.py`), desde a 4.22.0 |
-| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11; `x_criterion` e `x_measured_under` desde o v4.12. Só julga a chave presente, e só alerta |
+| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11; `x_criterion` e `x_measured_under` desde o v4.12; `x_classification`, no `meta`, desde o v4.20. Só julga a chave presente, e só alerta |
 | **Perfil `gate`** | A parte mínima da release: o suficiente para rodar o gate e o check |
 | **Plano** | `DEV` ou `PROD` |
-| **Proveniência** | O objeto `provenance` (`source`, `locator`, `method`): de onde veio a afirmação |
+| **Proveniência** | O objeto `provenance` (`source`, `locator`, `method`): de onde veio a afirmação. Obrigatória no nó `confirmed` ou PROD; desde o v4.21, SHOULD em toda `evidence` que não é `unverifiable` e na `decision` `done` (proveniência sempre) |
 | **Rampa** | Duas acepções: (1) no contrato, um aviso numa versão sobre o que vai reprovar na seguinte; (2) na adoção, subir de versão maior registrando o que passou a reprovar como dívida, e pagar aos poucos |
 | **Release** | Uma tag `kg-ssot-vX.Y.Z` com a superfície listada em `spec/release.json` |
 | **Runner** | O comando que expõe um leitor à suíte: `runner <caso>` imprime um JSON com o veredito |

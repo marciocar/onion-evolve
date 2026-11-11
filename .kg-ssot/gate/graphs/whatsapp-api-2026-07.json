@@ -3,6 +3,7 @@
   "id": "whatsapp-api-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 33,
     "form.range.node.label": 2,
     "yaml.unquoted-date": 1
   }

@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml",
+  "id": "guard-private-repo-cite-2026-11",
+  "must": [],
+  "should": {
+    "form.required.node.provenance": 2
+  }
+}

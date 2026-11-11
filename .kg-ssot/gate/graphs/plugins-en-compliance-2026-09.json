@@ -3,7 +3,9 @@
   "id": "plugins-en-compliance-2026-09",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 22,
     "form.range.node.label": 35,
+    "form.required.node.provenance": 2,
     "integrity.bare-decision": 2
   }
 }

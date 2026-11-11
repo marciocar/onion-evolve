@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml",
   "id": "guard-projection-ids-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 11
+  }
 }

@@ -3,6 +3,7 @@
   "id": "scope-inheritance-2026",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 50,
     "yaml.unquoted-date": 1
   }
 }

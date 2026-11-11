@@ -3,6 +3,7 @@
   "id": "kg-read-leg-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 10,
     "form.range.node.label": 13,
     "yaml.unquoted-date": 1
   }

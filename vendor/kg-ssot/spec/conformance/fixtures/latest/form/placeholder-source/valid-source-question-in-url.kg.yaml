@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "https://example.org/busca?q=a"
       locator: "caso de conformidade"
-      method: "medição: caso de conformidade"
+      method: "measurement: caso de conformidade"
 edges:
   - from: EV_A
     to: Q_A

@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: valid-method-juizes
+  id: warn-method-alias-no-space
 nodes:
   - id: Q_A
     node_type: question
@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "Fonte A"
       locator: "caso de conformidade"
-      method: "juízes: três votos, 3-0"
+      method: "medição:contagem no corpus A"
 edges:
   - from: EV_A
     to: Q_A

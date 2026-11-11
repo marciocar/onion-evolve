@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml",
   "id": "a2a-cross-user-spike-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 32
+  }
 }

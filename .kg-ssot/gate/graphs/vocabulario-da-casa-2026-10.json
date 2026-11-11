@@ -2,5 +2,7 @@
   "graph": "docs/onion/graph/vocabulario-da-casa-2026-10.kg.yaml",
   "id": "vocabulario-da-casa-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 61
+  }
 }

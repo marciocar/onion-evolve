@@ -3,6 +3,8 @@
   "id": "elenxos-2026-08-07",
   "must": [],
   "should": {
-    "form.range.node.label": 21
+    "form.deprecated.node.provenance.method": 17,
+    "form.range.node.label": 21,
+    "form.required.node.provenance": 2
   }
 }

@@ -82,7 +82,7 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 | `impact` | integer | req. 1 to 5 |
 | `confidence` | number | req. 0 to 1 |
 | `label` | string | req. Not empty. SHOULD: up to 280 characters |
-| `provenance` | map | **req. when `status: confirmed` or `plane: PROD`, except with `status: unverifiable`** |
+| `provenance` | map | **req. when `status: confirmed` or `plane: PROD`, except with `status: unverifiable`**. SHOULD since v4.21 (provenance always): on an `evidence` node in any status except `unverifiable`, and on a `decision` `done`, it warns as `form.required.node.provenance`, the same code at the SHOULD level |
 | `trace` | string | where the claim appears (file, path) |
 | `verified_at` | *date* | SHOULD on a PROD node |
 | `verified_against` | string | SHOULD on a `claim` with `verified_at` |
@@ -106,7 +106,7 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 |---|---|---|
 | `source` | string | req. Not empty and not a placeholder (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | string | req. Not empty |
-| `method` | string | req. Not empty. SHOULD: `<class>: <detail>`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony` (the Portuguese `medição`, `leitura`, `juízes`, `derivado`, `testemunho` are accepted aliases, since v4.16) |
+| `method` | string | req. Not empty. SHOULD: `<class>: <detail>`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony` (since v4.21, the Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho` still pass and warn as `form.deprecated.node.provenance.method`; they leave in v5, not before 2027-03-31, and only when the measurement on the first adopter and on its curation repository reaches zero. A value that already fails the form warns only as `form.pattern.node.provenance.method`) |
 | `locality` | enum | optional. `repo` `web` `host` `pessoa` (person) `privado` (private); a value outside the enum warns. It describes where the copy you read lives, not how the document is classified |
 | `x_*` | any | any other key warns; it does not fail |
 
@@ -158,6 +158,7 @@ is free, and any other key warns. Enum values are codes, in English, whatever th
 | `x_measured_under` | node | the criterion versions a result was measured under (v4.12) |
 | `x_confidence` | edge | how sure the link is, from 0 to 1 |
 | `x_provisional` | edge | `true` when the link still waits for a check |
+| `x_classification` | meta | the sensitivity level of the whole graph, one level of the organization's own scheme (v4.20) |
 
 ### `x_term`
 
@@ -316,6 +317,32 @@ unknown, the other counts by its day in UTC, and a gap of up to one day cannot t
 `round` decides (the round that motivated the amendment): rounds are labels, not an order. A date on a day that does
 not exist (February 30) is not compared. The `sha256` against the text or the file, and a
 citation of another graph, are checked by `kg_criterion.py` (chapter 5).
+
+### `x_classification` (v4.20)
+
+`meta.x_classification` marks how sensitive the whole graph is: one level, written as a slug (lowercase letters,
+digits, and hyphens), such as `confidential`. The contract fixes only the shape. The levels and their order belong to
+the organization and live in the policy of the server that serves the graph, never in the graph: in the `kg-mcp`, the
+`levels` of the area policy (chapter 5). A level outside the shape warns as `form.pattern.meta.x_classification`, and a
+value that is not text as `form.type.meta.x_classification`.
+
+```yaml
+meta:
+  id: payroll-2026
+  x_classification: confidential
+```
+
+The unit is the graph. A node more sensitive than the rest of its graph goes to a graph of its own, with the level in
+that graph's `meta`. So `x_classification` on a node is not a profile, and it warns as
+`form.misplaced.node.x_classification`, whatever its value. On an edge, it is a free `x_` key.
+
+The label is a marking that the server's policy enforces when it reads, not access control node by node: a reader
+that ignores the policy sees the graph like any other. Moving a node to another file does not take it out of the git
+history, where the old version still holds it.
+
+As an example of mapping, not as the standard: the TLP 2.0 of FIRST names audiences (`clear`, `green`, `amber`,
+`amber-strict`, `red`) for sharing between organizations, and states that it is not a formal classification scheme. An
+organization that uses it writes those names as its `levels`, in that order.
 
 ## Recording an external event (recommended shape, not normative)
 

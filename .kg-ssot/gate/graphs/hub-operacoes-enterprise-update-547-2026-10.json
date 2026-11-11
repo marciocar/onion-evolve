@@ -3,6 +3,7 @@
   "id": "hub-operacoes-enterprise-update-547-2026-10",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 7,
     "form.range.node.label": 7
   }
 }

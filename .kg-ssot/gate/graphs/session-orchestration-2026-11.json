@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/session-orchestration-2026-11/session-orchestration-2026-11.kg.yaml",
   "id": "session-orchestration-2026-11",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 14
+  }
 }

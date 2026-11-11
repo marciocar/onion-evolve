@@ -16,6 +16,10 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "A evidência sintética A, superada."
+    provenance:
+      source: "Fonte EV_A"
+      locator: "caso de conformidade"
+      method: "measurement: caso sintético"
   - id: EV_OLD
     node_type: evidence
     plane: DEV
@@ -23,6 +27,10 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "A evidência sintética mais velha."
+    provenance:
+      source: "Fonte EV_OLD"
+      locator: "caso de conformidade"
+      method: "measurement: caso sintético"
 edges:
   - from: EV_A
     to: EV_OLD

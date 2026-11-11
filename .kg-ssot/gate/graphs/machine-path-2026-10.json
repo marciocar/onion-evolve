@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml",
   "id": "machine-path-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 8
+  }
 }

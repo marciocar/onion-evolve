@@ -3,7 +3,9 @@
   "id": "colaboracao-onion-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 28,
     "form.range.node.label": 3,
+    "form.required.node.provenance": 5,
     "form.required.node.verified_at": 7,
     "integrity.bare-decision": 3,
     "integrity.superseded-without-successor": 1,

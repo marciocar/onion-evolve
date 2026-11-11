@@ -3,6 +3,8 @@
   "id": "backlog-grafo-2026-08",
   "must": [],
   "should": {
-    "form.range.node.label": 19
+    "form.deprecated.node.provenance.method": 19,
+    "form.range.node.label": 19,
+    "form.required.node.provenance": 2
   }
 }

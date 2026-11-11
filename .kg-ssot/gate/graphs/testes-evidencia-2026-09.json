@@ -3,7 +3,9 @@
   "id": "testes-evidencia-2026-09",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 25,
     "form.range.node.label": 34,
+    "form.required.node.provenance": 5,
     "integrity.untraced-decision": 8
   }
 }

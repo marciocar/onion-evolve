@@ -2,5 +2,7 @@
   "graph": "docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml",
   "id": "intelligent-ui-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 30
+  }
 }

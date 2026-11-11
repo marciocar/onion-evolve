@@ -2,5 +2,7 @@
   "graph": "docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml",
   "id": "rea-method-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 2
+  }
 }

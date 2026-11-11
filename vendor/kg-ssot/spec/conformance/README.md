@@ -68,7 +68,7 @@ Each code is a stable slug per layer, and the metaschema checks its shape.
 | yaml | `yaml.<rule>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<rule>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked`, and the `semantic.domain-*` codes of the domain layer (SHOULD), only in `optional/` |
 
-`<kind>` ∈ `required enum type pattern range const unknown-key exclusive`. `<scope>` ∈ `top meta node edge`.
+`<kind>` ∈ `required enum type pattern range const unknown-key exclusive misplaced deprecated`. `<scope>` ∈ `top meta node edge`.
 In a nested object, `<field>` is the dotted path: `form.required.node.provenance.locator`.
 `range` also covers text length: `label: ""` (MUST) and a `label` longer than 280 characters (SHOULD, because the
 narrative goes in `narrative`). Length counts code points, like JSON Schema's `maxLength`: an emoji counts as 1, not
@@ -90,7 +90,7 @@ What v4 changed in severity, and what it added:
 | `form.unknown-key.<scope>.<key>` (a key outside the grammar and without `x_`, at the top level, in meta, in a node, or in an edge) | SHOULD | **MUST** |
 | `form.pattern.<scope>.key` (a name that is not a slug, without `x_`) | SHOULD | **MUST** (with `x_`, still SHOULD) |
 | `form.pattern.node.provenance.source` (a placeholder `source`: whitespace only, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hyphens, an em dash, `?`...) | — | **MUST** (an empty value still gives `form.range`) |
-| `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony`, or, since v4.16, their Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST in v5) |
+| `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony`, or, since v4.16, their Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, which warn as `form.deprecated.node.provenance.method` since v4.21) | — | SHOULD (MUST in v5) |
 | `form.unknown-key.node.provenance.<key>` (an unknown key inside `provenance`) | SHOULD | SHOULD |
 
 v4.1 adds four SHOULD warnings (no verdict changes; `latest/form/unanchored/` and `latest/integrity/coherence/`).
@@ -244,6 +244,15 @@ v4.14 adds `scheme` to the `x_term` profile (a slug; without it, the scheme is t
 `refuted`) with the same `notation` in the same scheme, between nodes of the same graph. The notation compares exactly.
 The corpus as a whole and the codes in prose belong to `kg_vocab.py lint`, which is not part of the suite.
 
+v4.20 adds the `x_classification` profile, in the SHOULD (`latest/form/classification/`): the sensitivity level of the
+whole graph, in `meta`, as text in slug form (lowercase, digits, and hyphens). Outside that form it warns as
+`form.pattern.meta.x_classification`, and a value that is not text as `form.type.meta.x_classification`. The levels and
+their order belong to the organization, in the policy of whoever serves the graph, not in the graph. On a node,
+`x_classification` is not a profile and warns as `form.misplaced.node.x_classification`, whatever the value: the unit
+is the graph. On an edge it stays a free `x_` key. Nothing that passed fails.
+
+v4.21 adds two SHOULD warnings. In `latest/form/method-vocabulary/`, the Portuguese class of `provenance.method` (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) still passes and warns as `form.deprecated.node.provenance.method` (a `not` with the `deprecated` keyword, which only annotates); a value that already fails the form keeps only `form.pattern.node.provenance.method`, and the alias leaves in v5, not before 2027-03-31. In `latest/form/provenance-always/`, an `evidence` node without `provenance` in any status except `unverifiable`, and a `decision` `done` without it, warn as `form.required.node.provenance`, the code of the MUST rule; on a node where the MUST already flags it, the reader does not repeat it as a warning, and on another node of the same document it still warns (the deduplication is per occurrence). Nothing that passed fails.
+
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 
 ## Folders
@@ -265,11 +274,11 @@ sealed, that is, merged into the product graph, **and** the schema in `spec/` al
 (for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
 Nothing gets ahead of an open decision.
 
-**Today's score.** The reference reader passes 100% of `latest/`: 438 cases against contract v4, 32 of them
+**Today's score.** The reference reader passes 100% of `latest/`: 555 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
-verdict v4 changes became `bad-*` cases. Every case uses a valid `method` (`medição: caso de conformidade`, the Portuguese alias), so
-the vocabulary warning shows up only where a case asks for it. `proposals/` is empty.
+verdict v4 changes became `bad-*` cases. Every case uses a valid `method` in the canonical English class (`measurement: caso de conformidade`, since v4.21), so
+the vocabulary warnings show up only where a case asks for them. `proposals/` is empty.
 
 ## Run
 

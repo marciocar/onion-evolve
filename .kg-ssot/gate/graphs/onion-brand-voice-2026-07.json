@@ -3,6 +3,7 @@
   "id": "onion-brand-voice-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 6,
     "form.required.node.verified_against": 3,
     "integrity.untraced-decision": 1,
     "yaml.unquoted-date": 1

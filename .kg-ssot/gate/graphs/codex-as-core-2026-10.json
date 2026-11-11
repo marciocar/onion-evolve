@@ -2,5 +2,7 @@
   "graph": "docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml",
   "id": "codex-as-core-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 56
+  }
 }

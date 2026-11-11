@@ -3,6 +3,7 @@
 
   kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]
   kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]
+  kg_migrate.py methods plan|apply [--json] [--confirmed-out ARQ.tsv] [--root DIR] [--exclude GLOB] [grafo.kg.yaml ...]
 
 O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primeira cujo when casa decide a ação do nó
 (propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por
@@ -39,6 +40,7 @@ import posixpath
 import re
 import subprocess
 import sys
+import unicodedata
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 sys.dont_write_bytecode = True  # sem .pyc em vendor/kg-ssot/tools/__pycache__, que o kg_vendor.py check acusa
@@ -300,7 +302,10 @@ def plan(prof, graphs, root):
             if None in (src, loc, det):
                 rows.append((g.rel, n["id"], rule["id"], "review", None, "um marcador do template resolveu para vazio"))
                 continue
-            prov = {"source": src, "locator": loc, "method": f"{p['method']['class']}: {det}" + (f"; {note}" if note else "")}
+            # v4.21: o apelido em português da classe no perfil vira a classe em inglês na escrita, porque o contrato
+            # avisa o apelido (form.deprecated.node.provenance.method) e a proposta seria recusada por aviso novo
+            cls = METHOD_ALIASES.get(p["method"]["class"], p["method"]["class"])
+            prov = {"source": src, "locator": loc, "method": f"{cls}: {det}" + (f"; {note}" if note else "")}
             if "locality" in p:
                 prov["locality"] = p["locality"]
             problem = contract_problem(dict(n, provenance=prov), must, should)
@@ -1193,6 +1198,254 @@ def nest_command(args):
     return 1 if any(not ok for _r, ok, _w in report) else 0
 
 
+# --- methods: a classe de provenance.method em português vira a canônica em inglês ----------------------------------
+# O v4.16 deu à classe a forma canônica em inglês e aceitou as cinco em português como apelido, sem aviso. A tabela é a
+# única coisa que o schema não diz (qual apelido é qual classe); o conjunto das dez é conferido contra o pattern do
+# SHOULD vigente, e um contrato que mude a lista faz do migrador entrada quebrada, nunca uma troca adivinhada.
+METHOD_ALIASES = {"medição": "measurement", "leitura": "reading", "juízes": "judges", "derivado": "derived",
+                  "testemunho": "testimony"}
+METHOD_ALIAS_RE = re.compile(r"^(medição|leitura|juízes|derivado|testemunho): ")
+METHOD_CANON_RE = re.compile(r"^(?:measurement|reading|judges|derived|testimony): ")
+METHOD_ALL = set(METHOD_ALIASES) | set(METHOD_ALIASES.values())
+
+
+def method_classes(should):
+    """As classes que o pattern de provenance.method do SHOULD aceita, lidas do schema."""
+    try:
+        pattern = should["properties"]["nodes"]["items"]["properties"]["provenance"]["properties"]["method"]["pattern"]
+    except (KeyError, TypeError):
+        raise Broken(_("the SHOULD schema has no pattern for provenance.method"))
+    m = re.match(r"^\^\(\?:([^)]*)\): ", pattern)
+    if not m:
+        raise Broken(_("the SHOULD pattern for provenance.method is not in the form the migrator reads"))
+    return set(m.group(1).split("|"))
+
+
+def method_kind(value):
+    """('swap', apelido), ('tail', motivo) ou None (a forma canônica, ou um valor que não é texto)."""
+    if not isinstance(value, str):
+        return None
+    m = METHOD_ALIAS_RE.match(value)
+    if m:
+        # o detalhe vazio ou que começa com espaço não passa no pattern do SHOULD: trocar o prefixo esconderia isso
+        if not re.match(r"[^ \t\n\r]", value[m.end():]):
+            return ("tail", "bad-detail")
+        return ("swap", m.group(1))
+    if METHOD_CANON_RE.match(value):
+        return None
+    if value[:1] in ("'", '"'):
+        return ("tail", "quoted")
+    head = re.match(r"[^:\s]*", value).group(0)
+    nfc = unicodedata.normalize("NFC", head)
+    if nfc != head and (nfc in METHOD_ALL or nfc.lower() in METHOD_ALL):
+        return ("tail", "nfd")  # medição ou juízes com o acento decomposto: o pattern do SHOULD não casa
+    if head not in METHOD_ALL and head.lower() in METHOD_ALL:
+        return ("tail", "uppercase")
+    if head in METHOD_ALL:
+        return ("tail", "no-separator")
+    return ("tail", "unknown-class")
+
+
+def method_tail_reason(code):
+    """O motivo legível da cauda: quoted (a aspa dentro do texto), unknown-class, no-separator, uppercase, bad-detail
+    (o detalhe vazio ou começando com espaço) e nfd (o acento decomposto)."""
+    return {"bad-detail": _("the detail after ': ' is empty or starts with a space"),
+            "nfd": _("the class has a decomposed accent (NFD)"),
+            "quoted": _("the value starts with a quote inside the string"),
+            "unknown-class": _("the class is outside the list"),
+            "no-separator": _("no ': ' after the class"),
+            "uppercase": _("uppercase in the class")}[code]
+
+
+def method_plan(text, doc):
+    """[(índice, id, status, ação, antigo, novo, motivo, (linha, coluna) ou None)] de um arquivo, ação em swap, review
+    ou tail. O swap troca só o apelido no começo do valor; o resto, depois de ': ', fica byte a byte."""
+    import yaml
+    root, shared = _shared_nodes(text)
+    seq = next((v for k, v in root.value if getattr(k, "value", None) == "nodes"), None) \
+        if isinstance(root, yaml.MappingNode) else None
+    nodes = doc.get("nodes") if isinstance(doc.get("nodes"), list) else []
+    lines = text.splitlines()
+    rows = []
+    for i, node in enumerate(nodes):
+        prov = node.get("provenance") if isinstance(node, dict) else None
+        old = prov.get("method") if isinstance(prov, dict) else None
+        kind = method_kind(old)
+        if kind is None:
+            continue
+        nid, status = node.get("id"), node.get("status")
+        if kind[0] == "tail":
+            rows.append((i, nid, status, "tail", old, None, kind[1], None))
+            continue
+        alias = kind[1]
+        new = METHOD_ALIASES[alias] + old[len(alias):]
+        why, at = None, None
+        item = seq.value[i] if isinstance(seq, yaml.SequenceNode) and i < len(seq.value) else None
+        pnode = next((v for k, v in item.value if getattr(k, "value", None) == "provenance"), None) \
+            if isinstance(item, yaml.MappingNode) else None
+        mnode = next((v for k, v in pnode.value if getattr(k, "value", None) == "method"), None) \
+            if isinstance(pnode, yaml.MappingNode) else None
+        if not isinstance(item, yaml.MappingNode) or item.flow_style:
+            why = _("node in flow style ({...}): edit it by hand")
+        elif any(id(x) in shared for x in (seq, item, pnode, mnode) if x is not None) or any(
+                getattr(k, "value", None) == "<<" for x in (item, pnode) if isinstance(x, yaml.MappingNode)
+                for k, _v in x.value):
+            # a lista, o nó ou a provenance com âncora usada em outro lugar, ou com a chave de merge: uma edição no texto
+            # mudaria mais de um nó, e o plano tem de prever o apply
+            why = _("the method has an anchor (&) or an alias (*)")
+        elif not isinstance(mnode, yaml.ScalarNode) or mnode.value != old:
+            why = _("the method is written in a form the migrator does not edit")
+        elif mnode.style not in (None, "'", '"'):
+            why = _("the method is a block scalar (| or >): edit it by hand")
+        else:
+            ln, col = mnode.start_mark.line, mnode.start_mark.column + (0 if mnode.style is None else 1)
+            line = lines[ln] if ln < len(lines) else ""
+            if line[col:col + len(alias) + 1] == alias + ":":
+                at = (ln, col)
+            else:
+                why = _("the method is written in a form the migrator does not edit")
+        rows.append((i, nid, status, "review" if why else "swap", old, new, why, at))
+    return rows
+
+
+def methods_apply_text(text, doc, rows):
+    """(texto novo, motivo): o apelido de cada swap trocado no texto, e o motivo se a releitura não for a de antes com
+    só os methods trocados, ou se o diff tocar outra linha."""
+    import copy
+    todo = [r for r in rows if r[3] == "swap"]
+    lines = text.splitlines(keepends=True)
+    for r in sorted(todo, key=lambda r: r[7], reverse=True):  # da direita para a esquerda numa mesma linha
+        (ln, col), alias = r[7], METHOD_ALIAS_RE.match(r[4]).group(1)
+        lines[ln] = lines[ln][:col] + METHOD_ALIASES[alias] + lines[ln][col + len(alias):]
+    new = "".join(lines)
+    _t, new_doc, c2 = kg_validate.parse_v1(new)
+    if c2 is not None:
+        return new, _("the edited text does not parse ({code})").format(code=c2)
+    want = copy.deepcopy(doc)
+    for r in todo:
+        want["nodes"][r[0]]["provenance"]["method"] = r[5]
+    if new_doc != want:
+        return new, _("the reread document differs from the old one beyond the swapped methods")
+    edited = {r[7][0] for r in todo}
+    old_lines, new_lines = text.splitlines(), new.splitlines()
+    if len(old_lines) != len(new_lines) or any(a != b for i, (a, b) in enumerate(zip(old_lines, new_lines))
+                                               if i not in edited):
+        return new, _("the text diff touched a line without a swapped method")
+    return new, None
+
+
+def methods_command(args):
+    """kg_migrate.py methods plan|apply: a classe de provenance.method em português trocada pela canônica em inglês."""
+    must = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+    should_schema = json.loads(kg_validate.CONTRACT_SHOULD.read_text(encoding="utf-8"))
+    should = kg_validate.make_validator(should_schema)
+    if method_classes(should_schema) != METHOD_ALL:
+        raise Broken(_("the classes of provenance.method in the SHOULD schema are not the ones the migrator knows: {classes}")
+                     .format(classes=", ".join(sorted(method_classes(should_schema)))))
+    applying = args.mcmd == "apply"
+    files = args.graphs or tracked_graphs(args.root, args.exclude, not args.no_default_excludes)
+    unique = {}  # o mesmo arquivo dado duas vezes, ou por um symlink, conta uma vez só
+    for f in files:
+        unique.setdefault(pathlib.Path(f).resolve(), f)
+    graphs, files, broken = load_graphs(list(unique.values()), args.root, lenient=not args.graphs)
+    report, all_rows, written = [], [], set()
+    for g, f in zip(graphs, files):
+        path = pathlib.Path(f).resolve()
+        text = path.read_bytes().decode("utf-8")
+        crlf = "\r\n" in text
+        if (crlf and text.count("\n") != text.count("\r\n")) or "\r" in text.replace("\r\n", ""):
+            report.append((g.rel, False, [_("mixed line endings (\\r\\n with \\n or a lone \\r): normalize first")], 0))
+            continue
+        old = text.replace("\r\n", "\n") if crlf else text
+        _t, doc, _c = kg_validate.parse_v1(old)
+        rows = method_plan(old, doc)
+        all_rows.extend((g.rel,) + r for r in rows)
+        if not applying or not any(r[3] == "swap" for r in rows):
+            continue
+        new, problem = methods_apply_text(old, doc, rows)
+        fallen = 0
+        if problem is None:
+            before, after = set(kg_validate.codes(old, must)), set(kg_validate.codes(new, must))
+            if after - before:
+                problem = _("the file would gain a new MUST code: {codes}").format(codes=", ".join(sorted(after - before)))
+        if problem is None:
+            w_old, w_new = kg_validate.warning_counts(old, must, should), kg_validate.warning_counts(new, must, should)
+            grown = w_new - w_old
+            if grown:
+                problem = _("the file would gain a SHOULD warning: {codes}").format(codes=", ".join(sorted(grown)))
+            fallen = sum((w_old - w_new).values())
+        if problem:
+            report.append((g.rel, False, [problem], 0))
+            continue
+        tmp = path.with_name(path.name + ".kg-migrate.tmp")
+        tmp.write_bytes((new.replace("\n", "\r\n") if crlf else new).encode("utf-8"))
+        try:
+            os.chmod(tmp, path.stat().st_mode & 0o7777)
+        except OSError:
+            pass
+        tmp.replace(path)
+        written.add(g.rel)
+        report.append((g.rel, True, [], fallen))
+    swaps = [r for r in all_rows if r[4] == "swap"]
+    touched = [r for r in swaps if (r[0] in written if applying else True) and r[3] == "confirmed"]
+    if args.confirmed_out:
+        try:
+            with open(args.confirmed_out, "w", encoding="utf-8", newline="") as fh:
+                w = csv.writer(fh, delimiter="\t", lineterminator="\n")
+                w.writerow(["graph", "id", "status"])
+                for r in touched:
+                    w.writerow([r[0], r[2], r[3]])
+        except OSError as exc:
+            raise Broken(_("cannot write {path}: {exc}").format(path=args.confirmed_out, exc=exc))
+    by_class = collections.Counter(METHOD_ALIAS_RE.match(r[5]).group(1) for r in swaps)
+    by_graph = collections.Counter(r[0] for r in swaps)
+    by_tail = collections.Counter(r[7] for r in all_rows if r[4] == "tail")
+    fallen = sum(x[3] for x in report)
+    if args.json:
+        print(json.dumps({
+            "rows": [{"file": r[0], "id": r[2], "status": r[3], "action": r[4], "old": r[5], "new": r[6],
+                      "reason": r[7] if r[4] == "tail" else None,
+                      "message": method_tail_reason(r[7]) if r[4] == "tail" else r[7]} for r in all_rows],
+            "counts": {"by_class": {f"{a} → {METHOD_ALIASES[a]}": n for a, n in sorted(by_class.items())},
+                       "by_graph": dict(sorted(by_graph.items())), "tail": dict(sorted(by_tail.items())),
+                       "swaps": len(swaps), "graphs": len(by_graph),
+                       "review": sum(1 for r in all_rows if r[4] == "review"), "confirmed": len(touched)},
+            "unreadable": [{"file": rel, "code": code} for rel, code in broken],
+            "refused": [{"file": rel, "reasons": why} for rel, ok, why, _fl in report if not ok],
+            "applied": [{"file": rel, "written": ok, "reasons": why, "should_fallen": fl} for rel, ok, why, fl in report]
+            if applying else None}, ensure_ascii=False))
+    else:
+        for r in all_rows:
+            if r[4] == "swap":
+                alias = METHOD_ALIAS_RE.match(r[5]).group(1)
+                print(f"{_('SWAP'):8}  {r[0]}  {r[2]}  {alias} → {METHOD_ALIASES[alias]}")
+            elif r[4] == "review":
+                print(f"{_('REVIEW'):8}  {r[0]}  {r[2]}  ({r[7]})")
+            else:
+                print(f"{_('TAIL'):8}  {r[0]}  {r[2]}  ({method_tail_reason(r[7])}): {r[5][:80]!r}")
+        for rel, code in broken:
+            print(_("REVIEW").ljust(8) + "  " + rel + "  " + _("graph that does not parse ({code}): left out").format(code=code))
+        for rel, ok, why, _fl in report:
+            print(f"{(_('WRITTEN') if ok else _('REFUSED')):8}  {rel}" + "".join(f"\n    {w}" for w in why))
+        print(_("· by class:"))
+        for a, n in sorted(by_class.items()):
+            print(f"  {n:5d}  {a} → {METHOD_ALIASES[a]}")
+        print(_("· by graph:"))
+        for rel, n in sorted(by_graph.items()):
+            print(f"  {n:5d}  {rel}")
+        if by_tail:
+            print(_("· tail (only pointed out, never rewritten):"))
+            for code, n in sorted(by_tail.items()):
+                print(f"  {n:5d}  {method_tail_reason(code)}")
+        print(_("· {swaps} method(s) to swap in {files} file(s), {review} for the reviewer, {tail} in the tail, "
+                "{confirmed} confirmed node(s) touched{written}").format(
+            swaps=len(swaps), files=len(by_graph), review=sum(1 for r in all_rows if r[4] == "review"),
+            tail=sum(by_tail.values()), confirmed=len(touched),
+            written=(_("; {n} file(s) written, {fallen} SHOULD warning(s) fewer").format(
+                n=len(written), fallen=fallen) if applying else _("; nothing was written (plan)"))))
+    return 1 if any(not ok for _r, ok, _w, _f in report) else 0
+
+
 def load_graphs(files, root, lenient=False):
     """Os grafos lidos. Com lenient (a lista veio do git), o grafo que não parseia volta à parte, para quem revisa."""
     out, broken = [], []
@@ -1244,7 +1497,7 @@ def tracked_graphs(root, exclude=(), defaults=True):
 def broken_input(args, exc):
     """Entrada quebrada (rc 2). No plan --json, o objeto no stdout, que o erro de uso do argparse (rc 2, só no stderr)
     nunca escreve: quem lê a máquina distingue os dois sem casar frase."""
-    if args.cmd in ("plan", "keys", "nest") and args.json:
+    if args.cmd in ("plan", "keys", "nest", "methods") and getattr(args, "json", False):
         print(json.dumps({"error": str(exc), "reason": "broken_input"}, ensure_ascii=False))
     else:
         print(_("BROKEN INPUT  {error}").format(error=exc))
@@ -1259,6 +1512,14 @@ def main(argv=None):
         "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "  kg_migrate.py methods plan|apply [--json] [--confirmed-out FILE.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "\n"
+        "methods swaps the Portuguese alias of the provenance.method class (medição, leitura, juízes, derivado, testemunho)\n"
+        "for the canonical English one (measurement, reading, judges, derived, testimony), by text: only the class changes,\n"
+        "the detail after ': ' stays byte for byte, and comments and quoting stay. The tail (a value that starts with a quote\n"
+        "inside the string, a class outside the list, no ': ' after the class, uppercase in the class) is only pointed out,\n"
+        "and a node in flow style, an anchored method or a block scalar goes to the reviewer. apply writes under the same\n"
+        "checks as keys and counts the SHOULD warnings that fall; --confirmed-out writes the confirmed nodes touched.\n"
         "\n"
         "nest (4.21.0) moves the adopter's own x_ keys into a canonical node profile (x_mirror, x_doc_cycle, x_questionnaire),\n"
         "by text, as the map says (spec/kg-migrate-nest.schema.json): each profile field comes from a constant, from an x_ key\n"
@@ -1331,11 +1592,29 @@ def main(argv=None):
     n.add_argument("--no-default-excludes", action="store_true",
                    help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
     n.add_argument("graphs", nargs="*")
+    mt = sub.add_parser("methods", help=_("swaps the Portuguese alias of the provenance.method class for the English one"))
+    msub = mt.add_subparsers(dest="mcmd", required=True)
+    for name, text in (("plan", _("lists the swaps and the tail without writing anything")),
+                       ("apply", _("writes the swaps, with invariance and gate per file"))):
+        m = msub.add_parser(name, help=text)
+        m.add_argument("--root", default=".")
+        m.add_argument("--json", action="store_true")
+        m.add_argument("--confirmed-out", help=_("writes graph, id and status of the confirmed nodes touched, as TSV"))
+        m.add_argument("--exclude", action="append", default=[],
+                       help=_("extra glob to leave out of the git list (fnmatch: * crosses /, as in kg_gate.py)"))
+        m.add_argument("--no-default-excludes", action="store_true",
+                       help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
+        m.add_argument("graphs", nargs="*")
     args = ap.parse_args(argv)
     kg_validate._utf8_stdio()  # no Windows, a saída para arquivo ou pipe seria cp1252 e derrubaria o → do JSON
     if args.cmd == "nest":
         try:
             return nest_command(args)
+        except Broken as exc:
+            return broken_input(args, exc)
+    if args.cmd == "methods":
+        try:
+            return methods_command(args)
         except Broken as exc:
             return broken_input(args, exc)
     if args.cmd == "keys":

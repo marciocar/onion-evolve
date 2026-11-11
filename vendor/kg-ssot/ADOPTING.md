@@ -280,6 +280,33 @@ graph counts as new there. In a pull request, pass the target branch (`origin/ma
 does not replace the ratchet: a graph that already fails the MUST level can hide a node (a repeated id, no id). If a
 graph did not parse at the base, all of its nodes count as new. In a criss-cross merge, git picks one of the ancestors.
 
+**Cited sources.** `kg_gate.py --sources` also runs the source check of `kg_trace.py check --strict-sources` on the
+`.kg.yaml` graphs the gate measures, with the gate's excludes (not the `kg_trace` ones: the gate does not leave out
+`testdata/` or `__snapshots__/`, for example) and with the vendor left out. A `.kg.json` is not checked here; run
+`kg_trace.py check --strict-sources` for it. It fails (rc 1) when a `provenance.sha256` does not match the bytes of the
+cited file, when a `node_sha256` does not match the cited node, when a locator read by its `scheme` is not found, or when
+the cited file is gone from git. In the ratchet mode it checks the whole corpus; with `--touched`, only the changed graphs
+and the nodes, in any graph, whose cited source changed since the ancestor, so an old stale hash in a graph that nobody
+touched, with a source nobody touched, does not fail the pull request.
+
+Only a file that git tracks is read, and what is read is its blob in the index, never the disk, so the `sha256` you cite
+is the one of the blob (`git show :<path> | sha256sum`), as in 4.48.0, and not the one of a checkout with `autocrlf`: a tracked file the CI
+rewrites before the tests is judged by its versioned content, and a local edit is not judged until `git add`. A source
+that is not in the index is missing, whether or not the file exists on disk, so the rc never says whether a path
+exists: a cited file you forgot to `git add` fails, and so do a file the CI generates and an ignored file (leave those
+graphs out with `--exclude`). A file in a submodule that is not checked out, a tracked link that leaves the root or
+points into `.git`, and a path with a `.git` segment in any case or a `.` or `..` segment are counted as not checked.
+None of them is read, so a node cannot turn a file the CI created, or `.git/config`, into a yes or no in the log. A
+source the pull request deletes or renames is missing too. If a source you cite lives in a submodule or an ignored folder, leave those graphs out with
+`--exclude`. The gate does not go to the network: a URL source is not read (`kg_trace.py check --with` reads one at a
+pinned commit). The `· --sources` line counts each kind apart: URL, absolute path, not readable from git (submodule, link), form-only scheme,
+out of form (scheme, locator, or hash), and other. A node with no `scheme`, `sha256`, or `node_sha256` is not judged.
+
+It is off by default, so an adopter that does not turn it on pays nothing; one that does pays one read of each cited
+file. There is no baseline for it, and it does not go with `--update`: a hash that is already stale fails the ratchet
+mode on the first run, so run it once locally before adding it. In the CI step above, the last line becomes
+`python3 -I -B vendor/kg-ssot/tools/kg_gate.py --sources`.
+
 **Debt per node.** Per graph, a spread-out improvement shows up as a regression: fixing 3 occurrences in one graph and
 creating 1 in another counts as +1 graph. Since `contract-v4.2.0`, `kg_gate.py --update --granularity node` counts and
 locks the SHOULD debt per occurrence, summed across all graphs. The baseline keeps the granularity, and the gate uses
@@ -364,6 +391,17 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.48.0` to `kg-ssot-v4.49.0`, contracts v4.20 and v4.21 come in, SHOULD only: no graph that passed
+fails, and no MUST verdict changes. v4.20 adds the `x_classification` profile in `meta`. v4.21 adds two warnings:
+`form.deprecated.node.provenance.method`, the Portuguese class of `provenance.method` (`medição`, `leitura`, `juízes`,
+`derivado`, `testemunho`), which still passes and leaves in v5, not before 2027-03-31 (write `measurement`, `reading`,
+`judges`, `derived`, or `testimony`); and `form.required.node.provenance` at the SHOULD level, an `evidence` node that is
+not `unverifiable` or a `decision` `done` without `provenance`. When your graphs carry them, both are new SHOULD debt
+codes, and `kg_gate.py` fails after the update, with a baseline per graph or per node (`--granularity node`). Measured on the first adopter, at the
+version this repository pins: the alias in 5318 occurrences and provenance always in 157 nodes. Accept them as baseline with the
+reason, which keeps the ratchet against growth: `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+--accept-regression "contract v4.21: the Portuguese method alias and provenance always, debt that already existed"`, or your own gate's equivalent. To pay the alias instead, `kg_migrate.py methods apply` swaps it for the English class. Demoting a node without giving it a source trades the MUST for a SHOULD on the same node: a `confirmed` `evidence` that goes to `open`, or a `decision` `done` that leaves PROD, still lacks `provenance`, and the gate reports `form.required.node.provenance` as new SHOULD debt and asks for `--accept-regression`. The path of the hints passes clean: `unverifiable` for an `evidence` with no recoverable source, and, for a decision, its source as who decided, with method `testimony`.
 
 From `kg-ssot-v4.47.0` to `kg-ssot-v4.48.0`, nothing is required: the contract (v4.19) and the verdicts are the same, and
 the vendor brings no new file. One thing is opt-in: `kg-mcp --area-policy FILE`, on top of `--identity-header`, for an

@@ -3,6 +3,8 @@
   "id": "jev-type-safe-ai-2026-10",
   "must": [],
   "should": {
-    "form.range.node.label": 39
+    "form.deprecated.node.provenance.method": 28,
+    "form.range.node.label": 39,
+    "form.required.node.provenance": 2
   }
 }

@@ -3,6 +3,7 @@
   "id": "perception-instruments-2026-07",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 9,
     "form.required.node.verified_against": 9,
     "yaml.unquoted-date": 1
   }

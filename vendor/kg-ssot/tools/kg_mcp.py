@@ -36,7 +36,9 @@ essas, cujos grafos saem como @<área>/<grafo>; só as áreas legíveis são abe
 (arestas, e os ponteiros para grafo em provenance, trace, verified_against, verified_scope e reverify_on) sai inteira de
 kg_get, kg_list, kg_history, kg_query e kg_terms, sem id, sem arquivo e sem contar. Gravar continua sendo só na própria
 área. O que o filtro não vê: id e caminho escritos em texto livre (label, narrative, campos x_, mensagem de commit) e o
-provenance.source que aponta para um arquivo que não é grafo.
+provenance.source que aponta para um arquivo que não é grafo. O teto por área (levels, ceilings e default_level na
+política, contrato v4.20): numa área com teto, o grafo cujo meta.x_classification passa dele, ou que a lista de níveis
+não conhece, não é entregue e responde como o grafo que não existe.
 
 Uso:
   kg_mcp.py --root DIR [--backend disk|git|versioned] [--init] [--author "Nome <email>"] [--read-only]
@@ -473,9 +475,14 @@ class AreaPolicy:
     {"schema_version": 1, "canonical": "c-empresa", "groups": {"g-financeiro": ["ana@x.org"]}}
 
     O arquivo é relido quando muda, e a remoção de alguém vale na requisição seguinte, sem reiniciar. Depois de subir,
-    um arquivo que some ou quebra fecha a leitura: cada identidade fica só com a própria área, até ele voltar a valer."""
+    um arquivo que some ou quebra fecha a leitura: cada identidade fica só com a própria área, até ele voltar a valer.
 
-    KEYS = {"schema_version", "canonical", "groups"}
+    O teto por área (contrato v4.20): levels (a lista ordenada dos níveis da organização, do
+    menos ao mais sensível), ceilings ({área compartilhada: nível}) e default_level (o nível do grafo sem
+    meta.x_classification) vêm juntos. Numa área com teto, o grafo acima dele, ou com um nível que a lista não conhece,
+    não é entregue: responde como o grafo que não existe. É marcação que a política faz valer, não controle nó a nó."""
+
+    KEYS = {"schema_version", "canonical", "groups", "levels", "ceilings", "default_level"}
 
     def __init__(self, path, root=None):
         self.path = pathlib.Path(path)
@@ -484,14 +491,15 @@ class AreaPolicy:
             if real == base or base in real.parents:
                 raise ValueError(P_("the policy file must stay outside the store root"))
         self._lock = threading.Lock()
-        self._stamp, self._canonical, self._groups = self._load()
+        self._stamp, self._canonical, self._groups, self._ceilings = self._load()
 
     @staticmethod
     def parse(text):
         """(canonical ou None, {área: {identidades}}) de um texto de política, ou ValueError com o que está errado."""
         doc = json.loads(text)
         if not isinstance(doc, dict) or doc.get("schema_version") != 1 or set(doc) - AreaPolicy.KEYS:
-            raise ValueError(P_("the policy is an object with schema_version 1, canonical and groups, nothing else"))
+            raise ValueError(P_("the policy is an object with schema_version 1, canonical, groups and, together, "
+                                "levels, ceilings and default_level, nothing else"))
         canonical, groups = doc.get("canonical"), doc.get("groups", {})
         if canonical is not None and not (isinstance(canonical, str) and CANONICAL_AREA.fullmatch(canonical)):
             raise ValueError(P_("canonical: the area name is c-<letters, digits, dot, dash or underscore>"))
@@ -505,7 +513,38 @@ class AreaPolicy:
             if None in ids:
                 raise ValueError(P_("group {area}: every member is an e-mail identity").format(area=area))
             out[area] = frozenset(ids)
-        return canonical, out
+        return canonical, out, AreaPolicy._parse_ceilings(doc, canonical, out)
+
+    @staticmethod
+    def _parse_ceilings(doc, canonical, groups):
+        """{área: Ceiling} de levels, ceilings e default_level, que vêm juntos; {} quando a política não tem teto."""
+        present = [k for k in ("levels", "ceilings", "default_level") if k in doc]
+        if not present:
+            return {}
+        if len(present) != 3:
+            raise ValueError(P_("levels, ceilings and default_level come together"))
+        levels, ceilings, default = doc["levels"], doc["ceilings"], doc["default_level"]
+        if (not isinstance(levels, list) or not levels
+                or not all(isinstance(v, str) and LEVEL.fullmatch(v) for v in levels)):
+            raise ValueError(P_("levels is a list of level slugs (lowercase, digits, hyphen), from the least to the most "
+                                "sensitive"))
+        if len(set(levels)) != len(levels):
+            raise ValueError(P_("levels: every level appears once"))
+        if not isinstance(default, str) or default not in levels:
+            raise ValueError(P_("default_level is one of levels: the level of a graph without x_classification"))
+        if not isinstance(ceilings, dict):
+            raise ValueError(P_("ceilings maps each shared area (c-<name> or g-<name>) to one of levels"))
+        known = set(groups) | ({canonical} if canonical else set())
+        out = {}
+        for area, level in ceilings.items():
+            if not (CANONICAL_AREA.fullmatch(area) or GROUP_AREA.fullmatch(area)):
+                raise ValueError(P_("ceilings maps each shared area (c-<name> or g-<name>) to one of levels"))
+            if area not in known:
+                raise ValueError(P_("ceilings: {area} is neither the canonical area nor a group").format(area=area))
+            if not isinstance(level, str) or level not in levels:
+                raise ValueError(P_("ceilings: the ceiling of {area} is not one of levels").format(area=area))
+            out[area] = Ceiling(levels, level, default)
+        return out
 
     def _load(self):
         st = os.stat(self.path)
@@ -513,16 +552,128 @@ class AreaPolicy:
 
     def areas(self, identity):
         """As áreas compartilhadas que a identidade lê agora: a canônica e os grupos de que é membro."""
+        return self.readable(identity)[0]
+
+    def readable(self, identity):
+        """(áreas, {área: Ceiling}) de uma só leitura da política, sob a mesma trava: a filiação e o teto nunca vêm de
+        versões diferentes do arquivo. A política que fechou não dá área nem teto."""
         with self._lock:
             try:
                 st = os.stat(self.path)
                 if (st.st_mtime_ns, st.st_size, st.st_ino) != self._stamp:
-                    self._stamp, self._canonical, self._groups = self._load()
+                    self._stamp, self._canonical, self._groups, self._ceilings = self._load()
             except (OSError, ValueError, RecursionError) as exc:
-                self._stamp, self._canonical, self._groups = None, None, {}  # fecha, e tenta de novo na próxima
+                self._stamp, self._canonical, self._groups, self._ceilings = None, None, {}, {}  # fecha; tenta de novo
                 print(f"kg_mcp: area policy closed: {exc}", file=sys.stderr)
             shared = [area for area, members in sorted(self._groups.items()) if identity in members]
-            return ([self._canonical] if self._canonical else []) + shared
+            return ([self._canonical] if self._canonical else []) + shared, dict(self._ceilings)
+
+
+LEVEL = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")  # o nível de x_classification: o slug do contrato v4.20
+
+
+class Ceiling:
+    """O teto de uma área: os níveis em ordem, o nível máximo entregue e o nível do grafo sem meta.x_classification."""
+
+    def __init__(self, levels, ceiling, default):
+        self.rank = {level: i for i, level in enumerate(levels)}
+        self.ceiling, self.default = self.rank[ceiling], default
+
+    def level_of(self, name, text):
+        """O nível declarado do grafo, o default_level quando o meta não declara, ou None quando não se sabe: o grafo que
+        não parseia, o meta que não é mapa e o x_classification que não é um nível da lista (a falha fecha)."""
+        source = text if isinstance(text, kg_validate.JsonText) else kg_validate.as_source(name, text)
+        _tree, doc, code = kg_validate.parse_v1(source)
+        if code or not isinstance(doc, dict):
+            return None
+        if "meta" not in doc:
+            return self.default
+        meta = doc["meta"]
+        # o meta que não é mapa simples (nulo, lista, texto, ou com a chave de mescla <<, que outro leitor resolveria
+        # para um nível que este não vê) tem nível desconhecido
+        if not isinstance(meta, dict) or "<<" in meta:
+            return None
+        if "x_classification" not in meta:
+            return self.default
+        level = meta["x_classification"]
+        return level if isinstance(level, str) and level in self.rank else None
+
+    def allows(self, name, text):
+        level = self.level_of(name, text)
+        return level is not None and self.rank[level] <= self.ceiling
+
+
+class CeilingStore:
+    """Uma área compartilhada com teto, só de leitura: o grafo que o teto barra some de list, list_texts, read e
+    history, com a mesma recusa do grafo que não existe. Por não entrar no corpus, as arestas e os ponteiros que
+    apontavam para ele somem pelo corte de sempre (hide_unreadable, end_hidden)."""
+
+    def __init__(self, store, ceiling):
+        self._store, self._ceiling = store, ceiling
+
+    @staticmethod
+    def _missing(name):
+        return kg_store.NotFound(P_("{name} does not exist").format(name=name))
+
+    def list_texts(self):
+        return [(n, t) for n, t in self._store.list_texts() if self._ceiling.allows(n, t)]
+
+    def list(self):
+        return [n for n, _t in self.list_texts()]
+
+    def _guard_case(self, name):
+        """O nome que difere de outro só pela caixa: o armazém recusaria citando o outro, e isso revelaria um grafo (ou
+        uma pasta) que o teto esconde. Responde como inexistente quando o outro não tem nada visível; senão, a recusa
+        de sempre segue para o armazém."""
+        clash = self._store._case_clash(name)
+        if clash is None:
+            return
+        visible = self.list()
+        if clash not in visible and not any(n.startswith(clash + "/") for n in visible):
+            raise self._missing(name)
+
+    def _latest(self, name):
+        """O texto que decide o grafo: a versão atual ou, no grafo apagado, a última gravada; None quando não há."""
+        try:
+            return self._store.read(name)
+        except kg_store.NotFound:
+            pass
+        last = next((e for e in self._store.history(name) if e.get("op") == "write"), None)
+        if last is None:
+            return None
+        try:
+            return self._store.read(name, last["ref"])
+        except kg_store.StoreError:
+            return None
+
+    def read(self, name, ref=None):
+        """Com ref, o armazém confere o ref primeiro (o ref malformado dá a mesma recusa em qualquer nome), e depois
+        julga a versão pedida E a que decide o grafo (a atual, ou a última gravada do apagado): a mais restritiva vence.
+        A forma do ref vem antes de qualquer guarda de nome: com ref malformado, nenhum nome distingue o oculto."""
+        if ref is not None:
+            self._store.check_ref(ref)
+        kg_store.check_name(name)
+        self._guard_case(name)
+        try:
+            text = self._store.read(name, ref)
+        except kg_store.NotFound:
+            raise self._missing(name) from None
+        if not self._ceiling.allows(name, text):
+            raise self._missing(name)
+        if ref is not None:
+            latest = self._latest(name)
+            if latest is None or not self._ceiling.allows(name, latest):
+                raise self._missing(name)
+        return text
+
+    def history(self, name):
+        """O histórico do grafo que o teto deixa ler: decide a versão atual, ou a última gravada do grafo apagado."""
+        kg_store.check_name(name)
+        self._guard_case(name)
+        latest = self._latest(name)
+        if latest is None or not self._ceiling.allows(name, latest):
+            raise self._missing(name)
+        return self._store.history(name)
 
 
 class AreaView:
@@ -693,8 +844,10 @@ class Profile:
 
     def _view(self, identity, own):
         """A visão desta requisição: a filiação é lida agora, e só as áreas legíveis são abertas."""
-        readers = {area: self._shared_store(area) for area in self.policy.areas(identity)}
-        return AreaView(own, area_name(identity), {a: s for a, s in readers.items() if s is not None})
+        areas, ceilings = self.policy.readable(identity)
+        readers = {area: self._shared_store(area) for area in areas}
+        readers = {a: (CeilingStore(s, ceilings[a]) if a in ceilings else s) for a, s in readers.items() if s is not None}
+        return AreaView(own, area_name(identity), readers)
 
 
 class Server:

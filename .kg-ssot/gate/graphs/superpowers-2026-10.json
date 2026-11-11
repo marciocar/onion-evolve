@@ -2,5 +2,8 @@
   "graph": "docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml",
   "id": "superpowers-2026-10",
   "must": [],
-  "should": {}
+  "should": {
+    "form.deprecated.node.provenance.method": 1,
+    "form.required.node.provenance": 1
+  }
 }

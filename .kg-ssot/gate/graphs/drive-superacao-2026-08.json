@@ -3,6 +3,7 @@
   "id": "drive-superacao-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 2,
     "form.range.node.label": 3
   }
 }

@@ -3,7 +3,9 @@
   "id": "guardas-revisao-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 46,
     "form.range.node.label": 16,
+    "form.required.node.provenance": 1,
     "integrity.bare-decision": 2
   }
 }

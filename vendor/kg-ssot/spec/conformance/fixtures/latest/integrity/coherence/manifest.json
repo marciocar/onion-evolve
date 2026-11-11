@@ -14,10 +14,11 @@
     },
     {
       "file": "warn-testimony-method-in-prod.kg.yaml",
-      "description": "nó PROD cuja provenance.method é da classe testemunho",
+      "description": "nó PROD cuja provenance.method é da classe testemunho, o apelido em português: o testemunho vale igual, e o apelido alerta (v4.21)",
       "valid": true,
       "codes": [],
       "warnings": [
+        "form.deprecated.node.provenance.method",
         "integrity.testimony-in-prod"
       ]
     },

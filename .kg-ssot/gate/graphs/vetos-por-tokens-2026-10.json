@@ -3,6 +3,8 @@
   "id": "vetos-por-tokens-2026-10",
   "must": [],
   "should": {
-    "form.range.node.label": 11
+    "form.deprecated.node.provenance.method": 13,
+    "form.range.node.label": 11,
+    "form.required.node.provenance": 1
   }
 }

@@ -3,6 +3,7 @@
   "id": "bridge-produto-2026-08",
   "must": [],
   "should": {
+    "form.deprecated.node.provenance.method": 37,
     "form.range.node.label": 34,
     "yaml.unquoted-date": 1
   }
