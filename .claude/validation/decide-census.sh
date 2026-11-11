@@ -59,6 +59,8 @@
 # Uso:  bash .claude/validation/decide-census.sh [<repo>] [--markdown|--tsv] [--cite <arquivo|->]
 #                                               [--theme "<termos>"] [--window <dias>] [--no-gh]
 #                                               [--foreign-repo <dono/nome>]... [--idle-hours <h>] [--self <sessão>]
+#       bash .claude/validation/decide-census.sh [<repo>] --triage [--max-age-days N] [--markdown|--tsv]
+#         → repassa ao irmão decide-triage.sh (candidatos à triagem em lote, cláusula 10 da decide-doctrine)
 #   --self <id>      o id de SESSÃO desta sessão (default: CLAUDE_CODE_SESSION_ID): a reserva dela vira faço-eu
 # Env (bancada e sandbox; NUNCA para fingir medição — todo override ativo é declarado na saída):
 #   DECIDE_TODAY=<AAAA-MM-DD>   data de referência da janela (default: date +%F)
@@ -72,6 +74,15 @@
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_decide_selftests).
 # ===========================================================================
 set -uo pipefail
+# MODO TRIAGEM (D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111): `--triage [--max-age-days N]` repassa TODOS os argumentos ao
+# medidor irmão, decide-triage.sh, achado AO LADO deste (por referência, nunca nome construído do candidato)
+for _a in "$@"; do
+  if [ "${_a}" = "--triage" ]; then
+    _t="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/decide-triage.sh"
+    [ -f "${_t}" ] || { echo "decide-census: --triage pede o medidor irmão ${_t}, ausente neste papel" >&2; exit 2; }
+    exec bash "${_t}" "$@"
+  fi
+done
 REPO=""; FMT="--markdown"; CITE=""; THEME=""; WINDOW="7"; NOGH="0"; FOREIGN=""; IDLE="4"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "decide-census: $1 exige um valor" >&2; exit 2; }; }   # rc 2, nunca o 1 do ${:?}
 while [ $# -gt 0 ]; do

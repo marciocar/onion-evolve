@@ -164,6 +164,46 @@ Quatro regras fecham a cláusula:
 O painel mostra o estado de cada item, que a sessão devolve ao estado dele (`status/<qN>`): selado,
 executar, card pendente, volta como pergunta. O "executado" é a sessão que grava depois de rodar o ato.
 
+### 10. A triagem em lote: a sessão classifica, o maestro aprova o lote, o selador grava
+Decisão do maestro em 2026-11-11 (`D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111`, entrevista da forja, em
+`docs/evolution/research/forge-decide-2026-10/`). A dor é medida: o hub de um adotante tinha 106 nós
+`decision`/`question` abertos em 34 grafos, e o censo do core acusava centenas. O censo mostra 40 linhas
+por vez, e o maestro via sempre as mesmas perguntas. A triagem tira da mesa, de uma vez, o que já não é
+pergunta dele, sem que nada se grave sem o "sim".
+
+**Quem entra** (o medidor `decide-triage.sh`, também por `decide-census.sh --triage`): nó `decision` ou
+`question` com `status: open`, mais velho que o **teto** (padrão **30 dias**, `--max-age-days N`), **sem
+dono ativo** (nenhuma reserva viva no `maestro-ask.sh`) e sem pedido em curso. A idade sai do
+`verified_at` e, na falta dele, do último commit que tocou o bloco do nó; o medidor diz qual usou.
+
+**Os quatro destinos**, um por nó:
+- **(a) fecha por medição**: vai para o `/meta:kg-freshness`, **nunca** pelo selador. O selador grava
+  testemunho do maestro (cláusula 1); fechar por ele o que a medição fecha é forjar testemunho.
+- **(b) pedido a outro papel**, com prazo: CEO, jurídico, financeiro, outra sessão. O nó **segue aberto**,
+  com `owner:` (o papel, nunca o nome de uma pessoa) e `x_due:`, e volta à triagem quando o prazo vence.
+- **(c) obsoleto**: vira `superseded`, com o motivo e a aresta `SUPERSEDES` do nó que o superou quando ele
+  está no mesmo grafo (superação entre grafos fica no motivo).
+- **(d) do maestro**: entra na próxima rodada **normal**, com pergunta própria (cláusulas 1 a 7).
+
+**Quem fecha.** A sessão lê cada nó e classifica com evidência; a dica do medidor (`obsoleto`, `pedido`,
+`medição`, `maestro`) é **pista**, nunca decisão. Com dezenas de nós, a classificação vai pela peça 4, o
+workflow `.claude/workflows/decide-triage.js` (um worker por lote de nós, só leitura, e um refutador nas
+propostas de (b) e (c), que caem para (d) na dúvida), e só com o opt-in do maestro. A sessão monta o
+**lote** só com (b) e (c), mostra a lista com o sha256 (`kg-decide-seal.sh --batch <lote> --preview`) e
+pergunta **uma vez**. O "sim" vira `--approve <sha256>`, e só então o selador grava, com o mesmo gate do
+selo único. Lote que mudou depois da aprovação tem outro sha e é recusado. Um grafo que reprova desfaz
+o lote inteiro. É a regra da casa para mudança em massa: a sessão avalia, o maestro sela.
+
+**O que a triagem NÃO promete:**
+- **Não decide pelo maestro.** O lote é uma proposta, e o que é (d) vai a pergunta própria.
+- **Não fecha por medição pelo selador.** O selador recusa (a) e (d) no lote (rc 2).
+- **Não apaga nó.** Obsoleto é `superseded` com o motivo, e a narrativa anterior fica verbatim.
+- **Não acerta a dica.** Os padrões fixos (aresta `SUPERSEDES`, nó fechado mais novo que cita o id,
+  `owner:`, vizinho em `plane: PROD`, comando citado) erram para os dois lados, e a idade por commit
+  rejuvenesce o nó que uma migração em massa tocou.
+- **Não supera entre grafos por aresta.** A ref do obsoleto tem de estar no mesmo grafo; a superação
+  que vem de outro grafo fica escrita no motivo.
+
 ## O que esta doutrina NÃO promete
 
 - **Não decide pelo maestro.** Mede, filtra, compõe, pergunta e grava; a escolha é dele.
@@ -205,7 +245,9 @@ executar, card pendente, volta como pergunta. O "executado" é a sessão que gra
 - Superfície: [`/meta:decide`](../../meta/decide.md) · medidor (peça 3):
   `.claude/validation/decide-census.sh` · destino (peça 5): `.claude/validation/kg-decide-seal.sh` ·
   painel opcional (cláusula 9): `.claude/validation/decide-panel.sh` e a página
-  `.claude/validation/decide-panel.html` · bancada (peça 7): `run_decide_selftests`
+  `.claude/validation/decide-panel.html` · triagem em lote (cláusula 10): o medidor
+  `.claude/validation/decide-triage.sh`, o workflow `.claude/workflows/decide-triage.js` e o
+  `kg-decide-seal.sh --batch` · bancada (peça 7): `run_decide_selftests`
 - Precedente de forma: o checkpoint do [`/meta:drive`](../../meta/drive.md)
   (`kg-drive-project.sh --seal`), que já sela por escrita mecânica com radar
 - Grafo da forja (core-only): `docs/evolution/research/forge-decide-2026-10/forge-decide-2026-10.kg.yaml`

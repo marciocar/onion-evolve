@@ -9,8 +9,8 @@ tags:
   - decision
   - kg
   - forge
-version: "1.2.0"
-updated: "2026-10-21"
+version: "1.3.0"
+updated: "2026-11-11"
 related_commands:
   - /meta:drive
   - /meta:forge
@@ -24,7 +24,7 @@ Quando há opções, pendências e fios abertos, e principalmente quando há uma
 entendimento a selar, este comando **mede** o que está acontecendo, **tira** o que a sessão pode medir
 ou derivar sozinha, **pergunta** o resto ao maestro em rodadas estruturadas (cada opção com a sua
 implicação, a recomendada primeiro) e **sela** cada resposta no grafo no mesmo movimento. A doutrina
-inteira (as 9 cláusulas e o que ela não promete) vive em
+inteira (as 10 cláusulas e o que ela não promete) vive em
 [`common:prompts:decide-doctrine`](../common/prompts/decide-doctrine.md). **Referencie, não copie.**
 
 **Por que existe:** pedido do maestro em 2026-10-12, forjado pelo `/meta:forge` no mesmo dia; decisão
@@ -165,6 +165,26 @@ O round lido no passo 4 é o arquivo **local**. O `round_id` é o hash das pergu
 da emissão: resposta de outra rodada é recusada, e edição do round que não recalculou o hash também. O painel nunca escreve no grafo. Decisão sem nó (`--new`) e checkpoint do
 `/meta:drive` ficam no terminal.
 
+## Modo triagem (opcional, cláusula 10)
+
+Quando o maestro pede para **limpar a mesa** (centenas de nós abertos, as mesmas perguntas a cada rodada), a
+sessão tria em lote. Não se injeta nada: o medidor roda sob pedido.
+
+1. **Medir:** `bash .claude/validation/decide-census.sh . --triage [--max-age-days N] --markdown` (ou `--tsv`;
+   o irmão `.claude/validation/decide-triage.sh` é quem mede). Entra o `open` mais velho que o teto (30 dias por
+   padrão), sem reserva viva no `maestro-ask.sh` e sem pedido em curso. Cada linha traz idade e fonte, superação,
+   `owner:`, se é medível e a **dica**, que é pista e não decisão.
+2. **Classificar com evidência** cada nó num dos quatro destinos: (a) medição, (b) pedido a outro papel com
+   prazo, (c) obsoleto, (d) do maestro. Com dezenas de nós, ofereça a peça 4 (abaixo) e rode só com o opt-in.
+3. **Montar o lote** só com (b) e (c), em TSV (`grafo · nó · obsolete|request · ref · prazo · motivo`), e
+   mostrar a lista: `bash .claude/validation/kg-decide-seal.sh --batch <lote> --preview`. **Uma** pergunta ao
+   maestro, com a lista visível e o sha256. (a) vai para o `/meta:kg-freshness <grafo> --node <id>`, nunca
+   pelo selador. (d) entra na próxima rodada normal.
+4. **Selar só com o "sim":**
+   `bash .claude/validation/kg-decide-seal.sh --batch <lote> --approve <sha256> --date <hoje> --question "<pergunta>"`.
+   Ele sai 0 com o gate verde em todo grafo, 2 se recusou (sem aprovação, lote mudado, destino (a) ou (d), nó
+   que não está `open`) e 3 se um grafo reprovou, e então **todos** os grafos do lote voltam byte a byte.
+
 ## Destino (peça 5)
 
 O selo no nó, escrito por `.claude/validation/kg-decide-seal.sh`, com o **radar exit 0**
@@ -172,13 +192,17 @@ O selo no nó, escrito por `.claude/validation/kg-decide-seal.sh`, com o **radar
 reprova; o contrato e o **lint de nomes** (`kg_vocab.py lint`, antes×depois) também desfazem. O **contrato de custo** (`run_id` · `tokens` · `agents` · `duration_min`) **não se aplica**:
 não há run de workflow, e medidor e selador são 0 tokens. Declarado aqui e na doutrina.
 
-## Peça 4 (orquestração faseada) — AUSENTE por desenho, declarado
+## Peça 4 (orquestração faseada): presente no modo triagem
 
-Uma sessão, um questionário: medir, filtrar, perguntar e selar são seriais e dependem do maestro a
-cada rodada; não há fan-out com independência real, e um `.claude/workflows/*.js` seria coordenação
-sem nada a coordenar. **Gatilho nomeado:** o filtro (passo 2) passar a exigir medição paralela pesada
-por linha (por exemplo, re-verificar dezenas de nós contra o vivo antes de perguntar), que é trabalho
-do `/meta:kg-freshness` e, se virar rotina aqui, pede a peça 4.
+A rodada normal segue sem fan-out: medir, filtrar, perguntar e selar são seriais e dependem do maestro a
+cada rodada. O **gatilho** que esta seção nomeava disparou em 2026-11-11: classificar dezenas de nós contra
+o vivo antes de perguntar é a triagem em lote (cláusula 10). A peça é a da casa, a skill
+[`onion-orchestration`](../../skills/onion-orchestration/SKILL.md) no molde do `meta-evolve-fanout.js`:
+`.claude/workflows/decide-triage.js`, que recebe o TSV do medidor, dá um worker por lote de nós (só
+leitura, propõe destino e evidência), um refutador nas propostas de (b) e (c) e devolve o rascunho do lote.
+Invocação, **só com o opt-in do maestro**, no contexto principal:
+`Workflow({ scriptPath: '.claude/workflows/decide-triage.js', args: { tsv: '<--triage --tsv>', batch: 8, today: '<hoje>' } })`.
+Ele nunca escreve: o lote passa pelo `--preview`, pela pergunta e pelo selador.
 
 ## Peça 6 (lente) — sem lente PRÓPRIA, por desenho, declarado
 
@@ -209,5 +233,7 @@ registro de decisões por sessão), e aí a lente se deriva do caminho medido.
 - Medidor (peça 3): `.claude/validation/decide-census.sh` · destino (peça 5):
   `.claude/validation/kg-decide-seal.sh` · bancada (peça 7): `run_decide_selftests`
 - Painel opcional: `.claude/validation/decide-panel.sh` (rodada e selo) e `.claude/validation/decide-panel.html`
+- Modo triagem (cláusula 10): medidor `.claude/validation/decide-triage.sh` · peça 4
+  `.claude/workflows/decide-triage.js` · selo em lote `kg-decide-seal.sh --batch`
 - Lente da gramática que já cobre os grafos tocados: `.claude/rules/kg-grammar.md`
 - Molde: [`/meta:cc-update`](cc-update.md) (peças 2, 3, 7) e o checkpoint do [`/meta:drive`](drive.md)
