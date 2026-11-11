@@ -251,13 +251,21 @@ nodes:
   - id: Q_SUBIR_A_EXTENSAO_DO_VSCODE_PELO_EDITOR_1104
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 1
     confidence: 0.5
-    verified_at: "2026-11-04"
-    verified_against: "decorre de E_EXTENSAO_VSCODE_NA_2_1_306_E_O_CLI_NAO_A_SOBE_MAIS_1104; o ato é do maestro, no editor"
     label: "o maestro sobe a extensão do VS Code pela visão de extensões do editor, ou a casa passa a medi-la no censo de frescor, que hoje não a lista"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Gostaria, mas consome muito recurso: deixar para quando precisar»"
+    narrative: |-
+      verified_against anterior: «decorre de E_EXTENSAO_VSCODE_NA_2_1_306_E_O_CLI_NAO_A_SOBE_MAIS_1104; o ato é do maestro, no editor»
+      Selado por /meta:decide em 2026-11-11: escolhida «Gostaria, mas consome muito recurso: deixar para quando precisar» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Não uso mais» · «Uso no notebook» · «Uso, quero que a casa meça».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Você ainda usa o VS Code ou o Cursor com a extensão do Claude Code?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
   - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1104
     node_type: evidence
     layer: audit
