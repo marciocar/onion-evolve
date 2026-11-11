@@ -1,0 +1,429 @@
+# kg-backlog-guard: on
+meta:
+  schema_version: "1"
+  id: curation-verdicts-core-seal-2026-11
+  slug: curation-verdicts-core-seal-2026-11
+  title: "Selo do core sobre os vereditos de peças propostos pela curadoria"
+  date: "2026-11-11"
+  baseline: "2026-11-11"
+  review_after: "2026-12-11"
+  purpose: "A curadoria propõe e o core sela, peça a peça, com o maestro no /meta:decide. Este grafo guarda os selos do core sobre os vereditos de canais entre sessões, mods, iroh e o que vier da série de 2026-11-11; a curadoria cita cada nó em x_dissect_sealed_by."
+  note: "Os vereditos e a evidência moram nos grafos da curadoria (não conferíveis por terceiro). Aqui fica só o selo e a data de revisão."
+  # ═══ TETO: 25 NÓS ═══ (a série tem 17 peças revisadas uma a uma, mais a base)
+nodes:
+  - id: E_CURATION_VERDICTS_SERIES_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "cinco sinais da curadoria ao core em 2026-11-11, com os ids dos vereditos e a leitura do core dos grafos dela em origin/main"
+    label: "A curadoria mandou ao core 26 vereditos de peças em cinco sinais; o maestro mandou revisar um a um os de canais, mods e iroh, pesquisar antes a cifra da Parte B e o limite do veto com mods, e discutir o vigia em três rodadas"
+    narrative: "Grafos da curadoria lidos: claude-code-channels-2026-11, claude-code-mods-2026-11, iroh-openclaw-2026-11, activepieces-2026-11, redpanda-connect-2026-11 (docs/evolution/dissect/) e interconnect-part-b-2026-11, event-watcher-vendor-2026-11 (docs/evolution/research/)."
+    provenance:
+      source: "sinais da sessão da curadoria ao core, 2026-11-11"
+      locator: "sinais 1 a 5 da série"
+      method: "reading: leitura dos grafos da curadoria em origin/main"
+      locality: "pessoa"
+  - id: D_SEAL_CH_OFFICIAL_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear, com data de revisão»"
+    label: "O core sela parquear os channels oficiais Telegram, Discord e fakechat como canal entre sessões, com revisão em 2027-02-11 ou antes se surgir channel oficial entre sessões."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear, com data de revisão» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Channels oficiais Telegram, Discord e fakechat como canal entre sessões: parquear?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_IMESSAGE_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear, com revisão no futuro»"
+    label: "O core sela parquear, não rejeitar, o channel oficial do iMessage como canal entre sessões, com revisão futura caso haja uso em macOS."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear, com revisão no futuro» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Channel oficial do iMessage como canal entre sessões: rejeitar?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_AGENT_MAIL_RUST_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear o porte Rust»"
+    label: "O core sela parquear o porte Rust do MCP Agent Mail, a reavaliar só se sair com licença aberta; a versão Python, com a cláusula contra a Anthropic, não entra."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear o porte Rust»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «MCP Agent Mail: rejeitar?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_AGENT_BRIDGE_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear o agent-bridge, com o gatilho da curadoria: modo seguro como padrão e token no proxy do Codex."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «agent-bridge: parquear?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_PB_CIPHER_ECDHES_WITH_MIGRATION_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «ECDH-ES agora + migração»"
+    label: "O core sela a cifra da Parte B: JWE com ECDH-ES direto e A256GCM, autoria pelo JWS interno, com a migração ao HPKE desenhada e disparada quando houver RFC e biblioteca. Fecha a Parte B."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «ECDH-ES agora + migração»; descartadas: «ECDH-ES agora, sem plano» · «Esperar o HPKE»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Cifra da Parte B, depois da pesquisa: qual sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_MODS_GATE_SEAL_WHAT_EXISTS_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Selar o que existe»"
+    label: "O core sela o que já existe no limite do veto com mods: a política gerenciada que só aceita mods gerenciados e as duas guardas de escrita de plugin, medidas no log de debug; a premissa da curadoria fica corrigida."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Selar o que existe»; descartadas: «Selar + validar mods antes» · «Migrar os vetos ao gerenciado»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Limite do veto com mods, depois da medição: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_FORGE_DELPHI_MODE_IN_DECIDE_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Forjar como modo»"
+    label: "O Delphi (posição independente, crítica cruzada sem o autor e convergência com o dissenso declarado) vira um modo do /meta:decide para decisão consultada entre sessões, forjado pelo /meta:forge, com o vigia de 2026-11-11 como 1º dogfood."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Forjar como modo»; descartadas: «Só registrar a técnica» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «O Delphi acabou de rodar pela primeira vez entre as sessões. Vira padrão da casa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_WATCHER_OWN_COLLECTOR_TWO_GATES_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Coletor próprio + 2 portões»"
+    label: "O core sela o vigia como coletor próprio com motor trocável e entrada em CloudEvents 1.0, depois de 3 rodadas Delphi; antes dos ~20 pontos, o mapa CloudEvents para PROV e a contagem de mudanças de API dos 6 provedores."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Coletor próprio + 2 portões»; descartadas: «Motor de terceiro agora» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Vigia de eventos, pelo critério o melhor para o futuro do Onion e do KG-SSOT: sela assim?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_HARVEST_FIVE_IDEAS_AS_CARDS_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Um card por ideia»"
+    label: "O core absorve as 5 ideias colhidas das peças parqueadas como um card cada: cursor retomável na campainha, Ed25519 pinada por par, A2A 1.0 com mTLS, reconexão sem herdar escopo e a regra anti-spoof como teste."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Um card por ideia»; descartadas: «Só registrar no grafo» · «Revisar uma a uma»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «A colheita achou 5 ideias de maior valor nas peças parqueadas: o que faz com elas?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_CLAUDE_PEERS_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear, com a ideia de níveis automático e não automático»"
+    label: "O core sela parquear o claude-peers-mcp; a ideia que fica é ter níveis de canal, com o que é automático e o que pede ok separados."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear, com a ideia de níveis automático e não automático» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «claude-peers-mcp: parquear?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_PEERBUS_NN_REJECT_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Rejeitar»"
+    label: "O core sela rejeitar o peerbus de nnemirovsky: a fila A2A já assina por membro, melhor que o segredo único por par, e o ack antes de o modelo ver é anti-padrão."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Rejeitar»; descartadas: «Parquear» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «peerbus de nnemirovsky: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_CLAUDE_MESH_REJECT_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Rejeitar»"
+    label: "O core sela rejeitar o claude-mesh: o meta.from sobrescreve o remetente verificado, defeito de desenho; a lição anti-spoof segue no teste de bancada próprio."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Rejeitar»; descartadas: «Parquear» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «claude-mesh: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_AGENT_INBOX_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear o agent-inbox, a referência externa mais próxima do contrato da campainha; volta com token na rota de envio e verbo sessão com sessão."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «agent-inbox: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_PARLEY_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear o parley; a ideia do cursor retomável segue no card da campainha, e a peça volta se o POST autenticar o remetente."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «parley: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_CH_A2ABRIDGE_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear o a2abridge como referência do card de alinhamento ao A2A 1.0; volta com mTLS obrigatório, remetente verificado e corpo como dado."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «a2abridge: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_IROH_PARK_PHASE2_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear p/ Fase 2»"
+    label: "O core sela parquear o iroh como candidato à Fase 2, que só roda se o relay próprio da Parte B travar em NAT ou custo; a estimativa diverge entre 19 e 31 pontos."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear p/ Fase 2»; descartadas: «Rodar a Fase 2 agora» · «Rejeitar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «iroh: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_IROH_ALINK_PARK_PHASE2_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear p/ Fase 2»"
+    label: "O core sela parquear iroh mais alink para a Fase 2, junto do iroh; fica a lição de cadeia de suprimentos: nada de instalação por curl na fila."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear p/ Fase 2»; descartadas: «Rejeitar o alink» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «iroh mais alink: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_OPENCLAW_RECONNECT_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear o OpenClaw no recorte de reconexão, escopo e allowlist; a ideia de não herdar escopo na reconexão segue no card da fila A2A."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «OpenClaw no recorte de reconexão: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_MODS_WIDGETS_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear widgets próprios; volta com um widget de status que poupe passo medido contra a statusLine, e widget nunca decide chamada."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Piloto do widget de status» · «Rejeitar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Widgets próprios: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_MODS_DISTRIBUTION_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear a distribuição de mods aos adotantes; volta com um widget útil em uso e um adotante que o peça, só pela rota do marketplace."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Distribuir mods pelo update do Onion: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_SEAL_MODS_CATALOG_PARK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Parquear»"
+    label: "O core sela parquear a coleção de mods como catálogo: serve só de busca, e instalar mod de terceiro segue barrado pela política gerenciada."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Parquear»; descartadas: «Rejeitar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «A coleção de mods como catálogo: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+edges:
+  - from: D_SEAL_CH_OFFICIAL_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_IMESSAGE_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_AGENT_MAIL_RUST_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_AGENT_BRIDGE_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_PB_CIPHER_ECDHES_WITH_MIGRATION_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_MODS_GATE_SEAL_WHAT_EXISTS_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_FORGE_DELPHI_MODE_IN_DECIDE_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_WATCHER_OWN_COLLECTOR_TWO_GATES_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_HARVEST_FIVE_IDEAS_AS_CARDS_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_CLAUDE_PEERS_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_PEERBUS_NN_REJECT_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_CLAUDE_MESH_REJECT_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_AGENT_INBOX_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_PARLEY_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_CH_A2ABRIDGE_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_IROH_PARK_PHASE2_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_IROH_ALINK_PARK_PHASE2_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_OPENCLAW_RECONNECT_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_MODS_WIDGETS_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_MODS_DISTRIBUTION_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
+  - from: D_SEAL_MODS_CATALOG_PARK_1111
+    to: E_CURATION_VERDICTS_SERIES_1111
+    edge_type: TRACES_TO
