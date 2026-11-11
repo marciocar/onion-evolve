@@ -359,7 +359,7 @@ nodes:
     confidence: 0.75
     verified_at: "2026-11-10"
     verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em Q_O_QUE_O_DELTA_TOCA_NO_ONION"
-    label: "caíram quatro nós da r23: binário apagado (de seis para zero), correções sem terminal (já chegam ao bridge), dica do --continue (nenhuma conversa na janela) e extensão do VS Code (não reproduz); a pergunta do censo segue válida como mecanismo, com zero processos hoje"
+    label: "caíram quatro nós da rodada anterior: binário apagado (de seis para zero), correções sem terminal (já chegam ao bridge), dica do --continue (nenhuma conversa na janela) e extensão do VS Code (não reproduz); a pergunta do censo segue válida como mecanismo, com zero processos hoje"
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito: REPROVA de CU4"
