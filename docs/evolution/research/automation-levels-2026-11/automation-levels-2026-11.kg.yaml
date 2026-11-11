@@ -148,7 +148,63 @@ nodes:
       locator: "pergunta com opções de 2026-11-11: «O papel de operador de dados pela LGPD pede pessoa jurídica antes do 1º adotante externo?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
       locality: "pessoa"
+  - id: E_WATCHER_API_CHURN_MEASURED_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "contagem das mudanças de API de webhook e eventos dos 6 canais do vigia entre 2025-11-11 e 2026-11-11, pelos changelogs oficiais, relatório em data/watcher-api-churn.md"
+    label: "o portão de custo do vigia passa: 5 quebras no ano que o coletor sente (1,25 ponto por trimestre), ou 20 no amplo (5 por trimestre), no piso da estimativa de 5 a 7; nenhum canal mudou assinatura nem cabeçalho de webhook"
+    narrative: "Canais: Slack, WhatsApp Cloud API, WAHA, ClickUp, Teams e Linear. Quem mais muda: Linear e WAHA. Lacunas: o ClickUp não tem changelog público de API (o zero é falta de dado), e Teams e Linear têm meses sem leitura; supondo 2 quebras por ano onde falta dado, o total fica perto de 6, ainda na faixa."
+    trace: "docs/evolution/research/automation-levels-2026-11/data/watcher-api-churn.md"
+    provenance:
+      source: "docs/evolution/research/automation-levels-2026-11/data/watcher-api-churn.md"
+      locator: "tabela por provedor e veredito"
+      method: "reading: leitura dos changelogs oficiais por agente, com URL e data de cada quebra"
+      locality: "web"
+  - id: E_LGPD_OPERATOR_RESEARCH_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "texto da LGPD e guias e resoluções da ANPD lidos em 2026-11-11, relatório em data/lgpd-operator.md; não é parecer jurídico"
+    label: "a LGPD não exige pessoa jurídica para o operador de dados, mas ele responde solidariamente no art. 42 e a pessoa física não tem escudo patrimonial; o MEI não separa patrimônio e provavelmente não pode prestar hospedagem"
+    narrative: "Art. 5º, VII define operador como pessoa natural ou jurídica, e o guia da ANPD de 2022 diz que não há óbice à pessoa natural. Obrigações: registro (art. 37), instruções do controlador (art. 39), segurança (art. 46); a comunicação de incidente em 3 dias úteis é do controlador (Res. 15/2024), e o prazo do operador fica no contrato. O regime de pequeno porte (Res. 2/2022) inclui pessoa natural, mas não vale para tratamento de alto risco. O escudo real é SLU ou Ltda; forma, regime e CNAE com advogado e contador."
+    trace: "docs/evolution/research/automation-levels-2026-11/data/lgpd-operator.md"
+    provenance:
+      source: "docs/evolution/research/automation-levels-2026-11/data/lgpd-operator.md"
+      locator: "seções 1 a 5"
+      method: "reading: leitura da lei e dos guias da ANPD por agente, com citação"
+      locality: "web"
+  - id: D_LGPD_WAIT_THEN_SLU_BEFORE_FIRST_CONTRACT_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Esperar, SLU antes do 1º contrato»"
+    label: "Nenhum terceiro entra no serviço hospedado até o primeiro contrato com dado de cliente; até lá o core prepara o pacote técnico e contratual, e antes de assinar se abre uma SLU, com forma, regime e CNAE decididos com advogado e contador."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Esperar, SLU antes do 1º contrato»; descartadas: «Constituir a SLU agora» · «Pessoa física com DPA e seguro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «A LGPD não exige pessoa jurídica, mas o operador responde solidariamente: o que sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
 edges:
+  - from: E_WATCHER_API_CHURN_MEASURED_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: SUPPORTS
+  - from: E_LGPD_OPERATOR_RESEARCH_1111
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: SUPPORTS
   - from: E_AUTOMATION_CORPUS_1111
     to: Q_AUTOMATION_LEVELS_1111
     edge_type: SUPPORTS
@@ -172,4 +228,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_LGPD_OPERATOR_LEGAL_ENTITY_RESEARCH_FIRST_1111
     to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_LGPD_WAIT_THEN_SLU_BEFORE_FIRST_CONTRACT_1111
+    to: E_LGPD_OPERATOR_RESEARCH_1111
     edge_type: TRACES_TO
