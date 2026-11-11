@@ -185,6 +185,7 @@ ASSIGN = {}                      # atribuições literais vistas na própria str
 TAINTED = set()                  # variáveis cujo valor é uma substituição que calcula a branch PADRÃO
 SUBST_DEFAULT = "__ONION_SUBST__D"   # marcador da substituição que calcula a branch PADRÃO (que é a main)
 UNKNOWN = "__ONION_UNKNOWN_DIR__"    # `cd` que o analisador não segue: diretório DESCONHECIDO, nunca isento
+CHDIR_KEY = "__ONION_CHDIR__"        # chave do `env` de prefixo com os `env -C D` da linha, na ordem (não é nome de variável)
 LAST_CFG = [{}]                  # config de `-c` do último git analisado (decide a isenção pelo destino)
 GH_SETDEFAULT = [False]          # `gh repo set-default` na string: o repositório do gh deixa de ser o do diretório
 DEFAULT_RE = re.compile(r"symbolic-ref|origin/HEAD|defaultBranchRef|default_branch|init\.defaultBranch")
@@ -663,7 +664,9 @@ def strip_prefix(words, env):
         w = words[0]
         if w in KEYWORDS:
             words = words[1:]; continue
-        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w)
+        # `re.S`: o valor citado pode ter QUEBRA DE LINHA (`A=$'b\nc' git push origin main`, `A="b<LF>c" gh pr merge 1`).
+        # Sem ele, `(.*)$` não casava, a atribuição virava o NOME do comando e o push passava com rc 0 (SAC-390, 2026-11-11)
+        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w, re.S)
         if m:
             env[m.group(1)] = m.group(2); words = words[1:]; continue
         if w.startswith("\\") and len(w) > 1:
@@ -684,6 +687,14 @@ def strip_prefix(words, env):
                     return ["__ONION_RESPLIT__", opt.split("=", 1)[1]] + rest
                 if opt.startswith("-S") and len(opt) > 2:
                     return ["__ONION_RESPLIT__", opt[2:]] + rest
+                # `env -C D`/`--chdir=D` MUDA o diretório do comando: era consumido como opção e o comando era julgado no
+                # diretório de fora (`env --chdir=.claude/skills/x mkdir hooks` passava, SAC-390). O `command` o segue como `cd`
+                if opt in ("-C", "--chdir") and rest:
+                    env.setdefault(CHDIR_KEY, []).append(rest[0])
+                elif opt.startswith("--chdir="):
+                    env.setdefault(CHDIR_KEY, []).append(opt.split("=", 1)[1])
+                elif opt.startswith("-C") and len(opt) > 2:
+                    env.setdefault(CHDIR_KEY, []).append(opt[2:])
                 if opt in WRAPPER_ARG_OPTS["env"] and rest:
                     rest = rest[1:]
                 elif "=" in opt and not opt.startswith("-"):
@@ -706,6 +717,18 @@ def strip_prefix(words, env):
             continue
         return words
     return words
+
+
+def chdir_target(c, b):
+    """O diretório de `env -C c` partindo de `b`, com a regra do `cd` literal: dinâmico, relativo a um desconhecido ou
+    ausente no disco é DESCONHECIDO. O juiz que o lib hospeda pode redefini-la (o do adotante lê `$HOME`)."""
+    if DYNAMIC.search(c):
+        return UNKNOWN
+    c = os.path.expanduser(c)
+    if b == UNKNOWN and not os.path.isabs(c):
+        return UNKNOWN
+    p = os.path.normpath(c if os.path.isabs(c) else os.path.join(b, c))
+    return p if os.path.isdir(p) else UNKNOWN
 
 
 def other_project(path):
@@ -1348,7 +1371,7 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
     words = drop_redirects(raw_words)
     if words and words[0] in DECLARERS:
         for w in words[1:]:
-            m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w)
+            m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w, re.S)
             if m:
                 if DYNAMIC.search(m.group(2)):
                     ASSIGN.pop(m.group(1), None)
@@ -1383,6 +1406,18 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         words = strip_prefix(words, env)
         if not words:
             return
+    if CHDIR_KEY in env:
+        # `env -C D cmd`: o cmd roda em D, só ele. Julga-se como `cd D` de escopo próprio, com a mesma regra do `cd`: só
+        # diretório literal que EXISTE muda o julgado; dinâmico ou ausente é DESCONHECIDO, que nunca isenta (SAC-390)
+        b = CWD[-1] or JCWD
+        for c in env.pop(CHDIR_KEY):
+            b = chdir_target(c, b)
+        CWD.append(b)
+        try:
+            command(["%s=%s" % kv for kv in env.items()] + list(words), depth, cond, piped, stdin_from)
+        finally:
+            CWD.pop()
+        return
     if " " in words[0] and not DYNAMIC.search(words[0]):
         try:
             words = shlex.split(words[0]) + words[1:]  # `$X` com espaço: word-splitting do bash
@@ -1537,6 +1572,9 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         if tb in ("git", "gh") and (len(tail) < 2 or opaque(tail[1]) or (tb == "gh" and tail[1] == "pr" and (len(tail) < 3 or opaque(tail[2])))):
             emit_unanalyzable(words, CWD[-1], unknown_target=True); return   # o SUBCOMANDO vem do stdin
         if tb == "git" and "push" in tail:
+            # o stdin só ACRESCENTA argumentos: o rabo literal já é o comando, e o destino que ele nomeia vale com
+            # qualquer stdin (`xargs git push origin main </dev/null` passava com rc 0 — SAC-390). Julga-o primeiro
+            command(tail, depth)
             forced = any(push_long_opt(t).startswith("--force") or push_long_opt(t) == "--mirror" or (t.startswith("-") and not t.startswith("--") and "f" in t) or t.startswith("+") for t in tail)
             if forced or current_branch(CWD[-1]) in protected_branches(CWD[-1]):
                 emit_unanalyzable(words, CWD[-1], unknown_target=True)

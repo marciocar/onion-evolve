@@ -33,7 +33,10 @@
 #   · a raiz cujo `.git` é link quebrado, no Write e no Bash;
 #   · `curl` e `wget` com a opção colada (`-so x`, `-fsSLo x`, `-o.claude/…`, `wget -qO x`, `-O.claude/…`); `mkfifo` e `mknod` na forma;
 #     `$'\x68ooks'` (o prepass do lib decodifica) e `$"hooks"` (sem catálogo, o bash grava o texto) no caminho;
-#   · link: o `cwd` em `.claude`, a palavra sem barra que é link (`> docs-l`), o `cd` para link, e a pasta de fora de uma skill que é link.
+#   · link: o `cwd` em `.claude`, a palavra sem barra que é link (`> docs-l`), o `cd` para link, e a pasta de fora de uma skill que é link;
+#   · (SAC-390, 2026-11-11) prefixo de ambiente com quebra de linha no valor citado (`A=$'b\nc' mkdir …`), `env -C D`/`--chdir=D`
+#     seguido como o `cd` literal (também a pasta que só nasce na mesma string), e o `w`/`W` do script do sed e a flag `w` do
+#     `s///` (o nome até o fim da linha).
 #
 # ── O QUE CALA (falso positivo é o defeito dominante aqui) ────────────────────────────────
 #   · tudo o que não é forma listada: .claude/skills/onion/SKILL.md, .claude/hooks/x.sh, .claude/settings.json, docs/**, skill NOMEADA
@@ -56,9 +59,9 @@
 #   `tar -c`/`--create` com o arquivo na forma e `git -C … init` na forma. Também escapam: alias de
 #   import em Python, variável reatribuída em código embutido, pasta criada e copiada na MESMA string, e programa que escreve por dentro.
 #   FAMÍLIAS DECLARADAS, sem perseguir (guarda por lista), com caso que grava de verdade e confere que a varredura acusa o resultado:
-#   python indireto, `git mv`, `git worktree add`, `git submodule add`, `git restore`, `tar -x`, `unzip`, `sed w`, `sort -o`.
+#   python indireto, `git mv`, `git worktree add`, `git submodule add`, `git restore`, `tar -x`, `unzip`, `sort -o`.
 #   `$CLAUDE_CONFIG_DIR` escapa aqui E na varredura, que não conhece essa pasta.
-#   Declarados, sem perseguir: cwd que é link; verbos fora da lista sobre link (`truncate`, `sort -o`, `env -C`); link em código (`python3 -c`,
+#   Declarados, sem perseguir: cwd que é link; verbos fora da lista sobre link (`truncate`, `sort -o`); link em código (`python3 -c`,
 #   `perl -e`); link por glob ou variável (`docs-?`, `D=docs; cd $D`); chaves em `curl -o`, `wget -P` e `dd of=`; atribuição com espaço antes de
 #   um redirecionamento nu (`A='a b' > x`). E uma sobreacusação rara:
 #   `.claude/skills/self -> ../..` faz o `hooks/` da raiz barrar, como a S6. Duas mais, com caso SOBREACUSA no --selftest: o `tee` que só
@@ -374,6 +377,21 @@ open(p,'w').write('x')\""
   _c acusa "wget -O colado"               Bash  "wget -O${H} https://exemplo.invalid/x"
   _c acusa "ANSI-C no caminho: \$'\\x68ooks'" Bash "echo x > .claude/skills/x/\$'\\x68ooks'"
   _c acusa "locale no caminho: \$\"hooks\"" Bash "echo x > .claude/skills/x/\$\"hooks\""
+  # SAC-390 (2026-11-11, juiz do radar E3 r24): as formas que passavam rc 0 — prefixo de ambiente com quebra de linha no
+  # valor citado, `env -C`/`--chdir` para dentro da skill, e o `w` do script do sed
+  _c acusa "prefixo com quebra em ANSI-C: mkdir na forma" Bash "A=\$'b\\nc' mkdir -p .claude/skills/x/hooks"
+  _c acusa "prefixo com quebra literal entre aspas simples: mkdir na forma" Bash "A='b
+c' mkdir -p .claude/skills/x/hooks"
+  _c acusa "prefixo com quebra literal entre aspas duplas: printf na forma" Bash "A=\"b
+c\" printf x > ${H}"
+  _c acusa "env --chdir para a skill: mkdir hooks" Bash "env --chdir=.claude/skills/x mkdir hooks"
+  _c acusa "env -C para a skill: tee hooks/h"  Bash  "env -C .claude/skills/x tee hooks/h < /dev/null"
+  # a pasta que nasce na MESMA string: o `cd` literal já a seguia sem olhar o disco, e o `env -C` segue igual
+  _c acusa "env -C para skill criada na mesma string" Bash "mkdir -p .claude/skills/nova && env -C .claude/skills/nova mkdir hooks"
+  _c acusa "sed com w no script"               Bash  "sed -n 'w ${H}' docs/a"
+  _c acusa "sed com a flag w do s"             Bash  "sed 's/a/b/w ${H}' docs/a"
+  _c acusa "sed com w no segundo -e"           Bash  "sed -e p -e 'w ${H}' docs/a"
+  _c acusa "sed com endereço e W"              Bash  "sed -n '1,3W ${H}' docs/a"
   _c acusa "mkfifo na forma"              Bash  "mkfifo .claude/skills/x/hooks"
   _c acusa "exec > alvo"                  Bash  "exec > ${H}"
   _c acusa "exec 1> alvo"                 Bash  "exec 1> ${H}"
@@ -631,6 +649,16 @@ echo x > \"\$OUT\""
   _c cala "crontab que cita: relógio não é desta guarda" Bash "crontab /tmp/tab; echo ${H}"
   _c cala "Bash > em skill nomeada hooks"  Bash  "printf x > .claude/skills/hooks/SKILL.md"
   _c cala "script solto que só cita"       Bash  "bash scratch/cita.sh"
+  # os honestos vizinhos das formas de SAC-390: o que só lê, o que grava fora, e o sed cujo script não grava
+  _c cala "prefixo com quebra: mkdir fora da forma" Bash "A=\$'b\\nc' mkdir -p .claude/skills/x/refs"
+  _c cala "env -C para a skill: ls hooks"      Bash  "env -C .claude/skills/x ls hooks"
+  _c cala "env -C para fora: mkdir hooks"      Bash  "env -C /tmp mkdir hooks"
+  _c cala "env -C para pasta ausente: ls hooks" Bash "env -C .claude/skills/nada ls hooks"
+  _c cala "sed com w para fora"                Bash  "sed -n 'w /tmp/sed-out' ${H}"
+  _c cala "sed que só lê o plugin"             Bash  "sed -n '/wiki/p' ${H}"
+  _c cala "sed s com w no padrão, sem a flag"  Bash  "sed 's/w/x/g' docs/a"
+  _c cala "sed --sandbox recusa o w"           Bash  "sed --sandbox -n 'w ${H}' docs/a"
+  _c cala "sed a com texto que cita w"         Bash  "sed 'a w ${H}' docs/a"
   # ── TETO: não coberto, DECLARADO. Se um destes passar a barrar, o teto mudou e o cabeçalho tem de mudar junto ──
   _c TETO "script versionado (fronteira do juiz)" Bash "bash tools/w.sh"
   _c TETO "python3 x.py"                   Bash  "python3 scratch/qualquer.py"
@@ -689,7 +717,6 @@ z=zipfile.ZipFile(d+"/p.zip","w"); z.writestr("x/hooks/h","x"); z.close()' "${d}
   _tv "git restore"         "git restore --source=HEAD~1 --worktree -- .claude/skills/old/hooks/h"
   _tv "tar -x"              "tar -xf ${d}/p.tar -C .claude/skills"
   command -v unzip >/dev/null 2>&1 && _tv "unzip" "unzip -q ${d}/p.zip -d .claude/skills"
-  _tv "sed w"               "sed -n 'w .claude/skills/x/hooks/h' docs/a"
   _tv "sort -o"             "sort -o .claude/skills/x/hooks/h docs/a"
   _c TETO "git init e escrita na mesma string" Bash "git init -q ${d}/novo && printf x > ${d}/novo/.claude/skills/y/hooks/h"
   _c TETO "base64 -d | sh"                 Bash  "echo cHJpbnRm | base64 -d | sh"

@@ -10342,6 +10342,28 @@ PY
     "${_many}" "${_IL}" $'            emit_unanalyzable(seg, CWD[-1])\n        return\n    for body in FUNCS' $'            emit_unanalyzable(seg, CWD[-1])\n        raise Unanalyzable("teto")\n    for body in FUNCS'
   _pvmut "(fn9) protect-main: wrapper git(){ command git \"\$@\"; } com push sem force → passa" 0 pretooluse-protect-main.sh feat \
     'git(){ command git "$@"; }; git push origin HEAD:main' "${_IL}" 'raw_words[k] in ("command", "builtin")' 'raw_words[k] in ()'
+  # SAC-390 (2026-11-11, juiz do radar E3 r24): prefixo de ambiente com QUEBRA DE LINHA no valor citado, e o rabo literal
+  # do xargs. As formas passavam rc 0 (medido na main antes da cura); cada caso prova o mutante da cura numa cópia
+  local _SP=$'        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w, re.S)\n        if m:\n            env['
+  local _SPM=$'        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w)\n        if m:\n            env['
+  _pvmut "(nl1) merge-gate: A=\$'b\\nc' git push origin main → VETO" 2 pretooluse-merge-gate.sh feat \
+    $'A=$\'b\\nc\' git push origin main' "${_IL}" "${_SP}" "${_SPM}"
+  _pvmut "(nl2) merge-gate: A=\"b<LF>c\" gh pr merge 1 → VETO" 2 pretooluse-merge-gate.sh feat \
+    $'A="b\nc" gh pr merge 1' "${_IL}" "${_SP}" "${_SPM}"
+  _pvmut "(nl3) merge-gate: A=1 B=\$'b\\x0ac' git push origin main → VETO" 2 pretooluse-merge-gate.sh feat \
+    $'A=1 B=$\'b\\x0ac\' git push origin main' "${_IL}" "${_SP}" "${_SPM}"
+  _pvmut "(nl4) merge-gate: A='b<LF>c' git push origin main → VETO" 2 pretooluse-merge-gate.sh feat \
+    $'A=\'b\nc\' git push origin main' "${_IL}" "${_SP}" "${_SPM}"
+  _pvmut "(nl5) protect-main: A=\$'b\\nc' git push -f origin main → VETO" 2 pretooluse-protect-main.sh feat \
+    $'A=$\'b\\nc\' git push -f origin main' "${_IL}" "${_SP}" "${_SPM}"
+  _pvmut "(xa1) merge-gate: xargs git push origin main </dev/null → VETO" 2 pretooluse-merge-gate.sh feat \
+    'xargs git push origin main </dev/null' "${_IL}" $'            command(tail, depth)\n            forced = any(' $'            forced = any('
+  _case "(nl6) merge-gate: A=\$'b\\nc' git status → passa"         0 "${mg}" feat $'A=$\'b\\nc\' git status'
+  _case "(nl7) merge-gate: A='b<LF>c' git push origin feat → passa"  0 "${mg}" feat $'A=\'b\nc\' git push origin feat'
+  _case "(nl8) merge-gate: echo citando o prefixo com quebra → passa" 0 "${mg}" feat $'echo "A=$\'b\\nc\' git push origin main"'
+  _case "(xa2) merge-gate: xargs git push origin feat </dev/null → passa" 0 "${mg}" feat 'xargs git push origin feat </dev/null'
+  _case "(xa3) merge-gate: xargs -I{} git push origin {} <<< feat → passa" 0 "${mg}" feat 'xargs -I{} git push origin {} <<< feat'
+  _case "(xa4) merge-gate: xargs echo citando git push origin main → passa" 0 "${mg}" feat 'xargs echo git push origin main </dev/null'
   # invólucros — a classe medida pela auditoria de 2026-09-02 (todos passavam rc=0 nos DOIS vetos)
   _case "protect-main: command git push -f main → VETO"    2 "${pm}" feat 'command git push -f origin main'
   # escopo (2026-09-02): alvo em OUTRO repo não é assunto destes vetos; `-C .` e `-C <raiz>` continuam sendo
@@ -14762,6 +14784,24 @@ C = {
  # desconhecida e o glob do -not -path fechava como leitura; `-exec cat` (find-exec, acima) segue barrado
  'find-exec-wc': (0, "cd /tmp && grep -n 'a\\(b\\)' x; find . -name CLAUDE.md -not -path " + Q + "./node_modules/*" + Q + " -exec wc -c {} \\; | sort -n", SEM),
  'find-exec-mix': (2, "find . -name .env -exec wc -c {} \\; -exec cat {} \\;", SEM),
+ # SAC-390 (2026-11-11, juiz do radar E3 r24): o nome em ANSI-C (`$'…'`) e em `$"…"` passava com rc 0 — o shlex não
+ # conhece nenhum dos dois e entregava `$.env`. As seis formas medidas, mais escape hexadecimal, octal e substituição;
+ # e os honestos: `$'…'` DENTRO de aspas duplas é literal, o exemplo segue livre, e source/echo não leem valor
+ 'ansi-cat': (2, "cat $" + Q + ".env" + Q, SEM),
+ 'ansi-part': (2, "cat $" + Q + ".e" + Q + "nv", SEM),
+ 'ansi-dot': (2, "cat .$" + Q + "env" + Q, SEM),
+ 'locale-dq': (2, "cat $\".env\"", SEM),
+ 'ansi-cp': (2, "cp $" + Q + ".env" + Q + " /tmp/d/", SEM),
+ 'ansi-sed': (2, "sed -n p $" + Q + ".env" + Q, SEM),
+ 'ansi-hex': (2, "cat $" + Q + "\\x2eenv" + Q, SEM),
+ 'ansi-oct': (2, "head -1 $" + Q + "\\056env" + Q, SEM),
+ 'ansi-subst': (2, "x=$(cat $" + Q + ".env" + Q + ")", SEM),
+ 'ansi-in-dq': (0, "cat \"$" + Q + ".env" + Q + "\"", SEM),
+ 'ansi-example': (0, "cat $" + Q + ".env.example" + Q, SEM),
+ 'ansi-echo': (0, "echo $" + Q + ".env\\n" + Q, SEM),
+ 'ansi-source': (0, "set -a; source $" + Q + ".env" + Q + "; set +a", SEM),
+ 'locale-prose': (0, "printf " + Q + "%s" + Q + " $\"configure o .env\"", SEM),
+ 'ansi-readme': (0, "cat $" + Q + "README.md" + Q, SEM),
 }
 # mutantes: (rótulo, trecho da cura, trecho revertido, casos que TÊM de inverter)
 M = [
@@ -14799,6 +14839,7 @@ M = [
  ('M32 exec desvia a saída', "        if at_cmd and t in ('exec', 'coproc'):\n            return None", "        if False:\n            return None", ['exec-redir']),
  ('M33 find com -exec de metadado', "            if _ex and all(x in METADATA and x not in ('source', '.') for x in _ex):", "            if False:", ['find-exec-wc']),
  ('M34 qualquer -exec aceito', "            if _ex and all(x in METADATA and x not in ('source', '.') for x in _ex):", "            if _ex:", ['find-exec', 'find-exec-mix']),
+ ('M35 ANSI-C e $"…" não decodificados', "quote_escaped_punct(strip_comments(dollar_quotes(cmd))", "quote_escaped_punct(strip_comments(cmd)", ['ansi-cat', 'ansi-part', 'ansi-dot', 'locale-dq', 'ansi-cp', 'ansi-sed', 'ansi-subst']),
 ]
 bad = []
 for k, (e, c, w) in C.items():
@@ -14820,7 +14861,7 @@ print(' '.join(bad + ['VIVO ' + a for a in alive]))
 U4PY
 )" || u4_out="o harness do caso (u) não rodou"
     if [ -z "${u4_out}" ]; then
-      record_pass "env-exposure: (u) U4: as 24 formas medidas que não leem valor passam (heredoc em composto gravando dado e find com -exec de metadado inclusos); 41 leituras de valor e escapes seguem barrados; os 34 mutantes de cura mordem (A1/A5 e composto de 2026-10-23 inclusos)"
+      record_pass "env-exposure: (u) U4: as 30 formas medidas que não leem valor passam (heredoc em composto gravando dado, find com -exec de metadado e \$'…' honesto inclusos); 49 leituras de valor e escapes seguem barrados (o nome em ANSI-C de SAC-390 incluso); os 35 mutantes de cura mordem (A1/A5, composto de 2026-10-23 e ANSI-C inclusos)"
     else record_fail "env-exposure: (u) U4 (listar/nome de chave/prosa × ler valor)" "${u4_out}"; fi
   fi
   # (m) o caminho sancionado para a pergunta "a chave tem \r?": --lint fala por NOME, nunca pelo valor; e o
@@ -47002,6 +47043,7 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
   _agc "(i5) cd -P <core> && git add → VETO"                     2 "${A}" Bash 'cd -P @CORE@ && git add -A'
   _agc "(i6) pushd <core> && git commit → VETO"                  2 "${A}" Bash 'pushd @CORE@ && git commit -m x'
   _agc "(i7) env -C <core> git commit → VETO"                    2 "${A}" Bash 'env -C @CORE@ git commit -m x'
+  HOME="${sb}" _agc "(i7b) env -C \$HOME/<core> git commit (HOME do hook = a bancada) → VETO" 2 "${A}" Bash 'env -C $HOME/core git commit -m x'
   _agc "(i8) xargs -I{} git -C {} commit <<< <core> → VETO"      2 "${A}" Bash 'xargs -I{} git -C {} commit -m x <<< @CORE@'
   _agc "(i9) cat x >| <core>/N.md → VETO"                        2 "${A}" Bash 'cat /tmp/x >| @CORE@/N.md'
   _agc "(i10) exec 3><core>/N.md → VETO"                         2 "${A}" Bash 'exec 3>@CORE@/N.md'
@@ -47086,7 +47128,8 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
 (h12) o \$HOME volta a ser dinâmico$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    words = [_adv_home(w) if k > 0 and words[k - 1] == "-C" else$(printf '\x1f')    words = [w if k > 0 and words[k - 1] == "-C" else$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')git -C \$HOME/core commit -m x$(printf '\x1f')HOME
 (i1) o --tags volta a herdar a branch atual$(printf '\x1f')lib/invocation-lines.sh$(printf '\x1f')    if tags_only:$(printf '\x1f')    if False:$(printf '\x1f')${M}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')git push origin --tags$(printf '\x1f')MAIN
 (i5) o cd -P volta a deixar o repo desconhecido$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')        dirs = [w for w in words[1:] if not _ar.match(r"^-[PLe@]+\$", w)]$(printf '\x1f')        dirs = list(words[1:])$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')cd -P @CORE@ && git add -A$(printf '\x1f')
-(i7) o env -C volta a sumir com o diretório$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if chdir and not DYNAMIC.search(_adv_home(chdir)):$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')env -C @CORE@ git commit -m x$(printf '\x1f')
+(i7) o env -C volta a sumir com o diretório$(printf '\x1f')lib/invocation-lines.sh$(printf '\x1f')    if CHDIR_KEY in env:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')env -C @CORE@ git commit -m x$(printf '\x1f')
+(i7b) o \$HOME do env -C volta a ser dinâmico$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    return _adv_base_chdir_target(_adv_home(c), b)$(printf '\x1f')    return _adv_base_chdir_target(c, b)$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')env -C \$HOME/core git commit -m x$(printf '\x1f')HOME
 (i8) o xargs com here-string volta a não se montar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if base == "xargs" and "<<<" in words:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')xargs -I{} git -C {} commit -m x <<< @CORE@$(printf '\x1f')
 (i10) a varredura crua volta a não rodar antes da análise$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')def analyze(*a, **k):$(printf '\x1f')def _adv_sem_embrulho(*a, **k):$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')exec 3>@CORE@/N.md$(printf '\x1f')
 (i12) apagar o pai do carimbo volta a passar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if p and (rp in _ADV_SELF_TSV or (destroys and any(x.startswith(rp.rstrip("/") + "/") for x in _ADV_SELF_TSV))):$(printf '\x1f')    if p and rp in _ADV_SELF_TSV:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')rm -rf .claude$(printf '\x1f')
@@ -55069,6 +55112,8 @@ check_plugin_write_scan' 2>&1 || true)"
     case "${which}" in
       hook)  file="${sb}/.claude/hooks/pretooluse-plugin-write-guard.sh" ;;
       judge) file="${sb}/.claude/hooks/lib/plugin-write-judge.py" ;;
+      lib)   file="${sb}/.claude/hooks/lib/invocation-lines.sh" ;;
+      moat)  file="${sb}/.claude/hooks/lib/moat-judge.py" ;;
       scan)  file="${sb}/.claude/validation/plugin-write-scan-check.sh" ;;
     esac
     if ! python3 -I -c 'import sys
@@ -56282,7 +56327,32 @@ EOF_MUT
 @@@
 -type f
 EOF_MUT
-  if [ "${n_mut}" -ge 80 ]; then record_pass "plugin-write-guard: (f) ${n_mut} mutantes mordem"
+  # SAC-390 (2026-11-11): as três curas no ponto comum — o tokenizador (prefixo com quebra, `env -C`) e o juiz do MOAT (`sed w`)
+  _pw_mut L1-prefixo-com-quebra lib 'prefixo com quebra em ANSI-C: mkdir na forma' <<'EOF_MUT'
+        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w, re.S)
+        if m:
+            env[m.group(1)] = m.group(2); words = words[1:]; continue
+@@@
+        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", w)
+        if m:
+            env[m.group(1)] = m.group(2); words = words[1:]; continue
+EOF_MUT
+  _pw_mut L2-env-chdir lib 'env --chdir para a skill: mkdir hooks' <<'EOF_MUT'
+    if CHDIR_KEY in env:
+@@@
+    if False:
+EOF_MUT
+  _pw_mut J2-env-chdir-nasce moat 'env -C para skill criada na mesma string' <<'EOF_MUT'
+    if t != UNKNOWN or DYNAMIC.search(c):
+@@@
+    if True:
+EOF_MUT
+  _pw_mut J1-sed-w moat 'sed com w no script' <<'EOF_MUT'
+        for p in _moat_sed_writes(args):
+@@@
+        for p in []:
+EOF_MUT
+  if [ "${n_mut}" -ge 84 ]; then record_pass "plugin-write-guard: (f) ${n_mut} mutantes mordem"
   else record_fail "plugin-write-guard: (f) contagem" "só ${n_mut} mutantes morderam"; fi
   unset -f _pw_tree _pw_mut
   rm -rf "${d}"

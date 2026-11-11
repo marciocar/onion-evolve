@@ -154,6 +154,24 @@ def _moat_abspath(w, base=None):
     return p
 
 
+_moat_base_chdir_target = chdir_target
+
+
+def chdir_target(c, b):
+    """`env -C D`: o juiz de ESCRITA segue a pasta literal mesmo que ela só nasça em runtime, como já segue o `cd`
+    (`mkdir -p .claude/skills/y && env -C .claude/skills/y mkdir hooks` grava, e a regra estrita do lib a perdia —
+    passada adversarial de SAC-390). Os vetos de merge e force-push não carregam este juiz e ficam com a estrita."""
+    t = _moat_base_chdir_target(c, b)
+    if t != UNKNOWN or DYNAMIC.search(c):
+        return t
+    c = os.path.expanduser(c)
+    if b == UNKNOWN:
+        b = _MOAT_CDS[-1] if _MOAT_CDS else UNKNOWN
+    if os.path.isabs(c):
+        return os.path.normpath(c)
+    return UNKNOWN if b == UNKNOWN else os.path.normpath(os.path.join(b, c))
+
+
 def _moat_candidates(p):
     """O caminho como escrito e o REAL (symlink já no disco), cada um com seus ancestrais."""
     out = []
@@ -249,6 +267,142 @@ def _moat_write_path(p, detail, verb="escrita", creates=True):
     if hit:
         cls, pat, wrapper = hit
         _moat_emit(cls, p, wrapper, "%s em %s — %s" % (verb, pat, detail))
+
+
+def _moat_sed_delim_end(s, j, d):
+    """Índice depois do delimitador `d` não escapado a partir de `j` (o fim do texto, se não fecha)."""
+    while j < len(s):
+        if s[j] == "\\":
+            j += 2; continue
+        if s[j] == d:
+            return j + 1
+        j += 1
+    return len(s)
+
+
+def _moat_sed_script_writes(s):
+    """Os arquivos que um script de sed GRAVA: o comando `w`/`W` e a flag `w` do `s///`. O nome vai até o fim da
+    linha, como no GNU sed. SAC-390 (2026-11-11): `sed -n 'w .claude/skills/x/hooks/h'` passava com rc 0. Erra para
+    CALAR: o que não se lê não acusa, e o caminho só acusa se tiver a forma guardada."""
+    out, i, n = [], 0, len(s)
+
+    def eol(j):
+        e = s.find("\n", j)
+        return n if e < 0 else e
+
+    def name_at(j):
+        while j < n and s[j] in " \t":
+            j += 1
+        e = eol(j)
+        f = s[j:e].strip()
+        if f and f not in ("/dev/stdout", "/dev/stderr"):
+            out.append(f)
+        return e
+
+    def addr(j):
+        if j < n and s[j] == "/":
+            j = _moat_sed_delim_end(s, j + 1, "/")
+        elif j + 1 < n and s[j] == "\\":
+            j = _moat_sed_delim_end(s, j + 2, s[j + 1])
+        elif j < n and s[j] == "$":
+            return j + 1
+        else:
+            while j < n and (s[j].isdigit() or s[j] in "~+"):
+                j += 1
+            return j
+        while j < n and s[j] in "IM":                     # flags do endereço por regex
+            j += 1
+        return j
+
+    while i < n:
+        if s[i] in " \t\n;{}!":
+            i += 1; continue
+        if s[i] == "#":
+            i = eol(i); continue
+        i = addr(i)
+        while i < n and s[i] in " \t":
+            i += 1
+        if i < n and s[i] == ",":
+            i += 1
+            while i < n and s[i] in " \t":
+                i += 1
+            i = addr(i)
+        while i < n and s[i] in " \t!":
+            i += 1
+        if i >= n:
+            break
+        c = s[i]
+        if c in "wW":
+            i = name_at(i + 1)
+        elif c in "s":
+            if i + 1 >= n:
+                break
+            d = s[i + 1]
+            i = _moat_sed_delim_end(s, i + 2, d)
+            i = _moat_sed_delim_end(s, i, d)
+            while i < n and s[i] not in ";\n}":
+                if s[i] == "w":
+                    i = name_at(i + 1); break
+                i += 1
+        elif c == "y":
+            if i + 1 >= n:
+                break
+            d = s[i + 1]
+            i = _moat_sed_delim_end(s, _moat_sed_delim_end(s, i + 2, d), d)
+        elif c in "aic":                                   # texto até o fim da linha, e as linhas que a `\` continua
+            e = eol(i)
+            while e < n and s[e - 1:e] == "\\":
+                e = eol(e + 1)
+            i = e
+        elif c in "rRe:":                                  # nome de arquivo, comando ou rótulo até o fim da linha
+            i = eol(i)
+        elif c in "btT":
+            j = i + 1
+            while j < n and s[j] not in ";\n":
+                j += 1
+            i = j
+        else:
+            i += 1
+    return out
+
+
+def _moat_sed_writes(args):
+    """Os arquivos que `sed <args>` grava pelo SCRIPT (não pelo `-i`). `--sandbox` recusa o `w`: nada."""
+    if "--sandbox" in args:
+        return []
+    scripts, pos, k, explicit = [], [], 0, False
+    while k < len(args):
+        a = args[k]
+        if a == "--":
+            pos += args[k + 1:]; break
+        if a in ("-e", "--expression") and k + 1 < len(args):
+            scripts.append(args[k + 1]); explicit = True; k += 2; continue
+        if a.startswith("--expression="):
+            scripts.append(a.split("=", 1)[1]); explicit = True; k += 1; continue
+        if a in ("-f", "--file", "-l", "--line-length") and k + 1 < len(args):
+            explicit = explicit or a in ("-f", "--file"); k += 2; continue
+        if a.startswith("--file="):
+            explicit = True; k += 1; continue
+        if a.startswith("--"):
+            k += 1; continue
+        if a.startswith("-") and len(a) > 1:
+            body, used = a[1:], 0
+            for idx, ch in enumerate(body):
+                if ch in "efl":                            # o resto da palavra, ou a palavra seguinte, é o valor
+                    val = body[idx + 1:]
+                    if not val and k + 1 < len(args):
+                        val = args[k + 1]; used = 1
+                    if ch == "e":
+                        scripts.append(val)
+                    explicit = explicit or ch in "ef"
+                    break
+                if ch == "i":                              # `-i[SUFIXO]`: o resto é o sufixo
+                    break
+            k += 1 + used; continue
+        pos.append(a); k += 1
+    if not explicit and pos:
+        scripts.append(pos[0])
+    return [f for s in scripts for f in _moat_sed_script_writes(s)]
 
 
 def _moat_redirects(raw_words, detail):
@@ -886,6 +1040,8 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
                 any(a.startswith("-") and not a.startswith("--") and "i" in a[1:] for a in args):
             for p in _moat_positionals(args, {"-e", "-f", "--expression", "--file"}):
                 _moat_write_path(_moat_abspath(p), detail, "sed -i", creates=False)
+        for p in _moat_sed_writes(args):                 # `w arquivo` no script grava, com ou sem `-i` (SAC-390)
+            _moat_write_path(_moat_abspath(p), detail, "sed w")
     elif base == "dd":
         for a in args:
             if a.startswith("of="):

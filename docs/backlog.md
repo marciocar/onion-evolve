@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1062 itens abertos** em 164 grafo(s) com aberto (de 217 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1064 itens abertos** em 165 grafo(s) com aberto (de 216 no escopo) · 159 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1422,13 +1422,6 @@
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETERM |
 
-## radar-E3-2026-11-10-r24 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 9.6 | `Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110` | radar-E3-2026-11-10-r24 | o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita  |
-| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
-
 ## session-2026-07-18-evolve-review-triage — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1546,6 +1539,13 @@
 | 4.5 | `C_TETO_GATE_DO_GIT` | hooks-python-isolated-2026-11 | TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da s |
 | 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
 | 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
+
+## radar-E3-2026-11-10-r24 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.3 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110` | radar-E3-2026-11-10-r24 | o SDK do bridge sobe para 0.3.322, com o lock, e re-implanta pelo caminho declarado; o deploy é do maestro |
+| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
 
 ## ai-front-2026-10 — 1 item(ns)
 
@@ -1742,13 +1742,14 @@
 |--:|---|---|---|
 | 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
 
-## radar-E3-2026-11-04-r23 — 3 item(ns)
+## radar-E3-2026-11-04-r23 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_CENSO_DE_SESSOES_EM_BINARIO_DELETADO_1104` | radar-E3-2026-11-04-r23 | a casa lista os processos da conta em binário apagado, achados pelo executável (readlink no procfs) e não pelo nome claude: hoj |
 | 2.0 | `Q_CENSO_AVISA_O_FIM_DO_LOGIN_1104` | radar-E3-2026-11-04-r23 | o censo de frescor (currency-census.sh) ou o hook de início de sessão passa a ler loginExpiresAt e avisa o maestro antes do cort |
 | 2.0 | `Q_PREAMBULO_NOMEIA_O_CORTE_DE_3_MIN_1104` | radar-E3-2026-11-04-r23 | o preâmbulo do agente de execução nomeia o corte de 3 minutos e exige o rc do gate lido do arquivo de log, nunca a resposta do  |
+| 1.0 | `Q_SUBIR_A_EXTENSAO_DO_VSCODE_PELO_EDITOR_1104` | radar-E3-2026-11-04-r23 | o maestro sobe a extensão do VS Code pela visão de extensões do editor, ou a casa passa a medi-la no censo de frescor, que hoje |
 
 ## fios-abertos — 2 item(ns)
 
@@ -1852,6 +1853,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.0 | `Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL` | radar-E3-2026-10-17-r13 | medir um turno real do admin do /chat com o fork ligado (custo da cópia de contexto e saída em segundo plano antes do fim do tur |
+
+## radar-E3-2026-10-26-r19 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026` | radar-E3-2026-10-26-r19 | a extensão do VS Code do host deve entrar como fonte declarada no censo de versões, ou basta atualizá-la quando for usada |
 
 ## vendor-multi-branch-2026-07 — 1 item(ns)
 

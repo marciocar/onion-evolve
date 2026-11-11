@@ -81,7 +81,7 @@ onion_env_may_touch() {
 # heredoc ERA a entrada padrão: o JSON nunca chegava e o veto passava tudo (18 de 18 vetos falharam na 1ª
 # bateria — fail-open total, pego antes de registrar o hook).
 GUARD_PY=$(cat <<'PY'
-import fnmatch, glob, itertools, json, os, re, shlex, sys
+import codecs, fnmatch, glob, itertools, json, os, re, shlex, sys
 
 # ── shlex LINEAR (fix/vetos-fail-closed, 2026-10-11) ───────────────────────────────────────────
 # O shlex da stdlib monta cada token com `self.token += nextchar`. Num ATRIBUTO o CPython não otimiza a
@@ -564,8 +564,47 @@ def strip_comments(cmd):
 
 KEYWORDS = ('if', 'then', 'else', 'elif', 'while', 'until', 'do', '!', '{', '}', 'fi', 'done', 'esac')
 
+def dollar_quotes(cmd):
+    """`$'…'` (ANSI-C) decodificado e re-citado, e `$"…"` (sem catálogo, o bash o lê como "…") sem o `$`, FORA de
+    aspas: o shlex não conhece nenhum dos dois e entregava `$.env`, que não é nome de .env. SAC-390 (2026-11-11):
+    `cat $'.env'`, `cat $'.e'nv`, `cat .$'env'` e `cat $".env"` passavam com rc 0. Escape que não se decodifica
+    fica como está (a forma antiga), e dentro de aspas duplas o `$'` é literal, como no bash."""
+    out, i, n, q = [], 0, len(cmd), None
+    while i < n:
+        c = cmd[i]
+        if q == "'":
+            out.append(c)
+            if c == "'":
+                q = None
+            i += 1; continue
+        if c == '\\' and i + 1 < n:
+            out.append(cmd[i:i + 2]); i += 2; continue
+        if q == '"':
+            out.append(c)
+            if c == '"':
+                q = None
+            i += 1; continue
+        if cmd.startswith("$'", i):
+            j, buf = i + 2, []
+            while j < n and cmd[j] != "'":
+                if cmd[j] == '\\' and j + 1 < n:
+                    buf.append(cmd[j:j + 2]); j += 2
+                else:
+                    buf.append(cmd[j]); j += 1
+            try:
+                out.append(shlex.quote(codecs.decode(''.join(buf), 'unicode_escape')))
+            except Exception:
+                out.append(cmd[i:j + 1])
+            i = j + 1; continue
+        if cmd.startswith('$"', i):
+            i += 1; continue
+        if c in '"\'':
+            q = c
+        out.append(c); i += 1
+    return ''.join(out)
+
 def _tokens(cmd):
-    cmd = quote_escaped_punct(strip_comments(cmd).replace('\\\n', ' '))
+    cmd = quote_escaped_punct(strip_comments(dollar_quotes(cmd)).replace('\\\n', ' '))
     lex = LinearShlex(cmd, posix=True, punctuation_chars=';&|()<>\n')
     lex.whitespace = ' \t\r'
     lex.whitespace_split = True
