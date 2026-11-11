@@ -23,6 +23,7 @@ nota: "tokens 0 = não medido. O diff são dois grafos de selo e dois relatório
   nuvem e do modelo de automação, com três evidências (corpus, mercado de novembro de 2026, leitura do
   kg-ssot) e três selos do maestro (compliance com três domínios de nome inglês, níveis 0 a 2 agendados,
   script do adotante com o serviço Onion na VPS como direção, a combinar por Delphi).
+- Selos do /meta:decide de 2026-11-11 depois do Delphi: o serviço Onion na VPS com dois portões bloqueantes e a pesquisa antes da pessoa jurídica (no estudo), o modo de triagem em lote do /meta:decide (no grafo da forja do decide) e a peça de voz e conduta da persona (no estudo do Company Brain).
 - `docs/onion/graph/consulting-adopter-seal-2026-11.kg.yaml`: três decisões do maestro para o adotante de
   consultoria, repassadas pela sessão dele e confirmadas pelo maestro no /meta:decide do core.
 

@@ -206,6 +206,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-14: «O /meta:decide viaja para todos? E o mini, que nasce sem KG?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
+  - id: D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Forjar como peça do core»"
+    label: "O /meta:decide ganha um modo de triagem em lote, forjado pelo /meta:forge e viajando a todo papel com KG: cada nó vai para fechar por medição, pedir a outro papel com prazo, obsoleto com motivo ou a rodada do maestro, com teto de idade."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Forjar como peça do core»; descartadas: «O hub faz só para ele» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Triagem em lote da fila de decisões abertas: o que faz?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
 edges:
   - from: E_PEDIDO_DO_MAESTRO_QUESTIONARIO
     to: D_TOPOLOGIA_DO_DECIDE_SELADA
@@ -243,3 +259,6 @@ edges:
   - from: D_DECIDE_VIAJA_PARA_TODOS_MENOS_MINI
     to: Q_DECIDE_FICA_EM_PENDING
     edge_type: SUPERSEDES
+  - from: D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: TRACES_TO
