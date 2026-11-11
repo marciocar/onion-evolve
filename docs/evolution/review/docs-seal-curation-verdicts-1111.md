@@ -2,7 +2,8 @@
 branch: docs/seal-curation-verdicts-1111
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 48ed392d977e13fa6918935b562f91750e241fb456dc14c2a9524e9b382cbec3
+reviewed_code_sha256: 3199de08a73da4e9f646622252c0ffc4f034ef0d505d9bbc8ea28cfa7f626bc5
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
