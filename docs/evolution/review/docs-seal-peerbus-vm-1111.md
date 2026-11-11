@@ -2,7 +2,8 @@
 branch: docs/seal-peerbus-vm-1111
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1d8a0d6102f9f14de8344335a713ef944c7c5595469b9ac53479e7fac9882a6c
+reviewed_code_sha256: 0d6271ec08f97d86545c195fa245d3736152423a600c0b39c610adcee6efbdb9
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
