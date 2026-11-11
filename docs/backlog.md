@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1065 itens abertos** em 165 grafo(s) com aberto (de 219 no escopo) · 159 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1066 itens abertos** em 166 grafo(s) com aberto (de 221 no escopo) · 160 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -912,6 +912,24 @@
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
+## automation-levels-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 27.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
+
+## company-brain-non-devs-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 27.0 | `Q_COMPANY_BRAIN_NAO_DEVS_1111` | company-brain-non-devs-2026-11 | como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, c |
+| 24.0 | `Q_PECA_PAPEL_POR_IDENTIDADE_1111` | company-brain-non-devs-2026-11 | a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e u |
+| 21.0 | `Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111` | company-brain-non-devs-2026-11 | o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celula |
+| 16.8 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
+| 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
+| 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
+| 5.4 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
+
 ## problem-formula-2026-11 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -966,18 +984,6 @@
 | 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
-
-## company-brain-non-devs-2026-11 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 24.0 | `Q_COMPANY_BRAIN_NAO_DEVS_1111` | company-brain-non-devs-2026-11 | como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, c |
-| 24.0 | `Q_PECA_PAPEL_POR_IDENTIDADE_1111` | company-brain-non-devs-2026-11 | a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e u |
-| 21.0 | `Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111` | company-brain-non-devs-2026-11 | o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celula |
-| 16.8 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
-| 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
-| 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
-| 5.4 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
