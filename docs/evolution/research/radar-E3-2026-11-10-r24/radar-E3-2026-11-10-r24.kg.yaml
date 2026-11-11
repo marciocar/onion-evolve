@@ -138,6 +138,22 @@ nodes:
       locator: "## 2.1.319 e ## 2.1.321; pretooluse-merge-gate.sh; pretooluse-env-guard.sh; pretooluse-plugin-write-guard.sh"
       method: "measurement: medição no vivo pela sessão do core"
       locality: "repo"
+  - id: E_CURA_DOS_FUROS_DOS_VETOS_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-11"
+    verified_against: "a mesma sonda de payload forjado nos hooks reais da branch fix/veto-tokenizer-holes: as 20 formas de E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110 saem rc 2 (antes rc 0) e os 21 controles honestos seguem rc 0; bancada pretooluse_veto, env_exposure, plugin_write_guard, adopter_guard, moat_gate, kg_read_leg, hooks_python_isolated e veto_onfailure verdes; mutantes mordem pela bancada e por ops/mutate-and-restore.sh"
+    label: "os furos medidos dos vetos estão curados no ponto comum: prefixo com quebra de linha (re.S no tokenizador), xargs com rabo literal, env -C seguido como cd, sed w no juiz de escrita e nome em ANSI-C no env-guard"
+    narrative: "SAC-390, decisão do maestro de 2026-11-11 (D_PRIORIDADE_CURA_DOS_VETOS_1111). Expansão dinâmica ($(echo git), eval, variável com nome de comando), sed -f com w no arquivo e env -iC colado seguem fora, declarados no resíduo docs/evolution/review/fix-veto-tokenizer-holes.md. A passada adversarial foi do próprio agente de execução, sem refutador independente."
+    provenance:
+      source: "docs/evolution/review/fix-veto-tokenizer-holes.md"
+      locator: "## Achados e ## Mutantes"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
   - id: E_BANCADA_DO_DENY_VERDE_NA_2_1_322_1110
     node_type: evidence
     layer: audit
@@ -277,10 +293,10 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.8
-    verified_at: "2026-11-10"
+    verified_at: "2026-11-11"
     verified_against: "sondas com payload forjado nos hooks reais: rc 0 no merge-gate e no plugin-write com prefixo de valor citado contendo quebra de linha; rc 0 no env-guard com nome em ANSI-C; rc 0 com xargs, env --chdir e sed -n w"
     label: "o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita a resolver env --chdir e sed w, com caso na bancada e mutante; pela forja de guardas"
   - id: C_SUPERACAO_20261110_DUAS_VERSOES_DO_SDK
@@ -451,6 +467,9 @@ edges:
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     edge_type: SUPPORTS
   - from: E_MAPA_DO_QUE_OS_VETOS_BARRAM_E_DO_QUE_PASSA_1110
+    to: Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110
+    edge_type: SUPPORTS
+  - from: E_CURA_DOS_FUROS_DOS_VETOS_1111
     to: Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110
     edge_type: SUPPORTS
   - from: C_SUPERACAO_20261110_DUAS_VERSOES_DO_SDK

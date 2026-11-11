@@ -123,6 +123,18 @@ def _adv_home(w):
     return _ar.sub(r"^(\$HOME|\$\{HOME\})(?=/|$)", "~", w) if isinstance(w, str) else w
 
 
+_adv_base_chdir_target = chdir_target
+
+
+def chdir_target(c, b):
+    """`env -C X`/`--chdir=X`: o lib segue o diretório como `cd` (SAC-390, 2026-11-11, no lugar da leitura própria do B2,
+    que ficou morta quando o lib passou a tirar o invólucro antes). Aqui só o que é do adotante: `$HOME/x` vale `~/x`, e
+    o `cd -P`/`pushd` que o lib não segue mas este juiz segue serve de base."""
+    if b == UNKNOWN and _adv_last_cd():
+        b = _adv_last_cd()
+    return _adv_base_chdir_target(_adv_home(c), b)
+
+
 def _adv_abspath(w):
     w = _adv_home(w)
     if not w or DYNAMIC.search(w) or w == "-":
@@ -306,27 +318,6 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     _adv_raw_scan()
     _adv_redirects(raw_words, detail)
     args = words[1:]
-    # `env -C X git …`/`env --chdir=X`: o lib tira o invólucro e o diretório some (B2)
-    chdir = None
-    for k, w in enumerate(raw_words[:-1]):
-        if _ao.path.basename(w) != "env":
-            continue
-        for j in range(k + 1, len(raw_words)):
-            v = raw_words[j]
-            if v in ("-C", "--chdir") and j + 1 < len(raw_words):
-                chdir = raw_words[j + 1]; break
-            if v.startswith("--chdir="):
-                chdir = v[8:]; break
-            if not v.startswith("-") and "=" not in v:
-                break
-        break
-    if chdir and not DYNAMIC.search(_adv_home(chdir)):
-        CWD.append(_adv_abspath(chdir) or UNKNOWN)
-        try:
-            _adv_dispatch(words, base, depth, env, args, detail)
-        finally:
-            CWD.pop()
-        return
     # `xargs [-I R] git … <<< <texto>`: com pipe o lib monta o comando; com here-string não (B2)
     if base == "xargs" and "<<<" in words:
         k = words.index("<<<")
