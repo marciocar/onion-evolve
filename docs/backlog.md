@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1068 itens abertos** em 165 grafo(s) com aberto (de 218 no escopo) · 159 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1062 itens abertos** em 164 grafo(s) com aberto (de 218 no escopo) · 158 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -970,18 +970,6 @@
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
 
-## company-brain-non-devs-2026-11 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 24.0 | `Q_COMPANY_BRAIN_NAO_DEVS_1111` | company-brain-non-devs-2026-11 | como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, c |
-| 24.0 | `Q_PECA_PAPEL_POR_IDENTIDADE_1111` | company-brain-non-devs-2026-11 | a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e u |
-| 21.0 | `Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111` | company-brain-non-devs-2026-11 | o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celula |
-| 16.8 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
-| 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
-| 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
-| 5.4 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
-
 ## elenxos-2026-08-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1434,6 +1422,13 @@
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETERM |
 
+## radar-E3-2026-11-10-r24 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.6 | `Q_CURAR_O_TOKENIZADOR_DOS_VETOS_1110` | radar-E3-2026-11-10-r24 | o tokenizador compartilhado dos vetos passa a tratar quebra de linha dentro de valor citado e nome em ANSI-C, e o veto de escrita  |
+| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
+
 ## session-2026-07-18-evolve-review-triage — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1590,12 +1585,6 @@
 | 4.2 | `Q_ENXUGAR_O_CLAUDE_MD_1111` | model-compare-onion-2026-11 | auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito |
 | 4.2 | `Q_REVISOR_DE_OUTRO_FORNECEDOR_1111` | model-compare-onion-2026-11 | ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa  |
 | 4.2 | `Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111` | model-compare-onion-2026-11 | curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada |
-
-## radar-E3-2026-11-10-r24 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
 
 ## a2a-landscape-2026-11 — 4 item(ns)
 
