@@ -1,0 +1,447 @@
+# kg-backlog-guard: on
+# Estudo: como colaboradores que não são desenvolvedores consultam o Company Brain por Slack e Claude desktop e celular.
+meta:
+  id: company-brain-non-devs-2026-11
+  schema_version: "1"
+  baseline: "2026-11-11"
+  review_after: "2026-12-11"
+  x_supersedes_none: "estudo novo; parte do D_MA_ARCH e do runtime da persona selados, sem derrubar nó"
+  purpose: "Orquestrar entre as sessões do ecossistema a peça de comunicação do Company Brain para quem não é dev: identidade, permissão por papel, escrita com aprovação e runtime contínuo, com a 1ª entrega em Slack e Claude desktop e celular."
+  # ═══ TETO: 30 NÓS ═══ (subido em 2026-11-11 de 20: o estudo recebeu o campo do primeiro cliente, a validação do kg-ssot e a diretriz de auditoria no mesmo dia)
+external_edges:
+  - from: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
+    edge_type: DEPENDS_ON
+  - from: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    to: "docs/evolution/research/persona-runtime-2026-11/persona-runtime-2026-11.kg.yaml#D_PERSONA_RUNTIME_2026_11"
+    edge_type: DEPENDS_ON
+nodes:
+  - id: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "pedido do maestro de 2026-11-11, repassado pelo hub de um adotante e decidido no /meta:decide do core"
+    label: "como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, com sessões que conversam, dados com segurança e permissão por papel"
+    trace: "docs/evolution/research/company-brain-non-devs-2026-11/SYNTHESIS.md"
+  - id: E_PRIMARIAS_SLACK_MCP_RUNTIME_PERMISSAO_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "15 páginas primárias lidas (documentação da Slack, especificação MCP 2026-07-28, ajuda da Anthropic, documentação do Agent SDK e do Managed Agents, OpenFGA), licenças conferidas por gh api; relatório em data/primaries.md"
+    label: "as fontes primárias sustentam três escolhas: bot do Slack por eventos com confirmação e deduplicação, MCP remoto público com login por pessoa e papel lido do token no servidor, e permissão por área num motor de política"
+    narrative: "Bot token é identidade de serviço; user token age como a pessoa. O Socket Mode dispensa URL pública, e a entrega é best-effort, com ack em 3 s, 3 retentativas e dedupe por event_id. O conector personalizado do claude.ai existe em todos os planos e exige servidor alcançável pela internet; a spec MCP exige validar a audiência do token e proíbe repassá-lo. O pré-filtro por ListObjects do OpenFGA serve quando a pessoa enxerga poucas áreas."
+    provenance:
+      source: "docs/evolution/research/company-brain-non-devs-2026-11/data/primaries.md"
+      locator: "seções 1 a 6"
+      method: "measurement: leitura de fonte primária por agente, com citação e localizador"
+      locality: "web"
+  - id: E_KG_SSOT_PERMISSAO_POR_GRAFO_E_FALTAS_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-11"
+    verified_against: "resposta da sessão do kg-ssot ao core em 2026-11-11: contrato v4.20 com meta.x_classification por grafo e política de áreas do kg-mcp que falha fechado nas 5 ferramentas de leitura"
+    label: "o kg-ssot cobra permissão por grafo no servidor, mas faltam papel por identidade, separação de leitor e escritor, o perfil OAuth do MCP, TLS próprio, log de leitura e o fluxo de aprovação da escrita"
+    narrative: "A política de áreas mapeia identidade para área, não papel para permissão. O kg-mcp fala MCP por HTTP e tem perfil atrás de proxy por header de identidade. A escrita grava na área própria; a promoção para o canônico por PR existe só como proposta no kg-ssot."
+    provenance:
+      source: "sessão do kg-ssot"
+      locator: "mensagem ao core de 2026-11-11, itens 1 a 3"
+      method: "testimony: resposta da sessão dona do produto"
+      locality: "pessoa"
+  - id: E_HUB_DORES_DE_CAMPO_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "relato do hub de um adotante em 2026-11-11, com casos de 10 e 11 de novembro"
+    label: "no campo, a sessão única para quando o uso acaba, a leitura por busca periódica perde mensagem, a postagem e a permissão são toda a conta do maestro, e não há papel por pessoa"
+    provenance:
+      source: "sessão do hub do adotante"
+      locator: "mensagem ao core de 2026-11-11, dores (a) a (f)"
+      method: "testimony: relato de campo da sessão que opera"
+      locality: "pessoa"
+  - id: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "três rodadas entre core, curadoria e hub em 2026-11-11; manifesto e filtro da persona medidos no origin/main do bridge"
+    label: "a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket local e envio por política de tipo cobrada no serviço"
+  - id: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "spec MCP 2026-07-28 e ajuda dos conectores do claude.ai; kg-mcp hoje só atrás de proxy por header"
+    label: "o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celular consultarem com o login de cada pessoa"
+  - id: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "política de áreas do kg-mcp mapeia identidade para área, sem papel; OpenFGA como candidato de mercado"
+    label: "a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e um log de quem leu o quê"
+  - id: Q_PECA_ESCRITA_COM_APROVACAO_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "a promoção da área própria para o canônico existe só como proposta no kg-ssot, sem código"
+    label: "quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana"
+  - id: Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "docs/ tem os contextos business, technical, compliance e design; não há company-brain-context"
+    label: "o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio do adotante"
+  - id: D_PRIMEIRA_ENTREGA_SLACK_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Slack primeiro, mas o Claude desktop e celular é importante: o que a comunidade pensa disso e tem feito e aprovado?»"
+    label: "A 1ª entrega do Company Brain para não-devs é o bot do Slack; o Claude desktop e celular é importante e vem em seguida, depois de ouvir o que a comunidade faz e aprova."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Slack primeiro, mas o Claude desktop e celular é importante: o que a comunidade pensa disso e tem feito e aprovado?» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Os dois em paralelo» · «Claude desktop primeiro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Company Brain para não-devs: qual peça sai primeiro?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_LOGIN_PELO_PROVEDOR_DA_FAMILIA_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «O provedor de identidade da família»"
+    label: "O login por pessoa do servidor MCP público é emitido pelo provedor de identidade da família, com o papel de cada pessoa no token."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «O provedor de identidade da família»; descartadas: «O login gerado pelo Claude» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Para o Claude desktop e celular consultarem o Brain, quem emite o login por pessoa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_PERMISSAO_ESTENDE_A_POLITICA_ATUAL_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Estender a política atual, medida e testada com resultado necessário»"
+    label: "A permissão por papel estende a política de áreas que o servidor do kg-ssot já cobra, medida e testada com o resultado necessário antes de valer."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Estender a política atual, medida e testada com resultado necessário» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Adotar o OpenFGA» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «A permissão por papel: estender a política atual ou adotar um motor de mercado?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: D_VERTICAL_COMPANY_BRAIN_CONTEXT_AGORA_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Abrir agora»"
+    label: "O core abre agora a vertical company-brain-context, com a persona que fala por ela, pelo /meta:create-vertical."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Abrir agora»; descartadas: «Depois da 1ª entrega» · «Não abrir»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Abrir agora a vertical company-brain-context, com a persona?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: E_PLANO_TEAM_E_CONTAS_PESSOAIS_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "resposta do maestro na sessão do core em 2026-11-11"
+    label: "a empresa adotante tem plano Team do Claude, e a A2A e a mensageria existem para atender também quem usa conta pessoal, no plano Max"
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "resposta à pergunta do plano, 2026-11-11"
+      method: "testimony: informação do maestro"
+      locality: "pessoa"
+  - id: E_COMUNIDADE_CLAUDE_COMO_FRONT_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-11"
+    verified_against: "12 buscas e 10 páginas, com preço oficial, ajuda da Anthropic, uma issue de praticante e o anúncio do auth gerenciado; relatório em data/claude-community.md"
+    label: "o Claude desktop e celular vale como 2ª tela do mesmo servidor, com a permissão no servidor: no Team a URL do conector é visível a todos, o celular instala conector em beta, e os túneis MCP não chegam ao claude.ai"
+    narrative: "Quase não há relato independente de produção com não-devs. Audit log da Anthropic só no Enterprise. O ativo é o servidor com permissão por área; a tela se troca."
+    provenance:
+      source: "docs/evolution/research/company-brain-non-devs-2026-11/data/claude-community.md"
+      locator: "seções 1 a 5"
+      method: "measurement: leitura de fontes por agente, com URL e data"
+      locality: "web"
+  - id: Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-11"
+    verified_against: "a A2A e a mensageria estão em construção para membros com conta pessoal; o servidor cobra papel pelo token, não pelo plano"
+    label: "quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela mensageria, com assinatura e a fila que já existe"
+  - id: E_PECAS_JA_NA_VPS_1111
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "systemctl list-units e docker ps na VPS do core em 2026-11-11: Logto 1.46.0 com o próprio Postgres, Caddy na borda com TLS para os subdomínios da família, o bridge, o hub e a persona do Slack, o MCP de leitura e o de escrita do grafo, o LibreChat com RAG, o WAHA, o Vaultwarden, um MCP de fetch e o STT"
+    label: "a VPS já tem as peças de base: provedor de identidade (Logto), borda com TLS (Caddy), cofre (Vaultwarden), bridge, hub e persona, MCP de leitura e de escrita do grafo, LibreChat e WhatsApp; o estudo reaproveita antes de criar"
+    narrative: "Não instalar o que já roda. O Logto é o provedor de identidade da família e candidato a servidor de autorização do MCP público; falta medir se ele emite token com a audiência do recurso, como a spec MCP exige. O Caddy dá a borda pública. O Vaultwarden é candidato a cofre dos tokens de bot. O LibreChat e o WAHA são telas que vêm depois."
+    provenance:
+      source: "VPS do core"
+      locator: "systemctl e docker ps, 2026-11-11"
+      method: "measurement: inventário de serviços em execução"
+      locality: "host"
+  - id: E_LOGIN_POR_LINK_NA_WEB_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "reforço do maestro na sessão do core em 2026-11-11"
+    label: "requisito do maestro: o login de quem consulta o Brain é um link que abre o login na web, como o /login da assinatura do Claude"
+    narrative: "No conector do Claude desktop e celular, o próprio claude.ai abre o login do provedor e volta com o token. Para sessão de terminal ou de outro canal, o padrão de mercado é o fluxo de dispositivo do OAuth (RFC 8628): a sessão mostra um link e um código, a pessoa entra pela web. Falta medir se o Logto da VPS oferece esse fluxo."
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "reforço de 2026-11-11"
+      method: "testimony: requisito do maestro"
+      locality: "pessoa"
+  - id: E_DUPLA_VALIDACAO_KG_SSOT_CLASSIFICACAO_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-11"
+    verified_against: "veredito do refutador separado do kg-ssot em 2026-11-11 sobre a rodada de mercado da classificação: 13 pontos, 6 bloqueios"
+    label: "a dupla validação do kg-ssot aceitou a classificação de 2026-11-10, reprovou o ponteiro da versão redigida e o piso de sigilo para dado pessoal, e trocou o Logto como fonte única por um perfil OAuth genérico com o Logto como primeiro emissor"
+    narrative: "O ponteiro projection_of vazaria o nome da fonte e não passa no contrato. Quem perde o papel no Logto segue lendo até o token expirar, então a peça do papel exige uma bancada de revogação e a matriz de clientes medida. A RBAC do Logto vem das docs dele: https://docs.logto.io/authorization/role-based-access-control e https://docs.logto.io/use-cases/ai/mcp-server-add-auth."
+    provenance:
+      source: "sessão do kg-ssot"
+      locator: "mensagem ao core de 2026-11-11, itens 1 a 4"
+      method: "judges: refutador separado da sessão dona do produto"
+      locality: "pessoa"
+  - id: D_VERSAO_REDIGIDA_E_GRAFO_PROPRIO_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Grafo redigido próprio»"
+    label: "A versão redigida de um grafo é um grafo próprio de nível menor, sem apontar para a fonte; a ligação fica no grafo fonte ou na política do operador, e a checagem do nível roda do lado de quem opera."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Grafo redigido próprio»; descartadas: «Sem versão redigida por enquanto» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Versão redigida de um grafo: como fica o modelo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: E_DADOS_DO_PILOTO_DO_PRIMEIRO_CLIENTE_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "levantamento do hub do primeiro cliente em 2026-11-11, só papéis e dores genéricas"
+    label: "o piloto tem 7 pessoas, áreas com sigilo de interno ao nível mais alto da política do adotante, papéis por função com escrita só por PR ou card, diretório Google Workspace, e o log lido pelo responsável técnico, que também é o encarregado de dados, e pelo responsável de operações"
+    narrative: "Áreas: negócio, técnico e evolução internos; compliance confidencial, com evidência de auditoria no nível mais alto; operação e dados de cliente no nível mais alto, só leitura e agregado. Papéis: o responsável técnico lê e escreve em tudo; o de operações lê tudo e escreve em negócio e compliance; os demais sócios leem negócio, compliance e operação agregada; produto e desenvolvimento leem técnico e operação; os demais leem negócio. Pronto quando: 20 perguntas reais respondidas com fonte, zero vazamento entre papéis em teste dirigido, resposta em até 2 minutos e nenhuma escrita sem aprovação."
+    provenance:
+      source: "sessão do hub do primeiro cliente"
+      locator: "mensagem ao core de 2026-11-11, itens 1 a 5"
+      method: "testimony: levantamento de campo da sessão que opera"
+      locality: "pessoa"
+  - id: E_CONTROLE_DE_ACESSO_NO_PADRAO_DE_AUDITORIA_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-11"
+    verified_against: "diretriz do maestro repassada pelo hub do primeiro cliente em 2026-11-11"
+    label: "o controle de acesso do Company Brain nasce no padrão que a auditoria cobra, a ISO/IEC 27001:2022 e a LGPD, com matriz papel por área versionada, revisão periódica de acessos e log de leitura revisado"
+    narrative: "Controles 5.15, 5.18, 8.2 e 8.3 da ISO 27001 e, na LGPD, minimização e necessidade de saber. A matriz é aprovada pelo dono da informação com data, e cada ajuste vira versão nova. Revisão trimestral e a cada entrada, saída ou troca de função. Os níveis são os da política de segurança do adotante, como o contrato do kg-ssot já prevê. A matriz concreta mora no repositório privado do adotante; no core fica só o padrão."
+    provenance:
+      source: "maestro, pelo hub do primeiro cliente"
+      locator: "diretriz de 2026-11-11, itens 1 a 5"
+      method: "testimony: diretriz do maestro"
+      locality: "pessoa"
+  - id: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "decisão do maestro em 2026-11-11, por pergunta com opções (/meta:decide): escolhida «Confirmo como começo, consultando o kg-ssot; contas mistas»"
+    label: "A matriz de papéis levantada pelo hub vale como v1 do piloto, consultando o kg-ssot antes de virar política, e só vale depois do teste de zero vazamento entre papéis; as contas são mistas, Team e pessoal."
+    narrative: "Selado por /meta:decide em 2026-11-11: escolhida «Confirmo como começo, consultando o kg-ssot; contas mistas» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Confirmo com ajustes» · «Reviso depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-11: «Os papéis do piloto do Company Brain viram a política de acesso: confirma?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
+      locality: "pessoa"
+  - id: E_KG_SSOT_LE_A_MATRIZ_V1_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-11"
+    verified_against: "resposta da sessão do kg-ssot à consulta do core sobre a matriz v1, 2026-11-11"
+    label: "a política do kg-ssot expressa a matriz v1 hoje, com a exceção do Crítico num grafo próprio em área separada; faltam log de leitura, relatório da matriz efetiva e separação de quem administra a política"
+    narrative: "A política tem área, níveis da organização em ordem e um teto por área, sem exceção por papel. O papel vira a pessoa estar nos grupos das áreas que ele lê. A evidência de auditoria Crítica vai para um grafo próprio numa área separada (ex.: compliance-auditoria) cujo grupo exclui o papel que lê compliance sem o Crítico; isso se faz hoje, sem código. Para a ISO 27001, a política versionada no git é a matriz versionada e o PR aprovado pelo dono é o registro. Faltam: log de leitura só de acréscimo e sem conteúdo (minimização da LGPD), relatório da matriz efetiva por pessoa e área com diff para a revisão trimestral, e merge protegido para separar quem administra a política. Entram na peça do kg-ssot depois da tag 4.49.0."
+    provenance:
+      source: "sessão do kg-ssot"
+      locator: "resposta à consulta do core de 2026-11-11, itens 1 a 3"
+      method: "testimony: leitura do dono do motor de permissão"
+      locality: "pessoa"
+edges:
+  - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
+    to: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
+    to: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    edge_type: SUPPORTS
+  - from: E_DADOS_DO_PILOTO_DO_PRIMEIRO_CLIENTE_1111
+    to: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    edge_type: SUPPORTS
+  - from: E_DADOS_DO_PILOTO_DO_PRIMEIRO_CLIENTE_1111
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: SUPPORTS
+  - from: E_DUPLA_VALIDACAO_KG_SSOT_CLASSIFICACAO_1111
+    to: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    edge_type: SUPPORTS
+  - from: E_DUPLA_VALIDACAO_KG_SSOT_CLASSIFICACAO_1111
+    to: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    edge_type: SUPPORTS
+  - from: E_LOGIN_POR_LINK_NA_WEB_1111
+    to: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    edge_type: SUPPORTS
+  - from: E_LOGIN_POR_LINK_NA_WEB_1111
+    to: Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111
+    edge_type: SUPPORTS
+  - from: E_PECAS_JA_NA_VPS_1111
+    to: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    edge_type: SUPPORTS
+  - from: E_PECAS_JA_NA_VPS_1111
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: SUPPORTS
+  - from: E_PLANO_TEAM_E_CONTAS_PESSOAIS_1111
+    to: Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111
+    edge_type: SUPPORTS
+  - from: E_PLANO_TEAM_E_CONTAS_PESSOAIS_1111
+    to: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    edge_type: SUPPORTS
+  - from: E_COMUNIDADE_CLAUDE_COMO_FRONT_1111
+    to: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    edge_type: SUPPORTS
+  - from: E_PRIMARIAS_SLACK_MCP_RUNTIME_PERMISSAO_1111
+    to: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_PERMISSAO_POR_GRAFO_E_FALTAS_1111
+    to: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    edge_type: SUPPORTS
+  - from: E_HUB_DORES_DE_CAMPO_1111
+    to: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    edge_type: SUPPORTS
+  - from: E_PRIMARIAS_SLACK_MCP_RUNTIME_PERMISSAO_1111
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: SUPPORTS
+  - from: E_PRIMARIAS_SLACK_MCP_RUNTIME_PERMISSAO_1111
+    to: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_PERMISSAO_POR_GRAFO_E_FALTAS_1111
+    to: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_PERMISSAO_POR_GRAFO_E_FALTAS_1111
+    to: Q_PECA_ESCRITA_COM_APROVACAO_1111
+    edge_type: SUPPORTS
+  - from: E_HUB_DORES_DE_CAMPO_1111
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: SUPPORTS
+  - from: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    to: Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111
+    edge_type: DEPENDS_ON
+  - from: D_PRIMEIRA_ENTREGA_SLACK_1111
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: TRACES_TO
+  - from: D_LOGIN_PELO_PROVEDOR_DA_FAMILIA_1111
+    to: Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111
+    edge_type: TRACES_TO
+  - from: D_PERMISSAO_ESTENDE_A_POLITICA_ATUAL_1111
+    to: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    edge_type: TRACES_TO
+  - from: D_VERTICAL_COMPANY_BRAIN_CONTEXT_AGORA_1111
+    to: Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111
+    edge_type: TRACES_TO
+  - from: D_VERSAO_REDIGIDA_E_GRAFO_PROPRIO_1111
+    to: E_DUPLA_VALIDACAO_KG_SSOT_CLASSIFICACAO_1111
+    edge_type: TRACES_TO
+  - from: E_CONTROLE_DE_ACESSO_NO_PADRAO_DE_AUDITORIA_1111
+    to: Q_PECA_PAPEL_POR_IDENTIDADE_1111
+    edge_type: SUPPORTS
+  - from: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
+    to: E_DADOS_DO_PILOTO_DO_PRIMEIRO_CLIENTE_1111
+    edge_type: TRACES_TO
