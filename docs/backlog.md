@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1069 itens abertos** em 166 grafo(s) com aberto (de 221 no escopo) · 160 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1065 itens abertos** em 165 grafo(s) com aberto (de 219 no escopo) · 159 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -844,7 +844,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 21 item(ns)
+## maestro — 18 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -852,10 +852,7 @@
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
-| 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
-| 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
 | 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
@@ -915,24 +912,6 @@
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
-## automation-levels-2026-11 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 27.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
-
-## company-brain-non-devs-2026-11 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 27.0 | `Q_COMPANY_BRAIN_NAO_DEVS_1111` | company-brain-non-devs-2026-11 | como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, c |
-| 24.0 | `Q_PECA_PAPEL_POR_IDENTIDADE_1111` | company-brain-non-devs-2026-11 | a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e u |
-| 21.0 | `Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111` | company-brain-non-devs-2026-11 | o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celula |
-| 16.8 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
-| 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
-| 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
-| 5.4 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
-
 ## problem-formula-2026-11 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -987,6 +966,18 @@
 | 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
+
+## company-brain-non-devs-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 24.0 | `Q_COMPANY_BRAIN_NAO_DEVS_1111` | company-brain-non-devs-2026-11 | como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, c |
+| 24.0 | `Q_PECA_PAPEL_POR_IDENTIDADE_1111` | company-brain-non-devs-2026-11 | a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e u |
+| 21.0 | `Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111` | company-brain-non-devs-2026-11 | o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celula |
+| 16.8 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
+| 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
+| 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
+| 5.4 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
