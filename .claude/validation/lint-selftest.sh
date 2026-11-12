@@ -57151,6 +57151,58 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
 _family run_maestro_ask_selftests
 
 # ---------------------------------------------------------------------------
+# agent-brief — o ajudante que monta o brief do subagente com o cabeçalho do preâmbulo e a linha da espera em
+# primeiro plano COPIADA dele (SAC-421, 2026-11-12). Cada caso reprova contra o mutante dele.
+run_agent_brief_selftests() {
+  echo ""
+  echo "▸ agent-brief — cabeçalho, linha copiada, brief vazio e âncora (.claude/utils/orchestration/agent-brief.sh)"
+  local sut="${REPO_ROOT}/.claude/utils/orchestration/agent-brief.sh"
+  [ -f "${sut}" ] || { record_fail "agent-brief: SUT ausente" "${sut} não existe"; return; }
+  local d; d="$(TMPDIR=/tmp mktemp -d)"; chmod 700 "${d}"
+  mkdir -p "${d}/u"; cp "${sut}" "${d}/u/agent-brief.sh"
+  printf 'Faça a tarefa de teste.\n' > "${d}/brief.md"; : > "${d}/empty.md"
+  local PRE="${REPO_ROOT}/.claude/commands/common/prompts/execution-agent-preamble.md"
+  _abr() {  # $1 = SUT, $2 = brief, $3 = preâmbulo → "rc|saída"
+    local rc=0 out; out="$(ONION_AGENT_PREAMBLE="$3" LC_ALL=C bash "$1" "$2" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  _abcase() {  # <nome> <OLD> <NEW> <função>
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    cp "${sut}" "${d}/w.sh"
+    "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "agent-brief: ${name}"; else record_fail "agent-brief: ${name}" "${AB_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${d}/m.sh"
+    "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "agent-brief: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # (a) o brief final abre mandando seguir o preâmbulo e termina com o brief original
+  _ab_a() { local a; a="$(_abr "$1" "${d}/brief.md" "${PRE}")"; AB_WHY="${a:0:200}"
+    [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == "ANTES DE TUDO, leia e siga"*execution-agent-preamble.md* ]] && [[ "${a#*|}" == *"Faça a tarefa de teste."* ]]; }
+  _abcase "(a) o cabeçalho manda seguir o preâmbulo" "printf 'ANTES DE TUDO, leia e siga" "printf 'LEIA, se quiser" _ab_a
+  # (b) a linha da espera em primeiro plano é a do preâmbulo, byte a byte
+  _ab_b() { local a want; want="$(grep -m1 -F -- '- Processos longos: ESPERA EM PRIMEIRO PLANO' "${PRE}")"; a="$(_abr "$1" "${d}/brief.md" "${PRE}")"
+    AB_WHY="${a:0:200}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"${want}"* ]]; }
+  _abcase "(b) a linha da espera vem copiada do preâmbulo" 'printf '"'"'Regra que mais custou parar agente (copiada do preâmbulo):\n%s\n\n'"'"' "${wait_line}"' 'printf '"'"'Regra que mais custou parar agente (copiada do preâmbulo):\n\n'"'"'' _ab_b
+  # (c) brief vazio é rc 2
+  _ab_c() { local a; a="$(_abr "$1" "${d}/empty.md" "${PRE}")"; AB_WHY="${a:0:200}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"vazio"* ]]; }
+  _abcase "(c) brief vazio é recusado (rc 2)" "grep -q '[^[:space:]]' \"\${brief}\" || die2" "true || die2" _ab_c
+  # (d) preâmbulo ausente é rc 2
+  _ab_d() { local a; a="$(_abr "$1" "${d}/brief.md" "${d}/nao-existe.md")"; AB_WHY="${a:0:200}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"preâmbulo ausente"* ]]; }
+  _abcase "(d) preâmbulo ausente é recusado (rc 2)" '[ -f "${pre}" ] || die2' 'true || die2' _ab_d
+  # (e) âncora mudada no preâmbulo: o ajudante ACUSA (rc 2) em vez de entregar brief sem a linha
+  _ab_e() { local a; sed 's/- Processos longos: ESPERA EM PRIMEIRO PLANO/- Processos longos: aguarde/' "${PRE}" > "${d}/pre-moved.md"
+    a="$(_abr "$1" "${d}/brief.md" "${d}/pre-moved.md")"; AB_WHY="${a:0:200}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"âncora"* ]]; }
+  _abcase "(e) âncora do preâmbulo mudada é acusada (rc 2)" '[ -n "${wait_line}" ] || die2' 'true || die2' _ab_e
+  rm -rf "${d}"
+}
+_family run_agent_brief_selftests
+
+# ---------------------------------------------------------------------------
 # batuta-census — o medidor do /meta:decide diz o PARADO, a dona da pergunta e o sinal sem ack
 # (a batuta, 2026-11-10; .claude/validation/decide-census.sh). Cada caso reprova contra o mutante dele.
 run_batuta_census_selftests() {
