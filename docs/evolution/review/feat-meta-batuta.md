@@ -86,3 +86,7 @@ Os oito casos da `run_baton_pulse_selftests` reprovam cada um contra o seu mutan
   Ele espera a linha do maestro no `owners.tsv`.
 - **Fase 2 e fase 3.** O casamento com a fila e a medição de um dia são a fase 2; a viagem às portas é a fase 3.
   As duas estão desenhadas no grafo e não foram construídas.
+
+## Refutador independente, 2ª passada
+
+APROVADO COM LIMITES sobre o a4144cab7: os 3 bloqueios e os 3 limites curados resistiram, sem regressão (30 de 30, lint 0 HARD). Limites novos declarados: o «NÃO MEDIDO» de PRs e sinais casa o texto do aviso do decide-census.sh, e a batida que fala não nomeia qual sessão caiu (só o sha e as contagens).
