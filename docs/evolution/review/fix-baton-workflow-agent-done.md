@@ -2,7 +2,7 @@
 branch: fix/baton-workflow-agent-done
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 7335025b2ab5dec303e290cf326a9ed77edc82dbc1fae4f33670e966f2889c77
+reviewed_diff_sha256: f5f7cd9f9b27a9c599d27e376d9db50d8366378ca2a4f95d005fce491507a4bc
 reviewed_code_sha256: c8018d9511c1f644bc586529f75f157b6e668140498588ced0452d4bd901c16b
 findings_total: 5
 findings_real: 5
