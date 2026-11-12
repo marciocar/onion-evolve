@@ -2,7 +2,8 @@
 branch: docs/seal-stakeholder-signals
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d9282b1b7454fc343c897599f0a641bc12ef75e125a5f4de3cf3ffbe7e9beb51
+reviewed_code_sha256: 6648b8679ca6f252462dab1ebf0f63413d92e0407ea0b2cc0f4a6b8f24af93db
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
