@@ -19,6 +19,7 @@ corpo:
   controles_trocados: 0
   verified_semantic: false
 para: "onion-evolve — triagem normal (/meta:co-evolve)"
+reviewed_for_public: true  # relido pelo core em 2026-11-12 como publicado: só a forma, sem cliente, pessoas, segredo nem postura
 ---
 
 # Sinal a2a-live de maestro-peer-test

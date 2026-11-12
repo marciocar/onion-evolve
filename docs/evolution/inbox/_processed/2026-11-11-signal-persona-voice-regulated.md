@@ -7,6 +7,7 @@ to: onion-evolve (core)
 flow: upstream (consumidor→core)
 severity: medium
 status: open
+reviewed_for_public: true  # relido pelo core em 2026-11-12 como publicado: só a forma, sem cliente, pessoas, segredo nem postura
 ---
 
 # Voz e conduta da persona: v1 local no hub, a absorver pela vertical do core
