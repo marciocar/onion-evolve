@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1076 itens abertos** em 167 grafo(s) com aberto (de 222 no escopo) · 160 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1075 itens abertos** em 166 grafo(s) com aberto (de 222 no escopo) · 160 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -1467,13 +1467,6 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## curadoria — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.0 | `Q_INTERCONNECT_PART_B_STUDY_1110` | interconnect-profile-2026-11 | Parte B do perfil de interconexão: qual cifra do corpo, qual raiz de confiança e registro assinado (medindo TUF e sigstore contr |
-| 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
-
 ## graduated-automation-elenxo-2026-07 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1713,6 +1706,12 @@
 | 4.5 | `Q_CORTEX_HANDOFF_GATILHO` | cortex-2026-10 | Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cor |
 | 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
 | 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
+
+## curadoria — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
 

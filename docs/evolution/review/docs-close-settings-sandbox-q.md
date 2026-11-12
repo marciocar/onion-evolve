@@ -2,7 +2,7 @@
 branch: docs/close-settings-sandbox-q
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 6134f451e8cf7c51f95d43d2015f582e9897a41b81ed70e07c77e69a9b0e8bfc
+reviewed_diff_sha256: 186b45a94b429ec54bab4cbc5e1803a07d97e044bddbdf6f75a928217e4aeb18
 reviewed_code_sha256: f03c9e68a0446084e5b63f51bda3962ca21b2922ddc2834bdfe6e29ca46f5fa7
 findings_total: 1
 findings_real: 1
