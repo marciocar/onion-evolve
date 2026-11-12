@@ -423,6 +423,22 @@ nodes:
       locator: "seções 3 (contrato), 4 (migração da v1 local do hub) e 5 (persona)"
       method: "measurement: arquivo conferido no disco e exercitado pela família voice_conduct do lint-selftest.sh"
       locality: "repo"
+  - id: D_BRAIN_SLACK_AS_BOT_NOW_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Rodar o mais breve possível, tudo agora: (1) só o envio pelo bot do @brain, com o mesmo texto e a mesma catraca; (2) medir hoje se o piloto tem endpoint HTTPS e processo persistente, e então a leitura por evento num serviço único que reivindica cada event_id uma vez, por menção ou thread (HTTP com endpoint, Socket Mode sem ele, teto de 10 conexões declarado); (3) teste pré-registrado pelo kg-ssot com pedidos reais, e o perfil agent e on_behalf_of só vira contrato se o registro do serviço perder quem pediu»"
+    label: "O Brain posta no Slack como o bot do app @brain, nunca pela conta do maestro, e as três fases do Delphi rodam já, sem esperar o selo de 16/11."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Rodar o mais breve possível, tudo agora: (1) só o envio pelo bot do @brain, com o mesmo texto e a mesma catraca; (2) medir hoje se o piloto tem endpoint HTTPS e processo persistente, e então a leitura por evento num serviço único que reivindica cada event_id uma vez, por menção ou thread (HTTP com endpoint, Socket Mode sem ele, teto de 10 conexões declarado); (3) teste pré-registrado pelo kg-ssot com pedidos reais, e o perfil agent e on_behalf_of só vira contrato se o registro do serviço perder quem pediu» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Selar só a fase 1 agora» · «Esperar o selo de 16/11» · «Usuário humano brain» · «Avatar de bot na conta do maestro» · «Busca como caminho final» · «Recursos nativos do Slack no núcleo antes de medidos»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «O Delphi (core, kg-ssot e curadoria, consenso sem objeção, confiança 0,75 a 0,85) propôs que o Brain poste como bot do @brain em três fases. Selo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
     to: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
@@ -522,4 +538,7 @@ edges:
     edge_type: TRACES_TO
   - from: Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111
     to: A_VERTICAL_COMPANY_BRAIN_CONTEXT_1112
+    edge_type: TRACES_TO
+  - from: D_BRAIN_SLACK_AS_BOT_NOW_1112
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
     edge_type: TRACES_TO
