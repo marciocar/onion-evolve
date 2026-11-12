@@ -472,6 +472,54 @@ nodes:
       locator: "pergunta com opções de 2026-11-12: «Complemento ao selo do backbone: o transporte se vende?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
       locality: "pessoa"
+  - id: D_WHATSAPP_READ_PATHS_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Confirmo os dois: dedicado do Brain como membro visível e o pessoal do maestro, só leitura, sem rota de envio, grupos com advogado externo dentro com aviso e registro do tratamento»"
+    label: "o WhatsApp entra no Brain do hub por dois números, só leitura e sem rota de envio: o dedicado do Brain como membro visível nos grupos da empresa e o pessoal do maestro; os grupos com advogado externo ficam dentro, com aviso no grupo e registro do tratamento"
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Confirmo os dois: dedicado do Brain como membro visível e o pessoal do maestro, só leitura, sem rota de envio, grupos com advogado externo dentro com aviso e registro do tratamento»; descartadas: «Só o dedicado» · «Dois, sem os grupos com advogado»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «WhatsApp para o Brain: confirma os dois números, só leitura e sem rota de envio, com os grupos de advogado externo dentro, com aviso e registro do tratamento?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: D_WHATSAPP_PERSONAL_CONDITIONS_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Banimento: aceito, com mitigações (celular principal, WAHA vinculado, nada enviado, presença offline, sem confirmação de leitura; aviso ou queda do WhatsApp desliga o caminho pessoal). Leitura: allowlist de ids de grupo e contato fora do git, que só o maestro altera, negar por padrão, descarte antes de gravar sem id nem conteúdo (só contagem diária), base legítimo interesse (LGPD art. 7, IX, e art. 10) com teste de balanceamento escrito no compliance-context do hub, dado sensível do art. 11 não vira conhecimento. Retenção: bruto 90 dias, 30 nos grupos com advogado, apagamento automático; conhecimento passa pelo gate de captura; pedido de titular vai ao maestro»"
+    label: "o número pessoal do maestro só lê sob três condições: risco de banimento aceito com mitigações e saída automática, allowlist com descarte na entrada e legítimo interesse com teste de balanceamento escrito, e retenção do bruto de 90 dias (30 nos grupos com advogado)"
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Banimento: aceito, com mitigações (celular principal, WAHA vinculado, nada enviado, presença offline, sem confirmação de leitura; aviso ou queda do WhatsApp desliga o caminho pessoal). Leitura: allowlist de ids de grupo e contato fora do git, que só o maestro altera, negar por padrão, descarte antes de gravar sem id nem conteúdo (só contagem diária), base legítimo interesse (LGPD art. 7, IX, e art. 10) com teste de balanceamento escrito no compliance-context do hub, dado sensível do art. 11 não vira conhecimento. Retenção: bruto 90 dias, 30 nos grupos com advogado, apagamento automático; conhecimento passa pelo gate de captura; pedido de titular vai ao maestro»; descartadas: «Banimento aceito sem condição» · «Banimento não aceito» · «Allowlist com consentimento» · «Jurídico escolhe a base antes» · «Retenção de 30 dias para todos» · «Retenção de 180 dias»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Banimento do número pessoal, allowlist e base legal, e retenção da mensagem bruta»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: D_WHATSAPP_GROUP_NOTICE_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Texto único, também nos grupos com advogado: 'Oi, pessoal! A partir de agora o assistente de IA da empresa também acompanha este grupo, para ajudar a organizar os assuntos e não deixar nada se perder. Qualquer dúvida, fala comigo.' Sem levantar os pontos de antemão: retenção e saída valem no registro interno e são explicadas a quem perguntar. Entrada gradual por lista confirmada pelo maestro; piloto no grupo técnico e com um contato que ele escolheu, depois amplia»"
+    label: "o aviso nos grupos lidos é curto e igual em todos, diz que é assistente de IA e para quê; a entrada é gradual, por lista que o maestro confirma, e o piloto é um grupo técnico e um contato escolhidos por ele"
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Texto único, também nos grupos com advogado: 'Oi, pessoal! A partir de agora o assistente de IA da empresa também acompanha este grupo, para ajudar a organizar os assuntos e não deixar nada se perder. Qualquer dúvida, fala comigo.' Sem levantar os pontos de antemão: retenção e saída valem no registro interno e são explicadas a quem perguntar. Entrada gradual por lista confirmada pelo maestro; piloto no grupo técnico e com um contato que ele escolheu, depois amplia» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Aviso longo com retenção, saída e cláusula de sigilo, com o jurídico lendo o de advogado» · «Texto sem dizer que é IA» · «Sem aviso no início»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Aviso nos grupos lidos: o maestro pediu mais simples, sem levantar problemas, indireto sem mentir, e entrada aos poucos por lista confirmada; qual texto?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
     to: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
@@ -580,4 +628,13 @@ edges:
     edge_type: TRACES_TO
   - from: D_COMMS_BACKBONE_VALUE_TABLE_1112
     to: D_COMMS_BACKBONE_COMPOSED_1112
+    edge_type: TRACES_TO
+  - from: D_WHATSAPP_READ_PATHS_1112
+    to: D_COMMS_BACKBONE_COMPOSED_1112
+    edge_type: TRACES_TO
+  - from: D_WHATSAPP_PERSONAL_CONDITIONS_1112
+    to: D_WHATSAPP_READ_PATHS_1112
+    edge_type: TRACES_TO
+  - from: D_WHATSAPP_GROUP_NOTICE_1112
+    to: D_WHATSAPP_PERSONAL_CONDITIONS_1112
     edge_type: TRACES_TO
