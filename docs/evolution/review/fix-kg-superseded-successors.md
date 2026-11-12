@@ -2,7 +2,8 @@
 branch: fix/kg-superseded-successors
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 835642637f64995edd5d1c2d7bf1c6fb8d7a9fbe04c733c05931b5c8191f6caa
+reviewed_code_sha256: 3df855631368c0dcbdc4632fc95d3cc629d7e8e5c074f5a35c01e66b76a788a5
 findings_total: 63
 findings_real: 63
 findings_blocking: 0
