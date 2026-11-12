@@ -2,7 +2,8 @@
 branch: fix/main-bench-after-kgssot-449
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2e035ef2631a02aabe01f8bb999dec4a853e682cc4922c808a836f08cf3f91d7
+reviewed_code_sha256: 5ea8d3c3d6bd934427521918b298ed3b95d6a961d879498f67be9c0094a62752
 findings_total: 3
 findings_real: 3
 findings_blocking: 2
