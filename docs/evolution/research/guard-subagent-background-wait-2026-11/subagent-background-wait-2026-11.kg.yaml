@@ -1,0 +1,172 @@
+# kg-backlog-guard: on
+# ═══ TETO: 12 NÓS ═══
+meta:
+  id: subagent-background-wait-2026-11
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-11-12"
+  review_after: "2026-12-27"
+  note: "Forja (/meta:forge-guard) do veto pretooluse-subagent-background-wait.sh (SAC-421): Bash com run_in_background vindo de subagente sai com exit 2 e a espera certa. Decisão do maestro de 2026-11-12: ajudante + guarda, medindo antes. O ajudante (agent-brief.sh) está em PR à parte. O Elenxo fica para um refutador independente, e o merge é do maestro porque a guarda muda o settings.json."
+nodes:
+  - id: E_DEFEITO_SUBAGENTES_PARADOS_NO_FUNDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    valid_from: "2026-11-05"
+    verified_at: "2026-11-12"
+    verified_against: "memória de feedback subagent-bg-wait-never-wakes (2026-11-05, reincidência em 2026-11-12); linha 'Processos longos' de .claude/commands/common/prompts/execution-agent-preamble.md; commit 65a1c6716"
+    label: "O DEFEITO: em 2026-11-05 quatro subagentes ficaram parados de 10 min a 1h40 'aguardando o monitor' de um Bash de fundo já terminado. Em 2026-11-12 reincidiu três vezes num dia."
+    narrative: "o aviso de fim da tarefa de fundo não acorda um subagente que encerrou o turno; só uma mensagem da sessão principal o acorda. A regra da espera em primeiro plano com timeout já estava no preâmbulo do agente de execução desde 2026-11-05, e mesmo assim reincidiu quando os briefs não citaram o preâmbulo. Regra na disciplina da sessão é cura nula; daí o ajudante de brief e esta guarda."
+    provenance:
+      source: ".claude/commands/common/prompts/execution-agent-preamble.md"
+      locator: "linha 'Processos longos: ESPERA EM PRIMEIRO PLANO' ('4 casos em 2026-11-05')"
+      method: "reading: o preâmbulo versionado e a mensagem do commit 65a1c6716 (SAC-421)"
+      locality: "repo"
+
+  - id: E_SONDA_AGENT_ID_2_1_322
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    valid_from: "2026-11-12"
+    verified_at: "2026-11-12"
+    verified_against: "docs/evolution/review/feat-agent-brief-helper.md, seção 'Sonda do agent_id' (commit 65a1c6716)"
+    label: "A sonda mediu em Claude Code 2.1.322 que o JSON do PreToolUse de Bash vindo de subagente traz agent_id e agent_type no topo, e o da sessão principal não traz nenhum dos dois."
+    narrative: "claude -p num repo descartável com um PreToolUse que só gravava o JSON de entrada. Chamada direta: session_id, transcript_path, cwd, prompt_id, permission_mode, effort, hook_event_name, tool_name, tool_input, tool_use_id. Chamada do subagente general-purpose: os mesmos campos mais agent_id e agent_type. Uma amostra por caso, uma versão."
+    provenance:
+      source: "docs/evolution/review/feat-agent-brief-helper.md"
+      locator: "seção 'Sonda do agent_id'"
+      method: "measurement: hook gravador de entrada sob claude -p 2.1.322, herdado do resíduo do ajudante"
+      locality: "repo"
+
+  - id: E_CENSO_CLASSE_NOVA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    valid_from: "2026-11-12"
+    verified_at: "2026-11-12"
+    verified_against: "GUARD_CENSUS_QUERY='background subagent agent_id run_in_background ' bash .claude/validation/guard-census.sh . --markdown"
+    label: "O censo de guardas não achou guarda da classe (busca lexical), e o background-task-probe.sh é outra classe: UserPromptSubmit da sessão principal, mede e nunca veta."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seção 'já existe guarda' com GUARD_CENSUS_QUERY='background subagent agent_id run_in_background '"
+      method: "measurement: censo de guardas na carga da forja"
+      locality: "repo"
+
+  - id: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    trace: ".claude/hooks/pretooluse-subagent-background-wait.sh"
+    label: "Substrato: hook PreToolUse em Bash, molde pretooluse-direct-provider-api.sh, registrado no grupo Bash do .claude/settings.json com onFailure block. Veta (exit 2) só com agent_id não vazio no topo e tool_input.run_in_background booleano true."
+    narrative: "o censo lista o molde com registro no settings.json, no lint e na bancada. A guarda casa por campo JSON, nunca por palavra: a 1ª redação tinha um filtro rápido por substring dos nomes dos campos antes do juiz, e os mutantes (iii) e (iv) não morderam porque o filtro sozinho protegia os casos. O filtro saiu, e o python sobe em toda chamada de Bash. O veto diz a espera certa em uma linha: timeout <s> <cmd> > <log> 2>&1 em primeiro plano, e nohup … & numa chamada normal para servidor que precisa ficar vivo."
+
+  - id: D_MALFORMADO_FAIL_OPEN_DECLARADO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: ".claude/hooks/pretooluse-subagent-background-wait.sh"
+    label: "Entrada malformada (JSON que não parseia, topo que não é objeto) e python3 ausente: fail-open DECLARADO, rc 0 com 'NÃO MEDIDO' no stderr."
+    narrative: "cláusula 4 da guard-doctrine: a guarda erra para calar. A entrada vem do harness, não de terceiro (cláusula 5), e fechar barraria todo Bash de toda sessão numa mudança de formato do harness. O onFailure block do registro segue valendo para o hook que quebra (rc fora de 0 e 2). Caso (viii) e (xiii) na bancada, com mutante (viii) que troca o fail-open por exit 2."
+
+  - id: E_BANCADA_E_MUTANTES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    valid_from: "2026-11-12"
+    verified_at: "2026-11-12"
+    verified_against: "ONION: LC_ALL=C bash .claude/validation/lint-selftest.sh --families subagent_background_wait"
+    label: "Bancada run_subagent_background_wait_selftests: --selftest 13/13 (2 acusa, 11 cala), registro, produção com o JSON da sonda, cópia limpa verde e 8 mutantes que mordem."
+    narrative: "mutantes: sem a checagem do agent_id (iii), sem o print do veto (i), sem a checagem do fundo (iv), fundo por truthiness (vii), agent_id só por None (vi), agent_id lido também do tool_input (xi), sem a checagem da ferramenta (ix), malformado vetando (viii)."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_subagent_background_wait_selftests"
+      method: "measurement: só a família, LC_ALL=C"
+      locality: "repo"
+
+  - id: C_TETO_CAMPO_RENOMEADO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: "TETO: se o harness renomear ou tirar o campo agent_id, a guarda fica muda sem aviso. Uma só versão medida (2.1.322) e um só tipo (general-purpose)."
+    narrative: "a sonda tem de ser re-rodada no /meta:cc-update; a cláusula está na guard-doctrine."
+
+  - id: C_TETO_NOHUP_E_OUTRAS_FERRAMENTAS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "TETO: a guarda não vê o subagente que sobe nohup … & numa chamada normal e encerra o turno esperando, nem fundo por outra ferramenta (Agent, Monitor): o matcher é Bash."
+
+  - id: C_LATENCIA_MEDIDA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "laço de 50 chamadas do hook com date +%s%N, Bash comum sem agent_id, na VPS do core com carga ~7"
+    label: "Latência medida em 2026-11-12 nesta VPS: 46 ms por chamada de Bash, média de 50, incluindo a subida do bash e do python3, com carga em torno de 7."
+
+  - id: C_DOGFOOD_SEM_HARNESS_AO_VIVO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "NÃO MEDIDO: o veto não foi disparado pelo harness ao vivo. O dogfood rodou o hook com JSONs no formato da sonda (com e sem agent_id, malformado)."
+    narrative: "o agente que forjou roda sob o settings.json do checkout principal, onde o hook ainda não está registrado."
+
+  - id: Q_ELENXO_E_MERGE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/evolution/review/feat-guard-subagent-background-wait.md"
+    label: "O refutador independente (mandato: achar o falso positivo) não rodou nesta forja. O merge espera o maestro, porque a guarda muda o settings.json de todas as sessões."
+edges:
+  - from: E_DEFEITO_SUBAGENTES_PARADOS_NO_FUNDO
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: SUPPORTS
+  - from: E_SONDA_AGENT_ID_2_1_322
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: SUPPORTS
+  - from: E_CENSO_CLASSE_NOVA
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: SUPPORTS
+  - from: E_BANCADA_E_MUTANTES
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: SUPPORTS
+  - from: E_BANCADA_E_MUTANTES
+    to: D_MALFORMADO_FAIL_OPEN_DECLARADO
+    edge_type: SUPPORTS
+  - from: C_TETO_CAMPO_RENOMEADO
+    to: E_SONDA_AGENT_ID_2_1_322
+    edge_type: DEPENDS_ON
+  - from: C_TETO_NOHUP_E_OUTRAS_FERRAMENTAS
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: DEPENDS_ON
+  - from: C_LATENCIA_MEDIDA
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: DEPENDS_ON
+  - from: C_DOGFOOD_SEM_HARNESS_AO_VIVO
+    to: E_BANCADA_E_MUTANTES
+    edge_type: DEPENDS_ON
+  - from: Q_ELENXO_E_MERGE
+    to: D_PRETOOLUSE_BASH_POR_CAMPO_JSON
+    edge_type: DEPENDS_ON

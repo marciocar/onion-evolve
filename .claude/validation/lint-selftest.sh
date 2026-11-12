@@ -48448,6 +48448,72 @@ EOF_MUT
 }
 _family run_direct_provider_api_selftests
 
+# O veto pretooluse-subagent-background-wait.sh (SAC-421) — medido em 2026-11-05: quatro subagentes parados de 10 min a
+# 1h40 "aguardando o monitor" de um Bash de fundo que já tinha terminado, porque o aviso de fim não acorda subagente que
+# encerrou o turno; reincidiu 3 vezes em 2026-11-12. A sonda (Claude Code 2.1.322) mediu que o PreToolUse de Bash vindo de
+# subagente traz `agent_id` no topo e o da sessão principal não. Casos: (a) as polaridades do --selftest · (b) o registro
+# no settings.json real · (c) o caminho de produção com o JSON no formato da sonda · (m) mutantes, depois de provar a
+# cópia LIMPA verde no mesmo arranjo.
+run_subagent_background_wait_selftests() {
+  local hook="${REPO_ROOT}/.claude/hooks/pretooluse-subagent-background-wait.sh"
+  [ -f "${hook}" ] || { record_fail "subagent-background-wait" "hook ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "subagent-background-wait: python3 ausente"; return; }
+  local o rc
+  # (a) o --selftest do hook: 2 acusa + 11 cala
+  if o="$(LC_ALL=C bash "${hook}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qxF 'selftest: 13/13 verdes' <<< "${o}"; then
+    record_pass "subagent-background-wait: (a) hook --selftest verde (13: subagente com fundo, só agent_id | principal com fundo, subagente sem fundo, false, agent_id vazio, string \"true\", malformado, outra ferramenta, palavra no comando, agent_id no tool_input, fundo no topo, topo não-objeto)"
+  else record_fail "subagent-background-wait: (a) hook --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) REGISTRO: o settings.json real declara o veto no PreToolUse(Bash), com onFailure: block (REGRA 101)
+  if python3 -I -B -c 'import json,sys
+d=json.load(open(sys.argv[1]))
+ok=any("pretooluse-subagent-background-wait.sh" in h.get("command","") and h.get("onFailure")=="block"
+       for g in d["hooks"]["PreToolUse"] if "Bash" in (g.get("matcher") or "").split("|") for h in g["hooks"])
+sys.exit(0 if ok else 1)' "${REPO_ROOT}/.claude/settings.json" 2>/dev/null; then
+    record_pass "subagent-background-wait: (b) settings.json registra o veto no PreToolUse(Bash) com onFailure: block"
+  else record_fail "subagent-background-wait: (b) registro" "o veto não está no PreToolUse(Bash) do settings.json, ou sem onFailure: block"; fi
+  # (c) O CAMINHO DE PRODUÇÃO: o comando do settings.json, com CLAUDE_PROJECT_DIR, o JSON no formato da sonda e a mensagem
+  local base='"session_id":"s","transcript_path":"/tmp/t.jsonl","cwd":"/tmp","permission_mode":"default","hook_event_name":"PreToolUse","tool_name":"Bash","tool_use_id":"toolu_x"'
+  local r1=0 r2=0 e1
+  e1="$(printf '{%s,"tool_input":{"command":"sleep 1","run_in_background":true},"agent_id":"a56b80dfadbaac02b","agent_type":"general-purpose"}' "${base}" \
+        | CLAUDE_PROJECT_DIR="${REPO_ROOT}" bash -c 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-subagent-background-wait.sh"' 2>&1 >/dev/null)" || r1=$?
+  printf '{%s,"tool_input":{"command":"sleep 1","run_in_background":true}}' "${base}" \
+    | CLAUDE_PROJECT_DIR="${REPO_ROOT}" bash -c 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-subagent-background-wait.sh"' >/dev/null 2>&1 || r2=$?
+  if [ "${r1}" = 2 ] && [ "${r2}" = 0 ] && grep -qF 'timeout <s> <cmd> > <log> 2>&1' <<< "${e1}"; then
+    record_pass "subagent-background-wait: (c) produção: subagente com fundo → rc 2 com a espera certa; sessão principal → rc 0"
+  else record_fail "subagent-background-wait: (c) produção" "subagente rc=${r1} (esperava 2), principal rc=${r2} (esperava 0), stderr=[${e1:0:120}]"; fi
+  # (m) MUTANTES na CÓPIA — linha: velho@@@novo@@@caso que tem de reprovar. Antes, a cópia LIMPA tem de passar verde.
+  local sb dst line old new want rest mo mrc
+  sb="$(TMPDIR=/tmp mktemp -d)"; dst="${sb}/pretooluse-subagent-background-wait.sh"
+  cp "${hook}" "${dst}"
+  if mo="$(LC_ALL=C bash "${dst}" --selftest 2>&1)" && grep -qxF 'selftest: 13/13 verdes' <<< "${mo}"; then
+    record_pass "subagent-background-wait: (m0) a cópia LIMPA passa verde no arranjo dos mutantes"
+  else record_fail "subagent-background-wait: (m0) cópia limpa" "$(grep '✗' <<< "${mo}" | head -2 | tr '\n' '|')"; rm -rf "${sb}"; return; fi
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    old="${line%%@@@*}"; rest="${line#*@@@}"; new="${rest%%@@@*}"; want="${rest#*@@@}"
+    cp "${hook}" "${dst}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${dst}" "${old}" "${new}"; then
+      record_fail "subagent-background-wait: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${dst}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -ne 0 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "subagent-background-wait: (m) mutante morde → ✗ ${want}"
+    else record_fail "subagent-background-wait: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<'EOF_MUT'
+if not (isinstance(aid, str) and aid.strip()):@@@if False:@@@(iii)
+    print("VETO")@@@    pass@@@(i)
+if ti.get("run_in_background") is True:@@@if True:@@@(iv)
+if ti.get("run_in_background") is True:@@@if ti.get("run_in_background"):@@@(vii)
+if not (isinstance(aid, str) and aid.strip()):@@@if aid is None:@@@(vi)
+aid = d.get("agent_id")@@@aid = d.get("agent_id") or (d.get("tool_input") or {}).get("agent_id")@@@(xi)
+if tool is not None and tool != "Bash":@@@if False:@@@(ix)
+    MALFORMED)@@@    MALFORMED) exit 2 ;; XMALFORMED)@@@(viii)
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_subagent_background_wait_selftests
+
 # REGRA 116 (Memória do Claude Code sem envelope de canal não confiável) + o veto pretooluse-memory-write-guard.sh — medido
 # em 2026-11-05: o MemGhost grava conteúdo não confiável em memória de agente com 71,4% de ponta a ponta no Claude Code SDK
 # (achado 14 da pesquisa maestro-persona-2026-11), e nenhum hook do core olhava a pasta de memória. Casos: (a)/(b) as

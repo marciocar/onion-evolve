@@ -282,6 +282,11 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-direct-provider-api.sh\"",
             "onFailure": "block"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-subagent-background-wait.sh\"",
+            "onFailure": "block"
           }
         ]
       },
