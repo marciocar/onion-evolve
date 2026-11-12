@@ -8,12 +8,12 @@
 
 | Recurso | Quantidade |
 |---------|-----------:|
-| Comandos invocáveis | **119** |
+| Comandos invocáveis | **121** |
 | Agentes | **51** |
-| Skills | **14** |
+| Skills | **16** |
 | Knowledge Bases | **114** |
 
-## Comandos por categoria (10 categorias + root)
+## Comandos por categoria (11 categorias + root)
 
 | Categoria | Comandos |
 |-----------|---------:|
@@ -25,10 +25,11 @@
 | `git/` | 6 |
 | `design/` | 4 |
 | `test/` | 3 |
+| `company-brain/` | 2 |
 | `quick/` | 1 |
 | `development/` | 1 |
 | _root_ (`onion`, `warm-up`, `catch-up`) | 3 |
-| **Total** | **119** |
+| **Total** | **121** |
 
 ## Agentes por categoria (9 categorias)
 
