@@ -7,7 +7,7 @@ meta:
   review_after: "2026-12-11"
   x_supersedes_none: "estudo novo; parte do D_MA_ARCH e do runtime da persona selados, sem derrubar nó"
   purpose: "Orquestrar entre as sessões do ecossistema a peça de comunicação do Company Brain para quem não é dev: identidade, permissão por papel, escrita com aprovação e runtime contínuo, com a 1ª entrega em Slack e Claude desktop e celular."
-  # ═══ TETO: 30 NÓS ═══ (subido em 2026-11-11 de 20: o estudo recebeu o campo do primeiro cliente, a validação do kg-ssot e a diretriz de auditoria no mesmo dia)
+  # ═══ TETO: 40 NÓS ═══ (subido em 2026-11-12 de 30: o estudo recebeu os selos do maestro do Brain postando como bot, do backbone de comunicação e da tabela de critérios e valores, que nasceram dos dois Delphis do dia; antes: subido em 2026-11-11 de 20: o estudo recebeu o campo do primeiro cliente, a validação do kg-ssot e a diretriz de auditoria no mesmo dia)
 external_edges:
   - from: Q_COMPANY_BRAIN_NAO_DEVS_1111
     to: "docs/onion/graph/company-brain-multiaudiencia-2026-10.kg.yaml#D_MA_ARCH"
