@@ -1,16 +1,17 @@
 ---
 branch: feat/decide-batch-triage
 pr: pendente
-date: 2026-11-11
+date: 2026-11-12
 reviewed_diff_sha256: pendente
-findings_total: 7
-findings_real: 7
-findings_fixed: 5
-findings_blocking: 0
+findings_total: 12
+findings_real: 12
+findings_fixed: 7
+findings_blocking: 3
+findings_blocking_fixed: 3
 verdict: CORRIGIDO
 elenxo: sim
-reviewer: "passada adversarial curta da própria sessão de execução; NÃO houve revisor independente"
-nota: "o revisor independente fica para o pr-finalize / CI; os dois achados não corrigidos estão declarados como limite"
+reviewer: "refutador independente (provas em ~/.local/share/onion/scratch-1111/refute-triage/: bancadas sb1 a sb5 e wf-harness.mjs), sobre o commit 1f34606db; antes dele, uma passada curta da própria sessão (7 achados, abaixo)"
+nota: "os 12 achados são os do refutador independente: 3 bloqueantes e 4 limites curados; 5 limites declarados"
 ---
 
 # Passada adversarial: `feat/decide-batch-triage`
@@ -37,7 +38,47 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
   (os casos (g) e (l) liam o registro real de perguntas da VPS). Medido: com 9 reservas no registro real
   desta VPS, `lint-selftest.sh --families decide` sai rc 0, 45 casos verdes, sem `ONION_ASK_DIR` no ambiente.
 
-## Achados (passada adversarial da própria sessão)
+## Achados do refutador independente (12, sobre o commit 1f34606db)
+
+**Bloqueantes (3, todos curados):**
+
+1. **B1. Obsoleto com `ref -` nunca gravava no core.** O contrato reprova `integrity.superseded-without-successor`,
+   saía rc 3 e o lote inteiro voltava (caso real: `D_PODA_INSTRUCTION_BLOAT_MEDIDA`, cujo sucessor está em
+   outro grafo). O (t7) não pegava porque o grafo da bancada não tinha o contrato vendorizado. **Cura:** o
+   sucessor passa a ser obrigatório e se recusa já no `--preview`. Se ele está em outro grafo, a ref
+   `<grafo>#<ID>` vira `external_edges` SUPERSEDES (contrato v4.3), conferida contra o arquivo e o id. A
+   doutrina foi corrigida. **Prova:** o caso real, numa worktree descartável do core, sai rc 0 com
+   "contrato rc 0 por vendor kg-ssot" e o lint de nomes verde. A bancada (t10) tem o contrato vendorizado,
+   e o mutante sem a `external_edges` (a versão do 1f34606db) reprova.
+2. **B2. Prazo e data validados mais frouxos que no selo unitário.** `20261201` entrava (o `fromisoformat`
+   do Python 3.11+ o aceita) e virava `x_due` ilegível; `--date 2025-13-45` saía rc 0. **Cura:** `strict_date`
+   (regex AAAA-MM-DD e data real) para a data e o prazo, também no `--preview`. **Prova:** (t8), com mutante.
+3. **B3. O workflow chaveava só por id.** Dois candidatos de grafos diferentes com o mesmo id se fundiam no
+   lote. **Cura:** a chave é `<grafo>#<id>` da entrada à síntese, e o candidato repetido é recusado.
+   **Prova:** (t11), um harness em node com agentes simulados, e o mutante "chave = id nu" reprova.
+
+**Limites curados (4):**
+
+4. O sha da aprovação cobre também a `--date` e a `--question` (o `--preview` as exige). Prova: (t9).
+5. No workflow, o label e as pistas do grafo, e o motivo e a evidência levados ao juiz, entram dentro da
+   cerca R15.2 (`untrusted-content-provenance.md`), com nonce e `<<<`/`>>>` desarmados. Prova: (t11).
+6. O mutante que tirava a recusa de nó que não está `open` sobrevivia. O (t8) o mata: o lote com um nó
+   `done` sai rc 2 nomeando o estado. Para isso, a aprovação passou a ser conferida **depois** da forma e
+   do estado dos nós, e toda recusa diz o nome.
+7. `verified_at` no futuro vira aviso nomeado na triagem, em vez de sumir como "abaixo do teto". Prova: (t9).
+
+**Limites declarados (5):**
+
+8. A aprovação reaplicada de um lote só de pedidos passa de novo: o pedido não muda o status (o nó segue
+   `open`), então o mesmo sha reaplica `owner`/`x_due` e acrescenta outra linha na narrativa.
+9. Os caminhos do lote dependem do diretório de onde se roda: os grafos são relativos ao `cwd` (a raiz, como
+   o medidor imprime), e só a ref externa é resolvida pela raiz git.
+10. O pedido não tem proveniência própria nem as alternativas descartadas: grava `owner:`, `x_due:` e uma
+    linha na narrativa.
+11. O pedido ao papel `core` (a própria casa) não é recusado pelo selador; só o medidor deixa de dar a dica.
+12. O modo por grafo chamado direto aplica um subconjunto do lote aprovado (sem o desfazer do lote inteiro).
+
+## Achados (passada curta da própria sessão, antes do refutador)
 
 1. **Corrigido.** A dica `pedido` tratava `owner: core` como outro papel. Medido no core: 65 nós com
    `owner: core` e 49 com `owner: maestro`. Agora os papéis da casa são lidos (`--own`, o `role:` do
@@ -70,6 +111,10 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
   mensagem não diz o que falta.
 - (t5) sem a recusa do destino (a), a mensagem não manda ao `/meta:kg-freshness`.
 - (t6) sem a restauração do lote, o 1º grafo fica escrito quando o 2º reprova.
+- (t8a) sem o regex estrito, o prazo `20261201` passa. (t8b) sem a recusa de não-`open`, o nó `done` vira `superseded`.
+- (t10) sem a escrita da `external_edges`, o contrato reprova (rc ≠ 0), com o leitor do contrato copiado ao lado.
+- (t11) com a chave voltando a ser o id nu, o lote perde um dos dois candidatos.
+- (t9) não tem mutante próprio: prova a aprovação ligada à pergunta e o aviso do futuro.
 - (t7) não tem mutante: é o caminho feliz (obsoleto, pedido, aresta sem duplicar, radar 0, pedido em curso
   sai da triagem seguinte).
 
@@ -90,6 +135,10 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
     que o maestro reverteu exatamente esse flip para `superseded` em 2026-09-06.
   - `D_DEFINE_CHURN` (dica `medição`) → (d) maestro: é definição de domínio num grafo de material didático
     (`docs/materials/cold-adopter-2026-07/`), e o vizinho PROD é a métrica, não a definição.
+- Depois das curas: o lote do refutador com `D_PODA_INSTRUCTION_BLOAT_MEDIDA` e `ref -` sai rc 2 no `--preview`
+  (sem sucessor). Com a ref `docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml#D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS`,
+  numa worktree descartável do core, o selo sai rc 0 com o contrato e o lint de nomes julgados. A worktree
+  foi removida, e nada foi gravado no core.
 - Modo de falha: `--max-age-days abc` e `-3` → rc 2 com a mensagem; grafo rastreado que não parseia → rc 2
   nomeando o arquivo (bancada t3). O workflow não foi disparado (subagente não orquestra); a síntese
   determinística foi exercitada com agentes simulados sobre os 434 candidatos do core.
@@ -99,7 +148,6 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
 - A dica é pista: na amostra, errou em 2 de 4 `obsoleto` (aresta de evidência e reversão do maestro).
 - Grafos de material didático e propostas rejeitadas em `kg-inbox/_rejected/` entram como no censo
   (só fixtures/ e vendor/ ficam fora).
-- A superação entre grafos não vira aresta: fica no motivo.
 - O workflow não foi rodado com agentes reais nesta forja; a forma do retorno do harness não foi medida.
 
 ## Gate
@@ -107,5 +155,6 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
 - `bash .claude/validation/lint-artifacts.sh`: rc 0, **0 HARD**, 26 SOFT (nenhum destes arquivos). A 1ª
   passada deu 1 HARD, a REGRA 80 (Números do harness saem de SSOT gerada, nunca de comentário), por causa
   dos casos novos. Curada com `harness-inventory.sh --markdown > docs/onion/testing-inventory.md`.
-- `bash .claude/validation/lint-selftest.sh --families decide`: rc 0, 45 casos verdes, (t1) a (t7) inclusos.
+- `bash .claude/validation/lint-selftest.sh --families decide`: rc 0, **49 casos** verdes, (t1) a (t11), sem
+  `ONION_ASK_DIR` no ambiente (a família isola o seu).
 - `bash .claude/validation/forge-census.sh .`: `decide` 7/7.
