@@ -3,15 +3,15 @@ branch: feat/guard-subagent-background-wait
 pr: pendente
 date: 2026-11-12
 reviewed_diff_sha256: pendente
-findings_total: 1
-findings_real: 1
+findings_total: 3
+findings_real: 3
 findings_blocking: 0
 tokens: 0
 duration_min: 0
 findings_fixed: 1
 verdict: FIXED
 elenxo: false
-reviewer: agente de execução (autoverificação por mutantes; sem refutador independente)
+reviewer: "agente de execução (mutantes da bancada) e passada da sessão principal em 2026-11-12; o refutador independente travou duas vezes e foi parado, ver o achado 3"
 nota: "tokens e duration_min não medidos (0 = não medido); sem revisor independente nesta passada, só os mutantes da bancada. O MERGE ESPERA O MAESTRO: a guarda muda o .claude/settings.json de todas as sessões."
 ---
 
@@ -44,6 +44,16 @@ todo Bash de toda sessão numa mudança de formato. O `onFailure: block` vale pa
    por substring (`*agent_id*` e `*run_in_background*`) antes do juiz. Os mutantes que tiram a checagem do `agent_id`
    e a do fundo NÃO morderam: o filtro sozinho protegia os casos (iii) e (iv). Era casar por palavra, e a cobertura
    anunciada não existia. Cura: o filtro saiu, o juiz python sobe em toda chamada de Bash (~46 ms medidos, carga ~7).
+
+2. **Limite (passada da sessão principal, 2026-11-12).** O mutante `is True` → `== True` sobrevive à bancada: a
+   diferença só aparece com `run_in_background: 1` (inteiro), que o harness não emite. Fica declarado como
+   equivalente na prática. Os mutantes "ferramenta invertida" e "exit 1 no lugar do exit 2" morrem (rc 1).
+3. **Limite, e o mais importante: a guarda não cobre a forma de travamento medida hoje.** O refutador
+   independente desta guarda ficou duas vezes por mais de 1h num tool_use sem resultado. A causa, reproduzida
+   na sessão principal: um comando com `rm -rf $var` dispara a checagem de segurança do Claude Code, que pede
+   aprovação humana; no subagente em segundo plano o pedido fica pendurado. Esta guarda veta o
+   `run_in_background` e não enxerga isso. Registrado no SAC-421, com a cura de brief (agente não remove
+   diretório por variável) e a de mecanismo a propor (o medidor acusa tool_use sem resultado há N minutos).
 
 ## Mutantes
 
