@@ -90,6 +90,7 @@ What v4 changed in severity, and what it added:
 | `form.unknown-key.<scope>.<key>` (a key outside the grammar and without `x_`, at the top level, in meta, in a node, or in an edge) | SHOULD | **MUST** |
 | `form.pattern.<scope>.key` (a name that is not a slug, without `x_`) | SHOULD | **MUST** (with `x_`, still SHOULD) |
 | `form.pattern.node.provenance.source` (a placeholder `source`: whitespace only, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hyphens, an em dash, `?`...) | — | **MUST** (an empty value still gives `form.range`) |
+| `form.pattern.node.provenance.source` (a `private-cite:` marker out of form, v4.22) | — | SHOULD |
 | `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony`, or, since v4.16, their Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, which warn as `form.deprecated.node.provenance.method` since v4.21) | — | SHOULD (MUST in v5) |
 | `form.unknown-key.node.provenance.<key>` (an unknown key inside `provenance`) | SHOULD | SHOULD |
 
@@ -253,6 +254,8 @@ is the graph. On an edge it stays a free `x_` key. Nothing that passed fails.
 
 v4.21 adds two SHOULD warnings. In `latest/form/method-vocabulary/`, the Portuguese class of `provenance.method` (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) still passes and warns as `form.deprecated.node.provenance.method` (a `not` with the `deprecated` keyword, which only annotates); a value that already fails the form keeps only `form.pattern.node.provenance.method`, and the alias leaves in v5, not before 2027-03-31. In `latest/form/provenance-always/`, an `evidence` node without `provenance` in any status except `unverifiable`, and a `decision` `done` without it, warn as `form.required.node.provenance`, the code of the MUST rule; on a node where the MUST already flags it, the reader does not repeat it as a warning, and on another node of the same document it still warns (the deduplication is per occurrence). Nothing that passed fails.
 
+v4.22 adds one SHOULD rule. In `latest/form/private-cite/`, a `provenance.source` that starts with `private-cite:` (case-sensitive, with no leading space) and is not `private-cite:` followed by 22 to 43 base64url characters (`A-Z`, `a-z`, `0-9`, `-`, `_`) warns as `form.pattern.node.provenance.source`, the code of the placeholder rule at the SHOULD level (an `if` on the prefix with a `then` on the form). The marker cites a node in a private repository; it is also valid in `locator`, `trace`, `verified_against`, and the detail of `method`, where its form is not judged. A text that does not start with the prefix is not judged. One case keeps the MUST code on a placeholder in one node and the SHOULD warning on a malformed marker in another: the deduplication is per occurrence.
+
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 
 ## Folders
@@ -274,7 +277,7 @@ sealed, that is, merged into the product graph, **and** the schema in `spec/` al
 (for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
 Nothing gets ahead of an open decision.
 
-**Today's score.** The reference reader passes 100% of `latest/`: 555 cases against contract v4, 32 of them
+**Today's score.** The reference reader passes 100% of `latest/`: 570 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
 verdict v4 changes became `bad-*` cases. Every case uses a valid `method` in the canonical English class (`measurement: caso de conformidade`, since v4.21), so

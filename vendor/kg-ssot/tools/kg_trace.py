@@ -37,12 +37,22 @@ rc: 0 todo trace julgável resolve · 1 integrity.trace-target-missing, ou grafo
 grafo lido (desde a 4.27: o corpus vazio não passa por "todo trace resolve" num CI que só olha o rc) · 4 só com
 --strict-sources (4.44.0): nenhum dos anteriores, e alguma fonte com esquema ou sha256 ausente. A fonte sem nenhum dos
 dois fica fora, inclusive a URL com commit e sem hash: ela não se julga, nem com a opção.
+
+A citação a nó de repositório privado (4.51.0, contrato v4.22): o provenance.source ou o trace que é o marcador
+private-cite:<id> NA FORMA (o id de 22 a 43 caracteres base64url) é uma citação declarada não conferível. Nunca é
+lida, nunca conta como ausente e nunca vai à rede; a saída a conta em schemes.private_cite (o source) e em
+skipped.private_cite (o trace), só quando acima de 0. O locator de um nó com a fonte privada é da fonte privada e não é
+julgado contra o trace. O valor que começa com private-cite: e está fora da forma não é citação declarada: é conferido
+como fonte ou trace comum e, por não nomear arquivo, cai como ausente.
+
+  kg_trace.py private-cite-id   imprime um marcador novo, private-cite:<id>, com o id de secrets.token_urlsafe(16)
 """
 import argparse
 import hashlib
 import json
 import pathlib
 import re
+import secrets
 import subprocess
 import sys
 import urllib.parse
@@ -88,6 +98,40 @@ REF_HOST = r"(?:https?://)?(?:[\w-]+\.)+[a-zA-Z]{2,}/"
 REF_FORM = re.compile(r"(?<![\w./@:#-])(?:" + REF_HOST + r")?(?:(?P<owner>[\w.-]+)/)?"
                       r"(?P<name>[A-Za-z0-9][\w.-]*)#(?P<id>[\w.-]+)@(?P<commit>[\w-]+)")
 KG_NODE = re.compile(r"[A-Za-z][A-Za-z0-9_]*")
+# o marcador de citação a nó privado (contrato v4.22): o grafo público troca o repositório privado por private-cite:<id>
+PRIVATE_CITE_PREFIX = "private-cite:"
+PRIVATE_CITE = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}")  # a forma do schema SHOULD; julgada pelo leitor
+# no trace, o marcador pode levar o id do nó citado: a troca só do nome do repositório (repo#NÓ vira
+# private-cite:<id>#NÓ). Só o id de nó, na forma de id do contrato (o KG_NODE, ^[A-Za-z][A-Za-z0-9_]*$): o fragmento com
+# /, ., :, #, @ ou espaço cai como ausente. Um hash de commit sozinho ou uma palavra solta é id válido e não se distingue,
+# então o id do nó é público e não deve nomear assunto, arquivo, caminho ou commit privado
+PRIVATE_CITE_TRACE = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}(?:#" + KG_NODE.pattern + r")?")
+
+
+def is_private_cite(value):
+    """O valor é o marcador de citação a nó privado NA FORMA (o prefixo, sensível à caixa, e o id de 22 a 43 caracteres
+    base64url, o texto inteiro)? Só ele tira a fonte ou o trace da conferência."""
+    return isinstance(value, str) and PRIVATE_CITE.fullmatch(value) is not None
+
+
+def is_private_cite_trace(value):
+    """O trace é o marcador na forma, sozinho ou seguido de #<id do nó> (o nó citado no repositório privado, como
+    D_PLANO_1112): citação declarada não conferível, como no source. Depois do # só vai o id do nó: o fragmento com /, ., :,
+    #, @ ou espaço cai como ausente, e um hash de commit sozinho ou uma palavra solta é id válido e não se distingue, então
+    o id do nó é público e não deve nomear assunto, arquivo, caminho ou commit privado. No source e no locator, o marcador
+    é o valor inteiro."""
+    return isinstance(value, str) and PRIVATE_CITE_TRACE.fullmatch(value) is not None
+
+
+def malformed_private_cite(value):
+    """Começa pelo prefixo e está fora da forma: não é citação privada declarada, e não nomeia arquivo nenhum. É
+    conferido como fonte comum e, por não existir, cai como ausente (o leitor também o alerta, no SHOULD)."""
+    return isinstance(value, str) and value.startswith(PRIVATE_CITE_PREFIX) and not is_private_cite(value)
+
+
+def new_private_cite():
+    """Um marcador novo, com o id de 128 bits aleatórios em base64url (22 caracteres), um por citação."""
+    return PRIVATE_CITE_PREFIX + secrets.token_urlsafe(16)
 # a forma do json-pointer, a mesma do schema SHOULD: /a/b (RFC 6901) ou o fragmento #/a/b, sem espaço cru
 JSON_POINTER = re.compile(r"(?:/(?:[^/~]|~[01])*)*|#(?:/(?:[^/~ \t\n\r]|~[01])*)*")
 COMMIT_REF = re.compile(r"[0-9a-fA-F]{7,64}")  # o nome de um commit (SHA-1 ou SHA-256, abreviado ou inteiro)
@@ -125,6 +169,10 @@ def locate(trace, graph_dir, root, root_files, external_roots=()):
     """(classe, alvo, caminho), desde a 4.25.1: o de classify() e, só no resolved, o arquivo que o check viu existir,
     relativo à raiz, com os links seguidos (um link seguido de .. não pode apontar para outro arquivo), e se ele é
     file ou dir."""
+    if is_private_cite_trace(trace):
+        return "not_path", trace, None  # a citação privada declarada: nunca lida, nunca ausente (v4.22)
+    if malformed_private_cite(trace):
+        return "missing", trace.strip(), None  # o marcador fora da forma não nomeia arquivo: ausente (v4.22)
     text = trace.strip().strip("\"'").strip()
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
@@ -252,6 +300,8 @@ def locate_source(source, graph_dir, root, tracked=_UNSET):
     índice seguido até um arquivo rastreado), untracked é o que mora num submódulo ou o link do índice que não se segue
     (contado, nunca lido), e missing é todo o resto, o que não está no índice, exista ou não no disco. Fora do git, o
     disco, como antes. tracked: o tracked_index() já lido, para não chamar o git por nó."""
+    if malformed_private_cite(source):
+        return "missing", source.strip(), None  # o marcador fora da forma não nomeia arquivo: ausente (v4.22)
     text = source.strip().strip("\"'").strip()
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
@@ -310,6 +360,8 @@ def check_locators(corpus, root, root_files, external_roots=(), located=frozense
             continue
         if key in located:
             continue  # o check_schemes já julgou este ponteiro (4.37.0); o que ele não pôde julgar segue aqui
+        if is_private_cite(prov.get("source")):
+            continue  # o locator é da fonte privada (v4.22), contada em schemes.private_cite: nunca vai ao trace
         locator = locator.strip()
         if not (locator == "#" or locator.startswith("#/")):
             res["skipped"]["not_pointer"] += 1
@@ -386,6 +438,8 @@ def read_source(source, gdir, root, withs, files=None, tracked=_UNSET):
     sem o git, o commit da URL não se confere, e ler a árvore julgaria outra versão da fonte em silêncio (o kg_query lê
     a árvore porque navega; aqui se verifica). O ref que não tem forma de commit (main, HEAD, uma tag) é unpinned: ele
     anda com o tempo, e o que se confere é uma fonte fixada."""
+    if malformed_private_cite(source):
+        return "missing", source.strip(), None  # o marcador fora da forma não nomeia arquivo: ausente (v4.22)
     text = source.strip().strip("\"'").strip()
     url = text.split("#", 1)[0].split("?", 1)[0]
     for prefix, folder in withs:
@@ -573,7 +627,8 @@ def check_schemes(corpus, root, withs=()):
     keys = ("form_only", "absolute", "missing_source", "not_path", "outside_root", "unpinned", "malformed", "not_json",
             "not_text", "not_canonical", "untracked")
     res = {"judged": 0, "ok": 0, "sha256_checked": 0, "node_sha256_checked": 0, "failures": [],
-           "skipped": {k: 0 for k in keys}, "repo_refs": 0, "missing_sources": [], "absolute_urls": 0}
+           "skipped": {k: 0 for k in keys}, "repo_refs": 0, "missing_sources": [], "absolute_urls": 0,
+           "private_cite": 0}
     located = set()
     cache, files = {}, {}
     tracked = tracked_index(root)  # uma leitura do índice por rodada
@@ -581,6 +636,9 @@ def check_schemes(corpus, root, withs=()):
         node = corpus.nodes[key]
         prov = node.get("provenance")
         if not isinstance(prov, dict) or not isinstance(prov.get("source"), str):
+            continue
+        if is_private_cite(prov["source"]):
+            res["private_cite"] += 1  # a citação privada declarada (v4.22): nunca lida, nunca ausente, nunca à rede
             continue
         if REF_FORM.fullmatch(prov["source"].strip()):
             res["repo_refs"] += 1  # a classe própria (4.44.0), que não muda as outras contas nem o rc
@@ -865,7 +923,7 @@ def check(corpus, root, external_roots=(), withs=()):
     root_files = tracked_root_files(root)
     res = {"graphs": len(corpus.files) - len(corpus.unreadable), "judged": 0, "resolved": 0, "resolved_targets": [],
            "missing": [],
-           "skipped": {"absolute": 0, "external_root": 0, "not_path": 0, "not_text": 0}}
+           "skipped": {"absolute": 0, "external_root": 0, "not_path": 0, "not_text": 0, "private_cite": 0}}
     for key in corpus.order:
         node = corpus.nodes[key]
         if "trace" not in node:
@@ -875,6 +933,9 @@ def check(corpus, root, external_roots=(), withs=()):
             res["skipped"]["not_text"] += 1
             continue
         if not trace.strip():
+            continue
+        if is_private_cite_trace(trace):
+            res["skipped"]["private_cite"] += 1  # a citação a nó privado (v4.22): nunca lida, nunca ausente
             continue
         kind, target, path = locate(trace, pathlib.PurePosixPath(key[0]).parent.as_posix(), root, root_files,
                                 external_roots)
@@ -898,7 +959,7 @@ def check(corpus, root, external_roots=(), withs=()):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=_("The trace that does not resolve: each node's trace: anchor against "
                                                "the files of the repository."))
-    ap.add_argument("command", choices=("check", "projection", "digest"))
+    ap.add_argument("command", choices=("check", "projection", "digest", "private-cite-id"))
     ap.add_argument("pages", nargs="*", metavar=_("PAGE.md"),
                     help=_("projection: the pages to check (default: every tracked .md with projection_of)"))
     ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
@@ -917,6 +978,12 @@ def main(argv=None):
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_intermixed_args(argv)  # as páginas podem vir depois das opções
     kg_validate._utf8_stdio()
+    if args.command == "private-cite-id":
+        if args.pages:
+            print(_("BROKEN INPUT  {error}").format(error=_("private-cite-id takes no argument")), file=sys.stderr)
+            return 2
+        print(new_private_cite())
+        return 0
     if not pathlib.Path(args.root).is_dir():
         print(_("BROKEN INPUT  {error}").format(error=_("--root {root} is not a directory").format(root=args.root)),
               file=sys.stderr)
@@ -948,6 +1015,11 @@ def main(argv=None):
     res = check(corpus, args.root, args.external_root, withs)
     repo_refs, absent = res["schemes"]["repo_refs"], res["schemes"]["missing_sources"]
     del res["schemes"]["absolute_urls"]
+    private_sources, private_traces = res["schemes"]["private_cite"], res["skipped"]["private_cite"]
+    if not private_sources:  # só quando ocorre (v4.22): a saída sem marcador segue válida no schema da 4.50
+        del res["schemes"]["private_cite"]
+    if not private_traces:
+        del res["skipped"]["private_cite"]
     if not res["schemes"]["skipped"]["untracked"]:  # só quando ocorre: a saída de antes segue válida no schema da 4.48
         del res["schemes"]["skipped"]["untracked"]
     if not repo_refs:  # o campo só existe quando a forma ocorre: fora disso, o kg-ssot.trace/1 é o de sempre
@@ -986,6 +1058,10 @@ def main(argv=None):
                     "repository").format(judged=loc["judged"], resolved=loc["resolved"], missing=len(loc["missing"]),
                                          unreadable=len(loc["unreadable"]), absolute=ls["absolute"],
                                          nofile=ls["no_json_file"]))
+        if private_sources or private_traces:
+            print(_("· {sources} provenance.source and {traces} trace as private-cite: (a node in a private repository, "
+                    "declared not checkable): never read, never missing").format(sources=private_sources,
+                                                                                 traces=private_traces))
         if repo_refs:
             print(_("· {n} provenance.source in the form repo#id@commit, not read here: kg_refs pins compares them").format(n=repo_refs))
         if args.strict_sources:

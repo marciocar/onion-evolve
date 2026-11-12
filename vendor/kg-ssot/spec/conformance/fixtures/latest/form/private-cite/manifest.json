@@ -1,0 +1,126 @@
+{
+  "description": "O marcador de citação a nó privado (v4.22), só no SHOULD. Um grafo público que cita um nó de um repositório privado troca o nome e o caminho do repositório por private-cite:<id>, com o id aleatório de pelo menos 128 bits, um por citação, em base64url de 22 a 43 caracteres. O provenance.source que começa com private-cite: e não tem essa forma alerta como form.pattern.node.provenance.source; o marcador também vale em locator, trace, verified_against e no detalhe do method, mas a forma só é julgada no source. O texto que não começa pelo prefixo (com outra caixa ou com espaço antes) não é julgado. Nada que passava reprova.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-private-cite-22.kg.yaml",
+      "description": "o marcador com o id de 22 caracteres base64url, o secrets.token_urlsafe(16): 128 bits (v4.22)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-private-cite-43.kg.yaml",
+      "description": "o marcador com o id de 43 caracteres, o teto da forma (o token_urlsafe(32)), com - e _ do base64url (v4.22)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-private-cite-every-field.kg.yaml",
+      "description": "o marcador no source, no locator, no trace, no verified_against e no detalhe do method: a forma só é julgada no source (v4.22)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-private-cite-mid-text.kg.yaml",
+      "description": "o texto que só cita private-cite: no meio não começa pelo prefixo e não é julgado (v4.22)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-private-cite-other-case.kg.yaml",
+      "description": "o prefixo é sensível à caixa: Private-Cite: não é o marcador e não é julgado (v4.22)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-private-cite-leading-space.kg.yaml",
+      "description": "com espaço antes, o valor não começa pelo prefixo e não é julgado como marcador (v4.22)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-private-cite-short.kg.yaml",
+      "description": "o id de 21 caracteres, abaixo dos 128 bits: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-long.kg.yaml",
+      "description": "o id de 44 caracteres, acima do teto da forma: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-empty-id.kg.yaml",
+      "description": "o prefixo sem id: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-base64-padding.kg.yaml",
+      "description": "o id com o = do preenchimento, fora do base64url sem preenchimento: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-standard-base64.kg.yaml",
+      "description": "o id com + e / do base64 padrão, que não é o base64url: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-repo-path.kg.yaml",
+      "description": "o marcador que leva o repositório, o commit e o caminho, o que ele existe para esconder: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-trailing-newline.kg.yaml",
+      "description": "o id com uma quebra de linha no fim: o $ do ECMA-262 não casa antes dela, nos dois leitores (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "warn-private-cite-trailing-space.kg.yaml",
+      "description": "o id com um espaço no fim: alerta (v4.22)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-must-placeholder-keeps-private-cite-warning.kg.yaml",
+      "description": "o MUST acusa form.pattern.node.provenance.source no placeholder de um nó confirmed, e o marcador fora da forma, em outro nó, segue avisando com o mesmo código: a deduplicação é por ocorrência (v4.22)",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ],
+      "warnings": [
+        "form.pattern.node.provenance.source"
+      ]
+    }
+  ]
+}
