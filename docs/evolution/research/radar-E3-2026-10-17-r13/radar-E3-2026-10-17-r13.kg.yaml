@@ -45,7 +45,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.302 a ## 2.1.302 (cópias em docs/evolution/research/radar-E3-2026-10-17-r13/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: "onion-bridge@7f4322c (PR #78) e a saída do chat-runner verify"
       locator: "linhas OK do verify: 'o CLI do SDK responde 2.1.302, no piso 2.1.64 ou acima' e 'o argv do SDK servido ... (25 asserções)'; campos version e claudeCodeVersion do package.json do SDK"
-      method: "medição: verify do runner, --version do binário do SDK como a conta do serviço e leitura do package.json"
+      method: "measurement: verify do runner, --version do binário do SDK como a conta do serviço e leitura do package.json"
       locality: "host"
   - id: E_FORK_LIGADO_POR_PADRAO_ALCANCA_O_ADMIN_DO_BRIDGE
     node_type: evidence
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.302, item 'Changed fork subagents (`subagent_type: \"fork\"`) to be on by default in `claude -p`, the Agent SDK, the desktop app and VS Code, as they already are in the terminal'"
-      method: "medição: requisição capturada do CLI 2.1.302 com e sem a variável, init sob as flags do convidado e leitura da política do bridge"
+      method: "measurement: requisição capturada do CLI 2.1.302 com e sem a variável, init sob as flags do convidado e leitura da política do bridge"
       locality: "host"
   - id: E_REVISOR_DO_CI_INSTALA_O_CLI_2_1_220
     node_type: evidence
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: "github.com/anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b:src/entrypoints/run.ts"
       locator: "const claudeCodeVersion = \"2.1.220\" (a mesma linha no main diz 2.1.302)"
-      method: "medição: leitura do arquivo no pin e no main pelo gh api, contagem das seções do CHANGELOG e leitura do log da run do revisor"
+      method: "measurement: leitura do arquivo no pin e no main pelo gh api, contagem das seções do CHANGELOG e leitura do log da run do revisor"
       locality: "web"
   - id: E_NENHUM_ITEM_TOCA_SANDBOX_WEBFETCH_STREAMJSON_1017
     node_type: evidence
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.302, item 'Changed prompt and agent hooks so that at most 12 of one event run at a time; the rest wait their turn'"
-      method: "medição: grep das palavras de isolamento no delta, tipos dos hooks, política do bridge, argv do runner e verify do runner"
+      method: "measurement: grep das palavras de isolamento no delta, tipos dos hooks, política do bridge, argv do runner e verify do runner"
       locality: "host"
   - id: E_AUTO_MODE_NAO_ALCANCA_AS_SESSOES_EM_BYPASS
     node_type: evidence
@@ -134,7 +134,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.302, item 'Improved auto mode with the server-side classifier: a conversation too long for the safety check is now compacted, instead of every checked tool call being denied'"
-      method: "medição: leitura do defaultMode nos settings, grep da variável no core e linha de comando dos processos vivos"
+      method: "measurement: leitura do defaultMode nos settings, grep da variável no core e linha de comando dos processos vivos"
       locality: "host"
   - id: E_CLAUDE_DESIGN_STANDALONE_FECHA_EM_DEZEMBRO
     node_type: evidence
@@ -149,7 +149,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.302, item 'Added a notice to `/design-sync` and `/design-login` that standalone Claude Design (claude.ai/design) closes by December 14, 2026'"
-      method: "medição: init do CLI e grep no core"
+      method: "measurement: init do CLI e grep no core"
       locality: "host"
   - id: E_SINAIS_DO_DELTA_SEM_CONSUMIDOR_1017
     node_type: evidence
@@ -164,7 +164,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.302, item 'Fixed worktree isolation refusing to create or resume worktrees under git 2.56 or later when a stray `.git` file points at a directory that doesn't exist'"
-      method: "medição: versões e grep no core e no bridge"
+      method: "measurement: versões e grep no core e no bridge"
       locality: "host"
   - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_302
     node_type: evidence
@@ -179,7 +179,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.302 (o binário inteiro)"
-      method: "medição: execução da família cited_directive"
+      method: "measurement: execução da família cited_directive"
       locality: "host"
   - id: Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR
     node_type: question
@@ -199,7 +199,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «SAC-168: no CLI 2.1.302, o fork de subagentes vem ligado por padrão. O fork é o subagente que herda o contexto inteiro da conversa. Ele chega ao ADMIN do /chat do bridge, que não tem restrição de ferramentas; o convidado não recebe, porque só tem Read. O admin mantém o fork?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
   - id: Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO
     node_type: question
@@ -226,7 +226,7 @@ nodes:
     provenance:
       source: "github.com/anthropics/claude-code-action (releases, git ls-remote --tags e compare be7b93b1...f27be6b6)"
       locator: "refs/tags/v1.0.252^{} = f27be6b6; src/entrypoints/run.ts l.80 const claudeCodeVersion = \"2.1.302\"; PR #1607 (enforce max turns from claude args)"
-      method: "medição: gh api, git ls-remote, execução do currency-census.sh e da bancada currency_census"
+      method: "measurement: gh api, git ls-remote, execução do currency-census.sh e da bancada currency_census"
       locality: "web"
   - id: Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL
     node_type: question

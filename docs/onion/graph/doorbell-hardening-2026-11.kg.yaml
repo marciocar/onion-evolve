@@ -32,7 +32,7 @@ nodes:
     provenance:
       source: "o hub (sinal upstream de 2026-11-08)"
       locator: "docs/evolution/inbox/_processed/2026-11-08-signal-campainha-gaps.md, seções 1 a 4"
-      method: "leitura: o sinal inteiro; medida do hub, não reproduzida pelo core"
+      method: "reading: o sinal inteiro; medida do hub, não reproduzida pelo core"
       locality: "repo"
   - id: Q_DB_PRIMEIRA_EXECUCAO_EMUDECE_1111
     node_type: question

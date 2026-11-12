@@ -27,7 +27,7 @@ nodes:
     provenance:
       source: "transcripts do Claude Code (⟨diretório de projetos do Claude Code da conta⟩) e git log de .claude/utils/task-manager/tm.sh"
       locator: "comandos Bash com host de provider-hosts.tsv; git log --format='%h %ad' -- .claude/utils/task-manager/tm.sh"
-      method: "medição: script Python sobre os .jsonl (forma redigida, sem token) e git log"
+      method: "measurement: script Python sobre os .jsonl (forma redigida, sem token) e git log"
       locality: "repo"
 
   - id: E_PASSIVO_ZERO_NO_ARQUIVO_RASTREADO
@@ -43,7 +43,7 @@ nodes:
     provenance:
       source: "árvore de origin/main em 2026-10-12 (cd9d8128)"
       locator: "git ls-files | xargs grep -lE <hosts>; git log --all -G <hosts> -- '*.sh' '*.py' '*.js' '*.mjs' '*.ts'"
-      method: "medição: grep nos arquivos rastreados e no histórico"
+      method: "measurement: grep nos arquivos rastreados e no histórico"
       locality: "repo"
 
   - id: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
@@ -60,7 +60,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "bash .claude/validation/guard-census.sh . --markdown; GUARD_CENSUS_QUERY='api.linear.app clickup atlassian provider '"
-      method: "medição: censo de guardas antes de escrever"
+      method: "measurement: censo de guardas antes de escrever"
       locality: "repo"
 
   - id: E_REEXECUCAO_CONTRA_O_USO_REAL
@@ -76,7 +76,7 @@ nodes:
     provenance:
       source: "transcripts do Claude Code (⟨diretório de projetos do Claude Code da conta⟩)"
       locator: "replay: payload JSON {cwd, tool_input.command} por comando, rc do hook"
-      method: "medição: reexecução do hook sobre os comandos reais"
+      method: "measurement: reexecução do hook sobre os comandos reais"
       locality: "repo"
 
   - id: E_MUTANTES_MORDEM
@@ -93,7 +93,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_direct_provider_api_selftests (m)"
-      method: "medição: bancada com LC_ALL=C --families direct_provider_api"
+      method: "measurement: bancada com LC_ALL=C --families direct_provider_api"
       locality: "repo"
 
   - id: C_TETO_O_QUE_O_HOOK_NAO_VE
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-direct-provider-api.sh"
       locator: "cabeçalho, seção O QUE NÃO VETA"
-      method: "leitura: cabeçalho do artefato"
+      method: "reading: cabeçalho do artefato"
       locality: "repo"
 
   - id: C_TETO_O_QUE_A_REGRA_105_NAO_VE
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: ".claude/validation/direct-provider-api-check.sh"
       locator: "cabeçalho, FORA DO ESCOPO / TETO"
-      method: "leitura: cabeçalho do artefato"
+      method: "reading: cabeçalho do artefato"
       locality: "repo"
 
   - id: C_TETO_A_LISTA_DE_HOSTS_E_VOCABULARIO
@@ -144,7 +144,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/provider-hosts.tsv"
       locator: "linhas linear/clickup/jira/asana/zoho"
-      method: "leitura: o mapa"
+      method: "reading: o mapa"
       locality: "repo"
 
   - id: Q_ESTENDER_O_ARMAMENTO_A_OUTRO_PROVEDOR
@@ -161,7 +161,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters"
       locator: "ls adapters/*.py adapters/*.sh"
-      method: "medição: listagem do diretório"
+      method: "measurement: listagem do diretório"
       locality: "repo"
   - id: E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE
     node_type: evidence
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-direct-provider-api.sh e .claude/validation/direct-provider-api-check.sh"
       locator: "casos (xv)–(xx) do --selftest do hook e (xi) da REGRA 105; mutantes da família run_direct_provider_api_selftests"
-      method: "juízes: passada adversarial em sessão isolada, depois reexecução dos casos dela contra a cura"
+      method: "judges: passada adversarial em sessão isolada, depois reexecução dos casos dela contra a cura"
       locality: "repo"
 edges:
   - from: E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE

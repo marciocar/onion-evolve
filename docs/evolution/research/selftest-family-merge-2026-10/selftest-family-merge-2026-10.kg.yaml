@@ -20,7 +20,7 @@ nodes:
     provenance:
       source: "git log do core e gh pr view 1133/1134/1135"
       locator: "commits de97d324, f1724eaf, 56e2e001, b1b65025, dc32597b, 17c32516"
-      method: "medição: hunks e mensagens de commit no histórico"
+      method: "measurement: hunks e mensagens de commit no histórico"
       locality: "repo"
 
   - id: E_REPLAY_HISTORICO_COM_O_DRIVER
@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: "replay local do histórico"
       locator: "base de97d324^; blocos de de97d324, f1724eaf, 56e2e001"
-      method: "medição: rebase reproduzido"
+      method: "measurement: rebase reproduzido"
       locality: "repo"
 
   - id: E_UNION_APAGA_EDICAO_DA_MESMA_LINHA
@@ -53,7 +53,7 @@ nodes:
     provenance:
       source: "bancada do core"
       locator: "família selftest_family_merge, caso (c)"
-      method: "medição: rebase de fixture com merge=union"
+      method: "measurement: rebase de fixture com merge=union"
       locality: "repo"
 
   - id: E_PATCH_ID_MUDA_PELO_CONTEXTO
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "prova local"
       locator: "branch famY antes (famY@{1}) e depois do rebase"
-      method: "medição: patch-id e sha das linhas -U0, antes e depois do rebase"
+      method: "measurement: patch-id e sha das linhas -U0, antes e depois do rebase"
       locality: "repo"
 
   - id: D_DRIVER_DE_MERGE_DAS_FAMILIAS
@@ -88,7 +88,7 @@ nodes:
     provenance:
       source: "agente de execução do SAC-146, autorização delegada do maestro (2026-10-15)"
       locator: "SAC-146; PR deste grafo"
-      method: "derivado: opção recomendada pelo agente sob autorização delegada, declarada no resíduo"
+      method: "derived: opção recomendada pelo agente sob autorização delegada, declarada no resíduo"
       locality: "repo"
 
   - id: Q_REREVISAO_SO_PELO_CONTEXTO

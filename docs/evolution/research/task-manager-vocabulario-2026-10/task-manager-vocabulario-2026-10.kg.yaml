@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
       locator: "POST /rest/api/3/issue/bulk (Bulk create issue), description — QUOTE: 'Creates upto **50** issues and, where the option to create subtasks is enabled in Jira, subtasks.'"
-      method: "leitura: WebFetch da página e do OpenAPI v3 no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página e do OpenAPI v3 no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_CLOUD_DESCRIPTION_TEXTAREA_ADF
@@ -90,7 +90,7 @@ nodes:
     provenance:
       source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
       locator: "POST /rest/api/3/issue/bulk, description — QUOTE: 'Note that the `description`, `environment`, and any `textarea` type custom fields (multi-line text fields) take Atlassian Document Format content.'"
-      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_CLOUD_SEARCH_JQL_NEXTPAGETOKEN_7D
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: "https://dac-static.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
       locator: "components.schemas.SearchAndReconcileResults.properties.nextPageToken — QUOTE: 'Continuation token to fetch the next page. If this result represents the last or the only page this token will be null. This token will expire in 7 days.'"
-      method: "leitura: curl do OpenAPI v3 e extração do schema no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl do OpenAPI v3 e extração do schema no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_CLOUD_SEARCH_LEGACY_BEING_REMOVED
@@ -128,7 +128,7 @@ nodes:
     provenance:
       source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/"
       locator: "GET e POST /rest/api/3/search, description — QUOTE: 'Endpoint is currently being removed. [More details](https://developer.atlassian.com/changelog/#CHANGE-2046)'"
-      method: "leitura: WebFetch da página e do OpenAPI v3 no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página e do OpenAPI v3 no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_CLOUD_STATUS_VIA_TRANSITION
@@ -147,7 +147,7 @@ nodes:
     provenance:
       source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
       locator: "POST /rest/api/3/issue/{issueIdOrKey}/transitions (Transition issue), description — QUOTE: 'Performs an issue transition and, if the transition has a screen, updates the fields from the transition screen.'"
-      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   # ── JIRA DATA CENTER / SERVER · REST v2 ──────────────────────────────────────────────────
@@ -167,7 +167,7 @@ nodes:
     provenance:
       source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
       locator: "POST /rest/api/2/issue/{issueIdOrKey}/comment, schema JSON do Comment — QUOTE: '\"body\":{\"type\":\"string\"},\"renderedBody\":{\"type\":\"string\"}'"
-      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN
@@ -186,7 +186,7 @@ nodes:
     provenance:
       source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
       locator: "query parameters de GET/POST/PUT /rest/api/2/issue/{issueIdOrKey}/comment — QUOTE: 'expandstringoptional flags: renderedBody (provides body rendered in HTML)'"
-      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_DC_PAGINATION_STARTAT_MAXRESULTS
@@ -205,7 +205,7 @@ nodes:
     provenance:
       source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
       locator: "seção Pagination, parágrafos após o exemplo JSON — QUOTE: 'A client should always assume that the requested page can be empty. REST API consumers should also consider the field to be optional.'"
-      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_DC_SEARCH_JQL_GET_POST
@@ -224,7 +224,7 @@ nodes:
     provenance:
       source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
       locator: "GET /rest/api/2/search, seções Sorting e GET vs POST — QUOTE: 'If the JQL query is too large to be encoded as a query param you should instead POST to this resource.'"
-      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_JIRA_DC_BULK_CREATE_DOC_9_17
@@ -243,7 +243,7 @@ nodes:
     provenance:
       source: "https://docs.atlassian.com/software/jira/docs/api/REST/latest/"
       locator: "HTTP 302 para /REST/9.17.0/; Create issues, POST /rest/api/2/issue/bulk — QUOTE: 'POST /rest/api/2/issue/bulkCreates issues or sub-tasks from a JSON representation.'"
-      method: "leitura: curl com redirect seguido e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl com redirect seguido e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   # ── CLICKUP · API v2 ─────────────────────────────────────────────────────────────────────
@@ -263,7 +263,7 @@ nodes:
     provenance:
       source: "https://developer.clickup.com/reference/createtask"
       locator: "POST /api/v2/list/{list_id}/task, body.parent — QUOTE: 'The `parent` task ID you include can be a subtask, but must be in the same List specified in the path parameter.'"
-      method: "leitura: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CLICKUP_POINTS_NATIVE_PRIORITY_INT
@@ -282,7 +282,7 @@ nodes:
     provenance:
       source: "https://developer.clickup.com/reference/createtask"
       locator: "POST /api/v2/list/{list_id}/task, body.points — QUOTE: 'Add Sprint Points to the task.'"
-      method: "leitura: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION
@@ -301,7 +301,7 @@ nodes:
     provenance:
       source: "https://developer.clickup.com/reference/createtask"
       locator: "POST /api/v2/list/{list_id}/task, body.markdown_content — QUOTE: '`markdown_content` will be used instead of `description`.'"
-      method: "leitura: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CLICKUP_GET_TASKS_PAGE_100
@@ -320,7 +320,7 @@ nodes:
     provenance:
       source: "https://developer.clickup.com/reference/gettasks"
       locator: "GET /api/v2/list/{list_id}/task, param page — QUOTE: 'Responses are limited to 100 tasks per page.'"
-      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CLICKUP_DEPENDENCY_ONE_DIRECTION
@@ -339,7 +339,7 @@ nodes:
     provenance:
       source: "https://developer.clickup.com/reference/adddependency"
       locator: "POST /api/v2/task/{task_id}/dependency, requestBody — QUOTE: 'You can only use one per request.'"
-      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   # ── ASANA · REST ─────────────────────────────────────────────────────────────────────────
@@ -359,7 +359,7 @@ nodes:
     provenance:
       source: "https://developers.asana.com/docs/pagination"
       locator: "Docs > Pagination, parâmetro limit — QUOTE: 'The value must be between 1 and 100.'"
-      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_ASANA_OFFSET_EXPIRES
@@ -378,7 +378,7 @@ nodes:
     provenance:
       source: "https://developers.asana.com/docs/pagination"
       locator: "Docs > Pagination, parâmetro offset — QUOTE: 'Note that an offset token will expire after some time, as data may have changed.'"
-      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_ASANA_BATCH_MAX_10_ACTIONS
@@ -397,7 +397,7 @@ nodes:
     provenance:
       source: "https://developers.asana.com/docs/batch-requests"
       locator: "Docs > Batch requests — QUOTE: 'The maximum number of actions allowed in a single batch request is 10'"
-      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_ASANA_STORY_TEXT_OR_HTML
@@ -416,7 +416,7 @@ nodes:
     provenance:
       source: "https://developers.asana.com/reference/createstoryfortask"
       locator: "Reference > Create a story on a task, campo text — QUOTE: 'The plain text of the comment to add. Cannot be used with html_text.'"
-      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_ASANA_SEARCH_PREMIUM_ONLY
@@ -435,7 +435,7 @@ nodes:
     provenance:
       source: "https://developers.asana.com/reference/searchtasksforworkspace"
       locator: "Reference > Search tasks in a workspace, descrição — QUOTE: 'this search endpoint will only be available to premium Asana users.'"
-      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_ASANA_SUBTASK_OWN_ENDPOINT
@@ -454,7 +454,7 @@ nodes:
     provenance:
       source: "https://developers.asana.com/reference/createsubtaskfortask"
       locator: "Reference > Create a subtask for a task, descrição — QUOTE: 'Creates a new subtask and adds it to the parent task.'"
-      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   # ── LINEAR · GraphQL ─────────────────────────────────────────────────────────────────────
@@ -474,7 +474,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
       locator: "type Issue, campo priority — QUOTE: 'The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.'"
-      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LINEAR_ESTIMATE_NATIVE_TEAM_SCALE
@@ -493,7 +493,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
       locator: "type Issue, campo estimate — QUOTE: 'The estimate of the complexity of the issue. The specific scale used depends on the team's estimation configuration (e.g., points, T-shirt sizes). Null if no estimate has been set.'"
-      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LINEAR_COMMENT_BODY_MARKDOWN_DERIVED
@@ -512,7 +512,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
       locator: "type Comment, campo body — QUOTE: 'The comment content in markdown format. This is a derived representation of the canonical bodyData ProseMirror content.'"
-      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LINEAR_RELATION_FOUR_TYPES
@@ -531,7 +531,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
       locator: "enum IssueRelationType — QUOTE: 'enum IssueRelationType { blocks duplicate related similar }'"
-      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LINEAR_STATE_WORKFLOWSTATE_PARENT
@@ -550,7 +550,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
       locator: "type Issue, campos state e parent; type WorkflowState — QUOTE: 'The workflow state (issue status) that the issue is currently in. Workflow states represent the issue's progress through the team's workflow, such as Triage, Todo, In Progress, Done, or Canceled.'"
-      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LINEAR_CURSOR_PAGINATION_BATCH
@@ -569,7 +569,7 @@ nodes:
     provenance:
       source: "https://linear.app/developers/pagination"
       locator: "página Pagination — QUOTE: 'The first 50 results are returned by default without query arguments.'; Mutation issueBatchCreate/issueBatchUpdate em raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
-      method: "leitura: WebFetch da página e curl do schema.graphql no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      method: "reading: WebFetch da página e curl do schema.graphql no run wf_8e56d56f-a8b; ancorada por verificador independente"
       locality: "web"
 
   # ── CONTABILIDADE DA RODADA ──────────────────────────────────────────────────────────────
@@ -589,7 +589,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result: sources, anchored, rejected, unreachable e elenxo.gapsOpen"
-      method: "testemunho: retorno do run wf_8e56d56f-a8b repassado pelo workflow ao escritor em 2026-10-11"
+      method: "testimony: retorno do run wf_8e56d56f-a8b repassado pelo workflow ao escritor em 2026-10-11"
       locality: "host"
 
   # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (17 de 27) ──────────────────────────────────────────
@@ -609,7 +609,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[0] (objeção 1, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 1"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 1"
       locality: "host"
 
   - id: E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED
@@ -626,7 +626,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[1] (objeção 2, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 2"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 2"
       locality: "host"
 
   - id: E_ELENXO_JIRA_SEARCH_REMOVAL_CONTRADICTS_CORE
@@ -643,7 +643,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[3] (objeção 4, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 4"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 4"
       locality: "host"
 
   - id: E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN
@@ -660,7 +660,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[4] (objeção 5, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 5"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 5"
       locality: "host"
 
   - id: E_ELENXO_JIRA_DC_WIKI_MARKUP_UNPROVEN
@@ -677,7 +677,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[5] (objeção 6, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 6"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 6"
       locality: "host"
 
   - id: E_ELENXO_JIRA_DC_RENDERED_INFERENCE
@@ -694,7 +694,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[6] (objeção 7, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 7"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 7"
       locality: "host"
 
   - id: E_ELENXO_JIRA_DC_PAGINATION_GENERIC_SECTION
@@ -711,7 +711,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[7] (objeção 8, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 8"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 8"
       locality: "host"
 
   - id: E_ELENXO_JIRA_DC_VERSION_NOT_PRODUCT
@@ -729,7 +729,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[9] (objeção 10, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 10"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 10"
       locality: "host"
 
   - id: E_ELENXO_CLICKUP_MAX_DEPTH_AND_HIERARCHY_OPEN
@@ -746,7 +746,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[10] (objeção 11, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 11"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 11"
       locality: "host"
 
   - id: E_ELENXO_CLICKUP_PRIORITY_SCALE_CORE_ONLY
@@ -763,7 +763,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[11] (objeção 12, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 12"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 12"
       locality: "host"
 
   - id: E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN
@@ -780,7 +780,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[12] (objeção 13, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 13"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 13"
       locality: "host"
 
   - id: E_ELENXO_CLICKUP_TASK_LINKS_OPEN
@@ -797,7 +797,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[14] (objeção 15, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 15"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 15"
       locality: "host"
 
   - id: E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED
@@ -814,7 +814,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[19] (objeção 20, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 20"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 20"
       locality: "host"
 
   - id: E_ELENXO_ASANA_DEPTH_ABSENCE_NOT_PROOF
@@ -831,7 +831,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[20] (objeção 21, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 21"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 21"
       locality: "host"
 
   - id: E_ELENXO_LINEAR_COMMENT_WRITE_FORMAT_OPEN
@@ -848,7 +848,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[23] (objeção 24, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 24"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 24"
       locality: "host"
 
   - id: E_ELENXO_LINEAR_TRANSITION_FREEDOM_UNANCHORED
@@ -865,7 +865,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[25] (objeção 26, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 26"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 26"
       locality: "host"
 
   - id: E_ELENXO_LINEAR_BATCH_SEMANTICS_OPEN
@@ -882,7 +882,7 @@ nodes:
     provenance:
       source: "journal wf_8e56d56f-a8b (host)"
       locator: "result.elenxo.objections[26] (objeção 27, survives=true)"
-      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 27"
+      method: "judges: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 27"
       locality: "host"
 
   # ── SÍNTESE (open — não selada) ──────────────────────────────────────────────────────────
@@ -940,7 +940,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/jira.capabilities.tsv"
       locator: "coluna status das 5 declarações: jira, clickup, asana, linear e zoho .capabilities.tsv"
-      method: "medição: contagem por awk e a guarda da REGRA 103 sobre o corpus"
+      method: "measurement: contagem por awk e a guarda da REGRA 103 sobre o corpus"
       locality: "repo"
 
   - id: E_WAVE2_ASANA_SUBTASK_PATH_UNANCHORED
@@ -955,7 +955,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/asana.md"
       locator: "createSubtask, ramo REST: fetch de ASANA_BASE/tasks com body.data.parent"
-      method: "leitura: o código do adapter comparado à evidência ancorada da Onda 1"
+      method: "reading: o código do adapter comparado à evidência ancorada da Onda 1"
       locality: "repo"
 
   - id: E_WAVE2_CLICKUP_SEARCH_ENDPOINT_UNANCHORED
@@ -970,7 +970,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/clickup.md"
       locator: "searchTasks, ramo REST: GET /team/{workspaceId}/task com page, search_text e page_size"
-      method: "leitura: o código do adapter comparado à evidência ancorada da Onda 1"
+      method: "reading: o código do adapter comparado à evidência ancorada da Onda 1"
       locality: "repo"
 
   - id: E_SAC116_LINEAR_FILES_FULL_READ_1012
@@ -989,7 +989,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/linear-leitura-completa.md"
       locator: "seção Medido contra o workspace real (linhas MEDIDO AO VIVO 2026-10-12)"
-      method: "medição: tm.sh contra o workspace real, escrita relida e bytes comparados por sha256; leitura das primárias citadas"
+      method: "measurement: tm.sh contra o workspace real, escrita relida e bytes comparados por sha256; leitura das primárias citadas"
       locality: "repo"
 
   # ── PERGUNTAS QUE A RODADA ABRE ──────────────────────────────────────────────────────────

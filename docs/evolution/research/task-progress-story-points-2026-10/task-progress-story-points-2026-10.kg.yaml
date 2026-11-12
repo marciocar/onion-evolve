@@ -30,7 +30,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/zoho.md@9ef87725"
       locator: "zoho.md l.325 (n proporcional às fases concluídas do plano); types.md, interface TaskOutput (termina em timeSpent, sem storyPoints); engineer/work.md l.37 (progresso % sem fórmula)"
-      method: "medição: git grep sobre origin/main 9ef87725"
+      method: "measurement: git grep sobre origin/main 9ef87725"
       locality: "repo"
 
   - id: D_PROGRESS_E_DERIVACAO_COM_HELPER
@@ -47,7 +47,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/interface.md"
       locator: "seção Derivação progress (tabela de bordas) e o cabeçalho de progress.sh"
-      method: "leitura: a regra na interface e o helper que a executa, conferidos pela família run_task_progress_selftests"
+      method: "reading: a regra na interface e o helper que a executa, conferidos pela família run_task_progress_selftests"
       locality: "repo"
 
   - id: D_LEITURA_DE_PONTOS_E_CAPACIDADE_PROPRIA
@@ -64,7 +64,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/interface.md"
       locator: "bloco de capacidades (linha estimate.points_read) e os 5 adapters/*.capabilities.tsv"
-      method: "medição: task-manager-capabilities-check.sh sobre o corpus, saída vazia"
+      method: "measurement: task-manager-capabilities-check.sh sobre o corpus, saída vazia"
       locality: "repo"
 
   - id: D_MIXED_CAI_NA_CONTAGEM
@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/progress.sh"
       locator: "casos c, c2, d e d2 do --selftest"
-      method: "medição: --selftest com LC_ALL=C"
+      method: "measurement: --selftest com LC_ALL=C"
       locality: "repo"
 
   - id: E_PERCENTUAL_PONDERADO_E_DECLARADO
@@ -98,7 +98,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/progress.sh"
       locator: "casos a a k do --selftest; casos a, b, b2, b3, b4, c, d e m de run_task_progress_selftests em .claude/validation/lint-selftest.sh"
-      method: "medição: --selftest e a família da bancada rodados com LC_ALL=C em 2026-10-11"
+      method: "measurement: --selftest e a família da bancada rodados com LC_ALL=C em 2026-10-11"
       locality: "repo"
 
   - id: E_PROGRESS_MUTANTES_MORDEM
@@ -114,7 +114,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_task_progress_selftests, caso m (16 mutantes); mutate-and-restore.sh sobre progress.sh, zoho.md, engineer/work.md, engineer/pre-pr.md e jira.capabilities.tsv"
-      method: "medição: mutantes com rc 1 e o caso nomeado em vermelho; restauração conferida por hash"
+      method: "measurement: mutantes com rc 1 e o caso nomeado em vermelho; restauração conferida por hash"
       locality: "repo"
 
   - id: E_ELENXO_REPROVOU_E_FOI_CURADO
@@ -130,7 +130,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/progress.sh"
       locator: "casos h3, h4, i6, i7, j, k, k2, k3 e k4 do --selftest; casos b4 e c de run_task_progress_selftests"
-      method: "juízes: refutador com mandato de % errado em borda e fallback silencioso; curas re-medidas por --selftest e mutantes"
+      method: "judges: refutador com mandato de % errado em borda e fallback silencioso; curas re-medidas por --selftest e mutantes"
       locality: "repo"
 
   - id: C_TETO_STATUS_BINARIO_POR_SUBTASK

@@ -3,7 +3,6 @@
   "id": "door-role-parity-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 42,
     "yaml.unquoted-date": 1
   }
 }

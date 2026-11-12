@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre o chat gerar grafos"
       locator: "as três respostas: área própria, recusa sem gravar, MCP separado do Brain"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
 
   - id: A_MCP_KG_WRITER_SERVER
@@ -55,7 +55,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-18: «O onion-kg-writer em produção está em 524aaada, vendor kg-ssot 4.7.3. O que fazer?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-18"
       locality: "pessoa"
 
   - id: E_WRITER_2CBE59D9_PROBE_AUTENTICADO_1021
@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: "ops/mcp-onion-kg-writer/server.py"
       locator: "executa(): envelope com served_commit, store_commit e aviso_codigo"
-      method: "medição: chamada autenticada tools/call kg_my_list (só leitura)"
+      method: "measurement: chamada autenticada tools/call kg_my_list (só leitura)"
       locality: "host"
 edges:
   - from: A_MCP_KG_WRITER_SERVER

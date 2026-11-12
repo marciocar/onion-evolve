@@ -21,7 +21,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o5-juiz-resumo.md"
       locator: "Busca própria (regra 1), itens P3 e P4; o5-resumo.md P3 e M1; o7-juiz-resumo.md J-O7-1 e A7; contagem pré-ondas pela classe em e03952c2"
-      method: "medição: kg-machine-path-check.sh e a classe de machine_path.py sobre o corpus de e03952c2 extraído por git archive e sobre o corpus vivo"
+      method: "measurement: kg-machine-path-check.sh e a classe de machine_path.py sobre o corpus de e03952c2 extraído por git archive e sobre o corpus vivo"
       locality: "repo"
 
   - id: E_CENSO_CLASSE_NOVA
@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "seções 'já existe guarda' e 'moldes por SUBSTRATO' da saída de 2026-10-10"
-      method: "medição: guard-census.sh com GUARD_CENSUS_QUERY, rodado pela sessão da forja"
+      method: "measurement: guard-census.sh com GUARD_CENSUS_QUERY, rodado pela sessão da forja"
       locality: "repo"
 
   - id: D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT
@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml"
       locator: "chave host: do bloco de deploy do bridge, ao lado das lineages workstation e product"
-      method: "medição: varredura do corpus com a 1ª e a 2ª redação de known_hosts(), 218 → 0 acusações de hostname"
+      method: "measurement: varredura do corpus com a 1ª e a 2ª redação de known_hosts(), 218 → 0 acusações de hostname"
       locality: "repo"
 
   - id: E_DOGFOOD_CORPUS_ACHOU_O_QUE_AS_ONDAS_DEIXARAM
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-machine-path-check.sh"
       locator: "saída humana e --list-exempt no corpus vivo; vetos-por-tokens-2026-10.kg.yaml, label de E_REEXECUCAO_DOS_COMANDOS_REAIS"
-      method: "medição: a guarda no corpus vivo antes e depois da cura, e a regex antiga contra a nova no corpus de e03952c2"
+      method: "measurement: a guarda no corpus vivo antes e depois da cura, e a regex antiga contra a nova no corpus de e03952c2"
       locality: "repo"
 
   - id: E_DOGFOOD_MODO_DE_FALHA
@@ -102,7 +102,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-contract-check.sh"
       locator: "saída: quatro linhas MACHINE-PATH, kinds acct e fs em E_A.verified_against, dbl e shell em Q_A.label; rc=1"
-      method: "medição: kg-contract-check.sh sobre o grafo-fixture, apagado depois"
+      method: "measurement: kg-contract-check.sh sobre o grafo-fixture, apagado depois"
       locality: "repo"
 
   - id: E_MUTANTES_MORDEM
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_kg_machine_path_selftests (casos a–h e m) e run_kg_contract_check_selftests (i1–i3)"
-      method: "medição: bancada com LC_ALL=C, 28/28 e 29/29 verdes; cada mutante de produção aplicado à mão e revertido"
+      method: "measurement: bancada com LC_ALL=C, 28/28 e 29/29 verdes; cada mutante de produção aplicado à mão e revertido"
       locality: "repo"
 
   - id: C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA
@@ -180,7 +180,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-contract-check.sh"
       locator: "1ª passada sobre docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml, antes da perífrase"
-      method: "medição: kg-contract-check.sh rodado pela sessão da forja, rc 1 e depois rc 0"
+      method: "measurement: kg-contract-check.sh rodado pela sessão da forja, rc 1 e depois rc 0"
       locality: "repo"
 
   - id: E_ELENXO_APROVOU_COM_RESSALVAS
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: ".claude/utils/kg/machine_path.py"
       locator: "achados F1, F3, F7, F8, F9 do refutador e os casos novos do --selftest de kg-machine-path-check.sh"
-      method: "juízes: refutador opus com mandato de falso positivo; curas re-medidas pelo --selftest, pelo corpus vivo e pelo corpus de e03952c2"
+      method: "judges: refutador opus com mandato de falso positivo; curas re-medidas pelo --selftest, pelo corpus vivo e pelo corpus de e03952c2"
       locality: "repo"
 
   - id: C_TETO_ROTA_COM_NOME_DE_RAIZ

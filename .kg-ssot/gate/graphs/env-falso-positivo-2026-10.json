@@ -3,7 +3,6 @@
   "id": "env-falso-positivo-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 5,
     "form.required.node.provenance": 1,
     "integrity.untraced-decision": 1
   }

@@ -2,7 +2,5 @@
   "graph": "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml",
   "id": "radar-E3-2026-10-21-r14",
   "must": [],
-  "should": {
-    "form.deprecated.node.provenance.method": 20
-  }
+  "should": {}
 }

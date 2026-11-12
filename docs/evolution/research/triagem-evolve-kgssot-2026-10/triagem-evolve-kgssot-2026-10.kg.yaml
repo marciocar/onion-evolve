@@ -26,7 +26,7 @@ nodes:
     provenance:
       source: "inbox do core, sinais 2026-10-12-evolve-round-vendored-findings.md e 2026-10-12-evolve-maq-findings.md"
       locator: "tabelas MAQ-0..4 e D1-1..D8-0"
-      method: "leitura: os dois sinais inteiros; cada alvo depois medido no vivo"
+      method: "reading: os dois sinais inteiros; cada alvo depois medido no vivo"
       locality: "repo"
 
   - id: E_EVOLVE_ATALHO_DECLARA_COBERTURA
@@ -45,7 +45,7 @@ nodes:
     provenance:
       source: ".claude/workflows/evolve.js e a família run_evolve_workflow_selftests"
       locator: "casos (c) e (h) a (l); mutantes M6 a M12 por ops/mutate-and-restore.sh"
-      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      method: "measurement: bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
 
   - id: E_MAQ0_VIGIADO_POR_CITACAO
@@ -63,7 +63,7 @@ nodes:
     provenance:
       source: ".claude/validation/evolve-census.sh (seção 7) e a família run_evolve_census_selftests"
       locator: "grep de /meta:create-skill e /meta:create-vertical nos *-check.sh; caso (m); mutantes M1, M1b, M4"
-      method: "medição: grep no vivo, bancada com LC_ALL=C e mutante por cura"
+      method: "measurement: grep no vivo, bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
 
   - id: E_MAQ3_README_E_SKILL_NO_CENSO
@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: ".claude/validation/forge-census.sh --tsv e o raio-X"
       locator: "coluna caminho das linhas 1/7; caso forge (j); mutante M5"
-      method: "medição: censo no vivo, bancada e mutante"
+      method: "measurement: censo no vivo, bancada e mutante"
       locality: "repo"
 
   - id: E_IDADE_OPTOUT_NAO_E_FRESCA
@@ -98,7 +98,7 @@ nodes:
     provenance:
       source: ".claude/validation/evolve-census.sh (seções 5 e 6) com a guarda real evolve-staleness-check.sh"
       locator: "casos evolve-census (k) e (l); mutantes M2 e M3"
-      method: "medição: sandbox sem docs/analysis, bancada e mutante"
+      method: "measurement: sandbox sem docs/analysis, bancada e mutante"
       locality: "repo"
 
   - id: Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA
@@ -247,7 +247,7 @@ nodes:
     provenance:
       source: "find .claude -xtype l, com .claude/worktrees podado"
       locator: "saída vazia"
-      method: "medição: comando no vivo do core"
+      method: "measurement: comando no vivo do core"
       locality: "repo"
 
   - id: C_GUARD_LINKS_TETO
@@ -278,7 +278,7 @@ nodes:
     provenance:
       source: "inbox do core, sinal 2026-10-12-evolve-round-2-findings.md (workflows wf_0a338f5a-be0 e wf_751168af-70c do adotante)"
       locator: "seções Blockers e Contradição achada em dogfood"
-      method: "leitura: o sinal inteiro; cada item do core depois medido no vivo"
+      method: "reading: o sinal inteiro; cada item do core depois medido no vivo"
       locality: "repo"
 
   - id: E_REGRA97_DELTA_POR_COMMIT
@@ -296,7 +296,7 @@ nodes:
     provenance:
       source: ".claude/validation/evolve-staleness-check.sh (_population_delta) e as famílias --selftest e run_evolve_staleness_selftests"
       locator: "evolve-staleness-check.sh casos (j), (l), (m), (n); lint-selftest.sh casos (e1) e (e2); mutantes M1 (base volta ao --since), M2 (sem detecção de raso), M3 (fallback sem emissão)"
-      method: "medição: a guarda antiga e a curada rodadas no adotante e no core, bancada com LC_ALL=C e três mutantes, todos reprovando o caso deles"
+      method: "measurement: a guarda antiga e a curada rodadas no adotante e no core, bancada com LC_ALL=C e três mutantes, todos reprovando o caso deles"
       locality: "repo"
 
   - id: E_DECISAO_SELADA_DEV_CURADA_1064
@@ -314,7 +314,7 @@ nodes:
     provenance:
       source: "PR #1064 (fix(kg): o radar aceita em DEV a decisão selada pelo maestro), merge 80932bf597a6"
       locator: "kg-radar.sh, a exceção comentada na linha 804 e a contagem ndm; .claude/rules/kg-grammar.md, linha do plane"
-      method: "medição: gh pr view, git merge-base --is-ancestor e grep -n no vivo"
+      method: "measurement: gh pr view, git merge-base --is-ancestor e grep -n no vivo"
       locality: "repo"
 
   - id: E_MAQ0_LOCALIZADOR_E_CURA_1062
@@ -332,7 +332,7 @@ nodes:
     provenance:
       source: "git show dcdacf9ba196, 50cd399d e origin/main do .claude/validation/evolve-census.sh; PR #1062"
       locator: "linha 157 nos dois commits antigos; _guard_links nas linhas 186-198 de main"
-      method: "medição: grep -n nos três commits"
+      method: "measurement: grep -n nos três commits"
       locality: "repo"
 
 edges:

@@ -3,7 +3,6 @@
   "id": "librechat-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 14,
     "form.range.node.label": 3,
     "yaml.unquoted-date": 1
   }

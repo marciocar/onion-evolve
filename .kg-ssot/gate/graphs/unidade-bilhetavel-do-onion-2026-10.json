@@ -3,7 +3,6 @@
   "id": "unidade-bilhetavel-do-onion-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 23,
     "form.range.node.label": 30
   }
 }

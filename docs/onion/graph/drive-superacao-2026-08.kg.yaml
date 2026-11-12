@@ -30,7 +30,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/drive.md"
       locator: ".claude/commands/meta/drive.md + .claude/validation/kg-drive-project.sh no main (PR #692) + run_drive_selftests 4/4"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_DRIVE_CONDUZIU_FIO_REAL
     node_type: evidence
@@ -45,7 +45,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/catraca-regra49-2026-08.kg.yaml"
       locator: "execucao do laco na catraca-regra49-2026-08.kg.yaml: radar --integrity --schema rc=0, realign --check ALINHADO"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 edges:
   - from: D_DRIVE_MECANIZA_O_RUNTIME

@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml"
       locator: "rodado por mim nesta maquina: `kg-corpus-grep.sh typesafe` → 6 nó(s) em 109 grafos; `kg-corpus-grep.sh \"JEV\" \"type-safe AI\"` → 13 nó(s); `grep -ric jev` no grafo de 09-21 → 27 ocorrencias; `wc -c` → 34.832 B de .kg.yaml + 29.299 B de SYNTHESIS.md"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_VENDOR_PRIMARY_NOT_ON_DISK
@@ -79,7 +79,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md"
       locator: "rodado por mim: `git ls-files | grep -i llms-full` → vazio; `find <raiz do clone do core> -name \"*llms-full*\" -not -path \"*/.git/*\"` → vazio; `find docs/evolution/research/typesafe-ai-2026-09 -type f` → exatamente 2 arquivos (SYNTHESIS.md, typesafe-ai-2026-09.kg.yaml)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_SEALED_DECISION_EXISTS_0921
@@ -97,7 +97,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml"
       locator: "leitura integral do no `D_NAO_ADOTAR_AGORA_DOGFOOD_GATED` e dos seus dois vizinhos `E_AUTOCONSISTENCIA_MEDIDA_0921` (plane PROD, tier 10) e `C_JEV_NAO_COBRE_A_PARTE_CARA` em docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml, linhas 327-360"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ═════════════ ATAQUES E LIMITES PUBLICADOS (papers, tier 7-8) ═════════════
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2410.10414"
       locator: "https://arxiv.org/pdf/2410.10414 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_CONFOUNDER_GADGETS_ROUTER_ATTACK
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2501.01818"
       locator: "https://arxiv.org/pdf/2501.01818 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_PERPLEXITY_NOT_A_DEFENSE
@@ -156,7 +156,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2501.01818"
       locator: "https://arxiv.org/pdf/2501.01818 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_ROUTELLM_CATEGORY_HEURISTIC
@@ -175,7 +175,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2504.07113"
       locator: "https://arxiv.org/pdf/2504.07113 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_ROUTERS_SEND_JAILBREAKS_TO_WEAK
@@ -194,7 +194,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2504.07113"
       locator: "https://arxiv.org/pdf/2504.07113 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_SOTA_PAPER_SILENT_ON_JEV
@@ -212,7 +212,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2604.02367"
       locator: "https://arxiv.org/pdf/2604.02367 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ═════════════ O FABRICANTE: ARQUITETURA E CALIBRACAO SEGUEM SEM NUMERO ═════════════
@@ -233,7 +233,7 @@ nodes:
     provenance:
       source: "https://www.dsebastien.net/reinforcement-learning-for-calibrated-decisions-rlcd/"
       locator: "https://www.dsebastien.net/reinforcement-learning-for-calibrated-decisions-rlcd/ — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_JAGGEDNESS_NO_ARCHITECTURE
@@ -251,7 +251,7 @@ nodes:
     provenance:
       source: "https://docs.typesafe.ai/model-jaggedness/jev-1.13"
       locator: "https://docs.typesafe.ai/model-jaggedness/jev-1.13 — votacao adversarial 3-0"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_VENDOR_PUBLISHES_NO_CALIBRATION
@@ -269,7 +269,7 @@ nodes:
     provenance:
       source: "https://typesafe.ai"
       locator: "https://typesafe.ai — duas claims distintas, ambas por votacao 2-1 (nao 3-0: um juiz dissentiu)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_SHADOW_CALIBRATION_IS_THE_VENDOR_ADVICE
@@ -288,7 +288,7 @@ nodes:
     provenance:
       source: "https://opentweet.io/jev/api-access"
       locator: "https://opentweet.io/jev/api-access — votacao 2-1"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_HARD_DECISIONS_JEV_36_PERCENT
@@ -307,7 +307,7 @@ nodes:
     provenance:
       source: "https://www.modemguides.com/blogs/ai-news/jev-typesafe-reality-check-run-locally"
       locator: "https://www.modemguides.com/blogs/ai-news/jev-typesafe-reality-check-run-locally — votacao 2-1 (um juiz dissentiu; agregador, nao primario)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_MERCADO_CAPITAL_DCVC_UNRECONCILED
@@ -326,7 +326,7 @@ nodes:
     provenance:
       source: "https://dealroom.co/news/151032-typesafe-exits-stealth-with-40m-seed-to-build-ai-for-software-not-people/"
       locator: "https://dealroom.co/news/151032-typesafe-exits-stealth-with-40m-seed-to-build-ai-for-software-not-people/ (3-0) cruzado com https://runtimewire.com/article/typesafe-investors-discuss-a-higher-valuation-after-jev-reaches-nearly-13-of-one (3-0); nenhum anuncio primario do fabricante nem registro aberto"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ═════════════ OBJECOES SOBREVIVENTES DO ELENXO (confidence <= 0.6) ═════════════
@@ -346,7 +346,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml"
       locator: "objecao do Elenxo contra a premissa \"as lacunas 1/2/3/5 estao abertas e se fecham por busca web\"; a parte factual foi RE-MEDIDA POR MIM e confirmada (ver E_CORPUS_ALREADY_ANSWERED_MEASURED), e a parte do diagnostico foi medida e CORRIGIDA"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_OBJECAO_DECISION_ALREADY_SEALED
@@ -364,7 +364,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml"
       locator: "objecao do Elenxo contra tratar a pergunta 7 como aberta; a existencia e o conteudo do no selado foram RE-LIDOS POR MIM no arquivo (ver E_SEALED_DECISION_EXISTS_0921)"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_OBJECAO_GUARD_PAPER_SCOPE_AND_CHERRYPICK
@@ -382,7 +382,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2410.10414"
       locator: "objecao do Elenxo contra o uso do arxiv 2410.10414; a incoerencia de selecao e verificavel na propria lista da rodada (o resultado negativo ACEITO 3-0 e o positivo do MESMO paper na lista de refutados)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_ROUTER_ATTACK_IS_BLOCKING
@@ -400,7 +400,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2501.01818"
       locator: "objecao do Elenxo elevando o arxiv 2501.01818 de contexto a CONSTRAINT bloqueante, cruzada com o fragmento canonico .claude/commands/common/prompts/untrusted-content-provenance.md (R15)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_NO_CHEAP_DEFENSE_SO_STRUCTURAL
@@ -418,7 +418,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2501.01818"
       locator: "objecao do Elenxo sobre o terceiro achado do arxiv 2501.01818 (perplexidade nao defende), lida contra a doutrina do gate deterministico do core"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_SOTA_PAPER_IS_A_NONFINDING
@@ -436,7 +436,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2604.02367"
       locator: "objecao do Elenxo contra contar o arxiv 2604.02367 como achado; verificavel na propria lista da rodada, onde o conteudo substantivo do mesmo paper aparece entre os REFUTADOS"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
   # ═════════════ ANALISE ═════════════
@@ -571,7 +571,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml"
       locator: "inventario do que esta rodada NAO fez nem modelou — ausencia CONTADA, nao estimada"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
 edges:

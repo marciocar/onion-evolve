@@ -34,7 +34,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "replay do corpus de transcripts e execução do hook da main"
-      method: "medição: hook real, JSON do PreToolUse no stdin, rc lido; comando nunca executado"
+      method: "measurement: hook real, JSON do PreToolUse no stdin, rc lido; comando nunca executado"
       locality: "repo"
   - id: E_BANG_NAO_PASSA_PELOS_HOOKS
     node_type: evidence
@@ -51,7 +51,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "transcritos com bash-input, de 2026-10-08 a 2026-10-27"
-      method: "medição: replay dos comandos do `!` contra os hooks vigentes, saída lida no transcrito"
+      method: "measurement: replay dos comandos do `!` contra os hooks vigentes, saída lida no transcrito"
       locality: "repo"
   - id: D_ESTENDER_O_MOAT_GATE_POR_LINHA_ATO
     node_type: decision
@@ -116,7 +116,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "replay do corpus, antes e depois da cura dos falsos positivos"
-      method: "medição: os dois hooks, mesmo JSON, mesmo cwd; comando nunca executado"
+      method: "measurement: os dois hooks, mesmo JSON, mesmo cwd; comando nunca executado"
       locality: "repo"
   - id: E_LATENCIA
     node_type: evidence
@@ -133,7 +133,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "probe de 50 formas"
-      method: "medição: hook real com o JSON do PreToolUse no stdin; comando nunca executado"
+      method: "measurement: hook real com o JSON do PreToolUse no stdin; comando nunca executado"
       locality: "repo"
   - id: C_TETO_COPIA_MUDADA_E_RENOMEADA
     node_type: claim
@@ -210,7 +210,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "replay das formas de relógio de todos os projetos de transcritos"
-      method: "medição: hook real no modo do projeto de origem; comando nunca executado"
+      method: "measurement: hook real no modo do projeto de origem; comando nunca executado"
       locality: "repo"
   - id: D_MODO_DERIVADO_RELOGIO_VETA_PUBLICACAO_AVISA
     node_type: decision
@@ -239,7 +239,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "replay das formas de publicação de todos os projetos de transcritos"
-      method: "medição: hook real no modo do projeto de origem; comando nunca executado"
+      method: "measurement: hook real no modo do projeto de origem; comando nunca executado"
       locality: "repo"
   - id: E_TIMER_POR_ARQUIVO_JA_VETADO_PELO_BASH
     node_type: evidence
@@ -256,7 +256,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml"
       locator: "probe e casos der2 e der3"
-      method: "medição: hook real com o JSON do PreToolUse no stdin; comando nunca executado"
+      method: "measurement: hook real com o JSON do PreToolUse no stdin; comando nunca executado"
       locality: "repo"
   - id: C_TETO_AGENDAMENTO_NATIVO_E_WRITE
     node_type: claim
@@ -309,7 +309,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/feat-guard-deploy-acts.md"
       locator: "achados da passada adversarial sobre 159573a60"
-      method: "medição: probes do refutador independente reexecutadas antes e depois da cura"
+      method: "measurement: probes do refutador independente reexecutadas antes e depois da cura"
       locality: "repo"
   - id: C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA
     node_type: claim

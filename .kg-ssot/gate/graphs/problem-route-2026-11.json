@@ -2,7 +2,5 @@
   "graph": "docs/evolution/dissect/problem-route-2026-11/problem-route-2026-11.kg.yaml",
   "id": "problem-route-2026-11",
   "must": [],
-  "should": {
-    "form.deprecated.node.provenance.method": 39
-  }
+  "should": {}
 }

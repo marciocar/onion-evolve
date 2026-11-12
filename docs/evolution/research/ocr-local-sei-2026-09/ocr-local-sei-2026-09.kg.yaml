@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2512.02498"
       locator: "https://arxiv.org/pdf/2512.02498 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_CONSENSUS_ENTROPY_SEM_TREINO
@@ -80,7 +80,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/html/2504.11101"
       locator: "https://arxiv.org/html/2504.11101 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO
@@ -99,7 +99,7 @@ nodes:
     provenance:
       source: "https://github.com/rednote-hilab/dots.ocr"
       locator: "https://github.com/rednote-hilab/dots.ocr — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_DOCTR_PYTHON_311_PLUS
@@ -117,7 +117,7 @@ nodes:
     provenance:
       source: "https://mindee.github.io/doctr/getting_started/installing.html"
       locator: "https://mindee.github.io/doctr/getting_started/installing.html — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_SURYA_CPU_EXIGE_LLAMACPP
@@ -135,7 +135,7 @@ nodes:
     provenance:
       source: "https://github.com/datalab-to/surya"
       locator: "https://github.com/datalab-to/surya — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EIXO MERCADO/CAPITAL (invariante — registrado mesmo vazio) ───────────────────────
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "journal wf_fb266335-f95 (host) + docs/evolution/research/ocr-local-sei-2026-09/SYNTHESIS.md"
       locator: "journal: result.market (\"SEM SINAL ENCONTRADO ... nenhuma claim que sobrevivesse aos votos\"); result.notVerifiedByBudget[11] (Datalab seed US$3,5M, 7 pessoas) e [13] (dots.ocr 9.1k estrelas), reason \"orçamento maxVerify\"; decision.objections[20]; decision.recommendation constraint 3 (GPL-3.0, Datalab em seed); SYNTHESIS.md l.116 (claims de mercado da Datalab cortadas por orçamento)"
-      method: "testemunho: leitura do journal wf_fb266335-f95 no host 2026-10-09 (corte de mercado corroborado pela SYNTHESIS.md versionada l.116)"
+      method: "testimony: leitura do journal wf_fb266335-f95 no host 2026-10-09 (corte de mercado corroborado pela SYNTHESIS.md versionada l.116)"
       locality: "host"
 
   # ── LACUNAS DECLARADAS (régua de saída, item 2) ──────────────────────────────────────
@@ -175,7 +175,7 @@ nodes:
     provenance:
       source: "journal wf_fb266335-f95 (host) + docs/evolution/research/ocr-local-sei-2026-09/SYNTHESIS.md"
       locator: "journal: result.stats {sources 15, claims 48, verified 25, confirmed 5, refuted 20, unverified 0}; len(budgetDropped)=39; len(notVerifiedByBudget)=23; refuted[*].tier (8 de tier 3-4; 12 de tier 6-9, nenhum com campo de evidência); logs \"Elenxo: 25 objeções, 21 sobreviventes\"; grafo: 8 \"id: E_OBJECAO\"; SYNTHESIS.md l.104-113 (mesmas contagens, versionado)"
-      method: "testemunho: leitura do journal wf_fb266335-f95 no host 2026-10-09 (contagens corroboradas pela SYNTHESIS.md versionada l.104-113)"
+      method: "testimony: leitura do journal wf_fb266335-f95 no host 2026-10-09 (contagens corroboradas pela SYNTHESIS.md versionada l.104-113)"
       locality: "host"
 
   # ── CORPUS PRÉVIO (cláusula 0) ───────────────────────────────────────────────────────
@@ -194,7 +194,7 @@ nodes:
     provenance:
       source: "corpus docs/**/*.kg.yaml em 2026-09-08 (92 grafos, 3289 nós)"
       locator: "bash .claude/validation/kg-corpus-grep.sh <termos do enunciado OCR>"
-      method: "medição: bash .claude/validation/kg-corpus-grep.sh"
+      method: "measurement: bash .claude/validation/kg-corpus-grep.sh"
 
   # ── A DECISÃO (o maestro sela — esta sessão NUNCA sela) ──────────────────────────────
   - id: D_OCR_LOCAL_SEI_0908
@@ -306,7 +306,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2512.02498"
       locator: "E_DOTSOCR_VLM_FIM_A_FIM (https://arxiv.org/pdf/2512.02498, tier 7, 3-0) confrontada com o requisito dominante do enunciado (\"um erro de leitura produz uma superacao errada em silencio\") — inversao de sinal da mesma propriedade arquitetural"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO
@@ -324,7 +324,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/html/2504.11101"
       locator: "E_CONSENSUS_ENTROPY_SEM_TREINO (https://arxiv.org/html/2504.11101, tier 7, 3-0) confrontada com a propria lista de refutadas desta rodada, que marcou \"refutada\" a proposicao \"quando os VLMs erram, as predicoes divergem\" — a perna de sustentacao do mesmo achado"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO
@@ -342,7 +342,7 @@ nodes:
     provenance:
       source: "https://github.com/rednote-hilab/dots.ocr"
       locator: "E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO (https://github.com/rednote-hilab/dots.ocr, tier 6, 3-0) — a metade \"nao ha mencao a robustez contra carimbo\" e ausencia em README, nao medicao; confrontada com a doutrina behavior-over-declaration do repo"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH
@@ -360,7 +360,7 @@ nodes:
     provenance:
       source: "https://mindee.github.io/doctr/getting_started/installing.html"
       locator: "E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (venv do projeto: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES
@@ -378,7 +378,7 @@ nodes:
     provenance:
       source: "https://github.com/datalab-to/surya"
       locator: "E_SURYA_CPU_EXIGE_LLAMACPP (https://github.com/datalab-to/surya, tier 7, 3-0) confrontada com as 4 proposicoes tier 7 do MESMO repo marcadas refutada sem evidencia e com a disconfirmadora cortada por orcamento — corpo de evidencia mutuamente contraditorio"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_6_CUSTO_INSTALACAO_POR_IMPRESSAO
@@ -396,7 +396,7 @@ nodes:
     provenance:
       source: "https://mindee.github.io/doctr/getting_started/installing.html"
       locator: "proposicao tier 9 (doc oficial docTR, https://mindee.github.io/doctr/getting_started/installing.html) marcada \"refutada\" na lista desta rodada SEM evidencia registrada; e o teste de 1 comando que a decidiria (`pip install --dry-run python-doctr` neste venv) nunca foi executado"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE
@@ -414,7 +414,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/html/2504.11101"
       locator: "proposicao tier 7 (https://arxiv.org/html/2504.11101) \"o desacordo entre motores independentes e sinal detectavel de erro\" marcada refutada sem evidencia, enquanto E_CONSENSUS_ENTROPY_SEM_TREINO, que dela depende, foi mantida confirmada"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_OBJECAO_8_SURYA_QUATRO_REFUTADAS_EM_BLOCO
@@ -432,7 +432,7 @@ nodes:
     provenance:
       source: "https://github.com/datalab-to/surya"
       locator: "quatro proposicoes tier 7 da MESMA fonte (https://github.com/datalab-to/surya) marcadas refutada sem evidencia registrada para nenhuma delas: 87,2% em 91 idiomas; Pareto-otimo sub-3B com 83,3% no olmOCR-bench; confidence score por bloco; ausencia de dados sobre robustez a carimbo"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
 edges:

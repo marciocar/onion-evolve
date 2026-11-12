@@ -3,7 +3,6 @@
   "id": "company-brain-e-conducao-como-servico-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 41,
     "form.range.node.label": 47,
     "form.required.node.provenance": 1
   }

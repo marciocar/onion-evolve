@@ -2,7 +2,5 @@
   "graph": "docs/onion/graph/pr-decision-history-2026-08.kg.yaml",
   "id": "pr-decision-history-2026-08",
   "must": [],
-  "should": {
-    "form.deprecated.node.provenance.method": 681
-  }
+  "should": {}
 }

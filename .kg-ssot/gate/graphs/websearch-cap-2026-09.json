@@ -3,7 +3,6 @@
   "id": "websearch-cap-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 7,
     "form.range.node.label": 6
   }
 }

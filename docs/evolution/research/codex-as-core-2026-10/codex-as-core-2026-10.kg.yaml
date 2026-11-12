@@ -67,7 +67,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Porta nova do Codex: com os spikes medidos, o que fazemos?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
   - id: E_EXECPOLICY_MOST_RESTRICTIVE_WINS
@@ -85,7 +85,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/rules"
       locator: "rules, 'Understand rule fields'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/rules"
       locator: "rules, introdução"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_PROJECT_RULES_NEED_TRUST
@@ -122,7 +122,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/rules"
       locator: "rules, 'Create a rules file' e 'Test a rule file'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_APPROVAL_POLICY_AND_SANDBOX_MODES
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/config-file/config-reference"
       locator: "config-reference, 'approval_policy', 'sandbox_mode', 'default_permissions', permissions.<name>.*"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_AGENTS_MD_DIRECTORY_WALK
@@ -159,7 +159,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
       locator: "AGENTS.md, seção de descoberta (Directory walk)"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_AGENTS_MD_CLOSER_OVERRIDES
@@ -178,7 +178,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
       locator: "AGENTS.md, seção de precedência"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_CUSTOM_AGENTS_ARE_TOML
@@ -198,7 +198,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
       locator: "seção Custom agents"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_AGENT_FILE_MODEL_TAKES_PRECEDENCE
@@ -217,7 +217,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
       locator: "seção Fields / Custom agents"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_SUBAGENT_PARALLELISM_CAP
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
       locator: "seção Parallelism / agents config"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_SUBAGENT_INHERITS_PARENT_PERMISSIONS
@@ -255,7 +255,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
       locator: "seção Approvals and sandbox inheritance"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE
@@ -274,7 +274,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
       locator: "navegação lateral (único match de 'worktree')"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_CODEX_MCP_SERVER_REMOVED
@@ -293,7 +293,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/mcp-server"
       locator: "seção 'Codex MCP server removal'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_APP_SERVER_IS_NOT_MCP
@@ -312,7 +312,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/mcp-server"
       locator: "seção 'Use the Codex app server'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_CODEX_REMAINS_MCP_CLIENT
@@ -331,7 +331,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/mcp-server"
       locator: "seção 'Connect Codex to MCP tools'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_MCP_SERVERS_TOML_STDIO_HTTP
@@ -350,7 +350,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
       locator: "'Configure with config.toml' > 'STDIO servers' / 'Streamable HTTP servers'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_MCP_TOOL_ALLOW_DENY_LISTS
@@ -369,7 +369,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
       locator: "'Configure with config.toml' > 'Other configuration options'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK
@@ -387,7 +387,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
       locator: "'Other configuration options' (não há seção 'Tool approval')"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_EXEC_READ_ONLY_BY_DEFAULT
@@ -406,7 +406,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/non-interactive-mode"
       locator: "non-interactive-mode, seção Sandbox/permissões"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_EXEC_JSONL_TYPED_EVENTS
@@ -425,7 +425,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/non-interactive-mode"
       locator: "non-interactive-mode, seção JSON output (--json)"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_EXEC_FULL_AUTO_REMOVED
@@ -443,7 +443,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/non-interactive-mode"
       locator: "non-interactive-mode, nota de depreciação"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_EXEC_OUTPUT_SCHEMA_AND_API_KEY
@@ -461,7 +461,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/non-interactive-mode"
       locator: "non-interactive-mode, seção Output schema / autenticação"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_GHA_DROP_SUDO_DEFAULT
@@ -479,7 +479,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/github-action"
       locator: "github-action, seção Inputs/safety-strategy"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_GHA_WRITE_ACCESS_ONLY_AND_LATEST
@@ -498,7 +498,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/github-action"
       locator: "github-action, seção allow-users e codex-version"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_R164_HOOKS_OBSERVATION_LIFECYCLE
@@ -518,7 +518,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
       locator: "Release rust-v0.164.0, seção Hooks (junto de 'Add lifecycle hooks for inter-agent messages' e 'Bind plugin hook approval to plugin contents')"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_R137_NO_HOOKS_NO_MCP_IN_NOTES
@@ -538,7 +538,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/releases/tag/rust-v0.137.0"
       locator: "Release 0.137.0 (04 Jun), notas"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_R164_SUBAGENT_ENV_INHERITANCE
@@ -558,7 +558,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
       locator: "Release rust-v0.164.0, seção Subagent (junto de 'Resume unloaded subagent threads when selected in the TUI')"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_R164_MCP_AUTH_DORMANT_SERVERS
@@ -578,7 +578,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
       locator: "Release rust-v0.164.0, seção Hooks/MCP; Sandbox: 'Reject replaceable symlinks in pre-sandbox executable lookup'"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_TRACKER_PRETOOLUSE_PARTIAL
@@ -596,7 +596,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/issues/21753"
       locator: "issue #21753, corpo, Event Matrix, linha PreToolUse (Partial)"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK
@@ -615,7 +615,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/issues/21753"
       locator: "issue #21753, comentário de chrysent (2026-09-17) sobre permissionDecision 'ask', verificado no tag rust-v0.153.3"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_TRACKER_WORKTREECREATE_MISSING
@@ -634,7 +634,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/issues/21753"
       locator: "issue #21753, corpo, Event Matrix, linha WorktreeCreate (Missing); SubagentStart/SubagentStop também Missing"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS
@@ -653,7 +653,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/issues/21753"
       locator: "issue #21753, issue relacionada (título)"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE
@@ -673,7 +673,7 @@ nodes:
     provenance:
       source: "https://github.com/openai/codex/issues/21753"
       locator: "issue #21753, comentário de usuário (hoganfan, 2026-07-13)"
-      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      method: "reading: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
       locality: "web"
 
   - id: E_CORPUS_ONION_CODEX_PORT_STATE_1026
@@ -690,7 +690,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-codex@a21679136d27a9bd013859d405e4e48b4b941fbe"
       locator: ".codex/hooks.json; .agents/skills; .codex/agents; CODEX-NEXT-STEPS.md l.44"
-      method: "medição: ls | wc -l e cat no clone local do commit"
+      method: "measurement: ls | wc -l e cat no clone local do commit"
       locality: "web"
 
   - id: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
@@ -707,7 +707,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, objeções e gapsOpen do Elenxo"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   - id: C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT
@@ -794,7 +794,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_EXECPOLICY_MOST_RESTRICTIVE_WINS (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_02_OUTSIDE_SANDBOX_UNQUOTED
@@ -811,7 +811,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_04_NO_DIALOG_UNDER_NEVER_UNANCHORED
@@ -828,7 +828,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_APPROVAL_POLICY_AND_SANDBOX_MODES (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_10_INHERITANCE_NOW_CONFIGURABLE
@@ -845,7 +845,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_SUBAGENT_INHERITS_PARENT_PERMISSIONS (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_11_WORKTREE_CAPABILITY_UNREAD
@@ -862,7 +862,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_17_READ_ONLY_MARK_IS_DECLARATION
@@ -879,7 +879,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_24_EXIT2_STATE_UNPROVEN_IN_0164
@@ -896,7 +896,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_R164_HOOKS_OBSERVATION_LIFECYCLE (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_25_TRAJECTORY_ONLY_ENDPOINTS
@@ -913,7 +913,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_R137_NO_HOOKS_NO_MCP_IN_NOTES (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_29_COMMENT_PREDATES_CURRENT
@@ -930,7 +930,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_30_SUBAGENT_EVENTS_EXIST_IN_DOCS
@@ -947,7 +947,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_TRACKER_WORKTREECREATE_MISSING (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_32_INTER_AGENT_HOOK_MAY_RESTORE
@@ -964,7 +964,7 @@ nodes:
     provenance:
       source: "journal do run wf_e4a2a9be-bb5"
       locator: "Elenxo, objeção ao alvo E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
@@ -1079,7 +1079,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
       locator: "S1-1-c, S1-1-w, S1-2-c, S1-2-w, S1-3-c, S1-3-w: args.txt, result.txt, hook.log, stdout.jsonl, stderr.txt"
-      method: "medição: rodadas da curadoria (codex exec --json, 1 rodada por caso), conferida por releitura de cada arquivo e contagem de eventos do stdout.jsonl nesta escrita"
+      method: "measurement: rodadas da curadoria (codex exec --json, 1 rodada por caso), conferida por releitura de cada arquivo e contagem de eventos do stdout.jsonl nesta escrita"
       locality: "web"
 
   - id: E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026
@@ -1099,7 +1099,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/"
       locator: "runs-b/{S1-1,S1-2,S1-3}-{c,w}, runs-b/S2-1, runs-b/S2-2, runs-diag/DIAG1-c: rc.txt, stdout.jsonl (itens error), stderr.txt"
-      method: "medição: rodadas da curadoria, conferida nesta escrita por grep no stderr e leitura dos itens do stdout.jsonl"
+      method: "measurement: rodadas da curadoria, conferida nesta escrita por grep no stderr e leitura dos itens do stdout.jsonl"
       locality: "web"
 
   - id: E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026
@@ -1119,7 +1119,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
       locator: "S1-0-c e S1-0-w (args.txt, result.txt, stdout.jsonl, stderr.txt), contra S1-1-c e S1-1-w"
-      method: "medição: rodadas da curadoria, conferida nesta escrita por releitura e comparação dos args"
+      method: "measurement: rodadas da curadoria, conferida nesta escrita por releitura e comparação dos args"
       locality: "web"
 
   - id: E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026
@@ -1139,7 +1139,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs/"
       locator: "S1-0-c a S1-3-w (args.txt, result.txt, stdout.jsonl) e runs-diag/DIAG1-c"
-      method: "medição: rodadas da curadoria, conferida nesta escrita por contagem de command_execution e leitura dos result.txt"
+      method: "measurement: rodadas da curadoria, conferida nesta escrita por contagem de command_execution e leitura dos result.txt"
       locality: "web"
 
   - id: E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026
@@ -1158,7 +1158,7 @@ nodes:
     provenance:
       source: "https://learn.chatgpt.com/docs/hooks"
       locator: "seções 'Managed hooks from requirements.toml', 'How hooks run', 'Review and trust hooks', 'PreToolUse', 'Config shape'"
-      method: "leitura: WebFetch nesta escrita, conferindo a citação que a curadoria relatou"
+      method: "reading: WebFetch nesta escrita, conferindo a citação que a curadoria relatou"
       locality: "web"
 
   - id: E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026
@@ -1178,7 +1178,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
       locator: "S2-1 e S2-2: hook.log, result.txt, stdout.jsonl"
-      method: "medição: rodadas da curadoria, conferida nesta escrita por releitura"
+      method: "measurement: rodadas da curadoria, conferida nesta escrita por releitura"
       locality: "web"
 
   - id: E_SPIKE_S3_PORT_SKILLS_LOAD_1026
@@ -1198,7 +1198,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
       locator: "S3-onion, S3-engineer-start, S3-engineer-warm-up, S3X-engineer-warm-up: args.txt, stdout.jsonl; e github.com/marciocar/onion-codex@a216791 (.agents/skills)"
-      method: "medição: rodadas da curadoria, conferida nesta escrita por contagem de eventos e git show das linhas citadas no porte"
+      method: "measurement: rodadas da curadoria, conferida nesta escrita por contagem de eventos e git show das linhas citadas no porte"
       locality: "web"
 
   - id: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
@@ -1218,7 +1218,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
       locator: "S4T-A0, S4T-A1, S4T-B1 (rc.txt, stdout.jsonl, SIGNAL-B1.json); hooks-A0.json, hooks-A1.json, hooks-B1.json"
-      method: "medição: rodadas da curadoria (codex exec --json em clones descartáveis do porte), conferidas nesta escrita por leitura dos itens do stdout.jsonl e diff dos hooks.json contra o porte"
+      method: "measurement: rodadas da curadoria (codex exec --json em clones descartáveis do porte), conferidas nesta escrita por leitura dos itens do stdout.jsonl e diff dos hooks.json contra o porte"
       locality: "web"
 
   - id: Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026
@@ -1277,7 +1277,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
       locator: "S4-A0, S4-A1, S4-B1, S4-BISECT-1-clean a S4-BISECT-4-codex-dirs, S4-DIAG-*, S4-CTRL contra S4T-A0, S4T-A1, S4T-B1; PLAN-C.md seção Rodadas"
-      method: "medição: rodadas da curadoria, conferidas nesta escrita por leitura dos itens do stdout.jsonl de todas as rodadas de runs-c; a variável (entrada gravada) é declaração da curadoria"
+      method: "measurement: rodadas da curadoria, conferidas nesta escrita por leitura dos itens do stdout.jsonl de todas as rodadas de runs-c; a variável (entrada gravada) é declaração da curadoria"
       locality: "web"
 
   - id: Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026
@@ -1343,7 +1343,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Quem corrige o hooks.json do onion-codex?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
 edges:

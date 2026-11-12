@@ -23,7 +23,7 @@ nodes:
     provenance:
       source: "CLAUDE.md e .claude/sessions/instructions-loaded.jsonl"
       locator: "wc -c CLAUDE.md; git log --since=2026-09-03 --numstat -- CLAUDE.md; bash .claude/validation/instructions-loaded-census.sh"
-      method: "medição: comandos executados em 2026-10-19"
+      method: "measurement: comandos executados em 2026-10-19"
       locality: "repo"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "bash .claude/validation/guard-census.sh . --markdown (2026-10-19)"
-      method: "medição: censo de guardas executado antes da forja"
+      method: "measurement: censo de guardas executado antes da forja"
       locality: "repo"
 
   - id: C_TETO_MEDE_BYTES_NAO_COMPORTAMENTO
@@ -56,7 +56,7 @@ nodes:
     provenance:
       source: ".claude/validation/claude-md-size-check.sh"
       locator: "cabeçalho, seção TETO"
-      method: "leitura: o artefato forjado, lido por inteiro"
+      method: "reading: o artefato forjado, lido por inteiro"
       locality: "repo"
 
   - id: C_TETO_NO_CITADO_SO_POR_EXISTENCIA
@@ -72,7 +72,7 @@ nodes:
     provenance:
       source: ".claude/validation/claude-md-size-check.sh"
       locator: "laço das linhas raise: novas"
-      method: "leitura: o artefato forjado, lido por inteiro"
+      method: "reading: o artefato forjado, lido por inteiro"
       locality: "repo"
 
   - id: C_TETO_CATRACA_PRECISA_DA_INTEGRACAO
@@ -88,7 +88,7 @@ nodes:
     provenance:
       source: ".claude/validation/claude-md-size-check.sh"
       locator: "bloco da catraca"
-      method: "leitura: o artefato forjado, lido por inteiro"
+      method: "reading: o artefato forjado, lido por inteiro"
       locality: "repo"
 
   - id: C_TETO_NAO_VE_OUTRAS_CARGAS_PERMANENTES
@@ -105,7 +105,7 @@ nodes:
     provenance:
       source: "passada adversarial (refutador isolado), 2026-10-19"
       locator: "repos git temporários com a cópia da guarda"
-      method: "medição: execução real dos cenários"
+      method: "measurement: execução real dos cenários"
       locality: "repo"
   - id: D_TETO_NASCE_COM_64B_DE_FOLGA
     node_type: decision
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «Merge do #1203 (REGRA 109 + cura do EPIPE no hook do shell): com que teto?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
   - id: D_TETO_NAO_VIAJA_NO_TRANSPORTE
     node_type: decision
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «A guarda só julga o core; o arquivo de teto viaja junto com .claude/validation. O que fazer com ele?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
 edges:

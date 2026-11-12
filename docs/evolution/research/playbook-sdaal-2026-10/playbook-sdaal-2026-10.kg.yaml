@@ -57,7 +57,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre D_PLAYBOOK_SDAAL_SAC52"
       locator: "opção escolhida: A + gate D (Recomendado)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
 
   - id: "C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA"
     node_type: "claim"
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: ".claude/skills/onion-patterns/SKILL.md@dc06bb9b"
       locator: "§Playbooks (recognition-primed — catálogo, blip #9), l.176 em diante, 7 cabeçalhos ###"
-      method: "medição: awk de contagem dos ### na seção"
+      method: "measurement: awk de contagem dos ### na seção"
       locality: "repo"
 
   - id: "E_MEDIDO_SDAAL_E_POR_PROVIDER_1011"
@@ -141,7 +141,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/@dc06bb9b · .claude/utils/forge/adapters/@dc06bb9b"
       locator: "git ls-files dos adapters e de .claude/utils/playbook*"
-      method: "medição: git ls-files contado nesta sessão"
+      method: "measurement: git ls-files contado nesta sessão"
       locality: "repo"
 
   - id: "E_MEDIDO_PLUGINS_JA_TEM_IR_E_RUNBOOK_1011"
@@ -161,7 +161,7 @@ nodes:
     provenance:
       source: "⟨cache de plugins sincronizados do Claude Code nesta máquina⟩"
       locator: "engineering/skills/incident-response/SKILL.md · operations/skills/runbook/SKILL.md"
-      method: "medição: find por caminho de skill nesta sessão"
+      method: "measurement: find por caminho de skill nesta sessão"
       locality: "host"
 
   - id: "E_CACAO_V2_PADRAO_ABERTO_OASIS"
@@ -181,7 +181,7 @@ nodes:
     provenance:
       source: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_SKILLS_PADRAO_AGENT_SKILLS_NAO_EXECUTAVEL"
@@ -199,7 +199,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/skills"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_SKILL_E_TEMPLATE_SEM_ESTADO"
@@ -218,7 +218,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/skills"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 2-1 do run"
+      method: "judges: votação 2-1 do run"
       locality: "web"
 
   - id: "E_NIST_IACD_PLAYBOOKS_SEM_DETALHE"
@@ -238,7 +238,7 @@ nodes:
     provenance:
       source: "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_CACAO_ROASTER_GERA_E_EXECUTA"
@@ -258,7 +258,7 @@ nodes:
     provenance:
       source: "https://github.com/opencybersecurityalliance/cacao-roaster"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 2-1 do run"
+      method: "judges: votação 2-1 do run"
       locality: "web"
 
   - id: "E_CACAO_ROASTER_DELEGA_AO_SOARCA"
@@ -276,7 +276,7 @@ nodes:
     provenance:
       source: "https://github.com/opencybersecurityalliance/cacao-roaster"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 2-1 do run"
+      method: "judges: votação 2-1 do run"
       locality: "web"
 
   - id: "E_AI_SRE_CATEGORIA_FINANCIADA"
@@ -295,7 +295,7 @@ nodes:
     provenance:
       source: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_EXECUCAO_DE_RUNBOOK_TEM_ESTADO"
@@ -314,7 +314,7 @@ nodes:
     provenance:
       source: "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_MEDDICC_PLAYBOOK_PROPRIETARIO"
@@ -334,7 +334,7 @@ nodes:
     provenance:
       source: "https://meddicc.com/llm-info"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_MOS_SEM_CONTRATO_PUBLICO"
@@ -352,7 +352,7 @@ nodes:
     provenance:
       source: "https://meddicc.com/llm-info"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 2-1 do run"
+      method: "judges: votação 2-1 do run"
       locality: "web"
 
   - id: "E_RUNBOOK_V1_MANIFESTO_MCP"
@@ -371,7 +371,7 @@ nodes:
     provenance:
       source: "https://github.com/CorpusIQ/runbook-spec"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_RUNBOOK_V1_ESTADO_OBSERVADO"
@@ -390,7 +390,7 @@ nodes:
     provenance:
       source: "https://github.com/CorpusIQ/runbook-spec"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_CAST_GARTNER_NAO_RESPONDE"
@@ -409,7 +409,7 @@ nodes:
     provenance:
       source: "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_RUNBOOK_AGENT_YAML_MAQUINA_DE_ESTADOS"
@@ -428,7 +428,7 @@ nodes:
     provenance:
       source: "https://github.com/nutcas3/runbook-agent"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 2-1 do run"
+      method: "judges: votação 2-1 do run"
       locality: "web"
 
   - id: "E_CACAO_ESCOPO_SO_CIBER"
@@ -448,7 +448,7 @@ nodes:
     provenance:
       source: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_CACAO_PAGINA_NAO_DESCREVE_FORMATO"
@@ -466,7 +466,7 @@ nodes:
     provenance:
       source: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: "E_CAMPOS_DE_EXECUCAO_SAO_SO_CLAUDE_CODE"
@@ -484,7 +484,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/skills"
       locator: "página lida no Fetch da rodada"
-      method: "juízes: votação 2-1 do run"
+      method: "judges: votação 2-1 do run"
       locality: "web"
 
   - id: "E_MERCADO_PLAYBOOK_SDAAL_1011"
@@ -504,7 +504,7 @@ nodes:
     provenance:
       source: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
       locator: "anúncio da rodada da Resolve AI e menção à Traversal"
-      method: "juízes: votação 3-0 do run (claim AI SRE) + síntese do worker de mercado"
+      method: "judges: votação 3-0 do run (claim AI SRE) + síntese do worker de mercado"
       locality: "web"
 
   - id: "E_OBJECAO_CACAO_SEM_CONSUMIDOR"
@@ -523,7 +523,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_SKILL_E_SUBSTRATO_NATIVO"
@@ -541,7 +541,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_PFR_JA_E_TEMPLATE_MAIS_ESTADO"
@@ -559,7 +559,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_AMOSTRA_NIST_PEQUENA"
@@ -577,7 +577,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_ROASTER_TRAJETORIA_NAO_MEDIDA"
@@ -595,7 +595,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_SOARCA_E_INFRA_NOVA"
@@ -613,7 +613,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_EXECUCAO_JA_CAPITALIZADA"
@@ -631,7 +631,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_MEDDICC_E_METODOLOGIA_PUBLICA"
@@ -649,7 +649,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_SDAAL_FORA_DO_LUGAR"
@@ -668,7 +668,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_RUNBOOK_V1_NAO_E_PADRAO"
@@ -686,7 +686,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_PRINCIPIO_SEM_FORMATO"
@@ -704,7 +704,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_EIXO_ANALISTAS_ABERTO"
@@ -722,7 +722,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_ESPEC_CACAO_NAO_LIDA"
@@ -740,7 +740,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_CODEX_PERDE_O_CONTROLE"
@@ -758,7 +758,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_QUATRO_DOMINIOS_SEM_DECISAO"
@@ -776,7 +776,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_SEM_CONSUMIDOR_PULL_NOT_PUSH"
@@ -794,7 +794,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_INSTITUCIONALIZACAO"
@@ -812,7 +812,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_PLAYBOOK_APODRECE"
@@ -830,7 +830,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_LLM_LE_GATE_ESCREVE"
@@ -848,7 +848,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_APROVACAO_POR_ACAO"
@@ -866,7 +866,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_FATIA_POR_INCIDENTE_REAL"
@@ -884,7 +884,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_SESSAO_PFR_SOBREVIVE_A_QUEDA"
@@ -902,7 +902,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_SKILL_LE_ESTADO_NA_INVOCACAO"
@@ -920,7 +920,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_DISABLE_MODEL_INVOCATION"
@@ -938,7 +938,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_ARAZZO_NAO_LIDO"
@@ -956,7 +956,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_RUNME_NAO_LIDO"
@@ -974,7 +974,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_MERCADO_RUNBOOK_SEM_FONTE"
@@ -992,7 +992,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_OBJECAO_ENGINES_DURAVEIS_NAO_MEDIDAS"
@@ -1010,7 +1010,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "lista de objeções do Elenxo, item com survives=true"
-      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      method: "judges: objeção de UM agente do Elenxo, sem votação"
       locality: "host"
 
   - id: "E_LACUNAS_PLAYBOOK_SDAAL_1011"
@@ -1029,7 +1029,7 @@ nodes:
     provenance:
       source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
       locator: "contagens do retorno (confirmadas, refutadas, objeções com survives)"
-      method: "medição: contagem dos itens do retorno nesta escrita"
+      method: "measurement: contagem dos itens do retorno nesta escrita"
       locality: "host"
 
   # ═══ RODADA DE PRIMÁRIAS 2026-10-12 (gate D de D_PLAYBOOK_SDAAL_SAC52, sub-decisão 3) ═══
@@ -1051,7 +1051,7 @@ nodes:
     provenance:
       source: "https://spec.openapis.org/arazzo/v1.0.1.html"
       locator: "§4.6.4.1 Workflow Object, campo steps"
-      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_ARAZZO_ENTRADAS_JSON_SCHEMA_1012"
@@ -1070,7 +1070,7 @@ nodes:
     provenance:
       source: "https://spec.openapis.org/arazzo/v1.0.1.html"
       locator: "§4.6.4.1 Workflow Object, campos inputs, outputs e dependsOn"
-      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012"
@@ -1088,7 +1088,7 @@ nodes:
     provenance:
       source: "https://spec.openapis.org/arazzo/v1.0.1.html"
       locator: "§4.6.5.1 Step Object; §4.6.7 Success Action; §4.6.8 Failure Action; §4.6.11 Criterion"
-      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_ARAZZO_EXPRESSOES_PRESAS_AO_HTTP_1012"
@@ -1107,7 +1107,7 @@ nodes:
     provenance:
       source: "https://spec.openapis.org/arazzo/v1.0.1.html"
       locator: "§4.7 Runtime Expressions; §4.6.3.1 Source Description Object, campo type"
-      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012"
@@ -1126,7 +1126,7 @@ nodes:
     provenance:
       source: "https://github.com/OAI/Arazzo-Specification"
       locator: "README, introdução e linha 'Current Version - 1.1.0'; sidebar de licença"
-      method: "leitura: WebFetch do README no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch do README no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_ARAZZO_VERSIONAMENTO_DE_DOCUMENTO_1012"
@@ -1145,7 +1145,7 @@ nodes:
     provenance:
       source: "https://spec.openapis.org/arazzo/v1.0.1.html"
       locator: "§4.1 Versions; §4.6.1.1 Arazzo Object; §4.6.2.1 Info Object"
-      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_RUNME_EXECUTA_BLOCOS_CERCADOS_1012"
@@ -1164,7 +1164,7 @@ nodes:
     provenance:
       source: "https://github.com/runmedev/runme"
       locator: "README, 2º parágrafo"
-      method: "leitura: WebFetch do README no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch do README no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_RUNME_ATRIBUTOS_POR_CELULA_1012"
@@ -1183,7 +1183,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev/configuration/cell-level"
       locator: "tabela de atributos de célula, linha name"
-      method: "leitura: WebFetch da doc no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da doc no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_RUNME_APACHE_ADOCAO_MODERADA_1012"
@@ -1202,7 +1202,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev · https://github.com/runmedev/runme"
       locator: "página inicial da doc; sidebar do repositório (licença, stars, commits)"
-      method: "leitura: WebFetch no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_CACAO_FORMA_GENERICA_VOCABULARIO_CIBER_1012"
@@ -1221,7 +1221,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§1.3 Playbook Types; §4.2 workflow-step-type-enum"
-      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_CACAO_COMPOSICAO_E_CONDICIONAIS_1012"
@@ -1241,7 +1241,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§4.6 Playbook Action Step; §4.8; §4.9; §4.10"
-      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_CACAO_VARIAVEIS_DE_EXECUCAO_1012"
@@ -1261,7 +1261,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§3.3 Playbook Constants & Variables"
-      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_CACAO_PORTAVEL_VERSAO_POR_DATA_1012"
@@ -1281,7 +1281,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§1.2; §2.3; §3.1; §8"
-      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_CACAO_CS01_NAO_E_STANDARD_1012"
@@ -1300,7 +1300,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "front matter; Notices; §3.1 spec_version; Exemplo 4.8 na §4.10"
-      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      method: "reading: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
       locality: "web"
 
   - id: "E_LACUNAS_PLAYBOOK_SDAAL_1012"
@@ -1319,7 +1319,7 @@ nodes:
     provenance:
       source: "retorno do workflow /onion-research wf_5ceb8e1b-6d6 repassado ao write(KG) (claims ancoradas, rejeitadas e Elenxo integral)"
       locator: "listas de claims ANCORADAS e REJEITADAS; objections, gapsClosed e gapsOpen do Elenxo"
-      method: "medição: contagem dos itens do retorno nesta escrita"
+      method: "measurement: contagem dos itens do retorno nesta escrita"
       locality: "host"
 
   - id: "Q_SUBDECISAO_3_FECHAMENTO_1012"
@@ -1336,7 +1336,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre Q_SUBDECISAO_3_FECHAMENTO_1012"
       locator: "opção escolhida: Fechar como proposto (Recomendado)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
 
   - id: "Q_SDAAL_KIT_REPO_SEPARADO"
     node_type: "question"
@@ -1352,7 +1352,7 @@ nodes:
     provenance:
       source: "pergunta do maestro na sessão de 2026-10-12 e medição do estado do SDAAL no core"
       locator: "maestro pediu o registro deste nó com o gatilho nomeado"
-      method: "testemunho: pergunta e pedido de registro do maestro, 2026-10-12; medição: contagem de executáveis em .claude/utils/task-manager/adapters"
+      method: "testimony: pergunta e pedido de registro do maestro, 2026-10-12; medição: contagem de executáveis em .claude/utils/task-manager/adapters"
 
   # ── Leituras da sub-decisão (3), 2026-10-12 (rodada B, à mão no modo primaries) ──
   - id: "E_ARAZZO_110_NOTAS_SEM_PASSO_HUMANO_1012B"
@@ -1372,7 +1372,7 @@ nodes:
     provenance:
       source: "https://github.com/OAI/Arazzo-Specification/releases/tag/1.1.0 (corpo lido por api.github.com/repos/OAI/Arazzo-Specification/releases)"
       locator: "seção What's Changed, 1º item (PR #367); contagem dos 13 itens"
-      method: "leitura: curl do release; citação conferida por busca literal no corpo baixado; medição: grep de approv/manual/human/persist/pause/resume = 0"
+      method: "reading: curl do release; citação conferida por busca literal no corpo baixado; medição: grep de approv/manual/human/persist/pause/resume = 0"
       locality: "web"
 
   - id: "E_ARAZZO_110_PASSO_E_OPERACAO_DE_API_1012B"
@@ -1392,7 +1392,7 @@ nodes:
     provenance:
       source: "https://spec.openapis.org/arazzo/v1.1.0.html"
       locator: "§5.8.5 Step Object (1º parágrafo); §8 Appendix A Revision History (1.1.0, 2026-05-17)"
-      method: "leitura: curl da spec renderizada; citação conferida por busca literal no texto extraído; medição: grep case-insensitive dos termos no texto inteiro"
+      method: "reading: curl da spec renderizada; citação conferida por busca literal no texto extraído; medição: grep case-insensitive dos termos no texto inteiro"
       locality: "web"
 
   - id: "E_RUNME_INTERACTIVE_E_ENTRADA_1012B"
@@ -1411,7 +1411,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev/configuration/cell-level"
       locator: "tabela de opções de célula, linha interactive; seção Interactive vs non-interactive cells"
-      method: "leitura: curl da página; citações conferidas por busca literal no texto extraído"
+      method: "reading: curl da página; citações conferidas por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_RUNME_PROMPTS_DE_VARIAVEL_E_RUN_ALL_1012B"
@@ -1430,7 +1430,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev/configuration/cell-level · https://docs.runme.dev/usage/run-all"
       locator: "tabela de opções, linhas promptEnv e skipPrompts; página Run all cells, seção Run All in VS Code"
-      method: "leitura: curl das páginas; citações conferidas por busca literal no texto extraído"
+      method: "reading: curl das páginas; citações conferidas por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_RUNME_ESTADO_E_O_DO_TERMINAL_1012B"
@@ -1449,7 +1449,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev/usage/pipes-variables · https://raw.githubusercontent.com/runmedev/runme/main/README.md"
       locator: "1º parágrafo de Usage of Piping and Variables; README, 2º parágrafo"
-      method: "leitura: curl da página e do README; citações conferidas por busca literal no texto extraído"
+      method: "reading: curl da página e do README; citações conferidas por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_RUNME_SESSION_OUTPUTS_REGISTRO_1012B"
@@ -1468,7 +1468,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev/usage/auto-save"
       locator: "seções Session Outputs, Auto-save default e o aviso 💡 Session Outputs"
-      method: "leitura: curl da página; citações conferidas por busca literal no texto extraído"
+      method: "reading: curl da página; citações conferidas por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_RUNME_VERSION_E_DA_FERRAMENTA_1012B"
@@ -1487,7 +1487,7 @@ nodes:
     provenance:
       source: "https://docs.runme.dev/configuration/lifecycle-identity"
       locator: "seção Usage, item version"
-      method: "leitura: curl da página; citação conferida por busca literal no texto extraído"
+      method: "reading: curl da página; citação conferida por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_CACAO_PLAYBOOK_TYPES_OPCIONAL_1012B"
@@ -1507,7 +1507,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§3.1 Playbook Properties, linha playbook_types; §3.1.1 Playbook Type Vocabulary; §3.2.1"
-      method: "leitura: curl da spec (CS01); citação conferida por busca literal no texto extraído"
+      method: "reading: curl da spec (CS01); citação conferida por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_CACAO_OPEN_VOCAB_ACEITA_VALOR_PROPRIO_1012B"
@@ -1527,7 +1527,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§10.13 Open Vocabularies; §2.1 Vocabularies"
-      method: "leitura: curl da spec (CS01); citação conferida por busca literal no texto extraído"
+      method: "reading: curl da spec (CS01); citação conferida por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_CACAO_TIPO_PROPRIO_TEM_CONDICOES_1012B"
@@ -1547,7 +1547,7 @@ nodes:
     provenance:
       source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
       locator: "§2.1 Vocabularies; §3.1 linha playbook_activities; §3.2.2 playbook_activities Property"
-      method: "leitura: curl da spec (CS01); citações conferidas por busca literal no texto extraído"
+      method: "reading: curl da spec (CS01); citações conferidas por busca literal no texto extraído"
       locality: "web"
 
   - id: "E_LACUNAS_SUBDECISAO_3_1012B"
@@ -1566,7 +1566,7 @@ nodes:
     provenance:
       source: "esta rodada de leitura (2026-10-12): os 9 documentos listados na narrative"
       locator: "nós *_1012B deste grafo"
-      method: "medição: contagem de documentos, claims e citações reconferidas por busca literal"
+      method: "measurement: contagem de documentos, claims e citações reconferidas por busca literal"
       locality: "web"
 
 edges:

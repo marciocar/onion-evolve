@@ -23,7 +23,7 @@ nodes:
     provenance:
       source: "pedido do maestro na sessão de 2026-10-17"
       locator: "transcript da sessão principal de 2026-10-17, turno do pedido sobre a frase da rodada r13"
-      method: "testemunho: pedido do maestro em 2026-10-17, com a frase literal citada"
+      method: "testimony: pedido do maestro em 2026-10-17, com a frase literal citada"
       locality: "pessoa"
 
   - id: E_REFORCO_ESCREVER_CERTO_NAO_TRAVAR
@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: "reforço do maestro na sessão de 2026-10-17"
       locator: "mensagem da sessão principal ao agente da forja, com a frase literal do maestro"
-      method: "testemunho: reforço do maestro em 2026-10-17"
+      method: "testimony: reforço do maestro em 2026-10-17"
       locality: "pessoa"
 
   - id: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS
@@ -56,7 +56,7 @@ nodes:
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "LC_ALL=C bash .claude/hooks/house-code-gloss.sh --scan ⟨transcript JSONL da sessão⟩, nas 4 sessões mais recentes de 2026-10-17"
-      method: "medição: varredura determinística dos transcripts pelo próprio hook"
+      method: "measurement: varredura determinística dos transcripts pelo próprio hook"
       locality: "host"
 
   - id: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
@@ -73,7 +73,7 @@ nodes:
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "cabeçalho do hook (POR QUÊ e COMO) + bash .claude/hooks/house-code-gloss.sh --selftest"
-      method: "medição: bancada, mutantes e varredura de transcripts reais"
+      method: "measurement: bancada, mutantes e varredura de transcripts reais"
       locality: "repo"
 
   - id: C_TETO_A_GLOSA_E_JULGADA_POR_FORMA
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: ".claude/hooks/lib/house_codes.py"
       locator: "bloco TETO DECLARADO no cabeçalho"
-      method: "derivado: leitura do próprio lib e dos casos de bancada"
+      method: "derived: leitura do próprio lib e dos casos de bancada"
       locality: "repo"
 
   - id: C_TETO_O_GLOSSARIO_E_A_LISTA
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: ".claude/validation/house-codes.tsv"
       locator: "cabeçalho do glossário (FORMATO) + .claude/utils/adopt/vendor-manifest.sh (lista _base)"
-      method: "derivado: leitura do glossário e do manifesto de vendorização"
+      method: "derived: leitura do glossário e do manifesto de vendorização"
       locality: "repo"
   - id: E_ELENXO_1A_PASSADA_RECALCULAVA_O_LEMBRETE
     node_type: evidence
@@ -122,7 +122,7 @@ nodes:
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "relatório do refutador da 1ª passada (scratchpad da sessão, refut1/) + bash .claude/hooks/house-code-gloss.sh --selftest"
-      method: "medição: passada adversarial com entradas executadas, conferida pela bancada"
+      method: "measurement: passada adversarial com entradas executadas, conferida pela bancada"
       locality: "repo"
 
   - id: E_ELENXO_2A_PASSADA_O_LEMBRETE_DO_MEIO_DO_TURNO
@@ -139,7 +139,7 @@ nodes:
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "relatório do refutador da 2ª passada (scratchpad da sessão, refut2/) + bash .claude/hooks/house-code-gloss.sh --selftest"
-      method: "medição: passada adversarial com entradas executadas, conferida pela bancada e por 26 mutantes"
+      method: "measurement: passada adversarial com entradas executadas, conferida pela bancada e por 26 mutantes"
       locality: "repo"
 
   - id: D_MAESTRO_SIGLA_DA_CASA_COM_GLOSA_2026_10_17
@@ -156,7 +156,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «As siglas da casa na prosa ao maestro precisam de um mecanismo, e com que força?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
 
   - id: E_SIGLA_SEM_GLOSA_FORA_DA_RESPOSTA_1026
@@ -173,7 +173,7 @@ nodes:
     provenance:
       source: ".claude/hooks/lib/house_codes.py"
       locator: "findings() sobre o campo message de cada tool_use SendMessage dos transcripts JSONL e sobre os .md em CAIXA ALTA de docs/evolution/dissect e docs/evolution/research"
-      method: "medição: varredura determinística pelo próprio motor do hook, 2026-10-26"
+      method: "measurement: varredura determinística pelo próprio motor do hook, 2026-10-26"
       locality: "host"
 
   - id: D_LEMBRETE_PRETOOLUSE_SENDMESSAGE_E_PRE_REGISTRO_1026
@@ -190,7 +190,7 @@ nodes:
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "modo tool (tool_target, PREREG) + bash .claude/hooks/house-code-gloss.sh --selftest"
-      method: "medição: bancada, mutantes e payloads reais pelo hook"
+      method: "measurement: bancada, mutantes e payloads reais pelo hook"
       locality: "repo"
 
   - id: C_TETO_O_LEMBRETE_DO_PRETOOLUSE_CHEGA_DEPOIS
@@ -207,7 +207,7 @@ nodes:
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "cabeçalho, bloco do modo tool (TETO)"
-      method: "derivado: leitura do hook e dos casos de bancada"
+      method: "derived: leitura do hook e dos casos de bancada"
       locality: "repo"
 
 edges:

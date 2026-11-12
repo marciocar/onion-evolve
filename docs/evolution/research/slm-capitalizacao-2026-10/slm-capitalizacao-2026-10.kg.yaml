@@ -57,7 +57,7 @@ nodes:
     provenance:
       source: "transcrito da sessão 800cd025 (host) + memória onion-moat-verifiable-mechanism.md do harness (host)"
       locator: "falas do maestro (role user) na sessão 800cd025, 2026-10-05: \"é preciso ter este pensamento de captalizar\"; \"a capitalização pode vir de treinamentos e consultorias... mas sempre pensando em bilhetar\"; memória onion-moat-verifiable-mechanism (description)"
-      method: "testemunho: leitura do transcrito da sessão 800cd025 no host (falas verbatim do maestro, 2026-10-05) + leitura do arquivo memory/onion-moat-verifiable-mechanism.md no host"
+      method: "testimony: leitura do transcrito da sessão 800cd025 no host (falas verbatim do maestro, 2026-10-05) + leitura do arquivo memory/onion-moat-verifiable-mechanism.md no host"
       locality: "host"
 
   - id: X_REF_ONION_SLM_CAPITAL_NOT_MOAT
@@ -73,7 +73,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT"
       locator: "grep -n \"id: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT\" docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml -> l.988, status open, nesta worktree (branch research/onion-slm-roadmap-2026-10)"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: X_REF_IDENTITY_CANON_NS1
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_IDENTITY_CANON"
       locator: "sed -n 99,109p docs/onion/graph/onion-identity-2026-07.kg.yaml (C_IDENTITY_CANON confirmed: package.json AUSENTE, nao e npm) + D_NORTHSTAR_NS1_KG confirmed (l.929-932: adocao/curso/portabilidade sao VEICULO do KG, nao fim)"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ── EVIDENCIAS ANCORADAS: LMArena ────────────────────────────────────────────────────────
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: "https://arena.ai/blog/series-a/"
       locator: "QUOTE verbatim: \"We've raised $150M of Series A funding led by Felicis and UC Investments (University of California), with participation from Andreessen Horowitz, The House Fund, LDVP, Kleiner Perkins, Lightspeed Venture Partners, and Laude Ventures.\" — LOCATOR: post Series A da LMArena, paragrafo de abertura. ancorada por verificador independente. Tier: leitor nao declarou; herdado do mesmo post (9)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_LMARENA_EVAL_PRODUCT_DEMAND
@@ -128,7 +128,7 @@ nodes:
     provenance:
       source: "https://arena.ai/blog/series-a/"
       locator: "QUOTE verbatim: \"first evaluation product launched in September, which has resulted in a huge demand for: Real-world performance insights; Diverse, fresh, and expert-level data; Rigorous science; Testing environments\" — LOCATOR: secao Momentum Driven by the Community, lista de itens. ancorada por verificador independente. Tier herdado do mesmo post (9)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_LMARENA_REVENUE_GROWTH_NO_NUMBER
@@ -146,7 +146,7 @@ nodes:
     provenance:
       source: "https://arena.ai/blog/series-a/"
       locator: "QUOTE verbatim: \"This momentum has resulted in strong revenue growth, and we are using the opportunity to raise money so that we can move even faster to build new features and improve our product experience\" — LOCATOR: secao Momentum Driven by the Community, ultimo paragrafo. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_LMARENA_SEED_100M_VALUATION_PRESS_ONLY
@@ -165,7 +165,7 @@ nodes:
     provenance:
       source: "https://arena.ai/blog/series-a/"
       locator: "QUOTE verbatim: \"Since announcing our $100M Seed round last year in May, LMArena has grown far faster than we imagined.\" — LOCATOR: secao Momentum Driven by the Community, abertura. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EVIDENCIAS ANCORADAS: Artificial Analysis ────────────────────────────────────────────
@@ -184,7 +184,7 @@ nodes:
     provenance:
       source: "https://artificialanalysis.ai/pricing"
       locator: "QUOTE verbatim: Targets: \"individuals and small organizations\" — LOCATOR: artificialanalysis.ai/pricing, plano Pro (US$417/mes, desconto no anual). ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (fornecedor sobre o proprio preco)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_AA_ENTERPRISE_CUSTOM_150_PLUS
@@ -202,7 +202,7 @@ nodes:
     provenance:
       source: "https://artificialanalysis.ai/pricing"
       locator: "QUOTE verbatim: \"Pro is valid for single seats only\" — LOCATOR: artificialanalysis.ai/pricing, FAQ + cartao Enterprise. ancorada por verificador independente. Tier julgado 8."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_AA_ENTERPRISE_BUNDLES_ADVISORY
@@ -220,7 +220,7 @@ nodes:
     provenance:
       source: "https://artificialanalysis.ai/pricing"
       locator: "QUOTE verbatim: \"Compute market model access with forecasts\" — LOCATOR: artificialanalysis.ai/pricing, cartao Enterprise. ancorada por verificador independente. Tier julgado 8. ⚠ A QUOTE so sustenta o modelo de mercado de compute; workshops/educacao e AI strategy advisory NAO estao nela."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_AA_PRO_API_EXPORT
@@ -238,7 +238,7 @@ nodes:
     provenance:
       source: "https://artificialanalysis.ai/pricing"
       locator: "QUOTE verbatim: \"Export data for local analysis\" — LOCATOR: artificialanalysis.ai/pricing, cartao Pro. ancorada por verificador independente. Tier julgado 8."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EVIDENCIAS ANCORADAS: Scale (SEAL) ───────────────────────────────────────────────────
@@ -257,7 +257,7 @@ nodes:
     provenance:
       source: "https://scale.com/blog/leaderboard"
       locator: "QUOTE verbatim: \"Scale's proprietary datasets will remain private and unpublished, ensuring they cannot be exploited or incorporated into model training data.\" — LOCATOR: scale.com/blog/leaderboard. ancorada por verificador independente. Tier herdado do mesmo par de paginas (9)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_SCALE_HYBRID_PRIVATE_OPEN
@@ -275,7 +275,7 @@ nodes:
     provenance:
       source: "https://labs.scale.com/leaderboard"
       locator: "QUOTE verbatim: \"combining private datasets to prevent overfitting and open-source datasets for broad benchmarking and comparability\" — LOCATOR: labs.scale.com/leaderboard, secao Robust Datasets for Reliable AI Benchmarks. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_SCALE_EVALUATION_PLATFORM_SEGMENTS
@@ -293,7 +293,7 @@ nodes:
     provenance:
       source: "https://scale.com/blog/leaderboard"
       locator: "QUOTE verbatim: \"a platform to enable AI researchers, developers, enterprises, and public sector organizations to analyze, understand, and iterate on their AI models and production applications\" — LOCATOR: scale.com/blog/leaderboard, descricao da Scale Evaluation. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EVIDENCIAS ANCORADAS: Braintrust ─────────────────────────────────────────────────────
@@ -313,7 +313,7 @@ nodes:
     provenance:
       source: "https://www.braintrust.dev/blog/announcing-series-b"
       locator: "QUOTE verbatim: \"Braintrust has raised $80M to become the observability layer for production AI.\" — LOCATOR: blog Braintrust, anuncio Series B, abertura (17 February 2026). ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_BRAINTRUST_INVESTORS
@@ -332,7 +332,7 @@ nodes:
     provenance:
       source: "https://www.braintrust.dev/blog/announcing-series-b"
       locator: "QUOTE verbatim: \"I'm also happy to welcome back prior investors Andreessen Horowitz, Greylock, Elad Gil, basecase capital, and others\" — LOCATOR: blog Braintrust, anuncio Series B, paragrafo de investidores. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_BRAINTRUST_PRO_249_METERED
@@ -350,7 +350,7 @@ nodes:
     provenance:
       source: "https://www.braintrust.dev/pricing"
       locator: "QUOTE verbatim: \"Pro — $249/month - $100 model credits/month (+ token rates) - 5 GB processed data/month (+ $3/GB overage) - 50k scores/month (+ $1.50 per 1k overage)\" — LOCATOR: braintrust.dev/pricing, plano Pro. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EVIDENCIAS ANCORADAS: Patronus / Galileo / Arize ─────────────────────────────────────
@@ -369,7 +369,7 @@ nodes:
     provenance:
       source: "https://patronus.ai/blog/announcing-our-17-million-series-a"
       locator: "QUOTE verbatim: \"a single AI powered platform that enables end-to-end evaluation of AI systems\" — LOCATOR: patronus.ai/blog/announcing-our-17-million-series-a, paragrafo do produto. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_GALILEO_SERIES_B_45M
@@ -387,7 +387,7 @@ nodes:
     provenance:
       source: "https://galileo.ai/blog/announcing-our-series-b"
       locator: "QUOTE verbatim: \"$45 million Series B funding round\" — LOCATOR: galileo.ai/blog/announcing-our-series-b, abertura (lead Scale VP; participacao Premji, Databricks, Amex, Citi, ServiceNow, SentinelOne). ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_GALILEO_REVENUE_834_PCT
@@ -405,7 +405,7 @@ nodes:
     provenance:
       source: "https://galileo.ai/blog/announcing-our-series-b"
       locator: "QUOTE verbatim: \"Since the beginning of 2024, we've grown revenue by 834%\" — LOCATOR: galileo.ai/blog/announcing-our-series-b, secao de tracao (tambem: \"quadrupled our number of enterprise customers, and brought on six Fortune 50 companies\"). ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_ARIZE_PHOENIX_OSS_ADOPTION
@@ -423,7 +423,7 @@ nodes:
     provenance:
       source: "https://arize.com/blog/arize-ai-raises-70m-series-c/"
       locator: "QUOTE verbatim: \"Arize Phoenix OSS – The open-source AI observability and performance tracing tool launched in 2023, now with over two million monthly downloads and growing.\" — LOCATOR: anuncio Series C, secao sobre Phoenix OSS e uso dos recursos. ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (fornecedor sobre si)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EVIDENCIAS ANCORADAS: curso e consultoria (Hamel / Parlance) ─────────────────────────
@@ -442,7 +442,7 @@ nodes:
     provenance:
       source: "https://maven.com/parlance-labs/evals"
       locator: "QUOTE verbatim: \"Lifetime Access: Recordings, Materials & Every Future Cohort\" — LOCATOR: maven.com/parlance-labs/evals, secao O que esta incluido. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_PARLANCE_CONSULTING_EVAL_SYSTEMS
@@ -460,7 +460,7 @@ nodes:
     provenance:
       source: "https://parlance-labs.com"
       locator: "QUOTE verbatim: \"Build evaluation systems that identify exactly what's broken and what to fix next.\" — LOCATOR: parlance-labs.com, servicos de consultoria (sem preco na pagina). ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── EVIDENCIAS ANCORADAS: bench aberto sem receita (HF, MTEB) ────────────────────────────
@@ -479,7 +479,7 @@ nodes:
     provenance:
       source: "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard/discussions/1135"
       locator: "QUOTE verbatim: \"as model capabilities change (hello reasoning and LM assistants), benchmarks need to follow!\" — LOCATOR: discussao #1135, post fixado, secao Why? (conferido no texto cru da API e do HTML). ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (HF sobre o proprio leaderboard)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_MMTEB_COMMUNITY_EXPANSION
@@ -497,7 +497,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2502.13595"
       locator: "QUOTE verbatim: \"a large-scale, community-driven expansion of MTEB, covering over 500 quality-controlled evaluation tasks across 250+ languages\" — LOCATOR: arXiv 2502.13595, abstract. ancorada por verificador independente. Tier herdado do mesmo paper (7)."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_MMTEB_POINTS_TABLE
@@ -515,7 +515,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2502.13595"
       locator: "QUOTE verbatim: \"2 points were awarded for implementing the task and 4 points for each new language introduced by the task.\" — LOCATOR: arXiv 2502.13595, Apendice A, item New dataset. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_MMTEB_CREDIT_IMPERFECT
@@ -533,7 +533,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2502.13595"
       locator: "QUOTE verbatim: \"The managing group believes the point system successfully defined contribution terms but acknowledges it isn’t perfect.\" — LOCATOR: arXiv 2502.13595, secao Limitations, Credit Assignment for Large-scale Collaborations. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   - id: E_MMTEB_GITHUB_OPEN_PARTICIPATION
@@ -551,7 +551,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2502.13595"
       locator: "QUOTE verbatim: \"We actively encouraged participation from industry professionals, low-resource language communities, and academic researchers.\" — LOCATOR: arXiv 2502.13595, secao 2.1. ancorada por verificador independente."
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 
   # ── CONTABILIDADE DA RODADA ──────────────────────────────────────────────────────────────
@@ -569,7 +569,7 @@ nodes:
     provenance:
       source: "workflow onion-research (mode primaries), 2026-10-05"
       locator: "retorno do workflow onion-research mode primaries de 2026-10-05: listas de claims ANCORADAS (25), REJEITADAS na ancoragem (21), fontes inalcancaveis (nenhuma) e o Elenxo (TRUNCADO na objecao 17)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── LEITURAS DE SINTESE: o que sugere para bilhetar ─────────────────────────────────────
   - id: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER

@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: "logs do GitHub Actions (onion-selftest)"
       locator: "gh run view <run> --job <job> --log: linhas 'Image:' e os casos ✗/⊘"
-      method: "medição: leitura dos logs dos jobs que falharam e dos que passaram"
+      method: "measurement: leitura dos logs dos jobs que falharam e dos que passaram"
       locality: "repo"
 
   - id: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
@@ -49,7 +49,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «O ubuntu-latest migra para o 26.04 e duas guardas caem por ambiente; como tratar?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
   - id: E_BANCADA_COMPLETA_VERDE_NO_2604
@@ -66,7 +66,7 @@ nodes:
     provenance:
       source: "logs do GitHub Actions do PR #1210"
       locator: "gh run view <run> --job <job> --log: linhas 'Image:' e 'Passaram/Pularam/Falharam'"
-      method: "medição: leitura dos logs dos 4 jobs da bancada no runner 26.04"
+      method: "measurement: leitura dos logs dos 4 jobs da bancada no runner 26.04"
       locality: "repo"
 
 edges:

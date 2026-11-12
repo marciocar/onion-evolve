@@ -30,7 +30,7 @@ nodes:
     provenance:
       source: "9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "§1 l.26-37 (tabela \"Sintoma medido\" + \"A régua deste mapa\")"
-      method: "leitura: diagnóstico do mapa das guardas no commit 9c4f3082, apoiado nos 4 sintomas medidos que viraram REGRAS 50-53"
+      method: "reading: diagnóstico do mapa das guardas no commit 9c4f3082, apoiado nos 4 sintomas medidos que viraram REGRAS 50-53"
       locality: "repo"
 
   # ── as 4 lacunas medidas, cada uma fechada por uma regra nova ─────────────
@@ -46,7 +46,7 @@ nodes:
     provenance:
       source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082^:.claude/validation/rules-registry.sh"
       locator: "lint l.792 (header), l.806 (função), l.824/l.830 (violation HARD), l.2399 (chamada); registry l.28 (regex)"
-      method: "leitura: header sem número e regex do gerador no commit pai de 9c4f3082"
+      method: "reading: header sem número e regex do gerador no commit pai de 9c4f3082"
       locality: "repo"
 
   - id: E_GUARDA_SOFT_INVISIVEL
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "9c4f3082^:.claude/validation/lint-artifacts.sh"
       locator: "l.391-398 (header + docstring), l.399 (função), l.2396 (chamada)"
-      method: "leitura: header e docstring no commit pai de 9c4f3082"
+      method: "reading: header e docstring no commit pai de 9c4f3082"
       locality: "repo"
 
   # plane:DEV e nao PROD — o radar apontou MISPLANED e tem razao: a evidencia e um
@@ -79,7 +79,7 @@ nodes:
     provenance:
       source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/lint-artifacts.sh"
       locator: "git grep -n kg-radar 9c4f3082^ -- .github/workflows .githooks = 0 linhas; lint@9c4f3082^ só cita kg-radar em mensagem/docstring; docstring R52@9c4f3082 l.393-396 e l.400"
-      method: "leitura: workflows, hook e lint no commit pai + docstring da R52 no commit 9c4f3082"
+      method: "reading: workflows, hook e lint no commit pai + docstring da R52 no commit 9c4f3082"
       locality: "repo"
 
   - id: E_RULES_SEM_GUARDA
@@ -94,7 +94,7 @@ nodes:
     provenance:
       source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "grep -c 'claude/rules' no lint@9c4f3082^ = 0; docstring da REGRA 53@9c4f3082 l.461-468; mapa l.34"
-      method: "leitura: lint no commit pai de 9c4f3082, docstring da REGRA 53 e tabela de sintomas do mapa"
+      method: "reading: lint no commit pai de 9c4f3082, docstring da REGRA 53 e tabela de sintomas do mapa"
       locality: "repo"
 
   # ── a decisao estruturante ────────────────────────────────────────────────
@@ -111,7 +111,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-radar-integrity.sh + .claude/rules/kg-grammar.md:41"
       locator: "REGRA 52 no lint + kg-radar-integrity.sh cobrindo 51 grafos"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_RULE_NAO_BASTA
@@ -126,7 +126,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh"
       locator: "docstring da R52 l.413-416"
-      method: "leitura: docstring da R52 no commit 9c4f3082"
+      method: "reading: docstring da R52 no commit 9c4f3082"
       locality: "repo"
 
   # ── a pergunta do maestro que virou mecanismo ─────────────────────────────
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md · 9c4f3082 (corpo do commit)"
       locator: "mapa §2.1 l.71; corpo de 9c4f3082 §\"Nasceram de uma pergunta do maestro\""
-      method: "testemunho: pergunta do maestro citada pela sessão (2026-08-02/03) no corpo do commit 9c4f3082 e no mapa"
+      method: "testimony: pergunta do maestro citada pela sessão (2026-08-02/03) no corpo do commit 9c4f3082 e no mapa"
       locality: "repo"
 
   - id: E_SEV_LOAD_BEARING
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "lint R43 l.1637-1672 e R44 l.1674-1692; mapa §2.1 l.71-73"
-      method: "leitura: corpos da R43/R44 no commit pai de 9c4f3082"
+      method: "reading: corpos da R43/R44 no commit pai de 9c4f3082"
       locality: "repo"
 
   - id: D_TAG_OBRIGATORIO
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: ".claude/validation/rules-registry.sh:catracas-4-e-5"
       locator: "catracas 4 e 5 no rules-registry.sh, provadas por MUT"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ── o que a revisao adversarial refutou ───────────────────────────────────
@@ -195,7 +195,7 @@ nodes:
     provenance:
       source: "docs/INDEX.md"
       locator: "feeders da R16 rodados a mao contra docs/INDEX.md — 3 hits em comandos invocaveis"
-      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_PARSER_PREVINE_MULTILINHA
@@ -219,7 +219,7 @@ nodes:
     provenance:
       source: "9c4f3082 (corpo do commit, PR #519)"
       locator: "corpo §'E_FIX_PIORA_23_REGRAS REFUTES C_PARSER_PREVINE_MULTILINHA'"
-      method: "testemunho: corpo do commit 9c4f3082 da sessão 2026-08-02 em 1ª pessoa; o diff do fix não foi versionado"
+      method: "testimony: corpo do commit 9c4f3082 da sessão 2026-08-02 em 1ª pessoa; o diff do fix não foi versionado"
       locality: "repo"
 
   # ── sobreposicao real, declarada ──────────────────────────────────────────
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh"
       locator: "docstring da R52 l.399-405 (com o comando de re-medição embutido)"
-      method: "leitura: docstring da R52 no commit 9c4f3082"
+      method: "reading: docstring da R52 no commit 9c4f3082"
       locality: "repo"
 
   # ── o debito que a revisao encontrou e nao fechou ─────────────────────────
@@ -253,7 +253,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "lint-artifacts.sh l.727-816 (R21 check_graph_sync l.735, R38 l.756, R24 l.777, R25 l.799); mapa §7.4 l.233-240"
-      method: "leitura: os quatro corpos e a estimativa do mapa §7.4 no commit 9c4f3082"
+      method: "reading: os quatro corpos e a estimativa do mapa §7.4 no commit 9c4f3082"
       locality: "repo"
 
   - id: C_R28_R46_DOUBLE_FIRING
@@ -268,7 +268,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "lint-artifacts.sh l.869-875 (R28 classe (1)) e l.2273-2302 (R46); mapa §7.3 l.225-231"
-      method: "leitura: corpos das duas regras e a cura proposta no mapa, commit 9c4f3082"
+      method: "reading: corpos das duas regras e a cura proposta no mapa, commit 9c4f3082"
       locality: "repo"
 
   - id: C_SEM_GATE_REGRA_SEM_TESTE
@@ -283,7 +283,7 @@ nodes:
     provenance:
       source: "9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md · 9c4f3082:.claude/validation/lint-selftest.sh"
       locator: "mapa §6 l.187-189 e §8 l.277; lint-selftest.sh l.64 e l.69"
-      method: "leitura: limite declarado no mapa e o modo STRICT no selftest, commit 9c4f3082"
+      method: "reading: limite declarado no mapa e o modo STRICT no selftest, commit 9c4f3082"
       locality: "repo"
 
   - id: C_R45_COBERTURA_FALSA
@@ -298,7 +298,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base"
       locator: "varredura de links markdown vivos p/ caminho core-privado fora de docs/knowledge-base"
-      method: "derivado: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_R43_KG_PENDURADO
@@ -313,7 +313,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-27-sinal-plane-vs-procedencia-e-evaporacao.md · 0ce2fff4:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "sinal l.9; mapa@0ce2fff4 §7.2 l.212-240 (veredito + texto original preservado no <details>)"
-      method: "leitura: a citação kg: do sinal e o achado original + refutação registrados no mapa (nó refuted)"
+      method: "reading: a citação kg: do sinal e o achado original + refutação registrados no mapa (nó refuted)"
       locality: "repo"
 
   - id: E_KG_PENDURADO_E_DO_REMETENTE
@@ -328,7 +328,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-27-sinal-plane-vs-procedencia-e-evaporacao.md · 0ce2fff4:.claude/commands/meta/diary.md · 0ce2fff4:.claude/validation/kg-born-marker.sh"
       locator: "sinal l.4 e l.9; diary.md@0ce2fff4 l.115; kg-born-marker.sh@0ce2fff4 l.147-165"
-      method: "leitura: frontmatter do sinal, placeholder do template e extract_kg no commit 0ce2fff4"
+      method: "reading: frontmatter do sinal, placeholder do template e extract_kg no commit 0ce2fff4"
       locality: "repo"
 
   - id: E_MODO_DE_FALHA_NUNCA_OCORREU
@@ -343,7 +343,7 @@ nodes:
     provenance:
       source: "docs/onion/graph"
       locator: "git log --diff-filter=D e --diff-filter=R sobre docs/onion/graph/*.kg.yaml"
-      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_NAO_AMPLIAR_R43
@@ -359,7 +359,7 @@ nodes:
     provenance:
       source: "0ce2fff4:docs/analysis/onion-guardas-mapa-2026-08.md · 0ce2fff4:.claude/validation/kg-born-marker.sh"
       locator: "mapa §7.2 l.212-232; kg-born-marker.sh l.147-165 (extract_kg)"
-      method: "leitura: decisão e medições registradas no mapa e no extrator no commit 0ce2fff4 (PR #524)"
+      method: "reading: decisão e medições registradas no mapa e no extrator no commit 0ce2fff4 (PR #524)"
       locality: "repo"
 
   - id: C_DOCSTRINGS_STALE
@@ -374,7 +374,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/kb-vendored-link-baseline.txt · 9c4f3082:.claude/validation/automation-ladder-registry.txt"
       locator: "lint-artifacts.sh l.1797 (R44) e l.1822 (R45); baseline sem linhas úteis; registry com 15 linhas de classe"
-      method: "leitura: docstrings da R44/R45 e os dois arquivos de estado no commit 9c4f3082 (2026-08-02)"
+      method: "reading: docstrings da R44/R45 e os dois arquivos de estado no commit 9c4f3082 (2026-08-02)"
       locality: "repo"
 
   - id: E_R47_MORTA_SOB_ONLY
@@ -389,7 +389,7 @@ nodes:
     provenance:
       source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/lint-artifacts.sh"
       locator: "pré l.106-110 (ONLY_PATH normalizado p/ absoluto) e l.2204-2205; pós l.2323-2328"
-      method: "leitura: código da R47 antes e depois da cura (commit 9c4f3082)"
+      method: "reading: código da R47 antes e depois da cura (commit 9c4f3082)"
       locality: "repo"
 
   - id: D_CORRIGIR_R47
@@ -405,7 +405,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082^:.claude/validation/lint-artifacts.sh"
       locator: "pós l.2323-2328 (case ONLY_PATH in \"${narr}\"); pré l.2205 (\"${rel}\") e as 15 outras comparações case \"${ONLY_PATH}\" in das regras (l.1523-l.2247)"
-      method: "leitura: diff de uma palavra (rel → narr) entre 9c4f3082^ e 9c4f3082 + contagem das comparações irmãs"
+      method: "reading: diff de uma palavra (rel → narr) entre 9c4f3082^ e 9c4f3082 + contagem das comparações irmãs"
       locality: "repo"
 
   - id: E_R52_NUMEROS_ERRADOS
@@ -420,7 +420,7 @@ nodes:
     provenance:
       source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "lint l.400-404 (docstring R52 + comando); mapa@9c4f3082 l.149-150"
-      method: "leitura: docstring da R52 no commit 9c4f3082"
+      method: "reading: docstring da R52 no commit 9c4f3082"
       locality: "repo"
 
   - id: A_MAPA
@@ -436,7 +436,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "arquivo commitado com contagens medidas do filesystem"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── 2026-08-04: tres furos MEDIDOS no mesmo dia, todos "verde sem ter olhado" ──
@@ -456,7 +456,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-evolve/pull/537"
       locator: "mensagem do commit 79a7b89 do PR #537 (causas 1 e 2)"
-      method: "testemunho: execução da sessão 2026-08-04 relatada no commit 79a7b89; a worktree kg-freshness-identity-0804 não existe mais"
+      method: "testimony: execução da sessão 2026-08-04 relatada no commit 79a7b89; a worktree kg-freshness-identity-0804 não existe mais"
       locality: "web"
 
   - id: E_FUROESCOPO_EVOLUTION_0804
@@ -471,7 +471,7 @@ nodes:
     provenance:
       source: "docs/evolution"
       locator: "find docs/evolution -maxdepth 1 -name *.md + grep ^kg: em cada um + saida de kg-provenance-coverage.sh"
-      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_FUROSEMANTICO_RADAR_0804
@@ -486,7 +486,7 @@ nodes:
     provenance:
       source: "28db0b0e^:docs/onion/graph/onion-identity-2026-07.kg.yaml · https://github.com/marciocar/onion-evolve/pull/537"
       locator: "onion-identity@28db0b0e^ l.148 (C_TOPO_MAIN_HAS_FW), l.594 (E_LSTREE_MAIN_0717), l.948-950 (aresta SUPPORTS); corpo do PR #537 §\"Achado colateral\""
-      method: "leitura: o grafo no commit pai da correção + corpo do PR #537"
+      method: "reading: o grafo no commit pai da correção + corpo do PR #537"
       locality: "web"
 
   - id: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
@@ -502,7 +502,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-evolve/pull/537"
       locator: "corpo do PR #537 §'Os três furos nas guardas' e §'Fica aberto' (forma semântica); corpo do commit 39b9484 ('poda que se come e raiz que nunca entra (escopo)'; 'A forma SEMANTICA ... é outra natureza')"
-      method: "leitura: corpo do PR #537 e mensagem do commit 39b9484"
+      method: "reading: corpo do PR #537 e mensagem do commit 39b9484"
       locality: "web"
 
   - id: D_ESTUDAR_FAMILIA_ANTES_DE_CORRIGIR_0804
@@ -529,7 +529,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md · c2504994 (corpo do commit)"
       locator: "migalha l.28-31; corpo de c2504994 §1"
-      method: "testemunho: medição da sessão 2026-08-28 (beacons vivos + procfs) relatada em 1ª pessoa no commit c2504994; comando não registrado"
+      method: "testimony: medição da sessão 2026-08-28 (beacons vivos + procfs) relatada em 1ª pessoa no commit c2504994; comando não registrado"
       locality: "repo"
 
   - id: C_GUARDA_QUE_GRITA_ERRADO
@@ -544,7 +544,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
       locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 'id: C_GUARDA_QUE_GRITA_ERRADO' docs/onion/graph/guardas-revisao-2026-08.kg.yaml (nó+aresta) ; grep -n -B2 -A12 'id: E_FAROL_ANUNCIAVA_FANTASMA' docs/onion/graph/guardas-revisao-2026-08.kg.yaml (evidência que SUPPORTS o claim) ; head -40 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md (trace da evidência) ; grep -n 'owner_pid\\|owner_start\\|starttime' .claude/validation/session-beacon.sh (checar se a cura causada pelo claim ainda vive no arquivo real hoje)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_MEDIR_O_DONO_NAO_O_CARIMBO
@@ -561,7 +561,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
       locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: D_MEDIR_O_DONO_NAO_O_CARIMBO\" docs/onion/graph/guardas-revisao-2026-08.kg.yaml; grep -n \"owner_pid|owner_start|proc_starttime|beacon_verdict\" .claude/validation/session-beacon.sh; git log --oneline --since=2026-08-28 -- .claude/validation/session-beacon.sh; then live functional test: cd <diretório descartável> && bash session-beacon.sh up . mytest && bash session-beacon.sh verdict .claude/beacons/mytest.beacon (verdict=live); handcrafted .beacon with owner_pid=999999 (dead) → verdict=orphan; handcrafted .beacon with no owner_pid → verdict=declared; then bash session-beacon.sh check . on the declared beacon (exit 1, blocks); bash session-beacon.sh sweep . on the orphan beacon (removed, declared beacon preserved)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_AVISO_CARREGA_O_QUE_VALE
@@ -577,7 +577,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
       locator: "session-beacon-hook.sh + caso (f2) do selftest: o aviso tem de conter INFORMADO, NAO VERIFICADO e VERIFIQUE QUEM E O QUE FAZ"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_SONDA_ELEGEU_O_SHELL_DO_HOOK
@@ -593,7 +593,7 @@ nodes:
     provenance:
       source: "c2504994 (corpo do commit) · .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
       locator: "corpo de c2504994 §\"O dogfood pegou um bug meu\"; migalha l.53-55"
-      method: "testemunho: dogfood do hook pela sessão 2026-08-28, relatado em 1ª pessoa"
+      method: "testimony: dogfood do hook pela sessão 2026-08-28, relatado em 1ª pessoa"
       locality: "repo"
 
   - id: C_REGRA_COPIADA_ENVELHECE_SEPARADA
@@ -608,7 +608,7 @@ nodes:
     provenance:
       source: "c2504994^:.claude/validation/constellation-map.sh · c2504994:.claude/validation/constellation-map.sh"
       locator: "pré: l.46 (TTL_MIN 480) e l.82-91 (presence_of por idade); pós: l.87-102"
-      method: "leitura: presence_of antes e depois do commit c2504994"
+      method: "reading: presence_of antes e depois do commit c2504994"
       locality: "repo"
 
   - id: E_INVARIANTE_QUEBRADA_NA_1A_VERSAO
@@ -624,7 +624,7 @@ nodes:
     provenance:
       source: "289bc263 (corpo do commit) · .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
       locator: "corpo de 289bc263 §1-2 e §\"A BANCADA ESTAVA CEGA\"; migalha l.41-45 e l.64"
-      method: "testemunho: revisão adversarial em execução relatada pela sessão 2026-08-28 em 1ª pessoa no commit 289bc263"
+      method: "testimony: revisão adversarial em execução relatada pela sessão 2026-08-28 em 1ª pessoa no commit 289bc263"
       locality: "repo"
 
   - id: D_ORFAO_EXIGE_TRES_PROVAS
@@ -641,7 +641,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
       locator: "casos k/k2/k3/k4/k5 da bancada + mutacao MUT-E (restaurar o curto-circuito reprova 3 casos)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_INDICE_DO_DIARIO_SEM_CATRACA
@@ -656,7 +656,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/chore-diary-index-farol.md · d10ad708:.claude/validation/diary-index.sh · .claude/diary/2026-08-28-a-bancada-achou-o-defeito-destrutivo-que-eu-ia-enviar.md · 5111720a:.claude/validation/lint-artifacts.sh"
       locator: "resíduo l.21-29; diary-index.sh@d10ad708 l.7 e l.24; migalha l.44-48; lint@5111720a l.1004 e l.1053-1054"
-      method: "leitura: resíduo R56 do PR do índice, gerador no commit da REGRA 62, migalha e precedente do plugins-sync"
+      method: "reading: resíduo R56 do PR do índice, gerador no commit da REGRA 62, migalha e precedente do plugins-sync"
       locality: "repo"
 
   - id: D_REGRA62_CATRACA_DE_PROJECAO
@@ -672,7 +672,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "bancada run_backlog_projection_selftests 8/8 (inclui locale e radar-quebrado, os dois eixos que a revisao adversarial provou descobertos) + 5 mutacoes que reprovam + CI: lint rodou em runner diferente e a regra NAO disparou (render deterministico entre maquinas)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_ENUMERACAO_VAZIA_ERA_DESTRUTIVA
@@ -687,7 +687,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-08-28-a-bancada-achou-o-defeito-destrutivo-que-eu-ia-enviar.md · d10ad708 (corpo do commit) · d10ad708:.claude/validation/lint-selftest.sh"
       locator: "migalha l.30-36; corpo de d10ad708 §'A BANCADA ACHOU UM DEFEITO DESTRUTIVO'; selftest caso (f) l.10541-10554"
-      method: "testemunho: migalha e corpo de commit da sessão 2026-08-28 em 1ª pessoa; a cura tem caso de bancada versionado"
+      method: "testimony: migalha e corpo de commit da sessão 2026-08-28 em 1ª pessoa; a cura tem caso de bancada versionado"
       locality: "repo"
 
   - id: C_PROSA_PROMETIA_OWNER_INEXISTENTE
@@ -702,7 +702,7 @@ nodes:
     provenance:
       source: "bb39b568:.claude/validation/kg-backlog-project.sh · d10ad708^:.claude/commands/meta/backlog.md · d10ad708^:.claude/commands/meta/realign.md · d10ad708:.claude/validation/kg-backlog-project.sh · d10ad708 (corpo do commit) · docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "projetor@bb39b568 l.10 e l.40; git grep -E '^\\s*owner:' d10ad708^ -- '*.kg.yaml' = 0 linhas; backlog.md@d10ad708^ l.3 e l.43; realign.md@d10ad708^ l.52; projetor@d10ad708 l.87 e l.128; corpo de d10ad708 §'O QUE NÃO FOI CONSTRUÍDO' (l.37-40); SYNTHESIS l.252"
-      method: "leitura: projetor na criação e na cura, prosa no commit pai da cura, corpo do commit d10ad708 e o invariante de escopo da onda"
+      method: "reading: projetor na criação e na cura, prosa no commit pai da cura, corpo do commit d10ad708 e o invariante de escopo da onda"
       locality: "repo"
 
   - id: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
@@ -717,7 +717,7 @@ nodes:
     provenance:
       source: "e830cd64 (corpo do commit) · d10ad708:.claude/validation/kg-backlog-project.sh"
       locator: "corpo de e830cd64 §'CRÍTICO 1'; projetor@d10ad708 l.104"
-      method: "testemunho: revisão adversarial relatada pela sessão 2026-08-28 em 1ª pessoa no corpo do commit e830cd64; comandos não registrados"
+      method: "testimony: revisão adversarial relatada pela sessão 2026-08-28 em 1ª pessoa no corpo do commit e830cd64; comandos não registrados"
       locality: "repo"
 
   - id: E_RENDER_ERA_LOCALE_DEPENDENTE
@@ -732,7 +732,7 @@ nodes:
     provenance:
       source: "e830cd64 (corpo do commit) · d10ad708:.claude/validation/kg-backlog-project.sh"
       locator: "corpo de e830cd64 §'CRÍTICO 2'; projetor@d10ad708 sem LC_ALL, printf %.1f em l.149"
-      method: "testemunho: medição da revisão adversarial relatada pela sessão 2026-08-28 em 1ª pessoa no commit e830cd64; comandos não registrados"
+      method: "testimony: medição da revisão adversarial relatada pela sessão 2026-08-28 em 1ª pessoa no commit e830cd64; comandos não registrados"
       locality: "repo"
 
   - id: Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO
@@ -747,7 +747,7 @@ nodes:
     provenance:
       source: "9e4aaecc^ e 9cb4b27e (árvore git)"
       locator: "9e4aaecc^: 75 .kg.yaml sem fixtures, 4 inválidos (bridge-produto l.278, scope-inheritance l.555, fios-abertos l.184, identidade-onion-vps l.142); 9cb4b27e: 75, 3 inválidos (o fios-abertos saiu)"
-      method: "medição: python3 yaml.safe_load(git show <sha>:<f>) sobre git ls-tree -r <sha> filtrado por *.kg.yaml fora de /fixtures/, reproduzido em 2026-10-09 contra 9e4aaecc^ (antes da colheita) e 9cb4b27e (commit do nó)"
+      method: "measurement: python3 yaml.safe_load(git show <sha>:<f>) sobre git ls-tree -r <sha> filtrado por *.kg.yaml fora de /fixtures/, reproduzido em 2026-10-09 contra 9e4aaecc^ (antes da colheita) e 9cb4b27e (commit do nó)"
       locality: "repo"
 
   - id: E_A_FORMA_PRUNE_DEIXOU_DE_SER_INVISIVEL
@@ -763,7 +763,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh (check_scan_sanity)"
       locator: "bash .claude/validation/lint-artifacts.sh + leitura de check_scan_sanity e safe-count.sh, medido 2026-09-09"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
   - id: E_REVERIFY_RADAR_SEM_CADENCIA_HISTORICO_1027

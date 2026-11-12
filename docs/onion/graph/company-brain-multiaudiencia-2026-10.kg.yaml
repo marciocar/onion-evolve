@@ -382,7 +382,7 @@ nodes:
     provenance:
       source: "sessão do core, leitura do resultado registrado no sinais-de-campo"
       locator: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028"
-      method: "medição: resultado da R3 lido contra o que esta pergunta precisa"
+      method: "measurement: resultado da R3 lido contra o que esta pergunta precisa"
       locality: "repo"
   - id: E_MA_MARKET_CURADORIA_PROPOSTA_1028
     node_type: evidence

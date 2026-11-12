@@ -3,7 +3,6 @@
   "id": "guard-deploy-acts-2026-11",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 8,
     "form.required.node.provenance": 5
   }
 }

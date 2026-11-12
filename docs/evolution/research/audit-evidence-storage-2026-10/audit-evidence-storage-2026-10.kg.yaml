@@ -73,7 +73,7 @@ nodes:
     provenance:
       source: "https://github.com/oscal-compass/compliance-trestle"
       locator: "README: 'as a CICD pipeline running on top of compliance artifacts in git' e 'peer review via pull request'"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_TRESTLE_OSCAL_EXCHANGE_AND_BASE_OVERLAP
@@ -92,7 +92,7 @@ nodes:
     provenance:
       source: "https://github.com/oscal-compass/compliance-trestle"
       locator: "README, descrição do modelo de trabalho e formatos suportados"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_GEMARA_OSCAL_IS_CONVERSION_PACKAGE
@@ -112,7 +112,7 @@ nodes:
     provenance:
       source: "https://pkg.go.dev/github.com/ossf/gemara"
       locator: "pacote oscal ('conversion functions to transform Gemara documents into OSCAL'), cmd/oscal_export, pacote sarif"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_GEMARA_MODEL_PAGE_SILENT_ON_STORAGE
@@ -131,7 +131,7 @@ nodes:
     provenance:
       source: "https://gemara.openssf.org/model/"
       locator: "lista de ADRs (0002, 0005, 0016, 0022) e descrição das camadas"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_IBM_2021_OSCAL_AS_TRESTLE_SSOT
@@ -151,7 +151,7 @@ nodes:
     provenance:
       source: "https://research.ibm.com/blog/trestle-automates-compliance"
       locator: "'We have adopted the emerging OSCAL standard, and the latest 1.0.0rc2 version by NIST, to act as the single source of truth.'"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_THOUGHTWORKS_OSCAL_PROMISING_ONLY
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: "https://www.thoughtworks.com/radar/techniques/continuous-compliance"
       locator: "blip continuous compliance, menção ao OSCAL"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_VANTA_ARR_300M_16K_CUSTOMERS_SACRA
@@ -191,7 +191,7 @@ nodes:
     provenance:
       source: "https://sacra.com/c/vanta/"
       locator: "trecho de ARR e clientes (abr/2026)"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_VANTA_SERIES_D_150M_WELLINGTON
@@ -211,7 +211,7 @@ nodes:
     provenance:
       source: "https://sacra.com/c/vanta/"
       locator: "histórico de rodadas"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_REGSCALE_ARTICLE_NOT_STORAGE_PROOF
@@ -231,7 +231,7 @@ nodes:
     provenance:
       source: "https://securityboulevard.com/2025/12/regscale-open-sources-oscal-hub-to-further-compliance-as-code-adoption/"
       locator: "artigo inteiro"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_DRATA_PLATFORM_STATE_INFERRED
@@ -250,7 +250,7 @@ nodes:
     provenance:
       source: "https://sacra.com/c/drata/"
       locator: "descrição do produto"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_REGSCALE_OSCAL_NATIVE_STORAGE_UNSAID
@@ -269,7 +269,7 @@ nodes:
     provenance:
       source: "https://regscale.com/oscal"
       locator: "página de posicionamento OSCAL"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_AUDIT_HISTORY_NEEDS_VERSIONED_RECORDS
@@ -288,7 +288,7 @@ nodes:
     provenance:
       source: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
       locator: "trecho sobre evidência de configuração para ciclos históricos"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_PR_EVIDENCE_POPULATION_FROM_DEPLOYS
@@ -307,7 +307,7 @@ nodes:
     provenance:
       source: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
       locator: "trecho sobre população de mudanças e deploys de produção"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_COMPAI_SERIES_A_34M
@@ -327,7 +327,7 @@ nodes:
     provenance:
       source: "https://cryptobriefing.com/comp-ai-34m-series-a-compliance/"
       locator: "notícia da rodada"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_GRC_ENGINEERING_OSCAL_AS_OUTPUT
@@ -346,7 +346,7 @@ nodes:
     provenance:
       source: "https://github.com/GRCEngClub/claude-grc-engineering"
       locator: "README, comandos de geração OSCAL"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_GIT_AS_IMMUTABLE_AUDIT_LOG_PREMISE
@@ -366,7 +366,7 @@ nodes:
     provenance:
       source: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view"
       locator: "premissa do GitOps como trilha"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_GIT_IMMUTABILITY_DEPENDS_ON_HOST_CONFIG
@@ -386,7 +386,7 @@ nodes:
     provenance:
       source: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view"
       locator: "trecho sobre force push, push direto e admins"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_ATTESTFUL_OSCAL_FIRST_BUT_EXPORTS
@@ -405,7 +405,7 @@ nodes:
     provenance:
       source: "https://github.com/clay-good/attestful"
       locator: "README, lista de comandos"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_TRESTLE_JSON_YAML_NATIVE_SIGNING_JSON
@@ -424,7 +424,7 @@ nodes:
     provenance:
       source: "https://github.com/oscal-compass/compliance-trestle"
       locator: "README: 'Detached signing and verification for JSON artifacts'"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   - id: E_TRESTLE_AUTHORING_LAYER_RESULTS_ELSEWHERE
@@ -443,7 +443,7 @@ nodes:
     provenance:
       source: "https://github.com/oscal-compass/compliance-trestle"
       locator: "README, papel do trestle na cadeia"
-      method: "juízes: votação 3-0 do run"
+      method: "judges: votação 3-0 do run"
       locality: "web"
 
   # ─── Mercado e capital (eixo invariante) ───────────────────────────────────────────────────
@@ -467,7 +467,7 @@ nodes:
     provenance:
       source: "https://sacra.com/c/vanta/ ; https://sacra.com/c/drata/ ; https://cryptobriefing.com/comp-ai-34m-series-a-compliance/"
       locator: "trechos de ARR, clientes e rodadas; notícia da Série A da Comp AI"
-      method: "derivado: síntese do run sobre claims votadas 3-0"
+      method: "derived: síntese do run sobre claims votadas 3-0"
       locality: "web"
 
   # ─── Contabilidade da rodada ────────────────────────────────────────────────────────────────
@@ -492,7 +492,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-21"
       locator: "listas de confirmadas, refutadas, cortadas por orçamento, objeções do Elenxo e superações"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   # ─── Decisão OPEN (o escritor NÃO sela) ────────────────────────────────────────────────────
@@ -518,7 +518,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Como selar o armazenamento da evidência de auditoria contínua depois da varredura de fornecedores?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
@@ -587,7 +587,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 1, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_02_FOURTH_OPTION_OSCAL_FILES_IN_GIT
@@ -604,7 +604,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 2, critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_03_GEMARA_SILENCE_IS_ONE_PAGE
@@ -621,7 +621,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 4, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_04_VANTA_ARR_AGGREGATOR_AND_INFERENCE
@@ -638,7 +638,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 7, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_05_CAPITAL_AXIS_MISSING_ACQUISITIONS
@@ -655,7 +655,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 8, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_06_DRATA_CLASSIFIED_BY_SILENCE
@@ -672,7 +672,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 10, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_07_REGSCALE_OSCAL_NATIVE_COUNTEREXAMPLE_OPEN
@@ -689,7 +689,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 11, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_08_VERSIONED_RECORDS_NOT_GIT_SPECIFIC
@@ -706,7 +706,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 12, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_09_POPULATION_COMES_FROM_PRODUCTION
@@ -723,7 +723,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 13, critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_10_COMPAI_ROUND_TIER4_FAVORS_DB
@@ -740,7 +740,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 14, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_11_GIT_IMMUTABLE_PREMISE_SELF_CONTRADICTED
@@ -757,7 +757,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 16, critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_12_NO_EXTERNAL_WORM_ANCHOR
@@ -774,7 +774,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 17, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_13_TRESTLE_SIGNING_JSON_ONLY_NOT_YAML
@@ -791,7 +791,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 19, critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_14_MEASURED_STATE_GOES_TO_FILES_AND_DB
@@ -808,7 +808,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao achado 20, critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_15_REGSCALE_SIGNATURE_TRAIL_CUT
@@ -825,7 +825,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte por orçamento da trilha por assinatura da RegScale, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_16_REGSCALE_CAPITAL_UNANCHORED
@@ -842,7 +842,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim de receita da RegScale, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_17_OSCAL_COMPASS_MCP_AUTHORING_CUT
@@ -859,7 +859,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do MCP do OSCAL Compass, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_18_GEMARA_SEVEN_LAYERS_LOG_SCHEMAS_CUT
@@ -876,7 +876,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do Gemara de 7 camadas, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_19_GEMARA_ADR_0008_EVIDENCE_IN_LOGS_CUT
@@ -893,7 +893,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do ADR-0008, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_20_GENERATED_MANIFEST_NOT_AUTHORITATIVE_CUT
@@ -910,7 +910,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do manifesto gerado, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_21_AUDITOR_CONSUMPTION_AXIS_EMPTY
@@ -927,7 +927,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do julgamento do auditor, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_22_VANTA_OSCAL_CUT_WITH_PRIMARY_AVAILABLE
@@ -944,7 +944,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim da Vanta por API, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_23_WHO_PAYS_SOC2_BUYER_CUT
@@ -961,7 +961,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do comprador, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_24_SACRA_INTERNAL_INCONSISTENCY_CUT
@@ -978,7 +978,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim de inconsistência da Sacra, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_25_TRESTLE_70K_LINES_COST_CUT
@@ -995,7 +995,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim das 70.000 linhas, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_26_TRESTLE_TOOL_DATA_TO_AR_CUT
@@ -1012,7 +1012,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do compliance-operator, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_27_COMPAI_AGPL_CORE_CUT
@@ -1029,7 +1029,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim de licença da Comp AI, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_28_COMPAI_ARR_SELF_DECLARED_CUT
@@ -1046,7 +1046,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim de ARR da Comp AI, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_29_KYVERNO_REPORTS_SERVER_TO_POSTGRES
@@ -1063,7 +1063,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida kyverno reports-server, critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_30_COMPLYCTL_LEFT_OUT_SECOND_FILE_VENDOR
@@ -1080,7 +1080,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida complyctl, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_31_GEMARA_WHITEPAPER_UNREAD
@@ -1097,7 +1097,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida whitepaper do Gemara, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_32_SIX_REQUESTED_VENDORS_UNCLASSIFIED
@@ -1114,7 +1114,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida Hyperproof e aos fornecedores sem claim, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_33_IBM_OSCAL_COMPASS_PRODUCTION_PAPER_UNREAD
@@ -1131,7 +1131,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida paper do OSCAL Compass, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_34_REGSCALE_FEDRAMP_BLOG_UNREAD
@@ -1148,7 +1148,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida blog da RegScale, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_35_FEDRAMP_20X_OSCAL_ADOPTION_UNVERIFIED
@@ -1165,7 +1165,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida elevateconsult, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_36_ANALYST_COMMUNITY_OSCAL_FUTURE_EMPTY
@@ -1182,7 +1182,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida Pivot Point, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_37_CHEF_INSPEC_UNCLASSIFIED
@@ -1199,7 +1199,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção à fonte não lida devops.com sobre Chef, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_38_COMPAI_PRESEED_CUT
@@ -1216,7 +1216,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção ao corte da claim do pré-seed da Comp AI, critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   # ─── SUPERAÇÕES achadas (11; SAC-151) ───────────────────────────────────────────────────────

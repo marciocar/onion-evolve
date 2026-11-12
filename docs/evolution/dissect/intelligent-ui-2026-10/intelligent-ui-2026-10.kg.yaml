@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
   - id: Q_MCP_APPS_PILOT_PROPOSAL_1021
@@ -63,7 +63,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
   - id: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
@@ -95,7 +95,7 @@ nodes:
     provenance:
       source: "https://developers.openai.com/apps-sdk/build/chatgpt-ui"
       locator: "seção 'React helper hooks': 'Render from `toolResult?.structuredContent`, and treat it as untrusted input.'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_MCP_APPS_MIME_AND_UI_SCHEME
@@ -115,7 +115,7 @@ nodes:
     provenance:
       source: "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx"
       locator: "seção UI Resource Format: '`mimeType` MUST be `text/html;profile=mcp-app` (other types reserved for future extensions)'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_MCP_APPS_STABLE_SANDBOX_PROXY
@@ -136,7 +136,7 @@ nodes:
     provenance:
       source: "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx"
       locator: "seção Sandbox proxy: 'If the Host is a web page, it MUST wrap the View and communicate with it through an intermediate Sandbox proxy.'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_MCP_APPS_BIDIRECTIONAL_JSONRPC
@@ -156,7 +156,7 @@ nodes:
     provenance:
       source: "https://modelcontextprotocol.io/docs/extensions/apps"
       locator: "'How MCP Apps work', passo 4 (Bidirectional communication)"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_MCP_APPS_OFFICIAL_HOSTS
@@ -176,7 +176,7 @@ nodes:
     provenance:
       source: "https://modelcontextprotocol.io/docs/extensions/apps"
       locator: "seção 'Client support'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_MCP_UI_IMPLEMENTS_MCP_APPS
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: "https://github.com/idosal/mcp-ui"
       locator: "README, abertura e seções de hosts suportados"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_CLAUDE_INLINE_VISUALS
@@ -215,7 +215,7 @@ nodes:
     provenance:
       source: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
       locator: "abertura do artigo"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_CLAUDE_VISUALS_MODEL_DECIDES
@@ -234,7 +234,7 @@ nodes:
     provenance:
       source: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
       locator: "seção 'how Claude decides'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_CLAUDE_VISUALS_EPHEMERAL
@@ -254,7 +254,7 @@ nodes:
     provenance:
       source: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
       locator: "seção 'keep a visual'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_CLAUDE_VISUALS_LAUNCH_DATED
@@ -274,7 +274,7 @@ nodes:
     provenance:
       source: "https://claude.com/blog/claude-builds-visuals"
       locator: "post de 12 de março de 2026 (atualizado em 22 de abril de 2026 para o Cowork)"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_CLAUDE_ARTIFACTS_CONTENT_TYPES
@@ -294,7 +294,7 @@ nodes:
     provenance:
       source: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
       locator: "seção 'Types of content'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_CLAUDE_ARTIFACTS_CALL_CLAUDE
@@ -314,7 +314,7 @@ nodes:
     provenance:
       source: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
       locator: "seção 'AI-powered artifacts'"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_LIBRECHAT_ARTIFACTS_RENDER
@@ -334,7 +334,7 @@ nodes:
     provenance:
       source: "https://www.librechat.ai/docs/features/artifacts"
       locator: "lista de tipos renderizados"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   - id: E_LIBRECHAT_ARTIFACTS_ACTIVE_V088
@@ -355,7 +355,7 @@ nodes:
     provenance:
       source: "https://github.com/danny-avila/LibreChat/releases"
       locator: "v0.8.8-rc3 (15 Sep 2026), rc4 e v0.8.8 (01 Oct 2026)"
-      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      method: "reading: leitor da rodada de primárias + ancoragem por verificador independente"
       locality: "web"
 
   # ─── CONTABILIDADE DESTA RODADA (cláusula 8: lacuna vira nó) ───────────────────────────────
@@ -401,7 +401,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (/meta:dissect intelligent-ui), journal do workflow da sessão"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, objeções do Elenxo e gapsOpen"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   - id: C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM
@@ -432,7 +432,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a premissa da rodada, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_02_APPS_SDK_MECHANISM_PARTIAL
@@ -450,7 +450,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 1 [openai-apps-sdk], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_04_DECIDE_CARDS_NOT_PROVEN
@@ -468,7 +468,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 4 [mcp-apps-extension], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_05_HOSTS_NEGATIVE_UNANCHORED
@@ -486,7 +486,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 5 [mcp-apps-extension], critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_06_LIBRECHAT_HOST_NOT_IN_BRAIN
@@ -504,7 +504,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 6 [mcp-apps-extension], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_07_CLAUDE_VISUALS_NO_MECHANISM
@@ -522,7 +522,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 7 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_11_ARTIFACTS_PRIVATE_UNANCHORED
@@ -540,7 +540,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 11 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_12_ARTIFACTS_DATE_AND_CLI_UNANCHORED
@@ -558,7 +558,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 12 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_16_MARKET_CAPITAL_AXIS_EMPTY
@@ -576,7 +576,7 @@ nodes:
     provenance:
       source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra o eixo invariante de mercado e capital, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   # ─── Veredito proposto e plano de absorção (N4) — a sessão propõe, o maestro sela ─────────────
@@ -609,7 +609,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Qual o veredito da dissecação da Intelligent UI do GPT-6?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: A_ABSORB_DECIDE_PAINEL_INTERATIVO
@@ -631,7 +631,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_decide_selftests, casos (pn1), (pn2), (pn3), (pn4)"
-      method: "medição: bancada verde e mutantes por caso via mutate-and-restore"
+      method: "measurement: bancada verde e mutantes por caso via mutate-and-restore"
       locality: "repo"
     x_absorb_target: decide
     x_absorb_pieces: "2,3,7"
@@ -673,7 +673,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O que fazer com o recurso ui:// no /chat do onionevolve, o único host que o Onion controla nas duas pontas?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_TOKEN_DO_CHAT_FORA_DO_LOCALSTORAGE_VIRA_TAREFA_1021
     node_type: decision
@@ -689,7 +689,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O que fazer com o token do /chat em localStorage exposto a XSS?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
 edges:

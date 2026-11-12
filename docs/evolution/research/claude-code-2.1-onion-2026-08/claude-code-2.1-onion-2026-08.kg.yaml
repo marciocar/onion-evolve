@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/issues/34556"
       locator: "issue #34556, corpo §'3-Tier Memory Architecture' (L1 MEMORY.md, L2 topic files, L3 vault)"
-      method: "leitura: issue #34556 via gh api (2026-10-09)"
+      method: "reading: issue #34556 via gh api (2026-10-09)"
       locality: "web"
 
   - id: E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO
@@ -56,7 +56,7 @@ nodes:
     provenance:
       source: "https://news.ycombinator.com/item?id=47148025 · 49299985 · 46901233 · 47400262 · 47780622"
       locator: "47148025 título (Context Mode, 315 KB→5.4 KB, 2026-02-25); 49299985 título (Graft, -42% grep, 2026-08-14); 46901233 título (Smooth CLI, token-efficient browser, 2026-02-05); 47400262 texto (gertjandewilde, 2026-03-16: \"tool definitions alone burned 50,000+ tokens\"); 47780622 texto (bennettdixon, 2026-04-15: \"a task I expected to cost $2 comes back at $8\")"
-      method: "leitura: itens HN via API (hacker-news.firebaseio.com/v0/item/<id>.json), lidos em 2026-10-09"
+      method: "reading: itens HN via API (hacker-news.firebaseio.com/v0/item/<id>.json), lidos em 2026-10-09"
 
   - id: E_FRAGMENTACAO_NAO_ABSORCAO
     node_type: evidence
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "sessão do core 2026-08-16 (frente de pesquisa externa do run claude-code-2.1) — corpo do commit 6850818d (\"duas frentes de pesquisa externa\")"
       locator: "filtros registrados no verified_against (created:>2026-05-01, sort:stars); repos sem owner nem termos de busca"
-      method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
+      method: "testimony: medição da sessão 2026-08-16, comando não registrado"
       locality: "pessoa"
 
   - id: E_CONCORRENTE_DE_POSICAO_COMPANY_BRAIN
@@ -85,7 +85,7 @@ nodes:
     provenance:
       source: "https://news.ycombinator.com/item?id=48387095"
       locator: "título da Launch HN (2026-06-03, 79 pontos, 78 comentários): \"Launch HN: Hyper (YC P26) – Company brain to power agentic development\""
-      method: "leitura: thread HN via API Algolia (2026-10-09)"
+      method: "reading: thread HN via API Algolia (2026-10-09)"
       locality: "web"
 
   - id: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
@@ -100,7 +100,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/issues/87145 · /87146 · /54394"
       locator: "issues #87145, #87146, #54394"
-      method: "leitura: issues via gh api (2026-10-09)"
+      method: "reading: issues via gh api (2026-10-09)"
       locality: "host"
 
   - id: Q_ONDE_MORA_A_SUPERACAO
@@ -135,7 +135,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "## 2.1.233: 'Todo/task-tracking tools… are no longer available on Opus 4.8, Sonnet 5, Fable 5, Mythos 5, and newer models; set CLAUDE_CODE_ENABLE_TODO_TOOLS=1' (cópia local l.3195)"
-      method: "leitura: CHANGELOG 2.1.233 (o dogfood headless TASK_TOOLS_AUSENTES fica como testemunho sem comando registrado)"
+      method: "reading: CHANGELOG 2.1.233 (o dogfood headless TASK_TOOLS_AUSENTES fica como testemunho sem comando registrado)"
       locality: "web"
 
   - id: E_CONTRATO_DE_HOOKS_EXPLODIU
@@ -150,7 +150,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/docs-claude-code-2-1-audit.md + CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "resíduo PR #616 §'Verificação cruzada' (revisor re-mediu os eventos no binário 2.1.233) · CHANGELOG ## 2.1.214 'Fixed hooks with exit code 2 not blocking… when stdout JSON fails schema validation'"
-      method: "medição: grep no ELF do Claude Code 2.1.233 instalado com controle (PreToolUse 93, SessionStart 79), re-medido pelo revisor adversarial do PR #616 (resíduo docs/evolution/review/docs-claude-code-2-1-audit.md §Verificação cruzada) + leitura do CHANGELOG ## 2.1.214, flags do grep não registradas"
+      method: "measurement: grep no ELF do Claude Code 2.1.233 instalado com controle (PreToolUse 93, SessionStart 79), re-medido pelo revisor adversarial do PR #616 (resíduo docs/evolution/review/docs-claude-code-2-1-audit.md §Verificação cruzada) + leitura do CHANGELOG ## 2.1.214, flags do grep não registradas"
       locality: "web"
 
   - id: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
@@ -165,7 +165,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "## 2.1.224 (archive com SHA-256, self-hosted-runner, credential masking jwt/sigv4) · ## 2.1.222 (worktree isolation destructive git) · ## 2.1.219 (nesting depth 3) · ## 2.1.217 (cap 20 concorrentes, --max-budget-usd em background)"
-      method: "leitura: CHANGELOG 2.1.217–2.1.224"
+      method: "reading: CHANGELOG 2.1.217–2.1.224"
       locality: "web"
 
   - id: E_ASSIMETRIA_DE_PERMISSAO_DIR
@@ -181,7 +181,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "## 2.1.214: 'Fixed single-segment dir/** allow rules like Edit(src/**)… only <cwd>/dir' e 'Changed single-segment dir/** hook if: conditions… deny/ask permission rules keep their any-depth match' (cópia local l.3604 e l.3647)"
-      method: "leitura: CHANGELOG 2.1.214"
+      method: "reading: CHANGELOG 2.1.214"
       locality: "web"
 
   - id: E_ELENXO_DERRUBOU_METADE_DA_TESE
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/docs-claude-code-2-1-audit.md"
       locator: "frontmatter (REVISOR_ADVERSARIAL elenxo-superacao, 47 scripts e 63 grafos) + achados 1, 2 e 5; .claude/validation/lint-artifacts.sh@6850818d:831"
-      method: "juízes: passada adversarial Elenxo registrada no resíduo R56 do PR #616"
+      method: "judges: passada adversarial Elenxo registrada no resíduo R56 do PR #616"
       locality: "repo"
 
   - id: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
@@ -211,7 +211,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md (PR #510, commit 3e6a962d)"
       locator: "frontmatter l.6-7 (Elenxo 14 workers, run wf_38afb1f2-ee7) · §Veredito l.17-32 (1/9·1/9·0/9, gate social) · l.40-42 (C4–C6 falhou 3×) · l.48-49 (0 de 9 consultou e não achou; sete não consultou)"
-      method: "leitura: SYNTHESIS do Elenxo de 2026-08-02"
+      method: "reading: SYNTHESIS do Elenxo de 2026-08-02"
       locality: "repo"
 
   - id: E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO
@@ -226,7 +226,7 @@ nodes:
     provenance:
       source: ".claude/ no commit 6850818d (2026-08-16)"
       locator: "grep -rn SendMessage .claude --include=*.md --include=*.sh --include=*.json"
-      method: "medição: grep -rn SendMessage .claude (comando registrado no label)"
+      method: "measurement: grep -rn SendMessage .claude (comando registrado no label)"
       locality: "repo"
 
   - id: D_SUPERACAO_REESCRITA_REINCIDENCIA
@@ -282,7 +282,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-superacao-reincidencia-2026-08.md"
       locator: "cabeçalho (Status: ACEITA, ratificada pelo maestro 2026-08-16) + §Consequências linhas 72-81"
-      method: "leitura: ADR ratificada"
+      method: "reading: ADR ratificada"
       locality: "repo"
 
   - id: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
@@ -297,7 +297,7 @@ nodes:
     provenance:
       source: "sessão do core 2026-08-16 (adendo do Elenxo) — corpo do commit 6850818d + resíduo docs/evolution/review/docs-claude-code-2-1-audit.md achado 3 (l.31-34)"
       locator: "26.596 shell (validation+hooks+utils) × 52.655 markdown (commands+agents+skills) declarados no corpo de 6850818d e no resíduo PR #616 l.31"
-      method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
+      method: "testimony: medição da sessão 2026-08-16, comando não registrado"
 
   - id: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
     node_type: question
@@ -311,7 +311,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "linha 122 (gatilho de reabertura: 'fiado à mão, fresco e descartável, 2–3× em sessão real, registrando se o veredito injetado mudou a resposta')"
-      method: "leitura: gatilho declarado no SYNTHESIS de 2026-08-02 + docs/analysis/onion-adr-superacao-reincidencia-2026-08.md:70"
+      method: "reading: gatilho declarado no SYNTHESIS de 2026-08-02 + docs/analysis/onion-adr-superacao-reincidencia-2026-08.md:70"
       locality: "repo"
 
   - id: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
@@ -326,7 +326,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-superacao-reincidencia-2026-08.md"
       locator: "§Consequências linhas 72-81"
-      method: "leitura: ADR ratificada 2026-08-16 (commit db2f21bf)"
+      method: "reading: ADR ratificada 2026-08-16 (commit db2f21bf)"
       locality: "repo"
 
   - id: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
@@ -341,7 +341,7 @@ nodes:
     provenance:
       source: "sessão do core 2026-08-16 (agente a pedido do maestro) — .claude/diary/2026-08-16-dogfood-que-refutou-a-propria-cura.md + corpo do commit caedc046"
       locator: "diário l.13 (significance) e l.25-37 (desenho A/B cego + tabela 3/3); corpo de caedc046 (2026-08-16 19:12)"
-      method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
+      method: "testimony: medição da sessão 2026-08-16, comando não registrado"
 
   - id: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
     node_type: evidence
@@ -355,7 +355,7 @@ nodes:
     provenance:
       source: "sessão 2026-08-16 (agente do core) — commit 614e35b6 + leitura dos repos de adotante no host"
       locator: "11 de 12 membros medidos no disco: validation/ em 9/11, grafo autoral 3/7, diário 1/7, CI 1/7, review-artifact-check.sh nunca vendorizado"
-      method: "testemunho: leitura dos repos de adotante no host 2026-08-16 (comando não registrado)"
+      method: "testimony: leitura dos repos de adotante no host 2026-08-16 (comando não registrado)"
       locality: "host"
 
   - id: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
@@ -380,7 +380,7 @@ nodes:
     provenance:
       source: "gustavo-pulga@21ff04f:.claude/diary/"
       locator: "9 entradas 2026-07-14..16; 2026-07-16-retro-como-instrumento-spec-as-code.md:10 next_recommended 'Avaliar uma skill de retro/feedback… como produto do core'"
-      method: "leitura: diário autoral do adotante em gustavo-pulga@21ff04f (clone local; id do members.yaml)"
+      method: "reading: diário autoral do adotante em gustavo-pulga@21ff04f (clone local; id do members.yaml)"
       locality: "repo"
 
   - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
@@ -395,7 +395,7 @@ nodes:
     provenance:
       source: "sessão do core 2026-08-16 (agente a pedido do maestro) — corpo do commit 49f12f42 §2 + nota de método; corroboração parcial em docs/evolution/federation/CHANGELOG.md l.255-257"
       locator: "corpo de 49f12f42 (2026-08-16 20:52) §2 e NOTA DE MÉTODO; federation/CHANGELOG.md l.257 (metagamify: gate INERTE sob husky, 2026-08-31)"
-      method: "testemunho: medição da sessão 2026-08-16 (core.hooksPath/.githooks repo a repo), comando não registrado"
+      method: "testimony: medição da sessão 2026-08-16 (core.hooksPath/.githooks repo a repo), comando não registrado"
 
   - id: D_CURAR_O_GATE_INERTE_DO_ADOTANTE
     node_type: decision
@@ -419,7 +419,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-selftest.yml@61a950ee"
       locator: "linhas 3-34 (cabeçalho + on: pull_request.paths + schedule cron '17 4 * * *')"
-      method: "leitura: workflow criado no commit 61a950ee (2026-08-17)"
+      method: "reading: workflow criado no commit 61a950ee (2026-08-17)"
       locality: "repo"
 
   - id: E_MEDICAO_DOS_REMOTOS_PERDEU_VALOR_DE_DECISAO
@@ -434,7 +434,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md@61a950ee"
       locator: "§'Atualizar um repo adotado (--update)' l.605 → 'Re-aplicar a configuração install-only' l.653"
-      method: "leitura: adopt.md no commit que registrou o nó"
+      method: "reading: adopt.md no commit que registrou o nó"
       locality: "repo"
 
 
@@ -450,7 +450,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628) + .claude/utils/adopt/regen-baselines.sh"
       locator: "resíduo §'Origem: dogfood de campo' e §Achado 1; regen-baselines.sh:6-13 ('47 chaves de grafos do core… 47 violações HARD')"
-      method: "leitura: resíduo R56 do PR #628 e cabeçalho do helper que curou"
+      method: "reading: resíduo R56 do PR #628 e cabeçalho do helper que curou"
       locality: "repo"
 
   - id: E_A_GUARDA_DE_PROJECAO_CONFIAVA_NA_METADE_SEGURA
@@ -465,7 +465,7 @@ nodes:
     provenance:
       source: ".claude/validation/projection-safety.sh + docs/evolution/review/fix-adopt-regen-all-baselines.md"
       locator: "projection-safety.sh l.371-378 (pressuposto falho, nome NDA no console com guarda verde) · resíduo §Achado 2 l.37-46 (federation-map.md nunca auditado)"
-      method: "leitura: cabeçalho da guarda que curou + resíduo R56 do PR #628"
+      method: "reading: cabeçalho da guarda que curou + resíduo R56 do PR #628"
       locality: "repo"
 
   - id: D_INVARIANTE_PROJETADO_IGUAL_AO_SLUG_COM_ISENCAO_NO_DADO
@@ -480,7 +480,7 @@ nodes:
     provenance:
       source: ".claude/validation/projection-safety.sh + docs/evolution/federation/members.yaml"
       locator: "projection-safety.sh:370-401 (bloco P6) · members.yaml:505 (projection_name_exempt: true)"
-      method: "leitura: código da guarda P6 e dado de isenção"
+      method: "reading: código da guarda P6 e dado de isenção"
       locality: "repo"
 
   - id: D_REGENERAR_BASELINE_POR_DESCOBERTA_NAO_POR_LISTA
@@ -495,7 +495,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/regen-baselines.sh (commit 31f9d697)"
       locator: "linhas 20-25 (varre *-baseline.txt; sai 3), 78-89 (NUNCA no core; papel via onion-version.sh), :133 'exit 3' em 31f9d697"
-      method: "leitura: código do helper + resíduo docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628)"
+      method: "reading: código do helper + resíduo docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628)"
       locality: "repo"
 
 edges:

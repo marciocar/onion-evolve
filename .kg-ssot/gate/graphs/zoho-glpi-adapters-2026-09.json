@@ -3,7 +3,6 @@
   "id": "zoho-glpi-adapters-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 14,
     "form.range.node.label": 22,
     "form.required.node.provenance": 1,
     "integrity.bare-decision": 1

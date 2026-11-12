@@ -35,7 +35,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.300 a ## 2.1.300 (cópias em docs/evolution/research/radar-E3-2026-10-14-r11/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -60,7 +60,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Changed hooks: `updatedInput` from PreToolUse and PermissionRequest hooks is now validated like Claude's own input'"
-      method: "medição: grep de updatedInput nos hooks"
+      method: "measurement: grep de updatedInput nos hooks"
       locality: "web"
   - id: E_HOOKS_DO_CORE_SAO_TODOS_COMMAND
     node_type: evidence
@@ -75,7 +75,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Fixed agent hooks ignoring their `model`'"
-      method: "medição: contagem dos tipos de hook no settings.json"
+      method: "measurement: contagem dos tipos de hook no settings.json"
       locality: "web"
   - id: E_SESSIONEND_DO_FAROL_MAIS_CONFIAVEL
     node_type: evidence
@@ -91,7 +91,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Fixed SessionEnd hooks sometimes not running when you exit while a background command is still running'"
-      method: "medição: leitura do registro de hooks"
+      method: "measurement: leitura do registro de hooks"
       locality: "web"
   - id: E_SAIDA_MATA_O_FUNDO_EM_1_5S
     node_type: evidence
@@ -107,7 +107,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Changed exit to force-kill background commands still running 1.5 seconds after being asked to stop'"
-      method: "medição: grep de trap nos dois scripts de merge"
+      method: "measurement: grep de trap nos dois scripts de merge"
       locality: "web"
   - id: Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO
     node_type: question
@@ -133,7 +133,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Changed local session transcripts to also record each API request's system prompt, tools and parameters'"
-      method: "medição: cronometragem dos 2 hooks Stop sobre o transcript real"
+      method: "measurement: cronometragem dos 2 hooks Stop sobre o transcript real"
       locality: "web"
   - id: Q_HOOKS_STOP_LEEM_SO_A_CAUDA_DO_TRANSCRIPT
     node_type: question
@@ -159,7 +159,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Added support for rewriting a workflow agent's `prompt` and `model` in the `agent.spawn` mod hook'"
-      method: "medição: leitura da skill onion-orchestration"
+      method: "measurement: leitura da skill onion-orchestration"
       locality: "web"
   - id: E_OTEL_E_REFTABLE_SEM_CONSUMIDOR
     node_type: evidence
@@ -174,7 +174,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Added `cache_creation_5m_tokens` and `cache_creation_1h_tokens` to the OpenTelemetry `api_request` event'"
-      method: "medição: grep de OTel e leitura do refstorage"
+      method: "measurement: grep de OTel e leitura do refstorage"
       locality: "web"
   - id: E_HOOK_STOP_PUNE_O_RELATO_DE_ESPERAR_A_NOTIFICACAO
     node_type: evidence
@@ -189,7 +189,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.300, item 'Fixed Claude polling a background command's output file or sleeping while it runs'"
-      method: "medição: transcript mínimo pelo hook background-state-needs-evidence.sh"
+      method: "measurement: transcript mínimo pelo hook background-state-needs-evidence.sh"
       locality: "web"
 edges:
   - from: E_DELTA_DA_RODADA

@@ -3,7 +3,6 @@
   "id": "doctrine-sync-ingestor-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 7,
     "form.required.node.verified_against": 2,
     "integrity.untraced-decision": 2,
     "yaml.unquoted-date": 1

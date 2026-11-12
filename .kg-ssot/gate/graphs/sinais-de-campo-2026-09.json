@@ -3,7 +3,6 @@
   "id": "sinais-de-campo-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 72,
     "form.range.node.label": 4,
     "form.required.node.provenance": 1
   }

@@ -211,7 +211,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/interconnect-profile-2026-11/PIECES.md"
       locator: "tabela «estado da peça e transição proposta»"
-      method: "medição: git grep, git log e git rev-parse nos clones locais, só leitura, 2026-11-10"
+      method: "measurement: git grep, git log e git rev-parse nos clones locais, só leitura, 2026-11-10"
       locality: repo
   - id: D_PIECE_STATE_DOCTRINE_1110
     node_type: decision

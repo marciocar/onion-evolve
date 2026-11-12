@@ -3,7 +3,6 @@
   "id": "medidores-silenciosos-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 9,
     "form.range.node.label": 8
   }
 }

@@ -79,7 +79,7 @@ nodes:
     provenance:
       source: "grafo da dissecação do Superpowers no repo do adotante de curadoria; proposta upstream de 2026-10-13"
       locator: "nós E_N0_IDENTIDADE (l.32-50; estrelas na l.46), E_MERCADO_PERSUASAO_E_DISTRIBUICAO (l.149-158), D_SUPERPOWERS_2610 (l.159-180), P_N4_STAMP_REEXECUTED (l.220-229); grafo de 14 nós, no teto declarado"
-      method: "medição: bash .claude/validation/dissect-census.sh <repo-do-adotante> --tsv; leitura integral do grafo com grep -n nos números citados"
+      method: "measurement: bash .claude/validation/dissect-census.sh <repo-do-adotante> --tsv; leitura integral do grafo com grep -n nos números citados"
       locality: "repo"
 
   - id: E_REMEDIDA_SUPERACAO_SUPERPOWERS_1027

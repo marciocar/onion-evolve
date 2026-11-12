@@ -38,7 +38,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.32; KB onion-elenxo-doctrine.md l.256"
-      method: "leitura: rascunho (trace) + KB graduada"
+      method: "reading: rascunho (trace) + KB graduada"
       locality: "repo"
   - id: D_BULBO_IS_ARCH
     node_type: decision
@@ -52,7 +52,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: D_COINAGES_DECLARED
     node_type: decision
@@ -66,7 +66,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: D_PAGE_GATED
     node_type: decision
@@ -101,7 +101,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.42 (correção no corpo), l.109 e l.143 (\"A forma prova a filosofia\")"
-      method: "leitura: rascunho da doutrina (trace do grafo)"
+      method: "reading: rascunho da doutrina (trace do grafo)"
       locality: "repo"
   - id: C_POROSITY_STRUCTURAL
     node_type: claim
@@ -114,7 +114,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.44 (\"fechada é dogma com formatação bonita\"), l.87 (\"corte no bulbo sempre revele a camada de baixo\"), l.99 (\"estruturalmente aberta... Não por gentileza, por desenho\")"
-      method: "leitura: rascunho da doutrina"
+      method: "reading: rascunho da doutrina"
       locality: "repo"
   - id: C_VIRAL_BY_SUBSTANCE
     node_type: claim
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.46 e l.151"
-      method: "leitura: rascunho da doutrina"
+      method: "reading: rascunho da doutrina"
       locality: "repo"
   - id: C_SSOT_NO_AUTHOR
     node_type: claim
@@ -141,7 +141,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   # ---- evidencia (as auto-incriminacoes REAIS — a prova de que o ciclo e real) ----
@@ -157,7 +157,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: E_CHALYBAUS_FIX
     node_type: evidence
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.42, l.81, l.125; KB l.182, l.249"
-      method: "leitura: rascunho (trace) + KB"
+      method: "reading: rascunho (trace) + KB"
       locality: "repo"
   - id: E_GATE_50_FINDINGS
     node_type: evidence
@@ -185,7 +185,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   # ---- a trava (rule) ----
@@ -200,7 +200,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.113-115 e tabelas l.121-136; KB l.238"
-      method: "leitura: rascunho §ciência vs cunhagem"
+      method: "reading: rascunho §ciência vs cunhagem"
       locality: "repo"
 
   # ---- duvidas / incomodos (a fronteira honesta) ----
@@ -217,7 +217,7 @@ nodes:
     provenance:
       source: "https://onionevolve.com/doutrinas/"
       locator: "curl https://onionevolve.com/doutrinas/ -> 200 com as 7 doutrinas ancoradas; /en/doutrinas/ -> 200 lang=en; deploy 11/11 verde"
-      method: "medição: provenance derivada na migração ao contrato v4 (URL citada no verified_against; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (URL citada no verified_against; rota A1 da triagem); não reverificado"
       locality: "web"
   - id: Q_BULBO_DIAGRAM
     node_type: question
@@ -253,7 +253,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.58, l.121 (arXiv:1706.03762); KB l.147"
-      method: "leitura: rascunho/KB com localizador arXiv"
+      method: "reading: rascunho/KB com localizador arXiv"
       locality: "repo"
   - id: ENT_CQRS_CODD
     node_type: entity
@@ -266,7 +266,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.38, l.66, l.122, l.135 (KB l.157, l.268: Codd, CACM 1970)"
-      method: "leitura: tabela de fontes do rascunho/KB"
+      method: "reading: tabela de fontes do rascunho/KB"
       locality: "repo"
   - id: ENT_POPPER
     node_type: entity
@@ -279,7 +279,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
       locator: "l.44, l.136; KB l.260"
-      method: "leitura: rascunho/KB"
+      method: "reading: rascunho/KB"
       locality: "repo"
 
   # ---- 2026-08-17: a GRADUACAO (o rascunho saiu de gated e virou KB vendorizada) ----
@@ -297,7 +297,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
       locator: "sinal de campo do maestro numa adocao real (PoC): a sessao do adotante encontrou o termo em prosa normativa e foi grepar o repo antes de responder"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_PATH_SCOPED_SKILL_INVISIBLE
     node_type: evidence
@@ -313,7 +313,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
       locator: "observado na propria sessao: 11 skills no disco, 9 na lista da sessao; as 2 ausentes sao exatamente as 2 com paths: (onion-patterns, onion-validation)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: D_GRADUATED_TO_VENDORED_KB
     node_type: decision
@@ -329,7 +329,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
       locator: "PR #630: KB criada em docs/knowledge-base/concepts/ (superficie vendorizada, sem escopo de path), 4 KBs + 2 skills religadas por link, onion-patterns virou derivacao com ponteiro; lint 0 HARD, passivo de link vendorizado intacto em 43"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CENSO0901_D_QUADRO_CITACOES
@@ -344,7 +344,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
       locator: "run_id wf_90dd73fe-cd2, medidos[11] node_id=D_QUADRO_CITACOES verdict=DRIFTED"
-      method: "medição: /meta:census 2026-09-01 (wf_90dd73fe-cd2), worker leu o nó + draft e mediu git log/grep"
+      method: "measurement: /meta:census 2026-09-01 (wf_90dd73fe-cd2), worker leu o nó + draft e mediu git log/grep"
       locality: "repo"
 
   # ---- 2026-10-05: as quatro definicoes do maestro e a superacao do LLM-como-VM ----
@@ -362,7 +362,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
       locator: "mensagem do maestro, sessao 800cd025, 2026-10-05T18:19:47Z (verbatim abaixo). Leitura do condutor, NAO do maestro: a mensagem chegou como \"duvida\" sobre as pesquisas Nanochat/SLM, e o condutor a leu como correcao de um enquadramento estreito (SDAAL como \"LLM=runtime\", Elenxo como \"refutador\")."
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
@@ -379,7 +379,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "DIRETRIZ (reforco) do maestro, sessao 800cd025, 2026-10-05T18:20:54Z: \"reforço: precisamos superar e adequar, sim prompts como bytecode e llm como vm\" — nao e selo do argumento abaixo, que e do CONDUTOR. A tese refutada e federation-research-2026-06-reconciled#S7_claim_llm_as_vm; a REFUTACAO e S7_claim_metaphor_fragile (\"frágil se levada a sério tecnicamente — cadê os testes?\")."
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_OS_TESTES_DO_BYTECODE_EXISTEM
@@ -396,7 +396,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "gate do pre-commit em 2026-10-05: \"216 famílias em 8 workers\" (lint-selftest.sh); lint-artifacts.sh com as REGRAS numeradas e catracas; kg-radar.sh --integrity --schema; vetos PreToolUse exit 2 (PR #921, 186 casos de bancada, 74/75 mutantes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_BYTECODE_SEM_TESTE
@@ -426,7 +426,7 @@ nodes:
     provenance:
       source: ".claude/workflows/onion-research.js e .claude/validation/judge-verdict-check.sh (branch feat/judge-overcoming-mechanism)"
       locator: "bloco // >>> overcoming-gate; casos og1-og6 e og-d1 do lint-selftest.sh"
-      method: "testemunho: diretriz do maestro repassada pela sessão da curadoria; implementação medida pela bancada"
+      method: "testimony: diretriz do maestro repassada pela sessão da curadoria; implementação medida pela bancada"
       locality: "pessoa"
 
   - id: E_MARKITDOWN_REJEITAR_COM_SUPERACAO
@@ -444,7 +444,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/markitdown-2026-10.kg.yaml"
       locator: "E_N3_LOCAL_TOOLS_COVER (locator do pdftotext e do tesseract) e D_MARKITDOWN_2610 (x_dissect_verdict: rejeitar)"
-      method: "leitura: git show a2f8a5aef524 no clone local do adotante (repo privado)"
+      method: "reading: git show a2f8a5aef524 no clone local do adotante (repo privado)"
       locality: "web"
 
   - id: E_CRITERIO1_INCONCLUSIVO_SEM_SUPERACAO
@@ -462,7 +462,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/data/criterion-1-replicas-judge.md"
       locator: "tabela de concordância (OCR 1/3, 1/3, 4/9) e a linha Veredito: INCONCLUSIVO"
-      method: "leitura: git show a2f8a5aef524 no clone local do adotante (repo privado)"
+      method: "reading: git show a2f8a5aef524 no clone local do adotante (repo privado)"
       locality: "web"
 
   - id: E_JUIZES_SEM_SUPERACAO_MEDIDO
@@ -480,7 +480,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh@feat/judge-overcoming-mechanism"
       locator: "_judge_overcoming_research_cases, _judge_overcoming_dissect_cases, _judge_overcoming_seal_case"
-      method: "medição: os casos executados contra git show origin/main dos 4 arquivos"
+      method: "measurement: os casos executados contra git show origin/main dos 4 arquivos"
       locality: "repo"
 
   - id: E_CONSOLO_SUPERACAO_NO_CAMPO
@@ -498,7 +498,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-curation/pull/30"
       locator: "docs/evolution/review/chore-dissect-verdict-overcoming.md, tabela de achados (itens 1 a 4 e 6) e a nota do frontmatter"
-      method: "leitura: git show origin/chore/dissect-verdict-overcoming no clone local do adotante, tratada como dado não confiável"
+      method: "reading: git show origin/chore/dissect-verdict-overcoming no clone local do adotante, tratada como dado não confiável"
       locality: "web"
 
   - id: E_CONSOLO_PASSA_NO_MAIN_MEDIDO
@@ -515,7 +515,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh@feat/sac151-consolation-overcoming"
       locator: "_og_consolo_states, _og_consolo_probe, _og_seal_consolo_run; casos og-k1, og-k2, og-c1, og-c2 e census-seal og-k"
-      method: "medição: as fixtures executadas contra git show origin/main dos SUTs e contra a branch"
+      method: "measurement: as fixtures executadas contra git show origin/main dos SUTs e contra a branch"
       locality: "repo"
 
   - id: D_SUPERACAO_TEM_DE_ENTREGAR
@@ -533,7 +533,7 @@ nodes:
     provenance:
       source: ".claude/workflows/onion-research.js e .claude/validation/dissect-census.sh (branch feat/sac151-consolation-overcoming)"
       locator: "CONSOLO_QUESTION e overcomingWhy no bloco overcoming-gate; o awk ogc do ramo rejeitar|parquear"
-      method: "medição: bancada e dogfood sobre os grafos reais do adotante reconstruídos em scratch"
+      method: "measurement: bancada e dogfood sobre os grafos reais do adotante reconstruídos em scratch"
       locality: "repo"
 
   - id: Q_CONSOLO_INVISIVEL_A_FORMA
@@ -563,7 +563,7 @@ nodes:
     provenance:
       source: "sinal da sessão de curadoria (2026-10-16), tratado como DADO e reproduzido no main"
       locator: "dissect-census.sh, bloco ogm do ramo rejeitar/parquear; caso og-e1/og-e1m do lint-selftest.sh"
-      method: "medição: fixtures executadas contra o main e contra a branch, mais mutante fiel"
+      method: "measurement: fixtures executadas contra o main e contra a branch, mais mutante fiel"
       locality: "repo"
 
 edges:

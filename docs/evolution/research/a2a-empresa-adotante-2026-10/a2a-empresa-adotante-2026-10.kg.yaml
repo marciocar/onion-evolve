@@ -105,7 +105,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "seção de abertura 'Let Claude list and message your other Claude Code sessions' e 'Availability'"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_XSESSION_MESSAGE_NEVER_APPROVAL
@@ -124,7 +124,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "seção sobre o que a mensagem recebida pode e não pode fazer ('can't approve anything', 'Commands don't run')"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC
@@ -143,7 +143,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "tabela 'How the message travels' ('On another of your machines | Through Anthropic servers'; 'Over a per-session socket ... never through Anthropic servers') e 'Availability'"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_NATIVE_ROUNDTRIP_BUGS_2_1_299_309
@@ -163,7 +163,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "entradas das seções 2.1.299 a 2.1.309 do CHANGELOG"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_REMOTE_CONTROL_OUTBOUND_HTTPS_ONLY
@@ -182,7 +182,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/remote-control.md"
       locator: "seção de segurança da página de Remote Control"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_A2A_150_ORGS_22K_STARS
@@ -202,7 +202,7 @@ nodes:
     provenance:
       source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
       locator: "comunicado da Linux Foundation, parágrafos de abertura"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_A2A_1_0_SIGNED_AGENT_CARDS
@@ -222,7 +222,7 @@ nodes:
     provenance:
       source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
       locator: "comunicado da Linux Foundation, trecho sobre a versão 1.0"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_CLOUDFLARE_STREAMABLE_HTTP_DEFAULT
@@ -242,7 +242,7 @@ nodes:
     provenance:
       source: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/"
       locator: "seção de transporte Streamable HTTP"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_CLOUDFLARE_MCPAGENT_DEPRECATED_STATELESS
@@ -261,7 +261,7 @@ nodes:
     provenance:
       source: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/"
       locator: "seção sobre o handler stateless e o aviso de deprecação do McpAgent"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_SURVEY_PROTOCOL_GROWTH_OUTPACED_SECURITY
@@ -281,7 +281,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2506.23260"
       locator: "abstract do arXiv 2506.23260"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_SURVEY_ADHOC_AUTH_WEAK_VALIDATION
@@ -301,7 +301,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/pdf/2506.23260"
       locator: "abstract do arXiv 2506.23260"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_YORK_MCP_LIGHTER_STATE_IN_APP
@@ -321,7 +321,7 @@ nodes:
     provenance:
       source: "https://www.alphaxiv.org/abs/2607.23884"
       locator: "abstract do alphaxiv 2607.23884"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_YORK_A2A_STATEFUL_RICHER
@@ -341,7 +341,7 @@ nodes:
     provenance:
       source: "https://www.alphaxiv.org/abs/2607.23884"
       locator: "abstract do alphaxiv 2607.23884"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_AAIF_PLATINUM_SPONSORS
@@ -361,7 +361,7 @@ nodes:
     provenance:
       source: "https://www.flowhunt.io/blog/agentic-ai-foundation-a2a-mcp-standards/"
       locator: "trecho sobre os patrocinadores da AAIF"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_SESSION_NAME_NOT_STABLE_IDENTITY
@@ -381,7 +381,7 @@ nodes:
     provenance:
       source: "https://pasqualepillitteri.it/en/news/10215/claude-code-cross-session-messaging"
       locator: "artigo sobre cross-session messaging, seção de nomes de sessão"
-      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      method: "judges: votação 3-0 do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: E_MERCADO_A2A_EMPRESA_ADOTANTE_1027
@@ -401,7 +401,7 @@ nodes:
     provenance:
       source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
       locator: "comunicado LF de abr/2026 + trecho de patrocinadores do blog flowhunt"
-      method: "derivado: síntese do eixo mercado/capital do run /onion-research modo decision de 2026-10-27"
+      method: "derived: síntese do eixo mercado/capital do run /onion-research modo decision de 2026-10-27"
       locality: "web"
 
   - id: C_SUPERACAO_20261027_XSESSION_ADDRESSING_CORRECTED
@@ -518,7 +518,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 2' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
@@ -535,7 +535,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 4' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_03_SUPPORTERS_ARE_NOT_PRODUCTION_USE
@@ -552,7 +552,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 6' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE
@@ -569,7 +569,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 7' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_05_STREAMABLE_HTTP_IS_TOOL_TRANSPORT
@@ -586,7 +586,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 8' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_06_YORK_NO_NUMBERS
@@ -603,7 +603,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 12' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_07_A2A_COMPLEXITY_UNMEASURED
@@ -620,7 +620,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 13' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_08_AAIF_SPONSORS_TIER4
@@ -637,7 +637,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'achado 14' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4
@@ -664,7 +664,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'descarte da identidade por nome de sessão' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD
@@ -691,7 +691,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'descarte do Thoughtworks Radar' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_11_A2A_IN_AAIF_CORE_TRUE
@@ -708,7 +708,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'descarte da doação à AAIF' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_AAIF_DATE_PRIMARY
@@ -735,7 +735,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'descarte sobre autorização e injeção na spec A2A' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_13_AAIF_FOUNDERS_CUT
@@ -752,7 +752,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP, ServiceNow apoiam A2A' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_AAIF_FOUNDERS_LIST
@@ -779,7 +779,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: A2A no Azure AI Foundry/Copilot Studio e Bedrock AgentCore' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_15_CROSS_ORG_VS_TOOLS_PREMISE_CUT
@@ -796,7 +796,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: A2A entre organizações, MCP para ferramentas internas' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
@@ -813,7 +813,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: isolatePeerMachines, crossSessionInbound e deny rules' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_ISOLATE_PEER_MACHINES_PRIMARY
@@ -840,7 +840,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: 30+ técnicas de ataque, Toxic Agent Flow' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_18_PROVENANCE_MITIGATION_UNREAD
@@ -857,7 +857,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: mitigações do survey' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_19_STATELESS_INBOX_IS_COMPANY_PROJECT
@@ -874,7 +874,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: no stateless a caixa de entrada é projeto da empresa' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_20_CLOUDFLARE_RPC_NO_AUTH
@@ -891,7 +891,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: transporte RPC da Cloudflare sem autenticação' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_21_YORK_CUT_INFLATED
@@ -908,7 +908,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: estudo York sem números' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_22_OWN_PROTOCOL_VS_EXISTING_CHANNELS_UNSOURCED
@@ -925,7 +925,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: o artigo não compara protocolo próprio com padrão aberto' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_23_DRAFT_TOOL_MUST_BE_IDEMPOTENT
@@ -942,7 +942,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: cliente MCP remoto corrigido em 2.1.307 e 2.1.302' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_24_NATIVE_ENTERPRISE_CONTROLS_CUT
@@ -959,7 +959,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: 2.1.310 papéis Enterprise e 2.1.307 OTel safety_event' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_25_CHANGELOG_READ_9_PERCENT
@@ -976,7 +976,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: trecho lido do changelog (0–100k de ~1,1M)' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_26_AAIF_LAUNCH_MEMBERS_CUT
@@ -993,7 +993,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: AAIF lançada em 09/12/2025, de <40 para >250 membros' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_27_YOUNG_INTEROP_LAYER
@@ -1010,7 +1010,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'corte: camada de interoperabilidade jovem' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_28_AAIF_PRIMARY_UNREAD_IN_RUN
@@ -1027,7 +1027,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'fonte não lida: aaif.io/blog/a2a-joins-aaif' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_AAIF_BLOG_READ
@@ -1054,7 +1054,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'fonte não lida: channels.md' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_30_MANAGED_AGENTS_UNEVALUATED
@@ -1071,7 +1071,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'fonte não lida: claude-code-on-the-web e Managed Agents' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_31_AGENT_CARD_ATTACKS_UNREAD
@@ -1088,7 +1088,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
       locator: "objeção ao alvo 'fontes não lidas: keysight e levelblue' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
@@ -1105,7 +1105,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27"
       locator: "listas de claims confirmadas, refutadas, cortadas por orçamento, objeções do Elenxo e superações"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   - id: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
@@ -1125,7 +1125,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Como selar a topologia de A2A para empresas?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
 
   - id: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY
@@ -1195,7 +1195,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Rodar a rodada complementar antes de selar?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
 
   # ═══ RODADA DE PRIMÁRIAS (2026-10-27) — complementar de Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027 ═══
@@ -1219,7 +1219,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/channels.md"
       locator: "seção Security"
-      method: "leitura: WebFetch da seção Security; ancorada por verificador independente"
+      method: "reading: WebFetch da seção Security; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CHANNELS_PERMISSION_RELAY_APPROVER
@@ -1238,7 +1238,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/channels.md"
       locator: "seção Security, último parágrafo"
-      method: "leitura: WebFetch da seção Security; ancorada por verificador independente"
+      method: "reading: WebFetch da seção Security; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CHANNELS_ENTERPRISE_OPT_IN
@@ -1257,7 +1257,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/channels.md"
       locator: "seção Enterprise controls"
-      method: "leitura: WebFetch da seção Enterprise controls; ancorada por verificador independente"
+      method: "reading: WebFetch da seção Enterprise controls; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CHANNELS_PAUSES_ON_PERMISSION_PROMPT
@@ -1276,7 +1276,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/channels.md"
       locator: "Quickstart passo 3; nota de topo; seção Research preview"
-      method: "leitura: WebFetch do Quickstart e da seção Research preview; ancorada por verificador independente"
+      method: "reading: WebFetch do Quickstart e da seção Research preview; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_ISOLATE_PEER_MACHINES_BYPASS_ONE_WAY
@@ -1294,7 +1294,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "'Restrict cross-session messaging' > 'Require approval for cross-machine messages'"
-      method: "leitura: WebFetch da seção Restrict cross-session messaging; ancorada por verificador independente"
+      method: "reading: WebFetch da seção Restrict cross-session messaging; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_ISOLATE_PEER_MACHINES_OVER_MANAGED
@@ -1313,7 +1313,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/settings"
       locator: "'Settings precedence' > 'Exceptions to managed settings precedence', tabela"
-      method: "leitura: WebFetch da tabela de exceções de precedência; ancorada por verificador independente"
+      method: "reading: WebFetch da tabela de exceções de precedência; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CROSS_SESSION_INBOUND_THREE_VALUES
@@ -1332,7 +1332,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "'How a session treats an incoming message' > 'Control inbound messages', tabela de valores"
-      method: "leitura: WebFetch da seção Control inbound messages; ancorada por verificador independente"
+      method: "reading: WebFetch da seção Control inbound messages; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CROSS_SESSION_INBOUND_BYPASS_DEFAULT_HOLD
@@ -1351,7 +1351,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "'Control inbound messages', lista após a tabela"
-      method: "leitura: WebFetch da seção Control inbound messages; ancorada por verificador independente"
+      method: "reading: WebFetch da seção Control inbound messages; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CROSS_SESSION_INBOUND_PROJECT_ONLY_HARDENS
@@ -1370,7 +1370,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/settings"
       locator: "'Exceptions to managed settings precedence', linha crossSessionInbound"
-      method: "leitura: WebFetch da tabela de exceções de precedência; ancorada por verificador independente"
+      method: "reading: WebFetch da tabela de exceções de precedência; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CC_CLOUD_SESSIONS_EXCLUDED_ZDR_HIPAA_CMEK
@@ -1389,7 +1389,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/claude-code-on-the-web"
       locator: "'GitHub authentication options', nota logo após a tabela"
-      method: "leitura: WebFetch da seção GitHub authentication options; ancorada por verificador independente"
+      method: "reading: WebFetch da seção GitHub authentication options; ancorada por verificador independente"
       locality: "web"
 
   - id: E_MANAGED_AGENTS_SERVER_SIDE_NO_ZDR_BAA
@@ -1408,7 +1408,7 @@ nodes:
     provenance:
       source: "https://platform.claude.com/docs/en/managed-agents/overview"
       locator: "seção 'Beta access'; 'Core concepts' (Events)"
-      method: "leitura: WebFetch da overview de Managed Agents; ancorada por verificador independente"
+      method: "reading: WebFetch da overview de Managed Agents; ancorada por verificador independente"
       locality: "web"
 
   - id: E_A2A_SPEC_CARD_SIGNING_MAY
@@ -1427,7 +1427,7 @@ nodes:
     provenance:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "§8.4 Agent Card Signing"
-      method: "leitura: WebFetch da spec, §8.4; ancorada por verificador independente"
+      method: "reading: WebFetch da spec, §8.4; ancorada por verificador independente"
       locality: "web"
 
   - id: E_A2A_SPEC_CARD_JCS_MUST_WHEN_SIGNED
@@ -1446,7 +1446,7 @@ nodes:
     provenance:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "§8.4.1 Canonicalization Requirements"
-      method: "leitura: WebFetch da spec, §8.4.1; ancorada por verificador independente"
+      method: "reading: WebFetch da spec, §8.4.1; ancorada por verificador independente"
       locality: "web"
 
   - id: E_A2A_SPEC_CARD_VERIFY_SHOULD
@@ -1465,7 +1465,7 @@ nodes:
     provenance:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "§8.4.3 Signature Verification, bloco Security Considerations"
-      method: "leitura: WebFetch da spec, §8.4.3; ancorada por verificador independente"
+      method: "reading: WebFetch da spec, §8.4.3; ancorada por verificador independente"
       locality: "web"
 
   - id: E_A2A_SPEC_AUTHN_EVERY_REQUEST_MUST
@@ -1484,7 +1484,7 @@ nodes:
     provenance:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "§7.4 Server Authentication Responsibilities; §7.1 Protocol Security"
-      method: "leitura: WebFetch da spec, §7; ancorada por verificador independente"
+      method: "reading: WebFetch da spec, §7; ancorada por verificador independente"
       locality: "web"
 
   - id: E_A2A_SPEC_AUTHZ_EVERY_OPERATION_MUST
@@ -1503,7 +1503,7 @@ nodes:
     provenance:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "§13.1 Data Access and Authorization Scoping"
-      method: "leitura: WebFetch da spec, §13.1; ancorada por verificador independente"
+      method: "reading: WebFetch da spec, §13.1; ancorada por verificador independente"
       locality: "web"
 
   - id: E_A2A_SPEC_AUTH_REQUIRED_NOT_AUTHZ
@@ -1522,7 +1522,7 @@ nodes:
     provenance:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "§7.6.4 In-Task Authorization Scope; §7.2 Server Identity Verification; §13.2 Push Notification Security"
-      method: "leitura: WebFetch da spec, §7.6.4; ancorada por verificador independente"
+      method: "reading: WebFetch da spec, §7.6.4; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LEVELBLUE_A2A_REMOTE_LARGER_SURFACE
@@ -1541,7 +1541,7 @@ nodes:
     provenance:
       source: "https://www.levelblue.com/blogs/spiderlabs-blog/agent-in-the-middle-abusing-agent-cards-in-the-agent-2-agent-protocol-to-win-all-the-tasks"
       locator: "comparação MCP vs A2A"
-      method: "leitura: WebFetch do post; ancorada por verificador independente"
+      method: "reading: WebFetch do post; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LEVELBLUE_MITIGATION_GENERIC
@@ -1560,7 +1560,7 @@ nodes:
     provenance:
       source: "https://www.levelblue.com/blogs/spiderlabs-blog/agent-in-the-middle-abusing-agent-cards-in-the-agent-2-agent-protocol-to-win-all-the-tasks"
       locator: "conclusão do post"
-      method: "leitura: WebFetch do post; ancorada por verificador independente"
+      method: "reading: WebFetch do post; ancorada por verificador independente"
       locality: "web"
 
   - id: E_KEYSIGHT_CARD_POISONING_DEFINITION
@@ -1580,7 +1580,7 @@ nodes:
     provenance:
       source: "https://keysight.com/blogs/en/tech/nwvs/2026/03/12/agent-card-poisoning"
       locator: "resumo do post Agent Card Poisoning"
-      method: "leitura: WebFetch do post; ancorada por verificador independente"
+      method: "reading: WebFetch do post; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CHANGELOG_2_1_271_INBOUND_HELD_NOTICE
@@ -1599,7 +1599,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção 2.1.271, linha 2834"
-      method: "leitura: grep -nF no CHANGELOG baixado; ancorada por verificador independente"
+      method: "reading: grep -nF no CHANGELOG baixado; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CHANGELOG_2_1_261_REMOTE_CONTROL_QUEUE
@@ -1618,7 +1618,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção 2.1.261, linha 3253; grep -c isolatePeerMachines no arquivo inteiro"
-      method: "medição: grep -nF e grep -c no CHANGELOG baixado; ancorada por verificador independente"
+      method: "measurement: grep -nF e grep -c no CHANGELOG baixado; ancorada por verificador independente"
       locality: "web"
 
   - id: E_CHANGELOG_2_1_310_ENTERPRISE_ROLES
@@ -1637,7 +1637,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção 2.1.310, linhas 114 e 119"
-      method: "leitura: grep -nF no CHANGELOG baixado; ancorada por verificador independente"
+      method: "reading: grep -nF no CHANGELOG baixado; ancorada por verificador independente"
       locality: "web"
 
   - id: E_AAIF_HOSTS_A2A_LF_STRUCTURE
@@ -1656,7 +1656,7 @@ nodes:
     provenance:
       source: "https://aaif.io/blog/a2a-joins-aaif"
       locator: "parágrafo sobre governança aberta, logo antes de 'We're glad A2A is here'"
-      method: "leitura: WebFetch do post; ancorada por verificador independente"
+      method: "reading: WebFetch do post; ancorada por verificador independente"
       locality: "web"
 
   - id: E_AAIF_NEUTRAL_HOME_STACK
@@ -1675,7 +1675,7 @@ nodes:
     provenance:
       source: "https://aaif.io/blog/a2a-joins-aaif"
       locator: "parágrafo de abertura; seção 'Where A2A fits in the agentic stack'"
-      method: "leitura: WebFetch do post; ancorada por verificador independente"
+      method: "reading: WebFetch do post; ancorada por verificador independente"
       locality: "web"
 
   - id: E_LACUNAS_A2A_EMPRESA_RODADA_PRIMARIAS_1027
@@ -1692,7 +1692,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808)"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, superações e objeções do Elenxo (gapsClosed, gapsOpen)"
-      method: "derivado: contabilidade da rodada repassada ao escritor"
+      method: "derived: contabilidade da rodada repassada ao escritor"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_CHANNELS_CAN_BE_TWO_WAY
@@ -1819,7 +1819,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 4 [cc-channels]' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_33_ORG_DISABLE_UNQUOTED
@@ -1836,7 +1836,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 9 [cc-cross-session-controls]' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_34_CLOUD_PEOPLE_OFFER_UNANCHORED
@@ -1853,7 +1853,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 10 [cc-managed-agents-cloud]' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_35_MANAGED_AGENTS_NO_PEER_PRIMITIVE_UNQUOTED
@@ -1870,7 +1870,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 11 [cc-managed-agents-cloud]' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_36_MESSAGE_SIGNING_ABSENCE_UNMEASURED
@@ -1887,7 +1887,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 17 [a2a-spec-security]' (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_37_AITM_MECHANISM_UNANCHORED
@@ -1904,7 +1904,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 18 [a2a-agent-card-attacks]' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_38_CHANGELOG_CENSUS_MISSING
@@ -1921,7 +1921,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'lacuna [cc-changelog-full] cobertura do CHANGELOG inteiro e MCP remoto' (survives: true, critério E4_LACUNA_ABERTA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_39_AAIF_DATE_AND_G4_CONTRADICTION
@@ -1938,7 +1938,7 @@ nodes:
     provenance:
       source: "journal do run /onion-research modo primaries de 2026-10-27 (wf_bd8f7f49-808), resposta do Elenxo"
       locator: "objeção ao alvo 'claim 24 [aaif-a2a]' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: Q_A2A_EMPRESA_SELO_CONDICOES_1027
@@ -1958,7 +1958,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Selar D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027 como direção, com as condições?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
 
   - id: Q_AAIF_G4_SUPERSEDE_PROPOSAL_1027
@@ -1978,7 +1978,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Ancorar a data em que o A2A entrou na AAIF e gravar a SUPERSEDES do G4_AAIF_A2A_SEPARATE no grafo de federação?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
 
 edges:

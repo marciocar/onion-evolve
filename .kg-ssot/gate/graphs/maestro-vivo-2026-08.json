@@ -3,7 +3,6 @@
   "id": "maestro-vivo-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 60,
     "form.range.node.label": 50,
     "form.required.node.provenance": 1,
     "integrity.untraced-decision": 1

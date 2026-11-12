@@ -3,7 +3,6 @@
   "id": "technical-context-core-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 17,
     "form.range.node.label": 1,
     "yaml.unquoted-date": 1
   }

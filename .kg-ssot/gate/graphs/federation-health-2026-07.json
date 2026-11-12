@@ -3,7 +3,6 @@
   "id": "federation-health-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 18,
     "form.range.node.label": 8,
     "form.required.node.verified_against": 4,
     "yaml.unquoted-date": 1

@@ -26,7 +26,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-vps-network-exposure-2026-08.md"
       locator: "iptables-nat-DOCKER+DOCKER-USER-vazio+redis-auth-probe-vivo"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_containment_docker_user
@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-vps-network-exposure-2026-08.md"
       locator: "iptables-S-DOCKER-USER+systemctl-active"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_catalog_doctrine_promoted
@@ -58,7 +58,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md"
       locator: "KB-escrita+lint-verde"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_naming_onion_vps
@@ -74,7 +74,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
       locator: "docker-ps+systemctl-vivo+logto-users2-apps10"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
 edges:

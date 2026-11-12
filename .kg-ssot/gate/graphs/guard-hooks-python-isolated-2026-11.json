@@ -3,7 +3,6 @@
   "id": "guard-hooks-python-isolated-2026-11",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 5,
     "form.required.node.provenance": 2
   }
 }

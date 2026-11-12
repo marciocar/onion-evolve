@@ -43,7 +43,7 @@ nodes:
     provenance:
       source: "https://api.github.com/repos/microsoft/conductor"
       locator: "campos license.spdx_id, created_at, pushed_at, stargazers_count, archived; /releases?per_page=3; /commits?per_page=1"
-      method: "medição: gh api em 2026-10-11"
+      method: "measurement: gh api em 2026-10-11"
       locality: "web"
 
   - id: E_N1_CORPUS_PAGOU
@@ -62,7 +62,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml"
       locator: "nos E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO e E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME"
-      method: "leitura: corpus primeiro (kg-corpus-grep.sh conductor devolveu 10 nos)"
+      method: "reading: corpus primeiro (kg-corpus-grep.sh conductor devolveu 10 nos)"
       locality: "repo"
 
   - id: E_N2_RECUPERACAO_DE_FORMA_CAPADA_NO_CODIGO
@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/config/schema.py"
       locator: "l.618, l.622, l.629, l.722"
-      method: "leitura: codigo-fonte baixado pela API de conteudo do GitHub no sha fixado, lido com grep -n; nada instalado nem executado"
+      method: "reading: codigo-fonte baixado pela API de conteudo do GitHub no sha fixado, lido com grep -n; nada instalado nem executado"
       locality: "web"
 
   - id: E_N2_VALIDADOR_SEMANTICO_FAIL_OPEN
@@ -101,7 +101,7 @@ nodes:
     provenance:
       source: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/engine/validator.py"
       locator: "l.22, l.200, l.207-213, l.270-291"
-      method: "leitura: codigo-fonte no sha fixado, grep -n; nada instalado nem executado"
+      method: "reading: codigo-fonte no sha fixado, grep -n; nada instalado nem executado"
       locality: "web"
 
   - id: E_N3_ONION_CONFIA_NO_RADAR_DECLARADO
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: ".claude/workflows/onion-research.js"
       locator: "l.142-143, l.308, l.313, l.492, l.497 (grep -n radarExit e grep -n 'tentativas')"
-      method: "medição: grep -n na arvore do core em 2026-10-11"
+      method: "measurement: grep -n na arvore do core em 2026-10-11"
       locality: "repo"
 
   - id: E_N3_FAIL_OPEN_NAO_TRANSFERE
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: ".claude/validation/dissect-census.sh e .claude/validation/forge-census.sh"
       locator: "Exit: 3 = NAO PUDE MEDIR (cabecalho dos dois medidores)"
-      method: "leitura: comparacao da polaridade documentada"
+      method: "reading: comparacao da polaridade documentada"
       locality: "repo"
 
   - id: E_N3_SCHEMA_NATIVO_LACUNA
@@ -175,7 +175,7 @@ nodes:
     provenance:
       source: ".claude/workflows/onion-research.js e .claude/validation/lint-selftest.sh"
       locator: "bloco // >>> engine-verify … // <<< engine-verify; casos (ev1) e (ev2) de run_research_workflow_selftests"
-      method: "medição: bancada executada com stub que separa escritor e verificador, mais dois mutantes que a reprovam"
+      method: "measurement: bancada executada com stub que separa escritor e verificador, mais dois mutantes que a reprovam"
       locality: "repo"
 
   - id: E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO
@@ -195,7 +195,7 @@ nodes:
     provenance:
       source: ".claude/workflows/onion-research.js, .claude/commands/meta/forge.md, .claude/validation/forge-census.sh"
       locator: "grep -ci dissect (0); grep -n licen (0 no forge); forge-census --tsv linha dissect (7)"
-      method: "medição: dogfood do comando real em 2026-10-11"
+      method: "measurement: dogfood do comando real em 2026-10-11"
       locality: "repo"
 
   - id: D_CONDUCTOR_1011
@@ -214,7 +214,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, pergunta com opções sobre D_CONDUCTOR_1011"
       locator: "opção escolhida: Absorver o conceito (Recomendado)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
   - id: E_REMEDIDA_N1_CORPUS_1027

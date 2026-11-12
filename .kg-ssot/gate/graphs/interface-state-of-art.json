@@ -3,7 +3,6 @@
   "id": "interface-state-of-art",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 13,
     "integrity.untraced-decision": 3,
     "yaml.unquoted-date": 1
   }

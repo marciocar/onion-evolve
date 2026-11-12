@@ -102,7 +102,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve + git log de origin/main@5621f6ed (PRs #1004-#1063)"
       locator: "owner.type, rulesets, branches/main/protection, pulls/*/timeline; .gitattributes l.26; ops/pr-merge-verified.sh l.143"
-      method: "medição: corpus prévio do run wf_48596b33-657 + re-medição do escritor em 2026-10-13 (gh api e grep)"
+      method: "measurement: corpus prévio do run wf_48596b33-657 + re-medição do escritor em 2026-10-13 (gh api e grep)"
   - id: E_GH_MQ_INCIDENT_SILENT_REVERT_2026_04
     node_type: evidence
     plane: DEV
@@ -119,7 +119,7 @@ nodes:
     provenance:
       source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 2-1 do run wf_48596b33-657"
+      method: "judges: votação 2-1 do run wf_48596b33-657"
       locality: "web"
   - id: E_GH_MQ_INCIDENT_UNDETECTED_3H33
     node_type: evidence
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_GH_MQ_FIX_REGRESSION_CHECKS_GATING
     node_type: evidence
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_GH_MQ_INCIDENT_REPORT_CONTRADICTS_REBASE
     node_type: evidence
@@ -173,7 +173,7 @@ nodes:
     provenance:
       source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_GHES_MQ_RULE_REPO_LEVEL_ONLY
     node_type: evidence
@@ -190,7 +190,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_LINEAR_HISTORY_NEEDS_SQUASH_OR_REBASE
     node_type: evidence
@@ -207,7 +207,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_GITATTR_DRIVER_ONLY_ON_NONTRIVIAL_CONFLICT
     node_type: evidence
@@ -224,7 +224,7 @@ nodes:
     provenance:
       source: "https://docs.gitlab.com/user/project/repository/files/git_attributes"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_SEMANTIC_BREAK_WITHOUT_VCS_CONFLICT
     node_type: evidence
@@ -241,7 +241,7 @@ nodes:
     provenance:
       source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_KEYORIX_TWO_TIER_CI
     node_type: evidence
@@ -258,7 +258,7 @@ nodes:
     provenance:
       source: "https://github.com/keyorixhq/keyorix/pull/2052"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_KEYORIX_FULL_MATRIX_DUPLICATES_QUEUE
     node_type: evidence
@@ -275,7 +275,7 @@ nodes:
     provenance:
       source: "https://github.com/keyorixhq/keyorix/pull/2052"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_SEQUENTIAL_MERGE_REBASE_CI_EACH
     node_type: evidence
@@ -293,7 +293,7 @@ nodes:
     provenance:
       source: "https://codex.danielvaughan.com/2026/07/28/agent-pr-merge-conflicts-concurrent-coding-agents-codex-cli-worktree-isolation-coordination-defence/"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_CCMQ_LOCAL_SINGLE_MACHINE
     node_type: evidence
@@ -310,7 +310,7 @@ nodes:
     provenance:
       source: "https://www.everydev.ai/tools/claude-code-merge-queue"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_CCMQ_ONLY_GATE_CHECKCOMMAND
     node_type: evidence
@@ -327,7 +327,7 @@ nodes:
     provenance:
       source: "https://www.everydev.ai/tools/claude-code-merge-queue"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_FUNADOR_FIFO_PREPUSH
     node_type: evidence
@@ -345,7 +345,7 @@ nodes:
     provenance:
       source: "https://github.com/funador/claude-code-merge-queue"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_FUNADOR_LOCK_THROUGHPUT_CAP
     node_type: evidence
@@ -362,7 +362,7 @@ nodes:
     provenance:
       source: "https://github.com/funador/claude-code-merge-queue"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_BORS_NG_ARCHIVED_2024
     node_type: evidence
@@ -380,7 +380,7 @@ nodes:
     provenance:
       source: "https://redirect.github.com/bors-ng/bors-ng/issues/1729"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_BORS_NG_PUBLIC_INSTANCE_ENDED_2023
     node_type: evidence
@@ -398,7 +398,7 @@ nodes:
     provenance:
       source: "https://redirect.github.com/bors-ng/bors-ng/issues/1729"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 2-1 do run wf_48596b33-657"
+      method: "judges: votação 2-1 do run wf_48596b33-657"
       locality: "web"
   - id: E_GH_MQ_ORG_ONLY_MERGIFY_FAQ
     node_type: evidence
@@ -416,7 +416,7 @@ nodes:
     provenance:
       source: "https://articles.mergify.com/github-pull-request-merge-queue-faq/"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_GH_MQ_NEEDS_BRANCH_PROTECTION_MERGIFY_FAQ
     node_type: evidence
@@ -434,7 +434,7 @@ nodes:
     provenance:
       source: "https://articles.mergify.com/github-pull-request-merge-queue-faq/"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_GRAPHITE_SMALL_TEAMS_NO_QUEUE
     node_type: evidence
@@ -451,7 +451,7 @@ nodes:
     provenance:
       source: "https://graphite.com/guides/merge-queue-best-practices"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 2-1 do run wf_48596b33-657"
+      method: "judges: votação 2-1 do run wf_48596b33-657"
       locality: "web"
   - id: E_GRAPHITE_GUIDE_SCOPE_GAP
     node_type: evidence
@@ -468,7 +468,7 @@ nodes:
     provenance:
       source: "https://graphite.com/guides/merge-queue-best-practices"
       locator: "claim confirmada na fase Verify do run wf_48596b33-657"
-      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      method: "judges: votação 3-0 do run wf_48596b33-657"
       locality: "web"
   - id: E_MERCADO_MERGE_QUEUES_2026_10
     node_type: evidence
@@ -486,7 +486,7 @@ nodes:
     provenance:
       source: "https://mergify.com/pricing"
       locator: "\"Mergify is free for open source projects and for private teams of up to 5 active contributors\"; trunk.io/pricing: Merge Queue \"Included\" no Free, \"Up to 5 Repo Committers\""
-      method: "derivado: sintetizador do run wf_48596b33-657 + leitura de 1 agente (Elenxo)"
+      method: "derived: sintetizador do run wf_48596b33-657 + leitura de 1 agente (Elenxo)"
       locality: "web"
   - id: C_OPCAO_A_CURE_MAGNET_FILE
     node_type: claim
@@ -534,7 +534,7 @@ nodes:
     provenance:
       source: "ops/merge-serial.sh + ops/pr-merge-verified.sh + família merge_serial de .claude/validation/lint-selftest.sh"
       locator: "run_merge_serial_selftests, casos (c) (s) (q) (fd) (o) (w) (d1) (d2) (d3) (d4) (l) (e) (r1)-(r5)"
-      method: "medição: bancada merge_serial 17/17 sob LC_ALL=C e 17 mutantes plantados por ops/mutate-and-restore.sh, cada um reprovando o seu caso, 2026-10-13"
+      method: "measurement: bancada merge_serial 17/17 sob LC_ALL=C e 17 mutantes plantados por ops/mutate-and-restore.sh, cada um reprovando o seu caso, 2026-10-13"
       locality: "repo"
   - id: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
     node_type: claim
@@ -563,7 +563,7 @@ nodes:
     provenance:
       source: "ops/testing/selftest-pr-selection.sh + ops/testing/main-bench-alarm.sh + .github/workflows/onion-selftest.yml + família two_tier_bench de .claude/validation/lint-selftest.sh"
       locator: "run_two_tier_bench_selftests, casos (a) (a2) (b) (c) (d) (e) (f) (g) (h) (i) (i2) (i3); mutantes M1-M15 no resíduo docs/evolution/review/feat-merge-process-step-d-two-tier-bench.md"
-      method: "medição: bancada two_tier_bench 12/12 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso, 2026-10-13"
+      method: "measurement: bancada two_tier_bench 12/12 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso, 2026-10-13"
       locality: "repo"
   - id: C_OPCAO_E_REQUIRED_CHECKS_RULESET
     node_type: claim
@@ -579,7 +579,7 @@ nodes:
     provenance:
       source: "API REST do GitHub, repos/marciocar/onion-evolve/rulesets/25001643"
       locator: "campos enforcement, rules[].parameters.required_status_checks, bypass_actors e current_user_can_bypass"
-      method: "medição: gh api depois de bash ops/apply-ruleset-main.sh, em 2026-10-13"
+      method: "measurement: gh api depois de bash ops/apply-ruleset-main.sh, em 2026-10-13"
   - id: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
     node_type: claim
     plane: DEV
@@ -699,7 +699,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «Qual processo de PR/CI/merge o core adota? (D_MERGE_PROCESS_ONION_2026_10)»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: E_OBJECAO_INCIDENT_WEIGHS_LITTLE_QUEUE_UNAVAILABLE
     node_type: evidence
@@ -715,7 +715,7 @@ nodes:
     provenance:
       source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
       locator: "objeção #0 do retorno do Elenxo (Achado 1 — incidente de abril de 2026 na merge queue (reversão silenciosa em grupos com vários PRs))"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_GHES_WRONG_VERSION_OWNER_IS_BLOCK
     node_type: evidence
@@ -731,7 +731,7 @@ nodes:
     provenance:
       source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
       locator: "objeção #2 do retorno do Elenxo (Achado 3 — a regra de merge queue não existe em ruleset de organização (GHES 3.17))"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_DRIVER_NOT_RUN_SERVER_SIDE
     node_type: evidence
@@ -747,7 +747,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh@5621f6ed"
       locator: "objeção #3 do retorno do Elenxo (Achado 4 — o merge driver só é invocado em conflito não trivial)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_KEYORIX_NEEDS_MERGE_GROUP
     node_type: evidence
@@ -763,7 +763,7 @@ nodes:
     provenance:
       source: ".github/workflows@5621f6ed"
       locator: "objeção #5 do retorno do Elenxo (Achado 6 — keyorix #2052: matriz completa só em merge_group/push/label, faixa rápida no PR)"
-      method: "medição: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "measurement: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_FULL_PR_BENCH_IS_ONLY_GUARANTEE
     node_type: evidence
@@ -779,7 +779,7 @@ nodes:
     provenance:
       source: "https://github.com/keyorixhq/keyorix/pull/2052"
       locator: "objeção #6 do retorno do Elenxo (Achado 7 — a matriz completa no PR duplica a garantia da fila (de 39 para 23 jobs))"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_SEQUENTIAL_MERGE_IS_CURRENT_PRACTICE
     node_type: evidence
@@ -795,7 +795,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh@5621f6ed"
       locator: "objeção #7 do retorno do Elenxo (Achado 8 — merge sequencial com rebase sobre o alvo atualizado + CI em cada merge)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_FLOCK_MUST_WRAP_API_MERGE
     node_type: evidence
@@ -811,7 +811,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh@5621f6ed"
       locator: "objeção #8 do retorno do Elenxo (Achado 9 — a fila do claude-code-merge-queue é local de uma só máquina)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_ADOPT_SERIALIZATION_NOT_TOOL
     node_type: evidence
@@ -827,7 +827,7 @@ nodes:
     provenance:
       source: "https://www.everydev.ai/tools/claude-code-merge-queue"
       locator: "objeção #9 do retorno do Elenxo (Achado 10 — o único gate da ferramenta é o checkCommand, sem revisão humana)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_HELPER_LIVES_ONLY_IN_SCRATCHPAD
     node_type: evidence
@@ -843,7 +843,7 @@ nodes:
     provenance:
       source: "https://github.com/funador/claude-code-merge-queue"
       locator: "objeção #10 do retorno do Elenxo (Achado 11 — funador serializa landings com FIFO local + pre-push)"
-      method: "testemunho: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "testimony: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_LOCK_ONLY_ON_REBASE_AND_MERGE
     node_type: evidence
@@ -859,7 +859,7 @@ nodes:
     provenance:
       source: "https://github.com/funador/claude-code-merge-queue"
       locator: "objeção #11 do retorno do Elenxo (Achado 12 — o lock dura a suíte inteira e a vazão fica abaixo de 20/h)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_ORG_TRANSFER_OPTION_OMITTED
     node_type: evidence
@@ -875,7 +875,7 @@ nodes:
     provenance:
       source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
       locator: "objeção #14 do retorno do Elenxo (Achado 15 — a fila nativa só serve a org open source/Enterprise, não a repo de usuário)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_PROTECTION_IS_CHOICE_NOT_LIMIT
     node_type: evidence
@@ -891,7 +891,7 @@ nodes:
     provenance:
       source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md"
       locator: "objeção #15 do retorno do Elenxo (Achado 16 — a fila nativa funciona sobre branch protection, que o core não usa)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_QUEUE_DOES_NOT_CURE_MAGNET
     node_type: evidence
@@ -907,7 +907,7 @@ nodes:
     provenance:
       source: "https://graphite.com/guides/merge-queue-best-practices"
       locator: "objeção #16 do retorno do Elenxo (Achado 17 — Graphite: times de até cerca de 10 devs provavelmente não precisam de fila)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_LINEAR_HISTORY_BLOCKS_SAC80
     node_type: evidence
@@ -923,7 +923,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh@5621f6ed"
       locator: "objeção #20 do retorno do Elenxo (Achado 21 — exigir histórico linear requer squash ou rebase permitido)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_RULESETS_FREE_HALF_DISCARDED
     node_type: evidence
@@ -939,7 +939,7 @@ nodes:
     provenance:
       source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md"
       locator: "objeção #21 do retorno do Elenxo (Descartado (refutado) — rulesets disponíveis em repo público Free; sem plano mínimo para a fila)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_CONTRARIAN_DISCARD_HID_REASON
     node_type: evidence
@@ -955,7 +955,7 @@ nodes:
     provenance:
       source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
       locator: "objeção #23 do retorno do Elenxo (Descartado (refutado) — trunk-based exige o build completo antes do push)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_STRICT_VS_LOOSE_IS_THE_AXIS
     node_type: evidence
@@ -971,7 +971,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
       locator: "objeção #26 do retorno do Elenxo (Cortado por orçamento — status checks strict x loose)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_SERVER_SIDE_UNION_UNMEASURED
     node_type: evidence
@@ -987,7 +987,7 @@ nodes:
     provenance:
       source: ".gitattributes@5621f6ed"
       locator: "objeção #27 do retorno do Elenxo (Cortado por orçamento — merge driver não suportado no GitLab.com)"
-      method: "medição: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "measurement: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_INTRA_AGENT_ANCHORS_LOCAL_SERIALIZER
     node_type: evidence
@@ -1003,7 +1003,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2607.04697"
       locator: "objeção #29 do retorno do Elenxo (Cortado por orçamento — quase todo par co-ativo é intra-agente (só 0,5% cross-agent))"
-      method: "testemunho: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "testimony: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_TRUNK_SMALL_TEAM_FAST_BUILD
     node_type: evidence
@@ -1019,7 +1019,7 @@ nodes:
     provenance:
       source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
       locator: "objeção #33 do retorno do Elenxo (Cortado por orçamento — commit direto no trunk associado a times pequenos e builds rápidos)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_TRUNK_ONE_MINUTE_BUILD
     node_type: evidence
@@ -1035,7 +1035,7 @@ nodes:
     provenance:
       source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
       locator: "objeção #34 do retorno do Elenxo (Cortado por orçamento — o build completo antes da integração precisa durar cerca de 1 min)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_LOCK_SCOPE_SETS_THROUGHPUT
     node_type: evidence
@@ -1051,7 +1051,7 @@ nodes:
     provenance:
       source: "https://github.com/funador/claude-code-merge-queue"
       locator: "objeção #36 do retorno do Elenxo (Cortado por orçamento — o lock FIFO preso durante o checkCommand limita a vazão)"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET
     node_type: evidence
@@ -1067,7 +1067,7 @@ nodes:
     provenance:
       source: "https://github.com/github/docs/blob/main/data/reusables/pull_requests/merge-queue-removal-reasons.md"
       locator: "objeção #39 do retorno do Elenxo (Cortado por orçamento — a fila nativa é FIFO única e ejeta o PR em conflito ou falha)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_MERGIFY_OSS_FREE_QUEUE_EXISTS
     node_type: evidence
@@ -1083,7 +1083,7 @@ nodes:
     provenance:
       source: "https://mergify.com/pricing"
       locator: "objeção #40 do retorno do Elenxo (Fonte não lida — mergify.com/pricing)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_TRUNK_FREE_QUEUE_EXISTS
     node_type: evidence
@@ -1099,7 +1099,7 @@ nodes:
     provenance:
       source: "https://trunk.io/pricing"
       locator: "objeção #41 do retorno do Elenxo (Fonte não lida — trunk.io/pricing)"
-      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_POSTMERGE_WRITER_NO_EXTERNAL_SOURCE
     node_type: evidence
@@ -1115,7 +1115,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml"
       locator: "objeção #44 do retorno do Elenxo (Fontes não lidas — lingo.dev, oneuptime, tessl (gerados no merge))"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_TWO_TIER_WITHOUT_QUEUE_UNREAD
     node_type: evidence
@@ -1131,7 +1131,7 @@ nodes:
     provenance:
       source: "https://github.com/keyorixhq/keyorix/pull/2052"
       locator: "objeção #45 do retorno do Elenxo (Fontes não lidas — evgunter/cad#1887, hivecommons/hive#10884, bernstein#5793 (CI em dois níveis))"
-      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      method: "derived: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
       locality: "web"
   - id: E_LACUNAS_MERGE_PROCESS_2026_10
     node_type: evidence
@@ -1149,7 +1149,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_48596b33-657: resultado da fase Elenxo (agente a5f4ce932c7591c1d) e da fase Synthesize (agente a8f32f6e1a5e01e0a)⟩"
       locator: "objections (46; survives=True 27); unverifiedList (8); recommendation"
-      method: "medição: json.load do resultado no journal + contagem por survives/kind"
+      method: "measurement: json.load do resultado no journal + contagem por survives/kind"
       locality: "host"
   - id: D_REQUIRED_CHECKS_RULESET_MAIN
     node_type: decision
@@ -1165,7 +1165,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «Ligo required status checks por ruleset no main (grátis em repo público de usuário)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: D_RULESET_BYPASS_SO_EM_PR
     node_type: decision
@@ -1181,7 +1181,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «O ruleset do main exige selftest-gate e lint-onion-artifacts. Como fica o bypass do admin (o dono do repo)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: D_ACTIONS_ABRE_PR_DE_REVERT
     node_type: decision
@@ -1197,7 +1197,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «Quando a bancada completa reprova no main, o alarme empurra revert/<sha>, mas o token do Actions não pode abrir PR. Ligar 'Allow GitHub Actions to create and approve pull requests'?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
     node_type: decision
@@ -1213,7 +1213,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «Quais melhoras de CPU da VPS aplicar?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13
     node_type: evidence
@@ -1232,7 +1232,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh (família machine_slots e as vagas da máquina) + .githooks/pre-commit + ops/pr-finalize.sh, na branch feat/bench-machine-cpu-semaphore"
       locator: "run_machine_slots_selftests, casos (a) a (g); mutantes M1-M10 no resíduo docs/evolution/review/feat-bench-machine-cpu-semaphore.md"
-      method: "medição: família machine_slots sob LC_ALL=C, mutantes por ops/mutate-and-restore.sh e duas bancadas paralelas antes/depois com carga e pressão amostradas a cada 2 s, 2026-10-13"
+      method: "measurement: família machine_slots sob LC_ALL=C, mutantes por ops/mutate-and-restore.sh e duas bancadas paralelas antes/depois com carga e pressão amostradas a cada 2 s, 2026-10-13"
       locality: "repo"
   - id: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
     node_type: decision
@@ -1248,7 +1248,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «Como acelerar a fila de merge quando vários PRs ficam prontos juntos?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: Q_MERGE_LOTE_COM_BISSECCAO
     node_type: question
@@ -1277,7 +1277,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh + ops/merge-serial.sh + ops/apply-ruleset-main.sh + famílias merge_skip_ci e merge_serial de .claude/validation/lint-selftest.sh"
       locator: "run_merge_skip_ci_selftests, casos (a) (b) (c) (c2) (c3) (j) (d) (d2) (e) (f) (g) (h) (i) (l); run_merge_serial_selftests caso (wf); mutantes no resíduo docs/evolution/review/feat-merge-skip-ci-rerun-on-clean-rebase.md"
-      method: "medição: bancada das quatro famílias 89/89 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura ao vivo do ruleset pela API, 2026-10-13"
+      method: "measurement: bancada das quatro famílias 89/89 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura ao vivo do ruleset pela API, 2026-10-13"
       locality: "repo"
   - id: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
     node_type: evidence
@@ -1296,7 +1296,7 @@ nodes:
     provenance:
       source: "ops/testing/main-bench-alarm.sh + .github/workflows/onion-selftest.yml (job alarme-main) + família two_tier_bench de .claude/validation/lint-selftest.sh + gh pr view 1085 1087, gh issue view 1086"
       locator: "run_two_tier_bench_selftests, casos (i) (i2) (j1) (j2) (j2b) (j2c) (j3) (j4) (j5) (j6) (j7) (i3) (i4); resíduo docs/evolution/review/fix-main-bench-alarm-blames-first-break.md"
-      method: "medição: bancada two_tier_bench 22/22 sob LC_ALL=C e 18 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura dos PRs e da issue pela API, 2026-10-13"
+      method: "measurement: bancada two_tier_bench 22/22 sob LC_ALL=C e 18 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura dos PRs e da issue pela API, 2026-10-13"
       locality: "repo"
   - id: D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA
     node_type: decision
@@ -1312,7 +1312,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «36 de 50 PRs vão à bancada completa no CI só porque acrescentam casos no lint-selftest.sh. Como o nível PR do CI trata uma mudança nesse arquivo?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
   - id: E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13
     node_type: evidence
@@ -1331,7 +1331,7 @@ nodes:
     provenance:
       source: "ops/testing/selection-replay.sh + .claude/validation/lint-selftest.sh (famílias selector_per_file e shared_startup) + ops/testing/selftest-pr-selection.sh, na branch perf/bench-selector-per-file"
       locator: "linhas #REPLAY, #REPLAY_SEM_INFRA, #REPLAY_SEGUNDOS_CPU, #STARTUP_WORKER e #STARTUP_SERIAL do medidor; mutantes listados no resíduo docs/evolution/review/perf-bench-selector-per-file.md"
-      method: "medição: replay do seletor antes/depois sobre os mesmos 50 diffs mergeados, arranque medido 5× por forma, e mutantes por ops/mutate-and-restore.sh, 2026-10-13"
+      method: "measurement: replay do seletor antes/depois sobre os mesmos 50 diffs mergeados, arranque medido 5× por forma, e mutantes por ops/mutate-and-restore.sh, 2026-10-13"
       locality: "repo"
   - id: E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14
     node_type: evidence
@@ -1350,7 +1350,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh (_skip_ci_decide) + família merge_skip_ci de .claude/validation/lint-selftest.sh + gh pr view 1092 + gh api commits/1cddfb8092bc/check-runs"
       locator: "comentário de auto-rebase do #1092 (2026-10-13T22:22:57Z); caso (d3) de run_merge_skip_ci_selftests; resíduo docs/evolution/review/chore-tail-door-cache-fastpath-msg.md"
-      method: "medição: leitura do PR e dos check-runs pela API, contagem dos PRs mergeados e dos comentários de auto-rebase desde o #1081, bancada merge_skip_ci e pr_merge_verified sob LC_ALL=C e mutantes por ops/mutate-and-restore.sh, 2026-10-14"
+      method: "measurement: leitura do PR e dos check-runs pela API, contagem dos PRs mergeados e dos comentários de auto-rebase desde o #1081, bancada merge_skip_ci e pr_merge_verified sob LC_ALL=C e mutantes por ops/mutate-and-restore.sh, 2026-10-14"
       locality: "repo"
   - id: E_STRICT_LOCAL_EXECUTADO_2026_10_14
     node_type: evidence
@@ -1369,7 +1369,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh + ops/merge-serial.sh (cabeçalho) + famílias merge_skip_ci, pr_merge_verified, merge_dispensa e merge_serial de .claude/validation/lint-selftest.sh + gh pr list --state merged --limit 50"
       locator: "run_merge_skip_ci_selftests, casos (s1) a (s8) e (s7b); mutantes M1 a M6 no resíduo docs/evolution/review/feat-merge-requires-base-at-tip.md"
-      method: "medição: bancada das quatro famílias 93/93 sob LC_ALL=C, 6 mutantes por ops/mutate-and-restore.sh, e ancestralidade git dos 50 últimos merges contra o main de antes de cada um, 2026-10-14"
+      method: "measurement: bancada das quatro famílias 93/93 sob LC_ALL=C, 6 mutantes por ops/mutate-and-restore.sh, e ancestralidade git dos 50 últimos merges contra o main de antes de cada um, 2026-10-14"
       locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13

@@ -3,7 +3,6 @@
   "id": "fable-5-1-superacao-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 22,
     "form.range.node.label": 34,
     "form.required.node.provenance": 1
   }

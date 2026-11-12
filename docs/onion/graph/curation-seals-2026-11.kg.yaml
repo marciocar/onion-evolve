@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: "anúncio do core à curadoria, 2026-11-08"
       locator: "tabela «Respostas curtas do core»"
-      method: "leitura: anúncio versionado no outbox do core"
+      method: "reading: anúncio versionado no outbox do core"
   - id: D_SEAL_PIECE_CH_MECHANISM_1108
     node_type: decision
     layer: audit
@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: "sinal channels-trigger-per-bridge da curadoria, respondido pelo core em 2026-11-08"
       locator: "linha «Canais entre sessões» do anúncio de 2026-11-08"
-      method: "derivado: critério do costurar confrontado com a campainha em produção"
+      method: "derived: critério do costurar confrontado com a campainha em produção"
   - id: D_SEAL_YW_PARKS_1108
     node_type: decision
     layer: audit
@@ -55,7 +55,7 @@ nodes:
     provenance:
       source: "sinal wave2-seen-not-raised da curadoria, respondido pelo core em 2026-11-08"
       locator: "linha «Onda 2, os 10 vistos» do anúncio de 2026-11-08"
-      method: "derivado: leitura dos gatilhos propostos pela curadoria"
+      method: "derived: leitura dos gatilhos propostos pela curadoria"
 edges:
   - from: E_CS_ONDA2_RESPOSTAS_DO_CORE_1108
     to: D_SEAL_PIECE_CH_MECHANISM_1108

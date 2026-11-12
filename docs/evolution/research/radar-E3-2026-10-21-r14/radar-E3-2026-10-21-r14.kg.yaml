@@ -48,7 +48,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.303 a ## 2.1.306 (cópias em docs/evolution/research/radar-E3-2026-10-21-r14/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -74,7 +74,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.305 (data/2.1.305.txt) + .claude/workflows/*.js + .claude/diary/2026-07-24-workflow-resume-after-process-death-reexecutes.md"
-      method: "medição: leitura do CHANGELOG e grep no core"
+      method: "measurement: leitura do CHANGELOG e grep no core"
       locality: "web"
   - id: Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305
     node_type: question
@@ -94,7 +94,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Re-testo a migalha do resume de Workflow no CLI atual?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306
     node_type: evidence
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml"
       locator: "l.280 e l.414 (uses: claude-code-action@a5a423f7)"
-      method: "medição: grep no core e gh api compare v1.0.255...v1.0.256"
+      method: "measurement: grep no core e gh api compare v1.0.255...v1.0.256"
       locality: "repo"
   - id: E_REVISOR_SEGUE_SEM_PR_COM_A_LABEL_1021
     node_type: evidence
@@ -124,7 +124,7 @@ nodes:
     provenance:
       source: "gh pr list / gh run list (marciocar/onion-evolve)"
       locator: "label review:ia; workflow onion-review.yml, últimas 40 runs"
-      method: "medição: consulta ao forge"
+      method: "measurement: consulta ao forge"
       locality: "web"
   - id: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
     node_type: evidence
@@ -139,7 +139,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh"
       locator: "tabela de versões, linha SDK bridge; ops/cc-sdk-targets.tsv l.24"
-      method: "medição: binário do CLI embutido --version"
+      method: "measurement: binário do CLI embutido --version"
       locality: "host"
   - id: E_WORKTREE_DE_SUBAGENTE_COM_COMMITS_NAO_E_LIMPA_1021
     node_type: evidence
@@ -154,7 +154,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.305 + git worktree list do core"
-      method: "medição: leitura do CHANGELOG e git status/log por worktree"
+      method: "measurement: leitura do CHANGELOG e git status/log por worktree"
       locality: "web"
   - id: E_SUBAGENTE_RETOMADO_ESQUECIA_O_TRABALHO_2_1_304
     node_type: evidence
@@ -169,7 +169,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.304 (data/2.1.304.txt)"
-      method: "medição: leitura do CHANGELOG e grep no core"
+      method: "measurement: leitura do CHANGELOG e grep no core"
       locality: "web"
   - id: E_NENHUM_ITEM_TOCA_HOOK_SANDBOX_GATEWAY_1021
     node_type: evidence
@@ -184,7 +184,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.304 e ## 2.1.305 + grep em .claude, ops e .github"
-      method: "medição: busca no vivo por consumidor"
+      method: "measurement: busca no vivo por consumidor"
       locality: "web"
   - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_306
     node_type: evidence
@@ -199,7 +199,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família cited_directive"
-      method: "medição: execução da bancada no CLI 2.1.306"
+      method: "measurement: execução da bancada no CLI 2.1.306"
       locality: "repo"
   - id: E_COMPACTACAO_REENVIA_A_LISTA_DE_SKILLS_1021
     node_type: evidence
@@ -214,7 +214,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.304 + .claude/skills/language-standards/SKILL.md l.8"
-      method: "medição: leitura do CHANGELOG e grep no core"
+      method: "measurement: leitura do CHANGELOG e grep no core"
       locality: "web"
   - id: Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304
     node_type: question
@@ -234,7 +234,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_AVISO_DE_RESUME_NO_MAX_ENCONTRA_O_RESUME_COMMAND_1021
     node_type: evidence
@@ -249,7 +249,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.304 + .claude/hooks/worklog-capture-session.sh l.36"
-      method: "medição: leitura do CHANGELOG e do hook"
+      method: "measurement: leitura do CHANGELOG e do hook"
       locality: "web"
   - id: E_TIME_DA_SESSAO_NAO_DERRUBA_A_CLI_NO_SHUTDOWN_1021
     node_type: evidence
@@ -264,7 +264,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.304 + settings do usuário (env)"
-      method: "medição: leitura do CHANGELOG e do settings do usuário"
+      method: "measurement: leitura do CHANGELOG e do settings do usuário"
       locality: "web"
   - id: E_MODELO_DO_JUIZ_DECLARADO_PODIA_MENTIR_NO_FALLBACK_1021
     node_type: evidence
@@ -279,7 +279,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.305 + .claude/settings.json l.255"
-      method: "medição: leitura do CHANGELOG e grep no core"
+      method: "measurement: leitura do CHANGELOG e grep no core"
       locality: "web"
   - id: Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL
     node_type: question
@@ -306,7 +306,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh"
       locator: "tabela de versões, linha SDK bridge; saída do ops/update-bridge.sh colada pelo maestro"
-      method: "medição: binário do CLI embutido --version e verify do deploy"
+      method: "measurement: binário do CLI embutido --version e verify do deploy"
       locality: "host"
   - id: D_ESTACIONAR_SAC180_ATE_O_1O_RESUME_REAL
     node_type: decision
@@ -322,7 +322,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-180 no estacionamento?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA
     node_type: decision
@@ -338,7 +338,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-181 no estacionamento?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_ESTACIONAR_SAC182_SEM_GATILHO
     node_type: decision
@@ -354,7 +354,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-182 no estacionamento?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_FECHAR_SAC180_RESUME_MEDIDO_1026
     node_type: decision
@@ -370,7 +370,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «O parque do resume de Workflow reabre?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 edges:
   - from: E_DELTA_DA_RODADA

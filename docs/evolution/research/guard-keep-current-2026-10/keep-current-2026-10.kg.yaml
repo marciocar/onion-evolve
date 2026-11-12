@@ -24,7 +24,7 @@ nodes:
     provenance:
       source: "⟨o host do core⟩: registro npm e o SDK servido pelo bridge"
       locator: "npm view @anthropic-ai/claude-agent-sdk dist-tags --json; leitura do package.json do SDK servido como a conta dona (sudo -n, ambiente limpo)"
-      method: "medição: comandos executados na sessão de 2026-10-16"
+      method: "measurement: comandos executados na sessão de 2026-10-16"
       locality: "repo"
 
   - id: E_PREAMBULO_SO_NO_SCRATCHPAD
@@ -41,7 +41,7 @@ nodes:
     provenance:
       source: "origin/main 9ae5e233"
       locator: "git grep -n 'BASE ATUAL, SEMPRE' 9ae5e233"
-      method: "medição: git grep no core antes da forja"
+      method: "measurement: git grep no core antes da forja"
       locality: "repo"
 
   - id: E_DOGFOOD_CACHE_ENVENENADO
@@ -58,7 +58,7 @@ nodes:
     provenance:
       source: ".claude/validation/currency-census.sh"
       locator: "bloco do cache (a chave) e caso (j) de run_currency_census_selftests"
-      method: "medição: disparo real do hook na sessão de 2026-10-16"
+      method: "measurement: disparo real do hook na sessão de 2026-10-16"
       locality: "repo"
 
   - id: D_SUBSTRATO_HOOK_DE_AVISO
@@ -75,7 +75,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "GUARD_CENSUS_QUERY='version drift stale outdated ' bash .claude/validation/guard-census.sh . --markdown"
-      method: "medição: censo de guardas antes da forja"
+      method: "measurement: censo de guardas antes da forja"
       locality: "repo"
 
   - id: C_TETO_LATEST_NAO_E_ESTABILIDADE
@@ -91,7 +91,7 @@ nodes:
     provenance:
       source: "registro npm"
       locator: "npm view @anthropic-ai/claude-code dist-tags --json"
-      method: "medição: comando executado em 2026-10-16"
+      method: "measurement: comando executado em 2026-10-16"
       locality: "web"
 
   - id: C_TETO_SUBAGENTE_SEM_HOOK
@@ -108,7 +108,7 @@ nodes:
     provenance:
       source: ".claude/settings.json"
       locator: "hooks.UserPromptSubmit (session-currency-check.sh)"
-      method: "leitura: registro do hook no settings do projeto"
+      method: "reading: registro do hook no settings do projeto"
       locality: "repo"
 
   - id: C_TETO_SUPERFICIES_LISTADAS
@@ -124,7 +124,7 @@ nodes:
     provenance:
       source: ".claude/validation/currency-census.sh"
       locator: "cabeçalho, bloco AS SUPERFÍCIES"
-      method: "leitura: cabeçalho do medidor"
+      method: "reading: cabeçalho do medidor"
       locality: "repo"
   - id: D_MANTER_ATUALIZADO_E_ETERNO
     node_type: decision
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «ordem do maestro em dois reforços: 'temos que usar sempre as versões mais atuais e não sair criando coisas em cima de base velha' e 'este aviso anterior de manter atualizado é eterno, não só em memoria e sessão'»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   - id: E_ELENXO_1A_PASSADA_CACHE_E_PRAZO
@@ -156,7 +156,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_currency_census_selftests, casos (i2) (j)-(j5) (k5) (l) (m) (n) (o)"
-      method: "medição: refutador em sandbox e bancada com mutantes, 2026-10-16"
+      method: "measurement: refutador em sandbox e bancada com mutantes, 2026-10-16"
       locality: "repo"
 
   - id: E_ELENXO_2A_PASSADA_EPIPE_E_ESTADO
@@ -172,7 +172,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_currency_census_selftests, casos (n2) (n3) (p) a (z)"
-      method: "medição: refutador em sandbox e bancada com mutantes, 2026-10-16"
+      method: "measurement: refutador em sandbox e bancada com mutantes, 2026-10-16"
       locality: "repo"
   - id: E_REVERIFY_1027_FECHAMENTO_SO_REBASEIA_COM_FLAG
     node_type: evidence

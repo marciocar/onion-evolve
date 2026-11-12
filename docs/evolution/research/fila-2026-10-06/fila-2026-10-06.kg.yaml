@@ -31,7 +31,7 @@ nodes:
     provenance:
       source: ".claude/hooks/bash-empty-result-guard.sh"
       locator: "aviso PR-SEM-PASSADA-ADVERSARIAL nos PRs #932-#939, todos com resíduo"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_HOOK_PR_SEM_PASSADA_CURADO
     node_type: evidence
@@ -47,7 +47,7 @@ nodes:
     provenance:
       source: ".claude/hooks/bash-empty-result-guard.sh"
       locator: "PR #948; casos (s)(t)(u) de run_empty_result_guard_selftests"
-      method: "medição: bancada com mutante e uso ao vivo em três PRs"
+      method: "measurement: bancada com mutante e uso ao vivo em três PRs"
       locality: "repo"
   - id: E_MAPA_SEM_MERGE_ONION_HOOKS
     node_type: evidence
@@ -63,7 +63,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "lint-selftest.sh --affected .claude/utils/adopt/merge-onion-hooks.sh --dry-run"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_DOIS_LEITORES_DIVERGIAM
     node_type: evidence
@@ -79,7 +79,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-radar.sh"
       locator: "kg-radar.sh exit 0 e kg-drive-project.sh exit 2 na semente com dois documentos (curado no PR #938)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
     node_type: evidence
@@ -95,7 +95,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "eval da Porta 0 do onion-slm: 14 casos com REFUTA no rótulo, mais superou/substitui/ALEGAVA"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_RADAR_CEGO_A_TIPO_TROCADO
     node_type: evidence
@@ -111,7 +111,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md"
       locator: "fumaça da Porta 0 do onion-slm: MU-07 20/20 passaram no radar; Claude zero-shot pegou 17/20"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_CANAL_VIVO_ENTRE_SESSOES_USADO
     node_type: evidence
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/co-evolve.md"
       locator: "trocas SendMessage core↔onion-slm em 2026-10-06; uma mensagem não chegou; escrita em db de página alheia"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_MERGE_GATE_INERTE_NO_ADOTANTE
     node_type: evidence
@@ -143,7 +143,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-merge-gate.sh"
       locator: "adoção do onion-kg-ssot: pretooluse-merge-gate.sh sai 0 sem ops/ no repo"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_SKILL_CORE_ONLY_VIAJOU
     node_type: evidence
@@ -159,7 +159,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "_role_cut (case standalone|plugins); resolve-manifest.sh <core> adopted + git archive HEAD lista .claude/skills/onion-publish"
-      method: "medição: manifesto de papel adopted extraído por git archive em 2026-10-17"
+      method: "measurement: manifesto de papel adopted extraído por git archive em 2026-10-17"
       locality: "repo"
   # ── a fila: compromissos abertos, um por item aprovado ───────────────────────────────────────
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-12: «O canal vivo entre sessões vira a 3ª via da co-evolução ao lado do doc-bridge git-async (envelope fixo, registro do envio, decisão descendo ao grafo)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
   # ── 2026-10-07, fim do dia (lote do /meta:drive) ─────────────────────────────────────────────
   - id: D_PAPEL_DUAS_DIMENSOES
@@ -253,7 +253,7 @@ nodes:
     provenance:
       source: ".claude/validation/door-role-parity-check.sh"
       locator: "PR #949: Elenxo REPROVOU o vocabulário único (carimbo standalone liga o modo porta: 0→16 e 0→14 HARD medidos em clones); maestro selou o desenho do Elenxo com hub→hub; bancada door_role_parity (g2)-(g5) + fixture, 3 mutantes"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: Q_VETO_PRETOOLUSE_NO_PR_CREATE
     node_type: question
@@ -280,7 +280,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «granaai medido: está vivo e adotado (carimbo na branch de integração igual ao registro); o aviso vem de o clone local estar numa branch de trabalho sem .claude rastreado e a REGRA 92 ler a árvore de trabalho. Qual a cura?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
   # ── 2026-10-07, noite: seleção do pre-commit (pedido do maestro) ─────────────────────────────
   - id: E_PRECOMMIT_SELECAO_GROSSA
@@ -298,7 +298,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "lint-selftest.sh --affected <arquivo> --dry-run em origin/main 33d4067a: lint-selftest.sh → TODAS (failsafe); docs/README.md → 14; kg-grammar.md → 14; pr-merge-verified.sh → 16; as 14 de docs/README.md estão nas três seleções"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: Q_PRECOMMIT_SELECAO_POR_CASO
     node_type: question
@@ -315,7 +315,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "_selftest_affected_families, _selftest_block_families e run_selftest_selection_selftests"
-      method: "medição: --affected --dry-run em 4 diffs representativos antes e depois; bancada da família nova 18/18; 9 mutantes reprovados; passada adversarial com 5 achados curados e o 6º (dado lido pela guarda) medido no rebase"
+      method: "measurement: --affected --dry-run em 4 diffs representativos antes e depois; bancada da família nova 18/18; 9 mutantes reprovados; passada adversarial com 5 achados curados e o 6º (dado lido pela guarda) medido no rebase"
       locality: "repo"
   - id: E_TM_PERCENTUAL_IGNORA_STORY_POINTS
     node_type: evidence
@@ -331,7 +331,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/zoho.md"
       locator: "zoho.md:311 (% proporcional à contagem de fases do plan.md, pós-#956); grep story.point em .claude/utils/task-manager/ só acha clickup.md; nenhum % de task-mãe calculado"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: Q_TASK_MANAGER_SDAAL_COMPLETO
     node_type: question
@@ -357,7 +357,7 @@ nodes:
     provenance:
       source: "ops/pr-finalize.sh"
       locator: "leva de 2026-10-07/08 com até 6 PRs abertos: #956, #957 (2x), #959 e #960 entraram em CONFLICTING após merges vizinhos; os conflitos relatados nos rebases foram em testing-state.md, testing-inventory.md, backlog.md, kg-read-index.tsv e plugins/ regenerados; conflito de código só 1 (onion-research.js, #957 x #959). PR em CONFLICTING não dispara CI"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: Q_MERGE_DRIVER_PARA_PROJECAO_GERADA
     node_type: question
@@ -383,7 +383,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-08-onion-brain-mcp.md"
       locator: "§O que aconteceu no campo + §O pedido"
-      method: "leitura: sinal do adotante brain-granaai"
+      method: "reading: sinal do adotante brain-granaai"
       locality: "repo"
   - id: Q_ONION_BRAIN_MCP
     node_type: question
@@ -408,7 +408,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-18: «Próxima frente da fila (grafo fila-2026-10-06), qual primeiro?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-18"
       locality: "pessoa"
   - id: D_PODA_CATRACA_E_L2_DIRIGIDO_1019
     node_type: decision
@@ -424,7 +424,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «Poda do CLAUDE.md: com o L1 cumprido (90 sessões, carrega sempre), como seguimos?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
   - id: D_EPIPE_VIRA_GUARDA_DE_CLASSE_1019
     node_type: decision
@@ -440,7 +440,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «A forma printf|grep -q sob pipefail derrubou o CI três vezes hoje e aparece em ~85 pontos. Como seguir?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 edges:
   - from: E_MAPA_SEM_MERGE_ONION_HOOKS

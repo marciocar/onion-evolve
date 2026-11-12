@@ -27,7 +27,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation-roadmap-2026.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── TOOL 1: AUTH/IDENTIDADE (maduro) ──
@@ -44,7 +44,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
       locator: "m2-bridge-logto-KG+flip-P7+m8-serial-2026-08-reverificado"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── TOOL 2: WHATSAPP ──
@@ -62,7 +62,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
       locator: "ledger l.22 (ENT_whatsapp DRIFTED: WAHA vivo; whatsapp-sender inexistente) · corpo de 8b005f65 l.49-53 (sudo find no workspace do bridge: o diretório existe, o serviço não) · onion-waha@86662e01:docker-compose.yml l.12 (image devlikeapro/waha:latest) e l.16 (127.0.0.1:3999:3000)"
-      method: "testemunho: medição no host vivo da VPS em 2026-08-06/07 (ps, docker ps -a, systemctl, sudo find), registrada no ledger M8 e nos commits a8b6cfb7/8b005f65; 234M, mtime de .wwebjs_auth, \"running desde 2026-08-05\" e o 401 não têm comando versionado"
+      method: "testimony: medição no host vivo da VPS em 2026-08-06/07 (ps, docker ps -a, systemctl, sudo find), registrada no ledger M8 e nos commits a8b6cfb7/8b005f65; 234M, mtime de .wwebjs_auth, \"running desde 2026-08-05\" e o 401 não têm comando versionado"
       locality: "repo"
 
   - id: E_waha_public_route_caddy
@@ -78,7 +78,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/ops-waha-public-route.md"
       locator: "l.18 (Origem: ordem do maestro, integração Lovable) + §Prova l.46 (caddy validate, 401 sem chave/chave errada) + §Adendo l.54-62 (token da Hostinger no diretório de config do usuário (host), informado pelo maestro, PUT overwrite:false verificado por releitura, cert LE válido até 2026-11-17, 401 JSON do WAHA); README.md l.41-46 do clone local de onion-waha em c92ff68 (commit não publicado: o remoto só tem 86662e01; host)"
-      method: "leitura: resíduo R56 do PR #634 + commit 21e62755 + README do clone local de onion-waha em c92ff68 (não publicado, host)"
+      method: "reading: resíduo R56 do PR #634 + commit 21e62755 + README do clone local de onion-waha em c92ff68 (não publicado, host)"
       locality: "repo"
 
   - id: E_hub_operacoes_enterprise_demo_route_caddy
@@ -95,7 +95,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/ops-gmill-demo-site.md"
       locator: "l.24 (Origem: ordem do maestro, sessão ⟨de vendas do hub-operacoes-enterprise⟩) + §Achados l.39+ (1: Bearer→401, opção B cookie; 2: route load-bearing, mutante) + §\"Prova ao vivo (2026-10-08)\" l.67+ + §Pendente-com-dono l.80; ops/caddy/conf.d/gmill.caddy l.5-7, l.34-46"
-      method: "leitura: resíduo R56 do branch ops/gmill-demo-site + vhost versionado (commit afca438e)"
+      method: "reading: resíduo R56 do branch ops/gmill-demo-site + vhost versionado (commit afca438e)"
       locality: "repo"
 
   - id: E_librechat_install_started
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: "onion-vps-librechat@c943a9b"
       locator: "README.md l.9-12 (\"chat.onionevolve.com — SSO Logto (Onion ID), só Anthropic na v1 (família Claude 5), escopo completo com RAG\") + corpo do commit (\"boot verificado... VERIFICADO POR COMPORTAMENTO\"); onion-vps-catalog-doctrine.md l.187; docs/evolution/research/librechat-2026-08/SYNTHESIS.md l.12 e l.50-55"
-      method: "testemunho: leitura do commit c943a9b no repo onion-vps-librechat (sem remoto alcançável; host) + KB e síntese versionadas no core"
+      method: "testimony: leitura do commit c943a9b no repo onion-vps-librechat (sem remoto alcançável; host) + KB e síntese versionadas no core"
       locality: "host"
 
   # ── TOOL 3: EMAIL (gap) ──
@@ -163,7 +163,7 @@ nodes:
     provenance:
       source: "docs/discussions/vps-shared-tools/SEED.md"
       locator: "SEED.md l.39 (direção do maestro: MANTER web.js + WAHA PADRÃO, dois adapters) · docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md l.27 (Evolution perde para WAHA/Baileys/wwebjs) · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv l.22, l.25, l.27 · corpo de 8b005f65 l.49-53 (código em disco no workspace do bridge; o serviço não existe) · git ls-tree 8b005f65 .claude/utils/ (sem whatsapp) · vps-shared-tools-2026-07.kg.yaml D_f1_whatsapp_dogfood_first"
-      method: "leitura: direção do maestro no SEED + SYNTHESIS whatsapp-api + ledger M8 versionado (2026-08-06) + corpo de 8b005f65 + git ls-tree 8b005f65"
+      method: "reading: direção do maestro no SEED + SYNTHESIS whatsapp-api + ledger M8 versionado (2026-08-06) + corpo de 8b005f65 + git ls-tree 8b005f65"
       locality: "repo"
 
   - id: D_email_plus_logto_connector
@@ -190,7 +190,7 @@ nodes:
     provenance:
       source: "docs/discussions/vps-shared-tools/SEED.md"
       locator: "direcao-do-maestro+estado-de-execucao-medido-2026-08-06+m8-serial-2026-08-reverificado"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── QUESTOES DE PESQUISA (research-first-over-priors) ──
@@ -273,7 +273,7 @@ nodes:
     provenance:
       source: "commit 1125dfdd (corpo + o nó nascido no diff do mesmo commit)"
       locator: "1125dfdd corpo l.4-12 (VEREDITO CATÁLOGO; híbrido recusado com folha-de-figueira build-gated; nenhuma visão agregada/cross-tool pré-autorizada; precedente task-manager+forge 1→N sem registry) + 1125dfdd:docs/onion/graph/vps-shared-tools-2026-07.kg.yaml (D_framing_catalogo, label integral nascido com o veredito)"
-      method: "juízes: Elenxo de framing wf_8a8eca55 (2 steelman + juiz adversarial), veredito registrado no corpo de 1125dfdd (2026-07-31); journal ausente do host"
+      method: "judges: Elenxo de framing wf_8a8eca55 (2 steelman + juiz adversarial), veredito registrado no corpo de 1125dfdd (2026-07-31); journal ausente do host"
 
   - id: C_dissent_auth_transversal
     node_type: claim
@@ -344,7 +344,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
       locator: "pesquisa-f1-web-verificada-mais-teste-do-gatilho+m8-serial-2026-08-reverificado"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # A DIVIDA que o Elenxo mandou tirar da prosa do commit e por no grafo — e' aqui que
@@ -390,7 +390,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_escada_analise_presumida_cumprida
@@ -420,7 +420,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── AUFHEBUNG RESTAURADA (2026-08-07) — a posicao que o M8 APAGOU em vez de rebaixar ──
@@ -441,7 +441,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CENSO0901_ENT_monitoring
@@ -456,7 +456,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
       locator: "meta.note l.8-12 (F2+F2-b, dois Elenxos, síntese REPROVADA pelo crítico, verificação independente) + l.207 (ANTI-CATÁLOGO: OTel/Prometheus/Grafana e Langfuse NÃO AGORA); docs/analysis/backlog-real-2026-09.md l.53"
-      method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
+      method: "reading: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
       locality: "repo"
 
   - id: E_CENSO0901_A_analysis_structure
@@ -471,7 +471,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "l.77 (§3 PROPOSTAS DE SELO, linha A_analysis_structure; run_id wf_2944480c-98f no frontmatter); stack-harmonia-2026-08.kg.yaml l.16-24 (D_sintese_reprovada)"
-      method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
+      method: "reading: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
       locality: "repo"
 
   - id: E_CENSO0901_C_axis_tunneling
@@ -486,7 +486,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
       locator: "l.214-222 (C_tunneling_nome_errado: \"tunneling é o NOME ERRADO... INGRESSO AUTENTICADO... Caddy + Logto\") + l.207 (ANTI-CATÁLOGO); docs/analysis/backlog-real-2026-09.md l.62"
-      method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
+      method: "reading: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
       locality: "repo"
 
   - id: E_CENSO0901_Q_tunneling
@@ -501,7 +501,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
       locator: "medidos[18] (node_id Q_tunneling, run_id wf_90dd73fe-cd2: verdict DRIFTED, claims 3/3, campo divergence = texto do label)"
-      method: "leitura: docs/evolution/research/census-2026-09-01/data/rodada1.json medidos[18] (node_id Q_tunneling, verdict DRIFTED, claims 3/3, divergence = texto do label), run wf_90dd73fe-cd2"
+      method: "reading: docs/evolution/research/census-2026-09-01/data/rodada1.json medidos[18] (node_id Q_tunneling, verdict DRIFTED, claims 3/3, divergence = texto do label), run wf_90dd73fe-cd2"
       locality: "repo"
 
 
@@ -518,7 +518,7 @@ nodes:
     provenance:
       source: "ops/caddy/conf.d/sandbox.caddy e a saída do ops/install-caddy-config.sh de 2026-10-22"
       locator: "linhas '✓ https://sandbox.onionevolve.com/sandbox.html = 200' e '/qualquer = 404'; E_UI_PILOT_RENDERED_IN_BROWSER_1022"
-      method: "medição: verify do instalador contra o vivo e o render no navegador do maestro"
+      method: "measurement: verify do instalador contra o vivo e o render no navegador do maestro"
       locality: "host"
 
   - id: E_UI_SANDBOX_ORIGIN_LIVE_1022
@@ -533,7 +533,7 @@ nodes:
     provenance:
       source: "saída do ops/update-bridge.sh de 2026-10-22 12:2x UTC (invocação 8e630b44) e curl ao vivo"
       locator: "linhas '[update-bridge] sandbox: ... publicado' e 'OK — clone 7fc418ed · bridge 63542508'"
-      method: "medição: curl -sI e sha256sum da página servida contra o arquivo do bridge servido; claude --version do binário do SDK"
+      method: "measurement: curl -sI e sha256sum da página servida contra o arquivo do bridge servido; claude --version do binário do SDK"
       locality: "host"
 
   - id: E_LOGTO_ADMIN_LOCAL_LISTENER_1022
@@ -549,7 +549,7 @@ nodes:
     provenance:
       source: "medição ao vivo na VPS em 2026-10-22, ops/caddy/conf.d/logto-admin-local.caddy"
       locator: "comentário do vhost e o verify da escuta local"
-      method: "medição: curl contra o Logto em loopback e contra um Caddy descartável com o mesmo bloco"
+      method: "measurement: curl contra o Logto em loopback e contra um Caddy descartável com o mesmo bloco"
       locality: "host"
   - id: D_UI_PILOT_RESPOSTA_POR_ASKUSERQUESTION_1022
     node_type: decision
@@ -565,7 +565,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «Por onde o maestro responde a uma rodada do decide dentro do /chat?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_UI_PILOT_RODADA_GUARDADA_NO_SERVIDOR_1022
     node_type: decision
@@ -581,7 +581,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «A vista some ao recarregar a página; o que fazer?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022
     node_type: decision
@@ -597,7 +597,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «Como a rodada nasce no workspace do /chat, que não tem .claude/validation/?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
 
   - id: E_UI_PILOT_RENDERED_IN_BROWSER_1022
@@ -613,7 +613,7 @@ nodes:
     provenance:
       source: "capturas de tela e Console colados pelo maestro na sessão de 2026-10-22"
       locator: "turno do /chat que chamou decide_panel_view com a rodada 5ad98b3ed4eb0ea7 gerada no workspace"
-      method: "testemunho: capturas de tela do maestro, 2026-10-22"
+      method: "testimony: capturas de tela do maestro, 2026-10-22"
       locality: "pessoa"
   - id: D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022
     node_type: decision
@@ -629,7 +629,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «Como o workspace do admin recebe o motor KG e os comandos atuais, se o --update roda do core e o workspace só aceita escrita do serviço?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
 
   - id: E_WORKSPACE_ADMIN_ONION_ATUALIZADO_1022
@@ -645,7 +645,7 @@ nodes:
     provenance:
       source: "saída do ops/workspace-adopt-sync.sh (apply, reapply e verify) de 2026-10-22"
       locator: "linhas 'workspace-adopt-sync: verify ok' e 'reapply ok'; os dois backups timestampados do wrapper"
-      method: "medição: verify do wrapper, getfacl e find de dono no workspace vivo"
+      method: "measurement: verify do wrapper, getfacl e find de dono no workspace vivo"
       locality: "host"
   - id: D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022
     node_type: decision
@@ -661,7 +661,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «O Docker da VPS (29.1.3 do Ubuntu) fica atrás de todas as correções até o 29.9.2; o que fazer?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
     node_type: decision
@@ -677,7 +677,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «O container do WAHA roda com devlikeapro/waha:latest; fixar a versão?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
 
   - id: E_SEC_SCAN_PHP_DOCKER_SEMANA_1022
@@ -693,7 +693,7 @@ nodes:
     provenance:
       source: "https://docs.docker.com/engine/release-notes/29/"
       locator: "seções 29.7.0, 29.8.2, 29.9.0, 29.9.1 e 29.9.2; e a medição local da sessão do core em 2026-10-22"
-      method: "medição: inventário de versões na VPS e varredura dos repos, cruzados com as notas oficiais de versão"
+      method: "measurement: inventário de versões na VPS e varredura dos repos, cruzados com as notas oficiais de versão"
       locality: "host"
 
   - id: E_WAHA_FIXADA_2026_9_2_1022
@@ -709,7 +709,7 @@ nodes:
     provenance:
       source: "https://github.com/devlikeapro/waha/releases/tag/2026.9.2"
       locator: "releases 2026.8.1 a 2026.9.2; Docker Hub devlikeapro/waha tags latest-2026.7.2 e latest-2026.9.2; PR marciocar/onion-waha#1"
-      method: "medição: digest do container vivo contra as tags publicadas e leitura do changelog"
+      method: "measurement: digest do container vivo contra as tags publicadas e leitura do changelog"
       locality: "web"
 
   - id: Q_WAHA_REVISAO_MENSAL_DA_VERSAO
@@ -734,7 +734,7 @@ nodes:
     provenance:
       source: "saída do ops/docker-engine-migrate.sh (plan, apply e resume) de 2026-10-22 e o docker version ao vivo"
       locator: "linhas 'dockerd não respondeu em 120s' do apply e 'docker-engine-migrate: verify ok' do resume"
-      method: "medição: verify do wrapper contra o vivo, docker version e a API do WAHA"
+      method: "measurement: verify do wrapper contra o vivo, docker version e a API do WAHA"
       locality: "host"
   - id: D_UPDATE_BRIDGE_GANHA_RESTART_1022
     node_type: decision
@@ -750,7 +750,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «O update-bridge.sh não religa quando só o .env muda; o que fazer?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
   - id: E_REVERIFY_ROTA_DEMO_401_E_SEM_DRIFT_1027

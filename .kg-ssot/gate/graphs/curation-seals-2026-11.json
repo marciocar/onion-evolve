@@ -2,7 +2,5 @@
   "graph": "docs/onion/graph/curation-seals-2026-11.kg.yaml",
   "id": "curation-seals-2026-11",
   "must": [],
-  "should": {
-    "form.deprecated.node.provenance.method": 3
-  }
+  "should": {}
 }

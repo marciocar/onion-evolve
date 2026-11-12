@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh@bc0dd373"
       locator: "funções check_agent_frontmatter, check_no_gpt4_model, check_frontmatter_model_category e vizinhas; awk das chaves de topo entre o par de --- da linha 1"
-      method: "medição: leitura das regras e contagem das chaves de topo pela sessão da forja"
+      method: "measurement: leitura das regras e contagem das chaves de topo pela sessão da forja"
       locality: "repo"
 
   - id: E_TABELA_OFICIAL_LIDA
@@ -44,7 +44,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/sub-agents"
       locator: "seção Supported frontmatter fields; e a seção ## 2.1.296 de https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
-      method: "leitura: WebFetch da página inteira (dois trechos) e grep do CHANGELOG"
+      method: "reading: WebFetch da página inteira (dois trechos) e grep do CHANGELOG"
       locality: "web"
 
   - id: E_CENSO_SEM_GUARDA_DA_CLASSE
@@ -59,7 +59,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "seções 'já existe guarda' e 'moldes por SUBSTRATO' da saída de 2026-10-11"
-      method: "medição: guard-census.sh com GUARD_CENSUS_QUERY, injetado na carga do /meta:forge-guard"
+      method: "measurement: guard-census.sh com GUARD_CENSUS_QUERY, injetado na carga do /meta:forge-guard"
       locality: "repo"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
@@ -85,7 +85,7 @@ nodes:
     provenance:
       source: "claude -p --debug-file na 2.1.296, sem as configurações do usuário"
       locator: "linhas WARN 'has frontmatter keys Claude Code does not recognize or apply'"
-      method: "medição: uma chamada, log lido por grep, soma por arquivo e diff com a contagem da guarda"
+      method: "measurement: uma chamada, log lido por grep, soma por arquivo e diff com a contagem da guarda"
       locality: "host"
 
   - id: E_MUTANTES_MORDEM
@@ -101,7 +101,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_agent_frontmatter_keys_selftests, casos a a e mais m"
-      method: "medição: a família rodada com LC_ALL=C e mutate-and-restore.sh com hash de restauração conferido"
+      method: "measurement: a família rodada com LC_ALL=C e mutate-and-restore.sh com hash de restauração conferido"
       locality: "repo"
 
   - id: E_ELENXO_REPROVOU_E_FOI_CURADO
@@ -117,7 +117,7 @@ nodes:
     provenance:
       source: ".claude/validation/agent-frontmatter-keys-check.sh"
       locator: "casos do --selftest marcados Elenxo 1, 2, 3, 4, FN-A e FN-C, e os mutantes correspondentes da bancada"
-      method: "juízes: refutador adversarial com fixtures em diretório temporário, e as curas re-medidas pelo --selftest e pela bancada"
+      method: "judges: refutador adversarial com fixtures em diretório temporário, e as curas re-medidas pelo --selftest e pela bancada"
       locality: "repo"
 
   - id: C_TETO_SO_CHAVE_DE_TOPO

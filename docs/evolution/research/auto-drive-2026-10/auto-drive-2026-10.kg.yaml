@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: "histórico de PRs do core no GitHub (marciocar/onion-evolve)"
       locator: "PRs #955 a #965, mergeados em 2026-10-07/08"
-      method: "leitura: estado dos PRs (gh pr list/view) e logs das rodadas"
+      method: "reading: estado dos PRs (gh pr list/view) e logs das rodadas"
   - id: D_AUTO_DRIVE_DEGRAU_AUTOMATE
     node_type: decision
     layer: audit
@@ -44,7 +44,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-12: «Forjar agora o degrau AUTOMATE do /meta:drive (SAC-74), com as 4 arestas CONSTRAINS como requisito e --merge desligado por padrão?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
   - id: Q_SEGUNDA_OPINIAO_KG_SSOT
     node_type: question
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
       locator: "resposta à pergunta 1, em 2026-10-08"
-      method: "testemunho: resposta de opinião, não medição"
+      method: "testimony: resposta de opinião, não medição"
       locality: "pessoa"
   - id: E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO
     node_type: evidence
@@ -86,7 +86,7 @@ nodes:
     provenance:
       source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
       locator: "resposta à pergunta 2, em 2026-10-08"
-      method: "testemunho: resposta de opinião, não medição"
+      method: "testimony: resposta de opinião, não medição"
       locality: "pessoa"
   - id: E_OPINIAO_RISCOS_QUE_FALTAVAM
     node_type: evidence
@@ -102,7 +102,7 @@ nodes:
     provenance:
       source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
       locator: "resposta à pergunta 3, em 2026-10-08"
-      method: "testemunho: resposta de opinião, não medição"
+      method: "testimony: resposta de opinião, não medição"
       locality: "pessoa"
   - id: E_DOGFOOD_POR_COMANDO_REAL
     node_type: evidence
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: "issue SAC-66 no Linear e o estado escolhido pelo script"
       locator: "primeira transição do SAC-66 em 2026-10-08 (In Review em vez de In Progress)"
-      method: "leitura: estado da issue pela API depois da transição"
+      method: "reading: estado da issue pela API depois da transição"
   - id: Q_GUARDA_API_DIRETA_DE_PROVEDOR
     node_type: question
     layer: audit
@@ -131,7 +131,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml"
       locator: "D_DOIS_SUBSTRATOS_UMA_FRONTEIRA e E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO"
-      method: "medição: censo de guardas, varredura dos transcripts e bancada com mutantes (run_direct_provider_api_selftests)"
+      method: "measurement: censo de guardas, varredura dos transcripts e bancada com mutantes (run_direct_provider_api_selftests)"
       locality: "repo"
     label: "guarda que acusa chamada direta à API de provedor de task manager fora do adapter executável; só nasce depois do SAC-65"
     narrative: "guarda (forjada pelo /meta:forge-guard) que acusa chamada direta à API de provedor de task manager (api.linear.app, zohoapis, api.clickup.com, Jira, Asana) fora do adapter executável; só nasce depois do adapter executável (SAC-65), porque antes dele barraria o único caminho que existe"
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: ".claude/validation/drive-automate.sh e a família run_drive_automate_selftests de .claude/validation/lint-selftest.sh (branch feat/drive-automate-rung)"
       locator: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families drive_automate; resíduo docs/evolution/review/feat-drive-automate-rung.md (a tabela de mutantes)"
-      method: "medição: bancada com um mutante por parada nomeada, cada um numa cópia descartável da árvore, mais dogfood dos comandos reais contra o Linear e o forge"
+      method: "measurement: bancada com um mutante por parada nomeada, cada um numa cópia descartável da árvore, mais dogfood dos comandos reais contra o Linear e o forge"
       locality: "repo"
 edges:
   - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM

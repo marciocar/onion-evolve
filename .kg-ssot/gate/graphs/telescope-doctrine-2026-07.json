@@ -3,7 +3,6 @@
   "id": "telescope-doctrine-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 11,
     "form.required.node.verified_against": 6,
     "integrity.bare-decision": 1,
     "yaml.unquoted-date": 1

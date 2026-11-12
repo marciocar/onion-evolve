@@ -3,7 +3,6 @@
   "id": "triagem-inbox-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 10,
     "form.range.node.label": 13
   }
 }

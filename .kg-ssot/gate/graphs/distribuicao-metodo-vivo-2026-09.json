@@ -3,7 +3,6 @@
   "id": "distribuicao-metodo-vivo-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 46,
     "form.range.node.label": 55,
     "form.required.node.provenance": 3,
     "integrity.bare-decision": 2

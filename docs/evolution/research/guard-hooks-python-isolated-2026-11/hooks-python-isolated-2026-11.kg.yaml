@@ -34,7 +34,7 @@ nodes:
     provenance:
       source: "bancada do agente de sandbox de 2026-11-04, evidência fora da árvore"
       locator: "as 5 células do experimento"
-      method: "medição: hook real, JSON do PreToolUse no stdin, rc lido"
+      method: "measurement: hook real, JSON do PreToolUse no stdin, rc lido"
       locality: "repo"
   - id: E_CENSO_ANTES_E_DEPOIS
     node_type: evidence
@@ -51,7 +51,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
       locator: "python-isolated-check.sh --census, antes e depois"
-      method: "medição: scanner léxico de shell, alvo derivado do settings.json"
+      method: "measurement: scanner léxico de shell, alvo derivado do settings.json"
       locality: "repo"
   - id: D_GUARDA_POR_ALVO_DERIVADO
     node_type: decision
@@ -80,7 +80,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
       locator: "casos da família hooks_python_isolated"
-      method: "medição: interpretador direto, marcador em arquivo, e a família nos dois interpretadores"
+      method: "measurement: interpretador direto, marcador em arquivo, e a família nos dois interpretadores"
       locality: "repo"
   - id: E_O_QUE_I_QUEBRA
     node_type: evidence
@@ -97,7 +97,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml"
       locator: "busca por import yaml e PYTHON no alcance; matriz de interpretadores"
-      method: "medição: busca no alcance dos hooks e matriz nos dois interpretadores"
+      method: "measurement: busca no alcance dos hooks e matriz nos dois interpretadores"
       locality: "repo"
   - id: D_FALHA_DE_ANALISE_FECHA_PELA_FORMA
     node_type: decision
@@ -198,7 +198,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-hooks-python-isolated.md"
       locator: "seção Achados"
-      method: "medição: passada adversarial com corpus, mutantes e laboratório próprio; artefatos fora da árvore"
+      method: "measurement: passada adversarial com corpus, mutantes e laboratório próprio; artefatos fora da árvore"
       locality: "repo"
   - id: C_TETO_DE_CHAVES_FECHA_LEGITIMO
     node_type: claim

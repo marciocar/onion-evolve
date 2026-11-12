@@ -3,7 +3,6 @@
   "id": "claude-code-2.1-onion-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 26,
     "form.range.node.label": 33,
     "form.required.node.provenance": 1,
     "integrity.bare-decision": 2,

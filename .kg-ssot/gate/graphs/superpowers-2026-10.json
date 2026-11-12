@@ -3,7 +3,6 @@
   "id": "superpowers-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 1,
     "form.required.node.provenance": 1
   }
 }

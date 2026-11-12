@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
       locator: "commit 10b69d59"
-      method: "medição: kg_criterion.py digest sobre o arquivo commitado"
+      method: "measurement: kg_criterion.py digest sobre o arquivo commitado"
       locality: "repo"
 
   - id: S_STAGE0_V2
@@ -66,7 +66,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v2.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: S_STAGE0_V3
@@ -90,7 +90,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v3.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: E_L6_AMOSTRA_ABERTA_COM_EMENDA_PENDENTE
@@ -107,7 +107,7 @@ nodes:
     provenance:
       source: 'esta sessão e a sessão principal'
       locator: 'STAGE0.v3.md §1'
-      method: 'medição: reflog; testemunho das duas pontas sobre as mensagens'
+      method: 'measurement: reflog; testemunho das duas pontas sobre as mensagens'
       locality: 'repo'
 
   - id: E_DESVIO_AMOSTRAS_COM_EMENDA_PENDENTE
@@ -124,7 +124,7 @@ nodes:
     provenance:
       source: 'sessão principal e sessão condutora'
       locator: 'RESULT.v1.md, pre-teste/RESULT.v2.md'
-      method: 'medição: reflog; testemunho das duas pontas sobre a ordem'
+      method: 'measurement: reflog; testemunho das duas pontas sobre a ordem'
       locality: 'repo'
 
   - id: E_N0_SEV_PAGERDUTY
@@ -142,7 +142,7 @@ nodes:
     provenance:
       source: 'PagerDuty Incident Response Documentation'
       locator: 'seções Severity Levels e Always Assume The Worst'
-      method: 'leitura: fonte primária'
+      method: 'reading: fonte primária'
       locality: 'web'
 
   - id: E_N0_ERROR_BUDGET_SRE
@@ -160,7 +160,7 @@ nodes:
     provenance:
       source: 'Google SRE Workbook, Apêndice B'
       locator: 'SLO Miss Policy e Escalation Policy'
-      method: 'leitura: fonte primária'
+      method: 'reading: fonte primária'
       locality: 'web'
 
   - id: E_N0_CYNEFIN
@@ -178,7 +178,7 @@ nodes:
     provenance:
       source: 'Wikipedia, Cynefin framework'
       locator: 'seção dos domínios'
-      method: 'leitura: fonte secundária'
+      method: 'reading: fonte secundária'
       locality: 'web'
 
   - id: E_N0_ITIL_OODA_PDCA
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: 'Wikipedia e páginas de fornecedor'
       locator: 'resultados da busca'
-      method: 'leitura: fonte secundária'
+      method: 'reading: fonte secundária'
       locality: 'web'
 
   - id: E_N0_AUTONOMIA_POR_PAPEL
@@ -215,7 +215,7 @@ nodes:
     provenance:
       source: 'arXiv'
       locator: 'abstract'
-      method: 'leitura: fonte primária'
+      method: 'reading: fonte primária'
       locality: 'web'
 
   - id: E_N0_AUTO_MODE_FALSO_NEGATIVO
@@ -234,7 +234,7 @@ nodes:
     provenance:
       source: 'Anthropic Engineering, How we built Claude Code auto mode'
       locator: 'Tier 1 a 3, tabela de avaliação e backstop de negações'
-      method: 'leitura: fonte primária'
+      method: 'reading: fonte primária'
       locality: 'web'
 
   - id: E_N0_AGENTES_DE_CODIGO_GUARDRAILS
@@ -252,7 +252,7 @@ nodes:
     provenance:
       source: 'docs Claude Code e developers.openai.com/codex/agent-approvals-security'
       locator: 'Available modes e Actions no mode auto-approves'
-      method: 'leitura: primária (Claude Code) e resumo (Codex)'
+      method: 'reading: primária (Claude Code) e resumo (Codex)'
       locality: 'web'
 
   - id: E_N0_AI_SRE_CAPITAL
@@ -271,7 +271,7 @@ nodes:
     provenance:
       source: 'imprensa de tecnologia e guias de compra'
       locator: 'resultados da busca'
-      method: 'leitura: fonte secundária'
+      method: 'reading: fonte secundária'
       locality: 'web'
 
   - id: E_N0_CAPA_PROPORCIONAL
@@ -289,7 +289,7 @@ nodes:
     provenance:
       source: 'comentário especializado e fornecedores'
       locator: 'resultados da busca'
-      method: 'leitura: fonte secundária'
+      method: 'reading: fonte secundária'
       locality: 'web'
 
   - id: E_N0_CORPUS_PECAS_VIZINHAS
@@ -307,7 +307,7 @@ nodes:
     provenance:
       source: 'repo, base d6c3bfdbd'
       locator: 'decide-doctrine §1, drive-doctrine §3, pretooluse-moat-gate.sh'
-      method: 'leitura: código e doutrinas'
+      method: 'reading: código e doutrinas'
       locality: 'repo'
 
   - id: E_N1_BURACO_MEDIDO
@@ -325,7 +325,7 @@ nodes:
     provenance:
       source: 'repo, base d6c3bfdbd'
       locator: '.claude/commands/meta/analyze-complex-problem.md, Passo 1'
-      method: 'medição: grep e leitura; a ausência vale para o que foi nomeado com esses termos'
+      method: 'measurement: grep e leitura; a ausência vale para o que foi nomeado com esses termos'
       locality: 'repo'
 
   - id: E_N2_V1_REPROVADA
@@ -343,7 +343,7 @@ nodes:
     provenance:
       source: 'experimento pré-registrado desta pasta'
       locator: 'ROUTES.a1.json, ROUTES.a2.json, JUDGE.a2-on-a1.json, GABARITO.md'
-      method: 'medição: dois processos sem ferramenta, fora do repo, cegos ao desfecho; juiz cego às próprias rotas'
+      method: 'measurement: dois processos sem ferramenta, fora do repo, cegos ao desfecho; juiz cego às próprias rotas'
       locality: 'repo'
 
   - id: E_N2_V2_REPROVADA
@@ -361,7 +361,7 @@ nodes:
     provenance:
       source: 'experimento pré-registrado desta pasta, sorteio novo'
       locator: 'pre-teste/ROUTES.v2.a1.json, pre-teste/ROUTES.v2.a2.json, pre-teste/JUDGE.v2.a2-on-a1.json, pre-teste/GABARITO.v2.md'
-      method: 'medição: mesmos dois processos, para ficar no limite de 2; o 2º contaminado e declarado'
+      method: 'measurement: mesmos dois processos, para ficar no limite de 2; o 2º contaminado e declarado'
       locality: 'repo'
 
   - id: C_N2_CURAR_PERGUNTA_ABRE_LICENCA
@@ -378,7 +378,7 @@ nodes:
     provenance:
       source: 'esta pasta'
       locator: 'pre-teste/FORMULA.v2-preteste.md, parágrafo Não são protegidos; pre-teste/ROUTES.v2.a1.json G07 e G15'
-      method: 'leitura: a sessão sobre medição'
+      method: 'reading: a sessão sobre medição'
       locality: 'repo'
 
   - id: E_N3_BUSCA_SUPERACAO
@@ -396,7 +396,7 @@ nodes:
     provenance:
       source: 'blogs de praticantes, Elastic Observability Labs, arXiv 2602.11749'
       locator: 'resultados das duas buscas'
-      method: 'leitura: fonte secundária'
+      method: 'reading: fonte secundária'
       locality: 'web'
 
   - id: C_N3_ROTEADOR_NAO_COMANDO
@@ -414,7 +414,7 @@ nodes:
     provenance:
       source: 'esta pasta'
       locator: 'SYNTHESIS.md, seção N3'
-      method: 'derivado: análise da sessão, sem medição da forma'
+      method: 'derived: análise da sessão, sem medição da forma'
       locality: 'repo'
 
   - id: E_N2_V2_OFICIAL
@@ -431,7 +431,7 @@ nodes:
     provenance:
       source: 'experimento pré-registrado desta pasta'
       locator: 'GABARITO.v2.json, ROUTES.v2.a1.json, JUDGE.v2.json'
-      method: 'medição: processos novos sem ferramenta, fora do repo; gabarito de processo que não leu a fórmula; juiz com viés retrospectivo declarado'
+      method: 'measurement: processos novos sem ferramenta, fora do repo; gabarito de processo que não leu a fórmula; juiz com viés retrospectivo declarado'
       locality: 'repo'
 
   - id: E_N1_CAPTURA_POR_LEITURA
@@ -449,7 +449,7 @@ nodes:
     provenance:
       source: 'repo'
       locator: 'cabeçalhos dos comandos e skills'
-      method: 'leitura: os artefatos lidos, sem execução'
+      method: 'reading: os artefatos lidos, sem execução'
       locality: 'repo'
 
   - id: E_N1_ESCADA_POR_LEITURA
@@ -467,7 +467,7 @@ nodes:
     provenance:
       source: 'repo e arXiv 2506.12469'
       locator: 'drive-doctrine §3; session-orchestration-2026-11'
-      method: 'leitura: os artefatos lidos, sem execução'
+      method: 'reading: os artefatos lidos, sem execução'
       locality: 'repo'
 
   - id: C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA
@@ -485,7 +485,7 @@ nodes:
     provenance:
       source: 'esta pasta'
       locator: 'SYNTHESIS.md, seção Sem exceção'
-      method: 'derivado: análise da sessão'
+      method: 'derived: análise da sessão'
       locality: 'repo'
 
   - id: Q_PF_EXPERIMENTO_AO_VIVO
@@ -500,7 +500,7 @@ nodes:
     provenance:
       source: 'esta pasta'
       locator: 'SYNTHESIS.md, gatilho do parque'
-      method: 'derivado: pergunta do estudo'
+      method: 'derived: pergunta do estudo'
       locality: 'repo'
 
   - id: D_PROBLEM_FORMULA_VERDICT
@@ -551,7 +551,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
       locator: "item E1 da Etapa 0"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "E1 neste estudo é E1 agir demais: código local do estudo, não da casa."
     x_term:
@@ -572,7 +572,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
       locator: "item E2 da Etapa 0"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "E2 neste estudo é E2 recall do protegido: código local do estudo, não da casa."
     x_term:
@@ -593,7 +593,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.md"
       locator: "item E3 da Etapa 0"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "E3 neste estudo é E3 cobertura: código local do estudo, não da casa."
     x_term:
@@ -614,7 +614,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/STAGE0.v2.md"
       locator: "item P5 da emenda v2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P5 neste estudo é P5 ERRO-B: código local do estudo, não da casa."
     x_term:
@@ -635,7 +635,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/GABARITO.md"
       locator: "linha F17, caso B2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "B2 neste estudo é caso B2 da amostra: código local do estudo, não da casa."
     x_term:
@@ -656,7 +656,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/GABARITO.md"
       locator: "linha F24, caso L3"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "L3 neste estudo é caso L3 da amostra: código local do estudo, não da casa."
     x_term:
@@ -677,7 +677,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml"
       locator: "nó E_N0_ERROR_BUDGET_SRE"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P0 neste estudo é P0 (severidade de incidente): código de fonte externa, não da casa."
     x_term:
@@ -698,7 +698,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml"
       locator: "nó E_N0_CAPA_PROPORCIONAL"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "Q9 neste estudo é ICH Q9: código de fonte externa, não da casa."
     x_term:

@@ -29,7 +29,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/"
       locator: "mapa-completo-do-frontend-2026-08-14-2400-linhas-registry-metade-inerte-zero-persistencia-admin-morto"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_programa_bridge_evolve
@@ -45,7 +45,7 @@ nodes:
     provenance:
       source: "plano enumerated-squishing-adleman.md do harness (host)"
       locator: "plano-aprovado-pelo-maestro-com-4-decisoes-seladas-e-reforco-de-versoes-latest"
-      method: "testemunho: leitura do plano enumerated-squishing-adleman.md do harness no host 2026-08-14; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: leitura do plano enumerated-squishing-adleman.md do harness no host 2026-08-14; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "host"
 
   - id: F0_ALICERCE_FIACAO
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "deploy da fase F0 medido em produção: health ok, PWA, invocação nova, enforce no-op (host)"
       locator: "onion-bridge@28f3ad96:web/src/runtime/onion-runtime.ts ; deploy-em-producao-health-ok-pwa-true-invocacao-nova-auth-enforce-noop-do-mecanismo-e-estabilidade"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@28f3ad96:web/src/runtime/onion-runtime.ts"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@28f3ad96:web/src/runtime/onion-runtime.ts"
       locality: "host"
 
   - id: F1_FAROL_PESQUISA
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "deploy da fase F2 medido em produção: /threads 401 sem token, SPA fallback servindo index, bancada 22 testes (host)"
       locator: "onion-bridge@c2b4e9db:web/src/App.tsx ; deploy-em-producao-threads-401-sem-token-spa-fallback-servindo-index-bench-22-testes-gzip-253kib"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@c2b4e9db:web/src/App.tsx"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@c2b4e9db:web/src/App.tsx"
       locality: "host"
 
   - id: F3_ROSTO_REDESIGN
@@ -105,7 +105,7 @@ nodes:
     provenance:
       source: "deploy da fase F3 pelo mecanismo, medido em produção: bridge 1d45531 health ok, 38 testes, gzip no orçamento (host)"
       locator: "onion-bridge@1d45531a:web/src/theme/onion.css ; deploy-pelo-mecanismo-ramo-cheio-limpo-bridge-1d45531-health-ok-38-testes-gzip-no-orcamento"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@1d45531a:web/src/theme/onion.css"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@1d45531a:web/src/theme/onion.css"
       locality: "host"
 
   - id: F4_GOVERNO_ADMIN
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: "deploy da fase F4 medido em produção: convite anônimo 401, guards de usage, SPA admin 200, M2M sem .env (host)"
       locator: "onion-bridge@43afd2bd:src/meter.ts ; deploy-limpo-3a-vez-invite-anonimo-401-em-producao-usage-guards-ok-spa-admin-200-m2m-no-env"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@43afd2bd:src/meter.ts"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@43afd2bd:src/meter.ts"
       locality: "host"
 
   - id: F5_PRACA_DIVULGACAO
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "deploy 28f3ad96 da fase F5 com provas vivas em produção: shared 404 noindex/nostore, share anônimo 401, hit31 429 (host)"
       locator: "onion-bridge@28f3ad96:web/vite.config.ts ; deploy-28f3ad96-provas-vivas-shared-404-noindex-nostore-share-anonimo-401-s-noindex-hit31-429-selftest-16-16-bench-verde"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@28f3ad96:web/vite.config.ts"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@28f3ad96:web/vite.config.ts"
       locality: "host"
 
   - id: E_DEMO_CAMPO_2026_08_14
@@ -153,7 +153,7 @@ nodes:
     provenance:
       source: "demo do maestro em desktop e mobile com screenshots (relato) (host)"
       locator: "demo-real-do-maestro-desktop-e-mobile-8-achados-com-screenshot-curas-em-29b946da"
-      method: "testemunho: medição de comportamento no host 2026-08-14"
+      method: "testimony: medição de comportamento no host 2026-08-14"
       locality: "host"
 
   - id: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
@@ -170,7 +170,7 @@ nodes:
     provenance:
       source: "sonda com agente real contra o bridge em produção (host)"
       locator: "onion-bridge@a7184ef1:src/chat.ts (último commit do arquivo até 2026-08-15; não há registro de a sonda ter rodado antes ou depois dele) ; sonda-agente-real-cwd-workspace-bypass-respondeu-14-linhas-do-.env-e-16-re-sondas-das-curas"
-      method: "testemunho: medição de comportamento no host 2026-08-15"
+      method: "testimony: medição de comportamento no host 2026-08-15"
       locality: "host"
 
   - id: F_ID_1_ADOCAO_LIMPA
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: "deploy 2e10b497 da F-ID.1 medido em produção: catch-up limpo, 50 comandos vivos, vizinho bloqueado cross-workspace (host)"
       locator: "onion-bridge@2e10b497:src/workspace.ts ; deploy-2e10b497-dogfood-catch-up-LIMPO-comandos-onion-50-vivos-cross-workspace-VIZINHO_BLOQUEADO-vendor-manifest-5-5"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em onion-bridge@2e10b497:src/workspace.ts"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em onion-bridge@2e10b497:src/workspace.ts"
       locality: "host"
 
   - id: F_ID_2_CONTEXTOS_ORG
@@ -203,7 +203,7 @@ nodes:
     provenance:
       source: "deploy 83033b25 da F-ID.2 medido em produção: org povoada, dual-token, 7 ataques fail-closed, realpath nega symlink (host)"
       locator: "onion-bridge@83033b25:src/context.ts ; deploy-83033b25-org-granaai-povoada-dual-token-7-ataques-fail-closed-conflito-sem-marcadores-realpath-nega-symlink"
-      method: "testemunho: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em onion-bridge@83033b25:src/context.ts"
+      method: "testimony: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em onion-bridge@83033b25:src/context.ts"
       locality: "host"
 
   - id: F_ID_3_SUPERFICIE
@@ -220,7 +220,7 @@ nodes:
     provenance:
       source: "01ddba9c (corpo, core) + onion-bridge@3720e476, 7aa03ae, d4bb1a5, 82a81ea, 22a383e"
       locator: "git show -s 01ddba9c (\"F_ID_3_SUPERFICIE → done (ALTOs curados + teste de navegador...)\"); corpos de 3720e47 (3a), 7aa03ae (3b), d4bb1a5 (3c), 82a81ea (2 críticos), 22a383e (ALTOs) em onion-bridge"
-      method: "leitura: corpos de 3720e47/7aa03ae/d4bb1a5/82a81ea/22a383e em onion-bridge + corpo de 01ddba9c (transição a done)"
+      method: "reading: corpos de 3720e47/7aa03ae/d4bb1a5/82a81ea/22a383e em onion-bridge + corpo de 01ddba9c (transição a done)"
       locality: "repo"
 
   - id: F_ID_4_MGM
@@ -237,7 +237,7 @@ nodes:
     provenance:
       source: "onion-bridge@600cd9b3 + onion-bridge@c91374da (corpos)"
       locator: "corpo de 600cd9b (store tmp+rename, POST /me/referrals, \"Indicações pendentes\"); corpo de c91374d (Elenxo F-ID.4, 13 achados, \"o tenant AGORA aceita e-mail como login\"); git show -s 01ddba9c"
-      method: "leitura: corpos de 600cd9b3 e c91374da no remoto marciocar/onion-bridge"
+      method: "reading: corpos de 600cd9b3 e c91374da no remoto marciocar/onion-bridge"
       locality: "repo"
 
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
@@ -264,7 +264,7 @@ nodes:
     provenance:
       source: "Management API do Logto da VPS (DELETE 204, role criada 201) (host)"
       locator: "management-api-delete-204-role-bridge-admin-criada-201-scopes-finais-listados"
-      method: "testemunho: medição de comportamento no host 2026-08-14"
+      method: "testimony: medição de comportamento no host 2026-08-14"
       locality: "host"
 
   - id: Q_G5_DOGFOOD_GO_LIVE
@@ -311,7 +311,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_MISSION_CONTROL_CONCORRENTE_DIRETO
@@ -327,7 +327,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.88"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_AUTOMODE_BACKLASH_APROVACAO_BINARIA
@@ -343,7 +343,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.85"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CHAT_MORTO_VS_GENUI_REJEITADA
@@ -359,7 +359,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.65"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_MEMORIA_BITEMPORAL_VENCE_MEM0
@@ -375,7 +375,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PROGRESSO_VISIVEL_3X_RETENCAO
@@ -391,7 +391,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.5"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_IOS_PWA_TETO_DURO_SYNC
@@ -407,7 +407,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.75"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_OPENWEBUI_LICENCA_OPENWASHING
@@ -423,7 +423,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.85"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_OIDC_TABLE_STAKE_MAL_RESOLVIDO
@@ -439,7 +439,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.8"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PRICING_PISO_20_SEAT
@@ -455,7 +455,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.55"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_TETOS_DA_PESQUISA
@@ -471,7 +471,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "completeness-critic-do-proprio-run-7-lacunas-nomeadas"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_G1_POSICAO_E_CORTE_SELADOS
@@ -487,7 +487,7 @@ nodes:
     provenance:
       source: "docs/analysis/bridge-posicionamento-2026-08.md"
       locator: "askuserquestion-2026-08-14-selar-como-proposto-e-pr03b-na-f0-ja"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_MULTICONVERSA_TABLE_STAKE
@@ -503,7 +503,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "lentes-a1-a2-e-issue-8928-relida-ao-vivo-pelo-10o-elenxo-fechada-2025-01-31"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_QUOTA_GAP_FECHADO_ABRIL_2026
@@ -519,7 +519,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
       locator: "10o-elenxo-releu-as-4-issues-na-api-do-github-todas-closed-completed"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_G3_DEMO_DO_MAESTRO
@@ -534,7 +534,7 @@ nodes:
     provenance:
       source: "21c74dce (corpo e diff do label, core) + 2e4d16d8 (corpo)"
       locator: "git show -s 21c74dce (corpo l.4-21); docs/evolution/review/docs-close-g3-gate.md:21-39; git show -s 2e4d16d8 (corpo l.29-30: \"bordas dark 1,35:1... splash do PWA sempre creme\")"
-      method: "testemunho: medição da sessão 2026-08-16 (thread-store, deep-link, marcador de anexo) relatada em 1ª pessoa no commit 21c74dce e no resíduo PR #615, comando não registrado; as escolhas 1,35:1/splash creme registradas no corpo de 2e4d16d8"
+      method: "testimony: medição da sessão 2026-08-16 (thread-store, deep-link, marcador de anexo) relatada em 1ª pessoa no commit 21c74dce e no resíduo PR #615, comando não registrado; as escolhas 1,35:1/splash creme registradas no corpo de 2e4d16d8"
 
   - id: D_FASE_ID_CONTEINER_DE_IDENTIDADE
     node_type: decision
@@ -549,7 +549,7 @@ nodes:
     provenance:
       source: "e103c346 (corpo, core) + onion-bridge@98ab1af9 e 869af3c (corpos)"
       locator: "git show -s e103c346 (corpo l.3-6); onion-bridge 98ab1af corpo (\"Company Brain (org) e Second Brain (pessoal)\"; \"substrato do F6\"); 869af3c corpo (\"o furo que a 3ª entrada, marcio@grana.ai, expôs\"); docs/evolution/review/docs-kg-fase-f-id-fechada.md:23"
-      method: "leitura: corpo de e103c346 + corpos de 98ab1af e 869af3c em onion-bridge + resíduo PR #609 (docs-kg-fase-f-id-fechada.md:23)"
+      method: "reading: corpo de e103c346 + corpos de 98ab1af e 869af3c em onion-bridge + resíduo PR #609 (docs-kg-fase-f-id-fechada.md:23)"
       locality: "repo"
 
   - id: F_ID_2_DUAL_TOKEN_CONTEXTO
@@ -564,7 +564,7 @@ nodes:
     provenance:
       source: "onion-bridge@c91374da:src/context.ts"
       locator: "c91374d:src/context.ts:1-10 (par p:/o:, dual-token, anti-replay), :41 (storeKey h16), :44-80 (resolveCtx Promise.all, fail-closed → 403 em server.ts:236); corpo de 98ab1af e 83033b2; docs/onion/federation-orgs.json:2; corpo de 368e7a7"
-      method: "leitura: c91374d:src/context.ts e server.ts em onion-bridge + docs/onion/federation-orgs.json:2"
+      method: "reading: c91374d:src/context.ts e server.ts em onion-bridge + docs/onion/federation-orgs.json:2"
       locality: "repo"
 
   - id: F_ID_4_MGM_REFERRALS
@@ -580,7 +580,7 @@ nodes:
     provenance:
       source: "onion-bridge@c91374da:web/src/admin/UsageDashboard.tsx"
       locator: "c91374d:web/src/admin/UsageDashboard.tsx:136-141 (\"Indicações pendentes\"); c91374d:web/src/org/OrgMembers.tsx:54; corpos de 600cd9b e c91374d"
-      method: "leitura: corpos de 600cd9b e c91374d + UsageDashboard.tsx/OrgMembers.tsx @c91374d em onion-bridge"
+      method: "reading: corpos de 600cd9b e c91374d + UsageDashboard.tsx/OrgMembers.tsx @c91374d em onion-bridge"
       locality: "repo"
 
   - id: E_CONVITE_FUNCIONA_EMAIL_LOGIN
@@ -595,7 +595,7 @@ nodes:
     provenance:
       source: "onion-bridge@0914ff6b:ops/logto-sign-in-exp.baseline.json"
       locator: "ops/logto-sign-in-exp.baseline.json:30-32 @0914ff6 (identifier email, verificationCode true); corpo de c91374d; corpo de d4bb1a5; c91374d:web/src/admin/UsageDashboard.tsx:112-114"
-      method: "leitura: baseline do sign-in-exp versionado em 0914ff6 + corpos de c91374d e d4bb1a5 + UsageDashboard.tsx@c91374d (onion-bridge)"
+      method: "reading: baseline do sign-in-exp versionado em 0914ff6 + corpos de c91374d e d4bb1a5 + UsageDashboard.tsx@c91374d (onion-bridge)"
       locality: "repo"
 
   - id: Q_G_ID_PROVA_HUMANA
@@ -610,7 +610,7 @@ nodes:
     provenance:
       source: "2e1f212a (corpo do commit, core)"
       locator: "git show -s 2e1f212a (corpo l.3-11); docs/evolution/review/docs-human-gates-closed.md:21-27"
-      method: "testemunho: medição da sessão 2026-08-16 no tenant Logto e no ledger do bridge (1ª pessoa em 2e1f212a e resíduo PR #614), comando não registrado"
+      method: "testimony: medição da sessão 2026-08-16 no tenant Logto e no ledger do bridge (1ª pessoa em 2e1f212a e resíduo PR #614), comando não registrado"
       locality: "repo"
 
   - id: D_ROUND_INVITE_SIGNUP_PROFILE
@@ -625,7 +625,7 @@ nodes:
     provenance:
       source: "onion-bridge@0914ff6b..9ba71af0 (corpos)"
       locator: "corpos de 0914ff6 (F0), 2b04160 (F1), 61ef56e (F2a), 787e610+e1605e9 (F2b), 278d9bc (F3), 01cd4bf+d9699f0 (F4), 9ba71af (F5); docs/evolution/review/docs-round-invite-profile-announce.md:25; docs/evolution/federation/CHANGELOG.md:336-350"
-      method: "leitura: commits 0914ff6..9ba71af em onion-bridge + resíduo PR #610 (provas vivas) + CHANGELOG da federação (anúncio \"aplicar direto, registrar depois\")"
+      method: "reading: commits 0914ff6..9ba71af em onion-bridge + resíduo PR #610 (provas vivas) + CHANGELOG da federação (anúncio \"aplicar direto, registrar depois\")"
       locality: "repo"
 
   - id: Q_ROUND_HUMAN_PROOF
@@ -640,7 +640,7 @@ nodes:
     provenance:
       source: "857654fc (corpo do commit, core)"
       locator: "git show -s 2e1f212a (corpo l.13-21) e 857654fc (corpo l.3-14); docs/evolution/review/docs-close-round-human-proof.md:20-26; docs/evolution/review/docs-human-gates-closed.md:25-27"
-      method: "testemunho: medição da sessão 2026-08-15/16 no tenant (1ª pessoa em 2e1f212a e 857654fc), comando não registrado; item (5)🔁 = atestado do maestro (e-mail recebido), 2026-08-16"
+      method: "testimony: medição da sessão 2026-08-15/16 no tenant (1ª pessoa em 2e1f212a e 857654fc), comando não registrado; item (5)🔁 = atestado do maestro (e-mail recebido), 2026-08-16"
       locality: "repo"
 
   - id: Q_F3_DECISOES_DE_ACABAMENTO
@@ -666,7 +666,7 @@ nodes:
     provenance:
       source: "onion-bridge@a7184ef1, 7ff20f7, 867f95d (corpos)"
       locator: "corpos de a7184ef (ALTO 1/2, BAIXO 11/12), 7ff20f7 (MÉDIO 4-7), 867f95d (ALTO 3, pat-selftest); docs/evolution/review/docs-round-elenxo-cured.md:19-23"
-      method: "leitura: commits a7184ef/7ff20f7/867f95d em onion-bridge + resíduo PR #611 (docs-round-elenxo-cured.md:19-23)"
+      method: "reading: commits a7184ef/7ff20f7/867f95d em onion-bridge + resíduo PR #611 (docs-round-elenxo-cured.md:19-23)"
       locality: "repo"
   - id: E_REVERIFY_1027_CONTEXTO_DO_BRIDGE_FORA_DE_ALCANCE
     node_type: evidence

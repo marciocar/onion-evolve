@@ -21,7 +21,7 @@ nodes:
     provenance:
       source: ".claude/rules/kg-grammar.md@699a88e3"
       locator: "linha da tabela do campo provenance (SAC-80); pretooluse-merge-gate.sh cabeçalho e função deny; onion-orchestration/SKILL.md seção Gotchas"
-      method: "leitura: os três sítios em origin/main e a saída de vendor-manifest.sh por papel"
+      method: "reading: os três sítios em origin/main e a saída de vendor-manifest.sh por papel"
       locality: "repo"
 
   - id: E_CENSO_SEM_GUARDA_DA_CLASSE
@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "seções 'já existe guarda' e 'moldes por SUBSTRATO' da saída de 2026-10-11"
-      method: "medição: guard-census.sh com GUARD_CENSUS_QUERY, rodado pela sessão da forja"
+      method: "measurement: guard-census.sh com GUARD_CENSUS_QUERY, rodado pela sessão da forja"
       locality: "repo"
 
   - id: E_PASSIVO_MEDIDO
@@ -51,7 +51,7 @@ nodes:
     provenance:
       source: ".claude/validation/ops-citation-travel-baseline.txt"
       locator: "31 entradas no formato arquivo, token e contagem; escopo declarado na linha scope"
-      method: "medição: ops-citation-travel-check.sh --emit-baseline sobre a worktree da forja"
+      method: "measurement: ops-citation-travel-check.sh --emit-baseline sobre a worktree da forja"
       locality: "repo"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA
@@ -86,7 +86,7 @@ nodes:
     provenance:
       source: ".claude/rules/kg-grammar.md"
       locator: "linha do campo provenance; pretooluse-merge-gate.sh cabeçalho e deny; onion-orchestration/SKILL.md Gotchas"
-      method: "medição: emissão do baseline antes (36) e depois (33) da cura"
+      method: "measurement: emissão do baseline antes (36) e depois (33) da cura"
       locality: "repo"
 
   - id: E_MUTANTES_MORDEM
@@ -102,7 +102,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_ops_citation_travel_selftests, casos a, b, c e m"
-      method: "medição: mutate-and-restore.sh com hash de restauração conferido, e a família rodada com LC_ALL=C"
+      method: "measurement: mutate-and-restore.sh com hash de restauração conferido, e a família rodada com LC_ALL=C"
       locality: "repo"
 
   - id: E_ELENXO_REPROVOU_E_FOI_CURADO
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: ".claude/validation/ops-citation-travel-check.sh"
       locator: "casos x a xvii do --selftest e os mutantes correspondentes da bancada"
-      method: "juízes: refutador com mandato de falso positivo; curas re-medidas pelo --selftest, pelos mutantes e pelo corpus real"
+      method: "judges: refutador com mandato de falso positivo; curas re-medidas pelo --selftest, pelos mutantes e pelo corpus real"
       locality: "repo"
 
   - id: C_TETO_FORMA_NAO_SENTIDO

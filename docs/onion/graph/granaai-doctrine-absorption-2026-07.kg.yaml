@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml:154"
       locator: "docs/evolution/federation/members.yaml:154"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: E_S1
     node_type: evidence
@@ -34,7 +34,7 @@ nodes:
     provenance:
       source: "granaai:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
       locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
   - id: E_S3
     node_type: evidence
     layer: audit
@@ -48,7 +48,7 @@ nodes:
     provenance:
       source: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
       locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
   - id: E_S2
     node_type: evidence
     layer: audit
@@ -62,7 +62,7 @@ nodes:
     provenance:
       source: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
       locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
   - id: E_S4
     node_type: evidence
     layer: audit
@@ -76,7 +76,7 @@ nodes:
     provenance:
       source: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
       locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
   - id: C_S1
     node_type: claim
     layer: audit
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "knowledge-graph-sdaal.md l.50-59 ('Nota de doutrina — integridade técnica ≠ completude de rastreabilidade')"
-      method: "leitura: nota de doutrina viva na KB, absorvida pelo commit e21c82ba (2026-07-18) do sinal granaai 2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
+      method: "reading: nota de doutrina viva na KB, absorvida pelo commit e21c82ba (2026-07-18) do sinal granaai 2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
       locality: "repo"
   - id: C_S3a
     node_type: claim
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "knowledge-graph-sdaal.md l.61-63 ('Doutrina (S3a) — soberania do validador') e l.551-552"
-      method: "leitura: nota de doutrina viva na KB, absorvida pelo commit e21c82ba (2026-07-18) do sinal granaai 2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
+      method: "reading: nota de doutrina viva na KB, absorvida pelo commit e21c82ba (2026-07-18) do sinal granaai 2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
       locality: "repo"
   - id: C_S3b
     node_type: claim
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md + commit 773d5e4a"
       locator: "sinal l.52-53 e l.63; git show 773d5e4a (2026-07-18, fix(adopt): --update regenera inventory.md pos-copia); mecanismo vivo em .claude/commands/meta/adopt.md l.310 (passo 8 regenera inventory+graph)"
-      method: "leitura: sinal de campo granaai (2026-07-17) que descreve a feature + commit 773d5e4a que a construiu"
+      method: "reading: sinal de campo granaai (2026-07-17) que descreve a feature + commit 773d5e4a que a construiu"
       locality: "repo"
   - id: C_S4
     node_type: claim
@@ -142,7 +142,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
       locator: "l.94-96 ('o radar valida o carimbo, não a forma') e l.28 ('parseou zero nós e mesmo assim passou verde')"
-      method: "leitura: sinal de campo do adotante granaai (2026-07-17) em docs/evolution/inbox/_processed/"
+      method: "reading: sinal de campo do adotante granaai (2026-07-17) em docs/evolution/inbox/_processed/"
       locality: "repo"
   - id: D_ABSORB_KB
     node_type: decision
@@ -157,7 +157,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: D_BACKLOG
     node_type: decision
@@ -172,7 +172,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
       locator: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: D_S2_ABSORBED
     node_type: decision
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-radar.sh:120"
       locator: ".claude/validation/kg-radar.sh:120"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 edges:
   - from: E_S1

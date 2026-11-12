@@ -3,7 +3,6 @@
   "id": "granaai-doctrine-absorption-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 12,
     "form.required.node.verified_against": 3,
     "yaml.unquoted-date": 1
   }

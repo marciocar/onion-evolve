@@ -3,7 +3,6 @@
   "id": "kg-id-valid-from-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 3,
     "form.range.node.label": 6,
     "form.required.node.provenance": 3
   }

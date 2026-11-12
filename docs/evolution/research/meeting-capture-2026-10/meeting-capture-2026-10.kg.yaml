@@ -46,7 +46,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Modelo aviso ≠ consentimento do anarlog (P_CONSENT_EVIDENCE_REWRITE): absorver por reescrita como campos do grafo de cada reunião? [texto da pergunta reconstruído do tema pela triagem; o literal não chegou ao agente que selou]»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   - id: E_MEETING_GRAPH_GATE_1016
@@ -63,7 +63,7 @@ nodes:
     provenance:
       source: ".claude/validation/meeting-graph-check.sh"
       locator: "--selftest; lint-selftest.sh, run_meeting_graph_selftests"
-      method: "medição: selftest e bancada com mutantes, mais dogfood do comando por agente de contexto limpo"
+      method: "measurement: selftest e bancada com mutantes, mais dogfood do comando por agente de contexto limpo"
       locality: "repo"
 
   - id: E_DIR_MEETINGS_CANONICO
@@ -80,7 +80,7 @@ nodes:
     provenance:
       source: "git grep em origin/main 5179e467 e listagem dos repos locais"
       locator: "7 arquivos migrados: whisper-specialist, consolidate-documents, consolidate-meetings, convert-to-tasks, transform-consolidated, whisper (comando) e o KB tools/whisper.md"
-      method: "medição: git grep antes e depois, e ls dos diretórios docs/meet e docs/meetings"
+      method: "measurement: git grep antes e depois, e ls dos diretórios docs/meet e docs/meetings"
       locality: "repo"
 
   - id: Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016
@@ -105,7 +105,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «Caminho da captura de reuniões (Windows como cliente, VPS como servidor). Medido na VPS: o Parakeet v3 int8 transcreve 1 h de reunião em ~7 min (WER 6,19 %), mas ao vivo a VPS sem GPU não aguenta nem 1 reunião pela regra. Selamos qual caminho?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
 
   - id: Q_MEETING_CONSOLIDATION_GRAPH
@@ -131,7 +131,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «Caminho da captura de reuniões (Windows como cliente, VPS como servidor). Medido na VPS: o Parakeet v3 int8 transcreve 1 h de reunião em ~7 min (WER 6,19 %), mas ao vivo a VPS sem GPU não aguenta nem 1 reunião pela regra. Selamos qual caminho?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
   - id: D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017
     node_type: decision
@@ -152,7 +152,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «Sobre 'quero usar o modelo da NVIDIA': o motor já é da NVIDIA (o Parakeet TDT 0.6b v3 é modelo da NVIDIA, vencedor da medição). O que muda é COMO ele é servido. Qual?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
   - id: D_MC_DIARIZACAO_MEDIR_OS_DOIS_1017
     node_type: decision
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «Diarização: 'Opção 1 ou NVIDIA?' A NVIDIA também tem modelos abertos de diarização no NeMo (a família Sortformer). Pelo meu conhecimento, eles existem, mas não verifiquei a versão atual nem medi em pt-BR. O que a curadoria mede?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-17"
       locality: "pessoa"
 
   - id: Q_DIARIZACAO_SHERPA_X_SORTFORMER_1017
@@ -190,7 +190,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «Diarização no lote da VPS (SAC-167): qual caminho selar, e a licença OpenMDW-1.1 serve para uso interno?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
   - id: D_MC_ASR2_MANTER_MOTOR_1019
     node_type: decision
@@ -206,7 +206,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «C_MC_ASR2_RECOMMEND (curadoria, SAC-177): a regra pré-registrada aponta o Parakeet pelo NeMo-Speech.cpp (19,7 contra 24,8 % em trechos); a emenda 1, com o mesmo VAD em 10 reuniões inteiras, dá 30,1 contra 29,2 % e troca para o inglês em 3 de 10; a passada única reprova em custo e DER. O que o core sela?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
   - id: E_MC_STT_SERVICO_CORE_MEDIDO_1017
@@ -235,7 +235,7 @@ nodes:
     provenance:
       source: "ops/stt/server.py e ops/stt-service.sh nesta VPS"
       locator: "medição de 2026-10-17 11:39–11:50 (UTC-3), script membench no scratchpad da sessão; bancada: lint-selftest.sh --families stt_service e moat_gate"
-      method: "medição: servidor real por HTTP com WER por jiwer na normalização da curadoria, VmHWM do processo (status do kernel), e bancada com mutantes"
+      method: "measurement: servidor real por HTTP com WER por jiwer na normalização da curadoria, VmHWM do processo (status do kernel), e bancada com mutantes"
       locality: "repo"
   - id: D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019
     node_type: decision
@@ -251,7 +251,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «Qual é o próximo passo do produto de reuniões no core, depois do serviço de transcrição?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
   - id: D_MC_STT_SOBE_EM_LOOPBACK_1019
     node_type: decision
@@ -267,7 +267,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-19: «Quando o #1184 entrar, o serviço de transcrição em lote vai para a VPS como? (o --apply é do maestro; proxy, TLS e domínio pendentes; o cliente Windows ainda não existe)»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
   - id: E_MC_STT_INSTALADO_LOOPBACK_1020
@@ -288,7 +288,7 @@ nodes:
     provenance:
       source: "ops/stt-service.sh install --apply e verify, nesta VPS"
       locator: "install --apply de 2026-10-20 (invocação c41f0675) e verify: 'verify OK — onion-vps-stt vivo (MainPID 2285263), loopback, token exigido, fixture transcrito, 2 falantes diarizados, MemoryMax 6G (14 propriedades lidas)'; a 1ª instalação (invocação 9c7b9e3c, 13 propriedades) foi sem diarização"
-      method: "medição: o verify do wrapper lê as propriedades efetivas da unit pelo systemd e prova o cliente numa unit transitória"
+      method: "measurement: o verify do wrapper lê as propriedades efetivas da unit pelo systemd e prova o cliente numa unit transitória"
       locality: "host"
 
   - id: E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020
@@ -315,7 +315,7 @@ nodes:
     provenance:
       source: "ops/stt/server.py, ops/stt/smoke.py e ops/stt-service.sh deste branch, nesta VPS"
       locator: "medição de 2026-10-20 16:50–17:50 UTC: smoke n_fail=0 com o fixture de 2 falantes; POST de 3 h com X-Diarization ok e X-Proc-S 732,5; o GNU time do binário sozinho; ensaio do install sem --apply com os pins OK"
-      method: "medição: servidor real por HTTP, RSS do processo e dos filhos pelo procfs, o GNU time -v, e bancada com mutantes"
+      method: "measurement: servidor real por HTTP, RSS do processo e dos filhos pelo procfs, o GNU time -v, e bancada com mutantes"
       locality: "host"
 
 edges:

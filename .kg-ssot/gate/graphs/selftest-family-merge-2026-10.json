@@ -2,7 +2,5 @@
   "graph": "docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml",
   "id": "selftest-family-merge-2026-10",
   "must": [],
-  "should": {
-    "form.deprecated.node.provenance.method": 5
-  }
+  "should": {}
 }

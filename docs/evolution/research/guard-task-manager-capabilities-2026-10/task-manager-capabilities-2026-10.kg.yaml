@@ -21,7 +21,7 @@ nodes:
     provenance:
       source: "CLAUDE.md@46df6ad6"
       locator: "l.233 (Bulk: usar POST /rest/api/3/issue/bulk) e l.284 (Bulk-first); .claude/utils/task-manager/adapters/jira.md l.782 (não usado aqui); nenhuma ocorrência de bulkCreate nos adapters"
-      method: "medição: grep -n de bulk no CLAUDE.md e nos adapters do task-manager"
+      method: "measurement: grep -n de bulk no CLAUDE.md e nos adapters do task-manager"
       locality: "repo"
 
   - id: E_DEFEITO_MAPA_SEM_FONTE_NA_INTERFACE
@@ -37,7 +37,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/interface.md@46df6ad6"
       locator: "seção Mapeamento por Provedor, tabela Prioridade e a nota de que o mapa do Zoho vem da UI"
-      method: "leitura: a interface antes da Onda 2"
+      method: "reading: a interface antes da Onda 2"
       locality: "repo"
 
   - id: E_CENSO_SEM_GUARDA_DA_CLASSE
@@ -52,7 +52,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "seções 'moldes por SUBSTRATO' e 'passivo' da saída de 2026-10-11"
-      method: "medição: censo injetado na carga do /meta:forge-guard"
+      method: "measurement: censo injetado na carga do /meta:forge-guard"
       locality: "repo"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
@@ -88,7 +88,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_task_manager_capabilities_selftests, casos a, b, c e m"
-      method: "medição: mutate-and-restore.sh com restauração por hash, e a família rodada com LC_ALL=C"
+      method: "measurement: mutate-and-restore.sh com restauração por hash, e a família rodada com LC_ALL=C"
       locality: "repo"
 
   - id: E_ELENXO_REPROVOU_E_FOI_CURADO
@@ -104,7 +104,7 @@ nodes:
     provenance:
       source: ".claude/validation/task-manager-capabilities-check.sh"
       locator: "casos xix a xxvii do --selftest e os mutantes correspondentes da bancada"
-      method: "juízes: refutador com mandato de fonte que não sustenta e de falso positivo; curas re-medidas pelo --selftest, mutantes e corpus real"
+      method: "judges: refutador com mandato de fonte que não sustenta e de falso positivo; curas re-medidas pelo --selftest, mutantes e corpus real"
       locality: "repo"
 
   - id: C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA

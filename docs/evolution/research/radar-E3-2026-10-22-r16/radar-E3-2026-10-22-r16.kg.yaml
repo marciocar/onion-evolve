@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.308 a ## 2.1.308 (cópias em docs/evolution/research/radar-E3-2026-10-22-r16/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -62,7 +62,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/radar-E3-2026-10-22-r16/data/2.1.308.txt"
       locator: "seção ## 2.1.308, linha única de item"
-      method: "leitura: cópia byte a byte do CHANGELOG oficial feita pelo medidor"
+      method: "reading: cópia byte a byte do CHANGELOG oficial feita pelo medidor"
       locality: "repo"
   - id: E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022
     node_type: evidence
@@ -77,7 +77,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh e .github/workflows/onion-review.yml"
       locator: "tabela de versões do censo; uses: da claude-code-action nas duas etapas do workflow"
-      method: "medição: --version dos binários e leitura do package.json da action no commit fixado"
+      method: "measurement: --version dos binários e leitura do package.json da action no commit fixado"
       locality: "host"
   - id: Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL
     node_type: question
@@ -95,7 +95,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_CENSO_ZERA_SCRIPTPATH_EM_WORKTREE_1022
     node_type: evidence
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh"
       locator: "linha 367: o filtro de worktrees por substring no caminho absoluto"
-      method: "medição: o mesmo censo no clone principal e na worktree da rodada, contagens 8 e 0"
+      method: "measurement: o mesmo censo no clone principal e na worktree da rodada, contagens 8 e 0"
       locality: "repo"
   - id: Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022
     node_type: question
@@ -135,7 +135,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família cited_directive"
-      method: "medição: execução da família da bancada no host"
+      method: "measurement: execução da família da bancada no host"
       locality: "host"
   - id: D_SUBIDAS_2_1_309_NA_PROXIMA_SESSAO_1022
     node_type: decision
@@ -151,7 +151,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «Subir agora o CLI 2.1.309, o SDK 0.3.309 e a action 1.0.259, mais o cc-update r17?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
 edges:
   - from: E_DELTA_DA_RODADA
