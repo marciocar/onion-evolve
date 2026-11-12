@@ -339,6 +339,30 @@ nem `--strict-mcp-config` controlam essa fonte. **Decisão do maestro (2026-11-0
 que nenhum canal entra sem `--channels`. Rejeitadas: desligar na organização e só registrar. Nenhum critério do §2
 nem modo de falha do §3 muda.
 
+### Emenda 5 · 2026-11-12 · o S8a fecha pela letra, e a máquina offline vira o S8c (antes do run)
+
+**Motivo:** o canal nativo do Claude Code (`SendMessage` pelo Remote Control) recusa na hora a mensagem para
+uma sessão encerrada ("No agent named … is reachable"), e não há fila para sessão fechada. Por isso o passo do
+`/exit` do P12 mede o contrário do que o S8a pede, e os resultados de 09/11 (§10c e §10c.1) saíram inconclusivos.
+**Decisão do maestro (2026-11-12, `D_A2A_S8A_LETTER_S8C_1112`):** o S8a fecha pela letra como **não cumprido por
+limite do canal**. É um achado medido: o canal nativo não enfileira para sessão encerrada. A leitura "máquina
+offline com a sessão viva" **não** substitui o S8a, porque mudar o significado de um critério depois de ver o
+resultado é exatamente o que este pré-registro existe para impedir. Ela vira um critério novo, registrado aqui
+ANTES da rodada que o mede:
+
+- **S8c** (P12b, canal nativo, destino **inalcançável**): com a sessão de destino viva e a máquina dela fora da
+  rede, a mensagem enviada fica na fila do remetente e, quando a máquina volta, é entregue **uma vez**. O tempo até
+  a entrega é anotado. A sessão de destino **não age** sobre o conteúdo, e o `vps/judge-attempts.sh` roda na janela
+  e confirma. Rejeitadas: reler o S8a como máquina offline, e declarar só o limite, sem rodada.
+
+**Contra o viés de olhar o resultado:** o S8c nasce depois que as rodadas de 09/11 (§10c.1) já mostraram a
+máquina offline entregando. Por isso essas rodadas contam **só como piloto** e não valem para o S8c: só a rodada
+feita depois desta emenda, com o juiz rodando na janela, decide o veredito dele. Selo: `D_A2A_S8A_LETTER_S8C_1112`
+em `docs/onion/graph/sinais-de-campo-2026-09.kg.yaml`.
+
+Nenhum outro critério do §2 nem modo de falha do §3 muda. O veredito final passa a exigir o S8c no lugar do
+sucesso do S8a, que fica registrado como limite do canal.
+
 ## 10. Registro de resultados (preencher na execução)
 
 **Preenchido em 2026-10-28** pela sessão do core, com as saídas coladas pelo maestro (sem segredo, sem o nome da

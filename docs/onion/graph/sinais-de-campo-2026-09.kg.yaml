@@ -1857,6 +1857,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-09: «O que fazer com o critério do P12?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
       locality: "pessoa"
+  - id: D_A2A_S8A_LETTER_S8C_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Pela letra, com critério novo: a entrega à sessão fechada fecha como não cumprida por limite do canal nativo (não há fila para sessão encerrada); a máquina offline com a sessão viva (entrega uma vez, sem ação, com o juiz rodando) vira critério novo, pré-registrado agora; as rodadas de 09/11 contam só como piloto»"
+    label: "O critério de entrega com a sessão fechada (canal nativo) fecha pela letra como não cumprido por limite do canal, e a máquina offline com a sessão viva vira um critério novo, pré-registrado antes do run."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Pela letra, com critério novo: a entrega à sessão fechada fecha como não cumprida por limite do canal nativo (não há fila para sessão encerrada); a máquina offline com a sessão viva (entrega uma vez, sem ação, com o juiz rodando) vira critério novo, pré-registrado agora; as rodadas de 09/11 contam só como piloto»; descartadas: «Reler o critério de sessão fechada como máquina offline» · «Só declarar o limite do canal, sem rodada»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «O critério pede entrega com a sessão de destino fechada, e o canal nativo não enfileira para sessão encerrada. Qual leitura vale?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_IDA_E_VOLTA_P12_RETESTE_1109
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
@@ -2211,4 +2227,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_A2A_NATIVE_CHANNEL_CRITERION_RETEST_1109
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_A2A_S8A_LETTER_S8C_1112
+    to: E_IDA_E_VOLTA_P12_CANAL_NATIVO_1109
     edge_type: TRACES_TO
