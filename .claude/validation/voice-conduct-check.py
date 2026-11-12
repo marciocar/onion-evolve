@@ -21,6 +21,7 @@ rc: 0 o arquivo vale · 1 algum achado · 2 NÃO PUDE JULGAR (arquivo ou esquema
 import argparse
 import datetime as dt
 import re
+import os
 import sys
 
 try:
@@ -30,6 +31,7 @@ except Exception:  # pragma: no cover
     sys.exit(2)
 
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
+MAX_BYTES = 256 * 1024
 WILDCARDS = {"*", "anyone", "everyone", "todos", "qualquer-pessoa", "qualquer pessoa", "qualquer-membro"}
 
 
@@ -180,6 +182,13 @@ def judge(doc, schema, today):
         if apw & WILDCARDS:
             j.add("VC-REQUEST-APPROVE", "request_vs_approve.approve.who",
                   f"aprovar é do dono, não de qualquer pessoa: {sorted(apw & WILDCARDS)}")
+        # aprovar é SÓ do dono: a lista de curingas não esgota o vocabulário ("all", "todo-mundo", um estagiário
+        # nomeado), então a regra é positiva — approve.who é exatamente o owner (achado da passada adversarial, 2026-11-12)
+        own = str(doc.get("owner", "")).strip().lower()
+        extra = sorted(apw - {own})
+        if isinstance(ap.get("who"), list) and (extra or not apw):
+            j.add("VC-APPROVER-NOT-OWNER", "request_vs_approve.approve.who",
+                  f"aprovar é só do dono ({doc.get('owner')}): fora dele {extra if extra else 'lista vazia'}")
         both = set(map(str, ap.get("actions") or [])) & set(map(str, rq.get("actions") or [])) \
             if isinstance(ap.get("actions"), list) and isinstance(rq.get("actions"), list) else set()
         if both:
@@ -216,8 +225,17 @@ def main():
     try:
         with open(a.schema, encoding="utf-8") as fh:
             schema = yaml.safe_load(fh)
+        if os.path.getsize(a.file) > MAX_BYTES:
+            print(f"voice-conduct-check: arquivo acima de {MAX_BYTES} bytes — não pude julgar (teto contra arquivo-bomba)", file=sys.stderr)
+            return 2
         with open(a.file, encoding="utf-8-sig") as fh:
-            doc = yaml.safe_load(fh)
+            raw = fh.read()
+        # alias YAML é recusado ANTES de carregar: a expansão (billion laughs) trava o leitor, e o arquivo de voz não
+        # precisa de alias (achado da passada adversarial, 2026-11-12)
+        if any(isinstance(ev, yaml.AliasEvent) for ev in yaml.parse(raw, Loader=yaml.SafeLoader)):
+            print("voice-conduct-check: o arquivo usa alias YAML (*nome), que o esquema não aceita — não pude julgar", file=sys.stderr)
+            return 2
+        doc = yaml.safe_load(raw)
     except FileNotFoundError as e:
         print(f"voice-conduct-check: arquivo ausente: {e.filename} — não pude julgar", file=sys.stderr)
         return 2
