@@ -354,6 +354,8 @@ def synthesis_check(add, path, study_dir):
         return
     with open(synth, encoding="utf-8") as fh:
         text = fh.read()
+    # o caminho, não o nome: o kg: resolve da raiz do repo e o link da pasta da síntese, e os dois têm de cair no
+    # grafo medido (o ponteiro velho de um estudo movido ou renomeado tem o mesmo nome e outra pasta; refutador do #1638)
     cited = []
     fm = re.match(r"\A---\r?\n(.*?)\r?\n---[ \t]*\r?\n", text, re.S)
     if fm:
@@ -362,11 +364,15 @@ def synthesis_check(add, path, study_dir):
         except yaml.YAMLError:
             front = None
         kg = front.get("kg") if isinstance(front, dict) else None
-        cited += [str(k) for k in (kg if isinstance(kg, list) else [kg]) if k]
-    cited += re.findall(r"\]\(\s*<?([^)\s>]+)", text)
-    graph = os.path.basename(path)
-    if not any(os.path.basename(c.split("#", 1)[0]) == graph for c in cited):
-        add(11, "synthesis-nao-cita-o-grafo", "%s não cita %s no kg: do frontmatter nem num link: a síntese é projeção do grafo, não documento solto" % (synth, graph))
+        cited += [str(k).split("#", 1)[0].lstrip("/") for k in (kg if isinstance(kg, list) else [kg]) if k]
+    for link in re.findall(r"\]\(\s*<?([^)\s>]+)", text):
+        target = link.split("#", 1)[0]
+        if not target or re.match(r"^[a-z][a-z0-9+.-]*:", target):  # âncora local ou URL não é o grafo do repo
+            continue
+        cited.append(target.lstrip("/") if target.startswith("/") else os.path.join(study_dir, target))
+    graph = os.path.normpath(path)
+    if not any(os.path.normpath(c) == graph for c in cited):
+        add(11, "synthesis-nao-cita-o-grafo", "%s não cita %s no kg: do frontmatter (caminho da raiz) nem num link (caminho da pasta): a síntese é projeção do grafo, não documento solto" % (synth, graph))
 
 
 def registered_before(s0, since):
