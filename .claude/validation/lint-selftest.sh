@@ -50462,10 +50462,12 @@ want = [l.strip() for l in subprocess.run(
     capture_output=True, text=True).stdout.splitlines() if l.strip()]
 if not want:
     print("SEM-LISTA"); raise SystemExit(0)
-# `fixtures` vai a TODA faixa, cada uma com a sua fatia (fixtures_lane i/n distinta, cobrindo 0..n-1)
+# `fixtures` vai às faixas SEM pesada separada (todas, quando não há separação), cada uma com a sua fatia
+# (fixtures_lane i/k distinta, cobrindo 0..k-1, k = faixas com fixtures); faixa sem fixtures não leva fatia
 lanes = sorted(s.get("fixtures_lane", "") for s in sh if "fixtures" in s["familias"].split(","))
-n = len(sh)
-fx_ok = ("fixtures" not in want) or lanes == sorted("%d/%d" % (i, n) for i in range(n))
+n = len(lanes)
+stray = [s["n"] for s in sh if "fixtures" not in s["familias"].split(",") and s.get("fixtures_lane")]
+fx_ok = ("fixtures" not in want) or (n > 0 and not stray and lanes == sorted("%d/%d" % (i, n) for i in range(n)))
 rest = [f for f in got if f != "fixtures"]
 if fx_ok and sorted(set(got)) == sorted(want) and len(rest) == len(set(rest)):
     print("OK")
@@ -50565,10 +50567,13 @@ print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
   #     `selftest_selection` começava aos 393 s. A régua agora é a projeção do PRÓPRIO plano
   #     (`selftest-shard-plan.sh --project N`, o simulador da fila: ±3% nas 35 faixas de 7 runs completos com
   #     os tempos do próprio run; pela mediana, que é o que este caso lê, de −18% a +43% por faixa),
-  #     no N que o workflow roda, contra 75% do teto do PASSO da bancada (o que corta): 25% de folga para a
-  #     variância entre runners (a mesma família foi de 660 a 984 s no mesmo dia). Reprovou: re-medir a tabela
-  #     (collect-family-times.sh <runs completos>) e, se ainda não couber, somar uma faixa — nunca subir o teto.
-  #     MUTANTE: `selftest-shard-plan.sh 5` no workflow reprova este caso com a tabela de 2026-11-12.
+  #     no N que o workflow roda, contra 65% do teto do PASSO da bancada (o que corta). Era 75% até a tarde de
+  #     2026-11-12, quando a faixa 1 (as quatro pesadas juntas) estourou em 3 de 4 pushes à main com o plano
+  #     projetado a 16,7 min: a variância medida por família vai a 1,2–1,44× a mediana, e a do pior run, a
+  #     ~1,5×. Com 65%, a projeção +50% ainda cabe no passo (0,65 × 1,5 = 0,975). Reprovou: re-medir a tabela
+  #     (collect-family-times.sh <runs completos>), separar pesadas e, se ainda não couber, somar uma faixa —
+  #     nunca subir o teto.
+  #     MUTANTE: `selftest-shard-plan.sh 6` no workflow reprova este caso com a tabela da tarde de 2026-11-12.
   local _wf="${ONION_SHARD_WORKFLOW_UNDER_TEST:-${REPO_ROOT}/.github/workflows/onion-selftest.yml}" _pv
   _pv="$(WF="${_wf}" TAB="${_tab}" SUT="${sut}" python3 -c '
 import os, re, subprocess
@@ -50584,8 +50589,8 @@ r = subprocess.run(["bash", os.environ["SUT"], "--project", str(n)], capture_out
 lanes = [float(l.split("\t")[1]) for l in r.stdout.splitlines() if l.count("\t") == 2]
 if r.returncode != 0 or not lanes:
     print("FALHA a projeção do plano não saiu (rc=%d): %s" % (r.returncode, r.stderr[:160])); raise SystemExit(0)
-pior, orc = max(lanes), teto * 0.75
-msg = "N=%d · pior faixa %.0f s (%.1f min) · orçamento %.0f s (75%% de %d min do passo)" % (n, pior, pior / 60, orc, teto // 60)
+pior, orc = max(lanes), teto * 0.65
+msg = "N=%d · pior faixa %.0f s (%.1f min) · orçamento %.0f s (65%% de %d min do passo)" % (n, pior, pior / 60, orc, teto // 60)
 print(("OK " if len(lanes) == n and pior <= orc else "FALHA ") + msg + ("" if len(lanes) == n else " · projeção com %d faixas" % len(lanes)))
 ' 2>&1 | tail -1)"
   case "${_pv}" in
@@ -50598,10 +50603,12 @@ print(("OK " if len(lanes) == n and pior <= orc else "FALHA ") + msg + ("" if le
   #     só começa depois da fatia da `fixtures`, então a faixa que a recebe tem parede ≥ 1200 s; pela soma/W
   #     sairia ~450 s, a régua que aprovou a faixa de 23,4 min. E o plano não empilha nada caro com ela.
   #     MUTANTE: `return max(t)` → `return sum(t) / W` no simulador do plano reprova este caso.
+  #     A separação das pesadas fica DESLIGADA aqui (ONION_SHARD_HEAVY_FRACTION=2): o caso mede a fila, e
+  #     com ela ligada a família de 1000 s ganharia faixa própria sem `fixtures` — quem cobre isso é o (n).
   local _ti _pi; _ti="$(mktemp)"
   bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | grep -vx fixtures | awk '{last=$1; print $1"\t1"} END{print last"\t1000"}' > "${_ti}"
   printf 'fixtures\t%d\n' $((4 * 4 * 200)) >> "${_ti}"
-  _pi="$(ONION_SHARD_TIMES="${_ti}" ONION_SHARD_WORKERS=4 bash "${sut}" --project 4 2>&1 | python3 -c '
+  _pi="$(ONION_SHARD_TIMES="${_ti}" ONION_SHARD_WORKERS=4 ONION_SHARD_HEAVY_FRACTION=2 bash "${sut}" --project 4 2>&1 | python3 -c '
 import sys
 w = [float(l.split("\t")[1]) for l in sys.stdin if l.count("\t") == 2]
 print(("OK " if len(w) == 4 and max(w) >= 1200 and sorted(w)[-2] < 1200 else "FALHA ") + "paredes=" + ",".join("%.0f" % x for x in w))
@@ -50701,6 +50708,66 @@ print(("OK " if ok else "FALHA ") + "%d famílias do --list, %d sem tempo%s" % (
   if [ "${_pm}" -ge 1 ] && [[ "${_pc}" == OK* ]]; then
     record_pass "shard-plan: (m) família sem tempo sai nomeada no stderr do plano, e a tabela real cobre ≥95% do --list (${_pc#OK })"
   else record_fail "shard-plan: (m) família sem tempo calada ou tabela velha" "aviso=${_pm} cobertura=${_pc} (${_tab})"; fi
+
+  # (n) AS PESADAS EM FAIXAS SEPARADAS, SEM FATIA DA FIXTURES (2026-11-12, tarde). A faixa 1 do plano de 6 juntava
+  #     selftest_selection, kg_backlog, selftest_lanes e outbox_channel com uma fatia da `fixtures` e estourou o
+  #     passo em 3 de 4 pushes à main. No plano que o workflow roda, com a tabela versionada, cada família com
+  #     custo ≥ metade da mais cara cai numa faixa diferente, essa faixa não leva `fixtures`, e as fatias da
+  #     `fixtures` cobrem 0..k-1 nas outras (k = N − pesadas).
+  #     MUTANTES: `sep = bool(heavy) and n > len(heavy)` → `sep = False` reprova este caso (e o (h)); a fatia
+  #     `fx_lanes.index(i)/len(fx_lanes)` → `i/n` também (o (a) não vê, porque planeja com N=4, sem separação).
+  local _pn
+  _pn="$(WF="${_wf}" TAB="${_tab}" SUT="${sut}" python3 -c '
+import json, os, re, subprocess
+n = int(re.search(r"selftest-shard-plan\.sh (\d+)", open(os.environ["WF"], encoding="utf-8").read()).group(1))
+t = {}
+for l in open(os.environ["TAB"], encoding="utf-8"):
+    p = l.rstrip("\n").split("\t")
+    if len(p) == 2 and not p[0].startswith("#") and p[0] != "fixtures": t[p[0]] = float(p[1])
+top = max(t.values()); heavy = [f for f, v in t.items() if v >= 0.5 * top]
+e = dict(os.environ, ONION_SHARD_TIMES=os.environ["TAB"]); e.pop("ONION_SHARD_FAMILIES", None); e.pop("ONION_SHARD_WORKERS", None); e.pop("ONION_SHARD_HEAVY_FRACTION", None)
+sh = json.loads(subprocess.run(["bash", os.environ["SUT"], str(n)], capture_output=True, text=True, env=e).stdout)
+where = {f: s["n"] for s in sh for f in s["familias"].split(",")}
+lanes_h = [where.get(f) for f in heavy]
+bad = [s["n"] for s in sh if any(f in heavy for f in s["familias"].split(",")) and "fixtures" in s["familias"].split(",")]
+fxl = sorted(s.get("fixtures_lane", "") for s in sh if "fixtures" in s["familias"].split(","))
+k = len(fxl); fx_ok = k == n - len(heavy) and fxl == sorted("%d/%d" % (i, k) for i in range(k))
+ok = len(heavy) < n and None not in lanes_h and len(set(lanes_h)) == len(heavy) and not bad and fx_ok
+print(("OK " if ok else "FALHA ") + "N=%d · %d pesadas (%s) nas faixas %s · faixas de pesada com fixtures: %s · fatias %s" % (n, len(heavy), ",".join(sorted(heavy)), lanes_h, bad or "nenhuma", ",".join(fxl)))
+' 2>&1 | tail -1)"
+  case "${_pn}" in
+    OK*) record_pass "shard-plan: (n) cada pesada tem faixa própria, sem fatia da fixtures (${_pn#OK })" ;;
+    *)   record_fail "shard-plan: (n) as pesadas voltaram a dividir faixa ou a levar fixtures" "${_pn}" ;;
+  esac
+
+  # (o) O COLETOR CONTA A FAIXA QUE ESTOUROU (2026-11-12, tarde). A tabela vinha das linhas `⏱` do log, que
+  #     só saem no fim do passo: a faixa morta pelo teto não deixava nenhuma, e a tabela via só os runs em que
+  #     a família coube. Agora o coletor lê a sonda de disco do artefato. Fixture: um `gh` falso no PATH entrega
+  #     dois runs. No run A, a faixa terminou e `zz_a` levou 100 s. No run B, a faixa morreu (sem `_faixa fim`) com
+  #     `zz_a` no ar desde 1000 s depois do início: o limite inferior é 1380 − 1000 = 380 s. A mediana dos dois é
+  #     240. A `fixtures` sai como o total do run, contando a fatia que estava no ar: run A 50, run B 70 + (1380 −
+  #     1300) = 150, mediana 100.
+  #     MUTANTE: `last = max(last, t0 + step)` → `last = last` reprova este caso.
+  local _co="${REPO_ROOT}/ops/testing/collect-family-times.sh" _cd _po
+  _cd="$(mktemp -d)"; mkdir -p "${_cd}/bin"
+  cat > "${_cd}/bin/gh" <<'GHEOF'
+#!/usr/bin/env bash
+# gh falso: `gh run download <run> -p <pat> -D <dir>` escreve a sonda de disco de uma faixa
+run="$3"; dir=""; while [ "$#" -gt 0 ]; do [ "$1" = "-D" ] && dir="$2"; shift; done
+mkdir -p "${dir}/selftest-evidence-${run}-faixa1"; f="${dir}/selftest-evidence-${run}-faixa1/selftest-disk.tsv"
+printf 'familia\tfase\tepoch\tworker\ttmp_livre_kb\tws_livre_kb\ttmp_familia_kb\n' > "${f}"
+if [ "${run}" = "111" ]; then
+  printf '_faixa\tinicio\t0\t-\t1\t1\t-\nfixtures\tinicio\t0\t0/4\t1\t1\t-\nfixtures\tfim\t50\t0/4\t1\t1\t0\nzz_a\tinicio\t50\t0/4\t1\t1\t-\nzz_a\tfim\t150\t0/4\t1\t1\t0\n_faixa\tfim\t150\t-\t1\t1\t-\n' >> "${f}"
+else
+  printf '_faixa\tinicio\t0\t-\t1\t1\t-\nfixtures\tinicio\t0\t0/4\t1\t1\t-\nfixtures\tfim\t70\t0/4\t1\t1\t0\nzz_a\tinicio\t1000\t1/4\t1\t1\t-\nfixtures\tinicio\t1300\t2/4\t1\t1\t-\n' >> "${f}"
+fi
+GHEOF
+  chmod +x "${_cd}/bin/gh"
+  _po="$(PATH="${_cd}/bin:${PATH}" bash "${_co}" 111 222 2>&1)"
+  rm -rf "${_cd}"
+  if grep -qxP 'zz_a\t240' <<< "${_po}" && grep -qxP 'fixtures\t100' <<< "${_po}" && grep -q '1 medida(s) de família que estava no ar' <<< "${_po}"; then
+    record_pass "shard-plan: (o) o coletor lê a sonda de disco e conta a faixa que estourou como limite inferior (zz_a 240, fixtures 100)"
+  else record_fail "shard-plan: (o) o coletor não conta a faixa que estourou" "$(_emit "${_po}" | head -c 240)"; fi
 
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
   #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
