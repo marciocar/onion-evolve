@@ -251,6 +251,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-12: «Selo as quatro regras do molde das checagens operacionais, tiradas do primeiro spike do hub?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
       locality: "pessoa"
+  - id: D_STAKEHOLDER_SIGNALS_METHOD_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Selar, dizendo que vamos fazer a construção igual (resposta livre do maestro). Leitura da sessão: construir como a síntese descreve: método no core como skill com KB; limites escritos (primário e fato público primeiro, quem não tem rastro fica como ausência, nenhum ato visível sem aval, ficha nunca no git); classe no grafo; guarda do grafo no kg-ssot bloqueando já e guarda da ficha em prosa no core começando como aviso medido; expurgo dividido; só o consultor lê a avaliação, com log; o limite da base legal para fato público fica registrado»"
+    label: "A análise de stakeholders por sinais vira método do Onion (skill com KB no core, operação no adotante), com a ficha de avaliação fora do git, duas guardas e a construção feita como a síntese do Delphi descreve."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Selar, dizendo que vamos fazer a construção igual (resposta livre do maestro). Leitura da sessão: construir como a síntese descreve: método no core como skill com KB; limites escritos (primário e fato público primeiro, quem não tem rastro fica como ausência, nenhum ato visível sem aval, ficha nunca no git); classe no grafo; guarda do grafo no kg-ssot bloqueando já e guarda da ficha em prosa no core começando como aviso medido; expurgo dividido; só o consultor lê a avaliação, com log; o limite da base legal para fato público fica registrado» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Selar com o limite da base legal como gate antes do cliente» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «O Delphi da análise de stakeholders fechou por unanimidade (core, kg-ssot, curadoria). Selo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_HUB_FIRST_SPIKE_LOG_ARRIVAL_1112
     to: Q_OPS_CHECK_MOLD_RULES_1112
@@ -293,4 +309,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_ISOLATION_BENCH_STAGE0_AUTHORIZED_1111
     to: D_VPS_SERVICE_EDGE_WITH_TWO_BLOCKING_GATES_1111
+    edge_type: TRACES_TO
+  - from: D_STAKEHOLDER_SIGNALS_METHOD_1112
+    to: D_LGPD_WAIT_THEN_SLU_BEFORE_FIRST_CONTRACT_1111
     edge_type: TRACES_TO
