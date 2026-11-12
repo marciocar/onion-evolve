@@ -1,0 +1,177 @@
+# kg-backlog-guard: on
+# Forja do /meta:baton (o pulso da batuta) pelo /meta:forge (2026-11-12): a pergunta, a evidência medida, as três fases.
+meta:
+  id: forge-baton-2026-11
+  schema_version: "1"
+  baseline: "2026-11-12"
+  review_after: "2026-12-12"   # 30d: cadência de ferramenta; a fase 2 (um dia medido) é o teste de verdade
+  x_supersedes_none: "Forja de superfície nova: nenhum grafo anterior é superado. O /meta:decide e o seu medidor são MOLDES e fonte, não o superado."
+  # ═══ TETO: 14 NÓS ═══
+  # 9 nós nascem aqui; a folga é para os dois selos do maestro («forjar com o /loop», «nomes em inglês, baton»), que o
+  # selador grava depois do commit da forja, e para a colheita da fase 2.
+nodes:
+  - id: Q_BATON_IDLE_SESSIONS_1112
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-12"
+    verified_against: "dogfood do baton-pulse.sh no core, 2026-11-12T02:41Z: 15 sessões medidas, 1 ociosa sem fila declarada e 3 owner: sem sessão casada"
+    trace: "docs/evolution/research/forge-baton-2026-11/SYNTHESIS.md"
+    label: "sessões ficam ociosas esperando algo enquanto há trabalho pronto em outra fila: como medir quem está parado com trabalho pronto, perguntar o estado a cada sessão e oferecer a fila sem empurrar nem acordar quem foi parado por ordem?"
+    narrative: "Âncora da forja. A fase 1 (medidor, comando, doutrina, bancada) responde a parte de medir e perguntar; a oferta e a medição do ganho são a fase 2; a viagem às portas é a fase 3."
+    provenance:
+      source: "maestro, no pedido da forja do /meta:baton"
+      locator: "pedido de 2026-11-12, transcrito no comando (.claude/commands/meta/baton.md)"
+      method: "testimony: pedido do maestro, 2026-11-12"
+      locality: "pessoa"
+  - id: E_PEDIDO_DO_MAESTRO_BATON_LOOP_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-11-12"
+    verified_against: "pedido literal do maestro, repassado pela sessão do core no brief da forja"
+    label: "o maestro pediu forjar o comando da batuta com o /loop, porque as sessões ficam ociosas esperando algo quando poderiam tocar outras tarefas necessárias"
+    narrative: "Literal: «Forjar o comando da batuta com o /loop. As sessões ficam ociosas esperando algo mas poderiam tocar outras tarefas que são necessárias, e a batuta serviria para isso.» A sessão do core é o caso de uso."
+    provenance:
+      source: "maestro, pela sessão do core (brief da forja)"
+      locator: "pedido de 2026-11-12"
+      method: "testimony: pedido do maestro, 2026-11-12"
+      locality: "pessoa"
+  - id: E_WAIT_LOOPS_MATCHED_SIBLINGS_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-11"
+    verified_against: "relato da sessão do core no brief da forja de 2026-11-12; a mesma classe (espera por pgrep -f que casa o próprio shell) já está medida em 2026-11-05 no cabeçalho de ops/load-lease.sh e no grafo session-orchestration-2026-11"
+    label: "em 2026-11-11, quatro laços de espera da sessão do core se esperaram uns aos outros por quase uma hora, porque o padrão do pgrep casava os próprios irmãos"
+    narrative: "Ninguém mediu de fora que as quatro esperas estavam paradas: a sessão só descobriu quando olhou. É o que o pulso mede por idade (atividade no transcript e no farol), sem depender da frase de quem espera. A contagem de quatro laços e a duração vêm do relato da sessão, não de um registro durável; por isso a confiança é 0.8."
+    provenance:
+      source: "sessão do core (relato no brief da forja do /meta:baton)"
+      locator: "noite de 2026-11-11; classe irmã medida no cabeçalho de ops/load-lease.sh (POR QUE EXISTE)"
+      method: "testimony: relato da sessão do core, 2026-11-12"
+      locality: "pessoa"
+  - id: E_SESSION_STATE_ONLY_BY_ASKING_1111
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-11"
+    verified_against: "reforço do maestro de 2026-11-11 registrado na memória da casa (session-status-asks-the-sessions): o estado das sessões foi respondido de memória e cobrado"
+    label: "a cada pergunta «como estão as sessões», o estado só era descoberto ao perguntar a cada sessão; nada o media antes"
+    narrative: "A cura de comportamento (perguntar a cada sessão viva, marcar quem não respondeu) já era regra; faltava a medição que diz a quem perguntar e o que cruzar com a resposta. O /meta:baton junta as duas: o pulso mede, a sessão pergunta."
+    provenance:
+      source: "memória da casa session-status-asks-the-sessions (fora do repo)"
+      locator: "reforço do maestro de 2026-11-11"
+      method: "testimony: reforço do maestro registrado em memória, 2026-11-11"
+      locality: "pessoa"
+  - id: E_DOGFOOD_BATON_PULSE_CLASSES_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-11-12"
+    verified_against: "bash .claude/validation/baton-pulse.sh . --skip-repo <brain> --since 2026-11-12T02:00Z, rc 0, 2026-11-12T02:41Z; saída no scratch da sessão (batuta-dogfood.md, fora do repo)"
+    label: "o 1º pulso real no core mediu 15 sessões: ACTIVE 6, IDLE_WITH_QUEUE 0, IDLE_NO_QUEUE 1, PARKED 0, UNREACHABLE 8, mais 3 owner: com fila e sem sessão casada (brain, curadoria, onion-messaging)"
+    narrative: "Três achados do dogfood, curados no mesmo laço: (1) os faróis velhos da família (stale) inflavam UNREACHABLE para 22, e saíram da contagem como rastro; (2) faróis vivos fora da lista de peers do harness (ex.: um farol do core com o mesmo pid de outra sessão) saíam IDLE_WITH_QUEUE falso, e passaram a UNREACHABLE quando a lista foi lida; (3) a sessão onion-curation atende o owner: curadoria, que nenhum rótulo derivado casa: a fila dela aparece como sem sessão até o maestro declarar owners.tsv. Uma batida seguinte com o sha devolvido saiu em uma linha."
+    provenance:
+      source: ".claude/validation/baton-pulse.sh"
+      locator: "saída markdown do pulso de 2026-11-12T02:41Z"
+      method: "measurement: execução do medidor no core"
+      locality: "repo"
+  - id: E_BENCH_BATON_PULSE_SIX_CASES_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: "2026-11-12"
+    verified_against: "bash ops/load-lease.sh run -- bash .claude/validation/lint-selftest.sh --families baton_pulse: 12 passaram, 0 falharam"
+    label: "a bancada run_baton_pulse_selftests tem 6 casos, cada um reprovado pelo seu mutante: ociosa com fila, parada por ordem, batida silenciosa, fila só de dono declarado, CI vermelho, lacuna sem fonte"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família run_baton_pulse_selftests"
+      method: "measurement: bancada com mutante por caso"
+      locality: "repo"
+  - id: C_BATON_PHASE1_PULSE_BUILT_1112
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "forge-census conta o baton com as peças que ele cita; a bancada verde; o dogfood rc 0"
+    trace: ".claude/commands/meta/baton.md"
+    label: "fase 1 construída: o medidor baton-pulse.sh, o comando /meta:baton (pergunta de 3 linhas a cada sessão viva, formato fixo, modo /loop silencioso), a cláusula 7 da doutrina da batuta e a bancada, tudo no nível 0"
+    narrative: "Nível 0 da escada selada: só mede e lê. Não grava grafo, não despacha, não acorda PARKED. O nome do arquivo da doutrina (batuta-doctrine.md) segue fora da regra de identificador em inglês; o rename é um PR à parte, com os links."
+    provenance:
+      source: ".claude/commands/meta/baton.md"
+      locator: "seções Degrau e limites, Procedimento e Modo /loop"
+      method: "measurement: forge-census e bancada sobre os artefatos da forja"
+      locality: "repo"
+  - id: Q_BATON_PHASE2_MATCH_AND_MEASURE_1112
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "desenho no comando (seção Fase 2): TSV de pulsos com sessão, classe, minutos ociosa, tamanho da fila, oferta e aceite, gravado só com --record"
+    label: "fase 2: casar a sessão ociosa com a fila dela (oferta, nunca ordem) e medir por um dia as horas ociosas com fila, antes e depois da oferta? Gatilho: o maestro aprovar a gravação do TSV de pulsos"
+  - id: Q_BATON_PHASE3_TRAVEL_TO_DOORS_1112
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-12"
+    verified_against: "roles.yaml: baton nasce no conjunto pending (fonte e hub); a decisão de viajar espera os números da fase 2"
+    label: "fase 3: o /meta:baton viaja às portas (standalone, plugins), com os números da fase 2? Gatilho: um dia de pulsos medidos mostrar ganho de horas ociosas com fila"
+edges:
+  - from: E_PEDIDO_DO_MAESTRO_BATON_LOOP_1112
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: SUPPORTS
+  - from: E_WAIT_LOOPS_MATCHED_SIBLINGS_1111
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: SUPPORTS
+  - from: E_SESSION_STATE_ONLY_BY_ASKING_1111
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_BATON_PULSE_CLASSES_1112
+    to: C_BATON_PHASE1_PULSE_BUILT_1112
+    edge_type: SUPPORTS
+  - from: E_BENCH_BATON_PULSE_SIX_CASES_1112
+    to: C_BATON_PHASE1_PULSE_BUILT_1112
+    edge_type: SUPPORTS
+  - from: C_BATON_PHASE1_PULSE_BUILT_1112
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: TRACES_TO
+  - from: Q_BATON_PHASE2_MATCH_AND_MEASURE_1112
+    to: C_BATON_PHASE1_PULSE_BUILT_1112
+    edge_type: DEPENDS_ON
+  - from: Q_BATON_PHASE3_TRAVEL_TO_DOORS_1112
+    to: Q_BATON_PHASE2_MATCH_AND_MEASURE_1112
+    edge_type: DEPENDS_ON
+external_edges:
+  - from: C_BATON_PHASE1_PULSE_BUILT_1112
+    to: "docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml#D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111"
+    edge_type: TRACES_TO
