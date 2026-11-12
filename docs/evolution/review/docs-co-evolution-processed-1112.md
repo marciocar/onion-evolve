@@ -2,8 +2,7 @@
 branch: docs/co-evolution-processed-1112
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 26cf572b1dbf819f58362977b8cd3ee80497324db6b5a0ec66f1ad42f1a7b466
-reviewed_code_sha256: 00a54903b070195557ff800ead11a6b90dd8455cfbec9c18a2fa2eee6e8125db
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
