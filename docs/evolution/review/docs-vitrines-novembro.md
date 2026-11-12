@@ -2,7 +2,8 @@
 branch: docs/vitrines-novembro
 pr: 1637
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d91a8d5c77bc2d892f5c9a75ed19929605dce03824e6c08e4f668dd795581a51
+reviewed_code_sha256: a7172db824022a47c3c6ac2195522cf534ced38436a283ec31d8b8bff4b82a54
 findings_total: 9
 findings_real: 9
 findings_blocking: 1
