@@ -26,8 +26,12 @@ pre="${ONION_AGENT_PREAMBLE:-${here}/../../commands/common/prompts/execution-age
 wait_line="$(grep -m1 -F -- '- Processos longos: ESPERA EM PRIMEIRO PLANO' "${pre}" || true)"
 [ -n "${wait_line}" ] || die2 "âncora da espera em primeiro plano não achada em ${pre} (o preâmbulo mudou: ajuste a âncora aqui)"
 
-pre_rel="${pre}"
-case "${pre}" in "${here}"/../../commands/*) pre_rel=".claude/commands/common/prompts/execution-agent-preamble.md" ;; esac
+# Caminho que o agente lê: relativo à raiz do repo quando o preâmbulo está dentro dele (o agente roda na raiz),
+# senão o absoluto. Nunca um `.claude/` nu escrito aqui: dentro de um plugin ele não resolve (REGRA 74).
+pre_abs="$(cd "$(dirname "${pre}")" && pwd)/$(basename "${pre}")"
+root="$(git -C "$(dirname "${pre_abs}")" rev-parse --show-toplevel 2>/dev/null || true)"
+pre_rel="${pre_abs}"
+[ -n "${root}" ] && case "${pre_abs}" in "${root}"/*) pre_rel="${pre_abs#"${root}"/}" ;; esac
 
 printf 'ANTES DE TUDO, leia e siga `%s`.\n' "${pre_rel}"
 printf 'Regra que mais custou parar agente (copiada do preâmbulo):\n%s\n\n' "${wait_line}"
