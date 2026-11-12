@@ -2,7 +2,8 @@
 branch: chore/kg-migrate-methods-450
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b923fa0396acd4bf728ec222b0b3c707e163434824178979d97767230db52157
+reviewed_code_sha256: e5eaecfbeece623b681e443489ae32601f4d686ad3ac876848af97fe4d5888b0
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
