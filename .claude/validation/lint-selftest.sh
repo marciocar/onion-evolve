@@ -57336,7 +57336,7 @@ BP_PY
   printf 'gamma\tordem do maestro: parada até a revisão\t-\n' > "${sb}/state/parked.tsv"
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
-    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${sb}/state" BATON_PROJECTS_DIR="${sb}/proj" \
+    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${sb}/proj" \
       BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
   }
   _bpcase() {  # <nome> <OLD> <NEW> <função> [sem-farol]
@@ -57386,6 +57386,19 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     grep -q '^classes: sessões NÃO MEDIDAS' <<< "${a}" && grep -q 'lacuna: farol NÃO MEDIDO' <<< "${a}" && ! grep -q 'ACTIVE 0' <<< "${a}"; }
   _bpcase "(f) medidor sem fonte (farol ausente, sem peers) declara a lacuna em vez de zero" \
     "if sessions_measured else" "if True else" _bp_f sem-farol
+  # (g) parked.tsv que EXISTE e não se lê (aqui, um diretório no lugar dele) é lacuna e fail-closed: a parada vira
+  #     PARK_UNMEASURED, nenhuma sessão sai ociosa com oferta; nunca «ninguém parado» (achado do refutador, 2026-11-12)
+  mkdir -p "${sb}/state-bad/parked.tsv"
+  _bp_g() { local a; a="$(BP_STATE="${sb}/state-bad" _bpr "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-gamma|gap)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-gamma${T}PARK_UNMEASURED${T}" <<< "${a}" && ! grep -q "^session${T}[^${T}]*${T}IDLE_" <<< "${a}" \
+      && grep -q "^gap${T}.*parada por ordem NÃO MEDIDA" <<< "${a}"; }
+  _bpcase "(g) parked.tsv ilegível é lacuna fail-closed, nunca «ninguém parado»" \
+    "park_unknown = park_st.startswith('unreadable')" "park_unknown = False" _bp_g
+  # (h) --quiet com só --since NÃO cala: sem --last-sha não há base, e a batida fala (achado do refutador, 2026-11-12)
+  _bp_h() { local q; q="$(_bpr "$1" --quiet --since "$((NOW - 60))")"; BP_WHY="$(head -c 200 <<< "${q}")"
+    [ "$(printf '%s\n' "${q}" | wc -l)" -gt 1 ] && grep -q 'sem --last-sha' <<< "${q}" && ! grep -q '· sem mudança' <<< "${q}"; }
+  _bpcase "(h) --quiet só com --since fala: «sem mudança» exige o sha igual" \
+    "changed = (not last_sha) or last_sha != sha or bool(events)" "changed = (bool(last_sha) and last_sha != sha) or bool(events) or (not last_sha and since_ts is None)" _bp_h
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests

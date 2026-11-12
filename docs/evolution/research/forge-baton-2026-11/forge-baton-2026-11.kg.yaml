@@ -100,8 +100,8 @@ nodes:
     impact: 3
     confidence: 1.0
     verified_at: "2026-11-12"
-    verified_against: "bash ops/load-lease.sh run -- bash .claude/validation/lint-selftest.sh --families baton_pulse: 12 passaram, 0 falharam"
-    label: "a bancada run_baton_pulse_selftests tem 6 casos, cada um reprovado pelo seu mutante: ociosa com fila, parada por ordem, batida silenciosa, fila só de dono declarado, CI vermelho, lacuna sem fonte"
+    verified_against: "bash ops/load-lease.sh run -- bash .claude/validation/lint-selftest.sh --families baton_pulse,batuta_census: 30 passaram, 0 falharam (2026-11-12, depois do refutador)"
+    label: "a bancada run_baton_pulse_selftests tem 8 casos, cada um reprovado pelo seu mutante: ociosa com fila, parada por ordem, batida silenciosa, fila só de dono declarado, CI vermelho, lacuna sem fonte, parked.tsv ilegível fail-closed e --quiet que só cala com o sha igual"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família run_baton_pulse_selftests"
