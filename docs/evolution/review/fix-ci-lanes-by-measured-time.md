@@ -2,8 +2,7 @@
 branch: fix/ci-lanes-by-measured-time
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 099a54fce0cca47d55b52ee5ab099d4e9e9e4c06458ea542d1a7a521ce810d99
-reviewed_code_sha256: e5ef3c94073b36e070c01e5adcad31cb9d0ca0042300de79b6a19c07489e6255
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 8
 findings_blocking: 1
@@ -104,3 +103,12 @@ limites).
   melhora vem do simulador, não da faixa a mais. N=6 fica porque N=5 reprova no (h).
 - O coletor depende do `gh` e da rede, e não tem caso na bancada. A mediana foi conferida à mão contra a
   análise independente dos mesmos 7 logs.
+
+## Re-revisão (2026-11-12, sessão principal, depois do rebase sobre o #1614)
+
+O caso (m) da 1ª versão reprovou a própria main: o #1614 trouxe a família `subagent_background_wait`, ainda sem tempo medido. Exigir cobertura total quebraria todo PR que cria família, porque ela só ganha linha depois de rodar na main. O refutador tinha pedido **aviso**, não bloqueio. Cura:
+- o plano nomeia no stderr as famílias sem tempo, que entram pela mediana;
+- o (m) exige esse aviso, com uma linha tirada da tabela, e cobertura de pelo menos 95% do `--list`, mais a linha `fixtures`;
+- o caso (a) passou a ler só o stdout do plano, que é o contrato JSON. O workflow já lia só o stdout.
+
+Mutante `if _sem:` → `if False:` pelo `ops/mutate-and-restore.sh`: rc 1, o (m) reprova com `aviso=0`. `shard_plan` dá 13/13.

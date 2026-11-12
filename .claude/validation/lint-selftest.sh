@@ -50445,7 +50445,10 @@ run_shard_plan_selftests() {
 
   # (a) COBERTURA EXATA: toda familia do --list aparece em UMA faixa, nenhuma some, nenhuma repete.
   local plano rc
-  if plano="$(bash "${sut}" 4 2>&1)"; then rc=0; else rc=1; fi
+  # stdout é o contrato (JSON); o stderr leva avisos do plano (família sem tempo) e não entra no JSON.
+  local _perr="${TMPDIR:-/tmp}/shard-a-$$.err"
+  if plano="$(bash "${sut}" 4 2>"${_perr}")"; then rc=0; else rc=1; plano="${plano}$(cat "${_perr}")"; fi
+  rm -f "${_perr}"
   if [ "${rc}" -ne 0 ]; then
     record_fail "shard-plan: (a)" "o plano falhou (rc=${rc}): $(_emit "${plano}" | head -c 160)"
   else
@@ -50675,23 +50678,29 @@ print(("OK " if 0 < com < sem else "FALHA ") + "N=%d soma das paredes %.0f s com
     *)   record_fail "shard-plan: (l) a melhora local não melhora nada" "${_pl}" ;;
   esac
 
-  # (m) A TABELA COBRE O --list (refutador da SAC-423). Família que a tabela não conhece entra pela MEDIANA
-  #     (hoje ~3 s) sem aviso, e foi assim que 89 famílias somaram 4618 s invisíveis em 2026-11-06. O caso
-  #     exige uma linha por família do --list e a linha `fixtures` (o total do run). Reprovou: re-medir
-  #     (collect-family-times.sh <runs completos>) depois que a família nova rodar na main.
-  #     MUTANTE: apagar a linha `selftest_selection` da tabela reprova este caso.
-  local _pm
-  _pm="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | TAB="${_tab}" python3 -c '
+  # (m) FAMÍLIA SEM TEMPO NÃO PASSA EM SILÊNCIO (refutador da SAC-423). Família que a tabela não conhece entra
+  #     pela MEDIANA (hoje ~3 s); foi assim que 89 famílias somaram 4618 s invisíveis em 2026-11-06. Exigir
+  #     cobertura total reprovaria todo PR que cria família (ela só ganha tempo depois de rodar na main: medido
+  #     em 2026-11-12, a `subagent_background_wait` do #1614 derrubou a 1ª versão deste caso). O caso exige o
+  #     AVISO: com uma linha a menos na tabela, o plano nomeia a família no stderr; e a tabela real tem a
+  #     linha `fixtures` e cobre ao menos 95% do --list (o resto é família nova, re-medir com
+  #     collect-family-times.sh). MUTANTE: tirar o aviso do plano reprova este caso.
+  local _pm _tmt="${TMPDIR:-/tmp}/shard-m-$$.tsv"
+  grep -v '^selftest_selection	' "${_tab}" > "${_tmt}"
+  _pm="$(ONION_SHARD_TIMES="${_tmt}" bash "${sut}" 4 2>&1 >/dev/null | grep -c 'sem tempo na tabela entram pela mediana.*selftest_selection' || true)"
+  local _pc
+  _pc="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | TAB="${_tab}" python3 -c '
 import os, sys
 want = {l.strip() for l in sys.stdin if l.strip()}
-have = {l.split("\t")[0] for l in open(os.environ["TAB"], encoding="utf-8") if "\t" in l and not l.startswith("#")}
-falta = sorted(want - have)
-print(("OK " if want and not falta else "FALHA ") + "%d famílias do --list, %d sem tempo%s" % (len(want), len(falta), (": " + ",".join(falta[:8])) if falta else ""))
+rows = [l.split("\t")[0] for l in open(os.environ["TAB"], encoding="utf-8") if "\t" in l and not l.startswith("#")]
+falta = sorted(want - set(rows))
+ok = want and "fixtures" in rows and len(falta) <= 0.05 * len(want)
+print(("OK " if ok else "FALHA ") + "%d famílias do --list, %d sem tempo%s" % (len(want), len(falta), (": " + ",".join(falta[:8])) if falta else ""))
 ' 2>&1 | tail -1)"
-  case "${_pm}" in
-    OK*) record_pass "shard-plan: (m) a tabela de tempos cobre o --list inteiro, com a fixtures (${_pm#OK })" ;;
-    *)   record_fail "shard-plan: (m) a tabela de tempos não cobre o --list" "${_pm} (${_tab})" ;;
-  esac
+  rm -f "${_tmt}"
+  if [ "${_pm}" -ge 1 ] && [[ "${_pc}" == OK* ]]; then
+    record_pass "shard-plan: (m) família sem tempo sai nomeada no stderr do plano, e a tabela real cobre ≥95% do --list (${_pc#OK })"
+  else record_fail "shard-plan: (m) família sem tempo calada ou tabela velha" "aviso=${_pm} cobertura=${_pc} (${_tab})"; fi
 
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
   #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
