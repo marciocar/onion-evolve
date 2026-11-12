@@ -16,9 +16,11 @@
 #      este passo quase sempre cala; fica porque as skills o declaram);
 #   3. o default `docs/<dim>-context` (o layout Onion padrão).
 #
-# Uso   : resolve-context-dir.sh <business|technical|compliance|design> [--repo <dir>] [--source]
+# Uso   : resolve-context-dir.sh <business|technical|compliance|design|company-brain> [--repo <dir>] [--source]
 #         `design` (2026-10-27, onda 1 do setup de design): o design-context é CONTEXTO, não dimensão peer — a
 #         doutrina das três dimensões só muda pelo gatilho medido (Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027).
+#         `company-brain` (2026-11-12, SAC-417): o contexto da vertical company-brain-context — também contexto,
+#         não dimensão; é onde o adotante guarda o arquivo de voz e conduta da persona.
 #         --source : imprime também a origem, separada por TAB (`<caminho>\t<onion-context|stamp|default>`).
 # Saída : o caminho RELATIVO à raiz do repo, sem barra final.
 # Exit  : 0 = resolvido · 2 = uso · 3 = declaração inválida (absoluta, com `..` ou vazia) — o comando PARA:
@@ -31,7 +33,7 @@
 set -uo pipefail
 
 DIM=""; REPO=""; SHOW_SOURCE=0
-usage() { echo "uso: resolve-context-dir.sh <business|technical|compliance|design> [--repo <dir>] [--source]" >&2; }
+usage() { echo "uso: resolve-context-dir.sh <business|technical|compliance|design|company-brain> [--repo <dir>] [--source]" >&2; }
 while [ "$#" -gt 0 ]; do case "$1" in
   --repo)   [ "$#" -ge 2 ] || { usage; exit 2; }; REPO="$2"; shift 2 ;;
   --source) SHOW_SOURCE=1; shift ;;
@@ -39,7 +41,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   -*) usage; exit 2 ;;
   *) [ -z "${DIM}" ] && DIM="$1" || { usage; exit 2; }; shift ;;
 esac; done
-case "${DIM}" in business|technical|compliance|design) : ;; *) usage; exit 2 ;; esac
+case "${DIM}" in business|technical|compliance|design|company-brain) : ;; *) usage; exit 2 ;; esac
 [ -n "${REPO}" ] || REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 [ -d "${REPO}" ] || { echo "ERRO: repo inexistente: ${REPO}" >&2; exit 2; }
 

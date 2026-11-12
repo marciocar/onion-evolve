@@ -307,6 +307,7 @@
 .claude/settings.json	E_VETO_UNICO_ANTES_DA_RODADA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/skills	E_sem_retro_skill	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/skills	Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
+.claude/skills/onion-company-brain-context/SKILL.md	A_VERTICAL_COMPANY_BRAIN_CONTEXT_1112	docs/evolution/research/company-brain-non-devs-2026-11/company-brain-non-devs-2026-11.kg.yaml
 .claude/skills/onion-engineering-context/SKILL.md	C_D1	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/skills/onion-engineering-context/SKILL.md	E_D1_L73	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/skills/onion-onboarding/SKILL.md	E_OBJECAO_5_CORPUS_VAZIO_E_FALSO_NEGATIVO	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
