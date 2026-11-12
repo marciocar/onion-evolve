@@ -46551,6 +46551,8 @@ run_voice_conduct_selftests() {
 (k) chave fora do esquema|VC-UNKNOWN-KEY|d["aproved_by"]=d["approved_by"]|2026-11-12
 (l) aprovação no futuro|VC-DATE-FUTURE|import datetime; d["approved_at"]=datetime.date(2027,1,1); d["history"][-1]["date"]=datetime.date(2027,1,1)|2026-11-12
 (m) versão fora de semver|VC-FIELD-TYPE|d["version"]="v2"; d["history"][-1]["version"]="v2"|2026-11-12
+(r) aprovador nomeado que não é o dono|VC-APPROVER-NOT-OWNER|d["request_vs_approve"]["approve"]["who"]=["estagiario"]|2026-11-12
+(s) curinga fora da lista fixa|VC-APPROVER-NOT-OWNER|d["request_vs_approve"]["approve"]["who"]=["all","todo-mundo"]|2026-11-12
 CASES
   # (n) NÃO PUDE JULGAR ⇒ rc 2: arquivo que é lista; --today inválido; declaração de contexto com '..'
   printf -- '- isto\n- é uma lista\n' > "${d}/lista.yaml"
@@ -46579,6 +46581,26 @@ CASES
   if [ "${p1}" = $'docs/company-brain-context\tdefault' ] && [ "${p2}" = $'brain/regras\tonion-context' ] && [ "${p3}" = 0 ]; then
     record_pass "voice-conduct: (p) resolver: company-brain → docs/company-brain-context por default; a declaração vence e o validador lê o arquivo declarado"
   else record_fail "voice-conduct: (p) resolver" "default=${p1} declarado=${p2} validador=${p3}"; fi
+  # (t) alias YAML e arquivo acima do teto ⇒ rc 2 (não pude julgar), sem travar: a expansão de alias (billion laughs)
+  #     travava o leitor (achado da passada adversarial, 2026-11-12)
+  printf 'a: &a [x, x]\nb: [*a, *a]\n' > "${d}/alias.yaml"
+  python3 -I -B -c 'import sys; open(sys.argv[1],"w").write("# " + "x" * 300000 + "\n")' "${d}/grande.yaml"
+  local t1 t2
+  if timeout 20 bash "${chk}" "${d}" --file "${d}/alias.yaml" ${T} >/dev/null 2>&1; then t1=0; else t1=$?; fi
+  if timeout 20 bash "${chk}" "${d}" --file "${d}/grande.yaml" ${T} >/dev/null 2>&1; then t2=0; else t2=$?; fi
+  if [ "${t1}" = 2 ] && [ "${t2}" = 2 ]; then record_pass "voice-conduct: (t) alias YAML e arquivo acima de 256 KB ⇒ rc 2, sem travar"
+  else record_fail "voice-conduct: (t) alias/teto" "alias=${t1} grande=${t2} (esperado 2 e 2)"; fi
+  # (u) MUTANTE da regra positiva do aprovador: sem ela, o aprovador nomeado que não é o dono passa calado
+  local mu; mu="$(mktemp -d)"
+  sed 's/        if isinstance(ap.get("who"), list) and (extra or not apw):/        if False:/' "${py}" > "${mu}/m4.py"
+  _vc_variant "${ex}" "${d}/u.yaml" 'd["request_vs_approve"]["approve"]["who"]=["estagiario"]'
+  local u1 u2 scu="${REPO_ROOT}/.claude/utils/company-brain/voice-conduct.schema.yaml"
+  u1="$(python3 -I -B "${mu}/m4.py" --file "${d}/u.yaml" --schema "${scu}" --today 2026-11-12 --format tsv 2>&1 | grep -c '^VC-APPROVER-NOT-OWNER	' || true)"
+  u2="$(python3 -I -B "${py}" --file "${d}/u.yaml" --schema "${scu}" --today 2026-11-12 --format tsv 2>&1 | grep -c '^VC-APPROVER-NOT-OWNER	' || true)"
+  if [ "${u1}" = 0 ] && [ "${u2}" -ge 1 ] && ! cmp -s "${py}" "${mu}/m4.py"; then
+    record_pass "voice-conduct: (u) mutante sem a regra positiva do aprovador cala o estagiário que a cura pega"
+  else record_fail "voice-conduct: (u) mutante" "mutante=${u1} (esperado 0) cura=${u2} (esperado ≥1)"; fi
+  rm -rf "${mu}"
   # (q) MUTANTES: sem a regra do dono, sem a do curinga e sem a do histórico, o caso que a cura pega CALA
   local mdir; mdir="$(mktemp -d)"
   sed 's/        if doc\["owner"\] != doc\["approved_by"\]:/        if False:/' "${py}" > "${mdir}/m1.py"
