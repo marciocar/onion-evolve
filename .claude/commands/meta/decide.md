@@ -104,7 +104,7 @@ conta as quatro classes. A classe só sai onde a medição a prova; a **pista de
    e **"Depois"**. Decisão cuja execução é do maestro carrega isso na própria opção ("selar e receber
    o card"), em vez de gastar uma 2ª pergunta.
 4. **PERGUNTAR** com `AskUserQuestion`. Uma rodada por vez. **Antes**, reserve cada pergunta pela chave do
-   nó (cláusula 3 da [doutrina da batuta](../common/prompts/batuta-doctrine.md)):
+   nó (cláusula 3 da [doutrina da batuta](../common/prompts/baton-doctrine.md)):
    `bash .claude/utils/orchestration/maestro-ask.sh claim <repo>#<NODE_ID> --owner <sessão>`. Com rc 3 a pergunta
    já tem dona viva noutra sessão: não pergunte, leve o id a ela. O censo já marca essa linha como
    `outro-dono`; a dona é o id da sessão (`CLAUDE_CODE_SESSION_ID`, ou `--self <id>`), e a sua reserva sai `faço-eu`. Selado o nó, feche com `release <chave> --owner <sessão>`.

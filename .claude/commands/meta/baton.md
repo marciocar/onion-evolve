@@ -25,7 +25,7 @@ ociosas esperando algo mas poderiam tocar outras tarefas que são necessárias, 
 comando é a **fase 1**: o medidor, a pergunta às sessões e o relatório fixo. O casamento entre a sessão ociosa e a fila
 pronta, medido por um dia, é a **fase 2**, desenhada aqui e **não** construída (seção «Fase 2»).
 
-A doutrina vive na [cláusula 7 da doutrina da batuta](../common/prompts/batuta-doctrine.md) (o pulso: o que mede, quando
+A doutrina vive na [cláusula 7 da doutrina da batuta](../common/prompts/baton-doctrine.md) (o pulso: o que mede, quando
 fala, quem responde, o nível 0, o parado por ordem, puxar e não empurrar). **Referencie, não copie.**
 
 ## Degrau e limites
@@ -151,7 +151,7 @@ diretório de estado com gravação, e aí a lente se deriva do caminho.
 
 ## 🔗 Referências
 
-- Doutrina (peça 2): [`common:prompts:batuta-doctrine`](../common/prompts/batuta-doctrine.md), cláusula 7
+- Doutrina (peça 2): [`common:prompts:baton-doctrine`](../common/prompts/baton-doctrine.md), cláusula 7
 - Medidor (peça 3): `.claude/validation/baton-pulse.sh`, que chama `.claude/validation/decide-census.sh` e
   `.claude/validation/session-beacon.sh`
 - Reserva de perguntas: `.claude/utils/orchestration/maestro-ask.sh` · carga: `ops/load-lease.sh` (core-only)
