@@ -2,8 +2,7 @@
 branch: feat/agent-brief-helper
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 7b5c93682a5e3af5d8ff043b3fbe5ef67e9b656e81e0a76fbeb121e97f97a191
-reviewed_code_sha256: 269ac6165043eacc937eb6be17cc637e49bfc12f61670ea0a0be00f9e6f630c6
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -58,3 +57,7 @@ Não foi forjada guarda alguma (fora do escopo).
 
 - Sem refutador independente; sem medida de tokens e tempo.
 - A sonda mediu uma só versão do Claude Code e o tipo `general-purpose`.
+
+## Re-revisão (rebase)
+
+O rebase sobre a main trouxe o lint-selftest.sh com as famílias novas do dia; o bloco da família agent_brief foi mantido inteiro ao lado delas. O pré-voo das famílias agent_brief e shell_pipefail_robustness passou na árvore rebaseada.
