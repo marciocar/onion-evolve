@@ -46947,7 +46947,8 @@ run_veto_onfailure_selftests() {
   # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, sobre o settings de ANTES da cura (o campo removido dos
   #     5 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 6 — e não para o kg-read-leg (aviso)
   #     (o 6º é o pretooluse-moat-gate.sh, de 2026-10-13; o 7º o pretooluse-memory-write-guard.sh, o 8º o
-  #     pretooluse-plugin-write-guard.sh e o 9º o pretooluse-adopter-guard.sh, os três de 2026-11-05: o número sobe
+  #     pretooluse-plugin-write-guard.sh e o 9º o pretooluse-adopter-guard.sh, os três de 2026-11-05, e o 10º o
+  #     pretooluse-subagent-background-wait.sh, de 2026-11-12: o número sobe
   #     junto com o settings.json)
   #     nem para o PostModelSwitch, que roda o mesmo script mas não veta nada.
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
@@ -46958,13 +46959,14 @@ for ev in ("PreToolUse", "PreModelSwitch"):
 json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
   local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
   local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
-  if [ "${n}" -eq 9 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+  if [ "${n}" -eq 10 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+     && grep -q 'REGRA 101.*PreToolUse/pretooluse-subagent-b' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-moat-g' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-memory-w' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-plugin' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-adopter-g' <<< "${l}" \
      && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}" && ! grep -q 'REGRA 101.*PostModelSwitch' <<< "${l}"; then
-    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 9 vetos de antes da cura (8 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 10 vetos de antes da cura (9 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
   else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
   rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
