@@ -41,7 +41,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.md"
       locator: "commit do plano"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: S_STAGE0_V2
@@ -65,7 +65,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v2.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: S_STAGE0_V3
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v3.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: S_STAGE0_V4
@@ -113,7 +113,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v4.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: E_ENV_GUARD_FALSO_POSITIVO_HEREDOC_1105
@@ -130,7 +130,7 @@ nodes:
     provenance:
       source: "sessão do escritor do plano, 2026-11-05"
       locator: "STAGE0.v3.md §8 e STAGE0.v4.md §6"
-      method: 'medição: observação do próprio bloqueio, julgada pela regra por efeito da emenda 4'
+      method: 'measurement: observação do próprio bloqueio, julgada pela regra por efeito da emenda 4'
       locality: "repo"
 
   - id: S_STAGE0_V5
@@ -154,7 +154,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v5.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: A_ROTA_V4
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/ROTA.v4.md"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_CERCA_V3
@@ -188,7 +188,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/CERCA.v3.md"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: S_STAGE0_V6
@@ -212,7 +212,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v6.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: A_ROTA_V5
@@ -229,7 +229,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/ROTA.v5.md"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_FORMULA_V2
@@ -246,7 +246,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-formula-2026-11/FORMULA.v2.md"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: S_STAGE0_V7
@@ -270,7 +270,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v7.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
 
   - id: A_CERCA_V4
@@ -287,7 +287,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/CERCA.v4.md"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_USED
@@ -304,7 +304,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/USED.txt"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_CARGA_REGEX
@@ -321,7 +321,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/CARGA.regex"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_CARGA_CASOS
@@ -338,7 +338,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/CARGA.casos.txt"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: S_STAGE0_V8
@@ -362,7 +362,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "arquivo inteiro"
-      method: "medição: kg_criterion.py digest sobre o arquivo"
+      method: "measurement: kg_criterion.py digest sobre o arquivo"
       locality: "repo"
   - id: D_PROBLEM_ROUTE_RODAR_PAPEL_1105
     node_type: decision
@@ -395,7 +395,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/N0N1.md"
       locator: "arquivo inteiro"
-      method: "medição: git grep; busca web com tier por fonte"
+      method: "measurement: git grep; busca web com tier por fonte"
       locality: "repo"
 
   - id: A_SAMPLE_PY
@@ -412,7 +412,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/sample.py"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_SCORE_PY
@@ -431,7 +431,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/score.py"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_CARGA_SH
@@ -448,7 +448,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/carga.sh"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_HOOK_EXEC_PY
@@ -465,7 +465,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/hook_exec.py"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: A_MANIFEST
@@ -482,7 +482,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/MANIFEST.sha256"
       locator: "arquivo inteiro"
-      method: "medição: sha256sum"
+      method: "measurement: sha256sum"
       locality: "repo"
 
   - id: D_PROBLEM_ROUTE_PAPER_VERDICT
@@ -526,7 +526,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha E1"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "E1 neste estudo é E1 agir demais: código local do estudo, não da casa."
     x_term:
@@ -547,7 +547,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha E3"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "E3 neste estudo é E3 cobertura: código local do estudo, não da casa."
     x_term:
@@ -568,7 +568,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha P1"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P1 neste estudo é P1 rota adequada: código local do estudo, não da casa."
     x_term:
@@ -589,7 +589,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha P3"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P3 neste estudo é P3 reprodutibilidade: código local do estudo, não da casa."
     x_term:
@@ -610,7 +610,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha P4"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P4 neste estudo é P4 falso alarme: código local do estudo, não da casa."
     x_term:
@@ -631,7 +631,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha P5"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P5 neste estudo é P5 ERRO-B: código local do estudo, não da casa."
     x_term:
@@ -652,7 +652,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de critérios, linha P6"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P6 neste estudo é P6 controle: código local do estudo, não da casa."
     x_term:
@@ -673,7 +673,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/FICHAS.md"
       locator: "ficha P22"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "P22 neste estudo é caso P22 da amostra: código local do estudo, não da casa."
     x_term:
@@ -694,7 +694,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de papéis, A1"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "A1 neste estudo é aplicador A1: código local do estudo, não da casa."
     x_term:
@@ -715,7 +715,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de papéis, A2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "A2 neste estudo é aplicador A2: código local do estudo, não da casa."
     x_term:
@@ -736,7 +736,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de papéis, G1"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "G1 neste estudo é gabarito G1: código local do estudo, não da casa."
     x_term:
@@ -757,7 +757,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de papéis, G2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "G2 neste estudo é gabarito G2: código local do estudo, não da casa."
     x_term:
@@ -778,7 +778,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de papéis, C1"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "C1 neste estudo é controle C1: código local do estudo, não da casa."
     x_term:
@@ -799,7 +799,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v8.md"
       locator: "tabela de papéis, C2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "C2 neste estudo é controle C2: código local do estudo, não da casa."
     x_term:
@@ -820,7 +820,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v2.md"
       locator: "papéis J1 e J2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "J1 neste estudo é juiz J1: código local do estudo, não da casa."
     x_term:
@@ -841,7 +841,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/problem-route-2026-11/STAGE0.v2.md"
       locator: "papéis J1 e J2"
-      method: "leitura: a definição pré-registrada na fonte do estudo"
+      method: "reading: a definição pré-registrada na fonte do estudo"
       locality: "repo"
     label: "J2 neste estudo é juiz J2: código local do estudo, não da casa."
     x_term:

@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: "maestro, na abertura da forja do /meta:decide"
       locator: "pedido de 2026-10-12, transcrito na doutrina (seção Por que existe)"
-      method: "testemunho: pedido do maestro, 2026-10-12"
+      method: "testimony: pedido do maestro, 2026-10-12"
       locality: "pessoa"
   - id: D_TOPOLOGIA_DO_DECIDE_SELADA
     node_type: decision
@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: "maestro, na entrevista da forja do /meta:decide"
       locator: "as quatro perguntas de topologia (fonte, forma, destino, nome)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
   - id: E_CORPUS_SEM_OPCOES_ESTRUTURADAS
     node_type: evidence
@@ -55,7 +55,7 @@ nodes:
     provenance:
       source: "git ls-files '*.kg.yaml' (159 rastreados fora de fixtures e vendor)"
       locator: "campos node_type, status e as chaves de cada nó decision/question open"
-      method: "medição: leitura por PyYAML de todos os grafos rastreados"
+      method: "measurement: leitura por PyYAML de todos os grafos rastreados"
       locality: "repo"
   - id: E_JANELA_POR_BLOCO_ERA_RUIDO
     node_type: evidence
@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: ".claude/validation/decide-census.sh"
       locator: "bloco da janela (linhas de sentido de cada nó)"
-      method: "medição: execução do medidor antes e depois da cura"
+      method: "measurement: execução do medidor antes e depois da cura"
       locality: "repo"
   - id: E_SELO_EM_PROD_REPROVA_NO_CONTRATO
     node_type: evidence
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_validate.py"
       locator: "TESTIMONY_METHOD e coherence_located (integrity.testimony-in-prod)"
-      method: "medição: kg-contract-check.sh sobre o grafo da forja, antes e depois da cura"
+      method: "measurement: kg-contract-check.sh sobre o grafo da forja, antes e depois da cura"
       locality: "repo"
   - id: E_DOGFOOD_ACHOU_TRES_SILENCIOS_DO_MEDIDOR
     node_type: evidence
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: ".claude/validation/decide-census.sh"
       locator: "saída markdown com --cite e --window 0 sobre o repo vivo"
-      method: "medição: execução do medidor e do selador antes e depois das curas"
+      method: "measurement: execução do medidor e do selador antes e depois das curas"
       locality: "repo"
   - id: E_DOGFOOD_DE_CARGA_PROPOS_SELO_EM_LOTE
     node_type: evidence
@@ -119,7 +119,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/decide.md"
       locator: "diretivas de injeção e passos 1 e 2 do Procedimento"
-      method: "medição: invocação headless do comando com ferramentas só de leitura"
+      method: "measurement: invocação headless do comando com ferramentas só de leitura"
       locality: "repo"
   - id: E_REFUTADOR_REPROVOU_O_SELADOR
     node_type: evidence
@@ -135,7 +135,7 @@ nodes:
     provenance:
       source: "relatório do refutador da forja do /meta:decide"
       locator: "achados 1 a 17 e a seção do que se manteve sob ataque"
-      method: "medição: execução adversarial em cópias descartáveis, re-executada pela bancada depois das curas"
+      method: "measurement: execução adversarial em cópias descartáveis, re-executada pela bancada depois das curas"
       locality: "repo"
   - id: E_BANCADA_22_CASOS_27_MUTANTES
     node_type: evidence
@@ -150,7 +150,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_decide_selftests"
-      method: "medição: execução da família e de 14 versões defeituosas das duas peças"
+      method: "measurement: execução da família e de 14 versões defeituosas das duas peças"
       locality: "repo"
   - id: C_O_FILTRO_E_JULGAMENTO_DA_SESSAO
     node_type: claim
@@ -178,7 +178,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-12: «Para onde o /meta:decide viaja?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
   - id: Q_OPCOES_EM_CAMPO_ESTRUTURADO
     node_type: question
@@ -204,7 +204,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «O /meta:decide viaja para todos? E o mini, que nasce sem KG?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111
     node_type: decision

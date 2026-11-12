@@ -33,7 +33,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/evolve.md@9b251104 · docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "evolve.md@9b251104 l.14 (allowed-tools) · SYNTHESIS.md:20-25 (§A resposta à pergunta do maestro)"
-      method: "testemunho: medição da sessão 2026-08-31 (agente Explore, 30 tool-uses), comando não registrado; o núcleo (7 instrumentos, zero percepção externa, S9 parada) está em SYNTHESIS.md:22-24"
+      method: "testimony: medição da sessão 2026-08-31 (agente Explore, 30 tool-uses), comando não registrado; o núcleo (7 instrumentos, zero percepção externa, S9 parada) está em SYNTHESIS.md:22-24"
       locality: "repo"
 
   - id: E_F0_SKILLS
@@ -49,7 +49,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_GUARDAS
@@ -65,7 +65,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_COMANDOS_META
@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_DOUTRINAS
@@ -97,7 +97,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_COMANDOS_WORKFLOW
@@ -113,7 +113,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_FEDERACAO
@@ -129,7 +129,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_AGENTES
@@ -145,7 +145,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F0_ORQUESTRACAO
@@ -161,7 +161,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F1_E1_KG_AGENTE
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F1_E2_SELF_IMPROVING
@@ -193,7 +193,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F1_E3_CLAUDE_CODE_DELTA
@@ -209,7 +209,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F1_E4_CAPITAL
@@ -225,7 +225,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F1_E5_GATES_DETERMINISTICOS
@@ -241,7 +241,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_F1_E6_FRONTEIRA_MODELOS
@@ -257,7 +257,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
       locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_TESE_MOAT_GATES
@@ -273,7 +273,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:5 (tese_central) + :323 (verdict) + :327 e :330 (derrubados) + objeções :339, :341, :343, :344, :345"
-      method: "juízes: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo moat-gates (f2-confronto.json:323); emendas de :327, :330, :343, :344 e :345 aplicadas"
+      method: "judges: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo moat-gates (f2-confronto.json:323); emendas de :327, :330, :343, :344 e :345 aplicadas"
       locality: "repo"
 
   - id: E_ELENXO_MOAT_GATES
@@ -288,7 +288,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:322 (elenxos[tema=moat-gates]: verdict, vereditos_derrubados, objecoes_sobreviventes)"
-      method: "juízes: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema moat-gates em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
+      method: "judges: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema moat-gates em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
       locality: "repo"
 
   - id: C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C
@@ -303,7 +303,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:8 (confrontos[moat-gates].vereditos[0]) + :339 (obj. sobrevivente 0)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:8, não derrubado pelo Elenxo moat-gates (mandato REFUTAR); obj. sobrevivente :339 o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:8, não derrubado pelo Elenxo moat-gates (mandato REFUTAR); obj. sobrevivente :339 o confirma"
       locality: "repo"
 
   - id: C_VALI_A_TESE_MAE_VERIFICACAO_DETERMINISTICA_LL
@@ -319,7 +319,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:15-17 (veredito VALIDADO) + :348 (elenxos[moat-gates] obj. sobrevivente 9)"
-      method: "juízes: veredito VALIDADO não derrubado pelo Elenxo moat-gates, mas a obj. sobrevivente :348 derruba o apoio 'única validação que viaja no plugin' e credita a tese à evidência externa"
+      method: "judges: veredito VALIDADO não derrubado pelo Elenxo moat-gates, mas a obj. sobrevivente :348 derruba o apoio 'única validação que viaja no plugin' e credita a tese à evidência externa"
       locality: "repo"
 
   - id: C_UNIC_CATRACA_COM_BASELINE_O_PASSIVO_LEGADO_CO
@@ -335,7 +335,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json · .claude/validation/*-baseline.txt@9b251104"
       locator: "f2-confronto.json:22 (veredito UNICO) + :326-:327 (elenxos[moat-gates].vereditos_derrubados[0]); git show 9b251104:.claude/validation/<6 baselines>"
-      method: "juízes: o refutador Elenxo moat-gates (opus/high) DERRUBOU o veredito UNICO (f2-confronto.json:326-327) e preservou os 6 baselines; contagens por leitura dos 6 *-baseline.txt em 9b251104 (linhas não-comentário)"
+      method: "judges: o refutador Elenxo moat-gates (opus/high) DERRUBOU o veredito UNICO (f2-confronto.json:326-327) e preservou os 6 baselines; contagens por leitura dos 6 *-baseline.txt em 9b251104 (linhas não-comentário)"
       locality: "repo"
 
   - id: C_SUBE_EMPACOTAMENTO_PUBLICO_O_QUE_A_LANDING_DI
@@ -361,7 +361,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:36 (veredito) + :334-:335 (elenxos[moat-gates].vereditos_derrubados[2]) + :344 (obj. sobrevivente 5)"
-      method: "juízes: o refutador Elenxo moat-gates (opus/high, mandato REFUTAR) DERRUBOU o veredito em f2-confronto.json:334-335 e preservou só a objeção estreita :344"
+      method: "judges: o refutador Elenxo moat-gates (opus/high, mandato REFUTAR) DERRUBOU o veredito em f2-confronto.json:334-335 e preservou só a objeção estreita :344"
       locality: "repo"
 
   - id: C_INEF_A_REGUA_COM_QUE_MEDIMOS_AS_PROPRIAS_GUAR
@@ -376,7 +376,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:43 (confrontos[moat-gates].vereditos[5]) + :341 (obj. sobrevivente 2)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:43, não derrubado pelo Elenxo moat-gates (mandato REFUTAR); obj. sobrevivente :341 (\"WIRE-IN, não CAPTURA\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:43, não derrubado pelo Elenxo moat-gates (mandato REFUTAR); obj. sobrevivente :341 (\"WIRE-IN, não CAPTURA\") o confirma"
       locality: "repo"
 
   - id: C_SUBE_O_COMPRADOR_COM_GATILHO_DE_COMPRA_A_DIME
@@ -391,7 +391,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:50 (confrontos[moat-gates].vereditos[6]) + :347 (obj. sobrevivente 8)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:50, não derrubado pelo Elenxo moat-gates (mandato REFUTAR); obj. sobrevivente :347 (\"Compliance segue subestimado como eixo de COMPRADOR\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:50, não derrubado pelo Elenxo moat-gates (mandato REFUTAR); obj. sobrevivente :347 (\"Compliance segue subestimado como eixo de COMPRADOR\") o confirma"
       locality: "repo"
 
   - id: C_TESE_FEDERACAO_CAPITAL
@@ -407,7 +407,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:60 (tese_central) + :390 (verdict) + :394 (derrubado doc-bridge) + :404 (obj. sobrevivente 2)"
-      method: "juízes: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo federacao-capital (f2-confronto.json:390); emendas de :404 (drift e pin vivos) e :394 (116 = 64 anúncios distintos) aplicadas"
+      method: "judges: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo federacao-capital (f2-confronto.json:390); emendas de :404 (drift e pin vivos) e :394 (116 = 64 anúncios distintos) aplicadas"
       locality: "repo"
 
   - id: E_ELENXO_FEDERACAO_CAPITAL
@@ -422,7 +422,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:389 (elenxos[tema=federacao-capital]: verdict, vereditos_derrubados, objecoes_sobreviventes)"
-      method: "juízes: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema federacao-capital em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
+      method: "judges: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema federacao-capital em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
       locality: "repo"
 
   - id: C_ERRA_FEDERATION_ENGAGEMENT_SH_O_SINAL_DE_SAUD
@@ -437,7 +437,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:63-66 (confrontos[federacao-capital].vereditos[0]) + :403 (obj. sobrevivente 1)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:63, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :403 o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:63, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :403 o confirma"
       locality: "repo"
 
   - id: C_SUBE_A_METADE_FORMAL_DA_FEDERACAO_META_FEDERA
@@ -452,7 +452,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:70 (confrontos[federacao-capital].vereditos[1]) + :402 (obj. sobrevivente 0)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:70, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :402 (git log --all | grep federation-(publish|register) = 0) o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:70, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :402 (git log --all | grep federation-(publish|register) = 0) o confirma"
       locality: "repo"
 
   - id: C_INEF_D7_A_FRONTEIRA_DE_VENDA_E_A_FEDERACAO_HU
@@ -467,7 +467,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:77 (confrontos[federacao-capital].vereditos[2]) + :411 (obj. sobrevivente 9)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:77, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :411 (só põe a reescrita de D7 como gated) o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:77, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :411 (só põe a reescrita de D7 como gated) o confirma"
       locality: "repo"
 
   - id: C_INEF_A2A_LIVE_CANAL_VIVO_COM_ACEITE_GATED_A2A
@@ -482,7 +482,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:91 (confrontos[federacao-capital].vereditos[4]) + :412 (obj. sobrevivente 10)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:91, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :412 (\"sobrevive integralmente\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:91, não derrubado pelo Elenxo federacao-capital (mandato REFUTAR); obj. sobrevivente :412 (\"sobrevive integralmente\") o confirma"
       locality: "repo"
 
   - id: C_TESE_ESTRATEGIA_PRECO
@@ -497,7 +497,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:108 (tese_central) + :352-:353 (elenxos[estrategia-preco].verdict = REPROVADA)"
-      method: "juízes: tese REPROVADA pelo refutador Elenxo (opus/high, mandato REFUTAR) em f2-confronto.json:353 — sustenta o status refuted"
+      method: "judges: tese REPROVADA pelo refutador Elenxo (opus/high, mandato REFUTAR) em f2-confronto.json:353 — sustenta o status refuted"
       locality: "repo"
 
   - id: E_ELENXO_ESTRATEGIA_PRECO
@@ -512,7 +512,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:352 (elenxos[tema=estrategia-preco]: verdict, vereditos_derrubados, objecoes_sobreviventes)"
-      method: "juízes: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema estrategia-preco em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
+      method: "judges: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema estrategia-preco em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
       locality: "repo"
 
   - id: C_ERRA_GATE_DE_INSTRUMENTACAO_VALOR_POR_ADOTANT
@@ -527,7 +527,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:139 (confrontos[estrategia-preco].vereditos[4]) + :377 (obj. sobrevivente 0)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:139, não derrubado pelo Elenxo estrategia-preco (mandato REFUTAR); obj. sobrevivente :377 (\"verificado e de pé\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:139, não derrubado pelo Elenxo estrategia-preco (mandato REFUTAR); obj. sobrevivente :377 (\"verificado e de pé\") o confirma"
       locality: "repo"
 
   - id: C_SUBE_Q_COLD_ADOPTER_EXISTE_PULL_DOS_DIFERENCI
@@ -542,7 +542,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:146 (confrontos[estrategia-preco].vereditos[5]) + :380-:381 (obj. sobreviventes 3-4)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:146, não derrubado pelo Elenxo estrategia-preco (mandato REFUTAR); obj. sobrevivente :380 (braço contável real) o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:146, não derrubado pelo Elenxo estrategia-preco (mandato REFUTAR); obj. sobrevivente :380 (braço contável real) o confirma"
       locality: "repo"
 
   - id: C_SUBE_A_ESCADA_D5_INTEIRA_O_MOAT_DECLARADO_MEC
@@ -558,7 +558,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:153 (veredito) + :372-:373 (elenxos[estrategia-preco].vereditos_derrubados[4]) + :382 (obj. sobrevivente 5)"
-      method: "juízes: o refutador Elenxo estrategia-preco (tese REPROVADA) DERRUBOU o veredito em f2-confronto.json:372-373 e preservou a assimetria só como pergunta (:382)"
+      method: "judges: o refutador Elenxo estrategia-preco (tese REPROVADA) DERRUBOU o veredito em f2-confronto.json:372-373 e preservou a assimetria só como pergunta (:382)"
       locality: "repo"
 
   - id: C_TESE_AUTO_EVOLUCAO
@@ -574,7 +574,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:163 (tese_central) + :418 (verdict SUSTENTADA-COM-EMENDAS) + objeções :438 e :440"
-      method: "juízes: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo auto-evolucao (f2-confronto.json:418); emendas :438 (déficit de USO, não de desenho) e :440 (63 REGRAS distintas) aplicadas"
+      method: "judges: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo auto-evolucao (f2-confronto.json:418); emendas :438 (déficit de USO, não de desenho) e :440 (63 REGRAS distintas) aplicadas"
       locality: "repo"
 
   - id: E_ELENXO_AUTO_EVOLUCAO
@@ -589,7 +589,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:417 (elenxos[tema=auto-evolucao]: verdict, vereditos_derrubados, objecoes_sobreviventes)"
-      method: "juízes: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema auto-evolucao em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
+      method: "judges: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema auto-evolucao em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
       locality: "repo"
 
   - id: C_SUBE_CRITERIOS_CONTAVEIS_DE_PROMOCAO_NA_ESCAD
@@ -604,7 +604,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:173 (confrontos[auto-evolucao].vereditos[1]) + :442 (obj. sobrevivente 4)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:173, não derrubado pelo Elenxo auto-evolucao (mandato REFUTAR); obj. sobrevivente :442 (\"fica de pé\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:173, não derrubado pelo Elenxo auto-evolucao (mandato REFUTAR); obj. sobrevivente :442 (\"fica de pé\") o confirma"
       locality: "repo"
 
   - id: C_SUBE_FECHAMENTO_DE_NO_DO_GRAFO_FRESCOR_DA_PRO
@@ -620,7 +620,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json · commit 74dc3ab2"
       locator: "f2-confronto.json:187-190 (confrontos[auto-evolucao].vereditos[3]) + :439 (obj. sobrevivente 1); git show 74dc3ab2 corpo l.7-10"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:187, não derrubado pelo Elenxo auto-evolucao; citação conferida por leitura do corpo do commit 74dc3ab2 (2026-08-30)"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:187, não derrubado pelo Elenxo auto-evolucao; citação conferida por leitura do corpo do commit 74dc3ab2 (2026-08-30)"
       locality: "repo"
 
   - id: C_VALI_PRODUTO_DO_LOOP_DE_AUTO_MELHORIA_REGRA_D
@@ -635,7 +635,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:208 (confrontos[auto-evolucao].vereditos[6]) + :440 (obj. sobrevivente 2)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:208, não derrubado pelo Elenxo auto-evolucao (mandato REFUTAR); obj. sobrevivente :440 (higiene numérica, já refletida no parêntese do label) o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:208, não derrubado pelo Elenxo auto-evolucao (mandato REFUTAR); obj. sobrevivente :440 (higiene numérica, já refletida no parêntese do label) o confirma"
       locality: "repo"
 
   - id: C_TESE_KG_VS_PLATAFORMA
@@ -651,7 +651,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:218 (tese_central) + :451 (verdict) + :474 e :476 (obj. sobreviventes 7 e 9)"
-      method: "juízes: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo kg-vs-plataforma (f2-confronto.json:451); emenda de redação :474 e contagem verificada :476 aplicadas"
+      method: "judges: tese julgada SUSTENTADA-COM-EMENDAS pelo Elenxo kg-vs-plataforma (f2-confronto.json:451); emenda de redação :474 e contagem verificada :476 aplicadas"
       locality: "repo"
 
   - id: E_ELENXO_KG_VS_PLATAFORMA
@@ -666,7 +666,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:450 (elenxos[tema=kg-vs-plataforma]: verdict, vereditos_derrubados, objecoes_sobreviventes)"
-      method: "juízes: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema kg-vs-plataforma em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
+      method: "judges: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema kg-vs-plataforma em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
       locality: "repo"
 
   - id: C_ERRA_PERNA_DE_LEITURA_DO_KG_READ_KG_DISPARAR_
@@ -681,7 +681,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:221 (confrontos[kg-vs-plataforma].vereditos[0]) + :470-:472 (obj. sobreviventes 3-5, sobre a PROPOSTA)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:221, não derrubado pelo Elenxo kg-vs-plataforma (mandato REFUTAR); obj. sobrevivente :470-:472 (atacam só a proposta DENY) o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:221, não derrubado pelo Elenxo kg-vs-plataforma (mandato REFUTAR); obj. sobrevivente :470-:472 (atacam só a proposta DENY) o confirma"
       locality: "repo"
 
   - id: C_INEF_MANUTENCAO_DO_GRAFO_FECHAR_O_NO_NAO_SO_C
@@ -696,7 +696,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:235 (confrontos[kg-vs-plataforma].vereditos[2]) + :467 (obj. sobrevivente 0)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:235, não derrubado pelo Elenxo kg-vs-plataforma (mandato REFUTAR); obj. sobrevivente :467 (\"isso basta para o veredito INEFICIENTE\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:235, não derrubado pelo Elenxo kg-vs-plataforma (mandato REFUTAR); obj. sobrevivente :467 (\"isso basta para o veredito INEFICIENTE\") o confirma"
       locality: "repo"
 
   - id: C_VALI_GRAFO_COMO_CAMADA_DE_VERDADE_GOVERNADA_A
@@ -711,7 +711,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:249 (confrontos[kg-vs-plataforma].vereditos[4]) + :476 (obj. sobrevivente 9)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:249, não derrubado pelo Elenxo kg-vs-plataforma (mandato REFUTAR); obj. sobrevivente :476 (assimetria verificada no HEAD) o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:249, não derrubado pelo Elenxo kg-vs-plataforma (mandato REFUTAR); obj. sobrevivente :476 (assimetria verificada no HEAD) o confirma"
       locality: "repo"
 
   - id: C_TESE_MASSA_MORTA_COMANDOS
@@ -726,7 +726,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:266 (tese_central) + :482-:483 (elenxos[massa-morta-comandos].verdict = REPROVADA)"
-      method: "juízes: tese REPROVADA pelo refutador Elenxo (opus/high, mandato REFUTAR) em f2-confronto.json:483 — sustenta o status refuted"
+      method: "judges: tese REPROVADA pelo refutador Elenxo (opus/high, mandato REFUTAR) em f2-confronto.json:483 — sustenta o status refuted"
       locality: "repo"
 
   - id: E_ELENXO_MASSA_MORTA_COMANDOS
@@ -741,7 +741,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:482 (elenxos[tema=massa-morta-comandos]: verdict, vereditos_derrubados, objecoes_sobreviventes)"
-      method: "juízes: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema massa-morta-comandos em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
+      method: "judges: registro do refutador Elenxo opus/high (mandato REFUTAR, default REPROVADO) do tema massa-morta-comandos em f2-confronto.json; o label é o resumo gerado deterministicamente do registro (cabeçalho do grafo)"
       locality: "repo"
 
   - id: C_ERRA_A_HIPOTESE_DE_QUE_A_MASSA_MORTA_E_CUSTO_
@@ -756,7 +756,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "f2-confronto.json:304-307 (confrontos[massa-morta-comandos].vereditos[5]) + :518 (obj. sobrevivente 7)"
-      method: "juízes: veredito do confronto F2 (opus/high) em f2-confronto.json:304, não derrubado pelo Elenxo massa-morta-comandos (mandato REFUTAR); obj. sobrevivente :518 (\"o veredito 6 sobrevive intacto\") o confirma"
+      method: "judges: veredito do confronto F2 (opus/high) em f2-confronto.json:304, não derrubado pelo Elenxo massa-morta-comandos (mandato REFUTAR); obj. sobrevivente :518 (\"o veredito 6 sobrevive intacto\") o confirma"
       locality: "repo"
 
   - id: D_CARTEIRA_REFILL_FIOS
@@ -791,7 +791,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md · docs/evolution/review/feat-living-maestro-program.md"
       locator: "SYNTHESIS.md frontmatter (tokens: 2872141, agents: 32, duration_min: 31) e :116 (§Honestidade declarada)"
-      method: "testemunho: usage dos 3 task-notifications de 2026-08-31 (wf_6e6ef552/wf_6a4da33e/wf_e27840db) relatado na sessão; quebra por fase sem artefato versionado, journals ausentes do host"
+      method: "testimony: usage dos 3 task-notifications de 2026-08-31 (wf_6e6ef552/wf_6a4da33e/wf_e27840db) relatado na sessão; quebra por fase sem artefato versionado, journals ausentes do host"
       locality: "repo"
 
   - id: E_PRETOOLUSE_BARRA_SOB_BYPASS
@@ -807,7 +807,7 @@ nodes:
     provenance:
       source: "docs/analysis/pretooluse-proof-2026-08.md · docs/evolution/research/maestro-vivo-2026-08/data/pretooluse-sandbox/OBSERVADO.md"
       locator: "claude -p --dangerously-skip-permissions em sandbox: comando com marcador proibido BLOQUEADO (exit 2 do PreToolUse; prova.txt ausente) e controle PASSOU (controle.txt criado) — veredito pelo filesystem, nao pela mensagem"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_BENCHMARK_DO_GATE_PUBLICADO
@@ -823,7 +823,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-gate-benchmark-2026-08.md"
       locator: "medicoes 2026-08-31: lint 132.3-132.9s sob carga (16s historico ocioso), 0 tokens, 63 regras/218 HARD, 6 catracas/84 chaves, 5 vetos reais no dia, bancada 882/884 — e as 2 reprovacoes foram achado (fixture live-dependente curada no mesmo PR)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PECA_CATRACA_REDIGIDA
@@ -839,7 +839,7 @@ nodes:
     provenance:
       source: "docs/materials/catraca-passivo-legado-piece-2026-08.md"
       locator: "draft completo em docs/materials/catraca-passivo-legado-piece-2026-08.md; varredura de nomes de adotante = 0 ocorrencias (vendor-scrub respeitado); numeros vem do benchmark medido no mesmo dia"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_RADAR_SURFACE_CONSTRUIDA
@@ -855,7 +855,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/radar.md · docs/onion/radar-baselines.yaml"
       locator: "comando .claude/commands/meta/radar.md + REGRA 65 no lint (provada nos 4 modos: fresco/velho/ilegivel/vazio) + bancada run_radar_staleness_selftests 4/4 + baseline seed datada de hoje (rodada 0 = o F1 do programa); path vendorizado — merge e do maestro"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_ELENXO_DA_PASSADA_ONDA6
@@ -871,7 +871,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/feat-meta-radar-surface.md"
       locator: "refutador opus/high sobre as 4 entregas, mandato REFUTAR: prova SUSTENTADA-COM-EMENDAS, benchmark SUSTENTADO-COM-EMENDAS (2 celulas factualmente erradas), peca REPROVADA (republicou veredito ja derrubado no f2-confronto.json:327), radar SUSTENTADO-COM-EMENDAS (date -d GNU-only virava HARD contra o artefato). TODAS as emendas aplicadas na mesma passada"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO
@@ -887,7 +887,7 @@ nodes:
     provenance:
       source: "site/src/pages/index.astro · site/src/styles/home.css"
       locator: "site/src/pages/index.astro (reforma 2026-08-25): hero = grafo vivo e verificavel + trilha que voce audita + verificado por mecanismo, nenhum LLM adivinhou; o confronto mediu docs/materials/landing-page.md (06-28) — artefato MORTO, nao a superficie publicada"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PRETOOLUSE_EM_PRODUCAO
@@ -903,7 +903,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-protect-main.sh · .claude/settings.json"
       locator: "sonda VIVA na propria sessao: force-push a main vetado ANTES de executar (exit 2); bateria 7/7 apos a cura do falso-positivo por vocabulario (o veto pegou o proprio commit da feature — julgamento passou a ser POR LINHA DE INVOCACAO)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CENSO0901_D_META_RADAR_DESENHO
@@ -918,7 +918,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md · docs/evolution/review/feat-meta-radar-surface.md · docs/onion/radar-baselines.yaml@da7a72de"
       locator: "backlog-real-2026-09.md:75 (§3 PROPOSTAS DE SELO, linha D_META_RADAR_DESENHO) · feat-meta-radar-surface.md:5 (reviewer, 4/4) e :23-29 (Passada Elenxo da Onda 6)"
-      method: "juízes: medição da revisão-total wf_2944480c aprovada pelo juiz fixo opus (reprovados ficam sem carimbo na §4 de backlog-real-2026-09.md; este foi carimbado e listado na §3)"
+      method: "judges: medição da revisão-total wf_2944480c aprovada pelo juiz fixo opus (reprovados ficam sem carimbo na §4 de backlog-real-2026-09.md; este foi carimbado e listado na §3)"
       locality: "repo"
 
   - id: E_REVISAO_TOTAL_BACKLOG_0901
@@ -934,7 +934,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "wf_2944480c-98f: 72 medidos (0 descartes) + 27 frescos citados = 99/99; juiz fixo reprovou 21/72 (29%) — sem carimbo, listados; 29 carimbos aplicados, 22 SUPERSEDES; custo real 5.388.890 tokens vs teto 4,5M (+20%, declarado)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_META_CENSUS_NASCEU
@@ -951,7 +951,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/census.md · docs/analysis/backlog-real-census-dogfood-2026-09-01.md"
       locator: "dogfood ponta-a-ponta do modo-de-falha do TETO (wf_15ebe561-003): teto 150k selecionou 2/8 por atencao, nomeou 6 NAO_MEDIDO_POR_TETO, juiz reprovou os 2 CONFIRMED preguicosos e a selagem recusou carimbo (0 stamps — AUDIT integro); extrator provou retomada KG-runtime (22 a-medir pos-revisao = exatamente os reprovados); bancada census-extract 3/3"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CENSUS_RODADA1
@@ -967,7 +967,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09-01-r1.md"
       locator: "wf_90dd73fe-cd2: 22/22 medidos (motivo da reprovacao anterior injetado por no), 0 descartes; juiz aprovou 13, reprovou 5 (23% — caiu de 29%); vereditos 15 CONF/6 DRIFT/1 REFUTED; custo 1.768.062 tok = 80k/no vs teto 2M; A-MEDIR 22→6"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CENSUS_RODADA2
@@ -983,7 +983,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09-01-r2.md"
       locator: "wf_102a9bec-52f: 6/6 medidos, juiz aprovou 3/reprovou 2 (3a reincidencia dos mesmos: contagem-inflada e trace-nao-medido); 5 CONF/1 REFUTED; 521k = 87k/no; A-MEDIR 6→3; seal com cura indent-agnostica+fail-barulhento exercitada (3 carimbos, radar 0)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
 edges:

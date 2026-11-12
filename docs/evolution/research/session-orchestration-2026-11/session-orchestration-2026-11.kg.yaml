@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "seções «Estratégias», «Medida (até 17:40 UTC)» e «Adendo das 18h UTC»"
-      method: "leitura: diário escrito pela sessão orquestradora durante a janela"
+      method: "reading: diário escrito pela sessão orquestradora durante a janela"
       locality: "repo"
   - id: C_SO_TRES_PAPEIS
     node_type: claim
@@ -54,7 +54,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "seção «Papéis que emergiram»"
-      method: "leitura: DIARIO.md desta pasta"
+      method: "reading: DIARIO.md desta pasta"
       locality: "repo"
   - id: C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL
     node_type: claim
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "ops/load-lease.sh"
       locator: "cabeçalho (contrato) e família run_load_lease_selftests em .claude/validation/lint-selftest.sh"
-      method: "medição: bancada da família load_lease e dogfood do pr-finalize sob carga sintética, 2026-11-06"
+      method: "measurement: bancada da família load_lease e dogfood do pr-finalize sob carga sintética, 2026-11-06"
       locality: "repo"
   - id: E_SO_PSI_CONTRA_LOAD_1106
     node_type: evidence
@@ -88,7 +88,7 @@ nodes:
     provenance:
       source: "⟨arquivos diários do sysstat da VPS, de 2026-10-30 a 2026-11-06⟩"
       locator: "sadf -d -- -q ALL; junção por instante de ldavg-1, runq-sz, %scpu-10 e %scpu"
-      method: "medição: correlação e tabela de acerto por limiar, script versionado"
+      method: "measurement: correlação e tabela de acerto por limiar, script versionado"
       locality: "host"
   - id: D_SO_LIMITES_DERIVADOS_DO_LEASE_1106
     node_type: decision
@@ -125,7 +125,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégias 2, 10 e 16"
-      method: "leitura: DIARIO.md desta pasta"
+      method: "reading: DIARIO.md desta pasta"
       locality: "repo"
   - id: C_SO_REGRA_DO_MEDIDOR
     node_type: claim
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/PRE-REGISTRO.md"
       locator: "Emendas 1, 5 e 6"
-      method: "leitura: PRE-REGISTRO.md dos spikes"
+      method: "reading: PRE-REGISTRO.md dos spikes"
       locality: "repo"
   - id: C_SO_FRASE_DE_VEREDITO_DO_INSTRUMENTO
     node_type: claim
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégia 17"
-      method: "leitura: DIARIO.md desta pasta"
+      method: "reading: DIARIO.md desta pasta"
       locality: "repo"
   - id: C_SO_DONO_DA_ESPEC_JULGA_A_SEMANTICA
     node_type: claim
@@ -170,7 +170,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégias 9 e 15"
-      method: "leitura: DIARIO.md desta pasta"
+      method: "reading: DIARIO.md desta pasta"
       locality: "repo"
   - id: C_SO_RITMO_POR_EVENTO_E_AUTORIZACAO_DATADA
     node_type: claim
@@ -185,7 +185,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégias 5 e 8"
-      method: "leitura: DIARIO.md desta pasta"
+      method: "reading: DIARIO.md desta pasta"
       locality: "repo"
   - id: D_SO_MECANISMO_EM_DEGRAUS
     node_type: decision
@@ -202,7 +202,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «O mecanismo proposto»"
-      method: "derivado: proposta do core a partir dos C_SO_*, 2026-11-03"
+      method: "derived: proposta do core a partir dos C_SO_*, 2026-11-03"
       locality: "repo"
   - id: Q_SO_GATILHO_DE_CONSTRUCAO
     node_type: question
@@ -219,7 +219,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «Gatilho»"
-      method: "derivado: proposta do core a partir dos C_SO_*, 2026-11-03"
+      method: "derived: proposta do core a partir dos C_SO_*, 2026-11-03"
       locality: "repo"
   - id: Q_SO_PADROES_DE_MERCADO
     node_type: question
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «Gatilho»"
-      method: "derivado: proposta do core a partir dos C_SO_*, 2026-11-03"
+      method: "derived: proposta do core a partir dos C_SO_*, 2026-11-03"
       locality: "repo"
   - id: D_SO_DIRECAO_ACEITA_E_PASSO_A_PASSO_DO_GATILHO_1104
     node_type: decision
@@ -270,7 +270,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/data/market-supervision-2026-11-10.md"
       locator: "seções 1 a 4 e a lista de URLs"
-      method: "leitura: colheita de fontes primárias feita pela curadoria em 2026-11-10"
+      method: "reading: colheita de fontes primárias feita pela curadoria em 2026-11-10"
       locality: "repo"
   - id: C_SO_BATUTA_V1_1110
     node_type: claim
@@ -286,7 +286,7 @@ nodes:
     provenance:
       source: ".claude/commands/common/prompts/baton-doctrine.md"
       locator: "cláusulas 1 a 5 e a fronteira; bancada em .claude/validation/lint-selftest.sh (run_maestro_ask_selftests, run_batuta_census_selftests, run_load_lease_selftests)"
-      method: "medição: bancada com mutante e dogfood no repo real, 2026-11-10"
+      method: "measurement: bancada com mutante e dogfood no repo real, 2026-11-10"
       locality: "repo"
 edges:
   - from: E_SO_MERCADO_SUPERVISAO_1110

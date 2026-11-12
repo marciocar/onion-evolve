@@ -32,7 +32,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/inference-mitigation.md"
       locator: "docs/knowledge-base/concepts/inference-mitigation.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   # ── A escada de refutacoes (cada nivel REFUTES o anterior 'esta fechado') ──
@@ -78,7 +78,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-07-20-admission-rule-blindspot.md · docs/knowledge-base/concepts/inference-mitigation.md@ac259e25"
       locator: ".claude/diary/2026-07-20-admission-rule-blindspot.md:19-20 e :30-33 · docs/knowledge-base/concepts/inference-mitigation.md@ac259e25:111-114 (item (0) superfície de escrita) e :137-142 (POLÍTICA escapou, fixtures verdes por construção)"
-      method: "leitura: migalha e KB do contrato no commit ac259e25"
+      method: "reading: migalha e KB do contrato no commit ac259e25"
       locality: "repo"
 
   # ── A evidencia adversarial (as 8 passadas) ───────────────────────────────
@@ -101,7 +101,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-07-20-admission-rule-blindspot.md · commit 474b194f (corpo)"
       locator: ".claude/diary/2026-07-20-admission-rule-blindspot.md:17-19 (falha de forma), :23-26 (escada destinatário→…→política→superfície de escrita), :30-33 (política só vista na 8ª) · 474b194f corpo ('always the same failure of FORM, one level deeper each time')"
-      method: "leitura: migalha versionada e corpo do commit 474b194f"
+      method: "reading: migalha versionada e corpo do commit 474b194f"
       locality: "repo"
 
   - id: E_VERIFY_BACKGROUND_BLINDSPOT
@@ -115,7 +115,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/inference-mitigation.md:139"
       locator: "docs/knowledge-base/concepts/inference-mitigation.md:139"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: E_VERIFY_APPROVED
@@ -138,7 +138,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/inference-mitigation.md:104"
       locator: "docs/knowledge-base/concepts/inference-mitigation.md:104"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: D_HONEST_LIMITS
@@ -151,7 +151,7 @@ nodes:
     provenance:
       source: "commit 474b194f (corpo) · docs/knowledge-base/concepts/inference-mitigation.md@474b194f"
       locator: "474b194f corpo §'Honest limits kept explicit and symmetric' · inference-mitigation.md@474b194f:144-148 (escopo por-TURNO; composição = L3/L6 GATED), :165-169 (limite honesto de L1: só o rotulado), :183-186 (limite de L2: não fecha inferência dentro do propósito; não quantifica redução)"
-      method: "leitura: corpo do commit 474b194f e a KB do contrato no mesmo commit"
+      method: "reading: corpo do commit 474b194f e a KB do contrato no mesmo commit"
       locality: "repo"
 
   # ── O artefato e a migalha ────────────────────────────────────────────────
@@ -167,7 +167,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/inference-mitigation.md"
       locator: "docs/knowledge-base/concepts/inference-mitigation.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: A_ADMISSION_CRUMB
@@ -182,7 +182,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-07-20-admission-rule-blindspot.md"
       locator: ".claude/diary/2026-07-20-admission-rule-blindspot.md:34-38 (§Evidence, regra de admissão vive só no contrato) e :10 (next_recommended)"
-      method: "leitura: a migalha versionada apontada no trace"
+      method: "reading: a migalha versionada apontada no trace"
       locality: "repo"
 
 edges:

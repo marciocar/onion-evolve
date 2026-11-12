@@ -20,7 +20,7 @@ nodes:
     provenance:
       source: "gh run list/view --workflow onion-selftest.yml (marciocar/onion-evolve) e transcrições das sessões do core"
       locator: "29 runs vermelhos em PRs mergeados de 2026-10-07 a 2026-10-14; 89/431 chamadas com a variável"
-      method: "medição: contagem nos logs do forge e nas transcrições; 11 de 29 reproduzidas localmente"
+      method: "measurement: contagem nos logs do forge e nas transcrições; 11 de 29 reproduzidas localmente"
       locality: "web"
 
   - id: E_FAMILIAS_FORA_DO_PRE_VOO
@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: "lint-selftest.sh --affected-range (seletor vivo) sobre as cabeças dos 18 PRs"
       locator: "PRs #957 a #1127 listados no comentário da SAC-141"
-      method: "medição: replay do seletor por worktree em cada cabeça"
+      method: "measurement: replay do seletor por worktree em cada cabeça"
       locality: "repo"
 
   - id: E_MAPA_INTEIRO_NO_FECHAMENTO_E_CARO
@@ -52,7 +52,7 @@ nodes:
     provenance:
       source: "lint-selftest.sh --families nas cabeças do #1112 e #1118; gh run view 38649919883"
       locator: "450 s (109 famílias), 40 s (90 famílias ≤10 s), 219 s (118 famílias ≤60 s)"
-      method: "medição: uma amostra por configuração"
+      method: "measurement: uma amostra por configuração"
       locality: "repo"
 
   - id: Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO
@@ -78,7 +78,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-15: «SAC-141: 29 reprovações de CI em 8 dias; 9 de o pré-voo não ter rodado, 20 de famílias que ele não seleciona. O que eu faço?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-15"
       locality: "pessoa"
 
 edges:

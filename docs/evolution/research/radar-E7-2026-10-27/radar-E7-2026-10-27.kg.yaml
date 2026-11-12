@@ -78,7 +78,7 @@ nodes:
     provenance:
       source: "https://developers.openai.com/api/docs/deprecations"
       locator: "Seção 'Update to OpenAI’s self-serve fine-tuning', tabela, linha 'May 7, 2026'"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702
@@ -99,7 +99,7 @@ nodes:
     provenance:
       source: "https://developers.openai.com/api/docs/deprecations"
       locator: "Mesma seção, tabela, linha 'July 2, 2026'"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106
@@ -120,7 +120,7 @@ nodes:
     provenance:
       source: "https://developers.openai.com/api/docs/deprecations"
       locator: "Mesma seção, tabela, linha 'Jan 6, 2027'"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_OPENAI_FT_INFERENCE_CONTINUES_UNTIL_BASE_DEPRECATION
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "https://developers.openai.com/api/docs/deprecations"
       locator: "Seção do fine-tuning, parágrafo introdutório"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05
@@ -161,7 +161,7 @@ nodes:
     provenance:
       source: "https://ai.google.dev/gemini-api/docs/model-tuning"
       locator: "Página 'Fine-tuning with the Gemini API', parágrafo de abertura (corpo inteiro da página)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_GEMINI_API_NO_IMMEDIATE_TUNING_PLANS
@@ -181,7 +181,7 @@ nodes:
     provenance:
       source: "https://ai.google.dev/gemini-api/docs/model-tuning"
       locator: "Página 'Fine-tuning with the Gemini API', segundo parágrafo"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_MISTRAL_FT_API_DEPRECATED
@@ -201,7 +201,7 @@ nodes:
     provenance:
       source: "https://docs.mistral.ai/capabilities/finetuning/"
       locator: "Aviso 'Deprecated' no topo da página; sidebar 'Fine-tuning API (legacy)'"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST
@@ -221,7 +221,7 @@ nodes:
     provenance:
       source: "https://docs.mistral.ai/capabilities/finetuning/"
       locator: "Seção introdutória; sidebar de recursos deprecados"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD
@@ -241,7 +241,7 @@ nodes:
     provenance:
       source: "https://docs.mistral.ai/capabilities/finetuning/"
       locator: "Seção de preços da página"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217
@@ -262,7 +262,7 @@ nodes:
     provenance:
       source: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/"
       locator: "Parágrafo 3 (final) do anúncio What's New de 2026-02-17"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES
@@ -283,7 +283,7 @@ nodes:
     provenance:
       source: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/"
       locator: "Parágrafo 2 do anúncio"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_GEMINI_4_ARGON_FLAGSHIP_PAGE_1026
@@ -304,7 +304,7 @@ nodes:
     provenance:
       source: "https://ai.google.dev/gemini-api/docs/pricing"
       locator: "Seção Gemini 4 Argon, Standard, descrição do modelo"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_GEMINI_4_ARGON_INPUT_PRICE_DOUBLES_20261201
@@ -326,7 +326,7 @@ nodes:
     provenance:
       source: "https://ai.google.dev/gemini-api/docs/pricing"
       locator: "Gemini 4 Argon, Standard, Paid Tier, Input price"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_GEMINI_4_ARGON_OUTPUT_PRICE_DOUBLES_20261201
@@ -348,7 +348,7 @@ nodes:
     provenance:
       source: "https://ai.google.dev/gemini-api/docs/pricing"
       locator: "Gemini 4 Argon, Standard, Paid Tier, Output price (including thinking tokens)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_TOGETHER_SFT_SMALL_034_USD
@@ -368,7 +368,7 @@ nodes:
     provenance:
       source: "https://www.together.ai/pricing"
       locator: "Fine-tuning, tabela principal (SFT | DPO | Minimum)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_TOGETHER_SFT_COST_SCALES_WITH_SIZE
@@ -388,7 +388,7 @@ nodes:
     provenance:
       source: "https://www.together.ai/pricing"
       locator: "Fine-tuning, tabela principal, última linha; comparar Llama 3.3 70B $2.03 e Kimi K2.6 $15.00"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_TOGETHER_INFERENCE_SMALL_OPEN_WEIGHTS_CENTS
@@ -408,7 +408,7 @@ nodes:
     provenance:
       source: "https://www.together.ai/pricing"
       locator: "Serverless inference: chat (Input | Output por 1M tokens)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_TOGETHER_INFERENCE_HIGH_TIER_OPEN_WEIGHTS
@@ -428,7 +428,7 @@ nodes:
     provenance:
       source: "https://www.together.ai/pricing"
       locator: "Serverless inference: chat; comparar Kimi K3 $3.00 / $15.00"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_FIREWORKS_LORA_SFT_SIZE_TIERS
@@ -448,7 +448,7 @@ nodes:
     provenance:
       source: "https://fireworks.ai/pricing"
       locator: "Seção Fine-tuning (Managed Training), tabela de preço por 1M tokens de treino"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_FIREWORKS_FULL_PARAM_DOUBLE_LORA
@@ -468,7 +468,7 @@ nodes:
     provenance:
       source: "https://fireworks.ai/pricing"
       locator: "Seção Fine-tuning (Managed Training), última linha da tabela (LoRA SFT, LoRA DPO, Full Param SFT, Full Param DPO)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_NEMOTRON_BOLT_HYBRID_MAMBA_LATENTMOE
@@ -488,7 +488,7 @@ nodes:
     provenance:
       source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
       locator: "Model Summary (Architecture); Model Architecture (README linhas 60 e 165)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_NEMOTRON_BOLT_OPENMDW_LICENSE
@@ -509,7 +509,7 @@ nodes:
     provenance:
       source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
       locator: "License/Terms of Use (linha 119); Description (linha 53)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_NEMOTRON_BOLT_HF_RELEASE_20261015_256K
@@ -530,7 +530,7 @@ nodes:
     provenance:
       source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
       locator: "Model Design (linha 171); Release Date (linha 151); Model Overview (linha 75)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_NEMOTRON_BOLT_VENDOR_BENCHMARKS
@@ -551,7 +551,7 @@ nodes:
     provenance:
       source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
       locator: "Benchmarks (tabela, coluna Nemotron 3.5 Bolt 74B-A9B (BF16), README linhas 123-136)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH
@@ -572,7 +572,7 @@ nodes:
     provenance:
       source: "https://mistral.ai/news/mistral-large-4/"
       locator: "Artigo 'Mistral Large 4', seção de pesos/red-teaming (grep -F no texto extraído)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW
@@ -593,7 +593,7 @@ nodes:
     provenance:
       source: "https://mistral.ai/news/mistral-large-4/"
       locator: "Artigo 'Mistral Large 4', abertura"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_DISTILL_8B_2000X_ABSTRACT_CLAIM
@@ -613,7 +613,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2602.20164"
       locator: "Abstract (PDF p.1)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_DISTILL_8B_622_H100_HOURS
@@ -634,7 +634,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2602.20164"
       locator: "Seção 4.2, final (PDF p.8)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_DISTILL_BASELINE_IS_6ND_ESTIMATE
@@ -655,7 +655,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2602.20164"
       locator: "Seção 4.1, final (PDF p.7)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_DISTILL_COST_IS_MARGINAL
@@ -676,7 +676,7 @@ nodes:
     provenance:
       source: "https://arxiv.org/abs/2602.20164"
       locator: "Seção 4.2, item 2 (PDF p.8)"
-      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      method: "reading: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
       locality: "web"
 
   - id: E_OBJECAO_E7_00
@@ -694,7 +694,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27 (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_02
@@ -712,7 +712,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702 (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_03
@@ -730,7 +730,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106 (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_05
@@ -748,7 +748,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05 (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_07
@@ -766,7 +766,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_MISTRAL_FT_API_DEPRECATED (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_08
@@ -784,7 +784,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_09
@@ -802,7 +802,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_10
@@ -820,7 +820,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217 (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_11
@@ -838,7 +838,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_15
@@ -856,7 +856,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_TOGETHER_SFT_SMALL_034_USD (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_16
@@ -874,7 +874,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_TOGETHER_SFT_COST_SCALES_WITH_SIZE (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_22
@@ -892,7 +892,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_NEMOTRON_BOLT_OPENMDW_LICENSE (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_25
@@ -910,7 +910,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_26
@@ -928,7 +928,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_OBJECAO_E7_27
@@ -946,7 +946,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "Elenxo, objeção ao alvo E_DISTILL_8B_2000X_ABSTRACT_CLAIM (survives: true, critério E2_PROVA_MENOS)"
-      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      method: "judges: Elenxo de 1 agente com critério pré-registrado"
       locality: "host"
 
   - id: E_LACUNAS_RADAR_E7_2026_10_27
@@ -964,7 +964,7 @@ nodes:
     provenance:
       source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, objeções, superações e gapsOpen do Elenxo"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   - id: C_SUPERACAO_20261027_GPT4_FOUR_FAMILIES_ONLY
@@ -1073,7 +1073,7 @@ nodes:
     provenance:
       source: "https://developers.openai.com/api/docs/deprecations"
       locator: "Seção 'Update to OpenAI’s self-serve fine-tuning', tabela, linha 'July 2, 2026'"
-      method: "medição: curl da página em 2026-10-27, remoção de tags e grep pela frase; conferida também por WebFetch na mesma data"
+      method: "measurement: curl da página em 2026-10-27, remoção de tags e grep pela frase; conferida também por WebFetch na mesma data"
       locality: "web"
 
   - id: E_E7_BASELINE_SEALED_1027
@@ -1091,7 +1091,7 @@ nodes:
     provenance:
       source: "docs/onion/radar-baselines.yaml e docs/onion/radar-sources.yaml"
       locator: "eixo E7-treino-inferencia (baselines) e grupo treino-inferencia (sources)"
-      method: "medição: leitura do arquivo depois da edição e saída do lint-artifacts.sh sem o aviso de eixo nunca rodado"
+      method: "measurement: leitura do arquivo depois da edição e saída do lint-artifacts.sh sem o aviso de eixo nunca rodado"
       locality: "repo"
 
   - id: T_E7_KIMI_K2
@@ -1106,7 +1106,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "K2 nesta rodada é Kimi K2: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1128,7 +1128,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "K3 nesta rodada é Kimi K3: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1150,7 +1150,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "V3 nesta rodada é DeepSeek V3: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1172,7 +1172,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "BF16 nesta rodada é bfloat16: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1194,7 +1194,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "ML4 nesta rodada é Mistral Large 4: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1216,7 +1216,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "H100 nesta rodada é GPU NVIDIA H100: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1238,7 +1238,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "CO2 nesta rodada é dióxido de carbono: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:
@@ -1260,7 +1260,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
       locator: "as menções do código no label e no narrative dos nós deste grafo"
-      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      method: "measurement: o lint rodado no commit e cada menção lida no nó dela"
       locality: "repo"
     label: "B200 nesta rodada é GPU NVIDIA B200: nome de produto ou unidade que vem das fontes, não código da casa."
     x_term:

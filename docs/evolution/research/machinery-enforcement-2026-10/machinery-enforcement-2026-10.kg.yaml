@@ -20,7 +20,7 @@ nodes:
     provenance:
       source: "transcrições das sessões do core e .claude/validation/review-artifact-check.sh@origin/main"
       locator: "9 episódios de reviewed_code_sha256 'pendente' (10-07 a 10-12) e 3 de verdict ou campo ausente"
-      method: "medição: extração por script das escritas e das reprovações do validador"
+      method: "measurement: extração por script das escritas e das reprovações do validador"
       locality: "repo"
 
   - id: E_VETO_EM_WRITE_REFUTADO_PELA_MEDICAO
@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: "gh pr list (marciocar/onion-evolve) e transcrições das sessões do core"
       locator: "205 PRs depois do #923; 199 leituras sem invocação em até 3 h"
-      method: "medição: contagem por script sobre o forge e as transcrições"
+      method: "measurement: contagem por script sobre o forge e as transcrições"
       locality: "web"
 
   - id: Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA
@@ -74,7 +74,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-15: «SAC-142: o estudo derrubou o veto geral em Write. O que eu faço?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-15"
       locality: "pessoa"
 
 edges:

@@ -37,7 +37,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «anarlog: costurar pela CLI meetings export --format json, com qual aviso aos participantes?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   - id: E_CURADORIA_ANARLOG_1016
@@ -57,7 +57,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@aa70452:docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml"
       locator: "nós D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE, E_ELENXO_CORRECTIONS"
-      method: "leitura: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
+      method: "reading: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
       locality: "repo"
 
   - id: Q_ANARLOG_PORTAO_EXPORT

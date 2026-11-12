@@ -3,7 +3,6 @@
   "id": "onion-tier-matrix-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 9,
     "form.required.node.verified_against": 4,
     "form.required.node.verified_at": 1,
     "integrity.untraced-decision": 3,

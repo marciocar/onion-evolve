@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: "repo descartável em mktemp, git 2.43.0"
       locator: "init + .githooks/pre-commit que ecoa HOOK-DA-MAIN; worktree add com pre-commit que ecoa HOOK-DA-BRANCH; commit na worktree com cada forma do hooksPath"
-      method: "medição: comandos executados na sessão de 2026-10-26"
+      method: "measurement: comandos executados na sessão de 2026-10-26"
       locality: "repo"
 
   - id: E_DOGFOOD_CORE_VOLTOU_A_ABSOLUTO
@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "<core>/.git/config"
       locator: "git config --show-origin --get core.hooksPath; echo '{\"session_id\":\"dogfood-hp\"}' | bash .claude/hooks/session-currency-check.sh (2 vezes)"
-      method: "medição: leitura de config e invocação do hook como o runner o chama"
+      method: "measurement: leitura de config e invocação do hook como o runner o chama"
       locality: "repo"
 
   - id: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
@@ -59,7 +59,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "GUARD_CENSUS_QUERY='hooksPath ' bash .claude/validation/guard-census.sh . --markdown; .claude/settings.json hooks.SessionStart e hooks.UserPromptSubmit"
-      method: "medição: censo de guardas e leitura do registro antes da forja"
+      method: "measurement: censo de guardas e leitura do registro antes da forja"
       locality: "repo"
 
   - id: E_BANCADA_E_MUTANTE_HOOKSPATH
@@ -76,7 +76,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_hookspath_reminder_selftests, casos (a) a (h) e (m)"
-      method: "medição: bancada executada com LC_ALL=C"
+      method: "measurement: bancada executada com LC_ALL=C"
       locality: "repo"
 
   - id: C_TETO_CONSERTO_NO_LOCAL
@@ -93,7 +93,7 @@ nodes:
     provenance:
       source: ".claude/hooks/session-currency-check.sh"
       locator: "função hookspath_reminder"
-      method: "leitura: o código do lembrete"
+      method: "reading: o código do lembrete"
       locality: "repo"
 
   - id: C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: ".claude/settings.json"
       locator: "hooks.UserPromptSubmit (session-currency-check.sh)"
-      method: "leitura: registro do hook no settings do projeto"
+      method: "reading: registro do hook no settings do projeto"
       locality: "repo"
 
   - id: E_ELENXO_1A_PASSADA_FALSOS_POSITIVOS
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_hookspath_reminder_selftests, casos (b2) (b3) (e2) (e3) (f) (g) (h)"
-      method: "medição: refutador em subagente e mutantes externos re-rodados sobre a cura"
+      method: "measurement: refutador em subagente e mutantes externos re-rodados sobre a cura"
       locality: "repo"
   - id: D_WORKTREECREATE_PROPRIO_PARQUEADO_1026
     node_type: decision
@@ -143,7 +143,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «O que fazer com o hook WorktreeCreate próprio, depois do spike e do trampolim?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_REVERIFY_1027_HOOK_FALA_SUBAGENTE_NAO_OUVE
     node_type: evidence

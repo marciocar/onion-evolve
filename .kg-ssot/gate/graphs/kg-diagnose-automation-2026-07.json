@@ -3,7 +3,6 @@
   "id": "kg-diagnose-automation-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 8,
     "form.range.node.label": 1,
     "yaml.unquoted-date": 1
   }

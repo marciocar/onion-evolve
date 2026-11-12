@@ -35,7 +35,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.299 a ## 2.1.299 (cópias em docs/evolution/research/radar-E3-2026-10-14-r10/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Changed `UserPromptSubmit` hooks to run before a skill or custom slash command expands'"
-      method: "medição: grep nos 4 hooks UserPromptSubmit"
+      method: "measurement: grep nos 4 hooks UserPromptSubmit"
       locality: "web"
   - id: E_PLAN_MODE_E_VETOS_SEM_ALLOW
     node_type: evidence
@@ -76,7 +76,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Fixed plan mode running a write (an MCP tool's, a file's, a shell command's) that a `PreToolUse` hook or a mod's `tool.check` hook allowed'"
-      method: "medição: grep nos 5 hooks PreToolUse"
+      method: "measurement: grep nos 5 hooks PreToolUse"
       locality: "web"
   - id: E_MCP_ALLOW_ESTREITADO_SEM_EFEITO_NO_CORE
     node_type: evidence
@@ -91,7 +91,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Changed MCP allow rules to reach only the server they name; Changed agent `tools:` lists to take only the named MCP server's tools'"
-      method: "medição: grep das formas mcp__ em settings.json e agentes"
+      method: "measurement: grep das formas mcp__ em settings.json e agentes"
       locality: "web"
   - id: E_NOME_DE_SKILL_COM_CARACTERE_INVALIDO_ZERO
     node_type: evidence
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Changed skill and command loading: one whose file or folder name has hidden, direction-changing or blank-like characters, `<` or `>` is no longer offered'"
-      method: "medição: git ls-files com grep -P"
+      method: "measurement: git ls-files com grep -P"
       locality: "web"
   - id: E_COMPACTACAO_OCIOSA_E_A_SESSAO_DO_MAESTRO
     node_type: evidence
@@ -122,7 +122,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Added idle compaction in the terminal: a 200K+ token conversation left idle for about 54 minutes is compacted'"
-      method: "medição: leitura do settings.json e da sessão da rodada"
+      method: "measurement: leitura do settings.json e da sessão da rodada"
       locality: "web"
   - id: Q_COMPACTACAO_OCIOSA_DISPARA_O_PRECOMPACT
     node_type: question
@@ -142,7 +142,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «SAC-117: o PreCompact deve cobrir as branches do core?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: E_AGENT_SPAWN_RESUME_E_SENDMESSAGE_SEM_USO
     node_type: evidence
@@ -157,7 +157,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Fixed the `agent.spawn` mod hook not running when a finished subagent or a killed teammate is resumed; Fixed `SendMessage` not finding a subagent by name after the CLI restarted'"
-      method: "medição: grep de SendMessage em .claude"
+      method: "measurement: grep de SendMessage em .claude"
       locality: "web"
   - id: E_REVISOR_DO_CI_NAO_CHAMA_CLAUDE_P
     node_type: evidence
@@ -172,7 +172,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Fixed `claude -p` saying nothing when a settings file fails validation'"
-      method: "medição: leitura do onion-review.yml"
+      method: "measurement: leitura do onion-review.yml"
       locality: "web"
   - id: E_HOOK_DE_PLUGIN_FECHA_E_O_BUNDLE_LEVA_3
     node_type: evidence
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Changed actions a plugin hook can block to be refused, not let through, when the hook cannot be handed them or cannot hand back its answer'"
-      method: "medição: leitura do manifesto do bundle onion"
+      method: "measurement: leitura do manifesto do bundle onion"
       locality: "web"
   - id: E_WEBFETCH_DA_PESQUISA_HERDA_O_ESFORCO
     node_type: evidence
@@ -202,7 +202,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Changed WebFetch page reads to pick their effort as web searches do'"
-      method: "medição: grep no onion-research.js"
+      method: "measurement: grep no onion-research.js"
       locality: "web"
   - id: E_RELATORIO_DE_SUBAGENTE_EM_DOBRO_CURADO
     node_type: evidence
@@ -217,7 +217,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.299, item 'Fixed background subagents in auto mode sometimes sending their final report twice, once as the result and once as a message'"
-      method: "medição: leitura do modo padrão e dos usos de subagente de fundo"
+      method: "measurement: leitura do modo padrão e dos usos de subagente de fundo"
       locality: "web"
   - id: Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299
     node_type: question

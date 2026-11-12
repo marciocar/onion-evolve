@@ -3,7 +3,6 @@
   "id": "constellation-dialogic-layer-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 27,
     "form.required.node.provenance": 4,
     "yaml.unquoted-date": 1
   }

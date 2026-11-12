@@ -53,7 +53,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/feat-public-distribution-decisions.md (PR #827)"
       locator: "l.127 (\"3 refutadores, 16 HARD\") + l.221-226 (2ª rodada: \"9 HARD\") + l.305-314 (bancada 1232/0/0, lint 0 HARD, CI lint+selftest pass no SHA 98b35bc5)"
-      method: "leitura: resíduo R56 do PR #827 (MERGED 2026-09-14)"
+      method: "reading: resíduo R56 do PR #827 (MERGED 2026-09-14)"
       locality: "repo"
 
   # ── A CLASSE DOMINANTE: 3 ocorrencias em guardas DIFERENTES no mesmo dia ──
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: ".claude/validation/vendor-scrub-form-check.sh"
       locator: "tres ocorrencias medidas em tres guardas distintas no mesmo dia, cada uma com comando e saida no residuo do PR #827"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
@@ -88,7 +88,7 @@ nodes:
     provenance:
       source: ".claude/validation/vendor-scrub-form-check.sh"
       locator: "medicao no proprio repo: nome comercial de cliente real de PoC em DOIS arquivos da superficie vendorizada, e a REGRA 36 nunca cobrou"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/regen-baselines.sh"
       locator: "grep -c --emit-baseline no lint-artifacts.sh: era 0, virou 1 com uma mensagem de remediacao; 8 dos 10 baselines passaram a resolver 2 emissores e NENHUM foi regenerado"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH
@@ -124,7 +124,7 @@ nodes:
     provenance:
       source: ".claude/validation/pipe-verdict-check.sh"
       locator: "o detector pipe-verdict-check.sh enumerava _emit|grep|awk|sed|cat|printf; as duas instancias do dia tinham produtor `git` e `bash`, ambos fora da lista"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ── A CLASSE EPIPE: recorrencia que estava registrada SEM cura ──
@@ -141,7 +141,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "duas instancias medidas no mesmo dia, ambas com o padrao PRESENTE e o veredito FALSO; 0 falhas em 200 tentativas locais contra reprovacao no runner de 2 nucleos"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_EPIPE_ACUSOU_REGRA_VIVA_DE_MORTA
@@ -159,7 +159,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "CI do PR #827 reprovou com 1 HARD que nao reproduz local; o glob docs/evolution/research/** casa 139 arquivos rastreados (10 KB de caminhos)"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_EPIPE_ACUSOU_O_TRANSPORTE_DE_NAO_CARREGAR
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "a bancada reprovou upstream-portal (b) no mesmo minuto em que a instancia A foi curada; .claude/workflows e a 8a de 11 linhas emitidas"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA
@@ -195,7 +195,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "o caso (e) da familia regen_baselines ja trazia a frase, escrita numa passada anterior, sem cura anexada"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── O QUE A PASSADA ACHOU NOS MEUS PROPRIOS ARTEFATOS ──
@@ -214,7 +214,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "mutante provado: nome de cliente injetado passa em role:adopted e e pego em role:hub; com members.yaml enxuto o detector nao varria nada"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_O_DETECTOR_NAO_PEGAVA_METADE_DO_VAZAMENTO_QUE_O_MOTIVOU
@@ -232,7 +232,7 @@ nodes:
     provenance:
       source: ".claude/validation/vendor-scrub-form-check.sh"
       locator: "rodado sobre o texto original do vazamento: o ampersand pega a primeira metade, a ancora NAO pega a segunda (caixa alta) na mesma frase"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_O_PASSO_QUE_EU_ESCREVI_NASCIA_MORTO
@@ -250,7 +250,7 @@ nodes:
     provenance:
       source: ".claude/commands/engineer/pr.md"
       locator: "allowed-tools do /engineer:pr nao tinha Task, Workflow nem Skill; os irmaos meta/census e meta/drive tem"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_ESCOLHI_O_NUMERO_QUE_FECHAVA_O_ARGUMENTO
@@ -268,7 +268,7 @@ nodes:
     provenance:
       source: ".claude/commands/engineer/pr.md"
       locator: "gh run view nos tres runs: 19,0 · 24,2 · 24,2 min. Eu escrevera `primeiro CI: 24 min` e `cabem inteiros`; os refutadores levaram 19,5 min de parede"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_CURA_DAS_LICENCAS_ERA_ATIVAMENTE_DANOSA
@@ -286,7 +286,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "dois refutadores mediram independentemente: com LICENSE no manifesto, o cp -R do adopt sobrescreve o LICENSE do alvo; grep -c LICENSE no adopt.md = 0"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA
@@ -304,7 +304,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/durable-commit.sh"
       locator: "durable-commit.sh:43 tem ONION_PATHS hardcoded e independente da SSOT criada no PR #826"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ── A DECISAO QUE SAIU DISSO ──
@@ -321,7 +321,7 @@ nodes:
     provenance:
       source: ".claude/commands/engineer/pr.md"
       locator: "selado pelo maestro 2026-09-14 (`faz virar mecanismo no /engineer:pr`) e DOGFOODADO no PR que o criou: a 2a rodada rodou dentro da espera do CI e achou 9 HARD"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS
@@ -339,7 +339,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml"
       locator: "permission_denials_count: 9 no PR #827 e 14 em 2026-08-07, registrado no proprio workflow; pre-voo da credencial HTTP 200, logo nao e auth"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── OS FIOS ABERTOS, com dono e gatilho ──
@@ -360,7 +360,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml"
       locator: "medido no PR #828, o PRIMEIRO depois do merge da cura e pelo CAMINHO REAL (nao edita onion-review.yml, logo sem auto-pulo): permission_denials_count 0 (era 9, e 14 em 2026-08-07) · is_error false (era true) · num_turns 8 COMPLETOS (antes 18 morrendo, ou 1 sem partir) · total_cost_usd 0.37 (trabalho real, nao morte em t=0). onion-review-verdict SUCCESS de verdade, nao soft-pass."
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
@@ -376,7 +376,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: "dogfood dos DOIS cenarios por execucao: alvo virgem recebe LICENSE e LICENSE-DOCS; alvo com LICENSE proprietario PRESERVA o dele (Apache/Cliente Ficticio intacto) e recebe o nosso como LICENSE.onion. Familia license_travels 5/5 com mutante provado — a copia cega CLOBRA, logo o caso (b) prova algo."
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR
@@ -403,7 +403,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "bundle EXTRAIDO e contado: `--role adopted` 685 arquivos, `--role standalone` 578 (107 cortados, delta exato do prefixo da meta-fabrica); familia `role_cut` da bancada 11/11, com mutante provando que o corte vem de _role_cut e nao de outro lugar."
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CORTE_POR_PAPEL_MEDIDO_0915
@@ -419,7 +419,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "git archive dos dois papeis + tar -t + lint no sandbox extraido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CORTE_ESTAVA_INVERTIDO_MEDIDO_0915
@@ -435,7 +435,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "ls do repo PUBLICO onion-standalone (corte manual de 2026-07-19) + resolve-role-bundle.sh standalone --tools + bundle extraido e lintado"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_SSOT_DO_ESCOPO_JA_EXISTIA
@@ -451,7 +451,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml no commit df031ef5^ + .claude/utils/marketplace/resolve-role-bundle.sh"
       locator: "git show df031ef5^:.claude/utils/marketplace/roles.yaml l.27-41 (work_tool_sets.full: 14 entradas kg..co-relay); resolvedor criado em a07fa90b (2026-07-08) e lê roles.yaml"
-      method: "leitura: roles.yaml no pai do commit do nó + git log do resolvedor"
+      method: "reading: roles.yaml no pai do commit do nó + git log do resolvedor"
       locality: "repo"
 
   - id: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO
@@ -468,7 +468,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-adopt-role-cut-transport.md + commit df031ef5 + .claude/utils/adopt/resolve-manifest.sh + .claude/commands/meta/adopt.md"
       locator: "resíduo l.77-84 (§4: 2222 arquivos, 353 de biografia, rc=0, pré-existente); corpo de df031ef5 (2026-09-15); resolve-manifest.sh l.25-34 (exit 3 com rc≠0 ou saída vazia); adopt.md l.112-113 e l.737-738 (mapfile ... < <(resolve-manifest.sh) || ABORTADO), igual em df031ef5:adopt.md l.113/l.737"
-      method: "leitura: resíduo R56, corpo do commit df031ef5, resolve-manifest.sh e adopt.md (no worktree e em df031ef5)"
+      method: "reading: resíduo R56, corpo do commit df031ef5, resolve-manifest.sh e adopt.md (no worktree e em df031ef5)"
       locality: "repo"
 
   - id: E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE
@@ -484,7 +484,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/write-stamp.sh"
       locator: "write-stamp.sh --role standalone saia 2; o carimbo .claude/.onion-version da porta onion-standalone (clone local) carregava role: adopted"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_SSOT_DO_ESCOPO_ESTAVA_DEFASADA
@@ -500,7 +500,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "contagem das mencoes a /meta:* nas mensagens de .claude/validation/*.sh: inventory 32x, kg-freshness 27x, drive 5x, radar 4x, backlog 3x, kg-inbox 3x"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING
@@ -516,7 +516,7 @@ nodes:
     provenance:
       source: "ops/verify-adopter-gate.sh"
       locator: "adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = caminho ABSOLUTO para .githooks no clone de jogo-da-vida contra a comparacao `[ \"${DIR}\" != \".githooks\" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR
@@ -532,7 +532,7 @@ nodes:
     provenance:
       source: "ops/verify-adopter-gate.sh"
       locator: "sinal de campo de um adotante (inbox 2026-09-15) + leitura do verificador: o `info` imprime \"o BLOQUEIO nao foi exercido — declarado, nao aprovado\" e o veredito 3 linhas abaixo diz \"GATE VIVO — provado por execucao\""
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO
@@ -548,7 +548,7 @@ nodes:
     provenance:
       source: "ops/audit-adopters-registry.sh"
       locator: "ops/audit-adopters-registry.sh <diretório-pai dos clones no host> — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
@@ -578,7 +578,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: "lint completo rodado DENTRO dos bundles adopted/hub/standalone montados da arvore de trabalho (git stash create) e de main, por REGRA; e diff do conjunto normalizado de violacoes entre os dois lados, nos tres papeis"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_MANIFESTO_VAZIO_ERA_TODOS
@@ -594,7 +594,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "repo de teste sem nenhuma raiz da superficie Onion: manifesto saia com ZERO pathspecs e rc=0"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
@@ -610,7 +610,7 @@ nodes:
     provenance:
       source: "commit 58992add (merge do PR #831) + docs/evolution/review/fix-adopt-docs-onion-mkdir.md + .claude/utils/adopt/regen-ssot-projections.sh"
       locator: "git show -s 58992add (corpo: FALSA = ponteiros resolvem no passo (1); VERDADEIRA = \"procedimento PRÉ-CURA seguido POR INTEIRO dava 1 HARD\", bullet da Fase 3 só gerava o inventory; refuted→done); resíduo l.25-42 e l.70-79; script l.33 (mkdir -p docs/onion)"
-      method: "leitura: mensagem do commit 58992add (PR #831 mergeado 2026-09-15) + resíduo R56 + script curado"
+      method: "reading: mensagem do commit 58992add (PR #831 mergeado 2026-09-15) + resíduo R56 + script curado"
       locality: "repo"
 
   - id: A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN
@@ -638,7 +638,7 @@ nodes:
     provenance:
       source: "PR #831 (marciocar/onion-evolve), corpo"
       locator: "gh pr view 831 --json body, l.5: \"Simulação da adoção completa → lint-artifacts.sh dentro do alvo: rc=0, HARD 0, SOFT 8\"; resíduo fix-adopt-docs-onion-mkdir.md l.29 (medição 4) e l.36-42"
-      method: "medição: lint-artifacts.sh no alvo simulado após o procedimento completo (registrada no PR #831)"
+      method: "measurement: lint-artifacts.sh no alvo simulado após o procedimento completo (registrada no PR #831)"
 
   - id: E_MKDIR_ERA_DEFEITO_REAL_MEDIDO_0915
     node_type: evidence
@@ -655,7 +655,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: "procedimento PRE-CURA seguido POR INTEIRO (inclusive o bullet da Fase 3 que tinha o mkdir) num alvo simulado: lint dentro do alvo = 1 HARD, `docs/onion/graph.md: grafo ausente`"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA
@@ -671,7 +671,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "vendor-manifest.sh --emit-scrub-roots listava 11 raizes e NENHUMA era plugins/; e lint completo rodado depois de acrescenta-la achou 6 candidatos que nenhuma guarda via"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA
@@ -687,7 +687,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "grep do prefixo da familia na superficie que viaja: 6 citacoes num motor e numa KB que o padrao anterior nao casava, duas delas ja dentro do plugin publico montado"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_GUARDA_DAVA_VEREDITOS_OPOSTOS_EM_GIT_E_NAO_GIT
@@ -703,7 +703,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "lint-artifacts.sh rodado na porta REAL (clone local da porta onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o \"rc=0, 0 HARD\" que eu declarei do MESMO pin, medido num destino materializado SEM git init"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA
@@ -719,7 +719,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "diff -q das duas copias de .claude/rules/research-lens.md (byte-identicas) x git ls-files docs/evolution/research/** nos dois repos: 140 arquivos no core, 0 na porta"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_CATRACA_DA_PORTA_ERA_ESTEIRA
@@ -735,7 +735,7 @@ nodes:
     provenance:
       source: ".claude/validation/door-staleness-check.sh"
       locator: "observado ao vivo em tres tentativas de fechar o mesmo gate na branch feat/door-cycle-mechanized: 378 -> 380 -> 381, cada subida de teto invalidada pelo proprio commit que a fez; depois da cura, a medicao honesta contra merge-base devolveu 372/0"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_PATHSPEC_DE_EXCLUSAO_DESLIGOU_DUAS_GUARDAS
@@ -751,7 +751,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-branch.sh"
       locator: "bancada rodada em worktree do merge-base (b586ffd1) = 35/35 verde contra a branch = 31/4, isolando as quatro como REGRESSAO DESTA PILHA; reproducao manual do caso vendor-branch §8 mostrou foo.md indo de \"cmd v1 CUSTOM\" para \"cmd v2\" com rc=0"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO
@@ -767,7 +767,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "gh workflow run onion-review-diagnose.yml devolveu HTTP 422: \"failed to parse workflow: (Line: 39, Col: 5) env is already defined\"; git log -S localizou a quebra em 3d39372e (2026-09-16)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_DIVIDA_DA_REGRA_45_ERA_O_QUE_PRENDIA_A_PORTA
@@ -783,7 +783,7 @@ nodes:
     provenance:
       source: ".claude/validation/kb-vendored-link-check.sh"
       locator: "kb-vendored-link-check.sh antes: \"Links core-privados: 22 · Baseline: 24 entradas\"; depois da migracao link->texto+gloss em 15 arquivos: \"Links core-privados: 0 · Baseline: 0 entradas\""
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_GUARDA_CONTRA_NOME_DE_CLIENTE_CONTINHA_NOMES_DE_CLIENTE
@@ -799,7 +799,7 @@ nodes:
     provenance:
       source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
       locator: "gh api repos/marciocar/onion-core/contents/.claude/validation/vendor-scrub-form-check.sh devolveu as fixtures com quatro nomes comerciais reais no repo PUBLICO; depois da cura, `git grep` desses nomes na superficie que viaja devolve ZERO e a sonda ao vivo (injetar o nome num agente) passou a ser pega pela REGRA 36"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
@@ -816,7 +816,7 @@ nodes:
     provenance:
       source: ".claude/validation/vps-exposure-check.sh"
       locator: "grep do prefixo de home de conta e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO
@@ -832,7 +832,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml"
       locator: "gh pr checks nos PRs #846 e #847 apos o maestro repor credito: onion-review pass em 8m1s (#846) e 5m3s + onion-review-verdict pass em 3s (#847); antes, no #842, o mesmo workflow saia is_error:true com turnos=1 e custo=0"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
@@ -849,7 +849,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml"
       locator: "Log do job onion-review do PR #874 (run 36131799171, 2026-09-25T11:52:55Z): pre-voo POST /v1/messages com claude-sonnet-5 devolveu HTTP 400 e corpo {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API\"}}. Nas duas ocorrencias (2026-09-18 e 2026-09-25) a causa foi a MESMA. O maestro reps o credito no mesmo dia."
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PERNA_DE_LEITURA_E_CEGA_A_BASH
@@ -865,7 +865,7 @@ nodes:
     provenance:
       source: ".claude/hooks/kg-read-leg.sh"
       locator: ".claude/settings.json:141 (matcher \"Read\") e .claude/hooks/kg-read-leg.sh:35 (le tool_input.file_path, campo que NAO existe numa chamada Bash); medido pelo proprio incidente de 2026-09-19, em que o condutor leu e editou um .kg.yaml inteiramente por sed/grep/python-heredoc e o hook nunca falou"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE
@@ -890,7 +890,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-read-leg-reaches-bash.md"
       locator: "l.23-28 (tabela Bash 2.341/95,3% · Edit 83 · Read 17 · Write 16) + l.31-32 (29 transcrições, 841 MB, 19.084 chamadas, jq) + l.59 (Bash 16.338/86%) + l.138 (\"Os números reproduzem ... exatos\")"
-      method: "leitura: resíduo R56 que registra a extração jq e a reprodução pelo refutador"
+      method: "reading: resíduo R56 que registra a extração jq e a reprodução pelo refutador"
       locality: "repo"
 
   - id: E_FAILSAFE_AFROUXADO_REPROVOU_POR_MEDICAO
@@ -906,7 +906,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "seletor REAL (_selftest_affected_families) rodado arquivo a arquivo sobre os 253 do dominio; e lint-selftest.sh:3924 mostrando `bash \"${SCRIPT_DIR}/members-validate.sh\"` dentro de helper despachado pela familia fixtures"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER
@@ -931,7 +931,7 @@ nodes:
     provenance:
       source: ".claude/validation/lib/pt-br-words.txt"
       locator: "Medido em 2026-09-20 no core, e o numero final e do GATE, nao da minha leitura: rodando o checker NOVO (lista de 153 termos) contra o `origin/main` do dia, ele acusa 46 identificadores pt-BR em 16 arquivos — os mesmos que o checker VELHO (102 termos) reportava como `0 HARD - 0 tolerados pelo baseline`. Distribuicao: lint-selftest.sh 15, lint-artifacts.sh 8, review-verdict.sh 5, vendor-manifest.sh 3, e 10 em `ops/`, que nem sequer estava no universo. Em paralelo, 33 pareceres do `onion-review` mostraram 10 com violacao, SEIS delas desta mesma classe, a ~US$ 0,80 por PR."
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_BACKTICK_EM_PROSA_DENTRO_DE_CONTEXTO_QUE_INTERPRETA
@@ -948,7 +948,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh · ops/materialize-door.sh"
       locator: "TRES ocorrencias medidas em dois dias, cada uma com o artefato saindo 0: (1) 2026-09-25, `ops/pr-merge-verified.sh` — o corpo do registro de dispensa era montado com `printf %s\\\\n` seguido de DOIS contra-barras; o primeiro escapava o segundo, a linha terminava ali e as seguintes viraram comando que o bash tentou EXECUTAR (`## Merge com check DISPENSADO: command not found`). O `gh pr comment` postou um contra-barra, saiu 0, e o script disse `dispensa registrada`. (2) 2026-09-26, `ops/materialize-door.sh` — `onion_version` em crase dentro de heredoc NAO-CITADO virou substituicao de comando e a palavra saiu VAZIA da instrucao nova; so apareceu porque eu EXECUTEI a instrucao em vez de reler. (3) a mesma familia no `.claude/diary/` — caminho em crase citado para dizer que NAO existe, barrado pela guarda de ponteiro morto, que esta certa em nao distinguir a intencao."
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM
@@ -966,7 +966,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh (_family, reivindicacao da fila; agregacao do pai) + log do job 118913703983 do run 39505580236 (PR #1238, 1a tentativa) + log do job plano do mesmo run"
       locator: "_family: a linha da trava por noclobber; job log: '✗ selftest-lanes: (h) --jobs agrega — rc=0' e 59 relogios de familia para 58 familias, o excedente sendo a vendor_manifest; plano: selftest_lanes entra pelo nucleo da bancada do nivel PR; imagem ubuntu-26.04 20261018.168.1"
-      method: "medição: corrida de reivindicação com o binário real do uutils extraído da imagem ubuntu:26.04 e reprodução do (h) com taskset em 2 núcleos, com e sem carga, sobre main, a branch do #1238, a cura e o mutante; duas passadas adversariais (maquinaria e o artefato mente?)"
+      method: "measurement: corrida de reivindicação com o binário real do uutils extraído da imagem ubuntu:26.04 e reprodução do (h) com taskset em 2 núcleos, com e sem carga, sobre main, a branch do #1238, a cura e o mutante; duas passadas adversariais (maquinaria e o artefato mente?)"
       locality: "repo"
 
   - id: E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT
@@ -985,7 +985,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "980bdbe3 l.356/410/413/470 (pipe para grep -q) contra HEAD (here-string); lint-artifacts.sh de 980bdbe3 l.961/963 contra HEAD l.1228-1264; lint-selftest.sh run_kg_backlog_selftests, caso (e), mensagem de FAIL-OPEN"
-      method: "medição: harness em diretório temporário (lint inteiro por sandbox git archive; helper isolado; probe do matcher), serie contra concorrencia, com o liga-desliga feito pela troca do leitor e nada mais"
+      method: "measurement: harness em diretório temporário (lint inteiro por sandbox git archive; helper isolado; probe do matcher), serie contra concorrencia, com o liga-desliga feito pela troca do leitor e nada mais"
       locality: "repo"
   - id: E_REVERIFY_1027_MANIFESTO_FALHO_RECUSA
     node_type: evidence

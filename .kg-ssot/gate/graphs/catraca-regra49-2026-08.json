@@ -3,7 +3,6 @@
   "id": "catraca-regra49-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 34,
     "form.range.node.label": 40,
     "form.required.node.provenance": 1,
     "integrity.bare-decision": 4

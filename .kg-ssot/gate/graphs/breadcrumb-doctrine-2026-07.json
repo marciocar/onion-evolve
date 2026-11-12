@@ -3,7 +3,6 @@
   "id": "breadcrumb-doctrine-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 13,
     "form.required.node.verified_against": 9,
     "yaml.unquoted-date": 1
   }

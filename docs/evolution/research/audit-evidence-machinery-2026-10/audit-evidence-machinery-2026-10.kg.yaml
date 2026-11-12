@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: "https://github.com/oscal-compass/compliance-trestle"
       locator: "README, descrição do projeto e licença"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_TRESTLE_V5_SUPPORTS_OSCAL_1_2_1
@@ -100,7 +100,7 @@ nodes:
     provenance:
       source: "https://github.com/oscal-compass/compliance-trestle"
       locator: "README, seções de trilha v5 e v4"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_TRESTLE_IMPLICIT_ALL_OSCAL_SCHEMAS
@@ -119,7 +119,7 @@ nodes:
     provenance:
       source: "https://oscal-compass.dev/compliance-trestle/latest/"
       locator: "página inicial e README"
-      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_SCF_LICENSE_CC_BY_ND_ATTRIBUTION
@@ -138,7 +138,7 @@ nodes:
     provenance:
       source: "https://securecontrolsframework.com/terms-conditions/"
       locator: "seção Attribution"
-      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE
@@ -157,7 +157,7 @@ nodes:
     provenance:
       source: "https://securecontrolsframework.com/terms-conditions/"
       locator: "seção Derivatives"
-      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_CSA_CCM_V4_1_207_CONTROLS_17_DOMAINS
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1"
       locator: "descrição do artefato, release date 01/27/2026"
-      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_OCSF_COMPLIANCE_FINDING_IS_FINDING_FORMAT
@@ -197,7 +197,7 @@ nodes:
     provenance:
       source: "https://schema.ocsf.io/1.9.0/classes/compliance_finding"
       locator: "descrição da classe Compliance Finding [2003]"
-      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_OCSF_FINDINGS_CATEGORY_CLASS_2003
@@ -217,7 +217,7 @@ nodes:
     provenance:
       source: "https://schema.ocsf.io/1.9.0"
       locator: "categoria Findings, classes 2002 a 2008"
-      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_LULA_V2_BUILT_AFTER_OSCAL_LIMITATIONS
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md"
       locator: "linha 68, seção 'Learning from Lula 1'"
-      method: "leitura: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_LULA_V2_STORAGE_YAML_IN_GIT
@@ -255,7 +255,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md"
       locator: "linha 383, seção 'Architecture'"
-      method: "leitura: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_LULA_V2_OSCAL_ONLY_ON_CATALOG_IMPORT
@@ -274,7 +274,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md"
       locator: "linhas 49, 63 e 64"
-      method: "leitura: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_CISO_ASSISTANT_AGPL_PLUS_ENTERPRISE_DIR
@@ -293,7 +293,7 @@ nodes:
     provenance:
       source: "https://github.com/intuitem/ciso-assistant-community"
       locator: "README, seção License"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_CISO_ASSISTANT_STATE_SQLITE_OR_POSTGRES
@@ -312,7 +312,7 @@ nodes:
     provenance:
       source: "https://github.com/intuitem/ciso-assistant-community"
       locator: "README, seção de configuração de banco"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_PROBO_SELF_HOSTED_POSTGRES_MIT
@@ -331,7 +331,7 @@ nodes:
     provenance:
       source: "https://github.com/getprobo/probo"
       locator: "README, seções Tech Stack e License"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_COMPAI_STATE_POSTGRES_PLUS_REDIS
@@ -350,7 +350,7 @@ nodes:
     provenance:
       source: "https://github.com/trycompai/comp"
       locator: "README, seções Prerequisites, Built With e packages"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   - id: E_COMPAI_OPEN_CORE_AGPL_EE_COMMERCIAL
@@ -369,7 +369,7 @@ nodes:
     provenance:
       source: "https://github.com/trycompai/comp"
       locator: "README, seção License / Open Source"
-      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      method: "reading: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
       locality: "web"
 
   # ─── Evidências INTERNAS medidas no core (3) ────────────────────────────────────────────────
@@ -390,7 +390,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/spec/kg-contract-v4.schema.json@3358788c"
       locator: "$defs.node.propertyNames (enum de 22 chaves, else de ^x_) e $defs.provenance (required source, locator, method)"
-      method: "medição: python3 -I lendo o JSON Schema vendorizado, release.json = 4.13.1"
+      method: "measurement: python3 -I lendo o JSON Schema vendorizado, release.json = 4.13.1"
       locality: "repo"
 
   - id: E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE
@@ -409,7 +409,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-radar.sh@3358788c"
       locator: "linhas 38-40 e 594 (e 1061)"
-      method: "medição: grep -n sobre o radar em origin/main"
+      method: "measurement: grep -n sobre o radar em origin/main"
       locality: "repo"
 
   - id: E_CORE_CORPUS_ZERO_AUDIT_EVIDENCE_VOCAB
@@ -428,7 +428,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-corpus-grep.sh@3358788c"
       locator: "saída '# corpus: 180 grafos · termos: oscal · 0 nó(s)' e idem para evidence_type e oscal_method"
-      method: "medição: kg-corpus-grep.sh rodado em 2026-10-21"
+      method: "measurement: kg-corpus-grep.sh rodado em 2026-10-21"
       locality: "repo"
 
   # ─── Contabilidade da rodada ────────────────────────────────────────────────────────────────
@@ -453,7 +453,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, gapsOpen e superações do Elenxo"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   # ─── Objeções SOBREVIVENTES do Elenxo (10) ──────────────────────────────────────────────────
@@ -472,7 +472,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 1 [compliance-trestle], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_02_TRESTLE_DECLARES_1_2_1_NOT_1_2_3
@@ -489,7 +489,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 2 [compliance-trestle], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição pela API do GitHub declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição pela API do GitHub declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_03_TRESTLE_IMPLICIT_IS_NOT_END_TO_END
@@ -506,7 +506,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 3 [compliance-trestle], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED
@@ -523,7 +523,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 5 [scf-erl], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_05_CCM_FORMATS_UNANCHORED_197_VS_207
@@ -540,7 +540,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 6 [csa-caiq-ccm], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_06_OCSF_ABSENCE_NOT_IN_QUOTE
@@ -557,7 +557,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 7 [ocsf], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_07_PROBO_QUOTE_LACKS_POSTGRES_MIT
@@ -574,7 +574,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 14 [probo-compai], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_08_COMPAI_QUOTE_LACKS_POSTGRES
@@ -591,7 +591,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a claim 15 [probo-compai], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY
@@ -608,7 +608,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a afirmação [fedramp-20x] dos 7 dias, critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED
@@ -625,7 +625,7 @@ nodes:
     provenance:
       source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
       locator: "objeção contra a lacuna oscal-releases, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   # ─── SUPERAÇÕES achadas (18; SAC-151) ───────────────────────────────────────────────────────
@@ -829,7 +829,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Selar grafo YAML em git como armazenamento e OSCAL como borda?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
@@ -849,7 +849,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Reancorar OSCAL e FedRAMP antes de escrever os itens 1 e 2?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
@@ -869,7 +869,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Qual norma alimenta source_norm, com o SCF/ERL fora por licença?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
@@ -889,7 +889,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Como dividir o vocabulário de evidência entre o contrato kg-ssot e o core?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT
@@ -939,7 +939,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O compliance-trestle como validador da exportação OSCAL?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   # ═══ RODADA 2 (reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021), 2026-10-21 ═══
@@ -963,7 +963,7 @@ nodes:
     provenance:
       source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
       locator: "observation/relevant-evidence (cardinalidade do array, do objeto e do flag href)"
-      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_V123_RELEVANT_EVIDENCE_HREF_FORMS
@@ -982,7 +982,7 @@ nodes:
     provenance:
       source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
       locator: "observation/relevant-evidence/href, Remarks"
-      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_V123_BACK_MATTER_RLINK_OR_BASE64
@@ -1001,7 +1001,7 @@ nodes:
     provenance:
       source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
       locator: "back-matter/resources/resource, Remarks"
-      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_V123_RLINK_OPTIONAL_HASH
@@ -1020,7 +1020,7 @@ nodes:
     provenance:
       source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
       locator: "back-matter/resources/resource/rlinks/rlink, descrição"
-      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_FEDRAMP_FRC_APP_FCP_7_DAYS_INITIAL_PACKAGE
@@ -1049,7 +1049,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json"
       locator: "FRR/FRC/data/all/APP/FRC-APP-FCP: statement e updated (2026-06-24)"
-      method: "leitura: JSON oficial lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: JSON oficial lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_CLI_V3_2_0_BINDINGS_1_2_1
@@ -1070,7 +1070,7 @@ nodes:
     provenance:
       source: "https://github.com/metaschema-framework/oscal-cli/releases/tag/v3.2.0"
       locator: "Highlights da release v3.2.0 (published_at 2026-05-15T11:12:51Z)"
-      method: "leitura: página de release lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: página de release lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_CLI_README_VALIDATES_GENERIC_RESOURCES
@@ -1088,7 +1088,7 @@ nodes:
     provenance:
       source: "https://github.com/metaschema-framework/oscal-cli"
       locator: "README.md, lista de operações (linha 8)"
-      method: "leitura: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_CLI_PUBLIC_DOMAIN_CC0
@@ -1107,7 +1107,7 @@ nodes:
     provenance:
       source: "https://github.com/metaschema-framework/oscal-cli"
       locator: "README.md, seção 'Public domain' (linha 23) e linha 156 (CC0 1.0 Universal)"
-      method: "leitura: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   - id: E_OSCAL_CLI_METASCHEMA_FRAMEWORK_IS_SUCCESSOR
@@ -1126,7 +1126,7 @@ nodes:
     provenance:
       source: "https://github.com/metaschema-framework/oscal-cli"
       locator: "README.md, seção 'Relationship to prior work' (linha 158)"
-      method: "leitura: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      method: "reading: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
       locality: "web"
 
   # ─── Contabilidade da rodada 2 ──────────────────────────────────────────────────────────────
@@ -1154,7 +1154,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (modo primaries), repassado ao escritor"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, gapsClosed, gapsOpen e superações do Elenxo"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   # ─── Objeções SOBREVIVENTES do Elenxo, rodada 2 (6) ─────────────────────────────────────────
@@ -1173,7 +1173,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 1 [oscal-v123-assessment], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_12_OSCAL_CLI_BINDINGS_1_2_1_PROVE_LESS
@@ -1190,7 +1190,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 6 [nist-oscal-cli], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_13_OSCAL_CLI_README_SILENT_ON_AR_POAM
@@ -1207,7 +1207,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a claim 7 [nist-oscal-cli], critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_14_OSCAL_METHODS_GAP_STILL_UNANCHORED
@@ -1224,7 +1224,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a lacuna oscal-v123-assessment, parte observation.methods, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_15_OSCAL_ACCEPTANCE_GAP_EXAGGERATED
@@ -1241,7 +1241,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a lacuna oscal-v123-assessment, parte acceptance, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_16_FEDRAMP_CPM_IS_PACKAGE_CEILING_NOT_VERIFICATION_CADENCE
@@ -1258,7 +1258,7 @@ nodes:
     provenance:
       source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
       locator: "objeção contra a lacuna fedramp-20x-rules, partes CPO-CSX-CPM e FRC-CSX-VVK, critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   # ─── SUPERAÇÕES achadas na rodada 2 (6; SAC-151) ────────────────────────────────────────────

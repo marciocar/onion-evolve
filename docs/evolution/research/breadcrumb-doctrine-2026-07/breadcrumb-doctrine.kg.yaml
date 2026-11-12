@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: E_GREP_TRACE
     node_type: evidence
@@ -33,7 +33,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.40-42; docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.32,l.41; corpo de 0923bd88 (Claude-Session session_01Wx2qXuALLsmSMA7Xgz1NEb)"
-      method: "testemunho: medição da sessão 2026-07-18 (grep de 6 .kg.yaml), comando não registrado, relatada na KB v2 e na SYNTHESIS; a parte \"zero next_recommended\" re-medida em 0923bd88^ (git grep -c next_recommended -- \"*.kg.yaml\": rc=1 em 29 arquivos)"
+      method: "testimony: medição da sessão 2026-07-18 (grep de 6 .kg.yaml), comando não registrado, relatada na KB v2 e na SYNTHESIS; a parte \"zero next_recommended\" re-medida em 0923bd88^ (git grep -c next_recommended -- \"*.kg.yaml\": rc=1 em 29 arquivos)"
       locality: "repo"
   - id: E_FABLE_VERDICT
     node_type: evidence
@@ -47,7 +47,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.3-4,l.27-33"
-      method: "juízes: verificação adversarial opus da orquestração wf_3d64cf59 (2026-07-18), registrada na SYNTHESIS; journal do workflow não localizado no host"
+      method: "judges: verificação adversarial opus da orquestração wf_3d64cf59 (2026-07-18), registrada na SYNTHESIS; journal do workflow não localizado no host"
       locality: "repo"
   - id: C_FAMILY
     node_type: claim
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.10,l.29-30; 0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.31-32"
-      method: "leitura: SYNTHESIS da orquestração wf_3d64cf59 + KB v2.0.0"
+      method: "reading: SYNTHESIS da orquestração wf_3d64cf59 + KB v2.0.0"
       locality: "repo"
   - id: C_GENUS_ABSORPTION
     node_type: claim
@@ -75,7 +75,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.36; docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.11"
-      method: "leitura: KB breadcrumb-patterns v2.0.0 (tabela de gêneros)"
+      method: "reading: KB breadcrumb-patterns v2.0.0 (tabela de gêneros)"
       locality: "repo"
   - id: C_GENUS_PROVENANCE
     node_type: claim
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.37; docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.12"
-      method: "leitura: KB breadcrumb-patterns v2.0.0 (tabela de gêneros)"
+      method: "reading: KB breadcrumb-patterns v2.0.0 (tabela de gêneros)"
       locality: "repo"
   - id: C_GENUS_TRAIL
     node_type: claim
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.38; docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.13"
-      method: "leitura: KB breadcrumb-patterns v2.0.0 (tabela de gêneros)"
+      method: "reading: KB breadcrumb-patterns v2.0.0 (tabela de gêneros)"
       locality: "repo"
   - id: C_VALIDITY_AXIS
     node_type: claim
@@ -117,7 +117,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.44-47; docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.14"
-      method: "leitura: KB breadcrumb-patterns v2.0.0 §Eixo transversal"
+      method: "reading: KB breadcrumb-patterns v2.0.0 §Eixo transversal"
       locality: "repo"
   - id: C_SSOT_TIE
     node_type: claim
@@ -131,7 +131,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.16-17"
-      method: "leitura: SYNTHESIS §\"O que se decidiu\""
+      method: "reading: SYNTHESIS §\"O que se decidiu\""
       locality: "repo"
   - id: C_LOCUS_SLIP
     node_type: claim
@@ -145,7 +145,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.31-33"
-      method: "leitura: SYNTHESIS (2ª correção do adversário)"
+      method: "reading: SYNTHESIS (2ª correção do adversário)"
       locality: "repo"
   - id: C_KG_ASYMMETRY
     node_type: claim
@@ -167,7 +167,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md l.10; 0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.40-42; .claude/diary/2026-07-18-breadcrumb-doctrine-three-genera.md l.29-30"
-      method: "leitura: SYNTHESIS + KB v2 + diário 2026-07-18"
+      method: "reading: SYNTHESIS + KB v2 + diário 2026-07-18"
       locality: "repo"
   - id: C_DRAFT_V1
     node_type: claim
@@ -181,7 +181,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "0923bd88:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.9,l.46-47; 0923bd88^:docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md l.9; commit 0923bd88 corpo"
-      method: "leitura: KB breadcrumb-patterns v2.0.0 e v1.0.0 (parent de 0923bd88) + corpo do commit"
+      method: "reading: KB breadcrumb-patterns v2.0.0 e v1.0.0 (parent de 0923bd88) + corpo do commit"
       locality: "repo"
   - id: D_UNIFIED_DOCTRINE
     node_type: decision
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
       locator: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 edges:
   - from: E_PRIOR_STIGMERGY

@@ -23,7 +23,7 @@ nodes:
     provenance:
       source: "sinal de campo do hub de 2026-10-19 (revisão do build-compliance-docs, achado 8), reproduzido no checkout do hub"
       locator: "bash .claude/validation/currency-census.sh <hub> --fresh, main × cura; bancada currency_census caso (h6)"
-      method: "medição: o censo da main e o da cura sobre o mesmo checkout, só leitura (ls-remote)"
+      method: "measurement: o censo da main e o da cura sobre o mesmo checkout, só leitura (ls-remote)"
       locality: "repo"
   - id: E_U5_INDICE_KB_CONTAGEM_SEM_GUARDA
     node_type: evidence
@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: "sinal de campo do hub de 2026-10-19 (dogfood do --update 59ebe7fe1288, achado 5), medido no core"
       locator: "bash .claude/validation/kb-index-check.sh .; bancada kb_index casos (a)–(m)"
-      method: "medição: o check sobre o índice antes e depois da correção, e mutante por comparação"
+      method: "measurement: o check sobre o índice antes e depois da correção, e mutante por comparação"
       locality: "repo"
   - id: C_HUB_FIELD_SIGNALS_1019_CURED
     node_type: claim
@@ -54,7 +54,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh (run_currency_census_selftests, run_kb_index_selftests)"
       locator: "casos (h6) e (a)–(m)"
-      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      method: "measurement: bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
   - id: E_U1_SINAL_MIGRACAO_CORPUS_V4
     node_type: evidence
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-20-kg-v4-migration-field-report.md"
       locator: "§3 item 1 e §4 (Pedidos: core)"
-      method: "leitura: o sinal inteiro, como relato do adotante (testemunho de terceiro sobre o corpus dele)"
+      method: "reading: o sinal inteiro, como relato do adotante (testemunho de terceiro sobre o corpus dele)"
       locality: "repo"
   - id: D_U1_MIGRADOR_NO_KG_SSOT
     node_type: decision
@@ -86,7 +86,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-20: «U1: onde mora o migrador do corpus ao contrato v4?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
   - id: D_U1_CAMADA_SDAAL_NO_UPDATE
     node_type: decision
@@ -102,7 +102,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-20: «U1: onde entra a camada SDAAL da migração no Onion?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
   - id: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
     node_type: evidence
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: "remeasure-contract.sh e offer-onion-ci.sh desta branch, contra o clone do hub (só leitura) e uma cópia por git archive do commit 606d6941b"
       locator: "saída do helper: 'CONTRATO medido: kg-ssot 4.9.1 … 25 grafo(s) · 1 passam no MUST · 24 reprovam' e 'MUST form.required.node.provenance: 1024 ocorrência(s) em 24 grafo(s)'"
-      method: "medição: o helper real rodado nos dois pontos do hub, conferido contra o kg_gate.py do próprio hub e contra os números do sinal"
+      method: "measurement: o helper real rodado nos dois pontos do hub, conferido contra o kg_gate.py do próprio hub e contra os números do sinal"
       locality: "host"
   - id: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
     node_type: evidence
@@ -134,7 +134,7 @@ nodes:
     provenance:
       source: "co-relay.sh desta branch, os carimbos reais do hub brain-granaai (copiados para um remetente descartável) e o clone local do onion-kg-ssot (só leitura)"
       locator: "dry-run 'autoriza : vendor/kg-ssot/.kg-ssot-version (a tag kg-ssot-v4.12.0 do destino reproduz os 444 arquivos do carimbo)'; bancada corelay casos (V1)-(V5) e mutantes (V-M1)-(V-M4)"
-      method: "medição: o helper real em dry-run contra o dono real e entrega real numa cópia descartável dele; sha256 dos 444 blobs da tag comparados ao carimbo"
+      method: "measurement: o helper real em dry-run contra o dono real e entrega real numa cópia descartável dele; sha256 dos 444 blobs da tag comparados ao carimbo"
       locality: "host"
   - id: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
     node_type: question
@@ -160,7 +160,7 @@ nodes:
     provenance:
       source: "co-relay.sh e a família corelay de .claude/validation/lint-selftest.sh, branch fix/co-relay-core-proof; o clone local do espelho do kg-ssot e o checkout do core, só leitura"
       locator: "dry-run: 'ERRO: o destino … não tem carimbo .claude/.onion-version e não prova ser o core: não tem .claude/validation/onion-version.sh'; bancada: (C1) a (C5) e os mutantes (C-M1) a (C-M6)"
-      method: "medição: o helper da branch e o da main em --dry-run contra os dois alvos reais, e a bancada com mutante por decisão"
+      method: "measurement: o helper da branch e o da main em --dry-run contra os dois alvos reais, e a bancada com mutante por decisão"
       locality: "host"
   - id: Q_U1_FASE2_MIGRACAO_CONDUZIDA
     node_type: question
@@ -175,7 +175,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/plan-contract-migration.sh e a família plan_contract_migration de .claude/validation/lint-selftest.sh, nesta branch"
       locator: "E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE deste grafo"
-      method: "derivado: da evidência E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE, que mede a fase contra o hub e a bancada"
+      method: "derived: da evidência E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE, que mede a fase contra o hub e a bancada"
       locality: "repo"
   - id: E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE
     node_type: evidence
@@ -191,7 +191,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/plan-contract-migration.sh e a família plan_contract_migration de .claude/validation/lint-selftest.sh, nesta branch; o hub brain-granaai em 606d6941b (antes) e f3738f4aa (a migração à mão), lidos por git archive"
       locator: "saída do helper: 'MIGRAÇÃO planejada (dry-run, kg_migrate.py plan do vendor do alvo, kg-ssot 4.13.0)' e 'o plano cobre, nó a nó, os 1024 nó(s) que a medição do contrato acusou no MUST'; bancada: 10 casos e 16 mutantes"
-      method: "medição: o helper real contra a cópia descartável do hub, a planilha comparada nó a nó com a migração à mão, e a bancada com mutante por cura, inclusive o que troca o plan pelo apply"
+      method: "measurement: o helper real contra a cópia descartável do hub, a planilha comparada nó a nó com a migração à mão, e a bancada com mutante por cura, inclusive o que troca o plan pelo apply"
       locality: "host"
   - id: D_CANAL_UPSTREAM_POR_VENDOR
     node_type: decision
@@ -207,7 +207,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-20: «O co-relay recusa o adotante mandando sinal ao onion-kg-ssot (role adopted: canal lateral), mas o kg-ssot é upstream de produto de todo vendor/kg-ssot: que canal?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
   - id: E_UPDATE_PROVA_BLOQUEIO_DO_GATE
     node_type: evidence
@@ -223,7 +223,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/prove-gate-blocks.sh e a família prove_gate_blocks de .claude/validation/lint-selftest.sh, nesta branch"
       locator: "dogfood: 'bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)'; bancada: 8 casos e 5 mutantes"
-      method: "medição: o helper real contra um clone local descartável do adotante, e a bancada com mutante por decisão"
+      method: "measurement: o helper real contra um clone local descartável do adotante, e a bancada com mutante por decisão"
       locality: "host"
 edges:
   - from: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE

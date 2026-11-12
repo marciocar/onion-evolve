@@ -3,7 +3,6 @@
   "id": "waha-adapter-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 21,
     "form.range.node.label": 24,
     "yaml.unquoted-date": 1
   }

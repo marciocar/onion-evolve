@@ -24,7 +24,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/dissect.md e os .kg.yaml do core"
       locator: "grep -rl 'meta:dissect' --include='*.kg.yaml' (2 arquivos) e ls docs/evolution/research (nenhum dissect)"
-      method: "medição: grep no repositório em 2026-10-08"
+      method: "measurement: grep no repositório em 2026-10-08"
   - id: Q_COSTURA_DISSECT_FORGE
     node_type: question
     layer: audit
@@ -50,7 +50,7 @@ nodes:
     provenance:
       source: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
       locator: "nos E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO e A_PLAN_VERIFICACAO_PELO_MOTOR"
-      method: "medição: dogfood do comando real e dos medidores em 2026-10-11"
+      method: "measurement: dogfood do comando real e dos medidores em 2026-10-11"
       locality: "repo"
   - id: D_PLANO_DE_ABSORCAO_E_NO
     node_type: decision
@@ -77,7 +77,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «O /meta:dissect viaja para quem?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: D_DISSECT_REGUA_POR_ALVO
     node_type: decision
@@ -93,7 +93,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «Como generalizar a régua do /meta:dissect, hoje fixa no Onion?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: D_DISSECT_MODO_ESTUDO
     node_type: decision
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «E o modo só de estudo, sem cobrar veredito?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: D_DISSECT_REGUA_PADRAO_E_O_PROPRIO_REPO
     node_type: decision
@@ -125,7 +125,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-15: «Qual é a régua padrão do dissect fora do core, e ela pode ser só uma parte do repo?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-15"
       locality: "pessoa"
   - id: E_REGUA_PADRAO_DERIVADA_NAO_PELO_FRAMEWORK
     node_type: evidence
@@ -142,7 +142,7 @@ nodes:
     provenance:
       source: ".claude/validation/dissect-census.sh e os carimbos .claude/.onion-version dos adotados locais"
       locator: "função _self_regua e casos g1-g6, k1-k2 de run_dissect_selftests"
-      method: "medição: carimbos lidos e censo rodado no core e num adotado de fixture em 2026-10-15"
+      method: "measurement: carimbos lidos e censo rodado no core e num adotado de fixture em 2026-10-15"
       locality: "repo"
   - id: E_ELIMINATORIO_APAGA_A_COLHEITA_1107
     node_type: evidence

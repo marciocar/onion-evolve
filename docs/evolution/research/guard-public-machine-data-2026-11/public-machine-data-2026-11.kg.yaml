@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml e .claude/diary/ em origin/main 9e0f61c15"
       locator: "bash .claude/validation/public-machine-data-check.sh <cópia do estado anterior> --tsv"
-      method: "medição: guarda executada sobre o estado anterior em 2026-11-09"
+      method: "measurement: guarda executada sobre o estado anterior em 2026-11-09"
       locality: "repo"
   - id: D_GUARD_SUBSTRATE_LINT_CHECK_1109
     node_type: decision
@@ -38,7 +38,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "injeção do /meta:forge-guard em 2026-11-09"
-      method: "medição: censo de guardas executado antes da forja"
+      method: "measurement: censo de guardas executado antes da forja"
       locality: "repo"
   - id: D_HOST_FORM_REPLACES_REGISTRY_HOSTS_1109
     node_type: decision
@@ -54,7 +54,7 @@ nodes:
     provenance:
       source: ".claude/utils/kg/machine_path.py"
       locator: "HOST_FORM e host_re"
-      method: "medição: selftest e corpus real em 2026-11-09"
+      method: "measurement: selftest e corpus real em 2026-11-09"
       locality: "repo"
   - id: D_LOCAL_PATH_STAYS_1109
     node_type: decision
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "git grep local_path em .claude e ops"
       locator: "git grep -n local_path -- .claude/hooks .claude/utils .claude/validation"
-      method: "medição: leitura de consumidores em 2026-11-09"
+      method: "measurement: leitura de consumidores em 2026-11-09"
       locality: "repo"
   - id: C_CEILING_GIT_HISTORY_STILL_PUBLIC_1109
     node_type: claim
@@ -98,7 +98,7 @@ nodes:
     provenance:
       source: "git grep na árvore do PR"
       locator: "git grep -l dos valores, fora de members.yaml, .claude/diary e docs/evolution/outbox/diary"
-      method: "medição: comando executado em 2026-11-09"
+      method: "measurement: comando executado em 2026-11-09"
       locality: "repo"
   - id: C_CEILING_CLASS_FORMS_ONLY_1109
     node_type: claim
@@ -114,7 +114,7 @@ nodes:
     provenance:
       source: ".claude/validation/public-machine-data-check.sh"
       locator: "cabeçalho, seção TETO DECLARADO"
-      method: "medição: sonda da classe executada em 2026-11-09"
+      method: "measurement: sonda da classe executada em 2026-11-09"
       locality: "repo"
   - id: C_CEILING_ADOPTER_NAMES_REMAIN_1109
     node_type: claim
@@ -129,7 +129,7 @@ nodes:
     provenance:
       source: ".claude/diary e docs/evolution/outbox/diary"
       locator: "busca dos nomes de adotante nos arquivos .md dos dois diretórios"
-      method: "medição: varredura executada em 2026-11-09"
+      method: "measurement: varredura executada em 2026-11-09"
       locality: "repo"
   - id: D_MD_PROTECTED_DIARY_RECLASSIFIED_PUBLIC_1109
     node_type: decision
@@ -158,7 +158,7 @@ nodes:
     provenance:
       source: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
       locator: "§2.2, linha de protected"
-      method: "leitura: RFC e estado do repo em 2026-11-09"
+      method: "reading: RFC e estado do repo em 2026-11-09"
       locality: "repo"
 edges:
   - from: C_CEILING_ADOPTER_NAMES_REMAIN_1109

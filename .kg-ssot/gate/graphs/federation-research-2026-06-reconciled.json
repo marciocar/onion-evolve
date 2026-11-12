@@ -3,7 +3,6 @@
   "id": "federation-research-2026-06-reconciled",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 509,
     "form.range.node.label": 45,
     "form.required.node.provenance": 22,
     "form.required.node.verified_against": 74,

@@ -18,7 +18,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-07-18-perception-instruments-doctrine.md"
       locator: ".claude/diary/2026-07-18-perception-instruments-doctrine.md l.24; corpo do commit 8fd6c736"
-      method: "leitura: diário 2026-07-18 (decision) e corpo do commit 8fd6c736"
+      method: "reading: diário 2026-07-18 (decision) e corpo do commit 8fd6c736"
       locality: "repo"
   - id: C_HYP_FAROL_INSTRUMENT
     node_type: claim
@@ -50,7 +50,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
       locator: "docs/knowledge-base/concepts/onion-perception-instruments.md l.23-27 (seção \"Os 4 PAPÉIS\")"
-      method: "leitura: KB da doutrina versionada no commit 8fd6c736 (2026-07-18)"
+      method: "reading: KB da doutrina versionada no commit 8fd6c736 (2026-07-18)"
       locality: "repo"
   - id: C_3_GENERA
     node_type: claim
@@ -64,7 +64,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
       locator: "docs/knowledge-base/concepts/onion-perception-instruments.md l.29-34 (tabela \"Os 3 GÊNEROS de sensor\")"
-      method: "leitura: KB da doutrina versionada no mesmo commit 8fd6c736 (2026-07-18)"
+      method: "reading: KB da doutrina versionada no mesmo commit 8fd6c736 (2026-07-18)"
       locality: "repo"
   - id: C_3_SOURCES
     node_type: claim
@@ -78,7 +78,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
       locator: "docs/knowledge-base/concepts/onion-perception-instruments.md l.40-45 (seção \"As 3 FONTES que um sensor lê\")"
-      method: "leitura: KB da doutrina versionada no commit 8fd6c736 (2026-07-18)"
+      method: "reading: KB da doutrina versionada no commit 8fd6c736 (2026-07-18)"
       locality: "repo"
   - id: C_UNIT_CHECK
     node_type: claim
@@ -92,7 +92,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md + .claude/hooks/co-evolution-inbox-check.sh e .claude/validation/kg-radar.sh @8fd6c736"
       locator: "KB l.19-21; co-evolution-inbox-check.sh@8fd6c736 l.3-6; kg-radar.sh@8fd6c736 l.44 (uso com os 7 modos)"
-      method: "leitura: KB + código dos dois scripts no commit 8fd6c736 (2026-07-18)"
+      method: "reading: KB + código dos dois scripts no commit 8fd6c736 (2026-07-18)"
       locality: "repo"
   - id: C_VEREDITO_AXIS
     node_type: claim
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-radar.sh e .claude/validation/federation-radar.sh @8fd6c736 + docs/knowledge-base/concepts/onion-perception-instruments.md"
       locator: "kg-radar.sh@8fd6c736 l.35 (Exit 1 = INTEGRIDADE ou SCHEMA); federation-radar.sh@8fd6c736 l.14 (ADVISORY: exit 0) e l.74 (exit 0); KB l.37"
-      method: "leitura: código dos dois radares no commit 8fd6c736 + KB da doutrina"
+      method: "reading: código dos dois radares no commit 8fd6c736 + KB da doutrina"
       locality: "repo"
   - id: C_CANARY
     node_type: claim
@@ -120,7 +120,7 @@ nodes:
     provenance:
       source: ".claude/validation/pin-integrity-check.sh @8fd6c736 + docs/knowledge-base/concepts/onion-perception-instruments.md"
       locator: "pin-integrity-check.sh@8fd6c736 l.21 (CANARY=lint-artifacts.sh) e l.34-35 (diff -q → \"pin-untrusted canario-divergente\"); KB l.48-50"
-      method: "leitura: código do pin-integrity-check.sh no commit 8fd6c736 + KB da doutrina"
+      method: "reading: código do pin-integrity-check.sh no commit 8fd6c736 + KB da doutrina"
       locality: "repo"
   - id: C_FRESHNESS_LAZY
     node_type: claim
@@ -134,7 +134,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md + .claude/hooks/co-evolution-inbox-check.sh @8fd6c736"
       locator: "KB l.38 (eixo VALIDADE/FRESCOR); co-evolution-inbox-check.sh@8fd6c736 l.19-20, l.29, l.42"
-      method: "leitura: KB da doutrina + código do hook co-evolution-inbox-check.sh no commit 8fd6c736"
+      method: "reading: KB da doutrina + código do hook co-evolution-inbox-check.sh no commit 8fd6c736"
       locality: "repo"
   - id: D_INSTRUMENTS_DOCTRINE
     node_type: decision
@@ -149,7 +149,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
       locator: "docs/knowledge-base/concepts/onion-perception-instruments.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
   - id: E_REVERIFY_CANARY_BANCADA_1027

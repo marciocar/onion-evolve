@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.301 a ## 2.1.301 (cópias em docs/evolution/research/radar-E3-2026-10-16-r12/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -68,7 +68,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301 (o delta inteiro: o alcance dele, não um item)"
-      method: "medição: --version do binário do SDK, package-lock do bridge e npm view"
+      method: "measurement: --version do binário do SDK, package-lock do bridge e npm view"
       locality: "web"
   - id: E_NENHUM_ITEM_TOCA_SANDBOX_WEBFETCH_STREAMJSON
     node_type: evidence
@@ -83,7 +83,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Fixed a tool call cut off by a message sent mid-turn during its permission check being reported to the model as rejected by the user'"
-      method: "medição: grep das palavras de isolamento no delta e leitura das flags do runner"
+      method: "measurement: grep das palavras de isolamento no delta e leitura das flags do runner"
       locality: "web"
   - id: Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE
     node_type: question
@@ -120,7 +120,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Fixed Grep and Glob reporting no matches when the search program failed unexpectedly before returning any results'"
-      method: "medição: matchers dos hooks no settings.json e leitura do canUseTool do bridge"
+      method: "measurement: matchers dos hooks no settings.json e leitura do canUseTool do bridge"
       locality: "web"
   - id: E_WORKFLOW_PULAVA_O_PASSO_E_DIZIA_SUCESSO
     node_type: evidence
@@ -136,7 +136,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Fixed workflow agents sometimes skipping their step, and the run still reporting success'"
-      method: "medição: leitura dos dois scripts de Workflow"
+      method: "measurement: leitura dos dois scripts de Workflow"
       locality: "web"
   - id: E_ARTIFACT_PASSA_PELO_EDIT_E_O_KG_READ_LEG
     node_type: evidence
@@ -151,7 +151,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Fixed artifact updates being refused where a PreToolUse hook covers Edit or Write'"
-      method: "medição: matcher e saídas do kg-read-leg.sh"
+      method: "measurement: matcher e saídas do kg-read-leg.sh"
       locality: "web"
   - id: E_ALIAS_FABLE_SEM_USO_NO_CORE
     node_type: evidence
@@ -166,7 +166,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Fixed the `fable` (and `best`) model alias erroring on the Anthropic API'"
-      method: "medição: grep do alias e leitura da escada"
+      method: "measurement: grep do alias e leitura da escada"
       locality: "web"
   - id: E_PLUGIN_VALIDATE_CURTO_NO_MESMO_HOST
     node_type: evidence
@@ -181,7 +181,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Fixed sign-in refresh timeouts and unexpected sign-outs after a short command'"
-      method: "medição: grep das chamadas ao CLI nos scripts"
+      method: "measurement: grep das chamadas ao CLI nos scripts"
       locality: "web"
   - id: E_SINAIS_DO_DELTA_SEM_CONSUMIDOR
     node_type: evidence
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301, item 'Added `classifier_verdict` and `permission_mode` to OpenTelemetry `tool_decision` events'"
-      method: "medição: grep no core e no bridge"
+      method: "measurement: grep no core e no bridge"
       locality: "web"
   - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_301
     node_type: evidence
@@ -211,7 +211,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.301 (o binário inteiro)"
-      method: "medição: execução da família cited_directive"
+      method: "measurement: execução da família cited_directive"
       locality: "web"
   - id: E_SDK_0_3_301_EM_PRODUCAO_1016
     node_type: evidence
@@ -227,7 +227,7 @@ nodes:
     provenance:
       source: "onion-bridge@0d1bc843 (PR #77) e onion-evolve@99a821cb (PR #1171); saída do chat-runner verify e do wrapper de deploy do bridge"
       locator: "linhas OK do verify: 'o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'o argv do SDK servido ... passa pelo lançador instalado (25 asserções)'; campo version do package.json do SDK no clone servido"
-      method: "medição: deploy pelo wrapper, verify independente e leitura do package.json como a conta do serviço"
+      method: "measurement: deploy pelo wrapper, verify independente e leitura do package.json como a conta do serviço"
       locality: "host"
   - id: E_CENSO_MEDE_O_CLI_DO_SDK_1016
     node_type: evidence
@@ -243,7 +243,7 @@ nodes:
     provenance:
       source: "onion-evolve, branch fix/cc-census-measures-bridge-sdk: .claude/validation/cc-delta-census.sh e ops/cc-sdk-targets.tsv"
       locator: "saída do censo na VPS (tabela de versões e avisos) e a família run_cc_delta_census_selftests, casos (j) a (n)"
-      method: "medição: censo rodado ao vivo na VPS, bancada com LC_ALL=C e mutantes por ops/mutate-and-restore.sh"
+      method: "measurement: censo rodado ao vivo na VPS, bancada com LC_ALL=C e mutantes por ops/mutate-and-restore.sh"
       locality: "host"
   - id: E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016
     node_type: evidence
@@ -260,7 +260,7 @@ nodes:
     provenance:
       source: "ops/update-bridge.sh (fase 6) e a família update_bridge do .claude/validation/lint-selftest.sh"
       locator: "função post_verify e o bloco NOT_PROVEN da fase 6; casos (u1) a (u21) da família"
-      method: "medição: a versão de origin/main e a curada na mesma sandbox, mais a bancada com mutante por caso"
+      method: "measurement: a versão de origin/main e a curada na mesma sandbox, mais a bancada com mutante por caso"
       locality: "host"
   - id: E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016
     node_type: evidence
@@ -277,7 +277,7 @@ nodes:
     provenance:
       source: "ops/bridge-hardening.sh (verify_live), ops/chat-runner.sh (sonda do sudo), ops/update-bridge.sh (fase 6) e as famílias bridge_hardening, chat_runner e update_bridge do .claude/validation/lint-selftest.sh"
       locator: "casos (h29), (h30), (r24b), (r24c), (u22) e (u23)"
-      method: "medição: os wrappers reais de origin/main e curados com sudo falso, mais a bancada com mutante por caso"
+      method: "measurement: os wrappers reais de origin/main e curados com sudo falso, mais a bancada com mutante por caso"
       locality: "host"
 edges:
   - from: E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016

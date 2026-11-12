@@ -3,7 +3,6 @@
   "id": "identidade-onion-vps-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 37,
     "form.range.node.label": 27,
     "form.required.node.provenance": 2,
     "integrity.bare-decision": 3,

@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md"
       locator: "varredura de plugins/*/kb/*.md resolvendo cada link irmao contra o disco: 15 mortos em DOIS plugins (onion-work-tools 12, onion-engineering 3)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_KB_GENERATOR_DRIFT
     node_type: evidence
@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base"
       locator: "grep '## ⚡ Quick Start' em docs/knowledge-base: 2 arquivos de 91"
-      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_DIARY_MARKER_IN_SOURCE
     node_type: evidence
@@ -55,7 +55,7 @@ nodes:
     provenance:
       source: ".claude/diary"
       locator: "grep '^classification: .*📤' em .claude/diary: 3 ocorrencias historicas (2 de 07-16 + 1 minha de 08-17, esta ja curada)"
-      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_NENHUM_AGENDADO_PAROU
     node_type: evidence
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "gh run list (marciocar/onion-evolve) + .github/workflows/@9781efd0"
       locator: "gh run list --event schedule --created '<=2026-08-18' (1 run: 2026-08-18T04:52Z, Onion Guard Selftest); git grep -l schedule: 9781efd0 -- .github/workflows/ (só onion-selftest.yml); docs/evolution/review/fix-residuos-2026-08-18.md l.45-46"
-      method: "medição: gh run list --repo marciocar/onion-evolve --event schedule --created '<=2026-08-18' (comando do verified_against, com o recorte de data) + git grep -l -E '^\\s*schedule:' 9781efd0 -- .github/workflows/"
+      method: "measurement: gh run list --repo marciocar/onion-evolve --event schedule --created '<=2026-08-18' (comando do verified_against, com o recorte de data) + git grep -l -E '^\\s*schedule:' 9781efd0 -- .github/workflows/"
 
   # ---- decisao: o que EXECUTAR, em ordem de valor declarado ----
   - id: D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/assemble-plugin.sh"
       locator: "medido nos 2 plugins regenerados: 15 links mortos -> 0, titulos legiveis; kind da bancada 11/11 sob set -euo pipefail; MUTANTE (assembler sem a cura) reprovado com dead=12 — assercao load-bearing"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: D_ALINHAR_GERADOR_DE_KB
     node_type: decision
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/create-knowledge-base.md"
       locator: "Fase 3 reescrita com as 2 familias MEDIDAS (38 REFERENCIA / 5 DOUTRINA / template antigo cobria 2 de 86) + nucleo comum invariante + gatilho de escolha; numeros medidos ancorados no proprio comando"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: D_GUARDA_DO_MARCADOR_NA_FONTE
     node_type: decision
@@ -119,7 +119,7 @@ nodes:
     provenance:
       source: ".claude/validation/diary-index.sh"
       locator: "2 migalhas de 07-16 curadas (grep de frontmatter = ZERO); guarda de enum na LINHA inteira no diary-index.sh; caso (h) na bancada (kind 8/8 sob set -euo pipefail); mutante honesto = versao de HEAD engole (rc=0) e a guarda reprova (rc=1)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ---- questao GATED: parado, mas sob controle ----
@@ -146,7 +146,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-residuos-2026-08-18.md"
       locator: "fix-residuos-2026-08-18.md l.38-41 ('A cura certa não é guarda (detecção): é o assembler converter no empacotamento (construção) — R_MECANISMO_ANTES_DE_INSTANCIA: impossível > detectável > corrigido-uma-vez'); corpo do commit 9781efd0 ('A CURA É POR CONSTRUÇÃO, não por detecção — mecanismo antes de instância')"
-      method: "leitura: resíduo do PR #632 e corpo do commit 9781efd0"
+      method: "reading: resíduo do PR #632 e corpo do commit 9781efd0"
       locality: "repo"
 
 edges:

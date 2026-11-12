@@ -3,7 +3,6 @@
   "id": "onion-plugin-publication-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 24,
     "form.range.node.label": 18,
     "integrity.bare-decision": 2
   }

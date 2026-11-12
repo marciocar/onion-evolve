@@ -3,7 +3,6 @@
   "id": "kg-freshness-dogfood-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 26,
     "form.range.node.label": 32,
     "form.required.node.provenance": 3
   }

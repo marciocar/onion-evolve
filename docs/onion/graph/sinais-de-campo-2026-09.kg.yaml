@@ -34,7 +34,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-radar.sh"
       locator: "medido 2026-09-07: `kg-radar.sh <g> --integrity --schema` imprimia SO o cabecalho INTEGRIDADE; `--schema` sozinho imprime o dele. Causa: MODE=${2:---all} le so o $2. Sitios com a forma de dois modos, medidos por tipo: 22 ocorrencias em 6 arquivos .sh (executavel, incluindo os dois gates de passo zero e o predicado de selo) + 67 em 52 .md (prosa) + 6 outros. Rodando --schema sozinho: 0 reprovam entre os 92 grafos versionados nao-fixture (o corpus tem 125 no total; as 2 fixtures que reprovam existem para isso)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_LISTA_DE_VERSOES_MENTE_SOBRE_MATURIDADE
@@ -50,7 +50,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "medido na fonte em 2026-09-07: `npm view @base-ui-components/react versions` termina em 1.0.0-rc.0 (parece imaturo); `npm view @base-ui-components/react deprecated` devolve 'Package was renamed to @base-ui/react'; `npm view @base-ui/react version` devolve 1.8.0 estavel"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
@@ -66,7 +66,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "os dois sinais desta rodada, medidos no core: o radar rodava um modo e devolvia exit 0 como se fossem dois; e `npm view versions` descreve fielmente o historico de um nome abandonado e por isso engana sobre maturidade. Em ambos o artefato responde a verdade a uma pergunta que nao era a que importava"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CENSO_EM_VOO_LE_NOME_DE_BRANCH
@@ -82,7 +82,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/drive.md"
       locator: "medido 2026-09-07: o censo do grafo do plano em origin/main devolve pronto=12 bloqueado=13 sobre 39 nos, com 12 fechados — entre eles D_PR01_STRICT_LIMPO (PR #815 mergeado). A afirmacao contraria ('o plano ainda nao comecou') foi produzida lendo `git worktree list` e vendo a branch `fix/merge-verified-false-negative`, que nao e no do plano"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012
@@ -100,7 +100,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-12-spike-value-criterion.md"
       locator: "a tabela dos três spikes e a seção 'O sinal de método'"
-      method: "testemunho: medição feita pelo adotante onion-kg-ssot e relayada como sinal de campo; não remedida no core"
+      method: "testimony: medição feita pelo adotante onion-kg-ssot e relayada como sinal de campo; não remedida no core"
       locality: "repo"
   - id: D_ABSORVER_CRITERIO_DE_VALOR_EM_SPIKE
     node_type: decision
@@ -116,7 +116,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-12: «O que fazer com o sinal do kg-ssot (spike: sobrevivência premia a proposta trivial; só valor com avaliador cego separa)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
   - id: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
     node_type: evidence
@@ -133,7 +133,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
       locator: "os 9 achados numerados do sinal de compliance e as 7 fricções numeradas do sinal de update (2026-10-19-dogfood-update-59ebe7fe1288.md)"
-      method: "testemunho: medição do hub relayada como sinal; C3, C5 e U7 remedidos no core em 2026-10-20 pelos greps do verified_against"
+      method: "testimony: medição do hub relayada como sinal; C3, C5 e U7 remedidos no core em 2026-10-20 pelos greps do verified_against"
       locality: "repo"
   - id: D_TRIAGEM_HUB_1019_EM_DUAS_ONDAS
     node_type: decision
@@ -149,7 +149,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "rodada de 2026-10-20 sobre os dois sinais do hub brain-granaai"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
   - id: E_REGRA_100_NAO_VIA_O_COMANDO_CORTADO
     node_type: evidence
@@ -166,7 +166,7 @@ nodes:
     provenance:
       source: ".claude/validation/ops-citation-travel-check.sh"
       locator: "o bloco 2º VOCABULÁRIO do cabeçalho e os casos (xx) a (xxii) do --selftest"
-      method: "medição: guarda rodada no corpus antes e depois, selftest e mutante"
+      method: "measurement: guarda rodada no corpus antes e depois, selftest e mutante"
       locality: "repo"
   - id: Q_HUB_1019_ONDA_B_CORPUS_HERDA_CONTRATO
     node_type: question
@@ -200,7 +200,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Onda B (fase de grafo nos build-*-docs, prod/dev/policy, escritor): o gatilho U1 disparou; quando, sendo a base da maquinaria de auditoria?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: Q_HUB_1019_BACKLOG_COM_GATILHO
     node_type: question
@@ -220,7 +220,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-25: «Sela os gatilhos de U6, C4 e C9 propostos pela triagem do hub de 10-19?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: D_SINAL_COMPLIANCE_REDIGIDO_NO_CORE_PUBLICO
     node_type: decision
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-20: «O sinal de compliance do hub traz postura de segurança real do cliente e o core é público: o que fazer com o arquivo?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
   - id: D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2
     node_type: decision
@@ -252,7 +252,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Maquinaria de auditoria contínua pedida pelo hub (x_evidence_*, radar de vencimento, questionário, OSCAL, fonte documental, coleta recorrente), com padrões de mercado não verificados: como seguimos?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: E_KG_SSOT_419_ADOTADA_1022
     node_type: evidence
@@ -268,7 +268,7 @@ nodes:
     provenance:
       source: "ops/kg-gate-ci.sh no core, antes e depois do vendor 4.19.0"
       locator: "linhas MUST e '↑ improved' da saída do gate; .kg-ssot/gate/ regravado"
-      method: "medição: gate do contrato contra o corpus rastreado, comparado antes e depois"
+      method: "measurement: gate do contrato contra o corpus rastreado, comparado antes e depois"
       locality: "repo"
   - id: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
     node_type: question
@@ -287,7 +287,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «Rodar o kg_migrate keys no corpus do core?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023
     node_type: decision
@@ -303,7 +303,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Integridade do grafo: o que o core faz com a sobreposição com o contrato?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_KG_QUERY_DIFF_SO_COM_MEDICAO_1023
     node_type: decision
@@ -319,7 +319,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Adotar kg_query e kg_diff onde o core usa grep/awk?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     node_type: decision
@@ -335,7 +335,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Formalizar o canal de aprendizado core ↔ kg-ssot?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_LICOES_ADOTANTES_NO_CORE_1023
     node_type: decision
@@ -351,7 +351,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Trazer as lições dos outros adotantes para o core?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_NOMES_CANONICOS_NASCEM_CERTOS_1023
     node_type: decision
@@ -367,7 +367,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Nomear as convenções aprovadas (A7.tsv, A1, r1, N0–N4) com nome canônico e glossário comum facilita o entendimento do core, do kg-ssot e do maestro?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023
     node_type: decision
@@ -383,7 +383,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Nomes canônicos: qual forma?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_NOMES_NASCEM_CERTOS_NAS_TRES_CAMADAS_1023
     node_type: decision
@@ -399,7 +399,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Onde mora o nascer e usar certo dos nomes canônicos?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_FORK_VS_AGENTE_NOVO_MEDIR_ANTES_1023
     node_type: decision
@@ -415,7 +415,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Trocar fork por agente novo com brief nas tarefas de execução que não dependem do histórico?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
 
   - id: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
@@ -434,7 +434,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Com os 3 pares medidos, selo agente novo como o padrão?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
   - id: E_ENV_GUARD_A1_A5_CURADOS_1023
@@ -452,7 +452,7 @@ nodes:
     provenance:
       source: "resíduo onion-curation@7709caa:docs/evolution/review/chore-onion-update-ca3c622d33e8.md e a medição no core"
       locator: "achados 2 (A1) e 6 (A5) do resíduo; casos data-awk-f, data-make-f, data-redir-copy, data-tee-copy, helper-fake e helper-cd-first; mutantes M21 a M24"
-      method: "medição: hook com o JSON do PreToolUse antes e depois da cura"
+      method: "measurement: hook com o JSON do PreToolUse antes e depois da cura"
       locality: "repo"
 
   - id: E_ENV_GUARD_HEREDOC_COMPOSTO_CURADO_1023
@@ -470,7 +470,7 @@ nodes:
     provenance:
       source: "transcripts da máquina (vetos de 2026-10-23) e a medição no core"
       locator: "casos grp-md, if-md, two-var, tee-devnull, grp-exec, grp-awk, grp-pipe-md, func-nl, exec-redir, two-var-for e grp-md-mv; find-exec-wc e find-exec-mix; mutantes M25 a M34 (o M34 aceita qualquer -exec e prova que o cat segue barrado)"
-      method: "medição: hook com o JSON do PreToolUse antes e depois da cura"
+      method: "measurement: hook com o JSON do PreToolUse antes e depois da cura"
       locality: "repo"
 
   - id: E_FORK_VS_AGENTE_NOVO_PAR_1_KG_SSOT_422_1023
@@ -486,7 +486,7 @@ nodes:
     provenance:
       source: "relatórios dos agentes nas task-notifications da sessão do core, 2026-10-22/23"
       locator: "campo usage (subagent_tokens, tool_uses, duration_ms) de cada notificação final"
-      method: "medição: contagem de tokens e chamadas reportada pelo harness por agente"
+      method: "measurement: contagem de tokens e chamadas reportada pelo harness por agente"
       locality: "host"
 
   - id: E_FASES_1_E_2_DO_CORE_ENTREGUES_1024
@@ -503,7 +503,7 @@ nodes:
     provenance:
       source: "a sessão que executou as fases 1 e 2 na worktree feat/canonical-names-core-layer"
       locator: "ops/kg-vocab-ci.sh, .claude/validation/house-codes-gen.sh, docs/onion/graph/vocabulario-da-casa-2026-10.kg.yaml e as famílias kg_vocab_ci, house_codes_gen e house_code_gloss da bancada"
-      method: "medição: o gate, o lint, a bancada e o hook rodados; o caso do r1 comparado com o hook da origin/main"
+      method: "measurement: o gate, o lint, a bancada e o hook rodados; o caso do r1 comparado com o hook da origin/main"
       locality: repo
   - id: E_KG_SSOT_425_ADOTADA_1024
     node_type: evidence
@@ -520,7 +520,7 @@ nodes:
     provenance:
       source: "ops/kg-gate-ci.sh e a família kg_gate_ci de .claude/validation/lint-selftest.sh"
       locator: "saída do gate antes e depois do --update; casos (a) a (d) da família e os três mutantes"
-      method: "medição: gate do contrato contra o corpus rastreado e bancada com vendor de bancada sintético"
+      method: "measurement: gate do contrato contra o corpus rastreado e bancada com vendor de bancada sintético"
       locality: "repo"
   - id: E_REGRA_55_PASSA_AO_KG_TRACE_1024
     node_type: evidence
@@ -537,7 +537,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-trace.sh, check_kg_trace_resolve de .claude/validation/lint-artifacts.sh e a família kg_trace_resolve de .claude/validation/lint-selftest.sh"
       locator: "diff dos índices emitidos pelos dois parsers; casos (a) a (j) da família e os mutantes"
-      method: "medição: os dois resolvedores contra o corpus rastreado e contra a fixture, e bancada com produto-stub"
+      method: "measurement: os dois resolvedores contra o corpus rastreado e contra a fixture, e bancada com produto-stub"
       locality: "repo"
   - id: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
     node_type: question
@@ -565,7 +565,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version, vendor/kg-ssot/spec/trace.schema.json e vendor/kg-ssot/spec/release.json"
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
-      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
+      method: "measurement: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
   - id: E_KG_SSOT_434_ADOTADA_1027
     node_type: evidence
@@ -650,7 +650,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version"
       locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; comparação com o vendor da bancada pré-tag da ref f113410ba3a0"
-      method: "medição: atualização do vendor, gate do contrato antes e depois, diff contra o vendor da bancada e lint completo com o vendor novo"
+      method: "measurement: atualização do vendor, gate do contrato antes e depois, diff contra o vendor da bancada e lint completo com o vendor novo"
       locality: "repo"
   - id: E_KG_SSOT_430_ADOTADA_1026
     node_type: evidence
@@ -667,7 +667,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version"
       locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref 989447de2b4a"
-      method: "medição: atualização do vendor, gate do contrato e lint completo com o vendor novo"
+      method: "measurement: atualização do vendor, gate do contrato e lint completo com o vendor novo"
       locality: "repo"
   - id: E_KG_SSOT_4291_ADOTADA_1026
     node_type: evidence
@@ -684,7 +684,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version"
       locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref 2ad91641a511"
-      method: "medição: atualização do vendor e gate do contrato contra o corpus rastreado"
+      method: "measurement: atualização do vendor e gate do contrato contra o corpus rastreado"
       locality: "repo"
   - id: E_KG_SSOT_429_ADOTADA_1026
     node_type: evidence
@@ -701,7 +701,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version"
       locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref e39d26408f47"
-      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e reconstrução independente do --full"
+      method: "measurement: atualização do vendor, gate do contrato contra o corpus rastreado e reconstrução independente do --full"
       locality: "repo"
   - id: E_KG_SSOT_428_ADOTADA_1025
     node_type: evidence
@@ -718,7 +718,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version"
       locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref 975ec28b2ef2"
-      method: "medição: atualização do vendor e gate do contrato contra o corpus rastreado"
+      method: "measurement: atualização do vendor e gate do contrato contra o corpus rastreado"
       locality: "repo"
   - id: E_KG_SSOT_427_ADOTADA_1025
     node_type: evidence
@@ -735,7 +735,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version e a bancada pré-tag na worktree do core"
       locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh e da bancada da ref 5bf74b2c905e (relatório ao onion-kg-ssot)"
-      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e bancada antes e depois da troca"
+      method: "measurement: atualização do vendor, gate do contrato contra o corpus rastreado e bancada antes e depois da troca"
       locality: "repo"
   - id: E_KG_SSOT_426_ADOTADA_1025
     node_type: evidence
@@ -752,7 +752,7 @@ nodes:
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version e vendor/kg-ssot/spec/release.json"
       locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh e do kg_query.py --text/--semantic nas duas versões"
-      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e comparação de sha256 da saída do kg_query entre a 4.25.1 (git archive de origin/main) e a 4.26.0"
+      method: "measurement: atualização do vendor, gate do contrato contra o corpus rastreado e comparação de sha256 da saída do kg_query entre a 4.25.1 (git archive de origin/main) e a 4.26.0"
       locality: "repo"
   - id: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     node_type: evidence
@@ -769,7 +769,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-trace.sh, .claude/hooks/kg-read-leg.sh, check_kg_read_index_sync de .claude/validation/lint-artifacts.sh e as famílias kg_trace_resolve e kg_read_leg de .claude/validation/lint-selftest.sh"
       locator: "comparação do índice antes e depois; casos (g), (j), (j2), (j3), (j4) da família kg_trace_resolve e (l) da kg_read_leg; os cinco mutantes"
-      method: "medição: geração do índice pelos dois caminhos, diff com normalização e bancada com mutantes"
+      method: "measurement: geração do índice pelos dois caminhos, diff com normalização e bancada com mutantes"
       locality: "repo"
   - id: E_SINAL_DISSECAR_QUALQUER_OBJETO_1023
     node_type: evidence
@@ -786,7 +786,7 @@ nodes:
     provenance:
       source: "inbox do core, sinal do onion-curation"
       locator: "docs/evolution/inbox/_processed/2026-10-23-proposal-dissect-any-object.md, seções A comparação e O que propomos"
-      method: "leitura: proposta do adotante e peças do protótipo lidas no repo dele, sem re-execução"
+      method: "reading: proposta do adotante e peças do protótipo lidas no repo dele, sem re-execução"
       locality: "repo"
   - id: D_DISSECT_ABSORVE_PECAS_PARQUEIA_MOTOR_1024
     node_type: decision
@@ -802,7 +802,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-24: «A proposta de dissecar qualquer objeto saiu inconclusiva pela regra do remetente: o que o core absorve agora?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-24"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-24"
       locality: "pessoa"
   - id: Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA
     node_type: question
@@ -821,7 +821,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-25: «O motor do /meta:dissect segue parqueado até 1 objeto decisório a mais?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: E_DISSECT_PECAS_ABSORVIDAS_1024
     node_type: evidence
@@ -838,7 +838,7 @@ nodes:
     provenance:
       source: "a sessão que absorveu as peças na worktree feat/dissect-object-families"
       locator: ".claude/validation/dissect-object-check.py, .claude/validation/dissect-families.kg.yaml, .claude/validation/dissect-object-bench.py e a família dissect_object de .claude/validation/lint-selftest.sh"
-      method: "medição: bancada, mutantes à mão e o checador rodado contra estudos reais num clone descartável"
+      method: "measurement: bancada, mutantes à mão e o checador rodado contra estudos reais num clone descartável"
       locality: "repo"
   - id: E_SINAL_A2A_PRODUTO_PROPRIO_1025
     node_type: evidence
@@ -855,7 +855,7 @@ nodes:
     provenance:
       source: "onion-curation, sinal relayado sem commit ao inbox do core"
       locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-a2a-product.md; no adotante, docs/evolution/dissect/a2a-product-2026-10/ (PRs #78 e #79 do onion-curation)"
-      method: "medição: leitura do sinal inteiro e recontagem por grep no members.yaml"
+      method: "measurement: leitura do sinal inteiro e recontagem por grep no members.yaml"
       locality: "repo"
   - id: D_A2A_PRODUTO_PARQUEADO_COM_GATILHO_1025
     node_type: decision
@@ -871,7 +871,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "pergunta com opções de 2026-10-25: «A curadoria propõe PARQUEAR a extração do A2A como projeto próprio (D_A2A_PRODUCT_VERDICT)… Como selo?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025
     node_type: question
@@ -899,7 +899,7 @@ nodes:
     provenance:
       source: "onion-curation, sinal relayado sem commit ao inbox do core"
       locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-agent-neutral-channel.md; no adotante, docs/evolution/dissect/agent-neutral-channel-2026-10/ (PRs #83 e #85 do onion-curation)"
-      method: "medição: leitura do sinal inteiro, conferida contra o estado medido que o core enviou"
+      method: "measurement: leitura do sinal inteiro, conferida contra o estado medido que o core enviou"
       locality: "repo"
   - id: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
     node_type: decision
@@ -915,7 +915,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_NEUTRAL_CHANNEL_VERDICT e sobre o canal como serviço MCP"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025
     node_type: evidence
@@ -932,7 +932,7 @@ nodes:
     provenance:
       source: "onion-curation, sinal relayado sem commit ao inbox do core"
       locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-agent-transport.md; no adotante, docs/evolution/dissect/agent-transport-2026-10/ (PRs #87 e #88 do onion-curation)"
-      method: "medição: leitura do sinal inteiro"
+      method: "measurement: leitura do sinal inteiro"
       locality: "repo"
   - id: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
     node_type: decision
@@ -948,7 +948,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_TRANSPORT_VERDICT e o round-trip vivo"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025
     node_type: evidence
@@ -964,7 +964,7 @@ nodes:
     provenance:
       source: "onion-curation, mensagem entre sessões ao core"
       locator: "no adotante, docs/evolution/dissect/agent-transport-2026-10/N2-LIVE-PLAN.md e N2-LIVE-RESULT.md (PR #89 do onion-curation)"
-      method: "testemunho: relato da curadoria sobre a medição viva, conferido contra o pré-registro"
+      method: "testimony: relato da curadoria sobre a medição viva, conferido contra o pré-registro"
       locality: "repo"
   - id: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
     node_type: question
@@ -983,7 +983,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «O que fazemos com a ida e volta viva?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
   - id: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     node_type: question
@@ -1009,7 +1009,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
       locator: "§2 (sucesso), §3 (falha), §4 (passos e medidas), §5 (contrato da peça de rascunho) e o card da pré-condição em CARD-MAESTRO.md"
-      method: "testemunho: pré-registro do critério pelo core, a pedido do maestro, com a pré-condição medida na VPS"
+      method: "testimony: pré-registro do critério pelo core, a pedido do maestro, com a pré-condição medida na VPS"
       locality: "repo"
   - id: E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025
     node_type: evidence
@@ -1026,7 +1026,7 @@ nodes:
     provenance:
       source: "onion-curation, sinal relayado sem commit ao inbox do core"
       locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-peer-protocol.md; no adotante, docs/evolution/dissect/peer-protocol-2026-10/ (PR #92 do onion-curation)"
-      method: "medição: leitura do sinal inteiro e reexecução das duas bancadas do dissect"
+      method: "measurement: leitura do sinal inteiro e reexecução das duas bancadas do dissect"
       locality: "repo"
   - id: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
     node_type: decision
@@ -1042,7 +1042,7 @@ nodes:
     provenance:
       source: "sessão do core, sob a delegação do maestro de 2026-10-25"
       locator: "triagem do sinal 2026-10-25-proposal-peer-protocol.md"
-      method: "testemunho: decisão do core por delegação, aplicando o critério de recorrência pré-registrado no CORE-STATE enviado à curadoria"
+      method: "testimony: decisão do core por delegação, aplicando o critério de recorrência pré-registrado no CORE-STATE enviado à curadoria"
       locality: "pessoa"
   - id: E_GATILHO_DO_CANAL_NEUTRO_DISPAROU_E_O_CORE_REOLHOU_1025
     node_type: evidence
@@ -1058,7 +1058,7 @@ nodes:
     provenance:
       source: "onion-curation, mensagem entre sessões, conferida pelo peer-ref-check"
       locator: "no adotante, docs/evolution/dissect/agent-neutral-channel-2026-10/agent-neutral-channel-2026-10.kg.yaml (PR #96 do onion-curation)"
-      method: "medição: peer-ref-check na origin/main do par e releitura dos dois D do core"
+      method: "measurement: peer-ref-check na origin/main do par e releitura dos dois D do core"
       locality: "repo"
   - id: D_DUOLINGO_HLR_PARQUEADO_PARA_O_FRESCOR_DO_KG_1025
     node_type: decision
@@ -1074,7 +1074,7 @@ nodes:
     provenance:
       source: "sessão do core, sob a delegação do maestro de 2026-10-25"
       locator: "mensagem da curadoria de 2026-10-25 e o grafo docs/evolution/dissect/duolingo-b1-2026-10/duolingo-b1-2026-10.kg.yaml do onion-curation"
-      method: "testemunho: decisão do core por delegação, sobre o veredito do Elenxo do estudo"
+      method: "testimony: decisão do core por delegação, sobre o veredito do Elenxo do estudo"
       locality: "pessoa"
   - id: D_REGUA_CAPACIDADE_TESTA_BARATO_GUARDA_RECORRENCIA_1025
     node_type: decision
@@ -1090,7 +1090,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "mensagem de 2026-10-25 sobre o rdflib e a pergunta com opções «A sua diretriz de hoje fica onde?»"
-      method: "testemunho: decisão do maestro por texto livre e por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por texto livre e por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
     node_type: decision
@@ -1106,7 +1106,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "perguntas com opções de 2026-10-25 sobre o escopo e a condução do extra RDF"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
     node_type: evidence
@@ -1122,7 +1122,7 @@ nodes:
     provenance:
       source: "decisão do maestro em 2026-10-26 por pergunta com opções: «opção 1, No SGE»"
       locator: "/meta:decide de 2026-10-26, pergunta do 3º par"
-      method: "testemunho: pré-registro do critério pelo core, a pedido do maestro"
+      method: "testimony: pré-registro do critério pelo core, a pedido do maestro"
       locality: "pessoa"
   - id: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
     node_type: evidence
@@ -1138,7 +1138,7 @@ nodes:
     provenance:
       source: "notificações dos agentes e relatório do juiz cego, na sessão do core"
       locator: "branches chore/onion-update-7391404e946f-a e -b do sge; PR #147 do sge"
-      method: "medição: pré-registro em 6830604f, dois braços, juiz cego"
+      method: "measurement: pré-registro em 6830604f, dois braços, juiz cego"
       locality: "repo"
   - id: D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026
     node_type: decision
@@ -1155,7 +1155,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "pergunta com opções de 2026-10-26: «Novo eixo E7 + registrar o achado»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026
     node_type: decision
@@ -1171,7 +1171,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Pendências do sge: o que pedimos à sessão do sge?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: D_SGE_PENDENTES_SO_OS_DOIS_1026
     node_type: decision
@@ -1187,7 +1187,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Pendências do sge: o que pedimos à sessão do sge?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: D_A2A_EMPRESA_PESQUISA_DECISION_1027
     node_type: decision
@@ -1203,7 +1203,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Como uma empresa adotante deve falar entre sessões de pessoas e máquinas diferentes?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
   - id: D_MANUAL_CANAIS_A2A_AGORA_1027
     node_type: decision
@@ -1219,7 +1219,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Quando escrevemos o manual de canais e A2A?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
   - id: D_A2A_PECA_RASCUNHO_CONSTRUIR_1027
     node_type: decision
@@ -1235,7 +1235,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-27: «Construímos a peça de rascunho?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
   - id: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
     node_type: evidence
@@ -1252,7 +1252,7 @@ nodes:
     provenance:
       source: "sessão do core, construção da peça"
       locator: ".claude/validation/lint-selftest.sh (run_a2a_rt_selftests); dogfood com o install-a2a-rt.sh no scratchpad da sessão"
-      method: "medição: bancada com mutantes e uma sessão real do Claude Code julgada pelo juiz de tentativas"
+      method: "measurement: bancada com mutantes e uma sessão real do Claude Code julgada pelo juiz de tentativas"
       locality: "repo"
   - id: Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027
     node_type: question
@@ -1570,7 +1570,7 @@ nodes:
     provenance:
       source: "saídas dos scripts coladas pelo maestro na sessão do core"
       locator: "PRE-REGISTRO.md §10 (R1), thread th-20261028-b50de950"
-      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      method: "measurement: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
       locality: "pessoa"
   - id: E_IDA_E_VOLTA_R2_NOTEBOOK_DADO_VPS_INCONCLUSIVO_1028
     node_type: evidence
@@ -1587,7 +1587,7 @@ nodes:
     provenance:
       source: "saídas dos scripts coladas pelo maestro na sessão do core"
       locator: "PRE-REGISTRO.md §10 (R2), thread th-20261028-5c3c8cd3"
-      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      method: "measurement: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
       locality: "pessoa"
   - id: E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028
     node_type: evidence
@@ -1604,7 +1604,7 @@ nodes:
     provenance:
       source: "saídas dos scripts coladas pelo maestro na sessão do core"
       locator: "PRE-REGISTRO.md §10 (R3), thread th-20261028-dbf740cd"
-      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      method: "measurement: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
       locality: "pessoa"
   - id: E_IDA_E_VOLTA_REMEDICAO_NEGATIVOS_1103
     node_type: evidence
@@ -1621,7 +1621,7 @@ nodes:
     provenance:
       source: "saídas dos scripts coladas pelo maestro e medição da sessão do core"
       locator: "PRE-REGISTRO.md §10b e Emenda 2"
-      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      method: "measurement: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
       locality: "pessoa"
   - id: E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028
     node_type: evidence
@@ -1638,7 +1638,7 @@ nodes:
     provenance:
       source: "sessão do core, cura dos achados das rodadas R1 a R3"
       locator: ".claude/validation/lint-selftest.sh (run_a2a_rt_selftests); docs/evolution/research/a2a-cross-user-spike-2026-10/hooks/record-tool-attempts.selftest.sh"
-      method: "medição: bancada com mutantes e dogfood do instalador num HOME descartável"
+      method: "measurement: bancada com mutantes e dogfood do instalador num HOME descartável"
       locality: "repo"
   - id: Q_META_VELHO_EM_GRAFO_SELADO_1028
     node_type: question

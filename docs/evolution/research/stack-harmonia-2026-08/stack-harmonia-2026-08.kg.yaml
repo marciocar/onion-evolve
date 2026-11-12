@@ -26,7 +26,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "critico-adversarial-mais-re-medicao-independente"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_tres_erros_medidos
@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml@c4986d24 + git log"
       locator: "git show c4986d24:docs/evolution/federation/members.yaml | grep -c '^  - id:' → 12; git log --diff-filter=A -- docs/onion/federation-orgs.json → eb0bf582 2026-07-28"
-      method: "medição: grep -c members.yaml + git log do org-map"
+      method: "measurement: grep -c members.yaml + git log do org-map"
 
   - id: C_nao_promover_doutrina
     node_type: claim
@@ -57,7 +57,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "critico-mais-verificacao"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── O QUE SOBREVIVE (acionavel) ──
@@ -74,7 +74,7 @@ nodes:
     provenance:
       source: "container onion-vps-waha e seu docker-compose.yml no host (host)"
       locator: "docker-ps-mais-grep-no-src-do-bridge"
-      method: "testemunho: leitura do docker-compose.yml do onion-vps-waha e medição do container no host 2026-08-01"
+      method: "testimony: leitura do docker-compose.yml do onion-vps-waha e medição do container no host 2026-08-01"
       locality: "host"
 
   - id: C_producao_nao_e_o_repo
@@ -90,7 +90,7 @@ nodes:
     provenance:
       source: "checkout de produção do onion-bridge (git rev-list/status no host)"
       locator: "rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-a-frente-0-atras"
-      method: "testemunho: leitura do checkout de produção do onion-bridge no host 2026-08-08"
+      method: "testimony: leitura do checkout de produção do onion-bridge no host 2026-08-08"
       locality: "host"
 
   - id: C_bypass_permissions_exposto
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: ".env de produção do onion-bridge (host, não versionado)"
       locator: "env-de-producao-do-bridge"
-      method: "testemunho: leitura do .env de produção do onion-bridge no host 2026-08-01"
+      method: "testimony: leitura do .env de produção do onion-bridge no host 2026-08-01"
       locality: "host"
 
   - id: C_medir_firewall_antes
@@ -122,7 +122,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "critica-ao-rotulo-gatilho-disparado"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_ntfy_default_publico
@@ -138,7 +138,7 @@ nodes:
     provenance:
       source: ".claude/utils/co-evolution/mail-receiver.sh"
       locator: "leitura-do-mail-receiver.sh"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_downstream_parado_nao_partido
@@ -154,7 +154,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/outbox/"
       locator: "find-nos-8-outboxes"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   # ── A REGRA QUE SOBREVIVE (do F2-b) ──
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "F2b-veredito-3-dimensoes-web-verificadas"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_assimetria_do_custo
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "F2b-custo-total-e-contrafactual"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_dissent_seguranca_isolamento
@@ -204,7 +204,7 @@ nodes:
     provenance:
       source: "onion-bridge@38702f00:src/server.ts"
       locator: "leitura-do-server.ts-do-bridge"
-      method: "leitura: src/server.ts em onion-bridge@38702f00 (remoto marciocar/onion-bridge; arquivo na data 2026-08-01)"
+      method: "reading: src/server.ts em onion-bridge@38702f00 (remoto marciocar/onion-bridge; arquivo na data 2026-08-01)"
       locality: "repo"
 
   # ── ANTI-CATALOGO (sobreviveu inteiro) ──
@@ -221,7 +221,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "§O anti-catálogo (l.46-53)"
-      method: "leitura: SYNTHESIS.md da rodada stack-harmonia"
+      method: "reading: SYNTHESIS.md da rodada stack-harmonia"
       locality: "repo"
 
   - id: C_tunneling_nome_errado
@@ -237,7 +237,7 @@ nodes:
     provenance:
       source: "Caddyfile do host (configuração do Caddy, host)"
       locator: "F2b-pesquisa-tunneling"
-      method: "testemunho: leitura do Caddyfile no host 2026-08-01"
+      method: "testimony: leitura do Caddyfile no host 2026-08-01"
       locality: "host"
 
   - id: Q_publicar_ou_nao
@@ -262,7 +262,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-hosted-service-identity-2026-08.md"
       locator: "adr-ratificado-pelo-maestro-2026-08-01"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── RECONCILIAÇÃO de 2026-08-08 — e estes nós vivem AQUI de propósito ──────────────────────────
@@ -283,7 +283,7 @@ nodes:
     provenance:
       source: "checkout de produção do onion-bridge (git rev-list/status no host)"
       locator: "rev-list-nos-dois-sentidos-no-checkout-de-producao-mais-status-porcelain-limpo"
-      method: "testemunho: leitura do checkout de produção do onion-bridge no host 2026-08-08"
+      method: "testimony: leitura do checkout de produção do onion-bridge no host 2026-08-08"
       locality: "host"
 
   - id: PO_ferramenta_da_vps_nao_se_encerra
@@ -299,7 +299,7 @@ nodes:
     provenance:
       source: "docs/onion/graph/fios-abertos.kg.yaml"
       locator: "diretriz-do-maestro-2026-08-08-dada-depois-de-eu-propor-desligar-o-waha"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ── SAC-100 (2026-10-11): re-medição do C_bypass_permissions_exposto contra o vivo ──
@@ -317,7 +317,7 @@ nodes:
     provenance:
       source: "onion-bridge@1f7fb3f1:src/chat.ts"
       locator: "chat.ts l.238-243 (callerIsAdmin), l.474 e l.482 (modo e deny por chamador); config.ts permissionMode default \"default\"; ss -ltnp linha 0.0.0.0:8787 node; ufw status verbose sem regra 8787; curl app.onionevolve.com /chat 401"
-      method: "medição: leitura do código no clone de produção do bridge (sudo grep/cat, HEAD por refs) + systemctl show/cat + ss -ltnp + ufw status + curl de status HTTP na borda pública, 2026-10-11"
+      method: "measurement: leitura do código no clone de produção do bridge (sudo grep/cat, HEAD por refs) + systemctl show/cat + ss -ltnp + ufw status + curl de status HTTP na borda pública, 2026-10-11"
       locality: "host"
 
   - id: Q_BYPASS_MODO_DE_PRODUCAO_NAO_LEGIVEL

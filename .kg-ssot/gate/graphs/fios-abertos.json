@@ -3,7 +3,6 @@
   "id": "fios-abertos",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 12,
     "form.range.node.label": 15,
     "form.required.node.provenance": 3,
     "integrity.bare-decision": 3,

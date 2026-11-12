@@ -26,7 +26,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-env-guard.sh na main 2beae385"
       locator: "as 7 formas reproduzidas no harness do SAC-68 (6 vetos com a mensagem literal de cada um)"
-      method: "medição: o hook rodado com o JSON do PreToolUse no stdin"
+      method: "measurement: o hook rodado com o JSON do PreToolUse no stdin"
       locality: "repo"
   - id: Q_ENV_GUARD_SEM_FALSO_POSITIVO
     node_type: question
@@ -53,7 +53,7 @@ nodes:
     provenance:
       source: "bancada run_env_exposure_selftests (casos l e m) e o harness de mutantes do SAC-68"
       locator: "lint-selftest.sh, família env_exposure; mutantes M1 a M6"
-      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      method: "measurement: bancada com LC_ALL=C e mutante por cura"
   - id: D_GREP_E_HEREDOC_SEGUEM_VETADOS
     node_type: decision
     layer: audit
@@ -98,7 +98,7 @@ nodes:
     provenance:
       source: "⟨os transcripts de sessão do Claude Code desta máquina⟩ (sessões do core, do hub e de 4 adotantes)"
       locator: "cada tool_result com GUARDA-PRETOOLUSE (.env) e o tool_use correspondente; harness de replay no scratchpad da sessão de 2026-10-20"
-      method: "medição: o hook da main e o da cura rodados com o mesmo JSON do PreToolUse no stdin"
+      method: "measurement: o hook da main e o da cura rodados com o mesmo JSON do PreToolUse no stdin"
       locality: "repo"
   - id: D_U4_LISTAR_NOMEAR_CITAR_PASSAM
     node_type: decision
@@ -115,7 +115,7 @@ nodes:
     provenance:
       source: "a decisão (via sessão principal) e a bancada"
       locator: "lint-selftest.sh, run_env_exposure_selftests caso (u)"
-      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      method: "measurement: bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
   - id: E_U4_ESCAPES_ANTERIORES
     node_type: evidence
@@ -132,7 +132,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-env-guard.sh da main 3831c4ac e da cura"
       locator: "casos dq-subst, xargs, subst-heredoc e subsh-pipe do caso (u); mutantes M7, M8 e M9"
-      method: "medição: hook com o JSON do PreToolUse e bash 5 executando o heredoc dentro de $()"
+      method: "measurement: hook com o JSON do PreToolUse e bash 5 executando o heredoc dentro de $()"
       locality: "repo"
   - id: C_TETO_U4_RESIDUAL
     node_type: claim

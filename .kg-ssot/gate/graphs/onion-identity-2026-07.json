@@ -3,7 +3,6 @@
   "id": "onion-identity-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 63,
     "form.range.node.label": 25,
     "form.required.node.provenance": 2,
     "form.required.node.verified_against": 6,

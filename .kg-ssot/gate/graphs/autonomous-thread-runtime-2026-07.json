@@ -3,7 +3,6 @@
   "id": "autonomous-thread-runtime-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 11,
     "form.required.node.verified_against": 5,
     "yaml.unquoted-date": 1
   }

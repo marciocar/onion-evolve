@@ -3,7 +3,6 @@
   "id": "inbox-triage-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 4,
     "form.range.node.label": 7
   }
 }

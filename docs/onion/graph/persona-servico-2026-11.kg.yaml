@@ -35,7 +35,7 @@ nodes:
     provenance:
       source: "o hub, sinal upstream"
       locator: "docs/evolution/inbox/_processed/2026-11-06-cobranca-persona-prazos.md"
-      method: "leitura: o sinal inteiro, lido pela sessão do core"
+      method: "reading: o sinal inteiro, lido pela sessão do core"
       locality: "repo"
   - id: D_PS_DATAS_DO_HUB_ACEITAS_1106
     node_type: decision
@@ -51,7 +51,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-06: «O brain cobrou datas e nós com dono para a persona de serviço. Respondo como?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: Q_PS_PESQUISA_DO_RUNTIME_1110
     node_type: question

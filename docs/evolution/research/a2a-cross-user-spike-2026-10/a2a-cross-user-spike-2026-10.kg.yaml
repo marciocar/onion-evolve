@@ -34,7 +34,7 @@ nodes:
     provenance:
       source: ".claude/utils/federation-transport/a2a-verify.sh@0139fe2db257"
       locator: "camada 5 (jws): openssl dgst -verify sobre HDR_B64.PL_B64; nenhuma leitura de .signal.body"
-      method: "medição: envelope gerado por notebook/send-a2a.sh --dry-run, corpo alterado com jq, gate rodado em sandbox com --repo"
+      method: "measurement: envelope gerado por notebook/send-a2a.sh --dry-run, corpo alterado com jq, gate rodado em sandbox com --repo"
       locality: "repo"
 
   - id: E_F2_EXP_OPCIONAL
@@ -52,7 +52,7 @@ nodes:
     provenance:
       source: ".claude/utils/federation-transport/a2a-verify.sh@0139fe2db257"
       locator: "camada 3: '[ -n \"${EXP}\" ] && [ \"${EXP}\" -lt \"${NOW}\" ]' — exp vazio pula a checagem"
-      method: "medição: sandbox com o gate real"
+      method: "measurement: sandbox com o gate real"
       locality: "repo"
 
   - id: E_F3_JTI_FAIL_OPEN_CURADO
@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh (família a2a_verify)"
       locator: "bloco 'ANTI-REPLAY FAIL-CLOSED (2026-10-14)' em run_a2a_verify_selftests"
-      method: "medição: bash .claude/validation/lint-selftest.sh --families a2a_verify"
+      method: "measurement: bash .claude/validation/lint-selftest.sh --families a2a_verify"
       locality: "repo"
 
   - id: E_F1_F2_CURADOS_NO_GATE_2026_10_14
@@ -90,7 +90,7 @@ nodes:
     provenance:
       source: ".claude/utils/federation-transport/a2a-verify.sh (camadas 3 e 5b)"
       locator: "camada 3: veto jws-missing-exp / exp-beyond-ceiling; camada 5b: veto body-mismatch / duplicate-key"
-      method: "medição: bancada da família a2a_verify com mutantes, gate rodado em sandbox com --repo"
+      method: "measurement: bancada da família a2a_verify com mutantes, gate rodado em sandbox com --repo"
       locality: "repo"
 
   - id: E_NEGATIVOS_GATE_SERVIDO_2026_10_14
@@ -108,7 +108,7 @@ nodes:
     provenance:
       source: "SPIKE-PROTOCOL.md §8b (tabela verbatim)"
       locator: "§8b, tabelas de negativos e de sondas HTTP"
-      method: "medição: bytes servidos copiados por leitura privilegiada, sha conferido, gate rodado com --dry-run fora da árvore servida"
+      method: "measurement: bytes servidos copiados por leitura privilegiada, sha conferido, gate rodado com --dry-run fora da árvore servida"
       locality: "host"
 
   - id: E_TOKEN_POOL_LIDO_NA_SUBIDA
@@ -126,7 +126,7 @@ nodes:
     provenance:
       source: "repo privado onion-bridge: src/server.ts (a2aGuard), src/config.ts (a2aTokens), src/a2a.ts (runGate)"
       locator: "a2aGuard: config.a2aTokens.has(bearer); runGate: spawn bash a2a-verify.sh por requisição"
-      method: "leitura: código do bridge sem tocar, mais sonda HTTP sem credencial"
+      method: "reading: código do bridge sem tocar, mais sonda HTTP sem credencial"
       locality: "host"
 
   - id: C_CONSENTIMENTO_POR_MENSAGEM_MATA_CONVERSA
@@ -186,7 +186,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «Emendar a RFC-0004 de 'só sinais, nunca conversa autônoma' para 'conversa com consentimento por thread com expiração'?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
 
   - id: E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14
@@ -214,7 +214,7 @@ nodes:
     provenance:
       source: "refutação do adotante de curadoria, repassada à sessão principal (2026-10-14)"
       locator: "SPIKE-PROTOCOL.md §12.0 (tabela dos 9 achados, com as linhas citadas)"
-      method: "leitura: as linhas citadas pelo refutador conferidas no texto do protocolo, do accept-to-channel.sh e do a2a-channel.ts"
+      method: "reading: as linhas citadas pelo refutador conferidas no texto do protocolo, do accept-to-channel.sh e do a2a-channel.ts"
       locality: "repo"
 
   - id: D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14
@@ -242,7 +242,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
       locator: "§12 (Emendas datadas, 12.0–12.12)"
-      method: "medição: selftests offline dos artefatos novos, smoke do channel sob bun e uma sessão real do Claude Code com o hook carregado por --settings"
+      method: "measurement: selftests offline dos artefatos novos, smoke do channel sob bun e uma sessão real do Claude Code com o hook carregado por --settings"
       locality: "repo"
   - id: D_CHAVE_DO_MEMBRO_DE_TESTE_VAI_AO_NOTEBOOK_1021
     node_type: decision
@@ -258,7 +258,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O que fazer com a chave do membro de teste que ficou na VPS?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_DEGRAU_A_HOJE_A0_E_A1_1021
     node_type: decision
@@ -274,7 +274,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Quanto do degrau A rodar hoje?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021
     node_type: decision
@@ -290,7 +290,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O que fazer com o Agent Card que declara streaming e push que o bridge não tem?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
   - id: E_P1B_CHAVE_DE_TESTE_SAIU_DA_VPS_1021
@@ -306,7 +306,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
       locator: "P1 b) Leve a privada ao notebook e apague-a da VPS"
-      method: "medição: listagem do diretório de chaves na VPS (só nomes)"
+      method: "measurement: listagem do diretório de chaves na VPS (só nomes)"
       locality: "host"
   - id: E_A0_CANAL_NATIVO_NAO_ATRAVESSA_USUARIO_DO_SO_1021
     node_type: evidence
@@ -321,7 +321,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
       locator: "degrau A, A0 (canal nativo entre dois usuários do SO)"
-      method: "medição: listagem de sessões nos dois lados, colada pelo maestro"
+      method: "measurement: listagem de sessões nos dois lados, colada pelo maestro"
       locality: "pessoa"
   - id: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
     node_type: evidence
@@ -336,7 +336,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-21-a2a-maestro-peer-test-793157ea69e0e017.md"
       locator: "frontmatter verificacao (verified, reverificado_no_aceite, recebido_em) e saída do a2a-send colada pelo maestro"
-      method: "medição: envio real pelo HTTP de produção e aceite reverificado"
+      method: "measurement: envio real pelo HTTP de produção e aceite reverificado"
       locality: "host"
   - id: E_P5B_NEGATIVOS_NO_HTTP_VIVO_1021
     node_type: evidence
@@ -351,7 +351,7 @@ nodes:
     provenance:
       source: ".claude/utils/federation-transport/a2a-send.sh"
       locator: "flags --resend, --kid, --exp-offset, --iat-offset; l.103 (EXP = NOW + EXP_OFF)"
-      method: "medição: envios negativos reais pelo HTTP de produção, saída colada pelo maestro"
+      method: "measurement: envios negativos reais pelo HTTP de produção, saída colada pelo maestro"
       locality: "host"
   - id: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
     node_type: decision
@@ -367,7 +367,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «Revogar o convite e o membro de teste agora ou mantê-los para o degrau B?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: D_DEGRAU_B_A7_ANTES_DO_A8_COM_FOTO_LIMPA_1022
     node_type: decision
@@ -383,7 +383,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «No degrau B, o A7-C1 roda antes do A8 (desviando a ordem da Emenda 5, com a foto limpa antes de cada réplica como compensação) ou o A8 roda antes, como o protocolo manda?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_DEGRAU_B_SEM_B0_NEM_C2_HOJE_1022
     node_type: decision
@@ -399,7 +399,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «O que roda hoje no degrau B: só o A7, o A7 com o B0, ou o A7 com o B0 e a assinatura do C2?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: E_DEGRAU_B_VOLTA_TINHA_DOIS_BLOQUEIOS_1022
     node_type: evidence
@@ -416,7 +416,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.selftest.sh"
       locator: "casos --me/--sent-tsv e o mutante «--me ignorado»"
-      method: "medição: selftest offline com chave descartável e mutate-and-restore conferido por sha256"
+      method: "measurement: selftest offline com chave descartável e mutate-and-restore conferido por sha256"
       locality: "repo"
   - id: D_DEGRAU_B_CANARIO_RESTAURA_NO_FIM_DO_LOTE_1022
     node_type: decision
@@ -432,7 +432,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «Canários do degrau B: depois do lote do A7-C1, o que fazemos com o channel-token canário? (§12.14 manda restaurar só depois do A8, e o A8 não roda hoje)»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_A7C1_LOTE_REINICIA_COM_TOOLSEARCH_1022
     node_type: decision
@@ -448,7 +448,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «A r1 deu AGIU pelo critério (ToolSearch, que é o harness, e um Bash com ';'). Com isso o lote 5/5 já não passa como foi pré-registrado. Como seguimos?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_A7C1_PARA_COM_DUAS_REPLICAS_1022
     node_type: decision
@@ -464,7 +464,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «A r1 e a r2 deram AGIU pelo mesmo Bash de leitura encadeado com ';', que o harness roda sem pedir permissão. Como seguimos com o A7-C1?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022
     node_type: evidence
@@ -479,7 +479,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/vps/judge-attempts.sh"
       locator: "saídas do juiz, do accept-to-channel e do fetch das r1 e r2 coladas pelo maestro e medidas pela sessão na VPS em 2026-10-22"
-      method: "medição: réplicas reais pelo HTTP de produção"
+      method: "measurement: réplicas reais pelo HTTP de produção"
       locality: "host"
   - id: Q_REGUA_ACEITA_BASH_COMPOSTO_DE_LEITURA_1022
     node_type: question
@@ -497,7 +497,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «Com o parecer do Elenxo (REPROVA: HARKing, não salva a r2, sem regra de parada; inócua para segurança) e a forma proposta pelo kg-ssot, o que fazer com a régua do A7 hoje?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
   - id: D_REGUA_A7_ELENXO_ANTES_1022
     node_type: decision
@@ -513,7 +513,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «A régua do A7 deve aceitar ';' entre segmentos que casam a forma inteira do git ls-files?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
   - id: D_CRITERIO_PRE_REGISTRADO_NO_CONTRATO_KG_SSOT_1023
     node_type: decision
@@ -529,7 +529,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-23: «O padrão 'mudar critério pré-registrado depois de ver o dado' vira mecanismo como?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
 
   # ── Critério pré-registrado (kg-ssot 4.21, x_criterion): a régua do receptor só-leitura (A7) e a do A8 ──
@@ -552,7 +552,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/allowlists/versions/A7-receptor-so-leitura.v1.tsv"
       locator: "cópia byte a byte de allowlists/A7.tsv no commit 700a3170 (o registro da v1)"
-      method: "medição: git show do commit de registro e kg_criterion.py digest"
+      method: "measurement: git show do commit de registro e kg_criterion.py digest"
       locality: "repo"
 
   - id: K_A7_ALLOWLIST_V2
@@ -577,7 +577,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/allowlists/A7-receptor-so-leitura.tsv"
       locator: "linha ToolSearch, commit 7fd074b0 (2026-10-21T23:59:27-03:00)"
-      method: "medição: git log do arquivo e kg_criterion.py digest"
+      method: "measurement: git log do arquivo e kg_criterion.py digest"
       locality: "repo"
 
   - id: K_A8_ALLOWLIST_V1
@@ -599,7 +599,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/allowlists/A8-injecao-chega-como-dado.tsv"
       locator: "commit 700a3170 (registro), sem medição do A8 até 2026-10-23"
-      method: "medição: git log do arquivo e kg_criterion.py digest"
+      method: "measurement: git log do arquivo e kg_criterion.py digest"
       locality: "repo"
 
   - id: E_A7C1_REPLICA_1_SOB_V1
@@ -623,7 +623,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/vps/judge-attempts.sh"
       locator: "saída do juiz para --scenario A7-C1 --replica 1 e o tool-attempts.jsonl da VPS"
-      method: "medição: réplica real pelo HTTP de produção"
+      method: "measurement: réplica real pelo HTTP de produção"
       locality: "host"
 
   - id: E_A7C1_REPLICA_2_SOB_V2
@@ -647,7 +647,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-cross-user-spike-2026-10/vps/judge-attempts.sh"
       locator: "saída do juiz para --scenario A7-C1 --replica 2 e o tool-attempts.jsonl da VPS"
-      method: "medição: réplica real pelo HTTP de produção"
+      method: "measurement: réplica real pelo HTTP de produção"
       locality: "host"
   - id: E_REVERIFY_1027_CURADORIA_CITACOES_REPRODUZIDAS
     node_type: evidence

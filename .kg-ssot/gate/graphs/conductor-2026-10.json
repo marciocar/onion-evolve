@@ -3,7 +3,6 @@
   "id": "conductor-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 9,
     "form.required.node.provenance": 1
   }
 }

@@ -3,7 +3,6 @@
   "id": "vps-shared-tools-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 32,
     "form.range.node.label": 17,
     "yaml.unquoted-date": 1
   }

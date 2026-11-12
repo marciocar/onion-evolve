@@ -44,7 +44,7 @@ nodes:
     provenance:
       source: "árvore da porta onion-core antes da restauração no commit 4eb55ac"
       locator: "os 85 arquivos de meta-fábrica ausentes (adopt, create-*, federation-*, marketplace/, wizard/, skills/onion-publish/)"
-      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      method: "testimony: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   - id: C_DUAS_FONTES_SEM_COBRANCA
     node_type: claim
@@ -59,7 +59,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh em 2026-09-30"
       locator: "as REGRAS que liam members.yaml naquele dia: 24, 28, 30, 37, 38 e 85"
-      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      method: "testimony: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
       locality: "repo"
 
   # ---- o que a passada adversarial derrubou ----
@@ -76,7 +76,7 @@ nodes:
     provenance:
       source: "ops/materialize-door.sh"
       locator: "grep -niE \"members|federation/\" → só l.10/l.50 (comentário), l.67/l.71 (echo de aviso) e l.434 (heredoc de instrução); nenhuma leitura do arquivo"
-      method: "medição: grep -niE \"members|federation/\" ops/materialize-door.sh em origin/main cffe09fe (último commit do script 020661ca, 2026-10-09)"
+      method: "measurement: grep -niE \"members|federation/\" ops/materialize-door.sh em origin/main cffe09fe (último commit do script 020661ca, 2026-10-09)"
       locality: "repo"
 
   - id: E_LINT_NAO_FICA_NO_CAMINHO
@@ -94,7 +94,7 @@ nodes:
     provenance:
       source: "ops/materialize-door.sh e o relato do incidente de 2026-09-30"
       locator: "o caminho do dano: um operador rodando o script com --role standalone num clone, sem PR no meio"
-      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      method: "testimony: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   - id: C_TIER_HUB_E_CAPACIDADE
     node_type: claim
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml do core em 2026-09-30"
       locator: "members.yaml:73 (hub como central que pode ter sub-adotados) e a contagem de parent: metagamify"
-      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      method: "testimony: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
       locality: "repo"
 
   # ---- as duas guardas ----
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh, famílias door_role_parity e door_role_change_refusal"
       locator: "run_door_role_parity_selftests e run_door_role_change_refusal_selftests"
-      method: "medição: as duas famílias rodadas com LC_ALL=C em 2026-10-09, 19 casos e 0 falhas"
+      method: "measurement: as duas famílias rodadas com LC_ALL=C em 2026-10-09, 19 casos e 0 falhas"
 
   - id: Q_PREDICADO_SUCESSOR
     node_type: question
@@ -156,7 +156,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh e .claude/validation/lint-selftest.sh (família role_cut) na branch fix/role-cut-command-companions"
       locator: "_emit_companion_excludes e _is_anchor no manifesto; casos (m), (m-hub) e (m-MUT) na bancada"
-      method: "medição: materialize-door standalone e hub em diretório temporário antes e depois da cura, com diff das listas, lint da porta e bancada com mutante em 2026-10-09"
+      method: "measurement: materialize-door standalone e hub em diretório temporário antes e depois da cura, com diff das listas, lint da porta e bancada com mutante em 2026-10-09"
       locality: "repo"
 
   - id: Q_ROLE_DUPLA_LEITURA
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/docs-cure-named-private-pointers.md e docs/evolution/federation/members.yaml em origin/main d9852a9e"
       locator: "resíduo: seção 'O que mudou o dia' (onion-evolve PÚBLICO, core fechado, porta onion-core decidida); members.yaml: entrada id onion-core, comentário do remote e bloco da história reescrita"
-      method: "leitura: os dois arquivos lidos em 2026-10-09; a publicidade do repo em 17/09 é o que o resíduo registra, não remedida no forge nesta passada"
+      method: "reading: os dois arquivos lidos em 2026-10-09; a publicidade do repo em 17/09 é o que o resíduo registra, não remedida no forge nesta passada"
       locality: "repo"
 
   - id: D_MATRIZ_DE_PORTAS_2026_10
@@ -205,7 +205,7 @@ nodes:
     provenance:
       source: "issue Linear SAC-88 (projeto 'Onion — core: próximas levas') e o plano das portas que ela referencia, arquivo local da sessão fora do repo"
       locator: "seção 'Decisões do maestro (2026-10-09)', tabela Porta × O que é × Superfície"
-      method: "testemunho: decisão do maestro na sessão de 2026-10-09 (AskUserQuestion)"
+      method: "testimony: decisão do maestro na sessão de 2026-10-09 (AskUserQuestion)"
 
   - id: E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS
     node_type: evidence
@@ -224,7 +224,7 @@ nodes:
     provenance:
       source: ".claude/validation/members-validate.sh em origin/main d9852a9e"
       locator: "ROLES = {source, hub, standalone, consumer} e VENDOR = {adopter, door} no bloco python; saída sobre cópia temporária com onion-mini mutado"
-      method: "medição: members-validate.sh rodado sobre cópia mutada do members.yaml em 2026-10-09, rc 1"
+      method: "measurement: members-validate.sh rodado sobre cópia mutada do members.yaml em 2026-10-09, rc 1"
       locality: "repo"
 
   - id: Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS
@@ -257,7 +257,7 @@ nodes:
     provenance:
       source: "branch fix/adopt-robust-f1 (PR da F1, SAC-89): .claude/validation/lint-selftest.sh run_adopt_robust_selftests e as famílias door, door_seal_pin, role_cut, role_promotion"
       locator: "casos adopt-robust (a1)(a2)(b1)(b2)(b3)(c1)-(c6)(d1)(e1), door (f2), door-seal-pin (l)(m), role-cut (i), role-promotion (a); resíduo R56 docs/evolution/review/fix-adopt-robust-f1.md"
-      method: "medição: bancada sob LC_ALL=C com um mutante por caso (cada um reprova) e dogfood executando os blocos do próprio adopt.md num sandbox temporário"
+      method: "measurement: bancada sob LC_ALL=C com um mutante por caso (cada um reprova) e dogfood executando os blocos do próprio adopt.md num sandbox temporário"
       locality: "repo"
 
   - id: Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA
@@ -291,7 +291,7 @@ nodes:
     provenance:
       source: "branch chore/registry-honest-f15 (PR da F1.5, SAC-90): ops/registry-pins.sh, members-validate.sh, door-role-parity-check.sh e a passada real sobre docs/evolution/federation/members.yaml"
       locator: "saída de ops/registry-pins.sh --check e --seal em 2026-10-09; casos registry-pins (a)-(e) e door-role-parity (p1)-(p4) em .claude/validation/lint-selftest.sh; fixtures members-good-door-roles, members-bad-mini-adopter e members-bad-plugins-na"
-      method: "medição: passada real com leitura do carimbo pelo gh api em cada remoto, e bancada com um mutante por caso (todos reprovam)"
+      method: "measurement: passada real com leitura do carimbo pelo gh api em cada remoto, e bancada com um mutante por caso (todos reprovam)"
 
   - id: E_HISTORICO_DO_REGISTRO_DAS_PORTAS
     node_type: evidence
@@ -311,7 +311,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml em origin/main 9a45839d"
       locator: "blocos dos membros onion-core, onion-standalone, onion-mini e o preâmbulo antes de hub-operacoes-enterprise (que descrevia a onion-core)"
-      method: "leitura: linhas removidas pelo diff da F1.5, agrupadas por membro e copiadas sem edição (aspas duplas trocadas por simples)"
+      method: "reading: linhas removidas pelo diff da F1.5, agrupadas por membro e copiadas sem edição (aspas duplas trocadas por simples)"
 
   - id: E_HISTORICO_DO_REGISTRO_DOS_ADOTANTES
     node_type: evidence
@@ -331,7 +331,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml em origin/main 9a45839d"
       locator: "blocos dos adotantes cujas linhas o diff da F1.5 removeu ou reescreveu (o pin anterior ao carimbo está na linha onion_version de cada um)"
-      method: "leitura: linhas removidas pelo diff da F1.5, agrupadas por membro e copiadas sem edição (aspas duplas trocadas por simples)"
+      method: "reading: linhas removidas pelo diff da F1.5, agrupadas por membro e copiadas sem edição (aspas duplas trocadas por simples)"
 
   - id: Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO
     node_type: question
@@ -348,7 +348,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml, ops/registry-pins.sh e .claude/validation/members-validate.sh na branch feat/provenance-wave-o4"
       locator: "entrada granaai (superseded_by: brain-granaai); ramo superseded_by do registry-pins; checagem de superseded_by do members-validate; casos registry-pins (h) e fixtures members-*-superseded*"
-      method: "medição: ops/registry-pins.sh --check, members-validate.sh, projection-safety.sh e vendor-scrub-form-check.sh antes e depois em 2026-10-09"
+      method: "measurement: ops/registry-pins.sh --check, members-validate.sh, projection-safety.sh e vendor-scrub-form-check.sh antes e depois em 2026-10-09"
       locality: "repo"
 
   # ---- 2026-10-10: F2 das portas (SAC-91) — os manifestos por papel ----
@@ -370,7 +370,7 @@ nodes:
     provenance:
       source: "branch feat/doors-role-manifests-f2 (PR da F2, SAC-91): roles.yaml, vendor-manifest.sh, resolve-role-bundle.sh, lint-artifacts.sh (REGRAS 19, 37 e 61), topology-projection.sh, write-stamp.sh, materialize-door.sh e lint-selftest.sh"
       locator: "saída de vendor-manifest.sh --list e --diff por papel; casos role-cut (a2)(n)(n-MUT1)(n-MUT2)(o)(o-MUT)(o2)(p)(p-MUT)(q)(r)(r-MUT)(s)(s-MUT), role-bundle (p1)(p1-MUT), moat-boundary (a)(c)(d)(d-MUT) e materialize-repo (b)"
-      method: "medição: --list e --diff por papel, materialize-door standalone e mini em diretório temporário com o lint da porta, e bancada sob LC_ALL=C com um mutante por regra nova em 2026-10-10"
+      method: "measurement: --list e --diff por papel, materialize-door standalone e mini em diretório temporário com o lint da porta, e bancada sob LC_ALL=C com um mutante por regra nova em 2026-10-10"
       locality: "repo"
 
   - id: Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA
@@ -414,7 +414,7 @@ nodes:
     provenance:
       source: "branch feat/doors-publish-f3 (PR da F3, SAC-92): ops/publish-door.sh, door-staleness-check.sh --count, lint-artifacts.sh (REGRA 85), onion-door-staleness.yml e lint-selftest.sh"
       locator: "casos publish (a)-(k), (c2), (c3), (d2), (d3) e porta-severidade (a)-(e); saída do ensaio de cada porta e do --status em 2026-10-10"
-      method: "medição: bancada sob LC_ALL=C com um mutante por caso e ensaio de branch das quatro portas contra os remotos públicos, sem push"
+      method: "measurement: bancada sob LC_ALL=C com um mutante por caso e ensaio de branch das quatro portas contra os remotos públicos, sem push"
       locality: "repo"
 
   - id: Q_REGISTRO_ACOMPANHA_A_TROCA_DE_PAPEL
@@ -446,7 +446,7 @@ nodes:
     provenance:
       source: "branch feat/doors-plugins-out-f4 (PR da F4, SAC-93): plugin-bundle-check.sh, assemble-plugin.sh, generate-marketplace.sh --from-manifests, marketplace-root-check.sh, publish-door.sh (5d), lint-artifacts.sh, pre-commit e lint-selftest.sh"
       locator: "famílias plugin_bundle, plugin_version_derived, marketplace_root_sync, plugin_private_url, publish (q3, q4), capability (only-gate ii) e pre_push (F4 x1); bundle temporário das fontes vivas com 0 HARD"
-      method: "medição: bancada sob LC_ALL=C nas famílias tocadas, com mutante por caso plantado por ops/mutate-and-restore.sh, e montagem das fontes vivas num bundle temporário validado pelo claude plugin validate --strict"
+      method: "measurement: bancada sob LC_ALL=C nas famílias tocadas, com mutante por caso plantado por ops/mutate-and-restore.sh, e montagem das fontes vivas num bundle temporário validado pelo claude plugin validate --strict"
       locality: "repo"
 
   - id: Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN
@@ -479,7 +479,7 @@ nodes:
     provenance:
       source: "branch feat/doors-mini-f5 (PR da F5, SAC-94): door-mini-check.sh, overlays do mini, roles.yaml, resolve-role-bundle.sh, vendor-manifest.sh, materialize-door.sh, publish-door.sh, lint-artifacts.sh (REGRA 37) e lint-selftest.sh"
       locator: "famílias door_mini (a)-(f), publish (k), (k2), (k3), (k4) e role_bundle (p2); ensaio do motor contra o remoto público do onion-mini em 2026-10-10"
-      method: "medição: bancada sob LC_ALL=C nas famílias tocadas, com mutante por caso plantado por ops/mutate-and-restore.sh, e ensaio do motor real contra o remoto público sem push"
+      method: "measurement: bancada sob LC_ALL=C nas famílias tocadas, com mutante por caso plantado por ops/mutate-and-restore.sh, e ensaio do motor real contra o remoto público sem push"
       locality: "repo"
 
   - id: E_DESTILACAO_DO_MINI_VIRA_ARTEFATO_ARQUIVADO
@@ -500,7 +500,7 @@ nodes:
     provenance:
       source: "ops/publish-door.sh (passo 2b e o push da tag no passo 7) e o ensaio contra o remoto público do onion-mini"
       locator: "saída do ensaio de 2026-10-10 e caso publish (k2) em .claude/validation/lint-selftest.sh"
-      method: "medição: ensaio do motor sem push e bancada com remoto bare local"
+      method: "measurement: ensaio do motor sem push e bancada com remoto bare local"
       locality: "repo"
 
   - id: Q_MINI_CONFIGURA_INTEGRACAO_PELO_ENV
@@ -558,7 +558,7 @@ nodes:
     provenance:
       source: "ops/publish-door.sh --status contra os remotos públicos das quatro portas, e os commits 8d26637a (PR #1011), 4a240a0a e 87179f16 (PR #1012) na main"
       locator: "tabela do --status de 2026-10-11 (pin publicado, pin do registro e defasagem por porta) e as mensagens dos três commits"
-      method: "medição: --status lido do remoto em 2026-10-11 e saída do door-role-parity-check.sh; o relato do 1º ensaio e do refutador vem das mensagens de commit"
+      method: "measurement: --status lido do remoto em 2026-10-11 e saída do door-role-parity-check.sh; o relato do 1º ensaio e do refutador vem das mensagens de commit"
       locality: "web"
 
   - id: D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN
@@ -576,7 +576,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
       locator: "pergunta 1 de 4: o create-vertical e o motor do marketplace no plugin; opção escolhida MANTER FECHADO (a recomendada)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
   - id: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
@@ -594,7 +594,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
       locator: "pergunta 2 de 4: o standalone de adoção segue a porta?; opção escolhida SEPARAR PAPÉIS (a recomendada)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
   - id: E_CORTE_POR_DESTINO_MEDIDO
@@ -615,7 +615,7 @@ nodes:
     provenance:
       source: "branch feat/doors-decisions-sealed: vendor-manifest.sh, resolve-role-bundle.sh, roles.yaml, resolve-manifest.sh, vendor-branch.sh, adopt.md, lint-artifacts.sh (REGRA 37) e lint-selftest.sh"
       locator: "comparação dos manifestos por papel contra um worktree de origin/main; casos role-cut (u)-(u5) e role-bundle (p3)(p4)"
-      method: "medição: manifesto por papel antes e depois, bancada sob LC_ALL=C nas famílias tocadas e mutantes plantados por ops/mutate-and-restore.sh em 2026-10-11"
+      method: "measurement: manifesto por papel antes e depois, bancada sob LC_ALL=C nas famílias tocadas e mutantes plantados por ops/mutate-and-restore.sh em 2026-10-11"
       locality: "repo"
 
   - id: D_MINI_SEGUE_ENXUTO
@@ -633,7 +633,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
       locator: "pergunta 3 de 4: o mini com 49 ausências declaradas; opção escolhida MANTER ENXUTO (a recomendada)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
   - id: D_PERSONALITY_SYNC_NO_CONJUNTO_FEDERACAO
@@ -651,7 +651,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
       locator: "pergunta 4 de 4: personality-sync sem conjunto; opção escolhida CONJUNTO FEDERAÇÃO (a recomendada)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
   - id: Q_CARIMBO_DO_ADOTADO_STANDALONE
@@ -684,7 +684,7 @@ nodes:
     provenance:
       source: "clone local do sge e o carimbo do bomtexto, lidos nesta máquina em 2026-10-13"
       locator: "sge: lint-artifacts.sh com role adopted e com role standalone, sumário 0 HARD contra 16 HARD; bomtexto: .claude/.onion-version com role standalone e sem kind"
-      method: "medição: lint vendorizado rodado com LC_ALL=C num clone em diretório de rascunho, trocando só o carimbo"
+      method: "measurement: lint vendorizado rodado com LC_ALL=C num clone em diretório de rascunho, trocando só o carimbo"
       locality: "repo"
 
   - id: D_MODO_PORTA_VEM_DO_KIND
@@ -702,7 +702,7 @@ nodes:
     provenance:
       source: "branch fix/standalone-stamp-cut-vs-door, medições em clones locais do sge e do onion-standalone"
       locator: "lint-artifacts.sh, bloco do adotante standalone abaixo do IS_LEAF; door-role-parity-check.sh, _compat_ok e os ramos CARIMBO-DE-PORTA e SEM-KIND-DOOR; registry-pins.sh, o case de papel; lint-selftest.sh, casos pv-a a pv-g, pv-e2e-a e pv-e2e-b, g3, g3b, g3c, d2 e f2"
-      method: "medição: lint curado nos clones com LC_ALL=C e bancada com mutantes plantados por ops/mutate-and-restore.sh (core-only)"
+      method: "measurement: lint curado nos clones com LC_ALL=C e bancada com mutantes plantados por ops/mutate-and-restore.sh (core-only)"
       locality: "repo"
 
   # ---- o versionamento das portas (decisão do maestro de 2026-10-11) ----
@@ -721,7 +721,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
       locator: "quatro perguntas do versionamento (versionar, onde mora a tag, quem decide o bump, número da família); escolhidas as recomendadas"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
   - id: E_VERSIONAMENTO_NA_BANCADA
@@ -741,7 +741,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh, função run_publish_release_selftests, na branch feat/onion-release-versioning"
       locator: "casos r1 a r13 e os mutantes de cada um"
-      method: "medição: bancada rodada com LC_ALL=C e mutantes plantados por ops/mutate-and-restore.sh (core-only), um por caso"
+      method: "measurement: bancada rodada com LC_ALL=C e mutantes plantados por ops/mutate-and-restore.sh (core-only), um por caso"
       locality: "repo"
 
   - id: C_MAJOR_EXIGE_API_DECLARADA
@@ -759,7 +759,7 @@ nodes:
     provenance:
       source: ".claude/commands/common/prompts/publish-doctrine.md"
       locator: "cláusula 6, item 'API pública por porta', e o item 'Não mede todo o contrato que declara como API'"
-      method: "leitura: o texto escrito nesta leva, no locator citado"
+      method: "reading: o texto escrito nesta leva, no locator citado"
       locality: "repo"
 
   - id: C_CHANGELOG_DIZ_NENHUMA_QUEBRA
@@ -776,7 +776,7 @@ nodes:
     provenance:
       source: "ops/publish-door.sh, passo (4b)"
       locator: "seção 'Quebras nesta porta' do changelog gerado"
-      method: "medição: casos r4b e r6 de run_publish_release_selftests"
+      method: "measurement: casos r4b e r6 de run_publish_release_selftests"
       locality: "repo"
 
   - id: C_VERSAO_NUNCA_E_GUARDA
@@ -794,7 +794,7 @@ nodes:
     provenance:
       source: "ops/publish-door.sh e .claude/utils/adopt/write-stamp.sh"
       locator: "cabeçalho VERSIONAMENTO do motor; comentário da flag --release do write-stamp; função _status"
-      method: "leitura: o cabeçalho e as funções citados no locator"
+      method: "reading: o cabeçalho e as funções citados no locator"
       locality: "repo"
 
   - id: C_RECONCILIAR_O_SEMVER_SUPERADO
@@ -812,7 +812,7 @@ nodes:
     provenance:
       source: "docs/meta-specs/architecture.md"
       locator: "§6.1 Versionamento e o frontmatter version"
-      method: "leitura: o texto escrito nesta leva, no locator citado"
+      method: "reading: o texto escrito nesta leva, no locator citado"
       locality: "repo"
 
   # ---- o vazamento que só o motor via (2026-10-13) e a varredura que passou a rodar no PR ----
@@ -833,7 +833,7 @@ nodes:
     provenance:
       source: ".claude/validation/door-leak-scan.sh, rodado sobre git archive de e5e9a265, 91dcb25d e da cabeça do PR #1097"
       locator: "saída TSV por família (word, home) e rc, nos três commits"
-      method: "medição: a mesma varredura que o (5a) do motor roda, aplicada às raízes que viajam, com LC_ALL=C"
+      method: "measurement: a mesma varredura que o (5a) do motor roda, aplicada às raízes que viajam, com LC_ALL=C"
       locality: "repo"
 
   - id: D_VARREDURA_DA_PUBLICACAO_RODA_NO_PR
@@ -853,7 +853,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh, função run_door_leak_scan_selftests"
       locator: "casos (a) a (j) e os 8 mutantes"
-      method: "medição: bancada rodada com LC_ALL=C; cada mutante reverte uma cura na cópia do sandbox e o caso reprova"
+      method: "measurement: bancada rodada com LC_ALL=C; cada mutante reverte uma cura na cópia do sandbox e o caso reprova"
       locality: "repo"
 
   - id: E_CARIMBADOR_DO_CACHE_LIA_O_CLONE_LOCAL
@@ -873,7 +873,7 @@ nodes:
     provenance:
       source: "ops/door-seal-pin.sh e ops/publish-door.sh --status, rodados contra os remotos públicos das quatro portas"
       locator: "saída do --dry-run por porta e a tabela do --status"
-      method: "medição: execução real em --dry-run, sem escrita no registro"
+      method: "measurement: execução real em --dry-run, sem escrita no registro"
       locality: "repo"
 
   - id: D_CACHE_DO_PIN_LE_O_REMOTO_PELA_LEITURA_DO_STATUS
@@ -893,7 +893,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh, funções run_door_seal_pin_selftests e run_publish_selftests"
       locator: "casos (a) a (o) do door-seal-pin e (b2), (c) do publish, com os mutantes"
-      method: "medição: bancada com LC_ALL=C; cada mutante plantado por ops/mutate-and-restore.sh e o caso reprova"
+      method: "measurement: bancada com LC_ALL=C; cada mutante plantado por ops/mutate-and-restore.sh e o caso reprova"
       locality: "repo"
 
   - id: E_FONTE_DO_UPDATE_SEM_ESCOLHA
@@ -913,7 +913,7 @@ nodes:
     provenance:
       source: "carimbos .claude/.onion-version da história dos adotantes locais e a linha first-parent de origin/main do core"
       locator: "classificação por par adotante×pin: MAIN_FIRST_PARENT, MERGED_LATER_FEATURE, NEVER_ON_MAIN, NOT_IN_CORE"
-      method: "medição: leitura git somente, sem escrita nos adotantes"
+      method: "measurement: leitura git somente, sem escrita nos adotantes"
       locality: "repo"
 
   - id: D_FONTE_DO_UPDATE_RESOLVIDA_POR_MECANISMO
@@ -933,7 +933,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh, função run_adopt_update_source_selftests"
       locator: "casos (s1) a (s10) e os mutantes de cada um"
-      method: "medição: bancada com LC_ALL=C; cada mutante plantado pelo mutate-and-restore e o caso reprova"
+      method: "measurement: bancada com LC_ALL=C; cada mutante plantado pelo mutate-and-restore e o caso reprova"
       locality: "repo"
 
   - id: E_PROPOSTA_CONTAVA_A_RELEASE_NOVA
@@ -953,7 +953,7 @@ nodes:
     provenance:
       source: "ops/publish-door.sh, cálculo da proposta (4b) e da base da família"
       locator: "PROP_BASE ao lado de FAM_MAX; caso (r3g) e (r3g-MUT) de run_publish_release_selftests"
-      method: "medição: publicação real + ensaio contra as portas reais + bancada com mutante"
+      method: "measurement: publicação real + ensaio contra as portas reais + bancada com mutante"
       locality: "repo"
   - id: D_PORTAS_ENSAIAR_E_PUBLICAR_1018
     node_type: decision
@@ -969,7 +969,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-18: «As 4 portas estão na onion-v2.0.2 e 2 commits atrás. Publicar agora?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-18"
       locality: "pessoa"
 
 edges:

@@ -3,7 +3,6 @@
   "id": "inbox-sinais-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 9,
     "form.range.node.label": 23,
     "form.required.node.provenance": 4,
     "integrity.bare-decision": 1,

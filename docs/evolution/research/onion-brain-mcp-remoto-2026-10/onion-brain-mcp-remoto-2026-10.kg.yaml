@@ -67,7 +67,7 @@ nodes:
     provenance:
       source: "ops/mcp-onion-kg/server.py@8ade5598"
       locator: "l.8 (streamable-http), l.9 e l.117 (X-Api-Key), l.21 (REPO), l.31-32 (cwd=REPO), l.36-58 (tools), l.54 (grep sem '--')"
-      method: "medição: leitura do arquivo com grep -n e sed -n na árvore em 9d802460; git log -1 do arquivo = 8ade5598"
+      method: "measurement: leitura do arquivo com grep -n e sed -n na árvore em 9d802460; git log -1 do arquivo = 8ade5598"
       locality: "repo"
 
   # ═══════════════════ EVIDÊNCIAS CONFIRMADAS DA RODADA ═══════════════════
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization"
       locator: "seção Authorization Server Discovery / Protected Resource Metadata"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_MCP_PROIBE_TOKEN_PASSTHROUGH
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices"
       locator: "seção Token Passthrough"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_MCP_2026_07_28_AUDIENCE_BINDING
@@ -129,7 +129,7 @@ nodes:
     provenance:
       source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
       locator: "seção security considerations — audience binding (RFC 8707)"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_MCP_UPSTREAM_CREDENCIAL_PROPRIA
@@ -149,7 +149,7 @@ nodes:
     provenance:
       source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
       locator: "seção security considerations — upstream tokens"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_REUSAR_IAM_NAO_IMPLEMENTAR_AS
@@ -169,7 +169,7 @@ nodes:
     provenance:
       source: "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server"
       locator: "artigo sobre Keycloak como authorization server de MCP"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_CONECTORES_HTTP_NAO_STDIO
@@ -189,7 +189,7 @@ nodes:
     provenance:
       source: "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/"
       locator: "comparativo local vs remoto em conectores personalizados do Claude"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_STREAMABLE_HTTP_SUBSTITUI_SSE
@@ -209,7 +209,7 @@ nodes:
     provenance:
       source: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
       locator: "seção sobre transporte remoto"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_CLOUDFLARE_BYO_IDP
@@ -229,7 +229,7 @@ nodes:
     provenance:
       source: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
       locator: "seção sobre autenticação com provedores OAuth de terceiros"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_TENANT_DE_CLAIM_NUNCA_DE_INPUT
@@ -248,7 +248,7 @@ nodes:
     provenance:
       source: "https://wavect.io/blog/enterprise-mcp-authorization-architecture/"
       locator: "seção sobre isolamento por organização"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_CLAUDE_AI_OAUTH_FALHA_ISSUE_171
@@ -268,7 +268,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-ai-mcp/issues/171"
       locator: "issue anthropics/claude-ai-mcp #171"
-      method: "juízes: votação adversarial 2-1 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 2-1 da rodada de 2026-10-11"
       locality: "web"
 
   - id: E_MCP_2026_07_28_SEM_SESSAO
@@ -288,7 +288,7 @@ nodes:
     provenance:
       source: "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed"
       locator: "seção sobre remoção de sessões e Mcp-Session-Id"
-      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-10-11"
       locality: "web"
 
   # ═══════════════════ MERCADO / CAPITAL (invariante — cláusula 4) ═══════════════════
@@ -309,7 +309,7 @@ nodes:
     provenance:
       source: "síntese do worker de mercado da rodada /onion-research de 2026-10-11 (SAC-70)"
       locator: "seção Mercado do repasse do sintetizador"
-      method: "testemunho: síntese de 1 agente sobre as fontes da rodada"
+      method: "testimony: síntese de 1 agente sobre as fontes da rodada"
       locality: "host"
 
   # ═══════════════════ LACUNAS (cláusula 8 — lacuna vira nó) ═══════════════════
@@ -330,7 +330,7 @@ nodes:
     provenance:
       source: "repasse da rodada /onion-research de 2026-10-11 (SAC-70) ao write(KG)"
       locator: "listas Confirmadas, Não verificadas/refutadas e Objeções do Elenxo do repasse"
-      method: "testemunho: contagem do repasse pela sessão que escreveu o grafo"
+      method: "testimony: contagem do repasse pela sessão que escreveu o grafo"
       locality: "host"
 
   # ═══════════════════ AS OPÇÕES (uma claim por opção, todas open) ═══════════════════
@@ -415,7 +415,7 @@ nodes:
     provenance:
       source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre D_ONION_BRAIN_MCP_REMOTO"
       locator: "opção escolhida: 2 degraus, código no core (Recomendado)"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-12"
 
   - id: E_OBJECAO_IDP_CADASTRO_ABERTO_NAO_AUTORIZA
     node_type: evidence
@@ -433,7 +433,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Achado 1' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_NEGOCIAR_VARIAS_VERSOES
@@ -452,7 +452,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Achado 3' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_LOGTO_DCR_CIMD_NAO_MEDIDO
@@ -471,7 +471,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Achado 5' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_CLOUDFLARE_E_AS_PROXY
@@ -490,7 +490,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Achado 8' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_DOGFOOD_OAUTH_POR_CLIENTE
@@ -509,7 +509,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Achado 10' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_D2_INCONSISTENTE_COM_ACHADOS
@@ -528,7 +528,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'D2' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_PKCE_METADATA_DO_LOGTO
@@ -547,7 +547,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'D3' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_CONECTOR_EXIGE_INTERNET_PUBLICA
@@ -566,7 +566,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'D5' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_CALLBACK_NO_PRE_REGISTRO
@@ -585,7 +585,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'D10' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_GATEWAYS_ESTABELECIDOS_NAO_COMPARADOS
@@ -604,7 +604,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'D13' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_ORDEM_DE_REGISTRO_DO_CLIENTE
@@ -623,7 +623,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B1' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_ESCOPO_UNICO_DE_LEITURA
@@ -642,7 +642,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B2' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_OWNER_ADICIONA_CONECTOR
@@ -661,7 +661,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B3' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_SO_TOOLS
@@ -680,7 +680,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B4' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_INJECAO_INDIRETA_NO_BRAIN
@@ -699,7 +699,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B5' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_GATEWAY_SO_COM_MUITOS_HUBS
@@ -718,7 +718,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B6' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_SAML_EXIGE_PONTE_OIDC
@@ -737,7 +737,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B7' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_BEARER_POR_REQUISICAO_STATELESS
@@ -756,7 +756,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B8' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_SEM_HANDLES_POR_USUARIO
@@ -775,7 +775,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B9' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_CONFUSED_DEPUTY_E_O_CRITERIO
@@ -794,7 +794,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B10' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_ESCOPOS_PROGRESSIVOS
@@ -813,7 +813,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B11' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_STDIO_VIA_PROXY_ELIMINADO
@@ -832,7 +832,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B12' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_MCP_REMOTE_DATA_NAO_CONFERIDA
@@ -851,7 +851,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B13' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_CLOUDFLARE_CONTROLE_POR_USUARIO
@@ -870,7 +870,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B14' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_TOKEN_AMARRA_SERVIDOR_NAO_TENANT
@@ -889,7 +889,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'B15' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_MATRIZ_DE_CLIENTES_NAO_LIDA
@@ -908,7 +908,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Fontes não lidas' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_OBJECAO_PRECEDENTE_USA_X_API_KEY
@@ -927,7 +927,7 @@ nodes:
     provenance:
       source: "ops/mcp-onion-kg/server.py@8ade5598"
       locator: "ops/mcp-onion-kg/server.py@8ade5598 l.9 e l.117 (hmac.compare_digest do X-Api-Key), relido em 2026-10-11"
-      method: "medição: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
+      method: "measurement: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
       locality: "repo"
 
   - id: E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT
@@ -946,7 +946,7 @@ nodes:
     provenance:
       source: "ops/mcp-onion-kg/server.py@8ade5598"
       locator: "ops/mcp-onion-kg/server.py@8ade5598 l.21 e l.31-37 (REPO e cwd=REPO), relido em 2026-10-11"
-      method: "medição: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
+      method: "measurement: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
       locality: "repo"
 
   - id: E_OBJECAO_KB_SEARCH_GREP_SEM_DUPLO_HIFEN
@@ -965,7 +965,7 @@ nodes:
     provenance:
       source: "ops/mcp-onion-kg/server.py@8ade5598"
       locator: "ops/mcp-onion-kg/server.py@8ade5598 l.50-54 (grep -rin -m 3 termo sem '--'), relido em 2026-10-11"
-      method: "medição: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
+      method: "measurement: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
       locality: "repo"
 
   - id: E_OBJECAO_CONTRARIANO_LIBRECHAT_NAO_PESADO
@@ -984,7 +984,7 @@ nodes:
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
       locator: "objeção ao alvo 'Contrariano LibreChat' (survives=true)"
-      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
   - id: E_DEGRAU1_EM_PRODUCAO_1012
@@ -1003,7 +1003,7 @@ nodes:
     provenance:
       source: "VPS de produção: systemctl, ufw, docker exec no container do LibreChat e journal, 2026-10-12"
       locator: "unit onion-vps-mcp-kg-granaai; regra ufw 3033; log [MCP][onion-brain]"
-      method: "medição: chamadas reais pela rede da bridge, por comportamento, não declaração"
+      method: "measurement: chamadas reais pela rede da bridge, por comportamento, não declaração"
       locality: "host"
 
 edges:

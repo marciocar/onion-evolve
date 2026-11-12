@@ -3,7 +3,6 @@
   "id": "onion-family-topology-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 14,
     "form.range.node.label": 1,
     "yaml.unquoted-date": 1
   }

@@ -23,7 +23,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: E_L1
@@ -38,7 +38,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-sinal-catraca-falso-verde-arandek.md L24-61 (esp. L33-48); Arandek scripts/lint-provider-boundary.ts; source_commit 5e3ea5ee46ac"
       locator: "docs/evolution/inbox/_processed/2026-07-25-sinal-catraca-falso-verde-arandek.md L24-61 (esp. L33-48); Arandek scripts/lint-provider-boundary.ts; source_commit 5e3ea5ee46ac"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
 
   - id: E_DEVFANTASMA
     node_type: evidence
@@ -52,7 +52,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-contra-sinal-develop-fantasma-v2.md L24-72; core resolve-integration-branch.sh:49-51 (existencia antes de origin/HEAD); acao adotante commit b7182ccb"
       locator: "docs/evolution/inbox/_processed/2026-07-25-contra-sinal-develop-fantasma-v2.md L24-72; core resolve-integration-branch.sh:49-51 (existencia antes de origin/HEAD); acao adotante commit b7182ccb"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
 
   - id: E_L2
     node_type: evidence
@@ -66,7 +66,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; onion-logto@7c008b2e"
       locator: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; stack onion-logto commit 7c008b2"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: D_KB

@@ -108,7 +108,7 @@ nodes:
     provenance:
       source: "https://platform.claude.com/docs/en/agent-sdk/secure-deployment"
       locator: "seção de credenciais (proxy pattern)"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_RISK_FILES_PLATFORM
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: "https://platform.claude.com/docs/en/agent-sdk/secure-deployment"
       locator: "seção de arquivos sensíveis no filesystem"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_SANDBOX_RUNTIME_PLATFORM
@@ -146,7 +146,7 @@ nodes:
     provenance:
       source: "https://platform.claude.com/docs/en/agent-sdk/secure-deployment"
       locator: "tabela de tecnologias de isolamento"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_PROXY_PATTERN_CODE_MD
@@ -165,7 +165,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment.md"
       locator: "seção de credenciais (proxy pattern)"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_RISK_FILES_CODE_MD
@@ -184,7 +184,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment.md"
       locator: "seção de arquivos sensíveis no filesystem"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_SANDBOX_RUNTIME_CODE_MD
@@ -203,7 +203,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment.md"
       locator: "tabela de tecnologias de isolamento"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SANDBOXING_SHELL_ONLY
@@ -222,7 +222,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/sandboxing"
       locator: "seção de escopo do sandbox (o que roda dentro e fora)"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SANDBOXING_NOT_FULL_BOUNDARY
@@ -241,7 +241,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/sandboxing"
       locator: "ressalva de limites do sandbox e remissão a sandbox environments"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_PROXY_PATTERN_CODE
@@ -260,7 +260,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
       locator: "seção de credenciais (proxy pattern)"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_RISK_FILES_CODE
@@ -279,7 +279,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
       locator: "seção de arquivos sensíveis no filesystem"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SECDEP_SANDBOX_RUNTIME_CODE
@@ -298,7 +298,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/secure-deployment"
       locator: "tabela de tecnologias de isolamento"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_CVE_2026_25725_SETTINGS_HOOK
@@ -318,7 +318,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/security/advisories/GHSA-ff64-7w26-62rf"
       locator: "descrição do advisory GHSA-ff64-7w26-62rf"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_CVE_2026_25725_PATH_LIST_STARTUP
@@ -337,7 +337,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/security/advisories/GHSA-ff64-7w26-62rf"
       locator: "análise de causa do advisory GHSA-ff64-7w26-62rf"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_RADAR_V34_SANDBOXED_EXECUTION_TRIAL
@@ -357,7 +357,7 @@ nodes:
     provenance:
       source: "https://www.thoughtworks.com/de-de/radar/techniques/sandboxed-execution-for-coding-agents"
       locator: "blip sandboxed execution for coding agents, anel Trial"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_RADAR_V34_SANDBOX_DEFINITION
@@ -376,7 +376,7 @@ nodes:
     provenance:
       source: "https://www.thoughtworks.com/de-de/radar/techniques/sandboxed-execution-for-coding-agents"
       locator: "texto do blip"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_ONA_PROC_SELF_ROOT_BYPASSES_DENYLIST
@@ -396,7 +396,7 @@ nodes:
     provenance:
       source: "https://ona.com/stories/how-claude-code-escapes-its-own-denylist-and-sandbox"
       locator: "relato do contorno do denylist"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_STARTDEBUG_SECRET_OUT_OF_PROCESS
@@ -416,7 +416,7 @@ nodes:
     provenance:
       source: "https://startdebugging.net/2026/09/keep-api-keys-out-of-agent-context-with-a-credential-gateway/"
       locator: "tese central do post"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_STARTDEBUG_ROUTE_GATEWAY_TESTS
@@ -436,7 +436,7 @@ nodes:
     provenance:
       source: "https://startdebugging.net/2026/09/keep-api-keys-out-of-agent-context-with-a-credential-gateway/"
       locator: "seção de testes do gateway"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_AGENTGATEWAY_EGRESS_INJECTION
@@ -455,7 +455,7 @@ nodes:
     provenance:
       source: "https://agentgateway.dev/blog/2026-07-27-credential-injection-ai-agent-egress-cb4a/"
       locator: "descrição da injeção no egress"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_AGENTGATEWAY_BROKER_IS_TARGET
@@ -474,7 +474,7 @@ nodes:
     provenance:
       source: "https://agentgateway.dev/blog/2026-07-27-credential-injection-ai-agent-egress-cb4a/"
       locator: "seção de riscos do broker"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_YOLOCAGE_VAGRANT_MICROK8S
@@ -493,7 +493,7 @@ nodes:
     provenance:
       source: "https://github.com/borenstein/yolo-cage"
       locator: "README, arquitetura"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_YOLOCAGE_GIT_DISPATCHER
@@ -512,7 +512,7 @@ nodes:
     provenance:
       source: "https://github.com/borenstein/yolo-cage"
       locator: "README, dispatcher de git"
-      method: "juízes: votação adversarial 3-0 do run wf_505962e3-7c9"
+      method: "judges: votação adversarial 3-0 do run wf_505962e3-7c9"
       locality: "web"
 
   - id: E_SESSION_MEASURED_CHAT_BASH_READS_SECRETS_1015
@@ -529,7 +529,7 @@ nodes:
     provenance:
       source: "relato da sessão principal de 2026-10-15 no enunciado do run wf_505962e3-7c9"
       locator: "parágrafo 'Medição interna já feita pela sessão'"
-      method: "testemunho: medição da sessão repassada pelo prompt do workflow"
+      method: "testimony: medição da sessão repassada pelo prompt do workflow"
       locality: "pessoa"
 
   - id: E_CORPUS_PRIOR_BRIDGE_AND_A2A_1015
@@ -546,7 +546,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml e docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml"
       locator: "nós D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A e E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO"
-      method: "leitura: os dois nós lidos no worktree desta rodada"
+      method: "reading: os dois nós lidos no worktree desta rodada"
       locality: "repo"
 
   - id: E_MERCADO_AGENT_SANDBOX_CAPITAL_1015
@@ -563,7 +563,7 @@ nodes:
     provenance:
       source: "https://www.thoughtworks.com/de-de/radar/techniques/sandboxed-execution-for-coding-agents"
       locator: "anel Trial do blip; síntese de mercado do run wf_505962e3-7c9"
-      method: "derivado: síntese do sintetizador do run sobre as claims confirmadas"
+      method: "derived: síntese do sintetizador do run sobre as claims confirmadas"
       locality: "web"
 
   - id: E_LACUNAS_CHAT_AGENT_ISOLATION_1015
@@ -580,7 +580,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9"
       locator: "listas de refutadas, não verificadas, cortes por orçamento e objeções do Elenxo"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   - id: D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT
@@ -671,7 +671,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Opção 1 — EnvironmentFile= para o .env', critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_02_READONLY_SCOPE_LEAVES_CODE_WRITABLE
@@ -688,7 +688,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Opção 1 — escopo das ReadOnlyPaths', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_03_PREMISE_GUEST_IS_NOT_IN_BYPASS
@@ -705,7 +705,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Premissa — admin e convidados em bypassPermissions', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_04_PROXY_NEEDS_BOUNDARY_FIRST
@@ -722,7 +722,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achados 1/4/9 — proxy pattern apoia a opção 5', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_05_RISK_FILE_LIST_INCOMPLETE
@@ -739,7 +739,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achados 2/5/10 — .env e .git-credentials como os arquivos de risco', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_06_BWRAP_FAILS_ON_THIS_VPS
@@ -756,7 +756,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achados 3/6/11 — sandbox-runtime dá isolamento Good', critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_07_DENY_RULES_DO_BIND_READ_TOOL
@@ -773,7 +773,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achado 7 — denyRead não impede a ferramenta Read', critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_08_NO_KVM_UID_IS_THE_HARD_BOUNDARY
@@ -790,7 +790,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achado 8 — container/VM continuam necessários como fronteira dura', critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_09_CVE_VECTOR_OPEN_WITHOUT_SANDBOX
@@ -807,7 +807,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achados 12/13 — CVE-2026-25725', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_10_RADAR_DOES_NOT_PICK_A_LAYER
@@ -824,7 +824,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achados 14/15 — Thoughtworks Radar em Trial', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_12_PROCESS_IS_THE_WRONG_UNIT
@@ -841,7 +841,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achado 17 — segredo fora do processo que executa comandos', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_13_GATEWAY_TESTS_ARE_AUTHOR_ONLY
@@ -858,7 +858,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achado 18 — gateway com allowlist negou DELETE/traversal', critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_16_YOLOCAGE_NOT_REPLICABLE_HERE
@@ -875,7 +875,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Achado 21 — yolo-cage isola por VM Vagrant + MicroK8s', critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_18_BYPASS_RETRY_RUNS_UNPROMPTED
@@ -892,7 +892,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Descarte refutado tier 10 — em bypass o retry sem sandbox roda sem prompt', critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_19_SANDBOX_DEFAULT_FAILS_OPEN
@@ -909,7 +909,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Descarte refutado tier 5 — o agente desativou o sandbox quando o bwrap falhou', critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_21_MICROVM_DISCARDS_WERE_DECISIVE
@@ -926,7 +926,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Descartes por orçamento — Firecracker exige bare metal/KVM; gVisor caro em I/O', critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_22_PAT_READABLE_GIT_PROXY_CUT
@@ -943,7 +943,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Descartes por orçamento — git proxy/MCP fora da fronteira para o PAT', critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_23_APPROVAL_CHIP_IS_NOT_A_BOUNDARY
@@ -960,7 +960,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Descartes por orçamento — ld-linux/mmap contorna execve; fadiga de aprovação', critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_24_SHARED_RUNNER_MIXES_TENANTS
@@ -977,7 +977,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Descartes por orçamento — container não basta para multi-inquilino sem confiança mútua', critério E3_DESCARTE_SEM_MEDIDA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_25_OFFICIAL_HOSTING_PAGE_UNREAD
@@ -994,7 +994,7 @@ nodes:
     provenance:
       source: "journal do run wf_505962e3-7c9 (resposta do Elenxo)"
       locator: "objeção contra 'Fontes não lidas — agent-sdk/hosting, sandbox-runtime, CVE-2026-39861, systemd hardening', critério E4_LACUNA_ABERTA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição na VPS declarada pelo agente"
       locality: "host"
 
   - id: C_SUPERACAO_20261015_BYPASS_RETRY_DETERMINISTIC_OFF
@@ -1228,7 +1228,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/hosting"
       locator: "Handle production concerns > Auth and secrets, item Inbound"
-      method: "leitura: WebFetch e curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch e curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_CVE39861_SYMLINK_SANDBOX_ESCAPE
@@ -1248,7 +1248,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/security/advisories/GHSA-vp62-r36r-9xqp"
       locator: "Description, 1º parágrafo"
-      method: "leitura: WebFetch do advisory, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do advisory, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_CVE39861_FIXED_IN_2_1_64
@@ -1268,7 +1268,7 @@ nodes:
     provenance:
       source: "https://cveawg.mitre.org/api/cve/CVE-2026-39861"
       locator: "descrição do registro CVE; painel Affected/Patched do GHSA-vp62-r36r-9xqp"
-      method: "leitura: WebFetch do registro CVE.org e do advisory, ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do registro CVE.org e do advisory, ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_CVE39861_NEEDS_PROMPT_INJECTION
@@ -1288,7 +1288,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/security/advisories/GHSA-vp62-r36r-9xqp"
       locator: "Description, final do 1º parágrafo"
-      method: "leitura: WebFetch do advisory, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do advisory, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_CVE39861_SEVERITY_HIGH_7_7
@@ -1307,7 +1307,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code/security/advisories/GHSA-vp62-r36r-9xqp"
       locator: "painel de severidade do advisory"
-      method: "leitura: WebFetch do advisory, vetor CVSS ancorado por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do advisory, vetor CVSS ancorado por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SYSTEMD_PROTECTPROC_HIDES_OTHER_USERS_ONLY
@@ -1327,7 +1327,7 @@ nodes:
     provenance:
       source: "https://man7.org/linux/man-pages/man5/systemd.exec.5.html"
       locator: "ProtectProc="
-      method: "leitura: WebFetch do espelho man7.org (systemd 262~devel; freedesktop.org devolveu 403/418), ancorada por verificador independente na man page local v255.4"
+      method: "reading: WebFetch do espelho man7.org (systemd 262~devel; freedesktop.org devolveu 403/418), ancorada por verificador independente na man page local v255.4"
       locality: "web"
 
   - id: E_SYSTEMD_PROTECTPROC_NEEDS_USER_NO_PTRACE
@@ -1345,7 +1345,7 @@ nodes:
     provenance:
       source: "https://man7.org/linux/man-pages/man5/systemd.exec.5.html"
       locator: "ProtectProc="
-      method: "leitura: WebFetch do espelho man7.org, ancorada por verificador independente na man page local v255.4"
+      method: "reading: WebFetch do espelho man7.org, ancorada por verificador independente na man page local v255.4"
       locality: "web"
 
   - id: E_SYSTEMD_PROCSUBSET_PID_KEEPS_ENVIRON
@@ -1364,7 +1364,7 @@ nodes:
     provenance:
       source: "https://man7.org/linux/man-pages/man5/systemd.exec.5.html"
       locator: "ProcSubset="
-      method: "leitura: WebFetch do espelho man7.org, ancorada por verificador independente na man page local v255.4"
+      method: "reading: WebFetch do espelho man7.org, ancorada por verificador independente na man page local v255.4"
       locality: "web"
 
   - id: E_SYSTEMD_INACCESSIBLE_NO_NESTING
@@ -1383,7 +1383,7 @@ nodes:
     provenance:
       source: "https://man7.org/linux/man-pages/man5/systemd.exec.5.html"
       locator: "InaccessiblePaths= e TemporaryFileSystem="
-      method: "leitura: WebFetch do espelho man7.org, ancorada por verificador independente na man page local v255.4"
+      method: "reading: WebFetch do espelho man7.org, ancorada por verificador independente na man page local v255.4"
       locality: "web"
 
   - id: E_SDK_SPAWNOPTIONS_HAS_NO_UID
@@ -1402,7 +1402,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/typescript.md"
       locator: "seção SpawnOptions, linhas 5168-5180"
-      method: "leitura: curl da variante .md (292118 bytes), ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md (292118 bytes), ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SDK_SPAWNEDPROCESS_MINIMAL_CONTRACT
@@ -1421,7 +1421,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/typescript.md"
       locator: "seção SpawnedProcess, linhas 5141-5165"
-      method: "leitura: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SDK_ENV_REPLACES_PROCESS_ENV
@@ -1440,7 +1440,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/typescript.md"
       locator: "tabela Options, linha env"
-      method: "leitura: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SDK_TEARDOWN_WAITS_TWO_SECONDS
@@ -1459,7 +1459,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/typescript.md"
       locator: "nota abaixo de SpawnOptions, linhas ~5182-5185"
-      method: "leitura: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SDK_PATH_TO_CLAUDE_EXECUTABLE
@@ -1478,7 +1478,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/agent-sdk/typescript.md"
       locator: "tabela Options, linha pathToClaudeCodeExecutable (linha 532)"
-      method: "leitura: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_USERNS_NEEDS_CONFINED_PROFILE
@@ -1498,7 +1498,7 @@ nodes:
     provenance:
       source: "https://ubuntu.com/blog/ubuntu-23-10-restricted-unprivileged-user-namespaces"
       locator: "seção do perfil de exemplo (Chrome)"
-      method: "leitura: WebFetch do blog, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do blog, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_USERNS_KERNEL_SURFACE_RISK
@@ -1517,7 +1517,7 @@ nodes:
     provenance:
       source: "https://ubuntu.com/blog/ubuntu-23-10-restricted-unprivileged-user-namespaces"
       locator: "seção de motivação"
-      method: "leitura: WebFetch do blog, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do blog, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_USERNS_BWRAP_PROFILE_REUSABLE
@@ -1536,7 +1536,7 @@ nodes:
     provenance:
       source: "https://discourse.ubuntu.com/t/understanding-apparmor-user-namespace-restriction/58007"
       locator: "seção bwrap/Nautilus, riscos"
-      method: "leitura: WebFetch do discourse, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do discourse, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SANDBOX_DEFAULT_FAIL_OPEN_FAILIFUNAVAILABLE
@@ -1555,7 +1555,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/sandboxing"
       locator: "nota da seção de ativação, ~linha 101 do dump"
-      method: "leitura: curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SANDBOX_STRICT_RECIPE_MANAGED
@@ -1574,7 +1574,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/sandboxing"
       locator: "exemplo de managed settings, ~linhas 704-705 do dump"
-      method: "leitura: curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SANDBOX_UBUNTU_APPARMOR_BLOCKS_BWRAP
@@ -1594,7 +1594,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/sandboxing"
       locator: "pré-requisitos Linux, ~linhas 146-165 do dump"
-      method: "leitura: curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: curl da variante .md, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_SETTINGS_FAILIFUNAVAILABLE_REFUSES_START
@@ -1613,7 +1613,7 @@ nodes:
     provenance:
       source: "https://code.claude.com/docs/en/settings-reference"
       locator: "índice de chaves, sandbox.failIfUnavailable"
-      method: "leitura: WebFetch do índice de settings, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
+      method: "reading: WebFetch do índice de settings, quote verbatim ancorada por verificador independente (run wf_8847e3af-370)"
       locality: "web"
 
   - id: E_LACUNAS_PRIMARIES_CHAT_AGENT_ISOLATION_1015
@@ -1630,7 +1630,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370"
       locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis e gapsOpen do Elenxo"
-      method: "derivado: contabilidade do run repassada ao escritor"
+      method: "derived: contabilidade do run repassada ao escritor"
       locality: "host"
 
   - id: E_OBJECAO_26_HOSTING_ANCHOR_SILENT_ON_UID
@@ -1647,7 +1647,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 1 [sdk-hosting], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação"
+      method: "judges: Elenxo, 1 agente sem votação"
       locality: "host"
 
   - id: E_OBJECAO_27_BRIDGE_CANNOT_SWITCH_UID
@@ -1664,7 +1664,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 10 [sdk-spawn], critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição no host declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição no host declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_28_WRAPPER_NEEDS_STDERR_AND_TEARDOWN
@@ -1681,7 +1681,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 11 [sdk-spawn], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; leitura do sdk.d.ts instalado declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; leitura do sdk.d.ts instalado declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_29_CROSS_UID_KILL_NOT_VIABLE
@@ -1698,7 +1698,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 13 [sdk-spawn], critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; medição no host declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição no host declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_30_BWRAP_PROFILE_IS_HOST_WIDE
@@ -1715,7 +1715,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 17 [ubuntu-userns], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; medição no host declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; medição no host declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_31_FAILIFUNAVAILABLE_DEFAULT_BY_ROUTE
@@ -1732,7 +1732,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 18 [cc-sandbox-settings], critério E1_EVIDENCIA_CONTRARIA"
-      method: "juízes: Elenxo, 1 agente sem votação; leitura do sdk.d.ts instalado declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; leitura do sdk.d.ts instalado declarada pelo agente"
       locality: "host"
 
   - id: E_OBJECAO_32_WORKSPACE_CLAUDE_DIR_WRITABLE
@@ -1749,7 +1749,7 @@ nodes:
     provenance:
       source: "journal do run wf_8847e3af-370 (resposta do Elenxo)"
       locator: "objeção contra a claim 21 [cc-sandbox-settings], critério E2_PROVA_MENOS"
-      method: "juízes: Elenxo, 1 agente sem votação; leitura do código do bridge declarada pelo agente"
+      method: "judges: Elenxo, 1 agente sem votação; leitura do código do bridge declarada pelo agente"
       locality: "host"
 
   - id: C_RECOMENDACAO_ELENXO_PRIMARIES_1015
@@ -1955,7 +1955,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Como seguir com D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT depois das primárias?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   # ═══ AS 3 PROVAS DO ELENXO (2026-10-16, decisão D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016) — medidas em sandbox ═══
@@ -1976,7 +1976,7 @@ nodes:
     provenance:
       source: "SDK @anthropic-ai/claude-agent-sdk 0.3.232 instalado no onion-bridge (CLI embutido 2.1.232)"
       locator: "resolveSettings(), query() com settingSources:[\"project\"], managedSettings, settings.disableAllHooks"
-      method: "medição: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
+      method: "measurement: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
       locality: "host"
 
   - id: E_PROVA2_DYNAMICUSER_CLI_SDK_HANDSHAKE_1016
@@ -1993,7 +1993,7 @@ nodes:
     provenance:
       source: "systemd 255.4 do host + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge"
       locator: "systemd-run --pipe -p DynamicUser=yes; Options.spawnClaudeCodeProcess"
-      method: "medição: unit transitória com autorização do maestro, chave literal inválida"
+      method: "measurement: unit transitória com autorização do maestro, chave literal inválida"
       locality: "host"
 
   - id: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
@@ -2010,7 +2010,7 @@ nodes:
     provenance:
       source: "SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge (CLI 2.1.232); bwrap 0.9.0 do host"
       locator: "Options.sandbox, settings.sandbox, managedSettings.sandbox, failIfUnavailable"
-      method: "medição: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
+      method: "measurement: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
       locality: "host"
   - id: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
     node_type: decision
@@ -2026,7 +2026,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Isolamento do /chat, degraus 1 a 3 (corrigidos pelas provas). O que selar e executar?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   # ═══ DEGRAU 1 + SPIKES DOS DEGRAUS 2 E 3 (2026-10-16, decisão D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016) ═══
@@ -2047,7 +2047,7 @@ nodes:
     provenance:
       source: "systemd 255.4 do host + ops/bridge-hardening.sh (core-only) desta branch + o SDK @anthropic-ai/claude-agent-sdk 0.3.232 do bridge"
       locator: "systemd-run --pipe --wait --collect com ReadOnlyPaths=/ReadWritePaths=/InaccessiblePaths=; nsenter no MainPID; strace -f de query() e do tsx"
-      method: "medição: units transitórias, test -w/test -r (access), findmnt OPTIONS e TARGET, sem escrever em caminho servido; strace contando EROFS"
+      method: "measurement: units transitórias, test -w/test -r (access), findmnt OPTIONS e TARGET, sem escrever em caminho servido; strace contando EROFS"
       locality: "host"
 
   - id: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
@@ -2064,7 +2064,7 @@ nodes:
     provenance:
       source: "systemd 255.4 do host + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge (CLI 2.1.232)"
       locator: "Accept=yes, DynamicUser=, User=onion-chat-%i, CollectMode=, RuntimeMaxSec=; Options.spawnClaudeCodeProcess"
-      method: "medição: units de runtime removidas ao fim, journal do lançador e do systemd, cronometria no harness"
+      method: "measurement: units de runtime removidas ao fim, journal do lançador e do systemd, cronometria no harness"
       locality: "host"
 
   - id: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
@@ -2081,7 +2081,7 @@ nodes:
     provenance:
       source: "kernel e AppArmor 4.0.1 do host + bubblewrap 0.9.0 + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge"
       locator: "perfil unprivileged_userns; audit userns_create/capable; resolveSettings() effective.sandbox"
-      method: "medição: leitura de estado e execuções sem privilégio; nenhum perfil carregado, nenhum pacote instalado"
+      method: "measurement: leitura de estado e execuções sem privilégio; nenhum perfil carregado, nenhum pacote instalado"
       locality: "host"
 
   - id: E_DEGRAU1_EM_PRODUCAO_1016
@@ -2098,7 +2098,7 @@ nodes:
     provenance:
       source: "onion-vps-bridge no host, systemd 255.4"
       locator: "⟨drop-in 30-integrity.conf do onion-vps-bridge⟩; nsenter -t <MainPID> -m findmnt"
-      method: "medição: wrapper em produção + leitura independente sem escrita em caminho servido"
+      method: "measurement: wrapper em produção + leitura independente sem escrita em caminho servido"
       locality: "host"
   - id: D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016
     node_type: decision
@@ -2114,7 +2114,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Degrau 2 (UID distinto por sessão do /chat): é o único que fecha o segredo (.env, environ, PAT) e o data/ gravável. O spike provou o mecanismo (socket + DynamicUser) com 3 correções. Como seguir?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
   - id: D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016
     node_type: decision
@@ -2130,7 +2130,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Degrau 3 (sandbox nativo do Claude Code no /chat): exige socat, uma cópia privada do bwrap e um perfil AppArmor (root); o managedSettings descarta bwrapPath, e o caminho alternativo depende do degrau 2. Como seguir?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   - id: E_DEGRAU2_WORKSPACE_SPIKE_1016
@@ -2147,7 +2147,7 @@ nodes:
     provenance:
       source: "systemd 255.4 do host + acl 2.3 (setfacl/getfacl)"
       locator: "Accept=yes (nome da instância), SupplementaryGroups=, TemporaryFileSystem=, BindPaths=, ACL padrão (d:g:, d:u:, máscara)"
-      method: "medição: units de runtime e grupo temporário removidos ao fim; o papel do serviço feito pelo operador sobre um fixture"
+      method: "measurement: units de runtime e grupo temporário removidos ao fim; o papel do serviço feito pelo operador sobre um fixture"
       locality: "host"
 
   - id: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
@@ -2164,7 +2164,7 @@ nodes:
     provenance:
       source: "systemd 255.4 do host + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge (CLI 2.1.232) + os dois PRs deste degrau"
       locator: "ops/chat-runner.sh install/verify; deploy/chat-runner/ e src/chat-runner.ts do bridge"
-      method: "medição: units de runtime, grupo temporário e fixture removidos ao fim; API falsa no loopback; journal do lançador"
+      method: "measurement: units de runtime, grupo temporário e fixture removidos ao fim; API falsa no loopback; journal do lançador"
       locality: "host"
 
   # ═══ DEGRAU 2 EM PRODUÇÃO E O OBJETO DO DEGRAU 3 (2026-10-16) ═══
@@ -2184,7 +2184,7 @@ nodes:
     provenance:
       source: "onion-vps-bridge e onion-chat.socket no host, systemd 255.4"
       locator: "ops/chat-runner.sh verify; systemctl show -p ActiveEnterTimestamp; environ do MainPID; GET /health no loopback"
-      method: "medição: wrapper em produção, repetido por sessão independente da que instalou, mais leitura sem escrita"
+      method: "measurement: wrapper em produção, repetido por sessão independente da que instalou, mais leitura sem escrita"
       locality: "host"
 
   - id: E_DEGRAU3_OBJETO_MEDIDO_1016
@@ -2201,7 +2201,7 @@ nodes:
     provenance:
       source: "doc do Claude Code (sandboxing, tools-reference) + o bridge b7d224db + os CLIs 2.1.232 e 2.1.301 + systemd 255.4 do host"
       locator: "sandboxing l.9, l.11 e l.42-43; tools-reference l.608; agent-policy.ts READ_ONLY_TOOLS, EXEC_TOOLS e DENY_RULES; launcher.py REQUIRED_FLAGS; a guarda de URL do WebFetch (hostname.split('.').length<2) e o domain_info"
-      method: "medição: leitura da doc e do código instalado, consulta ao preflight, units transitórias sem nada persistente (0 unit restante)"
+      method: "measurement: leitura da doc e do código instalado, consulta ao preflight, units transitórias sem nada persistente (0 unit restante)"
       locality: "host"
 
   - id: C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX
@@ -2233,7 +2233,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Degrau 3: sem objeto no convidado (sandbox só cobre Bash/PowerShell/Monitor); o que fazemos com o risco da rede do WebFetch?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   - id: E_CERCA_DE_REDE_CONSTRUIDA_1016
@@ -2250,7 +2250,7 @@ nodes:
     provenance:
       source: "systemd 255.4 do host + o modelo do onion-bridge#75 + ops/chat-runner.sh desta branch + o CLI 2.1.232 do bridge"
       locator: "IPAddressDeny= e BindReadOnlyPaths= no drop-in do template; a sonda de rede NETPY com a perna de controle; effective_props com as slices"
-      method: "medição: units transitórias sem nada persistente, o verify do wrapper contra a produção e a bancada com mutantes"
+      method: "measurement: units transitórias sem nada persistente, o verify do wrapper contra a produção e a bancada com mutantes"
       locality: "host"
 
   - id: E_EGRESS_FENCE_EM_PRODUCAO_1016
@@ -2267,7 +2267,7 @@ nodes:
     provenance:
       source: "onion-chat@ e onion-chat.socket no host, sob a cerca 60-egress-fence.conf; onion-vps-bridge em 86c9c000"
       locator: "ops/chat-runner.sh install --apply --egress-fence e verify; systemctl show das propriedades IPAddressDeny e IPAddressAllow da instância; GET /health no loopback; journal de 3 min"
-      method: "medição: wrapper em produção pela sessão principal, com perna de controle sem a cerca para cada alvo"
+      method: "measurement: wrapper em produção pela sessão principal, com perna de controle sem a cerca para cada alvo"
       locality: "host"
 
   - id: E_SDK_0_3_301_CONTRATO_E_PISO_1016
@@ -2284,7 +2284,7 @@ nodes:
     provenance:
       source: "onion-bridge (worktree de origin/main 7446541) com @anthropic-ai/claude-agent-sdk 0.3.301; CHANGELOG do SDK (anthropics/claude-agent-sdk-typescript) e do Claude Code entre 0.3.232/2.1.232 e 0.3.301/2.1.301"
       locator: "o argv capturado pelo spawnClaudeCodeProcess nos dois SDKs; check_args do deploy/chat-runner/launcher.py; systemd-run com o sandbox do template e a API falsa no loopback"
-      method: "medição: captura do argv nos dois SDKs, bancada do bridge e do core com mutantes, dogfood local e sob DynamicUser"
+      method: "measurement: captura do argv nos dois SDKs, bancada do bridge e do core com mutantes, dogfood local e sob DynamicUser"
       locality: "host"
 
 edges:

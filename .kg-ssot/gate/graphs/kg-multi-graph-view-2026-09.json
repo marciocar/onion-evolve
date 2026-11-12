@@ -3,7 +3,6 @@
   "id": "kg-multi-graph-view-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 22,
     "form.range.node.label": 32,
     "form.required.node.provenance": 1,
     "integrity.bare-decision": 1

@@ -72,7 +72,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:25-41 e :65-66 @21213cc6"
-      method: "leitura: brief-irmão do grafo, recomendação D6 do analista"
+      method: "reading: brief-irmão do grafo, recomendação D6 do analista"
       locality: "repo"
   - id: C_D1_rec
     node_type: claim
@@ -85,7 +85,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:47 e :127-135 @21213cc6"
-      method: "leitura: brief-irmão do grafo (header do .kg.yaml l.6), recomendação D1 do analista"
+      method: "reading: brief-irmão do grafo (header do .kg.yaml l.6), recomendação D1 do analista"
       locality: "repo"
   - id: C_D5_rec
     node_type: claim
@@ -108,7 +108,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:49, :180, :183-186 @21213cc6"
-      method: "leitura: brief-irmão do grafo, recomendação D3 do analista"
+      method: "reading: brief-irmão do grafo, recomendação D3 do analista"
       locality: "repo"
 
   # ---- EVIDÊNCIA (evidence) ----
@@ -124,7 +124,7 @@ nodes:
     provenance:
       source: "https://adwaitx.com/claude-marketplace-enterprise"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:128 @21213cc6; adwaitx.com/claude-marketplace-enterprise (\"full enterprise marketplace with partner solutions requires an Enterprise subscription\"; \"Claude for Enterprise pricing is not publicly disclosed\")"
-      method: "leitura: brief-irmão l.128 + página adwaitx lida em 2026-10-09"
+      method: "reading: brief-irmão l.128 + página adwaitx lida em 2026-10-09"
       locality: "web"
   - id: E_whitespace_compliance
     node_type: evidence
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "docs/business-context/02-product/strategy.md"
       locator: "docs/business-context/02-product/strategy.md:30 @b57930a8; docs/business-context/01-customer/personas.md:36 @a4e5f8a2"
-      method: "leitura: strategy.md §Posicionamento l.30 + personas.md P4 l.36"
+      method: "reading: strategy.md §Posicionamento l.30 + personas.md P4 l.36"
       locality: "repo"
   - id: E_compliance_grc_market
     node_type: evidence
@@ -151,7 +151,7 @@ nodes:
     provenance:
       source: "https://layer3labs.io/guides/ai-compliance-software"
       locator: "layer3labs.io/guides/ai-compliance-software (lida 2026-10-09, \"Updated Sep 28, 2026\"); docs/business-context/gtm-decision-brief-2026-07.md:60"
-      method: "leitura: página layer3labs lida em 2026-10-09 + brief-irmão l.60"
+      method: "reading: página layer3labs lida em 2026-10-09 + brief-irmão l.60"
       locality: "web"
   - id: E_safe_cert
     node_type: evidence
@@ -164,7 +164,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:150 e :152 @21213cc6"
-      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
+      method: "testimony: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
       locality: "repo"
   - id: E_consulting_daterate
     node_type: evidence
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:128 e :150 @21213cc6"
-      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
+      method: "testimony: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
       locality: "repo"
   - id: E_consumer_pipoca
     node_type: evidence
@@ -191,7 +191,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:178 @21213cc6; docs/onion/graph/company-brain-market-2026-07.kg.yaml:65"
-      method: "leitura: brief-irmão l.178 + nó irmão do company-brain-market (url iwoszapar com path)"
+      method: "reading: brief-irmão l.178 + nó irmão do company-brain-market (url iwoszapar com path)"
       locality: "repo"
   - id: E_mentoria_pricing
     node_type: evidence
@@ -205,7 +205,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:180 @21213cc6"
-      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
+      method: "testimony: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
       locality: "repo"
   - id: E_hybrid_pricing_trend
     node_type: evidence
@@ -219,7 +219,7 @@ nodes:
     provenance:
       source: "docs/business-context/gtm-decision-brief-2026-07.md"
       locator: "docs/business-context/gtm-decision-brief-2026-07.md:130 e :151 @21213cc6"
-      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
+      method: "testimony: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
       locality: "repo"
 
   # ---- QUESTÕES ABERTAS (question) ----
@@ -277,7 +277,7 @@ nodes:
     provenance:
       source: "docs/business-context/decisions.md"
       locator: "docs/business-context/decisions.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: E_CENSO0901_Q_instrument_metrics
@@ -292,7 +292,7 @@ nodes:
     provenance:
       source: ".claude/validation"
       locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — git log --oneline -- .claude/validation/{cycle-completion,context-freshness-metric,session"
-      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
 
 edges:

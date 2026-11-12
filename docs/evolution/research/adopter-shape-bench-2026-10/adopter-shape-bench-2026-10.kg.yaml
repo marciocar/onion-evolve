@@ -21,7 +21,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-contract-check.sh@7a50fc14"
       locator: "o teste do vendor no início do script ('vendor do contrato ausente em … — não dá para julgar', exit 2)"
-      method: "medição: o script rodado no clone do adotante, com e sem KG_CONTRACT_VENDOR"
+      method: "measurement: o script rodado no clone do adotante, com e sem KG_CONTRACT_VENDOR"
       locality: "repo"
 
   - id: E_R85_R92_SOFT_NAO_PODE_JULGAR
@@ -37,7 +37,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh@7a50fc14"
       locator: "check_door_staleness (ramo ERRO, [porta/NAO-MEDIDO]) e check_door_role_parity (rc=3)"
-      method: "medição: o lint rodado nos dois clones e as linhas VIOLATION lidas"
+      method: "measurement: o lint rodado nos dois clones e as linhas VIOLATION lidas"
       locality: "repo"
 
   - id: E_ADOCAO_DEIXAVA_FORA_DO_COMMIT
@@ -53,7 +53,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/durable-commit.sh@7a50fc14"
       locator: "o array ONION_PATHS e o git add que o segue"
-      method: "medição: o materializador avisando 'sobrou arquivo FORA do commit durável' com a lista, antes e depois da cura"
+      method: "measurement: o materializador avisando 'sobrou arquivo FORA do commit durável' com a lista, antes e depois da cura"
       locality: "repo"
 
   - id: E_CENSO_SEM_FAMILIA_DE_ADOTANTE
@@ -68,7 +68,7 @@ nodes:
     provenance:
       source: ".claude/validation/guard-census.sh"
       locator: "seções 'já existe guarda' e 'massa' da saída de 2026-10-15"
-      method: "medição: o censo injetado na carga do /meta:forge-guard e a busca focada"
+      method: "measurement: o censo injetado na carga do /meta:forge-guard e a busca focada"
       locality: "repo"
 
   - id: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
@@ -83,7 +83,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh@02709b98 e ops/materialize-adopter.sh@02709b98"
       locator: "run_adopter_shape_selftests (lint-selftest.sh:33867) e o seu registro (:34581)"
-      method: "medição: a família adopter_shape executada com LC_ALL=C, 16 passaram e 0 falharam"
+      method: "measurement: a família adopter_shape executada com LC_ALL=C, 16 passaram e 0 falharam"
       locality: "repo"
     label: "Substrato: família de bancada (adopter_shape) com um materializador core-only (ops/materialize-adopter.sh). Molde: door_mini com ops/materialize-door.sh. Ela roda no CLONE do adotante de fixture o lint, o contrato e o radar."
     narrative: "Check de lint descartado: a pergunta é do formato de outro repo, que só existe montando-o. Hook descartado: nada a vetar na hora do comando. O materializador chama os helpers REAIS da adoção na ordem do adopt.md e lê o manifesto pelo vendor-branch.sh --print-manifest, o mesmo caminho do --update; a árvore é a do índice, como o _archive_staged, para o pre-commit não testar o já commitado. O clone é o ponto: arquivo fora do commit durável não chega ao time nem ao CI do adotante. A família custa um lint inteiro (cerca de 90 s com a materialização); a polaridade do detector é provada antes, em linhas sintéticas."
@@ -100,7 +100,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh@02709b98 e .claude/utils/adopt/durable-commit.sh@02709b98"
       locator: "o array _base (vendor-manifest.sh:106-107) e ONION_PATHS (durable-commit.sh:60)"
-      method: "medição: vendor-manifest.sh executado nos papéis adopted, standalone e mini, e a família durable_commit (caso sac149) verde"
+      method: "measurement: vendor-manifest.sh executado nos papéis adopted, standalone e mini, e a família durable_commit (caso sac149) verde"
       locality: "repo"
     label: "O fechamento leva vendor/kg-ssot INTEIRO (316 arquivos, 1,9 MB) para todo papel menos o mini, e não um recorte de tools/ e spec/: o .kg-ssot-version lista o sha256 de cada arquivo da release, e um recorte faria o carimbo do vendor mentir."
     narrative: "Entra no _base do vendor-manifest.sh, logo também nas raízes que a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e a REGRA 100 varrem, e na lista do commit durável. A licença é Apache-2.0 e LICENSE e NOTICE vão dentro da release. Os casos .kg.yaml da suíte de conformidade ficam sob fixtures/ e o kg-fixture-paths.sh já os isenta, como no core."
@@ -118,7 +118,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_adopter_shape_selftests, casos p, p2, a até f"
-      method: "medição: nove mutantes plantados e restaurados com hash conferido"
+      method: "measurement: nove mutantes plantados e restaurados com hash conferido"
       locality: "repo"
 
   - id: C_TETO_PASSOS_COPIADOS_DO_ADOPT
@@ -178,7 +178,7 @@ nodes:
     provenance:
       source: "relatório do refutador (subagente opus, worktree isolada)"
       locator: "achados 1 a 11 da passada sobre 53612815"
-      method: "juízes: refutador adversarial com scripts executados, e as curas re-medidas pela bancada"
+      method: "judges: refutador adversarial com scripts executados, e as curas re-medidas pela bancada"
       locality: "repo"
 
   - id: C_TETO_VENDOR_PROPRIO_IGNORADO
@@ -225,7 +225,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh@02709b98 e .claude/validation/rules-registry.sh@02709b98"
       locator: "'# aplica-se: source' nas REGRAS 85 (:2674) e 92 (:2856); a catraca nº8 do registro (:215-233)"
-      method: "medição: o caso (g) da adopter_shape e o (ap) da rules_registry executados, verdes"
+      method: "measurement: o caso (g) da adopter_shape e o (ap) da rules_registry executados, verdes"
       locality: "repo"
     label: "PR 2: a regra sem objeto num papel DECLARA '# aplica-se:' no docstring; fora dele o lint não a roda e a conta como 'NÃO SE APLICA', fora de HARD e SOFT. As REGRAS 85 e 92 declaram source."
     narrative: "O rules-registry.sh valida o vocabulário (typo calaria a regra em todo papel) e exige source na lista (regra que nunca roda no core fica sem a bancada), e projeta a seção 'Aplicabilidade por papel' no lint-rules.md. A 92 ficou source-only também no hub: o hub sem registro próprio saía 'não pôde julgar'; hub com members.yaml próprio perde a paridade de porta, teto nomeado. O recorte por mensagem antigo (_without_object_for_role) segue para o resto, rebaixando HARD a SOFT."
@@ -242,7 +242,7 @@ nodes:
     provenance:
       source: ".claude/validation/ops-citation-travel-check.sh@02709b98"
       locator: "a isenção source-only (:236-241) e os casos (xviii) e (xix) (:394-405)"
-      method: "medição: o --selftest da guarda executado (25/25 verdes, rc 0) e o caso (f) da adopter_shape verde"
+      method: "measurement: o --selftest da guarda executado (25/25 verdes, rc 0) e o caso (f) da adopter_shape verde"
       locality: "repo"
     label: "PR 2: a REGRA 100 passa a julgar o ops/ que uma violation IMPRIME: o teste de presença em OUTRA linha do arquivo não a isenta mais, só a regra declarada '# aplica-se: source', que não roda fora do core."
     narrative: "Estática no core (casos xviii e xix do --selftest da guarda, com mutantes) e dinâmica no adotante (caso f da adopter_shape, catraca vazia). O baseline só encolheu: as 3 citações das mensagens das 85 e 92 saíram por serem source-only, e as 2 da semente do KG ganharam o marcador (core-only)."
@@ -259,7 +259,7 @@ nodes:
     provenance:
       source: ".claude/utils/kg/stamp-adoption-graph-pin.sh@02709b98 e .claude/utils/adopt/write-stamp.sh@02709b98"
       locator: "a chamada do helper (write-stamp.sh:216-217) e a REGRA 108 (lint-artifacts.sh:5975)"
-      method: "medição: os casos (i) a (i4-MUT) da adopter_shape verdes e o helper --check executado numa fixture sem x_pin (rc 3)"
+      method: "measurement: os casos (i) a (i4-MUT) da adopter_shape verdes e o helper --check executado numa fixture sem x_pin (rc 3)"
       locality: "repo"
     label: "PR 2: o pin do grafo de adoção tem o escritor do carimbo. O write-stamp.sh chama utils/kg/stamp-adoption-graph-pin.sh ao fim de todo carimbo de adoção, a semente nasce com x_pin, e a REGRA 108 cobra a paridade (HARD)."
     narrative: "O helper mora em utils/kg, que viaja para todo papel com KG, e não em utils/adopt, que o standalone corta: senão a REGRA 108 diria 'não pôde julgar' no standalone, a classe que este PR cura. Pin ilegível (label editado pelo dono, sem x_pin) sai SOFT nomeado."
@@ -277,7 +277,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-env-guard.sh, .claude/utils/adopt/migrate-seed-graph.sh e .claude/validation/door-role-parity-check.sh"
       locator: "casos (r) da env_exposure, (v2) e (v2b) da migrate_seed_graph; o cabeçalho ADOTANTE do door-role-parity-check.sh"
-      method: "medição: sondas executadas e as famílias da bancada"
+      method: "measurement: sondas executadas e as famílias da bancada"
       locality: "repo"
 
   - id: Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO
@@ -301,7 +301,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "famílias adopter_shape, env_exposure, migrate_seed_graph, rules_registry e ops_citation_travel"
-      method: "medição: mutantes plantados e restaurados com hash conferido"
+      method: "measurement: mutantes plantados e restaurados com hash conferido"
       locality: "repo"
 
   - id: E_ELENXO_PR2_TRES_BLOQUEADORES_CURADOS
@@ -317,7 +317,7 @@ nodes:
     provenance:
       source: "relatório do refutador (subagente opus, worktree isolada)"
       locator: "achados 1 a 13 da passada sobre 27f09cd0"
-      method: "juízes: refutador adversarial com sondas executadas, e as curas re-medidas pela bancada e por mutantes"
+      method: "judges: refutador adversarial com sondas executadas, e as curas re-medidas pela bancada e por mutantes"
       locality: "repo"
 
   - id: C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO

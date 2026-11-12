@@ -3,7 +3,6 @@
   "id": "chat-agent-isolation-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 94,
     "form.required.node.provenance": 1
   }
 }

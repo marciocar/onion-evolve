@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve/rulesets/25001643 + git log de origin/main@0e84ddf8"
       locator: "rules[].type, parameters.strict_required_status_checks_policy, bypass_actors; .claude/hooks/kg-read-leg.sh l.23-28; ops/pr-merge-verified.sh l.35-36 e l.266"
-      method: "medição: gh api, git log e grep -n rodados pelo escritor em 2026-10-14"
+      method: "measurement: gh api, git log e grep -n rodados pelo escritor em 2026-10-14"
       locality: "repo"
   - id: E_TEMPL_CI_REGEN_DIFF_EXIT_CODE
     node_type: evidence
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: "https://templ.guide/developer-tools/cicd"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_TREZOR_COMMITS_GENERATED
     node_type: evidence
@@ -123,7 +123,7 @@ nodes:
     provenance:
       source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_TREZOR_GEN_CHECK_PER_PR
     node_type: evidence
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_GITLAB_GENERATED_NOT_COMPOSABLE
     node_type: evidence
@@ -157,7 +157,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_GITLAB_ONE_MR_AT_A_TIME
     node_type: evidence
@@ -174,7 +174,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_OPENTITAN_PORCELAIN_NOT_DIFF
     node_type: evidence
@@ -192,7 +192,7 @@ nodes:
     provenance:
       source: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_BOT_BRANCH_PR_INSTEAD_OF_BYPASS
     node_type: evidence
@@ -209,7 +209,7 @@ nodes:
     provenance:
       source: "https://zff.dev/Conduction/.github/issues/27"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_GITHUB_TOKEN_PUSH_TO_PROTECTED_FAILS
     node_type: evidence
@@ -227,7 +227,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/136531"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      method: "judges: votação 2-1 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_APP_AS_RULESET_BYPASS_ACTOR
     node_type: evidence
@@ -245,7 +245,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/136531"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_CPYTHON_VERSIONS_FOR_BOOTSTRAP
     node_type: evidence
@@ -263,7 +263,7 @@ nodes:
     provenance:
       source: "https://discuss.python.org/t/reducing-merge-conflicts-in-generated-code/68537"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_PAT_WORKAROUND_2020
     node_type: evidence
@@ -281,7 +281,7 @@ nodes:
     provenance:
       source: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_RENOVATE_TWO_WRITERS_COLLIDE
     node_type: evidence
@@ -298,7 +298,7 @@ nodes:
     provenance:
       source: "https://hackernoon.com/what-you-need-to-know-about-github-agentic-workflows-and-renovate"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_TEMPL_RECOMMENDS_COMMITTING
     node_type: evidence
@@ -315,7 +315,7 @@ nodes:
     provenance:
       source: "https://templ.guide/developer-tools/cicd"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      method: "judges: votação 2-1 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_TREZOR_NEVER_RESOLVE_BY_HAND
     node_type: evidence
@@ -332,7 +332,7 @@ nodes:
     provenance:
       source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_TREZOR_GENERATED_INCOMPATIBLE_ACROSS_BRANCHES
     node_type: evidence
@@ -349,7 +349,7 @@ nodes:
     provenance:
       source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_RELEASE_PLEASE_APP_TOKEN_PR
     node_type: evidence
@@ -366,7 +366,7 @@ nodes:
     provenance:
       source: "https://github.com/adcontextprotocol/adcp-client-python/pull/896/"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      method: "judges: votação 2-1 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_GITLAB_PROPOSAL_NEEDS_MERGE_TRAIN
     node_type: evidence
@@ -383,7 +383,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      method: "judges: votação 2-1 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_GITLAB_MANUAL_REGEN_FAILS
     node_type: evidence
@@ -400,7 +400,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_OPENTITAN_CHECK_GENERATED_GATE
     node_type: evidence
@@ -418,7 +418,7 @@ nodes:
     provenance:
       source: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
       locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
-      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      method: "judges: votação 3-0 do run wf_e26bb266-4aa"
       locality: "web"
   - id: E_MERCADO_POSTMERGE_WRITER_2026_10
     node_type: evidence
@@ -436,7 +436,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "campo market do sintetizador do run wf_e26bb266-4aa"
-      method: "derivado: sintetizador do run wf_e26bb266-4aa"
+      method: "derived: sintetizador do run wf_e26bb266-4aa"
       locality: "web"
   - id: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
     node_type: claim
@@ -516,7 +516,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «Como selar o Passo B (D_POSTMERGE_PROJECTION_WRITER_2026_10)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: E_OBJECAO_TEMPL_PER_PR_GATE_MISSES_COMBINATION
     node_type: evidence
@@ -532,7 +532,7 @@ nodes:
     provenance:
       source: "https://templ.guide/developer-tools/cicd"
       locator: "objeção #0 do retorno do Elenxo (Achado 1 (templ: git diff --exit-code no CI = catraca 'PR em sincronia'))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_TREZOR_LOW_PR_CONCURRENCY
     node_type: evidence
@@ -548,7 +548,7 @@ nodes:
     provenance:
       source: "git log origin/main@0e84ddf8 -300"
       locator: "objeção #1 do retorno do Elenxo (Achado 2 (Trezor commita os gerados))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_PER_PR_GATE_BLIND_STRICT_FALSE
     node_type: evidence
@@ -564,7 +564,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
       locator: "objeção #2 do retorno do Elenxo (Achado 3 (Trezor make gen_check por PR))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_REGEN_PR_PER_MERGE_DOUBLES_QUEUE
     node_type: evidence
@@ -580,7 +580,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml"
       locator: "objeção #6 do retorno do Elenxo (Achado 7 (bot abre branch+PR, 'algum churn'))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_RULESET_HAS_NO_PR_RULE_FF_VIABLE
     node_type: evidence
@@ -596,7 +596,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
       locator: "objeção #7 do retorno do Elenxo (Achado 8 ('Changes must be made through a pull request' com GITHUB_TOKEN))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_APP_BYPASS_BREAKS_INVARIANT
     node_type: evidence
@@ -612,7 +612,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
       locator: "objeção #8 do retorno do Elenxo (Achado 9 (GitHub App como bypass_actor always|pull_request))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_MAIN_MUST_KEEP_VERSIONING
     node_type: evidence
@@ -628,7 +628,7 @@ nodes:
     provenance:
       source: ".claude/hooks/kg-read-leg.sh"
       locator: "objeção #9 do retorno do Elenxo (Achado 10 (CPython versiona porque o bootstrap precisa dos arquivos))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_MAESTRO_PAT_LOSES_AUDIT
     node_type: evidence
@@ -644,7 +644,7 @@ nodes:
     provenance:
       source: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740"
       locator: "objeção #10 do retorno do Elenxo (Achado 11 (PAT de usuário no lugar do GITHUB_TOKEN, 2020))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_TEMPL_COMMIT_IS_CONSUMER_REASON
     node_type: evidence
@@ -660,7 +660,7 @@ nodes:
     provenance:
       source: "https://templ.guide/developer-tools/cicd"
       locator: "objeção #12 do retorno do Elenxo (Achado 13 (templ recomenda commitar *_templ.go, voto 2-1))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_REGEN_ON_REBASE_ALREADY_EXISTS
     node_type: evidence
@@ -676,7 +676,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh"
       locator: "objeção #13 do retorno do Elenxo (Achado 14 (Trezor: nunca resolver conflito à mão, regenerar))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_REGEN_PR_NEEDS_APP_AND_SECOND_MERGE_PATH
     node_type: evidence
@@ -692,7 +692,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/actions/using-workflows/triggering-a-workflow"
       locator: "objeção #15 do retorno do Elenxo (Achado 16 (release-please com token de App para os required checks rodarem))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_OPENTITAN_GATE_IS_POST_REGEN_DESIGN
     node_type: evidence
@@ -708,7 +708,7 @@ nodes:
     provenance:
       source: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
       locator: "objeção #18 do retorno do Elenxo (Achado 19 (OpenTitan versiona e o CI falha se a árvore não estiver limpa))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI
     node_type: evidence
@@ -724,7 +724,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh"
       locator: "objeção #19 do retorno do Elenxo (Premissa (5): 'a projeção commitada no PR já falha na combinação' como prova para o Passo B)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH
     node_type: evidence
@@ -740,7 +740,7 @@ nodes:
     provenance:
       source: ".claude/hooks/kg-read-leg.sh"
       locator: "objeção #20 do retorno do Elenxo (Ponto (2): o hook kg-read-leg fica defasado entre o merge e a regeneração)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_GITHUB_TOKEN_NO_PR_TRIGGER_IS_DOCUMENTED
     node_type: evidence
@@ -756,7 +756,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/actions/using-workflows/triggering-a-workflow"
       locator: "objeção #21 do retorno do Elenxo (Descartado: PR com GITHUB_TOKEN não dispara workflows pull_request (refutada))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_BOT_AS_BYPASS_ACTOR_UNREAD
     node_type: evidence
@@ -772,7 +772,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
       locator: "objeção #22 do retorno do Elenxo (Descartado: github-actions[bot] não pode ser bypass actor (refutada))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_APP_TOKEN_PUSH_PATTERN_DOCUMENTED
     node_type: evidence
@@ -788,7 +788,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/136531"
       locator: "objeção #23 do retorno do Elenxo (Descartado: App com bypass empurra ao protegido via workflow com o token do App (refutada))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_GITLAB_SINGLE_WRITER_AT_MERGE
     node_type: evidence
@@ -804,7 +804,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "objeção #26 do retorno do Elenxo (Descartado: a proposta do GitLab é um escritor único no merge (refutada))"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_GH013_IS_BOUNDARY_CONDITION
     node_type: evidence
@@ -820,7 +820,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
       locator: "objeção #27 do retorno do Elenxo (Cortada por orçamento: push de bot com gerado ao protegido falha com GH013)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_BYPASS_ALL_OR_NOTHING
     node_type: evidence
@@ -836,7 +836,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #28 do retorno do Elenxo (Cortada por orçamento: bypass tudo-ou-nada por ator, sem granularidade por caminho)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_GREEN_SHA_FAST_FORWARD_IS_KEY
     node_type: evidence
@@ -852,7 +852,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
       locator: "objeção #30 do retorno do Elenxo (Cortada por orçamento: commit com o check exigido já aprovado satisfaz a proteção)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_ADMIN_BYPASS_ONLY_IN_PR
     node_type: evidence
@@ -868,7 +868,7 @@ nodes:
     provenance:
       source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
       locator: "objeção #35 do retorno do Elenxo (Cortada por orçamento: bypass de branch ruleset só via PR, push rules agnósticas de ref)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "repo"
   - id: E_OBJECAO_EXEMPTION_IS_SILENT
     node_type: evidence
@@ -884,7 +884,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #37 do retorno do Elenxo (Cortada por orçamento: exemption pula a aplicação em silêncio, ao contrário do bypass)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_ADMIN_DIRECT_PUSH_AUDIT
     node_type: evidence
@@ -900,7 +900,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #38 do retorno do Elenxo (Cortada por orçamento: bypass de admin faz push direto sem prompt)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_AUTOMERGE_IGNORES_APP_BYPASS
     node_type: evidence
@@ -916,7 +916,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #41 do retorno do Elenxo (Cortada por orçamento: bypass do App vale no endpoint síncrono de merge e não no gh pr merge --auto)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_RULESETS_PRIMARY_DOC_UNREAD
     node_type: evidence
@@ -932,7 +932,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
       locator: "objeção #42 do retorno do Elenxo (Fonte não lida: docs.github.com creating-rulesets-for-a-repository)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_DISCUSSION_43460_UNREAD
     node_type: evidence
@@ -948,7 +948,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/43460"
       locator: "objeção #43 do retorno do Elenxo (Fonte não lida: community discussions 43460)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_DISCUSSION_25305_UNREAD
     node_type: evidence
@@ -964,7 +964,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/25305"
       locator: "objeção #44 do retorno do Elenxo (Fonte não lida: community discussions 25305)"
-      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      method: "reading: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
       locality: "web"
   - id: E_OBJECAO_TENKI_RELEASE_AUTOMATION_UNREAD
     node_type: evidence
@@ -980,7 +980,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #45 do retorno do Elenxo (Fonte não lida: tenki.cloud release-automation)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_EDENAI_FRESHNESS_GATE_UNREAD
     node_type: evidence
@@ -996,7 +996,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #46 do retorno do Elenxo (Fonte não lida: edenai/docs PR 50)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_OPAM_RUNTIME_READER_UNREAD
     node_type: evidence
@@ -1012,7 +1012,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #48 do retorno do Elenxo (Fonte não lida: opam-monorepo manage-duniverse)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_TESSL_MERGE_CONFLICT_UNREAD
     node_type: evidence
@@ -1028,7 +1028,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #49 do retorno do Elenxo (Fonte não lida: tessl frb-fix-merge-conflict)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_ASPECT_LOCKFILE_CONTRARIAN_UNREAD
     node_type: evidence
@@ -1044,7 +1044,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #50 do retorno do Elenxo (Fonte não lida: aspect-build easier merges on lockfiles)"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_OBJECAO_GETTEXT_VCS_DOC_UNREAD
     node_type: evidence
@@ -1060,7 +1060,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
       locator: "objeção #51 do retorno do Elenxo (Fonte não lida: GNU gettext 'Files under Version Control')"
-      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      method: "derived: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
       locality: "host"
   - id: E_LACUNAS_POSTMERGE_WRITER_2026_10
     node_type: evidence
@@ -1078,7 +1078,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c) e da fase Synthesize (agente a7a7af783e905c7a0)⟩"
       locator: "objections (52; survives=True 34); unverifiedList (6); openQuestions (6); recommendation"
-      method: "medição: json.load do resultado no journal + contagem por survives/kind"
+      method: "measurement: json.load do resultado no journal + contagem por survives/kind"
       locality: "host"
   - id: E_RULESETS_BYPASS_MODE_PR_ONLY_NO_DIRECT_PUSH
     node_type: evidence
@@ -1096,7 +1096,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
       locator: "Creating rulesets for a repository > Granting bypass permissions (menu ao lado de 'Always allow' > 'For pull requests only')"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_RULESETS_STRICT_REQUIRES_CHECK_DEFINED
     node_type: evidence
@@ -1114,7 +1114,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
       locator: "Creating rulesets for a repository > Require status checks before merging (Additional settings)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_ABOUT_RULESETS_BYPASS_NO_PERSONAL_VS_ORG
     node_type: evidence
@@ -1132,7 +1132,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets"
       locator: "About rulesets > seção sobre bypass permissions"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_PROTECTED_BRANCH_PUSH_DIRECT_AFTER_CHECKS
     node_type: evidence
@@ -1150,7 +1150,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches.md"
       locator: "about-protected-branches.md l.99 (Require status checks before merging)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_RULESET_STATUS_CHECKS_BEFORE_CHANGES
     node_type: evidence
@@ -1168,7 +1168,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md"
       locator: "available-rules-for-rulesets.md l.173 (Require status checks to pass before merging)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_RULESET_LOOSE_NOT_UP_TO_DATE
     node_type: evidence
@@ -1186,7 +1186,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md"
       locator: "available-rules-for-rulesets.md l.194 (tabela Loose)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GITHUB_TOKEN_EVENTS_DISPATCH_EXCEPTION
     node_type: evidence
@@ -1204,7 +1204,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/github/docs/main/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md"
       locator: "events-that-trigger-workflows.md l.468 (nota da seção pull_request)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_RULESETS_BYPASS_ELIGIBLE_LIST
     node_type: evidence
@@ -1222,7 +1222,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/github/docs/main/data/reusables/repositories/rulesets-bypass-step.md"
       locator: "data/reusables/repositories/rulesets-bypass-step.md (lista 'The following are eligible for bypass access')"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP
     node_type: evidence
@@ -1240,7 +1240,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/actions/using-workflows/triggering-a-workflow"
       locator: "triggering-a-workflow, 'Triggering a workflow from a workflow'; mesmo texto em github_token, 'When GITHUB_TOKEN triggers workflow runs'"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GITHUB_TOKEN_SCOPE_OWN_REPO_APP_OUTSIDE
     node_type: evidence
@@ -1258,7 +1258,7 @@ nodes:
     provenance:
       source: "https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/making-authenticated-api-requests-with-a-github-app-in-a-github-actions-workflow"
       locator: "Making authenticated API requests with a GitHub App in a GitHub Actions workflow, seção 'About GitHub Actions authentication'"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_APP_TOKEN_BOT_USER_GIT_PUSH
     node_type: evidence
@@ -1276,7 +1276,7 @@ nodes:
     provenance:
       source: "https://github.com/actions/create-github-app-token"
       locator: "README actions/create-github-app-token, seção 'Configure Git CLI for an app's bot user', comentário no YAML (linha 119)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_APP_TOKEN_REVOKED_POST_STEP
     node_type: evidence
@@ -1294,7 +1294,7 @@ nodes:
     provenance:
       source: "https://github.com/actions/create-github-app-token"
       locator: "README actions/create-github-app-token, lista numerada sobre o token (item 3, linha 436), relativa ao input skip-token-revoke"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_DISCUSSION_25305_ACTIONS_NO_PROTECTED_PUSH_2019
     node_type: evidence
@@ -1313,7 +1313,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/25305"
       locator: "Discussion 25305, resposta aceita de chrispat, 11 out 2019"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_DISCUSSION_25305_ACTIONS_USER_NOT_BRANCH_SCOPED_2022
     node_type: evidence
@@ -1332,7 +1332,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/25305"
       locator: "Discussion 25305, comentário de chrispat, 6 jan 2022"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_DISCUSSION_43460_STATUS_BYPASS_ONLY_RULESETS
     node_type: evidence
@@ -1351,7 +1351,7 @@ nodes:
     provenance:
       source: "https://github.com/orgs/community/discussions/43460"
       locator: "Discussion 43460, comentário de wheelerlaw, 20 nov 2024"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_ASPECT_LOCKFILE_STRANGE_CASE
     node_type: evidence
@@ -1369,7 +1369,7 @@ nodes:
     provenance:
       source: "https://aspect.build/blog/easier-merges-on-lockfiles"
       locator: "Parágrafo 1 (logo após a imagem de capa)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_ASPECT_AUTORESOLVE_DEPENDS_ON_MANAGER
     node_type: evidence
@@ -1387,7 +1387,7 @@ nodes:
     provenance:
       source: "https://aspect.build/blog/easier-merges-on-lockfiles"
       locator: "Parágrafo 2"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_ASPECT_OURS_MERGE_DRIVER
     node_type: evidence
@@ -1405,7 +1405,7 @@ nodes:
     provenance:
       source: "https://aspect.build/blog/easier-merges-on-lockfiles"
       locator: "Seção do merge driver, imediatamente antes do bloco `git config --global merge.ours.driver true`"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GETTEXT_THREE_POLICIES
     node_type: evidence
@@ -1423,7 +1423,7 @@ nodes:
     provenance:
       source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
       locator: "14.7.2, parágrafo introdutório e lista de três itens"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GETTEXT_ALWAYS_COMMIT_COSTS
     node_type: evidence
@@ -1441,7 +1441,7 @@ nodes:
     provenance:
       source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
       locator: "14.7.2, abordagem 1 (sempre commitar)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GETTEXT_OCCASIONAL_COMMIT_CONFLICTS
     node_type: evidence
@@ -1459,7 +1459,7 @@ nodes:
     provenance:
       source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
       locator: "14.7.2, abordagem 2, drawback 2b"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GETTEXT_NEVER_COMMIT_NEEDS_TOOLS
     node_type: evidence
@@ -1477,7 +1477,7 @@ nodes:
     provenance:
       source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
       locator: "14.7.2, abordagem 3 (nunca commitar)"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GITLAB_26290_PROPOSAL_MERGE_TRAIN
     node_type: evidence
@@ -1495,7 +1495,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "issue 26290, seção '### Proposal'"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_GITLAB_26290_PROPOSAL_ADMITS_VAGUE
     node_type: evidence
@@ -1513,7 +1513,7 @@ nodes:
     provenance:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
       locator: "issue 26290, seção '### Proposal', 2º parágrafo"
-      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      method: "reading: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
       locality: "web"
   - id: E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14
     node_type: evidence
@@ -1531,7 +1531,7 @@ nodes:
     provenance:
       source: "⟨journal do run wf_6babcd2c-1d8: resultado das fases Leitura, Ancoragem e Elenxo⟩"
       locator: "claims ancoradas (24) e rejeitadas (9); objections (17; survives=true 13); gapsClosed (5); gapsOpen (6); recommendation"
-      method: "medição: contagem das claims e objeções no retorno do run, repassado ao escritor"
+      method: "measurement: contagem das claims e objeções no retorno do run, repassado ao escritor"
       locality: "host"
   - id: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
     node_type: question
@@ -1551,7 +1551,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «Como fechar a pergunta central do B1 (Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
     node_type: question
@@ -1602,7 +1602,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-evolve/pull/1101"
       locator: "corpo do PR, seções '## Medido' e '## NÃO medido'; merge commit 0139fe2db257ded4fbc232405e2022b0813cf3e0"
-      method: "leitura: gh pr view 1101 --json state,mergedAt,mergeCommit,body (2026-10-14)"
+      method: "reading: gh pr view 1101 --json state,mergedAt,mergeCommit,body (2026-10-14)"
       locality: "web"
   - id: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN
     node_type: evidence
@@ -1620,7 +1620,7 @@ nodes:
     provenance:
       source: "⟨log do subagente ac649ccbb407392d8 da sessão do maestro de 2026-10-14 (dogfood do B1)⟩"
       locator: "tool_result do POST de ruleset (timestamp 2026-10-14T01:51:59Z, HTTP 403) e os dois tool_result de PreToolUse:Bash hook error do pretooluse-merge-gate.sh"
-      method: "leitura: mensagens verbatim do forge e da guarda no log do agente"
+      method: "reading: mensagens verbatim do forge e da guarda no log do agente"
       locality: "host"
   - id: E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET
     node_type: evidence
@@ -1638,7 +1638,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506294705"
       locator: "run 38506294705; rule-suites 4511927226, 4511931585, 4511952179, 4511956409"
-      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
     node_type: evidence
@@ -1656,7 +1656,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506709399"
       locator: "run 38506709399; rule-suite 4511975684; GET rule-suites?rule_suite_result=bypass"
-      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_NOCHECKS_REJECTED
     node_type: evidence
@@ -1674,7 +1674,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507118410"
       locator: "run 38507118410; rule-suites 4512026189 e 4511883675"
-      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_PR_BY_GITHUB_TOKEN_NEEDS_APPROVAL
     node_type: evidence
@@ -1692,7 +1692,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-ruleset-sandbox/pull/1"
       locator: "run 38506834350; PR #1"
-      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_ON_PUSH_SILENCED_AND_CURED
     node_type: evidence
@@ -1710,7 +1710,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507152179"
       locator: "GET actions/runs?head_sha=63e8d4f; run 38507152179; probes 38507169010 e 38507172687"
-      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP
     node_type: evidence
@@ -1728,7 +1728,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507262580"
       locator: "runs 38507262580 e 38507319397"
-      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: Q_GUARDA_DE_MAIN_CASA_PELO_NOME
     node_type: question
@@ -1755,7 +1755,7 @@ nodes:
     provenance:
       source: "maestro, por delegação noturna de 2026-10-14 (docs/evolution/decisions-delegated-2026-10-14.md), aplicada na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «O dogfood refutou o B1 como desenhado e mediu uma variante viável com garantia mais fraca: executar, testar outra variante ou deixar gated?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
   - id: D_SANDBOX_B1_APAGADO
     node_type: decision
@@ -1771,7 +1771,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-14: «O que fazer com o sandbox do B1, que já cumpriu o papel?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
 edges:
   - from: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14

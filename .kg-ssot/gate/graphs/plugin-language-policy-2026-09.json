@@ -3,7 +3,6 @@
   "id": "plugin-language-policy-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 22,
     "form.range.node.label": 23
   }
 }

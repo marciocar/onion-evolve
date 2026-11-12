@@ -3,7 +3,6 @@
   "id": "motores-de-regras-deterministicos-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 25,
     "form.range.node.label": 30
   }
 }

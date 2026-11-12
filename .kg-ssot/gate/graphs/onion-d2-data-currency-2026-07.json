@@ -3,7 +3,6 @@
   "id": "onion-d2-data-currency-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 7,
     "form.required.node.verified_against": 2,
     "integrity.untraced-decision": 1,
     "yaml.unquoted-date": 1

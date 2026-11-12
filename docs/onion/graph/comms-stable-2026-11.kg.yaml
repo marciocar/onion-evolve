@@ -30,7 +30,7 @@ nodes:
     provenance:
       source: "o hub (sinais upstream) e o maestro (sessão do core)"
       locator: "docs/evolution/inbox/_processed/2026-11-06-*.md"
-      method: "leitura: os três sinais inteiros e a mensagem do maestro"
+      method: "reading: os três sinais inteiros e a mensagem do maestro"
       locality: "repo"
   - id: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106
     node_type: decision
@@ -46,7 +46,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-06: «O que precisa estar de pé na segunda?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: D_CS_REPO_ONION_MESSAGING_PRIVADO_1106
     node_type: decision
@@ -62,7 +62,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "perguntas com opções de 2026-11-06: «Como começa?» e «Nome do repo próprio da mensageria»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: D_CS_PESQUISAR_PADROES_ANTES_1106
     node_type: decision
@@ -78,7 +78,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-06: «Qual pilha eu adoto?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: D_CS_DEPLOY_POR_PUSH_E_BANG_1106
     node_type: decision
@@ -94,7 +94,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "perguntas com opções de 2026-11-06: «O que continua seu e como faço com isso para não travar?» e «Como a delegação funciona na prática?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: D_CS_CARDS_SLACK_E_CHANNEL_HOJE_1106
     node_type: decision
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-06: «Atos seus que o degrau 2 e o degrau 1 exigem. Quando?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: D_CS_COMPLIANCE_ORIENTAR_HOJE_FORJAR_DEPOIS_1106
     node_type: decision
@@ -126,7 +126,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-06: «O que faço com o registro de mudança?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-11-06"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-06"
       locality: "pessoa"
   - id: Q_CS_PESQUISA_PADROES_MENSAGERIA_1106
     node_type: question
@@ -260,7 +260,7 @@ nodes:
     provenance:
       source: "fixture temporária de 2026-11-07 (quatro settings de sandbox: só allowWrite, com deny Edit do destino, com deny e allow do inbox, com deny e o spool) e a curadoria E_SANDBOX_F2_F7_1106"
       locator: "probe.out por variante; relay.out (cura) e relay-old.out (main)"
-      method: "medição: claude -p --settings <sandbox mínimo> --allowedTools=Bash; escrita em cada alvo + a tabela de montagens do processo sandboxado"
+      method: "measurement: claude -p --settings <sandbox mínimo> --allowedTools=Bash; escrita em cada alvo + a tabela de montagens do processo sandboxado"
 edges:
   - from: E_CS_PEDIDOS_DO_HUB_E_DO_MAESTRO_1106
     to: D_CS_TRES_DEGRAUS_NA_SEGUNDA_1106

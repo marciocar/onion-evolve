@@ -29,7 +29,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-protect-main.sh"
       locator: "push_lines e o regex de alvo main (antes da cura); .git/config e refs/remotes/origin/HEAD do brain-granaai"
-      method: "medição: hook alimentado com payload JSON num repo de bancada de produção master, antes e depois da cura"
+      method: "measurement: hook alimentado com payload JSON num repo de bancada de produção master, antes e depois da cura"
       locality: "repo"
 
   - id: D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB
@@ -46,7 +46,7 @@ nodes:
     provenance:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "def protected_branches; a passada final de canonical_git; touches_main; onion_protected_branches e onion_on_protected_branch"
-      method: "medição: bancada e dogfood do hook com payload contra a config real do adotante, sem escrever no repo dele"
+      method: "measurement: bancada e dogfood do hook com payload contra a config real do adotante, sem escrever no repo dele"
       locality: "repo"
 
   - id: E_VINTE_E_SEIS_CASOS_SEIS_MUTANTES_MORDEM
@@ -63,7 +63,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_pretooluse_veto_selftests, bloco RAMO DE PRODUÇÃO RESOLVIDO (_prmk, _prcase, pr-bash)"
-      method: "medição: bancada e seis mutantes rodados nesta sessão"
+      method: "measurement: bancada e seis mutantes rodados nesta sessão"
       locality: "repo"
 
   - id: C_TETO_RESOLUCAO_LOCAL_E_FONTES
@@ -80,7 +80,7 @@ nodes:
     provenance:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "cabeçalho, FRONTEIRA DECLARADA, bloco RAMO DE PRODUÇÃO"
-      method: "leitura: o código da resolução escrito nesta forja, conferido contra os casos da bancada"
+      method: "reading: o código da resolução escrito nesta forja, conferido contra os casos da bancada"
       locality: "repo"
 
   - id: C_TETO_PUSH_DIRETO_NO_ADOTANTE_SEGUE_SEM_VETO
@@ -97,7 +97,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-merge-gate.sh"
       locator: "teste de presença de ops/pr-merge-verified.sh e o bloco (c) git push não-force"
-      method: "medição: hooks alimentados com payload num repo de bancada de produção master"
+      method: "measurement: hooks alimentados com payload num repo de bancada de produção master"
       locality: "repo"
 
 edges:

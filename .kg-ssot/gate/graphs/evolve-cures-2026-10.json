@@ -3,7 +3,6 @@
   "id": "evolve-cures-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 6,
     "form.range.node.label": 6
   }
 }

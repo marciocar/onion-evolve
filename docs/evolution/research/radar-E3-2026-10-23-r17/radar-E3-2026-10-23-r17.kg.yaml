@@ -35,7 +35,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.309 a ## 2.1.309 (cópias em docs/evolution/research/radar-E3-2026-10-23-r17/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml e o registro npm"
       locator: "tabela de versões do censo; uses: da claude-code-action; tags da action pela API do GitHub"
-      method: "medição: --version dos binários, npm view e leitura do package.json da action em cada tag"
+      method: "measurement: --version dos binários, npm view e leitura do package.json da action em cada tag"
       locality: "host"
   - id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023
     node_type: question
@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_CENSO_ZERA_SCRIPTPATH_SO_COM_RAIZ_ABSOLUTA_1023
     node_type: evidence
@@ -96,7 +96,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh"
       locator: "linha 367: if '/worktrees/' in f: continue"
-      method: "medição: o mesmo censo na mesma worktree com três formas de raiz, contagens 8, 0 e 0"
+      method: "measurement: o mesmo censo na mesma worktree com três formas de raiz, contagens 8, 0 e 0"
       locality: "repo"
   - id: E_ITENS_DE_SANDBOX_E_PERMISSAO_SEM_CONFIG_NO_CORE_1023
     node_type: evidence
@@ -111,7 +111,7 @@ nodes:
     provenance:
       source: ".claude/settings.json e ops/chat-runner.sh"
       locator: "chaves permissions e sandbox; linhas 618 a 625 do runner"
-      method: "medição: leitura do JSON por python e grep no core"
+      method: "measurement: leitura do JSON por python e grep no core"
       locality: "repo"
   - id: E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023
     node_type: evidence
@@ -126,7 +126,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-env-guard.sh e .claude/hooks/kg-read-leg.sh"
       locator: "ramo geral de leitores do env-guard; ramo Bash do kg-read-leg (só .kg.yaml)"
-      method: "medição: o hook executado com JSON de entrada sintético, alvo e controle"
+      method: "measurement: o hook executado com JSON de entrada sintético, alvo e controle"
       locality: "repo"
   - id: E_TRANSCRIPTS_DO_PROJETO_PARSEIAM_E_LEITORES_TOLERAM_1023
     node_type: evidence
@@ -141,7 +141,7 @@ nodes:
     provenance:
       source: ".claude/hooks/lib/transcript-tail.py e os transcripts da conta"
       locator: "linhas 42 a 69 do transcript-tail.py"
-      method: "medição: jq sobre cada transcript e leitura dos leitores"
+      method: "measurement: jq sobre cada transcript e leitura dos leitores"
       locality: "host"
   - id: E_GATE_DE_CONTRASTE_DO_CORE_SEGUE_WCAG_1023
     node_type: evidence
@@ -156,7 +156,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-design-tokens.sh"
       locator: "cabeçalho, item (3) Contraste WCAG"
-      method: "medição: grep no core"
+      method: "measurement: grep no core"
       locality: "repo"
   - id: E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023
     node_type: evidence
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: "git ls-files e grep no core"
       locator: "CLAUDE.md da raiz; isolation worktree nas skills onion-orchestration e onion-validation e em meta/orchestrate.md"
-      method: "medição: listagem do repo e grep"
+      method: "measurement: listagem do repo e grep"
       locality: "repo"
   - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_309_1023
     node_type: evidence
@@ -186,7 +186,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família cited_directive"
-      method: "medição: execução da família da bancada no host"
+      method: "measurement: execução da família da bancada no host"
       locality: "host"
   - id: E_REVISOR_POSTA_TEXTO_DO_MODELO_SEM_SANITIZAR_ARROBA_1023
     node_type: evidence
@@ -201,7 +201,7 @@ nodes:
     provenance:
       source: ".claude/utils/forge/post-review-comment.sh"
       locator: "linhas 113 e 119, gh api com body=@arquivo"
-      method: "medição: grep no core, re-executado pela rodada"
+      method: "measurement: grep no core, re-executado pela rodada"
       locality: "repo"
   - id: E_ADD_DIR_DO_ADOPT_EFEMERO_E_SKILL_HOMONIMA_1023
     node_type: evidence
@@ -216,7 +216,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: "linhas 650 e 670"
-      method: "medição: grep no core, re-executado pela rodada"
+      method: "measurement: grep no core, re-executado pela rodada"
       locality: "repo"
   - id: Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023
     node_type: question
@@ -231,7 +231,7 @@ nodes:
     provenance:
       source: "https://linear.app/sacola/issue/SAC-240"
       locator: "issue SAC-240 do projeto Onion — core: próximas levas"
-      method: "derivado: proposta da rodada a partir de E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023"
+      method: "derived: proposta da rodada a partir de E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023"
       locality: "web"
   - id: Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023
     node_type: question
@@ -250,7 +250,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Faço agora a engenharia pequena dos radares?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: C_SUPERACAO_20261023_DENY_MORA_NO_RUNNER_DO_CONVIDADO
     node_type: claim
@@ -265,7 +265,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de E_ITENS_DE_SANDBOX_E_PERMISSAO_SEM_CONFIG_NO_CORE_1023"
-      method: "juízes: subagente opus independente, critério CU3"
+      method: "judges: subagente opus independente, critério CU3"
       locality: "repo"
   - id: C_SUPERACAO_20261023_PERNA_DE_LEITURA_SURDA_AO_SED_I
     node_type: claim
@@ -280,7 +280,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023"
-      method: "juízes: subagente opus independente, critério CU2"
+      method: "judges: subagente opus independente, critério CU2"
       locality: "repo"
   - id: C_SUPERACAO_20261023_WORKTREE_ISOLADA_E_PRESCRITA
     node_type: claim
@@ -295,7 +295,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito REPROVA de E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023"
-      method: "juízes: subagente opus independente, critério CU3"
+      method: "judges: subagente opus independente, critério CU3"
       locality: "repo"
   - id: E_PIN_DO_REVISOR_SOBE_PARA_V1_0_260_1023
     node_type: evidence
@@ -310,7 +310,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code-action/compare/v1.0.258...v1.0.260"
       locator: "base-action/action.yml e src/entrypoints/run.ts (versão do CLI); src/github/operations/branch.ts e src/modes/tag/index.ts (#1915)"
-      method: "medição: API do GitHub (ref da tag, notas das releases, compare) e leitura do código da action na 8d70a0dd"
+      method: "measurement: API do GitHub (ref da tag, notas das releases, compare) e leitura do código da action na 8d70a0dd"
       locality: "web"
 edges:
   - from: E_DELTA_DA_RODADA

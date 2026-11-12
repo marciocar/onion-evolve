@@ -27,7 +27,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-evolution-2026-10-04.md"
       locator: "saida do workflow wf_9cba4ab5-0ac (agentCount, totalTokens, logs de corte) e o journal.jsonl com 31 resultados"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO
@@ -43,7 +43,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/create-skill.md"
       locator: "regex do binario 2.1.289 (cDn/uDn sobre pTe) simuladas em node sobre commands, skills, agents e plugins; linhas 86 e 219 de create-skill.md"
-      method: "medição: regex cDn/uDn sobre pTe extraídas do binário do Claude Code 2.1.289 e simuladas em node sobre commands, skills, agents e plugins + leitura de .claude/commands/meta/create-skill.md l.86 e l.219, comando não registrado"
+      method: "measurement: regex cDn/uDn sobre pTe extraídas do binário do Claude Code 2.1.289 e simuladas em node sobre commands, skills, agents e plugins + leitura de .claude/commands/meta/create-skill.md l.86 e l.219, comando não registrado"
       locality: "web"
 
   - id: C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS
@@ -59,7 +59,7 @@ nodes:
     provenance:
       source: ".claude/validation/instructions-loaded-census.sh"
       locator: "string do evento InstructionsLoaded no binario 2.1.289; instructions-loaded-census.sh:32; lista de skills ativas da sessao"
-      method: "medição: string do evento InstructionsLoaded no binário do Claude Code 2.1.289 + leitura de .claude/validation/instructions-loaded-census.sh:32 e da lista de skills ativas da sessão, comando não registrado"
+      method: "measurement: string do evento InstructionsLoaded no binário do Claude Code 2.1.289 + leitura de .claude/validation/instructions-loaded-census.sh:32 e da lista de skills ativas da sessão, comando não registrado"
       locality: "web"
 
   - id: C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA
@@ -75,7 +75,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/drive.md"
       locator: "drive.md:38-40 (P0.5) e :85 (P5); git check-ignore -v .claude/sessions/x/STATE.md -> .gitignore:8; git ls-files .claude/sessions vazio; kg-seal-exception.sh:32; cycle-completion.sh:83"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE
@@ -91,7 +91,7 @@ nodes:
     provenance:
       source: ".claude/commands/common/prompts/client-material-doctrine.md"
       locator: "test -f do caminho com 3 e com 4 niveis a partir de .claude/commands/common/prompts/"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_FINDINGSCHEMA_DO_EVOLVE_NAO_E_JSON_SCHEMA
@@ -107,7 +107,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/evolve.md"
       locator: "evolve.md:141 (autore o script), :148-160 (FindingSchema), :13 (allowed-tools); census.md como molde; o script desta rodada persistido em onion-evolve-round-wf_9cba4ab5-0ac.js"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE
@@ -123,7 +123,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/evolve.md"
       locator: "grep -rn runCommand .claude --exclude-dir=worktrees -> so evolve.md:172,181-183; grep sweepSessionMemory -> so evolve.md:184"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: A_DOCUMENTACAO_LIDA_COMO_INVOCACAO_E_CLASSE_SISTEMICA
@@ -139,7 +139,7 @@ nodes:
     provenance:
       source: "journal wf_9cba4ab5-0ac (host)"
       locator: "journal wf_9cba4ab5-0ac (host) → findings MAQ-0, MAQ-5, MAQ-7; corpo de d688f71d; corpos de a102675b, 33039e0d, 9c17b4da"
-      method: "testemunho: leitura do journal wf_9cba4ab5-0ac no host (run wf_9cba4ab5 de 2026-10-04) + corpos de d688f71d/a102675b/33039e0d/9c17b4da"
+      method: "testimony: leitura do journal wf_9cba4ab5-0ac no host (run wf_9cba4ab5 de 2026-10-04) + corpos de d688f71d/a102675b/33039e0d/9c17b4da"
       locality: "host"
 
   - id: C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "journal wf_9cba4ab5-0ac (host)"
       locator: "journal wf_9cba4ab5-0ac (host) → findings, id MAQ-6 (dimension MAQ)"
-      method: "testemunho: leitura do journal wf_9cba4ab5-0ac no host (achado MAQ-6 do run wf_9cba4ab5, 2026-10-04)"
+      method: "testimony: leitura do journal wf_9cba4ab5-0ac no host (achado MAQ-6 do run wf_9cba4ab5, 2026-10-04)"
       locality: "host"
 
   - id: C_PESO_ADOPT_E_KG
@@ -171,7 +171,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: "wc -l em .claude/commands/meta/adopt.md (799) e kg.md (519); templates classificados como isentos"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_QUATRO_ARTEFATOS_DE_VALIDACAO_CONTRA_METASPEC
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: ".claude/commands/product/check.md"
       locator: "descriptions dos quatro artefatos; grep \"Diferença vs\" = 15 arquivos no repo, nenhum deles o product/check.md"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_D9_NAO_E_NOOP_NO_CORE
@@ -204,7 +204,7 @@ nodes:
     provenance:
       source: "docs/business-context"
       locator: "find docs/business-context docs/technical-context docs/compliance-context -type f, contado por diretorio"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_D10_MEMORIA_ACIMA_DO_LIMITE_CURADA
@@ -221,7 +221,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/session-memory-lifecycle.md"
       locator: "wc -c do MEMORY.md antes (29034) e depois (23501); contagem de entradas > 200 chars (80 -> 2); verificacao de ponteiros contra os arquivos do diretorio de memoria"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_D4_E_D5_NAO_RODARAM_NESTA_RODADA
@@ -237,7 +237,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/kb-freshness.md"
       locator: "a superficie do evolve declara a composicao NAO IMPLEMENTADA; esta rodada executou so as 7 dimensoes de varredura mais D9 e D10 no contexto principal"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_SDAAL_SEM_VAZAMENTO_DE_PROVIDER
@@ -254,7 +254,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/clickup.md"
       locator: "grep por mcp_ fora de adapters/ e especialistas; achados D6-0 a D6-4 da rodada"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_CURAS_DOS_BLOCKERS_SAO_A_PROXIMA_LEVA
@@ -270,7 +270,7 @@ nodes:
     provenance:
       source: "docs/backlog.md"
       locator: "as sete curas mergeadas em main, cada uma com Elenxo e resido: (1)(2)(3)(7) PR #913; (5) PR #915; (6) PR #914 (REGRA 98); (4) PR #916. O 3o sitio do checkpoint (cycle-completion.sh) ficou como no proprio, open, no grafo evolve-cures-2026-10"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
 edges:

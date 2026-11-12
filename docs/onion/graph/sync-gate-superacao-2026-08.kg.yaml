@@ -20,7 +20,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh"
       locator: "incidente medido na sessao: git push inesperado bec436cd->730bc67b em main"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: D_SYNC_GATED_IN_MERGE_PROOF
     node_type: decision
@@ -35,7 +35,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh"
       locator: "ops/pr-merge-verified.sh: o bloco --sync so existe dentro do case MERGED\\|* (pos-prova); os ramos `die` saem antes"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_CURE_PROVEN_BY_BEHAVIOR
     node_type: evidence
@@ -50,7 +50,7 @@ nodes:
     provenance:
       source: "ops/pr-merge-verified.sh"
       locator: "execucao do script com PR inexistente 999999 --sync"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 edges:
   - from: D_SYNC_GATED_IN_MERGE_PROOF

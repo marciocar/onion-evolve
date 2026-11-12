@@ -2,7 +2,5 @@
   "graph": "docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml",
   "id": "vetos-fail-closed-2026-10",
   "must": [],
-  "should": {
-    "form.deprecated.node.provenance.method": 6
-  }
+  "should": {}
 }

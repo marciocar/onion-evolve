@@ -28,7 +28,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.290 a ## 2.1.295 (cópias em data/)"
-      method: "medição: contagem de linhas das seções extraídas em data/ (wc -l)"
+      method: "measurement: contagem de linhas das seções extraídas em data/ (wc -l)"
       locality: "web"
   - id: E_HOOK_ONFAILURE_BLOCK
     node_type: evidence
@@ -44,7 +44,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.295 e .claude/settings.json@d56f685c"
       locator: "2.1.295, 1º item 'Added onFailure'; settings.json, chave hooks"
-      method: "leitura: os hooks registrados no JSON do settings.json, contados um a um"
+      method: "reading: os hooks registrados no JSON do settings.json, contados um a um"
   - id: Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS
     node_type: question
     layer: audit
@@ -71,7 +71,7 @@ nodes:
     provenance:
       source: "sandbox de medição do SAC-83 (4 variantes de settings.json, logs de debug de hooks)"
       locator: "variantes A (sem campo), B (block + script ausente), C (block + exit 0), D (block + exit 2)"
-      method: "medição: claude -p em sandbox, existência do arquivo-marcador e linha 'Hooks: PreToolUse' do log de debug"
+      method: "measurement: claude -p em sandbox, existência do arquivo-marcador e linha 'Hooks: PreToolUse' do log de debug"
   - id: Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT
     node_type: question
     layer: audit
@@ -98,7 +98,7 @@ nodes:
     provenance:
       source: "npm @anthropic-ai/claude-code@2.1.294 em sandbox"
       locator: "variantes B e D com o binário 2.1.294"
-      method: "medição: claude -p do binário antigo, existência do arquivo-marcador e log de debug"
+      method: "measurement: claude -p do binário antigo, existência do arquivo-marcador e log de debug"
   - id: E_REGRAS_POR_CAMINHO_CARREGAM_VIA_BASH
     node_type: evidence
     layer: audit
@@ -112,7 +112,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.293"
       locator: "item 'Fixed path-scoped rules and nested CLAUDE.md files not loading'"
-      method: "leitura: linha do CHANGELOG oficial citada no locator"
+      method: "reading: linha do CHANGELOG oficial citada no locator"
   - id: E_AGENT_TOOL_GANHOU_EFFORT
     node_type: evidence
     layer: audit
@@ -126,7 +126,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.292"
       locator: "item 'Added an effort parameter to the Agent tool'"
-      method: "leitura: linha do CHANGELOG oficial citada no locator"
+      method: "reading: linha do CHANGELOG oficial citada no locator"
   - id: E_REESCRITA_DO_PRETOOLUSE_REVALIDADA
     node_type: evidence
     layer: audit
@@ -140,7 +140,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.290"
       locator: "item 'Fixed some permission rules and safety checks not being applied ... after a PreToolUse hook rewrote its input'"
-      method: "leitura: linha do CHANGELOG oficial citada no locator"
+      method: "reading: linha do CHANGELOG oficial citada no locator"
   - id: E_MODS_GUARDA_NO_RESTART_CURADA
     node_type: evidence
     layer: audit
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.290 e 2.1.295"
       locator: "itens sobre plugin hooks worker restart"
-      method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+      method: "reading: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
   - id: E_SESSIONSTART_ASYNC_DUPLICAVA
     node_type: evidence
     layer: audit
@@ -169,7 +169,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.295 e o transcript da sessão de 2026-10-07"
       locator: "item 'async SessionStart hook's unchanged context'"
-      method: "testemunho: medição da sessão de 2026-10-08, comando não registrado"
+      method: "testimony: medição da sessão de 2026-10-08, comando não registrado"
   - id: E_FORK_EM_WORKTREE_VIA_GIT_DO_PAI
     node_type: evidence
     layer: audit
@@ -183,7 +183,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.295"
       locator: "itens 'subagents in their own linked worktree' e 'forked skills invoked from Workflow subagents'"
-      method: "leitura: linha do CHANGELOG oficial citada no locator"
+      method: "reading: linha do CHANGELOG oficial citada no locator"
   - id: E_HAIKU_5_5_E_O_GUARDA_DE_MODELO
     node_type: evidence
     layer: audit
@@ -197,7 +197,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.293 e .claude/hooks/premodelswitch-guard.sh"
       locator: "item 'Added Claude Haiku 5.5'"
-      method: "leitura: linha do CHANGELOG oficial citada no locator"
+      method: "reading: linha do CHANGELOG oficial citada no locator"
   - id: E_CANAL_VIVO_DOIS_AJUSTES
     node_type: evidence
     layer: audit
@@ -211,7 +211,7 @@ nodes:
     provenance:
       source: "CHANGELOG 2.1.290"
       locator: "itens '--channels permission relay' e '--restricted ... cross-session messaging socket'"
-      method: "leitura: linha do CHANGELOG oficial citada no locator"
+      method: "reading: linha do CHANGELOG oficial citada no locator"
   - id: Q_CONFERIR_GUARDA_DE_MODELO_COM_HAIKU_5_5
     node_type: question
     layer: audit
@@ -235,7 +235,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
       locator: "2.1.290:111"
-      method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+      method: "reading: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
   - id: E_HOOK_POR_LLM_FALHAVA_ABERTO
     node_type: evidence
     layer: audit
@@ -249,7 +249,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
       locator: "2.1.294:3"
-      method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+      method: "reading: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
   - id: E_ZERO_SILENCIOSO_NAS_FERRAMENTAS
     node_type: evidence
     layer: audit
@@ -263,7 +263,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
       locator: "2.1.290:18 e 2.1.292:24"
-      method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+      method: "reading: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
   - id: E_WORKFLOW_SCRIPTPATH_SEM_READ
     node_type: evidence
     layer: audit
@@ -277,7 +277,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
       locator: "2.1.295:112"
-      method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+      method: "reading: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
   - id: E_DISTRIBUICAO_DO_MARKETPLACE
     node_type: evidence
     layer: audit
@@ -291,7 +291,7 @@ nodes:
     provenance:
       source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
       locator: "2.1.292:3; 2.1.295:6, :12, :27"
-      method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+      method: "reading: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
   - id: E_REVERIFY_1027_SEIS_HOOKS_COM_ONFAILURE
     node_type: evidence
     plane: DEV

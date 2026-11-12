@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-16: «Vexa (bot/extensão de navegador para Meet e Teams, Apache-2.0): qual veredito?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
   - id: E_CURADORIA_VEXA_1016
@@ -60,7 +60,7 @@ nodes:
     provenance:
       source: "github.com/marciocar/onion-curation@aa70452:docs/evolution/dissect/vexa-2026-10/vexa-2026-10.kg.yaml"
       locator: "nós D_VEXA_2610, E_N3_FIT, E_N2_EXTENSION_NO_BOT, E_N2_TEAMS_FRAGILE, E_N2_NOT_RUN, E_ELENXO_REVERSAL"
-      method: "leitura: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
+      method: "reading: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
       locality: "repo"
 
   - id: Q_VEXA_PORTAO_MEET

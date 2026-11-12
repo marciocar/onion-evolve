@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
       locator: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: E_WIRE_IN_LIVE
@@ -58,7 +58,7 @@ nodes:
     provenance:
       source: "PR #452 (marciocar/onion-evolve, merge 633658a3) + .claude/validation/lint-selftest.sh @96d2beae"
       locator: "gh pr view 452 --json files (onion-untrusted-wrap.sh, onion-effect-gate.sh, untrusted-content-provenance.md, lint-selftest.sh); 96d2beae:.claude/validation/lint-selftest.sh l.4765 (def run_guardrails_selftests) e l.4828 (chamada)"
-      method: "leitura: gh pr view 452 + git show 96d2beae (commit que criou o grafo, 2026-07-24) dos arquivos"
+      method: "reading: gh pr view 452 + git show 96d2beae (commit que criou o grafo, 2026-07-24) dos arquivos"
 
   - id: C_ANTI_DRIFT_BY_CONSTRUCTION
     node_type: claim
@@ -72,7 +72,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-guardrails.md"
       locator: "docs/knowledge-base/concepts/onion-guardrails.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: C_STRUCTURAL_OVER_GATED
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: "docs/knowledge-base/concepts/onion-guardrails.md"
       locator: "docs/knowledge-base/concepts/onion-guardrails.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: C_SURFACE_REMAINS_GATED
@@ -103,7 +103,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
       locator: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no descreve o fio #4 (/meta:guardrails) como GATED — residuo aberto aguardando decisao do maestro. Mas o PROPRIO arquivo kg registra, 7 dias depois, que a decisao FOI tomada (D_N"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_INDEX_VS_DSL
@@ -129,7 +129,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "elenxo-3-steelman-6-refutacao-1-sintese"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_DSL_REFUTED
@@ -145,7 +145,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "run_id wf_15cebeba-773; §Veredito bullet DSL l.53-58"
-      method: "juízes: Elenxo orquestrado (3 steelman + 6 refutação 2 lentes + síntese), veredito registrado"
+      method: "judges: Elenxo orquestrado (3 steelman + 6 refutação 2 lentes + síntese), veredito registrado"
       locality: "repo"
 
   - id: E_HYBRID_REFUTED
@@ -161,7 +161,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "run_id wf_15cebeba-773; bullet Híbrido l.59"
-      method: "juízes: Elenxo orquestrado, veredito registrado"
+      method: "judges: Elenxo orquestrado, veredito registrado"
       locality: "repo"
 
   - id: E_INDEX_LIVE_LENS
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "run_id wf_15cebeba-773; bullet Índice l.65-69 + §A forma concreta item 1 l.79"
-      method: "juízes: Elenxo orquestrado, veredito registrado"
+      method: "judges: Elenxo orquestrado, veredito registrado"
       locality: "repo"
 
   - id: Q_AUTHORING_TRIGGER
@@ -203,7 +203,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "ADENDO — Spike 2026-07-31 l.14-27"
-      method: "leitura: adendo do veredito registra o resultado do spike (grep pelado vs lente em product/task.md e canal C2)"
+      method: "reading: adendo do veredito registra o resultado do spike (grep pelado vs lente em product/task.md e canal C2)"
       locality: "repo"
 
   - id: D_NO_COMMAND
@@ -219,7 +219,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "spike-behavior-over-declaration"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_REVERSE_JOIN_SCOPE
@@ -256,7 +256,7 @@ nodes:
     provenance:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "substrato-verificado-projection-safety+hooks+guia-claude-code"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_PRIMITIVE_EXISTS
@@ -272,7 +272,7 @@ nodes:
     provenance:
       source: ".claude/validation/projection-safety.sh"
       locator: "l.74 (--terms) e l.140-154 (gate client-safe; lista vazia = HARD)"
-      method: "medição: bash .claude/validation/projection-safety.sh --terms <arquivo com 1 termo> <alvo que o contém> → rc=1 \"✗ REPROVA — 1 violação(ões) HARD\"; com --terms <arquivo vazio> → rc=1 \"lista de termos ... está vazia\" (2026-10-09, origin/main cffe09fe)"
+      method: "measurement: bash .claude/validation/projection-safety.sh --terms <arquivo com 1 termo> <alvo que o contém> → rc=1 \"✗ REPROVA — 1 violação(ões) HARD\"; com --terms <arquivo vazio> → rc=1 \"lista de termos ... está vazia\" (2026-10-09, origin/main cffe09fe)"
       locality: "repo"
 
   - id: E_HOOK_SUBSTRATE
@@ -288,7 +288,7 @@ nodes:
     provenance:
       source: ".claude/settings.json"
       locator: "guia-claude-code-hooks-oficial"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
 edges:

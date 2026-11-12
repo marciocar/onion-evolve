@@ -3,7 +3,6 @@
   "id": "fila-2026-10-06",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 20,
     "form.range.node.label": 1
   }
 }

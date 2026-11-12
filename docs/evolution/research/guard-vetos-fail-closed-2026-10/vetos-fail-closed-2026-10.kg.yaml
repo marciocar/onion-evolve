@@ -36,7 +36,7 @@ nodes:
     provenance:
       source: ".claude/hooks/pretooluse-protect-main.sh e pretooluse-merge-gate.sh na main 6a429e73"
       locator: "o bloco parsed=$(… python3 …) seguido de [ -z \"$cmd\" ] && exit 0"
-      method: "medição: hooks rodados com env -i e PATH sem python3, JSON do PreToolUse no stdin, rc lido"
+      method: "measurement: hooks rodados com env -i e PATH sem python3, JSON do PreToolUse no stdin, rc lido"
       locality: "repo"
   - id: E_RECORTE_SEM_PYTHON_MEDIDO
     node_type: evidence
@@ -53,7 +53,7 @@ nodes:
     provenance:
       source: "transcripts do core (sessões e subagentes) e a bancada run_pretooluse_veto_selftests"
       locator: "casos (np-pm-force) a (np-seg); mutantes M1 a M6 e M10 a M12 via ops/mutate-and-restore.sh"
-      method: "medição: regex do recorte sobre o corpus e bancada com LC_ALL=C e mutante por cura"
+      method: "measurement: regex do recorte sobre o corpus e bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
   - id: C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON
     node_type: claim
@@ -81,7 +81,7 @@ nodes:
     provenance:
       source: "sandbox de medição do PreModelSwitch (4 variantes de settings.json, logs de debug)"
       locator: "variantes A (sem campo), B (block + script ausente), C (exit 2), D (block + exit 0)"
-      method: "medição: claude -p com /model em sandbox, marcador do PostModelSwitch e linhas Hooks do log de debug"
+      method: "measurement: claude -p com /model em sandbox, marcador do PostModelSwitch e linhas Hooks do log de debug"
       locality: "host"
   - id: C_PREMODELSWITCH_ABRE_SEM_PYTHON
     node_type: claim
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: "env-guard da main 6a429e73 contra o da branch fix/vetos-fail-closed"
       locator: "cites_env, as duas chamadas de LinearShlex e _fnm; caso (q) e mutantes M7, M8 e M15"
-      method: "medição: tempo de parede do hook por tamanho e comparação de vereditos em processo sobre o corpus real e um sintético"
+      method: "measurement: tempo de parede do hook por tamanho e comparação de vereditos em processo sobre o corpus real e um sintético"
       locality: "repo"
   - id: C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL
     node_type: claim
@@ -138,7 +138,7 @@ nodes:
     provenance:
       source: ".claude/validation/veto-onfailure-check.sh e run_veto_onfailure_selftests"
       locator: "EVENTS = (PreToolUse, PreModelSwitch); casos (xiv) e (c); mutante do EVENTS"
-      method: "medição: selftest próprio, família com LC_ALL=C e mutante"
+      method: "measurement: selftest próprio, família com LC_ALL=C e mutante"
       locality: "repo"
   - id: E_PUSH_OPCAO_ABREVIADA
     node_type: evidence
@@ -155,7 +155,7 @@ nodes:
     provenance:
       source: "git push -h (git 2.43) e sandbox com remoto bare"
       locator: "casos 'git push --mirr origin', '--mi', '--al' de run_pretooluse_veto_selftests; mutante M9"
-      method: "medição: git push --dry-run com cada prefixo e bancada com LC_ALL=C"
+      method: "measurement: git push --dry-run com cada prefixo e bancada com LC_ALL=C"
       locality: "repo"
 edges:
   - from: E_PUSH_OPCAO_ABREVIADA

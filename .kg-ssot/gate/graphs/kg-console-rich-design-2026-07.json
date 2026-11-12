@@ -3,7 +3,6 @@
   "id": "kg-console-rich-design-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 14,
     "yaml.unquoted-date": 1
   }
 }

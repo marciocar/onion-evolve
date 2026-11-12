@@ -41,7 +41,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.307 a ## 2.1.307 (cópias em docs/evolution/research/radar-E3-2026-10-21-r15/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -67,7 +67,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.307 + memória search-is-sdaal-fallback-when-capped"
-      method: "medição: leitura do CHANGELOG e grep na memória e nas KBs"
+      method: "measurement: leitura do CHANGELOG e grep na memória e nas KBs"
       locality: "web"
   - id: Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307
     node_type: question
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O que fazer com a memória do fallback de busca no teto do WebSearch (SAC-185)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
   - id: E_ARTIFACT_READ_RESET_TOCA_O_PAINEL_DO_DECIDE
     node_type: evidence
@@ -102,7 +102,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.307 + .claude/commands/meta/decide.md l.18, l.137, l.145"
-      method: "medição: leitura do CHANGELOG e grep no core"
+      method: "measurement: leitura do CHANGELOG e grep no core"
       locality: "web"
   - id: E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021
     node_type: evidence
@@ -117,7 +117,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh"
       locator: "tabela de versões, linha SDK bridge"
-      method: "medição: binário do CLI embutido --version"
+      method: "measurement: binário do CLI embutido --version"
       locality: "host"
   - id: E_SDK_MCP_FERRAMENTAS_TOCA_O_PILOTO_UI
     node_type: evidence
@@ -132,7 +132,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.307 + D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021"
-      method: "medição: leitura do CHANGELOG e git grep no bridge"
+      method: "measurement: leitura do CHANGELOG e git grep no bridge"
       locality: "web"
   - id: E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307
     node_type: evidence
@@ -147,7 +147,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml"
       locator: "uses: claude-code-action@aa8a7738 (2 jobs)"
-      method: "medição: grep no core e gh api compare"
+      method: "measurement: grep no core e gh api compare"
       locality: "repo"
   - id: E_NENHUM_ITEM_TOCA_OTEL_RUNNER_E_IDE_1021
     node_type: evidence
@@ -162,7 +162,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.307 + grep em .claude, ops e .github"
-      method: "medição: busca no vivo por consumidor"
+      method: "measurement: busca no vivo por consumidor"
       locality: "web"
   - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_307
     node_type: evidence
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família cited_directive"
-      method: "medição: execução da bancada no CLI 2.1.307"
+      method: "measurement: execução da bancada no CLI 2.1.307"
       locality: "repo"
   - id: C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO
     node_type: claim
@@ -215,7 +215,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_SONDA_DE_FUNDO_NAO_FECHAVA_TAREFA_PARADA_ATE_2_1_306
     node_type: evidence
@@ -230,7 +230,7 @@ nodes:
     provenance:
       source: ".claude/hooks/background-task-probe.sh"
       locator: "l.97 (regex de fechamento) + CHANGELOG 2.1.307"
-      method: "medição: leitura do hook e das duas formas da notificação nos binários 2.1.306 e 2.1.307, pelo 2º juiz"
+      method: "measurement: leitura do hook e das duas formas da notificação nos binários 2.1.306 e 2.1.307, pelo 2º juiz"
       locality: "repo"
 edges:
   - from: E_DELTA_DA_RODADA

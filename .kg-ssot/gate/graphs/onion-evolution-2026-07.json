@@ -3,7 +3,6 @@
   "id": "onion-evolution-2026-07",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 13,
     "form.range.node.label": 2,
     "form.required.node.provenance": 7,
     "form.required.node.verified_at": 1,

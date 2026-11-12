@@ -65,7 +65,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "etapa 3 da ordem explicita do maestro (vai na ordem, 2026-09-01); itens = secao 1 da listagem REAL, so os executaveis pelo condutor"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_W8_FECHAMENTO_FONTES
@@ -80,7 +80,7 @@ nodes:
     provenance:
       source: "49880151"
       locator: "49880151 (corpo + diff em 10 grafos de docs/onion/graph, census-seal.py e lint-selftest.sh); b4c8df62 (residuo)"
-      method: "leitura: corpo e diff de 49880151 (2026-09-02)"
+      method: "reading: corpo e diff de 49880151 (2026-09-02)"
       locality: "repo"
 
   - id: D_BANCADA_FAIXAS_E_MAPA
@@ -96,7 +96,7 @@ nodes:
     provenance:
       source: "docs/analysis/bancada-faixas-e-mapa-2026-09.md"
       locator: "run #4 paralelo: 994 casos / 0 falhas / 519 s (par8-final2.log); hook pre-commit --affected-staged --jobs auto; CI --jobs auto"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_BANCADA_FAIXAS_MEDIDA
@@ -112,7 +112,7 @@ nodes:
     provenance:
       source: "docs/analysis/bancada-faixas-e-mapa-2026-09.md"
       locator: "runs medidos: serial.log, par8.log (800 s), par8q.log (472 s), lintload (7 lints); CI selftest run 33715418241 (20m18s)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
     node_type: question
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-bench-emit-pipe-race.md"
       locator: "probe.sh (12 processos x 40, serial vs concorrente) e cure.sh (4 formas x 480 tentativas) num diretório temporário do host (scripts não versionados; a medição está no resíduo fix-bench-emit-pipe-race.md l.5); bancada completa 1035/0 em 145 familias/8 workers/777s pos-cura"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_CURA_HERE_STRING_MEDIDA_0904
     node_type: evidence
@@ -152,7 +152,7 @@ nodes:
     provenance:
       source: "docs/evolution/review/fix-bench-emit-pipe-race.md"
       locator: "lint-selftest.sh: 429 here-strings, 0 vereditos em pipe; bench1.log (1035/0/0, 777s)"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
@@ -170,7 +170,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-24: «Lote do drive #1332: selo do checkpoint + merge?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-24"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-24"
       locality: "pessoa"
 
   - id: I_KB_GAMIFICACAO_RAMPA_GATED
@@ -206,7 +206,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-census-parity-check.sh"
       locator: "intersecao medida no corpus vivo: 4 de 4 arquivos, comm -12 entre a saida NAO-MEDIDO da 82 e o baseline da 78"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_COMO_FECHAR_O_BURACO_78_82
@@ -233,7 +233,7 @@ nodes:
     provenance:
       source: "2ec7603f"
       locator: "2ec7603f (diff dos 4 grafos + kg-yaml-validity-baseline.txt); docs/evolution/review/fix-kg-yaml-passivo-zero.md l.70-71"
-      method: "leitura: diff de 2ec7603f nos 4 grafos e no baseline + residuo l.70-71; contagem de nos com PyYAML nos 4 arquivos em 2ec7603f (43/64/56/40)"
+      method: "reading: diff de 2ec7603f nos 4 grafos e no baseline + residuo l.70-71; contagem de nos com PyYAML nos 4 arquivos em 2ec7603f (43/64/56/40)"
       locality: "repo"
 
   - id: E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES
@@ -250,7 +250,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh (REGRA 16, pre-filtro e extrator) · .claude/utils/adopt/claude-md-fuse.sh · .claude/validation/lint-selftest.sh (shell-locale)"
       locator: "o GNU grep 3.11 que os scripts usam (o grep do PATH dos scripts), entrada real `Comandos — 116 invocáveis`: com `[—:–-]` casa VAZIO em LC_ALL=C e casa em C.UTF-8; com `(—|–|:|-)` casa nos dois. O lint inteiro num sandbox (origin/main e árvore viva) em C: a fixture r16 bad-invocaveis-invertida NAO e citada; em C.UTF-8 e citada"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_CURAR_O_LOCALE_PRE_EXISTENTE
@@ -279,7 +279,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: ".claude/validation/lint-selftest.sh l.17997-18032 (familia plugin_version_derived, casos j1/j2, nascidos em 2ec7603f)"
-      method: "medição: bash .claude/validation/lint-selftest.sh --families plugin_version_derived (re-executado 2026-10-09: \"(j1) 2o PR concorrente sem rebase CONFLITA no git\"; \"(j2) resolucao descuidada e pega pela REGRA 19 - commitado 0.1.1, derivado 0.1.2\")"
+      method: "measurement: bash .claude/validation/lint-selftest.sh --families plugin_version_derived (re-executado 2026-10-09: \"(j1) 2o PR concorrente sem rebase CONFLITA no git\"; \"(j2) resolucao descuidada e pega pela REGRA 19 - commitado 0.1.1, derivado 0.1.2\")"
       locality: "repo"
 
   - id: D_O_TETO_DA_VERSAO_GANHA_GUARDA_OU_ACEITE
@@ -307,7 +307,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/co-announce.md"
       locator: "SELADO PELO MAESTRO em 2026-10-04, e o selo foi conferido CONTRA O VIVO antes de aplicar, nao aceito por declaracao do STATE.md: a REGRA 95 (Anuncio que afirma ZERO sobre classe verificavel sem medicao) esta em `main` — `announce-zero-claim-check.sh` presente (5.496 bytes), registrada em 4 sitios do `lint-artifacts.sh`, e a familia `run_announce_zero_claim_selftests` passa 9/9. O driver conduziu este no ate PR-verde na passada de 2026-10-01 e PAROU no flip de status, que a tabela de selagem reserva ao maestro — mecanismo funcionando, nao atraso. ⚠️ O QUE A CURA NAO FECHA, e fica declarado: a guarda e PROSPECTIVA (so anuncios de 1o nivel em `outbox/<id>/`, onde a cura ainda existe; `_processed/` ja viajou e historia nao se reescreve), e nasceu `SEM-OBJETO` porque havia ZERO anuncios de 1o nivel na data — o que e DECLARACAO, nao conformidade. Ela morde o PROXIMO anuncio. Historico original do sinal: sinal de campo de um adotante (2026-08-31), triado e re-medido em 2026-09-16: a metade do transporte JA FOI CURADA (co-deliver.sh:111 exige .claude/.onion-version com role adopted|hub); a metade do RELATO segue viva"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE

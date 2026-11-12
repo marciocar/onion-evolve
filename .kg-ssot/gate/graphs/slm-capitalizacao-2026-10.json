@@ -3,7 +3,6 @@
   "id": "slm-capitalizacao-2026-10",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 29,
     "form.range.node.label": 27
   }
 }

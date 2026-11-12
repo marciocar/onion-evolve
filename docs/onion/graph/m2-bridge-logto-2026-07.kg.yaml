@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml:24"
       locator: "host-vps-medido-pos-flip"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_real_precedent
@@ -59,7 +59,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md:69"
       locator: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O fato histórico do label (o incidente de escrita de código a partir de um celular por bypassPermissions+git-local aconteceu) continua verdadeiro — não é isso que morreu."
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_a2a_gate_narrow
@@ -76,7 +76,7 @@ nodes:
     provenance:
       source: "onion-bridge@38702f0:src/server.ts + .claude/utils/federation-transport/a2a-verify.sh"
       locator: "server.ts l.46-60 (a2aGuard só config.a2aTokens, sem authMode), l.63-66 (/chat,/commands authGuard; /a2a a2aGuard), l.94 (fora de dual-legacy → 401); a2a-verify.sh l.15-25 (camadas 0-6); docs/analysis/backlog-real-2026-09.md l.28"
-      method: "leitura: código do bridge pós-flip e do gate a2a do core"
+      method: "reading: código do bridge pós-flip e do gate a2a do core"
 
   # ---- ENTIDADES (o terreno) ----
   - id: E_logto_live
@@ -93,7 +93,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md"
       locator: "endpoint-vivo"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_auth_token
@@ -110,7 +110,7 @@ nodes:
     provenance:
       source: "onion-bridge@c22517e:src/server.ts + onion-bridge@38702f0:src/server.ts"
       locator: "c22517e (2026-07-27) l.29 adminGuard compara AUTH_TOKEN, l.40 a2aGuard aceita authToken, l.77 authMode≠dual-legacy fecha /chat; 38702f0 l.30-35 e l.49-52 (P9 removeu os dois bypass → refuted)"
-      method: "leitura: código versionado do bridge no estado de 2026-07-27 e pós-P9"
+      method: "reading: código versionado do bridge no estado de 2026-07-27 e pós-P9"
 
   # ---- FIX G: A CITAÇÃO DE I3 ESTAVA ERRADA (a POSTURA se mantém, a âncora muda) ----
   - id: C_i3_miscited
@@ -150,7 +150,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ---- FIX A: TETO DE ANCESTRAL ZERA OS FLOORS (o achado mais importante da rodada) ----
@@ -169,7 +169,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_recursiveprot_is_not_the_gate
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_oom_bias_still_works
@@ -205,7 +205,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_memory_floors_done
@@ -222,7 +222,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_fix_ancestor_floor
@@ -253,7 +253,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "varredura-host-wide-dos-3-drop-ins-com-caminhador-de-cadeia-na-vps-do-core"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ---- FIX B: PATH-TRAVERSAL FURA A ALLOWLIST (bypass REAL) ----
@@ -271,7 +271,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "node-v22.23.1-neste-host"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_path_canon_guard
@@ -327,7 +327,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_logto_same_protection_tier
@@ -358,7 +358,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_docker_floor_gap
@@ -375,7 +375,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps re-medido 2026-08-27 via 1o /meta:drive na onda m2-bridge (CONFIRMED, o gap persiste): onion-vps-logto min=0/low=0/max=1073741824(1GB) · onion-vps-logto-postgres min=0/low=0/max=536870912(512MB) — piso 0 e teto exato da claim. ⚠ lição verify-read-path: os scopes docker do ADOTANTE arandek dao max=max; medir o container do CORE (docker ps -> id -> scope), nao um scope docker qualquer, senao da DRIFTED falso"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ---- FIX E: O COMANDO DE PROVA DO RFC 8707 ESTAVA QUEBRADO ----
@@ -393,7 +393,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "host-vps-medido"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_proof_command_fixed
@@ -469,7 +469,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "decisao-do-maestro"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_gate_m2m_only
@@ -554,7 +554,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 4/4 claims medidas ao vivo. sudo -n grep -n \"app\\.get(\\|app\\.post(\\|app\\.use(\\|app\\.route(\\|app\\.mount(\" <clone de produção do onion-bridge na conta de serviço>/… => Rodando no próprio host (a VPS do core) com sudo -n: (1) server.ts vivo mostra 46 registros app.get/post/... e middlewares…"
-      method: "testemunho: kg-freshness Onda 7 (wf_405c7716-7b3) mediu no host em 2026-09-01 com sudo -n grep no clone de produção do onion-bridge; o resultado só está registrado no próprio grafo"
+      method: "testimony: kg-freshness Onda 7 (wf_405c7716-7b3) mediu no host em 2026-09-01 com sudo -n grep no clone de produção do onion-bridge; o resultado só está registrado no próprio grafo"
       locality: "host"
 
   - id: Q_a2a_after_flip
@@ -571,7 +571,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O trabalho que o nó descreve como decisão pendente/prova a fazer já foi ENTREGUE e está vivo em produção: o /a2a tem cobertura dupla real e independente (a2aGuard por Bea"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_pwa_sse_headers
@@ -588,7 +588,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó era uma pergunta LOAD-BEARING a confirmar: 'a PWA consome SSE por EventSource?' — com o risco de o caminho humano quebrar após o flip OIDC, e a prescrição de migrar "
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ---- F3 (preservado): ENFORCEMENT FAIL-CLOSED ----
@@ -640,7 +640,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "p11-em-producao-boot-sem-linha-convites-era-2-agora-0-env-sem-courtesy-byok-e-sdk-0-3-231"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
@@ -657,7 +657,7 @@ nodes:
     provenance:
       source: "onion-bridge@a99994aa:src/identity.ts"
       locator: "CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em onion-bridge (produção)/src/identity.ts, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)"
-      method: "leitura: src/identity.ts em onion-bridge@a99994aa (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
+      method: "reading: src/identity.ts em onion-bridge@a99994aa (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
       locality: "repo"
 
   - id: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
@@ -674,7 +674,7 @@ nodes:
     provenance:
       source: "onion-bridge@9d33d7eb:src/a2a.ts"
       locator: "FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync onion-bridge (produção)/src/a2a.ts = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real"
-      method: "leitura: src/a2a.ts em onion-bridge@9d33d7eb (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
+      method: "reading: src/a2a.ts em onion-bridge@9d33d7eb (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
       locality: "repo"
 
   # ---- F4 (preservado): ACOPLAMENTO BRIDGE->LOGTO ----
@@ -702,7 +702,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   # ---- F5 (preservado): ALGORITMO PINADO ----
@@ -809,7 +809,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md"
       locator: "host-vps-declarado"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_console_autooff_gap
@@ -826,7 +826,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "fechamento W8 2026-09-02: SUPERSEDED por E_W8_CONSOLE_AUTOOFF_VIVO (auto-off medido no vivo); label preservado como historia"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ---- FONTES E O QUE É VPS-DECLARADO ----
@@ -844,7 +844,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md"
       locator: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó pede uma HIGIENE DE CITAÇÃO ainda pendente ('as duas fontes têm de ser citadas JUNTAS'; status: open). No vivo, essa higiene já foi APLICADA: o documento que origina"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_vps_declared
@@ -861,7 +861,7 @@ nodes:
     provenance:
       source: "docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md:48"
       locator: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó lista 8 lacunas de medição declaradas em 2026-07-05/07-26 ('o que esta sessão NÃO mediu'). Nesta passada, todas as 8 foram medidas diretamente no host vivo (VPS = a "
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_byok_courtesy_mode
@@ -878,7 +878,7 @@ nodes:
     provenance:
       source: "docs/discussions/onion-pessoal-app/SEED.md:9"
       locator: "censo lote 7 (run wf_05b33768-48c): os 2 modos cortesia+BYOK sairam do binario com o P11 — a pergunta ficou sem objeto"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "judges: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   # ---- O QUE FICA GATED ----
@@ -908,7 +908,7 @@ nodes:
     provenance:
       source: "drop-in 10-memory-protection.conf do system.slice no systemd do host (host)"
       locator: "host-vps-medido"
-      method: "testemunho: leitura do drop-in 10-memory-protection.conf no host 2026-07-26"
+      method: "testimony: leitura do drop-in 10-memory-protection.conf no host 2026-07-26"
       locality: "host"
 
   - id: E_bridge_source_read
@@ -925,7 +925,7 @@ nodes:
     provenance:
       source: "src/server.ts do checkout de produção do onion-bridge (host)"
       locator: "host-vps-medido"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
       locality: "host"
 
   # ---- P0 PRE-FLIGHT EXECUTADO 2026-07-26 (read-only). Tres achados; dois REFUTAM premissa. ----
@@ -944,7 +944,7 @@ nodes:
     provenance:
       source: "postgres do Logto da VPS consultado read-only (docker exec psql, host)"
       locator: "logto-db-consultada-read-only"
-      method: "testemunho: consulta read-only ao banco do Logto no host 2026-07-26"
+      method: "testimony: consulta read-only ao banco do Logto no host 2026-07-26"
       locality: "host"
 
   - id: C_permission_mode_fail_open
@@ -961,7 +961,7 @@ nodes:
     provenance:
       source: "src/config.ts:26 do checkout de produção do onion-bridge (host)"
       locator: "bridge-config-lido-e-env-medido"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
       locality: "host"
 
   - id: C_a2a_pool_empty_admin_bypasses
@@ -978,7 +978,7 @@ nodes:
     provenance:
       source: "src/server.ts:38 do checkout de produção do onion-bridge (host)"
       locator: "bridge-source-e-env-medidos"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
       locality: "host"
 
   - id: C_console_not_the_path
@@ -996,7 +996,7 @@ nodes:
     provenance:
       source: "vhost logto-console.caddy.disabled no conf.d do Caddy do host (host)"
       locator: "caddy-conf-e-logto-db-medidos"
-      method: "testemunho: leitura de logto-console.caddy.disabled no host 2026-07-26"
+      method: "testimony: leitura de logto-console.caddy.disabled no host 2026-07-26"
       locality: "host"
 
   - id: E_p1p3_provisioned
@@ -1015,7 +1015,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "logto-api-e-db-conferidos"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_p4_rfc8707_proven
@@ -1033,7 +1033,7 @@ nodes:
     provenance:
       source: "token client_credentials do app onion-bridge-service emitido pelo Logto da VPS e decodificado (host)"
       locator: "token-emitido-e-decodificado"
-      method: "testemunho: emissão e decodificação de token no host 2026-07-26"
+      method: "testimony: emissão e decodificação de token no host 2026-07-26"
       locality: "host"
 
   - id: E_p5_identity_live
@@ -1052,7 +1052,7 @@ nodes:
     provenance:
       source: "src/identity.ts do bridge reiniciado em produção (7 provas) (host)"
       locator: "bridge-reiniciado-e-7-provas-executadas"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_pwa_has_no_pkce
@@ -1071,7 +1071,7 @@ nodes:
     provenance:
       source: "web/src/App.tsx:21 do checkout de produção (grep sem OIDC/PKCE) (host)"
       locator: "grep-no-fonte-da-pwa"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_scaffold_removed_proof_was_invalid
@@ -1088,7 +1088,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "caddy-conf-e-handshake-tls-medidos"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_p6_pkce_live
@@ -1106,7 +1106,7 @@ nodes:
     provenance:
       source: "src/web-oidc.ts do checkout de produção (bundle servido e authorize medidos) (host)"
       locator: "bundle-servido-e-authorize-medidos"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   # ---- P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro) ----
@@ -1125,7 +1125,7 @@ nodes:
     provenance:
       source: ".env de produção do onion-bridge (host, não versionado)"
       locator: "bridge-reiniciado-e-gates-medidos-pos-flip"
-      method: "testemunho: leitura do .env de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura do .env de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_p9_blocked_no_admin_oidc
@@ -1143,7 +1143,7 @@ nodes:
     provenance:
       source: "src/server.ts:27 do checkout de produção pós-flip (host)"
       locator: "bridge-source-lido-pos-flip"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
   - id: C_p9_prereq_done_admin_oidc
     node_type: claim
@@ -1159,7 +1159,7 @@ nodes:
     provenance:
       source: "onion-bridge@7e736ba2:src/server.ts"
       locator: "server.ts vivo lido via sudo (1o /meta:drive na onda m2-bridge): adminGuard L225 chama verifyAccessToken(bearer,'bridge:admin') — OIDC com escopo admin; a2aGuard L37 so config.a2aTokens.has(bearer), bypass do admin REMOVIDO"
-      method: "leitura: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-27)"
+      method: "reading: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-27)"
       locality: "repo"
 
   - id: C_flip_was_partial
@@ -1177,7 +1177,7 @@ nodes:
     provenance:
       source: "rotas do bridge em produção medidas uma a uma pós-flip (host)"
       locator: "rotas-medidas-uma-a-uma-apos-o-flip"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: E_p9_complete
@@ -1196,7 +1196,7 @@ nodes:
     provenance:
       source: "rotas do bridge em produção após restart (src/identity.ts) (host)"
       locator: "rotas-medidas-apos-restart-e-remocao"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: E_p9_human_admin_proven
@@ -1213,7 +1213,7 @@ nodes:
     provenance:
       source: "PWA do maestro e token de serviço medidos contra o bridge em produção (host)"
       locator: "pwa-do-maestro-e-token-de-servico-medidos"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_identity_bought_who_not_what
@@ -1231,7 +1231,7 @@ nodes:
     provenance:
       source: "env e toolset do SDK no bridge em produção (src/chat.ts) (host)"
       locator: "env-e-toolset-do-sdk-medidos"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: C_allowedtools_does_not_restrict
@@ -1249,7 +1249,7 @@ nodes:
     provenance:
       source: "npm @anthropic-ai/claude-agent-sdk@0.3.195 (tipos do pacote, sdk.d.ts)"
       locator: "tipos-do-pacote-instalado-v0.3.195"
-      method: "leitura: tipos do @anthropic-ai/claude-agent-sdk 0.3.195 (o mesmo instalado no bridge em 2026-07-28; upgrade a 0.3.220 em 5c6e2cfb)"
+      method: "reading: tipos do @anthropic-ai/claude-agent-sdk 0.3.195 (o mesmo instalado no bridge em 2026-07-28; upgrade a 0.3.220 em 5c6e2cfb)"
       locality: "web"
 
   - id: D_capability_by_scope
@@ -1285,7 +1285,7 @@ nodes:
     provenance:
       source: "canário de escrita contra o bridge em produção (src/chat.ts) (host)"
       locator: "canario-de-escrita-e-enumeracao-no-ar"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: Q_p10_mutation_not_run
@@ -1301,7 +1301,7 @@ nodes:
     provenance:
       source: "sessão session_01WcQ2RsZYykMdqgP8BVQu37 (commit b5e5d086 #469, 2026-07-27)"
       locator: "controle de mutação NÃO rodado — exigiria desligar guarda no bridge vivo"
-      method: "testemunho: fronteira declarada pela sessão 2026-07-27 no commit b5e5d086 (#469)"
+      method: "testimony: fronteira declarada pela sessão 2026-07-27 no commit b5e5d086 (#469)"
       locality: "pessoa"
 
 
@@ -1319,7 +1319,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-logto-as-projection-2026-07.md"
       locator: "reverificado ao vivo 2026-08-23: dry-run logto-provision --project-federation (sem --apply) — direção repo->Logto e org-roles idempotentes confirmadas; D5 capturado em ato (org orfa (nome comercial no Logto redigido; id publico candidato: granaai) reportada, nao absorvida)"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_role_field_is_overloaded
@@ -1348,7 +1348,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-logto-as-projection-2026-07.md"
       locator: "tokens-do-env-testados-contra-o-ar"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_slices_2_to_4_unexercised
@@ -1377,7 +1377,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "dois-chamadores-medidos-antes-e-depois-da-revogacao"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_i_bypassed_the_api_with_sql
@@ -1394,7 +1394,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "duas-escritas-comparadas-uma-passou-outra-foi-barrada"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_signup_close_not_via_api
@@ -1410,7 +1410,7 @@ nodes:
     provenance:
       source: "sessão session_01WcQ2RsZYykMdqgP8BVQu37 (commit b5e5d086 #469, 2026-07-27) + ops/bridge-auth/logto-provision.sh"
       locator: "corpo do commit 'Recorded against myself: I closed the admin tenant's sign_up with a direct SQL UPDATE… logged in the graph as a named debt'; logto-provision.sh sem passo de fechamento (git log -S sign_up só e50e4aea, git mv)"
-      method: "testemunho: ato relatado pela sessão 2026-07-27 no commit b5e5d086 (#469), comando SQL não registrado"
+      method: "testimony: ato relatado pela sessão 2026-07-27 no commit b5e5d086 (#469), comando SQL não registrado"
       locality: "pessoa"
 
 
@@ -1428,7 +1428,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml"
       locator: "12-entradas-classificadas-e-yaml-revalidado"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_federation_projected
@@ -1445,7 +1445,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "8-orgs-e-2-org-roles-criadas-no-ar"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_d5_divergence_fires
@@ -1462,7 +1462,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "ssot-mutado-em-copia-temporaria-com-denominador"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_orgs_are_empty_scaffolding
@@ -1478,7 +1478,7 @@ nodes:
     provenance:
       source: "sessão session_01WcQ2RsZYykMdqgP8BVQu37 (commit c119608d #470, 2026-07-27)"
       locator: "8 Organizations criadas pelo projetor, nenhum usuário/app/org-role atribuído"
-      method: "testemunho: medição da sessão 2026-07-27 registrada no commit c119608d (#470), comando não registrado"
+      method: "testimony: medição da sessão 2026-07-27 registrada no commit c119608d (#470), comando não registrado"
       locality: "pessoa"
 
 
@@ -1508,7 +1508,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "matricula-executada-e-verificada-no-ar"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_org_has_member_with_role
@@ -1525,7 +1525,7 @@ nodes:
     provenance:
       source: "sessão session_01WcQ2RsZYykMdqgP8BVQu37 (commit bc7a9a80 #471, 2026-07-27)"
       locator: "relação org-usuário-papel: 'marcio em onion-dist como standalone'; contagem crua 2 = org interna do tenant admin"
-      method: "testemunho: medição da sessão 2026-07-27 registrada no commit bc7a9a80 (#471), comando não registrado"
+      method: "testimony: medição da sessão 2026-07-27 registrada no commit bc7a9a80 (#471), comando não registrado"
       locality: "pessoa"
 
   - id: Q_seven_orgs_still_empty
@@ -1541,7 +1541,7 @@ nodes:
     provenance:
       source: "sessão session_01WcQ2RsZYykMdqgP8BVQu37 (commit bc7a9a80 #471, 2026-07-27)"
       locator: "1 de 8 organizações com membro; --enroll recusa criar usuário (exit 7)"
-      method: "testemunho: medição da sessão 2026-07-27 registrada no commit bc7a9a80 (#471), comando não registrado"
+      method: "testimony: medição da sessão 2026-07-27 registrada no commit bc7a9a80 (#471), comando não registrado"
       locality: "pessoa"
 
 
@@ -1559,7 +1559,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "logins-medidos-uma-unica-pessoa-jamais-autenticou"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_org_born_on_demand
@@ -1576,7 +1576,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "reverificado 2026-08-23: --project-federation report-only (nenhum POST), 5 orgs reais (nenhuma vazia), guarda de --enroll exigindo id no members.yaml confirmada no codigo"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_dormant_privileged_duplicate
@@ -1593,7 +1593,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "last-sign-in-das-duas-contas"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_near_miss_guard_on_live_account
@@ -1610,7 +1610,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "comando-barrado-e-depois-provado-em-dry-run"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_blocked_chain_kills_inner_edit
@@ -1627,7 +1627,7 @@ nodes:
     provenance:
       source: "sessão session_01WcQ2RsZYykMdqgP8BVQu37 (2026-07-27, commit 874ec89b #472)"
       locator: "dry-run devolveu 'argumento desconhecido: --drop-user' depois de cadeia barrada pelo classificador"
-      method: "testemunho: relato da sessão 2026-07-27 registrado no commit 874ec89b (#472), comando não registrado"
+      method: "testimony: relato da sessão 2026-07-27 registrado no commit 874ec89b (#472), comando não registrado"
       locality: "pessoa"
 
 
@@ -1645,7 +1645,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
       locator: "local-paths-testados-no-filesystem"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_a2a_is_not_vaporware
@@ -1663,7 +1663,7 @@ nodes:
     provenance:
       source: "onion-bridge@c22517e:src/a2a.ts + .claude/utils/federation-transport/a2a-verify.sh@f5121e0d + .claude/utils/federation-transport/jwks/ + docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
       locator: "a2a.ts l.11 e l.51 (spawnSync), l.19 (VERIFY → a2a-verify.sh do core), l.45-46 e l.70-71 (fail-safe, layer_failed); a2a-verify.sh l.61-62 (veto emite layer_failed nomeado), l.67-76 (camada parse); jwks/metagamify-1.pem (668c03f5, 2026-07-09) e jwks/granaai-1.pem (dc489b45, 2026-07-10); ADR l.62-64 (\"Construímos o receptor e a alfândega, nunca o remetente\")"
-      method: "leitura: código do endpoint /a2a (onion-bridge@c22517e), gate e chaves versionados no core e ADR f5121e0d (2026-07-28)"
+      method: "reading: código do endpoint /a2a (onion-bridge@c22517e), gate e chaves versionados no core e ADR f5121e0d (2026-07-28)"
 
   - id: C_no_sender_exists
     node_type: claim
@@ -1679,7 +1679,7 @@ nodes:
     provenance:
       source: ".claude/utils/federation-transport/"
       locator: "listagem-do-diretorio-de-transporte"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_downstream_by_pull
@@ -1694,7 +1694,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
       locator: "docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
   - id: C_adopters_never_authenticate
@@ -1711,7 +1711,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
       locator: "enunciado-do-maestro-sobre-insustentabilidade"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_offline_fallback_truth
@@ -1740,7 +1740,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/outbox/"
       locator: "inbound-de-todos-os-adotantes-contado"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_pull_serves_history_not_queue
@@ -1757,7 +1757,7 @@ nodes:
     provenance:
       source: "src/federation.ts do checkout de produção (clone vazio puxou 12) (host)"
       locator: "clone-vazio-puxou-12-e-idempotencia-medida"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: E_pull_endpoint_works
@@ -1774,7 +1774,7 @@ nodes:
     provenance:
       source: "GET /federation/inbox/:member contra o bridge em produção (5 mecânicas ao vivo) (host)"
       locator: "onion-bridge@38702f00:src/federation.ts (último commit do arquivo até 2026-08-23) ; reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
-      method: "testemunho: medição de comportamento no host 2026-08-23"
+      method: "testimony: medição de comportamento no host 2026-08-23"
       locality: "host"
 
   - id: C_org_token_has_no_org_claim
@@ -1792,7 +1792,7 @@ nodes:
     provenance:
       source: "token de organização do Logto decodificado (src/identity.ts em produção) (host)"
       locator: "token-decodificado"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: C_p10_broke_scope_default
@@ -1810,7 +1810,7 @@ nodes:
     provenance:
       source: "src/identity.ts do checkout de produção (4 casos falhando igual) (host)"
       locator: "quatro-casos-falhando-identicamente"
-      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
+      method: "testimony: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
 
@@ -1828,7 +1828,7 @@ nodes:
     provenance:
       source: ".claude/hooks/co-evolution-inbox-check.sh"
       locator: "tres-casos-cronometrados"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_timeout_is_load_bearing
@@ -1845,7 +1845,7 @@ nodes:
     provenance:
       source: ".claude/hooks/co-evolution-inbox-check.sh"
       locator: "l.54 timeout \"${ONION_FED_TIMEOUT:-20}\"; commit 82da1e1a (#475) registra 127.0.0.1:9=0.076s e 10.255.255.1 com 3s=3.012s"
-      method: "medição: cd $(mktemp -d) && CLAUDE_PROJECT_DIR=<core> ONION_FED_CLIENT_ID=x ONION_FED_CLIENT_SECRET=y ONION_FED_ORG_ID=z ONION_FED_MEMBER=m ONION_FED_ISSUER=http://10.255.255.1 ONION_FED_TIMEOUT=3 time bash .claude/hooks/co-evolution-inbox-check.sh"
+      method: "measurement: cd $(mktemp -d) && CLAUDE_PROJECT_DIR=<core> ONION_FED_CLIENT_ID=x ONION_FED_CLIENT_SECRET=y ONION_FED_ORG_ID=z ONION_FED_MEMBER=m ONION_FED_ISSUER=http://10.255.255.1 ONION_FED_TIMEOUT=3 time bash .claude/hooks/co-evolution-inbox-check.sh"
       locality: "repo"
 
 
@@ -1863,7 +1863,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/outbox/"
       locator: "sha256-e-datas-dos-dois-diretorios"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_rule_46_outbox_membership
@@ -1880,7 +1880,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "reverificado 2026-08-23: lint real 0 disparos (outbox limpo) + reproducao sintetica isolada (staging vazia + anuncio so em _processed/) disparou SOFT como esperado. Sem drift"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: C_vendor_scrub_caught_me_again
@@ -1897,7 +1897,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "violacao-do-lint-na-propria-regra"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "derived: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_floors_effective_measured_20260729
@@ -1914,7 +1914,7 @@ nodes:
     provenance:
       source: "memory.min dos cgroups do system.slice medido no host (host)"
       locator: "drop-in 10-memory-protection.conf ; host-vps-medido"
-      method: "testemunho: leitura de memory.min nos cgroups do host 2026-07-29"
+      method: "testimony: leitura de memory.min nos cgroups do host 2026-07-29"
       locality: "host"
 
   - id: E_logto_now_critical_2026_08
@@ -1931,7 +1931,7 @@ nodes:
     provenance:
       source: "onion-logto@cc15d9b:docker-compose.yml + onion-bridge@7e736ba:src/identity.ts"
       locator: "docker-compose.yml l.64 (image ghcr.io/logto-io/logto:1.42.0); identity.ts l.28 (ISSUER auth.onionevolve.com/oidc), l.94 verifyAccessToken"
-      method: "leitura: compose do Logto e código do bridge"
+      method: "reading: compose do Logto e código do bridge"
   - id: E_bridge_write_grant_absent_2026_08
     node_type: evidence
     layer: audit
@@ -1946,7 +1946,7 @@ nodes:
     provenance:
       source: "/meta:kg-freshness de 2026-08-23 (commit 037b9fd9, session_018Qz5nju9yyZ69hhvVvP3jz)"
       locator: "Logto roles_scopes: scope bridge:write existe sem role atribuída; todos READ_ONLY"
-      method: "testemunho: medição da sessão 2026-08-23 (kg-freshness, 16 workers, maestro selou), comando não registrado"
+      method: "testimony: medição da sessão 2026-08-23 (kg-freshness, 16 workers, maestro selou), comando não registrado"
       locality: "host"
   - id: E_logto_tenant_provisioned_2026_08
     node_type: evidence
@@ -1962,7 +1962,7 @@ nodes:
     provenance:
       source: "postgres do Logto da VPS consultado read-only (docker exec psql, host)"
       locator: "medido ao vivo 2026-08-23 (docker exec psql): tenant default tem 3 users (nicole, marciog, marciocar), 9 applications (incl. onion-bridge-service/onion-bridge-pwa), o API Resource 'Onion Bridge' (https://bridge.onionevolve.com) existe, e sign_in_mode=SignIn nos dois tenants (registro fechado)"
-      method: "testemunho: consulta read-only ao banco do Logto no host 2026-08-23"
+      method: "testimony: consulta read-only ao banco do Logto no host 2026-08-23"
       locality: "host"
   - id: E_floors_now_effective_2026_08
     node_type: evidence
@@ -1978,7 +1978,7 @@ nodes:
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
       locator: "medido ao vivo 2026-08-23 (systemctl show): a correcao sugerida FOI aplicada — o drop-in agora e onion-vps-bridge.service.d/ (onion-bridge.service.d/ nao existe mais); onion-vps-bridge.service carrega MemoryMin=256M/MemoryLow=512M (loaded/active)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_org_membership_grows_2026_08
     node_type: evidence
@@ -1994,7 +1994,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "medido ao vivo 2026-08-23: a relacao nucleo (marciocar em onion-dist como standalone) segue verdadeira. Mas o tenant default tem HOJE 2 orgs com membro, nao 1: onion-dist/marciocar/standalone (original) + granaai/marciog/admin (novo, provavelmente via --enroll)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_bridge_write_regranted_2026_08
     node_type: evidence
@@ -2010,7 +2010,7 @@ nodes:
     provenance:
       source: "ops/bridge-auth/logto-provision.sh"
       locator: "reconcedido e provado por comportamento 2026-08-23 (ordem do maestro): via Management API do Logto (token m-default), a role humana bridge-user NAO tinha bridge:write ANTES (GET /roles/{}/scopes = ausente); POST /roles/{}/scopes {scopeIds:[bridge:write]} concedeu; GET DEPOIS = PRESENTE. O servico (bridge-operator) NAO recebeu. Grant cirurgico (um POST), sem rodar o --apply inteiro"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
   - id: E_REMEDIDA_CAPABILITY_BY_SCOPE_1028
     node_type: evidence
@@ -2044,7 +2044,7 @@ nodes:
     provenance:
       source: "docs/onion/federation-orgs.json"
       locator: "acolhimento provado por comportamento 2026-08-23 (ordem do maestro): a org orfa no Logto (nome comercial, id 9mt40fgqoudb, membro marciog) foi RENOMEADA para o id publico do membro via PATCH /organizations; ANTES nome comercial / DEPOIS name=granaai; a projecao --project-federation passou a reportar '✅ sem divergencia: Logto == SSOT' e granaai saiu de 'sem org'. Mapa docs/onion/federation-orgs.json regenerado (--write-org-map)"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "testimony: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_default_deny_never_existed
     node_type: evidence
@@ -2060,7 +2060,7 @@ nodes:
     provenance:
       source: "onion-bridge@7e736ba2:src/server.ts"
       locator: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
-      method: "leitura: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-30)"
+      method: "reading: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-30)"
       locality: "repo"
 
   - id: E_CENSO0901_D_resource_plan_b
@@ -2075,7 +2075,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "§3 l.72 (D_resource_plan_b)"
-      method: "juízes: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
+      method: "judges: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
       locality: "repo"
 
   - id: E_CENSO0901_C_hono_registration_order_bypass
@@ -2090,7 +2090,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "§3 l.73 (C_hono_registration_order_bypass); onion-bridge@7e736ba:src/server.ts l.55-60"
-      method: "juízes: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
+      method: "judges: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
       locality: "repo"
 
   - id: E_CENSO0901_Q_p10_mutation_not_run
@@ -2106,7 +2106,7 @@ nodes:
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "§1 l.32 (Q_p10_mutation_not_run); package.json l.11 do clone de desenvolvimento do onion-bridge (host)"
-      method: "juízes: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
+      method: "judges: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
       locality: "repo"
 
   - id: E_REFUTA_D_pkce_risk_mitigations
@@ -2121,7 +2121,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/census-2026-09-01/data/rodada2.json"
       locator: "medidos[node_id=D_pkce_risk_mitigations] (run wf_102a9bec-52f; campos method/observed/verdict=REFUTED; reproduz rodada1.json)"
-      method: "medição: census r2 wf_102a9bec (worker, sem juiz) — sudo grep accessTokenTtl/refreshTokenTtlInDays/rotat logto-provision.sh; sudo cat do Caddyfile do host; grep Content-Security-Policy server.ts; curl -sI https://app.onionevolve.com/health"
+      method: "measurement: census r2 wf_102a9bec (worker, sem juiz) — sudo grep accessTokenTtl/refreshTokenTtlInDays/rotat logto-provision.sh; sudo cat do Caddyfile do host; grep Content-Security-Policy server.ts; curl -sI https://app.onionevolve.com/health"
       locality: "repo"
 
   - id: D_TTL_UX_TRADEOFF
@@ -2137,7 +2137,7 @@ nodes:
     provenance:
       source: "ops/caddy/Caddyfile · ops/bridge-auth/logto-provision.sh · ops/bridge-auth/SUSPENSAO.md"
       locator: "etapa 2 da ordem vai-na-ordem (2026-09-01): CSP no ar (curl -sI mediu os 3 headers), rotateRefreshToken aplicado e provado por re-run idempotente (com rotacao), SUSPENSAO.md escrito; accessTokenTtl mantido 3600 por decisao"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_W8_CONSOLE_AUTOOFF_VIVO
@@ -2154,7 +2154,7 @@ nodes:
     provenance:
       source: "onion-logto@a0ce0fd:console.sh + corpo do commit onion-logto@a0ce0fd"
       locator: "console.sh l.28-41 (case on: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min, aviso \"auto-off NÃO armado\") e l.42-46 (case off: só mv + reload); corpo de a0ce0fd (2026-09-01, \"No dogfood o console estava LIGADO de esquecimento\"); janela de 30 do desenho em docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml l.791"
-      method: "leitura: script e mensagem do commit a0ce0fd no repo onion-logto"
+      method: "reading: script e mensagem do commit a0ce0fd no repo onion-logto"
 
   - id: E_W8_JWKS_PR65_ABERTO
     node_type: evidence
@@ -2169,7 +2169,7 @@ nodes:
     provenance:
       source: "marciocar/onion-bridge#65"
       locator: "gh pr view 65 --repo marciocar/onion-bridge --json title,state,mergedAt,createdAt"
-      method: "medição: gh pr view 65 -R marciocar/onion-bridge"
+      method: "measurement: gh pr view 65 -R marciocar/onion-bridge"
 
   - id: E_W9_A2A_ASYNC_PR66_ABERTO
     node_type: evidence
@@ -2186,7 +2186,7 @@ nodes:
     provenance:
       source: "https://github.com/marciocar/onion-bridge/pull/66"
       locator: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R marciocar/onion-bridge = OPEN"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
   - id: E_W9_BRIDGE_DEPLOY_0902
@@ -2203,7 +2203,7 @@ nodes:
     provenance:
       source: "ops/update-bridge.sh"
       locator: "ops/update-bridge.sh rc=0 (clone 5c40b1cc, bridge 1f7fb3f1, invocacao 75264042); systemctl show onion-vps-bridge: ActiveState=active, NRestarts=0, ActiveEnterTimestamp 02:07:16Z; journal -3min: 0 error/unhandled; /health 3x ~0,25ms; sudo -n git log no clone de produção do onion-bridge (conta de serviço) = merges #65 e #66 no topo"
-      method: "testemunho: deploy medido no serviço do host 2026-09-02 (update-bridge.sh rc, systemctl show, journal, /health, git log do clone de produção)"
+      method: "testimony: deploy medido no serviço do host 2026-09-02 (update-bridge.sh rc, systemctl show, journal, /health, git log do clone de produção)"
       locality: "host"
 
   # ── SAC-100 (2026-10-11): re-medição do Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA ──
@@ -2222,7 +2222,7 @@ nodes:
     provenance:
       source: "onion-bridge@1f7fb3f1:src/identity.ts"
       locator: "loadJwks: `if (now - jwksAttemptedAt < JWKS_MIN_REFETCH_MS) return; jwksAttemptedAt = now;` + fetch com AbortSignal.timeout(5000); jwksSelfCheck devolve ok:true sem checar jwksCache.size; sonda: 5 req / 1 fetch / 5003 ms→0 ms"
-      method: "medição: sonda local sobre cópia byte a byte do identity.ts de produção com o IdP inalcançável (porta recusada e IP não roteável), contando chamadas de fetch, 2026-10-11"
+      method: "measurement: sonda local sobre cópia byte a byte do identity.ts de produção com o IdP inalcançável (porta recusada e IP não roteável), contando chamadas de fetch, 2026-10-11"
       locality: "host"
 
 edges:

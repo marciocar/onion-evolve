@@ -33,7 +33,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.311 a ## 2.1.311 (cópias em docs/evolution/research/radar-E3-2026-10-26-r19/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -60,7 +60,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml, o registro npm e a API do GitHub"
       locator: "tabela de versões do censo; uses: da claude-code-action; compare v1.0.262...v1.0.263"
-      method: "medição: --version dos binários pelo censo, npm view e gh api do compare e do conteúdo na tag"
+      method: "measurement: --version dos binários pelo censo, npm view e gh api do compare e do conteúdo na tag"
       locality: "host"
   - id: E_BRIDGE_RETOMA_SESSAO_E_A_ORDEM_DO_TRANSCRIPT_SO_CHEGA_COM_A_SUBIDA_1026
     node_type: evidence
@@ -75,7 +75,7 @@ nodes:
     provenance:
       source: "ops/chat-runner.sh do core, src/chat-query-options.ts do onion-bridge servido e a tabela de versões do censo"
       locator: "função handshake do chat-runner (args com stream-json); src/chat-query-options.ts linha 84"
-      method: "medição: grep no core e no bridge servido (como a conta do serviço), e --version do binário servido pelo censo"
+      method: "measurement: grep no core e no bridge servido (como a conta do serviço), e --version do binário servido pelo censo"
       locality: "host"
   - id: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026
     node_type: question
@@ -90,7 +90,7 @@ nodes:
     provenance:
       source: "https://linear.app/sacola/issue/SAC-259"
       locator: "issue SAC-259 do projeto Onion — core: próximas levas"
-      method: "derivado: proposta da rodada a partir de E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026 e E_BRIDGE_RETOMA_SESSAO_E_A_ORDEM_DO_TRANSCRIPT_SO_CHEGA_COM_A_SUBIDA_1026"
+      method: "derived: proposta da rodada a partir de E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026 e E_BRIDGE_RETOMA_SESSAO_E_A_ORDEM_DO_TRANSCRIPT_SO_CHEGA_COM_A_SUBIDA_1026"
       locality: "web"
   - id: E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_311_1026
     node_type: evidence
@@ -106,7 +106,7 @@ nodes:
     provenance:
       source: "data/2.1.311.txt, a API de issues do GitHub e a configuração git do core"
       locator: "issues anthropics/claude-code 85039 e 88747; git config --show-origin --show-scope core.hooksPath"
-      method: "medição: grep na cópia do CHANGELOG, gh issue view, git config e stat dos arquivos de config"
+      method: "measurement: grep na cópia do CHANGELOG, gh issue view, git config e stat dos arquivos de config"
       locality: "host"
   - id: E_WORKTREE_DE_SUBAGENTE_NAO_SOME_COM_FILHO_EM_FUNDO_1026
     node_type: evidence
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: ".claude/skills/onion-orchestration/SKILL.md e git worktree list"
       locator: "linhas 79, 278, 281 e 289 da skill"
-      method: "medição: grep na skill e listagem das worktrees"
+      method: "measurement: grep na skill e listagem das worktrees"
       locality: "repo"
   - id: E_CLAUDE_MD_E_MEMORIA_FRESCOS_APOS_COMPACTACAO_1026
     node_type: evidence
@@ -136,7 +136,7 @@ nodes:
     provenance:
       source: "CLAUDE.md, git log do core, .claude/hooks/worklog-precompact-breadcrumb.sh e ops/chat-runner.sh"
       locator: "itens de lista do CLAUDE.md; cabeçalho do hook PreCompact; settings do handshake"
-      method: "medição: git log --since, python sobre o arquivo e leitura do hook"
+      method: "measurement: git log --since, python sobre o arquivo e leitura do hook"
       locality: "repo"
   - id: E_GUARDA_DE_MODELO_INDIFERENTE_AO_SUFIXO_1M_1026
     node_type: evidence
@@ -151,7 +151,7 @@ nodes:
     provenance:
       source: ".claude/hooks/premodelswitch-guard.sh e .claude/settings.json"
       locator: "linha 68 do hook; chave fallbackModel"
-      method: "medição: execução do hook com JSON no stdin e log desviado para o scratchpad"
+      method: "measurement: execução do hook com JSON no stdin e log desviado para o scratchpad"
       locality: "repo"
   - id: E_POSTTOOLUSE_CALA_NO_TIMEOUT_COM_SAIDA_PARCIAL_1026
     node_type: evidence
@@ -166,7 +166,7 @@ nodes:
     provenance:
       source: ".claude/hooks/bash-empty-result-guard.sh e uma execução no processo 2.1.311"
       locator: "campo tool_response.stdout lido pela guarda"
-      method: "medição: execução de comando com teto curto e observação do resultado e do hook"
+      method: "measurement: execução de comando com teto curto e observação do resultado e do hook"
       locality: "host"
   - id: E_SUBAGENTE_VE_MCP_QUE_CONECTA_DEPOIS_1026
     node_type: evidence
@@ -181,7 +181,7 @@ nodes:
     provenance:
       source: ".claude/agents e ops/mcp-onion-*"
       locator: "campo tools: dos agentes"
-      method: "medição: awk do frontmatter dos agentes, grep por mcp e ls; reescrito após o EXAGERA do juiz"
+      method: "measurement: awk do frontmatter dos agentes, grep por mcp e ls; reescrito após o EXAGERA do juiz"
       locality: "repo"
   - id: E_AGENT_TEAMS_SENDMESSAGE_E_WORKFLOW_SEM_MUDANCA_1026
     node_type: evidence
@@ -196,7 +196,7 @@ nodes:
     provenance:
       source: "data/2.1.311.txt, settings de usuário (só nomes de chave) e grep no core"
       locator: "chaves env e teammateMode; matcher SendMessage|Write|Edit"
-      method: "medição: grep e leitura dos nomes de chave por python"
+      method: "measurement: grep e leitura dos nomes de chave por python"
       locality: "host"
   - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1026
     node_type: evidence
@@ -211,7 +211,7 @@ nodes:
     provenance:
       source: "grep no core e settings de usuário"
       locator: "termos-chave de cada linha citada"
-      method: "medição: grep -rlF por termo e leitura dos eventos de hook por python"
+      method: "measurement: grep -rlF por termo e leitura dos eventos de hook por python"
       locality: "repo"
   - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_311_1026
     node_type: evidence
@@ -226,7 +226,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família cited_directive"
-      method: "medição: execução da família da bancada no host"
+      method: "measurement: execução da família da bancada no host"
       locality: "host"
   - id: E_INSTRUCTIONSLOADED_MEDE_A_RECARGA_POS_COMPACTACAO_1026
     node_type: evidence
@@ -241,7 +241,7 @@ nodes:
     provenance:
       source: ".claude/hooks/instructions-loaded-log.sh e o log que ele grava"
       locator: "campo load_reason do .claude/sessions/instructions-loaded.jsonl"
-      method: "medição: contagem por python e data de instalação do binário"
+      method: "measurement: contagem por python e data de instalação do binário"
       locality: "host"
   - id: E_EXTENSAO_VSCODE_DO_HOST_NA_2_1_306_1026
     node_type: evidence
@@ -257,7 +257,7 @@ nodes:
     provenance:
       source: "diretório de extensões do VS Code Server do host"
       locator: "anthropic.claude-code-2.1.306-linux-x64, binário resources/native-binary/claude"
-      method: "medição: ls e --version do binário embutido"
+      method: "measurement: ls e --version do binário embutido"
       locality: "host"
   - id: Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026
     node_type: question
@@ -291,7 +291,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de E_BRIDGE_RETOMA_SESSAO_E_A_ORDEM_DO_TRANSCRIPT_SO_CHEGA_COM_A_SUBIDA_1026"
-      method: "juízes: subagente opus independente, critério CU3"
+      method: "judges: subagente opus independente, critério CU3"
       locality: "repo"
   - id: C_SUPERACAO_20261026_O_ITEM_LONGO_DEPENDE_DA_CONTAGEM
     node_type: claim
@@ -306,7 +306,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de E_CLAUDE_MD_E_MEMORIA_FRESCOS_APOS_COMPACTACAO_1026"
-      method: "juízes: subagente opus independente, critério CU2"
+      method: "judges: subagente opus independente, critério CU2"
       locality: "repo"
   - id: C_SUPERACAO_20261026_MCP_DECLARADO_E_NO_FRONTMATTER
     node_type: claim
@@ -321,7 +321,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de E_SUBAGENTE_VE_MCP_QUE_CONECTA_DEPOIS_1026"
-      method: "juízes: subagente opus independente, critério CU3"
+      method: "judges: subagente opus independente, critério CU3"
       locality: "repo"
   - id: C_SUPERACAO_20261026_INSTRUCTIONSLOADED_E_O_INSTRUMENTO
     node_type: claim
@@ -336,7 +336,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissão: InstructionsLoaded e o caminho da compactação (linhas 7, 10 e 59)"
-      method: "juízes: subagente opus independente, critério CU5"
+      method: "judges: subagente opus independente, critério CU5"
       locality: "repo"
   - id: C_SUPERACAO_20261026_A_EXTENSAO_DO_VSCODE_E_FONTE_DE_VERSAO
     node_type: claim
@@ -351,7 +351,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissão: extensão do VS Code no host em 2.1.306 (linhas 79 a 86)"
-      method: "juízes: subagente opus independente, critério CU5"
+      method: "judges: subagente opus independente, critério CU5"
       locality: "repo"
   - id: C_SUPERACAO_20261026_REMOTE_CONTROL_E_O_CANAL_DO_MAESTRO
     node_type: claim
@@ -366,7 +366,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissão: Remote Control ligado no início de sessão (linhas 20, 21 e 22)"
-      method: "juízes: subagente opus independente, critério CU5"
+      method: "judges: subagente opus independente, critério CU5"
       locality: "repo"
   - id: C_SUPERACAO_20261026_A_SONDA_DE_FUNDO_LE_O_MESMO_TEXTO
     node_type: claim
@@ -381,7 +381,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissão: background-task-probe.sh lê o texto do Bash movido ao fundo (linha 58)"
-      method: "juízes: subagente opus independente, critério CU5"
+      method: "judges: subagente opus independente, critério CU5"
       locality: "repo"
 edges:
   - from: E_DELTA_DA_RODADA

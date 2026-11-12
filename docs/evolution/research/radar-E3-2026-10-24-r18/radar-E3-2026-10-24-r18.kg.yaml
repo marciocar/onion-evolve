@@ -38,7 +38,7 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.310 a ## 2.1.310 (cópias em docs/evolution/research/radar-E3-2026-10-24-r18/data/)"
-      method: "medição: extração determinística pelo cc-delta-census.sh"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
       locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
@@ -64,7 +64,7 @@ nodes:
     provenance:
       source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml, o registro npm e a API do GitHub"
       locator: "tabela de versões do censo; uses: da claude-code-action; compare v1.0.260...v1.0.261"
-      method: "medição: --version dos binários, npm view e gh api do compare e do conteúdo dos arquivos na tag"
+      method: "measurement: --version dos binários, npm view e gh api do compare e do conteúdo dos arquivos na tag"
       locality: "host"
   - id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
     node_type: question
@@ -84,7 +84,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
   - id: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
     node_type: evidence
@@ -99,7 +99,7 @@ nodes:
     provenance:
       source: "tm.sh item.read SAC-239 e git log do core"
       locator: "campo state da issue; commit 704c8ebf em .github/workflows/onion-review.yml"
-      method: "medição: leitura da issue pelo adapter executável e git log -S do sha do pin"
+      method: "measurement: leitura da issue pelo adapter executável e git log -S do sha do pin"
       locality: "web"
   - id: E_HOOKS_DO_CORE_E_ADOTANTES_NAO_SAO_SO_ASPAS_1024
     node_type: evidence
@@ -114,7 +114,7 @@ nodes:
     provenance:
       source: ".claude/settings.json do core e dos clones locais de adotantes e portas"
       locator: "campo command de cada hook"
-      method: "medição: leitura do JSON por python, contagem dos comandos que começam por aspas"
+      method: "measurement: leitura do JSON por python, contagem dos comandos que começam por aspas"
       locality: "host"
   - id: E_SANDBOX_FORA_DO_CORE_E_BWRAP_BARRADO_NO_HOST_1024
     node_type: evidence
@@ -129,7 +129,7 @@ nodes:
     provenance:
       source: ".claude/settings.json, sysctl e bwrap no host"
       locator: "chave sandbox ausente; kernel.apparmor_restrict_unprivileged_userns"
-      method: "medição: grep no core, sysctl e execução do bwrap"
+      method: "measurement: grep no core, sysctl e execução do bwrap"
       locality: "host"
   - id: E_MONITOR_E_SONO_LONGO_SEM_EFEITO_NO_HOST_DE_API_DIRETA_1024
     node_type: evidence
@@ -144,7 +144,7 @@ nodes:
     provenance:
       source: "settings de usuário, .github/workflows/onion-review.yml e grep no core"
       locator: "chaves de env; input anthropic_api_key"
-      method: "medição: leitura das chaves (só nomes) e grep"
+      method: "measurement: leitura das chaves (só nomes) e grep"
       locality: "host"
   - id: E_COMPACTACAO_E_ELICITACAO_NAO_INTERATIVAS_SO_COM_A_SUBIDA_1024
     node_type: evidence
@@ -159,7 +159,7 @@ nodes:
     provenance:
       source: "ops/mcp-onion-* e .claude"
       locator: "grep por elicit"
-      method: "medição: grep no core e a tabela de versões do censo"
+      method: "measurement: grep no core e a tabela de versões do censo"
       locality: "repo"
   - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1024
     node_type: evidence
@@ -174,7 +174,7 @@ nodes:
     provenance:
       source: ".claude/settings.json, settings de usuário e grep no core"
       locator: "chaves cleanupPeriodDays e defaultMode; ls .claude; grep Claude Tag"
-      method: "medição: leitura do JSON por python, ls e grep"
+      method: "measurement: leitura do JSON por python, ls e grep"
       locality: "repo"
   - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_310_1024
     node_type: evidence
@@ -189,7 +189,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "família cited_directive"
-      method: "medição: execução da família da bancada no host"
+      method: "measurement: execução da família da bancada no host"
       locality: "host"
   - id: E_REVISOR_SEM_SANITIZAR_ARROBA_NO_PIN_V1_0_260_1024
     node_type: evidence
@@ -204,7 +204,7 @@ nodes:
     provenance:
       source: ".github/workflows/onion-review.yml e .claude/utils/forge/post-review-comment.sh"
       locator: "linhas 288 e 430 do workflow; linhas 113 e 119 do script"
-      method: "medição: grep no core e gh run view das execuções do workflow"
+      method: "measurement: grep no core e gh run view das execuções do workflow"
       locality: "repo"
   - id: Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024
     node_type: question
@@ -224,7 +224,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-25: «Como fecha a SAC-239, com o revisor do CI sem crédito por decisão de 2026-10-01?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
   - id: C_SUPERACAO_20261024_A_SUBIDA_SE_JUSTIFICA_PELA_COMPACTACAO
     node_type: claim
@@ -239,7 +239,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024"
-      method: "juízes: subagente opus independente, critério CU3"
+      method: "judges: subagente opus independente, critério CU3"
       locality: "repo"
   - id: C_SUPERACAO_20261024_REVISOR_COM_PIN_E_SEM_EXECUCAO
     node_type: claim
@@ -254,7 +254,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA de E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024"
-      method: "juízes: subagente opus independente, critério CU2"
+      method: "judges: subagente opus independente, critério CU2"
       locality: "repo"
   - id: C_SUPERACAO_20261024_A_PERGUNTA_DA_R17_FOI_RESPONDIDA
     node_type: claim
@@ -269,7 +269,7 @@ nodes:
     provenance:
       source: "data/judge-verdicts.json"
       locator: "veredito EXAGERA da superação de r17#Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023"
-      method: "juízes: subagente opus independente, critério CU4"
+      method: "judges: subagente opus independente, critério CU4"
       locality: "repo"
   - id: E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_262_1024
     node_type: evidence
@@ -284,7 +284,7 @@ nodes:
     provenance:
       source: "https://github.com/anthropics/claude-code-action/compare/v1.0.260...v1.0.262"
       locator: "base-action/action.yml e src/entrypoints/run.ts (versão do CLI); tabela de versões do cc-delta-census.sh"
-      method: "medição: --version do binário servido pelo censo e API do GitHub (ref da tag e compare)"
+      method: "measurement: --version do binário servido pelo censo e API do GitHub (ref da tag e compare)"
       locality: "host"
 edges:
   - from: E_DELTA_DA_RODADA

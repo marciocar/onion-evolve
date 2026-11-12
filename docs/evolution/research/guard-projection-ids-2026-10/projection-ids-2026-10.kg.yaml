@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o7-juiz-resumo.md"
       locator: "§Itens para o maestro, A3 (os quatro ids com o nome privado); o4-resumo.md item 8 e o4-juiz-resumo.md M6 (o grafo e a REGRA 30 não olhar ids)"
-      method: "medição: P7 rodado sobre as versões de origin/main e06d2fae, depois da leitura dos resumos das ondas O4 e O7"
+      method: "measurement: P7 rodado sobre as versões de origin/main e06d2fae, depois da leitura dos resumos das ondas O4 e O7"
       locality: "repo"
 
   - id: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: ".claude/validation/projection-safety.sh"
       locator: "bloco P7 (kg_ids_audit) e a chamada em lint-artifacts.sh check_projection_safety"
-      method: "leitura: o artefato escrito nesta forja, conferido contra o censo de guardas"
+      method: "reading: o artefato escrito nesta forja, conferido contra o censo de guardas"
       locality: "repo"
 
   - id: E_SEIS_CASOS_SEIS_MUTANTES_MORDEM
@@ -56,7 +56,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_projection_safety_selftests, bloco P7 (casos P7a a P7f)"
-      method: "medição: bancada e seis mutantes rodados nesta sessão"
+      method: "measurement: bancada e seis mutantes rodados nesta sessão"
       locality: "repo"
 
   - id: E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA
@@ -73,7 +73,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml"
       locator: "meta (comentário RENOME e external_edges); narratives 'id anterior' nos 4 nós renomeados"
-      method: "medição: radar, contrato e gate rodados depois do renome"
+      method: "measurement: radar, contrato e gate rodados depois do renome"
       locality: "repo"
 
   - id: C_TETO_VOCABULARIO_E_LABEL
@@ -109,7 +109,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_projection_safety_selftests (P7a-P7j), run_harvest_residue_selftests (f, f2), run_kg_contract_check_selftests (k1-k3)"
-      method: "medição: bancada e mutantes rodados nesta sessão depois do parecer do refutador"
+      method: "measurement: bancada e mutantes rodados nesta sessão depois do parecer do refutador"
       locality: "repo"
 
   - id: E_P8_DEFAULT_DO_HOME_LIDO_EM_QUALQUER_REPO
@@ -127,7 +127,7 @@ nodes:
     provenance:
       source: "brain-granaai@bd769f168411 (branch chore/onion-update-bd769f168411), cópia local sem histórico; projection-safety.sh e lint-artifacts.sh de origin/main bd769f16"
       locator: "linha CLIENT_TERMS_FILE do projection-safety.sh (P8) e check_vendored_surface_clean do lint-artifacts.sh (bloco --emit-declared)"
-      method: "medição: lint completo antes e depois da troca dos dois scripts, contando as linhas [vendor-scrub] e o sumário HARD"
+      method: "measurement: lint completo antes e depois da troca dos dois scripts, contando as linhas [vendor-scrub] e o sumário HARD"
       locality: "host"
 
   - id: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
@@ -154,7 +154,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_client_terms_selftests, casos (e) a (h)"
-      method: "medição: bancada por família e lint completo na cópia do adotante, nesta sessão"
+      method: "measurement: bancada por família e lint completo na cópia do adotante, nesta sessão"
       locality: "repo"
 
   - id: C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP
@@ -180,7 +180,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «Como pseudonimizar os nomes de pessoas na árvore pública do core (members.yaml e onde mais aparecerem)?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
 
   - id: E_TROCA_DE_NOMES_POR_PAPEL_CONTADA
@@ -198,7 +198,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/members.yaml e os 24 outros arquivos da troca"
       locator: "contagem do script de troca, por arquivo e por papel"
-      method: "medição: contagem das substituições e busca das formas antigas na árvore rastreada, nesta sessão"
+      method: "measurement: contagem das substituições e busca das formas antigas na árvore rastreada, nesta sessão"
       locality: "repo"
   - id: D_EXEMPLO_DE_FORNECEDOR_FICTICIO
     node_type: decision
@@ -214,7 +214,7 @@ nodes:
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-13: «O nome de uma empresa real de birô de crédito ainda aparece em ~70 pontos de 4 arquivos de compliance que viajam (iso-22301, soc2, security-information-master e o template iso22301), como exemplo real de due diligence. O que fazer?»"
-      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
 
   - id: E_TROCA_DO_FORNECEDOR_FICTICIO_CONTADA
@@ -232,7 +232,7 @@ nodes:
     provenance:
       source: "os 6 arquivos da troca"
       locator: "contagem por grep -o -i antes e depois, por arquivo"
-      method: "medição: contagem das ocorrências e busca do nome real na árvore rastreada, nesta sessão"
+      method: "measurement: contagem das ocorrências e busca do nome real na árvore rastreada, nesta sessão"
       locality: "repo"
 
 edges:

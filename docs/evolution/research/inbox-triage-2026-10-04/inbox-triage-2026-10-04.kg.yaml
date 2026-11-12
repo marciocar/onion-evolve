@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/durable-commit.sh"
       locator: "durable-commit.sh l.59 lido (git add sem -f e stderr engolido); defeito reproduzido em bancada (durable_commit g2: sem a lista o arquivo novo ignorado some com rc=0)"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      method: "reading: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
   - id: D_EXIGIDOS_ATRAVESSAM_O_GITIGNORE
@@ -51,7 +51,7 @@ nodes:
     provenance:
       source: "docs/evolution/federation/outbox/brain-granaai/_processed/2026-10-05-update-perdia-arquivo-novo-curado.md · docs/evolution/review/fix-adopt-vendor-ignored-new-files.md · commit dfdfa52d"
       locator: "outbox ...curado.md:40 ('adotantes desta máquina com a perda hoje (22 com pin conhecido) | 0 — vocês já tinham se curado') · docs/evolution/federation/CHANGELOG.md:97 (mesma linha) · resíduo §'Os confirmed dos grafos' (nó nasceu no PR #918)"
-      method: "testemunho: medição da sessão 2026-10-04/05 (nó nascido no commit dfdfa52d, PR #918), comando descrito no verified_against mas não registrado verbatim"
+      method: "testimony: medição da sessão 2026-10-04/05 (nó nascido no commit dfdfa52d, PR #918), comando descrito no verified_against mas não registrado verbatim"
       locality: "repo"
 
   - id: C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA
@@ -67,7 +67,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/durable-commit.sh"
       locator: "grep dos chamadores do durable-commit: so o vendor-branch update passa ONION_REQUIRED_LIST"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO
@@ -83,7 +83,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/clickup.md"
       locator: "medido PELO HUB contra o adapter do pin 663fdbc5bdcc no workspace real, tasks de teste criadas e apagadas (GET final 404); nao re-medido no core"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
   - id: Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO
@@ -97,7 +97,7 @@ nodes:
     provenance:
       source: ".claude/utils/task-manager/adapters/clickup.md"
       locator: ".claude/utils/task-manager/adapters/clickup.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
 
 edges:

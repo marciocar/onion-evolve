@@ -3,7 +3,6 @@
   "id": "plugin-directory-landscape-2026-09",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 17,
     "form.range.node.label": 7
   }
 }

@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "l.72-77 (source: TIER 0 — o core (onion-evolve); note: meta-factory create-*/adopt/federation-*/evolve/graph/inventory core-only) + .claude/skills/onion-onboarding/SKILL.md l.41-42 (\"sem stamp = source\") + decouple-source.sh l.9-10 (\"o core original (que não tem stamp)\")"
-      method: "leitura: roles.yaml + skill de onboarding + cabeçalho do decouple-source.sh"
+      method: "reading: roles.yaml + skill de onboarding + cabeçalho do decouple-source.sh"
       locality: "repo"
   - id: ROLE_hub
     node_type: entity
@@ -35,7 +35,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "l.79-89 (hub: TIER 1 — adoção de EMPRESA, autoridade sobre os PRÓPRIOS projetos; Camada 1 source-only \"Hub USA, nao autora\"; Camada 2 aberta; role: hub via --promote-hub)"
-      method: "leitura: roles.yaml (3 camadas de capacidade) + /meta:adopt --promote-hub"
+      method: "reading: roles.yaml (3 camadas de capacidade) + /meta:adopt --promote-hub"
       locality: "repo"
   - id: ROLE_standalone
     node_type: entity
@@ -48,7 +48,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "l.91-95 (standalone: TIER 3 — dev solo com ferramenta COMPLETA, SEM federação; work_tools full; downstream false \"sem sub-adotados\") + arestas do próprio grafo l.174-176 (ROLE_standalone DEPENDS_ON TX_create DEPENDS_ON ROLE_source)"
-      method: "leitura: roles.yaml + arestas de transição do grafo de topologia"
+      method: "reading: roles.yaml + arestas de transição do grafo de topologia"
       locality: "repo"
   - id: ROLE_consumer
     node_type: entity
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "l.97-101 (consumer: TIER 2 — \"minimo (adota um hub, nao o core)\", downstream false) + .claude/commands/meta/adopt.md l.68 (role: adopted = consumidor, FED-3-1)"
-      method: "leitura: mapa role→bundle (roles.yaml) + PASSO 0 do /meta:adopt"
+      method: "reading: mapa role→bundle (roles.yaml) + PASSO 0 do /meta:adopt"
       locality: "repo"
   - id: ROLE_distilled
     node_type: entity
@@ -74,7 +74,7 @@ nodes:
     provenance:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "l.103-107 (distilled: \"NAO vendoriza nem instala — destilacao curada (onion-mini, prompt-as-bytecode)\") + docs/business-context/02-product/strategy.md l.46 (\"onion-mini (porta/teaser)\")"
-      method: "leitura: roles.yaml + estratégia de produto"
+      method: "reading: roles.yaml + estratégia de produto"
       locality: "repo"
   - id: ROLE_decoupled_source
     node_type: entity
@@ -87,7 +87,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/decouple-source.sh"
       locator: "l.3-10 (cabeçalho: adotado/hub vira FONTE SOBERANA própria (own T0); adopted_from→decoupled_from; role→source; autora o próprio framework; NÃO recebe mais --update; \"A fonte é soberana de quem a usa\" no limite)"
-      method: "leitura: cabeçalho do mecanismo decouple-source.sh"
+      method: "reading: cabeçalho do mecanismo decouple-source.sh"
       locality: "repo"
 
   # ---- AUTORIDADE DE PESSOA (entity, prefixo AUTH_) — dimensao ORTOGONAL aos tiers de REPO acima ----
@@ -105,7 +105,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
       locator: "l.114-119 (§\"Sinal 8 — responsabilidades assimétricas + autorização de fala com o core\") + .claude/skills/onion-onboarding/SKILL.md l.49-60 + corpo do commit daee2dee (#497)"
-      method: "leitura: sinal do relay 2026-07-30 (inbox processado) + skill de onboarding que projeta a fronteira"
+      method: "reading: sinal do relay 2026-07-30 (inbox processado) + skill de onboarding que projeta a fronteira"
       locality: "repo"
 
   # ---- TRANSIÇÕES (decision) — os movimentos; trace: = o procedimento REAL (o scaffold) ----
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: ".claude/commands/meta/adopt.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: TX_adopt
     node_type: decision
@@ -135,7 +135,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: ".claude/commands/meta/adopt.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: TX_promote_hub
     node_type: decision
@@ -149,7 +149,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: ".claude/commands/meta/adopt.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: TX_update
     node_type: decision
@@ -163,7 +163,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: ".claude/commands/meta/adopt.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: TX_invite
     node_type: decision
@@ -177,7 +177,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/invite-collaborator.sh"
       locator: ".claude/utils/adopt/invite-collaborator.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: TX_transfer
     node_type: decision
@@ -191,7 +191,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/transfer-ownership.sh"
       locator: ".claude/utils/adopt/transfer-ownership.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   - id: TX_decouple
     node_type: decision
@@ -205,7 +205,7 @@ nodes:
     provenance:
       source: ".claude/utils/adopt/decouple-source.sh"
       locator: ".claude/utils/adopt/decouple-source.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      method: "derived: trace do nó, sem registro de medição"
       locality: "repo"
   # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
   - id: E_REVERIFY_SOURCE_TAMBEM_E_A_PORTA_1027

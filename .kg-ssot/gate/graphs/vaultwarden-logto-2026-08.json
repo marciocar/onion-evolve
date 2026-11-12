@@ -3,7 +3,6 @@
   "id": "vaultwarden-logto-2026-08",
   "must": [],
   "should": {
-    "form.deprecated.node.provenance.method": 11,
     "form.range.node.label": 9,
     "form.required.node.provenance": 1,
     "yaml.unquoted-date": 1
