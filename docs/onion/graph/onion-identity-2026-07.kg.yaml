@@ -22,7 +22,7 @@ external_edges:
   # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
   - from: "docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml#E_FALLBACK_SERIAL_RODA"
     to: C_M8_FECHA_SO_UM_TERCO
-    edge_type: SUPERSEDES
+    edge_type: SUPPORTS
 nodes:
   # ---- perguntas de pesquisa (F2) ----
   - id: Q_IDENTITY
@@ -1220,10 +1220,15 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.8
-    status: superseded
-    verified_at: "2026-08-30"
+    status: confirmed
     verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): O nó C_M8_FECHA_SO_UM_TERCO é uma declaração de TETO/escopo escrita ANTES de rodar o item M8 do menu da refinaria — descreve o que M8 vai (e não vai) responder. O trabalh"
     label: "GATILHO DECLARADO, com o teto junto: o item M8 do menu da refinaria (corrida serial reescopada, ~300k tokens) fecha UM dos tres numeros — mede se o FALLBACK SERIAL (orchestration-fallback.md, escrito, testavel, e que NUNCA RODOU nem uma vez) de fato executa. Isso responde 'a rede de seguranca da portabilidade e real ou ficcao?', que e a metade viva do custo-de-sair. NAO fecha o custo do porte de 2026-05 (retrospectivo, evidencia primaria evaporada) nem o inventario do que se perdeu. Declarar o teto AQUI e o ponto: sem isso, rodar o M8 seria lido como 'lacuna fechada' e ela voltaria a ser invisivel — trocando uma redescoberta por um FALSO ENCERRAMENTO, que e pior"
+    verified_at: "2026-11-12"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml"
+      locator: "E_FALLBACK_SERIAL_RODA"
+      method: "reading: o refutador independente leu o nó e a evidência do M8 rodado, 2026-11-12"
+      locality: "repo"
   - id: D_NORTHSTAR_NS1_KG
     node_type: decision
     layer: audit
