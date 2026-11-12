@@ -172,7 +172,8 @@ jobs:
     # a soma dela pedindo ~15 min por worker. O modelo da soma/W estava errado: a fila do `--jobs` anda na
     # ORDEM DO SCRIPT, a `selftest_selection` (posição 130, ~11 a 16 min sozinha) só começava depois da fatia
     # da `fixtures` e de outras famílias, e a faixa acabava com 3 workers parados. O plano agora SIMULA a fila
-    # (erro de ±3% nas 35 faixas de 7 runs completos), a tabela é a mediana desses 7 runs, e são 6 faixas: o
+    # (±3% nas 35 faixas de 7 runs completos com os tempos do próprio run; pela mediana, de −18% a +43% por
+    # faixa), a tabela é a mediana desses 7 runs, e são 6 faixas: o
     # piso da faixa da `selftest_selection` é a fatia da `fixtures` + ela, e só cai com mais faixas.
     # O caso (h) da `shard_plan` reprova se a faixa mais pesada, projetada pelo PRÓPRIO plano
     # (`selftest-shard-plan.sh --project`) no N deste arquivo, passar de 75% do teto do passo (23 min).
