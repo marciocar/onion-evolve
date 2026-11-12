@@ -140,6 +140,8 @@ VALIDATION=(
   # o medidor da triagem em lote (2026-11-12, D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111), que o decide-census chama com --triage
   ".claude/validation/decide-triage.sh"
   ".claude/validation/kg-decide-seal.sh"
+  # o estado do modo Delphi (2026-11-12, D_FORGE_DELPHI_MODE_IN_DECIDE_1111), que a seção "Modo Delphi" do decide.md cita
+  ".claude/validation/decide-delphi.sh"
   # o painel OPCIONAL do /meta:decide (2026-10-21, D_INTELLIGENT_UI_1021): a rodada em JSON, a volta das
   # respostas pelo mesmo selador e a página que a sessão publica como Artifact. A superfície cita os dois.
   ".claude/validation/decide-panel.sh"
