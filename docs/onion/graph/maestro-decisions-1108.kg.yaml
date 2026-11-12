@@ -311,10 +311,12 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 4
-    confidence: 0.5
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "E_MD_SANDBOX_UPDATE_1552_MEASURED_1112"
     label: "Medir, antes de valer como rotina, o update que altera settings.json sob o sandbox da curadoria; o próximo traz o deny do PR #1552."
     narrative: "Pronto quando: o update que traz o deny foi rodado sob sandbox e o resultado está registrado, com o caminho de reset e restore por SSH conferido. Prazo a calibrar: sai de pontos e histórico, que ainda não existem. Espelho no Linear: SAC-373."
   - id: E_MD_MAESTRO_ROUND_1109
@@ -454,6 +456,22 @@ nodes:
       source: "maestro, por pergunta com opções, relatada pela sessão do core"
       locator: "mensagem da sessão do core de 2026-11-09: «Manter as 12 e avisar sandbox»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-09"
+  - id: E_MD_SANDBOX_UPDATE_1552_MEASURED_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "git merge-base --is-ancestor no core (merge do #1552 = 04fb54e37129) e leitura do permissions.deny no settings.json da curadoria, 2026-11-12"
+    label: "O update com o deny do PR #1552 rodou sob o sandbox da curadoria: a escrita do settings.json foi negada e a sincronização passou por reset e restore via SSH."
+    narrative: "Duas metades. A da curadoria: o nó E_SANDBOX_SETTINGS_SSH_RESET_RESTORE_1112 no grafo sandbox-first-line-2026-11 dela (commit 0b6cefc, PR 281 de lá) registra que o update que altera settings.json reprova sob o sandbox e que a sincronização é reset e restore por SSH, medido em vários merges; ela declarou o vínculo com o #1552 como não verificado. A do core fecha esse vínculo: o pin 04fb54e37129, que a curadoria aplicou em 2026-11-09, é o próprio commit de merge do #1552, e o pin seguinte (9c660e74a353) o contém; o settings.json dela traz hoje as entradas do deny (push forçado, filter-branch, clean com -x, rm recursivo da raiz, leitura de .env e de credenciais)."
+    provenance:
+      source: "sessão de curadoria (relato de 2026-11-12) e medição do core"
+      locator: "sandbox-first-line-2026-11#E_SANDBOX_SETTINGS_SSH_RESET_RESTORE_1112; gh pr view 1552 --json mergeCommit"
+      method: "measurement: ancestralidade git do merge do #1552 e leitura do permissions.deny, 2026-11-12"
+      locality: repo
 edges:
   - from: D_MD_DENY_KEEP_AND_WARN_SANDBOX_1109
     to: D_MD_DENY_DROP_WHAT_MACHINERY_READS_1109
@@ -524,6 +542,9 @@ edges:
   - from: Q_MD_SETTINGS_UPDATE_UNDER_SANDBOX_1108
     to: D_MD_SANDBOX_CURATION_WITH_LIMIT_1108
     edge_type: TRACES_TO
+  - from: E_MD_SANDBOX_UPDATE_1552_MEASURED_1112
+    to: Q_MD_SETTINGS_UPDATE_UNDER_SANDBOX_1108
+    edge_type: SUPPORTS
   - from: D_MD_GRAPH_HYGIENE_RATCHET_SCOUT_1109
     to: E_MD_MAESTRO_ROUND_1109
     edge_type: TRACES_TO
