@@ -9,7 +9,7 @@ findings_blocking: 3
 tokens: 0
 duration_min: 120
 findings_fixed: 7
-verdict: REPROVADO_E_CURADO
+verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: "subagente refutador independente lançado pela sessão do core (mandato REFUTAR), provas em scratch-1111/refute-baton/; curas pelo agente de execução"
 nota: "tokens 0 = não medido (o agente de execução não vê o próprio consumo nem o do refutador); duration_min é aproximado, forja mais cura. 10 achados do refutador: 3 bloqueantes curados com caso e mutante (2) ou regeneração (1), 4 limites baratos curados, 3 limites declarados (não curados, por desenho). Antes dele, a passada própria pelo dogfood achou e curou 3 defeitos, descritos no corpo."
