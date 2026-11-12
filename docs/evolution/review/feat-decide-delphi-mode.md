@@ -3,16 +3,16 @@ branch: feat/decide-delphi-mode
 pr: pendente
 date: 2026-11-12
 reviewed_diff_sha256: pendente
-findings_total: 5
-findings_real: 5
-findings_blocking: 1
-tokens: 0
-duration_min: 0
-findings_fixed: 3
+findings_total: 16
+findings_real: 16
+findings_blocking: 3
+tokens: 145223
+duration_min: 173
+findings_fixed: 5
 verdict: REJECTED_AND_FIXED
-elenxo: false
-reviewer: o próprio construtor, numa passada adversarial sobre o diff (o brief desta execução proibiu lançar agentes; o refutador independente fica para a sessão principal antes do PR)
-nota: "tokens e duration_min 0 = não medidos. Sem refutador independente: elenxo false, declarado. Os 5 achados são da passada do construtor e do dogfood"
+elenxo: true
+reviewer: "passada do construtor e refutador independente (subagente opus, sessão principal, 2026-11-12)"
+nota: "tokens e duration_min são do refutador independente (a passada do construtor não foi medida). O refutador ficou cerca de 3h preso num tool_use sem resultado antes de fechar o veredito, o que infla duration_min"
 ---
 
 # Passada adversarial: `feat/decide-delphi-mode`
@@ -47,6 +47,30 @@ Forja do **modo Delphi** do `/meta:decide` (`D_FORGE_DELPHI_MODE_IN_DECIDE_1111`
 5. **Limite.** O nome de quem objetou é conferido por palavra inteira; "onion-core" conta como "core", e a
    conferência prova a presença do nome, não a fidelidade do dissenso.
 
+### Refutador independente (2026-11-12): REJECTED, 2 bloqueiam e 9 limites, os 2 curados pela sessão principal
+
+6. **Bloqueante, curado.** A narrative que vai ao selo dizia "posições independentes" mesmo com posição tardia e
+   sem rodada 2 de quem respondeu (prova do refutador: `synth-late.txt`). A marca tardia só ia à tabela, que não
+   entra no nó. Cura: a narrative diz "independência PARCIAL" e nomeia sem rodada 1, posição tardia, sem rodada
+   2 e troca por `--replace`. Prova: (d9), com mutante.
+7. **Bloqueante, curado.** Objeção da rodada 3 trocada por aceite com `--replace` sumia do estado e da síntese.
+   Cura: a resposta anterior vai para `history`, a síntese mostra a objeção retirada cercada e a narrative nomeia
+   quem a retirou. Prova: (d10), com dois mutantes (sem histórico; sem a recusa da resposta repetida, que antes
+   sobrevivia).
+8. **Limite, declarado na doutrina.** O `<id>.json` guarda sal e autor, e outra sessão do mesmo usuário o lê.
+9. **Limite, declarado na doutrina.** Comparar o `anon --partial` com o completo mostra quem chegou depois.
+10. **Limite.** A rodada 2 é aceita de quem não fez a rodada 1; agora a narrative nomeia quem ficou sem rodada 1.
+11. **Limite.** `--absent c,c` não deduplica.
+12. **Limite.** `--absent` permite fechar com uma só voz, desde que os ausentes fiquem nomeados.
+13. **Limite.** A conferência do dissenso por palavra inteira casa nome curto como `a` (já declarado).
+14. **Limite.** `chmod 700` num `ONION_DELPHI_DIR` preexistente o fecha.
+15. **Limite.** A confiança vem da primeira linha `confiança:`, mesmo dentro de citação.
+16. **Limite.** A bancada não cobre `propose` depois da rodada 3, `--absent` de quem respondeu e a rodada 3 sem
+    `--stance`. A marca tardia e a recusa da resposta repetida passaram a ser cobertas por (d9) e (d10).
+
+Resistiu ao refutador: a cerca R15.2 (nenhum `/tmp/pwned*` criado), os ids maliciosos (rc 2), as permissões
+700/600, a narrative em YAML válido com caracteres difíceis e a ordem do anon presa ao sal.
+
 ## Mutantes
 
 Dez mutantes plantados pelo `ops/mutate-and-restore.sh` no `decide-delphi.sh` real, cada um contra
@@ -74,3 +98,6 @@ nenhum grafo real tocado).
 - O anonimato é dos metadados; o texto pode denunciar o autor, e reescrever é da condutora.
 - `--from` é declaração da condutora: o estado não prova que a resposta veio da sessão nomeada.
 - Sem refutador independente nesta execução (o brief proibiu lançar agentes).
+
+Depois da cura do refutador: `--families decide_delphi` com 10 casos (d1–d10), 0 falhas; mutantes novos `limpo = True`
+(d9), sem `history` (d10a) e sem a recusa da resposta repetida (d10b) mortos.

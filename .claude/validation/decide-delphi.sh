@@ -229,7 +229,12 @@ if mode == "record":
         warn(f"rodada 1 de {p} com {lines} linhas (a forma pede até 15)")
     ent = {"text": text, "confidence": conf, "sha256": hashlib.sha256(text.encode()).hexdigest()}
     if r == 3: ent["stance"] = stance
-    if p in got: ent["replaced"] = True; warn(f"{p} trocou a resposta da rodada {r} (--replace)")
+    if p in got:
+        prev = got[p]
+        hist = list(prev.get("history", []))
+        hist.append({k: prev.get(k) for k in ("text", "confidence", "sha256", "stance", "late")})
+        ent["replaced"] = True; ent["history"] = hist
+        warn(f"{p} trocou a resposta da rodada {r} (--replace): a anterior fica no histórico e a síntese a nomeia")
     if r in st.get("anon_emitted", []):
         ent["late"] = True
         warn(f"{p} respondeu a rodada {r} DEPOIS do anon dela: a posição pode não ser independente (marcada tardia no status e na síntese)")
@@ -344,11 +349,30 @@ if mode == "synthesis":
         out += ["Nenhuma sessão objetou na rodada 3." + (" Nota do condutor: " + defang(dissent) if dissent else ""), ""]
     if absent:
         out += [f"Não responderam e ficam nomeados: {', '.join(absent)}.", ""]
+    for p in ps:
+        for i, h in enumerate(r3.get(p, {}).get("history", [])):
+            if h.get("stance") == "object":
+                out += [f"### {p} · objeção RETIRADA por troca (--replace, versão {i+1})", fence(f"delphi/{did}/r3/{p}/v{i+1}", h["text"]), ""]
     out += ["## Confiança por rodada", "", "| participante | rodada 1 | rodada 2 | rodada 3 |", "|---|---|---|---|"]
     for p in ps:
         out.append(f"| {p} | {cf(1,p)} | {cf(2,p)} | {cf(3,p)} |")
-    nar = (f"Delphi {did} em 3 rodadas (posições independentes, crítica cruzada sem autor, convergência), "
-           f"participantes {', '.join(ps)}. Rodada 3: aceitaram {', '.join(aceites) or 'nenhum'}"
+    sem_r1 = [x for x in ps if x not in rnd(st, 1)]
+    tardias = [f"{x} (rodada {r})" for r in (1, 2) for x in ps if rnd(st, r).get(x, {}).get("late")]
+    sem_r2 = [x for x in ps if x not in rnd(st, 2)]
+    retirou = [x for x in ps if any(h.get("stance") == "object" for h in r3.get(x, {}).get("history", []))
+               and r3.get(x, {}).get("stance") != "object"]
+    trocas = [f"{x} (rodada {r})" for r in (1, 2, 3) for x in ps if rnd(st, r).get(x, {}).get("history")]
+    limpo = not (sem_r1 or tardias or sem_r2)
+    forma = ("posições independentes, crítica cruzada sem autor, convergência" if limpo
+             else "independência PARCIAL: veja as ressalvas desta narrative")
+    ressalvas = ""
+    if sem_r1: ressalvas += f" Sem posição na rodada 1: {', '.join(sem_r1)}."
+    if tardias: ressalvas += f" Posição tardia, gravada depois do anon e portanto não independente: {', '.join(tardias)}."
+    if sem_r2: ressalvas += f" Sem crítica na rodada 2: {', '.join(sem_r2)}."
+    if trocas: ressalvas += f" Trocaram a resposta (--replace): {', '.join(trocas)}."
+    if retirou: ressalvas += f" Retiraram objeção da rodada 3 por troca: {', '.join(retirou)}."
+    nar = (f"Delphi {did} em 3 rodadas ({forma}), "
+           f"participantes {', '.join(ps)}.{ressalvas} Rodada 3: aceitaram {', '.join(aceites) or 'nenhum'}"
            + (f"; objetaram {', '.join(objetores)}" if objetores else "; sem objeção")
            + (f"; não responderam {', '.join(absent)}" if absent else "") + ". "
            + "Confiança na rodada 3: " + ", ".join(f"{p} {cf(3,p)}" for p in ps if p in r3) + ". "

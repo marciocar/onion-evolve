@@ -54903,6 +54903,47 @@ run_decide_delphi_selftests() {
   if [ -z "${_db}" ]; then record_pass "decide-delphi: (d7) rodada 2 recusada antes do anon da 1, anon incompleto só com --partial; (MUT) sem cada recusa, passa"
   else record_fail "decide-delphi: (d7)" "${_db}"; fi
 
+  # (d9) a narrative que vai ao selo NÃO afirma independência que não houve: posição gravada depois do anon fica nomeada
+  #      como tardia NA narrative (não só na tabela). Mutante: a forma sempre "limpa".
+  _dlp_d9_case() {  # $1=SUT $2=dir → rc 0 se a narrative declara a independência parcial e nomeia a tardia
+    _dlp_r1 "$1" "$2" >/dev/null 2>&1 || return 1
+    _dlp "$1" "$2" anon dt --round 1 --partial >/dev/null 2>&1 || return 1
+    _dlp "$1" "$2" record dt --round 1 --from sessao-gama --file "${sb}/c1" >/dev/null 2>&1 || return 1
+    local p o; for p in sessao-alfa sessao-beta sessao-gama; do _dlp "$1" "$2" record dt --round 2 --from "${p}" --file "${sb}/x2" >/dev/null 2>&1 || return 1; done
+    _dlp "$1" "$2" anon dt --round 2 >/dev/null 2>&1 && _dlp "$1" "$2" propose dt --file "${sb}/syn" >/dev/null 2>&1 || return 1
+    for p in sessao-alfa sessao-beta sessao-gama; do _dlp "$1" "$2" record dt --round 3 --from "${p}" --file "${sb}/ok3" --stance accept >/dev/null 2>&1 || return 1; done
+    o="$(_dlp "$1" "$2" synthesis dt | grep '^narrative: ')" || return 1
+    grep -q 'independência PARCIAL' <<< "${o}" && grep -q 'tardia.*sessao-gama (rodada 1)' <<< "${o}" && ! grep -q '(posições independentes' <<< "${o}"
+  }
+  _db=""; _dlp_d9_case "${sut}" "${sb}/d9" || _db="${_db} caso-limpo"
+  if m="$(_dlp_mut d9 '    limpo = not (sem_r1 or tardias or sem_r2)' '    limpo = True')"; then
+    _dlp_d9_case "${m}" "${sb}/d9m" && _db="${_db} MUT-d9-sobreviveu"
+  else _db="${_db} MUT-d9-ancora"; fi
+  if [ -z "${_db}" ]; then record_pass "decide-delphi: (d9) narrative declara independência parcial e nomeia a posição tardia; (MUT) forma sempre limpa"
+  else record_fail "decide-delphi: (d9)" "${_db}"; fi
+
+  # (d10) objeção trocada por aceite com --replace NÃO some: a narrative nomeia quem retirou e a síntese mostra a objeção
+  #       retirada, cercada. E a resposta repetida sem --replace é recusada (rc 2). Mutantes: sem o histórico; sem a recusa.
+  _dlp_d10_case() {  # $1=SUT $2=dir
+    _dlp_full "$1" "$2" object >/dev/null 2>&1 || return 1
+    local o r
+    if o="$(_dlp "$1" "$2" record dt --round 3 --from sessao-gama --file "${sb}/ok3" --stance accept)"; then r=0; else r=$?; fi
+    [ "${r}" -eq 2 ] && grep -q 'já respondeu a rodada 3' <<< "${o}" || return 1
+    _dlp "$1" "$2" record dt --round 3 --from sessao-gama --file "${sb}/ok3" --stance accept --replace >/dev/null 2>&1 || return 1
+    o="$(_dlp "$1" "$2" synthesis dt)" || return 1
+    grep -q '^narrative: .*Retiraram objeção da rodada 3 por troca: sessao-gama' <<< "${o}" \
+      && grep -q 'objeção RETIRADA por troca' <<< "${o}" && grep -q 'objeto ao portao bloqueante' <<< "${o}"
+  }
+  _db=""; _dlp_d10_case "${sut}" "${sb}/d10" || _db="${_db} caso-limpo"
+  if m="$(_dlp_mut d10a '        ent["replaced"] = True; ent["history"] = hist' '        ent["replaced"] = True')"; then
+    _dlp_d10_case "${m}" "${sb}/d10a" && _db="${_db} MUT-d10a-sobreviveu"
+  else _db="${_db} MUT-d10a-ancora"; fi
+  if m="$(_dlp_mut d10b '    if p in got and not opt.get("--replace"):' '    if False:')"; then
+    _dlp_d10_case "${m}" "${sb}/d10b" && _db="${_db} MUT-d10b-sobreviveu"
+  else _db="${_db} MUT-d10b-ancora"; fi
+  if [ -z "${_db}" ]; then record_pass "decide-delphi: (d10) objeção retirada por --replace fica nomeada e cercada; resposta repetida sem --replace recusada; (MUT) sem histórico e sem recusa"
+  else record_fail "decide-delphi: (d10)" "${_db}"; fi
+
   # (d8) o estado mora fora do git, com permissão 700/600.
   _db=""; [ "$(stat -c %a "${sb}/d1" 2>/dev/null)" = 700 ] || _db="${_db} dir-nao-700"
   [ "$(stat -c %a "${sb}/d1/dt.json" 2>/dev/null)" = 600 ] || _db="${_db} json-nao-600"
