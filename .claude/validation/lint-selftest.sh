@@ -57422,7 +57422,11 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
   # (b) a linha da espera em primeiro plano é a do preâmbulo, byte a byte
   _ab_b() { local a want; want="$(grep -m1 -F -- '- Processos longos: ESPERA EM PRIMEIRO PLANO' "${PRE}")"; a="$(_abr "$1" "${d}/brief.md" "${PRE}")"
     AB_WHY="${a:0:200}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"${want}"* ]]; }
-  _abcase "(b) a linha da espera vem copiada do preâmbulo" 'printf '"'"'Regra que mais custou parar agente (copiada do preâmbulo):\n%s\n\n'"'"' "${wait_line}"' 'printf '"'"'Regra que mais custou parar agente (copiada do preâmbulo):\n\n'"'"'' _ab_b
+  _abcase "(b) a linha da espera vem copiada do preâmbulo" '"${wait_line}" "${perm_line}"' '"" "${perm_line}"' _ab_b
+  # (f) a linha da aprovação humana (rm -rf por variável pendura o subagente, 2026-11-12) vem copiada, byte a byte
+  _ab_f() { local a want; want="$(grep -m1 -F -- '- **NADA QUE PEÇA APROVAÇÃO HUMANA.**' "${PRE}")"; a="$(_abr "$1" "${d}/brief.md" "${PRE}")"
+    AB_WHY="${a:0:200}"; [ -n "${want}" ] && [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"${want}"* ]]; }
+  _abcase "(f) a linha da aprovação humana vem copiada do preâmbulo" '"${wait_line}" "${perm_line}"' '"${wait_line}" ""' _ab_f
   # (c) brief vazio é rc 2
   _ab_c() { local a; a="$(_abr "$1" "${d}/empty.md" "${PRE}")"; AB_WHY="${a:0:200}"; [ "${a%%|*}" = 2 ] && [[ "${a#*|}" == *"vazio"* ]]; }
   _abcase "(c) brief vazio é recusado (rc 2)" "grep -q '[^[:space:]]' \"\${brief}\" || die2" "true || die2" _ab_c
