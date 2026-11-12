@@ -2,8 +2,7 @@
 branch: docs/seal-ops-check-mold-rules
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 2746277d3675f258b7207ee25d18136d792bf91037d374bf8e3781eae11e83f3
-reviewed_code_sha256: 1c103ab5afe244535cfcb29ebb2440ff879d2509a207905fa3a920d905fb8cf6
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
