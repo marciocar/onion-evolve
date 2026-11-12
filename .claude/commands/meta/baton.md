@@ -65,6 +65,12 @@ que não foi medido: **ausência de linha com lacuna não é zero**. Os PRs, as 
 | `UNREACHABLE` | pid morto, sessão de fundo sem processo, farol órfão, ou farol vivo fora da lista do harness | não pergunta; reporta |
 | `PARK_UNMEASURED` | o `parked.tsv` existe e não se lê: fail-closed, toda sessão alcançável sai aqui | pergunta o estado, **sem** oferta; a lacuna vai ao maestro |
 
+Subagentes das sessões vivas, pelo fim do transcript (`<projects>/*/<sessão>/subagents/agent-<id>.jsonl`): `AGENT_STALLED`
+(`tool_use` sem `tool_result` há mais de `--stall-min`, padrão 15), `AGENT_RUNNING`, `AGENT_DONE` (texto final ou
+interrupção pelo humano) e `AGENT_UNMEASURED` (transcript ilegível). A classe mede o **sintoma**, não a causa: diz em que
+comando travou, não por quê, nem se o processo ainda vive. Diante de um `AGENT_STALLED`, olhe o comando pendente e
+reporte à sessão dona; não mate nem reinicie o agente por ela.
+
 ## Procedimento
 
 1. **MEDIR.** O pulso injetado acima mede sem a conversa. Para a lista de peers, o medidor usa `claude agents --json`

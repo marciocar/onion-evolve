@@ -57754,6 +57754,50 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     [ "$(printf '%s\n' "${q}" | wc -l)" -gt 1 ] && grep -q 'sem --last-sha' <<< "${q}" && ! grep -q '· sem mudança' <<< "${q}"; }
   _bpcase "(h) --quiet só com --since fala: «sem mudança» exige o sha igual" \
     "changed = (not last_sha) or last_sha != sha or bool(events)" "changed = (bool(last_sha) and last_sha != sha) or bool(events) or (not last_sha and since_ts is None)" _bp_h
+  # (i)-(l) subagentes das sessões vivas (SAC-421, 2026-11-12): transcripts sintéticos em <proj>/p/sid-alpha/subagents/.
+  #     O sintoma medido é o fim do transcript: tool_use sem tool_result há mais de --stall-min ⇒ AGENT_STALLED.
+  local ag="${sb}/proj/p/sid-alpha/subagents"; mkdir -p "${ag}"
+  python3 - "${ag}" <<'BP_AG'
+import json, sys
+d = sys.argv[1]
+def a(*b): return json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'content': list(b)}})
+def u(*b): return json.dumps({'type': 'user', 'message': {'role': 'user', 'content': list(b)}})
+tu = lambda i, c: {'type': 'tool_use', 'id': i, 'name': 'Bash', 'input': {'command': c}}
+tr = lambda i: {'type': 'tool_result', 'tool_use_id': i, 'content': 'ok'}
+txt = lambda t: {'type': 'text', 'text': t}
+F = {'stalled': [u(txt('brief')), a(tu('t1', 'ls')), u(tr('t1')), a(txt('vou limpar'), tu('t2', 'rm -rf $P/m1 && mkdir -p $P/m1'))],
+     'running': [u(txt('brief')), a(tu('t1', 'sleep 30'))],
+     'done':    [u(txt('brief')), a(tu('t1', 'ls')), u(tr('t1')), json.dumps({'type': 'api-request'}), a(txt('relatório final'))]}
+for k, L in F.items():
+    open(f'{d}/agent-a{k}.jsonl', 'w').write('\n'.join(L) + '\n')
+    open(f'{d}/agent-a{k}.meta.json', 'w').write(json.dumps({'description': f'agente {k}'}))
+open(f'{d}/agent-abroken.jsonl', 'w').write('{nao e json\n\x00\x01\n')
+# texto do MEIO do turno: gravado numa linha própria com stop_reason tool_use antes do bloco tool_use (forma medida nos transcripts reais)
+open(f'{d}/agent-amidturn.jsonl', 'w').write(u(txt('brief')) + '\n' + json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'stop_reason': 'tool_use', 'content': [txt('vou rodar')]}}) + '\n')
+BP_AG
+  touch -d "@$((NOW - 3600))" "${ag}/agent-astalled.jsonl" "${ag}/agent-adone.jsonl" "${ag}/agent-abroken.jsonl"
+  touch -d "@$((NOW - 60))" "${ag}/agent-arunning.jsonl" "${ag}/agent-amidturn.jsonl"
+  _bp_i() { local a q; a="$(_bpr "$1" --tsv)"; q="$(_bpr "$1" --quiet --last-sha 0000000000000000)"; BP_WHY="$(grep '^agent' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^agent${T}astalled${T}AGENT_STALLED${T}sid-alpha${T}.*tool_use sem tool_result há 60min · pendente: Bash: rm -rf \$P/m1" <<< "${a}" \
+      && grep -q '^- AGENT_STALLED: astalled' <<< "${q}"; }
+  _bpcase "(i) subagente com tool_use sem tool_result além do teto sai AGENT_STALLED com o comando pendente" \
+    "        if age > stall_s: return 'AGENT_STALLED'" "        if False: return 'AGENT_STALLED'" _bp_i
+  _bp_j() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.arunning' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}arunning${T}AGENT_RUNNING${T}sid-alpha${T}.*pendente: Bash: sleep 30" <<< "${a}"; }
+  _bpcase "(j) tool_use pendente mais novo que o teto sai AGENT_RUNNING, nunca parado" \
+    "        if age > stall_s: return 'AGENT_STALLED'" "        if age >= 0: return 'AGENT_STALLED'" _bp_j
+  _bp_k() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.adone' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}adone${T}AGENT_DONE${T}sid-alpha${T}.*agente done · texto final do assistente" <<< "${a}"; }
+  _bpcase "(k) transcript que termina em texto final do assistente sai AGENT_DONE (o tool_use antigo teve resultado)" \
+    "for b in res: pend.pop(b.get('tool_use_id'), None)" "for b in res: pass" _bp_k
+  _bp_l() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.abroken' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}abroken${T}AGENT_UNMEASURED${T}sid-alpha${T}.*NÃO medido" <<< "${a}"; }
+  _bpcase "(l) transcript ilegível sai AGENT_UNMEASURED declarado, nunca «não parado»" \
+    "if not n: return 'AGENT_UNMEASURED'" "if not n: return 'AGENT_DONE'" _bp_l
+  _bp_m() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.amidturn' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}amidturn${T}AGENT_RUNNING${T}sid-alpha${T}" <<< "${a}"; }
+  _bpcase "(m) texto do meio do turno (stop_reason tool_use) não é texto final: sai AGENT_RUNNING, nunca DONE" \
+    "txt.strip() and (last.get('message') or {}).get('stop_reason') != 'tool_use'" "txt.strip()" _bp_m
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests

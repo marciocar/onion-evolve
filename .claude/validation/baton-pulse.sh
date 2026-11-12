@@ -40,6 +40,14 @@
 #   IDLE_NO_QUEUE    ociosa e sem fila declarada.
 #   PARK_UNMEASURED  o parked.tsv EXISTE e não se lê (permissão, diretório): fail-closed, toda sessão alcançável sai
 #                    aqui e nenhuma recebe oferta. Ilegível nunca vira «ninguém parado».
+#   SUBAGENTES (SAC-421, 2026-11-12) de cada sessão viva e desta: <projects>/*/<sessão>/subagents/agent-<id>.jsonl (o
+#   <id>.output em /tmp/claude-<uid>/…/tasks/ é symlink para ele). Lê o CONTEÚDO do transcript do subagente:
+#   AGENT_STALLED    o fim tem tool_use sem tool_result e o mtime passou de --stall-min (padrão 15). Mede o SINTOMA,
+#                    não a causa: pedido de aprovação sem quem responda, comando pendurado, harness travado, tudo igual.
+#   AGENT_RUNNING    tool_use pendente mais novo que o teto, ou fim sem texto final e sem pendência.
+#   AGENT_DONE       o fim é texto do assistente (ou a marca de interrupção pelo humano).
+#   AGENT_UNMEASURED transcript ilegível ou sem entrada user/assistant: NÃO medido, nunca «não parado».
+#   Não sabe se o processo do subagente vive (o harness não expõe pid por subagente): um pendurado E morto sai STALLED.
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
 #   isso vence, quando a lista de peers foi lida). Sem lista de peers, a classe é só pela idade do farol.
@@ -52,7 +60,7 @@
 #   fala. A linha única carrega o aviso do que não foi medido (PRs, sinais, perguntas, parada).
 #
 # Uso:  bash .claude/validation/baton-pulse.sh [<repo>] [--markdown|--tsv] [--quiet] [--since <iso|epoch>]
-#                [--last-sha <sha>] [--idle-min N] [--peers <arquivo.json|->] [--no-peers] [--no-family]
+#                [--last-sha <sha>] [--idle-min N] [--stall-min N] [--peers <arquivo.json|->] [--no-peers] [--no-family]
 #                [--skip-repo <caminho>]... [--no-gh] [--self <sessionId>]
 # Env (bancada; todo override ativo é DECLARADO na saída):
 #   BATON_NOW=<epoch>  BATON_STATE_DIR=<dir> (padrão ~/.local/state/onion/baton)  BATON_PROJECTS_DIR=<dir>
@@ -61,7 +69,7 @@
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_baton_pulse_selftests).
 # ===========================================================================
 set -uo pipefail
-REPO=""; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
+REPO=""; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "baton-pulse: $1 exige um valor" >&2; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -70,6 +78,7 @@ while [ $# -gt 0 ]; do
     --since) _need "$@"; shift; SINCE="$1" ;;
     --last-sha) _need "$@"; shift; LAST="$1" ;;
     --idle-min) _need "$@"; shift; IDLE="$1" ;;
+    --stall-min) _need "$@"; shift; STALL="$1" ;;
     --peers) _need "$@"; shift; PEERS="$1" ;;
     --no-peers) NOPEERS="1" ;;
     --no-family) FAMILY="0" ;;
@@ -82,6 +91,7 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+case "${STALL}" in ''|*[!0-9]*|0) echo "baton-pulse: --stall-min inválido (${STALL}) — inteiro >= 1" >&2; exit 2 ;; esac
 case "${IDLE}" in ''|*[!0-9]*|0) echo "baton-pulse: --idle-min inválido (${IDLE}) — inteiro >= 1" >&2; exit 2 ;; esac
 case "${BATON_NOW:-0}" in *[!0-9]*) echo "baton-pulse: BATON_NOW inválido (${BATON_NOW}) — epoch em segundos" >&2; exit 2 ;; esac
 case "${LAST}" in ''|*[!0-9a-f]*) [ -z "${LAST}" ] || { echo "baton-pulse: --last-sha inválido (${LAST}) — hexadecimal" >&2; exit 2; } ;; esac
@@ -130,10 +140,11 @@ else LOAD_LINE="${LOAD_LINE} · lease ausente neste papel"; fi
 OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${QUIET}" "${SINCE}" "${LAST}" "${IDLE}" "${PEERS}" "${PEERS_SRC}" \
-  "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" <<'PY'
+  "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" <<'PY'
 import sys, os, re, json, glob, time, hashlib, subprocess, datetime
 (repo, fmt, quiet, since, last_sha, idle_min, peers_file, peers_src, family, skip, self_sid, here, dc_file, dc_rc,
- load_line, ovr) = sys.argv[1:17]
+ load_line, ovr, stall_min) = sys.argv[1:18]
+stall_s = int(stall_min) * 60
 quiet = quiet == '1'; idle_s = int(idle_min) * 60
 self_sid = self_sid or os.environ.get('CLAUDE_CODE_SESSION_ID', '')
 now = int(os.environ.get('BATON_NOW') or time.time())
@@ -405,6 +416,67 @@ for s in S.values():
 # farol STALE sem peer é rastro velho (fora do TTL do farol), não sessão: sai da tabela e da contagem, e vira uma linha
 stale_traces = sorted(s['sid'] for s in S.values() if 'peers' not in s['src'] and s['beacon'] == 'stale' and s['cls'] == 'UNREACHABLE')
 for sid in stale_traces: del S[sid]
+# ── subagentes das sessões vivas: o SINTOMA do agente parado num tool_use sem resultado (SAC-421) ──
+# Medido em 2026-11-12: o transcript do subagente mora em <projects>/<projeto>/<sessionId>/subagents/agent-<id>.jsonl
+# (com <id>.meta.json ao lado: agentType, description); o <id>.output em /tmp/claude-<uid>/<projeto>/<sessão>/tasks/ é
+# symlink para ele, então não é segunda fonte. Lê-se o conteúdo SÓ do subagente (as entradas user/assistant), nunca o da sessão.
+def agent_cmd(tu):
+    inp = tu.get('input') if isinstance(tu.get('input'), dict) else {}
+    arg = inp.get('command') or inp.get('file_path') or inp.get('pattern') or inp.get('url') or inp.get('prompt') or \
+          next((v for v in inp.values() if isinstance(v, str)), '')
+    return re.sub(r'\s+', ' ', f'{tu.get("name") or "?"}: {arg}').strip()[:120]
+def agent_state(path):
+    """→ (classe, nota, comando pendente). Classe pelo FIM do transcript, nunca pela prosa: o pendente é o tool_use cujo
+    id não teve tool_result desde o último prompt de texto (prompt novo abandona o que ficou para trás)."""
+    pend, last, n = {}, None, 0
+    try:
+        with open(path, encoding='utf-8') as fh:
+            for ln in fh:
+                if not ln.strip(): continue
+                try: d = json.loads(ln)
+                except ValueError: continue   # linha cortada (escrita em curso): não decide a classe
+                if not isinstance(d, dict) or d.get('type') not in ('user', 'assistant'): continue
+                c = (d.get('message') or {}).get('content'); n += 1; last = d
+                blocks = c if isinstance(c, list) else [{'type': 'text', 'text': c}]
+                if d['type'] == 'assistant':
+                    for b in blocks:
+                        if isinstance(b, dict) and b.get('type') == 'tool_use' and b.get('id'): pend[b['id']] = b
+                else:
+                    res = [b for b in blocks if isinstance(b, dict) and b.get('type') == 'tool_result']
+                    for b in res: pend.pop(b.get('tool_use_id'), None)
+                    if not res: pend.clear()
+    except (OSError, UnicodeDecodeError) as e:
+        return 'AGENT_UNMEASURED', f'transcript ilegível ({type(e).__name__}): NÃO medido', ''
+    if not n: return 'AGENT_UNMEASURED', 'transcript sem entrada user/assistant legível: NÃO medido', ''
+    age = now - int(os.path.getmtime(path))
+    if pend:
+        cmd = agent_cmd(list(pend.values())[-1])
+        if age > stall_s: return 'AGENT_STALLED', f'tool_use sem tool_result há {mins(age)}min', cmd
+        return 'AGENT_RUNNING', f'tool_use em curso há {mins(age)}min', cmd
+    c = (last.get('message') or {}).get('content')
+    blocks = c if isinstance(c, list) else [{'type': 'text', 'text': c}]
+    txt = ' '.join(str(b.get('text') or '') for b in blocks if isinstance(b, dict) and b.get('type') == 'text')
+    # o bloco de texto do meio de um turno tem stop_reason tool_use (blocos gravados um por linha): não é o fim
+    if last['type'] == 'assistant' and txt.strip() and (last.get('message') or {}).get('stop_reason') != 'tool_use': return 'AGENT_DONE', f'texto final do assistente há {mins(age)}min', ''
+    if last['type'] == 'user' and txt.startswith('[Request interrupted'): return 'AGENT_DONE', f'interrompido pelo humano há {mins(age)}min', ''
+    return 'AGENT_RUNNING', f'última escrita há {mins(age)}min, sem tool_use pendente', ''
+AG = []   # subagentes das sessões vivas (não UNREACHABLE) e desta sessão
+agents_measured = proj_ok
+live_sids = [s['sid'] for s in S.values() if s['cls'] != 'UNREACHABLE']
+if self_sid and self_sid not in live_sids: live_sids.append(self_sid)
+if proj_ok:
+    for sid in live_sids:
+        for f in sorted(glob.glob(os.path.join(glob.escape(proj_dir), '*', glob.escape(sid), 'subagents', 'agent-*.jsonl'))):
+            aid = os.path.basename(f)[len('agent-'):-len('.jsonl')]; desc = ''
+            try: desc = str(json.load(open(f[:-len('.jsonl')] + '.meta.json', encoding='utf-8')).get('description') or '')
+            except (OSError, ValueError, AttributeError): pass
+            cls_a, note_a, cmd_a = agent_state(f)
+            AG.append({'sid': sid, 'aid': aid, 'cls': cls_a, 'note': note_a, 'cmd': cmd_a, 'desc': desc})
+else: gaps.append(f'subagentes NÃO MEDIDOS: {proj_dir} ausente (não é «nenhum parado»)')
+AORD = {c: i for i, c in enumerate(('AGENT_STALLED', 'AGENT_UNMEASURED', 'AGENT_RUNNING', 'AGENT_DONE'))}
+AG.sort(key=lambda a: (AORD[a['cls']], a['sid'], a['aid']))
+acnt = {c: sum(1 for a in AG if a['cls'] == c) for c in AORD}
+
 orphan_queue = {o: v for o, v in owned.items() if o != 'maestro' and o not in claimed_owner}
 CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
 cnt = {c: sum(1 for s in S.values() if s['cls'] == c) for c in CLASSES}
@@ -428,7 +500,8 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'pr': sorted((p['ref'], p['ci'], p['stopped']) for p in prs), 'wt': sorted((t['ref'], t['path'], t['stopped']) for t in threads),
          'sig': sorted(f"{r.get('ref')}|{r.get('label')}" for r in signals), 'ask': sorted(a['key'] for a in asks if a['live']), 'busy': 'OCUPADO' in load_line,
          'measured': [prs_measured, signals_measured, asks_measured, park_st],
-         'cp': len(checkpoints), 'gaps': sorted(gaps)}
+         'cp': len(checkpoints), 'gaps': sorted(gaps),
+         'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] != 'AGENT_DONE'), 'ag_done': acnt['AGENT_DONE']}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 # «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
 # ficou vermelho sem evento datado passava calado. Sem --last-sha não há base, e a batida fala.
@@ -443,6 +516,7 @@ if fmt == '--tsv':
     for o, v in sorted(orphan_queue.items()): print(f'orphan_queue\t{tsvc(o)}\t-\t-\t\t{len(v)}\tgrafo\t' + tsvc('; '.join(n for _, n, _ in v)))
     for p in prs: print('\t'.join(tsvc(x) for x in ('pr', p['ref'], 'CI_' + p['ci'].upper().replace(' ', '_'), p['branch'], '' if p['age'] is None else mins(p['age']), '', 'decide-census', p['state'])))
     for t in threads: print('\t'.join(tsvc(x) for x in ('thread', t['ref'], 'STOPPED' if t['stopped'] else 'MOVING', t['path'], '', '', 'decide-census', f'{t["label"]} · {t["state"]} · {t["actor"]}')))
+    for a in AG: print('\t'.join(tsvc(x) for x in ('agent', a['aid'], a['cls'], a['sid'], '', '', 'subagents/' + a['aid'], f'{a["desc"] or "—"} · {a["note"]} · pendente: {a["cmd"] or "—"}')))
     for r in signals: print(f'signal\t{tsvc(r.get("ref"))}\t-\t-\t\t\tdecide-census\t{tsvc(r.get("label"))}')
     print(f'maestro\tasks\t-\t-\t\t{sum(1 for a in asks if a["live"])}\tmaestro-ask\tvencidas {sum(1 for a in asks if not a["live"])}')
     print(f'maestro\tseal_candidates\t-\t-\t\t{len(seals)}\tdecide-census\tcheckpoints {len(checkpoints)} · nós open owner:maestro {len(owned.get("maestro", []))}')
@@ -456,16 +530,18 @@ if fmt == '--tsv':
 
 head = f'baton-pulse · {iso(now)} · sha {sha}'
 cls_line = (' · '.join(f'{c} {cnt[c]}' for c in CLASSES)) if sessions_measured else 'sessões NÃO MEDIDAS (nenhuma fonte legível): não é zero'
+ag_line = ('subagentes: ' + ' · '.join(f'{c} {acnt[c]}' for c in AORD)) if agents_measured else 'subagentes NÃO MEDIDOS'
 if quiet and not changed:
     unm = ' · '.join(x for x, ok in (('⚠️ PRs NÃO medidos', prs_measured), ('⚠️ sinais NÃO medidos', signals_measured),
                                        ('⚠️ perguntas NÃO medidas', asks_measured), ('⚠️ parada NÃO medida', not park_unknown)) if not ok)
-    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line}' + (f' · {unm}' if unm else ''))
+    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line} · {ag_line}' + (f' · {unm}' if unm else ''))
     sys.exit(0)
 print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
       f'em voo=decide-census rc {dc_rc} · perguntas={ask_dir} · parked={park_p}{" (" + str(len(park_rows)) + " linha(s))" if park_rows is not None else (" (ausente: ninguém parado por ordem)" if park_st == "absent" else " (" + park_st + ": NÃO MEDIDO)")} · '
       f'rótulos={own_p if own_rows is not None else ("derivados" if own_st == "absent" else "derivados (" + own_st + ")")} · ociosa após {idle_min}min · papel={role or "?"}')
 print(f'classes: {cls_line}')
+print(ag_line)
 for w in warns: print(f'⚠️ {w}')
 for g in gaps: print(f'🕳️ lacuna: {g}')
 if quiet:
@@ -478,6 +554,8 @@ if quiet:
         if s['cls'] == 'IDLE_WITH_QUEUE': print(f'- IDLE_WITH_QUEUE: {s["name"] or s["sid"][:8]} ({os.path.basename(s["cwd"])}) · {len(s["queue"])} item(ns) de fila')
     for p in prs:
         if p['ci'] == 'RED': print(f'- {p["ref"]} com CI vermelho ({p["branch"]})')
+    for a in AG:
+        if a['cls'] in ('AGENT_STALLED', 'AGENT_UNMEASURED'): print(f'- {a["cls"]}: {a["aid"]} da sessão {a["sid"][:8]} ({a["desc"] or "—"}) · {a["note"]}' + (f' · pendente: `{a["cmd"]}`' if a['cmd'] else ''))
     sys.exit(0)
 print('\n## Sessões')
 print('| classe | sessão | repo | estado medido | fila pronta (dono declarado) | fonte |')
@@ -487,6 +565,11 @@ for s in sess_sorted:
     qd = (f'{len(s["queue"])}: ' + '; '.join(s['queue'][:4]) + (f'; +{len(s["queue"]) - 4}' if len(s['queue']) > 4 else '')) if s['queue'] else '—'
     print(f'| {s["cls"]} | {s["name"] or "—"} `{s["sid"][:8]}`{me} | {os.path.basename(s["cwd"]) or "—"} | {s["note"]} | {qd} | {"+".join(s["src"])} · rótulo {"/".join(s["labels"]) or "—"} |')
 if not S: print('| — | nenhuma sessão nas fontes medidas | | | | |')
+print('\n## Subagentes das sessões vivas (transcript em <projects>/*/<sessão>/subagents/)')
+if not agents_measured: print('- NÃO MEDIDO (sem diretório de transcripts): não é «nenhum parado»')
+for a in AG:
+    if a['cls'] != 'AGENT_DONE': print(f'- {a["cls"]} `{a["aid"]}` · sessão `{a["sid"][:8]}` · {a["desc"] or "—"} · {a["note"]}' + (f' · pendente: `{a["cmd"]}`' if a['cmd'] else ''))
+if agents_measured: print(f'- AGENT_DONE: {acnt["AGENT_DONE"]} (terminados, não listados; --tsv lista todos)' + ('' if AG else ' · nenhum transcript de subagente nas sessões vivas'))
 print('\n## Fila declarada sem sessão casada')
 if orphan_queue:
     for o, v in sorted(orphan_queue.items()):
