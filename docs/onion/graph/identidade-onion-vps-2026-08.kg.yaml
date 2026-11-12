@@ -942,3 +942,7 @@ edges:
   - from: E_REVERIFY_SEGUNDO_DESTINO_SEGUE_AUSENTE_1027
     to: Q_MAIS_UM_IMUTAVEL_GATED
     edge_type: SUPPORTS
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: I_A6_O_BLOQUEIO_NAO_ERA_SMTP
+    to: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
+    edge_type: SUPERSEDES

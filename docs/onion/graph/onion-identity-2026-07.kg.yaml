@@ -19,6 +19,10 @@ external_edges:
   - from: C_EXIT2_CONFORMIDADE_SEM_EXCLUSIVIDADE_1104
     to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
     edge_type: TRACES_TO
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml#E_FALLBACK_SERIAL_RODA"
+    to: C_M8_FECHA_SO_UM_TERCO
+    edge_type: SUPERSEDES
 nodes:
   # ---- perguntas de pesquisa (F2) ----
   - id: Q_IDENTITY
@@ -1278,7 +1282,8 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 1.0
-    status: superseded
+    status: open
+    narrative: "reaberto em 2026-11-12: superseded sem sucessor achável (furo de integridade, Delphi D_MIGRATION_TOUCHED_DELPHI_1112)"
     verified_at: "2026-08-30"
     verified_against: "contagem-direta-transcripts-x-sinteses-x-grafos-irmaos"
     label: "A CONTRADICAO MEDIDA DENTRO DA PROPRIA DECISAO DE VALOR: 77 runs de orquestracao com transcript · 19 sinteses versionadas (25%) · 16 com grafo irmao (21%). QUATRO EM CADA CINCO ORQUESTRACOES NAO DEIXARAM RASTRO NO GRAFO. E o vazamento tem forma conhecida e datada: em 2026-08-06 a corrida serial do M8 mediu 4 DRIFTED contra o host vivo, escreveu na sintese, e a SSOT seguiu afirmando que o whatsapp-sender estava VIVO por 12 HORAS — ate alguem ir procurar. O /meta:kg-freshness declara o contrato certo ('o worker propoe, o maestro sela') e o SELO NAO TEM FORCING FUNCTION. Com NS1 escolhido, este laco E O PRODUTO operando a 21%, nao divida de higiene. FALSIFICADOR: se a medicao do volume mostrar que existe UM unico veredito sem selo (o do M8), entao e conserto manual e mecanizar seria catedral pelo portao 4 — a medicao decide, nao a vontade"
@@ -1899,3 +1904,25 @@ edges:
   - from: D_PUBLICAR_CURA_DOS_VETOS_APOS_MERGE_1105
     to: C_CORE_NAO_E_FAMILIA
     edge_type: TRACES_TO
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: D_NORTHSTAR_NS1_KG
+    to: Q_MARKET
+    edge_type: SUPERSEDES
+  - from: D_NORTHSTAR_NS1_KG
+    to: Q_METHOD
+    edge_type: SUPERSEDES
+  - from: D_ICP_EMPRESA_MAIS_N1
+    to: C_ICP_TENSION
+    edge_type: SUPERSEDES
+  - from: D_NORTHSTAR_NS1_KG
+    to: C_NS3_EDU
+    edge_type: SUPERSEDES
+  - from: D_NORTHSTAR_NS1_KG
+    to: C_NS4_CONTROLPLANE
+    edge_type: SUPERSEDES
+  - from: D_NORTHSTAR_NS1_KG
+    to: D_COLD_ADOPTER_EXP
+    edge_type: SUPERSEDES
+  - from: E_ORBIT_0804
+    to: Q_COLD_ADOPTER_0717
+    edge_type: SUPERSEDES

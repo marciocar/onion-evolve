@@ -253,3 +253,7 @@ edges:
   - from: E_CONSOLE_DO_LOGTO_FECHADO_SAC100_2026_10
     to: I_CONSOLE_DO_LOGTO_ESTA_PUBLICO
     edge_type: SUPERSEDES
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: E_SSO_VALIDADO_PONTA_A_PONTA
+    to: E_PRIMEIRO_CASO_DOCUMENTADO
+    edge_type: SUPERSEDES

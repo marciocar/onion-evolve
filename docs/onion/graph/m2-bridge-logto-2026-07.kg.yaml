@@ -2836,3 +2836,40 @@ edges:
   - from: E_JWKS_PISO_NA_TENTATIVA_MEDIDO_SAC100_2026_10
     to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
     edge_type: SUPPORTS
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para os nós superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: E_default_deny_never_existed
+    to: D_path_canon_guard
+    edge_type: SUPERSEDES
+  - from: E_p4_rfc8707_proven
+    to: Q_default_api_resource_b1
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_C_hono_registration_order_bypass
+    to: A_spec_turnkey
+    edge_type: SUPERSEDES
+  - from: D_retire_legacy_immediately
+    to: A_flip_steps_reversible
+    edge_type: SUPERSEDES
+  - from: E_p9_complete
+    to: A_verification
+    edge_type: SUPERSEDES
+  - from: D_retire_legacy_immediately
+    to: Q_byok_courtesy_mode
+    edge_type: SUPERSEDES
+  - from: D_org_born_on_demand
+    to: Q_gated_m3
+    edge_type: SUPERSEDES
+  - from: D_enroll_instead_of_invite
+    to: Q_slices_2_to_4_unexercised
+    edge_type: SUPERSEDES
+  - from: D_org_born_on_demand
+    to: E_federation_projected
+    edge_type: SUPERSEDES
+  - from: E_org_has_member_with_role
+    to: Q_orgs_are_empty_scaffolding
+    edge_type: SUPERSEDES
+  - from: D_org_born_on_demand
+    to: Q_seven_orgs_still_empty
+    edge_type: SUPERSEDES
+  - from: D_pull_serves_history_not_queue
+    to: Q_offline_fallback_truth
+    edge_type: SUPERSEDES

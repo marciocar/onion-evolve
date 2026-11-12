@@ -494,3 +494,13 @@ edges:
   - from: D_EPIPE_VIRA_GUARDA_DE_CLASSE_1019
     to: Q_PODA_CLAUDE_MD_REVISITA
     edge_type: TRACES_TO
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: Q_PRECOMMIT_SELECAO_POR_CASO
+    to: E_PRECOMMIT_SELECAO_GROSSA
+    edge_type: SUPERSEDES
+
+external_edges:
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml#E_PERCENTUAL_PONDERADO_E_DECLARADO"
+    to: E_TM_PERCENTUAL_IGNORA_STORY_POINTS
+    edge_type: SUPERSEDES

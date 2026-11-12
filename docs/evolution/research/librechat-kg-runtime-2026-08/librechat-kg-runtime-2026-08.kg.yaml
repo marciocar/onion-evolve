@@ -438,3 +438,10 @@ edges:
   - from: E_REVERIFY_1027_QUATRO_SERVIDORES_POR_RISCO
     to: D_TRIADE_MCP_POR_EIXO
     edge_type: CONSTRAINS
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO
+    to: Q_WEB_SEARCH_GAP
+    edge_type: SUPERSEDES
+  - from: E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO
+    to: D_ROUTE_TO_BRIDGE
+    edge_type: SUPERSEDES

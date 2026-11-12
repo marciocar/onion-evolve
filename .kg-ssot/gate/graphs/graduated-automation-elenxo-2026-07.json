@@ -4,7 +4,6 @@
   "must": [],
   "should": {
     "form.deprecated.node.provenance.method": 8,
-    "form.range.node.label": 2,
-    "integrity.superseded-without-successor": 1
+    "form.range.node.label": 2
   }
 }

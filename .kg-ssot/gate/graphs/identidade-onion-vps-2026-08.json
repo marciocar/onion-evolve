@@ -7,7 +7,6 @@
     "form.range.node.label": 27,
     "form.required.node.provenance": 2,
     "integrity.bare-decision": 3,
-    "integrity.superseded-without-successor": 1,
     "integrity.untraced-decision": 2,
     "yaml.unquoted-date": 1
   }

@@ -8,7 +8,6 @@
     "form.required.node.provenance": 11,
     "form.required.node.verified_against": 2,
     "integrity.bare-decision": 10,
-    "integrity.superseded-without-successor": 1,
     "yaml.unquoted-date": 1
   }
 }

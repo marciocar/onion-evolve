@@ -23,6 +23,10 @@ external_edges:
   - from: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
     to: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#E_CVE39861_FIXED_IN_2_1_64"
     edge_type: SUPPORTS
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017"
+    to: E_SDK_0_3_301_EM_PRODUCAO_1016
+    edge_type: SUPERSEDES
 nodes:
   - id: E_DELTA_DA_RODADA
     node_type: evidence
