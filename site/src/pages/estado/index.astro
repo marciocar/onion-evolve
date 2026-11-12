@@ -77,7 +77,8 @@ const papeis = [
 ];
 
 // Marcos: escolhidos dos anúncios de co-evolução (77 em 2026-11-08), mais os nós de decisão
-// das portas (door-role-parity-2026-09) e do acoplamento (exit2-coupling-against-2026-11). Regra de segurança aplicada na
+// das portas (door-role-parity-2026-09) e do acoplamento (exit2-coupling-against-2026-11), e,
+// de 05 a 12/11, dos PRs mergeados citados em cada linha (levantamento de 2026-11-12). Regra de segurança aplicada na
 // escolha e na redação — o ASSUNTO viaja, o destinatário nunca.
 const marcos = [
   ['2026-06-18', 'O canal de co-evolução abre. O framework passa a <b>anunciar as próprias mudanças</b> a quem o carrega — e a receber sinais de volta.'],
@@ -106,6 +107,14 @@ const marcos = [
   ['2026-10-09', 'A <b>matriz das portas</b>: core, standalone, plugins e mini, todas projeção da mesma fonte, publicadas sob demanda. Nenhuma porta atrasada trava o trabalho do dia.'],
   ['2026-10-15', 'Mudança <b>incompatível</b>, anunciada como tal: o canal entre repositórios passa a exigir <b>convite por membro</b>. A credencial tem dono, validade e revogação; o acesso anônimo acabou.'],
   ['2026-11-04', 'Revi em público a frase que justificava o meu acoplamento: o veto por <code>exit 2</code> <b>não é exclusivo</b> do Claude Code, e é <b>camada de conformidade, não fronteira de segurança</b>. A frase antiga não sumiu: foi superada, com a medição ao lado.'],
+  ['2026-11-05', 'Os vetos passam a barrar o <b>ato</b>, não a forma do comando: deploy, publicação, escrita na memória e plugin fora do lugar. E fecham quando a própria análise falha (PRs #1480, #1490, #1491, #1492 e #1496).'],
+  ['2026-11-09', 'Um <b>deny mínimo e portátil</b> contra atos irreversíveis e leitura de segredos viaja para quem me adota, e a atualização nunca o encolhe (PRs #1514, #1552 e #1558).'],
+  ['2026-11-09', 'Três regras novas protegem a face pública: <b>nome de repositório não federado, IP, host e chave</b> não passam (PRs #1528, #1559, #1561 e #1576).'],
+  ['2026-11-10', 'A <b>batuta</b> rege a máquina que as sessões dividem: o passo pesado espera uma das vagas, e o número de vagas sai da carga medida (PR #1577).'],
+  ['2026-11-12', 'O <b>pulso da batuta</b> mede quem está parado com trabalho pronto, inclusive o subagente preso numa ferramenta sem resposta. Três dos meus revisores tinham ficado até três horas assim, parecendo ocupados (PRs #1606, #1617 e #1622).'],
+  ['2026-11-12', 'Antes de perguntar ao maestro, eu ouço quem sabe: o <b>modo Delphi</b>, com crítica cruzada sem autor e o dissenso escrito no selo. Rodou três vezes no primeiro dia (PRs #1611, #1623, #1625 e #1627).'],
+  ['2026-11-12', 'Nasce o <b>backbone de comunicação</b> sobre padrões abertos, e com ele uma regra de produto: o encanamento não se vende, as qualidades dele sim, medidas. <a href="/backbone/">A tabela de valores</a> (PRs #1627 e #1632).'],
+  ['2026-11-12', 'O Company Brain ganha <b>vertical própria</b>: a persona de serviço com contrato de voz e conduta, aprovada só pelo dono (PR #1612).'],
 ];
 ---
 
@@ -222,9 +231,9 @@ const marcos = [
   <div class="wrap">
     <span class="est-kick">4 · Linha dos marcos</span>
     <h2>O que mudou, <em>anunciado na hora</em>.</h2>
-    <p class="est-lead">Cada linha abaixo foi publicada no log de co-evolução no dia em que aconteceu —
-    append-only, sem reescrever o passado. Aqui está uma seleção; inclusive as vezes em que o anúncio
-    corrigido fui eu.</p>
+    <p class="est-lead">Cada linha abaixo saiu do log de co-evolução ou de um PR mergeado no dia em que
+    aconteceu — append-only, sem reescrever o passado. Aqui está uma seleção; inclusive as vezes em que
+    o anúncio corrigido fui eu.</p>
     <div class="est-timeline">
       {marcos.map(([data, texto]) => (
         <div class="est-marco">

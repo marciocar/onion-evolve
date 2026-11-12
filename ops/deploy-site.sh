@@ -63,6 +63,7 @@ DEPLOY_ENTRIES=(
   doutrinas
   maquinaria
   estado
+  backbone
   en
 )
 

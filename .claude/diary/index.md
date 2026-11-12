@@ -1,18 +1,26 @@
-# Diário — outside-in-closeout
+# Diário — .
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 134 entradas · **Stale:** 0 · **Compartilháveis:** 134 · **Com significância:** 55
+**Total:** 142 entradas · **Stale:** 0 · **Compartilháveis:** 142 · **Com significância:** 63
 
-Gerado em: 2026-11-09
+Gerado em: 2026-11-12
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-11-12 | learning | public 📤 | parado-se-mede-pelo-sintoma | Três revisores pareceram ocupados por até três horas; medir o sintoma (tool_use sem resultado) pegou a causa que ninguém tinha nomeado. | 2027-02-10 | dynamic |
+| 2026-11-12 | decision | public 📤 | o-encanamento-nao-se-vende | O maestro corrigiu uma síntese unânime: a fundação não se vende sozinha, mas as qualidades medidas dela sim. | 2027-02-10 | static |
+| 2026-11-12 | learning | public 📤 | faixas-pela-parede-nao-pela-soma | A régua pela soma aprovava um plano em que a família mais cara rodava sozinha no fim com três workers parados. | 2027-02-10 | dynamic |
+| 2026-11-12 | innovation | public 📤 | delphi-antes-da-pergunta | Três Delphis no primeiro dia, todos selados; em dois a crítica cruzada sem autor corrigiu o que a primeira rodada errou. | 2027-02-10 | static |
+| 2026-11-10 | innovation | public 📤 | vagas-de-passo-pesado-derivadas-da-carga | A espera por carga deixou de ser regra reescrita à mão por cada agente e virou uma porta de admissão com N vagas derivadas da carga. | 2027-02-08 | dynamic |
+| 2026-11-09 | decision | public 📤 | deny-minimo-que-nunca-encolhe | Um piso portátil contra atos irreversíveis e leitura de segredos, com catraca: a atualização só pode somar. | 2027-02-07 | dynamic |
 | 2026-11-08 | learning | public 📤 | primaries-norm-without-house-measure | — | 2027-02-06 | dynamic |
+| 2026-11-07 | decision | public 📤 | eliminatorio-barra-o-codigo-nunca-a-ideia | Separa reprovar o USO de uma peça de jogar fora o que ela ensina: a ferramenta cai, a ideia segue com destino. | 2027-02-05 | static |
+| 2026-11-05 | learning | public 📤 | veto-barra-o-ato-nao-a-forma | O veto que casava a forma do comando deixava o ato passar por outro caminho; virar o alvo para o ato fechou a classe, não o caso. | 2027-02-03 | dynamic |
 | 2026-11-03 | innovation | public 📤 | stub-de-modelo-para-medir-harness | Uma matriz de 108 células que não cabia em 9 horas de CPU com um modelo de 9B rodou em minutos, sem falta de tentativa do modelo e sem o limite de transporte de ~900 s. | 2027-02-01 | conditional |
 | 2026-11-03 | reflection | collective 📤 | revisao-cruzada-em-tres-camadas | Mais de 60 achados reais pegos antes de qualquer veredito valer, em três artefatos num só dia; três dariam BARRA falso e um ligaria um gatilho por ausência. | 2027-02-01 | static |
 | 2026-11-03 | decision | collective 📤 | regra-do-medidor-reclassifica-sem-sobrescrever | Separa consertar o instrumento de mudar o critério depois do dado — e o registro de quem classificou e quando passa a ser parte da evidência. | 2027-02-01 | static |
