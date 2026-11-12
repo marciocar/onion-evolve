@@ -3,16 +3,16 @@ branch: feat/baton-stalled-agent
 pr: pendente
 date: 2026-11-12
 reviewed_diff_sha256: pendente
-findings_total: 7
-findings_real: 7
-findings_blocking: 4
-tokens: 4807446
-duration_min: 11
-findings_fixed: 7
+findings_total: 11
+findings_real: 11
+findings_blocking: 5
+tokens: 6959210
+duration_min: 19
+findings_fixed: 11
 verdict: REJECTED_AND_FIXED
 elenxo: false
-reviewer: "1ª passada: o próprio agente de execução (1 bloqueio, curado); 2ª passada: refutador separado (subagente opus, que não escreveu o diff), REJECTED com 3 bloqueios e 10 de 10 mutantes vivos, curados pelo agente"
-nota: "tokens e duration_min são do refutador separado, lidos do transcript dele (entrada com cache 4771832 + saída 35614; 11 min do 1º ao último registro). Medidos depois da cura: família baton_pulse 46/46 (23 casos, 15 novos, cada um reprovando contra o mutante dele), dogfood real contra os transcripts da máquina e replay dos três refutadores travados de 2026-11-12."
+reviewer: "1ª passada: o próprio agente de execução (1 bloqueio, curado); 2ª passada: refutador separado (subagente opus, que não escreveu o diff), REJECTED com 3 bloqueios e 10 de 10 mutantes vivos; 3ª passada: re-revisão do mesmo refutador sobre 3827fff2f, REJECTED com 1 bloqueio novo; tudo curado pelo agente"
+nota: "tokens e duration_min são do refutador separado nas duas passadas dele, lidos do transcript (entrada com cache 6907242 + saída 51968; 19 min ativos, intervalos acima de 10 min descontados). Re-revisão sozinha: 2151764 tokens. Medidos depois da última cura: família baton_pulse 54/54 (27 casos, 19 novos, cada um reprovando contra o mutante dele), dogfood real contra os transcripts da máquina e replay dos três refutadores travados de 2026-11-12."
 ---
 
 # Passada adversarial: `feat/baton-stalled-agent`
@@ -59,12 +59,31 @@ sintoma) e o que não mede (a causa, e se o processo ainda vive).
 5. **Curado (M5 do refutador): o sha não provava que um agente parado muda a batida.** Caso (v): o `--quiet` com o sha
    de antes da parada fala e cita o STALLED.
 6. **Curado (limite 5): o comando pendente vazava segredo e caminho.** Antes de exibir, `sk-`, `gh*_`, `Bearer`,
-   `token=`/`secret=`/`password=` viram `[REDACTED]` e `/home/<usuário>` vira `~`; no markdown a cerca de crase cresce
+   `token=`/`secret=`/`password=` viram `[REDACTED]` (ampliada na re-revisão, achado 11) e `/home/<usuário>` vira `~`; no markdown a cerca de crase cresce
    (CommonMark) quando o comando tem crase. Casos (t) e (u).
 7. **Curado (limite 7): o sha mudava a cada agente rodando ou terminando.** Só STALLED, SILENT e UNMEASURED (e a
    contagem deles) entram no sha. Caso (w). E o M9: na leva paralela o comando exibido é o PRIMEIRO pendente, o que
    segura os outros, com `(+N pendente(s))`; o replay mostra que o a19bb3f2 travou no `rm -rf "$(cat …)"`, não no `ls`
    que a 1ª versão exibia. Caso (q).
+
+## Re-revisão (refutador, sobre 3827fff2f)
+
+Veredito REJECTED com 1 bloqueio novo; os 3 antigos, o sha e a redação confirmados curados.
+
+8. **Bloqueava, curado: o abandono por `message.id` novo errava nos dados.** Nos 6462 transcripts há 14 abandonos, e
+   em 12 o `tool_result` do id largado chegou DEPOIS: depois de uma cutucada o harness roda dois fluxos do assistente
+   ao mesmo tempo. Daí um falso DONE construível: X pendente, cutucada, m2 com Y e o resultado de Y, m3 com texto
+   final. Cura: o abandono saiu; só o `tool_result` do mesmo id fecha, e pendência aberta nunca é DONE, nem com
+   texto final. Os 2 abandonos legítimos ficam STALLED, falha ruidosa e preferível. O caso (r) virou a forma
+   intercalada, e o mutante que recoloca o abandono morre.
+9. **Curado: mutantes vivos M7, M8 e M3.** Casos (y) (o `--quiet` lista SILENT e UNMEASURED), (z) (os subagentes da
+   própria sessão entram pelo `--self`) e (aa) (sem diretório de transcripts, a lacuna «NÃO MEDIDOS» sai). O
+   diretório que existe e não se lê também vira lacuna, por `os.access`.
+10. **Curado (cosmético): a coluna fonte do `--tsv`** mostra o caminho relativo real,
+    `subagents/workflows/<run>/agent-<id>.jsonl`; o caso (s) confere.
+11. **Curado em parte, e declarado como limite: a redação por lista.** Passaram a ser cobertos `x-api-key:`,
+    `-u <u>:<x>`, `-p<x>`, `--password <x>`/`--password=<x>` e `NOME=valor` com token, secret, password ou `_key`
+    no nome (inclui `AWS_SECRET_ACCESS_KEY=`). Caso (x).
 
 ## Mutantes
 
@@ -80,6 +99,8 @@ Cada caso novo da família `baton_pulse` reprova contra o mutante plantado no pr
 - (r) a nova mensagem do assistente deixa de largar a pendência. (s) o caminho de Workflow é removido do glob.
 - (t) a redação de segredo é desligada. (u) a cerca de crase volta a ser simples.
 - (v) os agentes saem do sha (M5). (w) RUNNING entra no sha.
+- (r) agora recoloca o abandono por `message.id` novo. (x) o padrão do `--password` deixa de casar.
+- (y) o `--quiet` volta a listar só STALLED (M7). (z) a própria sessão sai da lista (M8). (aa) a lacuna é calada (M3).
 - Também mudou o mutante de (k): o `tool_result` deixa de tirar o id da pendência (`pop` vira `get`).
 
 ## Limites declarados
@@ -94,6 +115,8 @@ Cada caso novo da família `baton_pulse` reprova contra o mutante plantado no pr
   para acusar, mas um farol fora da lista do harness esconde os agentes dela).
 - Não sabe se o processo do subagente vive: o harness não expõe pid por subagente. Um agente morto no meio de uma
   ferramenta fica `AGENT_STALLED` enquanto a sessão dona estiver viva.
-- A pendência só se larga por nova mensagem do assistente com `message.id`; transcript sem `message.id` (fixtures,
-  formato antigo) mantém a pendência até o `tool_result`.
+- **Abandono legítimo fica STALLED:** uma ferramenta largada de verdade (2 dos 14 casos medidos) nunca recebe
+  `tool_result`, e o agente sai STALLED enquanto a sessão viver. É escolha: falso STALLED ruidoso em vez de falso DONE.
+- **Redação por lista:** o que não está na lista passa (outro cabeçalho de credencial, senha posicional, token em
+  URL sem `nome=`). O comando exibido serve para localizar o travamento, não é canal seguro para segredo.
 - O `--tsv` lista todos os terminados (50 no dogfood). O markdown só os conta.

@@ -57691,7 +57691,7 @@ BP_PY
   printf 'gamma\tordem do maestro: parada até a revisão\t-\n' > "${sb}/state/parked.tsv"
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
-    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${sb}/proj" \
+    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
       BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
   }
   _bpcase() {  # <nome> <OLD> <NEW> <função> [sem-farol]
@@ -57781,8 +57781,11 @@ G = {'nudged':   [u(txt('brief')), a(tu('n1', 'sleep 999')), u(txt('The coordina
                   u({'type': 'tool_result', 'tool_use_id': 'h1', 'content': [txt('{"success":true,"message":"Report delivered to your caller."}')]})],
      'silent':   [u(txt('brief')), a(tu('k1', 'make bench')), u({'type': 'tool_result', 'tool_use_id': 'k1', 'content': 'Exit code 137', 'is_error': True})],
      'parallel': [u(txt('brief')), am('m1', tu('p1', 'rm -rf $P/m1')), am('m1', tu('p2', 'ls -la state'))],
-     'abandon':  [u(txt('brief')), am('m1', tu('b1', 'rm -rf $P/m1')), u(txt('The coordinator sent a message while you were working:\noi')),
-                  json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'id': 'm2', 'stop_reason': 'end_turn', 'content': [txt('larguei e respondi')]}})],
+     'interleaved': [u(txt('brief')), am('m1', tu('x1', 'rm -rf $P/m1')), u(txt('The coordinator sent a message while you were working:\noi')),
+                  am('m2', tu('y1', 'ls')), u(tr('y1')),
+                  json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'id': 'm3', 'stop_reason': 'end_turn', 'content': [txt('respondi')]}})],
+     'leak2':    [u(txt('brief')), a(tu('l2', 'mysql -u root -pS3cretPW db; curl -u bob:hunter22 -H "x-api-key: KKKK1234"'))],
+     'leak3':    [u(txt('brief')), a(tu('l3', 'cli --password hunter33 AWS_SECRET_ACCESS_KEY=AKIAZZZZ MY_API_KEY=QQQQ9'))],
      'leak':     [u(txt('brief')), a(tu('l1', 'curl -H "Authorization: Bearer sk-ant-api03-SECRETSECRET" -d token=abc123 /home/someone/x | `tick`'))]}
 for k, L in G.items(): open(f'{d}/agent-a{k}.jsonl', 'w').write('\n'.join(L) + '\n')
 import os; os.makedirs(f'{d}/workflows/wf_1', exist_ok=True)
@@ -57790,7 +57793,8 @@ open(f'{d}/workflows/wf_1/agent-awf.jsonl', 'w').write('\n'.join(F['stalled']) +
 open(f'{d}/agent-amidturn.jsonl', 'w').write(u(txt('brief')) + '\n' + json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'stop_reason': 'tool_use', 'content': [txt('vou rodar')]}}) + '\n')
 BP_AG
   touch -d "@$((NOW - 3600))" "${ag}/agent-astalled.jsonl" "${ag}/agent-adone.jsonl" "${ag}/agent-abroken.jsonl" "${ag}/agent-anudged.jsonl" \
-    "${ag}/agent-ahandback.jsonl" "${ag}/agent-asilent.jsonl" "${ag}/agent-aparallel.jsonl" "${ag}/agent-aabandon.jsonl" "${ag}/agent-aleak.jsonl" \
+    "${ag}/agent-ahandback.jsonl" "${ag}/agent-asilent.jsonl" "${ag}/agent-aparallel.jsonl" "${ag}/agent-ainterleaved.jsonl" "${ag}/agent-aleak.jsonl" \
+    "${ag}/agent-aleak2.jsonl" "${ag}/agent-aleak3.jsonl" \
     "${ag}/workflows/wf_1/agent-awf.jsonl"
   touch -d "@$((NOW - 60))" "${ag}/agent-arunning.jsonl" "${ag}/agent-amidturn.jsonl"
   _bp_i() { local a q; a="$(_bpr "$1" --tsv)"; q="$(_bpr "$1" --quiet --last-sha 0000000000000000)"; BP_WHY="$(grep '^agent' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
@@ -57835,14 +57839,17 @@ BP_AG
     grep -q "^agent${T}aparallel${T}AGENT_STALLED${T}.*pendente: Bash: rm -rf \$P/m1 (+1 pendente(s))" <<< "${a}"; }
   _bpcase "(q) leva paralela mostra o 1º pendente, o que segura os outros" \
     "cmd = agent_cmd(pl[0])" "cmd = agent_cmd(pl[-1])" _bp_q
-  # (r) pendência largada por uma NOVA mensagem do assistente não vira parada eterna
-  _bp_r() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.aabandon' <<< "${a}" | tr '\t' ' ')"
-    grep -q "^agent${T}aabandon${T}AGENT_DONE${T}" <<< "${a}"; }
-  _bpcase "(r) pendência largada por nova mensagem do assistente sai do pendente" \
-    "                    if mid is not None:" "                    if False:" _bp_r
+  # (r) forma INTERCALADA (re-revisão, 2026-11-12): X pendente, cutucada, m2 com Y e o resultado de Y, m3 com texto final.
+  #     O harness roda dois fluxos depois da cutucada e o resultado de X pode chegar depois: pendência aberta nunca é DONE.
+  #     O mutante recoloca o abandono por message.id novo.
+  _bp_r() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.ainterleaved' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}ainterleaved${T}AGENT_STALLED${T}.*pendente: Bash: rm -rf \$P/m1" <<< "${a}"; }
+  _bpcase "(r) forma intercalada com pendência aberta sai AGENT_STALLED, nunca DONE pelo texto final" \
+    "                    mid = msg.get('id')" \
+    "                    mid = msg.get('id'); [pend.pop(k) for k in [k for k, (m0, _) in pend.items() if mid is not None and m0 != mid]]" _bp_r
   # (s) agente da ferramenta Workflow (subagents/workflows/<run>/) é medido, nunca um zero calado
   _bp_s() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_' <<< "${a}" | tr '\t' ' ')"
-    grep -q "^agent${T}wf_1/awf${T}AGENT_STALLED${T}sid-alpha${T}" <<< "${a}"; }
+    grep -q "^agent${T}wf_1/awf${T}AGENT_STALLED${T}sid-alpha${T}${T}${T}subagents/workflows/wf_1/agent-awf.jsonl${T}" <<< "${a}"; }
   _bpcase "(s) agente de Workflow em subagents/workflows/<run>/ é medido" \
     " + glob.glob(os.path.join(base, 'workflows', '*', 'agent-*.jsonl'))" "" _bp_s
   # (t) o comando pendente é redigido: segredo vira [REDACTED], a home vira ~
@@ -57868,6 +57875,29 @@ BP_AG
     [ -n "${s1}" ] && [ "${s1}" = "${s2}" ]; }
   _bpcase "(w) agente novo que só roda não muda o sha" \
     "AG_ALERT = ('AGENT_STALLED', 'AGENT_SILENT', 'AGENT_UNMEASURED')" "AG_ALERT = ('AGENT_STALLED', 'AGENT_SILENT', 'AGENT_UNMEASURED', 'AGENT_RUNNING')" _bp_w
+  # (x) redação além da lista mínima: -p<x>, -u <u>:<x>, x-api-key, --password <x>, *_SECRET*= e *_KEY=
+  _bp_x() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep -E '^agent.aleak[23]' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}aleak2${T}" <<< "${a}" && grep -q "^agent${T}aleak3${T}" <<< "${a}" \
+      && ! grep -qE 'S3cretPW|hunter22|KKKK1234|hunter33|AKIAZZZZ|QQQQ9' <<< "${a}"; }
+  _bpcase "(x) -p<x>, -u <u>:<x>, x-api-key, --password, *_SECRET*= e *_KEY= saem redigidos" \
+    "                       r'|--password[=\s]+" "                       r'|--passwordNUNCA[=\s]+" _bp_x
+  # (y) o --quiet que fala lista SILENT e UNMEASURED, não só STALLED (o M7 do refutador)
+  _bp_y() { local q; q="$(_bpr "$1" --quiet --last-sha 0000000000000000)"; BP_WHY="$(grep '^- AGENT_' <<< "${q}" | tr '\n' '|')"
+    grep -q '^- AGENT_SILENT: asilent' <<< "${q}" && grep -q '^- AGENT_UNMEASURED: abroken' <<< "${q}"; }
+  _bpcase "(y) o --quiet lista SILENT e UNMEASURED" \
+    "        if a['cls'] in AG_ALERT: print(f'- {a[" "        if a['cls'] == 'AGENT_STALLED': print(f'- {a[" _bp_y
+  # (z) os subagentes da PRÓPRIA sessão (--self) entram mesmo fora da lista de peers (o M8 do refutador)
+  mkdir -p "${sb}/proj/p/sid-self/subagents"; cp "${ag}/agent-astalled.jsonl" "${sb}/proj/p/sid-self/subagents/agent-aself.jsonl"
+  touch -d "@$((NOW - 3600))" "${sb}/proj/p/sid-self/subagents/agent-aself.jsonl"
+  _bp_z() { local a; a="$(_bpr "$1" --tsv --self sid-self)"; BP_WHY="$(grep '^agent.aself' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}aself${T}AGENT_STALLED${T}sid-self${T}" <<< "${a}"; }
+  _bpcase "(z) os subagentes da própria sessão entram pelo --self" \
+    "if self_sid and self_sid not in live_sids: live_sids.append(self_sid)" "pass" _bp_z
+  # (aa) diretório de transcripts que não existe é lacuna declarada, nunca «nenhum parado» (o M3 do refutador)
+  _bp_aa() { local a; a="$(BP_PROJ="${sb}/proj-missing" _bpr "$1" --tsv)"; BP_WHY="$(grep -E '^(gap|agent)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^gap${T}.*subagentes NÃO MEDIDOS: .*proj-missing ausente" <<< "${a}" && ! grep -q '^agent' <<< "${a}"; }
+  _bpcase "(aa) sem diretório de transcripts, os subagentes saem NÃO MEDIDOS" \
+    "else: gaps.append(f'subagentes NÃO MEDIDOS" "else: (lambda *a: None)(f'subagentes NÃO MEDIDOS" _bp_aa
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
