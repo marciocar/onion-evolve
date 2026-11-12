@@ -46507,6 +46507,100 @@ PY
 }
 _family run_design_context_selftests
 
+# Modo voice-conduct — exercita .claude/validation/voice-conduct-check.sh (vertical company-brain-context,
+# selo D_PERSONA_VOICE_CONDUCT_PIECE_1111, 2026-11-12, card SAC-417): o arquivo de voz e conduta da persona
+# confere com o esquema onion/voice-conduct/v1; cada regra semântica reprova o arquivo que a viola; rc 2
+# (não pude julgar) nunca é verde; e o resolver de contexto conhece a dimensão company-brain.
+_vc_variant() {  # <exemplo> <saída> <python que muta o dict d>
+  python3 -I - "$1" "$2" "$3" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1]))
+exec(sys.argv[3])
+yaml.safe_dump(d, open(sys.argv[2], "w"), allow_unicode=True, sort_keys=False)
+PY
+}
+run_voice_conduct_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/voice-conduct-check.sh" py="${REPO_ROOT}/.claude/validation/voice-conduct-check.py"
+  local ex="${REPO_ROOT}/.claude/utils/company-brain/voice-conduct.example.yaml"
+  local res="${REPO_ROOT}/.claude/utils/scope/resolve-context-dir.sh"
+  [ -f "${chk}" ] && [ -f "${py}" ] && [ -f "${ex}" ] || { record_fail "voice-conduct" "guarda ou exemplo ausente"; return; }
+  local T="--today 2026-11-12" d o rc
+  d="$(mktemp -d)"
+  # (a) o exemplo do framework vale: rc 0, sem achado
+  if o="$(bash "${chk}" "${d}" --file "${ex}" ${T} --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && [ -z "${o}" ]; then record_pass "voice-conduct: (a) o exemplo do framework confere com o esquema ⇒ rc 0, sem achado"
+  else record_fail "voice-conduct: (a) exemplo" "rc=${rc} ${o:0:200}"; fi
+  # casos de reprovação: <rótulo>|<código esperado>|<mutação python>|<today>
+  local spec label code mut today
+  while IFS='|' read -r label code mut today; do
+    [ -n "${label}" ] || continue
+    _vc_variant "${ex}" "${d}/v.yaml" "${mut}"
+    if o="$(bash "${chk}" "${d}" --file "${d}/v.yaml" --today "${today}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" = 1 ] && grep -q "^${code}	" <<< "${o}"; then record_pass "voice-conduct: ${label} ⇒ ${code}, rc 1"
+    else record_fail "voice-conduct: ${label}" "rc=${rc} esperado ${code}: ${o:0:200}"; fi
+  done <<'CASES'
+(b) seção de limites ausente|VC-SECTION-MISSING|del d["sections"]["limits"]|2026-11-12
+(c) aprovado por quem não é o dono|VC-APPROVER-NOT-OWNER|d["approved_by"]="outra-pessoa"; d["history"][-1]["approved_by"]="outra-pessoa"|2026-11-12
+(d) versão atual fora do histórico|VC-HISTORY-CURRENT|d["version"]="3.0.0"|2026-11-12
+(e) revisão periódica vencida|VC-REVIEW-OVERDUE|pass|2027-06-01
+(f) qualquer pessoa aprova|VC-REQUEST-APPROVE|d["request_vs_approve"]["approve"]["who"]=["todos"]|2026-11-12
+(g) a mesma ação nos dois lados|VC-REQUEST-APPROVE|d["request_vs_approve"]["request"]["actions"].append("executar-acao")|2026-11-12
+(h) mensagem recebida deixa de ser dado|VC-FIELD-TYPE|d["sections"]["limits"]["incoming_message_is_data"]=False|2026-11-12
+(i) gate de envio mais frouxo que a concisão|VC-GATE-LOOSER|d["send_gate"]["max_chars"]=5000|2026-11-12
+(j) id de regra repetido|VC-RULE-ID-DUP|d["sections"]["concision"]["rules"][0]["id"]="TONE_EMPATHY"|2026-11-12
+(k) chave fora do esquema|VC-UNKNOWN-KEY|d["aproved_by"]=d["approved_by"]|2026-11-12
+(l) aprovação no futuro|VC-DATE-FUTURE|import datetime; d["approved_at"]=datetime.date(2027,1,1); d["history"][-1]["date"]=datetime.date(2027,1,1)|2026-11-12
+(m) versão fora de semver|VC-FIELD-TYPE|d["version"]="v2"; d["history"][-1]["version"]="v2"|2026-11-12
+CASES
+  # (n) NÃO PUDE JULGAR ⇒ rc 2: arquivo que é lista; --today inválido; declaração de contexto com '..'
+  printf -- '- isto\n- é uma lista\n' > "${d}/lista.yaml"
+  local n1 n2 n3
+  if bash "${chk}" "${d}" --file "${d}/lista.yaml" ${T} >/dev/null 2>&1; then n1=0; else n1=$?; fi
+  if bash "${chk}" "${d}" --file "${ex}" --today 2026-13-40 >/dev/null 2>&1; then n2=0; else n2=$?; fi
+  mkdir -p "${d}/.claude"; printf 'context:\n  company-brain: ../fora\n' > "${d}/.claude/onion-context.yaml"
+  if bash "${chk}" "${d}" ${T} >/dev/null 2>&1; then n3=0; else n3=$?; fi
+  if [ "${n1}" = 2 ] && [ "${n2}" = 2 ] && [ "${n3}" = 2 ]; then record_pass "voice-conduct: (n) lista, --today inválido e declaração com '..' ⇒ rc 2 (não pude julgar), nunca verde"
+  else record_fail "voice-conduct: (n) rc 2" "lista=${n1} today=${n2} decl=${n3}"; fi
+  # (o) ARQUIVO AUSENTE: sem --require cala (rc 0); com --require é VC-FILE-ABSENT, rc 1 (a persona não fala)
+  rm -f "${d}/.claude/onion-context.yaml"
+  local o1 r1 o2 r2
+  if o1="$(bash "${chk}" "${d}" ${T} --format tsv 2>/dev/null)"; then r1=0; else r1=$?; fi
+  if o2="$(bash "${chk}" "${d}" ${T} --format tsv --require 2>/dev/null)"; then r2=0; else r2=$?; fi
+  if [ "${r1}" = 0 ] && [ -z "${o1}" ] && [ "${r2}" = 1 ] && grep -q '^VC-FILE-ABSENT	docs/company-brain-context/voice-conduct.yaml' <<< "${o2}"; then
+    record_pass "voice-conduct: (o) sem arquivo: cala sem --require; com --require ⇒ VC-FILE-ABSENT, rc 1"
+  else record_fail "voice-conduct: (o) ausente" "sem=${r1}/${o1:0:80} com=${r2}/${o2:0:120}"; fi
+  # (p) O RESOLVER conhece company-brain: default docs/company-brain-context; a declaração vence e o validador a segue
+  local p1 p2 p3
+  p1="$(bash "${res}" company-brain --repo "${d}" --source 2>/dev/null || true)"
+  printf 'context:\n  company-brain: brain/regras\n' > "${d}/.claude/onion-context.yaml"
+  p2="$(bash "${res}" company-brain --repo "${d}" --source 2>/dev/null || true)"
+  mkdir -p "${d}/brain/regras"; cp "${ex}" "${d}/brain/regras/voice-conduct.yaml"
+  if bash "${chk}" "${d}" ${T} --require >/dev/null 2>&1; then p3=0; else p3=$?; fi
+  if [ "${p1}" = $'docs/company-brain-context\tdefault' ] && [ "${p2}" = $'brain/regras\tonion-context' ] && [ "${p3}" = 0 ]; then
+    record_pass "voice-conduct: (p) resolver: company-brain → docs/company-brain-context por default; a declaração vence e o validador lê o arquivo declarado"
+  else record_fail "voice-conduct: (p) resolver" "default=${p1} declarado=${p2} validador=${p3}"; fi
+  # (q) MUTANTES: sem a regra do dono, sem a do curinga e sem a do histórico, o caso que a cura pega CALA
+  local mdir; mdir="$(mktemp -d)"
+  sed 's/        if doc\["owner"\] != doc\["approved_by"\]:/        if False:/' "${py}" > "${mdir}/m1.py"
+  sed 's/        if apw & WILDCARDS:/        if False:/' "${py}" > "${mdir}/m2.py"
+  sed 's/        if not cur:/        if False:/' "${py}" > "${mdir}/m3.py"
+  local sc="${REPO_ROOT}/.claude/utils/company-brain/voice-conduct.schema.yaml"
+  _vc_variant "${ex}" "${d}/c1.yaml" 'd["approved_by"]="outra-pessoa"; d["history"][-1]["approved_by"]="outra-pessoa"'
+  _vc_variant "${ex}" "${d}/c2.yaml" 'd["request_vs_approve"]["approve"]["who"]=["todos"]'
+  _vc_variant "${ex}" "${d}/c3.yaml" 'd["version"]="3.0.0"'
+  _vcm() { python3 -I -B "$1" --file "$2" --schema "${sc}" --today 2026-11-12 --format tsv 2>&1 | grep -c "^$3	" || true; }
+  local m1 m2 m3 k1 k2 k3
+  m1="$(_vcm "${mdir}/m1.py" "${d}/c1.yaml" VC-APPROVER-NOT-OWNER)"; k1="$(_vcm "${py}" "${d}/c1.yaml" VC-APPROVER-NOT-OWNER)"
+  m2="$(_vcm "${mdir}/m2.py" "${d}/c2.yaml" VC-REQUEST-APPROVE)";    k2="$(_vcm "${py}" "${d}/c2.yaml" VC-REQUEST-APPROVE)"
+  m3="$(_vcm "${mdir}/m3.py" "${d}/c3.yaml" VC-HISTORY-CURRENT)";    k3="$(_vcm "${py}" "${d}/c3.yaml" VC-HISTORY-CURRENT)"
+  if [ "${m1}" = 0 ] && [ "${m2}" = 0 ] && [ "${m3}" = 0 ] && [ "${k1}" -ge 1 ] && [ "${k2}" -ge 1 ] && [ "${k3}" -ge 1 ] \
+     && ! cmp -s "${py}" "${mdir}/m1.py" && ! cmp -s "${py}" "${mdir}/m2.py" && ! cmp -s "${py}" "${mdir}/m3.py"; then
+    record_pass "voice-conduct: (q) os 3 mutantes (sem o dono, sem o curinga, sem o histórico) calam o caso que a cura pega"
+  else record_fail "voice-conduct: (q) mutantes" "mutantes=${m1}/${m2}/${m3} (esperado 0) cura=${k1}/${k2}/${k3} (esperado ≥1; o sed precisa casar)"; fi
+  rm -rf "${mdir}" "${d}"
+}
+_family run_voice_conduct_selftests
+
 # REGRA 112 (Página com projection_of cita ids que existem nos grafos dela) — adoção da kg-ssot 4.35.0
 # (2026-10-27). Quem julga é o `kg_trace.py projection` do produto; o kg-projection.sh lê o rc e o JSON. O fixture é
 # o design gerado pelo próprio /design:setup (o brief stub cita `C_BRIEF`), num repo git com tudo commitado,

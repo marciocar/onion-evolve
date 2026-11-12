@@ -929,7 +929,7 @@
 | 16.8 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
 | 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
 | 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
-| 5.4 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
+| 7.2 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
 
 ## problem-formula-2026-11 — 3 item(ns)
 

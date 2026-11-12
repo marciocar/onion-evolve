@@ -36,6 +36,7 @@
 - **onion** --has-member--> clickup-specialist
 - **onion** --has-member--> code-reviewer
 - **onion** --has-member--> command-creator-specialist
+- **onion** --has-member--> company-brain
 - **onion** --has-member--> corporate-compliance-specialist
 - **onion** --has-member--> design-system-specialist
 - **onion** --has-member--> docker-specialist
@@ -55,6 +56,7 @@
 - **onion** --has-member--> nx-migration-specialist
 - **onion** --has-member--> nx-monorepo-specialist
 - **onion** --has-member--> onion
+- **onion** --has-member--> onion-company-brain-context
 - **onion** --has-member--> onion-compliance-context
 - **onion** --has-member--> onion-design-context
 - **onion** --has-member--> onion-engineering-context
@@ -508,6 +510,7 @@ onion	has-member	claude-code-specialist
 onion	has-member	clickup-specialist	
 onion	has-member	code-reviewer	
 onion	has-member	command-creator-specialist	
+onion	has-member	company-brain	
 onion	has-member	corporate-compliance-specialist	
 onion	has-member	design-system-specialist	
 onion	has-member	docker-specialist	
@@ -527,6 +530,7 @@ onion	has-member	nodejs-specialist
 onion	has-member	nx-migration-specialist	
 onion	has-member	nx-monorepo-specialist	
 onion	has-member	onion	
+onion	has-member	onion-company-brain-context	
 onion	has-member	onion-compliance-context	
 onion	has-member	onion-design-context	
 onion	has-member	onion-engineering-context	

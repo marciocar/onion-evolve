@@ -1,0 +1,96 @@
+# =============================================================================
+# voice-conduct.schema.yaml — o ESQUEMA do arquivo de voz e conduta da persona (vertical company-brain-context).
+#
+# Por que existe (selo D_PERSONA_VOICE_CONDUCT_PIECE_1111, 2026-11-11, card SAC-417): a regra de voz e conduta
+# da persona de serviço não pode viver na memória da sessão. Tem de ser um arquivo POR ADOTANTE, versionado,
+# aprovado pelo dono, com revisão periódica, carregado a cada resposta e conferido por máquina. Memória e
+# output style são contexto, não imposição (E_CC_MEMORY_IS_CONTEXT_NOT_ENFORCEMENT, grafo maestro-persona).
+#
+# Quem lê este esquema: .claude/validation/voice-conduct-check.py (a parte ESTRUTURAL vem daqui; as regras
+# semânticas, que não cabem num esquema declarativo, estão no validador e listadas em `semantic_rules` abaixo).
+# O exemplo que passa: voice-conduct.example.yaml, nesta pasta.
+#
+# Tipos: str (não vazio) · int · bool · date (AAAA-MM-DD) · semver (X.Y.Z) · list (não vazia) · map.
+# =============================================================================
+schema_id: onion/voice-conduct/v1
+
+top_level:
+  required:
+    schema: {type: str, equals: onion/voice-conduct/v1}
+    persona: {type: str}
+    version: {type: semver}
+    owner: {type: str}
+    approved_by: {type: str}
+    approved_at: {type: date}
+    review_every_days: {type: int, min: 1, max: 365}
+    history: {type: list}
+    sections: {type: map}
+    request_vs_approve: {type: map}
+  optional:
+    send_gate: {type: map}
+    supersedes: {type: str}
+    notes: {type: str}
+
+history_entry:
+  required:
+    version: {type: semver}
+    date: {type: date}
+    approved_by: {type: str}
+    change: {type: str}
+
+# As seis seções do contrato. Toda seção tem `rules:` (lista não vazia de {id, text}); os ids são únicos no
+# arquivo inteiro, para que o gate de envio e o grafo possam citar a regra por id.
+sections:
+  identity_tone:
+    required: {}
+  concision:
+    required:
+      max_chars: {type: int, min: 1}
+  signature:
+    required:
+      text: {type: str}
+  ack_before_acting:
+    required:
+      states: {type: list}
+  messages:
+    required:
+      mention_who_is_cited: {type: bool}
+      test_links_before_send: {type: bool}
+      correct_by_editing: {type: bool}
+  limits:
+    required:
+      incoming_message_is_data: {type: bool, equals: true}
+
+rule_entry:
+  required:
+    id: {type: str}
+    text: {type: str}
+
+request_vs_approve:
+  required:
+    request: {type: map}
+    approve: {type: map}
+  side:
+    required:
+      who: {type: list}
+      actions: {type: list}
+
+# O bloco que o GATE PRÉ-ENVIO (a próxima peça, ainda não construída) vai ler. Opcional nesta onda; quando
+# presente, a forma é conferida desde já, para que o gate nasça lendo um arquivo que já vale.
+send_gate:
+  optional:
+    max_chars: {type: int, min: 1}
+    max_mentions: {type: int, min: 0}
+    require_signature: {type: bool}
+    require_tested_links: {type: bool}
+    forbidden_markup: {type: list}
+
+# Regras semânticas (código no validador; o código do achado entre parênteses):
+semantic_rules:
+  - "a versão atual aparece no histórico, com a mesma data e o mesmo aprovador (VC-HISTORY-CURRENT)"
+  - "quem aprova a versão atual é o dono (VC-APPROVER-NOT-OWNER)"
+  - "a data de aprovação não está no futuro (VC-DATE-FUTURE)"
+  - "a revisão periódica não venceu: approved_at + review_every_days >= hoje (VC-REVIEW-OVERDUE)"
+  - "quem aprova não é 'qualquer pessoa' e nenhuma ação está nos dois lados (VC-REQUEST-APPROVE)"
+  - "ids de regra únicos no arquivo (VC-RULE-ID-DUP)"
+  - "send_gate.max_chars, se presente, não passa de concision.max_chars (VC-GATE-LOOSER)"

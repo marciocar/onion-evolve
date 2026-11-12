@@ -407,6 +407,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-11: «Regras de voz e conduta da persona: o que faz?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-11"
       locality: "pessoa"
+  - id: A_VERTICAL_COMPANY_BRAIN_CONTEXT_1112
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "arquivos na branch feat/vertical-company-brain-context; bancada voice_conduct verde (17 casos) e 8 mutantes mortos por ops/mutate-and-restore.sh"
+    label: "a vertical company-brain-context criada pelo /meta:create-vertical: resolver, hub, persona por warm-up e a peça de voz e conduta como contrato (esquema e validador); o gate pré-envio é a próxima peça"
+    trace: ".claude/skills/onion-company-brain-context/SKILL.md"
+    provenance:
+      source: ".claude/skills/onion-company-brain-context/SKILL.md"
+      locator: "seções 3 (contrato), 4 (migração da v1 local do hub) e 5 (persona)"
+      method: "measurement: arquivo conferido no disco e exercitado pela família voice_conduct do lint-selftest.sh"
+      locality: "repo"
 edges:
   - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
     to: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
@@ -503,4 +519,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_PERSONA_VOICE_CONDUCT_PIECE_1111
     to: Q_COMPANY_BRAIN_NAO_DEVS_1111
+    edge_type: TRACES_TO
+  - from: Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111
+    to: A_VERTICAL_COMPANY_BRAIN_CONTEXT_1112
     edge_type: TRACES_TO

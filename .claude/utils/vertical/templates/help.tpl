@@ -1,7 +1,6 @@
 ---
 name: help
 description: Ajuda contextual da vertical {{PROJECT_TITLE}} — o que ela entrega e os próximos passos a partir do estado vivo.
-model: sonnet
 allowed-tools: Read Bash(git *)
 category: {{PROJECT}}
 tags: [help, {{PROJECT}}]
