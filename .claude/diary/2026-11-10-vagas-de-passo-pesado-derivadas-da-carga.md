@@ -21,7 +21,7 @@ carga a cada tentativa. A vaga única serializava demais; espera escrita à mão
 ## Evidence
 - PR #1577: a batuta rege a carga, o parado e a dona da pergunta; N = piso((12 − load) / 2), entre 1 e 4.
 - Medido em 2026-11-10: 4 agentes na fila de uma vaga com a máquina folgada.
-- PRs #1499 e #1503: a regra de carga virou lease, com a pressão de CPU como segundo sinal.
+- PRs #1499 e #1503: a regra de carga virou lease (reserva com prazo, pega e devolvida por cada passo pesado), com a pressão de CPU como segundo sinal.
 
 ## Next crumb
 A trava é de eficiência, não de correção: se algum dia ela guardar correção, precisa de fencing token.

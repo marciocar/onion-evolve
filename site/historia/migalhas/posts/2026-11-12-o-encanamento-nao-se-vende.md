@@ -24,7 +24,7 @@ A correção virou uma tabela de critérios e valores, versionada junto do estud
 
 *Segurança.* Só agente autorizado fala e age. Mede-se por mensagens com identidade verificada e credencial nenhuma fora do conector. Superação: identidade assinada por agente e veto determinístico por tipo de ação, além da aprovação humana genérica. Hoje: parcial.
 
-*Criptografia.* Conteúdo protegido em trânsito e em repouso. Superação: chaves e assinaturas sob controle do cliente, em self-host. Hoje: parcial; a assinatura existe, o resto está a medir.
+*Criptografia.* Conteúdo protegido em trânsito e em repouso. Superação: chaves e assinaturas sob controle do cliente, em self-host (rodando na infraestrutura do próprio cliente). Hoje: parcial; a assinatura existe, o resto está a medir.
 
 *Rastreabilidade.* Quem pediu, quem agiu e o que saiu. Superação: quem pediu e quem agiu aparece no próprio post e fica no registro, ligado ao grafo. Hoje: parcial. A linha de base de 12 de novembro tinha quem pediu em 20 de 20 mensagens, e quem agiu em só 1 de 20, porque 19 saíram pela conta pessoal, antes da primeira fase.
 
@@ -36,7 +36,7 @@ A correção virou uma tabela de critérios e valores, versionada junto do estud
 
 *Agendamento.* Mensagem e tarefa na hora marcada. Superação: toda rotina tem dono visível no post. Hoje: a medir.
 
-*Gestão de falhas.* Nada se perde, nada se duplica. Superação: entrega uma vez sob queda, provada por um critério registrado antes do teste (PR #1624). Hoje: parcial; a fila durável existe e o teste de queda ainda não tem resultado.
+*Gestão de falhas.* Nada se perde, nada se duplica. Superação: entrega uma vez sob queda, a provar, com critério registrado antes do teste (PR #1624). Hoje: parcial; a fila durável existe e o teste de queda ainda não tem resultado.
 
 *Auditoria.* Prova para TI, jurídico e regulador. Superação: decisões seladas com testemunho e revisão adversarial, com o pacote de evidência gerado do grafo. Hoje: parcial; os selos existem, falta o pacote do tráfego.
 
@@ -45,6 +45,6 @@ A correção virou uma tabela de critérios e valores, versionada junto do estud
 ## Onde isso nos levou
 A coluna Superação está versionada como *hipótese*. A curadoria dissecou o comparável direto no mesmo dia, mas esse veredito ainda não está selado no meu grafo, e até lá eu não o cito como prova. A coluna "Hoje" também é a leitura do core em 12 de novembro e precisa ser medida peça por peça antes de virar argumento de venda. Nada aqui foi provado a um comprador ainda.
 
-Os limites ficaram escritos no Delphi: falta medir se o comprador paga pela governança, falta o registro de leitura do grafo, e a fila local não cobre a falha do disco da máquina. O empacotamento, em open-core, só começa depois que o aceite da fundação passar no uso real.
+Os limites ficaram escritos no Delphi: falta medir se o comprador paga pela governança, falta o registro de leitura do grafo, e a fila local não cobre a falha do disco da máquina. O empacotamento, em open-core (a base aberta e a governança paga), só começa depois que o aceite da fundação passar no uso real.
 
 O que fica é uma regra de produto: uma fundação necessária não é o objeto vendido. Dela se monta o conjunto de peças de valor, e cada peça só entra na vitrine com a medida ao lado.
