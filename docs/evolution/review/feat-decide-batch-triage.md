@@ -2,8 +2,7 @@
 branch: feat/decide-batch-triage
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 892a1579f5e6c63e5d356906b7cd4196d9b6d57d1235fca1118f789b604ed618
-reviewed_code_sha256: fc15524beca23fa22e71346bdb73012784828576960ec4cd2b72006380270150
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 12
 findings_fixed: 7
@@ -167,3 +166,7 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
 - 1ª passada: REPROVADO, com 3 bloqueios (obsoleto sem sucessor derrubava o lote, data e prazo frouxos no lote, chave só por id no workflow) e 9 limites.
 - 2ª passada, sobre o commit 834912cbc: APROVADO COM LIMITES. Os 3 bloqueios e 4 limites curados resistiram; a família decide passou 49 de 49 e o lint 0 HARD.
 - Limites que sobram: a reaplicação idêntica de um lote só de pedidos grava de novo (item 8), e no prompt do refutador do workflow o `ref`, o `due` e a chave ficam fora da cerca de conteúdo não confiável.
+
+## Re-revisão (CI)
+
+O CI reprovou 7 casos em cascata por uma causa: o `decide-census.sh` passou a chamar o `decide-triage.sh`, que não estava no `VALIDATION[]` do manifesto do plugin onion, e o bundle não montava. O medidor entrou no manifesto; as famílias bundle_dep_closure, materialize_repo, plugin_bundle, plugin_runtime, assemble_plugin e status_factor passaram 32 de 32 local.

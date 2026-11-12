@@ -137,6 +137,8 @@ VALIDATION=(
   ".claude/validation/kg-census-extract.sh"
   # Motores do /meta:decide (2026-10-14): o medidor que a carga injeta e o selador que grava a resposta.
   ".claude/validation/decide-census.sh"
+  # o medidor da triagem em lote (2026-11-12, D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111), que o decide-census chama com --triage
+  ".claude/validation/decide-triage.sh"
   ".claude/validation/kg-decide-seal.sh"
   # o painel OPCIONAL do /meta:decide (2026-10-21, D_INTELLIGENT_UI_1021): a rodada em JSON, a volta das
   # respostas pelo mesmo selador e a página que a sessão publica como Artifact. A superfície cita os dois.
