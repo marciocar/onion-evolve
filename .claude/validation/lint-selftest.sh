@@ -1256,11 +1256,13 @@ _selftest_affected_families() {
 # de faixas — e se ELA quebra, a completa do CI deixa de ser confiável:
 #   · selftest_lanes      — --list/--map/--jobs/fila/trailers/relatório (as faixas em si);
 #   · selftest_selection  — o seletor por caso (bloco, empacotado, núcleo);
+#   · selftest_selection_failsafe — a 2ª metade dela (failsafe do hook sem família e checkpoint), separada
+#                           em 2026-11-12 para caber numa faixa do CI;
 #   · two_tier_bench      — o nível PR e a completa do main (o que garante que a completa ACONTECE no CI);
 #   · machine_slots       — o semáforo da máquina e esta faixa local;
 #   · shell_pipefail_robustness — catraca estática barata (1 s) do antipadrão que só o CI de 2 cores expõe.
 # Mais as famílias `*` do mapa (rodam em todo commit). `--full`/ONION_SELFTEST_FULL=1 anula esta faixa.
-SELFTEST_LOCAL_CORE="selftest_lanes,selftest_selection,two_tier_bench,machine_slots,shell_pipefail_robustness"
+SELFTEST_LOCAL_CORE="selftest_lanes,selftest_selection,selftest_selection_failsafe,two_tier_bench,machine_slots,shell_pipefail_robustness"
 # núcleo da bancada no nível PR quando um BLOCO de família muda (o local + o seletor por arquivo e o arranque)
 SELFTEST_BENCH_CORE="${SELFTEST_LOCAL_CORE},selector_per_file,shared_startup"
 # Donos (famílias) das linhas mudadas da bancada, dos dois lados do diff. $1 = staged|worktree|range.
@@ -35056,6 +35058,19 @@ open(p, "w", encoding="utf-8").write(s[:i] + "\n".join(sys.argv[2:]) + "\n" + s[
   if [ "$(grep -c 'famílias=<todas>' <<< "${out}")" -eq 1 ]; then
     record_pass "selftest-selection: (d) arquivo do domínio citado só por '# selftest-covers:' continua comprando todas (fraca só acrescenta)"
   else record_fail "selftest-selection: (d) fraca estreitou" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+}
+_family run_selftest_selection_selftests
+
+# ── selftest_selection_failsafe — a 2ª metade da selftest_selection (2026-11-12, tarde) ─────────────
+# POR QUE É FAMÍLIA PRÓPRIA: a selftest_selection inteira levava ~850 s de mediana no runner (até ≥1053 s nas
+# faixas que estouraram), sozinha numa faixa. Nenhuma repartição de faixas a baixava, porque a parede de uma
+# faixa de pesada é a própria pesada. Medido local (819 s no total): os casos (a) a (d) levam ~365 s, e o (d2)
+# sozinho ~400 s, porque roda o seletor uma vez por hook até achar um sem família. Os casos (d2), (e) e (e2)
+# vieram para cá SEM mudar uma linha: só a fronteira da função mudou. As duas metades caem em faixas
+# diferentes pelo plano. A `selftest_selection` segue sendo o nome do seletor por caso; esta é a do failsafe e
+# do checkpoint.
+run_selftest_selection_failsafe_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh" out
   # (d2) o failsafe seguro FICA: hook que ninguém cita ⇒ todas, motivo impresso.
   #      O hook é ESCOLHIDO na hora, entre os que o seletor diz que nenhuma família cita. Até 2026-10-14 o
   #      exemplo era fixo (rule-title-in-prose.sh) e o caso quebrou no dia em que esse hook ganhou família
@@ -35085,7 +35100,7 @@ open(p, "w", encoding="utf-8").write(s[:i] + "\n".join(sys.argv[2:]) + "\n" + s[
     record_pass "selftest-selection: (e2) só o núcleo ⇒ covered=0 (o gatilho do pre-commit não dispara por doc)"
   else record_fail "selftest-selection: (e2) covered" "$(grep 'SELECTION' <<< "${out}")"; fi
 }
-_family run_selftest_selection_selftests
+_family run_selftest_selection_failsafe_selftests
 
 # ── testing_state — O PAINEL (ONDA 0.7) ──────────────────────────────────────────────────────
 #
@@ -50571,8 +50586,10 @@ print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
   #     2026-11-12, quando a faixa 1 (as quatro pesadas juntas) estourou em 3 de 4 pushes à main com o plano
   #     projetado a 16,7 min: a variância medida por família vai a 1,2–1,44× a mediana, e a do pior run, a
   #     ~1,5×. Com 65%, a projeção +50% ainda cabe no passo (0,65 × 1,5 = 0,975). Reprovou: re-medir a tabela
-  #     (collect-family-times.sh <runs completos>), separar pesadas e, se ainda não couber, somar uma faixa —
-  #     nunca subir o teto.
+  #     (collect-family-times.sh <runs completos>). Se a pior é faixa de PESADA (com faixa própria, sem
+  #     fixtures), a parede dela é a própria família e somar faixa NÃO cura: parta a família (como a
+  #     selftest_selection_failsafe saiu da selftest_selection em 2026-11-12), e a mensagem nomeia a pesada.
+  #     Se a pior é faixa de leves, somar uma faixa cura. Nunca subir o teto.
   #     MUTANTE: `selftest-shard-plan.sh 6` no workflow reprova este caso com a tabela da tarde de 2026-11-12.
   local _wf="${ONION_SHARD_WORKFLOW_UNDER_TEST:-${REPO_ROOT}/.github/workflows/onion-selftest.yml}" _pv
   _pv="$(WF="${_wf}" TAB="${_tab}" SUT="${sut}" python3 -c '
@@ -50591,6 +50608,16 @@ if r.returncode != 0 or not lanes:
     print("FALHA a projeção do plano não saiu (rc=%d): %s" % (r.returncode, r.stderr[:160])); raise SystemExit(0)
 pior, orc = max(lanes), teto * 0.65
 msg = "N=%d · pior faixa %.0f s (%.1f min) · orçamento %.0f s (65%% de %d min do passo)" % (n, pior, pior / 60, orc, teto // 60)
+if pior > orc:
+    import json
+    k = lanes.index(pior) + 1
+    pj = subprocess.run(["bash", os.environ["SUT"], str(n)], capture_output=True, text=True, env=e)
+    try: fams = next(x["familias"].split(",") for x in json.loads(pj.stdout) if x["n"] == k)
+    except Exception: fams = []
+    if fams and "fixtures" not in fams:
+        msg += " · a faixa %d é de PESADA (sem fixtures): somar faixa não cura; parta a família mais cara dela (%s)" % (k, fams[0])
+    else:
+        msg += " · a faixa %d é de leves: some uma faixa no workflow" % k
 print(("OK " if len(lanes) == n and pior <= orc else "FALHA ") + msg + ("" if len(lanes) == n else " · projeção com %d faixas" % len(lanes)))
 ' 2>&1 | tail -1)"
   case "${_pv}" in
@@ -50740,34 +50767,53 @@ print(("OK " if ok else "FALHA ") + "N=%d · %d pesadas (%s) nas faixas %s · fa
     *)   record_fail "shard-plan: (n) as pesadas voltaram a dividir faixa ou a levar fixtures" "${_pn}" ;;
   esac
 
-  # (o) O COLETOR CONTA A FAIXA QUE ESTOUROU (2026-11-12, tarde). A tabela vinha das linhas `⏱` do log, que
-  #     só saem no fim do passo: a faixa morta pelo teto não deixava nenhuma, e a tabela via só os runs em que
-  #     a família coube. Agora o coletor lê a sonda de disco do artefato. Fixture: um `gh` falso no PATH entrega
-  #     dois runs. No run A, a faixa terminou e `zz_a` levou 100 s. No run B, a faixa morreu (sem `_faixa fim`) com
-  #     `zz_a` no ar desde 1000 s depois do início: o limite inferior é 1380 − 1000 = 380 s. A mediana dos dois é
-  #     240. A `fixtures` sai como o total do run, contando a fatia que estava no ar: run A 50, run B 70 + (1380 −
-  #     1300) = 150, mediana 100.
-  #     MUTANTE: `last = max(last, t0 + step)` → `last = last` reprova este caso.
-  local _co="${REPO_ROOT}/ops/testing/collect-family-times.sh" _cd _po
+  # (o) O COLETOR CONTA A FAIXA QUE ESTOUROU, EM TODAS AS TENTATIVAS (2026-11-12, tarde; 2ª rodada pelo
+  #     refutador do #1635). A tabela vinha das linhas `⏱` do log, que só saem no fim do passo: a faixa morta
+  #     pelo teto não deixava nenhuma. E o `gh run download` só traz a ÚLTIMA tentativa, então o estouro da 1ª
+  #     sumia quando o rerun passava (run 43268758579). Fixture: um `gh` falso no PATH serve a API de artefatos.
+  #     O run 111 tem uma faixa: `zz_a` 100 s, fixtures 50. O run 222 tem a mesma faixa em DUAS tentativas: na
+  #     1ª ela morreu com `zz_a` no ar desde 1000 s (limite 1380 − 1000 = 380) e uma fatia de fixtures no ar
+  #     desde 1300 (70 + 80 = 150); na 2ª, `zz_a` 120 e fixtures 60. Esperado: `zz_a` = mediana(100, 380, 120) =
+  #     120; fixtures = mediana(50, mediana(150, 60) = 105) = 78. Com ONION_COLLECT_SPLIT=zz_a:0.25:zz_b, os runs
+  #     sem `zz_b` têm a medida dividida: `zz_a` = mediana(25, 95, 30) = 30 e `zz_b` = mediana(75, 285, 90) = 90.
+  #     MUTANTES: o limite do teto desligado (`last = last`), a fatia de fixtures no ar ignorada (`fx += 0`), só
+  #     um artefato por nome (a última tentativa) e a partição ignorada reprovam este caso.
+  local _co="${REPO_ROOT}/ops/testing/collect-family-times.sh" _cd _po _ps
   _cd="$(mktemp -d)"; mkdir -p "${_cd}/bin"
   cat > "${_cd}/bin/gh" <<'GHEOF'
 #!/usr/bin/env bash
-# gh falso: `gh run download <run> -p <pat> -D <dir>` escreve a sonda de disco de uma faixa
-run="$3"; dir=""; while [ "$#" -gt 0 ]; do [ "$1" = "-D" ] && dir="$2"; shift; done
-mkdir -p "${dir}/selftest-evidence-${run}-faixa1"; f="${dir}/selftest-evidence-${run}-faixa1/selftest-disk.tsv"
-printf 'familia\tfase\tepoch\tworker\ttmp_livre_kb\tws_livre_kb\ttmp_familia_kb\n' > "${f}"
-if [ "${run}" = "111" ]; then
-  printf '_faixa\tinicio\t0\t-\t1\t1\t-\nfixtures\tinicio\t0\t0/4\t1\t1\t-\nfixtures\tfim\t50\t0/4\t1\t1\t0\nzz_a\tinicio\t50\t0/4\t1\t1\t-\nzz_a\tfim\t150\t0/4\t1\t1\t0\n_faixa\tfim\t150\t-\t1\t1\t-\n' >> "${f}"
-else
-  printf '_faixa\tinicio\t0\t-\t1\t1\t-\nfixtures\tinicio\t0\t0/4\t1\t1\t-\nfixtures\tfim\t70\t0/4\t1\t1\t0\nzz_a\tinicio\t1000\t1/4\t1\t1\t-\nfixtures\tinicio\t1300\t2/4\t1\t1\t-\n' >> "${f}"
-fi
+# gh falso: só a API de artefatos (lista por run e zip por id)
+[ "$1" = "api" ] || { echo "gh falso: só 'api'" >&2; exit 1; }
+exec python3 - "$2" <<'PYEOF2'
+import io, json, re, sys, zipfile
+url = sys.argv[1]
+H = "familia\tfase\tepoch\tworker\ttmp_livre_kb\tws_livre_kb\ttmp_familia_kb\n"
+def row(f, ph, ep, w="0/4"): return "%s\t%s\t%d\t%s\t1\t1\t-\n" % (f, ph, ep, w)
+TSV = {
+  "1": H + row("_faixa", "inicio", 0, "-") + row("fixtures", "inicio", 0) + row("fixtures", "fim", 50) + row("zz_a", "inicio", 50) + row("zz_a", "fim", 150) + row("_faixa", "fim", 150, "-"),
+  "2": H + row("_faixa", "inicio", 0, "-") + row("fixtures", "inicio", 0) + row("fixtures", "fim", 70) + row("zz_a", "inicio", 1000, "1/4") + row("fixtures", "inicio", 1300, "2/4"),
+  "3": H + row("_faixa", "inicio", 0, "-") + row("fixtures", "inicio", 0) + row("fixtures", "fim", 60) + row("zz_a", "inicio", 60) + row("zz_a", "fim", 180) + row("_faixa", "fim", 180, "-"),
+}
+m = re.search(r"actions/runs/(\d+)/artifacts", url)
+if m:
+    arts = {"111": [("1", "selftest-evidence-111-faixa1")], "222": [("3", "selftest-evidence-222-faixa1"), ("2", "selftest-evidence-222-faixa1")]}[m.group(1)]
+    print(json.dumps({"total_count": len(arts), "artifacts": [{"id": int(i), "name": n, "expired": False} for i, n in arts]})); sys.exit(0)
+m = re.search(r"actions/artifacts/(\d+)/zip", url)
+if m:
+    b = io.BytesIO()
+    with zipfile.ZipFile(b, "w") as z: z.writestr("selftest-disk.tsv", TSV[m.group(1)])
+    sys.stdout.buffer.write(b.getvalue()); sys.exit(0)
+print("gh falso: url desconhecida " + url, file=sys.stderr); sys.exit(1)
+PYEOF2
 GHEOF
   chmod +x "${_cd}/bin/gh"
-  _po="$(PATH="${_cd}/bin:${PATH}" bash "${_co}" 111 222 2>&1)"
+  _po="$(PATH="${_cd}/bin:${PATH}" ONION_COLLECT_REPO=x/y bash "${_co}" 111 222 2>&1)"
+  _ps="$(PATH="${_cd}/bin:${PATH}" ONION_COLLECT_REPO=x/y ONION_COLLECT_SPLIT=zz_a:0.25:zz_b bash "${_co}" 111 222 2>&1)"
   rm -rf "${_cd}"
-  if grep -qxP 'zz_a\t240' <<< "${_po}" && grep -qxP 'fixtures\t100' <<< "${_po}" && grep -q '1 medida(s) de família que estava no ar' <<< "${_po}"; then
-    record_pass "shard-plan: (o) o coletor lê a sonda de disco e conta a faixa que estourou como limite inferior (zz_a 240, fixtures 100)"
-  else record_fail "shard-plan: (o) o coletor não conta a faixa que estourou" "$(_emit "${_po}" | head -c 240)"; fi
+  if grep -qxP 'zz_a\t120' <<< "${_po}" && grep -qxP 'fixtures\t78' <<< "${_po}" && grep -q '1 medida(s) de família que estava no ar' <<< "${_po}" \
+     && grep -qxP 'zz_a\t30' <<< "${_ps}" && grep -qxP 'zz_b\t90' <<< "${_ps}"; then
+    record_pass "shard-plan: (o) o coletor lê a sonda de disco de TODAS as tentativas e conta o estouro como limite inferior (zz_a 120, fixtures 78; partida 30/90)"
+  else record_fail "shard-plan: (o) o coletor não conta a faixa que estourou" "sem partição: $(_emit "${_po}" | grep -v '^#' | tr '\n' ' ' | head -c 160) · com partição: $(_emit "${_ps}" | grep -v '^#' | tr '\n' ' ' | head -c 120)"; fi
 
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
   #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
