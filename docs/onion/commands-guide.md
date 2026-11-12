@@ -538,7 +538,7 @@ docs/business-context/
 ### `/meta:baton`
 **Propósito**: O pulso da batuta (baton): mede as sessões vivas do repo e da família e dá a cada uma uma classe (`ACTIVE`, `IDLE_WITH_QUEUE`, `IDLE_NO_QUEUE`, `PARKED`, `UNREACHABLE`), com a fila pronta de dono declarado (`owner:` nos grafos, pergunta reservada, PR da branch); pergunta a cada sessão viva o estado em 3 linhas e reporta num formato fixo  
 **Natureza**: Nível 0 (só mede e lê). Não despacha, não acorda sessão parada por ordem (`~/.local/state/onion/baton/parked.tsv`). Core-only nesta fase (conjunto `pending`)  
-**Medidor**: `.claude/validation/baton-pulse.sh` (bancada `run_baton_pulse_selftests`); doutrina: cláusula 7 de `batuta-doctrine.md`
+**Medidor**: `.claude/validation/baton-pulse.sh` (bancada `run_baton_pulse_selftests`); doutrina: cláusula 7 de `baton-doctrine.md`
 
 ```bash
 # Exemplo de uso

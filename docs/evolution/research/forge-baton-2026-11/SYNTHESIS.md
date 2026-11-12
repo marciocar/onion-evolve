@@ -38,7 +38,7 @@ serviria para isso.»
 | Peça | Artefato | Estado |
 |---|---|---|
 | 1 superfície | `.claude/commands/meta/baton.md` | presente |
-| 2 doutrina | cláusula 7 de `.claude/commands/common/prompts/batuta-doctrine.md` | presente |
+| 2 doutrina | cláusula 7 de `.claude/commands/common/prompts/baton-doctrine.md` | presente |
 | 3 contexto medido | `.claude/validation/baton-pulse.sh`, injetado na carga | presente |
 | 4 orquestração | nenhuma: a pergunta é uma `SendMessage` por sessão | ausente por desenho |
 | 5 destino | TSV de pulsos com `--record` | especificado para a fase 2 |
@@ -85,5 +85,5 @@ Seis casos, cada um reprovado pelo seu mutante:
   maestro aprovar a gravação do TSV de pulsos.
 - **Fase 3** (`Q_BATON_PHASE3_TRAVEL_TO_DOORS_1112`, owner core): decidir se o comando viaja às portas, com os
   números da fase 2. Hoje ele está no conjunto `pending` (fonte e hub).
-- **Limite de nome:** a doutrina se chama `batuta-doctrine.md`, fora da regra de identificador em inglês. O rename
+- **Limite de nome:** a doutrina se chama `baton-doctrine.md`, fora da regra de identificador em inglês. O rename
   é um PR à parte, com os links atualizados.

@@ -118,7 +118,7 @@ nodes:
     verified_against: "forge-census conta o baton com as peças que ele cita; a bancada verde; o dogfood rc 0"
     trace: ".claude/commands/meta/baton.md"
     label: "fase 1 construída: o medidor baton-pulse.sh, o comando /meta:baton (pergunta de 3 linhas a cada sessão viva, formato fixo, modo /loop silencioso), a cláusula 7 da doutrina da batuta e a bancada, tudo no nível 0"
-    narrative: "Nível 0 da escada selada: só mede e lê. Não grava grafo, não despacha, não acorda PARKED. O nome do arquivo da doutrina (batuta-doctrine.md) segue fora da regra de identificador em inglês; o rename é um PR à parte, com os links."
+    narrative: "Nível 0 da escada selada: só mede e lê. Não grava grafo, não despacha, não acorda PARKED. O nome do arquivo da doutrina (baton-doctrine.md) segue fora da regra de identificador em inglês; o rename é um PR à parte, com os links."
     provenance:
       source: ".claude/commands/meta/baton.md"
       locator: "seções Degrau e limites, Procedimento e Modo /loop"
