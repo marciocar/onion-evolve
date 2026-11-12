@@ -57773,9 +57773,25 @@ for k, L in F.items():
     open(f'{d}/agent-a{k}.meta.json', 'w').write(json.dumps({'description': f'agente {k}'}))
 open(f'{d}/agent-abroken.jsonl', 'w').write('{nao e json\n\x00\x01\n')
 # texto do MEIO do turno: gravado numa linha própria com stop_reason tool_use antes do bloco tool_use (forma medida nos transcripts reais)
+# curas do refutador (2026-11-12): cutucada do líder no meio da ferramenta, relatório por SubagentHandback, silêncio com
+# Exit code 137, leva paralela (o 1º segura os outros), pendência largada por nova mensagem, segredo no comando e agente de Workflow
+am = lambda mid, *b: json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'id': mid, 'content': list(b)}})
+G = {'nudged':   [u(txt('brief')), a(tu('n1', 'sleep 999')), u(txt('The coordinator sent a message while you were working:\nainda está aí?'))],
+     'handback': [u(txt('brief')), a({'type': 'tool_use', 'id': 'h1', 'name': 'SubagentHandback', 'input': {'message': 'feito'}}),
+                  u({'type': 'tool_result', 'tool_use_id': 'h1', 'content': [txt('{"success":true,"message":"Report delivered to your caller."}')]})],
+     'silent':   [u(txt('brief')), a(tu('k1', 'make bench')), u({'type': 'tool_result', 'tool_use_id': 'k1', 'content': 'Exit code 137', 'is_error': True})],
+     'parallel': [u(txt('brief')), am('m1', tu('p1', 'rm -rf $P/m1')), am('m1', tu('p2', 'ls -la state'))],
+     'abandon':  [u(txt('brief')), am('m1', tu('b1', 'rm -rf $P/m1')), u(txt('The coordinator sent a message while you were working:\noi')),
+                  json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'id': 'm2', 'stop_reason': 'end_turn', 'content': [txt('larguei e respondi')]}})],
+     'leak':     [u(txt('brief')), a(tu('l1', 'curl -H "Authorization: Bearer sk-ant-api03-SECRETSECRET" -d token=abc123 /home/someone/x | `tick`'))]}
+for k, L in G.items(): open(f'{d}/agent-a{k}.jsonl', 'w').write('\n'.join(L) + '\n')
+import os; os.makedirs(f'{d}/workflows/wf_1', exist_ok=True)
+open(f'{d}/workflows/wf_1/agent-awf.jsonl', 'w').write('\n'.join(F['stalled']) + '\n')
 open(f'{d}/agent-amidturn.jsonl', 'w').write(u(txt('brief')) + '\n' + json.dumps({'type': 'assistant', 'message': {'role': 'assistant', 'stop_reason': 'tool_use', 'content': [txt('vou rodar')]}}) + '\n')
 BP_AG
-  touch -d "@$((NOW - 3600))" "${ag}/agent-astalled.jsonl" "${ag}/agent-adone.jsonl" "${ag}/agent-abroken.jsonl"
+  touch -d "@$((NOW - 3600))" "${ag}/agent-astalled.jsonl" "${ag}/agent-adone.jsonl" "${ag}/agent-abroken.jsonl" "${ag}/agent-anudged.jsonl" \
+    "${ag}/agent-ahandback.jsonl" "${ag}/agent-asilent.jsonl" "${ag}/agent-aparallel.jsonl" "${ag}/agent-aabandon.jsonl" "${ag}/agent-aleak.jsonl" \
+    "${ag}/workflows/wf_1/agent-awf.jsonl"
   touch -d "@$((NOW - 60))" "${ag}/agent-arunning.jsonl" "${ag}/agent-amidturn.jsonl"
   _bp_i() { local a q; a="$(_bpr "$1" --tsv)"; q="$(_bpr "$1" --quiet --last-sha 0000000000000000)"; BP_WHY="$(grep '^agent' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
     grep -q "^agent${T}astalled${T}AGENT_STALLED${T}sid-alpha${T}.*tool_use sem tool_result há 60min · pendente: Bash: rm -rf \$P/m1" <<< "${a}" \
@@ -57789,7 +57805,7 @@ BP_AG
   _bp_k() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.adone' <<< "${a}" | tr '\t' ' ')"
     grep -q "^agent${T}adone${T}AGENT_DONE${T}sid-alpha${T}.*agente done · texto final do assistente" <<< "${a}"; }
   _bpcase "(k) transcript que termina em texto final do assistente sai AGENT_DONE (o tool_use antigo teve resultado)" \
-    "for b in res: pend.pop(b.get('tool_use_id'), None)" "for b in res: pass" _bp_k
+    "hit = pend.pop(b.get('tool_use_id'), None)" "hit = pend.get(b.get('tool_use_id'))" _bp_k
   _bp_l() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.abroken' <<< "${a}" | tr '\t' ' ')"
     grep -q "^agent${T}abroken${T}AGENT_UNMEASURED${T}sid-alpha${T}.*NÃO medido" <<< "${a}"; }
   _bpcase "(l) transcript ilegível sai AGENT_UNMEASURED declarado, nunca «não parado»" \
@@ -57798,6 +57814,60 @@ BP_AG
     grep -q "^agent${T}amidturn${T}AGENT_RUNNING${T}sid-alpha${T}" <<< "${a}"; }
   _bpcase "(m) texto do meio do turno (stop_reason tool_use) não é texto final: sai AGENT_RUNNING, nunca DONE" \
     "txt.strip() and (last.get('message') or {}).get('stop_reason') != 'tool_use'" "txt.strip()" _bp_m
+  # (n) cutucada do líder no meio da ferramenta NÃO fecha a pendência (o M1 do refutador, ao contrário: limpar no texto)
+  _bp_n() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.anudged' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}anudged${T}AGENT_STALLED${T}sid-alpha${T}.*pendente: Bash: sleep 999" <<< "${a}"; }
+  _bpcase "(n) cutucada do líder no meio da ferramenta não esconde o travamento: segue AGENT_STALLED" \
+    "                        if not (isinstance(b, dict) and b.get('type') == 'tool_result'): continue" \
+    "                        if not (isinstance(b, dict) and b.get('type') == 'tool_result'): pend.clear(); continue" _bp_n
+  # (o) relatório entregue por SubagentHandback é fim
+  _bp_o() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.ahandback' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}ahandback${T}AGENT_DONE${T}.*SubagentHandback" <<< "${a}"; }
+  _bpcase "(o) relatório entregue por SubagentHandback sai AGENT_DONE, nunca RUNNING eterno" \
+    "    if handback: return 'AGENT_DONE'" "    if False: return 'AGENT_DONE'" _bp_o
+  # (p) sem pendência, sem fim e sem escrita além do teto é AGENT_SILENT, com o Exit code 137 nomeado
+  _bp_p() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.asilent' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}asilent${T}AGENT_SILENT${T}.*Exit code 137" <<< "${a}"; }
+  _bpcase "(p) agente calado sem pendência sai AGENT_SILENT com o Exit code 137 nomeado" \
+    "    if age > stall_s:   # sem pendência" "    if False:   # sem pendência" _bp_p
+  # (q) leva paralela: o comando exibido é o 1º (o que segura os outros), com a contagem do resto (o M9 do refutador)
+  _bp_q() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.aparallel' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}aparallel${T}AGENT_STALLED${T}.*pendente: Bash: rm -rf \$P/m1 (+1 pendente(s))" <<< "${a}"; }
+  _bpcase "(q) leva paralela mostra o 1º pendente, o que segura os outros" \
+    "cmd = agent_cmd(pl[0])" "cmd = agent_cmd(pl[-1])" _bp_q
+  # (r) pendência largada por uma NOVA mensagem do assistente não vira parada eterna
+  _bp_r() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.aabandon' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}aabandon${T}AGENT_DONE${T}" <<< "${a}"; }
+  _bpcase "(r) pendência largada por nova mensagem do assistente sai do pendente" \
+    "                    if mid is not None:" "                    if False:" _bp_r
+  # (s) agente da ferramenta Workflow (subagents/workflows/<run>/) é medido, nunca um zero calado
+  _bp_s() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}wf_1/awf${T}AGENT_STALLED${T}sid-alpha${T}" <<< "${a}"; }
+  _bpcase "(s) agente de Workflow em subagents/workflows/<run>/ é medido" \
+    " + glob.glob(os.path.join(base, 'workflows', '*', 'agent-*.jsonl'))" "" _bp_s
+  # (t) o comando pendente é redigido: segredo vira [REDACTED], a home vira ~
+  _bp_t() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.aleak' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}aleak${T}.*\[REDACTED\]" <<< "${a}" && ! grep -qE 'sk-ant|abc123|SECRETSECRET' <<< "${a}" && ! grep -q '/home/someone' <<< "${a}"; }
+  _bpcase "(t) segredo e home no comando pendente saem redigidos" \
+    "    s = SECRET_RE.sub('[REDACTED]', s)" "    pass" _bp_t
+  # (u) crase no comando não quebra o markdown: a cerca cresce
+  _bp_u() { local a; a="$(_bpr "$1" --markdown)"; BP_WHY="$(grep 'aleak' <<< "${a}")"
+    grep -q 'pendente: `` Bash: curl .*`tick` ``$' <<< "${a}"; }
+  _bpcase "(u) crase no comando pendente não quebra o markdown" \
+    "return f'{f} {s} {f}' if len(f) > 1 else f'\`{s}\`'" "return f'\`{s}\`'" _bp_u
+  # (v) o sha muda quando um agente PARA: o --quiet com o sha de antes fala e cita o parado (o M5 do refutador)
+  _bp_v() { local sha q; sha="$(_bpr "$1" --tsv --stall-min 120 | awk -F'\t' '$1=="sha"{print $2}')"
+    q="$(_bpr "$1" --quiet --last-sha "${sha:-0}")"; BP_WHY="sha=${sha} · $(head -c 300 <<< "${q}")"
+    [ -n "${sha}" ] && ! grep -q '· sem mudança' <<< "${q}" && grep -q '^- AGENT_STALLED: astalled' <<< "${q}"; }
+  _bpcase "(v) agente que para muda o sha: o --quiet não cala um STALLED" \
+    "'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT]}" "}" _bp_v
+  # (w) agente que só RODA não muda o sha: a batida segue quieta (limite 7 do refutador)
+  _bp_w() { local s1 s2; s1="$(_bpr "$1" --tsv | awk -F'\t' '$1=="sha"{print $2}')"
+    printf '%s\n' '{"type":"user","message":{"role":"user","content":"brief"}}' > "${ag}/agent-afresh.jsonl"; touch -d "@$((NOW - 30))" "${ag}/agent-afresh.jsonl"
+    s2="$(_bpr "$1" --tsv | awk -F'\t' '$1=="sha"{print $2}')"; rm -f "${ag}/agent-afresh.jsonl"; BP_WHY="${s1} → ${s2}"
+    [ -n "${s1}" ] && [ "${s1}" = "${s2}" ]; }
+  _bpcase "(w) agente novo que só roda não muda o sha" \
+    "AG_ALERT = ('AGENT_STALLED', 'AGENT_SILENT', 'AGENT_UNMEASURED')" "AG_ALERT = ('AGENT_STALLED', 'AGENT_SILENT', 'AGENT_UNMEASURED', 'AGENT_RUNNING')" _bp_w
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
