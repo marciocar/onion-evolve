@@ -35,6 +35,12 @@ STUDY = "docs/evolution/dissect/fixture-app-2026-10"
 GRAPH = STUDY + "/fixture-app-2026-10.kg.yaml"
 STAGE0 = STUDY + "/STAGE0.md"
 STAGE0_TEXT = "# Etapa 0 — fixture\n\n" + "".join("## %d. elemento %d\n\ntexto.\n\n" % (i, i) for i in range(1, 9))
+SYNTHESIS = STUDY + "/SYNTHESIS.md"
+SYNTHESIS_TEXT = {
+    "ok": "---\nkg: %s\n---\n\n# Síntese da fixture\n\ntexto.\n" % GRAPH,
+    "synth-link": "# Síntese da fixture\n\nO grafo: [fixture-app](fixture-app-2026-10.kg.yaml#D_FIXTURE).\n",
+    "synth-unlinked": "---\nkg: docs/evolution/dissect/outro-2026-10/outro-2026-10.kg.yaml\n---\n\n# Síntese solta\n\ntexto sem o grafo.\n",
+}
 DYNAMIC = "stage0-criterion-digest"  # o código que vem do kg_criterion (add(5, "stage0-" + …))
 
 
@@ -313,6 +319,11 @@ CASES = [
     ("candidata rejeitada noutro estudo do repo (o caso do MCP Agent Mail)", "gatilho-orfao", lambda g: D(g).update(x_dissect_candidate="onion-evolve:" + CAND_GRAPH + "#D_CAND"), "cand-graph", []),
     ("candidata rejeitada com o parque já selado (avisa, rc 0)", "aviso:gatilho-orfao", lambda g: D(g).update(x_dissect_candidate=CAND_GRAPH + "#D_CAND", status="done", x_dissect_sealed_by=SEAL), "cand-graph", []),
     ("candidata noutro repo (avisa que não mede, rc 0)", "aviso:candidata-fora-do-repo", lambda g: D(g).update(x_dissect_candidate="outro-repo:docs/x/x.kg.yaml#D_X"), "ok", []),
+    # item 11 — a síntese do estudo final (caso medido em 2026-11-12: uma dissecação passou na forma sem ela)
+    ("estudo final sem a SYNTHESIS.md", "synthesis-ausente", None, "no-synth", []),
+    ("stage plan sem a síntese (variante legítima)", None, None, "no-synth", ["--stage", "plan"]),
+    ("síntese que cita o grafo por link (variante legítima)", None, None, "synth-link", []),
+    ("síntese que não cita o grafo da pasta", "synthesis-nao-cita-o-grafo", None, "synth-unlinked", []),
 ]
 CAND_GRAPH = "docs/evolution/dissect/fixture-cand-2026-11/fixture-cand-2026-11.kg.yaml"
 RC3_CASES = [
@@ -360,7 +371,12 @@ def build(checker_src, mut, order):
     if mut:
         mut(g)
     plan = lambda: write(tmp, STAGE0, text)
-    graph = lambda: write_yaml(tmp, GRAPH, g)
+
+    def graph():
+        write_yaml(tmp, GRAPH, g)
+        # o item 11: a síntese nasce com o grafo; sem ela, ou sem citar o grafo, nas ordens que o caso pede
+        if order not in ("no-synth", "plan-uncommitted"):
+            write(tmp, SYNTHESIS, SYNTHESIS_TEXT.get(order, SYNTHESIS_TEXT["ok"]))
     if order == "plan-uncommitted":
         plan(); graph()
     elif order == "same":

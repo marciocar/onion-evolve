@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dissect-object-check — o checador de forma da dissecação de QUALQUER objeto (família, Etapa 0, veredito, destino).
 
-Cobra, por comando, os 10 itens (8 da §6, o registro de ideias e a candidata do parque da §1c) da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
+Cobra, por comando, os 11 itens (8 da §6, o registro de ideias, a candidata do parque da §1c e a síntese) da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
 de UM estudo e o git log. Determinístico, sem LLM e sem rede.
 
   item 1  x_dissect_tool, x_dissect_family e a aresta TRACES_TO para o registro existem e concordam
@@ -27,6 +27,9 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
   item 10 a candidata que o parque nomeia (x_dissect_candidate: [repo:]caminho#ID) existe e não foi rejeitada depois:
           rejeitada, o gatilho do parque ficou órfão (caso real: o parque do canal neutro da curadoria nomeia o MCP
           Agent Mail, rejeitado pela licença em 2026-11-06). No parque JÁ SELADO sai como AVISO, para o destino reabrir.
+  item 11 o estudo final traz <pasta-do-grafo>/SYNTHESIS.md, e ela cita o grafo da mesma pasta (no kg: do frontmatter
+          ou num link): a síntese é projeção do grafo, não documento solto. Sem ela o estudo passava na forma (caso
+          medido em 2026-11-12: uma dissecação da curadoria só ganhou a síntese depois de cobrada). Stage plan não cobra.
 
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
@@ -253,6 +256,10 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
     if stage == "plan":
         return findings
 
+    # item 11 — a SYNTHESIS.md do estudo final, projeção do grafo da mesma pasta (caso medido: uma dissecação da
+    # curadoria passou na forma sem síntese, e só a ganhou depois de cobrada)
+    synthesis_check(add, path, study_dir)
+
     # item 4 — quem paga e o que não foi verificado
     if not (isinstance(meta.get("x_who_pays"), str) and meta["x_who_pays"].strip()):
         add(4, "sem-x_who_pays", "meta.x_who_pays ausente ou vazio (quem paga e se abre via de bilhetagem)")
@@ -337,6 +344,29 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
             if any(v != "parquear" for v in verdicts):
                 add(8, "app-sem-artefato-veredito", "N2 sem artefato limita o veredito a parquear; achado %s" % verdicts)
     return findings
+
+
+def synthesis_check(add, path, study_dir):
+    """o estudo final traz <pasta>/SYNTHESIS.md, e ela cita o grafo da pasta (no kg: do frontmatter ou num link)."""
+    synth = os.path.join(study_dir, "SYNTHESIS.md")
+    if not os.path.isfile(synth):
+        add(11, "synthesis-ausente", "%s não existe: o estudo final traz a síntese, a projeção humana do grafo" % synth)
+        return
+    with open(synth, encoding="utf-8") as fh:
+        text = fh.read()
+    cited = []
+    fm = re.match(r"\A---\r?\n(.*?)\r?\n---[ \t]*\r?\n", text, re.S)
+    if fm:
+        try:
+            front = yaml.safe_load(fm.group(1))
+        except yaml.YAMLError:
+            front = None
+        kg = front.get("kg") if isinstance(front, dict) else None
+        cited += [str(k) for k in (kg if isinstance(kg, list) else [kg]) if k]
+    cited += re.findall(r"\]\(\s*<?([^)\s>]+)", text)
+    graph = os.path.basename(path)
+    if not any(os.path.basename(c.split("#", 1)[0]) == graph for c in cited):
+        add(11, "synthesis-nao-cita-o-grafo", "%s não cita %s no kg: do frontmatter nem num link: a síntese é projeção do grafo, não documento solto" % (synth, graph))
 
 
 def registered_before(s0, since):

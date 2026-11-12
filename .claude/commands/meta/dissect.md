@@ -169,6 +169,7 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    on` e `# ═══ TETO: N NÓS ═══`. **`kg-radar` exit 0 é obrigatório** antes de qualquer prosa.
    O `SYNTHESIS.md` é **projeção**, com o **contrato de custo** no frontmatter: `kg:` · `run_id` ·
    `tokens` · `agents` · `duration_min`.
+   A síntese é **obrigatória no estágio final**: sem ela, ou sem citar o grafo da pasta, o GATE reprova (item 11).
 6. **GATE** — `bash .claude/validation/dissect-object-check.sh <grafo>` rc 0 (estudo por família;
    rc 3 é "não mediu", nunca aprovação) · `lint-artifacts.sh` 0 HARD · famílias `run_dissect_selftests` e
    `run_dissect_object_selftests` verdes · resíduo da
