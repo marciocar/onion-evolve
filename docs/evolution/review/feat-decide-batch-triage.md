@@ -8,10 +8,12 @@ findings_real: 12
 findings_fixed: 7
 findings_blocking: 3
 findings_blocking_fixed: 3
-verdict: CORRIGIDO
-elenxo: sim
+tokens: 0
+duration_min: 0
+verdict: REJECTED_AND_FIXED
+elenxo: true
 reviewer: refutador independente (agente separado do construtor), duas passadas — 1ª REPROVADO com 3 bloqueios, 2ª APROVADO COM LIMITES
-nota: "os 12 achados são os do refutador independente: 3 bloqueantes e 4 limites curados; 5 limites declarados"
+nota: "tokens e duration_min 0 = não medidos. Os 12 achados são os do refutador independente: 3 bloqueantes e 4 limites curados; 5 limites declarados"
 ---
 
 # Passada adversarial: `feat/decide-batch-triage`
