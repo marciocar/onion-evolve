@@ -2,7 +2,8 @@
 branch: feat/meta-batuta
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 664a181d03d82dbc506e86311f0aa68a75ad2ac747c00f912315abe0a52b233b
+reviewed_code_sha256: a450423011cea9b8dd5ea9fd055637e12f17a4b4814a86d6b51a23f989c9126b
 findings_total: 10
 findings_real: 10
 findings_blocking: 3
