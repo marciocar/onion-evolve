@@ -2,7 +2,7 @@
 branch: feat/vertical-company-brain-context
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: f79209eda825fd77f1d1dc767f33a4c9f498a9771b37e369991148bb0e37c2de
+reviewed_diff_sha256: c4df86590c4206bfbb8d88dc6789266174acb1bf5ea998d2997b79ff0ad6ead0
 reviewed_code_sha256: 202d2b3f6abeace56c852cd9a871cc865f8dfde5122064ed75696e8260376b55
 findings_total: 7
 findings_real: 7
