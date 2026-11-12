@@ -2,7 +2,8 @@
 branch: feat/decide-delphi-mode
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 43aa0e6a1cb1bea44cab4e44079b8866dae46b5b289b418cd3c60603bfb8c52d
+reviewed_code_sha256: e43e0db66e49231e0f97fe7ab2a9cf2abd51cb337968f581b4daa1f5ff8ac68d
 findings_total: 16
 findings_real: 16
 findings_blocking: 3
