@@ -181,10 +181,14 @@ jobs:
     # faixa só: a parede dela era o máximo de quatro famílias ruidosas mais a maior fatia da `fixtures` entre
     # os workers, e no run lento foi além de 23 min. Cura sem subir o teto: cada PESADA (custo ≥ metade da mais
     # cara) em faixa própria, SEM fatia da `fixtures` (que se reparte entre as faixas sem pesada), tabela
-    # re-medida pela sonda de disco de 18 runs completos (os 3 estouros entram como limite inferior) e 7 faixas.
+    # re-medida pela sonda de disco de TODAS as tentativas de 18 runs completos (os estouros entram como limite
+    # inferior) e 7 faixas. A parede de uma faixa de pesada é a própria família, e somar faixa não a baixa: a
+    # `selftest_selection` (mediana de 870 s) foi PARTIDA em duas famílias, com a `selftest_selection_failsafe`
+    # levando os casos (d2), (e) e (e2) (56% do tempo).
     # O caso (h) da `shard_plan` reprova se a faixa mais pesada, projetada pelo PRÓPRIO plano
     # (`selftest-shard-plan.sh --project`) no N deste arquivo, passar de 65% do teto do passo (23 min): com
-    # +50% de variância sobre a projeção ela ainda cabe no passo (0,65 × 1,5 = 0,975).
+    # +50% de variância sobre a projeção ela ainda cabe no passo (0,65 × 1,5 = 0,975). A receita quando
+    # reprova: faixa de PESADA ⇒ partir a família (o caso nomeia qual); faixa de leves ⇒ somar uma faixa.
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5

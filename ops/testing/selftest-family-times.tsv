@@ -1,6 +1,7 @@
 # familia	segundos — mediana de 18 run(s) completo(s) no runner do CI, pela sonda de disco (collect-family-times.sh 43170996369 43175231577 43178327545 43183866359 43187839012 43192395593 43197970140 43208784215 43222986996 43228283532 43232754299 43241523163 43252777413 43259203932 43262706055 43265160002 43268758579 43279234372)
-# 3 medida(s) de família que estava no ar quando a faixa estourou entraram como limite inferior
+# todas as tentativas de cada run; 4 medida(s) de família que estava no ar quando a faixa estourou entraram como limite inferior
 # fixtures = TOTAL do run (soma das fatias de todas as faixas e workers)
+# partição: nos runs sem selftest_selection_failsafe, a medida de selftest_selection foi dividida 0.440 / 0.560 (ONION_COLLECT_SPLIT=selftest_selection:0.44:selftest_selection_failsafe)
 a2a_accept	106
 a2a_invite_live	27
 a2a_queue_live	56
@@ -127,7 +128,7 @@ inventory_adopter_scope	10
 kb_applies_to	0
 kb_index	20
 kb_vendored_link	1
-kg_backlog	776
+kg_backlog	820
 kg_born_marker	104
 kg_census_parity	3
 kg_console	2
@@ -202,7 +203,7 @@ mutate_helper	5
 onion_version	0
 onion_version_tracked	2
 ops_citation_travel	44
-outbox_channel	658
+outbox_channel	663
 peer_ref_check	4
 pin_integrity	0
 plan_contract_migration	202
@@ -234,7 +235,7 @@ public_machine_data	10
 publish	13
 publish_release	22
 r16_table_total	176
-r84_pathspec	112
+r84_pathspec	117
 radar_aufhebung	1
 radar_composable_modes	2
 radar_staleness	605
@@ -282,9 +283,10 @@ secret_gitignore	0
 seed_adoption_graph	4
 selector_per_file	330
 selftest_family_merge	2
-selftest_lanes	694
+selftest_lanes	698
 selftest_outcomes	0
-selftest_selection	850
+selftest_selection	383
+selftest_selection_failsafe	487
 selftest_series	1
 session_beacon	2
 session_velocity	0
@@ -313,7 +315,7 @@ task_manager_velocity	404
 task_progress	3
 testing_state	58
 trust_topology	1
-two_tier_bench	152
+two_tier_bench	158
 update_base_and_deny	6
 update_bridge	21
 upstream_portal_fixes	1
