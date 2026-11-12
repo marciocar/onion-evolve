@@ -2,7 +2,8 @@
 branch: docs/preamble-no-rm-var
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 868861175d4bc22ddf68dbbd2ba0bd05b30e3af671d331e74b4c89b1c250c900
+reviewed_code_sha256: 34cdb0304bd2ffe56b7bba1ce836d13699dceb1cb01bdb07c11f70440561217d
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
