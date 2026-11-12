@@ -10,8 +10,8 @@ findings_blocking: 0
 findings_fixed: 1
 tokens: 0
 duration_min: 30
-verdict: CORRIGIDO
-elenxo: nao
+verdict: FIXED
+elenxo: false
 reviewer: "agente de execução (claude-opus-5-5), passada própria sobre o próprio diff"
 nota: "tokens não medidos pelo agente; o harness reporta o uso na notificação final"
 ---
