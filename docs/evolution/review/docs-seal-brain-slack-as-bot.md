@@ -2,7 +2,8 @@
 branch: docs/seal-brain-slack-as-bot
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3eb53a1bc587d5ec2ab3907b70eca9461a84d0f1df78308e2cacb597c94818f0
+reviewed_code_sha256: 60622e7633e8cdd1c679a67dbfc860a3486889bc287e28dd40dc2301a7887818
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
