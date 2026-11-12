@@ -2,7 +2,8 @@
 branch: fix/ci-lanes-heavy-split
 pr: 1635
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 02a7646f1f31bfcd36bcbde5d6e4aa2892a0f116c0a03752ed2aee5b78293d2e
+reviewed_code_sha256: 459347f6b95b81a4ca145e774f30ba6b42107fd663639e3d14ca5ff9a01a06cf
 findings_total: 7
 findings_real: 7
 findings_blocking: 2
