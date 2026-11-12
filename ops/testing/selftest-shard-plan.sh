@@ -76,15 +76,18 @@ fi
 # (posição 11) roda em todo worker. A `selftest_selection` (posição 130, 984 s) só começou aos 393 s e a faixa
 # terminou aos 1378 s, com os outros três workers parados no fim. O LPT pela soma não vê isso. Agora o
 # plano SIMULA a fila (ordem do --list, W workers, a fatia da `fixtures` em cada um) e põe cada família na
-# faixa onde a parede projetada fica menor. O simulador acertou as 35 faixas de 7 runs completos da main de
-# 2026-11-12 com erro de −3% a +3%.
+# faixa onde a parede projetada fica menor. Nas 35 faixas de 7 runs completos da main de 2026-11-12 o erro
+# do simulador é de ±3% COM OS TEMPOS DO PRÓPRIO RUN e a fatia real da `fixtures`; pela MEDIANA da tabela (o
+# que o `--project` usa), é de −18% a +43% por faixa: a variância entre runners e o desbalanço da `fixtures`
+# entre workers (o maior worker leva 1,05 a 1,45× a média) não estão modelados. A régua prevê a ORDEM de
+# grandeza e o piso estrutural, não a parede de um run.
 # A linha `fixtures` da tabela é o TOTAL da família no run (soma das fatias de todas as faixas). W vem de
 # ONION_SHARD_WORKERS (4 = o nproc do runner, medido no log "em 4 workers").
 # `--project` imprime `faixa<TAB>parede_s<TAB>soma_s` em vez da matriz: é a projeção que o caso (h) da
 # bancada lê, para que a régua do teto e a do plano sejam o MESMO modelo.
 TIMES="${ONION_SHARD_TIMES:-${ROOT}/ops/testing/selftest-family-times.tsv}"
 [ -f "${TIMES}" ] || TIMES=""
-printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" W="${ONION_SHARD_WORKERS:-4}" PROJECT="${PROJECT}" python3 -c '
+printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" W="${ONION_SHARD_WORKERS:-4}" PROJECT="${PROJECT}" IMPROVE="${ONION_SHARD_IMPROVE:-1}" python3 -c '
 import json, os, sys
 fams = [l.strip() for l in sys.stdin if l.strip()]
 n = max(1, int(os.environ["N"]))
@@ -142,7 +145,8 @@ if times:
     # de faixa enquanto isso baixar (pior parede, soma dos quadrados): a folga se espalha por todas, e
     # a variância medida entre runners (+/-20%) não cai inteira numa faixa só.
     score = lambda ws: (round(max(ws)), sum(x * x for x in ws))
-    for _ in range(30):
+    # ONION_SHARD_IMPROVE=0 desliga a melhora (só para o caso (l) da bancada comparar)
+    for _ in range(30 if os.environ.get("IMPROVE", "1") != "0" else 0):
         moved = False
         for f in sorted(rest, key=lambda f: -cost(f)):
             a = next(i for i, s in enumerate(shards) if f in s)

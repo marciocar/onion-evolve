@@ -50560,7 +50560,8 @@ print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
   #     SAC-423). A 1ª régua projetava a parede por `soma/W + fixtures/(N·W) + arranque` e aprovou um plano
   #     cuja faixa 2 bateu 23,4 min na main (run 43208784215): a fila do `--jobs` anda na ORDEM DO SCRIPT, e a
   #     `selftest_selection` começava aos 393 s. A régua agora é a projeção do PRÓPRIO plano
-  #     (`selftest-shard-plan.sh --project N`, o simulador da fila, ±3% nas 35 faixas de 7 runs completos),
+  #     (`selftest-shard-plan.sh --project N`, o simulador da fila: ±3% nas 35 faixas de 7 runs completos com
+  #     os tempos do próprio run; pela mediana, que é o que este caso lê, de −18% a +43% por faixa),
   #     no N que o workflow roda, contra 75% do teto do PASSO da bancada (o que corta): 25% de folga para a
   #     variância entre runners (a mesma família foi de 660 a 984 s no mesmo dia). Reprovou: re-medir a tabela
   #     (collect-family-times.sh <runs completos>) e, se ainda não couber, somar uma faixa — nunca subir o teto.
@@ -50606,6 +50607,90 @@ print(("OK " if len(w) == 4 and max(w) >= 1200 and sorted(w)[-2] < 1200 else "FA
   case "${_pi}" in
     OK*) record_pass "shard-plan: (i) a projeção simula a fila na ordem do script: família cara no fim espera a fixtures (${_pi#OK })" ;;
     *)   record_fail "shard-plan: (i) a projeção não é a parede da fila" "${_pi}" ;;
+  esac
+
+  # (j) A FILA ANDA NA ORDEM DO --list, NÃO NA ALFABÉTICA (2026-11-12, refutador da SAC-423: o mutante
+  #     `sorted(lane)` sobrevivia ao (h) e ao (i)). Tabela sintética com W=2, N=1 e fixtures 0: H é a família
+  #     alfabeticamente PRIMEIRA (1000 s), e duas que vêm ANTES dela no script custam 100 s. Na ordem do
+  #     script, os 2 workers pegam as leves e H só começa aos 100 s: parede 1100. Em ordem alfabética, H sai na
+  #     frente e a parede é 1000.
+  #     MUTANTE: `seq = sorted(lane, key=lambda f: pos[f])` → `seq = sorted(lane)` reprova este caso.
+  local _tj _pj; _tj="$(mktemp)"
+  _pj="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | TJ="${_tj}" SUT="${sut}" python3 -c '
+import os, subprocess, sys
+fams = [l.strip() for l in sys.stdin if l.strip() and l.strip() != "fixtures"]
+h = min(fams); i = fams.index(h)
+if i < 2: print("FALHA a primeira alfabética está na posição %d do --list: o caso precisa de 2 antes dela" % i); raise SystemExit(0)
+c = {h: 1000, fams[0]: 100, fams[1]: 100}
+open(os.environ["TJ"], "w").write("".join("%s\t%d\n" % (f, c.get(f, 0)) for f in fams) + "fixtures\t0\n")
+e = dict(os.environ, ONION_SHARD_TIMES=os.environ["TJ"], ONION_SHARD_WORKERS="2"); e.pop("ONION_SHARD_FAMILIES", None)
+o = subprocess.run(["bash", os.environ["SUT"], "--project", "1"], capture_output=True, text=True, env=e).stdout
+w = [float(l.split("\t")[1]) for l in o.splitlines() if l.count("\t") == 2]
+print(("OK " if w == [1100.0] else "FALHA ") + "H=%s (posição %d) paredes=%s (esperado 1100)" % (h, i, w))
+' 2>&1 | tail -1)"
+  rm -f "${_tj}"
+  case "${_pj}" in
+    OK*) record_pass "shard-plan: (j) a fila simulada anda na ordem do --list (${_pj#OK })" ;;
+    *)   record_fail "shard-plan: (j) a fila simulada não segue a ordem do script" "${_pj}" ;;
+  esac
+
+  # (k) A REPARTIÇÃO É PELA PAREDE, NÃO PELA SOMA (refutador da SAC-423: o guloso pela soma sobrevivia).
+  #     Cinco famílias na ordem do --list com 200, 200, 1000, 800 e 1000 s, N=2, W=2 e fixtures 0. Pela
+  #     parede, a pior faixa sai com 1000 s. O LPT pela soma põe as duas de 1000 juntas e sai com 1200.
+  #     MUTANTE: a chave `(max(wk, others), wk, k)` → `(sum(cost(g) for g in shards[k]), 0, k)` reprova.
+  local _tk _pk; _tk="$(mktemp)"
+  _pk="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | TK="${_tk}" SUT="${sut}" python3 -c '
+import os, subprocess, sys
+fams = [l.strip() for l in sys.stdin if l.strip() and l.strip() != "fixtures"]
+c = dict(zip(fams[:5], [200, 200, 1000, 800, 1000]))
+open(os.environ["TK"], "w").write("".join("%s\t%d\n" % (f, c.get(f, 0)) for f in fams) + "fixtures\t0\n")
+e = dict(os.environ, ONION_SHARD_TIMES=os.environ["TK"], ONION_SHARD_WORKERS="2"); e.pop("ONION_SHARD_FAMILIES", None)
+o = subprocess.run(["bash", os.environ["SUT"], "--project", "2"], capture_output=True, text=True, env=e).stdout
+w = [float(l.split("\t")[1]) for l in o.splitlines() if l.count("\t") == 2]
+print(("OK " if len(w) == 2 and max(w) == 1000 else "FALHA ") + "paredes=%s (pior esperada 1000)" % w)
+' 2>&1 | tail -1)"
+  rm -f "${_tk}"
+  case "${_pk}" in
+    OK*) record_pass "shard-plan: (k) a repartição minimiza a PAREDE, não a soma (${_pk#OK })" ;;
+    *)   record_fail "shard-plan: (k) a repartição voltou a ser pela soma" "${_pk}" ;;
+  esac
+
+  # (l) A MELHORA LOCAL ESPALHA A FOLGA (refutador da SAC-423: desligá-la sobrevivia, porque o pior não muda).
+  #     O efeito dela é o custo de runner: no plano versionado de N=6 (2026-11-12), a soma das paredes cai de
+  #     ~5560 para ~4470 s. O caso exige que a soma COM a melhora seja menor que SEM ela, no N do workflow.
+  #     MUTANTE: `for _ in range(30 if …` → `for _ in range(0):` reprova este caso.
+  local _pl
+  _pl="$(WF="${_wf}" TAB="${_tab}" SUT="${sut}" python3 -c '
+import os, re, subprocess
+n = int(re.search(r"selftest-shard-plan\.sh (\d+)", open(os.environ["WF"], encoding="utf-8").read()).group(1))
+def tot(imp):
+    e = dict(os.environ, ONION_SHARD_TIMES=os.environ["TAB"], ONION_SHARD_IMPROVE=imp); e.pop("ONION_SHARD_FAMILIES", None); e.pop("ONION_SHARD_WORKERS", None)
+    o = subprocess.run(["bash", os.environ["SUT"], "--project", str(n)], capture_output=True, text=True, env=e).stdout
+    return sum(float(l.split("\t")[1]) for l in o.splitlines() if l.count("\t") == 2)
+com, sem = tot("1"), tot("0")
+print(("OK " if 0 < com < sem else "FALHA ") + "N=%d soma das paredes %.0f s com a melhora, %.0f s sem" % (n, com, sem))
+' 2>&1 | tail -1)"
+  case "${_pl}" in
+    OK*) record_pass "shard-plan: (l) a melhora local baixa o custo de runner (${_pl#OK })" ;;
+    *)   record_fail "shard-plan: (l) a melhora local não melhora nada" "${_pl}" ;;
+  esac
+
+  # (m) A TABELA COBRE O --list (refutador da SAC-423). Família que a tabela não conhece entra pela MEDIANA
+  #     (hoje ~3 s) sem aviso, e foi assim que 89 famílias somaram 4618 s invisíveis em 2026-11-06. O caso
+  #     exige uma linha por família do --list e a linha `fixtures` (o total do run). Reprovou: re-medir
+  #     (collect-family-times.sh <runs completos>) depois que a família nova rodar na main.
+  #     MUTANTE: apagar a linha `selftest_selection` da tabela reprova este caso.
+  local _pm
+  _pm="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | TAB="${_tab}" python3 -c '
+import os, sys
+want = {l.strip() for l in sys.stdin if l.strip()}
+have = {l.split("\t")[0] for l in open(os.environ["TAB"], encoding="utf-8") if "\t" in l and not l.startswith("#")}
+falta = sorted(want - have)
+print(("OK " if want and not falta else "FALHA ") + "%d famílias do --list, %d sem tempo%s" % (len(want), len(falta), (": " + ",".join(falta[:8])) if falta else ""))
+' 2>&1 | tail -1)"
+  case "${_pm}" in
+    OK*) record_pass "shard-plan: (m) a tabela de tempos cobre o --list inteiro, com a fixtures (${_pm#OK })" ;;
+    *)   record_fail "shard-plan: (m) a tabela de tempos não cobre o --list" "${_pm} (${_tab})" ;;
   esac
 
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
