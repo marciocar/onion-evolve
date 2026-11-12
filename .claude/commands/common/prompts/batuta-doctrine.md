@@ -48,6 +48,7 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 5. **Espera de agente é em primeiro plano e com teto.** O aviso de fim de tarefa de fundo não acorda um subagente
    que encerrou o turno (memória da casa, quatro casos em 2026-11-05). O brief pede `timeout` em primeiro plano. A
    sessão principal confere o PID antes de acreditar em «estou esperando».
+   O ajudante `bash .claude/utils/orchestration/agent-brief.sh <brief>` monta o brief final com o cabeçalho do preâmbulo e essa linha copiada dele.
 6. **A batuta tem dono do resultado.** Mecanismo sem quem responda pelo todo deixa gente parada e tarefa pela metade:
    em 2026-11-10, perguntado como estava a batuta, o core respondeu carga de CPU, e ninguém a segurava. Quem assume
    declara em uma frase o resultado e o critério de pronto, decide o que é reversível e registra, identifica o próximo

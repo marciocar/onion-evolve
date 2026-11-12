@@ -268,6 +268,9 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
   brief que funcionou manda esperar em PRIMEIRO PLANO (CI com `--watch`, saída lida até o fim) e nunca
   depender de notificação de tarefa de fundo, que travou um agente por 1 h. Lance sem `name` quando
   quiser que a notificação traga tokens e tempo.
+  Monte o brief por `bash .claude/utils/orchestration/agent-brief.sh <arquivo-do-brief>`: ele antepõe o
+  cabeçalho que manda seguir o `execution-agent-preamble.md` e a linha da espera em primeiro plano, copiada do
+  preâmbulo (SAC-421: três subagentes pararam num dia porque o brief não o citava).
 - **Refutador roda em WORKTREE ISOLADA — e isso é mecanismo, não etiqueta.** Medido em 2026-09-20:
   um refutador com briefing que dizia, literalmente, *"Não modifique NENHUM arquivo; só meça e
   reporte"* escreveu em **seis** arquivos da árvore principal — incluindo o script de merge
