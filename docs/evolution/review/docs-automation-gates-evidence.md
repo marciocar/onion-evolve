@@ -2,7 +2,8 @@
 branch: docs/automation-gates-evidence
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 833de10d54ed9ab2330d64635cdd5b1104a31db3d5a27e1b2ebeea78104586bf
+reviewed_code_sha256: e65e575b13186756c59fd50a8e7da35d56304c26347589a00b7fc4cc791d9ecf
 findings_total: 0
 findings_real: 0
 findings_blocking: 0

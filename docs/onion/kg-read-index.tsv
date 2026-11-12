@@ -1802,7 +1802,9 @@ docs/evolution/research/agent-command-composition-2026-09/agent-command-composit
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_DESTINO_DIFERENCIAL_OU_LACUNA	docs/onion/graph/forge-comando-framework-2026-09.kg.yaml
 docs/evolution/research/automation-levels-2026-11/data/corpus.md	Q_AUTOMATION_LEVELS_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
+docs/evolution/research/automation-levels-2026-11/data/lgpd-operator.md	E_LGPD_OPERATOR_RESEARCH_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
 docs/evolution/research/automation-levels-2026-11/data/market.md	E_AUTOMATION_CORPUS_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
+docs/evolution/research/automation-levels-2026-11/data/watcher-api-churn.md	E_WATCHER_API_CHURN_MEASURED_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_artifact_adr_thread_runtime	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_onion_stricter	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_transfer_onion	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
