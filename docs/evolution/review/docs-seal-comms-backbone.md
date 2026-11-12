@@ -2,7 +2,8 @@
 branch: docs/seal-comms-backbone
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 65cf94b0434d9bf605d9a3b23f1ce80d1a62a2b77a5c7aec7e1f2fb6fe8cd69b
+reviewed_code_sha256: 23a19f5bf341a582ff362eacba3619ba30acd37c976e0f9bf932bc8cb4b8d8d7
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
