@@ -119,3 +119,7 @@ Três sucessores carregam inferência além da leitura literal, e merecem o olho
 - `kg-radar.sh <grafo> --integrity --schema` exit 0 e `kg-contract-check.sh <grafo>` rc 0 nos 21 grafos tocados.
 - `ops/kg-gate-ci.sh`: rc 0, `integrity.superseded-without-successor` **63 → 0**; a base foi regravada com
   `ops/kg-gate-ci.sh --update` para travar o ganho (o diff da base só remove a linha do aviso por grafo).
+
+## Refutador independente
+
+Amostra de 15 (as 3 fracas e 12 sorteadas com `random.seed(20261112)`): 11 SUSTENTA, 4 EXAGERA, 0 REPROVA; direção das 28 external_edges conferida no validador; os 4 reabertos voltaram ao status anterior medido; gate rc 0. Correções aplicadas: `D_path_canon_guard` e `Q_gated_m3` reabertos (o sucessor não os supera); `Q_auth_decision` reaberto com a aresta virando CONSTRAINS; `C_M8_FECHA_SO_UM_TERCO` vira `confirmed`, com a aresta SUPPORTS e proveniência própria. Limite: cerca de 8% de EXAGERA na amostra sugere resíduo parecido nos 44 não lidos.

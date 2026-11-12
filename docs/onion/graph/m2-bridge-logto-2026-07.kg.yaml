@@ -281,7 +281,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: superseded
+    status: open
     verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A função canonicalPath especificada (laço de decode de 3 voltas, negação em '..'/'//'/'  '/%2e/%2f/%5c/byte de controle, defesa-em-profundidade) NUNCA foi construída como mecanismo"
     label: "FIX B fecho — GUARDA DE CANONICALIZAÇÃO OBRIGATÓRIA (canonicalPath), fail-closed: (1) decodifica em laço curto (3 voltas, pega %252e duplo-encode) e erro de decode => PROTEGIDO; (2) QUALQUER path que, no BRUTO ou em qualquer rodada decodificada, contenha '..', '//', '\\', %2e, %2f, %5c ou byte de controle => PROTEGIDO — não normaliza, NEGA; (3) ainda mudando na 3a volta => PROTEGIDO; (4) NUNCA assumir 'c.req.path já vem normalizado' sem prova, e mesmo com prova a guarda PERMANECE (defesa em profundidade — a premissa 'o framework normaliza' muda numa bump sem aviso). PROPRIEDADE que a torna segura: a guarda só sabe NEGAR MAIS — descasamento com o router só pode gerar 401 a mais, nunca 401 a menos. RODADA contra corpus: 12/12 ataques bloqueados, 11/11 paths legítimos abertos (inclusive /assets/logo%20final.svg)"
@@ -889,7 +889,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.6
-    status: superseded
+    status: open
     verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó é um bucket composto de 7 itens declarados GATED 'não neste flip, derivar fresco quando o gate abrir' (gatilho: 1º role:consumer real). A medição mostra que o gatilh"
     label: "GATED (não neste flip): RBAC MULTI-OPERADOR / plataforma admin M3 (Logto Organizations só no gatilho 1º role:consumer real) — o login humano PKCE SAIU do gated; o que segue gated é a MALHA multi-operador. Também gated: ENDURECIMENTO DA PWA como cliente (CSP completa, SRI, auditoria de dependência, storage fora do localStorage — este flip só fixa as 3 mitigações baratas e NOMEIA que a PWA entrou na base de confiança, D_pkce_risk_mitigations); Caddy forward_auth/oauth2-proxy (redundante com PKCE in-app); RBAC fino por operação; revisão do bypassPermissions do SDK (eixo separado); cgroup delegation ao dockerd (se cgroup_parent não pegar); AUDITORIA DOS DEMAIS FLOORS do host com check_floor (o fix A é uma CLASSE, não um caso). Derivar fresco quando o gate abrir"
@@ -2837,9 +2837,6 @@ edges:
     to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
     edge_type: SUPPORTS
   # 2026-11-12 fix/kg-superseded-successors: sucessor achado para os nós superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
-  - from: E_default_deny_never_existed
-    to: D_path_canon_guard
-    edge_type: SUPERSEDES
   - from: E_p4_rfc8707_proven
     to: Q_default_api_resource_b1
     edge_type: SUPERSEDES
@@ -2854,9 +2851,6 @@ edges:
     edge_type: SUPERSEDES
   - from: D_retire_legacy_immediately
     to: Q_byok_courtesy_mode
-    edge_type: SUPERSEDES
-  - from: D_org_born_on_demand
-    to: Q_gated_m3
     edge_type: SUPERSEDES
   - from: D_enroll_instead_of_invite
     to: Q_slices_2_to_4_unexercised
