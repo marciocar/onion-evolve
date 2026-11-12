@@ -3,29 +3,30 @@ branch: feat/baton-stalled-agent
 pr: pendente
 date: 2026-11-12
 reviewed_diff_sha256: pendente
-findings_total: 1
-findings_real: 1
-findings_blocking: 1
-tokens: 0
-duration_min: 0
-findings_fixed: 1
-verdict: FIXED
+findings_total: 7
+findings_real: 7
+findings_blocking: 4
+tokens: 4807446
+duration_min: 11
+findings_fixed: 7
+verdict: REJECTED_AND_FIXED
 elenxo: false
-reviewer: "o próprio agente de execução, com mandato de refutar o diff; sem subagente (o brief proíbe lançar agentes): a sessão principal roda o refutador separado antes do PR"
-nota: "tokens = 0 e duration_min = 0: não medidos. Medidos: família baton_pulse da bancada 26/26 (13 casos, 5 novos, cada um reprovando contra o mutante dele), lint-artifacts 0 HARD e 27 SOFT antes e depois, dogfood real contra os transcripts da máquina e replay dos três refutadores travados de 2026-11-12."
+reviewer: "1ª passada: o próprio agente de execução (1 bloqueio, curado); 2ª passada: refutador separado (subagente opus, que não escreveu o diff), REJECTED com 3 bloqueios e 10 de 10 mutantes vivos, curados pelo agente"
+nota: "tokens e duration_min são do refutador separado, lidos do transcript dele (entrada com cache 4771832 + saída 35614; 11 min do 1º ao último registro). Medidos depois da cura: família baton_pulse 46/46 (23 casos, 15 novos, cada um reprovando contra o mutante dele), dogfood real contra os transcripts da máquina e replay dos três refutadores travados de 2026-11-12."
 ---
 
 # Passada adversarial: `feat/baton-stalled-agent`
 
 ## O que muda
 
-O `baton-pulse.sh` ganha a seção de subagentes (SAC-421). Para cada sessão viva (classe diferente de
-`UNREACHABLE`) e para a própria sessão, lê o fim de cada `<projects>/*/<sessão>/subagents/agent-<id>.jsonl` e
-classifica `AGENT_STALLED` (`tool_use` sem `tool_result` há mais de `--stall-min`, padrão 15), `AGENT_RUNNING`,
-`AGENT_DONE` (texto final do assistente, ou a marca de interrupção pelo humano) e `AGENT_UNMEASURED` (transcript
-ilegível ou sem entrada user/assistant). O comando pendente sai cortado em 120 caracteres nas três formas: linha
-`agent` no `--tsv`, seção no `--markdown` (só os não terminados; os terminados em contagem) e linha por agente parado
-no `--quiet` que fala. Os não terminados entram no sha do estado, então um agente que trava muda a batida.
+O `baton-pulse.sh` ganha a seção de subagentes (SAC-421, a tarefa do agente parado). Para cada sessão viva (classe
+diferente de `UNREACHABLE`) e para a própria sessão, lê cada `<projects>/*/<sessão>/subagents/agent-<id>.jsonl` e os
+da ferramenta Workflow em `subagents/workflows/<run>/`, e classifica `AGENT_STALLED` (`tool_use` sem `tool_result` do
+mesmo id há mais de `--stall-min`, padrão 15), `AGENT_SILENT` (sem pendência, sem fim e sem escrita além do teto),
+`AGENT_RUNNING`, `AGENT_DONE` (texto final, relatório entregue por `SubagentHandback` ou interrupção pelo humano) e
+`AGENT_UNMEASURED` (transcript ilegível ou sem entrada user/assistant). O comando pendente sai redigido e cortado em
+120 caracteres nas três formas: linha `agent` no `--tsv`, seção no `--markdown` (os terminados só em contagem) e linha
+por agente em alerta no `--quiet` que fala. Só STALLED, SILENT e UNMEASURED entram no sha do estado.
 
 Onde ficam os transcripts (medido no disco): `~/.claude/projects/<projeto>/<sessão>/subagents/agent-<id>.jsonl`, com
 `agent-<id>.meta.json` ao lado (dá a `description`). O `/tmp/claude-<uid>/<projeto>/<sessão>/tasks/<id>.output` dos
@@ -43,6 +44,28 @@ sintoma) e o que não mede (a causa, e se o processo ainda vive).
    72 linhas dessa forma nos transcripts de subagentes de uma sessão só. Cura: `AGENT_DONE` exige `stop_reason`
    diferente de `tool_use`; caso (m) da bancada com mutante.
 
+2. **Bloqueava (refutador), curado: a cutucada escondia o travamento.** A mensagem do líder chega como linha `user`
+   de texto («The coordinator sent a message while you were working») no meio da ferramenta, e o `pend.clear()` a
+   tratava como prompt novo: o STALLED virava RUNNING para sempre (5 casos reais na varredura dele). Cura: só o
+   `tool_result` do mesmo `tool_use_id` fecha a pendência; o que a abandona é uma NOVA mensagem do assistente (outro
+   `message.id`), porque a API só aceita a próxima resposta depois de todos os resultados. Casos (n) e (r).
+3. **Bloqueava (refutador), curado: RUNNING eterno.** O agente que entrega o relatório por `SubagentHandback` (14 casos)
+   e o que se calou sem pendência (31 dos 34 não terminados que ele mediu) saíam RUNNING. Cura: o handback é
+   `AGENT_DONE`; sem pendência, sem fim e sem escrita além de `--stall-min` é `AGENT_SILENT`, com o «Exit code 137» do
+   último resultado nomeado. Casos (o) e (p).
+4. **Bloqueava (refutador), curado: agentes de Workflow ignorados.** Eles moram em
+   `<sessão>/subagents/workflows/<run>/agent-*.jsonl` (4744 na máquina) e não entravam. Cura: o caminho é lido, e o
+   id sai como `<run>/<agente>`. Caso (s).
+5. **Curado (M5 do refutador): o sha não provava que um agente parado muda a batida.** Caso (v): o `--quiet` com o sha
+   de antes da parada fala e cita o STALLED.
+6. **Curado (limite 5): o comando pendente vazava segredo e caminho.** Antes de exibir, `sk-`, `gh*_`, `Bearer`,
+   `token=`/`secret=`/`password=` viram `[REDACTED]` e `/home/<usuário>` vira `~`; no markdown a cerca de crase cresce
+   (CommonMark) quando o comando tem crase. Casos (t) e (u).
+7. **Curado (limite 7): o sha mudava a cada agente rodando ou terminando.** Só STALLED, SILENT e UNMEASURED (e a
+   contagem deles) entram no sha. Caso (w). E o M9: na leva paralela o comando exibido é o PRIMEIRO pendente, o que
+   segura os outros, com `(+N pendente(s))`; o replay mostra que o a19bb3f2 travou no `rm -rf "$(cat …)"`, não no `ls`
+   que a 1ª versão exibia. Caso (q).
+
 ## Mutantes
 
 Cada caso novo da família `baton_pulse` reprova contra o mutante plantado no próprio caso:
@@ -52,14 +75,25 @@ Cada caso novo da família `baton_pulse` reprova contra o mutante plantado no pr
 - (k) texto final sai DONE: o `tool_result` deixa de fechar o `tool_use`.
 - (l) ilegível sai UNMEASURED: o retorno vira `AGENT_DONE`.
 - (m) texto do meio do turno não é fim: a condição do `stop_reason` é removida.
+- (n) a linha `user` de texto volta a limpar a pendência (o M1 do refutador, no sentido da cura).
+- (o) o handback deixa de ser fim. (p) o ramo do SILENT é desligado. (q) o pendente exibido vira o último (M9).
+- (r) a nova mensagem do assistente deixa de largar a pendência. (s) o caminho de Workflow é removido do glob.
+- (t) a redação de segredo é desligada. (u) a cerca de crase volta a ser simples.
+- (v) os agentes saem do sha (M5). (w) RUNNING entra no sha.
+- Também mudou o mutante de (k): o `tool_result` deixa de tirar o id da pendência (`pop` vira `get`).
 
 ## Limites declarados
 
-- Mede o **sintoma**, não a causa. No replay, um dos três refutadores de hoje travou em `ls -la ~/.local/state/...`
-  e não em `rm -rf $var`, então a causa não era uma só.
+- Mede o **sintoma**, não a causa. **Falso STALLED de ferramenta longa legítima:** o refutador mediu 28 casos acima
+  de 15 min (bancada, mutantes, gates em primeiro plano); eles saem STALLED até a ferramenta voltar. `--stall-min` sobe
+  o teto; a classe não distingue espera legítima de travamento.
+- **Custo sem cache:** cada batida relê os transcripts inteiros das sessões vivas. O refutador mediu 15,6 s numa
+  sessão de 625 MB; aqui, a batida inteira levou 16,2 s com ~75 MB de transcripts (o decide-census domina). Não há
+  cache por mtime.
+- **UNREACHABLE fora da medida:** os subagentes de sessão `UNREACHABLE` não são lidos (sessão morta não tem agente vivo
+  para acusar, mas um farol fora da lista do harness esconde os agentes dela).
 - Não sabe se o processo do subagente vive: o harness não expõe pid por subagente. Um agente morto no meio de uma
   ferramenta fica `AGENT_STALLED` enquanto a sessão dona estiver viva.
-- Um prompt de texto do usuário limpa o que estava pendente. Uma mensagem que chegasse com uma ferramenta ainda aberta
-  esconderia o pendente. Nos transcripts medidos, mensagem nova só chega na volta da ferramenta.
-- Subagente de sessão `UNREACHABLE` fica fora: sessão morta não tem agente vivo para acusar.
+- A pendência só se larga por nova mensagem do assistente com `message.id`; transcript sem `message.id` (fixtures,
+  formato antigo) mantém a pendência até o `tool_result`.
 - O `--tsv` lista todos os terminados (50 no dogfood). O markdown só os conta.

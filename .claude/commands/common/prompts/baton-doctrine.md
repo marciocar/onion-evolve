@@ -73,9 +73,10 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    ilegível é lacuna e fail-closed (`PARK_UNMEASURED`, sem oferta), nunca «ninguém parado». **Puxar, não
    empurrar:** a sessão ociosa com fila recebe, no máximo, a oferta do que já é dela (a fase 2, desenhada e não
    construída); quem pega é ela ou o maestro. **Subagente parado (SAC-421):** o pulso lê o fim do transcript de cada
-   subagente das sessões vivas e acusa `AGENT_STALLED` quando há `tool_use` sem `tool_result` há mais de 15 min; mede o
-   SINTOMA, não a causa (aprovação sem quem responda, comando pendurado ou harness travado saem iguais), e não sabe se
-   o processo do subagente ainda vive.
+   subagente das sessões vivas (inclusive os de Workflow) e acusa `AGENT_STALLED` quando há `tool_use` sem `tool_result`
+   do mesmo id há mais de 15 min, e `AGENT_SILENT` quando o agente se calou sem pendência e sem fim; mede o SINTOMA, não a
+   causa (aprovação sem quem responda, comando pendurado, harness travado e ferramenta longa legítima saem iguais), e não
+   sabe se o processo do subagente ainda vive.
 
 ## O que ela NÃO promete (fronteira declarada)
 
