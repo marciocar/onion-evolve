@@ -25,4 +25,4 @@ falhas e as demais qualidades se vendem, cada uma com critério, medida e a hip�
 - Linha de base de 12/11: quem pediu em 20/20 mensagens, quem agiu em 1/20.
 
 ## Next crumb
-Aceite da fundação: uma semana com 0 perda, 0 dobro, tudo pelo bot e p95 abaixo de 60 s. Empacotar só depois.
+Aceite da fundação: uma semana com 0 perda, 0 dobro, tudo pelo bot e p95 abaixo de 60 s (95% das menções atendidas em menos de 60 s). Empacotar só depois.

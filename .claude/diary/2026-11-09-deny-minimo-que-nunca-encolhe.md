@@ -15,7 +15,7 @@ significance: "Um piso portátil contra atos irreversíveis e leitura de segredo
 
 ## Signal
 O core ganha um `deny` mínimo e portátil contra atos irreversíveis e leitura de segredos, que viaja para o adotante.
-A atualização nunca encolhe o deny do adotante, e quem roda em sandbox é avisado do que muda.
+A atualização nunca encolhe o deny do adotante, e quem roda em sandbox (o isolamento do Claude Code que restringe o que o agente toca) é avisado do que muda.
 
 ## Evidence
 - PR #1552: deny mínimo portátil de atos irreversíveis e leitura de segredos.

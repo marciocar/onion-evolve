@@ -1,19 +1,18 @@
 ---
 branch: docs/vitrines-novembro
-pr: pendente
+pr: 1637
 date: 2026-11-12
-reviewed_diff_sha256: 2becceae8b4fed7df303637a1bb51350f41520ad0d6b8114c105fbac787729fa
-reviewed_code_sha256: a4e8799709197634cdac96742305fc2a837b6b2f15d0e49abc85cf0ea14ae538
-findings_total: 5
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
 findings_blocking: 1
 tokens: 0
 duration_min: 0
-findings_fixed: 5
+findings_fixed: 9
 verdict: FIXED
-elenxo: false
-reviewer: "o próprio agente de execução, passada mecânica (PR citado contra o estado no forge, varredura de vazamento, build do site); sem refutador independente"
-nota: "tokens e duração não medidos. Sem refutador independente: o agente de execução que escreveu é subagente e não lançou outro agente (a espera por notificação de agente de fundo não acorda subagente). A conferência factual foi mecânica: os 56 números de PR citados, um a um, contra o estado no forge."
+elenxo: true
+reviewer: "refutador independente (subagente da sessão principal), depois da passada mecânica do agente de execução"
+nota: "tokens e duração não medidos. Duas passadas: a mecânica do agente de execução (5 achados, 1 bloqueante) e a do refutador independente, que APROVOU com 4 limites, todos curados neste PR."
 ---
 
 # Passada adversarial: `docs/vitrines-novembro`
@@ -36,6 +35,13 @@ Só a fonte. Sem deploy.
 4. **Limite (curado):** dois marcos da página de estado escreviam "PRs #1480 a #1496" e "#1528 a #1576", sugerindo intervalo contínuo. Curado com a lista exata.
 5. **Limite (curado):** o #1461 é de 04/11 e estava num post que diz "5 a 12 de novembro". Curado com a data escrita na nota.
 
+**Passada do refutador independente (APROVADO, com 4 limites, todos curados):**
+
+6. **L1 (curado):** a nota sobre o resíduo citava "#1497 e #1541" como se os dois separassem bloqueio de limite. O #1541 passou para o inglês o valor de campo do resíduo da REGRA 56 (Resíduo de review rastreado), com catraca no legado. A nota agora diz o que cada PR fez.
+7. **L2 (curado):** o cabeçalho do `.claude/diary/index.md` saiu com o nome da pasta da worktree. Regenerado pelo `diary-index.sh`, com o título ajustado para `onion-evolve`, que é o que o gerador produz no checkout com o nome canônico. O defeito do gerador (o título cai no nome da pasta quando falta `instance:` no `.onion-version`) fica fora deste PR.
+8. **L3 (curado):** este resíduo dizia `pr: pendente` e não registrava a passada independente.
+9. **L4 (curado):** glosa curta para lease, adotante carimbado, sandbox, open-core, self-host e p95 onde aparecem, e a linha Gestão de falhas da coluna Superação passa a dizer "a provar, com critério registrado antes do teste".
+
 Conferência mecânica: dos 56 PRs citados nas superfícies novas, 53 estão MERGED; os 3 restantes (#1628 e #1633, fechados; #1635, aberto) aparecem como fechados ou em voo no texto. A varredura por nomes de membro do registro da federação, nome de pessoa, IP, `/home` e host não achou nada nas linhas acrescentadas. O comparável direto da tabela de valores não é nomeado, porque o veredito da curadoria sobre ele ainda não está selado no core.
 
 ## Mutantes
@@ -44,7 +50,6 @@ Não se aplica: a mudança é de conteúdo e de uma linha de allowlist. O `--sel
 
 ## Limites declarados
 
-- Sem refutador independente (ver `nota:`).
 - A página `/backbone/` não foi conferida em tela, em largura de telefone; a tabela rola na horizontal dentro do próprio contêiner.
 - A coluna Superação é publicada como hipótese, e a coluna Hoje como a leitura do core em 12/11, ambas como estão no estudo do #1632.
 - O lint completo levou 820 s nesta máquina compartilhada, com 0 HARD.

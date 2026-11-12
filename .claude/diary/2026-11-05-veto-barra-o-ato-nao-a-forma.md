@@ -21,7 +21,7 @@ chega por outros caminhos. Veto se escreve contra o ato, e fecha (exit 2) quando
 - PR #1492: o veto do MOAT passou a barrar o ato de deploy e de publicação, não só a forma do comando.
 - PR #1480: python em modo isolado e vetos que fecham quando a análise falha (antes, análise quebrada = passa).
 - PR #1491 e #1490: a escrita na memória do Claude Code e o plugin escrito em `.claude/skills` ganharam veto e varredura.
-- PR #1496: os vetos passam a valer no adotante carimbado, não só no core.
+- PR #1496: os vetos passam a valer no adotante carimbado (o projeto que adotou o Onion e tem a versão instalada registrada), não só no core.
 
 ## Next crumb
 Re-testar com o artefato: para cada veto da REGRA 101, plantar o ato por um caminho que não seja o canônico e ver se
