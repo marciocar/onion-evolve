@@ -54,7 +54,7 @@ Uso:
 
 --touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e
 HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer
-campo diferente (verified_at e verified_against sozinhos não contam) e o nó que ganhou a dívida no diff (por exemplo, perdeu a aresta SUPPORTS ou SUPERSEDES que chegava a
+campo diferente (verified_at e verified_against sozinhos não contam, nem a classe de provenance.method trocada entre o apelido em português e a classe canônica em inglês, nos dois sentidos, com o detalhe idêntico, a troca do kg_migrate.py methods) e o nó que ganhou a dívida no diff (por exemplo, perdeu a aresta SUPPORTS ou SUPERSEDES que chegava a
 ele). Compara a árvore de trabalho, nó a nó; reformatar o YAML não toca. O grafo renomeado pareia pelo meta.id. O nó
 movido para outro grafo conta como novo no destino. rc 0: nenhum; rc 2: BASE que não resolve (clone raso) ou grafo
 alterado que não parseia. A conferência do carimbo do vendor vale como no modo da catraca.
@@ -322,10 +322,25 @@ def _node_debt(text):
 STAMP_FIELDS = ("verified_at", "verified_against")  # uma rodada de frescor carimba em massa e não paga a dívida do nó
 
 
+def _method_canon(node):
+    """O nó com a classe de provenance.method em português trocada pela canônica em inglês, pelo mapa do validador.
+
+    O kg_migrate.py methods apply troca em massa só esse prefixo e não paga a dívida do nó, como o carimbo de frescor.
+    Só a classe que é exatamente um apelido, seguida de ': ', é trocada; o detalhe fica byte a byte. Outra classe, outra
+    caixa, o acento decomposto, outro detalhe ou a provenance que some continuam diferentes."""
+    prov = node.get("provenance")
+    method = prov.get("method") if isinstance(prov, dict) else None
+    if isinstance(method, str):
+        head, sep, tail = method.partition(": ")
+        if sep and head in kg_validate.METHOD_ALIASES:
+            return {**node, "provenance": {**prov, "method": kg_validate.METHOD_ALIASES[head] + sep + tail}}
+    return node
+
+
 def _canon(node):
-    """A forma de comparar dois nós, sem o carimbo: 1 e true são campos diferentes, e .nan é igual a si mesmo, o que o ==
-    não dá."""
-    body = {k: v for k, v in node.items() if k not in STAMP_FIELDS}
+    """A forma de comparar dois nós, sem o carimbo e com a classe do method canônica: 1 e true são campos diferentes, e
+    .nan é igual a si mesmo, o que o == não dá."""
+    body = {k: v for k, v in _method_canon(node).items() if k not in STAMP_FIELDS}
     try:
         return json.dumps(body, sort_keys=True, ensure_ascii=False, default=str)
     except TypeError:  # chave de tipos misturados, que já reprova no MUST
@@ -766,7 +781,7 @@ Usage:
 
 --touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common
 ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new
-node, a node with any field changed (verified_at and verified_against alone do not count), and a node that gained the debt in the diff (it lost the SUPPORTS or SUPERSEDES
+node, a node with any field changed (verified_at and verified_against alone do not count, nor does a provenance.method class swapped between the Portuguese alias and the canonical English class, in both directions, with the detail identical, the kg_migrate.py methods swap), and a node that gained the debt in the diff (it lost the SUPPORTS or SUPERSEDES
 edge reaching it, for example). It compares the working tree node by node; reformatting the YAML touches nothing. A
 renamed graph is paired by meta.id. A node moved to another graph counts as new there. rc 0: none; rc 2: a BASE that
 does not resolve (shallow clone) or a changed graph that does not parse. The vendor stamp check works as in the ratchet.

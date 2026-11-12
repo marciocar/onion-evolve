@@ -38,7 +38,9 @@ kg_get, kg_list, kg_history, kg_query e kg_terms, sem id, sem arquivo e sem cont
 área. O que o filtro não vê: id e caminho escritos em texto livre (label, narrative, campos x_, mensagem de commit) e o
 provenance.source que aponta para um arquivo que não é grafo. O teto por área (levels, ceilings e default_level na
 política, contrato v4.20): numa área com teto, o grafo cujo meta.x_classification passa dele, ou que a lista de níveis
-não conhece, não é entregue e responde como o grafo que não existe.
+não conhece, não é entregue e responde como o grafo que não existe. Os papéis (roles e members na política): cada
+papel lê áreas, declara se grava na própria área e pode baixar o teto de uma área que lê; o acesso é a união das
+concessões (o grupo antigo vale como um papel com o teto da área), e na mesma área vale o maior teto entre elas.
 
 Uso:
   kg_mcp.py --root DIR [--backend disk|git|versioned] [--init] [--author "Nome <email>"] [--read-only]
@@ -425,11 +427,12 @@ class Context:
     Nunca é guardado no Server, que é um só entre as threads do ThreadingHTTPServer: guardar a identidade nele deixaria
     uma requisição concorrente gravar na área e com o autor de outra (a classe da Issue 2 do CVE-2026-25536 do SDK
     TypeScript do MCP: uma referência compartilhada sobrescrita por outra requisição)."""
-    __slots__ = ("store", "author", "identity", "untrusted", "store_error")
+    __slots__ = ("store", "author", "identity", "untrusted", "store_error", "writes")
 
-    def __init__(self, store, author, identity=None, untrusted=False, store_error=None):
+    def __init__(self, store, author, identity=None, untrusted=False, store_error=None, writes=True):
         self.store, self.author, self.identity, self.untrusted = store, author, identity, untrusted
         self.store_error = store_error if store is None else None
+        self.writes = writes  # False: os papéis da identidade não gravam (roles com write [])
 
 
 # um e-mail em ASCII imprimível, sem espaço nem controle: o header chega decodificado em latin-1, e um byte acima de
@@ -469,6 +472,51 @@ def _area_prefix(name):
     return name[:name.index("/") + 1] if name.startswith("@") else ""
 
 
+ROLE_NAME = re.compile(r"[a-z0-9][a-z0-9._-]{0,62}")
+POLICY_MAX_BYTES = 1 << 20  # 1 MiB: a política é escrita à mão pelo operador, e é relida a cada mudança
+
+
+def _unique_keys(pairs):
+    """O object_pairs_hook da política: a chave repetida, em qualquer nível, invalida o arquivo (o json do Python
+    ficaria com a última em silêncio, e outro leitor poderia ficar com a primeira)."""
+    out = {}
+    for key, value in pairs:
+        if key in out:
+            raise ValueError(P_("the policy repeats the key {key} in the same object").format(key=json.dumps(key)))
+        out[key] = value
+    return out
+OWN = "own"  # o único valor de write: a própria área, a única em que o kg-mcp grava
+
+
+def wider_rank(a, b):
+    """O teto que vale entre duas concessões da mesma área: o maior rank, e None (a área sem teto) vence qualquer um."""
+    return None if a is None or b is None else max(a, b)
+
+
+class PolicyDoc:
+    """A política lida e conferida: a canônica, os grupos, os tetos das áreas, os níveis e os papéis com seus membros."""
+    __slots__ = ("canonical", "groups", "ceilings", "levels", "default", "roles", "members", "member_of")
+
+    def __init__(self, canonical=None, groups=None, ceilings=None, levels=None, default=None, roles=None, members=None):
+        self.canonical, self.groups, self.ceilings = canonical, groups or {}, ceilings or {}
+        self.levels, self.default, self.roles, self.members = levels, default, roles or {}, members or {}
+        # o índice pessoa -> grupos, em ordem, feito uma vez por carga: grant() e overridden() não varrem os grupos
+        member_of = {}
+        for area in sorted(self.groups):
+            for who in self.groups[area]:
+                member_of.setdefault(who, []).append(area)
+        self.member_of = member_of
+
+
+class Role:
+    """Um papel: as áreas que lê, se grava na própria área e o teto que dá a cada área que lê ({área: nível}; a área
+    que falta no mapa fica com o teto dela)."""
+    __slots__ = ("read", "writes", "ceilings")
+
+    def __init__(self, read, writes, ceilings):
+        self.read, self.writes, self.ceilings = read, writes, ceilings
+
+
 class AreaPolicy:
     """A filiação às áreas compartilhadas (--area-policy): um arquivo JSON fora do armazém, que só o operador escreve.
 
@@ -480,9 +528,17 @@ class AreaPolicy:
     O teto por área (contrato v4.20): levels (a lista ordenada dos níveis da organização, do
     menos ao mais sensível), ceilings ({área compartilhada: nível}) e default_level (o nível do grafo sem
     meta.x_classification) vêm juntos. Numa área com teto, o grafo acima dele, ou com um nível que a lista não conhece,
-    não é entregue: responde como o grafo que não existe. É marcação que a política faz valer, não controle nó a nó."""
+    não é entregue: responde como o grafo que não existe. É marcação que a política faz valer, não controle nó a nó.
 
-    KEYS = {"schema_version", "canonical", "groups", "levels", "ceilings", "default_level"}
+    Os papéis (roles e members, opcionais): cada papel lê áreas (read), declara se grava na própria área (write, que só
+    aceita "own": nunca amplia a escrita além da própria área) e pode baixar o teto de uma área para quem o tem (ceilings,
+    nunca acima do teto da área). members dá papéis a um e-mail ou a todos de um grupo. O acesso de uma pessoa é a união
+    das concessões: a canônica e os grupos de que é membro (cada um equivale a um papel que lê a área com o teto dela) e os
+    papéis. Numa área concedida mais de uma vez, vale o maior teto entre as concessões (a área sem teto vence todas).
+    Quem tem papel grava na própria área se algum papel seu tem write ["own"]; quem não tem papel grava como antes."""
+
+    KEYS = {"schema_version", "canonical", "groups", "levels", "ceilings", "default_level", "roles", "members"}
+    ROLE_KEYS = {"read", "write", "ceilings"}
 
     def __init__(self, path, root=None):
         self.path = pathlib.Path(path)
@@ -491,15 +547,18 @@ class AreaPolicy:
             if real == base or base in real.parents:
                 raise ValueError(P_("the policy file must stay outside the store root"))
         self._lock = threading.Lock()
-        self._stamp, self._canonical, self._groups, self._ceilings = self._load()
+        self._stamp, self._doc = self._load()
+        self._had_roles = bool(self._doc.roles)  # o último documento válido tinha papéis
 
     @staticmethod
     def parse(text):
-        """(canonical ou None, {área: {identidades}}) de um texto de política, ou ValueError com o que está errado."""
-        doc = json.loads(text)
+        """A política (PolicyDoc) de um texto, ou ValueError com o que está errado."""
+        if len(text.encode("utf-8")) > POLICY_MAX_BYTES:
+            raise ValueError(P_("the policy is larger than {limit} bytes").format(limit=POLICY_MAX_BYTES))
+        doc = json.loads(text, object_pairs_hook=_unique_keys)
         if not isinstance(doc, dict) or doc.get("schema_version") != 1 or set(doc) - AreaPolicy.KEYS:
-            raise ValueError(P_("the policy is an object with schema_version 1, canonical, groups and, together, "
-                                "levels, ceilings and default_level, nothing else"))
+            raise ValueError(P_("the policy is an object with schema_version 1, canonical, groups, roles, members and, "
+                                "together, levels, ceilings and default_level, nothing else"))
         canonical, groups = doc.get("canonical"), doc.get("groups", {})
         if canonical is not None and not (isinstance(canonical, str) and CANONICAL_AREA.fullmatch(canonical)):
             raise ValueError(P_("canonical: the area name is c-<letters, digits, dot, dash or underscore>"))
@@ -513,7 +572,12 @@ class AreaPolicy:
             if None in ids:
                 raise ValueError(P_("group {area}: every member is an e-mail identity").format(area=area))
             out[area] = frozenset(ids)
-        return canonical, out, AreaPolicy._parse_ceilings(doc, canonical, out)
+        policy = PolicyDoc(canonical, out, AreaPolicy._parse_ceilings(doc, canonical, out))  # o índice sai daqui
+        if "levels" in doc:
+            policy.levels, policy.default = list(doc["levels"]), doc["default_level"]
+        policy.roles = AreaPolicy._parse_roles(doc, policy)
+        policy.members = AreaPolicy._parse_members(doc, policy)
+        return policy
 
     @staticmethod
     def _parse_ceilings(doc, canonical, groups):
@@ -546,27 +610,166 @@ class AreaPolicy:
             out[area] = Ceiling(levels, level, default)
         return out
 
+    @staticmethod
+    def _parse_roles(doc, policy):
+        """{papel: Role} de roles; {} sem a chave. Cada papel lê ao menos uma área conhecida (a canônica ou um grupo),
+        write só aceita "own", e o teto do papel é um dos levels, numa área que ele lê, igual ou abaixo do teto dela."""
+        if "roles" not in doc:
+            return {}
+        roles = doc["roles"]
+        if not isinstance(roles, dict):
+            raise ValueError(P_("roles maps each role name to its read, write and ceilings"))
+        known = set(policy.groups) | ({policy.canonical} if policy.canonical else set())
+        out = {}
+        for name, role in roles.items():
+            if not ROLE_NAME.fullmatch(name) or not isinstance(role, dict) or set(role) - AreaPolicy.ROLE_KEYS:
+                raise ValueError(P_("roles maps each role name (lowercase, digits, dot, dash or underscore) to an object "
+                                    "with read and, optionally, write and ceilings"))
+            read = role.get("read")
+            if not isinstance(read, list) or not read or not all(isinstance(a, str) for a in read):
+                raise ValueError(P_("role {role}: read lists at least one shared area").format(role=name))
+            for area in read:
+                if area not in known:
+                    raise ValueError(P_("role {role}: {area} is neither the canonical area nor a group").format(
+                        role=name, area=area))
+            write = role.get("write", [OWN])
+            if not isinstance(write, list) or any(w != OWN for w in write):
+                raise ValueError(P_('role {role}: write lists only "own", the area of the identity itself: the server '
+                                    'writes nowhere else').format(role=name))
+            ceilings = role.get("ceilings", {})
+            if not isinstance(ceilings, dict):
+                raise ValueError(P_("role {role}: ceilings maps an area it reads to one of levels").format(role=name))
+            if ceilings and policy.levels is None:
+                raise ValueError(P_("role {role}: ceilings needs levels, ceilings and default_level in the policy").format(
+                    role=name))
+            for area, level in ceilings.items():
+                if area not in read:
+                    raise ValueError(P_("role {role}: the ceiling of {area} is for an area the role does not read").format(
+                        role=name, area=area))
+                if area == policy.canonical:
+                    raise ValueError(P_("role {role}: everyone reads the canonical area at its own ceiling, and a role "
+                                        "cannot lower it").format(role=name))
+                if not isinstance(level, str) or level not in policy.levels:
+                    raise ValueError(P_("role {role}: the ceiling of {area} is not one of levels").format(
+                        role=name, area=area))
+                top = policy.ceilings.get(area)
+                if top is not None and policy.levels.index(level) > top.ceiling:
+                    raise ValueError(P_("role {role}: the ceiling of {area} is above the ceiling of the area").format(
+                        role=name, area=area))
+            out[name] = Role(frozenset(read), OWN in write, dict(ceilings))
+        return out
+
+    @staticmethod
+    def _parse_members(doc, policy):
+        """{e-mail ou grupo: {papéis}} de members; {} sem a chave. Cada papel citado existe em roles."""
+        if "members" not in doc:
+            return {}
+        members = doc["members"]
+        if not isinstance(members, dict):
+            raise ValueError(P_("members maps an e-mail or a group to the roles it holds"))
+        out = {}
+        for who, names in members.items():
+            key = who if who in policy.groups else check_identity(who)
+            if key is None:
+                raise ValueError(P_("members: each key is an e-mail identity or a group of the policy"))
+            if not isinstance(names, list) or not names or not all(isinstance(n, str) for n in names):
+                raise ValueError(P_("members: each e-mail or group lists at least one role"))
+            for n in names:
+                if n not in policy.roles:
+                    raise ValueError(P_("members: the role {role} does not exist").format(role=n))
+            out[key] = out.get(key, frozenset()) | frozenset(names)
+        return out
+
     def _load(self):
         st = os.stat(self.path)
-        return ((st.st_mtime_ns, st.st_size, st.st_ino), *self.parse(self.path.read_text(encoding="utf-8")))
+        if st.st_size > POLICY_MAX_BYTES:  # antes de ler: o arquivo grande demais nem chega à memória
+            raise ValueError(P_("the policy is larger than {limit} bytes").format(limit=POLICY_MAX_BYTES))
+        doc = self.parse(self.path.read_text(encoding="utf-8"))
+        for line in self.overridden(doc):
+            print(f"kg_mcp: area policy: {line}", file=sys.stderr)
+        return (st.st_mtime_ns, st.st_size, st.st_ino), doc
+
+    @staticmethod
+    def overridden(policy):
+        """Os tetos de papel que outra concessão anula para algum membro (outro papel, o grupo da área ou a canônica dão
+        teto maior), como frases que nomeiam o membro, o papel e a área, nunca um grafo. A união com o maior teto é a
+        regra; o aviso é para o operador ver que o teto menor não restringe aquela pessoa."""
+        if not any(role.ceilings for role in policy.roles.values()):
+            return []  # sem teto de papel, nada a anular
+        people = set(k for k in policy.members if k not in policy.groups)
+        for key in policy.members:
+            people |= policy.groups.get(key, frozenset())
+        out = []
+        for who in sorted(people):
+            held = set(policy.members.get(who, ()))
+            for area in policy.member_of.get(who, ()):
+                held |= policy.members.get(area, frozenset())
+            ceilings = AreaPolicy.grant(policy, who)[1]
+            for name in sorted(held):
+                for area, level in sorted(policy.roles[name].ceilings.items()):
+                    top = ceilings.get(area)
+                    if top is None or top.ceiling > policy.levels.index(level):
+                        out.append(f"the ceiling {level} of role {name} on {area} does not restrict {who}: another grant "
+                                   f"gives a higher ceiling")
+        return out
 
     def areas(self, identity):
-        """As áreas compartilhadas que a identidade lê agora: a canônica e os grupos de que é membro."""
-        return self.readable(identity)[0]
+        """As áreas compartilhadas que a identidade lê agora: a canônica, os grupos de que é membro e as dos papéis."""
+        return self.access(identity)[0]
 
     def readable(self, identity):
-        """(áreas, {área: Ceiling}) de uma só leitura da política, sob a mesma trava: a filiação e o teto nunca vêm de
-        versões diferentes do arquivo. A política que fechou não dá área nem teto."""
+        """(áreas, {área: Ceiling}) de uma só leitura da política: ver access."""
+        return self.access(identity)[:2]
+
+    def access(self, identity):
+        """(áreas, {área: Ceiling}, grava) de uma só leitura da política, sob a mesma trava: a filiação, o teto e a
+        escrita nunca vêm de versões diferentes do arquivo. A política que fechou não dá área nem teto; e, se o último
+        documento válido tinha papéis, ninguém grava enquanto ela está fechada (o papel com write [] não pode ganhar a
+        escrita porque o arquivo quebrou). Sem papéis no último válido, a escrita segue como na v4.20."""
         with self._lock:
             try:
                 st = os.stat(self.path)
                 if (st.st_mtime_ns, st.st_size, st.st_ino) != self._stamp:
-                    self._stamp, self._canonical, self._groups, self._ceilings = self._load()
+                    self._stamp, self._doc = self._load()
+                    self._had_roles = bool(self._doc.roles)
             except (OSError, ValueError, RecursionError) as exc:
-                self._stamp, self._canonical, self._groups, self._ceilings = None, None, {}, {}  # fecha; tenta de novo
+                self._stamp, self._doc = None, PolicyDoc()  # fecha; tenta de novo
                 print(f"kg_mcp: area policy closed: {exc}", file=sys.stderr)
-            shared = [area for area, members in sorted(self._groups.items()) if identity in members]
-            return ([self._canonical] if self._canonical else []) + shared, dict(self._ceilings)
+            areas, ceilings, writes = self.grant(self._doc, identity)
+            if self._stamp is None and self._had_roles:
+                writes = False
+            return areas, ceilings, writes
+
+    @staticmethod
+    def grant(policy, identity):
+        """O acesso efetivo de uma identidade numa política: a união das concessões, com o maior teto por área."""
+        groups = list(policy.member_of.get(identity, ()))
+        if not policy.roles:  # a política da v4.20, sem papéis: o mesmo veredito de antes
+            return ([policy.canonical] if policy.canonical else []) + groups, dict(policy.ceilings), True
+        held = set(policy.members.get(identity, ()))
+        for area in groups:
+            held |= policy.members.get(area, frozenset())
+        # o teto de cada concessão: o rank do nível, ou None para a área sem teto (que vence as outras)
+        tops = {}
+
+        def give(area, rank):
+            tops[area] = wider_rank(tops[area], rank) if area in tops else rank
+
+        def area_rank(area):
+            top = policy.ceilings.get(area)
+            return None if top is None else top.ceiling
+        for area in ([policy.canonical] if policy.canonical else []) + groups:
+            give(area, area_rank(area))
+        for name in sorted(held):
+            role = policy.roles[name]
+            for area in sorted(role.read):
+                level = role.ceilings.get(area)
+                give(area, area_rank(area) if level is None else policy.levels.index(level))
+        canonical = [policy.canonical] if policy.canonical in tops else []
+        areas = canonical + sorted(a for a in tops if a != policy.canonical)
+        ceilings = {a: Ceiling(policy.levels, policy.levels[r], policy.default) for a, r in tops.items() if r is not None}
+        writes = not held or any(policy.roles[n].writes for n in held)
+        return areas, ceilings, writes
 
 
 LEVEL = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")  # o nível de x_classification: o slug do contrato v4.20
@@ -685,12 +888,15 @@ class AreaView:
     como JSON, que também é YAML), com ou sem ponta cortada, para a forma do texto não contar se algo foi retirado. O da
     própria área sai como foi escrito: só ela escreve ali, e o sha256 precisa servir para gravar de volta."""
 
-    def __init__(self, own, own_area, readers):
+    def __init__(self, own, own_area, readers, writes=True):
         self._own, self._own_area, self._readers, self._names = own, own_area, readers, None
+        self._writes = writes
 
     def __getattr__(self, attr):  # kg_write e kg_delete: sempre na própria área
         if self._own is None:
             raise kg_store.StoreError(P_("this identity has no area of its own in this read-only server"))
+        if not self._writes and attr in ("write", "delete", "write_many"):
+            raise kg_store.StoreError(P_("the roles of this identity do not write"))
         return getattr(self._own, attr)
 
     def _texts(self, skip=None, names=None):  # o corpus do kg_validate é o da própria área, que é onde se grava
@@ -811,24 +1017,37 @@ class Profile:
         if self.root is None:
             return Context(None, author_of(identity), identity, untrusted=True,
                            store_error=self.root_error or P_("the server started without --root"))
-        if self.policy is not None and self.read_only and not (self.root / area_name(identity)).exists():
+        # uma só leitura da política por requisição: a filiação, o teto e a escrita vêm da mesma versão do arquivo
+        access = self.policy.access(identity) if self.policy is not None else None
+        writes = access is None or access[2]
+        if access is not None and (self.read_only or not writes) and not (self.root / area_name(identity)).exists():
             # quem só lê e nunca gravou não tem área, e ainda assim lê as compartilhadas
-            return Context(self._view(identity, None), author_of(identity), identity, untrusted=True)
+            return Context(self._view(identity, None, access), author_of(identity), identity, untrusted=True,
+                           writes=writes)
         with self._lock:
             cached = self._areas.get(identity)
             if cached is None:
                 try:
                     with kg_i18n.machine():  # o erro da área vai ao modelo: em inglês, como o resto do protocolo
                         cached = (kg_store.open_store(self.backend, self.root / area_name(identity),
-                                                      init=not self.read_only, gate=self.gate), None)
+                                                      init=not self.read_only and writes, gate=self.gate), None)
                 except (kg_store.StoreError, OSError, ValueError, RuntimeError) as exc:
                     # não fica em cache: tenta de novo
                     cached = (None, P_("the area of {identity} did not open ({error})").format(identity=identity,
                                                                                               error=exc))
-                    return Context(None, author_of(identity), identity, untrusted=True, store_error=cached[1])
-                self._areas[identity] = cached
-        store = cached[0] if self.policy is None else self._view(identity, cached[0])
-        return Context(store, author_of(identity), identity, untrusted=True)
+                else:
+                    self._areas[identity] = cached
+        if cached[0] is None:
+            if not writes:
+                # quem só tem papéis sem escrita e cuja pasta própria não abre (sem .git, por exemplo) lê as
+                # compartilhadas como quem nunca gravou: nada de git init, e a leitura segue (fora da trava, porque
+                # _view abre as compartilhadas sob ela)
+                print(f"kg_mcp: {cached[1]}", file=sys.stderr)
+                return Context(self._view(identity, None, access), author_of(identity), identity, untrusted=True,
+                               writes=writes)
+            return Context(None, author_of(identity), identity, untrusted=True, store_error=cached[1], writes=writes)
+        store = cached[0] if access is None else self._view(identity, cached[0], access)
+        return Context(store, author_of(identity), identity, untrusted=True, writes=writes)
 
     def _shared_store(self, area):
         """O armazém de uma área compartilhada, só de leitura, ou None quando ela ainda não existe ou não abre."""
@@ -842,12 +1061,13 @@ class Profile:
                     print(f"kg_mcp: shared area did not open: {exc}", file=sys.stderr)
             return store
 
-    def _view(self, identity, own):
-        """A visão desta requisição: a filiação é lida agora, e só as áreas legíveis são abertas."""
-        areas, ceilings = self.policy.readable(identity)
+    def _view(self, identity, own, access):
+        """A visão desta requisição, do acesso lido agora (AreaPolicy.access): só as áreas legíveis são abertas, e cada
+        uma com o teto efetivo da identidade (o da área, ou o maior entre os papéis que a leem)."""
+        areas, ceilings, writes = access
         readers = {area: self._shared_store(area) for area in areas}
         readers = {a: (CeilingStore(s, ceilings[a]) if a in ceilings else s) for a, s in readers.items() if s is not None}
-        return AreaView(own, area_name(identity), readers)
+        return AreaView(own, area_name(identity), readers, writes)
 
 
 class Server:
@@ -893,7 +1113,8 @@ class Server:
         return [{"name": n, "description": t["description"] + (f" {note}" if note else ""),
                  "inputSchema": t["inputSchema"], "annotations": ANNOTATIONS[n]}
                 for n, t in TOOLS.items()
-                if (ctx.store is not None or not t["needs_store"]) and not (self.read_only and t["writes"])]
+                if (ctx.store is not None or not t["needs_store"])
+                and not ((self.read_only or not ctx.writes) and t["writes"])]
 
     # --- JSON-RPC ------------------------------------------------------------------------------------------
     def handle(self, msg, ctx=None):

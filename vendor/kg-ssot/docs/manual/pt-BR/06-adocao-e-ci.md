@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:5d1c2429b80c2836 -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:0a2cdfab91bd513a -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.49.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.50.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -226,4 +226,6 @@ por um clone nu, então a configuração git dela não roda.
 carimbo registra a verificação, e o update seguinte a herda; `--no-verify-attestation` a tira de propósito. O
 `kg_vendor.py check` continua sem rede e compara só com o carimbo. A conferência roda no kit que faz o update, então a
 primeira ida à 4.47.0 a partir de um kit antigo não é conferida: rode de novo o `update --verify-attestation` com o kit
-novo para conferir.
+novo para conferir. Num sandbox com o cache do usuário (o `.cache` na pasta pessoal) só de leitura, o update com `--verify-attestation` falha porque o
+`gh` grava ali o trust root do Sigstore: rode com o `XDG_CACHE_HOME` apontando para um diretório gravável, e a
+verificação continua inteira.

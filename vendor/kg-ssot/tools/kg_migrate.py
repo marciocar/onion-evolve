@@ -3,7 +3,7 @@
 
   kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]
   kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]
-  kg_migrate.py methods plan|apply [--json] [--confirmed-out ARQ.tsv] [--root DIR] [--exclude GLOB] [grafo.kg.yaml ...]
+  kg_migrate.py methods plan|apply [--json] [--confirmed-out ARQ.tsv] [--manifest-out ARQ.tsv] [--root DIR] [--exclude GLOB] [grafo.kg.yaml ...]
 
 O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primeira cujo when casa decide a ação do nó
 (propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por
@@ -1202,8 +1202,7 @@ def nest_command(args):
 # O v4.16 deu à classe a forma canônica em inglês e aceitou as cinco em português como apelido, sem aviso. A tabela é a
 # única coisa que o schema não diz (qual apelido é qual classe); o conjunto das dez é conferido contra o pattern do
 # SHOULD vigente, e um contrato que mude a lista faz do migrador entrada quebrada, nunca uma troca adivinhada.
-METHOD_ALIASES = {"medição": "measurement", "leitura": "reading", "juízes": "judges", "derivado": "derived",
-                  "testemunho": "testimony"}
+METHOD_ALIASES = kg_validate.METHOD_ALIASES  # a fonte única do mapa, que o kg_gate.py --touched também lê
 METHOD_ALIAS_RE = re.compile(r"^(medição|leitura|juízes|derivado|testemunho): ")
 METHOD_CANON_RE = re.compile(r"^(?:measurement|reading|judges|derived|testimony): ")
 METHOD_ALL = set(METHOD_ALIASES) | set(METHOD_ALIASES.values())
@@ -1347,6 +1346,18 @@ def methods_command(args):
     unique = {}  # o mesmo arquivo dado duas vezes, ou por um symlink, conta uma vez só
     for f in files:
         unique.setdefault(pathlib.Path(f).resolve(), f)
+    def _same_file(a, b):
+        try:
+            return os.path.samefile(a, b)
+        except OSError:  # a saída que ainda não existe não é nenhum grafo
+            return False
+
+    for out in (args.confirmed_out, getattr(args, "manifest_out", None)):
+        # a saída que cai num grafo listado o sobrescreveria depois do apply: entrada quebrada, antes de gravar qualquer coisa.
+        # O caminho resolvido pega o symlink e o '..'; o samefile (dispositivo e inode) pega o hardlink e o nome em outra caixa
+        # num sistema de arquivos que não distingue caixa
+        if out and (pathlib.Path(out).resolve() in unique or any(_same_file(out, g) for g in unique)):
+            raise Broken(_("the output {path} is one of the graphs read").format(path=out))
     graphs, files, broken = load_graphs(list(unique.values()), args.root, lenient=not args.graphs)
     report, all_rows, written = [], [], set()
     for g, f in zip(graphs, files):
@@ -1397,6 +1408,17 @@ def methods_command(args):
                     w.writerow([r[0], r[2], r[3]])
         except OSError as exc:
             raise Broken(_("cannot write {path}: {exc}").format(path=args.confirmed_out, exc=exc))
+    if getattr(args, "manifest_out", None):
+        # o recibo da troca, para o resíduo do PR: grafo, id e o method de antes e o de depois, só dos arquivos gravados
+        try:
+            with open(args.manifest_out, "w", encoding="utf-8", newline="") as fh:
+                w = csv.writer(fh, delimiter="\t", lineterminator="\n")
+                w.writerow(["graph", "id", "old", "new"])
+                for r in swaps:
+                    if r[0] in written:
+                        w.writerow([r[0], r[2], r[5], r[6]])
+        except OSError as exc:
+            raise Broken(_("cannot write {path}: {exc}").format(path=args.manifest_out, exc=exc))
     by_class = collections.Counter(METHOD_ALIAS_RE.match(r[5]).group(1) for r in swaps)
     by_graph = collections.Counter(r[0] for r in swaps)
     by_tail = collections.Counter(r[7] for r in all_rows if r[4] == "tail")
@@ -1512,7 +1534,7 @@ def main(argv=None):
         "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
-        "  kg_migrate.py methods plan|apply [--json] [--confirmed-out FILE.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "  kg_migrate.py methods plan|apply [--json] [--confirmed-out FILE.tsv] [--manifest-out FILE.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "\n"
         "methods swaps the Portuguese alias of the provenance.method class (medição, leitura, juízes, derivado, testemunho)\n"
         "for the canonical English one (measurement, reading, judges, derived, testimony), by text: only the class changes,\n"
@@ -1520,6 +1542,7 @@ def main(argv=None):
         "inside the string, a class outside the list, no ': ' after the class, uppercase in the class) is only pointed out,\n"
         "and a node in flow style, an anchored method or a block scalar goes to the reviewer. apply writes under the same\n"
         "checks as keys and counts the SHOULD warnings that fall; --confirmed-out writes the confirmed nodes touched.\n"
+        "apply --manifest-out writes the receipt of each swap written: graph, id, and the method before and after.\n"
         "\n"
         "nest (4.21.0) moves the adopter's own x_ keys into a canonical node profile (x_mirror, x_doc_cycle, x_questionnaire),\n"
         "by text, as the map says (spec/kg-migrate-nest.schema.json): each profile field comes from a constant, from an x_ key\n"
@@ -1600,6 +1623,9 @@ def main(argv=None):
         m.add_argument("--root", default=".")
         m.add_argument("--json", action="store_true")
         m.add_argument("--confirmed-out", help=_("writes graph, id and status of the confirmed nodes touched, as TSV"))
+        if name == "apply":
+            m.add_argument("--manifest-out", metavar="FILE",
+                           help=_("writes graph, id and the method before and after of each swap written, as TSV"))
         m.add_argument("--exclude", action="append", default=[],
                        help=_("extra glob to leave out of the git list (fnmatch: * crosses /, as in kg_gate.py)"))
         m.add_argument("--no-default-excludes", action="store_true",

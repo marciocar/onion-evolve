@@ -247,7 +247,7 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--accept-regression "<reason>"` | Accepts a regression; the reason is recorded in the baseline |
 | `--exclude GLOB` | Removes paths from the corpus (repeatable). `*/fixtures/*`, `docs/materials/*`, and the KG-SSOT vendor (any folder with the `.kg-ssot-version` stamp, since 4.19.1) are excluded by default; `--no-default-excludes` brings them back |
 | `--granularity node` | With `--update`: counts the SHOULD debt per occurrence, not per graph |
-| `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor` |
+| `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor`. The freshness stamp (`verified_at`, `verified_against`) and, since 4.50, the `provenance.method` class swapped between a Portuguese alias and its canonical English class with the detail after `: ` byte for byte the same (the `kg_migrate.py methods` swap) do not touch a node; any other change does, the method's included. `--touched` does not look at the MUST level; with two nodes of the same id, which the MUST level already fails, the last one counts |
 | `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. `.kg.json` is not checked here. Not with `--update` |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |
@@ -699,6 +699,58 @@ write or a name that does not exist comes with `isError: true`, so the model can
     works the other way: `kg_history` of a visible graph lists every old version, those above the ceiling too, with
     their `ref` and commit message, and `kg_get` on such a version answers like a graph that does not exist. The content
     stays out, but the list shows that a more sensitive version once existed.
+  - **Roles, with a ceiling by role (unreleased):** two optional keys. `roles` names each role (a slug: lowercase,
+    digits, dot, dash, or underscore) and gives it `read` (the shared areas it reads, at least one, each the canonical
+    area or a group of the policy), `write` (optional, and only `[]` or `["own"]`: `own` is the identity's own area, the
+    only area where the server writes, so `write` restricts or declares and never widens; without the key, `["own"]`),
+    and `ceilings` (optional: an area the role reads to a level of `levels`, equal to or below the ceiling of that area,
+    never on the canonical area). `members` gives roles to an e-mail identity or to every member of a group:
+    `{"aud@x.org": ["auditor"], "g-audit": ["auditor"]}`. A person's access is the union of the grants: the canonical
+    area and each group they belong to (each one is the same as a role that reads the area with the area's ceiling),
+    and each of their roles. **When two grants give different ceilings to the same area, the higher one wins**, in any
+    order, and it can never pass the ceiling of the area; a grant with no ceiling (an area without a ceiling and no role
+    ceiling) wins over any ceiling. So a role with a lower ceiling only restricts someone who reads the area through
+    that role alone: someone in the group `g-compliance` reads it with the area's ceiling, whatever their roles. Someone
+    with at least one role writes in their own area if any of their roles has `write: ["own"]`; with only `write: []`
+    roles, `kg_write` and `kg_delete` leave the tool list, a call to them is refused as an unavailable tool, and the own
+    area is not created (an own area written earlier stays readable, and an own folder that does not open, such as one
+    without `.git` in the git backend, is left as it is while the shared areas are still read). Someone with no role writes as before. The five
+    read tools judge the ceiling of each area with the ceiling of that person, with everything above (the same answer as
+    a graph that does not exist, the same `ref` and case rules). Without `roles`, the policy is the one of the ceiling by
+    area above, with the same verdicts but one: a key repeated in the same object and a file larger than 1 MiB now
+    make a policy without roles invalid too, where 4.49.0 accepted them. The server does not start with such a file, and
+    one already running closes on the next reload, so check the policy before you update. The policy is parsed strictly, and any of these makes the file invalid, which
+    closes reading as above: a role with no area, an area that is neither the canonical one nor a group, a level that is
+    not in `levels`, a role ceiling above the ceiling of the area or on an area the role does not read, a role ceiling
+    without `levels`, a `write` other than `own`, a member that cites a role that does not exist, a key of `members`
+    that is neither an e-mail nor a group, an empty list, a wrong type, a key repeated in the same object (at any level),
+    or a file larger than 1 MiB. While the file is closed, nobody writes if the last valid file had `roles`, so a role
+    with `write: []` never gains writing because the file broke (a role deleted but still cited in `members`, or a
+    group deleted but still cited); if the last valid file had no `roles`, writing stays as in 4.49.0. When the file is
+    loaded, the server warns on stderr about each role ceiling that another grant overrides for a member, naming the
+    member, the role, and the area, never a graph. The warning writes the member's e-mail to the server's stderr, which
+    is personal data in the operator's log.
+  - **Limits of roles:** the ceiling of a role restricts only someone who reads the area only through roles with a
+    ceiling; a group of the area, or another role without a ceiling, gives the higher ceiling, and the kg-mcp does not
+    yet have a ceiling per person that no grant passes (the deny of the market). The response time can tell a hidden
+    graph from a missing one: to judge the ceiling, the server reads and parses the text of the graph before refusing,
+    so a large hidden graph takes longer to refuse than a name that does not exist, and someone who guesses the name can
+    infer that the graph exists. The kg-mcp does not equalize that time.
+
+    ```json
+    {"schema_version": 1, "canonical": "c-company",
+     "groups": {"g-compliance": ["dpo@x.org"], "g-audit": ["aud@x.org"]},
+     "levels": ["public", "internal", "confidential", "restricted"],
+     "ceilings": {"g-compliance": "restricted"},
+     "default_level": "internal",
+     "roles": {"auditor": {"read": ["g-compliance"], "write": [], "ceilings": {"g-compliance": "confidential"}},
+               "officer": {"read": ["g-compliance"]}},
+     "members": {"g-audit": ["auditor"], "off@x.org": ["officer"]}}
+    ```
+
+    Here `aud@x.org` reads `g-compliance` up to `confidential`, does not see its `restricted` graph and does not write;
+    `off@x.org` and `dpo@x.org` read it up to `restricted`. Giving `aud@x.org` the `officer` role too would show the
+    `restricted` graph and allow writing, because the higher grant wins.
 - **The content screen (4.47.0):** in any profile, every text that `kg_get`, `kg_list`, `kg_history`, `kg_query`, and
   `kg_terms` return is screened before it reaches the model (`tools/kg_screen.py`, standard library only, a pure
   function of the text). Three verdicts: `pass` (nothing found); `quarantine` (one signal alone: an invisible
@@ -1963,7 +2015,7 @@ text the map did not cover), both files written with the same verdict as before.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods plan                                  # what would change, and the tail
-python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods apply --confirmed-out confirmed.tsv   # writes the swaps
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods apply --confirmed-out confirmed.tsv --manifest-out swaps.tsv   # writes the swaps
 ```
 
 Since v4.16 the class of `provenance.method` has a canonical English form (`measurement`, `reading`, `judges`,
@@ -1992,6 +2044,10 @@ the run broken input (rc 2), never a guessed swap.
   nothing.
 - **`--confirmed-out FILE.tsv`** writes `graph`, `id`, and `status` of each `confirmed` node touched (in `plan`, the
   proposed swaps; in `apply`, the ones written), the list a pull request that edits a graph shows.
+- **`--manifest-out FILE.tsv`** (only in `apply`, since 4.50) writes `graph`, `id`, `old` and `new` of each swap
+  written, the receipt for the pull request. The gate does not need it: `kg_gate.py --touched` already counts the bare
+  class swap as no change, so a node whose only change is the swap does not bring its old debt into the pull request.
+  Both outputs refuse, with rc 2 and before anything is written, a path that is one of the graphs read: the same path resolved (a symlink, a `..`) or the same file (a hardlink, or the name in another case on a file system that does not tell case apart).
 
 rc 0 when the plan comes out or `apply` finishes; rc 1 when a file was refused (by `apply`, or by either one for mixed
 line endings, with the reason in `refused` in the `--json`); rc 2 on broken input. Run on a copy
