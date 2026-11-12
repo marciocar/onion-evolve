@@ -2,7 +2,8 @@
 branch: docs/ops-check-mold-first-spike
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: bfd0cfb0b5c47c9edb16e41e5940918bf9ae092aee3162d59f829cefc9b68160
+reviewed_code_sha256: b443a4a4b57c325e04a854284a79af3b4d42f823551ff6849447b0059fb7d26f
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
