@@ -2,7 +2,8 @@
 branch: docs/close-part-b-study
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7829b80568de1ba1770b92c7d012c5a417db92f8ce3200f5935591d0b54f9229
+reviewed_code_sha256: 6f66ae3970f5133c1157c0cdbebe790e272f6b23302b1da72990b66877e30893
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
