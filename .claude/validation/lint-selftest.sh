@@ -54671,7 +54671,7 @@ run_mcp_onion_kg_writer_selftests() {
   fi
   command -v python3 >/dev/null 2>&1 && python3 -I -c 'import yaml, jsonschema' >/dev/null 2>&1 \
     || { record_skip "mcp-onion-kg-writer: python3/PyYAML/jsonschema ausentes (gate do contrato não exercido)"; return; }
-  local want_total=65 o rc libyaml
+  local want_total=66 o rc libyaml
   # A libyaml do python3 (2026-10-27): o PyYAML 6.0.3 não publica wheel cp315 e o sdist compila sem ela, então no
   # Python 3.15 do core não há CSafeLoader. Aí o mutante `profundidade-tab-inicial` (tirar o parser C da medição) é
   # EQUIVALENTE por construção, e o veredito dele abaixo o declara assim, medido. O caminho da libyaml se prova num
