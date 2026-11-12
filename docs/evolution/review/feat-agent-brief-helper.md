@@ -2,8 +2,8 @@
 branch: feat/agent-brief-helper
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 78fa9a13a269b91f3dc63fbfed9091835f645c70057b9d86f50613753cc45610
-reviewed_code_sha256: b74a55a8f335c10ed446ce8389837a21b81cc395883bbbf618a701e4dcdc4e29
+reviewed_diff_sha256: 7b5c93682a5e3af5d8ff043b3fbe5ef67e9b656e81e0a76fbeb121e97f97a191
+reviewed_code_sha256: 269ac6165043eacc937eb6be17cc637e49bfc12f61670ea0a0be00f9e6f630c6
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -58,7 +58,3 @@ Não foi forjada guarda alguma (fora do escopo).
 
 - Sem refutador independente; sem medida de tokens e tempo.
 - A sonda mediu uma só versão do Claude Code e o tipo `general-purpose`.
-
-## Re-revisão (CI)
-
-O CI reprovou a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core): o ajudante escrevia `.claude/commands/...` literal, que no bundle do plugin não resolve. Agora o caminho exibido é derivado da raiz do repo pelo git, ou o absoluto. As famílias agent_brief e plugin_bundle passaram 17 de 17 local.
