@@ -19,13 +19,15 @@
 # o bloco escalar do YAML na primeira tentativa, e (b) script em arquivo tem
 # bancada — YAML inline não tem.
 #
-# Uso  : [ONION_SHARD_FAMILIES=a,b,c] bash ops/testing/selftest-shard-plan.sh [N=4]
+# Uso  : [ONION_SHARD_FAMILIES=a,b,c] bash ops/testing/selftest-shard-plan.sh [--project] [N=4]
 # Saída: uma linha JSON `[{"n":1,"familias":"a,b,c"}, …]` para `fromJson` da matriz.
 # Exit : 0 ok · 1 lista vazia (VAZIO NUNCA VIRA OK — matriz vazia = job verde que
 #        não exerceu nada, o fail-open mais caro num gate de gate) · 2 sem SUT.
 # =============================================================================
 set -uo pipefail
 
+PROJECT=0
+if [ "${1:-}" = "--project" ]; then PROJECT=1; shift; fi
 N="${1:-4}"
 case "${N}" in (*[!0-9]*|"") echo "uso: $0 [N inteiro >= 1]" >&2; exit 2 ;; esac
 [ "${N}" -ge 1 ] || { echo "uso: $0 [N inteiro >= 1]" >&2; exit 2; }
@@ -67,35 +69,101 @@ fi
 # ops/testing/collect-family-times.sh), o plano distribui por LPT guloso — a familia mais cara vai para a
 # faixa mais leve. Medido antes: faixas de 5/10/17/19 min no mesmo PR, com a soma pedindo ~11 por faixa.
 # Sem a tabela, segue o round-robin. Familia que a tabela nao conhece entra com a MEDIANA, nunca com zero.
+#
+# A CARGA DA FAIXA É A PAREDE DA FILA, NÃO A SOMA (2026-11-12, SAC-423). A faixa 2 estourou 23 min no PR #1612
+# com a soma dela pedindo 913 s por worker. A fila dinâmica do `--jobs` NÃO pega o caro primeiro: cada
+# worker anda o lint-selftest.sh na ORDEM DO SCRIPT e reivindica a próxima família livre, e a `fixtures`
+# (posição 11) roda em todo worker. A `selftest_selection` (posição 130, 984 s) só começou aos 393 s e a faixa
+# terminou aos 1378 s, com os outros três workers parados no fim. O LPT pela soma não vê isso. Agora o
+# plano SIMULA a fila (ordem do --list, W workers, a fatia da `fixtures` em cada um) e põe cada família na
+# faixa onde a parede projetada fica menor. O simulador acertou as 35 faixas de 7 runs completos da main de
+# 2026-11-12 com erro de −3% a +3%.
+# A linha `fixtures` da tabela é o TOTAL da família no run (soma das fatias de todas as faixas). W vem de
+# ONION_SHARD_WORKERS (4 = o nproc do runner, medido no log "em 4 workers").
+# `--project` imprime `faixa<TAB>parede_s<TAB>soma_s` em vez da matriz: é a projeção que o caso (h) da
+# bancada lê, para que a régua do teto e a do plano sejam o MESMO modelo.
 TIMES="${ONION_SHARD_TIMES:-${ROOT}/ops/testing/selftest-family-times.tsv}"
 [ -f "${TIMES}" ] || TIMES=""
-printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" python3 -c '
+printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" W="${ONION_SHARD_WORKERS:-4}" PROJECT="${PROJECT}" python3 -c '
 import json, os, sys
 fams = [l.strip() for l in sys.stdin if l.strip()]
 n = max(1, int(os.environ["N"]))
+W = max(1, int(os.environ["W"]) if os.environ["W"].isdigit() else 4)
 times = {}
+fx_total = 0.0
 if os.environ.get("TIMES"):
     for line in open(os.environ["TIMES"], encoding="utf-8"):
         parts = line.rstrip("\n").split("\t")
         if len(parts) == 2 and not parts[0].startswith("#"):
-            try: times[parts[0]] = float(parts[1])
-            except ValueError: pass
+            try: v = float(parts[1])
+            except ValueError: continue
+            if parts[0] == "fixtures": fx_total = v
+            else: times[parts[0]] = v
 # `fixtures` NAO entra no round-robin: vai a TODA faixa com a sua fatia do manifest (fixtures_lane i/n).
 # Medido 2026-10-05: ~1600 s de CPU numa faixa so, teto de 25 min estourado 3x no PR #927 — somar
 # faixas nao ajudava enquanto ela inteira caisse numa so.
 fx = "fixtures" in fams
 rest = [f for f in fams if f != "fixtures"]
+pos = {f: i for i, f in enumerate(fams)}
+known = sorted(times.values())
+med = known[len(known) // 2] if known else 1.0
+cost = lambda f: times.get(f, med)
+fx_w = (fx_total / (n * W)) if fx else 0.0
+
+def wall(lane):
+    # a fila dinamica do lint-selftest.sh --jobs: cada worker livre pega a proxima familia LIVRE na ordem
+    # do script; ao chegar na `fixtures`, roda a SUA fatia (todo worker roda a dele)
+    seq = sorted(lane, key=lambda f: pos[f])
+    if fx:
+        k = next((i for i, f in enumerate(seq) if pos[f] > pos["fixtures"]), len(seq))
+        seq = seq[:k] + ["fixtures"] + seq[k:]
+    t = [0.0] * W; ptr = [0] * W; taken = set()
+    while True:
+        live = [w for w in range(W) if ptr[w] < len(seq)]
+        if not live: return max(t)
+        w = min(live, key=lambda w: t[w])
+        f = seq[ptr[w]]; ptr[w] += 1
+        if f == "fixtures": t[w] += fx_w
+        elif f not in taken: taken.add(f); t[w] += cost(f)
+
 shards = [[] for _ in range(n)]
 if times:
-    known = sorted(v for v in times.values())
-    med = known[len(known) // 2] if known else 1.0
-    load = [0.0] * n
-    for f in sorted(rest, key=lambda f: -times.get(f, med)):   # LPT: o mais caro primeiro
-        k = load.index(min(load))
-        shards[k].append(f); load[k] += times.get(f, med)
+    walls = [wall(s) for s in shards]
+    for f in sorted(rest, key=lambda f: (-cost(f), pos[f])):   # LPT: o mais caro primeiro
+        best = None
+        for k in range(n):
+            wk = wall(shards[k] + [f])
+            others = max([walls[j] for j in range(n) if j != k], default=0.0)
+            key = (max(wk, others), wk, k)
+            if best is None or key < best[0]: best = (key, k, wk)
+        _, k, wk = best
+        shards[k].append(f); walls[k] = wk
+    # MELHORA LOCAL: o guloso fixa o pior e deixa faixas de 9 e de 17 min no mesmo plano. Move uma família
+    # de faixa enquanto isso baixar (pior parede, soma dos quadrados): a folga se espalha por todas, e
+    # a variância medida entre runners (+/-20%) não cai inteira numa faixa só.
+    score = lambda ws: (round(max(ws)), sum(x * x for x in ws))
+    for _ in range(30):
+        moved = False
+        for f in sorted(rest, key=lambda f: -cost(f)):
+            a = next(i for i, s in enumerate(shards) if f in s)
+            base = score(walls); best = None
+            src = [g for g in shards[a] if g != f]; wa = wall(src)
+            for b in range(n):
+                if b == a: continue
+                wb = wall(shards[b] + [f])
+                ws = list(walls); ws[a] = wa; ws[b] = wb
+                if score(ws) < base and (best is None or score(ws) < best[0]): best = (score(ws), b, wb)
+            if best:
+                _, b, wb = best
+                shards[a] = src; shards[b].append(f); walls[a] = wa; walls[b] = wb; moved = True
+        if not moved: break
 else:
     for i, f in enumerate(rest):
         shards[i % n].append(f)
+if os.environ.get("PROJECT") == "1":
+    for i, s in enumerate(shards):
+        print("%d\t%.0f\t%.0f" % (i + 1, wall(s), sum(cost(g) for g in s)))
+    raise SystemExit(0)
 out = []
 for i, s in enumerate(shards):
     if fx: s = ["fixtures"] + s
