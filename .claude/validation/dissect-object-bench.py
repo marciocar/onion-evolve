@@ -39,6 +39,7 @@ SYNTHESIS = STUDY + "/SYNTHESIS.md"
 SYNTHESIS_TEXT = {
     "ok": "---\nkg: %s\n---\n\n# Síntese da fixture\n\ntexto.\n" % GRAPH,
     "synth-link": "# Síntese da fixture\n\nO grafo: [fixture-app](fixture-app-2026-10.kg.yaml#D_FIXTURE).\n",
+    "synth-same-name": "---\nkg: docs/evolution/dissect/outra-2026-10/fixture-app-2026-10.kg.yaml\n---\n\n# Síntese com o ponteiro velho\n\n[g](../outra-2026-10/fixture-app-2026-10.kg.yaml).\n",
     "synth-unlinked": "---\nkg: docs/evolution/dissect/outro-2026-10/outro-2026-10.kg.yaml\n---\n\n# Síntese solta\n\ntexto sem o grafo.\n",
 }
 DYNAMIC = "stage0-criterion-digest"  # o código que vem do kg_criterion (add(5, "stage0-" + …))
@@ -324,6 +325,7 @@ CASES = [
     ("stage plan sem a síntese (variante legítima)", None, None, "no-synth", ["--stage", "plan"]),
     ("síntese que cita o grafo por link (variante legítima)", None, None, "synth-link", []),
     ("síntese que não cita o grafo da pasta", "synthesis-nao-cita-o-grafo", None, "synth-unlinked", []),
+    ("kg de outra pasta com o mesmo nome (o ponteiro velho)", "synthesis-nao-cita-o-grafo", None, "synth-same-name", []),
 ]
 CAND_GRAPH = "docs/evolution/dissect/fixture-cand-2026-11/fixture-cand-2026-11.kg.yaml"
 RC3_CASES = [
@@ -508,6 +510,16 @@ def one_case(src, item_of, case):
         rc_m, out_m = run(t2, extra)
         if tag in out_m:
             return None, "%s: o MUTANTE de %s ainda acusa — o caso não discrimina" % (name, code)
+        if order == "synth-same-name":
+            # o defeito que o refutador do #1638 mediu: comparar só o nome do arquivo aceita o ponteiro velho
+            based = src.replace("os.path.normpath(c) == graph for c in cited",
+                                "os.path.basename(c) == os.path.basename(graph) for c in cited")
+            assert based != src, "mutante do basename não achou a comparação de caminho"
+            t3 = build(based, mut, order); made.append(t3)
+            rc_b, out_b = run(t3, extra)
+            if tag in out_b:
+                return None, "%s: o MUTANTE que compara só o nome ainda acusa — o caso não discrimina" % name
+            return "ok   %-58s %s (mutante calado: rc %d; mutante do nome: rc %d)" % (name, tag, rc_m, rc_b), None
         return "ok   %-58s %s (mutante calado: rc %d)" % (name, tag, rc_m), None
     finally:
         for t in made:

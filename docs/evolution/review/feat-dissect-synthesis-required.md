@@ -1,18 +1,18 @@
 ---
 branch: feat/dissect-synthesis-required
-pr: pendente
+pr: 1638
 date: 2026-11-12
-reviewed_diff_sha256: 4e59dc048ac1202f865ba0223647f7a071923bcef6ff2f4f4ef35d106e445c86
-reviewed_code_sha256: 0791f145df83e288b342d30f099ec363e7131c2856102b9de1d809c06d7d9bbb
-findings_total: 3
-findings_real: 1
-findings_blocking: 0
-findings_fixed: 1
+reviewed_diff_sha256: fc364d13d5f5f42819d2a2e621be9035c873c6868b736d80a19161fd226096fb
+reviewed_code_sha256: 38e87e980823c27d6a1a344f93ac6379fe399bc0fa18b71842fc97c96d5e0ff5
+findings_total: 6
+findings_real: 2
+findings_blocking: 1
+findings_fixed: 2
 tokens: 0
 duration_min: 30
-verdict: FIXED
-elenxo: false
-reviewer: "agente de execução (claude-opus-5-5), passada própria sobre o próprio diff"
+verdict: REJECTED_AND_FIXED
+elenxo: true
+reviewer: "refutador independente (re-revisão do #1638) + agente de execução (claude-opus-5-5) na cura"
 nota: "tokens não medidos pelo agente; o harness reporta o uso na notificação final"
 ---
 
@@ -25,14 +25,14 @@ nota: "tokens não medidos pelo agente; o harness reporta o uso na notificação
   esperado), e ela cita o grafo da mesma pasta no `kg:` do frontmatter ou num link markdown (senão
   `synthesis-nao-cita-o-grafo`). `--stage plan` não cobra. A checagem roda antes dos retornos cedo do item 2, então
   vale também para o modo estudo e para o grafo sem veredito.
-- Bancada: a fixture boa passa a nascer com a síntese; 4 casos novos (sem síntese reprova; stage plan sem síntese
+- Bancada: a fixture boa passa a nascer com a síntese; 5 casos novos (sem síntese reprova; kg de outra pasta com o mesmo nome reprova; stage plan sem síntese
   passa; síntese citando por link passa; síntese que não cita o grafo reprova). Piso da família `dissect_object`
-  sobe de 125 para 129 casos.
+  sobe de 125 para 130 casos.
 - Doutrina §6 e `/meta:dissect` passo 5: uma linha cada dizendo que a síntese é obrigatória no estágio final.
 
 ## Medição
 
-- Família `run_dissect_object_selftests`: 135 pass, 0 fail (129 casos + 4 de rc 3, cobertura dos códigos).
+- Família `dissect_object` (`run_dissect_object_selftests`): 130 casos + 4 de rc 3 verdes, cobertura dos códigos; piso 130.
 - Mutante por código (o da bancada): calar `synthesis-ausente` e `synthesis-nao-cita-o-grafo` faz os dois casos
   deixarem de acusar (rc 0).
 - Mutante da regra inteira: o checador da `origin/main` (sem o item 11) sai **rc 0** nas fixtures sem síntese e com
@@ -42,11 +42,19 @@ nota: "tokens não medidos pelo agente; o harness reporta o uso na notificação
 
 1. **REAL, curado** — o frontmatter só era lido com `\n`; síntese gravada com CRLF caía para "só links" e
    reprovava mesmo com `kg:` correto. O regex aceita `\r?\n`.
-2. **LIMITE declarado** — a citação casa pelo nome do arquivo do grafo, não pelo caminho completo: uma síntese que
-   cite o grafo homônimo de outra pasta passaria. A convenção do corpus é pasta = nome do grafo, então o homônimo
-   só existe por cópia; não bloqueia.
-3. **LIMITE declarado** — o checador confere presença e citação, não a qualidade da síntese nem se ela projeta o
-   veredito sustentado: trabalho do Elenxo, como o resto do TETO DECLARADO do checador.
+2. **REAL, BLOQUEIO, curado (refutador independente)** — a 1ª versão comparava só o nome do arquivo: aceitava
+   um `kg:` apontando `docs/evolution/dissect/lixo/<grafo>.kg.yaml` e um link inline cujo alvo é `../outra-pasta/<grafo>.kg.yaml`, o ponteiro velho de um
+   estudo movido ou renomeado. Cura: o `kg:` resolve da raiz do repo, o link da pasta da síntese, e os dois se
+   comparam por `os.path.normpath` com o caminho do grafo medido. Bancada: o caso "kg de outra pasta com o mesmo
+   nome" exige `synthesis-nao-cita-o-grafo`, e além do mutante do código ganha o mutante que volta ao nome (rc 0,
+   o caso deixa de acusar).
+3. **LIMITE declarado** — citação só em prosa, ou em link de referência (`[g][ref]` com `[ref]: caminho`), reprova:
+   o checador lê o `kg:` e links inline.
+4. **LIMITE declarado** — link dentro de bloco de código ou de comentário HTML passa: o leitor de links não
+   conhece a estrutura do markdown.
+5. **LIMITE declarado** — não se confere se a SYNTHESIS.md está commitada; basta existir na árvore.
+6. **LIMITE declarado** — o checador julga forma, não qualidade: se a síntese projeta o veredito sustentado é
+   trabalho do Elenxo, como o resto do TETO DECLARADO do checador.
 
 ## Estudos já rastreados
 
