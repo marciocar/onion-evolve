@@ -272,7 +272,7 @@ a tie.
 **Touched nodes.** `kg_gate.py --touched <base>` is a separate mode for CI, next to the ratchet: it needs no baseline
 and fails (rc 1) only when a node touched since the common ancestor of `<base>` and `HEAD` carries
 `integrity.bare-decision` or `integrity.superseded-without-successor`. Touched means a new node, a node with any field
-changed (`verified_at` and `verified_against` alone do not count, so a freshness round pays no debt), and a node that gained the debt in the diff, by losing the edge that reached it. So
+changed (`verified_at` and `verified_against` alone do not count, so a freshness round pays no debt, and since 4.50 neither does the `provenance.method` class swapped between the Portuguese alias and the canonical English class, in both directions, with the detail identical, so a `kg_migrate.py methods apply` batch does not fail on old debt), and a node that gained the debt in the diff, by losing the edge that reached it. So
 old debt stays accepted until someone works on that node. It reads the working tree and needs the history: on GitHub
 Actions, `fetch-depth: 0`; otherwise rc 2. A graph renamed with its `meta.id` is not touched; a node moved to another
 graph counts as new there. In a pull request, pass the target branch (`origin/main`); on a push to the default branch,
@@ -360,7 +360,9 @@ The PR that changes the tag does three things:
    with no changed verdict, the gate passes with a `· identity` warning, and the `--update` can come later.
 
 From 4.47.0 on, add `--verify-attestation` to the update to refuse a tree that does not match the manifest the release
-attested; it needs `gh` and the network ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)).
+attested; it needs `gh` and the network ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)). In a sandbox where
+the user cache (`.cache` in the home directory) is read-only, run it with `XDG_CACHE_HOME` pointing to a writable directory, since `gh` writes the Sigstore
+trust root there; the verification stays whole.
 
 A new SHOULD warning raises the debt by design. The contract's ramps (SHOULD today, MUST later) arrive this way, as a
 measured commitment.
@@ -391,6 +393,14 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.49.0` to `kg-ssot-v4.50.0`, the contract (v4.21) and its verdicts are the same, and the vendor brings no new
+file. Two things can change. If you run `kg-mcp --area-policy`, a key repeated in the same object or a policy file
+larger than 1 MiB now makes the policy invalid, even without `roles`: the server does not start with it, and one
+already running closes reading on the next reload, so check the policy before you update. `kg_gate.py --touched` no
+longer counts as a touch the `provenance.method` class swapped between the Portuguese alias and the canonical English
+one with the detail identical, which lets a `kg_migrate.py methods apply` batch pass without old debt on the nodes it
+only retyped. Opt-in: `roles` and `members` in the area policy, and `kg_migrate.py methods apply --manifest-out`.
 
 From `kg-ssot-v4.48.0` to `kg-ssot-v4.49.0`, contracts v4.20 and v4.21 come in, SHOULD only: no graph that passed
 fails, and no MUST verdict changes. v4.20 adds the `x_classification` profile in `meta`. v4.21 adds two warnings:

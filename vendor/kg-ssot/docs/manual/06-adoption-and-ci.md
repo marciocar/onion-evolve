@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.12 or later (the floor si
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.49.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.50.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -221,4 +221,6 @@ It is optional because it needs `gh`, authentication and the network, and a tag 
 The stamp records the verification, and the next update inherits it; `--no-verify-attestation` drops it on purpose.
 `kg_vendor.py check` stays offline and still compares only against the stamp. The check runs in the kit that does the
 update, so the first move to 4.47.0 from an older kit is unverified: run the same `update --verify-attestation` again
-with the new kit to verify it.
+with the new kit to verify it. In a sandbox where the user cache (`.cache` in the home directory) is read-only, the update with `--verify-attestation`
+fails because `gh` writes the Sigstore trust root there: run it with `XDG_CACHE_HOME` pointing to a writable directory,
+and the verification stays whole.

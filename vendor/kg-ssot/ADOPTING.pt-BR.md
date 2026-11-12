@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:d620bf138fc6ca64 -->
+<!-- translation-of: ADOPTING.md sha256:e325b834b721be86 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -273,7 +273,7 @@ um total de grafos. Tirar um aviso de um grafo e pôr o mesmo em outro empata.
 **Nós tocados.** `kg_gate.py --touched <base>` é um modo separado para o CI, ao lado da catraca: não usa linha de base
 e reprova (rc 1) só quando um nó tocado desde o ancestral comum de `<base>` e `HEAD` carrega `integrity.bare-decision`
 ou `integrity.superseded-without-successor`. Tocado é o nó novo, o nó com qualquer campo diferente (`verified_at`
-e `verified_against` sozinhos não contam, então uma rodada de frescor não paga dívida) e o nó que ganhou a dívida no diff, ao perder a aresta que chegava a ele. Assim a dívida antiga segue aceita
+e `verified_against` sozinhos não contam, então uma rodada de frescor não paga dívida, e desde a 4.50 a classe de `provenance.method` trocada entre o apelido em português e a classe canônica em inglês, nos dois sentidos, com o detalhe idêntico também não, então um lote do `kg_migrate.py methods apply` não reprova por dívida antiga) e o nó que ganhou a dívida no diff, ao perder a aresta que chegava a ele. Assim a dívida antiga segue aceita
 até alguém mexer naquele nó. Ele lê a árvore de trabalho e precisa do histórico: no GitHub Actions, `fetch-depth: 0`;
 sem isso, rc 2. O grafo renomeado com o mesmo `meta.id` não é tocado; o nó movido para outro grafo conta como novo lá.
 Num pull request, passe a branch de destino (`origin/main`); num push na branch padrão, `HEAD^1`, porque ali
@@ -362,7 +362,9 @@ O PR que muda a tag faz três coisas:
    depois.
 
 A partir da 4.47.0, acrescente `--verify-attestation` ao update para recusar a árvore que não bate com o manifesto que a
-release atestou; pede o `gh` e a rede ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)).
+release atestou; pede o `gh` e a rede ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)). Num sandbox com o
+cache do usuário (o `.cache` na pasta pessoal) só de leitura, rode com o `XDG_CACHE_HOME` apontando para um diretório gravável, porque o `gh` grava ali o
+trust root do Sigstore; a verificação continua inteira.
 
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
@@ -392,6 +394,15 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.49.0` para a `kg-ssot-v4.50.0`, o contrato (v4.21) e os vereditos dele são os mesmos, e o vendor não traz
+arquivo novo. Duas coisas podem mudar. Se você roda o `kg-mcp --area-policy`, a chave repetida no mesmo objeto ou o
+arquivo de política acima de 1 MiB passam a invalidar a política, mesmo sem `roles`: o servidor não sobe com ela, e o
+que já está de pé fecha a leitura na recarga seguinte, então confira a política antes de atualizar. O
+`kg_gate.py --touched` deixa de contar como toque a classe de `provenance.method` trocada entre o apelido em português
+e a canônica em inglês com o detalhe idêntico, o que deixa passar um lote do `kg_migrate.py methods apply` sem a dívida
+antiga dos nós que ele só retipou. Opcional: `roles` e `members` na política de áreas, e o
+`kg_migrate.py methods apply --manifest-out`.
 
 Da `kg-ssot-v4.48.0` para a `kg-ssot-v4.49.0`, entram os contratos v4.20 e v4.21, só SHOULD: nenhum grafo que
 passava reprova, e nenhum veredito MUST muda. O v4.20 traz o perfil `x_classification` no `meta`. O v4.21 traz dois

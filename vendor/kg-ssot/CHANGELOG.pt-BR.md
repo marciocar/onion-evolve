@@ -10,6 +10,80 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.50.0] - 2026-11-12
+
+Sem mudança no contrato (segue o v4.21), e nenhum veredito do contrato muda. O que muda para o adotante: a política de
+áreas do `kg-mcp`, em que a chave repetida ou o arquivo acima de 1 MiB passam a invalidar a política; e o
+`kg_gate.py --touched`, que deixa de contar como toque a troca do `kg_migrate.py methods`.
+
+- `kg-mcp`: papéis na política de áreas, com teto por papel (item 1 da peça 1 do Company Brain). Duas chaves opcionais
+  no `--area-policy`: `roles` dá a cada papel `read` (as áreas compartilhadas que lê), `write` (só `[]` ou `["own"]`, a
+  própria área da identidade: restringe ou declara, e nunca amplia a gravação) e `ceilings` (um teto para uma área que o
+  papel lê, igual ou abaixo do teto da área); `members` dá papéis a um e-mail ou a todos os membros de um grupo. O
+  acesso de uma pessoa é a união das concessões, e um grupo vale como um papel que lê a área com o teto da área. Quando
+  duas concessões dão tetos diferentes à mesma área, vale o maior, nunca acima do teto da área. Só com papéis
+  `write: []`, o `kg_write` e o `kg_delete` saem da lista de ferramentas e a própria área não é criada. As cinco
+  ferramentas de leitura aplicam o teto de cada pessoa, com a mesma resposta do grafo que não existe. Papel malformado
+  (sem área, nível desconhecido, teto acima do da área, papel que não existe, tipo errado) invalida a política, que fecha
+  a leitura como antes (também chave repetida no mesmo objeto e arquivo maior que 1 MiB); enquanto ela está fechada,
+  ninguém grava se a última política válida tinha `roles`. Na carga, o stderr nomeia cada membro para quem outra
+  concessão anula um teto de papel (pelo e-mail, dado pessoal no log do operador). Sem `roles`, os vereditos são os da
+  4.49.0 menos um: a chave repetida no mesmo objeto e o arquivo maior que 1 MiB passam a invalidar também a política
+  sem papéis. O servidor não sobe com ela, e o que já está de pé fecha na recarga: confira a política antes de
+  atualizar. Sem mudança de contrato.
+- `kg_gate.py --touched`: a classe de `provenance.method` trocada entre um apelido em português e a sua classe
+  canônica em inglês (`medição`/`measurement`, `leitura`/`reading`, `juízes`/`judges`, `derivado`/`derived`,
+  `testemunho`/`testimony`), com o detalhe depois de `: ` igual byte a byte, não toca mais o nó, como o carimbo de
+  frescor não toca. Um lote do `kg_migrate.py methods apply` medido num corpus grande trocou 5.327 apelidos e reprovou
+  por 718 dívidas antigas que ele não criou. Qualquer outra mudança segue tocando o nó, no method também: outro
+  detalhe, outra classe canônica, mudança de caixa, de acento ou de espaço, ou a provenance que entra ou sai. O mapa
+  dos apelidos mora agora no `kg_validate.py`, que as duas ferramentas leem. O `kg_migrate.py methods apply
+  --manifest-out ARQ.tsv` grava `graph`, `id`, `old` e `new` de cada troca gravada, o recibo para o pull request. Sem
+  mudança de contrato.
+- Docs: num sandbox com o cache do usuário (o `.cache` na pasta pessoal) só de leitura, rode o `kg_vendor.py update --verify-attestation` com o
+  `XDG_CACHE_HOME` apontando para um diretório gravável (ADOPTING e capítulo 6 do manual).
+
+### Adicionado
+
+- `kg_capture.py cloudevents`, no adaptador de captura do mantenedor, que não viaja na release: lê CloudEvents 1.0 em
+  JSON estruturado (um objeto, um array ou JSON Lines, UTF-8 com ou sem BOM, até 64 MiB, de um arquivo ou de `-`, a
+  entrada padrão) e escreve PROV-JSON para o `kg_capture.py prov`, que continua sendo o passo que propõe os nós. Cada
+  evento vira a atividade `ce:<source>#<id>`, com o `type` como `prov:type` e `prov:label` e o `time` como
+  `prov:startTime`; ela usou o `source`, o `subject` e o `dataschema`, quando vêm.
+  - Identidade: o mesmo par cru (`source`, `id`) no lote vira uma atividade só (vale o primeiro), e o stderr dá a
+    contagem e, quando o repetido diverge em `type`, `time`, `subject` ou num valor de `--fields`, o par e o que
+    diverge. Nos ids, `%`, `#`, `|`, `~` e os caracteres de controle saem em percent-encoding (a quebra de linha vira
+    `%0A`), para que partes diferentes nunca deem o mesmo id (o `dataschema` também). O userinfo, a query e o fragmento
+    saem do `source`, e então o id leva o sufixo `~<8 hex>`, um HMAC-SHA256 do `source` cru, para que fontes que só
+    diferem no que saiu fiquem separadas. No rótulo, os caracteres de controle viram espaço.
+  - A chave do HMAC é local: `--key-file ARQ` (que vence) ou `KG_CAPTURE_KEY`, com pelo menos 32 bytes depois de tirar
+    os espaços das pontas e 16 bytes distintos (o erro cita o mínimo, nunca a chave; o mínimo é de tamanho e de
+    variedade, não de entropia: gere a chave com `secrets`, não a digite), guardada por quem roda a captura, fora do
+    grafo e do repositório. O `--key-file` tem de ser arquivo regular (um symlink é recusado, sem ser seguido, e o
+    aberto tem de ser o mesmo que se conferiu, então um FIFO posto no lugar não trava), de até 4 KiB, fora da árvore git
+    do diretório de trabalho (a trava recusa só arquivo dentro da árvore git do diretório de trabalho; um arquivo de
+    outro repositório ou um hardlink passam), e avisa quando o grupo ou outros podem lê-lo; um hash curto sem sal
+    devolveria por dicionário a senha fraca ou a query curta. Sem chave, um lote em que algum `source` precisa de
+    limpeza é recusado (rc 2, falha fechada); sem nenhum `source` assim, a chave não é exigida. A mesma chave dá a mesma
+    proposta; trocar ou perder a chave muda o sufixo, e com ele os ids das próximas capturas dessas fontes.
+  - A minimização de dados cobre só o `data`: entram só os campos de primeiro nível citados em `--fields` (nenhum, por
+    padrão; o ponto é parte do nome, não caminho aninhado), e só valor escalar (até 60 caracteres); um objeto ou uma
+    lista vira `<objeto omitido>` ou `<lista omitida>`. O corpo bruto, o `data_base64` e os atributos de extensão
+    nunca entram; `source`, `id`, `type`, `subject` e `dataschema` entram como vêm.
+  - Recusam o lote inteiro (rc 2), nomeando cada evento: falta de `specversion` "1.0", `id`, `source` ou `type`;
+    `source` que não é URI-reference (o valor não é repetido); `subject`, `dataschema` ou `time` que não é texto não
+    vazio; `time` fora da forma do RFC 3339 ou impossível no calendário (o segundo 60 vale; o segundo 60 e o minuto do
+    offset são conferidos só pela faixa que o `datetime.fromisoformat` aceita, sem tabela de segundos bissextos); lote
+    vazio. O teto de 64 MiB é conferido com `stat` antes de ler um arquivo regular, e a entrada padrão ou uma FIFO é
+    lida até o teto mais um byte e recusada acima disso.
+  - As propostas seguem as regras seladas: nascem `open`, com o method `derived: runtime capture`, e o rótulo diz o
+    tipo do evento e a fonte. Uma bancada de 64 mutantes, um por regra, todos mortos; o da lista sem recuo precisa do
+    radar no checkout.
+- `kg_capture.py prov` escreve as listas com recuo (`nodes:` / `  - id:`), a forma que o radar lê; o rótulo que não
+  cabe guarda o nome da atividade e corta o id comprido pelo meio, guardando a cauda, e dois passos com ids parecidos
+  deixam de ter o mesmo rótulo. Texto que não é UTF-8 válido (um surrogate solto) dá rc 2 em todos os subcomandos, em
+  vez de traceback ou arquivo vazio, e o `--out` sai em UTF-8 com fim de linha LF em todo sistema.
+
 ## [4.49.0] - 2026-11-11
 
 Contratos v4.20 e v4.21, só SHOULD: nenhum grafo que passava reprova.

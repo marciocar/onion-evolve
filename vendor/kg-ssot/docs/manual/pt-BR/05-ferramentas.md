@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:28136a0f2c691184 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:4ceaa693a97db30e -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -250,7 +250,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--accept-regression "<motivo>"` | Aceita uma piora; o motivo fica gravado na base |
 | `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*`, `docs/materials/*` e o vendor do KG-SSOT (qualquer pasta com o carimbo `.kg-ssot-version`, desde a 4.19.1) já saem por padrão; o `--no-default-excludes` os traz de volta |
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
-| `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor` |
+| `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor`. O carimbo de frescor (`verified_at`, `verified_against`) e, desde a 4.50, a classe de `provenance.method` trocada entre um apelido em português e a sua classe canônica em inglês com o detalhe depois de `: ` igual byte a byte (a troca do `kg_migrate.py methods`) não tocam o nó; qualquer outra mudança toca, inclusive no method. O `--touched` não olha o MUST; com dois nós de mesmo id, que o MUST já reprova, vale o último |
 | `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. O `.kg.json` não é conferido aqui. Não combina com `--update` |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
@@ -689,6 +689,57 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     vale no outro sentido: o `kg_history` de um grafo visível lista todas as versões antigas, as acima do teto também,
     com o `ref` e a mensagem do commit, e o `kg_get` dessa versão responde como o grafo que não existe. O conteúdo fica
     de fora, mas a lista mostra que houve uma versão mais sensível.
+  - **Papéis, com teto por papel (ainda não lançado):** duas chaves opcionais. `roles` dá nome a cada papel (um slug:
+    minúsculas, dígitos, ponto, hífen ou sublinhado) e dá a ele `read` (as áreas compartilhadas que lê, ao menos uma,
+    cada uma a canônica ou um grupo da política), `write` (opcional, e só `[]` ou `["own"]`: `own` é a própria área da
+    identidade, a única em que o servidor grava, e por isso `write` restringe ou declara e nunca amplia; sem a chave,
+    `["own"]`) e `ceilings` (opcional: uma área que o papel lê para um nível de `levels`, igual ou abaixo do teto dessa
+    área, nunca na canônica). `members` dá papéis a uma identidade de e-mail ou a todos os membros de um grupo:
+    `{"aud@x.org": ["auditor"], "g-auditoria": ["auditor"]}`. O acesso de uma pessoa é a união das concessões: a área
+    canônica e cada grupo de que ela é membro (cada um vale como um papel que lê a área com o teto da área), e cada um
+    dos seus papéis. **Quando duas concessões dão tetos diferentes à mesma área, vale o maior**, em qualquer ordem, e ele
+    nunca passa do teto da área; a concessão sem teto (área sem teto e papel sem teto) vence qualquer teto. Por isso o
+    papel com teto menor só restringe quem lê a área apenas por esse papel: quem é do grupo `g-compliance` a lê com o
+    teto da área, sejam quais forem os seus papéis. Quem tem ao menos um papel grava na própria área se algum dos seus
+    papéis tem `write: ["own"]`; só com papéis `write: []`, o `kg_write` e o `kg_delete` saem da lista de ferramentas, a
+    chamada a eles é recusada como ferramenta indisponível e a própria área não é criada (a área própria gravada antes
+    segue legível, e a pasta própria que não abre, como a sem `.git` no backend git, fica como está enquanto as
+    compartilhadas seguem legíveis). Quem não tem papel grava como antes. As cinco ferramentas de leitura julgam o teto de cada área com o
+    teto daquela pessoa, com tudo o que vale acima (a mesma resposta do grafo que não existe, as mesmas regras de `ref` e
+    de caixa). Sem `roles`, a política é a do teto por área acima, com os mesmos
+    vereditos menos um: a chave repetida no mesmo objeto e o arquivo maior que 1 MiB passam a invalidar também a
+    política sem papéis, que a 4.49.0 aceitava. O servidor não sobe com ela, e o que já está de pé fecha na recarga;
+    por isso confira a política antes de atualizar. A política é lida de forma
+    estrita, e qualquer um destes invalida o arquivo, que fecha a leitura como acima: papel sem área, área que não é a
+    canônica nem um grupo, nível que não está em `levels`, teto de papel acima do teto da área ou numa área que o papel
+    não lê, teto de papel sem `levels`, `write` diferente de `own`, membro que cita papel que não existe, chave de
+    `members` que não é e-mail nem grupo, lista vazia, tipo errado, chave repetida no mesmo objeto (em qualquer nível) ou
+    arquivo maior que 1 MiB. Enquanto o arquivo está fechado, ninguém grava se o último arquivo válido tinha `roles`, e
+    assim o papel com `write: []` nunca ganha a escrita porque o arquivo quebrou (o papel apagado e ainda citado em
+    `members`, ou o grupo apagado e ainda citado); se o último válido não tinha `roles`, a gravação segue como na 4.49.0.
+    Na carga do arquivo, o servidor avisa no stderr cada teto de papel que outra concessão anula para um membro, com o
+    membro, o papel e a área, nunca um grafo. O aviso escreve o e-mail do membro no stderr do servidor, que é dado
+    pessoal no log do operador.
+  - **Limites dos papéis:** o teto de um papel restringe só quem lê a área apenas por papéis com teto; um grupo da área,
+    ou outro papel sem teto, dá o teto maior, e o kg-mcp ainda não tem um teto por pessoa que nenhuma concessão passe (o
+    deny do mercado). O tempo de resposta pode separar o grafo oculto do inexistente: para julgar o teto, o servidor lê e
+    analisa o texto do grafo antes de recusar, e por isso o grafo oculto grande demora mais a ser recusado que o nome
+    que não existe, e quem adivinha o nome pode inferir que o grafo existe. O kg-mcp não iguala esse tempo.
+
+    ```json
+    {"schema_version": 1, "canonical": "c-empresa",
+     "groups": {"g-compliance": ["dpo@x.org"], "g-auditoria": ["aud@x.org"]},
+     "levels": ["public", "internal", "confidential", "restricted"],
+     "ceilings": {"g-compliance": "restricted"},
+     "default_level": "internal",
+     "roles": {"auditor": {"read": ["g-compliance"], "write": [], "ceilings": {"g-compliance": "confidential"}},
+               "officer": {"read": ["g-compliance"]}},
+     "members": {"g-auditoria": ["auditor"], "off@x.org": ["officer"]}}
+    ```
+
+    Aqui o `aud@x.org` lê a `g-compliance` até `confidential`, não vê o grafo `restricted` dela e não grava; o
+    `off@x.org` e o `dpo@x.org` a leem até `restricted`. Dar também o papel `officer` ao `aud@x.org` mostraria o grafo
+    `restricted` e liberaria a gravação, porque vale a concessão maior.
 - **A triagem do conteúdo (4.47.0):** em qualquer perfil, cada texto que `kg_get`, `kg_list`, `kg_history`, `kg_query`
   e `kg_terms` devolvem é triado antes de chegar ao modelo (`tools/kg_screen.py`, só biblioteca padrão, uma função pura
   do texto). Três vereditos: `pass` (nada achado); `quarantine` (um sinal sozinho: caractere invisível, região
@@ -1934,7 +1985,7 @@ o mapa não cobria), os dois arquivos gravados com o mesmo veredito de antes.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods plan                                  # o que mudaria, e a cauda
-python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods apply --confirmed-out confirmed.tsv   # grava as trocas
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py methods apply --confirmed-out confirmed.tsv --manifest-out swaps.tsv   # grava as trocas
 ```
 
 Desde o v4.16, a classe de `provenance.method` tem a forma canônica em inglês (`measurement`, `reading`, `judges`,
@@ -1961,6 +2012,10 @@ quebrada (rc 2), nunca uma troca adivinhada.
   nada.
 - **O `--confirmed-out ARQ.tsv`** grava `graph`, `id` e `status` de cada nó `confirmed` tocado (no `plan`, as trocas
   propostas; no `apply`, as gravadas), a lista que o pull request que edita um grafo mostra.
+- **O `--manifest-out ARQ.tsv`** (só no `apply`, desde a 4.50) grava `graph`, `id`, `old` e `new` de cada troca
+  gravada, o recibo para o pull request. O gate não depende dele: o `kg_gate.py --touched` já não conta a troca só da
+  classe como mudança, então o nó em que só a troca mudou não traz a dívida antiga para o pull request.
+  As duas saídas recusam, com rc 2 e antes de gravar qualquer coisa, um caminho que é um dos grafos lidos: o mesmo caminho resolvido (um symlink, um `..`) ou o mesmo arquivo (um hardlink, ou o nome em outra caixa num sistema de arquivos que não distingue caixa).
 
 rc 0 quando o plano sai ou o `apply` termina; rc 1 quando um arquivo foi recusado (pelo `apply`, ou por qualquer um dos
 dois por quebras de linha misturadas, com o motivo em `refused` no `--json`); rc 2 com entrada quebrada.

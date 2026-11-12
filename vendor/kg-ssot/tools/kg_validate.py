@@ -1264,6 +1264,11 @@ SLUG = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
 
 ISO_PREFIX = re.compile(r"^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$")
 TESTIMONY_METHOD = re.compile(r"^(?:testimony|testemunho): ")  # a canônica e o alias (v4.16)
+# O apelido em português de cada classe canônica de provenance.method (v4.16). Fonte única do mapa: o kg_migrate.py
+# methods troca por ele e o kg_gate.py --touched não conta a troca como toque. Mora aqui porque o validador viaja em todo
+# perfil da release, inclusive no do gate, e o migrador não.
+METHOD_ALIASES = {"medição": "measurement", "leitura": "reading", "juízes": "judges", "derivado": "derived",
+                  "testemunho": "testimony"}
 
 
 def coherence_located(doc, corpus=None):

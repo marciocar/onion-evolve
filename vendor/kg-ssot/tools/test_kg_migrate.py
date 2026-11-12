@@ -1578,6 +1578,77 @@ class Methods(unittest.TestCase):
         self.assertEqual(sorted(r[1] for r in rows), ["C_DER", "C_LEI", "C_MED", "C_TES"])
         self.assertTrue(all(r[0] == "g.kg.yaml" for r in rows))
 
+    def test_manifest_out_do_apply_e_o_recibo_do_gravado(self):
+        other = self.dir / "h.kg.yaml"
+        other.write_text(HEAD + mnode("C_RECUSA", '"medição: arquivo recusado"'), encoding="utf-8")
+        real = kg_validate.codes
+
+        def fake(text, validator, *a, **k):
+            return real(text, validator, *a, **k) + (["form.fake"] if "measurement: arquivo recusado" in text else [])
+        tsv = self.dir / "m.tsv"
+        res_plan, rows_plan = self.plan()
+        with mock.patch.object(kg_validate, "codes", side_effect=fake):
+            rc, out, _ = self.run_main("methods", "apply", "--json", "--root", self.dir, "--manifest-out", tsv,
+                                       self.path, other)
+        self.assertEqual(rc, 1, out)
+        with open(tsv, encoding="utf-8", newline="") as fh:
+            got = list(csv.reader(fh, delimiter="\t"))
+        self.assertEqual(got[0], ["graph", "id", "old", "new"])
+        want = sorted(["g.kg.yaml", r["id"], r["old"], r["new"]] for r in res_plan["rows"] if r["action"] == "swap")
+        self.assertTrue(want)
+        self.assertEqual(sorted(got[1:]), want)  # o arquivo recusado fica de fora
+        text = self.path.read_text(encoding="utf-8")
+        for _g, nid, old, new in got[1:]:
+            self.assertEqual(self.method_of(text, nid), new)
+            self.assertEqual(old.partition(": ")[2], new.partition(": ")[2])
+            self.assertEqual(kg_migrate.METHOD_ALIASES[old.partition(": ")[0]], new.partition(": ")[0])
+
+    def test_saida_que_e_um_grafo_lido_da_rc2_sem_gravar(self):
+        other = self.dir / "h.kg.yaml"
+        other.write_text(HEAD + mnode("C_H", '"medição: h"'), encoding="utf-8")
+        link = self.dir / "link.kg.yaml"
+        try:
+            link.symlink_to(other)
+        except OSError:
+            link = other
+        for opt in ("--manifest-out", "--confirmed-out"):
+            for target in (self.path, other, link, self.dir / "sub" / ".." / "h.kg.yaml"):
+                with self.subTest(opt=opt, target=target):
+                    rc, out, err = self.run_main("methods", "apply", "--json", "--root", self.dir, opt, target,
+                                                 self.path, other)
+                    self.assertEqual(rc, 2, out + err)
+                    self.assertIn("grafos lidos", out + err)
+                    self.assertEqual(self.path.read_text(encoding="utf-8"), METHODS)
+                    self.assertIn("medição: h", other.read_text(encoding="utf-8"))
+
+    def test_saida_que_e_hardlink_de_um_grafo_lido_da_rc2_sem_gravar(self):
+        # o hardlink tem outro caminho e o mesmo arquivo: o resolve() não o vê, o samefile vê
+        other = self.dir / "h.kg.yaml"
+        other.write_text(HEAD + mnode("C_H", '"measurement: h"'), encoding="utf-8")  # sem troca: o apply não o regrava
+        hard = self.dir / "hard.tsv"
+        try:
+            os.link(other, hard)
+        except OSError:
+            self.skipTest("o sistema de arquivos não dá hardlink")
+        for sub, opt in (("apply", "--manifest-out"), ("apply", "--confirmed-out"), ("plan", "--confirmed-out")):
+            with self.subTest(sub=sub, opt=opt):
+                rc, out, err = self.run_main("methods", sub, "--json", "--root", self.dir, opt, hard, self.path, other)
+                self.assertEqual(rc, 2, out + err)
+                self.assertIn("measurement: h", other.read_text(encoding="utf-8"))
+                self.assertEqual(self.path.read_text(encoding="utf-8"), METHODS)
+
+    def test_manifest_out_so_no_apply(self):
+        rc, out, err = self.run_main("methods", "plan", "--manifest-out", self.dir / "m.tsv", self.path)
+        self.assertEqual(rc, 2)
+        self.assertFalse((self.dir / "m.tsv").exists())
+
+    def test_manifest_out_sem_troca_so_tem_o_cabecalho(self):
+        self.apply()
+        tsv = self.dir / "m.tsv"
+        rc, out, _ = self.run_main("methods", "apply", "--json", "--root", self.dir, "--manifest-out", tsv, self.path)
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(tsv.read_text(encoding="utf-8"), "graph\tid\told\tnew\n")
+
     def test_plan_nao_grava(self):
         self.plan()
         self.assertEqual(self.path.read_text(encoding="utf-8"), METHODS)

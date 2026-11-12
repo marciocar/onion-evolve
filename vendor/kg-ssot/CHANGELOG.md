@@ -10,6 +10,79 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.50.0] - 2026-11-12
+
+No contract change (still v4.21), and no verdicts of the contract change. What changes for an adopter: the `kg-mcp`
+area policy, where a repeated key or a file larger than 1 MiB now makes the policy invalid; and `kg_gate.py --touched`,
+which no longer counts the `kg_migrate.py methods` swap as a touch.
+
+- `kg-mcp`: roles in the area policy, with a ceiling by role (item 1 of the first piece of the Company Brain). Two
+  optional keys in `--area-policy`: `roles` gives each role `read` (the shared areas it reads), `write` (only `[]` or
+  `["own"]`, the identity's own area: it restricts or declares, and never widens writing) and `ceilings` (a ceiling for
+  an area the role reads, equal to or below the ceiling of the area); `members` gives roles to an e-mail or to every
+  member of a group. A person's access is the union of the grants, and a group is the same as a role that reads the
+  area with the area's ceiling. When two grants give different ceilings to the same area, the higher one wins, never
+  above the ceiling of the area. With only `write: []` roles, `kg_write` and `kg_delete` leave the tool list and the
+  own area is not created. The five read tools apply the ceiling of each person, with the same answer as a graph that
+  does not exist. A malformed role (no area, an unknown level, a ceiling above the area's, a role that does not exist,
+  a wrong type, a key repeated in the same object, a file larger than 1 MiB) makes the policy invalid, which closes
+  reading as before; while it is closed, nobody writes if the last valid policy had `roles`. On load, stderr names each
+  member (by e-mail, personal data in the operator's log) for whom another grant overrides a role ceiling. Without
+  `roles`, the verdicts are those of 4.49.0 but one: a key repeated in the same object and a file larger than 1 MiB now
+  make a policy without roles invalid too. The server does not start with such a file, and one already running closes
+  on the next reload: check the policy before you update. No contract change.
+- `kg_gate.py --touched`: the `provenance.method` class swapped between a Portuguese alias and its canonical English
+  class (`medição`/`measurement`, `leitura`/`reading`, `juízes`/`judges`, `derivado`/`derived`,
+  `testemunho`/`testimony`), with the detail after `: ` byte for byte the same, no longer touches a node, as the
+  freshness stamp does not. A `kg_migrate.py methods apply` batch measured on a large corpus swapped 5,327 aliases and
+  failed on 718 old debts it did not create. Any other change still touches the node, in the method too: another
+  detail, another canonical class, a change of case, accent or spacing, or a provenance added or removed. The alias
+  map now lives in `kg_validate.py`, which both tools read. `kg_migrate.py methods apply --manifest-out FILE.tsv`
+  writes `graph`, `id`, `old` and `new` of each swap written, the receipt for the pull request. No contract change.
+- Docs: in a sandbox where the user cache (`.cache` in the home directory) is read-only, run `kg_vendor.py update --verify-attestation` with `XDG_CACHE_HOME`
+  pointing to a writable directory (ADOPTING and manual chapter 6).
+
+### Added
+
+- `kg_capture.py cloudevents`, in the maintainer's capture adapter, which is not part of the release: it reads
+  CloudEvents 1.0 in structured JSON (one object, an array or JSON Lines, UTF-8 with or without a BOM, up to 64 MiB,
+  from a file or from `-`, standard input) and writes PROV-JSON for `kg_capture.py prov`, which is still the step that
+  proposes nodes. Each event becomes the activity `ce:<source>#<id>`, with `type` as `prov:type` and `prov:label` and
+  `time` as `prov:startTime`; it used the `source`, the `subject` and the `dataschema`, when they come.
+  - Identity: the same raw (`source`, `id`) pair in a batch becomes one activity (the first one wins), and stderr gives
+    the count and, when the repeat differs in `type`, `time`, `subject` or a `--fields` value, the pair and what
+    differs. In the ids, `%`, `#`, `|`, `~` and control characters are percent-encoded (a newline becomes `%0A`), so
+    different parts never give the same id (the `dataschema` too). The userinfo, the query and the fragment leave the
+    `source`, and the id then carries a `~<8 hex>` suffix, an HMAC-SHA256 of the raw `source`, so sources that differ
+    only in what left stay apart. In labels, control characters become spaces.
+  - The HMAC key is local: `--key-file FILE` (which wins) or `KG_CAPTURE_KEY`, at least 32 bytes once the spaces at the
+    ends are trimmed and 16 distinct bytes (the error names the minimum, never the key; the minimum is about length and
+    variety, not entropy: generate the key with `secrets`, do not type it), kept by whoever runs the capture, outside
+    the graph and the repository. `--key-file` must be a regular file (a symlink is refused, not followed, and the file
+    opened must be the one checked, so a FIFO swapped in does not hang), at most 4 KiB, outside the git tree of the
+    working directory (the guard refuses only a file inside the git tree of the working directory; a file from another
+    repository or a hard link passes), and it warns when the group or others can read it; an unsalted short hash would
+    give a weak password or a short query back to a dictionary. Without a key, a batch where some `source` needs
+    cleaning is refused (rc 2, fail closed); with no such `source`, no key is needed. The same key gives the same
+    proposal; changing or losing it changes the suffix, and with it the ids of the next captures of those sources.
+  - Data minimization covers `data` only: only the top-level fields named in `--fields` go in (none by default; a dot
+    is part of the name, not a nested path), and only scalar values (up to 60 characters); an object or a list becomes
+    `<objeto omitido>` or `<lista omitida>`. The raw body, `data_base64` and extension attributes never go in;
+    `source`, `id`, `type`, `subject` and `dataschema` go in as they come.
+  - Rejecting the whole batch (rc 2), naming each event: a missing `specversion` "1.0", `id`, `source` or `type`; a
+    `source` that is not a URI-reference (its value is not echoed); a `subject`, `dataschema` or `time` that is not a
+    non-empty string; a `time` outside the RFC 3339 form or impossible on the calendar (second 60 is accepted; second 60
+    and the offset minute are checked only against the range that `datetime.fromisoformat` accepts, with no leap-second
+    table); an empty batch. The 64 MiB ceiling is checked with `stat` before reading a regular file, and standard input
+    or a FIFO is read up to the ceiling plus one byte and refused above it.
+  - The proposals keep the sealed rules: born `open`, method `derived: runtime capture`, and the label says the event
+    type and the source. A bench of 64 mutants, one per rule, all killed; the one for unindented lists needs the radar
+    in the checkout.
+- `kg_capture.py prov` writes the lists indented (`nodes:` / `  - id:`), the form the radar reads; a label that does
+  not fit keeps the activity's name and cuts a long id in the middle, keeping its tail, so two steps with similar ids
+  no longer get the same label. Text that is not valid UTF-8 (a lone surrogate) gives rc 2 in every subcommand,
+  instead of a traceback or an empty file, and `--out` is written as UTF-8 with LF line endings on every system.
+
 ## [4.49.0] - 2026-11-11
 
 Contracts v4.20 and v4.21, SHOULD only: no graph that passed fails.
