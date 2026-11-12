@@ -43,14 +43,14 @@
 #   SUBAGENTES (SAC-421, 2026-11-12) de cada sessão viva e desta: <projects>/*/<sessão>/subagents/agent-<id>.jsonl e os
 #   da ferramenta Workflow em subagents/workflows/<run>/agent-<id>.jsonl (o <id>.output em /tmp/claude-<uid>/…/tasks/ é
 #   symlink para o primeiro). Lê o CONTEÚDO do transcript do subagente. Pendente = tool_use sem tool_result do MESMO id;
-#   texto do usuário (a cutucada do líder) não fecha pendência, nova mensagem do assistente a abandona:
+#   nem texto do usuário (a cutucada do líder) nem nova mensagem do assistente fecham pendência (pendência aberta nunca é DONE):
 #   AGENT_STALLED    há pendente e o mtime passou de --stall-min (padrão 15). Mede o SINTOMA, não a causa: aprovação
 #                    sem quem responda, comando pendurado, harness travado e ferramenta longa legítima saem iguais.
 #   AGENT_SILENT     sem pendente, sem fim e sem escrita além do teto (nomeia o «Exit code 137» do último resultado).
 #   AGENT_RUNNING    pendente mais novo que o teto, ou escrita recente sem fim.
 #   AGENT_DONE       texto final do assistente, relatório entregue (SubagentHandback) ou interrupção pelo humano.
 #   AGENT_UNMEASURED transcript ilegível ou sem entrada user/assistant: NÃO medido, nunca «não parado».
-#   O comando pendente sai com segredo trocado por [REDACTED] e a home por ~. Só STALLED, SILENT e UNMEASURED entram no
+#   O comando pendente sai com segredo trocado por [REDACTED] (por LISTA: o que não está nela passa) e a home por ~. Só STALLED, SILENT e UNMEASURED entram no
 #   sha. Não sabe se o processo do subagente vive (o harness não expõe pid por subagente): um pendurado E morto sai STALLED.
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
@@ -424,7 +424,11 @@ for sid in stale_traces: del S[sid]
 # Medido em 2026-11-12: o transcript do subagente mora em <projects>/<projeto>/<sessionId>/subagents/agent-<id>.jsonl
 # (com <id>.meta.json ao lado: agentType, description); o <id>.output em /tmp/claude-<uid>/<projeto>/<sessão>/tasks/ é
 # symlink para ele, então não é segunda fonte. Lê-se o conteúdo SÓ do subagente (as entradas user/assistant), nunca o da sessão.
-SECRET_RE = re.compile(r'(sk-[A-Za-z0-9_\-]{6,}|gh[pousr]_[A-Za-z0-9]{6,}|github_pat_[A-Za-z0-9_]{6,}|(?i:bearer)\s+[^\s"\']+|(?i:[a-z_]*(?:token|secret|password|api_key|apikey))=[^\s&"\']+)')
+# redação por LISTA (limite declarado): o que não está aqui passa. Cobre chave de API, Bearer, x-api-key, var=valor de
+# nome com token/secret/password/_key, --password <x>, -p<x> (mysql) e -u <u>:<x> (curl).
+SECRET_RE = re.compile(r'(sk-[A-Za-z0-9_\-]{6,}|gh[pousr]_[A-Za-z0-9]{6,}|github_pat_[A-Za-z0-9_]{6,}|(?i:bearer)\s+[^\s"\']+'
+                       r'|(?i:x-api-key):\s*[^\s"\']+|(?i:[a-z0-9_]*(?:token|secret|passw(?:or)?d|api_?key|_key)[a-z0-9_]*)=[^\s&"\']+'
+                       r'|--password[=\s]+[^\s"\']+|(?<=\s)-p[^\s\-"\']{3,}|(?<=\s)-u\s+[^\s:"\']+:[^\s"\']+)')
 def redact(s):
     """Antes de exibir: segredo vira [REDACTED] e a home de qualquer usuário vira ~ (a saída é colada em chat e PR)."""
     s = SECRET_RE.sub('[REDACTED]', s)
@@ -443,8 +447,9 @@ def agent_state(path):
     """→ (classe, nota, comando pendente). Classe pelo FIM do transcript, nunca pela prosa.
     Pendente = tool_use cujo id não teve tool_result. Só o tool_result do MESMO id fecha, nunca uma linha user de texto:
     a cutucada do líder («The coordinator sent a message while you were working») chega no meio da ferramenta e não a
-    resolve (achado do refutador, 2026-11-12). O que abandona uma pendência é uma NOVA mensagem do assistente (outro
-    message.id): a API só aceita a próxima resposta depois de todos os resultados, então o que sobrou dali foi largado."""
+    resolve (achado do refutador, 2026-11-12). Nada ABANDONA uma pendência: depois da cutucada o harness roda dois fluxos
+    do assistente ao mesmo tempo, e em 12 de 14 «abandonos» medidos o resultado chegou depois (re-revisão, 2026-11-12).
+    Pendência aberta nunca é DONE, nem com texto final; o abandono legítimo fica STALLED, falha ruidosa."""
     pend, last, n, handback, last_res = {}, None, 0, False, ''
     try:
         with open(path, encoding='utf-8') as fh:
@@ -457,8 +462,6 @@ def agent_state(path):
                 blocks = c if isinstance(c, list) else [{'type': 'text', 'text': c}]
                 if d['type'] == 'assistant':
                     mid = msg.get('id')
-                    if mid is not None:
-                        for k in [k for k, (m0, _) in pend.items() if m0 != mid]: del pend[k]
                     for b in blocks:
                         if isinstance(b, dict) and b.get('type') == 'tool_use' and b.get('id'): pend[b['id']] = (mid, b)
                     handback = False
@@ -489,10 +492,10 @@ def agent_state(path):
         return 'AGENT_SILENT', f'sem pendência, sem texto final e sem escrita há {mins(age)}min{k137}', ''
     return 'AGENT_RUNNING', f'última escrita há {mins(age)}min, sem tool_use pendente', ''
 AG = []   # subagentes das sessões vivas (não UNREACHABLE) e desta sessão
-agents_measured = proj_ok
+agents_measured = proj_ok and os.access(proj_dir, os.R_OK | os.X_OK)
 live_sids = [s['sid'] for s in S.values() if s['cls'] != 'UNREACHABLE']
 if self_sid and self_sid not in live_sids: live_sids.append(self_sid)
-if proj_ok:
+if agents_measured:
     for sid in live_sids:
         base = os.path.join(glob.escape(proj_dir), '*', glob.escape(sid), 'subagents')
         # os agentes da ferramenta Workflow moram um nível abaixo: subagents/workflows/<run>/agent-<id>.jsonl
@@ -502,8 +505,9 @@ if proj_ok:
             try: desc = str(json.load(open(f[:-len('.jsonl')] + '.meta.json', encoding='utf-8')).get('description') or '')
             except (OSError, ValueError, AttributeError): pass
             cls_a, note_a, cmd_a = agent_state(f)
-            AG.append({'sid': sid, 'aid': aid, 'cls': cls_a, 'note': note_a, 'cmd': cmd_a, 'desc': redact(desc)})
-else: gaps.append(f'subagentes NÃO MEDIDOS: {proj_dir} ausente (não é «nenhum parado»)')
+            AG.append({'sid': sid, 'aid': aid, 'cls': cls_a, 'note': note_a, 'cmd': cmd_a, 'desc': redact(desc),
+                       'rel': f[f.rindex('/subagents/') + 1:]})
+else: gaps.append(f'subagentes NÃO MEDIDOS: {proj_dir} ' + ('ilegível' if proj_ok else 'ausente') + ' (não é «nenhum parado»)')
 AORD = {c: i for i, c in enumerate(('AGENT_STALLED', 'AGENT_UNMEASURED', 'AGENT_SILENT', 'AGENT_RUNNING', 'AGENT_DONE'))}
 AG.sort(key=lambda a: (AORD[a['cls']], a['sid'], a['aid']))
 acnt = {c: sum(1 for a in AG if a['cls'] == c) for c in AORD}
@@ -548,7 +552,7 @@ if fmt == '--tsv':
     for o, v in sorted(orphan_queue.items()): print(f'orphan_queue\t{tsvc(o)}\t-\t-\t\t{len(v)}\tgrafo\t' + tsvc('; '.join(n for _, n, _ in v)))
     for p in prs: print('\t'.join(tsvc(x) for x in ('pr', p['ref'], 'CI_' + p['ci'].upper().replace(' ', '_'), p['branch'], '' if p['age'] is None else mins(p['age']), '', 'decide-census', p['state'])))
     for t in threads: print('\t'.join(tsvc(x) for x in ('thread', t['ref'], 'STOPPED' if t['stopped'] else 'MOVING', t['path'], '', '', 'decide-census', f'{t["label"]} · {t["state"]} · {t["actor"]}')))
-    for a in AG: print('\t'.join(tsvc(x) for x in ('agent', a['aid'], a['cls'], a['sid'], '', '', 'subagents/' + a['aid'], f'{a["desc"] or "—"} · {a["note"]} · pendente: {a["cmd"] or "—"}')))
+    for a in AG: print('\t'.join(tsvc(x) for x in ('agent', a['aid'], a['cls'], a['sid'], '', '', a['rel'], f'{a["desc"] or "—"} · {a["note"]} · pendente: {a["cmd"] or "—"}')))
     for r in signals: print(f'signal\t{tsvc(r.get("ref"))}\t-\t-\t\t\tdecide-census\t{tsvc(r.get("label"))}')
     print(f'maestro\tasks\t-\t-\t\t{sum(1 for a in asks if a["live"])}\tmaestro-ask\tvencidas {sum(1 for a in asks if not a["live"])}')
     print(f'maestro\tseal_candidates\t-\t-\t\t{len(seals)}\tdecide-census\tcheckpoints {len(checkpoints)} · nós open owner:maestro {len(owned.get("maestro", []))}')
