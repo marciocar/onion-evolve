@@ -10,7 +10,7 @@ findings_blocking: 3
 findings_blocking_fixed: 3
 verdict: CORRIGIDO
 elenxo: sim
-reviewer: "refutador independente (provas em ~/.local/share/onion/scratch-1111/refute-triage/: bancadas sb1 a sb5 e wf-harness.mjs), sobre o commit 1f34606db; antes dele, uma passada curta da própria sessão (7 achados, abaixo)"
+reviewer: refutador independente (agente separado do construtor), duas passadas — 1ª REPROVADO com 3 bloqueios, 2ª APROVADO COM LIMITES
 nota: "os 12 achados são os do refutador independente: 3 bloqueantes e 4 limites curados; 5 limites declarados"
 ---
 
@@ -158,3 +158,9 @@ Forja do **modo triagem em lote** do `/meta:decide` (`D_FORGE_DECIDE_BATCH_TRIAG
 - `bash .claude/validation/lint-selftest.sh --families decide`: rc 0, **49 casos** verdes, (t1) a (t11), sem
   `ONION_ASK_DIR` no ambiente (a família isola o seu).
 - `bash .claude/validation/forge-census.sh .`: `decide` 7/7.
+
+## Refutador independente
+
+- 1ª passada: REPROVADO, com 3 bloqueios (obsoleto sem sucessor derrubava o lote, data e prazo frouxos no lote, chave só por id no workflow) e 9 limites.
+- 2ª passada, sobre o commit 834912cbc: APROVADO COM LIMITES. Os 3 bloqueios e 4 limites curados resistiram; a família decide passou 49 de 49 e o lint 0 HARD.
+- Limites que sobram: a reaplicação idêntica de um lote só de pedidos grava de novo (item 8), e no prompt do refutador do workflow o `ref`, o `due` e a chave ficam fora da cerca de conteúdo não confiável.
