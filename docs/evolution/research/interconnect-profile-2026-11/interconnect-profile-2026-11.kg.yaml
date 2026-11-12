@@ -123,14 +123,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 5
     confidence: 0.4
-    verified_at: "2026-11-10"
-    verified_against: "PROFILE.md, seção Parte B; aberta pela decisão do maestro de 2026-11-10"
+    verified_at: "2026-11-12"
+    verified_against: "os cinco eixos da Parte B selados: raiz TUF, transporte RFC 9421, pareamento combinado e duas chaves (grafo interconnect-part-b-2026-11 da curadoria) e a cifra, selada pelo maestro como D_SEAL_PB_CIPHER_ECDHES_WITH_MIGRATION_1111 em docs/onion/graph/curation-verdicts-core-seal-2026-11.kg.yaml; conferido pela curadoria em 2026-11-12"
     label: "Parte B do perfil de interconexão: qual cifra do corpo, qual raiz de confiança e registro assinado (medindo TUF e sigstore contra o desenho manual), qual transporte entre máquinas e qual pareamento pela RFC 10027 o Onion adota?"
-    narrative: "Estudo próprio antes de qualquer código. Itens: cifra do corpo (JWE ECDH-ES ou HPKE no JWE); raiz de confiança e registro assinado com versão monotônica, validade contra rollback e freeze, limiar, raiz offline e rotação, medindo TUF e sigstore/gitsign; transporte de saída com proxy e CA corporativa, private_key_jwt mais DPoP; pareamento pela RFC 10027, escolhido pela sessão (code com PKCE e loopback havendo navegador, device flow sem ele); duas chaves por máquina com rotação de 90 dias e recusa de rebaixamento. A Parte B revisa D_MESSAGING_DEVICE_FLOW_LOGTO_JA_1106 (aresta externa TRACES_TO). Condução: curadoria. Decisão de arquitetura: core. Selo: maestro."
+    narrative: "Estudo próprio antes de qualquer código. Itens: cifra do corpo (JWE ECDH-ES ou HPKE no JWE); raiz de confiança e registro assinado com versão monotônica, validade contra rollback e freeze, limiar, raiz offline e rotação, medindo TUF e sigstore/gitsign; transporte de saída com proxy e CA corporativa, private_key_jwt mais DPoP; pareamento pela RFC 10027, escolhido pela sessão (code com PKCE e loopback havendo navegador, device flow sem ele); duas chaves por máquina com rotação de 90 dias e recusa de rebaixamento. A Parte B revisa D_MESSAGING_DEVICE_FLOW_LOGTO_JA_1106 (aresta externa TRACES_TO). Condução: curadoria. Decisão de arquitetura: core. Selo: maestro. Fechada em 2026-11-12: os cinco eixos estão selados; o próximo passo é a construção do pacote selado, por emenda e autorização do maestro, não mais estudo."
     trace: "PROFILE.md, seção Parte B"
   - id: D_INTERCONNECT_PROFILE_A_V1_1110
     node_type: decision
