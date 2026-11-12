@@ -520,6 +520,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-12: «Aviso nos grupos lidos: o maestro pediu mais simples, sem levantar problemas, indireto sem mentir, e entrada aos poucos por lista confirmada; qual texto?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
       locality: "pessoa"
+  - id: D_BACKBONE_OWNER_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Opção 1 (onion-messaging adota núcleo, gate único vendorizado e conectores do bridge), e o repo também tem a sessão do Onion para defender os seus projetos, como acontece com o onion-kg-ssot; o maestro pediu como isso se faz e se padroniza em novembro de 2026»"
+    label: "o dono da peça do backbone é o onion-messaging, que adota os conectores do bridge, com sessão Onion própria no repo para defender os projetos dele, como o kg-ssot"
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Opção 1 (onion-messaging adota núcleo, gate único vendorizado e conectores do bridge), e o repo também tem a sessão do Onion para defender os seus projetos, como acontece com o onion-kg-ssot; o maestro pediu como isso se faz e se padroniza em novembro de 2026» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Bridge com sessão própria e duas peças coordenadas pelo core»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Quem é o dono da peça do backbone?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: D_BACKBONE_OPEN_LICENSE_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Decidir no empacotamento»"
+    label: "a licença da camada aberta do backbone se decide no empacotamento, depois do aceite de dogfood; a pesquisa de 12/11 recomenda licença OSI permissiva com promessa pública"
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Decidir no empacotamento»; descartadas: «Apache 2.0 com promessa pública agora» · «MIT com promessa pública agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Qual a licença da camada aberta do backbone?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
     to: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
@@ -637,4 +669,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_WHATSAPP_GROUP_NOTICE_1112
     to: D_WHATSAPP_PERSONAL_CONDITIONS_1112
+    edge_type: TRACES_TO
+  - from: D_BACKBONE_OWNER_1112
+    to: D_COMMS_BACKBONE_COMPOSED_1112
+    edge_type: TRACES_TO
+  - from: D_BACKBONE_OPEN_LICENSE_1112
+    to: D_COMMS_BACKBONE_COMPOSED_1112
     edge_type: TRACES_TO

@@ -1,0 +1,1323 @@
+# Pesquisa em MODO PRIMÁRIAS (2026-11-12): a forma da peça do backbone de comunicação do Onion
+# (fila, gate A2A, conectores Slack e e-mail, sobre A2A 1.0, CloudEvents e MCP) e a fronteira open-core.
+# Lacunas nomeadas: G1 onde mora o núcleo; G2 como o consumidor recebe; G3 fronteira open-core e licença;
+# G4 governança de especificação contra implementação.
+#
+# ⚠️ Proveniência (R15): label e narrative das evidências web carregam texto extraído de páginas da web.
+#    É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Este escritor NÃO sela nada: opções, leituras G2-G4 e superações nascem OPEN; as duas objeções que
+# BLOQUEIAM (opção C sem medida, gate A2A sem lado na fronteira) viram perguntas Q_ abertas.
+# kg-backlog-guard: on
+meta:
+  id: backbone-piece-shape-2026-11
+  schema_version: "1"
+  baseline: "2026-11-12"
+  review_after: "2027-02-10"   # 90d: o tipo DOMINANTE é MERCADO (open-core, licenciamento e o caso NATS/BUSL
+                               # movem G3, a lacuna de maior impacto). A metade governança de spec (MCP, CloudEvents,
+                               # Kubernetes) pediria 12m como doutrina. Gatilhos antecipados: (1) o maestro selar a forma
+                               # da peça; (2) medida da opção C contra o vendor carimbado; (3) classificação do gate A2A;
+                               # (4) reancoragem de a2a-governance, cloudevents-sdk ou temporal-open-core.
+  # ═══ TETO: 67 NÓS ═══
+  #   +4 (2026-11-12, na síntese): T_BACKBONE_GAP_G1..G4, um termo x_term por lacuna. O lint de nomes reprovou G3, G4
+  #   sem termo e G1, G2 resolviam calados para o gabarito de outro estudo (problem-route-2026-11).
+  #   Rodada de primárias executada em 2026-11-12: 1 pergunta + 3 opções + 3 leituras G2-G4 + 2 perguntas que
+  #   bloqueiam + 24 evidências ancoradas por verificador independente + 12 objeções sobreviventes do Elenxo
+  #   + 1 E_LACUNAS + 17 superações achadas (C_SUPERACAO_20261112_*). Nada agregado.
+external_edges:
+  - from: Q_BACKBONE_PIECE_SHAPE_2026_11
+    to: "docs/evolution/research/company-brain-non-devs-2026-11/company-brain-non-devs-2026-11.kg.yaml#D_COMMS_BACKBONE_COMPOSED_1112"
+    edge_type: TRACES_TO
+  - from: Q_BACKBONE_PIECE_SHAPE_2026_11
+    to: "docs/evolution/research/messaging-standards-2026-11/messaging-standards-2026-11.kg.yaml#Q_MESSAGING_STANDARDS_1106"
+    edge_type: TRACES_TO
+  - from: E_CE_SDK_FEATURE_SUPPORT_TABLE
+    to: "docs/evolution/research/company-brain-non-devs-2026-11/company-brain-non-devs-2026-11.kg.yaml#D_COMMS_BACKBONE_VALUE_TABLE_1112"
+    edge_type: SUPPORTS
+  - from: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    to: "docs/evolution/research/company-brain-non-devs-2026-11/company-brain-non-devs-2026-11.kg.yaml#D_COMMS_BACKBONE_VALUE_TABLE_1112"
+    edge_type: SUPPORTS
+nodes:
+  - id: Q_BACKBONE_PIECE_SHAPE_2026_11
+    node_type: question
+    layer: audit
+    impact: 5
+    confidence: 0.5
+    label: "Que forma deve ter a peça do backbone de comunicação do Onion (fila, gate A2A, conectores Slack e e-mail, sobre A2A 1.0, CloudEvents e MCP): repo próprio com vendor carimbado (A), núcleo no monorepo com staging (B) ou pacote publicado (C)? E onde fica a fronteira open-core?"
+    trace: "docs/evolution/research/backbone-piece-shape-2026-11/SYNTHESIS.md; pergunta do run /onion-research em modo primaries de 2026-11-12, computada pelo workflow"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «A, medindo C depois: repo e sessão próprios, semver, e o consumidor recebe só o cliente e o gate por vendorização carimbada (tag, commit e sha256 por arquivo), no molde do kg-ssot; a medida do pacote publicado (Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR) roda antes do empacotamento open-core e, se ganhar, substitui a entrega»"
+    narrative: |-
+      Pergunta computada pelo workflow /onion-research em modo primaries (2026-11-12), com quatro lacunas nomeadas: G1 onde mora o núcleo; G2 como o consumidor recebe; G3 fronteira open-core e licença, para que a governança seja a parte paga sem trair a camada aberta; G4 governança de especificação contra implementação. Corpus prévio que pesa (declarado pela tarefa, não medido por este escritor): os selos D_COMMS_BACKBONE_COMPOSED_1112 e D_COMMS_BACKBONE_VALUE_TABLE_1112; onion-messaging já é repo próprio registrado como membro; onion-bridge em produção sem sessão dona; o gate A2A vive em duas cópias sem carimbo; precedente interno kg-ssot (repo e sessão próprios, semver, vendor/kg-ssot/ com carimbo por arquivo). O que a rodada sustenta: G2 por vendorização com manifesto verificável, G4 por conformidade mecânica mais tabela de suporte, G3 por licença OSI permissiva, corte pelo comprador provável e promessa pública. O que NÃO sustenta: a escolha entre A e B (os dois precedentes existem), o descarte de C (sem medida) e a posição do gate A2A na fronteira. Fica open: o selo é do maestro.
+
+      Selado por /meta:decide em 2026-11-12: escolhida «A, medindo C depois: repo e sessão próprios, semver, e o consumidor recebe só o cliente e o gate por vendorização carimbada (tag, commit e sha256 por arquivo), no molde do kg-ssot; a medida do pacote publicado (Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR) roda antes do empacotamento open-core e, se ganhar, substitui a entrega»; descartadas: «Medir C antes de selar» · «B: núcleo no monorepo do core com repos publicados por staging».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Que forma tem a peça do backbone de comunicação?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: T_BACKBONE_GAP_G1
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "a pergunta da rodada de primárias de 2026-11-12, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo ou com o sentido de outro estudo"
+    provenance:
+      source: "docs/evolution/research/backbone-piece-shape-2026-11/SYNTHESIS.md"
+      locator: "seção «As quatro lacunas e o que cada fonte ancorou», G1"
+      method: "reading: a definição da lacuna na pergunta da rodada"
+      locality: "repo"
+    trace: "pergunta do run /onion-research em modo primaries de 2026-11-12 (lacuna G1)"
+    label: "G1 neste grafo é a lacuna G1 da rodada do backbone: onde mora o núcleo da peça do backbone (repo próprio, monorepo do core ou pacote)."
+    x_term:
+      pref: "lacuna G1 do backbone"
+      notation: "G1"
+      scheme: backbone-piece-gaps
+      lang: pt-BR
+      definition: "Lacuna G1 da rodada de primárias de 2026-11-12 sobre a forma da peça do backbone: onde mora o núcleo da peça do backbone (repo próprio, monorepo do core ou pacote)."
+  - id: T_BACKBONE_GAP_G2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "a pergunta da rodada de primárias de 2026-11-12, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo ou com o sentido de outro estudo"
+    provenance:
+      source: "docs/evolution/research/backbone-piece-shape-2026-11/SYNTHESIS.md"
+      locator: "seção «As quatro lacunas e o que cada fonte ancorou», G2"
+      method: "reading: a definição da lacuna na pergunta da rodada"
+      locality: "repo"
+    trace: "pergunta do run /onion-research em modo primaries de 2026-11-12 (lacuna G2)"
+    label: "G2 neste grafo é a lacuna G2 da rodada do backbone: como o consumidor recebe a peça do backbone (vendorização carimbada, projeção por staging ou versão de registro)."
+    x_term:
+      pref: "lacuna G2 do backbone"
+      notation: "G2"
+      scheme: backbone-piece-gaps
+      lang: pt-BR
+      definition: "Lacuna G2 da rodada de primárias de 2026-11-12 sobre a forma da peça do backbone: como o consumidor recebe a peça do backbone (vendorização carimbada, projeção por staging ou versão de registro)."
+  - id: T_BACKBONE_GAP_G3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "a pergunta da rodada de primárias de 2026-11-12, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo ou com o sentido de outro estudo"
+    provenance:
+      source: "docs/evolution/research/backbone-piece-shape-2026-11/SYNTHESIS.md"
+      locator: "seção «As quatro lacunas e o que cada fonte ancorou», G3"
+      method: "reading: a definição da lacuna na pergunta da rodada"
+      locality: "repo"
+    trace: "pergunta do run /onion-research em modo primaries de 2026-11-12 (lacuna G3)"
+    label: "G3 neste grafo é a lacuna G3 da rodada do backbone: a fronteira open-core e a licença do backbone, para que a governança seja a parte paga sem trair a camada aberta."
+    x_term:
+      pref: "lacuna G3 do backbone"
+      notation: "G3"
+      scheme: backbone-piece-gaps
+      lang: pt-BR
+      definition: "Lacuna G3 da rodada de primárias de 2026-11-12 sobre a forma da peça do backbone: a fronteira open-core e a licença do backbone, para que a governança seja a parte paga sem trair a camada aberta."
+  - id: T_BACKBONE_GAP_G4
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "a pergunta da rodada de primárias de 2026-11-12, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo ou com o sentido de outro estudo"
+    provenance:
+      source: "docs/evolution/research/backbone-piece-shape-2026-11/SYNTHESIS.md"
+      locator: "seção «As quatro lacunas e o que cada fonte ancorou», G4"
+      method: "reading: a definição da lacuna na pergunta da rodada"
+      locality: "repo"
+    trace: "pergunta do run /onion-research em modo primaries de 2026-11-12 (lacuna G4)"
+    label: "G4 neste grafo é a lacuna G4 da rodada do backbone: a governança da especificação do backbone contra a implementação (conformidade e tabela de suporte)."
+    x_term:
+      pref: "lacuna G4 do backbone"
+      notation: "G4"
+      scheme: backbone-piece-gaps
+      lang: pt-BR
+      definition: "Lacuna G4 da rodada de primárias de 2026-11-12 sobre a forma da peça do backbone: a governança da especificação do backbone contra a implementação (conformidade e tabela de suporte)."
+  - id: C_OPCAO_A_OWN_REPO_STAMPED_VENDOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Opção A: a peça vive em repo e sessão próprios, com semver, e os consumidores recebem só o cliente e o gate por vendorização carimbada (tag, commit e sha256 por arquivo), no molde do kg-ssot."
+    narrative: "O mecanismo de entrega de A é sustentado por evidência externa (Go: manifesto vendor/modules.txt conferido contra go.mod) e pelo precedente interno medido (vendor/kg-ssot/.kg-ssot-version). O que pesa por A no lugar de B é interno (onion-messaging já é repo e membro), não desta rodada."
+    trace: "opção (A) da pergunta da rodada"
+  - id: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Opção B: o núcleo vive dentro do monorepo do core e repos publicados são projeção por staging, no molde do Kubernetes; contribuição volta ao monorepo."
+    narrative: "O molde está documentado e é viável (staging/ autoritativo, PR só no monorepo, bot de publicação). O core já opera algo análogo nas portas (ops/materialize-door.sh e ops/publish-door.sh). O custo de B no Onion não foi medido: o bot do Kubernetes admite ausência de testes, mas é outra escala."
+    trace: "opção (B) da pergunta da rodada"
+  - id: C_OPCAO_C_PUBLISHED_PACKAGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Opção C: a peça é um pacote publicado (npm ou PyPI) e o consumidor a recebe por versão de registro."
+    narrative: "Nenhuma claim ancorada desta rodada avalia C. A única que tocava pacote por registro (A2A: pip install a2a-sdk, npm @a2a-js/sdk) foi rejeitada como EXAGERADA. Descartar C agora seria descarte sem medida (objeção E3_DESCARTE_SEM_MEDIDA, que bloqueia)."
+    trace: "opção (C) da pergunta da rodada"
+  - id: C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "G2: o consumidor recebe o backbone por vendorização com manifesto verificável (tag, commit e sha256 por arquivo); o gate A2A em duas cópias sem carimbo é defeito a curar pelo mesmo carimbo."
+    narrative: "Sustentado pelo precedente Go (manifesto conferido mecanicamente contra a versão declarada; divergência vira erro) e pelo carimbo interno vendor/kg-ssot/.kg-ssot-version. Leitura da rodada (recomendação do Elenxo), não selo."
+    trace: "recomendação do Elenxo da rodada de primárias de 2026-11-12"
+  - id: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "G3: a camada aberta usa licença OSI permissiva (Apache 2.0, nunca SSPL nem BUSL), o pago se corta pelo comprador provável e há promessa pública de não mover o aberto para o pago; sem fundação, a promessa é unilateral."
+    narrative: "Sustentado por MCP (Apache 2.0), A2A (Apache-2.0 sob a LF), nats-server (Apache 2.0) e pela promessa do GitLab (sem migração ao pago, sem atraso fixo, sem limites artificiais, MIT sem SSPL, corte pelo comprador provável). Limitado por: sem fundação, a neutralidade não tem executor externo (caso NATS, de fonte parcial); a posição do gate A2A na fronteira não foi decidida e BLOQUEIA a redação; o precedente motor aberto × nuvem paga (Temporal) não foi ancorado."
+    trace: "recomendação do Elenxo da rodada de primárias de 2026-11-12"
+  - id: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "G4: a especificação do backbone governa a implementação por conformidade mecânica (cada MUST/SHOULD mapeado a um check ou exclusão documentada) e por uma tabela de suporte por implementação."
+    narrative: "Sustentado pelo rastreio sep-NNNN.yaml do MCP e pela tabela de suporte por SDK da CloudEvents; coerente com D_COMMS_BACKBONE_VALUE_TABLE_1112 e com vendor/kg-ssot/spec/conformance/fixtures/ no core."
+    trace: "recomendação do Elenxo da rodada de primárias de 2026-11-12"
+  - id: Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Um pacote publicado (npm ou PyPI) atende, no consumidor Onion (repo Claude Code com hooks em shell), o carimbo por arquivo e o gate determinístico que o vendor carimbado entrega?"
+    narrative: "Medida que falta para julgar a opção C sem descarte por status quo (objeção E3_DESCARTE_SEM_MEDIDA, que bloqueia). vendor/kg-ssot/ é o precedente de A e não mede C."
+    trace: "objeção do Elenxo sobre a opção (C), rodada de 2026-11-12"
+  - id: Q_GATE_A2A_OPEN_OR_PAID_LAYER
+    node_type: question
+    layer: audit
+    impact: 5
+    confidence: 0.4
+    label: "O gate A2A (verificação de identidade e assinatura do receptor) é transporte da camada aberta ou governança da camada paga?"
+    trace: "objeção do Elenxo sobre a claim 20 [gitlab-stewardship], rodada de 2026-11-12"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Aberto: verificação de identidade e assinatura na camada aberta; o pago é a governança (políticas, auditoria, SLA, conformidade)»"
+    narrative: |-
+      Bloqueia a redação da fronteira G3. Se o gate for ao pago, a camada aberta entrega mensagens entre sessões sem verificar assinatura e perde o essencial para operar (promessa do GitLab de base aberta sem limites artificiais). Leitura que a evidência favorece, sem ancorar: verificação de identidade e assinatura no aberto; políticas, auditoria, SLA e conformidade no pago. Hoje o gate vive em duas cópias sem carimbo, então nem há artefato único a classificar.
+
+      Selado por /meta:decide em 2026-11-12: escolhida «Aberto: verificação de identidade e assinatura na camada aberta; o pago é a governança (políticas, auditoria, SLA, conformidade)»; descartadas: «Pago».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «O gate A2A fica na camada aberta ou na paga?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: E_K8S_STAGING_AUTHORITATIVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«The code in the staging/ directory is authoritative, i.e. the only copy of the code.» | staging/README.md, linhas 43-44 | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No molde Kubernetes o código em staging/ é a única cópia autoritativa e é editado direto no monorepo; os repos publicados são projeção."
+    narrative: "Citação literal: «The code in the staging/ directory is authoritative, i.e. the only copy of the code.». Locator: staging/README.md, linhas 43-44. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/kubernetes/kubernetes/blob/master/staging/README.md"
+    provenance:
+      source: "https://github.com/kubernetes/kubernetes/blob/master/staging/README.md"
+      locator: "staging/README.md, linhas 43-44"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_K8S_PRS_NOT_ACCEPTED_ON_PUBLISHED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«PRs are not directly accepted to the repo.» | staging/README.md, passo 5 da criação de novo repo, linha 81 | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No molde Kubernetes a contribuição vai ao monorepo, não aos repos publicados; o template de PR e o CONTRIBUTING do repo publicado devem dizer isso."
+    narrative: "Citação literal: «PRs are not directly accepted to the repo.». Locator: staging/README.md, passo 5 da criação de novo repo, linha 81. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/kubernetes/kubernetes/blob/master/staging/README.md"
+    provenance:
+      source: "https://github.com/kubernetes/kubernetes/blob/master/staging/README.md"
+      locator: "staging/README.md, passo 5 da criação de novo repo, linha 81"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_K8S_BOT_PUBLISHES_STAGING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«publishes the code in `k8s.io/kubernetes/staging` to their own repositories.» | publishing-bot README.md, linhas 9 e 11 | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Um bot publica staging/ em repos próprios e mantém os branches publicados compatíveis, reconstruindo o histórico por filtro de commits."
+    narrative: "Citação literal: «publishes the code in `k8s.io/kubernetes/staging` to their own repositories.». Locator: publishing-bot README.md, linhas 9 e 11. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+    provenance:
+      source: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+      locator: "publishing-bot README.md, linhas 9 e 11"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_K8S_SYNC_SHA_STAMP_IN_COMMITS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«`Kubernetes-sha: <sha>` lines in the commit messages.» | publishing-bot README.md, linha 11 | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O bot do Kubernetes rastreia o ponto de sincronização por carimbo Kubernetes-sha nas mensagens de commit do repo publicado."
+    narrative: "Citação literal: «`Kubernetes-sha: <sha>` lines in the commit messages.». Locator: publishing-bot README.md, linha 11. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+    provenance:
+      source: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+      locator: "publishing-bot README.md, linha 11"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_K8S_BOT_NO_TESTS_AND_ISSUE_RISK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«Make sure that the bot github user CANNOT close arbitrary issues in the upstream repo.» | publishing-bot README.md, linha 85 (Caution) e linha 47 (Testing and deploying the robot) | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O bot de publicação do Kubernetes admite não ter testes automatizados e alerta que o usuário do bot não deve poder fechar issues arbitrárias no upstream: o molde B tem custo operacional e superfície de risco."
+    narrative: "Citação literal: «Make sure that the bot github user CANNOT close arbitrary issues in the upstream repo.». Locator: publishing-bot README.md, linha 85 (Caution) e linha 47 (Testing and deploying the robot). Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+    provenance:
+      source: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+      locator: "publishing-bot README.md, linha 85 (Caution) e linha 47 (Testing and deploying the robot)"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_A2A_SPEC_APACHE_UNDER_LF
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«The A2A Protocol is an open source project under the Linux Foundation, contributed by Google.» | README, seção About | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O repo da especificação A2A é Apache-2.0 e o projeto está sob a Linux Foundation, contribuído pelo Google."
+    narrative: "Citação literal: «The A2A Protocol is an open source project under the Linux Foundation, contributed by Google.». Locator: README, seção About. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/a2aproject/A2A"
+    provenance:
+      source: "https://github.com/a2aproject/A2A"
+      locator: "README, seção About"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_LF_GOVERNANCE_KEEPS_A2A_NEUTRAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«Under the Linux Foundation’s governance, A2A will remain vendor neutral, emphasize inclusive contributions.» | anúncio do projeto Agent2Agent, 2025-06-23, parágrafo de governança | ancorada por verificador independente"
+    valid_from: "2025-06-23"
+    source_tier: 9
+    source_kind: primary
+    label: "A Linux Foundation declara que a governança neutra de fundação é o que mantém o A2A vendor-neutral."
+    narrative: "Citação literal: «Under the Linux Foundation’s governance, A2A will remain vendor neutral, emphasize inclusive contributions.». Locator: anúncio do projeto Agent2Agent, 2025-06-23, parágrafo de governança. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents"
+      locator: "anúncio do projeto Agent2Agent, 2025-06-23, parágrafo de governança"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_GOVERNANCE_INDIVIDUALS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«Membership in the technical governance process is for individuals, not companies. That is, there are no seats reserved for specific companies, and membership is associated with the person rather than the company employing that person.» | Governance and Stewardship, Technical Governance; Roles | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A especificação do MCP é governada por hierarquia de pessoas, não de empresas: Lead Maintainers decidem por último, Core Maintainers dirigem a spec, Maintainers cuidam de SDKs e Working Groups."
+    narrative: "Citação literal: «Membership in the technical governance process is for individuals, not companies. That is, there are no seats reserved for specific companies, and membership is associated with the person rather than the company employing that person.». Locator: Governance and Stewardship, Technical Governance; Roles. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://modelcontextprotocol.io/community/governance"
+    provenance:
+      source: "https://modelcontextprotocol.io/community/governance"
+      locator: "Governance and Stewardship, Technical Governance; Roles"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_LICENSE_APACHE_CC_BY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«All outbound code and specifications will be made available under the Project License. The Core Maintainers may approve the use of an alternative open license or licenses for inbound or outbound contributions on an exception basis.» | Governance and Stewardship, General Project Policies | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No MCP, código e especificações saem sob Apache 2.0, a documentação (exceto a spec) sob CC BY 4.0, o projeto é abrigado sob LF Projects e mudança de governança exige aprovação dela."
+    narrative: "Citação literal: «All outbound code and specifications will be made available under the Project License. The Core Maintainers may approve the use of an alternative open license or licenses for inbound or outbound contributions on an exception basis.». Locator: Governance and Stewardship, General Project Policies. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://modelcontextprotocol.io/community/governance"
+    provenance:
+      source: "https://modelcontextprotocol.io/community/governance"
+      locator: "Governance and Stewardship, General Project Policies"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_SEP_CONFORMANCE_TRACEABILITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«A traceability file, `sep-NNNN.yaml`, mapping every MUST, MUST NOT, SHOULD and SHOULD NOT in the SEP's Specification section to a check ID or to a documented exclusion» | SEP Guidelines, Conformance Test Requirement | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No MCP, um SEP que muda comportamento observável só chega a Final com cenário no repositório de conformidade e um arquivo de rastreio que mapeia cada MUST/SHOULD a uma checagem."
+    narrative: "Citação literal: «A traceability file, `sep-NNNN.yaml`, mapping every MUST, MUST NOT, SHOULD and SHOULD NOT in the SEP's Specification section to a check ID or to a documented exclusion». Locator: SEP Guidelines, Conformance Test Requirement. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://modelcontextprotocol.io/community/sep-guidelines"
+    provenance:
+      source: "https://modelcontextprotocol.io/community/sep-guidelines"
+      locator: "SEP Guidelines, Conformance Test Requirement"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_MCP_FINAL_SEP_FROZEN_SPEC_GOVERNS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«A Final SEP is a frozen record of the design as accepted. Where the specification has since diverged, the specification governs: report problems as issues against it, not as edits to the SEP.» | SEP Guidelines, After the decision | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No MCP, um SEP Final é registro congelado; onde a especificação divergiu, a especificação governa, não o SEP."
+    narrative: "Citação literal: «A Final SEP is a frozen record of the design as accepted. Where the specification has since diverged, the specification governs: report problems as issues against it, not as edits to the SEP.». Locator: SEP Guidelines, After the decision. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://modelcontextprotocol.io/community/sep-guidelines"
+    provenance:
+      source: "https://modelcontextprotocol.io/community/sep-guidelines"
+      locator: "SEP Guidelines, After the decision"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_CE_SPEC_GROUPED_RELEASES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«Specifications will be grouped into logical units, with all documents in a group released at the same time, with the same version number.» | docs/GOVERNANCE.md, seção de release e versionamento da spec, 2º item | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Na CloudEvents os documentos da spec são agrupados e liberados juntos com o mesmo número de versão, mesmo que o documento individual não tenha mudado."
+    narrative: "Citação literal: «Specifications will be grouped into logical units, with all documents in a group released at the same time, with the same version number.». Locator: docs/GOVERNANCE.md, seção de release e versionamento da spec, 2º item. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/cloudevents/spec/blob/main/docs/GOVERNANCE.md"
+    provenance:
+      source: "https://github.com/cloudevents/spec/blob/main/docs/GOVERNANCE.md"
+      locator: "docs/GOVERNANCE.md, seção de release e versionamento da spec, 2º item"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_CE_SDK_FEATURE_SUPPORT_TABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«The SDK [feature support table](cloudevents/SDK.md#feature-support) is a» | README.md, seção de SDKs (linhas após a lista de repos); a tabela de documentos lista 'CloudEvents SDK Requirements' como 'Not versioned' | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A spec CloudEvents remete a uma tabela de suporte por SDK para dizer que features, formatos e bindings cada SDK cumpre, e trata o requisito dos SDKs como documento à parte, sem versão."
+    narrative: "Citação literal: «The SDK [feature support table](cloudevents/SDK.md#feature-support) is a». Locator: README.md, seção de SDKs (linhas após a lista de repos); a tabela de documentos lista 'CloudEvents SDK Requirements' como 'Not versioned'. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/cloudevents/spec/blob/main/README.md"
+    provenance:
+      source: "https://github.com/cloudevents/spec/blob/main/README.md"
+      locator: "README.md, seção de SDKs (linhas após a lista de repos); a tabela de documentos lista 'CloudEvents SDK Requirements' como 'Not versioned'"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_SYNADIA_DEMANDED_DOMAIN_REPO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-12"
+    verified_against: "«full control of the nats.io domain name and the nats-io GitHub repository within two weeks» | CNCF blog (publicado 2025-05-01), seção 'Synadia's recent actions' | ancorada por verificador independente"
+    valid_from: "2025-05-01"
+    source_tier: 8
+    source_kind: primary
+    label: "A Synadia exigiu o controle do domínio e do repositório do NATS, com prazo curto, para tirar o projeto da fundação (segundo a CNCF, parte da disputa)."
+    narrative: "Citação literal: «full control of the nats.io domain name and the nats-io GitHub repository within two weeks». Locator: CNCF blog (publicado 2025-05-01), seção 'Synadia's recent actions'. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte PARTE da disputa (a CNCF, adversária da Synadia); o desfecho não foi ancorado."
+    trace: "https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/"
+    provenance:
+      source: "https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/"
+      locator: "CNCF blog (publicado 2025-05-01), seção 'Synadia's recent actions'"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_CNCF_FOUNDATIONS_PROTECT_LICENSE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-12"
+    verified_against: "«Open source foundations exist in part to protect the ecosystem from unilateral license changes» | CNCF blog (2025-05-01), seção 'CNCF IP and Trademarks' | ancorada por verificador independente"
+    valid_from: "2025-05-01"
+    source_tier: 8
+    source_kind: primary
+    label: "Doutrina declarada da CNCF: a defesa contra mudança unilateral de licença é um dos motivos de existir de uma fundação."
+    narrative: "Citação literal: «Open source foundations exist in part to protect the ecosystem from unilateral license changes». Locator: CNCF blog (2025-05-01), seção 'CNCF IP and Trademarks'. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte PARTE da disputa (a CNCF, adversária da Synadia); o desfecho não foi ancorado."
+    trace: "https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/"
+    provenance:
+      source: "https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/"
+      locator: "CNCF blog (2025-05-01), seção 'CNCF IP and Trademarks'"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_NATS_SERVER_APACHE_LICENSE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«Apache License Version 2.0, January 2004» | LICENSE, linhas 1-2 | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O repo nats-server segue sob Apache License 2.0, a licença vigente do núcleo do transporte."
+    narrative: "Citação literal: «Apache License Version 2.0, January 2004». Locator: LICENSE, linhas 1-2. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://github.com/nats-io/nats-server/blob/main/LICENSE"
+    provenance:
+      source: "https://github.com/nats-io/nats-server/blob/main/LICENSE"
+      locator: "LICENSE, linhas 1-2"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GITLAB_OPEN_NEVER_TO_PAID
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«When a feature is open source we won’t move that feature to a paid tier.» | Seção 'Promises', 1º item | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Promessa do GitLab: feature aberta não migra para tier pago; não cobre features já pagas (podem subir de tier) e admite remoção da base aberta ao combinar features de vários tiers."
+    narrative: "Citação literal: «When a feature is open source we won’t move that feature to a paid tier.». Locator: Seção 'Promises', 1º item. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte é o próprio GitLab falando da sua política: compromisso declarado, sem executor externo."
+    trace: "https://handbook.gitlab.com/handbook/company/stewardship/"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'Promises', 1º item"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GITLAB_PAID_BY_LIKELY_BUYER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«If the likely buyer is an individual contributor the feature will be open source, otherwise it will be source-available (proprietary).» | Seção 'What Features Are Paid-Only' | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Critério do GitLab para o que é pago: o comprador provável. Se for contribuidor individual, é aberto; senão, source-available proprietário."
+    narrative: "Citação literal: «If the likely buyer is an individual contributor the feature will be open source, otherwise it will be source-available (proprietary).». Locator: Seção 'What Features Are Paid-Only'. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte é o próprio GitLab falando da sua política: compromisso declarado, sem executor externo."
+    trace: "https://handbook.gitlab.com/handbook/company/stewardship/"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'What Features Are Paid-Only'"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GITLAB_NO_FIXED_DELAY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«We won’t introduce features into the open source codebase with a fixed delay, if a feature is planned to land in both it will be released simultaneously in both.» | Seção 'Promises', 2º item | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Promessa do GitLab: sem open source com atraso fixo; o que vale para as duas camadas sai ao mesmo tempo nas duas."
+    narrative: "Citação literal: «We won’t introduce features into the open source codebase with a fixed delay, if a feature is planned to land in both it will be released simultaneously in both.». Locator: Seção 'Promises', 2º item. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte é o próprio GitLab falando da sua política: compromisso declarado, sem executor externo."
+    trace: "https://handbook.gitlab.com/handbook/company/stewardship/"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'Promises', 2º item"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GITLAB_NO_ARTIFICIAL_LIMITS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«The open source codebase will not contain any artificial limits (repositories, users, size, performance,» | Seção 'Promises', 5º item (limites artificiais) e 4º item (essencial para um 'large forge') | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Promessa do GitLab: a base aberta não terá limites artificiais e conterá o essencial para operar o produto em escala."
+    narrative: "Citação literal: «The open source codebase will not contain any artificial limits (repositories, users, size, performance,». Locator: Seção 'Promises', 5º item (limites artificiais) e 4º item (essencial para um 'large forge'). Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte é o próprio GitLab falando da sua política: compromisso declarado, sem executor externo."
+    trace: "https://handbook.gitlab.com/handbook/company/stewardship/"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'Promises', 5º item (limites artificiais) e 4º item (essencial para um 'large forge')"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GITLAB_CE_MIT_NO_SSPL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«We don’t use a limiting license such as SSPL. As we highlight in our docs, GitLab Community Edition (CE) is licensed under the terms of the MIT License» | Seção 'Common Criticisms Of Open Core', item 'Deployment Constrained'; e seção 'Software as a Service' | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A camada aberta do GitLab é MIT (OSI), com rejeição explícita de licença limitante como SSPL; a promessa vale para o código, não para o SaaS, e terceiros podem oferecer SaaS."
+    narrative: "Citação literal: «We don’t use a limiting license such as SSPL. As we highlight in our docs, GitLab Community Edition (CE) is licensed under the terms of the MIT License». Locator: Seção 'Common Criticisms Of Open Core', item 'Deployment Constrained'; e seção 'Software as a Service'. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte é o próprio GitLab falando da sua política: compromisso declarado, sem executor externo."
+    trace: "https://handbook.gitlab.com/handbook/company/stewardship/"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'Common Criticisms Of Open Core', item 'Deployment Constrained'; e seção 'Software as a Service'"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GITLAB_EXISTING_FOSS_STAYS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«We never move existing features already in GitLab FOSS into a paid tier» | Seção 'Existing Contributed Open Source Features Will Not Become Source-Available' | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Reforço do GitLab: nunca se move para tier pago o que já está no FOSS, venha de quem vier; o inverso (abrir o que era fechado) acontece."
+    narrative: "Citação literal: «We never move existing features already in GitLab FOSS into a paid tier». Locator: Seção 'Existing Contributed Open Source Features Will Not Become Source-Available'. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA. Fonte é o próprio GitLab falando da sua política: compromisso declarado, sem executor externo."
+    trace: "https://handbook.gitlab.com/handbook/company/stewardship/"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'Existing Contributed Open Source Features Will Not Become Source-Available'"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GO_VENDOR_MODULES_TXT_MANIFEST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«`go mod vendor` also creates the file `vendor/modules.txt` that contains a list of vendored packages and the module versions they were copied from.» | go.dev/ref/mod, Vendoring, 3º parágrafo | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No Go, a cópia vendorizada tem manifesto próprio (vendor/modules.txt) que registra quais pacotes foram copiados e de qual versão de módulo vieram."
+    narrative: "Citação literal: «`go mod vendor` also creates the file `vendor/modules.txt` that contains a list of vendored packages and the module versions they were copied from.». Locator: go.dev/ref/mod, Vendoring, 3º parágrafo. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://go.dev/ref/mod#vendoring"
+    provenance:
+      source: "https://go.dev/ref/mod#vendoring"
+      locator: "go.dev/ref/mod, Vendoring, 3º parágrafo"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_GO_VENDOR_CONSISTENCY_CHECK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "«When the `go` command reads `vendor/modules.txt`, it checks that the module versions are consistent with `go.mod`. If `go.mod` has changed since `vendor/modules.txt` was generated, the `go` command will report an error.» | go.dev/ref/mod, Vendoring, 3º parágrafo | ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No Go, a verificação é mecânica: o go confere o manifesto contra a versão declarada em go.mod e erra se divergirem, exigindo regenerar o vendor."
+    narrative: "Citação literal: «When the `go` command reads `vendor/modules.txt`, it checks that the module versions are consistent with `go.mod`. If `go.mod` has changed since `vendor/modules.txt` was generated, the `go` command will report an error.». Locator: go.dev/ref/mod, Vendoring, 3º parágrafo. Lida integralmente pelo leitor da rodada de primárias de 2026-11-12 e reaberta por um segundo agente, independente do leitor, que julgou ANCORADA."
+    trace: "https://go.dev/ref/mod#vendoring"
+    provenance:
+      source: "https://go.dev/ref/mod#vendoring"
+      locator: "go.dev/ref/mod, Vendoring, 3º parágrafo"
+      method: "reading: leitura integral da primária; quote ancorada por verificador independente"
+      locality: "web"
+  - id: E_OBJECAO_K8S_SHA_STAMP_NOT_CONSUMER_MANIFEST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: bash .claude/validation/kg-corpus-grep.sh 'Kubernetes-sha' | grep -vc '^#'  # = 0 nós; e head -12 vendor/kg-ssot/.kg-ssot-version (sha256 por arquivo, ausente no Kubernetes-sha)"
+    label: "OBJEÇÃO (claim 4): o carimbo Kubernetes-sha marca a sincronização NO REPO PUBLICADO, não no consumidor, e não garante integridade de arquivo; não equivale à vendorização carimbada da opção A."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Prova MENOS que o necessário para G2. A analogia com vendor/kg-ssot/ é do leitor. O carimbo interno vive no consumidor e é verificável arquivo a arquivo: medido neste escritor, tag kg-ssot-v4.50.0, commit e77d8284 (o Elenxo escreveu e7d8284, typo corrigido pela medida), sha256 por arquivo, vendored_at 2026-11-12, 783 linhas. Quem usar a claim 4 para dizer que B entrega a vendorização carimbada de A engana-se. Superação achada (classe entrega): o carimbo do kg-ssot e o precedente Go."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Kubernetes-sha' | grep -vc '^#'  # = 0 nós; e head -12 vendor/kg-ssot/.kg-ssot-version (sha256 por arquivo, ausente no Kubernetes-sha)"
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version@7a5bd2ab7"
+      locator: "campos product, tag, commit, version, vendored_at e files (sha256 por arquivo); 783 linhas"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "repo"
+  - id: E_OBJECAO_K8S_BOT_COST_OTHER_SCALE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: bash .claude/validation/kg-corpus-grep.sh 'publishing-bot' | grep -vc '^#'  # = 0 nós; nenhuma medida do custo de B no Onion"
+    label: "OBJEÇÃO (claim 5): o custo e o risco do bot do Kubernetes são de outra escala; descartar B por custo operacional com base nisso seria descarte por proxy, sem medida no Onion."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. O motor análogo do Onion (ops/publish-door.sh) já rematerializou a porta onion-core 18 vezes até 2026-09-23, mas projeta PORTAS inteiras, não um subdiretório de peça: citar isso como prova seria status quo. A claim junta dois locators numa conclusão ('superfície de risco') que nenhum diz sozinho. Superação procurada e não achada (classe nenhuma): medida do custo de projetar um subdiretório do core em repo de peça."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'publishing-bot' | grep -vc '^#'  # = 0 nós; nenhuma medida do custo de B no Onion"
+    provenance:
+      source: "https://github.com/kubernetes/publishing-bot/blob/master/README.md"
+      locator: "linha 47 (Testing and deploying the robot) e linha 85 (Caution)"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_A2A_SPEC_SDK_SPLIT_UNANCHORED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E4_LACUNA_ABERTA, triagem limite: lista de claims ancoradas do prompt: [a2a-governance] só tem as claims 6 e 7 (licença e neutralidade); as claims de repos separados, registro por versão e GOVERNANCE.md estão em 'REJEITADAS'"
+    label: "OBJEÇÃO (claim 6): a licença e a casa da spec A2A não respondem G1/G4; a separação spec × SDKs e a governança própria da spec foram rejeitadas na ancoragem e seguem como lacuna."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. Só 10 dos 24 repos da org foram vistos e as descrições citadas não batiam; GOVERNANCE.md não foi lido. G1 e G4 ficam sem evidência ancorada vinda do A2A. Superação procurada e não achada (classe nenhuma): falta listar os 24 repos e ler GOVERNANCE.md."
+    trace: "lista de claims ancoradas do prompt: [a2a-governance] só tem as claims 6 e 7 (licença e neutralidade); as claims de repos separados, registro por versão e GOVERNANCE.md estão em 'REJEITADAS'"
+    provenance:
+      source: "https://github.com/a2aproject/A2A"
+      locator: "README, seção About; lista de repos da org (10 de 24 vistos)"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_NO_FOUNDATION_NO_NEUTRALITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: bash .claude/validation/kg-corpus-grep.sh 'Synadia' | grep -vc '^#'  # = 0 nós; o corpus não tem o caso de relicenciamento unilateral nem um mecanismo de garantia sem fundação"
+    label: "OBJEÇÃO (claim 7): a neutralidade do A2A vem de uma fundação, que o Onion não tem; sem ela, 'não trair a camada aberta' é promessa unilateral, e a decisão G3 não deve citar A2A ou MCP como modelo de neutralidade."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Core e peças são de um mantenedor só. Nada impede o dono de relicenciar, que é o que a Synadia tentou com o NATS (claim 14). A garantia possível ao Onion é a do molde GitLab (promessa pública, claims 17-22), não a da fundação. Superação procurada e não achada (classe nenhuma): a promessa do GitLab é compromisso unilateral do mesmo dono, sem executor externo; contá-la como superação seria consolo."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Synadia' | grep -vc '^#'  # = 0 nós; o corpus não tem o caso de relicenciamento unilateral nem um mecanismo de garantia sem fundação"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents"
+      locator: "parágrafo de governança do anúncio de 2025-06-23"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_MCP_WHO_DECIDES_NOT_HOW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: releitura da quote da claim 8: 'Membership in the technical governance process is for individuals, not companies' (não menciona conformidade nem a relação spec→SDK)"
+    label: "OBJEÇÃO (claim 8): a governança por indivíduos diz QUEM decide no MCP, não COMO a spec governa a implementação; para um mantenedor mais sessões de agente não discrimina nada."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Quem fecha G4 é a claim 10 (rastreio de cada MUST para check), não esta. Superação achada (classe entrega): a claim 10."
+    trace: "releitura da quote da claim 8: 'Membership in the technical governance process is for individuals, not companies' (não menciona conformidade nem a relação spec→SDK)"
+    provenance:
+      source: "https://modelcontextprotocol.io/community/governance"
+      locator: "Technical Governance; Roles"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_MCP_SEP_VS_SPEC_NOT_IMPL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: releitura da quote da claim 11: 'Where the specification has since diverged, the specification governs: report problems as issues against it, not as edits to the SEP' (objeto é o SEP, não o SDK)"
+    label: "OBJEÇÃO (claim 11): a hierarquia citada é SEP contra spec, ambos texto; nada diz da spec contra a implementação, e usá-la para dizer que a spec do backbone governa o código estica a fonte."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Quem cobre a implementação é a claim 10. Superação achada (classe entrega): a claim 10, ancorada na mesma fonte."
+    trace: "releitura da quote da claim 11: 'Where the specification has since diverged, the specification governs: report problems as issues against it, not as edits to the SEP' (objeto é o SEP, não o SDK)"
+    provenance:
+      source: "https://modelcontextprotocol.io/community/sep-guidelines"
+      locator: "After the decision"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_CE_SPEC_VERSIONING_NOT_SDK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E4_LACUNA_ABERTA, triagem limite: lista de claims ancoradas: [cloudevents-sdk] só tem as claims 12 (versão da spec) e 13 (tabela de suporte); as claims de 'repo próprio', 'N-1 / número do SDK à parte' e 'specversion X.0 interopera' estão em REJEITADAS"
+    label: "OBJEÇÃO (claim 12): o versionamento conjunto dos documentos da spec CloudEvents não toca SDK, repo próprio nem como o consumidor recebe; a lacuna 'SDKs como repos próprios sob a spec' segue aberta."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. As claims sobre SDK em repo próprio, número do SDK à parte e interoperabilidade por specversion foram rejeitadas como EXAGERADA. O 'repo próprio' só apareceu como contexto dentro de uma claim rejeitada. Superação procurada e não achada (classe nenhuma)."
+    trace: "lista de claims ancoradas: [cloudevents-sdk] só tem as claims 12 (versão da spec) e 13 (tabela de suporte); as claims de 'repo próprio', 'N-1 / número do SDK à parte' e 'specversion X.0 interopera' estão em REJEITADAS"
+    provenance:
+      source: "https://github.com/cloudevents/spec/blob/main/docs/GOVERNANCE.md"
+      locator: "seção de release e versionamento da spec"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_NATS_PARTIAL_SOURCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: bash .claude/validation/kg-corpus-grep.sh 'Synadia' | grep -vc '^#'  # = 0 nós; e a claim rejeitada 'A disputa terminou com acordo… sem fork' (anúncio conjunto 404)"
+    label: "OBJEÇÃO (claim 14): o risco de relicenciar um transporte aberto existe e foi tentado, mas a fonte é parte da disputa (CNCF) e o desfecho não foi ancorado; fica como limite declarado."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. O anúncio conjunto do acordo deu 404 numa URL deduzida. Nenhuma fonte da Synadia entrou no run. Superação procurada e não achada (classe nenhuma)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Synadia' | grep -vc '^#'  # = 0 nós; e a claim rejeitada 'A disputa terminou com acordo… sem fork' (anúncio conjunto 404)"
+    provenance:
+      source: "https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/"
+      locator: "seção 'Synadia's recent actions' e nota de atualização de 2025-05-01"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_FOUNDATION_DOCTRINE_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem limite: releitura da quote da claim 15 ('Open source foundations exist in part to protect…'): é afirmação de missão, sem caso medido de proteção efetiva"
+    label: "OBJEÇÃO (claim 15): a doutrina da CNCF é missão declarada pela parte interessada, não proteção medida; para o Onion, sem fundação, prova que a proteção não está disponível, não que exista outra."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: limite. Igual à objeção da claim 7: limite declarado. Superação procurada e não achada (classe nenhuma): só a promessa unilateral do GitLab, sem executor externo nem medida de cumprimento."
+    trace: "releitura da quote da claim 15 ('Open source foundations exist in part to protect…'): é afirmação de missão, sem caso medido de proteção efetiva"
+    provenance:
+      source: "https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/"
+      locator: "seção 'CNCF IP and Trademarks'"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_GATE_A2A_LAYER_UNDECIDED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E2_PROVA_MENOS, triagem bloqueia: nenhuma claim ancorada (1-24) menciona o gate A2A nem a assinatura; conferir a lista do prompt. Estado: 'o gate A2A vive em duas cópias sem carimbo' (estado medido citado na rodada)"
+    label: "OBJEÇÃO (claim 20, BLOQUEIA): nenhuma claim ancorada diz se o gate A2A é transporte ou governança; pô-lo no pago faz a camada aberta entregar mensagens sem verificar assinatura e trai a promessa de base aberta sem limites artificiais."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E2_PROVA_MENOS. Triagem: bloqueia. O veredito G3 muda conforme quem conduz decidir. Hoje o gate vive em duas cópias sem carimbo, então nem há artefato único a classificar. A única pista (grade da Temporal Cloud com SAML, SCIM e audit no pago) foi REJEITADA na ancoragem. Superação procurada e não achada (classe nenhuma): regra ancorada que ponha identidade e assinatura no aberto e políticas e auditoria no pago."
+    trace: "nenhuma claim ancorada (1-24) menciona o gate A2A nem a assinatura; conferir a lista do prompt. Estado: 'o gate A2A vive em duas cópias sem carimbo' (estado medido citado na rodada)"
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/stewardship/"
+      locator: "Seção 'Promises', 4º e 5º itens"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_OBJECAO_OPTION_C_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E3_DESCARTE_SEM_MEDIDA, triagem bloqueia: lista de claims ancoradas 1-24: nenhuma com answersGap G2 sobre pacote por registro; a única (a2a-governance, 'SDK como pacote por versão') está em REJEITADAS"
+    label: "OBJEÇÃO (opção C, BLOQUEIA): nenhuma claim ancorada avalia o pacote publicado; descartá-lo agora é descarte sem medida, e ninguém mediu se um pacote atende o carimbo por arquivo e o gate determinístico no consumidor."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Triagem: bloqueia. O consumidor do backbone é um repo Claude Code com hooks em shell, onde o kg-ssot é vendorizado e não instalado. Citar vendor/kg-ssot/ contra C seria status quo. Superação procurada e não achada (classe nenhuma)."
+    trace: "lista de claims ancoradas 1-24: nenhuma com answersGap G2 sobre pacote por registro; a única (a2a-governance, 'SDK como pacote por versão') está em REJEITADAS"
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version@7a5bd2ab7"
+      locator: "carimbo de vendorização do kg-ssot (precedente de A, não mede C)"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "repo"
+  - id: E_OBJECAO_TEMPORAL_OPEN_CORE_UNANCHORED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "Elenxo da rodada de primárias de 2026-11-12, critério E4_LACUNA_ABERTA, triagem limite: lista de claims ancoradas 1-24: zero com [temporal-open-core]; as 5 estão em REJEITADAS"
+    label: "OBJEÇÃO (lacuna temporal-open-core): o precedente mais próximo do backbone (motor aberto e operação gerenciada paga, cobrada por uso, sem trancar feature) não tem evidência ancorada; G3 fica coberta só em parte pelo GitLab."
+    narrative: "Afirmação de 1 agente (Elenxo), sem votação. Critério pré-registrado: E4_LACUNA_ABERTA. Triagem: limite. As 5 claims da Temporal foram rebaixadas: 4 como AFIRMADA-SEM-CITACAO (veredito sem quote nem locator) e 1 como EXAGERADA (SCIM no plano errado). O verificador achou o texto, mas o motor rebaixou por falta de quote e locator. Superação procurada e não achada (classe nenhuma): nova ancoragem resolveria e não foi feita neste run."
+    trace: "lista de claims ancoradas 1-24: zero com [temporal-open-core]; as 5 estão em REJEITADAS"
+    provenance:
+      source: "https://temporal.io/pricing"
+      locator: "página de preços (HTML l.40 'No features locked behind plan upgrades.') e LICENSE do servidor"
+      method: "judges: Elenxo, 1 agente sem votação, rodada de primárias de 2026-11-12"
+      locality: "web"
+  - id: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-12"
+    verified_against: "contabilidade do motor na rodada de primárias de 2026-11-12: 8 fontes nomeadas lidas, 0 inalcançáveis, 24 claims ancoradas, 19 rejeitadas na ancoragem, 26 alvos julgados pelo Elenxo, 12 objeções sobreviventes, 0 recusas, 17 superações achadas"
+    label: "LACUNAS: 8 fontes lidas, 0 inalcançáveis; 24 claims ancoradas e 19 rejeitadas (15 EXAGERADA, 4 AFIRMADA-SEM-CITACAO); 12 de 26 objeções sobrevivem (2 bloqueiam); 0 recusas; 17 superações. Seguem abertas: A2A spec×SDK, CloudEvents SDK, Temporal, opção C e gate A2A."
+    narrative: "FONTES LIDAS (8 chaves, 0 inalcançáveis): k8s-staging (staging/README.md e publishing-bot README), a2a-governance (repo A2A e anúncio da LF), mcp-governance (Governance and Stewardship e SEP Guidelines), cloudevents-sdk (GOVERNANCE.md, README.md e SDK-GOVERNANCE.md), nats-licensing (blog da CNCF e LICENSE do nats-server), gitlab-stewardship (handbook), temporal-open-core (LICENSE e página de preços), go-vendoring (go.dev/ref/mod). ANCORADAS: 24 (k8s 5, a2a 2, mcp 4, cloudevents 2, nats 3, gitlab 6, go 2, temporal 0). REJEITADAS NA ANCORAGEM (19, nenhuma vira nó de evidência): [k8s-staging] o bot atualiza go.mod e vendor/ como 'resolução de dependências do consumidor' (EXAGERADA: os target repos são os próprios repos publicados); [a2a-governance] spec e SDKs em repos separados, todos Apache-2.0, com ITK à parte (EXAGERADA: 14 de 24 repos não vistos e descrições não batem); o consumidor recebe o SDK por pacote por versão em registro de cada linguagem (EXAGERADA: quote é resumo do leitor; go get resolve por caminho de módulo); o repo da spec tem GOVERNANCE.md, MAINTAINERS.md e CHANGELOG.md separando governança da spec das implementações (EXAGERADA: arquivos existem, conteúdo não lido); [mcp-governance] mudanças só entram por SEP com WG patrocinador (EXAGERADA: bug fixes e clarificações vão por PR comum; Core Maintainers também patrocinam); a spec exige implementação de referência e conformidade para Final sem exigir SDKs (EXAGERADA: a exigência vale só para Standards Track com comportamento observável); [cloudevents-sdk] cada SDK em repo próprio e a spec só aponta pelo README, sem vendorizar (EXAGERADA: 'só pelo README' e 'não vendoriza' não estão no texto); relação SDK-spec é saúde, não versão, e o número do SDK corre à parte (EXAGERADA: numeração do SDK não aparece); specversion X.0 faz SDKs de versões diferentes interoperarem (EXAGERADA: 'interopera' não está no texto); [nats-licensing] a licença não aberta era a ameaça central (EXAGERADA: o post trata o conjunto como 'take back'); a causa raiz foi a marca não transferida (EXAGERADA: a marca aparece como alavanca); a disputa terminou em acordo, sob Apache-2.0, sem fork (EXAGERADA: 'sem fork' sem fonte; anúncio conjunto 404); [temporal-open-core] servidor MIT sem restrição comercial; nuvem sem trancar feature por plano; operação gerenciada com SLA no plano de entrada; suporte pago escalonado por P0 (as 4 AFIRMADA-SEM-CITACAO: rebaixadas pelo motor por veredito sem quote nem locator); identidade e segurança na grade paga com SCIM add-on no PAYG (EXAGERADA: SCIM é add-on no Business, não no PAYG); [go-vendoring] com vendor ativo o build não toca rede nem cache, cópia autossuficiente (EXAGERADA: rede e cache estão no 5º parágrafo e só para build commands); vendor usado automaticamente e só no módulo principal (EXAGERADA: automático só com go 1.14+). OBJEÇÕES DO ELENXO: 26 alvos (24 claims, a opção C e a lacuna temporal-open-core), 12 sobreviventes, todas modeladas como E_OBJECAO_ (10 limite, 2 bloqueiam: gate A2A na fronteira G3 e opção C sem medida); 14 não sobreviveram, por evidência. RECUSADAS PELO MOTOR: 0. SUPERAÇÕES ACHADAS: 17 (14 sobre claims rejeitadas na ancoragem, rastreadas a este nó; 3 sobre objeções às claims 4, 8 e 11, rastreadas ao E_OBJECAO_ de cada uma). Sem superação: a rejeição do k8s-staging e as 4 AFIRMADA-SEM-CITACAO da Temporal. LACUNAS QUE CONTINUAM ABERTAS (gapsOpen do Elenxo): (1) a2a-governance: separação spec×SDKs em repos próprios e governança própria da spec; (2) cloudevents-sdk: SDKs como repos próprios sob a spec e relação de versão SDK×spec; (3) temporal-open-core: fronteira motor aberto × nuvem paga sem evidência ancorada; (4) opção C (pacote npm/PyPI) sem claim ancorada que a avalie; (5) posição do gate A2A (transporte aberto ou governança paga) na fronteira G3. LIMITES DECLARADOS: a escolha A×B não é decidida por evidência externa; sem fundação, a camada aberta é promessa unilateral; o caso NATS vem de fonte parcial. O Elenxo citou o commit do carimbo do kg-ssot como e7d8284; o medido neste escritor é e77d8284."
+    trace: ".claude/workflows/onion-research.js@530b04f7c, modo primaries, rodada de 2026-11-12"
+    provenance:
+      source: ".claude/workflows/onion-research.js@530b04f7c, modo primaries, rodada de 2026-11-12"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e SUPERAÇÕES"
+      method: "judges: contabilidade da rodada"
+      locality: "repo"
+  - id: C_SUPERACAO_20261112_A2A_TEN_REPOS_SPEC_SDK_ITK_APACHE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação restrita aos 10 repos visíveis da org a2aproject entrega o valor do claim: separação spec, SDK e ITK em repos próprios, com licença Apache-2.0."
+    narrative: "Medida: WebFetch de github.com/a2aproject em 2026-11-12: 10 repos listados, cada um com rótulo Apache-2.0, incluindo A2A, a2a-python, a2a-js e a2a-itk. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [a2a-governance] Spec e SDKs em repos separados, cada SDK em repo próprio, todos Apache-2.0, com kit de teste de integração à parte. Afirmação de um juiz, nasce open."
+    trace: "WebFetch https://github.com/a2aproject e contar os repos listados: 'Showing 10 of 24'; o claim 'todos Apache-2.0' cobre 14 repos não vistos; descrição real de a2a-python = 'Official Python SDK for the Agent2Agent (A2A) Protocol'"
+  - id: C_SUPERACAO_20261112_A2A_README_INSTALL_COMMANDS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A lista de comandos de instalação do README do A2A entrega o valor de 'o consumidor recebe o SDK por gerenciador de pacotes'."
+    narrative: "Medida: WebFetch do README de github.com/a2aproject/A2A em 2026-11-12: seis SDKs com comando de instalação (pip, npm, Maven, dotnet, cargo, go get). Critério: A1_QUOTE_AUSENTE. Alvo reprovado: [a2a-governance] O consumidor recebe o SDK como pacote publicado por versão em registro de cada linguagem, com a spec linkada em separado. Afirmação de um juiz, nasce open."
+    trace: "WebFetch https://github.com/a2aproject/A2A e grep -F 'Use the SDKs: (links: a2a-sdk no pip' : 0 ocorrências (a quote é paráfrase do leitor)"
+  - id: C_SUPERACAO_20261112_A2A_GOVERNANCE_FILES_EXIST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação restrita à existência de GOVERNANCE.md, MAINTAINERS.md e CHANGELOG.md na raiz do repo da spec A2A."
+    narrative: "Medida: WebFetch da raiz de github.com/a2aproject/A2A em 2026-11-12: os três arquivos aparecem na lista; o conteúdo não foi aberto. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [a2a-governance] O repo da spec tem GOVERNANCE.md, MAINTAINERS.md e CHANGELOG.md próprios, separando governança da especificação das implementações. Afirmação de um juiz, nasce open."
+    trace: "WebFetch https://github.com/a2aproject/A2A (lista de arquivos da raiz): GOVERNANCE.md, MAINTAINERS.md e CHANGELOG.md presentes; nada na página sustenta 'separando governança da especificação das implementações'; abrir GOVERNANCE.md para conferir"
+  - id: C_SUPERACAO_20261112_MCP_SEP_SCOPE_AND_SPONSORS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação corrigida do fluxo de SEP do MCP: bug fixes e clarificações vão por PR comum e os Core Maintainers também podem patrocinar, pelas seções 'When you need a SEP' e 'Sponsors'."
+    narrative: "Medida: WebFetch de modelcontextprotocol.io/community/sep-guidelines em 2026-11-12; os trechos sobre PR comum para bug fixes e clarificações e sobre patrocínio dos Core Maintainers constam literalmente na página. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [mcp-governance] Mudanças na especificação só entram por SEP, com Working Group patrocinador; Core Maintainers decidem em reunião quinzenal por critérios explícitos. Afirmação de um juiz, nasce open."
+    trace: "WebFetch https://modelcontextprotocol.io/community/sep-guidelines e buscar 'ordinary pull request' (bug fixes e clarificações fora do SEP) e 'The Core Maintainers can also sponsor one' (patrocínio não exclusivo de WG)"
+  - id: C_SUPERACAO_20261112_MCP_CONFORMANCE_STANDARDS_TRACK_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação corrigida da exigência de conformidade do MCP, condicionada a SEP Standards Track com comportamento observável, pelo passo 8 e pela seção Conformance Test Requirement."
+    narrative: "Medida: WebFetch de modelcontextprotocol.io/community/sep-guidelines em 2026-11-12; a frase de isenção 'Process SEPs, Informational SEPs, and Standards Track SEPs with no observable protocol behavior ... are exempt' consta na página. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [mcp-governance] A spec exige implementação de referência e teste de conformidade para chegar a Final, mas não exige que os SDKs implementem; a conformidade vive em repositório próprio. Afirmação de um juiz, nasce open."
+    trace: "WebFetch https://modelcontextprotocol.io/community/sep-guidelines e buscar 'are exempt' na seção Conformance Test Requirement (a exigência de conformidade não é incondicional)"
+  - id: C_SUPERACAO_20261112_CE_NEW_SDKS_SPEC_ONLY_POINTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A seção 'New SDKs' do SDK-GOVERNANCE.md da CloudEvents entrega o que o claim prometia: a spec só recebe a documentação que aponta para o repo novo do SDK."
+    narrative: "Medida: curl -sL raw.githubusercontent.com/cloudevents/spec/main/docs/SDK-GOVERNANCE.md | sed -n 28,34p: trecho 'a PR should be opened in the spec repository with the documentation changes necessary to point to the new repo' lido literalmente. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [cloudevents-sdk] Cada SDK vive em repo próprio e a spec só aponta para ele a partir do README: não contém nem vendoriza o código dos SDKs. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://raw.githubusercontent.com/cloudevents/spec/main/docs/SDK-GOVERNANCE.md | sed -n 14,32p # 'só a partir do README' e 'não vendoriza' não aparecem; a seção New SDKs cita README.md e SDK.md"
+  - id: C_SUPERACAO_20261112_CE_SDK_SUPPORTS_N_AND_N_MINUS_1
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "cloudevents/SDK.md l.38 e o item 4 da lista healthy entregam a relação SDK-spec como faixa de suporte (versões maiores N e N-1), sem afirmar numeração independente."
+    narrative: "Medida: curl -sL .../cloudevents/SDK.md | grep -n -i 'version\\|N-1': l.38-46 lidas ('Each SDK supports the latest(N), and N-1, major releases of the ...'). Critério: A2_CLAIM_ESTICA. Alvo reprovado: [cloudevents-sdk] A relação SDK-spec é critério de saúde, não acoplamento de versão: o SDK suporta as últimas N-1 versões maiores e o número do SDK corre à parte. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://raw.githubusercontent.com/cloudevents/spec/main/docs/SDK-GOVERNANCE.md | grep -n -i 'version' # nenhuma linha trata da numeração do SDK; só l.105,106,108,138"
+  - id: C_SUPERACAO_20261112_CE_WIRE_VALUE_STABLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O parágrafo de GOVERNANCE.md l.163-169 da CloudEvents entrega a estabilidade do valor 'on the wire' prometida pelo claim, sem afirmar interoperabilidade entre SDKs."
+    narrative: "Medida: curl -sL .../docs/GOVERNANCE.md | sed -n 150,172p: texto lido ('this allows for the value \"on the wire\" to remain unchanged'); grep -n -i 'interop' no trecho de versionamento: sem ocorrência. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [cloudevents-sdk] A spec usa semver mantendo o valor on the wire estável, de modo que SDKs de versões diferentes interoperam. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://raw.githubusercontent.com/cloudevents/spec/main/docs/GOVERNANCE.md | sed -n 150,172p | grep -i -c 'interop' # 0: a palavra do claim que o trecho não sustenta"
+  - id: C_SUPERACAO_20261112_NATS_NONOPEN_LICENSE_PART_OF_TAKEBACK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação sustentada pelo blog da CNCF: a licença não aberta (BUSL) é componente de uma tentativa de retomar o projeto NATS, não a ameaça central."
+    narrative: "Medida: grep -F no texto extraído do post: 'non-open source license that restricts user freedoms' e 'attempt to \"take back\" a mature, community-driven open source project' ambos presentes. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [nats-licensing] A mudança planejada de licença do servidor era para uma licença não aberta, e a CNCF a trata como a ameaça central. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/ | sed 's/<[^>]*>/ /g' | grep -o 'this is not a typical license change or fork.\\{0,160\\}' # o post define o conjunto como 'attempt to take back', sem chamar a licença de ameaça central"
+  - id: C_SUPERACAO_20261112_NATS_TRADEMARK_AS_LEVERAGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação sustentada pelo blog da CNCF: a Synadia não completou a cessão prometida da marca e usa essa promessa quebrada como alavanca, sem que o post a chame de causa raiz."
+    narrative: "Medida: grep -F no texto extraído: 'Synadia did not complete the promised transfer of the trademark registration' e 'weaponizing that broken promise' presentes; ausência de 'root cause' ou equivalente conferida na leitura do texto. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [nats-licensing] A causa raiz foi uma marca prometida e não transferida: a Synadia já tinha registros e não completou a cessão. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/ | sed 's/<[^>]*>/ /g' | grep -o 'weaponizing that broken promise.\\{0,200\\}' # a marca aparece como alavanca, não como causa raiz declarada"
+  - id: C_SUPERACAO_20261112_NATS_AGREEMENT_UPDATE_NOTE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A nota de atualização de 2025-05-01 do mesmo post entrega a parte 'terminou com acordo' (NATS segue na CNCF); 'sem fork' segue sem fonte primária conferida."
+    narrative: "Medida: Leitura do texto extraído do post: 'Updated May 1, 2025: CNCF and Synadia have come to an agreement...' presente no topo; o trecho 'sem fork' ficou sem fonte primária conferida. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [nats-licensing] A disputa terminou com acordo: a CNCF continua hospedando o NATS sob Apache-2.0, sem fork. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://www.cncf.io/blog/2025/05/01/protecting-nats-and-the-integrity-of-open-source-cncfs-commitment-to-the-community/ | sed 's/<[^>]*>/ /g' | grep -ic 'fork the NATS\\|no fork\\|will not fork' # 0 na página: 'sem fork' não é sustentado por este documento"
+  - id: C_SUPERACAO_20261112_TEMPORAL_SCIM_BUSINESS_ADDON
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação corrigida pela página de preços em Markdown da Temporal: SCIM é add-on no plano Business (+$500/mo), incluso no Enterprise, e SSO via SAML está disponível desde o PAYG."
+    narrative: "Medida: curl de temporal.io/pricing.md e leitura das seções de plano (linhas 25-62 e 75-84): SCIM aparece só nas seções Business (add-on, +$500/mo) e Enterprise (incluso). Confirmado também no HTML: 'SCIM (add-on)' na grade e 'SCIM' na lista do Enterprise, 'SSO via SAML' na lista do PAYG. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [temporal-open-core] Identidade e segurança (SAML, SCIM, audit logging, roles) na grade da nuvem paga; SCIM add-on no Pay-As-You-Go e incluso no Enterprise. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://temporal.io/pricing.md | grep -n -i -E 'SCIM|SAML' (mostra 'SCIM available as add-on (+$500/mo)' sob Business e 'SCIM included (no add-on fee)' sob Enterprise; nenhuma linha de SCIM sob o plano Temporal Cloud/PAYG)"
+  - id: C_SUPERACAO_20261112_GO_VENDOR_BUILD_OFFLINE_SCOPED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O 5º parágrafo da seção Vendoring do Go entrega o build offline a partir de vendor/, com o escopo correto: só comandos de build; go mod download, tidy e get seguem usando rede e cache."
+    narrative: "Medida: Busca literal no HTML reaberto: 'instead of accessing the network or the local module cache' encontrada no parágrafo 5 da seção Vendoring. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [go-vendoring] Com vendoring ativo o manifesto é a fonte de versão e o build não toca rede nem cache: a cópia no consumidor é autossuficiente. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://go.dev/ref/mod | sed 's/<[^>]*>//g' | tr -s ' \\n' ' ' | grep -o 'When vendoring is enabled, this manifest is used as a source of module version information[^.]*\\.' ; confirmar que não há 'network' nessa frase e que 'instead of accessing the network or the local module cache' está só no 5º parágrafo, junto com 'go mod download and go mod tidy do not work differently'"
+  - id: C_SUPERACAO_20261112_GO_VENDOR_MAIN_MODULE_GO114
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Os 4º e 6º parágrafos da seção Vendoring do Go: uso automático do vendor só com go 1.14 ou superior no go.mod; vendor só no módulo principal e fora do zip."
+    narrative: "Medida: Busca literal no HTML reaberto: 'the go command ignores vendor directories in locations other than the main module’s root directory.' encontrada; trecho do 4º parágrafo lido na resposta do WebFetch e no mesmo HTML. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [go-vendoring] O vendor é instantâneo da fonte no consumidor, usado automaticamente quando presente e só no módulo principal, o que delimita o que o consumidor recebe. Afirmação de um juiz, nasce open."
+    trace: "curl -sL https://go.dev/ref/mod | sed 's/<[^>]*>//g' | tr -s ' \\n' ' ' | grep -o 'it will be used automatically if the go version[^.]*\\.' ; confirmar a condição 'go 1.14 or higher', ausente da quote citada e do claim"
+  - id: C_SUPERACAO_20261112_KGSSOT_STAMP_AND_GO_MANIFEST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Para o registro verificável no consumidor que o Kubernetes-sha não entrega: o carimbo de vendorização do kg-ssot no core (vendor/kg-ssot/.kg-ssot-version) e o precedente Go (vendor/modules.txt conferido contra go.mod)."
+    narrative: "Medida: Lido no repo: vendor/kg-ssot/.kg-ssot-version traz product, tag, commit, version, vendored_at e sha256 por arquivo (783 linhas). As claims 23 e 24 estão ancoradas em go.dev/ref/mod, Vendoring, 3º parágrafo. Critério: E2_PROVA_MENOS. Alvo reprovado: Claim 4 [k8s-staging]: o carimbo Kubernetes-sha é 'análogo à vendorização carimbada'. Afirmação de um juiz, nasce open."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Kubernetes-sha' | grep -vc '^#' # = 0 nós; e head -12 vendor/kg-ssot/.kg-ssot-version (sha256 por arquivo, ausente no Kubernetes-sha)"
+  - id: C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_G4_HOW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O arquivo de rastreio sep-NNNN.yaml do MCP (cada MUST/SHOULD mapeado a um check de conformidade) entrega a parte de G4 que a governança por indivíduos não cobre."
+    narrative: "Medida: A claim 10 está ancorada com citação literal em SEP Guidelines, Conformance Test Requirement, conferida por um segundo agente. Critério: E2_PROVA_MENOS. Alvo reprovado: Claim 8 [mcp-governance]: a governança do MCP é de indivíduos, não de empresas. Afirmação de um juiz, nasce open."
+    trace: "releitura da quote da claim 8: 'Membership in the technical governance process is for individuals, not companies' (não menciona conformidade nem a relação spec→SDK)"
+  - id: C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_SPEC_TO_IMPL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A conformidade com rastreio por MUST do MCP (claim 10) cobre a relação especificação → implementação que a hierarquia SEP × spec não cobre."
+    narrative: "Medida: Ancorada na mesma fonte (SEP Guidelines, Conformance Test Requirement), com citação literal conferida. Critério: E2_PROVA_MENOS. Alvo reprovado: Claim 11 [mcp-governance]: um SEP Final é registro congelado; onde divergir, a spec governa. Afirmação de um juiz, nasce open."
+    trace: "releitura da quote da claim 11: 'Where the specification has since diverged, the specification governs: report problems as issues against it, not as edits to the SEP' (objeto é o SEP, não o SDK)"
+edges:
+  - from: C_OPCAO_A_OWN_REPO_STAMPED_VENDOR
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_C_PUBLISHED_PACKAGE
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: Q_GATE_A2A_OPEN_OR_PAID_LAYER
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST
+    to: C_OPCAO_A_OWN_REPO_STAMPED_VENDOR
+    edge_type: SUPPORTS
+  - from: E_K8S_STAGING_AUTHORITATIVE
+    to: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    edge_type: SUPPORTS
+  - from: E_K8S_PRS_NOT_ACCEPTED_ON_PUBLISHED
+    to: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    edge_type: SUPPORTS
+  - from: E_K8S_BOT_PUBLISHES_STAGING
+    to: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    edge_type: SUPPORTS
+  - from: E_K8S_SYNC_SHA_STAMP_IN_COMMITS
+    to: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    edge_type: SUPPORTS
+  - from: E_K8S_BOT_NO_TESTS_AND_ISSUE_RISK
+    to: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    edge_type: CONSTRAINS
+  - from: E_A2A_SPEC_APACHE_UNDER_LF
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_LF_GOVERNANCE_KEEPS_A2A_NEUTRAL
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: CONSTRAINS
+  - from: E_MCP_GOVERNANCE_INDIVIDUALS
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: SUPPORTS
+  - from: E_MCP_LICENSE_APACHE_CC_BY
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_MCP_SEP_CONFORMANCE_TRACEABILITY
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: SUPPORTS
+  - from: E_MCP_FINAL_SEP_FROZEN_SPEC_GOVERNS
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: SUPPORTS
+  - from: E_CE_SPEC_GROUPED_RELEASES
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: SUPPORTS
+  - from: E_CE_SDK_FEATURE_SUPPORT_TABLE
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: SUPPORTS
+  - from: E_NATS_SYNADIA_DEMANDED_DOMAIN_REPO
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: CONSTRAINS
+  - from: E_CNCF_FOUNDATIONS_PROTECT_LICENSE
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: CONSTRAINS
+  - from: E_NATS_SERVER_APACHE_LICENSE
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_OPEN_NEVER_TO_PAID
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_PAID_BY_LIKELY_BUYER
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_NO_FIXED_DELAY
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_NO_ARTIFICIAL_LIMITS
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_CE_MIT_NO_SSPL
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_EXISTING_FOSS_STAYS
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: SUPPORTS
+  - from: E_GO_VENDOR_MODULES_TXT_MANIFEST
+    to: C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST
+    edge_type: SUPPORTS
+  - from: E_GO_VENDOR_MODULES_TXT_MANIFEST
+    to: C_OPCAO_A_OWN_REPO_STAMPED_VENDOR
+    edge_type: SUPPORTS
+  - from: E_GO_VENDOR_CONSISTENCY_CHECK
+    to: C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST
+    edge_type: SUPPORTS
+  - from: E_GO_VENDOR_CONSISTENCY_CHECK
+    to: C_OPCAO_A_OWN_REPO_STAMPED_VENDOR
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_K8S_SHA_STAMP_NOT_CONSUMER_MANIFEST
+    to: E_K8S_SYNC_SHA_STAMP_IN_COMMITS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_K8S_BOT_COST_OTHER_SCALE
+    to: E_K8S_BOT_NO_TESTS_AND_ISSUE_RISK
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A2A_SPEC_SDK_SPLIT_UNANCHORED
+    to: E_A2A_SPEC_APACHE_UNDER_LF
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_FOUNDATION_NO_NEUTRALITY
+    to: E_LF_GOVERNANCE_KEEPS_A2A_NEUTRAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MCP_WHO_DECIDES_NOT_HOW
+    to: E_MCP_GOVERNANCE_INDIVIDUALS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MCP_SEP_VS_SPEC_NOT_IMPL
+    to: E_MCP_FINAL_SEP_FROZEN_SPEC_GOVERNS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CE_SPEC_VERSIONING_NOT_SDK
+    to: E_CE_SPEC_GROUPED_RELEASES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NATS_PARTIAL_SOURCE
+    to: E_NATS_SYNADIA_DEMANDED_DOMAIN_REPO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_FOUNDATION_DOCTRINE_UNMEASURED
+    to: E_CNCF_FOUNDATIONS_PROTECT_LICENSE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GATE_A2A_LAYER_UNDECIDED
+    to: E_GITLAB_NO_ARTIFICIAL_LIMITS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPTION_C_UNMEASURED
+    to: C_OPCAO_C_PUBLISHED_PACKAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TEMPORAL_OPEN_CORE_UNANCHORED
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_A2A_SPEC_SDK_SPLIT_UNANCHORED
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_FOUNDATION_NO_NEUTRALITY
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CE_SPEC_VERSIONING_NOT_SDK
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GATE_A2A_LAYER_UNDECIDED
+    to: C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_K8S_BOT_COST_OTHER_SCALE
+    to: C_OPCAO_B_MONOREPO_STAGING_PROJECTION
+    edge_type: CONSTRAINS
+  - from: Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR
+    to: E_OBJECAO_OPTION_C_UNMEASURED
+    edge_type: TRACES_TO
+  - from: Q_GATE_A2A_OPEN_OR_PAID_LAYER
+    to: E_OBJECAO_GATE_A2A_LAYER_UNDECIDED
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_A2A_TEN_REPOS_SPEC_SDK_ITK_APACHE
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_A2A_README_INSTALL_COMMANDS
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_A2A_GOVERNANCE_FILES_EXIST
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_MCP_SEP_SCOPE_AND_SPONSORS
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_MCP_CONFORMANCE_STANDARDS_TRACK_ONLY
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_CE_NEW_SDKS_SPEC_ONLY_POINTS
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_CE_SDK_SUPPORTS_N_AND_N_MINUS_1
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_CE_WIRE_VALUE_STABLE
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_NATS_NONOPEN_LICENSE_PART_OF_TAKEBACK
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_NATS_TRADEMARK_AS_LEVERAGE
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_NATS_AGREEMENT_UPDATE_NOTE
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_TEMPORAL_SCIM_BUSINESS_ADDON
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_GO_VENDOR_BUILD_OFFLINE_SCOPED
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_GO_VENDOR_MAIN_MODULE_GO114
+    to: E_LACUNAS_BACKBONE_PIECE_SHAPE_1112
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_KGSSOT_STAMP_AND_GO_MANIFEST
+    to: E_OBJECAO_K8S_SHA_STAMP_NOT_CONSUMER_MANIFEST
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_G4_HOW
+    to: E_OBJECAO_MCP_WHO_DECIDES_NOT_HOW
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_SPEC_TO_IMPL
+    to: E_OBJECAO_MCP_SEP_VS_SPEC_NOT_IMPL
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261112_KGSSOT_STAMP_AND_GO_MANIFEST
+    to: C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_SPEC_TO_IMPL
+    to: C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE
+    edge_type: SUPPORTS
+  - from: T_BACKBONE_GAP_G1
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: T_BACKBONE_GAP_G2
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: T_BACKBONE_GAP_G3
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
+  - from: T_BACKBONE_GAP_G4
+    to: Q_BACKBONE_PIECE_SHAPE_2026_11
+    edge_type: TRACES_TO
