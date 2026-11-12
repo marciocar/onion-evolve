@@ -17,6 +17,7 @@ Comandos que **constroem, auditam, integram e co-evoluem o próprio Sistema Onio
 ### Inventário, auditoria e validação
 | Comando | Finalidade |
 |---------|-----------|
+| [`/meta:baton`](baton.md) | O pulso da batuta: classes das sessões vivas (ociosa com fila, parada por ordem…), fila de dono declarado e a pergunta de 3 linhas a cada sessão. Nível 0; armável no `/loop`. |
 | [`/meta:inventory`](inventory.md) | Regenera o inventário canônico (comandos/agentes/skills/KBs) do filesystem — SSOT que o lint protege. |
 | [`/meta:evolve`](evolve.md) | Auto-auditoria do core via orquestração (fan-out-and-synthesize) → backlog priorizado de modernização. Read-only. |
 | [`/meta:kb-freshness`](kb-freshness.md) | Audita o frescor de cada KB contra o fluxo atual do Onion (via `onion-orchestration`); veredito CURRENT/STALE/HISTORICAL. |

@@ -70,6 +70,7 @@
 .claude/commands/meta/adopt.md	TX_promote_hub	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	TX_update	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/commands/meta/analyze-complex-problem.md	E_N1_BURACO_MEDIDO	docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml
+.claude/commands/meta/baton.md	C_BATON_PHASE1_PULSE_BUILT_1112	docs/evolution/research/forge-baton-2026-11/forge-baton-2026-11.kg.yaml
 .claude/commands/meta/cc-update.md	D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA	docs/evolution/research/forge-cc-update-2026-10/forge-cc-update-2026-10.kg.yaml
 .claude/commands/meta/census.md	E_F9_WORKER_CORTADO_CONTINUA	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/commands/meta/co-announce.md	A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO	docs/onion/graph/fios-abertos.kg.yaml
@@ -2087,6 +2088,7 @@ docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_TOOL_POISONING_ST
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_VPS_SUFFICES	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml	E_MEDICAO_PROCESSO_ATUAL_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml	E_OBJECAO_POSTMERGE_WRITER_NO_EXTERNAL_SOURCE	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+docs/evolution/research/forge-baton-2026-11/SYNTHESIS.md	Q_BATON_IDLE_SESSIONS_1112	docs/evolution/research/forge-baton-2026-11/forge-baton-2026-11.kg.yaml
 docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml	E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml	C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md	D_INFRA_VPS_TREATMENT	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml

@@ -57305,6 +57305,91 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
 }
 _family run_batuta_census_selftests
 
+# ---------------------------------------------------------------------------
+# baton-pulse — o medidor do /meta:baton (o pulso da batuta, 2026-11-12; .claude/validation/baton-pulse.sh) classifica
+# cada sessão (ACTIVE, IDLE_WITH_QUEUE, IDLE_NO_QUEUE, PARKED, UNREACHABLE) com fila só de dono declarado, cala a
+# batida sem mudança e declara a lacuna da fonte ausente. Família PRÓPRIA, não extensão da batuta_census: o SUT é
+# outro script (o decide-census entra aqui só como TSV pronto). Cada caso reprova contra o mutante dele.
+run_baton_pulse_selftests() {
+  echo ""
+  echo "▸ baton-pulse — classes das sessões, fila de dono declarado, batida silenciosa e lacuna no baton-pulse.sh"
+  local sut="${REPO_ROOT}/.claude/validation/baton-pulse.sh" bea="${REPO_ROOT}/.claude/validation/session-beacon.sh"
+  [ -f "${sut}" ] && [ -f "${bea}" ] || { record_fail "baton-pulse: SUT ausente" "${sut} ou ${bea}"; return; }
+  command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
+    || { record_skip "baton-pulse: python3/PyYAML ausentes (SUT não exercido)"; return; }
+  local sb r T NOW=1791800000 G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
+  T="$(printf '\t')"; sb="$(TMPDIR=/tmp mktemp -d)"; "${G[@]}" -C "${sb}" init -q r; r="$(cd "${sb}/r" && pwd -P)"
+  mkdir -p "${r}/docs" "${r}/.claude/beacons" "${sb}/alpha" "${sb}/beta" "${sb}/gamma" "${sb}/busy" "${sb}/dead" "${sb}/asks" "${sb}/state" "${sb}/proj/p"
+  chmod 700 "${sb}/asks"
+  # D_A é de alpha, D_G de gamma (parada), D_N de um dono sem sessão; D_B só CITA beta na prosa, sem owner (nunca é fila)
+  printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: D_A\n    node_type: decision\n    status: open\n    owner: alpha\n    label: "a"\n  - id: D_G\n    node_type: decision\n    status: open\n    owner: gamma\n    label: "g"\n  - id: D_N\n    node_type: decision\n    status: open\n    owner: nobody\n    label: "n"\n  - id: D_B\n    node_type: decision\n    status: open\n    label: "beta deve fazer isto"\n  - id: D_D\n    node_type: decision\n    status: done\n    owner: beta\n    label: "feito"\n' > "${r}/docs/g.kg.yaml"
+  "${G[@]}" -C "${r}" add -A; "${G[@]}" -C "${r}" commit -q -m c1
+  local s
+  for s in alpha beta gamma busy dead; do : > "${sb}/proj/p/sid-${s}.jsonl"; touch -d "@$((NOW - 3600))" "${sb}/proj/p/sid-${s}.jsonl"; done
+  python3 - "${sb}" "$$" > "${sb}/peers.json" <<'BP_PY'
+import json, sys
+sb, pid = sys.argv[1], int(sys.argv[2])
+P = [('alpha', pid, 'idle'), ('beta', pid, 'idle'), ('gamma', pid, 'idle'), ('busy', pid, 'busy'), ('dead', 999999999, 'idle')]
+print(json.dumps([{'pid': p, 'cwd': f'{sb}/{n}', 'kind': 'interactive', 'sessionId': f'sid-{n}', 'name': n, 'status': st} for n, p, st in P]))
+BP_PY
+  printf 'kind\tref\torigin\tlabel\tstate\tvia\toptions\tincoming\tactor\taction\thint\task\nmerge\tPR#7\tfeat/x\tum PR\tchecks 1 ok · 2 falha · 0 em curso · sem movimento há 30min\tgh\t\t\tfaço-eu\t\t\t\n' > "${sb}/dc.tsv"
+  printf 'gamma\tordem do maestro: parada até a revisão\t-\n' > "${sb}/state/parked.tsv"
+  _bpr() {  # $1 = medidor sob teste, resto = args
+    local w="$1"; shift
+    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${sb}/state" BATON_PROJECTS_DIR="${sb}/proj" \
+      BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
+  }
+  _bpcase() {  # <nome> <OLD> <NEW> <função> [sem-farol]
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1 k="${sb}/k$(date +%N)/.claude/validation"
+    mkdir -p "${k}"; [ -n "${5:-}" ] || cp "${bea}" "${k}/session-beacon.sh"
+    cp "${sut}" "${k}/c.sh"; "${fn}" "${k}/c.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "baton-pulse: ${name}"; else record_fail "baton-pulse: ${name}" "${BP_WHY:-caso não satisfeito}"; fi
+    cp "${k}/c.sh" "${k}/m.sh"
+    OLD="${old}" NEW="${new}" python3 -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${k}/m.sh"
+    "${fn}" "${k}/m.sh" && rc_m=0
+    _prove_mutation "baton-pulse: ${name} (MUT)" "${k}/c.sh" "${k}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # (a) ociosa há 60 min com nó open de owner: alpha ⇒ IDLE_WITH_QUEUE; busy ⇒ ACTIVE; pid morto ⇒ UNREACHABLE
+  _bp_a() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^session' <<< "${a}" | cut -f2-6 | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-alpha${T}IDLE_WITH_QUEUE${T}alpha${T}60${T}1${T}" <<< "${a}" && grep -q "^session${T}sid-busy${T}ACTIVE${T}" <<< "${a}" \
+      && grep -q "^session${T}sid-dead${T}UNREACHABLE${T}" <<< "${a}"; }
+  _bpcase "(a) sessão ociosa com fila de dono declarado sai IDLE_WITH_QUEUE" \
+    "cls = 'IDLE_WITH_QUEUE' if q else 'IDLE_NO_QUEUE'" "cls = 'IDLE_NO_QUEUE'" _bp_a
+  # (b) parada por ordem NUNCA vira ociosa, nem com fila (D_G é dela)
+  _bp_b() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep 'sid-gamma' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^session${T}sid-gamma${T}PARKED${T}.*ordem do maestro: parada até a revisão (até nova ordem)" <<< "${a}" && ! grep -q "^session${T}sid-gamma${T}IDLE" <<< "${a}"; }
+  _bpcase "(b) parada por ordem sai PARKED, nunca IDLE" \
+    "    if pk: cls, note = 'PARKED', why" "    if False: cls, note = 'PARKED', why" _bp_b
+  # (c) batida sem mudança (sha igual) sai em UMA linha no --quiet; com sha diferente, fala
+  _bp_c() { local sha q d; sha="$(_bpr "$1" --tsv | awk -F'\t' '$1=="sha"{print $2}')"
+    q="$(_bpr "$1" --quiet --last-sha "${sha:-0}")"; d="$(_bpr "$1" --quiet --last-sha 0000000000000000)"
+    BP_WHY="sha=${sha} · quiet=$(printf '%s' "${q}" | wc -l)+1 linha(s): $(head -c 200 <<< "${q}")"
+    [ -n "${sha}" ] && [ "$(printf '%s\n' "${q}" | wc -l)" = 1 ] && grep -q '· sem mudança' <<< "${q}" && [ "$(printf '%s\n' "${d}" | wc -l)" -gt 1 ]; }
+  _bpcase "(c) batida sem mudança sai em uma linha no --quiet; com mudança, fala" \
+    "if quiet and not changed:" "if False:" _bp_c
+  # (d) a fila vem SÓ de dono declarado: beta (citada na prosa de D_B, dona de D_D já done) fica sem fila; D_N sai sem sessão
+  _bp_d() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-beta|orphan_queue)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-beta${T}IDLE_NO_QUEUE${T}beta${T}60${T}0${T}" <<< "${a}" && grep -q "^orphan_queue${T}nobody${T}.*${T}1${T}grafo${T}D_N\$" <<< "${a}"; }
+  _bpcase "(d) a fila vem só de owner: declarado (prosa e nó done não contam)" \
+    "for (g, nid, imp) in owned.get(l, []):" "for (g, nid, imp) in [x for v in owned.values() for x in v]:" _bp_d
+  # (e) PR com CI vermelho aparece como CI_RED (e no --quiet que fala)
+  _bp_e() { local a q; a="$(_bpr "$1" --tsv)"; q="$(_bpr "$1" --quiet --last-sha 0000000000000000)"; BP_WHY="$(grep '^pr' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^pr${T}PR#7${T}CI_RED${T}feat/x${T}30${T}" <<< "${a}" && grep -q 'PR#7 com CI vermelho' <<< "${q}"; }
+  _bpcase "(e) PR com CI vermelho aparece" \
+    "('RED' if int(m.group(2)) > 0 else" "('green' if int(m.group(2)) > 0 else" _bp_e
+  # (f) sem farol e sem lista de peers: declara a lacuna, nunca «0 sessões»
+  _bp_f() { local a; a="$(_bpr "$1" --no-peers)"; BP_WHY="$(grep -E '^(classes|🕳️)' <<< "${a}" | tr '\n' '|')"
+    grep -q '^classes: sessões NÃO MEDIDAS' <<< "${a}" && grep -q 'lacuna: farol NÃO MEDIDO' <<< "${a}" && ! grep -q 'ACTIVE 0' <<< "${a}"; }
+  _bpcase "(f) medidor sem fonte (farol ausente, sem peers) declara a lacuna em vez de zero" \
+    "if sessions_measured else" "if True else" _bp_f sem-farol
+  rm -rf "${sb}"
+}
+_family run_baton_pulse_selftests
+
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------

@@ -535,6 +535,17 @@ docs/business-context/
 /meta:orchestrate contar agentes por categoria em .claude/agents/ e retornar resumo consolidado
 ```
 
+### `/meta:baton`
+**Propósito**: O pulso da batuta (baton): mede as sessões vivas do repo e da família e dá a cada uma uma classe (`ACTIVE`, `IDLE_WITH_QUEUE`, `IDLE_NO_QUEUE`, `PARKED`, `UNREACHABLE`), com a fila pronta de dono declarado (`owner:` nos grafos, pergunta reservada, PR da branch); pergunta a cada sessão viva o estado em 3 linhas e reporta num formato fixo  
+**Natureza**: Nível 0 (só mede e lê). Não despacha, não acorda sessão parada por ordem (`~/.local/state/onion/baton/parked.tsv`). Core-only nesta fase (conjunto `pending`)  
+**Medidor**: `.claude/validation/baton-pulse.sh` (bancada `run_baton_pulse_selftests`); doutrina: cláusula 7 de `batuta-doctrine.md`
+
+```bash
+# Exemplo de uso
+/meta:baton                       # pulso completo + pergunta às sessões vivas
+/loop /meta:baton --quiet         # modo dinâmico: evento primeiro, reserva de 20-30 min, fala só quando muda
+```
+
 > Outros meta-comandos disponíveis: `/meta:create-command`, `/meta:create-skill`, `/meta:create-knowledge-base`, `/meta:create-abstraction`, `/meta:kb-freshness`, `/meta:metaspec-validate`, `/meta:setup-integration`, `/meta:setup-code-review`.
 
 ---

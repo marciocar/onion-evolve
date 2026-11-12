@@ -1,5 +1,5 @@
 ---
-description: "Doutrina da batuta: a orquestração de sessões e agentes numa máquina compartilhada vira mecanismo (carga, parado, dona da pergunta). Fragmento canônico; as superfícies referenciam."
+description: "Doutrina da batuta: a orquestração de sessões e agentes numa máquina compartilhada vira mecanismo (carga, parado, dona da pergunta, o pulso). Fragmento canônico; as superfícies referenciam."
 ---
 
 # 🎼 Doutrina da batuta — quem rege as sessões é o mecanismo, não a memória de quem rege
@@ -57,8 +57,29 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    alheio, gasto e o que muda o objetivo seguem indo ao maestro, e um caminho alternativo que passa por fora da guarda
    é o defeito, não a persistência.
 
+7. **O pulso da batuta (baton) mede quem está parado com trabalho pronto, e fala só quando muda.** Pedido do maestro
+   em 2026-11-12: as sessões ficavam ociosas esperando algo, com trabalho necessário em outra fila. O
+   [`/meta:baton`](../meta/baton.md) roda o medidor `.claude/validation/baton-pulse.sh`, que lista as sessões vivas do
+   repo e da família (a lista de peers do harness e os faróis) e dá a cada uma uma classe de máquina: `ACTIVE`,
+   `IDLE_WITH_QUEUE`, `IDLE_NO_QUEUE`, `PARKED` ou `UNREACHABLE`. Ociosa é idade (20 min sem prova de atividade no
+   transcript ou no farol), como na cláusula 2. **A fila vem só de dono declarado:** nó `open` com `owner:`, pergunta
+   reservada pela sessão, PR da branch dela. O que não tem dono declarado sai como «fila sem sessão casada», nunca
+   atribuído por palpite. **Quem responde é a sessão:** o medidor mede, e a sessão que segura a batuta pergunta a cada
+   sessão viva o estado em 3 linhas, como na memória da casa («como estão as sessões» se pergunta, não se lembra).
+   **Quando fala:** o gatilho principal é evento (fim de tarefa, campainha, PR mergeado ou vermelho, resposta de
+   sessão), com batimento de reserva de 20 a 30 min no `/loop`; a batida sem mudança sai em uma linha e se recolhe, para
+   não virar fadiga de alerta. **É nível 0** da escada selada (`D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111`): só mede e
+   lê. **Parada por ordem não se acorda:** `PARKED` vence qualquer outra classe e não recebe mensagem. **Puxar, não
+   empurrar:** a sessão ociosa com fila recebe, no máximo, a oferta do que já é dela (a fase 2, desenhada e não
+   construída); quem pega é ela ou o maestro.
+
 ## O que ela NÃO promete (fronteira declarada)
 
+- **O pulso não vê o que o harness e o git não veem.** Sem a lista de peers, a classe sai só pela idade do farol, e uma
+  sessão que espera um processo longo em primeiro plano sai ociosa. O rótulo que casa `owner:` com sessão é derivado do
+  nome e da pasta ou declarado em `owners.tsv`; o que não casa fica sem sessão, dito. Nada disso vale para outra máquina.
+- **O pulso não grava nem oferta.** A medição de horas ociosas com fila (o TSV de pulsos) e a oferta à sessão são a
+  fase 2; viajar às portas é a fase 3.
 - **Não despacha.** O censo lista e diz quem age; mandar trabalho de uma sessão a outra é o degrau 3
   (`D_SO_MECANISMO_EM_DEGRAUS`), e o rascunho da próxima fila é o degrau 2, com gatilho próprio
   (`Q_SO_GATILHO_DE_CONSTRUCAO`).
@@ -84,5 +105,6 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 
 - Medidor (peça 3): `.claude/validation/decide-census.sh`, com as linhas `ask` e `signal` e o estado PARADO
 - Registro de pergunta: `.claude/utils/orchestration/maestro-ask.sh`
-- Bancada (peça 7): `run_load_lease_selftests` (porta de admissão), `run_maestro_ask_selftests`, `run_batuta_census_selftests`
+- Bancada (peça 7): `run_load_lease_selftests` (porta de admissão), `run_maestro_ask_selftests`, `run_batuta_census_selftests`, `run_baton_pulse_selftests` (o pulso)
+- Pulso (cláusula 7): comando [`/meta:baton`](../meta/baton.md) e medidor `.claude/validation/baton-pulse.sh`
 - Colheita de mercado (core-only): `docs/evolution/research/session-orchestration-2026-11/data/market-supervision-2026-11-10.md`
