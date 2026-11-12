@@ -2,8 +2,7 @@
 branch: feat/meta-batuta
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 664a181d03d82dbc506e86311f0aa68a75ad2ac747c00f912315abe0a52b233b
-reviewed_code_sha256: a450423011cea9b8dd5ea9fd055637e12f17a4b4814a86d6b51a23f989c9126b
+reviewed_diff_sha256: pendente
 findings_total: 10
 findings_real: 10
 findings_blocking: 3
@@ -91,3 +90,7 @@ Os oito casos da `run_baton_pulse_selftests` reprovam cada um contra o seu mutan
 ## Refutador independente, 2ª passada
 
 APROVADO COM LIMITES sobre o a4144cab7: os 3 bloqueios e os 3 limites curados resistiram, sem regressão (30 de 30, lint 0 HARD). Limites novos declarados: o «NÃO MEDIDO» de PRs e sinais casa o texto do aviso do decide-census.sh, e a batida que fala não nomeia qual sessão caiu (só o sha e as contagens).
+
+## Re-revisão (CI)
+
+O CI reprovou a role-cut (k): o baton está no conjunto pending do roles.yaml (viaja às portas só na fase 3) e é citado só no docstring do baton-pulse.sh, como o decide. Entrou na lista de exceções do caso, com o motivo; a família role_cut passou 49 de 49 local.
