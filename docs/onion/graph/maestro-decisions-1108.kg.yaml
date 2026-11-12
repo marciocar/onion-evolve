@@ -464,9 +464,9 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-11-12"
-    verified_against: "git merge-base --is-ancestor no core (merge do #1552 = 04fb54e37129) e leitura do permissions.deny no settings.json da curadoria, 2026-11-12"
+    verified_against: "gh pr view 1552 (mergeCommit = 04fb54e37129), git diff do settings.json nos commits do #1552 e leitura do permissions.deny no settings.json da curadoria, 2026-11-12"
     label: "O update com o deny do PR #1552 rodou sob o sandbox da curadoria: a escrita do settings.json foi negada e a sincronização passou por reset e restore via SSH."
-    narrative: "Duas metades. A da curadoria: o nó E_SANDBOX_SETTINGS_SSH_RESET_RESTORE_1112 no grafo sandbox-first-line-2026-11 dela (commit 0b6cefc, PR 281 de lá) registra que o update que altera settings.json reprova sob o sandbox e que a sincronização é reset e restore por SSH, medido em vários merges; ela declarou o vínculo com o #1552 como não verificado. A do core fecha esse vínculo: o pin 04fb54e37129, que a curadoria aplicou em 2026-11-09, é o próprio commit de merge do #1552, e o pin seguinte (9c660e74a353) o contém; o settings.json dela traz hoje as entradas do deny (push forçado, filter-branch, clean com -x, rm recursivo da raiz, leitura de .env e de credenciais)."
+    narrative: "Duas metades. A da curadoria: o nó E_SANDBOX_SETTINGS_SSH_RESET_RESTORE_1112 no grafo sandbox-first-line-2026-11 dela (commit 0b6cefc, PR 281 de lá) registra que o update que altera settings.json reprova sob o sandbox e que a sincronização é reset e restore por SSH, medido em vários merges; ela declarou o vínculo com o #1552 como não verificado. A do core fecha esse vínculo: o pin 04fb54e37129, que a curadoria aplicou em 2026-11-09, é a ponta do #1552 na main (merge por rebase, sete commits), e o pin seguinte (9c660e74a353) o contém; as entradas do deny nasceram nesses commits (diff do settings.json medido) e o settings.json dela as traz hoje (push forçado, filter-branch, clean com -x, rm recursivo da raiz, leitura de .env e de credenciais)."
     provenance:
       source: "sessão de curadoria (relato de 2026-11-12) e medição do core"
       locator: "sandbox-first-line-2026-11#E_SANDBOX_SETTINGS_SSH_RESET_RESTORE_1112; gh pr view 1552 --json mergeCommit"
