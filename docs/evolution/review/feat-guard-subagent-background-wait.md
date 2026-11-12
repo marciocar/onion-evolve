@@ -2,8 +2,7 @@
 branch: feat/guard-subagent-background-wait
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: dd2768a45f4faa07c7454a4ced9ec4ac4ea1e54a1d35d6e88b5061b4d017efb9
-reviewed_code_sha256: dcbbf59e78c09fe39eecd4fb95658e94ef37b210879293bc53154fdf9eef4e92
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
@@ -73,3 +72,7 @@ vetando → (viii).
   `/meta:cc-update`.
 - Não vê `nohup … &` seguido de espera, nem fundo por outra ferramenta (Agent, Monitor).
 - **O merge espera o maestro**, porque a guarda muda o `.claude/settings.json` de todas as sessões.
+
+## Re-revisão (2026-11-12, depois do merge do selo pelo maestro)
+
+O código mudou depois da passada para curar o CI vermelho. Com a guarda nova, o caso (c) da família `veto_onfailure` passou a ver 10 vetos sem `onFailure` no settings de antes da cura, e não mais 9. O caso agora espera 10, confere pelo nome que o `pretooluse-subagent-background-wait.sh` está entre eles e atualiza o comentário que explica de onde vem cada número. Revisado pela sessão principal: é a mesma forma das subidas anteriores (6º a 9º vetos). `veto_onfailure` deu 14/14, e o pré-voo das 3 famílias tocadas deu 29/29.
