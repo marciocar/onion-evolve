@@ -2,7 +2,8 @@
 branch: feat/baton-stalled-agent
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 633185d934e0364f8c7fb93e9ba7fc4fb5ab327992bdb6b6e313fd79435112b9
+reviewed_code_sha256: c3ab1fae343acb68231aab81315b63fc01f5eb277748d207114aa29e2fa63afc
 findings_total: 11
 findings_real: 11
 findings_blocking: 5
