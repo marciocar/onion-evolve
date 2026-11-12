@@ -48,7 +48,8 @@
 #                    sem quem responda, comando pendurado, harness travado e ferramenta longa legítima saem iguais.
 #   AGENT_SILENT     sem pendente, sem fim e sem escrita além do teto (nomeia o «Exit code 137» do último resultado).
 #   AGENT_RUNNING    pendente mais novo que o teto, ou escrita recente sem fim.
-#   AGENT_DONE       texto final do assistente, relatório entregue (SubagentHandback) ou interrupção pelo humano.
+#   AGENT_DONE       texto final do assistente, relatório entregue (SubagentHandback, ou StructuredOutput no agente de
+#                    Workflow) ou interrupção pelo humano. A idade é a da última entrada user/assistant (attachment não conta).
 #   AGENT_UNMEASURED transcript ilegível ou sem entrada user/assistant: NÃO medido, nunca «não parado».
 #   O comando pendente sai com segredo trocado por [REDACTED] (por LISTA: o que não está nela passa) e a home por ~. Só STALLED, SILENT e UNMEASURED entram no
 #   sha. Não sabe se o processo do subagente vive (o harness não expõe pid por subagente): um pendurado E morto sai STALLED.
@@ -443,6 +444,9 @@ def md_code(s):
     if not s: return ''
     f = '`' * (max((len(m) for m in re.findall(r'`+', s)), default=0) + 1)
     return f'{f} {s} {f}' if len(f) > 1 else f'`{s}`'
+# ferramentas cujo resultado ENCERRA o agente: o subagente entrega por SubagentHandback; o agente da ferramenta Workflow
+# entrega por StructuredOutput (medido em 2026-11-12: 4744 dos 4851 transcripts de workflow da máquina terminam assim)
+FINAL_TOOLS = ('SubagentHandback', 'StructuredOutput')
 def agent_state(path):
     """→ (classe, nota, comando pendente). Classe pelo FIM do transcript, nunca pela prosa.
     Pendente = tool_use cujo id não teve tool_result. Só o tool_result do MESMO id fecha, nunca uma linha user de texto:
@@ -450,7 +454,7 @@ def agent_state(path):
     resolve (achado do refutador, 2026-11-12). Nada ABANDONA uma pendência: depois da cutucada o harness roda dois fluxos
     do assistente ao mesmo tempo, e em 12 de 14 «abandonos» medidos o resultado chegou depois (re-revisão, 2026-11-12).
     Pendência aberta nunca é DONE, nem com texto final; o abandono legítimo fica STALLED, falha ruidosa."""
-    pend, last, n, handback, last_res = {}, None, 0, False, ''
+    pend, last, n, handback, last_res, last_ts = {}, None, 0, '', '', None
     try:
         with open(path, encoding='utf-8') as fh:
             for ln in fh:
@@ -458,29 +462,35 @@ def agent_state(path):
                 try: d = json.loads(ln)
                 except ValueError: continue   # linha cortada (escrita em curso): não decide a classe
                 if not isinstance(d, dict) or d.get('type') not in ('user', 'assistant'): continue
-                msg = d.get('message') or {}; c = msg.get('content'); n += 1; last = d
+                msg = d.get('message') or {}; c = msg.get('content'); n += 1; last = d; last_ts = d.get('timestamp') or last_ts
                 blocks = c if isinstance(c, list) else [{'type': 'text', 'text': c}]
                 if d['type'] == 'assistant':
                     mid = msg.get('id')
                     for b in blocks:
                         if isinstance(b, dict) and b.get('type') == 'tool_use' and b.get('id'): pend[b['id']] = (mid, b)
-                    handback = False
+                    handback = ''
                 else:
                     for b in blocks:
                         if not (isinstance(b, dict) and b.get('type') == 'tool_result'): continue
                         hit = pend.pop(b.get('tool_use_id'), None)
                         rc = b.get('content'); last_res = rc if isinstance(rc, str) else json.dumps(rc, ensure_ascii=False)
-                        if hit and hit[1].get('name') == 'SubagentHandback': handback = True
+                        if hit and hit[1].get('name') in FINAL_TOOLS: handback = hit[1]['name']
     except (OSError, UnicodeDecodeError) as e:
         return 'AGENT_UNMEASURED', f'transcript ilegível ({type(e).__name__}): NÃO medido', ''
     if not n: return 'AGENT_UNMEASURED', 'transcript sem entrada user/assistant legível: NÃO medido', ''
-    age = now - int(os.path.getmtime(path))
+    # a idade é a da última entrada user/assistant (o carimbo dela), não o mtime: a linha `attachment` que o harness grava
+    # depois do fim não é atividade (medido: 66 agentes de Workflow terminam em StructuredOutput + attachment). Sem carimbo, mtime.
+    age = None
+    if last_ts:
+        try: age = now - int(datetime.datetime.fromisoformat(str(last_ts).replace('Z', '+00:00')).timestamp())
+        except ValueError: age = None
+    if age is None: age = now - int(os.path.getmtime(path))
     if pend:
         pl = [b for _, b in pend.values()]
         cmd = agent_cmd(pl[0]) + (f' (+{len(pl) - 1} pendente(s))' if len(pl) > 1 else '')   # o 1º da leva é o que segura os outros
         if age > stall_s: return 'AGENT_STALLED', f'tool_use sem tool_result há {mins(age)}min', cmd
         return 'AGENT_RUNNING', f'tool_use em curso há {mins(age)}min', cmd
-    if handback: return 'AGENT_DONE', f'relatório entregue (SubagentHandback) há {mins(age)}min', ''
+    if handback: return 'AGENT_DONE', f'relatório entregue ({handback}) há {mins(age)}min', ''
     c = (last.get('message') or {}).get('content')
     blocks = c if isinstance(c, list) else [{'type': 'text', 'text': c}]
     txt = ' '.join(str(b.get('text') or '') for b in blocks if isinstance(b, dict) and b.get('type') == 'text')

@@ -57966,6 +57966,32 @@ BP_AG
     grep -q "^gap${T}.*subagentes NÃO MEDIDOS: .*proj-missing ausente" <<< "${a}" && ! grep -q '^agent' <<< "${a}"; }
   _bpcase "(aa) sem diretório de transcripts, os subagentes saem NÃO MEDIDOS" \
     "else: gaps.append(f'subagentes NÃO MEDIDOS" "else: (lambda *a: None)(f'subagentes NÃO MEDIDOS" _bp_aa
+  # (ab)-(ac) agente de Workflow (2026-11-12, 1ª medida depois do #1617: 160 falsos SILENT na sessão do kg-ssot). Ele
+  #     entrega por StructuredOutput e o harness grava uma linha `attachment` DEPOIS do fim. Forma medida: 4744 dos 4851
+  #     transcripts de workflow da máquina terminam no tool_result «Structured output provided successfully».
+  python3 - "${ag}/workflows/wf_1" "${NOW}" <<'BP_WF'
+import json, sys, datetime
+d, now = sys.argv[1], int(sys.argv[2])
+ts = lambda t: datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.000Z')
+E = lambda typ, t, c: json.dumps({'type': typ, 'timestamp': ts(t), 'message': {'role': typ, 'content': c}})
+att = json.dumps({'type': 'attachment', 'timestamp': ts(now), 'attachment': {'type': 'environment'}})
+so = [E('user', now - 3700, 'tarefa'), E('assistant', now - 3650, [{'type': 'tool_use', 'id': 's1', 'name': 'StructuredOutput', 'input': {'verdict': 'ok'}}]),
+      E('user', now - 3600, [{'type': 'tool_result', 'tool_use_id': 's1', 'content': 'Structured output provided successfully'}]), att]
+quiet = [E('user', now - 3700, 'tarefa'), E('assistant', now - 3650, [{'type': 'tool_use', 'id': 'q1', 'name': 'Bash', 'input': {'command': 'ls'}}]),
+         E('user', now - 3600, [{'type': 'tool_result', 'tool_use_id': 'q1', 'content': 'ok'}]), att]
+open(f'{d}/agent-awfdone.jsonl', 'w').write('\n'.join(so) + '\n')
+open(f'{d}/agent-awfquiet.jsonl', 'w').write('\n'.join(quiet) + '\n')
+BP_WF
+  touch -d "@${NOW}" "${ag}/workflows/wf_1/agent-awfdone.jsonl" "${ag}/workflows/wf_1/agent-awfquiet.jsonl"
+  _bp_ab() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_1/awfdone' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}wf_1/awfdone${T}AGENT_DONE${T}.*relatório entregue (StructuredOutput) há 60min" <<< "${a}"; }
+  _bpcase "(ab) agente de Workflow que entregou por StructuredOutput sai AGENT_DONE" \
+    "FINAL_TOOLS = ('SubagentHandback', 'StructuredOutput')" "FINAL_TOOLS = ('SubagentHandback',)" _bp_ab
+  # (ac) a linha `attachment` gravada depois não é atividade: a idade vem do carimbo da última entrada user/assistant
+  _bp_ac() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_1/awfquiet' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}wf_1/awfquiet${T}AGENT_SILENT${T}.*há 60min" <<< "${a}"; }
+  _bpcase "(ac) a linha attachment final não conta como atividade: o agente calado sai AGENT_SILENT" \
+    "    if last_ts:" "    if False:" _bp_ac
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
