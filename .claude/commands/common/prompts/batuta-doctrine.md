@@ -67,9 +67,10 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    atribuído por palpite. **Quem responde é a sessão:** o medidor mede, e a sessão que segura a batuta pergunta a cada
    sessão viva o estado em 3 linhas, como na memória da casa («como estão as sessões» se pergunta, não se lembra).
    **Quando fala:** o gatilho principal é evento (fim de tarefa, campainha, PR mergeado ou vermelho, resposta de
-   sessão), com batimento de reserva de 20 a 30 min no `/loop`; a batida sem mudança sai em uma linha e se recolhe, para
-   não virar fadiga de alerta. **É nível 0** da escada selada (`D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111`): só mede e
-   lê. **Parada por ordem não se acorda:** `PARKED` vence qualquer outra classe e não recebe mensagem. **Puxar, não
+   sessão), com batimento de reserva de 20 a 30 min no `/loop`; a batida sem mudança (o sha do estado igual ao da batida anterior)
+   sai em uma linha e se recolhe, para não virar fadiga de alerta. **É nível 0** da escada selada (`D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111`): só mede e
+   lê. **Parada por ordem não se acorda:** `PARKED` vence qualquer outra classe e não recebe mensagem; um `parked.tsv`
+   ilegível é lacuna e fail-closed (`PARK_UNMEASURED`, sem oferta), nunca «ninguém parado». **Puxar, não
    empurrar:** a sessão ociosa com fila recebe, no máximo, a oferta do que já é dela (a fase 2, desenhada e não
    construída); quem pega é ela ou o maestro.
 

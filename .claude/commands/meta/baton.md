@@ -63,12 +63,14 @@ que não foi medido: **ausência de linha com lacuna não é zero**. Os PRs, as 
 | `IDLE_NO_QUEUE` | ociosa e sem fila declarada | pergunta o estado; a falta de fila vai para o maestro |
 | `PARKED` | linha viva no `parked.tsv` | **não** manda mensagem; reporta o motivo e o prazo |
 | `UNREACHABLE` | pid morto, sessão de fundo sem processo, farol órfão, ou farol vivo fora da lista do harness | não pergunta; reporta |
+| `PARK_UNMEASURED` | o `parked.tsv` existe e não se lê: fail-closed, toda sessão alcançável sai aqui | pergunta o estado, **sem** oferta; a lacuna vai ao maestro |
 
 ## Procedimento
 
 1. **MEDIR.** O pulso injetado acima mede sem a conversa. Para a lista de peers, o medidor usa `claude agents --json`
    (a interface suportada). Se ela falhou (lacuna «lista de peers NÃO MEDIDA»), chame a ferramenta `ListAgents` nesta
-   sessão, salve o resultado em JSON e rode de novo:
+   sessão, salve o resultado em JSON **fora do repo** (no scratchpad da sessão ou em `~/.local/state/onion/baton/`,
+   nunca na árvore de trabalho: a lista traz ids e caminhos de outras sessões) e rode de novo:
    `bash .claude/validation/baton-pulse.sh . --markdown --peers <arquivo.json>`. Precisa do conjunto inteiro? `--tsv`.
 2. **PERGUNTAR a cada sessão viva** (`ACTIVE`, `IDLE_WITH_QUEUE`, `IDLE_NO_QUEUE`), uma `SendMessage` por sessão, nesta
    forma e nada mais:
@@ -99,8 +101,11 @@ mercado é **evento primeiro, batimento de reserva**:
   resposta de sessão. Chegou evento, rode o pulso.
 - **Reserva de 20 a 30 min** quando nada chega.
 - **Fale só quando muda:** em `--quiet`, rode
-  `bash .claude/validation/baton-pulse.sh . --quiet --since <hora da batida anterior> --last-sha <sha anterior>`.
-  Sem mudança, o medidor devolve **uma linha** e a batida se recolhe (sem SendMessage, sem relatório). Com mudança, ele
+  `bash .claude/validation/baton-pulse.sh . --quiet --last-sha <sha anterior> --since <hora da batida anterior>`.
+  O `--last-sha` é o que permite calar: **«sem mudança» só sai quando o sha do estado bate**. O `--since` só acrescenta
+  eventos datados; sozinho, ele não cala (a 1ª batida, sem sha, sempre fala). Sem mudança, o medidor devolve **uma
+  linha**, com o aviso do que não foi medido (PRs, sinais, perguntas, parada), e a batida se recolhe (sem SendMessage,
+  sem relatório). Com mudança, ele
   lista o que mudou, as `IDLE_WITH_QUEUE` e os PRs com CI vermelho; só então siga o procedimento acima, e só para as
   sessões que mudaram. Guarde o `sha` da saída para a próxima batida. Isto evita a fadiga de alerta.
 - **No /loop o pulso também não empurra:** a oferta de fila é a fase 2, e a sessão `PARKED` segue sem mensagem.

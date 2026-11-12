@@ -38,15 +38,18 @@
 #   ACTIVE           o harness diz busy, ou houve atividade há menos de --idle-min (padrão 20).
 #   IDLE_WITH_QUEUE  ociosa e com fila pronta de dono declarado — o caso que a fase 2 ataca.
 #   IDLE_NO_QUEUE    ociosa e sem fila declarada.
+#   PARK_UNMEASURED  o parked.tsv EXISTE e não se lê (permissão, diretório): fail-closed, toda sessão alcançável sai
+#                    aqui e nenhuma recebe oferta. Ilegível nunca vira «ninguém parado».
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
 #   isso vence, quando a lista de peers foi lida). Sem lista de peers, a classe é só pela idade do farol.
 #
 # ── MODO SILENCIOSO (o /loop) ───────────────────────────────────────────────────────────────────
-#   --quiet [--since <iso>] [--last-sha <sha>]: a batida sem mudança sai em UMA linha. Mudança = o sha do estado
-#   (classe e fila de cada sessão, CI e PARADO de cada PR, PARADO de cada worktree, sinais, perguntas, carga, parados)
-#   diferente do --last-sha, ou evento datado depois de --since (sessão nova, sessão que ficou ociosa, pergunta nova,
-#   PR que se moveu). Sem --last-sha nem --since não há base: a batida fala.
+#   --quiet --last-sha <sha> [--since <iso>]: a batida sem mudança sai em UMA linha, e SÓ quando o sha do estado bate
+#   com o --last-sha (classe e fila de cada sessão, CI e PARADO de cada PR, PARADO de cada worktree, os ids dos sinais
+#   pendentes, perguntas, carga, e o que foi ou não medido). O --since só ACRESCENTA eventos datados (sessão nova, sessão
+#   que ficou ociosa, pergunta nova, PR que se moveu); sozinho ele não cala nada: sem --last-sha não há base e a batida
+#   fala. A linha única carrega o aviso do que não foi medido (PRs, sinais, perguntas, parada).
 #
 # Uso:  bash .claude/validation/baton-pulse.sh [<repo>] [--markdown|--tsv] [--quiet] [--since <iso|epoch>]
 #                [--last-sha <sha>] [--idle-min N] [--peers <arquivo.json|->] [--no-peers] [--no-family]
@@ -283,16 +286,23 @@ for r in dc:
     elif k == 'seal': seals.append(r)
     elif k == 'checkpoint': checkpoints.append(r)
     elif k == 'warn': warns.append('decide-census: ' + r.get('label', ''))
+prs_measured = dc_rc in ('0', 'override') and not any(r.get('kind') == 'warn' and 'NÃO medidos' in r.get('label', '') and 'PRs' in r.get('label', '')
+                                                      and not r.get('label', '').startswith('repo alheio') for r in dc)
+signals_measured = dc_rc in ('0', 'override') and not any(r.get('kind') == 'warn' and 'sinais sem ack NÃO medidos' in r.get('label', '') for r in dc)
 
 # ── perguntas reservadas (o registro do maestro-ask.sh: chave, dona, sessão, desde, prazo, pergunta) ──
-asks = []
-if os.path.isdir(ask_dir):
+asks = []; asks_measured = True
+if os.path.isdir(ask_dir) and not os.access(ask_dir, os.R_OK | os.X_OK):
+    asks_measured = False; gaps.append(f'perguntas reservadas NÃO MEDIDAS: {ask_dir} ilegível (não é «0»)')
+elif os.path.isdir(ask_dir):
     for f in sorted(glob.glob(os.path.join(ask_dir, '*.ask'))):
         try: v = open(f, encoding='utf-8').read().rstrip('\n').split('\t')
-        except OSError: continue
+        except OSError: warns.append(f'pergunta reservada ilegível (não contada): {f}'); continue
         if len(v) >= 5 and v[3].isdigit() and v[4].isdigit():
             asks.append({'key': v[0], 'owner': v[1], 'sid': v[2], 'since': int(v[3]), 'deadline': int(v[4]), 'live': int(v[4]) > now})
-else: gaps.append(f'perguntas reservadas não medidas: {ask_dir} ausente')
+elif os.path.lexists(ask_dir):
+    asks_measured = False; gaps.append(f'perguntas reservadas NÃO MEDIDAS: {ask_dir} não é diretório')
+# o diretório que não existe é «ninguém reservou ainda»: o maestro-ask.sh o cria na 1ª reserva
 
 # ── fila de dono declarado: nós open com owner: em todo grafo rastreado ─────────────────
 _, ls = git('-c', 'core.quotePath=false', 'ls-files', '--', '*.kg.yaml')
@@ -311,14 +321,24 @@ for g in ls.splitlines():
 
 # ── rótulo e parada por ordem (estado declarado pelo maestro, lido) ─────────────────────
 def read_tsv(name):
+    """→ (linhas, caminho, estado): estado 'ok' | 'absent' (não existe: ninguém declarou) | 'unreadable' (existe e não se lê).
+    ILEGÍVEL NÃO É AUSENTE (achado do refutador, 2026-11-12): um parked.tsv com chmod 000, ou um diretório no lugar
+    dele, virava «ninguém parado» e a sessão parada saía IDLE_WITH_QUEUE — exatamente o que a cláusula 7 proíbe."""
     p = os.path.join(state_dir, name); rows = []
+    if not os.path.lexists(p): return None, p, 'absent'
     try:
         for ln in open(p, encoding='utf-8'):
             if ln.strip() and not ln.startswith('#'): rows.append(ln.rstrip('\n').split('\t'))
-        return rows, p
-    except OSError: return None, p
-own_rows, own_p = read_tsv('owners.tsv')
-park_rows, park_p = read_tsv('parked.tsv')
+        return rows, p, 'ok'
+    except (OSError, UnicodeDecodeError) as e: return None, p, f'unreadable ({type(e).__name__})'
+own_rows, own_p, own_st = read_tsv('owners.tsv')
+park_rows, park_p, park_st = read_tsv('parked.tsv')
+park_unknown = park_st.startswith('unreadable')
+if park_unknown:
+    gaps.append(f'parada por ordem NÃO MEDIDA: {park_p} {park_st} — fail-closed: nenhuma sessão alcançável é classificada '
+                'ociosa nem recebe oferta (classe PARK_UNMEASURED) até o arquivo voltar a ser legível')
+if own_st.startswith('unreadable'):
+    gaps.append(f'rótulos declarados NÃO lidos: {own_p} {own_st} — os rótulos caem nos derivados (nome, pasta)')
 owners_map = {r[0]: r[1] for r in (own_rows or []) if len(r) >= 2}
 def labels_of(s):
     for k in (s['sid'], s['name'], s['cwd']):
@@ -367,6 +387,8 @@ for s in S.values():
     idle_for = None if s['act'] is None else now - s['act']
     s['idle_for'] = idle_for
     if pk: cls, note = 'PARKED', why
+    elif park_unknown and not (s['pid'] is not None and alive is False) and not ('peers' not in s['src'] and s['beacon'] in ('orphan', 'stale')):
+        cls, note = 'PARK_UNMEASURED', f'estado de parada não medido ({park_st}): sem oferta'
     elif s['pid'] is not None and alive is False: cls, note = 'UNREACHABLE', f'pid {s["pid"]} morto'
     elif 'peers' in s['src'] and s['pid'] is None and s['kind'] == 'background' and s['state'] != 'working':
         cls, note = 'UNREACHABLE', f'sessão de fundo sem processo (state {s["state"] or "?"})'
@@ -384,10 +406,10 @@ for s in S.values():
 stale_traces = sorted(s['sid'] for s in S.values() if 'peers' not in s['src'] and s['beacon'] == 'stale' and s['cls'] == 'UNREACHABLE')
 for sid in stale_traces: del S[sid]
 orphan_queue = {o: v for o, v in owned.items() if o != 'maestro' and o not in claimed_owner}
-CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE')
+CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
 cnt = {c: sum(1 for s in S.values() if s['cls'] == c) for c in CLASSES}
 sessions_measured = peers_ok or beacons_n > 0 or (os.path.isfile(beacon_tool) and 'NÃO MEDIDO' not in beacon_desc)
-ORD = {c: i for i, c in enumerate(('IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'ACTIVE', 'PARKED', 'UNREACHABLE'))}
+ORD = {c: i for i, c in enumerate(('IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'ACTIVE', 'PARK_UNMEASURED', 'PARKED', 'UNREACHABLE'))}
 sess_sorted = sorted(S.values(), key=lambda s: (ORD[s['cls']], s['cwd'], s['name'], s['sid']))
 
 # ── o que mudou: eventos datados depois de --since, e o sha do estado ───────────────────
@@ -404,10 +426,13 @@ if since_ts is not None:
         if pr['age'] is not None and now - pr['age'] > since_ts: events.append(f'{pr["ref"]} se moveu (CI {pr["ci"]})')
 state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'pr': sorted((p['ref'], p['ci'], p['stopped']) for p in prs), 'wt': sorted((t['ref'], t['path'], t['stopped']) for t in threads),
-         'sig': len(signals), 'ask': sorted(a['key'] for a in asks if a['live']), 'busy': 'OCUPADO' in load_line,
+         'sig': sorted(f"{r.get('ref')}|{r.get('label')}" for r in signals), 'ask': sorted(a['key'] for a in asks if a['live']), 'busy': 'OCUPADO' in load_line,
+         'measured': [prs_measured, signals_measured, asks_measured, park_st],
          'cp': len(checkpoints), 'gaps': sorted(gaps)}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
-changed = (bool(last_sha) and last_sha != sha) or bool(events) or (not last_sha and since_ts is None)
+# «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
+# ficou vermelho sem evento datado passava calado. Sem --last-sha não há base, e a batida fala.
+changed = (not last_sha) or last_sha != sha or bool(events)
 
 def tsvc(x): return str(x).replace('\t', ' ').replace('\n', ' ')
 if fmt == '--tsv':
@@ -432,19 +457,23 @@ if fmt == '--tsv':
 head = f'baton-pulse · {iso(now)} · sha {sha}'
 cls_line = (' · '.join(f'{c} {cnt[c]}' for c in CLASSES)) if sessions_measured else 'sessões NÃO MEDIDAS (nenhuma fonte legível): não é zero'
 if quiet and not changed:
-    print(f'{head} · sem mudança' + (f' desde {iso(since_ts)}' if since_ts is not None else ' (sha igual ao --last-sha)') + f' · {cls_line}')
+    unm = ' · '.join(x for x, ok in (('⚠️ PRs NÃO medidos', prs_measured), ('⚠️ sinais NÃO medidos', signals_measured),
+                                       ('⚠️ perguntas NÃO medidas', asks_measured), ('⚠️ parada NÃO medida', not park_unknown)) if not ok)
+    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line}' + (f' · {unm}' if unm else ''))
     sys.exit(0)
 print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
-      f'em voo=decide-census rc {dc_rc} · perguntas={ask_dir} · parked={park_p}{" (" + str(len(park_rows)) + " linha(s))" if park_rows is not None else " (ausente: ninguém parado por ordem)"} · '
-      f'rótulos={own_p if own_rows is not None else "derivados"} · ociosa após {idle_min}min · papel={role or "?"}')
+      f'em voo=decide-census rc {dc_rc} · perguntas={ask_dir} · parked={park_p}{" (" + str(len(park_rows)) + " linha(s))" if park_rows is not None else (" (ausente: ninguém parado por ordem)" if park_st == "absent" else " (" + park_st + ": NÃO MEDIDO)")} · '
+      f'rótulos={own_p if own_rows is not None else ("derivados" if own_st == "absent" else "derivados (" + own_st + ")")} · ociosa após {idle_min}min · papel={role or "?"}')
 print(f'classes: {cls_line}')
 for w in warns: print(f'⚠️ {w}')
 for g in gaps: print(f'🕳️ lacuna: {g}')
 if quiet:
     print('\n## O que mudou' + (f' desde {iso(since_ts)}' if since_ts is not None else ''))
     for e in events: print(f'- {e}')
-    if last_sha and last_sha != sha: print(f'- o estado mudou (sha {last_sha} → {sha})')
+    if not last_sha: print('- sem --last-sha: não há base de comparação, a batida fala (guarde o sha abaixo)')
+    elif last_sha != sha: print(f'- o estado mudou (sha {last_sha} → {sha})')
+    print(f'- sha do estado: {sha}')
     for s in sess_sorted:
         if s['cls'] == 'IDLE_WITH_QUEUE': print(f'- IDLE_WITH_QUEUE: {s["name"] or s["sid"][:8]} ({os.path.basename(s["cwd"])}) · {len(s["queue"])} item(ns) de fila')
     for p in prs:
@@ -467,15 +496,15 @@ else: print('- nenhuma')
 print('\n## PRs abertos (decide-census)')
 for p in prs:
     print(f'- {p["ref"]} `{p["branch"]}` · CI {p["ci"]} · {"PARADO" if p["stopped"] else "em voo"} · {p["state"]}' + ('' if p['ref'] in claimed_pr else ' · sem sessão casada'))
-if not prs: print('- nenhum' if dc_rc in ('0', 'override') else '- NÃO MEDIDO')
+if not prs: print('- nenhum' if prs_measured else '- NÃO MEDIDO (gh indisponível ou --no-gh): não é «nenhum»')
 print('\n## Worktrees com pendência (decide-census)')
 for t in threads: print(f'- `{t["ref"]}` {t["path"]} · {t["label"]} · {t["state"]} · {t["actor"]}')
 if not threads: print('- nenhuma' if dc_rc in ('0', 'override') else '- NÃO MEDIDO')
 print('\n## Com o maestro')
 la = [a for a in asks if a['live']]
-print(f'- perguntas reservadas vivas: {len(la)} (vencidas: {len(asks) - len(la)})' + (': ' + ', '.join(a['key'].split('#')[-1] for a in la[:8]) if la else ''))
+print((f'- perguntas reservadas vivas: {len(la)} (vencidas: {len(asks) - len(la)})' if asks_measured else '- perguntas reservadas: NÃO MEDIDAS') + (': ' + ', '.join(a['key'].split('#')[-1] for a in la[:8]) if la else ''))
 print(f'- candidatas a selo (decide-census, janela/citação): {len(seals)} · checkpoints pendentes: {len(checkpoints)} · nós open com `owner: maestro`: {len(owned.get("maestro", []))}')
-print(f'- sinais sem ack: {len(signals)}' + (': ' + '; '.join(r.get('label', '') for r in signals) if signals else ''))
+print(f'- sinais sem ack: {len(signals) if signals_measured else "NÃO MEDIDOS"}' + (': ' + '; '.join(r.get('label', '') for r in signals) if signals else ''))
 if stale_traces: print(f'- faróis velhos (stale, fora do TTL, sem peer): {len(stale_traces)} — rastro, não sessão; `session-beacon.sh sweep <repo>` limpa')
 print(f'\n## Carga\n- {load_line}')
 if since_ts is not None:
