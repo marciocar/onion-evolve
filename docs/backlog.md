@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1074 itens abertos** em 166 grafo(s) com aberto (de 222 no escopo) · 160 grupo(s), agrupados por `owner:` (71 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1082 itens abertos** em 167 grafo(s) com aberto (de 223 no escopo) · 161 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -844,6 +844,18 @@
 | 2.4 | `Q_PADRONIZAR_LLMS_TXT_NO_ONION` | contrato-kg-absorcao-2026-10 | o Onion padroniza um llms.txt e um llms-full.txt gerados (core, portas e site), absorvendo o gerador que o onion-kg-ssot provou? |
 | 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
+## subagent-background-wait-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 32.0 | `D_PRETOOLUSE_BASH_POR_CAMPO_JSON` | subagent-background-wait-2026-11 | Substrato: hook PreToolUse em Bash, molde pretooluse-direct-provider-api.sh, registrado no grupo Bash do .claude/settings.json com |
+| 6.0 | `D_MALFORMADO_FAIL_OPEN_DECLARADO` | subagent-background-wait-2026-11 | Entrada malformada (JSON que não parseia, topo que não é objeto) e python3 ausente: fail-open DECLARADO, rc 0 com 'NÃO MEDIDO' |
+| 5.6 | `C_TETO_CAMPO_RENOMEADO` | subagent-background-wait-2026-11 | TETO: se o harness renomear ou tirar o campo agent_id, a guarda fica muda sem aviso. Uma só versão medida (2.1.322) e um só tip |
+| 4.2 | `C_TETO_NOHUP_E_OUTRAS_FERRAMENTAS` | subagent-background-wait-2026-11 | TETO: a guarda não vê o subagente que sobe nohup … & numa chamada normal e encerra o turno esperando, nem fundo por outra ferr |
+| 4.0 | `Q_ELENXO_E_MERGE` | subagent-background-wait-2026-11 | O refutador independente (mandato: achar o falso positivo) não rodou nesta forja. O merge espera o maestro, porque a guarda muda  |
+| 3.6 | `C_DOGFOOD_SEM_HARNESS_AO_VIVO` | subagent-background-wait-2026-11 | NÃO MEDIDO: o veto não foi disparado pelo harness ao vivo. O dogfood rodou o hook com JSONs no formato da sonda (com e sem agent |
+| 2.4 | `C_LATENCIA_MEDIDA` | subagent-background-wait-2026-11 | Latência medida em 2026-11-12 nesta VPS: 46 ms por chamada de Bash, média de 50, incluindo a subida do bash e do python3, com ca |
+
 ## radar-E3-2026-09-03 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1036,7 +1048,7 @@
 | 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
 | 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
 
-## core — 45 item(ns)
+## core — 46 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1053,6 +1065,7 @@
 | 7.7 | `Q_CORE_ACTIONS_SHA_PIN_1116` | outside-in-primaries-2026-11 | As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada? |
 | 7.7 | `Q_DOORS_ATTESTATION_1130` | outside-in-primaries-2026-11 | Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit. |
 | 7.2 | `Q_BATON_PHASE2_MATCH_AND_MEASURE_1112` | forge-baton-2026-11 | fase 2: casar a sessão ociosa com a fila dela (oferta, nunca ordem) e medir por um dia as horas ociosas com fila, antes e depois  |
+| 7.2 | `Q_OPS_CHECK_MOLD_RULES_1112` | automation-levels-2026-11 | o molde das checagens operacionais fixa quatro regras: só sobe de nível o que está na lista de esperados que o adotante version |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |

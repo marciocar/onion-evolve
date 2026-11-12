@@ -273,6 +273,8 @@
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_MASTER_PASSAVA_RC0_REPRODUZIDO	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
+.claude/hooks/pretooluse-subagent-background-wait.sh	D_MALFORMADO_FAIL_OPEN_DECLARADO	docs/evolution/research/guard-subagent-background-wait-2026-11/subagent-background-wait-2026-11.kg.yaml
+.claude/hooks/pretooluse-subagent-background-wait.sh	D_PRETOOLUSE_BASH_POR_CAMPO_JSON	docs/evolution/research/guard-subagent-background-wait-2026-11/subagent-background-wait-2026-11.kg.yaml
 .claude/hooks/rule-title-in-prose.sh	E_O_QUE_I_QUEBRA	docs/evolution/research/guard-hooks-python-isolated-2026-11/hooks-python-isolated-2026-11.kg.yaml
 .claude/hooks/session-currency-check.sh	C_TETO_CONSERTO_NO_LOCAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/hooks/session-currency-check.sh	D_SUBSTRATO_HOOK_DE_AVISO	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
@@ -2529,6 +2531,7 @@ docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md	E_PLUGIN_DEAD_LINKS
 docs/evolution/review/feat-backlog-projection-ratchet.md	D_ENTREGA_ANTECIPADA_REGRA62	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
 docs/evolution/review/feat-guard-memory-write.md	Q_ELENXO_PENDENTE	docs/evolution/research/guard-memory-write-2026-11/memory-write-2026-11.kg.yaml
 docs/evolution/review/feat-guard-plugin-write.md	Q_ELENXO_PENDENTE	docs/evolution/research/guard-plugin-write-2026-11/plugin-write-2026-11.kg.yaml
+docs/evolution/review/feat-guard-subagent-background-wait.md	Q_ELENXO_E_MERGE	docs/evolution/research/guard-subagent-background-wait-2026-11/subagent-background-wait-2026-11.kg.yaml
 docs/evolution/review/feat-kg-seal-check.md	C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/feat-kg-seal-check.md	D_GUARDA_DA_BANCADA_NOMEIA_A_CAUSA	docs/onion/graph/elenxos-2026-08-07.kg.yaml
 docs/evolution/review/feat-meta-radar-surface.md	E_ELENXO_DA_PASSADA_ONDA6	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
