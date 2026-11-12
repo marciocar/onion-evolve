@@ -2,7 +2,7 @@
 branch: feat/guard-subagent-background-wait
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 11fc59d43c881568669064cbe41e7dea72ed5d96bfbec1760e21abc9337b0622
+reviewed_diff_sha256: 69a8064391a77abd6fd1ecd4b3c04002346eed575ad0b29dd88dcf142c01a941
 reviewed_code_sha256: f663bdbb879a4504709852118c671087135c9ec688a27a0d21ea7e207c4f7bd7
 findings_total: 3
 findings_real: 3
