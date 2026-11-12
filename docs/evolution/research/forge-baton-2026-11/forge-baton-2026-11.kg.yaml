@@ -146,6 +146,38 @@ nodes:
     verified_at: "2026-11-12"
     verified_against: "roles.yaml: baton nasce no conjunto pending (fonte e hub); a decisão de viajar espera os números da fase 2"
     label: "fase 3: o /meta:baton viaja às portas (standalone, plugins), com os números da fase 2? Gatilho: um dia de pulsos medidos mostrar ganho de horas ociosas com fila"
+  - id: D_FORGE_BATON_WITH_LOOP_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Forjar o comando da batuta com o /loop»"
+    label: "O maestro manda forjar o comando da batuta com o /loop: as sessões ficam ociosas esperando quando poderiam tocar trabalho necessário, e o core é o caso que prova o uso pela própria necessidade."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Forjar o comando da batuta com o /loop» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Não forjar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Forjar o comando de estado da batuta e ligá-lo ao /loop desta sessão?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: D_BATON_IDENTIFIERS_IN_ENGLISH_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Nomes em inglês: baton»"
+    label: "Todo identificador da batuta é em inglês: comando /meta:baton, medidor baton-pulse.sh, família run_baton_pulse_selftests e as classes de sessão; batuta fica só na prosa em português, como cunhagem da casa."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Nomes em inglês: baton» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Manter batuta nos identificadores»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Todos os nomes são em inglês: como fica a batuta?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_PEDIDO_DO_MAESTRO_BATON_LOOP_1112
     to: Q_BATON_IDLE_SESSIONS_1112
@@ -171,6 +203,12 @@ edges:
   - from: Q_BATON_PHASE3_TRAVEL_TO_DOORS_1112
     to: Q_BATON_PHASE2_MATCH_AND_MEASURE_1112
     edge_type: DEPENDS_ON
+  - from: D_FORGE_BATON_WITH_LOOP_1112
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: TRACES_TO
+  - from: D_BATON_IDENTIFIERS_IN_ENGLISH_1112
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: TRACES_TO
 external_edges:
   - from: C_BATON_PHASE1_PULSE_BUILT_1112
     to: "docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml#D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111"
