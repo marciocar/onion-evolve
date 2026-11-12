@@ -25,6 +25,9 @@ pre="${ONION_AGENT_PREAMBLE:-${here}/../../commands/common/prompts/execution-age
 # Âncora: o item "Processos longos" do preâmbulo (a espera em primeiro plano, com teto).
 wait_line="$(grep -m1 -F -- '- Processos longos: ESPERA EM PRIMEIRO PLANO' "${pre}" || true)"
 [ -n "${wait_line}" ] || die2 "âncora da espera em primeiro plano não achada em ${pre} (o preâmbulo mudou: ajuste a âncora aqui)"
+# Âncora 2: o item da aprovação humana (rm -rf por variável pendura o subagente, 2026-11-12).
+perm_line="$(grep -m1 -F -- '- **NADA QUE PEÇA APROVAÇÃO HUMANA.**' "${pre}" || true)"
+[ -n "${perm_line}" ] || die2 "âncora da aprovação humana não achada em ${pre} (o preâmbulo mudou: ajuste a âncora aqui)"
 
 # Caminho que o agente lê: relativo à raiz do repo quando o preâmbulo está dentro dele (o agente roda na raiz),
 # senão o absoluto. Nunca um `.claude/` nu escrito aqui: dentro de um plugin ele não resolve (REGRA 74).
@@ -34,5 +37,5 @@ pre_rel="${pre_abs}"
 [ -n "${root}" ] && case "${pre_abs}" in "${root}"/*) pre_rel="${pre_abs#"${root}"/}" ;; esac
 
 printf 'ANTES DE TUDO, leia e siga `%s`.\n' "${pre_rel}"
-printf 'Regra que mais custou parar agente (copiada do preâmbulo):\n%s\n\n' "${wait_line}"
+printf 'As duas regras que mais custaram agente parado (copiadas do preâmbulo):\n%s\n%s\n\n' "${wait_line}" "${perm_line}"
 cat "${brief}"
