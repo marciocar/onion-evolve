@@ -177,13 +177,14 @@ sessão tria em lote. Não se injeta nada: o medidor roda sob pedido.
 2. **Classificar com evidência** cada nó num dos quatro destinos: (a) medição, (b) pedido a outro papel com
    prazo, (c) obsoleto, (d) do maestro. Com dezenas de nós, ofereça a peça 4 (abaixo) e rode só com o opt-in.
 3. **Montar o lote** só com (b) e (c), em TSV (`grafo · nó · obsolete|request · ref · prazo · motivo`), e
-   mostrar a lista: `bash .claude/validation/kg-decide-seal.sh --batch <lote> --preview`. **Uma** pergunta ao
-   maestro, com a lista visível e o sha256. (a) vai para o `/meta:kg-freshness <grafo> --node <id>`, nunca
+   mostrar a lista: `bash .claude/validation/kg-decide-seal.sh --batch <lote> --preview --date <hoje> --question "<pergunta>"`.
+   **Uma** pergunta ao maestro, com a lista visível e o sha256 (que cobre lote, data e pergunta). Todo obsoleto
+   leva o sucessor: `ID` do mesmo grafo ou `<grafo>#<ID>` de outro, que vira `external_edges`. (a) vai para o `/meta:kg-freshness <grafo> --node <id>`, nunca
    pelo selador. (d) entra na próxima rodada normal.
 4. **Selar só com o "sim":**
    `bash .claude/validation/kg-decide-seal.sh --batch <lote> --approve <sha256> --date <hoje> --question "<pergunta>"`.
-   Ele sai 0 com o gate verde em todo grafo, 2 se recusou (sem aprovação, lote mudado, destino (a) ou (d), nó
-   que não está `open`) e 3 se um grafo reprovou, e então **todos** os grafos do lote voltam byte a byte.
+   Ele sai 0 com o gate verde em todo grafo, 2 se recusou (sem aprovação, lote, data ou pergunta mudados,
+   destino (a) ou (d), obsoleto sem sucessor, data fora de AAAA-MM-DD, nó que não está `open`) e 3 se um grafo reprovou, e então **todos** os grafos do lote voltam byte a byte.
 
 ## Destino (peça 5)
 

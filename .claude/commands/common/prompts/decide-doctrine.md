@@ -181,17 +181,21 @@ dono ativo** (nenhuma reserva viva no `maestro-ask.sh`) e sem pedido em curso. A
   testemunho do maestro (cláusula 1); fechar por ele o que a medição fecha é forjar testemunho.
 - **(b) pedido a outro papel**, com prazo: CEO, jurídico, financeiro, outra sessão. O nó **segue aberto**,
   com `owner:` (o papel, nunca o nome de uma pessoa) e `x_due:`, e volta à triagem quando o prazo vence.
-- **(c) obsoleto**: vira `superseded`, com o motivo e a aresta `SUPERSEDES` do nó que o superou quando ele
-  está no mesmo grafo (superação entre grafos fica no motivo).
+- **(c) obsoleto**: vira `superseded`, com o motivo e a aresta `SUPERSEDES` do **sucessor**, que é
+  obrigatório: em `edges` quando ele está no mesmo grafo, e em `external_edges` (`from: "<grafo>#<ID>"`,
+  contrato v4.3) quando está em outro. Sem sucessor não há obsoleto: o contrato reprova
+  `integrity.superseded-without-successor`, e o selador recusa já na lista; o nó é (a) ou (d).
 - **(d) do maestro**: entra na próxima rodada **normal**, com pergunta própria (cláusulas 1 a 7).
 
 **Quem fecha.** A sessão lê cada nó e classifica com evidência; a dica do medidor (`obsoleto`, `pedido`,
 `medição`, `maestro`) é **pista**, nunca decisão. Com dezenas de nós, a classificação vai pela peça 4, o
 workflow `.claude/workflows/decide-triage.js` (um worker por lote de nós, só leitura, e um refutador nas
 propostas de (b) e (c), que caem para (d) na dúvida), e só com o opt-in do maestro. A sessão monta o
-**lote** só com (b) e (c), mostra a lista com o sha256 (`kg-decide-seal.sh --batch <lote> --preview`) e
-pergunta **uma vez**. O "sim" vira `--approve <sha256>`, e só então o selador grava, com o mesmo gate do
-selo único. Lote que mudou depois da aprovação tem outro sha e é recusado. Um grafo que reprova desfaz
+**lote** só com (b) e (c), mostra a lista com o sha256 da aprovação (`kg-decide-seal.sh --batch <lote>
+--preview --date <hoje> --question "<pergunta>"`; o sha cobre o lote, a data e a pergunta) e pergunta **uma
+vez**. O "sim" vira `--approve <sha256>`, e só então o selador grava, com o mesmo gate do selo único e as
+mesmas datas estritas (AAAA-MM-DD real). Lote, data ou pergunta que mudaram depois têm outro sha e são
+recusados. Um grafo que reprova desfaz
 o lote inteiro. É a regra da casa para mudança em massa: a sessão avalia, o maestro sela.
 
 **O que a triagem NÃO promete:**
@@ -201,8 +205,11 @@ o lote inteiro. É a regra da casa para mudança em massa: a sessão avalia, o m
 - **Não acerta a dica.** Os padrões fixos (aresta `SUPERSEDES`, nó fechado mais novo que cita o id,
   `owner:`, vizinho em `plane: PROD`, comando citado) erram para os dois lados, e a idade por commit
   rejuvenesce o nó que uma migração em massa tocou.
-- **Não supera entre grafos por aresta.** A ref do obsoleto tem de estar no mesmo grafo; a superação
-  que vem de outro grafo fica escrita no motivo.
+- **Não prova o pedido.** O pedido a outro papel grava `owner:`, `x_due:` e o pedido na narrativa, sem
+  proveniência própria nem as alternativas descartadas; e o papel da própria casa (`core` no core) não é
+  recusado pelo selador, só pelo medidor, que não o dá como dica.
+- **Não independe do diretório.** Os grafos do lote são caminhos como o medidor os imprime, relativos à raiz,
+  e o selador roda da raiz.
 
 ## O que esta doutrina NÃO promete
 

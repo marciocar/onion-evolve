@@ -23,7 +23,8 @@
 #   2. na falta dele, a data do ÚLTIMO COMMIT que tocou alguma linha do bloco do nó (`git blame` do grafo,
 #      o maior committer-time entre as linhas do bloco). Linha não commitada conta como hoje (idade 0).
 #      Teto declarado: migração em massa que reescreve o bloco (aspas, campo novo) rejuvenesce o nó.
-#   3. nó sem verified_at e fora da forma `- id:` de bloco: idade NÃO MEDIDA, aviso nomeado, não entra.
+#   3. nó sem verified_at e fora da forma `- id:` de bloco, ou com verified_at no FUTURO: idade NÃO MEDIDA, aviso
+#      nomeado, não entra (nunca some calado como "abaixo do teto").
 #
 # ── AS COLUNAS (pistas para classificar) ──────────────────────────────────────────────────────
 #   superseded  arestas SUPERSEDES que CHEGAM ao nó (quem, com que status) e nós FECHADOS mais novos que
@@ -203,6 +204,9 @@ for g, (txt, nodes, byid, edges) in per_graph.items():
         nid = str(n.get('id'))
         ln, ind = idline.get(nid, (0, 0))
         va = as_date(n.get('verified_at'))
+        if va and va > today_d:
+            # carimbo no FUTURO não é idade: sumia calado como "abaixo do teto" (limite curado na passada independente)
+            avisos.append(f'verified_at no FUTURO ({va.isoformat()} > {today}): {nid} em {g} — idade NÃO MEDIDA, conserte o carimbo'); continue
         if va:
             born = va; src = 'verified_at'
         elif ln:
