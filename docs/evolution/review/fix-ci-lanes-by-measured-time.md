@@ -2,7 +2,8 @@
 branch: fix/ci-lanes-by-measured-time
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 099a54fce0cca47d55b52ee5ab099d4e9e9e4c06458ea542d1a7a521ce810d99
+reviewed_code_sha256: e5ef3c94073b36e070c01e5adcad31cb9d0ca0042300de79b6a19c07489e6255
 findings_total: 8
 findings_real: 8
 findings_blocking: 1
