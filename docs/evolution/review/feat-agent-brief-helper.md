@@ -2,7 +2,8 @@
 branch: feat/agent-brief-helper
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 78fa9a13a269b91f3dc63fbfed9091835f645c70057b9d86f50613753cc45610
+reviewed_code_sha256: b74a55a8f335c10ed446ce8389837a21b81cc395883bbbf618a701e4dcdc4e29
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
