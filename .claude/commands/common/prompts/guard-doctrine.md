@@ -68,6 +68,15 @@ O censo mede as duas mortes: **registrada e sem `--selftest`** (dispara sem ser 
 `--selftest` e não registrada** (exercitada e nunca dispara). O 1º dogfood do censo acusou a guarda
 que estava sendo forjada **naquele instante** na segunda categoria.
 
+### 7. Guarda que lê um CAMPO do harness re-mede o campo a cada versão
+Campo que o harness manda e não documenta pode mudar de nome sem aviso, e aí a guarda emudece verde. Medido em
+2026-11-12 (Claude Code 2.1.322): o PreToolUse de Bash vindo de subagente traz `agent_id` no topo do JSON, e o da
+sessão principal não. O veto `pretooluse-subagent-background-wait.sh` (SAC-421) barra `run_in_background` só quando
+esse campo existe, porque o aviso de fim de tarefa de fundo não acorda subagente que encerrou o turno. A sonda que
+mediu o campo é re-rodada no `/meta:cc-update`. Entrada que não parseia **cala, declarada** (cláusula 4): ela vem
+do harness, e fechar barraria todo Bash de toda sessão. Grafo:
+`docs/evolution/research/guard-subagent-background-wait-2026-11/subagent-background-wait-2026-11.kg.yaml`.
+
 > **O refutador que reprova aponta o que supera** (SAC-151, maestro 2026-10-15: "um juiz de sim ou
 > não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e
 > inovação; é preciso ter medição e critérios claros"). O subagente que REFUTA a guarda devolve, para
