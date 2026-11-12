@@ -2,8 +2,7 @@
 branch: docs/value-table-overcoming
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 6eccae2d7253bce63eb9695da5d9feb502fcad4b52cb61edf433d19f6e6c6194
-reviewed_code_sha256: ece59713931e37fb6e0261ac0ed7c22c709466ef15a9b6634b334ad1a26cddfd
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
