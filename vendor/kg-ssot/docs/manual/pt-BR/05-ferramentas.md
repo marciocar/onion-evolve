@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:4ceaa693a97db30e -->
+<!-- translation-of: docs/manual/05-tools.md sha256:701346cde334c89f -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 555/555 (reprova)
+latest: 570/570 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -252,8 +252,67 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
 | `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor`. O carimbo de frescor (`verified_at`, `verified_against`) e, desde a 4.50, a classe de `provenance.method` trocada entre um apelido em português e a sua classe canônica em inglês com o detalhe depois de `: ` igual byte a byte (a troca do `kg_migrate.py methods`) não tocam o nó; qualquer outra mudança toca, inclusive no method. O `--touched` não olha o MUST; com dois nós de mesmo id, que o MUST já reprova, vale o último |
 | `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. O `.kg.json` não é conferido aqui. Não combina com `--update` |
+| `--private-repos ARQ` | Desde a 4.51. Desligado por padrão. Reprova (rc 1) o repositório privado citado sem o marcador `private-cite:<id>` (contrato v4.22); veja *O repositório privado citado sem o marcador* abaixo. Não combina com `--update` |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
+
+### O repositório privado citado sem o marcador: `--private-repos` (4.51.0)
+
+O contrato (v4.22, capítulo 4) dá ao grafo público o marcador `private-cite:<id>` para um nó de repositório privado,
+mas o grafo não tem como saber quais repositórios são privados. O dono sabe. O `--private-repos ARQ` tira esse saber de
+um arquivo privado e reprova (rc 1) cada valor de texto que cita um deles sem o marcador. A regra, para qualquer
+ferramenta que a porte:
+
+1. **O arquivo.** UTF-8, um padrão por linha: um prefixo de URL (`https://git.example.com/acme/`), `owner/repo`
+   (`acme/planos`) ou `repo@` (`planos@`, a forma `repo@commit`). O espaço das pontas da linha sai; a linha vazia e a
+   que começa por `#` ficam de fora. O `#` só começa um comentário no início da linha: o padrão com espaço ou `#` no
+   meio (um comentário no fim da linha, por exemplo) é entrada quebrada (rc 2), dita pelo número da linha e nunca pelo
+   conteúdo, porque viraria parte do padrão e o gate passaria em silêncio. O arquivo que não se lê, ou que não tem
+   nenhum padrão, também é entrada quebrada (rc 2): uma lista vazia não confere nada.
+2. **Onde procura.** Em todo valor de texto e em toda chave de mapeamento de todo grafo medido: o `meta`, cada campo de
+   cada nó (`provenance.source`, `provenance.locator`, `provenance.method`, `trace`, `verified_against`, `narrative`,
+   `label` e as chaves `x_` em qualquer profundidade, itens de lista inclusive) e as arestas. O grafo que não parseia é
+   lido como texto, linha a linha, e nunca escapa. O comentário YAML de grafo que parseia não é lido.
+3. **Como casa.** O padrão como texto literal, sem distinguir maiúscula, depois de decodificar o `%xx` e levar o Unicode
+   a NFC, no texto e no padrão (`acme%2Fplanos` e o acento decomposto casam). A ponta do padrão que é letra, dígito, `_`
+   ou `-` não pode encostar em outra dessas no valor: `acme/planos` não casa `acme/planos-public` nem `xacme/planos`, e
+   casa `acme/planos.git`, `github.com/acme/planos#C_X@3f2a9c1` e `ACME/Planos`. Não são cobertos: largura cheia,
+   espaço de largura zero, barra invertida no lugar da barra, o nome quebrado entre as linhas de um bloco dobrado, a
+   dupla codificação (o `%xx` é decodificado uma vez só: `%252F` fica `%2F`) e os sósias de caractere (o `а` cirílico no
+   lugar do `a` latino). O padrão com caractere de formatação invisível (categoria Cf do Unicode, como o espaço de
+   largura zero) é entrada quebrada (rc 2), pelo número da linha.
+4. **O que imprime.** Uma linha por campo ou chave que cita um padrão: o grafo, o id do nó (`meta`, `edge #i`, ou `#i`
+   para o nó sem id), o campo como caminho com ponto (`provenance.source`, `x_ref.deep[1]`, com ` (key)` quando o
+   achado é a própria chave) e os números das linhas dos padrões no arquivo. Nunca o padrão e nunca o valor: o arquivo
+   de padrões é privado, e o que casou com ele também. A chave, o id de nó ou o caminho do grafo que contém um padrão sai
+   mascarado (`<key #i>`, a posição no caminho do campo; `<node #i>`, o índice do nó; `<graph #i>`), porque ao lado do
+   número da linha ligaria a linha ao nome. Uma linha de resumo conta padrões, grafos e campos.
+5. **O que não lê.** Só os grafos que o gate mede: nunca um `.kg.json`, nem, por padrão, as fixtures, `docs/materials/`
+   e o vendor, nem o que o `--exclude` tira.
+
+Desligado por padrão, nada muda sem ele. Vale nos dois modos: na catraca e no `--touched` (onde lê todos os grafos
+medidos, não só os tocados). Não combina com `--update`: a conferência não faz parte da linha de base.
+
+```bash
+cat > "$PRIVATE_REPOS_FILE" <<'EOF'
+# os repositórios privados da casa; este arquivo mora fora de qualquer repositório público
+https://git.example.com/acme/
+acme/planos
+planos@
+EOF
+python3 -I vendor/kg-ssot/tools/kg_gate.py --private-repos "$PRIVATE_REPOS_FILE"
+```
+
+```text
+✗ repositório privado citado sem o marcador private-cite:: docs/a.kg.yaml#EV_A provenance.source (padrão na linha 3 do --private-repos)
+· --private-repos: 3 padrão(ões) em 12 grafo(s): 1 campo(s) citam um repositório privado sem o marcador
+```
+
+O conserto é o marcador: `python3 -I tools/kg_trace.py private-cite-id` imprime um novo (`private-cite:` e 22
+caracteres base64url, `secrets.token_urlsafe(16)`), um por citação. A forma não prova aleatoriedade nem unicidade; o id
+vem do `private-cite-id`. Escreva-o onde estava o repositório, registre o id,
+o repositório, o commit e o caminho na tabela de resolução do repositório privado, e deixe o `provenance.node_sha256`
+fora. Na prosa, troque só o nome do repositório pelo marcador.
 
 ## `kg_vendor.py`: trazer e conferir a release
 
@@ -1609,6 +1668,24 @@ como antes.
 O `provenance.source` na forma `repo#id@commit` não se lê aqui, e quem o compara é o `kg_refs.py pins`. Quando a forma ocorre, com ou
 sem a opção, ela é contada numa linha própria da saída humana e em `schemes.repo_refs`, e a saída JSON é o `kg-ssot.trace/2`. Um
 corpus sem essa forma e sem a opção recebe o mesmo `kg-ssot.trace/1` de antes.
+
+O `provenance.source` ou o `trace` que é o marcador na forma, `private-cite:` e 22 a 43 caracteres base64url e nada
+mais (contrato v4.22, desde a 4.51.0), cita um nó de repositório privado e é declarado não conferível. Nunca é lido, nunca conta como ausente e nunca vai à rede, com ou sem
+`--strict-sources` ou `--with`; o locator de um nó com a fonte privada é dessa fonte e não é julgado contra o `trace`. A
+saída JSON conta as fontes em `schemes.private_cite` e os traces em `skipped.private_cite`, cada um só quando acima de 0,
+para a saída sem nenhum continuar válida no schema da 4.50; a saída humana lhes dá uma linha própria. Só o marcador na
+forma sai da conferência: o valor que começa com `private-cite:` e está fora da forma (um id curto, um espaço no fim, um
+nome de repositório) é conferido como fonte ou trace comum e, por não nomear arquivo, conta como ausente (o
+`--strict-sources` dá rc 4, e o `kg_gate.py --sources` reprova). A forma não prova aleatoriedade nem unicidade; o id
+vem do `private-cite-id`. O `kg_trace.py private-cite-id` imprime um marcador novo,
+`private-cite:` e 22 caracteres base64url do `secrets.token_urlsafe(16)`; rode-o uma vez por citação. O
+`kg_gate.py --sources` também não reprova pelo marcador.
+
+No `trace`, e só ali, o marcador pode levar o fragmento do nó citado: a regra selada da prosa troca só o nome do
+repositório, então um trace `planos#D_PLANO_1112` vira `private-cite:Qm3x7Rk2vTz9LpWc4HnYa8#D_PLANO_1112`, contado em
+`skipped.private_cite` e nunca como ausente. Depois do `#` só vai o id do nó, na forma de id do contrato (`^[A-Za-z][A-Za-z0-9_]*$`: `D_PLANO_1112`, `D_ponte_de_planos`, `REUNIAO`, `Q1`); o caminho, o commit e o nome de arquivo ficam na tabela privada. Um trace cujo fragmento traz `/`, `.`, `:`, `#`, `@` ou espaço conta como ausente, de forma ruidosa (`#docs/planos.md`, `#da53ec3:docs/x.md`, `#C_X#D_Y`). Um hash de commit sozinho ou uma palavra solta é id válido e não se distingue, então o id do nó depois do `#` é público: ele não deve nomear assunto, arquivo, caminho ou commit privado. No
+`provenance.source` e no `provenance.locator`, o marcador é o valor inteiro: o caminho mora na tabela privada, e
+`private-cite:<id>#...` ali está fora da forma e conta como ausente.
 
 ## `kg_refs.py`: as citações entre repositórios (4.44.0)
 

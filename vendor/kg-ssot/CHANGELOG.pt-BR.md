@@ -10,6 +10,44 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.51.0] - 2026-11-12
+
+Contrato v4.22, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda. Um grafo público que citava um nó de
+um repositório privado vazava o nome e o caminho desse repositório, e às vezes um hash de conteúdo adivinhável; no
+primeiro adotante, 202 nós citam repositório privado em `provenance.source`, `locator`, `trace`, `verified_against`, no
+detalhe do `method` e na prosa.
+
+- Contrato v4.22: o marcador `private-cite:<id>`. O repositório privado vira `private-cite:` e um id aleatório de pelo
+  menos 128 bits, um por citação, em base64url de 22 a 43 caracteres. A resolução do id para repositório, commit e
+  caminho mora numa tabela dentro do repositório privado de quem é dono da citação, nunca no grafo. O
+  `provenance.node_sha256` fica fora (sem opt-in salgado nesta versão), e o locator real também. O marcador vale em
+  `provenance.source`, `provenance.locator`, `trace`, `verified_against` e no detalhe do `provenance.method`; na prosa,
+  troca-se só o nome do repositório por ele. O `provenance.source` que começa com `private-cite:` e está fora da forma
+  alerta como `form.pattern.node.provenance.source`, com uma dica própria; a forma só é julgada ali. Os dois leitores dão
+  o mesmo veredito; a suíte vai de 555 a 570 casos.
+- `kg_trace.py`: o `provenance.source` ou o `trace` que é o marcador na forma é uma citação declarada não conferível. Nunca é
+  lido, nunca conta como ausente e nunca vai à rede; a saída JSON o conta em `schemes.private_cite` e
+  `skipped.private_cite`, só quando acima de 0, para a saída sem ele continuar válida no schema da 4.50. O locator de uma
+  fonte privada não é julgado contra o `trace`. O `kg_trace.py private-cite-id` imprime um marcador novo
+  (`secrets.token_urlsafe(16)`); a forma não prova aleatoriedade nem unicidade, então o id vem dele. O
+  `kg_gate.py --sources` não reprova por ele. O valor que começa com `private-cite:` e está fora da forma é conferido como
+  fonte ou trace comum e conta como ausente. No `trace`, e só ali, o marcador pode levar o fragmento do nó
+  (`private-cite:<id>#D_PLANO_1112`, da troca só do nome do repositório em `repo#D_PLANO_1112`), contado como citação
+  privada. Depois do `#` só vai o id do nó, na forma de id do contrato; o caminho, o commit e o nome de arquivo
+  ficam na tabela privada. Um trace cujo fragmento traz `/`, `.`, `:`, `#`, `@` ou espaço conta como ausente, de forma ruidosa. Um hash de commit sozinho ou uma palavra solta é id válido e não se distingue, então o id do nó depois do `#` é público: ele não deve nomear assunto, arquivo, caminho ou commit privado.
+- `kg_gate.py --private-repos ARQ`, opcional, nos dois modos: o grafo não sabe que um repositório é privado, então o dono
+  lista um padrão por linha num arquivo privado (o prefixo de URL, `owner/repo` ou `repo@`; `#` começa um comentário só no
+  início da linha, e o padrão com espaço ou `#` no meio dá rc 2, pelo número da linha). Cada valor de texto e cada chave
+  de mapeamento dos grafos medidos (o meta, cada campo do nó em qualquer profundidade, as arestas) que cita um padrão sem
+  o marcador reprova (rc 1), depois de decodificar o `%xx` e levar a NFC, nomeado por grafo, nó e campo, nunca pelo
+  padrão nem pelo valor; a chave, o id de nó ou o caminho do grafo que contém um padrão sai mascarado. O arquivo que não
+  se lê ou sem padrão dá rc 2. O padrão com caractere de formatação invisível (Cf do Unicode)
+  também dá rc 2. Não cobertos: largura cheia, espaço de largura zero, barra invertida, o nome quebrado num bloco
+  dobrado, a dupla codificação (o `%xx` é decodificado uma vez só), os sósias de caractere e o comentário YAML de grafo
+  que parseia; não lidos: o `.kg.json` e, por padrão, as fixtures,
+  `docs/materials/` e o vendor. A regra está escrita no capítulo 5 do manual, para outras ferramentas a portarem.
+- Uma bancada de 24 mutantes, um por regra, todos mortos, nos dois leitores onde a regra é do schema.
+
 ## [4.50.0] - 2026-11-12
 
 Sem mudança no contrato (segue o v4.21), e nenhum veredito do contrato muda. O que muda para o adotante: a política de

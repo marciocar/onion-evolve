@@ -10,6 +10,42 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.51.0] - 2026-11-12
+
+Contract v4.22, SHOULD only: nothing that passed fails, and no MUST verdict changes. A public graph that cited a node of
+a private repository leaked the name and path of that repository, and sometimes a guessable content hash; on the first
+adopter, 202 nodes cite a private repository in `provenance.source`, `locator`, `trace`, `verified_against`, the detail
+of `method`, and the prose.
+
+- Contract v4.22: the `private-cite:<id>` marker. The private repository becomes `private-cite:` and a random id of at
+  least 128 bits, one per citation, in base64url of 22 to 43 characters. The resolution of the id to repository, commit,
+  and path lives in a table inside the private repository of whoever owns the citation, never in the graph.
+  `provenance.node_sha256` is left out (no salted opt-in in this version), and so is the real locator. The marker is
+  valid in `provenance.source`, `provenance.locator`, `trace`, `verified_against`, and the detail of `provenance.method`;
+  in prose, only the repository name is swapped for it. A `provenance.source` that starts with `private-cite:` and is out
+  of the form warns as `form.pattern.node.provenance.source`, with a hint of its own; the form is judged only there.
+  Both readers give the same verdict; the suite goes from 555 to 570 cases.
+- `kg_trace.py`: a `provenance.source` or `trace` that is the marker in form is a citation declared not checkable. It
+  is never read, never counted as missing, and never goes to the network; the JSON output counts it in `schemes.private_cite` and
+  `skipped.private_cite`, only when above 0, so an output without it still validates against the 4.50 schema. The
+  locator of a private source is not judged against the `trace`. `kg_trace.py private-cite-id` prints a new marker
+  (`secrets.token_urlsafe(16)`); the form does not prove randomness or uniqueness, so the id comes from it.
+  `kg_gate.py --sources` does not fail on it. A value that starts with `private-cite:` and is out of form is checked as
+  an ordinary source or trace and counts as missing. In a `trace`, and only there, the marker may carry the node
+  fragment (`private-cite:<id>#D_PLAN_1112`, from swapping only the repository name in `repo#D_PLAN_1112`), counted as
+  a private citation. After the `#` goes only the node id, in the form of an id of the contract; the path, the commit,
+  and the file name stay in the private table. A trace whose fragment carries `/`, `.`, `:`, `#`, `@`, or a space counts as missing, loudly. A commit hash alone or a bare word is a valid id and cannot be told apart, so the node id after the `#` is public: it must not name a private subject, file, path, or commit.
+- `kg_gate.py --private-repos FILE`, opt-in, in both modes: the graph does not know that a repository is private, so the
+  owner lists one pattern per line in a private file (a URL prefix, `owner/repo`, or `repo@`; `#` starts a comment only at
+  the beginning of a line, and a pattern with a space or a `#` inside is rc 2, by line number). Each text value and each
+  mapping key of the measured graphs (meta, every node field at any depth, the edges) that cites a pattern without the
+  marker fails (rc 1), after `%xx` decoding and NFC, named by graph, node, and field, never by the pattern or the value;
+  a key, node id, or graph path that contains a pattern is masked. A file that cannot be read or has no pattern is rc 2.
+  A pattern with an invisible format character (Unicode Cf) is rc 2 too. Not covered: fullwidth characters, zero-width
+  spaces, backslashes, a name broken across a folded block, double percent-encoding (`%xx` is decoded once), look-alike
+  characters, and a YAML comment in a graph that parses; not read: `.kg.json`, and by default the fixtures, `docs/materials/`, and the vendor. The rule is written in manual chapter 5 for other tools to port.
+- A bench of 24 mutants, one per rule, all killed, in both readers where the rule is the schema's.
+
 ## [4.50.0] - 2026-11-12
 
 No contract change (still v4.21), and no verdicts of the contract change. What changes for an adopter: the `kg-mcp`

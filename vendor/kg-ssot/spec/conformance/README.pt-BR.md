@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:10802c8b8e966ab0 -->
+<!-- translation-of: spec/conformance/README.md sha256:4bd5f00edf1ce214 -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -93,6 +93,7 @@ O que o v4 mudou de severidade, e o que entrou:
 | `form.unknown-key.<escopo>.<chave>` (chave fora da gramática e sem `x_`, no topo, no meta, no nó ou na aresta) | SHOULD | **MUST** |
 | `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
 | `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue dando `form.range`) |
+| `form.pattern.node.provenance.source` (o marcador `private-cite:` fora da forma, v4.22) | — | SHOULD |
 | `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` ou, desde o v4.16, nos alias em português `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, que alertam como `form.deprecated.node.provenance.method` desde o v4.21) | — | SHOULD (MUST no v5) |
 | `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
 
@@ -254,6 +255,8 @@ chave `x_` livre. Nada que passava reprova.
 
 O v4.21 põe dois avisos no SHOULD. Em `latest/form/method-vocabulary/`, a classe de `provenance.method` em português (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) segue passando e alerta como `form.deprecated.node.provenance.method` (um `not` com a palavra `deprecated`, que só anota); o valor que já falha a forma fica só com `form.pattern.node.provenance.method`, e o apelido sai no v5, nunca antes de 2027-03-31. Em `latest/form/provenance-always/`, o nó `evidence` sem `provenance` em qualquer status exceto `unverifiable`, e a `decision` `done` sem ela, alertam como `form.required.node.provenance`, o código da regra MUST; no nó em que o MUST já o acusa, o leitor não o repete como aviso, e em outro nó do mesmo documento o aviso segue valendo (a deduplicação é por ocorrência). Nada que passava reprova.
 
+O v4.22 põe uma regra no SHOULD. Em `latest/form/private-cite/`, o `provenance.source` que começa com `private-cite:` (sensível à caixa, sem espaço antes) e não é `private-cite:` seguido de 22 a 43 caracteres base64url (`A-Z`, `a-z`, `0-9`, `-`, `_`) alerta como `form.pattern.node.provenance.source`, o código da regra do placeholder no nível SHOULD (um `if` com o prefixo e um `then` com a forma). O marcador cita um nó de repositório privado; ele vale também em `locator`, `trace`, `verified_against` e no detalhe do `method`, onde a forma não é julgada. O texto que não começa pelo prefixo não é julgado. Um caso mantém o código MUST no placeholder de um nó e o aviso SHOULD no marcador fora da forma de outro: a deduplicação é por ocorrência.
+
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 
 ## Pastas
@@ -275,7 +278,7 @@ estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `sp
 (por exemplo, `trigger` em `integrity-trigger`). O PR da promoção esvazia `pending_on` e cita o nó selado. Nada
 antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 555 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 570 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
 v4 muda viraram casos `bad-*`. Todo caso usa `method` válido na classe canônica em inglês (`measurement: caso de conformidade`, desde o v4.21), para que os avisos de

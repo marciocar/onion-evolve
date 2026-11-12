@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 555/555 (gates the rc)
+latest: 570/570 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -249,8 +249,68 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--granularity node` | With `--update`: counts the SHOULD debt per occurrence, not per graph |
 | `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor`. The freshness stamp (`verified_at`, `verified_against`) and, since 4.50, the `provenance.method` class swapped between a Portuguese alias and its canonical English class with the detail after `: ` byte for byte the same (the `kg_migrate.py methods` swap) do not touch a node; any other change does, the method's included. `--touched` does not look at the MUST level; with two nodes of the same id, which the MUST level already fails, the last one counts |
 | `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. `.kg.json` is not checked here. Not with `--update` |
+| `--private-repos FILE` | Since 4.51. Off by default. Fails (rc 1) when a private repository is cited without the `private-cite:<id>` marker (contract v4.22); see *A private repository cited without the marker* below. Not with `--update` |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |
+
+### A private repository cited without the marker: `--private-repos` (4.51.0)
+
+The contract (v4.22, chapter 4) gives a public graph the `private-cite:<id>` marker for a node in a private repository,
+but the graph cannot know which repositories are private. Their owner does. `--private-repos FILE` takes that knowledge
+from a private file and fails (rc 1) each text value that cites one of them without the marker. The rule, for any tool
+that ports it:
+
+1. **The file.** UTF-8, one pattern per line: a URL prefix (`https://git.example.com/acme/`), `owner/repo`
+   (`acme/plans`), or `repo@` (`plans@`, the form `repo@commit`). The spaces at the ends of a line are trimmed; a blank
+   line and a line that starts with `#` are skipped. `#` starts a comment only at the beginning of a line: a pattern
+   with a space or a `#` inside (a comment at the end of the line, say) is broken input (rc 2), reported with its line
+   number and never its content, because it would otherwise become part of the pattern and the gate would pass in
+   silence. A file that cannot be read, or that has no pattern, is broken input (rc 2) too: an empty list checks
+   nothing.
+2. **Where it looks.** Every text value and every mapping key of every measured graph: `meta`, every field of every node
+   (`provenance.source`, `provenance.locator`, `provenance.method`, `trace`, `verified_against`, `narrative`, `label`,
+   and `x_` keys at any depth, list items included), and the edges. A graph that does not parse is read as text, line by
+   line, so it never escapes. A YAML comment in a graph that parses is not read.
+3. **How it matches.** The pattern as literal text, case-insensitive, after decoding `%xx` and normalizing Unicode to
+   NFC, in the text and in the pattern (`acme%2Fplans` and a decomposed accent match). An end of the pattern that is a
+   letter, digit, `_` or `-` must not touch another one of those in the value: `acme/plans` does not match
+   `acme/plans-public` or `xacme/plans`, and does match `acme/plans.git`, `github.com/acme/plans#C_X@3f2a9c1`, and
+   `ACME/Plans`. Not covered: fullwidth characters, zero-width spaces, a backslash instead of the slash, a name
+   broken across the lines of a folded block, double percent-encoding (`%xx` is decoded once: `%252F` stays `%2F`), and
+   look-alike characters (homoglyphs, such as a Cyrillic `а` for a Latin `a`). A pattern with an invisible format
+   character (Unicode category Cf, such as a zero-width space) is broken input (rc 2), by line number.
+4. **What it prints.** One line per field or key that cites a pattern: graph, node id (`meta`, `edge #i`, or `#i` for a
+   node without an id), the field as a dotted path (`provenance.source`, `x_ref.deep[1]`, with ` (key)` when the hit is
+   the key itself), and the line numbers of the patterns in the file. Never the pattern and never the value: the pattern
+   file is private, and so is what matched it. A key, a node id, or a graph path that contains a pattern is masked
+   (`<key #i>`, the position in the field path; `<node #i>`, the index of the node; `<graph #i>`), because next to the
+   line number it would tie the line to the name. A summary line counts patterns, graphs, and fields.
+5. **What it does not read.** Only the graphs the gate measures: never a `.kg.json`, nor, by default, the fixtures,
+   `docs/materials/`, and the vendor, nor what `--exclude` leaves out.
+
+Off by default, nothing changes without it. It works in both modes: in the ratchet, and with `--touched` (where it reads
+every measured graph, not only the touched ones). It does not go with `--update`: the check is not part of the baseline.
+
+```bash
+cat > "$PRIVATE_REPOS_FILE" <<'EOF'
+# private repositories of the house; this file lives outside any public repository
+https://git.example.com/acme/
+acme/plans
+plans@
+EOF
+python3 -I vendor/kg-ssot/tools/kg_gate.py --private-repos "$PRIVATE_REPOS_FILE"
+```
+
+```text
+✗ private repository cited without the private-cite: marker: docs/a.kg.yaml#EV_A provenance.source (pattern on line 3 of --private-repos)
+· --private-repos: 3 pattern(s) in 12 graph(s): 1 field(s) cite a private repository without the marker
+```
+
+The fix is the marker: `python3 -I tools/kg_trace.py private-cite-id` prints a new one (`private-cite:` and 22
+base64url characters, `secrets.token_urlsafe(16)`), one per citation. The form does not prove randomness or
+uniqueness; the id comes from `private-cite-id`. Write it where the repository was, record the
+id, the repository, the commit, and the path in the resolution table of the private repository, and leave
+`provenance.node_sha256` out. In prose, swap only the repository name for the marker.
 
 ## `kg_vendor.py`: bring in and verify the release
 
@@ -1634,6 +1694,24 @@ the same rule. The `untracked` key appears only when it is above 0, so an output
 A `provenance.source` in the form `repo#id@commit` is not read here, and `kg_refs.py pins` is what compares it. When the form
 occurs, with or without the option, it is counted in a line of its own in the human output and in `schemes.repo_refs`, and the
 JSON output is `kg-ssot.trace/2`. A corpus without that form and without the option gets the same `kg-ssot.trace/1` as before.
+
+A `provenance.source` or a `trace` that is the marker in form, `private-cite:` and 22 to 43 base64url characters and
+nothing else (contract v4.22, since 4.51.0), cites a node in a private repository and is declared not checkable. It is never read, never counted as missing, and never goes to the
+network, with or without `--strict-sources` or `--with`; the locator of a node with a private source belongs to that
+source and is not judged against the `trace`. The JSON output counts the sources in `schemes.private_cite` and the traces
+in `skipped.private_cite`, each only when above 0, so an output with none still validates against the 4.50 schema; the
+human output gives them a line of their own. Only the marker in form leaves the check: a value that starts with
+`private-cite:` and is out of form (a short id, a space at the end, a repository name) is checked as an ordinary source
+or trace and, since it names no file, counts as missing (`--strict-sources` gives rc 4, and `kg_gate.py --sources`
+fails). The form does not prove randomness or uniqueness; the id comes from `private-cite-id`.
+`kg_trace.py private-cite-id` prints a new marker, `private-cite:` and 22 base64url characters from
+`secrets.token_urlsafe(16)`; run it once per citation. `kg_gate.py --sources` does not fail on the marker either.
+
+In a `trace`, and only there, the marker may carry the fragment of the cited node: the sealed rule for prose swaps only
+the repository name, so a trace `plans#D_PLAN_1112` becomes `private-cite:Qm3x7Rk2vTz9LpWc4HnYa8#D_PLAN_1112`, counted
+in `skipped.private_cite` and never as missing. After the `#` goes only the node id, in the form of an id of the contract (`^[A-Za-z][A-Za-z0-9_]*$`: `D_PLAN_1112`, `D_ponte_de_planos`, `REUNIAO`, `Q1`); the path, the commit, and the file name stay in the private table. A trace whose fragment carries `/`, `.`, `:`, `#`, `@`, or a space counts as missing, loudly (`#docs/plans.md`, `#da53ec3:docs/x.md`, `#C_X#D_Y`). A commit hash alone or a bare word is a valid id and cannot be told apart, so the node id after the `#` is public: it must not name a private subject, file, path, or commit. In
+`provenance.source` and `provenance.locator`, the marker is the whole value: the path belongs in the private table, and
+`private-cite:<id>#...` there is out of form and counts as missing.
 
 ## `kg_refs.py`: citations across repositories (4.44.0)
 

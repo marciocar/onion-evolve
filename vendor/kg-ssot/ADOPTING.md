@@ -394,6 +394,32 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.50.0` to `kg-ssot-v4.51.0`, contract v4.22 comes in, SHOULD only: no graph that passed fails, and no MUST
+verdict changes. It adds the `private-cite:<id>` marker for citing a node in a private repository from a public graph:
+`private-cite:` and a random id of 22 to 43 base64url characters, one per citation (`kg_trace.py private-cite-id`
+prints one), with the repository, commit, and path kept in a resolution table inside the private repository, never in
+the graph, and with `provenance.node_sha256` left out. A `provenance.source` that starts with `private-cite:` and is out
+of that form warns as `form.pattern.node.provenance.source`. No graph uses the marker before this version, so the
+update itself brings no new debt. If your gate fails later, while you migrate citations, the fix is the id: write a
+marker from `private-cite-id`. A baseline per graph or per node (`--granularity node`) sees that warning as a new SHOULD
+debt code; to accept it as debt instead, with the reason, which keeps the ratchet against growth: `python3 -I -B
+vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.22: private-cite marker out of form, debt
+recorded while migrating"`, or your own gate's equivalent. The form does not prove randomness or uniqueness; the id
+comes from `private-cite-id`. `kg_trace.py check` never reads the marker in form and never counts it as missing; its JSON
+output gains `schemes.private_cite` and `skipped.private_cite` only when they are above 0. A value that starts with
+`private-cite:` and is out of form is checked as an ordinary source and counts as missing, so `--strict-sources` and
+`kg_gate.py --sources` fail on it. Opt-in: `kg_gate.py --private-repos FILE` fails a private repository cited without the
+marker; FILE is private, one pattern per line (a URL prefix, `owner/repo`, or `repo@`; `#` starts a comment only at the
+beginning of a line, and a pattern with a space or a `#` inside is rc 2), and the output names graph, node, and field,
+never the pattern, with a key, node id, or graph path that contains a pattern masked. It searches values and keys,
+after `%xx` decoding (once: double encoding is not covered) and NFC; look-alike characters are not covered, and a pattern
+with an invisible format character (Unicode Cf) is rc 2. A YAML comment in a graph that parses is not read, and it does
+not read a `.kg.json`, nor, by default, the fixtures, `docs/materials/`, and the vendor, nor what `--exclude` leaves out
+(manual, chapter 5). In a `trace`, and only there, the marker may carry the node fragment, since the prose rule swaps
+only the repository name: `plans#D_PLAN_1112` becomes `private-cite:Qm3x7Rk2vTz9LpWc4HnYa8#D_PLAN_1112`, counted as a
+private citation, never as missing. After the `#` goes only the node id; the path, the commit, and the file name
+stay in the private table. A trace whose fragment carries `/`, `.`, `:`, `#`, `@`, or a space counts as missing, loudly. A commit hash alone or a bare word is a valid id and cannot be told apart, so the node id after the `#` is public: it must not name a private subject, file, path, or commit. In `provenance.source` and `provenance.locator` the marker is the whole value.
+
 From `kg-ssot-v4.49.0` to `kg-ssot-v4.50.0`, the contract (v4.21) and its verdicts are the same, and the vendor brings no new
 file. Two things can change. If you run `kg-mcp --area-policy`, a key repeated in the same object or a policy file
 larger than 1 MiB now makes the policy invalid, even without `roles`: the server does not start with it, and one

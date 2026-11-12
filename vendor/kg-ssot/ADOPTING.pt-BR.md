@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:e325b834b721be86 -->
+<!-- translation-of: ADOPTING.md sha256:e714bc772b9b74b8 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -394,6 +394,33 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.50.0` para a `kg-ssot-v4.51.0`, entra o contrato v4.22, só SHOULD: nenhum grafo que passava reprova, e nenhum
+veredito MUST muda. Ele traz o marcador `private-cite:<id>` para citar, de um grafo público, um nó de repositório
+privado: `private-cite:` e um id aleatório de 22 a 43 caracteres base64url, um por citação (o `kg_trace.py
+private-cite-id` imprime um), com o repositório, o commit e o caminho numa tabela de resolução dentro do repositório
+privado, nunca no grafo, e com o `provenance.node_sha256` fora. O `provenance.source` que começa com `private-cite:` e
+está fora dessa forma alerta como `form.pattern.node.provenance.source`. Nenhum grafo usa o marcador antes desta versão,
+então a atualização em si não traz dívida nova. Se o seu gate reprovar depois, enquanto você migra as citações, o
+conserto é o id: escreva um marcador do `private-cite-id`. A linha de base por grafo ou por nó (`--granularity node`)
+vê esse aviso como código novo de dívida SHOULD; para aceitá-lo como dívida, com o motivo, o que mantém a catraca contra
+o crescimento: `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contrato v4.22: marcador
+private-cite fora da forma, dívida registrada durante a migração"`, ou o equivalente do seu gate. A forma não prova
+aleatoriedade nem unicidade; o id vem do `private-cite-id`. O `kg_trace.py check` nunca lê o marcador na forma nem o
+conta como ausente; a saída JSON ganha `schemes.private_cite` e `skipped.private_cite` só quando acima de 0. O valor que
+começa com `private-cite:` e está fora da forma é conferido como fonte comum e conta como ausente, então o
+`--strict-sources` e o `kg_gate.py --sources` reprovam por ele. Opcional: o `kg_gate.py --private-repos ARQ` reprova o
+repositório privado citado sem o marcador; o ARQ é privado, com um padrão por linha (o prefixo de URL, `owner/repo` ou
+`repo@`; o `#` só começa um comentário no início da linha, e o padrão com espaço ou `#` no meio dá rc 2), e a saída
+nomeia grafo, nó e campo, nunca o padrão, com a chave, o id de nó ou o caminho do grafo que contém um padrão mascarado.
+Procura em valores e chaves, depois de decodificar o `%xx` (uma vez só: a dupla codificação não é coberta) e levar a
+NFC; os sósias de caractere não são cobertos, e o padrão com caractere de formatação invisível (Cf do Unicode) dá rc 2.
+O comentário YAML de grafo que parseia não é lido, e ele não lê um `.kg.json`, nem, por padrão, as fixtures,
+`docs/materials/` e o vendor, nem o que o `--exclude` tira (manual, capítulo 5). No `trace`, e só ali, o marcador pode
+levar o fragmento do nó, porque a regra da prosa troca só o nome do repositório: `planos#D_PLANO_1112` vira
+`private-cite:Qm3x7Rk2vTz9LpWc4HnYa8#D_PLANO_1112`, contado como citação privada, nunca como ausente. Depois do `#` só vai o id do nó; o caminho, o commit e o nome de
+arquivo ficam na tabela privada. Um trace cujo fragmento traz `/`, `.`, `:`, `#`, `@` ou espaço conta como ausente, de forma ruidosa. Um hash de commit sozinho ou uma palavra solta é id válido e não se distingue, então o id do nó depois do `#` é público: ele não deve nomear assunto, arquivo, caminho ou commit privado. No
+`provenance.source` e no `provenance.locator`, o marcador é o valor inteiro.
 
 Da `kg-ssot-v4.49.0` para a `kg-ssot-v4.50.0`, o contrato (v4.21) e os vereditos dele são os mesmos, e o vendor não traz
 arquivo novo. Duas coisas podem mudar. Se você roda o `kg-mcp --area-policy`, a chave repetida no mesmo objeto ou o

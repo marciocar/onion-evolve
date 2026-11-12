@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.21"
+CONTRACT_VERSION = "4.22"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1857,6 +1857,12 @@ PROVENANCE_HINTS = {
     "evidence": "Add provenance with source, locator, and method: where this evidence was read or measured; with no "
                 "recoverable source, change the status to unverifiable.",
 }
+# v4.22: o mesmo código, no SHOULD, para o marcador de citação a nó privado fora da forma; a dica do placeholder ali
+# mandaria apagar a fonte
+PRIVATE_CITE_HINT = ("Write the marker as private-cite: followed by a random id of 22 to 43 base64url characters "
+                     "(A-Z, a-z, 0-9, - and _), one per citation, such as the output of kg_trace.py private-cite-id "
+                     "(v4.22). The repository, commit, and path go in the resolution table of the private repository, "
+                     "never in the graph.")
 # A frase montada de form.<tipo>.<escopo>.<campo>: {field} é o campo e {scope} vem de SCOPE_TEXT.
 KIND_TEXT = {"required": 'Missing required field "{field}" {scope}.',
              "enum": 'Value outside the allowed list in "{field}" {scope}.',
@@ -1918,6 +1924,17 @@ def message_of(code, json_text=False):
     return _("Violation {code}.").format(code=code)
 
 
+def _private_source_at(doc, path):
+    """O provenance.source do nó em nodes[i] começa pelo marcador private-cite: (v4.22)?"""
+    nodes = doc.get("nodes") if isinstance(doc, dict) and isinstance(doc.get("nodes"), list) else []
+    if (isinstance(path, (list, tuple)) and len(path) >= 2 and path[0] == "nodes" and isinstance(path[1], int)
+            and 0 <= path[1] < len(nodes) and isinstance(nodes[path[1]], dict)):
+        prov = nodes[path[1]].get("provenance")
+        source = prov.get("source") if isinstance(prov, dict) else None
+        return isinstance(source, str) and source.startswith("private-cite:")
+    return False
+
+
 def _node_type_at(doc, path):
     """O node_type do nó em nodes[i] (o caminho da ocorrência), ou None."""
     nodes = doc.get("nodes") if isinstance(doc, dict) and isinstance(doc.get("nodes"), list) else []
@@ -1937,6 +1954,8 @@ def hint_of(code, place=None, doc=None, path=None):
         node_type = _node_type_at(doc, path)
         if node_type in PROVENANCE_HINTS:
             return _(PROVENANCE_HINTS[node_type])
+    if code == "form.pattern.node.provenance.source" and doc is not None and _private_source_at(doc, path):
+        return _(PRIVATE_CITE_HINT)
     if (code == "integrity.orphan-node" and isinstance(place, str) and place.startswith("nó ")
             and not place.startswith("nó #")):
         nid = place[3:]
@@ -1986,8 +2005,9 @@ def occurrences(text, validator, should_validator=None, corpus=None):
 
 
 def _hint_doc(text, found):
-    """O documento para a dica por tipo de nó, só quando alguma ocorrência é form.required.node.provenance (o parse custa)."""
-    if not any(item[1] == "form.required.node.provenance" for item in found):
+    """O documento para a dica que depende do nó: a do tipo (form.required.node.provenance) e a do marcador privado
+    (form.pattern.node.provenance.source, v4.22). Só quando uma delas ocorre, porque o parse custa."""
+    if not any(item[1] in ("form.required.node.provenance", "form.pattern.node.provenance.source") for item in found):
         return None
     _raw, doc, parse_code = parse_v1(text)
     return None if parse_code or not isinstance(doc, dict) else doc
@@ -2517,7 +2537,11 @@ def main(argv=None):
                 same = paths[(level, code, place)]
                 one = {_node_type_at(hint_doc, x) for x in same} if hint_doc is not None else {None}
                 path = same[0] if len(one) == 1 else None
-                hint = hint_of(code, place, hint_doc, path) if level == "MUST" else None  # no MUST, a correção ao lado do lugar
+                # no MUST, a correção ao lado do lugar; no SHOULD, só a do marcador privado fora da forma (v4.22), que
+                # sem ela ficaria sem conserto na saída
+                private = (code == "form.pattern.node.provenance.source" and hint_doc is not None
+                           and all(_private_source_at(hint_doc, x) for x in same))
+                hint = hint_of(code, place, hint_doc, same[0] if private else path) if level == "MUST" or private else None
                 if hint:
                     lines.append(f"           → {hint}")
     summary = summarize(results)

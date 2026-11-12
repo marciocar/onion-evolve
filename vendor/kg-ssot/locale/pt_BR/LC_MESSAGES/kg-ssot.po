@@ -333,8 +333,10 @@ msgid ""
 "\n"
 "Usage:\n"
 "  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
-"             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
+"             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos FILE]\n"
+"             [--update [--accept-regression REASON] [--granularity graph|node]]\n"
 "       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
+"                  [--private-repos FILE]\n"
 "\n"
 "--touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common\n"
 "ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new\n"
@@ -351,6 +353,22 @@ msgid ""
 "and a submodule that is not checked out, a tracked link that cannot be followed, a .git segment, and a . or .. segment\n"
 "are counted as not checked, as is a URL: the gate does not go to the network. Off by default; it does not go with\n"
 "--update.\n"
+"\n"
+"--private-repos FILE (4.51.0), in both modes: a private repository cited without the private-cite:<id> marker\n"
+"(contract v4.22). The graph does not know that a repository is private; its owner does, and lists the patterns in a\n"
+"private file, one per line (a URL prefix, owner/repo, or repo@; the spaces at the ends are trimmed, and blank lines and\n"
+"lines starting with # are skipped: # starts a comment only at the beginning of a line, and a pattern with a space or a #\n"
+"inside is broken input, rc 2, with the line number and never the content). Each pattern is searched, case-insensitively,\n"
+"in every text value and every mapping key of the measured graphs (meta, every field of every node at any depth, and the\n"
+"edges), with %xx decoded and Unicode in NFC, in the text and in the pattern; an end of the pattern that is a letter,\n"
+"digit, _ or - must not touch another one (acme/core does not match acme/core-public). Fullwidth characters, zero-width\n"
+"spaces, backslashes, a name broken across a folded block, double percent-encoding (%xx is decoded once), and look-alike\n"
+"characters are not covered, a pattern with an invisible format character (Unicode Cf) is broken input, rc 2, and a YAML\n"
+"comment in a graph that parses is not read. A graph that does not parse is read as text, line by line. Each hit fails (rc 1) and is printed as graph,\n"
+"node and field, with the line of the pattern in the file, never the pattern or the value: a key, a node id, or a graph\n"
+"path that contains a pattern is masked (<key #i>, <node #i>, <graph #i>). A file that cannot be read or has no pattern is\n"
+"broken input (rc 2): an empty list checks nothing. It reads only the graphs the gate measures: never .kg.json, nor,\n"
+"by default, the fixtures, docs/materials, and the vendor, nor what --exclude leaves out. It does not go with --update.\n"
 msgstr ""
 "O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
 "\n"
@@ -375,8 +393,10 @@ msgstr ""
 "\n"
 "Uso:\n"
 "  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
-"             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
+"             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos ARQ]\n"
+"             [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
 "       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
+"                  [--private-repos ARQ]\n"
 "\n"
 "--touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e\n"
 "HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer\n"
@@ -392,6 +412,23 @@ msgstr ""
 "pelo disco (a edição local conta depois do git add); a fonte que não está no índice é ausente, e o submódulo não\n"
 "baixado, o link rastreado que não se segue, o segmento .git e o segmento . ou .. contam como não conferidos, como a URL:\n"
 "o gate não vai à rede. Desligado por padrão; não combina com --update.\n"
+"\n"
+"--private-repos ARQ (4.51.0), nos dois modos: o repositório privado citado sem o marcador private-cite:<id> (contrato\n"
+"v4.22). O grafo não sabe que um repositório é privado; quem sabe é o dono, que lista os padrões num arquivo privado, um\n"
+"por linha (o prefixo de URL, owner/repo ou repo@; o espaço das pontas sai, e a linha vazia e a que começa por # ficam de\n"
+"fora: o # só começa um comentário no início da linha, e o padrão com espaço ou # no meio é entrada quebrada, rc 2, com o\n"
+"número da linha e nunca o conteúdo). Cada padrão é procurado, sem distinguir maiúscula, em todo valor de texto e em toda\n"
+"chave de mapeamento dos grafos medidos (o meta, cada campo de cada nó em qualquer profundidade e as arestas), com o %xx\n"
+"decodificado e o Unicode em NFC, no texto e no padrão; a ponta do padrão que é letra, dígito, _ ou - não pode encostar\n"
+"em outra dessas (acme/core não casa acme/core-public). Largura cheia, espaço de largura zero, barra invertida, o nome\n"
+"quebrado num bloco dobrado, a dupla codificação (o %xx é decodificado uma vez só) e os sósias de caractere não são\n"
+"cobertos, o padrão com caractere de formatação invisível (Cf do Unicode) é entrada quebrada, rc 2, e o comentário YAML\n"
+"de um grafo que parseia não é lido. O grafo que não\n"
+"parseia é lido como texto, linha a linha. Cada achado reprova (rc 1) e sai como grafo, nó e campo, com a linha do padrão\n"
+"no arquivo, nunca o padrão nem o valor: a chave, o id de nó e o caminho do grafo que contêm um padrão saem mascarados\n"
+"(<key #i>, <node #i>, <graph #i>). O arquivo ilegível ou sem nenhum padrão é entrada quebrada (rc 2): uma lista vazia\n"
+"não confere nada. Lê só os grafos que o gate mede: nunca o .kg.json, nem, por padrão, as fixtures, docs/materials e o\n"
+"vendor, nem o que o --exclude tira. Não combina com --update.\n"
 
 #: tools/kg_gate.py
 msgid "✗ cited source does not match: {graph}#{node} {code} → {target}"
@@ -4451,3 +4488,51 @@ msgstr "--area-policy só vale com --identity-header"
 #: tools/kg_mcp.py
 msgid "--area-policy did not load: {error}"
 msgstr "--area-policy não carregou: {error}"
+
+#: tools/kg_gate.py
+msgid "--private-repos {path} cannot be read ({error})"
+msgstr "--private-repos {path} não se lê ({error})"
+
+#: tools/kg_gate.py
+msgid "--private-repos {path} has no pattern: an empty list checks nothing"
+msgstr "--private-repos {path} não tem nenhum padrão: uma lista vazia não confere nada"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --private-repos does not go with --update (the check is not part of the baseline)"
+msgstr "GATE QUEBRADO  --private-repos não combina com --update (a conferência não faz parte da linha de base)"
+
+#: tools/kg_gate.py
+msgid "fails (rc 1) when a text value of a measured graph cites a private repository without the private-cite: marker; FILE lists one pattern per line (a URL prefix, owner/repo, or repo@; a line starting with # is a comment), and a hit names graph, node and field, never the pattern"
+msgstr "reprova (rc 1) quando um valor de texto de um grafo medido cita um repositório privado sem o marcador private-cite:; ARQ lista um padrão por linha (o prefixo de URL, owner/repo ou repo@; a linha que começa por # é um comentário), e o achado nomeia grafo, nó e campo, nunca o padrão"
+
+#: tools/kg_gate.py
+msgid "· --private-repos: {patterns} pattern(s) in {graphs} graph(s): {hits} field(s) cite a private repository without the marker"
+msgstr "· --private-repos: {patterns} padrão(ões) em {graphs} grafo(s): {hits} campo(s) citam um repositório privado sem o marcador"
+
+#: tools/kg_gate.py
+msgid "· --sources: {n} source(s) as private-cite: (a node in a private repository, declared not checkable): not read, not missing"
+msgstr "· --sources: {n} fonte(s) como private-cite: (um nó num repositório privado, declarado não conferível): não lidas, não ausentes"
+
+#: tools/kg_gate.py
+msgid "✗ private repository cited without the private-cite: marker: {graph}#{where} {field} (pattern on line {lines} of --private-repos)"
+msgstr "✗ repositório privado citado sem o marcador private-cite:: {graph}#{where} {field} (padrão na linha {lines} do --private-repos)"
+
+#: tools/kg_trace.py
+msgid "private-cite-id takes no argument"
+msgstr "private-cite-id não leva argumento"
+
+#: tools/kg_trace.py
+msgid "· {sources} provenance.source and {traces} trace as private-cite: (a node in a private repository, declared not checkable): never read, never missing"
+msgstr "· {sources} provenance.source e {traces} trace como private-cite: (um nó num repositório privado, declarado não conferível): nunca lidos, nunca ausentes"
+
+#: tools/kg_validate.py
+msgid "Write the marker as private-cite: followed by a random id of 22 to 43 base64url characters (A-Z, a-z, 0-9, - and _), one per citation, such as the output of kg_trace.py private-cite-id (v4.22). The repository, commit, and path go in the resolution table of the private repository, never in the graph."
+msgstr "Escreva o marcador como private-cite: seguido de um id aleatório de 22 a 43 caracteres base64url (A-Z, a-z, 0-9, - e _), um por citação, como a saída do kg_trace.py private-cite-id (v4.22). O repositório, o commit e o caminho vão na tabela de resolução do repositório privado, nunca no grafo."
+
+#: tools/kg_gate.py
+msgid "--private-repos {path}: the pattern on line {line} has a space or a #; a comment only starts at the beginning of a line"
+msgstr "--private-repos {path}: o padrão da linha {line} tem espaço ou #; o comentário só começa no início da linha"
+
+#: tools/kg_gate.py
+msgid "--private-repos {path}: the pattern on line {line} has an invisible format character (Unicode category Cf)"
+msgstr "--private-repos {path}: o padrão da linha {line} tem um caractere de formatação invisível (categoria Cf do Unicode)"

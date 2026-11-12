@@ -8,8 +8,8 @@ a decision records what it replaced and what it rests on, and a decision comes b
 **English** | [Português (Brasil)](README.pt-BR.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Contract: v4 · release 4.50.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.50.0-6f42c1)](spec/release.json)
-[![Conformance: 555/555](https://img.shields.io/badge/conformance-555%2F555-2ea44f)](spec/conformance/README.md)
+[![Contract: v4 · release 4.51.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.51.0-6f42c1)](spec/release.json)
+[![Conformance: 570/570](https://img.shields.io/badge/conformance-570%2F570-2ea44f)](spec/conformance/README.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
 [![npm](https://img.shields.io/npm/v/kg-ssot)](https://www.npmjs.com/package/kg-ssot)
@@ -104,7 +104,7 @@ The tools print in English by default and in Brazilian Portuguese when your loca
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
 | [Container](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
-| Your repository | `kg_vendor.py update --tag kg-ssot-v4.50.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.51.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
 
 ## A node, inside
 
@@ -160,7 +160,7 @@ In Claude Code, it also comes as a plugin: `/plugin marketplace add marciocar/kg
 flowchart LR
   subgraph product["Product (one tag kg-ssot-vX.Y.Z)"]
     C["Contract<br/>JSON Schema MUST + SHOULD<br/>+ integrity rules"]
-    S["Conformance suite<br/>555 cases as plain data"]
+    S["Conformance suite<br/>570 cases as plain data"]
     R["Reference reader<br/>kg_validate.py"]
     S -- "every reader passes" --> R
     C --> R
@@ -204,7 +204,7 @@ flowchart LR
 | **Citations across repositories** | `kg_refs.py` answers who cites a node before you delete it, and what changed in what you cite, over a declared list of local clones. A query, not an alarm: a change never alters the exit code, and an empty answer from a partial scan says so (`kg-ssot.refs/1`). It finds a wrong citation, not a missing one |
 | **Search by meaning** | `kg_query.py --text <term> --semantic "<question>"` finds the node when the question uses other words, fusing the text search and a local multilingual embedding model by RRF; optional (`kg-ssot[vector]`), pinned by sha256, and outside every verdict |
 | **Audit package by question** | `kg_audit.py` exports one row per questionnaire item (the `x_questionnaire` profile), with the question, the answer, the verdict, the required and the given evidence with its date and due date, the evidence requests (`role: evidence_request` and `evidence_requirement`), the contradictions, the owner, and the gaps it computes, in CSV, XLSX (no dependency), or JSON (`kg-ssot.audit/1`) |
-| **Data-only suite** | 555 cases with their own metaschema, in the style of the JSON-Schema-Test-Suite |
+| **Data-only suite** | 570 cases with their own metaschema, in the style of the JSON-Schema-Test-Suite |
 | **Per-graph ratchet** | Adopt without a big-bang migration: inherited debt stays named and only shrinks |
 | **Vendor by tag** | No copy-paste, no shared code: one sha256 stamp per file |
 | **Profile-driven migrator** | `kg_migrate.py` proposes the `provenance` the contract asks for, from rules the adopter declares, shows the plan first and writes with node-by-node invariance |
@@ -223,7 +223,7 @@ flowchart LR
 
 ## Status
 
-- **Current:** contract v4, release `kg-ssot-v4.50.0`. The reference reader passes 555 of 555 cases in `latest/`.
+- **Current:** contract v4, release `kg-ssot-v4.51.0`. The reference reader passes 570 of 570 cases in `latest/`.
 - **In use:** three adopters run the gate in CI, one of them in production.
 - **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
 - **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference

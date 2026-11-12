@@ -49,8 +49,10 @@ reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
 
 Uso:
   kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]
-             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression MOTIVO] [--granularity graph|node]]
+             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos ARQ]
+             [--update [--accept-regression MOTIVO] [--granularity graph|node]]
        kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
+                  [--private-repos ARQ]
 
 --touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e
 HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer
@@ -66,6 +68,23 @@ citada mudou desde o ancestral são conferidos. Só o arquivo que o git rastreia
 pelo disco (a edição local conta depois do git add); a fonte que não está no índice é ausente, e o submódulo não
 baixado, o link rastreado que não se segue, o segmento .git e o segmento . ou .. contam como não conferidos, como a URL:
 o gate não vai à rede. Desligado por padrão; não combina com --update.
+
+--private-repos ARQ (4.51.0), nos dois modos: o repositório privado citado sem o marcador private-cite:<id> (contrato
+v4.22). O grafo não sabe que um repositório é privado; quem sabe é o dono, que lista os padrões num arquivo privado, um
+por linha (o prefixo de URL, owner/repo ou repo@; o espaço das pontas sai, e a linha vazia e a que começa por # ficam de
+fora: o # só começa um comentário no início da linha, e o padrão com espaço ou # no meio é entrada quebrada, rc 2, com o
+número da linha e nunca o conteúdo). Cada padrão é procurado, sem distinguir maiúscula, em todo valor de texto e em toda
+chave de mapeamento dos grafos medidos (o meta, cada campo de cada nó em qualquer profundidade e as arestas), com o %xx
+decodificado e o Unicode em NFC, no texto e no padrão; a ponta do padrão que é letra, dígito, _ ou - não pode encostar
+em outra dessas (acme/core não casa acme/core-public). Largura cheia, espaço de largura zero, barra invertida, o nome
+quebrado num bloco dobrado, a dupla codificação (o %xx é decodificado uma vez só) e os sósias de caractere não são
+cobertos, o padrão com caractere de formatação invisível (Cf do Unicode) é entrada quebrada, rc 2, e o comentário YAML
+de um grafo que parseia não é lido. O grafo que não
+parseia é lido como texto, linha a linha. Cada achado reprova (rc 1) e sai como grafo, nó e campo, com a linha do padrão
+no arquivo, nunca o padrão nem o valor: a chave, o id de nó e o caminho do grafo que contêm um padrão saem mascarados
+(<key #i>, <node #i>, <graph #i>). O arquivo ilegível ou sem nenhum padrão é entrada quebrada (rc 2): uma lista vazia
+não confere nada. Lê só os grafos que o gate mede: nunca o .kg.json, nem, por padrão, as fixtures, docs/materials e o
+vendor, nem o que o --exclude tira. Não combina com --update.
 """
 import argparse
 import collections
@@ -78,6 +97,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import unicodedata
 
 sys.dont_write_bytecode = True  # num vendor, rodar o gate não pode sujar o diretório carimbado
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
@@ -204,7 +224,155 @@ def source_check(repo, items, changed=None):
                        url=res["absolute_urls"], abspath=sk["absolute"] - res["absolute_urls"],
                        untracked=sk["untracked"], form=sk["form_only"], malformed=sk["malformed"],
                        other=sum(v for k, v in sk.items() if k not in shown)))
+    if res["private_cite"]:
+        lines.append(_("· --sources: {n} source(s) as private-cite: (a node in a private repository, declared not "
+                       "checkable): not read, not missing").format(n=res["private_cite"]))
     return lines, bool(res["failures"] or res["missing_sources"])
+
+
+# --private-repos (4.51.0): o repositório privado citado sem o marcador private-cite:<id> (contrato v4.22)
+_WORD = "A-Za-z0-9_-"
+
+
+def _private_norm(text):
+    """O texto como é comparado: o %xx decodificado (a URL com %2F) e a forma NFC do Unicode (o acento composto e o
+    decomposto). Largura cheia, espaço de largura zero, barra invertida e o nome quebrado num bloco dobrado não são
+    cobertos."""
+    import unicodedata
+    import urllib.parse
+    return unicodedata.normalize("NFC", urllib.parse.unquote(unicodedata.normalize("NFC", text), errors="replace"))
+
+
+def read_private_repos(path):
+    """[(linha, padrão)] do arquivo de padrões: um por linha, sem as vazias e as que começam por #, com o espaço das
+    pontas tirado. Levanta Broken no arquivo ilegível, sem padrão (uma lista vazia não confere nada) ou com um padrão que
+    tem espaço ou # no meio (o comentário no fim da linha viraria parte do padrão, e o gate passaria em silêncio). A
+    mensagem cita o caminho dado e o número da linha, nunca o conteúdo."""
+    try:
+        text = pathlib.Path(path).read_text(encoding="utf-8-sig")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Broken(_("--private-repos {path} cannot be read ({error})").format(path=path,
+                                                                                   error=type(exc).__name__)) from None
+    patterns = []
+    for n, line in enumerate(text.splitlines(), 1):
+        pattern = line.strip()
+        if not pattern or pattern.startswith("#"):
+            continue
+        if "#" in pattern or any(c.isspace() for c in pattern):
+            raise Broken(_("--private-repos {path}: the pattern on line {line} has a space or a #; a comment only "
+                           "starts at the beginning of a line").format(path=path, line=n))
+        if any(unicodedata.category(c) == "Cf" for c in pattern):  # o espaço de largura zero e outros invisíveis
+            raise Broken(_("--private-repos {path}: the pattern on line {line} has an invisible format character "
+                           "(Unicode category Cf)").format(path=path, line=n))
+        patterns.append((n, _private_norm(pattern)))
+    if not patterns:
+        raise Broken(_("--private-repos {path} has no pattern: an empty list checks nothing").format(path=path))
+    return patterns
+
+
+def _private_regex(pattern):
+    """O padrão como texto literal, sem distinguir maiúscula; a ponta que é letra, dígito, _ ou - não encosta em outra
+    dessas, para owner/repo não casar owner/repo-public nem xowner/repo."""
+    lead = f"(?<![{_WORD}])" if re.match(f"[{_WORD}]", pattern[0]) else ""
+    tail = f"(?![{_WORD}])" if re.match(f"[{_WORD}]", pattern[-1]) else ""
+    return re.compile(lead + re.escape(pattern) + tail, re.I)
+
+
+def _text_values(doc):
+    """(caminho, texto, é chave) de cada valor de texto do documento e de cada chave de mapeamento, em ordem."""
+    stack = [(doc, [])]
+    while stack:
+        value, path = stack.pop()
+        if isinstance(value, str):
+            yield path, value, False
+        elif isinstance(value, dict):
+            items = list(value.items())
+            for k, v in reversed(items):
+                stack.append((v, path + [str(k)]))
+                stack.append((_KeyMark(str(k)), path + [str(k)]))
+        elif isinstance(value, list):
+            stack.extend((v, path + [i]) for i, v in reversed(list(enumerate(value))))
+        elif isinstance(value, _KeyMark):
+            yield path, value.text, True
+
+
+class _KeyMark:
+    """Uma chave de mapeamento, que o _text_values também procura (L2 da revisão), antes do valor dela."""
+    __slots__ = ("text",)
+
+    def __init__(self, text):
+        self.text = text
+
+
+def _place(doc, path, hits):
+    """(lugar, campo) de um caminho no documento, com a máscara: o segmento de chave e o id de nó que casam um padrão
+    saem como <key #i> (i, a posição no caminho do campo) e <node #i> (i, o índice do nó), nunca o texto. hits é o
+    teste da máscara (contém um padrão)."""
+    if len(path) >= 2 and path[0] in ("nodes", "edges") and isinstance(path[1], int):
+        if path[0] == "nodes":
+            item = doc["nodes"][path[1]]
+            nid = item.get("id") if isinstance(item, dict) else None
+            where = (f"<node #{path[1]}>" if isinstance(nid, str) and hits(nid)
+                     else nid if isinstance(nid, str) and nid else f"#{path[1]}")
+        else:
+            where = f"edge #{path[1]}"
+        rest = path[2:]
+    elif path:
+        where, rest = ("<key #0>" if hits(str(path[0])) else str(path[0])), path[1:]
+    else:
+        where, rest = "root", []
+    field = ""
+    for i, part in enumerate(rest):
+        if isinstance(part, int):
+            field += f"[{part}]"
+        else:
+            seg = f"<key #{i}>" if hits(part) else part
+            field += f".{seg}" if field else seg
+    return where, field or "(value)"
+
+
+def private_repo_check(items, patterns):
+    """(linhas, achou): cada valor de texto e cada chave dos grafos medidos que cita um padrão do --private-repos, como
+    grafo, lugar e campo, com as linhas dos padrões no arquivo. Nunca o padrão nem o valor: a chave, o id de nó e o
+    caminho do grafo que casam um padrão saem mascarados."""
+    compiled = [(n, _private_regex(p)) for n, p in patterns]
+
+    folded = [p.casefold() for _n, p in patterns]
+
+    def lines_of(text):
+        norm = _private_norm(text)
+        return [n for n, rx in compiled if rx.search(norm)]
+
+    def masked(text):
+        """A máscara é mais larga que o achado: qualquer chave, id ou caminho que CONTÉM um padrão, sem a fronteira
+        (x_acme/plans leva acme/plans), sai mascarado, e tudo o que a busca acusa também (o re.I iguala ı e İ a i, e o
+        casefold não)."""
+        norm = _private_norm(text).casefold()
+        return any(p in norm for p in folded) or bool(lines_of(text))  # o mesmo critério da busca (re.I), no mínimo
+
+    hits = []
+    for gi, (name, text) in enumerate(items):
+        graph = f"<graph #{gi}>" if masked(name) else name
+        _raw, doc, err = kg_validate.parse_v1(text)
+        if err or doc is None:  # o grafo que não parseia é lido como texto, linha a linha: nunca fica de fora
+            values = [(f"line {i}", "(text)", line) for i, line in enumerate(text.splitlines(), 1)]
+        else:
+            values = []
+            for path, value, is_key in _text_values(doc):
+                where, field = _place(doc, path, masked)
+                if is_key:
+                    field = "(key)" if field == "(value)" else field + " (key)"
+                values.append((where, field, value))
+        for where, field, value in values:
+            found = lines_of(value)
+            if found:
+                hits.append((graph, where, field, found))
+    out = [_("✗ private repository cited without the private-cite: marker: {graph}#{where} {field} (pattern on line "
+             "{lines} of --private-repos)").format(graph=g, where=w, field=f, lines=", ".join(map(str, ls)))
+           for g, w, f, ls in hits]
+    out.append(_("· --private-repos: {patterns} pattern(s) in {graphs} graph(s): {hits} field(s) cite a private "
+                 "repository without the marker").format(patterns=len(patterns), graphs=len(items), hits=len(hits)))
+    return out, bool(hits)
 
 
 def _source_paths(kg_trace, node, graph, repo, tracked):
@@ -776,8 +944,10 @@ fails (rc 1) unless --allow-unreleased is given, and it never writes the baselin
 
 Usage:
   kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
-             [--strict-identity] [--allow-unreleased] [--sources] [--update [--accept-regression REASON] [--granularity graph|node]]
+             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos FILE]
+             [--update [--accept-regression REASON] [--granularity graph|node]]
        kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
+                  [--private-repos FILE]
 
 --touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common
 ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new
@@ -794,6 +964,22 @@ index blob and never from the disk (a local edit counts after git add); a source
 and a submodule that is not checked out, a tracked link that cannot be followed, a .git segment, and a . or .. segment
 are counted as not checked, as is a URL: the gate does not go to the network. Off by default; it does not go with
 --update.
+
+--private-repos FILE (4.51.0), in both modes: a private repository cited without the private-cite:<id> marker
+(contract v4.22). The graph does not know that a repository is private; its owner does, and lists the patterns in a
+private file, one per line (a URL prefix, owner/repo, or repo@; the spaces at the ends are trimmed, and blank lines and
+lines starting with # are skipped: # starts a comment only at the beginning of a line, and a pattern with a space or a #
+inside is broken input, rc 2, with the line number and never the content). Each pattern is searched, case-insensitively,
+in every text value and every mapping key of the measured graphs (meta, every field of every node at any depth, and the
+edges), with %xx decoded and Unicode in NFC, in the text and in the pattern; an end of the pattern that is a letter,
+digit, _ or - must not touch another one (acme/core does not match acme/core-public). Fullwidth characters, zero-width
+spaces, backslashes, a name broken across a folded block, double percent-encoding (%xx is decoded once), and look-alike
+characters are not covered, a pattern with an invisible format character (Unicode Cf) is broken input, rc 2, and a YAML
+comment in a graph that parses is not read. A graph that does not parse is read as text, line by line. Each hit fails (rc 1) and is printed as graph,
+node and field, with the line of the pattern in the file, never the pattern or the value: a key, a node id, or a graph
+path that contains a pattern is masked (<key #i>, <node #i>, <graph #i>). A file that cannot be read or has no pattern is
+broken input (rc 2): an empty list checks nothing. It reads only the graphs the gate measures: never .kg.json, nor,
+by default, the fixtures, docs/materials, and the vendor, nor what --exclude leaves out. It does not go with --update.
 """
 
 
@@ -811,6 +997,8 @@ def run_touched(args):
         tampered = stamp_problems(args.allow_unreleased)
         sources, sources_failed = (source_check(args.repo, items, changed_paths(args.repo, sha)) if args.sources
                                    else ([], False))
+        private, private_failed = (private_repo_check(items, read_private_repos(args.private_repos))
+                                   if args.private_repos else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -824,9 +1012,9 @@ def run_touched(args):
     else:
         print(_("· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})").format(
             base=sha[:12], graphs=changed))
-    for line in sources:
+    for line in sources + private:
         print(line)
-    return 1 if found or tampered or sources_failed else 0
+    return 1 if found or tampered or sources_failed or private_failed else 0
 
 
 def main(argv=None):
@@ -862,10 +1050,18 @@ def main(argv=None):
                            "that is not found, or a source that is not in the git index fails (rc 1); with --touched, "
                            "only what the change touches; a URL is not read and is counted as not checked; off by "
                            "default"))
+    ap.add_argument("--private-repos", metavar="FILE",
+                    help=_("fails (rc 1) when a text value of a measured graph cites a private repository without the "
+                           "private-cite: marker; FILE lists one pattern per line (a URL prefix, owner/repo, or repo@; a "
+                           "line starting with # is a comment), and a hit names graph, node and field, never the "
+                           "pattern"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     if args.sources and args.update:
         print(_("GATE BROKEN  --sources does not go with --update (the sources are not part of the baseline)"))
+        return 2
+    if args.private_repos and args.update:
+        print(_("GATE BROKEN  --private-repos does not go with --update (the check is not part of the baseline)"))
         return 2
     if args.touched is not None:
         return run_touched(args)
@@ -899,6 +1095,8 @@ def main(argv=None):
         now = numbers(measured, args.granularity or g_base)
         debt_now = numbers(measured, g_base)["debt"] if base is not None and args.granularity not in (None, g_base) else None
         sources, sources_failed = source_check(args.repo, items) if args.sources else ([], False)
+        private, private_failed = (private_repo_check(items, read_private_repos(args.private_repos))
+                                   if args.private_repos else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -919,9 +1117,9 @@ def main(argv=None):
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
             print("\n".join(lines + [_("✗ --update refused: the vendor does not pass its stamp (see above)")]))
             return 1
-    print("\n".join(lines + detail(base, now) + sources))
+    print("\n".join(lines + detail(base, now) + sources + private))
     if not args.update:
-        return 1 if sources_failed else rc
+        return 1 if sources_failed or private_failed else rc
     if worse and not args.accept_regression:
         print(_("✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\""
                 " (it stays in the baseline)"))
