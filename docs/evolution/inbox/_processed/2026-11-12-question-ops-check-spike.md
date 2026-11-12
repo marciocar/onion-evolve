@@ -9,6 +9,7 @@ severity: medium
 status: open
 re:
   - docs/evolution/inbox/2026-11-11-proposal-ops-checks-starter.md
+reviewed_for_public: true  # relido pelo core em 2026-11-12 como publicado: só a forma, sem cliente, pessoas, segredo nem postura
 ---
 
 # Pergunta ao core: posso começar o spike?

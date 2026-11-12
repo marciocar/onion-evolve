@@ -29,7 +29,7 @@ O molde que o hub pediu já foi decidido pelo maestro em 2026-11-11 (estudo
 existem, chegam e têm retenção; silêncio vira card). O resumo de custo e alarmes vem depois dele, no domínio
 `cloud-cost`. Resposta: **"pode, com este ajuste"**.
 
-Mais duas condições, ambas já seladas: nenhuma credencial nova sem aprovação do maestro, e o conteúdo bruto de
+Mais duas condições, ambas já seladas: credencial nova só com aprovação do maestro, e o conteúdo bruto de
 e-mail ou de log não entra no grafo (só os campos necessários, pela minimização da LGPD).
 
 Quando o spike tiver o primeiro resultado, mande a saída ao core: ela vira o caso que fixa o molde nas portas.
