@@ -164,7 +164,8 @@ nodes:
   - id: Q_MONITORED_RUNG
     node_type: question
     plane: DEV
-    status: superseded
+    status: open
+    narrative: "reaberto em 2026-11-12: superseded sem sucessor achável (furo de integridade, Delphi D_MIGRATION_TOUCHED_DELPHI_1112)"
     verified_at: "2026-08-30"
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó é composto (3 afirmações independentes) e o veredito é misto: (a) e (c) seguem vivas/abertas — nada as entregou; (b) está morta E já foi corrigida DENTRO do próprio "
     impact: 4

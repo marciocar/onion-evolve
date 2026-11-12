@@ -5,7 +5,6 @@
   "should": {
     "form.deprecated.node.provenance.method": 18,
     "form.range.node.label": 9,
-    "integrity.superseded-without-successor": 2,
     "yaml.unquoted-date": 1
   }
 }

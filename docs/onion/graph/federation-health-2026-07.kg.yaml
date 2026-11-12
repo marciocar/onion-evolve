@@ -123,7 +123,8 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: superseded
+    status: open
+    narrative: "reaberto em 2026-11-12: superseded sem sucessor achável (furo de integridade, Delphi D_MIGRATION_TOUCHED_DELPHI_1112)"
     verified_against: pin
     verified_at: "2026-08-30"
     label: "metagamify onion/vendor tem 1 pin INVALIDO na historia: '2026-07-12' (uma DATA, nao commit — vnextpin). Merge-base pode ficar errada; dano latente. Fix e adopter-side (sessao do rhilo re-stampa o vendor); --audit-vendor detecta do core."
@@ -179,7 +180,8 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.9
-    status: superseded
+    status: open
+    narrative: "reaberto em 2026-11-12: superseded sem sucessor achável (furo de integridade, Delphi D_MIGRATION_TOUCHED_DELPHI_1112)"
     verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): As duas afirmacoes mecanicas do label seguem verdadeiras (mecanismo por-instancia via /meta:personality-sync + relay upstream; marcio-pessoal segue gated/n-a) mas o NUMER"
     label: "6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-instancia (sessao do adotante, I3); vira emergente quando cada um rodar /meta:personality-sync e relayar upstream. Estado esperado, nao divida do core."

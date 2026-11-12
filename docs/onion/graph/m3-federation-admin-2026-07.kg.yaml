@@ -560,3 +560,9 @@ edges:
   - from: E_CENSO0901_C_p4_gate_visibility
     to: C_p4_gate_visibility
     edge_type: CONSTRAINS
+
+external_edges:
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml#D_hosted_service_identity"
+    to: Q_auth_decision
+    edge_type: SUPERSEDES

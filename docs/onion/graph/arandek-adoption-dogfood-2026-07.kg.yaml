@@ -606,3 +606,9 @@ edges:
   - from: E_W9_PIN_GREP_MEDIDO
     to: D_GREP_OLD_PIN
     edge_type: SUPPORTS
+
+external_edges:
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml#PR_465"
+    to: Q_RELAY
+    edge_type: SUPERSEDES

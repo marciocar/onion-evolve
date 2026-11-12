@@ -6,7 +6,6 @@
     "form.deprecated.node.provenance.method": 14,
     "form.range.node.label": 16,
     "form.required.node.provenance": 1,
-    "integrity.superseded-without-successor": 1,
     "yaml.unquoted-date": 1
   }
 }

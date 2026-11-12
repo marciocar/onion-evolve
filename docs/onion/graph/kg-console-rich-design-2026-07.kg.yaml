@@ -294,3 +294,9 @@ edges:
   - from: Q_live_narration
     to: D_narration_prebaked
     edge_type: DEPENDS_ON
+
+external_edges:
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml#PR_488"
+    to: Q_f3_wow
+    edge_type: SUPERSEDES

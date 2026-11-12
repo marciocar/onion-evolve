@@ -24,6 +24,16 @@ external_edges:
   - from: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
     to: "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017"
     edge_type: SUPERSEDES
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml#E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307"
+    to: E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml#E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021"
+    to: E_SDK_DO_BRIDGE_EM_0_3_306_EM_PRODUCAO_1021
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml#Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL"
+    to: Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: SUPERSEDES
 nodes:
   - id: E_DELTA_DA_RODADA
     node_type: evidence

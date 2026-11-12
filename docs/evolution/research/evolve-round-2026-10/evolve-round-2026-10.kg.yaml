@@ -316,3 +316,27 @@ edges:
   - from: E_SDAAL_SEM_VAZAMENTO_DE_PROVIDER
     to: E_RODADA_CUSTO_E_COBERTURA
     edge_type: SUPPORTS
+
+external_edges:
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS"
+    to: C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA1_SKILL_E_NAO_MEDIVEL"
+    to: C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO"
+    to: C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE"
+    to: C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA2_PECA4_DO_EVOLVE"
+    to: C_FINDINGSCHEMA_DO_EVOLVE_NAO_E_JSON_SCHEMA
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA2_PECA4_DO_EVOLVE"
+    to: C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml#E_LEVA1_PREMISSA_DO_D9_CORRIGIDA"
+    to: E_D9_NAO_E_NOOP_NO_CORE
+    edge_type: SUPERSEDES

@@ -332,3 +332,10 @@ edges:
   - from: C_p1_gerador_vertical
     to: D_prioridade
     edge_type: DEPENDS_ON
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: E_create_vertical_existe
+    to: C_p1_gerador_vertical
+    edge_type: SUPERSEDES
+  - from: D_p4_visitor_authority
+    to: E_sem_perfil_visitante
+    edge_type: SUPERSEDES

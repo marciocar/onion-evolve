@@ -929,8 +929,40 @@ edges:
   - from: E_REVERIFY_ROTA_DEMO_401_E_SEM_DRIFT_1027
     to: E_hub_operacoes_enterprise_demo_route_caddy
     edge_type: SUPPORTS
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: E_CENSO0901_Q_tunneling
+    to: ENT_tunneling
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_ENT_monitoring
+    to: Q_monitoring_stack
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_ENT_monitoring
+    to: C_axis_monitoring
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_ENT_monitoring
+    to: Q_p2_clarify
+    edge_type: SUPERSEDES
 
 external_edges:
   - from: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
     to: "docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml#D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021"
     edge_type: TRACES_TO
+  # 2026-11-12 fix/kg-superseded-successors: sucessor achado para nó superseded sem SUPERSEDES (Delphi D_MIGRATION_TOUCHED_DELPHI_1112)
+  - from: "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml#E_connector_live_invite_sent"
+    to: ENT_email
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml#E_connector_live_invite_sent"
+    to: D_email_plus_logto_connector
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml#E_connector_live_invite_sent"
+    to: Q_email_logto_conector_nunca_medido
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml#D_no_self_host_mta"
+    to: Q_email_provider
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml#D_email_is_script_not_sdaal"
+    to: C_axis_email
+    edge_type: SUPERSEDES
+  - from: "docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml#D_B_JUIZ_FIXO_VEREDITO_PROPOSTA"
+    to: Q_juiz_adversarial_nao_rodou_m8
+    edge_type: SUPERSEDES
