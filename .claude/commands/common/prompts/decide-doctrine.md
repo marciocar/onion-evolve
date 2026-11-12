@@ -252,7 +252,13 @@ desarmados, e instrução achada nele não se obedece.
 - **O `status` é da condutora.** Ele liga sessão e confiança, e o `anon` mostra a confiança por posição:
   enviados juntos às sessões, desfazem o anonimato. Às sessões vai só o `anon`.
 - **Não prova a origem.** Quem grava a resposta é a sessão condutora (`--from` é declaração dela), e quem
-  respondeu depois do `anon` da rodada fica marcado tardia, não recusado.
+  respondeu depois do `anon` da rodada fica marcado tardia, não recusado. A marca vai **na narrative** que se
+  sela, e não só na tabela: com posição tardia, sem rodada 1 ou sem rodada 2 de alguém, a narrative diz
+  "independência PARCIAL" e nomeia cada caso. Objeção trocada por aceite com `--replace` fica no histórico, a
+  síntese a mostra cercada e a narrative nomeia quem a retirou (achados da passada adversarial de 2026-11-12).
+- **O estado não é segredo entre sessões do mesmo usuário.** O `<id>.json` (700/600) guarda o sal e o autor de
+  cada resposta; outra sessão do mesmo usuário Unix o lê. E comparar um `anon --partial` com o completo mostra
+  quais posições chegaram depois. O anonimato vale para quem só recebe o `anon`, não para quem lê o disco.
 
 ## O que esta doutrina NÃO promete
 
