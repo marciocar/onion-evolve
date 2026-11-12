@@ -2,7 +2,8 @@
 branch: docs/a2a-s8a-letter-s8c
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9ecfe661b70265d922486459d8cd4f347bc8cc29d3cf2324e1cad4bfcc1e01fd
+reviewed_code_sha256: 4977e4a5e275225aeace9757ae8b0c9e09663158652a2dcb815ea34327b266a4
 findings_total: 2
 findings_real: 2
 findings_blocking: 2
