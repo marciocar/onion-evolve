@@ -42301,8 +42301,12 @@ PY
     printf 'framework: onion-evolve\nsource_commit: a682c090d1bc\nsource_commit_date: 2026-11-04\nrole: hub\nadopted_at: 2026-09-01\nmode: greenfield\nintegration_branch: develop\n' > "${_e}/.claude/.onion-version"
   }
   # $1=helper $2=rótulo $3=programa python que prepara a fixture (recebe o grafo, o alvo e o carimbo) → o grafo resultante
+  #   O diretório nasce por mktemp, nunca por $RANDOM: o nome repetido (15 bits, ~250 diretórios por família) caía
+  #   num diretório já preparado, a semente fazia no-op (never-clobber) e o preparo não achava mais a âncora, e o
+  #   caso saía "c:<rótulo>:setup" sem relação com o motor (run 43162484859, recusa-inline, 2026-11-12).
   _as_rb_prep() {
-    local _f="${d}/i6-$2-$RANDOM"
+    local _f
+    _f="$(mktemp -d "${d}/i6-$2-XXXXXX")" || return 1
     _as_rb_fixture "${_f}" || return 1
     python3 -c "$3" "${_f}/docs/onion/graph/onion-adoption.kg.yaml" "${_f}" "${_f}/.claude/.onion-version" || return 1
     printf '%s' "${_f}"
@@ -42318,8 +42322,8 @@ PY
     grep -qF -- "$4" "${_f}/out" || printf ' c:%s:motivo' "$2"
   }
   _as_rb_run() {  # $1=helper → lista de desvios (vazio = ok)
-    local _e="${d}/i6-$RANDOM" _bad="" _r=0 _g _h0 _h1 _n _f
-    _as_rb_fixture "${_e}" || { printf ' fixture-nao-montou'; return; }
+    local _e _bad="" _r=0 _g _h0 _h1 _n _f
+    _e="$(mktemp -d "${d}/i6-XXXXXX")" && _as_rb_fixture "${_e}" || { printf ' fixture-nao-montou'; return; }
     _g="${_e}/docs/onion/graph/onion-adoption.kg.yaml"
     # a) refeito (o carimbo não tem updated_at: a data cai no relógio)
     bash "$1" "${_e}" >/dev/null 2>&1 || _r=$?
@@ -45361,11 +45365,13 @@ _family run_research_workflow_selftests
 # kg-contract-check — o escritor de grafo julga o próprio arquivo contra o contrato v3 vendorizado ANTES
 # do commit (o gate do CI só vê arquivo rastreado). Nasceu do SAC-71 (2026-10-08): o grafo novo saía com
 # data sem aspas, confirmed sem provenance e label longo, e foi curado à mão no #967 e no #968.
+# A classe do method vai em inglês (measurement): desde o contrato v4.21 (kg-ssot 4.49) o apelido em português
+# (medição) alerta form.deprecated.node.provenance.method, e num grafo NOVO todo SHOULD conta (2026-11-12).
 _kcc_graph() {
   printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-08"\nnodes:\n' "$1"
   printf '  - id: Q_A\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "pergunta A"\n'
   printf '  - id: E_A\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    verified_at: "2026-10-08"\n    label: "evidência A"\n'
-  printf '    provenance:\n      source: "caminho@commit"\n      locator: "linha 1"\n      method: "medição: comando de prova"\n'
+  printf '    provenance:\n      source: "caminho@commit"\n      locator: "linha 1"\n      method: "measurement: comando de prova"\n'
   printf 'edges:\n  - from: E_A\n    to: Q_A\n    edge_type: SUPPORTS\n'
 }
 run_kg_contract_check_selftests() {
@@ -45417,8 +45423,8 @@ run_kg_contract_check_selftests() {
   # (h) aviso do v4.2 (2026-10-09, SAC-97): locality fora de {repo, web, host, pessoa} acusa
   #     form.enum.node.provenance.locality com a cura; locality válida passa limpa. Mutante: tirar a dica do HINT
   #     deixa só o código e reprova este caso.
-  _kcc_graph locruim | sed -e 's/      method: "medição: comando de prova"/&\n      locality: "nuvem"/' > "${sb}/g/locruim.kg.yaml"
-  _kcc_graph locboa | sed -e 's/      method: "medição: comando de prova"/&\n      locality: "repo"/' > "${sb}/g/locboa.kg.yaml"
+  _kcc_graph locruim | sed -e 's/      method: "measurement: comando de prova"/&\n      locality: "nuvem"/' > "${sb}/g/locruim.kg.yaml"
+  _kcc_graph locboa | sed -e 's/      method: "measurement: comando de prova"/&\n      locality: "repo"/' > "${sb}/g/locboa.kg.yaml"
   local outb rcb
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/locruim.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
   if outb="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/locboa.kg.yaml 2>&1)"; then rcb=0; else rcb=$?; fi
@@ -45441,7 +45447,8 @@ run_kg_contract_check_selftests() {
   else record_fail "kg-contract-check: (i)" "esperava rc 1 dangling-external e rc 0 no válido: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
   # (i2) kit v4.3.2 (2026-10-10): o índice só lê os grafos citados, e o alvo sai do DOCUMENTO PARSEADO. Alvo
   #      válido escrito com escape YAML (\x2F) tem de passar; chave entre aspas com id inexistente tem de
-  #      reprovar. Mutante: derivar o alvo pelo regex de linha do kit (external_targets) reprova os dois.
+  #      reprovar. Mutante: derivar o alvo por um regex de linha sobre o texto cru reprova o escapado. (O antigo,
+  #      trocar pelo external_targets do kit, ficou EQUIVALENTE: o kit 4.49 também lê o documento parseado.)
   sed -e 's|"g/limpo.kg.yaml#Q_A"|"g\\x2Flimpo.kg.yaml#Q_A"|' "${sb}/g/extok.kg.yaml" > "${sb}/g/extesc.kg.yaml"
   sed -e 's/^external_edges:/"external_edges":/' "${sb}/g/extruim.kg.yaml" > "${sb}/g/extqkey.kg.yaml"
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/extesc.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
