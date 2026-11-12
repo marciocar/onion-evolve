@@ -87,7 +87,7 @@ fi
 # bancada lê, para que a régua do teto e a do plano sejam o MESMO modelo.
 TIMES="${ONION_SHARD_TIMES:-${ROOT}/ops/testing/selftest-family-times.tsv}"
 [ -f "${TIMES}" ] || TIMES=""
-printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" W="${ONION_SHARD_WORKERS:-4}" PROJECT="${PROJECT}" IMPROVE="${ONION_SHARD_IMPROVE:-1}" python3 -c '
+printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" W="${ONION_SHARD_WORKERS:-4}" PROJECT="${PROJECT}" IMPROVE="${ONION_SHARD_IMPROVE:-1}" HEAVY="${ONION_SHARD_HEAVY_FRACTION:-0.5}" python3 -c '
 import json, os, sys
 fams = [l.strip() for l in sys.stdin if l.strip()]
 n = max(1, int(os.environ["N"]))
@@ -102,7 +102,7 @@ if os.environ.get("TIMES"):
             except ValueError: continue
             if parts[0] == "fixtures": fx_total = v
             else: times[parts[0]] = v
-# `fixtures` NAO entra no round-robin: vai a TODA faixa com a sua fatia do manifest (fixtures_lane i/n).
+# `fixtures` NAO entra no round-robin: vai a cada faixa SEM pesada separada (todas, sem separacao), com a sua fatia (fixtures_lane i/k).
 # Medido 2026-10-05: ~1600 s de CPU numa faixa so, teto de 25 min estourado 3x no PR #927 — somar
 # faixas nao ajudava enquanto ela inteira caisse numa so.
 fx = "fixtures" in fams
@@ -117,13 +117,34 @@ _sem = sorted(f for f in rest if f not in times) if os.environ.get("TIMES") else
 if _sem:
     print("selftest-shard-plan: %d familia(s) sem tempo na tabela entram pela mediana (%.0f s): %s"
           % (len(_sem), med, ",".join(_sem[:12])), file=sys.stderr)
-fx_w = (fx_total / (n * W)) if fx else 0.0
+# AS PESADAS SEPARADAS (2026-11-12, tarde): a faixa 1 do plano de 6 juntava as quatro mais caras
+# (selftest_selection, kg_backlog, selftest_lanes, outbox_channel) e mais a fatia da `fixtures`, e estourou o
+# passo em 3 de 4 pushes à main (runs 43265160002, 43268758579 e 43279234372). O modelo achava a pilha
+# eficiente (4 workers, 4 pesadas em paralelo), mas a parede dela é o MÁXIMO de quatro variáveis ruidosas
+# (cada uma de 1,2 a 1,4× a mediana no pior run) somado à MAIOR fatia de `fixtures` entre os workers (1,05 a
+# 1,45× a média), e nada disso o modelo vê. Pesada = família com custo ≥ ONION_SHARD_HEAVY_FRACTION (0,5) da
+# mais cara. Com N maior que o número de pesadas, cada pesada tem faixa própria e essa faixa NÃO recebe fatia
+# da `fixtures`: a pesada começa no 0 e a parede da faixa é a dela. As leves completam as faixas pela fila
+# simulada, e a `fixtures` se reparte só entre as faixas sem pesada (fixtures_lane i/k, k = essas faixas).
+# Com N ≤ pesadas, o plano avisa e volta ao modo antigo (sem separação, `fixtures` em todas).
+heavy = []
+if times:
+    try: hf = float(os.environ.get("HEAVY", "0.5"))
+    except ValueError: hf = 0.5
+    top = max((cost(f) for f in rest), default=0.0)
+    heavy = sorted((f for f in rest if top > 0 and cost(f) >= hf * top), key=lambda f: (-cost(f), pos[f]))
+sep = bool(heavy) and n > len(heavy)
+if heavy and not sep:
+    print("selftest-shard-plan: %d pesada(s) e só %d faixa(s): sem separação, as pesadas podem dividir faixa"
+          % (len(heavy), n), file=sys.stderr)
+fx_lanes = [k for k in range(n) if not (sep and k < len(heavy))] if fx else []
+fx_w = (fx_total / (len(fx_lanes) * W)) if fx_lanes else 0.0
 
-def wall(lane):
+def wall(lane, k):
     # a fila dinamica do lint-selftest.sh --jobs: cada worker livre pega a proxima familia LIVRE na ordem
-    # do script; ao chegar na `fixtures`, roda a SUA fatia (todo worker roda a dele)
+    # do script; ao chegar na `fixtures`, roda a SUA fatia (todo worker da faixa que a recebe roda a dele)
     seq = sorted(lane, key=lambda f: pos[f])
-    if fx:
+    if k in fx_lanes:
         k = next((i for i, f in enumerate(seq) if pos[f] > pos["fixtures"]), len(seq))
         seq = seq[:k] + ["fixtures"] + seq[k:]
     t = [0.0] * W; ptr = [0] * W; taken = set()
@@ -136,12 +157,15 @@ def wall(lane):
         elif f not in taken: taken.add(f); t[w] += cost(f)
 
 shards = [[] for _ in range(n)]
+if sep:
+    for k, f in enumerate(heavy): shards[k].append(f)
+movable = [f for f in rest if not (sep and f in heavy)]
 if times:
-    walls = [wall(s) for s in shards]
-    for f in sorted(rest, key=lambda f: (-cost(f), pos[f])):   # LPT: o mais caro primeiro
+    walls = [wall(s, k) for k, s in enumerate(shards)]
+    for f in sorted(movable, key=lambda f: (-cost(f), pos[f])):   # LPT: o mais caro primeiro
         best = None
         for k in range(n):
-            wk = wall(shards[k] + [f])
+            wk = wall(shards[k] + [f], k)
             others = max([walls[j] for j in range(n) if j != k], default=0.0)
             key = (max(wk, others), wk, k)
             if best is None or key < best[0]: best = (key, k, wk)
@@ -154,13 +178,13 @@ if times:
     # ONION_SHARD_IMPROVE=0 desliga a melhora (só para o caso (l) da bancada comparar)
     for _ in range(30 if os.environ.get("IMPROVE", "1") != "0" else 0):
         moved = False
-        for f in sorted(rest, key=lambda f: -cost(f)):
+        for f in sorted(movable, key=lambda f: -cost(f)):
             a = next(i for i, s in enumerate(shards) if f in s)
             base = score(walls); best = None
-            src = [g for g in shards[a] if g != f]; wa = wall(src)
+            src = [g for g in shards[a] if g != f]; wa = wall(src, a)
             for b in range(n):
                 if b == a: continue
-                wb = wall(shards[b] + [f])
+                wb = wall(shards[b] + [f], b)
                 ws = list(walls); ws[a] = wa; ws[b] = wb
                 if score(ws) < base and (best is None or score(ws) < best[0]): best = (score(ws), b, wb)
             if best:
@@ -172,14 +196,15 @@ else:
         shards[i % n].append(f)
 if os.environ.get("PROJECT") == "1":
     for i, s in enumerate(shards):
-        print("%d\t%.0f\t%.0f" % (i + 1, wall(s), sum(cost(g) for g in s)))
+        print("%d\t%.0f\t%.0f" % (i + 1, wall(s, i), sum(cost(g) for g in s)))
     raise SystemExit(0)
 out = []
 for i, s in enumerate(shards):
-    if fx: s = ["fixtures"] + s
+    has_fx = i in fx_lanes
+    if has_fx: s = ["fixtures"] + s
     if not s: continue
     d = {"n": i + 1, "familias": ",".join(s)}
-    if fx: d["fixtures_lane"] = "%d/%d" % (i, n)
+    if has_fx: d["fixtures_lane"] = "%d/%d" % (fx_lanes.index(i), len(fx_lanes))
     out.append(d)
 print(json.dumps(out))
 '

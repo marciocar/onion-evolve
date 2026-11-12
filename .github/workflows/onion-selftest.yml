@@ -129,7 +129,7 @@ jobs:
           ONION_SHARD_FAMILIES: ${{ steps.n.outputs.familias }}
         run: |
           set -euo pipefail
-          plano="$(bash ops/testing/selftest-shard-plan.sh 6)"
+          plano="$(bash ops/testing/selftest-shard-plan.sh 7)"
           echo "plano: ${plano}"
           echo "faixas=${plano}" >> "${GITHUB_OUTPUT}"
 
@@ -175,8 +175,16 @@ jobs:
     # (±3% nas 35 faixas de 7 runs completos com os tempos do próprio run; pela mediana, de −18% a +43% por
     # faixa), a tabela é a mediana desses 7 runs, e são 6 faixas: o
     # piso da faixa da `selftest_selection` é a fatia da `fixtures` + ela, e só cai com mais faixas.
+    # 2026-11-12, TARDE: A FAIXA 1 ESTOUROU O PASSO em 3 de 4 pushes à main (runs 43265160002, 43268758579 na 1ª
+    # tentativa e 43279234372) e no PR #1630, sem caso reprovado. O plano de 6 juntava as quatro pesadas
+    # (`selftest_selection`, `kg_backlog`, `selftest_lanes`, `outbox_channel`) e uma fatia da `fixtures` numa
+    # faixa só: a parede dela era o máximo de quatro famílias ruidosas mais a maior fatia da `fixtures` entre
+    # os workers, e no run lento foi além de 23 min. Cura sem subir o teto: cada PESADA (custo ≥ metade da mais
+    # cara) em faixa própria, SEM fatia da `fixtures` (que se reparte entre as faixas sem pesada), tabela
+    # re-medida pela sonda de disco de 18 runs completos (os 3 estouros entram como limite inferior) e 7 faixas.
     # O caso (h) da `shard_plan` reprova se a faixa mais pesada, projetada pelo PRÓPRIO plano
-    # (`selftest-shard-plan.sh --project`) no N deste arquivo, passar de 75% do teto do passo (23 min).
+    # (`selftest-shard-plan.sh --project`) no N deste arquivo, passar de 65% do teto do passo (23 min): com
+    # +50% de variância sobre a projeção ela ainda cabe no passo (0,65 × 1,5 = 0,975).
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
@@ -218,10 +226,11 @@ jobs:
         # está bom" de "não verifiquei" — no CI só o primeiro vale verde.
         env:
           ONION_SELFTEST_STRICT: '1'
-          # ⏱ por família no log: é a medida que o collect-family-times.sh lê para o plano dividir as faixas
-          # por TEMPO, e não por round-robin (faixas de 5 a 19 min no mesmo PR, 2026-10-07)
+          # ⏱ por família no log (o tempo de cada família à vista no job). A tabela do plano é medida pela
+          # SONDA DE DISCO do artefato (collect-family-times.sh), que também registra a faixa que estourou
           ONION_SELFTEST_TIMING: '1'
-          # a fatia desta faixa no manifest da família `fixtures` (o plano a reparte entre TODAS as faixas)
+          # a fatia desta faixa no manifest da família `fixtures` (o plano a reparte entre as faixas SEM
+          # pesada; na faixa de uma pesada vem vazia e a `fixtures` não está na lista de famílias dela)
           ONION_SELFTEST_FIXTURES_LANE: ${{ matrix.faixa.fixtures_lane }}
         # --jobs auto: faixa paralela (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03) — cada worker é um
         # processo --child com o mesmo cabeçalho; worker sem trailer de soma = FALHA no pai.
