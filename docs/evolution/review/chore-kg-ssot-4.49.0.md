@@ -2,8 +2,7 @@
 branch: chore/kg-ssot-4.49.0
 pr: pendente
 date: 2026-11-11
-reviewed_diff_sha256: 1a4928fb217edb1af74810dbde941d12fcf2b7ea659557c6fe8892d1d3994a9f
-reviewed_code_sha256: 3a58dfb5de4bf4a17e0f4bdd823db1c64f95d98f85cc0ec701fa231f68a6eae5
+reviewed_diff_sha256: pendente
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
@@ -64,3 +63,7 @@ num diretório vazio passam (38/38). Não é efeito da 4.49.0 e não foi alterad
 ## Re-revisão 2
 
 O CI reprovou o caso `method-classe-ingles-e-alias-aprovam-sem-aviso` do selftest do escritor MCP (`ops/mcp-onion-kg-writer/selftest.py`): desde o contrato v4.21 os aliases em português seguem aprovados, mas com o aviso SHOULD de depreciação. O caso agora exige zero aviso só das classes inglesas, e um caso novo exige que os aliases aprovem COM o aviso. Rodado local: 66 de 66.
+
+## Re-revisão 3
+
+A bancada da família `mcp_onion_kg_writer` contava 65 casos; com o caso novo dos aliases, o harness tem 66. `want_total` foi a 66.
