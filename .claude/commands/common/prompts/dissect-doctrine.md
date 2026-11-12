@@ -393,9 +393,10 @@ segue com o sentido de sempre.
 e o contrato ok já passaram num grafo que ele reprovou no CI.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
-mediu, nunca aprovação) confere os 10 itens — família e aresta, veredito da família, destino, quem paga e o não
+mediu, nunca aprovação) confere os 11 itens — família e aresta, veredito da família, destino, quem paga e o não
 verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
-nível 1, o registro de ideias e a candidata nomeada pelo parque (§1c) — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
+nível 1, o registro de ideias, a candidata nomeada pelo parque (§1c) e a síntese — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
 2026-10-24 (sem `x_study_destination`) fica fora por desenho; rodar o checador direto sobre ele lista o que falta
 para migrar. Bancada: `run_dissect_object_selftests`.
+**A síntese é obrigatória no estágio final:** sem `<pasta-do-grafo>/SYNTHESIS.md` citando o grafo da pasta (no `kg:` ou num link) o item 11 reprova (`synthesis-ausente`, `synthesis-nao-cita-o-grafo`); o `--stage plan` não a cobra.
