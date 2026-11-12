@@ -290,6 +290,9 @@ jobs:
         # SUBIDO para v1.0.269 (61a9c274; a tag anotada é 402b5b79) em 2026-11-06, pelo aviso do session-currency-check: 4 commits,
         # um por release (1.0.266 a 1.0.269), todos "bump Claude Code to 2.1.31x and Agent SDK to 0.3.31x", nos mesmos 6 arquivos;
         # as notas das 4 releases só trazem o link do changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
+        # SUBIDO para v1.0.272 (d5f7970a; a tag anotada é 6efe0fa3) em 2026-11-12, pelo aviso do session-currency-check: 1 commit
+        # (PR #1963 da action), que só muda o exemplo test-failure-analysis.yml para passar o structured_output por env:;
+        # o comportamento da action não muda, e este workflow já lê o structured_output por env (SO1/SO2). Antes:
         # SUBIDO para v1.0.271 (4fa93a88; a tag anotada é 9008224d) em 2026-11-10, pelo aviso do session-currency-check: 3 commits,
         # 2 bumps (CLI 2.1.321 e 2.1.322, SDK 0.3.32x) e o #1650 (o release.yml deles empurra tags com deploy key). As notas da
         # 1.0.270 só citam o #1650 e as da 1.0.271 só o changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
@@ -304,7 +307,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed
+        uses: anthropics/claude-code-action@d5f7970ae232b6039636a16ea7f251e58e814f38
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -451,6 +454,9 @@ jobs:
         # SUBIDO para v1.0.269 (61a9c274; a tag anotada é 402b5b79) em 2026-11-06, pelo aviso do session-currency-check: 4 commits,
         # um por release (1.0.266 a 1.0.269), todos "bump Claude Code to 2.1.31x and Agent SDK to 0.3.31x", nos mesmos 6 arquivos;
         # as notas das 4 releases só trazem o link do changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
+        # SUBIDO para v1.0.272 (d5f7970a; a tag anotada é 6efe0fa3) em 2026-11-12, pelo aviso do session-currency-check: 1 commit
+        # (PR #1963 da action), que só muda o exemplo test-failure-analysis.yml para passar o structured_output por env:;
+        # o comportamento da action não muda, e este workflow já lê o structured_output por env (SO1/SO2). Antes:
         # SUBIDO para v1.0.271 (4fa93a88; a tag anotada é 9008224d) em 2026-11-10, pelo aviso do session-currency-check: 3 commits,
         # 2 bumps (CLI 2.1.321 e 2.1.322, SDK 0.3.32x) e o #1650 (o release.yml deles empurra tags com deploy key). As notas da
         # 1.0.270 só citam o #1650 e as da 1.0.271 só o changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
@@ -465,7 +471,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed
+        uses: anthropics/claude-code-action@d5f7970ae232b6039636a16ea7f251e58e814f38
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
