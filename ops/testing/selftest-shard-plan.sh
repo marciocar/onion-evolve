@@ -111,6 +111,12 @@ pos = {f: i for i, f in enumerate(fams)}
 known = sorted(times.values())
 med = known[len(known) // 2] if known else 1.0
 cost = lambda f: times.get(f, med)
+# Familia que a tabela nao conhece entra pela MEDIANA; o plano AVISA no stderr pelo nome (nunca em silencio):
+# familia nova nasce sem tempo medido e so ganha linha quando rodar na main (collect-family-times.sh).
+_sem = sorted(f for f in rest if f not in times) if os.environ.get("TIMES") else []
+if _sem:
+    print("selftest-shard-plan: %d familia(s) sem tempo na tabela entram pela mediana (%.0f s): %s"
+          % (len(_sem), med, ",".join(_sem[:12])), file=sys.stderr)
 fx_w = (fx_total / (n * W)) if fx else 0.0
 
 def wall(lane):
