@@ -2,7 +2,8 @@
 branch: chore/rename-baton-doctrine
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 210842722ff8617fead69e00426c8ba6279c04f56b4b45af1dee524b007ec9e8
+reviewed_code_sha256: a06c8927def9e383d98ee37020b02d4cab7a07fc3908c555615b976af5df6d2c
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
