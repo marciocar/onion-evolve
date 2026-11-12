@@ -439,6 +439,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-12: «O Delphi (core, kg-ssot e curadoria, consenso sem objeção, confiança 0,75 a 0,85) propôs que o Brain poste como bot do @brain em três fases. Selo?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
       locality: "pessoa"
+  - id: D_COMMS_BACKBONE_COMPOSED_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «Selar e o core orquestra: (1) Slack por evento com reivindicação única, envio pelo bot e DM de não-admin; (2) descoberta de sessões independente do config; (3) conformidade A2A 1.0 do bridge; (4) e-mail; (5) NATS só quando medido. Aceite: uma semana com 0 perda, 0 dobro, tudo pelo bot, p95 abaixo de 60 s. O transporte é a fundação necessária; o valor está nas peças de cima (governança, auditoria, soberania), em open-core, empacotado só depois do dogfood e com uma medida própria de que a governança é o que o comprador paga»"
+    label: "O backbone de comunicação do Onion é composição sobre padrões abertos (A2A 1.0, CloudEvents, MCP), com núcleo estreito, conectores na periferia, o grafo fora do caminho de entrega e a construção orquestrada pelo core na ordem da dor medida."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «Selar e o core orquestra: (1) Slack por evento com reivindicação única, envio pelo bot e DM de não-admin; (2) descoberta de sessões independente do config; (3) conformidade A2A 1.0 do bridge; (4) e-mail; (5) NATS só quando medido. Aceite: uma semana com 0 perda, 0 dobro, tudo pelo bot, p95 abaixo de 60 s. O transporte é a fundação necessária; o valor está nas peças de cima (governança, auditoria, soberania), em open-core, empacotado só depois do dogfood e com uma medida própria de que a governança é o que o comprador paga»; descartadas: «Selar só os passos 1 e 2» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «O Delphi do backbone fechou por unanimidade (core, kg-ssot, curadoria e hub). Selo, com o core orquestrando a construção?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
+  - id: D_COMMS_BACKBONE_VALUE_TABLE_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «o transporte vende segurança, monitoramento, rastreabilidade, observabilidade, criptografia, eventos, agendamento, gestão de falhas, auditoria; são muitos os valores a serem mensurados e colocados em uma tabela de critérios e valores que venda (complemento do maestro ao selo do backbone)»"
+    label: "As qualidades do transporte se vendem, medidas numa tabela de critérios e valores (segurança, criptografia, rastreabilidade, observabilidade, monitoramento, eventos, agendamento, gestão de falhas, auditoria, soberania); o que não se vende sozinho é o encanamento."
+    narrative: "Selado por /meta:decide em 2026-11-12: escolhida «o transporte vende segurança, monitoramento, rastreabilidade, observabilidade, criptografia, eventos, agendamento, gestão de falhas, auditoria; são muitos os valores a serem mensurados e colocados em uma tabela de critérios e valores que venda (complemento do maestro ao selo do backbone)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «O transporte não se vende (redação da síntese do Delphi)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-12: «Complemento ao selo do backbone: o transporte se vende?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
+      locality: "pessoa"
 edges:
   - from: E_KG_SSOT_LE_A_MATRIZ_V1_1111
     to: D_MATRIZ_DE_PAPEIS_V1_DO_PILOTO_1111
@@ -541,4 +573,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_BRAIN_SLACK_AS_BOT_NOW_1112
     to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: TRACES_TO
+  - from: D_COMMS_BACKBONE_COMPOSED_1112
+    to: Q_PECA_BOT_SLACK_POR_EVENTOS_1111
+    edge_type: TRACES_TO
+  - from: D_COMMS_BACKBONE_VALUE_TABLE_1112
+    to: D_COMMS_BACKBONE_COMPOSED_1112
     edge_type: TRACES_TO
