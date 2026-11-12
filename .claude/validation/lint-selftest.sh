@@ -57981,8 +57981,19 @@ quiet = [E('user', now - 3700, 'tarefa'), E('assistant', now - 3650, [{'type': '
          E('user', now - 3600, [{'type': 'tool_result', 'tool_use_id': 'q1', 'content': 'ok'}]), att]
 open(f'{d}/agent-awfdone.jsonl', 'w').write('\n'.join(so) + '\n')
 open(f'{d}/agent-awfquiet.jsonl', 'w').write('\n'.join(quiet) + '\n')
+# limites curados na passada do refutador (APPROVED, 2026-11-12): carimbo no futuro, entrega com is_error, entrega e depois mais trabalho
+fut = [E('user', now + 86400, 'tarefa'), E('assistant', now + 86400, [{'type': 'tool_use', 'id': 'f1', 'name': 'Bash', 'input': {'command': 'sleep 9'}}])]
+soerr = [E('user', now - 3700, 'tarefa'), E('assistant', now - 3650, [{'type': 'tool_use', 'id': 'e1', 'name': 'StructuredOutput', 'input': {}}]),
+         E('user', now - 3600, [{'type': 'tool_result', 'tool_use_id': 'e1', 'content': 'schema inválido', 'is_error': True}])]
+after = [E('user', now - 3800, 'tarefa'), E('assistant', now - 3750, [{'type': 'tool_use', 'id': 'a1', 'name': 'StructuredOutput', 'input': {}}]),
+         E('user', now - 3700, [{'type': 'tool_result', 'tool_use_id': 'a1', 'content': 'Structured output provided successfully'}]),
+         json.dumps({'type': 'assistant', 'timestamp': ts(now - 3650), 'message': {'role': 'assistant', 'id': 'm9', 'content': [{'type': 'tool_use', 'id': 'a2', 'name': 'Bash', 'input': {'command': 'ls'}}]}}),
+         E('user', now - 3600, [{'type': 'tool_result', 'tool_use_id': 'a2', 'content': 'ok'}])]
+for k, L in (('awffuture', fut), ('awfsoerror', soerr), ('awfafter', after)): open(f'{d}/agent-{k}.jsonl', 'w').write('\n'.join(L) + '\n')
 BP_WF
-  touch -d "@${NOW}" "${ag}/workflows/wf_1/agent-awfdone.jsonl" "${ag}/workflows/wf_1/agent-awfquiet.jsonl"
+  touch -d "@${NOW}" "${ag}/workflows/wf_1/agent-awfdone.jsonl" "${ag}/workflows/wf_1/agent-awfquiet.jsonl" \
+    "${ag}/workflows/wf_1/agent-awfsoerror.jsonl" "${ag}/workflows/wf_1/agent-awfafter.jsonl"
+  touch -d "@$((NOW - 3600))" "${ag}/workflows/wf_1/agent-awffuture.jsonl"
   _bp_ab() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_1/awfdone' <<< "${a}" | tr '\t' ' ')"
     grep -q "^agent${T}wf_1/awfdone${T}AGENT_DONE${T}.*relatório entregue (StructuredOutput) há 60min" <<< "${a}"; }
   _bpcase "(ab) agente de Workflow que entregou por StructuredOutput sai AGENT_DONE" \
@@ -57992,6 +58003,21 @@ BP_WF
     grep -q "^agent${T}wf_1/awfquiet${T}AGENT_SILENT${T}.*há 60min" <<< "${a}"; }
   _bpcase "(ac) a linha attachment final não conta como atividade: o agente calado sai AGENT_SILENT" \
     "    if last_ts:" "    if False:" _bp_ac
+  # (ad) carimbo no futuro não é idade: cai no mtime (60 min) e o pendente sai STALLED, nunca «RUNNING há -1440min»
+  _bp_ad() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_1/awffuture' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}wf_1/awffuture${T}AGENT_STALLED${T}.*há 60min" <<< "${a}"; }
+  _bpcase "(ad) carimbo no futuro cai no mtime" \
+    "    if age is None or age < 0: age = now" "    if age is None: age = now" _bp_ad
+  # (ae) entrega com is_error não fecha: o agente que morreu depois dela sai SILENT, não DONE
+  _bp_ae() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_1/awfsoerror' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}wf_1/awfsoerror${T}AGENT_SILENT${T}" <<< "${a}"; }
+  _bpcase "(ae) StructuredOutput com is_error não é fim" \
+    "in FINAL_TOOLS and not b.get('is_error'): handback" "in FINAL_TOOLS: handback" _bp_ae
+  # (af) entregou, seguiu trabalhando e se calou: a marca de fim zera na nova mensagem do assistente (o W5 do refutador)
+  _bp_af() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep '^agent.wf_1/awfafter' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent${T}wf_1/awfafter${T}AGENT_SILENT${T}" <<< "${a}"; }
+  _bpcase "(af) entrega seguida de mais trabalho e silêncio sai SILENT, não DONE" \
+    "                    handback = ''   # nova mensagem" "                    pass   # nova mensagem" _bp_af
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests

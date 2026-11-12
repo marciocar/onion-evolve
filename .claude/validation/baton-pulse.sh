@@ -468,13 +468,14 @@ def agent_state(path):
                     mid = msg.get('id')
                     for b in blocks:
                         if isinstance(b, dict) and b.get('type') == 'tool_use' and b.get('id'): pend[b['id']] = (mid, b)
-                    handback = ''
+                    handback = ''   # nova mensagem do assistente depois da entrega: o fim deixou de ser o fim
                 else:
                     for b in blocks:
                         if not (isinstance(b, dict) and b.get('type') == 'tool_result'): continue
                         hit = pend.pop(b.get('tool_use_id'), None)
                         rc = b.get('content'); last_res = rc if isinstance(rc, str) else json.dumps(rc, ensure_ascii=False)
-                        if hit and hit[1].get('name') in FINAL_TOOLS: handback = hit[1]['name']
+                        # entrega com is_error não é fim: o agente tenta de novo (65 casos reais, refutador 2026-11-12)
+                        if hit and hit[1].get('name') in FINAL_TOOLS and not b.get('is_error'): handback = hit[1]['name']
     except (OSError, UnicodeDecodeError) as e:
         return 'AGENT_UNMEASURED', f'transcript ilegível ({type(e).__name__}): NÃO medido', ''
     if not n: return 'AGENT_UNMEASURED', 'transcript sem entrada user/assistant legível: NÃO medido', ''
@@ -484,7 +485,7 @@ def agent_state(path):
     if last_ts:
         try: age = now - int(datetime.datetime.fromisoformat(str(last_ts).replace('Z', '+00:00')).timestamp())
         except ValueError: age = None
-    if age is None: age = now - int(os.path.getmtime(path))
+    if age is None or age < 0: age = now - int(os.path.getmtime(path))   # carimbo no futuro não é idade: cai no mtime
     if pend:
         pl = [b for _, b in pend.values()]
         cmd = agent_cmd(pl[0]) + (f' (+{len(pl) - 1} pendente(s))' if len(pl) > 1 else '')   # o 1º da leva é o que segura os outros

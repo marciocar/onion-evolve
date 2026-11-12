@@ -3,16 +3,16 @@ branch: fix/baton-workflow-agent-done
 pr: pendente
 date: 2026-11-12
 reviewed_diff_sha256: pendente
-findings_total: 2
-findings_real: 2
+findings_total: 5
+findings_real: 5
 findings_blocking: 2
 tokens: 0
 duration_min: 0
-findings_fixed: 2
+findings_fixed: 5
 verdict: FIXED
 elenxo: false
-reviewer: "o próprio agente de execução, sobre o defeito que a sessão principal mediu na 1ª batida real depois do #1617; sem subagente (o brief proíbe lançar agentes)"
-nota: "tokens = 0 e duration_min = 0: não medidos. Medidos: família baton_pulse 58/58 (29 casos, 2 novos, cada um reprovando contra o mutante dele), censo das formas de fim nos 4851 transcripts de workflow da máquina e dogfood real antes e depois."
+reviewer: "1ª passada: o próprio agente de execução, sobre o defeito que a sessão principal mediu na 1ª batida real depois do #1617; 2ª passada: refutador separado (subagente que não escreveu o diff), APPROVED sem bloqueio e com 3 limites, curados pelo agente"
+nota: "tokens = 0 e duration_min = 0: não medidos. Medidos: família baton_pulse 64/64 (32 casos, 5 novos, cada um reprovando contra o mutante dele), censo das formas de fim nos 4851 transcripts de workflow da máquina e dogfood real antes e depois."
 ---
 
 # Passada adversarial: `fix/baton-workflow-agent-done`
@@ -50,10 +50,26 @@ SILENT e 5 STALLED que sobram são subagentes comuns e antigos: os SILENT termin
 API sem resposta, e os STALLED em laços de espera pendurados. Isso é o sintoma que a classe deve acusar, e não outra
 forma de fim.
 
+## Passada do refutador (APPROVED)
+
+Nada bloqueia; família 58/58 no 98b491bc3. Três limites baratos, curados na mesma branch:
+
+3. **Carimbo no futuro dava idade negativa.** O agente pendente saía `RUNNING há -1440min` para sempre. Cura: idade
+   negativa cai no mtime. Caso (ad).
+4. **Entrega com `is_error: true` fechava como DONE.** O agente tenta de novo depois dela (65 casos reais). Cura: só o
+   tool_result sem erro de uma ferramenta final é fim. Caso (ae).
+5. **Mutante W5 vivo: a marca de fim não zerava na nova mensagem do assistente.** O código já zerava, mas nenhum caso
+   provava. Um agente que entregou, seguiu trabalhando e morreu calado sai SILENT, não DONE. Caso (af).
+
+Os casos sintéticos do refutador (carimbo epoch, no futuro, lixo, ausente, ingênuo, com fuso, velho com mtime novo,
+StructuredOutput com pendência, StructuredOutput com erro) rodados contra a cura: os pendentes saem STALLED ou RUNNING
+pela idade, a entrega com erro sai SILENT, e nenhum sai DONE.
+
 ## Mutantes
 
 - (ab): o `StructuredOutput` sai de `FINAL_TOOLS`.
 - (ac): a idade volta a ser só o mtime (`if last_ts:` vira `if False:`).
+- (ad): a idade negativa deixa de cair no mtime. (ae): o `is_error` deixa de ser conferido. (af): a marca de fim não zera (W5).
 
 ## Limites declarados
 
