@@ -2,7 +2,8 @@
 branch: feat/decide-batch-triage
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c0d89b9a517bff51a4ac769258943f8c5c515d1cb06c1cef221396f231d53258
+reviewed_code_sha256: 5a78a5feaaeabbd275086584831ca86cd8df997f12b923afd35a6ddfa467d3fd
 findings_total: 12
 findings_real: 12
 findings_fixed: 7
