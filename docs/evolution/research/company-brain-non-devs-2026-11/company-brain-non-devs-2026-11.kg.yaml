@@ -465,6 +465,7 @@ nodes:
     verified_at: "2026-11-12"
     verified_against: "decisão do maestro em 2026-11-12, por pergunta com opções (/meta:decide): escolhida «o transporte vende segurança, monitoramento, rastreabilidade, observabilidade, criptografia, eventos, agendamento, gestão de falhas, auditoria; são muitos os valores a serem mensurados e colocados em uma tabela de critérios e valores que venda (complemento do maestro ao selo do backbone)»"
     label: "As qualidades do transporte se vendem, medidas numa tabela de critérios e valores (segurança, criptografia, rastreabilidade, observabilidade, monitoramento, eventos, agendamento, gestão de falhas, auditoria, soberania); o que não se vende sozinho é o encanamento."
+    trace: "docs/evolution/research/company-brain-non-devs-2026-11/comms-backbone-value-table.md"
     narrative: "Selado por /meta:decide em 2026-11-12: escolhida «o transporte vende segurança, monitoramento, rastreabilidade, observabilidade, criptografia, eventos, agendamento, gestão de falhas, auditoria; são muitos os valores a serem mensurados e colocados em uma tabela de critérios e valores que venda (complemento do maestro ao selo do backbone)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «O transporte não se vende (redação da síntese do Delphi)»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
