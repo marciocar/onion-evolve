@@ -2,7 +2,8 @@
 branch: fix/kg-pr-history-as-evidence
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 56173973e553d35f95f9fb7e005c4ada16a741aa8e6f70d7ec8bd4c85f197749
+reviewed_code_sha256: 9a5c7c4ef6767cb4fa0124ae179a5cb06543522912c7d7aaf2dce07e674bc29a
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
