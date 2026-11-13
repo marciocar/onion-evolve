@@ -128,6 +128,11 @@ nodes:
     verified_at: "2026-11-13"
     verified_against: "lint-selftest.sh --families private_repos_port com LC_ALL=C na branch chore/kg-ssot-4510: 42 passam, 0 falham (re-rodada de 2026-11-13)"
     trace: ".claude/utils/kg/private_repos.py"
+    provenance:
+      source: "vendor/kg-ssot/docs/manual/pt-BR/05-ferramentas.md (kg-ssot 4.51.0, tag kg-ssot-v4.51.0)"
+      locator: "seção «O repositório privado citado sem o marcador: `--private-repos` (4.51.0)»"
+      method: "measurement: o porte escrito pela regra do manual e conferido contra o kg_gate.private_repo_check do vendor no mesmo corpus"
+      locality: "repo"
     label: "a regra do kg_gate.py --private-repos (kg-ssot 4.51.0, contrato v4.22) é PORTADA para a casa num módulo só, que a REGRA 121 e o kg-trace.sh chamam com o arquivo privado de padrões do dono; desligada sem ele"
     narrative: "A catraca do kg_gate.py julga o corpus inteiro, e as guardas da casa julgam o tocado (REGRA 121) ou o corpus do trace: por isso o porte, escrito pela regra do capítulo 5 do manual, e não a chamada ao gate. Busca em texto e chaves, %xx decodificado uma vez, NFC, fronteira de palavra, máscara de chave, id e caminho, e nunca o padrão nem o valor na saída. A casa lê também o comentário de linha inteira, que a referência não lê. Na REGRA 121 o achado é HARD PRIVADO-SEM-MARCADOR e só existe com o arquivo, que o CI não tem: é guarda local do dono. O que fica de fora vai no cabeçalho do módulo."
   - id: E_PORTE_EMPATA_COM_A_REFERENCIA
@@ -141,7 +146,7 @@ nodes:
     verified_against: "private_repos.py --corpus e kg_gate.private_repo_check com o mesmo arquivo de padrões do dono, nos 260 grafos do corpus da branch (313 contra 313, nenhum só de um lado); bancada private_repos_port com LC_ALL=C (42 passam, 0 falham); 5 mutantes das guardas por ops/mutate-and-restore.sh, todos com rc 1 do helper com o mesmo arquivo de padrões do dono, no corpus da branch"
     trace: ".claude/validation/lint-selftest.sh"
     label: "medido: no corpus do core, o porte e o kg_gate.py dão os mesmos 313 achados (grafo, nó, campo e linhas do padrão), e o porte acha mais 5 em comentário de linha inteira; os 18 mutantes do porte e os 5 das guardas re-rodados em 2026-11-13 morrem"
-    narrative: "A bancada private_repos_port tem 42 asserções, entre eles a paridade com o kg_gate.private_repo_check nos grafos do caso. Os mutantes do porte cobrem %xx, NFC, fronteira, caixa, chave, máscara de id e de caminho, padrão com espaço, Cf, lista vazia, chave repetida, comentário, teto de expansão, TAB no TSV, tag explícita, bytes inválidos e o carimbo do vendor na raiz. Os das guardas, plantados por ops/mutate-and-restore.sh: na 1ª rodada (2026-11-12) foram 6, e um sobreviveu (o rc 2 do modo humano do kg-trace.sh), que ganhou o caso (n3). Na re-rodada de 2026-11-13 foram 5, todos mortos: o rc 1 da REGRA 121, o desligamento sem o arquivo, o rc 2 da guarda principal preservado com --private-repos (L2, que o caso (m3) mata), o rc 2 do humano do kg-trace.sh e a linha ENTRADA-QUEBRADA do TSV dele."
+    narrative: "A bancada private_repos_port tem 42 asserções, entre eles a paridade com o kg_gate.private_repo_check nos grafos do caso. Os mutantes do porte cobrem %xx, NFC, fronteira, caixa, chave, máscara de id e de caminho, padrão com espaço, Cf, lista vazia, chave repetida, comentário, teto de expansão, TAB no TSV, tag explícita, bytes inválidos e o carimbo do vendor na raiz. Os das guardas, plantados por ops/mutate-and-restore.sh: na 1ª rodada (2026-11-12) foram 6, e um sobreviveu (o rc 2 do modo humano do kg-trace.sh), que ganhou o caso (n3). Na re-rodada de 2026-11-13 foram 5, todos mortos: o rc 1 da REGRA 121, o desligamento sem o arquivo, o rc 2 da guarda principal preservado com --private-repos (que o caso (m3) mata), o rc 2 do humano do kg-trace.sh e a linha ENTRADA-QUEBRADA do TSV dele."
     provenance:
       source: "família run_private_repos_port_selftests na branch chore/kg-ssot-4510"
       locator: "casos (l), (m3), (x) e (n3) da família"
