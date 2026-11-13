@@ -2,7 +2,7 @@
 branch: docs/backbone-piece-shape
 pr: pendente
 date: 2026-11-12
-reviewed_diff_sha256: 584b0295c8349b589ce7ff49c3963de0bf0a3a28e2a583b28a9cd9236eb56fae
+reviewed_diff_sha256: f2e2100fde3efa1498f6a006445ab5f3b9351e95e37836ad05a80e42ba1f40c4
 reviewed_code_sha256: e393b90c9d1332fd35ec43b05873b555a4a0cb2e2736eaeb92db92b6d7c90c1a
 findings_total: 3
 findings_real: 3
