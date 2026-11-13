@@ -54,6 +54,75 @@ src = re.sub(r"(?m)^([ \t]*)export[ \t]+(const[ \t]+meta\b)", r"\1\2", src, coun
 sys.stdout.write("export default async function(){\n" + src + "\n}\n")
 '
 
+# ── RELÓGIO E SORTEIO PROIBIDOS (medido 2026-11-12) ──────────────────────────
+# O runtime do Workflow recusa o script com "Date.now() / new Date() are unavailable in workflow
+# scripts (breaks resume)": o resume REEXECUTA o corpo e precisa que ele dê o mesmo resultado.
+# O `decide-triage.js` gerava o nonce da cerca com `Date.now()` + `Math.random()`, passava neste
+# check (a sintaxe é válida) e por isso o modo triagem do /meta:decide NUNCA rodou. Sintaxe válida
+# que o runtime recusa é o mesmo vermelho-tardio que este arquivo existe para antecipar.
+# `Math.random()` entra pela mesma razão: o replay não reproduz o sorteio.
+# Varre só CÓDIGO: comentário e string são apagados antes (o `onion-research.js` cita `Date.now()`
+# numa mensagem de erro e num comentário, e isso é legítimo). Regex literal é reconhecido pela
+# heurística usual (barra depois de operador/abertura), para uma aspa dentro dela não dessincronizar.
+_CLOCK_PY='
+import io, re, sys
+src = io.open(sys.argv[1], encoding="utf-8", newline="").read()
+out = list(src); n = len(src); i = 0; stack = []   # stack: profundidade de chave de cada ${ aberto
+def blank(a, b):
+    for k in range(a, b):
+        if out[k] != "\n": out[k] = " "
+def prev_sig(k):
+    k -= 1
+    while k >= 0 and out[k] in " \t\r\n": k -= 1
+    return out[k] if k >= 0 else ""
+def template(k):   # k aponta logo depois da crase; devolve onde o texto do template termina
+    while k < n:
+        c = src[k]
+        if c == "\\": k += 2; continue
+        if c == "`": return k + 1, False
+        if c == "$" and k + 1 < n and src[k+1] == "{": return k + 2, True
+        k += 1
+    return n, False
+while i < n:
+    c = src[i]
+    if c == "/" and i + 1 < n and src[i+1] == "/":
+        j = src.find("\n", i); j = n if j < 0 else j; blank(i, j); i = j; continue
+    if c == "/" and i + 1 < n and src[i+1] == "*":
+        j = src.find("*/", i + 2); j = n if j < 0 else j + 2; blank(i, j); i = j; continue
+    if c in "\"\x27":
+        j = i + 1
+        while j < n and src[j] != c and src[j] != "\n":
+            j += 2 if src[j] == "\\" else 1
+        blank(i, min(j + 1, n)); i = j + 1; continue
+    if c == "`":
+        j, opened = template(i + 1); blank(i, j - (2 if opened else 0)); i = j
+        if opened: stack.append(0)
+        continue
+    if c == "/" and (prev_sig(i) in "(,=:[!&|?{};+-*%<>~^" or re.search(r"\b(return|typeof|case)\s*$", "".join(out[max(0,i-12):i]))):
+        j = i + 1; cls = False
+        while j < n and src[j] != "\n":
+            if src[j] == "\\": j += 2; continue
+            if src[j] == "[": cls = True
+            elif src[j] == "]": cls = False
+            elif src[j] == "/" and not cls: break
+            j += 1
+        blank(i, min(j + 1, n)); i = j + 1; continue
+    if stack:
+        if c == "{": stack[-1] += 1
+        elif c == "}":
+            if stack[-1] == 0:
+                stack.pop(); j, opened = template(i + 1); blank(i, j - (2 if opened else 0)); i = j
+                if opened: stack.append(0)
+                continue
+            stack[-1] -= 1
+    i += 1
+code = "".join(out)
+pat = re.compile(r"\bDate\s*\.\s*now\s*\(|\bnew\s+Date\b|(?<![\w$.])Date\s*\(|\bMath\s*\.\s*random\s*\(")
+for m in pat.finditer(code):
+    ln = code.count("\n", 0, m.start()) + 1
+    print("%d: %s" % (ln, re.sub(r"\s+", "", m.group(0))))
+'
+
 rc=0
 for f in "$@"; do
   if [ ! -f "${f}" ]; then echo "  ✗ ${f}: arquivo ausente"; rc=1; continue; fi
@@ -68,6 +137,14 @@ for f in "$@"; do
   # em erro de SINTAXE; qualquer outro rc e falha de FERRAMENTA. Achado pela bancada, caso (i).
   err="$(printf '%s' "${wrapped}" | node --input-type=module --check 2>&1)"; nrc=$?
   if [ "${nrc}" -eq 0 ]; then
+    if ! clock="$(python3 -c "${_CLOCK_PY}" "${f}" 2>&1)"; then
+      echo "  ⊘ ${f}: a varredura de relógio/sorteio falhou (${clock:0:100}) — NÃO PUDE JULGAR"
+      rc=2; continue
+    fi
+    if [ -n "${clock}" ]; then
+      echo "  ✗ ${f}: relógio/sorteio no código, que o runtime de workflow recusa (quebra o resume) — linha $(printf '%s' "${clock}" | sed -n '1,3p' | tr '\n' ' ')"
+      rc=1; continue
+    fi
     echo "  ✓ ${f}"
   elif [ "${nrc}" -eq 1 ]; then
     echo "  ✗ ${f}: $(printf '%s' "${err}" | grep -m1 -E 'Error' | head -c 160)"
