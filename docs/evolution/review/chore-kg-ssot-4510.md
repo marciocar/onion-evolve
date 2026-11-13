@@ -2,8 +2,7 @@
 branch: chore/kg-ssot-4510
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: b9e279b85eb3eb047eaaa251b64a078c1da88d56d28af96f711358ccb24ba2d8
-reviewed_code_sha256: b874817e487daa7451491af9944726577586e31c4609a4ec77e81d9d0edf75bf
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 7
 findings_blocking: 2
@@ -56,3 +55,9 @@ nota: "tokens e duração não medidos: a passada foi da sessão interrompida, e
 - No `kg-trace.sh`, a máscara vale só nas linhas `PRIVATE-REPO`; as linhas do produto seguem com o grafo e o id em
   claro. A saída com a flag é do dono e não vai para superfície pública (dito no cabeçalho).
 - A migração dos nós para `private-cite:<id>` não está aqui: é o PR seguinte.
+
+## Re-revisão depois do contrato
+
+O `pr-finalize` parou no contrato do kg-ssot: a decisão do porte sem `provenance` e um rótulo da passada lido como
+código sem termo na narrativa da evidência. A cura mexe só no grafo do tema (a proveniência aponta a seção do manual
+05 da 4.51.0, e o rótulo saiu do texto); o `kg-gate-ci.sh` dá rc 0. Revisei esse diff: nada muda no código das guardas.
