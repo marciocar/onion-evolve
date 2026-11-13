@@ -6644,6 +6644,9 @@ check_private_repo_cite() {
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
       *.kg.yaml|*/private-repo-cite-check.sh|*/public-repos.tsv|*/private-repo-cite-baseline.txt|*/lint-artifacts.sh) : ;;
+      # a maquinaria (.claude/) não é dado: um baseline .txt dela não aciona a guarda (o caso P1 do kg_coverage roda o lint
+      # --only num baseline, num sandbox sem git, e a guarda acionada ali somava um HARD de «não rodou» ao valor-base)
+      */.claude/*) return 0 ;;
       *.csv|*.tsv|*.json|*.jsonl|*.txt|*/data/*) : ;;   # os arquivos de dado (fix/provenance-triage-scrub)
       *) return 0 ;;
     esac
