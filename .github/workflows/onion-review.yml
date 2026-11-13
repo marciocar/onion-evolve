@@ -979,7 +979,7 @@ jobs:
               echo "::warning::bootstrap: a base ${BASE_SHA:0:8} não tem ${f} — este run usa o do PR."
             fi
           done
-          if ! grep -qF -- '--reviewed-mark' "${jd}/ops/review/review-mode-decide.sh"; then
+          if ! grep -qF -- '--achados <n>' "${jd}/ops/review/review-mode-decide.sh"; then
             cp ops/review/review-mode-decide.sh "${jd}/ops/review/review-mode-decide.sh"
             echo "::warning::bootstrap: o juiz da base ${BASE_SHA:0:8} não emite a marca positiva (--reviewed-mark) — este run usa o juiz do PR. O merge-verified não aceita a marca de PR que toca .github/workflows/, então este caso cai no resíduo."
           fi
@@ -1099,7 +1099,8 @@ jobs:
             fi
             # a MARCA POSITIVA, emitida pelo juiz da BASE: é ela, e não o verde, que o merge-verified aceita como
             # revisão num PR de guarda (B1 do refutador do #1652)
-            bash "${JD}/ops/review/review-mode-decide.sh" --reviewed-mark --head "${HEAD_SHA}"
+            # SÓ com achados exatamente 0 (N1): o juiz recusa a marca para -1/vazio (não pude contar, árvore suja)
+            bash "${JD}/ops/review/review-mode-decide.sh" --reviewed-mark --head "${HEAD_SHA}" --achados "${ACHADOS}"
             exit 0
           fi
           # FALTA DE CRÉDITO: o pré-voo (HTTP 400 "credit balance") ou a evidência do run. A classificação mora no

@@ -43,6 +43,8 @@
 #   bash ops/review/guard-paths.sh --files-from <arq|->             lista pronta, um caminho por linha
 #   bash ops/review/guard-paths.sh --range <base>...<head> [--git-dir <dir>]   o diff do git
 #   bash ops/review/guard-paths.sh --print-patterns                 a lista derivada, um padrão por linha
+#   --all (com --pr/--pr-json/--files-from/--range): imprime TODOS os caminhos lidos (nomes antigos inclusos), sem filtrar,
+#         exit 0 — o merge-verified mede a maquinaria do revisor sobre o PR inteiro com a mesma leitura
 #   Opção comum: --targets <arq> (repetível; os tsv se SOMAM). Sem --targets: o ops/moat-targets.tsv ao lado deste
 #                script mais o de origin/main do repo dele (git show). Pelo menos um tem de ser legível.
 # Exit: 0 = toca guarda (stdout: os caminhos que casaram, únicos) · 1 = não toca · 2 = erro NOMEADO
@@ -129,11 +131,12 @@ _match() { # stdin: caminhos ; $1: padrões (um por linha). Prefixo (`/` no fim)
     }'
 }
 
-MODE=""; ARG=""; REPO=""; GIT_DIR_ARG="."
+MODE=""; ARG=""; REPO=""; GIT_DIR_ARG="."; ALL=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --pr|--pr-json|--files-from|--range) MODE="$1"; ARG="${2-}"; [ -n "${ARG}" ] || _die2 "$1 exige valor"; shift 2 ;;
     --print-patterns) MODE="$1"; shift ;;
+    --all) ALL=1; shift ;;
     --repo) REPO="${2-}"; [ -n "${REPO}" ] || _die2 "--repo exige <dono/repo>"; shift 2 ;;
     --git-dir) GIT_DIR_ARG="${2-}"; shift 2 ;;
     --targets) TARGETS+=("${2-}"); shift 2 ;;
@@ -166,6 +169,7 @@ case "${MODE}" in
     FILES="$(printf '%s\n' "${FILES}" | cut -f2-)" ;;
 esac
 
+if [ "${ALL}" -eq 1 ]; then printf '%s\n' "${FILES}" | awk 'NF && !seen[$0]++'; exit 0; fi
 HITS="$(printf '%s\n' "${FILES}" | _match "${PATS}")"
 [ -n "${HITS}" ] || exit 1
 printf '%s\n' "${HITS}"
