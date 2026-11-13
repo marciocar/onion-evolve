@@ -298,6 +298,11 @@ nodes:
     label: "a peça se declara por campo NOVO (piece: true + owner_session + sponsor: maestro) no members.yaml, não por kind: piece; o pulso da batuta resolve o dono em ordem fixa e avisa PIECE_UNOWNED e PIECE_OWNER_NAME_MISMATCH com card de arranque"
     narrative: "O purpose deste grafo falava em `kind piece`. Medido antes de mudar: `kind:` é a NATUREZA do membro, enum fechado no members-validate.sh (source, adopter, distillation, door, method, port) e consumido pela paridade de porta (REGRA 92), pelos pins (vendoriza ou não) e pelo destino do /meta:adopt. As três peças (onion-kg-ssot, onion-curation, onion-messaging) seguem adotantes; trocar o kind as tiraria do pin obrigatório. Por isso campo novo. As três formas do mercado entram assim: owner_session aponta entidade resolvível (spec.owner), a resolução para na primeira (owner_session, owners.tsv, core), e o sponsor humano fica ao lado. O onion-bridge não virou membro: é infra do core (a2a.host) e os conectores dele ficam sob a peça onion-messaging, pelo selo D_BACKBONE_OWNER_1112. Onde mora: baton-pulse.sh (classes PIECE_*), members.yaml, cláusula 8 da baton-doctrine e os casos (ag) a (am) de run_baton_pulse_selftests."
     trace: ".claude/validation/baton-pulse.sh"
+    provenance:
+      source: ".claude/validation/members-validate.sh"
+      locator: "o enum fechado KINDS e os consumidores de kind: (paridade de porta, pins, destino do /meta:adopt)"
+      method: "measurement: leitura do enum e git grep -n 'kind' em .claude/ e ops/ antes de escolher o campo novo"
+      locality: "repo"
 
 edges:
   - from: E_AGENTSMD_DIRECTORY_SCOPE_1112
