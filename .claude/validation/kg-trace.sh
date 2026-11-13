@@ -57,18 +57,38 @@
 #        `./_material/x` não casa. A isenção vale também onde o material existe (o checkout principal): lá quem
 #        julga o trace é o meeting-graph-check.sh. Arquivo ausente = só `memory/`. Prefixo absoluto é recusado pelo produto (entrada quebrada, rc 2).
 #        O arquivo é do adotante; o core não escreve nele.
+# Priv.: --private-repos ARQ (desde 2026-11-12, kg-ssot 4.51.0, contrato v4.22), nos modos humano e TSV: a regra do
+#        `kg_gate.py --private-repos`, PORTADA em .claude/utils/kg/private_repos.py (manual 05 do vendor). O dono lista
+#        os repositórios privados num arquivo FORA de todo repo público; cada valor de texto e cada chave do corpus que o
+#        produto julga (menos o trace-excludes.txt) que cita um deles SEM o marcador `private-cite:<id>` sai como achado
+#        (rc 1): no humano, `✗ … grafo#nó campo (padrão na linha N …)`; no TSV, `grafo·nó·-·campo (linha N)·PRIVATE-REPO`.
+#        Nunca imprime o padrão nem o valor; chave, id de nó e caminho que contêm um padrão saem mascarados. Arquivo
+#        ilegível, vazio, ou padrão com espaço, # ou Cf = rc 2. Só com a flag EXPLÍCITA (o lint não a passa: quem julga o
+#        tocado no lint é a REGRA 121 com ONION_PRIVATE_REPOS). Não combina com --emit-index (rc 2). O marcador em si é do
+#        produto: o trace `private-cite:<id>[#<id de nó>]` nunca é lido nem conta como ausente (skipped.private_cite).
+#        A MÁSCARA vale só nas linhas PRIVATE-REPO: as linhas do produto (TARGET-MISSING etc.) seguem com o grafo e o id
+#        em claro, e na mesma saída podem ligar o `<graph #i>`/`<node #i>` ao nome; trate a saída com a flag como
+#        privada (é do dono, com o arquivo dele), nunca a cole em superfície pública.
+#        NÃO COBERTOS: os do private_repos.py (largura cheia, largura zero no texto, barra invertida, bloco dobrado, dupla
+#        codificação, sósias, comentário no fim de linha, .kg.json, `repo @ sha` e nome nu em prosa).
 # Env  : ONION_KG_TRACE — caminho do kg_trace.py (default: <repo_root>/vendor/kg-ssot/tools/kg_trace.py; a bancada
 #        aponta o do core quando roda numa caixa de areia sem vendor).
 set -euo pipefail
 
 REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
   printf 'kg-trace: repo_root inválido\n' >&2; exit 2; }
-MODE=human OUT="" _prev=""
+MODE=human OUT="" _prev="" PRIV=""
 for a in "$@"; do
   [ "${_prev}" = --out ] && { OUT="${a}"; _prev=""; continue; }
-  case "$a" in tsv|--format=tsv) MODE=tsv ;; --emit-index) MODE=index ;; --out) _prev=--out ;; --out=*) OUT="${a#--out=}" ;; esac
+  [ "${_prev}" = --private-repos ] && { PRIV="${a}"; _prev=""; continue; }
+  case "$a" in tsv|--format=tsv) MODE=tsv ;; --emit-index) MODE=index ;; --out) _prev=--out ;; --out=*) OUT="${a#--out=}" ;;
+    --private-repos) _prev=--private-repos ;; --private-repos=*) PRIV="${a#--private-repos=}" ;; esac
 done
 [ "${_prev}" != --out ] || { echo "ERRO kg-trace: --out sem arquivo" >&2; exit 2; }
+[ "${_prev}" != --private-repos ] || { echo "ERRO kg-trace: --private-repos sem arquivo" >&2; exit 2; }
+_pv=0; for a in "$@"; do case "${a}" in --private-repos|--private-repos=*) _pv=1 ;; esac; done
+[ "${_pv}" -eq 0 ] || [ -n "${PRIV}" ] || { echo "ERRO kg-trace: --private-repos sem arquivo" >&2; exit 2; }
+if [ -n "${PRIV}" ] && [ "${MODE}" = index ]; then echo "ERRO kg-trace: --private-repos não combina com --emit-index (a conferência não faz parte do índice)" >&2; exit 2; fi
 if [ -n "${OUT}" ]; then
   [ "${MODE}" = index ] || { echo "ERRO kg-trace: --out só vale com --emit-index" >&2; exit 2; }
   # Escrita atômica: o script chama a si mesmo com o stdout num temporário AO LADO do destino (mesmo sistema de
@@ -179,9 +199,36 @@ PY
   exit "${_irc}"
 fi
 
+# --private-repos: o porte da regra do kg_gate.py (ver «Priv.» no cabeçalho). Imprime no formato do modo e devolve
+# 0 (nada), 1 (achado) ou 2 (entrada quebrada: o arquivo, o porte ou o PyYAML).
+_private_repos() {  # $1 = human|tsv
+  local _pr _o _r=0
+  _pr="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/private_repos.py"
+  [ -f "${_pr}" ] || { echo "ERRO kg-trace --private-repos: o porte não existe (${_pr})" >&2; return 2; }
+  _o="$(python3 -I -B "${_pr}" --patterns "${PRIV}" --root "${REPO_ROOT}" --format tsv --corpus \
+        ${_KT_EXCL[@]+"${_KT_EXCL[@]}"})" || _r=$?
+  [ "${_r}" -lt 2 ] || { echo "ERRO kg-trace --private-repos: NÃO JULGOU (rc ${_r})" >&2; return 2; }
+  local _t
+  if [ "$1" = tsv ]; then
+    _t="$(awk -F'\t' -v OFS='\t' 'NF==5 && $5=="PRIVATE-REPO"{print $1,$2,"-",$3" (linha "$4" do --private-repos)","PRIVATE-REPO"}' <<< "${_o}")"
+  else
+    _t="$(awk -F'\t' 'NF==5 && $5=="PRIVATE-REPO"{print "✗ repositório privado citado sem o marcador private-cite:: "$1"#"$2" "$3" (padrão na linha "$4" do --private-repos)"}' <<< "${_o}")"
+  fi
+  # rc 1 do porte sem linha traduzida: o rc e a saída discordam (passada adversarial, B2) — nunca verde, nunca mudo
+  if [ "${_r}" -eq 1 ] && [ -z "${_t}" ]; then echo "ERRO kg-trace --private-repos: rc 1 sem achado que esta tradução leia" >&2; return 2; fi
+  [ -z "${_t}" ] || printf '%s\n' "${_t}"
+  [ "$1" = tsv ] || awk -F'\t' '$2=="RESUMO"{print "· --private-repos: "$4}' <<< "${_o}"
+  return "${_r}"
+}
+
 if [ "${MODE}" = human ]; then
   _hrc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" "${_KT_EXT[@]}" ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} || _hrc=$?
-  [ "${_hrc}" -ne 3 ] || { echo "AVISO kg-trace: corpus vazio (o kg_trace.py não leu nenhum grafo, rc 3)" >&2; exit 0; }
+  if [ "${_hrc}" -eq 3 ]; then echo "AVISO kg-trace: corpus vazio (o kg_trace.py não leu nenhum grafo, rc 3)" >&2; _hrc=0; fi
+  if [ -n "${PRIV}" ]; then
+    _prc=0; _private_repos human || _prc=$?
+    [ "${_prc}" -lt 2 ] || exit 2
+    [ "${_prc}" -eq 0 ] || [ "${_hrc}" -ne 0 ] || _hrc=1
+  fi
   exit "${_hrc}"
 fi
 
@@ -268,6 +315,14 @@ _findings="$(grep -v $'\tSCHEME-AVISO$' <<< "${_tsv}" || true)"
 if [ -z "${_findings}" ] && [ "${_krc}" -eq 1 ]; then
   [ -z "${_tsv}" ] || printf '%s\n' "${_tsv}"
   printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' '(kg_trace.py rc=1 sem achado que esta tradução conheça)' 'ENTRADA-QUEBRADA'; exit 1
+fi
+if [ -n "${PRIV}" ]; then
+  _pt="" _prc=0; _pt="$(_private_repos tsv)" || _prc=$?
+  if [ "${_prc}" -ge 2 ]; then
+    [ -z "${_tsv}" ] || printf '%s\n' "${_tsv}"
+    printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRIVATE-REPOS' '-' '(--private-repos não julgou)' 'ENTRADA-QUEBRADA'; exit 1
+  fi
+  if [ -n "${_pt}" ]; then _tsv="${_tsv:+${_tsv}$'\n'}${_pt}"; _findings="${_findings:+${_findings}$'\n'}${_pt}"; fi
 fi
 [ -n "${_tsv}" ] || exit "${_krc}"
 printf '%s\n' "${_tsv}"

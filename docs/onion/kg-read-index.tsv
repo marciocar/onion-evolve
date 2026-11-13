@@ -418,6 +418,7 @@
 .claude/utils/kg/machine_path.py	C_TETO_VERBOS_DE_SHELL_SAO_LISTA	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
 .claude/utils/kg/machine_path.py	D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
 .claude/utils/kg/machine_path.py	D_HOST_FORM_REPLACES_REGISTRY_HOSTS_1109	docs/evolution/research/guard-public-machine-data-2026-11/public-machine-data-2026-11.kg.yaml
+.claude/utils/kg/private_repos.py	D_PORTE_DO_PRIVATE_REPOS_DA_4510	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CONTATO_DESACOPLADO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER	docs/onion/graph/residuos-2026-08-18.kg.yaml
@@ -716,6 +717,7 @@
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_P9_CASOS_MUTANTES_E_DOGFOOD	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_PORTE_EMPATA_COM_A_REFERENCIA	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/validation/lint-selftest.sh	E_PRECOMMIT_SELECAO_GROSSA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
