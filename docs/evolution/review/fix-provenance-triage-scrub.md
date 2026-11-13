@@ -2,7 +2,8 @@
 branch: fix/provenance-triage-scrub
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: eb88ab16c1c6f415ea850be1604cd2fee939f70df38beb31dcc53f8b1450eca3
+reviewed_code_sha256: b9b971c246b10b3743ec3bbe5c4c80a4ead108c9298c1007478756fdfa3ecd07
 findings_total: 8
 findings_real: 8
 findings_blocking: 6
