@@ -239,7 +239,8 @@ else
 fi
 # (5ª passada, decisão do maestro de 2026-11-13) PATH fixo SEMPRE que a sessão do core chama, não só no delegado: um gh
 # ou git falso no PATH da sessão mentiria o CI, o estado e o merge de qualquer PR
-_pmv_fix_path() { PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r; }
+# (9ª passada) e o git sem objetos de `git replace`: o replace desviava o show do resíduo, o rev-parse e o merge-base
+_pmv_fix_path() { PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; GIT_NO_REPLACE_OBJECTS=1; export PATH GIT_NO_REPLACE_OBJECTS; hash -r; }
 [ "${_CORE_SESSION}" = 1 ] && _pmv_fix_path
 # --dispensa e --ci-inoperante são do MAESTRO (5ª passada): pela sessão do core, só com --maestro, que o hook veta à sessão
 if [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] && { [ "${#DISPENSA[@]}" -gt 0 ] || [ "${CI_INOPERANTE}" -eq 1 ]; }; then
@@ -269,6 +270,7 @@ _delegated_env_guard() {
   done
   [ -z "${bad}" ] || die "o merge alheio delegado (--foreign-repo) recusa estas variáveis de ambiente, que mudam o que o git e o gh leem:${bad}. Rode sem elas. Nada foi feito."
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r
+  GIT_NO_REPLACE_OBJECTS=1; export GIT_NO_REPLACE_OBJECTS   # (9ª passada) o replace não desvia o que o git lê
   # N2 da re-refutação: o HOME decide o ~/.gitconfig (insteadOf troca o origin) e o config.yml do gh (http_unix_socket
   # desvia todo o HTTP). HOME fixo pelo passwd do usuário, e o diretório de config do gh dentro dele
   local h; h="$(getent passwd "$(id -un)" | cut -d: -f6)"

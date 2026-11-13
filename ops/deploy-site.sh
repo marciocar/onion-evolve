@@ -554,6 +554,12 @@ selftest() {
   local f4m; f4m="$(bash -c "source <(sed -n '/^vp_members_src() {/,/^}/p' '$ds'); REPO='$sb/f4'; vp_members_src")"
   if [[ "$f4m" == marciocar/sge ]]; then pass=$((pass+1)); echo "  ✓ M (MUT): o slug lido do members.yaml seria '$f4m' — a constante é a causa"
   else fail=$((fail+1)); echo "  ✗ M (MUT): a leitura do members.yaml deu '$f4m'"; fi
+  # 9ª passada: o guarda exporta GIT_NO_REPLACE_OBJECTS=1; MUTANTE: a linha fora
+  tm "L: o deploy delegado roda o git com GIT_NO_REPLACE_OBJECTS=1" 0 "NRO=1" \
+    env -i HOME="$HOME" PATH="$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo NRO=\${GIT_NO_REPLACE_OBJECTS:-}"
+  local nro; nro="$(env -i HOME="$HOME" PATH="$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds' | grep -v GIT_NO_REPLACE_OBJECTS); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo NRO=\${GIT_NO_REPLACE_OBJECTS:-}")"
+  if [[ "$nro" == "NRO=" ]]; then pass=$((pass+1)); echo "  ✓ L (MUT): sem a linha, o git leria os objetos de replace — a linha é a causa"
+  else fail=$((fail+1)); echo "  ✗ L (MUT): o mutante deu '$nro'"; fi
   tm "B4: um gh falso no PATH não é o gh do deploy delegado (PATH fixo)" 0 "/usr/" \
     env -i HOME="$HOME" PATH="$sb/fakegh:$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo \"\${GH_CMD[0]}\"; [[ \"\${GH_CMD[0]}\" != '$sb/fakegh/gh' ]]"
 
@@ -609,6 +615,7 @@ delegated_env_guard() {
   done
   [[ -z "$bad" ]] || die "o deploy delegado recusa estas variáveis de ambiente, que mudam o que o git e o gh leem:${bad}"
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r
+  GIT_NO_REPLACE_OBJECTS=1; export GIT_NO_REPLACE_OBJECTS   # (9ª passada) o git replace não desvia o resíduo nem site/
   # N2 da re-refutação do #1647: o HOME decide o ~/.gitconfig (insteadOf troca o origin) e o config.yml do gh
   # (http_unix_socket desvia o HTTP). HOME fixo pelo passwd, e o config do gh dentro dele
   local h; h="$(getent passwd "$(id -un)" | cut -d: -f6)"
