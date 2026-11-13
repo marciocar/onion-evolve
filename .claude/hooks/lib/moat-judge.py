@@ -843,8 +843,10 @@ def _moat_forge_redirect(base, args, detail):
         if sub and sub[0] in ("add", "set-url", "rename"):
             _moat_emit("forja", "git remote %s" % sub[0], "-", "mudar os remotes muda o alvo do gh e do merge — %s" % detail)
     elif rest[0] == "config":
-        if any(re.match(r"^remote\.", a, re.I) for a in rest[1:]) and not any(a in _GIT_CONFIG_READ for a in rest[1:]):
-            _moat_emit("forja", "git config remote.*", "-", "escrever remote.* muda o alvo do gh e do merge — %s" % detail)
+        # url.<x>.insteadOf e include/includeIf também (3ª passada, F1): reescrevem o origin sem tocar remote.*
+        if any(re.match(r"^(remote|url|include|includeif)\.", a, re.I) for a in rest[1:]) \
+                and not any(a in _GIT_CONFIG_READ for a in rest[1:]):
+            _moat_emit("forja", "git config remote.*/url.*/include*", "-", "escrever remote.*, url.* ou include* muda o alvo do gh e do merge — %s" % detail)
 
 
 def _moat_act_judge(rel, args, detail, rootcopy=None):

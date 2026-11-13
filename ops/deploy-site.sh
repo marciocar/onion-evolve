@@ -250,8 +250,17 @@ deploy() {
 # ── deploy delegado: as quatro condições do selo, medidas antes de qualquer efeito ───
 # rc 0 = todas valem; die (rc 2) nomeia a que falta. Lê: git deste checkout, o forge (check-runs da main e o PR).
 VERIFIED_PR=""
-vp_slug() { git -C "$REPO" remote get-url origin 2>/dev/null \
-  | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##'; }
+# o repo do CI e do PR NÃO sai da config do git (F1 da 3ª passada do refutador do #1647): GIT_CONFIG_* com insteadOf, um
+# include no ~/.gitconfig ou o .git/config editado trocavam o origin. Sai do `remote:` do membro `kind: source` do
+# members.yaml deste checkout, e na falta, da constante do core.
+vp_slug() {
+  local r
+  r="$(awk '/^[[:space:]]*-[[:space:]]+id:/ { if (src && rem != "") { print rem; done = 1; exit } src = 0; rem = "" }
+    /^[[:space:]]+kind:[[:space:]]*source([[:space:]#]|$)/ { src = 1 }
+    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v); gsub(/["'"'"' ]/, "", v); rem = v }
+    END { if (!done && src && rem != "") print rem }' "$REPO/docs/evolution/federation/members.yaml" 2>/dev/null)"
+  sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "${r:-marciocar/onion-evolve}"
+}
 verified_gate() {
   local pr="$1" why="o deploy delegado exige a main verde e o PR revisado por refutador independente (D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113)"
   [[ "$pr" =~ ^[0-9]+$ ]] || die "--verified-pr exige o NÚMERO do PR, não '${pr}'"
@@ -521,6 +530,16 @@ selftest() {
   if ! cmp -s "$ds" "$sb/ds-mut.sh" && grep -qF "HOME=$sb/fakehome" <<< "$mo" && ! grep -q MORREU <<< "$mo"; then
     pass=$((pass+1)); echo "  ✓ N2 (MUT): sem o HOME fixo e a recusa de proxy/CA, o HOME falso e o proxy passam — a cura é a causa"
   else fail=$((fail+1)); echo "  ✗ N2 (MUT): o mutante não mudou nada (âncora sumiu?) ou também recusou: $mo"; fi
+  # F1: o slug não sai da config do git (um insteadOf que troca o origin não o move); MUTANTE: o vp_slug de antes, pelo origin
+  mkdir -p "$sb/f1/docs/evolution/federation"; git init -q "$sb/f1"; git -C "$sb/f1" remote add origin https://github.com/marciocar/onion-evolve.git
+  printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/marciocar/onion-evolve\n' > "$sb/f1/docs/evolution/federation/members.yaml"
+  tm "F1: com url.<outro>.insteadOf na config, o slug do deploy delegado segue o do members.yaml" 0 "marciocar/onion-evolve" \
+    env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.https://github.com/marciocar/sge.git.insteadOf GIT_CONFIG_VALUE_0=https://github.com/marciocar/onion-evolve.git \
+    bash -c "source <(sed -n '/^vp_slug() {/,/^}/p' '$ds'); REPO='$sb/f1'; s=\$(vp_slug); echo \$s; [[ \$s == marciocar/onion-evolve ]]"
+  local f1m; f1m="$(env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.https://github.com/marciocar/sge.git.insteadOf GIT_CONFIG_VALUE_0=https://github.com/marciocar/onion-evolve.git \
+    git -C "$sb/f1" remote get-url origin | sed -E 's#^https?://[^/]+/##; s#\.git$##')"
+  if [[ "$f1m" == marciocar/sge ]]; then pass=$((pass+1)); echo "  ✓ F1 (MUT): o vp_slug de antes (pelo origin) leria marciocar/sge — a leitura do members.yaml é a causa"
+  else fail=$((fail+1)); echo "  ✗ F1 (MUT): o origin com insteadOf deu '$f1m', não marciocar/sge"; fi
   tm "B4: um gh falso no PATH não é o gh do deploy delegado (PATH fixo)" 0 "/usr/" \
     env -i HOME="$HOME" PATH="$sb/fakegh:$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo \"\${GH_CMD[0]}\"; [[ \"\${GH_CMD[0]}\" != '$sb/fakegh/gh' ]]"
 

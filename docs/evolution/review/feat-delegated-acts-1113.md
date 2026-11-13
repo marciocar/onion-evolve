@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: 9d2165ed7cf6d9725d445e5f6e3c6e1380182c5a05876365a5476ad775b976ab
-reviewed_code_sha256: 181a6db7473a3662fbd5d11a98da516e98740d3d1c3165239f4c8f1fccaa0994
-findings_total: 15
-findings_real: 15
-findings_fixed: 15
+reviewer: "4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: 061607a2b97b9f5d9776750f0da287c3f37b86734e3cc4f56dda3f82383ba680
+reviewed_code_sha256: 31dd991518de447c3ee33cb72beaa58cec1b8e0d1e1e75bfeb2729064c139ca0
+findings_total: 17
+findings_real: 17
+findings_fixed: 17
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou duas vezes (B1-B5, depois N1-N3); as curas entraram neste PR. PR de guarda: a cura dos N também passa por refutador independente antes do merge"
+nota: "o refutador independente reprovou três vezes (B1-B5, N1-N3, F1-F2); as curas entraram neste PR. PR de guarda: a cura dos F também passa por refutador independente antes do merge"
 ---
 
 # Resíduo — REGRA 56
@@ -98,6 +98,27 @@ estão certos: o argv não tem o ato (não há push; é o verify).
 Harness re-rodado (after2.txt): a linha do N1 veta. As formas com HOME passam o hook e o script as neutraliza (HOME do
 passwd). O que ainda passa o hook é forma legítima, é recusado pelo script com caso na bancada, ou é LIMITE abaixo.
 
+## 4ª passada: 2 bloqueios estruturais (curados aqui)
+
+16. **F1 — a config do git apontando outro remote.** `GIT_DIR` de outro repo, `GIT_CONFIG_*`/`GIT_CONFIG_PARAMETERS`/
+    `GIT_CONFIG_GLOBAL` com `url.X.insteadOf`, `git config url.…`, escrita direta no `.git/config` e include no
+    `~/.gitconfig` faziam o origin "do core" apontar o outro repo: alvo e core empatavam, porque o slug do core vinha
+    de `git remote get-url origin`. Cura estrutural: o slug do core sai do `remote:` do membro `kind: source` do
+    members.yaml do checkout (na falta, da constante), nunca da config do git; na sessão do core sem --repo, o script
+    entrega `GH_REPO=<o core>` ao gh, que nunca resolve pela config; o `vp_slug` do deploy-site lê o mesmo members.yaml;
+    o caminho delegado já recusava GIT_DIR, GIT_WORK_TREE e GIT_CONFIG*. No hook, a forja passa a ver `git config url.*`
+    e `include*`. Com isso, insteadOf e include ficam inofensivos para o alvo. (rf14-rf16, rb20-rb21, F1 do deploy-site,
+    cada um com mutante). As formas de r3.txt que ainda passam o hook (GIT_DIR, GIT_CONFIG_*, printf/sed/cp no
+    .git/config) são neutralizadas no script, não na linha, como o refutador indicou.
+17. **F2 — a allowlist da unit furada por NBSP.** O `strip()` do Python comia U+00A0; o systemd ignorava a chave
+    "\xa0DynamicUser" e o serviço rodava como root. Cura: sem strip; fora das linhas de comentário (# ou ; na coluna 0,
+    que o systemd descarta inteiras), só ASCII imprimível; espaço nas pontas do valor recusa; a linha casa com
+    `^[A-Za-z]+=`. E depois do daemon-reload, antes de seguir (e de novo no start), a unit EFETIVA se confere por
+    `systemctl show` (DynamicUser=yes, User=onion-slack-persona, CapabilityBoundingSet e AmbientCapabilities vazios,
+    nenhuma Exec* além do ExecStart); divergiu, a unit sai e nada liga. Desvio declarado do pedido: os comentários da
+    unit real são em pt-BR (acentos), então o não-ASCII é aceito só em linha de comentário. (casos F2 da bancada da
+    persona, com dois mutantes)
+
 ## LIMITES declarados (o refutador os apontou; não se curam aqui)
 
 - **BASH_ENV e `--rcfile`**: `BASH_ENV=x bash ops/deploy-site.sh …` e `sudo bash --rcfile x -i <cópia>` passam o hook.
@@ -110,6 +131,8 @@ passwd). O que ainda passa o hook é forma legítima, é recusado pelo script co
   origem por tar).
 - **O `ops/moat-targets.tsv` é editável pela sessão**: quem edita a lista edita o veto. A REGRA 117 confere a forma das
   linhas, não a autoria.
+- **O `~/.gitconfig` (include, insteadOf) agora é limite de verdade, não alvo**: ele ainda muda o que o git busca (o
+  fetch do deploy-site, por exemplo), mas não muda mais o repo que o merge e o CI miram.
 - **O próprio HOME do operador é escrito pela sessão**: com o HOME fixo pelo passwd, o `~/.gitconfig` e o
   `~/.config/gh/config.yml` reais continuam editáveis pelo mesmo usuário (um `insteadOf` ou um `http_unix_socket`
   plantados ali valem no caminho delegado). O mesmo vale para o set-url do origin feito por outra porta que o hook não

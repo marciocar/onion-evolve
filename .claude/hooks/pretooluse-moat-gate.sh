@@ -159,7 +159,7 @@ moat_cites_symlink() {
 [ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(gh|curl)([^[:alnum:]_-]|$)' <<< "$flat" \
   && grep -qE 'pending_deployments|repo[[:space:]]+edit|release[[:space:]]+(create|edit|delete|upload)|/releases|/topics|visibility|description|private' <<< "$flat" && hit=1
 # (7) o alvo do forge por outra porta (re-refutação do #1647, N1): remotes, `remote.*` no git config e o default do gh
-[ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(remote[[:space:]]+(add|set-url|rename)|repo[[:space:]]+set-default|config([[:space:]]+[^[:space:]]+)*[[:space:]]+remote\.)' <<< "$flat" && hit=1
+[ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(remote[[:space:]]+(add|set-url|rename)|repo[[:space:]]+set-default|config([[:space:]]+[^[:space:]]+)*[[:space:]]+([Rr]emote|[Uu]rl|[Ii]nclude([Ii]f)?)\.)' <<< "$flat" && hit=1
 [ "$hit" = 0 ] && exit 0
 
 # ── leitura exata do JSON + juiz ──────────────────────────────────────────────────────────────────────────

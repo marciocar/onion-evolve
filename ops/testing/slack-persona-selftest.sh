@@ -19,7 +19,22 @@ cat > "${t}/bin/systemd-creds" <<'F'
 [ "$1" = encrypt ] || exit 9; n="${2#--name=}"; s="$(cat)"; printf 'ENC:%s:%s\n' "$n" "${#s}" > "$4"; printf '%s' "$s" > "$4.plain-for-test"
 F
 # systemctl falso: ativa só com o marcador ${t}/active; o show responde DynamicUser=yes ou a InvocationID
-printf '#!/usr/bin/env bash\necho "systemctl $*" >> "%s/calls"\ncase "$1" in show) case "$*" in *DynamicUser*) echo yes ;; *) echo inv-1 ;; esac ;; is-active) [ -e "%s/active" ] ;; is-failed) exit 1 ;; esac\n' "${t}" "${t}" > "${t}/bin/systemctl"
+# o show responde por propriedade (o efetivo do F2); ${t}/eff-user troca o User efetivo (o caso em que o systemd leu outra coisa)
+cat > "${t}/bin/systemctl" <<F
+#!/usr/bin/env bash
+echo "systemctl \$*" >> "${t}/calls"
+case "\$1" in
+  show) case "\$*" in
+          *ExecStartPre*) echo "" ;;
+          *DynamicUser*) echo yes ;;
+          *" User "*|*"-p User"*) if [ -e "${t}/eff-user" ]; then cat "${t}/eff-user"; else echo onion-slack-persona; fi ;;
+          *CapabilityBoundingSet*|*AmbientCapabilities*) echo "" ;;
+          *) echo inv-1 ;;
+        esac ;;
+  is-active) [ -e "${t}/active" ] ;;
+  is-failed) exit 1 ;;
+esac
+F
 printf '#!/usr/bin/env bash\nexit 0\n' > "${t}/bin/systemd-analyze"
 # journalctl falso: conta as leituras; com ${t}/jdelay = N, a linha de conexão só sai a partir da leitura N+1 (o atraso
 # real entre o restart e a conexão)
@@ -80,13 +95,35 @@ python3 -I - "${me}" "${t}/mut.sh" <<'PYM'
 import sys
 s = open(sys.argv[1]).read()
 for a, b in (("if ctl:", "if False:"), (r're.split(r"[\r\n]", txt)', r'txt.split("\n")'),
-             (r'r"[ -Z\]-~]{1,200}"', r'r"[^\n]{1,200}"')):
+             (r'r"[ -Z\]-~]{1,200}"', r'r"[^\n]{1,200}"'),
+             ("    if any(not (32 <= ord(c) <= 126) for c in t):", "    if False:")):
     assert s.count(a) == 1, a
     s = s.replace(a, b)
 open(sys.argv[2], "w").write(s)
 PYM
 PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut.sh" install > "${t}/out" 2>&1
 [ $? = 0 ] && ! grep -q 'allowlist' "${t}/out"; chk "install: o MUTANTE (a allowlist de antes) aceitaria a unit com \\r — a recusa é a causa" $?
+# F2 da 3ª passada: o NBSP antes da chave (o strip do Python o comia; o systemd não, e ignorava o DynamicUser)
+printf '%s\n' "${UNIT_OK}" | sed 's/^DynamicUser=yes/\xc2\xa0DynamicUser=yes/' > "${S}/${UNIT}.service"
+run install --apply; [ $? = 1 ] && grep -q 'fora do ASCII' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: NBSP antes de DynamicUser recusa e não escreve" $?
+python3 -I - "${me}" "${t}/mut2.sh" <<'PYM'
+import sys
+s = open(sys.argv[1]).read()
+for a, b in (("    t = ln\n", "    t = ln.strip()\n"),
+             ("    if any(not (32 <= ord(c) <= 126) for c in t):", "    if False:")):
+    assert s.count(a) == 1, a
+    s = s.replace(a, b)
+open(sys.argv[2], "w").write(s)
+PYM
+PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut2.sh" install > "${t}/out" 2>&1
+[ $? = 0 ] && ! grep -q 'allowlist' "${t}/out"; chk "install: o MUTANTE (com strip e sem a recusa de não-ASCII) aceitaria o NBSP — a recusa é a causa" $?
+# F2: o EFETIVO depois do daemon-reload diverge (o systemd leu User=root): recusa, remove a unit e não liga
+printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"; printf 'root\n' > "${t}/eff-user"
+run install --apply; [ $? = 1 ] && grep -q 'EFETIVA diverge' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit efetiva com User=root depois do reload recusa e remove" $?
+sed 's/^  local eff; if ! eff="\$(effective_ok)"; then$/  local eff; if false; then/' "${me}" > "${t}/mut3.sh"
+PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut3.sh" install --apply > "${t}/out" 2>&1
+rc=$?; ! cmp -s "${me}" "${t}/mut3.sh" && [ "${rc}" = 0 ]; chk "install: o MUTANTE sem a conferência do efetivo instalaria a unit lida como root — a conferência é a causa" $?
+rm -f "${t}/eff-user" "${t}/root/etc/systemd/system/${UNIT}.service"
 printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"
 run install; chk "install: ensaio sai 0" $?
 [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: ensaio não escreve" $?
