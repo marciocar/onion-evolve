@@ -3,7 +3,7 @@ title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, 
 date: 2026-11-13
 branch: feat/delegated-acts-1113
 reviewer: "3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: fddb7fc70928de69dc06f3537897609c13e74048fffdb5baa52cb8382158d35d
+reviewed_diff_sha256: 9d2165ed7cf6d9725d445e5f6e3c6e1380182c5a05876365a5476ad775b976ab
 reviewed_code_sha256: 181a6db7473a3662fbd5d11a98da516e98740d3d1c3165239f4c8f1fccaa0994
 findings_total: 15
 findings_real: 15
