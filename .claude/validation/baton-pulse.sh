@@ -53,6 +53,15 @@
 #   AGENT_UNMEASURED transcript ilegível ou sem entrada user/assistant: NÃO medido, nunca «não parado».
 #   O comando pendente sai com segredo trocado por [REDACTED] (por LISTA: o que não está nela passa) e a home por ~. Só STALLED, SILENT e UNMEASURED entram no
 #   sha. Não sabe se o processo do subagente vive (o harness não expõe pid por subagente): um pendurado E morto sai STALLED.
+#   PEÇAS (D_BACKBONE_OWNER_1112, 2026-11-12): todo membro `piece: true` do members.yaml tem sessão dona. Dono em ordem
+#   fixa, parando na 1ª: owner_session do members.yaml → owners.tsv (linha cujo rótulo é o id da peça) → a sessão do core.
+#   Casa pelo NOME da sessão viva (não UNREACHABLE), nunca pelo ref. Aviso, nunca bloqueio; cada aviso traz o card de
+#   arranque (texto: o pulso nunca abre sessão):
+#   PIECE_OWNED               há sessão viva com o nome do dono.
+#   PIECE_UNOWNED             nenhuma sessão viva com esse nome, nem sessão viva no repo da peça.
+#   PIECE_OWNER_NAME_MISMATCH há sessão viva com cwd no repo da peça, com outro nome: a retomada troca ref e nome, e o
+#                             desencontro não pode sair como dono ausente (pedido de rigor da curadoria).
+#   PIECE_UNMEASURED          sem a lista de peers não há nome a casar: NÃO medido, nunca «sem dono».
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
 #   isso vence, quando a lista de peers foi lida). Sem lista de peers, a classe é só pela idade do farol.
@@ -524,6 +533,58 @@ AG.sort(key=lambda a: (AORD[a['cls']], a['sid'], a['aid']))
 acnt = {c: sum(1 for a in AG if a['cls'] == c) for c in AORD}
 AG_ALERT = ('AGENT_STALLED', 'AGENT_SILENT', 'AGENT_UNMEASURED')   # só estes entram no sha: RUNNING e DONE mudam toda batida
 
+# ── peças: a sessão dona de cada peça estratégica (D_BACKBONE_OWNER_1112, cláusula 8 da doutrina) ──────────
+# A peça é o membro com `piece: true` no members.yaml (o `kind:` segue sendo a NATUREZA, validada por enum). O dono se
+# resolve em ORDEM FIXA, parando na 1ª que responde (a forma do Spotify Portal AI Explorer): (1) `owner_session` do
+# members.yaml; (2) owners.tsv, a linha cujo rótulo é o id da peça (a chave é o NOME da sessão); (3) a sessão do core,
+# último recurso. Casa pelo NOME da sessão, nunca pelo ref/sessionId: a retomada troca o ref e mantém o nome.
+# Peça sem dono é AVISO, nunca bloqueio, e cada aviso traz o card de arranque como TEXTO: o pulso nunca abre sessão.
+def card_of(lp, name):
+    import shlex
+    where = re.sub(r'^/home/[^/]+|^/root(?=/|$)', '~', lp) if isinstance(lp, str) and lp.startswith('/') else '<local_path>'
+    return f'cd {where} && claude --name {shlex.quote(name)}'
+PIECES = []; pieces_src = ''
+try:
+    _members = (yaml.safe_load(open(os.path.join(repo, 'docs/evolution/federation/members.yaml'), encoding='utf-8')) or {}).get('members') or []
+    pieces_src = 'members.yaml'
+except OSError: _members, pieces_src = [], 'sem members.yaml neste papel'
+except Exception as e:
+    _members, pieces_src = [], 'NÃO MEDIDAS'; gaps.append(f'peças NÃO MEDIDAS: members.yaml ilegível ({e})')
+_live = [s for s in S.values() if s['cls'] != 'UNREACHABLE']
+for m in _members:
+    if not isinstance(m, dict) or m.get('piece') is not True: continue
+    pc = {'id': str(m.get('id')), 'lp': m.get('local_path'), 'sponsor': str(m.get('sponsor') or '')}
+    lp_r = real(pc['lp']) if isinstance(pc['lp'], str) and pc['lp'].startswith('/') else ''
+    hit = next((r[0] for r in (own_rows or []) if len(r) >= 2 and r[1] == pc['id']), None)
+    if m.get('owner_session'): pc['owner'], pc['osrc'] = str(m['owner_session']), 'members.yaml'
+    elif hit: pc['owner'], pc['osrc'] = hit, 'owners.tsv'
+    else: pc['owner'], pc['osrc'] = 'core', 'core (último recurso)'
+    if pc['osrc'].startswith('core'):   # o core se reconhece pelo checkout da fonte, como no rótulo derivado
+        match = [s for s in _live if 'core' in s['labels']]
+    else: match = [s for s in _live if s['name'] == pc['owner']]
+    in_repo = [s for s in _live if lp_r and s['cwd'] and (real(s['cwd']) == lp_r or real(s['cwd']).startswith(lp_r + '/'))]
+    pc['card'] = ''
+    if not peers_ok:
+        pc['cls'], pc['note'] = 'PIECE_UNMEASURED', 'sem a lista de peers não há nome de sessão a casar: NÃO medido, nunca «sem dono»'
+    elif pc['osrc'].startswith('core') and own_st.startswith('unreadable'):   # o 2º degrau não se leu: cair no core seria palpite
+        pc['cls'], pc['note'] = 'PIECE_UNMEASURED', f'sem owner_session e o owners.tsv {own_st}: a ordem parou no 2º degrau, NÃO medido'
+    elif match:
+        pc['cls'], pc['note'] = 'PIECE_OWNED', 'dono vivo: ' + ', '.join(f'{s["name"] or "core"} ({s["cls"]})' for s in match)
+    elif in_repo:
+        pc['cls'] = 'PIECE_OWNER_NAME_MISMATCH'
+        pc['note'] = 'há sessão viva no repo da peça com outro nome: ' + ', '.join(f'«{s["name"] or "sem nome"}» ({s["cls"]})' for s in in_repo) + \
+                     f'; o dono declarado é «{pc["owner"]}» (retomada troca ref e nome: não é dono ausente)'
+        pc['card'] = f'na sessão viva, /rename {pc["owner"]}; ou abra: {card_of(pc["lp"], pc["owner"])}'
+    else:
+        pc['cls'], pc['note'] = 'PIECE_UNOWNED', f'nenhuma sessão viva com o nome «{pc["owner"]}»'
+        pc['card'] = card_of(pc['lp'], pc['owner'] if not pc['osrc'].startswith('core') else pc['id'])
+    if pc['osrc'].startswith('core') and pc['cls'] != 'PIECE_UNMEASURED': warns.append(f'peça {pc["id"]} sem owner_session nem linha no owners.tsv: o dono caiu no core (último recurso)')
+    PIECES.append(pc)
+PORD = {c: i for i, c in enumerate(('PIECE_UNOWNED', 'PIECE_OWNER_NAME_MISMATCH', 'PIECE_UNMEASURED', 'PIECE_OWNED'))}
+PIECES.sort(key=lambda p: (PORD[p['cls']], p['id']))
+PIECE_ALERT = ('PIECE_UNOWNED', 'PIECE_OWNER_NAME_MISMATCH', 'PIECE_UNMEASURED')
+pc_line = ('peças: ' + ' · '.join(f'{c} {sum(1 for p in PIECES if p["cls"] == c)}' for c in PORD)) if PIECES else f'peças: nenhuma declarada ({pieces_src})'
+
 orphan_queue = {o: v for o, v in owned.items() if o != 'maestro' and o not in claimed_owner}
 CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
 cnt = {c: sum(1 for s in S.values() if s['cls'] == c) for c in CLASSES}
@@ -548,7 +609,8 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'sig': sorted(f"{r.get('ref')}|{r.get('label')}" for r in signals), 'ask': sorted(a['key'] for a in asks if a['live']), 'busy': 'OCUPADO' in load_line,
          'measured': [prs_measured, signals_measured, asks_measured, park_st],
          'cp': len(checkpoints), 'gaps': sorted(gaps),
-         'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT]}
+         'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT],
+         'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES)}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 # «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
 # ficou vermelho sem evento datado passava calado. Sem --last-sha não há base, e a batida fala.
@@ -564,6 +626,8 @@ if fmt == '--tsv':
     for p in prs: print('\t'.join(tsvc(x) for x in ('pr', p['ref'], 'CI_' + p['ci'].upper().replace(' ', '_'), p['branch'], '' if p['age'] is None else mins(p['age']), '', 'decide-census', p['state'])))
     for t in threads: print('\t'.join(tsvc(x) for x in ('thread', t['ref'], 'STOPPED' if t['stopped'] else 'MOVING', t['path'], '', '', 'decide-census', f'{t["label"]} · {t["state"]} · {t["actor"]}')))
     for a in AG: print('\t'.join(tsvc(x) for x in ('agent', a['aid'], a['cls'], a['sid'], '', '', a['rel'], f'{a["desc"] or "—"} · {a["note"]} · pendente: {a["cmd"] or "—"}')))
+    for p in PIECES: print('\t'.join(tsvc(x) for x in ('piece', p['id'], p['cls'], os.path.basename(str(p['lp'] or '')), '', '', p['osrc'],
+              f'dono {p["owner"]} · sponsor {p["sponsor"] or "—"} · {p["note"]}' + (f' · arranque: {p["card"]}' if p['card'] else ''))))
     for r in signals: print(f'signal\t{tsvc(r.get("ref"))}\t-\t-\t\t\tdecide-census\t{tsvc(r.get("label"))}')
     print(f'maestro\tasks\t-\t-\t\t{sum(1 for a in asks if a["live"])}\tmaestro-ask\tvencidas {sum(1 for a in asks if not a["live"])}')
     print(f'maestro\tseal_candidates\t-\t-\t\t{len(seals)}\tdecide-census\tcheckpoints {len(checkpoints)} · nós open owner:maestro {len(owned.get("maestro", []))}')
@@ -581,7 +645,7 @@ ag_line = ('subagentes: ' + ' · '.join(f'{c} {acnt[c]}' for c in AORD)) if agen
 if quiet and not changed:
     unm = ' · '.join(x for x, ok in (('⚠️ PRs NÃO medidos', prs_measured), ('⚠️ sinais NÃO medidos', signals_measured),
                                        ('⚠️ perguntas NÃO medidas', asks_measured), ('⚠️ parada NÃO medida', not park_unknown)) if not ok)
-    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line} · {ag_line}' + (f' · {unm}' if unm else ''))
+    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line} · {ag_line} · {pc_line}' + (f' · {unm}' if unm else ''))
     sys.exit(0)
 print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
@@ -589,6 +653,7 @@ print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} �
       f'rótulos={own_p if own_rows is not None else ("derivados" if own_st == "absent" else "derivados (" + own_st + ")")} · ociosa após {idle_min}min · papel={role or "?"}')
 print(f'classes: {cls_line}')
 print(ag_line)
+print(pc_line)
 for w in warns: print(f'⚠️ {w}')
 for g in gaps: print(f'🕳️ lacuna: {g}')
 if quiet:
@@ -603,6 +668,8 @@ if quiet:
         if p['ci'] == 'RED': print(f'- {p["ref"]} com CI vermelho ({p["branch"]})')
     for a in AG:
         if a['cls'] in AG_ALERT: print(f'- {a["cls"]}: {a["aid"]} da sessão {a["sid"][:8]} ({a["desc"] or "—"}) · {a["note"]}' + (f' · pendente: {md_code(a["cmd"])}' if a['cmd'] else ''))
+    for p in PIECES:
+        if p['cls'] in PIECE_ALERT: print(f'- {p["cls"]}: {p["id"]} · dono {p["owner"]} ({p["osrc"]}) · {p["note"]}' + (f' · arranque: {md_code(p["card"])}' if p['card'] else ''))
     sys.exit(0)
 print('\n## Sessões')
 print('| classe | sessão | repo | estado medido | fila pronta (dono declarado) | fonte |')
@@ -617,6 +684,10 @@ if not agents_measured: print('- NÃO MEDIDO (sem diretório de transcripts): n�
 for a in AG:
     if a['cls'] != 'AGENT_DONE': print(f'- {a["cls"]} `{a["aid"]}` · sessão `{a["sid"][:8]}` · {a["desc"] or "—"} · {a["note"]}' + (f' · pendente: {md_code(a["cmd"])}' if a['cmd'] else ''))
 if agents_measured: print(f'- AGENT_DONE: {acnt["AGENT_DONE"]} (terminados, não listados; --tsv lista todos)' + ('' if AG else ' · nenhum transcript de subagente nas sessões vivas'))
+print('\n## Peças (sessão dona por peça: owner_session → owners.tsv → core; aviso, nunca bloqueio)')
+for p in PIECES:
+    print(f'- {p["cls"]} `{p["id"]}` · dono «{p["owner"]}» ({p["osrc"]}) · sponsor {p["sponsor"] or "—"} · {p["note"]}' + (f' · arranque: {md_code(p["card"])}' if p['card'] else ''))
+if not PIECES: print(f'- nenhuma peça declarada ({pieces_src})')
 print('\n## Fila declarada sem sessão casada')
 if orphan_queue:
     for o, v in sorted(orphan_queue.items()):
