@@ -1,0 +1,1247 @@
+# kg-backlog-guard: on
+# Grafo da rodada de primárias market-peek-machinery (/onion-research, modo primárias, 2026-11-13, run wf_3157a547-84f).
+# Pergunta: maquinaria para o agente 'espiar o mercado' em toda dúvida de desenho (quanto esforço de descoberta a
+# dúvida merece, e como escutar fóruns e comunidades de forma atual, local e sem dependência de serviço externo).
+# Este grafo nunca sela; as ligações com o corpus vão em external_edges (contrato v4.3), sem editar os grafos antigos.
+meta:
+  id: market-peek-machinery-2026-11
+  schema_version: "1"
+  baseline: "2026-11-13"
+  review_after: "2026-12-13"   # 30d: o tipo DOMINANTE é FERRAMENTA/API (20 de 25 evidências: HN Algolia,
+                               # GitHub search, Gemini/Claude Research, a escada da Anthropic, OpenMagpie e TrendRadar),
+                               # que muda por release sem aviso; a doutrina (carta Type 1/Type 2, VOI) valeria 12 meses,
+                               # mas não move a revisita. O OpenMagpie tem 6 meses de vida e a OpenAI ficou de fora.
+  # ═══ TETO: 56 NÓS ═══
+  # Justificativa do teto: rodada de primárias executada em 2026-11-13, grafo novo. 56 nós: 1 pergunta raiz,
+  # 3 claims-hipótese de desenho (escada de esforço, registro da espiada, escuta local), 1 claim com a recomendação
+  # íntegra do Elenxo, 25 evidências ancoradas (1 por claim), 18 objeções sobreviventes do Elenxo (1 por alvo),
+  # 7 superações achadas (5 das rejeitadas na ancoragem e 2 do Elenxo) e 1 contabilidade
+  # (E_LACUNAS_MARKET_PEEK_MACHINERY_1113). As 5 claims rejeitadas não viram nó: entram na contabilidade.
+  purpose: "Responder, com âncora verbatim, como o mercado dimensiona o esforço de descoberta de um agente e como escutar comunidades por delta, e separar o que é padrão de mercado do que é cunhagem Onion na maquinaria de espiada."
+external_edges:
+  - from: E_OBJECAO_HN_ALGOLIA_HOSTED_SERVICE
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_OPENMAGPIE_OPEN_CORE_AND_REDDIT
+    to: "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml#E_REDDIT_INACESSIVEL_DESTE_HARNESS"
+    edge_type: SUPPORTS
+  - from: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    to: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml#E_N0_SEV_PAGERDUTY"
+    edge_type: TRACES_TO
+  - from: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    to: "docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml#E_N0_ERROR_BUDGET_SRE"
+    edge_type: TRACES_TO
+  - from: Q_MARKET_PEEK_MACHINERY_1113
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_ESCADA_DE_ADOCAO_1105"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_MARKET_PEEK_MACHINERY_1113
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "Como o agente decide quanto esforço de descoberta uma dúvida de desenho merece (valor da informação, porta de mão única x dupla, orçamento por severidade) e como escuta fóruns e comunidades de forma atual, local e sem dependência de serviço externo?"
+    narrative: "Pergunta original: maquinaria para o agente 'espiar o mercado' em toda dúvida de desenho: como decidir quanto esforço de descoberta uma dúvida merece (valor da informação, decisões reversíveis x irreversíveis, orçamento por severidade) e como escutar fóruns e comunidades (Hacker News, Reddit, GitHub Discussions/Issues, Lobsters, fóruns de fornecedor) de forma atual (novembro de 2026), local e sem dependência de serviço externo, registrando o custo e se a espiada mudou a decisão, para recalibrar os limiares pelo histórico. Origem: pedido do maestro de 2026-11-13 para que o padrão de mercado vire maquinaria, não só memória. Corpus prévio: problem-formula-2026-11 (E_N0_SEV_PAGERDUTY, E_N0_ERROR_BUDGET_SRE), a skill onion-research (5 eixos e custo medido por modo), D_ESCADA_DE_ADOCAO_1105 e D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027; nada sobre valor da informação aplicado a agente, portas de mão única/dupla ou APIs de busca de comunidade."
+    trace: "pergunta original do run /onion-research em modo primárias, 2026-11-13 (wf_3157a547-84f)"
+  - id: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Hipótese de desenho (cunhagem Onion): escada fixa de esforço da espiada indexada por reversibilidade x severidade da dúvida, com teto inicial no degrau barato de 3-10 chamadas, recalibrada pelo histórico."
+    narrative: "Composição desta rodada, não padrão de mercado: a taxonomia Type 1/Type 2 vem da carta de 2015, o degrau-base vem da escada da Anthropic (que escala por complexidade, não por reversibilidade), e o teto teórico vem do EVPI, que sem payoffs não vira regra de parada. A ponte reversibilidade -> degrau é do Onion e precisa ser declarada como tal e medida por dogfood."
+    trace: "recomendação do Elenxo do run wf_3157a547-84f, itens (1), (2), (a) e (b)"
+  - id: C_PEEK_LEDGER_RECALIBRATION_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.35
+    label: "Hipótese de desenho (sem evidência de mercado nesta rodada): registrar por espiada o custo, as fontes, o http_code e o incomplete_results, e se a espiada mudou a decisão, para recalibrar os limiares pelo histórico."
+    narrative: "Só a coluna incomplete_results tem fonte (E_GH_SEARCH_INCOMPLETE_RESULTS). O restante (diário de decisão, mudou-ou-não, recalibração) não tem nenhuma fonte de mercado nesta rodada; o silêncio do blog do Gemini sobre registro de mudança de decisão não prova diferencial (objeção 16). É desenho próprio a medir por dogfood."
+    trace: "recomendação do Elenxo do run wf_3157a547-84f, item (f)"
+  - id: C_LOCAL_COMMUNITY_LISTENER_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Hipótese: escuta de comunidade por delta (HN Algolia search_by_date, GitHub search, Lobsters) roda local e barata, declarando a fonte como dependência intrínseca (a comunidade É o serviço); Reddit fica fora até medido."
+    narrative: "Viável pelas claims 6 a 14 e pelo uso atual do HN Algolia no core (onion-research.js linha 556 e radar-sources.yaml linha 38). Limites: HN Algolia e GitHub são serviços de terceiro e precisam da declaração de dependência intrínseca ou de alternativa nomeada pela D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027; GitHub Discussions exige token; o Reddit devolveu 403; os exemplos de URL com '>' cru devolvem 400."
+    trace: "recomendação do Elenxo do run wf_3157a547-84f, itens (3), (4), (c), (e) e (h)"
+  - id: C_ELENXO_RECOMMENDATION_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "Recomendação do Elenxo: escada de esforço no prompt é mercado; ligá-la à reversibilidade é cunhagem Onion; escuta de HN/GitHub é viável com operador codificado; Reddit é lacuna; recalibração por histórico não tem fonte."
+    narrative: "Recomendação íntegra do Elenxo (afirmação de 1 agente): O QUE A RODADA SUSTENTA: (1) uma escada de esforço embutida no prompt é padrão de mercado. A Anthropic a usa porque o agente julga mal o esforço (claim 19), e o degrau-base de 1 agente com 3-10 chamadas (claim 20) pode virar o teto inicial da 'espiada barata'. (2) A taxonomia porta de mão única/dupla (claims 1 a 3) serve de eixo de severidade, com o aviso explícito contra processo pesado em decisão reversível. (3) A escuta local de HN e GitHub é viável e barata: HN Algolia search_by_date com delta por created_at_i e GitHub REST/GraphQL com teto de 1.000 resultados e incomplete_results registrado. O core já chama o HN Algolia (onion-research.js:556, radar-sources.yaml:38), e o Lobsters /newest.json respondeu 200 hoje. (4) O OpenMagpie e o TrendRadar servem de molde de arquitetura (conector por fonte, cursor, alerta). O QUE A RODADA NÃO SUSTENTA: (a) VOI como regra prática de parada. Só a definição de teto está ancorada, e as duas regras operacionais foram rejeitadas. Sem payoffs, o limiar fica ao arbítrio de quem conduz. Use uma escada fixa por reversibilidade x severidade, declarada como desenho do Onion e não como padrão de mercado, e recalibre pelo histórico. (b) A ligação reversibilidade -> degrau de esforço: a Anthropic escala por complexidade, e a ponte é cunhagem do Onion, a declarar. (c) Reddit: inalcançável (403 medido hoje e E_REDDIT_INACESSIVEL_DESTE_HARNESS de 2026-08). Não prometa cobertura de Reddit. Declare a fonte como lacuna até alguém medir o caminho .rss ou OAuth, que a sonda desta passada não pôde rodar. (d) 'Mercado não expõe degraus de esforço em deep research': a OpenAI ficou fora, a imprensa de 2025 mostra um tier lightweight, e as fontes de Gemini e Claude não são de 2026. (e) 'Local e sem dependência externa': HN Algolia e GitHub são serviços de terceiro. Pela D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027, cada um precisa de alternativa nomeada ou da declaração de que a fonte É a comunidade (dependência intrínseca, não substituível). Nenhuma claim trata disso. (f) O núcleo de recalibração (registrar custo e se a espiada mudou a decisão, recalibrar limiares pelo histórico) não tem NENHUMA evidência de mercado nesta rodada. Não há fonte sobre decision journal ou calibração por histórico, então é desenho próprio a medir por dogfood. (g) Fóruns de fornecedor (Discourse etc.) e Lobsters, citados na pergunta, ficaram sem claim. (h) Armadilha concreta para quem implementar: os exemplos de URL do HN Algolia com '>' cru devolvem 400 por curl. Codifique (%3E) e confira o http_code, ou a espiada registra 'nada novo' em silêncio."
+    trace: "Elenxo do run /onion-research wf_3157a547-84f, campo recommendation"
+  - id: E_TYPE1_ONE_WAY_DOOR_DELIBERATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'Some decisions are consequential and irreversible or nearly irreversible – one-way doors – and these decisions must be made methodically, carefully, slowly, with great deliberation and consultation.' · Carta aos acionistas de 2015 (Invention Machine), parágrafo Type 1 / Type 2, 3º parágrafo da seção · ancorada por verificador independente"
+    valid_from: "2016"
+    source_kind: primary
+    label: "Decisões Type 1 são as consequentes e irreversíveis ou quase (portas de mão única) e merecem processo lento, deliberado e consultivo; o critério é a irreversibilidade."
+    narrative: "Claim 1. Citação verbatim: \"Some decisions are consequential and irreversible or nearly irreversible – one-way doors – and these decisions must be made methodically, carefully, slowly, with great deliberation and consultation.\". Elenxo (alvo 1): objeção sobrevivente, triagem limite; ver E_OBJECAO_NO_REVERSIBILITY_CLASSIFIER. Tier: o leitor não declarou tier para esta fonte; o campo fica de fora em vez de inventado."
+    trace: "https://www.sec.gov/Archives/edgar/data/1018724/000119312516530910/d168744dex991.htm"
+    provenance:
+      source: "https://www.sec.gov/Archives/edgar/data/1018724/000119312516530910/d168744dex991.htm"
+      locator: "Carta aos acionistas de 2015 (Invention Machine), parágrafo Type 1 / Type 2, 3º parágrafo da seção"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_TYPE2_DECIDE_QUICKLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'Type 2 decisions can and should be made quickly by high judgment individuals or small groups.' · Carta aos acionistas de 2015 (Invention Machine), mesmo parágrafo Type 1 / Type 2 · ancorada por verificador independente"
+    valid_from: "2016"
+    source_kind: primary
+    label: "Decisões reversíveis (Type 2, porta de mão dupla) devem ser tomadas rapidamente por indivíduos de alto julgamento ou grupos pequenos, não pelo processo pesado."
+    narrative: "Claim 2. Citação verbatim: \"Type 2 decisions can and should be made quickly by high judgment individuals or small groups.\". Elenxo (alvo 2): objeção sobrevivente, triagem limite; ver E_OBJECAO_TYPE2_NOT_PEEK_BUDGET. Tier: o leitor não declarou tier para esta fonte; o campo fica de fora em vez de inventado."
+    trace: "https://www.sec.gov/Archives/edgar/data/1018724/000119312516530910/d168744dex991.htm"
+    provenance:
+      source: "https://www.sec.gov/Archives/edgar/data/1018724/000119312516530910/d168744dex991.htm"
+      locator: "Carta aos acionistas de 2015 (Invention Machine), mesmo parágrafo Type 1 / Type 2"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_TYPE1_PROCESS_CREEP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'As organizations get larger, there seems to be a tendency to use the heavy-weight Type 1 decision-making process on most decisions, including many Type 2 decisions.' · Carta aos acionistas de 2015 (Invention Machine), parágrafo seguinte ao Type 1 / Type 2 · ancorada por verificador independente"
+    valid_from: "2016"
+    source_kind: primary
+    label: "A carta nomeia o risco: à medida que crescem, organizações tendem a usar o processo pesado Type 1 na maioria das decisões, inclusive em muitas Type 2."
+    narrative: "Claim 3. Citação verbatim: \"As organizations get larger, there seems to be a tendency to use the heavy-weight Type 1 decision-making process on most decisions, including many Type 2 decisions.\". Elenxo (alvo 3): a objeção não sobreviveu: a claim afirma só o que a carta diz, uma observação de tendência com aspas literais; serve de alerta contra pesquisa pesada em toda dúvida. Tier: o leitor não declarou tier para esta fonte; o campo fica de fora em vez de inventado."
+    trace: "https://www.sec.gov/Archives/edgar/data/1018724/000119312516530910/d168744dex991.htm"
+    provenance:
+      source: "https://www.sec.gov/Archives/edgar/data/1018724/000119312516530910/d168744dex991.htm"
+      locator: "Carta aos acionistas de 2015 (Invention Machine), parágrafo seguinte ao Type 1 / Type 2"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_EVPI_UPPER_BOUND
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "'The EVPI is an upper bound on the amount the DM would be willing to pay for additional information.' · MIT ESD.72, DA 2 (The Value of Perfect Information), slide 10 · ancorada por verificador independente"
+    valid_from: "2007"
+    source_tier: 7
+    source_kind: paper
+    label: "O EVPI (valor esperado da informação perfeita) é o teto do que vale pagar por informação adicional."
+    narrative: "Claim 4. Citação verbatim: \"The EVPI is an upper bound on the amount the DM would be willing to pay for additional information.\". Elenxo (alvo 4): objeção sobrevivente, triagem bloqueia; ver E_OBJECAO_EVPI_NEEDS_PAYOFFS."
+    trace: "https://ocw.iti.hr/courses/engineering-systems-division/esd-72-engineering-risk-benefit-analysis-spring-2007/lecture-notes/da2.pdf"
+    provenance:
+      source: "https://ocw.iti.hr/courses/engineering-systems-division/esd-72-engineering-risk-benefit-analysis-spring-2007/lecture-notes/da2.pdf"
+      locator: "MIT ESD.72, DA 2 (The Value of Perfect Information), slide 10"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VOI_CLAIRVOYANCE_BOUND
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "'VOI of clairvoyance is an upper bound for any imperfect information gathering scheme.' · Eidsvik (NTNU), Lecture 1, slide 'Properties of VOI', itens d e e · ancorada por verificador independente"
+    source_tier: 7
+    source_kind: paper
+    label: "O VOI do clarividente limita qualquer coleta imperfeita de informação; entre experimentos, escolhe-se o de maior VOI menos preço."
+    narrative: "Claim 5. Citação verbatim: \"VOI of clairvoyance is an upper bound for any imperfect information gathering scheme.\". Elenxo (alvo 5): objeção sobrevivente, triagem limite; ver E_OBJECAO_VOI_PER_SOURCE_UNKNOWN."
+    trace: "https://joeid.folk.ntnu.no/Lecture1_Eidsvik_Geilo.pdf"
+    provenance:
+      source: "https://joeid.folk.ntnu.no/Lecture1_Eidsvik_Geilo.pdf"
+      locator: "Eidsvik (NTNU), Lecture 1, slide 'Properties of VOI', itens d e e"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HN_ALGOLIA_RATE_LIMIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'We are limiting the number of API requests from a single IP to 10,000 per hour.' · Seção 'Rate limits' (h2), parágrafo único · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "HN Search API (Algolia): limite oficial de 10.000 requisições por hora por IP, com contato do suporte em caso de bloqueio indevido; uma rotina local de escuta cabe com folga."
+    narrative: "Claim 6. Citação verbatim: \"We are limiting the number of API requests from a single IP to 10,000 per hour.\". Elenxo (alvo 6): objeção sobrevivente, triagem limite; ver E_OBJECAO_HN_ALGOLIA_HOSTED_SERVICE."
+    trace: "https://hn.algolia.com/api"
+    provenance:
+      source: "https://hn.algolia.com/api"
+      locator: "Seção 'Rate limits' (h2), parágrafo único"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HN_ALGOLIA_DATE_WINDOW_STORIES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'http://hn.algolia.com/api/v1/search_by_date?tags=story&numericFilters=created_at_i>X,created_at_i<Y' · Seção 'Search', Examples, 'Stories between timestamp X and timestamp Y (in second)' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "search_by_date aceita numericFilters por created_at_i (segundos Unix) com > e <, numa janela X..Y com tags=story: dá para consultar só o delta desde a última espiada."
+    narrative: "Claim 7. Citação verbatim: \"http://hn.algolia.com/api/v1/search_by_date?tags=story&numericFilters=created_at_i>X,created_at_i<Y\". Elenxo (alvo 7): objeção sobrevivente, triagem bloqueia; ver E_OBJECAO_HN_RAW_GT_RETURNS_400."
+    trace: "https://hn.algolia.com/api"
+    provenance:
+      source: "https://hn.algolia.com/api"
+      locator: "Seção 'Search', Examples, 'Stories between timestamp X and timestamp Y (in second)'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HN_ALGOLIA_COMMENTS_SINCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'http://hn.algolia.com/api/v1/search_by_date?tags=comment&numericFilters=created_at_i>X' · Seção 'Search', Examples, 'Comments since timestamp X (in second)' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O mesmo filtro vale para comentários (tags=comment e created_at_i>X): lê só os comentários novos desde um timestamp, ordenados por data."
+    narrative: "Claim 8. Citação verbatim: \"http://hn.algolia.com/api/v1/search_by_date?tags=comment&numericFilters=created_at_i>X\". Elenxo (alvo 8): objeção sobrevivente, triagem limite; ver E_OBJECAO_HN_COMMENTS_RAW_GT."
+    trace: "https://hn.algolia.com/api"
+    provenance:
+      source: "https://hn.algolia.com/api"
+      locator: "Seção 'Search', Examples, 'Comments since timestamp X (in second)'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HN_ALGOLIA_TWO_ENDPOINTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'http://hn.algolia.com/api/v1/search_by_date?tags=(story,poll)' · Seção 'Search': títulos dos dois endpoints, tabela de parâmetros e exemplos 'Last stories OR polls' e 'All stories matching foo' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Há dois endpoints: search (relevância; query, tags=story/comment/front_page, restrictSearchableAttributes=url) e search_by_date (mais recentes); o OR de tags usa parênteses, como tags=(story,poll)."
+    narrative: "Claim 9. Citação verbatim: \"http://hn.algolia.com/api/v1/search_by_date?tags=(story,poll)\". Elenxo (alvo 9): a objeção não sobreviveu: descrição de superfície da API com exemplo literal; o search_by_date respondeu 200 hoje com query codificada."
+    trace: "https://hn.algolia.com/api"
+    provenance:
+      source: "https://hn.algolia.com/api"
+      locator: "Seção 'Search': títulos dos dois endpoints, tabela de parâmetros e exemplos 'Last stories OR polls' e 'All stories matching foo'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GH_REST_SEARCH_1000_CAP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'the GitHub REST API provides up to 1,000 results for each search.' · REST > Search > 'About search' (o leitor citou 'Search issues and pull requests' / Rate limit) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A REST search do GitHub devolve no máximo 1.000 resultados por busca, em páginas de até 100; varredura por janela de data precisa fatiar a consulta."
+    narrative: "Claim 10. Citação verbatim: \"the GitHub REST API provides up to 1,000 results for each search.\". Elenxo (alvo 10): a objeção não sobreviveu: teto literal da documentação; uma espiada por delta raramente passa de 1.000 resultados."
+    trace: "https://docs.github.com/en/rest/search/search"
+    provenance:
+      source: "https://docs.github.com/en/rest/search/search"
+      locator: "REST > Search > 'About search' (o leitor citou 'Search issues and pull requests' / Rate limit)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GH_REST_SEARCH_RATE_LIMIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'you can make up to 30 requests per minute for all search endpoints' · REST > Search > 'About search' > Rate limit · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Limite de taxa da search REST do GitHub: 30 requisições por minuto autenticado, 10 sem autenticação."
+    narrative: "Claim 11. Citação verbatim: \"you can make up to 30 requests per minute for all search endpoints\". Elenxo (alvo 11): a objeção não sobreviveu: literal; para uma espiada por dúvida o teto não limita (a busca de código exige token, 401 sem autenticação, mas isso não contraria a claim)."
+    trace: "https://docs.github.com/en/rest/search/search"
+    provenance:
+      source: "https://docs.github.com/en/rest/search/search"
+      locator: "REST > Search > 'About search' > Rate limit"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GH_SEARCH_INCOMPLETE_RESULTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'the response has the `incomplete_results` property set to `true`.' · REST > Search > 'Timeouts and incomplete results' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Timeout da search do GitHub pode devolver resultado parcial, sinalizado em incomplete_results; a espiada deve registrar esse campo."
+    narrative: "Claim 12. Citação verbatim: \"the response has the `incomplete_results` property set to `true`.\". Elenxo (alvo 12): a objeção não sobreviveu: literal e diretamente útil; o campo vira coluna obrigatória no registro da espiada."
+    trace: "https://docs.github.com/en/rest/search/search"
+    provenance:
+      source: "https://docs.github.com/en/rest/search/search"
+      locator: "REST > Search > 'Timeouts and incomplete results'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GH_GRAPHQL_DISCUSSION_SEARCH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'Perform a search across resources, returning a maximum of 1,000 results.' · GraphQL reference > Search > Query.search; SearchType: DISCUSSION · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No GraphQL do GitHub, search aceita type DISCUSSION (discussions de repositórios), com o mesmo teto de 1.000 resultados; o REST /search/issues não declara cobrir discussions."
+    narrative: "Claim 13. Citação verbatim: \"Perform a search across resources, returning a maximum of 1,000 results.\". Elenxo (alvo 13): objeção sobrevivente, triagem limite; ver E_OBJECAO_GH_DISCUSSIONS_NEED_TOKEN."
+    trace: "https://docs.github.com/en/graphql/reference/queries#search"
+    provenance:
+      source: "https://docs.github.com/en/graphql/reference/queries#search"
+      locator: "GraphQL reference > Search > Query.search; SearchType: DISCUSSION"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GH_GRAPHQL_PAGE_AND_BUDGET
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "'Values of `first` and `last` must be within 1-100.' · GraphQL > Rate limits and query limits · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "GraphQL do GitHub: first/last entre 1 e 100; orçamento primário de 5.000 pontos/hora por usuário (este número lido no resumo, sem aspas verbatim)."
+    narrative: "Claim 14. Citação verbatim: \"Values of `first` and `last` must be within 1-100.\". Elenxo (alvo 14): objeção sobrevivente, triagem limite; ver E_OBJECAO_GH_GRAPHQL_BUDGET_NOT_VERBATIM."
+    trace: "https://docs.github.com/en/graphql/overview/rate-limits-and-query-limits-for-the-graphql-api"
+    provenance:
+      source: "https://docs.github.com/en/graphql/overview/rate-limits-and-query-limits-for-the-graphql-api"
+      locator: "GraphQL > Rate limits and query limits"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GEMINI_DR_NO_DECLARED_BUDGET
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "'Over the course of a few minutes, Gemini continuously refines its analysis, browsing the web the way you do:' · blog.google, Gemini Deep Research, seção 'Process and timing' · ancorada por verificador independente"
+    valid_from: "2024-12"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Gemini Deep Research não fixa tempo nem número de fontes, só 'alguns minutos': o esforço é aberto e refinado continuamente, sem orçamento declarado."
+    narrative: "Claim 15. Citação verbatim: \"Over the course of a few minutes, Gemini continuously refines its analysis, browsing the web the way you do:\". Elenxo (alvo 15): objeção sobrevivente, triagem limite; ver E_OBJECAO_GEMINI_SOURCE_NOT_CURRENT."
+    trace: "https://blog.google/products/gemini/google-gemini-deep-research/"
+    provenance:
+      source: "https://blog.google/products/gemini/google-gemini-deep-research/"
+      locator: "blog.google, Gemini Deep Research, seção 'Process and timing'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_GEMINI_DR_SOURCE_LINKS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "'It's neatly organized with links to the original sources' · blog.google, Gemini Deep Research, seção 'Sources and citations' · ancorada por verificador independente"
+    valid_from: "2024-12"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Gemini Deep Research mostra as fontes como links para os originais no relatório, exportável para Google Doc; não registra se a pesquisa mudou alguma decisão."
+    narrative: "Claim 16. Citação verbatim: \"It's neatly organized with links to the original sources\". Elenxo (alvo 16): objeção sobrevivente, triagem limite; ver E_OBJECAO_GEMINI_DECISION_LOG_FROM_SILENCE."
+    trace: "https://blog.google/products/gemini/google-gemini-deep-research/"
+    provenance:
+      source: "https://blog.google/products/gemini/google-gemini-deep-research/"
+      locator: "blog.google, Gemini Deep Research, seção 'Sources and citations'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CLAUDE_RESEARCH_AGENTIC_NO_DEPTH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-13"
+    verified_against: "'Claude operates agentically, conducting multiple searches that build on each other while determining exactly what to investigate next.' · claude.com/blog/research (post de 2025-04-15, beta), seção 'How Research works' · ancorada por verificador independente"
+    valid_from: "2025-04-15"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Claude Research decide sozinho o que investigar em seguida, em buscas encadeadas, sem orçamento nem seletor de profundidade no post (só 'ligar' e 'minutos')."
+    narrative: "Claim 17. Citação verbatim: \"Claude operates agentically, conducting multiple searches that build on each other while determining exactly what to investigate next.\". Elenxo (alvo 17): objeção sobrevivente, triagem bloqueia; ver E_OBJECAO_OPENAI_LIGHTWEIGHT_TIER_MISSING."
+    trace: "https://claude.com/blog/research"
+    provenance:
+      source: "https://claude.com/blog/research"
+      locator: "claude.com/blog/research (post de 2025-04-15, beta), seção 'How Research works'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_CLAUDE_RESEARCH_CITATIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'This approach delivers thorough answers, complete with easy-to-check citations so you can trust Claude's findings.' · claude.com/blog/research, seção sobre citações · ancorada por verificador independente"
+    valid_from: "2025-04-15"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Claude Research entrega citações verificáveis como parte do contrato do produto, mas não publica número de fontes nem custo."
+    narrative: "Claim 18. Citação verbatim: \"This approach delivers thorough answers, complete with easy-to-check citations so you can trust Claude's findings.\". Elenxo (alvo 18): objeção sobrevivente, triagem limite; ver E_OBJECAO_CLAUDE_RESEARCH_DATED."
+    trace: "https://claude.com/blog/research"
+    provenance:
+      source: "https://claude.com/blog/research"
+      locator: "claude.com/blog/research, seção sobre citações"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ANTHROPIC_EFFORT_SCALING_RULES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'Agents struggle to judge appropriate effort for different tasks, so we embedded scaling rules in the prompts.' · Prompt engineering and evaluations for research agents, princípio 'Scale effort to query complexity' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A Anthropic embute regras de escala de esforço nos prompts porque os agentes julgam mal o esforço adequado; o caso simples é 1 agente com 3-10 chamadas de ferramenta."
+    narrative: "Claim 19. Citação verbatim: \"Agents struggle to judge appropriate effort for different tasks, so we embedded scaling rules in the prompts.\". Elenxo (alvo 19): objeção sobrevivente, triagem limite; ver E_OBJECAO_SCALING_BY_COMPLEXITY_NOT_REVERSIBILITY."
+    trace: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    provenance:
+      source: "https://www.anthropic.com/engineering/multi-agent-research-system"
+      locator: "Prompt engineering and evaluations for research agents, princípio 'Scale effort to query complexity'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ANTHROPIC_SIMPLE_TIER_3_10_CALLS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'Simple fact-finding requires just 1 agent with 3-10 tool calls,' · Prompt engineering and evaluations for research agents, princípio 'Scale effort to query complexity' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Degrau mais baixo da escada da Anthropic: fato simples usa 1 agente com 3-10 chamadas; comparação direta 2-4 subagentes com 10-15 chamadas cada; pesquisa complexa mais de 10 subagentes."
+    narrative: "Claim 20. Citação verbatim: \"Simple fact-finding requires just 1 agent with 3-10 tool calls,\". Elenxo (alvo 20): a objeção não sobreviveu: literal, dá um degrau-base numérico adotável como teto inicial da espiada barata, recalibrável pelo histórico. Tier: o leitor não declarou tier nesta claim; 9 é o tier que ele declarou para o mesmo documento (claims 19, 21 e 22)."
+    trace: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    provenance:
+      source: "https://www.anthropic.com/engineering/multi-agent-research-system"
+      locator: "Prompt engineering and evaluations for research agents, princípio 'Scale effort to query complexity'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ANTHROPIC_AGENT_4X_TOKENS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'In our data, agents typically use about 4× more tokens than chat interactions,' · Benefits of a multi-agent system, parágrafo 'There is a downside' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Agentes usam cerca de 4x mais tokens que o chat (e sistemas multiagente cerca de 15x, número fora da citação)."
+    narrative: "Claim 21. Citação verbatim: \"In our data, agents typically use about 4× more tokens than chat interactions,\". Elenxo (alvo 21): objeção sobrevivente, triagem limite; ver E_OBJECAO_15X_NOT_QUOTED."
+    trace: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    provenance:
+      source: "https://www.anthropic.com/engineering/multi-agent-research-system"
+      locator: "Benefits of a multi-agent system, parágrafo 'There is a downside'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ANTHROPIC_TOKENS_80PCT_VARIANCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'We found that token usage by itself explains 80% of the variance,' · Benefits of a multi-agent system · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O uso de tokens sozinho explica 80% da variância de desempenho nas avaliações de navegação (BrowseComp): mais esforço compra qualidade nesse benchmark."
+    narrative: "Claim 22. Citação verbatim: \"We found that token usage by itself explains 80% of the variance,\". Elenxo (alvo 22): objeção sobrevivente, triagem limite; ver E_OBJECAO_BROWSECOMP_NOT_DESIGN_DOUBT."
+    trace: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    provenance:
+      source: "https://www.anthropic.com/engineering/multi-agent-research-system"
+      locator: "Benefits of a multi-agent system"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OPENMAGPIE_LOCAL_SELF_HOST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-13"
+    verified_against: "'run it on your own box with your own model for the cost of the hardware.' · github.com/obris-dev/openmagpie, README, seção 'Why self-host it' · ancorada por verificador independente"
+    source_tier: 5
+    source_kind: repo
+    label: "OpenMagpie se declara open source (Apache 2.0), cobre Reddit, Hacker News e RSS/Atom (além de X e YouTube) e roda local com modelo próprio, sem custo além do hardware."
+    narrative: "Claim 23. Citação verbatim: \"run it on your own box with your own model for the cost of the hardware.\". Elenxo (alvo 23): objeção sobrevivente, triagem bloqueia; ver E_OBJECAO_OPENMAGPIE_OPEN_CORE_AND_REDDIT."
+    trace: "https://github.com/obris-dev/openmagpie"
+    provenance:
+      source: "https://github.com/obris-dev/openmagpie"
+      locator: "github.com/obris-dev/openmagpie, README, seção 'Why self-host it'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OPENMAGPIE_CONNECTORS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'scan X/Twitter, YouTube, Reddit, Hacker News, and a few RSS feeds.' · github.com/obris-dev/openmagpie, README, seção 'What it does' · ancorada por verificador independente"
+    source_tier: 5
+    source_kind: repo
+    label: "OpenMagpie lista os conectores atuais: X/Twitter, YouTube, Reddit, Hacker News e RSS/Atom; a última atividade não estava visível na captura do leitor."
+    narrative: "Claim 24. Citação verbatim: \"scan X/Twitter, YouTube, Reddit, Hacker News, and a few RSS feeds.\". Elenxo (alvo 24): objeção sobrevivente, triagem limite; ver E_OBJECAO_OPENMAGPIE_YOUNG_PROJECT."
+    trace: "https://github.com/obris-dev/openmagpie"
+    provenance:
+      source: "https://github.com/obris-dev/openmagpie"
+      locator: "github.com/obris-dev/openmagpie, README, seção 'What it does'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_TRENDRADAR_LOCAL_ARCH_MODEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'支持 Docker ，数据本地/云端自持。支持 Docker ，数据本地/云端自持。' · github.com/sansan0/TrendRadar, README, descrição do projeto e changelog v6.11.0 (2026/10/13) · ancorada por verificador independente"
+    valid_from: "2026-10-13"
+    source_tier: 5
+    source_kind: repo
+    label: "TrendRadar (GPL-3.0) roda local/Docker com dados próprios e agrega RSS/Atom, mas as fontes padrão são plataformas chinesas, não HN/Reddit; serve de molde de arquitetura (RSS + alerta), não de cobertura."
+    narrative: "Claim 25. Citação verbatim: \"支持 Docker ，数据本地/云端自持。支持 Docker ，数据本地/云端自持。\". Elenxo (alvo 25): a objeção não sobreviveu: a própria claim limita o alcance (fontes chinesas, molde RSS + alerta, não cobertura)."
+    trace: "https://github.com/sansan0/TrendRadar"
+    provenance:
+      source: "https://github.com/sansan0/TrendRadar"
+      locator: "github.com/sansan0/TrendRadar, README, descrição do projeto e changelog v6.11.0 (2026/10/13)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OBJECAO_NO_REVERSIBILITY_CLASSIFIER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 1, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a carta dá a taxonomia Type 1/Type 2, mas não um classificador operacional de reversibilidade para dúvida de desenho, nem converte a classe em orçamento de descoberta."
+    narrative: "Alvo: 1 (E_TYPE1_ONE_WAY_DOOR_DELIBERATE). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A carta (Invention Machine, 2015) dá a taxonomia, mas não dá regra para CLASSIFICAR uma dúvida de desenho como porta de mão única ou dupla, nem converte a classe em orçamento de descoberta. Fonte corporativa única, sem medida. No corpus, kg-corpus-grep --phrase 'one-way door' devolveu 0 nós sobre 263 grafos. A maquinaria precisaria de um classificador (critérios de reversibilidade: dado migrado, contrato público, porta publicada…) que nenhuma claim fornece. Superação: nenhuma (procurado nas 25 claims e no corpus; as regras de escala da Anthropic, claims 19 e 20, escalam por complexidade da consulta, não por reversibilidade)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'one-way door'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 1"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_TYPE2_NOT_PEEK_BUDGET
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 2, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: o trecho Type 2 diz QUEM decide e com que velocidade, não quanta informação externa coletar; 'decidir rápido' não equivale a 'espiar pouco'."
+    narrative: "Alvo: 2 (E_TYPE2_DECIDE_QUICKLY). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O trecho diz QUEM decide e com que velocidade ('quickly by high judgment individuals or small groups'). Não diz quanta informação externa coletar antes. Daí até um orçamento de espiada para Type 2 é inferência. A claim 22 (mais tokens compram qualidade) puxa na direção oposta, e a rodada não reconcilia as duas. Superação: nenhuma (procurado nas claims 19 a 22 e nas 4 de VOI; nenhuma liga reversibilidade a número de chamadas ou tokens)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'two-way door'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 2"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_EVPI_NEEDS_PAYOFFS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 4, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO (bloqueia): o EVPI só se calcula com probabilidades a priori e payoffs numéricos, que a dúvida de desenho do agente não tem; sem eles, o limiar de espiar fica ao arbítrio de quem conduz."
+    narrative: "Alvo: 4 (E_EVPI_UPPER_BOUND). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: As duas claims que tentavam fazer do VOI uma regra prática de parada ('triagem antes de desenhar a busca'; 'comprar só se VOI > preço') foram REJEITADAS como EXAGERADAS na ancoragem. Cenário: na dúvida 'adotar OpenMagpie como ouvinte local?', quem conduz atribui payoff 10 ou 100 à decisão certa; o EVPI muda 10x e com ele a decisão de espiar. Sem payoffs, 'teto do EVPI' não fecha a lacuna 'uso prático'. Superação: nenhuma (o proxy procurado, escada fixa de chamadas por severidade/reversibilidade, só existe como a escada da Anthropic, nunca medida no Onion para dúvida de desenho; kg-corpus-grep EVPI = 0 nós e --phrase 'valor da informa' = 0 nós)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh EVPI  # 0 nós; e as 2 claims de VOI rejeitadas como EXAGERADAS nesta rodada"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 4"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_VOI_PER_SOURCE_UNKNOWN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 5, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: escolher o experimento de maior VOI menos preço exige quantificar VOI por fonte (HN x GitHub x Reddit), e nenhuma claim dá esse número nem um proxy dele."
+    narrative: "Alvo: 5 (E_VOI_CLAIRVOYANCE_BOUND). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Correta como teoria (Eidsvik, NTNU), mas herda o problema da objeção ao EVPI: os slides operam sob 'Assuming risk neutral decision maker!' e com payoffs explícitos. Superação: nenhuma (procurado nas claims 6 a 25, nenhuma estima taxa de acerto ou mudança de decisão por fonte; corpus 0 nós)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'valor da informa'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 5"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_HN_ALGOLIA_HOSTED_SERVICE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 6, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: o HN Algolia é serviço hospedado de terceiro; pela D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027 só entra como ponte com alternativa local nomeada, e nenhuma claim a nomeia. O limite não foi exercitado e a página não tem data."
+    narrative: "Alvo: 6 (E_HN_ALGOLIA_RATE_LIMIT). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A API oficial do HN (Firebase) não tem busca, e isso também não foi ancorado. Atenuante medido: o core já usa search_by_date em .claude/workflows/onion-research.js (linha 556) e docs/onion/radar-sources.yaml (linha 38), e E_REDDIT_INACESSIVEL_DESTE_HARNESS (2026-08-28) registra que o HN Algolia funciona. Superação: nenhuma (a API Firebase do HN não foi ancorada; o Lobsters /newest.json respondeu 200 hoje, mas cobre outra comunidade e não substitui o HN)."
+    trace: "grep -n algolia .claude/workflows/onion-research.js docs/onion/radar-sources.yaml"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 6"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_HN_RAW_GT_RETURNS_400
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 7, com o critério E1_EVIDENCIA_CONTRARIA e o comando registrado em trace"
+    label: "OBJEÇÃO (bloqueia): a URL de exemplo da doc do HN Algolia, usada literalmente por curl com '>' cru, devolve HTTP 400; com '%3E' devolve 200. Um ouvinte que não confere o status registra 'nada novo' em silêncio."
+    narrative: "Alvo: 7 (E_HN_ALGOLIA_DATE_WINDOW_STORIES). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: Medido em 2026-11-13: curl 'https://hn.algolia.com/api/v1/search_by_date?query=claude&tags=story&numericFilters=created_at_i>1762905600&hitsPerPage=1' devolveu HTTP 400 'Your client has issued a malformed or illegal request'; a mesma URL com '%3E' devolveu 200 com hits. Falso negativo silencioso exatamente no delta que a claim promete. Superação achada (classe entrega): C_SUPERACAO_20261113_HN_ENCODE_GT_OPERATOR."
+    trace: "curl -s -o /dev/null -w '%{http_code}\\n' 'https://hn.algolia.com/api/v1/search_by_date?query=claude&tags=story&numericFilters=created_at_i>1762905600'  # 400; com %3E -> 200"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 7"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_HN_COMMENTS_RAW_GT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 8, com o critério E1_EVIDENCIA_CONTRARIA e o comando registrado em trace"
+    label: "OBJEÇÃO: o exemplo de comentários usa o mesmo '>' cru que devolveu 400 na variante tags=story; a variante tags=comment não foi testada e a dúvida fica a favor da objeção."
+    narrative: "Alvo: 8 (E_HN_ALGOLIA_COMMENTS_SINCE). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: O mecanismo de parsing de numericFilters é o mesmo do exemplo de stories. Superação achada (classe entrega): C_SUPERACAO_20261113_HN_COMMENTS_ENCODE_GT."
+    trace: "curl -s -o /dev/null -w '%{http_code}\\n' 'https://hn.algolia.com/api/v1/search_by_date?tags=comment&numericFilters=created_at_i>1762905600'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 8"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_GH_DISCUSSIONS_NEED_TOKEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 13, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: 'o REST não declara discussions' é ausência de declaração lida como ausência de cobertura; o GraphQL exige token, então escutar Discussions depende de credencial do maestro, e a claim não traz filtro de data para o delta."
+    narrative: "Alvo: 13 (E_GH_GRAPHQL_DISCUSSION_SEARCH). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Superação: nenhuma (procurado nas claims 10 a 14; nenhuma ancora caminho anônimo). Medido: api.github.com/search/code devolveu 401 sem token."
+    trace: "curl -s -o /dev/null -w '%{http_code}\\n' -X POST https://api.github.com/graphql -d '{\"query\":\"{viewer{login}}\"}'  # sem token -> 401"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 13"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_GH_GRAPHQL_BUDGET_NOT_VERBATIM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 14, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: os 5.000 pontos/hora do GraphQL foram lidos num resumo, sem aspas verbatim; só 'first/last 1-100' está ancorado, e um orçamento calibrado nesse número fica sem lastro."
+    narrative: "Alvo: 14 (E_GH_GRAPHQL_PAGE_AND_BUDGET). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Superação: nenhuma (não reaberto; o cabeçalho X-RateLimit-Limit de uma chamada autenticada mediria, mas exige token, que não foi usado)."
+    trace: "claim 14 desta rodada: '5.000 pontos/hora ... lido no resumo, sem aspas verbatim'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 14"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_GEMINI_SOURCE_NOT_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 15, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a fonte do Gemini Deep Research é post de blog sem data ancorada (lançamento de dez/2024); 'o blog não declara orçamento' não prova que o produto de nov/2026 não tenha seletor."
+    narrative: "Alvo: 15 (E_GEMINI_DR_NO_DECLARED_BUDGET). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Superação: nenhuma (procurado nas claims 15 a 18; nenhuma fonte tem data de 2026)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'deep research'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 15"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_GEMINI_DECISION_LOG_FROM_SILENCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 16, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: 'não registra mudança de decisão' é inferência do silêncio de um blog de marketing; a citação sustenta só a exibição de fontes, e o Onion não pode alegar diferencial sobre ela."
+    narrative: "Alvo: 16 (E_GEMINI_DR_SOURCE_LINKS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Superação: nenhuma (procurado nas claims 15 a 18 e nas rejeitadas; nenhuma trata do registro de mudança de decisão nos produtos de deep research)."
+    trace: "claim 16: a QUOTE cobre só 'links to the original sources'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 16"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_OPENAI_LIGHTWEIGHT_TIER_MISSING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 17, com o critério E1_EVIDENCIA_CONTRARIA e o comando registrado em trace"
+    label: "OBJEÇÃO (bloqueia): a OpenAI, nomeada na lacuna e sem claim, lançou em 2025 um deep research lightweight (o4-mini, cota separada); com ela, o padrão de mercado passa a ser degraus de esforço com custo explícito, não 'o agente decide sozinho'."
+    narrative: "Alvo: 17 (E_CLAUDE_RESEARCH_AGENTIC_NO_DEPTH). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A fonte do Claude Research é o post beta de 2025-04-15, 19 meses antes de nov/2026. Fontes de imprensa (não primárias): the-decoder.com/deep-research-feature-now-available-to-free-chatgpt-users/ e techradar.com 'Free ChatGPT users are finally getting Deep Research access'. A página da OpenAI devolveu 403 ao leitor, inclusive nos espelhos de idioma. Superação: nenhuma (a busca standard devolveu só imprensa de 2025; nenhuma primária de 2026 da OpenAI ou da Anthropic sobre níveis de esforço foi aberta)."
+    trace: "WebSearch 'OpenAI deep research lightweight version o4-mini usage limits' -> the-decoder.com/deep-research-feature-now-available-to-free-chatgpt-users/ (lightweight o4-mini, cota separada)"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 17"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_CLAUDE_RESEARCH_DATED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 18, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a citação do Claude Research é literal mas datada (2025-04, beta); prova o contrato de citação, não o estado de nov/2026, nem custo ou número de fontes."
+    narrative: "Alvo: 18 (E_CLAUDE_RESEARCH_CITATIONS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Superação: nenhuma (a página atual do recurso Research não foi reaberta nesta passada)."
+    trace: "claim 18 LOCATOR: 'post de 2025-04-15, beta'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 18"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SCALING_BY_COMPLEXITY_NOT_REVERSIBILITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 19, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a escada da Anthropic é por COMPLEXIDADE da consulta, não por reversibilidade nem severidade da decisão; ligar Type 1 a degrau alto é desenho do Onion, sem fonte."
+    narrative: "Alvo: 19 (E_ANTHROPIC_EFFORT_SCALING_RULES). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: É a evidência mais útil da rodada (o padrão é embutir uma escada no prompt porque o agente julga mal o esforço). Superação: nenhuma (procurado nas 25 claims; a E_N0_SEV_PAGERDUTY do corpus roteia por severidade de incidente, não por esforço de pesquisa)."
+    trace: "claims 19 e 20: 'Scale effort to query complexity' — o eixo é complexidade, não reversibilidade"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 19"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_15X_NOT_QUOTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 21, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a citação sustenta só o 4x; o ~15x do multiagente está na claim sem aspas, e um orçamento que o use como multiplicador fica sem lastro ancorado."
+    narrative: "Alvo: 21 (E_ANTHROPIC_AGENT_4X_TOKENS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Superação: nenhuma (não reaberto; está no mesmo parágrafo da fonte, mas o verificador só conferiu o 4x)."
+    trace: "claim 21: a QUOTE termina em 'about 4× more tokens than chat interactions,'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 21"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_BROWSECOMP_NOT_DESIGN_DOUBT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 22, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: os 80% da variância são do BrowseComp (achar fato difícil navegando), não de dúvida de desenho; usados sem freio justificam espiada cara em toda dúvida, o risco que a carta Type 1/Type 2 nomeia."
+    narrative: "Alvo: 22 (E_ANTHROPIC_TOKENS_80PCT_VARIANCE). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Contradiz a disciplina Type 2 (E_TYPE2_DECIDE_QUICKLY). Superação: nenhuma (procurado nas claims e no corpus; a skill onion-research registra custo, ~7,3M tokens na varredura, não a relação custo x mudança de decisão)."
+    trace: "claim 22 LOCATOR: avaliação BrowseComp; nenhuma claim mede em dúvida de desenho"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 22"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_OPENMAGPIE_OPEN_CORE_AND_REDDIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 23, com o critério E1_EVIDENCIA_CONTRARIA e o comando registrado em trace"
+    label: "OBJEÇÃO (bloqueia): OpenMagpie é open-core (Apache 2.0 com cláusula ee/, NOASSERTION na API do GitHub), o Reddit depende de raspagem anônima que daqui devolve 403, e 'sem custo além do hardware' exige LLM local."
+    narrative: "Alvo: 23 (E_OPENMAGPIE_LOCAL_SELF_HOST). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: (a) O LICENSE (raw, HEAD) diz 'Licensed under the Apache License, Version 2.0 ... with the following additional terms: 1. All content that resides under the \"ee/\" directory ... is licensed under the license defined in \"ee/LICENSE\"'; hoje não há ee/ na raiz. (b) O connector.py do Reddit comenta que o endpoint anônimo .json 'is gated by a TLS / HTTP-2 fingerprint' e cai para /r/<slug>/new/.rss, com oauth.reddit.com como alternativa. Medido desta VPS em 2026-11-13: www.reddit.com e old.reddit.com /r/ClaudeAI/new.json devolveram 403; os termos da Data API ficaram inalcançáveis. Cenário: se o .rss for barrado como o .json, o ouvinte devolve zero posts e 'ninguém fala disso' vira falso negativo. (c) Exige LLM para pontuar ('once an LLM is reachable'). Superação: nenhuma (a sonda de /new/.rss foi negada pelo classificador de permissões e não foi medida)."
+    trace: "curl -s https://raw.githubusercontent.com/obris-dev/openmagpie/HEAD/LICENSE | head -8; curl -s -o /dev/null -w '%{http_code}' -A generic 'https://www.reddit.com/r/ClaudeAI/new.json?limit=1'  # 403"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 23"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_OPENMAGPIE_YOUNG_PROJECT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 24, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: OpenMagpie tem 6 meses (criado 2026-05-11, último push 2026-10-14, 100 estrelas): maturidade baixa para virar dependência do core; X/Twitter e YouTube dependem de APIs de terceiros com chave."
+    narrative: "Alvo: 24 (E_OPENMAGPIE_CONNECTORS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Medido pela API do GitHub em 2026-11-13: created_at 2026-05-11, pushed_at 2026-10-14, 100 estrelas, archived false. Superação: nenhuma (nenhuma claim cobre ouvinte OSS maduro com HN, GitHub e Lobsters; o F5Bot é serviço, rejeitado no 'local')."
+    trace: "curl -s https://api.github.com/repos/obris-dev/openmagpie | python3 -I -c 'import sys,json;d=json.load(sys.stdin);print(d[\"created_at\"],d[\"pushed_at\"],d[\"stargazers_count\"])'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "Elenxo, objeção ao alvo 24"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "contabilidade do run /onion-research wf_3157a547-84f e contagem do escritor sobre as listas recebidas: 25 ancoradas, 5 rejeitadas, 25 objeções, 18 sobreviventes, 0 recusas, 7 superações"
+    label: "LACUNAS: 7 fontes lidas, 1 inalcançável (reddit-api); 25 claims ancoradas, 5 rejeitadas (todas EXAGERADA); 25 objeções, 18 sobreviventes (4 bloqueiam), 0 recusadas; 7 superações; 3 lacunas abertas."
+    narrative: "FONTES: chaves lidas (7 de 8): two-way-doors (carta de 2015 no SEC EDGAR), value-of-information (MIT ESD.72 DA 2 em espelho ocw.iti.hr e slides de Eidsvik, NTNU, como substitutas de Howard 1966, cujo texto o leitor não alcançou: IEEE e DTIC bloqueados), hn-algolia, github-search, deep-research-agents (Gemini e Claude; a página da OpenAI devolveu 403 ao leitor, inclusive nos espelhos de idioma), anthropic-multiagent-research, social-listening-oss (OpenMagpie, TrendRadar, F5Bot). Inalcançáveis (1): reddit-api; medido em 2026-11-13, www.reddit.com e old.reddit.com /r/ClaudeAI/new.json devolveram 403 desta VPS, e os termos da Data API, OAuth, limites e uso não comercial seguem sem evidência. CLAIMS: 30 propostas; 25 ANCORADAS, cada uma virou nó evidence; 5 REJEITADAS na ancoragem (5 EXAGERADA, 0 NAO-ENCONTRADA), que nunca viram nó. ELENXO: 25 objeções (uma por claim ancorada); 18 sobreviventes modeladas como E_OBJECAO (4 bloqueiam: alvos 4, 7, 17 e 23; 14 limitam: alvos 1, 2, 5, 6, 8, 13, 14, 15, 16, 18, 19, 21, 22 e 24); 7 não sobreviveram (alvos 3, 9, 10, 11, 12, 20 e 25) e o motivo está na narrativa do alvo. Objeções RECUSADAS pelo motor (sobreviveram sem critério pré-registrado ou sem superação): 0; nenhum alvo fica não-julgado por recusa. SUPERAÇÕES: 7 nós C_SUPERACAO_20261113 (5 das rejeitadas na ancoragem, com TRACES_TO para este nó; 2 do Elenxo, alvos 7 e 8, com TRACES_TO para o E_OBJECAO respectivo). LACUNAS FECHADAS (5): two-way-doors (taxonomia Type 1/Type 2 e o risco de processo pesado em decisão reversível, sem classificador operacional) · hn-algolia (endpoints, filtro created_at_i e limite de taxa; funciona com o operador codificado %3E e devolve 400 com '>' cru) · github-search (teto de 1.000, 30 req/min, incomplete_results, type DISCUSSION no GraphQL; o GraphQL exige token e os 5.000 pontos/h não são verbatim) · anthropic-multiagent-research (regras de escala embutidas no prompt e degrau-base de 1 agente com 3-10 chamadas) · social-listening-oss (OpenMagpie local, open-core Apache 2.0 com cláusula ee/, e TrendRadar como molde; Reddit não verificado, projeto de 6 meses). LACUNAS QUE CONTINUAM ABERTAS (3, do Elenxo gapsOpen): value-of-information — só a DEFINIÇÃO fechou (EVPI e VOI como teto); o uso prático como regra de parar caiu nas duas claims rejeitadas e exige payoffs que a dúvida de agente não tem (objeção 4, bloqueia) · reddit-api — inalcançável; 403 medido hoje; termos da Data API, OAuth, limites e uso não comercial sem evidência · deep-research-agents — a OpenAI Deep Research não tem claim ancorada (a imprensa de 2025 mostra tier lightweight com o4-mini) e as fontes de Gemini e Claude são de 2024-2025, não de nov/2026 (objeção 17, bloqueia). Lacunas da pergunta sem fonte nesta rodada (da recomendação do Elenxo): o núcleo de recalibração (registrar custo e se a espiada mudou a decisão) não tem evidência de mercado; fóruns de fornecedor (Discourse etc.) e Lobsters ficaram sem claim; nenhuma fonte trata a dependência intrínseca de HN Algolia e GitHub frente à D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027. REJEITADAS NA ANCORAGEM, com o motivo do verificador: (1) [value-of-information] Qualquer fonte real vale entre zero e o EVPI, então o EVPI serve de triagem antes de desenhar a busca. VEREDITO EXAGERADA: a quote existe literal (slide 11, não 10); 'vale entre zero e o EVPI' é o que o texto diz, mas 'serve de triagem antes de desenhar a busca' é inferência do leitor; o slide só ilustra com 'In DA 1, the cost of the survey was $20K < EVPI'; e o texto fala do valor esperado bruto, não líquido do custo. (2) [value-of-information] Regra de decisão: comprar informação só se o VOI superar o preço. VEREDITO EXAGERADA: a quote é literal (linhas 320 e 506 do texto extraído; propriedade c, 'Data should be purchased if VOI > Price of experiment P'), mas é condicional suficiente ('if'), e o claim a reescreve como necessária ('só se'); o item está sob 'Assuming risk neutral decision maker!'. (3) [deep-research-agents] No Gemini Deep Research o agente propõe um plano multi-etapas e o usuário o revisa ou aprova antes de pesquisar; o esforço é negociado por plano, não por seletor de profundidade. VEREDITO EXAGERADA: a primeira frase é sustentada; 'o esforço é negociado por plano' é interpretação (o texto nunca fala de esforço, profundidade ou orçamento); o locator também está errado (não existe seção 'Planning and editing'; o trecho fica sob 'Deep Research: Your personal AI research assistant is here to help'). (4) [anthropic-multiagent-research] Multiagente só se paga quando o valor da tarefa é alto o bastante para cobrir o custo extra, o critério de valor da informação para decidir quando gastar mais. VEREDITO EXAGERADA: a citação existe ('For economic viability, multi-agent systems require tasks where the value of the task is high enough to pay for the increased performance.'), mas não formula 'valor da informação', não trata de quanto gastar em descoberta e não dá limiar. (5) [social-listening-oss] F5Bot, referência de serviço, cobre Reddit, HN e Lobsters, e é hospedado (não local); plano grátis, pagos de US$12,99 e US$49,99/mês. VEREDITO EXAGERADA: fontes e preços batem (Free US$0, Silver US$12,99/mês, Gold US$49,99/mês), mas a página não declara onde o F5Bot roda; só mostra um serviço de cadastro 'Running since 2017'; 'hospedado (não local)' é inferência razoável, não o que o trecho sustenta."
+    trace: "run /onion-research de 2026-11-13 (wf_3157a547-84f), seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_3157a547-84f⟩)"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada, conferida pelo escritor"
+      locality: "host"
+  - id: C_SUPERACAO_20261113_EVPI_BOUND_WITH_SURVEY_EXAMPLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Formulação do próprio slide: o valor esperado de qualquer fonte fica entre zero e o EVPI, com o exemplo do levantamento de US$ 20 mil < EVPI de US$ 45 mil."
+    narrative: "Medida: pdftotext -layout em da2.pdf (linhas 143-157) entrega o teto e o exemplo numérico; grep por 'triag|screen' no PDF inteiro devolve 0. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA na ancoragem): [value-of-information] Qualquer fonte real vale entre zero e o EVPI, então o EVPI serve de triagem antes de desenhar a busca. Afirmação de UM juiz."
+    trace: "curl -sL https://ocw.iti.hr/courses/engineering-systems-division/esd-72-engineering-risk-benefit-analysis-spring-2007/lecture-notes/da2.pdf -o da2.pdf && pdftotext -layout da2.pdf - | sed -n 143,157p ; pdftotext da2.pdf - | grep -i -c 'triag\\|screen' # esperado: 0 ocorrências de triagem/screening"
+  - id: C_SUPERACAO_20261113_VOI_PURCHASE_IF_NOT_ONLY_IF
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Formulação condicional do slide (comprar dados SE o VOI excede o preço, nunca 'só se'), com a propriedade c e o aviso de decisor neutro ao risco."
+    narrative: "Medida: grep -n em pdftotext do Lecture1_Eidsvik_Geilo.pdf: 'exceeds the price' nas linhas 320, 506 e 820; 'Data should be purchased if VOI > Price' na lista de propriedades; 0 ocorrências de 'only if' ligado à regra. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [value-of-information] Regra de decisão: comprar informação só se o VOI superar o preço. Afirmação de UM juiz."
+    trace: "pdftotext -layout Lecture1_Eidsvik_Geilo.pdf - | grep -n -i -F -e 'exceeds the price' -e 'should be purchased if' -e 'risk neutral' # baixar de https://joeid.folk.ntnu.no/Lecture1_Eidsvik_Geilo.pdf; só aparece 'if', nunca 'only if'"
+  - id: C_SUPERACAO_20261113_GEMINI_PLAN_REVISE_OR_APPROVE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Gemini Deep Research cria plano multi-etapas que o usuário revisa ou aprova antes de a pesquisa começar, sem seletor de profundidade nem contagem de fontes."
+    narrative: "Medida: dois WebFetch do mesmo URL em 2026-11-13; o primeiro devolveu a frase literal 'it creates a multi-step research plan for you to either revise or approve'; o segundo confirmou 'before research begins' e a ausência de número de fontes e de seletor de profundidade. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [deep-research-agents] No Gemini Deep Research o agente propõe um plano multi-etapas e o usuário o revisa ou aprova antes de pesquisar. O esforço é negociado por plano, não por um seletor de profundidade. Afirmação de UM juiz."
+    trace: "WebFetch https://blog.google/products/gemini/google-gemini-deep-research/ e procurar 'multi-step research plan'; buscar 'effort', 'depth' e 'negotiat' e achar 0 ocorrências"
+  - id: C_SUPERACAO_20261113_MULTIAGENT_ECONOMIC_VIABILITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Viabilidade econômica do multiagente exige valor da tarefa alto o bastante para cobrir o custo extra de tokens (4x agente, 15x multiagente), mais a escala de esforço por complexidade da consulta."
+    narrative: "Medida: busca literal no HTML limpo (python -I): 'For economic viability...' e 'Scale effort to query complexity...' aparecem verbatim nas posições 4987 e 9924, e 'value of information' não aparece no artigo. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [anthropic-multiagent-research] Multiagente só se paga quando o valor da tarefa é alto o bastante para cobrir o custo extra, o critério de valor da informação para decidir quando gastar mais. Afirmação de UM juiz."
+    trace: "curl -sL https://www.anthropic.com/engineering/multi-agent-research-system | grep -o 'For economic viability[^.]*\\.' ; curl -sL https://www.anthropic.com/engineering/multi-agent-research-system | grep -ci 'value of information' # esperado 0"
+  - id: C_SUPERACAO_20261113_F5BOT_SIGNUP_SERVICE_PRICES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "F5Bot é serviço web de cadastro que monitora Reddit, Hacker News e Lobsters, com planos Free US$0, Silver US$12,99/mês e Gold US$49,99/mês; hospedagem remota é inferência, não declarada."
+    narrative: "Medida: WebFetch de f5bot.com em 2026-11-13: a citação, as fontes e os três planos com preços batem com a página; a página não declara hospedagem. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [social-listening-oss] F5Bot, referência de serviço, cobre Reddit, HN e Lobsters, e é hospedado (não local); plano grátis, pagos de US$12,99 e US$49,99/mês. Afirmação de UM juiz."
+    trace: "WebFetch https://f5bot.com e procurar 'host' ou 'self-host' na página: o trecho citado não afirma hospedagem; a palavra do claim que o trecho não sustenta é 'hospedado (nao local)'"
+  - id: C_SUPERACAO_20261113_HN_ENCODE_GT_OPERATOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Codificar o operador do numericFilters (created_at_i%3E<ts>) ou usar curl -G --data-urlencode, conferindo o http_code de cada espiada."
+    narrative: "Medida: curl com numericFilters=created_at_i%3E1762905600 devolveu 200 e hits (story de 'bromney' casando 'claude') em 2026-11-13. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: 7 [hn-algolia] search_by_date + numericFilters created_at_i>X,<Y. Afirmação de UM juiz."
+    trace: "curl -s -o /dev/null -w '%{http_code}\\n' 'https://hn.algolia.com/api/v1/search_by_date?query=claude&tags=story&numericFilters=created_at_i>1762905600' # 400; com %3E -> 200"
+  - id: C_SUPERACAO_20261113_HN_COMMENTS_ENCODE_GT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Mesma codificação %3E do operador na variante de comentários (tags=comment), conferindo o http_code."
+    narrative: "Medida: em search_by_date com tags=story em 2026-11-13, 200 com %3E; o parâmetro tags não muda o parsing de numericFilters. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: 8 [hn-algolia] comentários desde X com tags=comment. Afirmação de UM juiz."
+    trace: "curl -s -o /dev/null -w '%{http_code}\\n' 'https://hn.algolia.com/api/v1/search_by_date?tags=comment&numericFilters=created_at_i>1762905600'"
+edges:
+  - from: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_PEEK_LEDGER_RECALIBRATION_1113
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_LOCAL_COMMUNITY_LISTENER_1113
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_ELENXO_RECOMMENDATION_1113
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_ELENXO_RECOMMENDATION_1113
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: C_ELENXO_RECOMMENDATION_1113
+    to: C_PEEK_LEDGER_RECALIBRATION_1113
+    edge_type: CONSTRAINS
+  - from: C_ELENXO_RECOMMENDATION_1113
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: CONSTRAINS
+  - from: E_TYPE1_ONE_WAY_DOOR_DELIBERATE
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_TYPE1_ONE_WAY_DOOR_DELIBERATE
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_TYPE2_DECIDE_QUICKLY
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_TYPE2_DECIDE_QUICKLY
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_TYPE1_PROCESS_CREEP
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_TYPE1_PROCESS_CREEP
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_EVPI_UPPER_BOUND
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_EVPI_UPPER_BOUND
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_VOI_CLAIRVOYANCE_BOUND
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_VOI_CLAIRVOYANCE_BOUND
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_HN_ALGOLIA_RATE_LIMIT
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_HN_ALGOLIA_RATE_LIMIT
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_HN_ALGOLIA_DATE_WINDOW_STORIES
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_HN_ALGOLIA_DATE_WINDOW_STORIES
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_HN_ALGOLIA_COMMENTS_SINCE
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_HN_ALGOLIA_COMMENTS_SINCE
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_HN_ALGOLIA_TWO_ENDPOINTS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_HN_ALGOLIA_TWO_ENDPOINTS
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_GH_REST_SEARCH_1000_CAP
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_GH_REST_SEARCH_1000_CAP
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_GH_REST_SEARCH_RATE_LIMIT
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_GH_REST_SEARCH_RATE_LIMIT
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_GH_SEARCH_INCOMPLETE_RESULTS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_GH_SEARCH_INCOMPLETE_RESULTS
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_GH_SEARCH_INCOMPLETE_RESULTS
+    to: C_PEEK_LEDGER_RECALIBRATION_1113
+    edge_type: SUPPORTS
+  - from: E_GH_GRAPHQL_DISCUSSION_SEARCH
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_GH_GRAPHQL_DISCUSSION_SEARCH
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_GH_GRAPHQL_PAGE_AND_BUDGET
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_GH_GRAPHQL_PAGE_AND_BUDGET
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_GEMINI_DR_NO_DECLARED_BUDGET
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_GEMINI_DR_SOURCE_LINKS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_CLAUDE_RESEARCH_AGENTIC_NO_DEPTH
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_CLAUDE_RESEARCH_CITATIONS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_ANTHROPIC_EFFORT_SCALING_RULES
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_ANTHROPIC_EFFORT_SCALING_RULES
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_ANTHROPIC_SIMPLE_TIER_3_10_CALLS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_ANTHROPIC_SIMPLE_TIER_3_10_CALLS
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_ANTHROPIC_AGENT_4X_TOKENS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_ANTHROPIC_AGENT_4X_TOKENS
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_ANTHROPIC_TOKENS_80PCT_VARIANCE
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_ANTHROPIC_TOKENS_80PCT_VARIANCE
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: SUPPORTS
+  - from: E_OPENMAGPIE_LOCAL_SELF_HOST
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_OPENMAGPIE_LOCAL_SELF_HOST
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_OPENMAGPIE_CONNECTORS
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_OPENMAGPIE_CONNECTORS
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_TRENDRADAR_LOCAL_ARCH_MODEL
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: E_TRENDRADAR_LOCAL_ARCH_MODEL
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_NO_REVERSIBILITY_CLASSIFIER
+    to: E_TYPE1_ONE_WAY_DOOR_DELIBERATE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NO_REVERSIBILITY_CLASSIFIER
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TYPE2_NOT_PEEK_BUDGET
+    to: E_TYPE2_DECIDE_QUICKLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TYPE2_NOT_PEEK_BUDGET
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EVPI_NEEDS_PAYOFFS
+    to: E_EVPI_UPPER_BOUND
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EVPI_NEEDS_PAYOFFS
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VOI_PER_SOURCE_UNKNOWN
+    to: E_VOI_CLAIRVOYANCE_BOUND
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VOI_PER_SOURCE_UNKNOWN
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HN_ALGOLIA_HOSTED_SERVICE
+    to: E_HN_ALGOLIA_RATE_LIMIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HN_ALGOLIA_HOSTED_SERVICE
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HN_RAW_GT_RETURNS_400
+    to: E_HN_ALGOLIA_DATE_WINDOW_STORIES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HN_RAW_GT_RETURNS_400
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HN_COMMENTS_RAW_GT
+    to: E_HN_ALGOLIA_COMMENTS_SINCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GH_DISCUSSIONS_NEED_TOKEN
+    to: E_GH_GRAPHQL_DISCUSSION_SEARCH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GH_DISCUSSIONS_NEED_TOKEN
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GH_GRAPHQL_BUDGET_NOT_VERBATIM
+    to: E_GH_GRAPHQL_PAGE_AND_BUDGET
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GEMINI_SOURCE_NOT_CURRENT
+    to: E_GEMINI_DR_NO_DECLARED_BUDGET
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GEMINI_DECISION_LOG_FROM_SILENCE
+    to: E_GEMINI_DR_SOURCE_LINKS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GEMINI_DECISION_LOG_FROM_SILENCE
+    to: C_PEEK_LEDGER_RECALIBRATION_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENAI_LIGHTWEIGHT_TIER_MISSING
+    to: E_CLAUDE_RESEARCH_AGENTIC_NO_DEPTH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENAI_LIGHTWEIGHT_TIER_MISSING
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CLAUDE_RESEARCH_DATED
+    to: E_CLAUDE_RESEARCH_CITATIONS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCALING_BY_COMPLEXITY_NOT_REVERSIBILITY
+    to: E_ANTHROPIC_EFFORT_SCALING_RULES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SCALING_BY_COMPLEXITY_NOT_REVERSIBILITY
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15X_NOT_QUOTED
+    to: E_ANTHROPIC_AGENT_4X_TOKENS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BROWSECOMP_NOT_DESIGN_DOUBT
+    to: E_ANTHROPIC_TOKENS_80PCT_VARIANCE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BROWSECOMP_NOT_DESIGN_DOUBT
+    to: C_EFFORT_LADDER_BY_REVERSIBILITY_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENMAGPIE_OPEN_CORE_AND_REDDIT
+    to: E_OPENMAGPIE_LOCAL_SELF_HOST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENMAGPIE_OPEN_CORE_AND_REDDIT
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENMAGPIE_YOUNG_PROJECT
+    to: E_OPENMAGPIE_CONNECTORS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENMAGPIE_YOUNG_PROJECT
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    to: Q_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_EVPI_BOUND_WITH_SURVEY_EXAMPLE
+    to: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_VOI_PURCHASE_IF_NOT_ONLY_IF
+    to: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_GEMINI_PLAN_REVISE_OR_APPROVE
+    to: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_MULTIAGENT_ECONOMIC_VIABILITY
+    to: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_F5BOT_SIGNUP_SERVICE_PRICES
+    to: E_LACUNAS_MARKET_PEEK_MACHINERY_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_HN_ENCODE_GT_OPERATOR
+    to: E_OBJECAO_HN_RAW_GT_RETURNS_400
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_HN_ENCODE_GT_OPERATOR
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261113_HN_COMMENTS_ENCODE_GT
+    to: E_OBJECAO_HN_COMMENTS_RAW_GT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_HN_COMMENTS_ENCODE_GT
+    to: C_LOCAL_COMMUNITY_LISTENER_1113
+    edge_type: SUPPORTS
