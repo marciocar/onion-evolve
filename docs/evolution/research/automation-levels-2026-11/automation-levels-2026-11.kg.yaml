@@ -6,7 +6,7 @@ meta:
   review_after: "2026-12-11"
   x_supersedes_none: "estudo novo; reabre o sétimo valor do eixo de topologia de sessão no ADR de modelos de trabalho pela porta que o próprio ADR deixou, sem derrubar nó"
   purpose: "Decidir a divisão de segurança, compliance e custo de nuvem entre o Onion e o kg-ssot, e o modelo de automação com níveis, catraca e agendamento, a partir da proposta de checagens operacionais do hub do primeiro cliente."
-  # ═══ TETO: 20 NÓS ═══
+  # ═══ TETO: 21 NÓS ═══ (subido em 2026-11-13 de 20: o selo do modelo de confiança da delegação, D_DELEGATION_TRUST_MODEL_1113, nasceu da 5ª refutação do PR das guardas delegadas e pertence a este estudo dos níveis de automação)
 nodes:
   - id: Q_AUTOMATION_LEVELS_1111
     node_type: question
@@ -331,6 +331,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-13: «Publicar as portas públicas com push e tag de release: pode passar a ser da sessão?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
       locality: "pessoa"
+  - id: D_DELEGATION_TRUST_MODEL_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Fechar o barato e declarar o resto: a forma delegada só roda script idêntico ao da origin/main (régua do @rootcopy), --dispensa e --ci-inoperante só com --maestro, PR que toca guarda/hook/script delegado/sudoers pede o merge do maestro, PATH fixo e FragmentPath conferido; declarado que a sessão roda como o usuário do maestro e que hook é camada de conformidade, não fronteira»"
+    label: "a delegação fecha o barato e declara o resto: a forma delegada só roda script idêntico ao da origin/main, dispensa e CI inoperante ficam com o maestro, PR que mexe em guarda é mergeado por ele, e a fronteira real (sessão com outro usuário do sistema) fica declarada como limite"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Fechar o barato e declarar o resto: a forma delegada só roda script idêntico ao da origin/main (régua do @rootcopy), --dispensa e --ci-inoperante só com --maestro, PR que toca guarda/hook/script delegado/sudoers pede o merge do maestro, PATH fixo e FragmentPath conferido; declarado que a sessão roda como o usuário do maestro e que hook é camada de conformidade, não fronteira»; descartadas: «Sessão com outro usuário do sistema» · «Aceitar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «A 5ª refutação do PR das guardas delegadas mostrou que a sessão edita o próprio script e mergeia o próprio PR com dispensa; até onde fechamos?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
 edges:
   - from: E_HUB_FIRST_SPIKE_LOG_ARRIVAL_1112
     to: Q_OPS_CHECK_MOLD_RULES_1112
@@ -388,4 +404,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113
     to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_DELEGATION_TRUST_MODEL_1113
+    to: D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113
     edge_type: TRACES_TO
