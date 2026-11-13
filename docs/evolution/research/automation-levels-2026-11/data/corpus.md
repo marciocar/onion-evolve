@@ -1,6 +1,6 @@
 # Corpus de automação do Onion — o que a casa já tem (2026-11-11)
 
-Levantamento só leitura. Todo caminho:linha vem de grep desta sessão no core ou, para o kg-ssot, de git show/grep no repositório dele (HEAD 3083a45b).
+Levantamento só leitura. Todo caminho:linha vem de grep desta sessão no core ou, para o kg-ssot, de git show/grep no repositório dele (HEAD ⟨commit⟩).
 
 ## 1. Onde nasce a regra "nunca agendado / nunca cron" (W7) e o PORQUÊ
 
@@ -53,7 +53,7 @@ A regra veda **o agente do Onion agendar-se**. Ela nunca vedou hook de sessão, 
 | Ideia de hoje do maestro | `D_SEAL_CH_CLAUDE_PEERS_PARK_1111` (`docs/onion/graph/curation-verdicts-core-seal-2026-11.kg.yaml:174`): «Parquear, com a ideia de níveis automático e não automático» (resposta livre, label: "níveis de canal, com o que é automático e o que pede ok separados"). É só decisão de parquear; não há desenho de níveis ainda. A escada de camadas A2A acima é o precursor natural. | |
 | Classificação no kg-ssot | não achei "níveis de classificação" de automação; o que há é a escada de status/confiança dos nós (open/confirmed, method `testimony`/`derived`) e a classe de método "derived: runtime capture" | `kg_capture.py` docstring; não aprofundado |
 
-## 4. kg-ssot (HEAD 3083a45b, via git show)
+## 4. kg-ssot (HEAD ⟨commit⟩, via git show)
 
 - **Captura automática (`kg_capture`)**: `tools/kg_capture.py` lê rastro PROV-JSON ou traduz transcript de harness e **PROPÕE nós `open`**, ligados por TRACES_TO às entidades do rastro. Regras seladas (`D_CAPTURE_CONTRACT_SHAPE`): nada nasce `confirmed` nem com `verified_at`, o selo é de quem mede depois; method "derived: runtime capture". **Fora da release** até o spike de valor (`Q_CAPTURE_VALUE_SPIKE`) decidir (`D_EPIC_10_NEXT_1012`). Nó: `A_KG_CAPTURE_ADAPTER` em `docs/onion/graph/kg-ssot-product.kg.yaml:1329` (medido: 140 propostas open sobre PROV-JSON de terceiro; 95 com descrição cortada); épico no `:1272`. Revisões: `docs/evolution/review/feat-kg-capture-adapter.md`, `feat-capture-spike.md`. Moral: "a captura propõe, o contrato sela".
 - **Gate com catraca**: `tools/kg_gate.py` (grafos do adotante contra o contrato, catraca POR GRAFO: `failing` herdado nomeado por caminho, dívida SHOULD só pode cair; rc 1 reprova grafo novo ou piora) e `tools/kg_ratchet.py` (E5: suíte, core no MUST, core_debt SHOULD; base em `docs/onion/measurements/ratchet.json`; `--update` recusa regressão sem `--accept-regression "<motivo>"`).

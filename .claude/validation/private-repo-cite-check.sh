@@ -483,14 +483,20 @@ MK_AT = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}@[0-9A-Fa-f]{6,40}(?![0-9A
 # só o GitHub alcança vai qualificado: dono/repo@<hex> da lista pública. Re-refutação do #1648.
 MK = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}")
 HEX_LOOSE = re.compile(r"(?<![0-9A-Za-z_-])[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])")
-_own = {}
+import bisect
+_reach = None
 def own_commit(h):
-    h = h.lower()
-    if h not in _own:
-        full = subprocess.run(["git", "-C", root, "rev-parse", "--verify", "-q", f"{h}^{{commit}}"], capture_output=True, text=True).stdout.strip()
-        _own[h] = bool(full) and bool(subprocess.run(["git", "-C", root, "for-each-ref", "--count=1", "--contains", full,
-                                                      "refs/remotes", "refs/tags"], capture_output=True, text=True).stdout.strip())
-    return _own[h]
+    """Commit deste repo ALCANÇÁVEL de um ref remoto ou tag (o que o clone do CI tem), por prefixo, sem rede."""
+    global _reach
+    if _reach is None:
+        _reach = sorted(subprocess.run(["git", "-C", root, "rev-list", "--remotes", "--tags"], capture_output=True, text=True).stdout.split())
+    h = h.lower(); k = bisect.bisect_left(_reach, h)
+    return k < len(_reach) and _reach[k].startswith(h)
+def _loose_on_marker_line(line):
+    """Hex solto na linha do marcador que não é commit deste repo alcançável nem dono/repo@<hex> da lista pública."""
+    rest = re.sub(r"([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)@[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])",
+                  lambda m: " " if m.group(1).lower() in public else m.group(0), MK.sub(" ", line))
+    return [x for x in HEX_LOOSE.findall(rest) if re.search(r"[0-9]", x) and re.search(r"[A-Fa-f]", x) and not own_commit(x)]
 for f in files:
     node = "-"
     for i, line in enumerate(rd(os.path.join(root, f)).splitlines(), 1):
@@ -501,34 +507,38 @@ for f in files:
             rc = 1
             out("HARD", "MARCADOR-COM-COMMIT", f, f"nó {node}, linha {i}: o marcador private-cite:<id> leva um commit colado (@<hex>), o que devolve ao grafo público o commit do repo privado. No source, locator, trace, verified_against e no detalhe do method o marcador ocupa o valor inteiro; na prosa, tire o @<hex> e o :caminho")
         elif MK.search(line):
-            # o commit qualificado por um repo da LISTA PÚBLICA (dono/repo@<hex>) é conferível por terceiro: não conta
-            rest = re.sub(r"([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)@[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])",
-                          lambda m: " " if m.group(1).lower() in public else m.group(0), MK.sub(" ", line))
-            loose = [x for x in HEX_LOOSE.findall(rest)
-                     if re.search(r"[0-9]", x) and re.search(r"[A-Fa-f]", x) and not own_commit(x)]
+            loose = _loose_on_marker_line(line)
             if loose:
                 rc = 1
                 out("HARD", "MARCADOR-COM-COMMIT", f, f"nó {node}, linha {i}: {len(loose)} hex solto(s) na linha do marcador private-cite:<id> que não são commit deste repo — o commit do repo privado volta ao grafo público. Troque por ⟨commit⟩ e registre na tabela privada")
 # ── ARQUIVOS DE DADO (desde 2026-11-13, fix/provenance-triage-scrub) ────────────────────────────────────────────────
 # Nenhuma guarda varria CSV: os 41 arquivos de data/provenance-triage/ chegaram à main pública com 393 linhas citando
-# repo privado e 342 com caminho de home de conta, inclusive caminho/repo@commit. Nos csv, tsv, json, jsonl, txt e nos md
-# sob data/ julgados (o tocado, ou todos com --all), cada LINHA é varrida por:
+# repo privado e 342 com caminho de home de conta, inclusive caminho/repo@commit. Nos csv, tsv, json, jsonl e txt, e em todo arquivo de texto
+# sob data/, julgados (o tocado, ou todos com --all), cada LINHA é varrida por:
 #   CAMINHO-DE-MAQUINA-EM-DADO (HARD): home de conta com segmento (/home/<x>, /root/<x>, /Users/<x>, também //home/),
 #     pela classe do machine_path.py (a mesma da REGRA 99). `/home` nu como conceito e ./home/ relativo calam;
 #   MARCADOR-COM-COMMIT (HARD): a mesma regra dos grafos, acima;
 #   PRIVADO-SEM-MARCADOR-EM-DADO (HARD, só com --private-repos / ONION_PRIVATE_REPOS): padrão do arquivo privado do dono.
-# Nunca imprime o valor. Fora: vendor, fixture, e a configuração FUNCIONAL que os hooks do core leem na pasta de
+# Nunca imprime o valor. Escopo: csv, tsv, json, jsonl e txt em qualquer lugar, e todo arquivo de texto sob data/.
+# Fora: vendor, fixture, binário, e a configuração FUNCIONAL que os hooks do core leem na pasta de
 # operações dele (o caminho ali é o alvo que o veto do MOAT protege; trocá-lo desarmaria a guarda) — lista declarada,
 # por pasta e nome, não padrão. Na porta e no adotante a pasta não existe, e a isenção não tem efeito.
 DATA_EXT = (".csv", ".tsv", ".json", ".jsonl", ".txt")
+# sob uma pasta data/, TODO arquivo de texto é dado (o refutador do #1649 achou commit em register.js); o binário fica fora
+DATA_BIN = (".gz", ".tgz", ".tar", ".zip", ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".webp", ".ico", ".woff", ".woff2")
 FUNCTIONAL_DIR, FUNCTIONAL_NAMES = "ops", {"moat-targets.tsv", "cc-sdk-targets.tsv"}
+HEX_COMMIT = re.compile(r"(?<![0-9A-Za-z_-])[0-9A-Fa-f]{7,40}(?![0-9A-Za-z_-])")
+NONCOMMIT_LABEL = re.compile(r"(?i)(?:\bmd5(?:sum)?|\bsha-?(?:1|256)|\bsess(?:ion|ão|ao)|\bsubagent[e]?|\buuid)\b[^\n]{0,40}$")
 HOME_SEG = re.compile(r"/{1,2}(?:home|root|Users)/[A-Za-z0-9_.@+-]+")
 def data_scope(f):
     functional = os.path.dirname(f) == FUNCTIONAL_DIR and os.path.basename(f) in FUNCTIONAL_NAMES
-    if f.startswith("vendor/") or fix.search(f) or functional or f.endswith(".kg.yaml"):
+    own_artifact = f in (base_rel, allow_rel)  # o baseline (repo por hash) e a lista pública são da própria guarda
+    if f.startswith("vendor/") or fix.search(f) or functional or own_artifact or f.endswith(".kg.yaml"):
         return False
     low = f.lower()
-    return low.endswith(DATA_EXT) or (low.endswith(".md") and "/data/" in f)
+    if low.endswith(DATA_BIN):
+        return False
+    return low.endswith(DATA_EXT) or "/data/" in f
 data_files = [f for f in kg_list("data_files") if data_scope(f)] if os.path.exists(os.path.join(tmp, "data_files")) else []
 # o próprio arquivo de padrões, se o dono o pôs dentro da árvore (não versionado), não é dado do repo
 if os.environ.get("PRC_PRIVATE"):
@@ -554,13 +564,72 @@ if data_files:
             if any(_mp._root_of(t) in _mp.HOME_ROOTS and HOME_SEG.match(line[s:]) for _k, t, s in _mp.find(line)):
                 rc = 1
                 out("HARD", "CAMINHO-DE-MAQUINA-EM-DADO", f, f"linha {i}: caminho de home de conta num arquivo de dado público — troque por caminho relativo ao repo ou por ⟨caminho⟩ (o original vai na tabela privada)")
-            if MK_AT.search(line) or (MK.search(line) and [x for x in HEX_LOOSE.findall(MK.sub(" ", line))
-                                                           if re.search(r"[0-9]", x) and re.search(r"[A-Fa-f]", x) and not own_commit(x)]):
+            if MK_AT.search(line) or (MK.search(line) and _loose_on_marker_line(line)):
                 rc = 1
                 out("HARD", "MARCADOR-COM-COMMIT", f, f"linha {i}: commit ao lado do marcador private-cite:<id> num arquivo de dado — troque por ⟨commit⟩")
             if _priv and any(r.search(_pr.norm(line)) for r in _priv):
                 rc = 1
                 out("HARD", "PRIVADO-SEM-MARCADOR-EM-DADO", f, f"linha {i}: cita um repositório privado (padrão do --private-repos) sem o marcador private-cite:<id>")
+    # ── o COMMIT solto em dado (refutador do #1649, B2): o hex sem marcador por perto passava. Duas camadas:
+    #   COMMIT-PRIVADO-EM-DADO (HARD, só com ONION_PRIVATE_CLONES = clones dos repos privados, separados por os.pathsep):
+    #     todo hex de 7 a 40 em QUALQUER linha do arquivo julgado que é commit de um desses clones e não do core;
+    #   HEX-NAO-CONFERIDO-EM-DADO (HARD, sempre, falha fechada): na LINHA ACRESCENTADA pelo diff (o arquivo novo inteiro),
+    #     o hex que não é commit do core alcançável, nem `dono/repo@<hex>` de repo da lista pública ou de dono de
+    #     terceiro, nem leva um rótulo de não-commit logo antes (md5, sha1, sha256, sessão, subagente, uuid).
+    #   «Acrescentado» é por token: o hex na linha acrescentada que NÃO estava no arquivo da base (o JSON minificado é
+    #   uma linha só, e mexer nele não torna novo cada id que ele já tinha). Por que só o acrescentado na 2ª camada: o corpus de dado tem ~1.000 hex que não são commit (hash, id de
+    #   sessão), e a falha fechada sobre ele reescreveria evidência sem ganho; o que ENTRA passa pela catraca.
+    _clones = [c for c in os.environ.get("ONION_PRIVATE_CLONES", "").split(os.pathsep) if c]
+    def _batch(repo, hs):
+        r = subprocess.run(["git", "-C", repo, "cat-file", "--batch-check=%(objecttype)"],
+                           input="".join(h + "^{commit}\n" for h in hs), capture_output=True, text=True)
+        return {h for h, l in zip(hs, r.stdout.splitlines()) if l.strip() == "commit"}
+    def _added(f):
+        """(linhas acrescentadas, texto da base). None nas linhas = o arquivo inteiro é novo."""
+        if mode != "touched":
+            return set(), ""
+        b = subprocess.run(["git", "-C", root, "show", f"{os.environ.get('PRC_BASE', 'HEAD')}:{f}"], capture_output=True)
+        base_txt = b.stdout.decode("utf-8", "replace").lower() if b.returncode == 0 else ""
+        if subprocess.run(["git", "-C", root, "ls-files", "--error-unmatch", f], capture_output=True).returncode != 0:
+            return None, base_txt  # arquivo novo, não versionado: todas as linhas
+        d = subprocess.run(["git", "-C", root, "diff", "-U0", os.environ.get("PRC_BASE", "HEAD"), "--", f], capture_output=True, text=True).stdout
+        out_, ln = set(), 0
+        for l in d.splitlines():
+            m = re.match(r"@@ -\S+ \+(\d+)(?:,(\d+))? @@", l)
+            if m:
+                ln = int(m.group(1)); continue
+            if l.startswith("+") and not l.startswith("+++"):
+                out_.add(ln); ln += 1
+        return out_, base_txt
+    for f in data_files:
+        lines = rd(os.path.join(root, f)).splitlines()
+        occ = [(i, m) for i, line in enumerate(lines, 1) for m in HEX_COMMIT.finditer(line)
+               if re.search(r"[0-9]", m.group(0)) and re.search(r"[A-Fa-f]", m.group(0)) and not own_commit(m.group(0))]
+        if not occ:
+            continue
+        if _clones:
+            hs = sorted({m.group(0).lower() for _, m in occ}); pv = set()
+            for c in _clones:
+                pv |= _batch(c, [h for h in hs if h not in pv])
+            for i in sorted({i for i, m in occ if m.group(0).lower() in pv}):
+                rc = 1
+                out("HARD", "COMMIT-PRIVADO-EM-DADO", f, f"linha {i}: commit de repositório privado num arquivo de dado público — troque por ⟨commit⟩ e registre na tabela privada")
+        added, base_txt = _added(f)
+        for i, m in occ:
+            if added is not None and i not in added:
+                continue
+            # o hex NOVO é o que não estava no arquivo na base: a linha mexida (ou o JSON de uma linha só) que só
+            # carrega hex antigos não é entrada nova (o passivo antigo é da COMMIT-PRIVADO-EM-DADO, com os clones)
+            if re.search(r"(?<![0-9a-z_-])" + re.escape(m.group(0).lower()) + r"(?![0-9a-z_-])", base_txt):
+                continue
+            line = lines[i - 1]; pre = line[:m.start()]
+            q = re.search(r"([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)@$", pre)
+            if q and (f"{q.group(1)}/{q.group(2)}".lower() in public or q.group(1).lower() not in owners):
+                continue
+            if NONCOMMIT_LABEL.search(pre[-40:]):
+                continue
+            rc = 1
+            out("HARD", "HEX-NAO-CONFERIDO-EM-DADO", f, f"linha {i}: hex que não é commit do core alcançável nem dono/repo@<hex> público entrou num arquivo de dado — troque por ⟨commit⟩ (se for de repo privado), qualifique como dono/repo@<hex> (se público) ou rotule (md5, sessão…)")
 for f, err in unread:
     out("SOFT", "NAO-JULGADO", f, f"não deu para parsear ({err}) — este grafo NÃO foi julgado (YAML inválido é da REGRA 78)")
 if human:

@@ -536,7 +536,7 @@
         },
         "criterio": {
           "id": "A2_CLAIM_ESTICA",
-          "comando": "grep -nF 'on another machine' /tmp/claude-1000/-home-marcio-onion-evolve/1c3b4688-d85d-45ed-91f8-8a6ad4b876f3/scratchpad/cl.md  # a linha 3253 contradiz o 'apenas' do claim sobre a linha 3607"
+          "comando": "grep -nF 'on another machine' ⟨caminho⟩  # a linha 3253 contradiz o 'apenas' do claim sobre a linha 3607"
         }
       },
       {
@@ -558,7 +558,7 @@
         },
         "criterio": {
           "id": "A2_CLAIM_ESTICA",
-          "comando": "sed -n '3637p;3918p;4217p' /tmp/claude-1000/-home-marcio-onion-evolve/1c3b4688-d85d-45ed-91f8-8a6ad4b876f3/scratchpad/cl.md  # nenhuma das três diz que managed settings têm precedência nem quem liga/desliga"
+          "comando": "sed -n '3637p;3918p;4217p' ⟨caminho⟩  # nenhuma das três diz que managed settings têm precedência nem quem liga/desliga"
         }
       },
       {
@@ -580,7 +580,7 @@
         },
         "criterio": {
           "id": "A2_CLAIM_ESTICA",
-          "comando": "sed -n '761p' /tmp/claude-1000/-home-marcio-onion-evolve/1c3b4688-d85d-45ed-91f8-8a6ad4b876f3/scratchpad/cl.md  # 'by default' vem condicionado a 'on installs that fetch no flags', omitido no claim"
+          "comando": "sed -n '761p' ⟨caminho⟩  # 'by default' vem condicionado a 'on installs that fetch no flags', omitido no claim"
         }
       }
     ],

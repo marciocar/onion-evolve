@@ -57666,12 +57666,38 @@ run_private_repo_cite_selftests() {
      && grep -q $'^HARD\tCAMINHO-DE-MAQUINA-EM-DADO\tr/data/t.json\tlinha 1:' <<< "${o}" \
      && grep -q $'^HARD\tCAMINHO-DE-MAQUINA-EM-DADO\tr/data/u.tsv\tlinha 1:' <<< "${o}" \
      && grep -q $'^HARD\tMARCADOR-COM-COMMIT\tr/data/t.txt\tlinha 1:' <<< "${o}" \
-     && [ "$(grep -c 'EM-DADO\|MARCADOR-COM-COMMIT' <<< "${o}")" -eq 4 ] && ! grep -q 'PRIVADO-SEM-MARCADOR-EM-DADO' <<< "${o}" \
+     && grep -q $'^HARD\tHEX-NAO-CONFERIDO-EM-DADO\tr/data/t.txt\tlinha 1:' <<< "${o}" \
+     && [ "$(grep -c 'EM-DADO\|MARCADOR-COM-COMMIT' <<< "${o}")" -eq 5 ] && ! grep -q 'PRIVADO-SEM-MARCADOR-EM-DADO' <<< "${o}" \
      && [ "${rc2}" -eq 1 ] && grep -q $'^HARD\tPRIVADO-SEM-MARCADOR-EM-DADO\tr/data/u.tsv\tlinha 1:' <<< "${o2}" \
      && ! grep -q 'zeuser\|planos-x\|0a1b2c3d' <<< "${o}${o2}"; then
     record_pass "private-repo-cite: (s) arquivo de dado tocado → CAMINHO-DE-MAQUINA-EM-DADO (csv, json com //home, tsv), MARCADOR-COM-COMMIT (txt) e, com --private-repos, PRIVADO-SEM-MARCADOR-EM-DADO, sem ecoar; /home nu, /home., ./home/, md fora de data/ e config funcional calam"
   else record_fail "private-repo-cite: (s) arquivo de dado" "rc=${rc}/${rc2}; [$(tr '\n' '|' <<< "${o}" | head -c 500)] [$(grep -c PRIVADO-SEM-MARCADOR-EM-DADO <<< "${o2}")]"; fi
   rm -rf "${sb}/r" "${sb}/ops" "${sb}/priv.txt"
+  # (s2) o COMMIT SOLTO em dado (refutador do #1649, B2). Falha fechada no hex NOVO da linha acrescentada:
+  #      `repo-secreto (HEAD abc1234)` e `commit abc1234` acusam HEX-NAO-CONFERIDO-EM-DADO; calam o rótulo (md5), o
+  #      dono/repo@<hex> público, o de dono de terceiro, o commit deste repo e o hex que já estava no arquivo na base.
+  #      Com ONION_PRIVATE_CLONES, o commit de um clone privado acusa COMMIT-PRIVADO-EM-DADO mesmo em linha antiga.
+  local pr pc prev; pr="$(TMPDIR=/tmp mktemp -d)"; prev="$(git -C "${sb}" rev-parse HEAD)"
+  ( cd "${pr}" && git init -q -b main && git -c user.email=t@t -c user.name=t commit -q --allow-empty -m priv ) >/dev/null 2>&1
+  pc="$(git -C "${pr}" rev-parse --short=10 HEAD 2>/dev/null)"
+  mkdir -p "${sb}/r/data"
+  printf 'linha velha com commit fe0d1c2b3a\nlinha velha com o privado %s\n' "${pc}" > "${sb}/r/data/v.txt"
+  ( cd "${sb}" && git add -A && _prc_git "${sb}" commit -qm velho && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+  printf 'linha velha com commit fe0d1c2b3a, agora mexida\nlinha velha com o privado %s\n' "${pc}" > "${sb}/r/data/v.txt"
+  printf 'em repo-secreto (HEAD abc1234)\no commit abc1235 de lá\nmd5 do arquivo = abc1236\ndonoteste/repo-publico@abc1237\nterceiro/proj@abc1238\npin %s\n' \
+    "$(git -C "${sb}" rev-parse --short=9 HEAD)" > "${sb}/r/data/n.txt"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if o2="$(LC_ALL=C ONION_PRIVATE_CLONES="${pr}" bash "${s}" "${sb}" --tsv 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tHEX-NAO-CONFERIDO-EM-DADO\tr/data/n.txt\tlinha 1:' <<< "${o}" \
+     && grep -q $'^HARD\tHEX-NAO-CONFERIDO-EM-DADO\tr/data/n.txt\tlinha 2:' <<< "${o}" \
+     && [ "$(grep -c 'HEX-NAO-CONFERIDO-EM-DADO' <<< "${o}")" -eq 2 ] && ! grep -q 'COMMIT-PRIVADO-EM-DADO' <<< "${o}" \
+     && [ -n "${pc}" ] && [ "${rc2}" -eq 1 ] && grep -q $'^HARD\tCOMMIT-PRIVADO-EM-DADO\tr/data/v.txt\tlinha 2:' <<< "${o2}" \
+     && ! grep -q "abc123\|fe0d1c2b3a\|${pc}" <<< "${o}${o2}"; then
+    record_pass "private-repo-cite: (s2) hex novo em dado → HEX-NAO-CONFERIDO-EM-DADO (HEAD <hex>, commit <hex>); rótulo, dono/repo@ público e de terceiro, commit deste repo e hex já na base calam; com ONION_PRIVATE_CLONES, o commit privado em linha antiga → COMMIT-PRIVADO-EM-DADO"
+  else record_fail "private-repo-cite: (s2) commit solto em dado" "rc=${rc}/${rc2} pc=${pc}; [$(tr '\n' '|' <<< "${o}" | head -c 400)] [$(grep -c COMMIT-PRIVADO <<< "${o2}")]"; fi
+  rm -rf "${pr}"
+  # o sandbox volta ao estado de antes: os casos seguintes (a catraca) medem contra a mesma base
+  ( cd "${sb}" && git reset -q --hard "${prev}" && git update-ref refs/remotes/origin/main "${prev}" && git clean -qfd r ) >/dev/null 2>&1
   # (d) SÓ O TOCADO É JULGADO (o histórico fica)
   if _prc_case_scope "${chk}"; then record_pass "private-repo-cite: (d) grafo que o diff não toca não é julgado (o histórico fica)"
   else record_fail "private-repo-cite: (d) escopo" "o grafo fora do diff foi julgado, ou o novo não"; fi

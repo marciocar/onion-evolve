@@ -1,4 +1,4 @@
-// Derivado de mod-process (curadoria, 77b7a13): mesma forma, $.process.run dentro de tool.call.
+// Derivado de mod-process (curadoria, ⟨commit⟩): mesma forma, $.process.run dentro de tool.call.
 // Diferencas: le o arquivo em vez de `touch`; guarda o que next(e) devolve; no Bash responde com o lido.
 export function register(on) {
   on('tool.call', async ($, e, next) => {
