@@ -688,7 +688,8 @@ nodes:
     impact: 3
     confidence: 0.5
     evidence_class: testimony
-    verified_against: "medido pelo core em 2026-11-13: GranaAi/granaai PR #1844 MERGED 2026-11-12T23:56:01Z (merge 9261b9191); docs/compliance/graph/compliance.kg.yaml na develop tem D_CMP_WHATSAPP_READ_CHANGE_1112 com bloco x_change (gh api .../contents?ref=develop, linhas 6234 e 6252)"
+    verified_at: "2026-11-13"
+    verified_against: "medido pelo core em 2026-11-13: o PR #1844 do repo do hub está MERGED (2026-11-12T23:56:01Z); o grafo de compliance da develop do hub tem D_CMP_WHATSAPP_READ_CHANGE_1112 com bloco x_change (lido pela API do forge)"
     label: "A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) para o registro de mudança de compliance do hub."
     narrative: |-
       Fechado por medição em 2026-11-13: a 2ª metade foi entregue. O hub registrou a mudança real da leitura do WhatsApp pelo Brain na forma x_change (estado planned, selada pelo CTO), no grafo de compliance da develop (PR #1844, mergeado pelo maestro). As transições seguintes ficam no grafo do hub.
