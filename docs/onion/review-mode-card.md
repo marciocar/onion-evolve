@@ -9,13 +9,26 @@ e a lista de guardas mora em `ops/review/guard-paths.sh`.
 
 | Valor | O que faz |
 |---|---|
-| `auto` | revisa **só** o PR que toca guarda. A lista sai de `bash ops/review/guard-paths.sh --print-patterns`: os scripts de ato, delega e wrapper do `ops/moat-targets.tsv`, mais as cercas fixas (hooks, `settings.json`, `members.yaml`, workflows, `ops/review/`, `act-signature-check.sh`, `ops/sudoers/` e o próprio tsv). Rename conta pelo nome antigo e pelo novo, e arquivo removido também conta. |
+| `auto` | revisa **só** o PR que toca guarda. A lista sai de `bash ops/review/guard-paths.sh --print-patterns`: os scripts de ato, delega e **fecho** (o que os atos executam) e os wrappers de deploy do `ops/moat-targets.tsv` (o da árvore somado ao de `origin/main`), mais as cercas fixas: hooks, `settings.json`, `members.yaml`, workflows, `.githooks/`, `ops/review/`, `.claude/validation/` inteiro, `ops/sudoers/`, o próprio tsv, a lista antiga (`ops/update-*`, `ops/deploy-*`, `ops/mcp-*`, `merge-serial.sh`, `apply-ruleset-main.sh`, `pr-merge-verified.sh`), `pr-finalize.sh`, `materialize-door.sh` e o `post-review-comment.sh`. Rename conta pelo nome antigo e pelo novo, e arquivo removido também conta. |
 | `on` | revisa todo PR. |
 | `off` ou vazio | não revisa: **fallback**. |
 
 A label `review:ia` força a revisão em qualquer modo.
 
-## O fallback (sem crédito, sem chave, ou `off`)
+## O que conta como revisão num PR de guarda
+
+Só o verde com a **marca positiva** `onion-review-revisado: … o head <sha>`. Quem a emite é o juiz lido da
+**base**, quando o revisor rodou e o gate de achados aprovou aquele head. Qualquer outro verde é fallback:
+
+- a marca de desligado;
+- um verde sem marca nenhuma (por exemplo, um PR que mudou o gate);
+- nenhum veredito no head.
+
+A marca positiva **não vale** quando o PR muda a maquinaria do revisor: `.github/workflows/`, `ops/review/`,
+`review-verdict.sh` e `post-review-comment.sh`. O workflow de um `pull_request` é o do head, e por isso um PR
+que o edita consegue forjar qualquer anotação.
+
+## O fallback (sem crédito, sem chave, `off`, ou a action auto-pulada)
 
 O veredito `onion-review-verdict` **não fica vermelho** por isso. Ele sai verde com a anotação
 `onion-review-desligado: não revisado pelo CI: <motivo>`, e o motivo aparece no sumário do check e num
@@ -69,3 +82,17 @@ gh pr checks <N>                                           # o onion-review-verd
 
 No sumário do job `onion-review-mode` aparecem as linhas `run`, `mode`, `reason`, `guard` e `guard_paths`.
 No `onion-review-verdict`, a linha `⊘ Não revisado pelo CI: …` indica fallback. Sem ela, o PR foi revisado.
+
+## Limites declarados (2ª passada do refutador do #1652)
+
+- **`elenxo_isolado: true` é auto-atestado.** O script exige que a declaração exista, não prova que o
+  refutador foi outro agente.
+- **Bootstraps latentes.** O job do modo usa o juiz, o helper e o tsv do PR quando a base não tem o arquivo.
+  O job do veredito usa o juiz do PR quando o da base não emite a marca positiva. Hoje isso só acontece no
+  PR que introduz cada capacidade, mas a porta volta a abrir sempre que uma capacidade nova nascer do mesmo
+  jeito. Um PR que entre por ela toca `ops/review/` ou `.github/workflows/`, então a marca não vale para ele
+  e ele cai no resíduo.
+- **Com o #1647 em vigor, a sessão nem mergeia PR de guarda:** o merge dele é do maestro (`--maestro`). A
+  exigência do resíduo cobre o caminho que sobra até lá e é o que o maestro confere antes do merge.
+- **A frase de crédito só vale no evento `result`.** O resto do arquivo de evidência (o diff, as saídas
+  das ferramentas) é ignorado de propósito: um PR não tira o próprio vermelho escrevendo a frase.
