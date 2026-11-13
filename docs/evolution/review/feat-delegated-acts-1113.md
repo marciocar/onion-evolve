@@ -3,11 +3,10 @@ title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, 
 date: 2026-11-13
 branch: feat/delegated-acts-1113
 reviewer: "passada própria do condutor sobre o próprio diff (sem subagente: o brief vedou spawn); bancada moat_gate (dl1-dl5, db1-db8, cada um com mutante), pr_merge_verified (fr1-fr11 + fr-MUT), deploy_site (43/43), slack_persona (26/26), act_signature (13/13 + 12 mutantes), delegated-ops --selftest 5/5, visudo -cf parsed OK, e o hook real rodado com payload PreToolUse nas 6 formas"
-reviewed_diff_sha256: f2c422ed953c892da46c940956cbb58bbc7cc04fd11ccbe370cbd819f35f0c46
-reviewed_code_sha256: 6c067f6c49074b9a0db9616ac77eb4fce7fc809c6c470e94ba0f7aee6ce0954b
-findings_total: 5
-findings_real: 5
-findings_fixed: 5
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 7
+findings_fixed: 7
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
@@ -35,6 +34,13 @@ O hook passa só a forma exata (linhas `delega` do `ops/moat-targets.tsv`); o qu
    com rc 0. O juiz agora julga o ato pelo nome (db7).
 5. **A bancada envelheceu com a mudança** (contagens fixas 8/8 e 25, âncoras de mutante que deixaram de ser únicas,
    texto esperado do fr4). Curado, e as quatro catracas novas da REGRA 117 ganharam mutante.
+6. **A cura do achado 4 vetava um glob só de curinga** (`/var/lib/onion-bridge/*` como palavra de comando casava o
+   1º script de ato por `fnmatch`), e o caso b5 da bancada caiu. O julgamento pelo nome agora exige que o nome
+   tenha algo além de curinga. As âncoras dos mutantes ato3 e ato4 seguiram a linha nova.
+7. **O seletor da bancada por arquivo (selector_per_file (a)) estourou o teto de 30 famílias para o resíduo**: o
+   pr-merge-verified.sh e o deploy-site.sh passaram a LER o resíduo, e as 7 famílias que os leem viraram leitoras
+   legítimas dele. Teto 40, com o motivo no comentário. A doutrina e os comentários que citam ops/ ganharam a
+   marca (core-only) da REGRA 100.
 
 ## Tetos declarados
 
