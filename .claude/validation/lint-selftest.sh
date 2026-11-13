@@ -57707,9 +57707,13 @@ run_private_repo_cite_selftests() {
   if v1="$(PRC_ANON_PROBE="${probe}" bash "${s}" "${sb}" --verify-allowlist 2>&1)"; then r1=0; else r1=$?; fi
   if v2="$(PROBE_CODE=000 PRC_ANON_PROBE="${probe}" bash "${s}" "${sb}" --verify-allowlist 2>&1)"; then r2=0; else r2=$?; fi
   if v3="$(PROBE_CODE=200 PRC_ANON_PROBE="${probe}" bash "${s}" "${sb}" --verify-allowlist 2>&1)"; then r3=0; else r3=$?; fi
+  # o MODO QUE A PRODUÇÃO CONSOME (REGRA 59): o lint chama a guarda da fonte, pelo caminho literal, com
+  # --verify-allowlist sobre o repo real; a sonda devolve 200 e não usa rede
+  local v4 r4
+  if v4="$(PROBE_CODE=200 PRC_ANON_PROBE="${probe}" bash "${REPO_ROOT}/.claude/validation/private-repo-cite-check.sh" "${REPO_ROOT}" --verify-allowlist 2>&1)"; then r4=0; else r4=$?; fi
   rm -f "${probe}"
   if [ "${r1}" -eq 1 ] && grep -q $'^LISTA-ERRADA\tdonoteste/vai-fechar\tHTTP 404' <<< "${v1}" && [ "${r2}" -eq 2 ] && grep -q $'^NAO-MEDIDO\tdonoteste/vai-fechar' <<< "${v2}" \
-     && [ "${r3}" -eq 0 ]; then
+     && [ "${r3}" -eq 0 ] && [ "${r4}" -eq 0 ] && grep -q 'reconferido(s) por HTTP anônimo' <<< "${v4}"; then
     record_pass "private-repo-cite: (v) lista pública por HTTP anônimo: 404 → LISTA-ERRADA rc 1, rede fora → NAO-MEDIDO rc 2, tudo 200 → rc 0"
   else record_fail "private-repo-cite: (v) conferência anônima" "rc=${r1}/${r2}/${r3}; [${v1}] [${v2}]"; fi
   # (s3) a camada de clones DERIVADA (sem ONION_PRIVATE_CLONES), como a REGRA 119 deriva os irmãos: um clone irmão do
