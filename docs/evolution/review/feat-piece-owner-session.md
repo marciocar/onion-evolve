@@ -2,8 +2,7 @@
 branch: feat/piece-owner-session
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: e95c7d46383f6a39651ace9544c419369b2f5a7f5f8be13964296288c7c00218
-reviewed_code_sha256: 6a775bf6b7c668b35fae5de875d7cffac20a83ccd72d32c225e1108162f11626
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 2
@@ -53,6 +52,19 @@ no `--tsv`, no `--markdown` e no `--quiet`. A doutrina ganha a cláusula 8, e a 
 | (ak) só o nome casa | casa também pelo sessionId | reprova |
 | (al) sem peers | `if not peers_ok:` → `if False:` | reprova |
 | (am) owners.tsv ilegível | o degrau de parada desligado | reprova |
+
+## Pulso real (2026-11-13, `bash .claude/validation/baton-pulse.sh` nesta máquina)
+
+```
+peças: PIECE_UNOWNED 1 · PIECE_OWNER_NAME_MISMATCH 0 · PIECE_UNMEASURED 0 · PIECE_OWNED 2
+## Peças (sessão dona por peça: owner_session → owners.tsv → core; aviso, nunca bloqueio)
+- PIECE_UNOWNED `onion-messaging` · dono «onion-messaging» (members.yaml) · sponsor maestro · nenhuma sessão viva com o nome «onion-messaging» · arranque: `cd ~/onion-messaging && claude --name onion-messaging`
+- PIECE_OWNED `onion-curation` · dono «onion-curation» (members.yaml) · sponsor maestro · dono vivo: onion-curation (IDLE_WITH_QUEUE)
+- PIECE_OWNED `onion-kg-ssot` · dono «onion-kg-ssot» (members.yaml) · sponsor maestro · dono vivo: onion-kg-ssot (IDLE_WITH_QUEUE)
+```
+
+O `onion-messaging` sai sem dono porque nenhuma sessão viva se chama assim: é o aviso que o desenho pede, com o card
+de arranque como texto. Abrir a sessão é ato do maestro.
 
 ## Limites declarados
 
