@@ -193,16 +193,47 @@ def _moat_rootcopy(p):
     return None
 
 
+# Os marcadores de flag se julgam pela GRAMÁTICA do script, não pela presença do token (refutador do #1647, B1/B2): o token
+# solto casava em `--foreign-repo=0`, como VALOR de `--motivo`, e dentro de `<<< --foreign-repo` (stdin, não argv), e
+# em todos o merge alheio rodava sem o gate. Marcador que o juiz não conhece não delega (fecha).
+_PMV_VALUE_FLAGS = {"--repo", "--dispensa", "--motivo", "--assert-ancestor"}
+_PMV_NO_DELEG = {"--dispensa", "--ci-inoperante", "--allow-draft", "--maestro"}
+
+
+def _moat_marker_ok(marker, args):
+    if any(DYNAMIC.search(a) for a in args):
+        return False                                    # um argumento só conhecido em runtime pode deslocar a gramática
+    if marker == "--verified-pr":                       # ops/deploy-site.sh deploy --verified-pr <N>, posição exata (core-only)
+        return len(args) == 3 and args[0] == "deploy" and args[1] == "--verified-pr" and args[2].isdigit()
+    if marker == "--foreign-repo":                      # ops/pr-merge-verified.sh <N> ... --foreign-repo, a palavra nua (core-only)
+        if not args or not args[0].isdigit():
+            return False
+        seen, k = False, 1
+        while k < len(args):
+            a = args[k]
+            if a in _PMV_NO_DELEG or a.split("=", 1)[0] in _PMV_NO_DELEG:
+                return False
+            if a in _PMV_VALUE_FLAGS:
+                k += 2
+                continue
+            if a == "--foreign-repo":
+                seen = True
+            elif a.startswith("--foreign-repo"):
+                return False
+            k += 1
+        return seen
+    return False
+
+
 def _moat_delegated(rel, words, args, rootcopy):
     """True se as palavras da assinatura presentes (`words`) estão todas cobertas por uma forma delegada satisfeita."""
-    lits = set((a.split("=", 1)[0] if a.startswith("--") else a) for a in args if not DYNAMIC.search(a))
     for marker, verbs in MOAT_DELEG.get(rel, []):
         if not words <= verbs:
             continue
         if marker.startswith("@rootcopy="):
             if rootcopy == "ok":
                 return True
-        elif marker in lits:
+        elif _moat_marker_ok(marker, args):
             return True
     return False
 
@@ -729,7 +760,29 @@ def _moat_act(p, words, src=None, rootcopy=None):
                 noexec = w == "-o"
         if noexec:
             return
-    _moat_act_judge(rel, [a for a in _moat_script_args(p, words) if a], " ".join(words), rootcopy)
+    _moat_act_judge(rel, _moat_argv(_moat_script_args(p, words)), " ".join(words), rootcopy)
+
+
+# o argv que o SCRIPT recebe: redirecionamento e here-string não são argumento (`x.sh <<< --foreign-repo` entrega a flag
+# no stdin, e o juiz a lia como o marcador; refutador do #1647, B1/B2). O argumento vazio FICA: `"" --verified-pr 3`
+# é um 1º argumento, e o filtro antigo o apagava.
+_MOAT_REDIR_OP = re.compile(r"^(\d*|&)(<<<|<<-?|<>|<&|>&|>>|>\||<|>)$")
+_MOAT_REDIR_ATT = re.compile(r"^(\d*|&)(<<<|<<-?|<>|<&|>&|>>|>\||<|>)\S")
+
+
+def _moat_argv(args):
+    out, k = [], 0
+    while k < len(args):
+        a = args[k]
+        if _MOAT_REDIR_OP.match(a):
+            k += 2
+            continue
+        if _MOAT_REDIR_ATT.match(a):
+            k += 1
+            continue
+        out.append(a)
+        k += 1
+    return out
 
 
 def _moat_foreign_repo(args):
@@ -743,7 +796,23 @@ def _moat_foreign_repo(args):
             continue
         if not v or DYNAMIC.search(v) or _moat_slug(v) not in MOAT_SELF_SLUGS:
             return True
+    if any(a == "--repo" or a.startswith("--repo=") for a in args):
+        return False
+    # sem --repo, o alvo é o que o gh usaria (refutador do #1647, B3): o GH_REPO da linha ou de um export, e senão o
+    # repositório do diretório atual. `GH_REPO=x bash pmv.sh 12` e `cd /outro/repo && bash …/pmv.sh 12` são merge alheio.
+    env = _MOAT_CUR.get("env") or {}
+    for v in (env.get("GH_REPO"), ASSIGN.get("GH_REPO")):
+        if v is not None and (not v or DYNAMIC.search(v) or _moat_slug(v) not in MOAT_SELF_SLUGS):
+            return True
+    cwd = _MOAT_CDS[-1] if _MOAT_CDS else (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
+    if cwd and cwd is not UNKNOWN and not DYNAMIC.search(str(cwd)):
+        rc = os.path.realpath(str(cwd))
+        if not any(rc == d or rc.startswith(d + "/") for d in _moat_project_dirs()):
+            return True
     return False
+
+
+_MOAT_CUR = {}
 
 
 def _moat_act_judge(rel, args, detail, rootcopy=None):
@@ -1058,6 +1127,7 @@ def _moat_crontab(args, detail):
 
 def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     detail = " ".join(raw_words)
+    _MOAT_CUR["env"] = env if isinstance(env, dict) else {}
     args = words[1:]
     # o MODO DE TESTE do wrapper de convites roda o motor e o backup que o ambiente nomear, como o operador: pela
     # sessão ele lavaria um script não versionado através do wrapper versionado (refutador, medido). Ele só existe
@@ -1090,6 +1160,12 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             or (isinstance(env, dict) and "ONION_STT_SERVICE_TEST" in env) \
             or "ONION_STT_SERVICE_TEST" in globals().get("ASSIGN", {}):
         _moat_emit("inanalisavel", "ONION_STT_SERVICE_TEST", "", "modo de teste do wrapper do STT em lote fora da bancada — %s" % detail)
+    # e para o merge verificado (ops/pr-merge-verified.sh) (core-only), de 2026-11-13: a variável da bancada desliga a recusa
+    # do merge alheio pela sessão do core (refutador do #1647) — na linha da sessão, fecha
+    if any(re.match(r"^(export\s+)?ONION_PR_MERGE_VERIFIED_TEST=", w) for w in list(raw_words) + list(words)) \
+            or (isinstance(env, dict) and "ONION_PR_MERGE_VERIFIED_TEST" in env) \
+            or "ONION_PR_MERGE_VERIFIED_TEST" in globals().get("ASSIGN", {}):
+        _moat_emit("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST", "", "modo de bancada do merge verificado fora da bancada — %s" % detail)
     if base == "cd" and len(words) > 1 and not DYNAMIC.search(words[1]) and words[1] != "-":
         prev = _MOAT_CDS[-1] if _MOAT_CDS else (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
         _MOAT_CDS.append(os.path.normpath(os.path.join(prev, os.path.expanduser(words[1]))))
@@ -1217,15 +1293,19 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
                 moat_unanalyzable(words, "eval inanalisável")
     # script em arquivo: shell com caminho, `source`/`.`, executável por caminho, shell lendo arquivo por `<`
     if base in SHELLS:
-        if not any(re.match(r"^-[A-Za-z]*c[A-Za-z]*$", a) for a in args) and "<<<" not in args:
+        # o here-string é o STDIN: `bash <<< 'código'` não tem script (outro ramo julga o código), mas `bash x.sh <<< y`
+        # roda x.sh, e pular o ramo deixava o ato passar sem juízo (refutador do #1647, B1/B2)
+        _sa = _moat_argv(args)
+        if not any(re.match(r"^-[A-Za-z]*c[A-Za-z]*$", a) for a in args) \
+                and ("<<<" not in args or _moat_positionals(_sa, {"-o", "-O", "--rcfile", "--init-file"})):
             # `+n`, `+x`, `+o noexec` são opções do shell (desligam), não o script: sem isto `bash -n +n x.sh` via "+n"
             sa, k = [], 0
-            while k < len(args):
-                if args[k] in ("+o", "+O") and k + 1 < len(args):
+            while k < len(_sa):
+                if _sa[k] in ("+o", "+O") and k + 1 < len(_sa):
                     k += 2; continue
-                if re.match(r"^\+[A-Za-z]+$", args[k]):
+                if re.match(r"^\+[A-Za-z]+$", _sa[k]):
                     k += 1; continue
-                sa.append(args[k]); k += 1
+                sa.append(_sa[k]); k += 1
             pos = _moat_positionals(sa, {"-o", "-O", "--rcfile", "--init-file"})
             prev = [resolve(x) for x in (stdin_from or [])]
             if pos and "-s" not in args:                    # `bash -s <args> < x.sh`: os posicionais são argumentos

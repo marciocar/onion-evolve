@@ -158,31 +158,115 @@ served_regular() {
   priv test -f "${r}" && ! priv test -L "$1"
 }
 
+# ── A UNIT QUE O ROOT INSTALA (refutador do #1647, B5, 2026-11-13) ─────────────────────────────────────────────────
+# A unit vem do bridge servido, que a conta `onion` escreve (e que o merge na main do bridge muda, puxado pelo
+# update-bridge). Copiada verbatim pelo root, `User=root` e um ExecStart qualquer seriam root para quem escreve lá. Então:
+#   1. o conteúdo se LÊ COMO O DONO do bridge servido (sudo -u onion), uma vez só: um symlink plantado só alcança o que
+#      o onion já lê, e não há janela entre conferir e copiar (o TOCTOU do served_regular com o `install` do root);
+#   2. a unit passa por uma ALLOWLIST FECHADA de diretivas: chave fora da lista recusa, e as que decidem quem o processo é
+#      e o que ele roda têm valor FIXO (DynamicUser=yes, User, SupplementaryGroups, ExecStart, WorkingDirectory, os binds,
+#      as quatro credenciais, capacidades vazias). Nenhuma Exec* além do ExecStart, nenhum prefixo `+`/`!`/`@`;
+#   3. o root instala o TEXTO conferido, de um diretório temporário dele, nunca o arquivo do bridge.
+# Mudar a unit no bridge numa dessas diretivas exige mudar esta lista no core (PR revisado): é o preço declarado.
+as_owner() { if [ "${TEST}" = 1 ]; then "$@"; else sudo -n -u onion -- "$@"; fi; }
+unit_allowlist_check() { # stdin = a unit; rc 0 = cabe na allowlist; imprime o motivo da recusa
+  python3 -I -c '
+import re, sys
+FIX = {
+  ("Service", "Type"): {"simple"}, ("Service", "DynamicUser"): {"yes"}, ("Service", "User"): {"onion-slack-persona"},
+  ("Service", "SupplementaryGroups"): {"onion-brain-hub"},
+  ("Service", "StateDirectory"): {"onion-slack-persona"}, ("Service", "StateDirectoryMode"): {"0700"},
+  ("Service", "RuntimeDirectory"): {"onion-slack-persona"}, ("Service", "RuntimeDirectoryMode"): {"0755"},
+  ("Service", "ConfigurationDirectory"): {"onion-slack-persona"},
+  ("Service", "Environment"): {"ONION_SLACK_PERSONA_CONFIG=/etc/onion-slack-persona/config.json", "NODE_ENV=production"},
+  ("Service", "LoadCredentialEncrypted"): {"%s:/etc/credstore.encrypted/onion-slack-persona.%s" % (n, n)
+      for n in ("slack-bot-token", "slack-app-token", "anthropic-api-key", "kg-token")},
+  ("Service", "BindReadOnlyPaths"): {"/home/onion/onion-bridge:/run/onion-slack-persona-app"},
+  ("Service", "InaccessiblePaths"): {"-/run/onion-slack-persona-app/.env -/run/onion-slack-persona-app/data -/run/onion-slack-persona-app/workspaces"},
+  ("Service", "WorkingDirectory"): {"/run/onion-slack-persona-app"},
+  ("Service", "ExecStart"): {"/usr/bin/node /run/onion-slack-persona-app/node_modules/tsx/dist/cli.mjs src/slack-persona/main.ts"},
+  ("Service", "Restart"): {"on-failure"}, ("Service", "SuccessExitStatus"): {"143"}, ("Service", "UMask"): {"0077"},
+  ("Service", "ProtectProc"): {"invisible"}, ("Service", "ProcSubset"): {"pid"},
+  ("Service", "CapabilityBoundingSet"): {""}, ("Service", "AmbientCapabilities"): {""},
+  ("Service", "SystemCallArchitectures"): {"native"}, ("Service", "RestrictAddressFamilies"): {"AF_UNIX AF_INET AF_INET6"},
+  ("Install", "WantedBy"): {"multi-user.target"},
+}
+YES = {"PrivateTmp", "PrivateDevices", "ProtectHome", "ProtectKernelTunables", "ProtectKernelModules", "ProtectKernelLogs",
+       "ProtectControlGroups", "ProtectClock", "ProtectHostname", "RestrictNamespaces", "RestrictRealtime",
+       "RestrictSUIDSGID", "LockPersonality", "NoNewPrivileges"}
+for k in YES:
+    FIX[("Service", k)] = {"yes"}
+FREE = {("Unit", "Description"): r"[^\n]{1,200}", ("Unit", "After"): r"[A-Za-z0-9@._ -]+", ("Unit", "Wants"): r"[A-Za-z0-9@._ -]+",
+        ("Service", "RestartSec"): r"[0-9]{1,4}", ("Service", "MemoryMax"): r"[0-9]{1,6}[KMG]?", ("Service", "TasksMax"): r"[0-9]{1,5}"}
+REQ = {("Service", "DynamicUser"), ("Service", "User"), ("Service", "ExecStart"), ("Service", "WorkingDirectory"),
+       ("Service", "CapabilityBoundingSet"), ("Service", "BindReadOnlyPaths")}
+sec, seen, bad = None, set(), []
+for n, ln in enumerate(sys.stdin.read().split("\n"), 1):
+    t = ln.strip()
+    if not t or t[0] in "#;":
+        continue
+    if t.endswith("\\"):
+        bad.append("linha %d: continuação de linha" % n); continue
+    m = re.fullmatch(r"\[(Unit|Service|Install)\]", t)
+    if m:
+        sec = m.group(1); continue
+    if t.startswith("["):
+        bad.append("linha %d: seção fora da allowlist: %s" % (n, t)); continue
+    m = re.fullmatch(r"([A-Za-z]+)=(.*)", t)
+    if not m or sec is None:
+        bad.append("linha %d: não é diretiva de seção conhecida" % n); continue
+    k, v = (sec, m.group(1)), m.group(2).strip()
+    if k in FIX:
+        if v not in FIX[k]:
+            bad.append("%s=%s fora do valor fixo" % (k[1], v[:80]))
+    elif k in FREE:
+        if not re.fullmatch(FREE[k], v):
+            bad.append("%s=%s fora da forma" % (k[1], v[:80]))
+    else:
+        bad.append("diretiva fora da allowlist: [%s] %s" % k)
+    seen.add(k)
+for k in sorted(REQ - seen):
+    bad.append("falta %s" % k[1])
+print("; ".join(bad[:6]))
+sys.exit(1 if bad else 0)
+'
+}
+
 cmd_install() {
   local apply=0
   case "${1:-}" in "") ;; --apply) apply=1 ;; *) usage ;; esac
   need_sudo
-  local src="${SERVED}/${UNIT}.service" dst="${UNIT_DIR}/${UNIT}.service"
+  local src="${SERVED}/${UNIT}.service" dst="${UNIT_DIR}/${UNIT}.service" unit why
   priv test -s "${src}" || die 1 "o bridge servido não tem ${src}: o PR da persona chegou ao bridge? (ops/update-bridge.sh)"
   served_regular "${src}" || die 1 "${src} não é arquivo regular dentro do bridge servido (symlink?): recusado, o root copiaria o alvo do link"
-  if priv cmp -s "${src}" "${dst}" 2>/dev/null; then say "unit: igual à servida"; else
-    say "unit: difere da servida (ou não está instalada):"; priv diff -u "${dst}" "${src}" 2>/dev/null | head -60 || true
+  unit="$(as_owner cat -- "${src}")" || die 2 "não li ${src} como o dono do bridge servido"
+  why="$(unit_allowlist_check <<< "${unit}")" || die 1 "a unit servida sai da allowlist de diretivas (o root não a instala): ${why}"
+  if [ "$(priv cat -- "${dst}" 2>/dev/null)" = "${unit}" ]; then say "unit: igual à servida"; else
+    say "unit: difere da servida (ou não está instalada):"; diff -u <(priv cat -- "${dst}" 2>/dev/null) <(printf '%s\n' "${unit}") | head -60 || true
   fi
   local cp; cp="$(config_problem)"; [ -n "${cp}" ] && say "config: ${cp}"
   local ur; ur="$(unreadable_code)"; [ -n "${ur}" ] && say "ATENÇÃO: código sem leitura para outros (o start vai recusar): ${ur}"
   if [ "${apply}" = 0 ]; then say "ENSAIO: nada foi escrito. Instalar: ops/slack-persona.sh install --apply"; return 0; fi
-  priv systemd-analyze verify "${src}" >/dev/null 2>&1 || die 1 "systemd-analyze verify reprova a unit servida"
+  # o texto conferido vai a um diretório temporário do root (0700), e só ele é verificado e instalado
+  local tmpd; tmpd="$(priv mktemp -d)" || die 2 "mktemp do root falhou"
+  printf '%s\n' "${unit}" | priv tee "${tmpd}/${UNIT}.service" >/dev/null || die 2 "não escrevi a unit conferida"
+  priv systemd-analyze verify "${tmpd}/${UNIT}.service" >/dev/null 2>&1 || { priv rm -f -- "${tmpd}/${UNIT}.service"; priv rmdir -- "${tmpd}"; die 1 "systemd-analyze verify reprova a unit servida"; }
   local ts; ts="$(date -u +%Y%m%dT%H%M%SZ)"
   priv install -d -m 0700 "${BACKUP}"
   if priv test -e "${dst}"; then priv cp -a "${dst}" "${BACKUP}/${UNIT}.service.${ts}"; fi
   priv install -d -m 0755 "${UNIT_DIR}"
-  priv install -m 0644 "${src}" "${dst}" || die 2 "não instalei a unit"
+  priv install -m 0644 "${tmpd}/${UNIT}.service" "${dst}" || die 2 "não instalei a unit"
   priv install -d -m 0755 "${ETC}"
   if ! priv test -e "${ETC}/config.json"; then
     served_regular "${SERVED}/config.example.json" || die 1 "${SERVED}/config.example.json não é arquivo regular dentro do bridge servido (symlink?): recusado"
-    priv install -m 0644 "${SERVED}/config.example.json" "${ETC}/config.json" || die 2 "não instalei a config de exemplo"
+    local cfg; cfg="$(as_owner cat -- "${SERVED}/config.example.json")" || die 2 "não li a config de exemplo como o dono do bridge servido"
+    python3 -I -c 'import json,sys; json.loads(sys.stdin.read())' <<< "${cfg}" 2>/dev/null || die 1 "a config de exemplo servida não é JSON: recusada"
+    printf '%s\n' "${cfg}" | priv tee "${tmpd}/config.json" >/dev/null || die 2 "não escrevi a config conferida"
+    priv install -m 0644 "${tmpd}/config.json" "${ETC}/config.json" || die 2 "não instalei a config de exemplo"
+    priv rm -f -- "${tmpd}/config.json"
     say "config: instalada a de EXEMPLO em ${ETC}/config.json; troque os IDs U0000…/C0000… pelos reais antes do start"
   fi
+  priv rm -f -- "${tmpd}/${UNIT}.service"; priv rmdir -- "${tmpd}"
   priv systemctl daemon-reload || die 2 "daemon-reload falhou"
   say "unit instalada (não ligada). Backup: ${BACKUP}/${UNIT}.service.${ts} (se havia). Próximo: ops/slack-persona.sh start"
   say "ROLLBACK: sudo rm ${dst} && sudo systemctl daemon-reload"

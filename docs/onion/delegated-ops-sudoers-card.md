@@ -14,7 +14,9 @@
 
 O fecho das cópias: `update-bridge.sh`, `bridge-backup.sh`, `bridge-hardening.sh`, `chat-runner.sh` e
 `slack-persona.sh`. Como root, cada script só aceita rodar a partir da cópia (dono root, sem escrita de grupo nem
-de outros, sem symlink); `bridge-hardening` e `chat-runner` só rodam o `verify` por ela; a persona recusa o `creds`;
+de outros, sem symlink); `bridge-hardening` e `chat-runner` só rodam o `verify` por ela; a persona recusa o `creds`,
+e o payload dela (a unit do bridge servido, que a conta `onion` escreve) é lido como `onion` e só se instala se couber
+numa allowlist fechada de diretivas: `DynamicUser=yes`, `User` e `ExecStart` fixos, nenhuma outra `Exec*`;
 o backup como root só lê a origem e entrega o tar por pipe ao operador, que cifra e grava no destino dele.
 
 A regra (`ops/sudoers/onion-delegated-ops`) libera só estas linhas exatas, com `env_reset` e `!setenv`:

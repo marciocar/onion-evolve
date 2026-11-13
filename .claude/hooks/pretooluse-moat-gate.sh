@@ -217,12 +217,13 @@ case "$cls" in
     echo "GUARDA-PRETOOLUSE (MOAT/repo alheio): ${detail} — ${target} não é este projeto (I3: a sessão do core não escreve repo alheio). Negado; ${how}." >&2 ;;
   ato)
     case "$wrapper" in
+      --maestro) how="--maestro é o escape do MAESTRO (terminal dele, ou o \`!\`), nunca da sessão" ;;
       @foreign) how="merge em repo da família pela sessão só com --foreign-repo, que confere registro, CI verde, conflito e resíduo" ;;
       @any)  how="este script roda o ato em qualquer invocação" ;;
       @none) how="sem argumento ele roda o modo padrão, que é o ato; o ensaio ou a leitura dele (--help, --check, plan, verify) passa" ;;
       *)     how="sem ${wrapper} é ensaio ou leitura, e isso passa" ;;
     esac
-    echo "GUARDA-PRETOOLUSE (MOAT/ato): ${detail} — deploy, publicação e push de porta são do maestro, salvo os atos delegados na forma exata (linhas delega), e o wrapper versionado não os torna da sessão (REGRA 117; alvos em ops/moat-targets.tsv, core-only). Negado pela sessão; ${how}. Peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks: \`! <o mesmo comando>\`. Porta se publica por /meta:publish, que pergunta antes do --push." >&2 ;;  # (core-only)
+    echo "GUARDA-PRETOOLUSE (MOAT/ato): ${detail} — deploy, publicação e push de porta são do maestro, salvo os atos delegados na forma exata (linhas delega), e o wrapper versionado não os torna da sessão (REGRA 117; alvos em ops/moat-targets.tsv, core-only). Negado pela sessão; ${how}. Peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks: \`! <o mesmo comando>\` (o deploy do site e o merge alheio, chamados de dentro da sessão, pedem também --maestro). Porta se publica por /meta:publish, que pergunta antes do --push." >&2 ;;  # (core-only)
   relogio)
     echo "GUARDA-PRETOOLUSE (MOAT/relógio): ${detail} — agendar por relógio (${target}) é W7: o Onion é maestro-invocado, nunca cron/timer sobre si. Negado; agendamento é do maestro, fora da sessão (\`!\` no prompt)." >&2 ;;
   *)

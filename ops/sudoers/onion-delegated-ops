@@ -19,7 +19,11 @@
 # O FECHO DE CADA CÓPIA (o que ela executa como root sem sair do diretório):
 #   update-bridge.sh  → bridge-backup.sh (o tar da origem sai por pipe; cifra e retenção rodam como o operador),
 #                       bridge-hardening.sh verify e chat-runner.sh verify (só leitura; só o verify roda pela cópia).
-#   slack-persona.sh  → nada além de comandos do sistema.
+#   slack-persona.sh  → nenhum script, mas um PAYLOAD: a unit e a config de exemplo que o bridge servido traz (a conta
+#                       onion as escreve, e o merge na main do bridge as muda). O install as lê COMO onion (sudo -u
+#                       onion, uma leitura só, sem janela entre conferir e copiar), passa a unit por uma allowlist
+#                       FECHADA de diretivas (DynamicUser=yes, User, SupplementaryGroups, ExecStart e binds com valor
+#                       fixo; nenhuma outra Exec*) e a config por um parse de JSON, e instala o texto conferido.
 #
 # ARGUMENTOS EXATOS: no sudoers, comando seguido de argumentos casa só com aqueles argumentos, e `""` quer dizer
 # "nenhum". `install` sem --apply é o ensaio (só lê). O `creds` não está aqui, e a cópia o recusa como root.
