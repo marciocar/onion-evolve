@@ -31,7 +31,11 @@ A marca positiva **não vale** quando o PR muda a maquinaria do revisor. São du
 
 - **os scripts do veredito:** `.github/workflows/`, `ops/review/`, `review-verdict.sh` e `post-review-comment.sh`;
 - **o que o CLI do revisor carrega do head:** `.claude/hooks/`, `.claude/settings*.json`, `CLAUDE.md`,
-  `.claude/agents/`, `.claude/skills/` e `.mcp.json`.
+  `.claude/agents/`, `.claude/skills/`, `.claude/rules/`, `.claude/commands/`, `.claude/output-styles/` e
+  `.mcp.json`;
+- **o que os hooks executam:** `.claude/validation/` e `.claude/utils/` inteiros. O `settings.json` roda
+  scripts de lá no SessionStart, e os hooks carregam os utils. Código assim pode reescrever o
+  `claude-execution-output.json` no `RUNNER_TEMP`, fora da árvore, e forjar 0 achados.
 
 O workflow de um `pull_request` é o do head, e um hook do PR roda dentro do job. Por isso esse PR consegue
 forjar qualquer anotação. A medição cobre **todos** os arquivos do PR, inclusive o nome antigo de um rename.
@@ -109,6 +113,14 @@ No `onion-review-verdict`, a linha `⊘ Não revisado pelo CI: …` indica fallb
   `--achados <n>` nele, e o job do modo procura `--guard-helper`. Uma capacidade nova que não mude esse
   literal faz a base velha rodar sem ela. Uma que o mude faz o PR que a introduz rodar o juiz do próprio PR,
   mas esse PR toca `ops/review/` e cai no resíduo.
+- **A lista de arquivos do PR vem da API, que trunca em 3000 sem erro.** O helper confere a contagem lida com
+  o `changed_files` do PR e falha fechado (rc 2, o merge recusa) se divergir ou passar de 3000. PR maior que
+  isso não se mede pela API: é do maestro.
+- **Injeção de prompt pelo próprio diff.** O revisor lê o diff, e um PR pode trazer instrução nele. Nenhuma
+  lista de caminhos fecha isso. Como o revisor tem `Bash`, a injeção que pega vira **forja determinística**
+  pelo `RUNNER_TEMP`: um comando reescreve a evidência ou a saída. A marca positiva é, portanto, evidência
+  de que o revisor de IA rodou e não achou nada, não uma fronteira de segurança. Num PR de guarda, a defesa
+  que não depende do revisor é o resíduo independente, junto com o merge do maestro (#1647).
 - **A evidência é escrita no runner em que o revisor tem `Bash`.** Um revisor manipulado por injeção pode
   escrever no `RUNNER_TEMP`, e o conteúdo do head (`CLAUDE.md`, `.claude/agents/`) é uma via de injeção.
   O efeito fica limitado, pelas três razões abaixo:
