@@ -466,15 +466,19 @@ for f, n, form, repo in acc:
 MK_AT = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}@[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])")
 # Na mesma linha do marcador, o hex SOLTO (6+, com dígito e letra, qualquer caixa: `(<hex>)`, `/blob/<hex>/`, argumento
 # de flag) também é commit do repo privado, a menos que seja commit DESTE repo: o core é público, e o pin do core
-# (onion_version) mora ao lado do marcador nos registros de adotante. A isenção lê o objeto no git local; o CI tem a
-# história inteira (fetch-depth: 0 no onion-validate). Re-refutação do #1648.
+# (onion_version) mora ao lado do marcador nos registros de adotante. A isenção vale só para o commit ALCANÇÁVEL de um ref
+# remoto ou de uma tag, que é o que o clone do CI tem (fetch-depth: 0): o objeto que só existe no git local (branch
+# apagada, commit de PR squash) passaria aqui e reprovaria no CI — o caso medido no 1º CI do #1648. O commit público que
+# só o GitHub alcança vai qualificado: dono/repo@<hex> da lista pública. Re-refutação do #1648.
 MK = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}")
 HEX_LOOSE = re.compile(r"(?<![0-9A-Za-z_-])[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])")
 _own = {}
 def own_commit(h):
     h = h.lower()
     if h not in _own:
-        _own[h] = subprocess.run(["git", "-C", root, "cat-file", "-e", f"{h}^{{commit}}"], capture_output=True).returncode == 0
+        full = subprocess.run(["git", "-C", root, "rev-parse", "--verify", "-q", f"{h}^{{commit}}"], capture_output=True, text=True).stdout.strip()
+        _own[h] = bool(full) and bool(subprocess.run(["git", "-C", root, "for-each-ref", "--count=1", "--contains", full,
+                                                      "refs/remotes", "refs/tags"], capture_output=True, text=True).stdout.strip())
     return _own[h]
 for f in files:
     node = "-"

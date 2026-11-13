@@ -2,14 +2,13 @@
 branch: chore/kg-private-cite-migration
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: aa1a4aa7f8fefd779517d2b800e041696d50e5ea295a9a6e0d6b034c09f01e09
-reviewed_code_sha256: bc2251065f31b3640821134fe1d2f6e98e1419ed69650cffa390dfd95709d301
-findings_total: 10
-findings_real: 10
-findings_blocking: 9
+reviewed_diff_sha256: pendente
+findings_total: 11
+findings_real: 11
+findings_blocking: 10
 tokens: 0
 duration_min: 0
-findings_fixed: 10
+findings_fixed: 11
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: refutador independente do #1648 (3 bloqueios, depois 1 residual na re-refutação), sobre a passada do próprio executor (6 achados)
@@ -58,6 +57,7 @@ contagem, sem ecoar nada).
 | B2 | (blocking) | `C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR` estava como `refuted`, mas o claim era verdade e deixou de ser (caso DRIFTED do `/meta:kg-freshness`) | o nó antigo voltou ao texto original com `status: superseded`. O nó novo `C_CLASSE_NAO_CONFERIVEL_E_O_MARCADOR_PRIVATE_CITE` ganhou a verdade atual e uma `SUPERSEDES` para o antigo, e cita o PR e o commit da main, não a branch |
 | B3 | (blocking) | a catraca da REGRA 121 seguia com 255 entradas para um passivo real de 12 | o `--emit-baseline` a encolheu para 12 |
 | B4 | (blocking) | re-refutação: em `E_HISTORICO_DO_REGISTRO_DOS_ADOTANTES` sobravam 2 commits de repo privado, um em `(… <hex>` e outro como argumento de flag. A guarda não os via, e a medida anterior só os conferia contra os repos já citados em cada grafo | os dois viraram `⟨commit⟩`, com o id do nó na tabela privada (e as trocas antigas ganharam o nó que tinham perdido). A guarda passou a acusar todo hex solto na linha do marcador (`(<hex>)`, `/blob/<hex>/`, em qualquer caixa), menos o commit deste repo (o core é público) e `dono/repo@<hex>` da lista pública. Isso trouxe mais 2 linhas: um commit do espelho público da kg-ssot, agora qualificado como `marciocar/kg-ssot@<hex>`, e um slug de workspace, agora `⟨slug de 16 hex⟩`. O caso (r) ganhou fixtures em maiúscula e as duas vizinhas que calam, e 4 mutantes morreram |
+| B5 | (blocking) | o 1º CI do PR reprovou na REGRA 121 e no caso (b): a isenção «commit deste repo» lia o git local, que tinha 3 pins do core sem ref remoto (commit de PR squash). O clone do CI não os tem | a isenção passou a valer só para commit alcançável de um ref remoto ou de uma tag, igual ao CI. Os 3 pins são públicos (o GitHub do core os alcança) e foram qualificados como `marciocar/onion-evolve@<hex>`. O caso (r) ganhou a fixture do commit só local, e o mutante que volta ao git local morreu |
 
 ## Re-revisão (refutador independente)
 
