@@ -3,8 +3,8 @@ title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, 
 date: 2026-11-13
 branch: feat/delegated-acts-1113
 reviewer: "10ª passada: o refutador independente no head a065593a3 REPROVOU pela mesma classe (3 escapes do fecho no ENSAIO das portas); por decisão de desenho do team-lead, o ônus se inverteu para a EXECUÇÃO (bancada act_trace). 9ª passada: o refutador independente no head 1759dba93 REPROVOU por um bloqueio (o detector do fecho não via caminho em variável) e uma linha (git replace), curados aqui. 8ª passada: o refutador independente no head 386161856 REPROVOU por um bloqueio (a lista de guarda não seguia o que os atos executam) e uma cura de uma linha (o ls-remote isolado da config), curados aqui. 7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: 55d90782c63b0d6752282e44442ce5e8688ca4403f3642b9d65c546635b519c2
-reviewed_code_sha256: 3a04f617382a7c309515a49df57cd859b8e3d03683a0dbada233b12eb2505a70
+reviewed_diff_sha256: c4d20dc9ca391bc0147dac6520fd5b311a33edb98e5b87092db850a463f8296a
+reviewed_code_sha256: c32e21369a65462da4395d0207cae5b0510d9192449b702ac6703af1932aa5ee
 findings_total: 33
 findings_real: 33
 findings_fixed: 33
@@ -219,7 +219,10 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
     juiz em rastros sintéticos, (b) roda o ensaio e (m) julga o mesmo rastro contra o tsv sem a linha fecho do
     materialize-door.sh, que tem de reprovar nomeando-o. Custo: ~4 min, com nice.
     **O ensaio exercitado é o caminho de produção, com os mesmos argumentos**; a única diferença, declarada, é o
-    registro por --members (as portas apontam repositórios bare locais, semeados sem rede). **Lacuna nomeada:** o que
+    registro por --members (as portas apontam repositórios bare locais, semeados sem rede); e, onde a fonte privada de termos
+    de cliente não existe (CI, pré-voo), o ensaio usa um termo sintético e o registro de bancada sai sem os marcadores
+    CONFIDENCIAL/PRIVADO (sem os termos reais nenhum nome se deriva, e o passo 5a recusaria). Nenhuma das duas muda o que
+    se executa. **Lacuna nomeada:** o que
     não tem ensaio executável (o merge alheio, o deploy do site, o update do bridge e a persona do Slack) fica no
     detector estático; o rastro não vê arquivo lido por `source`/`.`, nem script executado por `/bin/bash` absoluto ou
     shebang `#!/bin/bash`; e o rastro é o de HEAD (o pre-commit local mede o commit anterior; o CI mede o do PR).
@@ -227,6 +230,22 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
     `_delegated_env_guard` e no `_pmv_fix_path` do pr-merge-verified.sh (o replace ainda desviava o show do resíduo, o
     rev-parse de site/, o merge-base e o show de origin/main:members.yaml e do tsv). (rf30 e o caso L do deploy-site,
     com mutante)
+34. **A forma da lista de guarda (decisão do maestro de 2026-11-13, selo D_GUARD_LIST_NAMED_CODEOWNERS_1113 em
+    docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml)**: a lista cujos PRs só o
+    maestro mergeia é NOMEADA, arquivo a arquivo, no formato do padrão de mercado CODEOWNERS, e não a pasta inteira
+    (medido pelo maestro: ~17% dos PRs contra ~46%). É a forma que o `_guard_paths` do pr-merge-verified.sh já tem
+    (derivada do tsv; as entradas com `/` final são as pastas que JÁ eram guarda inteira: workflows, hooks, sudoers,
+    review, .githooks). **Medida de conferência (155 commits não-projeção da origin/main, 10 a 13/11):** a lista deste
+    head pega 56 (36%), e 53 deles só pelo `.claude/validation/lint-selftest.sh`, que entrou no fecho como executor da
+    FRONTEIRA; sem os dois executores do lint (lint-selftest e lint-artifacts), pega 19 (12%). A pasta inteira
+    (.claude/hooks, .claude/validation, ops, .github, .githooks) pega 60 (39%). O número do maestro e o meu divergem
+    pela janela e pela unidade (PR × commit); a pergunta que sobra é dele: **os dois executores do lint são guarda?**
+    Ficam, por ora, porque o ensaio das portas os executa e o fecho tem de cobri-los.
+    **Próximo passo nomeado (não coube aqui):** gerar `.github/CODEOWNERS` a partir da mesma derivação do `_guard_paths`,
+    com catraca de igualdade no lint. Não coube porque (a) com dono único que é também o autor dos PRs, ligar "exigir
+    revisão do dono" na proteção da main trava todo PR de guarda (o autor não aprova o próprio PR), e ligar é do
+    maestro; sem ligar, o arquivo só informa; (b) a catraca é guarda nova (REGRA nova pelo /meta:forge-guard); (c) não
+    medi se `.github/` viaja para as portas, e um dono nomeado num arquivo que viaja pede decisão de porta.
 
 ## LIMITES aceitos (o refutador e o maestro, 2026-11-13)
 

@@ -6,7 +6,7 @@ meta:
   review_after: "2026-12-11"
   x_supersedes_none: "estudo novo; reabre o sétimo valor do eixo de topologia de sessão no ADR de modelos de trabalho pela porta que o próprio ADR deixou, sem derrubar nó"
   purpose: "Decidir a divisão de segurança, compliance e custo de nuvem entre o Onion e o kg-ssot, e o modelo de automação com níveis, catraca e agendamento, a partir da proposta de checagens operacionais do hub do primeiro cliente."
-  # ═══ TETO: 21 NÓS ═══ (subido em 2026-11-13 de 20: o selo do modelo de confiança da delegação, D_DELEGATION_TRUST_MODEL_1113, nasceu da 5ª refutação do PR das guardas delegadas e pertence a este estudo dos níveis de automação)
+  # ═══ TETO: 22 NÓS ═══ (subido em 2026-11-13 de 20 para 21: o selo do modelo de confiança da delegação, D_DELEGATION_TRUST_MODEL_1113, nasceu da 5ª refutação do PR das guardas delegadas; de 21 para 22: o selo da lista de guarda nomeada, D_GUARD_LIST_NAMED_CODEOWNERS_1113, que refina o mesmo modelo)
 nodes:
   - id: Q_AUTOMATION_LEVELS_1111
     node_type: question
@@ -347,6 +347,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-13: «A 5ª refutação do PR das guardas delegadas mostrou que a sessão edita o próprio script e mergeia o próprio PR com dispensa; até onde fechamos?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
       locality: "pessoa"
+  - id: D_GUARD_LIST_NAMED_CODEOWNERS_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Lista nomeada no formato do padrão de mercado CODEOWNERS (medido pelo maestro: ~17% dos PRs)»"
+    label: "a lista de guarda, cujos PRs só o maestro mergeia, é uma lista NOMEADA de arquivos no formato do padrão de mercado CODEOWNERS, derivada do ops/moat-targets.tsv, e não a pasta inteira"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Lista nomeada no formato do padrão de mercado CODEOWNERS (medido pelo maestro: ~17% dos PRs)»; descartadas: «Pasta inteira (medido pelo maestro: ~46% dos PRs)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «A lista de guarda do PR que só o maestro mergeia: arquivos nomeados ou a pasta inteira?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
 edges:
   - from: E_HUB_FIRST_SPIKE_LOG_ARRIVAL_1112
     to: Q_OPS_CHECK_MOLD_RULES_1112
@@ -407,4 +423,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_DELEGATION_TRUST_MODEL_1113
     to: D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113
+    edge_type: TRACES_TO
+  - from: D_GUARD_LIST_NAMED_CODEOWNERS_1113
+    to: D_DELEGATION_TRUST_MODEL_1113
     edge_type: TRACES_TO
