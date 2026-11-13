@@ -58655,6 +58655,170 @@ BP_PC
 }
 _family run_baton_pulse_selftests
 
+# ---------------------------------------------------------------------------
+# peek — o /meta:peek (espiar o mercado na dúvida, 2026-11-13): o EXECUTOR do nível 1
+# (.claude/utils/peek/community-peek.sh) confere o canal antes de ler o silêncio, e o MEDIDOR
+# (.claude/validation/peek-census.sh) escolhe o nível pela tabela, cobra o registro e propõe a recalibração.
+# Sem rede: o curl é falso (PEEK_CURL) e imita o HN Algolia medido em 2026-11-13 (o '>' cru devolve 400).
+# Cada caso reprova contra o mutante dele.
+run_market_peek_selftests() {
+  echo ""
+  echo "▸ peek — executor do nível 1 (canal conferido) e medidor da escada (tabela, registro, recalibração)"
+  local cp="${REPO_ROOT}/.claude/utils/peek/community-peek.sh" pc="${REPO_ROOT}/.claude/validation/peek-census.sh" \
+        lad="${REPO_ROOT}/.claude/utils/peek/peek-ladder.tsv"
+  [ -f "${cp}" ] && [ -f "${pc}" ] && [ -f "${lad}" ] || { record_fail "peek: SUT ausente" "${cp}, ${pc} ou ${lad}"; return; }
+  command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
+    || { record_skip "peek: python3/PyYAML ausentes (SUT não exercido)"; return; }
+  local sb T NOW=1794000000 G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
+  T="$(printf '\t')"; sb="$(TMPDIR=/tmp mktemp -d)"
+  # ── o curl falso: grava a URL no log, escreve o corpo no -o e imprime o http_code no -w ──
+  cat > "${sb}/curl" <<'PK_FAKE'
+#!/usr/bin/env bash
+out=""; url=""
+while [ $# -gt 0 ]; do case "$1" in -o) shift; out="$1" ;; -w|-m|-A) shift ;; -*) ;; *) url="$1" ;; esac; shift; done
+printf '%s\n' "${url}" >> "${PK_LOG}"
+case "${url}" in
+  *hn.algolia.com*'>'*) printf '{"message":"malformed"}' > "${out}"; printf 400 ;;
+  *hn.algolia.com*tags=comment*) printf '{"nbHits":0,"hits":[]}' > "${out}"; printf 200 ;;
+  *hn.algolia.com*) cat "${PK_HN_FILE}" > "${out}"; printf 200 ;;
+  *api.github.com*) printf '{"total_count":1500,"incomplete_results":true,"items":[{"title":"issue a","html_url":"https://example.invalid/a","created_at":"2026-11-12T00:00:00Z"}]}' > "${out}"; printf 200 ;;
+  *lobste.rs*) printf '[]' > "${out}"; printf '%s' "${PK_LOB:-200}" ;;
+  *) printf '' > "${out}"; printf 404 ;;
+esac
+PK_FAKE
+  chmod +x "${sb}/curl"
+  printf '%s' '{"nbHits":3,"hits":[{"objectID":"1","title":"novo um","created_at":"2026-11-10T00:00:00Z","created_at_i":1793900000},{"objectID":"2","title":"novo dois","created_at":"2026-11-11T00:00:00Z","created_at_i":1793950000},{"objectID":"3","title":"velho","created_at":"2020-01-01T00:00:00Z","created_at_i":1500000000}]}' > "${sb}/hn.json"
+  printf '%s' '{"nbHits":0,"hits":[]}' > "${sb}/hn-empty.json"
+  _pkr() {  # $1 = executor sob teste, resto = args → saída + «rc=N» + o log de URLs
+    local w="$1" rc=0 out; shift; : > "${sb}/log"
+    out="$(env PK_LOG="${sb}/log" PK_HN_FILE="${PK_HN_FILE:-${sb}/hn.json}" PEEK_CURL="${sb}/curl" PEEK_NOW="${NOW}" LC_ALL=C bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s\nrc=%s\n' "${out}" "${rc}"; sed 's/^/url /' "${sb}/log"
+  }
+  # _pkcase <nome> <SUT> <OLD> <NEW> <função>: o caso no intacto, a mutação (âncora tem de existir 1×) e a prova
+  _pkcase() {
+    local name="$1" sut="$2" old="$3" new="$4" fn="$5" rc_i=1 rc_m=1 k="${sb}/k"
+    rm -rf "${k}"; mkdir -p "${k}/.claude/validation" "${k}/.claude/utils/peek"; cp "${lad}" "${k}/.claude/utils/peek/"
+    local dst="${k}/.claude/validation/c.sh"; cp "${sut}" "${dst}"; "${fn}" "${dst}" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "peek: ${name}"; else record_fail "peek: ${name}" "${PK_WHY:-caso não satisfeito}"; fi
+    cp "${dst}" "${k}/.claude/validation/m.sh"
+    OLD="${old}" NEW="${new}" python3 -I -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${k}/.claude/validation/m.sh"
+    "${fn}" "${k}/.claude/validation/m.sh" && rc_m=0
+    _prove_mutation "peek: ${name} (MUT)" "${dst}" "${k}/.claude/validation/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # (a) o operador do numericFilters vai CODIFICADO (%3E): com '>' cru o HN devolve 400 e a fonte sai FAIL
+  _pk_a() { local a; a="$(_pkr "$1" "agent identity" --sources hn)"; PK_WHY="$(grep -E '^(source|url)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^source${T}hn${T}ok${T}200${T}" <<< "${a}" && grep -q '^url .*numericFilters=created_at_i%3E' <<< "${a}"; }
+  _pkcase "(a) o '>' do numericFilters vai codificado e o HN responde 200" "${cp}" \
+    "print('https://hn.algolia.com/api/v1/search_by_date?' + u.urlencode(p, quote_via=u.quote))" \
+    "print('https://hn.algolia.com/api/v1/search_by_date?' + u.unquote(u.urlencode(p, quote_via=u.quote)))" _pk_a
+  # (b) fonte que falhou não é «nada»: lobsters 500 e o resto vazio sai PARCIAL, nunca «nada achado»
+  _pk_b() { local a; a="$(PK_LOB=500 PK_HN_FILE="${sb}/hn-empty.json" _pkr "$1" "x y z" --sources hn,lobsters)"; PK_WHY="$(grep -E '^(source|summary)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^source${T}lobsters${T}FAIL${T}500${T}.*NÃO MEDIDO" <<< "${a}" && grep -q "^summary${T}.*PARCIAL" <<< "${a}" && ! grep -q 'nada achado' <<< "${a}"; }
+  _pkcase "(b) fonte que falhou deixa a espiada PARCIAL, nunca «nada achado»" "${cp}" "if fail:
+    verdict = " "if False:
+    verdict = " _pk_b
+  # (c) e o rc diz o mesmo: alguma fonte FAIL ⇒ rc 1
+  _pk_c() { local a; a="$(PK_LOB=500 _pkr "$1" "agent" --sources hn,lobsters)"; PK_WHY="$(grep '^rc=' <<< "${a}")"; grep -q '^rc=1$' <<< "${a}"; }
+  _pkcase "(c) espiada parcial sai rc 1" "${cp}" "sys.exit(1 if fail else 0)" "sys.exit(0)" _pk_c
+  # (d) o teto do GitHub e o incomplete_results vão para a linha da fonte
+  _pk_d() { local a; a="$(_pkr "$1" "agent" --sources github)"; PK_WHY="$(grep '^source' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^source${T}github${T}ok${T}200${T}1${T}true${T}total=1500 · só no título.*acima do teto de 1.000" <<< "${a}"; }
+  _pkcase "(d) incomplete_results e o teto de 1.000 do GitHub saem na linha" "${cp}" \
+    "inc = 'true' if data.get('incomplete_results') else 'false'" "inc = 'false'" _pk_d
+  # (e) o Reddit é LACUNA declarada: linha GAP, nenhuma chamada, nenhuma URL do reddit
+  _pk_e() { local a; a="$(_pkr "$1" "agent" --sources hn,reddit)"; PK_WHY="$(grep -E '^(source|summary|url)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^source${T}reddit${T}GAP${T}.*403 medido" <<< "${a}" && grep -q "^summary${T}calls=1${T}" <<< "${a}" && ! grep -q '^url .*reddit' <<< "${a}"; }
+  _pkcase "(e) o Reddit sai GAP declarado e nunca é consultado" "${cp}" \
+    "    reddit|discourse) ;;" "    reddit|discourse) _get \"\${s}\" \"https://www.reddit.com/new.json\"; CALLS=\$((CALLS + 1)) ;;" _pk_e
+  # (f) o filtro de data do servidor é CONFERIDO: o hit mais velho que a janela não conta
+  _pk_f() { local a; a="$(_pkr "$1" "agent" --sources hn)"; PK_WHY="$(grep -E '^(source|item)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^source${T}hn${T}ok${T}200${T}2${T}" <<< "${a}" && ! grep -q "${T}velho${T}" <<< "${a}"; }
+  _pkcase "(f) hit mais velho que a janela não conta, mesmo que o servidor o devolva" "${cp}" \
+    "if int(h.get('created_at_i') or 0) <= ts: continue" "if False: continue" _pk_f
+  # (r) --gh-repo é dono/nome por regex ANCORADA: «a/b c» sai rc 2 antes de qualquer chamada
+  _pk_r() { local a; a="$(_pkr "$1" "agent" --sources github --gh-repo "a/b c")"; PK_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q '^rc=2$' <<< "${a}" && grep -q -- '--gh-repo inválido' <<< "${a}" && ! grep -q '^url ' <<< "${a}"; }
+  _pkcase "(r) --gh-repo fora de dono/nome sai rc 2 sem chamar a rede" "${cp}" \
+    "! [[ \"\${GHREPO}\" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\$ ]]" "! [[ \"\${GHREPO}\" == [A-Za-z0-9._-]*/[A-Za-z0-9._-]* ]]" _pk_r
+  # ── o medidor ──
+  local r; "${G[@]}" -C "${sb}" init -q r; r="$(cd "${sb}/r" && pwd -P)"; mkdir -p "${r}/docs" "${r}/tests/fixtures"
+  _pknode() {  # id rev sev unc level changed [verified_at] [override]
+    printf '  - id: %s\n    node_type: evidence\n    status: confirmed\n    label: "e"\n    verified_at: "%s"\n    x_peek_level: %s\n    x_peek_reversibility: %s\n    x_peek_severity: %s\n    x_peek_uncertainty: %s\n    x_peek_calls: 4\n    x_peek_sources: ["hn:200:1"]\n    x_peek_changed_decision: %s\n' \
+      "$1" "${7:-2026-11-01}" "$5" "$2" "$3" "$4" "$6"
+    [ -n "${8:-}" ] && printf '    x_peek_override: "%s"\n' "$8"; return 0
+  }
+  {
+    printf 'meta:\n  id: led\n  schema_version: "1"\nnodes:\n'
+    for i in 1 2 3 4 5; do _pknode "E_DOWN_${i}" two-way 4 med 1 no; done          # célula de nível 1: 5 decididas, nenhuma mudou
+    _pknode E_UP_1 one-way 2 med 1 yes; _pknode E_UP_2 one-way 2 med 1 yes; _pknode E_UP_3 one-way 2 med 1 yes
+    _pknode E_UP_4 one-way 2 med 1 no; _pknode E_UP_5 one-way 2 med 1 no            # nível 1: 3 de 5 mudaram
+    for i in 1 2 3 4; do _pknode "E_FEW_${i}" one-way 5 low 1 no; done             # nível 1: só 4 decididas
+    _pknode E_OLD two-way 1 low 0 pending 2026-09-01                                 # pendente há mais de 30 dias
+    _pknode E_OVR two-way 1 low 1 no 2026-11-01 "fonte única, quis o fio"            # acima da tabela, com motivo
+  } > "${r}/docs/led.kg.yaml"
+  { printf 'meta:\n  id: fx\n  schema_version: "1"\nnodes:\n'; _pknode E_FIX two-way 1 low 0 no; } > "${r}/tests/fixtures/fx.kg.yaml"
+  "${G[@]}" -C "${r}" add -A; "${G[@]}" -C "${r}" commit -q -m c1
+  _pcr() {  # $1 = medidor sob teste, resto = args → TSV + «rc=N»
+    local w="$1" rc=0 out; shift
+    out="$(env PEEK_TODAY=2026-11-13 LC_ALL=C bash "${w}" "$@" 2>&1)" || rc=$?; printf '%s\nrc=%s\n' "${out}" "${rc}"
+  }
+  # (g) a tabela escolhe o nível: severidade 4 é banda alta (two-way/high/med = 1; one-way/high/high = 3)
+  _pk_g() { local a b; a="$(_pcr "$1" --pick two-way 4 med --tsv)"; b="$(_pcr "$1" --pick one-way 5 high --tsv)"; PK_WHY="${a%%$'\n'*} ‖ ${b%%$'\n'*}"
+    grep -q "^pick${T}1${T}two-way${T}high${T}med${T}max_calls=10" <<< "${a}" && grep -q "^pick${T}3${T}one-way${T}high${T}high${T}max_calls=run" <<< "${b}"; }
+  _pkcase "(g) --pick: severidade 4 é banda alta e a tabela dá o nível" "${pc}" \
+    "band_of = lambda s: 'high' if s >= 4 else 'low'" "band_of = lambda s: 'high' if s >= 5 else 'low'" _pk_g
+  # (h) a tabela com porta de mão dupla acima do nível 1 é recusada (rc 2)
+  sed "s/^two-way${T}high${T}high${T}1\$/two-way${T}high${T}high${T}2/" "${lad}" > "${sb}/lad-h.tsv"
+  _pk_h() { local a; a="$(_pcr "$1" --pick two-way 1 low --ladder "${sb}/lad-h.tsv")"; PK_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q '^rc=2$' <<< "${a}" && grep -q 'mão dupla acima do nível 1' <<< "${a}"; }
+  _pkcase "(h) tabela com mão dupla acima do nível 1 sai rc 2" "${pc}" "    if int(lv) > CAP[r]: die(" "    if False: die(" _pk_h
+  # (i) a tabela incompleta é recusada (rc 2): uma célula a menos
+  grep -v "^one-way${T}low${T}low${T}" "${lad}" > "${sb}/lad-i.tsv"
+  _pk_i() { local a; a="$(_pcr "$1" --pick two-way 1 low --ladder "${sb}/lad-i.tsv")"; PK_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q '^rc=2$' <<< "${a}" && grep -q 'faltam one-way/low/low' <<< "${a}"; }
+  _pkcase "(i) tabela incompleta sai rc 2 nomeando a célula" "${pc}" "if missing: die(" "if False: die(" _pk_i
+  # (j) registro inválido (desfecho fora do enum) sai invalid e rc 1
+  local rj="${sb}/rj"; "${G[@]}" -C "${sb}" init -q rj; rj="$(cd "${rj}" && pwd -P)"; mkdir -p "${rj}/docs"
+  { printf 'meta:\n  id: j\n  schema_version: "1"\nnodes:\n'; _pknode E_BAD two-way 1 low 0 maybe; } > "${rj}/docs/j.kg.yaml"
+  "${G[@]}" -C "${rj}" add -A; "${G[@]}" -C "${rj}" commit -q -m c1
+  _pk_j() { local a; a="$(_pcr "$1" "${rj}" --tsv)"; PK_WHY="$(grep -E '^(peek|rc)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^peek${T}docs/j.kg.yaml#E_BAD${T}.*invalid(x_peek_changed_decision)" <<< "${a}" && grep -q '^rc=1$' <<< "${a}"; }
+  _pkcase "(j) desfecho fora de yes|no|pending é registro inválido e rc 1" "${pc}" \
+    "        if ch not in ('yes', 'no', 'pending'): bad.append('x_peek_changed_decision')" "        pass" _pk_j
+  # (k) nível acima da tabela COM x_peek_override vale (flag override); o medidor do repo r sai rc 0
+  _pk_k() { local a; a="$(_pcr "$1" "${r}" --tsv)"; PK_WHY="$(grep -E '^(peek.*E_OVR|rc)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^peek${T}docs/led.kg.yaml#E_OVR${T}1${T}0${T}.*${T}override\$" <<< "${a}" && grep -q '^rc=0$' <<< "${a}"; }
+  _pkcase "(k) nível acima da tabela com motivo vale como override" "${pc}" \
+    "            if not str(nd.get('x_peek_override') or '').strip():" "            if True:" _pk_k
+  # (l) recalibração para BAIXO: 5 decididas e nenhuma mudou ⇒ propõe 1 → 0
+  _pk_l() { local a; a="$(_pcr "$1" "${r}" --tsv)"; PK_WHY="$(grep -E '^(cell|propose)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^propose${T}two-way/high/med${T}1${T}0${T}5 espiada" <<< "${a}"; }
+  _pkcase "(l) célula que nunca mudou a decisão: propõe descer" "${pc}" "    if st['yes'] == 0 and lv > 0:" "    if False:" _pk_l
+  # (m) recalibração para CIMA: 3 de 5 mudaram ⇒ propõe 1 → 2
+  _pk_m() { local a; a="$(_pcr "$1" "${r}" --tsv)"; PK_WHY="$(grep -E '^(cell|propose)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^propose${T}one-way/low/med${T}1${T}2${T}3 de 5" <<< "${a}"; }
+  _pkcase "(m) célula que muda a decisão metade das vezes: propõe subir" "${pc}" \
+    "    elif st['yes'] * 2 >= dec and lv < CAP[cell[0]]:" "    elif False:" _pk_m
+  # (n) sem amostra (4 decididas), nenhuma proposta para a célula
+  _pk_n() { local a; a="$(_pcr "$1" "${r}" --tsv)"; PK_WHY="$(grep -E '^(cell|propose)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^cell${T}one-way/high/low${T}1${T}n=4" <<< "${a}" && ! grep -q "^propose${T}one-way/high/low" <<< "${a}"; }
+  _pkcase "(n) célula sem a amostra mínima não gera proposta" "${pc}" "    if dec < minn: continue" "    if False: continue" _pk_n
+  # (o) pendente há mais de 30 dias é acusado; e a fixture não entra no registro (descoberta pelo campo, fora de fixtures)
+  _pk_o() { local a; a="$(_pcr "$1" "${r}" --tsv)"; PK_WHY="$(grep -E '^(peek.*E_OLD|peek.*E_FIX|summary)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^peek${T}docs/led.kg.yaml#E_OLD${T}.*pending-old(73d" <<< "${a}" && ! grep -q 'E_FIX' <<< "${a}"; }
+  _pkcase "(o) pendente sem desfecho há mais de 30 dias é acusado" "${pc}" \
+    "(today - vd).days > 30: p['flags']" "(today - vd).days > 3000: p['flags']" _pk_o
+  _pkcase "(p) o registro numa fixture não conta" "${pc}" "':!:*fixtures*' " "" _pk_o
+  # (q) o «no» sem aspas que o YAML 1.1 lê como booleano conta como «no» (a fixture inteira o escreve assim, como um humano)
+  _pkcase "(q) yes/no sem aspas (booleano do YAML) conta como desfecho" "${pc}" "        elif ch is False: ch = 'no'" "        elif False: ch = 'no'" _pk_l
+  rm -rf "${sb}"
+}
+_family run_market_peek_selftests
+
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------

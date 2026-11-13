@@ -44,7 +44,7 @@ Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
 ```
 seu-projeto/
 ├── .claude/
-│   ├── commands/           # 119 comandos em 10 categorias
+│   ├── commands/           # 122 comandos em 11 categorias
 │   ├── agents/             # 51 agentes especializados
 │   ├── skills/             # 14 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento

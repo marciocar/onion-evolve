@@ -1,0 +1,114 @@
+# kg-backlog-guard: on
+# Registro das espiadas do /meta:peek (espiar o mercado na dúvida) e as fases abertas da forja, 2026-11-13.
+# Cada espiada é um nó com x_peek_level; o .claude/validation/peek-census.sh as descobre pelo CAMPO em qualquer grafo
+# rastreado, então espiada registrada noutro grafo também conta. Este é o lugar padrão das espiadas do core.
+meta:
+  id: peek-ledger-2026-11
+  schema_version: "1"
+  baseline: "2026-11-13"
+  review_after: "2026-12-13"   # 30d: a tabela da escada é cunhagem a medir por dogfood; a 1ª recalibração pede amostra
+  x_supersedes_none: "Superfície nova: nenhum grafo anterior é superado. A pesquisa que a ancora é docs/evolution/research/market-peek-machinery-2026-11/."
+  # ═══ TETO: 40 NÓS ═══
+  # 4 nós nascem aqui (a pergunta da recalibração, a 1ª espiada, o portal do decide e a lacuna do Reddit); a folga é
+  # para as espiadas das próximas semanas, até a 1ª célula da tabela ter amostra para o medidor propor.
+external_edges:
+  - from: Q_PEEK_LADDER_LEARNS_1113
+    to: "docs/evolution/research/market-peek-machinery-2026-11/market-peek-machinery-2026-11.kg.yaml#C_EFFORT_LADDER_BY_REVERSIBILITY_1113"
+    edge_type: TRACES_TO
+  - from: Q_PEEK_LADDER_LEARNS_1113
+    to: "docs/evolution/research/market-peek-machinery-2026-11/market-peek-machinery-2026-11.kg.yaml#C_PEEK_LEDGER_RECALIBRATION_1113"
+    edge_type: TRACES_TO
+  - from: Q_PEEK_REDDIT_GAP_1113
+    to: "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml#E_REDDIT_INACESSIVEL_DESTE_HARNESS"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_PEEK_LADDER_LEARNS_1113
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-13"
+    verified_against: "peek-census.sh no core em 2026-11-13: 1 espiada registrada, nenhuma célula com amostra mínima (5 decididas)"
+    trace: "docs/evolution/research/market-peek-machinery-2026-11/SYNTHESIS.md"
+    label: "a escada da espiada (nível por reversibilidade x severidade x incerteza) escolhe o esforço certo? O histórico de espiadas registradas deve dizer, por célula, se o degrau rende (muda a decisão) ou só custa."
+    narrative: "A ponte reversibilidade -> degrau, o registro por espiada e a recalibração pelo histórico são cunhagem Onion: a rodada de primárias de 2026-11-13 não achou evidência de mercado para nenhum dos três (recomendação do Elenxo, itens b e f). Fecha quando a 1ª célula com amostra (5 espiadas decididas) gerar proposta do peek-census.sh e o maestro aceitar ou recusar a mudança da tabela."
+    provenance:
+      source: "rodada /onion-research modo primárias wf_3157a547-84f e a forja do /meta:peek"
+      locator: "recomendação do Elenxo (itens a, b, f) no grafo market-peek-machinery-2026-11"
+      method: "judges: Elenxo da rodada, conferido pela forja"
+      locality: "host"
+  - id: E_PEEK_AGENT_IDENTITY_PER_TOOL_1113
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "community-peek.sh \"agent identity\" --since-days 60 --sources hn,github,reddit em 2026-11-13: hn 200 (16 itens), github 200 (total 9.108 no título, incomplete_results false), reddit GAP; e 2 leituras do HN Algolia items (200, 200)"
+    x_peek_level: 1
+    x_peek_reversibility: two-way
+    x_peek_severity: 4
+    x_peek_uncertainty: med
+    x_peek_calls: 4
+    x_peek_sources:
+      - "hn:200:16"
+      - "github:200:9108(titulo,incomplete=false)"
+      - "reddit:GAP"
+      - "hn-item:200:2"
+    x_peek_changed_decision: pending
+    x_peek_decision: "proposta de 2026-11-13 na caixa do core: identidade própria do agente em cada ferramenta (app onde existe, usuário de serviço onde não)"
+    label: "1ª espiada (nível 1) sobre a dúvida aberta da identidade do agente por ferramenta: a comunidade fala de DELEGAÇÃO OAuth com corretor de identidade e da granularidade da aprovação (por ferramenta x por chamada), não só de conta de serviço."
+    narrative: "Dúvida: a proposta na caixa do core pede, em cada ferramenta, identidade de app onde a plataforma oferece e usuário de serviço onde não, nunca a credencial pessoal. Classificação: porta de mão dupla (o padrão pode trocar depois), severidade 4 (credencial), incerteza média: a tabela dá nível 1. Achado (DADO de comunidade, não confiável: conteúdo de terceiro orienta, não prova): um Show HN de 2026-11-06 de um projeto de incubadora corporativa, 'Agentic Identity Broker, OAuth Delegation for AI Agents' (25 pontos, 4 comentários), em que a comunidade pergunta 'por que delegação OAuth não basta', 'como trata casos transitivos' e 'a aprovação é por ferramenta ou presa à chamada exata; e o agente sem ninguém para aprovar?'. Outros títulos do período: 'Design Tenets for Agent Identity Management Systems' (2026-11-04), 'Arken, identidade criptográfica para agentes que chamam MCP' (2026-11-02), 'Agent identity is a really hard problem' (2026-10-15). No GitHub, uma issue de 2026-11-13 de uma ferramenta de BI com servidor MCP: o login OAuth do app desktop falha quando a opção agent-identity está ligada, sinal de que fornecedores já expõem a identidade do agente como opção. Efeito na dúvida: acrescenta uma terceira opção (delegação com corretor) e uma pergunta que a proposta não faz (granularidade da aprovação, por ferramenta ou por chamada), que é a mesma da proposta irmã do agente agir com o privilégio do solicitante. A decisão é da triagem da proposta, então o desfecho fica pending. Custo: 4 chamadas, mais 8 de ajuste do próprio executor antes desta (o filtro por título no HN e no GitHub nasceu delas: sem ele, três palavras devolveram 225.476 resultados no GitHub)."
+    trace: "bash .claude/utils/peek/community-peek.sh \"agent identity\" --since-days 60 --sources hn,github,reddit ; curl -s https://hn.algolia.com/api/v1/items/50393235 ; curl -s https://hn.algolia.com/api/v1/items/50098626"
+    provenance:
+      source: "HN Algolia search_by_date e items, GitHub REST search/issues"
+      locator: "news.ycombinator.com/item?id=50393235 · id=50360940 · id=50333115 · id=50098626 · github.com/lightdash/lightdash/issues/32605"
+      method: "measurement: community-peek.sh, http_code conferido por fonte"
+      locality: "host"
+  - id: Q_PEEK_DECIDE_PORTAL_1113
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "brief da forja do /meta:peek (2026-11-13): o portal no /meta:decide fica para um 2º PR quando a peça ficar grande"
+    label: "2º PR: o /meta:decide passa a exigir, por opção, a citação de mercado ou o registro 'espiei e não há' (um nó com x_peek_level), com a doutrina do decide, o medidor e a bancada mudados juntos."
+    narrative: "Fora desta forja por tamanho: a peça (doutrina, executor, medidor, tabela, comando, bancada e registro) já é o PR inteiro. O desenho do portal: o decide-census.sh lista, por nó decision open citado, as opções sem aresta para um nó de espiada nem citação de mercado; a doutrina do decide ganha a cláusula; a bancada prova que a opção sem citação aparece e que a opção com 'espiei e não há' não aparece."
+    provenance:
+      source: "brief da forja do /meta:peek, pela sessão do core"
+      locator: "passo 2, último item do brief de 2026-11-13"
+      method: "testimony: pedido do maestro repassado pela sessão do core"
+      locality: "pessoa"
+  - id: Q_PEEK_REDDIT_GAP_1113
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "rodada wf_3157a547-84f: www.reddit.com e old.reddit.com /r/ClaudeAI/new.json devolveram 403 desta VPS em 2026-11-13"
+    label: "o Reddit fica como lacuna declarada da espiada (403 medido); entra quando alguém medir um caminho que responda (.rss ou OAuth com termos da Data API lidos)."
+    narrative: "O community-peek.sh imprime a linha GAP do Reddit em vez de consultar ou prometer. Os termos da Data API (OAuth, limites, uso não comercial) seguem sem evidência."
+    provenance:
+      source: "rodada /onion-research wf_3157a547-84f"
+      locator: "E_LACUNAS_MARKET_PEEK_MACHINERY_1113, fontes inalcançáveis"
+      method: "measurement: curl com http_code, 2026-11-13"
+      locality: "host"
+edges:
+  - from: E_PEEK_AGENT_IDENTITY_PER_TOOL_1113
+    to: Q_PEEK_LADDER_LEARNS_1113
+    edge_type: SUPPORTS
+  - from: Q_PEEK_DECIDE_PORTAL_1113
+    to: Q_PEEK_LADDER_LEARNS_1113
+    edge_type: TRACES_TO
+  - from: Q_PEEK_REDDIT_GAP_1113
+    to: Q_PEEK_LADDER_LEARNS_1113
+    edge_type: TRACES_TO

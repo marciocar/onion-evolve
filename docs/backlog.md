@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1120 itens abertos** em 169 grafo(s) com aberto (de 226 no escopo) · 163 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1135 itens abertos** em 171 grafo(s) com aberto (de 228 no escopo) · 165 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -54,6 +54,23 @@
 | 3.0 | `C_SUPERACAO_20261113_SLACK_APP_MENTION_PAYLOAD_EXAMPLE` | agent-requester-privilege-2026-11 | O exemplo de payload do app_mention traz user no evento, team_id no topo e authorizations (user_id, is_bot, is_enterprise_install) |
 | 3.0 | `C_SUPERACAO_20261113_SLACK_BOT_TOKEN_TIED_TO_APP` | agent-requester-privilege-2026-11 | No Slack, o bot token está ligado ao app, não à identidade de um usuário. Sem a glosa 'privilégio próprio único'. |
 | 3.0 | `C_SUPERACAO_20261113_SLACK_USER_WRITE_AS_USER` | agent-requester-privilege-2026-11 | No Slack, escrita com user token é feita como se fosse do próprio usuário: 'Write actions with user tokens are performed as if  |
+
+## market-peek-machinery-2026-11 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 144.0 | `Q_MARKET_PEEK_MACHINERY_1113` | market-peek-machinery-2026-11 | Como o agente decide quanto esforço de descoberta uma dúvida de desenho merece (valor da informação, porta de mão única x du |
+| 44.0 | `C_LOCAL_COMMUNITY_LISTENER_1113` | market-peek-machinery-2026-11 | Hipótese: escuta de comunidade por delta (HN Algolia search_by_date, GitHub search, Lobsters) roda local e barata, declarando a f |
+| 33.6 | `C_EFFORT_LADDER_BY_REVERSIBILITY_1113` | market-peek-machinery-2026-11 | Hipótese de desenho (cunhagem Onion): escada fixa de esforço da espiada indexada por reversibilidade x severidade da dúvida, co |
+| 15.0 | `C_ELENXO_RECOMMENDATION_1113` | market-peek-machinery-2026-11 | Recomendação do Elenxo: escada de esforço no prompt é mercado; ligá-la à reversibilidade é cunhagem Onion; escuta de HN/Git |
+| 7.0 | `C_PEEK_LEDGER_RECALIBRATION_1113` | market-peek-machinery-2026-11 | Hipótese de desenho (sem evidência de mercado nesta rodada): registrar por espiada o custo, as fontes, o http_code e o incomplet |
+| 5.4 | `C_SUPERACAO_20261113_HN_COMMENTS_ENCODE_GT` | market-peek-machinery-2026-11 | Mesma codificação %3E do operador na variante de comentários (tags=comment), conferindo o http_code. |
+| 5.4 | `C_SUPERACAO_20261113_HN_ENCODE_GT_OPERATOR` | market-peek-machinery-2026-11 | Codificar o operador do numericFilters (created_at_i%3E<ts>) ou usar curl -G --data-urlencode, conferindo o http_code de cada espi |
+| 3.0 | `C_SUPERACAO_20261113_EVPI_BOUND_WITH_SURVEY_EXAMPLE` | market-peek-machinery-2026-11 | Formulação do próprio slide: o valor esperado de qualquer fonte fica entre zero e o EVPI, com o exemplo do levantamento de US$  |
+| 3.0 | `C_SUPERACAO_20261113_F5BOT_SIGNUP_SERVICE_PRICES` | market-peek-machinery-2026-11 | F5Bot é serviço web de cadastro que monitora Reddit, Hacker News e Lobsters, com planos Free US$0, Silver US$12,99/mês e Gold U |
+| 3.0 | `C_SUPERACAO_20261113_GEMINI_PLAN_REVISE_OR_APPROVE` | market-peek-machinery-2026-11 | Gemini Deep Research cria plano multi-etapas que o usuário revisa ou aprova antes de a pesquisa começar, sem seletor de profundi |
+| 3.0 | `C_SUPERACAO_20261113_MULTIAGENT_ECONOMIC_VIABILITY` | market-peek-machinery-2026-11 | Viabilidade econômica do multiagente exige valor da tarefa alto o bastante para cobrir o custo extra de tokens (4x agente, 15x mu |
+| 3.0 | `C_SUPERACAO_20261113_VOI_PURCHASE_IF_NOT_ONLY_IF` | market-peek-machinery-2026-11 | Formulação condicional do slide (comprar dados SE o VOI excede o preço, nunca 'só se'), com a propriedade c e o aviso de decis |
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1098,7 +1115,7 @@
 | 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
 | 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
 
-## core — 45 item(ns)
+## core — 47 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1108,6 +1125,7 @@
 | 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
 | 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
 | 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
+| 12.0 | `Q_PEEK_LADDER_LEARNS_1113` | peek-ledger-2026-11 | a escada da espiada (nível por reversibilidade x severidade x incerteza) escolhe o esforço certo? O histórico de espiadas regis |
 | 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
@@ -1121,6 +1139,7 @@
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 4.8 | `Q_ADOPTER_VETOES_RESIDUE_1108` | adopter-vetoes-2026-11 | Depois da REGRA 118, sobra um resíduo de classes de ato que ainda passa pelos hooks no adotante; ele vira pergunta própria, aber |
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
+| 4.8 | `Q_PEEK_DECIDE_PORTAL_1113` | peek-ledger-2026-11 | 2º PR: o /meta:decide passa a exigir, por opção, a citação de mercado ou o registro 'espiei e não há' (um nó com x_peek_le |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
@@ -1756,6 +1775,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `Q_REGISTRO_DO_CONSULTORIA_DIVERGE_DO_CLONE` | member-paths-2026-11 | com o clone legível, o pin do registro (6c4272252528) diverge do carimbo da origin/main do clone (e4c954ebad47): o --seal do memb |
+
+## peek-ledger-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_PEEK_REDDIT_GAP_1113` | peek-ledger-2026-11 | o Reddit fica como lacuna declarada da espiada (403 medido); entra quando alguém medir um caminho que responda (.rss ou OAuth com |
 
 ## cortex-2026-10 — 5 item(ns)
 

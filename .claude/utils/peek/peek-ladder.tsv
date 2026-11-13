@@ -1,0 +1,21 @@
+# Escada da espiada (/meta:peek) — a TABELA que escolhe o nível pela dúvida. CUNHAGEM ONION, não padrão de mercado.
+# A taxonomia porta de mão única x dupla vem da carta aos acionistas da Amazon de 2015; o degrau-base de 3-10 chamadas
+# vem da escada de esforço da Anthropic (que escala por COMPLEXIDADE, não por reversibilidade). A ponte
+# reversibilidade -> degrau é nossa (C_EFFORT_LADDER_BY_REVERSIBILITY_1113) e se recalibra pelo histórico: o
+# peek-census.sh PROPÕE a mudança de célula, e quem edita esta tabela é o maestro. VOI/EVPI só como teto conceitual.
+# Invariante que o medidor cobra (rc 2 se violado): as 12 combinações aparecem uma vez cada, nível de 0 a 3, e porta de
+# mão DUPLA nunca passa do nível 1 pela tabela (o alerta da carta: processo de Tipo 1 usado em decisão de Tipo 2).
+# reversibility: one-way | two-way · severity_band: low (1-3) | high (4-5) · uncertainty: low | med | high
+reversibility	severity_band	uncertainty	level
+two-way	low	low	0
+two-way	low	med	0
+two-way	low	high	1
+two-way	high	low	0
+two-way	high	med	1
+two-way	high	high	1
+one-way	low	low	1
+one-way	low	med	1
+one-way	low	high	2
+one-way	high	low	1
+one-way	high	med	2
+one-way	high	high	3
