@@ -2,7 +2,8 @@
 branch: chore/kg-private-cite-migration
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: aa1a4aa7f8fefd779517d2b800e041696d50e5ea295a9a6e0d6b034c09f01e09
+reviewed_code_sha256: bc2251065f31b3640821134fe1d2f6e98e1419ed69650cffa390dfd95709d301
 findings_total: 10
 findings_real: 10
 findings_blocking: 9
