@@ -113,6 +113,22 @@ nodes:
       locator: "branch feat/review-mode-switch"
       method: "measurement: LC_ALL=C bash .claude/validation/lint-selftest.sh --families review_mode,pr_merge_verified ; gh api repos/marciocar/onion-evolve/check-runs/<id>/annotations nos PRs #887 e #923"
       locality: "repo"
+  - id: D_REVIEW_AUTO_WITH_FALLBACK_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Modo auto com a regra de necessidade igual à lista de guardas derivada do moat-targets.tsv (a mesma do item 3 da delegação); fallback para quando faltar crédito ou o maestro pedir off: o PR sensível exige resíduo com refutador independente (elenxo_isolado) em vez do parecer do CI, e o merge não trava por saldo; o maestro põe o crédito com teto mensal e liga a variável»"
+    label: "o revisor de IA do CI volta em modo auto, só nos PRs que tocam guarda (a mesma lista derivada que trava o merge da sessão), e quando não há crédito ou o maestro o desliga, o fallback exige refutador independente registrado no resíduo, sem travar o fluxo"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Modo auto com a regra de necessidade igual à lista de guardas derivada do moat-targets.tsv (a mesma do item 3 da delegação); fallback para quando faltar crédito ou o maestro pedir off: o PR sensível exige resíduo com refutador independente (elenxo_isolado) em vez do parecer do CI, e o merge não trava por saldo; o maestro põe o crédito com teto mensal e liga a variável» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Modo on em todo PR» · «Manter off»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «Religar o revisor independente do CI agora que a sessão faz merge sozinha?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
 edges:
   - from: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO
     to: E_REVISOR_CAI_POR_SALDO_DE_API
@@ -129,3 +145,6 @@ edges:
   - from: E_REVIEW_MODE_SWITCH_FORJADO
     to: D_REVIEW_MODE_SWITCH_PADRAO_OFF
     edge_type: SUPPORTS
+  - from: D_REVIEW_AUTO_WITH_FALLBACK_1113
+    to: D_REVIEW_MODE_SWITCH_PADRAO_OFF
+    edge_type: TRACES_TO
