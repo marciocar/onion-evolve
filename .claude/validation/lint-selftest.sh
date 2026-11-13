@@ -22196,7 +22196,18 @@ run_review_mode_selftests() {
     --classify-credit --evidence-dir "${d}/ev4"
   _p_pos() { [ "${_rc}" -eq 0 ] && grep -qx "::notice::onion-review-revisado: o revisor de IA do CI revisou e aprovou o head $(printf '%040d' 3)" <<< "${_o}"; }
   _rmcase "(pos-a) a marca POSITIVA leva o sha do head (é o que o merge-verified aceita num PR de guarda)" _p_pos \
-    'POS_MARKER="onion-review-revisado:"' 'POS_MARKER="outra-marca:"' --reviewed-mark --head "$(printf '%040d' 3)"
+    'POS_MARKER="onion-review-revisado:"' 'POS_MARKER="outra-marca:"' --reviewed-mark --head "$(printf '%040d' 3)" --achados 0
+  # N1 (3ª passada): a marca SÓ com achados exatamente 0; -1 e vazio (não pude contar, árvore suja) saem sem ela
+  _p_nopos() { [ "${_rc}" -eq 0 ] && grep -qF "sem marca positiva" <<< "${_o}" && ! grep -qF "onion-review-revisado:" <<< "${_o}"; }
+  _rmcase "(pos-b) achados -1 (não pude contar / árvore suja) ⇒ SEM marca positiva" _p_nopos \
+    'if [ "${5-}" != "0" ]; then' 'if false; then' --reviewed-mark --head "$(printf '%040d' 3)" --achados -1
+  _rmcase "(pos-c) achados vazio ⇒ SEM marca positiva" _p_nopos \
+    'if [ "${5-}" != "0" ]; then' 'if false; then' --reviewed-mark --head "$(printf '%040d' 3)" --achados ""
+  # retry: um result de crédito seguido de um result de SUCESSO não é crédito (vale o último evento)
+  mkdir -p "${d}/ev5"
+  printf '[{"type":"result","is_error":true,"result":"Credit balance is too low"},{"type":"result","is_error":false,"result":"VEREDITO: conforme"}]' > "${d}/ev5/claude-execution-output.json"
+  _rmcase "(cr-g) result de crédito seguido de result de sucesso (retry) ⇒ NÃO é crédito (vale o último)" _p_nocr \
+    '| last // empty' '| first // empty' --classify-credit --evidence-dir "${d}/ev5"
   _p_fb() { [ "${_rc}" -eq 0 ] && grep -qF "::notice::onion-review-desligado: não revisado pelo CI: sem crédito na API" <<< "${_o}" \
             && grep -qF "toca GUARDA" "${d}/cf" && grep -qF "<!-- onion-review-fallback -->" "${d}/cf"; }
   _rmcase "(fb-a) falta de crédito ⇒ verde COM a marca que o merge-verified lê + comentário com a exigência" _p_fb \
@@ -22280,7 +22291,7 @@ PYW
     else record_fail "review-mode: (s) fiação do workflow" "${_o}"; fi
     unset -f _wire
   fi
-  unset -f _rmrun _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go _p_g_auto _p_cr _p_nocr _p_fb _p_pos
+  unset -f _rmrun _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go _p_g_auto _p_cr _p_nocr _p_fb _p_pos _p_nopos
 }
 
 # ---------------------------------------------------------------------------
@@ -26977,7 +26988,7 @@ PFSTUB
   _p_dupk() { [ "${_mv_rc}" -ne 0 ] && grep -qF "repete chave no frontmatter (elenxo_isolado" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
   export GH_PR_FILES="ops/deploy-site.sh" STUB_RESIDUE="${d}/nao-existe.md"
   _rvcase "(rv-j) PR de GUARDA com veredito VERDE SEM marca (gate do HEAD mudado, B1b) ⇒ fallback, sem resíduo RECUSA" _p_nomark \
-    'if [ -n "${_REVIEW_POS}" ] && [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ] && LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"; then' 'if [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ]; then' \
+    'if [ -z "${_disp}" ] && [ -n "${_REVIEW_POS}" ] && [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ] && LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"; then' 'if [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ]; then' \
     '230\tsuccess\n' 0 0
   _rvcase "(rv-k) PR de GUARDA com a marca POSITIVA do juiz da base no head ⇒ mergeia sem resíduo" _p_pos \
     'case "${_rm_pos}" in onion-review-*:)' 'case "${_rm_pos}" in nada-*:)' \
@@ -26993,8 +27004,23 @@ PFSTUB
   _rvcase "(rv-n) resíduo com CHAVE REPETIDA no frontmatter (o bash lê a 1ª, o YAML a última) ⇒ RECUSA" _p_dupk \
     '[ -z "${_dup}" ] || die "${_why}; ${_rel} repete' 'true || die "${_why}; ${_rel} repete' \
     '210\tsuccess\n' 0 0
+  # ── (rv-o..q) 3ª passada: N3 (a dispensa do vermelho num PR de guarda exige o resíduo) e N2 (o que o CLI carrega) ──
+  _p_disp() { [ "${_mv_rc}" -ne 0 ] && grep -qF "foi DISPENSADO (a dispensa não substitui" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_mach2() { [ "${_mv_rc}" -ne 0 ] && grep -qF "muda a maquinaria do revisor ($1" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_m_claude() { _p_mach2 "CLAUDE.md"; }
+  _p_m_hook() { _p_mach2 ".claude/hooks/x.sh"; }
+  export GH_PR_FILES="ops/deploy-site.sh" STUB_RESIDUE="${d}/nao-existe.md"
+  _rvcase "(rv-o) veredito VERMELHO + --dispensa num PR de GUARDA sem resíduo ⇒ RECUSA (a dispensa não substitui)" _p_disp \
+    '    _dispensado onion-review-verdict || return 0' '    return 0' \
+    '300\tfailure\n' 1 0 --dispensa onion-review-verdict --motivo "o achado é falso-positivo"
+  export GH_PR_FILES="ops/deploy-site.sh CLAUDE.md"
+  _rvcase "(rv-p) PR de GUARDA que muda o CLAUDE.md (o revisor o carrega) com marca positiva ⇒ a marca não vale" _p_m_claude \
+    '|CLAUDE\.md$|' '|' '220\tsuccess\n' 0 0
+  export GH_PR_FILES=".claude/hooks/x.sh"
+  _rvcase "(rv-q) PR que muda um HOOK (roda dentro do job do revisor) com marca positiva ⇒ a marca não vale" _p_m_hook \
+    '|\.claude/hooks/|' '|' '220\tsuccess\n' 0 0
   unset GH_PR_FILES STUB_RESIDUE
-  unset -f _p_fb_nores _p_fb_umavoz _p_fb_ok _p_fb_comum _p_nomark _p_pos _p_mach _p_dupk
+  unset -f _p_fb_nores _p_fb_umavoz _p_fb_ok _p_fb_comum _p_nomark _p_pos _p_mach _p_dupk _p_disp _p_mach2 _p_m_claude _p_m_hook
 
   # ── (th1)-(th3) TOCTOU: O HEAD MUDA ENTRE O JULGAMENTO E O MERGE (2026-10-27) ─────────────────
   # Caso vivo da curadoria (PRs #117 e #118 de 2026-10-26, --merge-commit): os gates julgavam os check-runs

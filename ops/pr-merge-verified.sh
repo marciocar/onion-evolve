@@ -1074,10 +1074,20 @@ fi
 # de sempre (dispensa nomeada). Leitura que falha = recusa (fail-closed): "não medi" não vira "não toca".
 # TETO DECLARADO: `elenxo_isolado: true` é AUTO-ATESTADO no resíduo; o script exige a declaração, não a prova.
 _FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
-_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$)'
+# A MAQUINARIA do revisor (3ª passada do refutador do #1652, N2): além do workflow e dos scripts do veredito, o que o CLI
+# do revisor CARREGA do head do PR — os hooks e o settings que os registra (o próprio onion-review.yml o registra:
+# "settings e 14 hooks presentes"), o CLAUDE.md, os agentes, as skills e o .mcp.json. Um hook do PR roda dentro do job
+# e escreve a anotação que quiser. Medido sobre TODOS os arquivos do PR (nome antigo do rename incluso), não só a guarda.
+_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$|\.claude/hooks/|\.claude/settings[^/]*\.json$|CLAUDE\.md$|\.claude/CLAUDE\.md$|\.claude/agents/|\.claude/skills/|\.mcp\.json$)'
 _fallback_guard_gate() {
-  [ -z "${_REVIEW_PRIOR_REPROVOU}" ] || return 0
-  [ "${_RV_STATE}" != "other" ] || return 0
+  # veredito VERMELHO (ou achado anterior apagado por desligamento): sem dispensa, o caminho de sempre recusa adiante.
+  # COM a dispensa nomeada, num PR de guarda ela também exige o resíduo independente (3ª passada do refutador, N3):
+  # dispensar o parecer do CI não pode ser mais barato do que não tê-lo.
+  local _disp=""
+  if [ -n "${_REVIEW_PRIOR_REPROVOU}" ] || [ "${_RV_STATE}" = "other" ]; then
+    _dispensado onion-review-verdict || return 0
+    _disp=1
+  fi
   [ -f "${_rm_script}" ] || return 0
   local _here _slug _core _gh _grc=0 _gout
   _here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -1097,12 +1107,16 @@ _fallback_guard_gate() {
     *) die "não medi se o PR #${PR} toca guarda (${_gout:0:200}). Nada foi mergeado." ;;
   esac
   local _mach _reason
-  _mach="$(LC_ALL=C grep -E "${_REVIEW_MACHINERY_RE}" <<< "${_gout}" | head -3 | paste -sd' ' -)"
-  if [ -n "${_REVIEW_POS}" ] && [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ] && LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"; then
+  local _allf _arc=0
+  _allf="$(bash "${_gh}" --pr "${PR}" --repo "${_slug}" --all 2>&1)" || _arc=$?
+  [ "${_arc}" -eq 0 ] || die "não li todos os arquivos do PR #${PR} (${_allf:0:200}): sem eles não sei se o PR muda a maquinaria do revisor. Nada foi mergeado."
+  _mach="$(LC_ALL=C grep -E "${_REVIEW_MACHINERY_RE}" <<< "${_allf}" | head -3 | paste -sd' ' -)"
+  if [ -z "${_disp}" ] && [ -n "${_REVIEW_POS}" ] && [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ] && LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"; then
     say "✓ PR de GUARDA revisado pelo CI: marca positiva do juiz da base no head ${GATE_SHA:0:8}"
     return 0
   fi
-  if [ -n "${_REVIEW_OFF}" ]; then _reason="o revisor do CI não julgou (${_REVIEW_OFF#*: })"
+  if [ -n "${_disp}" ]; then _reason="o veredito do revisor não aprovou e foi DISPENSADO (a dispensa não substitui a revisão num PR de guarda)"
+  elif [ -n "${_REVIEW_OFF}" ]; then _reason="o revisor do CI não julgou (${_REVIEW_OFF#*: })"
   elif [ -n "${_mach}" ]; then _reason="o PR muda a maquinaria do revisor (${_mach}), e a marca do CI não vale para quem a reescreve"
   elif [ "${_RV_STATE}" = "none" ]; then _reason="não li veredito do revisor neste head"
   else _reason="o veredito verde não traz a marca positiva do juiz da base para o head ${GATE_SHA:0:8}"; fi

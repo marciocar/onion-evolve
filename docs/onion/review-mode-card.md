@@ -24,9 +24,20 @@ Só o verde com a **marca positiva** `onion-review-revisado: … o head <sha>`. 
 - um verde sem marca nenhuma (por exemplo, um PR que mudou o gate);
 - nenhum veredito no head.
 
-A marca positiva **não vale** quando o PR muda a maquinaria do revisor: `.github/workflows/`, `ops/review/`,
-`review-verdict.sh` e `post-review-comment.sh`. O workflow de um `pull_request` é o do head, e por isso um PR
-que o edita consegue forjar qualquer anotação.
+A marca só sai com a contagem de achados **exatamente 0**. Com `-1` ou vazio ("não pude contar", inclusive
+a árvore suja), o check segue verde, mas sem a marca.
+
+A marca positiva **não vale** quando o PR muda a maquinaria do revisor. São duas partes:
+
+- **os scripts do veredito:** `.github/workflows/`, `ops/review/`, `review-verdict.sh` e `post-review-comment.sh`;
+- **o que o CLI do revisor carrega do head:** `.claude/hooks/`, `.claude/settings*.json`, `CLAUDE.md`,
+  `.claude/agents/`, `.claude/skills/` e `.mcp.json`.
+
+O workflow de um `pull_request` é o do head, e um hook do PR roda dentro do job. Por isso esse PR consegue
+forjar qualquer anotação. A medição cobre **todos** os arquivos do PR, inclusive o nome antigo de um rename.
+
+**Dispensar** o veredito vermelho (`--dispensa onion-review-verdict`) num PR de guarda também exige o resíduo
+independente: a dispensa não substitui a revisão.
 
 ## O fallback (sem crédito, sem chave, `off`, ou a action auto-pulada)
 
@@ -94,5 +105,18 @@ No `onion-review-verdict`, a linha `⊘ Não revisado pelo CI: …` indica fallb
   e ele cai no resíduo.
 - **Com o #1647 em vigor, a sessão nem mergeia PR de guarda:** o merge dele é do maestro (`--maestro`). A
   exigência do resíduo cobre o caminho que sobra até lá e é o que o maestro confere antes do merge.
+- **O bootstrap depende de um literal.** O job do veredito decide se usa o juiz da base procurando o texto
+  `--achados <n>` nele, e o job do modo procura `--guard-helper`. Uma capacidade nova que não mude esse
+  literal faz a base velha rodar sem ela. Uma que o mude faz o PR que a introduz rodar o juiz do próprio PR,
+  mas esse PR toca `ops/review/` e cai no resíduo.
+- **A evidência é escrita no runner em que o revisor tem `Bash`.** Um revisor manipulado por injeção pode
+  escrever no `RUNNER_TEMP`, e o conteúdo do head (`CLAUDE.md`, `.claude/agents/`) é uma via de injeção.
+  O efeito fica limitado, pelas três razões abaixo:
+  - a falta de crédito só conta com `is_error: true` no **último** evento `result`;
+  - um retry que deu certo não conta como falta de crédito;
+  - o PR que muda essas vias não ganha marca.
+- **O fecho de 2º nível** (o que os scripts do fecho executam, como o `materialize-marketplace-repo`, o
+  `vendor-manifest.sh`, o `selftest-families.py` e o `load-lease.sh`) é curado no #1647, no mesmo tsv. O
+  helper lê as linhas `fecho` de lá e não duplica a lista.
 - **A frase de crédito só vale no evento `result`.** O resto do arquivo de evidência (o diff, as saídas
   das ferramentas) é ignorado de propósito: um PR não tira o próprio vermelho escrevendo a frase.

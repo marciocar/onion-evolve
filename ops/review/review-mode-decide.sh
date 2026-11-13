@@ -205,8 +205,16 @@ case "${1:-}" in
   --print-marker) printf '%s\n' "${MARKER}"; exit 0 ;;
   --print-reviewed-marker) printf '%s\n' "${POS_MARKER}"; exit 0 ;;
   --reviewed-mark)
-    [ "${2:-}" = "--head" ] && grep -qE '^[0-9a-f]{40}$' <<< "${3:-}" \
-      || { printf '::error::review-mode-decide --reviewed-mark exige --head <sha de 40 hex>\n'; exit 1; }
+    # `--reviewed-mark --head <sha> --achados <n>`. A marca sai SÓ com achados EXATAMENTE 0 (3ª passada do refutador,
+    # N1): o gate de achados deixa passar -1 e vazio ("não pude contar", inclusive a árvore suja, que o job do revisor
+    # converte em -1), e verde sem contagem não é aprovação. Sem a marca, o merge-verified trata o PR de guarda como
+    # fallback (resíduo independente). Contagem fora de 0 não é erro: o check segue verde, só sem a marca.
+    [ "${2:-}" = "--head" ] && grep -qE '^[0-9a-f]{40}$' <<< "${3:-}" && [ "${4:-}" = "--achados" ] \
+      || { printf '::error::review-mode-decide --reviewed-mark exige --head <sha de 40 hex> --achados <n>\n'; exit 1; }
+    if [ "${5-}" != "0" ]; then
+      printf '::notice::sem marca positiva: a contagem de achados veio "%s", não 0 (não pude contar, ou árvore suja) — num PR de guarda o merge pede o resíduo independente\n' "$(_one_line "${5-}")"
+      exit 0
+    fi
     printf '::notice::%s o revisor de IA do CI revisou e aprovou o head %s\n' "${POS_MARKER}" "$3"; exit 0 ;;
   --classify-credit) shift; _classify_credit "$@"; exit $? ;;
   --fallback) shift; _fallback_cli "$@"; exit $? ;;
