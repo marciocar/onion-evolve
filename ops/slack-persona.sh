@@ -209,10 +209,16 @@ ctl = sorted(set("%r" % c for c in txt if (ord(c) < 32 and c != "\n") or ord(c) 
 if ctl:
     print("caractere de controle na unit: %s" % ", ".join(ctl[:5]))
     sys.exit(1)
+# F2 da 3ª passada do refutador do #1647: o strip() do Python come o NBSP (U+00A0), e o systemd não: a chave
+# "\xa0DynamicUser" passava aqui como DynamicUser e lá era ignorada (o serviço rodava como root). Então nada de strip:
+# fora das linhas de comentário (# ou ; na coluna 0, que o systemd descarta inteiras), só ASCII imprimível; a linha
+# casa com ^[A-Za-z]+= sem espaço nenhum. Os comentários da unit real são em pt-BR (acentos), por isso a exceção.
 for n, ln in enumerate(re.split(r"[\r\n]", txt), 1):
-    t = ln.strip()
+    t = ln
     if not t or t[0] in "#;":
         continue
+    if any(not (32 <= ord(c) <= 126) for c in t):
+        bad.append("linha %d: caractere fora do ASCII imprimível fora de comentário" % n); continue
     if t.endswith("\\"):
         bad.append("linha %d: continuação de linha" % n); continue
     m = re.fullmatch(r"\[(Unit|Service|Install)\]", t)
@@ -221,9 +227,11 @@ for n, ln in enumerate(re.split(r"[\r\n]", txt), 1):
     if t.startswith("["):
         bad.append("linha %d: seção fora da allowlist: %s" % (n, t)); continue
     m = re.fullmatch(r"([A-Za-z]+)=(.*)", t)
+    if m and m.group(2) != m.group(2).strip():
+        bad.append("linha %d: espaço nas pontas do valor" % n); continue
     if not m or sec is None:
         bad.append("linha %d: não é diretiva de seção conhecida" % n); continue
-    k, v = (sec, m.group(1)), m.group(2).strip()
+    k, v = (sec, m.group(1)), m.group(2)
     if k in FIX:
         if v not in FIX[k]:
             bad.append("%s=%s fora do valor fixo" % (k[1], v[:80]))
@@ -238,6 +246,20 @@ for k in sorted(REQ - seen):
 print("; ".join(bad[:6]))
 sys.exit(1 if bad else 0)
 '
+}
+
+# A UNIT EFETIVA (F2): depois do daemon-reload, o que o systemd de fato carregou, contra o esperado. A allowlist confere o
+# TEXTO; esta confere a LEITURA do systemd (o que um parser diferente do nosso entendesse diferente aparece aqui).
+effective_ok() { # rc 0 = o efetivo bate; imprime o que diverge
+  local k want got bad=""
+  for k in DynamicUser User CapabilityBoundingSet AmbientCapabilities; do
+    case "${k}" in DynamicUser) want=yes ;; User) want=onion-slack-persona ;; *) want="" ;; esac
+    got="$(priv systemctl show -p "${k}" --value "${UNIT}" 2>/dev/null)" || { bad="${bad} ${k}=(ilegível)"; continue; }
+    [ "${got}" = "${want}" ] || bad="${bad} ${k}='${got}' (esperado '${want}')"
+  done
+  got="$(priv systemctl show -p ExecStartPre,ExecStartPost,ExecStop,ExecStopPost,ExecReload,ExecCondition --value "${UNIT}" 2>/dev/null | tr -d '[:space:]')"
+  [ -z "${got}" ] || bad="${bad} Exec* além do ExecStart"
+  [ -z "${bad}" ] || { echo "${bad# }"; return 1; }
 }
 
 cmd_install() {
@@ -276,6 +298,10 @@ cmd_install() {
   fi
   priv rm -f -- "${tmpd}/${UNIT}.service"; priv rmdir -- "${tmpd}"
   priv systemctl daemon-reload || die 2 "daemon-reload falhou"
+  local eff; if ! eff="$(effective_ok)"; then
+    priv rm -f -- "${dst}"; priv systemctl daemon-reload
+    die 1 "a unit EFETIVA diverge do esperado (${eff}): removida e recarregada, nada ligado. Restaure o backup se havia: ${BACKUP}"
+  fi
   say "unit instalada (não ligada). Backup: ${BACKUP}/${UNIT}.service.${ts} (se havia). Próximo: ops/slack-persona.sh start"
   say "ROLLBACK: sudo rm ${dst} && sudo systemctl daemon-reload"
 }
@@ -320,6 +346,7 @@ preflight_start() {
 
 cmd_start() {
   need_sudo; preflight_start
+  local eff; eff="$(effective_ok)" || die 1 "a unit EFETIVA diverge do esperado (${eff}): não ligo. Reinstale pelo install --apply"
   priv systemctl enable "${UNIT}" >/dev/null 2>&1 || die 2 "enable falhou"
   priv systemctl restart "${UNIT}" || die 2 "restart falhou (journalctl -u ${UNIT})"
   if wait_connected; then say "ligada: conectada ao Slack nesta invocação"; say "ROLLBACK: sudo systemctl disable --now ${UNIT}"; return 0; fi

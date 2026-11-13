@@ -201,7 +201,16 @@ _CORE_SESSION=0
 [ "${ONION_PR_MERGE_VERIFIED_TEST:-0}" = 1 ] && _SESSION_CWD=""
 [ -n "${_SESSION_CWD}" ] && [ -n "${_PMV_COMMON}" ] \
   && [ "$(git -C "${_SESSION_CWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" = "${_PMV_COMMON}" ] && _CORE_SESSION=1
-_PMV_CORE_SLUG="$(_slug_norm "$(git -C "${_PMV_DIR}" remote get-url origin 2>/dev/null)")"
+# O SLUG DO CORE não sai da config do git (F1 da 3ª passada do refutador): GIT_DIR, GIT_CONFIG_* com url.X.insteadOf, um
+# include no ~/.gitconfig ou o .git/config editado faziam o origin "do core" apontar o outro repo, e alvo e core empatavam.
+# Ele sai do `remote:` do membro `kind: source` do members.yaml DESTE checkout (arquivo versionado), e na falta, da constante.
+_PMV_CORE_CONST=marciocar/onion-evolve
+_PMV_CORE_SLUG="$(awk '
+  /^[[:space:]]*-[[:space:]]+id:/ { if (src && rem != "") { print rem; exit } src = 0; rem = "" }
+  /^[[:space:]]+kind:[[:space:]]*source([[:space:]#]|$)/ { src = 1 }
+  /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v); gsub(/["'"'"' ]/, "", v); rem = v }
+  END { if (src && rem != "") print rem }' "${_PMV_DIR}/docs/evolution/federation/members.yaml" 2>/dev/null | head -1)"
+_PMV_CORE_SLUG="$(_slug_norm "${_PMV_CORE_SLUG:-${_PMV_CORE_CONST}}")"
 # Sem --repo, o gh NÃO resolve pelo origin: um remote com `remote.<nome>.gh-resolved` (o `gh repo set-default`) vence
 # (re-refutação do #1647, N1: `git remote add sge …; gh repo set-default …/sge; bash pmv.sh 12` mergeava no sge). Então o
 # alvo sem --repo é o conjunto de TODOS os remotes do repo do cwd, mais o GH_REPO e os gh-resolved com nome de repo; se
@@ -225,6 +234,11 @@ fi
 if [ "${_CORE_SESSION}" = 1 ] && [ -n "${_PMV_TARGET}" ] && [ "${_PMV_TARGET}" != "${_PMV_CORE_SLUG}" ] \
    && [ "${DELEGATED_FOREIGN}" -eq 0 ] && [ "${MAESTRO}" -eq 0 ]; then
   die "merge em '${_PMV_TARGET}' (não é o core) pela sessão do core: só pelo caminho delegado, '--repo <dono/repo> --foreign-repo' como palavra nua (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113). O maestro roda com --maestro. Nada foi feito."
+fi
+# e o gh nunca resolve o alvo pela config na sessão do core: sem --repo, o alvo é o core, dito explicitamente (F1). O GH_REPO
+# vale para todo `gh` deste script sem mudar a lógica de "repo alheio", que segue lendo o --repo
+if [ "${_CORE_SESSION}" = 1 ] && [ "${#REPO_ARG[@]}" -lt 2 ] && [ -n "${_PMV_CORE_SLUG}" ]; then
+  GH_REPO="${_PMV_CORE_SLUG}"; export GH_REPO
 fi
 # B4: no caminho delegado o AMBIENTE não pode forjar as condições. PATH fixo (um gh falso no PATH mentiria CI e PR) e
 # recusa de variável que muda o que o git e o gh leem (GIT_CONFIG_* troca o origin; GH_REPO troca o alvo; GH_* além do
@@ -417,7 +431,7 @@ _delegated_foreign_gate() {
   local _t _cdir _core _m _kind
   _t="$(_slug_norm "${REPO_ARG[1]}")"
   _cdir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-  _core="$(_slug_norm "$(git -C "${_cdir}" remote get-url origin 2>/dev/null)")"
+  _core="${_PMV_CORE_SLUG}"   # do members.yaml do checkout, nunca da config do git (F1)
   [ -n "${_core}" ] && [ "${_t}" = "${_core}" ] \
     && die "--foreign-repo com o próprio core ('${_t}'): o merge do core segue sem a flag. Nada foi feito."
   # o registro vale como está na origin/main do core: só conta depois de passar por PR e merge (o vendor_push lê igual)

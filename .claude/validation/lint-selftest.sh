@@ -11498,7 +11498,13 @@ EOF" "${L}" \
   _mgcase "(rb16) gh repo set-default <outro> → VETO" "2:gh repo set-default" "${P}" \
     'gh repo set-default onion-bancada/adotante' "${J}" '        if pos[:2] == ["repo", "set-default"] and not any(' '        if False and not any('
   _mgcase "(rb17) git config remote.<x>.gh-resolved base → VETO" "2:git config remote" "${P}" \
-    'git config remote.sge.gh-resolved base' "${J}" '        if any(re.match(r"^remote\.", a, re.I)' '        if False and any(re.match(r"^remote\.", a, re.I)'
+    'git config remote.sge.gh-resolved base' "${J}" '        if any(re.match(r"^(remote|url|include|includeif)\.", a, re.I) for a in rest[1:]) \' '        if False and any(re.match(r"^(remote|url|include|includeif)\.", a, re.I) for a in rest[1:]) \'
+  _mgcase "(rb20) git config url.<alheio>.insteadOf <core> → VETO (3ª passada, F1)" "2:git config remote" "${P}" \
+    'git config url.https://github.com/onion-bancada/adotante.git.insteadOf https://github.com/onion-bancada/core.git' "${J}" \
+    '        if any(re.match(r"^(remote|url|include|includeif)\.", a, re.I) for a in rest[1:]) \' '        if any(re.match(r"^(remote)\.", a, re.I) for a in rest[1:]) \'
+  _mgcase "(rb21) git config --global include.path <arquivo> → VETO (3ª passada, F1)" "2:git config remote" "${P}" \
+    'git config --global include.path /tmp/x.gitconfig' "${J}" \
+    '        if any(re.match(r"^(remote|url|include|includeif)\.", a, re.I) for a in rest[1:]) \' '        if any(re.match(r"^(remote)\.", a, re.I) for a in rest[1:]) \'
   _mgcase "(rb18) gh repo set-default --view (leitura) → passa" 0 "${P}" \
     'gh repo set-default --view' "${J}" 'not any(a in ("-v", "--view", "-u", "--unset") for a in args)' 'not any(a in ("-u", "--unset") for a in args)'
   _mgcase "(rb19) git remote set-url origin <outro> → VETO" "2:git remote set-url" "${P}" \
@@ -13494,7 +13500,7 @@ run_slack_persona_selftests() {
   [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
   local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
   mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
-  local want=31 o rc
+  local want=35 o rc
   if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
     record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico, verify espera a conexão até o teto)"
@@ -26075,7 +26081,7 @@ STUB
   _fr "(fr1) merge alheio delegado com tudo em ordem ⇒ mergeia" 0 "merge alheio delegado: 'owner/repo' registrado" --repo owner/repo --foreign-repo
   _fr "(fr2) repo fora do members.yaml ⇒ recusa sem merge" 1 "não está registrado" --repo outro/zzz --foreign-repo
   _fr "(fr3) PORTA (kind: door) ⇒ recusa: publicação segue com o maestro" 1 "PORTA" --repo owner/porta --foreign-repo
-  _fr "(fr4) --foreign-repo com o próprio core ⇒ recusa" 1 "própria fonte" --repo onion-bancada/core --foreign-repo
+  _fr "(fr4) --foreign-repo com o próprio core ⇒ recusa" 1 "com o próprio core" --repo onion-bancada/core --foreign-repo
   FR_FILES="a.txt" _fr "(fr5) PR sem o resíduo ⇒ recusa" 1 "não traz o resíduo" --repo owner/repo --foreign-repo
   FR_RESIDUE="$(printf -- '---\\nverdict: REJECTED\\nreviewed_diff_sha256: %s\\n---\\n' "${_fr_h}")" \
     _fr "(fr6) resíduo REPROVADO ⇒ recusa" 1 "verdict 'REJECTED'" --repo owner/repo --foreign-repo
@@ -26104,9 +26110,11 @@ STUB
   local fcl="${d}/fakeclaude/bin/claude" _pi="${fc}/ops/pmv-intacto.sh"
   mkdir -p "$(dirname "${fcl}")" "${d}/outro-repo" "${d}/fakegh"; cp "$(command -v bash)" "${fcl}"
   printf '#!/bin/sh\necho fake\n' > "${d}/fakegh/gh"; chmod +x "${d}/fakegh/gh"
+  # o gh dos casos rf: nunca a rede; anota o GH_REPO que recebeu e falha
+  mkdir -p "${d}/nogh"; printf '#!/bin/sh\nprintf "%%s\\n" "${GH_REPO:-}" >> "%s/ghrepo.out"\nexit 1\n' "${d}" > "${d}/nogh/gh"; chmod +x "${d}/nogh/gh"
   _frs() { # $1=rótulo $2=trecho esperado ; resto = o comando que o "claude" roda (cwd = o core de sandbox)
     local lbl="$1" txt="$2"; shift 2; local o rc=0
-    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "$*; exit \$?" 2>&1)" || rc=$?
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" "${fcl}" -c "$*; exit \$?" 2>&1)" || rc=$?
     if [ "${rc}" -ne 0 ] && grep -qF -- "${txt}" <<< "${o}"; then record_pass "pr-merge-verified: ${lbl}"
     else record_fail "pr-merge-verified: ${lbl}" "rc=${rc} out=$(tail -2 <<< "${o}" | tr '\n' '|' | cut -c1-240)"; fi
   }
@@ -26146,17 +26154,43 @@ STUB
   # ── RE-REFUTAÇÃO DO #1647 (2026-11-13) ───────────────────────────────────────────────────────────────────────────
   # N1: o gh resolve o alvo pelo `remote.<nome>.gh-resolved`, não pelo origin. Um remote a mais com o default do gh
   # apontado para ele, e o merge sem --repo, mirava o outro repo
+  # o origin do core de sandbox passa a ser o do members.yaml dele (o slug do core sai de lá desde o F1)
+  git -C "${fc}" remote set-url origin https://github.com/onion-bancada/core.git
   git -C "${fc}" remote add sge https://github.com/owner/repo.git; git -C "${fc}" config remote.sge.gh-resolved base
   _frs "(rf10) sessão do core + remote alheio com gh-resolved (gh repo set-default), sem --repo ⇒ recusa" "pela sessão do core" \
     "bash '${_pi}' 999"
   sed 's#^  done < <(_pmv_remote_slugs | awk .!seen\[\$0\]++.)$#  done < <(_slug_norm "$(git remote get-url origin 2>/dev/null)")#' "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (rf10-MUT)" "a âncora da leitura de todos os remotes sumiu"
   else
-    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999; exit \$?" 2>&1)"
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999; exit \$?" 2>&1)"
     if grep -qF "pela sessão do core" <<< "${o}"; then record_fail "pr-merge-verified: (rf10-MUT)" "o mutante (só o origin) também recusou"
     else record_pass "pr-merge-verified: (rf10-MUT) lendo só o origin, o remote do gh-resolved passaria — a leitura de todos é a causa"; fi
   fi
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote remove sge
+  # ── 3ª PASSADA (F1): a config do git apontando outro remote. O slug do core sai do members.yaml, não do origin ──────
+  git init -q "${d}/outro-git"; git -C "${d}/outro-git" remote add origin https://github.com/owner/repo.git
+  _frs "(rf14) GIT_DIR de outro repo, sem --repo ⇒ recusa (o core não empata com o alvo)" "pela sessão do core" \
+    "GIT_DIR='${d}/outro-git/.git' bash '${_pi}' 999"
+  _frs "(rf15) GIT_CONFIG_PARAMETERS com url.<alheio>.insteadOf trocando o origin, sem --repo ⇒ recusa" "pela sessão do core" \
+    "GIT_CONFIG_PARAMETERS=\"'url.https://github.com/owner/repo.git.insteadof'='https://github.com/onion-bancada/core.git'\" bash '${_pi}' 999"
+  sed 's#^_PMV_CORE_SLUG="\$(_slug_norm "\${_PMV_CORE_SLUG:-\${_PMV_CORE_CONST}}")"$#_PMV_CORE_SLUG="$(_slug_norm "$(git -C "${_PMV_DIR}" remote get-url origin 2>/dev/null)")"#' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (rf14-MUT)" "a âncora do slug do core sumiu"
+  else
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" GIT_DIR="${d}/outro-git/.git" "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999; exit \$?" 2>&1)"
+    if grep -qF "pela sessão do core" <<< "${o}"; then record_fail "pr-merge-verified: (rf14-MUT)" "o mutante (core pelo origin) também recusou"
+    else record_pass "pr-merge-verified: (rf14-MUT) com o core lido do origin, o GIT_DIR alheio empataria e passaria — o members.yaml é a causa"; fi
+  fi
+  # o gh nunca resolve pela config na sessão do core: sem --repo, ele recebe GH_REPO=<o core> explícito
+  : > "${d}/ghrepo.out"
+  (cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" "${fcl}" -c "bash '${_pi}' 999; exit \$?" >/dev/null 2>&1)
+  if grep -qx 'onion-bancada/core' "${d}/ghrepo.out"; then record_pass "pr-merge-verified: (rf16) sem --repo, a sessão do core entrega GH_REPO=<o core> ao gh"
+  else record_fail "pr-merge-verified: (rf16) GH_REPO explícito" "o gh recebeu: $(sort -u "${d}/ghrepo.out" | tr '\n' ' ')"; fi
+  sed 's#^  GH_REPO="\${_PMV_CORE_SLUG}"; export GH_REPO$#  :#' "${_pi}" > "${fc}/ops/pmv-mut.sh"; : > "${d}/ghrepo.out"
+  (cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999; exit \$?" >/dev/null 2>&1)
+  if ! cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh" && ! grep -qx 'onion-bancada/core' "${d}/ghrepo.out"; then
+    record_pass "pr-merge-verified: (rf16-MUT) sem o GH_REPO explícito o gh resolveria pela config — a cura é a causa"
+  else record_fail "pr-merge-verified: (rf16-MUT)" "o mutante não mudou nada"; fi
+  rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
   # N2: HOME (o ~/.gitconfig com insteadOf, o config.yml do gh com http_unix_socket), proxy e CA desviam o git e o gh
   _frs "(rf11) HTTPS_PROXY no merge alheio delegado ⇒ recusa" "HTTPS_PROXY" "HTTPS_PROXY=http://127.0.0.1:9 bash '${_pi}' 999 --repo owner/repo --foreign-repo"
   _frs "(rf12) GIT_SSL_CAINFO no merge alheio delegado ⇒ recusa" "GIT_SSL_CAINFO" "GIT_SSL_CAINFO=/tmp/ca.pem bash '${_pi}' 999 --repo owner/repo --foreign-repo"
