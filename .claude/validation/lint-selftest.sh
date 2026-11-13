@@ -11491,6 +11491,19 @@ EOF" "${L}" \
   _mgcase "(rb14) a variável da bancada do merge verificado na linha da sessão → VETO" "2:modo de bancada do merge verificado" "${P}" \
     'ONION_PR_MERGE_VERIFIED_TEST=1 bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo' "${J}" \
     '_moat_emit("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST",' '(lambda *a: None)("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST",'
+  # N1 da re-refutação: o alvo do gh por outra porta (o remote a mais e o default do gh), a linha exata do refutador
+  _mgcase "(rb15) git remote add + gh repo set-default + merge sem --repo (a linha do refutador) → VETO" "2:redireciona o forge" "${P}" \
+    'git remote add sge https://github.com/onion-bancada/adotante.git; gh repo set-default onion-bancada/adotante; bash ops/pr-merge-verified.sh 12' \
+    "${J}" '    _moat_forge_redirect(base, args, detail)' '    pass'
+  _mgcase "(rb16) gh repo set-default <outro> → VETO" "2:gh repo set-default" "${P}" \
+    'gh repo set-default onion-bancada/adotante' "${J}" '        if pos[:2] == ["repo", "set-default"] and not any(' '        if False and not any('
+  _mgcase "(rb17) git config remote.<x>.gh-resolved base → VETO" "2:git config remote" "${P}" \
+    'git config remote.sge.gh-resolved base' "${J}" '        if any(re.match(r"^remote\.", a, re.I)' '        if False and any(re.match(r"^remote\.", a, re.I)'
+  _mgcase "(rb18) gh repo set-default --view (leitura) → passa" 0 "${P}" \
+    'gh repo set-default --view' "${J}" 'not any(a in ("-v", "--view", "-u", "--unset") for a in args)' 'not any(a in ("-u", "--unset") for a in args)'
+  _mgcase "(rb19) git remote set-url origin <outro> → VETO" "2:git remote set-url" "${P}" \
+    'git remote set-url origin https://github.com/onion-bancada/adotante.git' "${J}" \
+    '        if sub and sub[0] in ("add", "set-url", "rename"):' '        if False:'
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   # (ato16) o ADOTANTE: sem ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/) o veto do ato não arma, e os
   #       wrappers também não viajam. O "mutante" é o DADO de novo: o mesmo repo com o tsv e a linha `ato` veta
@@ -13481,7 +13494,7 @@ run_slack_persona_selftests() {
   [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
   local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
   mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
-  local want=29 o rc
+  local want=31 o rc
   if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
     record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico, verify espera a conexão até o teto)"
@@ -26130,6 +26143,35 @@ STUB
     else record_pass "pr-merge-verified: (rf-MUT) sem a recusa da sessão, o rf1 segue adiante — a recusa é a causa"; fi
   fi
   rm -f "${fc}/ops/pmv-mut.sh"
+  # ── RE-REFUTAÇÃO DO #1647 (2026-11-13) ───────────────────────────────────────────────────────────────────────────
+  # N1: o gh resolve o alvo pelo `remote.<nome>.gh-resolved`, não pelo origin. Um remote a mais com o default do gh
+  # apontado para ele, e o merge sem --repo, mirava o outro repo
+  git -C "${fc}" remote add sge https://github.com/owner/repo.git; git -C "${fc}" config remote.sge.gh-resolved base
+  _frs "(rf10) sessão do core + remote alheio com gh-resolved (gh repo set-default), sem --repo ⇒ recusa" "pela sessão do core" \
+    "bash '${_pi}' 999"
+  sed 's#^  done < <(_pmv_remote_slugs | awk .!seen\[\$0\]++.)$#  done < <(_slug_norm "$(git remote get-url origin 2>/dev/null)")#' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (rf10-MUT)" "a âncora da leitura de todos os remotes sumiu"
+  else
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999; exit \$?" 2>&1)"
+    if grep -qF "pela sessão do core" <<< "${o}"; then record_fail "pr-merge-verified: (rf10-MUT)" "o mutante (só o origin) também recusou"
+    else record_pass "pr-merge-verified: (rf10-MUT) lendo só o origin, o remote do gh-resolved passaria — a leitura de todos é a causa"; fi
+  fi
+  rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote remove sge
+  # N2: HOME (o ~/.gitconfig com insteadOf, o config.yml do gh com http_unix_socket), proxy e CA desviam o git e o gh
+  _frs "(rf11) HTTPS_PROXY no merge alheio delegado ⇒ recusa" "HTTPS_PROXY" "HTTPS_PROXY=http://127.0.0.1:9 bash '${_pi}' 999 --repo owner/repo --foreign-repo"
+  _frs "(rf12) GIT_SSL_CAINFO no merge alheio delegado ⇒ recusa" "GIT_SSL_CAINFO" "GIT_SSL_CAINFO=/tmp/ca.pem bash '${_pi}' 999 --repo owner/repo --foreign-repo"
+  local _hpw _gm; _hpw="$(getent passwd "$(id -un)" | cut -d: -f6)"; mkdir -p "${d}/fakehome"
+  for _gm in intacta mutante; do
+    if [ "${_gm}" = mutante ]; then _gg="$(sed 's/^  HOME="\${h}"; GH_CONFIG_DIR=.*$/  :/' <<< "${_gg}")"; fi
+    o="$(env -i HOME="${d}/fakehome" PATH="${PATH}" bash -c "${_gg}"$'\ndie() { echo "MORREU $*"; exit 1; }; _delegated_env_guard; echo "$HOME|${GH_CONFIG_DIR:-}"' 2>&1)"
+    if [ "${_gm}" = intacta ]; then
+      [ "${o}" = "${_hpw}|${_hpw}/.config/gh" ] && record_pass "pr-merge-verified: (rf13) HOME falso vira o do passwd no delegado, e o config do gh dentro dele" \
+        || record_fail "pr-merge-verified: (rf13) HOME fixo" "${o}"
+    else
+      [ "${o}" = "${d}/fakehome|" ] && record_pass "pr-merge-verified: (rf13-MUT) sem o HOME fixo, o HOME falso passaria — a cura é a causa" \
+        || record_fail "pr-merge-verified: (rf13-MUT)" "o mutante não mudou nada: ${o}"
+    fi
+  done
 
   _mv "OPEN|null" "${M}" 0 "merged"
   if [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; then
