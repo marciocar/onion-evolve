@@ -464,6 +464,18 @@ for f, n, form, repo in acc:
 # method, e na prosa troca o nome sem deixar @sha nem :caminho. HARD em todo grafo julgado, sem baseline: não há passivo
 # legítimo desta forma (refutador do #1648, B1). Diz grafo, nó e linha; nunca o id nem o hex.
 MK_AT = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}@[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])")
+# Na mesma linha do marcador, o hex SOLTO (6+, com dígito e letra, qualquer caixa: `(<hex>)`, `/blob/<hex>/`, argumento
+# de flag) também é commit do repo privado, a menos que seja commit DESTE repo: o core é público, e o pin do core
+# (onion_version) mora ao lado do marcador nos registros de adotante. A isenção lê o objeto no git local; o CI tem a
+# história inteira (fetch-depth: 0 no onion-validate). Re-refutação do #1648.
+MK = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}")
+HEX_LOOSE = re.compile(r"(?<![0-9A-Za-z_-])[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])")
+_own = {}
+def own_commit(h):
+    h = h.lower()
+    if h not in _own:
+        _own[h] = subprocess.run(["git", "-C", root, "cat-file", "-e", f"{h}^{{commit}}"], capture_output=True).returncode == 0
+    return _own[h]
 for f in files:
     node = "-"
     for i, line in enumerate(rd(os.path.join(root, f)).splitlines(), 1):
@@ -473,6 +485,15 @@ for f in files:
         if MK_AT.search(line):
             rc = 1
             out("HARD", "MARCADOR-COM-COMMIT", f, f"nó {node}, linha {i}: o marcador private-cite:<id> leva um commit colado (@<hex>), o que devolve ao grafo público o commit do repo privado. No source, locator, trace, verified_against e no detalhe do method o marcador ocupa o valor inteiro; na prosa, tire o @<hex> e o :caminho")
+        elif MK.search(line):
+            # o commit qualificado por um repo da LISTA PÚBLICA (dono/repo@<hex>) é conferível por terceiro: não conta
+            rest = re.sub(r"([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)@[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])",
+                          lambda m: " " if m.group(1).lower() in public else m.group(0), MK.sub(" ", line))
+            loose = [x for x in HEX_LOOSE.findall(rest)
+                     if re.search(r"[0-9]", x) and re.search(r"[A-Fa-f]", x) and not own_commit(x)]
+            if loose:
+                rc = 1
+                out("HARD", "MARCADOR-COM-COMMIT", f, f"nó {node}, linha {i}: {len(loose)} hex solto(s) na linha do marcador private-cite:<id> que não são commit deste repo — o commit do repo privado volta ao grafo público. Troque por ⟨commit⟩ e registre na tabela privada")
 for f, err in unread:
     out("SOFT", "NAO-JULGADO", f, f"não deu para parsear ({err}) — este grafo NÃO foi julgado (YAML inválido é da REGRA 78)")
 if human:
