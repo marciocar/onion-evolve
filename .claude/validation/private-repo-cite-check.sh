@@ -39,10 +39,23 @@
 #   nome nu de repo fora do registro; grafo renomeado (as entradas dele contam como novas: cure, não re-emita); outras formas de citar (gist, GitLab, nome
 #   seguido de "commit abc1234" em prosa, sha sem nome); grafo que o diff não toca; mensagem de commit e
 #   corpo de PR; e se a lista pública ainda está certa (isso é o --verify-allowlist, que só roda com rede).
+#
+# --private-repos ARQ (ou ONION_PRIVATE_REPOS=ARQ), desde 2026-11-12 com a kg-ssot 4.51.0 (contrato v4.22): a regra do
+#   `kg_gate.py --private-repos`, PORTADA em .claude/utils/kg/private_repos.py (manual 05 do vendor, "O repositório
+#   privado citado sem o marcador"). O dono lista os repos privados num arquivo FORA de todo repo público (um padrão
+#   por linha: prefixo de URL, owner/repo ou repo@); cada valor de texto e cada CHAVE dos grafos julgados (o tocado,
+#   ou o corpus com --all) que cita um deles sem o marcador `private-cite:<id>` sai HARD PRIVADO-SEM-MARCADOR (rc 1),
+#   depois de decodificar o %xx e levar a NFC, nomeado por grafo, nó e campo, NUNCA pelo padrão nem pelo valor; a
+#   chave, o id de nó ou o caminho que contém um padrão sai mascarado. Arquivo ilegível, vazio ou com padrão de
+#   espaço, # ou Cf = rc 2. Desligado sem o arquivo: o CI não o tem (ele é privado), então isto é guarda LOCAL do dono.
+#   NÃO COBERTOS (o teto do porte, igual ao da referência): largura cheia, espaço de largura zero no texto, barra
+#   invertida, nome quebrado em bloco dobrado, dupla codificação, sósias de caractere, comentário no FIM de linha,
+#   .kg.json, e as formas que um padrão sem espaço não expressa (`repo @ sha`, `repo (HEAD sha)`, nome nu em prosa):
+#   essas seguem com o vocabulário acima. Extensão da casa: o comentário de LINHA INTEIRA é lido.
 set -uo pipefail
 
 _HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT=""; MODE="tsvh"; HUMAN=1; BASE_REF=""; SHOW=0
+ROOT=""; MODE="tsvh"; HUMAN=1; BASE_REF=""; SHOW=0; PRIV="${ONION_PRIVATE_REPOS:-}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --tsv) MODE="touched"; HUMAN=0; shift ;;
@@ -52,6 +65,9 @@ while [ $# -gt 0 ]; do
     --hash-name) MODE="hashname"; export PRC_NAME="${2:?--hash-name exige o nome}"; shift 2 ;;
     --selftest) MODE="selftest"; shift ;;
     --show-names) SHOW=1; shift ;;
+    --private-repos) [ $# -ge 2 ] && [ -n "$2" ] || { echo "ERRO: --private-repos exige o arquivo" >&2; exit 2; }
+                     PRIV="$2"; shift 2 ;;
+    --private-repos=*) PRIV="${1#--private-repos=}"; [ -n "${PRIV}" ] || { echo "ERRO: --private-repos exige o arquivo" >&2; exit 2; }; shift ;;
     --base) BASE_REF="${2:?--base exige ref}"; shift 2 ;;
     -*) echo "ERRO: flag desconhecida '$1'" >&2; exit 2 ;;
     *) [ -z "${ROOT}" ] || { echo "ERRO: raiz duplicada '$1'" >&2; exit 2; }; ROOT="$1"; shift ;;
@@ -114,7 +130,8 @@ if [ "${MODE}" != "selftest" ] && [ "${MODE}" != "hashname" ]; then
   export PRC_BASE="${base}"
 fi
 
-KG_FIXTURE_RE="${KG_FIXTURE_RE:-x^}" python3 -I -B - "${ROOT:-.}" "${MODE}" "${ALLOW_REL}" "${BASE_REL}" "${MEMBERS_REL}" "${_TMP}" "${SHOW}" "${HUMAN}" <<'PY'
+_main_rc=0
+KG_FIXTURE_RE="${KG_FIXTURE_RE:-x^}" python3 -I -B - "${ROOT:-.}" "${MODE}" "${ALLOW_REL}" "${BASE_REL}" "${MEMBERS_REL}" "${_TMP}" "${SHOW}" "${HUMAN}" <<'PY' || _main_rc=$?
 import hashlib, os, re, subprocess, sys
 import yaml
 root, mode, allow_rel, base_rel, members_rel, tmp, show, human = sys.argv[1:9]
@@ -448,3 +465,38 @@ if human:
           f"{passivo} no passivo, baseline com {len(base)} (merge-base: {len(prev) if armed else 'sem baseline'}), {len(unread)} não julgado(s)")
 sys.exit(rc)
 PY
+
+# ── --private-repos: a regra do kg_gate.py, portada (ver o cabeçalho). Só nos modos que julgam (touched e all). ──
+[ -n "${PRIV}" ] || exit "${_main_rc}"
+case "${MODE}" in touched|all) : ;; *) exit "${_main_rc}" ;; esac
+_PR="${_HERE}/../utils/kg/private_repos.py"
+[ -f "${_PR}" ] || { echo "private-repo-cite: --private-repos sem o porte (${_PR}) — NAO VERIFICADO" >&2; exit 2; }
+_pfiles=()
+while IFS= read -r -d '' _f; do [ -f "${ROOT}/${_f}" ] && _pfiles+=("${_f}"); done < "${_TMP}/files"
+if [ "${MODE}" = touched ] && [ "${#_pfiles[@]}" -eq 0 ]; then
+  [ "${HUMAN}" = 1 ] && echo "private-repo-cite: --private-repos: 0 grafo(s) tocado(s), nada a conferir"
+  exit "${_main_rc}"
+fi
+_prc=0
+_pout="$(python3 -I -B "${_PR}" --patterns "${PRIV}" --root "${ROOT}" --format tsv --corpus ${_pfiles[@]+"${_pfiles[@]}"} 2>"${_TMP}/perr")" || _prc=$?
+if [ "${_prc}" -ge 2 ]; then
+  echo "private-repo-cite: --private-repos NÃO JULGOU (rc ${_prc}): $(head -1 "${_TMP}/perr") — NAO VERIFICADO" >&2
+  exit 2
+fi
+_pn=0
+while IFS=$'\t' read -r _g _w _fd _ls _v; do
+  [ "${_v:-}" = PRIVATE-REPO ] || continue
+  _pn=$((_pn + 1))
+  _m="nó ${_w}, campo ${_fd}: cita um repositório privado (padrão na linha ${_ls} do --private-repos) sem o marcador private-cite:<id>. Cure com o private-cite-id do kg_trace.py do vendor kg-ssot (um id por citação): o marcador substitui o valor inteiro no source e no locator, vira private-cite:<id>#<id de nó> no trace, e na prosa troca só o nome do repo"
+  if [ "${HUMAN}" = 1 ]; then echo "HARD: [private-repo-cite/PRIVADO-SEM-MARCADOR] ${_g} — ${_m}"
+  else printf 'HARD\tPRIVADO-SEM-MARCADOR\t%s\t%s\n' "${_g}" "${_m}"; fi
+done <<< "${_pout}"
+[ "${HUMAN}" = 1 ] && echo "private-repo-cite: --private-repos: $(awk -F'\t' '$2=="RESUMO"{print $4}' <<< "${_pout}")"
+# rc 1 do porte sem nenhuma linha traduzida: o rc e a saída discordam, e isso nunca é verde nem achado mudo
+if [ "${_prc}" -eq 1 ] && [ "${_pn}" -eq 0 ]; then
+  echo "private-repo-cite: --private-repos: o porte saiu rc 1 sem achado que esta tradução leia — NAO VERIFICADO" >&2; exit 2
+fi
+# o pior dos dois vence: o rc 2 da guarda principal (não julgou) nunca vira rc 1 (passada adversarial, L2)
+[ "${_main_rc}" -ge 2 ] && exit "${_main_rc}"
+[ "${_prc}" -eq 1 ] && exit 1
+exit "${_main_rc}"

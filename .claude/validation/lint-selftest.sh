@@ -57730,6 +57730,223 @@ EOF_PMUT
 }
 _family run_private_repo_cite_selftests
 
+# private_repos_port — o porte da regra do `kg_gate.py --private-repos` (kg-ssot 4.51.0, contrato v4.22) para as guardas
+# da casa: .claude/utils/kg/private_repos.py, chamado pelo private-repo-cite-check.sh (--private-repos / ONION_PRIVATE_REPOS)
+# e pelo kg-trace.sh (--private-repos). A regra está no manual 05 do vendor ("O repositório privado citado sem o
+# marcador"). Casos: (a) acusa sem ecoar · (b) %xx · (c) NFC · (d) fronteira · (e) chave · (f) id de nó mascarado ·
+# (g) caminho mascarado · (h) o marcador cala · (i) arquivo quebrado (espaço, vazio, Cf, ausente) · (j) chave repetida
+# lida linha a linha · (k) comentário de linha inteira (extensão da casa) · (l) paridade com a referência ·
+# (m) a REGRA 121 com --private-repos · (n) o kg-trace.sh com --private-repos e o trace private-cite · (x) mutantes.
+_prp_out() {  # $1=porte $2=padrões $3=dir, resto=arquivos → "rc<TAB>saída numa linha"
+  local o rc
+  if o="$(LC_ALL=C python3 -I -B "$1" --patterns "$2" --root "$3" "${@:4}" 2>&1)"; then rc=0; else rc=$?; fi
+  printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
+}
+_prp_box() {  # dir com os grafos e o arquivo de padrões dos casos
+  local d; d="$(TMPDIR=/tmp mktemp -d)" || return 1
+  printf '# padrões do caso\nacme/planos\nsegredo\ndono/repo-\xc3\xa9\n' > "${d}/p.txt"
+  printf 'meta:\n  id: a\nnodes:\n  - id: E_A\n    provenance:\n      source: "https://github.com/acme/planos/blob/abc1234/x.md"\n' > "${d}/a.kg.yaml"
+  printf 'meta:\n  id: b\nnodes:\n  - id: E_B\n    trace: "github.com/acme%%2Fplanos#C_X"\n' > "${d}/b.kg.yaml"
+  printf 'meta:\n  id: c\nnodes:\n  - id: E_C\n    narrative: "lido em dono/repo-e\xcc\x81 ontem"\n' > "${d}/c.kg.yaml"
+  printf 'meta:\n  id: d\nnodes:\n  - id: E_D\n    narrative: "acme/planos-public e xacme/planos"\n' > "${d}/d.kg.yaml"
+  printf 'meta:\n  id: d2\nnodes:\n  - id: E_D2\n    narrative: "ACME/Planos.git"\n' > "${d}/d2.kg.yaml"
+  printf 'meta:\n  id: e\nnodes:\n  - id: E_E\n    x_ref:\n      "acme/planos": 1\n' > "${d}/e.kg.yaml"
+  printf 'meta:\n  id: f\nnodes:\n  - id: E_SEGREDO_1\n    label: "um segredo"\n' > "${d}/f.kg.yaml"
+  printf 'meta:\n  id: g\nnodes:\n  - id: E_G\n    label: "o segredo"\n' > "${d}/x-segredo.kg.yaml"
+  printf 'meta:\n  id: h\nnodes:\n  - id: E_H\n    provenance:\n      source: "private-cite:AAAAAAAAAAAAAAAAAAAAAA"\n    trace: "private-cite:AAAAAAAAAAAAAAAAAAAAAA#D_X"\n' > "${d}/h.kg.yaml"
+  # (j) o valor privado na 1ª ocorrência: é a que o "última vence" esconderia (passada adversarial, L4)
+  printf 'meta:\n  id: j\nnodes:\n  - id: E_J\n    label: "acme/planos"\n    label: "limpo"\n' > "${d}/j.kg.yaml"
+  # (o) âncora aninhada que expande em potência: tem de terminar, e ler linha a linha (B1)
+  { printf 'meta:\n  id: o\nx0: &a0 "acme/planos"\n'; for i in 1 2 3 4 5 6 7; do printf 'x%s: &a%s [' "$i" "$i"; for k in 1 2 3 4 5 6 7 8 9; do printf '*a%s, ' "$((i-1))"; done; printf '*a%s]\n' "$((i-1))"; done; printf 'nodes: []\n'; } > "${d}/o.kg.yaml"
+  # (p) chave com TAB: o achado não pode sumir no TSV (B2)
+  printf 'meta:\n  id: p\nnodes:\n  - id: E_P\n    "x\\tk": "github.com/acme/planos"\n' > "${d}/p.kg.yaml"
+  # (s) !!set: o valor sob tag explícita não escapa (L6)
+  printf 'meta:\n  id: s\nnodes:\n  - id: E_S\n    x_s: !!set {github.com/acme/planos: null}\n' > "${d}/s.kg.yaml"
+  # (t) bytes inválidos: entrada quebrada, nunca leitura com troca de caractere
+  printf 'meta:\n  id: t\nnodes:\n  - id: E_T\n    label: "\xff acme/planos"\n' > "${d}/t.kg.yaml"
+  printf '# lido em acme/planos\nmeta:\n  id: k\nnodes:\n  - id: E_K\n    label: "limpo"\n' > "${d}/k.kg.yaml"
+  printf '%s' "${d}"
+}
+_prp_case() {  # $1=caso $2=porte $3=dir → 0 se o caso vale
+  local d="$3" r
+  case "$1" in
+    a) r="$(_prp_out "$2" "${d}/p.txt" "${d}" a.kg.yaml)"
+       [ "${r%%$'\t'*}" = 1 ] && grep -qF 'a.kg.yaml#E_A provenance.source (padrão na linha 2 do --private-repos)' <<< "${r}" \
+         && ! grep -qi 'acme\|planos' <<< "${r}" ;;
+    b) r="$(_prp_out "$2" "${d}/p.txt" "${d}" b.kg.yaml)"; [ "${r%%$'\t'*}" = 1 ] && grep -qF 'b.kg.yaml#E_B trace' <<< "${r}" ;;
+    c) r="$(_prp_out "$2" "${d}/p.txt" "${d}" c.kg.yaml)"; [ "${r%%$'\t'*}" = 1 ] && grep -qF 'c.kg.yaml#E_C narrative (padrão na linha 4' <<< "${r}" ;;
+    d) r="$(_prp_out "$2" "${d}/p.txt" "${d}" d.kg.yaml)"; [ "${r%%$'\t'*}" = 0 ] || return 1
+       r="$(_prp_out "$2" "${d}/p.txt" "${d}" d2.kg.yaml)"; [ "${r%%$'\t'*}" = 1 ] ;;
+    e) r="$(_prp_out "$2" "${d}/p.txt" "${d}" e.kg.yaml)"
+       [ "${r%%$'\t'*}" = 1 ] && grep -qF 'e.kg.yaml#E_E x_ref.<key #1> (key)' <<< "${r}" && ! grep -qi 'planos' <<< "${r}" ;;
+    f) r="$(_prp_out "$2" "${d}/p.txt" "${d}" f.kg.yaml)"
+       [ "${r%%$'\t'*}" = 1 ] && grep -qF 'f.kg.yaml#<node #0> label' <<< "${r}" && ! grep -qi 'segredo' <<< "${r}" ;;
+    g) r="$(_prp_out "$2" "${d}/p.txt" "${d}" x-segredo.kg.yaml)"
+       [ "${r%%$'\t'*}" = 1 ] && grep -qF '<graph #0>#E_G label' <<< "${r}" && ! grep -qi 'segredo' <<< "${r}" ;;
+    h) r="$(_prp_out "$2" "${d}/p.txt" "${d}" h.kg.yaml)"; [ "${r%%$'\t'*}" = 0 ] ;;
+    i) printf 'acme /planos\n' > "${d}/bad1.txt"; printf '# só comentário\n\n' > "${d}/bad2.txt"
+       printf 'acme/pla\xe2\x80\x8bnos\n' > "${d}/bad3.txt"
+       r="$(_prp_out "$2" "${d}/bad1.txt" "${d}" a.kg.yaml)"
+       [ "${r%%$'\t'*}" = 2 ] && grep -qF 'linha 1' <<< "${r}" && ! grep -q 'acme' <<< "${r}" || return 1
+       r="$(_prp_out "$2" "${d}/bad2.txt" "${d}" a.kg.yaml)"; [ "${r%%$'\t'*}" = 2 ] || return 1
+       r="$(_prp_out "$2" "${d}/bad3.txt" "${d}" a.kg.yaml)"; [ "${r%%$'\t'*}" = 2 ] && grep -qF 'Cf' <<< "${r}" || return 1
+       r="$(_prp_out "$2" "${d}/nao-existe.txt" "${d}" a.kg.yaml)"; [ "${r%%$'\t'*}" = 2 ] ;;
+    j) r="$(_prp_out "$2" "${d}/p.txt" "${d}" j.kg.yaml)"; [ "${r%%$'\t'*}" = 1 ] ;;
+    o) r="$(timeout 30 python3 -I -B "$2" --patterns "${d}/p.txt" --root "${d}" o.kg.yaml 2>&1)"; [ $? -eq 1 ] && grep -qF 'o.kg.yaml#line 3 (text)' <<< "${r}" ;;
+    p) r="$(LC_ALL=C python3 -I -B "$2" --patterns "${d}/p.txt" --root "${d}" --format tsv p.kg.yaml 2>&1)"
+       [ "$(awk -F'\t' '$5=="PRIVATE-REPO"' <<< "${r}" | wc -l)" -eq 1 ] && awk -F'\t' '$5=="PRIVATE-REPO"{exit !(NF==5)}' <<< "${r}" ;;
+    s) r="$(_prp_out "$2" "${d}/p.txt" "${d}" s.kg.yaml)"; [ "${r%%$'\t'*}" = 1 ] ;;
+    t) r="$(_prp_out "$2" "${d}/p.txt" "${d}" t.kg.yaml)"; [ "${r%%$'\t'*}" = 2 ] && ! grep -q 'acme' <<< "${r}" ;;
+    q) local q; q="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${q}/docs"
+       printf '{}\n' > "${q}/.kg-ssot-version"; printf 'meta:\n  id: q\nnodes:\n  - id: E_Q\n    label: "acme/planos"\n' > "${q}/docs/q.kg.yaml"
+       ( cd "${q}" && git init -q -b main && git add -A ) >/dev/null 2>&1
+       r="$(_prp_out "$2" "${d}/p.txt" "${q}" --corpus)"; rm -rf "${q}"; [ "${r%%$'\t'*}" = 1 ] ;;
+    k) r="$(_prp_out "$2" "${d}/p.txt" "${d}" k.kg.yaml)"; [ "${r%%$'\t'*}" = 1 ] && grep -qF 'k.kg.yaml#line 1 (comment)' <<< "${r}" ;;
+  esac
+}
+_prp_parity() {  # $1=porte $2=dir → 0 se o porte e o kg_gate.private_repo_check dão os mesmos achados (fora o comentário)
+  local tools="${REPO_ROOT}/vendor/kg-ssot/tools"
+  LC_ALL=C python3 -I -B - "$1" "${tools}" "$2" <<'PY'
+import importlib.util, pathlib, re, sys
+port_path, tools, d = sys.argv[1:4]
+sys.path.insert(0, tools)
+import kg_gate
+spec = importlib.util.spec_from_file_location("prp", port_path); prp = importlib.util.module_from_spec(spec); spec.loader.exec_module(prp)
+# os grafos em que porte e referência DEVEM empatar; o, p, s e t são onde o porte difere de propósito (expansão lida
+# linha a linha, TAB saneado no TSV, !!set lido, bytes inválidos → rc 2), e o comentário (k) sai do lado do porte
+names = sorted(p.name for p in pathlib.Path(d).glob("*.kg.yaml") if p.name[0] in "abcdefjkx")
+items = [(n, (pathlib.Path(d) / n).read_text(encoding="utf-8")) for n in names]
+ref_lines, _ = kg_gate.private_repo_check(items, kg_gate.read_private_repos(str(pathlib.Path(d) / "p.txt")))
+ref = set()
+for l in ref_lines:
+    m = re.match(r"✗ .*?marker: (.*) \(pattern on line ([0-9, ]+) of", l)
+    if m: ref.add((m.group(1), m.group(2)))
+port = {(f"{g}#{w} {f}", ", ".join(map(str, ls))) for g, w, f, ls in prp.check(items, prp.read_patterns(str(pathlib.Path(d) / "p.txt"))) if f != "(comment)"}
+sys.exit(0 if ref == port and ref else 1)
+PY
+}
+run_private_repos_port_selftests() {
+  local port="${REPO_ROOT}/.claude/utils/kg/private_repos.py" chk="${REPO_ROOT}/.claude/validation/private-repo-cite-check.sh"
+  local kt="${REPO_ROOT}/.claude/validation/kg-trace.sh"
+  [ -f "${port}" ] || { record_fail "private-repos-port" "porte ausente: ${port}"; return; }
+  python3 -c 'import yaml' >/dev/null 2>&1 || { record_skip "private-repos-port: PyYAML ausente (SUT não exercido)"; return; }
+  local d c; d="$(_prp_box)" || { record_skip "private-repos-port: mktemp falhou"; return; }
+  local -A why=([a]="acusa o source, nomeia grafo#nó campo e a linha, sem ecoar padrão nem valor" [b]="o %2F decodificado casa"
+    [c]="o acento decomposto (NFD) casa o padrão em NFC" [d]="fronteira: -public e xacme/ calam; ACME/Planos.git casa"
+    [e]="a CHAVE de mapeamento é lida, e sai mascarada" [f]="o id de nó que contém o padrão sai <node #i>"
+    [g]="o caminho do grafo que contém o padrão sai <graph #i>" [h]="o marcador private-cite:<id> cala (source e trace)"
+    [i]="arquivo quebrado (espaço, vazio, Cf, ausente) → rc 2 pelo número da linha, sem o conteúdo"
+    [j]="chave repetida: o grafo é lido linha a linha e o valor escondido não escapa"
+    [k]="comentário de linha inteira é lido (extensão da casa, além da referência)"
+    [o]="âncora que expande em potência termina e é lida linha a linha" [p]="chave com TAB: a linha TSV segue com 5 colunas"
+    [s]="!!set: o valor sob tag explícita não escapa" [t]="bytes inválidos → rc 2, sem ecoar"
+    [q]="o carimbo do vendor na RAIZ não esvazia o corpus")
+  for c in a b c d e f g h i j k o p q s t; do
+    if _prp_case "${c}" "${port}" "${d}"; then record_pass "private-repos-port: (${c}) ${why[${c}]}"
+    else record_fail "private-repos-port: (${c})" "${why[${c}]}"; fi
+  done
+  # (l) paridade com o leitor de referência, nos mesmos grafos
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && grep -q 'def private_repo_check' "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py"; then
+    if _prp_parity "${port}" "${d}"; then record_pass "private-repos-port: (l) mesmos achados que o kg_gate.private_repo_check do vendor (fora o comentário)"
+    else record_fail "private-repos-port: (l) paridade" "o porte e a referência divergem nos grafos do caso"; fi
+  else record_skip "private-repos-port: (l) vendor sem kg_gate.private_repo_check (kg-ssot < 4.51.0) — paridade não medida"; fi
+  # (m) a REGRA 121 com --private-repos, num repo-sandbox como o runner a invoca
+  local sb o rc
+  if sb="$(_prc_box "${chk}")"; then
+    mkdir -p "${sb}/.claude/utils/kg"; cp "${port}" "${sb}/.claude/utils/kg/private_repos.py"
+    cp "${d}/p.txt" "${sb}/p.txt"
+    printf 'meta:\n  id: priv\nnodes:\n  - id: E_P\n    provenance:\n      source: "github.com/acme/planos/x.md"\n' > "${sb}/g/priv.kg.yaml"
+    if o="$(LC_ALL=C bash "${sb}/.claude/validation/private-repo-cite-check.sh" "${sb}" --tsv --private-repos "${sb}/p.txt" 2>&1)"; then rc=0; else rc=$?; fi
+    local o2 rc2
+    if o2="$(LC_ALL=C bash "${sb}/.claude/validation/private-repo-cite-check.sh" "${sb}" --tsv 2>&1)"; then rc2=0; else rc2=$?; fi
+    if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tPRIVADO-SEM-MARCADOR\tg/priv.kg.yaml\tnó E_P, campo provenance.source' <<< "${o}" \
+       && ! grep -qi 'acme\|planos' <<< "${o}" && ! grep -q 'PRIVADO-SEM-MARCADOR' <<< "${o2}"; then
+      record_pass "private-repos-port: (m) REGRA 121 --private-repos → HARD PRIVADO-SEM-MARCADOR no tocado (rc 1), sem a flag nada"
+    else record_fail "private-repos-port: (m) REGRA 121 --private-repos" "rc=${rc}/${rc2}; [$(tr '\n' '|' <<< "${o}" | head -c 300)]"; fi
+    # (m3) a guarda principal que NÃO julgou (lista pública sem dono) segue rc 2 com --private-repos e achado (L2)
+    cp "${sb}/docs/evolution/federation/public-repos.tsv" "${sb}/pr.bak"
+    printf 'public\tdonoteste/repo-publico\t2026-11-10\n' > "${sb}/docs/evolution/federation/public-repos.tsv"
+    cp "${sb}/docs/evolution/federation/members.yaml" "${sb}/mb.bak"; printf 'members: []\n' > "${sb}/docs/evolution/federation/members.yaml"
+    if o="$(LC_ALL=C bash "${sb}/.claude/validation/private-repo-cite-check.sh" "${sb}" --tsv --private-repos "${sb}/p.txt" 2>&1)"; then rc=0; else rc=$?; fi
+    local rcm3="${rc}"
+    if o="$(LC_ALL=C bash "${sb}/.claude/validation/private-repo-cite-check.sh" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -eq 2 ] && [ "${rcm3}" -eq 2 ]; then record_pass "private-repos-port: (m3) guarda principal sem julgar (rc 2) segue rc 2 com --private-repos e achado"
+    else record_fail "private-repos-port: (m3) rc 2 preservado" "sem flag=${rc} com flag=${rcm3}"; fi
+    cp "${sb}/pr.bak" "${sb}/docs/evolution/federation/public-repos.tsv"; cp "${sb}/mb.bak" "${sb}/docs/evolution/federation/members.yaml"
+    if o="$(LC_ALL=C ONION_PRIVATE_REPOS="${sb}/nao-existe.txt" bash "${sb}/.claude/validation/private-repo-cite-check.sh" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -eq 2 ] && grep -q 'NAO VERIFICADO' <<< "${o}"; then record_pass "private-repos-port: (m2) ONION_PRIVATE_REPOS ilegível → rc 2 (nunca verde)"
+    else record_fail "private-repos-port: (m2) arquivo ilegível" "rc=${rc}; [${o}]"; fi
+    rm -rf "${sb}"
+  else record_skip "private-repos-port: (m) sandbox da REGRA 121 falhou"; fi
+  # (n) o kg-trace.sh: --private-repos acusa; o trace private-cite:<id>#<nó> não é TARGET-MISSING
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" ] && grep -q 'private_cite' "${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py"; then
+    local sn; sn="$(TMPDIR=/tmp mktemp -d)"
+    printf 'meta:\n  id: n\nnodes:\n  - id: E_N\n    trace: "private-cite:AAAAAAAAAAAAAAAAAAAAAA#D_X"\n  - id: E_M\n    label: "github.com/acme/planos"\n' > "${sn}/n.kg.yaml"
+    ( cd "${sn}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm b ) >/dev/null 2>&1
+    if o="$(LC_ALL=C ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${kt}" "${sn}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+    if o2="$(LC_ALL=C ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${kt}" "${sn}" --format tsv --private-repos "${d}/p.txt" 2>&1)"; then rc2=0; else rc2=$?; fi
+    if [ "${rc}" -eq 0 ] && [ -z "${o}" ] && [ "${rc2}" -eq 1 ] && grep -q $'^n.kg.yaml\tE_M\t-\tlabel (linha 2 do --private-repos)\tPRIVATE-REPO$' <<< "${o2}" \
+       && ! grep -qi 'acme\|planos' <<< "${o2}"; then
+      record_pass "private-repos-port: (n) kg-trace.sh: o trace private-cite:<id>#<nó> passa, e --private-repos acusa PRIVATE-REPO sem ecoar"
+    else record_fail "private-repos-port: (n) kg-trace.sh" "rc=${rc}/${rc2}; [${o}] [$(tr '\n' '|' <<< "${o2}")]"; fi
+    if o="$(bash "${kt}" "${sn}" --emit-index --private-repos "${d}/p.txt" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -eq 2 ]; then record_pass "private-repos-port: (n2) kg-trace.sh --emit-index com --private-repos → rc 2"
+    else record_fail "private-repos-port: (n2) --emit-index" "rc=${rc}"; fi
+    # (n3) arquivo de padrões quebrado: o humano sai rc 2 e o TSV dá ENTRADA-QUEBRADA (nunca verde calado)
+    printf 'acme /planos\n' > "${d}/bad-n3.txt"
+    if o="$(LC_ALL=C ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${kt}" "${sn}" --private-repos "${d}/bad-n3.txt" 2>&1)"; then rc=0; else rc=$?; fi
+    if o2="$(LC_ALL=C ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${kt}" "${sn}" --format tsv --private-repos "${d}/bad-n3.txt" 2>&1)"; then rc2=0; else rc2=$?; fi
+    if [ "${rc}" -eq 2 ] && [ "${rc2}" -eq 1 ] && grep -q $'PRIVATE-REPOS\t-\t(--private-repos não julgou)\tENTRADA-QUEBRADA' <<< "${o2}"; then
+      record_pass "private-repos-port: (n3) kg-trace.sh com padrões quebrados → humano rc 2, TSV ENTRADA-QUEBRADA rc 1"
+    else record_fail "private-repos-port: (n3) padrões quebrados" "rc=${rc}/${rc2}; [$(tr '\n' '|' <<< "${o2}")]"; fi
+    # (n4) a chave com TAB não some do TSV do kg-trace.sh (B2), e a flag com valor vazio é rc 2 (L3)
+    printf 'meta:\n  id: n4\nnodes:\n  - id: E_T\n    "x\\tk": "github.com/acme/planos"\n' > "${sn}/n4.kg.yaml"
+    ( cd "${sn}" && git add -A ) >/dev/null 2>&1
+    if o="$(LC_ALL=C ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${kt}" "${sn}" --format tsv --private-repos "${d}/p.txt" 2>&1)"; then rc=0; else rc=$?; fi
+    local r1 r2 r3 r4
+    if bash "${kt}" "${sn}" --format tsv --private-repos '' >/dev/null 2>&1; then r1=0; else r1=$?; fi
+    if bash "${kt}" "${sn}" --format tsv --private-repos= >/dev/null 2>&1; then r2=0; else r2=$?; fi
+    if bash "${chk}" "${sn}" --tsv --private-repos '' >/dev/null 2>&1; then r3=0; else r3=$?; fi
+    if bash "${chk}" "${sn}" --tsv --private-repos= >/dev/null 2>&1; then r4=0; else r4=$?; fi
+    if [ "${rc}" -eq 1 ] && grep -q $'^n4.kg.yaml\tE_T\t-\t' <<< "${o}" && [ "${r1}" -eq 2 ] && [ "${r2}" -eq 2 ] && [ "${r3}" -eq 2 ] && [ "${r4}" -eq 2 ]; then
+      record_pass "private-repos-port: (n4) chave com TAB segue no TSV do kg-trace.sh (rc 1); flag vazia → rc 2 nas duas guardas"
+    else record_fail "private-repos-port: (n4)" "rc=${rc} vazio=${r1}/${r2}/${r3}/${r4}; [$(tr '\n' '|' <<< "${o}" | head -c 300)]"; fi
+    rm -rf "${sn}"
+  else record_skip "private-repos-port: (n) vendor kg_trace.py sem private_cite (kg-ssot < 4.51.0)"; fi
+  # (x) UM MUTANTE POR REGRA do porte: a cópia mutada tem de derrubar o caso que a regra sustenta
+  local name anchor repl case_ mt ri rm_
+  while IFS=$'\x1f' read -r name anchor repl case_; do
+    [ -n "${name}" ] || continue
+    mt="${d}/mut.py"
+    python3 -I -B -c 'import sys; s=open(sys.argv[1]).read(); a=sys.argv[2].replace("\\n","\n"); r=sys.argv[3].replace("\\n","\n"); assert s.count(a)==1, "ancora"; open(sys.argv[4],"w").write(s.replace(a,r))' \
+      "${port}" "${anchor}" "${repl}" "${mt}" 2>/dev/null || { record_fail "private-repos-port: (x) ${name}" "âncora não única/ausente no porte"; continue; }
+    if _prp_case "${case_}" "${port}" "${d}"; then ri=0; else ri=1; fi
+    if _prp_case "${case_}" "${mt}" "${d}"; then rm_=0; else rm_=1; fi
+    _prove_mutation "private-repos-port: (x) mutante morde → (${case_}) ${name}" "${port}" "${mt}" "${ri}" "${rm_}"
+  done <<EOF_PRPMUT
+sem %xx$(printf '\x1f')urllib.parse.unquote(unicodedata.normalize("NFC", text), errors="replace")$(printf '\x1f')unicodedata.normalize("NFC", text)$(printf '\x1f')b
+sem NFC$(printf '\x1f')    return unicodedata.normalize("NFC", urllib.parse.unquote(unicodedata.normalize("NFC", text), errors="replace"))$(printf '\x1f')    return urllib.parse.unquote(text, errors="replace")$(printf '\x1f')c
+sem fronteira à esquerda$(printf '\x1f')    lead = f"(?<![{WORD}])" if$(printf '\x1f')    lead = "" if$(printf '\x1f')d
+caixa sensível$(printf '\x1f')    return re.compile(lead + re.escape(p) + tail, re.I)$(printf '\x1f')    return re.compile(lead + re.escape(p) + tail)$(printf '\x1f')d
+chave não lida$(printf '\x1f')                stack.append((str(k), path + [str(k)], True))$(printf '\x1f')                pass$(printf '\x1f')e
+sem máscara$(printf '\x1f')        return any(p in t for p in folded) or bool(lines_of(text))$(printf '\x1f')        return False$(printf '\x1f')f
+caminho sem máscara$(printf '\x1f')        graph = f"<graph #{gi}>" if masked(name) else name$(printf '\x1f')        graph = name$(printf '\x1f')g
+padrão com espaço aceito$(printf '\x1f')        if "#" in p or any(c.isspace() for c in p):$(printf '\x1f')        if False:$(printf '\x1f')i
+Cf aceito$(printf '\x1f')        if any(unicodedata.category(c) == "Cf" for c in p):$(printf '\x1f')        if False:$(printf '\x1f')i
+lista vazia aceita$(printf '\x1f')    if not out:\n        raise Broken$(printf '\x1f')    if False:\n        raise Broken$(printf '\x1f')i
+chave repetida aceita$(printf '\x1f')            raise _DupKey()$(printf '\x1f')            pass$(printf '\x1f')j
+comentário não lido$(printf '\x1f')                       if line.lstrip().startswith("#")]$(printf '\x1f')                       if False]$(printf '\x1f')k
+sem fronteira à direita$(printf '\x1f')    tail = f"(?![{WORD}])" if$(printf '\x1f')    tail = "" if$(printf '\x1f')d
+sem teto de expansão$(printf '\x1f')        if seen > budget:\n            return True$(printf '\x1f')        if False:\n            return True$(printf '\x1f')o
+TAB cru no TSV$(printf '\x1f')        g, w, f = cell(g), cell(w), cell(f)$(printf '\x1f')        pass$(printf '\x1f')p
+tag explícita parseada$(printf '\x1f')    if _has_tag(text):\n        return None, False$(printf '\x1f')    if False:\n        return None, False$(printf '\x1f')s
+bytes trocados$(printf '\x1f')                items.append((n, (root / n).read_text(encoding="utf-8")))$(printf '\x1f')                items.append((n, (root / n).read_text(encoding="utf-8", errors="replace")))$(printf '\x1f')t
+carimbo da raiz esvazia$(printf '\x1f')for n in listed if n.endswith("/.kg-ssot-version")}$(printf '\x1f')for n in listed if n == ".kg-ssot-version" or n.endswith("/.kg-ssot-version")}$(printf '\x1f')q
+EOF_PRPMUT
+  rm -rf "${d}"
+}
+_family run_private_repos_port_selftests
+
 # ---------------------------------------------------------------------------
 # maestro-ask — dono único por pergunta ao maestro (a batuta, 2026-11-10;
 # .claude/utils/orchestration/maestro-ask.sh). Cada caso reprova contra o mutante dele.

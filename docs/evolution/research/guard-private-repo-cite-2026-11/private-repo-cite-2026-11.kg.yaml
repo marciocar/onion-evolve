@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-10"
   review_after: "2026-12-10"   # 30d: defeito de guarda
-  # ═══ TETO: 8 NÓS ═══
+  # ═══ TETO: 10 NÓS ═══ (de 8 para 10 em 2026-11-12: o porte do --private-repos da kg-ssot 4.51.0 traz uma decisão e a evidência dela)
 nodes:
   - id: Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA
     node_type: question
@@ -118,7 +118,42 @@ nodes:
     trace: ".claude/rules/kg-grammar.md"
     label: "a classe «não conferível por terceiro» hoje é texto no provenance.source; nenhum leitor do kg-ssot a imprime nem a conta, e o contrato segue exigindo source, locator e method"
     narrative: "O kg-ssot mediu que, omitida a URL, somem a conferência de versão e a de locator. Que o leitor imprima a classe é trabalho do kg-ssot, não deste PR. Gatilho: o kg-ssot ganhar campo ou leitor para a classe, e aí a gramática e esta guarda migram para ele."
+  - id: D_PORTE_DO_PRIVATE_REPOS_DA_4510
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "lint-selftest.sh --families private_repos_port com LC_ALL=C na branch chore/kg-ssot-4510: 42 passam, 0 falham (re-rodada de 2026-11-13)"
+    trace: ".claude/utils/kg/private_repos.py"
+    label: "a regra do kg_gate.py --private-repos (kg-ssot 4.51.0, contrato v4.22) é PORTADA para a casa num módulo só, que a REGRA 121 e o kg-trace.sh chamam com o arquivo privado de padrões do dono; desligada sem ele"
+    narrative: "A catraca do kg_gate.py julga o corpus inteiro, e as guardas da casa julgam o tocado (REGRA 121) ou o corpus do trace: por isso o porte, escrito pela regra do capítulo 5 do manual, e não a chamada ao gate. Busca em texto e chaves, %xx decodificado uma vez, NFC, fronteira de palavra, máscara de chave, id e caminho, e nunca o padrão nem o valor na saída. A casa lê também o comentário de linha inteira, que a referência não lê. Na REGRA 121 o achado é HARD PRIVADO-SEM-MARCADOR e só existe com o arquivo, que o CI não tem: é guarda local do dono. O que fica de fora vai no cabeçalho do módulo."
+  - id: E_PORTE_EMPATA_COM_A_REFERENCIA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "private_repos.py --corpus e kg_gate.private_repo_check com o mesmo arquivo de padrões do dono, nos 260 grafos do corpus da branch (313 contra 313, nenhum só de um lado); bancada private_repos_port com LC_ALL=C (42 passam, 0 falham); 5 mutantes das guardas por ops/mutate-and-restore.sh, todos com rc 1 do helper com o mesmo arquivo de padrões do dono, no corpus da branch"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "medido: no corpus do core, o porte e o kg_gate.py dão os mesmos 313 achados (grafo, nó, campo e linhas do padrão), e o porte acha mais 5 em comentário de linha inteira; os 18 mutantes do porte e os 5 das guardas re-rodados em 2026-11-13 morrem"
+    narrative: "A bancada private_repos_port tem 42 asserções, entre eles a paridade com o kg_gate.private_repo_check nos grafos do caso. Os mutantes do porte cobrem %xx, NFC, fronteira, caixa, chave, máscara de id e de caminho, padrão com espaço, Cf, lista vazia, chave repetida, comentário, teto de expansão, TAB no TSV, tag explícita, bytes inválidos e o carimbo do vendor na raiz. Os das guardas, plantados por ops/mutate-and-restore.sh: na 1ª rodada (2026-11-12) foram 6, e um sobreviveu (o rc 2 do modo humano do kg-trace.sh), que ganhou o caso (n3). Na re-rodada de 2026-11-13 foram 5, todos mortos: o rc 1 da REGRA 121, o desligamento sem o arquivo, o rc 2 da guarda principal preservado com --private-repos (L2, que o caso (m3) mata), o rc 2 do humano do kg-trace.sh e a linha ENTRADA-QUEBRADA do TSV dele."
+    provenance:
+      source: "família run_private_repos_port_selftests na branch chore/kg-ssot-4510"
+      locator: "casos (l), (m3), (x) e (n3) da família"
+      method: "measurement: bancada com mutante plantado na cópia do porte e por ops/mutate-and-restore.sh nas guardas"
+      locality: "repo"
 edges:
+  - from: E_PORTE_EMPATA_COM_A_REFERENCIA
+    to: D_PORTE_DO_PRIVATE_REPOS_DA_4510
+    edge_type: SUPPORTS
+  - from: D_PORTE_DO_PRIVATE_REPOS_DA_4510
+    to: D_CHECK_DE_LINT_COM_CATRACA_E_LISTA_OFFLINE
+    edge_type: DEPENDS_ON
   - from: E_REVISAO_INDEPENDENTE_REJEITOU_E_FOI_CURADA
     to: D_CHECK_DE_LINT_COM_CATRACA_E_LISTA_OFFLINE
     edge_type: SUPPORTS
