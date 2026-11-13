@@ -6644,6 +6644,7 @@ check_private_repo_cite() {
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
       *.kg.yaml|*/private-repo-cite-check.sh|*/public-repos.tsv|*/private-repo-cite-baseline.txt|*/lint-artifacts.sh) : ;;
+      *.csv|*.tsv|*.json|*.jsonl|*.txt|*/data/*) : ;;   # os arquivos de dado (fix/provenance-triage-scrub)
       *) return 0 ;;
     esac
   fi
@@ -6658,6 +6659,26 @@ check_private_repo_cite() {
   # rc 1 = catraca (já emitida acima); rc >= 2 = a guarda declarou que NÃO pôde julgar, e isso não é aprovação
   if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
     violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  # A LISTA PÚBLICA SÓ VALE CONFERIDA POR TERCEIRO (refutador do #1649: um repo privado ficou como `public` três dias,
+  # conferido pelo gh AUTENTICADO, e levou commit privado para o core). Uma requisição HTTP ANÔNIMA por repo da lista:
+  # não-200 4xx = HARD; rede fora = SOFT NÃO MEDIDO. DEPENDE DE REDE; ONION_OFFLINE=1 pula, e o lint o diz.
+  if [ -z "${ONLY_PATH}" ] || [ "${ONLY_PATH##*/}" = public-repos.tsv ]; then
+    if [ "${ONION_OFFLINE:-0}" = 1 ]; then
+      violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/public-repos.tsv" "${_R}: [LISTA-NAO-RECONFERIDA] ONION_OFFLINE=1 — a lista pública NÃO foi reconferida por HTTP anônimo"
+    else
+      local _v _vrc=0 _k _repo _why
+      if _v="$(LC_ALL=C bash "${helper}" "${REPO_ROOT}" --verify-allowlist 2>&1)"; then _vrc=0; else _vrc=$?; fi
+      while IFS=$'\t' read -r _k _repo _why; do
+        case "${_k}" in
+          LISTA-ERRADA) violation "HARD" "${REPO_ROOT}/docs/evolution/federation/public-repos.tsv" "${_R}: [LISTA-ERRADA] ${_repo}: ${_why}" ;;
+          NAO-MEDIDO) violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/public-repos.tsv" "${_R}: [LISTA-NAO-MEDIDA] ${_repo}: ${_why}" ;;
+        esac
+      done <<< "${_v}"
+      if [ "${_vrc}" -ne 0 ] && ! grep -qE '^(LISTA-ERRADA|NAO-MEDIDO)' <<< "${_v}"; then
+        violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/public-repos.tsv" "${_R}: [LISTA-NAO-MEDIDA] a conferência anônima não rodou (rc=${_vrc})"
+      fi
+    fi
   fi
   [ "${_err}" = /dev/null ] || rm -f "${_err}"
   return 0

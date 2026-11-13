@@ -57698,6 +57698,41 @@ run_private_repo_cite_selftests() {
   rm -rf "${pr}"
   # o sandbox volta ao estado de antes: os casos seguintes (a catraca) medem contra a mesma base
   ( cd "${sb}" && git reset -q --hard "${prev}" && git update-ref refs/remotes/origin/main "${prev}" && git clean -qfd r ) >/dev/null 2>&1
+  # (v) a LISTA PÚBLICA conferida por HTTP ANÔNIMO (refutador do #1649: um repo privado estava na lista, conferido
+  #     pelo gh autenticado). Sonda trocada por PRC_ANON_PROBE, sem rede: 404 num repo da lista → LISTA-ERRADA rc 1;
+  #     000 (rede fora) → NAO-MEDIDO rc 2, nunca verde; tudo 200 → rc 0.
+  local probe; probe="$(TMPDIR=/tmp mktemp)"
+  printf '#!/usr/bin/env bash\ncase "$1" in donoteste/vai-fechar) echo "${PROBE_CODE:-404}" ;; *) echo 200 ;; esac\n' > "${probe}"; chmod +x "${probe}"
+  local v1 v2 v3 r1 r2 r3
+  if v1="$(PRC_ANON_PROBE="${probe}" bash "${s}" "${sb}" --verify-allowlist 2>&1)"; then r1=0; else r1=$?; fi
+  if v2="$(PROBE_CODE=000 PRC_ANON_PROBE="${probe}" bash "${s}" "${sb}" --verify-allowlist 2>&1)"; then r2=0; else r2=$?; fi
+  if v3="$(PROBE_CODE=200 PRC_ANON_PROBE="${probe}" bash "${s}" "${sb}" --verify-allowlist 2>&1)"; then r3=0; else r3=$?; fi
+  rm -f "${probe}"
+  if [ "${r1}" -eq 1 ] && grep -q $'^LISTA-ERRADA\tdonoteste/vai-fechar\tHTTP 404' <<< "${v1}" && [ "${r2}" -eq 2 ] && grep -q $'^NAO-MEDIDO\tdonoteste/vai-fechar' <<< "${v2}" \
+     && [ "${r3}" -eq 0 ]; then
+    record_pass "private-repo-cite: (v) lista pública por HTTP anônimo: 404 → LISTA-ERRADA rc 1, rede fora → NAO-MEDIDO rc 2, tudo 200 → rc 0"
+  else record_fail "private-repo-cite: (v) conferência anônima" "rc=${r1}/${r2}/${r3}; [${v1}] [${v2}]"; fi
+  # (s3) a camada de clones DERIVADA (sem ONION_PRIVATE_CLONES), como a REGRA 119 deriva os irmãos: um clone irmão do
+  #      checkout cujo origin é de dono julgado e fora da lista pública conta como privado, e o commit dele numa linha
+  #      ANTIGA de dado acusa COMMIT-PRIVADO-EM-DADO; ONION_PRIVATE_CLONES="" desliga.
+  local par sb3 pv pc3; par="$(TMPDIR=/tmp mktemp -d)"
+  if sb3="$(_prc_box "${chk}")" && mv "${sb3}" "${par}/core"; then
+    sb3="${par}/core"; pv="${par}/segredo"
+    ( git init -q -b main "${pv}" && cd "${pv}" && git remote add origin https://github.com/donoteste/repo-secreto.git \
+        && git -c user.email=t@t -c user.name=t commit -q --allow-empty -m s ) >/dev/null 2>&1
+    pc3="$(git -C "${pv}" rev-parse --short=10 HEAD 2>/dev/null)"
+    mkdir -p "${sb3}/r/data"; printf 'antiga com %s\noutra\n' "${pc3}" > "${sb3}/r/data/x.txt"
+    ( cd "${sb3}" && git add -A && _prc_git "${sb3}" commit -qm d && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+    printf 'antiga com %s\noutra, mexida\n' "${pc3}" > "${sb3}/r/data/x.txt"
+    local w1 w2 q1 q2
+    if w1="$(env -u ONION_PRIVATE_CLONES LC_ALL=C bash "${sb3}/.claude/validation/private-repo-cite-check.sh" "${sb3}" --tsv 2>&1)"; then q1=0; else q1=$?; fi
+    if w2="$(ONION_PRIVATE_CLONES= LC_ALL=C bash "${sb3}/.claude/validation/private-repo-cite-check.sh" "${sb3}" --tsv 2>&1)"; then q2=0; else q2=$?; fi
+    if [ -n "${pc3}" ] && [ "${q1}" -eq 1 ] && grep -q $'^HARD\tCOMMIT-PRIVADO-EM-DADO\tr/data/x.txt\tlinha 1:' <<< "${w1}" \
+       && [ "${q2}" -eq 0 ] && ! grep -q COMMIT-PRIVADO <<< "${w2}" && ! grep -q "${pc3}" <<< "${w1}"; then
+      record_pass "private-repo-cite: (s3) clone irmão de dono julgado fora da lista → COMMIT-PRIVADO-EM-DADO em linha antiga, sem ONION_PRIVATE_CLONES; vazio desliga"
+    else record_fail "private-repo-cite: (s3) clones derivados" "rc=${q1}/${q2} pc=${pc3}; [$(tr '\n' '|' <<< "${w1}" | head -c 300)]"; fi
+  else record_fail "private-repo-cite: (s3) clones derivados" "sandbox falhou"; fi
+  rm -rf "${par}"
   # (d) SÓ O TOCADO É JULGADO (o histórico fica)
   if _prc_case_scope "${chk}"; then record_pass "private-repo-cite: (d) grafo que o diff não toca não é julgado (o histórico fica)"
   else record_fail "private-repo-cite: (d) escopo" "o grafo fora do diff foi julgado, ou o novo não"; fi

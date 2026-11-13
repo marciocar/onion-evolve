@@ -32,7 +32,7 @@
 # repo por HASH curto, nunca o nome: a saída do CI de um repo público é pública.
 #
 # Uso : bash private-repo-cite-check.sh [<raiz>] [--tsv | --all | --emit-baseline] [--base <ref>] [--show-names]
-#       bash private-repo-cite-check.sh [<raiz>] --verify-allowlist   (ONLINE, usa gh; fora do CI)
+#       bash private-repo-cite-check.sh [<raiz>] --verify-allowlist   (ONLINE, HTTP ANÔNIMO, uma requisição por repo)
 #       bash private-repo-cite-check.sh --hash-name <nome>   (a linha `private nome#<hash>` para a lista, sem gravar o nome)
 #       bash private-repo-cite-check.sh --selftest
 # Exit: 0 = ok (ou só aviso) · 1 = catraca violada · 2 = não pôde julgar (NAO VERIFICADO; nunca é verde).
@@ -391,19 +391,33 @@ if not owners:
     sys.exit(2)
 
 if mode == "verify":
-    # ONLINE (gh): a lista ainda está certa? e o que o corpus cita fora dela, o que é?
-    import shutil
-    if not shutil.which("gh"):
-        print("private-repo-cite: gh ausente — a lista NÃO foi reconferida", file=sys.stderr); sys.exit(2)
-    def vis(repo):
-        p = subprocess.run(["gh", "repo", "view", repo, "--json", "visibility", "-q", ".visibility"], capture_output=True, text=True)
-        return p.stdout.strip() if p.returncode == 0 else "INALCANCAVEL"
+    # ONLINE e ANÔNIMO: a lista ainda está certa? Público é o que um TERCEIRO, sem credencial, abre. A 1ª versão
+    # perguntava ao `gh` autenticado, que enxerga o privado do dono e o dizia visível: um repo privado ficou como
+    # `public` de 2026-11-10 a 2026-11-13 e levou commit privado para o core (refutador do #1649). Agora: uma
+    # requisição HTTP sem credencial por repo da lista (curl, sem token, User-Agent genérico). 200 = público; 404 (ou
+    # outro 4xx) = LISTA-ERRADA (rc 1); rede caída, timeout ou 5xx = NAO-MEDIDO (rc 2, nunca verde). DEPENDE DE REDE.
+    # PRC_ANON_PROBE troca a sonda (a bancada usa uma que devolve o código sem rede): recebe dono/repo, imprime o código.
+    import concurrent.futures as _cf, shlex as _sh
+    _probe = os.environ.get("PRC_ANON_PROBE")
+    def anon(repo):
+        if _probe:
+            p = subprocess.run(_sh.split(_probe) + [repo], capture_output=True, text=True)
+        else:
+            p = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "--max-time", "15", "-A", "repo-visibility-check",
+                                "--netrc-optional", "--netrc-file", "/dev/null", f"https://github.com/{repo}"], capture_output=True, text=True,
+                               env={k: v for k, v in os.environ.items() if not k.upper().endswith("TOKEN")})
+        return p.stdout.strip() if p.returncode == 0 else "000"
+    with _cf.ThreadPoolExecutor(8) as ex:
+        codes = dict(zip(sorted(public), ex.map(anon, sorted(public))))
     rc = 0
-    for repo in sorted(public):
-        v = vis(repo)
-        if v != "PUBLIC":
-            rc = 1; print(f"LISTA-ERRADA\t{repo}\t{v} — saia da lista pública")
-    print(f"# {len(public)} repo(s) da lista reconferido(s) contra o GitHub")
+    for repo, c in codes.items():
+        if c == "200":
+            continue
+        if c.startswith("4"):
+            rc = 1; print(f"LISTA-ERRADA\t{repo}\tHTTP {c} anônimo — não é público para terceiro: saia da lista pública")
+        else:
+            rc = max(rc, 2); print(f"NAO-MEDIDO\t{repo}\tHTTP {c or '000'} — rede ou GitHub fora; a lista NÃO foi reconferida neste repo")
+    print(f"# {len(public)} repo(s) da lista reconferido(s) por HTTP anônimo")
     sys.exit(rc)
 
 files = kg_list("files")
@@ -580,6 +594,24 @@ if data_files:
     #   uma linha só, e mexer nele não torna novo cada id que ele já tinha). Por que só o acrescentado na 2ª camada: o corpus de dado tem ~1.000 hex que não são commit (hash, id de
     #   sessão), e a falha fechada sobre ele reescreveria evidência sem ganho; o que ENTRA passa pela catraca.
     _clones = [c for c in os.environ.get("ONION_PRIVATE_CLONES", "").split(os.pathsep) if c]
+    if "ONION_PRIVATE_CLONES" not in os.environ and mode == "touched":
+        # DERIVADO como a REGRA 119 deriva os irmãos (private-name-check.sh): os diretórios irmãos do checkout PRINCIPAL
+        # do core que são clone git cujo origin é de um dono julgado e NÃO está na lista pública. Sem isso o passivo
+        # antigo (o commit privado que já estava no arquivo) não teria guarda nenhuma no lint local. No CI não há
+        # irmãos, e a camada fica vazia (dita no resumo humano). ONION_PRIVATE_CLONES="" desliga.
+        _cd = subprocess.run(["git", "-C", root, "rev-parse", "--path-format=absolute", "--git-common-dir"], capture_output=True, text=True).stdout.strip()
+        _main = os.path.dirname(_cd) if _cd else ""
+        _par = os.path.dirname(_main) if _main else ""
+        for _d in (sorted(os.listdir(_par)) if _par and os.path.isdir(_par) else []):
+            _p = os.path.join(_par, _d)
+            if _p == _main or not os.path.exists(os.path.join(_p, ".git")):
+                continue
+            _u = subprocess.run(["git", "-C", _p, "remote", "get-url", "origin"], capture_output=True, text=True).stdout.strip()
+            _m = re.search(r"[/:]([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git)?/?$", _u)
+            if _m and _m.group(1).lower() in owners and f"{_m.group(1)}/{_m.group(2)}".lower() not in public:
+                _clones.append(_p)
+        if human:
+            print(f"private-repo-cite: camada de clones privados derivada dos irmãos do checkout: {len(_clones)} clone(s)")
     def _batch(repo, hs):
         r = subprocess.run(["git", "-C", repo, "cat-file", "--batch-check=%(objecttype)"],
                            input="".join(h + "^{commit}\n" for h in hs), capture_output=True, text=True)
