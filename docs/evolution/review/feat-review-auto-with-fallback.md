@@ -1,7 +1,8 @@
 ---
 branch: feat/review-auto-with-fallback
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b3838129504055abf21a86df4d6a4417fc8ba0d07f0a0c82c839a10401d8269a
+reviewed_code_sha256: 5f00b0ce51c95ccc95c0d4fd18eca6801532524c5a93c55ddd83c5298d811672
 findings_total: 17
 findings_real: 16
 findings_fixed: 16
