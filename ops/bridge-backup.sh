@@ -24,6 +24,40 @@ LABEL="${1:-diario}"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 OUT="${DEST}/bridge-${LABEL}-${STAMP}.tar.gz"
 
+# ── ROOT NÃO ESCREVE NO DESTINO DO OPERADOR (2026-11-13, D_DELEGATE_VPS_SERVICE_SCRIPTS_1113) ───────────────────────
+# Pela cópia de root delegada (o ops/update-bridge.sh do sudoers sem senha) este script roda como ROOT, e o destino é do
+# operador. Root escrevendo lá é escalada: o operador planta um symlink com o nome previsível do dump (o carimbo é por
+# segundo) apontando para /etc/shadow; o `tar -czf` do root escreve por ele, e o `chown marcio` seguinte entrega o
+# arquivo ao operador. O mesmo vale para o `chmod` do diretório, o `cat` do .gpg-id (vazaria o alvo do link na mensagem
+# de erro do gpg) e o `rm` da retenção (nome com quebra de linha). Por isso, como root, o root só LÊ a origem: o tar sai
+# por um pipe, e o resto (cifra, retenção, conferência) roda como o operador, que só escreve no que já é dele. O claro
+# nem toca o disco nesse caminho.
+_OPERATOR=marcio
+if [ "$(id -u)" -eq 0 ] && [ "${1:-}" != --operator-stage ]; then
+  test -d "$SRC" || { echo "ERRO: origem ausente ou inacessível: $SRC" >&2; exit 1; }
+  { tar --ignore-failed-read -czf - -C "$SRC" data .env 2>/dev/null || true; } \
+    | sudo -u "${_OPERATOR}" -H bash "$(realpath "${BASH_SOURCE[0]}")" --operator-stage "${LABEL}" "${STAMP}"
+  exit $?
+fi
+if [ "${1:-}" = --operator-stage ]; then
+  [ "$(id -u)" -ne 0 ] || { echo "ERRO: o estágio do operador não roda como root" >&2; exit 1; }
+  LABEL="${2:?}"; STAMP="${3:?}"; OUT="${DEST}/bridge-${LABEL}-${STAMP}.tar.gz"
+  mkdir -p "$DEST"; chmod 700 "$DEST"
+  GPGID="$(cat "/home/${_OPERATOR}/.password-store/.gpg-id" 2>/dev/null || true)"
+  [ -n "${GPGID}" ] || { echo "✗ sem gpg-id do pass — NAO gravo o estado do bridge"; exit 1; }
+  gpg --batch --yes --trust-model always -r "${GPGID}" -o "${OUT}.gpg" -e
+  case "$(gpg --batch --list-packets "${OUT}.gpg" 2>/dev/null || true)" in
+    *"pubkey enc packet"*) : ;;
+    *) echo "✗ o .gpg nao parece OpenPGP valido — abortando"; rm -f -- "${OUT}.gpg"; exit 1 ;;
+  esac
+  chmod 600 "${OUT}.gpg"; OUT="${OUT}.gpg"
+  SIZE=$(stat -c%s "$OUT" 2>/dev/null || echo 0)
+  [ "$SIZE" -ge 200 ] || { rm -f -- "$OUT"; echo "ERRO: dump suspeito (${SIZE}b) — verifique permissões de ${SRC}" >&2; exit 1; }
+  ls -1t "${DEST}"/bridge-diario-*.tar.gz.gpg 2>/dev/null | tail -n +15 | xargs -r rm -f || true
+  echo "ok: ${OUT} (${SIZE} bytes)"
+  exit 0
+fi
+
 # A origem vive sob /home/onion (não atravessável por outro usuário), então o teste
 # TAMBÉM passa por sudo — senão o guard falha por permissão e mente "origem ausente".
 # (Rodando como root pela cron, o sudo é no-op.)

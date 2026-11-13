@@ -10886,6 +10886,7 @@ run_moat_gate_selftests() {
 members:
   - id: core-bancada
     kind: source
+    remote: github.com/onion-bancada/core
     local_path: "${d}/proj"
   - id: adotante-bancada
     kind: adopter
@@ -10895,9 +10896,13 @@ EOF
   # hook só lê o comando). E um script versionado que NÃO é ato (o corpo do kg-writer com uma linha a mais, para o
   # conteúdo não casar com o do ato): a fronteira do versionado para o ALVO segue valendo para ele
   local _ph
-  for _ph in update-bridge deploy-site publish-door pr-merge-verified; do
+  for _ph in update-bridge deploy-site publish-door pr-merge-verified slack-persona; do
     printf '#!/usr/bin/env bash\n# placeholder da bancada (%s): nunca roda\necho placeholder\n' "${_ph}" > "${d}/proj/ops/${_ph}.sh"
   done
+  # a cópia de root delegada (2026-11-13) mora num diretório da bancada: o marcador do tsv aponta para ele
+  mkdir -p "${d}/rootcopy"
+  sed -i "s#@rootcopy=/usr/local/lib/onion-ops#@rootcopy=${d}/rootcopy#" "${d}/proj/ops/moat-targets.tsv"
+  cp "${d}/proj/ops/update-bridge.sh" "${d}/proj/ops/slack-persona.sh" "${d}/rootcopy/"
   { cat "${REPO_ROOT}/ops/update-kg-writer.sh"; echo '# irmão versionado da bancada: não é ato'; } > "${d}/proj/ops/kgw-irmao.sh"
   git -C "${d}/proj" add -A
   git -C "${d}/proj" -c user.email=t@t -c user.name=t commit -q -m base
@@ -11361,10 +11366,10 @@ EOF" "${L}" \
     'bash ops/stt-service.sh install' "${J}" '        if w in sig:' '        if True:'
   _mgcase "(ato3) o caso de campo (2026-10-19): timeout + install --apply com redirecionamento → VETO" "2:ops/stt-service.sh --apply é o ato" "${P}" \
     'timeout 1500 bash ops/stt-service.sh install --apply > /tmp/stt.log 2>&1; echo rc=$?' "${J}" \
-    '    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None)' '    pass'
+    '    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None, rc[1] if rc else None)' '    pass'
   _mgcase "(ato4) sh -c com cd e ./ (outra grafia do mesmo ato) → VETO" "2:MOAT/ato" "${P}" \
     'sh -c "cd ops && ./chat-runner.sh install --apply"' "${J}" \
-    '    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None)' '    pass'
+    '    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None, rc[1] if rc else None)' '    pass'
   _mgcase "(ato5) publish-door.sh --status (leitura) → passa" 0 "${P}" \
     'bash ops/publish-door.sh --status' "${J}" '    if "@any" in sig:' '    if True:'
   _mgcase "(ato6) publish-door.sh --push (push de porta) → VETO" "2:ops/publish-door.sh --push é o ato" "${P}" \
@@ -11394,7 +11399,8 @@ EOF" "${L}" \
   _mgcase "(ato14) echo e heredoc que CITAM o ato → passam (prosa não é invocação)" 0 "${P}" \
     $'echo "rode bash ops/update-bridge.sh depois"; cat <<\'X\'\nbash ops/publish-door.sh --all --push\nX' "${J}" \
     '    detail = " ".join(raw_words)' '    detail = " ".join(raw_words); [_moat_emit("ato", "x", "", "x") for r in MOAT_ACTS if os.path.basename(r) in raw]'
-  # (ato15) pr-merge-verified.sh FICA FORA por desenho (é o caminho verificado de merge, usado com o "sim" do maestro).
+  # (ato15) pr-merge-verified.sh no repo do core FICA FORA por desenho (é o caminho verificado de merge); com --repo de
+  #       outro repositório é merge alheio (@foreign, casos dl1/db1 abaixo).
   #       O "mutante" é o DADO: o mesmo hook, com uma linha `ato` dele no tsv, tem de vetar — prova que o passa é a
   #       ausência da linha, e não um cego do juiz
   local _pmr _pmm _pmi=1 _pmmrc=1
@@ -11407,6 +11413,41 @@ EOF" "${L}" \
   _mgok 0 "${_pmm}" && _pmmrc=0
   cp "${P}/ops/moat-targets.tsv" "${d}/tsv-mutante"; cp "${d}/tsv-intacto" "${P}/ops/moat-targets.tsv"
   _prove_mutation "moat-gate: (ato15) pr-merge-verified fora (MUT: a linha ato no tsv)" "${d}/tsv-intacto" "${d}/tsv-mutante" "${_pmi}" "${_pmmrc}"
+  # ── os ATOS DELEGADOS (2026-11-13, D_DELEGATE_*_1113): cada forma liberada passa, e o resto segue barrado ─────────
+  # O selo delegou à sessão o merge alheio pelo caminho verificado (--foreign-repo), o deploy do site com --verified-pr
+  # e o update do bridge e a persona do Slack (install, start) pela cópia de root do sudoers. O push de porta, o creds da
+  # persona, a forma do repo e o merge alheio sem a flag continuam vetados. As condições que o hook não mede (CI, conflito,
+  # resíduo, refutador) são do script e têm bancada própria (pr_merge_verified, deploy-site --selftest).
+  local DLG_OFF=$'        elif marker in lits:\n            return True' DLG_OFF_NEW=$'        elif False:\n            return True'
+  local DLG_ALL='    if _moat_delegated(rel, words, args, rootcopy):' DLG_ALL_NEW='    if True:'
+  _mgcase "(dl1) merge alheio pelo caminho verificado com --foreign-repo → passa" 0 "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo --sync' "${J}" "${DLG_OFF}" "${DLG_OFF_NEW}"
+  _mgcase "(dl2) deploy do site com --verified-pr → passa" 0 "${P}" \
+    'bash ops/deploy-site.sh deploy --verified-pr 1600' "${J}" "${DLG_OFF}" "${DLG_OFF_NEW}"
+  _mgcase "(dl3) update do bridge pela cópia de root do sudoers → passa" 0 "${P}" \
+    "sudo ${d}/rootcopy/update-bridge.sh --restart" "${J}" $'            if rootcopy == "ok":\n                return True' $'            if False:\n                return True'
+  _mgcase "(dl4) persona do Slack (start) pela cópia de root → passa" 0 "${P}" \
+    "sudo ${d}/rootcopy/slack-persona.sh start" "${J}" $'            if rootcopy == "ok":\n                return True' $'            if False:\n                return True'
+  _mgcase "(dl5) --repo do PRÓPRIO core não é merge alheio → passa" 0 "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/core --sync' "${J}" '_moat_slug(v) not in MOAT_SELF_SLUGS' 'True'
+  _mgcase "(db1) merge alheio SEM --foreign-repo → VETO" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --sync' "${J}" '    if "@foreign" in sig and _moat_foreign_repo(args):' '    if False:'
+  _mgcase "(db2) merge alheio com o repo só conhecido em runtime → VETO" "2:merge alheio" "${P}" \
+    'R=$(cat repo.txt); bash ops/pr-merge-verified.sh 12 --repo "$R" --sync' "${J}" '        if not v or DYNAMIC.search(v) or _moat_slug(v) not in MOAT_SELF_SLUGS:' '        if not v or (not DYNAMIC.search(v) and _moat_slug(v) not in MOAT_SELF_SLUGS):'
+  _mgcase "(db3) deploy do site sem --verified-pr → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
+    'bash ops/deploy-site.sh deploy' "${J}" "${DLG_ALL}" "${DLG_ALL_NEW}"
+  _mgcase "(db4) push de porta, mesmo com os marcadores dos outros atos → VETO" "2:ops/publish-door.sh --push é o ato" "${P}" \
+    'bash ops/publish-door.sh onion-core --push --foreign-repo --verified-pr 3' "${J}" "${DLG_ALL}" "${DLG_ALL_NEW}"
+  _mgcase "(db5) update do bridge pelo script do REPO (não a cópia) → VETO" "2:MOAT/ato" "${P}" \
+    'bash ops/update-bridge.sh --restart' "${J}" "${DLG_ALL}" "${DLG_ALL_NEW}"
+  _mgcase "(db6) creds da persona pela cópia de root → VETO (segue com o maestro)" "2:ops/slack-persona.sh creds é o ato" "${P}" \
+    "sudo ${d}/rootcopy/slack-persona.sh creds" "${J}" '        if not words <= verbs:' '        if False:'
+  _mgcase "(db7) script de ato executado direto por caminho que o hook não lê → VETO" "2:MOAT/ato" "${P}" \
+    'sudo /srv/x/ops/update-bridge.sh' "${J}" '        elif p and re.sub(r"[*?\[\]]", "", os.path.basename(p)) and _moat_act_of(p):' '        elif False:'
+  echo '# mudou' >> "${d}/rootcopy/update-bridge.sh"
+  _mgcase "(db8) cópia de root DEFASADA (difere do ops/ do checkout) → VETO" "2:AUSENTE ou DIFERE" "${P}" \
+    "sudo ${d}/rootcopy/update-bridge.sh" "${J}" '                return rel, ("ok" if mine and _moat_act_digest(rp) == mine else "stale")' '                return rel, "ok"'
+  cp "${P}/ops/update-bridge.sh" "${d}/rootcopy/update-bridge.sh"
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   # (ato16) o ADOTANTE: sem ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/) o veto do ato não arma, e os
   #       wrappers também não viajam. O "mutante" é o DADO de novo: o mesmo repo com o tsv e a linha `ato` veta
@@ -13397,7 +13438,7 @@ run_slack_persona_selftests() {
   [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
   local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
   mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
-  local want=25 o rc
+  local want=26 o rc
   if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
     record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico, verify espera a conexão até o teto)"
@@ -25910,6 +25951,8 @@ case "$args" in
       printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
   # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): quantos commits da base o head NÃO tem
   *"api "*"/compare/"*) echo "${GH_BEHIND_BY:-0}"; exit 0 ;;
+  # o resíduo do PR lido no head (merge alheio delegado, 2026-11-13)
+  *"api "*"/contents/"*) [ -n "${GH_RESIDUE:-}" ] && printf '%b' "${GH_RESIDUE}"; exit "${GH_RESIDUE_RC:-0}" ;;
   *"api "*pulls*files*)
       # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
       [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
@@ -25941,6 +25984,59 @@ STUB
     _mv_rc=$?
   }
   local M="MERGED|2026-09-07T18:00:00Z"
+
+  # ── MERGE ALHEIO DELEGADO (--foreign-repo, D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, 2026-11-13) ─────────────────
+  # O hook do MOAT só deixa a sessão rodar o merge com --repo alheio quando a flag está na linha; as condições do selo
+  # (registro, CI verde, sem conflito, resíduo) são DESTE script. Um core de sandbox com o members.yaml na origin/main.
+  local fc="${d}/fcore" _fr_rc _fr_out _fr_h
+  git init -q -b main "${fc}"; mkdir -p "${fc}/ops" "${fc}/docs/evolution/federation"
+  printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: adot\n    kind: adopter\n    remote: github.com/owner/repo   # comentário\n  - id: porta\n    kind: door\n    remote: github.com/owner/porta\n' \
+    > "${fc}/docs/evolution/federation/members.yaml"
+  cp "${sut}" "${fc}/ops/pr-merge-verified.sh"
+  git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm base
+  git -C "${fc}" update-ref refs/remotes/origin/main HEAD; git -C "${fc}" remote add origin "${d}/sem-remoto.git"
+  _fr_h="$(printf 'a%.0s' {1..64})"
+  _fr() { # $1=rótulo $2=esperado (0|1) $3=trecho da saída ; resto=args do script. Env do caso vem de fora (FR_*).
+    local lbl="$1" want="$2" txt="$3"; shift 3
+    echo 0 > "${d}/n"; : > "${d}/merge-args"
+    _fr_out="$(cd "${fc}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
+      GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x \
+      GH_PR_FILES="${FR_FILES-docs/evolution/review/feat-x.md a.txt}" \
+      GH_RESIDUE="${FR_RESIDUE-$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_fr_h}")}" \
+      GH_MERGEABLE_SEQ="${FR_MG:-}" GH_BEHIND_BY="${FR_BEHIND:-0}" GH_RUNS_EMPTY="${FR_RUNS_EMPTY:-}" GH_WF_COUNT="${FR_WF:-5}" \
+      ONION_MERGE_POLL_SECS=0 bash "${fc}/ops/pr-merge-verified.sh" 999 "$@" 2>&1)"; _fr_rc=$?
+    if { [ "${want}" = 0 ] && [ "${_fr_rc}" -eq 0 ] && [ -s "${d}/merge-args" ]; } \
+       || { [ "${want}" = 1 ] && [ "${_fr_rc}" -ne 0 ] && [ ! -s "${d}/merge-args" ]; }; then
+      grep -qF -- "${txt}" <<< "${_fr_out}" && { record_pass "pr-merge-verified: ${lbl}"; return 0; }
+    fi
+    record_fail "pr-merge-verified: ${lbl}" "rc=${_fr_rc} merge=$(head -c 80 "${d}/merge-args") out=$(tail -3 <<< "${_fr_out}" | tr '\n' '|' | cut -c1-300)"
+  }
+  _fr "(fr1) merge alheio delegado com tudo em ordem ⇒ mergeia" 0 "merge alheio delegado: 'owner/repo' registrado" --repo owner/repo --foreign-repo
+  _fr "(fr2) repo fora do members.yaml ⇒ recusa sem merge" 1 "não está registrado" --repo outro/zzz --foreign-repo
+  _fr "(fr3) PORTA (kind: door) ⇒ recusa: publicação segue com o maestro" 1 "PORTA" --repo owner/porta --foreign-repo
+  _fr "(fr4) --foreign-repo com o próprio core ⇒ recusa" 1 "própria fonte" --repo onion-bancada/core --foreign-repo
+  FR_FILES="a.txt" _fr "(fr5) PR sem o resíduo ⇒ recusa" 1 "não traz o resíduo" --repo owner/repo --foreign-repo
+  FR_RESIDUE="$(printf -- '---\\nverdict: REJECTED\\nreviewed_diff_sha256: %s\\n---\\n' "${_fr_h}")" \
+    _fr "(fr6) resíduo REPROVADO ⇒ recusa" 1 "verdict 'REJECTED'" --repo owner/repo --foreign-repo
+  FR_RESIDUE='---\nverdict: APPROVED\nreviewed_diff_sha256: pendente\n---\n' \
+    _fr "(fr7) resíduo sem carimbo ⇒ recusa" 1 "não foi carimbado" --repo owner/repo --foreign-repo
+  _fr "(fr8) --dispensa no merge alheio ⇒ recusa" 1 "não aceita --dispensa" --repo owner/repo --foreign-repo --dispensa onion-review-verdict --motivo x
+  FR_MG=CONFLICTING _fr "(fr9) PR CONFLICTING ⇒ recusa, sem rebasear a branch alheia" 1 "CONFLICTING" --repo owner/repo --foreign-repo
+  FR_BEHIND=2 _fr "(fr10) PR atrás da base ⇒ recusa, sem rebasear" 1 "atrás de" --repo owner/repo --foreign-repo
+  FR_RUNS_EMPTY=1 FR_WF=0 _fr "(fr11) repo sem CI ⇒ recusa (o modo gate local fica com o maestro)" 1 "exige CI verde" --repo owner/repo --foreign-repo
+  # MUTANTE: sem a chamada do gate, o repo fora do registro mergeia — prova que a recusa do fr2 é dele
+  cp "${fc}/ops/pr-merge-verified.sh" "${d}/pmv-intacto"
+  sed -i 's/^_delegated_foreign_gate$/: _delegated_foreign_gate/' "${fc}/ops/pr-merge-verified.sh"
+  if cmp -s "${d}/pmv-intacto" "${fc}/ops/pr-merge-verified.sh"; then record_fail "pr-merge-verified: (fr-MUT)" "o mutante não mudou o script (a âncora sumiu?)"
+  else
+    echo 0 > "${d}/n"; : > "${d}/merge-args"
+    (cd "${fc}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
+      GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x \
+      bash "${fc}/ops/pr-merge-verified.sh" 999 --repo outro/zzz --foreign-repo >/dev/null 2>&1)
+    if [ -s "${d}/merge-args" ]; then record_pass "pr-merge-verified: (fr-MUT) sem o gate, o repo fora do registro mergearia — o gate é a causa da recusa"
+    else record_fail "pr-merge-verified: (fr-MUT)" "o mutante também recusou: a recusa do fr2 não vem do gate"; fi
+  fi
+  cp "${d}/pmv-intacto" "${fc}/ops/pr-merge-verified.sh"
 
   _mv "OPEN|null" "${M}" 0 "merged"
   if [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; then
@@ -47028,8 +47124,8 @@ run_act_signature_selftests() {
   command -v python3 >/dev/null 2>&1 || { record_skip "act-signature: python3 ausente"; return; }
   local o rc
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 8/8 verdes' <<< "${o}"; then
-    record_pass "act-signature: (a) --selftest verde (8: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 13/13 verdes' <<< "${o}"; then
+    record_pass "act-signature: (a) --selftest verde (13: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante, e a delegação: forma certa cala, marcador fora do código, palavra fora da assinatura, delegação sem ato, push de porta)"
   else record_fail "act-signature: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/act-signature-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
@@ -47064,10 +47160,14 @@ run_act_signature_selftests() {
         if not re.search(r"(?<![\w-])" + re.escape(w) + r"(?![\w-])", code):$(printf '\x1f')        if False:$(printf '\x1f')(iii) assinatura que o código não tem acusa
     if not os.path.isfile(p):$(printf '\x1f')    if False:$(printf '\x1f')(iv) linha ato de script inexistente acusa
     if not words:$(printf '\x1f')    if False:$(printf '\x1f')(v) linha ato sem assinatura acusa
-        if w in ("@none", "@any"):$(printf '\x1f')        if False:$(printf '\x1f')(vi) @none e palavra do case
+        if w in ("@none", "@any", "@foreign"):$(printf '\x1f')        if False:$(printf '\x1f')(vi) @none e palavra do case
                          if not l.lstrip().startswith("#"))$(printf '\x1f')                         if True)$(printf '\x1f')(vii) palavra só em COMENTÁRIO
     if cls in ("deploy", "relogio") and col4 not in ("", "-"):$(printf '\x1f')    if cls in ("deploy", "relogio"):$(printf '\x1f')(vi) @none e palavra do case
     sys.exit(0)                                  # adotante$(printf '\x1f')    pass                                  # adotante$(printf '\x1f')(viii) sem ops/moat-targets.tsv
+    if not marker or not re.search(r"(?<![\w-])" + re.escape(marker) + r"(?![\w-])", code):$(printf '\x1f')    if False:$(printf '\x1f')(x) marcador que o código não tem acusa
+    if extra or not verbs.strip():$(printf '\x1f')    if False:$(printf '\x1f')(xi) delegação que cobre palavra fora da assinatura acusa
+    if s not in acts:$(printf '\x1f')    if False:$(printf '\x1f')(xii) delegação de script sem linha ato acusa
+    if os.path.basename(s) == "publish-door.sh":$(printf '\x1f')    if False:$(printf '\x1f')(xiii) delegação do push de porta acusa
 EOF_MUT
   rm -rf "${sb}"
 }
@@ -51989,8 +52089,10 @@ run_selector_per_file_selftests() {
   local s n kg="" prose=""
   # (a) RESÍDUO → poucas: só quem lê resíduo (a REGRA 56, o ledger, o pr-finalize…) + o núcleo. Nada de quem
   #     só varre `*.md` do repo inteiro (o resíduo nunca é citado pelo nome: o nome é o slug da branch).
+  #     Teto 40 (era 30) desde 2026-11-13: os atos delegados fizeram o pr-merge-verified.sh e o deploy-site.sh LEREM o
+  #     resíduo (D_DELEGATE_*_1113), e as 7 famílias que leem esses scripts passaram a ser leitoras legítimas dele.
   s="$(_spf_sel --affected docs/evolution/review/zz-spf-residuo.md)"; n="$(_spf_n "${s}")"
-  if [ "${s}" != "ALL" ] && [ "${n}" -le 30 ] && [[ "${s}" == *",review_artifact,"* ]] && [[ "${s}" == *",review_ledger,"* ]] \
+  if [ "${s}" != "ALL" ] && [ "${n}" -le 40 ] && [[ "${s}" == *",review_artifact,"* ]] && [[ "${s}" == *",review_ledger,"* ]] \
      && [[ "${s}" == *",gitattributes_eol,"* ]] && [[ "${s}" != *",vendor_scrub,"* ]] && [[ "${s}" != *",plugin_bundle,"* ]] \
      && [[ "${s}" != *",durable_commit,"* ]]; then
     record_pass "selector-per-file: (a) resíduo ⇒ ${n} famílias, com review_artifact/review_ledger/núcleo, sem varredora de *.md nem quem só varre o ancestral docs/evolution/ (durable_commit)"

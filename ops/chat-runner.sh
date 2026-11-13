@@ -137,6 +137,24 @@ PROBE_SLUG=0000000000000000          # o workspace de SONDA do verify (16 hex: a
 MARKER="# onion-chat-runner: v1"
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NAME=chat-runner
+# ── CÓPIA DE ROOT DELEGADA (D_DELEGATE_VPS_SERVICE_SCRIPTS_1113, selado pelo maestro em 2026-11-13) ─────────────────
+# A sessão roda o update do bridge e a persona do Slack por uma regra de sudoers sem senha que aponta CÓPIAS de root
+# destes scripts em /usr/local/lib/onion-ops (root:root, 0755), instaladas e conferidas por sha256 contra a origin/main
+# pelo ops/delegated-ops.sh (core-only). NOPASSWD no script do repo seria root completo: quem edita o script vira root.
+# 0 = rodando como root, a partir da cópia, com o diretório e o arquivo do root e sem escrita de grupo nem de outros.
+ONION_DELEGATED_DIR=/usr/local/lib/onion-ops
+onion_delegated_root() {
+  [ "$(id -u)" = 0 ] && [ "${SELF_DIR}" = "${ONION_DELEGATED_DIR}" ] || return 1
+  local _m _p
+  for _m in "${SELF_DIR}" "${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")"; do
+    [ -L "${_m}" ] && return 1
+    [ "$(stat -c '%u' "${_m}" 2>/dev/null)" = 0 ] || return 1
+    _p="$(stat -c '%A' "${_m}" 2>/dev/null)"; [ "${_p:5:1}" = - ] && [ "${_p:8:1}" = - ] || return 1
+  done
+}
+# Aqui só o VERIFY roda pela cópia: o ops/update-bridge.sh delegado o chama no fim (a prova do boot novo). O install
+# segue do maestro, pelo checkout, com `!`.
+onion_delegated_verify() { onion_delegated_root && [ "${1:-}" = verify ]; }
 
 say()  { printf '[%s] %s\n' "${NAME}" "$*"; }
 die()  { local rc="$1"; shift; printf '[%s] ERRO: %s\n' "${NAME}" "$*" >&2; exit "${rc}"; }
@@ -168,14 +186,19 @@ else
   SVC_HOME="${PROD_SVC_HOME}"; STATE="${PROD_STATE}"; UNIT_DIR="${PROD_UNIT_DIR}"; LIBEXEC="${PROD_LIBEXEC}"
   BACKUP_DIR="${PROD_BACKUP_DIR}"; SOCKET="${PROD_SOCKET}"; LOCK="${PROD_LOCK}"
   # o wrapper roda como root por sudo o que ele mesmo renderiza: tem de ser o RASTREADO e limpo de um checkout
+  # (a cópia de root delegada não é checkout: o sha256 dela contra a origin/main é conferido pelo ops/delegated-ops.sh,
+  # e ela só roda o verify)
+  if ! onion_delegated_verify "${1:-}"; then
   _f="${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")"
   git -C "${SELF_DIR}" ls-files --error-unmatch -- "${_f}" >/dev/null 2>&1 \
     || die 3 "${_f} não é arquivo rastreado de um checkout: rode o wrapper do repositório, não uma cópia"
   git -C "${SELF_DIR}" diff --quiet HEAD -- "${_f}" 2>/dev/null \
     || die 3 "${_f} tem mudança não commitada: rode o wrapper como está no commit"
+  fi
 fi
 
-[ "$(id -u)" -eq 0 ] && die 3 "rodando como root: rode como o operador (o wrapper chama sudo onde precisa)"
+[ "$(id -u)" -eq 0 ] && ! onion_delegated_verify "${1:-}" \
+  && die 3 "rodando como root: rode como o operador (o wrapper chama sudo onde precisa); como root só o verify da cópia delegada em ${ONION_DELEGATED_DIR}"
 
 # o intérprete que o wrapper EXECUTA no host (o pré-voo e o contrato SDK↔lançador, rodado no mesmo python do runner).
 # Na bancada (CI) o /opt não existe: ela usa o /usr/bin/python3, e o literal RUNNER_PY segue o que a allowlist exige

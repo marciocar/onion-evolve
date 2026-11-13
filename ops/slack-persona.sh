@@ -56,7 +56,30 @@ MCP_CONF="${R}/etc/onion-vps-mcp-kg-granaai.conf"
 TTY="${ONION_SLACK_PERSONA_TTY:-/dev/tty}"
 
 priv() { if [ "${TEST}" = 1 ]; then "$@"; else sudo -n "$@"; fi; }
-[ "$(id -u)" = 0 ] && [ "${TEST}" != 1 ] && die 3 "rode como o operador (o script chama sudo onde precisa), não como root"
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# ── CÓPIA DE ROOT DELEGADA (D_DELEGATE_VPS_SERVICE_SCRIPTS_1113, selado pelo maestro em 2026-11-13) ─────────────────
+# A sessão roda o update do bridge e a persona do Slack por uma regra de sudoers sem senha que aponta CÓPIAS de root
+# destes scripts em /usr/local/lib/onion-ops (root:root, 0755), instaladas e conferidas por sha256 contra a origin/main
+# pelo ops/delegated-ops.sh (core-only). NOPASSWD no script do repo seria root completo: quem edita o script vira root.
+# 0 = rodando como root, a partir da cópia, com o diretório e o arquivo do root e sem escrita de grupo nem de outros.
+ONION_DELEGATED_DIR=/usr/local/lib/onion-ops
+onion_delegated_root() {
+  [ "$(id -u)" = 0 ] && [ "${SELF_DIR}" = "${ONION_DELEGATED_DIR}" ] || return 1
+  local _m _p
+  for _m in "${SELF_DIR}" "${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")"; do
+    [ -L "${_m}" ] && return 1
+    [ "$(stat -c '%u' "${_m}" 2>/dev/null)" = 0 ] || return 1
+    _p="$(stat -c '%A' "${_m}" 2>/dev/null)"; [ "${_p:5:1}" = - ] && [ "${_p:8:1}" = - ] || return 1
+  done
+}
+# Pela cópia: install, start e verify. O creds (a entrada oculta dos tokens) segue com o maestro, pelo checkout, com `!`.
+if [ "$(id -u)" = 0 ] && [ "${TEST}" != 1 ]; then
+  onion_delegated_root || die 3 "rode como o operador (o script chama sudo onde precisa), não como root (a exceção é a cópia de root delegada em ${ONION_DELEGATED_DIR})"
+  case "${1:-}" in
+    install|start|verify) : ;;
+    *) die 3 "a cópia de root delegada roda só install, start e verify; '${1:-}' segue com o maestro, pelo checkout, com \`!\` (D_DELEGATE_VPS_SERVICE_SCRIPTS_1113)" ;;
+  esac
+fi
 need_sudo() { [ "${TEST}" = 1 ] || sudo -n true 2>/dev/null || die 2 "sudo sem senha indisponível (rode pelo \`!\` do maestro)"; }
 
 cred_path() { printf '%s/%s.%s' "${CREDSTORE}" "${UNIT}" "$1"; }
@@ -127,12 +150,21 @@ config_problem() {
   if priv grep -Eq '"[UC]0000' "${ETC}/config.json"; then echo "a config ainda tem os IDs de exemplo (U0000…/C0000…)"; fi
 }
 
+# o que o root COPIA do bridge servido (a home da conta do serviço) tem de ser arquivo regular lá dentro: um symlink
+# plantado faria o root copiar o alvo dele (o /etc/shadow virando a unit 0644). Vale pelo checkout e pela cópia delegada.
+served_regular() {
+  local r; r="$(priv realpath -e -- "$1" 2>/dev/null)" || return 1
+  case "${r}" in "${SERVED%/deploy/slack-persona}/"*) ;; *) return 1 ;; esac
+  priv test -f "${r}" && ! priv test -L "$1"
+}
+
 cmd_install() {
   local apply=0
   case "${1:-}" in "") ;; --apply) apply=1 ;; *) usage ;; esac
   need_sudo
   local src="${SERVED}/${UNIT}.service" dst="${UNIT_DIR}/${UNIT}.service"
   priv test -s "${src}" || die 1 "o bridge servido não tem ${src}: o PR da persona chegou ao bridge? (ops/update-bridge.sh)"
+  served_regular "${src}" || die 1 "${src} não é arquivo regular dentro do bridge servido (symlink?): recusado, o root copiaria o alvo do link"
   if priv cmp -s "${src}" "${dst}" 2>/dev/null; then say "unit: igual à servida"; else
     say "unit: difere da servida (ou não está instalada):"; priv diff -u "${dst}" "${src}" 2>/dev/null | head -60 || true
   fi
@@ -147,6 +179,7 @@ cmd_install() {
   priv install -m 0644 "${src}" "${dst}" || die 2 "não instalei a unit"
   priv install -d -m 0755 "${ETC}"
   if ! priv test -e "${ETC}/config.json"; then
+    served_regular "${SERVED}/config.example.json" || die 1 "${SERVED}/config.example.json não é arquivo regular dentro do bridge servido (symlink?): recusado"
     priv install -m 0644 "${SERVED}/config.example.json" "${ETC}/config.json" || die 2 "não instalei a config de exemplo"
     say "config: instalada a de EXEMPLO em ${ETC}/config.json; troque os IDs U0000…/C0000… pelos reais antes do start"
   fi

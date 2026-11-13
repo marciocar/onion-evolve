@@ -126,6 +126,98 @@ def _moat_load():
 MOAT_UNITS, MOAT_PATHS, MOAT_MEMBERS, MOAT_ACTS = _moat_load()
 
 
+# ── ATOS DELEGADOS (2026-11-13, D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113,
+#    D_DELEGATE_VPS_SERVICE_SCRIPTS_1113) ────────────────────────────────────────────────────────────────────────────
+# O maestro selou três delegações: o ato que o veto barrava passa a ser da sessão, numa FORMA exata, e as condições que o
+# hook não mede (CI verde, resíduo, refutador) moram no próprio script, que recusa quando falta uma. Linhas do tsv:
+#   delega  script  <ops/x.sh>  <marcador>  <palavras da assinatura cobertas>  (core-only)
+# O marcador é uma flag literal na linha (`--foreign-repo`, `--verified-pr`) ou `@rootcopy=<dir>`: o script invocado
+# é a cópia em <dir> (a do sudoers sem senha, D_DELEGATE_VPS_SERVICE_SCRIPTS_1113), byte a byte a deste checkout. Passa
+# só quando TODA palavra da assinatura presente está coberta: `slack-persona.sh creds` pela cópia segue vetado.
+# A publicação das portas (`publish-door.sh --push`) não tem linha `delega` (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113).
+def _moat_load_delegations():
+    deleg, self_slugs = {}, set()
+    try:
+        with open(os.environ.get("ONION_MOAT_TARGETS", ""), encoding="utf-8") as fh:
+            for ln in fh:
+                if not ln.strip() or ln.lstrip().startswith("#"):
+                    continue
+                f = [x.strip() for x in ln.rstrip("\n").split("\t")]
+                if len(f) >= 5 and f[0] == "delega" and f[1] == "script" and f[3] and f[4] not in ("", "-"):
+                    deleg.setdefault(os.path.normpath(f[2]), []).append(
+                        (f[3], set(x.strip() for x in f[4].split(",") if x.strip())))
+    except OSError:
+        pass
+    # o repo DESTE projeto (o membro `kind: source`): `--repo` com ele não é merge alheio
+    try:
+        cur = {}
+        with open(os.environ.get("ONION_MOAT_MEMBERS", ""), encoding="utf-8") as fh:
+            for ln in list(fh) + ["- id: __fim__\n"]:
+                if re.match(r"^\s*-\s+id:", ln):
+                    if cur.get("kind") == "source" and cur.get("remote"):
+                        self_slugs.add(cur["remote"])
+                    cur = {}
+                    continue
+                m = re.match(r"^\s+kind:\s*([A-Za-z_-]+)", ln)
+                if m:
+                    cur["kind"] = m.group(1)
+                m = re.match(r"^\s+remote:\s*['\"]?([^'\"#\s]+)", ln)
+                if m:
+                    cur["remote"] = _moat_slug(m.group(1))
+    except OSError:
+        pass
+    return deleg, self_slugs
+
+
+def _moat_slug(v):
+    v = re.sub(r"^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)", "", str(v).strip())
+    return re.sub(r"\.git$", "", v).strip("/").lower()
+
+
+MOAT_DELEG, MOAT_SELF_SLUGS = _moat_load_delegations()
+
+
+def _moat_rootcopy(p):
+    """-> (rel, "ok"|"stale") se `p` é a cópia de root delegada de um script de ops/, ou None. (core-only)"""
+    if not p or not MOAT_DELEG or not ROOT:
+        return None
+    rp = os.path.realpath(p)
+    for rel, forms in MOAT_DELEG.items():
+        for marker, _ in forms:
+            if not marker.startswith("@rootcopy="):
+                continue
+            d = os.path.normpath(os.path.expanduser(marker.split("=", 1)[1]))
+            if os.path.dirname(rp) == d and os.path.basename(rp) == os.path.basename(rel):
+                mine = _moat_act_digest(os.path.join(ROOT, rel))
+                return rel, ("ok" if mine and _moat_act_digest(rp) == mine else "stale")
+    return None
+
+
+def _moat_delegated(rel, words, args, rootcopy):
+    """True se as palavras da assinatura presentes (`words`) estão todas cobertas por uma forma delegada satisfeita."""
+    lits = set((a.split("=", 1)[0] if a.startswith("--") else a) for a in args if not DYNAMIC.search(a))
+    for marker, verbs in MOAT_DELEG.get(rel, []):
+        if not words <= verbs:
+            continue
+        if marker.startswith("@rootcopy="):
+            if rootcopy == "ok":
+                return True
+        elif marker in lits:
+            return True
+    return False
+
+
+def _moat_delegated_hint(rel):
+    out = []
+    for marker, verbs in MOAT_DELEG.get(rel, []):
+        if marker.startswith("@rootcopy="):
+            out.append("sudo %s/%s (a cópia de root do sudoers, conferida por sha256), cobrindo %s"
+                       % (marker.split("=", 1)[1].rstrip("/"), os.path.basename(rel), ", ".join(sorted(verbs))))
+        else:
+            out.append("%s com %s, que confere as condições do selo antes de agir" % (rel, marker))
+    return ("; DELEGADO à sessão só por: " + " · ".join(out)) if out else ""
+
+
 def _moat_emit(cls, target, wrapper, detail):
     clean = lambda s: " ".join(str(s).split())[:300]
     OUT.append("__ONION_MOAT__" + _MOAT_SEP + _MOAT_SEP.join([cls, clean(target), wrapper or "-", clean(detail)]))
@@ -615,7 +707,7 @@ def _moat_act_of(p):
     return _MOAT_ACT_SHA["d"].get(_moat_act_digest(rp))
 
 
-def _moat_act(p, words, src=None):
+def _moat_act(p, words, src=None, rootcopy=None):
     """emite `ato` se o script é da lista e os argumentos trazem a assinatura (ou não se provam)."""
     rel = _moat_act_of(src) if src else None
     rel = rel or _moat_act_of(p)
@@ -637,17 +729,33 @@ def _moat_act(p, words, src=None):
                 noexec = w == "-o"
         if noexec:
             return
-    _moat_act_judge(rel, [a for a in _moat_script_args(p, words) if a], " ".join(words))
+    _moat_act_judge(rel, [a for a in _moat_script_args(p, words) if a], " ".join(words), rootcopy)
 
 
-def _moat_act_judge(rel, args, detail):
+def _moat_foreign_repo(args):
+    """True se algum `--repo X` aponta outro repositório que não este projeto (ou só se conhece em runtime)."""
+    for k, a in enumerate(args):
+        if a == "--repo":
+            v = args[k + 1] if k + 1 < len(args) else ""
+        elif a.startswith("--repo="):
+            v = a.split("=", 1)[1]
+        else:
+            continue
+        if not v or DYNAMIC.search(v) or _moat_slug(v) not in MOAT_SELF_SLUGS:
+            return True
+    return False
+
+
+def _moat_act_judge(rel, args, detail, rootcopy=None):
     sig = MOAT_ACTS[rel]
+    # as palavras da assinatura que ESTA invocação traz (todas, não só a 1ª: a forma delegada tem de cobrir cada uma)
+    words = set()
     if "@any" in sig:
-        _moat_emit("ato", rel, "@any", "%s roda o ato em qualquer invocação — %s" % (rel, detail))
-        return
+        words.add("@any")
     if not args and "@none" in sig:
-        _moat_emit("ato", rel, "@none", "%s sem argumento roda o ato (o modo padrão) — %s" % (rel, detail))
-        return
+        words.add("@none")
+    if "@foreign" in sig and _moat_foreign_repo(args):
+        words.add("@foreign")
     for a in args:
         # argumento só conhecido em runtime CALA (cláusula 4): no corpus, os 13 casos eram nome de serviço, porta ou
         # registro num laço (`for s in …; do bash x.sh $s verify`), nunca a assinatura. O valor literal na própria string
@@ -656,12 +764,43 @@ def _moat_act_judge(rel, args, detail):
             continue
         w = a.split("=", 1)[0] if a.startswith("--") else a
         if w in sig:
-            _moat_emit("ato", rel, w, "%s %s é o ato — %s" % (rel, w, detail))
-            return
+            words.add(w)
+    if not words:
+        return
+    if _moat_delegated(rel, words, args, rootcopy):
+        return                                          # a forma delegada: o script confere as condições do selo
+    hint = _moat_delegated_hint(rel)
+    if rootcopy == "stale":
+        hint = "; a cópia de root delegada está AUSENTE ou DIFERE de %s deste checkout (o maestro a reinstala: ops/delegated-ops.sh install)%s" % (rel, hint)  # (core-only)
+    if "@any" in words:
+        _moat_emit("ato", rel, "@any", "%s roda o ato em qualquer invocação — %s%s" % (rel, detail, hint))
+    elif "@none" in words:
+        _moat_emit("ato", rel, "@none", "%s sem argumento roda o ato (o modo padrão) — %s%s" % (rel, detail, hint))
+    elif "@foreign" in words and len(words) == 1:
+        _moat_emit("ato", rel, "@foreign", "%s com --repo de outro repositório é merge alheio — %s%s" % (rel, detail, hint))
+    else:
+        w = next(_moat_first_sig(args, sig, words))
+        _moat_emit("ato", rel, w, "%s %s é o ato — %s%s" % (rel, w, detail, hint))
+
+
+def _moat_first_sig(args, sig, words):
+    for a in args:
+        if not DYNAMIC.search(a):
+            w = a.split("=", 1)[0] if a.startswith("--") else a
+            if w in words and w in sig:
+                yield w
+    yield sorted(words)[0]
 
 
 def _moat_script(path, depth, words):
     p = _moat_abspath(path)
+    # a cópia de root delegada (sudoers sem senha): byte a byte o wrapper deste checkout, ela é fronteira para o ALVO como
+    # o versionado; o ATO dela se julga com a forma `@rootcopy`. A cópia que difere segue o caminho de sempre (corpo
+    # julgado, ato pelo nome) e a mensagem diz que ela está defasada
+    rc = _moat_rootcopy(p) if p else None
+    if rc and rc[1] == "ok":
+        _moat_act(p, words, None, "ok")
+        return
     if not p:
         # caminho só conhecido em runtime: a fronteira do `bash x.sh`, salvo se o texto cita um script de ato
         # `bash "$R"/ops/x.sh --apply`: o NOME está na palavra, e a assinatura se julga como no caminho literal (core-only)
@@ -680,7 +819,7 @@ def _moat_script(path, depth, words):
     _moat_script_body(path, depth, words)
     # o ATO se julga DEPOIS do corpo: o script versionado é fronteira para o ALVO (o que ele escreve por dentro), não
     # para o ATO; e numa cópia não versionada o veto por alvo do corpo, quando há, sai primeiro (é o mais específico)
-    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None)
+    _moat_act(p, words, _MOAT_COPIED.get(p) if not os.path.isfile(p) else None, rc[1] if rc else None)
 
 
 def _moat_script_body(path, depth, words):
@@ -1118,6 +1257,13 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
                 head = b""
             if head.startswith(b"#!") and re.match(rb"#!\s*\S*/(env\s+)?(ba|z|da|k)?sh\b", head) or p.endswith(".sh"):
                 _moat_script(p, depth, words)
+        elif p and re.sub(r"[*?\[\]]", "", os.path.basename(p)) and _moat_act_of(p):
+            # (um glob só de curinga, `/var/lib/x/*`, não nomeia script nenhum: o veto por alvo é que o julga)
+            # o script de ATO executado direto por um caminho que o hook não lê (o clone servido sob a home 0750 da conta
+            # do serviço; a cópia de root ainda não instalada): é o ato do mesmo jeito, julgado pelo NOME. Medido em
+            # 2026-11-13: `sudo /srv/x/ops/update-bridge.sh` passava com rc 0 (com `bash` na frente, o ato9 já vetava)
+            rc = _moat_rootcopy(p)
+            _moat_act(p, words, None, rc[1] if rc else None)
     # executores: o que vem depois é comando (watch/flock/nice…) ou código em texto (su -c, python -c)
     if base in RUNNERS and base not in ("crontab", "at", "batch"):
         for k, w in enumerate(args, 1):
