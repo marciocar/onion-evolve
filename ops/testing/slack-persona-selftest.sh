@@ -49,6 +49,10 @@ run creds --kg-from-mcp-conf kg-token; chk "creds: kg-token do conf do MCP" $?
 
 PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/sem-tty" bash "${me}" creds slack-app-token > "${t}/out" 2>&1
 [ $? = 2 ] && grep -q 'sem terminal' "${t}/out" && [ ! -e "${CS}/${UNIT}.slack-app-token" ]; chk "creds: sem terminal recusa antes de gravar" $?
+# a unit servida trocada por SYMLINK (2026-11-13): o root copiaria o alvo do link; o install recusa, ensaio ou não
+mv "${S}/${UNIT}.service" "${t}/unit.real"; printf 'segredo-do-root\n' > "${t}/alvo"; ln -s "${t}/alvo" "${S}/${UNIT}.service"
+run install --apply; [ $? = 1 ] && grep -q 'symlink' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida que é symlink recusa e não escreve" $?
+rm "${S}/${UNIT}.service"; mv "${t}/unit.real" "${S}/${UNIT}.service"
 run install; chk "install: ensaio sai 0" $?
 [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: ensaio não escreve" $?
 run install --apply; chk "install --apply" $?

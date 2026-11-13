@@ -63,6 +63,10 @@ LOCK=/tmp/onion-update-bridge.lock
 HEALTH_LOCAL="http://127.0.0.1:8787/health"
 HEALTH_PUBLIC="https://app.onionevolve.com/health"
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# CÓPIA DE ROOT DELEGADA (D_DELEGATE_VPS_SERVICE_SCRIPTS_1113, 2026-11-13): a sessão roda este script pela cópia de root
+# em /usr/local/lib/onion-ops (sudoers sem senha, instalada e conferida por sha256 pelo ops/delegated-ops.sh, core-only).
+# Como root, SELF_DIR é a cópia: o backup e os verify do fim rodam as cópias irmãs, e o post_verify só os aceita se forem
+# byte a byte os do clone servido (uma cópia defasada não prova nada, e o sha256 manda reinstalar).
 # Sandbox do piloto ui:// (D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021): o arquivo que o vhost ops/caddy/conf.d/sandbox.caddy serve.
 SANDBOX_DIR=/var/www/onion-sandbox
 SANDBOX_SRC_REL=deploy/sandbox/sandbox.html
@@ -70,7 +74,15 @@ SANDBOX_OWNER=root:root
 NOT_PROVEN=()
 
 # Duas execuções concorrentes fariam stop/start cruzados sobre o mesmo checkout.
-exec 9>"${LOCK}"
+# Como ROOT (a cópia delegada pelo sudoers) a trava abre SÓ PARA LEITURA, que basta ao flock: com fs.protected_regular=2
+# (medido nesta VPS) o root não abre com O_CREAT o arquivo que o operador criou no /tmp, e o arquivo que o root criasse
+# (0644) deixaria o operador sem a trava. Ausente, o root a cria 0666 (dono root, o dono do /tmp: o operador a abre).
+if [ "$(id -u)" = 0 ]; then
+  [ -e "${LOCK}" ] || ( umask 000; : > "${LOCK}" ) 2>/dev/null || true
+  exec 9<"${LOCK}"
+else
+  exec 9>"${LOCK}"
+fi
 # rc 2, não 0: quem lê o rc concluiria que entregou (a mesma trava é a do install do bridge-hardening e do chat-runner).
 flock -n 9 || { echo "[update-bridge] ERRO: outra execução (este wrapper ou um install do bridge-hardening/chat-runner) segura ${LOCK} — NADA foi atualizado." >&2; exit 2; }
 

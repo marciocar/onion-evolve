@@ -33,6 +33,21 @@
 #   ops/deploy-site.sh             # deploya a allowlist (local, na KVM 8)
 #   ops/deploy-site.sh --check     # builda e verifica drift dist×webroot (exit 1 se houver)
 #   ops/deploy-site.sh --selftest  # bancada em sandbox (nunca toca fonte/webroot reais)
+#   ops/deploy-site.sh deploy --verified-pr <N>   # o deploy DELEGADO à sessão (ver abaixo)
+#
+# DEPLOY DELEGADO (D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113, selado pelo maestro em 2026-11-13): a sessão pode
+# deployar só com a main verde e o PR revisado por refutador independente, com --check antes e depois. O veto do MOAT
+# (pretooluse-moat-gate.sh, core-only) só deixa a sessão rodar o deploy com --verified-pr; as condições moram AQUI e
+# recusam (rc 2) antes de buildar ou tocar o webroot:
+#   1. este checkout está em origin/main (buscada agora), e site/ e este script sem mudança nem arquivo não rastreado;
+#   2. a main VERDE: os check-runs do commit de origin/main existem, terminaram, e nenhum falhou;
+#   3. o PR <N> está MERGED na main, tocou site/, e a árvore site/ de origin/main é a mesma do commit de merge dele
+#      (o que vai ao ar é exatamente o que o PR deixou; outro PR que mexeu em site/ depois exige o número dele);
+#   4. REFUTADOR INDEPENDENTE, medido pelo resíduo da REGRA 56 do PR (docs/evolution/review/<branch>.md, lido no
+#      commit de merge): `elenxo: true` E `elenxo_isolado: true` (a passada adversarial por agente separado, a mesma
+#      régua do AUTOMATE do /meta:drive), verdict aprovado e reviewed_diff_sha256 carimbado.
+#   Depois: --check ANTES (o drift esperado é impresso, não recusa), o deploy, e o --check DEPOIS decide o rc.
+#   TETO: `elenxo_isolado: true` é auto-atestado no resíduo; o script exige a declaração, não prova o isolamento.
 #
 # Fonte: o OUTPUT DO BUILD Astro (site/dist) — cutover F2 da reforma (2026-08-25).
 # O build roda AQUI DENTRO (deploy E --check): comparar um dist velho contra o webroot
@@ -48,6 +63,8 @@ WEBROOT="/var/www/onion-landing"
 SUDO_CMD="sudo"
 # O selftest troca por ":" (sandbox não builda); fora dele, é sempre o build real.
 BUILD_CMD=(npm --prefix "${REPO}/site" run build)
+# o forge do deploy delegado: o selftest troca por uma função de stub
+GH_CMD=(gh)
 
 # Allowlist: TUDO que o deploy gerencia. Entrada nova no site = linha nova aqui
 # (é o ponto único de decisão do-que-se-publica, como o manifesto dos plugins).
@@ -230,6 +247,73 @@ deploy() {
   check
 }
 
+# ── deploy delegado: as quatro condições do selo, medidas antes de qualquer efeito ───
+# rc 0 = todas valem; die (rc 2) nomeia a que falta. Lê: git deste checkout, o forge (check-runs da main e o PR).
+VERIFIED_PR=""
+vp_slug() { git -C "$REPO" remote get-url origin 2>/dev/null \
+  | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##'; }
+verified_gate() {
+  local pr="$1" why="o deploy delegado exige a main verde e o PR revisado por refutador independente (D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113)"
+  [[ "$pr" =~ ^[0-9]+$ ]] || die "--verified-pr exige o NÚMERO do PR, não '${pr}'"
+  local slug head main dirty runs bad pr_tsv state base merge files ref rel body fm k v dup
+  slug="$(vp_slug)"; [[ -n "$slug" ]] || die "não li o remote origin deste checkout — sem ele não sei de que repo medir o CI"
+  # 1. o checkout é a origin/main recém-buscada, e o que o build lê está limpo
+  git -C "$REPO" fetch -q origin main 2>/dev/null || die "não busquei origin/main — sem a ponta da main não há deploy delegado"
+  head="$(git -C "$REPO" rev-parse HEAD 2>/dev/null)"; main="$(git -C "$REPO" rev-parse origin/main 2>/dev/null)"
+  [[ -n "$head" && "$head" == "$main" ]] || die "este checkout está em ${head:0:12}, não em origin/main ${main:0:12}: ${why}. Rode de uma worktree de origin/main."
+  dirty="$(git -C "$REPO" status --porcelain -- site ops/deploy-site.sh 2>/dev/null)" || die "não li o estado de site/ neste checkout"
+  [[ -z "$dirty" ]] || die "site/ ou ops/deploy-site.sh com mudança ou arquivo não rastreado neste checkout — o build publicaria o que não está na main: $(head -3 <<< "$dirty" | tr '\n' ' ')"
+  # 2. a main verde: os check-runs do commit existem, terminaram e nenhum falhou
+  runs="$("${GH_CMD[@]}" api "repos/${slug}/commits/${main}/check-runs?per_page=100" --paginate \
+          --jq '.check_runs[] | [.name, .status, (.conclusion // "")] | @tsv' 2>/dev/null)" \
+    || die "não li os check-runs de origin/main ${main:0:12} — sem ler o CI não há main verde"
+  [[ -n "$runs" ]] || die "origin/main ${main:0:12} não tem check-run nenhum (o CI ainda não nasceu?): ${why}"
+  bad="$(awk -F'\t' '$2 != "completed" || ($3 != "success" && $3 != "skipped" && $3 != "neutral") { print $1 " (" $2 "/" $3 ")" }' <<< "$runs")"
+  [[ -z "$bad" ]] || die "a main ${main:0:12} não está verde: $(head -5 <<< "$bad" | tr '\n' ' ')— ${why}"
+  # 3. o PR mergeado, que tocou site/, e cuja árvore site/ é a que vai ao ar
+  pr_tsv="$("${GH_CMD[@]}" pr view "$pr" --repo "$slug" --json state,baseRefName,headRefName,mergeCommit \
+            --jq '[.state, .baseRefName, .headRefName, (.mergeCommit.oid // "")] | @tsv' 2>/dev/null)" \
+    || die "não li o PR #${pr} no forge"
+  IFS=$'\t' read -r state base ref merge <<< "$pr_tsv"
+  [[ "$state" == MERGED && "$base" == main ]] || die "o PR #${pr} está '${state:-?}' na base '${base:-?}', não MERGED na main: ${why}"
+  [[ -n "$merge" ]] && git -C "$REPO" merge-base --is-ancestor "$merge" "$main" 2>/dev/null \
+    || die "o commit de merge do PR #${pr} (${merge:0:12}) não está na origin/main deste checkout"
+  files="$("${GH_CMD[@]}" api "repos/${slug}/pulls/${pr}/files?per_page=100" --paginate --jq '.[].filename' 2>/dev/null)" \
+    || die "não li os arquivos do PR #${pr}"
+  grep -q '^site/' <<< "$files" || die "o PR #${pr} não tocou site/: ele não revisou o que vai ao ar. Use o número do PR que mudou o site."
+  [[ "$(git -C "$REPO" rev-parse "${main}:site" 2>/dev/null)" == "$(git -C "$REPO" rev-parse "${merge}:site" 2>/dev/null)" ]] \
+    || die "site/ mudou na main depois do PR #${pr} (outro PR mexeu no site): o que iria ao ar não é o que ele revisou. Use o número do último PR que tocou site/."
+  # 4. o refutador independente, pelo resíduo do PR
+  rel="docs/evolution/review/${ref//\//-}.md"
+  body="$(git -C "$REPO" show "${merge}:${rel}" 2>/dev/null)" || die "o PR #${pr} não deixou o resíduo ${rel} na main (REGRA 56): ${why}"
+  fm="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' <<< "$body")"
+  [[ -n "$fm" ]] || die "${rel} sem frontmatter"
+  dup="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' <<< "$fm")"
+  [[ -z "$dup" ]] || die "${rel} repete chave no frontmatter (${dup}): o bash lê a 1ª e o YAML a última"
+  fmv() { sed -n "s/^$1:[[:space:]]*//p" <<< "$fm" | head -1 | tr -d "\"' " | tr '[:upper:]' '[:lower:]'; }
+  for k in elenxo elenxo_isolado; do
+    v="$(fmv "$k")"
+    [[ "$v" == true ]] || die "${rel} declara ${k}: '${v:-ausente}' — refutador independente é elenxo: true E elenxo_isolado: true (a passada por agente separado): ${why}"
+  done
+  v="$(fmv verdict | tr 'a-z-' 'A-Z_')"
+  case "$v" in APPROVED|FIXED|REJECTED_AND_FIXED|NO_FINDINGS) ;; *) die "${rel} tem verdict '${v:-ausente}': o refutador não aprovou" ;; esac
+  v="$(fmv reviewed_diff_sha256)"
+  [[ "$v" =~ ^[0-9a-f]{64}$ ]] || die "${rel} tem reviewed_diff_sha256 '${v:-ausente}': o resíduo não foi carimbado"
+  echo "✓ deploy delegado: origin/main ${main:0:12} verde ($(wc -l <<< "$runs") check-runs), PR #${pr} mergeado com site/ intacto desde ele, resíduo ${rel} com Elenxo isolado (${v:0:12})"
+}
+
+delegated_deploy() {
+  local pre=0
+  verified_gate "$VERIFIED_PR"
+  [[ -d "$WEBROOT" ]] || die "webroot ausente: $WEBROOT (este script roda NA KVM 8)"
+  run_build
+  echo "── --check ANTES do deploy delegado ──"
+  check || pre=$?
+  [[ "$pre" -eq 0 ]] && echo "── antes: nada a mudar (o deploy é idempotente) ──" || echo "── antes: drift acima (é o que o deploy vai levar ao ar) ──"
+  echo "── deploy + --check DEPOIS ──"
+  deploy
+}
+
 # ── selftest: os ataques da revisão adversarial, congelados como bancada ────────────
 # Roda em sandbox (mktemp), SEM sudo, SEM tocar fonte/webroot reais. Cada caso é um
 # ataque que REFUTOU (ou tentou refutar) uma guarda — regressão de qualquer um deles
@@ -332,11 +416,88 @@ selftest() {
     && { pass=$((pass+1)); echo "  ✓ cutover: webroot intacto após build falho"; } ; } \
     || { fail=$((fail+1)); echo "  ✗ cutover: build falho tocou o webroot"; }
 
+  # DEPLOY DELEGADO (D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113): cada condição do selo recusa sozinha. O REPO vira
+  # um clone de sandbox com origin num bare local; o forge é a função _gh_stub (STUB_RUNS e STUB_PR por caso)
+  local gb="$sb/origin.git" gr="$sb/repo" mrg
+  git init -q --bare -b main "$gb"
+  git init -q -b main "$gr"; git -C "$gr" remote add origin "$gb"
+  mkdir -p "$gr/site" "$gr/docs/evolution/review" "$gr/ops"; echo v1 > "$gr/site/index.md"; echo x > "$gr/ops/deploy-site.sh"
+  vp_residue() { printf -- '---\nverdict: %s\nelenxo: %s\nelenxo_isolado: %s\nreviewed_diff_sha256: %s\n---\n' "$1" "$2" "$3" "${4:-$(printf 'a%.0s' {1..64})}"; }
+  vp_residue APPROVED true true > "$gr/docs/evolution/review/feat-site.md"
+  git -C "$gr" add -A; git -C "$gr" -c user.email=t@t -c user.name=t commit -qm pr; git -C "$gr" push -q origin main
+  mrg="$(git -C "$gr" rev-parse HEAD)"
+  REPO="$gr"
+  STUB_RUNS=$'lint\tcompleted\tsuccess\nselftest\tcompleted\tskipped'; STUB_PR="MERGED	main	feat/site	${mrg}"; STUB_FILES="site/index.md"
+  _gh_stub() {
+    case "$*" in
+      *check-runs*) [[ -n "$STUB_RUNS" ]] && printf '%s\n' "$STUB_RUNS"; return 0 ;;
+      *"pr view"*)  printf '%s\n' "$STUB_PR"; return 0 ;;
+      *"/files"*)   printf '%s\n' "$STUB_FILES"; return 0 ;;
+    esac
+    return 1
+  }
+  GH_CMD=(_gh_stub)
+  t "delegado: todas as condições valem → passa"                     0 verified_gate 7
+  t "delegado: --verified-pr sem número → recusa"                    2 verified_gate abc
+  STUB_RUNS=$'lint\tin_progress\t'
+  t "delegado: check-run da main ainda rodando → recusa"             2 verified_gate 7
+  STUB_RUNS=$'lint\tcompleted\tfailure'
+  t "delegado: main VERMELHA → recusa"                               2 verified_gate 7
+  STUB_RUNS=""
+  t "delegado: main sem check-run nenhum → recusa"                   2 verified_gate 7
+  STUB_RUNS=$'lint\tcompleted\tsuccess'
+  STUB_PR="OPEN	main	feat/site	"
+  t "delegado: PR não mergeado → recusa"                             2 verified_gate 7
+  STUB_PR="MERGED	main	feat/site	${mrg}"; STUB_FILES="docs/x.md"
+  t "delegado: PR que não tocou site/ → recusa"                      2 verified_gate 7
+  STUB_FILES="site/index.md"
+  vp_residue APPROVED true false > "$gr/docs/evolution/review/feat-site.md"
+  git -C "$gr" -c user.email=t@t -c user.name=t commit -qam r2; git -C "$gr" push -q origin main
+  # o resíduo se lê no commit de MERGE do PR: reescrevê-lo depois, na main, não muda o que o PR teve
+  t "delegado: resíduo reescrito DEPOIS do merge não conta → passa"  0 verified_gate 7
+  STUB_PR="MERGED	main	feat/site	$(git -C "$gr" rev-parse HEAD)"
+  t "delegado: resíduo sem elenxo_isolado (uma voz só) → recusa"     2 verified_gate 7
+  vp_residue REJECTED true true > "$gr/docs/evolution/review/feat-site.md"
+  git -C "$gr" -c user.email=t@t -c user.name=t commit -qam r3; git -C "$gr" push -q origin main
+  STUB_PR="MERGED	main	feat/site	$(git -C "$gr" rev-parse HEAD)"
+  t "delegado: refutador REPROVOU (verdict REJECTED) → recusa"       2 verified_gate 7
+  vp_residue FIXED true true pendente > "$gr/docs/evolution/review/feat-site.md"
+  git -C "$gr" -c user.email=t@t -c user.name=t commit -qam r4; git -C "$gr" push -q origin main
+  STUB_PR="MERGED	main	feat/site	$(git -C "$gr" rev-parse HEAD)"
+  t "delegado: resíduo sem carimbo (pendente) → recusa"              2 verified_gate 7
+  vp_residue FIXED true true > "$gr/docs/evolution/review/feat-site.md"
+  git -C "$gr" -c user.email=t@t -c user.name=t commit -qam r5; git -C "$gr" push -q origin main
+  mrg="$(git -C "$gr" rev-parse HEAD)"; STUB_PR="MERGED	main	feat/site	${mrg}"
+  t "delegado: resíduo refeito e aprovado → passa"                   0 verified_gate 7
+  echo v2 > "$gr/site/index.md"; git -C "$gr" -c user.email=t@t -c user.name=t commit -qam outro; git -C "$gr" push -q origin main
+  t "delegado: outro PR mexeu em site/ depois → recusa"              2 verified_gate 7
+  STUB_PR="MERGED	main	feat/site	$(git -C "$gr" rev-parse HEAD)"
+  echo sujo > "$gr/site/novo.md"
+  t "delegado: arquivo não rastreado em site/ → recusa"              2 verified_gate 7
+  rm "$gr/site/novo.md"
+  git -C "$gr" -c user.email=t@t -c user.name=t commit -q --allow-empty -m local
+  t "delegado: checkout à frente de origin/main → recusa"            2 verified_gate 7
+  git -C "$gr" reset -q --hard origin/main
+  t "delegado: de volta à ponta → passa"                             0 verified_gate 7
+  # a linha de comando: `deploy` com argumento que não é --verified-pr recusa (antes, o resto da linha era ignorado)
+  t "delegado: 'deploy --qualquer' → recusa (o argumento não some)"  2 bash "${BASH_SOURCE[0]}" deploy --qualquer
+  t "delegado: 'deploy --verified-pr' sem número → recusa"           2 bash "${BASH_SOURCE[0]}" deploy --verified-pr
+
   echo "── selftest: ${pass} pass / ${fail} fail ──"
   [[ "$fail" -eq 0 ]]
 }
 
 MODE="${1:-deploy}"
+# `deploy --verified-pr <N>` (ou `--verified-pr=<N>`): o deploy delegado. Qualquer outro argumento depois do modo é recusado:
+# a 1ª redação ignorava o resto da linha, e um `deploy --verified-pr` mal escrito viraria o deploy do maestro
+if [[ "$MODE" == deploy && $# -gt 1 ]]; then
+  case "$2" in
+    --verified-pr) [[ $# -eq 3 ]] || die "uso: ops/deploy-site.sh deploy --verified-pr <N>"; VERIFIED_PR="$3" ;;
+    --verified-pr=*) [[ $# -eq 2 ]] || die "uso: ops/deploy-site.sh deploy --verified-pr <N>"; VERIFIED_PR="${2#--verified-pr=}" ;;
+    *) die "argumento desconhecido depois de 'deploy': '$2' (use --help)" ;;
+  esac
+  MODE=delegated
+fi
 case "$MODE" in
   --help|-h) usage; exit 0 ;;
   --selftest) selftest ;;
@@ -348,5 +509,6 @@ case "$MODE" in
     [[ -d "$WEBROOT" ]] || die "webroot ausente: $WEBROOT (este script roda NA KVM 8)"
     run_build
     deploy ;;
+  delegated) delegated_deploy ;;
   *) die "modo desconhecido: $MODE (use --help)" ;;
 esac

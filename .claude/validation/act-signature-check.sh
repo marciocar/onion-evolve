@@ -19,6 +19,16 @@
 #           docker-engine-migrate.sh apply e install-caddy-config.sh em 2026-10-22, stt-service.sh install
 #           --apply em 2026-10-19). O veto do ato nasceu com a lista; esta guarda é a catraca dela.
 #
+# DELEGAÇÃO (2026-11-13, D_DELEGATE_*_1113): a linha `delega script <ops/x.sh> <marcador> <palavras>` libera um ato  (core-only)
+#           à sessão numa forma exata. A catraca dela:
+#             · delega-sem-ato           — a delegação aponta um script sem linha `ato` (delegar o que não é vetado);
+#             · delega-fora-da-assinatura — uma palavra coberta que a assinatura do ato não tem (a delegação cobriria
+#                                          o que o veto nem julga, e o leitor acharia que ela libera mais do que libera);
+#             · marcador-fora-do-codigo  — a flag-marcador (`--foreign-repo`, `--verified-pr`) não aparece no código: o
+#                                          script não conferiria as condições do selo, e o veto deixaria passar;
+#             · delega-porta             — linha `delega` para ops/publish-door.sh (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113).  (core-only)
+#           `@foreign` (merge com --repo de outro repositório) é palavra de assinatura que não se confere no código.
+#
 # O QUE NÃO VÊ (teto): não sabe se a assinatura está CERTA, só que ela existe no código. Um modo novo que faz o
 #           ato sem nenhuma das palavras (um `--force` que também aplica) passa. Script de deploy que nenhuma
 #           linha de deploy nomeia como wrapper (caso do caddy-site-secrets.sh) só entra se alguém escrever a
@@ -41,7 +51,7 @@ try:
     lines = open(tsv, encoding="utf-8").read().split("\n")
 except OSError as e:
     sys.stderr.write("act-signature-check: tsv ilegível: %s\n" % e); sys.exit(2)
-wrappers, acts = {}, {}
+wrappers, acts, delegs = {}, {}, []
 for n, ln in enumerate(lines, 1):
     if not ln.strip() or ln.lstrip().startswith("#"):
         continue
@@ -53,6 +63,8 @@ for n, ln in enumerate(lines, 1):
     if kind == "script":
         if cls == "ato":
             acts[os.path.normpath(pat)] = (n, col4)
+        elif cls == "delega":
+            delegs.append((n, os.path.normpath(pat), col4, f[4].strip() if len(f) > 4 else ""))
         continue
     if cls in ("deploy", "relogio") and col4 not in ("", "-"):
         wrappers.setdefault(os.path.normpath(col4), n)
@@ -77,10 +89,31 @@ for s, (n, sig) in sorted(acts.items(), key=lambda x: x[1][0]):
     except OSError as e:
         sys.stderr.write("act-signature-check: %s ilegível: %s\n" % (s, e)); sys.exit(2)
     for w in words:
-        if w in ("@none", "@any"):
+        if w in ("@none", "@any", "@foreign"):
             continue
         if not re.search(r"(?<![\w-])" + re.escape(w) + r"(?![\w-])", code):
             say("assinatura-fora-do-codigo", n, "a palavra `%s` da assinatura de %s não aparece no código dele: o veto calaria nesse ato" % (w, s))
+for n, s, marker, verbs in delegs:
+    if os.path.basename(s) == "publish-door.sh":
+        say("delega-porta", n, "a publicação das portas segue com o maestro (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113): %s não se delega" % s)
+        continue
+    if s not in acts:
+        say("delega-sem-ato", n, "a delegação aponta %s, que não tem linha `ato`: não há veto a delegar" % s)
+        continue
+    sig = set(x.strip() for x in acts[s][1].split(",") if x.strip())
+    extra = sorted(set(x.strip() for x in verbs.split(",") if x.strip()) - sig)
+    if extra or not verbs.strip():
+        say("delega-fora-da-assinatura", n, "a delegação de %s cobre %s, fora da assinatura do ato (%s)" % (s, ", ".join(extra) or "nada", ", ".join(sorted(sig))))
+    if marker.startswith("@rootcopy="):
+        continue
+    p = os.path.join(root, s)
+    try:
+        code = "\n".join(l for l in open(p, encoding="utf-8", errors="replace").read().split("\n")
+                         if l.strip()[:1] != "#")      # o marcador em comentário não conta
+    except OSError:
+        continue
+    if not marker or not re.search(r"(?<![\w-])" + re.escape(marker) + r"(?![\w-])", code):
+        say("marcador-fora-do-codigo", n, "o marcador `%s` da delegação de %s não aparece no código dele: o script não conferiria as condições do selo" % (marker, s))
 print("\n".join(out))
 PY
 }
@@ -113,6 +146,20 @@ _selftest() {
   printf '#!/usr/bin/env bash\n# --apply só no comentário\necho x\n' > "${d}/ok/ops/c.sh"
   printf 'ato\tscript\tops/c.sh\t--apply\n' >> "${d}/ok/ops/moat-targets.tsv"  # (core-only)
   _ck "(vii) palavra só em COMENTÁRIO não conta como código" "${d}/ok" "assinatura-fora-do-codigo"
+  # a DELEGAÇÃO (2026-11-13): a forma certa cala; cada desvio acusa
+  printf '#!/usr/bin/env bash\ncase "$1" in install) [ "${2:-}" = --apply ] && [ "${3:-}" = --delegado ] && echo aplica ;; esac\n' > "${d}/ok/ops/w.sh"
+  printf 'delega\tscript\tops/w.sh\t--delegado\t--apply\n' >> "${d}/ok/ops/moat-targets.tsv"  # (core-only)
+  sed -i '/ops\/c.sh/d' "${d}/ok/ops/moat-targets.tsv"  # (core-only)
+  _ck "(ix) delegação com marcador no código e palavras da assinatura cala" "${d}/ok" ""
+  printf 'deploy\tunit\tx\tops/w.sh\nato\tscript\tops/w.sh\t--apply\ndelega\tscript\tops/w.sh\t--sumido\t--apply\n' | _mk mk
+  _ck "(x) marcador que o código não tem acusa" "${d}/mk" "marcador-fora-do-codigo"
+  printf 'deploy\tunit\tx\tops/w.sh\nato\tscript\tops/w.sh\t--apply\ndelega\tscript\tops/w.sh\t@rootcopy=/x\t--apply,creds\n' | _mk fora
+  _ck "(xi) delegação que cobre palavra fora da assinatura acusa" "${d}/fora" "delega-fora-da-assinatura"
+  printf 'deploy\tunit\tx\tops/w.sh\nato\tscript\tops/w.sh\t--apply\ndelega\tscript\tops/outro.sh\t@rootcopy=/x\t--apply\n' | _mk semato
+  _ck "(xii) delegação de script sem linha ato acusa" "${d}/semato" "delega-sem-ato"
+  printf 'ato\tscript\tops/publish-door.sh\t--push\ndelega\tscript\tops/publish-door.sh\t--x\t--push\n' | _mk porta  # (core-only)
+  printf '#!/usr/bin/env bash\n[ "$1" = --push ] && echo push\n' > "${d}/porta/ops/publish-door.sh"  # (core-only)
+  _ck "(xiii) delegação do push de porta acusa (fica com o maestro)" "${d}/porta" "delega-porta"
   mkdir -p "${d}/adotante"
   _ck "(viii) sem ops/moat-targets.tsv (adotante) cala" "${d}/adotante" ""  # (core-only)
   echo "selftest: ${pass}/$((pass + fail)) verdes"

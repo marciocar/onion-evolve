@@ -24,8 +24,13 @@
 #            assinatura do ato nos argumentos (`--apply`, `--push`, `apply`, sem argumento…): as linhas `ato script` do
 #            tsv. Medido: o wrapper versionado era fronteira para tudo, e `bash ops/<wrapper>.sh --apply` e (core-only)
 #            `ops/publish-door.sh --push` passavam com exit 0. A cerca barrava a FORMA, não o ATO. Ensaio e leitura (core-only)
-#            do mesmo script passam. `ops/pr-merge-verified.sh` fica fora (é o caminho verificado de merge, usado (core-only)
-#            pela sessão com o "sim" do maestro).
+#            do mesmo script passam. `ops/pr-merge-verified.sh` no repo do core fica fora (é o caminho verificado de merge) (core-only);
+#            com `--repo` de outro repositório (`@foreign`) é merge alheio.
+#  delegado· (2026-11-13, selos D_DELEGATE_*_1113) o ato que o maestro delegou à sessão passa numa FORMA exata (linhas
+#            `delega` do tsv): o merge alheio com --foreign-repo, o deploy do site com --verified-pr, o update do bridge
+#            e a persona do Slack (install, start) pela cópia de root do sudoers. As condições que o hook não mede (CI
+#            verde, conflito, resíduo, refutador independente) o próprio script confere e recusa. O push de porta não se
+#            delega (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113), nem o creds da persona.
 # O juiz mora em lib/moat-judge.py e roda DENTRO do tokenizador de lib/invocation-lines.sh (linhas de
 # invocação: heredoc inerte, echo e prosa que CITAM o alvo não vetam; `bash -c`, `sudo -u`, `$(…)`,
 # variável literal, `cd`, symlink, script fora do projeto e função definida na própria string — a chamada é
@@ -212,11 +217,12 @@ case "$cls" in
     echo "GUARDA-PRETOOLUSE (MOAT/repo alheio): ${detail} — ${target} não é este projeto (I3: a sessão do core não escreve repo alheio). Negado; ${how}." >&2 ;;
   ato)
     case "$wrapper" in
+      @foreign) how="merge em repo da família pela sessão só com --foreign-repo, que confere registro, CI verde, conflito e resíduo" ;;
       @any)  how="este script roda o ato em qualquer invocação" ;;
       @none) how="sem argumento ele roda o modo padrão, que é o ato; o ensaio ou a leitura dele (--help, --check, plan, verify) passa" ;;
       *)     how="sem ${wrapper} é ensaio ou leitura, e isso passa" ;;
     esac
-    echo "GUARDA-PRETOOLUSE (MOAT/ato): ${detail} — deploy, publicação e push de porta são do maestro, e o wrapper versionado não os torna da sessão (REGRA 117; alvos em ops/moat-targets.tsv, core-only). Negado pela sessão; ${how}. Peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks: \`! <o mesmo comando>\`. Porta se publica por /meta:publish, que pergunta antes do --push." >&2 ;;  # (core-only)
+    echo "GUARDA-PRETOOLUSE (MOAT/ato): ${detail} — deploy, publicação e push de porta são do maestro, salvo os atos delegados na forma exata (linhas delega), e o wrapper versionado não os torna da sessão (REGRA 117; alvos em ops/moat-targets.tsv, core-only). Negado pela sessão; ${how}. Peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks: \`! <o mesmo comando>\`. Porta se publica por /meta:publish, que pergunta antes do --push." >&2 ;;  # (core-only)
   relogio)
     echo "GUARDA-PRETOOLUSE (MOAT/relógio): ${detail} — agendar por relógio (${target}) é W7: o Onion é maestro-invocado, nunca cron/timer sobre si. Negado; agendamento é do maestro, fora da sessão (\`!\` no prompt)." >&2 ;;
   *)

@@ -11,6 +11,12 @@
 #   (`--apply`, `apply`, `--push`; `--x=v` conta como `--x`), `@none` = invocado sem argumento (o modo padrão é o ato),
 #   `@any` = qualquer invocação. Sem a assinatura, é ensaio ou leitura e passa. O ato é do maestro: pela sessão o veto
 #   barra, e o maestro roda pelo `!` no prompt, que não passa pelos hooks de ferramenta (medido no corpus em 2026-11-05).
+#   `@foreign` (2026-11-13) = um `--repo X` com X que não é este projeto (o membro `kind: source` do members.yaml).
+# Classe `delega` (2026-11-13, selos D_DELEGATE_*_1113 do maestro): 5 colunas — delega · script · <ops/x.sh> · marcador ·
+#   palavras da assinatura cobertas. O ato passa pela sessão SÓ na forma do marcador, e as condições do selo moram no
+#   script, que recusa quando falta uma. Marcador = flag literal na linha (`--foreign-repo`, `--verified-pr`) ou
+#   `@rootcopy=<dir>` (o script invocado é a cópia de root do sudoers nesse diretório, byte a byte a deste checkout).
+#   Passa só se TODA palavra da assinatura presente está coberta. A catraca é a REGRA 117 (act-signature-check.sh).
 # O alvo mais ESPECÍFICO vence (padrão mais longo), então a linha do wrapper vem junto da genérica.
 #
 # DE ONDE SAEM (medido em 2026-10-13, nunca de memória):
@@ -60,6 +66,9 @@
 #     wrapper próprio: slack-persona.sh instala a unit onion-slack-persona a partir do bridge servido, guarda os tokens
 #     cifrados em /etc/credstore.encrypted/onion-slack-persona.* (systemd-creds, D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106),
 #     a config em /etc/onion-slack-persona, o backup da unit em /var/backups/onion-slack-persona, e liga provando a conexão.
+#   · as CÓPIAS DE ROOT dos atos de VPS delegados (2026-11-13, D_DELEGATE_VPS_SERVICE_SCRIPTS_1113) e a regra de sudoers
+#     que as aponta: delegated-ops.sh install as copia da origin/main (root:root 0755) e valida a regra com visudo. É do
+#     maestro (o ato `install`); o verify é leitura. O resto de /etc/sudoers.d não tem wrapper: é do maestro.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -115,6 +124,9 @@ deploy	path	/home/marcio/mcp-kg/core-writer	ops/update-kg-writer.sh
 deploy	path	/var/lib/onion-chat-kg	-
 deploy	path	/home/marcio/mcp-kg	-
 deploy	path	/usr/local/sbin/onion-*	-
+deploy	path	/usr/local/lib/onion-ops	ops/delegated-ops.sh
+deploy	path	/etc/sudoers.d	-
+deploy	path	/etc/sudoers.d/onion-delegated-ops	ops/delegated-ops.sh
 relogio	path	/etc/cron*	-
 relogio	path	/var/spool/cron	-
 relogio	path	/etc/anacrontab	-
@@ -122,7 +134,8 @@ relogio	path	/etc/anacrontab	-
 #   Medido em 2026-11-05 (estudo problem-route, CERCA.md): com o wrapper sendo fronteira, `bash ops/<wrapper>.sh --apply`
 #   e `ops/publish-door.sh --push` passavam com exit 0. As assinaturas saem da gramática de cada script, lida no código.
 #   caddy-site-secrets.sh não é wrapper de nenhuma linha acima, mas escreve /etc/caddy/secrets (gera segredo): ato.
-#   pr-merge-verified.sh fica FORA de propósito: é o caminho verificado de merge, que a sessão usa com o "sim" do maestro.
+#   pr-merge-verified.sh no repo do core fica FORA de propósito: é o caminho verificado de merge. Com `--repo` de OUTRO
+#   repositório (`@foreign`, 2026-11-13) é merge alheio: a sessão só o faz com --foreign-repo (a linha `delega` abaixo).
 ato	script	ops/update-bridge.sh	@none,--restart
 ato	script	ops/update-kg-writer.sh	@any
 ato	script	ops/deploy-site.sh	@none,deploy
@@ -138,3 +151,17 @@ ato	script	ops/chat-runner.sh	--apply
 ato	script	ops/stt-service.sh	--apply
 ato	script	ops/slack-persona.sh	--apply,creds,start
 ato	script	ops/publish-door.sh	--push
+ato	script	ops/pr-merge-verified.sh	@foreign
+ato	script	ops/delegated-ops.sh	install
+# ── DELEGADOS (2026-11-13): o maestro selou três atos como da sessão, cada um numa forma, com as condições no script ──
+#   D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113: merge alheio só com --foreign-repo (registro, CI verde, sem conflito, resíduo).
+#   D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113: deploy do site só com --verified-pr (main verde, Elenxo isolado,
+#     --check antes e depois).
+#   D_DELEGATE_VPS_SERVICE_SCRIPTS_1113: o update do bridge e a persona do Slack (install, start; o verify não é ato) só
+#     pela cópia de root do sudoers em /usr/local/lib/onion-ops; o creds da persona segue com o maestro.
+#   O push de porta NÃO tem linha aqui: D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113 (a REGRA 117 acusa se alguém a escrever).
+#   O sudoers e as cópias: ops/sudoers/onion-delegated-ops (o arquivo) e ops/delegated-ops.sh (o instalador do maestro).
+delega	script	ops/pr-merge-verified.sh	--foreign-repo	@foreign
+delega	script	ops/deploy-site.sh	--verified-pr	deploy
+delega	script	ops/update-bridge.sh	@rootcopy=/usr/local/lib/onion-ops	@none,--restart
+delega	script	ops/slack-persona.sh	@rootcopy=/usr/local/lib/onion-ops	--apply,start

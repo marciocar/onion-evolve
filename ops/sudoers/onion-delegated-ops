@@ -1,0 +1,42 @@
+# /etc/sudoers.d/onion-delegated-ops — a regra MÍNIMA dos atos de VPS delegados à sessão do core (core-only).
+#
+# Fonte: ops/sudoers/onion-delegated-ops na origin/main do core. Quem instala é o MAESTRO, por
+# `bash ops/delegated-ops.sh install` (que copia da origin/main, valida com `visudo -cf` e confere por sha256);
+# nunca a sessão: a linha `ato script ops/delegated-ops.sh install` do ops/moat-targets.tsv veta.
+#
+# Selo: D_DELEGATE_VPS_SERVICE_SCRIPTS_1113 (maestro, 2026-11-13) — a sessão roda ops/update-bridge.sh e
+# ops/slack-persona.sh install|start|verify por sudoers sem senha; config com segredo e o `creds` seguem com ele.
+#
+# POR QUE AS CÓPIAS E NÃO O REPO: os scripts moram num checkout que o operador escreve. NOPASSWD apontando para eles
+# é root completo: quem edita o script vira root. E NOPASSWD nos comandos internos não fecha a conta (medido no
+# código em 2026-11-13): o update-bridge chama por sudo `tee`, `mv`, `install`, `rm`, `chown` e `find` com caminhos
+# variáveis, `git` e `npm` como a conta do serviço (o `-c core.sshCommand` do git executa o que quiser) e o
+# bridge-backup.sh do próprio repo (`sudo "${SELF_DIR}/bridge-backup.sh"`). Cada um, liberado, é escrita ou execução
+# arbitrária como root. Então a regra aponta só CÓPIAS do root, 0755, num diretório do root, com os argumentos
+# FIXOS de cada forma delegada. Os scripts reconhecem a cópia (onion_delegated_root: root, SELF_DIR é este
+# diretório, dono root e sem escrita de grupo ou de outros) e só aí aceitam rodar como root.
+#
+# O FECHO DE CADA CÓPIA (o que ela executa como root sem sair do diretório):
+#   update-bridge.sh  → bridge-backup.sh (o tar da origem sai por pipe; cifra e retenção rodam como o operador),
+#                       bridge-hardening.sh verify e chat-runner.sh verify (só leitura; só o verify roda pela cópia).
+#   slack-persona.sh  → nada além de comandos do sistema.
+#
+# ARGUMENTOS EXATOS: no sudoers, comando seguido de argumentos casa só com aqueles argumentos, e `""` quer dizer
+# "nenhum". `install` sem --apply é o ensaio (só lê). O `creds` não está aqui, e a cópia o recusa como root.
+#
+# ⚠️ ESTA REGRA SÓ LIMITA SE ELA FOR TUDO O QUE O OPERADOR TEM. Medido em 2026-11-13 com `sudo -n -l`: o operador
+# tem hoje `(ALL) NOPASSWD: ALL`, e é do grupo `docker` (que é root por outro caminho). Enquanto isso valer, esta
+# regra não reduz nada: a fronteira é só o veto do hook, que é camada de conformidade, não de segurança. O card do
+# maestro (docs/onion/delegated-ops-sudoers-card.md) tem o passo de tirar o NOPASSWD: ALL.
+
+Cmnd_Alias ONION_BRIDGE_UPDATE = /usr/local/lib/onion-ops/update-bridge.sh "", \
+                                 /usr/local/lib/onion-ops/update-bridge.sh --restart
+Cmnd_Alias ONION_SLACK_PERSONA = /usr/local/lib/onion-ops/slack-persona.sh install, \
+                                 /usr/local/lib/onion-ops/slack-persona.sh install --apply, \
+                                 /usr/local/lib/onion-ops/slack-persona.sh start, \
+                                 /usr/local/lib/onion-ops/slack-persona.sh verify
+
+# ambiente zerado (o padrão da casa, explícito aqui) e sem setenv: nada de LD_PRELOAD, PATH ou BASH_ENV do operador
+Defaults!ONION_BRIDGE_UPDATE, ONION_SLACK_PERSONA env_reset, !setenv
+
+marcio ALL=(root) NOPASSWD: ONION_BRIDGE_UPDATE, ONION_SLACK_PERSONA

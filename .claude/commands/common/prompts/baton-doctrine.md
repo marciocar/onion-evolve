@@ -55,7 +55,12 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    passo sem esperar ser chamado, e entrega verificado, com cada pendência com dono. Escalar é trazer diagnóstico e
    recomendação, nunca só a pergunta. **Firmeza nunca é contornar veto:** bloqueio de guarda, deploy, merge em repo
    alheio, gasto e o que muda o objetivo seguem indo ao maestro, e um caminho alternativo que passa por fora da guarda
-   é o defeito, não a persistência.
+   é o defeito, não a persistência. **A exceção é o ato delegado por selo, e só na forma dele** (2026-11-13,
+   `D_DELEGATE_*_1113`): o merge em repo da família por `ops/pr-merge-verified.sh --foreign-repo`, o deploy do site (core-only)
+   por `ops/deploy-site.sh deploy --verified-pr <N>` e o update do bridge e a persona do Slack (install, start, (core-only)
+   verify) pela cópia de root do sudoers em `/usr/local/lib/onion-ops`. Esses a batuta toca sem esperar, porque o
+   script confere as condições do selo e recusa sozinho. Recusou, a batuta não procura outra forma: leva ao maestro
+   o motivo que o script imprimiu. O push de porta segue com ele (`D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113`).
 
 7. **O pulso da batuta (baton) mede quem está parado com trabalho pronto, e fala só quando muda.** Pedido do maestro
    em 2026-11-12: as sessões ficavam ociosas esperando algo, com trabalho necessário em outra fila. O

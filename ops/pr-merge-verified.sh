@@ -92,6 +92,16 @@
 #           rebase, push, comentário, merge —, rc 1, nomeando o rascunho. Rascunho é o autor dizendo
 #           "ainda não"; mergear por cima disso é decidir por ele. Leitura ilegível do isDraft = recusa.
 #   --allow-draft: opt-in explícito, para a bancada (e para quem decidiu mergear o rascunho de propósito).
+#   --foreign-repo: o MERGE ALHEIO DELEGADO à sessão do core (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, selado pelo
+#           maestro em 2026-11-13). O veto do MOAT (pretooluse-moat-gate.sh, core-only) só deixa a sessão rodar este
+#           script com `--repo` de outro repositório quando a flag está na linha; as condições que o hook não mede
+#           moram AQUI, e cada uma recusa antes de qualquer efeito: (1) `--repo` presente e diferente do core;
+#           (2) o repo registrado em docs/evolution/federation/members.yaml lido de origin/main do core, com kind
+#           que não é `source` nem `door` (porta é publicação, D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113); (3) sem
+#           --dispensa, --ci-inoperante e --allow-draft, e nunca o modo "repo sem CI": o CI do repo tem de existir e
+#           estar verde no head; (4) SEM CONFLITO: PR CONFLICTING ou atrás da base é recusado, nunca rebaseado (o
+#           caminho delegado não reescreve a branch alheia); (5) o RESÍDUO da REGRA 56 no PR,
+#           docs/evolution/review/<branch>.md, lido no head, com verdict aprovado e reviewed_diff_sha256 carimbado.
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -123,6 +133,7 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""; NO_CI_PROVADO=""
 MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0; ALLOW_DRAFT=0
+DELEGATED_FOREIGN=0   # --foreign-repo: o merge alheio delegado (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113)
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -139,6 +150,7 @@ while [ $# -gt 0 ]; do
     --no-wait-after-rebase) NO_WAIT_AFTER_REBASE=1; shift ;;
     --wait-ci-after-rebase) WAIT_CI_AFTER_REBASE=1; shift ;;
     --allow-draft) ALLOW_DRAFT=1; shift ;;
+    --foreign-repo) DELEGATED_FOREIGN=1; shift ;;
     --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
@@ -306,6 +318,64 @@ _kg_guard_post() { # depois do merge PROVADO: cada sha da branch tem de ser ance
   say "✓ provenance: os commits da branch citados pelo .kg.yaml são ancestrais de origin/${_kg_base}"
 }
 _kg_guard_pre
+# ══ MERGE ALHEIO DELEGADO (--foreign-repo, D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, 2026-11-13) ══════════════════
+# O selo delega à sessão o merge de PR num repo da família, só por este caminho, com CI verde, sem conflito e com
+# resíduo. O veto do MOAT (core-only) exige a flag na linha de comando; o que ele não consegue medir se mede aqui,
+# antes de qualquer efeito (comentário, rebase, merge). O CI verde é o gate de sempre adiante (check-runs do head,
+# completos e sem falha); a flag só tira as saídas que o contornam. O conflito se recusa no laço do auto-rebase.
+_slug_norm() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
+_delegated_foreign_gate() {
+  [ "${DELEGATED_FOREIGN}" -eq 1 ] || return 0
+  local _why="o merge alheio pela sessão é delegado só pelo caminho verificado, com CI verde, sem conflito e com resíduo (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113)"
+  [ "${#REPO_ARG[@]}" -ge 2 ] || die "--foreign-repo exige --repo <dono>/<repo>. Nada foi feito."
+  [ "${#DISPENSA[@]}" -eq 0 ] || die "--foreign-repo não aceita --dispensa: ${_why}. Dispensa em repo alheio é do maestro. Nada foi feito."
+  [ "${CI_INOPERANTE}" -eq 0 ] || die "--foreign-repo não aceita --ci-inoperante: ${_why}. Nada foi feito."
+  [ "${ALLOW_DRAFT}" -eq 0 ] || die "--foreign-repo não aceita --allow-draft: ${_why}. Nada foi feito."
+  local _t _cdir _core _m _kind
+  _t="$(_slug_norm "${REPO_ARG[1]}")"
+  _cdir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  _core="$(_slug_norm "$(git -C "${_cdir}" remote get-url origin 2>/dev/null)")"
+  [ -n "${_core}" ] && [ "${_t}" = "${_core}" ] \
+    && die "--foreign-repo com o próprio core ('${_t}'): o merge do core segue sem a flag. Nada foi feito."
+  # o registro vale como está na origin/main do core: só conta depois de passar por PR e merge (o vendor_push lê igual)
+  git -C "${_cdir}" fetch -q origin main 2>/dev/null || say "ℹ️  não busquei origin/main do core: o registro é lido da cópia local"
+  _m="$(git -C "${_cdir}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null)" \
+    || die "não li docs/evolution/federation/members.yaml de origin/main do core: sem o registro não sei se '${_t}' é da família. Nada foi feito."
+  _kind="$(awk -v want="${_t}" '
+    function norm(v) { sub(/[[:space:]]+#.*$/, "", v); gsub(/["'"'"' ]/, "", v); sub(/^(https?:\/\/)?github\.com\//, "", v); sub(/\.git$/, "", v); return tolower(v) }
+    function flush() { if (rem != "" && rem == want && out == "") out = (kind == "" ? "?" : kind); rem = ""; kind = "" }
+    /^[[:space:]]*-[[:space:]]+id:/ { flush() }
+    /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
+    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
+    END { flush(); print out }' <<< "${_m}")"
+  case "${_kind}" in
+    "") die "'${_t}' não está registrado em members.yaml (origin/main do core): ${_why}, num repo da família registrado. Nada foi feito." ;;
+    source) die "'${_t}' é a própria fonte (kind: source): o merge do core segue sem a flag. Nada foi feito." ;;
+    door) die "'${_t}' é uma PORTA (kind: door): o merge nela publica, e a publicação das portas segue com o maestro (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113). Nada foi feito." ;;
+  esac
+  say "✓ merge alheio delegado: '${_t}' registrado em members.yaml (kind: ${_kind})"
+  # o RESÍDUO da REGRA 56, pela convenção do AUTOMATE do drive: docs/evolution/review/<branch com / trocado por ->.md
+  local _rel="docs/evolution/review/${HEAD_REF//\//-}.md" _body _fm _v _h _dup
+  [ -n "${HEAD_REF}" ] || die "não li a branch do PR #${PR}: sem ela não acho o resíduo. Nada foi feito."
+  grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
+    || die "o PR #${PR} não traz o resíduo ${_rel} (REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)): ${_why}. Nada foi feito."
+  _body="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${_t}/contents/${_rel}?ref=${HEAD_SHA}" 2>/dev/null)" \
+    || die "não li ${_rel} no head ${HEAD_SHA:0:8} do PR #${PR}. Nada foi feito."
+  _fm="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' <<< "${_body}")"
+  [ -n "${_fm}" ] || die "${_rel} sem frontmatter. Nada foi feito."
+  _dup="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' <<< "${_fm}")"
+  [ -z "${_dup}" ] || die "${_rel} repete chave no frontmatter (${_dup}): o bash lê a 1ª e o YAML a última. Nada foi feito."
+  _v="$(sed -n 's/^verdict:[[:space:]]*//p' <<< "${_fm}" | head -1 | tr -d '"'"'"'[:space:]' | tr 'a-z-' 'A-Z_')"
+  case "${_v}" in
+    APPROVED|FIXED|REJECTED_AND_FIXED|NO_FINDINGS) : ;;
+    *) die "${_rel} tem verdict '${_v:-ausente}': o merge delegado exige APPROVED, FIXED, REJECTED_AND_FIXED ou NO_FINDINGS. Nada foi feito." ;;
+  esac
+  _h="$(sed -n 's/^reviewed_diff_sha256:[[:space:]]*//p' <<< "${_fm}" | head -1 | tr -d '"'"'"'[:space:]')"
+  grep -qE '^[0-9a-f]{64}$' <<< "${_h}" \
+    || die "${_rel} tem reviewed_diff_sha256 '${_h:-ausente}': o resíduo não foi carimbado (o pr-finalize do repo carimba). Nada foi feito."
+  say "✓ resíduo ${_rel}: verdict ${_v}, diff revisado ${_h:0:12}"
+}
+_delegated_foreign_gate
 # ══ AUTO-REBASE EM REPO ALHEIO: o adotante NÃO tem ops/pr-finalize.sh (medido 2026-10-25) ════════════════
 # Adotantes sem `ops/` (onion-kg-ssot, onion-curation) mergeiam por ESTE script, chamado do core com
 # `--repo`, de dentro do repo deles. O auto-rebase abaixo rodava `bash ops/pr-finalize.sh --rebase --push` na
@@ -681,6 +751,9 @@ _RB_REASON_TEXT=""
 _RB_ENGINE_TEXT="O rebase rodou na worktree local da branch por \`ops/pr-finalize.sh --rebase --push\`, que resolve só conflito de projeção gerada (e, pelo driver das famílias, o acréscimo lado a lado de famílias da bancada) e regenera as projeções na árvore combinada."
 _FOREIGN_RB=0
 while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
+  # merge alheio delegado: SEM CONFLITO é condição do selo, e o caminho delegado não reescreve a branch alheia
+  [ "${DELEGATED_FOREIGN}" -eq 1 ] \
+    && die "PR #${PR} está $([ "$_mg" = CONFLICTING ] && echo CONFLICTING || echo "${_behind} commit(s) atrás de '${_BASE_REF}'") — o merge alheio delegado (--foreign-repo) exige o PR sem conflito e na ponta da base, e não rebaseia a branch de outro repo. Rebaseie na sessão do repo, espere o CI e rode de novo. Nada foi mergeado."
   _rebases=$((_rebases+1))
   if [ "$_mg" = CONFLICTING ]; then
     _rb_state="CONFLICTING"
@@ -952,6 +1025,8 @@ if [ -z "$head_runs" ] && [ "${_WF_COUNT}" -eq 0 ]; then
   # repo do PR, no head do PR, sem mudança rastreada. O merge e o comentário no PR dizem que não havia CI.
   # NUNCA vale para o core: o core tem CI, e workflow "sumido" ali é defeito a investigar, não modo.
   _nc_slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _nc_slug="${REPO_ARG[1]}"
+  [ "${DELEGATED_FOREIGN}" -eq 1 ] \
+    && die "o repo '${_nc_slug}' leu ZERO workflows: o merge alheio delegado (--foreign-repo) exige CI verde, e o modo 'repo sem CI' (gate local) fica com o maestro. Nada foi mergeado."
   _slug_of_url() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
   _core_slug="$(_slug_of_url "$(git -C "${_SKIP_HERE}/.." remote get-url origin 2>/dev/null)")"
   _nc_target="$(tr '[:upper:]' '[:lower:]' <<< "${_nc_slug}")"
