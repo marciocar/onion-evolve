@@ -37,7 +37,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 184.5 | `Q_AGENT_REQUESTER_PRIVILEGE_1113` | agent-requester-privilege-2026-11 | Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próp |
+| 207.0 | `Q_AGENT_REQUESTER_PRIVILEGE_1113` | agent-requester-privilege-2026-11 | Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próp |
 | 60.0 | `C_ELENXO_RECOMMENDATION_1113` | agent-requester-privilege-2026-11 | Recomendação do Elenxo: delegação (sub=solicitante, act=agente), nunca impersonation; autorização a jusante; aprovação hum |
 | 22.0 | `C_LESSER_OF_AGENT_AND_REQUESTER_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: privilégio efetivo = menor entre agente e solicitante é o padrão de 2026. Sustentada como prática de me |
 | 15.6 | `C_AUDIT_KIT_NORMATIVE_BASIS_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: aprovação por papel e o kit de auditoria (política, inventário de contas, matriz de papéis, log por at |

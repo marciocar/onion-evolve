@@ -2,7 +2,8 @@
 branch: docs/agent-requester-privilege-research
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 646a25fade963863eb4b8d023c7295a1bf08938987743f7e63c906b292e4c166
+reviewed_code_sha256: 7d2d5281ffeb11e0980c98bf703a9c8398bf79c6a471b25c3f6122de32e9b604
 findings_total: 38
 findings_real: 15
 findings_blocking: 5
