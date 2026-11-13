@@ -1022,6 +1022,9 @@ fi
 # Sem isto, tirar a label depois do parecer seria o jeito mudo de virar um vermelho em verde.
 # Leitura que falha = recusa (fail-closed), como a dos check-runs acima.
 _REVIEW_OFF=""; _REVIEW_PRIOR_REPROVOU=""
+# _RV_STATE: none (nenhum veredito lido neste head) · success (o mais recente é verde) · other (não é verde: o caminho
+# de sempre decide). _REVIEW_POS: a anotação da marca POSITIVA (o revisor rodou e aprovou), emitida pelo juiz da base.
+_RV_STATE="none"; _REVIEW_POS=""
 _rm_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/review/review-mode-decide.sh"
 if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
   _rm_marker="$(bash "${_rm_script}" --print-marker)"
@@ -1033,10 +1036,14 @@ if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
     [ -n "${_rv_id}" ] || continue
     if [ "${_rv_first}" -eq 1 ]; then
       _rv_first=0
-      [ "${_rv_concl}" = "success" ] || break       # o mais recente não é verde: o caminho de sempre decide
+      [ "${_rv_concl}" = "success" ] || { _RV_STATE="other"; break; }   # o mais recente não é verde: o caminho de sempre decide
+      _RV_STATE="success"
       _rv_ann="$(gh api "repos/${OWNER_REPO}/check-runs/${_rv_id}/annotations" --jq '.[].message' 2>/dev/null)" \
         || die "não consegui LER as anotações do onion-review-verdict (check-run ${_rv_id}) — não sei se o verde é aprovação ou desligamento."
       _REVIEW_OFF="$(LC_ALL=C grep -m1 -F -- "${_rm_marker}" <<< "${_rv_ann}" || true)"
+      # marca vazia (juiz antigo, sem --print-reviewed-marker) nunca vira grep -F "" (que casaria tudo)
+      _rm_pos="$(bash "${_rm_script}" --print-reviewed-marker 2>/dev/null)" || _rm_pos=""
+      case "${_rm_pos}" in onion-review-*:) _REVIEW_POS="$(LC_ALL=C grep -m1 -F -- "${_rm_pos}" <<< "${_rv_ann}" || true)" ;; esac
       [ -n "${_REVIEW_OFF}" ] || break               # verde que não é desligamento: aprovação de verdade
       continue
     fi
@@ -1053,37 +1060,55 @@ if [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
   head_runs="${head_runs}"$'\n'"onion-review-verdict"$'\t'"completed"$'\t'"failure"
 fi
 # ══ FALLBACK DO REVISOR × GUARDA (2026-11-13, D_REVIEW_AUTO_WITH_FALLBACK_1113) ═══════════════════════
-# Quando o revisor de IA não julgou (modo off, chave ausente ou falta de crédito: o veredito sai verde com a
-# marca "não revisado pelo CI"), o PR que toca GUARDA não pode entrar só com o gate determinístico. O que
-# substitui o parecer do CI é o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com
-# Elenxo por refutador INDEPENDENTE: `elenxo: true` e `elenxo_isolado: true` (o campo do AUTOMATE do drive e
-# do #1647), verdict aceito e o diff carimbado. Sem isso, recusa. PR que não toca guarda segue sem exigência.
-# A lista de guardas é a do ops/review/guard-paths.sh (uma só, a mesma da regra do `auto`), lida pela API com
-# o nome antigo do rename. Vale no CORE (a lista é dele); em repo alheio, dito e pulado.
-# Leitura que falha = recusa (fail-closed): "não medi" não vira "não toca".
+# Num PR que toca GUARDA, o verde do onion-review-verdict só vale como revisão com a MARCA POSITIVA
+# (`onion-review-revisado:`, emitida pelo juiz lido da BASE quando o revisor rodou e o gate de achados aprovou, com o
+# sha deste head). Qualquer outro verde é FALLBACK (2ª passada do refutador do #1652, B1): a marca de desligado (modo
+# off, chave ausente, falta de crédito, action auto-pulada), verde sem marca nenhuma, ou nenhum veredito no head. E a
+# marca NÃO vale quando o PR muda a maquinaria do revisor (_REVIEW_MACHINERY_RE): o workflow de um pull_request é o do
+# HEAD, então um PR que o edita forja qualquer anotação.
+# Em fallback, o que substitui o parecer do CI é o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada
+# adversarial) com Elenxo por refutador INDEPENDENTE: `elenxo: true` e `elenxo_isolado: true` (o campo do AUTOMATE do
+# drive e do #1647), verdict aceito e o diff carimbado. Sem isso, recusa. PR que não toca guarda segue sem exigência.
+# A lista de guardas é a do ops/review/guard-paths.sh (uma só, a mesma da regra do `auto`), lida pela API com o nome
+# antigo do rename. Vale no CORE (a lista é dele); em repo alheio, dito e pulado. Veredito vermelho segue o caminho
+# de sempre (dispensa nomeada). Leitura que falha = recusa (fail-closed): "não medi" não vira "não toca".
+# TETO DECLARADO: `elenxo_isolado: true` é AUTO-ATESTADO no resíduo; o script exige a declaração, não a prova.
 _FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
+_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$)'
 _fallback_guard_gate() {
-  [ -n "${_REVIEW_OFF}" ] && [ -z "${_REVIEW_PRIOR_REPROVOU}" ] || return 0
+  [ -z "${_REVIEW_PRIOR_REPROVOU}" ] || return 0
+  [ "${_RV_STATE}" != "other" ] || return 0
+  [ -f "${_rm_script}" ] || return 0
   local _here _slug _core _gh _grc=0 _gout
   _here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
   # sem --repo, o script roda contra o repo do checkout (o core); com --repo, só vale se for o próprio core
   _core="$(git -C "${_here}/.." remote get-url origin 2>/dev/null | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' | tr '[:upper:]' '[:lower:]')"
   if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(tr '[:upper:]' '[:lower:]' <<< "${REPO_ARG[1]}")" != "${_core:-?}" ]; then
-    say "ℹ️  revisão em fallback num repo alheio (${_slug}): a lista de guardas é do core, a exigência do resíduo independente não se aplica aqui."
+    [ -n "${_REVIEW_OFF}" ] && say "ℹ️  revisão em fallback num repo alheio (${_slug}): a lista de guardas é do core, a exigência do resíduo independente não se aplica aqui."
     return 0
   fi
   _gh="${_here}/review/guard-paths.sh"
-  [ -f "${_gh}" ] || die "a revisão do CI está em fallback e não achei ${_gh}: sem a lista de guardas não sei se o PR #${PR} exige o resíduo independente. Nada foi mergeado."
+  [ -f "${_gh}" ] || die "não achei ${_gh}: sem a lista de guardas não sei se o PR #${PR} exige o resíduo independente. Nada foi mergeado."
   _gout="$(bash "${_gh}" --pr "${PR}" --repo "${_slug}" 2>&1)" || _grc=$?
   case "${_grc}" in
-    1) say "⊘ revisão em fallback e o PR não toca guarda: sem exigência extra (o gate determinístico cobre)."; return 0 ;;
+    1) [ -n "${_REVIEW_OFF}" ] && say "⊘ revisão em fallback e o PR não toca guarda: sem exigência extra (o gate determinístico cobre)."; return 0 ;;
     0) : ;;
-    *) die "a revisão do CI está em fallback e não medi se o PR #${PR} toca guarda (${_gout:0:200}). Nada foi mergeado." ;;
+    *) die "não medi se o PR #${PR} toca guarda (${_gout:0:200}). Nada foi mergeado." ;;
   esac
+  local _mach _reason
+  _mach="$(LC_ALL=C grep -E "${_REVIEW_MACHINERY_RE}" <<< "${_gout}" | head -3 | paste -sd' ' -)"
+  if [ -n "${_REVIEW_POS}" ] && [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ] && LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"; then
+    say "✓ PR de GUARDA revisado pelo CI: marca positiva do juiz da base no head ${GATE_SHA:0:8}"
+    return 0
+  fi
+  if [ -n "${_REVIEW_OFF}" ]; then _reason="o revisor do CI não julgou (${_REVIEW_OFF#*: })"
+  elif [ -n "${_mach}" ]; then _reason="o PR muda a maquinaria do revisor (${_mach}), e a marca do CI não vale para quem a reescreve"
+  elif [ "${_RV_STATE}" = "none" ]; then _reason="não li veredito do revisor neste head"
+  else _reason="o veredito verde não traz a marca positiva do juiz da base para o head ${GATE_SHA:0:8}"; fi
   local _paths _why _rel _body _fm _dup _v _h _e _ei
   _paths="$(head -5 <<< "${_gout}" | paste -sd' ' -)"
-  _why="o PR #${PR} toca GUARDA (${_paths}) e o revisor do CI não julgou (${_REVIEW_OFF#*: }): o merge exige o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com refutador independente (D_REVIEW_AUTO_WITH_FALLBACK_1113)"
+  _why="o PR #${PR} toca GUARDA (${_paths}) e ${_reason}: o merge exige o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com refutador independente (D_REVIEW_AUTO_WITH_FALLBACK_1113)"
   [ -n "${HEAD_REF}" ] || die "${_why}, e não li a branch do PR para achar o resíduo. Nada foi mergeado."
   _rel="docs/evolution/review/${HEAD_REF//\//-}.md"
   grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
@@ -1108,7 +1133,7 @@ _fallback_guard_gate() {
   grep -qE '^[0-9a-f]{64}$' <<< "${_h}" \
     || die "${_why}; ${_rel} tem reviewed_diff_sha256 '${_h:-ausente}': o resíduo não foi carimbado (o pr-finalize carimba). Nada foi mergeado."
   unset -f _fmv
-  say "✓ revisão em fallback num PR de GUARDA (${_paths}): resíduo ${_rel} com refutador independente (elenxo_isolado: true), verdict ${_v}, diff ${_h:0:12}"
+  say "✓ PR de GUARDA sem revisão válida do CI (${_reason}): resíduo ${_rel} com refutador independente (elenxo_isolado: true), verdict ${_v}, diff ${_h:0:12}"
 }
 _fallback_guard_gate
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
