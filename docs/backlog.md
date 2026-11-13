@@ -1257,6 +1257,13 @@
 | 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
 | 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
 
+## private-repo-cite-2026-11 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 16.0 | `Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA` | private-repo-cite-2026-11 | no core público, grafo novo ou tocado que cita repo privado ou inalcançável por URL ou repo@sha sai com aviso no lint, e o pass |
+| 4.5 | `C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA` | private-repo-cite-2026-11 | teto: repo de terceiro que fechou, nome nu fora do registro, gist, GitLab, 'commit abc1234' em prosa, sha sem nome, grafo fora do  |
+
 ## session-orchestration-2026-11 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1412,13 +1419,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
-
-## private-repo-cite-2026-11 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 12.0 | `Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA` | private-repo-cite-2026-11 | no core público, grafo novo ou tocado que cita repo privado ou inalcançável por URL ou repo@sha sai com aviso no lint, e o pass |
-| 4.5 | `C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA` | private-repo-cite-2026-11 | teto: repo de terceiro que fechou, nome nu fora do registro, gist, GitLab, 'commit abc1234' em prosa, sha sem nome, grafo fora do  |
 
 ## dissect-forge-2026-10 — 2 item(ns)
 
