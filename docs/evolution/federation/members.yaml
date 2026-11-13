@@ -24,6 +24,10 @@
 # onion/vendor dele por fast-forward, relatado. Ausente = não consentiu: a remota não é tocada (vendor-branch.sh).
 # O consentimento vale só para o `remote:` do membro (toda URL de push tem de ser ele) e é lido de
 # origin/main do core: só conta depois de passar por PR e merge.
+# `piece: true` + `owner_session` + `sponsor` (2026-11-12, D_BACKBONE_OWNER_1112): a PEÇA estratégica tem uma sessão
+# Onion própria que a defende (molde do kg-ssot) e um patrocinador humano. Campo NOVO, não um `kind:` novo: o kind é a
+# natureza (enum do members-validate.sh, lido pela paridade de porta e pelos pins), e a peça segue sendo adotante. O
+# baton-pulse.sh avisa (nunca bloqueia) PIECE_UNOWNED e PIECE_OWNER_NAME_MISMATCH com o card de arranque.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
@@ -747,6 +751,9 @@ members:
     name: onion-curation (curadoria do Onion Evolve)
     role: standalone
     kind: adopter
+    piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); `kind:` segue a natureza
+    owner_session: onion-curation # o NOME da sessão que a defende; o baton-pulse casa por nome, nunca pelo ref
+    sponsor: maestro            # patrocinador humano ao lado do dono (forma do Entra Agent ID)
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-curation (privado)
     local_path: /home/marcio/onion-curation
@@ -772,6 +779,10 @@ members:
     name: onion-kg-ssot (produto KG-SSOT)
     role: standalone
     kind: adopter
+    piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); `kind:` segue a natureza
+    owner_session: onion-kg-ssot # o NOME da sessão que a defende; o baton-pulse casa por nome, nunca pelo ref
+    sponsor: maestro            # patrocinador humano ao lado do dono (forma do Entra Agent ID)
+    # as worktrees onion-kg-ssot-* NÃO são peças: só o local_path abaixo é o repo da peça
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-kg-ssot (privado)
     local_path: /home/marcio/onion-kg-ssot
@@ -894,6 +905,12 @@ members:
     name: onion-messaging (comunicação estável entre sessões)
     role: standalone            # TIER 3 — adota o core direto; o carimbo vivo diz `adopted` (par da REGRA 92)
     kind: adopter
+    piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); `kind:` segue a natureza
+    owner_session: onion-messaging # o NOME da sessão que a defende; o baton-pulse casa por nome, nunca pelo ref
+    sponsor: maestro            # patrocinador humano ao lado do dono (forma do Entra Agent ID)
+    # o onion-bridge NÃO é membro: é a infra que hospeda o endpoint a2a do core (a2a.host do onion-evolve), em produção
+    # sem sessão dona. O selo D_BACKBONE_OWNER_1112 põe os conectores dele sob esta peça; a peça bridge não se registra
+    # à parte até o maestro decidir se ela vira repo próprio.
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-messaging (privado)
     local_path: /home/marcio/onion-messaging

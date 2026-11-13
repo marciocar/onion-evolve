@@ -1,0 +1,347 @@
+# kg-backlog-guard: on
+# Estudo: existe padrão de mercado, com nome, para um agente ou sessão persistente DONO de repositório ou componente?
+# Cadência (review_after = baseline + 90d): o tipo dominante é MERCADO (existência de padrão consolidado e
+# direção de catálogo e identidade de agentes); as fontes de ferramenta (agent teams experimentais) mudam mais
+# rápido, mas a pergunta é se o mercado consolidou um nome, e isso se mede em trimestre.
+meta:
+  id: agent-repo-ownership-2026-11
+  schema_version: "1"
+  baseline: "2026-11-12"
+  review_after: "2027-02-10"
+  purpose: "Medir se o mercado tem nome e campos para um agente ou sessão persistente dona de repo ou componente, coordenada por orquestrador, e o que disso serve ao padrão do Onion de sessão dona por peça (members.yaml kind piece com owner_session, aviso PIECE_UNOWNED no pulso da batuta, card de arranque)."
+  # ═══ TETO: 20 NÓS ═══
+nodes:
+  - id: Q_AGENT_REPO_OWNERSHIP_1112
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-12"
+    verified_against: "rodada /onion-research de 2026-11-12: 43 fontes, 16 claims, 12 confirmadas"
+    label: "existe em novembro de 2026 um padrão de mercado consolidado, com nome, para agente ou sessão persistente dona de repo ou componente, coordenada por orquestrador?"
+    narrative: "Resposta: NÃO há nome de mercado consolidado; a ausência é declarada. O mercado declara dono por spec.owner do Backstage (grupo ou usuário do catálogo, resolvido por manifesto, CODEOWNERS, catalog-info.yaml e organização do GitHub) e, na identidade de agentes, pelos papéis Owner, Sponsor e Manager do Entra Agent ID, sempre com o agente como OBJETO governado e humano ou grupo como dono. AGENTS.md é escopo de instrução sem campo owner; agent teams do Claude Code são experimentais, efêmeros e partição de arquivos por sessão. O que serve ao Onion: espelhar o campo spec.owner (owner_session aponta entidade resolvível), a ordem de resolução com parada na primeira correspondência, e manter um humano Sponsor por peça ao lado da sessão dona; o PIECE_UNOWNED e o card de arranque persistente são cunhagem do Onion sem par de mercado. Origem: pergunta do maestro de 2026-11-12, após D_BACKBONE_OWNER_1112 (onion-messaging dono do backbone com sessão própria)."
+    trace: "docs/evolution/research/agent-repo-ownership-2026-11/SYNTHESIS.md"
+
+  # ── EVIDÊNCIAS CONFIRMADAS (fontes web) ──────────────────────────────────────────────
+  - id: E_AGENTSMD_DIRECTORY_SCOPE_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://agents.md (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "AGENTS.md usa escopo por diretório: o arquivo mais próximo do editado vence e o prompt explícito do usuário prevalece; é escopo de instruções, não declaração de dono"
+    trace: "https://agents.md"
+    provenance:
+      source: "https://agents.md"
+      locator: "seção sobre arquivos aninhados e precedência"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_AGENTSMD_NO_OWNER_FIELD_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://agents.md (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "AGENTS.md é Markdown livre, sem campos obrigatórios; a especificação não tem campo owner, time ou sessão responsável"
+    trace: "https://agents.md"
+    provenance:
+      source: "https://agents.md"
+      locator: "descrição do formato"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_BACKSTAGE_SPEC_OWNER_AIRESOURCE_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://backstage.io/docs/ai/ai-in-the-catalog (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "no Backstage, spec.owner é obrigatório em AiResource (skill e rule) e em API type mcp-server, e referencia entidade dona, tipicamente grupo ou usuário, não um agente"
+    trace: "https://backstage.io/docs/ai/ai-in-the-catalog"
+    provenance:
+      source: "https://backstage.io/docs/ai/ai-in-the-catalog"
+      locator: "definição de AiResource e API mcp-server"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_BACKSTAGE_AI_AS_RESOURCE_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://backstage.io/docs/ai/ai-in-the-catalog (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "o Backstage cataloga o recurso de IA como contexto consumido por ferramentas de código (skills e rules), com dono humano ou grupo; a página não define agente dono de repo"
+    trace: "https://backstage.io/docs/ai/ai-in-the-catalog"
+    provenance:
+      source: "https://backstage.io/docs/ai/ai-in-the-catalog"
+      locator: "modelo de AiResource"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CC_AGENT_TEAMS_EXPERIMENTAL_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://code.claude.com/docs/en/agent-teams (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "agent teams do Claude Code são experimentais e desligados por padrão (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1); não são padrão consolidado nem dono persistente de repo"
+    trace: "https://code.claude.com/docs/en/agent-teams"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-teams"
+      locator: "aviso de recurso experimental e habilitação"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CC_AGENT_TEAMS_FILE_PARTITION_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-12"
+    verified_against: "https://code.claude.com/docs/en/agent-teams (votos 2-1)"
+    source_tier: 9
+    source_kind: primary
+    label: "em agent teams, dono é partição de arquivos feita pelo lead por sessão, não campo declarado: a doc só recomenda que cada teammate possua arquivos distintos; não há campo owner"
+    narrative: "Voto dividido 2-1: a confiança fica abaixo das demais primárias do mesmo documento."
+    trace: "https://code.claude.com/docs/en/agent-teams"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-teams"
+      locator: "boas práticas sobre conflito de arquivos entre teammates"
+      method: "judges: votação 2-1 do run"
+      locality: "web"
+  - id: E_CC_AGENT_TEAMS_RUNTIME_CONFIG_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://code.claude.com/docs/en/agent-teams (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "a configuração do time é estado de runtime efêmero, sem equivalente de projeto; papéis reutilizáveis vêm de subagent definitions (.claude/agents), não de arquivo de ownership"
+    trace: "https://code.claude.com/docs/en/agent-teams"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-teams"
+      locator: "configuração do time e definições de subagente"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_CC_AGENT_TEAMS_NO_PERSISTENCE_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "https://code.claude.com/docs/en/agent-teams (votos 3-0)"
+    source_tier: 9
+    source_kind: primary
+    label: "agent teams não persistem o dono: /resume não restaura teammates in-process, um time por sessão, lead fixo, config removida ao fim; contrasta com sessão dona por peça persistente"
+    trace: "https://code.claude.com/docs/en/agent-teams"
+    provenance:
+      source: "https://code.claude.com/docs/en/agent-teams"
+      locator: "limitações conhecidas"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_SPOTIFY_PORTAL_OWNER_RESOLUTION_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "https://backstage.spotify.com/docs/portal/core-features-and-plugins/ai-explorer/ownership (votos 3-0)"
+    source_tier: 8
+    source_kind: primary
+    label: "no Spotify Portal AI Explorer, o dono de um recurso se resolve em ordem fixa: manifesto, CODEOWNERS, catalog-info.yaml do repo, organização do GitHub, parando na primeira correspondência"
+    trace: "https://backstage.spotify.com/docs/portal/core-features-and-plugins/ai-explorer/ownership"
+    provenance:
+      source: "https://backstage.spotify.com/docs/portal/core-features-and-plugins/ai-explorer/ownership"
+      locator: "ordem de resolução de ownership"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_SPOTIFY_PORTAL_OWNER_MUST_BE_CATALOG_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-12"
+    verified_against: "https://backstage.spotify.com/docs/portal/core-features-and-plugins/ai-explorer/ownership (votos 3-0)"
+    source_tier: 8
+    source_kind: primary
+    label: "o dono tem de corresponder a usuário ou grupo do catálogo; a página não prevê agente nem sessão como dono, nem aviso de recurso sem dono, e não nomeia padrão de agente dono de repo"
+    trace: "https://backstage.spotify.com/docs/portal/core-features-and-plugins/ai-explorer/ownership"
+    provenance:
+      source: "https://backstage.spotify.com/docs/portal/core-features-and-plugins/ai-explorer/ownership"
+      locator: "requisito de correspondência no catálogo"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_ENTRA_AGENT_ID_THREE_ROLES_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-12"
+    verified_against: "https://nhimg.org/articles/entra-agent-ids-owner-sponsor-manager-model-changes-accountability/ (votos 3-0)"
+    valid_from: "2026-07"
+    source_tier: 5
+    source_kind: analyst
+    label: "no Microsoft Entra Agent ID, o dono do agente se declara em três papéis: Owner (configuração e credenciais), Sponsor (ciclo de vida, revisão de acesso, retenção) e Manager (organizacional)"
+    narrative: "Fonte analista tier 5: confiança limitada a 0.7 pela doutrina, a primária da Microsoft não foi lida nesta rodada."
+    trace: "https://nhimg.org/articles/entra-agent-ids-owner-sponsor-manager-model-changes-accountability/"
+    provenance:
+      source: "https://nhimg.org/articles/entra-agent-ids-owner-sponsor-manager-model-changes-accountability/"
+      locator: "descrição dos papéis Owner, Sponsor e Manager"
+      method: "judges: votação 3-0 do run"
+      locality: "web"
+  - id: E_ENTRA_PERSON_OVER_AUTOMATION_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-12"
+    verified_against: "https://nhimg.org/articles/entra-agent-ids-owner-sponsor-manager-model-changes-accountability/ (votos 2-1)"
+    valid_from: "2026-07"
+    source_tier: 5
+    source_kind: analyst
+    label: "a fonte recomenda pessoa, não só grupo ou automação, quando a responsabilidade precisa ser rastreável, e alerta que ownership concentrado em automação amplia o raio de impacto"
+    narrative: "Não impõe dono humano como regra rígida. Voto 2-1 e tier 5: confiança baixa."
+    trace: "https://nhimg.org/articles/entra-agent-ids-owner-sponsor-manager-model-changes-accountability/"
+    provenance:
+      source: "https://nhimg.org/articles/entra-agent-ids-owner-sponsor-manager-model-changes-accountability/"
+      locator: "recomendação sobre dono pessoa versus automação"
+      method: "judges: votação 2-1 do run"
+      locality: "web"
+
+  # ── EIXO MERCADO / CAPITAL (invariante, mesmo sem sinal) ──────────────────────────────
+  - id: E_MERCADO_AGENT_OWNERSHIP_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-12"
+    verified_against: "worker de mercado e sintetizador da rodada /onion-research de 2026-11-12: nenhuma rodada, M&A ou relatório de analista sobre agente dono de repo sobreviveu à verificação"
+    source_tier: 10
+    source_kind: measurement
+    label: "EIXO MERCADO, SEM SINAL de capital sobre agente dono de repo; a tendência medida é governança DE agentes (Entra Agent ID, catálogo do Backstage), não ownership POR agentes"
+    narrative: "Nenhuma rodada, M&A ou relatório Gartner ou Forrester sobre o tema sobreviveu. O único sinal de produto de fornecedor grande é o Entra Agent ID (Owner, Sponsor, Manager), por fonte analista tier 5 de 2026-07, e nele o agente é o objeto governado. O Backstage e o Spotify Portal AI Explorer seguem a mesma direção: inventariar recursos de IA sob dono humano."
+    provenance:
+      source: "síntese do eixo mercado da rodada /onion-research desta pergunta (2026-11-12)"
+      locator: "bloco Mercado do sintetizador"
+      method: "derived: síntese do worker de mercado sobre as fontes verificadas da rodada"
+
+  # ── LACUNAS DECLARADAS (contagem exata) ──────────────────────────────────────────────
+  - id: E_LACUNAS_AGENT_OWNERSHIP_1112
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "contagem do handoff da rodada: 43 fontes, 16 claims, 12 confirmadas, 0 refutadas por fonte fraca listadas, 0 não verificadas, 0 reprovações recusadas pelo motor"
+    source_tier: 10
+    source_kind: measurement
+    label: "LACUNAS: 16 claims, 12 confirmadas; 0 refutadas por fonte fraca listadas, 0 não verificadas, 0 reprovações recusadas; corte por orçamento em 43 fontes e 16 claims; vários alvos da pergunta sem claim"
+    narrative: "Sem claim confirmada nesta rodada, e por isso NÃO-JULGADOS (nem a favor nem contra): CODEOWNERS do GitHub como primária própria (entra só pela ordem de resolução do Spotify Portal), OpsLevel, Cortex, GitHub Copilot coding agent e custom agents, Devin, Factory droids, OpenHands, os projetos da AAIF além do AGENTS.md, e os papéis de dono em CrewAI, AutoGen e LangGraph. A primária do Microsoft Entra Agent ID não foi lida (só a analista tier 5). A ausência de nome de mercado é conclusão sobre as fontes lidas; uma rodada que leia essas primárias pode encontrar um termo de fornecedor."
+    provenance:
+      source: "handoff da rodada /onion-research desta pergunta (2026-11-12)"
+      locator: "contagens de fontes, claims, refutadas, não verificadas e recusadas"
+      method: "derived: contagem do handoff da rodada"
+
+  # ── O QUE O CORE CONSTRUIU A PARTIR DESTA RODADA ─────────────────────────────────────
+  - id: D_PIECE_FIELD_NOT_KIND_1112
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-12"
+    verified_against: "members-validate.sh (KINDS é enum fechado, lido também pela paridade de porta e pelos pins) e git grep -n 'kind' em .claude/ e ops/"
+    label: "a peça se declara por campo NOVO (piece: true + owner_session + sponsor: maestro) no members.yaml, não por kind: piece; o pulso da batuta resolve o dono em ordem fixa e avisa PIECE_UNOWNED e PIECE_OWNER_NAME_MISMATCH com card de arranque"
+    narrative: "O purpose deste grafo falava em `kind piece`. Medido antes de mudar: `kind:` é a NATUREZA do membro, enum fechado no members-validate.sh (source, adopter, distillation, door, method, port) e consumido pela paridade de porta (REGRA 92), pelos pins (vendoriza ou não) e pelo destino do /meta:adopt. As três peças (onion-kg-ssot, onion-curation, onion-messaging) seguem adotantes; trocar o kind as tiraria do pin obrigatório. Por isso campo novo. As três formas do mercado entram assim: owner_session aponta entidade resolvível (spec.owner), a resolução para na primeira (owner_session, owners.tsv, core), e o sponsor humano fica ao lado. O onion-bridge não virou membro: é infra do core (a2a.host) e os conectores dele ficam sob a peça onion-messaging, pelo selo D_BACKBONE_OWNER_1112. Onde mora: baton-pulse.sh (classes PIECE_*), members.yaml, cláusula 8 da baton-doctrine e os casos (ag) a (am) de run_baton_pulse_selftests."
+    trace: ".claude/validation/baton-pulse.sh"
+
+edges:
+  - from: E_AGENTSMD_DIRECTORY_SCOPE_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_AGENTSMD_NO_OWNER_FIELD_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_BACKSTAGE_SPEC_OWNER_AIRESOURCE_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_BACKSTAGE_AI_AS_RESOURCE_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_CC_AGENT_TEAMS_EXPERIMENTAL_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_CC_AGENT_TEAMS_FILE_PARTITION_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_CC_AGENT_TEAMS_RUNTIME_CONFIG_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_CC_AGENT_TEAMS_NO_PERSISTENCE_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_SPOTIFY_PORTAL_OWNER_RESOLUTION_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_SPOTIFY_PORTAL_OWNER_MUST_BE_CATALOG_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_ENTRA_AGENT_ID_THREE_ROLES_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_ENTRA_PERSON_OVER_AUTOMATION_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_MERCADO_AGENT_OWNERSHIP_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_AGENT_OWNERSHIP_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: SUPPORTS
+  - from: D_PIECE_FIELD_NOT_KIND_1112
+    to: Q_AGENT_REPO_OWNERSHIP_1112
+    edge_type: TRACES_TO

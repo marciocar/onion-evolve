@@ -78,6 +78,21 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    causa (aprovação sem quem responda, comando pendurado, harness travado e ferramenta longa legítima saem iguais), e não
    sabe se o processo do subagente ainda vive.
 
+8. **Toda peça estratégica tem sessão dona e patrocinador humano; peça sem dono é aviso, nunca bloqueio.** Selado pelo
+   maestro em 2026-11-12 (`D_BACKBONE_OWNER_1112`), no molde do kg-ssot: a peça é o membro com `piece: true` no
+   `docs/evolution/federation/members.yaml`, com `owner_session` (o NOME da sessão Onion que a defende) e
+   `sponsor: maestro`. O `kind:` segue sendo a natureza do membro (a peça continua adotante). O dono se resolve em
+   **ordem fixa, parando na primeira que responde:** `owner_session` do members.yaml, depois o `owners.tsv` do estado
+   da batuta (a linha cujo rótulo é o id da peça), depois a sessão do core, como último recurso e com aviso. O pulso
+   casa pelo **nome** da sessão, nunca pelo ref `[xxxx]`, porque a retomada troca o ref. Ele dá a cada peça uma
+   classe: `PIECE_OWNED`, `PIECE_UNOWNED` (nenhuma sessão viva com aquele nome), `PIECE_OWNER_NAME_MISMATCH` (há sessão
+   viva no repo da peça com outro nome: um desencontro de nome não é dono ausente) e `PIECE_UNMEASURED` (sem a lista
+   de peers não há nome a casar). Cada aviso traz o **card de arranque**, o comando que abre a sessão nomeada no repo
+   da peça, como texto: o pulso nunca abre sessão. Abrir é ato do maestro. As três formas vêm do mercado
+   (dono obrigatório que aponta entidade registrada, do `spec.owner` do Backstage; ordem fixa de resolução, do Spotify
+   Portal AI Explorer; patrocinador humano ao lado do dono, do Entra Agent ID). O mercado não tem nome para «agente
+   dono de repo», e esse desenho é do Onion (`docs/evolution/research/agent-repo-ownership-2026-11/`).
+
 ## O que ela NÃO promete (fronteira declarada)
 
 - **O pulso não vê o que o harness e o git não veem.** Sem a lista de peers, a classe sai só pela idade do farol, e uma

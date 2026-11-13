@@ -58179,7 +58179,7 @@ BP_AG
     q="$(_bpr "$1" --quiet --last-sha "${sha:-0}")"; BP_WHY="sha=${sha} · $(head -c 300 <<< "${q}")"
     [ -n "${sha}" ] && ! grep -q '· sem mudança' <<< "${q}" && grep -q '^- AGENT_STALLED: astalled' <<< "${q}"; }
   _bpcase "(v) agente que para muda o sha: o --quiet não cala um STALLED" \
-    "'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT]}" "}" _bp_v
+    "'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT]," "" _bp_v
   # (w) agente que só RODA não muda o sha: a batida segue quieta (limite 7 do refutador)
   _bp_w() { local s1 s2; s1="$(_bpr "$1" --tsv | awk -F'\t' '$1=="sha"{print $2}')"
     printf '%s\n' '{"type":"user","message":{"role":"user","content":"brief"}}' > "${ag}/agent-afresh.jsonl"; touch -d "@$((NOW - 30))" "${ag}/agent-afresh.jsonl"
@@ -58262,6 +58262,61 @@ BP_WF
     grep -q "^agent${T}wf_1/awfafter${T}AGENT_SILENT${T}" <<< "${a}"; }
   _bpcase "(af) entrega seguida de mais trabalho e silêncio sai SILENT, não DONE" \
     "                    handback = ''   # nova mensagem" "                    pass   # nova mensagem" _bp_af
+  # (ag)-(al) PEÇAS (D_BACKBONE_OWNER_1112, 2026-11-12): membro `piece: true` com sessão dona, casada pelo NOME.
+  #     Ordem fixa: owner_session do members.yaml → owners.tsv (rótulo = id da peça) → a sessão do core (último recurso).
+  mkdir -p "${r}/docs/evolution/federation" "${sb}/pclive" "${sb}/pcgone" "${sb}/pcmis/sub" "${sb}/pcref"
+  printf 'version: 2\nmembers:\n  - id: p-live\n    piece: true\n    owner_session: pc-live\n    local_path: %s\n  - id: p-gone\n    piece: true\n    owner_session: pc-gone\n    local_path: %s\n  - id: p-mis\n    piece: true\n    owner_session: pc-mis\n    local_path: %s\n  - id: p-ref\n    piece: true\n    owner_session: sid-pcref\n    local_path: %s\n  - id: p-ord1\n    piece: true\n    local_path: /nao/existe/ord1\n  - id: p-ord2\n    piece: true\n    owner_session: pc-live\n    local_path: /nao/existe/ord2\n  - id: p-ord3\n    piece: true\n    local_path: /nao/existe/ord3\n  - id: not-a-piece\n    owner_session: pc-gone\n    local_path: /nao/existe/np\n' \
+    "${sb}/pclive" "${sb}/pcgone" "${sb}/pcmis" "${sb}/pcref" > "${r}/docs/evolution/federation/members.yaml"
+  printf 'pc-tsv\tp-ord1\npc-gone\tp-ord2\n' > "${sb}/state/owners.tsv"
+  python3 - "${sb}" "${r}" "$$" > "${sb}/peers-pc.json" <<'BP_PC'
+import json, sys
+sb, r, pid = sys.argv[1], sys.argv[2], int(sys.argv[3])
+# pc-live dono vivo · «catch-up» vivo DENTRO do repo de p-mis, com outro nome · a sessão de ref sid-pcref se chama «outro»
+# (o ref NUNCA casa) · pc-tsv é o dono por owners.tsv · core-sess roda no checkout da fonte (o último recurso)
+P = [('pc-live', 'sid-pclive', f'{sb}/pclive'), ('catch-up', 'sid-catchup', f'{sb}/pcmis/sub'), ('outro', 'sid-pcref', f'{sb}/alpha'),
+     ('pc-tsv', 'sid-pctsv', f'{sb}/beta'), ('core-sess', 'sid-core', r)]
+print(json.dumps([{'pid': pid, 'cwd': c, 'kind': 'interactive', 'sessionId': i, 'name': n, 'status': 'idle'} for n, i, c in P]))
+BP_PC
+  _bppc() { _bpr "$1" --tsv --peers "${sb}/peers-pc.json" "${@:2}" | grep "^piece${T}"; }
+  _bp_ag() { local a; a="$(_bppc "$1")"; BP_WHY="$(grep 'p-live' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^piece${T}p-live${T}PIECE_OWNED${T}pclive${T}${T}${T}members.yaml${T}dono pc-live · .*dono vivo: pc-live" <<< "${a}"; }
+  _bpcase "(ag) peça com sessão viva do nome do dono sai PIECE_OWNED" \
+    "    else: match = [s for s in _live if s['name'] == pc['owner']]" "    else: match = []" _bp_ag
+  _bp_ah() { local a; a="$(_bppc "$1")"; BP_WHY="$(grep 'p-gone' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^piece${T}p-gone${T}PIECE_UNOWNED${T}.*nenhuma sessão viva com o nome «pc-gone» · arranque: cd .*/pcgone && claude --name pc-gone\$" <<< "${a}" \
+      && ! grep -q "^piece${T}not-a-piece" <<< "${a}"; }
+  _bpcase "(ah) peça sem sessão viva sai PIECE_UNOWNED com o card de arranque" \
+    "        pc['card'] = card_of(pc['lp'], pc['owner'] if not pc['osrc'].startswith('core') else pc['id'])" "        pc['card'] = ''" _bp_ah
+  _bp_ai() { local a; a="$(_bppc "$1")"; BP_WHY="$(grep 'p-mis' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^piece${T}p-mis${T}PIECE_OWNER_NAME_MISMATCH${T}.*«catch-up».*o dono declarado é «pc-mis».*arranque: na sessão viva, /rename pc-mis" <<< "${a}"; }
+  _bpcase "(ai) sessão viva no repo da peça com outro nome sai PIECE_OWNER_NAME_MISMATCH, nunca dono ausente" \
+    "    elif in_repo:" "    elif False:" _bp_ai
+  # (aj) ordem: p-ord2 tem owner_session E linha no owners.tsv (que aponta um dono morto) ⇒ vence o members.yaml;
+  #      p-ord1 só no owners.tsv ⇒ pc-tsv; p-ord3 sem nenhum ⇒ o core (último recurso), com aviso
+  _bp_aj() { local a w; a="$(_bppc "$1")"; w="$(_bpr "$1" --tsv --peers "${sb}/peers-pc.json" | grep "^warn${T}.*p-ord3")"
+    BP_WHY="$(grep 'p-ord' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^piece${T}p-ord2${T}PIECE_OWNED${T}.*${T}members.yaml${T}dono pc-live " <<< "${a}" \
+      && grep -q "^piece${T}p-ord1${T}PIECE_OWNED${T}.*${T}owners.tsv${T}dono pc-tsv " <<< "${a}" \
+      && grep -q "^piece${T}p-ord3${T}PIECE_OWNED${T}.*${T}core (último recurso)${T}dono core " <<< "${a}" && [ -n "${w}" ]; }
+  _bpcase "(aj) dono em ordem fixa: owner_session → owners.tsv → core" \
+    "    if m.get('owner_session'): pc['owner']" "    if m.get('owner_session') and not hit: pc['owner']" _bp_aj
+  # (ak) casa pelo NOME, nunca pelo ref: owner_session igual ao sessionId de uma sessão viva de outro nome não é dono
+  _bp_ak() { local a; a="$(_bppc "$1")"; BP_WHY="$(grep 'p-ref' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^piece${T}p-ref${T}PIECE_UNOWNED${T}" <<< "${a}"; }
+  _bpcase "(ak) o ref [xxxx] nunca casa o dono: só o nome" \
+    "    else: match = [s for s in _live if s['name'] == pc['owner']]" "    else: match = [s for s in _live if pc['owner'] in (s['name'], s['sid'])]" _bp_ak
+  # (al) sem a lista de peers não há nome a casar: PIECE_UNMEASURED, nunca «sem dono»
+  _bp_al() { local a; a="$(_bpr "$1" --tsv --no-peers | grep "^piece${T}")"; BP_WHY="$(head -2 <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^piece${T}p-gone${T}PIECE_UNMEASURED${T}" <<< "${a}" && ! grep -q "PIECE_UNOWNED" <<< "${a}"; }
+  _bpcase "(al) sem lista de peers a peça sai PIECE_UNMEASURED, nunca sem dono" \
+    "    if not peers_ok:" "    if False:" _bp_al
+  # (am) owners.tsv que existe e não se lê (um diretório no lugar dele) para a ordem no 2º degrau: a peça sem
+  #      owner_session sai PIECE_UNMEASURED, nunca «dono = core» por palpite (1ª passada adversarial, 2026-11-12)
+  mkdir -p "${sb}/state-own-bad/owners.tsv"
+  _bp_am() { local a; a="$(BP_STATE="${sb}/state-own-bad" _bppc "$1")"; BP_WHY="$(grep 'p-ord' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^piece${T}p-ord3${T}PIECE_UNMEASURED${T}.*owners.tsv unreadable" <<< "${a}" && grep -q "^piece${T}p-ord2${T}PIECE_OWNED${T}" <<< "${a}"; }
+  _bpcase "(am) owners.tsv ilegível: a peça sem owner_session sai PIECE_UNMEASURED, nunca dona pelo core" \
+    "    elif pc['osrc'].startswith('core') and own_st.startswith('unreadable'):" "    elif False:" _bp_am
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests

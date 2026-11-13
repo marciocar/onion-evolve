@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1104 itens abertos** em 168 grafo(s) com aberto (de 224 no escopo) · 162 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1081 itens abertos** em 167 grafo(s) com aberto (de 224 no escopo) · 161 grupo(s), agrupados por `owner:` (71 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## outside-in-primaries-2026-11 — 21 item(ns)
 
@@ -627,12 +627,6 @@
 | 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
 | 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
 
-## automation-levels-2026-11 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 45.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
-
 ## nanochat-eixo-d-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -660,35 +654,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
-
-## backbone-piece-shape-2026-11 — 24 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 42.5 | `C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT` | backbone-piece-shape-2026-11 | G3: a camada aberta usa licença OSI permissiva (Apache 2.0, nunca SSPL nem BUSL), o pago se corta pelo comprador provável e há  |
-| 26.4 | `C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE` | backbone-piece-shape-2026-11 | G4: a especificação do backbone governa a implementação por conformidade mecânica (cada MUST/SHOULD mapeado a um check ou exc |
-| 14.4 | `C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST` | backbone-piece-shape-2026-11 | G2: o consumidor recebe o backbone por vendorização com manifesto verificável (tag, commit e sha256 por arquivo); o gate A2A em |
-| 12.8 | `C_OPCAO_B_MONOREPO_STAGING_PROJECTION` | backbone-piece-shape-2026-11 | Opção B: o núcleo vive dentro do monorepo do core e repos publicados são projeção por staging, no molde do Kubernetes; contr |
-| 10.0 | `C_OPCAO_A_OWN_REPO_STAMPED_VENDOR` | backbone-piece-shape-2026-11 | Opção A: a peça vive em repo e sessão próprios, com semver, e os consumidores recebem só o cliente e o gate por vendorizaç |
-| 5.4 | `C_SUPERACAO_20261112_KGSSOT_STAMP_AND_GO_MANIFEST` | backbone-piece-shape-2026-11 | Para o registro verificável no consumidor que o Kubernetes-sha não entrega: o carimbo de vendorização do kg-ssot no core (vend |
-| 5.4 | `C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_SPEC_TO_IMPL` | backbone-piece-shape-2026-11 | A conformidade com rastreio por MUST do MCP (claim 10) cobre a relação especificação → implementação que a hierarquia SEP  |
-| 4.8 | `Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR` | backbone-piece-shape-2026-11 | Um pacote publicado (npm ou PyPI) atende, no consumidor Onion (repo Claude Code com hooks em shell), o carimbo por arquivo e o gat |
-| 3.6 | `C_SUPERACAO_20261112_A2A_GOVERNANCE_FILES_EXIST` | backbone-piece-shape-2026-11 | A formulação restrita à existência de GOVERNANCE.md, MAINTAINERS.md e CHANGELOG.md na raiz do repo da spec A2A. |
-| 3.6 | `C_SUPERACAO_20261112_A2A_README_INSTALL_COMMANDS` | backbone-piece-shape-2026-11 | A lista de comandos de instalação do README do A2A entrega o valor de 'o consumidor recebe o SDK por gerenciador de pacotes'. |
-| 3.6 | `C_SUPERACAO_20261112_A2A_TEN_REPOS_SPEC_SDK_ITK_APACHE` | backbone-piece-shape-2026-11 | A formulação restrita aos 10 repos visíveis da org a2aproject entrega o valor do claim: separação spec, SDK e ITK em repos pr |
-| 3.6 | `C_SUPERACAO_20261112_CE_NEW_SDKS_SPEC_ONLY_POINTS` | backbone-piece-shape-2026-11 | A seção 'New SDKs' do SDK-GOVERNANCE.md da CloudEvents entrega o que o claim prometia: a spec só recebe a documentação que ap |
-| 3.6 | `C_SUPERACAO_20261112_CE_SDK_SUPPORTS_N_AND_N_MINUS_1` | backbone-piece-shape-2026-11 | cloudevents/SDK.md l.38 e o item 4 da lista healthy entregam a relação SDK-spec como faixa de suporte (versões maiores N e N-1) |
-| 3.6 | `C_SUPERACAO_20261112_CE_WIRE_VALUE_STABLE` | backbone-piece-shape-2026-11 | O parágrafo de GOVERNANCE.md l.163-169 da CloudEvents entrega a estabilidade do valor 'on the wire' prometida pelo claim, sem afi |
-| 3.6 | `C_SUPERACAO_20261112_GO_VENDOR_BUILD_OFFLINE_SCOPED` | backbone-piece-shape-2026-11 | O 5º parágrafo da seção Vendoring do Go entrega o build offline a partir de vendor/, com o escopo correto: só comandos de bui |
-| 3.6 | `C_SUPERACAO_20261112_GO_VENDOR_MAIN_MODULE_GO114` | backbone-piece-shape-2026-11 | Os 4º e 6º parágrafos da seção Vendoring do Go: uso automático do vendor só com go 1.14 ou superior no go.mod; vendor só n |
-| 3.6 | `C_SUPERACAO_20261112_MCP_CONFORMANCE_STANDARDS_TRACK_ONLY` | backbone-piece-shape-2026-11 | A formulação corrigida da exigência de conformidade do MCP, condicionada a SEP Standards Track com comportamento observável, p |
-| 3.6 | `C_SUPERACAO_20261112_MCP_SEP_SCOPE_AND_SPONSORS` | backbone-piece-shape-2026-11 | A formulação corrigida do fluxo de SEP do MCP: bug fixes e clarificações vão por PR comum e os Core Maintainers também podem |
-| 3.6 | `C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_G4_HOW` | backbone-piece-shape-2026-11 | O arquivo de rastreio sep-NNNN.yaml do MCP (cada MUST/SHOULD mapeado a um check de conformidade) entrega a parte de G4 que a gover |
-| 3.6 | `C_SUPERACAO_20261112_NATS_AGREEMENT_UPDATE_NOTE` | backbone-piece-shape-2026-11 | A nota de atualização de 2025-05-01 do mesmo post entrega a parte 'terminou com acordo' (NATS segue na CNCF); 'sem fork' segue s |
-| 3.6 | `C_SUPERACAO_20261112_NATS_NONOPEN_LICENSE_PART_OF_TAKEBACK` | backbone-piece-shape-2026-11 | A formulação sustentada pelo blog da CNCF: a licença não aberta (BUSL) é componente de uma tentativa de retomar o projeto NAT |
-| 3.6 | `C_SUPERACAO_20261112_NATS_TRADEMARK_AS_LEVERAGE` | backbone-piece-shape-2026-11 | A formulação sustentada pelo blog da CNCF: a Synadia não completou a cessão prometida da marca e usa essa promessa quebrada co |
-| 3.6 | `C_SUPERACAO_20261112_TEMPORAL_SCIM_BUSINESS_ADDON` | backbone-piece-shape-2026-11 | A formulação corrigida pela página de preços em Markdown da Temporal: SCIM é add-on no plano Business (+$500/mo), incluso no  |
-| 2.7 | `C_OPCAO_C_PUBLISHED_PACKAGE` | backbone-piece-shape-2026-11 | Opção C: a peça é um pacote publicado (npm ou PyPI) e o consumidor a recebe por versão de registro. |
 
 ## poda-instruction-bloat-2026-09 — 6 item(ns)
 
@@ -850,6 +815,12 @@
 | 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
 | 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
 | 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
+
+## automation-levels-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 33.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
 
 ## deck-patterns-2026-09 — 8 item(ns)
 
@@ -1040,13 +1011,14 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## kg-ssot — 4 item(ns)
+## kg-ssot — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
+| 6.0 | `Q_COORD_KGSSOT_FORMA_X_CHANGE_1111` | coordenacao-sessoes-2026-10 | A forma recomendada, não normativa, do x_change (planned, communicated, applied, verified, reverted, com vínculo ao x_event) par |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
