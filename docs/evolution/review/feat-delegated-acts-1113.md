@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: df8523cd6f036527042584e044e9d93939bf5820ef2582e3bc613a83c796a5ef
-reviewed_code_sha256: 2c408273332a20bf0d760da33bf992a89a8ba2efd1f3d672922c8138cd6d1a4b
-findings_total: 24
-findings_real: 24
-findings_fixed: 24
+reviewer: "7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: bd94a6da0835f9308c6215e87d6544d5e2d10e6a73c5854fa0db7614f02fa46b
+reviewed_code_sha256: b753b0fa3a181ebba07e4609a50f6e69eaf0acc762b573ea715eb63421cc75af
+findings_total: 27
+findings_real: 27
+findings_fixed: 27
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou cinco vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
+nota: "o refutador independente reprovou seis vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
 ---
 
 # Resíduo — REGRA 56
@@ -159,6 +159,20 @@ passwd). O que ainda passa o hook é forma legítima, é recusado pelo script co
 a ref origin/main local, o ~/.gitconfig, a config do gh e o próprio hook. Os hooks e as recusas dos scripts são CAMADA
 DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/onion/delegated-ops-sudoers-card.md).
 
+## 7ª passada: o item 3 enxergando o que deve (curado aqui)
+
+25. **Rename escapava.** `pulls/N/files --jq .filename` trazia só o nome novo, e renomear ops/moat-targets.tsv para
+    .old (o que põe o hook em modo derivado) passava como PR comum. Cura: o pmv lê `.filename` E `.previous_filename`;
+    o arquivo `removed` vem pelo `.filename`. (rf24, com o --jq do script rodando de verdade no gh de bancada, e mutante)
+26. **A regex escrita à mão deixava guarda de fora** (o publish-door.sh e os outros scripts de ato, o members.yaml, os
+    workflows, ops/review/, a catraca da REGRA 117). Cura: a lista é DERIVADA do moat-targets.tsv (o da árvore somado ao
+    de origin/main: as linhas `ato` e `delega` e os wrappers de deploy/relógio), mais os fixos (o tsv, members.yaml,
+    .github/workflows/, ops/review/, act-signature-check.sh, .claude/hooks/, settings.json, ops/sudoers/ e o fecho dos
+    scripts delegados). (rf25, rf26, com mutante)
+27. **A ponta da main medida no remoto** (o reforço que o refutador recomendou para o limite da ref local): rb30 forja a
+    origin/main local por update-ref com o deploy-site.sh editado e a árvore igual; o hook veta, e o mutante que lê a
+    ref local passa. A bancada aponta a URL constante para o próprio repo de sandbox (costura declarada).
+
 ## LIMITES declarados (o refutador os apontou; não se curam aqui)
 
 - **BASH_ENV e `--rcfile`**: `BASH_ENV=x bash ops/deploy-site.sh …` e `sudo bash --rcfile x -i <cópia>` passam o hook.
@@ -171,12 +185,15 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
   origem por tar).
 - **O `ops/moat-targets.tsv` é editável pela sessão**: quem edita a lista edita o veto. A REGRA 117 confere a forma das
   linhas, não a autoria.
-- **sudo amplo e script de scratchpad**: com `(ALL) NOPASSWD: ALL`, `sudo systemd-run -p User=root …` roda qualquer
-  coisa como root, e um script não versionado com `gh pr merge --repo <outro>` no corpo, ou `gh api -X PUT
-  …/pulls/N/merge`, passa o hook (r5b do refutador). São o item 6: a sessão é o usuário do maestro, e a fronteira é
-  outro usuário. O veto de merge do merge-gate julga a linha, não o corpo do script.
-- **A ref `origin/main` é da sessão também**: `git update-ref refs/remotes/origin/main <commit>` ou um objeto plantado
-  faria a conferência do item 1 comparar com o falso. Fecha só com outro usuário.
+- **sudo amplo, `curl` e script em arquivo**: com `(ALL) NOPASSWD: ALL`, `sudo systemd-run -p User=root …` roda
+  qualquer coisa como root; `curl -X PUT …/pulls/N/merge` e um script em arquivo com `gh pr merge --repo <outro>` no
+  corpo passam o hook (r5b do refutador). Correção de registro (7ª passada): o `gh api … /merge` NÃO passa, o
+  refutador mediu e todas as formas dele são vetadas; a 6ª redação deste resíduo dizia que passava, e estava errada.
+  São o item 6: a sessão é o usuário do maestro, e a fronteira é outro usuário.
+- **A ref `origin/main` local deixou de ser a régua do hook (7ª passada)**: o hook mede a ponta da main no REMOTO
+  (`git ls-remote https://github.com/marciocar/onion-evolve refs/heads/main`, URL constante) e exige o objeto aqui
+  (`cat-file -e`); sem rede, a forma delegada fecha. O update-ref, o fetch de outro lugar e a escrita no arquivo da ref
+  não movem mais a régua sem editar o hook. O script do merge alheio ainda confere contra a origin/main local (limite).
 - **A constante do core mora em três arquivos que a sessão edita**: mudar a constante é mudar o script ou o hook, que
   passam por PR e pelo refutador (é a mesma natureza do tsv editável); trocar só o members.yaml não basta mais.
 - **O `~/.gitconfig` (include, insteadOf) agora é limite de verdade, não alvo**: ele ainda muda o que o git busca (o

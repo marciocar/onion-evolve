@@ -354,7 +354,9 @@ _kg_base=""
 _kg_guard_pre() {
   local _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
   local _files
-  _files="$(gh api "repos/${_slug}/pulls/${PR}/files?per_page=100" --paginate --jq '.[].filename' 2>/dev/null)" \
+  # o nome NOVO e o ANTIGO (rename): só o .filename deixava o PR que renomeia ops/moat-targets.tsv fora da guarda (6ª
+  # passada); o arquivo `removed` vem pelo .filename
+  _files="$(gh api "repos/${_slug}/pulls/${PR}/files?per_page=100" --paginate --jq '.[] | .filename, (.previous_filename // empty)' 2>/dev/null)" \
     || die "não consegui LER os arquivos do PR #${PR} — sem eles não sei se o .kg.yaml cita commit da branch (SAC-80). Não prossigo."
   _PR_FILES="${_files}"   # o aviso de serialização (repo alheio) reusa esta leitura, sem 2ª chamada
   grep -qE '\.kg\.yaml$' <<< "${_files}" || return 0
@@ -433,11 +435,31 @@ _kg_guard_pre
 # (5ª passada, item 3 da decisão do maestro de 2026-11-13) PR do CORE que toca GUARDA (os hooks e o settings.json que os
 # registra, o moat-targets.tsv, os scripts delegados e o fecho deles, o sudoers) não é mergeado pela sessão: quem muda a
 # cerca não a atravessa sozinho. O merge desse PR é do maestro (--maestro, que o hook veta à sessão).
-_PMV_GUARD_RE='^(\.claude/hooks/|\.claude/settings(\.local)?\.json$|ops/moat-targets\.tsv$|ops/(pr-merge-verified|deploy-site|slack-persona|update-bridge|bridge-backup|bridge-hardening|chat-runner|delegated-ops)\.sh$|ops/sudoers/)'
+# A LISTA DE GUARDA é DERIVADA do moat-targets.tsv (o desta árvore e o de origin/main, somados: mais caminho é mais
+# estrito), nunca escrita à mão (6ª passada: a regex deixava de fora o publish-door.sh e os outros scripts de ato):
+# os scripts das linhas `ato` e `delega` e os wrappers das linhas de deploy/relógio. Somam-se os fixos: o próprio tsv, o
+# members.yaml (o registro amplia a delegação), os workflows, ops/review/, a catraca da REGRA 117, os hooks e o
+# settings.json que os registra, o sudoers e o fecho dos scripts delegados. Entrada terminada em / é prefixo.
+_guard_paths() {
+  { cat "${_PMV_DIR}/ops/moat-targets.tsv" 2>/dev/null; git -C "${_PMV_DIR}" show origin/main:ops/moat-targets.tsv 2>/dev/null; } \
+    | awk -F'\t' '!/^[[:space:]]*#/ && NF >= 3 { if (($1 == "ato" || $1 == "delega") && $2 == "script") print $3; else if (($1 == "deploy" || $1 == "relogio") && NF >= 4 && $4 ~ /^ops\//) print $4 }'
+  printf '%s\n' ops/moat-targets.tsv docs/evolution/federation/members.yaml .github/workflows/ ops/review/ \
+    .claude/validation/act-signature-check.sh .claude/hooks/ .claude/settings.json .claude/settings.local.json ops/sudoers/ \
+    ops/bridge-backup.sh ops/bridge-hardening.sh ops/chat-runner.sh ops/delegated-ops.sh
+}
+_guard_hits() { # stdin = os arquivos do PR; imprime os que são guarda
+  local g f; local -a G; mapfile -t G < <(_guard_paths | awk 'NF && !seen[$0]++')
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    for g in "${G[@]}"; do
+      case "${g}" in */) [ "${f#"${g}"}" != "${f}" ] && { echo "${f}"; break; } ;; *) [ "${f}" = "${g}" ] && { echo "${f}"; break; } ;; esac
+    done
+  done
+}
 _guard_pr_gate() {
   [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] || return 0
   if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(_slug_norm "${REPO_ARG[1]}")" != "${_PMV_CORE_SLUG}" ]; then return 0; fi
-  local _g; _g="$(grep -E "${_PMV_GUARD_RE}" <<< "${_PR_FILES}" | head -5 | tr '\n' ' ')"
+  local _g; _g="$(_guard_hits <<< "${_PR_FILES}" | head -5 | tr '\n' ' ')"
   [ -z "${_g}" ] || die "o PR #${PR} toca GUARDA (${_g}): o merge dele é do maestro, não da sessão (decisão de 2026-11-13). Peça: ! bash ops/pr-merge-verified.sh ${PR} --maestro. Nada foi feito."
 }
 _guard_pr_gate

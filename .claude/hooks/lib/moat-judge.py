@@ -245,12 +245,31 @@ def _moat_blob(path):
     return _git(["hash-object", "--", path]) if path and os.path.isfile(path) else ""
 
 
+# A PONTA DA MAIN se mede no REMOTO, por URL constante (6ª passada do refutador do #1647): a ref origin/main local é da
+# sessão (update-ref, fetch de outro lugar, escrita no arquivo da ref). `git ls-remote <URL> refs/heads/main` dá o sha, e
+# o objeto tem de existir aqui (`cat-file -e`). Sem rede, ou sem o objeto, a forma delegada não vale (fecha). (core-only)
+_MOAT_CORE_URL = "https://github.com/marciocar/onion-evolve"
+
+
+def _moat_main_sha():
+    if "main" not in _OUR:
+        sha = ""
+        out = _git(["ls-remote", _MOAT_CORE_URL, "refs/heads/main"])
+        m = re.match(r"^([0-9a-f]{40})\s+refs/heads/main$", out.split("\n")[0]) if out else None
+        if m and ROOT and subprocess.run(["git", "-C", ROOT, "cat-file", "-e", m.group(1) + "^{commit}"],
+                                         capture_output=True).returncode == 0:
+            sha = m.group(1)
+        _OUR["main"] = sha
+    return _OUR["main"]
+
+
 def _moat_main_blob(rel):
-    return _git(["-C", ROOT, "rev-parse", "-q", "--verify", "origin/main:" + rel]) if ROOT else ""
+    sha = _moat_main_sha()
+    return _git(["-C", ROOT, "rev-parse", "-q", "--verify", sha + ":" + rel]) if ROOT and sha else ""
 
 
 def _moat_matches_main(script, rel):
-    if not ROOT or not _git(["-C", ROOT, "rev-parse", "-q", "--verify", "origin/main^{commit}"]):
+    if not ROOT or not _moat_main_sha():
         return False
     pairs = [(script, rel)] + [(os.path.join(ROOT, r), r) for r in _MOAT_MAIN_PINNED]
     return all(_moat_blob(p) == _moat_main_blob(r) for p, r in pairs)
