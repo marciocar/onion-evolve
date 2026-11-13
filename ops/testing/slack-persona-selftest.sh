@@ -27,6 +27,8 @@ case "\$1" in
   show) case "\$*" in
           *ExecStartPre*) echo "" ;;
           *"-p ExecStart "*) echo "{ path=/usr/bin/node ; argv[]=/usr/bin/node /run/onion-slack-persona-app/node_modules/tsx/dist/cli.mjs src/slack-persona/main.ts ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }" ;;
+          *FragmentPath*) [ -e "${t}/eff-frag" ] && cat "${t}/eff-frag" || echo "${t}/root/etc/systemd/system/onion-slack-persona.service" ;;
+          *SupplementaryGroups*) [ -e "${t}/eff-groups" ] && cat "${t}/eff-groups" || echo onion-brain-hub ;;
           *DropInPaths*) [ -e "${t}/eff-dropin" ] && cat "${t}/eff-dropin" || echo "" ;;
           *DynamicUser*) echo yes ;;
           *" User "*|*"-p User"*) if [ -e "${t}/eff-user" ]; then cat "${t}/eff-user"; else echo onion-slack-persona; fi ;;
@@ -133,6 +135,16 @@ sed 's/^  \[ -z "\${got}" \] || bad="\${bad} DropInPaths=.*$/  :/' "${me}" > "${
 PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut4.sh" install --apply > "${t}/out" 2>&1
 rc=$?; ! cmp -s "${me}" "${t}/mut4.sh" && [ "${rc}" = 0 ]; chk "install: o MUTANTE sem a conferência do DropInPaths instalaria com o drop-in — a conferência é a causa" $?
 rm -f "${t}/eff-dropin" "${t}/root/etc/systemd/system/${UNIT}.service"
+# 5ª passada: a unit carregada de uma transiente (/run/systemd/transient) e um grupo a mais (docker é root)
+printf '/run/systemd/transient/onion-slack-persona.service\n' > "${t}/eff-frag"
+run install --apply; [ $? = 1 ] && grep -q 'FragmentPath' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit efetiva carregada de /run/systemd/transient recusa e remove" $?
+sed 's/^  \[ "\${got}" = "\${UNIT_DIR}\/\${UNIT}.service" \] || bad=.*$/  :/' "${me}" > "${t}/mut5.sh"
+PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut5.sh" install --apply > "${t}/out" 2>&1
+rc=$?; ! cmp -s "${me}" "${t}/mut5.sh" && [ "${rc}" = 0 ]; chk "install: o MUTANTE sem a conferência do FragmentPath aceitaria a transiente — a conferência é a causa" $?
+rm -f "${t}/eff-frag" "${t}/root/etc/systemd/system/${UNIT}.service"
+printf 'onion-brain-hub docker\n' > "${t}/eff-groups"
+run install --apply; [ $? = 1 ] && grep -q 'SupplementaryGroups' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit efetiva com o grupo docker a mais recusa e remove" $?
+rm -f "${t}/eff-groups" "${t}/root/etc/systemd/system/${UNIT}.service"
 printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"
 run install; chk "install: ensaio sai 0" $?
 [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: ensaio não escreve" $?

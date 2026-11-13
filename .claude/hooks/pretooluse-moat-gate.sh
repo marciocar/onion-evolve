@@ -77,7 +77,8 @@ signal=$(
           printf '%s\n' "$p"
           case "$p" in "$HOME"/*) printf '%s\n' "~/${p#"$HOME"/}" ;; esac
           # o componente só de padrão SEM glob: `onion-` (de /usr/local/sbin/onion-*) casaria a casa inteira
-          b="${p%/}"; b="${b##*/}"; [ "$c" = deploy ] && [ "$g" = 0 ] && [ "${#b}" -ge 4 ] && [ "$b" != onion ] && printf '%s\n' "$b"
+          # e `system` (de /run/systemd/system) casaria todo `systemctl`: o caminho inteiro já está no sinal
+          b="${p%/}"; b="${b##*/}"; [ "$c" = deploy ] && [ "$g" = 0 ] && [ "${#b}" -ge 4 ] && [ "$b" != onion ] && [ "$b" != system ] && printf '%s\n' "$b"
           # o script de ATO pelo nome (`cd ops && ./x.sh`, o clone servido, a cópia em /tmp): versionado, ele não
           # chegaria ao juiz pelo ramo (3), que só manda o que NÃO é rastreado
           [ "$c" = ato ] && printf '%s\n' "$b"
