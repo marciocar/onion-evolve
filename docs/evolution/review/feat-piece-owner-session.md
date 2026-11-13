@@ -3,12 +3,12 @@ branch: feat/piece-owner-session
 pr: pendente
 date: 2026-11-13
 reviewed_diff_sha256: pendente
-findings_total: 5
-findings_real: 5
+findings_total: 6
+findings_real: 6
 findings_blocking: 2
 tokens: 0
 duration_min: 15
-findings_fixed: 2
+findings_fixed: 3
 verdict: REJECTED_AND_FIXED
 elenxo: false
 reviewer: "1ª passada: o próprio agente de execução (o brief proibiu spawnar agentes); sem refutador separado. É uma voz só e está DECLARADA: a revisão separada fica para o revisor do CI e para quem ler este resíduo."
@@ -40,6 +40,10 @@ no `--tsv`, no `--markdown` e no `--quiet`. A doutrina ganha a cláusula 8, e a 
    fora do repo da peça. O pulso não exige que o cwd bata, porque a retomada pode abrir a sessão numa worktree.
 5. **(non-blocking) O card de arranque não cita caminho com espaço.** limite: o nome vai por `shlex.quote`, mas o
    caminho sai como está (com a home trocada por `~`). Os `local_path` de hoje não têm espaço.
+6. **(non-blocking) Curado: a decisão do grafo sem `provenance`.** Cenário: o contrato KG-SSOT do commit, no
+   `pr-finalize`, acusou `D_PIECE_FIELD_NOT_KIND_1112` sem `provenance` (`debt.form.required.node.provenance` 159 → 160).
+   Cura: a decisão cita a medição em que se apoia (o enum `KINDS` do `members-validate.sh`), e o `kg-gate-ci.sh` volta
+   verde.
 
 ## Mutantes
 
