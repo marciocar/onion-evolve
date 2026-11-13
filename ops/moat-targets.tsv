@@ -179,3 +179,43 @@ delega	script	ops/pr-merge-verified.sh	--foreign-repo	@foreign
 delega	script	ops/deploy-site.sh	--verified-pr	deploy
 delega	script	ops/update-bridge.sh	@rootcopy=/usr/local/lib/onion-ops	@none,--restart
 delega	script	ops/slack-persona.sh	@rootcopy=/usr/local/lib/onion-ops	--apply,start
+# ── FECHO (7ª passada do refutador do #1647, 2026-11-13): o que os atos EXECUTAM também é guarda ─────────────────
+#   Um PR que mude um destes scripts muda o que um ato faz (o ensaio do publish-door roda o materialize-door.sh), e por
+#   isso o pr-merge-verified.sh o trata como PR de GUARDA (merge do maestro). A lista é explícita e revisada; a REGRA 117
+#   (act-signature-check.sh) confere que toda execução de script do repo, a partir de ato/delega/fecho, está aqui. Os
+#   executores do gate (lint-artifacts, lint-selftest) são FRONTEIRA: entram, mas o que eles rodam não se desce.
+fecho	script	.claude/hooks/co-evolution-inbox-check.sh	-
+fecho	script	.claude/utils/adopt/emit-eol-gitattributes.sh	-
+fecho	script	.claude/utils/adopt/regen-ssot-projections.sh	-
+fecho	script	.claude/utils/adopt/vendor-manifest.sh	-
+fecho	script	.claude/utils/adopt/write-stamp.sh	-
+fecho	script	.claude/utils/federation-transport/a2a-accept.sh	-
+fecho	script	.claude/utils/marketplace/materialize-marketplace-repo.sh	-
+fecho	script	.claude/validation/act-signature-check.sh	-
+fecho	script	.claude/validation/door-mini-check.sh	-
+fecho	script	.claude/validation/door-staleness-check.sh	-
+fecho	script	.claude/validation/federation-console.sh	-
+fecho	script	.claude/validation/graph.sh	-
+fecho	script	.claude/validation/kg-backlog-project.sh	-
+fecho	script	.claude/validation/kg-decide-seal.sh	-
+fecho	script	.claude/validation/kg-radar.sh	-
+fecho	script	.claude/validation/kg-trace.sh	-
+fecho	script	.claude/validation/lint-artifacts.sh	-
+fecho	script	.claude/validation/lint-selftest.sh	-
+fecho	script	.claude/validation/marketplace-root-check.sh	-
+fecho	script	.claude/validation/projection-safety.sh	-
+fecho	script	.claude/validation/resolve-integration-branch.sh	-
+fecho	script	.claude/validation/review-artifact-check.sh	-
+fecho	script	.claude/validation/rules-registry.sh	-
+fecho	script	ops/bridge-backup.sh	-
+fecho	script	ops/door-seal-pin.sh	-
+fecho	script	ops/kg-gate-ci.sh	-
+fecho	script	ops/load-lease.sh	-
+fecho	script	ops/materialize-door.sh	-
+fecho	script	ops/merge-drivers/selftest-families.py	-
+fecho	script	ops/pr-finalize.sh	-
+fecho	script	ops/merge-serial.sh	-
+fecho	script	ops/testing/preflight-families.sh	-
+fecho	script	ops/testing/preflight-run.sh	-
+fecho	script	ops/testing/preflight-shadow.sh	-
+fecho	script	ops/testing/selftest-pr-selection.sh	-

@@ -251,10 +251,23 @@ def _moat_blob(path):
 _MOAT_CORE_URL = "https://github.com/marciocar/onion-evolve"
 
 
+def _moat_lsremote():
+    # isolado da config do git (7ª passada): cwd=/, sem config global nem de sistema, sem GIT_* do ambiente, e só
+    # https. Sem isso, um insteadOf no .git/config (escrito por Edit) desviava a URL constante
+    _env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    _env.update(GIT_CONFIG_GLOBAL="/dev/null", GIT_CONFIG_NOSYSTEM="1")
+    try:
+        return subprocess.run(["git", "-c", "protocol.allow=never", "-c", "protocol.https.allow=always",
+                               "ls-remote", _MOAT_CORE_URL, "refs/heads/main"],
+                              cwd="/", env=_env, capture_output=True, text=True, timeout=10).stdout.strip()
+    except Exception:
+        return ""
+
+
 def _moat_main_sha():
     if "main" not in _OUR:
         sha = ""
-        out = _git(["ls-remote", _MOAT_CORE_URL, "refs/heads/main"])
+        out = _moat_lsremote()
         m = re.match(r"^([0-9a-f]{40})\s+refs/heads/main$", out.split("\n")[0]) if out else None
         if m and ROOT and subprocess.run(["git", "-C", ROOT, "cat-file", "-e", m.group(1) + "^{commit}"],
                                          capture_output=True).returncode == 0:

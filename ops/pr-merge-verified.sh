@@ -442,8 +442,9 @@ _kg_guard_pre
 # settings.json que os registra, o sudoers e o fecho dos scripts delegados. Entrada terminada em / é prefixo.
 _guard_paths() {
   { cat "${_PMV_DIR}/ops/moat-targets.tsv" 2>/dev/null; git -C "${_PMV_DIR}" show origin/main:ops/moat-targets.tsv 2>/dev/null; } \
-    | awk -F'\t' '!/^[[:space:]]*#/ && NF >= 3 { if (($1 == "ato" || $1 == "delega") && $2 == "script") print $3; else if (($1 == "deploy" || $1 == "relogio") && NF >= 4 && $4 ~ /^ops\//) print $4 }'
-  printf '%s\n' ops/moat-targets.tsv docs/evolution/federation/members.yaml .github/workflows/ ops/review/ \
+    | awk -F'\t' '!/^[[:space:]]*#/ && NF >= 3 { if (($1 == "ato" || $1 == "delega" || $1 == "fecho") && $2 == "script") print $3; else if (($1 == "deploy" || $1 == "relogio") && NF >= 4 && $4 ~ /^ops\//) print $4 }'
+  # (7ª passada) + as linhas `fecho` (o que os atos executam, conferido pela REGRA 117) e os .githooks/
+  printf '%s\n' ops/moat-targets.tsv docs/evolution/federation/members.yaml .github/workflows/ ops/review/ .githooks/ \
     .claude/validation/act-signature-check.sh .claude/hooks/ .claude/settings.json .claude/settings.local.json ops/sudoers/ \
     ops/bridge-backup.sh ops/bridge-hardening.sh ops/chat-runner.sh ops/delegated-ops.sh
 }

@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: bd94a6da0835f9308c6215e87d6544d5e2d10e6a73c5854fa0db7614f02fa46b
-reviewed_code_sha256: b753b0fa3a181ebba07e4609a50f6e69eaf0acc762b573ea715eb63421cc75af
-findings_total: 27
-findings_real: 27
-findings_fixed: 27
+reviewer: "8ª passada: o refutador independente no head 386161856 REPROVOU por um bloqueio (a lista de guarda não seguia o que os atos executam) e uma cura de uma linha (o ls-remote isolado da config), curados aqui. 7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: 98045cd0e8ceeffdfe0da02921d5b115ec33997c71ab2ad1bad3b0a3db903643
+reviewed_code_sha256: 0573d712a61407c0defddef72ef54790f7f41663a31384a0b6e70a9e3daa3b7f
+findings_total: 29
+findings_real: 29
+findings_fixed: 29
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou seis vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
+nota: "o refutador independente reprovou sete vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
 ---
 
 # Resíduo — REGRA 56
@@ -172,6 +172,23 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
 27. **A ponta da main medida no remoto** (o reforço que o refutador recomendou para o limite da ref local): rb30 forja a
     origin/main local por update-ref com o deploy-site.sh editado e a árvore igual; o hook veta, e o mutante que lê a
     ref local passa. A bancada aponta a URL constante para o próprio repo de sandbox (costura declarada).
+
+## 8ª passada: o fecho do que os atos executam (curado aqui)
+
+28. **A lista de guarda não seguia o que os atos EXECUTAM.** O publish-door.sh, mesmo em ensaio, roda o
+    materialize-door.sh e o materialize-marketplace-repo.sh; um PR que só os tocasse não era guarda. Cura: linhas
+    `fecho script <path>` no moat-targets.tsv, explícitas e revisadas (35 hoje), que o pr-merge-verified.sh soma à lista
+    de guarda, mais os .githooks/. A REGRA 117 (act-signature-check.sh) confere o fecho contra o código: toda execução de
+    um script do repo (`bash x.sh`, `source`, `.`, `python3 x.py`, `"${WT}/ops/x.sh"`, `$(…)`) a partir de uma linha
+    ato/delega/fecho tem de estar numa delas (`fecho-incompleto`), e a linha fecho sem arquivo acusa
+    (`fecho-sem-script`). (rf27 com o materialize-door.sh, rf28 com .githooks/, (xiv)-(xvi) da REGRA 117, com mutante)
+    **FRONTEIRA declarada:** os executores do gate (lint-artifacts.sh e lint-selftest.sh) estão no fecho, mas o que eles
+    rodam não se desce. Medido: o fecho transitivo inteiro passa de 130 arquivos (quase todo .claude/validation e boa
+    parte de .claude/utils), e tornaria quase todo PR do core um merge do maestro. Se o maestro quiser o fecho inteiro,
+    é tirar a FRONTEIRA da REGRA 117 e deixar o lint pedir as linhas. O ops/local-gate.sh citado pelo refutador não existe.
+29. **O ls-remote isolado da config do git.** Um insteadOf no .git/config (escrito por Edit) desviava a URL constante.
+    Cura: cwd=/, GIT_CONFIG_GLOBAL=/dev/null, GIT_CONFIG_NOSYSTEM=1, sem GIT_* do ambiente, e `-c protocol.allow=never
+    -c protocol.https.allow=always`. (rb31, com mutante; a bancada troca o protocolo por file, costura declarada)
 
 ## LIMITES declarados (o refutador os apontou; não se curam aqui)
 
