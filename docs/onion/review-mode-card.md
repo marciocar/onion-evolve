@@ -105,6 +105,16 @@ No `onion-review-verdict`, a linha `⊘ Não revisado pelo CI: …` indica fallb
 
 ## Limites declarados (2ª passada do refutador do #1652)
 
+Aprovado pelo refutador independente na 5ª passada dele (head fa6570082). Os limites abaixo são os que ficam.
+
+- **O `details_url` da check-run não é autenticado.** A origem da marca lê o run id do `details_url`, e quem
+  cria a check-run escreve esse campo. Forjá-lo exige um workflow do repo com `checks: write`, e hoje nenhum
+  tem. Endurecimento futuro: conferir que o `head_sha` da run é o `GATE_SHA` e que o `check_suite_id` da
+  check-run é o da run.
+- **Espaço de largura zero e U+0085 no nome** não são caracteres de controle ASCII e passam pela checagem.
+  Eles casam pelo **prefixo**: `.github/workflows/x<ZWSP>.yml` continua começando por `.github/workflows/` e
+  conta como guarda. O efeito é a favor da guarda.
+
 - **`elenxo_isolado: true` é auto-atestado.** O script exige que a declaração exista, não prova que o
   refutador foi outro agente.
 - **Bootstraps latentes.** O job do modo usa o juiz, o helper e o tsv do PR quando a base não tem o arquivo.

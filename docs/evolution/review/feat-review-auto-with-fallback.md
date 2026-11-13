@@ -10,9 +10,9 @@ tokens: 0
 duration_min: 20
 verdict: FIXED
 elenxo: true
-elenxo_isolado: false
-reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui; 4ª passada (head 0497986e4): REPROVOU com 2 bloqueios (X1, X2), curados aqui; 5ª passada (head b0cffda0e): REPROVOU com 1 bloqueio (Z1, a e b) e o CLAUDE.md em subdiretório, curados aqui"
-nota: "tokens = 0: não medido. elenxo_isolado: false porque as curas da 2ª passada não foram re-refutadas pelo refutador independente; pelo próprio mecanismo deste PR, a sessão não o mergearia em fallback. O merge é do maestro (D_DELEGATION_TRUST_MODEL_1113)."
+elenxo_isolado: true
+reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui; 4ª passada (head 0497986e4): REPROVOU com 2 bloqueios (X1, X2), curados aqui; 5ª passada (head b0cffda0e): REPROVOU com 1 bloqueio (Z1, a e b) e o CLAUDE.md em subdiretório, curados aqui; 6ª passada (a 5ª do refutador independente refute-review-auto, head fa6570082): APROVADO, sem bloqueio, mutantes R1, R2 e R4 mortos"
+nota: "tokens = 0: não medido. elenxo_isolado: true pela 6ª passada do refutador independente (agente refute-review-auto, separado do agente de execução), que APROVOU o head fa6570082; logs em scratchpad/r1652/v5-*.log. Depois dela só mudaram documentos (este resíduo e o cartão). O merge é do maestro (D_DELEGATION_TRUST_MODEL_1113)."
 ---
 
 # Passada adversarial: `feat/review-auto-with-fallback`
@@ -154,3 +154,25 @@ Declarados no cartão:
     (rv-u), outro app, e (rv-v), outro workflow.
 - **CLAUDE.md em subdiretório:** a regex da maquinaria cobre `CLAUDE.md` e `CLAUDE.local.md` em qualquer
   diretório. Caso (rv-w).
+
+## 6ª passada (a 5ª do refutador independente), head fa6570082: APROVADO
+
+O agente `refute-review-auto`, separado do agente de execução, refutou o head fa6570082 e **aprovou sem
+bloqueio**. Os mutantes R1, R2 e R4 morreram:
+
+- **R1:** o parser da API ignorando a linha de controle;
+- **R2:** o path do workflow da run ignorado;
+- **R4:** o nome com controle no `--range` ignorado.
+
+Os logs estão em `scratchpad/r1652/v5-R1-pr-ctl-ignored.log`, `v5-R2-wf-path-ignored.log` e
+`v5-R4-range-ctl-ignored.log`. Por isso `elenxo_isolado: true`.
+
+Depois da aprovação só mudaram documentos, sem tocar código: este resíduo e os limites do cartão.
+
+Os limites que o refutador pediu declarar estão no cartão:
+
+- o `details_url` não é autenticado;
+- a injeção de prompt pelo diff, com forja determinística pelo `RUNNER_TEMP`;
+- o bootstrap preso ao literal `--achados <n>`;
+- o espaço de largura zero e o U+0085 casam pelo prefixo;
+- o fecho de 2º nível vem pelo #1647.
