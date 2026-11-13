@@ -882,6 +882,9 @@ members:
     name: onion-vps-ops (operação dos serviços da VPS)
     role: standalone
     kind: adopter
+    piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); `kind:` segue a natureza
+    owner_session: onion-vps-ops # o NOME da sessão que a defende; o baton-pulse casa por nome, nunca pelo ref
+    sponsor: maestro            # patrocinador humano ao lado do dono (forma do Entra Agent ID)
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-vps-ops (privado)
     local_path: /home/marcio/onion-vps-ops
