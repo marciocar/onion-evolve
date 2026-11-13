@@ -1,17 +1,16 @@
 ---
 branch: feat/review-auto-with-fallback
 date: 2026-11-13
-reviewed_diff_sha256: 95257f85a5197dc0529d6168f9a3fdfd56c6962663aae900637bdb86cf0db66b
-reviewed_code_sha256: 714d03810de72a4836f3e93b3decfdf9415cdb1aa81aa5dcdc3c7a05b5070be3
-findings_total: 9
-findings_real: 8
-findings_fixed: 8
+reviewed_diff_sha256: pendente
+findings_total: 13
+findings_real: 12
+findings_fixed: 12
 tokens: 0
 duration_min: 20
 verdict: FIXED
 elenxo: true
 elenxo_isolado: false
-reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente, todos curados aqui"
+reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui"
 nota: "tokens = 0: não medido. elenxo_isolado: false porque as curas da 2ª passada não foram re-refutadas pelo refutador independente; pelo próprio mecanismo deste PR, a sessão não o mergearia em fallback. O merge é do maestro (D_DELEGATION_TRUST_MODEL_1113)."
 ---
 
@@ -99,3 +98,26 @@ Limites declarados, que também estão no cartão:
 - com o #1647, a sessão nem mergeia PR de guarda.
 
 Este resíduo segue com `elenxo_isolado: false`: a 2ª passada foi independente, mas o resíduo não foi escrito por ela.
+
+## 3ª passada: re-refutação do head 731576f3a (REPROVOU, N1 a N3, curados)
+
+10. **N1, REAL, CURADO. A marca positiva saía com achados -1 ou vazio.** O `review-verdict.sh --gate` dá rc 0
+    para os dois. Agora `--reviewed-mark` exige `--achados` e só emite a marca com contagem exatamente `0`. A
+    árvore suja chega como -1 e fica sem marca. Casos (pos-b) e (pos-c).
+11. **N2, REAL, CURADO. A marca era forjável por hook do PR.** O CLI do revisor carrega do head os hooks, o
+    settings, o `CLAUDE.md`, os agentes e as skills. A maquinaria passou a incluir `.claude/hooks/`,
+    `.claude/settings*.json`, `CLAUDE.md`, `.claude/agents/`, `.claude/skills/` e `.mcp.json`. Ela é medida
+    sobre **todos** os arquivos do PR (`guard-paths.sh --all`, com o nome antigo do rename), não só sobre os de
+    guarda. Casos (rv-p) e (rv-q).
+12. **N3, REAL, CURADO. A dispensa do vermelho pulava o gate.** Agora a dispensa do veredito num PR de guarda
+    também exige o resíduo independente. Caso (rv-o).
+13. **Retry, REAL, CURADO NA BANCADA.** Um result de crédito seguido de um result de sucesso não conta como
+    falta de crédito. O código já lia o último result, mas faltava caso. Caso (cr-g), que mata o mutante que lê
+    o primeiro result.
+
+Declarados no cartão:
+
+- o bootstrap depende de um literal;
+- o revisor com `Bash` pode escrever a evidência, e o head pode injetar instruções pelo `CLAUDE.md` e pelos
+  agentes;
+- o fecho de 2º nível fica no tsv do #1647, sem duplicar.
