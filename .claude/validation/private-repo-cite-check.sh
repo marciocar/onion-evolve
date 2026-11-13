@@ -123,7 +123,7 @@ if [ "${MODE}" != "selftest" ] && [ "${MODE}" != "hashname" ]; then
     || { echo "private-repo-cite: git ls-files falhou — NAO VERIFICADO" >&2; exit 2; }
   [ "${MODE}" = "touched" ] || cp "${_TMP}/all_files" "${_TMP}/files"
   # os ARQUIVOS DE DADO (csv, tsv, json, jsonl, txt, e md sob data/): o tocado, ou todos fora do modo touched. O filtro
-  # de extensão e de exclusão é do Python (DATA_EXT, FUNCTIONAL_CONFIG); aqui só a lista do git.
+  # de extensão e de exclusão é do Python (DATA_EXT, FUNCTIONAL_NAMES); aqui só a lista do git.
   if [ "${MODE}" = "touched" ]; then
     { git -C "${ROOT}" diff --name-only --no-renames -z "${base}" \
       && git -C "${ROOT}" ls-files --others --exclude-standard -z; } > "${_TMP}/data_files" 2>"${_TMP}/err" \
@@ -517,13 +517,15 @@ for f in files:
 #     pela classe do machine_path.py (a mesma da REGRA 99). `/home` nu como conceito e ./home/ relativo calam;
 #   MARCADOR-COM-COMMIT (HARD): a mesma regra dos grafos, acima;
 #   PRIVADO-SEM-MARCADOR-EM-DADO (HARD, só com --private-repos / ONION_PRIVATE_REPOS): padrão do arquivo privado do dono.
-# Nunca imprime o valor. Fora: vendor, fixture, e a configuração FUNCIONAL que os hooks leem (o caminho ali é o alvo
-# que o veto do MOAT protege; trocá-lo desarmaria a guarda) — lista declarada, não padrão.
+# Nunca imprime o valor. Fora: vendor, fixture, e a configuração FUNCIONAL que os hooks do core leem na pasta de
+# operações dele (o caminho ali é o alvo que o veto do MOAT protege; trocá-lo desarmaria a guarda) — lista declarada,
+# por pasta e nome, não padrão. Na porta e no adotante a pasta não existe, e a isenção não tem efeito.
 DATA_EXT = (".csv", ".tsv", ".json", ".jsonl", ".txt")
-FUNCTIONAL_CONFIG = {"ops/moat-targets.tsv", "ops/cc-sdk-targets.tsv"}
+FUNCTIONAL_DIR, FUNCTIONAL_NAMES = "ops", {"moat-targets.tsv", "cc-sdk-targets.tsv"}
 HOME_SEG = re.compile(r"/{1,2}(?:home|root|Users)/[A-Za-z0-9_.@+-]+")
 def data_scope(f):
-    if f.startswith("vendor/") or fix.search(f) or f in FUNCTIONAL_CONFIG or f.endswith(".kg.yaml"):
+    functional = os.path.dirname(f) == FUNCTIONAL_DIR and os.path.basename(f) in FUNCTIONAL_NAMES
+    if f.startswith("vendor/") or fix.search(f) or functional or f.endswith(".kg.yaml"):
         return False
     low = f.lower()
     return low.endswith(DATA_EXT) or (low.endswith(".md") and "/data/" in f)

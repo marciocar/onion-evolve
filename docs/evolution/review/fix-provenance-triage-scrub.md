@@ -2,14 +2,13 @@
 branch: fix/provenance-triage-scrub
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 69436a7652ea85fc194b82a004bb1d349c0b3b907805321ac4abd1a7c48a968a
-reviewed_code_sha256: c04c697080e9c356f600193fb9ee8ad76f64b88ca3144acc642344443869f0bb
-findings_total: 6
-findings_real: 6
-findings_blocking: 4
+reviewed_diff_sha256: pendente
+findings_total: 8
+findings_real: 8
+findings_blocking: 6
 tokens: 0
 duration_min: 0
-findings_fixed: 6
+findings_fixed: 8
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: passada adversarial do próprio agente executor, sem subagente (o brief proíbe spawnar), contra a guarda nova e a medida por clones
@@ -64,6 +63,8 @@ outros 116 são commits do core alcançáveis de um ref remoto.
 | 4 | (blocking) | a 1ª regra de home acusava `/home.` no fim de frase e `/home` como conceito | a regra passou a exigir barra e segmento depois da raiz; `./home/` relativo cala pela classe do `machine_path.py` |
 | 5 | (non-blocking) | com `--private-repos` apontando para um arquivo dentro da árvore, o próprio arquivo de padrões era julgado | ele fica fora da varredura |
 | 6 | (non-blocking) | a 1ª medida pela API esgotou o limite da conta (cerca de 4,7 mil chamadas) | a medida passou a usar clones locais; os 2 repositórios sem clone foram clonados pelo git, sem a API REST |
+| 7 | (blocking) | o lint do commit (REGRA 119, nome de repo ou clone de adotante não federado) achou o nome nu de um clone sem registro numa linha da limpeza | o nome virou `⟨clone sem registro⟩`, registrado na tabela privada |
+| 8 | (blocking) | a guarda viaja para as portas e citava os dois arquivos de configuração funcional pelo caminho em `ops/` (REGRA 100) | a isenção passou a ser por pasta e nome (`FUNCTIONAL_DIR`, `FUNCTIONAL_NAMES`), sem o caminho literal; o mutante da isenção morreu de novo |
 
 ## Mutantes
 
