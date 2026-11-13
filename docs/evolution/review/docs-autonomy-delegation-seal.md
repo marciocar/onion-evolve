@@ -2,7 +2,8 @@
 branch: docs/autonomy-delegation-seal
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cfc6ef6cfb7e3dcf69757261687461263cda9d6adcef07dc13cff395cfa2225d
+reviewed_code_sha256: a6e0d88ea0a51a8b528cff80b03b122cac6b97e1a3a6cf047f406f997abb7105
 findings_total: 0
 findings_real: 0
 findings_blocking: 0

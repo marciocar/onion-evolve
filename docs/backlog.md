@@ -627,6 +627,12 @@
 | 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
 | 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
 
+## automation-levels-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
+
 ## nanochat-eixo-d-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -815,12 +821,6 @@
 | 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
 | 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
 | 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
-
-## automation-levels-2026-11 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 33.0 | `Q_AUTOMATION_LEVELS_1111` | automation-levels-2026-11 | como o Onion e o kg-ssot dividem segurança, compliance e custo de nuvem, e qual o modelo de automação com níveis, catraca e ag |
 
 ## deck-patterns-2026-09 — 8 item(ns)
 
