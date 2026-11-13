@@ -43911,8 +43911,12 @@ case "${_args}" in
   *"--json headRepository,headRepositoryOwner"*) echo "o/r" ;;
   *"--json headRefName"*)       echo "feat/x" ;;
   # SAC-80: o SUT lê os arquivos do PR antes de tudo (fail-closed se não ler). Aqui o PR não toca
-  # .kg.yaml, então a guarda de provenance cala e esta família segue medindo só a dispensa.
-  *"pulls/"*"/files"*)          echo "ops/pr-merge-verified.sh" ;;
+  # .kg.yaml, então a guarda de provenance cala e esta família segue medindo só a dispensa. Nem toca GUARDA (#1652:
+  # o guard-paths agora mede de verdade, e PR de guarda recusa dispensa — caso que é da família pr_merge_verified);
+  # a lista antiga (ops/pr-merge-verified.sh) era guarda e só passava porque o --pr não lia nada.
+  *"pulls/"*"/files"*)          echo "src/app.py" ;;
+  # o changed_files do PR (o guard-paths confere a lista contra ele, X2 do #1652): coerente com a lista acima, 1 arquivo
+  *"--jq .changed_files"*)      echo 1 ;;
   # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): a base e a distância do head até a ponta
   *"--json baseRefName"*)       echo "main" ;;
   *"/compare/"*)                echo 0 ;;
@@ -52435,6 +52439,9 @@ case "$a" in
   # head NÃO tem — aqui medido de verdade no remoto bare, como o compare do GitHub mede
   *"api "*"compare/main..."*)
       git --git-dir="${MSC_ORIGIN}" rev-list --count refs/heads/feat/x..refs/heads/main; exit 0 ;;
+  # o changed_files do PR (o guard-paths confere a lista contra ele, X2 do #1652): ANTES de pulls*files, que também
+  # casaria ".changed_files". Coerente com a lista abaixo: 1 arquivo.
+  *"api "*"--jq .changed_files"*) echo 1; exit 0 ;;
   *"api "*pulls*files*)   echo "src/pr.txt"; exit 0 ;;
   *"api "*pulls*commits*) echo 1; exit 0 ;;
   *"pr checks"*)          printf '%b' "${MSC_PR_CHECKS:-selftest-gate\tpending\t0\turl\n}"; exit 0 ;;
@@ -52918,8 +52925,12 @@ run_selector_per_file_selftests() {
   local s n kg="" prose=""
   # (a) RESÍDUO → poucas: só quem lê resíduo (a REGRA 56, o ledger, o pr-finalize…) + o núcleo. Nada de quem
   #     só varre `*.md` do repo inteiro (o resíduo nunca é citado pelo nome: o nome é o slug da branch).
-  #     Teto 40 (era 30) desde 2026-11-13: os atos delegados fizeram o pr-merge-verified.sh e o deploy-site.sh LEREM o
-  #     resíduo (D_DELEGATE_*_1113), e as 7 famílias que leem esses scripts passaram a ser leitoras legítimas dele.
+  #     TETO 40 (era 30), medido: dois movimentos de 2026-11-13 puseram scripts a LER o resíduo. Os atos delegados
+  #     (D_DELEGATE_*_1113) fizeram o pr-merge-verified.sh e o deploy-site.sh lerem o resíduo; e o gate de fallback do
+  #     #1652 (D_REVIEW_AUTO_WITH_FALLBACK_1113) pôs o ops/pr-merge-verified.sh a montar docs/evolution/review/<branch>.md.
+  #     As famílias que exercitam esses scripts (merge_dispensa, merge_serial, merge_skip_ci, pr_merge_verified,
+  #     review_mode, sync_main_worktree e as do deploy) viraram leitoras legítimas do resíduo. O que o caso protege é
+  #     não voltar às ~100 do prefixo de diretório; isso fica.
   s="$(_spf_sel --affected docs/evolution/review/zz-spf-residuo.md)"; n="$(_spf_n "${s}")"
   if [ "${s}" != "ALL" ] && [ "${n}" -le 40 ] && [[ "${s}" == *",review_artifact,"* ]] && [[ "${s}" == *",review_ledger,"* ]] \
      && [[ "${s}" == *",gitattributes_eol,"* ]] && [[ "${s}" != *",vendor_scrub,"* ]] && [[ "${s}" != *",plugin_bundle,"* ]] \
