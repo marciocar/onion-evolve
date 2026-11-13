@@ -51,7 +51,7 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-16"
-    verified_against: "grafo da dissecação da Vexa no repo de curadoria (private-cite:6n37B5vrpBnLI8J4A2Ciig@aa70452), lido inteiro pela triagem: D_VEXA_2610, E_N3_FIT, E_N2_EXTENSION_NO_BOT, E_N2_TEAMS_FRAGILE, E_N2_NOT_RUN e E_ELENXO_REVERSAL"
+    verified_against: "private-cite:6n37B5vrpBnLI8J4A2Ciig"
     source_tier: 8
     source_kind: primary-repo
     label: "A dissecação da curadoria sustenta o costurar: o transcript.v1 traz falante, texto e tempo por segmento, e o caminho extensão + desktop roda local em CPU, sem bot nem lobby. Não transfere: o registro de consentimento e o Teams, frágil."

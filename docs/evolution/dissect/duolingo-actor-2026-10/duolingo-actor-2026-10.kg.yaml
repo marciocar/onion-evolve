@@ -29,7 +29,7 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-26"
-    verified_against: "grafo da dissecação do Duolingo como empresa no repo de curadoria (private-cite:YrKl7roml2roWXdfEmgoyg@f12dd1b, main, que contém o merge e605e6f), lido inteiro pela triagem: D_DUOLINGO_ACTOR_VERDICT (open, costurar), C_N3_SCORE, C_N3_PROJECTS, E_N2_MONEY_FY2025, E_N2_MONEY_Q2_2026 e as quatro objeções; nó de decisão conferido por peer-ref-check (EXISTE na origin/main do par)"
+    verified_against: "private-cite:YrKl7roml2roWXdfEmgoyg"
     source_tier: 8
     source_kind: primary-repo
     label: "A dissecação da curadoria sustenta o costurar no limite: o dinheiro vem da SEC (relatório anual de 2025 auditado e carta do 2º trimestre de 2026, não auditada), mas o custo de IA só aparece em texto e os concorrentes não têm número primário. Nota 7 de 10, sem folga."

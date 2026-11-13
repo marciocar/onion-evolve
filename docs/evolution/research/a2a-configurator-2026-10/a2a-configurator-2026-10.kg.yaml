@@ -192,7 +192,7 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-10-14"
-    verified_against: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh re-executado pela sessão principal num clone novo do private-cite:v-zx9f_7Du4VBruSub81eg (94a21ca) com docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff aplicado: 18/18 PASS; VPS intocada. Linear SAC-129 e SAC-130"
+    verified_against: "private-cite:v-zx9f_7Du4VBruSub81eg"
     label: "o bridge com convite por membro e receptor múltiplo funciona: convite certo aceito, de outro membro, vencido e revogado recusados, revogação vale sem restart, receptor só source ou hub, aud cruzado vetado"
     provenance:
       source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh e docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff"

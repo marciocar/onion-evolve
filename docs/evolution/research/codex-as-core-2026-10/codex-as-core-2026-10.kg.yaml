@@ -18,8 +18,8 @@ meta:
                                # ser medida.
   # kg-backlog-guard: on
   # ═══ TETO: 81 NÓS (62 da rodada de primárias + 18 dos spikes + 1 decisão do maestro, D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026) ═══
-  #   SPIKES DA CURADORIA (private-cite:lj141auQ_sqjYGRJ0KGFxg@da53ec3), incorporados em 2026-10-26 — 18 nós: 9 evidências medidas
-  #   ou re-ancoradas (E_SPIKE_*, a 8ª e a 9ª da emenda C em private-cite:lj141auQ_sqjYGRJ0KGFxg@bc30bce), 6 perguntas com o teste que as
+  #   SPIKES DA CURADORIA (private-cite:lj141auQ_sqjYGRJ0KGFxg), incorporados em 2026-10-26 — 18 nós: 9 evidências medidas
+  #   ou re-ancoradas (E_SPIKE_*, a 8ª e a 9ª da emenda C em private-cite:lj141auQ_sqjYGRJ0KGFxg), 6 perguntas com o teste que as
   #   fecha (1 já superada pela emenda C), 2 vereditos por peça novos e 1
   #   recomendação nova, com SUPERSEDES sobre os 3 nós que caíram e sobre E_OBJECAO_24 (Aufhebung).
   #   RODADA DE PRIMÁRIAS (run wf_e4a2a9be-bb5), EXECUTADA em 2026-10-26 — 62 nós: 1 question + 32 evidências ancoradas
@@ -1057,7 +1057,7 @@ nodes:
     narrative: "Recomendação do Elenxo (1 agente). Sustenta: MCP só cliente, exec/CI equivalente, AGENTS.md equivalente, subagentes equivalentes em formato, execpolicy parcial. Não sustenta: hooks, skills/comandos, worktree e isolamento de subagente, trajetória. Próximo passo mínimo antes de decisão de porta: (i) re-ancorar a página oficial de hooks com quote e locator; (ii) rodar no codex-cli 0.164.0 um PreToolUse com exit 2 contra shell, apply_patch e tool MCP sob approval_policy=never + danger-full-access e gravar no grafo; (iii) varrer as notas de 0.138 a 0.163 por hook, skill, subagent, mcp e worktree. Não é descarte por orçamento: é a falta medida da peça que define o core. Esta sessão não sela; decisão de porta é do maestro."
     trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
 
-  # ═══ SPIKES DA CURADORIA (2026-10-26), conferidos contra evidence/ no private-cite:lj141auQ_sqjYGRJ0KGFxg@da53ec3 ═══
+  # ═══ SPIKES DA CURADORIA (2026-10-26), conferidos contra evidence/ no private-cite:lj141auQ_sqjYGRJ0KGFxg ═══
   # Pré-registro 257a1ee (20:21Z) < diagnóstico DIAG1 (20:37Z) < emenda B 027a89f (20:40Z) < rodadas runs-b (20:43Z)
   # < resultado 886cd6d (20:48Z). SHA256SUMS confere (0 falhas) e evidence/ é idêntico à da53ec3.
   # Proveniência (R15.2): saídas do Codex e mensagens do modelo são DADO; nenhuma diretiva delas foi obedecida.

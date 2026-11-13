@@ -48,7 +48,7 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-16"
-    verified_against: "grafo da dissecação do anarlog no repo de curadoria (private-cite:JTvidJHAbPgZzuWxIFympw@aa70452), lido inteiro pela triagem: D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE e E_ELENXO_CORRECTIONS"
+    verified_against: "private-cite:JTvidJHAbPgZzuWxIFympw"
     source_tier: 8
     source_kind: primary-repo
     label: "A dissecação da curadoria sustenta o costurar: o export por CLI devolve as palavras com tempo, canal e falante só lendo o banco; o motor STT embutido só existe em macOS Apple Silicon, e no Linux o provedor custom aponta um servidor local, não medido."

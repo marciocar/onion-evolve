@@ -90,7 +90,7 @@ nodes:
     provenance:
       source: "775569f1"
       locator: "private-cite:IBR4OxThSKw8FTwigLlORA"
-      method: "testimony: relato da sessão 2026-08-10 em 1ª pessoa no corpo de 775569f1 (fluxo 307/303 medido, comando não registrado) + leitura do README do private-cite:IBR4OxThSKw8FTwigLlORA@6d82b1b"
+      method: "testimony: private-cite:IBR4OxThSKw8FTwigLlORA"
       locality: "repo"
 
   # ── MATURIDADE ──────────────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ nodes:
     provenance:
       source: "775569f1"
       locator: "private-cite:TRLjqBjuAWokjCL-mClYTQ"
-      method: "testimony: relato da sessão 2026-08-10 em 1ª pessoa no corpo de 775569f1 + leitura do clone private-cite:TRLjqBjuAWokjCL-mClYTQ@6d82b1b (README, backup.sh)"
+      method: "testimony: private-cite:TRLjqBjuAWokjCL-mClYTQ"
       locality: "repo"
 
   # ── COLATERAIS: producao, nao Vaultwarden ───────────────────────────────────
@@ -167,7 +167,7 @@ nodes:
     provenance:
       source: "4b3c70fb"
       locator: "private-cite:Hfb9FBOhNe0XUJ9aiQu18g"
-      method: "testimony: medição da sessão 2026-08-10 (302 no console, interruptor off/on), registrada em 1ª pessoa no corpo de 4b3c70fb; 3º documento por leitura do README do private-cite:Hfb9FBOhNe0XUJ9aiQu18g@617364f"
+      method: "testimony: private-cite:Hfb9FBOhNe0XUJ9aiQu18g"
       locality: "repo"
 
   - id: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME

@@ -380,7 +380,7 @@ nodes:
     provenance:
       source: "private-cite:lgoac04J8GVicRfHN5IVEw"
       locator: "private-cite:lgoac04J8GVicRfHN5IVEw"
-      method: "reading: diário autoral do adotante em private-cite:lgoac04J8GVicRfHN5IVEw@21ff04f (clone local; id do members.yaml)"
+      method: "reading: private-cite:lgoac04J8GVicRfHN5IVEw"
       locality: "repo"
 
   - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6

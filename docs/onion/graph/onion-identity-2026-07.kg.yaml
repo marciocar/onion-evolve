@@ -192,7 +192,7 @@ nodes:
     provenance:
       source: "private-cite:DPp5jyTWkgRzjrCV6j00BA"
       locator: "private-cite:DPp5jyTWkgRzjrCV6j00BA"
-      method: "reading: merge-base dos commits 62ef2c10 e f7e4b034 do private-cite:DPp5jyTWkgRzjrCV6j00BA = 05f96a05 (2026-07-01)"
+      method: "reading: private-cite:DPp5jyTWkgRzjrCV6j00BA"
       locality: "web"
   - id: C_TOPO_MAIN_HAS_FW
     node_type: claim
@@ -210,7 +210,7 @@ nodes:
     # MEDIDO 2026-08-04 (git ls-remote contra o remoto vivo, sem fetch): 239 arquivos .claude
     # EXATOS na main do metagamify; ultima gravacao nela em 2026-06-26 — 39 dias parada enquanto
     # a develop andou ate 07-14. As tres asserções do no batem verbatim; "apenas parada" REFORCADO.
-    verified_against: "private-cite:GrQkBETt_8ZVEh_PkfyBjA@origin/main-bfb9bce2-2026-08-04"
+    verified_against: "private-cite:GrQkBETt_8ZVEh_PkfyBjA"
     provenance:
       source: "git ls-tree origin/main .claude"
       locator: "private-cite:GrQkBETt_8ZVEh_PkfyBjA"
@@ -303,7 +303,7 @@ nodes:
     provenance:
       source: "private-cite:r_WnnpTwlTNcZVUrepu7EQ"
       locator: "private-cite:r_WnnpTwlTNcZVUrepu7EQ"
-      method: "reading: merge-base dos commits 62ef2c10 e f7e4b034 do private-cite:r_WnnpTwlTNcZVUrepu7EQ = 05f96a05 (2026-07-01)"
+      method: "reading: private-cite:r_WnnpTwlTNcZVUrepu7EQ"
       locality: "web"
   - id: E_GIT_LSTREE_MAIN
     node_type: evidence
@@ -317,7 +317,7 @@ nodes:
     provenance:
       source: "private-cite:55Z_3J98U586m-AeOF57JQ"
       locator: "private-cite:55Z_3J98U586m-AeOF57JQ"
-      method: "reading: árvore .claude do commit bfb9bce2 do private-cite:55Z_3J98U586m-AeOF57JQ (239 arquivos)"
+      method: "reading: private-cite:55Z_3J98U586m-AeOF57JQ"
       locality: "web"
   - id: E_CLAUDE_MD
     node_type: evidence
@@ -1072,7 +1072,7 @@ nodes:
     label: "metagamify origin/main = 239 arquivos .claude, ultimo commit 2026-06-26 (bfb9bce2, 39 dias parada); develop = f016e3d3 (andou ate 07-14), rhilo/main = f7e4b034 e rhilo/develop = 07e19aaf VIVAS — a topologia de 3 linhagens NAO colapsou"
     trace: "private-cite:Ql8uPdR-B77bu0w1eJrD4A"
     verified_at: "2026-08-04"
-    verified_against: "private-cite:Ql8uPdR-B77bu0w1eJrD4A @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
+    verified_against: "private-cite:Ql8uPdR-B77bu0w1eJrD4A"
     provenance:
       source: "private-cite:Ql8uPdR-B77bu0w1eJrD4A"
       locator: "private-cite:Ql8uPdR-B77bu0w1eJrD4A"
@@ -1092,7 +1092,7 @@ nodes:
     # MEDIDO 2026-08-04: a main do CORE tinha 397 arquivos .claude em 2026-07-16 16h50 e 410-412
     # em 2026-07-17 20h — o "399" de E_LSTREE_MAIN_0717 cai exatamente nessa janela. A main do
     # metagamify esta congelada em 239 desde 06-26, logo nunca esteve em 399. Cadeia fechada.
-    verified_against: "onion-evolve@main-historico-2026-07-16..17 x private-cite:MwAqTfGgHFqk2PGk8pFpiw@origin/main"
+    verified_against: "private-cite:MwAqTfGgHFqk2PGk8pFpiw"
     provenance:
       source: "E_LSTREE_MAIN_0717 (refutado) + veredito do worker medir:C_TOPO_MAIN_HAS_FW (derrubado pelo juiz)"
       locator: "private-cite:MwAqTfGgHFqk2PGk8pFpiw"

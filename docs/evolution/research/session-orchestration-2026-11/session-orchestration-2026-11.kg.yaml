@@ -230,7 +230,7 @@ nodes:
     impact: 4
     confidence: 0.75
     verified_at: "2026-11-10"
-    verified_against: "duas colheitas: a da curadoria de 2026-11-04 (private-cite:oCwom35magPivhNYKebFsQ@ce1bba2, docs/evolution/research/session-orchestration-market-2026-11/session-orchestration-market-2026-11.kg.yaml#Q_SESSION_ORCHESTRATION_MARKET, status done: papéis, lease e passagem com aceite) e a de 2026-11-10 (E_SO_MERCADO_SUPERVISAO_1110: ociosidade, dona da pergunta e carga); lacunas declaradas em E_SO_MERCADO_SUPERVISAO_1110"
+    verified_against: "private-cite:oCwom35magPivhNYKebFsQ"
     label: "Que padrões de mercado já cobrem papéis entre agentes, reserva de recurso compartilhado e passagem de tarefa com aceite (o ciclo de tarefa do A2A aberto, entre outros)? Pesquisar pelo /onion-research antes de desenhar o degrau 2."
     narrative: "O perfil do Onion vai por cima do padrão de mercado, e cunhagem só onde o mercado não tiver (market-standards-first). Respondida em duas partes. Papéis: nenhuma spec aberta tem campo de papel, e a AAIF tem o vocabulário em rascunho (classe parcial, C_SOM_E1_ROLES_PARTIAL na curadoria). Passagem com aceite: o A2A 1.0.0 cobre pausa e fim, sem aceite assinado padrão (parcial, C_SOM_E3_HANDOFF_PARTIAL). Reserva de recurso: lease com TTL, cumprido pelo SO via cgroup (parcial, C_SOM_E2_LEASE_PARTIAL), e a colheita de 2026-11-10 acrescenta flock mais admissão por carga. Ociosidade: heartbeat com prazo julgado pelo supervisor. Dona da pergunta: chave do produtor com no máximo uma aberta e ack com prazo que escala (PagerDuty, Opsgenie). A batuta v1 (C_SO_BATUTA_V1_1110) usa as três formas da colheita. Fechar esta pergunta NÃO dispara o gatilho: Q_SO_GATILHO_DE_CONSTRUCAO segue aberto pela letra."
     provenance:

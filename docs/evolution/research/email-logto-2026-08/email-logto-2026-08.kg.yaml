@@ -153,11 +153,11 @@ nodes:
     verified_at: "2026-08-01"
     verified_against: hostinger-api-put-overwrite-false-mais-releitura-da-zona
     label: "DNS ESCRITO NA HOSTINGER VIA API, NAO-DESTRUTIVO: zona onionevolve.com foi de 26 -> 30 registros, com os 25 A-records PRESERVADOS (verificado relendo a zona depois). Metodo: backup da zona ANTES + PUT /api/dns/v1/zones com overwrite:FALSE (contrato confirmado por pesquisa: false=append/update, true=deleta os que casam name+type). Criados: DKIM TXT (20260801114651pm._domainkey.mail), Return-Path CNAME (pm-bounces.mail -> pm.mtasv.net), SPF TXT (mail -> v=spf1 include:spf.mtasv.net ~all), DMARC TXT (_dmarc -> v=DMARC1; p=none;). DMARC publicado SEM rua= (nao publicar email pessoal no DNS sem decisao do maestro)"
-    narrative: "trace anterior (só no host): dns-backup/ do clone de onion-waha no host. Na data do nó (2026-08-01) o arquivo não estava em remoto algum: o único commit de private-cite:O9qg-cfzrFP-jYBRoVUIwA é 86662e01, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é private-cite:O9qg-cfzrFP-jYBRoVUIwA@86662e01:dns-backup/."
+    narrative: "trace anterior (só no host): dns-backup/ do clone de onion-waha no host. Na data do nó (2026-08-01) o arquivo não estava em remoto algum: o único commit de private-cite:O9qg-cfzrFP-jYBRoVUIwA é ⟨commit⟩, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é private-cite:O9qg-cfzrFP-jYBRoVUIwA."
     provenance:
       source: "git:f5d50f4b"
       locator: "private-cite:O9qg-cfzrFP-jYBRoVUIwA"
-      method: "testimony: escrita e releitura da zona relatadas em 1ª pessoa no commit f5d50f4b (2026-08-01); backup prévio lido em private-cite:O9qg-cfzrFP-jYBRoVUIwA@86662e0 e leitura do backup dns-backup/onionevolve-20261008-232540.json do clone de onion-waha (não versionado, só no host) para os registros criados"
+      method: "testimony: private-cite:O9qg-cfzrFP-jYBRoVUIwA"
       locality: "repo"
 
   - id: E_domain_verified

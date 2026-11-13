@@ -193,7 +193,7 @@ nodes:
     provenance:
       source: "private-cite:9bPFJW6UJ1cD00S05HD-2A"
       locator: "private-cite:9bPFJW6UJ1cD00S05HD-2A"
-      method: "reading: diário do adotante no clone local (private-cite:9bPFJW6UJ1cD00S05HD-2A@e88af2e)"
+      method: "reading: private-cite:9bPFJW6UJ1cD00S05HD-2A"
   - id: E_RETRO
     node_type: evidence
     layer: audit
@@ -229,7 +229,7 @@ nodes:
     provenance:
       source: "private-cite:vVC_2oUKHn5Axcc1bzcGkQ"
       locator: "private-cite:vVC_2oUKHn5Axcc1bzcGkQ"
-      method: "reading: relatório da deep-research do adotante e KB destilada dele, ambos no commit private-cite:vVC_2oUKHn5Axcc1bzcGkQ@2e5e0a4"
+      method: "reading: private-cite:vVC_2oUKHn5Axcc1bzcGkQ"
   - id: C_ONBOARDING_AUTOGUIADO
     node_type: claim
     layer: audit
@@ -241,7 +241,7 @@ nodes:
     provenance:
       source: "private-cite:0hdkFo14DS599idAPshtUA"
       locator: "private-cite:0hdkFo14DS599idAPshtUA"
-      method: "reading: migalha de diário do adotante (private-cite:0hdkFo14DS599idAPshtUA@682fbcc)"
+      method: "reading: private-cite:0hdkFo14DS599idAPshtUA"
   - id: D_KG_SEPARADO
     node_type: decision
     layer: audit
@@ -282,7 +282,7 @@ nodes:
     provenance:
       source: "private-cite:XTjHNQMCOx3aazJXd0CH-w"
       locator: "private-cite:XTjHNQMCOx3aazJXd0CH-w"
-      method: "reading: KB do adotante que resume o relatório da deep-research (private-cite:XTjHNQMCOx3aazJXd0CH-w@2e5e0a4)"
+      method: "reading: private-cite:XTjHNQMCOx3aazJXd0CH-w"
   - id: C_I3_VALIDADO
     node_type: claim
     layer: audit

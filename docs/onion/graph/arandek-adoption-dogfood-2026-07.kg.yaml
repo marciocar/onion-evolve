@@ -141,7 +141,7 @@ nodes:
     provenance:
       source: "private-cite:NFW0AcQjdtzAceIuGLjIYA"
       locator: "private-cite:NFW0AcQjdtzAceIuGLjIYA"
-      method: "reading: .gitignore do adotante em private-cite:NFW0AcQjdtzAceIuGLjIYA@611329a1 (l.106 e l.117 = \".claude/\", conferido pelo juiz com git show) + diff-tree do 1º commit durável"
+      method: "reading: private-cite:NFW0AcQjdtzAceIuGLjIYA"
       locality: "repo"
 
   - id: E_GAP3_FP

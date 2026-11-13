@@ -657,7 +657,7 @@ nodes:
     provenance:
       source: "private-cite:8VdU6xQcZfRcReSM37sd0g"
       locator: "private-cite:8VdU6xQcZfRcReSM37sd0g"
-      method: "reading: src/identity.ts em private-cite:8VdU6xQcZfRcReSM37sd0g@a99994aa (remoto private-cite:8VdU6xQcZfRcReSM37sd0g; arquivo na data 2026-09-02)"
+      method: "reading: private-cite:8VdU6xQcZfRcReSM37sd0g"
       locality: "repo"
 
   - id: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
@@ -674,7 +674,7 @@ nodes:
     provenance:
       source: "private-cite:dAshXl0p_S2Xe0gVM2LjsQ"
       locator: "private-cite:dAshXl0p_S2Xe0gVM2LjsQ"
-      method: "reading: src/a2a.ts em private-cite:dAshXl0p_S2Xe0gVM2LjsQ@9d33d7eb (remoto private-cite:dAshXl0p_S2Xe0gVM2LjsQ; arquivo na data 2026-09-02)"
+      method: "reading: private-cite:dAshXl0p_S2Xe0gVM2LjsQ"
       locality: "repo"
 
   # ---- F4 (preservado): ACOPLAMENTO BRIDGE->LOGTO ----
@@ -1159,7 +1159,7 @@ nodes:
     provenance:
       source: "private-cite:qHWHyytTEzqVlroknCIWwA"
       locator: "private-cite:qHWHyytTEzqVlroknCIWwA"
-      method: "reading: src/server.ts em private-cite:qHWHyytTEzqVlroknCIWwA@7e736ba2 (remoto private-cite:qHWHyytTEzqVlroknCIWwA; arquivo na data 2026-08-27)"
+      method: "reading: private-cite:qHWHyytTEzqVlroknCIWwA"
       locality: "repo"
 
   - id: C_flip_was_partial
@@ -1663,7 +1663,7 @@ nodes:
     provenance:
       source: "private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q"
       locator: "private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q"
-      method: "reading: código do endpoint /a2a (private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q@c22517e), gate e chaves versionados no core e ADR f5121e0d (2026-07-28)"
+      method: "reading: private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q"
 
   - id: C_no_sender_exists
     node_type: claim
@@ -2020,11 +2020,11 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: "2026-10-28"
-    verified_against: "consulta read-only ao banco do Logto (roles x roles_scopes x scopes, scopes bridge:*) e git grep bridge:write na origin/main do private-cite:l_Tl3I60SnWt_qdV2azlQA (5819d8e)"
+    verified_against: "private-cite:l_Tl3I60SnWt_qdV2azlQA"
     source_tier: 10
     source_kind: primary
     label: "A capacidade por scope vigora em 2026-10-28: bridge:write está só na role humana bridge-user, a role de serviço bridge-operator tem só bridge:invoke, e o código do bridge segue decidindo as tools pelo bridge:write."
-    narrative: "Saída da consulta, tenant default: bridge-admin com bridge:admin; bridge-operator com bridge:invoke; bridge-user com bridge:admin, bridge:invoke e bridge:write. No private-cite:l_Tl3I60SnWt_qdV2azlQA, origin/main 5819d8e: src/agent-policy.ts (sem bridge:write, lê e propõe; o convidado com bridge:write escreve no próprio workspace, sem Bash nem Task) e src/chat-query-options.ts l.82. Restaura D_capability_by_scope, que ficara superseded por um achado já superado. Não medido: um turno de chat de ponta a ponta com cada identidade."
+    narrative: "Saída da consulta, tenant default: bridge-admin com bridge:admin; bridge-operator com bridge:invoke; bridge-user com bridge:admin, bridge:invoke e bridge:write. No private-cite:l_Tl3I60SnWt_qdV2azlQA, origin/main ⟨commit⟩: src/agent-policy.ts (sem bridge:write, lê e propõe; o convidado com bridge:write escreve no próprio workspace, sem Bash nem Task) e src/chat-query-options.ts l.82. Restaura D_capability_by_scope, que ficara superseded por um achado já superado. Não medido: um turno de chat de ponta a ponta com cada identidade."
     provenance:
       source: "private-cite:l_Tl3I60SnWt_qdV2azlQA"
       locator: "private-cite:l_Tl3I60SnWt_qdV2azlQA"
@@ -2060,7 +2060,7 @@ nodes:
     provenance:
       source: "private-cite:ct-Jq-GpFJmJwVWhrneY4g"
       locator: "private-cite:ct-Jq-GpFJmJwVWhrneY4g"
-      method: "reading: src/server.ts em private-cite:ct-Jq-GpFJmJwVWhrneY4g@7e736ba2 (remoto private-cite:ct-Jq-GpFJmJwVWhrneY4g; arquivo na data 2026-08-30)"
+      method: "reading: private-cite:ct-Jq-GpFJmJwVWhrneY4g"
       locality: "repo"
 
   - id: E_CENSO0901_D_resource_plan_b
@@ -2148,7 +2148,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: "2026-09-02"
-    verified_against: "grep -n systemd-run console.sh (private-cite:IgYPGLpnSehltd3cQAH2OQ@a0ce0fd) => linhas 30-37: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min no case on), com aviso fail-loud se o timer nao armar (private-cite:IgYPGLpnSehltd3cQAH2OQ@master, Onda 8, I_CONSOLE_AUTOOFF em fios-abertos)"
+    verified_against: "private-cite:IgYPGLpnSehltd3cQAH2OQ"
     label: "PAGO (Onda 8, 2026-09-01): o `on` do console.sh arma auto-off de 60min (sudo systemd-run transient, sobrevive ao fim da sessão de shell) e avisa se não armar; o `off` NÃO para o timer. O dogfood achou o console LIGADO por esquecimento. Janela de 60min; o desenho previa 30."
     narrative: "label anterior: PAGO (Onda 8, 2026-09-01): o GAP deixou de existir — console.sh arma auto-off transitorio de 60min via systemd-run em modo SYSTEM no case on) (sobrevive ao fim da sessao SSH), e o case off) para o timer. O dogfood achou o console LIGADO por esquecimento — exatamente o caso que o gap descrevia. Janela escolhida: 60min (nao os 30 do desenho) por pedido de uso real do painel."
     provenance:
@@ -2169,7 +2169,7 @@ nodes:
     provenance:
       source: "private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
       locator: "private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
-      method: "measurement: gh pr view 65 -R private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
+      method: "measurement: private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
 
   - id: E_W9_A2A_ASYNC_PR66_ABERTO
     node_type: evidence
@@ -2179,7 +2179,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: "2026-09-02"
-    verified_against: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R private-cite:WPVsBPL1fNv6g9pGl6hPDQ = OPEN"
+    verified_against: "private-cite:WPVsBPL1fNv6g9pGl6hPDQ"
     label: "CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (W9, 09-02): o PR #66 do onion-bridge troca spawnSync por spawn assíncrono (mesmo fail-safe); /health durante POST /a2a: 4820ms → 1,1ms. Fecha com merge+deploy (ato do maestro); produção ainda roda spawnSync no src/a2a.ts:51."
     narrative: "label anterior: CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (drive W9, 2026-09-02): PR #66 do onion-bridge troca spawnSync por spawn assincrono com o MESMO fail-safe. Medido antes/depois na bancada: /health durante um POST /a2a foi de 4820ms para 1,1ms. Modo-de-falha preservado: gate de 20s => SIGKILL aos 15s => 403 veto; gate exit 1 sem stdout => 403 veto em 40ms; zero orfaos apos o kill. A pergunta FECHA quando o PR for mergeado e deployado (ato do maestro; producao ainda roda spawnSync ⟨no src/a2a.ts:51 de o clone de produção do onion-bridge⟩, medido por sudo -n grep)."
     trace: "private-cite:WPVsBPL1fNv6g9pGl6hPDQ"

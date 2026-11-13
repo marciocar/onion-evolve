@@ -459,6 +459,20 @@ for f, n, form, repo in acc:
         f"nó {n} cita {shown} por {what}, e esse repo não está na lista pública ({allow_rel}): terceiro não confere. "
         "Troque a citação pelo marcador private-cite:<id> (kg_trace.py private-cite-id do vendor kg-ssot, um por citação): no source e no locator ele substitui o valor inteiro, no trace vira private-cite:<id>#<id de nó>, na prosa troca só o nome do repo, e a resolução fica numa tabela privada do dono. "
         "Se o repo é público, meça com gh repo view e acrescente-o à lista")
+# o marcador com o commit colado (private-cite:<id>@<hex>) devolve ao grafo o que o marcador tirou: o commit do repo
+# privado. O contrato v4.22 põe o marcador no valor inteiro de source, locator, trace, verified_against e do detalhe do
+# method, e na prosa troca o nome sem deixar @sha nem :caminho. HARD em todo grafo julgado, sem baseline: não há passivo
+# legítimo desta forma (refutador do #1648, B1). Diz grafo, nó e linha; nunca o id nem o hex.
+MK_AT = re.compile(r"private-cite:[A-Za-z0-9_-]{22,43}@[0-9A-Fa-f]{6,40}(?![0-9A-Za-z_-])")
+for f in files:
+    node = "-"
+    for i, line in enumerate(rd(os.path.join(root, f)).splitlines(), 1):
+        m = re.match(r"\s*-\s+id:\s*['\"]?([A-Za-z0-9_.-]+)", line)
+        if m:
+            node = m.group(1)
+        if MK_AT.search(line):
+            rc = 1
+            out("HARD", "MARCADOR-COM-COMMIT", f, f"nó {node}, linha {i}: o marcador private-cite:<id> leva um commit colado (@<hex>), o que devolve ao grafo público o commit do repo privado. No source, locator, trace, verified_against e no detalhe do method o marcador ocupa o valor inteiro; na prosa, tire o @<hex> e o :caminho")
 for f, err in unread:
     out("SOFT", "NAO-JULGADO", f, f"não deu para parsear ({err}) — este grafo NÃO foi julgado (YAML inválido é da REGRA 78)")
 if human:

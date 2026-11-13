@@ -260,7 +260,7 @@ nodes:
     provenance:
       source: "private-cite:3SsV6FHUGXmVjpDBXnBlGg"
       locator: "private-cite:3SsV6FHUGXmVjpDBXnBlGg"
-      method: "reading: corpo do commit c383df21 + KB do adotante no commit private-cite:3SsV6FHUGXmVjpDBXnBlGg@148a87e contra a KB do core em 198393e4"
+      method: "reading: private-cite:3SsV6FHUGXmVjpDBXnBlGg"
       locality: "repo"
 
   # ── SELOS DO MAESTRO EM 2026-10-01 (pesquisa de motores e corpus de regras) ─────────────────

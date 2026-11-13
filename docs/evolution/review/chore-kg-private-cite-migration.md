@@ -2,18 +2,17 @@
 branch: chore/kg-private-cite-migration
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: ac801339416b99b9619e7886d8ddd3f4b1c7af6e2b7b1fc890d9077dc0fc9c51
-reviewed_code_sha256: 9cfbeb64b35b9759181e5fe1d922af34efca7df70c75edbfd9bd3f0368dfc2df
-findings_total: 6
-findings_real: 6
-findings_blocking: 5
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
+findings_blocking: 8
 tokens: 0
 duration_min: 0
-findings_fixed: 6
+findings_fixed: 9
 verdict: REJECTED_AND_FIXED
 elenxo: true
-reviewer: passada adversarial do próprio agente executor, sem subagente (o brief proíbe spawnar), contra o contrato v4.22 e os gates
-nota: "tokens e duração não medidos. A passada não é independente: quem migrou é quem revisou, e cada achado foi pego por um gate ou pela leitura do contrato, não por um segundo leitor."
+reviewer: refutador independente do #1648 (3 bloqueios, re-revisão), sobre a passada do próprio executor (6 achados)
+nota: "tokens e duração não medidos. Achados 1 a 6: passada do próprio executor, que não é independente. Achados B1 a B3: refutador independente, que reprovou a 1ª versão; os três foram curados no mesmo PR."
 ---
 
 # Passada adversarial: `chore/kg-private-cite-migration`
@@ -54,6 +53,24 @@ contagem, sem ecoar nada).
 | 4 | (blocking) | o marcador é mais longo que o nome, e um `label` passou de 280 caracteres (`form.range.node.label` 2160 → 2161) | o label foi encurtado sem mudar a afirmação |
 | 5 | (blocking) | o `--touched` do gate acusou `integrity.bare-decision` numa decisão que a troca tocou | a decisão ganhou `narrative` com o porquê |
 | 6 | (non-blocking) | a REGRA 121 viu 3 citações `nome (sha)` com o nome nu, nos nós tocados | o nome virou o marcador do nó |
+| B1 | (blocking) | sobravam 64 `private-cite:<id>@<commit>` (com `:caminho` ou `/caminho` em parte deles), que devolviam ao grafo o commit do repo privado; o gate não os via | `verified_against` e `method` levam o marcador no valor inteiro (o `method` mantém a classe); na prosa e nos comentários saem o `@sha`, o `:caminho` e o `/caminho`. Os 7 hex soltos que ainda resolviam para commit privado viraram `⟨commit⟩`. O `private-repo-cite-check.sh` ganhou o HARD `MARCADOR-COM-COMMIT`, com o caso (r) e 2 mutantes mortos |
+| B2 | (blocking) | `C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR` estava como `refuted`, mas o claim era verdade e deixou de ser (caso DRIFTED do `/meta:kg-freshness`) | o nó antigo voltou ao texto original com `status: superseded`. O nó novo `C_CLASSE_NAO_CONFERIVEL_E_O_MARCADOR_PRIVATE_CITE` ganhou a verdade atual e uma `SUPERSEDES` para o antigo, e cita o PR e o commit da main, não a branch |
+| B3 | (blocking) | a catraca da REGRA 121 seguia com 255 entradas para um passivo real de 12 | o `--emit-baseline` a encolheu para 12 |
+
+## Re-revisão (refutador independente)
+
+Medido depois da cura:
+- `private-cite:<id>@<hex>` no corpus: 0;
+- hex nas linhas acrescentadas que resolvem para commit de repositório privado: 0. Foram 31 distintos, conferidos pela
+  API contra os 18 repositórios privados que o PR cita; 26 deles são commits do próprio core;
+- linhas acrescentadas com padrão privado: 0;
+- `--private-repos`: 0 campos;
+- REGRA 121: rc 0 no tocado e no `--all`, baseline com 12;
+- `kg-gate-ci.sh`: rc 0;
+- família `private_repo_cite`: 47 de 47.
+
+Ponto cego da medida: o hex só é conferido contra os repositórios que a `gh` alcança. Um grafo com hex não tinha
+repositório privado alcançável, e o hex dele é commit do core.
 
 ## Limites declarados
 

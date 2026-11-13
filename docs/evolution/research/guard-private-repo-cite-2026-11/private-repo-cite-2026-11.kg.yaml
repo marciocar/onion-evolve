@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-10"
   review_after: "2026-12-10"   # 30d: defeito de guarda
-  # ═══ TETO: 10 NÓS ═══ (de 8 para 10 em 2026-11-12: o porte do --private-repos da kg-ssot 4.51.0 traz uma decisão e a evidência dela)
+  # ═══ TETO: 11 NÓS ═══ (de 8 para 10 em 2026-11-12: o porte do --private-repos da kg-ssot 4.51.0 traz uma decisão e a evidência dela; 11 em 2026-11-13: a classe superada pelo marcador)
 nodes:
   - id: Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA
     node_type: question
@@ -110,14 +110,31 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: refuted
+    status: superseded
     impact: 3
     confidence: 0.7
-    verified_at: "2026-11-13"
-    verified_against: "medido na branch chore/kg-private-cite-migration: 0 provenance.source do corpus com a classe em texto; o kg-trace.sh (kg_trace.py da kg-ssot 4.51.0) imprime 123 provenance.source e 73 trace como private-cite; o kg-grammar.md e o conselho da REGRA 121 prescrevem o marcador"
+    verified_at: "2026-11-10"
+    verified_against: "kg-grammar.md (linha da citação de repo privado) e o nó C_PROVISIONAL_OMIT_URL_AND_HASH_BY_DEFAULT_1109 do kg-ssot"
     trace: ".claude/rules/kg-grammar.md"
     label: "a classe «não conferível por terceiro» hoje é texto no provenance.source; nenhum leitor do kg-ssot a imprime nem a conta, e o contrato segue exigindo source, locator e method"
-    narrative: "O kg-ssot mediu que, omitida a URL, somem a conferência de versão e a de locator. Que o leitor imprima a classe é trabalho do kg-ssot, não deste PR. Gatilho: o kg-ssot ganhar campo ou leitor para a classe, e aí a gramática e esta guarda migram para ele. Refutada em 2026-11-13: o gatilho disparou na 4.51.0 (contrato v4.22), que deu à classe o marcador private-cite:<id>, contado pelo kg_trace.py; a migração do corpus, da gramática e do conselho da guarda a cumpriu. Valia até 2026-11-12."
+    narrative: "O kg-ssot mediu que, omitida a URL, somem a conferência de versão e a de locator. Que o leitor imprima a classe é trabalho do kg-ssot, não deste PR. Gatilho: o kg-ssot ganhar campo ou leitor para a classe, e aí a gramática e esta guarda migram para ele."
+  - id: C_CLASSE_NAO_CONFERIVEL_E_O_MARCADOR_PRIVATE_CITE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "PR #1648 sobre a main em 13ed59f62 (merge do #1646, kg-ssot 4.51.0): kg-trace.sh imprime 123 provenance.source e 73 trace como private-cite, 0 provenance.source com a classe em texto, e o --private-repos dá 0 campos no corpus"
+    trace: ".claude/rules/kg-grammar.md"
+    label: "a classe «não conferível por terceiro» é o marcador private-cite:<id> do contrato v4.22 da kg-ssot: o kg_trace.py o conta e nunca o lê, e a gramática e o conselho da REGRA 121 o prescrevem"
+    narrative: "Verdade de 2026-11-13, que supera a de 2026-11-10. O gatilho do nó antigo disparou na kg-ssot 4.51.0, que deu à classe o marcador e um leitor que o conta; a migração do corpus (PR #1648) levou a gramática e o conselho da guarda junto. A tabela que resolve cada id para repositório, commit e caminho é privada do dono e fica fora de todo repositório."
+    provenance:
+      source: ".claude/validation/kg-trace.sh e vendor/kg-ssot/docs/manual/pt-BR/04-contrato.md (kg-ssot 4.51.0)"
+      locator: "a linha «as private-cite:» do kg-trace.sh no corpus; o parágrafo do marcador no capítulo 4 do manual"
+      method: "measurement: kg-trace.sh e private_repos.py --corpus rodados no corpus do PR #1648"
+      locality: "repo"
   - id: D_PORTE_DO_PRIVATE_REPOS_DA_4510
     node_type: decision
     layer: audit
@@ -153,6 +170,9 @@ nodes:
       method: "measurement: bancada com mutante plantado na cópia do porte e por ops/mutate-and-restore.sh nas guardas"
       locality: "repo"
 edges:
+  - from: C_CLASSE_NAO_CONFERIVEL_E_O_MARCADOR_PRIVATE_CITE
+    to: C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR
+    edge_type: SUPERSEDES
   - from: E_PORTE_EMPATA_COM_A_REFERENCIA
     to: D_PORTE_DO_PRIVATE_REPOS_DA_4510
     edge_type: SUPPORTS
