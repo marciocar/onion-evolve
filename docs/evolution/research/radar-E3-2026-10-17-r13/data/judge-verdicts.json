@@ -68,7 +68,7 @@
     "classe": "nenhuma",
     "achada": false,
     "o_que": "versão do CLI servido pelo /chat",
-    "medida": "clone em 7f4322c; package.json 0.3.302 com claudeCodeVersion 2.1.302; binário glibc responde 2.1.302 e o musl nem executa no host; processo nascido 00:18:51 UTC; verify rc 0, n_fail=0"
+    "medida": "clone em ⟨commit⟩; package.json 0.3.302 com claudeCodeVersion 2.1.302; binário glibc responde 2.1.302 e o musl nem executa no host; processo nascido 00:18:51 UTC; verify rc 0, n_fail=0"
    },
    "nota": "o cabeçalho de ops/cc-sdk-targets.tsv ainda diz 'Medido: 0.3.301' (deriva de doc fora do nó)"
   },
@@ -212,7 +212,7 @@
  "aufhebung": {
   "forma": "SUPERSEDES",
   "alvo": "docs/evolution/research/radar-E3-2026-10-16-r12/radar-E3-2026-10-16-r12.kg.yaml#E_SDK_0_3_301_EM_PRODUCAO_1016",
-  "razao": "o /chat serve 0.3.302 com CLI 2.1.302 desde o PR #78 (7f4322c); E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017 o substitui; precedente da r12"
+  "razao": "o /chat serve 0.3.302 com CLI 2.1.302 desde o PR #78 (⟨commit⟩); E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017 o substitui; precedente da r12"
  },
  "juiz": "subagente general-purpose, model opus, effort high, mandato REFUTAR; 156656 tokens, 49 chamadas, 7,5 min (2026-10-17)"
 }

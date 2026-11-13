@@ -1,6 +1,6 @@
 {
   "date": "2026-10-08",
-  "reason": "adoção do contrato v4.0.0 (93f61ac): a provenance virou MUST e a dívida herdada fica travada na base; queima pelas ondas O1–O3 do SAC-73 com as políticas seladas em 2026-10-08",
+  "reason": "adoção do contrato v4.0.0 (⟨commit⟩): a provenance virou MUST e a dívida herdada fica travada na base; queima pelas ondas O1–O3 do SAC-73 com as políticas seladas em 2026-10-08",
   "worse": [
     "✗ PIOROU  docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml falha no MUST: form.required.node.provenance",
     "✗ PIOROU  docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml falha no MUST: form.required.node.provenance",

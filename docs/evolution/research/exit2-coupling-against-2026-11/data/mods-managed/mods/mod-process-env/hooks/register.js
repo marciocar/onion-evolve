@@ -1,4 +1,4 @@
-// Derivado de mod-process (curadoria, 77b7a13) e de mod-process-env (mods-real-hooks).
+// Derivado de mod-process (curadoria, ⟨commit⟩) e de mod-process-env (mods-real-hooks).
 // Diferenca: grava um arquivo por chamada, com a chamada que disparou, e no Bash responde com o lido.
 let n = 0
 export function register(on) {

@@ -2,18 +2,17 @@
 branch: fix/provenance-triage-scrub
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: eb88ab16c1c6f415ea850be1604cd2fee939f70df38beb31dcc53f8b1450eca3
-reviewed_code_sha256: b9b971c246b10b3743ec3bbe5c4c80a4ead108c9298c1007478756fdfa3ecd07
-findings_total: 8
-findings_real: 8
-findings_blocking: 6
+reviewed_diff_sha256: pendente
+findings_total: 12
+findings_real: 12
+findings_blocking: 8
 tokens: 0
 duration_min: 0
-findings_fixed: 8
+findings_fixed: 12
 verdict: REJECTED_AND_FIXED
 elenxo: true
-reviewer: passada adversarial do próprio agente executor, sem subagente (o brief proíbe spawnar), contra a guarda nova e a medida por clones
-nota: "tokens e duração não medidos. A passada não é independente: cada achado saiu de uma medida (guarda, resolução de hex, diff) e não de um segundo leitor."
+reviewer: refutador independente do #1649 (2 bloqueios mais 2 correções, re-revisão), sobre a passada do próprio executor (8 achados)
+nota: "tokens e duração não medidos. Achados 1 a 8: passada do próprio executor, que não é independente. B1, B2, C1 e C2: refutador independente, curados no mesmo PR."
 ---
 
 # Passada adversarial: `fix/provenance-triage-scrub`
@@ -66,6 +65,10 @@ outros 116 são commits do core alcançáveis de um ref remoto.
 | 6 | (non-blocking) | a 1ª medida pela API esgotou o limite da conta (cerca de 4,7 mil chamadas) | a medida passou a usar clones locais; os 2 repositórios sem clone foram clonados pelo git, sem a API REST |
 | 7 | (blocking) | o lint do commit (REGRA 119, nome de repo ou clone de adotante não federado) achou o nome nu de um clone sem registro numa linha da limpeza | o nome virou `⟨clone sem registro⟩`, registrado na tabela privada |
 | 8 | (blocking) | a guarda viaja para as portas e citava os dois arquivos de configuração funcional pelo caminho em `ops/` (REGRA 100) | a isenção passou a ser por pasta e nome (`FUNCTIONAL_DIR`, `FUNCTIONAL_NAMES`), sem o caminho literal; o mutante da isenção morreu de novo |
+| B1 | (blocking) | sobravam 45 commits privados distintos em `data/`, em qualquer linha, contados contra os clones (38 no methods-manifest.tsv; 4 em arquivos que o PR não tocava, inclusive dois `register.js`) | todo hex de 7 a 40 caracteres de todo arquivo de texto sob `data/` foi classificado offline: commit do core alcançável, do core só por ref de PR, de repo público da lista, de repo privado ou desconhecido. As 116 ocorrências privadas (47 distintos) viraram `⟨commit⟩`, com arquivo e linha na tabela. Recontado do jeito do refutador, sobra 0 privado nos 636 arquivos |
+| B2 | (blocking) | a guarda só procurava hex em linha com o marcador; `repo-secreto (HEAD abc1234)` e `commit abc1234` passavam | duas camadas. `COMMIT-PRIVADO-EM-DADO`, com `ONION_PRIVATE_CLONES` (local do dono), pega o hex de qualquer linha que é commit de um clone privado. `HEX-NAO-CONFERIDO-EM-DADO`, sempre ligada e falhando fechada, pega o hex NOVO: o que está numa linha acrescentada e não estava no arquivo da base. Esse hex só passa se for commit do core alcançável, `dono/repo@<hex>` da lista pública ou de dono de terceiro, ou se levar um rótulo de não-commit (md5, sha256, sessão, subagente, uuid). Caso (s2) e 5 mutantes mortos. O escopo passou a ser todo arquivo de texto sob `data/`, e a guarda não julga mais os próprios artefatos (o baseline e a lista pública) |
+| C1 | (non-blocking) | 12 commits públicos tinham virado `⟨commit⟩` (do core e de `marciocar/gmill`) | foram devolvidos por alinhamento de tokens com a linha original da tabela (10 ocorrências do core, 17 do gmill) e qualificados como `marciocar/onion-evolve@<hex>` e `marciocar/gmill@<hex>`, que o CI confere pela lista pública |
+| C2 | (non-blocking) | colchete angular aninhado no `o7-proposta.csv`, que já vinha da main (7 lá) | o par externo saiu nos 6 casos; o `[[...]]` de link de wiki ficou |
 
 ## Mutantes
 
@@ -75,9 +78,17 @@ outros 116 são commits do core alcançáveis de um ref remoto.
 
 ## Limites declarados
 
+- **Fora de `data/`:** a guarda varre os csv, tsv, json, jsonl e txt de todo o repo, e todo arquivo de texto sob
+  `data/`. O resto, como `.md` e `.py` fora de `data/`, não é varrido.
+- **Configuração funcional:** `ops/moat-targets.tsv` e `ops/cc-sdk-targets.tsv` ficam de fora de propósito, porque são
+  os alvos que o veto do MOAT lê.
+- **Binários:** `tar.gz`, imagens e PDF não são lidos.
+- **Formas de caminho que a guarda não cobre:** `~/`, `$HOME`, e a forma codificada `/tmp/claude-<uid>/-home-<conta>-…`.
+  Nesta passada trocaram-se 28 ocorrências desta última, em 5 arquivos, mas a guarda não a acusa.
+- **Hex antigo:** o hex que já estava na main e não é commit de nenhum clone alcançável (1.072 ocorrências de
+  desconhecidos, quase todos hash e id de sessão) não é julgado sem os clones.
 - **Repositórios fora do alcance:** 8 repositórios privados da lista não são alcançáveis nem pela API nem pelo git
-  (apagados, renomeados ou sem acesso). Um commit deles que não esteja ao lado de um marcador não é visto.
+  (apagados, renomeados ou sem acesso). Um commit deles que já estava na main não é visto; o hex novo cai na falha fechada.
 - **Nome nu:** o nome de repositório sem dono e sem `@` segue, como nos grafos.
 - **Edição de evidência:** os arquivos limpos são evidência arquivada de pesquisas (retornos de workflow, vereditos de
   juiz), e o texto deles mudou. A tabela privada guarda cada original.
-- **Arquivos fora do escopo de dado:** `.py` e `.md` fora de `data/` não são varridos pela guarda.
