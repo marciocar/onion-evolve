@@ -205,7 +205,7 @@ case "${1:-}" in
   --print-marker) printf '%s\n' "${MARKER}"; exit 0 ;;
   --print-reviewed-marker) printf '%s\n' "${POS_MARKER}"; exit 0 ;;
   --reviewed-mark)
-    [ "${2:-}" = "--head" ] && printf '%s' "${3:-}" | grep -qE '^[0-9a-f]{40}$' \
+    [ "${2:-}" = "--head" ] && grep -qE '^[0-9a-f]{40}$' <<< "${3:-}" \
       || { printf '::error::review-mode-decide --reviewed-mark exige --head <sha de 40 hex>\n'; exit 1; }
     printf '::notice::%s o revisor de IA do CI revisou e aprovou o head %s\n' "${POS_MARKER}" "$3"; exit 0 ;;
   --classify-credit) shift; _classify_credit "$@"; exit $? ;;
