@@ -2,7 +2,8 @@
 branch: docs/close-xchange-request
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: bd43210a01590f244e35a588b915501df3b8c43bae7e3bc1b548c8ca1e113c50
+reviewed_code_sha256: 00946b5703d5d6894882731f2f30e46ef9857f58058832419fcd09eb92ae7771
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
