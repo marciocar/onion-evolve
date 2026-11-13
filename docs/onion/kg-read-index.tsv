@@ -286,6 +286,7 @@
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/rules/dissect-lens.md	C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
+.claude/rules/kg-grammar.md	C_CLASSE_NAO_CONFERIVEL_E_O_MARCADOR_PRIVATE_CITE	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/rules/kg-grammar.md	C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR	docs/evolution/research/guard-private-repo-cite-2026-11/private-repo-cite-2026-11.kg.yaml
 .claude/rules/kg-grammar.md	C_TETO_DATAS_ISO_SEM_ASPAS	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/rules/kg-grammar.md	C_TETO_PERFIL_YAML_E_DO_CONTRATO	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
