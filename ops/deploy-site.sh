@@ -250,22 +250,27 @@ deploy() {
 # ── deploy delegado: as quatro condições do selo, medidas antes de qualquer efeito ───
 # rc 0 = todas valem; die (rc 2) nomeia a que falta. Lê: git deste checkout, o forge (check-runs da main e o PR).
 VERIFIED_PR=""
-# o repo do CI e do PR NÃO sai da config do git (F1 da 3ª passada do refutador do #1647): GIT_CONFIG_* com insteadOf, um
-# include no ~/.gitconfig ou o .git/config editado trocavam o origin. Sai do `remote:` do membro `kind: source` do
-# members.yaml deste checkout, e na falta, da constante do core.
-vp_slug() {
+# o repo do CI e do PR é uma CONSTANTE (4ª passada do refutador do #1647): nem a config do git (insteadOf, include,
+# .git/config) nem o members.yaml (que a sessão edita) dizem quem é o core. O members.yaml só se CONFERE contra ela
+# (vp_members_ok), e a divergência recusa o deploy delegado.
+VP_CORE_CONST=marciocar/onion-evolve
+vp_slug() { printf '%s\n' "$VP_CORE_CONST"; }
+vp_members_src() {
   local r
   r="$(awk '/^[[:space:]]*-[[:space:]]+id:/ { if (src && rem != "") { print rem; done = 1; exit } src = 0; rem = "" }
     /^[[:space:]]+kind:[[:space:]]*source([[:space:]#]|$)/ { src = 1 }
     /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v); gsub(/["'"'"' ]/, "", v); rem = v }
     END { if (!done && src && rem != "") print rem }' "$REPO/docs/evolution/federation/members.yaml" 2>/dev/null)"
-  sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "${r:-marciocar/onion-evolve}"
+  [[ -n "$r" ]] || return 0
+  sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "$r" | tr '[:upper:]' '[:lower:]'
 }
 verified_gate() {
   local pr="$1" why="o deploy delegado exige a main verde e o PR revisado por refutador independente (D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113)"
   [[ "$pr" =~ ^[0-9]+$ ]] || die "--verified-pr exige o NÚMERO do PR, não '${pr}'"
   local slug head main dirty runs bad pr_tsv state base merge files ref rel body fm k v dup
-  slug="$(vp_slug)"; [[ -n "$slug" ]] || die "não li o remote origin deste checkout — sem ele não sei de que repo medir o CI"
+  slug="$(vp_slug)"
+  local msrc; msrc="$(vp_members_src)"
+  [[ -z "$msrc" || "$msrc" == "$VP_CORE_CONST" ]] || die "o members.yaml deste checkout diz que o core é '${msrc}', e a constante diz '${VP_CORE_CONST}': o registro foi mexido. Nada foi feito."
   # 1. o checkout é a origin/main recém-buscada, e o que o build lê está limpo
   git -C "$REPO" fetch -q origin main 2>/dev/null || die "não busquei origin/main — sem a ponta da main não há deploy delegado"
   head="$(git -C "$REPO" rev-parse HEAD 2>/dev/null)"; main="$(git -C "$REPO" rev-parse origin/main 2>/dev/null)"
@@ -533,13 +538,22 @@ selftest() {
   # F1: o slug não sai da config do git (um insteadOf que troca o origin não o move); MUTANTE: o vp_slug de antes, pelo origin
   mkdir -p "$sb/f1/docs/evolution/federation"; git init -q "$sb/f1"; git -C "$sb/f1" remote add origin https://github.com/marciocar/onion-evolve.git
   printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/marciocar/onion-evolve\n' > "$sb/f1/docs/evolution/federation/members.yaml"
-  tm "F1: com url.<outro>.insteadOf na config, o slug do deploy delegado segue o do members.yaml" 0 "marciocar/onion-evolve" \
+  tm "F1: com url.<outro>.insteadOf na config, o slug do deploy delegado segue a constante do core" 0 "marciocar/onion-evolve" \
     env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.https://github.com/marciocar/sge.git.insteadOf GIT_CONFIG_VALUE_0=https://github.com/marciocar/onion-evolve.git \
-    bash -c "source <(sed -n '/^vp_slug() {/,/^}/p' '$ds'); REPO='$sb/f1'; s=\$(vp_slug); echo \$s; [[ \$s == marciocar/onion-evolve ]]"
+    bash -c "source <(sed -n '/^VP_CORE_CONST=/p; /^vp_slug() {/p' '$ds'); REPO='$sb/f1'; s=\$(vp_slug); echo \$s; [[ \$s == marciocar/onion-evolve ]]"
   local f1m; f1m="$(env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=url.https://github.com/marciocar/sge.git.insteadOf GIT_CONFIG_VALUE_0=https://github.com/marciocar/onion-evolve.git \
     git -C "$sb/f1" remote get-url origin | sed -E 's#^https?://[^/]+/##; s#\.git$##')"
   if [[ "$f1m" == marciocar/sge ]]; then pass=$((pass+1)); echo "  ✓ F1 (MUT): o vp_slug de antes (pelo origin) leria marciocar/sge — a leitura do members.yaml é a causa"
   else fail=$((fail+1)); echo "  ✗ F1 (MUT): o origin com insteadOf deu '$f1m', não marciocar/sge"; fi
+  # 4ª passada: o members.yaml trocado (kind: source → outro repo) recusa o deploy delegado antes de ler o forge; o
+  # MUTANTE (o slug lido do members.yaml, a forma da 3ª passada) leria o repo trocado
+  mkdir -p "$sb/f4/docs/evolution/federation"
+  printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/marciocar/sge\n' > "$sb/f4/docs/evolution/federation/members.yaml"
+  tm "M: members.yaml com o kind: source trocado → o deploy delegado recusa" 2 "foi mexido" \
+    bash -c "source <(sed -n '/^VP_CORE_CONST=/p; /^vp_slug() {/p; /^vp_members_src() {/,/^}/p; /^verified_gate() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; REPO='$sb/f4'; verified_gate 7"
+  local f4m; f4m="$(bash -c "source <(sed -n '/^vp_members_src() {/,/^}/p' '$ds'); REPO='$sb/f4'; vp_members_src")"
+  if [[ "$f4m" == marciocar/sge ]]; then pass=$((pass+1)); echo "  ✓ M (MUT): o slug lido do members.yaml seria '$f4m' — a constante é a causa"
+  else fail=$((fail+1)); echo "  ✗ M (MUT): a leitura do members.yaml deu '$f4m'"; fi
   tm "B4: um gh falso no PATH não é o gh do deploy delegado (PATH fixo)" 0 "/usr/" \
     env -i HOME="$HOME" PATH="$sb/fakegh:$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo \"\${GH_CMD[0]}\"; [[ \"\${GH_CMD[0]}\" != '$sb/fakegh/gh' ]]"
 

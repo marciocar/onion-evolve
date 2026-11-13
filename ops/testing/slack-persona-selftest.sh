@@ -26,6 +26,8 @@ echo "systemctl \$*" >> "${t}/calls"
 case "\$1" in
   show) case "\$*" in
           *ExecStartPre*) echo "" ;;
+          *"-p ExecStart "*) echo "{ path=/usr/bin/node ; argv[]=/usr/bin/node /run/onion-slack-persona-app/node_modules/tsx/dist/cli.mjs src/slack-persona/main.ts ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }" ;;
+          *DropInPaths*) [ -e "${t}/eff-dropin" ] && cat "${t}/eff-dropin" || echo "" ;;
           *DynamicUser*) echo yes ;;
           *" User "*|*"-p User"*) if [ -e "${t}/eff-user" ]; then cat "${t}/eff-user"; else echo onion-slack-persona; fi ;;
           *CapabilityBoundingSet*|*AmbientCapabilities*) echo "" ;;
@@ -124,6 +126,13 @@ sed 's/^  local eff; if ! eff="\$(effective_ok)"; then$/  local eff; if false; t
 PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut3.sh" install --apply > "${t}/out" 2>&1
 rc=$?; ! cmp -s "${me}" "${t}/mut3.sh" && [ "${rc}" = 0 ]; chk "install: o MUTANTE sem a conferência do efetivo instalaria a unit lida como root — a conferência é a causa" $?
 rm -f "${t}/eff-user" "${t}/root/etc/systemd/system/${UNIT}.service"
+# 4ª passada: um drop-in (de /run/systemd/system, em runtime) muda a unit por cima do texto conferido
+printf '/run/systemd/system/onion-slack-persona.service.d/x.conf\n' > "${t}/eff-dropin"
+run install --apply; [ $? = 1 ] && grep -q 'DropInPaths' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit efetiva com drop-in recusa e remove" $?
+sed 's/^  \[ -z "\${got}" \] || bad="\${bad} DropInPaths=.*$/  :/' "${me}" > "${t}/mut4.sh"
+PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut4.sh" install --apply > "${t}/out" 2>&1
+rc=$?; ! cmp -s "${me}" "${t}/mut4.sh" && [ "${rc}" = 0 ]; chk "install: o MUTANTE sem a conferência do DropInPaths instalaria com o drop-in — a conferência é a causa" $?
+rm -f "${t}/eff-dropin" "${t}/root/etc/systemd/system/${UNIT}.service"
 printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"
 run install; chk "install: ensaio sai 0" $?
 [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: ensaio não escreve" $?

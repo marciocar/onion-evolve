@@ -132,6 +132,7 @@ deploy	path	/home/marcio/mcp-kg	-
 deploy	path	/usr/local/sbin/onion-*	-
 deploy	path	/usr/local/lib/onion-ops	ops/delegated-ops.sh
 deploy	path	/etc/sudoers.d	-
+deploy	path	/run/systemd/system/onion-*	-
 deploy	path	/etc/sudoers.d/onion-delegated-ops	ops/delegated-ops.sh
 relogio	path	/etc/cron*	-
 relogio	path	/var/spool/cron	-

@@ -259,6 +259,15 @@ effective_ok() { # rc 0 = o efetivo bate; imprime o que diverge
   done
   got="$(priv systemctl show -p ExecStartPre,ExecStartPost,ExecStop,ExecStopPost,ExecReload,ExecCondition --value "${UNIT}" 2>/dev/null | tr -d '[:space:]')"
   [ -z "${got}" ] || bad="${bad} Exec* além do ExecStart"
+  # (4ª passada) o ExecStart efetivo é o fixo, e nenhum drop-in (/etc/systemd/system/<unit>.d, /run/systemd/system/…)
+  # muda a unit por cima do texto conferido
+  got="$(priv systemctl show -p ExecStart --value "${UNIT}" 2>/dev/null)"
+  case "${got}" in
+    "{ path=/usr/bin/node ; argv[]=/usr/bin/node /run/onion-slack-persona-app/node_modules/tsx/dist/cli.mjs src/slack-persona/main.ts ; "*) ;;
+    *) bad="${bad} ExecStart='${got:0:120}'" ;;
+  esac
+  got="$(priv systemctl show -p DropInPaths --value "${UNIT}" 2>/dev/null)"
+  [ -z "${got}" ] || bad="${bad} DropInPaths='${got:0:120}'"
   [ -z "${bad}" ] || { echo "${bad# }"; return 1; }
 }
 
