@@ -3,7 +3,8 @@ title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, 
 date: 2026-11-13
 branch: feat/delegated-acts-1113
 reviewer: "passada própria do condutor sobre o próprio diff (sem subagente: o brief vedou spawn); bancada moat_gate (dl1-dl5, db1-db8, cada um com mutante), pr_merge_verified (fr1-fr11 + fr-MUT), deploy_site (43/43), slack_persona (26/26), act_signature (13/13 + 12 mutantes), delegated-ops --selftest 5/5, visudo -cf parsed OK, e o hook real rodado com payload PreToolUse nas 6 formas"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9c3f96f31c5ea64288b55dcfa745dee08be25df18c8807fe926af703c054d576
+reviewed_code_sha256: dd9212412f9cafca90f20fca0ef676f63833438a294e78dc0fc7fa7d569c01cf
 findings_total: 7
 findings_real: 7
 findings_fixed: 7
