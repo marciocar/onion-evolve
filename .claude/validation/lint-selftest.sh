@@ -33166,6 +33166,75 @@ run_ssot_projections_selftests() {
       record_pass "ssot-projections: (g-MUT) sem a re-regeneração o commit greenfield nasce sem as duas projeções — (g) é load-bearing"
     else record_fail "ssot-projections: (g-MUT)" "o mutante deu '${_gok}' — (g) não prova a cura"; fi
   else record_fail "ssot-projections: (g-MUT) setup" "a mutação não foi aplicada (âncora do durable-commit mudou)"; fi
+  # (h) LEITOR CONCORRENTE NUNCA VÊ A PROJEÇÃO PELA METADE (2026-11-13, derrubou um merge do maestro). Todo
+  #     destino era escrito por `gerador > destino`: o shell trunca o arquivo quando o gerador COMEÇA, e quem
+  #     lê no meio (outra sessão no mesmo checkout: o `git add` do pr-finalize, a catraca da REGRA 62) pega o
+  #     arquivo cortado. Medido num clone: 187 de 533 amostras de uma rodada do backlog estavam cortadas no
+  #     meio de uma tabela. O caso é DETERMINÍSTICO, sem corrida de relógio: o gerador escreve a 1ª metade,
+  #     avisa e PARA até o caso mandar seguir; parado, o caso lê o destino, que tem de ser o ANTIGO inteiro.
+  #     (h-MUT) o redirecionamento direto de antes da cura: o mesmo leitor vê a 1ª metade.
+  _pp_wait() { local _i=0; while [ ! -e "$1" ] && [ "${_i}" -lt 600 ]; do sleep 0.1; _i=$((_i + 1)); done; [ -e "$1" ]; }
+  _pp_regen() {   # $1 = helper ; $2 = dir → imprime "<visto no meio>|<final>"
+    mkdir -p "$2"; git -C "$2" init -q
+    _archive_staged "$2" .claude/validation .claude/commands .claude/agents .claude/skills
+    mkdir -p "$2/docs/onion"; printf 'ANTIGO\n' > "$2/docs/onion/testing-state.md"
+    printf '#!/usr/bin/env bash\necho metade-1\n: > "%s/started"\n_i=0; while [ ! -e "%s/go" ] && [ "${_i}" -lt 600 ]; do sleep 0.1; _i=$((_i + 1)); done\necho metade-2\n' \
+      "$2" "$2" > "$2/.claude/validation/testing-state.sh"
+    bash "$1" "$2" >/dev/null 2>&1 & local _pid=$!
+    local _mid="(o gerador não começou)"
+    _pp_wait "$2/started" && _mid="$(tr '\n' ' ' < "$2/docs/onion/testing-state.md")"
+    : > "$2/go"; wait "${_pid}" 2>/dev/null || true
+    printf '%s|%s' "${_mid}" "$(tr '\n' ' ' < "$2/docs/onion/testing-state.md" 2>/dev/null)"
+  }
+  local _pr _pm
+  _pr="$(_pp_regen "${h}" "${d}/h")"
+  if [ "${_pr}" = "ANTIGO |metade-1 metade-2 " ] && [ -z "$(find "${d}/h/docs/onion" -name '.*.??????' 2>/dev/null)" ]; then
+    record_pass "ssot-projections: (h) gerador no meio: quem lê vê o painel ANTIGO inteiro; no fim, o novo inteiro, sem temporário largado"
+  else record_fail "ssot-projections: (h)" "visto|final='${_pr}' (esperado 'ANTIGO |metade-1 metade-2 ') — quem lê junto pega a projeção pela metade"; fi
+  sed 's|^  bash "${DEST}/.claude/validation/${_gen}" --markdown > "${_t}" 2>/dev/null \|\| true$|  bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null; cp "${DEST}/docs/onion/${_out}" "${_t}" # ONION_MUTANTE|' \
+    "${h}" > "${d}/gm/regen-mut.sh"
+  if ! cmp -s "${h}" "${d}/gm/regen-mut.sh"; then
+    _pm="$(_pp_regen "${d}/gm/regen-mut.sh" "${d}/hm")"
+    if [ "${_pm%%|*}" = "metade-1 " ]; then
+      record_pass "ssot-projections: (h-MUT) com o redirecionamento direto o leitor vê a 1ª metade — (h) é load-bearing"
+    else record_fail "ssot-projections: (h-MUT)" "o mutante deu '${_pm}' — (h) não prova a cura"; fi
+  else record_fail "ssot-projections: (h-MUT) setup" "a mutação não foi aplicada (âncora do laço mudou)"; fi
+
+  # (i) O MESMO PARA O BACKLOG (kg-backlog-project.sh --write), que é o que mais custa: o render leva
+  #     segundos. O ponto de parada é o 1º `iconv` do render (um por linha da tabela), por um iconv de
+  #     mentira no PATH que avisa, espera e chama o de verdade. (i-MUT) `render > "$OUT"` de antes da cura.
+  local _bp="${SCRIPT_DIR}/kg-backlog-project.sh" _real_iconv; _real_iconv="$(command -v iconv)"
+  _pp_backlog() {  # $1 = gerador ; $2 = dir → "<visto no meio>|<linhas finais>"
+    mkdir -p "$2/bin" "$2/docs/onion/graph"; git -C "$2" init -q
+    _archive_staged "$2" .claude/validation
+    cp "$1" "$2/.claude/validation/kg-backlog-project.sh"
+    printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: Q_UM\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 1.0\n    label: "um item"\nedges: []\n' \
+      > "$2/docs/onion/graph/t.kg.yaml"
+    printf 'ANTIGO\n' > "$2/docs/backlog.md"
+    git -C "$2" add docs/onion/graph/t.kg.yaml
+    printf '#!/usr/bin/env bash\nif [ ! -e "%s/started" ]; then : > "%s/started"; _i=0; while [ ! -e "%s/go" ] && [ "${_i}" -lt 600 ]; do sleep 0.1; _i=$((_i + 1)); done; fi\nexec "%s" "$@"\n' \
+      "$2" "$2" "$2" "${_real_iconv}" > "$2/bin/iconv"; chmod +x "$2/bin/iconv"
+    ( cd "$2" && PATH="$2/bin:${PATH}" bash .claude/validation/kg-backlog-project.sh --write >/dev/null 2>&1 ) & local _pid=$!
+    local _mid="(o render não começou)"
+    _pp_wait "$2/started" && _mid="$(head -1 "$2/docs/backlog.md")"
+    : > "$2/go"; wait "${_pid}" 2>/dev/null || true
+    printf '%s|%s' "${_mid}" "$(grep -c 'Q_UM' "$2/docs/backlog.md" 2>/dev/null)"
+  }
+  if [ -z "${_real_iconv}" ] || [ ! -f "${_bp}" ]; then
+    record_fail "ssot-projections: (i) setup" "iconv ou o gerador do backlog ausente — o caso não mede"
+  else
+    _pr="$(_pp_backlog "${_bp}" "${d}/i")"
+    if [ "${_pr}" = "ANTIGO|1" ]; then
+      record_pass "ssot-projections: (i) render do backlog no meio: quem lê vê o backlog ANTIGO; no fim, o novo com o item"
+    else record_fail "ssot-projections: (i)" "visto|item='${_pr}' (esperado 'ANTIGO|1') — o docs/backlog.md fica pela metade para quem lê junto"; fi
+    sed 's|^render > "\$_OTMP" |render > "$OUT"; cp "$OUT" "$_OTMP"; true |' "${_bp}" > "${d}/gm/backlog-mut.sh"
+    if ! cmp -s "${_bp}" "${d}/gm/backlog-mut.sh"; then
+      _pm="$(_pp_backlog "${d}/gm/backlog-mut.sh" "${d}/im")"
+      if [ "${_pm%%|*}" != "ANTIGO" ] && [ "${_pm%%|*}" != "(o render não começou)" ]; then
+        record_pass "ssot-projections: (i-MUT) com \`render > \"\$OUT\"\` o leitor vê o backlog cortado ('${_pm%%|*}') — (i) é load-bearing"
+      else record_fail "ssot-projections: (i-MUT)" "o mutante deu '${_pm}' — (i) não prova a cura"; fi
+    else record_fail "ssot-projections: (i-MUT) setup" "a mutação não foi aplicada (âncora do render mudou)"; fi
+  fi
   rm -rf "${d}"
 }
 

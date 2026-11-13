@@ -233,5 +233,19 @@ if [ "$MODE" = "check" ]; then
   if [ "$(cat "$OUT" 2>/dev/null || true)" = "$(render)" ]; then echo "backlog.md: em dia ($n_open abertos)"; else echo "backlog.md: DRIFT (advisory) — rode /meta:backlog"; fi
   exit 0
 fi
-render > "$OUT"
+# ESCRITA ATÔMICA (medido em 2026-11-13; derrubou um merge do maestro). Era `render > "$OUT"`: o shell
+# TRUNCA o backlog no instante em que o render começa, e o render leva segundos (um fork de sed/cut/iconv
+# por linha). Medido num clone: em ~35% das amostras de uma rodada o docs/backlog.md no disco estava
+# cortado NO MEIO DE UMA TABELA (9, 16, 25 … 1930 de 1944 linhas). Várias sessões rodam o pr-finalize e o
+# lint no MESMO checkout ao mesmo tempo; quem lia nessa janela (o `git add` do vizinho, a catraca da REGRA 62)
+# pegava o arquivo pela metade, e as voltas do pr-finalize oscilavam. A cura é a do kg-trace --out: render
+# num temporário ÚNICO AO LADO do destino (mesmo sistema de arquivos: o mv é rename) e troca de uma vez.
+# Quem lê vê o backlog antigo ou o novo, inteiro — nunca o meio. Render que sai ≠0 deixa o vivo intacto (o rc
+# do render é o do último comando dele: falha no meio de um laço não é vista aqui, limite declarado).
+_OTMP="$(mktemp "$(dirname -- "$OUT")/.$(basename -- "$OUT").XXXXXX")" \
+  || { echo "kg-backlog-project: não consegui criar o temporário ao lado de $OUT" >&2; exit 2; }
+trap 'rm -f "$TMP" "$RERR" "$RTSV" "$_OTMP"' EXIT
+render > "$_OTMP" || { echo "kg-backlog-project: render falhou — $OUT INTACTO" >&2; exit 2; }
+if [ -e "$OUT" ]; then chmod --reference="$OUT" "$_OTMP" 2>/dev/null || chmod 644 "$_OTMP"; else chmod 644 "$_OTMP"; fi
+mv -f "$_OTMP" "$OUT"
 echo "✓ $OUT gerado: $n_open abertos · $n_with_open grafo(s) com aberto (de $n_graphs no escopo)"
