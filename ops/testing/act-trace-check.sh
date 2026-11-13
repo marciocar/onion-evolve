@@ -103,6 +103,14 @@ sed -e "s#remote: github.com/marciocar/onion-core\\b.*#remote: ${T}/door-core.gi
     -e "s#remote: github.com/marciocar/onion-plugins\\b.*#remote: ${T}/door-plugins.git#" \
     -e "s#remote: github.com/marciocar/onion-standalone\\b.*#remote: ${T}/door-standalone.git#" \
     "${T}/core/docs/evolution/federation/members.yaml" > "${T}/members-bench.yaml"
+# a fonte PRIVADA de termos de cliente (a varredura de vazamento do passo 5a a exige): sem ela no ambiente (CI, pré-voo),
+# o ensaio usa um termo SINTÉTICO de bancada. É a 2ª diferença declarada para a produção; o rastro de execução não muda.
+if [ -z "${ONION_CLIENT_TERMS_FILE:-}" ] && [ ! -f "${HOME}/.config/onion/client-terms.txt" ]; then
+  printf 'termo-sintetico-da-bancada-act-trace\n' > "${T}/client-terms.txt"; export ONION_CLIENT_TERMS_FILE="${T}/client-terms.txt"
+  # sem os termos reais, nenhum nome comercial se deriva do registro, e o passo 5a recusa o registro com marcador de
+  # confidencialidade ("varrer assim seria teatro"): o registro de bancada sai sem os marcadores (o rastro não muda)
+  sed -i -e 's/CONFIDENCIAL//g' -e 's/PRIVADO//g' "${T}/members-bench.yaml"
+fi
 # o REGISTRADOR: bash, sh e python3 no PATH anotam o script que vão executar e seguem para o binário real. Abaixo da
 # FRONTEIRA (o processo do lint e os filhos dele), a anotação leva a marca 1 e não se julga.
 mkdir -p "${T}/bin"; : > "${T}/trace.log"
