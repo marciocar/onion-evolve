@@ -237,6 +237,14 @@ else
     _PMV_TARGET="${_s}"
   done < <(_pmv_remote_slugs | awk '!seen[$0]++')
 fi
+# (5ª passada, decisão do maestro de 2026-11-13) PATH fixo SEMPRE que a sessão do core chama, não só no delegado: um gh
+# ou git falso no PATH da sessão mentiria o CI, o estado e o merge de qualquer PR
+_pmv_fix_path() { PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r; }
+[ "${_CORE_SESSION}" = 1 ] && _pmv_fix_path
+# --dispensa e --ci-inoperante são do MAESTRO (5ª passada): pela sessão do core, só com --maestro, que o hook veta à sessão
+if [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] && { [ "${#DISPENSA[@]}" -gt 0 ] || [ "${CI_INOPERANTE}" -eq 1 ]; }; then
+  die "--dispensa e --ci-inoperante são só do maestro (--maestro, pelo terminal dele ou pelo \`!\`): a sessão do core não dispensa check nem declara CI inoperante. Nada foi feito."
+fi
 if [ "${_CORE_SESSION}" = 1 ] && [ -n "${_PMV_TARGET}" ] && [ "${_PMV_TARGET}" != "${_PMV_CORE_SLUG}" ] \
    && [ "${DELEGATED_FOREIGN}" -eq 0 ] && [ "${MAESTRO}" -eq 0 ]; then
   die "merge em '${_PMV_TARGET}' (não é o core) pela sessão do core: só pelo caminho delegado, '--repo <dono/repo> --foreign-repo' como palavra nua (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113). O maestro roda com --maestro. Nada foi feito."
@@ -422,6 +430,17 @@ _kg_guard_post() { # depois do merge PROVADO: cada sha da branch tem de ser ance
   say "✓ provenance: os commits da branch citados pelo .kg.yaml são ancestrais de origin/${_kg_base}"
 }
 _kg_guard_pre
+# (5ª passada, item 3 da decisão do maestro de 2026-11-13) PR do CORE que toca GUARDA (os hooks e o settings.json que os
+# registra, o moat-targets.tsv, os scripts delegados e o fecho deles, o sudoers) não é mergeado pela sessão: quem muda a
+# cerca não a atravessa sozinho. O merge desse PR é do maestro (--maestro, que o hook veta à sessão).
+_PMV_GUARD_RE='^(\.claude/hooks/|\.claude/settings(\.local)?\.json$|ops/moat-targets\.tsv$|ops/(pr-merge-verified|deploy-site|slack-persona|update-bridge|bridge-backup|bridge-hardening|chat-runner|delegated-ops)\.sh$|ops/sudoers/)'
+_guard_pr_gate() {
+  [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] || return 0
+  if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(_slug_norm "${REPO_ARG[1]}")" != "${_PMV_CORE_SLUG}" ]; then return 0; fi
+  local _g; _g="$(grep -E "${_PMV_GUARD_RE}" <<< "${_PR_FILES}" | head -5 | tr '\n' ' ')"
+  [ -z "${_g}" ] || die "o PR #${PR} toca GUARDA (${_g}): o merge dele é do maestro, não da sessão (decisão de 2026-11-13). Peça: ! bash ops/pr-merge-verified.sh ${PR} --maestro. Nada foi feito."
+}
+_guard_pr_gate
 # ══ MERGE ALHEIO DELEGADO (--foreign-repo, D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, 2026-11-13) ══════════════════
 # O selo delega à sessão o merge de PR num repo da família, só por este caminho, com CI verde, sem conflito e com
 # resíduo. O veto do MOAT (core-only) exige a flag na linha de comando; o que ele não consegue medir se mede aqui,
@@ -429,6 +448,13 @@ _kg_guard_pre
 # completos e sem falha); a flag só tira as saídas que o contornam. O conflito se recusa no laço do auto-rebase.
 _delegated_foreign_gate() {
   [ "${DELEGATED_FOREIGN}" -eq 1 ] || return 0
+  # (5ª passada, item 1) o script que roda a forma delegada é o de origin/main, byte a byte: a cópia editada na árvore
+  # (um `return 0` no gate) não é a revisada
+  local _mine _main
+  _mine="$(git -C "${_PMV_DIR}" hash-object -- "${BASH_SOURCE[0]}" 2>/dev/null)"
+  _main="$(git -C "${_PMV_DIR}" rev-parse -q --verify "origin/main:ops/pr-merge-verified.sh" 2>/dev/null)"
+  [ -n "${_mine}" ] && [ "${_mine}" = "${_main}" ] \
+    || die "o merge alheio delegado roda só o ops/pr-merge-verified.sh de origin/main, byte a byte; este (${_mine:0:12}) difere (${_main:0:12}). Rode de um checkout em origin/main. Nada foi feito."
   local _why="o merge alheio pela sessão é delegado só pelo caminho verificado, com CI verde, sem conflito e com resíduo (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113)"
   [ "${#REPO_ARG[@]}" -ge 2 ] || die "--foreign-repo exige --repo <dono>/<repo>. Nada foi feito."
   [ "${#DISPENSA[@]}" -eq 0 ] || die "--foreign-repo não aceita --dispensa: ${_why}. Dispensa em repo alheio é do maestro. Nada foi feito."

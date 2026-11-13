@@ -30,6 +30,15 @@ A regra (`ops/sudoers/onion-delegated-ops`) libera só estas linhas exatas, com 
 /usr/local/lib/onion-ops/slack-persona.sh verify
 ```
 
+## ⚠️ A fronteira real é outro usuário do sistema
+
+A sessão do Claude Code roda como o **mesmo usuário do maestro** (`marcio`). Tudo o que esse usuário escreve, a sessão
+escreve: o checkout e os scripts, a ref `origin/main` local, o `~/.gitconfig`, a config do gh e o próprio hook. Por isso
+os hooks e as recusas dos scripts são **camada de conformidade, não fronteira de segurança**: eles barram o engano e o
+atalho, não um adversário com a conta. A fronteira de verdade é rodar a sessão (ou os atos) como **outro usuário** do
+sistema, sem escrita no checkout servido e sem sudo amplo. Decisão do maestro de 2026-11-13: fechar o barato e declarar
+o resto.
+
 ## ⚠️ Antes: a regra só limita se for tudo o que o operador tem
 
 Medido em 2026-11-13 com `sudo -n -l`: `marcio` tem `(ALL) NOPASSWD: ALL` e é do grupo `docker`, que dá root por

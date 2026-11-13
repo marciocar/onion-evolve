@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: af33f832970dc7fe14a1b5c64bcba58be33d56572f371e161afa43bbc0c15a6a
-reviewed_code_sha256: 3263570a810fa2e973a5881a393e1b0971989504b3640c085442b19910a64ed8
-findings_total: 19
-findings_real: 19
-findings_fixed: 19
+reviewer: "6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: df8523cd6f036527042584e044e9d93939bf5820ef2582e3bc613a83c796a5ef
+reviewed_code_sha256: 2c408273332a20bf0d760da33bf992a89a8ba2efd1f3d672922c8138cd6d1a4b
+findings_total: 24
+findings_real: 24
+findings_fixed: 24
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou quatro vezes (B1-B5, N1-N3, F1-F2, M1); as curas entraram neste PR. PR de guarda: a cura do M1 também passa por refutador independente antes do merge"
+nota: "o refutador independente reprovou cinco vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
 ---
 
 # Resíduo — REGRA 56
@@ -134,6 +134,31 @@ passwd). O que ainda passa o hook é forma legítima, é recusado pelo script co
     (com o glob: o caminho nu punha "system" no sinal do pré-filtro, que casava todo `systemctl` e matava os mutantes
     d14 e d22). (caso do drop-in na bancada da persona, com mutante; as formas de r4b/r4c vetam)
 
+## 6ª passada: a forma delegada roda o revisado (decisão do maestro de 2026-11-13: fechar o barato, declarar o resto)
+
+20. **Item 1 — a forma delegada rodava o script EDITADO na árvore**, sem PR (`verified_gate() { return 0;`, a constante
+    do core). Cura no hook: a forma delegada só vale se o script invocado (o de ops/ ou a cópia de root) e a cerca (o
+    hook, o juiz, o tokenizador e o moat-targets.tsv) forem byte a byte os de `origin/main` (`git hash-object` contra
+    `origin/main:<rel>`), a mesma régua do @rootcopy. No script: o merge alheio delegado confere o próprio blob contra
+    `origin/main:ops/pr-merge-verified.sh`; o deploy delegado já exigia HEAD = origin/main e ops/deploy-site.sh limpo.
+    (rb24-rb26, rf22, com mutante)
+21. **Item 2 — `--dispensa` e `--ci-inoperante` são do maestro.** Na sessão do core o script recusa sem `--maestro`, e
+    as duas viraram palavras de assinatura do ato no tsv (o hook veta). (rf19, rf20, rb27, rb28, com mutante)
+22. **Item 3 — PR do core que toca guarda não é mergeado pela sessão.** Hooks, settings.json, moat-targets.tsv, os
+    scripts delegados e o fecho deles, sudoers: o pmv lê os arquivos do PR e recusa na sessão do core sem --maestro.
+    **Este próprio PR passa a ser de merge do maestro.** (rf21, com mutante)
+23. **Item 4 — PATH fixo sempre que a sessão do core chama**, não só no delegado. (rf23, com mutante; a bancada desliga
+    a chamada nas cópias dela, cujo gh é o falso do PATH, costura declarada)
+24. **Item 5 — o efetivo exige `FragmentPath=/etc/systemd/system/onion-slack-persona.service` e
+    `SupplementaryGroups=onion-brain-hub`**, e os diretórios `/run/systemd/{system,transient,system.control,generator,
+    generator.early,generator.late}` entraram no tsv inteiros (o `cp /tmp/u /run/systemd/transient/` do refutador
+    passava com o glob `onion-*`); o sinal do pré-filtro não ganha "system", que casaria todo systemctl. (casos da
+    bancada da persona, com mutante; rb29 com o tsv sem a linha)
+
+**Item 6 — a fronteira real é outro usuário do sistema.** A sessão roda como o usuário do maestro: escreve o checkout,
+a ref origin/main local, o ~/.gitconfig, a config do gh e o próprio hook. Os hooks e as recusas dos scripts são CAMADA
+DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/onion/delegated-ops-sudoers-card.md).
+
 ## LIMITES declarados (o refutador os apontou; não se curam aqui)
 
 - **BASH_ENV e `--rcfile`**: `BASH_ENV=x bash ops/deploy-site.sh …` e `sudo bash --rcfile x -i <cópia>` passam o hook.
@@ -146,6 +171,12 @@ passwd). O que ainda passa o hook é forma legítima, é recusado pelo script co
   origem por tar).
 - **O `ops/moat-targets.tsv` é editável pela sessão**: quem edita a lista edita o veto. A REGRA 117 confere a forma das
   linhas, não a autoria.
+- **sudo amplo e script de scratchpad**: com `(ALL) NOPASSWD: ALL`, `sudo systemd-run -p User=root …` roda qualquer
+  coisa como root, e um script não versionado com `gh pr merge --repo <outro>` no corpo, ou `gh api -X PUT
+  …/pulls/N/merge`, passa o hook (r5b do refutador). São o item 6: a sessão é o usuário do maestro, e a fronteira é
+  outro usuário. O veto de merge do merge-gate julga a linha, não o corpo do script.
+- **A ref `origin/main` é da sessão também**: `git update-ref refs/remotes/origin/main <commit>` ou um objeto plantado
+  faria a conferência do item 1 comparar com o falso. Fecha só com outro usuário.
 - **A constante do core mora em três arquivos que a sessão edita**: mudar a constante é mudar o script ou o hook, que
   passam por PR e pelo refutador (é a mesma natureza do tsv editável); trocar só o members.yaml não basta mais.
 - **O `~/.gitconfig` (include, insteadOf) agora é limite de verdade, não alvo**: ele ainda muda o que o git busca (o

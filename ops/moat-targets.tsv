@@ -15,6 +15,8 @@
 #   --repo, um GH_REPO na linha ou num export, ou um `cd` literal para fora do projeto (refutador do #1647, B3).
 #   `--maestro` (2026-11-13) = o escape do maestro no pr-merge-verified.sh e no deploy-site.sh, que recusam a sessão
 #   sem ele: palavra de assinatura nunca coberta por `delega`, para a sessão não a usar.
+#   `--dispensa` e `--ci-inoperante` (2026-11-13, 5ª passada) = do maestro também: a sessão não dispensa check nem
+#   declara CI inoperante (o script recusa na sessão do core sem --maestro).
 # Classe `delega` (2026-11-13, selos D_DELEGATE_*_1113 do maestro): 5 colunas — delega · script · <ops/x.sh> · marcador ·
 #   palavras da assinatura cobertas. O ato passa pela sessão SÓ na forma do marcador, e as condições do selo moram no
 #   script, que recusa quando falta uma. Marcador = flag literal na linha (`--foreign-repo`, `--verified-pr`) ou
@@ -132,7 +134,12 @@ deploy	path	/home/marcio/mcp-kg	-
 deploy	path	/usr/local/sbin/onion-*	-
 deploy	path	/usr/local/lib/onion-ops	ops/delegated-ops.sh
 deploy	path	/etc/sudoers.d	-
-deploy	path	/run/systemd/system/onion-*	-
+deploy	path	/run/systemd/system	-
+deploy	path	/run/systemd/transient	-
+deploy	path	/run/systemd/system.control	-
+deploy	path	/run/systemd/generator	-
+deploy	path	/run/systemd/generator.early	-
+deploy	path	/run/systemd/generator.late	-
 deploy	path	/etc/sudoers.d/onion-delegated-ops	ops/delegated-ops.sh
 relogio	path	/etc/cron*	-
 relogio	path	/var/spool/cron	-
@@ -158,7 +165,7 @@ ato	script	ops/chat-runner.sh	--apply
 ato	script	ops/stt-service.sh	--apply
 ato	script	ops/slack-persona.sh	--apply,creds,start
 ato	script	ops/publish-door.sh	--push
-ato	script	ops/pr-merge-verified.sh	@foreign,--maestro
+ato	script	ops/pr-merge-verified.sh	@foreign,--maestro,--dispensa,--ci-inoperante
 ato	script	ops/delegated-ops.sh	install
 # ── DELEGADOS (2026-11-13): o maestro selou três atos como da sessão, cada um numa forma, com as condições no script ──
 #   D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113: merge alheio só com --foreign-repo (registro, CI verde, sem conflito, resíduo).

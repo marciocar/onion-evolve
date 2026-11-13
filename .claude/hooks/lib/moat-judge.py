@@ -232,6 +232,30 @@ def _moat_marker_ok(marker, args):
     return False
 
 
+# (5ª passada do refutador do #1647, item 1 da decisão do maestro de 2026-11-13) A FORMA DELEGADA roda o que foi
+# revisado: o script invocado e a cerca (este juiz, o tokenizador, o hook e o tsv) têm de ser byte a byte os de
+# origin/main. Um Edit de `verified_gate() { return 0;` ou da constante do core, na árvore e sem PR, não é a forma
+# selada. A mesma régua do @rootcopy. TETO: a ref origin/main é da sessão também (update-ref); a fronteira real é outro
+# usuário do sistema. (core-only)
+_MOAT_MAIN_PINNED = (".claude/hooks/pretooluse-moat-gate.sh", ".claude/hooks/lib/moat-judge.py",
+                     ".claude/hooks/lib/invocation-lines.sh", "ops/moat-targets.tsv")  # (core-only)
+
+
+def _moat_blob(path):
+    return _git(["hash-object", "--", path]) if path and os.path.isfile(path) else ""
+
+
+def _moat_main_blob(rel):
+    return _git(["-C", ROOT, "rev-parse", "-q", "--verify", "origin/main:" + rel]) if ROOT else ""
+
+
+def _moat_matches_main(script, rel):
+    if not ROOT or not _git(["-C", ROOT, "rev-parse", "-q", "--verify", "origin/main^{commit}"]):
+        return False
+    pairs = [(script, rel)] + [(os.path.join(ROOT, r), r) for r in _MOAT_MAIN_PINNED]
+    return all(_moat_blob(p) == _moat_main_blob(r) for p, r in pairs)
+
+
 def _moat_delegated(rel, words, args, rootcopy):
     """True se as palavras da assinatura presentes (`words`) estão todas cobertas por uma forma delegada satisfeita."""
     if MOAT_MEMBERS_DIVERGE:
@@ -241,9 +265,9 @@ def _moat_delegated(rel, words, args, rootcopy):
             continue
         if marker.startswith("@rootcopy="):
             if rootcopy == "ok":
-                return True
+                return _moat_matches_main(_MOAT_CUR.get("script"), rel)
         elif _moat_marker_ok(marker, args):
-            return True
+            return _moat_matches_main(_MOAT_CUR.get("script"), rel)
     return False
 
 
@@ -255,7 +279,7 @@ def _moat_delegated_hint(rel):
                        % (marker.split("=", 1)[1].rstrip("/"), os.path.basename(rel), ", ".join(sorted(verbs))))
         else:
             out.append("%s com %s, que confere as condições do selo antes de agir" % (rel, marker))
-    return ("; DELEGADO à sessão só por: " + " · ".join(out)) if out else ""
+    return ("; DELEGADO à sessão só por: " + " · ".join(out) + " (o script e a cerca byte a byte os de origin/main)") if out else ""
 
 
 def _moat_emit(cls, target, wrapper, detail):
@@ -749,6 +773,7 @@ def _moat_act_of(p):
 
 def _moat_act(p, words, src=None, rootcopy=None):
     """emite `ato` se o script é da lista e os argumentos trazem a assinatura (ou não se provam)."""
+    _MOAT_CUR["script"] = p
     rel = _moat_act_of(src) if src else None
     rel = rel or _moat_act_of(p)
     if not rel:

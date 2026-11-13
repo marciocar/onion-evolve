@@ -268,6 +268,12 @@ effective_ok() { # rc 0 = o efetivo bate; imprime o que diverge
   esac
   got="$(priv systemctl show -p DropInPaths --value "${UNIT}" 2>/dev/null)"
   [ -z "${got}" ] || bad="${bad} DropInPaths='${got:0:120}'"
+  # (5ª passada) a unit carregada é a do /etc/systemd/system (não uma transiente nem de gerador em /run), e os grupos são
+  # só os da allowlist
+  got="$(priv systemctl show -p FragmentPath --value "${UNIT}" 2>/dev/null)"
+  [ "${got}" = "${UNIT_DIR}/${UNIT}.service" ] || bad="${bad} FragmentPath='${got:0:120}'"
+  got="$(priv systemctl show -p SupplementaryGroups --value "${UNIT}" 2>/dev/null)"
+  [ "${got}" = onion-brain-hub ] || bad="${bad} SupplementaryGroups='${got:0:120}'"
   [ -z "${bad}" ] || { echo "${bad# }"; return 1; }
 }
 
