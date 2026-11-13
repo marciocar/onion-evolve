@@ -11,12 +11,18 @@
 #   (`--apply`, `apply`, `--push`; `--x=v` conta como `--x`), `@none` = invocado sem argumento (o modo padrão é o ato),
 #   `@any` = qualquer invocação. Sem a assinatura, é ensaio ou leitura e passa. O ato é do maestro: pela sessão o veto
 #   barra, e o maestro roda pelo `!` no prompt, que não passa pelos hooks de ferramenta (medido no corpus em 2026-11-05).
-#   `@foreign` (2026-11-13) = um `--repo X` com X que não é este projeto (o membro `kind: source` do members.yaml).
+#   `@foreign` (2026-11-13) = um `--repo X` com X que não é este projeto (o membro `kind: source` do members.yaml); sem
+#   --repo, um GH_REPO na linha ou num export, ou um `cd` literal para fora do projeto (refutador do #1647, B3).
+#   `--maestro` (2026-11-13) = o escape do maestro no pr-merge-verified.sh e no deploy-site.sh, que recusam a sessão
+#   sem ele: palavra de assinatura nunca coberta por `delega`, para a sessão não a usar.
 # Classe `delega` (2026-11-13, selos D_DELEGATE_*_1113 do maestro): 5 colunas — delega · script · <ops/x.sh> · marcador ·
 #   palavras da assinatura cobertas. O ato passa pela sessão SÓ na forma do marcador, e as condições do selo moram no
 #   script, que recusa quando falta uma. Marcador = flag literal na linha (`--foreign-repo`, `--verified-pr`) ou
 #   `@rootcopy=<dir>` (o script invocado é a cópia de root do sudoers nesse diretório, byte a byte a deste checkout).
 #   Passa só se TODA palavra da assinatura presente está coberta. A catraca é a REGRA 117 (act-signature-check.sh).
+#   O marcador de flag se julga pela GRAMÁTICA do script (refutador do #1647): `--foreign-repo` só como palavra nua, fora
+#   do valor de uma flag que consome argumento, sem --dispensa/--ci-inoperante/--allow-draft; `--verified-pr` só em
+#   `deploy --verified-pr <N>`, posição exata. Here-string e redirecionamento não são argumento.
 # O alvo mais ESPECÍFICO vence (padrão mais longo), então a linha do wrapper vem junto da genérica.
 #
 # DE ONDE SAEM (medido em 2026-10-13, nunca de memória):
@@ -138,7 +144,7 @@ relogio	path	/etc/anacrontab	-
 #   repositório (`@foreign`, 2026-11-13) é merge alheio: a sessão só o faz com --foreign-repo (a linha `delega` abaixo).
 ato	script	ops/update-bridge.sh	@none,--restart
 ato	script	ops/update-kg-writer.sh	@any
-ato	script	ops/deploy-site.sh	@none,deploy
+ato	script	ops/deploy-site.sh	@none,deploy,--maestro
 ato	script	ops/install-caddy-config.sh	@none,install
 ato	script	ops/caddy-site-secrets.sh	@any
 ato	script	ops/docker-engine-migrate.sh	apply,resume
@@ -151,7 +157,7 @@ ato	script	ops/chat-runner.sh	--apply
 ato	script	ops/stt-service.sh	--apply
 ato	script	ops/slack-persona.sh	--apply,creds,start
 ato	script	ops/publish-door.sh	--push
-ato	script	ops/pr-merge-verified.sh	@foreign
+ato	script	ops/pr-merge-verified.sh	@foreign,--maestro
 ato	script	ops/delegated-ops.sh	install
 # ── DELEGADOS (2026-11-13): o maestro selou três atos como da sessão, cada um numa forma, com as condições no script ──
 #   D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113: merge alheio só com --foreign-repo (registro, CI verde, sem conflito, resíduo).

@@ -74,6 +74,9 @@ fi
 # ainda: `GIT_CONFIG_*` aplica-se a TODA invocação de git na árvore de processos. Desativar o gc
 # num sandbox descartável não custa nada — ele vive segundos e é apagado.
 export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=gc.auto GIT_CONFIG_VALUE_0=0
+# o pr-merge-verified.sh recusa merge de outro repo quando a sessão do core o chama (refutador do #1647); a bancada o
+# roda com --repo de sandbox sob a sessão de quem a dispara, e se declara aqui (o hook veta a variável na linha da sessão)
+export ONION_PR_MERGE_VERIFIED_TEST=1
 # ── A BANCADA JÁ FOI ADMITIDA PELO LEASE DE CARGA (ops/load-lease.sh, 2026-11-06) ────────────────
 # Quem chama a bancada (o pre-commit, o pré-voo do pr-finalize) espera a carga ANTES. Dentro dela, uma
 # família que invoca o hook num sandbox não pode esperar de novo: com a própria bancada pondo o load em
@@ -11418,7 +11421,7 @@ EOF" "${L}" \
   # e o update do bridge e a persona do Slack (install, start) pela cópia de root do sudoers. O push de porta, o creds da
   # persona, a forma do repo e o merge alheio sem a flag continuam vetados. As condições que o hook não mede (CI, conflito,
   # resíduo, refutador) são do script e têm bancada própria (pr_merge_verified, deploy-site --selftest).
-  local DLG_OFF=$'        elif marker in lits:\n            return True' DLG_OFF_NEW=$'        elif False:\n            return True'
+  local DLG_OFF=$'        elif _moat_marker_ok(marker, args):\n            return True' DLG_OFF_NEW=$'        elif False:\n            return True'
   local DLG_ALL='    if _moat_delegated(rel, words, args, rootcopy):' DLG_ALL_NEW='    if True:'
   _mgcase "(dl1) merge alheio pelo caminho verificado com --foreign-repo → passa" 0 "${P}" \
     'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo --sync' "${J}" "${DLG_OFF}" "${DLG_OFF_NEW}"
@@ -11448,6 +11451,46 @@ EOF" "${L}" \
   _mgcase "(db8) cópia de root DEFASADA (difere do ops/ do checkout) → VETO" "2:AUSENTE ou DIFERE" "${P}" \
     "sudo ${d}/rootcopy/update-bridge.sh" "${J}" '                return rel, ("ok" if mine and _moat_act_digest(rp) == mine else "stale")' '                return rel, "ok"'
   cp "${P}/ops/update-bridge.sh" "${d}/rootcopy/update-bridge.sh"
+  # ── REFUTADOR DO #1647 (2026-11-13): as entradas exatas que passavam o veto. Cada mutante devolve o juiz à forma de
+  #    antes da cura (o marcador como token solto, o here-string pulando o ramo do shell, o alvo só pelo --repo)
+  local OLDMK='        elif marker in set((a.split("=", 1)[0] if a.startswith("--") else a) for a in args):'
+  local NEWMK='        elif _moat_marker_ok(marker, args):'
+  local HSOLD='                and ("<<<" not in args or _moat_positionals(_sa, {"-o", "-O", "--rcfile", "--init-file"})):'
+  local ARGVOLD='    _moat_act_judge(rel, _moat_argv(_moat_script_args(p, words)), " ".join(words), rootcopy)'
+  local ARGVNEW='    _moat_act_judge(rel, [a for a in _moat_script_args(p, words) if a], " ".join(words), rootcopy)'
+  mkdir -p "${d}/fora-do-projeto"
+  _mgcase "(rb1) --foreign-repo=0 (a forma com valor, que o script ignorava) → VETO" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo=0' "${J}" "${NEWMK}" "${OLDMK}"
+  _mgcase "(rb2) --motivo --foreign-repo (a flag como VALOR do --motivo) → VETO" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --motivo --foreign-repo' "${J}" "${NEWMK}" "${OLDMK}"
+  _mgcase "(rb3) --dispensa X --motivo --foreign-repo (dispensa o review) → VETO" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --dispensa onion-review-verdict --motivo --foreign-repo' "${J}" "${NEWMK}" "${OLDMK}"
+  _mgcase "(rb4) <<< --foreign-repo (a flag no stdin, não no argv) → VETO" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante <<< --foreign-repo' "${J}" "${ARGVOLD}" "${ARGVNEW}"
+  _mgcase "(rb5) --foreign-repo com --dispensa (a forma delegada não dispensa check) → VETO" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo --dispensa onion-review-verdict --motivo x' "${J}" \
+    '            if a in _PMV_NO_DELEG or a.split("=", 1)[0] in _PMV_NO_DELEG:' '            if False:'
+  _mgcase "(rb6) deploy-site.sh deploy <<< --verified-pr (stdin) → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
+    'bash ops/deploy-site.sh deploy <<< --verified-pr' "${J}" "${HSOLD}" '                and "<<<" not in args:'
+  _mgcase "(rb7) deploy-site.sh <<< --verified-pr (sem argv, o deploy do maestro) → VETO" "2:sem argumento roda o ato" "${P}" \
+    'bash ops/deploy-site.sh <<< --verified-pr' "${J}" "${HSOLD}" '                and "<<<" not in args:'
+  _mgcase "(rb8) deploy --verified-pr=3 (fora da posição exata) → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
+    'bash ops/deploy-site.sh deploy --verified-pr=3' "${J}" "${NEWMK}" "${OLDMK}"
+  _mgcase "(rb9) GH_REPO=<outro> na linha, sem --repo → VETO" "2:merge alheio" "${P}" \
+    'GH_REPO=onion-bancada/adotante bash ops/pr-merge-verified.sh 12' "${J}" '    for v in (env.get("GH_REPO"), ASSIGN.get("GH_REPO")):' '    for v in ():'
+  _mgcase "(rb10) export GH_REPO=<outro>; … sem --repo → VETO" "2:merge alheio" "${P}" \
+    'export GH_REPO=onion-bancada/adotante; bash ops/pr-merge-verified.sh 12' "${J}" '    for v in (env.get("GH_REPO"), ASSIGN.get("GH_REPO")):' '    for v in ():'
+  _mgcase "(rb11) cd para fora do projeto e o script por caminho absoluto, sem --repo → VETO" "2:merge alheio" "${P}" \
+    "cd ${d}/fora-do-projeto && bash ${P}/ops/pr-merge-verified.sh 12" "${J}" \
+    '        if not any(rc == d or rc.startswith(d + "/") for d in _moat_project_dirs()):' '        if False:'
+  _mgcase "(rb12) o merge do PRÓPRIO core sem --repo, de dentro do projeto → passa" 0 "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --sync' "${J}" \
+    '        if not any(rc == d or rc.startswith(d + "/") for d in _moat_project_dirs()):' '        if True:'
+  _mgcase "(rb13) --maestro pela sessão (o escape do maestro) → VETO" "2:--maestro é o ato" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --maestro' "${J}" '            words.add(w)' '            pass'
+  _mgcase "(rb14) a variável da bancada do merge verificado na linha da sessão → VETO" "2:modo de bancada do merge verificado" "${P}" \
+    'ONION_PR_MERGE_VERIFIED_TEST=1 bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo' "${J}" \
+    '_moat_emit("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST",' '(lambda *a: None)("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST",'
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   # (ato16) o ADOTANTE: sem ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/) o veto do ato não arma, e os
   #       wrappers também não viajam. O "mutante" é o DADO de novo: o mesmo repo com o tsv e a linha `ato` veta
@@ -13438,7 +13481,7 @@ run_slack_persona_selftests() {
   [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
   local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
   mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
-  local want=26 o rc
+  local want=29 o rc
   if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
     record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico, verify espera a conexão até o teto)"
@@ -25993,6 +26036,11 @@ STUB
   printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: adot\n    kind: adopter\n    remote: github.com/owner/repo   # comentário\n  - id: porta\n    kind: door\n    remote: github.com/owner/porta\n' \
     > "${fc}/docs/evolution/federation/members.yaml"
   cp "${sut}" "${fc}/ops/pr-merge-verified.sh"
+  # a cópia INTACTA (com a guarda de ambiente e o PATH fixo) mora ao lado; a dos casos fr1-fr11 tem a guarda desligada,
+  # porque o gh falso deles chega pelo PATH e lê GH_* (a costura é só desta cópia de bancada)
+  cp "${sut}" "${fc}/ops/pmv-intacto.sh"
+  sed -i 's/^\[ "\${DELEGATED_FOREIGN}" -eq 1 \] && _delegated_env_guard$/: bancada/' "${fc}/ops/pr-merge-verified.sh"
+  cmp -s "${sut}" "${fc}/ops/pr-merge-verified.sh" && record_fail "pr-merge-verified: (fr-costura)" "a âncora da guarda de ambiente sumiu: a bancada rodaria o gh real"
   git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm base
   git -C "${fc}" update-ref refs/remotes/origin/main HEAD; git -C "${fc}" remote add origin "${d}/sem-remoto.git"
   _fr_h="$(printf 'a%.0s' {1..64})"
@@ -26037,6 +26085,51 @@ STUB
     else record_fail "pr-merge-verified: (fr-MUT)" "o mutante também recusou: a recusa do fr2 não vem do gate"; fi
   fi
   cp "${d}/pmv-intacto" "${fc}/ops/pr-merge-verified.sh"
+  # ── REFUTADOR DO #1647 (2026-11-13): o script decide sozinho, sem depender do que o hook viu ───────────────────────
+  # A SESSÃO DO CORE é um processo "claude" entre os ancestrais com o cwd num checkout deste repo: um bash copiado para
+  # .../bin/claude (o /proc/<pid>/exe dele casa), com o cwd no core de sandbox. Igual no CI e aqui.
+  local fcl="${d}/fakeclaude/bin/claude" _pi="${fc}/ops/pmv-intacto.sh"
+  mkdir -p "$(dirname "${fcl}")" "${d}/outro-repo" "${d}/fakegh"; cp "$(command -v bash)" "${fcl}"
+  printf '#!/bin/sh\necho fake\n' > "${d}/fakegh/gh"; chmod +x "${d}/fakegh/gh"
+  _frs() { # $1=rótulo $2=trecho esperado ; resto = o comando que o "claude" roda (cwd = o core de sandbox)
+    local lbl="$1" txt="$2"; shift 2; local o rc=0
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "$*; exit \$?" 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && grep -qF -- "${txt}" <<< "${o}"; then record_pass "pr-merge-verified: ${lbl}"
+    else record_fail "pr-merge-verified: ${lbl}" "rc=${rc} out=$(tail -2 <<< "${o}" | tr '\n' '|' | cut -c1-240)"; fi
+  }
+  _frs "(rf1) sessão do core + --repo alheio sem --foreign-repo ⇒ recusa antes de qualquer efeito" "pela sessão do core" \
+    "(cd '${d}/outro-repo' && bash '${_pi}' 999 --repo owner/repo)"
+  _frs "(rf2) sessão do core + '--motivo --foreign-repo' (a flag como valor) ⇒ recusa" "pela sessão do core" \
+    "bash '${_pi}' 999 --repo owner/repo --motivo --foreign-repo"
+  _frs "(rf3) sessão do core + '<<< --foreign-repo' (stdin) ⇒ recusa" "pela sessão do core" \
+    "bash '${_pi}' 999 --repo owner/repo <<< --foreign-repo"
+  _frs "(rf4) sessão do core + GH_REPO alheio, sem --repo ⇒ recusa" "pela sessão do core" \
+    "GH_REPO=owner/repo bash '${_pi}' 999"
+  _frs "(rf5) '--foreign-repo=0' ⇒ recusa (não é a palavra nua)" "não é forma aceita" "bash '${_pi}' 999 --repo owner/repo --foreign-repo=0"
+  _frs "(rf6) GIT_CONFIG_* no merge alheio delegado ⇒ recusa antes do forge" "GIT_CONFIG_COUNT" \
+    "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.url GIT_CONFIG_VALUE_0=https://github.com/x/y bash '${_pi}' 999 --repo owner/repo --foreign-repo"
+  _frs "(rf7) GH_REPO no merge alheio delegado ⇒ recusa" "GH_REPO" "GH_REPO=owner/repo bash '${_pi}' 999 --repo owner/repo --foreign-repo"
+  # o PATH fixo: com um gh falso na frente, a guarda deixa o gh do sistema
+  local _gg; _gg="$(awk '/^_delegated_env_guard\(\) \{/{f=1} f{print} f&&/^}$/{exit}' "${_pi}")"
+  if o="$(env -i HOME="${HOME}" PATH="${d}/fakegh:${PATH}" bash -c "${_gg}"$'\ndie() { echo "$*"; exit 1; }; _delegated_env_guard; command -v gh' 2>&1)" \
+     && [ "${o}" != "${d}/fakegh/gh" ] && [ -n "${o}" ]; then record_pass "pr-merge-verified: (rf8) PATH fixo no delegado: um gh falso no PATH não é o gh usado (${o})"
+  else record_fail "pr-merge-verified: (rf8) PATH fixo" "gh=${o}"; fi
+  # o maestro, pelo --maestro, passa da recusa da sessão (e cai no merge do gh de bancada)
+  echo 0 > "${d}/n"; : > "${d}/merge-args"
+  (cd "${fc}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
+    GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
+    ONION_MERGE_POLL_SECS=0 env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${_pi}' 999 --repo owner/repo --maestro; exit \$?" >/dev/null 2>&1)
+  if [ -s "${d}/merge-args" ]; then record_pass "pr-merge-verified: (rf9) o maestro com --maestro passa da recusa da sessão"
+  else record_fail "pr-merge-verified: (rf9) --maestro" "não mergeou: a recusa da sessão pegou o escape do maestro"; fi
+  # MUTANTE: sem a recusa da sessão, o rf1 seguiria para o merge
+  sed 's/^if \[ "\${_CORE_SESSION}" = 1 \]/if false \&\& [ "${_CORE_SESSION}" = 1 ]/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (rf-MUT)" "a âncora da recusa da sessão sumiu"
+  else
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999 --repo owner/repo; exit \$?" 2>&1)"
+    if grep -qF "pela sessão do core" <<< "${o}"; then record_fail "pr-merge-verified: (rf-MUT)" "o mutante também recusou"
+    else record_pass "pr-merge-verified: (rf-MUT) sem a recusa da sessão, o rf1 segue adiante — a recusa é a causa"; fi
+  fi
+  rm -f "${fc}/ops/pmv-mut.sh"
 
   _mv "OPEN|null" "${M}" 0 "merged"
   if [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; then

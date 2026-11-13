@@ -483,21 +483,86 @@ selftest() {
   t "delegado: 'deploy --qualquer' → recusa (o argumento não some)"  2 bash "${BASH_SOURCE[0]}" deploy --qualquer
   t "delegado: 'deploy --verified-pr' sem número → recusa"           2 bash "${BASH_SOURCE[0]}" deploy --verified-pr
 
+  # REFUTADOR DO #1647 (2026-11-13): as entradas exatas que passavam. A cópia da bancada tem o WEBROOT num caminho que não
+  # existe: se a recusa regredir, o caso cai em "webroot ausente" e nunca deploya de verdade. O ancestral "claude" é um
+  # bash copiado para .../bin/claude (o /proc/<pid>/exe dele casa), o que faz a bancada valer igual no CI e aqui.
+  local ds="$sb/ds.sh" fcl="$sb/fakeclaude/bin/claude" o rc
+  sed 's#^WEBROOT=.*#WEBROOT="/nonexistent-onion-webroot-bancada"#' "${BASH_SOURCE[0]}" > "$ds"
+  mkdir -p "$(dirname "$fcl")" "$sb/fakegh"; cp "$(command -v bash)" "$fcl"
+  printf '#!/bin/sh\necho fake\n' > "$sb/fakegh/gh"; chmod +x "$sb/fakegh/gh"
+  tm() { # tm <nome> <rc> <trecho> <cmd...>: rc E a mensagem (rc 2 sozinho também é "webroot ausente")
+    local name="$1" want="$2" txt="$3"; shift 3; rc=0; o="$( ( "$@" ) 2>&1 )" || rc=$?
+    if [[ "$rc" -eq "$want" ]] && grep -qF -- "$txt" <<< "$o"; then pass=$((pass+1)); echo "  ✓ $name"
+    else fail=$((fail+1)); echo "  ✗ $name (rc=$rc, esperado=$want com '$txt')"; printf '%s\n' "$o" | tail -3 | sed 's/^/      | /'; fi
+  }
+  tm "B2: sessão + 'bash deploy-site.sh <<< --verified-pr' (stdin, sem argv) → recusa o deploy do maestro" 2 "chamado pela sessão" \
+    "$fcl" -c "bash '$ds' <<< --verified-pr"
+  tm "B2: sessão + 'deploy <<< --verified-pr' → recusa" 2 "chamado pela sessão" "$fcl" -c "bash '$ds' deploy <<< --verified-pr"
+  tm "B2: '\"\" --verified-pr 3' (1º argumento vazio) → recusa" 2 "1º argumento vazio" bash "$ds" "" --verified-pr 3
+  tm "B2: 'deploy --verified-pr=' (forma com =) → recusa" 2 "argumento desconhecido" bash "$ds" deploy --verified-pr=
+  tm "B2: 'deploy --verified-pr 3 extra' → recusa" 2 "uso:" bash "$ds" deploy --verified-pr 3 extra
+  tm "B2: o maestro com --maestro passa da recusa da sessão (para no webroot da bancada)" 2 "webroot ausente" \
+    "$fcl" -c "bash '$ds' deploy --maestro"
+  tm "B4: GIT_CONFIG_* no deploy delegado → recusa antes de ler o forge" 2 "GIT_CONFIG_COUNT" \
+    env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.url GIT_CONFIG_VALUE_0=https://github.com/x/y bash "$ds" deploy --verified-pr 3
+  tm "B4: GH_REPO no deploy delegado → recusa" 2 "GH_REPO" env GH_REPO=x/y bash "$ds" deploy --verified-pr 3
+  tm "B4: um gh falso no PATH não é o gh do deploy delegado (PATH fixo)" 0 "/usr/" \
+    env -i HOME="$HOME" PATH="$sb/fakegh:$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo \"\${GH_CMD[0]}\"; [[ \"\${GH_CMD[0]}\" != '$sb/fakegh/gh' ]]"
+
   echo "── selftest: ${pass} pass / ${fail} fail ──"
   [[ "$fail" -eq 0 ]]
 }
 
+# ── A LINHA DE COMANDO (refutador do #1647, 2026-11-13) ─────────────────────────────────────────────────────────────
+# Formas aceitas, e só elas: (nada) | deploy | --check | --selftest | --help | deploy --verified-pr <N> (o delegado, em
+# posição exata) | deploy --maestro | --maestro. O 1º argumento VAZIO não vira deploy (`${1:-deploy}` o tratava como
+# ausente, e `"" --verified-pr 3` passava pelo hook como outra coisa); `--verified-pr=<N>` saiu (a forma é uma só).
+if [[ $# -ge 1 && -z "$1" ]]; then die "1º argumento vazio: modo desconhecido (use --help)"; fi
 MODE="${1:-deploy}"
-# `deploy --verified-pr <N>` (ou `--verified-pr=<N>`): o deploy delegado. Qualquer outro argumento depois do modo é recusado:
-# a 1ª redação ignorava o resto da linha, e um `deploy --verified-pr` mal escrito viraria o deploy do maestro
-if [[ "$MODE" == deploy && $# -gt 1 ]]; then
+MAESTRO=0
+if [[ "$MODE" == --maestro ]]; then
+  [[ $# -eq 1 ]] || die "uso: ops/deploy-site.sh [deploy] --maestro"
+  MODE=deploy; MAESTRO=1
+elif [[ "$MODE" == deploy && $# -gt 1 ]]; then
   case "$2" in
-    --verified-pr) [[ $# -eq 3 ]] || die "uso: ops/deploy-site.sh deploy --verified-pr <N>"; VERIFIED_PR="$3" ;;
-    --verified-pr=*) [[ $# -eq 2 ]] || die "uso: ops/deploy-site.sh deploy --verified-pr <N>"; VERIFIED_PR="${2#--verified-pr=}" ;;
+    --verified-pr) [[ $# -eq 3 ]] || die "uso: ops/deploy-site.sh deploy --verified-pr <N>"; VERIFIED_PR="$3"; MODE=delegated ;;
+    --maestro) [[ $# -eq 2 ]] || die "uso: ops/deploy-site.sh deploy --maestro"; MAESTRO=1 ;;
     *) die "argumento desconhecido depois de 'deploy': '$2' (use --help)" ;;
   esac
-  MODE=delegated
+elif [[ $# -gt 1 ]]; then
+  die "argumento a mais depois de '$MODE': '$2' (use --help)"
 fi
+# O DEPLOY DO MAESTRO recusa quando é a sessão que o chama: o hook lê a linha, e `bash ops/deploy-site.sh <<< --verified-pr`
+# chega aqui sem argumento nenhum. Sessão = um processo do Claude Code entre os ancestrais (medido em /proc, não no
+# ambiente). O maestro roda do terminal dele, ou pelo `!` com --maestro (palavra da assinatura do ato: a sessão é vetada).
+_claude_ancestor() {
+  local pid="$PPID" exe n=0
+  while [[ -n "$pid" && "$pid" -gt 1 && "$n" -lt 64 ]]; do
+    exe="$(readlink "/proc/${pid}/exe" 2>/dev/null)"
+    case "$exe" in */claude/versions/*|*/bin/claude) return 0 ;; esac
+    pid="$(awk '/^PPid:/{print $2}' "/proc/${pid}/status" 2>/dev/null)"; n=$((n+1))
+  done
+  return 1
+}
+if [[ "$MODE" == deploy && "$MAESTRO" -eq 0 ]] && _claude_ancestor; then
+  die "o deploy do maestro chamado pela sessão do Claude Code: a sessão só deploya por 'deploy --verified-pr <N>' (D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113). O maestro: terminal dele, ou '! bash ops/deploy-site.sh deploy --maestro'."
+fi
+# B4: no deploy delegado o AMBIENTE não forja as condições (um gh falso no PATH mentiria CI e PR; GIT_CONFIG_* troca o
+# origin). PATH fixo, gh absoluto, e recusa das variáveis que mudam o que o git e o gh leem.
+delegated_env_guard() {
+  local v bad=""
+  for v in $(compgen -e); do
+    case "$v" in
+      GIT_CONFIG*|GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_EXEC_PATH|GIT_SSH|GIT_SSH_COMMAND|GIT_OBJECT_DIRECTORY|GIT_ALTERNATE_OBJECT_DIRECTORIES|GIT_INDEX_FILE|GIT_NAMESPACE|GIT_PROXY_COMMAND|GIT_CEILING_DIRECTORIES|XDG_CONFIG_HOME) bad+=" $v" ;;
+      GH_TOKEN) ;;
+      GH_*) bad+=" $v" ;;
+    esac
+  done
+  [[ -z "$bad" ]] || die "o deploy delegado recusa estas variáveis de ambiente, que mudam o que o git e o gh leem:${bad}"
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r
+  GH_CMD=("$(command -v gh)"); [[ -x "${GH_CMD[0]}" ]] || die "gh ausente no PATH do sistema"
+}
+[[ "$MODE" == delegated ]] && delegated_env_guard
 case "$MODE" in
   --help|-h) usage; exit 0 ;;
   --selftest) selftest ;;

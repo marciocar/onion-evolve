@@ -27,7 +27,17 @@ printf '#!/usr/bin/env bash\nc=$(( $(cat "%s/jcount" 2>/dev/null || echo 0) + 1 
 printf '#!/usr/bin/env bash\nexit 0\n' > "${t}/bin/sleep"
 chmod +x "${t}/bin/"*
 S="${t}/root/home/onion/onion-bridge/deploy/slack-persona"
-printf '[Service]\nDynamicUser=yes\n' > "${S}/${UNIT}.service"
+# a unit mínima que cabe na allowlist do install (as diretivas obrigatórias, com os valores fixos)
+UNIT_OK='[Service]
+DynamicUser=yes
+User=onion-slack-persona
+WorkingDirectory=/run/onion-slack-persona-app
+BindReadOnlyPaths=/home/onion/onion-bridge:/run/onion-slack-persona-app
+ExecStart=/usr/bin/node /run/onion-slack-persona-app/node_modules/tsx/dist/cli.mjs src/slack-persona/main.ts
+CapabilityBoundingSet=
+[Install]
+WantedBy=multi-user.target'
+printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"
 printf '{"approverUserId":"U0000MAESTRO","allowedChannels":["C0000PILOTO"]}\n' > "${S}/config.example.json"
 printf 'ONION_KG_TOKEN=kg-segredo-do-conf\nMCP_PORT=3033\n' > "${t}/root/etc/onion-vps-mcp-kg-granaai.conf"
 run() { PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${me}" "$@" > "${t}/out" 2>&1; }
@@ -53,6 +63,14 @@ PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t
 mv "${S}/${UNIT}.service" "${t}/unit.real"; printf 'segredo-do-root\n' > "${t}/alvo"; ln -s "${t}/alvo" "${S}/${UNIT}.service"
 run install --apply; [ $? = 1 ] && grep -q 'symlink' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida que é symlink recusa e não escreve" $?
 rm "${S}/${UNIT}.service"; mv "${t}/unit.real" "${S}/${UNIT}.service"
+# B5 do refutador do #1647: quem escreve a unit no bridge servido não escolhe o usuário nem o que roda como root
+printf '%s\n' "${UNIT_OK}" | sed 's/^User=.*/User=root/' > "${S}/${UNIT}.service"
+run install --apply; [ $? = 1 ] && grep -q 'allowlist' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida com User=root recusa e não escreve" $?
+printf '%s\n' "${UNIT_OK}" | sed 's#^\[Install\]#ExecStartPre=+/bin/sh -c id\n[Install]#' > "${S}/${UNIT}.service"
+run install --apply; [ $? = 1 ] && grep -q 'ExecStartPre' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida com ExecStartPre=+ (roda como root) recusa e não escreve" $?
+printf '%s\n' "${UNIT_OK}" | grep -v '^DynamicUser' > "${S}/${UNIT}.service"
+run install --apply; [ $? = 1 ] && grep -q 'falta DynamicUser' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida sem DynamicUser=yes recusa e não escreve" $?
+printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"
 run install; chk "install: ensaio sai 0" $?
 [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: ensaio não escreve" $?
 run install --apply; chk "install --apply" $?

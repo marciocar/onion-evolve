@@ -134,6 +134,7 @@ _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""; NO_CI_PROVADO=""
 MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0; ALLOW_DRAFT=0
 DELEGATED_FOREIGN=0   # --foreign-repo: o merge alheio delegado (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113)
+MAESTRO=0             # --maestro: o merge alheio do maestro, fora do caminho delegado
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -151,6 +152,11 @@ while [ $# -gt 0 ]; do
     --wait-ci-after-rebase) WAIT_CI_AFTER_REBASE=1; shift ;;
     --allow-draft) ALLOW_DRAFT=1; shift ;;
     --foreign-repo) DELEGATED_FOREIGN=1; shift ;;
+    # a forma com valor não é a flag: antes caía no `*) shift` e o hook a lia como o marcador (refutador do #1647, B1)
+    --foreign-repo=*) printf '✗ %s\n' "'$1' não é forma aceita: o merge alheio delegado é a palavra nua --foreign-repo. Nada foi feito."; exit 1 ;;
+    # o escape do MAESTRO para o merge alheio sem o caminho delegado (pelo terminal dele, ou pelo `!` com esta flag); a
+    # sessão não o usa: `--maestro` é palavra da assinatura do ato no ops/moat-targets.tsv, e o veto barra
+    --maestro) MAESTRO=1; shift ;;
     --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
@@ -164,6 +170,61 @@ _em() { # $1=agulha, resto=palheiro → 0 se presente
   local x; for x in "$@"; do [ "$x" = "$a" ] && return 0; done; return 1
 }
 _dispensado() { [ "${#DISPENSA[@]}" -eq 0 ] && return 1; _em "$1" "${DISPENSA[@]}"; }
+
+# ══ O SCRIPT RECUSA O MERGE ALHEIO DA SESSÃO DO CORE SEM O CAMINHO DELEGADO (refutador do #1647, 2026-11-13) ═══════
+# O veto do hook lê a linha de comando, e a linha mente: `--motivo --foreign-repo` (a flag vira valor), `<<< --foreign-repo`
+# (stdin, não argv), `GH_REPO=x` e `cd /outro/repo` (o alvo sem --repo). Então o script decide por conta própria:
+#   · o ALVO é o que o gh usaria: --repo, senão GH_REPO, senão o origin do diretório atual;
+#   · a SESSÃO DO CORE é um processo do Claude Code entre os ancestrais deste, com o cwd num checkout deste repositório
+#     (mesmo git common dir). Medido em /proc, não no ambiente: CLAUDECODE e CLAUDE_PID se apagam com `env -u`;
+#   · sessão do core + alvo que não é o core + sem --foreign-repo nem --maestro = recusa, antes de qualquer efeito.
+# A sessão de OUTRO repo da família (o adotante que mergeia o próprio repo por este script, com --repo) não é a do core,
+# e segue como sempre. TETO: um processo desligado da árvore (setsid/nohup com o pai morto) perde o ancestral; o hook
+# barra essas formas na linha.
+_slug_norm() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
+_claude_ancestor_cwd() { # o cwd do processo do Claude Code mais próximo entre os ancestrais; vazio se não há
+  local pid="$PPID" exe n=0
+  while [ -n "${pid}" ] && [ "${pid}" -gt 1 ] && [ "${n}" -lt 64 ]; do
+    exe="$(readlink "/proc/${pid}/exe" 2>/dev/null)"
+    case "${exe}" in */claude/versions/*|*/bin/claude) readlink "/proc/${pid}/cwd" 2>/dev/null; return 0 ;; esac
+    pid="$(awk '/^PPid:/{print $2}' "/proc/${pid}/status" 2>/dev/null)"; n=$((n+1))
+  done
+}
+_PMV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+_PMV_COMMON="$(git -C "${_PMV_DIR}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
+_SESSION_CWD="$(_claude_ancestor_cwd)"
+_CORE_SESSION=0
+# a BANCADA (lint-selftest.sh) roda este script sob a sessão de quem a dispara, com --repo de sandbox: ela exporta
+# ONION_PR_MERGE_VERIFIED_TEST=1. Na linha de comando da sessão o hook do MOAT veta a variável (como os modos de teste
+# dos outros wrappers), então ela não é um escape para a sessão. TETO: um script não versionado que a exporte por dentro
+# segue julgado pelo corpo, e o corpo a cita.
+[ "${ONION_PR_MERGE_VERIFIED_TEST:-0}" = 1 ] && _SESSION_CWD=""
+[ -n "${_SESSION_CWD}" ] && [ -n "${_PMV_COMMON}" ] \
+  && [ "$(git -C "${_SESSION_CWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" = "${_PMV_COMMON}" ] && _CORE_SESSION=1
+_PMV_CORE_SLUG="$(_slug_norm "$(git -C "${_PMV_DIR}" remote get-url origin 2>/dev/null)")"
+if [ "${#REPO_ARG[@]}" -ge 2 ]; then _PMV_TARGET="$(_slug_norm "${REPO_ARG[1]}")"
+elif [ -n "${GH_REPO:-}" ]; then _PMV_TARGET="$(_slug_norm "${GH_REPO}")"
+else _PMV_TARGET="$(_slug_norm "$(git remote get-url origin 2>/dev/null)")"; fi
+if [ "${_CORE_SESSION}" = 1 ] && [ -n "${_PMV_TARGET}" ] && [ "${_PMV_TARGET}" != "${_PMV_CORE_SLUG}" ] \
+   && [ "${DELEGATED_FOREIGN}" -eq 0 ] && [ "${MAESTRO}" -eq 0 ]; then
+  die "merge em '${_PMV_TARGET}' (não é o core) pela sessão do core: só pelo caminho delegado, '--repo <dono/repo> --foreign-repo' como palavra nua (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113). O maestro roda com --maestro. Nada foi feito."
+fi
+# B4: no caminho delegado o AMBIENTE não pode forjar as condições. PATH fixo (um gh falso no PATH mentiria CI e PR) e
+# recusa de variável que muda o que o git e o gh leem (GIT_CONFIG_* troca o origin; GH_REPO troca o alvo; GH_* além do
+# token muda host e config). GIT_EDITOR e os demais GIT_* de interface não mudam o que se lê, e passam.
+_delegated_env_guard() {
+  local v bad=""
+  for v in $(compgen -e); do
+    case "${v}" in
+      GIT_CONFIG*|GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_EXEC_PATH|GIT_SSH|GIT_SSH_COMMAND|GIT_OBJECT_DIRECTORY|GIT_ALTERNATE_OBJECT_DIRECTORIES|GIT_INDEX_FILE|GIT_NAMESPACE|GIT_PROXY_COMMAND|GIT_CEILING_DIRECTORIES|XDG_CONFIG_HOME) bad="${bad} ${v}" ;;
+      GH_TOKEN) ;;
+      GH_*) bad="${bad} ${v}" ;;
+    esac
+  done
+  [ -z "${bad}" ] || die "o merge alheio delegado (--foreign-repo) recusa estas variáveis de ambiente, que mudam o que o git e o gh leem:${bad}. Rode sem elas. Nada foi feito."
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r
+}
+[ "${DELEGATED_FOREIGN}" -eq 1 ] && _delegated_env_guard
 
 
 
@@ -323,7 +384,6 @@ _kg_guard_pre
 # resíduo. O veto do MOAT (core-only) exige a flag na linha de comando; o que ele não consegue medir se mede aqui,
 # antes de qualquer efeito (comentário, rebase, merge). O CI verde é o gate de sempre adiante (check-runs do head,
 # completos e sem falha); a flag só tira as saídas que o contornam. O conflito se recusa no laço do auto-rebase.
-_slug_norm() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
 _delegated_foreign_gate() {
   [ "${DELEGATED_FOREIGN}" -eq 1 ] || return 0
   local _why="o merge alheio pela sessão é delegado só pelo caminho verificado, com CI verde, sem conflito e com resíduo (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113)"
