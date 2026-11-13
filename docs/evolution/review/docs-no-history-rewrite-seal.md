@@ -2,7 +2,8 @@
 branch: docs/no-history-rewrite-seal
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e18f58975779fd5461ad4bc891f94d20b51f2630f5b5e99cd78d0e2b8950e163
+reviewed_code_sha256: 63a56186e7215fb7501e1eb34cfebb4c23d7be1c8e610fa08daf99ce79a10c23
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
