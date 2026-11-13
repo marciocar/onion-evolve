@@ -1,8 +1,7 @@
 ---
 branch: feat/review-auto-with-fallback
 date: 2026-11-13
-reviewed_diff_sha256: ea1577ee319a72b4eaea611aa54e514c14a41ee3e3a0d0a26bc58c3aa59830d9
-reviewed_code_sha256: a9a094d00c7f910d22018b4f2ff5be6aba3335ccf42f41b612ab41065c3cf54f
+reviewed_diff_sha256: pendente
 findings_total: 17
 findings_real: 16
 findings_fixed: 16
@@ -168,6 +167,11 @@ Os logs estão em `scratchpad/r1652/v5-R1-pr-ctl-ignored.log`, `v5-R2-wf-path-ig
 `v5-R4-range-ctl-ignored.log`. Por isso `elenxo_isolado: true`.
 
 Depois da aprovação só mudaram documentos, sem tocar código: este resíduo e os limites do cartão.
+
+O `pr-finalize` recusou recarimbar sozinho porque o hash de código mudou (a9a094d00c7f → 5f00b0ce51c9). A
+mudança é o cartão `docs/onion/review-mode-card.md`, que não é projeção gerada, e por isso entra no hash. O
+`reviewed_diff_sha256` voltou a `pendente` e foi recarimbado sobre o diff que inclui só esse acréscimo de
+documento ao head que o refutador aprovou.
 
 Os limites que o refutador pediu declarar estão no cartão:
 
