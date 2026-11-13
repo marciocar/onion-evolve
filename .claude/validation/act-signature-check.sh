@@ -122,8 +122,30 @@ for n, s, marker, verbs in delegs:
 # e lint-selftest) são FRONTEIRA: estão no fecho, mas o que eles rodam (o resto de .claude/validation) não se desce — o
 # fecho inteiro dá ~130 arquivos e tornaria quase todo PR do core um merge do maestro (declarado no resíduo).
 FRONTEIRA = {".claude/validation/lint-artifacts.sh", ".claude/validation/lint-selftest.sh"}
-EXEC = re.compile(r"""(?:^|[;&|(`{]|\$\(|\b(?:bash|sh|source|exec|python3?|timeout\s+\S+)\s+(?:-[\w-]+\s+)*)\s*["']?(?:\$\{?[A-Za-z_]\w*\}?/+|\./|"\$\{?[A-Za-z_]\w*\}?"/+)?((?:ops|\.claude)/[\w./-]+\.(?:sh|py))""", re.M)
+EXEC = re.compile(r"""(?:^|[;&|(`{]|\$\(|(?:^|(?<=[\s;&|(`{]))\.\s+|\b(?:bash|sh|source|exec|python3?|timeout\s+\S+)\s+(?:-[\w-]+\s+)*)\s*["']?(?:\$\{?[A-Za-z_]\w*\}?/+|\./|"\$\{?[A-Za-z_]\w*\}?"/+)?((?:ops|\.claude)/[\w./-]+\.(?:sh|py))""", re.M)
 known = set(acts) | set(fecho) | set(d[1] for d in delegs)
+# CAMINHO EM VARIÁVEL (8ª passada do refutador do #1647): `ASM="${HERE}/assemble-plugin.sh"; bash "${ASM}"` não casava.
+# Antes do EXEC, as variáveis de diretório do script (o que vem de `dirname … BASH_SOURCE`, com cada `/..` subindo um
+# nível) e as que guardam um caminho de script do repo a partir delas viram o caminho, e o texto é reescrito com eles.
+ASSIGN = re.compile(r"^[ \t]*(?:local[ \t]+|readonly[ \t]+|export[ \t]+|declare[ \t]+-\w+[ \t]+)?([A-Za-z_]\w*)=(.*)$", re.M)
+VREF = re.compile(r"\$\{([A-Za-z_]\w*)\}|\$([A-Za-z_]\w*)")
+def subst(text, vars_):
+    return VREF.sub(lambda m: vars_.get(m.group(1) or m.group(2), m.group(0)), text)
+def resolve(code, rel):
+    vars_ = {}
+    for m in ASSIGN.finditer(code):
+        name, val = m.group(1), m.group(2).strip()
+        if "BASH_SOURCE" in val and "dirname" in val:
+            base = os.path.dirname(rel)
+            for _ in range(val.count("/..")):
+                base = os.path.dirname(base)
+            vars_[name] = base or "."
+            continue
+        v = subst(val, vars_).strip().strip("\"'")
+        v = os.path.normpath(v) if v else v
+        if re.fullmatch(r"(?:ops|\.claude)/[\w./-]+\.(?:sh|py)", v or ""):
+            vars_[name] = v
+    return subst(code, vars_)
 for s, n in sorted(fecho.items(), key=lambda x: x[1]):
     if not os.path.isfile(os.path.join(root, s)):
         say("fecho-sem-script", n, "a linha fecho aponta %s, que não existe" % s)
@@ -133,7 +155,7 @@ for s in sorted(known - FRONTEIRA):
         code = "\n".join(l for l in open(p, encoding="utf-8", errors="replace").read().split("\n") if not l.lstrip().startswith("#"))
     except OSError:
         continue
-    for m in EXEC.finditer(code):
+    for m in EXEC.finditer(resolve(code, s)):
         r = os.path.normpath(m.group(1))
         if r not in known and os.path.isfile(os.path.join(root, r)):
             say("fecho-incompleto", fecho.get(s, acts.get(s, (0,))[0] if s in acts else 0),
@@ -194,6 +216,16 @@ _selftest() {
   _ck "(xv) com a linha fecho do filho, cala" "${d}/fx" ""
   printf 'fecho\tscript\tops/sumido.sh\t-\n' >> "${d}/fx/ops/moat-targets.tsv"  # (core-only)
   _ck "(xvi) linha fecho de script inexistente acusa" "${d}/fx" "fecho-sem-script"
+  # o caminho EM VARIÁVEL (8ª passada): HERE de dirname BASH_SOURCE, X="${HERE}/y.sh" e as formas que o executam
+  _fv() {  # $1 = nome ; $2 = a linha que executa (o ato w.sh a roda no install --apply)
+    printf 'deploy\tunit\tx\tops/w.sh\nato\tscript\tops/w.sh\t--apply\n' | _mk "$1"
+    printf '#!/usr/bin/env bash\nHERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"\nX="${HERE}/y.sh"\nP="${HERE}/y.py"\ncase "$1" in install) [ "${2:-}" = --apply ] && %s ;; esac\n' "$2" > "${d}/$1/ops/w.sh"
+    printf '#!/usr/bin/env bash\necho y\n' > "${d}/$1/ops/y.sh"; printf 'print(1)\n' > "${d}/$1/ops/y.py"
+  }
+  _fv v1 'bash "${X}"';             _ck "(xvii) X=\"\${HERE}/y.sh\" e bash \"\${X}\" acusa" "${d}/v1" "fecho-incompleto"
+  _fv v2 'python3 -I "${P}"';       _ck "(xviii) python3 -I \"\${P}\" (P=\"\${HERE}/y.py\") acusa" "${d}/v2" "fecho-incompleto"
+  _fv v3 '. "${HERE}/y.sh"';        _ck "(xix) source por ponto (. \"\${HERE}/y.sh\") acusa" "${d}/v3" "fecho-incompleto"
+  _fv v4 'bash "${HERE}/y.sh"';     _ck "(xx) bash \"\${HERE}/y.sh\" direto acusa" "${d}/v4" "fecho-incompleto"
   mkdir -p "${d}/adotante"
   _ck "(viii) sem ops/moat-targets.tsv (adotante) cala" "${d}/adotante" ""  # (core-only)
   echo "selftest: ${pass}/$((pass + fail)) verdes"
