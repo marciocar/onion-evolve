@@ -2,7 +2,7 @@
 branch: feat/piece-owner-session
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 62506976fb14cd5649d98acbc1860c34ccc3c84741718a365bf6d164c40d581b
+reviewed_diff_sha256: 7c056005231361d823f51f3e696f54c6931b42872c91396e02bbc9bfd60a3810
 reviewed_code_sha256: c787eebf9ebb2b0d5f660c80478428b97aca85fdee650a56ca13b3126908e5d5
 findings_total: 6
 findings_real: 6
