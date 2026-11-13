@@ -1,0 +1,1476 @@
+# kg-backlog-guard: on
+# Grafo da rodada de primárias agent-requester-privilege (/onion-research, modo primárias, 2026-11-13).
+# Pergunta: como um agente que atende várias pessoas age com o privilégio de quem pediu (delegação, menor-entre,
+# identidade pelo evento, on_behalf_of, aprovação, trilha por ato), e o que uma auditoria pede. Este grafo nunca sela;
+# as ligações com o corpus vão em external_edges (contrato v4.3), sem editar os grafos antigos.
+meta:
+  id: agent-requester-privilege-2026-11
+  schema_version: "1"
+  baseline: "2026-11-13"
+  review_after: "2027-02-11"   # 90d: o tipo DOMINANTE é PADRÃO DE MERCADO. O que move os vereditos é o rascunho WG
+                               # draft-ietf-wimse-aims (ciclo de ~6 meses), a doc de plataforma (Microsoft, Slack) e a
+                               # versão anual da OWASP. RFC 8693, Hardy e NIST valeriam 12 meses, mas não movem a revisita;
+                               # 30d (ferramenta) giraria sem mudança nas fontes que decidem.
+  # ═══ TETO: 68 NÓS ═══
+  # Justificativa do teto: rodada de primárias executada em 2026-11-13, grafo novo. 68 nós: 35 evidências ancoradas
+  # (1 por claim), 15 objeções sobreviventes do Elenxo (1 por alvo), 13 superações achadas (9 das rejeitadas na
+  # ancoragem e 4 do Elenxo), 1 contabilidade (E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113), 1 pergunta raiz, 2 claims-hipótese da
+  # pergunta (menor-entre e base normativa do kit) e 1 claim com a recomendação íntegra do Elenxo. As 10 claims
+  # rejeitadas não viram nó: entram na contabilidade.
+  purpose: "Responder, com âncora verbatim, qual o padrão de mercado e normativo de 2026-11 para o agente multiusuário agir com o privilégio de quem pediu, e separar o que é norma, o que é prática de mercado e o que é composição Onion no kit de auditoria."
+external_edges:
+  - from: E_LLM06_COMPLETE_MEDIATION
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#ENT_AUTH_LAYERS"
+    edge_type: SUPPORTS
+  - from: E_LLM06_HUMAN_IN_THE_LOOP
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#C_FATIGUE_IS_SECURITY"
+    edge_type: TRACES_TO
+  - from: E_ASI03_SIGNED_INTENT_TOKEN
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#REF_3_EXTERNAL_IS_IRREVERSIBLE"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próprio único? Qual o padrão de mercado e normativo em 2026-11, e o que uma auditoria pede?"
+    narrative: "Pergunta original: Como um agente de IA que atende várias pessoas de uma organização (ex.: bot de Slack) deve agir com o privilégio de quem pediu, em vez de um privilégio próprio único: privilégio efetivo = menor entre agente e solicitante, identidade pelo evento autenticado, on_behalf_of real, aprovação por papel e trilha de auditoria por ato. Qual o padrão de mercado e normativo em novembro de 2026, e que documentos e registros uma auditoria pede (kit de auditoria para a família Onion)? Corpus prévio: o estudo de camadas de liberação (ENT_AUTH_LAYERS), C_FATIGUE_IS_SECURITY e REF_3_EXTERNAL_IS_IRREVERSIBLE; nada sobre delegação OAuth, confused deputy, OWASP LLM06, ISO 27001, ISO 42001 ou NIST AI RMF aplicados a agente que age em nome de usuário."
+    trace: "pergunta original do run /onion-research em modo primárias, 2026-11-13"
+  - id: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'When principal A impersonates principal B, A is given all the rights that B has within some defined rights context and is indistinguishable from B in that context.' · RFC 8693 §1.1 · ancorada por verificador independente"
+    valid_from: "2020"
+    source_tier: 10
+    source_kind: primary
+    label: "Na RFC 8693, impersonation dá ao agente todos os direitos do solicitante e o torna indistinguível dele: um bot que usa o token de quem pediu apaga a própria identidade na trilha."
+    narrative: "Claim 1 [rfc8693]. Citação verbatim: \"When principal A impersonates principal B, A is given all the rights that B has within some defined rights context and is indistinguishable from B in that context.\". Elenxo (alvo 1): a objeção não sobreviveu. A extensão 'apaga a identidade do agente na trilha' é inferência, apoiada pela frase do Slack 'Write actions with user tokens are performed as if by the user themselves.' (ver C_SUPERACAO_20261113_SLACK_USER_WRITE_AS_USER)."
+    trace: "https://www.rfc-editor.org/rfc/rfc8693"
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc8693"
+      locator: "RFC 8693 §1.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_RFC8693_DELEGATION_SEPARATE_IDENTITY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'With delegation semantics, principal A still has its own identity separate from B, and it is explicitly understood that while B may have delegated some of its rights to A, any actions taken are being taken by A representing B.' · RFC 8693 §1.1 · ancorada por verificador independente"
+    valid_from: "2020"
+    source_tier: 10
+    source_kind: primary
+    label: "Na delegação (RFC 8693), o agente mantém identidade própria, separada da do solicitante; os atos são do agente representando o solicitante. É o modelo on_behalf_of."
+    narrative: "Claim 2 [rfc8693]. Citação verbatim: \"With delegation semantics, principal A still has its own identity separate from B, and it is explicitly understood that while B may have delegated some of its rights to A, any actions taken are being taken by A representing B.\". Elenxo (alvo 2): a objeção não sobreviveu; a citação prova a separação de identidades que o modelo on_behalf_of precisa. Tier: o leitor não declarou tier nesta claim; 10 é o tier que ele declarou para o mesmo documento."
+    trace: "https://www.rfc-editor.org/rfc/rfc8693"
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc8693"
+      locator: "RFC 8693 §1.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_RFC8693_ACT_CLAIM_IDENTIFIES_ACTOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'The \"act\" (actor) claim provides a means within a JWT to express that delegation has occurred and identify the acting party to whom authority has been delegated.' · RFC 8693 §4.1 · ancorada por verificador independente"
+    valid_from: "2020"
+    source_tier: 10
+    source_kind: primary
+    label: "A claim act (RFC 8693) expressa no JWT que houve delegação e identifica o ator; o sujeito do token continua sendo o solicitante e o agente aparece como ator."
+    narrative: "Claim 3 [rfc8693]. Citação verbatim: \"The \"act\" (actor) claim provides a means within a JWT to express that delegation has occurred and identify the acting party to whom authority has been delegated.\". Elenxo (alvo 3): a objeção não sobreviveu; que sub continua sendo o sujeito é a estrutura do próprio exemplo de §4.1."
+    trace: "https://www.rfc-editor.org/rfc/rfc8693"
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc8693"
+      locator: "RFC 8693 §4.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_RFC8693_NESTED_ACTORS_INFORMATIONAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'Prior actors identified by any nested \"act\" claims are informational only and are not to be considered in access control decisions.' · RFC 8693 §4.1 · ancorada por verificador independente"
+    valid_from: "2020"
+    source_tier: 10
+    source_kind: primary
+    label: "Na RFC 8693 só as claims de topo e o ator corrente entram na decisão de acesso; atores anteriores, na cadeia act aninhada, são só informativos."
+    narrative: "Claim 4 [rfc8693]. Citação verbatim: \"Prior actors identified by any nested \"act\" claims are informational only and are not to be considered in access control decisions.\". Elenxo (alvo 4): a objeção não sobreviveu. Consequência para o kit: na cadeia agente→subagente só o ator corrente decide, e a cadeia inteira tem de ir para o log de auditoria, porque o token não a torna vinculante."
+    trace: "https://www.rfc-editor.org/rfc/rfc8693"
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc8693"
+      locator: "RFC 8693 §4.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_RFC8693_MAY_ACT_PREAUTHORIZATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-13"
+    verified_against: "'The \"may_act\" claim makes a statement that one party is authorized to become the actor and act on behalf of another party.' · RFC 8693 §4.4 · ancorada por verificador independente"
+    valid_from: "2020"
+    source_tier: 10
+    source_kind: primary
+    label: "A claim may_act (RFC 8693) declara quem está autorizado a virar ator em nome de outro: pré-autorização que o servidor de autorização confere na troca de token."
+    narrative: "Claim 5 [rfc8693]. Citação verbatim: \"The \"may_act\" claim makes a statement that one party is authorized to become the actor and act on behalf of another party.\". Elenxo (alvo 5): a objeção sobreviveu, triagem limite; ver E_OBJECAO_MAY_ACT_NOT_LESSER_OF. may_act diz QUEM pode agir, não o escopo do token emitido, que a RFC deixa à política do servidor."
+    trace: "https://www.rfc-editor.org/rfc/rfc8693"
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc8693"
+      locator: "RFC 8693 §4.4"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_RFC8693_ACT_NO_EXP_AUD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'non- identity claims (e.g., \"exp\", \"nbf\", and \"aud\") are not meaningful when used within an \"act\" claim and are therefore not used.' · RFC 8693 §4.1 · ancorada por verificador independente"
+    valid_from: "2020"
+    source_tier: 10
+    source_kind: primary
+    label: "Na RFC 8693, as claims dentro de act só identificam o ator: exp, nbf e aud não valem ali, então validade e audiência ficam no token externo."
+    narrative: "Claim 6 [rfc8693]. Citação verbatim: \"non- identity claims (e.g., \"exp\", \"nbf\", and \"aud\") are not meaningful when used within an \"act\" claim and are therefore not used.\". Elenxo (alvo 6): a objeção não sobreviveu; consequência de desenho: validade e audiência ficam no token externo. Tier: o leitor não declarou tier nesta claim; 10 é o tier que ele declarou para o mesmo documento."
+    trace: "https://www.rfc-editor.org/rfc/rfc8693"
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc8693"
+      locator: "RFC 8693 §4.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DRAFT_OBO_AI_AGENTS_02_EXPIRED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'This Internet-Draft will expire on 27 February 2026.' · draft-oauth-ai-agents-on-behalf-of-user-02, Status of This Memo · ancorada por verificador independente"
+    valid_from: "2025-08-26"
+    source_tier: 9
+    source_kind: primary
+    label: "O rascunho individual OAuth On-Behalf-Of User Authorization for AI Agents (-02, 26/08/2025) expirou em 27/02/2026: não é item ativo do IETF nem padrão; vale só como referência de mecanismo."
+    narrative: "Claim 7 [oauth-ai-agents]. Citação verbatim: \"This Internet-Draft will expire on 27 February 2026.\". Elenxo (alvo 7): a objeção não sobreviveu; a conclusão 'não é padrão, só referência de mecanismo' reduz o que se afirma."
+    trace: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+      locator: "draft-oauth-ai-agents-on-behalf-of-user-02, Status of This Memo"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DRAFT_OBO_REQUESTED_ACTOR_REQUIRED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-13"
+    verified_against: "'REQUIRED. The unique identifier of the actor for which the client is requesting delegated access on behalf of the user.' · draft-oauth-ai-agents-on-behalf-of-user-02, Section 4.1.1 · ancorada por verificador independente"
+    valid_from: "2025-08-26"
+    source_tier: 9
+    source_kind: primary
+    label: "No rascunho -02 (expirado), o cliente declara o ator pelo parâmetro requested_actor, obrigatório (Section 4.1.1)."
+    narrative: "Claim 8 [oauth-ai-agents]. Citação verbatim: \"REQUIRED. The unique identifier of the actor for which the client is requesting delegated access on behalf of the user.\". Claim como ancorada: o agente se autentica com actor_token na troca do authorization_code; não é grant type separado. Elenxo (alvo 8): a objeção sobreviveu, triagem limite; ver E_OBJECAO_OBO_ACTOR_TOKEN_NOT_IN_QUOTE. Correção do escritor: actor_token e a negação de grant type separado saem do rótulo, porque não estão no trecho citado. Tier: o leitor não declarou tier nesta claim; 9 é o tier que ele declarou para o mesmo documento."
+    trace: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+      locator: "draft-oauth-ai-agents-on-behalf-of-user-02, Section 4.1.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DRAFT_OBO_ACT_SUB_IN_TOKEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'REQUIRED. The unique identifier of the actor that is acting on behalf of the user.' · draft-oauth-ai-agents-on-behalf-of-user-02, Section 4.3 (act.sub) · ancorada por verificador independente"
+    valid_from: "2025-08-26"
+    source_tier: 9
+    source_kind: primary
+    label: "O rascunho -02 (expirado) registra a delegação no token: sub identifica o usuário e act.sub (RFC 8693) o ator. O token registra a delegação; não é trilha por ato."
+    narrative: "Claim 9 [oauth-ai-agents]. Citação verbatim: \"REQUIRED. The unique identifier of the actor that is acting on behalf of the user.\". Claim como ancorada: '... dando trilha por ato na própria credencial'. Elenxo (alvo 9): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_TOKEN_IS_NOT_PER_ACT_TRAIL. Correção do escritor: 'trilha por ato' sai do rótulo; um token serve a N chamadas, e a trilha por ato vem do log (E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS). Tier: o leitor não declarou tier nesta claim; 9 é o tier que ele declarou para o mesmo documento."
+    trace: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-oauth-ai-agents-on-behalf-of-user-02"
+      locator: "draft-oauth-ai-agents-on-behalf-of-user-02, Section 4.3 (act.sub)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DRAFT_KLRC_AGENT_IN_CLIENT_ID
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'The access token includes the Agent identity as the 'client_id' claim.' · draft-klrc-aiagent-auth-00, Section 10.2 · ancorada por verificador independente"
+    valid_from: "2026-03-02"
+    source_tier: 9
+    source_kind: primary
+    label: "O draft-klrc-aiagent-auth-00 (02/03/2026) põe o agente em client_id (RFC 9068) e o usuário em sub; expirava em 03/09/2026 e consta como substituído por draft-ietf-wimse-aims. Não descreve act nem interseção."
+    narrative: "Claim 10 [oauth-ai-agents]. Citação verbatim: \"The access token includes the Agent identity as the 'client_id' claim.\". Elenxo (alvo 10): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_WIMSE_AIMS_SUCCESSOR_NOT_ANCHORED. O sucessor vivo (draft-ietf-wimse-aims-01) não foi ancorado nesta rodada."
+    trace: "https://datatracker.ietf.org/doc/html/draft-klrc-aiagent-auth-00"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-klrc-aiagent-auth-00"
+      locator: "draft-klrc-aiagent-auth-00, Section 10.2"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DRAFT_KLRC_USER_IN_SUB_NO_LESSER_OF
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'the User or System identifier is conveyed in the 'sub' claim.' · draft-klrc-aiagent-auth-00, Section 10.2 e Section 10.8 · ancorada por verificador independente"
+    valid_from: "2026-03-02"
+    source_tier: 9
+    source_kind: primary
+    label: "No draft-klrc-aiagent-auth-00, o usuário ou sistema delegante viaja em sub; a Seção 10.8 manda pedir o mínimo de escopos, mas não define o menor privilégio entre agente e solicitante."
+    narrative: "Claim 11 [oauth-ai-agents]. Citação verbatim: \"the User or System identifier is conveyed in the 'sub' claim.\". Elenxo (alvo 11): a objeção não sobreviveu; a claim declara o próprio limite, o que reforça que a regra do menor-entre não está no rascunho. Tier: o leitor não declarou tier nesta claim; 9 é o tier que ele declarou para o mesmo documento."
+    trace: "https://datatracker.ietf.org/doc/html/draft-klrc-aiagent-auth-00"
+    provenance:
+      source: "https://datatracker.ietf.org/doc/html/draft-klrc-aiagent-auth-00"
+      locator: "draft-klrc-aiagent-auth-00, Section 10.2 e Section 10.8"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HARDY_CONFUSED_DEPUTY_TWO_AUTHORITIES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'The fundamental problem is that the compiler runs with authority stemming from two sources. (That’s why the compiler is a confused deputy.)' · Hardy 1988, parágrafo que começa 'The fundamental problem' · ancorada por verificador independente"
+    valid_from: "1988"
+    source_tier: 8
+    source_kind: paper
+    label: "Hardy (1988): o deputado confuso carrega autoridade de duas fontes e não consegue separá-las nem dizer qual quer usar. É o bot de Slack com credencial única servindo vários solicitantes."
+    narrative: "Claim 12 [confused-deputy]. Citação verbatim: \"The fundamental problem is that the compiler runs with authority stemming from two sources. (That’s why the compiler is a confused deputy.)\". Elenxo (alvo 12): a objeção não sobreviveu; o mapeamento para o bot de credencial única e vários solicitantes é direto."
+    trace: "http://www.cap-lore.com/CapTheory/ConfusedDeputy.html"
+    provenance:
+      source: "http://www.cap-lore.com/CapTheory/ConfusedDeputy.html"
+      locator: "Hardy 1988, parágrafo que começa 'The fundamental problem'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_HARDY_SERVES_TWO_MASTERS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "'The compiler serves two masters and carries some authority from each to perform its respective duties. It has no way to keep them apart.' · Hardy 1988, parágrafo seguinte a 'The invoker yields his authority' · ancorada por verificador independente"
+    valid_from: "1988"
+    source_tier: 8
+    source_kind: paper
+    label: "Hardy (1988): o deputado atende a dois mestres, carrega autoridade de cada um e não tem como separá-las."
+    narrative: "Claim 13 [confused-deputy]. Citação verbatim: \"The compiler serves two masters and carries some authority from each to perform its respective duties. It has no way to keep them apart.\". Claim como ancorada: 'a falha é de arquitetura (autoridade ambiente), não de código errado'. Elenxo (alvo 13): a objeção sobreviveu, triagem limite; ver E_OBJECAO_HARDY_CURE_NOT_ANCHORED. Correção do escritor: o rótulo 'autoridade ambiente' é do leitor (a citação não usa 'ambient') e sai do label. Tier: o leitor não declarou tier nesta claim; 8 é o tier que ele declarou para o mesmo documento."
+    trace: "http://www.cap-lore.com/CapTheory/ConfusedDeputy.html"
+    provenance:
+      source: "http://www.cap-lore.com/CapTheory/ConfusedDeputy.html"
+      locator: "Hardy 1988, parágrafo seguinte a 'The invoker yields his authority'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_AWS_CONFUSED_DEPUTY_DEFINITION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'The confused deputy problem is a security issue where an entity that doesn't have permission to perform an action can coerce a more-privileged entity to perform the action.' · AWS IAM User Guide, 'The confused deputy problem', parágrafo de abertura · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A AWS define o confused deputy como a coerção de uma entidade mais privilegiada por quem não tem a permissão: a forma moderna do problema do agente com privilégio próprio maior que o do solicitante."
+    narrative: "Claim 14 [confused-deputy]. Citação verbatim: \"The confused deputy problem is a security issue where an entity that doesn't have permission to perform an action can coerce a more-privileged entity to perform the action.\". Elenxo (alvo 14): a objeção não sobreviveu."
+    trace: "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html"
+    provenance:
+      source: "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html"
+      locator: "AWS IAM User Guide, 'The confused deputy problem', parágrafo de abertura"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_AWS_SOURCE_CONTEXT_KEYS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'AWS service principals include information about the AWS resource, AWS account, and AWS organization they’re acting on behalf of.' · AWS IAM User Guide, 'Cross-service confused deputy prevention', 2º parágrafo (aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, aws:SourceOrgPaths) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Na AWS, o principal de serviço leva no pedido o recurso, a conta e a organização de origem, e a política do recurso testa essa origem. É análogo por recurso e conta, não pela pessoa solicitante."
+    narrative: "Claim 15 [confused-deputy]. Citação verbatim: \"AWS service principals include information about the AWS resource, AWS account, and AWS organization they’re acting on behalf of.\". Elenxo (alvo 15): a objeção sobreviveu, triagem limite; ver E_OBJECAO_AWS_KEYS_ARE_RESOURCE_NOT_PERSON. Correção do escritor: o label deixa de chamar isso de on_behalf_of da pessoa; o análogo com a pessoa como sujeito está em C_SUPERACAO_20261113_MS_DELEGATED_USER_AS_SUBJECT."
+    trace: "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html"
+    provenance:
+      source: "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html"
+      locator: "AWS IAM User Guide, 'Cross-service confused deputy prevention', 2º parágrafo (aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, aws:SourceOrgPaths)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LLM06_EXCESSIVE_PERMISSIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'An LLM extension has permissions on downstream systems that are not needed for the intended operation of the application.' · LLM06:2025, Causas raiz, Excessive Permissions · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP LLM06:2025: a causa 'excessive permissions' é o agente ter, nos sistemas a jusante, permissões além das necessárias à operação pretendida."
+    narrative: "Claim 16 [owasp-llm06]. Citação verbatim: \"An LLM extension has permissions on downstream systems that are not needed for the intended operation of the application.\". Elenxo (alvo 16): a objeção não sobreviveu."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Causas raiz, Excessive Permissions"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LLM06_EXCESSIVE_AUTONOMY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'An LLM-based application or extension fails to independently verify and approve high-impact actions.' · LLM06:2025, Causas raiz, Excessive Autonomy · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP LLM06:2025: a causa 'excessive autonomy' é a falta de verificação e aprovação independente de ações de alto impacto."
+    narrative: "Claim 17 [owasp-llm06]. Citação verbatim: \"An LLM-based application or extension fails to independently verify and approve high-impact actions.\". Elenxo (alvo 17): a objeção não sobreviveu."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Causas raiz, Excessive Autonomy"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LLM06_EXECUTE_IN_USER_CONTEXT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'Track user authorization and security scope to ensure actions taken on behalf of a user are executed on downstream systems' · LLM06:2025, Prevention and Mitigation, 'Execute extensions in user's context' (citação possivelmente truncada) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP LLM06:2025 manda rastrear a autorização e o escopo do usuário para que ações em nome dele sejam executadas a jusante no contexto dele."
+    narrative: "Claim 18 [owasp-llm06]. Citação verbatim: \"Track user authorization and security scope to ensure actions taken on behalf of a user are executed on downstream systems\". Elenxo (alvo 18): a objeção sobreviveu, triagem limite; ver E_OBJECAO_LLM06_QUOTE_TRUNCATED. O sentido 'no contexto do usuário' vem do título da subseção; o resto da frase não foi reconferido."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Prevention and Mitigation, 'Execute extensions in user's context' (citação possivelmente truncada)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LLM06_HUMAN_IN_THE_LOOP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'Utilise human-in-the-loop control to require a human to approve high-impact actions before they are taken.' · LLM06:2025, Prevention and Mitigation, Human-in-the-loop · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP LLM06:2025 exige aprovação humana antes de ações de alto impacto. A fonte pede aprovação HUMANA, não por papel."
+    narrative: "Claim 19 [owasp-llm06]. Citação verbatim: \"Utilise human-in-the-loop control to require a human to approve high-impact actions before they are taken.\". Elenxo (alvo 19): a objeção não sobreviveu, mas registrou que a citação não diz 'por papel': a aprovação por papel segue sem âncora normativa (E_OBJECAO_ROLE_APPROVAL_AND_KIT_UNANCHORED). O corpus pesa a fadiga de aprovação como falha de segurança (C_FATIGUE_IS_SECURITY, via external_edges)."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Prevention and Mitigation, Human-in-the-loop"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LLM06_COMPLETE_MEDIATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'Implement authorization in downstream systems rather than relying on an LLM to decide if an action is allowed or not.' · LLM06:2025, Prevention and Mitigation, Complete mediation · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP LLM06:2025: a autorização é imposta nos sistemas a jusante (mediação completa), não decidida pelo LLM."
+    narrative: "Claim 20 [owasp-llm06]. Citação verbatim: \"Implement authorization in downstream systems rather than relying on an LLM to decide if an action is allowed or not.\". Elenxo (alvo 20): a objeção não sobreviveu. Sustenta a espinha intake × execução do corpus (ENT_AUTH_LAYERS, via external_edges)."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Prevention and Mitigation, Complete mediation"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LLM06_PRIVILEGED_ACCOUNT_ANTIPATTERN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'an extension to read the current user’s document store connects to the document repository with a privileged account' · LLM06:2025, Exemplos comuns (Excessive Permissions) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP LLM06:2025 dá como exemplo de vulnerabilidade a extensão que lê os documentos do usuário atual por uma conta privilegiada: o antipadrão da identidade única do agente."
+    narrative: "Claim 21 [owasp-llm06]. Citação verbatim: \"an extension to read the current user’s document store connects to the document repository with a privileged account\". Elenxo (alvo 21): a objeção não sobreviveu; é o antipadrão do bot de privilégio único."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Exemplos comuns (Excessive Permissions)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ASI03_ATTRIBUTION_GAP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'Without a distinct, governed identity of its own, an agent operates in an attribution gap that makes enforcing true least privilege impossible.' · OWASP Top 10 for Agentic Applications 2026, ASI03 Description, p.15 · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP ASI03 (2026): agente sem identidade própria e governada opera numa lacuna de atribuição que torna impossível o privilégio mínimo real."
+    narrative: "Claim 22 [owasp-agentic]. Citação verbatim: \"Without a distinct, governed identity of its own, an agent operates in an attribution gap that makes enforcing true least privilege impossible.\". Claim como ancorada: identidade inclui persona e material de autenticação (chaves, tokens OAuth, sessões delegadas). Elenxo (alvo 22): a objeção não sobreviveu; sustenta delegação e não impersonation. Tier: o leitor não declarou tier nesta claim; 9 é o tier que ele declarou para o mesmo documento."
+    trace: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "OWASP Top 10 for Agentic Applications 2026, ASI03 Description, p.15"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ASI03_IDENTITY_SHARING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'An agent gains access to systems on behalf of a user, often their maker. It then allows other users to leverage that identity implicitly by invoking its tools as that identity.' · OWASP Top 10 for Agentic Applications 2026, ASI03 Example Attack Scenarios, item 7, p.16 · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP ASI03 lista Identity Sharing: o agente age em nome de um usuário (muitas vezes quem o criou) e deixa outros usarem essa identidade implicitamente."
+    narrative: "Claim 23 [owasp-agentic]. Citação verbatim: \"An agent gains access to systems on behalf of a user, often their maker. It then allows other users to leverage that identity implicitly by invoking its tools as that identity.\". Elenxo (alvo 23): a objeção não sobreviveu; é a descrição direta do bot de Slack com credencial do criador."
+    trace: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "OWASP Top 10 for Agentic Applications 2026, ASI03 Example Attack Scenarios, item 7, p.16"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ASI03_SIGNED_INTENT_TOKEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'Bind OAuth tokens to a signed intent that includes subject, audience, purpose, and session. Reject any token use where the bound intent doesn't match the current request.' · OWASP Top 10 for Agentic Applications 2026, ASI03 Prevention and Mitigation Guidelines, item 5 (item 4: human-in-the-loop; item 7: herança com revalidação da intenção), p.17 · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP ASI03 manda amarrar o token OAuth a uma intenção assinada (sujeito, audiência, propósito, sessão) e recusar uso fora dela. É recomendação, sem mecanismo padronizado."
+    narrative: "Claim 24 [owasp-agentic]. Citação verbatim: \"Bind OAuth tokens to a signed intent that includes subject, audience, purpose, and session. Reject any token use where the bound intent doesn't match the current request.\". Claim como ancorada inclui aprovação humana para ações irreversíveis (item 4) e herança de privilégio com revalidação (item 7), presentes no locator mas não na citação. Elenxo (alvo 24): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SIGNED_INTENT_NO_STANDARD_MECHANISM. Tier: o leitor não declarou tier nesta claim; 9 é o tier que ele declarou para o mesmo documento."
+    trace: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "OWASP Top 10 for Agentic Applications 2026, ASI03 Prevention and Mitigation Guidelines, item 5 (item 4: human-in-the-loop; item 7: herança com revalidação da intenção), p.17"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_T8_SIGNED_IMMUTABLE_LOGS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "'Implement comprehensive logging, cryptographic verification, enriched metadata, and real-time monitoring to ensure accountability and traceability. Require AI-generated logs to be cryptographically signed and immutable for regulatory compliance.' · Agentic AI Threats and Mitigations v1.0, tabela de ameaças, T8 (Repudiation & Untraceability), p.18 impressa (PDF p.19; o locator original dizia p.17) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O catálogo OWASP de ameaças agênticas (T8, repúdio e falta de rastro) recomenda logs assinados criptograficamente e imutáveis. É recomendação OWASP, não exigência de norma."
+    narrative: "Claim 25 [owasp-agentic]. Citação verbatim: \"Implement comprehensive logging, cryptographic verification, enriched metadata, and real-time monitoring to ensure accountability and traceability. Require AI-generated logs to be cryptographically signed and immutable for regulatory compliance.\". Elenxo (alvo 25): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SIGNED_LOGS_RECOMMENDED_NOT_REQUIRED. No kit o item entra como recomendação OWASP."
+    trace: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+    provenance:
+      source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+      locator: "Agentic AI Threats and Mitigations v1.0, tabela de ameaças, T8 (Repudiation & Untraceability), p.18 impressa (PDF p.19; o locator original dizia p.17)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'Record all inter-agent messages, policy decisions, and execution outcomes in tamper-evident, time-stamped logs bound to cryptographic agent identities. Maintain lineage metadata for every propagated action' · OWASP Top 10 for Agentic Applications 2026, ASI08 Prevention item 10 (Logging and non-repudiation), p.32 (o locator original dizia p.~27); T3 p.17 e T9 p.18 impressas em Threats and Mitigations · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "OWASP ASI08 (2026): logs à prova de adulteração e com carimbo de tempo, ligados à identidade criptográfica do agente, com metadados de linhagem de cada ato propagado."
+    narrative: "Claim 26 [owasp-agentic]. Citação verbatim: \"Record all inter-agent messages, policy decisions, and execution outcomes in tamper-evident, time-stamped logs bound to cryptographic agent identities. Maintain lineage metadata for every propagated action\". Claim como ancorada: para T3 e T9 o catálogo pede permissões granulares, auditoria de operações elevadas e validação de identidade. Elenxo (alvo 26): a objeção não sobreviveu; é a peça que fecha o requisito 'auditoria por ato'."
+    trace: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "OWASP Top 10 for Agentic Applications 2026, ASI08 Prevention item 10 (Logging and non-repudiation), p.32 (o locator original dizia p.~27); T3 p.17 e T9 p.18 impressas em Threats and Mitigations"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ISO27001_8_15_FIVE_FIELDS_GUIDE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-11-13"
+    verified_against: "'ISO 27001:2022 Annex A 8.15 states that for each event log to fulfil its purpose, it must contain five main components:' · isms.online, Annex A 8.15 Logging, seção 'Guidance on Event Log Information' · ancorada por verificador independente"
+    source_tier: 4
+    source_kind: aggregator
+    label: "INTERPRETAÇÃO DE GUIA (isms.online), não texto da norma: para o 8.15, cada registro de evento teria cinco componentes (ID do usuário, atividade, data e hora, dispositivo, rede)."
+    narrative: "Claim 27 [iso27001-controls]. Citação verbatim: \"ISO 27001:2022 Annex A 8.15 states that for each event log to fulfil its purpose, it must contain five main components:\". A página afirma que a norma diz isso, mas não cita o texto normativo. Elenxo (alvo 27): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_8_15_FIELDS_ARE_27002_GUIDANCE. A lista de conteúdo do log é orientação da ISO/IEC 27002:2022, não requisito do Anexo A."
+    trace: "https://www.isms.online/iso-27001/annex-a/8-15-logging-2022/"
+    provenance:
+      source: "https://www.isms.online/iso-27001/annex-a/8-15-logging-2022/"
+      locator: "isms.online, Annex A 8.15 Logging, seção 'Guidance on Event Log Information'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_ISO27001_8_2_PRIVILEGED_INVENTORY_GUIDE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-13"
+    verified_against: "'Document all privileged accounts, detailing their access levels and associated roles.' · isms.online, checklist Annex A 8.2, seção 'Detailed Annex A.8.2 Compliance Checklist', subseção 'Definition and Management' · ancorada por verificador independente"
+    source_tier: 4
+    source_kind: aggregator
+    label: "INTERPRETAÇÃO DE GUIA (checklist do 8.2): o guia lista como evidência o inventário documentado de contas privilegiadas, com nível de acesso e papel."
+    narrative: "Claim 28 [iso27001-controls]. Citação verbatim: \"Document all privileged accounts, detailing their access levels and associated roles.\". Elenxo (alvo 28): a objeção sobreviveu, triagem limite; ver E_OBJECAO_8_2_AGENT_ACCOUNT_NOT_ESTABLISHED. Não estabelece que a conta do agente é conta privilegiada no sentido do 8.2."
+    trace: "https://www.isms.online/iso-27001/checklist/annex-a-8-2-checklist/"
+    provenance:
+      source: "https://www.isms.online/iso-27001/checklist/annex-a-8-2-checklist/"
+      locator: "isms.online, checklist Annex A 8.2, seção 'Detailed Annex A.8.2 Compliance Checklist', subseção 'Definition and Management'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_GOVERN_2_1_ROLES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'GOVERN 2.1: Roles and responsibilities and lines of communication related to mapping, measuring, and managing AI risks are documented and are clear to individuals and teams throughout the organization.' · NIST AI 100-1, Core, GOVERN 2 (Tabela 1), pdf p.28 / impressa p.23 · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_kind: primary
+    label: "NIST AI RMF GOVERN 2.1: papéis, responsabilidades e linhas de comunicação sobre riscos de IA documentados e claros na organização. Base da matriz de papéis do agente e dos solicitantes."
+    narrative: "Claim 29 [iso42001-nist-rmf]. Citação verbatim: \"GOVERN 2.1: Roles and responsibilities and lines of communication related to mapping, measuring, and managing AI risks are documented and are clear to individuals and teams throughout the organization.\". O leitor não declarou tier (tier=?), e nenhuma outra claim desta fonte o declarou: source_tier fica omitido. Elenxo (alvo 29): a objeção não sobreviveu."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "NIST AI 100-1, Core, GOVERN 2 (Tabela 1), pdf p.28 / impressa p.23"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_GOVERN_3_2_HUMAN_AI_ROLES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'GOVERN 3.2: Policies and procedures are in place to define and differentiate roles and responsibilities for human-AI configurations and oversight of AI systems.' · NIST AI 100-1, Core, GOVERN 3 (Tabela 1), pdf p.28; NIST AI 600-1, GOVERN 3.2, pdf p.22 · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_kind: primary
+    label: "NIST AI RMF GOVERN 3.2: políticas que definem e diferenciam papéis nas configurações humano-IA e na supervisão. Não prescreve o menor privilégio entre agente e solicitante."
+    narrative: "Claim 30 [iso42001-nist-rmf]. Citação verbatim: \"GOVERN 3.2: Policies and procedures are in place to define and differentiate roles and responsibilities for human-AI configurations and oversight of AI systems.\". O leitor não declarou tier; source_tier omitido. Elenxo (alvo 30): a objeção não sobreviveu; a claim declara que não prescreve o menor-entre."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "NIST AI 100-1, Core, GOVERN 3 (Tabela 1), pdf p.28; NIST AI 600-1, GOVERN 3.2, pdf p.22"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_MANAGE_2_4_DEACTIVATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'MANAGE 2.4: Mechanisms are in place and applied, and responsibilities are assigned and understood, to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use.' · NIST AI 100-1, Core, MANAGE 2 (Tabela 1), pdf p.37; NIST AI 600-1, MANAGE 2.4, pdf p.45 · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_kind: primary
+    label: "NIST AI RMF MANAGE 2.4: mecanismos com responsável atribuído para substituir, desengajar ou desativar o sistema de IA. No agente, é o kill switch e a revogação da autoridade delegada."
+    narrative: "Claim 31 [iso42001-nist-rmf]. Citação verbatim: \"MANAGE 2.4: Mechanisms are in place and applied, and responsibilities are assigned and understood, to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use.\". O leitor não declarou tier; source_tier omitido. Elenxo (alvo 31): a objeção não sobreviveu; 'revogação da autoridade delegada' é mapeamento razoável de 'disengage, or deactivate'."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+      locator: "NIST AI 100-1, Core, MANAGE 2 (Tabela 1), pdf p.37; NIST AI 600-1, MANAGE 2.4, pdf p.45"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_GV_3_2_003_CHATBOT_AUP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'Define acceptable use policies for GAI interfaces, modalities, and human-AI configurations (i.e., for chatbots and decision-making tasks), including criteria for the kinds of queries GAI applications should refuse to respond to.' · NIST AI 600-1, GV-3.2-003, pdf p.22 / impressa p.18 · ancorada por verificador independente"
+    valid_from: "2024-07-26"
+    source_kind: primary
+    label: "NIST AI 600-1 GV-3.2-003 (ação sugerida): política de uso aceitável por interface e configuração humano-IA, citando chatbots, com critério do que recusar. Cobre um bot de Slack."
+    narrative: "Claim 32 [iso42001-nist-rmf]. Citação verbatim: \"Define acceptable use policies for GAI interfaces, modalities, and human-AI configurations (i.e., for chatbots and decision-making tasks), including criteria for the kinds of queries GAI applications should refuse to respond to.\". O leitor não declarou tier; source_tier omitido. Elenxo (alvo 32): a objeção não sobreviveu; é 'suggested action', não requisito."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "NIST AI 600-1, GV-3.2-003, pdf p.22 / impressa p.18"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLACK_USER_TOKEN_SAME_ACCESS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'User tokens represent the same access a user has to a workspace' · docs.slack.dev/authentication/tokens, seção User tokens · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No Slack, o user token representa o mesmo acesso que o usuário tem ao workspace e permite agir em nome dele. Usá-lo no bot é impersonation."
+    narrative: "Claim 33 [slack-platform]. Citação verbatim: \"User tokens represent the same access a user has to a workspace\". Elenxo (alvo 33): a objeção não sobreviveu; combinada com E_RFC8693_IMPERSONATION_INDISTINGUISHABLE, mostra que o caminho do user token no Slack é impersonation, não delegação."
+    trace: "https://docs.slack.dev/authentication/tokens"
+    provenance:
+      source: "https://docs.slack.dev/authentication/tokens"
+      locator: "docs.slack.dev/authentication/tokens, seção User tokens"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLACK_BOT_NEEDS_USER_SCOPE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "'does not allow the bot user to act on behalf of a user (this requires a user scope)' · docs.slack.dev/authentication/tokens, nota sobre workflow · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No Slack, o bot não age em nome de usuário sem user scope, mesmo com visibilidade emprestada."
+    narrative: "Claim 34 [slack-platform]. Citação verbatim: \"does not allow the bot user to act on behalf of a user (this requires a user scope)\". Elenxo (alvo 34): a objeção não sobreviveu."
+    trace: "https://docs.slack.dev/authentication/tokens"
+    provenance:
+      source: "https://docs.slack.dev/authentication/tokens"
+      locator: "docs.slack.dev/authentication/tokens, nota sobre workflow"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_SLACK_USER_GUEST_FLAGS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-13"
+    verified_against: "'Indicates whether or not the user is a single-channel guest.' · docs.slack.dev/reference/objects/user-object, is_ultra_restricted (is_restricted indica guest; is_stranger indica outro workspace sem canais compartilhados visíveis) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O objeto user do Slack classifica o solicitante: is_ultra_restricted marca o guest de canal único (verbatim); is_restricted (guest) e is_stranger (outro workspace) só parafraseados."
+    narrative: "Claim 35 [slack-platform]. Citação verbatim: \"Indicates whether or not the user is a single-channel guest.\". Elenxo (alvo 35): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SLACK_EVENT_IDENTITY_UNANCHORED."
+    trace: "https://docs.slack.dev/reference/objects/user-object"
+    provenance:
+      source: "https://docs.slack.dev/reference/objects/user-object"
+      locator: "docs.slack.dev/reference/objects/user-object, is_ultra_restricted (is_restricted indica guest; is_stranger indica outro workspace sem canais compartilhados visíveis)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OBJECAO_MAY_ACT_NOT_LESSER_OF
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 5 [rfc8693] may_act, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: may_act diz quem pode agir em nome de outro, não o escopo; a RFC 8693 não enuncia o menor privilégio entre agente e solicitante."
+    narrative: "Alvo: 5 [rfc8693] may_act (E_RFC8693_MAY_ACT_PREAUTHORIZATION). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: may_act prova QUEM pode virar ator (pré-autorização). Não prova a regra central da pergunta, privilégio efetivo = menor entre agente e solicitante: a RFC 8693 deixa o escopo do token emitido à política do servidor de autorização. Medido: kg-corpus-grep 'may_act' = 0 nós. Nenhuma claim ancorada da rodada define a interseção. Superação achada (classe entrega): C_SUPERACAO_20261113_MS_DELEGATED_BOTH_AUTHORIZED."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'may_act' | grep -vc '^#'  # = 0; e nenhuma claim ancorada com 'intersection'/'lesser of' na lista do prompt"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 5 [rfc8693] may_act"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_OBO_ACTOR_TOKEN_NOT_IN_QUOTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 8 [oauth-ai-agents] mecanismo requested_actor/actor_token, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a citação do -02 prova só que requested_actor é obrigatório; actor_token na troca do código e 'não é grant separado' não estão no trecho, e o rascunho expirou."
+    narrative: "Alvo: 8 [oauth-ai-agents] mecanismo requested_actor/actor_token (E_DRAFT_OBO_REQUESTED_ACTOR_REQUIRED). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação prova só que requested_actor é REQUIRED (Section 4.1.1). O uso de 'actor_token na troca do authorization_code' e a negação de 'grant type separado' não estão no trecho citado. Além disso, o rascunho expirou em 27/02/2026 e só vale como referência histórica de mecanismo. Superação: nenhuma (classe nenhuma). WebFetch de draft-ietf-wimse-aims-01 (2026-11-02): agente em client_id e usuário em sub, sem act nem actor_token no fluxo de código; é outro desenho, não substitui o mecanismo do -02."
+    trace: "reabrir https://datatracker.ietf.org/doc/draft-oauth-ai-agents-on-behalf-of-user-02 §4.1.1 e procurar 'actor_token' e 'grant_type' no mesmo trecho da citação"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 8 [oauth-ai-agents] mecanismo requested_actor/actor_token"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_TOKEN_IS_NOT_PER_ACT_TRAIL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 9 [oauth-ai-agents] 'trilha por ato na própria credencial', com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: o token com sub e act registra a delegação, não cada ato; um token serve N chamadas. Sem log por chamada a auditoria não acha qual ato fez a escrita nem qual mensagem a pediu."
+    narrative: "Alvo: 9 [oauth-ai-agents] 'trilha por ato na própria credencial' (E_DRAFT_OBO_ACT_SUB_IN_TOKEN). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação (act.sub REQUIRED, Section 4.3) prova que o TOKEN registra a delegação. Não prova trilha POR ATO: um token é emitido por concessão ou sessão e serve a N chamadas. CENÁRIO: o bot recebe um token com sub=usuário e act=agente e faz 40 chamadas de ferramenta, entre elas uma escrita destrutiva. Se o kit aceitar 'a credencial é a trilha por ato', a auditoria não acha qual das 40 chamadas fez a escrita, nem qual mensagem do Slack a pediu. É preciso log por ato (claims 25 e 26), e a claim, como escrita, autoriza omiti-lo. Superação achada (classe entrega): C_SUPERACAO_20261113_ASI08_PER_ACT_LOG."
+    trace: "conferir na claim 9 que a citação ('REQUIRED. The unique identifier of the actor that is acting on behalf of the user.') não contém 'per action', 'log' nem 'audit'; o requisito por ato só aparece em OWASP ASI08 item 10 (claim 26)"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 9 [oauth-ai-agents] 'trilha por ato na própria credencial'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_WIMSE_AIMS_SUCCESSOR_NOT_ANCHORED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 10 [oauth-ai-agents] klrc-00 substituído por draft-ietf-wimse-aims, com o critério E4_LACUNA_ABERTA e o comando registrado em trace"
+    label: "OBJEÇÃO: a rodada ancorou só rascunhos expirados ou substituídos; o sucessor vivo draft-ietf-wimse-aims-01 (WG Document, 02/11/2026, §10.6 'can never exceed') foi achado mas não ancorado."
+    narrative: "Alvo: 10 [oauth-ai-agents] klrc-00 substituído por draft-ietf-wimse-aims (E_DRAFT_KLRC_AGENT_IN_CLIENT_ID). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: A pergunta pede o padrão em NOVEMBRO DE 2026. A rodada ancorou dois rascunhos individuais, um expirado e um substituído, e NÃO leu o sucessor ativo que ela mesma nomeia. CENÁRIO: a resposta diz 'não há trilha IETF ativa para delegação de agentes'. É falso: draft-ietf-wimse-aims-01 é WG Document do wimse, datado de 02/11/2026 e com expiração em 06/05/2027, e (Section 10.6) diz que o token derivado 'can never exceed that of the token presented to obtain it'. É a regra de rebaixamento que a pergunta procura. Superação: nenhuma (classe nenhuma). WebFetch de https://datatracker.ietf.org/doc/draft-ietf-wimse-aims/ em 2026-11-13 devolveu -01 (2 Nov 2026, WG Document, Section 10.3 sub/client_id, Section 10.6 downscoping), lido por modelo de resumo, sem reconferência verbatim: pista para a próxima rodada, não superação que entrega."
+    trace: "curl -s https://datatracker.ietf.org/doc/draft-ietf-wimse-aims/ | grep -Eo 'draft-ietf-wimse-aims-[0-9]+' | sort -u  # versão viva não citada em nenhuma claim ancorada"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 10 [oauth-ai-agents] klrc-00 substituído por draft-ietf-wimse-aims"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_HARDY_CURE_NOT_ANCHORED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 13 [confused-deputy] 'autoridade ambiente', com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: 'autoridade ambiente' é rótulo do leitor, e a cura de Hardy (capability) caiu na ancoragem: a rodada tem a definição do confused deputy, não a mitigação dele."
+    narrative: "Alvo: 13 [confused-deputy] 'autoridade ambiente' (E_HARDY_SERVES_TWO_MASTERS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação prova os 'dois mestres'. O rótulo 'autoridade ambiente' e 'falha de arquitetura, não de código' é inferência do leitor: a citação não usa 'ambient authority'. A MITIGAÇÃO canônica de Hardy, a capability, foi REJEITADA na ancoragem como EXAGERADA. A rodada tem a definição do confused deputy, mas não a cura de Hardy. Superação: nenhuma (classe nenhuma). Só a claim 15 (AWS) traz mitigação, e não é capability-based; a formulação corrigida da capability ficou em C_SUPERACAO_20261113_HARDY_EXPLICIT_DESIGNATION, de uma claim rejeitada."
+    trace: "reabrir Hardy 1988 (cap-lore.com/CapTheory/ConfusedDeputy.html) e procurar 'ambient': 0 ocorrências no parágrafo citado; ver também a claim rejeitada sobre a mitigação por capability"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 13 [confused-deputy] 'autoridade ambiente'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_AWS_KEYS_ARE_RESOURCE_NOT_PERSON
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 15 [confused-deputy] mitigação cross-service da AWS como análogo de on_behalf_of, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: as chaves aws:Source* identificam recurso, conta e organização, não a pessoa solicitante; é analogia de contexto de origem, não padrão de agente com o privilégio do humano."
+    narrative: "Alvo: 15 [confused-deputy] mitigação cross-service da AWS como análogo de on_behalf_of (E_AWS_SOURCE_CONTEXT_KEYS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: aws:SourceArn, SourceAccount e SourceOrgID identificam o RECURSO, a CONTA ou a ORG de origem para a política do recurso testar. Não identificam a PESSOA solicitante nem limitam o principal de serviço ao privilégio dela. Serve de analogia (contexto de origem verificado em cada chamada), não de padrão de 'agente com o privilégio do solicitante humano'. Superação achada (classe entrega): C_SUPERACAO_20261113_MS_DELEGATED_USER_AS_SUBJECT."
+    trace: "conferir que a citação da claim 15 lista 'AWS resource, AWS account, and AWS organization' e não 'user' nem 'principal humano'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 15 [confused-deputy] mitigação cross-service da AWS como análogo de on_behalf_of"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_LLM06_QUOTE_TRUNCATED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 18 [owasp-llm06] execute no contexto do usuário, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a citação do LLM06 está truncada antes do trecho que diz 'no contexto do usuário'; o sentido se apoia só no título da subseção."
+    narrative: "Alvo: 18 [owasp-llm06] execute no contexto do usuário (E_LLM06_EXECUTE_IN_USER_CONTEXT). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O próprio verificador marca a citação como 'possivelmente truncada'. Ela termina em 'executed on downstream systems', e o trecho cortado é o que carrega a claim (no contexto daquele usuário, com o mínimo de privilégio). O título 'Execute extensions in user's context' segura o sentido, mas a frase operacional não foi reconferida inteira. Superação: nenhuma (classe nenhuma); não refetchado nesta passada."
+    trace: "reabrir https://genai.owasp.org/llmrisk/llm062025-excessive-agency/ e conferir o restante da frase após 'executed on downstream systems'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 18 [owasp-llm06] execute no contexto do usuário"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SIGNED_INTENT_NO_STANDARD_MECHANISM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 24 [owasp-agentic] token amarrado à intenção assinada, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a citação cobre só o item 5 do ASI03; 'intenção assinada' não tem mecanismo padronizado (RFC 8693 só oferece aud e scope), e os itens 4 e 7 não têm texto verbatim."
+    narrative: "Alvo: 24 [owasp-agentic] token amarrado à intenção assinada (E_ASI03_SIGNED_INTENT_TOKEN). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A claim é composta. A citação cobre só o item 5 (vincular o token a uma intenção assinada). Os itens 4 (human-in-the-loop) e 7 (herança de privilégio com revalidação) estão no locator, mas não na citação. 'Signed intent' é recomendação OWASP sem mecanismo padronizado nomeado. Nenhuma claim da rodada mostra RFC, rascunho ou produto que implemente essa amarração. Superação: nenhuma (classe nenhuma); RFC 8693, rascunhos IETF e draft-ietf-wimse-aims-01 não definem a amarração intenção↔token."
+    trace: "conferir que a QUOTE da claim 24 contém só o item 5; itens 4 e 7 sem texto verbatim no run"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 24 [owasp-agentic] token amarrado à intenção assinada"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SIGNED_LOGS_RECOMMENDED_NOT_REQUIRED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 25 [owasp-agentic] T8 logs assinados 'para conformidade regulatória', com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: a OWASP recomenda logs assinados e imutáveis, mas nenhuma norma ancorada os exige; no kit o item é recomendação OWASP, não exigência de auditor."
+    narrative: "Alvo: 25 [owasp-agentic] T8 logs assinados 'para conformidade regulatória' (E_T8_SIGNED_IMMUTABLE_LOGS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Prova que a OWASP RECOMENDA logs assinados e imutáveis. Não prova que alguma NORMA ou auditoria os EXIGE: a rodada não ancorou texto normativo de 8.15 (ISO 27001), e as claims ISO de 5.15 foram rejeitadas. No kit, o item entra como recomendação OWASP, não como exigência de auditor. O locator também precisou de correção (p.17 → p.18 impressa). Superação: nenhuma (classe nenhuma); ISO/IEC 27002:2022 §8.15 é paga e não foi lida."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'A.8.15' | grep -vc '^#'; e na lista do prompt: nenhuma claim ancorada com texto normativo ISO 8.15"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 25 [owasp-agentic] T8 logs assinados 'para conformidade regulatória'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_8_15_FIELDS_ARE_27002_GUIDANCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 27 [iso27001-controls] 8.15 cinco componentes (guia), com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: os cinco campos do 8.15 vêm de guia de vendedor sem texto normativo; a lista é orientação da 27002, e 'a 27001 exige 5 campos' seria atribuição errada diante do auditor."
+    narrative: "Alvo: 27 [iso27001-controls] 8.15 cinco componentes (guia) (E_ISO27001_8_15_FIVE_FIELDS_GUIDE). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Rotulada honestamente como interpretação de guia, mas é a ÚNICA âncora de 8.15 na rodada, e o verificador diz que a página não cita o texto normativo. A lista de conteúdo do log é orientação da ISO/IEC 27002:2022, não requisito do Anexo A da 27001, que só traz o enunciado do controle. CENÁRIO: o kit escreve 'a ISO 27001 exige 5 campos por evento'; o auditor de certificação confronta com a SoA e com o enunciado de A.8.15, e a atribuição está errada. Com outro guia, a lista de campos muda ao arbítrio da fonte secundária. Superação: nenhuma (classe nenhuma); ISO/IEC 27001:2022 Anexo A e 27002:2022 §8.15 são pagas e não foram lidas."
+    trace: "conferir no locator da claim 27 (isms.online/iso-27001/annex-a/8-15-logging-2022/) a ausência de citação do texto normativo, como o verificador registrou"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 27 [iso27001-controls] 8.15 cinco componentes (guia)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_8_2_AGENT_ACCOUNT_NOT_ESTABLISHED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 28 [iso27001-controls] 8.2 inventário de contas privilegiadas (guia), com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: o inventário de contas privilegiadas vem de checklist de vendedor e não estabelece que a conta do agente (bot token) é conta privilegiada no sentido do 8.2."
+    narrative: "Alvo: 28 [iso27001-controls] 8.2 inventário de contas privilegiadas (guia) (E_ISO27001_8_2_PRIVILEGED_INVENTORY_GUIDE). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Checklist de vendedor, não a norma nem relatório de auditor. Não estabelece que a conta do agente (bot token) é 'conta privilegiada' no sentido de 8.2. A rejeição da claim de 5.15 registrou: 'a página não menciona agentes de IA, contas de serviço ou bots'. Superação: nenhuma (classe nenhuma); nenhuma fonte primária ISO lida."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'A.8.2' | grep -vc '^#'  # e a lista do prompt: nenhuma claim normativa de 8.2"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 28 [iso27001-controls] 8.2 inventário de contas privilegiadas (guia)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_SLACK_EVENT_IDENTITY_UNANCHORED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo 35 [slack-platform] campos de classificação do solicitante, com o critério E4_LACUNA_ABERTA e o comando registrado em trace"
+    label: "OBJEÇÃO: só is_ultra_restricted é verbatim; is_ext_shared, Slack AI agindo com permissão do usuário e a identidade pelo evento autenticado (app_mention) ficam sem âncora."
+    narrative: "Alvo: 35 [slack-platform] campos de classificação do solicitante (E_SLACK_USER_GUEST_FLAGS). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: Só is_ultra_restricted tem citação verbatim. is_restricted e is_stranger vêm parafraseados no locator. is_ext_shared, nomeado na lacuna, não aparece em nenhuma claim. 'Slack AI/agentes agindo com permissão do usuário' também não. A claim sobre o evento autenticado (app_mention.user/authorizations) foi REJEITADA, então a peça 'identidade pelo evento autenticado' fica sem âncora Slack. Superação: nenhuma (classe nenhuma); não refetchado nesta passada."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'is_ext_shared' | grep -vc '^#'  # = 0; e nenhuma claim ancorada com is_ext_shared na lista do prompt"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo 35 [slack-platform] campos de classificação do solicitante"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_LESSER_OF_NOT_NORMATIVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo GLOBAL: 'privilégio efetivo = menor entre agente e solicitante' como padrão normativo, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: nenhuma fonte ancorada (ISO, NIST, OWASP) enuncia 'privilégio efetivo = menor entre agente e solicitante'; ele existe como comportamento de plataforma e em rascunho WG, não como norma."
+    narrative: "Alvo: GLOBAL: 'privilégio efetivo = menor entre agente e solicitante' como padrão normativo (C_LESSER_OF_AGENT_AND_REQUESTER_1113). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Nenhuma claim ANCORADA da rodada afirma a regra. A claim OWASP-agentic que a sugeria foi rejeitada ('Grep por intersection, requester, requesting user, lesser of e on-behalf-of dá 0 ocorrências'). As claims 11 (klrc) e 30 (NIST) declaram que não a definem. CENÁRIO: a resposta apresenta o menor-entre como 'padrão normativo de novembro de 2026', e o auditor pede a norma. Não há norma ISO, NIST ou OWASP que a enuncie. Existe como comportamento de PLATAFORMA (Microsoft) e como regra de rebaixamento em rascunho WG (wimse-aims §10.6), não como requisito normativo. Superação achada (classe entrega, lado mercado): C_SUPERACAO_20261113_MS_LESSER_OF_MARKET. O lado normativo continua sem fonte."
+    trace: "na lista de claims ancoradas do prompt: nenhuma QUOTE com 'intersection'/'lesser'/'never exceed'/'couldn't access'; a claim OWASP-agentic rejeitada registra grep = 0"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo GLOBAL: 'privilégio efetivo = menor entre agente e solicitante' como padrão normativo"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_ROLE_APPROVAL_AND_KIT_UNANCHORED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo GLOBAL: 'aprovação por papel' e 'kit de auditoria' (documentos que o auditor pede), com o critério E4_LACUNA_ABERTA e o comando registrado em trace"
+    label: "OBJEÇÃO: 'aprovação por papel' e o kit 'o que o auditor pede' não têm âncora normativa: as fontes pedem aprovação humana, e ISO 27001 (5.15-5.18, 8.2, 8.15) e ISO 42001 não foram lidas."
+    narrative: "Alvo: GLOBAL: 'aprovação por papel' e 'kit de auditoria' (documentos que o auditor pede) (C_AUDIT_KIT_NORMATIVE_BASIS_1113). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: A aprovação por PAPEL não tem âncora: a claim ISO 5.15 'corresponde à aprovação por papel' foi rejeitada ('o texto fala de pessoal apropriado, não de papéis'), e OWASP LLM06 e ASI03 pedem aprovação HUMANA, não por papel. O kit de auditoria depende só de dois guias de vendedor (claims 27 e 28) e de GOVERN 2.1. Não há texto normativo ISO 27001 de 5.15, 5.16, 5.18, 8.2 ou 8.15, nem ISO 42001. CENÁRIO: o kit lista 'matriz papel→aprovação exigida pela ISO 27001 A.5.18' e o auditor confronta com a norma. A atribuição não tem fonte na rodada, e o conteúdo do kit muda conforme o guia escolhido. Superação: nenhuma (classe nenhuma); ISO/IEC 27001:2022, 27002:2022 e 42001:2023 são pagas e não foram lidas. Só NIST AI RMF é fonte primária de governança na rodada."
+    trace: "lista de claims ancoradas do prompt: [iso27001-controls] só 27 e 28 (guia), nenhuma de 5.15/5.16/5.18; [iso42001-nist-rmf] zero claims de ISO 42001; bash .claude/validation/kg-corpus-grep.sh 'A.5.18' | grep -vc '^#'"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo GLOBAL: 'aprovação por papel' e 'kit de auditoria' (documentos que o auditor pede)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-13"
+    verified_against: "objeção do Elenxo ao alvo GLOBAL: atualidade 'novembro de 2026' das fontes OWASP e NIST, com o critério E2_PROVA_MENOS e o comando registrado em trace"
+    label: "OBJEÇÃO: as versões OWASP e NIST usadas não foram conferidas contra revisão posterior a 2026-11; restrição declarada sobre a atualidade da resposta."
+    narrative: "Alvo: GLOBAL: atualidade 'novembro de 2026' das fontes OWASP e NIST (Q_AGENT_REQUESTER_PRIVILEGE_1113). Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: As versões usadas (LLM Top 10 2025, Agentic Top 10 2026, Threats & Mitigations v1.0, AI 100-1 1.0, AI 600-1) não foram conferidas contra uma revisão posterior a 2026-11. A rodada não mediu se houve revisão do AI RMF ou nova versão OWASP. Sem cenário concreto de troca de veredito (os controles citados são estáveis); fica como restrição declarada. Superação: nenhuma (classe nenhuma); só o draft-ietf-wimse-aims teve a versão viva medida (-01, 2026-11-02)."
+    trace: "nenhuma claim do run traz data de 'última versão conferida em 2026-11' para OWASP ou NIST; conferir genai.owasp.org e nist.gov/itl/ai-risk-management-framework"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "Elenxo, objeção ao alvo GLOBAL: atualidade 'novembro de 2026' das fontes OWASP e NIST"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-13"
+    verified_against: "contabilidade do run /onion-research de 2026-11-13 e contagem do escritor sobre as listas recebidas: 35 ancoradas, 10 rejeitadas, 38 objeções, 15 sobreviventes, 0 recusas, 13 superações"
+    label: "LACUNAS: 8 fontes lidas, 0 inalcançáveis; 35 claims ancoradas, 10 rejeitadas (todas EXAGERADA); 38 objeções, 15 sobreviventes (5 bloqueiam), 0 recusadas; 13 superações; 5 lacunas abertas."
+    narrative: "FONTES: lidas (8): rfc8693, oauth-ai-agents, confused-deputy, owasp-llm06, owasp-agentic, iso27001-controls, iso42001-nist-rmf, slack-platform. Inalcançáveis: 0. CLAIMS: 35 ancoradas, cada uma virou nó evidence; 10 REJEITADAS na ancoragem (10 EXAGERADA), que nunca viram nó. ELENXO: 38 objeções (35 claims + 3 globais); 15 sobreviventes modeladas como E_OBJECAO (5 bloqueiam: alvos 9, 10, 27 e as globais do menor-entre e do kit; 10 limitam: alvos 5, 8, 13, 15, 18, 24, 25, 28, 35 e a global de atualidade); 23 não sobreviveram, e a evidência delas está na narrativa do alvo. Objeções RECUSADAS pelo motor (sobreviveram sem critério pré-registrado ou sem superação): 0; nenhum alvo fica não-julgado por recusa. SUPERAÇÕES: 13 nós C_SUPERACAO_20261113 (9 das rejeitadas na ancoragem, com TRACES_TO para este nó; 4 do Elenxo, para o E_OBJECAO respectivo: alvos 5, 9, 15 e a global do menor-entre). LACUNAS FECHADAS (3): rfc8693 — claims 1-6: impersonation x delegation (§1.1), act (§4.1), atores aninhados só informativos, may_act (§4.4), exp/nbf/aud fora de act · owasp-llm06 — claims 16-21: excessive permissions e autonomy, executar no contexto do usuário (citação possivelmente truncada, limite), human-in-the-loop, complete mediation, antipadrão da conta privilegiada · owasp-agentic — claims 22-26: ASI03 (lacuna de atribuição, Identity Sharing, token amarrado à intenção) e T8/ASI08 (repúdio, logs à prova de adulteração com linhagem por ato); identity spoofing (T9) só pelo locator da claim 26. LACUNAS QUE CONTINUAM ABERTAS (5): oauth-ai-agents — PARCIAL: só rascunhos individuais expirados ou substituídos (on-behalf-of-user-02, klrc-00); o sucessor vivo draft-ietf-wimse-aims-01 (WG Document do wimse, 02/11/2026, sub=usuário, client_id=agente, §10.6 'can never exceed') foi achado por WebFetch, mas não ancorado por um segundo agente · confused-deputy — PARCIAL: definição fechada (Hardy e AWS), mas a mitigação canônica por capability de Hardy foi REJEITADA na ancoragem; a única mitigação ancorada (AWS SourceArn) é por recurso ou conta, não pela pessoa solicitante · iso27001-controls — ABERTA: 5.15, 5.16 e 5.18 sem nenhuma claim ancorada (as de 5.15 foram rejeitadas); 8.2 e 8.15 só por interpretação de guia de vendedor, sem texto normativo; 'o que o auditor pede' sem fonte primária · iso42001-nist-rmf — PARCIAL: NIST AI 100-1 e 600-1 ancorados (GOVERN 2.1/3.2, MANAGE 2.4, GV-3.2-003); ISO/IEC 42001 com zero claims · slack-platform — PARCIAL: user token, user scope do bot e is_ultra_restricted ancorados; is_ext_shared ausente; is_restricted e is_stranger só parafraseados; Slack AI/agentes com permissão do usuário ausente; identidade pelo evento autenticado (app_mention.user/authorizations) REJEITADA. REJEITADAS NA ANCORAGEM, com o motivo do verificador: (1) [confused-deputy] Hardy descarta remendos baseados em listas de acesso: regras de abertura de arquivo chegaram a 14 operadores booleanos e cada cláusula nova quebrava programas seguros ou legítimos; é argumento contra checagem de nome ou lista. VEREDITO EXAGERADA: a citação aparece literal e os 14 operadores são exatos, mas o claim troca as causas (cláusula permissiva gera problema de segurança em programa seguro; restrição quebra programa legítimo) e 'listas de acesso' só aparece como arquitetura e como exercício ao leitor. [motivo do verificador truncado pelo motor; não completado de memória] (2) [confused-deputy] Mitigação canônica de Hardy: a capability une designação e autorização; cada ato usa a capability entregue pelo solicitante e o deputado só age com o que foi explicitamente designado. VEREDITO EXAGERADA: a ideia de unir designação e autorização é fiel, mas no mesmo parágrafo o compilador recebe capability PRÓPRIA para o arquivo de estatísticas; só a depuração usa a do invocador. A exigência é designar explicitamente qual autoridade se usa. [motivo truncado pelo motor; não completado de memória] (3) [owasp-agentic] ASI03 prevê autorização por ação via motor de política central, o que sustenta checar o menor privilégio entre agente e solicitante a cada ato. VEREDITO EXAGERADA: a citação existe (item 3, p.17), mas só pede reverificar cada passo privilegiado num motor central; grep por intersection, requester, requesting user, lesser of e on-behalf-of dá 0 ocorrências. O menor-entre é inferência do leitor. (4) [iso27001-controls] INTERPRETAÇÃO DO GUIA: o 5.15 pede política de controle de acesso desenvolvida, documentada e revisada periodicamente; é o documento-base que uma auditoria pede primeiro. VEREDITO EXAGERADA: a quote é prosa do artigo; 'documento-base que uma auditoria pede primeiro' não está no trecho. (5) [iso27001-controls] INTERPRETAÇÃO DO GUIA: o acesso privilegiado, que vai além do usuário comum, deve ser monitorado e auditado. Isso vale para um agente que opera com privilégio próprio. VEREDITO EXAGERADA: o bullet trata de 'users'; a aplicação a agentes é inferência do leitor (a página não menciona agentes de IA, contas de serviço ou bots). (6) [iso27001-controls] INTERPRETAÇÃO DO GUIA: a autorização deve ser formal, documentada e dada por pessoal competente. Isso corresponde à aprovação por papel. VEREDITO EXAGERADA: o texto diz 'appropriate personnel'; 'corresponde à aprovação por papel' é mapeamento do leitor, não há papéis nem matriz de papéis. (7) [iso42001-nist-rmf] O Perfil GenAI exige procedimento de escalonamento quando os critérios de desativação são atingidos e revisão desses critérios contra a tolerância a risco; juntos dão trilha de auditoria e registro de incidente do agente. VEREDITO EXAGERADA: MG-2.4-002 existe, mas são 'Suggested Actions'; a revisão contra tolerância está em MG-2.4-004, fora do locator; 'trilha de auditoria' e 'registro de incidente' não saem desses textos. [motivo truncado pelo motor; não completado de memória] (8) [slack-platform] Bot token pertence ao app, não a uma pessoa: privilégio próprio único, sem identidade do solicitante. VEREDITO EXAGERADA: a citação sustenta 'pertence ao app'; 'privilégio próprio único' e 'sem identidade do solicitante' são inferência. (9) [slack-platform] Ações com user token são executadas como se fossem do próprio usuário, ou seja, atribuídas a ele. VEREDITO EXAGERADA: a citação só diz 'on behalf of users'; 'as if by the user' está em outra frase da seção, e 'atribuídas' é acréscimo do leitor. (10) [slack-platform] O evento app_mention identifica o solicitante pelo campo user e traz authorizations com team_id; a página mostra isso só em exemplos, sem definir semântica. VEREDITO EXAGERADA: a frase citada é requisito de instalação do bot e não sustenta nada sobre user, authorizations ou team_id; o claim se apoia no exemplo de payload, e 'user identifica o solicitante' é leitura do exemplo."
+    trace: "run /onion-research de 2026-11-13, seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações"
+    provenance:
+      source: "run /onion-research de 2026-11-13, modo primárias (⟨journal do run wf_45f0fcd2-079⟩)"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada, conferida pelo escritor"
+      locality: "host"
+  - id: C_ELENXO_RECOMMENDATION_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "Recomendação do Elenxo: delegação (sub=solicitante, act=agente), nunca impersonation; autorização a jusante; aprovação humana no alto impacto; log por ato. Menor-entre é padrão de mercado, não norma; o kit é mapeamento Onion."
+    narrative: "O QUE A RODADA SUSTENTA, com âncora:\n(1) O modelo certo é DELEGAÇÃO, não impersonation (RFC 8693 §1.1). O agente mantém identidade própria e age representando o solicitante. Isso se expressa com sub=solicitante e act=agente (§4.1) e com may_act como pré-autorização (§4.4). O rascunho WG vivo (wimse-aims-01) usa client_id=agente.\n(2) O bot de credencial única é o confused deputy (Hardy 1988; AWS) e o antipadrão nomeado pela OWASP: LLM06 'privileged account' e ASI03 'Identity Sharing'.\n(3) A OWASP manda: executar no contexto do usuário, impor a autorização a jusante e não no LLM, aprovação humana para ações de alto impacto ou irreversíveis, e logs à prova de adulteração com linhagem POR ATO (ASI08 e T8).\n(4) O NIST AI RMF dá a base de governança do kit: papéis documentados (GOVERN 2.1), papéis humano-IA diferenciados (GOVERN 3.2), mecanismo de desligamento e revogação com responsável (MANAGE 2.4) e política de uso aceitável para chatbots (GV-3.2-003).\n(5) No Slack, o user token é o acesso do usuário. Usá-lo é impersonation e apaga o agente na trilha. O bot não age em nome de ninguém sem user scope.\n\nO QUE A RODADA NÃO SUSTENTA:\n(a) 'Menor entre agente e solicitante' como NORMA. Nenhuma fonte ISO, NIST ou OWASP ancorada enuncia a regra, e a claim que a atribuía à OWASP foi rejeitada. Ela se sustenta como PADRÃO DE MERCADO pela Microsoft Learn ('Both the client and the user must be authorized separately' / 'isn't able to access anything the signed in user couldn't access', medido nesta passada) e como regra de rebaixamento em rascunho WG (wimse-aims §10.6, não ancorada). Deve ser apresentada como composição Onion apoiada em mercado, nunca como 'exigência normativa'.\n(b) 'Aprovação por PAPEL': as fontes pedem aprovação HUMANA. O 'por papel' é escolha de desenho do Onion.\n(c) O KIT DE AUDITORIA como 'o que o auditor pede': sem texto normativo ISO 27001 (5.15, 5.16, 5.18, 8.2, 8.15) nem ISO 42001. Os campos de log e o inventário de contas privilegiadas vêm de guia de vendedor, com risco concreto de atribuição errada (a lista de campos de 8.15 é orientação da 27002, não requisito do Anexo A).\n(d) O token como 'trilha por ato'. O token registra a delegação; a trilha por ato exige log por chamada (ASI08).\n(e) Identidade pelo evento autenticado do Slack, is_ext_shared e Slack AI agindo com permissão do usuário: sem âncora.\n(f) O estado IETF de novembro de 2026: precisa ancorar draft-ietf-wimse-aims-01.\n\nPRÓXIMA RODADA, na ordem do valor:\n1. Ancorar draft-ietf-wimse-aims-01 §4, §10.3, §10.5.1 e §10.6 e a página Microsoft permissions-consent-overview, para fechar o lado mercado e IETF do menor-entre.\n2. Fonte primária, ou ao menos texto oficial da ISO, para 27001 A.5.15, A.5.16, A.5.18, A.8.2 e A.8.15, para 27002 §8.15 e para o Anexo A da ISO/IEC 42001. Se forem inalcançáveis por serem pagas, declarar o kit como 'mapeamento Onion para controles', não como 'exigência da norma'.\n3. Slack: conversation object (is_ext_shared), segurança da Events API (assinatura do request e o campo user do evento) e documentação de agentes e Slack AI.\n\nNenhum descarte por orçamento: as lacunas acima ficam abertas como objeções sobreviventes."
+    trace: "run /onion-research de 2026-11-13, Elenxo, campo recommendation (íntegro); projeção em docs/evolution/research/agent-requester-privilege-2026-11/SYNTHESIS.md"
+  - id: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.4
+    label: "Hipótese da pergunta: privilégio efetivo = menor entre agente e solicitante é o padrão de 2026. Sustentada como prática de mercado (Microsoft), não como norma ISO, NIST ou OWASP."
+    narrative: "Hipótese que a pergunta traz. A rodada não ancorou fonte normativa que a enuncie (E_OBJECAO_LESSER_OF_NOT_NORMATIVE); a OWASP pede execução no contexto do usuário e o fim das permissões excessivas, o que aponta para ela sem enunciá-la; a superação C_SUPERACAO_20261113_MS_LESSER_OF_MARKET entrega o lado mercado. O rascunho WG draft-ietf-wimse-aims-01 §10.6 ('can never exceed') é pista não ancorada."
+    trace: "pergunta original do run /onion-research de 2026-11-13"
+  - id: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    label: "Hipótese da pergunta: aprovação por papel e o kit de auditoria (política, inventário de contas, matriz de papéis, log por ato, revogação) têm base normativa. Hoje só o NIST AI RMF é âncora primária."
+    narrative: "Hipótese que a pergunta traz. Âncoras primárias: NIST GOVERN 2.1 (papéis), GOVERN 3.2 (papéis humano-IA), MANAGE 2.4 (revogação), GV-3.2-003 (uso aceitável do chatbot); OWASP ASI08 e T8 (logs por ato, recomendação). ISO 27001 só por guia de vendedor (8.15, 8.2) e ISO 42001 sem claim. Aprovação por PAPEL sem âncora: as fontes pedem aprovação humana (E_OBJECAO_ROLE_APPROVAL_AND_KIT_UNANCHORED)."
+    trace: "pergunta original do run /onion-research de 2026-11-13"
+  - id: C_SUPERACAO_20261113_HARDY_CLAUSE_VS_RESTRICTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Hardy, no mesmo parágrafo: cada cláusula nova abria falha de segurança em programa seguro, cada restrição nova quebrava programa legítimo; Hardy rejeita checagem de nome, e 'access lists' só aparece como exercício ao leitor."
+    narrative: "Medida: texto da página do autor baixado por curl e lido; grep de 'Every time we added a clause', 'broke other legitimate programs', 'fourteen boolean', 'Should the compiler check for directory name SYSX?' e 'Show that access lists do not solve this problem' achou cada um no lugar descrito. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA na ancoragem): [confused-deputy] Hardy descarta remendos baseados em listas de acesso: regras de abertura de arquivo chegaram a 14 operadores booleanos e cada cláusula nova quebrava programas seguros ou legítimos; é argumento contra checagem de nome ou lista. Afirmação de UM juiz."
+    trace: "curl -sL http://www.cap-lore.com/CapTheory/ConfusedDeputy.html | sed 's/<[^>]*>//g' | tr '\\n' ' ' | grep -o 'Every time we added a clause.\\{0,330\\}' # mostra: cláusula -> problemas de segurança em programas seguros; restrições -> quebra de programas legítimos"
+  - id: C_SUPERACAO_20261113_HARDY_EXPLICIT_DESIGNATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Hardy, mesmo trecho: a cura é a designação explícita por ato; o deputado usa capability PRÓPRIA para os recursos dele (STAT) e a capability do invocador só para os recursos do invocador (saída de depuração)."
+    narrative: "Medida: mesmo curl da página do autor, leitura do parágrafo completo e grep de 'direct capability to the statistics file', 'provided by the invoker' e 'explicitly designate that authority': os três no mesmo parágrafo. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [confused-deputy] Mitigação canônica de Hardy: cada ato usa a capability entregue pelo solicitante e o deputado só age com o que foi explicitamente designado. Afirmação de UM juiz."
+    trace: "curl -sL http://www.cap-lore.com/CapTheory/ConfusedDeputy.html | sed 's/<[^>]*>//g' | tr '\\n' ' ' | grep -o 'The capability solution would endow.\\{0,700\\}' # mostra: capability PRÓPRIA para STAT; só a depuração usa a do invocador; 'require the compiler to explicitly designate that authority'"
+  - id: C_SUPERACAO_20261113_ISO_5_15_POLICY_REVIEWED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "INTERPRETAÇÃO DE GUIA (isms.online, 5.15, seção 'Access Control Policy'): a política de controle de acesso é desenvolvida, documentada e revisada periodicamente. Sem a parte 'a auditoria pede primeiro'."
+    narrative: "Medida: WebFetch da página 5.15 com pedido de verificação literal: frase confirmada verbatim, na seção 'Access Control Policy', como prosa do artigo; 'auditoria pede primeiro' não aparece no trecho. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [iso27001-controls] o 5.15 pede política de controle de acesso desenvolvida, documentada e revisada periodicamente; é o documento-base que uma auditoria pede primeiro. Afirmação de UM juiz."
+    trace: "WebFetch https://www.isms.online/iso-27001/annex-a/5-15-access-control-2022/ e procurar, ao redor de 'periodically reviewed', as palavras 'first' / 'auditor' / 'primeiro': o trecho não diz que a auditoria pede a política primeiro"
+  - id: C_SUPERACAO_20261113_ISO_5_15_PRIVILEGED_MONITORED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "INTERPRETAÇÃO DE GUIA (isms.online, 5.15): usuários com acesso acima do padrão são monitorados e auditados. Aplicar isso à conta do agente é inferência do Onion; a página não fala de agente, bot ou conta de serviço."
+    narrative: "Medida: WebFetch da página 5.15: frase confirmada verbatim como bullet da lista de 11 pontos, sem menção a agente, bot ou IA. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [iso27001-controls] o acesso privilegiado deve ser monitorado e auditado; isso vale para um agente que opera com privilégio próprio. Afirmação de UM juiz."
+    trace: "WebFetch https://www.isms.online/iso-27001/annex-a/5-15-access-control-2022/ e procurar 'agent' / 'bot' / 'AI agent' no bullet 'above and beyond that of a standard user': só 'users' aparece"
+  - id: C_SUPERACAO_20261113_ISO_5_15_FORMAL_APPROVAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "INTERPRETAÇÃO DE GUIA (isms.online, 5.15): autorização formal e documentada, dada pelo pessoal apropriado. Ler isso como 'aprovação por papel' é mapeamento do Onion; o texto não fala de papel."
+    narrative: "Medida: WebFetch da página 5.15: bullet 'formal, documented approval from the appropriate personnel' confirmado verbatim; não há 'role' no trecho. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [iso27001-controls] a autorização deve ser formal, documentada e dada por pessoal competente; isso corresponde à aprovação por papel. Afirmação de UM juiz."
+    trace: "WebFetch https://www.isms.online/iso-27001/annex-a/5-15-access-control-2022/ e procurar 'role' no bullet 'formal, documented approval from the appropriate personnel': o trecho diz 'appropriate personnel', não papel"
+  - id: C_SUPERACAO_20261113_NIST_MG_2_4_004_MG_4_3_002
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "No NIST AI 600-1, MG-2.4-004 manda revisar os critérios de desativação conforme a tolerância a risco e MG-4.3-002 manda registrar erros, quase-acidentes e impactos negativos. Trilha de auditoria por ato não aparece."
+    narrative: "Medida: grep -oE sobre o texto normalizado do AI 600-1 (pdf p.45-46 e seção MG-4.3) devolveu os dois trechos literais ('Establish and regularly review specific criteria that warrants the deactivation of GAI systems in accordance with set risk tolerances and appetites'; 'Establish and maintain policies and procedures to record and track GAI system reported errors, near-misses, and negative impacts'). 'Trilha de auditoria por ato' não foi achada em nenhum dos dois documentos. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [iso42001-nist-rmf] o Perfil GenAI exige procedimento de escalonamento e revisão dos critérios contra a tolerância a risco; juntos dão trilha de auditoria e registro de incidente. Afirmação de UM juiz."
+    trace: "pdftotext -layout NIST.AI.600-1.pdf - | tr -s '[:space:]' ' ' | grep -oE 'Establish and maintain procedures for escalating.{0,260}' (só escalonamento); grep -oiE 'audit (trail|log)|least privilege' no mesmo texto (nenhuma ocorrência em contexto de agente); grep -oE 'Establish and regularly review.{0,250}' (a revisão contra tolerância é MG-2.4-004, não MG-2.4-002)"
+  - id: C_SUPERACAO_20261113_SLACK_BOT_TOKEN_TIED_TO_APP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "No Slack, o bot token está ligado ao app, não à identidade de um usuário. Sem a glosa 'privilégio próprio único'."
+    narrative: "Medida: WebFetch de https://docs.slack.dev/authentication/tokens em 2026-11-13, seção Bot tokens, frase literal conferida: 'Unlike user tokens, they're not tied to a user's identity; they're only tied to your app.' Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [slack-platform] bot token pertence ao app, não a uma pessoa: privilégio próprio único, sem identidade do solicitante. Afirmação de UM juiz."
+    trace: "WebFetch https://docs.slack.dev/authentication/tokens e ler a seção 'Bot tokens'; procurar 'privilege'/'single' ligados ao bot: o trecho só diz 'not tied to a user's identity; they're only tied to your app'"
+  - id: C_SUPERACAO_20261113_SLACK_USER_WRITE_AS_USER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "No Slack, escrita com user token é feita como se fosse do próprio usuário: 'Write actions with user tokens are performed as if by the user themselves.' (seção User tokens)."
+    narrative: "Medida: segundo WebFetch da seção User tokens em 2026-11-13, listando as frases em ordem (a frase é a 7ª); leitura do sumarizador do WebFetch, não grep literal no HTML cru. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [slack-platform] ações com user token são executadas como se fossem do próprio usuário, ou seja, atribuídas a ele. 'Atribuídas' (trilha) segue acréscimo do leitor. Afirmação de UM juiz."
+    trace: "WebFetch https://docs.slack.dev/authentication/tokens, seção 'User tokens': a frase 'You can use these tokens to take actions on behalf of users.' não contém 'as if by the user'; essa expressão está em 'Write actions with user tokens are performed as if by the user themselves.'"
+  - id: C_SUPERACAO_20261113_SLACK_APP_MENTION_PAYLOAD_EXAMPLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O exemplo de payload do app_mention traz user no evento, team_id no topo e authorizations (user_id, is_bot, is_enterprise_install); a prosa da página não define a semântica desses campos."
+    narrative: "Medida: WebFetch de https://docs.slack.dev/reference/events/app_mention em 2026-11-13: o exemplo traz user em event e team_id no topo; authorizations traz user_id, is_bot e is_enterprise_install; o exemplo de convite omite team_id em authorizations. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA): [slack-platform] o evento app_mention identifica o solicitante pelo campo user e traz authorizations com team_id. Afirmação de UM juiz."
+    trace: "WebFetch https://docs.slack.dev/reference/events/app_mention e conferir que a frase 'Your Slack app must have a bot user configured and installed to use this event.' trata de requisito de instalação, sem mencionar user, authorizations ou team_id"
+  - id: C_SUPERACAO_20261113_MS_DELEGATED_BOTH_AUTHORIZED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Microsoft identity platform (permissions-consent-overview, acesso delegado): 'Both the client and the user must be authorized separately to make the request.' O escopo do app é limitado pelo RBAC do usuário."
+    narrative: "Medida: WebFetch de https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview em 2026-11-13 (updated_at 2026-06-25, git_commit_id ef25d88ad9774b6fa60bd0190609701ea600bb04); as duas frases ('Both the client and the user must be authorized separately to make the request.' e 'The application isn't able to access anything the signed in user couldn't access.') aparecem verbatim. Critério: E2_PROVA_MENOS. Alvo reprovado: claim 5 [rfc8693] may_act (E_OBJECAO_MAY_ACT_NOT_LESSER_OF). Padrão de mercado, não norma. Afirmação de UM juiz."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'may_act' | grep -vc '^#' # = 0; e nenhuma claim ancorada com 'intersection'/'lesser of' na lista do prompt"
+  - id: C_SUPERACAO_20261113_ASI08_PER_ACT_LOG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A trilha por ato vem do log, não do token: OWASP ASI08 item 10 pede logs à prova de adulteração, com carimbo de tempo, ligados à identidade do agente e com linhagem de cada ato propagado."
+    narrative: "Medida: claim 26 ancorada nesta rodada pelo segundo agente (p.32): 'tamper-evident, time-stamped logs bound to cryptographic agent identities. Maintain lineage metadata for every propagated action' (E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS). Critério: E2_PROVA_MENOS. Alvo reprovado: claim 9 [oauth-ai-agents] 'trilha por ato na própria credencial' (E_OBJECAO_TOKEN_IS_NOT_PER_ACT_TRAIL). Afirmação de UM juiz."
+    trace: "conferir na claim 9 que a citação ('REQUIRED. The unique identifier of the actor that is acting on behalf of the user.') não contém 'per action', 'log' nem 'audit'; o requisito por ato só aparece em OWASP ASI08 item 10 (claim 26)"
+  - id: C_SUPERACAO_20261113_MS_DELEGATED_USER_AS_SUBJECT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O análogo direto com a pessoa como sujeito é o acesso delegado da Microsoft: cliente e usuário autorizados separadamente, e o app não acessa nada que o usuário logado não acessaria."
+    narrative: "Medida: WebFetch de https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview em 2026-11-13, frases verbatim no markdown devolvido ('Both the client and the user must be authorized separately'; 'The application isn't able to access anything the signed in user couldn't access'). Critério: E2_PROVA_MENOS. Alvo reprovado: claim 15 [confused-deputy] mitigação cross-service da AWS como análogo de on_behalf_of (E_OBJECAO_AWS_KEYS_ARE_RESOURCE_NOT_PERSON). Afirmação de UM juiz."
+    trace: "conferir que a citação da claim 15 lista 'AWS resource, AWS account, and AWS organization' e não 'user' nem 'principal humano'"
+  - id: C_SUPERACAO_20261113_MS_LESSER_OF_MARKET
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O menor-entre existe como PADRÃO DE MERCADO, não norma: na Microsoft, cliente e usuário são autorizados separadamente e o app não acessa nada que o usuário logado não acessaria."
+    narrative: "Medida: WebFetch de https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview em 2026-11-13, verbatim no markdown (updated_at 2026-06-25). Entrega o lado mercado; o lado normativo continua sem fonte. Critério: E2_PROVA_MENOS. Alvo reprovado: GLOBAL 'privilégio efetivo = menor entre agente e solicitante' como padrão normativo (E_OBJECAO_LESSER_OF_NOT_NORMATIVE). Afirmação de UM juiz."
+    trace: "na lista de claims ancoradas do prompt: nenhuma QUOTE com 'intersection'/'lesser'/'never exceed'/'couldn't access'; a claim OWASP-agentic rejeitada registra grep = 0"
+edges:
+  - from: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_RFC8693_DELEGATION_SEPARATE_IDENTITY
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_RFC8693_ACT_CLAIM_IDENTIFIES_ACTOR
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_RFC8693_NESTED_ACTORS_INFORMATIONAL
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_RFC8693_MAY_ACT_PREAUTHORIZATION
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_RFC8693_ACT_NO_EXP_AUD
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_DRAFT_OBO_AI_AGENTS_02_EXPIRED
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_DRAFT_OBO_REQUESTED_ACTOR_REQUIRED
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_DRAFT_OBO_ACT_SUB_IN_TOKEN
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_DRAFT_KLRC_AGENT_IN_CLIENT_ID
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_DRAFT_KLRC_USER_IN_SUB_NO_LESSER_OF
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_HARDY_CONFUSED_DEPUTY_TWO_AUTHORITIES
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_HARDY_SERVES_TWO_MASTERS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_AWS_CONFUSED_DEPUTY_DEFINITION
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_AWS_SOURCE_CONTEXT_KEYS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LLM06_EXCESSIVE_PERMISSIONS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LLM06_EXCESSIVE_AUTONOMY
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LLM06_EXECUTE_IN_USER_CONTEXT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LLM06_HUMAN_IN_THE_LOOP
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LLM06_COMPLETE_MEDIATION
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LLM06_PRIVILEGED_ACCOUNT_ANTIPATTERN
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_ASI03_ATTRIBUTION_GAP
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_ASI03_IDENTITY_SHARING
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_ASI03_SIGNED_INTENT_TOKEN
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_T8_SIGNED_IMMUTABLE_LOGS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_ISO27001_8_15_FIVE_FIELDS_GUIDE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_ISO27001_8_2_PRIVILEGED_INVENTORY_GUIDE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_GOVERN_2_1_ROLES
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_GOVERN_3_2_HUMAN_AI_ROLES
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_MANAGE_2_4_DEACTIVATE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_GV_3_2_003_CHATBOT_AUP
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_SLACK_USER_TOKEN_SAME_ACCESS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_SLACK_BOT_NEEDS_USER_SCOPE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_SLACK_USER_GUEST_FLAGS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_RFC8693_DELEGATION_SEPARATE_IDENTITY
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_RFC8693_ACT_CLAIM_IDENTIFIES_ACTOR
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_RFC8693_NESTED_ACTORS_INFORMATIONAL
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_HARDY_CONFUSED_DEPUTY_TWO_AUTHORITIES
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_AWS_CONFUSED_DEPUTY_DEFINITION
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_PRIVILEGED_ACCOUNT_ANTIPATTERN
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_COMPLETE_MEDIATION
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_HUMAN_IN_THE_LOOP
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_ASI03_ATTRIBUTION_GAP
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_ASI03_IDENTITY_SHARING
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_SLACK_USER_TOKEN_SAME_ACCESS
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_SLACK_BOT_NEEDS_USER_SCOPE
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_GOVERN_2_1_ROLES
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_GOVERN_3_2_HUMAN_AI_ROLES
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_MANAGE_2_4_DEACTIVATE
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_GV_3_2_003_CHATBOT_AUP
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_SLACK_USER_TOKEN_SAME_ACCESS
+    to: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
+    edge_type: SUPPORTS
+  - from: E_RFC8693_DELEGATION_SEPARATE_IDENTITY
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_EXECUTE_IN_USER_CONTEXT
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_EXCESSIVE_PERMISSIONS
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_PRIVILEGED_ACCOUNT_ANTIPATTERN
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_HARDY_CONFUSED_DEPUTY_TWO_AUTHORITIES
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_DRAFT_KLRC_USER_IN_SUB_NO_LESSER_OF
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: CONSTRAINS
+  - from: E_NIST_GOVERN_3_2_HUMAN_AI_ROLES
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: CONSTRAINS
+  - from: E_RFC8693_MAY_ACT_PREAUTHORIZATION
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: CONSTRAINS
+  - from: E_NIST_GOVERN_2_1_ROLES
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_GOVERN_3_2_HUMAN_AI_ROLES
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_MANAGE_2_4_DEACTIVATE
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_NIST_GV_3_2_003_CHATBOT_AUP
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_T8_SIGNED_IMMUTABLE_LOGS
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_RFC8693_NESTED_ACTORS_INFORMATIONAL
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_LLM06_HUMAN_IN_THE_LOOP
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_ISO27001_8_15_FIVE_FIELDS_GUIDE
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_ISO27001_8_2_PRIVILEGED_INVENTORY_GUIDE
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_DRAFT_OBO_AI_AGENTS_02_EXPIRED
+    to: E_DRAFT_OBO_REQUESTED_ACTOR_REQUIRED
+    edge_type: CONSTRAINS
+  - from: E_DRAFT_OBO_AI_AGENTS_02_EXPIRED
+    to: E_DRAFT_OBO_ACT_SUB_IN_TOKEN
+    edge_type: CONSTRAINS
+  - from: E_RFC8693_ACT_CLAIM_IDENTIFIES_ACTOR
+    to: E_DRAFT_OBO_ACT_SUB_IN_TOKEN
+    edge_type: SUPPORTS
+  - from: E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS
+    to: E_T8_SIGNED_IMMUTABLE_LOGS
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_MAY_ACT_NOT_LESSER_OF
+    to: E_RFC8693_MAY_ACT_PREAUTHORIZATION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OBO_ACTOR_TOKEN_NOT_IN_QUOTE
+    to: E_DRAFT_OBO_REQUESTED_ACTOR_REQUIRED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TOKEN_IS_NOT_PER_ACT_TRAIL
+    to: E_DRAFT_OBO_ACT_SUB_IN_TOKEN
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_WIMSE_AIMS_SUCCESSOR_NOT_ANCHORED
+    to: E_DRAFT_KLRC_AGENT_IN_CLIENT_ID
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HARDY_CURE_NOT_ANCHORED
+    to: E_HARDY_SERVES_TWO_MASTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AWS_KEYS_ARE_RESOURCE_NOT_PERSON
+    to: E_AWS_SOURCE_CONTEXT_KEYS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LLM06_QUOTE_TRUNCATED
+    to: E_LLM06_EXECUTE_IN_USER_CONTEXT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SIGNED_INTENT_NO_STANDARD_MECHANISM
+    to: E_ASI03_SIGNED_INTENT_TOKEN
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SIGNED_LOGS_RECOMMENDED_NOT_REQUIRED
+    to: E_T8_SIGNED_IMMUTABLE_LOGS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_8_15_FIELDS_ARE_27002_GUIDANCE
+    to: E_ISO27001_8_15_FIVE_FIELDS_GUIDE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_8_2_AGENT_ACCOUNT_NOT_ESTABLISHED
+    to: E_ISO27001_8_2_PRIVILEGED_INVENTORY_GUIDE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SLACK_EVENT_IDENTITY_UNANCHORED
+    to: E_SLACK_USER_GUEST_FLAGS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LESSER_OF_NOT_NORMATIVE
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ROLE_APPROVAL_AND_KIT_UNANCHORED
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261113_HARDY_CLAUSE_VS_RESTRICTION
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_HARDY_EXPLICIT_DESIGNATION
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_ISO_5_15_POLICY_REVIEWED
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_ISO_5_15_PRIVILEGED_MONITORED
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_ISO_5_15_FORMAL_APPROVAL
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_NIST_MG_2_4_004_MG_4_3_002
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_SLACK_BOT_TOKEN_TIED_TO_APP
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_SLACK_USER_WRITE_AS_USER
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_SLACK_APP_MENTION_PAYLOAD_EXAMPLE
+    to: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_MS_DELEGATED_BOTH_AUTHORIZED
+    to: E_OBJECAO_MAY_ACT_NOT_LESSER_OF
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_ASI08_PER_ACT_LOG
+    to: E_OBJECAO_TOKEN_IS_NOT_PER_ACT_TRAIL
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_MS_DELEGATED_USER_AS_SUBJECT
+    to: E_OBJECAO_AWS_KEYS_ARE_RESOURCE_NOT_PERSON
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261113_MS_LESSER_OF_MARKET
+    to: E_OBJECAO_LESSER_OF_NOT_NORMATIVE
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_ELENXO_RECOMMENDATION_1113
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
