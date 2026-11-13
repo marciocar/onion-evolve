@@ -2,17 +2,16 @@
 branch: chore/kg-private-cite-migration
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: eff37b16324f5ec328de65cf8ec2038c4ba1e108a48ba19d8536a11c45019ef5
-reviewed_code_sha256: e7c1529769d689e6c15e0f16f58b1d8437e183cae7ed6b5e6359a189e5fd4e88
-findings_total: 9
-findings_real: 9
-findings_blocking: 8
+reviewed_diff_sha256: pendente
+findings_total: 10
+findings_real: 10
+findings_blocking: 9
 tokens: 0
 duration_min: 0
-findings_fixed: 9
+findings_fixed: 10
 verdict: REJECTED_AND_FIXED
 elenxo: true
-reviewer: refutador independente do #1648 (3 bloqueios, re-revisão), sobre a passada do próprio executor (6 achados)
+reviewer: refutador independente do #1648 (3 bloqueios, depois 1 residual na re-refutação), sobre a passada do próprio executor (6 achados)
 nota: "tokens e duração não medidos. Achados 1 a 6: passada do próprio executor, que não é independente. Achados B1 a B3: refutador independente, que reprovou a 1ª versão; os três foram curados no mesmo PR."
 ---
 
@@ -57,21 +56,22 @@ contagem, sem ecoar nada).
 | B1 | (blocking) | sobravam 64 `private-cite:<id>@<commit>` (com `:caminho` ou `/caminho` em parte deles), que devolviam ao grafo o commit do repo privado; o gate não os via | `verified_against` e `method` levam o marcador no valor inteiro (o `method` mantém a classe); na prosa e nos comentários saem o `@sha`, o `:caminho` e o `/caminho`. Os 7 hex soltos que ainda resolviam para commit privado viraram `⟨commit⟩`. O `private-repo-cite-check.sh` ganhou o HARD `MARCADOR-COM-COMMIT`, com o caso (r) e 2 mutantes mortos |
 | B2 | (blocking) | `C_CLASSE_NAO_CONFERIVEL_SEM_LEITOR` estava como `refuted`, mas o claim era verdade e deixou de ser (caso DRIFTED do `/meta:kg-freshness`) | o nó antigo voltou ao texto original com `status: superseded`. O nó novo `C_CLASSE_NAO_CONFERIVEL_E_O_MARCADOR_PRIVATE_CITE` ganhou a verdade atual e uma `SUPERSEDES` para o antigo, e cita o PR e o commit da main, não a branch |
 | B3 | (blocking) | a catraca da REGRA 121 seguia com 255 entradas para um passivo real de 12 | o `--emit-baseline` a encolheu para 12 |
+| B4 | (blocking) | re-refutação: em `E_HISTORICO_DO_REGISTRO_DOS_ADOTANTES` sobravam 2 commits de repo privado, um em `(… <hex>` e outro como argumento de flag. A guarda não os via, e a medida anterior só os conferia contra os repos já citados em cada grafo | os dois viraram `⟨commit⟩`, com o id do nó na tabela privada (e as trocas antigas ganharam o nó que tinham perdido). A guarda passou a acusar todo hex solto na linha do marcador (`(<hex>)`, `/blob/<hex>/`, em qualquer caixa), menos o commit deste repo (o core é público) e `dono/repo@<hex>` da lista pública. Isso trouxe mais 2 linhas: um commit do espelho público da kg-ssot, agora qualificado como `marciocar/kg-ssot@<hex>`, e um slug de workspace, agora `⟨slug de 16 hex⟩`. O caso (r) ganhou fixtures em maiúscula e as duas vizinhas que calam, e 4 mutantes morreram |
 
 ## Re-revisão (refutador independente)
 
 Medido depois da cura:
 - `private-cite:<id>@<hex>` no corpus: 0;
-- hex nas linhas acrescentadas que resolvem para commit de repositório privado: 0. Foram 31 distintos, conferidos pela
-  API contra os 18 repositórios privados que o PR cita; 26 deles são commits do próprio core;
+- hex nas linhas acrescentadas que resolvem para commit de repositório privado: 0. Foram 30 distintos: 26 são commits
+  do próprio core, e os outros 4 foram conferidos pela API contra os 28 repositórios privados alcançáveis;
 - linhas acrescentadas com padrão privado: 0;
 - `--private-repos`: 0 campos;
 - REGRA 121: rc 0 no tocado e no `--all`, baseline com 12;
 - `kg-gate-ci.sh`: rc 0;
-- família `private_repo_cite`: 47 de 47.
+- família `private_repo_cite`: 47 de 47, com o caso (r) ampliado.
 
-Ponto cego da medida: o hex só é conferido contra os repositórios que a `gh` alcança. Um grafo com hex não tinha
-repositório privado alcançável, e o hex dele é commit do core.
+Ponto cego da medida: o hex só é conferido contra os repositórios privados que a `gh` alcança (28). Na guarda, a isenção
+do commit deste repo lê o git local, e o CI tem a história inteira (`fetch-depth: 0`).
 
 ## Limites declarados
 
