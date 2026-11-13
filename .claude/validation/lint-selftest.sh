@@ -10969,6 +10969,8 @@ FIELD
   grep -q '^_MOAT_CORE_SLUG = "onion-bancada/core"$' "${d}/h/lib/moat-judge.py" || record_fail "moat-gate: (costura do core)" "a âncora da constante do core sumiu"
   sed -i "s#^_MOAT_CORE_URL = \"https://github.com/marciocar/onion-evolve\"\$#_MOAT_CORE_URL = \"${d}/proj\"#" "${d}/h/lib/moat-judge.py"
   grep -qF "_MOAT_CORE_URL = \"${d}/proj\"" "${d}/h/lib/moat-judge.py" || record_fail "moat-gate: (costura da URL do core)" "a âncora da URL constante sumiu"
+  # e o protocolo: o "remoto" da bancada é um caminho local (file), que o juiz de produção não aceita (só https)
+  sed -i 's#"protocol.https.allow=always"#"protocol.file.allow=always"#' "${d}/h/lib/moat-judge.py"
   # _mgr <dir-do-hook> <raiz> <cwd> <comando> [PATH] → "rc|stderr"
   _mgr() {
     local rc=0 err
@@ -11541,9 +11543,17 @@ EOF" "${L}" \
   git -C "${P}" update-ref refs/remotes/origin/main "${_sp_commit}"
   _mgcase "(rb30) origin/main LOCAL forjada (update-ref) com o deploy-site.sh editado + a forma delegada → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
     'bash ops/deploy-site.sh deploy --verified-pr 3' "${J}" \
-    '        out = _git(["ls-remote", _MOAT_CORE_URL, "refs/heads/main"])' \
+    '        out = _moat_lsremote()' \
     '        out = _git(["-C", ROOT, "rev-parse", "origin/main"]) + "\trefs/heads/main"'
-  git -C "${P}" update-ref refs/remotes/origin/main HEAD; cp "${d}/ds-intacto" "${P}/ops/deploy-site.sh"
+  git -C "${P}" update-ref refs/remotes/origin/main HEAD
+  # (rb31) o insteadOf no .git/config (Edit) desviando a URL constante para um "remoto" cuja main é o commit forjado
+  #       (7ª passada). O ls-remote isolado (cwd=/, sem config, só o protocolo permitido) não lê o .git/config: VETO.
+  #       MUTANTE: o ls-remote no cwd do hook, com a config do repo
+  git init -q --bare "${d}/fakeremote"; git -C "${P}" push -q "${d}/fakeremote" "${_sp_commit}:refs/heads/main"
+  git -C "${P}" config "url.${d}/fakeremote.insteadOf" "${d}/proj"
+  _mgcase "(rb31) insteadOf no .git/config desviando a URL constante + a forma delegada → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
+    'bash ops/deploy-site.sh deploy --verified-pr 3' "${J}" '                              cwd="/", env=_env, capture_output' '                              cwd=None, env=None, capture_output'
+  git -C "${P}" config --unset "url.${d}/fakeremote.insteadOf"; cp "${d}/ds-intacto" "${P}/ops/deploy-site.sh"
   # (rb29) unit transiente em /run/systemd/transient: o veto é do DADO (a linha do tsv); o "mutante" é o tsv sem ela
   local _r29='sudo cp /tmp/u /run/systemd/transient/' _r29i _r29m
   _r29i="$(_mgr "${d}/h" "${P}" "${P}" "${_r29}" "")"
@@ -26333,6 +26343,11 @@ STUB
   FRG_FILES="docs/evolution/federation/members.yaml" _frx "(rf26) PR que toca o members.yaml (o registro amplia a delegação) ⇒ a sessão não mergeia" "${_pi}" ""
   FRG_FILES="docs/evolution/federation/members.yaml" _frx "(rf26-MUT) sem o members.yaml na lista, ele passaria — a lista é a causa" "" \
     's# docs/evolution/federation/members.yaml##'
+  # 7ª passada: o FECHO — o PR que só toca o que um ato executa (o materialize-door.sh do publish-door) é guarda
+  FRG_FILES="ops/materialize-door.sh" _frx "(rf27) PR que só toca ops/materialize-door.sh (o ensaio do publish-door o roda) ⇒ a sessão não mergeia" "${_pi}" ""
+  FRG_FILES="ops/materialize-door.sh" _frx "(rf27-MUT) sem as linhas fecho na lista, ele passaria — o fecho é a causa" "" \
+    's#(\$1 == "ato" || \$1 == "delega" || \$1 == "fecho")#($1 == "ato" || $1 == "delega")#'
+  FRG_FILES=".githooks/pre-commit" _frx "(rf28) PR que toca .githooks/ ⇒ a sessão não mergeia" "${_pi}" ""
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
   # item 1 (no script): o delegado roda o pr-merge-verified.sh de origin/main, byte a byte
   cp "${fc}/ops/pr-merge-verified.sh" "${d}/pmv-5p"; echo '# editado na árvore' >> "${fc}/ops/pr-merge-verified.sh"
@@ -47457,8 +47472,8 @@ run_act_signature_selftests() {
   command -v python3 >/dev/null 2>&1 || { record_skip "act-signature: python3 ausente"; return; }
   local o rc
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 13/13 verdes' <<< "${o}"; then
-    record_pass "act-signature: (a) --selftest verde (13: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante, e a delegação: forma certa cala, marcador fora do código, palavra fora da assinatura, delegação sem ato, push de porta)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 16/16 verdes' <<< "${o}"; then
+    record_pass "act-signature: (a) --selftest verde (16: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante, e a delegação: forma certa cala, marcador fora do código, palavra fora da assinatura, delegação sem ato, push de porta, e o fecho: script executado fora da lista, a linha que cala, a linha sem arquivo)"
   else record_fail "act-signature: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/act-signature-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
@@ -47501,6 +47516,8 @@ run_act_signature_selftests() {
     if extra or not verbs.strip():$(printf '\x1f')    if False:$(printf '\x1f')(xi) delegação que cobre palavra fora da assinatura acusa
     if s not in acts:$(printf '\x1f')    if False:$(printf '\x1f')(xii) delegação de script sem linha ato acusa
     if os.path.basename(s) == "publish-door.sh":$(printf '\x1f')    if False:$(printf '\x1f')(xiii) delegação do push de porta acusa
+        if r not in known and os.path.isfile(os.path.join(root, r)):$(printf '\x1f')        if False:$(printf '\x1f')(xiv) ato que executa um script fora
+    if not os.path.isfile(os.path.join(root, s)):$(printf '\x1f')    if False:$(printf '\x1f')(xvi) linha fecho de script inexistente
 EOF_MUT
   rm -rf "${sb}"
 }

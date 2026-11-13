@@ -72,7 +72,8 @@ raw_cmd=$(printf '%s' "$input" | onion_json_string_field command) || raw_cmd="$i
 signal=$(
   # cada alvo entra como escrito, com `~/` no lugar do HOME (o juiz expande o til) e pelo último componente
   # (`cd /var && rsync x www/onion-landing/` não traz o caminho inteiro); `onion` sozinho casaria tudo
-  { awk -F'\t' '!/^[[:space:]]*#/ && NF>=3 { p=$3; g=sub(/[*?\[].*$/, "", p); if (p != "") print $1 "\t" g "\t" p }' "$tsv" \
+  # (as linhas `fecho` não são alvo nem ato: listam o que os atos executam, para a guarda de PR do merge verificado)
+  { awk -F'\t' '!/^[[:space:]]*#/ && NF>=3 && $1 != "fecho" { p=$3; g=sub(/[*?\[].*$/, "", p); if (p != "") print $1 "\t" g "\t" p }' "$tsv" \
       | while IFS=$'\t' read -r c g p; do
           printf '%s\n' "$p"
           case "$p" in "$HOME"/*) printf '%s\n' "~/${p#"$HOME"/}" ;; esac

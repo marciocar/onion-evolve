@@ -51,7 +51,7 @@ try:
     lines = open(tsv, encoding="utf-8").read().split("\n")
 except OSError as e:
     sys.stderr.write("act-signature-check: tsv ilegível: %s\n" % e); sys.exit(2)
-wrappers, acts, delegs = {}, {}, []
+wrappers, acts, delegs, fecho = {}, {}, [], {}
 for n, ln in enumerate(lines, 1):
     if not ln.strip() or ln.lstrip().startswith("#"):
         continue
@@ -65,6 +65,8 @@ for n, ln in enumerate(lines, 1):
             acts[os.path.normpath(pat)] = (n, col4)
         elif cls == "delega":
             delegs.append((n, os.path.normpath(pat), col4, f[4].strip() if len(f) > 4 else ""))
+        elif cls == "fecho":
+            fecho[os.path.normpath(pat)] = n
         continue
     if cls in ("deploy", "relogio") and col4 not in ("", "-"):
         wrappers.setdefault(os.path.normpath(col4), n)
@@ -114,6 +116,29 @@ for n, s, marker, verbs in delegs:
         continue
     if not marker or not re.search(r"(?<![\w-])" + re.escape(marker) + r"(?![\w-])", code):
         say("marcador-fora-do-codigo", n, "o marcador `%s` da delegação de %s não aparece no código dele: o script não conferiria as condições do selo" % (marker, s))
+# O FECHO (7ª passada do refutador do #1647): o que os atos EXECUTAM também é guarda. Para cada script de ato, delega e
+# fecho, as referências de EXECUÇÃO a um script deste repo (`bash x.sh`, `source`, `.`, `python3 x.py`, `"${WT}/ops/x.sh"`
+# em posição de comando, `$(…x.sh…)`) têm de estar numa linha ato/delega/fecho. Os dois executores do gate (lint-artifacts
+# e lint-selftest) são FRONTEIRA: estão no fecho, mas o que eles rodam (o resto de .claude/validation) não se desce — o
+# fecho inteiro dá ~130 arquivos e tornaria quase todo PR do core um merge do maestro (declarado no resíduo).
+FRONTEIRA = {".claude/validation/lint-artifacts.sh", ".claude/validation/lint-selftest.sh"}
+EXEC = re.compile(r"""(?:^|[;&|(`{]|\$\(|\b(?:bash|sh|source|exec|python3?|timeout\s+\S+)\s+(?:-[\w-]+\s+)*)\s*["']?(?:\$\{?[A-Za-z_]\w*\}?/+|\./|"\$\{?[A-Za-z_]\w*\}?"/+)?((?:ops|\.claude)/[\w./-]+\.(?:sh|py))""", re.M)
+known = set(acts) | set(fecho) | set(d[1] for d in delegs)
+for s, n in sorted(fecho.items(), key=lambda x: x[1]):
+    if not os.path.isfile(os.path.join(root, s)):
+        say("fecho-sem-script", n, "a linha fecho aponta %s, que não existe" % s)
+for s in sorted(known - FRONTEIRA):
+    p = os.path.join(root, s)
+    try:
+        code = "\n".join(l for l in open(p, encoding="utf-8", errors="replace").read().split("\n") if not l.lstrip().startswith("#"))
+    except OSError:
+        continue
+    for m in EXEC.finditer(code):
+        r = os.path.normpath(m.group(1))
+        if r not in known and os.path.isfile(os.path.join(root, r)):
+            say("fecho-incompleto", fecho.get(s, acts.get(s, (0,))[0] if s in acts else 0),
+                "%s executa %s, que não está numa linha ato/delega/fecho do tsv: um PR que o mude não seria guarda" % (s, r))
+            known.add(r)                         # uma vez por alvo
 print("\n".join(out))
 PY
 }
@@ -160,6 +185,15 @@ _selftest() {
   printf 'ato\tscript\tops/publish-door.sh\t--push\ndelega\tscript\tops/publish-door.sh\t--x\t--push\n' | _mk porta  # (core-only)
   printf '#!/usr/bin/env bash\n[ "$1" = --push ] && echo push\n' > "${d}/porta/ops/publish-door.sh"  # (core-only)
   _ck "(xiii) delegação do push de porta acusa (fica com o maestro)" "${d}/porta" "delega-porta"
+  # o FECHO (7ª passada): o ato que executa outro script do repo pede a linha fecho dele; a linha fecho sem arquivo acusa
+  printf 'deploy\tunit\tx\tops/w.sh\nato\tscript\tops/w.sh\t--apply\n' | _mk fx
+  printf '#!/usr/bin/env bash\ncase "$1" in install) [ "${2:-}" = --apply ] && bash "${WT}/ops/filho.sh" ;; esac\n' > "${d}/fx/ops/w.sh"
+  printf '#!/usr/bin/env bash\necho filho\n' > "${d}/fx/ops/filho.sh"
+  _ck "(xiv) ato que executa um script fora de ato/delega/fecho acusa" "${d}/fx" "fecho-incompleto"
+  printf 'fecho\tscript\tops/filho.sh\t-\n' >> "${d}/fx/ops/moat-targets.tsv"  # (core-only)
+  _ck "(xv) com a linha fecho do filho, cala" "${d}/fx" ""
+  printf 'fecho\tscript\tops/sumido.sh\t-\n' >> "${d}/fx/ops/moat-targets.tsv"  # (core-only)
+  _ck "(xvi) linha fecho de script inexistente acusa" "${d}/fx" "fecho-sem-script"
   mkdir -p "${d}/adotante"
   _ck "(viii) sem ops/moat-targets.tsv (adotante) cala" "${d}/adotante" ""  # (core-only)
   echo "selftest: ${pass}/$((pass + fail)) verdes"
