@@ -2,8 +2,8 @@
 branch: fix/decide-triage-deterministic-nonce
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 5bb031630497e77cfb02db8f62b9056bfc7a5af7994adbc9c954b615c8d3a704
-reviewed_code_sha256: ed39669e5c6b82d64cf8bbd6c769d228816b6fcfe9af94cb65918301e2a154d2
+reviewed_diff_sha256: d3357866b74c94555176a1df0d74be0891e213d7c84ce8761be07635084bd6ed
+reviewed_code_sha256: 7138dd743314ea5e887f5bc0f8f6f48c4202bd6c091ab296279d866873487a42
 findings_total: 3
 findings_real: 3
 findings_blocking: 1
@@ -12,7 +12,7 @@ duration_min: 0
 findings_fixed: 2
 verdict: FIXED
 elenxo: true
-reviewer: passada própria do autor (sondas no scanner novo e mutante no workflow real)
+reviewer: passada própria do autor (sondas no scanner novo e mutante no workflow real), refeita sobre o código final por um segundo agente
 nota: "tokens e duração não medidos. Sem refutador externo: o brief proibia spawnar agentes. O achado 3 fica como limite declarado."
 ---
 
@@ -56,6 +56,21 @@ foi restaurado da cópia e conferido com `cmp`, idêntico. Na cópia limpa, 10 d
    O corpus não tem essa forma. Sondas que passaram: divisão depois de `)` e de número, regex com
    barra em classe (`/[/]…/`), regex com aspa, template aninhado dentro de `${}`, `globalThis.Date.now()`
    e `obj.Date(` (que não é acusado).
+
+## Re-revisão sobre o código final (2026-11-13)
+
+O primeiro carimbo foi feito antes de duas mudanças no código: o `| head -3` da mensagem do check
+virou `sed -n '1,3p'` (uma guarda da casa acusou o `head`, que fecha o pipe cedo e é a classe EPIPE
+sob `pipefail`; o pré-voo roda a família `shell_pipefail_robustness`), e a mensagem do caso (a)
+passou a citar a saída do check. Um segundo agente leu o diff inteiro de novo e refez a prova:
+
+- família `workflow_syntax` isolada (`--families=workflow_syntax`): 10 de 10 passam;
+- mutante (linha antiga do nonce reposta): o check sai rc 1 com `linha 71: Date.now( 71:
+  Math.random(`, e a família reprova o caso (a) com essa mesma linha; restaurado da cópia e
+  conferido com `cmp`, idêntico;
+- pre-commit do commit: bancada completa, 2014 passaram, 0 falharam.
+
+Nenhum achado novo.
 
 ## Limites declarados
 
