@@ -11,7 +11,9 @@ meta:
                                # draft-ietf-wimse-aims (ciclo de ~6 meses), a doc de plataforma (Microsoft, Slack) e a
                                # versão anual da OWASP. RFC 8693, Hardy e NIST valeriam 12 meses, mas não movem a revisita;
                                # 30d (ferramenta) giraria sem mudança nas fontes que decidem.
-  # ═══ TETO: 68 NÓS ═══
+  # ═══ TETO: 73 NÓS ═══
+  #   +5 (2026-11-13, no PR): T_OWASP_LLM06, T_OWASP_ASI03, T_OWASP_ASI08, T_OWASP_AGENTIC_THREAT_T8 e T9,
+  #   um termo x_term por código OWASP que o lint de nomes do pr-finalize reprovou sem termo.
   # Justificativa do teto: rodada de primárias executada em 2026-11-13, grafo novo. 68 nós: 35 evidências ancoradas
   # (1 por claim), 15 objeções sobreviventes do Elenxo (1 por alvo), 13 superações achadas (9 das rejeitadas na
   # ancoragem e 4 do Elenxo), 1 contabilidade (E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113), 1 pergunta raiz, 2 claims-hipótese da
@@ -1149,6 +1151,116 @@ nodes:
     label: "O menor-entre existe como PADRÃO DE MERCADO, não norma: na Microsoft, cliente e usuário são autorizados separadamente e o app não acessa nada que o usuário logado não acessaria."
     narrative: "Medida: WebFetch de https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview em 2026-11-13, verbatim no markdown (updated_at 2026-06-25). Entrega o lado mercado; o lado normativo continua sem fonte. Critério: E2_PROVA_MENOS. Alvo reprovado: GLOBAL 'privilégio efetivo = menor entre agente e solicitante' como padrão normativo (E_OBJECAO_LESSER_OF_NOT_NORMATIVE). Afirmação de UM juiz."
     trace: "na lista de claims ancoradas do prompt: nenhuma QUOTE com 'intersection'/'lesser'/'never exceed'/'couldn't access'; a claim OWASP-agentic rejeitada registra grep = 0"
+  - id: T_OWASP_LLM06
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "a fonte já ancorada nesta rodada, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "página LLM06:2025 Excessive Agency"
+      method: "reading: o nome do item na fonte ancorada pela rodada de 2026-11-13"
+      locality: "web"
+    trace: "lint de nomes do pr-finalize de 2026-11-13 sobre este grafo (vocab.code-unresolved LLM06)"
+    label: "LLM06 neste grafo é o item LLM06:2025 (Excessive Agency) do OWASP Top 10 for LLM Applications 2025."
+    x_term:
+      pref: "OWASP LLM06:2025 Excessive Agency"
+      notation: "LLM06"
+      scheme: owasp-llm-top10-2025
+      lang: pt-BR
+      definition: "Item LLM06:2025 do OWASP Top 10 for LLM Applications 2025, Excessive Agency: o agente com permissões, funcionalidade ou autonomia além do necessário."
+  - id: T_OWASP_ASI03
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "a fonte já ancorada nesta rodada, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "seção ASI03 do OWASP Top 10 for Agentic Applications 2026"
+      method: "reading: o nome do item na fonte ancorada pela rodada de 2026-11-13"
+      locality: "web"
+    trace: "lint de nomes do pr-finalize de 2026-11-13 sobre este grafo (vocab.code-unresolved ASI03)"
+    label: "ASI03 neste grafo é o item ASI03 do OWASP Top 10 for Agentic Applications 2026, de onde vêm os nós E_ASI03_* (compartilhamento de identidade, lacuna de atribuição, token amarrado à intenção)."
+    x_term:
+      pref: "OWASP ASI03 (Agentic Top 10 2026)"
+      notation: "ASI03"
+      scheme: owasp-agentic-top10-2026
+      lang: pt-BR
+      definition: "Item ASI03 do OWASP Top 10 for Agentic Applications 2026, o item de identidade e privilégio do agente, citado aqui pelos cenários de ataque e pela prevenção."
+  - id: T_OWASP_ASI08
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "a fonte já ancorada nesta rodada, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "seção ASI08, Prevention item 10 (Logging and non-repudiation)"
+      method: "reading: o nome do item na fonte ancorada pela rodada de 2026-11-13"
+      locality: "web"
+    trace: "lint de nomes do pr-finalize de 2026-11-13 sobre este grafo (vocab.code-unresolved ASI08)"
+    label: "ASI08 neste grafo é o item ASI08 do OWASP Top 10 for Agentic Applications 2026, cuja prevenção item 10 pede logs à prova de adulteração com linhagem de cada ato."
+    x_term:
+      pref: "OWASP ASI08 (Agentic Top 10 2026)"
+      notation: "ASI08"
+      scheme: owasp-agentic-top10-2026
+      lang: pt-BR
+      definition: "Item ASI08 do OWASP Top 10 for Agentic Applications 2026; este grafo usa a prevenção item 10 (Logging and non-repudiation)."
+  - id: T_OWASP_AGENTIC_THREAT_T8
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "a fonte já ancorada nesta rodada, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo"
+    provenance:
+      source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+      locator: "tabela de ameaças, T8 (Repudiation & Untraceability), p.18 impressa"
+      method: "reading: o nome do item na fonte ancorada pela rodada de 2026-11-13"
+      locality: "web"
+    trace: "lint de nomes do pr-finalize de 2026-11-13 sobre este grafo (vocab.code-unresolved T8)"
+    label: "T8 neste grafo é a ameaça T8 (Repudiation & Untraceability) do catálogo OWASP Agentic AI Threats and Mitigations v1.0."
+    x_term:
+      pref: "ameaça T8 do catálogo OWASP de ameaças agênticas"
+      notation: "T8"
+      scheme: owasp-agentic-threats-v1
+      lang: pt-BR
+      definition: "Ameaça T8 do OWASP Agentic AI Threats and Mitigations v1.0: repúdio e falta de rastro das ações do agente."
+  - id: T_OWASP_AGENTIC_THREAT_T9
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "a fonte já ancorada nesta rodada, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo"
+    provenance:
+      source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+      locator: "tabela de ameaças, T9, p.18 impressa (citada no locator de E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS)"
+      method: "reading: o nome do item na fonte ancorada pela rodada de 2026-11-13"
+      locality: "web"
+    trace: "lint de nomes do pr-finalize de 2026-11-13 sobre este grafo (vocab.code-unresolved T9)"
+    label: "T9 neste grafo é a ameaça T9 do catálogo OWASP Agentic AI Threats and Mitigations v1.0, citada no locator de E_ASI08_TAMPER_EVIDENT_LINEAGE_LOGS."
+    x_term:
+      pref: "ameaça T9 do catálogo OWASP de ameaças agênticas"
+      notation: "T9"
+      scheme: owasp-agentic-threats-v1
+      lang: pt-BR
+      definition: "Ameaça T9 do OWASP Agentic AI Threats and Mitigations v1.0, para a qual o catálogo pede permissões granulares, auditoria de operações elevadas e validação de identidade."
 edges:
   - from: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
@@ -1472,5 +1584,20 @@ edges:
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
     edge_type: TRACES_TO
   - from: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: T_OWASP_LLM06
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: T_OWASP_ASI03
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: T_OWASP_ASI08
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: T_OWASP_AGENTIC_THREAT_T8
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: T_OWASP_AGENTIC_THREAT_T9
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
     edge_type: TRACES_TO

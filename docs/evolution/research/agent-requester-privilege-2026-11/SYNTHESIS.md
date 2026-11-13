@@ -14,7 +14,8 @@ mode: primaries
 # Agente multiusuário com o privilégio de quem pediu
 
 > **SSOT:** [`agent-requester-privilege-2026-11.kg.yaml`](./agent-requester-privilege-2026-11.kg.yaml)
-> (radar `--integrity --schema` exit 0, `kg-contract-check` rc 0; 68 nós, 108 arestas). Esta página é
+> (radar `--integrity --schema` exit 0, `kg-contract-check` rc 0; 73 nós e 113 arestas: os 68 nós da rodada
+> e 5 termos `x_term` para os códigos OWASP LLM06, ASI03, ASI08, T8 e T9, que o lint de nomes reprovou sem termo). Esta página é
 > projeção: o que ela afirma tem nó, e o nó vence a página. Nada foi selado; a recomendação do Elenxo (a passada que refuta antes de selar) está em
 > `C_ELENXO_RECOMMENDATION_1113`.
 
@@ -101,7 +102,7 @@ Na ordem do valor, em modo `primaries` com as fontes nomeadas:
 
 ## Valeu a pena
 
-São 1.537.345 tokens, 20 agentes e cerca de 15 minutos para 68 nós: cerca de **22,6 mil tokens por nó**,
+São 1.537.345 tokens, 20 agentes e cerca de 15 minutos para os 68 nós da rodada: cerca de **22,6 mil tokens por nó**,
 na faixa barata das rodadas de primárias. O ganho foi separar com âncora o que é norma (RFC 8693, NIST, OWASP)
 do que é mercado (menor-entre) e do que é escolha Onion (aprovação por papel, kit), e achar o sucessor IETF
 vivo que a pergunta não nomeava. O que falta é texto normativo pago e a doc da plataforma, não varredura.

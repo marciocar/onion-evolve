@@ -2,8 +2,7 @@
 branch: docs/agent-requester-privilege-research
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 868506478385c927c9ef5684e4d619765d7f867d8860cc517468653a6c7dae6b
-reviewed_code_sha256: bba27a26563454c9dff6fa1054c7efa33916d73c9da41253cddfa52bb7ffe297
+reviewed_diff_sha256: pendente
 findings_total: 38
 findings_real: 15
 findings_blocking: 5
@@ -25,6 +24,11 @@ Entra o grafo da rodada de primárias `agent-requester-privilege-2026-11` (68 n�
 `docs/backlog.md` regenerado com os nós abertos. Única edição no grafo depois do run: o `trace:` de
 `C_ELENXO_RECOMMENDATION_1113` ganha o caminho da SYNTHESIS no MESMO valor (todos os 68 nós já tinham
 `trace:`; acrescentar uma segunda chave a repetiria).
+
+O pr-finalize reprovou a 1ª rodada no contrato do commit: o lint de nomes (`ops/kg-vocab-ci.sh`) achou 29
+códigos novos sem termo (LLM06, ASI03, ASI08, T8, T9) na prosa que o workflow escreveu. A cura são 5 nós
+`T_OWASP_*` com `x_term` e aresta TRACES_TO à pergunta (teto 68 → 73); o `write(KG)` do workflow confere radar
+e contrato, mas não o lint de nomes, então a rodada saiu verde e o commit não.
 
 ## Achados
 
