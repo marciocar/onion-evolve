@@ -1024,15 +1024,15 @@ fi
 _REVIEW_OFF=""; _REVIEW_PRIOR_REPROVOU=""
 # _RV_STATE: none (nenhum veredito lido neste head) · success (o mais recente é verde) · other (não é verde: o caminho
 # de sempre decide). _REVIEW_POS: a anotação da marca POSITIVA (o revisor rodou e aprovou), emitida pelo juiz da base.
-_RV_STATE="none"; _REVIEW_POS=""
+_RV_STATE="none"; _REVIEW_POS=""; _POS_PROV=""
 _rm_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/review/review-mode-decide.sh"
 if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
   _rm_marker="$(bash "${_rm_script}" --print-marker)"
   _rv_runs="$(gh api "repos/${OWNER_REPO}/commits/${GATE_SHA}/check-runs?check_name=onion-review-verdict&filter=all&per_page=100" \
-    --jq '[.check_runs[]] | sort_by(.id) | reverse | .[] | "\(.id)\t\(.conclusion // "-")"' 2>/dev/null)" \
+    --jq '[.check_runs[]] | sort_by(.id) | reverse | .[] | "\(.id)\t\(.conclusion // "-")\t\(.app.slug // "-")\t\(.details_url // "-")"' 2>/dev/null)" \
     || die "não consegui LER o histórico do onion-review-verdict no head ${HEAD_SHA:0:8} — sem ele não sei se a revisão foi desligada ou se um achado anterior foi apagado. Tente de novo."
   _rv_first=1
-  while IFS=$'\t' read -r _rv_id _rv_concl; do
+  while IFS=$'\t' read -r _rv_id _rv_concl _rv_app _rv_url; do
     [ -n "${_rv_id}" ] || continue
     if [ "${_rv_first}" -eq 1 ]; then
       _rv_first=0
@@ -1044,6 +1044,21 @@ if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
       # marca vazia (juiz antigo, sem --print-reviewed-marker) nunca vira grep -F "" (que casaria tudo)
       _rm_pos="$(bash "${_rm_script}" --print-reviewed-marker 2>/dev/null)" || _rm_pos=""
       case "${_rm_pos}" in onion-review-*:) _REVIEW_POS="$(LC_ALL=C grep -m1 -F -- "${_rm_pos}" <<< "${_rv_ann}" || true)" ;; esac
+      # PROVENIÊNCIA da marca positiva (4ª passada do refutador do #1652, Z1b): a anotação só vale vinda de uma check-run
+      # do app github-actions cuja run é do .github/workflows/onion-review.yml. Check-run de MESMO NOME criada por outro
+      # workflow, ou por outro app (um token com checks:write), escreve a anotação que quiser. Uma leitura só, da run
+      # desta check-run (o run id sai do details_url), sem laço.
+      if [ -n "${_REVIEW_POS}" ]; then
+        _rv_rid="$(sed -nE 's#.*/actions/runs/([0-9]+)(/.*)?$#\1#p' <<< "${_rv_url:-}")"
+        if [ "${_rv_app:-}" != "github-actions" ]; then _POS_PROV="a check-run é do app '${_rv_app:--}', não do github-actions"
+        elif [ -z "${_rv_rid}" ]; then _POS_PROV="a check-run não aponta uma run de Actions (details_url '${_rv_url:--}')"
+        else
+          _rv_wf="$(gh api "repos/${OWNER_REPO}/actions/runs/${_rv_rid}" --jq '.path' 2>/dev/null)" || _rv_wf=""
+          [ "${_rv_wf%%@*}" = ".github/workflows/onion-review.yml" ] \
+            || _POS_PROV="a run ${_rv_rid} é do workflow '${_rv_wf:-ilegível}', não do .github/workflows/onion-review.yml"
+        fi
+        if [ -n "${_POS_PROV}" ]; then say "⚠️  marca positiva DESCARTADA: ${_POS_PROV}"; _REVIEW_POS=""; fi
+      fi
       [ -n "${_REVIEW_OFF}" ] || break               # verde que não é desligamento: aprovação de verdade
       continue
     fi
@@ -1082,7 +1097,7 @@ _FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
 # carregam .claude/utils/ — código assim reescreve o claude-execution-output.json no RUNNER_TEMP (fora da árvore, a
 # guarda dirty-tree não vê) e forja 0 achados. Por isso .claude/validation/ e .claude/utils/ INTEIROS anulam a marca, e
 # também .claude/rules/, .claude/commands/ e .claude/output-styles/ (o que o CLI carrega como instrução).
-_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$|\.claude/hooks/|\.claude/settings[^/]*\.json$|CLAUDE\.md$|\.claude/CLAUDE\.md$|\.claude/agents/|\.claude/skills/|\.mcp\.json$|\.claude/validation/|\.claude/utils/|\.claude/rules/|\.claude/commands/|\.claude/output-styles/)'
+_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$|\.claude/hooks/|\.claude/settings[^/]*\.json$|(.*/)?CLAUDE(\.local)?\.md$|\.claude/agents/|\.claude/skills/|\.mcp\.json$|\.claude/validation/|\.claude/utils/|\.claude/rules/|\.claude/commands/|\.claude/output-styles/)'
 _fallback_guard_gate() {
   # veredito VERMELHO (ou achado anterior apagado por desligamento): sem dispensa, o caminho de sempre recusa adiante.
   # COM a dispensa nomeada, num PR de guarda ela também exige o resíduo independente (3ª passada do refutador, N3):
@@ -1123,6 +1138,7 @@ _fallback_guard_gate() {
   elif [ -n "${_REVIEW_OFF}" ]; then _reason="o revisor do CI não julgou (${_REVIEW_OFF#*: })"
   elif [ -n "${_mach}" ]; then _reason="o PR muda a maquinaria do revisor (${_mach}), e a marca do CI não vale para quem a reescreve"
   elif [ "${_RV_STATE}" = "none" ]; then _reason="não li veredito do revisor neste head"
+  elif [ -n "${_POS_PROV}" ]; then _reason="a marca positiva não vale: ${_POS_PROV}"
   else _reason="o veredito verde não traz a marca positiva do juiz da base para o head ${GATE_SHA:0:8}"; fi
   local _paths _why _rel _body _fm _dup _v _h _e _ei
   _paths="$(head -5 <<< "${_gout}" | paste -sd' ' -)"

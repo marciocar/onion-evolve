@@ -1,17 +1,16 @@
 ---
 branch: feat/review-auto-with-fallback
 date: 2026-11-13
-reviewed_diff_sha256: 4ad1440ee95a2a94178b3ce4a29629a79f8ab02b98ecbcf6f0d623900d86dcd6
-reviewed_code_sha256: fef9b486a9ddfb6cf1047d35ab7c45f1c6400e15ab44038a1c2cfaa0a21d61d1
-findings_total: 15
-findings_real: 14
-findings_fixed: 14
+reviewed_diff_sha256: pendente
+findings_total: 17
+findings_real: 16
+findings_fixed: 16
 tokens: 0
 duration_min: 20
 verdict: FIXED
 elenxo: true
 elenxo_isolado: false
-reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui; 4ª passada (head 0497986e4): REPROVOU com 2 bloqueios (X1, X2), curados aqui"
+reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui; 4ª passada (head 0497986e4): REPROVOU com 2 bloqueios (X1, X2), curados aqui; 5ª passada (head b0cffda0e): REPROVOU com 1 bloqueio (Z1, a e b) e o CLAUDE.md em subdiretório, curados aqui"
 nota: "tokens = 0: não medido. elenxo_isolado: false porque as curas da 2ª passada não foram re-refutadas pelo refutador independente; pelo próprio mecanismo deste PR, a sessão não o mergearia em fallback. O merge é do maestro (D_DELEGATION_TRUST_MODEL_1113)."
 ---
 
@@ -140,3 +139,17 @@ Declarados no cartão:
   marca não é fronteira de segurança;
 - o bootstrap dependente do literal `--achados <n>`;
 - o fecho de 2º nível, que vem pelo #1647.
+
+## 5ª passada: re-refutação do head b0cffda0e (REPROVOU, Z1, curado)
+
+16. **Z1a, REAL, CURADO. O parser F/P falhava aberto com TAB no nome.** A linha
+    `F<TAB>.github/workflows/x<TAB>.yml` contava 1 arquivo e imprimia a linha crua, que não casava a guarda.
+    Agora a API e o JSON passam por um jq que marca com `X` todo nome com caractere de controle, e qualquer
+    linha fora da forma `F|P<TAB>nome` dá rc 2. O diff do git é lido com `-z`, e o nome com controle também dá
+    rc 2. Casos (gp-ctl-pr), (gp-ctl-json) e (gp-ctl-range), cada um com mutante que falha aberto.
+17. **Z1b, REAL, CURADO. A marca positiva valia de qualquer check-run com o mesmo nome.** Agora ela só vale de
+    uma check-run do app `github-actions` cuja run (o id sai do `details_url`, numa leitura só) seja do
+    `.github/workflows/onion-review.yml`. Isso também fecha o limite do token de app com `checks:write`. Casos
+    (rv-u), outro app, e (rv-v), outro workflow.
+- **CLAUDE.md em subdiretório:** a regex da maquinaria cobre `CLAUDE.md` e `CLAUDE.local.md` em qualquer
+  diretório. Caso (rv-w).

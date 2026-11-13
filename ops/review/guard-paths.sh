@@ -54,10 +54,12 @@ set -uo pipefail
 
 _HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGETS=()
-# o jq das duas leituras da API (a de verdade e a da bancada): o nome e, no rename, o nome antigo
-_FILES_JQ='.[] | .filename, (.previous_filename // empty)'
-# o mesmo, ETIQUETADO, para contar os arquivos contra o changed_files (o nome antigo não é arquivo a mais)
-_FILES_JQ_TAGGED='.[] | ("F\t" + .filename), (.previous_filename // empty | "P\t" + .)'
+# o jq das duas leituras da API (a de verdade e a da bancada): F<TAB>nome por arquivo e P<TAB>nome antigo no rename,
+# para contar os arquivos contra o changed_files (o nome antigo não é arquivo a mais)
+# (4ª passada do refutador do #1652, Z1) nome com CARACTERE DE CONTROLE (TAB, CR, LF, \x00-\x1f, \x7f) não passa pelo
+# parser de linha: o TAB no nome deslocava a etiqueta e o caminho saía cru, sem casar a guarda (falha ABERTA). O jq marca
+# o arquivo com `X`, e a linha X derruba a leitura inteira em rc 2.
+_FILES_JQ_TAGGED='.[] | if ([.filename, (.previous_filename // "")] | map(explode | any(. < 32 or . == 127)) | any) then "X\tcontrole" else ("F\t" + .filename), (.previous_filename // empty | "P\t" + .) end'
 MAX_API_FILES=3000
 FIXED_PATTERNS=(
   '.claude/hooks/'
@@ -167,21 +169,35 @@ case "${MODE}" in
       || _die2 "o PR #${ARG} muda ${_CHANGED} arquivos, acima do teto de ${MAX_API_FILES} que a API lista — não meço PR truncado"
     _RAW="$(gh api "repos/${REPO}/pulls/${ARG}/files?per_page=100" --paginate --jq "${_FILES_JQ_TAGGED}" 2>/dev/null)" \
       || _die2 "não li os arquivos do PR #${ARG} em ${REPO} — sem eles não sei se toca guarda"
-    # linha `F<TAB>nome` = um arquivo; `P<TAB>nome` = o nome antigo de um rename; linha sem etiqueta conta como arquivo
+    # linha `F<TAB>nome` = um arquivo; `P<TAB>nome` = o nome antigo de um rename; linha sem etiqueta conta como arquivo.
+    # Linha X (nome com controle) ou com TAB fora da forma `F|P<TAB>nome` = rc 2: o parser nunca adivinha.
+    printf '%s\n' "${_RAW}" | LC_ALL=C awk -F'\t' 'NF > 1 && !(NF == 2 && ($1 == "F" || $1 == "P")) {bad=1} END {exit bad ? 0 : 1}' \
+      && _die2 "o PR #${ARG} tem nome de arquivo com caractere de controle (TAB, quebra de linha…) — não meço nome que o parser de linha não lê inteiro"
     _READ="$(printf '%s\n' "${_RAW}" | awk -F'\t' 'NF && !($1 == "P" && NF == 2) {n++} END {print n+0}')"
     [ "${_READ}" -eq "${_CHANGED}" ] \
       || _die2 "li ${_READ} arquivo(s) do PR #${ARG}, e o PR declara changed_files=${_CHANGED} — lista truncada ou divergente; não meço pela metade"
     FILES="$(printf '%s\n' "${_RAW}" | awk -F'\t' 'NF == 2 && ($1 == "F" || $1 == "P") {print $2; next} NF {print}')" ;;
   --pr-json)
     command -v jq >/dev/null 2>&1 || _die2 "jq ausente"
-    FILES="$(jq -r "${_FILES_JQ}" "${ARG}" 2>/dev/null)" || _die2 "JSON ilegível em ${ARG}" ;;
+    _RAW="$(jq -r "${_FILES_JQ_TAGGED}" "${ARG}" 2>/dev/null)" || _die2 "JSON ilegível em ${ARG}"
+    printf '%s\n' "${_RAW}" | LC_ALL=C awk -F'\t' 'NF > 1 && !(NF == 2 && ($1 == "F" || $1 == "P")) {bad=1} END {exit bad ? 0 : 1}' \
+      && _die2 "${ARG} tem nome de arquivo com caractere de controle — não meço nome que o parser de linha não lê inteiro"
+    FILES="$(printf '%s\n' "${_RAW}" | awk -F'\t' 'NF == 2 {print $2}')" ;;
   --files-from)
     if [ "${ARG}" = "-" ]; then FILES="$(cat)"; else
       [ -r "${ARG}" ] || _die2 "não li ${ARG}"; FILES="$(cat "${ARG}")"; fi ;;
   --range)
-    FILES="$(git -C "${GIT_DIR_ARG}" -c core.quotepath=off diff --name-status --no-renames "${ARG}" -- 2>/dev/null)" \
+    # -z (Z1): o nome vem cru, separado por NUL. Sem -z, o git ENTRE ASPAS o nome com TAB/LF ("…"), e o caminho entre
+    # aspas não casava a guarda. Nome com caractere de controle = rc 2. --no-renames: o rename vira remoção + adição.
+    git -C "${GIT_DIR_ARG}" diff -z --name-only --no-renames "${ARG}" -- >/dev/null 2>&1 \
       || _die2 "o diff ${ARG} não pôde ser lido em ${GIT_DIR_ARG}"
-    FILES="$(printf '%s\n' "${FILES}" | cut -f2-)" ;;
+    FILES=""
+    while IFS= read -r -d '' _n; do
+      [ -n "${_n}" ] || continue
+      case "${_n}" in *[[:cntrl:]]*)
+        _die2 "o diff ${ARG} tem nome de arquivo com caractere de controle — não meço nome que o parser de linha não lê inteiro" ;; esac
+      FILES="${FILES}${_n}"$'\n'
+    done < <(LC_ALL=C git -C "${GIT_DIR_ARG}" diff -z --name-only --no-renames "${ARG}" -- 2>/dev/null) ;;
 esac
 
 if [ "${ALL}" -eq 1 ]; then printf '%s\n' "${FILES}" | awk 'NF && !seen[$0]++'; exit 0; fi

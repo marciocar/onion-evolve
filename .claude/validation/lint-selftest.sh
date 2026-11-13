@@ -22079,9 +22079,9 @@ run_review_mode_selftests() {
     record_pass "review-mode: ${lbl} (e o mutante do helper reprova)"
   }
   _gpcase "(j) auto: hook RENOMEADO para docs/ ⇒ revisa (o nome antigo conta)" _p_run \
-    '--name-status --no-renames' '--name-only -M' --mode auto --labels-json '[]' --range main...b_ren --targets "${gpt}"
+    '--name-only --no-renames "${ARG}" -- 2>/dev/null)' '--name-only -M "${ARG}" -- 2>/dev/null)' --mode auto --labels-json '[]' --range main...b_ren --targets "${gpt}"
   _gpcase "(j2) auto: hook REMOVIDO ⇒ revisa (remoção conta)" _p_run \
-    '--name-status --no-renames' '--name-status --no-renames --diff-filter=AM' --mode auto --labels-json '[]' --range main...b_del --targets "${gpt}"
+    '--name-only --no-renames "${ARG}" -- 2>/dev/null)' '--name-only --no-renames --diff-filter=AM "${ARG}" -- 2>/dev/null)' --mode auto --labels-json '[]' --range main...b_del --targets "${gpt}"
   # a derivação do tsv, contra um tsv de bancada (uma linha de cada classe, e só ela cobre o arquivo do caso)
   printf '# bancada\nato\tscript\tops/a.sh\t--apply\ndeploy\tpath\t/x\tops/w.sh\ndelega\tscript\tops/dl.sh\t--f\t@none\nrelogio\tpath\t/etc/cron*\t-\n' > "${d}/t.tsv"
   local _gpw
@@ -22106,7 +22106,7 @@ run_review_mode_selftests() {
   _gprc=0; _gpo="$(LC_ALL=C bash "${gph}" --pr-json "${d}/pr.json" --targets "${gpt}" 2>&1)" || _gprc=$?
   if [ "${_gprc}" -ne 0 ] || [ "${_gpo}" != ".claude/hooks/h.sh" ]; then record_fail "review-mode: (gp-f) rename pela API" "rc=${_gprc} out=${_gpo}"
   else
-    A=', (.previous_filename // empty)' B='' awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${d}/gp-mut.sh"
+    A=', (.previous_filename // empty | "P\t" + .)' B='' awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${d}/gp-mut.sh"
     _gprc=0; LC_ALL=C bash "${d}/gp-mut.sh" --pr-json "${d}/pr.json" --targets "${gpt}" >/dev/null 2>&1 || _gprc=$?
     if cmp -s "${gph}" "${d}/gp-mut.sh"; then record_fail "review-mode: (gp-f) rename pela API — MUTANTE" "a âncora do previous_filename não casou"
     elif [ "${_gprc}" -eq 0 ]; then record_fail "review-mode: (gp-f) rename pela API — MUTANTE SOBREVIVEU" "sem previous_filename o rename ainda casou"
@@ -22167,6 +22167,32 @@ FGH
   # a lista de 3001 BATE com o changed_files: só o teto a recusa (o mutante sem o teto mede e sai rc 1)
   _gpapi "(gp-max) changed_files=3001 (acima do que a API lista) ⇒ rc 2, mesmo com a contagem batendo" 2 \
     '[ "${_CHANGED}" -le "${MAX_API_FILES}" ] \' 'true || [ "${_CHANGED}" -le "${MAX_API_FILES}" ] \' 3001 "$(seq 1 3001 | sed 's/^/F\\tdocs\//; s/$/.md\\n/' | tr -d '\n')"
+  # Z1 (5ª passada): nome com caractere de CONTROLE derruba a leitura em rc 2, nas três fontes (API, JSON, git)
+  _gpapi "(gp-ctl-pr) a API marca um nome com TAB (linha X) ⇒ rc 2, nunca 'não toca'" 2 \
+    "LC_ALL=C awk -F'\\t' 'NF > 1 && !(NF == 2" "LC_ALL=C awk -F'\\t' '0 && !(NF == 2" 1 'X\tcontrole\n'
+  printf '[{"filename":".github/workflows/x\\t.yml","status":"added"}]' > "${d}/pr-tab.json"
+  _gprc=0; LC_ALL=C bash "${gph}" --pr-json "${d}/pr-tab.json" --targets "${gpt}" >/dev/null 2>&1 || _gprc=$?
+  if [ "${_gprc}" -ne 2 ]; then record_fail "review-mode: (gp-ctl-json) nome com TAB no JSON da API" "rc=${_gprc}, esperado 2"
+  else
+    A='map(explode | any(. < 32 or . == 127))' B='map(explode | any(. < 0))' awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${d}/gp-ctl.sh"
+    A="LC_ALL=C awk -F'\\t' 'NF > 1 && !(NF == 2" B="LC_ALL=C awk -F'\\t' '0 && !(NF == 2" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${d}/gp-ctl.sh" > "${d}/gp-ctl2.sh"
+    _gprc=0; LC_ALL=C bash "${d}/gp-ctl2.sh" --pr-json "${d}/pr-tab.json" --targets "${gpt}" >/dev/null 2>&1 || _gprc=$?
+    if cmp -s "${d}/gp-ctl.sh" "${d}/gp-ctl2.sh" || cmp -s "${gph}" "${d}/gp-ctl.sh"; then record_fail "review-mode: (gp-ctl-json) — MUTANTE" "uma das âncoras não casou"
+    elif [ "${_gprc}" -eq 2 ]; then record_fail "review-mode: (gp-ctl-json) — MUTANTE SOBREVIVEU" "sem a marca X e sem a checagem da linha, ainda rc 2"
+    else record_pass "review-mode: (gp-ctl-json) nome com TAB no JSON da API ⇒ rc 2 (e o mutante sem as duas defesas falha aberto, rc ${_gprc})"; fi
+  fi
+  { git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_tab && mkdir -p "${r}/.github/workflows" \
+    && printf 'x\n' > "${r}/.github/workflows/x$(printf '\t').yml" && git -C "${r}" add -A && git -C "${r}" commit -qm tab \
+    && git -C "${r}" checkout -q main; } >/dev/null 2>&1 || record_fail "review-mode" "não montei a branch b_tab"
+  _gprc=0; _gpo="$(LC_ALL=C bash "${gph}" --range main...b_tab --git-dir "${r}" --targets "${gpt}" 2>&1)" || _gprc=$?
+  if [ "${_gprc}" -ne 2 ]; then record_fail "review-mode: (gp-ctl-range) nome com TAB no diff do git" "rc=${_gprc} out=${_gpo}"
+  else
+    A='case "${_n}" in *[[:cntrl:]]*)' B='case "${_n}" in *NADA*)' awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${d}/gp-ctl3.sh"
+    _gprc=0; LC_ALL=C bash "${d}/gp-ctl3.sh" --range main...b_tab --git-dir "${r}" --targets "${gpt}" >/dev/null 2>&1 || _gprc=$?
+    if cmp -s "${gph}" "${d}/gp-ctl3.sh"; then record_fail "review-mode: (gp-ctl-range) — MUTANTE" "a âncora não casou"
+    elif [ "${_gprc}" -eq 2 ]; then record_fail "review-mode: (gp-ctl-range) — MUTANTE SOBREVIVEU" "sem a checagem, ainda rc 2"
+    else record_pass "review-mode: (gp-ctl-range) nome com TAB no diff do git ⇒ rc 2 (e o mutante sem a checagem sai rc ${_gprc})"; fi
+  fi
   _gpapi "(gp-api-ren) rename pela API: o nome antigo não conta como arquivo a mais, e casa a guarda ⇒ rc 0" 0 \
     '!($1 == "P" && NF == 2) {n++}' '{n++}' 1 'F\tdocs/h.md\nP\t.claude/hooks/h.sh\n'
   unset -f _gpcase _p_gp_unk _p_gfalse _gpitem _gpapi
@@ -26102,6 +26128,8 @@ case "$args" in
   *"api "*"/compare/"*) echo "${GH_BEHIND_BY:-0}"; exit 0 ;;
   # o changed_files do PR (o helper da guarda confere a lista contra ele: a API trunca em 3000 sem erro). ANTES do
   # ramo de pulls*files, que também casaria ".changed_files". Padrão: a contagem de GH_PR_FILES.
+  # a run de Actions de uma check-run (a proveniência da marca positiva): o workflow dela
+  *"api "*"/actions/runs/"*) echo "${GH_RUN_PATH:-.github/workflows/onion-review.yml}"; exit 0 ;;
   *"api "*"--jq .changed_files"*)
       if [ -n "${GH_CHANGED_FILES:-}" ]; then echo "${GH_CHANGED_FILES}"; else set -- ${GH_PR_FILES:-}; echo "$#"; fi; exit 0 ;;
   # o resíduo da REGRA 56 lido no head (fallback do revisor × guarda, D_REVIEW_AUTO_WITH_FALLBACK_1113)
@@ -27024,14 +27052,14 @@ PFSTUB
     '230\tsuccess\n' 0 0
   _rvcase "(rv-k) PR de GUARDA com a marca POSITIVA do juiz da base no head ⇒ mergeia sem resíduo" _p_pos \
     'case "${_rm_pos}" in onion-review-*:)' 'case "${_rm_pos}" in nada-*:)' \
-    '220\tsuccess\n' 0 0
+    '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   _rvcase "(rv-m) marca positiva de OUTRO head ⇒ não vale, sem resíduo RECUSA" _p_nomark \
     'LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"' 'true' \
-    '240\tsuccess\n' 0 0
+    '240\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   export GH_PR_FILES=".github/workflows/x.yml"
   _rvcase "(rv-l) PR que edita o WORKFLOW com marca positiva (forjável, B1a) ⇒ a marca não vale, RECUSA sem resíduo" _p_mach \
     '_mach="$(LC_ALL=C grep -E "${_REVIEW_MACHINERY_RE}"' '_mach="$(LC_ALL=C grep -E "^nada$"' \
-    '220\tsuccess\n' 0 0
+    '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   export GH_PR_FILES=".github/workflows/x.yml ${_rres}" STUB_RESIDUE="${d}/res-dup.md"
   _rvcase "(rv-n) resíduo com CHAVE REPETIDA no frontmatter (o bash lê a 1ª, o YAML a última) ⇒ RECUSA" _p_dupk \
     '[ -z "${_dup}" ] || die "${_why}; ${_rel} repete' 'true || die "${_why}; ${_rel} repete' \
@@ -27047,10 +27075,10 @@ PFSTUB
     '300\tfailure\n' 1 0 --dispensa onion-review-verdict --motivo "o achado é falso-positivo"
   export GH_PR_FILES="ops/deploy-site.sh CLAUDE.md"
   _rvcase "(rv-p) PR de GUARDA que muda o CLAUDE.md (o revisor o carrega) com marca positiva ⇒ a marca não vale" _p_m_claude \
-    '|CLAUDE\.md$|' '|' '220\tsuccess\n' 0 0
+    '|(.*/)?CLAUDE(\.local)?\.md$|' '|' '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   export GH_PR_FILES=".claude/hooks/x.sh"
   _rvcase "(rv-q) PR que muda um HOOK (roda dentro do job do revisor) com marca positiva ⇒ a marca não vale" _p_m_hook \
-    '|\.claude/hooks/|' '|' '220\tsuccess\n' 0 0
+    '|\.claude/hooks/|' '|' '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   # ── (rv-r..t) 4ª passada: X1 (o que os hooks EXECUTAM anula a marca) e X2 (lista de arquivos truncada) ──
   _p_m_val() { _p_mach2 ".claude/validation/memory-write-scan-check.sh"; }
   _p_m_utl() { _p_mach2 ".claude/utils/task-manager/env-check.sh"; }
@@ -27058,14 +27086,34 @@ PFSTUB
                && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
   export GH_PR_FILES=".claude/validation/memory-write-scan-check.sh" STUB_RESIDUE="${d}/nao-existe.md"
   _rvcase "(rv-r) PR que só muda memory-write-scan-check.sh (o SessionStart o roda) com marca positiva ⇒ perde a marca" _p_m_val \
-    '|\.claude/validation/|' '|' '220\tsuccess\n' 0 0
+    '|\.claude/validation/|' '|' '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   export GH_PR_FILES="ops/deploy-site.sh .claude/utils/task-manager/env-check.sh"
   _rvcase "(rv-s) PR de GUARDA que muda env-check.sh (um hook o carrega) com marca positiva ⇒ perde a marca" _p_m_utl \
-    '|\.claude/utils/|' '|' '220\tsuccess\n' 0 0
+    '|\.claude/utils/|' '|' '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
   export GH_PR_FILES="ops/deploy-site.sh" GH_CHANGED_FILES=9
   _rvcase "(rv-t) a API devolve MENOS arquivos que o changed_files (truncada) ⇒ falha fechado, nada mergeado" _p_trunc \
     '    *) die "não medi se o PR #${PR} toca guarda' '    *) return 0; die "não medi se o PR #${PR} toca guarda' \
-    '220\tsuccess\n' 0 0
+    '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
+  # ── (rv-u..w) 5ª passada: Z1b (a marca só vale do github-actions no onion-review.yml) e o CLAUDE.md em subdiretório ──
+  _p_prov() { [ "${_mv_rc}" -ne 0 ] && grep -qF "marca positiva DESCARTADA: $1" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_prov_app() { _p_prov "a check-run é do app 'outro-app'"; }
+  _p_prov_wf() { _p_prov "a run 55 é do workflow '.github/workflows/outro.yml'"; }
+  _p_m_sub() { _p_mach2 "docs/sub/CLAUDE.local.md"; }
+  unset GH_CHANGED_FILES
+  export GH_PR_FILES="ops/deploy-site.sh" STUB_RESIDUE="${d}/nao-existe.md"
+  _rvcase "(rv-u) marca positiva numa check-run de OUTRO app (token com checks:write) ⇒ descartada, RECUSA sem resíduo" _p_prov_app \
+    'if [ "${_rv_app:-}" != "github-actions" ]; then _POS_PROV=' 'if false; then _POS_PROV=' \
+    '220\tsuccess\toutro-app\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
+  export GH_RUN_PATH=".github/workflows/outro.yml"
+  _rvcase "(rv-v) marca positiva de check-run de MESMO NOME vinda de outro workflow ⇒ descartada, RECUSA" _p_prov_wf \
+    '[ "${_rv_wf%%@*}" = ".github/workflows/onion-review.yml" ] \' 'true || [ "${_rv_wf%%@*}" = ".github/workflows/onion-review.yml" ] \' \
+    '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
+  unset GH_RUN_PATH
+  export GH_PR_FILES="ops/deploy-site.sh docs/sub/CLAUDE.local.md"
+  _rvcase "(rv-w) PR de GUARDA que muda um CLAUDE.local.md em SUBDIRETÓRIO com marca positiva ⇒ perde a marca" _p_m_sub \
+    '(.*/)?CLAUDE(\.local)?\.md$' 'CLAUDE\.md$' \
+    '220\tsuccess\tgithub-actions\thttps://github.com/o/r/actions/runs/55/job/1\n' 0 0
+  unset -f _p_prov _p_prov_app _p_prov_wf _p_m_sub
   unset GH_PR_FILES STUB_RESIDUE GH_CHANGED_FILES
   unset -f _p_fb_nores _p_fb_umavoz _p_fb_ok _p_fb_comum _p_nomark _p_pos _p_mach _p_dupk _p_disp _p_mach2 _p_m_claude _p_m_hook _p_m_val _p_m_utl _p_trunc
 

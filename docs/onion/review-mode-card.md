@@ -30,7 +30,8 @@ a árvore suja), o check segue verde, mas sem a marca.
 A marca positiva **não vale** quando o PR muda a maquinaria do revisor. São duas partes:
 
 - **os scripts do veredito:** `.github/workflows/`, `ops/review/`, `review-verdict.sh` e `post-review-comment.sh`;
-- **o que o CLI do revisor carrega do head:** `.claude/hooks/`, `.claude/settings*.json`, `CLAUDE.md`,
+- **o que o CLI do revisor carrega do head:** `.claude/hooks/`, `.claude/settings*.json`, `CLAUDE.md` e
+  `CLAUDE.local.md` em qualquer diretório,
   `.claude/agents/`, `.claude/skills/`, `.claude/rules/`, `.claude/commands/`, `.claude/output-styles/` e
   `.mcp.json`;
 - **o que os hooks executam:** `.claude/validation/` e `.claude/utils/` inteiros. O `settings.json` roda
@@ -39,6 +40,10 @@ A marca positiva **não vale** quando o PR muda a maquinaria do revisor. São du
 
 O workflow de um `pull_request` é o do head, e um hook do PR roda dentro do job. Por isso esse PR consegue
 forjar qualquer anotação. A medição cobre **todos** os arquivos do PR, inclusive o nome antigo de um rename.
+
+A marca também só vale pela **origem**: tem de vir de uma check-run do app `github-actions` cuja run seja
+do `.github/workflows/onion-review.yml`. Uma check-run de mesmo nome criada por outro workflow, ou por outro
+app com `checks:write`, é descartada.
 
 **Dispensar** o veredito vermelho (`--dispensa onion-review-verdict`) num PR de guarda também exige o resíduo
 independente: a dispensa não substitui a revisão.
@@ -113,6 +118,8 @@ No `onion-review-verdict`, a linha `⊘ Não revisado pelo CI: …` indica fallb
   `--achados <n>` nele, e o job do modo procura `--guard-helper`. Uma capacidade nova que não mude esse
   literal faz a base velha rodar sem ela. Uma que o mude faz o PR que a introduz rodar o juiz do próprio PR,
   mas esse PR toca `ops/review/` e cai no resíduo.
+- **Nome de arquivo com caractere de controle** (TAB, quebra de linha, `\x00`-`\x1f`, `\x7f`) derruba a medição
+  em rc 2, na API, no JSON e no diff do git (lido com `-z`). O parser de linha nunca adivinha onde o nome acaba.
 - **A lista de arquivos do PR vem da API, que trunca em 3000 sem erro.** O helper confere a contagem lida com
   o `changed_files` do PR e falha fechado (rc 2, o merge recusa) se divergir ou passar de 3000. PR maior que
   isso não se mede pela API: é do maestro.
