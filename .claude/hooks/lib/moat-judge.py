@@ -242,7 +242,7 @@ _MOAT_MAIN_PINNED = (".claude/hooks/pretooluse-moat-gate.sh", ".claude/hooks/lib
 
 
 def _moat_blob(path):
-    return _git(["hash-object", "--", path]) if path and os.path.isfile(path) else ""
+    return _git(["--no-replace-objects", "hash-object", "--", path]) if path and os.path.isfile(path) else ""
 
 
 # A PONTA DA MAIN se mede no REMOTO, por URL constante (6ª passada do refutador do #1647): a ref origin/main local é da
@@ -269,7 +269,7 @@ def _moat_main_sha():
         sha = ""
         out = _moat_lsremote()
         m = re.match(r"^([0-9a-f]{40})\s+refs/heads/main$", out.split("\n")[0]) if out else None
-        if m and ROOT and subprocess.run(["git", "-C", ROOT, "cat-file", "-e", m.group(1) + "^{commit}"],
+        if m and ROOT and subprocess.run(["git", "--no-replace-objects", "-C", ROOT, "cat-file", "-e", m.group(1) + "^{commit}"],
                                          capture_output=True).returncode == 0:
             sha = m.group(1)
         _OUR["main"] = sha
@@ -278,7 +278,8 @@ def _moat_main_sha():
 
 def _moat_main_blob(rel):
     sha = _moat_main_sha()
-    return _git(["-C", ROOT, "rev-parse", "-q", "--verify", sha + ":" + rel]) if ROOT and sha else ""
+    # --no-replace-objects (8ª passada): um `git replace <main> <forjado>` trocava a árvore que a régua lê
+    return _git(["--no-replace-objects", "-C", ROOT, "rev-parse", "-q", "--verify", sha + ":" + rel]) if ROOT and sha else ""
 
 
 def _moat_matches_main(script, rel):

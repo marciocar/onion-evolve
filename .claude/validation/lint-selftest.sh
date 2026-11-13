@@ -11553,7 +11553,14 @@ EOF" "${L}" \
   git -C "${P}" config "url.${d}/fakeremote.insteadOf" "${d}/proj"
   _mgcase "(rb31) insteadOf no .git/config desviando a URL constante + a forma delegada → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
     'bash ops/deploy-site.sh deploy --verified-pr 3' "${J}" '                              cwd="/", env=_env, capture_output' '                              cwd=None, env=None, capture_output'
-  git -C "${P}" config --unset "url.${d}/fakeremote.insteadOf"; cp "${d}/ds-intacto" "${P}/ops/deploy-site.sh"
+  git -C "${P}" config --unset "url.${d}/fakeremote.insteadOf"
+  # (rb32) `git replace <main> <commit forjado>` (8ª passada): a main remota é a de verdade, mas o objeto dela no repo
+  #       local é trocado pelo commit com o deploy-site.sh editado, e a árvore fica igual a ele. Com --no-replace-objects
+  #       a régua lê o objeto de verdade: VETO. MUTANTE: o rev-parse sem a flag
+  git -C "${P}" replace "$(git -C "${P}" rev-parse refs/heads/main)" "${_sp_commit}"
+  _mgcase "(rb32) git replace da main pelo commit forjado + a forma delegada → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
+    'bash ops/deploy-site.sh deploy --verified-pr 3' "${J}" '_git(["--no-replace-objects", "-C", ROOT, "rev-parse"' '_git(["-C", ROOT, "rev-parse"'
+  git -C "${P}" replace -d "$(git -C "${P}" rev-parse refs/heads/main)"; cp "${d}/ds-intacto" "${P}/ops/deploy-site.sh"
   # (rb29) unit transiente em /run/systemd/transient: o veto é do DADO (a linha do tsv); o "mutante" é o tsv sem ela
   local _r29='sudo cp /tmp/u /run/systemd/transient/' _r29i _r29m
   _r29i="$(_mgr "${d}/h" "${P}" "${P}" "${_r29}" "")"
@@ -26348,6 +26355,10 @@ STUB
   FRG_FILES="ops/materialize-door.sh" _frx "(rf27-MUT) sem as linhas fecho na lista, ele passaria — o fecho é a causa" "" \
     's#(\$1 == "ato" || \$1 == "delega" || \$1 == "fecho")#($1 == "ato" || $1 == "delega")#'
   FRG_FILES=".githooks/pre-commit" _frx "(rf28) PR que toca .githooks/ ⇒ a sessão não mergeia" "${_pi}" ""
+  # 8ª passada: o assemble-plugin.sh que o materialize-marketplace-repo.sh roda por variável (bash "${ASM}")
+  FRG_FILES=".claude/utils/marketplace/assemble-plugin.sh" _frx "(rf29) PR que só toca o assemble-plugin.sh (executado por bash \"\${ASM}\") ⇒ a sessão não mergeia" "${_pi}" ""
+  FRG_FILES=".claude/utils/marketplace/assemble-plugin.sh" _frx "(rf29-MUT) sem as linhas fecho na lista, ele passaria — o fecho é a causa" "" \
+    's#(\$1 == "ato" || \$1 == "delega" || \$1 == "fecho")#($1 == "ato" || $1 == "delega")#'
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
   # item 1 (no script): o delegado roda o pr-merge-verified.sh de origin/main, byte a byte
   cp "${fc}/ops/pr-merge-verified.sh" "${d}/pmv-5p"; echo '# editado na árvore' >> "${fc}/ops/pr-merge-verified.sh"
@@ -47472,8 +47483,8 @@ run_act_signature_selftests() {
   command -v python3 >/dev/null 2>&1 || { record_skip "act-signature: python3 ausente"; return; }
   local o rc
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 16/16 verdes' <<< "${o}"; then
-    record_pass "act-signature: (a) --selftest verde (16: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante, e a delegação: forma certa cala, marcador fora do código, palavra fora da assinatura, delegação sem ato, push de porta, e o fecho: script executado fora da lista, a linha que cala, a linha sem arquivo)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 20/20 verdes' <<< "${o}"; then
+    record_pass "act-signature: (a) --selftest verde (20: cala, wrapper sem ato, assinatura fora do código, script ausente, assinatura vazia, @none/case, comentário não conta, adotante, e a delegação: forma certa cala, marcador fora do código, palavra fora da assinatura, delegação sem ato, push de porta, e o fecho: script executado fora da lista, a linha que cala, a linha sem arquivo, e o caminho em variável: X=\${HERE}/y.sh, python3 -I, source por ponto, bash \${HERE}/y.sh)"
   else record_fail "act-signature: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/act-signature-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
@@ -47518,6 +47529,10 @@ run_act_signature_selftests() {
     if os.path.basename(s) == "publish-door.sh":$(printf '\x1f')    if False:$(printf '\x1f')(xiii) delegação do push de porta acusa
         if r not in known and os.path.isfile(os.path.join(root, r)):$(printf '\x1f')        if False:$(printf '\x1f')(xiv) ato que executa um script fora
     if not os.path.isfile(os.path.join(root, s)):$(printf '\x1f')    if False:$(printf '\x1f')(xvi) linha fecho de script inexistente
+        if "BASH_SOURCE" in val and "dirname" in val:$(printf '\x1f')        if False:$(printf '\x1f')(xx) bash
+            vars_[name] = v$(printf '\x1f')            pass$(printf '\x1f')(xvii) X=
+    for m in EXEC.finditer(resolve(code, s)):$(printf '\x1f')    for m in EXEC.finditer(code):$(printf '\x1f')(xviii) python3 -I
+EXEC = re.compile(r"""(?:^|[;&|(\`{]|\\\$\\(|(?:^|(?<=[\\s;&|(\`{]))\\.\\s+|$(printf '\x1f')EXEC = re.compile(r"""(?:^|[;&|(\`{]|\\\$\\(|$(printf '\x1f')(xix) source por ponto
 EOF_MUT
   rm -rf "${sb}"
 }

@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "8ª passada: o refutador independente no head 386161856 REPROVOU por um bloqueio (a lista de guarda não seguia o que os atos executam) e uma cura de uma linha (o ls-remote isolado da config), curados aqui. 7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: cf25c823af81bcc8531a2c82e64f01009386b4dc6a152e31b6612a05371193bc
-reviewed_code_sha256: 0573d712a61407c0defddef72ef54790f7f41663a31384a0b6e70a9e3daa3b7f
-findings_total: 29
-findings_real: 29
-findings_fixed: 29
+reviewer: "9ª passada: o refutador independente no head 1759dba93 REPROVOU por um bloqueio (o detector do fecho não via caminho em variável) e uma linha (git replace), curados aqui. 8ª passada: o refutador independente no head 386161856 REPROVOU por um bloqueio (a lista de guarda não seguia o que os atos executam) e uma cura de uma linha (o ls-remote isolado da config), curados aqui. 7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: f5e30b6ad11e5910196949de768d0a008be589b49701b3418fbc6dc45b9135ec
+reviewed_code_sha256: 9ba1a43d7f38a5ef56bae4687aa47469d1f55f1bfce99c92359dfc306516deb2
+findings_total: 31
+findings_real: 31
+findings_fixed: 31
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou sete vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
+nota: "o refutador independente reprovou oito vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
 ---
 
 # Resíduo — REGRA 56
@@ -177,7 +177,7 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
 
 28. **A lista de guarda não seguia o que os atos EXECUTAM.** O publish-door.sh, mesmo em ensaio, roda o
     materialize-door.sh e o materialize-marketplace-repo.sh; um PR que só os tocasse não era guarda. Cura: linhas
-    `fecho script <path>` no moat-targets.tsv, explícitas e revisadas (35 hoje), que o pr-merge-verified.sh soma à lista
+    `fecho script <path>` no moat-targets.tsv, explícitas e revisadas (51 depois da 9ª passada), que o pr-merge-verified.sh soma à lista
     de guarda, mais os .githooks/. A REGRA 117 (act-signature-check.sh) confere o fecho contra o código: toda execução de
     um script do repo (`bash x.sh`, `source`, `.`, `python3 x.py`, `"${WT}/ops/x.sh"`, `$(…)`) a partir de uma linha
     ato/delega/fecho tem de estar numa delas (`fecho-incompleto`), e a linha fecho sem arquivo acusa
@@ -189,6 +189,32 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
 29. **O ls-remote isolado da config do git.** Um insteadOf no .git/config (escrito por Edit) desviava a URL constante.
     Cura: cwd=/, GIT_CONFIG_GLOBAL=/dev/null, GIT_CONFIG_NOSYSTEM=1, sem GIT_* do ambiente, e `-c protocol.allow=never
     -c protocol.https.allow=always`. (rb31, com mutante; a bancada troca o protocolo por file, costura declarada)
+
+## 9ª passada: o caminho em variável e o git replace (curado aqui)
+
+30. **O detector do fecho não via caminho em variável.** O materialize-marketplace-repo.sh (que o ensaio de onion-plugins
+    roda) executa `bash "${ASM}"` (ASM="${HERE}/assemble-plugin.sh"), `bash "${GEN}"` e `bash "${HERE}/marketplace-readme.sh"`,
+    e nenhum casava. Cura: a REGRA 117 resolve as variáveis de diretório do script (`dirname … BASH_SOURCE`, cada `/..`
+    sobe um nível) e as que guardam um caminho de script do repo a partir delas, reescreve o texto com elas antes do
+    EXEC, e o EXEC passou a ver o source por ponto (`. x.sh`). O lint pediu 16 linhas fecho novas (as 3 do marketplace e o
+    que elas executam: plugin-readme, public-face, plugin-dead-link-check, plugin-namespace-check, resolve-role-bundle, e
+    o 2º nível de a2a-accept, kg-decide-seal, door-seal-pin e pr-merge-verified). O 2º nível que o refutador do #1652
+    apontou já estava: vendor-manifest.sh, selftest-families.py e load-lease.sh. (xvii)-(xx) da REGRA 117, um por forma
+    (X="${HERE}/y.sh" + bash "${X}", python3 -I "${P}", `. "${HERE}/y.sh"`, bash "${HERE}/y.sh"), cada um com mutante; rf29
+    no pr-merge-verified com o assemble-plugin.sh.
+31. **`git replace` desviava a régua.** `git replace <main> <commit forjado>` trocava a árvore que o hook lê. Cura:
+    `--no-replace-objects` no hash-object, no rev-parse e no cat-file do ROOT. (rb32, com mutante)
+
+## LIMITES aceitos (o refutador e o maestro, 2026-11-13)
+
+- **(6) o mesmo usuário**: a sessão roda como o usuário do maestro; os hooks são camada de conformidade, a fronteira
+  real é outro usuário do sistema.
+- **A FRONTEIRA do lint**: o fecho não desce no que o lint-artifacts.sh e o lint-selftest.sh executam. A reserva: isso só
+  vale se nenhum ato executar FORA do lint um script que o lint chama. Agora é conferível: a REGRA 117 examina o que cada
+  ato/delega/fecho (exceto os dois executores) executa, então um ato que chamar direto um script de .claude/validation
+  pede a linha fecho dele.
+- **curl, systemd-run e NOPASSWD**: `curl -X PUT …/merge`, `sudo systemd-run -p User=root …` e o `(ALL) NOPASSWD: ALL`
+  do operador passam ou valem por cima do hook; fecham com outro usuário e sem sudo amplo.
 
 ## LIMITES declarados (o refutador os apontou; não se curam aqui)
 
