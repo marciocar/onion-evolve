@@ -2,14 +2,13 @@
 branch: fix/provenance-triage-scrub
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 9741b40c0775073863dcab94483513942cbe2354c52f8a06c9a741d877fbdb40
-reviewed_code_sha256: 4ceda11edf370b7a13e03d7daceb39584afb9356e4a443be1b3ba7b60b504a30
-findings_total: 13
-findings_real: 13
-findings_blocking: 9
+reviewed_diff_sha256: pendente
+findings_total: 14
+findings_real: 14
+findings_blocking: 10
 tokens: 0
 duration_min: 0
-findings_fixed: 13
+findings_fixed: 14
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: refutador independente do #1649 (três rodadas: 2 bloqueios e 2 correções, depois 1 bloqueio), sobre a passada do próprio executor (8 achados)
@@ -71,6 +70,7 @@ outros 116 são commits do core alcançáveis de um ref remoto.
 | C1 | (non-blocking) | commits tidos como públicos tinham virado `⟨commit⟩` | foram devolvidos por alinhamento de tokens com a linha original da tabela e qualificados como `<dono/repo>@<hex>`. Os do core seguem assim; os de um dos repos da lista voltaram a `⟨commit⟩` em D1, porque o repo era privado |
 | C2 | (non-blocking) | colchete angular aninhado no `o7-proposta.csv`, que já vinha da main (7 lá) | o par externo saiu nos 6 casos; o `[[...]]` de link de wiki ficou |
 | D1 | (blocking) | um repo estava como `public` na lista pública desde 2026-11-10, mas é privado: o HTTP anônimo dá 404. A lista tinha sido conferida pelo `gh` autenticado, que enxerga o privado do dono, e C1 levou 17 commits dele qualificados para o core, mais 4 que já estavam em `data/` | o repo saiu da lista pública e entrou na lista privada local do dono. As 21 ocorrências viraram `⟨commit⟩`, registradas na tabela. O `--verify-allowlist` passou a ser HTTP anônimo, uma requisição por repo, e o lint o roda: 4xx é HARD `LISTA-ERRADA`, rede fora é SOFT não medido, e `ONION_OFFLINE=1` pula avisando. Os outros 13 repos da lista deram 200. A camada de clones passou a ser derivada no lint local, dos irmãos do checkout principal, como a REGRA 119 deriva. Casos (v) e (s3) e 3 mutantes mortos. Recontado: 0 commit privado em `data/` |
+| E1 | (blocking) | a faixa 3 do CI reprovou o caso P1 do `kg_coverage`. O filtro `--only` do lint acionava a REGRA 121 em todo `*.txt`, inclusive o baseline da maquinaria que o P1 usa num sandbox sem git; a guarda saía rc 2 e somava um HARD «não rodou» ao valor-base (3 em vez de 2) | o filtro deixou de acionar a guarda nos caminhos sob `.claude/`. A guarda e o lint seguem acionando, porque vêm antes na lista. P1 voltou a 2→3 e 2→2, as 4 famílias que chamam o lint com `--only` num `.tsv` ou `.json` passaram (39 de 39), e o mutante que tira a exclusão morreu |
 
 ## Mutantes
 
