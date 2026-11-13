@@ -49,6 +49,21 @@ bash "$(dirname "${BASH_SOURCE[0]}")/assert-dest.sh" "${DEST}" || exit 2
 mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs/onion' (existe como arquivo?)" >&2; exit 3; }
 [ -d "${DEST}/docs/onion" ] || { echo "ERRO: '${DEST}/docs/onion' não é diretório" >&2; exit 3; }
 
+# ⚠️ ESCRITA ATÔMICA — medido em 2026-11-13, e derrubou um merge do maestro. Todo destino abaixo era
+# escrito por redirecionamento direto (`gerador > destino`): o shell TRUNCA o destino no instante em que o
+# gerador começa e o enche aos poucos. Na casa, várias sessões rodam o pr-finalize e o lint no MESMO checkout
+# ao mesmo tempo, e quem lesse no meio (o `git add` do vizinho, o lint, a outra rodada) via o arquivo pela
+# metade — o testing-state.md oscilava entre voltas e o pr-finalize morria "não estabilizou". A cura é a do
+# kg-trace --out: o gerador escreve num temporário ÚNICO AO LADO do destino (mesmo sistema de arquivos, então
+# o mv é rename) e o destino só troca de uma vez, inteiro. Quem lê vê o antigo ou o novo, nunca o meio.
+# `_atomic_put <destino> <arquivo-pronto>`: preserva o modo do destino (o mktemp nasce 0600).
+_atomic_put() {
+  if [ -e "$1" ]; then chmod --reference="$1" "$2" 2>/dev/null || chmod 644 "$2"; else chmod 644 "$2"; fi
+  mv -f "$2" "$1"
+}
+_tmp_beside() { mktemp "$(dirname -- "$1")/.$(basename -- "$1").XXXXXX"; }
+_t=""; trap 'rm -f "${_t}"' EXIT   # interrupção no meio não deixa o temporário oculto na árvore
+
 # O índice de leitura do KG não usa `--markdown` (é TSV) nem vive sob o mesmo molde, então
 # sai do laço — mas pertence à mesma lista por natureza: projeção GERADA com catraca no lint.
 # O gerador é o do ALVO, e o alvo pode ser de antes de 2026-10-24 (a porta materializada de origin/main, o adotante
@@ -64,8 +79,12 @@ if [ -f "${_kgi}" ]; then
   # vazio, e ele é escrito vazio. Sem isso sobrevivia o índice de lixo que o resolvedor antigo gravava
   # nesse estado (a frase "(nenhum .kg.yaml rastreado — nada a verificar)", que ele imprimia no stdout com
   # rc 0), e a REGRA 84 o leria como índice com linhas, defasado (2026-10-24).
-  if [ "${_irc}" -eq 0 ] && [ -n "${_idx}" ]; then printf '%s\n' "${_idx}" > "${DEST}/docs/onion/kg-read-index.tsv"
-  elif [ "${_irc}" -eq 3 ]; then : > "${DEST}/docs/onion/kg-read-index.tsv"; fi
+  if [ "${_irc}" -eq 0 ] && [ -n "${_idx}" ]; then
+    _t="$(_tmp_beside "${DEST}/docs/onion/kg-read-index.tsv")" && printf '%s\n' "${_idx}" > "${_t}" \
+      && _atomic_put "${DEST}/docs/onion/kg-read-index.tsv" "${_t}"
+  elif [ "${_irc}" -eq 3 ]; then
+    _t="$(_tmp_beside "${DEST}/docs/onion/kg-read-index.tsv")" && _atomic_put "${DEST}/docs/onion/kg-read-index.tsv" "${_t}"
+  fi
 fi
 
 _n=0 _vazias=""
@@ -93,10 +112,14 @@ _n=0 _vazias=""
 for _pair in "${_PAIRS[@]}"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
-  bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null || true
-  if [ -s "${DEST}/docs/onion/${_out}" ]; then
+  # temporário ao lado + rename (ver _atomic_put): o destino nunca fica pela metade para quem lê junto
+  _t="$(_tmp_beside "${DEST}/docs/onion/${_out}")" || { _vazias="${_vazias} ${_out}"; continue; }
+  bash "${DEST}/.claude/validation/${_gen}" --markdown > "${_t}" 2>/dev/null || true
+  if [ -s "${_t}" ]; then
+    _atomic_put "${DEST}/docs/onion/${_out}" "${_t}"
     _n=$((_n + 1))
   else
+    rm -f "${_t}"
     # ⚠️ ARQUIVO 0-BYTE NÃO FICA NO DISCO: ele faz o alvo colher HARD da REGRA 8 (inventário
     # desatualizado vs filesystem) enquanto o relatório aqui some com a linha. Remover é honesto —
     # ausente é um estado que a guarda do alvo sabe nomear; vazio, ela lê como drift.
@@ -110,7 +133,8 @@ done
 if [ -f "${DEST}/.claude/validation/rules-registry.sh" ]; then
   _lr="$(bash "${DEST}/.claude/validation/rules-registry.sh" 2>/dev/null)" || _lr=""
   if [ -n "${_lr}" ]; then
-    printf '%s\n' "${_lr}" > "${DEST}/.claude/validation/lint-rules.md"; _n=$((_n + 1))
+    _t="$(_tmp_beside "${DEST}/.claude/validation/lint-rules.md")" && printf '%s\n' "${_lr}" > "${_t}" \
+      && _atomic_put "${DEST}/.claude/validation/lint-rules.md" "${_t}" && _n=$((_n + 1))
   else
     _vazias="${_vazias} lint-rules.md"   # NÃO sobrescreve com vazio: o registro bom vale mais que um 0-byte
   fi

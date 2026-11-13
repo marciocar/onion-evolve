@@ -3661,13 +3661,16 @@ run_backlog_projection_fix() {
   [ "${IS_DERIVED}" -eq 0 ] || return 0
   local gen="${SCRIPT_DIR}/kg-backlog-project.sh" out="${REPO_ROOT}/docs/backlog.md"
   [ -f "${gen}" ] && [ -f "${out}" ] || return 0
-  local tmp; tmp="$(mktemp)"
+  # temporário AO LADO do destino e troca por rename, nunca `cp` por cima (2026-11-13): o cp trunca o
+  # backlog e o reescreve, e outra sessão no mesmo checkout lendo nessa janela pega o arquivo pela metade
+  local tmp; tmp="$(mktemp "$(dirname -- "${out}")/.backlog.md.XXXXXX")" || return 0
   # o rc do gerador MANDA: ele agora recusa (exit 2) quando o radar falha, quando um grafo
   # enumerado sumiu do worktree, ou sem iconv. `[ -s ]` sozinho NÃO basta — a saída
   # destrutiva medida na revisão era PLAUSÍVEL (cabeçalho + "nada aberto"), não vazia.
   if bash "${gen}" --markdown > "${tmp}" 2>/dev/null && [ -s "${tmp}" ] \
      && ! diff -q "${out}" "${tmp}" >/dev/null 2>&1; then
-    cp "${tmp}" "${out}"
+    chmod --reference="${out}" "${tmp}" 2>/dev/null || chmod 644 "${tmp}"
+    mv -f "${tmp}" "${out}"
     FIX_LOG+=("docs/backlog.md: projeção regenerada (REGRA 62)")
     FIXED_FILES=$(( FIXED_FILES + 1 ))
   fi
