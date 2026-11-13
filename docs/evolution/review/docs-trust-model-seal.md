@@ -2,7 +2,8 @@
 branch: docs/trust-model-seal
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e2a59121035ba3ffe10234c671e1f2cf34571519038045faa9cadb6688fb6495
+reviewed_code_sha256: 795e08d0b9f09c874a398f8dd0ff48cedaa24626d471002506820a2304babebd
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
