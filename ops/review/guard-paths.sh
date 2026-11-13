@@ -13,17 +13,24 @@
 #     (`_PMV_GUARD_RE`); depois do merge dos dois, ele passa a usar este helper. Os caminhos que aquela
 #     regex tem e o moat-targets.tsv de hoje ainda não tem entram na lista FIXA abaixo, marcados.
 #
-# ── A LISTA ──────────────────────────────────────────────────────────────────────────────────────────
-# DERIVADA do ops/moat-targets.tsv (as linhas que não são comentário):
-#   · classe `ato`    → a coluna 3 (o script cujo uso é o ato)
-#   · classe `delega` → a coluna 3 (o script delegado)
-#   · classe `deploy` → a coluna 4, quando é um script de ops/ (o wrapper do deploy)
-# FIXA (as cercas que o tsv não descreve, porque não são alvo de deploy):
-#   .claude/hooks/  .claude/settings.json  .claude/settings.local.json  docs/evolution/federation/members.yaml
-#   .github/workflows/  ops/review/  .claude/validation/act-signature-check.sh  ops/sudoers/
-#   ops/moat-targets.tsv (o próprio tsv: quem tira uma linha dele tira a guarda da lista)
-#   ops/pr-merge-verified.sh  ops/bridge-backup.sh  ops/delegated-ops.sh (compat com a regex do #1647)
-# Padrão terminado em `/` é PREFIXO (vale tudo abaixo); os outros são caminho EXATO.
+# ── A LISTA (refeita na 2ª passada do refutador do #1652: a 1ª regredia e deixava cercas de fora) ─────────
+# DERIVADA do ops/moat-targets.tsv, o da ÁRVORE somado ao de origin/main (mais caminho é mais estrito, como o
+# #1647 faz; um PR que tire uma linha do tsv não sai da lista por isso):
+#   · classes `ato`, `delega` e `fecho` → a coluna 3. `fecho` é o FECHO TRANSITIVO: o que os atos EXECUTAM
+#     (o #1647 o constrói, e a REGRA 117 confere que está completo). Quando ele entrar na main, entra aqui sozinho.
+#   · classes `deploy` e `relogio` → a coluna 4, quando é um script de ops/ (o wrapper)
+# FIXA:
+#   · as cercas que o tsv não descreve: .claude/hooks/ .claude/settings.json .claude/settings.local.json
+#     docs/evolution/federation/members.yaml .github/workflows/ .githooks/ ops/review/ ops/sudoers/
+#     ops/moat-targets.tsv (o próprio tsv)
+#   · .claude/validation/ INTEIRO: o que o lint barra é guarda (inclui act-signature-check.sh, a catraca da
+#     REGRA 117, review-artifact-check.sh, o único que compara reviewed_diff_sha256 com o diff, e review-verdict.sh)
+#   · a SENSITIVE_PATHS antiga do review-mode-decide.sh, somada: ops/update-* ops/deploy-* ops/mcp-*
+#     ops/pr-merge-verified.sh ops/merge-serial.sh ops/apply-ruleset-main.sh
+#   · o fecho que o tsv de hoje ainda não traz (o do #1647, até ele entrar): ops/pr-finalize.sh
+#     ops/materialize-door.sh ops/merge-serial.sh .claude/utils/forge/post-review-comment.sh (o que o workflow do
+#     revisor executa) e ops/bridge-backup.sh ops/bridge-hardening.sh ops/chat-runner.sh ops/delegated-ops.sh
+# Padrão terminado em `/` é PREFIXO; padrão com `*` é GLOB (o `*` casa também `/`, como o `case` da lista antiga); o resto é EXATO.
 #
 # ── O QUE CONTA COMO "TOCAR" ─────────────────────────────────────────────────────────────────────────
 # Todo caminho do diff: adicionado, modificado, REMOVIDO, e o rename pelos DOIS nomes (o antigo vem no
@@ -36,14 +43,15 @@
 #   bash ops/review/guard-paths.sh --files-from <arq|->             lista pronta, um caminho por linha
 #   bash ops/review/guard-paths.sh --range <base>...<head> [--git-dir <dir>]   o diff do git
 #   bash ops/review/guard-paths.sh --print-patterns                 a lista derivada, um padrão por linha
-#   Opção comum: --targets <arq> (padrão: o ops/moat-targets.tsv ao lado deste script)
+#   Opção comum: --targets <arq> (repetível; os tsv se SOMAM). Sem --targets: o ops/moat-targets.tsv ao lado deste
+#                script mais o de origin/main do repo dele (git show). Pelo menos um tem de ser legível.
 # Exit: 0 = toca guarda (stdout: os caminhos que casaram, únicos) · 1 = não toca · 2 = erro NOMEADO
 #       (tsv ilegível, API ou diff que não leu). Erro nunca vira "não toca": quem chama decide o lado.
 # =============================================================================
 set -uo pipefail
 
 _HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGETS="${_HERE}/../moat-targets.tsv"
+TARGETS=()
 # o jq das duas leituras da API (a de verdade e a da bancada): o nome e, no rename, o nome antigo
 _FILES_JQ='.[] | .filename, (.previous_filename // empty)'
 FIXED_PATTERNS=(
@@ -52,36 +60,68 @@ FIXED_PATTERNS=(
   '.claude/settings.local.json'
   'docs/evolution/federation/members.yaml'
   '.github/workflows/'
+  '.githooks/'
   'ops/review/'
-  '.claude/validation/act-signature-check.sh'
   'ops/sudoers/'
   'ops/moat-targets.tsv'
+  '.claude/validation/'
+  'ops/update-*'
+  'ops/deploy-*'
+  'ops/mcp-*'
   'ops/pr-merge-verified.sh'
+  'ops/merge-serial.sh'
+  'ops/apply-ruleset-main.sh'
+  'ops/pr-finalize.sh'
+  'ops/materialize-door.sh'
+  '.claude/utils/forge/post-review-comment.sh'
   'ops/bridge-backup.sh'
+  'ops/bridge-hardening.sh'
+  'ops/chat-runner.sh'
   'ops/delegated-ops.sh'
 )
 
 _die2() { printf 'guard-paths: %s\n' "$1" >&2; exit 2; }
 
+_tsv_all() { # os tsv somados: os passados por --targets, ou o da árvore + o de origin/main
+  local t ok=0
+  if [ "${#TARGETS[@]}" -gt 0 ]; then
+    for t in "${TARGETS[@]}"; do [ -r "${t}" ] && { cat "${t}"; ok=1; }; done
+  else
+    [ -r "${_HERE}/../moat-targets.tsv" ] && { cat "${_HERE}/../moat-targets.tsv"; ok=1; }
+    git -C "${_HERE}" show origin/main:ops/moat-targets.tsv 2>/dev/null && ok=1
+  fi
+  [ "${ok}" -eq 1 ]
+}
+
 _patterns() {
-  [ -r "${TARGETS}" ] || _die2 "não li ${TARGETS} — sem o moat-targets.tsv a lista de guardas fica incompleta, e lista incompleta não vira 'não toca'"
-  local derived
-  derived="$(awk -F'\t' '
+  local all derived
+  all="$(_tsv_all)" || _die2 "não li nenhum moat-targets.tsv (${TARGETS[*]:-árvore e origin/main}) — sem ele a lista de guardas fica incompleta, e lista incompleta não vira 'não toca'"
+  derived="$(printf '%s\n' "${all}" | awk -F'\t' '
     /^[[:space:]]*#/ || NF < 3 { next }
-    ($1 == "ato" || $1 == "delega") && $2 == "script" { print $3; next }
-    $1 == "deploy" && NF >= 4 && $4 ~ /^ops\// { print $4 }' "${TARGETS}")" \
-    || _die2 "não consegui derivar a lista de ${TARGETS}"
-  [ -n "${derived}" ] || _die2 "${TARGETS} não rendeu nenhum script de ato, delega ou wrapper — tsv vazio ou com outra forma; não sigo com a lista só fixa"
+    ($1 == "ato" || $1 == "delega" || $1 == "fecho") && $2 == "script" { print $3; next }
+    ($1 == "deploy" || $1 == "relogio") && NF >= 4 && $4 ~ /^ops\// { print $4 }')"
+  [ -n "${derived}" ] || _die2 "o moat-targets.tsv não rendeu nenhum script de ato, delega, fecho ou wrapper — tsv vazio ou com outra forma; não sigo com a lista só fixa"
   { printf '%s\n' "${FIXED_PATTERNS[@]}"; printf '%s\n' "${derived}"; } | awk 'NF && !seen[$0]++'
 }
 
-_match() { # stdin: caminhos ; $1: padrões (um por linha)
+_match() { # stdin: caminhos ; $1: padrões (um por linha). Prefixo (`/` no fim), glob (`*` casa até `/`) ou exato.
   awk -v pats="$1" '
-    BEGIN { n = split(pats, P, "\n") }
+    function glob2re(g,   r, i, c) {
+      r = "^"
+      for (i = 1; i <= length(g); i++) {
+        c = substr(g, i, 1)
+        if (c == "*") r = r ".*"
+        else if (c ~ /[.+?()|{}^$\[\]\\]/) r = r "\\" c
+        else r = r c
+      }
+      return r "$"
+    }
+    BEGIN { n = split(pats, P, "\n"); for (i = 1; i <= n; i++) if (index(P[i], "*") > 0) R[i] = glob2re(P[i]) }
     NF {
       for (i = 1; i <= n; i++) {
         p = P[i]; if (p == "") continue
-        if (substr(p, length(p)) == "/") { if (index($0, p) == 1) { hit = 1; break } }
+        if (i in R) { if ($0 ~ R[i]) { hit = 1; break } }
+        else if (substr(p, length(p)) == "/") { if (index($0, p) == 1) { hit = 1; break } }
         else if ($0 == p) { hit = 1; break }
       }
       if (hit && !seen[$0]++) print $0
@@ -96,7 +136,7 @@ while [ $# -gt 0 ]; do
     --print-patterns) MODE="$1"; shift ;;
     --repo) REPO="${2-}"; [ -n "${REPO}" ] || _die2 "--repo exige <dono/repo>"; shift 2 ;;
     --git-dir) GIT_DIR_ARG="${2-}"; shift 2 ;;
-    --targets) TARGETS="${2-}"; shift 2 ;;
+    --targets) TARGETS+=("${2-}"); shift 2 ;;
     -h|--help) sed -n '/^# Uso:/,/^# Exit:/p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) _die2 "argumento desconhecido '$1'" ;;
   esac

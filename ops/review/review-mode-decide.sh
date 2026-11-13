@@ -46,7 +46,8 @@
 #   fallback: bash ops/review/review-mode-decide.sh --fallback --reason <motivo> [--guard ...] \
 #                  [--guard-paths ...] [--summary-file <arq>] [--comment-file <arq>]
 #             exit 0 sempre: a anotação-marca "não revisado pelo CI: <motivo>", o sumário e o corpo do comentário
-#   marca   : bash ops/review/review-mode-decide.sh --print-marker
+#   marca   : bash ops/review/review-mode-decide.sh --print-marker | --print-reviewed-marker
+#   revisado: bash ops/review/review-mode-decide.sh --reviewed-mark --head <sha>   (a anotação da marca positiva)
 # Exit (decidir): 0 decidido · 2 valor fora do enum / uso inválido (falha alta e nomeada, nunca silêncio).
 # =============================================================================
 set -uo pipefail
@@ -55,6 +56,11 @@ FORCE_LABEL="review:ia"
 # a MARCA que o ops/pr-merge-verified.sh procura na anotação do check para saber que o verde é
 # DESLIGAMENTO e não aprovação. Um lugar só: o merge-verified a lê por --print-marker.
 MARKER="onion-review-desligado:"
+# a marca POSITIVA (2ª passada do refutador do #1652, B1): o revisor RODOU e o gate de achados APROVOU este head. É o
+# único verde que o merge-verified aceita como revisão num PR de guarda; verde sem ela é fallback. Quem a emite é o
+# juiz lido da BASE (o job do veredito o tira de lá), então um PR não a forja mudando este script. Um PR que edita o
+# workflow forjaria qualquer coisa, e por isso o merge-verified não aceita a marca em PR que toca .github/workflows/.
+POS_MARKER="onion-review-revisado:"
 # o corpo do comentário de fallback começa por esta marca, que o post-review-comment.sh usa para EDITAR o
 # mesmo comentário a cada push (sticky), em vez de empilhar um por run
 COMMENT_MARK="<!-- onion-review-fallback -->"
@@ -107,16 +113,29 @@ _classify_credit() {
   if [ "${http}" = "400" ] && LC_ALL=C grep -qiF 'credit balance' <<< "${causa}"; then
     printf 'sem crédito na API (pré-voo HTTP 400: %s)\n' "$(_one_line "${causa}" | cut -c1-200)"; return 0
   fi
-  # (2) a evidência do run (artefato review-evidence): a mensagem literal, ou o status 400 junto de "credit"
-  if [ -n "${ev}" ] && [ -d "${ev}" ]; then
-    local f
+  # (2) a evidência do run (artefato review-evidence). Lê SÓ o evento `result` (o último) e o campo de erro da API,
+  #     NUNCA o arquivo inteiro: o arquivo traz o diff e as saídas das ferramentas, e um PR que contenha a frase
+  #     "credit balance is too low" faria um estouro de turnos sair verde (refutador do #1652, B2). Crédito é:
+  #     is_error true E (a mensagem do resultado/erro diz "credit balance is too low", OU api_error_status 400 com
+  #     "credit" nessa mesma mensagem). JSON ilegível ou sem evento result = não é crédito (segue vermelho).
+  if [ -n "${ev}" ] && [ -d "${ev}" ] && command -v jq >/dev/null 2>&1; then
+    local f r
     while IFS= read -r f; do
       [ -n "${f}" ] || continue
-      if LC_ALL=C grep -qiF 'credit balance is too low' "${f}" \
-         || { LC_ALL=C grep -qE '"api_error_status"[[:space:]]*:[[:space:]]*"?400' "${f}" && LC_ALL=C grep -qiF 'credit' "${f}"; }; then
-        printf 'sem crédito na API (evidência do run: %s)\n' "${f##*/}"; return 0
+      r="$(jq -rs '
+        (if length == 1 and (.[0] | type) == "array" then .[0] else . end)
+        | map(select(type == "object" and .type == "result")) | last // empty
+        | select(.is_error == true)
+        | [ (.api_error_status // "" | tostring),
+            ([.result, .error, .error_message, (.error | objects | .message)] | map(select(type == "string")) | join(" ")) ]
+        | @tsv' "${f}" 2>/dev/null)" || continue
+      [ -n "${r}" ] || continue
+      local st="${r%%$'\t'*}" msg="${r#*$'\t'}"
+      if LC_ALL=C grep -qiF 'credit balance is too low' <<< "${msg}" \
+         || { [ "${st}" = "400" ] && LC_ALL=C grep -qiF 'credit' <<< "${msg}"; }; then
+        printf 'sem crédito na API (evidência do run: %s, evento result)\n' "${f##*/}"; return 0
       fi
-    done < <(find "${ev}" -type f 2>/dev/null)
+    done < <(find "${ev}" -type f -name '*.json' 2>/dev/null)
   fi
   return 1
 }
@@ -184,6 +203,11 @@ _fallback_cli() {
 
 case "${1:-}" in
   --print-marker) printf '%s\n' "${MARKER}"; exit 0 ;;
+  --print-reviewed-marker) printf '%s\n' "${POS_MARKER}"; exit 0 ;;
+  --reviewed-mark)
+    [ "${2:-}" = "--head" ] && printf '%s' "${3:-}" | grep -qE '^[0-9a-f]{40}$' \
+      || { printf '::error::review-mode-decide --reviewed-mark exige --head <sha de 40 hex>\n'; exit 1; }
+    printf '::notice::%s o revisor de IA do CI revisou e aprovou o head %s\n' "${POS_MARKER}" "$3"; exit 0 ;;
   --classify-credit) shift; _classify_credit "$@"; exit $? ;;
   --fallback) shift; _fallback_cli "$@"; exit $? ;;
   --verdict-gate) shift; _verdict_gate "$@"; exit $? ;;
