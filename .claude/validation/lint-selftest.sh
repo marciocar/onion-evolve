@@ -10909,8 +10909,9 @@ EOF
   { cat "${REPO_ROOT}/ops/update-kg-writer.sh"; echo '# irmão versionado da bancada: não é ato'; } > "${d}/proj/ops/kgw-irmao.sh"
   git -C "${d}/proj" add -A
   git -C "${d}/proj" -c user.email=t@t -c user.name=t commit -q -m base
-  # a forma delegada só vale com o script e a cerca byte a byte os de origin/main (5ª passada): a base É a origin/main
-  git -C "${d}/proj" update-ref refs/remotes/origin/main HEAD
+  # a forma delegada só vale com o script e a cerca byte a byte os da main REMOTA (5ª e 6ª passadas): a base é a main
+  # do "remoto" da bancada, que é o próprio proj (a URL constante do juiz aponta para ele, costura abaixo)
+  git -C "${d}/proj" update-ref refs/remotes/origin/main HEAD; git -C "${d}/proj" branch -q main HEAD
   # a cópia RENOMEADA de um script de ato (mesmo conteúdo, nome outro), fora do projeto
   cp "${d}/proj/ops/update-bridge.sh" "${d}/scratch/ub-renomeado.sh"
   # o mesmo wrapper NÃO rastreado: o rastreio é o que faz dele fronteira
@@ -10966,6 +10967,8 @@ FIELD
   # `kind: source` do members.yaml abaixo diz o mesmo (costura só desta cópia)
   sed -i 's#^_MOAT_CORE_SLUG = "marciocar/onion-evolve"$#_MOAT_CORE_SLUG = "onion-bancada/core"#' "${d}/h/lib/moat-judge.py"
   grep -q '^_MOAT_CORE_SLUG = "onion-bancada/core"$' "${d}/h/lib/moat-judge.py" || record_fail "moat-gate: (costura do core)" "a âncora da constante do core sumiu"
+  sed -i "s#^_MOAT_CORE_URL = \"https://github.com/marciocar/onion-evolve\"\$#_MOAT_CORE_URL = \"${d}/proj\"#" "${d}/h/lib/moat-judge.py"
+  grep -qF "_MOAT_CORE_URL = \"${d}/proj\"" "${d}/h/lib/moat-judge.py" || record_fail "moat-gate: (costura da URL do core)" "a âncora da URL constante sumiu"
   # _mgr <dir-do-hook> <raiz> <cwd> <comando> [PATH] → "rc|stderr"
   _mgr() {
     local rc=0 err
@@ -11526,6 +11529,21 @@ EOF" "${L}" \
     'bash ops/pr-merge-verified.sh 12 --dispensa onion-review-verdict --motivo x' "${J}" '            words.add(w)' '            pass'
   _mgcase "(rb28) --ci-inoperante pela sessão → VETO (é do maestro)" "2:--ci-inoperante é o ato" "${P}" \
     'bash ops/pr-merge-verified.sh 12 --ci-inoperante --motivo x' "${J}" '            words.add(w)' '            pass'
+  # (rb30) o spoof da ref origin/main LOCAL (6ª passada): um commit com o deploy-site.sh editado vira a origin/main por
+  #       update-ref, e a árvore fica igual a ele. A main medida no remoto (ls-remote da URL constante) não muda: VETO.
+  #       MUTANTE: a ponta lida da origin/main local, que o spoof controla
+  cp "${P}/ops/deploy-site.sh" "${d}/ds-intacto"; echo 'verified_gate() { return 0; }' >> "${P}/ops/deploy-site.sh"
+  local _sp_blob _sp_tree _sp_commit
+  _sp_blob="$(git -C "${P}" hash-object -w ops/deploy-site.sh)"
+  _sp_tree="$(GIT_INDEX_FILE="${d}/sp-index" git -C "${P}" read-tree HEAD && GIT_INDEX_FILE="${d}/sp-index" git -C "${P}" update-index --cacheinfo "100755,${_sp_blob},ops/deploy-site.sh" \
+    && GIT_INDEX_FILE="${d}/sp-index" git -C "${P}" write-tree)"
+  _sp_commit="$(git -C "${P}" -c user.email=t@t -c user.name=t commit-tree "${_sp_tree}" -p HEAD -m spoof)"
+  git -C "${P}" update-ref refs/remotes/origin/main "${_sp_commit}"
+  _mgcase "(rb30) origin/main LOCAL forjada (update-ref) com o deploy-site.sh editado + a forma delegada → VETO" "2:ops/deploy-site.sh deploy é o ato" "${P}" \
+    'bash ops/deploy-site.sh deploy --verified-pr 3' "${J}" \
+    '        out = _git(["ls-remote", _MOAT_CORE_URL, "refs/heads/main"])' \
+    '        out = _git(["-C", ROOT, "rev-parse", "origin/main"]) + "\trefs/heads/main"'
+  git -C "${P}" update-ref refs/remotes/origin/main HEAD; cp "${d}/ds-intacto" "${P}/ops/deploy-site.sh"
   # (rb29) unit transiente em /run/systemd/transient: o veto é do DADO (a linha do tsv); o "mutante" é o tsv sem ela
   local _r29='sudo cp /tmp/u /run/systemd/transient/' _r29i _r29m
   _r29i="$(_mgr "${d}/h" "${P}" "${P}" "${_r29}" "")"
@@ -26059,6 +26077,11 @@ case "$args" in
   # o resíduo do PR lido no head (merge alheio delegado, 2026-11-13)
   *"api "*"/contents/"*) [ -n "${GH_RESIDUE:-}" ] && printf '%b' "${GH_RESIDUE}"; exit "${GH_RESIDUE_RC:-0}" ;;
   *"api "*pulls*files*)
+      # com GH_PR_FILES_JSON, o --jq do chamador roda de verdade sobre o JSON da API (rename: .previous_filename)
+      if [ -n "${GH_PR_FILES_JSON:-}" ]; then
+        q=""; prev=""; for x in "$@"; do [ "$prev" = --jq ] && q="$x"; prev="$x"; done
+        printf '%s' "${GH_PR_FILES_JSON}" | jq -r "$q"; exit 0
+      fi
       # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
       [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
   *"pr merge"*)
@@ -26098,6 +26121,8 @@ STUB
   printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: adot\n    kind: adopter\n    remote: github.com/owner/repo   # comentário\n  - id: porta\n    kind: door\n    remote: github.com/owner/porta\n' \
     > "${fc}/docs/evolution/federation/members.yaml"
   cp "${sut}" "${fc}/ops/pr-merge-verified.sh"
+  # o tsv real: a lista de guarda do item 3 é derivada dele (6ª passada)
+  cp "${REPO_ROOT}/ops/moat-targets.tsv" "${fc}/ops/moat-targets.tsv"  # (core-only)
   # a cópia INTACTA (com a guarda de ambiente e o PATH fixo) mora ao lado; a dos casos fr1-fr11 tem a guarda desligada,
   # porque o gh falso deles chega pelo PATH e lê GH_* (a costura é só desta cópia de bancada)
   cp "${sut}" "${fc}/ops/pmv-intacto.sh"
@@ -26274,7 +26299,7 @@ STUB
     echo 0 > "${d}/n"; : > "${d}/merge-args"
     (cd "${fc}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
       GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
-      GH_PR_FILES=".claude/hooks/lib/moat-judge.py docs/x.md" ONION_MERGE_POLL_SECS=0 \
+      GH_PR_FILES="${FRG_FILES:-.claude/hooks/lib/moat-judge.py docs/x.md}" GH_PR_FILES_JSON="${FRG_JSON:-}" ONION_MERGE_POLL_SECS=0 \
       env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '$1' 999; exit \$?" 2>&1)
   }
   o="$(_frg "${_pi}")"
@@ -26285,6 +26310,29 @@ STUB
   if ! cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh" && ! grep -qF "toca GUARDA" <<< "${o}"; then
     record_pass "pr-merge-verified: (rf21-MUT) sem a recusa, a sessão seguiria para o merge do PR de guarda — a recusa é a causa"
   else record_fail "pr-merge-verified: (rf21-MUT)" "o mutante também recusou ou não mudou"; fi
+  # ── 6ª passada: o rename e a lista DERIVADA do tsv ────────────────────────────────────────────────────────────
+  _frx() { # $1=rótulo $2=script intacto-ou-mutante $3=mutante sed (vazio = intacto) ; FRG_* do caso vêm de fora
+    local lbl="$1" scr="$2" mut="$3" o
+    if [ -n "${mut}" ]; then sed "${mut}" "${_pi}" > "${fc}/ops/pmv-mut.sh"; scr="${fc}/ops/pmv-mut.sh"
+      cmp -s "${_pi}" "${scr}" && { record_fail "pr-merge-verified: ${lbl}" "a âncora do mutante sumiu"; return; }; fi
+    o="$(_frg "${scr}")"
+    if [ -z "${mut}" ]; then
+      grep -qF "toca GUARDA" <<< "${o}" && [ ! -s "${d}/merge-args" ] && record_pass "pr-merge-verified: ${lbl}" \
+        || record_fail "pr-merge-verified: ${lbl}" "merge=$(head -c 60 "${d}/merge-args") out=$(tail -2 <<< "${o}" | tr '\n' '|' | cut -c1-200)"
+    else
+      grep -qF "toca GUARDA" <<< "${o}" && record_fail "pr-merge-verified: ${lbl}" "o mutante também recusou" || record_pass "pr-merge-verified: ${lbl}"
+    fi
+  }
+  local J24='[{"filename":"ops/moat-targets.tsv.old","previous_filename":"ops/moat-targets.tsv","status":"renamed"},{"filename":"docs/x.md","status":"modified"}]'
+  FRG_JSON="${J24}" _frx "(rf24) PR que RENOMEIA ops/moat-targets.tsv (só o nome novo no .filename) ⇒ a sessão não mergeia" "${_pi}" ""
+  FRG_JSON="${J24}" _frx "(rf24-MUT) lendo só o .filename, o rename passaria — o .previous_filename é a causa" "" \
+    's#--jq .\.\[\] | \.filename, (\.previous_filename // empty).#--jq ".[].filename"#'
+  FRG_FILES="ops/publish-door.sh docs/x.md" _frx "(rf25) PR que toca ops/publish-door.sh (um ato do tsv, fora da regex antiga) ⇒ a sessão não mergeia" "${_pi}" ""
+  FRG_FILES="ops/publish-door.sh docs/x.md" _frx "(rf25-MUT) sem derivar do tsv, o publish-door.sh passaria — a derivação é a causa" "" \
+    's#^  { cat "\${_PMV_DIR}/ops/moat-targets.tsv" 2>/dev/null; git -C "\${_PMV_DIR}" show origin/main:ops/moat-targets.tsv 2>/dev/null; } \\$#  { :; } \\#'
+  FRG_FILES="docs/evolution/federation/members.yaml" _frx "(rf26) PR que toca o members.yaml (o registro amplia a delegação) ⇒ a sessão não mergeia" "${_pi}" ""
+  FRG_FILES="docs/evolution/federation/members.yaml" _frx "(rf26-MUT) sem o members.yaml na lista, ele passaria — a lista é a causa" "" \
+    's# docs/evolution/federation/members.yaml##'
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
   # item 1 (no script): o delegado roda o pr-merge-verified.sh de origin/main, byte a byte
   cp "${fc}/ops/pr-merge-verified.sh" "${d}/pmv-5p"; echo '# editado na árvore' >> "${fc}/ops/pr-merge-verified.sh"
