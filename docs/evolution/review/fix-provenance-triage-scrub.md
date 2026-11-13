@@ -2,17 +2,16 @@
 branch: fix/provenance-triage-scrub
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 48adc5d24f05d162a636d5622eb71fcb4fd79741609ed02df2bdc63d6aa8d270
-reviewed_code_sha256: e8405a5e49aaf6e1d673b6dd6716d7dab79287bb4ffdd4a7dc258a78ed881ead
-findings_total: 12
-findings_real: 12
-findings_blocking: 8
+reviewed_diff_sha256: pendente
+findings_total: 13
+findings_real: 13
+findings_blocking: 9
 tokens: 0
 duration_min: 0
-findings_fixed: 12
+findings_fixed: 13
 verdict: REJECTED_AND_FIXED
 elenxo: true
-reviewer: refutador independente do #1649 (2 bloqueios mais 2 correções, re-revisão), sobre a passada do próprio executor (8 achados)
+reviewer: refutador independente do #1649 (três rodadas: 2 bloqueios e 2 correções, depois 1 bloqueio), sobre a passada do próprio executor (8 achados)
 nota: "tokens e duração não medidos. Achados 1 a 8: passada do próprio executor, que não é independente. B1, B2, C1 e C2: refutador independente, curados no mesmo PR."
 ---
 
@@ -68,8 +67,9 @@ outros 116 são commits do core alcançáveis de um ref remoto.
 | 8 | (blocking) | a guarda viaja para as portas e citava os dois arquivos de configuração funcional pelo caminho em `ops/` (REGRA 100) | a isenção passou a ser por pasta e nome (`FUNCTIONAL_DIR`, `FUNCTIONAL_NAMES`), sem o caminho literal; o mutante da isenção morreu de novo |
 | B1 | (blocking) | sobravam 45 commits privados distintos em `data/`, em qualquer linha, contados contra os clones (38 no methods-manifest.tsv; 4 em arquivos que o PR não tocava, inclusive dois `register.js`) | todo hex de 7 a 40 caracteres de todo arquivo de texto sob `data/` foi classificado offline: commit do core alcançável, do core só por ref de PR, de repo público da lista, de repo privado ou desconhecido. As 116 ocorrências privadas (47 distintos) viraram `⟨commit⟩`, com arquivo e linha na tabela. Recontado do jeito do refutador, sobra 0 privado nos 636 arquivos |
 | B2 | (blocking) | a guarda só procurava hex em linha com o marcador; `repo-secreto (HEAD abc1234)` e `commit abc1234` passavam | duas camadas. `COMMIT-PRIVADO-EM-DADO`, com `ONION_PRIVATE_CLONES` (local do dono), pega o hex de qualquer linha que é commit de um clone privado. `HEX-NAO-CONFERIDO-EM-DADO`, sempre ligada e falhando fechada, pega o hex NOVO: o que está numa linha acrescentada e não estava no arquivo da base. Esse hex só passa se for commit do core alcançável, `dono/repo@<hex>` da lista pública ou de dono de terceiro, ou se levar um rótulo de não-commit (md5, sha256, sessão, subagente, uuid). Caso (s2) e 5 mutantes mortos. O escopo passou a ser todo arquivo de texto sob `data/`, e a guarda não julga mais os próprios artefatos (o baseline e a lista pública) |
-| C1 | (non-blocking) | 12 commits públicos tinham virado `⟨commit⟩` (do core e de `marciocar/gmill`) | foram devolvidos por alinhamento de tokens com a linha original da tabela (10 ocorrências do core, 17 do gmill) e qualificados como `marciocar/onion-evolve@<hex>` e `marciocar/gmill@<hex>`, que o CI confere pela lista pública |
+| C1 | (non-blocking) | commits tidos como públicos tinham virado `⟨commit⟩` | foram devolvidos por alinhamento de tokens com a linha original da tabela e qualificados como `<dono/repo>@<hex>`. Os do core seguem assim; os de um dos repos da lista voltaram a `⟨commit⟩` em D1, porque o repo era privado |
 | C2 | (non-blocking) | colchete angular aninhado no `o7-proposta.csv`, que já vinha da main (7 lá) | o par externo saiu nos 6 casos; o `[[...]]` de link de wiki ficou |
+| D1 | (blocking) | um repo estava como `public` na lista pública desde 2026-11-10, mas é privado: o HTTP anônimo dá 404. A lista tinha sido conferida pelo `gh` autenticado, que enxerga o privado do dono, e C1 levou 17 commits dele qualificados para o core, mais 4 que já estavam em `data/` | o repo saiu da lista pública e entrou na lista privada local do dono. As 21 ocorrências viraram `⟨commit⟩`, registradas na tabela. O `--verify-allowlist` passou a ser HTTP anônimo, uma requisição por repo, e o lint o roda: 4xx é HARD `LISTA-ERRADA`, rede fora é SOFT não medido, e `ONION_OFFLINE=1` pula avisando. Os outros 13 repos da lista deram 200. A camada de clones passou a ser derivada no lint local, dos irmãos do checkout principal, como a REGRA 119 deriva. Casos (v) e (s3) e 3 mutantes mortos. Recontado: 0 commit privado em `data/` |
 
 ## Mutantes
 
@@ -88,6 +88,15 @@ outros 116 são commits do core alcançáveis de um ref remoto.
   Nesta passada trocaram-se 28 ocorrências desta última, em 5 arquivos, mas a guarda não a acusa.
 - **Hex antigo:** o hex que já estava na main e não é commit de nenhum clone alcançável (1.072 ocorrências de
   desconhecidos, quase todos hash e id de sessão) não é julgado sem os clones.
+- **Isenções da falha fechada:** um rótulo forjado (escrever `md5` antes de um commit) cala o hex. O `dono/repo@<hex>`
+  de um dono que a guarda não julga é tratado como terceiro e cala. O hex que já estava no arquivo na base cala mesmo
+  que a linha tenha mudado, e um hex antigo repetido numa linha nova também.
+- **Rede:** a conferência anônima da lista pública depende de rede. Fora dela, o lint diz não medido e não julga.
+- **Clones derivados:** a camada de clones privados só existe onde há irmãos do checkout (a máquina do dono). No CI ela
+  fica vazia, e o passivo antigo só é guardado localmente. O commit de um repo privado sem clone na máquina não é
+  visto.
+- **Nome nu pré-existente:** o nome do repo que saiu da lista pública segue em arquivos que este PR não toca, como o
+  registro da federação, um site do Caddy e resíduos antigos, como nome nu. A REGRA 119 cobre esse caso.
 - **Repositórios fora do alcance:** 8 repositórios privados da lista não são alcançáveis nem pela API nem pelo git
   (apagados, renomeados ou sem acesso). Um commit deles que já estava na main não é visto; o hex novo cai na falha fechada.
 - **Nome nu:** o nome de repositório sem dono e sem `@` segue, como nos grafos.
