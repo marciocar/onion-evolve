@@ -56,6 +56,9 @@ _HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGETS=()
 # o jq das duas leituras da API (a de verdade e a da bancada): o nome e, no rename, o nome antigo
 _FILES_JQ='.[] | .filename, (.previous_filename // empty)'
+# o mesmo, ETIQUETADO, para contar os arquivos contra o changed_files (o nome antigo não é arquivo a mais)
+_FILES_JQ_TAGGED='.[] | ("F\t" + .filename), (.previous_filename // empty | "P\t" + .)'
+MAX_API_FILES=3000
 FIXED_PATTERNS=(
   '.claude/hooks/'
   '.claude/settings.json'
@@ -155,8 +158,20 @@ case "${MODE}" in
       REPO="$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)" || REPO=""
       [ -n "${REPO}" ] || _die2 "não descobri o repo do PR #${ARG} (passe --repo <dono/repo>)"
     fi
-    FILES="$(gh api "repos/${REPO}/pulls/${ARG}/files?per_page=100" --paginate --jq "${_FILES_JQ}" 2>/dev/null)" \
-      || _die2 "não li os arquivos do PR #${ARG} em ${REPO} — sem eles não sei se toca guarda" ;;
+    # TRUNCAMENTO (3ª passada do refutador do #1652, X2): `pulls/<n>/files` para em 3000 arquivos SEM erro. A leitura só
+    # vale se a contagem bater com o `changed_files` do PR, e PR com mais de 3000 arquivos não se mede por aqui: rc 2.
+    _CHANGED="$(gh api "repos/${REPO}/pulls/${ARG}" --jq '.changed_files' 2>/dev/null)" \
+      || _die2 "não li o changed_files do PR #${ARG} em ${REPO} — sem ele não sei se a lista de arquivos veio inteira"
+    case "${_CHANGED}" in ''|*[!0-9]*) _die2 "changed_files ilegível ('${_CHANGED}') no PR #${ARG}" ;; esac
+    [ "${_CHANGED}" -le "${MAX_API_FILES}" ] \
+      || _die2 "o PR #${ARG} muda ${_CHANGED} arquivos, acima do teto de ${MAX_API_FILES} que a API lista — não meço PR truncado"
+    _RAW="$(gh api "repos/${REPO}/pulls/${ARG}/files?per_page=100" --paginate --jq "${_FILES_JQ_TAGGED}" 2>/dev/null)" \
+      || _die2 "não li os arquivos do PR #${ARG} em ${REPO} — sem eles não sei se toca guarda"
+    # linha `F<TAB>nome` = um arquivo; `P<TAB>nome` = o nome antigo de um rename; linha sem etiqueta conta como arquivo
+    _READ="$(printf '%s\n' "${_RAW}" | awk -F'\t' 'NF && !($1 == "P" && NF == 2) {n++} END {print n+0}')"
+    [ "${_READ}" -eq "${_CHANGED}" ] \
+      || _die2 "li ${_READ} arquivo(s) do PR #${ARG}, e o PR declara changed_files=${_CHANGED} — lista truncada ou divergente; não meço pela metade"
+    FILES="$(printf '%s\n' "${_RAW}" | awk -F'\t' 'NF == 2 && ($1 == "F" || $1 == "P") {print $2; next} NF {print}')" ;;
   --pr-json)
     command -v jq >/dev/null 2>&1 || _die2 "jq ausente"
     FILES="$(jq -r "${_FILES_JQ}" "${ARG}" 2>/dev/null)" || _die2 "JSON ilegível em ${ARG}" ;;
