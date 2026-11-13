@@ -1052,6 +1052,65 @@ if [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
   # entra na lista de falhos para a dispensa NÃO ser recusada como preventiva: o achado existe
   head_runs="${head_runs}"$'\n'"onion-review-verdict"$'\t'"completed"$'\t'"failure"
 fi
+# ══ FALLBACK DO REVISOR × GUARDA (2026-11-13, D_REVIEW_AUTO_WITH_FALLBACK_1113) ═══════════════════════
+# Quando o revisor de IA não julgou (modo off, chave ausente ou falta de crédito: o veredito sai verde com a
+# marca "não revisado pelo CI"), o PR que toca GUARDA não pode entrar só com o gate determinístico. O que
+# substitui o parecer do CI é o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com
+# Elenxo por refutador INDEPENDENTE: `elenxo: true` e `elenxo_isolado: true` (o campo do AUTOMATE do drive e
+# do #1647), verdict aceito e o diff carimbado. Sem isso, recusa. PR que não toca guarda segue sem exigência.
+# A lista de guardas é a do ops/review/guard-paths.sh (uma só, a mesma da regra do `auto`), lida pela API com
+# o nome antigo do rename. Vale no CORE (a lista é dele); em repo alheio, dito e pulado.
+# Leitura que falha = recusa (fail-closed): "não medi" não vira "não toca".
+_FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
+_fallback_guard_gate() {
+  [ -n "${_REVIEW_OFF}" ] && [ -z "${_REVIEW_PRIOR_REPROVOU}" ] || return 0
+  local _here _slug _core _gh _grc=0 _gout
+  _here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
+  # sem --repo, o script roda contra o repo do checkout (o core); com --repo, só vale se for o próprio core
+  _core="$(git -C "${_here}/.." remote get-url origin 2>/dev/null | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' | tr '[:upper:]' '[:lower:]')"
+  if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(tr '[:upper:]' '[:lower:]' <<< "${REPO_ARG[1]}")" != "${_core:-?}" ]; then
+    say "ℹ️  revisão em fallback num repo alheio (${_slug}): a lista de guardas é do core, a exigência do resíduo independente não se aplica aqui."
+    return 0
+  fi
+  _gh="${_here}/review/guard-paths.sh"
+  [ -f "${_gh}" ] || die "a revisão do CI está em fallback e não achei ${_gh}: sem a lista de guardas não sei se o PR #${PR} exige o resíduo independente. Nada foi mergeado."
+  _gout="$(bash "${_gh}" --pr "${PR}" --repo "${_slug}" 2>&1)" || _grc=$?
+  case "${_grc}" in
+    1) say "⊘ revisão em fallback e o PR não toca guarda: sem exigência extra (o gate determinístico cobre)."; return 0 ;;
+    0) : ;;
+    *) die "a revisão do CI está em fallback e não medi se o PR #${PR} toca guarda (${_gout:0:200}). Nada foi mergeado." ;;
+  esac
+  local _paths _why _rel _body _fm _dup _v _h _e _ei
+  _paths="$(head -5 <<< "${_gout}" | paste -sd' ' -)"
+  _why="o PR #${PR} toca GUARDA (${_paths}) e o revisor do CI não julgou (${_REVIEW_OFF#*: }): o merge exige o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com refutador independente (D_REVIEW_AUTO_WITH_FALLBACK_1113)"
+  [ -n "${HEAD_REF}" ] || die "${_why}, e não li a branch do PR para achar o resíduo. Nada foi mergeado."
+  _rel="docs/evolution/review/${HEAD_REF//\//-}.md"
+  grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
+    || die "${_why}; o PR não traz ${_rel}. Nada foi mergeado."
+  _body="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${_slug}/contents/${_rel}?ref=${HEAD_SHA}" 2>/dev/null)" \
+    || die "${_why}; não li ${_rel} no head ${HEAD_SHA:0:8}. Nada foi mergeado."
+  _fm="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' <<< "${_body}")"
+  [ -n "${_fm}" ] || die "${_why}; ${_rel} sem frontmatter. Nada foi mergeado."
+  _dup="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' <<< "${_fm}")"
+  [ -z "${_dup}" ] || die "${_why}; ${_rel} repete chave no frontmatter (${_dup}): o bash lê a 1ª e o YAML a última. Nada foi mergeado."
+  _fmv() { sed -n "s/^$1:[[:space:]]*//p" <<< "${_fm}" | head -1 | tr -d '"'"'"'[:space:]'; }
+  _e="$(_fmv elenxo | tr '[:upper:]' '[:lower:]')"; _ei="$(_fmv elenxo_isolado | tr '[:upper:]' '[:lower:]')"
+  [ "${_e}" = "true" ] || die "${_why}; ${_rel} declara elenxo: '${_e:-ausente}' (exige true). Nada foi mergeado."
+  [ "${_ei}" = "true" ] \
+    || die "${_why}; ${_rel} não declara elenxo_isolado: true (veio '${_ei:-ausente}'): Elenxo do mesmo agente é uma voz só. Nada foi mergeado."
+  _v="$(_fmv verdict | tr 'a-z-' 'A-Z_')"
+  case " ${_FB_OK_VERDICTS} " in
+    *" ${_v} "*) [ -n "${_v}" ] || die "${_why}; ${_rel} sem verdict. Nada foi mergeado." ;;
+    *) die "${_why}; ${_rel} tem verdict '${_v:-ausente}' (aceitos: ${_FB_OK_VERDICTS}). Nada foi mergeado." ;;
+  esac
+  _h="$(_fmv reviewed_diff_sha256)"
+  grep -qE '^[0-9a-f]{64}$' <<< "${_h}" \
+    || die "${_why}; ${_rel} tem reviewed_diff_sha256 '${_h:-ausente}': o resíduo não foi carimbado (o pr-finalize carimba). Nada foi mergeado."
+  unset -f _fmv
+  say "✓ revisão em fallback num PR de GUARDA (${_paths}): resíduo ${_rel} com refutador independente (elenxo_isolado: true), verdict ${_v}, diff ${_h:0:12}"
+}
+_fallback_guard_gate
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
 _falhos="$(printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{print $1}')"
 _not_waived=""

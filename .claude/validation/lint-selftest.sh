@@ -22007,12 +22007,21 @@ run_review_mode_selftests() {
       && git -C "${r}" mv .claude/hooks/h.sh docs/h.md && git -C "${r}" commit -qm ren \
       && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_small \
       && seq 1 10 > "${r}/src/small.sh" && git -C "${r}" add -A && git -C "${r}" commit -qm small \
+      && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_del \
+      && git -C "${r}" rm -q .claude/hooks/h.sh && git -C "${r}" commit -qm del \
+      && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_nest \
+      && mkdir -p "${r}/docs/ops/review" && printf 'x\n' > "${r}/docs/ops/review/x.md" && git -C "${r}" add -A && git -C "${r}" commit -qm nest \
       && git -C "${r}" checkout -q main
   } >/dev/null 2>&1 || { record_fail "review-mode" "não consegui montar o repo git da bancada"; return; }
 
   local _o _rc
-  _rmrun() { # $1=script ; resto = args do juiz → _o (stdout+stderr) e _rc
+  # a lista de guardas é do helper (D_REVIEW_AUTO_WITH_FALLBACK_1113): o juiz e o mutante dele apontam para o
+  # helper REAL; o mutante do helper (os casos _gpcase) aponta o juiz real para o helper mutado.
+  local gph="${REPO_ROOT}/ops/review/guard-paths.sh" gpt="${REPO_ROOT}/ops/moat-targets.tsv"
+  [ -f "${gph}" ] || { record_fail "review-mode" "ops/review/guard-paths.sh ausente: a regra do auto não tem lista"; return; }
+  _rmrun() { # $1=script ; resto = args do juiz → _o (stdout+stderr) e _rc ; limpa os arquivos de sumário/comentário
     local s="$1"; shift
+    rm -f "${d}/sf" "${d}/cf"
     _rc=0; _o="$(cd "${r}" && LC_ALL=C bash "${s}" "$@" 2>&1)" || _rc=$?
   }
   _rmcase() { # $1=rótulo $2=predicado $3=âncora literal do mutante $4=substituição ; resto = args
@@ -22040,19 +22049,70 @@ run_review_mode_selftests() {
     'map(select(.==$l))' 'map(select(contains($l)))' --mode off --labels-json '["review:ia-x"]'
   _rmcase "(e) on ⇒ revisa" _p_run \
     'on)  _decide true on' 'on)  _decide false on' --mode on --labels-json '[]'
-  _rmcase "(f) auto tocando .claude/hooks/ ⇒ revisa" _p_run \
-    "'.claude/hooks/*'" "'.claude/hooks-nao/*'" --mode auto --labels-json '[]' --range main...b_hook
-  _rmcase "(g) auto só docs/ + .kg.yaml (780 linhas) ⇒ NÃO revisa" _p_norun \
-    '$3 !~ /^docs\// && ' '' --mode auto --labels-json '[]' --range main...b_docs
-  _rmcase "(h) auto com 700 linhas de código fora da lista ⇒ revisa (passa do teto)" _p_run \
-    'AUTO_MAX_CODE_LINES=600' 'AUTO_MAX_CODE_LINES=600000' --mode auto --labels-json '[]' --range main...b_big
-  _rmcase "(i) auto com 10 linhas de código fora da lista ⇒ NÃO revisa (abaixo do teto)" _p_norun \
-    'AUTO_MAX_CODE_LINES=600' 'AUTO_MAX_CODE_LINES=5' --mode auto --labels-json '[]' --range main...b_small
-  _rmcase "(j) auto: hook RENOMEADO para docs/ ⇒ revisa (o nome antigo conta)" _p_run \
-    '--name-status --no-renames' '--name-only -M' --mode auto --labels-json '[]' --range main...b_ren
+  local GA=(--guard-helper "${gph}" --targets "${gpt}")
+  _rmcase "(f) auto com PR de GUARDA (.claude/hooks/) ⇒ revisa" _p_run \
+    'true)  _decide true auto "o diff toca guarda' 'true)  _decide false auto "o diff toca guarda' \
+    --mode auto --labels-json '[]' --range main...b_hook "${GA[@]}"
+  _rmcase "(g) auto com PR COMUM (docs/ + .kg.yaml) ⇒ NÃO revisa" _p_norun \
+    'false) _decide false auto' 'false) _decide true auto' --mode auto --labels-json '[]' --range main...b_docs "${GA[@]}"
+  _rmcase "(h) auto com 700 linhas de código fora da lista ⇒ NÃO revisa (o teto saiu com a decisão de 11-13)" _p_norun \
+    '1) GUARD=false ;;' '1) GUARD=unknown ;;' --mode auto --labels-json '[]' --range main...b_big "${GA[@]}"
+  _rmcase "(i) auto com 10 linhas de código fora da lista ⇒ NÃO revisa" _p_norun \
+    'false) _decide false auto' 'false) _decide true auto' --mode auto --labels-json '[]' --range main...b_small "${GA[@]}"
   _rmcase "(k) auto com diff ilegível ⇒ revisa (na dúvida, o lado que mede)" _p_run \
-    '_decide true auto "o diff ${RANGE} não pôde ser lido' '_decide false auto "o diff ${RANGE} não pôde ser lido' \
-    --mode auto --labels-json '[]' --range main...nao-existe
+    '*)     _decide true auto "não medi' '*)     _decide false auto "não medi' \
+    --mode auto --labels-json '[]' --range main...nao-existe "${GA[@]}"
+  _p_gfalse() { [ "${_rc}" -eq 0 ] && grep -qx 'run=false' <<< "${_o}" && grep -qx 'guard=true' <<< "${_o}" && grep -qx 'guard_paths=.claude/hooks/h.sh' <<< "${_o}"; }
+  _rmcase "(k2) modo off mede a guarda mesmo assim (guard=true, para o fallback dizer ao PR)" _p_gfalse \
+    '0) GUARD=true;' '0) GUARD=false;' --mode off --labels-json '[]' --range main...b_hook "${GA[@]}"
+
+  # ── o HELPER da lista (ops/review/guard-paths.sh): o mutante é do helper, e o juiz real o consulta ──
+  _gpcase() { # $1=rótulo $2=predicado $3=âncora no helper $4=substituição ; resto = args do JUIZ (sem --guard-helper)
+    local lbl="$1" pred="$2" anc="$3" sub="$4"; shift 4
+    _rmrun "${sut}" "$@" --guard-helper "${gph}"
+    if ! "${pred}"; then record_fail "review-mode: ${lbl}" "rc=${_rc} out=$(printf '%s' "${_o}" | tail -3)"; return; fi
+    local m="${d}/gp-mut.sh"
+    A="${anc}" B="${sub}" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${m}"
+    if cmp -s "${gph}" "${m}"; then record_fail "review-mode: ${lbl} — MUTANTE" "a âncora '${anc}' não casou no helper"; return; fi
+    _rmrun "${sut}" "$@" --guard-helper "${m}"
+    if "${pred}"; then record_fail "review-mode: ${lbl} — MUTANTE SOBREVIVEU" "'${anc}' → '${sub}' e o caso não notou"; return; fi
+    record_pass "review-mode: ${lbl} (e o mutante do helper reprova)"
+  }
+  _gpcase "(j) auto: hook RENOMEADO para docs/ ⇒ revisa (o nome antigo conta)" _p_run \
+    '--name-status --no-renames' '--name-only -M' --mode auto --labels-json '[]' --range main...b_ren --targets "${gpt}"
+  _gpcase "(j2) auto: hook REMOVIDO ⇒ revisa (remoção conta)" _p_run \
+    '--name-status --no-renames' '--name-status --no-renames --diff-filter=AM' --mode auto --labels-json '[]' --range main...b_del --targets "${gpt}"
+  # a derivação do tsv, contra um tsv de bancada (uma linha de cada classe, e só ela cobre o arquivo do caso)
+  printf '# bancada\nato\tscript\tops/a.sh\t--apply\ndeploy\tpath\t/x\tops/w.sh\ndelega\tscript\tops/dl.sh\t--f\t@none\nrelogio\tpath\t/etc/cron*\t-\n' > "${d}/t.tsv"
+  local _gpw
+  for _gpw in a w dl; do
+    { git -C "${r}" checkout -q main && git -C "${r}" checkout -qb "b_t${_gpw}" && mkdir -p "${r}/ops" \
+      && printf 'x\n' > "${r}/ops/${_gpw}.sh" && git -C "${r}" add -A && git -C "${r}" commit -qm "t${_gpw}" \
+      && git -C "${r}" checkout -q main; } >/dev/null 2>&1 || record_fail "review-mode" "não montei a branch b_t${_gpw}"
+  done
+  _gpcase "(gp-a) auto: script de ATO do moat-targets.tsv ⇒ revisa" _p_run \
+    '($1 == "ato" || $1 == "delega")' '($1 == "nada" || $1 == "delega")' --mode auto --labels-json '[]' --range main...b_ta --targets "${d}/t.tsv"
+  _gpcase "(gp-b) auto: WRAPPER de deploy do moat-targets.tsv ⇒ revisa" _p_run \
+    '$1 == "deploy" && NF >= 4' '$1 == "nada" && NF >= 4' --mode auto --labels-json '[]' --range main...b_tw --targets "${d}/t.tsv"
+  _gpcase "(gp-c) auto: script DELEGA do moat-targets.tsv ⇒ revisa" _p_run \
+    '|| $1 == "delega")' '|| $1 == "nada")' --mode auto --labels-json '[]' --range main...b_tdl --targets "${d}/t.tsv"
+  _gpcase "(gp-d) auto: prefixo só no INÍCIO do caminho (docs/ops/review/ não é guarda)" _p_norun \
+    'index($0, p) == 1' 'index($0, p) >= 1' --mode auto --labels-json '[]' --range main...b_nest --targets "${d}/t.tsv"
+  _p_gp_unk() { [ "${_rc}" -eq 0 ] && grep -qx 'run=true' <<< "${_o}" && grep -qx 'guard=unknown' <<< "${_o}"; }
+  _gpcase "(gp-e) auto: moat-targets.tsv ilegível ⇒ guard=unknown e REVISA (lista incompleta não vira 'não toca')" _p_gp_unk \
+    'PATS="$(_patterns)" || exit 2' 'PATS="$(_patterns)" || exit 1' --mode auto --labels-json '[]' --range main...b_small --targets "${d}/nao-existe.tsv"
+  # o rename pela API: o JSON do `pulls/<n>/files` traz o nome antigo em previous_filename
+  printf '[{"filename":"docs/h.md","status":"renamed","previous_filename":".claude/hooks/h.sh"},{"filename":"docs/x.md","status":"modified"}]' > "${d}/pr.json"
+  _gprc=0; _gpo="$(LC_ALL=C bash "${gph}" --pr-json "${d}/pr.json" --targets "${gpt}" 2>&1)" || _gprc=$?
+  if [ "${_gprc}" -ne 0 ] || [ "${_gpo}" != ".claude/hooks/h.sh" ]; then record_fail "review-mode: (gp-f) rename pela API" "rc=${_gprc} out=${_gpo}"
+  else
+    A=', (.previous_filename // empty)' B='' awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${d}/gp-mut.sh"
+    _gprc=0; LC_ALL=C bash "${d}/gp-mut.sh" --pr-json "${d}/pr.json" --targets "${gpt}" >/dev/null 2>&1 || _gprc=$?
+    if cmp -s "${gph}" "${d}/gp-mut.sh"; then record_fail "review-mode: (gp-f) rename pela API — MUTANTE" "a âncora do previous_filename não casou"
+    elif [ "${_gprc}" -eq 0 ]; then record_fail "review-mode: (gp-f) rename pela API — MUTANTE SOBREVIVEU" "sem previous_filename o rename ainda casou"
+    else record_pass "review-mode: (gp-f) rename pela API conta pelo previous_filename (e o mutante sem ele reprova)"; fi
+  fi
+  unset -f _gpcase _p_gp_unk _p_gfalse
   _rmcase "(l) valor fora do enum (ON) ⇒ falha NOMEADA rc 2, sem decisão" _p_enum \
     'on|off|auto) _mode_src' 'on|off|auto|ON|" on"|"off ") _mode_src' --mode ON --labels-json '[]'
   _rmcase "(m) valor com espaço (' on') ⇒ falha nomeada, não normaliza" _p_enum \
@@ -22061,13 +22121,49 @@ run_review_mode_selftests() {
     'on|off|auto) _mode_src' 'on|off|auto|ON|" on"|"off ") _mode_src' --mode "off " --labels-json '["review:ia"]'
 
   # ── o check do veredito (--verdict-gate): desligada ⇒ verde COM a marca; sem decisão ⇒ vermelho ──
-  _p_g_off() { [ "${_rc}" -eq 0 ] && grep -qF "::notice::onion-review-desligado: revisão desligada (modo off" <<< "${_o}"; }
+  _p_g_off() { [ "${_rc}" -eq 0 ] && grep -qF "::notice::onion-review-desligado: não revisado pelo CI: revisão desligada (modo off" <<< "${_o}" \
+                && grep -qF "Não revisado pelo CI" "${d}/sf" && grep -qF "toca GUARDA" "${d}/cf"; }
   _p_g_nomode() { [ "${_rc}" -eq 1 ] && grep -qF "decisão do modo do revisor NÃO concluiu" <<< "${_o}"; }
   _p_g_skip() { [ "${_rc}" -eq 1 ] && grep -qF "foi PULADO" <<< "${_o}"; }
   _p_g_go() { [ "${_rc}" -eq 10 ] && [ -z "${_o}" ]; }
   _rmcase "(o) veredito com revisão desligada ⇒ rc 0 e a ANOTAÇÃO-marca que o merge-verified lê" _p_g_off \
     'MARKER="onion-review-desligado:"' 'MARKER="desligado-sem-marca:"' \
-    --verdict-gate --mode-result success --run false --mode off --reason "padrão" --review-result skipped
+    --verdict-gate --mode-result success --run false --mode off --reason "padrão" --review-result skipped \
+    --guard true --guard-paths ".claude/hooks/h.sh" --summary-file "${d}/sf" --comment-file "${d}/cf"
+  _rmcase "(o1) OFF é FALLBACK: o motivo vai ao sumário E ao comentário do PR (com a exigência da guarda)" _p_g_off \
+    '"${gp}" "${summ}" "${cfile}"' '"${gp}" "${summ}" ""' \
+    --verdict-gate --mode-result success --run false --mode off --reason "padrão" --review-result skipped \
+    --guard true --guard-paths ".claude/hooks/h.sh" --summary-file "${d}/sf" --comment-file "${d}/cf"
+  _p_g_auto() { [ "${_rc}" -eq 0 ] && grep -qF "::notice::onion-review-desligado: não revisado pelo CI: revisão desligada (modo auto" <<< "${_o}" && [ ! -s "${d}/cf" ]; }
+  _rmcase "(o2) auto SEM guarda: marca e sumário, SEM comentário (não há o que pedir)" _p_g_auto \
+    'if [ "${mode}" = "auto" ]; then' 'if false; then' \
+    --verdict-gate --mode-result success --run false --mode auto --reason "não toca guarda" --review-result skipped \
+    --guard false --summary-file "${d}/sf" --comment-file "${d}/cf"
+
+  # ── FALTA DE CRÉDITO ⇒ fallback, nunca vermelho (--classify-credit + --fallback) ──
+  mkdir -p "${d}/ev1" "${d}/ev2" "${d}/ev3"
+  printf '{"type":"result","is_error":true,"result":"Credit balance is too low to access the Anthropic API."}' > "${d}/ev1/claude-execution-output.json"
+  printf '{"type":"result","is_error":true,"api_error_status":400,"result":"Your credit is exhausted"}' > "${d}/ev2/claude-execution-output.json"
+  printf '{"type":"result","is_error":true,"api_error_status":400,"result":"invalid model"}' > "${d}/ev3/claude-execution-output.json"
+  _p_cr() { [ "${_rc}" -eq 0 ] && grep -qF "sem crédito na API" <<< "${_o}"; }
+  _p_nocr() { [ "${_rc}" -eq 1 ] && ! grep -qF "sem crédito" <<< "${_o}"; }
+  _rmcase "(cr-a) pré-voo HTTP 400 'credit balance' ⇒ falta de crédito" _p_cr \
+    '[ "${http}" = "400" ]' '[ "${http}" = "999" ]' \
+    --classify-credit --preflight-http 400 --preflight-causa '{"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API."}}'
+  _rmcase "(cr-b) evidência do run com 'Credit balance is too low' ⇒ falta de crédito" _p_cr \
+    "'credit balance is too low'" "'frase-que-nao-existe'" --classify-credit --preflight-http 200 --evidence-dir "${d}/ev1"
+  _rmcase "(cr-c) evidência com api_error_status 400 e crédito ⇒ falta de crédito" _p_cr \
+    '"api_error_status"[[:space:]]*' '"api_error_statusX"[[:space:]]*' --classify-credit --evidence-dir "${d}/ev2"
+  _rmcase "(cr-d) HTTP 400 sem 'credit balance' (modelo inexistente) NÃO é crédito ⇒ segue vermelho" _p_nocr \
+    "LC_ALL=C grep -qiF 'credit balance' <<< \"\${causa}\"" 'true' --classify-credit --preflight-http 400 --preflight-causa 'model: claude-x not found'
+  _rmcase "(cr-e) api_error_status 400 SEM crédito (modelo inválido) NÃO é crédito" _p_nocr \
+    "&& LC_ALL=C grep -qiF 'credit' \"\${f}\"" '' --classify-credit --evidence-dir "${d}/ev3"
+  _p_fb() { [ "${_rc}" -eq 0 ] && grep -qF "::notice::onion-review-desligado: não revisado pelo CI: sem crédito na API" <<< "${_o}" \
+            && grep -qF "toca GUARDA" "${d}/cf" && grep -qF "<!-- onion-review-fallback -->" "${d}/cf"; }
+  _rmcase "(fb-a) falta de crédito ⇒ verde COM a marca que o merge-verified lê + comentário com a exigência" _p_fb \
+    "printf '::notice::%s não revisado pelo CI: %s\\n' \"\${MARKER}\"" "printf '::notice::%s revisado: %s\\n' \"x\"" \
+    --fallback --reason "sem crédito na API (pré-voo HTTP 400: credit balance)" --guard true --guard-paths ".github/workflows/x.yml" \
+    --summary-file "${d}/sf" --comment-file "${d}/cf"
   _rmcase "(p) veredito sem decisão (job do modo falhou) ⇒ vermelho nomeado, nunca verde" _p_g_nomode \
     'if [ "${mres}" != "success" ]; then' 'if false; then' \
     --verdict-gate --mode-result failure --run false --mode "" --reason "" --review-result skipped
@@ -22117,6 +22213,11 @@ v = j.get("onion-review-verdict") or {}
 if "onion-review-mode" not in (v.get("needs") or []): err.append("verdict não depende do job do modo")
 vr = " ".join(str(s.get("run", "")) for s in v.get("steps", []) if isinstance(s, dict))
 if "--verdict-gate" not in vr: err.append("verdict não passa pelo --verdict-gate")
+# o FALLBACK (D_REVIEW_AUTO_WITH_FALLBACK_1113): a guarda sai do helper da BASE, a falta de crédito vira fallback
+if "guard-paths.sh" not in runs: err.append("o job do modo não usa o helper da lista de guardas")
+if "guard" not in (m.get("outputs") or {}): err.append("o job do modo não exporta guard")
+if "--classify-credit" not in vr or "--fallback" not in vr: err.append("verdict não reconhece a falta de crédito como fallback")
+if not any("download-artifact" in str(s.get("uses", "")) for s in v.get("steps", []) if isinstance(s, dict)): err.append("verdict não baixa a evidência do revisor")
 print("OK" if not err else "; ".join(err))
 PYW
     }
@@ -22126,10 +22227,14 @@ PYW
       if cmp -s "${wf}" "${d}/wf-mut.yml"; then record_fail "review-mode: (s) fiação — MUTANTE" "a âncora dos types não casou"
       elif [ "$(_wire "${d}/wf-mut.yml")" = "OK" ]; then record_fail "review-mode: (s) fiação — MUTANTE SOBREVIVEU" "workflow sem labeled/unlabeled passou"
       else record_pass "review-mode: (s) fiação do workflow (labeled/unlabeled, job do modo, gate do revisor, --verdict-gate) (e o mutante reprova)"; fi
+      sed 's/--classify-credit/--classifica-nada/' "${wf}" > "${d}/wf-mut2.yml"
+      if cmp -s "${wf}" "${d}/wf-mut2.yml"; then record_fail "review-mode: (s2) fiação do fallback — MUTANTE" "a âncora --classify-credit não casou"
+      elif [ "$(_wire "${d}/wf-mut2.yml")" = "OK" ]; then record_fail "review-mode: (s2) fiação do fallback — MUTANTE SOBREVIVEU" "workflow sem a classificação de crédito passou"
+      else record_pass "review-mode: (s2) fiação do fallback (helper da base, guard, crédito ⇒ --fallback, evidência baixada) (e o mutante reprova)"; fi
     else record_fail "review-mode: (s) fiação do workflow" "${_o}"; fi
     unset -f _wire
   fi
-  unset -f _rmrun _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go
+  unset -f _rmrun _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go _p_g_auto _p_cr _p_nocr _p_fb
 }
 
 # ---------------------------------------------------------------------------
@@ -25910,6 +26015,10 @@ case "$args" in
       printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
   # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): quantos commits da base o head NÃO tem
   *"api "*"/compare/"*) echo "${GH_BEHIND_BY:-0}"; exit 0 ;;
+  # o resíduo da REGRA 56 lido no head (fallback do revisor × guarda, D_REVIEW_AUTO_WITH_FALLBACK_1113)
+  *"api "*"/contents/docs/evolution/review/"*)
+      [ -f "${STUB_RESIDUE:-/nonexistent}" ] || { echo "gh: Not Found (HTTP 404)" >&2; exit 1; }
+      cat "${STUB_RESIDUE}"; exit 0 ;;
   *"api "*pulls*files*)
       # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
       [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
@@ -26727,7 +26836,8 @@ PFSTUB
   # comentar; revisão que RODOU e reprovou continua exigindo dispensa; e desligar DEPOIS de um achado
   # no mesmo head não o apaga. Cada caso roda contra o SUT real E contra um mutante que tem de reprovar.
   mkdir -p "${d}/ann" "${d}/rvm/ops/review"
-  cp "${REPO_ROOT}/ops/review/review-mode-decide.sh" "${d}/rvm/ops/review/" 2>/dev/null || true
+  cp "${REPO_ROOT}/ops/review/review-mode-decide.sh" "${REPO_ROOT}/ops/review/guard-paths.sh" "${d}/rvm/ops/review/" 2>/dev/null || true
+  cp "${REPO_ROOT}/ops/moat-targets.tsv" "${d}/rvm/ops/" 2>/dev/null || true
   printf '%s\n' "onion-review-desligado: revisão desligada (modo off, motivo: variável ausente ou vazia ⇒ padrão off)" > "${d}/ann/200"
   printf '%s\n' "onion-review apontou 2 violação(ões) — corrija, ou dispense com motivo registrado" > "${d}/ann/150"
   _mvr() { # $1=script $2=GH_RV_RUNS $3=verdict_fail(0|1) $4=rv_rc ; resto = flags do SUT
@@ -26779,6 +26889,38 @@ PFSTUB
   _rvcase "(rv-e) histórico do veredito ilegível ⇒ recusa nomeada (fail-closed)" _p_hist \
     '|| die "não consegui LER o histórico' '|| echo "não li o histórico' \
     '' 0 1
+
+  # ── (rv-f..i) FALLBACK DO REVISOR × GUARDA (D_REVIEW_AUTO_WITH_FALLBACK_1113, 2026-11-13) ─────────────
+  # Revisão em fallback (a marca "não revisado pelo CI") num PR que toca GUARDA exige o resíduo da REGRA 56 com
+  # elenxo: true e elenxo_isolado: true (refutador independente); PR comum segue sem exigência. A lista de
+  # guardas é a do ops/review/guard-paths.sh (copiado ao lado do mutante). Os arquivos do PR saem do esboço.
+  printf '%s\n' "onion-review-desligado: não revisado pelo CI: sem crédito na API (pré-voo HTTP 400: credit balance)" > "${d}/ann/210"
+  local _rres="docs/evolution/review/feat-alguma-coisa.md"
+  printf -- '---\nverdict: FIXED\nelenxo: true\nelenxo_isolado: true\nreviewed_diff_sha256: %s\n---\n# r\n' "$(printf '%064d' 7)" > "${d}/res-ok.md"
+  printf -- '---\nverdict: FIXED\nelenxo: true\nreviewed_diff_sha256: %s\n---\n# r\n' "$(printf '%064d' 7)" > "${d}/res-uma-voz.md"
+  _p_fb_nores() { [ "${_mv_rc}" -ne 0 ] && grep -qF "toca GUARDA (.github/workflows/x.yml)" <<< "${_mv_out}" && grep -qF "não traz ${_rres}" <<< "${_mv_out}" \
+                  && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_fb_umavoz() { [ "${_mv_rc}" -ne 0 ] && grep -qF "não declara elenxo_isolado: true" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_fb_ok() { [ "${_mv_rc}" -eq 0 ] && grep -qF "resíduo ${_rres} com refutador independente" <<< "${_mv_out}" && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_fb_comum() { [ "${_mv_rc}" -eq 0 ] && grep -qF "o PR não toca guarda: sem exigência extra" <<< "${_mv_out}" && grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  export GH_PR_FILES=".github/workflows/x.yml" STUB_RESIDUE="${d}/nao-existe.md"
+  _rvcase "(rv-f) FALLBACK por crédito num PR de GUARDA sem resíduo ⇒ merge RECUSADO" _p_fb_nores \
+    '[ -n "${_REVIEW_OFF}" ] && [ -z "${_REVIEW_PRIOR_REPROVOU}" ] || return 0' 'return 0' \
+    '210\tsuccess\n' 0 0
+  export GH_PR_FILES=".github/workflows/x.yml ${_rres}" STUB_RESIDUE="${d}/res-uma-voz.md"
+  _rvcase "(rv-g) FALLBACK num PR de GUARDA com resíduo SEM elenxo_isolado (uma voz só) ⇒ merge RECUSADO" _p_fb_umavoz \
+    '[ "${_ei}" = "true" ] \' 'true || [ "${_ei}" = "true" ] \' \
+    '210\tsuccess\n' 0 0
+  export STUB_RESIDUE="${d}/res-ok.md"
+  _rvcase "(rv-h) FALLBACK num PR de GUARDA com resíduo independente ⇒ mergeia, e diz qual resíduo cobriu" _p_fb_ok \
+    'grep -qxF -- "${_rel}" <<< "${_PR_FILES}"' 'grep -qxF -- "nao-esta-no-pr" <<< "${_PR_FILES}"' \
+    '210\tsuccess\n' 0 0
+  export GH_PR_FILES="docs/x.md src/a.sh" STUB_RESIDUE="${d}/nao-existe.md"
+  _rvcase "(rv-i) FALLBACK (modo off) num PR COMUM ⇒ mergeia sem exigência extra" _p_fb_comum \
+    '1) say "⊘ revisão em fallback e o PR não toca guarda' '1) die "⊘ revisão em fallback e o PR não toca guarda' \
+    '200\tsuccess\n' 0 0
+  unset GH_PR_FILES STUB_RESIDUE
+  unset -f _p_fb_nores _p_fb_umavoz _p_fb_ok _p_fb_comum
 
   # ── (th1)-(th3) TOCTOU: O HEAD MUDA ENTRE O JULGAMENTO E O MERGE (2026-10-27) ─────────────────
   # Caso vivo da curadoria (PRs #117 e #118 de 2026-10-26, --merge-commit): os gates julgavam os check-runs
