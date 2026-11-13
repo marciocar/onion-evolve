@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "9ª passada: o refutador independente no head 1759dba93 REPROVOU por um bloqueio (o detector do fecho não via caminho em variável) e uma linha (git replace), curados aqui. 8ª passada: o refutador independente no head 386161856 REPROVOU por um bloqueio (a lista de guarda não seguia o que os atos executam) e uma cura de uma linha (o ls-remote isolado da config), curados aqui. 7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: f5e30b6ad11e5910196949de768d0a008be589b49701b3418fbc6dc45b9135ec
-reviewed_code_sha256: 9ba1a43d7f38a5ef56bae4687aa47469d1f55f1bfce99c92359dfc306516deb2
-findings_total: 31
-findings_real: 31
-findings_fixed: 31
+reviewer: "10ª passada: o refutador independente no head a065593a3 REPROVOU pela mesma classe (3 escapes do fecho no ENSAIO das portas); por decisão de desenho do team-lead, o ônus se inverteu para a EXECUÇÃO (bancada act_trace). 9ª passada: o refutador independente no head 1759dba93 REPROVOU por um bloqueio (o detector do fecho não via caminho em variável) e uma linha (git replace), curados aqui. 8ª passada: o refutador independente no head 386161856 REPROVOU por um bloqueio (a lista de guarda não seguia o que os atos executam) e uma cura de uma linha (o ls-remote isolado da config), curados aqui. 7ª passada: o refutador independente no head 7a1e8dce3 REPROVOU o item 3 (rename escapa; regex à mão deixava atos de fora), curado aqui com a lista derivada do tsv e o reforço do ls-remote. 6ª passada: o refutador independente no head 8e0b4df5d manteve a constante do core e REPROVOU pela forma delegada rodando o script EDITADO na árvore e pela sessão mergeando o próprio PR com --dispensa; o maestro decidiu por /meta:decide fechar o barato e declarar o resto (6 itens, curados aqui). 5ª passada: o refutador independente no head d820c629b REPROVOU com 1 bloqueio (o members.yaml define o core) e 2 itens baratos (ExecStart e DropInPaths efetivos, /run/systemd/system), curados aqui com o harness re-rodado (after4.txt). 4ª passada: o refutador independente no head ad3260def conferiu as formas de linha curadas e REPROVOU com 2 bloqueios estruturais (F1, F2), curados aqui com o harness re-rodado (after3.txt). 3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: 55d90782c63b0d6752282e44442ce5e8688ca4403f3642b9d65c546635b519c2
+reviewed_code_sha256: 3a04f617382a7c309515a49df57cd859b8e3d03683a0dbada233b12eb2505a70
+findings_total: 33
+findings_real: 33
+findings_fixed: 33
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou oito vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
+nota: "o refutador independente reprovou nove vezes; as curas entraram neste PR. Pelo item 3 da decisão do maestro de 2026-11-13, este PR toca guarda e o merge dele é do maestro (--maestro), depois de nova passada do refutador"
 ---
 
 # Resíduo — REGRA 56
@@ -177,7 +177,7 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
 
 28. **A lista de guarda não seguia o que os atos EXECUTAM.** O publish-door.sh, mesmo em ensaio, roda o
     materialize-door.sh e o materialize-marketplace-repo.sh; um PR que só os tocasse não era guarda. Cura: linhas
-    `fecho script <path>` no moat-targets.tsv, explícitas e revisadas (51 depois da 9ª passada), que o pr-merge-verified.sh soma à lista
+    `fecho script <path>` no moat-targets.tsv, explícitas e revisadas (82 depois da 10ª passada), que o pr-merge-verified.sh soma à lista
     de guarda, mais os .githooks/. A REGRA 117 (act-signature-check.sh) confere o fecho contra o código: toda execução de
     um script do repo (`bash x.sh`, `source`, `.`, `python3 x.py`, `"${WT}/ops/x.sh"`, `$(…)`) a partir de uma linha
     ato/delega/fecho tem de estar numa delas (`fecho-incompleto`), e a linha fecho sem arquivo acusa
@@ -204,6 +204,29 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
     no pr-merge-verified com o assemble-plugin.sh.
 31. **`git replace` desviava a régua.** `git replace <main> <commit forjado>` trocava a árvore que o hook lê. Cura:
     `--no-replace-objects` no hash-object, no rev-parse e no cat-file do ROOT. (rb32, com mutante)
+
+## 10ª passada: o fecho medido por EXECUÇÃO (curado aqui)
+
+32. **Os escapes do fecho no ensaio das portas** (a variável de diretório derivada de outra, `CORE="$(cd "${HERE}/.."
+    && pwd)"` e `bash "${LEAK_SCAN}"`; a raiz de mktemp, `bash "${_pb}"`; o caminho montado dentro da função, `_regen`).
+    Por decisão de desenho do team-lead, parei de perseguir forma por forma e inverti o ônus: a bancada nova
+    `act_trace` (ops/testing/act-trace-check.sh) roda o ENSAIO REAL de onion-core e onion-plugins (o publish-door.sh de
+    produção, sem --push) num clone de sandbox, com `bash`, `sh` e `python3` no PATH trocados por um registrador que anota
+    cada script executado, e reprova se algum script do repo executado não está numa linha ato/delega/fecho nem abaixo
+    da FRONTEIRA do lint. O rastro é a verdade; o detector estático da REGRA 117 é pré-filtro. A 1ª medição achou 29
+    scripts fora do fecho (os 3 do refutador e mais 26: o regen-baselines.sh do materialize-door roda os checadores
+    de baseline FORA do lint, e por isso eles são do ato); o tsv tem agora 82 linhas fecho. A bancada (a1)-(a3) julga o
+    juiz em rastros sintéticos, (b) roda o ensaio e (m) julga o mesmo rastro contra o tsv sem a linha fecho do
+    materialize-door.sh, que tem de reprovar nomeando-o. Custo: ~4 min, com nice.
+    **O ensaio exercitado é o caminho de produção, com os mesmos argumentos**; a única diferença, declarada, é o
+    registro por --members (as portas apontam repositórios bare locais, semeados sem rede). **Lacuna nomeada:** o que
+    não tem ensaio executável (o merge alheio, o deploy do site, o update do bridge e a persona do Slack) fica no
+    detector estático; o rastro não vê arquivo lido por `source`/`.`, nem script executado por `/bin/bash` absoluto ou
+    shebang `#!/bin/bash`; e o rastro é o de HEAD (o pre-commit local mede o commit anterior; o CI mede o do PR).
+33. **O git replace nos scripts.** `GIT_NO_REPLACE_OBJECTS=1` exportado no `delegated_env_guard` do deploy-site.sh e no
+    `_delegated_env_guard` e no `_pmv_fix_path` do pr-merge-verified.sh (o replace ainda desviava o show do resíduo, o
+    rev-parse de site/, o merge-base e o show de origin/main:members.yaml e do tsv). (rf30 e o caso L do deploy-site,
+    com mutante)
 
 ## LIMITES aceitos (o refutador e o maestro, 2026-11-13)
 

@@ -26368,6 +26368,22 @@ STUB
     _fr "(rf22-MUT) sem a conferência do blob, o script editado mergearia — a conferência é a causa" 0 "merge alheio delegado" --repo owner/repo --foreign-repo
   else record_fail "pr-merge-verified: (rf22-MUT)" "a âncora da conferência do blob sumiu"; fi
   cp "${d}/pmv-5p" "${fc}/ops/pr-merge-verified.sh"
+  # 9ª passada (L): o _pmv_fix_path e o _delegated_env_guard exportam GIT_NO_REPLACE_OBJECTS=1; MUTANTE: sem a exportação
+  local _nr _nrf
+  for _nrf in _pmv_fix_path _delegated_env_guard; do
+    _nr="$(awk -v f="${_nrf}" '$0 ~ "^"f"\\(\\) \\{" {g=1} g{print} g && /^}$/{exit} g && /\}$/ && $0 ~ "^"f{exit}' "${sut}")"
+    for _gm in intacta mutante; do
+      [ "${_gm}" = mutante ] && _nr="$(sed 's/GIT_NO_REPLACE_OBJECTS=1; //; s/ GIT_NO_REPLACE_OBJECTS;/;/; /^  GIT_NO_REPLACE_OBJECTS=1; export GIT_NO_REPLACE_OBJECTS/d' <<< "${_nr}")"
+      o="$(env -i HOME="${HOME}" PATH="${PATH}" bash -c "${_nr}"$'\ndie() { echo "MORREU $*"; exit 1; }; '"${_nrf}"'; echo "NRO=${GIT_NO_REPLACE_OBJECTS:-}"' 2>&1)"
+      if [ "${_gm}" = intacta ]; then
+        [ "${o##*$'\n'}" = "NRO=1" ] && record_pass "pr-merge-verified: (rf30) ${_nrf} exporta GIT_NO_REPLACE_OBJECTS=1 (o git replace não desvia o que o script lê)" \
+          || record_fail "pr-merge-verified: (rf30) ${_nrf}" "${o:0:160}"
+      else
+        [ "${o##*$'\n'}" = "NRO=" ] && record_pass "pr-merge-verified: (rf30-MUT) ${_nrf} sem a exportação — a linha é a causa" \
+          || record_fail "pr-merge-verified: (rf30-MUT) ${_nrf}" "o mutante deu ${o:0:120}"
+      fi
+    done
+  done
   # item 4: PATH fixo sempre que a sessão do core chama (a função e a linha que a chama, tiradas do script real)
   local _pf; _pf="$(grep -E '^_pmv_fix_path\(\) |^\[ "\$\{_CORE_SESSION\}" = 1 \] && _pmv_fix_path$' "${sut}")"
   for _gm in intacta mutante; do
@@ -47537,6 +47553,45 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_act_signature_selftests
+
+# REGRA 117, o FECHO POR EXECUÇÃO (9ª passada do refutador do #1647, 2026-11-13): o ensaio REAL das portas (onion-core e
+# onion-plugins, o publish-door.sh de produção sem --push) roda num sandbox sob um registrador de bash/sh/python3 no PATH
+# (ops/testing/act-trace-check.sh, core-only), e reprova se algum script do repo executado não está no fecho do tsv nem
+# abaixo da FRONTEIRA do lint. O rastro é a verdade; o detector estático (act_signature) é pré-filtro. MUTANTE: o mesmo
+# rastro julgado contra o tsv sem a linha fecho do materialize-door.sh tem de reprovar nomeando-o. Caro (~4 min, nice).
+run_act_trace_selftests() {
+  local chk="${REPO_ROOT}/ops/testing/act-trace-check.sh" tsv="${REPO_ROOT}/ops/moat-targets.tsv" o rc sb  # (core-only)
+  [ -f "${chk}" ] && [ -f "${tsv}" ] || { record_skip "act-trace: sem ops/testing/act-trace-check.sh (core-only)"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "act-trace: python3 ausente"; return; }
+  # (a) o juiz, em rastro sintético: dentro do fecho cala, abaixo da FRONTEIRA cala, fora acusa, vazio é "não medi"
+  sb="$(TMPDIR=/tmp mktemp -d)"
+  printf '/x/core/ops/materialize-door.sh\t0\n/x/b/.claude/validation/inventory.sh\t1\n' > "${sb}/t1"
+  if o="$(bash "${chk}" --judge "${sb}/t1" "${tsv}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] && record_pass "act-trace: (a1) script no fecho e script abaixo da FRONTEIRA calam" || record_fail "act-trace: (a1)" "rc=${rc} ${o:0:200}"
+  printf '/x/core/ops/kg-vocab-ci.sh\t0\n' > "${sb}/t2"
+  if o="$(bash "${chk}" --judge "${sb}/t2" "${tsv}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 1 ] && grep -q 'FORA-DO-FECHO.ops/kg-vocab-ci.sh' <<< "${o}" && record_pass "act-trace: (a2) script executado fora do fecho acusa, nomeado" \
+    || record_fail "act-trace: (a2)" "rc=${rc} ${o:0:200}"
+  : > "${sb}/t3"
+  if o="$(bash "${chk}" --judge "${sb}/t3" "${tsv}" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 2 ] && record_pass "act-trace: (a3) rastro vazio é 'não medi' (rc 2), nunca verde" || record_fail "act-trace: (a3)" "rc=${rc}"
+  # (b) o ENSAIO REAL das portas, rastreado
+  local tr="${sb}/trace.log"
+  # ambiente limpo: o da bancada (GIT_CONFIG_COUNT, as variáveis de modo de teste) mudaria o que o ensaio de produção faz
+  if o="$(env -i HOME="${HOME}" PATH="${PATH}" LANG="${LANG:-C.UTF-8}" TERM=dumb nice -n 10 bash "${chk}" --trace-out "${tr}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ]; then record_pass "act-trace: (b) o ensaio de onion-core e onion-plugins só executa scripts do fecho ($(grep -o 'executados no ensaio: [0-9]*' <<< "${o}"))"
+  else record_fail "act-trace: (b) ensaio rastreado" "rc=${rc} $(grep -E 'FORA-DO-FECHO|NAO-MEDI|saiu' <<< "${o}" | head -5 | tr '\n' '|' | cut -c1-400)"; fi
+  # (m) MUTANTE: o mesmo rastro contra o tsv sem a linha fecho do materialize-door.sh
+  if [ -n "${tr}" ] && [ -f "${tr}" ]; then
+    grep -v $'^fecho\tscript\tops/materialize-door.sh\t' "${tsv}" > "${sb}/tsv-mut"
+    if o="$(bash "${chk}" --judge "${tr}" "${sb}/tsv-mut" "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 1 ] && grep -q 'FORA-DO-FECHO.ops/materialize-door.sh' <<< "${o}" \
+      && record_pass "act-trace: (m) sem a linha fecho do materialize-door.sh, o rastro reprova nomeando-o — o fecho é a causa" \
+      || record_fail "act-trace: (m) mutante" "rc=${rc} ${o:0:200}"
+  else record_fail "act-trace: (m) mutante" "sem o rastro do ensaio (a bancada não pôde medir)"; fi
+  rm -rf -- "${sb}"
+}
+_family run_act_trace_selftests
 
 # REGRA 118 (Veto de repo alheio do adotante registrado e com lista) — o MODO DE ADOTANTE dos vetos (2026-11-05).
 # Defeito datado: a curadoria rodou 31 formas de ato com os 5 hooks e o cwd no repo dela, e 27 passaram. Aqui cada
