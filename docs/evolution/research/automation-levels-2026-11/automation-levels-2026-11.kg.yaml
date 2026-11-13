@@ -267,6 +267,70 @@ nodes:
       locator: "pergunta com opções de 2026-11-12: «O Delphi da análise de stakeholders fechou por unanimidade (core, kg-ssot, curadoria). Selo?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
       locality: "pessoa"
+  - id: D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Só pelo caminho verificado»"
+    label: "a sessão do core pode fazer merge de PR em repositório da família registrado no members.yaml, só pelo caminho verificado (pr-merge-verified com --foreign-repo), com CI verde, sem conflito e com resíduo; fora disso o veto continua"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Só pelo caminho verificado»; descartadas: «Continua com o maestro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «Merge de PR em repositório de outro dono da família: pode passar a ser da sessão do core?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
+  - id: D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Depois de merge verificado»"
+    label: "a sessão do core pode rodar o deploy do site (ops/deploy-site.sh) só com a main verde e o PR passado por refutador independente, com o --check antes e depois"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Depois de merge verificado»; descartadas: «Continua com o maestro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «Deploy do site onionevolve.com: pode passar a ser da sessão?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
+  - id: D_DELEGATE_VPS_SERVICE_SCRIPTS_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Só os dois scripts»"
+    label: "a sessão do core pode rodar os dois scripts de serviço da VPS (ops/update-bridge.sh e ops/slack-persona.sh install/start) por regra de sudoers sem senha só para eles, que o maestro cria; editar config com segredo e mexer em credenciais continuam com o maestro"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Só os dois scripts»; descartadas: «Continua com o maestro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «Atualizar os serviços da VPS que precisam de root: pode passar a ser da sessão?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
+  - id: D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-13"
+    verified_against: "decisão do maestro em 2026-11-13, por pergunta com opções (/meta:decide): escolhida «Continua com o maestro»"
+    label: "a publicação das portas públicas (push e tag de release) continua com o maestro: a sessão ensaia, testa e propõe o número"
+    narrative: "Selado por /meta:decide em 2026-11-13: escolhida «Continua com o maestro»; descartadas: «Libera depois do ensaio»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-13: «Publicar as portas públicas com push e tag de release: pode passar a ser da sessão?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
+      locality: "pessoa"
 edges:
   - from: E_HUB_FIRST_SPIKE_LOG_ARRIVAL_1112
     to: Q_OPS_CHECK_MOLD_RULES_1112
@@ -312,4 +376,16 @@ edges:
     edge_type: TRACES_TO
   - from: D_STAKEHOLDER_SIGNALS_METHOD_1112
     to: D_LGPD_WAIT_THEN_SLU_BEFORE_FIRST_CONTRACT_1111
+    edge_type: TRACES_TO
+  - from: D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_DELEGATE_SITE_DEPLOY_AFTER_VERIFIED_MERGE_1113
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_DELEGATE_VPS_SERVICE_SCRIPTS_1113
+    to: Q_AUTOMATION_LEVELS_1111
+    edge_type: TRACES_TO
+  - from: D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113
+    to: Q_AUTOMATION_LEVELS_1111
     edge_type: TRACES_TO
