@@ -528,7 +528,7 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-22"
-    verified_against: "curl -sI https://sandbox.onionevolve.com/sandbox.html = HTTP/2 200 com o CSP do vhost e nosniff; sha256 da página servida igual ao de private-cite:bMkAuUIlE3loWiq0mZhB4A@63542508:deploy/sandbox/sandbox.html (bd412290…); bridge servido 63542508 (onion-bridge#83 e #84 mergeados pelo maestro); CLI embutido do SDK 0.3.308 = 2.1.308"
+    verified_against: "private-cite:bMkAuUIlE3loWiq0mZhB4A"
     label: "A sandbox do piloto ui:// está no ar: o update-bridge publicou o sandbox.html (2980 bytes, root:root 0644) e a origem responde 200 com o CSP; o vhost passa a cobrar o 200 no verify. Falta só o teste no navegador"
     provenance:
       source: "saída do ops/update-bridge.sh de 2026-10-22 12:2x UTC (invocação 8e630b44) e curl ao vivo"

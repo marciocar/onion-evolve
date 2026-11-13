@@ -30,7 +30,7 @@ nodes:
     confidence: 0.65
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_PLAN_GATE e a medida E_MEASURE_PLAN_GATE no grafo da curadoria (private-cite:GMTo64uZrIJIX0CCUSGH6Q@8d64aef8737e, main, que contém o PR #133), conferidos por peer-ref-check.sh (EXISTEM na origin/main do par)"
+    verified_against: "private-cite:GMTo64uZrIJIX0CCUSGH6Q"
     source_tier: 8
     source_kind: primary-repo
     label: "Gate de plano, nota 6, costurar só a peça: o script do Cortex barra sem plano commitado e passa com o plano no HEAD, mas também passa com o plano commitado depois do código; nenhum dos dois lados barra o commit."
@@ -50,7 +50,7 @@ nodes:
     confidence: 0.65
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_QUALITY e a medida E_MEASURE_MUTATION no grafo da curadoria (private-cite:jP8rLsGr--mDO-GfvbH32A@8d64aef8737e), conferidos por peer-ref-check.sh; a lacuna reproduzida no helper do core antes da cura"
+    verified_against: "private-cite:jP8rLsGr--mDO-GfvbH32A"
     source_tier: 8
     source_kind: primary-repo
     label: "Âncora única na mutação, nota 6, costurar só a peça como remendo no helper do core: com a âncora repetida, o helper trocava a 1ª ocorrência em silêncio, e o código de saída 3 valia tanto para a âncora ausente quanto para um teste que sai 3."
@@ -70,7 +70,7 @@ nodes:
     confidence: 0.55
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e as evidências das duas provas (E_DOCS_PROOF_PYTHON, E_CAPTURE_PROOF_RESULT, E_CAPTURE_CDN_DEPENDENCY, E_OBJECAO_CAPTURE_COST_MACHINE e E_ONION_GAMMA_PPTX) no grafo da curadoria (private-cite:MykcWrKeUwSO-SlVol8_TQ@5f5f6584a02b, main, que contém os PRs #137 e #144), conferidos por peer-ref-check.sh"
+    verified_against: "private-cite:MykcWrKeUwSO-SlVol8_TQ"
     source_tier: 8
     source_kind: primary-repo
     label: "Documentação e apresentações, nota 5 a 6 conforme o navegador, costurar a receita completa, local, a partir do git, com captura e diagrama: em Python, 9 slides e um docx, com 3 imagens em cada, e 0 requisições externas medidas com a rede bloqueada."
@@ -90,7 +90,7 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_FLEET e a âncora Q_FLEET_PARALLEL_DEMAND no grafo da curadoria (private-cite:BDzKm2tKdUDlGNAnOY4sXw@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "private-cite:BDzKm2tKdUDlGNAnOY4sXw"
     source_tier: 8
     source_kind: primary-repo
     label: "Frota, nota 5, parquear: N issues em worktrees paralelas, com aprovação humana em lote e dados isolados por worktree, não têm par no Onion, mas nenhum adotante pediu isso."
@@ -110,7 +110,7 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_USAGE_TELEMETRY e a âncora E_NATIVE_OTEL_USAGE no grafo da curadoria (private-cite:6YU94i5D-S73pO9rhHt22Q@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "private-cite:6YU94i5D-S73pO9rhHt22Q"
     source_tier: 8
     source_kind: primary-repo
     label: "Registro de uso, nota 5, parquear: a telemetria nativa do Claude Code em OpenTelemetry já registra o uso, com coletor; a forma do Cortex grava dentro do git com o nome de quem rodou."
@@ -130,7 +130,7 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_MEMORY e a âncora E_ONION_WORKLOG_HOOKS no grafo da curadoria (private-cite:fq6QGVHuGvPzF-IGvGxJlQ@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "private-cite:fq6QGVHuGvPzF-IGvGxJlQ"
     source_tier: 8
     source_kind: primary-repo
     label: "Memória, nota 5, parquear só o handoff commitado no git: o core tem os ganchos de retomada do worklog, que não rodaram na medida, e o resto da memória fica rejeitado."
@@ -150,7 +150,7 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_DISTRIBUTION no grafo da curadoria (private-cite:l93GkAYWDKrFZXTUMFiYQw@8d64aef8737e), conferido por peer-ref-check.sh"
+    verified_against: "private-cite:l93GkAYWDKrFZXTUMFiYQw"
     source_tier: 8
     source_kind: primary-repo
     label: "Distribuição, nota 4, rejeitar: o merge do onion/vendor preservou a customização sem conflito falso e acusou o conflito real; a fusão do lado do Cortex segue lida, porque o instalador dele não está na máquina."
@@ -170,7 +170,7 @@ nodes:
     confidence: 0.8
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_SPEC_AS_CODE no grafo da curadoria (private-cite:jPI9VI_fIfzZz9LjatAISg@8d64aef8737e), conferido por peer-ref-check.sh"
+    verified_against: "private-cite:jPI9VI_fIfzZz9LjatAISg"
     source_tier: 8
     source_kind: primary-repo
     label: "Especificação como código, nota 3, rejeitar: no artefato do framework fora do padrão, o lint do core reprova pela REGRA 1 e pela REGRA 2 e o Cortex deixa entrar; na decisão de arquitetura no código do projeto, empate, porque nos dois quem confere é agente."
@@ -190,7 +190,7 @@ nodes:
     confidence: 0.8
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_STUDIES no grafo da curadoria (private-cite:Xy0t1ojHVq8kfnu6ZpsvNQ@8d64aef8737e), conferido por peer-ref-check.sh"
+    verified_against: "private-cite:Xy0t1ojHVq8kfnu6ZpsvNQ"
     source_tier: 8
     source_kind: primary-repo
     label: "Estudos e avaliações, nota 3, rejeitar: o kg_query devolve o estado aberto de um estudo por comando (8 nós em 5,7 KB); a busca nos scripts do Cortex achou 3 arquivos, e nenhum faz isso."

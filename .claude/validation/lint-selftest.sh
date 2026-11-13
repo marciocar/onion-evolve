@@ -57620,6 +57620,16 @@ run_private_repo_cite_selftests() {
     record_pass "private-repo-cite: (c) grafo novo com repo privado → SOFT NAO-CONFERIVEL (rc 0, 4 campos, repo por hash)"
   else record_fail "private-repo-cite: (c)" "rc=${rc}; [${o}]"; fi
   rm -f "${sb}/g/novo.kg.yaml"
+  # (r) o marcador com o commit colado (private-cite:<id>@<hex>) é HARD MARCADOR-COM-COMMIT, sem ecoar id nem hex; as
+  #     vizinhas calam: o marcador nu, o #<nó> do trace e o @sha por extenso (a palavra, não um hex) (refutador do #1648)
+  printf 'meta:\n  id: mk\nnodes:\n  - id: E_MK\n    narrative: "lido em private-cite:AAAAAAAAAAAAAAAAAAAAAA@abc1234 ontem"\n' > "${sb}/g/mk.kg.yaml"
+  printf 'meta:\n  id: mk2\nnodes:\n  - id: E_MK2\n    trace: "private-cite:BBBBBBBBBBBBBBBBBBBBBB#D_X"\n    narrative: "outro repo como private-cite:BBBBBBBBBBBBBBBBBBBBBB@sha, e o nu private-cite:BBBBBBBBBBBBBBBBBBBBBB."\n' > "${sb}/g/mk2.kg.yaml"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tMARCADOR-COM-COMMIT\tg/mk.kg.yaml\tnó E_MK, linha 5:' <<< "${o}" \
+     && [ "$(grep -c 'MARCADOR-COM-COMMIT' <<< "${o}")" -eq 1 ] && ! grep -q 'abc1234\|AAAAAAAAAAAAAAAAAAAAAA' <<< "${o}"; then
+    record_pass "private-repo-cite: (r) private-cite:<id>@<hex> → HARD MARCADOR-COM-COMMIT (rc 1, sem ecoar); marcador nu, #<nó> e @sha por extenso calam"
+  else record_fail "private-repo-cite: (r) marcador com commit" "rc=${rc}; [$(tr '\n' '|' <<< "${o}" | head -c 400)]"; fi
+  rm -f "${sb}/g/mk.kg.yaml" "${sb}/g/mk2.kg.yaml"
   # (d) SÓ O TOCADO É JULGADO (o histórico fica)
   if _prc_case_scope "${chk}"; then record_pass "private-repo-cite: (d) grafo que o diff não toca não é julgado (o histórico fica)"
   else record_fail "private-repo-cite: (d) escopo" "o grafo fora do diff foi julgado, ou o novo não"; fi

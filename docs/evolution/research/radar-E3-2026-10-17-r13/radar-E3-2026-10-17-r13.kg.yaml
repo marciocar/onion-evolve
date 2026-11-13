@@ -81,7 +81,7 @@ nodes:
     impact: 2
     confidence: 0.75
     verified_at: "2026-10-17"
-    verified_against: "medido em 2026-10-17 no CLI 2.1.302 do host com um servidor local que captura a requisição (sem chamar a API): em claude -p sem a variável, a descrição da ferramenta Agent oferece subagent_type fork (10 menções a fork, 'the fork inherits your full conversation context'); com CLAUDE_CODE_FORK_SUBAGENT=0 sobram 2 menções, no schema dos parâmetros model e effort, e a frase que oferece o fork some; o mesmo CLI com as flags do convidado (--tools Read, --disallowedTools com Task e Agent, --permission-mode default) inicia com tools=['Read']; no bridge, agentPolicy do admin devolve só permissionMode, sem tools nem disallowedTools (private-cite:7dwQcGho2yS2E-xRxBxR7g@7f4322c:src/agent-policy.ts l.155-160), no ramo bypass ela acrescenta só allowDangerouslySkipPermissions; o env do admin herda process.env filtrado só por nomes sensíveis (src/chat.ts l.276-291), há 0 menções a fork em src/ e 0 a FORK na unit do serviço"
+    verified_against: "private-cite:7dwQcGho2yS2E-xRxBxR7g"
     narrative: "O que se mediu foi a oferta do fork no claude -p do host e a forma da política do bridge; o que não se mediu foi um turno admin real chamando o fork pelo SDK, nem se o arquivo de ambiente do bridge (não lido, por regra) define CLAUDE_CODE_FORK_SUBAGENT. O fork herda o contexto inteiro e roda no modelo do pai, então um turno admin que delega passa a poder copiar a conversa inteira para um subagente, com custo. Corrigido pelo juiz: a saída em segundo plano NÃO é efeito do fork; o juiz capturou a requisição na 2.1.301 e na 2.1.302, em -p e com o entrypoint sdk-ts, e o padrão 'subagentes em segundo plano' aparece nas duas (7 menções), enquanto a oferta do fork sobe de 2 para 10 menções só na 2.1.302. O convidado segue sem fork porque Agent e Task estão fora por tools, disallowedTools e deny."
     label: "a 2.1.302 liga o fork de subagente por padrão no claude -p e no Agent SDK; no /chat ele alcança o admin, cuja política não restringe ferramentas, e não o convidado, que não tem Agent nem Task"
     provenance:
@@ -113,7 +113,7 @@ nodes:
     impact: 2
     confidence: 0.8
     verified_at: "2026-10-17"
-    verified_against: "medido em 2026-10-17 sobre data/2.1.302.txt: 0 linhas com sandbox, WebFetch, stream-json, --settings, socket ou Workflow; 1 com permission (l.32: claude -p e Agent SDK sem modo de permissão começam em default em provedor de terceiros); 1 com hook (l.37: no máximo 12 hooks prompt ou agent de um evento por vez); o bridge passa permissionMode sempre (admin do config, convidado 'default', private-cite:hMvGS2Km1m6inwEgtjH8qw@7f4322c:src/agent-policy.ts l.155-166) e o runner passa --permission-mode default no argv (ops/chat-runner.sh l.625); os 23 hooks do .claude/settings.json e os do settings do usuário são todos do tipo command; o chat-runner verify desta rodada provou a cerca de rede (4 destinos TCP barrados, DNS e TLS com api.anthropic.com seguem), o DynamicUser e o aperto de mão pelo socket no CLI 2.1.302"
+    verified_against: "private-cite:hMvGS2Km1m6inwEgtjH8qw"
     label: "a 2.1.302 não mexe em sandbox, WebFetch, stream-json, --settings, socket nem Workflow; a mudança de modo padrão não alcança o bridge nem o runner, que passam o modo sempre, e o teto de 12 hooks vale só para prompt e agent, tipos que o core não usa"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"

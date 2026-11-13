@@ -35,7 +35,7 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-26"
-    verified_against: "grafo da dissecação da frente de IA no repo de curadoria (private-cite:T-B9RcgRQrJxhFkkz9C1Ag@f12dd1b, main, que contém o merge e605e6f), lido pela triagem: D_AI_FRONT_VERDICT (open, perseguir como estudo), C_PILOT3_PROPOSAL (open), E_N2_PILOT2_RESULT e E_PILOT2_POETA_PTBR_SLM; os dois primeiros conferidos por peer-ref-check (EXISTEM na origin/main do par)"
+    verified_against: "private-cite:T-B9RcgRQrJxhFkkz9C1Ag"
     source_tier: 8
     source_kind: primary-repo
     label: "A dissecação da curadoria sustenta perseguir a frente como estudo em ondas: os pilotos 1 e 2 ficaram abaixo do critério de 2 achados aceitos depois da revisão adversarial (0 e 1), e o que mais derrubou achado foi a fonte que mede outra coisa."

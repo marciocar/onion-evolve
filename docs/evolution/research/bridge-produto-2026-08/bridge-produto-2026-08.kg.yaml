@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: "deploy da fase F0 medido em produção: health ok, PWA, invocação nova, enforce no-op (host)"
       locator: "private-cite:PFA0vpiMHMBgZTv1CoGUZQ"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em private-cite:PFA0vpiMHMBgZTv1CoGUZQ@28f3ad96:web/src/runtime/onion-runtime.ts"
+      method: "testimony: private-cite:PFA0vpiMHMBgZTv1CoGUZQ"
       locality: "host"
 
   - id: F1_FAROL_PESQUISA
@@ -89,7 +89,7 @@ nodes:
     provenance:
       source: "deploy da fase F2 medido em produção: /threads 401 sem token, SPA fallback servindo index, bancada 22 testes (host)"
       locator: "private-cite:i-3beU6xAKvqpml7XuXx0g"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em private-cite:i-3beU6xAKvqpml7XuXx0g@c2b4e9db:web/src/App.tsx"
+      method: "testimony: private-cite:i-3beU6xAKvqpml7XuXx0g"
       locality: "host"
 
   - id: F3_ROSTO_REDESIGN
@@ -105,7 +105,7 @@ nodes:
     provenance:
       source: "deploy da fase F3 pelo mecanismo, medido em produção: bridge 1d45531 health ok, 38 testes, gzip no orçamento (host)"
       locator: "private-cite:wYAJr3KqHtQ6oGDpWMl8jQ"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em private-cite:wYAJr3KqHtQ6oGDpWMl8jQ@1d45531a:web/src/theme/onion.css"
+      method: "testimony: private-cite:wYAJr3KqHtQ6oGDpWMl8jQ"
       locality: "host"
 
   - id: F4_GOVERNO_ADMIN
@@ -121,7 +121,7 @@ nodes:
     provenance:
       source: "deploy da fase F4 medido em produção: convite anônimo 401, guards de usage, SPA admin 200, M2M sem .env (host)"
       locator: "private-cite:-zGnc3n74SvkAJRKvQpAKw"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em private-cite:-zGnc3n74SvkAJRKvQpAKw@43afd2bd:src/meter.ts"
+      method: "testimony: private-cite:-zGnc3n74SvkAJRKvQpAKw"
       locality: "host"
 
   - id: F5_PRACA_DIVULGACAO
@@ -137,7 +137,7 @@ nodes:
     provenance:
       source: "deploy 28f3ad96 da fase F5 com provas vivas em produção: shared 404 noindex/nostore, share anônimo 401, hit31 429 (host)"
       locator: "private-cite:fUqtcbHcfrtL7HnJPjBxoA"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em private-cite:fUqtcbHcfrtL7HnJPjBxoA@28f3ad96:web/vite.config.ts"
+      method: "testimony: private-cite:fUqtcbHcfrtL7HnJPjBxoA"
       locality: "host"
 
   - id: E_DEMO_CAMPO_2026_08_14
@@ -187,7 +187,7 @@ nodes:
     provenance:
       source: "deploy 2e10b497 da F-ID.1 medido em produção: catch-up limpo, 50 comandos vivos, vizinho bloqueado cross-workspace (host)"
       locator: "private-cite:w1mEnHouX2DnPzNqAnYTmA"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em private-cite:w1mEnHouX2DnPzNqAnYTmA@2e10b497:src/workspace.ts"
+      method: "testimony: private-cite:w1mEnHouX2DnPzNqAnYTmA"
       locality: "host"
 
   - id: F_ID_2_CONTEXTOS_ORG
@@ -203,7 +203,7 @@ nodes:
     provenance:
       source: "deploy 83033b25 da F-ID.2 medido em produção: org povoada, dual-token, 7 ataques fail-closed, realpath nega symlink (host)"
       locator: "private-cite:MAgBfc1WFpt0MeZ06pZBlw"
-      method: "testimony: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em private-cite:MAgBfc1WFpt0MeZ06pZBlw@83033b25:src/context.ts"
+      method: "testimony: private-cite:MAgBfc1WFpt0MeZ06pZBlw"
       locality: "host"
 
   - id: F_ID_3_SUPERFICIE
@@ -237,7 +237,7 @@ nodes:
     provenance:
       source: "private-cite:PCV5FENXVbsbUsa8PdJPFw"
       locator: "private-cite:PCV5FENXVbsbUsa8PdJPFw"
-      method: "reading: corpos de 600cd9b3 e c91374da no remoto private-cite:PCV5FENXVbsbUsa8PdJPFw"
+      method: "reading: private-cite:PCV5FENXVbsbUsa8PdJPFw"
       locality: "repo"
 
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES

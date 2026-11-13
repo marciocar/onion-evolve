@@ -70,7 +70,7 @@ nodes:
     verified_at: "2026-08-01"
     verified_against: docker-ps-mais-grep-no-src-do-bridge
     label: "MELHOR ITEM DA LISTA INTEIRA — DESLIGAR O WAHA: container Up 15h, ZERO referencias a waha/3999/whatsapp em todo o src/ do bridge, ZERO cron/systemd-timer, WAHA_API_KEY e WAHA_DASHBOARD_PASSWORD legiveis via docker inspect, e as 3 primeiras mensagens de teste voltaram HTTP 200 e NUNCA chegaram. Custo de seguranca > 0, entrega comprovada = 0, esforco = docker stop, totalmente reversivel. NOTA DE HONESTIDADE: o canal FOI provado depois (LID + ack READ) — mas provado != consumido; nao ha consumidor nomeado num artefato versionado"
-    narrative: "trace anterior (só no host): docker-compose.yml do clone de onion-waha no host. Na data do nó (2026-08-01) o arquivo não estava em remoto algum: o único commit de private-cite:yOlMvZu2a2uRqYM73e3pvQ é 86662e01, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é private-cite:yOlMvZu2a2uRqYM73e3pvQ@86662e01:docker-compose.yml."
+    narrative: "trace anterior (só no host): docker-compose.yml do clone de onion-waha no host. Na data do nó (2026-08-01) o arquivo não estava em remoto algum: o único commit de private-cite:yOlMvZu2a2uRqYM73e3pvQ é ⟨commit⟩, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é private-cite:yOlMvZu2a2uRqYM73e3pvQ."
     provenance:
       source: "container onion-vps-waha e seu docker-compose.yml no host (host)"
       locator: "docker-ps-mais-grep-no-src-do-bridge"
@@ -204,7 +204,7 @@ nodes:
     provenance:
       source: "private-cite:e5qPTClALLZXc-cx3KdhyA"
       locator: "private-cite:e5qPTClALLZXc-cx3KdhyA"
-      method: "reading: src/server.ts em private-cite:e5qPTClALLZXc-cx3KdhyA@38702f00 (remoto private-cite:e5qPTClALLZXc-cx3KdhyA; arquivo na data 2026-08-01)"
+      method: "reading: private-cite:e5qPTClALLZXc-cx3KdhyA"
       locality: "repo"
 
   # ── ANTI-CATALOGO (sobreviveu inteiro) ──
