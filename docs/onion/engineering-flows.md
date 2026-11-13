@@ -1150,8 +1150,4 @@ O roteamento para o especialista depende de `TASK_MANAGER_PROVIDER`:
 
 ## 🔗 Documentos Relacionados
 
-- [Guia de Comandos](./commands-guide.md) — Referência completa de comandos (121 comandos em 11 categorias)
-- [Referência de Agentes](./agents-reference.md) — 51 agentes especializados em 9 categorias
-- [Task Manager Abstraction](../knowledge-base/concepts/task-manager-abstraction.md) — Abstração provider-agnóstica
-- Adapters por provedor: `.claude/utils/task-manager/adapters/` (`jira.md`, `clickup.md`, `asana.md`, `linear.md`)
-- Adapter de forge (PR/CI): `.claude/utils/forge/adapters/github.md`
+- [Guia de Comandos](./commands-guide.md) — Referência completa de comandos (122 comandos em 11 categorias)

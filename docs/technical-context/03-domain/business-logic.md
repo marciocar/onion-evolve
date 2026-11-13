@@ -280,29 +280,4 @@ interrompida (`.claude/commands/engineer/plan.md:24`).
 ## 5. Números-âncora (SSOT — nunca hardcode; sempre `docs/onion/inventory.md`)
 
 Lido de `docs/onion/inventory.md:11-14` (gerado por `.claude/validation/inventory.sh`, validado no
-CI): 121 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 14 skills, 108
-Knowledge Bases. Contextos de domínio no próprio framework (template, ainda não populados):
-`business-context/` 13 arquivos, `technical-context/` 6, `compliance-context/` 0 (medido 2026-08-13 contra `docs/onion/inventory.md` — o preenchimento greenfield que este arquivo anunciava já avançou; derive de lá, não copie)
-(`docs/onion/inventory.md:58-61`) — **este arquivo que você está lendo é parte do preenchimento
-inicial de `technical-context/`, greenfield**, conforme o pedido que originou esta geração.
-
----
-
-## Fora de escopo — seções do template genérico não aplicáveis
-
-- **`api-specification.md`**: o core não expõe uma API HTTP de produto. O único endpoint real é
-  `/.well-known/agent-card.json` do `onion-bridge` (canal `a2a-live`, RFC-0004 F2.2) — infraestrutura
-  de federação, não domínio de negócio do template; não modelado aqui.
-- **Entidades de negócio tradicionais** (`User`/`Order`/etc.): não existem — o "domínio" é o próprio
-  framework (comandos, agentes, sessões, membros da federação), coberto nas seções acima.
-
-## Referências
-
-- `docs/meta-specs/integrations.md` — meta-spec L0 de padrões de integração (SDAAL)
-- `docs/knowledge-base/concepts/knowledge-graph-sdaal.md` — KG SDAAL completo
-- `docs/knowledge-base/concepts/onion-federation-and-adoption.md` — guia-síntese de federação/adoção
-- `docs/knowledge-base/concepts/multi-repo-federation.md` — federação formal por contrato
-- `docs/knowledge-base/concepts/federation-usage-modes.md` — matriz canônica de 5 eixos
-- `.claude/utils/task-manager/interface.md`, `.claude/utils/forge/interface.md` — contratos SDAAL
-- `.claude/commands/engineer/plan.md` — contrato de fase/sessão
-- `docs/onion/inventory.md` — SSOT numérica
+CI): 122 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 14 skills, 108
