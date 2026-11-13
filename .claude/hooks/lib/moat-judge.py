@@ -135,6 +135,12 @@ MOAT_UNITS, MOAT_PATHS, MOAT_MEMBERS, MOAT_ACTS = _moat_load()
 # é a cópia em <dir> (a do sudoers sem senha, D_DELEGATE_VPS_SERVICE_SCRIPTS_1113), byte a byte a deste checkout. Passa
 # só quando TODA palavra da assinatura presente está coberta: `slack-persona.sh creds` pela cópia segue vetado.
 # A publicação das portas (`publish-door.sh --push`) não tem linha `delega` (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113).
+# QUEM É O CORE é uma CONSTANTE (4ª passada do refutador do #1647): o members.yaml é da sessão (Edit, sed, e o commit
+# também), e trocar o `remote:` do membro `kind: source` fazia o merge alheio passar como merge do core. O registro só
+# se confere contra ela; divergiu, nenhuma forma delegada vale (MOAT_MEMBERS_DIVERGE). (core-only)
+_MOAT_CORE_SLUG = "marciocar/onion-evolve"
+
+
 def _moat_load_delegations():
     deleg, self_slugs = {}, set()
     try:
@@ -166,7 +172,8 @@ def _moat_load_delegations():
                     cur["remote"] = _moat_slug(m.group(1))
     except OSError:
         pass
-    return deleg, self_slugs
+    diverge = bool(self_slugs) and self_slugs != {_moat_slug(_MOAT_CORE_SLUG)}
+    return deleg, {_moat_slug(_MOAT_CORE_SLUG)}, diverge
 
 
 def _moat_slug(v):
@@ -174,7 +181,7 @@ def _moat_slug(v):
     return re.sub(r"\.git$", "", v).strip("/").lower()
 
 
-MOAT_DELEG, MOAT_SELF_SLUGS = _moat_load_delegations()
+MOAT_DELEG, MOAT_SELF_SLUGS, MOAT_MEMBERS_DIVERGE = _moat_load_delegations()
 
 
 def _moat_rootcopy(p):
@@ -227,6 +234,8 @@ def _moat_marker_ok(marker, args):
 
 def _moat_delegated(rel, words, args, rootcopy):
     """True se as palavras da assinatura presentes (`words`) estão todas cobertas por uma forma delegada satisfeita."""
+    if MOAT_MEMBERS_DIVERGE:
+        return False                                    # o registro diz outro core: nada se delega até ele voltar
     for marker, verbs in MOAT_DELEG.get(rel, []):
         if not words <= verbs:
             continue

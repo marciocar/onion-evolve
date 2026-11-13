@@ -201,16 +201,18 @@ _CORE_SESSION=0
 [ "${ONION_PR_MERGE_VERIFIED_TEST:-0}" = 1 ] && _SESSION_CWD=""
 [ -n "${_SESSION_CWD}" ] && [ -n "${_PMV_COMMON}" ] \
   && [ "$(git -C "${_SESSION_CWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" = "${_PMV_COMMON}" ] && _CORE_SESSION=1
-# O SLUG DO CORE não sai da config do git (F1 da 3ª passada do refutador): GIT_DIR, GIT_CONFIG_* com url.X.insteadOf, um
-# include no ~/.gitconfig ou o .git/config editado faziam o origin "do core" apontar o outro repo, e alvo e core empatavam.
-# Ele sai do `remote:` do membro `kind: source` do members.yaml DESTE checkout (arquivo versionado), e na falta, da constante.
+# O SLUG DO CORE é uma CONSTANTE (4ª passada do refutador do #1647): nem a config do git (GIT_DIR, insteadOf, include,
+# .git/config editado: F1 da 3ª) nem o members.yaml do checkout (a sessão o edita, e o commit também é dela) dizem quem é
+# o core. O members.yaml só se CONFERE contra a constante: o `remote:` do membro `kind: source` que diverge dela recusa,
+# na sessão do core e no caminho delegado.
 _PMV_CORE_CONST=marciocar/onion-evolve
-_PMV_CORE_SLUG="$(awk '
+_PMV_MEMBERS_SRC="$(awk '
   /^[[:space:]]*-[[:space:]]+id:/ { if (src && rem != "") { print rem; exit } src = 0; rem = "" }
   /^[[:space:]]+kind:[[:space:]]*source([[:space:]#]|$)/ { src = 1 }
   /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v); gsub(/["'"'"' ]/, "", v); rem = v }
   END { if (src && rem != "") print rem }' "${_PMV_DIR}/docs/evolution/federation/members.yaml" 2>/dev/null | head -1)"
-_PMV_CORE_SLUG="$(_slug_norm "${_PMV_CORE_SLUG:-${_PMV_CORE_CONST}}")"
+_PMV_CORE_SLUG="$(_slug_norm "${_PMV_CORE_CONST}")"
+_PMV_MEMBERS_SRC="$(_slug_norm "${_PMV_MEMBERS_SRC}")"
 # Sem --repo, o gh NÃO resolve pelo origin: um remote com `remote.<nome>.gh-resolved` (o `gh repo set-default`) vence
 # (re-refutação do #1647, N1: `git remote add sge …; gh repo set-default …/sge; bash pmv.sh 12` mergeava no sge). Então o
 # alvo sem --repo é o conjunto de TODOS os remotes do repo do cwd, mais o GH_REPO e os gh-resolved com nome de repo; se
@@ -222,6 +224,10 @@ _pmv_remote_slugs() {
     < <(git config --get-regexp '^remote\..*\.gh-resolved$' 2>/dev/null)
   [ -z "${GH_REPO:-}" ] || _slug_norm "${GH_REPO}"
 }
+if { [ "${_CORE_SESSION}" = 1 ] || [ "${DELEGATED_FOREIGN}" -eq 1 ]; } && [ -n "${_PMV_MEMBERS_SRC}" ] \
+   && [ "${_PMV_MEMBERS_SRC}" != "${_PMV_CORE_SLUG}" ]; then
+  die "o members.yaml deste checkout diz que o core (kind: source) é '${_PMV_MEMBERS_SRC}', e a constante do script diz '${_PMV_CORE_SLUG}': o registro foi mexido ou o script está errado. Nada foi feito."
+fi
 if [ "${#REPO_ARG[@]}" -ge 2 ]; then _PMV_TARGET="$(_slug_norm "${REPO_ARG[1]}")"
 else
   _PMV_TARGET=""

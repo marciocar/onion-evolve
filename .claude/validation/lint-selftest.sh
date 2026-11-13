@@ -10960,6 +10960,10 @@ FIELD
   local field_body; field_body="$(sed -n '/^main() {$/,/^}$/p' "${d}/scratch/update-kg-writer.sh" | sed '1d;$d')"
   ln -s /var/www/onion-landing "${d}/lw"
   cp -r "${src_hooks}/pretooluse-moat-gate.sh" "${src_hooks}/lib" "${d}/h/"
+  # quem é o core é uma CONSTANTE do juiz (4ª passada do #1647); a bancada a troca pelo core de sandbox, cuja linha
+  # `kind: source` do members.yaml abaixo diz o mesmo (costura só desta cópia)
+  sed -i 's#^_MOAT_CORE_SLUG = "marciocar/onion-evolve"$#_MOAT_CORE_SLUG = "onion-bancada/core"#' "${d}/h/lib/moat-judge.py"
+  grep -q '^_MOAT_CORE_SLUG = "onion-bancada/core"$' "${d}/h/lib/moat-judge.py" || record_fail "moat-gate: (costura do core)" "a âncora da constante do core sumiu"
   # _mgr <dir-do-hook> <raiz> <cwd> <comando> [PATH] → "rc|stderr"
   _mgr() {
     local rc=0 err
@@ -11491,6 +11495,17 @@ EOF" "${L}" \
   _mgcase "(rb14) a variável da bancada do merge verificado na linha da sessão → VETO" "2:modo de bancada do merge verificado" "${P}" \
     'ONION_PR_MERGE_VERIFIED_TEST=1 bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo' "${J}" \
     '_moat_emit("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST",' '(lambda *a: None)("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST",'
+  # 4ª passada: o members.yaml do projeto com o kind: source trocado pelo alvo não faz o merge alheio virar "do core",
+  # e nenhuma forma delegada vale enquanto o registro divergir da constante
+  cp "${P}/docs/evolution/federation/members.yaml" "${d}/mg-members-intacto"
+  sed -i 's#remote: github.com/onion-bancada/core#remote: github.com/onion-bancada/adotante#' "${P}/docs/evolution/federation/members.yaml"
+  _mgcase "(rb22) members.yaml trocado + merge sem --foreign-repo no alvo → VETO (o core é a constante)" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --sync' "${J}" \
+    '    return deleg, {_moat_slug(_MOAT_CORE_SLUG)}, diverge' '    return deleg, self_slugs, diverge'
+  _mgcase "(rb23) members.yaml trocado + a forma delegada → VETO (nada se delega com o registro divergente)" "2:merge alheio" "${P}" \
+    'bash ops/pr-merge-verified.sh 12 --repo onion-bancada/adotante --foreign-repo' "${J}" \
+    '    if MOAT_MEMBERS_DIVERGE:' '    if False:'
+  cp "${d}/mg-members-intacto" "${P}/docs/evolution/federation/members.yaml"
   # N1 da re-refutação: o alvo do gh por outra porta (o remote a mais e o default do gh), a linha exata do refutador
   _mgcase "(rb15) git remote add + gh repo set-default + merge sem --repo (a linha do refutador) → VETO" "2:redireciona o forge" "${P}" \
     'git remote add sge https://github.com/onion-bancada/adotante.git; gh repo set-default onion-bancada/adotante; bash ops/pr-merge-verified.sh 12' \
@@ -13500,7 +13515,7 @@ run_slack_persona_selftests() {
   [ "$(id -u)" = 0 ] && { record_skip "slack-persona: rodando como root (o wrapper recusa root) → pulado"; return; }
   local d; d="$(mktemp -d /tmp/slack-persona-lint.XXXXXX)"
   mkdir -p "${d}/ops/testing"; cp "${st}" "${d}/ops/testing/"; cp "${wr}" "${d}/ops/slack-persona.sh"
-  local want=35 o rc
+  local want=37 o rc
   if o="$(bash "${d}/ops/testing/slack-persona-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
     record_pass "slack-persona: (a) bancada do wrapper — ${want} casos (segredo só pelo stdin, prefixo, TTY, conf do MCP, ensaio, config de exemplo, leitura do UID dinâmico, verify espera a conexão até o teto)"
@@ -26058,6 +26073,9 @@ STUB
   # a cópia INTACTA (com a guarda de ambiente e o PATH fixo) mora ao lado; a dos casos fr1-fr11 tem a guarda desligada,
   # porque o gh falso deles chega pelo PATH e lê GH_* (a costura é só desta cópia de bancada)
   cp "${sut}" "${fc}/ops/pmv-intacto.sh"
+  # a constante do core é a do sandbox nas duas cópias (4ª passada; costura de bancada)
+  sed -i 's#^_PMV_CORE_CONST=marciocar/onion-evolve$#_PMV_CORE_CONST=onion-bancada/core#' "${fc}/ops/pr-merge-verified.sh" "${fc}/ops/pmv-intacto.sh"
+  grep -q '^_PMV_CORE_CONST=onion-bancada/core$' "${fc}/ops/pmv-intacto.sh" || record_fail "pr-merge-verified: (costura do core)" "a âncora da constante sumiu"
   sed -i 's/^\[ "\${DELEGATED_FOREIGN}" -eq 1 \] && _delegated_env_guard$/: bancada/' "${fc}/ops/pr-merge-verified.sh"
   cmp -s "${sut}" "${fc}/ops/pr-merge-verified.sh" && record_fail "pr-merge-verified: (fr-costura)" "a âncora da guarda de ambiente sumiu: a bancada rodaria o gh real"
   git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm base
@@ -26173,7 +26191,7 @@ STUB
     "GIT_DIR='${d}/outro-git/.git' bash '${_pi}' 999"
   _frs "(rf15) GIT_CONFIG_PARAMETERS com url.<alheio>.insteadOf trocando o origin, sem --repo ⇒ recusa" "pela sessão do core" \
     "GIT_CONFIG_PARAMETERS=\"'url.https://github.com/owner/repo.git.insteadof'='https://github.com/onion-bancada/core.git'\" bash '${_pi}' 999"
-  sed 's#^_PMV_CORE_SLUG="\$(_slug_norm "\${_PMV_CORE_SLUG:-\${_PMV_CORE_CONST}}")"$#_PMV_CORE_SLUG="$(_slug_norm "$(git -C "${_PMV_DIR}" remote get-url origin 2>/dev/null)")"#' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  sed 's#^_PMV_CORE_SLUG="\$(_slug_norm "\${_PMV_CORE_CONST}")"$#_PMV_CORE_SLUG="$(_slug_norm "$(git -C "${_PMV_DIR}" remote get-url origin 2>/dev/null)")"#' "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (rf14-MUT)" "a âncora do slug do core sumiu"
   else
     o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" GIT_DIR="${d}/outro-git/.git" "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999; exit \$?" 2>&1)"
@@ -26191,6 +26209,22 @@ STUB
     record_pass "pr-merge-verified: (rf16-MUT) sem o GH_REPO explícito o gh resolveria pela config — a cura é a causa"
   else record_fail "pr-merge-verified: (rf16-MUT)" "o mutante não mudou nada"; fi
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
+  # ── 4ª PASSADA: o members.yaml do checkout trocado (o kind: source apontando o alvo) não faz o alvo virar "o core" ────
+  local _mfy="${fc}/docs/evolution/federation/members.yaml"; cp "${_mfy}" "${d}/members-intacto"
+  sed -i 's#remote: github.com/onion-bancada/core#remote: github.com/owner/repo#' "${_mfy}"
+  _frs "(rf17) members.yaml com o kind: source trocado pelo alvo + --repo <alvo> ⇒ recusa" "members.yaml deste checkout" \
+    "bash '${_pi}' 999 --repo owner/repo"
+  _frs "(rf18) o mesmo no caminho delegado (--foreign-repo) ⇒ recusa" "members.yaml deste checkout" \
+    "bash '${_pi}' 999 --repo owner/repo --foreign-repo"
+  # MUTANTE: o core lido do members.yaml (a forma da 3ª passada) faria alvo e core empatarem e passaria
+  sed -e 's#^_PMV_CORE_SLUG="\$(_slug_norm "\${_PMV_CORE_CONST}")"$#_PMV_CORE_SLUG="$(_slug_norm "${_PMV_MEMBERS_SRC:-${_PMV_CORE_CONST}}")"#' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (rf17-MUT)" "a âncora do slug constante sumiu"
+  else
+    o="$(cd "${fc}" && env -u ONION_PR_MERGE_VERIFIED_TEST PATH="${d}/nogh:${PATH}" "${fcl}" -c "bash '${fc}/ops/pmv-mut.sh' 999 --repo owner/repo; exit \$?" 2>&1)"
+    if grep -qF "pela sessão do core" <<< "${o}" || grep -qF "members.yaml deste checkout" <<< "${o}"; then record_fail "pr-merge-verified: (rf17-MUT)" "o mutante também recusou: ${o:0:160}"
+    else record_pass "pr-merge-verified: (rf17-MUT) com o core lido do members.yaml, o registro trocado faria o alvo passar como core — a constante é a causa"; fi
+  fi
+  rm -f "${fc}/ops/pmv-mut.sh"; cp "${d}/members-intacto" "${_mfy}"
   # N2: HOME (o ~/.gitconfig com insteadOf, o config.yml do gh com http_unix_socket), proxy e CA desviam o git e o gh
   _frs "(rf11) HTTPS_PROXY no merge alheio delegado ⇒ recusa" "HTTPS_PROXY" "HTTPS_PROXY=http://127.0.0.1:9 bash '${_pi}' 999 --repo owner/repo --foreign-repo"
   _frs "(rf12) GIT_SSL_CAINFO no merge alheio delegado ⇒ recusa" "GIT_SSL_CAINFO" "GIT_SSL_CAINFO=/tmp/ca.pem bash '${_pi}' 999 --repo owner/repo --foreign-repo"
