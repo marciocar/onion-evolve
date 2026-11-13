@@ -1,17 +1,16 @@
 ---
 branch: feat/review-auto-with-fallback
 date: 2026-11-13
-reviewed_diff_sha256: b6483958785d6d232d541603e529037278eed6642c577c1006838f796b126765
-reviewed_code_sha256: 08eb7007e661c356314a5b1d7717f1a6ae841b88135f30d4cf73ad95a9862565
-findings_total: 13
-findings_real: 12
-findings_fixed: 12
+reviewed_diff_sha256: pendente
+findings_total: 15
+findings_real: 14
+findings_fixed: 14
 tokens: 0
 duration_min: 20
 verdict: FIXED
 elenxo: true
 elenxo_isolado: false
-reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui"
+reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui; 4ª passada (head 0497986e4): REPROVOU com 2 bloqueios (X1, X2), curados aqui"
 nota: "tokens = 0: não medido. elenxo_isolado: false porque as curas da 2ª passada não foram re-refutadas pelo refutador independente; pelo próprio mecanismo deste PR, a sessão não o mergearia em fallback. O merge é do maestro (D_DELEGATION_TRUST_MODEL_1113)."
 ---
 
@@ -122,3 +121,21 @@ Declarados no cartão:
 - o revisor com `Bash` pode escrever a evidência, e o head pode injetar instruções pelo `CLAUDE.md` e pelos
   agentes;
 - o fecho de 2º nível fica no tsv do #1647, sem duplicar.
+
+## 4ª passada: re-refutação do head 0497986e4 (REPROVOU, X1 e X2, curados)
+
+14. **X1, REAL, CURADO. A maquinaria não cobria o que os hooks EXECUTAM.** O `settings.json` roda
+    `.claude/validation/memory-write-scan-check.sh` no SessionStart, e os hooks carregam `.claude/utils/`
+    (`env-check.sh`, `co-evolution/*` etc.). Esse código reescreveria o `claude-execution-output.json` no
+    `RUNNER_TEMP` e forjaria 0 achados. Agora `.claude/validation/` e `.claude/utils/` inteiros anulam a
+    marca, e `.claude/rules/`, `.claude/commands/` e `.claude/output-styles/` também. Casos (rv-r) e (rv-s).
+15. **X2, REAL, CURADO. A API trunca `pulls/<n>/files` em 3000 sem erro.** O helper agora lê o `changed_files`
+    do PR e compara com a contagem lida (o nome antigo do rename não conta como arquivo a mais). Diverge ou
+    passa de 3000 = rc 2, e o merge-verified recusa. Casos (gp-trunc), (gp-max), (gp-api-ren) e (rv-t).
+
+Declarados no cartão:
+
+- a injeção de prompt pelo diff, que com `Bash` vira forja determinística pelo `RUNNER_TEMP`, de modo que a
+  marca não é fronteira de segurança;
+- o bootstrap dependente do literal `--achados <n>`;
+- o fecho de 2º nível, que vem pelo #1647.

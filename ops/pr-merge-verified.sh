@@ -1078,7 +1078,11 @@ _FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
 # do revisor CARREGA do head do PR — os hooks e o settings que os registra (o próprio onion-review.yml o registra:
 # "settings e 14 hooks presentes"), o CLAUDE.md, os agentes, as skills e o .mcp.json. Um hook do PR roda dentro do job
 # e escreve a anotação que quiser. Medido sobre TODOS os arquivos do PR (nome antigo do rename incluso), não só a guarda.
-_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$|\.claude/hooks/|\.claude/settings[^/]*\.json$|CLAUDE\.md$|\.claude/CLAUDE\.md$|\.claude/agents/|\.claude/skills/|\.mcp\.json$)'
+# (3ª passada, X1) E o que os hooks EXECUTAM: o settings.json roda .claude/validation/*.sh no SessionStart e os hooks
+# carregam .claude/utils/ — código assim reescreve o claude-execution-output.json no RUNNER_TEMP (fora da árvore, a
+# guarda dirty-tree não vê) e forja 0 achados. Por isso .claude/validation/ e .claude/utils/ INTEIROS anulam a marca, e
+# também .claude/rules/, .claude/commands/ e .claude/output-styles/ (o que o CLI carrega como instrução).
+_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$|\.claude/hooks/|\.claude/settings[^/]*\.json$|CLAUDE\.md$|\.claude/CLAUDE\.md$|\.claude/agents/|\.claude/skills/|\.mcp\.json$|\.claude/validation/|\.claude/utils/|\.claude/rules/|\.claude/commands/|\.claude/output-styles/)'
 _fallback_guard_gate() {
   # veredito VERMELHO (ou achado anterior apagado por desligamento): sem dispensa, o caminho de sempre recusa adiante.
   # COM a dispensa nomeada, num PR de guarda ela também exige o resíduo independente (3ª passada do refutador, N3):

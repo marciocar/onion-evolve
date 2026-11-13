@@ -22141,7 +22141,35 @@ run_review_mode_selftests() {
   _gpitem ops/filho.sh '|| $1 == "fecho")' '|| $1 == "nada")' --targets "${d}/t0.tsv" --targets "${d}/t-fecho.tsv"
   printf 'ato\tscript\tops/b.sh\t--apply\n' > "${d}/t1.tsv"
   _gpitem ops/b.sh 'for t in "${TARGETS[@]}"; do' 'for t in "${TARGETS[0]}"; do' --targets "${d}/t0.tsv" --targets "${d}/t1.tsv"
-  unset -f _gpcase _p_gp_unk _p_gfalse _gpitem
+  # X2 (4ª passada): a leitura pela API confere a contagem com o changed_files e falha fechado (rc 2) se divergir ou
+  # passar de 3000. Um gh FALSO no PATH devolve o changed_files e a lista etiquetada (F = arquivo, P = nome antigo).
+  mkdir -p "${d}/fgh"
+  cat > "${d}/fgh/gh" <<'FGH'
+#!/usr/bin/env bash
+case "$*" in
+  *"--jq .changed_files"*) echo "${FAKE_CHANGED}" ;;
+  *"/files"*) printf '%b' "${FAKE_FILES}" ;;
+esac
+FGH
+  chmod +x "${d}/fgh/gh"
+  _gpapi() { # $1=rótulo $2=rc esperado $3=âncora $4=substituição $5=FAKE_CHANGED $6=FAKE_FILES
+    local lbl="$1" want="$2" anc="$3" sub="$4" ch="$5" ff="$6" rc=0
+    PATH="${d}/fgh:${PATH}" FAKE_CHANGED="${ch}" FAKE_FILES="${ff}" LC_ALL=C bash "${gph}" --pr 7 --repo o/r --targets "${gpt}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -ne "${want}" ]; then record_fail "review-mode: ${lbl}" "rc=${rc}, esperado ${want}"; return; fi
+    A="${anc}" B="${sub}" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${gph}" > "${d}/gp-api.sh"
+    if cmp -s "${gph}" "${d}/gp-api.sh"; then record_fail "review-mode: ${lbl} — MUTANTE" "a âncora '${anc}' não casou"; return; fi
+    rc=0; PATH="${d}/fgh:${PATH}" FAKE_CHANGED="${ch}" FAKE_FILES="${ff}" LC_ALL=C bash "${d}/gp-api.sh" --pr 7 --repo o/r --targets "${gpt}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq "${want}" ]; then record_fail "review-mode: ${lbl} — MUTANTE SOBREVIVEU" "'${anc}' → '${sub}' e o rc não mudou"; return; fi
+    record_pass "review-mode: ${lbl} (e o mutante reprova)"
+  }
+  _gpapi "(gp-trunc) a API devolve 3 arquivos e o PR declara changed_files=5 ⇒ rc 2 (não mede pela metade)" 2 \
+    '[ "${_READ}" -eq "${_CHANGED}" ] \' 'true || [ "${_READ}" -eq "${_CHANGED}" ] \' 5 'F\tdocs/a.md\nF\tdocs/b.md\nF\tdocs/c.md\n'
+  # a lista de 3001 BATE com o changed_files: só o teto a recusa (o mutante sem o teto mede e sai rc 1)
+  _gpapi "(gp-max) changed_files=3001 (acima do que a API lista) ⇒ rc 2, mesmo com a contagem batendo" 2 \
+    '[ "${_CHANGED}" -le "${MAX_API_FILES}" ] \' 'true || [ "${_CHANGED}" -le "${MAX_API_FILES}" ] \' 3001 "$(seq 1 3001 | sed 's/^/F\\tdocs\//; s/$/.md\\n/' | tr -d '\n')"
+  _gpapi "(gp-api-ren) rename pela API: o nome antigo não conta como arquivo a mais, e casa a guarda ⇒ rc 0" 0 \
+    '!($1 == "P" && NF == 2) {n++}' '{n++}' 1 'F\tdocs/h.md\nP\t.claude/hooks/h.sh\n'
+  unset -f _gpcase _p_gp_unk _p_gfalse _gpitem _gpapi
   _rmcase "(l) valor fora do enum (ON) ⇒ falha NOMEADA rc 2, sem decisão" _p_enum \
     'on|off|auto) _mode_src' 'on|off|auto|ON|" on"|"off ") _mode_src' --mode ON --labels-json '[]'
   _rmcase "(m) valor com espaço (' on') ⇒ falha nomeada, não normaliza" _p_enum \
@@ -26072,6 +26100,10 @@ case "$args" in
       printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
   # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): quantos commits da base o head NÃO tem
   *"api "*"/compare/"*) echo "${GH_BEHIND_BY:-0}"; exit 0 ;;
+  # o changed_files do PR (o helper da guarda confere a lista contra ele: a API trunca em 3000 sem erro). ANTES do
+  # ramo de pulls*files, que também casaria ".changed_files". Padrão: a contagem de GH_PR_FILES.
+  *"api "*"--jq .changed_files"*)
+      if [ -n "${GH_CHANGED_FILES:-}" ]; then echo "${GH_CHANGED_FILES}"; else set -- ${GH_PR_FILES:-}; echo "$#"; fi; exit 0 ;;
   # o resíduo da REGRA 56 lido no head (fallback do revisor × guarda, D_REVIEW_AUTO_WITH_FALLBACK_1113)
   *"api "*"/contents/docs/evolution/review/"*)
       [ -f "${STUB_RESIDUE:-/nonexistent}" ] || { echo "gh: Not Found (HTTP 404)" >&2; exit 1; }
@@ -27019,8 +27051,23 @@ PFSTUB
   export GH_PR_FILES=".claude/hooks/x.sh"
   _rvcase "(rv-q) PR que muda um HOOK (roda dentro do job do revisor) com marca positiva ⇒ a marca não vale" _p_m_hook \
     '|\.claude/hooks/|' '|' '220\tsuccess\n' 0 0
-  unset GH_PR_FILES STUB_RESIDUE
-  unset -f _p_fb_nores _p_fb_umavoz _p_fb_ok _p_fb_comum _p_nomark _p_pos _p_mach _p_dupk _p_disp _p_mach2 _p_m_claude _p_m_hook
+  # ── (rv-r..t) 4ª passada: X1 (o que os hooks EXECUTAM anula a marca) e X2 (lista de arquivos truncada) ──
+  _p_m_val() { _p_mach2 ".claude/validation/memory-write-scan-check.sh"; }
+  _p_m_utl() { _p_mach2 ".claude/utils/task-manager/env-check.sh"; }
+  _p_trunc() { [ "${_mv_rc}" -ne 0 ] && grep -qF "não medi se o PR #999 toca guarda" <<< "${_mv_out}" && grep -qF "changed_files=9" <<< "${_mv_out}" \
+               && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  export GH_PR_FILES=".claude/validation/memory-write-scan-check.sh" STUB_RESIDUE="${d}/nao-existe.md"
+  _rvcase "(rv-r) PR que só muda memory-write-scan-check.sh (o SessionStart o roda) com marca positiva ⇒ perde a marca" _p_m_val \
+    '|\.claude/validation/|' '|' '220\tsuccess\n' 0 0
+  export GH_PR_FILES="ops/deploy-site.sh .claude/utils/task-manager/env-check.sh"
+  _rvcase "(rv-s) PR de GUARDA que muda env-check.sh (um hook o carrega) com marca positiva ⇒ perde a marca" _p_m_utl \
+    '|\.claude/utils/|' '|' '220\tsuccess\n' 0 0
+  export GH_PR_FILES="ops/deploy-site.sh" GH_CHANGED_FILES=9
+  _rvcase "(rv-t) a API devolve MENOS arquivos que o changed_files (truncada) ⇒ falha fechado, nada mergeado" _p_trunc \
+    '    *) die "não medi se o PR #${PR} toca guarda' '    *) return 0; die "não medi se o PR #${PR} toca guarda' \
+    '220\tsuccess\n' 0 0
+  unset GH_PR_FILES STUB_RESIDUE GH_CHANGED_FILES
+  unset -f _p_fb_nores _p_fb_umavoz _p_fb_ok _p_fb_comum _p_nomark _p_pos _p_mach _p_dupk _p_disp _p_mach2 _p_m_claude _p_m_hook _p_m_val _p_m_utl _p_trunc
 
   # ── (th1)-(th3) TOCTOU: O HEAD MUDA ENTRE O JULGAMENTO E O MERGE (2026-10-27) ─────────────────
   # Caso vivo da curadoria (PRs #117 e #118 de 2026-10-26, --merge-commit): os gates julgavam os check-runs
