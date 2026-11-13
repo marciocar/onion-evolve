@@ -2,7 +2,8 @@
 branch: fix/research-write-vocab-lint
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 875d51e3ddf0b5182ba8d783835255b7db57728b5ac4a4410ddbdd78f768062e
+reviewed_code_sha256: 67326700dfb99f8cc3b27283f5aefc2401f79bd69b6888e472b5d3c0fea4ba8e
 findings_total: 0
 findings_real: 0
 tokens: 0
