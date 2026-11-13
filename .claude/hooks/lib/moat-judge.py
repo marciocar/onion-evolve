@@ -815,6 +815,38 @@ def _moat_foreign_repo(args):
 _MOAT_CUR = {}
 
 
+# ── O ALVO DO GH POR OUTRA PORTA (re-refutação do #1647, N1, 2026-11-13) ─────────────────────────────────────────────
+# `git remote add x <outro>; gh repo set-default <outro>; bash ops/pr-merge-verified.sh 12` mergeava no outro repo: o gh (core-only)
+# resolve o alvo pelo `remote.<nome>.gh-resolved`, não pelo origin. Pela sessão, mudar os remotes ou o default do gh é
+# redirecionar o forge, e fecha: `git remote add|set-url|rename`, `git config` que escreve `remote.*`, e
+# `gh repo set-default` (a leitura, `--view`, e o `--unset` passam). O script também recusa remote divergente.
+_GIT_GLOBAL_VAL = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path", "--config-env"}
+_GIT_CONFIG_READ = {"--get", "--get-all", "--get-regexp", "--get-urlmatch", "-l", "--list", "--name-only", "--show-origin"}
+
+
+def _moat_forge_redirect(base, args, detail):
+    if base == "gh":
+        pos = [a for a in args if not a.startswith("-")]
+        if pos[:2] == ["repo", "set-default"] and not any(a in ("-v", "--view", "-u", "--unset") for a in args):
+            _moat_emit("forja", "gh repo set-default", "-", "mudar o repositório padrão do gh muda o alvo do merge e do forge — %s" % detail)
+        return
+    if base != "git":
+        return
+    k = 0
+    while k < len(args) and args[k].startswith("-"):
+        k += 2 if args[k] in _GIT_GLOBAL_VAL else 1
+    rest = args[k:]
+    if not rest:
+        return
+    if rest[0] == "remote":
+        sub = [a for a in rest[1:] if not a.startswith("-")]
+        if sub and sub[0] in ("add", "set-url", "rename"):
+            _moat_emit("forja", "git remote %s" % sub[0], "-", "mudar os remotes muda o alvo do gh e do merge — %s" % detail)
+    elif rest[0] == "config":
+        if any(re.match(r"^remote\.", a, re.I) for a in rest[1:]) and not any(a in _GIT_CONFIG_READ for a in rest[1:]):
+            _moat_emit("forja", "git config remote.*", "-", "escrever remote.* muda o alvo do gh e do merge — %s" % detail)
+
+
 def _moat_act_judge(rel, args, detail, rootcopy=None):
     sig = MOAT_ACTS[rel]
     # as palavras da assinatura que ESTA invocação traz (todas, não só a 1ª: a forma delegada tem de cobrir cada uma)
@@ -1166,6 +1198,7 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             or (isinstance(env, dict) and "ONION_PR_MERGE_VERIFIED_TEST" in env) \
             or "ONION_PR_MERGE_VERIFIED_TEST" in globals().get("ASSIGN", {}):
         _moat_emit("inanalisavel", "ONION_PR_MERGE_VERIFIED_TEST", "", "modo de bancada do merge verificado fora da bancada — %s" % detail)
+    _moat_forge_redirect(base, args, detail)
     if base == "cd" and len(words) > 1 and not DYNAMIC.search(words[1]) and words[1] != "-":
         prev = _MOAT_CDS[-1] if _MOAT_CDS else (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
         _MOAT_CDS.append(os.path.normpath(os.path.join(prev, os.path.expanduser(words[1]))))

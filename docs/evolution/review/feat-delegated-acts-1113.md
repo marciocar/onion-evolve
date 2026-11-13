@@ -2,18 +2,18 @@
 title: "Revisão — as guardas dos atos delegados de 2026-11-13 (merge alheio, deploy do site, scripts da VPS)"
 date: 2026-11-13
 branch: feat/delegated-acts-1113
-reviewer: "2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
-reviewed_diff_sha256: 4dcec4d3e324f1a253ce23371eebdd15795367baff4c5bba086eb4c6a1a1ab63
-reviewed_code_sha256: 1d57dd60cb81d128e03ef4afaa2d4cf349f7f5f063f842e51ef2714dbdcbb0b8
-findings_total: 12
-findings_real: 12
-findings_fixed: 12
+reviewer: "3ª passada: a re-refutação independente no head 454a3c1bb conferiu B1-B5 curados e REPROVOU com 3 novos (N1-N3), curados aqui e com o harness re-rodado (after2.txt). 2ª passada: refutador INDEPENDENTE (agente separado, a pedido do team-lead) REPROVOU com 5 bloqueios (B1-B5), harness em scratchpad/refute1647 (all.sh, allp.sh, cases1-4); o condutor curou e re-rodou o harness do refutador contra a cura. 1ª passada: o condutor sobre o próprio diff. Bancada: moat_gate (dl1-dl5, db1-db8, rb1-rb14, cada um com mutante), pr_merge_verified (fr1-fr11, rf1-rf9, fr-MUT, rf-MUT), deploy_site (52/52, com os casos B2/B4), slack_persona (29/29, com os casos B5), act_signature (13/13 + 12 mutantes), visudo -cf parsed OK"
+reviewed_diff_sha256: fddb7fc70928de69dc06f3537897609c13e74048fffdb5baa52cb8382158d35d
+reviewed_code_sha256: 181a6db7473a3662fbd5d11a98da516e98740d3d1c3165239f4c8f1fccaa0994
+findings_total: 15
+findings_real: 15
+findings_fixed: 15
 tokens: 0
 duration_min: 60
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-nota: "o refutador independente reprovou a 1ª forma (B1-B5); a cura entrou neste PR. PR de guarda: a cura também passa por refutador independente antes do merge"
+nota: "o refutador independente reprovou duas vezes (B1-B5, depois N1-N3); as curas entraram neste PR. PR de guarda: a cura dos N também passa por refutador independente antes do merge"
 ---
 
 # Resíduo — REGRA 56
@@ -77,6 +77,27 @@ O harness do refutador, re-rodado contra a cura: as 9 formas de B1/B3 vetam (res
 recusa. `bash ops/publish-door.sh onion-core <<< --push` e `bash ops/delegated-ops.sh <<< install` seguem passando, e
 estão certos: o argv não tem o ato (não há push; é o verify).
 
+## 3ª passada: a re-refutação (3 bloqueios novos, curados aqui)
+
+13. **N1 — merge alheio pelo default do gh.** `git remote add sge …; gh repo set-default …/sge; bash ops/pr-merge-verified.sh 12`
+    passava: o script resolvia o alvo pelo origin, e o gh pelo `remote.<nome>.gh-resolved`. Cura no script: sem
+    --repo, o alvo é o conjunto de TODOS os remotes do repo do cwd, mais os gh-resolved com nome e o GH_REPO; qualquer
+    um que diverja do core é o alvo, e a sessão do core recusa. Cura no hook: `git remote add|set-url|rename`, `git
+    config` que escreve `remote.*` e `gh repo set-default` (fora `--view` e `--unset`) vetam na linha da sessão (classe
+    nova `forja`, e um sinal novo no pré-filtro, sem o qual o juiz nem rodava para essas linhas). (rb15-rb19, rf10)
+14. **N2 — o HOME ficou fora da cura de B4.** `HOME=x bash …` trocava o `~/.gitconfig` (insteadOf troca o origin) e o
+    config.yml do gh (`http_unix_socket` desvia todo o HTTP). Cura: no caminho delegado, HOME fixo pelo passwd,
+    GH_CONFIG_DIR dentro dele, e recusa de *_PROXY/*_proxy, SSL_CERT_*, CURL_CA_BUNDLE, REQUESTS_CA_BUNDLE,
+    NODE_EXTRA_CA_CERTS, GIT_SSL_* e XDG_CONFIG_DIRS. (rf11-rf13 e os casos N2 do deploy-site, cada um com mutante)
+15. **N3 — a allowlist da unit era furada por `\r`.** O systemd parte linha em `\r`: um Description com
+    `\r[Service]\rExecStartPre=+/bin/true\r[Unit]` era UMA linha aqui e três lá (root). Cura: caractere de controle
+    (fora o `\n`) no texto inteiro recusa antes do parse, as linhas se partem em `[\r\n]`, e o Description só aceita
+    ASCII imprimível sem `[` nem `\`. As três units do refutador (unit.cr-*) recusam; a unit real servida segue
+    passando. (caso N3 da bancada da persona, com o mutante da allowlist de antes)
+
+Harness re-rodado (after2.txt): a linha do N1 veta. As formas com HOME passam o hook e o script as neutraliza (HOME do
+passwd). O que ainda passa o hook é forma legítima, é recusado pelo script com caso na bancada, ou é LIMITE abaixo.
+
 ## LIMITES declarados (o refutador os apontou; não se curam aqui)
 
 - **BASH_ENV e `--rcfile`**: `BASH_ENV=x bash ops/deploy-site.sh …` e `sudo bash --rcfile x -i <cópia>` passam o hook.
@@ -89,6 +110,10 @@ estão certos: o argv não tem o ato (não há push; é o verify).
   origem por tar).
 - **O `ops/moat-targets.tsv` é editável pela sessão**: quem edita a lista edita o veto. A REGRA 117 confere a forma das
   linhas, não a autoria.
+- **O próprio HOME do operador é escrito pela sessão**: com o HOME fixo pelo passwd, o `~/.gitconfig` e o
+  `~/.config/gh/config.yml` reais continuam editáveis pelo mesmo usuário (um `insteadOf` ou um `http_unix_socket`
+  plantados ali valem no caminho delegado). O mesmo vale para o set-url do origin feito por outra porta que o hook não
+  lê (editor, script versionado). Fecha só com a sessão rodando como outro usuário.
 - **A sessão do core se mede pelos ancestrais**: um processo desligado da árvore (setsid/nohup com o pai morto) perde o
   ancestral `claude`. O hook barra essas formas na linha. A bancada se declara por ONION_PR_MERGE_VERIFIED_TEST=1, que
   o hook veta na linha da sessão (rb14).

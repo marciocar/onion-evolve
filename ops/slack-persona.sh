@@ -196,12 +196,20 @@ YES = {"PrivateTmp", "PrivateDevices", "ProtectHome", "ProtectKernelTunables", "
        "RestrictSUIDSGID", "LockPersonality", "NoNewPrivileges"}
 for k in YES:
     FIX[("Service", k)] = {"yes"}
-FREE = {("Unit", "Description"): r"[^\n]{1,200}", ("Unit", "After"): r"[A-Za-z0-9@._ -]+", ("Unit", "Wants"): r"[A-Za-z0-9@._ -]+",
+FREE = {("Unit", "Description"): r"[ -Z\]-~]{1,200}", ("Unit", "After"): r"[A-Za-z0-9@._ -]+", ("Unit", "Wants"): r"[A-Za-z0-9@._ -]+",
         ("Service", "RestartSec"): r"[0-9]{1,4}", ("Service", "MemoryMax"): r"[0-9]{1,6}[KMG]?", ("Service", "TasksMax"): r"[0-9]{1,5}"}
 REQ = {("Service", "DynamicUser"), ("Service", "User"), ("Service", "ExecStart"), ("Service", "WorkingDirectory"),
        ("Service", "CapabilityBoundingSet"), ("Service", "BindReadOnlyPaths")}
 sec, seen, bad = None, set(), []
-for n, ln in enumerate(sys.stdin.read().split("\n"), 1):
+# N3 da re-refutação do #1647: o systemd parte linha também em \r, e um Description com "\r[Service]\rExecStartPre=+…"
+# passava aqui como UMA linha e lá virava três (root). Caractere de controle (fora o \n) no texto inteiro recusa ANTES
+# do parse, as linhas se partem em \r e \n, e o Description é só imprimível ASCII sem colchete nem barra invertida.
+txt = sys.stdin.read()
+ctl = sorted(set("%r" % c for c in txt if (ord(c) < 32 and c != "\n") or ord(c) == 127))
+if ctl:
+    print("caractere de controle na unit: %s" % ", ".join(ctl[:5]))
+    sys.exit(1)
+for n, ln in enumerate(re.split(r"[\r\n]", txt), 1):
     t = ln.strip()
     if not t or t[0] in "#;":
         continue

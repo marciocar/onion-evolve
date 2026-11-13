@@ -506,6 +506,21 @@ selftest() {
   tm "B4: GIT_CONFIG_* no deploy delegado → recusa antes de ler o forge" 2 "GIT_CONFIG_COUNT" \
     env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.url GIT_CONFIG_VALUE_0=https://github.com/x/y bash "$ds" deploy --verified-pr 3
   tm "B4: GH_REPO no deploy delegado → recusa" 2 "GH_REPO" env GH_REPO=x/y bash "$ds" deploy --verified-pr 3
+  # N2 da re-refutação do #1647: o HOME (o ~/.gitconfig com insteadOf, o config.yml do gh com http_unix_socket) e as
+  # variáveis de proxy e de CA desviam o que o git e o gh leem
+  tm "N2: HTTPS_PROXY no deploy delegado → recusa" 2 "HTTPS_PROXY" env HTTPS_PROXY=http://127.0.0.1:9 bash "$ds" deploy --verified-pr 3
+  tm "N2: SSL_CERT_FILE no deploy delegado → recusa" 2 "SSL_CERT_FILE" env SSL_CERT_FILE=/tmp/ca.pem bash "$ds" deploy --verified-pr 3
+  local home_pw; home_pw="$(getent passwd "$(id -un)" | cut -d: -f6)"
+  mkdir -p "$sb/fakehome"
+  tm "N2: HOME falso vira o HOME do passwd no deploy delegado (e o config do gh dentro dele)" 0 "${home_pw}|${home_pw}/.config/gh" \
+    env -i HOME="$sb/fakehome" PATH="$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo \"\$HOME|\$GH_CONFIG_DIR\""
+  # MUTANTE dos N2: a guarda sem o HOME fixo e sem a recusa de proxy/CA deixa os dois passarem
+  sed -e 's/^      \*_PROXY|\*_proxy) bad+=" \$v" ;;$/      __nunca__) ;;/' -e 's/^  HOME="\$h"; GH_CONFIG_DIR=.*$/  :/' \
+      -e 's/|GIT_SSL_\*|XDG_CONFIG_HOME|XDG_CONFIG_DIRS|SSL_CERT_\*|CURL_CA_BUNDLE|REQUESTS_CA_BUNDLE|NODE_EXTRA_CA_CERTS)/|XDG_CONFIG_HOME)/' "$ds" > "$sb/ds-mut.sh"
+  local mo; mo="$(env HTTPS_PROXY=http://127.0.0.1:9 SSL_CERT_FILE=/tmp/ca.pem env -i HOME="$sb/fakehome" PATH="$PATH" HTTPS_PROXY=x SSL_CERT_FILE=y bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$sb/ds-mut.sh'); die() { echo \"MORREU \$*\"; exit 2; }; delegated_env_guard; echo \"HOME=\$HOME\"" 2>&1)"
+  if ! cmp -s "$ds" "$sb/ds-mut.sh" && grep -qF "HOME=$sb/fakehome" <<< "$mo" && ! grep -q MORREU <<< "$mo"; then
+    pass=$((pass+1)); echo "  ✓ N2 (MUT): sem o HOME fixo e a recusa de proxy/CA, o HOME falso e o proxy passam — a cura é a causa"
+  else fail=$((fail+1)); echo "  ✗ N2 (MUT): o mutante não mudou nada (âncora sumiu?) ou também recusou: $mo"; fi
   tm "B4: um gh falso no PATH não é o gh do deploy delegado (PATH fixo)" 0 "/usr/" \
     env -i HOME="$HOME" PATH="$sb/fakegh:$PATH" bash -c "source <(sed -n '/^delegated_env_guard() {/,/^}/p' '$ds'); die() { echo \"\$*\"; exit 2; }; delegated_env_guard; echo \"\${GH_CMD[0]}\"; [[ \"\${GH_CMD[0]}\" != '$sb/fakegh/gh' ]]"
 
@@ -553,13 +568,19 @@ delegated_env_guard() {
   local v bad=""
   for v in $(compgen -e); do
     case "$v" in
-      GIT_CONFIG*|GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_EXEC_PATH|GIT_SSH|GIT_SSH_COMMAND|GIT_OBJECT_DIRECTORY|GIT_ALTERNATE_OBJECT_DIRECTORIES|GIT_INDEX_FILE|GIT_NAMESPACE|GIT_PROXY_COMMAND|GIT_CEILING_DIRECTORIES|XDG_CONFIG_HOME) bad+=" $v" ;;
+      GIT_CONFIG*|GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_EXEC_PATH|GIT_SSH|GIT_SSH_COMMAND|GIT_OBJECT_DIRECTORY|GIT_ALTERNATE_OBJECT_DIRECTORIES|GIT_INDEX_FILE|GIT_NAMESPACE|GIT_PROXY_COMMAND|GIT_CEILING_DIRECTORIES|GIT_SSL_*|XDG_CONFIG_HOME|XDG_CONFIG_DIRS|SSL_CERT_*|CURL_CA_BUNDLE|REQUESTS_CA_BUNDLE|NODE_EXTRA_CA_CERTS) bad+=" $v" ;;
+      *_PROXY|*_proxy) bad+=" $v" ;;
       GH_TOKEN) ;;
       GH_*) bad+=" $v" ;;
     esac
   done
   [[ -z "$bad" ]] || die "o deploy delegado recusa estas variáveis de ambiente, que mudam o que o git e o gh leem:${bad}"
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r
+  # N2 da re-refutação do #1647: o HOME decide o ~/.gitconfig (insteadOf troca o origin) e o config.yml do gh
+  # (http_unix_socket desvia o HTTP). HOME fixo pelo passwd, e o config do gh dentro dele
+  local h; h="$(getent passwd "$(id -un)" | cut -d: -f6)"
+  [[ -n "$h" && -d "$h" ]] || die "não li o HOME de $(id -un) no passwd"
+  HOME="$h"; GH_CONFIG_DIR="$h/.config/gh"; export HOME GH_CONFIG_DIR
   GH_CMD=("$(command -v gh)"); [[ -x "${GH_CMD[0]}" ]] || die "gh ausente no PATH do sistema"
 }
 [[ "$MODE" == delegated ]] && delegated_env_guard

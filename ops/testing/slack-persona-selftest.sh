@@ -70,6 +70,23 @@ printf '%s\n' "${UNIT_OK}" | sed 's#^\[Install\]#ExecStartPre=+/bin/sh -c id\n[I
 run install --apply; [ $? = 1 ] && grep -q 'ExecStartPre' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida com ExecStartPre=+ (roda como root) recusa e não escreve" $?
 printf '%s\n' "${UNIT_OK}" | grep -v '^DynamicUser' > "${S}/${UNIT}.service"
 run install --apply; [ $? = 1 ] && grep -q 'falta DynamicUser' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: unit servida sem DynamicUser=yes recusa e não escreve" $?
+# N3 da re-refutação do #1647: o systemd parte linha em \r; um Description com "\r[Service]\rExecStartPre=+…" virava
+# três linhas lá e uma só na allowlist (root). Recusa, e o MUTANTE (a allowlist de antes: sem a recusa de controle,
+# partindo só em \n e com o Description livre) aceitaria
+CR_UNIT="$(printf '[Unit]\nDescription=x\r[Service]\rExecStartPre=+/bin/true\r[Unit]\n%s' "${UNIT_OK}")"
+printf '%s\n' "${CR_UNIT}" > "${S}/${UNIT}.service"
+run install --apply; [ $? = 1 ] && grep -q 'caractere de controle' "${t}/out" && [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: Description com \\r que o systemd partiria em diretivas (ExecStartPre=+) recusa e não escreve" $?
+python3 -I - "${me}" "${t}/mut.sh" <<'PYM'
+import sys
+s = open(sys.argv[1]).read()
+for a, b in (("if ctl:", "if False:"), (r're.split(r"[\r\n]", txt)', r'txt.split("\n")'),
+             (r'r"[ -Z\]-~]{1,200}"', r'r"[^\n]{1,200}"')):
+    assert s.count(a) == 1, a
+    s = s.replace(a, b)
+open(sys.argv[2], "w").write(s)
+PYM
+PATH="${t}/bin:${PATH}" ONION_SLACK_PERSONA_TEST=1 ONION_SLACK_PERSONA_ROOT="${t}/root" ONION_SLACK_PERSONA_TTY="${t}/tty" bash "${t}/mut.sh" install > "${t}/out" 2>&1
+[ $? = 0 ] && ! grep -q 'allowlist' "${t}/out"; chk "install: o MUTANTE (a allowlist de antes) aceitaria a unit com \\r — a recusa é a causa" $?
 printf '%s\n' "${UNIT_OK}" > "${S}/${UNIT}.service"
 run install; chk "install: ensaio sai 0" $?
 [ ! -e "${t}/root/etc/systemd/system/${UNIT}.service" ]; chk "install: ensaio não escreve" $?

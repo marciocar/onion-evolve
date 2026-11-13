@@ -158,6 +158,8 @@ moat_cites_symlink() {
 # (6) publicação pela API do forge: aprovação de ambiente, visibilidade, descrição e tópicos do repo
 [ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(gh|curl)([^[:alnum:]_-]|$)' <<< "$flat" \
   && grep -qE 'pending_deployments|repo[[:space:]]+edit|release[[:space:]]+(create|edit|delete|upload)|/releases|/topics|visibility|description|private' <<< "$flat" && hit=1
+# (7) o alvo do forge por outra porta (re-refutação do #1647, N1): remotes, `remote.*` no git config e o default do gh
+[ "$hit" = 0 ] && grep -qE '(^|[^[:alnum:]_-])(remote[[:space:]]+(add|set-url|rename)|repo[[:space:]]+set-default|config([[:space:]]+[^[:space:]]+)*[[:space:]]+remote\.)' <<< "$flat" && hit=1
 [ "$hit" = 0 ] && exit 0
 
 # ── leitura exata do JSON + juiz ──────────────────────────────────────────────────────────────────────────
@@ -224,6 +226,8 @@ case "$cls" in
       *)     how="sem ${wrapper} é ensaio ou leitura, e isso passa" ;;
     esac
     echo "GUARDA-PRETOOLUSE (MOAT/ato): ${detail} — deploy, publicação e push de porta são do maestro, salvo os atos delegados na forma exata (linhas delega), e o wrapper versionado não os torna da sessão (REGRA 117; alvos em ops/moat-targets.tsv, core-only). Negado pela sessão; ${how}. Peça ao maestro que rode pelo \`!\` no prompt, que não passa pelos hooks: \`! <o mesmo comando>\` (o deploy do site e o merge alheio, chamados de dentro da sessão, pedem também --maestro). Porta se publica por /meta:publish, que pergunta antes do --push." >&2 ;;  # (core-only)
+  forja)
+    echo "GUARDA-PRETOOLUSE (MOAT/forja): ${detail} — ${target} redireciona o forge (o gh e o merge verificado passam a mirar outro repositório). Negado pela sessão; o alvo de um merge se diz com --repo, e mudar remotes ou o default do gh é do maestro (\`!\` no prompt)." >&2 ;;
   relogio)
     echo "GUARDA-PRETOOLUSE (MOAT/relógio): ${detail} — agendar por relógio (${target}) é W7: o Onion é maestro-invocado, nunca cron/timer sobre si. Negado; agendamento é do maestro, fora da sessão (\`!\` no prompt)." >&2 ;;
   *)

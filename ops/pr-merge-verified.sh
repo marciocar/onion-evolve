@@ -202,9 +202,26 @@ _CORE_SESSION=0
 [ -n "${_SESSION_CWD}" ] && [ -n "${_PMV_COMMON}" ] \
   && [ "$(git -C "${_SESSION_CWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" = "${_PMV_COMMON}" ] && _CORE_SESSION=1
 _PMV_CORE_SLUG="$(_slug_norm "$(git -C "${_PMV_DIR}" remote get-url origin 2>/dev/null)")"
+# Sem --repo, o gh NÃO resolve pelo origin: um remote com `remote.<nome>.gh-resolved` (o `gh repo set-default`) vence
+# (re-refutação do #1647, N1: `git remote add sge …; gh repo set-default …/sge; bash pmv.sh 12` mergeava no sge). Então o
+# alvo sem --repo é o conjunto de TODOS os remotes do repo do cwd, mais o GH_REPO e os gh-resolved com nome de repo; se
+# algum diverge do core, o alvo é esse, e a sessão do core recusa. Remote ilegível conta como divergente.
+_pmv_remote_slugs() {
+  local u v
+  while read -r _ u _; do [ -n "${u}" ] && _slug_norm "${u}"; done < <(git remote -v 2>/dev/null)
+  while read -r _ v; do case "${v}" in ""|base|other) ;; *) _slug_norm "${v}" ;; esac; done \
+    < <(git config --get-regexp '^remote\..*\.gh-resolved$' 2>/dev/null)
+  [ -z "${GH_REPO:-}" ] || _slug_norm "${GH_REPO}"
+}
 if [ "${#REPO_ARG[@]}" -ge 2 ]; then _PMV_TARGET="$(_slug_norm "${REPO_ARG[1]}")"
-elif [ -n "${GH_REPO:-}" ]; then _PMV_TARGET="$(_slug_norm "${GH_REPO}")"
-else _PMV_TARGET="$(_slug_norm "$(git remote get-url origin 2>/dev/null)")"; fi
+else
+  _PMV_TARGET=""
+  while read -r _s; do
+    [ -n "${_s}" ] || continue
+    if [ "${_s}" != "${_PMV_CORE_SLUG}" ]; then _PMV_TARGET="${_s}"; break; fi
+    _PMV_TARGET="${_s}"
+  done < <(_pmv_remote_slugs | awk '!seen[$0]++')
+fi
 if [ "${_CORE_SESSION}" = 1 ] && [ -n "${_PMV_TARGET}" ] && [ "${_PMV_TARGET}" != "${_PMV_CORE_SLUG}" ] \
    && [ "${DELEGATED_FOREIGN}" -eq 0 ] && [ "${MAESTRO}" -eq 0 ]; then
   die "merge em '${_PMV_TARGET}' (não é o core) pela sessão do core: só pelo caminho delegado, '--repo <dono/repo> --foreign-repo' como palavra nua (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113). O maestro roda com --maestro. Nada foi feito."
@@ -216,13 +233,19 @@ _delegated_env_guard() {
   local v bad=""
   for v in $(compgen -e); do
     case "${v}" in
-      GIT_CONFIG*|GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_EXEC_PATH|GIT_SSH|GIT_SSH_COMMAND|GIT_OBJECT_DIRECTORY|GIT_ALTERNATE_OBJECT_DIRECTORIES|GIT_INDEX_FILE|GIT_NAMESPACE|GIT_PROXY_COMMAND|GIT_CEILING_DIRECTORIES|XDG_CONFIG_HOME) bad="${bad} ${v}" ;;
+      GIT_CONFIG*|GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_EXEC_PATH|GIT_SSH|GIT_SSH_COMMAND|GIT_OBJECT_DIRECTORY|GIT_ALTERNATE_OBJECT_DIRECTORIES|GIT_INDEX_FILE|GIT_NAMESPACE|GIT_PROXY_COMMAND|GIT_CEILING_DIRECTORIES|GIT_SSL_*|XDG_CONFIG_HOME|XDG_CONFIG_DIRS|SSL_CERT_*|CURL_CA_BUNDLE|REQUESTS_CA_BUNDLE|NODE_EXTRA_CA_CERTS) bad="${bad} ${v}" ;;
+      *_PROXY|*_proxy) bad="${bad} ${v}" ;;
       GH_TOKEN) ;;
       GH_*) bad="${bad} ${v}" ;;
     esac
   done
   [ -z "${bad}" ] || die "o merge alheio delegado (--foreign-repo) recusa estas variáveis de ambiente, que mudam o que o git e o gh leem:${bad}. Rode sem elas. Nada foi feito."
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; export PATH; hash -r
+  # N2 da re-refutação: o HOME decide o ~/.gitconfig (insteadOf troca o origin) e o config.yml do gh (http_unix_socket
+  # desvia todo o HTTP). HOME fixo pelo passwd do usuário, e o diretório de config do gh dentro dele
+  local h; h="$(getent passwd "$(id -un)" | cut -d: -f6)"
+  [ -n "${h}" ] && [ -d "${h}" ] || die "não li o HOME de $(id -un) no passwd: sem ele o git e o gh leriam config de outro lugar. Nada foi feito."
+  HOME="${h}"; GH_CONFIG_DIR="${h}/.config/gh"; export HOME GH_CONFIG_DIR
 }
 [ "${DELEGATED_FOREIGN}" -eq 1 ] && _delegated_env_guard
 
