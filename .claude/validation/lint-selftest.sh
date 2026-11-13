@@ -8632,7 +8632,7 @@ _judge_overcoming_research_cases() {
   # cenários: 0 = nenhum nó novo · 1 = nó+aresta novos · 2 = só os 2 nós ANTIGOS do mesmo prefixo (baseline 2)
   for nodes in 0 1 2; do
     { printf '%s\n' "const TASK_ANCHOR='';const KG_PATH='d/x.kg.yaml';const kgPathOk=p=>'';const SC=${nodes};" \
-        "const agent=async(p,o)=>{const L=String(o.label); if(L==='count-sup') return SC===2?{overcomingNodes:2,overcomingEdges:2}:{overcomingNodes:0,overcomingEdges:0}; if(L.startsWith('verify-kg-')) return {radarExit:0,contractExit:0,output:'',overcomingNodes:SC===1?1:SC===2?2:0,overcomingEdges:SC===1?1:SC===2?2:0}; return {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'}};const ag=(p,o)=>agent(p,o);"
+        "const agent=async(p,o)=>{const L=String(o.label); if(L==='count-sup') return SC===2?{overcomingNodes:2,overcomingEdges:2}:{overcomingNodes:0,overcomingEdges:0}; if(L.startsWith('verify-kg-')) return {radarExit:0,contractExit:0,vocabExit:0,output:'',overcomingNodes:SC===1?1:SC===2?2:0,overcomingEdges:SC===1?1:SC===2?2:0}; return {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'}};const ag=(p,o)=>agent(p,o);"
       awk '/^\/\/ >>> engine-verify/{f=1} f{print} /^\/\/ <<< engine-verify/{f=0}' "${wf}"
       printf '%s\n' "(async()=>{const s=await supBaseline('d/x.kg.yaml',{need:1,prefix:'C_SUPERACAO_X_'});const r=await writeAndVerify('p',{label:'write-kg',sup:s});console.log(JSON.stringify({n:r.attempts.length,ok:engineOk(r.ver,s)}))})().catch(e=>console.log(JSON.stringify({thrown:String(e)})))"
     } > "${ogd}/e${nodes}.mjs"
@@ -8714,7 +8714,7 @@ const agent=async(p,o)=>{const L=String(o.label);
  if(L.startsWith('search:'))return{results:[{url:'https://x.example/'+L,title:'t',snippet:'s'}]};
  if(L.startsWith('fetch:'))return{claims:[{claim:'claim '+L,quote:'q',importance:'central'}],sourceQuality:'primary',sourceKind:'primary',sourceTier:8};
  if(L==='count-sup')return{overcomingNodes:0,overcomingEdges:0};
- if(L.startsWith('verify-kg'))return{radarExit:0,contractExit:0,output:'',overcomingNodes:/3\. grep -c/.test(p)?9:0,overcomingEdges:/4\. awk/.test(p)?9:0};
+ if(L.startsWith('verify-kg'))return{radarExit:0,contractExit:0,vocabExit:0,output:'',overcomingNodes:/4\. grep -c/.test(p)?9:0,overcomingEdges:/5\. awk/.test(p)?9:0};
  if(/^v[0-9]:/.test(L)){vn++; return vn%3===0?{refuted:false,evidence:'e',confidence:'high'}:((ALLSUP||vn%2)? {refuted:true,evidence:'e',confidence:'high',superacao:sup,criterio:crit}:{refuted:true,evidence:'e',confidence:'high'})}
  if(L==='synthesize')return{summary:'s',findings:[],caveats:'',unverifiedList:[],market:'m'};
  if(L==='elenxo')return{objections:[{target:'t1',kind:'finding',survives:true,evidence:'e',superacao:sup,criterio:{id:'E1_EVIDENCIA_CONTRARIA',comando:'c u'}},{target:'t2',kind:'finding',survives:true,evidence:'e'}],recommendation:'r',options:['A','B']};
@@ -9198,7 +9198,7 @@ run_research_workflow_selftests() {
     else
       for okAt in 0 2; do
         { printf '%s\n' "const TASK_ANCHOR='';const KG_PATH='d/x.kg.yaml';const kgPathOk=p=>String(p).startsWith('/')?'':'rel';let vcalls=0,wcalls=0;const okAt=${okAt};" \
-            "const agent=async(p,o)=>{ if(String(o.label).startsWith('verify-kg-')){vcalls++;return okAt&&vcalls>=okAt?{radarExit:0,contractExit:0,output:''}:{radarExit:1,contractExit:0,output:'ERRO'}} wcalls++; return {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'} };const ag=(p,o)=>agent(p,o);"
+            "const agent=async(p,o)=>{ if(String(o.label).startsWith('verify-kg-')){vcalls++;return okAt&&vcalls>=okAt?{radarExit:0,contractExit:0,vocabExit:0,output:''}:{radarExit:1,contractExit:0,vocabExit:0,output:'ERRO'}} wcalls++; return {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'} };const ag=(p,o)=>agent(p,o);"
           awk '/^\/\/ >>> engine-verify/{f=1} f{print} /^\/\/ <<< engine-verify/{f=0}' "${wf}"
           printf '%s\n' "(async()=>{const r=await writeAndVerify('p',{label:'write-kg'});console.log(JSON.stringify({n:r.attempts.length,ok:engineOk(r.ver),declared:r.res.radarExit,w:wcalls,v:vcalls}))})().catch(e=>console.log(JSON.stringify({thrown:String(e)})))"
         } > "${evd}/ev${okAt}.mjs"
@@ -9212,6 +9212,70 @@ run_research_workflow_selftests() {
       else record_fail "research-workflow: (ev2)" "esperava parar na 2ª tentativa aprovada, veio: ${ev2:0:220}"; fi
     fi
     rm -rf "${evd}"
+  fi
+  # (ev3) O LINT DE NOMES ENTRA NO VERIFICADOR (2026-11-13). Dano medido: a rodada wf_45f0fcd2-079 saiu verde no
+  #       radar e no contrato, e o commit reprovou com 29 códigos OWASP sem termo (PR #1654), curados à mão.
+  #       EXECUTA o bloco engine-verify com o verificador medindo radar 0, contrato 0 e nomes rc 1: o motor tem de
+  #       reprovar em 3 tentativas contadas, e o prompt de correção tem de levar o rc do lint e a cura x_term.
+  #       (ev4) nomes rc 2 (não julgou aqui) passa, declarado, como o rc 2 do contrato. (ev5) o verificador roda o
+  #       kg-vocab-graph.sh. (ev6) MUTANTE: engineOk sem a cláusula de nomes ⇒ o caso (ev3) aprova na 1ª.
+  if command -v node >/dev/null 2>&1; then
+    local evv o3 o4 o3m
+    evv="$(mktemp -d)"
+    _ev_vocab_mk() {  # <workflow> <vocabExit> <saída .mjs>
+      { printf '%s\n' "const TASK_ANCHOR='';const KG_PATH='d/x.kg.yaml';const kgPathOk=p=>String(p).startsWith('/')?'':'rel';let vcalls=0,wcalls=0,fixp='',verp='';" \
+          "const agent=async(p,o)=>{ if(String(o.label).startsWith('verify-kg-')){vcalls++;verp=p;return {radarExit:0,contractExit:0,vocabExit:$2,output:'  ✗ vocab.code-unresolved d/x.kg.yaml#E_X label QZ97'}} wcalls++; if(wcalls>1)fixp=p; return {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'} };const ag=(p,o)=>agent(p,o);"
+        awk '/^\/\/ >>> engine-verify/{f=1} f{print} /^\/\/ <<< engine-verify/{f=0}' "$1"
+        printf '%s\n' "(async()=>{const r=await writeAndVerify('p',{label:'write-kg'});console.log(JSON.stringify({n:r.attempts.length,ok:engineOk(r.ver),v:vcalls,vocabInFix:/nomes \(kg-vocab-graph\) rc 1/.test(fixp)&&/x_term/.test(fixp)&&/QZ97/.test(fixp),vocabCmd:/kg-vocab-graph\.sh/.test(verp),rec:r.attempts[0]&&r.attempts[0].vocabExit}))})().catch(e=>console.log(JSON.stringify({thrown:String(e)})))"
+      } > "$3"
+    }
+    _ev_vocab_mk "${wf}" 1 "${evv}/e3.mjs"; _ev_vocab_mk "${wf}" 2 "${evv}/e4.mjs"
+    o3="$(node "${evv}/e3.mjs" 2>&1 || true)"; o4="$(node "${evv}/e4.mjs" 2>&1 || true)"
+    if grep -qF '"n":3,"ok":false,"v":3,"vocabInFix":true' <<< "${o3}" && grep -qF '"rec":1' <<< "${o3}"; then
+      record_pass "research-workflow: (ev3) radar 0 e contrato 0 mas nomes rc 1 ⇒ o MOTOR reprova em 3 tentativas, e a correção leva o rc do lint, a sigla e a cura x_term"
+    else record_fail "research-workflow: (ev3)" "esperava 3 tentativas reprovadas pelo lint de nomes com o achado no prompt de correção, veio: ${o3:0:240}"; fi
+    if grep -qF '"n":1,"ok":true' <<< "${o4}"; then
+      record_pass "research-workflow: (ev4) nomes rc 2 (o lint não pôde julgar aqui) ⇒ passa declarado, como o rc 2 do contrato"
+    else record_fail "research-workflow: (ev4)" "esperava aprovar na 1ª com nomes rc 2, veio: ${o4:0:200}"; fi
+    if grep -qF '"vocabCmd":true' <<< "${o3}"; then
+      record_pass "research-workflow: (ev5) o verificador do motor roda o kg-vocab-graph.sh sobre o grafo escrito"
+    else record_fail "research-workflow: (ev5)" "o prompt do verificador não manda rodar o kg-vocab-graph.sh: ${o3:0:200}"; fi
+    grep -vF '&& (v.vocabExit === 0 || v.vocabExit === 2)' "${wf}" > "${evv}/w.js"
+    _ev_vocab_mk "${evv}/w.js" 1 "${evv}/e3m.mjs"; o3m="$(node "${evv}/e3m.mjs" 2>&1 || true)"
+    if ! cmp -s "${wf}" "${evv}/w.js" && grep -qF '"n":1,"ok":true' <<< "${o3m}"; then
+      record_pass "research-workflow: (ev6) MUTANTE sem a cláusula de nomes no engineOk ⇒ o grafo com sigla sem termo passa na 1ª (o caso ev3 morde)"
+    else record_fail "research-workflow: (ev6)" "o mutante não reproduziu o furo (ou não removeu a cláusula): ${o3m:0:200}"; fi
+    rm -rf "${evv}"
+  fi
+  # (vg) O LINT DE NOMES SOBRE UM GRAFO NÃO RASTREADO (kg-vocab-graph.sh). O kg_vocab.py lint --root lê só o que o
+  #      git rastreia e descarta GIT_INDEX_FILE; o grafo do write(KG) nasce não rastreado. Repo de teste com um grafo
+  #      rastreado e dois soltos: (vg1) sigla sem termo no solto ⇒ rc 1 nomeando-a; (vg2) a mesma sigla com nó
+  #      x_term ⇒ rc 0; (vg3) MUTANTE sem acrescentar o solto ao corpus ⇒ rc 0 no (vg1) (o furo que o script fecha).
+  local vgt="${REPO_ROOT}/vendor/kg-ssot/tools" vgs="${REPO_ROOT}/.claude/validation/kg-vocab-graph.sh"
+  if [ ! -f "${vgt}/kg_vocab.py" ]; then record_skip "research-workflow: (vg) vendor/kg-ssot/tools/kg_vocab.py ausente → lint de nomes por grafo não exercitado"
+  elif [ ! -f "${vgs}" ]; then record_fail "research-workflow: (vg)" "ausente: ${vgs}"
+  else
+    local vgd vg1 vg2 vg3 vr1 vr2 vr3
+    vgd="$(mktemp -d)"; mkdir -p "${vgd}/r/g" "${vgd}/m/.claude/validation" "${vgd}/m/.claude/utils/kg"
+    printf '%s\n' 'meta:' '  id: base' '  schema_version: "1"' 'nodes:' '  - id: Q_BASE' '    node_type: question' '    status: open' '    label: "pergunta base"' 'edges: []' > "${vgd}/r/g/base.kg.yaml"
+    printf '%s\n' 'meta:' '  id: new' '  schema_version: "1"' 'nodes:' '  - id: E_NEW' '    node_type: evidence' '    status: confirmed' '    label: "o item QZ97 do catálogo manda logar"' 'edges: []' > "${vgd}/r/g/new.kg.yaml"
+    { sed '$d' "${vgd}/r/g/new.kg.yaml"
+      printf '%s\n' '  - id: T_CAT_QZ97' '    node_type: entity' '    status: confirmed' '    label: "QZ97 neste grafo é o item QZ97 do catálogo"' '    x_term:' '      pref: "item QZ97 do catálogo"' '      notation: "QZ97"' '      scheme: catalogo' '      lang: pt-BR' '      definition: "O item QZ97 do catálogo de teste."' 'edges: []'; } > "${vgd}/r/g/new2.kg.yaml"
+    (cd "${vgd}/r" && git init -q && git add g/base.kg.yaml && git -c user.email=t@t -c user.name=t commit -qm i) >/dev/null 2>&1
+    sed 's/ || EXTRA="${REL}"$//' "${vgs}" > "${vgd}/m/.claude/validation/kg-vocab-graph.sh"
+    cp "${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" "${vgd}/m/.claude/utils/kg/"
+    vg1="$(cd "${vgd}/r" && KG_SSOT_TOOLS="${vgt}" bash "${vgs}" g/new.kg.yaml 2>&1)" && vr1=0 || vr1=$?
+    vg2="$(cd "${vgd}/r" && KG_SSOT_TOOLS="${vgt}" bash "${vgs}" g/new2.kg.yaml 2>&1)" && vr2=0 || vr2=$?
+    vg3="$(cd "${vgd}/r" && KG_SSOT_TOOLS="${vgt}" bash "${vgd}/m/.claude/validation/kg-vocab-graph.sh" g/new.kg.yaml 2>&1)" && vr3=0 || vr3=$?
+    if [ "${vr1}" -eq 1 ] && grep -qF 'g/new.kg.yaml#E_NEW label QZ97' <<< "${vg1}"; then
+      record_pass "research-workflow: (vg1) grafo NÃO rastreado com sigla sem termo ⇒ kg-vocab-graph rc 1 nomeando nó, campo e sigla"
+    else record_fail "research-workflow: (vg1)" "esperava rc 1 com QZ97, veio rc ${vr1}: ${vg1:0:200}"; fi
+    if [ "${vr2}" -eq 0 ]; then record_pass "research-workflow: (vg2) a mesma sigla com nó x_term ⇒ rc 0"
+    else record_fail "research-workflow: (vg2)" "esperava rc 0 com o termo, veio rc ${vr2}: ${vg2:0:200}"; fi
+    if ! cmp -s "${vgs}" "${vgd}/m/.claude/validation/kg-vocab-graph.sh" && [ "${vr3}" -eq 0 ]; then
+      record_pass "research-workflow: (vg3) MUTANTE sem acrescentar o grafo solto ao corpus ⇒ rc 0 no caso (vg1) (o furo do --root só-rastreados)"
+    else record_fail "research-workflow: (vg3)" "o mutante não reproduziu o furo (rc ${vr3}): ${vg3:0:200}"; fi
+    rm -rf "${vgd}"
   fi
   local n; n=$(grep -cE '^  - id: ' "${rs}")
   [ "${n}" -ge 5 ] && grep -q "vendor-on-competitor" "${rs}" && record_pass "research-workflow: (e) radar-sources.yaml com ${n} eixos e tier vendor-on-competitor declarado" \

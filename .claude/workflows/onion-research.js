@@ -264,9 +264,13 @@ const KG_SCHEMA_DECISION = { ...KG_SCHEMA, required: [...KG_SCHEMA.required, 'de
 // "máx 3 tentativas" existia só no prompt. Agora o motor manda um agente SEPARADO (que não escreveu e não edita)
 // rodar o kg-radar e o kg-contract-check sobre o arquivo escrito, e o laço de correção é contado AQUI.
 // O script não tem shell: o verificador é o braço executor do motor, e o veredito que vale é o dele.
+// 2026-11-13: o verificador roda também o LINT DE NOMES (kg-vocab-graph.sh, o kg_vocab.py lint do CI sobre UM
+// grafo, rastreado ou não). A rodada wf_45f0fcd2-079 saiu verde no radar e no contrato e o commit reprovou com 29
+// códigos OWASP sem termo (PR #1654). O achado volta ao laço de correção e conta como tentativa (mesmo teto).
+// rc 2 do lint = não pôde julgar aqui (sem kg_vocab.py): declarado no output, como o rc 2 do contrato.
 const MAX_WRITE_ATTEMPTS = 3
-const VERIFY_SCHEMA = { type: 'object', required: ['radarExit', 'contractExit', 'output'], properties: {
-  radarExit: { type: 'integer' }, contractExit: { type: 'integer' }, output: { type: 'string' }, overcomingNodes: { type: 'integer' }, overcomingEdges: { type: 'integer' } } }
+const VERIFY_SCHEMA = { type: 'object', required: ['radarExit', 'contractExit', 'vocabExit', 'output'], properties: {
+  radarExit: { type: 'integer' }, contractExit: { type: 'integer' }, vocabExit: { type: 'integer' }, output: { type: 'string' }, overcomingNodes: { type: 'integer' }, overcomingEdges: { type: 'integer' } } }
 // conta nós do prefixo e arestas TRACES_TO que saem deles — o MESMO comando antes (baseline) e depois do write:
 // um grafo que APENDA (primárias, revisita, re-rodada no mesmo dia) não se satisfaz com nós de rodada anterior
 const supCountCmds = (absPath, prefix, n) => n + '. grep -c \'^[[:space:]]*- id: ' + prefix + '\' "' + absPath + '" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum ou arquivo ausente).\n' +
@@ -283,10 +287,12 @@ const engineVerify = (absPath, attempt, sup) => agent(
   'A partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n' +
   '1. bash .claude/validation/kg-radar.sh "' + absPath + '" --integrity --schema; echo "RC=$?"\n' +
   '2. bash .claude/validation/kg-contract-check.sh "' + absPath + '"; echo "RC=$?"\n' +
-  (sup && sup.need > 0 ? supCountCmds(absPath, sup.prefix, 3) : '') +
-  'Devolva radarExit e contractExit = os RC LITERAIS impressos (arquivo ausente ou comando que não rodou = 99), e output = as linhas de erro das falhas (até 60 linhas; vazio se os dois deram 0). Não conserte, não interprete.',
+  '3. bash .claude/validation/kg-vocab-graph.sh "' + absPath + '"; echo "RC=$?"\n' +
+  (sup && sup.need > 0 ? supCountCmds(absPath, sup.prefix, 4) : '') +
+  'Devolva radarExit, contractExit e vocabExit = os RC LITERAIS impressos pelos comandos 1, 2 e 3 (arquivo ausente ou comando que não rodou = 99), e output = as linhas de erro das falhas, inclusive as linhas ✗ do lint de nomes (até 60 linhas; vazio se os três deram 0). Não conserte, não interprete.',
   { label: 'verify-kg-' + attempt, phase: 'write(KG)', schema: VERIFY_SCHEMA, model: 'sonnet', effort: 'low' })
 const engineOk = (v, sup) => !!v && v.radarExit === 0 && v.contractExit !== 1   // contrato rc 2 = não vendorizado aqui (declarado)
+  && (v.vocabExit === 0 || v.vocabExit === 2)   // lint de nomes: rc 1 = código sem termo no grafo; ausente/99 reprova (fail-closed)
   && (!sup || !(sup.need > 0) || (Number(v.overcomingNodes || 0) >= Number(sup.baseNodes || 0) + sup.need
     && Number(v.overcomingEdges || 0) >= Number(sup.baseEdges || 0) + sup.need))   // SAC-151: superação achada sem nó+aresta NOVOS reprova
 async function writeAndVerify(firstPrompt, opts) {
@@ -295,16 +301,18 @@ async function writeAndVerify(firstPrompt, opts) {
   for (let i = 1; i <= MAX_WRITE_ATTEMPTS; i++) {
     const prompt = i === 1 ? firstPrompt
       : '## Correção do write(KG) — tentativa ' + i + ' de ' + MAX_WRITE_ATTEMPTS + '\nO verificador INDEPENDENTE do motor reprovou o grafo em ' + res.kgPath +
-        ': kg-radar rc ' + (ver ? ver.radarExit : '?') + ', kg-contract-check rc ' + (ver ? ver.contractExit : '?') +
+        ': kg-radar rc ' + (ver ? ver.radarExit : '?') + ', kg-contract-check rc ' + (ver ? ver.contractExit : '?') + ', lint de nomes (kg-vocab-graph) rc ' + (ver ? ver.vocabExit : '?') +
         (opts.sup && opts.sup.need > 0 ? ', superação: ' + (ver ? Number(ver.overcomingNodes || 0) : '?') + ' nós e ' + (ver ? Number(ver.overcomingEdges || 0) : '?') + ' arestas TRACES_TO com o prefixo ' + opts.sup.prefix + ', exigidos ' + (Number(opts.sup.baseNodes || 0) + opts.sup.need) + ' de cada (' + (opts.sup.baseNodes || 0) + ' já existiam antes desta rodada)' : '') + '.\nSaída do motor:\n' + (ver ? ver.output : '(o verificador não devolveu)') +
-        '\n\nEdite SÓ o que a saída acusa (não reescreva o que está certo) e devolva o mesmo schema, com os números reais do grafo ao fim.\n\nSomente saída estruturada.'
+        '\n\nEdite SÓ o que a saída acusa (não reescreva o que está certo) e devolva o mesmo schema, com os números reais do grafo ao fim.' +
+        (ver && ver.vocabExit === 1 ? ' Código sem termo do lint de nomes: para cada sigla acusada, acrescente UM nó entity T_<ESQUEMA>_<CÓDIGO> com x_term {pref, notation: "<código>", scheme, lang: pt-BR, definition} tirado da fonte que a rodada já leu, e uma aresta TRACES_TO dele à pergunta; ou escreva esquema:código na prosa. Não apague a sigla da evidência.' : '') +
+        '\n\nSomente saída estruturada.'
     const { sup: _sup, ...agOpts } = opts
     res = await ag(prompt, { ...agOpts, label: opts.label + (i > 1 ? '-fix' + i : '') })
     if (!res) return { res: null, ver, attempts }
     const pathErr = kgPathOk(res.kgPath)
     if (pathErr) return { res, ver: null, attempts, pathErr }
     ver = await engineVerify(res.kgPath, i, opts.sup)
-    attempts.push({ attempt: i, declaredRadarExit: res.radarExit, radarExit: ver ? ver.radarExit : null, contractExit: ver ? ver.contractExit : null, overcomingNodes: ver ? ver.overcomingNodes : null })
+    attempts.push({ attempt: i, declaredRadarExit: res.radarExit, radarExit: ver ? ver.radarExit : null, contractExit: ver ? ver.contractExit : null, vocabExit: ver ? ver.vocabExit : null, overcomingNodes: ver ? ver.overcomingNodes : null })
     if (engineOk(ver, opts.sup)) break
   }
   return { res, ver, attempts }
@@ -492,13 +500,13 @@ if (MODE === 'primaries') {
     '\n\n### Objeções RECUSADAS pelo motor (sobreviveram sem critério pré-registrado ou sem superação — o alvo fica NÃO-JULGADO; entram no E_LACUNAS_… com a contagem EXATA: ' + pGate.recused.length + ')\n' + (pGate.recused.length ? pGate.recused.map(r => '- ' + webText(r.verdict.target) + ' → ' + r.why).join('\n') : '(nenhuma)') +
     (pSup.need > 0 ? SUP_NODES + '\n' + pOvercomings.map(o => '- alvo: ' + o.alvo + ' | registro: ' + o.registro + ' | supera: ' + webText(o.superacao.o_que) + ' | medida: ' + webText(o.superacao.medida) + ' | critério: ' + webText(o.criterio && o.criterio.id) + ' `' + webText(o.criterio && o.criterio.comando) + '`').join('\n') : '') +
     KG_ANCHOR + CONTRACT_V3 +
-    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo. O motor RECONFERE por um verificador independente e conta as tentativas em código; o seu número é declaração. 3b. `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` — rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary. 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
+    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo. O motor RECONFERE por um verificador independente e conta as tentativas em código; o seu número é declaração. 3b. `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` — rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary. 3c. `bash .claude/validation/kg-vocab-graph.sh ' + KG_PATH + '` (o lint de nomes do CI) — rc 1 = sigla sem termo: dê a cada uma um nó com x_term ou escreva esquema:código, e rode de novo; rc 2 = não julgou aqui, declare no summary. 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
     'Somente saída estruturada.',
     { label: 'write-kg-primarias', phase: 'write(KG)', schema: KG_SCHEMA_PRIMARIES, model: TIER.judge.model, effort: TIER.judge.effort, sup: pSup })
   const pKg = pW.res
   if (!pKg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, anchoredCount: anchored.length, elenxo: pElenxo }
   if (pW.pathErr) return { error: 'write(KG): ' + pW.pathErr, question: QUESTION, kgPath: pKg.kgPath }
-  if (!engineOk(pW.ver, pSup)) return { error: 'o MOTOR reprovou o grafo em ' + pKg.kgPath + ' depois de ' + pW.attempts.length + ' tentativa(s): radar rc ' + (pW.ver ? pW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (pW.ver ? pW.ver.contractExit : 'sem veredito') + ' (o escritor declarou ' + pKg.radarExit + '); não conte a rodada como feita.', question: QUESTION, kgPath: pKg.kgPath, writeAttempts: pW.attempts }
+  if (!engineOk(pW.ver, pSup)) return { error: 'o MOTOR reprovou o grafo em ' + pKg.kgPath + ' depois de ' + pW.attempts.length + ' tentativa(s): radar rc ' + (pW.ver ? pW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (pW.ver ? pW.ver.contractExit : 'sem veredito') + ', nomes rc ' + (pW.ver ? pW.ver.vocabExit : 'sem veredito') + ' (o escritor declarou ' + pKg.radarExit + '); não conte a rodada como feita.', question: QUESTION, kgPath: pKg.kgPath, writeAttempts: pW.attempts }
   pKg.radarExit = pW.ver.radarExit
   log('write(KG): ' + pKg.kgPath + ' — +' + pKg.nodes + ' nós / +' + pKg.edges + ' arestas, total ' + pKg.nodesTotal + ', radar exit ' + pKg.radarExit + ' (pelo motor, ' + pW.attempts.length + ' tentativa(s))')
 
@@ -705,13 +713,13 @@ const kgW = await writeAndVerify(
   '\n### Reprovações RECUSADAS pelo motor (sem critério pré-registrado ou sem superação — o alvo fica NÃO-JULGADO; o E_LACUNAS_… declara a contagem EXATA: ' + (verifyRecused + elenxoGate.recused.length) + ')\n' +
   [...voted.filter(c => (c.recusedVotes || []).length).map(c => '- voto(s) recusado(s) em ' + webText(c.claim) + ': ' + c.recusedVotes.join(' | ')), ...elenxoGate.recused.map(r => '- objeção sobre ' + webText(r.verdict.target) + ': ' + r.why)].join('\n') +
   (supNeed.need > 0 ? SUP_NODES + '\n' + overcomings.map(o => '- alvo: ' + o.alvo + ' | registro: ' + o.registro + ' | supera: ' + webText(o.superacao.o_que) + ' | medida: ' + webText(o.superacao.medida) + ' | critério: ' + webText(o.criterio && o.criterio.id) + ' `' + webText(o.criterio && o.criterio.comando) + '`').join('\n') : '') +
-  (REVISIT ? '\n\n## MODO REVISITA — o grafo JÁ EXISTE (' + REVISIT + '): NÃO reescreva. Para cada nó revisitado: se a claim SOBREVIVEU, edite só verified_at=' + TODAY + ' (+ verified_against com o voto); se foi REFUTADA, apende um nó evidence novo E_…_REVISITA_' + TODAY.replace(/-/g, '') + ' com a verdade atual e aresta SUPERSEDES para o nó antigo, e mude o status do antigo para superseded (Aufhebung — nunca apague). Atualize meta.review_after para hoje + cadência. Nós revisitados: ' + JSON.stringify(rankedClaims.map(c => ({ id: c.revisitId, verdict: confirmed.includes(c) ? 'CONFIRMED' : killed.includes(c) ? 'REFUTED' : 'UNVERIFIED' }))) : '') + '\n\n## Passos\n1. ' + (REVISIT ? 'Edit do arquivo ' + REVISIT : 'Write do arquivo em ' + KG_PATH + ' (crie o diretório)') + '.\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo. O motor RECONFERE por um verificador independente e conta as tentativas em código; o seu número é declaração.\n2b. Rode: bash .claude/validation/kg-contract-check.sh ' + KG_PATH + ' — contrato v3: rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary.' + CONTRACT_V3 + '\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
+  (REVISIT ? '\n\n## MODO REVISITA — o grafo JÁ EXISTE (' + REVISIT + '): NÃO reescreva. Para cada nó revisitado: se a claim SOBREVIVEU, edite só verified_at=' + TODAY + ' (+ verified_against com o voto); se foi REFUTADA, apende um nó evidence novo E_…_REVISITA_' + TODAY.replace(/-/g, '') + ' com a verdade atual e aresta SUPERSEDES para o nó antigo, e mude o status do antigo para superseded (Aufhebung — nunca apague). Atualize meta.review_after para hoje + cadência. Nós revisitados: ' + JSON.stringify(rankedClaims.map(c => ({ id: c.revisitId, verdict: confirmed.includes(c) ? 'CONFIRMED' : killed.includes(c) ? 'REFUTED' : 'UNVERIFIED' }))) : '') + '\n\n## Passos\n1. ' + (REVISIT ? 'Edit do arquivo ' + REVISIT : 'Write do arquivo em ' + KG_PATH + ' (crie o diretório)') + '.\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo. O motor RECONFERE por um verificador independente e conta as tentativas em código; o seu número é declaração.\n2b. Rode: bash .claude/validation/kg-contract-check.sh ' + KG_PATH + ' — contrato v3: rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary.' + CONTRACT_V3 + '\n2c. Rode: bash .claude/validation/kg-vocab-graph.sh ' + KG_PATH + ' — o lint de nomes do CI: rc 1 = sigla sem termo (dê a cada uma um nó com x_term ou escreva esquema:código) e rode de novo; rc 2 = não julgou aqui, declare no summary.\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
   { label: 'write-kg', phase: 'write(KG)', schema: (MODE === 'decision' && elenxo) ? KG_SCHEMA_DECISION : KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort, sup: supNeed })
 const kg = kgW.res
 if (!kg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, findings: report ? report.findings : [] }
 if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.' + (elenxoGate.recused.length ? ' (' + elenxoGate.recused.length + ' objeção(ões) sobrevivente(s) RECUSADA(S) pelo motor sem critério/superação: se todas foram, a decisão ficou sem CONSTRAINS válido — re-rode o Elenxo com os critérios pré-registrados)' : ''), question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
 if (kgW.pathErr) return { error: 'write(KG): ' + kgW.pathErr, question: QUESTION, kgPath: kg.kgPath }
-if (!engineOk(kgW.ver, supNeed)) return { error: 'o MOTOR reprovou o grafo em ' + kg.kgPath + ' depois de ' + kgW.attempts.length + ' tentativa(s): radar rc ' + (kgW.ver ? kgW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (kgW.ver ? kgW.ver.contractExit : 'sem veredito') + ' (o escritor declarou ' + kg.radarExit + '); não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, writeAttempts: kgW.attempts }
+if (!engineOk(kgW.ver, supNeed)) return { error: 'o MOTOR reprovou o grafo em ' + kg.kgPath + ' depois de ' + kgW.attempts.length + ' tentativa(s): radar rc ' + (kgW.ver ? kgW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (kgW.ver ? kgW.ver.contractExit : 'sem veredito') + ', nomes rc ' + (kgW.ver ? kgW.ver.vocabExit : 'sem veredito') + ' (o escritor declarou ' + kg.radarExit + '); não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, writeAttempts: kgW.attempts }
 kg.radarExit = kgW.ver.radarExit
 log('write(KG): ' + kg.kgPath + ' — ' + kg.nodes + ' nós / ' + kg.edges + ' arestas, radar exit ' + kg.radarExit + ' (pelo motor, ' + kgW.attempts.length + ' tentativa(s))')
 
