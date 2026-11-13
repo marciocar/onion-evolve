@@ -52,7 +52,7 @@ Pré-requisito: a guarda rebase→provenance (SAC-80) antes da O1.
 3. Vivacidade de URL medida só na amostra (~100 URLs).
 4. Suporte do label é métrica lexical.
 5. Classe de `method` é heurística por regex.
-6. Caminhos `/home/onion/…` ilegíveis por esta conta: `exists=False` ali é permissão, não ausência.
+6. Caminhos `⟨caminho⟩` ilegíveis por esta conta: `exists=False` ali é permissão, não ausência.
 7. Medido contra o contrato v3 vigente: com o v4, os PROD `unverifiable` deixam de contar como dívida.
 
 ## Arquivos

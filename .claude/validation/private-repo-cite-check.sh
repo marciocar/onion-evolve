@@ -122,6 +122,16 @@ if [ "${MODE}" != "selftest" ] && [ "${MODE}" != "hashname" ]; then
   git -C "${ROOT}" ls-files -z -- '*.kg.yaml' > "${_TMP}/all_files" 2>"${_TMP}/err" \
     || { echo "private-repo-cite: git ls-files falhou — NAO VERIFICADO" >&2; exit 2; }
   [ "${MODE}" = "touched" ] || cp "${_TMP}/all_files" "${_TMP}/files"
+  # os ARQUIVOS DE DADO (csv, tsv, json, jsonl, txt, e md sob data/): o tocado, ou todos fora do modo touched. O filtro
+  # de extensão e de exclusão é do Python (DATA_EXT, FUNCTIONAL_CONFIG); aqui só a lista do git.
+  if [ "${MODE}" = "touched" ]; then
+    { git -C "${ROOT}" diff --name-only --no-renames -z "${base}" \
+      && git -C "${ROOT}" ls-files --others --exclude-standard -z; } > "${_TMP}/data_files" 2>"${_TMP}/err" \
+      || { echo "private-repo-cite: git diff dos dados falhou — NAO VERIFICADO" >&2; exit 2; }
+  else
+    git -C "${ROOT}" ls-files -z > "${_TMP}/data_files" 2>"${_TMP}/err" \
+      || { echo "private-repo-cite: git ls-files dos dados falhou — NAO VERIFICADO" >&2; exit 2; }
+  fi
   # a catraca compara o CONJUNTO de entradas com o do merge-base (o que a branch herdou), não a contagem
   # da ponta: trocar uma entrada velha por uma nova mantém o número e é afrouxar do mesmo jeito
   if [ -n "${base}" ] && git -C "${ROOT}" cat-file -e "${base}:${BASE_REL}" 2>/dev/null; then
@@ -133,6 +143,7 @@ if [ "${MODE}" != "selftest" ] && [ "${MODE}" != "hashname" ]; then
 fi
 
 _main_rc=0
+export PRC_KG_UTILS="${_HERE}/../utils/kg" PRC_PRIVATE="${PRIV}"
 KG_FIXTURE_RE="${KG_FIXTURE_RE:-x^}" python3 -I -B - "${ROOT:-.}" "${MODE}" "${ALLOW_REL}" "${BASE_REL}" "${MEMBERS_REL}" "${_TMP}" "${SHOW}" "${HUMAN}" <<'PY' || _main_rc=$?
 import hashlib, os, re, subprocess, sys
 import yaml
@@ -498,6 +509,56 @@ for f in files:
             if loose:
                 rc = 1
                 out("HARD", "MARCADOR-COM-COMMIT", f, f"nó {node}, linha {i}: {len(loose)} hex solto(s) na linha do marcador private-cite:<id> que não são commit deste repo — o commit do repo privado volta ao grafo público. Troque por ⟨commit⟩ e registre na tabela privada")
+# ── ARQUIVOS DE DADO (desde 2026-11-13, fix/provenance-triage-scrub) ────────────────────────────────────────────────
+# Nenhuma guarda varria CSV: os 41 arquivos de data/provenance-triage/ chegaram à main pública com 393 linhas citando
+# repo privado e 342 com caminho de home de conta, inclusive caminho/repo@commit. Nos csv, tsv, json, jsonl, txt e nos md
+# sob data/ julgados (o tocado, ou todos com --all), cada LINHA é varrida por:
+#   CAMINHO-DE-MAQUINA-EM-DADO (HARD): home de conta com segmento (/home/<x>, /root/<x>, /Users/<x>, também //home/),
+#     pela classe do machine_path.py (a mesma da REGRA 99). `/home` nu como conceito e ./home/ relativo calam;
+#   MARCADOR-COM-COMMIT (HARD): a mesma regra dos grafos, acima;
+#   PRIVADO-SEM-MARCADOR-EM-DADO (HARD, só com --private-repos / ONION_PRIVATE_REPOS): padrão do arquivo privado do dono.
+# Nunca imprime o valor. Fora: vendor, fixture, e a configuração FUNCIONAL que os hooks leem (o caminho ali é o alvo
+# que o veto do MOAT protege; trocá-lo desarmaria a guarda) — lista declarada, não padrão.
+DATA_EXT = (".csv", ".tsv", ".json", ".jsonl", ".txt")
+FUNCTIONAL_CONFIG = {"ops/moat-targets.tsv", "ops/cc-sdk-targets.tsv"}
+HOME_SEG = re.compile(r"/{1,2}(?:home|root|Users)/[A-Za-z0-9_.@+-]+")
+def data_scope(f):
+    if f.startswith("vendor/") or fix.search(f) or f in FUNCTIONAL_CONFIG or f.endswith(".kg.yaml"):
+        return False
+    low = f.lower()
+    return low.endswith(DATA_EXT) or (low.endswith(".md") and "/data/" in f)
+data_files = [f for f in kg_list("data_files") if data_scope(f)] if os.path.exists(os.path.join(tmp, "data_files")) else []
+# o próprio arquivo de padrões, se o dono o pôs dentro da árvore (não versionado), não é dado do repo
+if os.environ.get("PRC_PRIVATE"):
+    _pp = os.path.realpath(os.environ["PRC_PRIVATE"])
+    data_files = [f for f in data_files if os.path.realpath(os.path.join(root, f)) != _pp]
+if data_files:
+    sys.path.insert(0, os.environ.get("PRC_KG_UTILS", ""))
+    try:
+        import machine_path as _mp
+    except Exception as e:
+        print(f"private-repo-cite: machine_path.py ausente ({e}) — os {len(data_files)} arquivo(s) de dado NAO VERIFICADO(s)", file=sys.stderr)
+        sys.exit(2)
+    _priv = []
+    if os.environ.get("PRC_PRIVATE"):
+        try:
+            import private_repos as _pr
+            _priv = [_pr.compile_pattern(x) for _, x in _pr.read_patterns(os.environ["PRC_PRIVATE"])]
+        except BaseException as e:
+            print(f"private-repo-cite: --private-repos não leu o arquivo ({type(e).__name__}) — NAO VERIFICADO", file=sys.stderr)
+            sys.exit(2)
+    for f in data_files:
+        for i, line in enumerate(rd(os.path.join(root, f)).splitlines(), 1):
+            if any(_mp._root_of(t) in _mp.HOME_ROOTS and HOME_SEG.match(line[s:]) for _k, t, s in _mp.find(line)):
+                rc = 1
+                out("HARD", "CAMINHO-DE-MAQUINA-EM-DADO", f, f"linha {i}: caminho de home de conta num arquivo de dado público — troque por caminho relativo ao repo ou por ⟨caminho⟩ (o original vai na tabela privada)")
+            if MK_AT.search(line) or (MK.search(line) and [x for x in HEX_LOOSE.findall(MK.sub(" ", line))
+                                                           if re.search(r"[0-9]", x) and re.search(r"[A-Fa-f]", x) and not own_commit(x)]):
+                rc = 1
+                out("HARD", "MARCADOR-COM-COMMIT", f, f"linha {i}: commit ao lado do marcador private-cite:<id> num arquivo de dado — troque por ⟨commit⟩")
+            if _priv and any(r.search(_pr.norm(line)) for r in _priv):
+                rc = 1
+                out("HARD", "PRIVADO-SEM-MARCADOR-EM-DADO", f, f"linha {i}: cita um repositório privado (padrão do --private-repos) sem o marcador private-cite:<id>")
 for f, err in unread:
     out("SOFT", "NAO-JULGADO", f, f"não deu para parsear ({err}) — este grafo NÃO foi julgado (YAML inválido é da REGRA 78)")
 if human:

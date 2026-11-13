@@ -8,13 +8,13 @@
     "Ancoragem: 30 claim(s) ANCORADA(S) · 8 rejeitada(s) (exagerada ou não encontrada) · 0 reprovação(ões) RECUSADA(S) pelo motor sem critério/superação",
     "Elenxo: 31 objeções (15 sobrevivem) · 0 RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: 9 · abertas: 7",
     "Superação: 7 achada(s) → nó obrigatório (C_SUPERACAO_20261027_…)",
-    "write(KG): /home/marcio/onion-evolve/docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml — +55 nós / +59 arestas, total 55, radar exit 0 (pelo motor, 1 tentativa(s))"
+    "write(KG): docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml — +55 nós / +59 arestas, total 55, radar exit 0 (pelo motor, 1 tentativa(s))"
   ],
   "result": {
     "mode": "primaries",
     "question": "Primeira rodada do eixo E7-treino-inferencia do radar de mundo do Onion (2026-10-27, decisão do maestro: só primárias). Medir, com citação verbatim e datada, a trajetória do mercado de treino e inferência: APIs de ajuste fino que fecham e que abrem, custo de inferência e de ajuste, plataformas e lançamentos de pesos abertos, treino barato e destilação. Para cada fonte: o fato, a data do fato (valid_from) e o que isso muda para o Onion, que é acoplado ao Claude Code, não faz treino próprio e só usa modelo pequeno como ferramenta de conjunto fechado ancorada no mecanismo verificável. Fronteira: não tocar a escada de modelos da sessão (isso é o E6). O fim do fine-tuning self-serve da OpenAI (desde 2026-05-07, nó E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026) já está no corpus: re-leia a página de descontinuações para confirmar e datar.",
     "today": "2026-10-27",
-    "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml",
+    "kgPath": "docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml",
     "radarExit": 0,
     "writeAttempts": [
       {
@@ -1453,14 +1453,14 @@
       "queuedAt": 1793078780299,
       "attempt": 1,
       "lastToolName": "StructuredOutput",
-      "lastToolSummary": "/home/marcio/onion-evolve/docs/evolution/research/radar-E7-…",
+      "lastToolSummary": "docs/evolution/research/radar-E7-…",
       "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Primeira rodada do eixo E7-treino-inferencia do radar de mundo do Onion (2026-10-27, decisão do maestro: só primárias). Medir, com citação verbatim e datada, a trajetória do mercado de treino e inferência: APIs de ajuste fino que fecham e que abrem, custo de inferência e…",
       "promptFramed": true,
       "lastProgressAt": 1793079114404,
       "tokens": 153087,
       "toolCalls": 18,
       "durationMs": 334079,
-      "resultPreview": "{\"kgPath\":\"/home/marcio/onion-evolve/docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml\",\"radarExit\":0,\"nodes\":55,\"edges\":59,\"nodesTotal\":55,\"constrainsEdges\":19,\"summary\":\"Grafo novo da 1ª rodada de primárias do E7 (2026-10-27): 1 Q raiz, 30 evidências ancoradas, 15 E_OBJECAO_E7_* sobreviventes com CONSTRAINS, E_LACUNAS (10 fontes, 0 inalcançáveis, 8 rejeitadas, 0 recusadas, …"
+      "resultPreview": "{\"kgPath\":\"docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml\",\"radarExit\":0,\"nodes\":55,\"edges\":59,\"nodesTotal\":55,\"constrainsEdges\":19,\"summary\":\"Grafo novo da 1ª rodada de primárias do E7 (2026-10-27): 1 Q raiz, 30 evidências ancoradas, 15 E_OBJECAO_E7_* sobreviventes com CONSTRAINS, E_LACUNAS (10 fontes, 0 inalcançáveis, 8 rejeitadas, 0 recusadas, …"
     },
     {
       "type": "workflow_agent",
@@ -1475,7 +1475,7 @@
       "queuedAt": 1793079114409,
       "attempt": 1,
       "lastToolName": "StructuredOutput",
-      "promptPreview": "## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\nA partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n1. bash .claude/validation/kg-radar.sh \"/home/marcio/onion-evolve/docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml\" --integrity --schema; echo \"RC=$?\"\n2. bash .claude/validation/kg-cont…",
+      "promptPreview": "## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\nA partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n1. bash .claude/validation/kg-radar.sh \"docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml\" --integrity --schema; echo \"RC=$?\"\n2. bash .claude/validation/kg-cont…",
       "promptFramed": true,
       "lastProgressAt": 1793079121690,
       "tokens": 55895,

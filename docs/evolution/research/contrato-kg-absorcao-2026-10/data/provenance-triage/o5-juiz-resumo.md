@@ -34,10 +34,10 @@ Conversões a testemunho com `locality: host` pela regra 1: **5**. São as 4 do 
 
 ## O que reproduzi
 
-- **Shas remotos (`gh api`), todos existem e batem com a data:** `onion-vps-vaultwarden` em `6d82b1b8`
-  (08-10) e `31cd4f99` (08-11); `onion-logto` em `617364f2`, `2a4d992e`, `4e99f87c` e `dd1ba808`;
-  `onion-waha` em `86662e01`; `onion-plugins` em `22b859fc`, que é o master até 09-07.
-  O `onion-waha@c92ff68` devolve **422**, o que confirma o M2.
+- **Shas remotos (`gh api`), todos existem e batem com a data:** `onion-vps-vaultwarden` em `⟨commit⟩`
+  (08-10) e `⟨commit⟩` (08-11); `onion-logto` em `⟨commit⟩`, `⟨commit⟩`, `⟨commit⟩` e `⟨commit⟩`;
+  `onion-waha` em `⟨commit⟩`; `onion-plugins` em `22b859fc`, que é o master até 09-07.
+  O `private-cite:z9JJUTfw72RxPP9_1g9c9Q` devolve **422**, o que confirma o M2.
 - **`onion-plugins@22b859fc`**, no clone local: `git grep -c onion-evolve` soma **50**. Os 5 hits `Fonte:`
   estão nas linhas exatas que o nó cita.
 - **Shas do repo:** `27179d37` (ls-tree `.claude/diary` = 127, `exclude` = 0) e `9e75a73d` (l.89, 90, 92 e
@@ -131,7 +131,7 @@ Rodei uma busca pela **classe**: absoluto no início de token, ou `~/`. Ela cobr
 
 ## Achados fora da provenance
 
-- **F1 (M2 confirmado).** `onion-vps-waha@c92ff68`, citado em `E_waha_public_route_caddy`, não existe no
+- **F1 (M2 confirmado).** `onion-vps-waha@⟨commit⟩`, citado em `E_waha_public_route_caddy`, não existe no
   remoto (422). A âncora está quebrada.
 - **F2. Drift provável de `E_HEADROOM_SWAP_100`.** O label diz, no presente, que o headroom "é apertado". Hoje
   há 24 GiB disponíveis de 32, e o swap está em 44%. Candidato a `/meta:kg-freshness`.

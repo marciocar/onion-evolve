@@ -55,7 +55,7 @@
     "o_que": "não se aplica (veredito positivo)",
     "medida": "não se aplica"
    },
-   "nota": "Reproduz: disco 2.1.307, processo 2.1.307, SDK do bridge 2.1.306 (SDK 0.3.306) lido do binário em /home/onion/onion-bridge, 43 itens."
+   "nota": "Reproduz: disco 2.1.307, processo 2.1.307, SDK do bridge 2.1.306 (SDK 0.3.306) lido do binário em private-cite:OHQJih2UHW2vrLTzrFy9EQ, 43 itens."
   },
   {
    "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
@@ -122,7 +122,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU2_MEDICAO_NAO_REPRODUZ",
-    "comando": "bash .claude/validation/cc-delta-census.sh | grep -i sdk; git -C /home/marcio/onion-bridge-dev grep -n -E 'setModel|createSdkMcpServer' origin/main"
+    "comando": "bash .claude/validation/cc-delta-census.sh | grep -i sdk; git -C private-cite:kfw_CZWari7ZEC8K_sPwRA grep -n -E 'setModel|createSdkMcpServer' origin/main"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -130,14 +130,14 @@
     "o_que": "não se aplica (veredito positivo)",
     "medida": "não se aplica"
    },
-   "nota": "Reproduz: SDK do bridge 2.1.306 (0.3.306) contra o host 2.1.307, com o aviso de 1 versão atrás. setModel dá 0 no origin/main (21ae69c, #80). Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL existe na r13 (l.232, open), então a ligação com o fork procede. Ressalva: o 'PR do SDK 0.3.307 em preparo' é declaração. Agora não há PR aberto nem branch sdk/307 no remoto marciocar/onion-bridge (gh pr list --state open: vazio)."
+   "nota": "Reproduz: SDK do bridge 2.1.306 (0.3.306) contra o host 2.1.307, com o aviso de 1 versão atrás. setModel dá 0 no origin/main (⟨commit⟩, #80). Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL existe na r13 (l.232, open), então a ligação com o fork procede. Ressalva: o 'PR do SDK 0.3.307 em preparo' é declaração. Agora não há PR aberto nem branch sdk/307 no remoto private-cite:OHQJih2UHW2vrLTzrFy9EQ (gh pr list --state open: vazio)."
   },
   {
    "alvo": "E_SDK_MCP_FERRAMENTAS_TOCA_O_PILOTO_UI",
    "veredito": "REPROVA",
    "criterio": {
     "id": "CU3_LIGACAO_SEM_SUPERFICIE",
-    "comando": "grep -rln -i createSdkMcpServer docs .claude ops; git -C /home/marcio/onion-bridge-dev grep -n -i -E 'createSdkMcpServer|mcpServers' origin/main -- src; grep -n -i 'servidor MCP' docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml"
+    "comando": "grep -rln -i createSdkMcpServer docs .claude ops; git -C private-cite:kfw_CZWari7ZEC8K_sPwRA grep -n -i -E 'createSdkMcpServer|mcpServers' origin/main -- src; grep -n -i 'servidor MCP' docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -167,7 +167,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU3_LIGACAO_SEM_SUPERFICIE",
-    "comando": "grep -rn -E 'OTEL_|safety_event' .claude ops .github; grep -rc -E 'output_tokens|input_tokens' .claude ops .github | grep -v ':0$'; cat .mcp.json; python3 -c \"import json;print(json.load(open('/home/marcio/.claude.json'))['projects']['/home/marcio/onion-evolve'].get('mcpServers'))\""
+    "comando": "grep -rn -E 'OTEL_|safety_event' .claude ops .github; grep -rc -E 'output_tokens|input_tokens' .claude ops .github | grep -v ':0$'; cat .mcp.json; python3 -c \"import json;print(json.load(open('⟨caminho⟩'))['projects']['⟨caminho⟩'].get('mcpServers'))\""
    },
    "superacao": {
     "classe": "nenhuma",
@@ -213,7 +213,7 @@
   {
    "item": "Added /claude-api api-version to move Claude API code to API version 2026-10-21",
    "versao": "2.1.307",
-   "superficie": "chamadas diretas à API com anthropic-version 2023-06-01: .github/workflows/onion-review.yml l.201-202, .github/workflows/onion-review-diagnose.yml l.86 e l.122; app companheiro /home/marcio/onion-pessoal-app/llmAnthropic.ts l.92-98 (repo próprio, fora do core)",
+   "superficie": "chamadas diretas à API com anthropic-version 2023-06-01: .github/workflows/onion-review.yml l.201-202, .github/workflows/onion-review-diagnose.yml l.86 e l.122; app companheiro private-cite:Xo3VzBc1hE2TxywPwQLtQQ l.92-98 (repo próprio, fora do core)",
    "medida": "O bridge não chama a API direto: só importa tipos de @anthropic-ai/sdk/resources (src/chat.ts l.8) e fala pelo Agent SDK, com 0 de new Anthropic/messages.create/anthropic-version. O comando é opt-in e nada quebra hoje. Se a 2023-06-01 será descontinuada: NÃO MEDIDO.",
    "impacto": 1,
    "proposta": "Sem nó. Se sair aviso de descontinuação da 2023-06-01, o pre-flight do revisor do CI vira o 1º alvo."

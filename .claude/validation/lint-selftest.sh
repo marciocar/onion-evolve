@@ -57534,6 +57534,8 @@ _prc_box() {  # $1=caminho da guarda → imprime um repo-sandbox com a guarda CO
   mkdir -p "${sb}/.claude/validation" "${sb}/g" "${sb}/docs/evolution/federation"
   cp "$1" "${sb}/.claude/validation/private-repo-cite-check.sh"
   cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sb}/.claude/validation/"
+  mkdir -p "${sb}/.claude/utils/kg"
+  cp "${REPO_ROOT}/.claude/utils/kg/machine_path.py" "${REPO_ROOT}/.claude/utils/kg/private_repos.py" "${sb}/.claude/utils/kg/"
   printf 'owner\tdonoteste\npublic\tdonoteste/repo-publico\t2026-11-10\npublic\tdonoteste/vai-fechar\t2026-11-10\n' \
     > "${sb}/docs/evolution/federation/public-repos.tsv"
   printf 'members:\n  - repo: https://github.com/donoteste/repo-registrado\n' > "${sb}/docs/evolution/federation/members.yaml"
@@ -57646,6 +57648,30 @@ run_private_repo_cite_selftests() {
     record_pass "private-repo-cite: (r) private-cite:<id>@<hex> e o hex solto na linha do marcador ((<HEX>), /blob/<hex>/, em maiúscula) → HARD MARCADOR-COM-COMMIT sem ecoar; marcador nu, #<nó>, @sha por extenso, commit deste repo alcançável de ref remoto e dono/repo@<hex> público calam; commit só local acusa"
   else record_fail "private-repo-cite: (r) marcador com commit" "rc=${rc} own=${own}; [$(tr '\n' '|' <<< "${o}" | head -c 500)]"; fi
   rm -f "${sb}"/g/mk.kg.yaml "${sb}"/g/mk2.kg.yaml "${sb}"/g/mk3.kg.yaml "${sb}"/g/mk4.kg.yaml "${sb}"/g/mk5.kg.yaml "${sb}"/g/mk6.kg.yaml "${sb}"/g/mk7.kg.yaml
+  # (s) ARQUIVOS DE DADO (fix/provenance-triage-scrub): no csv/tsv/json/jsonl/txt e no md sob data/ tocados, o home de
+  #     conta com segmento acusa CAMINHO-DE-MAQUINA-EM-DADO; o marcador com commit acusa; com --private-repos, o padrão
+  #     privado acusa PRIVADO-SEM-MARCADOR-EM-DADO. Calam: /home nu como conceito, /home. no fim de frase, ./home/
+  #     relativo, o md FORA de data/, e a configuração funcional (ops/moat-targets.tsv). Na main de antes, nada acusava.
+  mkdir -p "${sb}/r/data" "${sb}/ops"
+  printf 'id,grafo,source\nE_A,g.kg.yaml,/home/zeuser/repo/x.md\nE_B,g.kg.yaml,fora de /home e de /home.\nE_C,g.kg.yaml,./home/.qwen/debug\n' > "${sb}/r/data/t.csv"
+  printf '{"v": "Read(//home/zeuser/**)"}\n' > "${sb}/r/data/t.json"
+  printf 'lido em private-cite:HHHHHHHHHHHHHHHHHHHHHH (0a1b2c3d)\n' > "${sb}/r/data/t.txt"
+  printf 'em donoteste/planos-x e /home/zeuser/y\n' > "${sb}/r/data/u.tsv"
+  printf '/home/zeuser/fora-de-data.md\n' > "${sb}/r/nota.md"
+  printf 'alvo\t/home/zeuser/servico\n' > "${sb}/ops/moat-targets.tsv"
+  printf 'donoteste/planos-x\n' > "${sb}/priv.txt"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if o2="$(LC_ALL=C bash "${s}" "${sb}" --tsv --private-repos "${sb}/priv.txt" 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tCAMINHO-DE-MAQUINA-EM-DADO\tr/data/t.csv\tlinha 2:' <<< "${o}" \
+     && grep -q $'^HARD\tCAMINHO-DE-MAQUINA-EM-DADO\tr/data/t.json\tlinha 1:' <<< "${o}" \
+     && grep -q $'^HARD\tCAMINHO-DE-MAQUINA-EM-DADO\tr/data/u.tsv\tlinha 1:' <<< "${o}" \
+     && grep -q $'^HARD\tMARCADOR-COM-COMMIT\tr/data/t.txt\tlinha 1:' <<< "${o}" \
+     && [ "$(grep -c 'EM-DADO\|MARCADOR-COM-COMMIT' <<< "${o}")" -eq 4 ] && ! grep -q 'PRIVADO-SEM-MARCADOR-EM-DADO' <<< "${o}" \
+     && [ "${rc2}" -eq 1 ] && grep -q $'^HARD\tPRIVADO-SEM-MARCADOR-EM-DADO\tr/data/u.tsv\tlinha 1:' <<< "${o2}" \
+     && ! grep -q 'zeuser\|planos-x\|0a1b2c3d' <<< "${o}${o2}"; then
+    record_pass "private-repo-cite: (s) arquivo de dado tocado → CAMINHO-DE-MAQUINA-EM-DADO (csv, json com //home, tsv), MARCADOR-COM-COMMIT (txt) e, com --private-repos, PRIVADO-SEM-MARCADOR-EM-DADO, sem ecoar; /home nu, /home., ./home/, md fora de data/ e config funcional calam"
+  else record_fail "private-repo-cite: (s) arquivo de dado" "rc=${rc}/${rc2}; [$(tr '\n' '|' <<< "${o}" | head -c 500)] [$(grep -c PRIVADO-SEM-MARCADOR-EM-DADO <<< "${o2}")]"; fi
+  rm -rf "${sb}/r" "${sb}/ops" "${sb}/priv.txt"
   # (d) SÓ O TOCADO É JULGADO (o histórico fica)
   if _prc_case_scope "${chk}"; then record_pass "private-repo-cite: (d) grafo que o diff não toca não é julgado (o histórico fica)"
   else record_fail "private-repo-cite: (d) escopo" "o grafo fora do diff foi julgado, ou o novo não"; fi

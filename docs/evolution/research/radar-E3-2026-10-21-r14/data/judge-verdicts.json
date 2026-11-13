@@ -122,7 +122,7 @@
    "veredito": "EXAGERA",
    "criterio": {
     "id": "CU4_IMPACTO_DESPROPORCIONAL",
-    "comando": "git -C /home/marcio/onion-bridge-dev show origin/main:package-lock.json (SDK 0.3.302); git grep -nE 'resume|interrupt\\(|hooks *:|mcpServers *:' origin/main -- src (resume em chat-query-options.ts:79, nenhum interrupt(, hooks: ou mcpServers:); grep -nE 'ANTHROPIC_API_KEY' ops/bridge-backup.sh (l.44)"
+    "comando": "git -C private-cite:ckT76ZrrMhlyScckPUDfuA show origin/main:package-lock.json (SDK 0.3.302); git grep -nE 'resume|interrupt\\(|hooks *:|mcpServers *:' origin/main -- src (resume em chat-query-options.ts:79, nenhum interrupt(, hooks: ou mcpServers:); grep -nE 'ANTHROPIC_API_KEY' ops/bridge-backup.sh (l.44)"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -137,7 +137,7 @@
    "veredito": "EXAGERA",
    "criterio": {
     "id": "CU2_MEDICAO_NAO_REPRODUZ",
-    "comando": "git -C /home/marcio/onion-evolve worktree list; para cada .claude/worktrees/agent-*: git status --porcelain | wc -l e git rev-list --count origin/main..HEAD; gh pr list --head <branch> --state all; grep -rn '114 worktree' docs .claude; grep -c '^PODAVEL' <scratchpad>/wt-audit.out"
+    "comando": "git -C ⟨caminho⟩ worktree list; para cada .claude/worktrees/agent-*: git status --porcelain | wc -l e git rev-list --count origin/main..HEAD; gh pr list --head <branch> --state all; grep -rn '114 worktree' docs .claude; grep -c '^PODAVEL' <scratchpad>/wt-audit.out"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -167,7 +167,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU3_LIGACAO_SEM_SUPERFICIE",
-    "comando": "command grep -rn em .claude ops .github por 'claude --worktree' (0), ANTHROPIC_BASE_URL (0), 'tool\\.check|settings\\.read' (0), CLAUDE_CODE_AUTO_COMPACT_WINDOW (0), sandbox em .claude/settings*.json (0); awk do frontmatter de .claude/skills/*/SKILL.md, commands e agents por '^hooks:' (0); /home/marcio/onion-evolve/.claude/settings.local.json só tem permissions e outputStyle; plugins/onion/hooks/hooks.json do onion-plugins; grep de 'hooks' em base-action/src da claude-code-action v1.0.256; git grep 'hooks *:|mcpServers *:|setMcpServers' em origin/main do onion-bridge"
+    "comando": "command grep -rn em .claude ops .github por 'claude --worktree' (0), ANTHROPIC_BASE_URL (0), 'tool\\.check|settings\\.read' (0), CLAUDE_CODE_AUTO_COMPACT_WINDOW (0), sandbox em .claude/settings*.json (0); awk do frontmatter de .claude/skills/*/SKILL.md, commands e agents por '^hooks:' (0); .claude/settings.local.json só tem permissions e outputStyle; plugins/onion/hooks/hooks.json do onion-plugins; grep de 'hooks' em base-action/src da claude-code-action v1.0.256; git grep 'hooks *:|mcpServers *:|setMcpServers' em origin/main do onion-bridge"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -230,7 +230,7 @@
    "item": "Improved resume of large compacted sessions in SDK and headless mode: the first request after resuming is sent sooner",
    "versao": "2.1.304",
    "superficie": "onion-bridge origin/main src/chat-query-options.ts:79 ('...(f.sessionId ? { resume: f.sessionId } : {})') e l.95 ('Cada turno do /chat é um processo novo com `resume`')",
-   "medida": "git -C /home/marcio/onion-bridge-dev grep -nE 'resume' origin/main -- src/chat-query-options.ts",
+   "medida": "git -C private-cite:ckT76ZrrMhlyScckPUDfuA grep -nE 'resume' origin/main -- src/chat-query-options.ts",
    "impacto": 2,
    "proposta": "nomear dentro de E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021 como o ganho concreto do bump para 0.3.306, em vez de 'nada do delta chega'"
   },
@@ -285,7 +285,7 @@
   {
    "item": "Fixed `rm -r` of a mounted drive or a folder at its top level (`/Volumes`, `/media`, WSL's `/mnt/c`) not getting the safety prompt that `rm -rf /Applications` gets",
    "versao": "2.1.304",
-   "superficie": "findmnt: /home/granaai/granaai (bind de /home/marcio/granaai), único ponto de montagem fora do sistema",
+   "superficie": "findmnt: private-cite:iZ2LpuUmyT2d6txLjJCApw (bind de private-cite:iZ2LpuUmyT2d6txLjJCApw), único ponto de montagem fora do sistema",
    "medida": "findmnt -rn -o TARGET,FSTYPE,SOURCE; nenhum script do core faz rm -r num ponto de montagem",
    "impacto": 1,
    "proposta": "nenhum nó"

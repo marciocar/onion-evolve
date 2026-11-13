@@ -100,7 +100,7 @@ fez nos `dev-sem-versao` da O5.
   motivo viaja com a chave, e a guarda pode exigir que ele seja um de três (citação, vetor ou receita). Com
   booleano, a guarda precisa ler a prosa. Não apliquei: a forma do brief é o booleano.
 - **"Não é desta máquina" tem de ser mecânico.** A guarda futura (P3) deve recusar o marcador quando o
-  caminho marcado contiver home de conta (`/home/<x>`, `/root`) ou o hostname. Do contrário, o marcador vira
+  caminho marcado contiver home de conta (`⟨caminho⟩<x>`, `/root`) ou o hostname. Do contrário, o marcador vira
   a porta pela qual o caminho de máquina volta.
 
 | Nó | Classe | Caminho é desta máquina? |
@@ -132,7 +132,7 @@ Os padrões de troca, todos determinísticos e conferidos no gerador por substri
 - `onion-evolve@27179d37` e `@9e75a73d`;
 - `onion-plugins@22b859fc`;
 - `8320b1c3:` para o `kg-freshness.md` (o F3 do juiz da O5);
-- `onion-logto@a0ce0fd`, com o `console.sh` l.30-37 conferido no `gh api`;
+- `private-cite:GQgG2O7HexN2ombj_TRalg`, com o `console.sh` l.30-37 conferido no `gh api`;
 - `af4a420a~1` no `E_REEXTRACAO`, que corrige também o "de HEAD" do `verified_against`, a mesma âncora
   móvel do F6.
 
@@ -140,7 +140,7 @@ Os padrões de troca, todos determinísticos e conferidos no gerador por substri
 
 - `E_DEFEITO_…` (`/usr/bin/gh` → "gh por caminho absoluto"): é a mesma forma que a O5 aprovou no locator, e
   o literal sobrevive no `_case` de `lint-selftest.sh`;
-- `A_CAMINHO_DE_MAQUINA_…` (`/home/<conta>/` → "prefixo de home de conta"): é um placeholder de padrão, não
+- `A_CAMINHO_DE_MAQUINA_…` (`⟨caminho⟩<conta>/` → "prefixo de home de conta"): é um placeholder de padrão, não
   um caminho.
 
 Os IDs de pastas privadas que apareciam no `verified_against` também saíram, por exemplo no
@@ -166,7 +166,7 @@ ela é segura no gate.
 - `SY4_…`: o `~/` era descrição do conteúdo do documento;
 - `E_L2`: o commit já estava no trace, e só a pasta vira o nome do remoto;
 - `E_LSTREE_…`: o remoto já estava nomeado no trace;
-- `REC_PIN_DRIFT_…`, com `gustavo-pulga@21ff04f`;
+- `REC_PIN_DRIFT_…`, com `private-cite:1V8OoCSfnltK5sYbymJxEg`;
 - `E_MEDIDO_LOCAL_TIER10_…` e `E_OBJECAO_EXIT2_…` (binário). Ver P-a.
 
 **Ao maestro (72), em três famílias:**
@@ -178,7 +178,7 @@ ela é segura no gate.
   - **Ressalva forte:** 11 nós do bridge são de antes de 2026-08-08, quando o clone de produção divergia do
     repo (`C_producao_nao_e_o_repo`). Neles o sha é "o que o remoto tinha", e não necessariamente "o que
     rodava". Por isso a confiança é 0.5.
-  - **O waha** foi versionado um dia depois dos nós de 07-31 e 08-01, em `86662e01`. O nó irmão
+  - **O waha** foi versionado um dia depois dos nós de 07-31 e 08-01, em `⟨commit⟩`. O nó irmão
     `D_engine_noweb_confirmed` já documenta isso.
 - **(H) só no host, 23 linhas.**
   - **Remover e registrar na narrative `(a)`:** os 2 efêmeros, o plano do harness (já apagado) e um
@@ -220,11 +220,11 @@ hoje**: a causa de agosto era nomeada (VS Code e ~7 claudes).
 
 | Item | Resultado |
 |---|---|
-| **4 sem `locality`** | Todos `repo`: `E_NAO_HA_NAO_USO_…` (o remoto do gustavo-pulga tem `21ff04f`), `E_V1_COMMITS` (**o remoto do arandek ficou alcançável**: `1aa794f9` e `88d93f26` existem, coisa que o juiz da O5 não alcançava), `E_LOCALE_FRAGIL_…` e `E_ADOCAO_ROBUSTA_F1` (scripts e resíduo do repo) |
+| **4 sem `locality`** | Todos `repo`: `E_NAO_HA_NAO_USO_…` (o remoto do gustavo-pulga tem `⟨commit⟩`), `E_V1_COMMITS` (**o remoto do arandek ficou alcançável**: `⟨commit⟩` e `⟨commit⟩` existem, coisa que o juiz da O5 não alcançava), `E_LOCALE_FRAGIL_…` e `E_ADOCAO_ROBUSTA_F1` (scripts e resíduo do repo) |
 | **F6, `E_REEXTRACAO`** | **Confere.** `af4a420a` nasceu o nó e trocou a cópia. Em `af4a420a~1` (`9f403c2a`) a l.80 é `function D3n` (cópia 2.1.290) e em `af4a420a` já é `function Ltr`. `HEAD` hoje daria a cópia errada. A source passa a `git show af4a420a~1:…` |
-| **F1, `onion-vps-waha@c92ff68`** | **Não há sha certo no remoto.** `marciocar/onion-waha` tem **um** commit (`86662e01`, 08-02). `c92ff68` é o HEAD do clone local e nunca foi enviado, e o README do remoto não tem a seção de 08-19. **Rebaixo a âncora do README a host**; a base do nó segue `repo` (o resíduo R56 e o commit `21e62755`). **Alternativa ao maestro:** um push no onion-waha validaria `c92ff68` sem mudar o nó |
-| **Achado novo da mesma classe** | `ENT_whatsapp` cita `onion-vps-waha@3408d82`, que também dá **422**. Em `86662e01`, anterior ao nó, as l.12 e l.16 do compose têm exatamente o que o locator cita: reescrito |
-| **D5** | 4 trocas da pasta pelo remoto: `onion-vps-logto@` → `onion-logto@` em 3 nós (`I_CONSOLE_…` method, `E_logto_now_critical_2026_08` source e `E_W8_CONSOLE_AUTOOFF_VIVO` source) e `onion-vps-waha@86662e0` → `onion-waha@86662e0` em `E_lid_addressing_root_cause`. Todos os shas foram conferidos no `gh api`. O librechat não tem remoto e fica pelo nome da pasta |
+| **F1, `onion-vps-waha@⟨commit⟩`** | **Não há sha certo no remoto.** `private-cite:zU_IswTyh6mDinh8Z7wGvg` tem **um** commit (`⟨commit⟩`, 08-02). `⟨commit⟩` é o HEAD do clone local e nunca foi enviado, e o README do remoto não tem a seção de 08-19. **Rebaixo a âncora do README a host**; a base do nó segue `repo` (o resíduo R56 e o commit `21e62755`). **Alternativa ao maestro:** um push no onion-waha validaria `⟨commit⟩` sem mudar o nó |
+| **Achado novo da mesma classe** | `ENT_whatsapp` cita `onion-vps-waha@⟨commit⟩`, que também dá **422**. Em `⟨commit⟩`, anterior ao nó, as l.12 e l.16 do compose têm exatamente o que o locator cita: reescrito |
+| **D5** | 4 trocas da pasta pelo remoto: `onion-vps-logto@` → `private-cite:GQgG2O7HexN2ombj_TRalg` em 3 nós (`I_CONSOLE_…` method, `E_logto_now_critical_2026_08` source e `E_W8_CONSOLE_AUTOOFF_VIVO` source) e `onion-vps-waha@⟨commit⟩` → `private-cite:zU_IswTyh6mDinh8Z7wGvg` em `E_lid_addressing_root_cause`. Todos os shas foram conferidos no `gh api`. O librechat não tem remoto e fica pelo nome da pasta |
 
 ## Casos difíceis
 
@@ -256,7 +256,7 @@ hoje**: a causa de agosto era nomeada (VS Code e ~7 claudes).
 - **P6-label:** `label` (**66 nós**) e `narrative` (**6**) ainda carregam caminho de máquina pela mesma
   classe. O `E_waha_public_route_caddy` tem o caminho no label, dois campos acima do `verified_against` que
   esta onda limpa. Isso é o mesmo argumento da P5 da O5, um nível acima.
-- **Push do onion-waha:** `c92ff68` (e o `3408d82` do clone) estão só no host. Um push validaria as âncoras.
+- **Push do onion-waha:** `⟨commit⟩` (e o `⟨commit⟩` do clone) estão só no host. Um push validaria as âncoras.
 
 ## Achados fora do mandato
 

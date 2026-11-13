@@ -60,7 +60,7 @@ Classes de `method` finais: leitura 201, testemunho 70, medição 18, derivado 1
     backup de 3 meses. Ele **contradiz** "irrecuperáveis", porque a Railway recuperou os dados.
     Ronacher/Hashimoto e "token em arquivo não relacionado" saem.
   - `D_VIAVEL_COM_EXPECTATIVA_CALIBRADA` → corrigir-label. A fonte é o README upstream do
-    Vaultwarden mais o 6d82b1b do clone. Saem os números de RAM do Bitwarden e o "de graça vs
+    Vaultwarden mais o ⟨commit⟩ do clone. Saem os números de RAM do Bitwarden e o "de graça vs
     licença".
   - `E_hybrid_pricing_trend` → corrigir-label. O juiz-mestre trocou a classe para **testemunho**
     (detalhe abaixo, no padrão 5). A URL flexprice.io não traz o número, e o 21%→15% e o BCG saem.
@@ -148,7 +148,7 @@ Classes de `method` finais: leitura 201, testemunho 70, medição 18, derivado 1
    - `E_MERCADO_CAPITAL_MOTORES_1001` diz "nenhuma rodada", mas o journal tem "Cerbos raises $7.5M"
      cortada por orçamento. É o mesmo padrão do `E_MERCADO_OCR_LOCAL` da onda 1.
    - Fontes achadas pelo juiz: 4584d4c9, o PR #2 do onion-bridge, 3 resíduos do offsite,
-     `logto-provision.sh@db8d9844`, 775569f1 e o README do onion-vps-logto em 617364f.
+     `logto-provision.sh@db8d9844`, 775569f1 e o README do onion-vps-logto em ⟨commit⟩.
 8. **Número datado não reproduzido no commit da data.** `E_CENSO_VENUE_IDIOMA_0904`: rodando o
    `langcensus.py` nos marketplace.json dos commits da data, os totais (2.282 e 291) batem, mas o
    comunitário tem pelo menos 14 descrições fora do inglês, 2 delas em chinês, e não 11.
@@ -236,7 +236,7 @@ Quatro flips propostos caíram e ficam `confirmed` com o label restrito:
 
    Sobrescreveu 6 vereditos de worker (`E_EXPERIMENT`, `C_OPT_DIARY_BRAIN` e os 4 do gtm). Os demais
    são dos workers.
-2. **Journals no host e clones em `/home/marcio/`** só se reabrem nesta máquina. Três journals
+2. **Journals no host e clones em `⟨caminho⟩`** só se reabrem nesta máquina. Três journals
    citados não existem no host: `wf_2944480c-98f`, `wf_bde10f3f-28c` e `wf_9487391f`.
 3. **0 REPROVADO é um sinal a desconfiar, não um mérito.** Os workers preferiram reescrever o label
    a devolver. Cada reescrita foi conferida contra a fonte aberta, mas os 73 corrigir-label finais
