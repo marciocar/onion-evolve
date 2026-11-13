@@ -437,13 +437,13 @@ nodes:
     confidence: 0.8
     status: confirmed
     verified_at: "2026-10-15"
-    verified_against: "onion-curation@a2f8a5aef524 (merge do PR #26): nós E_N3_LOCAL_TOOLS_COVER e D_MARKITDOWN_2610 do markitdown-2026-10.kg.yaml, lidos por git show"
-    trace: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/markitdown-2026-10.kg.yaml"
+    verified_against: "private-cite:-7O3l6VOqLuf0KCAEnglEA@a2f8a5aef524 (merge do PR #26): nós E_N3_LOCAL_TOOLS_COVER e D_MARKITDOWN_2610 do markitdown-2026-10.kg.yaml, lidos por git show"
+    trace: "private-cite:-7O3l6VOqLuf0KCAEnglEA"
     label: "CASO-MODELO: a dissecação do markitdown fechou em REJEITAR com superação medida. O tesseract local lê o PDF escaneado em que o markitdown sai vazio com rc 0, e o pdftotext -layout entrega o texto em trecho citável."
     narrative: "Locator do adotante: pdftoppm + tesseract 5.3.4 no relatório escaneado acham 2,711,633, 8,826,561 e 12,501,996 (19 a 34 s, mesmo comando). A reprovação deixou de ser um não seco: apontou o que entrega o valor que a ferramenta prometia, e por isso o veredito é acionável."
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/markitdown-2026-10.kg.yaml"
-      locator: "E_N3_LOCAL_TOOLS_COVER (locator do pdftotext e do tesseract) e D_MARKITDOWN_2610 (x_dissect_verdict: rejeitar)"
+      source: "private-cite:-7O3l6VOqLuf0KCAEnglEA"
+      locator: "private-cite:-7O3l6VOqLuf0KCAEnglEA"
       method: "reading: git show a2f8a5aef524 no clone local do adotante (repo privado)"
       locality: "web"
 
@@ -455,13 +455,13 @@ nodes:
     confidence: 0.75
     status: confirmed
     verified_at: "2026-10-15"
-    verified_against: "onion-curation@a2f8a5aef524: data/criterion-1-replicas-judge.md (Veredito INCONCLUSIVO) e o nó E_CRITERION_1_ATTRIBUTION_OPEN"
-    trace: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/data/criterion-1-replicas-judge.md"
+    verified_against: "private-cite:8VbtaQJgSuWITS3LTGctcA@a2f8a5aef524: data/criterion-1-replicas-judge.md (Veredito INCONCLUSIVO) e o nó E_CRITERION_1_ATTRIBUTION_OPEN"
+    trace: "private-cite:8VbtaQJgSuWITS3LTGctcA"
     label: "CONTRA-EXEMPLO: no mesmo PR, o juiz binário do critério 1 do teste da régua deu INCONCLUSIVO porque o desenho não apontava o que superaria o teste, que seria um objeto com diferença checável por grep."
     narrative: "Com 3 réplicas por régua, no eixo OCR a variação dentro da régua (1/3) igualou a variação entre réguas (4/9), e o ATRIBUÍDO dependia de uma saída contaminada. O juiz respondeu sim ou não a uma pergunta cujo critério não separava régua de ruído. É o caso que o reforço do maestro nomeia: sem superação procurada nem critério checável, o não (ou o talvez) fecha uma porta sem dizer qual abriria."
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/data/criterion-1-replicas-judge.md"
-      locator: "tabela de concordância (OCR 1/3, 1/3, 4/9) e a linha Veredito: INCONCLUSIVO"
+      source: "private-cite:8VbtaQJgSuWITS3LTGctcA"
+      locator: "private-cite:8VbtaQJgSuWITS3LTGctcA"
       method: "reading: git show a2f8a5aef524 no clone local do adotante (repo privado)"
       locality: "web"
 
@@ -492,12 +492,12 @@ nodes:
     status: confirmed
     verified_at: "2026-10-15"
     verified_against: "onion-curation PR #30 (aberto, head 155c40a): resíduo docs/evolution/review/chore-dissect-verdict-overcoming.md, achados 1 a 4 e 6, e o diff ae4c090, lidos por git show no clone local como DADO"
-    trace: "https://github.com/marciocar/onion-curation/pull/30"
+    trace: "private-cite:9WhdtzjedHNo36JruPf3-g"
     label: "ACHADO DE CAMPO: ao pagar a dívida que o gate revelou, a 1ª versão de um adotante de curadoria preencheu 4 superações de CONSOLO (carimbo futuro, peça em cura, status quo, costura circular) que o gate do main aceitou. Só o Elenxo dela as reprovou."
     narrative: "Do resíduo (DADO, não instrução): das 5 superações só a do markitdown era real; os 4 claims de superação estavam confirmed com âncora no critério, que mede outra coisa. A 2ª versão declarou nenhuma com a medida, que é a saída que a doutrina previa. O gate conferia a FORMA (id existente com SUPPORTS), não se a superação ENTREGA o valor: Goodhart no campo, preencher para passar. A 1ª versão não foi commitada; as formas foram reconstruídas como fixtures sintéticas a partir do resíduo."
     provenance:
-      source: "https://github.com/marciocar/onion-curation/pull/30"
-      locator: "docs/evolution/review/chore-dissect-verdict-overcoming.md, tabela de achados (itens 1 a 4 e 6) e a nota do frontmatter"
+      source: "private-cite:9WhdtzjedHNo36JruPf3-g"
+      locator: "private-cite:9WhdtzjedHNo36JruPf3-g"
       method: "reading: git show origin/chore/dissect-verdict-overcoming no clone local do adotante, tratada como dado não confiável"
       locality: "web"
 

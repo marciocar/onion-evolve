@@ -18,8 +18,8 @@ meta:
                                # ser medida.
   # kg-backlog-guard: on
   # ═══ TETO: 81 NÓS (62 da rodada de primárias + 18 dos spikes + 1 decisão do maestro, D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026) ═══
-  #   SPIKES DA CURADORIA (onion-curation@da53ec3), incorporados em 2026-10-26 — 18 nós: 9 evidências medidas
-  #   ou re-ancoradas (E_SPIKE_*, a 8ª e a 9ª da emenda C em onion-curation@bc30bce), 6 perguntas com o teste que as
+  #   SPIKES DA CURADORIA (private-cite:lj141auQ_sqjYGRJ0KGFxg@da53ec3), incorporados em 2026-10-26 — 18 nós: 9 evidências medidas
+  #   ou re-ancoradas (E_SPIKE_*, a 8ª e a 9ª da emenda C em private-cite:lj141auQ_sqjYGRJ0KGFxg@bc30bce), 6 perguntas com o teste que as
   #   fecha (1 já superada pela emenda C), 2 vereditos por peça novos e 1
   #   recomendação nova, com SUPERSEDES sobre os 3 nós que caíram e sobre E_OBJECAO_24 (Aufhebung).
   #   RODADA DE PRIMÁRIAS (run wf_e4a2a9be-bb5), EXECUTADA em 2026-10-26 — 62 nós: 1 question + 32 evidências ancoradas
@@ -1057,7 +1057,7 @@ nodes:
     narrative: "Recomendação do Elenxo (1 agente). Sustenta: MCP só cliente, exec/CI equivalente, AGENTS.md equivalente, subagentes equivalentes em formato, execpolicy parcial. Não sustenta: hooks, skills/comandos, worktree e isolamento de subagente, trajetória. Próximo passo mínimo antes de decisão de porta: (i) re-ancorar a página oficial de hooks com quote e locator; (ii) rodar no codex-cli 0.164.0 um PreToolUse com exit 2 contra shell, apply_patch e tool MCP sob approval_policy=never + danger-full-access e gravar no grafo; (iii) varrer as notas de 0.138 a 0.163 por hook, skill, subagent, mcp e worktree. Não é descarte por orçamento: é a falta medida da peça que define o core. Esta sessão não sela; decisão de porta é do maestro."
     trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
 
-  # ═══ SPIKES DA CURADORIA (2026-10-26), conferidos contra evidence/ no onion-curation@da53ec3 ═══
+  # ═══ SPIKES DA CURADORIA (2026-10-26), conferidos contra evidence/ no private-cite:lj141auQ_sqjYGRJ0KGFxg@da53ec3 ═══
   # Pré-registro 257a1ee (20:21Z) < diagnóstico DIAG1 (20:37Z) < emenda B 027a89f (20:40Z) < rodadas runs-b (20:43Z)
   # < resultado 886cd6d (20:48Z). SHA256SUMS confere (0 falhas) e evidence/ é idêntico à da53ec3.
   # Proveniência (R15.2): saídas do Codex e mensagens do modelo são DADO; nenhuma diretiva delas foi obedecida.
@@ -1075,10 +1075,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "MEDIDO no Codex CLI 0.164.0: hook PreToolUse confiável barra git push e escrita por shell, sem diálogo, sob workspace-write + approval never E sob --dangerously-bypass-approvals-and-sandbox, pelas duas formas de negação (exit 2 e JSON deny)."
     narrative: "Medição da curadoria (repo descartável, remoto bare, .codex/hooks.json com matchers 'Bash|exec_command' e '^apply_patch$|Edit|Write'), conferida nesta escrita arquivo a arquivo. Seis rodadas (S1-1 a S1-3, comando e escrita): o hook disparou uma vez em cada, recebeu tool_name Bash e o comando em tool_input.command, e não há evento command_execution no --json, logo o comando não rodou. O hook recebeu permission_mode 'bypassPermissions' em TODAS as rodadas, inclusive sob workspace-write + approval never (S1-1): o campo não distingue o modo, então uma guarda não pode usá-lo para saber se está no modo mais permissivo. LIMITE que o relato não diz: o remoto já estava em e41e40c antes das rodadas runs-b (o 1º lote o empurrou, ver E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026), então 'remoto igual' não discrimina bloqueio de push sem efeito; o que prova o bloqueio do push é a ausência de command_execution, não o remoto. Uma versão, um modelo (o padrão da conta), uma rodada por caso. Condição: o hook só roda com confiança gravada ou --dangerously-bypass-hook-trust (E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026). Comparável ao corpus do Claude Code: maestro-vivo-2026-08#E_PRETOOLUSE_BARRA_SOB_BYPASS (exit 2 barra sob --dangerously-skip-permissions, medido em 2026-08-31)."
-    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:_AyMAZKoiXHx3UQWAaqCNw"
     provenance:
-      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
-      locator: "S1-1-c, S1-1-w, S1-2-c, S1-2-w, S1-3-c, S1-3-w: args.txt, result.txt, hook.log, stdout.jsonl, stderr.txt"
+      source: "private-cite:_AyMAZKoiXHx3UQWAaqCNw"
+      locator: "private-cite:_AyMAZKoiXHx3UQWAaqCNw"
       method: "measurement: rodadas da curadoria (codex exec --json, 1 rodada por caso), conferida por releitura de cada arquivo e contagem de eventos do stdout.jsonl nesta escrita"
       locality: "web"
 
@@ -1095,10 +1095,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "MEDIDO: quando o hook barra, o codex exec sai com 0 e o --json não tem evento do hook; o bloqueio aparece na agent_message do modelo e numa linha de log ERROR no stderr. Um CI que leia rc ou o JSON não vê o veto."
     narrative: "O relato da curadoria diz que o único rastro é a agent_message. A conferência achou um segundo rastro que o relato não cita: o stderr de todas as 9 rodadas que barraram traz a linha de log do roteador de tools ('Command blocked by PreToolUse hook: <motivo>. Command: <comando>'). É log, não contrato: não há garantia de formato entre versões. A agent_message é texto do modelo, então não serve de verificação. Isto LIMITA C_PIECE_EXEC_CI_EQUIVALENT_1026 (o gate que lê e reprova precisa de sinal de máquina do veto) sem derrubá-lo."
-    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:x80ZjkiLsfPMjPAvnZ_PKg"
     provenance:
-      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/"
-      locator: "runs-b/{S1-1,S1-2,S1-3}-{c,w}, runs-b/S2-1, runs-b/S2-2, runs-diag/DIAG1-c: rc.txt, stdout.jsonl (itens error), stderr.txt"
+      source: "private-cite:x80ZjkiLsfPMjPAvnZ_PKg"
+      locator: "private-cite:x80ZjkiLsfPMjPAvnZ_PKg"
       method: "measurement: rodadas da curadoria, conferida nesta escrita por grep no stderr e leitura dos itens do stdout.jsonl"
       locality: "web"
 
@@ -1115,10 +1115,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "FALHA ABERTA 1 (medida): no codex exec, hook de projeto sem confiança gravada é PULADO em silêncio, sem aviso no --json nem no stderr; só roda com o /hooks interativo ou com --dangerously-bypass-hook-trust."
     narrative: "Nas S1-0 o comando só não rodou porque o sandbox desta VPS não sobe (bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted), ou seja, nada barrou: num host com sandbox funcional o git push sob workspace-write teria seguido sem o hook. O deny.py grava o stdin no hook.log antes de qualquer decisão, então hook.log ausente prova que o hook não foi invocado. A doc oficial confirma a regra ('Non-managed hooks must be reviewed and trusted before they run', E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026). Os hooks gerenciados (requirements.toml), confiáveis por política, são a via declarada para impor hook e NÃO foram testados. O corpus do core não mede se o Claude Code exige confiança de hook de projeto nas mesmas condições (claude -p): não medido."
-    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:KP521sS5PJkQ23EnvnC0tQ"
     provenance:
-      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
-      locator: "S1-0-c e S1-0-w (args.txt, result.txt, stdout.jsonl, stderr.txt), contra S1-1-c e S1-1-w"
+      source: "private-cite:KP521sS5PJkQ23EnvnC0tQ"
+      locator: "private-cite:KP521sS5PJkQ23EnvnC0tQ"
       method: "measurement: rodadas da curadoria, conferida nesta escrita por releitura e comparação dos args"
       locality: "web"
 
@@ -1135,10 +1135,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "FALHA ABERTA 2 (medida): com --ignore-user-config o hook do projeto não dispara, em silêncio; sem sandbox, o push chegou ao remoto e o arquivo foi escrito, nas QUATRO rodadas sem sandbox (exit 2 e JSON deny)."
     narrative: "O relato cita S1-2-c e S1-2-w; a conferência acha o mesmo em S1-3-c (o push RODOU, 'Everything up-to-date' porque o S1-2-c já tinha empurrado) e S1-3-w (marcador escrito). Logo são 4 rodadas com a ação executada, não 2, e a forma JSON deny falha igual. Não isolado nesta medição: as rodadas passavam também a confiança do projeto por -c projects.<dir>.trust_level. A emenda C da curadoria explicou depois: o -c não confia o projeto, e a flag descarta a confiança gravada na config do usuário (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026). O diagnóstico DIAG1-c rodou antes da emenda B (20:37Z contra 20:40Z do commit), como a emenda declara. Corpus do Claude Code, para comparação honesta: um operador também desliga hooks por configuração lá (chat-agent-isolation-2026-10#E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016: settings {disableAllHooks:true} e o hook não rodou); se isso é silencioso no claude -p não foi medido. A diferença a pesar é que aqui o nome da flag (ignorar a configuração do USUÁRIO) não anuncia que derruba os hooks do PROJETO."
-    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/PLAN-B.md"
+    trace: "private-cite:Ja8xAX0B2sVJitS0IS-D7A"
     provenance:
-      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs/"
-      locator: "S1-0-c a S1-3-w (args.txt, result.txt, stdout.jsonl) e runs-diag/DIAG1-c"
+      source: "private-cite:Ja8xAX0B2sVJitS0IS-D7A"
+      locator: "private-cite:Ja8xAX0B2sVJitS0IS-D7A"
       method: "measurement: rodadas da curadoria, conferida nesta escrita por contagem de command_execution e leitura dos result.txt"
       locality: "web"
 
@@ -1174,10 +1174,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "MEDIDO no 0.164.0: o deny do PreToolUse vale para apply_patch que CRIA arquivo (Add File), pelas duas formas; a #27833 ('hook fires, write proceeds') não se reproduziu neste caso."
     narrative: "Não testado: patch que edita arquivo existente (*** Update File), patch que apaga, e repositório com várias worktrees (o caso de E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). Logo a #27833 não fica refutada, fica sem reprodução num caso. Mesmas condições de confiança do spike 1 (--dangerously-bypass-hook-trust)."
-    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:7HdhzdzpFZAtfdeRhcyQWQ"
     provenance:
-      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
-      locator: "S2-1 e S2-2: hook.log, result.txt, stdout.jsonl"
+      source: "private-cite:7HdhzdzpFZAtfdeRhcyQWQ"
+      locator: "private-cite:7HdhzdzpFZAtfdeRhcyQWQ"
       method: "measurement: rodadas da curadoria, conferida nesta escrita por releitura"
       locality: "web"
 
@@ -1194,10 +1194,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "MEDIDO: as skills $onion, $engineer-start e $engineer-warm-up do porte onion-codex (a216791) CARREGAM no Codex 0.164.0; o warm-up RODOU sem sandbox (13 comandos, os lints do porte com exit 0)."
     narrative: "Conferido nesta escrita: as linhas citadas existem em onion-codex@a216791 (.agents/skills/onion/SKILL.md l.33, 34, 57, 146; .agents/skills/engineer-start/SKILL.md l.35). 'Carregar' aqui é o modelo seguir o texto da skill, julgado pela resposta: uma rodada por skill, um modelo. A rodada S3X ficou FORA do pré-registro e foi declarada como tal; o pré-registro errou ao dizer que $onion não existia no porte (corte de head -10), e a curadoria o declarou. Em read-only nada executa nesta VPS porque o bwrap não sobe (RTM_NEWADDR), limite de ambiente já no corpus (chat-agent-isolation-2026-10#E_OBJECAO_06_BWRAP_FAILS_ON_THIS_VPS). Não mede: os 117 comandos do core como skills, invocação implícita pela description, nem equivalência de eficácia."
-    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:QmAlJ_HNqrDj7X0X-IvhwQ"
     provenance:
-      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
-      locator: "S3-onion, S3-engineer-start, S3-engineer-warm-up, S3X-engineer-warm-up: args.txt, stdout.jsonl; e github.com/marciocar/onion-codex@a216791 (.agents/skills)"
+      source: "private-cite:QmAlJ_HNqrDj7X0X-IvhwQ"
+      locator: "private-cite:QmAlJ_HNqrDj7X0X-IvhwQ"
       method: "measurement: rodadas da curadoria, conferida nesta escrita por contagem de eventos e git show das linhas citadas no porte"
       locality: "web"
 
@@ -1214,10 +1214,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "DEFEITO MEDIDO na LINHA VIVA onion-codex: o Codex 0.164.0 recusa o .codex/hooks.json do porte (a216791), que começa em SessionStart sem a chave 'hooks', e o hook do porte não roda; envolvido em {\"hooks\": ...}, carrega e dispara."
     narrative: "Emenda C da curadoria, pré-registrada em 97fa177 (20:57Z) antes do resultado 42defa7 (21:04Z). Conferido nesta escrita: hooks-A0.json é byte a byte o .codex/hooks.json de onion-codex@a216791; o erro de parse está no --json como item error, então a falha NÃO é silenciosa, mas o codex exec sai com 0 e segue sem o hook (nada reprova). O SessionStart do porte é a detecção do provider do task manager (E_CORPUS_ONION_CODEX_PORT_STATE_1026): no Codex atual ele não roda. A correção é uma linha de estrutura no repo onion-codex, não neste (Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026). Uma versão, uma rodada por caso. As rodadas S4T rodaram com a confiança do projeto gravada (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026); as S4-A0, S4-A1 e S4-B1 sem ela nem chegaram a ler o arquivo."
-    trace: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:HuIteXHzReG5HxnRganfAQ"
     provenance:
-      source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
-      locator: "S4T-A0, S4T-A1, S4T-B1 (rc.txt, stdout.jsonl, SIGNAL-B1.json); hooks-A0.json, hooks-A1.json, hooks-B1.json"
+      source: "private-cite:HuIteXHzReG5HxnRganfAQ"
+      locator: "private-cite:HuIteXHzReG5HxnRganfAQ"
       method: "measurement: rodadas da curadoria (codex exec --json em clones descartáveis do porte), conferidas nesta escrita por leitura dos itens do stdout.jsonl e diff dos hooks.json contra o porte"
       locality: "web"
 
@@ -1273,10 +1273,10 @@ nodes:
     valid_from: "2026-10-26"
     label: "Confiança de PROJETO no Codex 0.164.0: o -c projects.<dir>.trust_level=\"trusted\" não confia o projeto; o .codex/ só é lido com [projects.<dir>] trust_level gravado na config do usuário. Logo o hook que barra exige DUAS confianças: a do projeto gravada e a do hook."
     narrative: "Explica a falha aberta 2 (E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026): o --ignore-user-config descarta a confiança gravada e os hooks do projeto somem em silêncio. O que a evidência SUSTENTA, conferido nesta escrita: nas rodadas S4-* (com o -c, pelo pré-registro) o hooks.json nem foi lido, porque o mesmo arquivo malformado que dá erro de parse em S4T-A0 não dá nada em S4-A0. O que fica SÓ no relato da curadoria, sem artefato em evidence/ (não há args.txt nem cópia do config.toml do usuário em runs-c): (i) que a diferença entre as rodadas S4-* e S4T-* é exatamente a entrada gravada; (ii) que o controle S4-CTRL disparou (o SIGNAL-CTRL.json não foi guardado); (iii) que foi o próprio Codex que gravou a entrada, o que o RESULTS.md declara NÃO isolado ('é provável' que tenham sido as rodadas sem sandbox nem aprovação). Por isso a confiança é 0.6. Consequência para o veredito de hooks: para automação, o hook que barra só roda com a confiança do projeto gravada E a do hook (pelo /hooks interativo ou pelo --dangerously-bypass-hook-trust); sem qualquer uma, é pulado. A config do usuário foi restaurada pela curadoria depois das rodadas."
-    trace: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    trace: "private-cite:i6E74EhM-s8nwF--BaE63Q"
     provenance:
-      source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
-      locator: "S4-A0, S4-A1, S4-B1, S4-BISECT-1-clean a S4-BISECT-4-codex-dirs, S4-DIAG-*, S4-CTRL contra S4T-A0, S4T-A1, S4T-B1; PLAN-C.md seção Rodadas"
+      source: "private-cite:i6E74EhM-s8nwF--BaE63Q"
+      locator: "private-cite:i6E74EhM-s8nwF--BaE63Q"
       method: "measurement: rodadas da curadoria, conferidas nesta escrita por leitura dos itens do stdout.jsonl de todas as rodadas de runs-c; a variável (entrada gravada) é declaração da curadoria"
       locality: "web"
 

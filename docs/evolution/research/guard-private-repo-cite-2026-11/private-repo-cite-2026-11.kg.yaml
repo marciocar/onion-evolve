@@ -110,14 +110,14 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: open
+    status: refuted
     impact: 3
     confidence: 0.7
-    verified_at: "2026-11-10"
-    verified_against: "kg-grammar.md (linha da citação de repo privado) e o nó C_PROVISIONAL_OMIT_URL_AND_HASH_BY_DEFAULT_1109 do kg-ssot"
+    verified_at: "2026-11-13"
+    verified_against: "medido na branch chore/kg-private-cite-migration: 0 provenance.source do corpus com a classe em texto; o kg-trace.sh (kg_trace.py da kg-ssot 4.51.0) imprime 123 provenance.source e 73 trace como private-cite; o kg-grammar.md e o conselho da REGRA 121 prescrevem o marcador"
     trace: ".claude/rules/kg-grammar.md"
     label: "a classe «não conferível por terceiro» hoje é texto no provenance.source; nenhum leitor do kg-ssot a imprime nem a conta, e o contrato segue exigindo source, locator e method"
-    narrative: "O kg-ssot mediu que, omitida a URL, somem a conferência de versão e a de locator. Que o leitor imprima a classe é trabalho do kg-ssot, não deste PR. Gatilho: o kg-ssot ganhar campo ou leitor para a classe, e aí a gramática e esta guarda migram para ele."
+    narrative: "O kg-ssot mediu que, omitida a URL, somem a conferência de versão e a de locator. Que o leitor imprima a classe é trabalho do kg-ssot, não deste PR. Gatilho: o kg-ssot ganhar campo ou leitor para a classe, e aí a gramática e esta guarda migram para ele. Refutada em 2026-11-13: o gatilho disparou na 4.51.0 (contrato v4.22), que deu à classe o marcador private-cite:<id>, contado pelo kg_trace.py; a migração do corpus, da gramática e do conselho da guarda a cumpriu. Valia até 2026-11-12."
   - id: D_PORTE_DO_PRIVATE_REPOS_DA_4510
     node_type: decision
     layer: audit

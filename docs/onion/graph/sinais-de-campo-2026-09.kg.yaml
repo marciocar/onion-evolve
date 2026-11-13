@@ -450,8 +450,8 @@ nodes:
     label: "A passada adversarial do adotante onion-curation achou a regressão A1 (arquivo de dados virando programa por awk/make/sed -f e por cópia via redirecionamento) e o furo A5 (helper aceito pelo nome); os dois curados no core"
     narrative: "A1: o veto do dado usado como código conhecia só shell, interpretador, eval e renomeação; entram os executores de arquivo de programa (awk, make, sed, m4) e a cópia por redirecionamento ou tee para nome não-dados, sem contar o próprio heredoc gravando o arquivo. A5: o helper vale só pelo caminho canônico do repo do hook ou do topo git do cwd, por realpath, inclusive a forma documentada REPO=$(git rev-parse --show-toplevel) sem cd antes. Origem: resíduo do PR #61 do onion-curation, recebido por mensagem entre sessões."
     provenance:
-      source: "resíduo onion-curation@7709caa:docs/evolution/review/chore-onion-update-ca3c622d33e8.md e a medição no core"
-      locator: "achados 2 (A1) e 6 (A5) do resíduo; casos data-awk-f, data-make-f, data-redir-copy, data-tee-copy, helper-fake e helper-cd-first; mutantes M21 a M24"
+      source: "private-cite:PsS0gLhqLRNT9PtFTRig-A"
+      locator: "private-cite:PsS0gLhqLRNT9PtFTRig-A"
       method: "measurement: hook com o JSON do PreToolUse antes e depois da cura"
       locality: "repo"
 
@@ -1330,14 +1330,14 @@ nodes:
     confidence: 0.85
     verified_at: "2026-10-27"
     verified_against: "onion-curation na origin/main: `peer-ref-check.sh onion-curation docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#D_DESIGN_SETUP_PROPOSAL` rc 0 e `peer-ref-check.sh onion-curation 19b9e500c0101c041564838d85f88dabcd5f420a` rc 0 (ancestral); `peer-ref-check.sh onion-curation docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#C_WAVE1_WITH_GRAPH` rc 0 @ 668e13b. O script aceita caminho#id ou sha, não a URL"
-    trace: "https://github.com/marciocar/onion-curation/blob/19b9e500c0101c041564838d85f88dabcd5f420a/docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#D_DESIGN_SETUP_PROPOSAL"
+    trace: "private-cite:TRvLlS2krNrWGkuK4qNyBA#D_DESIGN_SETUP_PROPOSAL"
     label: "A base do selo do setup de design: a proposta da curadoria (opção 1, fio fino em três ondas) está na origin/main dela, e a onda 1 revista já tem o grafo do design-context com laboratório que pega o token sumido dentro do JSON."
     narrative: |-
       O estudo da curadoria (design-setup-2026-10) chegou à origin/main dela pelo PR 138, com o nó D_DESIGN_SETUP_PROPOSAL @ 19b9e500c010. A proposta: a onda 1 cobre os critérios 1 a 4 do gatilho (entrada), a onda 2 cobre o 5 e o 6 (identidade, deck e componentes mínimos locais nos dois adotantes), a onda 3 enriquece. A observação do maestro acrescenta à onda 1 o grafo próprio do design.
       Depois do selo, no mesmo dia, a curadoria mergeou o PR 140 (@ 668e13b): a onda 1 revista (C_WAVE1_WITH_GRAPH) cria docs/design-context/design-context.kg.yaml, o .md fica escrito à mão com projection_of e review_after, e as ligações com os outros contextos são external_edges. O laboratório dela (E_LAB_GRAPH_RESULT, onze casos) mostra que o token que some de dentro do JSON é pego pelo lint-design-tokens.sh quando era citado por alias, e só pelo protótipo check_design_context.py quando era citado apenas pelo grafo.
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/19b9e500c0101c041564838d85f88dabcd5f420a/docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#D_DESIGN_SETUP_PROPOSAL"
-      locator: "D_DESIGN_SETUP_PROPOSAL @ 19b9e500c010; C_WAVE1_WITH_GRAPH, E_LAB_GRAPH_RESULT e Q_KG_SSOT_LOCATOR_CHECK @ 668e13b (https://github.com/marciocar/onion-curation/blob/668e13ba9132050888db2b4610f755221b019a27/docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#C_WAVE1_WITH_GRAPH)"
+      source: "private-cite:TRvLlS2krNrWGkuK4qNyBA"
+      locator: "private-cite:TRvLlS2krNrWGkuK4qNyBA"
       method: "reading: peer-ref-check.sh no clone local da curadoria (nós lidos por kg_query.py) e git show da origin/main dela"
       locality: "web"
   - id: E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027
@@ -1352,7 +1352,7 @@ nodes:
       Recebido da sessão do kg-ssot em 2026-10-27, por mensagem; não há nó dela na main que o core tenha conferido, por isso o nó fica open. O grafo do design é `layer: domain`. A marca e cada token são `entity`; o contraste mínimo é `invariant`; o tema (claro, escuro) é `state`; a política de marca é `policy`; a escolha da paleta é `decision` e o arquivo de tokens é `artifact`. As ligações com os outros contextos vão por `external_edges` (TRACES_TO para a origem no business-context, CONSTRAINS para o que o design restringe no technical-context). Os tokens ficam no JSON do W3C DTCG (o formato de design tokens do W3C), referenciados pelo `trace:` do nó mais `provenance` com `locator` em JSON Pointer (por exemplo `/color/brand/primary`).
       Variante medida na curadoria (C_WAVE1_WITH_GRAPH @ 668e13b): lá o contraste é `invariant` ou `rule` (o laboratório exercitou uma `rule`) e o brief entra como `claim`, escolha do laboratório. O core registra o desenho do kg-ssot e não fixa a variante; quem constrói a onda 1 escolhe e declara.
       Lacuna conhecida, declarada: o `trace:` confere o ARQUIVO, não o ponteiro. Um token que some de dentro do JSON enquanto o arquivo continua lá não é pego pelo trace. Hoje não existe conferente do locator no contrato nem no core; existe só o protótipo da curadoria (check_design_context.py), e onde ele mora (no kg_trace do contrato ou num checador da vertical de design no core) é a pergunta aberta Q_KG_SSOT_LOCATOR_CHECK, na curadoria.
-    trace: "https://github.com/marciocar/onion-curation/blob/668e13ba9132050888db2b4610f755221b019a27/docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#C_WAVE1_WITH_GRAPH"
+    trace: "private-cite:qQTHMUiKZZUv8Bbgz7XErw#C_WAVE1_WITH_GRAPH"
   - id: Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027
     node_type: question
     layer: audit

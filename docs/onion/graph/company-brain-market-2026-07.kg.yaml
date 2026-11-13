@@ -287,10 +287,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     verified_at: "2026-07-25"
-    label: "Onion JÁ TEM N=1 provado no device (Moto G54): cifra XChaCha20 at-rest + life-KG runtime store + sync zero-knowledge (só ciphertext sobe p/ marciocar/onion-pessoal-kg). Prova funcionando vs. maioria dos personal brain = wrapper de RAG sobre vetor centralizado"
+    label: "Onion JÁ TEM N=1 provado no device (Moto G54): cifra XChaCha20 at-rest + life-KG runtime store + sync zero-knowledge (só ciphertext sobe p/ private-cite:cgYenOYJj3BF2dAUxlWfxg). Prova funcionando vs. maioria dos personal brain = wrapper de RAG sobre vetor centralizado"
     provenance:
-      source: "onion-pessoal-app@7e61e10"
-      locator: "commit 7e61e10 (2026-07-19, feat(F0): encrypted life-KG sync) + 87908d5 (cifra XChaCha20-Poly1305) + 1a6e5cd (life-KG runtime-grade store)"
+      source: "private-cite:Ku11dIWqkd6tR0ALJJv8cw"
+      locator: "private-cite:Ku11dIWqkd6tR0ALJJv8cw"
       method: "reading: commits no repo onion-pessoal-app (o trace era a memória do host onion-pessoal-app-state)"
   - id: E_onion_inference_doctrine
     node_type: evidence
@@ -449,8 +449,8 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — Li o nó (1 claim: ''instrumentar 1-2 prospects P4 reais + valor medido por adotante''). Bu'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (aberto desde 07-25) dizia ''Zero adotante P4 provado hoje''. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (⟨cliente⟩, via oferta <cliente-poc>), com material de cliente sob NDA, entrega em reunião confirmada, e o resultado foi PROVADO e CONFIRMADO PELO CLIENT'
     provenance:
-      source: "poc-venda-direta-pdi@e540954:README.md"
-      locator: "README.md l.1-17 (\"ENCERRADA em 2026-08-27\"; \"Confirmado pelo cliente\") + docs/business-context/poc-overview.md l.27-28, l.63 (@7a6aa36)"
+      source: "private-cite:nHYCvNwP4RF4Je4l31bjDA"
+      locator: "private-cite:nHYCvNwP4RF4Je4l31bjDA"
       method: "reading: commits no repo do adotante poc-venda-direta-pdi (e540954 README de encerramento; poc-overview.md @7a6aa36)"
 
 edges:

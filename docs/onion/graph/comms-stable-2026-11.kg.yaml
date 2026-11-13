@@ -146,7 +146,7 @@ nodes:
     layer: audit
     plane: DEV
     status: done
-    verified_against: "2026-11-06: gh repo view marciocar/onion-messaging → PRIVATE; clone local na VPS (o local_path do membro); adoção greenfield durável no pin 6760a7bede50 (onion/adopt, gate VIVO provado por execução); pin-integrity-check → pin-ok 6760a7bede50; membro onion-messaging no members.yaml (members-validate valid:true). A main do remoto nasce pelo `!` do maestro: a guarda de repo alheio negou o push da main à sessão, corretamente."
+    verified_against: "2026-11-06: gh repo view private-cite:8EQ9nUuImFzzdgjVm-KCzw → PRIVATE; clone local na VPS (o local_path do membro); adoção greenfield durável no pin 6760a7bede50 (onion/adopt, gate VIVO provado por execução); pin-integrity-check → pin-ok 6760a7bede50; membro onion-messaging no members.yaml (members-validate valid:true). A main do remoto nasce pelo `!` do maestro: a guarda de repo alheio negou o push da main à sessão, corretamente."
     owner: maestro
     x_due: "2026-11-06"
     impact: 4
@@ -229,7 +229,7 @@ nodes:
     confidence: 0.8
     evidence_class: testimony
     verified_at: "2026-11-06"
-    verified_against: "gh pr view 228 --repo marciocar/onion-curation: MERGED 2026-11-06T15:36:25Z (169f9e746253), docs(curation): dissecação dos channels do Claude Code e das pontes entre sessões; o conteúdo e as 3 respostas por relato da curadoria"
+    verified_against: "gh pr view 228 --repo private-cite:yMACzAhgKIRNMARea4Dmug: MERGED 2026-11-06T15:36:25Z (169f9e746253), docs(curation): dissecação dos channels do Claude Code e das pontes entre sessões; o conteúdo e as 3 respostas por relato da curadoria"
     label: "Dissecação pelo /meta:dissect dos channels do Claude Code (channels.md e channels-reference.md), dos channels da allowlist oficial e das pontes da comunidade (peerbus, agent-inbox, agent-bridge, claude-mesh), com veredito por família e as 3 respostas pedidas pelo core."
     narrative: "As 3 respostas: ponte pronta × costura × protótipo próprio; o que os oficiais mudam no desenho; os 3 maiores riscos das pontes. Aceito pela curadoria na repassada de 2026-11-06, até 12h de São Paulo de 07/11. Pronto quando: o grafo da dissecação está na curadoria com radar exit 0 e as 3 respostas chegaram ao core. Linear: SAC-296. Entregue em 2026-11-06, antes do prazo, no PR #228 da curadoria; o degrau 3 usou as referências de desenho dela (peerbus e a2abridge). O core não releu a dissecação inteira: a classe é testemunho."
   - id: Q_CS_KGSSOT_FORMA_X_EVENT_1107

@@ -985,8 +985,8 @@ nodes:
     narrative: "Alvo: 4 [a2a-spec] E_A2A_TASK_STATES_TERMINAL_INTERRUPTED. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação define AUTH_REQUIRED e não sustenta 'não há ack explícito': a afirmação é negativa e sem trecho. Além disso compara camadas diferentes: TaskState é ciclo de tarefa, e o ack da fila é entrega de transporte (queue/DOCTRINE.md, ack amarrado a id e body_sha256). O análogo correto, push com tentativa de entrega do §4.3.3, foi rejeitado na ancoragem por exagero."
     trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'TaskState'; conferir que a claim de push do A2A está na lista de REJEITADAS deste run"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:queue/DOCTRINE.md"
-      locator: "ack amarrado a id e body_sha256"
+      source: "private-cite:uznmg9rEN5napiwDkX6Ieg"
+      locator: "private-cite:uznmg9rEN5napiwDkX6Ieg"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_MCP_LISTEN_DOES_NOT_APPLY_TO_STDIO_BELL
     node_type: evidence
@@ -1001,8 +1001,8 @@ nodes:
     narrative: "Alvo: 5 [mcp-spec] E_MCP_NOTIFICATIONS_VIA_SUBSCRIPTIONS_LISTEN. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O locator é o binding Streamable HTTP. A campainha é stdio e não negocia essa revisão: doorbell/DOCTRINE.md cláusula 6 diz que o runtime v2 não registra channel que negocia 2026-07-28 e que o SDK 1.32.2 vai até 2025-11-25. kg_mcp.py l.545 declara listChanged False. CENÁRIO: aplicar a claim à campainha gera o veredito 'atrás', e cumprir o item faria o channel deixar de registrar, medido pelo caso no_2026_07_28_negotiation."
     trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:doorbell/DOCTRINE.md | grep -n '2026-07-28'; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_mcp.py | grep -n 'listChanged'"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:doorbell/DOCTRINE.md"
-      locator: "cláusula 6; vendor/kg-ssot/tools/kg_mcp.py l.545"
+      source: "private-cite:wsLKQxp6GNfOw6E4Dl-O0Q"
+      locator: "private-cite:wsLKQxp6GNfOw6E4Dl-O0Q"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_MCP_AUDIENCE_NOT_APPLICABLE
     node_type: evidence
@@ -1017,8 +1017,8 @@ nodes:
     narrative: "Alvo: 7 [mcp-spec] E_MCP_TOKEN_AUDIENCE_NO_PASSTHROUGH. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O MUST vale para servidor que aceita access token OAuth. Nenhum servidor da casa aceita: a campainha é stdio, e o kg_mcp compara segredo compartilhado com hmac.compare_digest (l.436-439). A claim não nomeia alvo; o veredito é 'não se aplica' e ela não diz isso."
     trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_mcp.py | grep -n 'compare_digest\\|Bearer\\|audience'"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_mcp.py"
-      locator: "l.436-439"
+      source: "private-cite:Kg1y5sE9wCzYy3i8g6QLWw"
+      locator: "private-cite:Kg1y5sE9wCzYy3i8g6QLWw"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_WATCHER_RECEIVES_AND_IS_IN_OPEN_PR
     node_type: evidence
@@ -1031,10 +1031,10 @@ nodes:
     verified_against: "Li channels.py e a DOCTRINE do vigia no branch; a bancada dele não foi rodada nesta passada. Reconferido pelo escritor em 2026-11-08: PR #8 OPEN, head b0d8b2cc4, 0 entradas watcher na origin/main. Superação procurada: a leitura correta é parte do veredito."
     label: "OBJEÇÃO: o vigia RECEBE e verifica pela peça oficial, e a fila transporta sinal A2A; julgar pela frase 'só conforma se os emitir' reprova errado. E o 'alinhado' do corpus descreve código não mergeado: o PR #8 está aberto e a main não tem watcher."
     narrative: "Alvo: 9 [cloudevents-standard-webhooks] E_STDWEBHOOKS_THREE_HEADERS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A segunda metade erra o papel: 'um evento da fila/vigia só conforma se os EMITIR'. O vigia RECEBE; verify_standard lê os três cabeçalhos e chama standardwebhooks.Webhook.verify (channels.py l.92-103, branch feat/event-watcher), e a fila transporta sinal A2A, não POST de webhook. O vigia ainda não está na main: PR #8 aberto, e git ls-tree origin/main não tem watcher. CENÁRIO: julgar pela frase da claim dá 'não conforma' para um verificador que usa a peça oficial, e o veredito 'alinhado' do corpus descreve código não mergeado."
-    trace: "git -C ⟨clone do onion-messaging⟩ show origin/feat/event-watcher:watcher/onion_watcher/channels.py | sed -n 92,103p; git -C ⟨clone do onion-messaging⟩ ls-tree origin/main --name-only | grep -c watcher; gh pr view 8 -R marciocar/onion-messaging --json state"
+    trace: "private-cite:l0hSy2O3sX3OWKvRpCKMCw"
     provenance:
-      source: "marciocar/onion-messaging@b0d8b2cc4:watcher/onion_watcher/channels.py"
-      locator: "l.92-103; https://github.com/marciocar/onion-messaging/pull/8"
+      source: "private-cite:l0hSy2O3sX3OWKvRpCKMCw"
+      locator: "private-cite:l0hSy2O3sX3OWKvRpCKMCw"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_CLOUDEVENTS_SOURCE_FORM_NOT_VALIDATED
     node_type: evidence
@@ -1049,8 +1049,8 @@ nodes:
     narrative: "Alvo: 12 [cloudevents-standard-webhooks] E_CLOUDEVENTS_REQUIRED_ATTRS_SOURCE_ID_UNIQUE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Sustenta a presença dos atributos e a unicidade, mas não a forma. _clean_attr em queue/onion_queue/daemon.py l.277-280 aceita qualquer texto imprimível: um source com espaço passa, embora o CloudEvents peça URI-reference (trecho ce.md l.284, que caiu junto com a claim rejeitada). A chave de dedupe com remetente verificado é divergência declarada e legítima (queue/DOCTRINE.md cláusula 4). O veredito 'alinhado' vale para presença, com item de validação de forma para o onion-messaging."
     trace: "git -C ⟨clone do onion-messaging⟩ show origin/feat/event-watcher:queue/onion_queue/daemon.py | sed -n 277,296p"
     provenance:
-      source: "marciocar/onion-messaging@b0d8b2cc4:queue/onion_queue/daemon.py"
-      locator: "l.277-296; queue/DOCTRINE.md cláusula 4"
+      source: "private-cite:b_p8-D40tsVOdOV9IV1fgA"
+      locator: "private-cite:b_p8-D40tsVOdOV9IV1fgA"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_CC_TIMEOUT_EXCEPTION_ONFAILURE
     node_type: evidence
@@ -1116,8 +1116,8 @@ nodes:
     narrative: "Alvo: 19 [slsa] E_SLSA_L1_PROVENANCE_DIGEST. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: A condição não descreve os alvos. vendor/kg-ssot/.kg-ssot-version guarda tag, commit e sha256 de cada arquivo, e o carimbo das portas guarda source_commit. O que falta é outra coisa: kg_vendor.py lê por git archive da tag e tem 0 menções a attestation, então o vendor consome uma árvore que a atestação não cobre. CENÁRIO: pela claim, o item vira 'pôr digest', que já existe, e o defeito real (procedência do que é consumido) fica sem item."
     trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/.kg-ssot-version | sed -n 1,14p; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_vendor.py | grep -c attestation; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_vendor.py | grep -n 'archive'"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_vendor.py"
-      locator: "l.5 e l.256 (git archive); 0 menções a attestation; vendor/kg-ssot/.kg-ssot-version"
+      source: "private-cite:KeV0wHeAaLtVw3G712YWlA"
+      locator: "private-cite:KeV0wHeAaLtVw3G712YWlA"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_SLSA_L3_NOT_MEASURED
     node_type: evidence
@@ -1370,8 +1370,8 @@ nodes:
     narrative: "Alvo: 36 [aaif-projects] E_AAIF_MCP_HOSTED. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: O texto da casa diz isso só do Task Manager: CLAUDE.md, 'Adapters são API-first; o MCP é um transporte opcional'. A campainha depende do MCP: 'Não roda fora do Claude Code como push' (doorbell/DOCTRINE.md), e o kg_mcp é servidor MCP. CENÁRIO: a generalização dá 'diverge por decisão, MCP opcional' para a campainha, cujo push não existe sem MCP."
     trace: "grep -n 'transporte' CLAUDE.md | head -3; git -C ⟨clone do onion-messaging⟩ show origin/main:doorbell/DOCTRINE.md | grep -n 'Não roda fora do Claude Code'"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:doorbell/DOCTRINE.md"
-      locator: "l.58 'Não roda fora do Claude Code como push'; CLAUDE.md, seção Task Manager"
+      source: "private-cite:E7byzVBcUesH2siTaY9NyQ"
+      locator: "private-cite:E7byzVBcUesH2siTaY9NyQ"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_AAIF_NEGATIVES_WITHOUT_QUOTE
     node_type: evidence
@@ -1403,8 +1403,8 @@ nodes:
     narrative: "Alvo: 38 [w3c-prov-shacl] E_PROVO_THREE_CLASSES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: Ignora peça que já existe. vendor/kg-ssot/tools/kg_prov_export.py exporta para PROV-O em JSON-LD. Rodei em onion-identity-2026-07.kg.yaml: rc=0, 104 prov:Entity, 73 prov:wasDerivedFrom, 73 prov:Activity. O kg-corpus-grep dá 0 nós para PROV-O porque casa só id e label, e por isso passou despercebido. CENÁRIO: o veredito sai 'atrás, sem mapeamento' e gera item para algo entregue; o certo é 'alinhado por exportador, sem agente' (claim 39). Superação achada (classe entrega): nó C_SUPERACAO_20261108 que aponta para esta objeção."
     trace: "python3 -I ⟨clone do onion-messaging⟩/vendor/kg-ssot/tools/kg_prov_export.py docs/onion/graph/onion-identity-2026-07.kg.yaml | grep -c 'prov:wasDerivedFrom'"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_prov_export.py"
-      locator: "saída sobre docs/onion/graph/onion-identity-2026-07.kg.yaml"
+      source: "private-cite:GT-NJRjVMxyMnuWdbjm6AA"
+      locator: "private-cite:GT-NJRjVMxyMnuWdbjm6AA"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_PROV_DERIVATION_ANALOGY_REFUSED_BY_KG_SSOT
     node_type: evidence
@@ -1419,8 +1419,8 @@ nodes:
     narrative: "Alvo: 40 [w3c-prov-shacl] E_PROVO_BUNDLES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: O kg-ssot recusa exatamente essa analogia. Docstring de kg_prov_export.py: 'derivação em PROV é relação de produção, e não de suporte evidencial, e exportá-las como wasDerivedFrom diria algo que o grafo não diz'; e o carimbo vai como kg:verifiedAt, 'e não como prov:generatedAtTime'. CENÁRIO: a analogia gera 'alinhado' numa escolha que é divergência deliberada."
     trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_prov_export.py | sed -n 11,20p"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_prov_export.py"
-      locator: "docstring, l.11-20"
+      source: "private-cite:12DNNj9a96H85RGP_EMOQw"
+      locator: "private-cite:12DNNj9a96H85RGP_EMOQw"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_SHACL_JSON_REPORT_EXISTS_NOT_SHACL
     node_type: evidence
@@ -1435,8 +1435,8 @@ nodes:
     narrative: "Alvo: 41 [w3c-prov-shacl] E_SHACL_SEVERITY. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O mapeamento é aceitável, mas 'sem relatório padronizado' não pesa o que existe: kg_validate --json emite relatório estruturado por arquivo (l.2044, schema_version e results), ainda que não seja sh:ValidationReport, e D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025 (done) prevê pySHACL como leitor. O vendor 4.44 não tem a palavra SHACL em tools, spec e manual, então o estado na última release ficou sem medir."
     trace: "bash .claude/validation/kg-corpus-grep.sh 'D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025'; git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_validate.py | grep -n 'VERDICT_SCHEMA_VERSION'"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_validate.py"
-      locator: "l.2044 (--json, schema_version, results)"
+      source: "private-cite:DhvMnoc-AZBqVgFZDOpv9Q"
+      locator: "private-cite:DhvMnoc-AZBqVgFZDOpv9Q"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_SHACL_CONFORMS_CORE_GATES_UNMEASURED
     node_type: evidence
@@ -1451,8 +1451,8 @@ nodes:
     narrative: "Alvo: 42 [w3c-prov-shacl] E_SHACL_CONFORMS_FROM_RESULTS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Frase condicional sem alvo. No kg-ssot o rc deriva dos resultados ('return 1 if any(r[\"verdict\"] == \"FAIL\"...)', kg_validate.py l.2399), logo o paralelo vale lá. Para as guardas do core ninguém mediu quais emitem resultado por violação."
     trace: "git -C ⟨clone do onion-messaging⟩ show origin/main:vendor/kg-ssot/tools/kg_validate.py | sed -n 2395,2404p"
     provenance:
-      source: "marciocar/onion-messaging@ead81baea:vendor/kg-ssot/tools/kg_validate.py"
-      locator: "l.2399"
+      source: "private-cite:HWb10xDU3WJTNGklkS_7yQ"
+      locator: "private-cite:HWb10xDU3WJTNGklkS_7yQ"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_OKF_V0_3_UNREACHABLE
     node_type: evidence

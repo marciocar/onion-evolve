@@ -31,8 +31,8 @@ nodes:
     verified_against: "medido em 2026-10-14 por leitura de .claude/utils/federation-transport/ (a2a-verify.sh, a2a-accept.sh, jwks/), ops/update-bridge.sh e do bridge servido (src/a2a.ts l.53 com --receiver onion-evolve fixo; src/config.ts l.46-50 lendo o pool de bearers só na subida)"
     label: "montar uma conexão A2A hoje são 11 passos manuais: keygen à mão, .pem por git add -f, kid no registro, merge, update-bridge, bearer no ambiente do bridge com restart, entrega fora de banda, remetente próprio, aceite com sudo e revogação à mão"
     provenance:
-      source: ".claude/utils/federation-transport/a2a-verify.sh e o bridge marciocar/onion-bridge@94a21ca"
-      locator: "a2a-verify.sh l.184-195 (kid pinado no registro); onion-bridge src/a2a.ts l.53; src/config.ts l.46-50"
+      source: "private-cite:GfkBCCI4DGXNhUP_x6Rqzw"
+      locator: "private-cite:GfkBCCI4DGXNhUP_x6Rqzw"
       method: "measurement: leitura dos scripts e do clone servido do bridge"
       locality: "repo"
   - id: E_LACUNAS_DO_A2A_MEDIDAS
@@ -192,7 +192,7 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-10-14"
-    verified_against: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh re-executado pela sessão principal num clone novo do onion-bridge (94a21ca) com docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff aplicado: 18/18 PASS; VPS intocada. Linear SAC-129 e SAC-130"
+    verified_against: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh re-executado pela sessão principal num clone novo do private-cite:v-zx9f_7Du4VBruSub81eg (94a21ca) com docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff aplicado: 18/18 PASS; VPS intocada. Linear SAC-129 e SAC-130"
     label: "o bridge com convite por membro e receptor múltiplo funciona: convite certo aceito, de outro membro, vencido e revogado recusados, revogação vale sem restart, receptor só source ou hub, aud cruzado vetado"
     provenance:
       source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh e docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff"
@@ -723,8 +723,8 @@ nodes:
     verified_against: "medido em 2026-10-15 na VPS do core, só leitura: GET /health do bridge = permissionMode bypassPermissions; a unit onion-vps-bridge roda como User=onion com ProtectSystem=strict, ProtectHome=read-only e ReadWritePaths = ⟨a home da conta do serviço⟩ e ⟨o diretório de estado do bridge⟩; no clone servido, jwks/ (drwxrwxr-x onion:onion, .pem -rw-rw-r--), docs/evolution/federation/members.yaml (-rw-rw-r--), .claude/sessions/ e docs/evolution/trust-log.md, e no bridge data/a2a-pending (drwxr-xr-x onion), são todos graváveis pelo UID onion; o src/chat.ts roda o agente do /chat no MESMO UID: o admin (bridge:admin) em bypassPermissions SEM deny, o convidado com bridge:write em default com Bash e deny só para Edit/Write no ⟨clone servido⟩ (Bash, e Write no data/ do bridge, não estão negados). bwrap presente; socat ausente. Não medido: quem tem bridge:write hoje no Logto"
     label: "o /chat roda no mesmo UID que é dono do JWKS, do registro, do estado de jti e da fila do clone servido: o admin em bypass e o convidado com bridge:write (pelo Bash que ele mesmo aprova) conseguem pinar chave ou forjar registro"
     provenance:
-      source: "⟨a VPS do core⟩: systemctl show/cat onion-vps-bridge, stat dos caminhos, GET /health; marciocar/onion-bridge@5ff4116:src/chat.ts"
-      locator: "chat.ts DENY_RULES e permissionMode por chamador; drop-in 20-hardening.conf"
+      source: "private-cite:RAfqIrTehpI9tF1tWAZtSg"
+      locator: "private-cite:RAfqIrTehpI9tF1tWAZtSg"
       method: "measurement: leitura na VPS com sudo -n só para ler, sem mudar nada"
       locality: "host"
   - id: D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A

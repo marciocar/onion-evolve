@@ -1650,7 +1650,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: "2026-07-21"
-    trace: "git rev-list --count c9eb2c40bc3b..HEAD = 292; git rev-list --count b8208cc1a3da..91d5dbb05a6d = 42; docs/evolution/federation/members.yaml (granaai onion_version, gustavo-pulga onion_version); gustavo-pulga@21ff04f:.claude/.onion-version (clone local; id do members.yaml)"
+    trace: "private-cite:AJga_JAy1_K5cA8X2idlJQ"
     label: "REFUTA 'o híbrido subtree+pin é o padrão certo, resolvido': a métrica que doeu em julho foi drift de pin silencioso — gustavo-pulga está 292 commits atrás do core (pin c9eb2c40bc3b, verificado por rev-list) e granaai chegou a 42 atrás antes de a própria sessão do adotante atualizar em 2026-07-19 (b8208cc1a3da→91d5dbb05a6d, 13 atrás hoje). Nenhum dos 9 docs de junho modela envelhecimento de pin"
     provenance:
       source: "git rev-list (onion-evolve) + docs/evolution/federation/members.yaml@4e54b052"
@@ -10516,7 +10516,7 @@ nodes:
     narrative: "label anterior: Raiz do repo contém apenas CLAUDE.md, CONTRIBUTING.md, LICENSE, README.md, docs/, plugins/, site/ — zero código de aplicação: a extração via subtree split foi executada"
     provenance:
       source: "commit f05ba421 (onion-evolve) + árvore @e94fd6f1"
-      locator: "git ls-tree --name-only e94fd6f1 (raiz); git ls-tree --name-only e94fd6f1 .claude/utils/ (sem messenger); corpo de f05ba421 l.5-10 (subtree split para marciocar/whatsapp-sender)"
+      locator: "private-cite:B2DzV-PfsS1_Tg1tmu5N1g"
       method: "reading: árvore do commit e94fd6f1 e corpo do commit f05ba421 (#252)"
   - id: SY6_ev_slm_virou_adr
     node_type: claim

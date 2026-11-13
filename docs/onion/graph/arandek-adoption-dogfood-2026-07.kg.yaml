@@ -3,7 +3,7 @@ meta:
   schema_version: "1"
   baseline: "2026-07-24"
   date: 2026-07-24
-  note: "Dogfood da adoção ArandekBR/arandek (legacy). 2 gaps reais + 1 refutação + 4 achados de campo (sinal da 1ª sessão de trabalho no adotante). Todos incorporados no core via PR #454 (merge d6aba0e)."
+  note: "Dogfood da adoção private-cite:SMO8lCfvZtAEa_HzAxrpXw (legacy). 2 gaps reais + 1 refutação + 4 achados de campo (sinal da 1ª sessão de trabalho no adotante). Todos incorporados no core via PR #454 (merge d6aba0e)."
 
 nodes:
   - id: C_GAP2
@@ -31,8 +31,8 @@ nodes:
     narrative: "label anterior: o ignore cego de .claude/ JÁ custara 242 arquivos (71 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante perdido em silêncio, não só o stamp Onion"
     trace: "arandek commits 1aa794f9 / 88d93f26"
     provenance:
-      source: "arandek@88d93f26 ; arandek@1aa794f9"
-      locator: "git ls-tree -r 88d93f26^ -- .claude (242 arquivos; 39 em .claude/commands; 70 .claude/skills/*/SKILL.md); corpo de 88d93f26 ('242 arquivos sob .claude/ removidos do index ... Arquivos permanecem no working tree') e de 1aa794f9"
+      source: "private-cite:2_qpkeh6xKM7TtVzizAauA"
+      locator: "private-cite:2_qpkeh6xKM7TtVzizAauA"
       method: "reading: história git do adotante arandek (commits 88d93f26 e 1aa794f9)"
       locality: "repo"
 
@@ -139,9 +139,9 @@ nodes:
     label: "verificado no arandek: .gitignore ignorava .claude/ (linhas 106+117); o durable-commit stajou 0 arquivos .claude/ (só docs/)"
     trace: "git ls-files .claude no onion-adopt-arandek pós 1º commit"
     provenance:
-      source: "arandek@611329a1:.gitignore ; arandek@611329a1 (1º commit durável)"
-      locator: ".gitignore l.106 e l.117 (\".claude/\"); 611329a1 \"chore(onion): adopt to pin 5e3ea5ee46ac\" (2026-07-24) — git diff-tree: 0 arquivos .claude/, 101 em docs/"
-      method: "reading: .gitignore do adotante em arandek@611329a1 (l.106 e l.117 = \".claude/\", conferido pelo juiz com git show) + diff-tree do 1º commit durável"
+      source: "private-cite:NFW0AcQjdtzAceIuGLjIYA"
+      locator: "private-cite:NFW0AcQjdtzAceIuGLjIYA"
+      method: "reading: .gitignore do adotante em private-cite:NFW0AcQjdtzAceIuGLjIYA@611329a1 (l.106 e l.117 = \".claude/\", conferido pelo juiz com git show) + diff-tree do 1º commit durável"
       locality: "repo"
 
   - id: E_GAP3_FP
@@ -182,8 +182,8 @@ nodes:
     label: "commits 1aa794f9 (remove .claude/) e 88d93f26 (untrack .claude/ mantém local) — 242 arquivos sumiram de todo checkout; busca exaustiva não achou cópia fora do git; sintoma = 8 refs mortas no CLAUDE.md"
     trace: "arandek git history mai/2026; git show 88d93f26^:.claude/"
     provenance:
-      source: "arandek@1aa794f9 ; arandek@88d93f26"
-      locator: "git ls-tree -r --name-only 88d93f26^ -- .claude"
+      source: "private-cite:COkARsYs6jeNMytfMPQhUg"
+      locator: "private-cite:COkARsYs6jeNMytfMPQhUg"
       method: "reading: git show/ls-tree dos commits 1aa794f9 e 88d93f26 no clone local de arandek"
       locality: "repo"
 
@@ -463,8 +463,8 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) git -C onion-evolve merge-base --is-ancestor d6aba0e 65d8a7501a03 (confirma que o pin d'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de update no adotante. A pergunta não tem mais objeto: já foi respondida pelo próprio comportamento do adotante, e a segunda cláusula (s'
     provenance:
-      source: "onion-evolve@5c40b1cc (merge-base d6aba0e → 65d8a7501a03) ; arandek@cd682ac4 (ArandekBR/arandek, último commit em .claude/.onion-version até 2026-09-01) ; docs/analysis/backlog-real-2026-09.md l.79"
-      locator: "git merge-base --is-ancestor d6aba0e 65d8a7501a03 (rc=0); no adotante, git log --all -- .claude/.onion-version: fbde45ad 07-25 (pin 65d8a750), 68f5cd8c 07-30, e05fd15a/908e8376/cd682ac4 08-31"
+      source: "private-cite:5uI-gDhnEP9NNzo5NvtTIA"
+      locator: "private-cite:5uI-gDhnEP9NNzo5NvtTIA"
       method: "measurement: git merge-base --is-ancestor d6aba0e 65d8a7501a03 → rc=0 e git log --all -- .claude/.onion-version no adotante → fbde45ad, 68f5cd8c, e05fd15a, 908e8376, cd682ac4 (reproduzidos pelo juiz em 2026-10-09)"
       locality: "repo"
 

@@ -36,8 +36,8 @@ nodes:
     verified_against: "piloto kg-freshness 2026-08-29: worker mediu papel contra o vivo (canais de escrita no repo); selo do maestro 2026-08-30"
     label: "colaborador visitante — acesso repo-only; entrega sinais como arquivos"
     provenance:
-      source: "gustavo-pulga@e88af2e:.claude/diary/2026-07-14-colaborador-visitante-acesso.md"
-      locator: "seção Signal (\"acesso repo-only: envia mensagens pelo repo ... sinais em docs/evolution/inbox/; não acessa o core nem relaya\")"
+      source: "private-cite:w4TDv-mw6ciLoxfqJDbeKA"
+      locator: "private-cite:w4TDv-mw6ciLoxfqJDbeKA"
       method: "reading: migalha de diário do adotante (commit e88af2e, 2026-07-14)"
   - id: EN_REPO
     node_type: entity
@@ -149,8 +149,8 @@ nodes:
     status: confirmed
     label: "branch two-tier — vendor(core)/adopt(integracao)/master(release)/work(pessoal)"
     provenance:
-      source: "gustavo-pulga@682fbcc:.claude/diary/2026-07-14-branch-model-two-tier.md"
-      locator: "l.16-17 (onion/vendor=core, onion/adopt=integração, master=release, work/<nome>=pessoal)"
+      source: "private-cite:wJrTYwc7-g-UaeEa62m-Hg"
+      locator: "private-cite:wJrTYwc7-g-UaeEa62m-Hg"
       method: "reading: migalha de diário do adotante (682fbcc)"
   - id: PO_SSOT_GIT
     node_type: policy
@@ -163,8 +163,8 @@ nodes:
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -rn "SSOT-de-registro" --include="*.md" --include="*.yaml" . | grep -v node_module => (1) "SSOT-de-registro" aparece em 3 lugares vivos: o próprio label do nó EN_REPO (linha 40 do mesmo grafo), o …'
     label: "git e o SSOT-de-registro canonico; ambientes sao vistas que leem/escrevem de volta"
     provenance:
-      source: "gustavo-pulga@682fbcc:.claude/diary/2026-07-14-ssot-compartilhado.md"
-      locator: "l.22 (\"git = SSOT-de-registro canônico; ambientes = views que leem/escrevem de volta\")"
+      source: "private-cite:2tgjtSg9ejngDDwK6u-RDQ"
+      locator: "private-cite:2tgjtSg9ejngDDwK6u-RDQ"
       method: "reading: migalha de diário do adotante (682fbcc)"
   # ---- camada audit (epistemica — teses e evidencias do que funciona) ----
   - id: E_TREINO_OK
@@ -191,9 +191,9 @@ nodes:
     status: confirmed
     label: "5 migalhas do diario (branch-model, visitante, ssot, ssh, design-vertical)"
     provenance:
-      source: "gustavo-pulga@e88af2e:.claude/diary/2026-07-14-*.md"
-      locator: "git ls-tree e88af2e .claude/diary/: as 5 migalhas de 2026-07-14 (branch-model-two-tier, colaborador-visitante-acesso, ssot-compartilhado, provisionamento-ssh-colaborador, design-vertical-e-onboarding-autoguiado)"
-      method: "reading: diário do adotante no clone local (gustavo-pulga@e88af2e)"
+      source: "private-cite:9bPFJW6UJ1cD00S05HD-2A"
+      locator: "private-cite:9bPFJW6UJ1cD00S05HD-2A"
+      method: "reading: diário do adotante no clone local (private-cite:9bPFJW6UJ1cD00S05HD-2A@e88af2e)"
   - id: E_RETRO
     node_type: evidence
     layer: audit
@@ -227,9 +227,9 @@ nodes:
     label: "colaboracao assincrona via repo (I3) segue o substrato para o qual o estado-da-arte converge: git como coordenacao assincrona grosseira, adequada ao ritmo humano da dupla"
     narrative: "label anterior: colaboracao assincrona via repo (I3) escala sem chat ao vivo compartilhado"
     provenance:
-      source: "gustavo-pulga@2e5e0a4: relatório colaboracao-moderna-2026.md da deep-research (na pasta da vertical privada do adotante; nome omitido pela REGRA 30) + gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
-      locator: "relatório l.12-13 (converge para git como substrato de coordenação assíncrona), l.25 (finding 1, voto 3-0), l.45-49 (git = assíncrona grosseira; adequado ao ritmo humano×humano da dupla); KB l.10-11, l.21 (delivery-without-commit = I3), l.31"
-      method: "reading: relatório da deep-research do adotante e KB destilada dele, ambos no commit gustavo-pulga@2e5e0a4"
+      source: "private-cite:vVC_2oUKHn5Axcc1bzcGkQ"
+      locator: "private-cite:vVC_2oUKHn5Axcc1bzcGkQ"
+      method: "reading: relatório da deep-research do adotante e KB destilada dele, ambos no commit private-cite:vVC_2oUKHn5Axcc1bzcGkQ@2e5e0a4"
   - id: C_ONBOARDING_AUTOGUIADO
     node_type: claim
     layer: audit
@@ -239,9 +239,9 @@ nodes:
     status: confirmed
     label: "onboarding auto-guiado (usar+ajustar, exemplo preenchido) reduz friccao de adocao"
     provenance:
-      source: "gustavo-pulga@682fbcc:.claude/diary/2026-07-14-design-vertical-e-onboarding-autoguiado.md"
-      locator: "seção Evidence (exemplo preenchido copiável mata a fricção; \"usar+ajustar, não criar do zero\")"
-      method: "reading: migalha de diário do adotante (gustavo-pulga@682fbcc)"
+      source: "private-cite:0hdkFo14DS599idAPshtUA"
+      locator: "private-cite:0hdkFo14DS599idAPshtUA"
+      method: "reading: migalha de diário do adotante (private-cite:0hdkFo14DS599idAPshtUA@682fbcc)"
   - id: D_KG_SEPARADO
     node_type: decision
     layer: audit
@@ -280,9 +280,9 @@ nodes:
     status: confirmed
     label: "deep-research colaboracao moderna 2026 (24 fontes, 9 findings verificados) — preprints, cautela"
     provenance:
-      source: "gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
-      locator: "l.3-7 (cabeçalho: fonte = deep-research citado, \"24 fontes, 9 findings verificados adversarialmente\"; \"fontes centrais são preprints\")"
-      method: "reading: KB do adotante que resume o relatório da deep-research (gustavo-pulga@2e5e0a4)"
+      source: "private-cite:XTjHNQMCOx3aazJXd0CH-w"
+      locator: "private-cite:XTjHNQMCOx3aazJXd0CH-w"
+      method: "reading: KB do adotante que resume o relatório da deep-research (private-cite:XTjHNQMCOx3aazJXd0CH-w@2e5e0a4)"
   - id: C_I3_VALIDADO
     node_type: claim
     layer: audit
@@ -292,8 +292,8 @@ nodes:
     status: confirmed
     label: "delivery-without-commit (I3) validado externamente pelo KPR (Knowledge-Based Pull Requests)"
     provenance:
-      source: "gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
-      locator: "l.21 (linha Delivery-without-commit: KPR -> I3) + l.58 (KPR arxiv 2606.26721)"
+      source: "private-cite:ZB_FtNl42ZwMmSvGriP_cg"
+      locator: "private-cite:ZB_FtNl42ZwMmSvGriP_cg"
       method: "reading: KB do adotante que cita o KPR (preprint arxiv 2606.26721)"
   - id: C_RETRO_CIENTIFICA
     node_type: claim
@@ -304,8 +304,8 @@ nodes:
     status: confirmed
     label: "retro que combina perceptual + dado objetivo e a recomendada pela ciencia (DevEx)"
     provenance:
-      source: "gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
-      locator: "l.26 (Feedback perceptual + objetivo: DevEx, ACM Queue 2023)"
+      source: "private-cite:yVe12mFGl_SEps9seUfE0w"
+      locator: "private-cite:yVe12mFGl_SEps9seUfE0w"
       method: "reading: KB do adotante que cita DevEx (ACM Queue 2023)"
   - id: C_NPS_PREDITOR
     node_type: claim
@@ -469,8 +469,8 @@ nodes:
     verified_against: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cd <clone local de membro-t2> && ls -la docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml && grep -c '🔒'"
     label: 'MEDIDO 2026-09-01, a verdade atual supera o label de julho: O label afirma ''nos 🔒 marcados'' (plural, marcação estrutural explícita por nó). No vivo: só 1 nó (D_UPSELL) está marcado como confidencial, e o marcador real é ⚠️ num comentário de cabeçalho do arquivo — não 🔒, não um campo por nó, não plural. As outras duas cláusulas do label (''fica no repo dev'' e ''nunca sai'') s'
     provenance:
-      source: "gustavo-pulga@4113a55:docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml"
-      locator: "l.3 (cabeçalho ⚠️ marcando só D_UPSELL como confidencial) + grep -c 🔒 = 0"
+      source: "private-cite:_Da7TO32WhCjL1OkGIzMhw"
+      locator: "private-cite:_Da7TO32WhCjL1OkGIzMhw"
       method: "reading: arquivo do grafo do engajamento no repo do adotante (último commit 4113a55)"
 
   - id: E_RELAY_NAO_EXCLUSIVO_2026_09

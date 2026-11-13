@@ -1634,10 +1634,10 @@ nodes:
     source_kind: primary
     label: "REFUTA a premissa do B1 como desenhado: check run que nasce de workflow_dispatch NÃO satisfaz required_status_checks do ruleset, nem para o admin. Checks de evento push e o check run publicado pela API satisfazem."
     narrative: "T2 com prova por workflow_dispatch: os 2 checks estavam completed:success no SHA com app 15368 e o push foi recusado mesmo assim. Dois controles (o admin empurrando o mesmo SHA; um SHA verde só por dispatch disparado pelo admin, recusado duas vezes com minutos de intervalo) e uma contraprova (SHAs verdes por push entram). A CAUSA não foi explicada; a medição é robusta (2 atores, 2 momentos). Isto derruba o passo 'dispara selftest+validate por workflow_dispatch' de C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS, não o B1 inteiro (ver E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS)."
-    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506294705"
+    trace: "private-cite:QMRXsgqvAtwqx6Hvo_eYug"
     provenance:
-      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506294705"
-      locator: "run 38506294705; rule-suites 4511927226, 4511931585, 4511952179, 4511956409"
+      source: "private-cite:QMRXsgqvAtwqx6Hvo_eYug"
+      locator: "private-cite:QMRXsgqvAtwqx6Hvo_eYug"
       method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
@@ -1652,10 +1652,10 @@ nodes:
     source_kind: primary
     label: "O escritor entra no main por fast-forward SEM bypass se ele mesmo rodar os checks no job e publicar os check runs pela API. A garantia do ruleset vira 'um job do Actions publicou sucesso com esse nome', não 'o workflow selftest rodou'."
     narrative: "Fecha Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD (a pergunta central) e Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY (T6: nenhum push aceito saiu por bypass; a avaliação da regra deu pass). Consequência declarada pelo agente: qualquer workflow com checks: write pode publicar selftest-gate; o escritor precisa rodar os comandos reais e publicar o rc lido, nunca um sucesso fixo. Variante NÃO testada: o próprio workflow selftest despachado publicar ao final um check run extra com o nome exigido."
-    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506709399"
+    trace: "private-cite:Vrpg6PFb4f9iTIGh6EXJkA"
     provenance:
-      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506709399"
-      locator: "run 38506709399; rule-suite 4511975684; GET rule-suites?rule_suite_result=bypass"
+      source: "private-cite:Vrpg6PFb4f9iTIGh6EXJkA"
+      locator: "private-cite:Vrpg6PFb4f9iTIGh6EXJkA"
       method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_NOCHECKS_REJECTED
@@ -1670,10 +1670,10 @@ nodes:
     source_kind: primary
     label: "O caminho de falha segura vale: SHA sem checks é recusado para o escritor e para o admin direto (o bypass do admin é só em PR)."
     narrative: "T3 e T1 do dogfood. É o modo de falha que o Elenxo exigiu antes de confiar no caminho feliz."
-    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507118410"
+    trace: "private-cite:4vsCCs27WWgAR-WoM2adRQ"
     provenance:
-      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507118410"
-      locator: "run 38507118410; rule-suites 4512026189 e 4511883675"
+      source: "private-cite:4vsCCs27WWgAR-WoM2adRQ"
+      locator: "private-cite:4vsCCs27WWgAR-WoM2adRQ"
       method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_PR_BY_GITHUB_TOKEN_NEEDS_APPROVAL
@@ -1688,10 +1688,10 @@ nodes:
     source_kind: primary
     label: "A prova por PR aberto pelo GITHUB_TOKEN não é autônoma: os runs nascem action_required e exigem aprovação humana a cada run."
     narrative: "Fecha a via 'PR do bot' como forma de obter os checks sem humano; reforça a escolha da variante check run e mantém o B2 (PR rolante) dependente de token de App."
-    trace: "https://github.com/marciocar/onion-ruleset-sandbox/pull/1"
+    trace: "private-cite:DJgPmgyFZ1CbxTo4gLfZEQ"
     provenance:
-      source: "https://github.com/marciocar/onion-ruleset-sandbox/pull/1"
-      locator: "run 38506834350; PR #1"
+      source: "private-cite:DJgPmgyFZ1CbxTo4gLfZEQ"
+      locator: "private-cite:DJgPmgyFZ1CbxTo4gLfZEQ"
       method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_ON_PUSH_SILENCED_AND_CURED
@@ -1706,10 +1706,10 @@ nodes:
     source_kind: primary
     label: "CONFIRMA Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS: o push do escritor não dispara on:push. A cura testada é o escritor redisparar os workflows do main por workflow_dispatch ou repository_dispatch."
     narrative: "Os workflows atingidos precisam aceitar esses eventos, e o inventário de quem fica mudo no core continua obrigatório (não feito no dogfood)."
-    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507152179"
+    trace: "private-cite:Wy5o55c-fx895hM-IaFWcQ"
     provenance:
-      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507152179"
-      locator: "GET actions/runs?head_sha=63e8d4f; run 38507152179; probes 38507169010 e 38507172687"
+      source: "private-cite:Wy5o55c-fx895hM-IaFWcQ"
+      locator: "private-cite:Wy5o55c-fx895hM-IaFWcQ"
       method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP
@@ -1724,10 +1724,10 @@ nodes:
     source_kind: primary
     label: "RESPONDE Q_B1_NON_FF_RACE_REDISPATCH: o retry (regenerar da ponta nova, novo SHA, nova prova) converge em intrusos+1 ciclos e o teto PARA de verdade. Cada ciclo paga a prova inteira; no core, a bancada de ~14,8 min."
     narrative: "O custo por ciclo empurra para coalescer (concurrency group serial). O writer.yml do sandbox morria em silêncio no push recusado (bash -eo pipefail do Actions) até ganhar set +e: armadilha a levar para o core."
-    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507262580"
+    trace: "private-cite:N6x8tNbX1yy8P0NRsIcBsA"
     provenance:
-      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507262580"
-      locator: "runs 38507262580 e 38507319397"
+      source: "private-cite:N6x8tNbX1yy8P0NRsIcBsA"
+      locator: "private-cite:N6x8tNbX1yy8P0NRsIcBsA"
       method: "measurement: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
       locality: "web"
   - id: Q_GUARDA_DE_MAIN_CASA_PELO_NOME
@@ -1766,7 +1766,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-14"
     verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Apagar»"
-    label: "o sandbox do B1 (repo público marciocar/onion-ruleset-sandbox) é apagado: as medições vivem no grafo, e um B1 futuro re-mede fresco contra o GitHub do dia"
+    label: "o sandbox do B1 (repo público private-cite:H37TDNHx-AIhA0mG-NDeuw) é apagado: as medições vivem no grafo, e um B1 futuro re-mede fresco contra o GitHub do dia"
     narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Apagar»; descartadas: «Arquivar» · «Manter como está»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
