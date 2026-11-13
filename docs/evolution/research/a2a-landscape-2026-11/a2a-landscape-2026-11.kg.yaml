@@ -635,7 +635,7 @@ nodes:
     confidence: 0.6
     label: "A spec v1 define GetTask, TaskPushNotificationConfig e os estados INPUT_REQUIRED e AUTH_REQUIRED; o perfil Onion JÁ devolve input_required como gate humano, mas não serve tasks/get, push nem AUTH_REQUIRED: a lacuna é consultar o desfecho, não a pausa."
     narrative: "Medida: WebFetch da página de definições (GetTask, TaskPushNotificationConfig, TaskState 6/8) e grep no onion-bridge-dev em 7e736ba (src/a2a.ts:96 state input_required) e no core (.claude/validation/a2a-agent-card.sh:27-61, capabilities streaming/push false, sem tasks/get). Critério: V2_CONTRADITA. Alvo reprovado: 'O perfil Onion, sem tasks/get nem push, não cobre esses elementos nativos' (tier 9). Limita a premissa de E_OBJECAO_07 (a2a-empresa-adotante-2026-10) de que o Onion já usa tasks/get para a volta. Afirmação de UM juiz, sem votação."
-    trace: "grep -n 'input_required' src/a2a.ts src/server.ts (onion-bridge-dev@7e736ba) && grep -n 'tasks/get\\|pushNotifications' .claude/validation/a2a-agent-card.sh"
+    trace: "private-cite:qXKI2c-P0XZ2EZeM5ow0dw"
 
   - id: C_SUPERACAO_20261104_A2A_1_0_LINE_AISIX_SELF_DECLARED
     node_type: claim

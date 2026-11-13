@@ -225,8 +225,8 @@ nodes:
     label: "Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria)."
     narrative: "O nó da curadoria fica no repo dela e entra pela proveniência fixada no sha, conferida por peer-ref-check (rc 0 @ e3db38e). Anotado em 2026-10-28, pela curadoria: depois, por escolha do maestro, sem prazo."
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/e3db38edbfd8d28e4d5b21c3e3101d1344df7937/docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#Q_MC_BROWSER_LOCAL"
-      locator: "Q_MC_BROWSER_LOCAL @ e3db38edbfd8"
+      source: "private-cite:fLeeaFg54QxiXNuXIu7VAQ"
+      locator: "private-cite:fLeeaFg54QxiXNuXIu7VAQ"
       method: "reading: peer-ref-check.sh no clone local da curadoria, nó lido por kg_query.py"
       locality: "web"
   - id: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA

@@ -97,8 +97,8 @@ nodes:
     narrative: "Este grafo nasceu em 2026-10-14, antes da exigência de superação e critério no veredito negativo (SAC-151, 2026-10-15), e por isso o censo o recusava desde então: 'veredito NEGATIVO parquear RECUSADO: sem x_dissect_criterion, sem x_dissect_overcoming'. A origem já tinha os campos (D_SUPERPOWERS_2610, verificado no par); a triagem do core não os copiou. A cura é declarar no nó da triagem o critério da origem e a superação nenhuma, com a medida refeita hoje, sem mexer no veredito. Q_REABRIR_TRES_SKILLS segue fechado porque nenhuma das 3 skills foi rodada em worktree contra tarefa de bancada no core; Q_REABRIR_CARIMBO_POR_PROBE, porque nem o kg-freshness nem o census devolvem probe {argv[], expect_regex}."
     trace: "docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml"
     provenance:
-      source: "main do core em 8857bc9b; github.com/marciocar/onion-curation@f2118c198678:docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml"
-      locator: "D_SUPERPOWERS_2610 do adotante (x_dissect_criterion, x_dissect_overcoming e x_dissect_overcoming_measure); saída dos três greps e do critério no core"
+      source: "private-cite:OJrPhfipLmsFcD9ehrYjnQ"
+      locator: "private-cite:OJrPhfipLmsFcD9ehrYjnQ"
       method: "measurement: critério e buscas re-rodados na main do core, e o nó do par conferido por peer-ref-check.sh, em 2026-10-27"
       locality: "repo"
 

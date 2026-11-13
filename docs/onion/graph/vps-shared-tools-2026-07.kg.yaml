@@ -61,7 +61,7 @@ nodes:
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
     provenance:
       source: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
-      locator: "ledger l.22 (ENT_whatsapp DRIFTED: WAHA vivo; whatsapp-sender inexistente) · corpo de 8b005f65 l.49-53 (sudo find no workspace do bridge: o diretório existe, o serviço não) · onion-waha@86662e01:docker-compose.yml l.12 (image devlikeapro/waha:latest) e l.16 (127.0.0.1:3999:3000)"
+      locator: "private-cite:ydlTOvrRlVfCVKspHjeQwg"
       method: "testimony: medição no host vivo da VPS em 2026-08-06/07 (ps, docker ps -a, systemctl, sudo find), registrada no ledger M8 e nos commits a8b6cfb7/8b005f65; 234M, mtime de .wwebjs_auth, \"running desde 2026-08-05\" e o 401 não têm comando versionado"
       locality: "repo"
 
@@ -108,8 +108,8 @@ nodes:
     verified_against: "CAMPO VERIFICADO 2026-08-20 (maestro no navegador): SSO Onion ID login success — ES384 PROVADO em uso real (1o precedente Logto+LibreChat conhecido); troca de conta via end-session OK; chat Claude streaming OK; documento-em-contexto OK (teto default ~34k p/ modelo desconhecido no v0.8.7 — v0.8.8 traz os token maps da familia 5); Meili com primary key explicita e 7 docs (pegadinha 12538 nao mordeu); VIA RAG PROVADA no F6.2 (2026-08-20): agente Onion-KB com 4 bundles/92 KBs, pgvector 0->793 embeddings, teste de aceitacao via Agents API respondeu as 5 etapas do Elenxo COM citacao de arquivo-fonte. UPGRADE v0.8.8-rc1 (2026-08-20, carta branca do maestro; backup pre-upgrade): sonnet-5 pleno de volta ao agente (re-testado com citacao); skillSync segue SEM caller de boot ate no rc1 — a gestao e do Admin Panel (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo) — painel onion-vps-librechat-admin no ar, pin 1.0.0, LOOPBACK-ONLY 3027 (superficie admin = tunel, doutrina da casa); FECHADO 2026-08-20: 11/11 skills sincronizadas (run succeeded via POST /api/admin/skills/sync/run; o gate final era github.enabled default-off, ligado pelo painel como override role __base__); periodicidade por MECANISMO — skill-sync-run.sh (JWT cunhado) no cron root 05:15, testado como marcio e root. A INTEGRACAO #1 DO TOP-5 ESTA ENTREGUE: o repo Onion e fonte VIVA das skills do LibreChat. 4 fixes de campo commitados no repo da VPS (secret null->vivo, end-session, LOGIN_MAX 20, conta admin promovida a openid c/ break-glass documentado)"
     label: "LIBRECHAT NO AR (2026-08-20, boot verificado por comportamento): face de chat multiusuario da casa (chat.onionevolve.com), SSO Logto, so-Anthropic v1, escopo completo com RAG. Pesquisa-fonte: docs/evolution/research/librechat-2026-08/ (3 exploracoes, mapa TRANSFERE/DESENHA/NAO-VALE). NAO e adapter SDAAL: e consumidor das ferramentas do catalogo"
     provenance:
-      source: "onion-vps-librechat@c943a9b"
-      locator: "README.md l.9-12 (\"chat.onionevolve.com — SSO Logto (Onion ID), só Anthropic na v1 (família Claude 5), escopo completo com RAG\") + corpo do commit (\"boot verificado... VERIFICADO POR COMPORTAMENTO\"); onion-vps-catalog-doctrine.md l.187; docs/evolution/research/librechat-2026-08/SYNTHESIS.md l.12 e l.50-55"
+      source: "private-cite:nfJ4sVOJY29JdC9JCmhnpg"
+      locator: "private-cite:nfJ4sVOJY29JdC9JCmhnpg"
       method: "testimony: leitura do commit c943a9b no repo onion-vps-librechat (sem remoto alcançável; host) + KB e síntese versionadas no core"
       locality: "host"
 
@@ -528,7 +528,7 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-22"
-    verified_against: "curl -sI https://sandbox.onionevolve.com/sandbox.html = HTTP/2 200 com o CSP do vhost e nosniff; sha256 da página servida igual ao de onion-bridge@63542508:deploy/sandbox/sandbox.html (bd412290…); bridge servido 63542508 (onion-bridge#83 e #84 mergeados pelo maestro); CLI embutido do SDK 0.3.308 = 2.1.308"
+    verified_against: "curl -sI https://sandbox.onionevolve.com/sandbox.html = HTTP/2 200 com o CSP do vhost e nosniff; sha256 da página servida igual ao de private-cite:bMkAuUIlE3loWiq0mZhB4A@63542508:deploy/sandbox/sandbox.html (bd412290…); bridge servido 63542508 (onion-bridge#83 e #84 mergeados pelo maestro); CLI embutido do SDK 0.3.308 = 2.1.308"
     label: "A sandbox do piloto ui:// está no ar: o update-bridge publicou o sandbox.html (2980 bytes, root:root 0644) e a origem responde 200 com o CSP; o vhost passa a cobrar o 200 no verify. Falta só o teste no navegador"
     provenance:
       source: "saída do ops/update-bridge.sh de 2026-10-22 12:2x UTC (invocação 8e630b44) e curl ao vivo"
@@ -708,7 +708,7 @@ nodes:
     narrative: "Executa D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022 (decisão do maestro, 2026-10-22). O PR do onion-waha também registra três mudanças que rodavam no vivo desde 2026-08-10 sem commit (nome do projeto, container_name onion-vps-waha, chave da API em sha512)."
     provenance:
       source: "https://github.com/devlikeapro/waha/releases/tag/2026.9.2"
-      locator: "releases 2026.8.1 a 2026.9.2; Docker Hub devlikeapro/waha tags latest-2026.7.2 e latest-2026.9.2; PR marciocar/onion-waha#1"
+      locator: "private-cite:Et1n8EL0TFmnpG4UInf9Hg"
       method: "measurement: digest do container vivo contra as tags publicadas e leitura do changelog"
       locality: "web"
 

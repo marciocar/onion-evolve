@@ -125,8 +125,8 @@ nodes:
     trace: ".claude/validation/projection-safety.sh"
     verified_against: "lint-artifacts.sh rodado em LC_ALL=C na cópia da branch chore/onion-update-bd769f168411 do adotante: 5 HARD, todos [vendor-scrub] nome da fonte privada; sem o default (fonte inexistente) 0 HARD"
     provenance:
-      source: "brain-granaai@bd769f168411 (branch chore/onion-update-bd769f168411), cópia local sem histórico; projection-safety.sh e lint-artifacts.sh de origin/main bd769f16"
-      locator: "linha CLIENT_TERMS_FILE do projection-safety.sh (P8) e check_vendored_surface_clean do lint-artifacts.sh (bloco --emit-declared)"
+      source: "private-cite:ERco7oNb3FIV6r7LCl_4eQ"
+      locator: "private-cite:ERco7oNb3FIV6r7LCl_4eQ"
       method: "measurement: lint completo antes e depois da troca dos dois scripts, contando as linhas [vendor-scrub] e o sumário HARD"
       locality: "host"
 

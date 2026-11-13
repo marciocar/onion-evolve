@@ -48,15 +48,15 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-16"
-    verified_against: "grafo da dissecação do anarlog no repo de curadoria (onion-curation@aa70452), lido inteiro pela triagem: D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE e E_ELENXO_CORRECTIONS"
+    verified_against: "grafo da dissecação do anarlog no repo de curadoria (private-cite:JTvidJHAbPgZzuWxIFympw@aa70452), lido inteiro pela triagem: D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE e E_ELENXO_CORRECTIONS"
     source_tier: 8
     source_kind: primary-repo
     label: "A dissecação da curadoria sustenta o costurar: o export por CLI devolve as palavras com tempo, canal e falante só lendo o banco; o motor STT embutido só existe em macOS Apple Silicon, e no Linux o provedor custom aponta um servidor local, não medido."
     trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
     narrative: "Tudo do lado de lá é LEITURA de código no pin: nada foi compilado nem executado (E_N2_NOT_RUN, open). O aviso do anarlog é constante em inglês, vem desligado por padrão e é postado por acessibilidade da UI; no Windows a função recusa (E_N2_CONSENT_EVIDENCE_MODEL). Isso pesa na pergunta da máquina de captura, que o maestro respondeu ser Windows."
     provenance:
-      source: "github.com/marciocar/onion-curation@aa70452:docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml"
-      locator: "nós D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE, E_ELENXO_CORRECTIONS"
+      source: "private-cite:JTvidJHAbPgZzuWxIFympw"
+      locator: "private-cite:JTvidJHAbPgZzuWxIFympw"
       method: "reading: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
       locality: "repo"
 

@@ -74,8 +74,8 @@ nodes:
     verified_against: 'host-vps-medido-pos-flip (recarimbo Onda 8, 2026-09-01) — claim medida VERDADEIRA: /a2a 403 com token a2a, a2aGuard nao olha authMode; flip open->confirmed no fechamento W8 (2026-09-02)'
     label: "[ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat e /commands agora exigem OIDC. Medido: /a2a segue caso à parte (a2aGuard não olha authMode) — 403 com token a2a = gate vivo, 3 tokens dedicados no pool.] Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito"
     provenance:
-      source: "onion-bridge@38702f0:src/server.ts + .claude/utils/federation-transport/a2a-verify.sh"
-      locator: "server.ts l.46-60 (a2aGuard só config.a2aTokens, sem authMode), l.63-66 (/chat,/commands authGuard; /a2a a2aGuard), l.94 (fora de dual-legacy → 401); a2a-verify.sh l.15-25 (camadas 0-6); docs/analysis/backlog-real-2026-09.md l.28"
+      source: "private-cite:yS4dHfebsl5kkTIJLRU2wQ"
+      locator: "private-cite:yS4dHfebsl5kkTIJLRU2wQ"
       method: "reading: código do bridge pós-flip e do gate a2a do core"
 
   # ---- ENTIDADES (o terreno) ----
@@ -108,8 +108,8 @@ nodes:
     verified_against: host-vps-medido-pos-flip
     label: "[PÓS-FLIP 2026-07-27: REBAIXADO — não abre mais /chat nem /commands (execução exige OIDC). Sobrevive como chave de /admin (adminGuard) e /a2a (a2aGuard), que não olham o authMode. P9 (aposentar de vez) NÃO feito: gated em C_p9_blocked_no_admin_oidc, senão o /admin/* morre sem reposição.] AUTH_TOKEN próprio do bridge — segredo estático/compartilhado do serviço, não ligado a members.yaml nem a papel/tier. Era o artefato a APOSENTAR (P9) imediatamente após o P8; a janela dual-legacy fechou no P7, mas o valor sobrevive para admin/a2a"
     provenance:
-      source: "onion-bridge@c22517e:src/server.ts + onion-bridge@38702f0:src/server.ts"
-      locator: "c22517e (2026-07-27) l.29 adminGuard compara AUTH_TOKEN, l.40 a2aGuard aceita authToken, l.77 authMode≠dual-legacy fecha /chat; 38702f0 l.30-35 e l.49-52 (P9 removeu os dois bypass → refuted)"
+      source: "private-cite:J1g7xaMfqUpwh4SPn64seQ"
+      locator: "private-cite:J1g7xaMfqUpwh4SPn64seQ"
       method: "reading: código versionado do bridge no estado de 2026-07-27 e pós-P9"
 
   # ---- FIX G: A CITAÇÃO DE I3 ESTAVA ERRADA (a POSTURA se mantém, a âncora muda) ----
@@ -653,11 +653,11 @@ nodes:
     impact: 3
     confidence: 0.95
     label: "PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legado ainda autenticava (degradado); agora NINGUEM autentica (queda total) E cada request re-busca o JWKS (medido pelo 6o Elenxo com IdP num buraco negro: 3 reqs seguidas, 5s cada, um fetch novo por request — retry storm contra a dependencia que ja esta caindo). O piso de 60s (identity.ts:41) so guarda o ramo force=true; o ramo normal so retorna cedo com cache POPULADO e fresco, e jwksFetchedAt so atualiza no sucesso. CURA DESENHADA pelo Elenxo (jwksAttemptedAt marcando a TENTATIVA + timeout de 5s no fetch + jwksSelfCheck reportando ok=cache.size>0). GATILHO: PR proprio no bridge; e o /health mentindo ok:true durante queda do IdP entra na mesma cura."
-    trace: "onion-bridge@a99994aa:src/identity.ts"
+    trace: "private-cite:8VdU6xQcZfRcReSM37sd0g"
     provenance:
-      source: "onion-bridge@a99994aa:src/identity.ts"
-      locator: "CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em onion-bridge (produção)/src/identity.ts, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)"
-      method: "reading: src/identity.ts em onion-bridge@a99994aa (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
+      source: "private-cite:8VdU6xQcZfRcReSM37sd0g"
+      locator: "private-cite:8VdU6xQcZfRcReSM37sd0g"
+      method: "reading: src/identity.ts em private-cite:8VdU6xQcZfRcReSM37sd0g@a99994aa (remoto private-cite:8VdU6xQcZfRcReSM37sd0g; arquivo na data 2026-09-02)"
       locality: "repo"
 
   - id: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
@@ -670,11 +670,11 @@ nodes:
     impact: 4
     confidence: 0.95
     label: "PRE-EXISTENTE, achado pelo 6o Elenxo ao procurar 'outra rota cara fora do rate-limit': POST /a2a faz spawnSync do gate do core (a2a.ts:50, timeout 15s) — e spawnSync BLOQUEIA o event loop do Node inteiro. Medido com gate falso dormindo 5s: /health foi de 9,6ms a 3,99s durante UM unico request a2a; todos os streams SSE de /chat congelam junto. Um remetente a2a (autenticado por token de pool, nao identidade) pode negar servico ao bridge inteiro dentro do timeout. CURA: spawn assincrono (execFile+promise) + rate-limit proprio no /a2a. GATILHO: PR proprio no bridge, junto ou apos o do JWKS."
-    trace: "onion-bridge@9d33d7eb:src/a2a.ts"
+    trace: "private-cite:dAshXl0p_S2Xe0gVM2LjsQ"
     provenance:
-      source: "onion-bridge@9d33d7eb:src/a2a.ts"
-      locator: "FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync onion-bridge (produção)/src/a2a.ts = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real"
-      method: "reading: src/a2a.ts em onion-bridge@9d33d7eb (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
+      source: "private-cite:dAshXl0p_S2Xe0gVM2LjsQ"
+      locator: "private-cite:dAshXl0p_S2Xe0gVM2LjsQ"
+      method: "reading: src/a2a.ts em private-cite:dAshXl0p_S2Xe0gVM2LjsQ@9d33d7eb (remoto private-cite:dAshXl0p_S2Xe0gVM2LjsQ; arquivo na data 2026-09-02)"
       locality: "repo"
 
   # ---- F4 (preservado): ACOPLAMENTO BRIDGE->LOGTO ----
@@ -903,7 +903,7 @@ nodes:
     status: confirmed
     verified_at: "2026-07-26"
     verified_against: host-vps-medido
-    label: "FIX A APLICADO 2026-07-26 (sessão do core, permissão explícita do maestro; hardening NAO-AUTH, sem risco de lockout). Drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. VERIFICADO NO EFETIVO lendo o cgroup: system.slice/memory.min 0 -> 402653184 e memory.low 0 -> 805306368; caddy (67108864) e onion-bridge (268435456) agora tem ancestral que concede protecao. Reverter: rm o arquivo + daemon-reload. A CLASSE do problema (varredura dos demais floors) segue aberta em Q_floors_effective"
+    label: "FIX A APLICADO 2026-07-26 (sessão do core, permissão explícita do maestro; hardening NAO-AUTH, sem risco de lockout). Drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. VERIFICADO NO EFETIVO lendo o cgroup: system.slice/memory.min 0 -> 402653184 e memory.low 0 -> 805306368; caddy (67108864) e private-cite:enLLNM8atP6cjMz7C-mYUA (268435456) agora tem ancestral que concede protecao. Reverter: rm o arquivo + daemon-reload. A CLASSE do problema (varredura dos demais floors) segue aberta em Q_floors_effective"
     narrative: "trace anterior (só no host): o drop-in system.slice.d/10-memory-protection.conf do systemd do host (fora de repo)."
     provenance:
       source: "drop-in 10-memory-protection.conf do system.slice no systemd do host (host)"
@@ -932,7 +932,7 @@ nodes:
 
   - id: E_p0_logto_tenant_measured
     node_type: evidence
-    trace: "onion-logto@7c008b2e:docker-compose.yml"
+    trace: "private-cite:v20WGmY_GI1JD5-8EITZQQ"
     layer: audit
     plane: DEV
     impact: 5
@@ -1038,7 +1038,7 @@ nodes:
 
   - id: E_p5_identity_live
     node_type: evidence
-    trace: "onion-bridge@c22517ee:src/identity.ts"
+    trace: "private-cite:RsWUL6jymnEIRP6B3A9OzQ"
     layer: audit
     plane: DEV
     impact: 5
@@ -1057,7 +1057,7 @@ nodes:
 
   - id: C_pwa_has_no_pkce
     node_type: claim
-    trace: "onion-bridge@c22517ee:web/src/App.tsx:21"
+    trace: "private-cite:482nAik112vmvxx13yl_SQ"
     layer: audit
     plane: DEV
     impact: 5
@@ -1130,7 +1130,7 @@ nodes:
 
   - id: C_p9_blocked_no_admin_oidc
     node_type: claim
-    trace: "onion-bridge@c22517ee:src/server.ts:27"
+    trace: "private-cite:FJruNkjxnvq4-wTPSIY1RQ"
     layer: audit
     plane: DEV
     impact: 4
@@ -1154,17 +1154,17 @@ nodes:
     status: confirmed
     verified_at: "2026-08-27"
     verified_against: "server.ts vivo lido via sudo (1o /meta:drive na onda m2-bridge): adminGuard L225 chama verifyAccessToken(bearer,'bridge:admin') — OIDC com escopo admin; a2aGuard L37 so config.a2aTokens.has(bearer), bypass do admin REMOVIDO"
-    trace: "onion-bridge@7e736ba2:src/server.ts:225"
+    trace: "private-cite:qHWHyytTEzqVlroknCIWwA"
     label: "SUPERA C_p9: o pre-requisito que C_p9 dizia NAO-feito (caminho admin via OIDC, scope/sub->admin) ESTA FEITO. Medido 2026-08-27 no server.ts vivo: adminGuard (L225) NAO usa mais config.authToken — chama verifyAccessToken(bearer,'bridge:admin'), OIDC com escopo dedicado; a2aGuard (L37) aceita SO config.a2aTokens, o bypass do segredo de admin foi removido (comentario no codigo: 'P9 — o bypass do segredo de admin SAIU'). Logo P9 (aposentar o AUTH_TOKEN legado) deixou de estar bloqueado — o bridge avancou desde 2026-07-27. C_p9 nao errou (estava certo quando escrito); a realidade andou (DRIFTED). Achado do /meta:drive medindo o vivo."
     provenance:
-      source: "onion-bridge@7e736ba2:src/server.ts"
-      locator: "server.ts vivo lido via sudo (1o /meta:drive na onda m2-bridge): adminGuard L225 chama verifyAccessToken(bearer,'bridge:admin') — OIDC com escopo admin; a2aGuard L37 so config.a2aTokens.has(bearer), bypass do admin REMOVIDO"
-      method: "reading: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-27)"
+      source: "private-cite:qHWHyytTEzqVlroknCIWwA"
+      locator: "private-cite:qHWHyytTEzqVlroknCIWwA"
+      method: "reading: src/server.ts em private-cite:qHWHyytTEzqVlroknCIWwA@7e736ba2 (remoto private-cite:qHWHyytTEzqVlroknCIWwA; arquivo na data 2026-08-27)"
       locality: "repo"
 
   - id: C_flip_was_partial
     node_type: claim
-    trace: "onion-bridge@c22517ee:src/server.ts"
+    trace: "private-cite:R7o3VQfwBmXRmmjeIEH3wA"
     layer: audit
     plane: DEV
     impact: 5
@@ -1182,7 +1182,7 @@ nodes:
 
   - id: E_p9_complete
     node_type: evidence
-    trace: "onion-bridge@c22517ee:src/identity.ts"
+    trace: "private-cite:tqMRLZfOcnyNI4bWj8y72w"
     layer: audit
     plane: DEV
     impact: 5
@@ -1218,7 +1218,7 @@ nodes:
 
   - id: C_identity_bought_who_not_what
     node_type: claim
-    trace: "onion-bridge@c22517ee:src/chat.ts"
+    trace: "private-cite:v2K5eLix_2xSXIZa-T48JQ"
     layer: audit
     plane: DEV
     impact: 5
@@ -1236,7 +1236,7 @@ nodes:
 
   - id: C_allowedtools_does_not_restrict
     node_type: claim
-    trace: "onion-bridge@c22517ee:src/chat.ts"
+    trace: "private-cite:o2mzgD984oPctFM6Al7sBQ"
     layer: audit
     plane: DEV
     impact: 5
@@ -1272,7 +1272,7 @@ nodes:
 
   - id: E_p10_service_cannot_write
     node_type: evidence
-    trace: "onion-bridge@c22517ee:src/chat.ts"
+    trace: "private-cite:GXxHo-mANMi5fTTloi72pQ"
     layer: audit
     plane: DEV
     impact: 5
@@ -1661,9 +1661,9 @@ nodes:
     label: "O a2a NAO e desenho no papel: o endpoint invoca a2a-verify.sh do core por spawnSync e rejeita fail-safe NOMEANDO a camada que falhou (layer_failed, ex.: parse). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate esta construido; o que falta e o REMETENTE"
     narrative: "label anterior: CORRECAO DE PRESSUPOSTO MEU: eu ia tratar o a2a como desenho no papel. O endpoint invoca a2a-verify.sh do core por spawnSync, rejeita fail-safe NOMEANDO a camada que falhou (layer_failed: parse), e o state de replay guarda um handshake REAL aceito em 2026-07-11 21:40 (hs-real-1783806004). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate funciona; o que falta e o REMETENTE"
     provenance:
-      source: "onion-bridge@c22517e:src/a2a.ts + .claude/utils/federation-transport/a2a-verify.sh@f5121e0d + .claude/utils/federation-transport/jwks/ + docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
-      locator: "a2a.ts l.11 e l.51 (spawnSync), l.19 (VERIFY → a2a-verify.sh do core), l.45-46 e l.70-71 (fail-safe, layer_failed); a2a-verify.sh l.61-62 (veto emite layer_failed nomeado), l.67-76 (camada parse); jwks/metagamify-1.pem (668c03f5, 2026-07-09) e jwks/granaai-1.pem (dc489b45, 2026-07-10); ADR l.62-64 (\"Construímos o receptor e a alfândega, nunca o remetente\")"
-      method: "reading: código do endpoint /a2a (onion-bridge@c22517e), gate e chaves versionados no core e ADR f5121e0d (2026-07-28)"
+      source: "private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q"
+      locator: "private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q"
+      method: "reading: código do endpoint /a2a (private-cite:nEI3Xfe6Y0K3dgvIkb2N1Q@c22517e), gate e chaves versionados no core e ADR f5121e0d (2026-07-28)"
 
   - id: C_no_sender_exists
     node_type: claim
@@ -1762,7 +1762,7 @@ nodes:
 
   - id: E_pull_endpoint_works
     node_type: evidence
-    trace: "onion-bridge@38702f00:src/federation.ts"
+    trace: "private-cite:A0H8pNnH_o8HETpffGENnw"
     layer: audit
     plane: DEV
     impact: 5
@@ -1773,13 +1773,13 @@ nodes:
     label: "PULL DOWNSTREAM VIVO em GET /federation/inbox/:member. Medido: token de org do pulse-mais puxa os 12 proprios com sha; pedir o inbox de OUTRO membro devolve 403 nomeando o conflito ('identidade pertence a pulse-mais, pediu granaai'); sem token 401; token do bridge-service (nao-org) 401. Os 12 baixados sao BYTE-IDENTICOS ao que o core anunciou. O adotante real nao foi tocado — a prova de clone-novo rodou em diretorio temporario"
     provenance:
       source: "GET /federation/inbox/:member contra o bridge em produção (5 mecânicas ao vivo) (host)"
-      locator: "onion-bridge@38702f00:src/federation.ts (último commit do arquivo até 2026-08-23) ; reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
+      locator: "private-cite:A0H8pNnH_o8HETpffGENnw"
       method: "testimony: medição de comportamento no host 2026-08-23"
       locality: "host"
 
   - id: C_org_token_has_no_org_claim
     node_type: claim
-    trace: "onion-bridge@c22517ee:src/identity.ts"
+    trace: "private-cite:G-WhzRRYPI2QcRlicKcKDA"
     layer: audit
     plane: DEV
     impact: 4
@@ -1797,7 +1797,7 @@ nodes:
 
   - id: C_p10_broke_scope_default
     node_type: claim
-    trace: "onion-bridge@c22517ee:src/identity.ts"
+    trace: "private-cite:mBQ-D3oeHLyNMMomiGy4hQ"
     layer: audit
     plane: DEV
     impact: 3
@@ -1929,8 +1929,8 @@ nodes:
     trace: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
     label: "Logto NAO esta mais ocioso: 1.42.0 vivo E consumido pelo bridge (valida OIDC no caminho critico). O flip que E_logto_live descrevia como futuro/gated JA ACONTECEU — a verdade andou (versao + consumo), o no antigo nao errou na origem"
     provenance:
-      source: "onion-logto@cc15d9b:docker-compose.yml + onion-bridge@7e736ba:src/identity.ts"
-      locator: "docker-compose.yml l.64 (image ghcr.io/logto-io/logto:1.42.0); identity.ts l.28 (ISSUER auth.onionevolve.com/oidc), l.94 verifyAccessToken"
+      source: "private-cite:9QUqeODdDVz1fy1A4GQ3Kw"
+      locator: "private-cite:9QUqeODdDVz1fy1A4GQ3Kw"
       method: "reading: compose do Logto e código do bridge"
   - id: E_bridge_write_grant_absent_2026_08
     node_type: evidence
@@ -1957,7 +1957,7 @@ nodes:
     status: confirmed
     verified_at: "2026-08-23"
     verified_against: "medido ao vivo 2026-08-23 (docker exec psql): tenant default tem 3 users (nicole, marciog, marciocar), 9 applications (incl. onion-bridge-service/onion-bridge-pwa), o API Resource 'Onion Bridge' (https://bridge.onionevolve.com) existe, e sign_in_mode=SignIn nos dois tenants (registro fechado)"
-    trace: "onion-logto@cc15d9b0:docker-compose.yml"
+    trace: "private-cite:0oiAFFRuOuYpeAqU9E6y_g"
     label: "O tenant default NAO esta mais vazio: 3 users, 9 apps, resource do bridge existe, sign-up FECHADO. O pre-requisito que E_p0 descrevia (criar user antes do flip) foi cumprido E o P3.4 (desligar sign-up) tambem ja foi aplicado, na ordem recomendada. O snapshot de 07-26 foi ultrapassado pela linha do tempo"
     provenance:
       source: "postgres do Logto da VPS consultado read-only (docker exec psql, host)"
@@ -2020,14 +2020,14 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: "2026-10-28"
-    verified_against: "consulta read-only ao banco do Logto (roles x roles_scopes x scopes, scopes bridge:*) e git grep bridge:write na origin/main do onion-bridge (5819d8e)"
+    verified_against: "consulta read-only ao banco do Logto (roles x roles_scopes x scopes, scopes bridge:*) e git grep bridge:write na origin/main do private-cite:l_Tl3I60SnWt_qdV2azlQA (5819d8e)"
     source_tier: 10
     source_kind: primary
     label: "A capacidade por scope vigora em 2026-10-28: bridge:write está só na role humana bridge-user, a role de serviço bridge-operator tem só bridge:invoke, e o código do bridge segue decidindo as tools pelo bridge:write."
-    narrative: "Saída da consulta, tenant default: bridge-admin com bridge:admin; bridge-operator com bridge:invoke; bridge-user com bridge:admin, bridge:invoke e bridge:write. No onion-bridge, origin/main 5819d8e: src/agent-policy.ts (sem bridge:write, lê e propõe; o convidado com bridge:write escreve no próprio workspace, sem Bash nem Task) e src/chat-query-options.ts l.82. Restaura D_capability_by_scope, que ficara superseded por um achado já superado. Não medido: um turno de chat de ponta a ponta com cada identidade."
+    narrative: "Saída da consulta, tenant default: bridge-admin com bridge:admin; bridge-operator com bridge:invoke; bridge-user com bridge:admin, bridge:invoke e bridge:write. No private-cite:l_Tl3I60SnWt_qdV2azlQA, origin/main 5819d8e: src/agent-policy.ts (sem bridge:write, lê e propõe; o convidado com bridge:write escreve no próprio workspace, sem Bash nem Task) e src/chat-query-options.ts l.82. Restaura D_capability_by_scope, que ficara superseded por um achado já superado. Não medido: um turno de chat de ponta a ponta com cada identidade."
     provenance:
-      source: "banco do Logto da VPS e onion-bridge@5819d8e:src/agent-policy.ts"
-      locator: "roles_scopes do tenant default; src/agent-policy.ts l.37 e l.40; src/chat-query-options.ts l.82"
+      source: "private-cite:l_Tl3I60SnWt_qdV2azlQA"
+      locator: "private-cite:l_Tl3I60SnWt_qdV2azlQA"
       method: "measurement: SELECT read-only por docker exec psql e git grep na origin/main do bridge"
       locality: "host"
   - id: E_d5_granaai_acolhida_2026_08
@@ -2056,11 +2056,11 @@ nodes:
     verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
     label: "REFUTA [D_default_deny_routes]: o default-deny por middleware global + allowlist ancorada NUNCA foi implementado — nem em producao nem em NENHUM ponto do historico git. O codigo sempre praticou o modelo INVERSO que o proprio label nomeia como perigoso: lista fixa de rotas PROTEGIDAS (authGuard/a2aGuard rota-a-rota), com todo o resto aberto por default (incluindo o catch-all estatico). A decisao foi escrita como se descrevesse o sistema, e o sistema nunca a conheceu. A superficie de risco que ela mitigaria segue mapeada por Q_route_inventory (vivo). Selado REFUTED pelo maestro em 2026-08-30."
-    trace: "onion-bridge@7e736ba2:src/server.ts (histórico completo)"
+    trace: "private-cite:ct-Jq-GpFJmJwVWhrneY4g"
     provenance:
-      source: "onion-bridge@7e736ba2:src/server.ts"
-      locator: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
-      method: "reading: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-30)"
+      source: "private-cite:ct-Jq-GpFJmJwVWhrneY4g"
+      locator: "private-cite:ct-Jq-GpFJmJwVWhrneY4g"
+      method: "reading: src/server.ts em private-cite:ct-Jq-GpFJmJwVWhrneY4g@7e736ba2 (remoto private-cite:ct-Jq-GpFJmJwVWhrneY4g; arquivo na data 2026-08-30)"
       locality: "repo"
 
   - id: E_CENSO0901_D_resource_plan_b
@@ -2089,7 +2089,7 @@ nodes:
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa do claim — um `app.use(''*'', requireIdentity)` GLOBAL cuja ORDEM DE REGISTRO decide bypass-total — não corresponde à arquitetura real. A produção nunca adotou middleware global; foi para guardas POR ROTA (authGuard/adminGuard/a2aGuard), cada uma escrita e verificada linha-a-linha antes d'
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
-      locator: "§3 l.73 (C_hono_registration_order_bypass); onion-bridge@7e736ba:src/server.ts l.55-60"
+      locator: "private-cite:xDDNpLROMVRs8eqoxY3vZg"
       method: "judges: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
       locality: "repo"
 
@@ -2148,12 +2148,12 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: "2026-09-02"
-    verified_against: "grep -n systemd-run console.sh (onion-logto@a0ce0fd) => linhas 30-37: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min no case on), com aviso fail-loud se o timer nao armar (onion-logto@master, Onda 8, I_CONSOLE_AUTOOFF em fios-abertos)"
+    verified_against: "grep -n systemd-run console.sh (private-cite:IgYPGLpnSehltd3cQAH2OQ@a0ce0fd) => linhas 30-37: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min no case on), com aviso fail-loud se o timer nao armar (private-cite:IgYPGLpnSehltd3cQAH2OQ@master, Onda 8, I_CONSOLE_AUTOOFF em fios-abertos)"
     label: "PAGO (Onda 8, 2026-09-01): o `on` do console.sh arma auto-off de 60min (sudo systemd-run transient, sobrevive ao fim da sessão de shell) e avisa se não armar; o `off` NÃO para o timer. O dogfood achou o console LIGADO por esquecimento. Janela de 60min; o desenho previa 30."
     narrative: "label anterior: PAGO (Onda 8, 2026-09-01): o GAP deixou de existir — console.sh arma auto-off transitorio de 60min via systemd-run em modo SYSTEM no case on) (sobrevive ao fim da sessao SSH), e o case off) para o timer. O dogfood achou o console LIGADO por esquecimento — exatamente o caso que o gap descrevia. Janela escolhida: 60min (nao os 30 do desenho) por pedido de uso real do painel."
     provenance:
-      source: "onion-logto@a0ce0fd:console.sh + corpo do commit onion-logto@a0ce0fd"
-      locator: "console.sh l.28-41 (case on: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min, aviso \"auto-off NÃO armado\") e l.42-46 (case off: só mv + reload); corpo de a0ce0fd (2026-09-01, \"No dogfood o console estava LIGADO de esquecimento\"); janela de 30 do desenho em docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml l.791"
+      source: "private-cite:IgYPGLpnSehltd3cQAH2OQ"
+      locator: "private-cite:IgYPGLpnSehltd3cQAH2OQ"
       method: "reading: script e mensagem do commit a0ce0fd no repo onion-logto"
 
   - id: E_W8_JWKS_PR65_ABERTO
@@ -2167,9 +2167,9 @@ nodes:
     verified_against: 'gh pr view 65 -R <forge>/onion-bridge => OPEN "fix(identity): piso do JWKS vale na falha (jwksAttemptedAt)"; tsc rc=0 no clone dev (fix/jwks-attempt-floor)'
     label: "O GATILHO 'PR proprio no bridge' DISPAROU (Onda 8, 2026-09-01): PR onion-bridge#65 implementa jwksAttemptedAt (piso de 60s na TENTATIVA, nao so no sucesso). A pergunta NAO fecha aqui: plane PROD segue com o storm ate merge+deploy do bridge — ato do maestro (MOAT: deploy). Fecha em Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA quando o vivo medir 1 fetch por janela durante queda do IdP."
     provenance:
-      source: "marciocar/onion-bridge#65"
-      locator: "gh pr view 65 --repo marciocar/onion-bridge --json title,state,mergedAt,createdAt"
-      method: "measurement: gh pr view 65 -R marciocar/onion-bridge"
+      source: "private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
+      locator: "private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
+      method: "measurement: gh pr view 65 -R private-cite:n2Qhh9zcfgWKF3o2N-JrTg"
 
   - id: E_W9_A2A_ASYNC_PR66_ABERTO
     node_type: evidence
@@ -2179,13 +2179,13 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: "2026-09-02"
-    verified_against: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R marciocar/onion-bridge = OPEN"
+    verified_against: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R private-cite:WPVsBPL1fNv6g9pGl6hPDQ = OPEN"
     label: "CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (W9, 09-02): o PR #66 do onion-bridge troca spawnSync por spawn assíncrono (mesmo fail-safe); /health durante POST /a2a: 4820ms → 1,1ms. Fecha com merge+deploy (ato do maestro); produção ainda roda spawnSync no src/a2a.ts:51."
     narrative: "label anterior: CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (drive W9, 2026-09-02): PR #66 do onion-bridge troca spawnSync por spawn assincrono com o MESMO fail-safe. Medido antes/depois na bancada: /health durante um POST /a2a foi de 4820ms para 1,1ms. Modo-de-falha preservado: gate de 20s => SIGKILL aos 15s => 403 veto; gate exit 1 sem stdout => 403 veto em 40ms; zero orfaos apos o kill. A pergunta FECHA quando o PR for mergeado e deployado (ato do maestro; producao ainda roda spawnSync ⟨no src/a2a.ts:51 de o clone de produção do onion-bridge⟩, medido por sudo -n grep)."
-    trace: "https://github.com/marciocar/onion-bridge/pull/66"
+    trace: "private-cite:WPVsBPL1fNv6g9pGl6hPDQ"
     provenance:
-      source: "https://github.com/marciocar/onion-bridge/pull/66"
-      locator: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R marciocar/onion-bridge = OPEN"
+      source: "private-cite:WPVsBPL1fNv6g9pGl6hPDQ"
+      locator: "private-cite:WPVsBPL1fNv6g9pGl6hPDQ"
       method: "measurement: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
@@ -2218,10 +2218,10 @@ nodes:
     verified_against: "identity.ts copiado byte a byte do clone de produção do onion-bridge (sha256 75286a55…, HEAD 1f7fb3f1) e exercitado por sonda local com o IdP inalcançável: 5 requests, 1 fetch; 5003 ms no 1º e 0 ms nos seguintes; e um 2º fetch só depois de 60 s (t=59 s: 1, t=61,5 s: 2)"
     label: "Re-medido (SAC-100): o piso do JWKS vale na FALHA. O identity.ts de produção, rodado com o IdP inalcançável, faz 1 fetch em 5 requests e corta em 5 s. Falta a 3ª peça da cura: jwksSelfCheck devolve ok:true com 0 chaves dentro do piso."
     narrative: "COMO SE MEDIU SEM TEMPESTADE NEM CARGA: o arquivo src/identity.ts do clone de produção (refs/heads/main = 1f7fb3f158566d32, o mesmo bridge do deploy E_W9 de 2026-09-02) foi copiado para uma pasta descartável (sha256 75286a5574a975beb12d445253824ea65c153134d569f7f6e49e42a7ee4b05e7) e importado por uma sonda Node 22 (--experimental-strip-types) que embrulha globalThis.fetch num contador e chama verifyAccessToken 5× com um token ES384 de kid desconhecido. Nada tocou o Logto nem o serviço de produção. Com OIDC_ISSUER na porta discard local (conexão recusada): 5 requests, fetches_acumulados=1. Com OIDC_ISSUER num IP privado não roteável (buraco negro): req1 5003 ms, req2-5 0 ms, fetches_acumulados=1. E o piso não trava para sempre (2ª sonda, porta recusada, achado 7 do refutador): 3 req em t=0 → 1 fetch; +1 req em t=59 s → 1 fetch; +1 req em t=61,5 s → 2 fetches; +1 req logo depois → 2 fetches. Isto é o critério de fechamento do nó (1 fetch por janela de 60 s com o IdP caído), medido no CÓDIGO deployado — não no processo vivo durante uma queda real, que segue sem acontecer de forma observável: o journal do onion-vps-bridge (lido com sudo -n journalctl) só retém desde 2026-10-04 e não tem entradas no período. RESÍDUO MEDIDO: a cura desenhada pelo Elenxo tinha 3 peças; jwksAttemptedAt e o timeout de 5 s estão lá, mas `jwksSelfCheck` ainda devolve `{ok:true, keys:0}` quando loadJwks(true) retorna cedo pelo piso (medido: selfcheck_dentro_do_piso={\"ok\":true,\"keys\":0}). Hoje ele só roda no boot, quando jwksAttemptedAt=0 e o piso não morde, então o boot não mente; a mentira fica latente para qualquer chamador futuro (por exemplo, um /health que consulte identidade). E o /health continua estático (`ok: true` sem olhar identidade), o que é coerente com C_logto_now_critical (/health não consulta o Logto para não virar loop de restart)."
-    trace: "onion-bridge@1f7fb3f1:src/identity.ts"
+    trace: "private-cite:jPquah0RTIdNVzwkl78Aow"
     provenance:
-      source: "onion-bridge@1f7fb3f1:src/identity.ts"
-      locator: "loadJwks: `if (now - jwksAttemptedAt < JWKS_MIN_REFETCH_MS) return; jwksAttemptedAt = now;` + fetch com AbortSignal.timeout(5000); jwksSelfCheck devolve ok:true sem checar jwksCache.size; sonda: 5 req / 1 fetch / 5003 ms→0 ms"
+      source: "private-cite:jPquah0RTIdNVzwkl78Aow"
+      locator: "private-cite:jPquah0RTIdNVzwkl78Aow"
       method: "measurement: sonda local sobre cópia byte a byte do identity.ts de produção com o IdP inalcançável (porta recusada e IP não roteável), contando chamadas de fetch, 2026-10-11"
       locality: "host"
 

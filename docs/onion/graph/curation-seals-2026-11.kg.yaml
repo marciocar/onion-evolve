@@ -36,7 +36,7 @@ nodes:
     verified_at: "2026-11-08"
     verified_against: "a campainha declara a capability claude/channel e tocou ao vivo em 2026-11-07 e 2026-11-08 (Q_CS_DEGRAU1_CAMPAINHA_1109 done em comms-stable-2026-11)"
     label: "A peça D_PIECE_CH_MECHANISM da curadoria fecha: o costurar já foi feito, porque a campainha é o toque do degrau 1 e declara claude/channel."
-    narrative: "Selado pelo core em nome do maestro, revogável por ele. A curadoria cita este nó em x_dissect_sealed_by e reescreve os nós do gatilho por ponte. A re-âncora da superação pode citar onion-messaging@f67ff00."
+    narrative: "Selado pelo core em nome do maestro, revogável por ele. A curadoria cita este nó em x_dissect_sealed_by e reescreve os nós do gatilho por ponte. A re-âncora da superação pode citar private-cite:Tk2YDwbMUAoof657luYQCg@f67ff00."
     provenance:
       source: "sinal channels-trigger-per-bridge da curadoria, respondido pelo core em 2026-11-08"
       locator: "linha «Canais entre sessões» do anúncio de 2026-11-08"

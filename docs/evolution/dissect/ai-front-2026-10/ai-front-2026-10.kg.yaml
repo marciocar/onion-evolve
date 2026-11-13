@@ -35,15 +35,15 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-26"
-    verified_against: "grafo da dissecação da frente de IA no repo de curadoria (onion-curation@f12dd1b, main, que contém o merge e605e6f), lido pela triagem: D_AI_FRONT_VERDICT (open, perseguir como estudo), C_PILOT3_PROPOSAL (open), E_N2_PILOT2_RESULT e E_PILOT2_POETA_PTBR_SLM; os dois primeiros conferidos por peer-ref-check (EXISTEM na origin/main do par)"
+    verified_against: "grafo da dissecação da frente de IA no repo de curadoria (private-cite:T-B9RcgRQrJxhFkkz9C1Ag@f12dd1b, main, que contém o merge e605e6f), lido pela triagem: D_AI_FRONT_VERDICT (open, perseguir como estudo), C_PILOT3_PROPOSAL (open), E_N2_PILOT2_RESULT e E_PILOT2_POETA_PTBR_SLM; os dois primeiros conferidos por peer-ref-check (EXISTEM na origin/main do par)"
     source_tier: 8
     source_kind: primary-repo
     label: "A dissecação da curadoria sustenta perseguir a frente como estudo em ondas: os pilotos 1 e 2 ficaram abaixo do critério de 2 achados aceitos depois da revisão adversarial (0 e 1), e o que mais derrubou achado foi a fonte que mede outra coisa."
     trace: "docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md"
     narrative: "Pela régua pré-registrada da curadoria, a nota de 4 a 6 parquearia; o maestro já tinha selado lá não parquear, com a direção de que piloto inconclusivo pede piloto melhor. A proposta do piloto 3 tem 6 perguntas, um juiz separado que filtra já na escolha, exige caso de uso real ou um nó de impacto 4 ou mais para mudar, exige que a fonte meça o que a pergunta pede e conta por fato, não por fonte. Não foi rodada."
     provenance:
-      source: "github.com/marciocar/onion-curation@f12dd1b:docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml"
-      locator: "nós D_AI_FRONT_VERDICT, C_PILOT3_PROPOSAL, E_N2_PILOT2_RESULT, E_PILOT2_POETA_PTBR_SLM"
+      source: "private-cite:T-B9RcgRQrJxhFkkz9C1Ag"
+      locator: "private-cite:T-B9RcgRQrJxhFkkz9C1Ag"
       method: "reading: grafo canônico da curadoria, relido pela triagem do core; referências conferidas por peer-ref-check.sh"
       locality: "repo"
 
@@ -93,8 +93,8 @@ nodes:
     narrative: "O que a triagem de 2026-10-26 leu e mudou: D_AI_FRONT_VERDICT estava open e hoje é done, com o label reescrito para três pilotos inconclusivos e a forma da frente devolvida ao maestro; E_N2_PILOT3_RESULT (confirmed, 2026-10-26) diz que o juiz separado aceitou 1 achado em 6 perguntas e a revisão adversarial o derrubou; D_AI_FRONT_RADAR_COUPLING_1027 registra a escolha «Acoplar ao eixo do radar», descartadas «Piloto 4 mais rigoroso», «Encerrar a frente fixa» e «Depois». Com isso o gatilho do Q_AI_FRONT_PILOTO3_RESULTADO DISPAROU (há nó de resultado do piloto 3 que não está open) e a resposta é não. Fechar a pergunta e registrar aqui a decisão do acoplamento é triagem do core sobre um sinal da curadoria, e fica para ela: este nó só mede. A decisão D_AI_FRONT_PILOTO3_1026 (rodar o piloto 3) foi cumprida, não derrubada."
     trace: "docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml"
     provenance:
-      source: "github.com/marciocar/onion-curation@f2118c198678:docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml"
-      locator: "D_AI_FRONT_VERDICT, C_PILOT3_PROPOSAL, C_PILOT3_PLAN, E_N2_PILOT2_RESULT, E_PILOT2_POETA_PTBR_SLM, E_N2_PILOT3_RESULT e D_AI_FRONT_RADAR_COUPLING_1027"
+      source: "private-cite:CFfe143ruCiSIc2uL79XAQ"
+      locator: "private-cite:CFfe143ruCiSIc2uL79XAQ"
       method: "measurement: peer-ref-check.sh na origin/main do par e o grafo dela lido por parser, em 2026-10-27"
       locality: "repo"
 

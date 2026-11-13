@@ -225,8 +225,8 @@ nodes:
     narrative: "Fecha a SAC-156. A versão saiu de 0.3.232 (CLI 2.1.232, E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232) para 0.3.301 (CLI 2.1.301), e o piso 2.1.64 do CVE-2026-39861 passou a ser cobrado pelo verify, não mais garantido por acaso de versão. A prova cobre o deploy, a versão do CLI servido e o argv pelo lançador; o turno ponta a ponta com a API fica como lacuna declarada. Superada em 2026-10-17 por E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017 (rodada r13): onion-bridge 7f4322c (PR #78) subiu o SDK para 0.3.302 com o CLI 2.1.302, e o verify do runner saiu rc 0; a medição desta rodada valeu até ali."
     label: "o /chat em produção serve o SDK 0.3.301 com o CLI 2.1.301, acima do piso 2.1.64 que o verify do runner agora cobra, depois do deploy de onion-bridge 0d1bc843 e core 99a821cb com rc 0"
     provenance:
-      source: "onion-bridge@0d1bc843 (PR #77) e onion-evolve@99a821cb (PR #1171); saída do chat-runner verify e do wrapper de deploy do bridge"
-      locator: "linhas OK do verify: 'o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'o argv do SDK servido ... passa pelo lançador instalado (25 asserções)'; campo version do package.json do SDK no clone servido"
+      source: "private-cite:0tmdeXfJKiUMEKGoWfHpaQ"
+      locator: "private-cite:0tmdeXfJKiUMEKGoWfHpaQ"
       method: "measurement: deploy pelo wrapper, verify independente e leitura do package.json como a conta do serviço"
       locality: "host"
   - id: E_CENSO_MEDE_O_CLI_DO_SDK_1016

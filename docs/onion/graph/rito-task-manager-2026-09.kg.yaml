@@ -205,8 +205,8 @@ nodes:
     source_tier: 10
     label: "a absorcao de KB de adotante se pagou NO MESMO DIA: o core absorveu a v1.1 dele de manha e a v1.2 dele corrigiu o core a tarde"
     provenance:
-      source: "commit fbf9ac12 (corpo) · hub-operacoes-enterprise@6d601498 e @148a87e2:docs/knowledge-base/platforms/zoho-projects-api.md · onion-evolve@198393e4"
-      locator: "fbf9ac12 corpo §'E o que isto diz da federação' · hub-operacoes-enterprise@6d60149:16 (v1.1, 10:49 -0300) · hub-operacoes-enterprise@148a87e:16 (v1.2, 15:30 -0300) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
+      source: "private-cite:dVZHxtIVXOyNAwiRpagr3Q"
+      locator: "private-cite:dVZHxtIVXOyNAwiRpagr3Q"
       method: "reading: corpo do commit fbf9ac12 e as duas versões da KB no histórico do adotante (hub-operacoes-enterprise)"
       locality: "repo"
 
@@ -242,8 +242,8 @@ nodes:
     x_gatilho: "o maestro dizer qual lado ganha em cada um dos 6 arquivos sobrepostos, OU a equipe do adotante reconciliar no repo dela. Ate la o Onion entrega em branch dedicada a partir do origin/main REAL, sem tocar o main."
     narrative: "id anterior (SAC-99, 2026-10-11): Q_⟨pasta privada⟩_MAIN_DIVERGIU — o id carregava o nome da pasta privada do hub e foi trocado pelo id do members.yaml (selo da O7: labels e ids usam o id). Registros históricos (resíduos R56, mailbox _processed, CHANGELOG da federação) citam a forma antiga e ficam como estão."
     provenance:
-      source: "commit c383df21 (corpo) · hub-operacoes-enterprise@e1e0ec3e e @148a87e2"
-      locator: "c383df21 corpo §<o id anterior deste nó, ver narrative> (\"divergiu 3x3 do remoto... PR #2 da equipe (ADR, 219 linhas)... seis arquivos se sobrepõem\") · hub-operacoes-enterprise@e1e0ec3 (Merge PR #2 ... SAC-59, 2026-09-30 15:40) · hub-operacoes-enterprise@148a87e numstat adr-zoho-projects-task-mapping.md +219"
+      source: "private-cite:u11Odhv8RaVdsL7FVdwfyA"
+      locator: "private-cite:u11Odhv8RaVdsL7FVdwfyA"
       method: "reading: corpo do commit c383df21 (2026-09-30) + commits e1e0ec3 e 148a87e no clone hub-operacoes-enterprise"
       locality: "repo"
 
@@ -258,9 +258,9 @@ nodes:
     label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
     x_gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
     provenance:
-      source: "commit c383df21 (corpo) · hub-operacoes-enterprise@148a87e2:docs/knowledge-base/platforms/zoho-projects-api.md · docs/knowledge-base/platforms/zoho-projects-api.md@198393e4"
-      locator: "c383df21 corpo §D_NAO_SOBRESCREVER_KB_DE_ADOTANTE · hub-operacoes-enterprise@148a87e zoho-projects-api.md:16,18,232,304 (v1.2, /api/v3.1/, global-statuses, custom_fields.READ) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
-      method: "reading: corpo do commit c383df21 + KB do adotante no commit hub-operacoes-enterprise@148a87e contra a KB do core em 198393e4"
+      source: "private-cite:3SsV6FHUGXmVjpDBXnBlGg"
+      locator: "private-cite:3SsV6FHUGXmVjpDBXnBlGg"
+      method: "reading: corpo do commit c383df21 + KB do adotante no commit private-cite:3SsV6FHUGXmVjpDBXnBlGg@148a87e contra a KB do core em 198393e4"
       locality: "repo"
 
   # ── SELOS DO MAESTRO EM 2026-10-01 (pesquisa de motores e corpus de regras) ─────────────────

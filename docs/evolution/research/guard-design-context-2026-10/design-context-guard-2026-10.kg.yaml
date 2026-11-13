@@ -21,8 +21,8 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "a bancada do core: lint-selftest.sh --families=design_context,design_setup (13 e 8 casos verdes, depois das curas da passada adversarial)"
     provenance:
-      source: "onion-curation@668e13b:docs/evolution/research/design-setup-2026-10/evidence/lab-graph/lab-graph-output.txt"
-      locator: "casos 2, 4, 5, 6, 9 e 11"
+      source: "private-cite:0OGDCkUu4kRqxZ-zhtcrQw"
+      locator: "private-cite:0OGDCkUu4kRqxZ-zhtcrQw"
       method: "reading: a saída literal do laboratório, reproduzida pela bancada do core"
       locality: web
   - id: D_GUARD_SUBSTRATE_LINT_CHECK

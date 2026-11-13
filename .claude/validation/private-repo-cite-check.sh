@@ -8,6 +8,8 @@
 # histórico público, e nada impedia a 44ª citação. Decisão do maestro de 2026-11-10, «Guarda + omitir no
 # futuro»: uma guarda que AVISA quando grafo novo ou tocado cita repo privado ou inalcançável; citação
 # futura omite URL e hash, com a classe «não conferível por terceiro»; o histórico fica como está.
+# Desde 2026-11-13 a classe é o marcador `private-cite:<id>` do contrato v4.22 da kg-ssot (4.51.0), que o
+# kg_trace.py conta e nunca lê; o corpus migrou para ele, e o conselho do aviso aponta o marcador.
 #
 # O QUE ELA JULGA: os .kg.yaml que o diff contra a base (merge-base com origin/main, em cascata) toca ou
 # acrescenta, fora de vendor e fixture. Em cada um, todo texto dos nós (e o que fica fora de campo, como
@@ -455,7 +457,7 @@ for f, n, form, repo in acc:
     what = {"url": "URL", "hash": "hash (repo@sha)", "ref": "referência dono/repo"}[form]
     out("SOFT", "NAO-CONFERIVEL", f,
         f"nó {n} cita {shown} por {what}, e esse repo não está na lista pública ({allow_rel}): terceiro não confere. "
-        "Omita URL e hash e escreva a classe na fonte: source: \"não conferível por terceiro: <o que foi lido, sem URL nem hash>\". "
+        "Troque a citação pelo marcador private-cite:<id> (kg_trace.py private-cite-id do vendor kg-ssot, um por citação): no source e no locator ele substitui o valor inteiro, no trace vira private-cite:<id>#<id de nó>, na prosa troca só o nome do repo, e a resolução fica numa tabela privada do dono. "
         "Se o repo é público, meça com gh repo view e acrescente-o à lista")
 for f, err in unread:
     out("SOFT", "NAO-JULGADO", f, f"não deu para parsear ({err}) — este grafo NÃO foi julgado (YAML inválido é da REGRA 78)")

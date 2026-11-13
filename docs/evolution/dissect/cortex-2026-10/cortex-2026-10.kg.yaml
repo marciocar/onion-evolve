@@ -30,15 +30,15 @@ nodes:
     confidence: 0.65
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_PLAN_GATE e a medida E_MEASURE_PLAN_GATE no grafo da curadoria (onion-curation@8d64aef8737e, main, que contém o PR #133), conferidos por peer-ref-check.sh (EXISTEM na origin/main do par)"
+    verified_against: "nó D_PIECE_PLAN_GATE e a medida E_MEASURE_PLAN_GATE no grafo da curadoria (private-cite:GMTo64uZrIJIX0CCUSGH6Q@8d64aef8737e, main, que contém o PR #133), conferidos por peer-ref-check.sh (EXISTEM na origin/main do par)"
     source_tier: 8
     source_kind: primary-repo
     label: "Gate de plano, nota 6, costurar só a peça: o script do Cortex barra sem plano commitado e passa com o plano no HEAD, mas também passa com o plano commitado depois do código; nenhum dos dois lados barra o commit."
     narrative: "Medido pela curadoria em laboratório isolado: quatro casos do lado do Cortex (dois recusam com saída 2, dois passam) e o pre-commit do core saindo 0 no mesmo cenário. A nota caiu de 8 para 6 pela revisão adversarial da curadoria: conferir o plano pelo HEAD exige commitar a pasta de sessões, que o core ignora por escolha declarada no .gitignore, e o gate não confere a ordem entre plano e código."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_PLAN_GATE"
-      locator: "D_PIECE_PLAN_GATE (x_dissect_verdict costurar, nota 6) e E_MEASURE_PLAN_GATE"
+      source: "private-cite:GMTo64uZrIJIX0CCUSGH6Q"
+      locator: "private-cite:GMTo64uZrIJIX0CCUSGH6Q"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -50,15 +50,15 @@ nodes:
     confidence: 0.65
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_QUALITY e a medida E_MEASURE_MUTATION no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh; a lacuna reproduzida no helper do core antes da cura"
+    verified_against: "nó D_PIECE_QUALITY e a medida E_MEASURE_MUTATION no grafo da curadoria (private-cite:jP8rLsGr--mDO-GfvbH32A@8d64aef8737e), conferidos por peer-ref-check.sh; a lacuna reproduzida no helper do core antes da cura"
     source_tier: 8
     source_kind: primary-repo
     label: "Âncora única na mutação, nota 6, costurar só a peça como remendo no helper do core: com a âncora repetida, o helper trocava a 1ª ocorrência em silêncio, e o código de saída 3 valia tanto para a âncora ausente quanto para um teste que sai 3."
     narrative: "A curadoria rodou o helper do core e o mutate.py do Cortex no mesmo alvo e no mesmo teste. O requisito novo veio por acidente: nenhum dos dois rodava o teste sem a mutação antes, e o do Cortex respondeu que o pino funcionava para um teste que falhava por erro de importação. A defesa do core contra a morte do processo (o marcador no mutante e a REGRA 94 (Mutante esquecido na árvore rastreada)) cobre outro modo de falha e fica."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_QUALITY"
-      locator: "D_PIECE_QUALITY (x_dissect_verdict costurar, nota 6) e E_MEASURE_MUTATION"
+      source: "private-cite:jP8rLsGr--mDO-GfvbH32A"
+      locator: "private-cite:jP8rLsGr--mDO-GfvbH32A"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -70,15 +70,15 @@ nodes:
     confidence: 0.55
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e as evidências das duas provas (E_DOCS_PROOF_PYTHON, E_CAPTURE_PROOF_RESULT, E_CAPTURE_CDN_DEPENDENCY, E_OBJECAO_CAPTURE_COST_MACHINE e E_ONION_GAMMA_PPTX) no grafo da curadoria (onion-curation@5f5f6584a02b, main, que contém os PRs #137 e #144), conferidos por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e as evidências das duas provas (E_DOCS_PROOF_PYTHON, E_CAPTURE_PROOF_RESULT, E_CAPTURE_CDN_DEPENDENCY, E_OBJECAO_CAPTURE_COST_MACHINE e E_ONION_GAMMA_PPTX) no grafo da curadoria (private-cite:MykcWrKeUwSO-SlVol8_TQ@5f5f6584a02b, main, que contém os PRs #137 e #144), conferidos por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Documentação e apresentações, nota 5 a 6 conforme o navegador, costurar a receita completa, local, a partir do git, com captura e diagrama: em Python, 9 slides e um docx, com 3 imagens em cada, e 0 requisições externas medidas com a rede bloqueada."
     narrative: "No sinal medido a peça tinha nota 6 e não fora exercida: as ferramentas do Cortex são Node, do npm. A 1ª prova da curadoria (PR #137 de lá) gerou 8 slides e um docx com tabela a partir do histórico do git, em python-pptx e python-docx, em cerca de 35 ms, só texto, e rebaixou a nota para 5 por uma régua NÃO pré-registrada (nasceu depois do resultado), o que fica declarado aqui. A 2ª prova (PR #144 de lá, com revisão adversarial) provou a captura e o diagrama: 2 telas de uma página local pelo Chromium sem janela e o Mermaid carregado do disco. A nota fica 6 quando o chromium_headless_shell já está no cache E a versão do Playwright que o usa está fixada (a pegada em execução é de cerca de 205 MB, com 0 MB a mais de navegador), e 5 numa máquina limpa (cerca de 483 MB: o ambiente virtual, 278 MB de navegador e o Mermaid). A régua dessa nota foi escrita antes do braço da captura, mas não às cegas, e a do critério de custo mudou depois do 1º laboratório; as duas réguas do custo dão o mesmo veredito. O desenho do Cortex carrega o Mermaid de uma CDN pública, o que conflita com a doutrina sem dependência de serviço externo; a receita da curadoria não tem esse problema na execução, embora instalar o Playwright e o Mermaid ainda baixe pela rede, uma vez por máquina. Correção factual: o Onion só exporta pptx pelo Gamma, serviço externo, nunca a partir do git, e o Gamma não conta como par."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/5f5f6584a02bd8a49db2b7ea06d240f9104a873a/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DOCS_PRESENTATIONS"
-      locator: "D_PIECE_DOCS_PRESENTATIONS (x_dissect_verdict costurar; o label diz a receita completa, nota 5 a 6 conforme o navegador), E_DOCS_PROOF_PYTHON, E_CAPTURE_PROOF_RESULT, E_CAPTURE_CDN_DEPENDENCY, E_OBJECAO_CAPTURE_COST_MACHINE e E_ONION_GAMMA_PPTX"
+      source: "private-cite:MykcWrKeUwSO-SlVol8_TQ"
+      locator: "private-cite:MykcWrKeUwSO-SlVol8_TQ"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -90,15 +90,15 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_FLEET e a âncora Q_FLEET_PARALLEL_DEMAND no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_FLEET e a âncora Q_FLEET_PARALLEL_DEMAND no grafo da curadoria (private-cite:BDzKm2tKdUDlGNAnOY4sXw@8d64aef8737e), conferidos por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Frota, nota 5, parquear: N issues em worktrees paralelas, com aprovação humana em lote e dados isolados por worktree, não têm par no Onion, mas nenhum adotante pediu isso."
     narrative: "A busca da curadoria no core por esse fluxo deu 0 arquivos, e a worktree nativa do Claude Code cobre parte dele. O custo inclui o modo de equipes de agentes, ainda experimental."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_FLEET"
-      locator: "D_PIECE_FLEET (x_dissect_verdict parquear, x_dissect_trigger com min_count 2)"
+      source: "private-cite:BDzKm2tKdUDlGNAnOY4sXw"
+      locator: "private-cite:BDzKm2tKdUDlGNAnOY4sXw"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -110,15 +110,15 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_USAGE_TELEMETRY e a âncora E_NATIVE_OTEL_USAGE no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_USAGE_TELEMETRY e a âncora E_NATIVE_OTEL_USAGE no grafo da curadoria (private-cite:6YU94i5D-S73pO9rhHt22Q@8d64aef8737e), conferidos por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Registro de uso, nota 5, parquear: a telemetria nativa do Claude Code em OpenTelemetry já registra o uso, com coletor; a forma do Cortex grava dentro do git com o nome de quem rodou."
     narrative: "A forma útil ao Onion seria contar o uso de comando fora do git e sem identificar a pessoa, e ela ainda é só desenho, sem adotante que a peça e sem consumidor medido."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_USAGE_TELEMETRY"
-      locator: "D_PIECE_USAGE_TELEMETRY (x_dissect_verdict parquear, x_dissect_trigger com min_count 2)"
+      source: "private-cite:6YU94i5D-S73pO9rhHt22Q"
+      locator: "private-cite:6YU94i5D-S73pO9rhHt22Q"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -130,15 +130,15 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_MEMORY e a âncora E_ONION_WORKLOG_HOOKS no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_MEMORY e a âncora E_ONION_WORKLOG_HOOKS no grafo da curadoria (private-cite:fq6QGVHuGvPzF-IGvGxJlQ@8d64aef8737e), conferidos por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Memória, nota 5, parquear só o handoff commitado no git: o core tem os ganchos de retomada do worklog, que não rodaram na medida, e o resto da memória fica rejeitado."
     narrative: "A 1ª versão da curadoria dizia que o core não tinha script de retomada, porque buscou por nome; a revisão adversarial corrigiu de costurar para parquear. O que sobra sem par é o handoff versionado no git, que o core descarta por escolha: o .gitignore ignora a pasta de sessões."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_MEMORY"
-      locator: "D_PIECE_MEMORY (x_dissect_verdict parquear, x_dissect_trigger com min_count 2)"
+      source: "private-cite:fq6QGVHuGvPzF-IGvGxJlQ"
+      locator: "private-cite:fq6QGVHuGvPzF-IGvGxJlQ"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -150,15 +150,15 @@ nodes:
     confidence: 0.75
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_DISTRIBUTION no grafo da curadoria (onion-curation@8d64aef8737e), conferido por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_DISTRIBUTION no grafo da curadoria (private-cite:l93GkAYWDKrFZXTUMFiYQw@8d64aef8737e), conferido por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Distribuição, nota 4, rejeitar: o merge do onion/vendor preservou a customização sem conflito falso e acusou o conflito real; a fusão do lado do Cortex segue lida, porque o instalador dele não está na máquina."
     narrative: "Medido do lado do Onion e lido do lado do Cortex. A superação é a atualização por merge do vendor que o /meta:adopt já faz."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DISTRIBUTION"
-      locator: "D_PIECE_DISTRIBUTION (x_dissect_verdict rejeitar, nota 4)"
+      source: "private-cite:l93GkAYWDKrFZXTUMFiYQw"
+      locator: "private-cite:l93GkAYWDKrFZXTUMFiYQw"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -170,15 +170,15 @@ nodes:
     confidence: 0.8
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_SPEC_AS_CODE no grafo da curadoria (onion-curation@8d64aef8737e), conferido por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_SPEC_AS_CODE no grafo da curadoria (private-cite:jPI9VI_fIfzZz9LjatAISg@8d64aef8737e), conferido por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Especificação como código, nota 3, rejeitar: no artefato do framework fora do padrão, o lint do core reprova pela REGRA 1 e pela REGRA 2 e o Cortex deixa entrar; na decisão de arquitetura no código do projeto, empate, porque nos dois quem confere é agente."
     narrative: "Medido do lado do Onion e lido do lado do Cortex, cujo checador de decisões de arquitetura não bloqueia por padrão. O empate entra como limite: o lint do core não lê o código do adotante."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_SPEC_AS_CODE"
-      locator: "D_PIECE_SPEC_AS_CODE (x_dissect_verdict rejeitar, nota 3)"
+      source: "private-cite:jPI9VI_fIfzZz9LjatAISg"
+      locator: "private-cite:jPI9VI_fIfzZz9LjatAISg"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -190,15 +190,15 @@ nodes:
     confidence: 0.8
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_STUDIES no grafo da curadoria (onion-curation@8d64aef8737e), conferido por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_STUDIES no grafo da curadoria (private-cite:Xy0t1ojHVq8kfnu6ZpsvNQ@8d64aef8737e), conferido por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
     label: "Estudos e avaliações, nota 3, rejeitar: o kg_query devolve o estado aberto de um estudo por comando (8 nós em 5,7 KB); a busca nos scripts do Cortex achou 3 arquivos, e nenhum faz isso."
     narrative: "Medido do lado do Onion e lido do lado do Cortex. A superação é o par /onion-research e /meta:dissect, com o pré-registro que a própria dissecação usou."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_STUDIES"
-      locator: "D_PIECE_STUDIES (x_dissect_verdict rejeitar, nota 3)"
+      source: "private-cite:Xy0t1ojHVq8kfnu6ZpsvNQ"
+      locator: "private-cite:Xy0t1ojHVq8kfnu6ZpsvNQ"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
