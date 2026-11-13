@@ -49733,11 +49733,14 @@ run_workflow_syntax_selftests() {
     # `cmd; rc=$?` sob `set -euo pipefail` MATA a suite — o caso (c) abaixo evita isto e este aqui
     # nao evitava: um mutante que quebrasse o corpus fazia a bancada ABORTAR antes da soma, e o
     # `record_fail` logo abaixo virava codigo morto. Achado da passada adversarial de 2026-09-22.
+    # A saida do check vai na mensagem: desde o (j), o corpus tambem reprova por relogio/sorteio
+    # num workflow real, e "o falso-negativo voltou" sozinho mandaria o leitor ao lugar errado.
+    local _ao
     # shellcheck disable=SC2086
-    if ( cd "${REPO_ROOT}" && bash "${chk}" ${real} ) >/dev/null 2>&1; then rc_real=0; else rc_real=1; fi
+    if _ao="$( cd "${REPO_ROOT}" && bash "${chk}" ${real} 2>&1 )"; then rc_real=0; else rc_real=1; fi
     if [ "${rc_real}" -eq 0 ]; then
-      record_pass "workflow-syntax: (a) os $(printf '%s\n' ${real} | wc -l) script(s) REAIS do corpus passam"
-    else record_fail "workflow-syntax: (a)" "o corpus valido foi reprovado (rc=${rc_real}) — o falso-negativo voltou"; fi
+      record_pass "workflow-syntax: (a) os $(printf '%s\n' ${real} | wc -l) script(s) REAIS do corpus passam (sintaxe, relogio e sorteio)"
+    else record_fail "workflow-syntax: (a)" "um script REAL do corpus reprovou (rc=${rc_real}): $(_emit "$(grep -E '✗|⊘' <<< "${_ao}")" | head -c 300)"; fi
   fi
 
   # (b) `return` no topo (a forma que o runtime EXECUTA) e valido
@@ -49801,6 +49804,27 @@ run_workflow_syntax_selftests() {
   if [ "${_ri}" -eq 2 ] || LC_ALL=C grep -qi 'NAO PUDE JULGAR\|não pude julgar' <<< "${_oi}"; then
     record_pass "workflow-syntax: (i) ferramenta quebrada => nao pude julgar (!= passou)"
   else record_fail "workflow-syntax: (i)" "node quebrado deu rc=${_ri}: $(_emit "${_oi}" | head -c 140)"; fi
+
+  # (j) RELOGIO E SORTEIO (2026-11-12): o runtime recusa `Date.now()`/`new Date()` ("breaks resume"),
+  # e o `decide-triage.js` gerava o nonce assim — sintaxe valida, check verde, modo triagem do
+  # /meta:decide NUNCA rodou. Cada forma proibida no CODIGO reprova; a mesma forma em comentario,
+  # string, template ou regex nao reprova (o onion-research.js a cita numa mensagem de erro). O (a)
+  # acima passa o corpus real por aqui: repor a linha antiga do decide-triage.js reprova o (a) tambem.
+  local _jf _jbad="" _jn=0
+  for _jf in 'const t = Date.now()' 'const t = new Date()' 'const r = Math.random()' 'const t = Date ()' \
+             'const x = `a ${ Date.now() } b`' 'const t = Date . now ()'; do
+    _jn=$((_jn+1))
+    printf '%s\n' 'export const meta = { name: "a", description: "b" }' "${_jf}" 'return 1' > "${d}/clock${_jn}.mjs"
+    bash "${chk}" "${d}/clock${_jn}.mjs" >/dev/null 2>&1 && _jbad="${_jbad} [${_jf}]"
+  done
+  printf '%s\n' 'export const meta = { name: "a", description: "b" }' '// Date.now() e proibido' \
+    '/* new Date() */ const e = "Date.now() e proibido no runtime"' "const q = 'Math.random()'" \
+    'const re = /["'"'"']Date.now()/g' 'const t = `txt Date.now() ${"s"} new Date()`' 'return { e, q, re, t }' > "${d}/clock-clean.mjs"
+  local _jo _jc
+  if _jo="$(bash "${chk}" "${d}/clock-clean.mjs" 2>&1)"; then _jc=0; else _jc=1; fi
+  if [ -z "${_jbad}" ] && [ "${_jc}" -eq 0 ]; then
+    record_pass "workflow-syntax: (j) relogio/sorteio no CODIGO reprova (${_jn} formas) e em comentario/string/template/regex nao"
+  else record_fail "workflow-syntax: (j)" "passaram:${_jbad:- nenhuma} · limpo rc=${_jc}: $(_emit "${_jo}" | head -c 140)"; fi
 
   # (e) script SEM bloco meta ainda e checado (nao pula calado)
   printf '%s\n' 'const s = `sem fechar' 'return 1' > "${d}/semmeta.mjs"

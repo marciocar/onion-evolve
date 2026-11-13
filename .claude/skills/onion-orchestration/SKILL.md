@@ -48,7 +48,7 @@ Nativas" (fonte única).
    `Workflow({scriptPath})`. **Três ganhos de uma vez, e só o primeiro é óbvio:**
 
    ```bash
-   bash .claude/validation/workflow-syntax-check.sh <script>   # exit 1 = sintaxe quebrada
+   bash .claude/validation/workflow-syntax-check.sh <script>   # exit 1 = sintaxe quebrada ou Date/Math.random no código
    ```
 
    ⚠️ **`node --check` sozinho MENTE** — trata `.js` como CommonJS e deixa passar erro de módulo

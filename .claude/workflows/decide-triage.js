@@ -66,7 +66,9 @@ log('candidatos: ' + cands.length + ' · lotes de ' + BATCH + ' · avisos/exclus
 // CERCA DE CONTEÚDO NÃO CONFIÁVEL (R15.2, `.claude/commands/common/prompts/untrusted-content-provenance.md`): o
 // label e as pistas vêm do grafo, que qualquer sessão ou adotante escreve. Entram no prompt dentro da cerca, com
 // nonce; um `<<<`/`>>>` dentro do texto é desarmado (‹‹‹/›››), para não forjar a fronteira.
-const NONCE = Date.now().toString(36) + Math.random().toString(36).slice(2, 10)
+// Date.now() é proibido no runtime de workflow (quebra o replay do resume): o nonce é um hash FNV-1a do próprio
+// TSV com a data, determinístico por rodada. Quem escreve um nó não controla o TSV inteiro nem a data da rodada.
+const NONCE = (() => { let h = 0x811c9dc5; const s = A.tsv + '|' + A.today; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0 } return h.toString(36) + s.length.toString(36) })()
 const defang = t => String(t || '').replace(/<<</g, '‹‹‹').replace(/>>>/g, '›››')
 const fence = body => '<<<UNTRUSTED origin="kg-node" channel="decide-triage" verified-crypto="false" verified-semantic="false" nonce="' + NONCE + '">>>\n' +
   defang(body) + '\n<<<END UNTRUSTED nonce="' + NONCE + '">>>'
