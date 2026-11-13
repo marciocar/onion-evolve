@@ -43,11 +43,11 @@ Todos foram aprovados com a condição de o `verified_at` passar a 2026-10-09.
 
 ### Pontos específicos pedidos
 
-- **`E_LSTREE_MAIN_0717`: APROVADO.** Reproduzi `ls-tree fb08cc6b -- .claude` = **399** e `bfb9bce2` = **239**.
-  O `bfb9bce2` existe em `marciocar/metagamify` e é o `main` até 2026-07-17 (`gh api …&until`). Pela regra 2
+- **`E_LSTREE_MAIN_0717`: APROVADO.** Reproduzi `ls-tree fb08cc6b -- .claude` = **399** e `⟨commit⟩` = **239**.
+  O `⟨commit⟩` existe em `private-cite:tgxVGOBwRqcaoECe9S48YQ` e é o `main` até 2026-07-17 (`gh api …&until`). Pela regra 2
   selada, remoto alcançável dá `repo`, e isso prevalece sobre a amostra.
-- **onion-bridge de 26 a 28/07: APROVADOS em `host`.** Até 08-02, o remoto tem só `c22517ee` (07-27 17:01Z) e
-  `38702f00` (08-01). Confirmei que `c22517ee` já traz `web/src/auth/oidc.ts`, o que não sustenta
+- **onion-bridge de 26 a 28/07: APROVADOS em `host`.** Até 08-02, o remoto tem só `⟨commit⟩` (07-27 17:01Z) e
+  `⟨commit⟩` (08-01). Confirmei que `⟨commit⟩` já traz `web/src/auth/oidc.ts`, o que não sustenta
   `C_pwa_has_no_pkce`. O argumento do proponente se sustenta.
 - **Shas do onion-bridge de 08-01 em diante:** os 30 conferidos existem no remoto. Onde a claim é sobre
   código, o sha é o último commit do arquivo até a data, ou o commit que o próprio nó cita.
@@ -58,17 +58,17 @@ Todos foram aprovados com a condição de o `verified_at` passar a 2026-10-09.
    `host`. Mas as **7 fases de deploy** (`F0`–`F5`, `F_ID_1`, `F_ID_2_CONTEXTOS_ORG`) foram para `repo` com
    `leitura:`, embora o locator delas descreva **deploy medido no serviço** (health, rotas 401/404/429, ataques).
    Isso **promove um ponteiro derivado na migração** (rota A2, "não reverificado") a leitura de código. Corrigi
-   para `host`, com a source descrevendo a medição e o código no locator. Em `F_ID_1` troquei `83033b25`, que é
-   da F-ID.2, por `2e10b497`, o deploy que o locator nomeia. Também acrescentei o código ao locator onde a
+   para `host`, com a source descrevendo a medição e o código no locator. Em `F_ID_1` troquei `⟨commit⟩`, que é
+   da F-ID.2, por `⟨commit⟩`, o deploy que o locator nomeia. Também acrescentei o código ao locator onde a
    proposta o descartou: `E_SONDA_…` e `E_pull_endpoint_works`. Em `Q_ONION_KG_MCP_NEXT`, o código saiu da
    source.
 2. **Promoção de método sem base (1, mais as 7 acima).** `I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO` passou de
    `testemunho:` a `leitura:` num relato em 1ª pessoa de medição sem comando.
-3. **"sha da data do nó" sem conferir a data (4).** `D_engine_noweb_confirmed` cita `onion-waha@86662e01`, que
+3. **"sha da data do nó" sem conferir a data (4).** `D_engine_noweb_confirmed` cita `private-cite:VKCcyQhPj6jc0y8UL-4Vlg`, que
    é o **único** commit do remoto e é de 08-02T23:22Z, um dia **depois** do nó. `E_GAP2_ZERO` usava `HEAD`.
    `E_CENSO0901_Q_ARANDEK_UPDATE` e `E_LSTREE_METAGAMIFY_0804` ficaram sem sha. Reproduzi as medições
-   (`merge-base` rc=0, lista de pins, 239 arquivos) e ancorei em `onion-evolve@5c40b1cc`, `arandek@cd682ac4`,
-   `arandek@611329a1` e `metagamify@bfb9bce2`.
+   (`merge-base` rc=0, lista de pins, 239 arquivos) e ancorei em `onion-evolve@5c40b1cc`, `private-cite:0iYLgyflaG5YyeE8jZmV-A`,
+   `private-cite:0iYLgyflaG5YyeE8jZmV-A` e `private-cite:tgxVGOBwRqcaoECe9S48YQ`.
 4. **Regra 3 selada ignorada (1, mais 3 omissões).** O proponente **renumerou as regras**: a "Regra 3" dele é a
    5 do maestro. Por isso tratou o binário como caso difícil (P3) e escreveu que "a regra literal pediria
    testemunho". **Isso é falso**: a regra 3 selada manda `medição` com `host`. `E_OBJECAO_EXIT2_E_PRIMITIVO_GRATIS`
@@ -81,7 +81,7 @@ Todos foram aprovados com a condição de o `verified_at` passar a 2026-10-09.
    `C_console_not_the_path`, `E_floors_effective_measured_20260729` e `E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING`.
    O corpus tem **145** sources com caminho absoluto, e a planilha cobria 137.
 6. **Afirmação sem medir (7).** "onion-vps-librechat sem remoto" é falso: há um `origin`, só que ele **aponta
-   para `marciocar/onion-bridge.git`**, e os commits do librechat não existem lá (`gh api` 422). `host` continua
+   para `private-cite:ijfNgIkz7BGIKYZoOVgtBA`**, e os commits do librechat não existem lá (`gh api` 422). `host` continua
    certo, mas pela razão "sem remoto **alcançável**".
 7. **Resíduo de replace mecânico (14).** Há "journal journal" em 5 linhas, "testemunho: leitura:" em 7, a pasta
    `onion-bridge-dev` no method de `E_CONVITE_…` e `onion-vps-logto` no de `I_UPGRADE_…`. Também há uma
@@ -114,7 +114,7 @@ Nenhum foi aplicado. As regras novas abaixo são **propostas**.
 
 ## Achados fora da provenance
 
-- **`onion-vps-librechat` tem `origin` = `git@github.com:marciocar/onion-bridge.git`.** Um `git push` ali
+- **`onion-vps-librechat` tem `origin` = `private-cite:ijfNgIkz7BGIKYZoOVgtBA`.** Um `git push` ali
   mandaria a história do librechat para o repo do bridge. Sugiro corrigir ou remover o remote.
 - **O reboot do host segue pendente:** `/var/run/reboot-required` está datado de 2026-09-24 e o kernel em uso
   ainda é o 6.8.0-139. É o mesmo estado que `E_MEDIDO_ESTADO_VIVO_1005` registrou em 10-05. Fica como

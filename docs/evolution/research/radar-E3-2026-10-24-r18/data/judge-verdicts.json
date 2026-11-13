@@ -122,7 +122,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU2_MEDICAO_NAO_REPRODUZ",
-    "comando": "python sobre .claude/settings.json (25 hooks, todos 'bash \"$CLAUDE_PROJECT_DIR/...\"', 0 começam por aspas, nenhum PermissionRequest); python sobre /home/marcio/*/.claude/settings.json e /home/marcio/*/*/.claude/settings.json (41 arquivos legíveis, 624 comandos, 0 começam por aspas, 0 PermissionRequest); ~/.claude/settings.json (Notification e Stop começam por curl); assemble-plugin.sh l.259 (gera 'bash \"${CLAUDE_PLUGIN_ROOT}/hooks/<bn>\"')"
+    "comando": "python sobre .claude/settings.json (25 hooks, todos 'bash \"$CLAUDE_PROJECT_DIR/...\"', 0 começam por aspas, nenhum PermissionRequest); python sobre ⟨caminho⟩ e ⟨caminho⟩ (41 arquivos legíveis, 624 comandos, 0 começam por aspas, 0 PermissionRequest); ~/.claude/settings.json (Notification e Stop começam por curl); assemble-plugin.sh l.259 (gera 'bash \"${CLAUDE_PLUGIN_ROOT}/hooks/<bn>\"')"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -130,7 +130,7 @@
     "o_que": "não se aplica (veredito positivo)",
     "medida": "não se aplica"
    },
-   "nota": "A conclusão reproduz e se fortalece numa população maior. O número '20 settings.json' não reproduz (ls /home/marcio/*/.claude/settings.json = 37; com o 2º nível, 41 legíveis) e o filtro 'adotantes e portas' não está escrito; o 0 vale nos 41. O nó não mediu o bundle de plugins, que é a superfície que de fato chega a Windows pelo marketplace público: o gerador emite o bash nu, então nada muda."
+   "nota": "A conclusão reproduz e se fortalece numa população maior. O número '20 settings.json' não reproduz (ls ⟨caminho⟩ = 37; com o 2º nível, 41 legíveis) e o filtro 'adotantes e portas' não está escrito; o 0 vale nos 41. O nó não mediu o bundle de plugins, que é a superfície que de fato chega a Windows pelo marketplace público: o gerador emite o bash nu, então nada muda."
   },
   {
    "alvo": "E_SANDBOX_FORA_DO_CORE_E_BWRAP_BARRADO_NO_HOST_1024",
@@ -227,7 +227,7 @@
    "veredito": "EXAGERA",
    "criterio": {
     "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
-    "comando": "grep -n 'id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023' r17.kg.yaml (l.66, status open); git show --stat 704c8ebf (pin v1.0.260); git -C /home/marcio/onion-bridge-dev-sdk310 log --oneline -1 (35c5187, SDK 0.3.309, bridge #90); cc-delta-census.sh . (bridge 2.1.309)"
+    "comando": "grep -n 'id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023' r17.kg.yaml (l.66, status open); git show --stat 704c8ebf (pin v1.0.260); git -C private-cite:5XBZ_9UEOtU1pkIv7T_swQ log --oneline -1 (⟨commit⟩, SDK 0.3.309, bridge #90); cc-delta-census.sh . (bridge 2.1.309)"
    },
    "superacao": {
     "classe": "entrega",

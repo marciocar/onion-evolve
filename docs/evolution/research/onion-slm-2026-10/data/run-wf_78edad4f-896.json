@@ -7,13 +7,13 @@
   "Leitura: 18/18 fontes alcançadas · inalcançáveis: nenhuma",
   "Ancoragem: 58 claim(s) ANCORADA(S) · 28 rejeitada(s) (exagerada ou não encontrada)",
   "Elenxo: 58 objeções (29 sobrevivem) · lacunas fechadas: 11 · abertas: 8",
-  "write(KG): /home/marcio/worktrees/onion-evolve/research-onion-slm/docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml — +86 nós / +118 arestas, total 86, radar exit 0"
+  "write(KG): docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml — +86 nós / +118 arestas, total 86, radar exit 0"
  ],
  "result": {
   "mode": "primaries",
   "question": "Onion SLM — selar do lado do core, contra PRIMÁRIAS, o conhecimento e as possibilidades que a pesquisa do chat do maestro (docs/discussions/onion-slm/fontes, 45 afirmações, estado nao-verificado, escrita sem ler o repo) propõe: modelos pequenos especialistas prontos (GLiNER2.5, GLiNER2-PII, OpenAI Privacy Filter, NuExtract 3), bases (Qwen3.5 Small, Gemma 4, Qwen3.8 sem variante <=9B, ZAYA1), embedders (Qwen3-Embedding, EmbeddingGemma), destilação on-policy (Thinking Machines/Tinker) e o estado do TRL GKD, evidência de quando SLM ajustado vence fronteira (LoRA Land), avaliação de extração de KG (KaLLM 2026), rótulo por mutação/corrupção de grafo, SLMs para subtarefas agênticas (NVIDIA), e o capital por trás dos fornecedores. Os docs do chat NÃO são verdade: cada claim só vira nó com citação verbatim da primária. Enquadramento do maestro: o Nanochat foi um EXEMPLO de rodada anterior, não é o moat; o moat do Onion é o mecanismo verificável (radar determinístico, dogfood, KG-SSOT First+Runtime, SDAAL em todas as fases, Elenxo). O SLM só interessa como ferramenta de conjunto fechado ancorada nesse mecanismo. Decisão vigente no corpus: nanochat-onion-2026-10#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 (A operante: não treinar agora; C = primitiva tipada local sem treino, fine-tune só após eval de domínio que falhe) e Q_EVAL_DE_DOMINIO_DO_ONION aberto. Schema real do KG medido hoje (não o inferido pela fonte): node_type evidence/decision/claim/question/entity/artifact/policy/invariant/state/rule/event; edge_type SUPPORTS/TRACES_TO/CONSTRAINS/DEPENDS_ON/SUPERSEDES/CAUSES/REFUTES/HAS_STATE/TRANSITIONS/WRITES/READS/EMITS. Para cada fonte: o que a primária DIZ de fato, o que a fonte do chat ESTICOU, e o que isso habilita ou veta para o Onion.",
   "today": "2026-10-05",
-  "kgPath": "/home/marcio/worktrees/onion-evolve/research-onion-slm/docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml",
+  "kgPath": "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml",
   "radarExit": 0,
   "summary": "Grafo criado em 2026-10-05, com teto declarado de 86 nós e radar --integrity --schema em exit 0 (o modo padrão e o kg-backlog-check também saíram em 0). Conteúdo: 58 evidências ancoradas em primária, E_LACUNAS_ONION_SLM_PRIMARIES_1005 (17 fontes lidas, 0 inalcançáveis, 28 claims rejeitadas na ancoragem com o motivo de cada uma e 9 lacunas abertas), 9 leituras de síntese em status open, 9 afirmações do chat reconciliadas com aresta nomeada (4 REFUTES, 3 SUPERSEDES, 2 unverifiable), a proposta Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF, que não sela, e o enquadramento do maestro (o nanochat foi exemplo, não é o moat). A decisão do nanochat e o IN_NONE_FAILSAFE vivem em outros grafos, e o radar reprova aresta para fora do arquivo. Por isso entram como 5 âncoras X_REF_* espelhadas: o grafo do nanochat está só no branch docs/research-infra-nanochat-2026-10, e os grafos de origem e o selo D_NANOCHAT não foram tocados. O retorno do Elenxo chegou truncado na objeção 23, o que está declarado no nó de lacunas, e o diretório docs/discussions/onion-slm/fontes não existe nesta árvore.",
   "unreachable": [],
@@ -2138,14 +2138,14 @@
    "queuedAt": 1791229599116,
    "attempt": 1,
    "lastToolName": "StructuredOutput",
-   "lastToolSummary": "/home/marcio/worktrees/onion-evolve/research-onion-slm/docs…",
+   "lastToolSummary": "docs…",
    "promptPreview": "## write(KG) — escreva o grafo desta rodada de primárias e prove que o radar o lê\n\nPergunta: \"Onion SLM — selar do lado do core, contra PRIMÁRIAS, o conhecimento e as possibilidades que a pesquisa do chat do maestro (docs/discussions/onion-slm/fontes, 45 afirmações, estado nao-verificado, escrita sem ler o repo) propõe: modelos pequenos especialistas prontos (GLiNER2.5, GLiNER2-PII, OpenAI Privacy…",
    "promptFramed": true,
    "lastProgressAt": 1791230140077,
    "tokens": 171304,
    "toolCalls": 21,
    "durationMs": 540906,
-   "resultPreview": "{\"kgPath\":\"/home/marcio/worktrees/onion-evolve/research-onion-slm/docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":86,\"edges\":118,\"nodesTotal\":86,\"summary\":\"Grafo criado em 2026-10-05, com teto declarado de 86 nós e radar --integrity --schema em exit 0 (o modo padrão e o kg-backlog-check também saíram em 0). Conteúdo: 58 evidências ancoradas em primária, E…"
+   "resultPreview": "{\"kgPath\":\"docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":86,\"edges\":118,\"nodesTotal\":86,\"summary\":\"Grafo criado em 2026-10-05, com teto declarado de 86 nós e radar --integrity --schema em exit 0 (o modo padrão e o kg-backlog-check também saíram em 0). Conteúdo: 58 evidências ancoradas em primária, E…"
   }
  ],
  "totalTokens": 2613991,

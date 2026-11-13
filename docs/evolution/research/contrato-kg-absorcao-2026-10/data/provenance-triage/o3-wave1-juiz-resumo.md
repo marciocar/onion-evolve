@@ -104,9 +104,9 @@ Os 4 nós `rebaixar` que vieram de `corrigir` são os quatro `E_R3_TST_*`.
      (`C_H1_04`, `C_H4_F4` e os três `E_*_CORR` do scope-inheritance).
 4. **Fonte recuperável perdida, procura encerrada cedo.**
    - threads HN de `E_DOR_…` e `E_CONCORRENTE_…`;
-   - PoC clonada em `/home/marcio/poc-venda-direta-pdi`, que transforma testemunho em leitura;
-   - `d8434efc`, `be29ab00` e o cabeçalho do radar `ff6c22a6`;
-   - commit durável 611329a1 no `onion-adopt-arandek`;
+   - PoC clonada em `private-cite:A4s3mTgpwlCTJ6gIMY4Z6A`, que transforma testemunho em leitura;
+   - `⟨commit⟩`, `be29ab00` e o cabeçalho do radar `ff6c22a6`;
+   - commit durável ⟨commit⟩ no `onion-adopt-arandek`;
    - RFC-0005 aceito, no lugar do SYNTHESIS, que se declara não-decisório, como fonte de 4 decisões.
 5. **Rebaixar quando havia fonte (o inverso).** Em `E_DOR_DOMINANTE_…` a fonte parcial existia. Mesmo
    assim o nó ficou REPROVADO, porque os relatos "50k+ tokens" e "US$2→US$8" não foram localizados.
@@ -181,8 +181,8 @@ cindir o label, não carimbar provenance.
 2. **A busca externa ficou no teto.** O DuckDuckGo devolveu página bloqueada. A recuperação do
    acórdão TST e dos relatos do `E_DOR` não foi esgotada, e a busca de comentários do HN (Algolia)
    falhou ao decodificar.
-3. **Journals no host e clones em `/home/marcio/`** só se reabrem nesta máquina. O
-   `/home/marcio/onion-bridge` não existe; o clone usado foi o `onion-bridge-dev`.
+3. **Journals no host e clones em `⟨caminho⟩`** só se reabrem nesta máquina. O
+   `private-cite:ICv10U5bP9hv4YEy9GLlZQ` não existe; o clone usado foi o `onion-bridge-dev`.
 4. **URLs medidas uma vez, em 2026-10-09.** O trendshift exige User-Agent de navegador.
 5. **`E_CORPUS_VAZIO_OCR_0908` foi aprovado com ressalva.** O total de 3289 nós não reproduziu: o
    parse do worker deu 3437 em 88 grafos legíveis.

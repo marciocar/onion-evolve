@@ -7,13 +7,13 @@
     "Leitura: 5/6 fontes alcançadas · inalcançáveis: zoho-projects-v3",
     "Ancoragem: 27 claim(s) ANCORADA(S) · 3 rejeitada(s) (exagerada ou não encontrada)",
     "Elenxo: 27 objeções (17 sobrevivem) · lacunas fechadas: 6 · abertas: 7",
-    "write(KG): /home/marcio/onion-evolve/docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml — +52 nós / +62 arestas, total 52, radar exit 0"
+    "write(KG): docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml — +52 nós / +62 arestas, total 52, radar exit 0"
   ],
   "result": {
     "mode": "primaries",
     "question": "Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máximos); (2) status e transição (status livre ou workflow com transições obrigatórias); (3) prioridade (tipo e escala); (4) estimativa/story points (campo nativo ou custom); (5) comentário (formato do corpo: ADF, markdown, HTML, texto); (6) anexo; (7) label/tag; (8) sprint/ciclo/iteração; (9) dependência/vínculo entre itens; (10) busca/filtro e paginação; (11) operação em lote; (12) versão de API vigente e depreciações. O objetivo é a matriz provedor × capacidade que a interface agnóstica do Onion (interface.md) vai declarar.",
     "today": "2026-10-11",
-    "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml",
+    "kgPath": "docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml",
     "radarExit": 0,
     "summary": "Grafo novo da Onda 1 (SAC-62, run wf_8e56d56f-a8b): 27 evidências ancoradas com URL primária, a contabilidade E_LACUNAS (5 fontes lidas, Zoho inalcançável, 3 claims rejeitadas por exagero, gapsOpen inteiros), 17 objeções sobreviventes do Elenxo como nós CONSTRAINS, 3 sínteses open e 4 perguntas, entre elas a reconciliação do \"removido em maio/2025\" do core com o \"currently being removed\" da primária. As 62 arestas são 61 internas mais 1 external_edge CONSTRAINS sobre zoho-glpi-adapters-2026-09#E_ZOHO_SEM_ENDPOINT_TRANSICAO. Nenhum selo. Radar --integrity --schema exit 0 e kg-contract-check rc 0.",
     "unreachable": [
@@ -852,14 +852,14 @@
       "queuedAt": 1791726209219,
       "attempt": 1,
       "lastToolName": "StructuredOutput",
-      "lastToolSummary": "/home/marcio/onion-evolve/docs/evolution/research/task-mana…",
+      "lastToolSummary": "docs/evolution/research/task-mana…",
       "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
       "promptFramed": true,
       "lastProgressAt": 1791726649677,
       "tokens": 161753,
       "toolCalls": 18,
       "durationMs": 440427,
-      "resultPreview": "{\"kgPath\":\"/home/marcio/onion-evolve/docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":52,\"edges\":62,\"nodesTotal\":52,\"summary\":\"Grafo novo da Onda 1 (SAC-62, run wf_8e56d56f-a8b): 27 evidências ancoradas com URL primária, a contabilidade E_LACUNAS (5 fontes lidas, Zoho inalcançável, 3 claims rejeitadas por exagero, gapsOpen int…"
+      "resultPreview": "{\"kgPath\":\"docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":52,\"edges\":62,\"nodesTotal\":52,\"summary\":\"Grafo novo da Onda 1 (SAC-62, run wf_8e56d56f-a8b): 27 evidências ancoradas com URL primária, a contabilidade E_LACUNAS (5 fontes lidas, Zoho inalcançável, 3 claims rejeitadas por exagero, gapsOpen int…"
     }
   ],
   "totalTokens": 1012508,

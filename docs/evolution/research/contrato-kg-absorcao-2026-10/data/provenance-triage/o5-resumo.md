@@ -54,8 +54,8 @@ a linha da regra 3 cai junto.
 
 ### Âncoras medidas hoje (regra 1)
 
-- **Repos com remoto:** `onion-vps-vaultwarden@6d82b1b` e `@31cd4f9`, e `onion-logto@617364f`, `@2a4d992`,
-  `@4e99f87` e `@dd1ba80`. Conferidos com `gh api …/commits/<sha>`. A pasta local `onion-vps-logto` tem remoto
+- **Repos com remoto:** `private-cite:HNUpyhvVwy8PhBJ91H0nmA` e `@⟨commit⟩`, e `private-cite:qCoLDA0fEfiQR_W5v2BHiA`, `@⟨commit⟩`,
+  `@⟨commit⟩` e `@⟨commit⟩`. Conferidos com `gh api …/commits/<sha>`. A pasta local `onion-vps-logto` tem remoto
   `marciocar/onion-logto`.
 - **`E_BIOGRAFIA_…`:** vira `onion-evolve@27179d37`. Reproduzido: `ls-tree .claude/diary` = 127.
 - **`Q_VPS_EXPOSURE_…`:** vira `onion-evolve@9e75a73d:…vps-exposure-check.sh`, com as l.89-92 e a l.99
@@ -128,8 +128,8 @@ Universo reproduzido: `kg_validate.py --where` dá `integrity.testimony-in-prod`
   `web`, mas metade da evidência é `onion-evolve@sha`.
 - **D4. `Q_route_inventory`.** É pergunta aberta medida com `sudo grep` no clone de produção. Só tirei o
   caminho, sem converter a testemunho, porque a source é a análise versionada.
-- **D5. `I_CONSOLE_DO_LOGTO_ESTA_PUBLICO`.** O locator passa a `onion-logto@617364f` (nome do remoto), mas o
-  method diz `onion-vps-logto@617364f` (nome da pasta). Não unifiquei o method, que está fora da regra.
+- **D5. `I_CONSOLE_DO_LOGTO_ESTA_PUBLICO`.** O locator passa a `private-cite:qCoLDA0fEfiQR_W5v2BHiA` (nome do remoto), mas o
+  method diz `onion-vps-logto@⟨commit⟩` (nome da pasta). Não unifiquei o method, que está fora da regra.
 
 ## Propostas ao maestro (regras novas, NÃO aplicadas)
 
@@ -144,21 +144,21 @@ Universo reproduzido: `kg_validate.py --where` dá `integrity.testimony-in-prod`
 - **P4. Isenção para caminho-conteúdo** (D2): citação verbatim de terceiro, vetor de teste e receita. Ou se
   marca explicitamente, ou se proíbe também e se aceita a perda da literalidade.
 - **P5. Caminho absoluto fora de `provenance`.** `verified_against` e `trace` continuam com
-  `/home/marcio/.local/share/claude/versions/…`, por exemplo em `E_ESTUDO_…`, `E_OBJECAO_EXIT2_…`,
+  `⟨caminho⟩`, por exemplo em `E_ESTUDO_…`, `E_OBJECAO_EXIT2_…`,
   `E_MEDIDO_LOCAL_O_GATE_…` e `E_MEDIDO_LOCAL_TIER10_…`. A regra 1 não os alcança.
 
 ## Para o maestro (fora da provenance)
 
 - **M1.** Ver P3. As formas sem barra e `/boot` escapavam do grep do brief e do juiz.
-- **M2.** O `onion-vps-waha@c92ff68`, citado em `E_waha_public_route_caddy`, **não existe** no remoto
-  `marciocar/onion-waha`: o `gh api` devolve 422. O backup de DNS de 2026-10-08 também só existe no host.
+- **M2.** O `onion-vps-waha@⟨commit⟩`, citado em `E_waha_public_route_caddy`, **não existe** no remoto
+  `private-cite:4b-WpYXd0rHkz7S2gOhjnA`: o `gh api` devolve 422. O backup de DNS de 2026-10-08 também só existe no host.
 - **M3. Ponto cego da REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente).** Uma das 10 pastas do
   locator de `E_W9_PIN_GREP_MEDIDO` (a 1ª da lista original) **não tem entrada no `members.yaml`**. O nome não
   é repetido aqui. Há também dois clones
   locais para o id `poc-venda-direta-pdi`. Isso fica invisível à REGRA 36, e registrar é ato de segurança.
 - **M4.** `C_TOPO_SHARED_BASE` e `E_GIT_MERGEBASE` carregavam, no locator, o nome de uma **branch** do
   metagamify que contém o nome privado. Como o locator já era reescrito, troquei a branch por
-  `<branch do fork privado>`, e o sha `f7e4b034` continua identificando o commit. O id do nó, o label e o
+  `<branch do fork privado>`, e o sha `⟨commit⟩` continua identificando o commit. O id do nó, o label e o
   nome do grafo `hub-operacoes-enterprise-update-547-2026-10` seguem com nome privado, mas estão fora do alcance desta onda (P6
   da O4). A REGRA 30 (Segurança de PROJEÇÃO: nome comercial de membro privado não sai)
   não olha refs.

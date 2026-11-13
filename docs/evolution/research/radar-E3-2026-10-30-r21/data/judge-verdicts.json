@@ -137,7 +137,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU2_MEDICAO_NAO_REPRODUZ",
-    "comando": "command grep -rlF blockWritesOutsideWorkingDirectories .claude ops .github CLAUDE.md → nenhum; python: .claude/settings.json permissions keys = ['allow']; ~/.claude/settings.json permissions = {allow: list, defaultMode: 'bypassPermissions'}, sem additionalDirectories; esta worktree mora em /home/marcio/worktrees, fora do checkout"
+    "comando": "command grep -rlF blockWritesOutsideWorkingDirectories .claude ops .github CLAUDE.md → nenhum; python: .claude/settings.json permissions keys = ['allow']; ~/.claude/settings.json permissions = {allow: list, defaultMode: 'bypassPermissions'}, sem additionalDirectories; esta worktree mora em ⟨caminho⟩, fora do checkout"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -377,13 +377,13 @@
    "veredito": "REPROVA",
    "criterio": {
     "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
-    "comando": "git -C /home/marcio/onion-evolve config --local --get core.hooksPath → '.githooks' (RELATIVO, não absoluto como o r20 mediu); ls -t .git/worktrees → nenhuma worktree de agente criada depois da instalação do 2.1.314 (versions/2.1.314 de 2026-10-30 01:06; as últimas de agente são de 2026-10-29 12:30, pelo 2.1.312; a desta rodada, cc-update-r21, nasceu às 02:47 fora de .claude/worktrees); gh issue view 85039 e 88747 -R anthropics/claude-code → OPEN, closedAt null; grep -n hooksPath .claude/hooks/session-currency-check.sh → linhas 29-77, a guarda que avisa quando está ABSOLUTO"
+    "comando": "git -C ⟨caminho⟩ config --local --get core.hooksPath → '.githooks' (RELATIVO, não absoluto como o r20 mediu); ls -t .git/worktrees → nenhuma worktree de agente criada depois da instalação do 2.1.314 (versions/2.1.314 de 2026-10-30 01:06; as últimas de agente são de 2026-10-29 12:30, pelo 2.1.312; a desta rodada, cc-update-r21, nasceu às 02:47 fora de .claude/worktrees); gh issue view 85039 e 88747 -R anthropics/claude-code → OPEN, closedAt null; grep -n hooksPath .claude/hooks/session-currency-check.sh → linhas 29-77, a guarda que avisa quando está ABSOLUTO"
    },
    "superacao": {
     "classe": "entrega",
     "achada": true,
     "o_que": "nó novo E_HOOKSPATH_RELATIVO_HOJE_SEM_WORKTREE_DE_AGENTE_DO_2_1_314_1030 ('core.hooksPath local é .githooks, relativo; nenhuma worktree de agente nasceu sob o 2.1.314; as issues 85039 e 88747 seguem abertas; se o 2.1.314 ainda regrava para absoluto não está medido') com SUPERSEDES para r20#E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028, e uma pergunta para medir na próxima worktree de agente (git config --get core.hooksPath e stat do .git/config antes e depois)",
-    "medida": "git -C /home/marcio/onion-evolve config --local --get core.hooksPath; ls -la --time-style=full-iso -t /home/marcio/onion-evolve/.git/worktrees | head; gh issue view 85039 -R anthropics/claude-code --json state"
+    "medida": "git -C ⟨caminho⟩ config --local --get core.hooksPath; ls -la --time-style=full-iso -t .git/worktrees | head; gh issue view 85039 -R anthropics/claude-code --json state"
    },
    "nota": "o estado afirmado pelo r20 ('segue absoluto') não vale hoje, e a rodada não mediu se o 2.1.314 ainda regrava o hooksPath ao criar worktree de agente; a linha 34 (worktree e sandbox) era o gancho para olhar"
   },
@@ -428,7 +428,7 @@
     "classe": "entrega",
     "achada": true,
     "o_que": "acrescentar a linha 62 como razão candidata (efeito não medido) em Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030, e registrar em E_ITENS_SEM_SUPERFICIE_NO_CORE_1030 que a linha 71 não se aplica ao bridge (o runner nega Task e Agent, ops/chat-runner.sh linha 629)",
-    "medida": "grep -n stream-json ops/chat-runner.sh; sudo -n -u onion /home/onion/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude --version"
+    "medida": "grep -n stream-json ops/chat-runner.sh; sudo -n -u onion private-cite:IFrNRg3UU6xrJsHRCiyNQw --version"
    },
    "nota": "é o único item do delta, além do 36, que descreve o modo de operação do bridge; prompt de convidado com essas tags não é reconhecido até o SDK subir; efeito no /chat não medido (exigiria sessão real)"
   }

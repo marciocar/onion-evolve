@@ -7,13 +7,13 @@
   "Leitura: 9/9 fontes alcançadas · inalcançáveis: nenhuma",
   "Ancoragem: 37 claim(s) ANCORADA(S) · 17 rejeitada(s) (exagerada ou não encontrada)",
   "Elenxo: 37 objeções (25 sobrevivem) · lacunas fechadas: 6 · abertas: 12",
-  "write(KG): /home/marcio/worktrees/onion-evolve/research-slm-roadmap/docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml — +59 nós / +87 arestas, total 59, radar exit 0"
+  "write(KG): docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml — +59 nós / +87 arestas, total 59, radar exit 0"
  ],
  "result": {
   "mode": "primaries",
   "question": "Onion SLM — ROTEIRO GRADUAL (spike → PoC → MVP → produto): quais frameworks e guias PRIMÁRIOS (Hugging Face e outros) dizem COMO avaliar e especializar modelos pequenos de forma progressiva — o que entra e o que sai de cada etapa, critérios de passagem, resultado final possível e exemplos esperados. O mote do maestro: o modelo é Dogfood + KG-SSOT First + Runtime SDAAL encarnado; o moat é o mecanismo verificável, não o modelo. Já selado no corpus (onion-slm-2026-10): não treinar agora; medir especialistas prontos zero-shot (OpenAI Privacy Filter, GLiNER2-PII, NuExtract 3, GLiNER2.5) num eval de domínio com erros REAIS selados; F1 automático é piso; rótulo por mutação não certifica. Para cada fonte: as ETAPAS que ela prescreve, os gates/critérios de saída, o que ela manda medir ANTES de treinar, e o que habilita/veta para o roteiro do Onion.",
   "today": "2026-10-05",
-  "kgPath": "/home/marcio/worktrees/onion-evolve/research-slm-roadmap/docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml",
+  "kgPath": "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml",
   "radarExit": 0,
   "summary": "Grafo novo criado (TETO 59, review_after 2027-10-05 com gatilhos nomeados): 37 evidências ancoradas de 9 fontes, E_LACUNAS com 17 rejeições por exagero e as 12 lacunas abertas do Elenxo, lido inteiro no journal. Também tem 12 leituras do roteiro porta 0 → spike → PoC → MVP → produto, declarado como cunhagem do Onion porque nenhuma fonte dá limiar numérico. Completam o grafo 6 âncoras cross-grafo e a proposta Q_SLM_GRADUAL_ROADMAP_PROPOSAL, que não sela e deixa intacto o D done. Radar --integrity --schema terminou com exit 0.",
   "unreachable": [],
@@ -1325,14 +1325,14 @@
    "queuedAt": 1791243516658,
    "attempt": 1,
    "lastToolName": "StructuredOutput",
-   "lastToolSummary": "/home/marcio/worktrees/onion-evolve/research-slm-roadmap/do…",
+   "lastToolSummary": "do…",
    "promptPreview": "## write(KG) — escreva o grafo desta rodada de primárias e prove que o radar o lê\n\nPergunta: \"Onion SLM — ROTEIRO GRADUAL (spike → PoC → MVP → produto): quais frameworks e guias PRIMÁRIOS (Hugging Face e outros) dizem COMO avaliar e especializar modelos pequenos de forma progressiva — o que entra e o que sai de cada etapa, critérios de passagem, resultado final possível e exemplos esperados. O mot…",
    "promptFramed": true,
    "lastProgressAt": 1791243994102,
    "tokens": 154957,
    "toolCalls": 17,
    "durationMs": 477420,
-   "resultPreview": "{\"kgPath\":\"/home/marcio/worktrees/onion-evolve/research-slm-roadmap/docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":59,\"edges\":87,\"nodesTotal\":59,\"summary\":\"Grafo novo criado (TETO 59, review_after 2027-10-05 com gatilhos nomeados): 37 evidências ancoradas de 9 fontes, E_LACUNAS com 17 rejeições por exagero e as 12 lacunas abertas do Elenxo, lid…"
+   "resultPreview": "{\"kgPath\":\"docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":59,\"edges\":87,\"nodesTotal\":59,\"summary\":\"Grafo novo criado (TETO 59, review_after 2027-10-05 com gatilhos nomeados): 37 evidências ancoradas de 9 fontes, E_LACUNAS com 17 rejeições por exagero e as 12 lacunas abertas do Elenxo, lid…"
   }
  ],
  "totalTokens": 1411884,

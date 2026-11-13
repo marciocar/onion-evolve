@@ -60,7 +60,7 @@ remover.
    - o sha é o último commit do arquivo em `commits?until=<verified_at>T23:59:59Z&path=`.
 
    Bateram 40 de 41 nos remotos que não são o waha. O `E_logto` não tem `verified_at`. Usei o `meta.date`
-   do grafo e o commit que nasceu o nó (`346d1bd9`, às 22:18Z), e o `17f4ecd9` (21:26Z) é anterior, então
+   do grafo e o commit que nasceu o nó (`346d1bd9`, às 22:18Z), e o `⟨commit⟩` (21:26Z) é anterior, então
    confere.
 2. **Cada `trace` relativo proposto foi conferido no repo com `test -e`:** `ops/mcp-onion-kg/server.py`,
    `docs/evolution/federation/members.yaml`, `CLAUDE.md`, os dois do SY4 e o `_processed` do E_L2.
@@ -73,11 +73,11 @@ remover.
    - Os line numbers do compose (`7338dcb`), que o proponente não pôde reler (F-O6-3), **eu reli**: a l.6 é a
      frase do swap e as l.16, 82, 100, 119 e 137 são os 5 `mem_limit`.
    - O `admin` não está em `7338dcb`. O 512m dele vem do `docker inspect`, e o label do nó novo já diz isso.
-4. **Pendências:** conferi no `gh api` `onion-logto@617364f` (README l.9), `cc15d9b`, `a0ce0fd` (console.sh
-   l.30-37), `onion-bridge@7e736ba`, `onion-waha@86662e01` (README l.33-34 e compose l.12/l.16),
-   `ArandekBR/arandek@1aa794f9/88d93f26` e `gustavo-pulga@21ff04f`. Este último está no remoto registrado
+4. **Pendências:** conferi no `gh api` `private-cite:x2JeGzgqU96GzbTNaw-nkw` (README l.9), `⟨commit⟩`, `⟨commit⟩` (console.sh
+   l.30-37), `private-cite:plDUkfaVc3In-HYgxM3WsA`, `private-cite:IoS3cJR7umpPcOHV5JUyKw` (README l.33-34 e compose l.12/l.16),
+   `private-cite:2Sq-8_eXsAw5eFkAegmdOg` e `private-cite:W0XoYvHsoboHKTUdITAVCQ`. Este último está no remoto registrado
    no `members.yaml`, e o diário tem 10 entradas nesse ref.
-   - `3408d82` e `c92ff68` devolvem **422**.
+   - `⟨commit⟩` e `⟨commit⟩` devolvem **422**.
    - `af4a420a~1` = `9f403c2a`: a l.80 é `function D3n`, e o nó nasceu em `af4a420a`.
 
 ## Padrões de erro do proponente
@@ -89,8 +89,8 @@ remover.
 2. **O D5 foi aplicado por campo, e não por nó.** O `E_W8_CONSOLE_AUTOOFF_VIVO` trocou a pasta pelo remoto
    na `source` e deixou o `method` com o nome da pasta. Corrigi.
 3. **O sha foi medido "até a data", mas a data não foi confrontada com a do commit.** Nos 6 traces do waha,
-   o `commits?until=` volta vazio, porque o único commit (`86662e01`, 08-02T23:22Z) é **posterior** aos nós
-   de 07-31 e 08-01. O proponente propôs `86662e01` assim mesmo. Pela regra selada, isso é só-host na data
+   o `commits?until=` volta vazio, porque o único commit (`⟨commit⟩`, 08-02T23:22Z) é **posterior** aos nós
+   de 07-31 e 08-01. O proponente propôs `⟨commit⟩` assim mesmo. Pela regra selada, isso é só-host na data
    (corrigido para `remover-trace-narrative`, com o sha posterior nomeado como tal na narrative).
 4. **Âncora relativa enganosa.** Em `REC_STAGING_…`, o `(b)` deixava no trace `docs/evolution/inbound/ do
    clone local de marcio-pessoal`. Hoje o resolvedor pula por causa do espaço, mas o prefixo é um diretório
@@ -115,10 +115,10 @@ remover.
    terceiro. Uma guarda mecânica (P3) que recuse `~/` reprova os dois.
    - É preciso decidir se a guarda recusa todo `~/` (e esses 2 não ganham o marcador) ou se aceita `~/`
      **dentro de citação delimitada**.
-4. **Sha posterior ao nó no LOCATOR.** O `E_lid_addressing_root_cause` cita `onion-waha@86662e0` no
+4. **Sha posterior ao nó no LOCATOR.** O `E_lid_addressing_root_cause` cita `private-cite:IoS3cJR7umpPcOHV5JUyKw` no
    locator, um dia depois do nó. A regra "sha pela data do nó" foi selada só para o `trace`. Se valer para o
    locator, essa âncora (e o padrão) cai.
-5. **Push do onion-waha.** `c92ff68` e `3408d82` existem só no clone local. Um push validaria as âncoras sem
+5. **Push do onion-waha.** `⟨commit⟩` e `⟨commit⟩` existem só no clone local. Um push validaria as âncoras sem
    tocar o nó. É a alternativa do proponente, e eu a confirmo.
 
 ## Achados fora do mandato

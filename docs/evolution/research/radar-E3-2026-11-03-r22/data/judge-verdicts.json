@@ -182,7 +182,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU2_MEDICAO_NAO_REPRODUZ",
-    "comando": "grep -c claudeInChromeDefaultEnabled ~/.claude.json → 1 (valor true); claude --help | grep chrome → --chrome, --no-chrome; sudo -n grep claudeInChromeDefaultEnabled /home/onion/.claude.json → nada (rc 1)"
+    "comando": "grep -c claudeInChromeDefaultEnabled ~/.claude.json → 1 (valor true); claude --help | grep chrome → --chrome, --no-chrome; sudo -n grep claudeInChromeDefaultEnabled ⟨caminho⟩ → nada (rc 1)"
    },
    "superacao": {
     "classe": "nenhuma",
@@ -197,7 +197,7 @@
    "veredito": "SUSTENTA",
    "criterio": {
     "id": "CU3_LIGACAO_SEM_SUPERFICIE",
-    "comando": "sudo -n sed -n 18,26p /home/onion/onion-bridge/src/agent-policy.ts → comentário 5 (disableAllHooks + allowManagedHooksOnly); sudo -n grep -rn -E 'hooks\\s*:|HookCallback|onFailure' src/ → nenhum registro de hook por callback (só canUseTool); SDK instalado 0.3.310"
+    "comando": "sudo -n sed -n 18,26p private-cite:kLHW3aCzNd7CXINTizkPiA → comentário 5 (disableAllHooks + allowManagedHooksOnly); sudo -n grep -rn -E 'hooks\\s*:|HookCallback|onFailure' src/ → nenhum registro de hook por callback (só canUseTool); SDK instalado 0.3.310"
    },
    "superacao": {
     "classe": "nenhuma",

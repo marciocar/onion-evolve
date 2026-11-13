@@ -1,6 +1,6 @@
 # Inventário interno — acoplamento da maquinaria Onion a suposições de modelo
 
-> **Escopo:** read-only sobre `/home/marcio/onion-evolve` (core), 2026-09-02. Mede **onde a maquinaria
+> **Escopo:** read-only sobre `⟨caminho⟩` (core), 2026-09-02. Mede **onde a maquinaria
 > depende de suposições sobre modelo/tier/effort/capacidade**, para depois decidir o que o Fable 5.1
 > supera. Exclui `.claude/worktrees/**` (cópias de worktree antiga) salvo nota explícita.
 > **Método:** `grep`/`find` sobre o vivo; toda contagem re-medida com stderr visível (a guarda

@@ -49,11 +49,11 @@ exceções seladas (`D_AGREGACAO_CROSS_REPO_E_MOAT`, `E_GIT_DIR_QUEBRA_A_RAIZ_DE
 - **Harness, sem versionamento** (journal `wf_*`, transcrito `.jsonl`, plano, memória, binário do Claude Code,
   scratchpad, `.claude/sessions/`): a `source` passa a descrever sem caminho, como em `journal wf_xxx (host)`,
   com `method: testemunho: … no host <data>` e `locality: host`.
-- **`onion-bridge`:** o remoto `marciocar/onion-bridge` **só começa em `c22517ee` (2026-07-27 14:01 -03)**, e o
-  estado de produção pós-flip só foi versionado em **`38702f00` (2026-08-01)**. Por isso:
-  - os nós de 07-26 a 07-28 vão a `host`. O arquivo daquele instante não está no remoto: `c22517ee` já traz
+- **`onion-bridge`:** o remoto `private-cite:1RlpxWxI74Jwd2XWYYq20A` **só começa em `⟨commit⟩` (2026-07-27 14:01 -03)**, e o
+  estado de produção pós-flip só foi versionado em **`⟨commit⟩` (2026-08-01)**. Por isso:
+  - os nós de 07-26 a 07-28 vão a `host`. O arquivo daquele instante não está no remoto: `⟨commit⟩` já traz
     OIDC/PKCE na PWA e **não sustenta** `C_pwa_has_no_pkce`;
-  - de 08-01 em diante, quando a claim é sobre **código**, a forma é `onion-bridge@<sha>:<path>` com `leitura`
+  - de 08-01 em diante, quando a claim é sobre **código**, a forma é `private-cite:1RlpxWxI74Jwd2XWYYq20A<sha>:<path>` com `leitura`
     e `repo`, e o sha vem de `gh api commits?path&until=<data>`;
   - quando a claim é sobre **comportamento** (demo, sonda, rotas vivas, token, `.env`, qual commit roda), a
     proposta é `host`, porque o arquivo citado era só ponteiro.
@@ -79,8 +79,8 @@ ganham locality pelas linhas da regra 2.
 ## Casos difíceis
 
 1. **`E_LSTREE_MAIN_0717` diverge da amostra.** A amostra mandava tratar a parte metagamify como testemunho
-   `host`, mas `bfb9bce2` **existe** no remoto `marciocar/metagamify` (gh api, 2026-06-26). A proposta é
-   `onion-evolve@fb08cc6b:.claude + metagamify@bfb9bce2:.claude`, com `method: medição` e `locality: repo`. O
+   `host`, mas `⟨commit⟩` **existe** no remoto `private-cite:E7ZGvVh3MBpTDl5FrHBugQ` (gh api, 2026-06-26). A proposta é
+   `onion-evolve@fb08cc6b:.claude + private-cite:E7ZGvVh3MBpTDl5FrHBugQ`, com `method: medição` e `locality: repo`. O
    juiz decide se a amostra prevalece.
 2. **Binário do Claude Code** (`E_REEXTRACAO_2_1_295_SO_NOMES`, `E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO`). Os
    dois já têm `medição:` sobre um binário identificado por versão. Mantive o `method` e pus `locality: host`.
@@ -93,7 +93,7 @@ ganham locality pelas linhas da regra 2.
    arquivo, mas a medição foi no banco ou no serviço vivo. Propus `host` descrevendo a medição, e não
    `repo@sha` do arquivo-ponteiro.
 5. **`C_allowedtools_does_not_restrict`:** a claim é sobre os tipos do SDK, não sobre código do bridge. Propus
-   `npm @anthropic-ai/claude-agent-sdk@0.3.195`, com `web`. O `5c6e2cfb` confirma que a produção estava em
+   `npm @anthropic-ai/claude-agent-sdk@0.3.195`, com `web`. O `⟨commit⟩` confirma que a produção estava em
    0.3.195.
 6. **Decisões seladas pelo maestro** (7 nós, como `D_R2_EMENDAS_A_C_SELADAS` e `D_SEM_CREDITO_POR_ORA`). O ato
    é imutável, mas o estado que a decisão regula não foi conferido hoje. Pela regra de classe, vão a DEV.
@@ -112,7 +112,7 @@ ganham locality pelas linhas da regra 2.
   classe testemunho (caso 2)?
 - **P4. Comportamento medido no host com código versionado:** a `source` aponta o que foi medido (serviço ou
   banco), e o código vai ao `locator`. Hoje é convenção minha, não regra (caso 4).
-- **P5. O grep da regra 2 só pega `/home/` no INÍCIO da `source`.** Há mais 25 com o caminho no meio, e eu os
+- **P5. O grep da regra 2 só pega `⟨caminho⟩` no INÍCIO da `source`.** Há mais 25 com o caminho no meio, e eu os
   incluí, marcados `[fora do grep do brief]`. A regra deveria nomear a classe ("qualquer caminho absoluto na
   `source`"), e não a forma.
 - **P6. Ids e nomes de grafo com nome comercial** (caso 8): a REGRA 30 só olha projeção, não id.

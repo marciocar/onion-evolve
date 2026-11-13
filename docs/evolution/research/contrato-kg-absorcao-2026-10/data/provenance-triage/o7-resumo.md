@@ -100,7 +100,7 @@ existente vem antes, e o acréscimo do label anterior depois.
 | 1 | `E_OBJECAO_EXIT2_E_PRIMITIVO_GRATIS` | trace = `binário do Claude Code 2.1.286` (hoje o nó não tem trace) | `npm view …@2.1.286` devolve a versão |
 | 2 | `E_GRANAAI_DOCTRINE` | trace = as 4 cópias `onion-evolve@<sha>:docs/evolution/inbox/_processed/…`; a narrative diz que o original foi extinto | ver abaixo |
 | 3 | `E_SKILL_INSTALL_PROMPT_AND_CURL`, `E_F4_CLAUDE_JSON_CONCORRENTE` | `x_path_is_content: "citação"` mais a linha "Caminho como conteúdo: …" (texto do juiz da O6) | a O6 **não** pôs o marcador: o `grep` no corpus acha só o do `E_m3` |
-| 4 | `E_lid_addressing_root_cause` | o locator ganha a ressalva "lido em `onion-waha@86662e0`, posterior ao nó" | aplica junto o D5 retido: o locator vivo ainda diz `onion-vps-waha@` |
+| 4 | `E_lid_addressing_root_cause` | o locator ganha a ressalva "lido em `private-cite:6ji1q5b3lpDzSX3Z_xi2Gw`, posterior ao nó" | aplica junto o D5 retido: o locator vivo ainda diz `onion-vps-waha@` |
 
 **Divergência no item 2.** O brief diz que as cópias foram "commitadas em 2026-07-17". O `git log --follow` por
 arquivo mostra outra coisa:

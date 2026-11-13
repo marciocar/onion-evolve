@@ -54,7 +54,7 @@
    mas o mesmo `/dev/null` no `F_ID_1` foi descrito ("apontando ao dispositivo nulo"). A REGRA 2 selada manda descrever
    cada caminho do label anterior, então a correção descreve e tira o marcador.
 7. **A omissão vem da regex, não do proponente:** `E_ASSIMETRIA_DE_PERMISSAO_DIR`
-   (`claude-code-2.1-onion-2026-08`) tem `` `Read(//home/marcio/**)` `` no label, um caminho do `settings.local.json`
+   (`claude-code-2.1-onion-2026-08`) tem `` `Read(/⟨caminho⟩/**)` `` no label, um caminho do `settings.local.json`
    deste core. O `ABS_FS_RE` exige que o caractere antes de `/home` seja espaço ou pontuação, e na barra dupla ele é
    `/`. Entrou como CORRIGIDO pela variante A, com o label antigo de mais de 280 caracteres.
 
@@ -88,7 +88,7 @@ O valor foi medido **sem ser impresso nem gravado**. Ele era extraído do label 
 | 1 | `E_MEDIDO_LOCAL_TIER10…`, `E_OBJECAO_EXIT2…` | `npm view @anthropic-ai/claude-code@2.1.259` e `@2.1.286` devolvem a versão (2026-10-10); a forma é `binário do Claude Code <versão>` | APROVADO |
 | 2 | `E_GRANAAI_DOCTRINE` | ver abaixo | APROVADO |
 | 3 | `E_SKILL_INSTALL…`, `E_F4_CLAUDE_JSON…` | o `~/` está na citação verbatim de terceiro: a página do jev e a l.7 do CHANGELOG oficial. Os labels são paráfrase e são reescritos à parte | APROVADO |
-| 4 | `E_lid_addressing_root_cause` | o locator troca `onion-vps-waha@` (pasta) por `onion-waha@` (remoto `marciocar/onion-waha`) e ganha a ressalva do sha posterior (2026-08-02T23:22Z contra o nó de 08-01) | APROVADO |
+| 4 | `E_lid_addressing_root_cause` | o locator troca `onion-vps-waha@` (pasta) por `private-cite:cLta7R3QttZfE6z3mMcdOQ` (remoto `private-cite:cLta7R3QttZfE6z3mMcdOQ`) e ganha a ressalva do sha posterior (2026-08-02T23:22Z contra o nó de 08-01) | APROVADO |
 
 **Item 2, a divergência 07-17/07-18, confirmada.** O `git log --follow --diff-filter=A` mostra:
 
@@ -114,7 +114,7 @@ fora por desenho:
 **Varredura frouxa** (o prefixo de sistema em qualquer posição, `~<x>/`, `marcio/`, `onion/onion-`), para achar o que a
 regex não vê:
 
-- **1 omissão real:** `E_ASSIMETRIA_DE_PERMISSAO_DIR`, com a barra dupla `//home/marcio`. Entrou como CORRIGIDO.
+- **1 omissão real:** `E_ASSIMETRIA_DE_PERMISSAO_DIR`, com a barra dupla `/⟨caminho⟩`. Entrou como CORRIGIDO.
 - **7 campos com o idioma de shell** `2>/dev/null` ou `--//dev/stdin`, todos em label e um também em narrative. Vão
   ao maestro (item A4), porque o tratamento muda conforme o caractere anterior.
 - `docs/discussions/onion-pessoal-marcio/…` em source, locator e trace: é caminho **relativo do repo**, não de máquina.
@@ -156,7 +156,7 @@ regex não vê:
 ## Achados
 
 - **J-O7-1.** A cegueira à barra dupla do `ABS_FS_RE` produziu a omissão desta onda (ver A7).
-- **J-O7-2.** Nove sources do `librechat-2026-08` e do `vps-shared-tools-2026-07` usam `onion-vps-librechat@sha`. Esse
+- **J-O7-2.** Nove sources do `librechat-2026-08` e do `vps-shared-tools-2026-07` usam `private-cite:rSyuH4_1jgFl5InfMurQzg`. Esse
   repo **não tem remoto** (`git remote -v` vazio, 2026-10-10). Alguns nós declaram "repo local sem remoto alcançável",
   outros não. Está fora do mandato P6 e é candidato à próxima onda.
 - **J-O7-3.** O F-O7-4 (o `I_CONSOLE_DO_LOGTO` afirma "ATIVO" e a O6 mediu `.disabled`) segue de pé. A O7 não muda a

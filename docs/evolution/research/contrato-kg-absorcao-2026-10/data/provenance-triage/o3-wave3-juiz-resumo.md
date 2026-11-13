@@ -94,7 +94,7 @@ Os casos que o proponente pediu para olhar:
    A tese dos 4 nós que "sobreviveram ao Elenxo" e foram derrubados **se confirmou**.
 4. **dev-óbvio sobre decisão já construída (5 nós foram para `corrigir`).** São `D_HOOK_PREMODELSWITCH_GUARDA`,
    `C_S3b` (`773d5e4a`), `D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR` (`a74ff166`, REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente)),
-   `D_engine_noweb_confirmed` (compose `86662e0` com NOWEB e o container vivo) e `SY5_prose_backlog_antipattern`
+   `D_engine_noweb_confirmed` (compose `⟨commit⟩` com NOWEB e o container vivo) e `SY5_prose_backlog_antipattern`
    (corpo de `123749e2`). É a mesma classe do `D_TRIADE_MCP_POR_EIXO` da onda 1. Outros 6 foram para
    `dev-dúvida`.
 5. **corrigir aprovado com fonte que contradiz o label.** Os casos:
@@ -110,7 +110,7 @@ Os casos que o proponente pediu para olhar:
      190/187/86); em `Q_HUB_OPERACOES_ENTERPRISE`, o clone avançou.
    - Medição de sessão em gitignorado, em `E_LACUNAS_E3_0903` (`model-switch.jsonl`).
 7. **Fonte posterior ao nó, ou fonte circular.**
-   - `REC_STAGING_ROT_2026_08_REMEASURED` citava `onion-pessoal@d0e9669` (09-03) para um nó de 08-30. Foi
+   - `REC_STAGING_ROT_2026_08_REMEASURED` citava `private-cite:NdZNR7SQrYXv1UoNQYBLPw` (09-03) para um nó de 08-30. Foi
      trocado por `757a6676` (08-18).
    - `D_framing_catalogo` citava uma KB que transcreve o próprio nó. Foi trocado pelo corpo de `1125dfdd`.
    - `E_RESPAWN` apontava o cache `~/.claude/cache/changelog.md`. Foi trocado pelo CHANGELOG oficial
@@ -197,7 +197,7 @@ há wf_* da janela de 07-19 a 07-21 no host.
 2. **O hook `worklog-precompact-breadcrumb.sh` ainda tem o filtro antigo `feature/|hotfix/|release/`
    (l.10-13).** É o defeito vivo do `E_WORKLOG`.
 3. **O trust-log de produção do a2a grava fora do git.** O `trust-topology-check` do endpoint a2a-live
-   escreve no trust-log da cópia da VPS (`/home/onion/onion-evolve`), que não é versionado. Há uma linha de
+   escreve no trust-log da cópia da VPS (`⟨caminho⟩`), que não é versionado. Há uma linha de
    10-05 que o git não tem, e as linhas dos handshakes de 07-10 não existem em lugar nenhum.
 4. **`D_CURAR_O_GATE_INERTE_DO_ADOTANTE` está `open`, mas a cura existe:** `ops/verify-adopter-gate.sh`, de
    `6eb75761` (2026-08-16). É candidato ao censo.

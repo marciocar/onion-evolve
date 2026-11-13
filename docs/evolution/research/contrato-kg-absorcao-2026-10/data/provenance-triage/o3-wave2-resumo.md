@@ -63,7 +63,7 @@ Os 13 dev-óbvio são quase todos o `bridge-produto` (F0–F5, F-ID.1–4) e evi
 passado. Dois deles (`F_ID_3_SUPERFICIE`, `F_ID_4_MGM`) têm um label que é snapshot anterior ao
 `done` e que contradiz o próprio status.
 
-Os 16 corrigir trocaram a leitura do arquivo no host (`/home/onion/...`, `/home/marcio/onion-vps-*`)
+Os 16 corrigir trocaram a leitura do arquivo no host (`⟨caminho⟩...`, `⟨caminho⟩`)
 por **leitura de commit** no clone do adotante, com sha.
 
 ## Correção aplicada pelo proponente
@@ -137,7 +137,7 @@ citados em corpo de commit. Ficaram 29 `testemunho`.
    (48/276) mostra que os workers aplicaram a regra nova, mas não garante que nenhum `corrigir`
    esconda uma cláusula sem fonte (padrão 1).
 3. **Journals `wf_*` e transcripts no host** só se reabrem nesta máquina. Os clones dos adotantes
-   dependem de `/home/marcio/<repo>`.
+   dependem de `⟨caminho⟩<repo>`.
 4. **URLs e `gh run` medidos uma vez, em 2026-10-09.** Os artefatos de run do Actions expiram.
 5. **O anexo de 30 nós está fora do mandato estrito da onda.** Foi incluído porque a lista do v4.1
    não intersecta o universo da O3, e sem isso esses nós não teriam onda.

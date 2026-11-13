@@ -7,13 +7,13 @@
   "Leitura: 9/9 fontes alcançadas · inalcançáveis: nenhuma",
   "Ancoragem: 25 claim(s) ANCORADA(S) · 21 rejeitada(s) (exagerada ou não encontrada)",
   "Elenxo: 27 objeções (25 sobrevivem) · lacunas fechadas: 3 · abertas: 9",
-  "write(KG): /home/marcio/worktrees/onion-evolve/research-slm-roadmap/docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml — +37 nós / +48 arestas, total 37, radar exit 0"
+  "write(KG): docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml — +37 nós / +48 arestas, total 37, radar exit 0"
  ],
  "result": {
   "mode": "primaries",
   "question": "Onion SLM — CAPITALIZAÇÃO: como benchmarks abertos, evals-como-serviço e treinamento/consultoria em avaliação de IA viram RECEITA, segundo as primárias (anúncios de rodada, páginas de preço, modelos de negócio declarados). Diretriz do maestro: 'sempre pensando em bilhetar' — vias: treinamentos, consultorias, gestão de federação, advisor de core/hub, membro externo de rede; estratégia por momento. O Onion não compete no modelo (o capital financia o modelo pequeno, que vira commodity); o moat é o mecanismo verificável. Para cada fonte: quem paga, por quê, quanto (quando houver), e o que isso sugere como via de bilhetagem para um bench aberto do mecanismo (eval de domínio com erros reais + radar como corretor) e para consultoria de avaliação.",
   "today": "2026-10-05",
-  "kgPath": "/home/marcio/worktrees/onion-evolve/research-slm-roadmap/docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml",
+  "kgPath": "docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml",
   "radarExit": 0,
   "summary": "Grafo novo criado (TETO 37, review_after 2027-01-03, cadência de mercado/capital de 90 dias, com gatilho para re-medir os preços em 30 dias) e radar --integrity --schema com exit 0. Conteúdo: 25 evidências ancoradas, mais E_LACUNAS com 21 rejeitadas e 9 lacunas abertas, 6 leituras de síntese, 1 proposta Q de ordem das vias de bilhetagem (que não sela) e 2 âncoras cross-grafo. A âncora do corpus C_CAPITAL_FUNDS recebe CONSTRAINS, porque o capital também financia a camada de avaliação. Ressalvas: o Elenxo chegou truncado na objeção 17. A parte de treino/advisory do Enterprise da AA não está na citação, então foi marcada para re-ancorar com confiança 0,5. Nenhuma decisão foi tocada.",
   "unreachable": [],
@@ -1182,14 +1182,14 @@
    "queuedAt": 1791243473269,
    "attempt": 1,
    "lastToolName": "StructuredOutput",
-   "lastToolSummary": "/home/marcio/worktrees/onion-evolve/research-slm-roadmap/do…",
+   "lastToolSummary": "do…",
    "promptPreview": "## write(KG) — escreva o grafo desta rodada de primárias e prove que o radar o lê\n\nPergunta: \"Onion SLM — CAPITALIZAÇÃO: como benchmarks abertos, evals-como-serviço e treinamento/consultoria em avaliação de IA viram RECEITA, segundo as primárias (anúncios de rodada, páginas de preço, modelos de negócio declarados). Diretriz do maestro: 'sempre pensando em bilhetar' — vias: treinamentos, consultori…",
    "promptFramed": true,
    "lastProgressAt": 1791243812524,
    "tokens": 127044,
    "toolCalls": 16,
    "durationMs": 339221,
-   "resultPreview": "{\"kgPath\":\"/home/marcio/worktrees/onion-evolve/research-slm-roadmap/docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":37,\"edges\":48,\"nodesTotal\":37,\"summary\":\"Grafo novo criado (TETO 37, review_after 2027-01-03, cadência de mercado/capital de 90 dias, com gatilho para re-medir os preços em 30 dias) e radar --integrity --schema com exit 0. Co…"
+   "resultPreview": "{\"kgPath\":\"docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":37,\"edges\":48,\"nodesTotal\":37,\"summary\":\"Grafo novo criado (TETO 37, review_after 2027-01-03, cadência de mercado/capital de 90 dias, com gatilho para re-medir os preços em 30 dias) e radar --integrity --schema com exit 0. Co…"
   }
  ],
  "totalTokens": 1392008,

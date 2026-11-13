@@ -6,7 +6,7 @@ v4 (2026-10-09, re-medição da onda O1): caminhos por ambiente (PROV_REPO = a �
 de entrada/saída) e o universo do contrato v4 — status unverifiable fica isento de provenance, mesmo em PROD."""
 import importlib.util, json, os, re, sys, collections
 
-CANON = "/home/marcio/onion-evolve"   # o prefixo absoluto que os grafos citam (o checkout do core)
+CANON = "⟨caminho⟩"   # o prefixo absoluto que os grafos citam (o checkout do core)
 REPO = os.environ.get("PROV_REPO", CANON).rstrip("/")
 HERE = os.environ.get("PROV_HERE", "/tmp/prov-triage")
 spec = importlib.util.spec_from_file_location("mig", f"{REPO}/.claude/utils/kg/kg-migrate-v3.py")

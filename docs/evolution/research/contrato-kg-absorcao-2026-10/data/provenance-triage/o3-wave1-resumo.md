@@ -43,7 +43,7 @@ mudam o **plano** (PROD → DEV), não o status. Nenhum nó não-confirmed foi r
 Seis workers trabalharam em paralelo, cada um com cerca de 46 nós de grafos inteiros. Cada worker
 recebeu o nó completo e as políticas seladas, e abriu a fonte candidata: o arquivo irmão do grafo
 (SYNTHESIS, NOTE-*, H*.md, `data/wf_*.json`), o commit ou PR com `git show` e `gh`, os clones dos
-adotantes em `/home/marcio/<repo>`, os journals `wf_*` no host e as URLs com `curl`. A consolidação
+adotantes em `⟨caminho⟩<repo>`, os journals `wf_*` no host e as URLs com `curl`. A consolidação
 conferiu que há 276 linhas, sem duplicata e sem nó faltando, que cada `method` está em
 `<classe>: <detalhe>` e que dev-* só aparece em PROD.
 
@@ -119,9 +119,9 @@ diretório do grafo.
    nota truncada, e o casamento foi lexical na própria linha. `E_F8_CORR` é paráfrase.
 3. **URLs medidas uma vez**, em 2026-10-09, sem re-medição. trendshift.io devolveu 403 (Cloudflare),
    e o site do Hyper não contém "YC P26".
-4. **Journals no host** (`/home/marcio/.claude/projects/…/workflows/`) não viajam com o repo. Por
+4. **Journals no host** (`⟨caminho⟩`) não viajam com o repo. Por
    isso viraram testemunho (política 7), e o juiz só consegue reabri-los nesta máquina.
-5. **Commits de adotante** (`gustavo-pulga@…`, `onion-standalone@…`, `onion-vps-logto@…`,
-   `onion-bridge@…`) dependem dos clones locais em `/home/marcio/`.
+5. **Commits de adotante** (`private-cite:VSI2WGgB-3KkZTZtspWAHg`, `onion-standalone@…`, `onion-vps-logto@…`,
+   `private-cite:EUHWm7-U0r23p4D1OxM5nA`) dependem dos clones locais em `⟨caminho⟩`.
 6. A partição usa contagem de nós como proxy de esforço. A onda 1 concentrou grafos de pesquisa com
    irmãos ricos, e as ondas 2 e 3 podem ter taxa de rebaixamento bem maior.
