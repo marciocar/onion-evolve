@@ -241,6 +241,9 @@ DE CONFORMIDADE, não fronteira de segurança. Declarado também no card (docs/o
     (.claude/hooks, .claude/validation, ops, .github, .githooks) pega 60 (39%). O número do maestro e o meu divergem
     pela janela e pela unidade (PR × commit); a pergunta que sobra é dele: **os dois executores do lint são guarda?**
     Ficam, por ora, porque o ensaio das portas os executa e o fecho tem de cobri-los.
+    **Os `confirmed` do grafo editado, conferidos:** E_KG_SSOT_FRONTIER_1111 (nível 3, agir fora da área, sempre por
+    PR) é o chão em que o selo se apoia, e não o contraria; E_WATCHER_API_CHURN_MEASURED_1111 (o custo do vigia) e
+    E_LGPD_OPERATOR_RESEARCH_1111 (o operador de dados na LGPD) não falam da lista de guarda.
     **Próximo passo nomeado (não coube aqui):** gerar `.github/CODEOWNERS` a partir da mesma derivação do `_guard_paths`,
     com catraca de igualdade no lint. Não coube porque (a) com dono único que é também o autor dos PRs, ligar "exigir
     revisão do dono" na proteção da main trava todo PR de guarda (o autor não aprova o próprio PR), e ligar é do
