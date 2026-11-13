@@ -181,3 +181,22 @@ Os limites que o refutador pediu declarar estão no cartão:
 - o bootstrap preso ao literal `--achados <n>`;
 - o espaço de largura zero e o U+0085 casam pelo prefixo;
 - o fecho de 2º nível vem pelo #1647.
+
+## Cura de harness depois da aprovação (CI run 43506907575, faixas 2 e 3)
+
+O CI reprovou três famílias da bancada. Nenhuma tocou código de produção: `ops/` segue como o refutador
+aprovou em fa6570082. O `guard-paths --pr` falhar fechado (rc 2) sem o `changed_files` está **certo**; o que
+faltava era o harness responder.
+
+- **`merge_skip_ci`** (casos a, c2, h, s2, s4, s5 e s7b): o `gh` falso casava `.changed_files` no ramo
+  `*pulls*files*` e devolvia `src/pr.txt`. Ganhou o handler `--jq .changed_files` antes desse ramo, coerente
+  com a lista (1 arquivo).
+- **`merge_dispensa`** (casos a, b, c e f): o `gh` falso não respondia `.changed_files` (exit 9). Ganhou o
+  handler (1 arquivo). A lista de arquivos dele era `ops/pr-merge-verified.sh`, que é **guarda**, e só
+  passava porque o `--pr` não media nada. Com a medição viva, PR de guarda recusa a dispensa, e esse caso é
+  da família `pr_merge_verified`. A lista virou `src/app.py`, e a família volta a medir só a dispensa.
+- **`selector_per_file` (a)**: o resíduo selecionava 36 famílias, acima do teto de 30. Na main eram
+  exatamente 30, sem folga. O #1652 pôs o gate de merge a ler o resíduo, e as seis famílias que o exercitam
+  entraram por direito: `merge_dispensa`, `merge_serial`, `merge_skip_ci`, `pr_merge_verified`,
+  `review_mode` e `sync_main_worktree`. O teto subiu para 40. O caso continua barrando a volta às ~100 do
+  prefixo de diretório e continua exigindo `review_artifact`, `review_ledger` e o núcleo, sem as varredoras.
