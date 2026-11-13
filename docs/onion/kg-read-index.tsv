@@ -490,6 +490,7 @@
 .claude/validation/aside-router.sh	E_ASIDE_ROUTER_GATE_E_PROMPT	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/automation-ladder-registry.txt	C_RELOGIO_NAO_E_VEDADO_AO_EVOLVE_E_A_GUARDA_NAO_DECIDE_ISSO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/automation-ladder-registry.txt	D_AGREGACAO_CROSS_REPO_E_MOAT	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
+.claude/validation/baton-pulse.sh	D_PIECE_FIELD_NOT_KIND_1112	docs/evolution/research/agent-repo-ownership-2026-11/agent-repo-ownership-2026-11.kg.yaml
 .claude/validation/cited-directive-check.sh	C_TETO_PROSA_NUA_E_AGENTES	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	D_MOTOR_E_COPIA_LITERAL_DO_BINARIO	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
@@ -1805,6 +1806,7 @@ docs/evolution/research/agent-command-composition-2026-09/agent-command-composit
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONDUCTOR_VETO_ANCHORING_PENDING	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_DESTINO_DIFERENCIAL_OU_LACUNA	docs/onion/graph/forge-comando-framework-2026-09.kg.yaml
+docs/evolution/research/agent-repo-ownership-2026-11/SYNTHESIS.md	Q_AGENT_REPO_OWNERSHIP_1112	docs/evolution/research/agent-repo-ownership-2026-11/agent-repo-ownership-2026-11.kg.yaml
 docs/evolution/research/automation-levels-2026-11/data/corpus.md	Q_AUTOMATION_LEVELS_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
 docs/evolution/research/automation-levels-2026-11/data/lgpd-operator.md	E_LGPD_OPERATOR_RESEARCH_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
 docs/evolution/research/automation-levels-2026-11/data/market.md	E_AUTOMATION_CORPUS_1111	docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml
