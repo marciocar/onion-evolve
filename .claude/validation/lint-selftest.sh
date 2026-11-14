@@ -33219,7 +33219,10 @@ run_role_cut_selftests() {
         # `baton` entrou em 2026-11-12 (forja do /meta:baton, fase 1): nasce no conjunto `pending` do roles.yaml, como o
         #     decide — viajar às portas é a fase 3, com os números da fase 2 —, e quem o cita é só o DOCSTRING do
         #     baton-pulse.sh; nenhuma mensagem de violação manda o alvo rodá-lo. Sexto comando pego aqui (CI do PR #1606).
-        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync|publish|decide|baton) continue ;;  # adoção/federação/pendente
+        # `peek` entrou em 2026-11-13 (forja do /meta:peek): nasce no conjunto `pending` do roles.yaml, como o baton, e
+        #     quem o cita são só os DOCSTRINGS do peek-census.sh e do community-peek.sh; nenhuma mensagem de violação
+        #     manda o alvo rodá-lo. Sétimo comando pego aqui (CI do PR #1656).
+        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync|publish|decide|baton|peek) continue ;;  # adoção/federação/pendente
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe

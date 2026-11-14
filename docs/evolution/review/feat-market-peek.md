@@ -2,14 +2,13 @@
 branch: feat/market-peek
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 5f68bac914d7cf4e5694ae6ae44bc2f982359afac9ce50a69c07624cf503d71f
-reviewed_code_sha256: cb0e5e8eb6c8a449a8ce7e642c5c92205cfdda610e939adad2c5ce1a1f9e96c8
-findings_total: 4
-findings_real: 2
+reviewed_diff_sha256: pendente
+findings_total: 5
+findings_real: 3
 findings_blocking: 0
 tokens: 0
 duration_min: 15
-findings_fixed: 2
+findings_fixed: 3
 verdict: FIXED
 elenxo: false
 reviewer: "1ª passada: o próprio agente de execução (o brief proibiu lançar agentes); voz única, DECLARADA. A passada independente fica PENDENTE e é lançada pelo team-lead da sessão do core; ela regrava este resíduo."
@@ -36,6 +35,7 @@ nasce no conjunto `pending` do `roles.yaml` (fonte e hub). O censo da forja dá 
 | 2 | o nó da espiada citava um código de regra sem termo na prosa, e o lint de nomes acusou um código novo | sim | curado: troquei o código pela glosa; `kg-vocab-ci.sh` rc 0 |
 | 3 | a contagem `items=` do resumo soma a página devolvida (até 20 por fonte), não o `total_count` | não | limite: o total vai na nota da linha da fonte (`total=9118`), e o resumo conta o que foi lido |
 | 4 | o Lobsters filtra por substring dos termos (`agent` casa `agents`) | não | limite: o recall baixo já está declarado na linha e na doutrina |
+| 5 | o CI do PR reprovou o caso (k) da `role_cut`: o `peek` é citado no docstring do `peek-census.sh` e nasce em `pending`, então o standalone não o recebe | sim | curado: exceção declarada com razão na `role_cut`, como a do `baton`; a família passa local |
 
 ## Mutantes
 
