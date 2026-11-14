@@ -2,7 +2,7 @@
 branch: research/agent-privilege-owasp-1114
 pr: pendente
 date: 2026-11-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 651d910d55e3af2220f700d7ec6905b83c17d9831b142078423722dfb9d300d8
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
