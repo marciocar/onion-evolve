@@ -11,7 +11,13 @@ meta:
                                # draft-ietf-wimse-aims (ciclo de ~6 meses), a doc de plataforma (Microsoft, Slack) e a
                                # versão anual da OWASP. RFC 8693, Hardy e NIST valeriam 12 meses, mas não movem a revisita;
                                # 30d (ferramenta) giraria sem mudança nas fontes que decidem.
-  # ═══ TETO: 73 NÓS ═══
+  # ═══ TETO: 92 NÓS ═══
+  #   +19 (2026-11-14, rodada de primárias OWASP/NIST atuais): 16 evidências ancoradas (6 OWASP LLM, 5 OWASP
+  #   agentic, 5 NIST AI 600-1), 1 contabilidade (E_LACUNAS_OWASP_NIST_VERSIONS_1114), 1 superação
+  #   (C_SUPERACAO_20261114_ASI_EXPLICIT_USER_APPROVAL) e 1 pergunta (Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114).
+  #   Esta rodada de primárias foi executada em 2026-11-14 para fechar a objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED:
+  #   fecha a metade OWASP (LLM Top 10 -> 2026; ASI Threats -> v1.1 dez/2025; Agentic Top 10 -> 2026), a objeção
+  #   sobrevive (conteúdo da edição LLM 2026 não lido; atualidade NIST rejeitada na ancoragem), o selo segue adiado.
   #   +5 (2026-11-13, no PR): T_OWASP_LLM06, T_OWASP_ASI03, T_OWASP_ASI08, T_OWASP_AGENTIC_THREAT_T8 e T9,
   #   um termo x_term por código OWASP que o lint de nomes do pr-finalize reprovou sem termo.
   # Justificativa do teto: rodada de primárias executada em 2026-11-13, grafo novo. 68 nós: 35 evidências ancoradas
@@ -514,7 +520,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.8
     verified_at: "2026-11-13"
@@ -522,7 +528,7 @@ nodes:
     source_tier: 9
     source_kind: primary
     label: "O catálogo OWASP de ameaças agênticas (T8, repúdio e falta de rastro) recomenda logs assinados criptograficamente e imutáveis. É recomendação OWASP, não exigência de norma."
-    narrative: "Claim 25 [owasp-agentic]. Citação verbatim: \"Implement comprehensive logging, cryptographic verification, enriched metadata, and real-time monitoring to ensure accountability and traceability. Require AI-generated logs to be cryptographically signed and immutable for regulatory compliance.\". Elenxo (alvo 25): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SIGNED_LOGS_RECOMMENDED_NOT_REQUIRED. No kit o item entra como recomendação OWASP."
+    narrative: "Claim 25 [owasp-agentic]. Citação verbatim: \"Implement comprehensive logging, cryptographic verification, enriched metadata, and real-time monitoring to ensure accountability and traceability. Require AI-generated logs to be cryptographically signed and immutable for regulatory compliance.\". Elenxo (alvo 25): a objeção sobreviveu, triagem limite; ver E_OBJECAO_SIGNED_LOGS_RECOMMENDED_NOT_REQUIRED. No kit o item entra como recomendação OWASP. SUPERSEDIDO em 2026-11-14 por E_OWASP_T8_SIGNED_IMMUTABLE_LOGS_V11: o mesmo requisito T8 re-ancorado na versão vigente v1.1 (este nó citava v1.0)."
     trace: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
     provenance:
       source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
@@ -1261,6 +1267,360 @@ nodes:
       scheme: owasp-agentic-threats-v1
       lang: pt-BR
       definition: "Ameaça T9 do OWASP Agentic AI Threats and Mitigations v1.0, para a qual o catálogo pede permissões granulares, auditoria de operações elevadas e validação de identidade."
+  # ─── Rodada de primárias OWASP/NIST atuais, 2026-11-14 (fecha a metade OWASP de E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED) ───
+  - id: E_OWASP_LLM_TOP10_2026_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'The OWASP GenAI LLM Top 10 2026 is available for download' · genai.owasp.org/2026/09/01/ post oficial (byline 1/set/2026; press release 2/set/2026) · ancorada por verificador independente"
+    valid_from: "2026-09-01"
+    source_tier: 9
+    source_kind: primary
+    label: "A versão vigente do OWASP Top 10 for LLM Applications é a 2026 (lançamento formal 1-2/set/2026), não mais a 2025: houve revisão com rankings atualizados."
+    narrative: "Rodada de primárias de 2026-11-14. Citação verbatim: \"The OWASP GenAI LLM Top 10 2026 is available for download\". A imprensa cita publicação em 3-4/ago/2026; o post oficial data 1/set/2026 e o press release 2/set/2026 (discrepância de data secundária, não afeta a identidade da versão). CONSEQUÊNCIA que VINDICA a objeção: a base LLM da recomendação (LLM06:2025, nós E_LLM06_*) está SUPERSEDIDA por uma edição 2026 cujo texto NÃO foi lido nesta rodada."
+    trace: "https://genai.owasp.org/2026/09/01/"
+    provenance:
+      source: "https://genai.owasp.org/2026/09/01/"
+      locator: "post oficial genai.owasp.org/2026/09/01/, byline 1/set/2026; press release datado 2/set/2026"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM_EXCESSIVE_AGENCY_NOW_THREE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'the risk where expert judgment and the record agree most clearly is Excessive Agency, now number three.' · genai.owasp.org/2026/09/01/, citação de Michael Bargury (Zenity) · ancorada por verificador independente"
+    valid_from: "2026-09-01"
+    source_tier: 9
+    source_kind: primary
+    label: "Na edição 2026, Excessive Agency subiu para o número três (nota oficial citando Michael Bargury); a numeração LLM06 é da edição 2025 e mudou."
+    narrative: "Citação verbatim: \"the risk where expert judgment and the record agree most clearly is Excessive Agency, now number three.\". O texto integral e a redação 2026 do item NÃO foram lidos (kg-corpus-grep 'llm062026' = 0 nós). Logo 'o que a versão atual muda na recomendação' permanece NÃO provado para o OWASP LLM: a recomendação ainda cita LLM06:2025 como se fosse a norma vigente."
+    trace: "https://genai.owasp.org/2026/09/01/"
+    provenance:
+      source: "https://genai.owasp.org/2026/09/01/"
+      locator: "post oficial genai.owasp.org/2026/09/01/, citação de Michael Bargury (Zenity)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_AGENT_CONTROL_STANDARD_DONATED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'The Agent Control Standard (ACS) has been donated to the OWASP GenAI Security Project.' · genai.owasp.org/2026/09/01/, seção Agent Control Standard · ancorada por verificador independente"
+    valid_from: "2026"
+    source_tier: 9
+    source_kind: primary
+    label: "O projeto doou o Agent Control Standard (ACS) ao OWASP GenAI, estendendo a orientação de agentes (riscos, controles, identidade, governança, teste) para aplicação em runtime."
+    narrative: "Citação verbatim: \"The Agent Control Standard (ACS) has been donated to the OWASP GenAI Security Project.\". O texto do ACS NÃO foi lido (kg-corpus-grep --phrase 'Agent Control Standard' = 0 nós); a claim registra a doação, sem conteúdo que mude a recomendação de privilégio em runtime."
+    trace: "https://genai.owasp.org/2026/09/01/"
+    provenance:
+      source: "https://genai.owasp.org/2026/09/01/"
+      locator: "post oficial genai.owasp.org/2026/09/01/, seção Agent Control Standard"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM06_2025_EXCESSIVE_PERMISSIONS_BASE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'An LLM extension has permissions on downstream systems that are not needed for the intended operation of the application.' · genai.owasp.org/llmrisk/llm062025-excessive-agency/, causa Excessive Permissions · ancorada por verificador independente"
+    valid_from: "2025"
+    source_kind: primary
+    label: "Base comparativa (edição 2025): a causa de permissões excessivas do LLM06 é o acesso a sistemas a jusante além do necessário à operação pretendida."
+    narrative: "Re-leitura da edição 2025 como base comparativa. Mesmo texto do nó E_LLM06_EXCESSIVE_PERMISSIONS, re-confirmado nesta rodada (SUPPORTS). O leitor não declarou tier (tier=?): source_tier omitido. A redação equivalente da edição 2026 vigente NÃO foi lida (kg-corpus-grep 'llm062026' = 0 nós)."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, causa Excessive Permissions"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM06_2025_USER_APPROVAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'Utilise human-in-the-loop control to require a human to approve high-impact actions before they are taken.' · genai.owasp.org/llmrisk/llm062025-excessive-agency/, Prevention: Require user approval · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "LLM06:2025 recomenda executar no contexto do usuário, aprovação humana para atos de alto impacto e mediação completa fora do LLM."
+    narrative: "Citação verbatim: \"Utilise human-in-the-loop control to require a human to approve high-impact actions before they are taken.\". Mesmo requisito do nó E_LLM06_HUMAN_IN_THE_LOOP, re-confirmado (SUPPORTS); edição 2025. A prevention equivalente na edição 2026 vigente não foi lida."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Prevention and Mitigation, Require user approval (human-in-the-loop)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM06_2025_COMPLETE_MEDIATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'Implement authorization in downstream systems rather than relying on an LLM to decide if an action is allowed or not.' · genai.owasp.org/llmrisk/llm062025-excessive-agency/, Prevention: Complete mediation · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "Mediação completa (LLM06:2025): a autorização é imposta no sistema a jusante, não decidida pelo LLM."
+    narrative: "Citação verbatim: \"Implement authorization in downstream systems rather than relying on an LLM to decide if an action is allowed or not.\". Mesmo requisito do nó E_LLM06_COMPLETE_MEDIATION, re-confirmado (SUPPORTS); edição 2025. A redação equivalente da edição 2026 vigente não foi lida."
+    trace: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      locator: "LLM06:2025, Prevention and Mitigation, Complete mediation"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_ASI_THREATS_V11_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'Agentic AI - Threats and Mitigations ... Version 1.1 December 2025' · PDF genai.owasp.org/download/45674/, capa (p.1) · ancorada por verificador independente"
+    valid_from: "2025-12"
+    source_kind: primary
+    label: "A versão vigente do OWASP ASI 'Agentic AI - Threats and Mitigations' é a v1.1 de dezembro de 2025; v1.0 é de fev/2025; sem revisão posterior até 2026-11-14."
+    narrative: "Citação verbatim da capa: \"Agentic AI - Threats and Mitigations OWASP Top 10 for LLM Apps & Gen AI Agentic Security Initiative Version 1.1 December 2025\". O leitor não declarou tier (tier=?): source_tier omitido. A metade 'sem revisão posterior até 2026-11-14' é inferência por ausência (a capa de v1.1 não cita índice de releases); identidade da versão sólida, atualidade sem busca negativa citada (mesma fraqueza registrada em E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED)."
+    trace: "https://genai.owasp.org/download/45674/"
+    provenance:
+      source: "https://genai.owasp.org/download/45674/"
+      locator: "Agentic AI - Threats and Mitigations, capa (p.1), Version 1.1 December 2025"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_T8_SIGNED_IMMUTABLE_LOGS_V11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-14"
+    verified_against: "'Require AI-generated logs to be cryptographically signed and immutable for regulatory compliance.' · PDF v1.1, tabela da taxonomia, T8 Repudiation & Untraceability (p.17-18) · ancorada por verificador independente"
+    valid_from: "2025-12"
+    source_kind: primary
+    label: "T8 (v1.1) pede log assinado e imutável; o texto não fala em 'tamper-evident lineage log' nem em encadeamento de hash."
+    narrative: "Citação verbatim: \"Require AI-generated logs to be cryptographically signed and immutable for regulatory compliance.\". Re-ancora o requisito T8 na versão vigente v1.1 (o nó E_T8_SIGNED_IMMUTABLE_LOGS citava v1.0): SUPERSEDES E_T8_SIGNED_IMMUTABLE_LOGS. Sustenta log assinado+imutável para conformidade, NÃO 'log por ato' (granularidade por ação)."
+    trace: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+    provenance:
+      source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+      locator: "Agentic AI Threats and Mitigations v1.1, tabela da taxonomia, T8 Repudiation & Untraceability (p.17-18)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_T9_IMPERSONATION_LEAST_PRIVILEGE_V11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'Attackers exploit authentication mechanisms to impersonate AI agents or users to perform unauthorized actions under false identities.' · PDF v1.1, tabela da taxonomia, T9 Identity Spoofing & Impersonation / Agent Identity Compromise (p.18) · ancorada por verificador independente"
+    valid_from: "2025-12"
+    source_kind: primary
+    label: "T9 (v1.1) define personificação de agentes ou usuários e prescreve menor privilégio; o documento não usa 'identity attribution gap', 'identity sharing' nem 'signed intent token'."
+    narrative: "Citação verbatim: \"Attackers exploit authentication mechanisms to impersonate AI agents or users to perform unauthorized actions under false identities.\". Busca por 'attribution', 'signed intent', 'tamper', 'lineage' só achou outros contextos. Sustenta o núcleo da recomendação (nunca impersonation + menor privilégio); a lacuna de atribuição está coberta por outra fonte da família OWASP (E_ASI03_ATTRIBUTION_GAP, Agentic Top 10 2026)."
+    trace: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+    provenance:
+      source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+      locator: "Agentic AI Threats and Mitigations v1.1, tabela da taxonomia, T9 Identity Spoofing & Impersonation / Agent Identity Compromise (p.18)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_ASI_IDENTITY_MITIGATION_CROSS_AGENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'Prevent cross-agent privilege delegation unless explicitly authorized through predefined workflows.' · PDF v1.1, 'Step 1: Implement Secure AI Authentication Mechanisms (Proactive)' · ancorada por verificador independente"
+    valid_from: "2025-12"
+    source_tier: 10
+    source_kind: primary
+    label: "A mitigação de identidade (Step 1) veta delegação entre agentes não autorizada e exige credenciais efêmeras e permissões mínimas por papel; compatível com menor-entre privilégios, mas não prescreve sub/act (RFC 8693)."
+    narrative: "Citação verbatim: \"Prevent cross-agent privilege delegation unless explicitly authorized through predefined workflows.\". Compatível com menor-entre privilégios (SUPPORTS C_LESSER_OF_AGENT_AND_REQUESTER_1113), mas a própria claim declara que NÃO prescreve o padrão sub=solicitante/act=agente do RFC 8693 (CONSTRAINS C_ELENXO_RECOMMENDATION_1113): o núcleo sub/act segue sem âncora normativa, restrição já conhecida (E_OBJECAO_SIGNED_INTENT_NO_STANDARD_MECHANISM)."
+    trace: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+    provenance:
+      source: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+      locator: "Agentic AI Threats and Mitigations v1.1, 'Step 1: Implement Secure AI Authentication Mechanisms (Proactive)'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_AGENTIC_TOP10_2026_PUBLISHED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'OWASP Top 10 for Agentic Applications for 2026' · genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/, título e data 'December 9, 2025' · ancorada por verificador independente"
+    valid_from: "2025-12-09"
+    source_tier: 10
+    source_kind: primary
+    label: "O OWASP publicou separadamente o 'Top 10 for Agentic Applications for 2026' (ASI01-10), de 9/12/2025; a página só mostra título e data; o texto do ASI03 e do log não foi lido nesta rodada."
+    narrative: "Citação verbatim: \"OWASP Top 10 for Agentic Applications for 2026\". Confirma a identidade/atualidade do documento agentic 2026; o conteúdo de identidade dele (ASI03) já está ancorado no corpus a tier 9 (E_ASI03_ATTRIBUTION_GAP, E_ASI03_IDENTITY_SHARING, E_ASI03_SIGNED_INTENT_TOKEN). Fecha a metade agentic da objeção de versão."
+    trace: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    provenance:
+      source: "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      locator: "título e data 'December 9, 2025' da página do recurso"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_600_GOVERN_2_1_ROLES_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'Roles and responsibilities and lines of communication related to mapping, measuring, and managing AI risks are documented and are clear to individuals and teams throughout the organization.' · NIST AI 600-1, GOVERN 2.1 · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_tier: 9
+    source_kind: primary
+    label: "NIST AI 600-1 GOVERN 2.1 embasa a aprovação por papel: papéis, responsabilidades e linhas de comunicação para gerir risco de IA documentados e claros na organização."
+    narrative: "Citação verbatim conferida no NIST AI 600-1. Re-confirma o controle já ancorado em E_NIST_GOVERN_2_1_ROLES (via AI 100-1): SUPPORTS. A atualidade da norma-mãe (AI RMF em revisão sob o AI Action Plan, sem data) NÃO foi ancorada por citação primária nesta rodada (claim de versão REJEITADA; ver E_LACUNAS_OWASP_NIST_VERSIONS_1114)."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "NIST AI 600-1, GOVERN 2.1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_600_GOVERN_3_2_HUMAN_AI_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'Policies and procedures are in place to define and differentiate roles and responsibilities for human-AI configurations and oversight of AI systems.' · NIST AI 600-1, GOVERN 3.2 · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_tier: 9
+    source_kind: primary
+    label: "NIST AI 600-1 GOVERN 3.2 exige políticas que diferenciem papéis em configurações humano-IA e na supervisão, sustentando o desenho solicitante/agente/aprovador."
+    narrative: "Citação verbatim conferida no NIST AI 600-1. Re-confirma o controle já ancorado em E_NIST_GOVERN_3_2_HUMAN_AI_ROLES: SUPPORTS. Não prescreve o menor privilégio entre agente e solicitante (restrição já registrada)."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "NIST AI 600-1, GOVERN 3.2"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_600_GV_3_2_003_AUP_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'Define acceptable use policies for GAI interfaces, modalities, and human-AI configurations (i.e., for chatbots and decision-making tasks), including criteria for the kinds of queries GAI applications should refuse to respond to.' · NIST AI 600-1, ação GV-3.2-003 · ancorada por verificador independente"
+    valid_from: "2024-07-26"
+    source_tier: 9
+    source_kind: primary
+    label: "NIST AI 600-1 GV-3.2-003 pede AUP para configurações humano-IA, com chatbots citados, incluindo critérios do que recusar. Cobre um bot de Slack."
+    narrative: "Citação verbatim conferida no NIST AI 600-1. Re-confirma o controle já ancorado em E_NIST_GV_3_2_003_CHATBOT_AUP: SUPPORTS. É 'suggested action', não requisito."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "NIST AI 600-1, ação sugerida GV-3.2-003"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_600_MANAGE_2_4_DEACTIVATE_CURRENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "'Mechanisms are in place and applied, and responsibilities are assigned and understood, to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use.' · NIST AI 600-1, MANAGE 2.4 · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_tier: 9
+    source_kind: primary
+    label: "NIST AI 600-1 MANAGE 2.4 fundamenta a desativação: mecanismos aplicados e responsabilidades atribuídas para suplantar, desengajar ou desativar o sistema."
+    narrative: "Citação verbatim conferida no NIST AI 600-1. Re-confirma o controle já ancorado em E_NIST_MANAGE_2_4_DEACTIVATE: SUPPORTS. No agente é o kill switch e a revogação da autoridade delegada."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "NIST AI 600-1, MANAGE 2.4"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_600_AUDIT_KIT_GV_1_5_002_MG_2_4_002
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "'Establish organizational policies and procedures for after action reviews of GAI system incident response and incident disclosures, to identify gaps; Update incident response and incident disclosure processes as required.' · NIST AI 600-1, GV-1.5-002 (GOVERN 1.5) e MG-2.4-002 · ancorada por verificador independente"
+    valid_from: "2024-07-26"
+    source_tier: 9
+    source_kind: primary
+    label: "O kit de auditoria encontra apoio em GV-1.5-002 (revisão pós-incidente) e MG-2.4-002 (escalonamento com critérios de desativação); o NIST não prescreve log por ato nem delegação sub/act."
+    narrative: "Citação verbatim conferida no NIST AI 600-1. Novas âncoras NIST para o kit: SUPPORTS C_AUDIT_KIT_NORMATIVE_BASIS_1113. Os dois mecanismos-núcleo do kit (log por ato, delegação sub/act) continuam SEM âncora normativa — restrição já conhecida do grafo."
+    trace: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+    provenance:
+      source: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf"
+      locator: "NIST AI 600-1, GV-1.5-002 (GOVERN 1.5) e MG-2.4-002"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LACUNAS_OWASP_NIST_VERSIONS_1114
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-14"
+    verified_against: "contabilidade da rodada de primárias de 2026-11-14: 3 fontes lidas, 0 inalcançáveis, 16 claims ancoradas, 2 rejeitadas na ancoragem, 0 objeções recusadas, 1 superação, 2 lacunas seguem abertas"
+    label: "LACUNAS (rodada 2026-11-14): 3 fontes lidas (OWASP LLM, OWASP ASI, NIST), 0 inalcançáveis; 16 claims ancoradas; 2 rejeitadas na ancoragem; 0 recusadas; 1 superação; 2 lacunas abertas; a objeção de versão fecha só a metade OWASP."
+    narrative: "FONTES LIDAS (3): owasp-llm-2025-current, owasp-agentic-current, nist-ai-rmf-current. INALCANÇÁVEIS: 0. CLAIMS ANCORADAS (16): cada uma virou nó evidence. REJEITADAS NA ANCORAGEM (2, nunca viram nó): (1) [owasp-agentic] 'a seção de rastreabilidade exige trilha criptográfica imutável e registro dos overrides humanos, sustentando log por ato e aprovação humana registrada' -> EXAGERADA: a quote existe (2 ocorrências, linhas 1307 e 1533, ambas em 'Step 3 ... (Detective)'); o Step 3 diz 'Monitor and log human overrides of AI recommendations, analyzing reviewer patterns for potential bias or AI misalignment' — é log do humano que contraria a recomendação da IA, para análise de viés, não registro de aprovação humana de um ato do agente; o texto não diz 'log por ato'; é bullet, não exigência. (2) [nist-ai-rmf] 'vigente em 2026-11-14: AI RMF 1.0 de 2023 sem versão nova, em revisão sob o AI Action Plan sem data; AI 600-1 de 2024; único item de 2026 é a nota conceitual de perfil de infraestrutura crítica de 7/4/2026' -> AFIRMADA-SEM-CITACAO, REBAIXADA pelo motor: a prova é resumo de dois WebFetch ('The AI RMF 1.0 is being revised as part of the White House AI Action Plan.'), não citação verbatim; a conclusão 'não há versão pós-2026-11' é inferência do leitor, válida só como estado da página em 2026-11-14. OBJEÇÕES RECUSADAS PELO MOTOR (sobreviveram sem critério ou sem superação): 0; nenhum alvo fica não-julgado por recusa. LACUNAS QUE CONTINUAM ABERTAS (gapsOpen, 2): (a) owasp-llm CONTEÚDO da edição 2026 — o texto do item Excessive Agency #3 NÃO foi lido (kg-corpus-grep 'llm062026' = 0 nós); a rodada prova que a versão MUDOU, não o que ela DIZ; (b) nist atualidade da norma-mãe — a única claim de versão foi REJEITADA; sem citação primária datada de que não há versão NIST pós-2026-11. RESTRIÇÃO JÁ CONHECIDA (não fechada por esta rodada): sub=solicitante/act=agente (RFC 8693) e 'log por ato' seguem SEM prescrição em OWASP ou NIST. SUPERAÇÕES: 1 nó C_SUPERACAO_20261114_ASI_EXPLICIT_USER_APPROVAL, com TRACES_TO para este nó. VEREDITO: a objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED fecha a metade OWASP (LLM Top 10 -> 2026; Agentic Threats -> v1.1 dez/2025; Agentic Top 10 -> 2026) e VINDICA o medo da objeção (a base LLM 2025 está SUPERSEDIDA por uma edição 2026 cujo texto não foi lido), mas SOBREVIVE em duas frentes; o selo segue ADIADO."
+    trace: "run /onion-research de 2026-11-14, modo primárias, seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações"
+    provenance:
+      source: "run /onion-research de 2026-11-14, modo primárias"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada, conferida pelo escritor"
+      locality: "host"
+  - id: C_SUPERACAO_20261114_ASI_EXPLICIT_USER_APPROVAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Bullet do mesmo PDF v1.1 (~linha 1425) 'Enforce explicit user approval for AI tool executions involving financial, medical, or administrative...' entrega o valor 'aprovação humana' que o claim rejeitado atribuía ao Step 3."
+    narrative: "Medida: grep -n -iE 'approval' no PDF v1.1 reaberto (pdftotext -layout) — a linha ~1425 traz o bullet verbatim, lido em contexto. Critério: A2_CLAIM_ESTICA (pdftotext -layout a.pdf a.txt; sed -n 1306,1310p a.txt -> o Step 3 diz 'Monitor and log human overrides of AI recommendations, analyzing reviewer patterns for potential bias or AI misalignment', não aprovação de ato do agente; grep -n -i 'per-action|per action|log por ato' a.txt -> sem trecho que sustente 'log por ato'). Alvo reprovado (EXAGERADA, registrado em E_LACUNAS_OWASP_NIST_VERSIONS_1114): [owasp-agentic] 'a seção de rastreabilidade exige trilha criptográfica imutável e registro dos overrides humanos, sustentando log por ato e aprovação humana registrada'. Afirmação de UM juiz."
+    trace: "pdftotext -layout a.pdf a.txt; grep -n -iE 'approval' a.txt (linha ~1425: 'Enforce explicit user approval for AI tool executions involving financial, medical, or administrative...')"
+  - id: Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Com a metade OWASP da objeção de versão fechada (LLM Top 10 -> 2026; ASI Threats -> v1.1; Agentic Top 10 -> 2026), o selo pode ser revisto? Falta: (a) texto do item Excessive Agency #3 da edição 2026 e (b) citação primária datada de atualidade do NIST."
+    narrative: "Esta rodada NÃO sela (o escritor nunca sela). Propõe revisão do selo que a objeção adiou: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED teve a metade OWASP conferida, mas SOBREVIVE em duas frentes (conteúdo da edição LLM 2026 não lido; atualidade NIST rejeitada na ancoragem). Caminho de fechamento (Elenxo): ancorar o texto do item EA #3 da edição 2026 e uma citação primária datada de atualidade do NIST; OU re-escopar a recomendação como 'versões vigentes em 2026-11-14 por identidade de documento; conteúdo de privilégio ancorado em LLM06:2025 + ASI03:2026 + RFC 8693 + prática Microsoft, NÃO na edição LLM 2026 cujo texto não foi lido'. A decisão de selo é do maestro."
+    trace: "run /onion-research de 2026-11-14; objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED; Elenxo recommendation e gapsOpen"
 edges:
   - from: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
@@ -1600,4 +1960,125 @@ edges:
     edge_type: TRACES_TO
   - from: T_OWASP_AGENTIC_THREAT_T9
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  # ─── Arestas da rodada de primárias OWASP/NIST atuais, 2026-11-14 ───
+  - from: E_OWASP_LLM_TOP10_2026_CURRENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM_EXCESSIVE_AGENCY_NOW_THREE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_AGENT_CONTROL_STANDARD_DONATED
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM06_2025_EXCESSIVE_PERMISSIONS_BASE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM06_2025_USER_APPROVAL
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM06_2025_COMPLETE_MEDIATION
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_ASI_THREATS_V11_CURRENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_T8_SIGNED_IMMUTABLE_LOGS_V11
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_T9_IMPERSONATION_LEAST_PRIVILEGE_V11
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_ASI_IDENTITY_MITIGATION_CROSS_AGENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_AGENTIC_TOP10_2026_PUBLISHED
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_600_GOVERN_2_1_ROLES_CURRENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_600_GOVERN_3_2_HUMAN_AI_CURRENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_600_GV_3_2_003_AUP_CURRENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_600_MANAGE_2_4_DEACTIVATE_CURRENT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_600_AUDIT_KIT_GV_1_5_002_MG_2_4_002
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_OWASP_NIST_VERSIONS_1114
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM_TOP10_2026_CURRENT
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: E_OWASP_LLM_TOP10_2026_CURRENT
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: CONSTRAINS
+  - from: E_OWASP_LLM_EXCESSIVE_AGENCY_NOW_THREE
+    to: T_OWASP_LLM06
+    edge_type: CONSTRAINS
+  - from: E_OWASP_LLM_EXCESSIVE_AGENCY_NOW_THREE
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: CONSTRAINS
+  - from: E_OWASP_LLM06_2025_EXCESSIVE_PERMISSIONS_BASE
+    to: E_LLM06_EXCESSIVE_PERMISSIONS
+    edge_type: SUPPORTS
+  - from: E_OWASP_LLM06_2025_USER_APPROVAL
+    to: E_LLM06_HUMAN_IN_THE_LOOP
+    edge_type: SUPPORTS
+  - from: E_OWASP_LLM06_2025_COMPLETE_MEDIATION
+    to: E_LLM06_COMPLETE_MEDIATION
+    edge_type: SUPPORTS
+  - from: E_OWASP_ASI_THREATS_V11_CURRENT
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: E_OWASP_ASI_THREATS_V11_CURRENT
+    to: T_OWASP_AGENTIC_THREAT_T8
+    edge_type: CONSTRAINS
+  - from: E_OWASP_ASI_THREATS_V11_CURRENT
+    to: T_OWASP_AGENTIC_THREAT_T9
+    edge_type: CONSTRAINS
+  - from: E_OWASP_T8_SIGNED_IMMUTABLE_LOGS_V11
+    to: E_T8_SIGNED_IMMUTABLE_LOGS
+    edge_type: SUPERSEDES
+  - from: E_OWASP_T9_IMPERSONATION_LEAST_PRIVILEGE_V11
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_OWASP_ASI_IDENTITY_MITIGATION_CROSS_AGENT
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_OWASP_ASI_IDENTITY_MITIGATION_CROSS_AGENT
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: CONSTRAINS
+  - from: E_OWASP_AGENTIC_TOP10_2026_PUBLISHED
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: E_NIST_600_GOVERN_2_1_ROLES_CURRENT
+    to: E_NIST_GOVERN_2_1_ROLES
+    edge_type: SUPPORTS
+  - from: E_NIST_600_GOVERN_3_2_HUMAN_AI_CURRENT
+    to: E_NIST_GOVERN_3_2_HUMAN_AI_ROLES
+    edge_type: SUPPORTS
+  - from: E_NIST_600_GV_3_2_003_AUP_CURRENT
+    to: E_NIST_GV_3_2_003_CHATBOT_AUP
+    edge_type: SUPPORTS
+  - from: E_NIST_600_MANAGE_2_4_DEACTIVATE_CURRENT
+    to: E_NIST_MANAGE_2_4_DEACTIVATE
+    edge_type: SUPPORTS
+  - from: E_NIST_600_AUDIT_KIT_GV_1_5_002_MG_2_4_002
+    to: C_AUDIT_KIT_NORMATIVE_BASIS_1113
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_OWASP_NIST_VERSIONS_1114
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261114_ASI_EXPLICIT_USER_APPROVAL
+    to: E_LACUNAS_OWASP_NIST_VERSIONS_1114
+    edge_type: TRACES_TO
+  - from: Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
     edge_type: TRACES_TO

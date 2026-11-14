@@ -25,6 +25,21 @@ privilégio próprio único, e o que uma auditoria pede como registro. Rodada em
 lidas, 0 inalcançáveis, 35 claims ancoradas, 10 rejeitadas (todas EXAGERADA), 38 objeções, 15 sobreviventes
 (5 bloqueiam), 13 superações (`E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113`).
 
+## Rodada complemento 2026-11-14 — atualidade OWASP/NIST (fecha metade da objeção)
+
+Run `wf_148b5b18-17e` (modo primárias, 837.802 tokens, 10 agentes, ~20 min). Fecha a **metade OWASP** da
+objeção `E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED` (via `CONSTRAINS`): o **OWASP Top 10 for LLM é 2026** (lançado
+set/2026), e **Excessive Agency subiu a nº 3** (`LLM03:2026`, era `LLM06:2025`); o texto 2025 (executar no
+contexto do usuário, aprovação humana no alto impacto, mediação a jusante) **se mantém e foi reforçado**; o
+**Agent Control Standard (ACS) foi doado ao OWASP GenAI** (enforcement em runtime); o **OWASP ASI
+"Agentic AI — Threats and Mitigations" v1.1 (dez/2025)** é a vigente (supersede `E_T8` v1.0 → v1.1). +19 nós,
+radar exit 0, contrato rc 0.
+
+**O selo SEGUE ADIADO** (`Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114`), por honestidade: o **conteúdo integral da
+edição LLM 2026** não foi lido (só o anúncio) e a **atualidade do NIST foi rejeitada na ancoragem**. Falta um
+round complemento (texto 2026 do item + NIST atual) antes de selar. A recomendação do Elenxo **não muda — é
+reforçada** pelas versões atuais.
+
 ## O que sustenta
 
 | Afirmação | Âncora | Nós |
