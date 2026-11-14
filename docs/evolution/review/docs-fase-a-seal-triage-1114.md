@@ -2,7 +2,7 @@
 branch: docs/fase-a-seal-triage-1114
 pr: pendente
 date: 2026-11-14
-reviewed_diff_sha256: 356bb325fc568c40784561f7d5ce2f228fe5daf54f3296400f59c214ed987849
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
