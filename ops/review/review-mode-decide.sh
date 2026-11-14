@@ -15,68 +15,139 @@
 # tem selftest — foi assim que a máquina quebrada sobreviveu meses parecendo sã". A bancada é a
 # família `run_review_mode_selftests` de lint-selftest.sh.
 #
-# ── A REGRA DO `auto` (lista ÚNICA — a doc cita esta, não a copia) ───────────────────────────────
-# Revisa quando o diff do PR contra a base (nomes antigos E novos: renomear um hook para docs/ não o
-# tira da lista) toca algum destes caminhos:
-#   .claude/hooks/*  .claude/validation/*  .github/workflows/*  .claude/settings.json
-#   ops/update-*  ops/deploy-*  ops/mcp-*  ops/pr-merge-verified.sh  ops/merge-serial.sh
-#   ops/apply-ruleset-main.sh  ops/review/* (este próprio juiz — quem muda o juiz é julgado)
-# OU quando as linhas de CÓDIGO mudadas (adições + remoções fora de docs/ e de *.kg.yaml) passam de
-# AUTO_MAX_CODE_LINES. Grafo, docs e projeções (tudo em docs/) sozinhos NÃO disparam.
-# O TETO É MEDIDO, não escolhido (2026-10-13, últimos 100 PRs mergeados, arquivos por PR via
-# `gh api pulls/<n>/files`): linhas de código por PR p50=198 · p70=470 · p75=579 · p90=1104. O teto é
-# o p75 arredondado (600). Na mesma amostra, 78 dos 100 PRs tocaram um caminho da lista (77 deles por
-# .claude/validation/), e entre os 22 que não tocaram o maior tinha 410 linhas de código — ou seja, o
-# teto é a REDE para o PR grande fora da lista, e não mudou a decisão de nenhum PR medido.
+# ── A REGRA DO `auto` (decisão do maestro de 2026-11-13, D_REVIEW_AUTO_WITH_FALLBACK_1113) ──────────────
+# Revisa SÓ o PR que toca GUARDA. A lista NÃO mora aqui: é a do ops/review/guard-paths.sh, derivada do
+# ops/moat-targets.tsv mais as cercas fixas, a mesma que o ops/pr-merge-verified.sh usa para exigir o resíduo
+# independente em fallback. Conta o nome antigo e o novo do rename e o arquivo removido. O teto de linhas
+# (600, medido em 2026-10-13) e o `.claude/validation/*` inteiro SAÍRAM da regra com a decisão: o PR comum,
+# grande ou não, fica com o gate determinístico. Helper ou diff ilegível ⇒ REVISA (na dúvida, o lado que mede).
+#
+# ── O FALLBACK (a mesma decisão) ─────────────────────────────────────────────────────────────────────
+# Quando o revisor não pode julgar (modo off, chave ausente, ou falta de crédito na API), o veredito NÃO
+# fica vermelho por isso: sai verde com a marca, dizendo "não revisado pelo CI: <motivo>", e o motivo vai
+# para o sumário do check e para um comentário no PR. Quem cobre o PR de guarda nesse caso é o
+# ops/pr-merge-verified.sh, que exige o resíduo da REGRA 56 com Elenxo isolado (refutador independente).
+# A falta de crédito se reconhece por `--classify-credit` (o pré-voo HTTP 400 "credit balance", ou a
+# evidência do run com "Credit balance is too low" / api_error_status 400 com crédito).
 #
 # Uso:
 #   decidir : bash ops/review/review-mode-decide.sh --mode "<valor>" [--labels-json '<array JSON>'] \
-#                  [--range <base>...<head>] [--repo <dir>]
+#                  [--range <base>...<head>] [--repo <dir>] [--guard-helper <guard-paths.sh>] [--targets <tsv>]
 #             saída (stdout, pronta para o GITHUB_OUTPUT): run=true|false · mode=on|off|auto · reason=<linha>
+#                  · guard=true|false|unknown · guard_paths=<caminhos de guarda tocados, separados por espaço>
 #   veredito: bash ops/review/review-mode-decide.sh --verdict-gate --mode-result <r> --run <true|false> \
-#                  --mode <m> --reason <texto> --review-result <r> [--summary-file <arq>]
+#                  --mode <m> --reason <texto> --review-result <r> [--summary-file <arq>] \
+#                  [--guard <true|false|unknown>] [--guard-paths <lista>] [--comment-file <arq>]
 #             exit 0 = revisão DESLIGADA (o check sai verde, com a anotação-marca) · 10 = segue para o
 #             veredito normal · 1 = falha NOMEADA
-#   marca   : bash ops/review/review-mode-decide.sh --print-marker
+#   crédito : bash ops/review/review-mode-decide.sh --classify-credit [--preflight-http <c>] \
+#                  [--preflight-causa <txt>] [--evidence-dir <dir>]
+#             exit 0 = a falha é FALTA DE CRÉDITO (stdout: a causa numa linha) · 1 = não é
+#   fallback: bash ops/review/review-mode-decide.sh --fallback --reason <motivo> [--guard ...] \
+#                  [--guard-paths ...] [--summary-file <arq>] [--comment-file <arq>]
+#             exit 0 sempre: a anotação-marca "não revisado pelo CI: <motivo>", o sumário e o corpo do comentário
+#   marca   : bash ops/review/review-mode-decide.sh --print-marker | --print-reviewed-marker
+#   revisado: bash ops/review/review-mode-decide.sh --reviewed-mark --head <sha>   (a anotação da marca positiva)
 # Exit (decidir): 0 decidido · 2 valor fora do enum / uso inválido (falha alta e nomeada, nunca silêncio).
 # =============================================================================
 set -uo pipefail
 
 FORCE_LABEL="review:ia"
-AUTO_MAX_CODE_LINES=600
 # a MARCA que o ops/pr-merge-verified.sh procura na anotação do check para saber que o verde é
 # DESLIGAMENTO e não aprovação. Um lugar só: o merge-verified a lê por --print-marker.
 MARKER="onion-review-desligado:"
-SENSITIVE_PATHS=(
-  '.claude/hooks/*'
-  '.claude/validation/*'
-  '.github/workflows/*'
-  '.claude/settings.json'
-  'ops/update-*'
-  'ops/deploy-*'
-  'ops/mcp-*'
-  'ops/pr-merge-verified.sh'
-  'ops/merge-serial.sh'
-  'ops/apply-ruleset-main.sh'
-  'ops/review/*'
-)
+# a marca POSITIVA (2ª passada do refutador do #1652, B1): o revisor RODOU e o gate de achados APROVOU este head. É o
+# único verde que o merge-verified aceita como revisão num PR de guarda; verde sem ela é fallback. Quem a emite é o
+# juiz lido da BASE (o job do veredito o tira de lá), então um PR não a forja mudando este script. Um PR que edita o
+# workflow forjaria qualquer coisa, e por isso o merge-verified não aceita a marca em PR que toca .github/workflows/.
+POS_MARKER="onion-review-revisado:"
+# o corpo do comentário de fallback começa por esta marca, que o post-review-comment.sh usa para EDITAR o
+# mesmo comentário a cada push (sticky), em vez de empilhar um por run
+COMMENT_MARK="<!-- onion-review-fallback -->"
 
 _die2() { printf 'review-mode-decide: %s\n' "$1" >&2; exit 2; }
 _one_line() { printf '%s' "$1" | tr '\n\r' '  '; }
+GUARD="unknown"; GUARD_PATHS=""
 _decide() { # $1=run $2=mode $3=reason
-  printf 'run=%s\nmode=%s\nreason=%s\n' "$1" "$2" "$(_one_line "$3")"
+  printf 'run=%s\nmode=%s\nreason=%s\nguard=%s\nguard_paths=%s\n' "$1" "$2" "$(_one_line "$3")" "${GUARD}" "$(_one_line "${GUARD_PATHS}")"
   printf 'review-mode-decide: run=%s (modo %s) — %s\n' "$1" "$2" "$3" >&2
   exit 0
 }
-_is_sensitive() { local p="$1" g; for g in "${SENSITIVE_PATHS[@]}"; do
-  # shellcheck disable=SC2254
-  case "${p}" in ${g}) return 0 ;; esac; done; return 1; }
+
+# ── fallback: o texto único do "não revisado pelo CI" (anotação-marca, sumário e comentário) ─────────
+# $1=motivo $2=guard $3=guard_paths $4=arquivo do sumário (ou vazio) $5=arquivo do comentário (ou vazio)
+_fallback_emit() {
+  local why gd gp summ cfile req
+  why="$(_one_line "$1")"; gd="${2:-unknown}"; gp="$(_one_line "${3:-}")"; summ="${4:-}"; cfile="${5:-}"
+  printf '::notice::%s não revisado pelo CI: %s\n' "${MARKER}" "${why}"
+  case "${gd}" in
+    true)  req="Este PR toca GUARDA (\`${gp:-?}\`). Sem o parecer do CI, o merge pela sessão (\`ops/pr-merge-verified.sh\`) exige o resíduo da REGRA 56 (\`docs/evolution/review/<branch>.md\`) com \`elenxo: true\` e \`elenxo_isolado: true\` (refutador independente), verdict aceito e \`reviewed_diff_sha256\` carimbado; sem ele, recusa." ;;
+    false) req="Este PR não toca guarda: sem exigência extra, o gate determinístico (lint e bancada) segue cobrindo." ;;
+    *)     req="Não medi se este PR toca guarda; o \`ops/pr-merge-verified.sh\` mede de novo na hora do merge e exige o resíduo independente se tocar." ;;
+  esac
+  if [ -n "${summ}" ]; then
+    printf '%s\n' "## ⊘ Não revisado pelo CI: ${why}" "" \
+      "O check sai verde por **fallback**, não por aprovação: a semântica NÃO foi medida pelo revisor de IA." "" \
+      "${req}" "" \
+      "Para forçar a revisão neste PR, ponha a label \`${FORCE_LABEL}\` (com crédito na API)." >> "${summ}"
+  fi
+  if [ -n "${cfile}" ]; then
+    printf '%s\n' "${COMMENT_MARK}" "⊘ **Não revisado pelo CI: ${why}**" "" "${req}" "" \
+      "_Fallback do revisor de IA (D_REVIEW_AUTO_WITH_FALLBACK_1113). Ligar, desligar e pôr crédito: \`docs/onion/review-mode-card.md\`._" > "${cfile}"
+  fi
+  return 0
+}
+
+# ── crédito: a falha do revisor é FALTA DE SALDO? (o único modo de falha que vira fallback) ─────────
+_classify_credit() {
+  local http="" causa="" ev=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --preflight-http) http="${2-}"; shift 2 ;;
+      --preflight-causa) causa="${2-}"; shift 2 ;;
+      --evidence-dir) ev="${2-}"; shift 2 ;;
+      *) printf 'review-mode-decide --classify-credit: argumento desconhecido %s\n' "$1" >&2; return 2 ;;
+    esac
+  done
+  # (1) o pré-voo: HTTP 400 com "credit balance" no corpo da API
+  if [ "${http}" = "400" ] && LC_ALL=C grep -qiF 'credit balance' <<< "${causa}"; then
+    printf 'sem crédito na API (pré-voo HTTP 400: %s)\n' "$(_one_line "${causa}" | cut -c1-200)"; return 0
+  fi
+  # (2) a evidência do run (artefato review-evidence). Lê SÓ o evento `result` (o último) e o campo de erro da API,
+  #     NUNCA o arquivo inteiro: o arquivo traz o diff e as saídas das ferramentas, e um PR que contenha a frase
+  #     "credit balance is too low" faria um estouro de turnos sair verde (refutador do #1652, B2). Crédito é:
+  #     is_error true E (a mensagem do resultado/erro diz "credit balance is too low", OU api_error_status 400 com
+  #     "credit" nessa mesma mensagem). JSON ilegível ou sem evento result = não é crédito (segue vermelho).
+  if [ -n "${ev}" ] && [ -d "${ev}" ] && command -v jq >/dev/null 2>&1; then
+    local f r
+    while IFS= read -r f; do
+      [ -n "${f}" ] || continue
+      r="$(jq -rs '
+        (if length == 1 and (.[0] | type) == "array" then .[0] else . end)
+        | map(select(type == "object" and .type == "result")) | last // empty
+        | select(.is_error == true)
+        | [ (.api_error_status // "" | tostring),
+            ([.result, .error, .error_message, (.error | objects | .message)] | map(select(type == "string")) | join(" ")) ]
+        | @tsv' "${f}" 2>/dev/null)" || continue
+      [ -n "${r}" ] || continue
+      local st="${r%%$'\t'*}" msg="${r#*$'\t'}"
+      if LC_ALL=C grep -qiF 'credit balance is too low' <<< "${msg}" \
+         || { [ "${st}" = "400" ] && LC_ALL=C grep -qiF 'credit' <<< "${msg}"; }; then
+        printf 'sem crédito na API (evidência do run: %s, evento result)\n' "${f##*/}"; return 0
+      fi
+    done < <(find "${ev}" -type f -name '*.json' 2>/dev/null)
+  fi
+  return 1
+}
 
 # ── veredito: o que o check `onion-review-verdict` faz ANTES do veredito normal ───────────────────
 _verdict_gate() {
-  local mres="" run="" mode="" reason="" rres="" summ=""
+  local mres="" run="" mode="" reason="" rres="" summ="" gd="unknown" gp="" cfile=""
   while [ $# -gt 0 ]; do
     case "$1" in
+      --guard) gd="${2-}"; shift 2 ;;
+      --guard-paths) gp="${2-}"; shift 2 ;;
+      --comment-file) cfile="${2-}"; shift 2 ;;
       --mode-result) mres="${2-}"; shift 2 ;;
       --run) run="${2-}"; shift 2 ;;
       --mode) mode="${2-}"; shift 2 ;;
@@ -94,11 +165,13 @@ _verdict_gate() {
   fi
   case "${run}" in
     false)
-      printf '::notice::%s revisão desligada (modo %s, motivo: %s)\n' "${MARKER}" "${mode:-?}" "$(_one_line "${reason:-?}")"
-      _sum "## ⊘ Revisão de IA desligada neste PR" "" \
-        "Modo \`${mode:-?}\` — ${reason:-?}." "" \
-        "O check sai verde por **desligamento**, não por aprovação: a semântica NÃO foi medida." \
-        "Para forçar a revisão neste PR, ponha a label \`${FORCE_LABEL}\`."
+      # modo off é FALLBACK (o maestro desligou): sumário + comentário no PR. modo auto sem guarda é a regra
+      # de necessidade dizendo "não precisa": sumário, sem comentário (não há o que pedir a ninguém).
+      if [ "${mode}" = "auto" ]; then
+        _fallback_emit "revisão desligada (modo auto, motivo: ${reason:-?})" "${gd}" "${gp}" "${summ}" ""
+      else
+        _fallback_emit "revisão desligada (modo ${mode:-?}, motivo: ${reason:-?})" "${gd}" "${gp}" "${summ}" "${cfile}"
+      fi
       return 0 ;;
     true)
       if [ "${rres}" = "skipped" ]; then
@@ -112,19 +185,53 @@ _verdict_gate() {
   esac
 }
 
+_fallback_cli() {
+  local why="" gd="unknown" gp="" summ="" cfile=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --reason) why="${2-}"; shift 2 ;;
+      --guard) gd="${2-}"; shift 2 ;;
+      --guard-paths) gp="${2-}"; shift 2 ;;
+      --summary-file) summ="${2-}"; shift 2 ;;
+      --comment-file) cfile="${2-}"; shift 2 ;;
+      *) printf '::error::review-mode-decide --fallback: argumento desconhecido %s\n' "$1"; return 1 ;;
+    esac
+  done
+  [ -n "${why}" ] || { printf '::error::review-mode-decide --fallback exige --reason (fallback sem motivo é verde mudo)\n'; return 1; }
+  _fallback_emit "${why}" "${gd}" "${gp}" "${summ}" "${cfile}"
+}
+
 case "${1:-}" in
   --print-marker) printf '%s\n' "${MARKER}"; exit 0 ;;
+  --print-reviewed-marker) printf '%s\n' "${POS_MARKER}"; exit 0 ;;
+  --reviewed-mark)
+    # `--reviewed-mark --head <sha> --achados <n>`. A marca sai SÓ com achados EXATAMENTE 0 (3ª passada do refutador,
+    # N1): o gate de achados deixa passar -1 e vazio ("não pude contar", inclusive a árvore suja, que o job do revisor
+    # converte em -1), e verde sem contagem não é aprovação. Sem a marca, o merge-verified trata o PR de guarda como
+    # fallback (resíduo independente). Contagem fora de 0 não é erro: o check segue verde, só sem a marca.
+    [ "${2:-}" = "--head" ] && grep -qE '^[0-9a-f]{40}$' <<< "${3:-}" && [ "${4:-}" = "--achados" ] \
+      || { printf '::error::review-mode-decide --reviewed-mark exige --head <sha de 40 hex> --achados <n>\n'; exit 1; }
+    if [ "${5-}" != "0" ]; then
+      printf '::notice::sem marca positiva: a contagem de achados veio "%s", não 0 (não pude contar, ou árvore suja) — num PR de guarda o merge pede o resíduo independente\n' "$(_one_line "${5-}")"
+      exit 0
+    fi
+    printf '::notice::%s o revisor de IA do CI revisou e aprovou o head %s\n' "${POS_MARKER}" "$3"; exit 0 ;;
+  --classify-credit) shift; _classify_credit "$@"; exit $? ;;
+  --fallback) shift; _fallback_cli "$@"; exit $? ;;
   --verdict-gate) shift; _verdict_gate "$@"; exit $? ;;
   -h|--help) sed -n '/^# Uso:/,/^# Exit (decidir)/p' "${BASH_SOURCE[0]}"; exit 0 ;;
 esac
 
 MODE_SET=0; MODE=""; LABELS_JSON=""; RANGE=""; REPO="."
+GUARD_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/guard-paths.sh"; TARGETS_ARG=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --mode) MODE_SET=1; MODE="${2-}"; shift 2 || _die2 "--mode exige valor (vazio vale: \"\")" ;;
     --labels-json) LABELS_JSON="${2-}"; shift 2 || _die2 "--labels-json exige valor" ;;
     --range) RANGE="${2-}"; shift 2 || _die2 "--range exige <base>...<head>" ;;
     --repo) REPO="${2-}"; shift 2 || _die2 "--repo exige diretório" ;;
+    --guard-helper) GUARD_HELPER="${2-}"; shift 2 || _die2 "--guard-helper exige caminho" ;;
+    --targets) TARGETS_ARG=(--targets "${2-}"); shift 2 || _die2 "--targets exige caminho" ;;
     *) _die2 "argumento desconhecido '$1'" ;;
   esac
 done
@@ -137,6 +244,18 @@ case "${MODE}" in
   on|off|auto) _mode_src="vars.ONION_REVIEW_MODE=${MODE}" ;;
   *) _die2 "ONION_REVIEW_MODE='${MODE}' fora do enum on|off|auto (exato, minúsculo, sem espaço; vazio = off). Corrija a variável do repositório — o revisor não decide sobre valor que não entende." ;;
 esac
+
+# (1b) a GUARDA, medida em todo modo quando há diff: o fallback diz ao PR se ele cai na exigência do resíduo.
+#      A pergunta é do helper (a lista única); rc 2 dele (tsv ou diff ilegível) fica `unknown`, nunca `false`.
+_guard_err=""
+if [ -n "${RANGE}" ]; then
+  _grc=0; _gout="$(bash "${GUARD_HELPER}" --range "${RANGE}" --git-dir "${REPO}" "${TARGETS_ARG[@]}" 2>&1)" || _grc=$?
+  case "${_grc}" in
+    0) GUARD=true; GUARD_PATHS="$(printf '%s\n' "${_gout}" | head -5 | paste -sd' ' -)" ;;
+    1) GUARD=false ;;
+    *) GUARD=unknown; _guard_err="$(printf '%s' "${_gout}" | head -c 160)" ;;
+  esac
+fi
 
 # (2) a LABEL força em qualquer modo. Pertinência EXATA no array JSON (nome de label é texto livre
 #     de quem tem permissão de triagem; nunca interpolado, nunca casado por substring).
@@ -153,20 +272,10 @@ case "${MODE}" in
   off) _decide false off "${_mode_src}; sem a label ${FORCE_LABEL}" ;;
 esac
 
-# (3) modo auto: a regra de necessidade. Diff ilegível ⇒ REVISA (na dúvida, o lado que mede).
+# (3) modo auto: a regra de necessidade é a lista de guardas. Sem medida ⇒ REVISA (na dúvida, o lado que mede).
 [ -n "${RANGE}" ] || _die2 "modo auto exige --range <base>...<head>"
-if ! _names="$(git -C "${REPO}" -c core.quotepath=off diff --name-status --no-renames "${RANGE}" -- 2>&1)"; then
-  _decide true auto "o diff ${RANGE} não pôde ser lido ($(printf '%s' "${_names}" | head -c 100)) — na dúvida, revisa"
-fi
-while IFS=$'\t' read -r _st _p; do
-  [ -n "${_p:-}" ] || continue
-  _is_sensitive "${_p}" && _decide true auto "o diff toca ${_p} (caminho sensível da lista do auto)"
-done <<< "${_names}"
-if ! _num="$(git -C "${REPO}" -c core.quotepath=off diff --numstat --no-renames "${RANGE}" -- 2>&1)"; then
-  _decide true auto "o numstat de ${RANGE} não pôde ser lido — na dúvida, revisa"
-fi
-_lines="$(printf '%s\n' "${_num}" | awk -F'\t' 'NF>=3 && $3 !~ /^docs\// && $3 !~ /\.kg\.yaml$/ {a=($1=="-")?0:$1; d=($2=="-")?0:$2; s+=a+d} END{print s+0}')"
-if [ "${_lines}" -gt "${AUTO_MAX_CODE_LINES}" ]; then
-  _decide true auto "${_lines} linhas de código mudadas (fora de docs/ e *.kg.yaml) passam do teto ${AUTO_MAX_CODE_LINES}"
-fi
-_decide false auto "nenhum caminho sensível e ${_lines} linhas de código (teto ${AUTO_MAX_CODE_LINES}) — grafo/docs/projeções sozinhos não disparam"
+case "${GUARD}" in
+  true)  _decide true auto "o diff toca guarda: ${GUARD_PATHS} (lista do ops/review/guard-paths.sh)" ;;
+  false) _decide false auto "o diff não toca nenhuma guarda (lista do ops/review/guard-paths.sh): o PR comum fica com o gate determinístico" ;;
+  *)     _decide true auto "não medi se o diff ${RANGE} toca guarda (${_guard_err:-sem saída}) — na dúvida, revisa" ;;
+esac

@@ -43,8 +43,10 @@ jobs:
   # ═══ O INTERRUPTOR (decisão do maestro, 2026-10-13 — D_REVIEW_MODE_SWITCH_PADRAO_OFF) ═══
   # `vars.ONION_REVIEW_MODE` = on (todo PR) | off (nunca — PADRÃO, variável ausente ou vazia) | auto
   # (só quando a regra de necessidade casa); a label `review:ia` força em qualquer modo. Este job é
-  # LEVE: não chama a API da Anthropic, não lê secret. A regra (inclusive a lista de caminhos do `auto`
-  # e o teto de linhas medido) vive em ops/review/review-mode-decide.sh, que tem bancada — o YAML só
+  # LEVE: não chama a API da Anthropic, não lê secret. A regra vive em ops/review/review-mode-decide.sh e
+  # a lista de guardas do `auto` em ops/review/guard-paths.sh (D_REVIEW_AUTO_WITH_FALLBACK_1113: o auto revisa
+  # só o PR que toca guarda; sem crédito, sem chave ou em off, o veredito vira FALLBACK, não vermelho; cartão
+  # em docs/onion/review-mode-card.md). Os dois têm bancada — o YAML só
   # encadeia. Valor fora do enum ⇒ este job FALHA nomeado, e o veredito também (nunca silêncio).
   onion-review-mode:
     runs-on: ubuntu-latest
@@ -54,6 +56,10 @@ jobs:
       run: ${{ steps.decide.outputs.run }}
       mode: ${{ steps.decide.outputs.mode }}
       reason: ${{ steps.decide.outputs.reason }}
+      # a GUARDA (D_REVIEW_AUTO_WITH_FALLBACK_1113): medida em todo modo, para o fallback dizer ao PR se ele
+      # cai na exigência do resíduo independente do ops/pr-merge-verified.sh
+      guard: ${{ steps.decide.outputs.guard }}
+      guard_paths: ${{ steps.decide.outputs.guard_paths }}
     steps:
       - name: Checkout (a regra do auto lê o diff base...head)
         uses: actions/checkout@v5
@@ -74,23 +80,36 @@ jobs:
           # O JUIZ VEM DA BASE, não do PR: um PR que reescrevesse o próprio script para dizer
           # run=false se desligaria sozinho. Só no bootstrap (a base ainda não tem o script — o PR
           # que o cria) usa-se o do head, e isso é DITO no log, não escondido.
-          juiz="${RUNNER_TEMP}/review-mode-decide.sh"
-          if git show "${BASE_SHA}:ops/review/review-mode-decide.sh" > "${juiz}" 2>/dev/null; then
-            echo "juiz: ops/review/review-mode-decide.sh da BASE ${BASE_SHA:0:8}"
-          else
+          # A LISTA DE GUARDAS também vem da BASE (D_REVIEW_AUTO_WITH_FALLBACK_1113): o helper e o
+          # moat-targets.tsv de que ela deriva. Um PR que tirasse uma linha do tsv, ou reescrevesse o helper,
+          # não sai da regra do auto por isso. Bootstrap por arquivo, dito no log.
+          jd="${RUNNER_TEMP}/juiz"; mkdir -p "${jd}/ops/review"
+          for f in ops/review/review-mode-decide.sh ops/review/guard-paths.sh ops/moat-targets.tsv; do
+            if git show "${BASE_SHA}:${f}" > "${jd}/${f}" 2>/dev/null; then
+              echo "juiz: ${f} da BASE ${BASE_SHA:0:8}"
+            else
+              cp "${f}" "${jd}/${f}"
+              echo "::warning::bootstrap: a base ${BASE_SHA:0:8} não tem ${f} — este run usa o do PR (só o PR que o cria passa por aqui)."
+            fi
+          done
+          juiz="${jd}/ops/review/review-mode-decide.sh"
+          # bootstrap do helper: o juiz da base anterior a 2026-11-13 não conhece --guard-helper. Só o PR que
+          # introduz o helper passa por aqui; depois do merge dele, a base sempre conhece.
+          if ! grep -qF -- '--guard-helper' "${juiz}"; then
             cp ops/review/review-mode-decide.sh "${juiz}"
-            echo "::warning::bootstrap: a base ${BASE_SHA:0:8} não tem ops/review/review-mode-decide.sh — o juiz deste run é o do PR (só o PR que cria o interruptor passa por aqui)."
+            echo "::warning::bootstrap: o juiz da base ${BASE_SHA:0:8} não conhece a lista de guardas (--guard-helper) — este run usa o juiz do PR."
           fi
           rc=0
           bash "${juiz}" --mode "${MODE}" --labels-json "${LABELS_JSON}" \
-            --range "${BASE_SHA}...${HEAD_SHA}" > decisao.out || rc=$?
+            --range "${BASE_SHA}...${HEAD_SHA}" --guard-helper "${jd}/ops/review/guard-paths.sh" \
+            --targets "${jd}/ops/moat-targets.tsv" > decisao.out || rc=$?
           if [ "${rc}" -ne 0 ]; then
             echo "::error title=ONION_REVIEW_MODE::a decisão do revisor falhou (rc=${rc}) — veja a linha 'review-mode-decide:' acima (valor fora de on|off|auto? vazio = off)."
             { echo "## ❌ Interruptor do revisor sem decisão"; echo; echo "\`review-mode-decide.sh\` saiu rc=${rc}. Confira \`vars.ONION_REVIEW_MODE\` (on|off|auto; vazio = off)."; } >> "${GITHUB_STEP_SUMMARY}"
             exit 1
           fi
           cat decisao.out
-          grep -E '^(run|mode|reason)=' decisao.out >> "${GITHUB_OUTPUT}"
+          grep -E '^(run|mode|reason|guard|guard_paths)=' decisao.out >> "${GITHUB_OUTPUT}"
           { echo "### Interruptor do revisor de IA"; echo; sed 's/^/- /' decisao.out; } >> "${GITHUB_STEP_SUMMARY}"
 
   onion-review:
@@ -937,7 +956,34 @@ jobs:
       - name: Checkout (o gate lê um script do repo)
         uses: actions/checkout@v5
         with:
-          fetch-depth: 1
+          # 0, não 1 (refutador do #1652, B1): o juiz deste job vem da BASE, e `git show <base>:…` precisa dela
+          fetch-depth: 0
+
+      # ═══ O JUIZ DO VEREDITO VEM DA BASE (refutador do #1652, B1) ═══
+      # Este job rodava o review-mode-decide.sh e o review-verdict.sh do HEAD do PR: um PR que mudasse o
+      # --verdict-gate (ou o gate de achados) saía verde sem a marca, e verde sem marca contava como aprovação.
+      # Agora os dois vêm da base, como o job do modo já fazia. Bootstrap por arquivo, dito no log: só o PR que
+      # introduz uma capacidade nova (a base ainda não a tem) usa a do PR.
+      - name: Juiz do veredito (da BASE)
+        id: juiz
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -uo pipefail
+          jd="${RUNNER_TEMP}/juiz-veredito"; mkdir -p "${jd}/ops/review" "${jd}/.claude/validation"
+          for f in ops/review/review-mode-decide.sh .claude/validation/review-verdict.sh; do
+            if git show "${BASE_SHA}:${f}" > "${jd}/${f}" 2>/dev/null; then
+              echo "juiz do veredito: ${f} da BASE ${BASE_SHA:0:8}"
+            else
+              cp "${f}" "${jd}/${f}"
+              echo "::warning::bootstrap: a base ${BASE_SHA:0:8} não tem ${f} — este run usa o do PR."
+            fi
+          done
+          if ! grep -qF -- '--achados <n>' "${jd}/ops/review/review-mode-decide.sh"; then
+            cp ops/review/review-mode-decide.sh "${jd}/ops/review/review-mode-decide.sh"
+            echo "::warning::bootstrap: o juiz da base ${BASE_SHA:0:8} não emite a marca positiva (--reviewed-mark) — este run usa o juiz do PR. O merge-verified não aceita a marca de PR que toca .github/workflows/, então este caso cai no resíduo."
+          fi
+          echo "dir=${jd}" >> "${GITHUB_OUTPUT}"
 
       # ═══ O INTERRUPTOR ANTES DO VEREDITO (2026-10-13, D_REVIEW_MODE_SWITCH_PADRAO_OFF) ═══
       # Desligado (run=false) ⇒ o check sai VERDE com a anotação-marca `onion-review-desligado:`
@@ -953,16 +999,40 @@ jobs:
           MODE: ${{ needs.onion-review-mode.outputs.mode }}
           REASON: ${{ needs.onion-review-mode.outputs.reason }}
           REVIEW_RESULT: ${{ needs.onion-review.result }}
+          GUARD: ${{ needs.onion-review-mode.outputs.guard }}
+          GUARD_PATHS: ${{ needs.onion-review-mode.outputs.guard_paths }}
+          PR: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JD: ${{ steps.juiz.outputs.dir }}
         run: |
           rc=0
-          bash ops/review/review-mode-decide.sh --verdict-gate --mode-result "${MODE_RESULT}" \
+          coment="${RUNNER_TEMP}/fallback-comment.md"; : > "${coment}"
+          bash "${JD}/ops/review/review-mode-decide.sh" --verdict-gate --mode-result "${MODE_RESULT}" \
             --run "${RUN}" --mode "${MODE}" --reason "${REASON}" --review-result "${REVIEW_RESULT}" \
+            --guard "${GUARD:-unknown}" --guard-paths "${GUARD_PATHS}" --comment-file "${coment}" \
             --summary-file "${GITHUB_STEP_SUMMARY}" || rc=$?
+          # FALLBACK com modo off: o motivo vai também para um comentário no PR (sticky: um só, editado a cada
+          # push). Postar é aviso, não veredito: falha ao postar não muda o check.
+          if [ "${rc}" -eq 0 ] && [ -s "${coment}" ]; then
+            bash .claude/utils/forge/post-review-comment.sh --pr "${PR}" --body-file "${coment}" \
+              --sticky '<!-- onion-review-fallback -->' || echo "::warning::não postei o comentário de fallback no PR (o sumário do check o traz)."
+          fi
           case "${rc}" in
             0)  echo "segue=false" >> "${GITHUB_OUTPUT}" ;;
             10) echo "segue=true" >> "${GITHUB_OUTPUT}" ;;
             *)  exit 1 ;;
           esac
+
+      # A EVIDÊNCIA DO REVISOR (artefato review-evidence, subido pelo job onion-review) é onde a falta de
+      # crédito aparece quando o pré-voo passou e o saldo acabou no meio do run (`api_error_status 400`,
+      # "Credit balance is too low"). Baixar é best-effort: sem o artefato, o pré-voo ainda classifica.
+      - name: Baixa a evidência do revisor (para reconhecer falta de crédito)
+        if: ${{ steps.modo.outputs.segue == 'true' }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: review-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/review-evidence
 
       - name: O PR foi revisado semanticamente?
         if: ${{ steps.modo.outputs.segue == 'true' }}
@@ -977,7 +1047,24 @@ jobs:
           SEM_CHAVE: ${{ needs.onion-review.outputs.sem_chave }}
           PF_HTTP: ${{ needs.onion-review.outputs.preflight_http }}
           PF_CAUSA: ${{ needs.onion-review.outputs.preflight_causa }}
+          GUARD: ${{ needs.onion-review-mode.outputs.guard }}
+          GUARD_PATHS: ${{ needs.onion-review-mode.outputs.guard_paths }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JD: ${{ steps.juiz.outputs.dir }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          # ═══ FALLBACK (D_REVIEW_AUTO_WITH_FALLBACK_1113) ═══ o revisor não pôde julgar por falta de CHAVE ou
+          # de CRÉDITO: o veredito não fica vermelho por isso. Sai verde com a anotação-marca "não revisado
+          # pelo CI: <motivo>" (a mesma que o ops/pr-merge-verified.sh lê), o motivo vai ao sumário e a um
+          # comentário no PR, e o PR que toca guarda passa a exigir o resíduo com Elenxo isolado no merge.
+          _fallback() {
+            coment="${RUNNER_TEMP}/fallback-comment.md"; : > "${coment}"
+            bash "${JD}/ops/review/review-mode-decide.sh" --fallback --reason "$1" --guard "${GUARD:-unknown}" \
+              --guard-paths "${GUARD_PATHS}" --summary-file "${GITHUB_STEP_SUMMARY}" --comment-file "${coment}"
+            [ -s "${coment}" ] && { bash .claude/utils/forge/post-review-comment.sh --pr "${PR_NUM}" --body-file "${coment}" \
+              --sticky '<!-- onion-review-fallback -->' || echo "::warning::não postei o comentário de fallback no PR (o sumário do check o traz)."; }
+            exit 0
+          }
           if [ "${RESULT}" = "skipped" ]; then
             # Só FORK chega aqui (o job de veredito exige fork == false, então na prática este
             # ramo é inalcançável — mantido por defesa, não por cobertura). O texto anterior
@@ -985,15 +1072,10 @@ jobs:
             echo "::notice::onion-review pulado — nada a verificar."
             exit 0
           fi
+          # Sem chave era verde SEM a marca, e o merge-verified o lia como APROVAÇÃO: o mesmo buraco que a marca
+          # fechou para o modo off. Agora é fallback, dito.
           if [ "${SEM_CHAVE}" = "true" ]; then
-            echo "::notice::ANTHROPIC_API_KEY ausente — o revisor sequer foi chamado. Não é falha de revisão; é ambiente sem credencial."
-            {
-              echo "ℹ️ **Revisor não configurado neste repo**"
-              echo ""
-              echo "Sem \`ANTHROPIC_API_KEY\`, o revisor não é chamado. O gate determinístico"
-              echo "(\`onion-validate\`) segue cobrindo estrutura/YAML/naming."
-            } >> "${GITHUB_STEP_SUMMARY}"
-            exit 0
+            _fallback "ANTHROPIC_API_KEY ausente, o revisor sequer foi chamado"
           fi
           if [ "${REVISOU}" = "true" ]; then
             # ═══ O ACHADO PASSA A BLOQUEAR (ordem do maestro, 2026-09-20) ═══
@@ -1009,13 +1091,23 @@ jobs:
             # `-1`/vazio (NÃO PUDE CONTAR) não bloqueia: "não revisou" já é o campo `revisou`, e
             # transformar ignorância em bloqueio é a classe que esta casa mais persegue.
             rc=0
-            bash .claude/validation/review-verdict.sh --gate "${ACHADOS:--1}" "${PR_NUM:-<pr>}" \
+            bash "${JD}/.claude/validation/review-verdict.sh" --gate "${ACHADOS:--1}" "${PR_NUM:-<pr>}" \
               >> "${GITHUB_STEP_SUMMARY}" || rc=$?
             if [ "${rc}" -ne 0 ]; then
               echo "::error::onion-review apontou ${ACHADOS} violação(ões) — corrija, ou dispense com motivo registrado (ops/pr-merge-verified.sh --dispensa onion-review-verdict --motivo …)."
               exit 1
             fi
+            # a MARCA POSITIVA, emitida pelo juiz da BASE: é ela, e não o verde, que o merge-verified aceita como
+            # revisão num PR de guarda (B1 do refutador do #1652)
+            # SÓ com achados exatamente 0 (N1): o juiz recusa a marca para -1/vazio (não pude contar, árvore suja)
+            bash "${JD}/ops/review/review-mode-decide.sh" --reviewed-mark --head "${HEAD_SHA}" --achados "${ACHADOS}"
             exit 0
+          fi
+          # FALTA DE CRÉDITO: o pré-voo (HTTP 400 "credit balance") ou a evidência do run. A classificação mora no
+          # juiz, que tem bancada; aqui só se encadeia.
+          if _cred="$(bash "${JD}/ops/review/review-mode-decide.sh" --classify-credit --preflight-http "${PF_HTTP}" \
+                --preflight-causa "${PF_CAUSA}" --evidence-dir "${RUNNER_TEMP}/review-evidence")"; then
+            _fallback "${_cred}"
           fi
           # CASO BENIGNO — e ele existe porque este check ERROU no seu primeiro run real.
           # No PR #549 (o que criou este job) ele ficou VERMELHO em 4s. Causa: a claude-code-action
@@ -1026,16 +1118,11 @@ jobs:
           # "alarme que anuncia a própria irrelevância não é alarme; é ruído com justificativa
           # anexa, e ensina a ignorar os que importam". Um check que grita no caso inócuo perde
           # a credibilidade justo para quando o caso for grave, que é a razão de ele existir.
+          # Pulada por desenho (o PR edita o próprio workflow) não é revisão: era verde SEM marca, e o merge-verified
+          # o lia como aprovação (refutador do #1652, B1a). Agora é FALLBACK dito, e o PR (que toca guarda por
+          # definição: .github/workflows/) cai na exigência do resíduo independente.
           if [ "${BENIGNO}" = "true" ]; then
-            echo "::notice::onion-review pulado por desenho (este PR edita o próprio workflow) — não é falha de revisão. O caminho real volta a ser exercido no PR seguinte ao merge."
-            {
-              echo "ℹ️ **Revisão pulada por desenho, não por falha**"
-              echo ""
-              echo "Este PR edita o próprio \`onion-review.yml\`, e a action se auto-pula quando o"
-              echo "workflow difere da branch default. **Nada a fazer** — o caminho real volta a ser"
-              echo "exercido no PR seguinte ao merge."
-            } >> "${GITHUB_STEP_SUMMARY}"
-            exit 0
+            _fallback "a action se auto-pulou porque o PR edita o próprio onion-review.yml"
           fi
           # ── A CAUSA, quando o pré-voo a capturou, vem ANTES do sintoma ─────────────────────
           # `sem-arquivo` é o SINTOMA (a action não expôs o execution_file). A causa vive no

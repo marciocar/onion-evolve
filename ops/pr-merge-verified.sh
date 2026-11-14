@@ -1022,21 +1022,43 @@ fi
 # Sem isto, tirar a label depois do parecer seria o jeito mudo de virar um vermelho em verde.
 # Leitura que falha = recusa (fail-closed), como a dos check-runs acima.
 _REVIEW_OFF=""; _REVIEW_PRIOR_REPROVOU=""
+# _RV_STATE: none (nenhum veredito lido neste head) · success (o mais recente é verde) · other (não é verde: o caminho
+# de sempre decide). _REVIEW_POS: a anotação da marca POSITIVA (o revisor rodou e aprovou), emitida pelo juiz da base.
+_RV_STATE="none"; _REVIEW_POS=""; _POS_PROV=""
 _rm_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/review/review-mode-decide.sh"
 if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
   _rm_marker="$(bash "${_rm_script}" --print-marker)"
   _rv_runs="$(gh api "repos/${OWNER_REPO}/commits/${GATE_SHA}/check-runs?check_name=onion-review-verdict&filter=all&per_page=100" \
-    --jq '[.check_runs[]] | sort_by(.id) | reverse | .[] | "\(.id)\t\(.conclusion // "-")"' 2>/dev/null)" \
+    --jq '[.check_runs[]] | sort_by(.id) | reverse | .[] | "\(.id)\t\(.conclusion // "-")\t\(.app.slug // "-")\t\(.details_url // "-")"' 2>/dev/null)" \
     || die "não consegui LER o histórico do onion-review-verdict no head ${HEAD_SHA:0:8} — sem ele não sei se a revisão foi desligada ou se um achado anterior foi apagado. Tente de novo."
   _rv_first=1
-  while IFS=$'\t' read -r _rv_id _rv_concl; do
+  while IFS=$'\t' read -r _rv_id _rv_concl _rv_app _rv_url; do
     [ -n "${_rv_id}" ] || continue
     if [ "${_rv_first}" -eq 1 ]; then
       _rv_first=0
-      [ "${_rv_concl}" = "success" ] || break       # o mais recente não é verde: o caminho de sempre decide
+      [ "${_rv_concl}" = "success" ] || { _RV_STATE="other"; break; }   # o mais recente não é verde: o caminho de sempre decide
+      _RV_STATE="success"
       _rv_ann="$(gh api "repos/${OWNER_REPO}/check-runs/${_rv_id}/annotations" --jq '.[].message' 2>/dev/null)" \
         || die "não consegui LER as anotações do onion-review-verdict (check-run ${_rv_id}) — não sei se o verde é aprovação ou desligamento."
       _REVIEW_OFF="$(LC_ALL=C grep -m1 -F -- "${_rm_marker}" <<< "${_rv_ann}" || true)"
+      # marca vazia (juiz antigo, sem --print-reviewed-marker) nunca vira grep -F "" (que casaria tudo)
+      _rm_pos="$(bash "${_rm_script}" --print-reviewed-marker 2>/dev/null)" || _rm_pos=""
+      case "${_rm_pos}" in onion-review-*:) _REVIEW_POS="$(LC_ALL=C grep -m1 -F -- "${_rm_pos}" <<< "${_rv_ann}" || true)" ;; esac
+      # PROVENIÊNCIA da marca positiva (4ª passada do refutador do #1652, Z1b): a anotação só vale vinda de uma check-run
+      # do app github-actions cuja run é do .github/workflows/onion-review.yml. Check-run de MESMO NOME criada por outro
+      # workflow, ou por outro app (um token com checks:write), escreve a anotação que quiser. Uma leitura só, da run
+      # desta check-run (o run id sai do details_url), sem laço.
+      if [ -n "${_REVIEW_POS}" ]; then
+        _rv_rid="$(sed -nE 's#.*/actions/runs/([0-9]+)(/.*)?$#\1#p' <<< "${_rv_url:-}")"
+        if [ "${_rv_app:-}" != "github-actions" ]; then _POS_PROV="a check-run é do app '${_rv_app:--}', não do github-actions"
+        elif [ -z "${_rv_rid}" ]; then _POS_PROV="a check-run não aponta uma run de Actions (details_url '${_rv_url:--}')"
+        else
+          _rv_wf="$(gh api "repos/${OWNER_REPO}/actions/runs/${_rv_rid}" --jq '.path' 2>/dev/null)" || _rv_wf=""
+          [ "${_rv_wf%%@*}" = ".github/workflows/onion-review.yml" ] \
+            || _POS_PROV="a run ${_rv_rid} é do workflow '${_rv_wf:-ilegível}', não do .github/workflows/onion-review.yml"
+        fi
+        if [ -n "${_POS_PROV}" ]; then say "⚠️  marca positiva DESCARTADA: ${_POS_PROV}"; _REVIEW_POS=""; fi
+      fi
       [ -n "${_REVIEW_OFF}" ] || break               # verde que não é desligamento: aprovação de verdade
       continue
     fi
@@ -1052,6 +1074,102 @@ if [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
   # entra na lista de falhos para a dispensa NÃO ser recusada como preventiva: o achado existe
   head_runs="${head_runs}"$'\n'"onion-review-verdict"$'\t'"completed"$'\t'"failure"
 fi
+# ══ FALLBACK DO REVISOR × GUARDA (2026-11-13, D_REVIEW_AUTO_WITH_FALLBACK_1113) ═══════════════════════
+# Num PR que toca GUARDA, o verde do onion-review-verdict só vale como revisão com a MARCA POSITIVA
+# (`onion-review-revisado:`, emitida pelo juiz lido da BASE quando o revisor rodou e o gate de achados aprovou, com o
+# sha deste head). Qualquer outro verde é FALLBACK (2ª passada do refutador do #1652, B1): a marca de desligado (modo
+# off, chave ausente, falta de crédito, action auto-pulada), verde sem marca nenhuma, ou nenhum veredito no head. E a
+# marca NÃO vale quando o PR muda a maquinaria do revisor (_REVIEW_MACHINERY_RE): o workflow de um pull_request é o do
+# HEAD, então um PR que o edita forja qualquer anotação.
+# Em fallback, o que substitui o parecer do CI é o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada
+# adversarial) com Elenxo por refutador INDEPENDENTE: `elenxo: true` e `elenxo_isolado: true` (o campo do AUTOMATE do
+# drive e do #1647), verdict aceito e o diff carimbado. Sem isso, recusa. PR que não toca guarda segue sem exigência.
+# A lista de guardas é a do ops/review/guard-paths.sh (uma só, a mesma da regra do `auto`), lida pela API com o nome
+# antigo do rename. Vale no CORE (a lista é dele); em repo alheio, dito e pulado. Veredito vermelho segue o caminho
+# de sempre (dispensa nomeada). Leitura que falha = recusa (fail-closed): "não medi" não vira "não toca".
+# TETO DECLARADO: `elenxo_isolado: true` é AUTO-ATESTADO no resíduo; o script exige a declaração, não a prova.
+_FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
+# A MAQUINARIA do revisor (3ª passada do refutador do #1652, N2): além do workflow e dos scripts do veredito, o que o CLI
+# do revisor CARREGA do head do PR — os hooks e o settings que os registra (o próprio onion-review.yml o registra:
+# "settings e 14 hooks presentes"), o CLAUDE.md, os agentes, as skills e o .mcp.json. Um hook do PR roda dentro do job
+# e escreve a anotação que quiser. Medido sobre TODOS os arquivos do PR (nome antigo do rename incluso), não só a guarda.
+# (3ª passada, X1) E o que os hooks EXECUTAM: o settings.json roda .claude/validation/*.sh no SessionStart e os hooks
+# carregam .claude/utils/ — código assim reescreve o claude-execution-output.json no RUNNER_TEMP (fora da árvore, a
+# guarda dirty-tree não vê) e forja 0 achados. Por isso .claude/validation/ e .claude/utils/ INTEIROS anulam a marca, e
+# também .claude/rules/, .claude/commands/ e .claude/output-styles/ (o que o CLI carrega como instrução).
+_REVIEW_MACHINERY_RE='^(\.github/workflows/|ops/review/|\.claude/validation/review-verdict\.sh$|\.claude/utils/forge/post-review-comment\.sh$|\.claude/hooks/|\.claude/settings[^/]*\.json$|(.*/)?CLAUDE(\.local)?\.md$|\.claude/agents/|\.claude/skills/|\.mcp\.json$|\.claude/validation/|\.claude/utils/|\.claude/rules/|\.claude/commands/|\.claude/output-styles/)'
+_fallback_guard_gate() {
+  # veredito VERMELHO (ou achado anterior apagado por desligamento): sem dispensa, o caminho de sempre recusa adiante.
+  # COM a dispensa nomeada, num PR de guarda ela também exige o resíduo independente (3ª passada do refutador, N3):
+  # dispensar o parecer do CI não pode ser mais barato do que não tê-lo.
+  local _disp=""
+  if [ -n "${_REVIEW_PRIOR_REPROVOU}" ] || [ "${_RV_STATE}" = "other" ]; then
+    _dispensado onion-review-verdict || return 0
+    _disp=1
+  fi
+  [ -f "${_rm_script}" ] || return 0
+  local _here _slug _core _gh _grc=0 _gout
+  _here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
+  # sem --repo, o script roda contra o repo do checkout (o core); com --repo, só vale se for o próprio core
+  _core="$(git -C "${_here}/.." remote get-url origin 2>/dev/null | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' | tr '[:upper:]' '[:lower:]')"
+  if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(tr '[:upper:]' '[:lower:]' <<< "${REPO_ARG[1]}")" != "${_core:-?}" ]; then
+    [ -n "${_REVIEW_OFF}" ] && say "ℹ️  revisão em fallback num repo alheio (${_slug}): a lista de guardas é do core, a exigência do resíduo independente não se aplica aqui."
+    return 0
+  fi
+  _gh="${_here}/review/guard-paths.sh"
+  [ -f "${_gh}" ] || die "não achei ${_gh}: sem a lista de guardas não sei se o PR #${PR} exige o resíduo independente. Nada foi mergeado."
+  _gout="$(bash "${_gh}" --pr "${PR}" --repo "${_slug}" 2>&1)" || _grc=$?
+  case "${_grc}" in
+    1) [ -n "${_REVIEW_OFF}" ] && say "⊘ revisão em fallback e o PR não toca guarda: sem exigência extra (o gate determinístico cobre)."; return 0 ;;
+    0) : ;;
+    *) die "não medi se o PR #${PR} toca guarda (${_gout:0:200}). Nada foi mergeado." ;;
+  esac
+  local _mach _reason
+  local _allf _arc=0
+  _allf="$(bash "${_gh}" --pr "${PR}" --repo "${_slug}" --all 2>&1)" || _arc=$?
+  [ "${_arc}" -eq 0 ] || die "não li todos os arquivos do PR #${PR} (${_allf:0:200}): sem eles não sei se o PR muda a maquinaria do revisor. Nada foi mergeado."
+  _mach="$(LC_ALL=C grep -E "${_REVIEW_MACHINERY_RE}" <<< "${_allf}" | head -3 | paste -sd' ' -)"
+  if [ -z "${_disp}" ] && [ -n "${_REVIEW_POS}" ] && [ -z "${_REVIEW_OFF}" ] && [ -z "${_mach}" ] && LC_ALL=C grep -qF -- "${GATE_SHA}" <<< "${_REVIEW_POS}"; then
+    say "✓ PR de GUARDA revisado pelo CI: marca positiva do juiz da base no head ${GATE_SHA:0:8}"
+    return 0
+  fi
+  if [ -n "${_disp}" ]; then _reason="o veredito do revisor não aprovou e foi DISPENSADO (a dispensa não substitui a revisão num PR de guarda)"
+  elif [ -n "${_REVIEW_OFF}" ]; then _reason="o revisor do CI não julgou (${_REVIEW_OFF#*: })"
+  elif [ -n "${_mach}" ]; then _reason="o PR muda a maquinaria do revisor (${_mach}), e a marca do CI não vale para quem a reescreve"
+  elif [ "${_RV_STATE}" = "none" ]; then _reason="não li veredito do revisor neste head"
+  elif [ -n "${_POS_PROV}" ]; then _reason="a marca positiva não vale: ${_POS_PROV}"
+  else _reason="o veredito verde não traz a marca positiva do juiz da base para o head ${GATE_SHA:0:8}"; fi
+  local _paths _why _rel _body _fm _dup _v _h _e _ei
+  _paths="$(head -5 <<< "${_gout}" | paste -sd' ' -)"
+  _why="o PR #${PR} toca GUARDA (${_paths}) e ${_reason}: o merge exige o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com refutador independente (D_REVIEW_AUTO_WITH_FALLBACK_1113)"
+  [ -n "${HEAD_REF}" ] || die "${_why}, e não li a branch do PR para achar o resíduo. Nada foi mergeado."
+  _rel="docs/evolution/review/${HEAD_REF//\//-}.md"
+  grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
+    || die "${_why}; o PR não traz ${_rel}. Nada foi mergeado."
+  _body="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${_slug}/contents/${_rel}?ref=${HEAD_SHA}" 2>/dev/null)" \
+    || die "${_why}; não li ${_rel} no head ${HEAD_SHA:0:8}. Nada foi mergeado."
+  _fm="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' <<< "${_body}")"
+  [ -n "${_fm}" ] || die "${_why}; ${_rel} sem frontmatter. Nada foi mergeado."
+  _dup="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' <<< "${_fm}")"
+  [ -z "${_dup}" ] || die "${_why}; ${_rel} repete chave no frontmatter (${_dup}): o bash lê a 1ª e o YAML a última. Nada foi mergeado."
+  _fmv() { sed -n "s/^$1:[[:space:]]*//p" <<< "${_fm}" | head -1 | tr -d '"'"'"'[:space:]'; }
+  _e="$(_fmv elenxo | tr '[:upper:]' '[:lower:]')"; _ei="$(_fmv elenxo_isolado | tr '[:upper:]' '[:lower:]')"
+  [ "${_e}" = "true" ] || die "${_why}; ${_rel} declara elenxo: '${_e:-ausente}' (exige true). Nada foi mergeado."
+  [ "${_ei}" = "true" ] \
+    || die "${_why}; ${_rel} não declara elenxo_isolado: true (veio '${_ei:-ausente}'): Elenxo do mesmo agente é uma voz só. Nada foi mergeado."
+  _v="$(_fmv verdict | tr 'a-z-' 'A-Z_')"
+  case " ${_FB_OK_VERDICTS} " in
+    *" ${_v} "*) [ -n "${_v}" ] || die "${_why}; ${_rel} sem verdict. Nada foi mergeado." ;;
+    *) die "${_why}; ${_rel} tem verdict '${_v:-ausente}' (aceitos: ${_FB_OK_VERDICTS}). Nada foi mergeado." ;;
+  esac
+  _h="$(_fmv reviewed_diff_sha256)"
+  grep -qE '^[0-9a-f]{64}$' <<< "${_h}" \
+    || die "${_why}; ${_rel} tem reviewed_diff_sha256 '${_h:-ausente}': o resíduo não foi carimbado (o pr-finalize carimba). Nada foi mergeado."
+  unset -f _fmv
+  say "✓ PR de GUARDA sem revisão válida do CI (${_reason}): resíduo ${_rel} com refutador independente (elenxo_isolado: true), verdict ${_v}, diff ${_h:0:12}"
+}
+_fallback_guard_gate
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
 _falhos="$(printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{print $1}')"
 _not_waived=""

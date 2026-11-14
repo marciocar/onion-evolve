@@ -1,0 +1,183 @@
+---
+branch: feat/review-auto-with-fallback
+date: 2026-11-13
+reviewed_diff_sha256: b3838129504055abf21a86df4d6a4417fc8ba0d07f0a0c82c839a10401d8269a
+reviewed_code_sha256: 5f00b0ce51c95ccc95c0d4fd18eca6801532524c5a93c55ddd83c5298d811672
+findings_total: 17
+findings_real: 16
+findings_fixed: 16
+tokens: 0
+duration_min: 20
+verdict: FIXED
+elenxo: true
+elenxo_isolado: true
+reviewer: "1ª passada: o próprio agente de execução; 2ª passada: refutador independente da sessão principal (evidência em scratchpad/r1652), que REPROVOU com 3 bloqueios e um mutante sobrevivente; 3ª passada (re-refutação, head 731576f3a): REPROVOU com 3 bloqueios (N1-N3) e 1 caso a fechar, todos curados aqui; 4ª passada (head 0497986e4): REPROVOU com 2 bloqueios (X1, X2), curados aqui; 5ª passada (head b0cffda0e): REPROVOU com 1 bloqueio (Z1, a e b) e o CLAUDE.md em subdiretório, curados aqui; 6ª passada (a 5ª do refutador independente refute-review-auto, head fa6570082): APROVADO, sem bloqueio, mutantes R1, R2 e R4 mortos"
+nota: "tokens = 0: não medido. elenxo_isolado: true pela 6ª passada do refutador independente (agente refute-review-auto, separado do agente de execução), que APROVOU o head fa6570082; logs em scratchpad/r1652/v5-*.log. Depois dela só mudaram documentos (este resíduo e o cartão). O merge é do maestro (D_DELEGATION_TRUST_MODEL_1113)."
+---
+
+# Passada adversarial: `feat/review-auto-with-fallback`
+
+## O que muda
+
+- `ops/review/guard-paths.sh`, novo: a lista de guardas num lugar só, derivada do `ops/moat-targets.tsv`
+  (as colunas de ato, delega e wrapper) mais as cercas fixas. Conta o rename pelos dois nomes e o arquivo
+  removido.
+- `ops/review/review-mode-decide.sh`: o `auto` revisa só o PR que toca guarda, e o teto de 600 linhas
+  saiu. A decisão também mede `guard` em todo modo, ganhou `--classify-credit` e `--fallback`, e o caso
+  `run=false` passou a dizer "não revisado pelo CI: <motivo>".
+- `.github/workflows/onion-review.yml`: o juiz, o helper e o tsv vêm da BASE. Sem crédito, sem chave ou
+  com modo off, o veredito vira fallback verde com a marca, e o motivo vai para o sumário e para um
+  comentário sticky no PR.
+- `ops/pr-merge-verified.sh`: em fallback, o PR de guarda só entra com o resíduo da REGRA 56 com
+  `elenxo: true`, `elenxo_isolado: true`, verdict aceito e diff carimbado.
+
+## Achados
+
+1. **REAL, CURADO.** O juiz da base anterior não conhece `--guard-helper`. O workflow novo passaria a
+   flag ao juiz velho, que sai rc 2. O job do modo falharia, e o veredito ficaria vermelho neste PR. A
+   cura é um bootstrap dito no log: se o juiz da base não conhece a flag, usa-se o do PR. Isso só
+   acontece no PR que introduz o helper.
+2. **REAL, CURADO (pré-existente).** Com a chave ausente, o veredito saía verde **sem a marca**, e o
+   `pr-merge-verified.sh` o lia como aprovação. Agora esse caso também é fallback com marca, e o PR de
+   guarda passa a exigir o resíduo.
+3. **REAL, CURADO (na bancada).** O mutante `--name-status -M` do caso (j) sobreviveu. Com `-M`, a linha
+   do rename vira `antigo<TAB>novo`, e o prefixo `.claude/hooks/` ainda casa no começo dela. Em produção
+   o diff é `--no-renames`, então não há defeito no código. O mutante foi trocado por `--name-only -M`,
+   que mostra só o nome novo, e esse reprova.
+4. **REAL, CURADO (na bancada).** O caso (gp-d), prefixo só no início do caminho, rodava sobre uma branch
+   sem caminho aninhado, e o mutante passava. A branch `b_nest`, com `docs/ops/review/x.md`, agora faz o
+   mutante reprovar.
+5. **NÃO É DEFEITO, É TETO DECLARADO.** O `reviewed_diff_sha256` só tem a forma conferida no merge, igual
+   ao #1647. A coerência entre o hash e o diff é da REGRA 56 no lint e do `pr-finalize`.
+
+## O que a bancada exercita
+
+Na família `review_mode`, cada caso tem mutante:
+
+- `auto` com PR de guarda roda (f); `auto` com PR comum não roda (g, h, i);
+- rename pelo git (j) e pela API, via `previous_filename` (gp-f); remoção (j2);
+- derivação do tsv: ato, wrapper e delega (gp-a a gp-c); prefixo só no início (gp-d); tsv ilegível revisa
+  (gp-e); diff ilegível revisa (k); `guard` medido também em off (k2);
+- off é fallback com sumário e comentário (o, o1); auto sem guarda não comenta (o2);
+- falta de crédito pelo pré-voo e pela evidência (cr-a a cr-c); 400 que não é crédito segue vermelho
+  (cr-d, cr-e); `--fallback` emite a marca (fb-a); fiação do workflow (s, s2).
+
+Na família `pr_merge_verified`, também com mutante:
+
+- (rv-f) fallback num PR de guarda sem resíduo recusa;
+- (rv-g) fallback num PR de guarda com resíduo sem `elenxo_isolado` recusa;
+- (rv-h) fallback num PR de guarda com resíduo independente mergeia;
+- (rv-i) fallback num PR comum mergeia sem exigência extra.
+
+## 2ª passada: refutador independente (REPROVOU, 3 bloqueios, curados)
+
+6. **B1, REAL, CURADO. Verde sem marca contava como aprovação.** O `_fallback_guard_gate` só entrava com a
+   marca de desligado, e isso deixava duas portas:
+   - (a) um PR que edita o `onion-review.yml` faz a action se auto-pular e sai verde sem marca. Este PR cai aí;
+   - (b) o job do veredito rodava o `review-mode-decide.sh` do head, então um PR que mudasse o `--verdict-gate` saía verde sem marca.
+
+   Cura:
+   - o job do veredito lê o juiz e o `review-verdict.sh` da **base**;
+   - quando o revisor rodou e aprovou, o juiz da base emite a marca **positiva** `onion-review-revisado: … <sha>`;
+   - num PR de guarda, o merge-verified só aceita como revisão essa marca, com o sha do head e sem mudança na maquinaria do revisor (workflow, `ops/review/`, `review-verdict.sh`, `post-review-comment.sh`). Todo o resto é fallback, com o resíduo;
+   - o caso da action auto-pulada passou a ser fallback dito.
+
+   Casos: (rv-j) a (rv-m), (pos-a) e (s3).
+7. **B2, REAL, CURADO. O `--classify-credit` fazia grep no arquivo inteiro.** O arquivo traz o diff e as saídas das ferramentas, então a frase num `tool_result` fazia um estouro de turnos sair verde. Agora lê só o último evento `result`, com `is_error`, `api_error_status` e a mensagem. Caso (cr-f), com mutante que lê o arquivo inteiro.
+8. **B3, REAL, CURADO. A lista regredia.** Escapavam:
+   - `materialize-door.sh`, `.githooks/`, `lint-artifacts.sh`, `review-artifact-check.sh`, `review-verdict.sh`;
+   - `pr-finalize.sh`, `merge-serial.sh`, `post-review-comment.sh`;
+   - `apply-ruleset-main.sh` e os globs antigos.
+
+   Agora o helper lê a classe `fecho` (o fecho transitivo do #1647) e soma o tsv da árvore ao de `origin/main`. Também soma `.githooks/`, `.claude/validation/` inteiro, a `SENSITIVE_PATHS` antiga (com glob) e o fecho que a main ainda não traz. Casos (gp-item), um por cerca e cada um com mutante, mais o fecho e a soma dos tsv.
+9. **REAL, CURADO. Faltava caso para a chave repetida no frontmatter, e o mutante dela sobrevivia.** Caso (rv-n).
+
+Limites declarados, que também estão no cartão:
+
+- `elenxo_isolado` é auto-atestado;
+- os bootstraps (o juiz e o helper do PR quando a base não os tem) voltam a abrir a cada capacidade nova. Quem entra por eles muda a maquinaria e cai no resíduo;
+- com o #1647, a sessão nem mergeia PR de guarda.
+
+Este resíduo segue com `elenxo_isolado: false`: a 2ª passada foi independente, mas o resíduo não foi escrito por ela.
+
+## 3ª passada: re-refutação do head 731576f3a (REPROVOU, N1 a N3, curados)
+
+10. **N1, REAL, CURADO. A marca positiva saía com achados -1 ou vazio.** O `review-verdict.sh --gate` dá rc 0
+    para os dois. Agora `--reviewed-mark` exige `--achados` e só emite a marca com contagem exatamente `0`. A
+    árvore suja chega como -1 e fica sem marca. Casos (pos-b) e (pos-c).
+11. **N2, REAL, CURADO. A marca era forjável por hook do PR.** O CLI do revisor carrega do head os hooks, o
+    settings, o `CLAUDE.md`, os agentes e as skills. A maquinaria passou a incluir `.claude/hooks/`,
+    `.claude/settings*.json`, `CLAUDE.md`, `.claude/agents/`, `.claude/skills/` e `.mcp.json`. Ela é medida
+    sobre **todos** os arquivos do PR (`guard-paths.sh --all`, com o nome antigo do rename), não só sobre os de
+    guarda. Casos (rv-p) e (rv-q).
+12. **N3, REAL, CURADO. A dispensa do vermelho pulava o gate.** Agora a dispensa do veredito num PR de guarda
+    também exige o resíduo independente. Caso (rv-o).
+13. **Retry, REAL, CURADO NA BANCADA.** Um result de crédito seguido de um result de sucesso não conta como
+    falta de crédito. O código já lia o último result, mas faltava caso. Caso (cr-g), que mata o mutante que lê
+    o primeiro result.
+
+Declarados no cartão:
+
+- o bootstrap depende de um literal;
+- o revisor com `Bash` pode escrever a evidência, e o head pode injetar instruções pelo `CLAUDE.md` e pelos
+  agentes;
+- o fecho de 2º nível fica no tsv do #1647, sem duplicar.
+
+## 4ª passada: re-refutação do head 0497986e4 (REPROVOU, X1 e X2, curados)
+
+14. **X1, REAL, CURADO. A maquinaria não cobria o que os hooks EXECUTAM.** O `settings.json` roda
+    `.claude/validation/memory-write-scan-check.sh` no SessionStart, e os hooks carregam `.claude/utils/`
+    (`env-check.sh`, `co-evolution/*` etc.). Esse código reescreveria o `claude-execution-output.json` no
+    `RUNNER_TEMP` e forjaria 0 achados. Agora `.claude/validation/` e `.claude/utils/` inteiros anulam a
+    marca, e `.claude/rules/`, `.claude/commands/` e `.claude/output-styles/` também. Casos (rv-r) e (rv-s).
+15. **X2, REAL, CURADO. A API trunca `pulls/<n>/files` em 3000 sem erro.** O helper agora lê o `changed_files`
+    do PR e compara com a contagem lida (o nome antigo do rename não conta como arquivo a mais). Diverge ou
+    passa de 3000 = rc 2, e o merge-verified recusa. Casos (gp-trunc), (gp-max), (gp-api-ren) e (rv-t).
+
+Declarados no cartão:
+
+- a injeção de prompt pelo diff, que com `Bash` vira forja determinística pelo `RUNNER_TEMP`, de modo que a
+  marca não é fronteira de segurança;
+- o bootstrap dependente do literal `--achados <n>`;
+- o fecho de 2º nível, que vem pelo #1647.
+
+## 5ª passada: re-refutação do head b0cffda0e (REPROVOU, Z1, curado)
+
+16. **Z1a, REAL, CURADO. O parser F/P falhava aberto com TAB no nome.** A linha
+    `F<TAB>.github/workflows/x<TAB>.yml` contava 1 arquivo e imprimia a linha crua, que não casava a guarda.
+    Agora a API e o JSON passam por um jq que marca com `X` todo nome com caractere de controle, e qualquer
+    linha fora da forma `F|P<TAB>nome` dá rc 2. O diff do git é lido com `-z`, e o nome com controle também dá
+    rc 2. Casos (gp-ctl-pr), (gp-ctl-json) e (gp-ctl-range), cada um com mutante que falha aberto.
+17. **Z1b, REAL, CURADO. A marca positiva valia de qualquer check-run com o mesmo nome.** Agora ela só vale de
+    uma check-run do app `github-actions` cuja run (o id sai do `details_url`, numa leitura só) seja do
+    `.github/workflows/onion-review.yml`. Isso também fecha o limite do token de app com `checks:write`. Casos
+    (rv-u), outro app, e (rv-v), outro workflow.
+- **CLAUDE.md em subdiretório:** a regex da maquinaria cobre `CLAUDE.md` e `CLAUDE.local.md` em qualquer
+  diretório. Caso (rv-w).
+
+## 6ª passada (a 5ª do refutador independente), head fa6570082: APROVADO
+
+O agente `refute-review-auto`, separado do agente de execução, refutou o head fa6570082 e **aprovou sem
+bloqueio**. Os mutantes R1, R2 e R4 morreram:
+
+- **R1:** o parser da API ignorando a linha de controle;
+- **R2:** o path do workflow da run ignorado;
+- **R4:** o nome com controle no `--range` ignorado.
+
+Os logs estão em `scratchpad/r1652/v5-R1-pr-ctl-ignored.log`, `v5-R2-wf-path-ignored.log` e
+`v5-R4-range-ctl-ignored.log`. Por isso `elenxo_isolado: true`.
+
+Depois da aprovação só mudaram documentos, sem tocar código: este resíduo e os limites do cartão.
+
+O `pr-finalize` recusou recarimbar sozinho porque o hash de código mudou (a9a094d00c7f → 5f00b0ce51c9). A
+mudança é o cartão `docs/onion/review-mode-card.md`, que não é projeção gerada, e por isso entra no hash. O
+`reviewed_diff_sha256` voltou a `pendente` e foi recarimbado sobre o diff que inclui só esse acréscimo de
+documento ao head que o refutador aprovou.
+
+Os limites que o refutador pediu declarar estão no cartão:
+
+- o `details_url` não é autenticado;
+- a injeção de prompt pelo diff, com forja determinística pelo `RUNNER_TEMP`;
+- o bootstrap preso ao literal `--achados <n>`;
+- o espaço de largura zero e o U+0085 casam pelo prefixo;
+- o fecho de 2º nível vem pelo #1647.
