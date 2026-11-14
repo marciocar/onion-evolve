@@ -186,6 +186,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-10: «Vocabulário do provenance.method, após 3 rodadas entre core, kg-ssot e curadoria, com as três de acordo: a lista fechada já existe desde a v4.16 (5 classes, com apelidos em português). Proposta: (1) primeiro o que escreve — o seletor e os geradores do core gravam a classe em inglês; (2) depois, a v4.21 do kg-ssot com avisos SHOULD (apelido em português, proveniência sempre em evidence e decision concluída), MUST só no v5; (3) o apelido sai no v5.0, piso 2027-03-31, só com zero medido no core e na curadoria; (4) cada dono migra o próprio corpus por lotes com o kg_migrate.py (kg-ssot ~1.230, curadoria 7 lotes, core ~5.300 nós em ~10 lotes). Selar?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
       locality: "pessoa"
+  - id: D_SUBAGENT_METHOD_IS_AUTHOR_1114
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-14"
+    verified_against: "decisão do maestro em 2026-11-14, por pergunta com opções (/meta:decide): escolhida «método produzido por subagente = do autor (classe que ele fez: measurement/reading/...); o invariante um-escritor-por-repo trata subagente como a própria sessão; testimony reservado a parte EXTERNA (maestro, peer, adotante)»"
+    label: "Método de subagente carimba-se como DO AUTOR, não como testemunho de terceiro"
+    narrative: "Selado por /meta:decide em 2026-11-14: escolhida «método produzido por subagente = do autor (classe que ele fez: measurement/reading/...); o invariante um-escritor-por-repo trata subagente como a própria sessão; testimony reservado a parte EXTERNA (maestro, peer, adotante)»; descartadas: «subagente = testemunho de terceiro (acende testimony em trabalho normal)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-14: «método de um subagente conta como do autor ou como testemunho de terceiro? (gramática do contrato provenance.method; pergunta do kg-ssot e da curadoria)»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-14"
+      locality: "pessoa"
 edges:
   - from: D_BROWSER_PHASE1_1110
     to: E_MD_MAESTRO_ROUND_1110
@@ -215,6 +231,9 @@ edges:
     to: E_MD_MAESTRO_ROUND_1110
     edge_type: TRACES_TO
   - from: D_PROVENANCE_METHOD_VOCAB_PLAN_1110
+    to: D_PROVENANCE_METHOD_VOCAB_1110
+    edge_type: TRACES_TO
+  - from: D_SUBAGENT_METHOD_IS_AUTHOR_1114
     to: D_PROVENANCE_METHOD_VOCAB_1110
     edge_type: TRACES_TO
 external_edges:
