@@ -125,6 +125,7 @@ work_tool_sets:
   # como o lugar de quem nascer sem classificação.
   pending:
     - baton                  # /meta:baton (2026-11-12, fase 1): o pulso da batuta nasce aqui (fonte e hub); viajar às portas é a fase 3, com os números da fase 2
+    - peek                   # /meta:peek (2026-11-13): espiar o mercado na dúvida nasce aqui (fonte e hub); viajar às portas se decide com a série de espiadas
   # MINIMAL (consumer T2) — A DEFINIR quando nascer um consumer real (subconjunto de full).
 
 roles:

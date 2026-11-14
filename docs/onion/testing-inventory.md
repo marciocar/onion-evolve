@@ -11,7 +11,7 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **339** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **340** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
 | Sítios de asserção (**não** asserções executadas) | **2735** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **121** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
@@ -22,7 +22,7 @@
 | — HARD **e** SOFT (contadas nas duas) | **39** | idem |
 | Pares de modo consumido (REGRA 59) | **85** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
-| Scripts de validação | **134** | `git ls-files '.claude/validation/*.sh'` |
+| Scripts de validação | **135** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **28** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **5** | `git ls-files '.github/workflows/*.yml'` |
 | Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
