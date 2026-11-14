@@ -25,7 +25,7 @@ date: 2026-08-13
 ```
 onion-evolve/
 ├── .claude/                    # o FRAMEWORK propriamente dito (o "produto")
-│   ├── commands/                # 119 comandos invocáveis, 10 categorias
+│   ├── commands/                # 121 comandos invocáveis, 10 categorias
 │   ├── agents/                  # 51 agentes especializados, 9 categorias
 │   ├── skills/                  # 14 skills (Claude Code-nativas)
 │   ├── utils/                   # abstrações SDAAL (task-manager, forge, ...)
