@@ -2,7 +2,8 @@
 branch: feat/market-peek
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a3db5cf05dd7b8126c9ee2bbdb28b55242965a1f87e444ccad2811c19cd58451
+reviewed_code_sha256: 769fd3d7520b39bff6292eb04f92b5663c7d1e2fda52a83122b1bf489210d4d9
 findings_total: 5
 findings_real: 3
 findings_blocking: 0
