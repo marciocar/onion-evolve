@@ -2,7 +2,7 @@
 branch: fix/backlog-projection-stable
 pr: pendente
 date: 2026-11-13
-reviewed_diff_sha256: 3057a27b1c9de789cb5c46784d1f49870dc3f7d076d2c571605b661e1aee4fe0
+reviewed_diff_sha256: c49a76ad34b113d2407eef1391fa5ab96766f99359dfbf6bc21e8c71fea39f56
 reviewed_code_sha256: c09f9e022cbb62997312d03948fc1e67c0fbb86503bfa8b6f57d48115f051734
 findings_total: 7
 findings_real: 7
