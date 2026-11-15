@@ -10,6 +10,34 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.52.0] - 2026-11-15
+
+Contrato v4.23, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.
+
+- Contrato v4.23: o prazo de expurgo do grafo inteiro, no `meta`, julgado só quando presente e só pela forma, nunca
+  pelo vencimento. `x_dispose_by` é uma data do calendário (`AAAA-MM-DD`), com nome de ação porque *retain* quer dizer
+  guarda mínima; `x_dispose_basis` é a base, num texto não vazio; `x_hold` suspende o descarte, um mapa com `reason` e
+  `until`. Fora da forma alertam como `form.pattern`, `form.type` ou `form.required` no `meta`; no nó, como
+  `form.misplaced.node.<chave>`, como o `x_classification`. A descrição de `provenance.method` ganha a regra do
+  subagente: o que um subagente da sessão fez é do autor, com a classe do ato, e `testimony` fica para parte externa.
+  Os dois leitores dão o mesmo veredito; a suíte vai de 570 a 597 casos.
+- `kg_validate.py --due` lista o expurgo vencido (`dispose`), o suspenso por um `x_hold` vigente (`dispose_held`) e, num
+  grafo com `x_dispose_by`, todo nó com `retain_for` como conflito a decidir pelo dono (`dispose_conflict`), sem calcular
+  qual prevalece. O vencimento abre o procedimento de descarte; nenhuma ferramenta apaga nada. As três listas só saem
+  com conteúdo, então a versão do `kg-ssot.due/1` não muda e o relatório de um grafo sem o perfil sai igual ao de antes.
+  O prazo que não é data sai em `dispose_malformed`, e o `x_hold` cujo `until` não se lê é nomeado na entrada
+  (`hold_unreadable`). O relatório que traz as listas novas não vale no schema da 4.51 (o topo é fechado): quem valida
+  o relatório traz o `spec/due.schema.json` novo. O `days_late` 0 passa a sair como `(na data)`, não `(hoje)`.
+- `kg_gate.py --classification-floor NÍVEL --area-policy ARQ`, opcional, nos dois modos: reprova o grafo medido (com
+  `--touched`, o grafo alterado) cujo `meta.x_classification` está no nível ou acima, pela ordem de `levels` do arquivo
+  de política do kg-mcp. Lê todo `.kg.yaml` e `.kg.json` rastreado, com as fixtures, o `docs/materials/` e o vendor;
+  só o `--exclude` explícito tira um caminho, e o valor vazio é entrada quebrada. O grafo sem a chave tem o `default_level` da política; o nível desconhecido reprova. A política
+  ausente, ilegível ou inválida, a sem `levels` e o nível que ela não tem são entrada quebrada (rc 2).
+- `tools/kg_policy.py`: o leitor puro da política de áreas do kg-mcp, que o `kg_mcp.py` e o gate compartilham; entra no
+  perfil `gate`. O `kg_mcp.py` se comporta igual.
+- Manual: o procedimento de descarte com registro agregado, o limite do histórico do git, a receita de pre-commit com
+  `--touched` e o limite de que no CI o gate barra o merge, não a entrada do dado.
+
 ## [4.51.0] - 2026-11-12
 
 Contrato v4.22, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda. Um grafo público que citava um nó de

@@ -106,11 +106,32 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 |---|---|---|
 | `source` | string | req. Not empty and not a placeholder (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | string | req. Not empty |
-| `method` | string | req. Not empty. SHOULD: `<class>: <detail>`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony` (since v4.21, the Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho` still pass and warn as `form.deprecated.node.provenance.method`; they leave in v5, not before 2027-03-31, and only when the measurement on the first adopter and on its curation repository reaches zero. A value that already fails the form warns only as `form.pattern.node.provenance.method`) |
+| `method` | string | req. Not empty. SHOULD: `<class>: <detail>`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony` (since v4.21, the Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho` still pass and warn as `form.deprecated.node.provenance.method`; they leave in v5, not before 2027-03-31, and only when the measurement on the first adopter and on its curation repository reaches zero. A value that already fails the form warns only as `form.pattern.node.provenance.method`). Since v4.23, the subagent rule: what a subagent of the session that writes the graph did belongs to the author, with the class of the act (`measurement` if it measured, `reading` if it read, `judges` if it judged with judges, `derived` if it derived), and `testimony` is for the account of an external party (a person, another session, an adopter); see *Who did it: the subagent rule* below |
 | `locality` | enum | optional. `repo` `web` `host` `pessoa` (person) `privado` (private); a value outside the enum warns. It describes where the copy you read lives, not how the document is classified |
 | `x_*` | any | any other key warns; it does not fail |
 
 `provenance: null` fails. Either the whole object is there, or it is absent.
+
+### Who did it: the subagent rule (v4.23)
+
+The class of `method` says how the author of the graph got to what the node states. A session that writes a graph
+often hands part of the work to subagents (a worker that reads a source, a script that measures). Their act is the
+author's act: the node takes the class of what was done, not `testimony`. `testimony` is for the account of an
+external party, someone outside the session that writes the graph: a person, another session, an adopter. It is
+grammar, not a new rule: no verdict changes.
+
+```yaml
+# a subagent of this session read the norm and quoted the article: the act is reading
+provenance:
+  source: "https://example.org/norm-2024.html"
+  locator: "art. 12, § 3"
+  method: "reading: a subagent of the session read the article and quoted it"
+# the owner of the policy said it in a meeting: that is an external party
+provenance:
+  source: "compliance owner, review meeting of 2026-11-14"
+  locator: "minutes, item 4"
+  method: "testimony: stated by the compliance owner"
+```
 
 ## Edge
 
@@ -159,6 +180,7 @@ is free, and any other key warns. Enum values are codes, in English, whatever th
 | `x_confidence` | edge | how sure the link is, from 0 to 1 |
 | `x_provisional` | edge | `true` when the link still waits for a check |
 | `x_classification` | meta | the sensitivity level of the whole graph, one level of the organization's own scheme (v4.20) |
+| `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | the disposal deadline of the whole graph, its basis, and its suspension (v4.23) |
 
 ### `x_term`
 
@@ -343,6 +365,56 @@ history, where the old version still holds it.
 As an example of mapping, not as the standard: the TLP 2.0 of FIRST names audiences (`clear`, `green`, `amber`,
 `amber-strict`, `red`) for sharing between organizations, and states that it is not a formal classification scheme. An
 organization that uses it writes those names as its `levels`, in that order.
+
+### `x_dispose_by`, `x_dispose_basis` and `x_hold` (v4.23)
+
+The disposal deadline of the whole graph. `x_dispose_by` is the calendar date, `YYYY-MM-DD` and in quotes, by which the
+graph is to be disposed of: a maximum, named as an action, because *retain* means a minimum keep (as in the node's
+`retain_for`). `x_dispose_basis` is the basis of the deadline, in text that is not empty: the law, the contract, or the
+decision. `x_hold` suspends the disposal: a map with `reason` (text that is not empty) and `until` (the date when the
+suspension lapses, because a hold that never ends is a deadline that never comes). Another key inside `x_hold` is free.
+
+```yaml
+meta:
+  id: client-onboarding-2026
+  x_classification: confidential
+  x_dispose_by: "2031-12-31"
+  x_dispose_basis: "service contract, clause 9: delete the client's data five years after the end"
+  x_hold:
+    reason: "preservation request in case 123"
+    until: "2032-06-30"
+```
+
+The contract judges only the form, and only when the key is present: a date outside `YYYY-MM-DD` or off the calendar
+warns as `form.pattern.meta.x_dispose_by`, a number as `form.type.meta.x_dispose_by`, an empty basis (or one of whitespace only, Unicode
+spaces such as NBSP and the ideographic space included) as `form.pattern.meta.x_dispose_basis`, and a hold without `until` as `form.required.meta.x_hold.until`. Each key is
+judged on its own. A date that has already passed is valid. The date coming due never enters the verdict, so the same
+commit cannot pass one day and fail the next: `kg_validate.py --due` lists it (chapter 5). The unit is the graph: on a
+node, the three keys warn as `form.misplaced.node.<key>`, as `x_classification` does. A node that must go earlier than
+the rest goes to a graph of its own.
+
+With `x_dispose_by` in the graph, a node's `retain_for` is a conflict that the owner decides: `retain_for` does not say
+from when it counts, so `--due` lists every node with it as `dispose_conflict` and never computes which one prevails.
+
+#### The disposal procedure
+
+1. **The date opens the procedure; no tool deletes.** `kg_validate.py --due` lists the graph as `DISPOSAL DUE` on the
+   date and after. The owner of the graph decides: dispose of it, renew the deadline with a new basis, or hold it.
+2. **The hold comes first.** A graph with an `x_hold` whose `until` has not passed is listed as `DISPOSAL HELD` and
+   waits. When `until` passes, the hold lapses, and the graph is due again (`hold_expired_on` in the JSON). A hold whose `until`
+   cannot be read does not suspend either, and the entry says so (`hold_unreadable`); a deadline that is not a date shows
+   up as `DISPOSAL UNREADABLE`, because a deadline that is never measured is a deadline that never comes.
+3. **The disposal is a commit.** Remove the file, and every copy of it in the repository (an exported `.kg.json`, a
+   projection, an index), in one reviewed change.
+4. **The record is aggregate.** Record the disposal as one aggregate entry, as the disposal term of archival practice
+   does: how many graphs, the dates of the oldest and the newest, the basis, who decided, and the date. Never a list of
+   the disposed graphs or nodes in the repository: the ids of this format are descriptive (`D_HIRE_ANA_SILVA`), and the
+   list would keep the name that was erased.
+5. **The git history keeps what left the tree.** Removing the file takes it out of the next commits, not out of the
+   history, where the old versions still hold it. Rewriting the history (`git filter-repo`, for example) changes this
+   repository only: it does not reach clones, forks, mirrors, and caches that already have the old commits. The deadline
+   does not replace the first decision: data that must disappear for good is better kept out of a shared repository from
+   the start.
 
 ## Recording an external event (recommended shape, not normative)
 

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:875b13aa9924e6da -->
+<!-- translation-of: docs/manual/03-format.md sha256:a807a339c762cd48 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -109,11 +109,32 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 |---|---|---|
 | `source` | texto | obr. Não vazio e não marcador (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | texto | obr. Não vazio |
-| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, com a classe entre `measurement`, `reading`, `judges`, `derived` e `testimony` (desde o v4.21, os apelidos em português, `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, seguem passando e alertam como `form.deprecated.node.provenance.method`; saem no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro adotante e no repositório de curadoria dele der zero. O valor que já falha a forma alerta só como `form.pattern.node.provenance.method`) |
+| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, com a classe entre `measurement`, `reading`, `judges`, `derived` e `testimony` (desde o v4.21, os apelidos em português, `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, seguem passando e alertam como `form.deprecated.node.provenance.method`; saem no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro adotante e no repositório de curadoria dele der zero. O valor que já falha a forma alerta só como `form.pattern.node.provenance.method`). Desde o v4.23, a regra do subagente: o que um subagente da sessão que escreve o grafo fez é do autor, com a classe do ato (`measurement` se mediu, `reading` se leu, `judges` se julgou com juízes, `derived` se derivou), e `testimony` fica para o relato de parte externa (uma pessoa, outra sessão, um adotante); veja *Quem fez: a regra do subagente* abaixo |
 | `locality` | enum | opcional. `repo` `web` `host` `pessoa` `privado`; fora do enum alerta. Descreve onde está a cópia que você leu, não a classificação do documento |
 | `x_*` | qualquer | outra chave alerta, não reprova |
 
 `provenance: null` reprova. Ou o objeto vem inteiro, ou não vem.
+
+### Quem fez: a regra do subagente (v4.23)
+
+A classe do `method` diz como o autor do grafo chegou ao que o nó afirma. A sessão que escreve um grafo muitas vezes
+passa parte do trabalho a subagentes (um worker que lê uma fonte, um script que mede). O ato deles é o ato do autor:
+o nó leva a classe do que foi feito, não `testimony`. O `testimony` fica para o relato de parte externa, alguém fora
+da sessão que escreve o grafo: uma pessoa, outra sessão, um adotante. É gramática, não regra nova: nenhum veredito
+muda.
+
+```yaml
+# um subagente desta sessão leu a norma e citou o artigo: o ato é leitura
+provenance:
+  source: "https://example.org/norma-2024.html"
+  locator: "art. 12, § 3º"
+  method: "reading: um subagente da sessão leu o artigo e o citou"
+# o dono da política disse numa reunião: é parte externa
+provenance:
+  source: "dono de compliance, reunião de revisão de 2026-11-14"
+  locator: "ata, item 4"
+  method: "testimony: dito pelo dono de compliance"
+```
 
 ## Aresta
 
@@ -162,6 +183,7 @@ livre, e qualquer outra chave alerta. Os valores de enum são códigos, em ingl�
 | `x_confidence` | aresta | a certeza da ligação, de 0 a 1 |
 | `x_provisional` | aresta | `true` quando a ligação ainda espera conferência |
 | `x_classification` | meta | o nível de sensibilidade do grafo inteiro, um nível do esquema próprio da organização (v4.20) |
+| `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | o prazo de expurgo do grafo inteiro, a base dele e a suspensão (v4.23) |
 
 ### `x_term`
 
@@ -343,6 +365,56 @@ versão antiga ainda o guarda.
 Como exemplo de mapeamento, não como padrão: o TLP 2.0 da FIRST nomeia audiências (`clear`, `green`, `amber`,
 `amber-strict`, `red`) para a troca entre organizações, e declara que não é um esquema formal de classificação. A
 organização que o usa escreve esses nomes como os seus `levels`, nessa ordem.
+
+### `x_dispose_by`, `x_dispose_basis` e `x_hold` (v4.23)
+
+O prazo de expurgo do grafo inteiro. `x_dispose_by` é a data do calendário, `AAAA-MM-DD` e entre aspas, até a qual o
+grafo deve ser descartado: um teto máximo, com nome de ação, porque *retain* quer dizer guarda mínima (como no
+`retain_for` do nó). `x_dispose_basis` é a base do prazo, num texto não vazio: a lei, o contrato ou a decisão. `x_hold`
+suspende o descarte: um mapa com `reason` (um texto não vazio) e `until` (a data em que a suspensão caduca, porque uma
+suspensão sem fim é um prazo que nunca chega). Outra chave dentro do `x_hold` é livre.
+
+```yaml
+meta:
+  id: client-onboarding-2026
+  x_classification: confidential
+  x_dispose_by: "2031-12-31"
+  x_dispose_basis: "contrato de serviço, cláusula 9: apagar os dados do cliente cinco anos depois do fim"
+  x_hold:
+    reason: "pedido de preservação no processo 123"
+    until: "2032-06-30"
+```
+
+O contrato julga só a forma, e só quando a chave está presente: a data fora de `AAAA-MM-DD` ou fora do calendário
+alerta como `form.pattern.meta.x_dispose_by`, um número como `form.type.meta.x_dispose_by`, a base vazia (ou só de espaço, inclusive o espaço Unicode,
+como o NBSP e o ideográfico) como `form.pattern.meta.x_dispose_basis` e a suspensão sem `until` como `form.required.meta.x_hold.until`. Cada chave é
+julgada sozinha. A data já passada vale. O vencimento nunca entra no veredito, para o mesmo commit não passar num dia e
+reprovar no outro: quem o lista é o `kg_validate.py --due` (capítulo 5). A unidade é o grafo: no nó, as três chaves
+alertam como `form.misplaced.node.<chave>`, como o `x_classification`. O nó que tem de sair antes do resto vai para um
+grafo próprio.
+
+Com `x_dispose_by` no grafo, o `retain_for` de um nó é um conflito que o dono decide: o `retain_for` não diz de quando
+conta, então o `--due` lista todo nó com ele como `dispose_conflict` e nunca calcula qual prevalece.
+
+#### O procedimento de descarte
+
+1. **O vencimento abre o procedimento; nenhuma ferramenta apaga.** O `kg_validate.py --due` lista o grafo como
+   `EXPURGO VENCIDO` na data e depois dela. O dono do grafo decide: descartá-lo, renovar o prazo com uma base nova ou
+   suspendê-lo.
+2. **A suspensão vem antes.** O grafo com um `x_hold` cujo `until` não passou sai como `EXPURGO SUSPENSO` e espera.
+   Passado o `until`, a suspensão caduca, e o grafo volta a vencer (`hold_expired_on` no JSON). A suspensão cujo `until`
+   não se lê também não suspende, e a entrada o diz (`hold_unreadable`); o prazo que não é data sai como
+   `EXPURGO ILEGÍVEL`, porque o prazo que nunca é medido é um prazo que nunca chega.
+3. **O descarte é um commit.** Tire o arquivo, e toda cópia dele no repositório (um `.kg.json` exportado, uma projeção,
+   um índice), numa mudança revisada.
+4. **O registro é agregado.** Registre o descarte numa entrada agregada, como o termo de eliminação da prática de
+   arquivo: quantos grafos, as datas do mais antigo e do mais novo, a base, quem decidiu e a data. Nunca a listagem dos
+   grafos ou dos nós descartados no repositório: os ids deste formato são descritivos (`D_HIRE_ANA_SILVA`), e a lista
+   guardaria o nome que foi apagado.
+5. **O histórico do git guarda o que saiu da árvore.** Tirar o arquivo o tira dos próximos commits, não do histórico,
+   onde as versões antigas ainda o têm. Reescrever o histórico (o `git filter-repo`, por exemplo) muda só este
+   repositório: não alcança clones, forks, espelhos e caches que já têm os commits antigos. O prazo não substitui a
+   primeira decisão: o dado que tem de sumir de vez fica melhor fora de um repositório compartilhado desde o começo.
 
 ## Registrar um evento externo (forma recomendada, não normativa)
 

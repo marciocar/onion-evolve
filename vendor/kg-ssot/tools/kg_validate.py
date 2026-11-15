@@ -31,7 +31,9 @@ yaml.lone-surrogate e yaml.depth-over-128.
 somado à cadência já passou na data, o que tem cadência e não tem carimbo, e o que só tem reverify_on (por evento,
 sem data). Vence o que vence na data ou antes. Nunca muda o veredito nem julga o grafo: o rc é 0, ou 2 com entrada
 quebrada; um arquivo que não parseia sai no relatório (NÃO LIDO, broken no JSON). Com --format json, o relatório sai no
-formato kg-ssot.due/1 (spec/due.schema.json).
+formato kg-ssot.due/1 (spec/due.schema.json). Desde o v4.23, o relatório lista também o prazo de expurgo do grafo
+inteiro (meta.x_dispose_by): o vencido, o suspenso por um x_hold vigente e, num grafo com x_dispose_by, todo nó com
+retain_for como conflito a decidir pelo dono, sem calcular vigência. O vencimento abre o procedimento; nada é apagado.
 --where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta (where()); a saída padrão não muda.
 --spike troca a saída humana e o rc pelos do spike (check() e classify(), perfil Yaml12BoolLoader), para
 reproduzir a medição do spike. --json OUT grava SEMPRE o formato do spike ({summary, results}),
@@ -90,7 +92,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.22"
+CONTRACT_VERSION = "4.23"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1905,6 +1907,20 @@ PROFILE_HINTS = {
                                   "organization's, in the policy of the server that serves the graph.",
     ("node", "x_classification"): "x_classification belongs in meta (v4.20): the unit is the graph, not the node. Move "
                                   "the node to a graph of its own and declare the level in that graph's meta.",
+    # v4.23: o prazo de expurgo do grafo inteiro, julgado só pela forma; o vencimento é do --due
+    ("meta", "x_dispose_by"): "x_dispose_by is the date by which the whole graph is to be disposed of (v4.23): a "
+                              "calendar date YYYY-MM-DD in quotes. Only its form is judged; the date coming due opens "
+                              "the disposal procedure, listed by kg_validate.py --due, and no tool deletes anything.",
+    ("meta", "x_dispose_basis"): "x_dispose_basis is the basis of the disposal deadline (v4.23): text that is not "
+                                 "empty, such as the law, the contract, or the decision.",
+    ("meta", "x_hold"): "x_hold suspends the disposal (v4.23): a map with reason (text that is not empty) and until "
+                        "(the date YYYY-MM-DD when the suspension lapses).",
+    ("node", "x_dispose_by"): "x_dispose_by belongs in meta (v4.23): the unit of disposal is the graph, not the node. "
+                              "Move the node to a graph of its own and declare the deadline in that graph's meta.",
+    ("node", "x_dispose_basis"): "x_dispose_basis belongs in meta (v4.23), next to x_dispose_by: the unit of disposal is "
+                                 "the graph, not the node.",
+    ("node", "x_hold"): "x_hold belongs in meta (v4.23), next to x_dispose_by: the unit of disposal is the graph, not "
+                        "the node.",
 }
 
 
@@ -2247,7 +2263,9 @@ def due_report(sources, as_of):
     reverify_every válido cujo verified_at + a cadência é igual ou anterior a as_of; unstamped: cadência válida sem
     verified_at legível; event: só reverify_on; broken: o arquivo que não parseia. A cadência fora da forma não entra
     (o SHOULD já alerta form.pattern.node.reverify_every). Desde o v4.11 entram também os perfis com cadência
-    (cadence_subjects): a entrada deles leva subject e detail, e a do nó segue sem essas chaves."""
+    (cadence_subjects): a entrada deles leva subject e detail, e a do nó segue sem essas chaves. Desde o v4.23, o
+    prazo de expurgo do grafo inteiro (_dispose_entries): dispose, dispose_held, dispose_malformed e dispose_conflict,
+    só com conteúdo."""
     out = {"as_of": as_of.isoformat(), "due": [], "unstamped": [], "event": [], "broken": []}
     for name, text in sources:
         _, doc, err = parse_v1(text)
@@ -2279,7 +2297,64 @@ def due_report(sources, as_of):
                     out["due"].append({"file": name, "id": nid, "verified_at": stamped.isoformat(),
                                        "reverify_every": every, "due_on": due_on.isoformat(),
                                        "days_late": (as_of - due_on).days, "reverify_on": on, **extra})
+        _dispose_entries(out, name, doc, nodes, as_of)
     return out
+
+
+# o espaço do \s do ECMA-262, o mesmo da classe do SHOULD no x_dispose_basis e no x_hold.reason (v4.23)
+BLANK = re.compile("[\t\n\u000b\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*")
+
+
+def _declared(value):
+    """O texto declarado, ou None quando falta, não é texto ou é só espaço (inclusive o Unicode): a saída humana diz
+    "não declarada" em vez de imprimir um branco."""
+    return value if isinstance(value, str) and not BLANK.fullmatch(value) else None
+
+
+def _report_text(value):
+    """O valor como texto para o relatório: o próprio texto, ou o JSON do valor que não é texto."""
+    return value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, default=str)
+
+
+def _dispose_entries(out, name, doc, nodes, as_of):
+    """O prazo de expurgo do grafo inteiro (v4.23), fora do veredito. Com meta.x_dispose_by numa data válida igual ou
+    anterior a as_of, o grafo entra em dispose; com um x_hold cujo until é válido e igual ou posterior a as_of (a
+    suspensão vigente), entra em dispose_held. O x_hold vencido, ou sem until legível, não suspende: a entrada vai a
+    dispose (com hold_expired_on quando o until era legível, e hold_unreadable quando o x_hold existe e o until não se
+    lê, para a suspensão quebrada não sumir). O x_dispose_by fora da forma entra em dispose_malformed, com o valor como
+    texto: o prazo não é medido, e o relatório o diz em vez de calar (o SHOULD também alerta). Com a chave x_dispose_by no meta, todo nó com retain_for entra em dispose_conflict, a decidir pelo dono:
+    o relatório não calcula vigência, porque o retain_for não diz de onde conta. As listas só saem com conteúdo, para
+    o relatório de um grafo sem o perfil ficar igual ao de antes. O relatório nunca apaga nada."""
+    meta = doc.get("meta")
+    if not isinstance(meta, dict) or "x_dispose_by" not in meta:
+        return
+    raw = meta["x_dispose_by"]
+    for n in nodes:
+        if isinstance(n, dict) and n.get("id") is not None and "retain_for" in n:
+            out.setdefault("dispose_conflict", []).append({"file": name, "id": str(n["id"]),
+                                                           "retain_for": _report_text(n["retain_for"]),
+                                                           "dispose_by": _report_text(raw)})
+    dispose_by = _as_date(raw)
+    if dispose_by is None:
+        out.setdefault("dispose_malformed", []).append({"file": name, "dispose_by": _report_text(raw)})
+        return
+    if dispose_by > as_of:
+        return
+    basis = meta.get("x_dispose_basis")
+    entry = {"file": name, "dispose_by": dispose_by.isoformat(), "days_late": (as_of - dispose_by).days,
+             "basis": basis if isinstance(basis, str) else None}
+    hold = meta.get("x_hold")
+    until = _as_date(hold.get("until")) if isinstance(hold, dict) else None
+    if until is not None and until >= as_of:
+        reason = hold.get("reason")
+        out.setdefault("dispose_held", []).append({**entry, "hold_reason": reason if isinstance(reason, str) else None,
+                                                   "hold_until": until.isoformat()})
+        return
+    if until is not None:
+        entry["hold_expired_on"] = until.isoformat()
+    elif "x_hold" in meta:
+        entry["hold_unreadable"] = True
+    out.setdefault("dispose", []).append(entry)
 
 
 def _subject(d):
@@ -2293,7 +2368,7 @@ def due_lines(rep):
     labels = {"due": _("DUE"), "unstamped": _("UNSTAMPED"), "event": _("BY EVENT"), "broken": _("UNREADABLE")}
     w = max(len(v) for v in labels.values()) + 1
     for d in rep["due"]:
-        late = (_(" ({n} days late)").format(n=d["days_late"]) if d["days_late"] else _(" (today)"))
+        late = (_(" ({n} days late)").format(n=d["days_late"]) if d["days_late"] else _(" (on the date)"))
         if d.get("subject") == "x_mirror":
             when = _("synced on {verified_at}, every {every}, due on {due_on}")
         elif d.get("subject") == "x_doc_cycle":
@@ -2315,6 +2390,43 @@ def due_lines(rep):
     lines.append(_("· on {as_of}: {due} due, {unstamped} unstamped, {event} by event; the report does not change the "
                    "verdict").format(as_of=rep["as_of"], due=len(rep["due"]), unstamped=len(rep["unstamped"]),
                                      event=len(rep["event"])))
+    lines.extend(dispose_lines(rep))
+    return lines
+
+
+def dispose_lines(rep):
+    """As linhas do prazo de expurgo (v4.23), só quando o relatório tem alguma: o grafo de antes sai igual."""
+    disp, held, conflict = rep.get("dispose", []), rep.get("dispose_held", []), rep.get("dispose_conflict", [])
+    malformed = rep.get("dispose_malformed", [])
+    if not (disp or held or conflict or malformed):
+        return []
+    labels = {"dispose": _("DISPOSAL DUE"), "held": _("DISPOSAL HELD"), "conflict": _("CONFLICT"),
+              "malformed": _("DISPOSAL UNREADABLE")}
+    w = max(len(v) for v in labels.values()) + 1
+    lines = []
+    for d in disp:
+        late = (_(" ({n} days late)").format(n=d["days_late"]) if d["days_late"] else _(" (on the date)"))
+        text = _("dispose by {date}, basis: {basis}").format(
+            date=d["dispose_by"], basis=_declared(d["basis"]) or _("not declared")) + late
+        if "hold_expired_on" in d:
+            text += _("; the hold lapsed on {date}").format(date=d["hold_expired_on"])
+        if d.get("hold_unreadable"):
+            text += _("; x_hold cannot be read (its until is not a YYYY-MM-DD date), so it does not suspend")
+        lines.append(f"{labels['dispose']:<{w}} {d['file']}: {text}")
+    for d in held:
+        lines.append(f"{labels['held']:<{w}} {d['file']}: " + _("dispose by {date}, held until {until}: {reason}").format(
+            date=d["dispose_by"], until=d["hold_until"],
+            reason=_declared(d["hold_reason"]) or _("not declared")))
+    for d in malformed:
+        lines.append(f"{labels['malformed']:<{w}} {d['file']}: " + _(
+            "x_dispose_by {value} is not a YYYY-MM-DD date: the deadline is not measured").format(value=d["dispose_by"]))
+    for d in conflict:
+        lines.append(f"{labels['conflict']:<{w}} {d['file']}  {d['id']}: " + _(
+            "retain_for {retain_for} in a graph with x_dispose_by {dispose_by}: the owner decides, the report does not "
+            "compute which one prevails").format(retain_for=d["retain_for"], dispose_by=d["dispose_by"]))
+    lines.append(_("· disposal: {due} due, {held} held, {malformed} unreadable, {conflict} conflict(s) with retain_for; "
+                   "the date opens the disposal procedure, and no tool deletes anything").format(
+                       due=len(disp), held=len(held), malformed=len(malformed), conflict=len(conflict)))
     return lines
 
 
@@ -2425,7 +2537,10 @@ A .kg.json (the same data model in JSON) is read by the JSON parser in the contr
 --corpus DIR enables the check of the external end of external_edges against the graphs under DIR.
 --due YYYY-MM-DD replaces the verdict with the due report: nodes whose verified_at plus the reverify_every cadence
 has passed on the date, nodes with a cadence and no stamp, and nodes with only reverify_on. It never changes the
-verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format.
+verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format. Since v4.23,
+it also lists the disposal deadline of the whole graph (meta.x_dispose_by): the one that came due, the one held by an
+x_hold in force and, in a graph with x_dispose_by, every node with retain_for as a conflict for the owner to decide,
+without computing which one prevails. The date opens the disposal procedure; nothing is deleted.
 --where adds, per file, one line per occurrence with the node or edge.
 --spike replaces the human output and the rc with those of the spike; --json OUT ALWAYS writes the frozen spike format.
 

@@ -92,7 +92,7 @@ Useful options:
 | `--limit N` | With `--format json`, how many occurrences per file (default 50); the summary counts all of them |
 | `-` in place of the file | Reads the graph from stdin, with no temporary file; `--stdin-format json` reads a `.kg.json` graph (default `yaml`) |
 | `--should-schema F` | With `--schema`, the SHOULD schema that goes with it (in place of the one next to it) |
-| `--due YYYY-MM-DD` | Instead of the verdict, the due report on that date (since 4.15.0): each node with `reverify_every` whose `verified_at` plus the cadence falls on or before the date, each node that has a cadence but no stamp, and each node that has only `reverify_on`. Since 4.19.0 it also lists the canonical profiles with a cadence: each synonym of an `x_term` that is not retired, `x_mirror` (`synced_at` plus `resync_every`), and `x_doc_cycle` (`checked_at` plus `recheck_every`), with `subject` and `detail` in the JSON. The rc is 0 (or 2 on broken input): being due never fails, and the report does not judge the graph (the gate is still `kg_gate.py`). A file that does not parse shows up as `UNREADABLE`; in a scheduled job, check that list, because the rc does not flag it. A malformed or zero cadence stays out of the report (the SHOULD warning flags it), and so does a due date after the year 9999. With `--format json`, the output uses the `kg-ssot.due/1` format (`spec/due.schema.json`) |
+| `--due YYYY-MM-DD` | Instead of the verdict, the due report on that date (since 4.15.0): each node with `reverify_every` whose `verified_at` plus the cadence falls on or before the date, each node that has a cadence but no stamp, and each node that has only `reverify_on`. Since 4.19.0 it also lists the canonical profiles with a cadence: each synonym of an `x_term` that is not retired, `x_mirror` (`synced_at` plus `resync_every`), and `x_doc_cycle` (`checked_at` plus `recheck_every`), with `subject` and `detail` in the JSON. The rc is 0 (or 2 on broken input): being due never fails, and the report does not judge the graph (the gate is still `kg_gate.py`). A file that does not parse shows up as `UNREADABLE`; in a scheduled job, check that list, because the rc does not flag it. A malformed or zero cadence stays out of the report (the SHOULD warning flags it), and so does a due date after the year 9999. With `--format json`, the output uses the `kg-ssot.due/1` format (`spec/due.schema.json`). Since 4.52.0 (contract v4.23) it also lists the disposal deadline of the whole graph (`meta.x_dispose_by`, chapter 3): the graph whose date falls on or before the date (`DISPOSAL DUE`, `dispose` in the JSON), the same graph held by an `x_hold` whose `until` has not passed (`DISPOSAL HELD`, `dispose_held`), and, in a graph with `x_dispose_by`, every node with `retain_for` as a conflict for the owner (`CONFLICT`, `dispose_conflict`), without computing which one prevails. A graph whose `x_dispose_by` is not a `YYYY-MM-DD` date shows up as `DISPOSAL UNREADABLE` (`dispose_malformed`), on any date, and an `x_hold` whose `until` cannot be read is named on the entry (`hold_unreadable`) and does not suspend. The lists show up only when they have something, so the report of a graph without the profile is the same as before and stays valid in the earlier schema: the `schema_version` does not change. A report that carries the new lists does not validate against the earlier schema, which closes the top level with `additionalProperties: false`: if you validate the report, bring the new `spec/due.schema.json`. A `days_late` of 0 is printed as `(on the date)`, the date given to `--due`. The date opens the disposal procedure; nothing is deleted |
 
 The `--json OUT`, `--spike`, `--git`, `--rev`, and `--list` options belong to the measurement instrument that gave
 rise to the contract (the "spike"). They write and replay a frozen legacy format and are not part of the stable
@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 570/570 (gates the rc)
+latest: 597/597 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -250,6 +250,7 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor`. The freshness stamp (`verified_at`, `verified_against`) and, since 4.50, the `provenance.method` class swapped between a Portuguese alias and its canonical English class with the detail after `: ` byte for byte the same (the `kg_migrate.py methods` swap) do not touch a node; any other change does, the method's included. `--touched` does not look at the MUST level; with two nodes of the same id, which the MUST level already fails, the last one counts |
 | `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. `.kg.json` is not checked here. Not with `--update` |
 | `--private-repos FILE` | Since 4.51. Off by default. Fails (rc 1) when a private repository is cited without the `private-cite:<id>` marker (contract v4.22); see *A private repository cited without the marker* below. Not with `--update` |
+| `--classification-floor LEVEL --area-policy FILE` | Since 4.52. Off by default. Fails (rc 1) when a tracked `.kg.yaml` or `.kg.json` (with `--touched`, a changed one; the default excludes do not apply, only `--exclude`) has its `meta.x_classification` at `LEVEL` or above, in the order of the policy's `levels` (contract v4.23); see *A classification floor* below. Not with `--update` |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |
 
@@ -312,6 +313,63 @@ uniqueness; the id comes from `private-cite-id`. Write it where the repository w
 id, the repository, the commit, and the path in the resolution table of the private repository, and leave
 `provenance.node_sha256` out. In prose, swap only the repository name for the marker.
 
+### A classification floor: `--classification-floor` (4.52.0)
+
+`x_classification` (contract v4.20, chapter 3) marks how sensitive a graph is, and the `kg-mcp` enforces it when it
+serves. `--classification-floor LEVEL --area-policy FILE` enforces it where the graph enters a repository: it fails
+(rc 1) each graph whose `meta.x_classification` is at `LEVEL` or above. A public repository, say, runs it with
+the first level it must never hold.
+
+1. **What it reads.** Every `.kg.yaml` and `.kg.json` that git tracks, wherever it is. The ratchet's default excludes
+   do not apply: the fixtures (`*/fixtures/*`), `docs/materials/`, and the vendor are read too, because they hold data
+   as well, and `--no-default-excludes` changes nothing here. Only an explicit `--exclude GLOB` leaves a path out. The
+   vendor of the full release carries the suite's fixtures, with levels such as `confidential` and levels your
+   policy does not know: exclude it explicitly (`--exclude 'vendor/kg-ssot/*'`), or vendor the `gate` profile, which
+   brings no fixture.
+2. **The order comes from the policy.** `FILE` is the area policy of the `kg-mcp` (`levels`, `ceilings`,
+   `default_level`), read by the same strict reader. The order of `levels`, from the least to the most sensitive, says
+   what is above what: the gate never guesses an order from the names.
+3. **It fails closed.** A graph without the key has the policy's `default_level`. A graph that does not parse, is not
+   UTF-8, whose `meta` is not a map, or whose level is not in `levels` fails, because its level is unknown. A missing,
+   unreadable, or invalid policy, a policy without `levels`, and a `LEVEL` that `levels` does not have are broken input
+   (rc 2), and so are one option without the other and an empty value (`--classification-floor ""` would otherwise
+   switch the floor off in silence).
+4. **What it prints.** One line per graph that fails, with its path and its level, and a summary line.
+
+It works in both modes: in the ratchet, every graph it reads; with `--touched`, only those changed since the common
+ancestor (a new path counts as changed, a `.kg.json` included), and those are read from the git index, never from
+the disk, because the index is what the commit takes; the bytes are compared before decoding, so an unchanged file
+that is not UTF-8 does not count, so a graph that was already there does not block an unrelated change. It does not go with `--update`: the
+check is not part of the baseline.
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-floor confidential --area-policy "$KG_AREA_POLICY"
+```
+
+```text
+✗ classification floor: docs/payroll.kg.yaml is at restricted, at or above confidential
+· --classification-floor confidential: 12 graph(s) checked, 1 at or above the floor or with an unknown level
+```
+
+**The limit in CI.** In CI, the gate blocks the merge, not the entry of the data: by the time it runs, the commit with
+the graph already exists on the branch, in the pushed remote, and in every fork of the pull request. To block it before
+the commit, run the same gate with `--touched` in a pre-commit hook:
+
+```sh
+#!/bin/sh
+# .git/hooks/pre-commit: refuses the commit when a changed graph is at the floor or above
+exec python3 -I vendor/kg-ssot/tools/kg_gate.py --touched HEAD \
+  --classification-floor confidential --area-policy "$KG_AREA_POLICY"
+```
+
+The hook has its own limits. It lives in each clone, and each person installs it; `git commit --no-verify` skips it.
+For the floor, `--touched` judges the git index, the bytes the commit will take, not the working tree: a graph staged
+at a level above the floor fails even if the disk now holds another version, and a graph added and then deleted from
+the disk still counts. A graph that is only on disk, never added, is not judged (and is not committed). The other
+checks of `--touched` (the debt on touched nodes) still compare the working tree. In a repository with no commit yet, `HEAD` does not resolve, and the gate stops with
+rc 2. That is why the CI keeps the same check: the hook catches the mistake early, and the CI catches the hook that
+did not run.
+
 ## `kg_vendor.py`: bring in and verify the release
 
 An adopter never copies the contract by hand. The vendor tool reads a **tag** with `git archive` and writes a stamp
@@ -352,7 +410,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | The repository (a path or a URL, such as `https://github.com/marciocar/kg-ssot`) that has the tag. Required when you run it from inside a vendor |
 | `--dest DIR` | Where the vendor lives (default `vendor/kg-ssot`) |
-| `--profile gate` | Brings only the minimum to run the gate and the check (17 files since 4.26.0, without the suite); `--profile full` goes back to the whole release |
+| `--profile gate` | Brings only the minimum to run the gate and the check (18 files since 4.52.0, without the suite); `--profile full` goes back to the whole release |
 | `--force` | Replaces a locally edited vendor |
 | `--index` (on `check`) | Verifies the git index instead of the working tree |
 | `--ref COMMIT` (on `update`) | The bench before a tag (4.24): brings a commit that is not a release yet, from a repository where you can reach it. The stamp says `unreleased` |

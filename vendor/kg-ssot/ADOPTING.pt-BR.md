@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:e714bc772b9b74b8 -->
+<!-- translation-of: ADOPTING.md sha256:11a20bfd3aa00d0f -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -97,8 +97,9 @@ As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/
   - um diretório sem carimbo, porque nunca apaga um diretório alheio;
   - um vendor que diverge do carimbo, a menos que venha `--force`. Isso evita que uma edição local suma em
     silêncio.
-- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 17 arquivos:
-  o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o vendor, o check do trace com o módulo de consulta
+- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 18 arquivos:
+  o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o leitor da política de áreas do kg-mcp que o
+  `--classification-floor` do gate usa (`tools/kg_policy.py`, desde a 4.52.0), o vendor, o check do trace com o módulo de consulta
   que ele importa e o schema da saída dele (`tools/kg_trace.py`, `tools/kg_query.py` e `spec/trace.schema.json`, desde
   a 4.25.1), o módulo vetorial que a consulta importa só para o `--semantic` e os requirements fixados dele (`tools/kg_vector.py` e
   `tools/requirements-vector.txt`, desde a 4.26.0), o módulo de língua e o catálogo dele
@@ -394,6 +395,23 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.51.0` para a `kg-ssot-v4.52.0`, entra o contrato v4.23, só SHOULD: nenhum grafo que passava reprova, e nenhum
+veredito MUST muda. Entra o prazo de expurgo do grafo inteiro, no `meta`: `x_dispose_by` (uma data do calendário),
+`x_dispose_basis` (a base, num texto não vazio) e `x_hold` (a suspensão com `reason` e `until`), julgados só pela forma,
+nunca pelo vencimento; no nó, as três chaves alertam como `form.misplaced.node.<chave>`. O grafo que já usava um desses
+nomes como chave `x_` livre com outra forma ganha um aviso SHOULD: a linha de base por grafo ou por nó o vê como código
+de dívida novo, e o conserto é a forma (manual, capítulo 3) ou, para registrá-lo como dívida com o motivo,
+`python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contrato v4.23: perfil de expurgo fora da
+forma, dívida registrada"`. O `kg_validate.py --due` lista o expurgo vencido, o suspenso e o conflito com o
+`retain_for` de um nó; as listas só saem com conteúdo, então um job agendado que lê o JSON `kg-ssot.due/1` de um grafo
+sem o perfil lê os mesmos bytes; o relatório que traz as listas novas não vale no schema da 4.51, então o job que o
+valida traz o `spec/due.schema.json` novo. O `days_late` 0 passa a sair como `(na data)`. O vencimento abre o procedimento de descarte, e nenhuma ferramenta apaga nada. O vendor
+traz um arquivo novo, `tools/kg_policy.py`, o leitor puro da política de áreas do kg-mcp, também no perfil `gate`, que
+passa a ter 18 arquivos. Opcional: `kg_gate.py --classification-floor NÍVEL --area-policy ARQ` reprova o grafo no nível
+ou acima, pela ordem dos `levels` da política; ele lê todo `.kg.yaml` e `.kg.json` rastreado, o vendor inclusive, então
+com a release inteira vendorizada acrescente `--exclude 'vendor/kg-ssot/*'`; no CI ele barra o merge, não a entrada do dado, e o manual dá a receita
+de pre-commit com `--touched`.
 
 Da `kg-ssot-v4.50.0` para a `kg-ssot-v4.51.0`, entra o contrato v4.22, só SHOULD: nenhum grafo que passava reprova, e nenhum
 veredito MUST muda. Ele traz o marcador `private-cite:<id>` para citar, de um grafo público, um nó de repositório

@@ -1,0 +1,236 @@
+{
+  "description": "Os perfis canônicos do prazo de expurgo do grafo inteiro (v4.23): x_dispose_by (a data absoluta até a qual o grafo deve ser descartado), x_dispose_basis (a base do prazo, em texto não vazio) e x_hold (a suspensão, com reason e until), no meta. É SHOULD: julgados só quando presentes e só pela forma, nunca pelo vencimento, que é do relatório --due e fica fora do veredito. No nó, as três chaves não são perfil e alertam como form.misplaced.node.<chave>: a unidade é o grafo. Na aresta, seguem chave x_ livre.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-meta-dispose-full.kg.yaml",
+      "description": "o prazo de expurgo do grafo inteiro no meta: a data, a base e a suspensão com motivo e data-limite (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-dispose-by-alone.kg.yaml",
+      "description": "só a data de expurgo, sem a base: cada perfil é julgado sozinho, pela forma (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-dispose-by-past.kg.yaml",
+      "description": "a data de expurgo já passada vale igual: o contrato julga a forma, nunca o vencimento, que é do --due (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-hold-expired.kg.yaml",
+      "description": "a suspensão com data-limite já passada vale igual: o vencimento fica fora do veredito (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-hold-extra-key.kg.yaml",
+      "description": "a suspensão com uma chave a mais além de reason e until: o mapa não é fechado (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-edge-dispose-free.kg.yaml",
+      "description": "x_dispose_by na aresta não é perfil: segue chave x_ livre (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-dispose-by-not-iso.kg.yaml",
+      "description": "a data de expurgo fora de AAAA-MM-DD (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_by"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-by-datetime.kg.yaml",
+      "description": "a data de expurgo com hora: o perfil é só data (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_by"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-by-impossible.kg.yaml",
+      "description": "a data de expurgo que não existe no calendário (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_by"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-by-integer.kg.yaml",
+      "description": "a data de expurgo como número (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_dispose_by"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-by-unquoted.kg.yaml",
+      "description": "a data de expurgo sem aspas: o leitor YAML 1.1 a leria como data, e o aviso é o do arquivo, não o do perfil (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-basis-empty.kg.yaml",
+      "description": "a base do prazo vazia (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_basis"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-basis-blank.kg.yaml",
+      "description": "a base do prazo só com espaço (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_basis"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-basis-nbsp.kg.yaml",
+      "description": "a base do prazo só com espaço não separável (U+00A0): espaço Unicode conta como vazio (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_basis"
+      ]
+    },
+    {
+      "file": "warn-meta-dispose-basis-unicode-spaces.kg.yaml",
+      "description": "a base do prazo só com espaços Unicode (ideográfico, BOM, separador de linha, espaço fino) (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_dispose_basis"
+      ]
+    },
+    {
+      "file": "warn-meta-hold-reason-nbsp.kg.yaml",
+      "description": "o motivo da suspensão só com espaço não separável (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_hold.reason"
+      ]
+    },
+    {
+      "file": "valid-meta-dispose-basis-unicode-text.kg.yaml",
+      "description": "a base do prazo com texto fora do ASCII e espaço não separável no meio vale (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-dispose-basis-list.kg.yaml",
+      "description": "a base do prazo como lista (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_dispose_basis"
+      ]
+    },
+    {
+      "file": "warn-meta-hold-not-map.kg.yaml",
+      "description": "a suspensão como texto, não como mapa (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_hold"
+      ]
+    },
+    {
+      "file": "warn-meta-hold-missing-until.kg.yaml",
+      "description": "a suspensão sem data-limite: na norma, a suspensão caduca (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_hold.until"
+      ]
+    },
+    {
+      "file": "warn-meta-hold-missing-reason.kg.yaml",
+      "description": "a suspensão sem motivo (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_hold.reason"
+      ]
+    },
+    {
+      "file": "warn-meta-hold-until-not-date.kg.yaml",
+      "description": "a data-limite da suspensão fora de AAAA-MM-DD (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_hold.until"
+      ]
+    },
+    {
+      "file": "warn-meta-hold-reason-blank.kg.yaml",
+      "description": "o motivo da suspensão só com espaço (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_hold.reason"
+      ]
+    },
+    {
+      "file": "warn-node-dispose-by.kg.yaml",
+      "description": "x_dispose_by no nó não é perfil: a unidade é o grafo (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_dispose_by"
+      ]
+    },
+    {
+      "file": "warn-node-dispose-basis.kg.yaml",
+      "description": "x_dispose_basis no nó não é perfil (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_dispose_basis"
+      ]
+    },
+    {
+      "file": "warn-node-hold.kg.yaml",
+      "description": "x_hold no nó não é perfil, mesmo bem formado (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_hold"
+      ]
+    },
+    {
+      "file": "warn-node-dispose-with-meta.kg.yaml",
+      "description": "o meta com o prazo válido e o nó com outro: só o nó alerta (v4.23)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_dispose_by"
+      ]
+    }
+  ]
+}
