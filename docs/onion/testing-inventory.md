@@ -11,5 +11,49 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **340** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
-| Sítios de asserção (**não** asserções executadas) | **2735** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **341** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Sítios de asserção (**não** asserções executadas) | **2744** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
+| Linhas do manifesto de fixtures | **121** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
+| Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
+| Arquivos de fixture rastreados | **175** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
+| Regras do lint | **113** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **99** | idem |
+| — das quais SOFT | **53** | idem |
+| — HARD **e** SOFT (contadas nas duas) | **39** | idem |
+| Pares de modo consumido (REGRA 59) | **85** | `bash .claude/validation/consumed-mode-check.sh .` |
+| — sem teste | **0** | idem |
+| Scripts de validação | **135** | `git ls-files '.claude/validation/*.sh'` |
+| Hooks | **28** | `git ls-files '.claude/hooks/*.sh'` |
+| Workflows de CI | **5** | `git ls-files '.github/workflows/*.yml'` |
+| Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
+
+## O que RODOU
+
+Este arquivo conta o que **existe**. Quantas asserções de fato **passaram** é resultado de
+execução, vive em `docs/onion/metrics/selftest-runs.jsonl` (**2** envelope(s)
+coletado(s)) e é projetado em [`testing-state.md`](testing-state.md).
+
+A distinção não é formalismo. Há **2744** sítios estáticos de asserção e a última
+execução completa contou **mais** que isso, porque sítio dentro de laço dispara N vezes.
+Publicar o número estático como "tamanho da bancada" trocaria uma defasagem por um erro de
+categoria — e foi por confundir os dois que `689 asserções` sobreviveu em três comentários
+de CI depois de ter deixado de ser verdade.
+
+Para medir agora, sem esperar a série:
+
+```bash
+ONION_SELFTEST_STRICT=1 bash .claude/validation/lint-selftest.sh --jobs auto --report /tmp/r.tsv
+grep -P '^TOTAL\t' /tmp/r.tsv
+```
+
+## Fronteiras declaradas
+
+- **Estático só.** Nada aqui executa a bancada — a catraca da REGRA 62 (Projeção GERADA em
+  sincronia com a fonte) chama este gerador a cada lint, e uma rodada de 10 minutos por lint
+  não é gate, é bloqueio.
+- **Famílias contadas pelo `^_family `, não pelo `--list`.** O modo que a produção consome
+  custa ~2s; o grep é instantâneo. A **bancada** prova que os dois dão o mesmo número — sem
+  essa prova, o barato poderia medir outra coisa que o caro.
+- **Duas populações de fixture, de propósito.** Manifesto (tabela que dirige famílias
+  table-driven) e disco (inclui fixture de família que a lê direto) não são a mesma coisa.
+- **Falha alto.** Produtor que morre derruba o gerador; nenhuma linha é emitida zerada.
