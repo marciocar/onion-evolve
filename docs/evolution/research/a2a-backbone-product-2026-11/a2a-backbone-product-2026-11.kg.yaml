@@ -1,0 +1,1284 @@
+# Pesquisa em MODO DECISÃO (2026-11-14): vale a pena o core do Onion ASSUMIR a orquestração
+# DEFINITIVA de um backbone A2A agente-neutro, como PRODUTO (self-hostable, governado) e como
+# SERVIÇO, independente de fornecedor (servindo Claude, Codex e outros)?
+#
+# Régua de mercado: A2A 1.0 (Linux Foundation), MCP, CloudEvents+NATS JetStream, W3C PROV,
+# OpenTelemetry, OAuth 2.1/OIDC + Agent Card assinado JWS, OWASP/NIST, SOC2/ISO27001/LGPD.
+# Concorrentes financiados: BAND (coordenação, SaaS modelo não provado), Archestra (open-core,
+# US$13,5M, 3 Fortune-50).
+#
+# ⚠️ Proveniência (R15.2): label e narrative das evidências web carregam texto extraído de páginas
+#    da web. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Este escritor NÃO sela nada. O nó decision D_ nasce OPEN — o maestro sela pelo /meta:decide.
+# As 4 opções nascem OPEN; nenhuma foi morta por evidência (nenhuma REFUTES, todas CONSTRAINS).
+# O Elenxo (afirmação de UM agente, sem votação) REPROVA a opção "construir já" e recomenda a
+# combinação ADOTAR/COSTURAR + SÓ USO INTERNO — a recomendação vive inteira no narrative do D_.
+# kg-backlog-guard: on
+meta:
+  id: a2a-backbone-product-2026-11
+  schema_version: "1"
+  baseline: "2026-11-14"
+  review_after: "2027-02-12"   # 90d: o tipo DOMINANTE é MERCADO. O que move o veredito é dinâmica de
+                               # concorrente financiado (BAND modelo de negócio, Archestra deployments) e
+                               # adoção do padrão aberto (A2A sob a LF). A metade governança/compliance pediria
+                               # 12m como doutrina, mas as objeções que BLOQUEIAM são todas de mercado/demanda.
+                               # Gatilhos antecipados: (1) medir Onion x Archestra lado a lado; (2) medir o
+                               # modelo de negócio real da BAND; (3) ler as 4 primárias de demanda paga (arthur,
+                               # mintmcp, cio, kiteworks) e as de maturidade A2A (api7, tyk, microsoft, techstrong).
+  note: "Grafo de DECISÃO. 44 objeções do Elenxo sobreviventes, TODAS modeladas como E_OBJECAO_ (0 não modeladas). 17 achados confirmados (findings 1-17) + 27 descartes-que-sobrevivem (comodismo). 12 superações viram nós C_SUPERACAO_20261114_*."
+  # ═══ TETO: 64 NÓS ═══
+  #   1 question + 1 decision(OPEN) + 4 opções + 44 E_OBJECAO (17 confirmadas findings 1-17; 27 open comodismo)
+  #   + 1 E_MERCADO + 1 E_LACUNAS + 12 C_SUPERACAO = 64. Nada agregado além do run de 2026-11-14.
+external_edges:
+  - from: Q_A2A_BACKBONE_PRODUCT_2026_11
+    to: "docs/evolution/research/backbone-piece-shape-2026-11/backbone-piece-shape-2026-11.kg.yaml#Q_BACKBONE_PIECE_SHAPE_2026_11"
+    edge_type: TRACES_TO
+  - from: Q_A2A_BACKBONE_PRODUCT_2026_11
+    to: "docs/evolution/research/a2a-landscape-2026-11/a2a-landscape-2026-11.kg.yaml#Q_A2A_LANDSCAPE_2026_11"
+    edge_type: TRACES_TO
+  - from: D_A2A_BACKBONE_PRODUCT_2026_11
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_INTERNAL_ONLY
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_A2A_BACKBONE_PRODUCT_2026_11
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Vale a pena o core do Onion ASSUMIR a orquestração DEFINITIVA de um backbone A2A agente-neutro, como PRODUTO (self-hostable, governado) e como SERVIÇO, servindo Claude, Codex e outros, pesado contra o padrão de mercado e contra concorrentes financiados (BAND, Archestra)?"
+    trace: "run /onion-research modo decision de 2026-11-14; pergunta computada pelo workflow; corpus TESE do maestro (backbone como produto+serviço) + backbone-piece-shape-2026-11 (forma A selada) + no-external-service-dependency"
+    narrative: |-
+      Pergunta do run em modo decision (2026-11-14). Opções reais: (A) construir o backbone como
+      produto+serviço, definitivo, agora; (B) só uso interno (dogfood da camada de governança-de-grafo
+      sobre A2A adotado); (C) adotar/costurar um padrão existente (A2A 1.0 + MCP + CloudEvents/NATS +
+      OTel + W3C PROV + OAuth2.1/OIDC + Agent Card JWS); (D) não fazer. A decisão é do maestro
+      (D_A2A_BACKBONE_PRODUCT_2026_11, OPEN).
+  - id: D_A2A_BACKBONE_PRODUCT_2026_11
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: core assume backbone A2A agente-neutro como produto+serviço? Opções: A construir já · B só uso interno · C adotar/costurar padrão · D não fazer. Elenxo REPROVA A e recomenda C+B (adotar o padrão, construir só a governança-de-grafo interna)."
+    trace: "run /onion-research modo decision de 2026-11-14; pergunta Q_A2A_BACKBONE_PRODUCT_2026_11; segue backbone-piece-shape-2026-11 (forma A, repo próprio vendorizado, open-core indeciso) e no-external-service-dependency"
+    narrative: |-
+      Opções: C_OPCAO_BUILD_PRODUCT_SERVICE, C_OPCAO_INTERNAL_ONLY, C_OPCAO_ADOPT_STITCH,
+      C_OPCAO_DO_NOTHING.
+
+      RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; íntegra, sem corte): REPROVO a opção
+      "construir o backbone como produto+serviço definitivo, agora". Recomendo ao maestro a opção
+      combinada ADOTAR/COSTURAR + SÓ USO INTERNO: adotar A2A 1.0 (LF), MCP, CloudEvents+NATS, OTel,
+      W3C PROV e OAuth2.1/OIDC+Agent Card JWS como protocolo e identidade (não reinventar nenhum deles),
+      e construir SOMENTE a camada estreita de GOVERNANÇA DE GRAFO como peça INTERNA primeiro (dogfood),
+      parqueando a decisão produto+serviço até que as objeções que bloqueiam sejam fechadas. Isto segue
+      o que o próprio corpus já selou (backbone-piece-shape-2026-11: forma A, repo próprio vendorizado,
+      open-core indeciso, 2 objeções que bloqueiam em aberto) e a doutrina no-external-service-dependency.
+
+      CONSTRAINS (objeções que BLOQUEIAM e precisam ser fechadas ANTES de qualquer passo de produto+serviço):
+      1. Fosso falso na entrada (achados 8/9): Archestra já entrega self-host+MCP/A2A+governança em
+         open-core, financiado (US$13,5M) e deployado (3 Fortune-50); o corpus tem 0 nós sobre ele.
+         Fechar: medir Onion x Archestra lado a lado e ancorar no grafo.
+      2. Posicionamento já tem dono financiado (achados 15/16): BAND é agente-neutro servindo Claude
+         Code e Codex, e a premissa "BAND é SaaS fechado" (o wedge aberto-vs-fechado) é NÃO PROVADA.
+         Fechar: medir o modelo de negócio real da BAND antes de vender "aberto" como diferencial.
+      3. Neutralidade não é diferencial (achados 3/4/5/6/10): o protocolo neutro já é commons da LF com
+         150+ orgs; o moat só pode ser governança-de-grafo + self-host soberano, que é ESTRUTURAL e
+         NÃO-VERIFICADO até a fase 1 estar no ar.
+      4. Demanda paga não provada e imatura (achado 7): 13% entendem IA soberana; as 4 primárias de
+         demanda paga (arthur.ai, mintmcp, cio, kiteworks) ficaram NÃO LIDAS. Fechar: ler e ancorar
+         antes de assumir receita.
+      5. Modo SERVIÇO tem cold-start e custo de conformidade não medidos (SOC2 Type 2 e synadia/jepsen-NATS
+         cortados por orçamento): nenhum serviço vendável a regulado antes de 3-12 meses de observação, e
+         o risco de consistência do NATS (transporte) não foi lido. O modo PRODUTO self-host deixa o SOC2
+         com o adotante, por isso é o caminho mais barato e menos arriscado para começar.
+      6. Substrato expande coordenação nativa (achados 1/2 + CC 2.1.323): a fatia intra-Claude é cada vez
+         mais gratis; o valor restante do backbone é só a fatia cross-vendor, ainda não dimensionada.
+
+      Em suma: NÃO assumir como produto+serviço definitivo agora; adotar o padrão, construir só a
+      governança-de-grafo como peça interna em dogfood, e reabrir a decisão de produto+serviço quando
+      (1) o diferencial for medido entregando valor, (2) Archestra/BAND estiverem ancorados no corpus, e
+      (3) a demanda paga for lida nas primárias. Este escritor NÃO sela: o maestro sela pelo /meta:decide.
+  # ═══ OPÇÕES (1 claim por opção, OPEN; nenhuma morta por evidência) ═══
+  - id: C_OPCAO_BUILD_PRODUCT_SERVICE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    label: "OPÇÃO A) Construir o backbone A2A agente-neutro como produto+serviço (self-hostable, governado), definitivo, agora."
+    narrative: "A opção que o Elenxo REPROVA. Contra (CONSTRAINS): Archestra já ocupa a posição em open-core financiado (achados 8/9); BAND já é agente-neutro servindo Claude/Codex e o wedge aberto-vs-fechado é não provado (achados 15/16); neutralidade já é commons da LF (achados 3/4/5/6/10); demanda paga imatura/não lida (achado 7); modo serviço com cold-start SOC2 e NATS não medidos; substrato comoditiza a coordenação intra-Claude (achados 1/2)."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-14"
+  - id: C_OPCAO_INTERNAL_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO B) Só uso interno: dogfood da camada de governança-de-grafo sobre A2A adotado, parqueando produto+serviço."
+    narrative: "Metade da recomendação do Elenxo. A favor: constrói só a camada estreita de governança-de-grafo como peça interna, sem reivindicar o protocolo, alinhada a no-external-service-dependency e backbone-piece-shape (forma A). Contra (CONSTRAINS): a lacuna de governança do A2A não foi medida (lf-roadmap, api7/tyk/microsoft não lidos) — pode ser o espaço ou pode ser preenchida pela própria LF."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-14"
+  - id: C_OPCAO_ADOPT_STITCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: "OPÇÃO C) Adotar/costurar um padrão existente: A2A 1.0 + MCP + CloudEvents/NATS + OTel + W3C PROV + OAuth2.1/OIDC + Agent Card JWS."
+    narrative: "Metade da recomendação do Elenxo, sustentada por mais achados que qualquer outra (3/4/5/6/10 + superações de adoção). O padrão é estável/produção, commons da LF com 150+ orgs, identidade JWS nativa, interop MCP demonstrada. A neutralidade vem de graça do protocolo — adotar entrega a camada sem construí-la."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-14"
+  - id: C_OPCAO_DO_NOTHING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    label: "OPÇÃO D) Não fazer: não assumir backbone nem construir camada de governança."
+    narrative: "A favor: o substrato comoditiza coordenação intra-Claude (CC 2.1.323), o espaço tem concorrentes financiados e a demanda paga é imatura. Contra (CONSTRAINS): a fatia cross-vendor segue descoberta pelo substrato e há demanda-base por coordenar agentes heterogêneos (idc-85-usam-agentes); não fazer nada deixa essa fatia sem resposta."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-14"
+  # ═══ ACHADOS 1-17: objeções CONFIRMADAS do Elenxo (evidence confirmed, SUPPORTS Q + CONSTRAINS) ═══
+  - id: E_OBJECAO_01_CC_TEAMMATES_NATIVE_COORD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-11-12"
+    verified_at: "2026-11-14"
+    verified_against: "changelog CC 2.1.323 (code.claude.com/docs/en/changelog): teammates checam team lead; votação 2-1 do run"
+    label: "CC 2.1.323 embute checagem de team lead nos teammates: parte do valor (coordenar sessões) já vem grátis do substrato — mas intra-Claude, não cobre Codex/outros."
+    narrative: "LIMITE (survives, triage=limite). Apara o escopo da tese agente-neutra, não derruba: a cobertura cross-vendor segue não entregue pelo substrato (o changelog não menciona nenhum agente fora do Claude). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://code.claude.com/docs/en/changelog"
+      locator: "entrada CC 2.1.323: teammates de painel dividido checam se pedidos vêm do team lead"
+      method: "judges: votação 2-1 do run sobre leitura WebFetch do changelog"
+      locality: "web"
+    trace: "https://code.claude.com/docs/en/changelog"
+  - id: E_OBJECAO_02_CHANGELOG_SILENT_ON_A2A
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    source_tier: 9
+    source_kind: primary
+    verified_at: "2026-11-14"
+    verified_against: "changelog CC (code.claude.com/docs/en/changelog): ausência verbatim de A2A/JWS/NATS/CloudEvents/PROV/BAND/compliance; votação 2-1"
+    label: "O changelog não cita A2A/JWS/NATS/CloudEvents/PROV/BAND/compliance: a evidência 'o fornecedor comoditiza a coordenação' prova MENOS do que a decisão precisa."
+    narrative: "LIMITE (survives, triage=limite, critério E2_PROVA_MENOS). Só mostra teammates/OTel/OAuth intra-Claude, nada do eixo agente-neutro. Fica de pé como limite da própria evidência — por isso CONSTRAINS a decisão, não uma opção. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://code.claude.com/docs/en/changelog"
+      locator: "página inteira do changelog: zero menção a A2A, Agent Card, JWS, NATS, CloudEvents, W3C PROV, BAND, compliance"
+      method: "reading: WebFetch da página inteira do changelog"
+      locality: "web"
+    trace: "https://code.claude.com/docs/en/changelog"
+  - id: E_OBJECAO_03_A2A_V1_STABLE_ADOPT_NOT_INVENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2026-03"
+    verified_at: "2026-11-14"
+    verified_against: "opensource.googleblog 2026-04: 'first stable, production-ready version'; votação 3-0"
+    label: "A2A v1.0 (mar/2026) é a primeira versão estável pronta para produção: se o core INVENTAR protocolo em vez de adotar A2A, entrega padrão redundante e MENOS neutro que o commons."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA). Bloqueia a variante 'inventar protocolo' dentro da opção A; o alvo promete agente-neutro e um caseiro entrega menos neutralidade. Superação achada (C_SUPERACAO_20261114_ADOPT_A2A_PROTOCOL_LAYER). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://opensource.googleblog.com/2026/04/a-year-of-open-collaboration-celebrating-the-anniversary-of-a2a.html"
+      locator: "'first stable, production-ready version' do A2A Protocol v1.0 (mar/2026)"
+      method: "judges: votação 3-0 do run sobre leitura WebFetch da fonte primária"
+      locality: "web"
+    trace: "https://opensource.googleblog.com/2026/04/a-year-of-open-collaboration-celebrating-the-anniversary-of-a2a.html"
+  - id: E_OBJECAO_04_A2A_LF_NEUTRAL_NOT_A_DIFFERENTIAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2025-06-23"
+    verified_at: "2026-11-14"
+    verified_against: "opensource.googleblog: A2A sob LF, governança neutra desde 23/06/2025; votação 3-0"
+    label: "A2A sob a Linux Foundation, governança neutra desde 23/06/2025: se o pitch vende NEUTRALIDADE como diferencial, o comprador vê que ela já vem de graça do protocolo."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, E1_EVIDENCIA_CONTRARIA). Bloqueia 'neutralidade como diferencial' da opção A; sobra só governança-de-grafo + self-host como moat — ESTRUTURAL e NÃO-VERIFICADO até a fase 1 no ar. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://opensource.googleblog.com/2026/04/a-year-of-open-collaboration-celebrating-the-anniversary-of-a2a.html"
+      locator: "A2A governado pela Linux Foundation como padrão neutro e comunitário desde a doação em 23/06/2025"
+      method: "judges: votação 3-0 do run sobre leitura WebFetch da fonte primária"
+      locality: "web"
+    trace: "https://opensource.googleblog.com/2026/04/a-year-of-open-collaboration-celebrating-the-anniversary-of-a2a.html"
+  - id: E_OBJECAO_05_A2A_150_ORGS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "linuxfoundation.org press: 'surpasses 150 organizations' (contra 50+ em abr/2025); votação 3-0"
+    label: "A2A 1.0 com 150+ orgs apoiadoras (contra 50+ em abr/2025): a massa está no padrão aberto na camada de PROTOCOLO; reforça adotar sobre construir protocolo."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Reforça achados 3/4; não toca a camada de governança/serviço. Superação achada (C_SUPERACAO_20261114_ADOPT_A2A_COMMONS). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "'surpasses 150 organizations' apoiando o A2A 1.0, contra 50+ em abril de 2025"
+      method: "judges: votação 3-0 do run sobre leitura WebFetch da fonte primária"
+      locality: "web"
+    trace: "https://linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+  - id: E_OBJECAO_06_A2A_DONATED_LF_NOT_PROPRIETARY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    source_tier: 7
+    source_kind: primary
+    valid_from: "2025-06"
+    verified_at: "2026-11-14"
+    verified_against: "developers.googleblog donates-a2a: 'vendor-neutral and community-driven governance'; votação 3-0"
+    label: "Google Cloud doou A2A à LF com governança neutra declarada: a camada de protocolo NÃO pode ser ativo proprietário do core; restringe o construível a 'por cima do padrão'."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Limita a opção A à camada acima do protocolo. Superação achada (C_SUPERACAO_20261114_BUILD_ONLY_GOVERNANCE_LAYER). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://developers.googleblog.com/en/google-cloud-donates-a2a-to-linux-foundation/"
+      locator: "'vendor-neutral and community-driven governance' na transferência do A2A à Linux Foundation"
+      method: "judges: votação 3-0 do run sobre leitura WebFetch da fonte primária"
+      locality: "web"
+    trace: "https://developers.googleblog.com/en/google-cloud-donates-a2a-to-linux-foundation/"
+  - id: E_OBJECAO_07_SOVEREIGNTY_IMMATURE_SLOW_BUY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    source_tier: 6
+    source_kind: analyst
+    valid_from: "2026-05"
+    verified_at: "2026-11-14"
+    verified_against: "IDC InfoBrief (go.cohere.com): '13% ... 12%'; kg-corpus-grep 'demanda paga self-host soberano' = 0 nós; votação 3-0"
+    label: "IDC: só 13% entendem conceitos de IA soberana e 12% os riscos. Comprador regulado que não entende soberania não compra backbone soberano sem meses de educação: ciclo longo, receita incerta no ano 1."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, E1_EVIDENCIA_CONTRARIA). Bloqueia o modo SERVIÇO-agora: 'produto+serviço' promete demanda paga que a própria fonte diz imatura. Não houve superação: as fontes de demanda paga (arthur.ai, mintmcp, cio, kiteworks) ficaram NÃO LIDAS. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://go.cohere.com/rs/003-EZL-678/images/IDC-Sovereign-AI-InfoBrief.pdf?version=1"
+      locator: "13% entendem amplamente os conceitos de IA soberana; 12% entendem seus riscos"
+      method: "judges: votação 3-0 do run sobre leitura do InfoBrief; derived: kg-corpus-grep 'demanda paga self-host soberano' = 0"
+      locality: "web"
+    trace: "https://go.cohere.com/rs/003-EZL-678/images/IDC-Sovereign-AI-InfoBrief.pdf?version=1"
+  - id: E_OBJECAO_08_ARCHESTRA_OPEN_CORE_SAME_POSITION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    source_tier: 6
+    source_kind: primary
+    verified_at: "2026-11-14"
+    verified_against: "github.com/archestra-ai/archestra: open-core AGPL-3.0 + Enterprise, gateways LLM/MCP/A2A, registro MCP, orquestrador k8s, self-host Docker/Helm/k8s; kg-corpus-grep 'Archestra' = 0 nós; votação 3-0"
+    label: "Archestra é plataforma enterprise open-core (AGPL-3.0 + Enterprise) com gateways LLM/MCP/A2A, registro privado de MCP, orquestrador MCP com operador k8s e self-host via Docker/Helm/k8s: a posição que o alvo chama de fosso já está ocupada."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, E1_EVIDENCIA_CONTRARIA). Bloqueia 'ninguém entrega junto'. Não houve superação: corpus-grep 'Archestra' = 0 nós; o core nunca mediu Archestra lado a lado — só promessa de governança de grafo bi-temporal. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://github.com/archestra-ai/archestra"
+      locator: "README: open core AGPL-3.0 + Enterprise; gateways LLM/MCP/A2A; registro privado de MCP; orquestrador MCP com operador k8s; runtime de agentes; self-host Docker/Helm/k8s"
+      method: "judges: votação 3-0 do run sobre leitura do repositório; derived: kg-corpus-grep 'Archestra' = 0"
+      locality: "web"
+    trace: "https://github.com/archestra-ai/archestra"
+  - id: E_OBJECAO_09_ARCHESTRA_FUNDED_DEPLOYED_CONTRADICTS_MOAT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.5
+    source_tier: 6
+    source_kind: primary
+    verified_at: "2026-11-14"
+    verified_against: "github.com/archestra-ai/archestra: US$13,5M, 3 Fortune-50 deployments, open-core (não SaaS fechado); votação 2-1"
+    label: "Archestra: US$13,5M e três deployments Fortune-50, open-core e NÃO SaaS fechado. Contradiz diretamente a premissa do corpus 'o concorrente financiado vende SaaS fechado e ninguém entrega self-host+agente-neutro+governança junto'."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, E1_EVIDENCIA_CONTRARIA). A tese de moat é falsa já na entrada: existe concorrente financiado, deployado e open-core no mesmo espaço. Não houve superação: voto 2-1 (há dissenso) e 0 nós no corpus sobre Archestra. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://github.com/archestra-ai/archestra"
+      locator: "US$13,5M de financiamento total; três deployments em empresas Fortune-50; open core (não SaaS fechado)"
+      method: "judges: votação 2-1 do run sobre leitura do repositório"
+      locality: "web"
+    trace: "https://github.com/archestra-ai/archestra"
+  - id: E_OBJECAO_10_A2A_V1_PRODUCTION_TSC_8
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    source_tier: 6
+    source_kind: engineer
+    valid_from: "2026-07"
+    verified_at: "2026-11-14"
+    verified_against: "discuss.google.dev a2a-v1.0: 'open standard ... production ... technical committee of eight'; votação 3-0"
+    label: "A2A v1.0 é padrão aberto pronto para produção, com comitê técnico de 8 empresas sob a LF: reforça adotar/costurar; limite sobre a opção construir-protocolo."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Reforça adotar. Superação achada (C_SUPERACAO_20261114_ADOPT_A2A_V1). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://discuss.google.dev/t/what-s-new-in-a2a-v1-0-a-python-dx-glow-up-and-a-fresh-new-look/381896"
+      locator: "A2A v1.0 como padrão aberto pronto para produção, mantido sob a LF por comitê técnico de oito empresas"
+      method: "judges: votação 3-0 do run sobre leitura da discussão"
+      locality: "web"
+    trace: "https://discuss.google.dev/t/what-s-new-in-a2a-v1-0-a-python-dx-glow-up-and-a-fresh-new-look/381896"
+  - id: E_OBJECAO_11_AGENT_CARD_JWS_KEY_ROTATION_GAP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    source_tier: 6
+    source_kind: engineer
+    valid_from: "2026-07"
+    verified_at: "2026-11-14"
+    verified_against: "discuss.google.dev: Agent Card assinado/verificado por JWS RFC7515 + JCS RFC8785; não trata gestão/rotação/revogação de chaves; memória key-rotation-parked-by-order"
+    label: "A2A v1.0 assina/verifica Agent Card (JWS RFC7515 + JCS RFC8785), mas não trata ciclo de vida de chave: (a) identidade assinada já é nativa, não construir; (b) a única lacuna (rotação) é estreita demais E está PARADA POR ORDEM do maestro."
+    narrative: "LIMITE (survives, triage=limite, E2_PROVA_MENOS). Objeção dupla; não houve superação (a lacuna ampla do A2A não foi medida — a lf-roadmap-gap foi cortada por orçamento). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://discuss.google.dev/t/what-s-new-in-a2a-v1-0-a-python-dx-glow-up-and-a-fresh-new-look/381896"
+      locator: "Agent Card pode ser assinado e verificado (JWS RFC 7515 + canonização JSON RFC 8785); a página não trata de gestão, rotação ou revogação de chaves"
+      method: "judges: votação 3-0 do run sobre leitura da discussão; reading: memória key-rotation-parked-by-order"
+      locality: "web"
+    trace: "https://discuss.google.dev/t/what-s-new-in-a2a-v1-0-a-python-dx-glow-up-and-a-fresh-new-look/381896"
+  - id: E_OBJECAO_12_BAND_17M_SEED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    source_tier: 5
+    source_kind: analyst
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "unite.ai: 'US$17 million seed' (Sierra/Hetz/Team8); votação 3-0"
+    label: "BAND saiu do stealth com seed de US$17M (Sierra/Hetz/Team8): concorrente financiado na camada de coordenação; junto com Archestra, múltiplos financiados no espaço."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Espaço contestado; não houve superação (corpus não ancora BAND-empresa). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://www.unite.ai/band-raises-17m-seed-round-to-build-the-coordination-layer-for-ai-agents/"
+      locator: "'US$17 million seed' liderado/apoiado por Sierra Ventures, com Hetz Ventures e Team8"
+      method: "judges: votação 3-0 do run sobre leitura da matéria"
+      locality: "web"
+    trace: "https://www.unite.ai/band-raises-17m-seed-round-to-build-the-coordination-layer-for-ai-agents/"
+  - id: E_OBJECAO_13_BAND_COORDINATION_LAYER_ABOVE_FRAMEWORKS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    source_tier: 5
+    source_kind: analyst
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "unite.ai: 'discovery, context exchange and delegation'; votação 3-0"
+    label: "BAND é camada de interação/coordenação acima dos frameworks, cobrindo descoberta, troca de contexto e delegação: ocupa a camada que o backbone quer."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Não houve superação (self-host da BAND não provado, achado 16). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://www.unite.ai/band-raises-17m-seed-round-to-build-the-coordination-layer-for-ai-agents/"
+      locator: "camada de interação/coordenação acima dos frameworks: descoberta, troca de contexto e delegação"
+      method: "judges: votação 3-0 do run sobre leitura da matéria"
+      locality: "web"
+    trace: "https://www.unite.ai/band-raises-17m-seed-round-to-build-the-coordination-layer-for-ai-agents/"
+  - id: E_OBJECAO_14_BAND_SF_STARTUP_DIRECT_COMPETITOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    source_tier: 5
+    source_kind: analyst
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "itbrief.news: 'competes directly ... multi-agent coordination layer'; votação 3-0"
+    label: "BAND é startup financiada de SF competindo diretamente na coordenação multiagente: concorrência direta confirmada por 2ª fonte."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Não houve superação (vantagem do Onion não medida). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://itbrief.news/story/band-raises-usd-17-million-for-multi-agent-ai-layer"
+      locator: "'competes directly ... multi-agent coordination layer'; startup financiada de San Francisco"
+      method: "judges: votação 3-0 do run sobre leitura da matéria"
+      locality: "web"
+    trace: "https://itbrief.news/story/band-raises-usd-17-million-for-multi-agent-ai-layer"
+  - id: E_OBJECAO_15_BAND_AGENT_NEUTRAL_SERVES_CLAUDE_CODEX
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.5
+    source_tier: 5
+    source_kind: analyst
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "itbrief.news: 'coding agents such as Claude Code and Codex'; votação 3-0"
+    label: "BAND: agentes se descobrem, compartilham contexto, delegam entre frameworks/nuvens/orgs, INCLUINDO Claude Code e Codex: o posicionamento EXATO do backbone proposto já é produto vivo de startup financiada."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, E1_EVIDENCIA_CONTRARIA). Bloqueia a unicidade do posicionamento 'agente-neutro servindo Claude, Codex e outros'. Não houve superação (não medido lado a lado; achado 16 mostra que nem sabemos se BAND é fechado). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://itbrief.news/story/band-raises-usd-17-million-for-multi-agent-ai-layer"
+      locator: "agentes se descobrem, compartilham contexto, delegam entre frameworks/nuvens/orgs, incluindo 'coding agents such as Claude Code and Codex'"
+      method: "judges: votação 3-0 do run sobre leitura da matéria"
+      locality: "web"
+    trace: "https://itbrief.news/story/band-raises-usd-17-million-for-multi-agent-ai-layer"
+  - id: E_OBJECAO_16_BAND_CLOSED_SAAS_NO_EVIDENCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.5
+    source_tier: 5
+    source_kind: analyst
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "itbrief.news: sem modelo de negócio, preço ou clientes nomeados; kg-corpus-grep 'BAND SaaS fechado' = 0 nós; votação 3-0"
+    label: "A fonte NÃO sustenta que BAND seja SaaS fechado nem que adote/rejeite A2A/MCP: o fosso do corpus ('BAND vende coordenação mas SaaS FECHADO; nós abrimos self-host') assenta em claim sem evidência."
+    narrative: "BLOQUEIA (survives, triage=bloqueia, E2_PROVA_MENOS). Se BAND também abrir/self-host, o wedge inteiro evapora. Não houve superação: a fonte da própria rodada diz que não há esse dado; o fato que fundaria o wedge nunca foi medido. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "https://itbrief.news/story/band-raises-usd-17-million-for-multi-agent-ai-layer"
+      locator: "não traz modelo de negócio, preço, receita, suporte explícito a A2A/MCP nem clientes nomeados (só 'design partners')"
+      method: "judges: votação 3-0 do run sobre leitura da matéria; derived: kg-corpus-grep 'BAND SaaS fechado' = 0"
+      locality: "web"
+    trace: "https://itbrief.news/story/band-raises-usd-17-million-for-multi-agent-ai-layer"
+  - id: E_OBJECAO_17_BAND_AGNOSTIC_LAYER_DIRECT_COMPETITOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    source_tier: 4
+    source_kind: aggregator
+    verified_at: "2026-11-14"
+    verified_against: "letsdatascience: 'protocol and framework agnostic'; votação 3-0"
+    label: "BAND: camada de interação acima dos runtimes, agnóstica a protocolo e framework: confirma concorrente direto do backbone agente-neutro por 3ª fonte."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Não houve superação (mesma lacuna de F15/F16). Objeção do Elenxo, confidence ≤0.6; tier 4 (agregador)."
+    provenance:
+      source: "https://letsdatascience.com/news/band-launches-interaction-layer-raises-17m-seed-1842660e"
+      locator: "camada de interação acima dos runtimes de agentes, 'protocol and framework agnostic'"
+      method: "judges: votação 3-0 do run sobre leitura do agregador"
+      locality: "web"
+    trace: "https://letsdatascience.com/news/band-launches-interaction-layer-raises-17m-seed-1842660e"
+  # ═══ DESCARTES QUE SOBREVIVEM (comodismo): objeções OPEN, confidence ≤0.6, CONSTRAINS ═══
+  - id: E_OBJECAO_18_SOC2_COST_12K_100K_SERVICE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "O custo de operar o modo SERVIÇO com SOC2 (US$12k-100k+ de auditoria) é objeção real cortada em vez de medida: as primárias getagency SOC2 2026 e synadia/jepsen NATS ficaram NÃO LIDAS."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Marcada refutada como número de vendor, mas o custo do serviço não foi medido. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_18_SOC2_COST_12K_100K_SERVICE"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch blog.getagency.com/.../soc-2-compliance-cost-2026 e synadia.com/blog/jepsen-nats-2-12-1 (ambas 'fonte não lida')"
+  - id: E_OBJECAO_19_SOC2_FIRST_YEAR_25K_200K
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "O custo de primeiro ano de SOC2 (US$25k-200k+) e manutenção (US$15-40k/ano) pesa no modo SERVIÇO e foi descartado por ser número de vendor, não por medir a conta do serviço."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). A distinção produto (SOC2 do adotante) vs serviço (SOC2 do Onion) não foi pesada. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_19_SOC2_FIRST_YEAR_25K_200K"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch blog.getagency.com SOC2 2026 (fonte não lida); separar conta produto vs serviço"
+  - id: E_OBJECAO_20_HN_A2A_NOT_IN_PRODUCTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "'A2A não chegou a produção' (HN) é sinal de ADOÇÃO REAL que pesa contra um produto A2A-cêntrico e só foi descartado por tier: as primárias de maturidade (api7, microsoft, tyk, techstrong) ficaram NÃO LIDAS."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Adoção real não foi medida. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_20_HN_A2A_NOT_IN_PRODUCTION"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch api7.ai/blog/a2a-protocol-gateway-layer e devblogs.microsoft agent-framework (fonte não lida)"
+  - id: E_OBJECAO_21_MARKET_BUILDS_MCP_NOT_A2A
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "'O incentivo de mercado é construir MCP servers, não agentes A2A' fura a tese de um backbone A2A como produto: se o mercado constrói MCP e não A2A, o produto A2A-cêntrico nasce sem comprador."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E3_DESCARTE_SEM_MEDIDA). Cortado por tier sem medir a direção real. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_21_MARKET_BUILDS_MCP_NOT_A2A"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch mintmcp.com/blog/agent-management-platforms-compared (fonte não lida) para medir proliferação MCP vs A2A"
+  - id: E_OBJECAO_22_100_COS_SUPPORT_A2A
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "100+ empresas apoiam A2A (AWS, Cisco, MS, Salesforce, SAP, ServiceNow na massa crítica do padrão aberto): reforça adotar sobre construir protocolo; cortada por orçamento sem refutação."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Deveria ter sido somada aos achados 3-6. Superação achada (C_SUPERACAO_20261114_ADOPT_A2A_CRITICAL_MASS). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_22_100_COS_SUPPORT_A2A"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run (lista do prompt); cruzar com achados 3-6"
+  - id: E_OBJECAO_23_SIGNED_AGENT_CARDS_NATIVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Identidade assinada (Signed Agent Cards) é nativa do A2A, logo não se constrói identidade; mas o texto não traz auditoria/cert (SOC2/ISO/LGPD), a prova exigida de quem vende como SERVIÇO."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Cortada sem refutação. Superação achada (C_SUPERACAO_20261114_ADOPT_SIGNED_AGENT_CARDS). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_23_SIGNED_AGENT_CARDS_NATIVE"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run; medir a prova de compliance exigida do modo serviço"
+  - id: E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Interop A2A x MCP já demonstrada (ADK/LangGraph/AG2/CrewAI): a interoperabilidade é commons resolvido, aparando o que resta construir."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Cortada sem refutação; deveria ter integrado a decisão adotar. Superação achada (C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run (lista do prompt)"
+  - id: E_OBJECAO_25_IDC_85_USE_AGENTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "85% já usam agentes (80% de terceiros / 48% internos): sinal de demanda-base por coordenação de agentes HETEROGÊNEOS (pro-tese); cortar por orçamento um sinal que sustenta a tese é comodismo."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Mede uso de agentes, não compra de backbone; a ponte para demanda PAGA não foi medida. CONSTRAINS a decisão (limita a evidência de demanda). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_25_IDC_85_USE_AGENTS"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run; cruzar com achado 7"
+  - id: E_OBJECAO_26_SECURITY_PRIVACY_SOVEREIGNTY_DRIVER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Segurança/privacidade é o PILAR de demanda da tese self-host (61% citam risco de compliance), e foi cortado por orçamento: sem ele, 'produto+serviço' se decide no escuro."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E3_DESCARTE_SEM_MEDIDA). Cortar o pilar pro-tese deixa a decisão sem a evidência que mais a sustentaria OU refutaria; faltou medir se o driver vira COMPRA. CONSTRAINS a decisão. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_26_SECURITY_PRIVACY_SOVEREIGNTY_DRIVER"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run; WebFetch arthur.ai e kiteworks (fontes não lidas)"
+  - id: E_OBJECAO_27_COHERE_SPONSORED_STUDY_CAVEAT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.4
+    label: "O estudo IDC é encomendado pela Cohere e não avalia construir-ou-não nem cita A2A/BAND: a ressalva correta que reforça o achado 7 (demanda indireta, não paga)."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). As primárias de demanda paga independente não foram lidas. CONSTRAINS a decisão. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_27_COHERE_SPONSORED_STUDY_CAVEAT"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run; caveat que limita o valor das evidências de demanda"
+  - id: E_OBJECAO_28_SOC2_TYPE2_6_12_MONTHS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.45
+    label: "SOC2 Type 2 exige 3-12 meses de observação: um serviço vendável a cliente regulado NÃO existe antes de meses; o alvo promete 'serviço' sem contar o cold-start de conformidade."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E3_DESCARTE_SEM_MEDIDA). Type 1 (1-3 meses) não basta para regulado; nenhum caminho alternativo foi medido. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_28_SOC2_TYPE2_6_12_MONTHS"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch getagency SOC2 2026 (fonte não lida) para a janela de observação Type 2"
+  - id: E_OBJECAO_29_SOC2_HIDDEN_COSTS_PRODUCT_VS_SERVICE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.45
+    label: "O modo PRODUTO self-host deixa o SOC2 com o adotante; o modo SERVIÇO o carrega (mais pentest US$5-15k, tooling US$5-50k, consultoria). A distinção MUDA a escolha e foi cortada sem pesar."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Custos ocultos só nomeados, não medidos. CONSTRAINS a opção A (produto é mais barato de operar). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_29_SOC2_HIDDEN_COSTS_PRODUCT_VS_SERVICE"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run; separar a conta produto vs serviço"
+  - id: E_OBJECAO_30_LF_ROADMAP_GOVERNANCE_GAP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.45
+    label: "O roadmap da LF aponta lacunas em registro, testes/ferramentas e segurança/deploy — EXATAMENTE o espaço de uma camada de governança sobre o padrão; evidência pro-tese cortada por orçamento."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E4_LACUNA_ABERTA). Sem medir essa lacuna, 'construir governança' fica sem base; pode ser o espaço ou pode ser preenchido pela própria LF. CONSTRAINS a opção B. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_30_LF_ROADMAP_GOVERNANCE_GAP"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "nenhuma claim ancorada fecha 'onde o A2A deixa espaço de governança'; WebFetch api7.ai gateway-layer (não lida)"
+  - id: E_OBJECAO_31_BAND_GOVERNANCE_RUNTIME_MODEL_UNKNOWN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "A página não diz se BAND é SaaS/self-host/OSS nem se suporta A2A/MCP ou tem certs: cortar deixa o wedge 'aberto vs fechado' sem a medida do concorrente (reforça achado 16)."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). CONSTRAINS a opção A. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_31_BAND_GOVERNANCE_RUNTIME_MODEL_UNKNOWN"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run; medir o modelo/stack da BAND"
+  - id: E_OBJECAO_32_COORDINATION_CATEGORY_UNDEFINED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "A camada de coordenação ainda NÃO é categoria definida e é incerto se virará padrão: corta nos dois sentidos — sem incumbente entrincheirado, mas também sem demanda provada."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Limite de maturidade de categoria. CONSTRAINS a decisão. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_32_COORDINATION_CATEGORY_UNDEFINED"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "claim sem refutação no run"
+  - id: E_OBJECAO_33_CC_20_TO_100K_MESSAGES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "CC 2.1.323 elevou de ~20 para 100.000 as mensagens inter-sessão sem prompt, expandindo a coordenação Claude<->Claude nativa e erodindo uma fatia do valor do backbone para o caso intra-Claude."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). O aumento é intra-Claude; cross-vendor segue descoberto, mas o tamanho da fatia erodida não foi medido. CONSTRAINS a opção A. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_33_CC_20_TO_100K_MESSAGES"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "citar changelog 2.1.323; medir a fatia intra-Claude erodida vs a fatia cross-vendor restante"
+  - id: E_OBJECAO_34_CC_MCP_TASKS_CHURN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "A superfície MCP do cliente muda rápido (2.1.319 adiciona MCP tasks; 2.1.323 remove cliente MCP v1): alvo móvel para um backbone acoplado a MCP."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). O impacto do churn no backbone não foi avaliado. CONSTRAINS a opção A. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_34_CC_MCP_TASKS_CHURN"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "citar changelog 2.1.319/2.1.323; medir o custo de churn MCP no backbone"
+  - id: E_OBJECAO_35_UNREAD_API7_A2A_GATEWAY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (api7.ai/blog/a2a-protocol-gateway-layer) sobre lacunas/maturidade do A2A: justamente o que decide se há espaço para governança sobre o padrão."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a opção B (lacuna de governança não medida). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_35_UNREAD_API7_A2A_GATEWAY"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://api7.ai/blog/a2a-protocol-gateway-layer"
+  - id: E_OBJECAO_36_UNREAD_MICROSOFT_AGENT_FRAMEWORK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (devblogs.microsoft.com agent-framework) sobre maturidade/lacunas do A2A 1.0 pela ótica do fornecedor concorrente de framework."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a opção B. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_36_UNREAD_MICROSOFT_AGENT_FRAMEWORK"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://devblogs.microsoft.com/agent-framework/?p=5367"
+  - id: E_OBJECAO_37_UNREAD_TYK_A2A_ARCHITECTURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (tyk.io a2a-protocol-architecture-and-technical-specification) sobre a especificação e arquitetura do A2A."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a opção B (arquitetura e limites técnicos do A2A não medidos). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_37_UNREAD_TYK_A2A_ARCHITECTURE"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://tyk.io/learning-center/a2a-protocol-architecture-and-technical-specification/"
+  - id: E_OBJECAO_38_UNREAD_TECHSTRONG_A2A
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (techstrong.ai) sobre maturidade/lacunas do A2A 1.0: sinal de analista não medido."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a opção B. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_38_UNREAD_TECHSTRONG_A2A"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://techstrong.ai/?p=64806"
+  - id: E_OBJECAO_39_UNREAD_ARTHUR_GOVERN_MULTI_AGENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Fonte-chave NÃO LIDA (arthur.ai how-enterprises-govern-multi-agent-ai-systems): a prova de demanda paga por governança/self-host, a lacuna que a tarefa nomeia; decidir sem ela é decidir no escuro."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E4_LACUNA_ABERTA). CONSTRAINS a decisão. kg-corpus-grep 'demanda paga self-host' = 0. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_39_UNREAD_ARTHUR_GOVERN_MULTI_AGENT"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://www.arthur.ai/column/how-enterprises-govern-multi-agent-ai-systems; grep corpus 'demanda paga self-host' = 0"
+  - id: E_OBJECAO_40_UNREAD_MINTMCP_PLATFORMS_COMPARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Fonte NÃO LIDA (mintmcp.com agent-management-platforms-compared): comparativo de plataformas onde Archestra e concorrentes apareceriam; decidir o fosso sem ler é o mesmo cegamento dos achados 8/9."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E4_LACUNA_ABERTA). CONSTRAINS a decisão. corpus 0 nós sobre Archestra. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_40_UNREAD_MINTMCP_PLATFORMS_COMPARED"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://www.mintmcp.com/blog/agent-management-platforms-compared; grep corpus 'Archestra' = 0"
+  - id: E_OBJECAO_41_UNREAD_CIO_GOVERNANCE_MODEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (cio.com why-cios-should-choose-ai-governance-model-before-agents): sinal de decisor sobre governança antes do deploy de agentes."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a decisão (demanda de decisores não medida). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_41_UNREAD_CIO_GOVERNANCE_MODEL"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://www.cio.com/article/4208878/ (fonte não lida)"
+  - id: E_OBJECAO_42_UNREAD_KITEWORKS_SOVEREIGN_GOVERNANCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (kiteworks sovereign-ai-governance-problem): demanda por governança de IA soberana, pilar da tese self-host."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a decisão. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_42_UNREAD_KITEWORKS_SOVEREIGN_GOVERNANCE"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://www.kiteworks.com/cybersecurity-risk-management/sovereign-ai-governance-problem/"
+  - id: E_OBJECAO_43_UNREAD_SYNADIA_JEPSEN_NATS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Fonte NÃO LIDA (synadia jepsen-nats-2.12.1): análise Jepsen do NATS JetStream, o transporte escolhido do backbone; operar como SERVIÇO sobre NATS sem ler é assumir modo-de-falha não medido."
+    narrative: "SOBREVIVE/BLOQUEIA (discarded-by-comodismo, triage=bloqueia, E4_LACUNA_ABERTA). CONSTRAINS a opção A (transporte do modo serviço). Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_43_UNREAD_SYNADIA_JEPSEN_NATS"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://synadia.com/blog/jepsen-nats-2-12-1"
+  - id: E_OBJECAO_44_UNREAD_GETAGENCY_SOC2_COST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "Fonte NÃO LIDA (getagency soc-2-compliance-cost-2026): custo real do SOC2, a conta do modo SERVIÇO."
+    narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E4_LACUNA_ABERTA). CONSTRAINS a opção A. Objeção do Elenxo, confidence ≤0.6."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "triagem do Elenxo (descarte-que-sobrevive por comodismo), nó E_OBJECAO_44_UNREAD_GETAGENCY_SOC2_COST"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente, fonte não medida nesta rodada)"
+    trace: "WebFetch https://blog.getagency.com/articles/how-much-does-soc-2-compliance-cost-2026"
+  # ═══ MERCADO ═══
+  - id: E_MERCADO_A2A_BACKBONE_2026_11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    source_tier: 6
+    source_kind: analyst
+    valid_from: "2026-04"
+    verified_at: "2026-11-14"
+    verified_against: "síntese de mercado do run: BAND US$17M (unite.ai/itbrief), Archestra US$13,5M+3 Fortune-50 (github), A2A 50+→150+ orgs sob LF (linuxfoundation), IDC 13%/12% (cohere)"
+    label: "Capital já está AMBOS na coordenação (BAND, US$17M) e no backbone open-core self-hostable (Archestra, US$13,5M + 3 Fortune-50); o protocolo (A2A) é padrão aberto da LF com 150+ orgs. Nenhuma das três frentes é espaço vazio."
+    narrative: "Eixo mercado/capital (sinais ENCONTRADOS e fortes). CAPITAL: BAND seed US$17M (Sierra/Hetz/Team8), SF, mira coordenação multiagente agente-neutra incl. Claude Code e Codex; Archestra US$13,5M e 3 deployments Fortune-50 em open-core (AGPL + Enterprise) — o espaço-alvo já tem concorrente financiado NÃO-SaaS-fechado. ECOSSISTEMA/PADRÃO: A2A sob LF passou de 50+ (abr/2025) a 150+ (abr/2026), uso enterprise em produção, landing em nuvens — a camada de protocolo comoditiza. ANALISTA (IDC): demanda por soberania existe mas imatura (13%/12%), ciclo de compra longo. Sem M&A específico nesta rodada."
+    provenance:
+      source: "https://www.unite.ai/band-raises-17m-seed-round-to-build-the-coordination-layer-for-ai-agents/; https://github.com/archestra-ai/archestra; https://linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "seção Mercado do sintetizador do run de 2026-11-14 (capital, ecossistema/padrão, analista)"
+      method: "derived: síntese do eixo mercado/capital a partir das evidências ancoradas do run"
+      locality: "web"
+    trace: "síntese de mercado do run /onion-research de 2026-11-14"
+  # ═══ LACUNAS (contabilidade) ═══
+  - id: E_LACUNAS_A2A_BACKBONE_2026_11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Contabilidade da rodada: 44 objeções do Elenxo SOBREVIVENTES, TODAS 44 modeladas como E_OBJECAO_ (0 não modeladas). 8 claims refutadas por fonte fraca; 0 não verificadas; fontes/claims cortadas por orçamento nomeadas nos E_OBJECAO_35..44."
+    narrative: |-
+      SOBREVIVENTES: 44 (17 achados confirmados findings 1-17 = E_OBJECAO_01..17; 27 descartes-que-sobrevivem
+      por comodismo = E_OBJECAO_18..44). MODELADAS: 44. NÃO MODELADAS: 0 — nenhuma objeção sobrevivente
+      ficou sem nó (ao contrário do 1º dogfood de 2026-09-13, que dizia '3 reabertos' com 40 vivos).
+
+      REFUTADAS por fonte fraca / descarte legítimo por evidência (survives=false, NÃO viram E_OBJECAO):
+      6 descartes-por-evidência (a2a-integracao-hyperscalers-comoditiza tier 8; neutralidade-vem-do-protocolo
+      tier 8; idc-5-vetores-soberania tier 6; band-integra-frameworks-mesmo-territorio tier 4;
+      signed-agent-cards-release-nao-cita-jws; coordenacao-e-o-gargalo-promocional) + as 8 claims da lista
+      "não verificadas/refutadas" do run (hyperscalers comoditiza; neutralidade dispensa backbone; IDC 5
+      vetores; SOC2 US$12k-20k/30k-100k; SOC2 1º ano US$25k-200k; BAND integra frameworks; HN A2A não em
+      produção; mercado constrói MCP não A2A). 5 delas tiveram SUPERAÇÃO achada (formulação corrigida) e
+      viram C_SUPERACAO_* registradas aqui.
+
+      NÃO VERIFICADAS: 0 (a rodada não deixou claim em limbo de verificação).
+
+      CORTADAS POR ORÇAMENTO / FONTES NÃO LIDAS (nomeadas): api7.ai (E_OBJECAO_35), devblogs.microsoft
+      (36), tyk.io (37), techstrong.ai (38), arthur.ai (39), mintmcp.com (40), cio.com (41), kiteworks (42),
+      synadia/jepsen-NATS (43), getagency SOC2 (44). Essas 10 primárias decidem a maioria das objeções que
+      BLOQUEIAM (demanda paga, mapa de concorrentes, maturidade A2A, risco do transporte, custo do serviço).
+
+      Escala declarada pela tarefa: 42 fontes, 40 claims na rodada.
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-14"
+      locator: "contabilidade de objeções, refutadas, não verificadas e cortes do run"
+      method: "derived: contagem das objeções e descartes do run"
+    trace: "run /onion-research modo decision de 2026-11-14; contabilidade de objeções, refutadas, não verificadas e cortes"
+  # ═══ SUPERAÇÕES (SAC-151): 12 nós C_SUPERACAO, TRACES_TO o nó que registra a reprovação ═══
+  - id: C_SUPERACAO_20261114_ADOPT_A2A_NOT_COMMODITIZE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A2A TEM integração profunda e verificada em Google/MS/AWS e é camada líder de orquestração agente-a-agente — mas SEM 'padrão default de nuvem' e SEM 'comoditiza o protocolo de coordenação' (ausentes/contradidos na fonte)."
+    narrative: "Supera a claim refutada 'A2A tem integração profunda ... comoditiza o protocolo'. Medida: WebFetch devolveu a frase de deep integration verbatim e confirmou ausência de 'commoditize'; WebSearch corroborou com estudo empírico (arxiv 2603.22823) e roundups que tratam A2A/MCP como complementares. Critério V5_MARKETING: domínio linuxfoundation.org = promotor do A2A; 'default standard' é autocaracterização da LF; grep -i 'commoditize' = 0. Alvo reprovado: a claim refutada registrada no E_LACUNAS. Afirmação de UM juiz."
+    trace: "V5_MARKETING: domínio linuxfoundation.org = steward/promotora do A2A; WebFetch = press release (dateline 2026-04-09); grep -i 'commoditize' no texto = 0"
+  - id: C_SUPERACAO_20261114_GOVERNANCE_ABOVE_PROTOCOL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O protocolo A2A entrega neutralidade NO FIO (transporte, complementar ao MCP), mas orquestração, governança, registry/roteamento e auditoria são LACUNA documentada ACIMA do protocolo — a camada que um backbone governado preencheria."
+    narrative: "Supera a claim refutada 'a neutralidade já vem do protocolo e não precisa de backbone'. Medida: (1) análise de lacunas (arXiv) classifica A2A v1.0.1 Absent em audit/replay, human-escalation, voting/dissent e Partial em membership; (2) guia da própria BAND diz que produção 'still needs an orchestration layer above it'; (3) WebFetch confirma que a página não trata de camadas de governança. Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado: registrado no E_LACUNAS. Afirmação de UM juiz."
+    trace: "V1_QUOTE_NAO_SUSTENTA: WebFetch linuxfoundation.org press + grep 'não precisa de backbone proprietário' = ausente; a página só diz 'without being locked into a single vendor's ecosystem'"
+  - id: C_SUPERACAO_20261114_SOVEREIGNTY_DEMAND_INDEPENDENT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A DEMANDA por evitar lock-in e por portabilidade/auditabilidade é real e documentada por fontes INDEPENDENTES do vendor (ISG, InformationWeek: >2/3 citam data leakage/privacy, >1/2 citam risco de compliance)."
+    narrative: "Supera a claim refutada dos 'cinco vetores IDC' (fonte patrocinada pela Cohere). Medida: WebSearch (2026-11-14) retornou ISG 'Technical sovereignty in the age of AI' e InformationWeek como fontes independentes corroborando lock-in/portabilidade e drivers regulatórios; o WebFetch do PDF só devolveu stream comprimido, então a taxonomia exata ficou pela cobertura (que NÃO reproduz os 'cinco vetores' nomeados). Critério V5_MARKETING: domínio go.cohere.com = fornecedor. Alvo reprovado: registrado no E_LACUNAS. Afirmação de UM juiz."
+    trace: "V5_MARKETING: go.cohere.com = domínio do fornecedor Cohere; WebSearch confirma estudo patrocinado e que a Cohere comercializa IA soberana/self-hostable"
+  - id: C_SUPERACAO_20261114_A2A_PRODUCTION_CONTESTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A adoção de A2A em produção é CONTESTADA, não ausente: a LF reporta deployments em produção em múltiplas indústrias e 150+ orgs; a cautela real é que os números são AUTO-REPORTADOS no press release do projeto, não que A2A inexista em produção."
+    narrative: "Supera a claim refutada 'A2A não chegou ao produto final' (HN, tier 3). Medida: WebFetch da thread HN confirmou a citação como anedota de um único autor; WebSearch retornou a primária da LF (2026-04-09) e secundárias repetindo 'active production deployments across multiple industries' + 150 orgs + integração Google/MS/AWS, com a ressalva de que as cifras são do press release e os clientes não foram verificados independentemente. Critério V2_CONTRADITA. Alvo reprovado: registrado no E_LACUNAS. Afirmação de UM juiz."
+    trace: "V2_CONTRADITA: WebFetch linuxfoundation.org press + grep -iF 'production' = 'active production deployments across multiple industries', contradizendo 'A2A não chegou ao produto final'"
+  - id: C_SUPERACAO_20261114_A2A_BACKBONE_CATEGORY_DISTINCT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O incentivo de construir MCP servers supera o de agentes A2A individuais — mas isso NÃO enfraquece a tese de um backbone de coordenação/governança A2A, categoria distinta com demanda MEDIDA (A2A em produção sob LF, 150+ orgs; BAND financiado vende coordenação)."
+    narrative: "Supera a claim refutada 'o mercado constrói MCP, não A2A, o que enfraquece a tese de backbone A2A'. Medida: WebSearch 'MCP vs A2A adoption 2026' retornou Arcade.dev/analistas confirmando A2A production-grade 150+ orgs e framing complementar camada-a-camada; a tarefa nomeia BAND (financiado) vendendo coordenação/governança. Critério V2_CONTRADITA. Alvo reprovado: registrado no E_LACUNAS. Afirmação de UM juiz."
+    trace: "V2_CONTRADITA: WebFetch arcade.dev/blog/a2a-vs-mcp-layering-decision posiciona A2A como camada de coordenação complementar ao MCP; cruzar com A2A 150+ orgs LF e BAND financiado"
+  - id: C_SUPERACAO_20261114_ADOPT_A2A_PROTOCOL_LAYER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Adotar A2A 1.0 como camada de protocolo e costurar por cima, em vez de inventar protocolo."
+    narrative: "Supera o alvo achado3 (E_OBJECAO_03). Medida: A2A 1.0 medido estável/produção por fonte tier 8 (3-0) e 150+ orgs; a opção adotar entrega a camada de protocolo sem construí-la. Critério E1_EVIDENCIA_CONTRARIA. Afirmação de UM juiz."
+    trace: "E1_EVIDENCIA_CONTRARIA: citar opensource.googleblog 2026-04 'first stable, production-ready version'"
+  - id: C_SUPERACAO_20261114_ADOPT_A2A_COMMONS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Adotar A2A como protocolo commons (150+ orgs)."
+    narrative: "Supera o alvo achado5 (E_OBJECAO_05). Medida: 150+ orgs medido tier 8; a adoção entrega o protocolo como commons. Critério E1_EVIDENCIA_CONTRARIA. Afirmação de UM juiz."
+    trace: "E1_EVIDENCIA_CONTRARIA: citar linuxfoundation.org press 'surpasses 150 organizations'"
+  - id: C_SUPERACAO_20261114_BUILD_ONLY_GOVERNANCE_LAYER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Construir só a camada acima do protocolo (governança/grafo), sem reivindicar o protocolo."
+    narrative: "Supera o alvo achado6 (E_OBJECAO_06). Medida: a doação do A2A à LF é medida (tier 7); a opção costurar por cima entrega sem reivindicar o protocolo. Critério E1_EVIDENCIA_CONTRARIA. Afirmação de UM juiz."
+    trace: "E1_EVIDENCIA_CONTRARIA: citar developers.googleblog donates-a2a 'vendor-neutral and community-driven governance'"
+  - id: C_SUPERACAO_20261114_ADOPT_A2A_V1
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: "Adotar A2A 1.0 (padrão aberto pronto para produção, comitê técnico de 8 empresas)."
+    narrative: "Supera o alvo achado10 (E_OBJECAO_10). Medida: estabilidade medida tier 6 3-0. Critério E1_EVIDENCIA_CONTRARIA. Afirmação de UM juiz."
+    trace: "E1_EVIDENCIA_CONTRARIA: citar discuss.google.dev a2a-v1.0 'open standard ... production ... technical committee of eight'"
+  - id: C_SUPERACAO_20261114_ADOPT_A2A_CRITICAL_MASS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Adotar A2A (massa crítica medida: 100+ e 150+ orgs apoiadoras)."
+    narrative: "Supera o alvo descartado-100-cos-apoiam-a2a (E_OBJECAO_22). Medida: 100+ e 150+ orgs medidos tier 8; a opção adotar entrega o commons que o objeto apontava. Critério E3_DESCARTE_SEM_MEDIDA. Afirmação de UM juiz."
+    trace: "E3_DESCARTE_SEM_MEDIDA: a claim não tem refutação no run; cruzar com achados 3-6"
+  - id: C_SUPERACAO_20261114_ADOPT_SIGNED_AGENT_CARDS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Adotar Signed Agent Cards do A2A para identidade (nativo no padrão v1.0)."
+    narrative: "Supera o alvo descartado-signed-agent-cards-nativo (E_OBJECAO_23). Medida: nativo no padrão v1.0 (achado 11, medido); a identidade é entregue pelo padrão, não construída. Critério E3_DESCARTE_SEM_MEDIDA. Afirmação de UM juiz."
+    trace: "E3_DESCARTE_SEM_MEDIDA: claim sem refutação no run; medir a prova de compliance exigida do modo serviço"
+  - id: C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Adotar A2A+MCP complementares (interop demonstrada: ADK/LangGraph/AG2/CrewAI)."
+    narrative: "Supera o alvo descartado-a2a-complementar-mcp-interop (E_OBJECAO_24). Medida: interop demonstrada citada na própria claim. Critério E3_DESCARTE_SEM_MEDIDA. Afirmação de UM juiz."
+    trace: "E3_DESCARTE_SEM_MEDIDA: claim sem refutação no run (lista do prompt)"
+edges:
+  # SUPPORTS: achados confirmados 1-17 + mercado -> question
+  - from: E_OBJECAO_01_CC_TEAMMATES_NATIVE_COORD
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_02_CHANGELOG_SILENT_ON_A2A
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_03_A2A_V1_STABLE_ADOPT_NOT_INVENT
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_04_A2A_LF_NEUTRAL_NOT_A_DIFFERENTIAL
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_05_A2A_150_ORGS
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_06_A2A_DONATED_LF_NOT_PROPRIETARY
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_07_SOVEREIGNTY_IMMATURE_SLOW_BUY
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_08_ARCHESTRA_OPEN_CORE_SAME_POSITION
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_09_ARCHESTRA_FUNDED_DEPLOYED_CONTRADICTS_MOAT
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_10_A2A_V1_PRODUCTION_TSC_8
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_11_AGENT_CARD_JWS_KEY_ROTATION_GAP
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_12_BAND_17M_SEED
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_13_BAND_COORDINATION_LAYER_ABOVE_FRAMEWORKS
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_14_BAND_SF_STARTUP_DIRECT_COMPETITOR
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_15_BAND_AGENT_NEUTRAL_SERVES_CLAUDE_CODEX
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_16_BAND_CLOSED_SAAS_NO_EVIDENCE
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_17_BAND_AGNOSTIC_LAYER_DIRECT_COMPETITOR
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  - from: E_MERCADO_A2A_BACKBONE_2026_11
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: SUPPORTS
+  # Opções -> decisão; decisão -> pergunta
+  - from: C_OPCAO_BUILD_PRODUCT_SERVICE
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_INTERNAL_ONLY
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_ADOPT_STITCH
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_DO_NOTHING
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: TRACES_TO
+  - from: D_A2A_BACKBONE_PRODUCT_2026_11
+    to: Q_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: TRACES_TO
+  # CONSTRAINS: 44 objeções -> opção/decisão que limitam
+  - from: E_OBJECAO_01_CC_TEAMMATES_NATIVE_COORD
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_CHANGELOG_SILENT_ON_A2A
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_A2A_V1_STABLE_ADOPT_NOT_INVENT
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_A2A_LF_NEUTRAL_NOT_A_DIFFERENTIAL
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_A2A_150_ORGS
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_A2A_DONATED_LF_NOT_PROPRIETARY
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_SOVEREIGNTY_IMMATURE_SLOW_BUY
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_ARCHESTRA_OPEN_CORE_SAME_POSITION
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_09_ARCHESTRA_FUNDED_DEPLOYED_CONTRADICTS_MOAT
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_A2A_V1_PRODUCTION_TSC_8
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_AGENT_CARD_JWS_KEY_ROTATION_GAP
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_BAND_17M_SEED
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_BAND_COORDINATION_LAYER_ABOVE_FRAMEWORKS
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_14_BAND_SF_STARTUP_DIRECT_COMPETITOR
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_BAND_AGENT_NEUTRAL_SERVES_CLAUDE_CODEX
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_BAND_CLOSED_SAAS_NO_EVIDENCE
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_17_BAND_AGNOSTIC_LAYER_DIRECT_COMPETITOR
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_18_SOC2_COST_12K_100K_SERVICE
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_19_SOC2_FIRST_YEAR_25K_200K
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_20_HN_A2A_NOT_IN_PRODUCTION
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_21_MARKET_BUILDS_MCP_NOT_A2A
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_22_100_COS_SUPPORT_A2A
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_23_SIGNED_AGENT_CARDS_NATIVE
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_IDC_85_USE_AGENTS
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_26_SECURITY_PRIVACY_SOVEREIGNTY_DRIVER
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_27_COHERE_SPONSORED_STUDY_CAVEAT
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_28_SOC2_TYPE2_6_12_MONTHS
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_29_SOC2_HIDDEN_COSTS_PRODUCT_VS_SERVICE
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_30_LF_ROADMAP_GOVERNANCE_GAP
+    to: C_OPCAO_INTERNAL_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_BAND_GOVERNANCE_RUNTIME_MODEL_UNKNOWN
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_32_COORDINATION_CATEGORY_UNDEFINED
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_33_CC_20_TO_100K_MESSAGES
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_34_CC_MCP_TASKS_CHURN
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_35_UNREAD_API7_A2A_GATEWAY
+    to: C_OPCAO_INTERNAL_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_36_UNREAD_MICROSOFT_AGENT_FRAMEWORK
+    to: C_OPCAO_INTERNAL_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_37_UNREAD_TYK_A2A_ARCHITECTURE
+    to: C_OPCAO_INTERNAL_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_38_UNREAD_TECHSTRONG_A2A
+    to: C_OPCAO_INTERNAL_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_39_UNREAD_ARTHUR_GOVERN_MULTI_AGENT
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_40_UNREAD_MINTMCP_PLATFORMS_COMPARED
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_41_UNREAD_CIO_GOVERNANCE_MODEL
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_42_UNREAD_KITEWORKS_SOVEREIGN_GOVERNANCE
+    to: D_A2A_BACKBONE_PRODUCT_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_43_UNREAD_SYNADIA_JEPSEN_NATS
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_44_UNREAD_GETAGENCY_SOC2_COST
+    to: C_OPCAO_BUILD_PRODUCT_SERVICE
+    edge_type: CONSTRAINS
+  # TRACES_TO: superações -> nó que registra a reprovação
+  - from: C_SUPERACAO_20261114_ADOPT_A2A_NOT_COMMODITIZE
+    to: E_LACUNAS_A2A_BACKBONE_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_GOVERNANCE_ABOVE_PROTOCOL
+    to: E_LACUNAS_A2A_BACKBONE_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_SOVEREIGNTY_DEMAND_INDEPENDENT
+    to: E_LACUNAS_A2A_BACKBONE_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_A2A_PRODUCTION_CONTESTED
+    to: E_LACUNAS_A2A_BACKBONE_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_A2A_BACKBONE_CATEGORY_DISTINCT
+    to: E_LACUNAS_A2A_BACKBONE_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_ADOPT_A2A_PROTOCOL_LAYER
+    to: E_OBJECAO_03_A2A_V1_STABLE_ADOPT_NOT_INVENT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_ADOPT_A2A_COMMONS
+    to: E_OBJECAO_05_A2A_150_ORGS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_BUILD_ONLY_GOVERNANCE_LAYER
+    to: E_OBJECAO_06_A2A_DONATED_LF_NOT_PROPRIETARY
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_ADOPT_A2A_V1
+    to: E_OBJECAO_10_A2A_V1_PRODUCTION_TSC_8
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_ADOPT_A2A_CRITICAL_MASS
+    to: E_OBJECAO_22_100_COS_SUPPORT_A2A
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_ADOPT_SIGNED_AGENT_CARDS
+    to: E_OBJECAO_23_SIGNED_AGENT_CARDS_NATIVE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY
+    to: E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP
+    edge_type: TRACES_TO
