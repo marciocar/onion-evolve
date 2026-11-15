@@ -5,14 +5,17 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-## agent-requester-privilege-2026-11 — 17 item(ns)
+**1136 itens abertos** em 170 grafo(s) com aberto (de 228 no escopo) · 164 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+
+## agent-requester-privilege-2026-11 — 19 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 207.0 | `Q_AGENT_REQUESTER_PRIVILEGE_1113` | agent-requester-privilege-2026-11 | Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próp |
-| 60.0 | `C_ELENXO_RECOMMENDATION_1113` | agent-requester-privilege-2026-11 | Recomendação do Elenxo: delegação (sub=solicitante, act=agente), nunca impersonation; autorização a jusante; aprovação hum |
-| 22.0 | `C_LESSER_OF_AGENT_AND_REQUESTER_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: privilégio efetivo = menor entre agente e solicitante é o padrão de 2026. Sustentada como prática de me |
-| 15.6 | `C_AUDIT_KIT_NORMATIVE_BASIS_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: aprovação por papel e o kit de auditoria (política, inventário de contas, matriz de papéis, log por at |
+| 283.5 | `Q_AGENT_REQUESTER_PRIVILEGE_1113` | agent-requester-privilege-2026-11 | Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próp |
+| 72.0 | `C_ELENXO_RECOMMENDATION_1113` | agent-requester-privilege-2026-11 | Recomendação do Elenxo: delegação (sub=solicitante, act=agente), nunca impersonation; autorização a jusante; aprovação hum |
+| 24.0 | `C_LESSER_OF_AGENT_AND_REQUESTER_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: privilégio efetivo = menor entre agente e solicitante é o padrão de 2026. Sustentada como prática de me |
+| 16.8 | `C_AUDIT_KIT_NORMATIVE_BASIS_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: aprovação por papel e o kit de auditoria (política, inventário de contas, matriz de papéis, log por at |
+| 4.8 | `Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114` | agent-requester-privilege-2026-11 | Com a metade OWASP da objeção de versão fechada (LLM Top 10 -> 2026; ASI Threats -> v1.1; Agentic Top 10 -> 2026), o selo pode  |
 | 3.0 | `C_SUPERACAO_20261113_ASI08_PER_ACT_LOG` | agent-requester-privilege-2026-11 | A trilha por ato vem do log, não do token: OWASP ASI08 item 10 pede logs à prova de adulteração, com carimbo de tempo, ligados |
 | 3.0 | `C_SUPERACAO_20261113_HARDY_CLAUSE_VS_RESTRICTION` | agent-requester-privilege-2026-11 | Hardy, no mesmo parágrafo: cada cláusula nova abria falha de segurança em programa seguro, cada restrição nova quebrava progr |
 | 3.0 | `C_SUPERACAO_20261113_HARDY_EXPLICIT_DESIGNATION` | agent-requester-privilege-2026-11 | Hardy, mesmo trecho: a cura é a designação explícita por ato; o deputado usa capability PRÓPRIA para os recursos dele (STAT)  |
@@ -26,6 +29,33 @@
 | 3.0 | `C_SUPERACAO_20261113_SLACK_APP_MENTION_PAYLOAD_EXAMPLE` | agent-requester-privilege-2026-11 | O exemplo de payload do app_mention traz user no evento, team_id no topo e authorizations (user_id, is_bot, is_enterprise_install) |
 | 3.0 | `C_SUPERACAO_20261113_SLACK_BOT_TOKEN_TIED_TO_APP` | agent-requester-privilege-2026-11 | No Slack, o bot token está ligado ao app, não à identidade de um usuário. Sem a glosa 'privilégio próprio único'. |
 | 3.0 | `C_SUPERACAO_20261113_SLACK_USER_WRITE_AS_USER` | agent-requester-privilege-2026-11 | No Slack, escrita com user token é feita como se fosse do próprio usuário: 'Write actions with user tokens are performed as if  |
+| 3.0 | `C_SUPERACAO_20261114_ASI_EXPLICIT_USER_APPROVAL` | agent-requester-privilege-2026-11 | Bullet do mesmo PDF v1.1 (~linha 1425) 'Enforce explicit user approval for AI tool executions involving financial, medical, or adm |
+
+## outside-in-primaries-2026-11 — 21 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 225.0 | `Q_OUTSIDE_IN_PRIMARIES_1108` | outside-in-primaries-2026-11 | Comparadas às primárias, onde as escolhas do core, do kg-ssot e do onion-messaging estão ALINHADAS, DIVERGEM por decisão ou es |
+| 81.6 | `C_ELENXO_VERDICTS_BY_CHOICE_1108` | outside-in-primaries-2026-11 | Vereditos que as medidas já permitem, por escolha: ALINHADO em 6 pontos, DIVERGE POR DECISÃO em 4, ATRÁS em 7 com dono proposto |
+| 3.0 | `C_SUPERACAO_20261108_A2A_PUSH_NORMATIVE_DEGREES` | outside-in-primaries-2026-11 | A entrega por push do A2A com os graus certos: MUST tentar ao menos uma vez, MAY retry com backoff, MAY parar após falhas seguida |
+| 3.0 | `C_SUPERACAO_20261108_A2A_WEBHOOK_SSRF_IS_SHOULD` | outside-in-primaries-2026-11 | O §13.2 do A2A com o grau certo: agentes SHOULD validar URLs de webhook contra SSRF (rejeitar IP privado), agentes MUST incluir c |
+| 3.0 | `C_SUPERACAO_20261108_CC_ONFAILURE_BLOCK_CLOSES_TIMEOUT` | outside-in-primaries-2026-11 | onFailure: block nas guardas de PreToolUse fecha o timeout. |
+| 3.0 | `C_SUPERACAO_20261108_CC_SANDBOX_RECOMMENDED_CONFIG` | outside-in-primaries-2026-11 | Sandbox com os limites exatos: seção 'What runs outside the sandbox', sandbox.enabled + failIfUnavailable: true + allowUnsandbox |
+| 3.0 | `C_SUPERACAO_20261108_CE_TIME_IS_OPTIONAL` | outside-in-primaries-2026-11 | CloudEvents com a formulação correta (ce.md l.244 e l.416-428): obrigatórios id, source, specversion e type; time opcional, em  |
+| 3.0 | `C_SUPERACAO_20261108_DORA_FIVE_METRICS_MODEL` | outside-in-primaries-2026-11 | O modelo DORA de cinco métricas pelos trechos do mesmo guia ('DORA has identified five software delivery performance metrics', 't |
+| 3.0 | `C_SUPERACAO_20261108_DORA_RECOVERY_MOVE_FROM_MTTR` | outside-in-primaries-2026-11 | Recuperação DORA medida só sobre deploy com falha, apoiada na frase 'the move from MTTR to Failed Deployment Recovery Time', se |
+| 3.0 | `C_SUPERACAO_20261108_KG_PROV_EXPORT_DELIVERS_PROV_O` | outside-in-primaries-2026-11 | kg_prov_export.py entrega a exportação para PROV-O. |
+| 3.0 | `C_SUPERACAO_20261108_KG_SSOT_RELEASE_ATTESTATION` | outside-in-primaries-2026-11 | actions/attest-build-provenance no release.yml do kg-ssot. |
+| 3.0 | `C_SUPERACAO_20261108_MCP_CUSTOM_TRANSPORT_IS_THE_RULER` | outside-in-primaries-2026-11 | A régua sustentada para julgar canal próprio no MCP: a seção Custom Transports de basic/transports e as listas 'At a glance' e |
+| 3.0 | `C_SUPERACAO_20261108_MCP_HTTP_SECURITY_MODALS` | outside-in-primaries-2026-11 | A seção Security & Endpoint do MCP com os três modais corretos: MUST validar Origin, SHOULD ligar só a localhost e SHOULD aute |
+| 3.0 | `C_SUPERACAO_20261108_NIST_MS_2_8_003_VERSION_CONTROL_OPTIONAL` | outside-in-primaries-2026-11 | A MS-2.8-003 do perfil GenAI como padrão de procedência à prova de adulteração, com controle de versão como adição opciona |
+| 3.0 | `C_SUPERACAO_20261108_OKF_PR63_VERBATIM_COMMENT` | outside-in-primaries-2026-11 | O comentário verbatim de amirhormati no PR #63 do OKF ('This repository is tied to Google and Google Cloud...') e o 'private for  |
+| 3.0 | `C_SUPERACAO_20261108_OKF_TYPES_FREE_NOT_IDS` | outside-in-primaries-2026-11 | OKF §4.1 e §11 com o alcance correto: tipos sem registro central e consumidores MUST NOT rejeitar tipo desconhecido; a afirmaç |
+| 3.0 | `C_SUPERACAO_20261108_OKF_YOUNG_WITH_BREAKS_NOT_UNSTABLE` | outside-in-primaries-2026-11 | OKF §12 e §13 sustentam 'jovem e com quebras já ocorridas' (v0.2, quebras de v0.1 para v0.2, consumo best-effort em versão des |
+| 3.0 | `C_SUPERACAO_20261108_SCORECARD_SAST_DETECTION_AND_LOW_SCORE` | outside-in-primaries-2026-11 | O SAST do Scorecard pela seção do próprio documento: detecção por apps em PRs recentes ou por github/codeql-action em workflo |
+| 3.0 | `C_SUPERACAO_20261108_SLSA_DISTRIBUTE_PROVENANCE_TO_CONSUMERS` | outside-in-primaries-2026-11 | A seção Producer do SLSA com o MUST de distribuir a procedência aos consumidores e o MAY de delegar ao ecossistema de pacotes,  |
+| 3.0 | `C_SUPERACAO_20261108_SLSA_L2_MUSTS_AND_SHOULD` | outside-in-primaries-2026-11 | SLSA nível 2 pelos graus certos da linha 'Provenance is Authentic': MUST validar autenticidade, MUST gerar no plano de controle,  |
+| 3.0 | `C_SUPERACAO_20261108_SW_RETRY_IS_RECOMMENDATION` | outside-in-primaries-2026-11 | O reenvio do Standard Webhooks como recomendação (sw.md l.252-254): backoff exponencial por vários dias, até sucesso ou até c |
 
 ## market-peek-machinery-2026-11 — 12 item(ns)
 
@@ -43,4 +73,1893 @@
 | 3.0 | `C_SUPERACAO_20261113_GEMINI_PLAN_REVISE_OR_APPROVE` | market-peek-machinery-2026-11 | Gemini Deep Research cria plano multi-etapas que o usuário revisa ou aprova antes de a pesquisa começar, sem seletor de profundi |
 | 3.0 | `C_SUPERACAO_20261113_MULTIAGENT_ECONOMIC_VIABILITY` | market-peek-machinery-2026-11 | Viabilidade econômica do multiagente exige valor da tarefa alto o bastante para cobrir o custo extra de tokens (4x agente, 15x mu |
 | 3.0 | `C_SUPERACAO_20261113_VOI_PURCHASE_IF_NOT_ONLY_IF` | market-peek-machinery-2026-11 | Formulação condicional do slide (comprar dados SE o VOI excede o preço, nunca 'só se'), com a propriedade c e o aviso de decis |
+
+## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 135.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
+| 27.5 | `Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C` | compartilhamento-individuo-organizacao-2026-09 | TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ |
+| 12.8 | `D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR` | compartilhamento-individuo-organizacao-2026-09 | SUPERA D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA, e a saida vem do mesmo corpus que a derrubou. O corpus nao deixou so a refuta |
+| 12.8 | `Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL` | compartilhamento-individuo-organizacao-2026-09 | A FRONTEIRA QUE A E2 NAO COBRE, E ELA E NOVA. A E2 diz que a alavanca que mede e o CONTROLE DO ALVO. O adotante devolveu: num dese |
+| 8.0 | `E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5) — A CLAIM DE MAIOR CARGA DA RODADA: a conclusao dispositiva AUTORIZA o empregador a mo |
+| 3.2 | `E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): a licitude do monitoramento e condicionada a CIENCIA PREVIA do empregado de que a caixa |
+| 2.4 | `E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DURA DE LOCATOR (tier 5, nao 9): o TST distingue e-mail PESSOAL (provedor proprio, protegido pela inviolabil |
+| 2.4 | `E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): o acordao invoca o principio da PROPORCIONALIDADE para exigir PARCIMONIA na qualificaca |
+
+## postmerge-projection-writer-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 96.0 | `C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS` | postmerge-projection-writer-2026-10 | OPÇÃO B1 — escritor único sem bypass: job no push ao main (concurrency, sem cancelar) regenera, confere com porcelain, empurr |
+| 69.0 | `C_OPCAO_C_CONTRARIAN_STRICT_LOCAL` | postmerge-projection-writer-2026-10 | OPÇÃO C (contrarian) — manter commitado e curar a combinação: o caminho verificado exige base == ponta do main (strict local |
+| 25.2 | `C_OPCAO_B2_ROLLING_REGEN_PR` | postmerge-projection-writer-2026-10 | OPÇÃO B2 — PR rolante de regeneração (um só, reescrito por force-push), com token de GitHub App para os required checks rod |
+| 7.8 | `C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH` | postmerge-projection-writer-2026-10 | OPÇÃO B3 — GitHub App na bypass list (always) empurrando direto ao main. Elenxo: REJEITAR (bypass do ruleset inteiro, chave pr |
+| 3.0 | `Q_GUARDA_DE_MAIN_CASA_PELO_NOME` | postmerge-projection-writer-2026-10 | A guarda pretooluse-merge-gate.sh casar o main pelo NOME, em qualquer repo, é intencional (protege também o main de adotante e o |
+| 2.1 | `C_OPCAO_B4_MAESTRO_PAT_IN_CI` | postmerge-projection-writer-2026-10 | OPÇÃO B4 — PAT do maestro no CI como escritor do main. Elenxo: REJEITAR (push de bot parece humano, perde auditoria, herda o p |
+| 1.8 | `C_OPCAO_U_UNVERSIONED_RUNTIME` | postmerge-projection-writer-2026-10 | OPÇÃO U — não versionar as projeções e ler em runtime. Elenxo: REJEITAR (o hook custaria 7,7 s por consulta; portas e adota |
+
+## plugin-mcp-posture-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 94.5 | `Q_PLUGIN_MCP_POSTURE_0904` | plugin-mcp-posture-2026-09 | No canal publico de plugins (marketplace onion-plugins -> comunitario/diretorio da Anthropic), o Onion deve se apresentar TAMBEM c |
+| 10.0 | `C_OPCAO_B_STDIO_EMBARCADO_READONLY` | plugin-mcp-posture-2026-09 | OPCAO (b): embarcar um servidor stdio read-only (adapter do onion-kg: kg_list, kg_radar, kb_search, kb_get, diary_index, inventory |
+| 7.5 | `C_OPCAO_A_CONECTOR_REMOTO_PUBLICO` | plugin-mcp-posture-2026-09 | OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 too |
+| 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
+| 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
+
+## engenharia-de-corpus-de-regras-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 87.0 | `Q_RULE_CORPUS_ENGINEERING_1001` | engenharia-de-corpus-de-regras-2026-10 | Como a comunidade GERENCIA, MEDE e APOSENTA um corpus grande de regras escritas à mão, e o que o Onion ABSORVE, ADOTA ou RECUSA  |
+| 45.0 | `D_RULE_CORPUS_STRATEGY_1001` | engenharia-de-corpus-de-regras-2026-10 | DECISÃO ABERTA — o que o Onion faz com a engenharia do seu corpus de 93 guardas. OPÇÕES NOMEADAS: A — ABSORVER cobertura de |
+| 33.8 | `C_OPCAO_B_ABSORVER_ORDEM_DERIVADA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO B (confiança 0.75): absorver a ordem DERIVADA — inferir escreve/lê de cada etapa executando o pipeline, fixers até fi |
+| 17.5 | `C_OPCAO_E_RECUSAR_AGORA_E_RE_RODAR_ESTREITO` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO E — RECUSAR decidir agora e RE-RODAR a pesquisa, ESTREITA, nas 5 fontes não lidas do eixo 3/2 (nx inferred-tasks, ruff, |
+| 9.8 | `C_OPCAO_A_ABSORVER_COBERTURA_DE_REGRA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO A — ABSORVER cobertura de regra: contador por regra dentro do motor de lint que já existe, mais baseline de regras-que- |
+| 6.6 | `C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO F — ABSORVER teste de mutação de regra: automatizar na bancada o que hoje esta casa faz À MÃO (mutar o sujeito e exi |
+| 4.2 | `C_OPCAO_C_ADOTAR_SARIF_E_INTERCAMBIO` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO C — ADOTAR intercâmbio: emitir SARIF do lint e usar ferramenta externa (reviewdog para anotar PR, baseline por commit)  |
+| 3.0 | `C_OPCAO_D_ADOTAR_MOTOR_DE_POLITICA_ANALISAVEL` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO D — ADOTAR motor de política analisável (Cedar/OPA) para expressar o corpus de guardas e ganhar análise de sobreposi |
+
+## kg-multi-graph-view-2026-09 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 84.0 | `Q_KG_MULTI_GRAPH_VIEW_0904` | kg-multi-graph-view-2026-09 | Qual e o mecanismo certo para "N grafos .kg.yaml PEER, 1 visao" no Knowledge Graph SDAAL do Onion, quando um adotante tem 4 vertic |
+| 15.0 | `C_OPCAO_O5_PONTEIRO_XREF_COM_RESOLVER` | kg-multi-graph-view-2026-09 | OPCAO O5: referencia cross-arquivo como PONTEIRO tipado (proxy-node / campo `xref:` no padrao do `trace:`) + resolver-irmao HARD q |
+| 12.0 | `C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO` | kg-multi-graph-view-2026-09 | OPCAO O2: o radar permanece de ARQUIVO UNICO e awk-puro; a agregacao vive num CONSUMIDOR-IRMAO que faz o laco por grafo — padrao |
+| 9.6 | `C_OPCAO_O7_BACKLOG_PARAMETRIZA_RAIZ` | kg-multi-graph-view-2026-09 | OPCAO O7: kg-backlog-project.sh parametriza a RAIZ canonica (hoje `docs/onion/graph` hardcoded em l.55/l.89/l.155/l.160) alem do m |
+| 6.2 | `C_OPCAO_O1_RADAR_CORPUS_GLOB` | kg-multi-graph-view-2026-09 | OPCAO O1: kg-radar.sh ganha modo multi-arquivo (--corpus <glob>) agregando atencao/estado/reconciliacao de N grafos numa unica inv |
+| 3.6 | `C_OPCAO_O3_SEM_VISAO_AGREGADA` | kg-multi-graph-view-2026-09 | OPCAO O3: nenhuma visao agregada — cada grafo julgado sozinho por desenho, agregar e anti-padrao. Confianca 0.3: o Elenxo NAO re |
+| 2.4 | `C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE` | kg-multi-graph-view-2026-09 | OPCAO O4: referencia cross-arquivo vira ARESTA de 1a classe no schema (edge com file:id, resolvida pelo motor). Confianca 0.2: o E |
+| 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
+| 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
+
+## onion-core-ports-multi-model-2026-11 — 16 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 81.0 | `C_OPCAO_A_GENERATOR_PER_HARNESS` | onion-core-ports-multi-model-2026-11 | OPÇÃO A: gerador por HARNESS (não por modelo), extensão do ops/publish-door.sh e do materialize-door.sh, com tabela de capacid |
+| 9.0 | `C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND` | onion-core-ports-multi-model-2026-11 | OPÇÃO D: não abrir porta nova agora — onion-codex segue como única linha viva até haver demanda medida de adotante nomeado. |
+| 8.0 | `C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY` | onion-core-ports-multi-model-2026-11 | OPÇÃO C: só piso agnóstico — portar o gate de shell (.claude/validation) para o CI de qualquer harness, sem porta de harness |
+| 3.6 | `C_SUPERACAO_20261102_AAIF_PROJECTS_PAGE_AS_PRIMARY` | onion-core-ports-multi-model-2026-11 | aaif.io/projects serve de primária para a pertença do Agent Skills à AAIF, no lugar de atlan.com, paperclipped.de e do arXiv 26 |
+| 3.6 | `C_SUPERACAO_20261102_AAIF_SKILLS_MEMBERSHIP_PRIMARY` | onion-core-ports-multi-model-2026-11 | A pertença do Agent Skills à AAIF se ancora na primária: aaif.io/projects lista 'Agent Skills' entre os 10 projetos hospedados. |
+| 3.6 | `C_SUPERACAO_20261102_CODEX_OSS_PROFILE_FILES` | onion-core-ports-multi-model-2026-11 | O Codex CLI roda modelo aberto local via --oss com oss_provider ou --local-provider, mais [model_providers.*]; desde a 0.134.0 per |
+| 3.6 | `C_SUPERACAO_20261102_CORE_SHELL_GATE_IN_CODEX_CI` | onion-core-ports-multi-model-2026-11 | O gate agnóstico do próprio core (.claude/validation/, 26.596 linhas de shell) já está portado e roda no CI do onion-codex com |
+| 3.6 | `C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES` | onion-core-ports-multi-model-2026-11 | Exit 2 bloqueia nos eventos PRÉ-ação de Claude Code, Cursor, Codex e Gemini CLI; um guard que traduz em exit 2 os próprios err |
+| 3.6 | `C_SUPERACAO_20261102_GEMINI_CLI_RETAIL_SUNSET_SCOPE` | onion-core-ports-multi-model-2026-11 | Em 18/06/2026 o Gemini CLI deixou de servir AI Pro/Ultra e o uso gratuito, que passaram ao Antigravity CLI; segue por chave de API |
+| 3.6 | `C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN` | onion-core-ports-multi-model-2026-11 | O Ruler (experimental) só PROPAGA subagentes para 5 alvos, mas subagentes nativos existem também no Gemini CLI (.gemini/agents/* |
+| 3.6 | `C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR` | onion-core-ports-multi-model-2026-11 | A âncora correta do veto exit 2 do Qwen Code é a página de HOOKS, não a de skills: 'exit 2 is a Blocking error. Ignores stdout |
+| 3.6 | `C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID` | onion-core-ports-multi-model-2026-11 | O Qwen Code segue o contrato de hooks do Claude Code no ENVELOPE (PreToolUse, exit 2, permissionDecision, CLAUDE_PROJECT_DIR, Bash |
+| 3.6 | `C_SUPERACAO_20261102_RULESYNC_ASYMMETRIC_KIRO` | onion-core-ports-multi-model-2026-11 | Mesmo com fonte única, o rulesync tem cobertura parcial e assimétrica: Codex commands só global; ignore deprecado em favor de p |
+| 3.6 | `C_SUPERACAO_20261102_VIBE_HOOKS_PRIMARY_READ` | onion-core-ports-multi-model-2026-11 | A primária de hooks do Vibe foi lida: confirma o veto por JSON deny, acrescenta strict=true (falha vira negação em pre_tool) e  |
+| 3.6 | `C_SUPERACAO_20261102_VIBE_README_CURRENT_PIECES` | onion-core-ports-multi-model-2026-11 | O README atual do mistralai/mistral-vibe (Apache-2.0, movido por Devstral) declara MCP, skills na spec Agent Skills, subagentes, h |
+| 3.2 | `C_OPCAO_B_RUNTIME_BRIDGE` | onion-core-ports-multi-model-2026-11 | OPÇÃO B: ponte em runtime — o core traduz eventos e hooks em execução para o harness alvo. |
+
+## radar-E7-2026-10-27 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 81.0 | `Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27` | radar-E7-2026-10-27 | Como anda o mercado de treino e inferência (APIs de ajuste que fecham e abrem, custo, pesos abertos, destilação) e o que isso m |
+| 4.5 | `Q_E7_BASELINE_CLOSE_BEFORE_SEAL_1027` | radar-E7-2026-10-27 | Antes de selar a baseline do E7: ler 3 primárias a mais (Hugging Face da Mistral para o ML4, texto da licença OpenMDW 1.1, chang |
+| 3.6 | `C_SUPERACAO_20261027_BEDROCK_RFT_NO_OPENAI_LINK` | radar-E7-2026-10-27 | A formulação que o próprio texto sustenta: lançamento, modelos e data de 17/02/2026, sem a ligação causal com a OpenAI. |
+| 3.6 | `C_SUPERACAO_20261027_BEDROCK_RFT_NO_TRAINING_COST_CLAIM` | radar-E7-2026-10-27 | A formulação sustentada pelos parágrafos 1 e 2 do documento: poucos prompts, variantes menores e custo-efetivas, recompensa por |
+| 3.6 | `C_SUPERACAO_20261027_FIREWORKS_SERVERLESS_VERBATIM_QUOTE` | radar-E7-2026-10-27 | A citação verbatim do mesmo documento, 'To view the current pricing for our most popular serverless models across Standard, Prio |
+| 3.6 | `C_SUPERACAO_20261027_GPT4_FOUR_FAMILIES_ONLY` | radar-E7-2026-10-27 | A formulação limitada às quatro famílias listadas, tirada da mesma entrada do documento, mais a entrada 'Legacy GPT model snap |
+| 3.6 | `C_SUPERACAO_20261027_ML4_PRICE_CARD_VERBATIM` | radar-E7-2026-10-27 | O trecho do cartão no mesmo documento, 'Input (/M tokens) $1.36 Output (/M tokens) $4.18', que entrega os mesmos valores com cita |
+| 3.6 | `C_SUPERACAO_20261027_ML4_SCALE_WITHOUT_INFRA_INFERENCE` | radar-E7-2026-10-27 | A formulação sustentada pelo mesmo documento (1T, 52B ativos, MoE, Blackwell na Europa), sem a inferência sobre infraestrutura  |
+| 3.6 | `C_SUPERACAO_20261027_TOGETHER_BILLING_EPOCHS_EVAL_TOKENS` | radar-E7-2026-10-27 | A frase completa da nota de preço no mesmo documento, que entrega o valor que o claim prometia (a base de cobrança), com épocas |
+
+## company-brain-e-conducao-como-servico-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 80.0 | `Q_COMPANY_BRAIN_E_CONDUCAO_COMO_SERVICO_2026` | company-brain-e-conducao-como-servico-2026-10 | Das duas candidatas que a rodada anterior NAO atacou e que sao as mais proximas da identidade do Onion — (b) o GRAFO/Company Bra |
+| 27.5 | `D_COMPANY_BRAIN_OU_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): entre as duas candidatas mais proximas da identidade do Onion, qual tem u |
+| 19.2 | `C_OPCAO_B_COMPANY_BRAIN_ANCORADO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b) — COMPANY BRAIN / GRAFO ANCORADO COMO SERVICO: cobrar pelo conhecimento organizacional com proveniencia verificavel. A |
+| 17.5 | `C_OPCAO_NENHUMA_COMPLETAR_OS_EIXOS` | company-brain-e-conducao-como-servico-2026-10 | OPCAO NENHUMA AGORA — rodada de COMPLETUDE dos eixos 1 pelo lado da suite, 3 cemiterio, 6 ICP e 7 capital antes de qualquer selo |
+| 13.8 | `C_OPCAO_BD_PACOTE_NO_FORMATO_GURU` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b mais d) — O PACOTE NA FORMA QUE O MERCADO JA VALIDOU: software de conhecimento VERIFICADO com conducao humana EMBUTIDA, |
+| 13.8 | `C_OPCAO_D_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (d) — CONDUCAO / ADOCAO COMO SERVICO: cobrar pelo metodo (/meta:adopt, gate instalado, federacao) de forma recorrente. A F |
+
+## playbook-sdaal-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 78.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
+| 55.0 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
+| 19.8 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
+| 9.0 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
+| 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
+| 4.8 | `Q_SDAAL_KIT_REPO_SEPARADO` | playbook-sdaal-2026-10 | GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): execut |
+| 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
+
+## canal-vivo-sessoes-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 76.8 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
+| 3.2 | `Q_XSESSION_LIVE_NOT_VERIFIED` | canal-vivo-sessoes-2026-10 | NÃO VERIFICADO, fechar antes de qualquer absorção: dois membros da mesma org Team; dois usuários do SO na mesma máquina; clou |
+| 3.0 | `Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (b): algum adotante pediu canal entre organizações? Se sim, o caminho é o A2A gated que o core já tem, n |
+| 3.0 | `Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (a): a Anthropic respondeu à issue #87954 (pedido de canal entre usuários) ou lançou canal nativo entre u |
+
+## exit2-coupling-against-2026-11 — 40 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 75.0 | `C_OPCAO_C_RETIRE_EXCLUSIVITY_COMPLIANCE_LAYER` | exit2-coupling-against-2026-11 | C: retirar a exclusividade e dizer que o veto é camada de conformidade, não fronteira de segurança |
+| 54.0 | `Q_EXIT2_COUPLING_AGAINST_2026_11` | exit2-coupling-against-2026-11 | O que derruba a tese do CLAUDE.md de que o exit 2 de hook, que barra sob bypassPermissions, não existe fora do Claude Code, nenhu |
+| 26.0 | `C_OPCAO_D_REVISE_POSTURE_WITH_TRIGGER` | exit2-coupling-against-2026-11 | D: rever a própria postura de acoplamento, com gatilho nomeado |
+| 17.0 | `C_OPCAO_A_KEEP_WITH_MOD_CONDITION` | exit2-coupling-against-2026-11 | A: manter a frase só com a condição do mod |
+| 5.4 | `C_SUPERACAO_20261104_CUT_SEATED_GUARD_CONDITION` | exit2-coupling-against-2026-11 | Configuração gerenciada não vazia senta a guarda. |
+| 4.5 | `C_OPCAO_B_REWRITE_CAPABILITY` | exit2-coupling-against-2026-11 | B: reescrever a capacidade que compra o acoplamento, nomeando outra |
+| 3.6 | `C_SUPERACAO_20261104_ANTHROPIC_PERMISSIONS_PRECEDENCE` | exit2-coupling-against-2026-11 | A primária que entrega o valor é da Anthropic: permissions.md, seção 'Precedence among rules, hooks, and mods', mais mods/admi |
+| 3.6 | `C_SUPERACAO_20261104_CC_FAIL_OPEN_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: em Linux, com hook de comando e onFailure ausente, PreToolUse falha aberto, salvo exit 1 com JSON válido, |
+| 3.6 | `C_SUPERACAO_20261104_CODEX_BYPASS_MEASURED` | exit2-coupling-against-2026-11 | Rodagem da curadoria no Codex CLI 0.164.0, com seis rodadas. |
+| 3.6 | `C_SUPERACAO_20261104_CODEX_FAIL_OPEN_V0166` | exit2-coupling-against-2026-11 | Formulação corrigida: no Codex rust-v0.166.0, hook PreToolUse que quebra, estoura o tempo ou devolve JSON inválido fica Failed  |
+| 3.6 | `C_SUPERACAO_20261104_CODEX_OFFICIAL_GUARDRAIL` | exit2-coupling-against-2026-11 | Doc oficial da OpenAI e a rodagem E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026. |
+| 3.6 | `C_SUPERACAO_20261104_CODEX_PRIMARIES_REPLACE_BLOG` | exit2-coupling-against-2026-11 | Primárias que dispensam o blog: doc oficial de hooks do Codex, fonte pre_tool_use.rs em openai/codex e E_SPIKE_S1_TRUSTED_HOOK_BL |
+| 3.6 | `C_SUPERACAO_20261104_COPILOT_DOC_CLOUD_AGENT_FIRES` | exit2-coupling-against-2026-11 | A referência de hooks do Copilot não cita --allow-all-tools nem --yolo, e allowing-tools não fala de hooks; mas no cloud agent, |
+| 3.6 | `C_SUPERACAO_20261104_CURSOR_3_21_STAFF_BY_MODE` | exit2-coupling-against-2026-11 | Formulação corrigida, por staff do Cursor em tópico mais novo: no 3.21.16 (out/2026), deny vale em Auto-review, Allowlist e Run |
+| 3.6 | `C_SUPERACAO_20261104_CUT_ADVISORY_NO_HOOKS` | exit2-coupling-against-2026-11 | Leitura do advisory. |
+| 3.6 | `C_SUPERACAO_20261104_CUT_CVE_25724_DETAILS` | exit2-coupling-against-2026-11 | O próprio advisory. |
+| 3.6 | `C_SUPERACAO_20261104_CUT_MOD_FS_PROCESS_UNVETOED` | exit2-coupling-against-2026-11 | allowManagedModsOnly impede os hooks do mod de rodar («allowManagedModsOnly com mod de processo»). |
+| 3.6 | `C_SUPERACAO_20261104_CVE_25724_NOT_HOOK` | exit2-coupling-against-2026-11 | Prova correta do limite do veto: permissions.md, 'the mod can approve a call that a deny rule refuses or a PreToolUse hook blocked |
+| 3.6 | `C_SUPERACAO_20261104_CVE_40068_TRUST_NOT_VETO` | exit2-coupling-against-2026-11 | Citar o advisory do fornecedor em vez do NVD. |
+| 3.6 | `C_SUPERACAO_20261104_ENDOR_VENDOR_BETTER_SOURCES` | exit2-coupling-against-2026-11 | Doc da Anthropic e Thoughtworks Radar vol. 35: 'We now consider agent sandboxing a sensible default for all agents', anel Adopt. |
+| 3.6 | `C_SUPERACAO_20261104_EXIT2_JSON_NOT_DIFFERENTIATOR` | exit2-coupling-against-2026-11 | A parte 'sob bypass' existe por medição, não por doc: célula «hook sem mod» do laboratório. |
+| 3.6 | `C_SUPERACAO_20261104_GEMINI_BLOG_DUPLICATES` | exit2-coupling-against-2026-11 | A doc oficial do Gemini CLI, já lida no achado 2. |
+| 3.6 | `C_SUPERACAO_20261104_GEMINI_SOURCE_V0660_YOLO` | exit2-coupling-against-2026-11 | A primária que faltava é o código e o teste de integração do gemini-cli v0.66.0: o exit 2 do BeforeTool barra antes da polít |
+| 3.6 | `C_SUPERACAO_20261104_HOOK_POLICY_WORDING_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: o filtro if é best-effort e por isso não serve para allow/deny rígido; deny e exit 2 valem sob bypass e |
+| 3.6 | `C_SUPERACAO_20261104_HOOK_VECTOR_BY_DESIGN` | exit2-coupling-against-2026-11 | Tabela 'What runs before you trust a folder', de permissions.md, como prova vigente da superfície de ataque. |
+| 3.6 | `C_SUPERACAO_20261104_MANAGED_CLIENT_SIDE_NOT_BOUNDARY` | exit2-coupling-against-2026-11 | Formulação corrigida: managed settings são a camada de PRECEDÊNCIA e distribuição de política; a versão server-managed é  |
+| 3.6 | `C_SUPERACAO_20261104_MOD_ANSWER_MANAGED_RUNS_FIRST` | exit2-coupling-against-2026-11 | Formulação corrigida: se um mod responde em tool.call sem chamar next, a ferramenta não roda, nem os PreToolUse e PostToolUse n |
+| 3.6 | `C_SUPERACAO_20261104_MOD_UNDERSIZED_SELF_INSTALL` | exit2-coupling-against-2026-11 | permissions.md mais as células «mod-allow com hook», «mod-allow sob bypass», «mod em skills com aceite» e a ponta a ponta d |
+| 3.6 | `C_SUPERACAO_20261104_RADAR_ADOPT_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: o Radar Vol 35 põe Agent sandboxing em Adopt como padrão sensato para todos os agentes; em blip separado |
+| 3.6 | `C_SUPERACAO_20261104_RADAR_PDF_CITES_HOOKS` | exit2-coupling-against-2026-11 | Formulação corrigida: a landing do Radar Vol. 35 não cita Claude Code, mas o PDF cita Claude Code e hooks 11 vezes cada, recome |
+| 3.6 | `C_SUPERACAO_20261104_REFUT_CC_FAIL_OPEN` | exit2-coupling-against-2026-11 | onFailure: block, em uso nos 5 vetos do core. |
+| 3.6 | `C_SUPERACAO_20261104_REFUT_CODEX_EXIT2_FACT` | exit2-coupling-against-2026-11 | Doc oficial e rodagem da curadoria. |
+| 3.6 | `C_SUPERACAO_20261104_REFUT_MANAGED_TOP_PRECEDENCE` | exit2-coupling-against-2026-11 | Hook gerenciado com guarda sentada: células «hook gerenciado contra mod-allow» e «hook gerenciado contra mod-answer» seguram  |
+| 3.6 | `C_SUPERACAO_20261104_REFUT_MOD_ANSWER_FORGES_SIGNAL` | exit2-coupling-against-2026-11 | Hook gerenciado segura esse caso («hook gerenciado contra mod-answer»). |
+| 3.6 | `C_SUPERACAO_20261104_REFUT_RADAR_ADOPT` | exit2-coupling-against-2026-11 | A própria página do blip, anel Adopt. |
+| 3.6 | `C_SUPERACAO_20261104_RUN_PAID_MEASUREMENTS_LEFT_OUT` | exit2-coupling-against-2026-11 | Mapa por harness: medido em Codex e Qwen (veto) e Vibe (contrato diferente); só por doc em Copilot, Gemini e Cursor; por leitura  |
+| 3.6 | `C_SUPERACAO_20261104_SETTINGS_PAGE_SCOPE_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: settings.md não trata de exit 2, exclusividade, mods nem CVEs; cobre escopos, precedência e política ge |
+| 3.6 | `C_SUPERACAO_20261104_UNREAD_DANIELVAUGHAN_DIVERGES` | exit2-coupling-against-2026-11 | Rodagem no Codex 0.164.0 sob --dangerously-bypass-approvals-and-sandbox. |
+| 3.6 | `C_SUPERACAO_20261104_UNREAD_GENTIC_BASH_RULE` | exit2-coupling-against-2026-11 | Primária em permissions.md para o que o blog só relatava. |
+| 3.6 | `C_SUPERACAO_20261104_UNREAD_VULN_TODAY` | exit2-coupling-against-2026-11 | O advisory do fornecedor. |
+
+## a2a-empresa-adotante-2026-10 — 33 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 72.0 | `C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE` | a2a-empresa-adotante-2026-10 | OPÇÃO C) A2A aberto 1.0 (AAIF/LF) + MCP remoto por Streamable HTTP como formato de fio. |
+| 60.5 | `C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D` | a2a-empresa-adotante-2026-10 | Combinação recomendada: B falando C (A2A do Onion como perfil do padrão aberto) entre pessoas + D com isolatePeerMachines para  |
+| 56.0 | `C_OPCAO_D_NATIVE_SAME_PERSON_ONLY` | a2a-empresa-adotante-2026-10 | OPÇÃO D) Canais nativos Anthropic (cross-session via Remote Control, isolatePeerMachines): só para a mesma pessoa entre máquin |
+| 50.0 | `Q_A2A_EMPRESA_ADOTANTE_2026_10` | a2a-empresa-adotante-2026-10 | Como uma empresa adotante do Onion deve conectar sessões de agentes de pessoas e máquinas diferentes, com ida e volta viva, iden |
+| 32.0 | `C_OPCAO_B_SELF_HOSTED_RECEIVER` | a2a-empresa-adotante-2026-10 | OPÇÃO B) Mesmo receptor em self-host pela empresa (VPS ou serverless com armazenamento durável). |
+| 5.4 | `C_SUPERACAO_20261027_A2A_AUTHZ_MUST_NO_INJECTION_CONTROL` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela spec A2A 1.0.0: autorização OBRIGATÓRIA em toda operação, com modelo e lógica a cargo da impleme |
+| 5.4 | `C_SUPERACAO_20261027_A2A_AUTH_REQUIRED_HUMAN_APPROVAL` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela spec A2A 1.0 (§7.6): o protocolo TEM estado para pedir aprovação humana (TASK_STATE_AUTH_REQUIRED,  |
+| 5.4 | `C_SUPERACAO_20261027_AAIF_BLOG_READ` | a2a-empresa-adotante-2026-10 | O blog aaif.io/blog/a2a-joins-aaif foi lido nesta rodada, com frase verbatim e data: o A2A entra na AAIF em 17/08/2026, ao lado do |
+| 5.4 | `C_SUPERACAO_20261027_ISOLATE_PEER_MACHINES_PRIMARY` | a2a-empresa-adotante-2026-10 | Primária relida: isolatePeerMachines=true exige aprovação humana antes de qualquer mensagem sair da máquina, inclusive sob byp |
+| 5.4 | `C_SUPERACAO_20261027_REMOTE_CONTROL_SAME_ACCOUNT_MULTI_SESSION` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o Remote Control liga claude.ai/code, o app e as OUTRAS sessões da mesma conta, inclusive entre máquinas |
+| 5.2 | `C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY` | a2a-empresa-adotante-2026-10 | OPÇÃO A) A2A do Onion hospedado pelo onion-bridge (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho): só on |
+| 3.6 | `C_SUPERACAO_20261027_A2A_JOINS_AAIF_2026_08_17` | a2a-empresa-adotante-2026-10 | Formulação corrigida: em 17/08/2026 o A2A, que o Google doou à Linux Foundation em 2025, passou a projeto hospedado da Agentic  |
+| 3.6 | `C_SUPERACAO_20261027_A2A_LF_2025_V1_0_1_EXAMPLE_EXTENSIONS` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o A2A, criado pelo Google (abr/2025) e hospedado pela Linux Foundation desde 23/06/2025, está na v1.0.1 ( |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_DATE_PRIMARY` | a2a-empresa-adotante-2026-10 | Primária aaif.io lida nesta rodada: o A2A entra na AAIF em 17/08/2026, junto ao MCP, o que põe os dois padrões sob a mesma fund |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_FOUNDERS_LIST` | a2a-empresa-adotante-2026-10 | A primária aaif.io, lida nesta rodada, traz a lista verbatim de fundadores da entrada do A2A na AAIF: AWS, Cisco, Microsoft, Sale |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4` | a2a-empresa-adotante-2026-10 | A primária aaif.io substitui o blog tier 4 para a parte de governança e financiamento: o A2A entrou na AAIF em 17/08/2026, doado |
+| 3.6 | `C_SUPERACAO_20261027_CHANGELOG_2_1_311_MOBILE_DISPLAY_BUG` | a2a-empresa-adotante-2026-10 | Na 2.1.311 o Claude Code corrigiu um defeito de EXIBIÇÃO nos apps móveis: mensagens do Claude a uma sessão na nuvem ou de Remo |
+| 3.6 | `C_SUPERACAO_20261027_CHANNELS_CAN_BE_TWO_WAY` | a2a-empresa-adotante-2026-10 | Formulação sem esticar: 'Channels can be two-way: Claude reads the event and replies back through the same channel' (pode ser de |
+| 3.6 | `C_SUPERACAO_20261027_CHANNELS_EVENTS_ONLY_WHILE_OPEN` | a2a-empresa-adotante-2026-10 | Formulação sem esticar: 'Events only arrive while the session is open' entrega o limite declarado (a entrega depende da sessão  |
+| 3.6 | `C_SUPERACAO_20261027_CLOUD_SESSION_INBOUND_THREE_CHANNELS` | a2a-empresa-adotante-2026-10 | Formulação corrigida: a sessão na nuvem recebe entrada por mais de um caminho: follow-up pelo CLI na conta do próprio usuário |
+| 3.6 | `C_SUPERACAO_20261027_CLOUD_VM_ISOLATION_NOT_DATA_OWNERSHIP` | a2a-empresa-adotante-2026-10 | Formulação corrigida, restrita a VM, isolamento e rede: na nuvem hospedada a VM é gerenciada pela Anthropic; no self-hosted rod |
+| 3.6 | `C_SUPERACAO_20261027_CROSS_SESSION_INBOUND_CHANGELOG_LINES` | a2a-empresa-adotante-2026-10 | Formulação sustentada pelo CHANGELOG: crossSessionInbound nasceu retendo para aprovação mensagens a sessões em bypass (linha  |
+| 3.6 | `C_SUPERACAO_20261027_KEYSIGHT_MAY_TREAT_METADATA_AS_COMMANDS` | a2a-empresa-adotante-2026-10 | Formulação do próprio Keysight, com o modal: quando o card entra direto no contexto de raciocínio do LLM sem fronteira estrita |
+| 3.6 | `C_SUPERACAO_20261027_MCP_2026_07_28_NO_FLAGS_QUALIFIER` | a2a-empresa-adotante-2026-10 | Formulação com o escopo correto (2.1.299): conectores MCP de sessão na nuvem e de Remote Control negociam o protocolo MCP 2026- |
+| 3.6 | `C_SUPERACAO_20261027_SHARE_LINK_NOT_REAL_TIME` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o link compartilhado mostra o estado mais recente na abertura e não atualiza em tempo real; 'não serve d |
+| 3.6 | `C_SUPERACAO_20261027_SHARE_SESSIONS_VISIBILITY_ONLY` | a2a-empresa-adotante-2026-10 | Formulação corrigida, limitada à seção 'Share sessions': visibilidade Private/Team (Private/Public em Max/Pro), destinatário |
+| 3.6 | `C_SUPERACAO_20261027_THOUGHTWORKS_ASSESS_NOT_TRIAL` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o Technology Radar vol. 33 (05/11/2025) pôs o A2A em Assess ('olhar de perto, não necessariamente experi |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_ADDRESSING_CORRECTED` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela primária: destinatário endereçado pelo nome da sessão (com identificador curto na colisão); socke |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_AVAILABILITY_SPLIT` | a2a-empresa-adotante-2026-10 | Formulação do próprio 'Availability': 'Sessions on this machine' funciona em qualquer provedor, por socket local, sem servidore |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_CROSS_MACHINE_OPEN_2_1_225` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela primária: desde a 2.1.225 uma sessão em Remote Control PODE abrir conversa com sessão de outra máq |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD` | a2a-empresa-adotante-2026-10 | Releitura da primária de cross-session: sessão na nuvem não responde por SendMessage a outra máquina, mesmo com endereço de r |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248` | a2a-empresa-adotante-2026-10 | Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS, Linux e WSL 2), a 2.1.234 levou ao Wind |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_SAME_MACHINE_PLUS_REMOTE_CONTROL` | a2a-empresa-adotante-2026-10 | Formulação sustentada pelo CHANGELOG: o cross-session na mesma máquina passou a valer em Bedrock, Vertex e Foundry e com teleme |
+
+## jev-decision-round2-2026-10 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 69.0 | `Q_TYPED_DECISION_IN_ONION_2026_10` | jev-decision-round2-2026-10 | O Onion deve adotar uma primitiva de decisao TIPADA e barata nas camadas que ACONSELHAM (triagem, roteamento de modelo/skill, prio |
+| 42.0 | `D_TYPED_DECISION_PRIMITIVE_ONION_2026_10` | jev-decision-round2-2026-10 | DECISAO A SELAR PELO MAESTRO (eu nunca selo): o Onion adota uma primitiva de decisao tipada barata nas camadas que ACONSELHAM? Opc |
+| 27.0 | `C_OPCAO_B_PRIMITIVE_IN_HOUSE` | jev-decision-round2-2026-10 | OPCAO B — ADOTAR A PRIMITIVA EM CASA: decisao tipada de conjunto fechado implementada localmente (1 token sob gramatica restrita |
+| 24.5 | `C_OPCAO_D_CLOSE_GAPS_FIRST` | jev-decision-round2-2026-10 | OPCAO D — FECHAR AS LACUNAS PRIMEIRO pelo corpus local, pelas fontes nao lidas e por uma medicao propria em pt-BR, e so depois d |
+| 19.8 | `C_OPCAO_C_HOSTED_JEV_SHADOW` | jev-decision-round2-2026-10 | OPCAO C — ADOTAR O JEV HOSPEDADO nas camadas que aconselham, em modo SHADOW primeiro, por uso direto (nao SDAAL), com `state` re |
+| 18.0 | `C_GATE_BOUNDARY_IS_INVIOLABLE` | jev-decision-round2-2026-10 | A fronteira nao e negociavel e ja estava desenhada antes desta rodada: a primitiva tipada NUNCA entra no que REPROVA. O kg-radar e |
+| 15.0 | `C_UNTRUSTED_INPUT_IS_THE_REAL_BLOCKER` | jev-decision-round2-2026-10 | O bloqueio real das camadas que ACONSELHAM nao e calibracao, e PROVENIENCIA DA ENTRADA — e e o achado que esta rodada acrescenta |
+| 12.0 | `C_CALIBRATION_IS_STILL_UNVERIFIED` | jev-decision-round2-2026-10 | A unica propriedade que justifica comprar a primitiva — confidence CALIBRADO, derivado da distribuicao e nao carimbado por quem  |
+| 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
+| 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
+
+## a2a-configurator-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 66.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
+| 4.8 | `C_A8_SO_A_PARTE_DETERMINISTICA_RODOU` | a2a-configurator-2026-10 | do A8 e do A8g, rodou em sandbox o caminho de produção (fila → aceite → doc do inbox → sessão headless): 0 canário vazad |
+| 4.8 | `C_TRUST_LOG_PRESO_NO_CLONE_SERVIDO_1022` | a2a-configurator-2026-10 | a trilha de auditoria do A2A caía no trust-log RASTREADO do clone servido e o update-bridge a prendia em stash; a cura é o desti |
+| 2.8 | `Q_ESTADO_DE_JTI_SO_CRESCE` | a2a-configurator-2026-10 | o estado de jti precisa de poda? Gatilho: o arquivo de estado de um receptor passar de 1 MiB ou 10 mil linhas (hoje 220 bytes) |
+
+## chat-agent-isolation-2026-10 — 47 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 66.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
+| 54.0 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
+| 33.0 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
+| 30.2 | `C_OPCAO_5_NARROW_CREDENTIAL_BROKER` | chat-agent-isolation-2026-10 | OPÇÃO (5) credential broker — estreito: proxy da ANTHROPIC_API_KEY e ferramenta de git, sobre a opção 2. |
+| 17.5 | `C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE` | chat-agent-isolation-2026-10 | OPÇÃO (0) imediato sem root: convidado sem Bash + deny Edit/Write no home do onion fora do workspace. |
+| 16.8 | `C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX` | chat-agent-isolation-2026-10 | A rede de saída do convidado se fecha na UNIT do runner (IPAddressDeny do loopback, link-local e faixas privadas, com DNS pelos r |
+| 7.5 | `C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION` | chat-agent-isolation-2026-10 | OPÇÃO (4) container/microVM por sessão — inviável nesta VPS (sem KVM); opcional por adotante. |
+| 7.2 | `C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION` | chat-agent-isolation-2026-10 | Runner por sessão com HOME efêmero (unit template onion-chat@<sessão>) e DynamicUser=yes: UID único por sessão sem criar cont |
+| 6.0 | `C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER` | chat-agent-isolation-2026-10 | Lançador privilegiado instalado uma vez pelo root: unit template onion-chat@.service ativado por socket (DynamicUser=yes ou User= |
+| 6.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF` | chat-agent-isolation-2026-10 | Teardown pelo canal, não por sinal: o SDK fecha o stdin e espera cerca de 2 s; o fechamento do socket encerra o CLI do outro lado |
+| 5.4 | `C_SUPERACAO_20261015_PROCESS_AND_UID_VIA_SPAWN` | chat-agent-isolation-2026-10 | Processo separado E UID separado, via spawnClaudeCodeProcess, presente no SDK instalado (sdk.d.ts:2132 da 0.3.232): o spawn do CLI |
+| 5.4 | `C_SUPERACAO_20261015_READONLY_FOR_INTEGRITY` | chat-agent-isolation-2026-10 | Variante da opção 1 voltada à integridade: ReadOnlyPaths em src/, node_modules/, web/ do bridge, .claude/settings.json, .bashrc |
+| 5.4 | `C_SUPERACAO_20261015_SANDBOX_THREE_PIECES` | chat-agent-isolation-2026-10 | A opção 3 só vale com as três peças: perfil AppArmor do bwrap instalado por root, sandbox.failIfUnavailable=true e allowUnsan |
+| 5.0 | `C_RECOMENDACAO_ELENXO_PRIMARIES_1015` | chat-agent-isolation-2026-10 | Recomendação do Elenxo (primárias): NÃO selar ainda. Degrau 1 = só integridade; degrau 2 exige lançador do root; degrau 3 no |
+| 4.5 | `C_SUPERACAO_20261015_EXPLICIT_FAILIFUNAVAILABLE_VIA_OPTIONS` | chat-agent-isolation-2026-10 | Passar o sandbox por Options (sandbox ou managedSettings) com failIfUnavailable=true explícito, sem depender do default de nenhum |
+| 4.5 | `C_SUPERACAO_20261015_POLICY_TIER_AND_WORKSPACE_CLAUDE_DENY` | chat-agent-isolation-2026-10 | Duas peças: (1) fixar sandbox e permissões no nível de política via Options.managedSettings (restrictive-only, sem arquivo de  |
+| 4.5 | `C_SUPERACAO_20261015_PRIVATE_BWRAP_COPY_BWRAPPATH` | chat-agent-isolation-2026-10 | Cópia PRIVADA do bwrap num caminho executável só pelo grupo do agente (root:onion-chat 0750), com o perfil 'userns,' preso a ES |
+| 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_DETERMINISTIC_OFF` | chat-agent-isolation-2026-10 | Em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; o desligamento determinístico é sandbox.allowUnsandb |
+| 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_INTERACTIVE_SCOPE_ASK_RULE` | chat-agent-isolation-2026-10 | Na sessão interativa, em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; uma ask rule Bash(dangerouslyDi |
+| 3.6 | `C_SUPERACAO_20261015_CONTAINMENT_WITHOUT_APPROVAL` | chat-agent-isolation-2026-10 | Contenção que não depende de aprovação: convidado sem Bash, ou Bash só no UID separado. |
+| 3.6 | `C_SUPERACAO_20261015_CVE39861_QUOTE_WITHOUT_UID_INFERENCE` | chat-agent-isolation-2026-10 | Formulação que o advisory sustenta: nenhuma das duas partes escreve fora do workspace sozinha, mas a combinação escreve em loc |
+| 3.6 | `C_SUPERACAO_20261015_DENY_PLUS_SANDBOX_OR_UID` | chat-agent-isolation-2026-10 | A cobertura completa vem das Read deny (ferramentas) somadas ao sandbox funcional (Bash) ou ao UID separado (tudo, inclusive hooks |
+| 3.6 | `C_SUPERACAO_20261015_EXCLUDED_COMMANDS_REGULAR_FLOW` | chat-agent-isolation-2026-10 | allowUnsandboxedCommands:false faz ignorar dangerouslyDisableSandbox; o comando que casa com excludedCommands roda fora do sandbox |
+| 3.6 | `C_SUPERACAO_20261015_FAIL_IF_UNAVAILABLE` | chat-agent-isolation-2026-10 | failIfUnavailable=true faz o agente morrer em vez de rodar sem gaiola. |
+| 3.6 | `C_SUPERACAO_20261015_GATEWAY_ONLY_FOR_AGENT_CREDS` | chat-agent-isolation-2026-10 | Usar o gateway só para o que o agente consome (API da Anthropic, git) e separar a raiz de confiança (M2M, JWKS, members.yaml, fi |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_LONG_RUNNING_MULTI_PROCESS` | chat-agent-isolation-2026-10 | Padrões da página: efêmero = um container por tarefa, destruído ao fim, com a tarefa por TASK_PROMPT; o /chat corresponde a Lo |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_MULTITENANT_LOGICAL_PLUS_EGRESS` | chat-agent-isolation-2026-10 | Multi-tenant em container compartilhado: a doc prescreve settingSources vazio, auto-memory off, CLAUDE_CONFIG_DIR e cwd por tenant |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_SHARED_CONTAINER_ADMITTED` | chat-agent-isolation-2026-10 | A página de hosting recomenda sandbox em container (com remissão a Docker, gVisor e Firecracker em secure-deployment) e, na seç |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_SUBPROCESS_OWNS_SHELL_CWD` | chat-agent-isolation-2026-10 | Formulação sustentada do hosting: o SDK hospeda um subprocesso CLI de longa vida, dono de shell, cwd e transcrições em disco,  |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_TOOL_CREDS_BY_PROXY` | chat-agent-isolation-2026-10 | Formulação sustentada de Auth and secrets: credenciais de FERRAMENTAS ficam fora do ambiente do agente e entram por proxy, e a c |
+| 3.6 | `C_SUPERACAO_20261015_INACCESSIBLEPATHS_IS_UNIT_WIDE` | chat-agent-isolation-2026-10 | InaccessiblePaths=/ReadOnlyPaths= valem para a unit inteira (Node e Bash juntos), então não separam o agente do serviço; e Envi |
+| 3.6 | `C_SUPERACAO_20261015_KEEP_LOADENVFILE_SEPARATE_UID` | chat-agent-isolation-2026-10 | Manter o loadEnvFile no processo e separar por UID (opção 2): com o home do onion em 0750, um UID onion-chat perde .env, .git-cr |
+| 3.6 | `C_SUPERACAO_20261015_MEASURE_THEN_DELETE_PAT` | chat-agent-isolation-2026-10 | Medir se o PAT ainda é necessário (o onion-evolve é público desde 10-13, o pull não precisa dele); se não for, apagar; se fo |
+| 3.6 | `C_SUPERACAO_20261015_MICROVM_OUT_OF_THIS_VPS` | chat-agent-isolation-2026-10 | Reinstalar como restrição: a opção 4 com microVM sai do caminho desta VPS; gVisor/Docker exigem root e a questão Docker×ufw, |
+| 3.6 | `C_SUPERACAO_20261015_NARROW_BROKER_ON_UID` | chat-agent-isolation-2026-10 | Opção 5 estreita sobre a 2: o runner (UID onion-chat) recebe ANTHROPIC_BASE_URL para um proxy local no processo da frente, que i |
+| 3.6 | `C_SUPERACAO_20261015_READONLY_CLAUDE_SETTINGS_EPHEMERAL_HOME` | chat-agent-isolation-2026-10 | ReadOnlyPaths para os .claude/settings*.json do home e para o código do bridge, mais deny de Edit/Write no home do onion fora do  |
+| 3.6 | `C_SUPERACAO_20261015_REANCHOR_HOSTING_LITERAL_QUOTES` | chat-agent-isolation-2026-10 | Reancorar as quotes do hosting que o verificador achou VERBATIM, sem a inferência que as derrubou: Container-based sandboxing (re |
+| 3.6 | `C_SUPERACAO_20261015_REINSTATE_BYPASS_RETRY_CONSTRAINT` | chat-agent-isolation-2026-10 | Reinstalar a claim do retry em bypass como restrição da opção 3: allowUnsandboxedCommands=false + failIfUnavailable=true. |
+| 3.6 | `C_SUPERACAO_20261015_SANDBOX_STRICT_MODE_MANAGED` | chat-agent-isolation-2026-10 | O Claude Code pode reexecutar fora do sandbox quando ele falha; em bypass sem prompt. Com allowUnsandboxedCommands:false e failIfU |
+| 3.6 | `C_SUPERACAO_20261015_SEPARATE_BY_UID_NOT_LIST` | chat-agent-isolation-2026-10 | Separar por UID em vez de listar: o UID do agente só enxerga o próprio workspace e o core vendorizado; o resto some por constru |
+| 3.6 | `C_SUPERACAO_20261015_SPAWN_HOOK_ONLY_COMMAND_ENV_SIGNAL` | chat-agent-isolation-2026-10 | spawnClaudeCodeProcess é a opção oficial para substituir o spawn do agente (VMs, containers, remoto); o gancho recebe só comma |
+| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_ALLOWLIST_AND_PRIVILEGE_WARNING` | chat-agent-isolation-2026-10 | Para fechar a escrita de código no degrau 1 a man page dá dois caminhos (RW aninhado em RO, ou allow-list com ProtectSystem=stri |
+| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_UNIT_AS_HARD_BOUNDARY` | chat-agent-isolation-2026-10 | UID separado num unit systemd próprio (User=onion-chat, ProtectSystem=strict, PrivateTmp, PrivateDevices, RestrictNamespaces, Sys |
+| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_UNIT_PER_SESSION_NOT_VM` | chat-agent-isolation-2026-10 | Reaproveitar a ideia do yolo-cage (um runner por sessão e um dispatcher de git fora da gaiola) com um unit systemd por sessão no |
+| 3.6 | `C_SUPERACAO_20261015_TREAT_BY_CALLER` | chat-agent-isolation-2026-10 | Tratar por chamador: convidado sem Bash, ou com Bash só no UID separado; admin em bypass segue no UID onion até o runner separad |
+| 3.6 | `C_SUPERACAO_20261015_USERNS_REMOVE_BROAD_PROFILES` | chat-agent-isolation-2026-10 | Formulação do discourse do Ubuntu: o risco é um perfil amplo alcançável por processo unconfined (busybox, nautilus), e as cur |
+| 3.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_SYSTEMD_KILLMODE` | chat-agent-isolation-2026-10 | Teardown pelo próprio systemd: fechar o socket, mais RuntimeMaxSec= e KillMode=control-group no template onion-chat@, em vez de o |
+
+## infra-vps-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 66.0 | `Q_INFRA_VPS_TREATMENT_2026` | infra-vps-2026-10 | Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas  |
+| 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPÇÃO B linha (B enxuta), recomendada pelo Elenxo: censo shell que compõe sinais nativos (needrestart -b, reboot-required.pkgs, |
+| 12.0 | `C_OPCAO_B_GRAFO_CENSO_COMANDO` | infra-vps-2026-10 | OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + coman |
+| 5.4 | `Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA` | infra-vps-2026-10 | VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz qu |
+| 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
+| 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
+| 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
+
+## messaging-standards-2026-11 — 37 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 65.0 | `Q_MESSAGING_STANDARDS_1106` | messaging-standards-2026-11 | Qual pilha de padrões de mercado (envelope, fila, campainha, identidade, adapters, prior art) o onion-messaging deve adotar para  |
+| 60.0 | `C_OPCAO_QUEUE_1_SQLITE_WAL_OUTBOX_INBOX` | messaging-standards-2026-11 | Fila 1: SQLite em WAL com um daemon escritor, outbox e inbox, ack explícito, tentativas com teto, tabela dead_letter, dedupe por  |
+| 35.0 | `C_OPCAO_BELL_I_OWN_CHANNEL_FROM_SPIKE` | messaging-standards-2026-11 | Campainha i: channel próprio derivado do a2a-channel.ts do spike, só em sessão interativa com a flag de dev, sem permission rel |
+| 33.0 | `C_OPCAO_ENVELOPE_C_CLOUDEVENTS_IN_A2A_SIGNAL` | messaging-standards-2026-11 | Envelope C (os dois): CloudEvents 1.0 no corpo do sinal A2A, amarrado pelo body_sha256 assinado; já é a forma de a2a-accept.sh e |
+| 15.0 | `C_OPCAO_IDENTITY_A_A2A_MEMBER_INVITE` | messaging-standards-2026-11 | Identidade a: convite A2A por membro com validade e revogação (S6 em produção) (recomendada para os 3 dias) |
+| 13.5 | `C_OPCAO_QUEUE_3_NATS_JETSTREAM_R2` | messaging-standards-2026-11 | Fila 3: NATS JetStream, semântica lida (ack, reentrega, MaxDeliver, at-least-once), SEM dead-letter nativa; a operação mínima  |
+| 8.0 | `C_OPCAO_ADAPTERS_SLACK_SOCKET_MODE_AND_GIT` | messaging-standards-2026-11 | Adapters: Slack por Socket Mode (só conexão de saída) e git assíncrono pelo doc-bridge no dia 1; e-mail depois dos 3 dias (rec |
+| 8.0 | `Q_MESSAGING_PRIMARIES_REVIEW_1106` | messaging-standards-2026-11 | PROPOSTA (não sela): o maestro revisa a frase 'o mercado não a tem' de Q_COORD_DECIDIR_VIGIA_DE_EVENTOS (done) à luz do EventMe |
+| 6.0 | `C_OPCAO_BELL_II_YOU_HAVE_MAIL_HOOK` | messaging-standards-2026-11 | Campainha ii: hook 'you have mail' no início do turno, para sessões headless e Agent SDK |
+| 5.0 | `C_OPCAO_IDENTITY_B_DEVICE_FLOW_RFC8628` | messaging-standards-2026-11 | Identidade b: device flow RFC 8628, que exige servidor de autorização próprio e nunca leva o código no convite |
+| 4.5 | `C_OPCAO_ENVELOPE_A_A2A_ONION_PROFILE_ONLY` | messaging-standards-2026-11 | Envelope A: A2A 1.0 com o perfil Onion (JWS RS256, kid pinado, aud, jti, body_sha256), sem CloudEvents |
+| 3.6 | `C_SUPERACAO_20261106_A2A_PUSH_AUTH_SCHEME_OPEN` | messaging-standards-2026-11 | O A2A 1.0 exige (MUST) autenticar o servidor no webhook e verificar a notificação, mas o esquema é aberto (IANA: Bearer, Basic; |
+| 3.6 | `C_SUPERACAO_20261106_AGENT_INBOX_ACK_IS_TRANSPORT` | messaging-standards-2026-11 | No agent-inbox o 200/202 confirma só a aceitação do transporte; journal antes do 202 e idempotência por ID de cliente existem  |
+| 3.6 | `C_SUPERACAO_20261106_BODY_SHA256_PROFILE` | messaging-standards-2026-11 | Perfil Onion com claim body_sha256 obrigatório no a2a-verify.sh |
+| 3.6 | `C_SUPERACAO_20261106_CHANNEL_ACK_TOOL_BOUND` | messaging-standards-2026-11 | Tool ack/reply do channel do próprio core (a2a-channel.ts do spike), com in_reply_to e body_sha256 conferidos no fetch-replies |
+| 3.6 | `C_SUPERACAO_20261106_CHANNEL_REQUIREMENTS_FULL_LIST` | messaging-standards-2026-11 | Requisitos completos do channel: SDK MCP, runtime Node, capability claude/channel, notifications/claude/channel e stdio; para regi |
+| 3.6 | `C_SUPERACAO_20261106_CORE_CLOUDEVENT_READER` | messaging-standards-2026-11 | Leitor de CloudEvent 1.0 do core (a2a-metrics.py, com specversion, id, source e type obrigatórios) |
+| 3.6 | `C_SUPERACAO_20261106_INVITE_WITHOUT_CODE` | messaging-standards-2026-11 | Convite A2A por membro, sem código no convite (D_CONVITE_POR_MEMBRO_COM_VALIDADE) |
+| 3.6 | `C_SUPERACAO_20261106_INVITE_WITHOUT_CODE_SLACK_EMAIL` | messaging-standards-2026-11 | Convite A2A por membro (com validade e revogação), sem código de login no convite |
+| 3.6 | `C_SUPERACAO_20261106_MARK_DELIVERED_ONLY_ON_ACK` | messaging-standards-2026-11 | Só marcar como entregue com o ack explícito da tool do channel, amarrado ao id e ao body_sha256 (e reenviar enquanto o ack não  |
+| 3.6 | `C_SUPERACAO_20261106_MEMBER_INVITE_FOR_MACHINES` | messaging-standards-2026-11 | O convite A2A por membro, com validade e revogação, já em produção (D_CONVITE_POR_MEMBRO_COM_VALIDADE, E_S6_PONTA_A_PONTA_EM_ |
+| 3.6 | `C_SUPERACAO_20261106_NO_PERMISSION_RELAY` | messaging-standards-2026-11 | Não declarar a capability de permission relay e manter a aprovação no terminal (channel do spike 'sem relay') |
+| 3.6 | `C_SUPERACAO_20261106_OWN_BASE_CHANNEL_ACCEPT` | messaging-standards-2026-11 | Base própria do core: a2a-channel.ts mais accept-to-channel.sh |
+| 3.6 | `C_SUPERACAO_20261106_OWN_CHANNEL_DELIVERY_LATER_VERSION` | messaging-standards-2026-11 | Entrega do channel próprio medida numa versão posterior |
+| 3.6 | `C_SUPERACAO_20261106_OWN_CHANNEL_NO_RELAY` | messaging-standards-2026-11 | docs/evolution/research/a2a-cross-user-spike-2026-10/channel/a2a-channel.ts (channel próprio, sem relay) |
+| 3.6 | `C_SUPERACAO_20261106_PULL_RETURN_TASKS_GET` | messaging-standards-2026-11 | Volta por pull: quem está do lado de fora consulta (fetch-replies.sh / tasks/get), em vez de receber webhook |
+| 3.6 | `C_SUPERACAO_20261106_RFC10027_CROSS_DEVICE_PHISHING` | messaging-standards-2026-11 | Segundo o juiz, a RFC 10027/BCP 247 diz que o RFC 8628 é suscetível a phishing de consentimento entre dispositivos; só se usa s |
+| 3.6 | `C_SUPERACAO_20261106_SENDER_KID_GATE` | messaging-standards-2026-11 | Gate por kid pinado do remetente (iss==from no a2a-verify) antes do channel |
+| 3.6 | `C_SUPERACAO_20261106_SIGNED_ENVELOPE_CROSS_USER` | messaging-standards-2026-11 | Envelope A2A assinado, com kid pinado, entre usuários |
+| 3.3 | `C_SUPERACAO_20261106_ADR0021_ATTRIBUTE_TABLE_LITERAL` | messaging-standards-2026-11 | Tabela da ADR 0021 pela linha literal, sem aspas internas: '· `source` · Agent DID URI ·', com id=entry_id e type=ai.agentmesh. |
+| 3.3 | `C_SUPERACAO_20261106_EIP_DLC_TYPICAL_LOCAL_PER_MACHINE` | messaging-standards-2026-11 | Dead Letter Channel do EIP, pelo próprio parágrafo: o sistema PODE mover a mensagem; tipicamente cada máquina tem seu canal loc |
+| 3.3 | `C_SUPERACAO_20261106_EVENTMESH_A2A_MAPPING_CORRECTED` | messaging-standards-2026-11 | EventMesh A2A pelo README EN: a mensagem entre agentes é um CloudEvent; type marca requisição ou resposta, mcptype a direção, |
+| 3.3 | `C_SUPERACAO_20261106_HONKER_ALPHA_WITH_RELEASE_V060` | messaging-standards-2026-11 | honker: alpha declarado no README, licença Apache-2.0 OR MIT, e release v0.6.0 existente fora do README (API do GitHub /releases  |
+| 3.3 | `C_SUPERACAO_20261106_NATS_SYNC_INTERVAL_NO_DEFAULT` | messaging-standards-2026-11 | sync_interval do JetStream, pela própria página: o filestore usa os buffers do SO e o servidor força o sync no intervalo; 'alwa |
+| 3.3 | `C_SUPERACAO_20261106_SQS_DLQ_RETENTION_STANDARD_VS_FIFO` | messaging-standards-2026-11 | Retenção na DLQ do SQS, pelo próprio parágrafo: na fila standard o timestamp de enqueue fica inalterado e a retenção maior n |
+| 2.2 | `C_OPCAO_QUEUE_2_REDIS_STREAMS` | messaging-standards-2026-11 | Fila 2: Redis Streams com consumer groups (nesta VPS o Docker fura o ufw, e já houve Redis sem auth exposto) |
+| 1.5 | `C_OPCAO_ENVELOPE_B_CLOUDEVENTS_ONLY` | messaging-standards-2026-11 | Envelope B: CloudEvents 1.0 puro, fora do A2A |
+
+## nanochat-onion-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 63.0 | `Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10` | nanochat-onion-2026-10 | Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina |
+| 30.6 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
+| 16.5 | `C_OPCAO_B_NANOCHAT_STUDY_BENCH` | nanochat-onion-2026-10 | OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e le |
+| 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
+| 10.8 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
+| 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
+
+## plugin-write-2026-11 — 13 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 59.5 | `D_VETO_ESTREITO_MAIS_VARREDURA` | plugin-write-2026-11 | Decisão do maestro de 2026-11-04: veto estreito mais varredura no disco. Um hook PreToolUse em Write, Edit, NotebookEdit e Bash c |
+| 27.0 | `C_TETO_NAO_E_FRONTEIRA` | plugin-write-2026-11 | TETO (peça 7): esta guarda é contenção de acidente e de injeção ingênua, NÃO fronteira. Quem quer contornar consegue, e o  |
+| 16.0 | `D_MOLDE_COMPOE_O_JUIZ_DO_MOAT` | plugin-write-2026-11 | Molde pelo censo: pretooluse-direct-provider-api.sh é o único PreToolUse com --selftest próprio, e é a forma de hook mais chec |
+| 13.6 | `C_TETO_CAI_JUNTO_COM_O_SETTINGS` | plugin-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json e com o próprio script, que o veto não protege. A medição g |
+| 8.0 | `E_ELENXO_REPROVOU_E_CUROU` | plugin-write-2026-11 | A 1ª passada adversarial REPROVOU a guarda em aad2d62d3, com 6 achados altos e 7 médios. O 0 de 371 do replay se sustentou, mas  |
+| 6.8 | `C_TETO_BASH_FALHA_PELO_VOCABULARIO` | plugin-write-2026-11 | TETO: em Bash a lista falha pelo vocabulário. Tudo o que não é forma listada passa. |
+| 6.8 | `C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE` | plugin-write-2026-11 | TETO: o processo de um mod e um MCP de escrita ficam fora do PreToolUse: a escrita deles não é uma chamada de Write nem de Bash  |
+| 6.4 | `E_BANCADA_CASOS_E_MUTANTES` | plugin-write-2026-11 | Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 80 mutantes, cada  |
+| 5.1 | `C_TETO_PARTIDA_E_DETECCAO` | plugin-write-2026-11 | TETO: no SessionStart o plugin que puder carregar já carregou: o aviso é detecção, não prevenção. |
+| 5.1 | `C_TETO_REDIRECIONAMENTO_COMPOSTO` | plugin-write-2026-11 | TETO: redirecionamento de composto e formas raras passam calados: { } > alvo, ( ) > alvo, for … done > alvo, if … fi > alvo, & |
+| 4.5 | `C_FALSO_POSITIVO_E_O_DEFEITO_DOMINANTE` | plugin-write-2026-11 | A vizinha ensina: a guarda do .env deu dois falsos positivos hoje, relatados pelo maestro, e mais dois nesta forja (um grep em .cl |
+| 4.2 | `C_CONSEQUENCIA_A_SESSAO_NAO_FORJA_MOD` | plugin-write-2026-11 | Consequência declarada: nesta árvore a sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill em |
+| 4.0 | `Q_ELENXO_PENDENTE` | plugin-write-2026-11 | O Elenxo não rodou: a passada adversarial é da sessão principal, em revisor novo, com mandato de achar o falso positivo. Enquan |
+
+## maestro-persona-2026-11 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 58.5 | `Q_MAESTRO_PERSONA_1105` | maestro-persona-2026-11 | Como o Onion copia voz, preferências e julgamento do maestro em todo papel de sessão (core, brain, curadoria, kg-ssot) sem copia |
+| 30.0 | `C_OPCAO_A_KG_SSOT_PERSONA_GRAPH_PROJECTED_BY_ROLE` | maestro-persona-2026-11 | A. Fonte única no KG-SSOT: grafo maestro-persona com nós de voz, julgamento e limite (porquê e evidência em cada um), projetad |
+| 9.8 | `C_OPCAO_D_IDENTITY_IN_WEIGHTS_OR_SLM` | maestro-persona-2026-11 | D. Identidade nos pesos (fine-tune/SFT de identidade) ou SLM |
+| 5.4 | `C_SUPERACAO_20261105_GSS_V3_83_PERCENT` | maestro-persona-2026-11 | Correção pela v3 de 2411.10109 (28/06/2026): em itens do GSS fora do treino, agentes de entrevistas de duas horas com 1.052 amer |
+| 5.4 | `C_SUPERACAO_20261105_PANZA_STYLE_N1_RATER` | maestro-persona-2026-11 | O Panza mede fidelidade de ESTILO de e-mail com BLEU e MAUVE (MAUVE 0,6-1,0 no próprio usuário, ~0 nos outros), sem LLM-juiz; a  |
+| 5.4 | `C_SUPERACAO_20261105_RFC8693_ACT_CLAIM` | maestro-persona-2026-11 | RFC 8693 (OAuth 2.0 Token Exchange, Standards Track, jan/2020), seções 1.1 e 4.1: o claim act separa o ator do titular e disting |
+| 5.4 | `C_SUPERACAO_20261105_SUMMARY_WEAK_SIGNAL_NO_SIGNIFICANCE` | maestro-persona-2026-11 | Twin-2K (GPT-4.1-mini): resumo 3,7 pp abaixo do texto completo (68,02 contra 71,72; acaso 59,17, reteste 81,72), JSON 1,24 pp abai |
+| 5.4 | `C_SUPERACAO_20261105_WIMSE_SECRET_NOT_DEPLOY` | maestro-persona-2026-11 | O draft individual WIMSE (-02, sem posição formal) exige que o agente nunca tenha a credencial bruta, guardada em cofre que não |
+| 5.0 | `C_OPCAO_B_NATIVE_USER_MEMORY_SHARED` | maestro-persona-2026-11 | B. Memória de usuário nativa do Claude Code (CLAUDE.md de usuário, auto memory, autoMemoryDirectory) compartilhada entre repos |
+| 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
+| 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
+| 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
+
+## ocr-local-sei-2026-09 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 54.0 | `Q_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | Qual motor de OCR LOCAL escolher para ler PDF-imagem de documento administrativo brasileiro do SEI (fonte serifada, tabelas, carim |
+| 14.0 | `C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES` | ocr-local-sei-2026-09 | OPCAO (9) — O PROCEDIMENTO, que o Elenxo recomenda decidir ANTES do motor: consenso entre 2 motores ARQUITETURALMENTE INDEPENDEN |
+| 9.0 | `C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT` | ocr-local-sei-2026-09 | OPCAO (8) — O PASSO 0, e a de maior confianca do grafo (0.9): antes de instalar QUALQUER motor, rodar `pdftotext -layout` e `pdf |
+| 6.0 | `C_OPCAO_TESSERACT5_TESSDATA_BEST` | ocr-local-sei-2026-09 | OPCAO (1): Tesseract 5 instalado por apt com por.traineddata do tessdata_best — saida TSV com confidence e bounding box POR PALA |
+| 3.6 | `C_OPCAO_DOCTR_TORCH_VENV` | ocr-local-sei-2026-09 | OPCAO (3): docTR (python-doctr + torch) em venv isolado. Compatibilidade com Python 3.12 CONFIRMADA em tier 9 (E_DOCTR_PYTHON_311_ |
+| 3.2 | `C_OPCAO_DOTSOCR_3B_CPU` | ocr-local-sei-2026-09 | OPCAO (5): dots.ocr / dots.mocr 3B em CPU, sem flash-attn/vLLM (que nao instalam sem GPU). O arco do dossie aponta este como estad |
+| 2.7 | `C_OPCAO_DOCLING_IBM` | ocr-local-sei-2026-09 | OPCAO (7): Docling (IBM, Apache-2.0) — CANDIDATO AUSENTE DO ESCOPO ORIGINAL da pergunta, que apareceu como vencedor em TABELA no |
+| 2.7 | `C_OPCAO_PADDLEOCR_VL_CPU` | ocr-local-sei-2026-09 | OPCAO (2): PaddleOCR / PaddleOCR-VL 0.9B em CPU, venv isolado. Confianca 0.3: TODAS as claims a favor foram refutadas nesta rodada |
+| 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
+| 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
+
+## onion-brain-mcp-remoto-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 54.0 | `C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG` | onion-brain-mcp-remoto-2026-10 | OPÇÃO B: MCP remoto público por streamable-http stateless, resource server OAuth 2.1 (PRM, RFC 9728) com o Logto como AS e clai |
+| 42.5 | `Q_ONION_BRAIN_MCP_REMOTO_2026_10` | onion-brain-mcp-remoto-2026-10 | SAC-70: o Onion deve oferecer um MCP remoto só leitura (kg_list, kg_radar, kg_node, docs_search) para o time não técnico de um  |
+| 19.2 | `C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT` | onion-brain-mcp-remoto-2026-10 | OPÇÃO A: reativar o precedente ops/mcp-onion-kg apontado para o clone do brain-granaai, consumido só pelo LibreChat da VPS (SSO |
+| 4.5 | `C_OPCAO_C_GATEWAY_DE_TERCEIROS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO C: gateway de terceiros (Pomerium, agentgateway, Cloudflare Access) na frente de um servidor MCP sem auth própria, fazend |
+| 3.6 | `C_OPCAO_E_MULTI_TENANT_POR_CLAIM` | onion-brain-mcp-remoto-2026-10 | OPÇÃO E: multi-tenant único com a raiz escolhida por claim do token — adiada até haver mais de um hub. |
+| 1.5 | `C_OPCAO_D_WORKERS_AS_PROXY` | onion-brain-mcp-remoto-2026-10 | OPÇÃO D: padrão Cloudflare Workers com o servidor atuando como AS proxy para o IdP do hub — listada como rejeitada por acopla |
+| 1.2 | `C_OPCAO_F_SEM_MCP_LEITOR_JS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO F: não fazer MCP — manter o segundo leitor JS do corpus (o paliativo atual do hub). |
+
+## vibe-subagent-2026-11 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 52.8 | `Q_VIBE_SUBAGENT_SESSION_HOOKS_1104` | vibe-subagent-2026-11 | No Mistral Vibe 3.0.4, como o subagente do agents.spawn grava a sessão e o vínculo pai→filho, como o registro do filho liga o  |
+| 5.4 | `C_SUPERACAO_20261104_CHILD_SESSIONS_EMPTY_BY_STRUCTURE` | vibe-subagent-2026-11 | Na 3.0.4, meta.json.child_sessions vem vazio por estrutura (nenhum escritor de ChildSessionLink; o adapter só copia o previous),  |
+| 3.6 | `C_SUPERACAO_20261104_HOOKS_PAGE_ANSWERS_PART` | vibe-subagent-2026-11 | A página de agentes não cobre (1)-(4), mas a página oficial de hooks documenta que subagentes herdam os hooks do projeto, o std |
+| 3.6 | `C_SUPERACAO_20261104_README_SESSION_JOURNAL` | vibe-subagent-2026-11 | O README chama o armazenamento atual da sessão de session journal, no diretório de logs de sessão sob VIBE_HOME (journal_dir no |
+| 3.6 | `C_SUPERACAO_20261104_RELEASES_CONFIRM_HOOKS_IN_SUBAGENT` | vibe-subagent-2026-11 | As release notes confirmam hooks dentro do subagente (v3.0.2), parent_session_id, session_id e transcript_path no stdin (v2.26.0), |
+
+## deploy-acts-2026-11 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 52.0 | `Q_VETO_BARRA_O_ATO_DE_DEPLOY` | deploy-acts-2026-11 | o veto do MOAT barra, pela sessão, o ato de deploy e de publicação que os wrappers de ops/ fazem, e deixa passar o ensaio e a l |
+| 4.8 | `C_TETO_COPIA_MUDADA_E_RENOMEADA` | deploy-acts-2026-11 | teto: a cópia de um wrapper que alguém MUDA e renomeia escapa do veto do ato; o corpo dela segue julgado por alvo, e a cópia ve |
+| 4.8 | `C_TETO_FORA_DO_BASH` | deploy-acts-2026-11 | teto: o veto só vê o Bash da sessão; um servidor MCP que executa comando, um interpretador que chama o wrapper por subprocess e |
+| 4.8 | `C_TETO_PUBLICACAO_NO_DERIVADO_E_SO_AVISO` | deploy-acts-2026-11 | teto: no derivado a publicação só avisa; quem barra é o hook local do adotante, quando ele existe, e um adotante sem esse hook |
+| 4.5 | `C_TETO_AGENDAMENTO_NATIVO_E_WRITE` | deploy-acts-2026-11 | teto: o agendamento nativo do Claude Code (CronCreate, ScheduleWakeup do /loop, RemoteTrigger) e a unit .timer escrita pela ferram |
+| 4.5 | `C_TETO_MERGE_ALHEIO_SEGUE_SOCIAL` | deploy-acts-2026-11 | teto: o merge de PR de outra sessão pelo caminho verificado segue regra social, porque o hook não sabe de quem é o PR |
+| 4.5 | `C_TETO_SCRIPT_DE_PUBLICACAO_FORA_DA_LISTA` | deploy-acts-2026-11 | teto: script de ops/ que age no forge ou no público e que nenhuma linha do tsv nomeia (apply-ruleset-main.sh) passa; a REGRA 117  |
+| 3.2 | `C_TETO_ARGUMENTO_DE_FORA_DA_STRING` | deploy-acts-2026-11 | teto: a assinatura que chega por variável de fora da string (arquivo, ambiente, laço) passa calada, por decisão |
+| 3.2 | `C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA` | deploy-acts-2026-11 | teto: a REGRA 117 confere só que a palavra da assinatura existe no código do script, não que ela seja o que faz o ato |
+| 3.0 | `C_TETO_TAG_POR_NOME_AMBIGUO` | deploy-acts-2026-11 | teto: push de tag pelo nome só se reconhece se a tag já existe no clone e não há branch homônima, ou se nasceu na mesma strin |
+
+## onda-derivada-e-o-lugar-do-onion-2026-10 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 51.8 | `Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026` | onda-derivada-e-o-lugar-do-onion-2026-10 | Que PEÇA o Onion é na cadeia de valor de outra pessoa (PRÉ-geração, DURANTE, PÓS, META), onde ele pode ser BASE ou ACOPLADO  |
+| 42.0 | `D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION` | onda-derivada-e-o-lugar-do-onion-2026-10 | DECISÃO ABERTA (o maestro sela; esta sessão NUNCA sela). Em qual gargalo DERIVADO o Onion é a peça mais próxima de pronto, qu |
+| 15.8 | `C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO A — ACOPLAR AO QUE JÁ SE PAGA: vender condução + gate INSTALADO como camada sobre o contrato de Claude Code/Copilot q |
+| 12.0 | `C_OPCAO_G_RE_MEDIR_ANTES_DE_ESCOLHER` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO G — RE-MEDIR ANTES DE ESCOLHER: abrir as 4 fontes que decidem (permit.io/mcp-gateway, toolbooth, Brain0, github.blog def |
+| 9.8 | `C_OPCAO_B_POS_PROVA_E_ATESTACAO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO B — PÓS, PROVA/ATESTAÇÃO: vender o registro verificável do que o agente fez e com base em quê (tier de fonte, verif |
+| 8.0 | `C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO E — (B+D) NO FORMATO GURU: conhecimento verificado com condução humana embutida, preço fechado por contrato, sem asse |
+| 5.6 | `C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO D — META, Company Brain / grafo ancorado como serviço. A FAVOR: é o norte declarado da casa (NS1, conhecimento) e o mo |
+| 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
+| 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
+
+## codex-as-core-2026-10 — 21 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 51.0 | `C_RECOMMENDATION_AFTER_SPIKES_1026` | codex-as-core-2026-10 | Depois dos spikes: o Codex 0.164.0 TEM o primitivo do bloqueio determinístico, mas ainda não roda o Onion Core com eficácia equ |
+| 45.5 | `C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026` | codex-as-core-2026-10 | Hooks que barram: PARCIAL (antes FALTA). O bloqueio determinístico existe no 0.164.0 e vale até sem sandbox, mas pede DUAS confi |
+| 24.0 | `C_PIECE_EXEC_CI_EQUIVALENT_1026` | codex-as-core-2026-10 | Execução não interativa e CI: EQUIVALENTE ao claude -p para o gate que lê e reprova (exec read-only por padrão, JSONL tipado, |
+| 24.0 | `C_PIECE_MCP_CLIENT_ONLY_1026` | codex-as-core-2026-10 | MCP: EQUIVALENTE como cliente ([mcp_servers.*] em TOML, stdio e HTTP, allow/deny de tools, aprovação por servidor e tool); FALTA |
+| 22.0 | `C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026` | codex-as-core-2026-10 | Subagentes: EQUIVALENTE em outro formato (TOML com model por agente e teto de paralelismo); isolamento por worktree e restrição  |
+| 18.0 | `C_PIECE_RELEASES_TRAJECTORY_OPEN_1026` | codex-as-core-2026-10 | Trajetória de releases: ABERTA. Lidas só a 0.137.0 e a 0.164.0; a cadência real é de estáveis a cada poucos dias (27 minors e |
+| 15.4 | `C_PIECE_RULES_SANDBOX_PARTIAL_1026` | codex-as-core-2026-10 | Sandbox, approval policy e execpolicy: PARCIAL. Há forbidden>prompt>allow por prefixo de comando, sandbox read-only/workspace-wri |
+| 12.0 | `C_PIECE_AGENTS_MD_EQUIVALENT_1026` | codex-as-core-2026-10 | AGENTS.md: EQUIVALENTE ao CLAUDE.md em descoberta e precedência por diretório (raiz ao cwd, o mais próximo prevalece, override  |
+| 11.0 | `C_PIECE_SKILLS_LOAD_EQUIVALENT_1026` | codex-as-core-2026-10 | Skills e comandos: EQUIVALENTE em carregamento (antes NÃO JULGADO). Três skills do porte carregam por $nome no 0.164.0 e uma rod |
+| 8.0 | `Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026` | codex-as-core-2026-10 | A falha aberta declarada (erro, timeout, resposta malformada do PreToolUse) acontece de fato no 0.164.0, e um hook GERENCIADO (req |
+| 7.2 | `Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026` | codex-as-core-2026-10 | Correção na LINHA VIVA onion-codex (repo próprio, não este): envolver o .codex/hooks.json do porte em {\"hooks\": ...} e cobra |
+| 6.0 | `Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026` | codex-as-core-2026-10 | O deny do PreToolUse vale para apply_patch que EDITA (Update File) ou apaga arquivo existente, e em repositório com várias workt |
+| 6.0 | `Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026` | codex-as-core-2026-10 | Quem grava a confiança do projeto na config do usuário do Codex, e em que modo? Se o próprio codex exec a grava sob --dangerous |
+| 4.5 | `Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026` | codex-as-core-2026-10 | Existe sinal de máquina estável do veto do hook no codex exec (código de saída, evento no --json, flag) para um gate de CI rep |
+| 3.6 | `C_SUPERACAO_20261026_ISSUE_TITLES_27833_20204` | codex-as-core-2026-10 | Os títulos reais de #27833 ('PreToolUse deny (exit 2 + permissionDecision JSON) is not enforced for apply_patch - hook fires, wri |
+| 3.6 | `C_SUPERACAO_20261026_RELEASE_CADENCE_DAYS` | codex-as-core-2026-10 | A listagem de releases do repositório (rust-v0.160.1 a rust-v0.164.0) sustenta a cadência real: estáveis a cada poucos dias, n |
+| 3.6 | `C_SUPERACAO_20261026_REPO_SKILLS_REPLACE_PROMPTS` | codex-as-core-2026-10 | Skills de repositório em .agents/skills (SKILL.md com name e description), versionadas no repo e invocáveis por $, /skills ou im |
+| 3.6 | `C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT` | codex-as-core-2026-10 | O parágrafo literal da seção 'When Codex does not split the script' da página de rules sustenta o fato: o script inteiro é av |
+| 3.6 | `C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED` | codex-as-core-2026-10 | Formulação sustentada pela página de approvals e segurança: defaults sem rede e escrita no workspace, caminhos protegidos (.gi |
+| 3.6 | `C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN` | codex-as-core-2026-10 | As linhas #26106 e #26167 da 0.137.0 (catálogo de skills por turno e injeção de prompt v1) e #54050 da 0.164.0 (refresh de skil |
+| 3.6 | `C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT` | codex-as-core-2026-10 | Formulação corrigida pela página de subagentes: spawn por pedido direto ou instrução de projeto/skill, agente customizado nom |
+
+## persona-runtime-2026-11 — 29 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 49.5 | `C_OPCAO_A_OWN_BOT_AGENT_SDK_BRIDGE` | persona-runtime-2026-11 | A) Bot próprio no Claude Agent SDK, hospedado no onion-bridge (runner do degrau 2 com DynamicUser), com o kg_mcp como ferramenta  |
+| 43.8 | `C_OPCAO_B_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-hospedado) Claude Tag no Slack, ambiente da Anthropic: conectores pelo Agent Proxy, sem hook do adotante, dados do lado da Anthr |
+| 17.5 | `C_OPCAO_A_PLUS_B_BRIDGE` | persona-runtime-2026-11 | A+ponte B) A como núcleo e o Claude Tag só como ponte opcional nomeada para um adotante não regulado, com A como alternativa lo |
+| 6.8 | `C_OPCAO_C_THIRD_PARTY_MARKETPLACE_BOT` | persona-runtime-2026-11 | C) Bot de mercado de terceiro (Marketplace): o vendor concentra os tokens OAuth de muitos clientes (classe Drift), há lock-in e n |
+| 6.2 | `C_OPCAO_B_SELF_HOSTED_CLAUDE_TAG` | persona-runtime-2026-11 | B-self-hosted) Claude Tag com runner na rede do adotante: o runtime é local, mas os conectores do admin não funcionam ali |
+| 3.6 | `C_SUPERACAO_20261106_AUDIT_PAGE_READ` | persona-runtime-2026-11 | A página audit.md do Claude Tag, lida: quatro trilhas de auditoria e nenhum log por ato de quem pediu. |
+| 3.6 | `C_SUPERACAO_20261106_B_DISABLE_DMS` | persona-runtime-2026-11 | Reinstalar com a restrição: em B, desligar DMs, porque DM 1:1 roda na conta claude.ai de quem enviou. |
+| 3.6 | `C_SUPERACAO_20261106_MERGE_OWN_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 6 de identidade própria por access bundles com o descarte tier 9 reinstalado. |
+| 3.6 | `C_SUPERACAO_20261106_MERGE_SERVICE_IDENTITY_INTO_TIER9` | persona-runtime-2026-11 | Fundir o descarte tier 5 de identidade de serviço com o descarte tier 9 reinstalado. |
+| 3.6 | `C_SUPERACAO_20261106_PERSONA_RUNNER_DEGRAU2` | persona-runtime-2026-11 | Runner da persona sob o degrau 2 do bridge: unit systemd com DynamicUser, ProtectHome e IPAddressDeny, no lugar de bwrap ou Docker |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_ANY_MEMBER_INVOKES` | persona-runtime-2026-11 | Reinstalar com a primária: por padrão qualquer membro de workspace Slack conectado invoca o Claude Tag em canais, com ou sem con |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_CONNECTOR_METHOD_PATH` | persona-runtime-2026-11 | Reinstalar a claim de credencial por host, caminho e método, com a ressalva da revisão de conector pessoal. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_NON_MARKETPLACE_RATE_LIMIT` | persona-runtime-2026-11 | Reinstalar a claim do corte de rate limit para apps fora do Marketplace com a primária redirecionada de docs.slack.dev. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PROXY_ALLOWLIST_EXFIL` | persona-runtime-2026-11 | Reinstalar com a primária: proxy fora da fronteira faz allowlist, injeta credencial e loga, mas dentro da allowlist o agente envi |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_PUBLIC_SEARCH_SURFACE` | persona-runtime-2026-11 | Reinstalar com a primária do Claude Tag: a busca padrão cobre todos os canais públicos do workspace, inclusive os em que o Clau |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SELF_HOSTED_NO_CONNECTORS` | persona-runtime-2026-11 | Reinstalar com a primária: no ambiente self-hosted o Claude Tag não usa os conectores que o admin adiciona. |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_SHARED_CREDENTIAL_PERSONAL_REPAIR` | persona-runtime-2026-11 | Reinstalar a claim de credencial compartilhada por canal, com o reparo dos conectores pessoais (impersonação, não delegação c |
+| 3.6 | `C_SUPERACAO_20261106_REINSTATE_TAG_SERVICE_ACCOUNTS` | persona-runtime-2026-11 | Reinstalar a claim de que em canais o Claude Tag age sob service accounts próprias, com a primária security-and-data.md (seção |
+| 3.6 | `C_SUPERACAO_20261106_RESTRICT_ACCESS_PAGE_READ` | persona-runtime-2026-11 | A página restrict-access.md do Claude Tag, lida: resposta sem menção com 'Respond automatically' ligado por padrão, audit log  |
+| 3.6 | `C_SUPERACAO_20261106_SDK_PROXY_RECOMMENDED_NOT_DEFAULT` | persona-runtime-2026-11 | No Agent SDK a Anthropic RECOMENDA, para implantação endurecida, fronteira de isolamento e credenciais por proxy fora dela; mont |
+| 3.6 | `C_SUPERACAO_20261106_SLACK_AI_2024_PATCHED_RISK_CLASS` | persona-runtime-2026-11 | Em ago/2024 o Slack AI (Salesforce, não o Claude) teve injeção indireta divulgada pela PromptArmor que exfiltrava canais privad |
+| 3.6 | `C_SUPERACAO_20261106_SLACK_RATE_LIMIT_EXISTING_INSTALLS_2026_03_03` | persona-runtime-2026-11 | Desde 2025-05-29 apps comerciais fora do Marketplace (novos ou instalação nova) ficam em 1 req/min e 15 objetos; instalações e |
+| 3.6 | `C_SUPERACAO_20261106_TAG_AGENT_IDENTITY_WITH_DM_EXCEPTION` | persona-runtime-2026-11 | Em canal o Claude Tag age por padrão com contas de serviço próprias (agent identity do Owner), com acesso por conector, repo ou |
+| 3.6 | `C_SUPERACAO_20261106_TAG_AUDIT_FOUR_TRAILS` | persona-runtime-2026-11 | Auditoria de B = log de admin + export de rede por hora (sem git nem MCP) + log do serviço conectado sob a conta de serviço; fal |
+| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_IDENTITIES_DEFAULT_TWO_EXCEPTIONS` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o Claude age por padrão sob identidades de serviço próprias; duas exceções: conector pes |
+| 3.6 | `C_SUPERACAO_20261106_TAG_SERVICE_PATTERN_PLUS_USER_DELEGATION` | persona-runtime-2026-11 | No Claude Tag, em canais e group DMs o agente age como contas de serviço do Owner, credenciais pelo Agent Proxy; conectores pesso |
+| 3.6 | `C_SUPERACAO_20261106_TAG_TWO_CREDENTIAL_PATHS_NO_ACT` | persona-runtime-2026-11 | No Claude Tag há dois caminhos: conectores do admin com credencial de serviço compartilhada no canal, sem mapear quem menciona;  |
+| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_FOUR_LAYERS` | persona-runtime-2026-11 | Escada de B em camadas: (a) allowlist determinística host+método+caminho; (b) checker probabilístico do auto mode + até 50 all |
+| 3.6 | `C_SUPERACAO_20261106_TAG_WRITE_CONTROL_PROXY_DETERMINISTIC` | persona-runtime-2026-11 | Escrita no Claude Tag por camadas: escopo da conta de serviço, onde o bundle se aplica, Agent Proxy default-deny com host, caminh |
+
+## slm-frameworks-2026-10 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.8 | `C_STAGE0_GATE_BEFORE_ANY_MODEL` | slm-frameworks-2026-10 | LEITURA — PORTA 0 (antes de qualquer modelo). ENTRA: a pergunta "precisa de ML?" e os erros REAIS que o corpus já rotula (refut |
+| 45.5 | `C_SPIKE_MEASURE_READY_SPECIALISTS` | slm-frameworks-2026-10 | LEITURA — SPIKE (dias, não semanas; Smol "a few days"). ENTRA: o eval selado da porta 0 + os 4 especialistas prontos (OpenAI Pr |
+| 42.5 | `C_NO_NUMERIC_PASS_CRITERIA_IN_SOURCES` | slm-frameworks-2026-10 | LEITURA (o achado transversal): NENHUMA das 9 fontes dá critério NUMÉRICO de passagem entre etapas — Smol deixa "your perform |
+| 42.0 | `Q_SLM_GRADUAL_ROADMAP_PROPOSAL` | slm-frameworks-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; NÃO revisa D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, que segue done): adotar o roteiro gradua |
+| 26.0 | `C_MVP_FINETUNE_ONLY_IF_EVAL_FAILS` | slm-frameworks-2026-10 | LEITURA — MVP / AJUSTE (só se o eval FALHAR no spike ou na PoC). ENTRA: pares entrada/saída DE TREINO separados do eval selado |
+| 20.0 | `C_EVAL_SET_PRIVATE_EXCLUDED_FROM_DOOR` | slm-frameworks-2026-10 | LEITURA (ação concreta, não opcional): o eval selado tem de ficar PRIVADO e EXCLUÍDO da projeção da porta pública onion-cor |
+| 18.9 | `C_LIGHTEVAL_IS_CANDIDATE_NOT_CHOICE` | slm-frameworks-2026-10 | LEITURA (instrumento): o lighteval é CANDIDATO a validar no spike, não o harness escolhido. A favor: tarefa e métrica customiz |
+| 15.6 | `C_POC_E2E_WITH_SIMPLE_MODEL` | slm-frameworks-2026-10 | LEITURA — PoC. ENTRA: o especialista que passou no spike (no papel do "modelo simples" da Fase I do Google). FAZ: plugá-lo por  |
+| 13.6 | `C_ROADMAP_VOCAB_IS_ONION_COINAGE` | slm-frameworks-2026-10 | LEITURA (declaração de autoria): o vocabulário spike → PoC → MVP → produto e o mapeamento das fontes nele são CUNHAGEM D |
+| 12.0 | `C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR` | slm-frameworks-2026-10 | LEITURA (veto): LLM-as-judge NÃO serve de gate em etapa nenhuma enquanto o Onion tiver um rotulador só. A calibração exige cor |
+| 12.0 | `Q_SLM_FRAMEWORKS_ROADMAP_2026_10` | slm-frameworks-2026-10 | Quais frameworks e guias PRIMÁRIOS dizem como avaliar e especializar modelos pequenos de forma progressiva — etapas, o que entr |
+| 11.6 | `C_PRODUCT_INSTRUMENT_AND_LOOP` | slm-frameworks-2026-10 | LEITURA — PRODUTO (resultado final POSSÍVEL, proposta do Onion — nenhuma fonte o fecha). ENTRA: o especialista que passou no  |
+| 11.2 | `C_COST_ARGUMENTS_NOT_THE_RULER` | slm-frameworks-2026-10 | LEITURA (o que NÃO sustenta o roteiro): os argumentos de CUSTO desta rodada não servem de critério. Os 161k GPU-h do Smol são  |
+| 11.2 | `C_NO_TRAIN_HOLDS_ONLY_WHILE_NO_EVAL` | slm-frameworks-2026-10 | LEITURA (temporalidade do "não treinar agora"): o Hamel mostra que, COM eval, o ajuste fica barato (99% do trabalho é montar dad |
+
+## motores-de-regras-deterministicos-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.0 | `Q_MOTORES_DE_REGRAS_DETERMINISTICOS_2026` | motores-de-regras-deterministicos-2026-10 | Quais sao os motores de decisao DETERMINISTICOS vivos em 2026 (substitutos do ZEN Engine e os de politica), para onde vai a supera |
+| 33.0 | `D_MOTOR_DE_REGRAS_DO_GATE_ONION` | motores-de-regras-deterministicos-2026-10 | DECISAO ABERTA (o maestro sela): o gate determinístico do Onion — motor de regras escrito a mao em bash, 5.282 linhas, 203 cham |
+| 18.0 | `C_OPCAO_A_MANTER_SHELL_E_IMPORTAR_O_METODO_VGD` | motores-de-regras-deterministicos-2026-10 | OPCAO A — manter o gate em shell a mao e importar o METODO do Cedar (verification-guided development), nao o motor: escrever um  |
+| 13.2 | `C_OPCAO_E_ALVO_CIRURGICO_AUTORIZACAO_DE_AGENTE` | motores-de-regras-deterministicos-2026-10 | OPCAO E — alvo cirurgico: nao migrar o gate, e adotar motor declarativo SO onde o dominio e autorizacao de AGENTE (permissao de  |
+| 10.5 | `C_OPCAO_D_NAO_DECIDIR_E_REABRIR_AS_FAIXAS_NAO_LIDAS` | motores-de-regras-deterministicos-2026-10 | OPCAO D — nao decidir agora: reabrir a pesquisa nas faixas nao lidas (Drools, Camunda/DMN e o status ISO/OMG, OpenL Tablets, Eas |
+| 9.6 | `C_OPCAO_C_HIBRIDO_SHELL_EXTRAI_MOTOR_DECIDE` | motores-de-regras-deterministicos-2026-10 | OPCAO C — hibrido: o shell continua EXTRAINDO fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de ho |
+| 7.5 | `C_OPCAO_B_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO` | motores-de-regras-deterministicos-2026-10 | OPCAO B — migrar o gate determinístico para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como po |
+
+## zoho-glpi-adapters-2026-09 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.0 | `Q_ZOHO_GLPI_ADAPTERS_0923` | zoho-glpi-adapters-2026-09 | Como integrar Zoho Projects (como task manager) e GLPI (como FONTE DE ATIVIDADE para apuracao/relatorios/apresentacoes) ao Onion v |
+| 21.0 | `C_OPCAO_A_ACTIVITY_SOURCE_IRMA_READONLY` | zoho-glpi-adapters-2026-09 | OPCAO A — GLPI FORA do task-manager: nasce familia SDAAL irma read-only `.claude/utils/activity-source/` com 4-6 metodos proprio |
+| 9.6 | `C_OPCAO_D3_PILOTO_ONLINE_DATADO` | zoho-glpi-adapters-2026-09 | OPCAO D3 — online como PILOTO de leitura com corte datado e gatilho nomeado, condicionado a sonda de cobertura de dados passar.  |
+| 9.0 | `C_SONDA_ANTES_DE_QUALQUER_ADAPTER` | zoho-glpi-adapters-2026-09 | CLAIM DE METODO — NENHUM adapter (nem activity-source, nem Zoho) se escreve antes de uma sonda de 3 medidas na instancia REAL, p |
+| 5.0 | `C_OPCAO_D1_ONLINE_PRIMEIRO_VPS_DEPOIS` | zoho-glpi-adapters-2026-09 | OPCAO D1 (ORDEM DE HOSPEDAGEM — a proposta explicita do maestro): usar o GLPI online agora e trazer para a VPS depois. Confianca |
+| 4.8 | `C_OPCAO_C_SEM_ADAPTER_INGESTAO_KG` | zoho-glpi-adapters-2026-09 | OPCAO C — sem adapter algum: ingestao periodica GLPI->KG (plugin Advanced Dashboard + export CSV, ou SQL direto no banco) e a ap |
+| 4.8 | `C_OPCAO_D2_VPS_PRIMEIRO` | zoho-glpi-adapters-2026-09 | OPCAO D2 — self-hosted na VPS PRIMEIRO (Docker, prefixo onion-vps- conforme a convencao da casa), online nunca ou so como espelh |
+| 0.6 | `C_OPCAO_B_GLPI_DENTRO_TASK_MANAGER` | zoho-glpi-adapters-2026-09 | OPCAO B — GLPI DENTRO do task-manager, com ~10 metodos stub (createTask/deleteTask/createSubtask/updateStatus/...): e a classe d |
+
+## jev-type-safe-ai-2026-10 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 46.2 | `Q_JEV_PRIMARIES_2026_10` | jev-type-safe-ai-2026-10 | O que e o JEV (jevtypesafeai.com): onde se enquadra na taxonomia de ferramentas de IA para desenvolvimento, que funcionalidades ex |
+| 25.5 | `C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL` | jev-type-safe-ai-2026-10 | A RESPOSTA A "por que ele diz nao alucinar": ele NAO diz. A garantia que o produto sustenta e ESTRUTURAL — tipo fixado pelo pedi |
+| 21.0 | `Q_JEV_IN_ONION_GATE_DISQUALIFIED` | jev-type-safe-ai-2026-10 | PROPOSTA a julgar na rodada de decisao (nao selada aqui): o JEV NAO deve sentar em gate DETERMINISTICO do Onion — nada que termi |
+| 20.0 | `C_JEV_CATEGORY_IS_SYSTEM_ONE` | jev-type-safe-ai-2026-10 | ONDE O JEV SE ENQUADRA: nao e LLM de chat, nem roteador, nem biblioteca de validacao de schema — e um "System One Model" (catego |
+| 12.8 | `C_ARCHITECTURE_NOT_DISCLOSED` | jev-type-safe-ai-2026-10 | A ARQUITETURA DO JEV NAO ESTA DECLARADA EM NENHUMA FONTE LIDA. Nenhuma pagina do revendedor, nenhuma frase do fabricante e nenhuma |
+| 12.0 | `C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL` | jev-type-safe-ai-2026-10 | COMO ELE SE INTEGRA, em uma frase: tudo e UMA chamada HTTP, e as "integracoes" sao embalagens dela. SDK TypeScript, servidor jev-m |
+| 12.0 | `Q_ONION_COULD_BECOME_THIS` | jev-type-safe-ai-2026-10 | O Onion poderia virar algo assim? DEFERIDA POR MANDATO para a rodada de decisao, e esta rodada entrega so o que ela precisa saber: |
+| 11.2 | `Q_ANCHORING_DOES_NOT_CHECK_PROVENANCE` | jev-type-safe-ai-2026-10 | PROPOSTA DE MECANISMO (classe nova, achada por esta rodada): o modo `primarias nomeadas` confere a CITACAO contra o DOCUMENTO e NA |
+| 9.0 | `Q_JEV_PRICE_AND_ACCESS_RECONCILE` | jev-type-safe-ai-2026-10 | Qual e o preco e o regime de acesso REAIS do JEV, conciliados? A rodada tem tres numeros incompativeis (US$ 0,042/M do fabricante, |
+| 4.8 | `E_DISTRIBUTION_GATEWAYS` | jev-type-safe-ai-2026-10 | NAO CONFIRMADA (a pagina diz; nenhum registro de origem confirma). A lista de distribuicao por gateways de terceiros (Vercel AI Ga |
+| 4.0 | `Q_JEV_ARCHITECTURE_UNKNOWN` | jev-type-safe-ai-2026-10 | Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos;  |
+| 2.0 | `E_OPENROUTER_SLUG_NOT_CONFIRMED` | jev-type-safe-ai-2026-10 | A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu |
+
+## onion-slm-2026-10 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.5 | `C_DEID_OFF_THE_SHELF_CANDIDATES` | onion-slm-2026-10 | LEITURA (1o caso de uso, de-id): existem dois especialistas PRONTOS, locais e Apache 2.0 para redacao de PII — OpenAI Privacy Fi |
+| 45.5 | `C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS` | onion-slm-2026-10 | LEITURA (desenho do eval de dominio): (i) F1 automatico de triplas e PISO, nao medida — gold incompleto e schema rigido punem ac |
+| 39.2 | `C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT` | onion-slm-2026-10 | LEITURA (quando SLM ajustado vence): vence em tarefa ESTREITA de conjunto fechado (NER 0,986 x 0,742; legal; classificacao), empat |
+| 33.6 | `Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026` | onion-slm-2026-10 | Contra primárias: das 45 afirmações do chat sobre SLMs, o que se sustenta e o que habilita ou veta ao Onion? Segue open: já h |
+| 30.8 | `C_DISTILLATION_REAL_BUT_TEACHER_BOUND` | onion-slm-2026-10 | LEITURA (destilacao): destilacao on-policy e real e barata em raciocinio matematico (Qwen3 74,4 a 1/10 do custo do RL; receita Tin |
+| 26.4 | `C_TYPED_EXTRACTION_OFF_THE_SHELF` | onion-slm-2026-10 | LEITURA (extracao tipada de conjunto fechado): NuExtract3 (Qwen3.5-4B, templates JSON tipados, Apache 2.0) e GLiNER2.5 (74M-0.3B,  |
+| 16.8 | `Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF` | onion-slm-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; NAO revisa o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10): quando o gatilho de C abrir, |
+| 16.2 | `C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION` | onion-slm-2026-10 | LEITURA (SLM em subtarefa agentica): o caminho LLM->SLM da NVIDIA e UMA via nao validada (position paper): exige log de todas as c |
+| 15.0 | `C_BASE_MODELS_MENU_2026_10` | onion-slm-2026-10 | LEITURA (menu de bases, SO se o eval falhar e o fine-tune abrir): Gemma 4 (Apache 2.0 padrao; E2B/E4B, 12B Unified desde 2026-06-0 |
+| 12.6 | `C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT` | onion-slm-2026-10 | LEITURA (capital): o dinheiro vai para o MODELO pequeno eficiente/customizavel — Liquid AI US$250M (edge/on-prem, 2024-12), Fast |
+| 9.9 | `X_CHAT_SOURCES_ONION_SLM` | onion-slm-2026-10 | FONTE DO CHAT do maestro (docs/discussions/onion-slm/fontes): 45 afirmacoes, estado nao-verificado, escrita SEM ler o repo (e por  |
+| 7.0 | `C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT` | onion-slm-2026-10 | LEITURA (embedders): EmbeddingGemma (308M, 100+ linguas) e Qwen3-Embedding (0.6B/8B) HABILITAM busca semantica local sobre o corpu |
+| 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
+| 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
+
+## nanochat-eixo-d-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.0 | `Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10` | nanochat-eixo-d-2026-10 | EIXO D do estudo Nanochat x Onion — qual o orcamento de dados sinteticos e de identidade para (D) treinar/ajustar modelo com o c |
+| 42.2 | `C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY` | nanochat-eixo-d-2026-10 | RESPOSTA A DUVIDA DO MAESTRO ("qual o orcamento de dados sinteticos e identidade?"): a rodada sustenta so uma ORDEM DE GRANDEZA DE |
+| 19.2 | `C_EIXO_D_OPTION_D_SECOND_GATE_EVAL` | nanochat-eixo-d-2026-10 | Projecao local de C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai): a opcao D CONTINUA GATED e ganha um SEGUNDO gate alem da falta de co |
+| 11.0 | `C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN` | nanochat-eixo-d-2026-10 | Sentido (a) e S7_claim_analogy_breaks, na forma que a rodada consegue dar: identidade em pesos exige RETREINO DE ESTAGIOS por muda |
+
+## unidade-bilhetavel-do-onion-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.0 | `D_UNIDADE_BILHETAVEL_DO_ONION` | unidade-bilhetavel-do-onion-2026-10 | DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): qual e a unidade bilhetavel do Onion que NAO contradiz a identidade canon |
+| 37.5 | `Q_UNIDADE_BILHETAVEL_DO_ONION_2026` | unidade-bilhetavel-do-onion-2026-10 | Qual e a UNIDADE BILHETAVEL de um framework de orquestracao com gate deterministico, em outubro de 2026, dado que a identidade can |
+| 14.0 | `C_OPCAO_A_VEREDITO_DE_GATE_POR_EXECUCAO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (a) — VEREDITO DE GATE POR EXECUCAO: cobrar pelo rodou, reprovou, aqui esta a prova. A FAVOR: e a forma mais fiel ao que o |
+| 13.0 | `C_OPCAO_F_NAO_SELAR_NESTA_RODADA` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (f) — NAO SELAR NESTA RODADA: segunda passada obrigatoria sobre as fontes nao lidas e os cortes por orcamento ANTES de qua |
+| 10.0 | `C_OPCAO_B_GRAFO_COMPANY_BRAIN_ANCORADO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (b) — GRAFO/Company Brain ancorado como servico (KG mais chat-RAG mais radar deterministico sem-LLM). A FAVOR: e o norte d |
+| 9.6 | `C_OPCAO_C_GOVERNANCA_DE_AGENTE_EM_HOOK` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (c) — GOVERNANCA DE AGENTE EM HOOK: vender a coleira onde o dinheiro do campo esta. A FAVOR: e a unica vizinhanca desta ro |
+| 7.2 | `C_OPCAO_D_CONDUCAO_E_ADOCAO_COMO_SERVICO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (d) — CONDUCAO/ADOCAO como servico (wizard mais onboarding mais manutencao do corpus de regras). A FAVOR: e a UNICA opcao  |
+| 4.8 | `C_OPCAO_E_NADA_O_VALOR_E_INTERNO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (e) — NADA: o valor e interno e o produto bilhetavel e outro (o Onion e o meio de producao, nao a mercadoria). A FAVOR: e  |
+
+## plugin-directory-landscape-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
+
+## backbone-piece-shape-2026-11 — 24 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 42.5 | `C_G3_PERMISSIVE_OPEN_LAYER_BUYER_CUT` | backbone-piece-shape-2026-11 | G3: a camada aberta usa licença OSI permissiva (Apache 2.0, nunca SSPL nem BUSL), o pago se corta pelo comprador provável e há  |
+| 26.4 | `C_G4_CONFORMANCE_TRACE_AND_SUPPORT_TABLE` | backbone-piece-shape-2026-11 | G4: a especificação do backbone governa a implementação por conformidade mecânica (cada MUST/SHOULD mapeado a um check ou exc |
+| 14.4 | `C_G2_STAMPED_VENDOR_VERIFIABLE_MANIFEST` | backbone-piece-shape-2026-11 | G2: o consumidor recebe o backbone por vendorização com manifesto verificável (tag, commit e sha256 por arquivo); o gate A2A em |
+| 12.8 | `C_OPCAO_B_MONOREPO_STAGING_PROJECTION` | backbone-piece-shape-2026-11 | Opção B: o núcleo vive dentro do monorepo do core e repos publicados são projeção por staging, no molde do Kubernetes; contr |
+| 10.0 | `C_OPCAO_A_OWN_REPO_STAMPED_VENDOR` | backbone-piece-shape-2026-11 | Opção A: a peça vive em repo e sessão próprios, com semver, e os consumidores recebem só o cliente e o gate por vendorizaç |
+| 5.4 | `C_SUPERACAO_20261112_KGSSOT_STAMP_AND_GO_MANIFEST` | backbone-piece-shape-2026-11 | Para o registro verificável no consumidor que o Kubernetes-sha não entrega: o carimbo de vendorização do kg-ssot no core (vend |
+| 5.4 | `C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_SPEC_TO_IMPL` | backbone-piece-shape-2026-11 | A conformidade com rastreio por MUST do MCP (claim 10) cobre a relação especificação → implementação que a hierarquia SEP  |
+| 4.8 | `Q_MEASURE_OPTION_C_PACKAGE_VS_STAMPED_VENDOR` | backbone-piece-shape-2026-11 | Um pacote publicado (npm ou PyPI) atende, no consumidor Onion (repo Claude Code com hooks em shell), o carimbo por arquivo e o gat |
+| 3.6 | `C_SUPERACAO_20261112_A2A_GOVERNANCE_FILES_EXIST` | backbone-piece-shape-2026-11 | A formulação restrita à existência de GOVERNANCE.md, MAINTAINERS.md e CHANGELOG.md na raiz do repo da spec A2A. |
+| 3.6 | `C_SUPERACAO_20261112_A2A_README_INSTALL_COMMANDS` | backbone-piece-shape-2026-11 | A lista de comandos de instalação do README do A2A entrega o valor de 'o consumidor recebe o SDK por gerenciador de pacotes'. |
+| 3.6 | `C_SUPERACAO_20261112_A2A_TEN_REPOS_SPEC_SDK_ITK_APACHE` | backbone-piece-shape-2026-11 | A formulação restrita aos 10 repos visíveis da org a2aproject entrega o valor do claim: separação spec, SDK e ITK em repos pr |
+| 3.6 | `C_SUPERACAO_20261112_CE_NEW_SDKS_SPEC_ONLY_POINTS` | backbone-piece-shape-2026-11 | A seção 'New SDKs' do SDK-GOVERNANCE.md da CloudEvents entrega o que o claim prometia: a spec só recebe a documentação que ap |
+| 3.6 | `C_SUPERACAO_20261112_CE_SDK_SUPPORTS_N_AND_N_MINUS_1` | backbone-piece-shape-2026-11 | cloudevents/SDK.md l.38 e o item 4 da lista healthy entregam a relação SDK-spec como faixa de suporte (versões maiores N e N-1) |
+| 3.6 | `C_SUPERACAO_20261112_CE_WIRE_VALUE_STABLE` | backbone-piece-shape-2026-11 | O parágrafo de GOVERNANCE.md l.163-169 da CloudEvents entrega a estabilidade do valor 'on the wire' prometida pelo claim, sem afi |
+| 3.6 | `C_SUPERACAO_20261112_GO_VENDOR_BUILD_OFFLINE_SCOPED` | backbone-piece-shape-2026-11 | O 5º parágrafo da seção Vendoring do Go entrega o build offline a partir de vendor/, com o escopo correto: só comandos de bui |
+| 3.6 | `C_SUPERACAO_20261112_GO_VENDOR_MAIN_MODULE_GO114` | backbone-piece-shape-2026-11 | Os 4º e 6º parágrafos da seção Vendoring do Go: uso automático do vendor só com go 1.14 ou superior no go.mod; vendor só n |
+| 3.6 | `C_SUPERACAO_20261112_MCP_CONFORMANCE_STANDARDS_TRACK_ONLY` | backbone-piece-shape-2026-11 | A formulação corrigida da exigência de conformidade do MCP, condicionada a SEP Standards Track com comportamento observável, p |
+| 3.6 | `C_SUPERACAO_20261112_MCP_SEP_SCOPE_AND_SPONSORS` | backbone-piece-shape-2026-11 | A formulação corrigida do fluxo de SEP do MCP: bug fixes e clarificações vão por PR comum e os Core Maintainers também podem |
+| 3.6 | `C_SUPERACAO_20261112_MCP_SEP_TRACE_COVERS_G4_HOW` | backbone-piece-shape-2026-11 | O arquivo de rastreio sep-NNNN.yaml do MCP (cada MUST/SHOULD mapeado a um check de conformidade) entrega a parte de G4 que a gover |
+| 3.6 | `C_SUPERACAO_20261112_NATS_AGREEMENT_UPDATE_NOTE` | backbone-piece-shape-2026-11 | A nota de atualização de 2025-05-01 do mesmo post entrega a parte 'terminou com acordo' (NATS segue na CNCF); 'sem fork' segue s |
+| 3.6 | `C_SUPERACAO_20261112_NATS_NONOPEN_LICENSE_PART_OF_TAKEBACK` | backbone-piece-shape-2026-11 | A formulação sustentada pelo blog da CNCF: a licença não aberta (BUSL) é componente de uma tentativa de retomar o projeto NAT |
+| 3.6 | `C_SUPERACAO_20261112_NATS_TRADEMARK_AS_LEVERAGE` | backbone-piece-shape-2026-11 | A formulação sustentada pelo blog da CNCF: a Synadia não completou a cessão prometida da marca e usa essa promessa quebrada co |
+| 3.6 | `C_SUPERACAO_20261112_TEMPORAL_SCIM_BUSINESS_ADDON` | backbone-piece-shape-2026-11 | A formulação corrigida pela página de preços em Markdown da Temporal: SCIM é add-on no plano Business (+$500/mo), incluso no  |
+| 2.7 | `C_OPCAO_C_PUBLISHED_PACKAGE` | backbone-piece-shape-2026-11 | Opção C: a peça é um pacote publicado (npm ou PyPI) e o consumidor a recebe por versão de registro. |
+
+## poda-instruction-bloat-2026-09 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 41.6 | `Q_PODA_INSTRUCTION_BLOAT_CORE` | poda-instruction-bloat-2026-09 | O que podar do CLAUDE.md (246 linhas / 17.041 bytes) e das skills do core do Onion para curar o agent instruction bloat (Thoughtwo |
+| 24.5 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
+| 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
+| 5.4 | `E_LACUNAS_DECLARADAS_PODA_0903` | poda-instruction-bloat-2026-09 | LACUNAS (custo declarado: 40 fontes, 12 claims, 2 confirmadas, 8 refutadas, 0 nao-verificadas por 403/truncagem). REFUTADAS QUE O  |
+| 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
+| 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
+
+## onion-distribution-packages-2026-11 — 40 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 41.2 | `C_OPCAO_B_DOORS_PLUS_OFFICIAL_DIRECTORY_PACKAGES_PARKED` | onion-distribution-packages-2026-11 | B. Manter portas e marketplace, candidatar onion-plugins ao diretório oficial e deixar pacotes em parque com gatilho nomeado (rec |
+| 12.0 | `C_OPCAO_C_NPM_THIN_INSTALLER` | onion-distribution-packages-2026-11 | C. Publicar npm só como instalador fino que copia para .claude |
+| 9.0 | `C_OPCAO_F_OWN_READONLY_VERDICT_MCP_WITH_REGISTRY` | onion-distribution-packages-2026-11 | F. Publicar servidor MCP só de leitura e veredito próprio do Onion, com entrada no Registry |
+| 7.5 | `C_OPCAO_A_STATUS_QUO_DOORS_AND_OWN_MARKETPLACE` | onion-distribution-packages-2026-11 | A. Manter só portas e marketplace próprio, sem mudar nada (status quo) |
+| 4.5 | `C_OPCAO_D_NPM_CONTENT_AS_PLUGIN_SOURCE` | onion-distribution-packages-2026-11 | D. Publicar npm com conteúdo, como fonte de plugin |
+| 3.8 | `C_OPCAO_G_MCPB_BUNDLE` | onion-distribution-packages-2026-11 | G. Publicar MCPB do Onion |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO19_REGISTRY_PRIMARY_NOT_FOR_HOSTS` | onion-distribution-packages-2026-11 | Requisitos lidos na fonte primária e o caso real da casa: io.github.marciocar/kg-ssot 4.43.0 listado com pypi e mcpb. |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO6_WHAT_DOES_NOT_TRAVEL` | onion-distribution-packages-2026-11 | Matriz por forma lida na doc primária: plugin dá hook, comando, skill e agente; cópia em .claude dá isso mais CLAUDE.md, rules |
+| 3.6 | `C_SUPERACAO_20261105_ACHADO8_CHANNEL_DOES_NOT_EXPLAIN_ADOPTION` | onion-distribution-packages-2026-11 | Tabela multicanal na mesma data, que permite comparar npm, PyPI e estrelas, mas não instalações de plugin: OpenSpec, BMAD, spec |
+| 3.6 | `C_SUPERACAO_20261105_CORPUS_KG_SSOT_IS_PUBLISHED_ANALOGY_FAILS` | onion-distribution-packages-2026-11 | Molde já pago: marciocar/kg-ssot/.github/workflows/release.yml (278 linhas), um job por registro, id-token só nele, environment  |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MARKETPLACE_ALLOWLIST_POLICY` | onion-distribution-packages-2026-11 | Restaurar a claim de allowlist e blocklist de marketplaces por política (strictKnownMarketplaces, blockedMarketplaces, hostPatter |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MCPNAME_OWNERSHIP_VERIFICATION` | onion-distribution-packages-2026-11 | Restaurar pela primária a verificação de propriedade no Registry, por mcpName e pela string mcp-name. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MCP_PUBLISHER_OIDC_PACKAGE_TYPES` | onion-distribution-packages-2026-11 | Restaurar a claim do mcp-publisher por GitHub OIDC e dos tipos aceitos, com Cargo incluído. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_MITIGATIONS_FALL_ON_ADOPTER` | onion-distribution-packages-2026-11 | Restaurar as mitigações (script desligado, lockfile, atraso de versão nova, auditoria de workflows) sem o número de horas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_ORPHAN_WORKFLOW_OIDC_AND_PNPM_CACHE` | onion-distribution-packages-2026-11 | Restaurar a claim de workflow órfão com OIDC e cache pnpm via pull_request_target. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_PIN_ENFORCE_AND_SEED_DIR` | onion-distribution-packages-2026-11 | Restaurar a claim e citar a semente como alternativa à imagem. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_RECURRING_WAVES` | onion-distribution-packages-2026-11 | Restaurar a recorrência das ondas de 2025 e 2026, sem as contagens não conferidas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_REGISTRY_IMMUTABLE_VERSIONS_PREVIEW` | onion-distribution-packages-2026-11 | Restaurar a claim de versões imutáveis no Registry, com a ressalva de preview e sem afirmar nada sobre rollback. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_RESERVED_NAMES_NPM_MARKETPLACE_UNIMPLEMENTED` | onion-distribution-packages-2026-11 | Restaurar a claim de nomes reservados (npm, pip, uv, cargo, github, gh) e de marketplace do tipo npm ainda não implementado. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_SHA_PIN_AND_ARCHIVE_INTEGRITY` | onion-distribution-packages-2026-11 | Restaurar a claim e avaliar pin por sha nas entradas das portas. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_SINGLE_WEEK_POINT_DOES_NOT_COMPARE` | onion-distribution-packages-2026-11 | Tabela multicanal registrada no achado 8, no lugar de um ponto único de downloads de uma semana. |
+| 3.6 | `C_SUPERACAO_20261105_CUT_STEALER_TARGETS_AI_CONFIG` | onion-distribution-packages-2026-11 | Restaurar a claim de que o stealer mira tokens e configurações de IA, sem bypass_2fa até haver fonte. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_OIDC_EXTRACTED_FROM_RUNNER` | onion-distribution-packages-2026-11 | Restaurar a claim de cache envenenado e OIDC extraído da memória do runner, trocando 'propagação' por 'publicação inicial'. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_PYPI_NOT_EXEMPT` | onion-distribution-packages-2026-11 | Restaurar a claim da campanha com nomes e versões (mistralai 2.4.6, guardrails-ai 0.10.1), sem afirmar a divisão 170 + 2. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_RADAR_MCP_BY_DEFAULT_STANDS` | onion-distribution-packages-2026-11 | Restaurar a claim de que 'MCP by default' está em Caution no Radar, citando a página do blip em vez do PDF. |
+| 3.6 | `C_SUPERACAO_20261105_DISCARD_SAP_TRUSTED_ANY_WORKFLOW` | onion-distribution-packages-2026-11 | Restaurar a claim de Trusted Publishing confiando em qualquer workflow, limitada a @cap-js. |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_MAY_CAMPAIGN_COUNTS_CORRECTED` | onion-distribution-packages-2026-11 | A 1ª onda da Mini Shai-Hulud (11-12/05/2026) atingiu mais de 170 pacotes npm e 2 PyPI (mistralai 2.4.6, guardrails-ai 0.10.1). At |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_OIDC_TANSTACK_POSTMORTEM_CORRECTED` | onion-distribution-packages-2026-11 | Postmortem da TanStack: PR de fork via pull_request_target envenenou o cache do pnpm; o release.yml o restaurou; o binário extrai |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_RADAR_MCP_BY_DEFAULT_CORRECTED` | onion-distribution-packages-2026-11 | O Radar Vol. 34 pôs 'MCP by default' em Caution: não adotar por padrão; uma CLI bem desenhada muitas vezes basta; MCP agrega va |
+| 3.6 | `C_SUPERACAO_20261105_REFUTED_SAP_CAP_ENVIRONMENT_CORRECTED` | onion-distribution-packages-2026-11 | Em @cap-js, uma conta com escrita editou o release-please.yml num branch não-main e trocou o OIDC à mão; o nome de arquivo do n |
+| 3.6 | `C_SUPERACAO_20261105_SRC_BMAD_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: BMAD-METHOD com 55.023 estrelas e 6.138 forks. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_DEVTO_ROUTES` | onion-distribution-packages-2026-11 | Rotas confirmadas e métricas substituídas pelas de hoje. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_ORG_MD` | onion-distribution-packages-2026-11 | org.md incorporada nos itens sobre allowlist, imposição e semente. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_PLUGIN_OVERVIEW` | onion-distribution-packages-2026-11 | plugins/components cobre o que importava da overview. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_PYPISTATS_SUPERCLAUDE` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: superclaude com last_week 2.463 e last_month 5.193 no PyPI. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_SPEC_KIT_REPO` | onion-distribution-packages-2026-11 | Dado incorporado à tabela multicanal: spec-kit com 147.665 estrelas, 13.250 forks e PyPI desde o PR #3516. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_TENABLE_FAQ` | onion-distribution-packages-2026-11 | FAQ da Tenable incorporada: linha do tempo, comprometimentos anteriores e a ordem de remover o daemon antes de girar credencial. |
+| 3.6 | `C_SUPERACAO_20261105_SRC_VENTUREBEAT_OIDC_SCOPE` | onion-distribution-packages-2026-11 | VentureBeat incorporada às restrições da recomendação: o escopo do OIDC é o controle que manda. |
+| 3.0 | `C_OPCAO_E_PYPI_PACKAGE` | onion-distribution-packages-2026-11 | E. Publicar pacote PyPI do Onion |
+| 2.2 | `C_OPCAO_H_CONTAINER_IMAGE` | onion-distribution-packages-2026-11 | H. Publicar imagem de contêiner |
+
+## audit-evidence-storage-2026-10 — 16 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 38.5 | `C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS` | audit-evidence-storage-2026-10 | OPÇÃO B (recomendada pelo Elenxo): o grafo em git guarda o estado declarativo e de julgamento (controles, mapeamentos, achados,  |
+| 24.0 | `C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT` | audit-evidence-storage-2026-10 | OPÇÃO A: selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 como está: o grafo YAML em git é o armazenamento de TODO o estado d |
+| 9.6 | `C_OPCAO_E_PRODUCT_RELATIONAL_DB` | audit-evidence-storage-2026-10 | OPÇÃO E: banco relacional próprio, o padrão de Vanta, CISO Assistant, Probo, Comp AI e do kyverno reports-server para resultad |
+| 7.5 | `C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE` | audit-evidence-storage-2026-10 | OPÇÃO D: OSCAL como arquivo nativo versionado em git (o modelo do trestle, IBM 2021): a quarta opção que a pergunta omitiu. |
+| 4.8 | `C_OPCAO_C_ONE_MORE_FOCUSED_PASS` | audit-evidence-storage-2026-10 | OPÇÃO C: não selar ainda; rodar mais uma passada focada em RegScale (OSCAL Hub), Paramify, Hyperproof, Drata, Chef InSpec, o wh |
+| 3.6 | `C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS` | audit-evidence-storage-2026-10 | C2P: 'produces OSCAL Assessment Results from the native assessment results of PVP': o resultado nasce no motor de política e o OS |
+| 3.6 | `C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER` | audit-evidence-storage-2026-10 | O C2P liga compliance-as-code a policy-as-code em GitOps: gera políticas a partir de Component Definitions e produz OSCAL AR dos  |
+| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG` | audit-evidence-storage-2026-10 | complyctl mede e grava em '.complytime/scan/', com EvaluationLog nativo e OSCAL como borda. |
+| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE` | audit-evidence-storage-2026-10 | complyctl: o estado medido vai para arquivos no workspace, com o EvaluationLog do Gemara como formato nativo e OSCAL como saída o |
+| 3.6 | `C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL` | audit-evidence-storage-2026-10 | complyctl: 'Scan output reports (EvaluationLog, OSCAL, SARIF, Markdown)', com EvaluationLog sempre produzido e OSCAL só com '--fo |
+| 3.6 | `C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT` | audit-evidence-storage-2026-10 | A fonte vigente do Gemara é o go-gemara v0.11.0 (30/09/2026): o artefato é YAML/JSON validado por CUE ('Decode unmarshals raw YA |
+| 3.6 | `C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES` | audit-evidence-storage-2026-10 | O blog da IBM de 13/04/2021 confirma o catálogo NIST 800-53 em JSON com mais de 70.000 linhas: o custo de tamanho e fragmentaçã |
+| 3.6 | `C_SUPERACAO_20261021_OSCAL_HUB_HOST_AND_SHARE_NOT_CICD` | audit-evidence-storage-2026-10 | O OSCAL Hub (deck da RegScale no NIST OSCAL Workshop #40, fev/2026) é plataforma para hospedar e compartilhar artefatos OSCAL (Ca |
+| 3.6 | `C_SUPERACAO_20261021_TRESTLE_GIT_SSOT_SCOPED_TO_SDK` | audit-evidence-storage-2026-10 | O compliance-trestle (SDK do OSCAL Compass) usa um repositório Git como fonte única dos artefatos, do histórico e das aprovaç |
+| 3.6 | `C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M` | audit-evidence-storage-2026-10 | Mercado corrigido: a Vanta passou de US$ 300M de ARR com mais de 16.000 clientes (Fortune, 29/04/2026, número da empresa); a Drat |
+| 3.6 | `C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE` | audit-evidence-storage-2026-10 | A Vanta tem OSCAL como BORDA de exportação de controles, testes e evidência (post de 04/05/2026, planos Plus, Professional, Ent |
+
+## machine-path-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 38.4 | `D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL` | machine-path-2026-10 | A classe é: absoluto de RAIZ DE SISTEMA no início de token (FHS 3.0 + snap, nix, Users, Volumes, private), com ou sem barra; abs |
+| 17.0 | `D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT` | machine-path-2026-10 | Substrato: dois lugares e uma classe. O kg-contract-check.sh cobra o grafo NOVO limpo e o rastreado sem piora; a REGRA 99 do lint  |
+| 5.1 | `C_TETO_HOSTNAME_DE_OUTRA_MAQUINA` | machine-path-2026-10 | TETO: hostname só vale para o host do processo e os lineages.*.host do members.yaml. No CI o processo é o runner, então ali a g |
+| 5.1 | `C_TETO_ROTA_COM_NOME_DE_RAIZ` | machine-path-2026-10 | TETO (lado do falso positivo, aceito): rota HTTP ou chave de config cujo 1º segmento tem nome de raiz de sistema (home, media, de |
+| 4.8 | `C_TETO_MARCADOR_AUTODECLARADO` | machine-path-2026-10 | TETO: o x_path_is_content é declarado por quem escreve o nó. A guarda não sabe se o caminho É o conteúdo; ela só torna a ise |
+| 4.8 | `C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA` | machine-path-2026-10 | TETO: absoluto de raiz que não é de sistema FORA de argumento de shell (raízes como workspace ou data em prosa) passa calado  |
+| 3.4 | `C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO` | machine-path-2026-10 | TETO: não vê a variável HOME (não é literal), caminho Windows (C:\\), o que está fora de nó (meta.note, arestas) nem coment |
+| 3.0 | `C_TETO_VERBOS_DE_SHELL_SAO_LISTA` | machine-path-2026-10 | TETO: o contexto de shell é uma LISTA de verbos e o redirecionamento. Raiz não-sistema depois de outro verbo (um clone para dest |
+
+## relay-public-review-2026-10 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 38.4 | `D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA` | relay-public-review-2026-10 | Desenho: duas metades. No remetente, o co-relay.sh mede a visibilidade do destino e, público ou não medido, para sem --confirm-p |
+| 7.2 | `C_TETO_PARAFRASE` | relay-public-review-2026-10 | TETO: a guarda vê a MARCA, não o conteúdo. Paráfrase que deixa reconstruir o detalhe passa (o caso de 2026-10-29 era exatament |
+| 6.8 | `D_INDICE_NAO_ARVORE` | relay-public-review-2026-10 | A REGRA 113 lê o ÍNDICE do git (git grep --cached e git show :caminho), nunca a árvore: o carteiro escreve o sinal untracked, e |
+| 5.1 | `C_TETO_FORA_DO_CARTEIRO` | relay-public-review-2026-10 | TETO: sinal que não passa pelo carteiro (cópia à mão, A2A, colado na sessão) chega sem a marca e a REGRA 113 cala; o inbound/ |
+| 4.8 | `C_TETO_CONFIRMACAO_REFLEXA` | relay-public-review-2026-10 | TETO: --confirm-public é lombada. Uma sessão pode confirmar no reflexo, e para o core (público) a confirmação vira o caminho  |
+| 4.8 | `E_BANCADA_CASOS_E_MUTANTES` | relay-public-review-2026-10 | Família relay_public: 11 comportamentos do carteiro, 10 com caso e mutante e a polaridade da lista sem mutante próprio; o dispat |
+| 4.8 | `E_ELENXO_APROVOU_COM_RESSALVAS_CURADAS` | relay-public-review-2026-10 | Passada adversarial (revisor novo, só-leitura, mandato de falso positivo): APROVADO_COM_RESSALVAS, 6 achados, 4 reais, nenhum rep |
+| 4.2 | `D_NAO_MEDIDA_SE_TRATA_COMO_PUBLICA` | relay-public-review-2026-10 | Modo de falha declarado: visibilidade não medida (gh ausente, sem auth, sem rede, repo inacessível, host fora do GitHub) se trat |
+| 3.4 | `C_TETO_LISTA_DE_TERMOS` | relay-public-review-2026-10 | TETO: a lista de termos casa substring sem caixa, só ASCII (acento não se dobra), falha pelo vocabulário e não bloqueia. Ela n |
+| 1.6 | `C_TETO_REGUA_NA_LINHA_1` | relay-public-review-2026-10 | TETO: um --- na linha 1 usado como régua horizontal vira abertura de frontmatter, no carteiro e no check; a marca entra antes do  |
+
+## memory-write-2026-11 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 36.0 | `D_SOFT_PROVENIENCIA_HARD_ENVELOPE` | memory-write-2026-11 | Substrato escolhido pelo censo: hook PreToolUse em Write, Edit, MultiEdit e Bash, molde pretooluse-direct-provider-api.sh (o PreTo |
+| 9.6 | `D_VARREDURA_DO_DISCO_REGRA_116` | memory-write-2026-11 | A metade que não depende do vocabulário do veto: a varredura das notas da memória do projeto pelo mesmo juiz, no SessionStart e |
+| 9.0 | `C_TETO_NAO_E_FRONTEIRA` | memory-write-2026-11 | TETO (peça 7): é lembrete e contenção de cópia verbatim, NÃO fronteira. Conteúdo de fora parafraseado, ou copiado sem envel |
+| 7.2 | `D_HOOK_NO_SETTINGS_DO_PROJETO` | memory-write-2026-11 | O veto e a varredura moram no .claude/settings.json versionado do projeto, que viaja aos adotantes; o ⟨settings.json de usuário |
+| 6.8 | `C_TETO_BASH_PELO_VOCABULARIO` | memory-write-2026-11 | TETO: no Bash só se julga o comando que CITA o caminho de memória (literal, ~, $HOME, ${CLAUDE_CONFIG_DIR}) como DESTINO de uma  |
+| 6.0 | `Q_ELENXO_PENDENTE` | memory-write-2026-11 | A 1ª passada do refutador independente reprovou 5293ef4aa (nó E_REFUTADOR_REPROVOU_E_CUROU) e a cura veio numa volta. Em 2026-11 |
+| 5.1 | `C_TETO_CAI_COM_O_SETTINGS` | memory-write-2026-11 | TETO: o hook é de projeto e cai junto com o .claude/settings.json; falha ABERTA declarada: sem python3 ou com o juiz quebrado, s |
+| 4.8 | `C_TETO_ESCRITA_FORA_DA_SESSAO` | memory-write-2026-11 | NÃO MEDIDO: se a extração de memória que o Claude Code faz por conta própria em segundo plano passa pelo PreToolUse. Também  |
+| 3.0 | `Q_GATILHO_HARD_POR_PROVENIENCIA` | memory-write-2026-11 | Gatilho nomeado: se o replay futuro medir uma nota de memória com regra plantada por conteúdo lido de fora SEM envelope (o caso  |
+| 2.8 | `C_LATENCIA_MEDIDA` | memory-write-2026-11 | Latência medida em 2026-11-05 nesta VPS (média de 50 chamadas): 10 ms no caminho quente (JSON sem 'memory' e sem autoMemoryDirec |
+
+## radar-E3-2026-09-04 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 36.0 | `Q_E3_DELTA_2_1_260` | radar-E3-2026-09-04 | O que mudou no Claude Code entre 2.1.259 e 2.1.260 que altera a ADEQUACAO da estrategia do Onion (escada de modelos, hooks/guardas |
+
+## plugin-language-policy-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 35.8 | `Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO` | plugin-language-policy-2026-09 | Qual politica de idioma o canal publico de plugins do Onion (onion-plugins -> marketplace comunitario / diretorio da Anthropic) de |
+| 16.2 | `C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE` | plugin-language-policy-2026-09 | OPCAO (i-linha) CORRIGIDA PELO ELENXO — ingles em TODA superficie que os geradores EMITEM, com a fronteira definida MECANICAMENT |
+| 12.6 | `C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR` | plugin-language-policy-2026-09 | OPCAO (i) — superficies GERADAS em ingles (description do plugin.json, README do plugin e do marketplace, argument-hint, marketp |
+| 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
+| 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
+
+## agent-frontmatter-keys-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 34.0 | `D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV` | agent-frontmatter-keys-2026-10 | Substrato: check de lint (REGRA 102) com SSOT em .tsv e juiz em awk. Molde: kg-machine-path-check.sh (helper com --selftest e --ts |
+| 3.2 | `C_TETO_COMANDOS_SKILLS_E_PLUGINS` | agent-frontmatter-keys-2026-10 | TETO: comandos e skills não entram (outros campos, sem medição nesta forja), e o bundle de plugin não roda o lint; o agente em |
+| 3.2 | `C_TETO_SO_CHAVE_DE_TOPO` | agent-frontmatter-keys-2026-10 | TETO: a guarda julga só a chave de TOPO; chave aninhada (dentro de hooks, mcpServers, experimental) e VALOR ficam com outras regr |
+| 3.0 | `C_TETO_DOC_OFICIAL_ENVELHECE` | agent-frontmatter-keys-2026-10 | TETO: a lista oficial é a da doc em 2026-10-11; chave oficial nova é acusada até entrar no .tsv, e chave que a doc remover cont |
+
+## sinais-de-campo-2026-09 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 34.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
+| 8.0 | `Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027` | sinais-de-campo-2026-09 | O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e d |
+| 8.0 | `Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027` | sinais-de-campo-2026-09 | Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligaçõ |
+| 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
+| 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
+| 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
+| 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
+| 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
+| 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
+| 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
+| 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
+
+## deck-patterns-2026-09 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 33.0 | `Q_DECK_PATTERNS_ORDER_0924` | deck-patterns-2026-09 | Quais sao os padroes CONSAGRADOS de apresentar um framework/maquinaria de desenvolvimento (documentacao e deck), e qual e a ORDEM  |
+| 26.2 | `C_OPCAO_G_FUSAO_A_D_C_COM_GATE_F` | deck-patterns-2026-09 | OPCAO (G) — RECOMENDADA PELO ELENXO: fusao A+D+C, com F como gate de 30 minutos antes. A divisao de trabalho entre as tres, que  |
+| 24.5 | `C_OPCAO_A_ARCO_ATOS_DECK_DE_CAMPO` | deck-patterns-2026-09 | OPCAO (A): arco em ATOS problem-first, derivado do deck de campo — usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.htm |
+| 24.0 | `C_OPCAO_F_PARAR_E_MEDIR_O_ALVO` | deck-patterns-2026-09 | OPCAO (F): PARAR antes de reorganizar — medir qual deck e o alvo real (o de 65 slides nao existe neste repo) e rodar uma 2a roda |
+| 14.0 | `C_OPCAO_D_ARCO_SRL_PLEA_DA_CASA` | deck-patterns-2026-09 | OPCAO (D): arco SRL/PLEA da casa — Orient -> Activate -> Reinforce com planificar->executar->avaliar por ato, sobre o chassi sel |
+| 7.2 | `C_OPCAO_C_ARCO_DOC_CLAUDE_CODE` | deck-patterns-2026-09 | OPCAO (C): arco da doc do Claude Code — instalar/rodar -> o que da para fazer -> escada de customizacao (memoria -> skills -> ho |
+| 4.5 | `C_OPCAO_B_ARCO_DIATAXIS` | deck-patterns-2026-09 | OPCAO (B): arco Diataxis — reorganizar o deck nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as est |
+| 1.6 | `C_OPCAO_E_APLICAR_OS_QUATRO_ACHADOS` | deck-patterns-2026-09 | OPCAO (E): aplicar literalmente os 4 achados sobreviventes — Diataxis + teto de 2 camadas de progressive disclosure sobre o deck |
+
+## contrato-kg-absorcao-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 32.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 12.0 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PADRONIZAR_LLMS_TXT_NO_ONION` | contrato-kg-absorcao-2026-10 | o Onion padroniza um llms.txt e um llms-full.txt gerados (core, portas e site), absorvendo o gerador que o onion-kg-ssot provou? |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
+## subagent-background-wait-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 32.0 | `D_PRETOOLUSE_BASH_POR_CAMPO_JSON` | subagent-background-wait-2026-11 | Substrato: hook PreToolUse em Bash, molde pretooluse-direct-provider-api.sh, registrado no grupo Bash do .claude/settings.json com |
+| 6.0 | `D_MALFORMADO_FAIL_OPEN_DECLARADO` | subagent-background-wait-2026-11 | Entrada malformada (JSON que não parseia, topo que não é objeto) e python3 ausente: fail-open DECLARADO, rc 0 com 'NÃO MEDIDO' |
+| 5.6 | `C_TETO_CAMPO_RENOMEADO` | subagent-background-wait-2026-11 | TETO: se o harness renomear ou tirar o campo agent_id, a guarda fica muda sem aviso. Uma só versão medida (2.1.322) e um só tip |
+| 4.2 | `C_TETO_NOHUP_E_OUTRAS_FERRAMENTAS` | subagent-background-wait-2026-11 | TETO: a guarda não vê o subagente que sobe nohup … & numa chamada normal e encerra o turno esperando, nem fundo por outra ferr |
+| 4.0 | `Q_ELENXO_E_MERGE` | subagent-background-wait-2026-11 | O refutador independente (mandato: achar o falso positivo) não rodou nesta forja. O merge espera o maestro, porque a guarda muda  |
+| 3.6 | `C_DOGFOOD_SEM_HARNESS_AO_VIVO` | subagent-background-wait-2026-11 | NÃO MEDIDO: o veto não foi disparado pelo harness ao vivo. O dogfood rodou o hook com JSONs no formato da sonda (com e sem agent |
+| 2.4 | `C_LATENCIA_MEDIDA` | subagent-background-wait-2026-11 | Latência medida em 2026-11-12 nesta VPS: 46 ms por chamada de Bash, média de 50, incluindo a subida do bash e do python3, com ca |
+
+## radar-E3-2026-09-03 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
+
+## maestro — 18 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 30.0 | `Q_SPIKE_COPILOT_STUDIO_MCP` | spike-copilot-studio-mcp-2026-10 | O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? INFER |
+| 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
+| 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
+| 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
+| 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
+| 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
+| 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
+| 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
+| 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
+| 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
+| 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
+| 3.0 | `D_A2A_OUTBOUND_IROH_PHASE2_1110` | a2a-outbound-2026-11 | Caminho do transporte VPS↔notebook: Fase 2 com iroh, caminho próprio ou parquear; aguarda validação das estimativas (próprio |
+| 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
+| 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
+| 3.0 | `Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL` | coordenacao-sessoes-2026-10 | Ligar ClientAliveInterval e ClientAliveCountMax no sshd da VPS, para a porta de um túnel reverso morto não ficar presa. |
+| 2.0 | `Q_COORD_MAESTRO_DISSECAR_CLAI` | coordenacao-sessoes-2026-10 | A dissecação do clai (baalimago/clai), deixada para depois. |
+| 2.0 | `Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES` | coordenacao-sessoes-2026-10 | As decisões do maestro que o sge tem em espera, em um nó: as 4 ligações «normalizado» da SAEB, as branches antigas de update |
+| 1.6 | `Q_IT_AGENT_MAIL_RIDER_READING` | inbox-triage-1108 | A rider da licença do Agent Mail alcança uma ideia gerada do zero no onion-messaging, ou só o código? |
+
+## onion-identity-2026-07 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 29.2 | `C_NS1_KG` | onion-identity-2026-07 | NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado |
+| 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
+| 10.0 | `C_ANCORA_SOLTA_79PCT` | onion-identity-2026-07 | A CONTRADICAO MEDIDA DENTRO DA PROPRIA DECISAO DE VALOR: 77 runs de orquestracao com transcript · 19 sinteses versionadas (25%)  |
+| 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
+| 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
+
+## task-manager-vocabulario-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.8 | `C_PAGINATION_AS_OPAQUE_ITERATOR` | task-manager-vocabulario-2026-10 | interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 pr |
+| 26.4 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
+| 18.0 | `D_TASK_MANAGER_INTERFACE_WAVE2` | task-manager-vocabulario-2026-10 | Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter dec |
+| 13.5 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
+| 10.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
+| 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
+
+## adopter-vetoes-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.0 | `Q_VETOS_VALEM_NO_ADOTANTE` | adopter-vetoes-2026-11 | no adotante carimbado, o merge digitado, o push na main e a escrita em repo alheio vetam, e o caminho verificado do adotante passa |
+| 7.7 | `C_TETO_SO_REPO_REGISTRADO` | adopter-vetoes-2026-11 | TETO: só o repo REGISTRADO é alheio; adotante sem lista (adopted_from por URL e sem .claude/adopter-guard.tsv) cala para tudo, e |
+| 5.1 | `C_TETO_SCRIPT_E_OUTRA_LINGUAGEM` | adopter-vetoes-2026-11 | TETO: script em arquivo não se lê (por essa fronteira passam o co-relay e o merge verificado); código embutido (-c/-e) fecha pe |
+| 4.8 | `C_TETO_PUSH_NU_DEPOIS_DE_SWITCH` | adopter-vetoes-2026-11 | TETO herdado do core: o push nu (sem refspec) se julga pela branch do disco na hora do hook; git switch na mesma string não é se |
+| 4.8 | `C_TETO_VOCABULARIO_E_PUSH_DE_FIXTURE` | adopter-vetoes-2026-11 | TETO: escritores por opção (tar -C, unzip -d, perl -pi, sort -o, curl -o, patch -d, awk -i inplace, find -delete) e repo de nome |
+| 4.5 | `C_CAMADA_NATIVA_PRIMEIRO` | adopter-vetoes-2026-11 | o permissions.deny do adotante é a 1ª linha; o hook é a 2ª, no que o deny por padrão de caminho e prefixo de comando não alc |
+| 4.2 | `C_TETO_WRAPPER_RTK` | adopter-vetoes-2026-11 | TETO não curado aqui: o invólucro rtk (rtk, rtk run, rtk bypass) não é tirado pelo tokenizador, e o push e o merge escritos at |
+
+## slm-capitalizacao-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.0 | `C_CAPITAL_ALSO_FUNDS_EVAL_LAYER` | slm-capitalizacao-2026-10 | LEITURA (capital): o capital NAO vai so para o modelo pequeno — vai tambem para a CAMADA DE AVALIACAO: LMArena US$100M seed + US |
+| 26.0 | `C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER` | slm-capitalizacao-2026-10 | LEITURA (eval-como-servico): o que tem preco e tracao declarados e eval EMBUTIDO numa plataforma de producao (Braintrust observabi |
+| 22.0 | `Q_BILLING_VIAS_ORDER_PROPOSAL` | slm-capitalizacao-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; nenhum no decision foi criado ou tocado): ordem de vias sugerida por esta rodada — (1) consu |
+| 22.0 | `Q_SLM_CAPITALIZATION_2026_10` | slm-capitalizacao-2026-10 | Como benchmark aberto, eval-como-servico e treinamento/consultoria em avaliacao de IA viram RECEITA segundo as primarias — quem  |
+| 21.0 | `C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM` | slm-capitalizacao-2026-10 | LEITURA (via treinamento/consultoria): as primarias que vendem sem plataforma vendem (i) curso com ativos que continuam rendendo ( |
+| 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
+| 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
+| 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
+
+## company-brain-non-devs-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 27.0 | `Q_COMPANY_BRAIN_NAO_DEVS_1111` | company-brain-non-devs-2026-11 | como colaboradores não-devs de um adotante consultam e propõem mudança no Company Brain por Slack e Claude desktop e celular, c |
+| 24.0 | `Q_PECA_PAPEL_POR_IDENTIDADE_1111` | company-brain-non-devs-2026-11 | a política do servidor passa a mapear papel para permissão, separando leitura e escrita por área, com o papel lido do token e u |
+| 22.4 | `Q_PECA_BOT_SLACK_POR_EVENTOS_1111` | company-brain-non-devs-2026-11 | a persona do piloto posta e lê como bot, por Socket Mode, com leitura dos canais declarados, eventos entregues ao hub pelo socket |
+| 21.0 | `Q_PECA_MCP_REMOTO_COM_LOGIN_POR_PESSOA_1111` | company-brain-non-devs-2026-11 | o kg-mcp ganha uma borda pública com TLS e o perfil OAuth do MCP, validando a audiência do token, para o Claude desktop e celula |
+| 7.2 | `Q_PECA_A2A_PARA_CONTAS_PESSOAIS_1111` | company-brain-non-devs-2026-11 | quem usa conta pessoal consulta o Brain pelo mesmo servidor, com o próprio login, e a sessão dele fala com o hub pela A2A e pela |
+| 7.2 | `Q_PECA_ESCRITA_COM_APROVACAO_1111` | company-brain-non-devs-2026-11 | quem não usa git propõe mudança no grafo pela área própria, e a promoção ao canônico vira PR com gate e aprovação humana |
+| 7.2 | `Q_PECA_VERTICAL_COMPANY_BRAIN_CONTEXT_1111` | company-brain-non-devs-2026-11 | o core abre a vertical company-brain-context pelo /meta:create-vertical, com a persona que fala por ela, como contexto de domínio |
+
+## problem-formula-2026-11 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 26.4 | `C_N3_ROTEADOR_NAO_COMANDO` | problem-formula-2026-11 | Resposta à pergunta de dissect:N3, condicionada: se houver nova tese, a forma menor é um roteador fino sobre /meta:decide, /meta |
+| 9.0 | `C_N3_SEM_EXCECAO_NAO_SE_SUSTENTA` | problem-formula-2026-11 | Sem exceção não se sustenta como está, por leitura e sem medida. |
+| 4.0 | `Q_PF_EXPERIMENTO_AO_VIVO` | problem-formula-2026-11 | A fórmula encaminha problemas ao vivo, com ao menos 3 atos protegidos reais, sem agir demais e com ERRO-B de no máximo 20%? O n |
+
+## meta-research-lens-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.5 | `Q_DIRETRIZ_DE_PESQUISA_VIRA_MAQUINARIA` | meta-research-lens-2026-09 | Como a diretriz de pesquisa que o maestro re-digita a cada pesquisa/decisao (lente Onion, fontes atuais, Claude Code na versao atu |
+| 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
+| 6.3 | `D_BUSCA_COMO_SDAAL_GATED` | meta-research-lens-2026-09 | DECISAO PROPOSTA (GATED): adapter de busca em .claude/utils/search/ (irmao do task-manager: WebSearch nativo default; MCP Exa/Tavi |
+
+## typesafe-ai-2026-09 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.2 | `Q_TYPESAFE_AI_2026_09` | typesafe-ai-2026-09 | O que e a TypeSafe AI, o que o Jev faz de fato, e qual a relacao (convergencia, atrito e rivalidade) com o Onion? ABERTA no que a  |
+| 24.0 | `D_NAO_ADOTAR_AGORA_DOGFOOD_GATED` | typesafe-ai-2026-09 | DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao  |
+| 21.2 | `C_JEV_NAO_COBRE_A_PARTE_CARA` | typesafe-ai-2026-09 | CORRECAO ao candidato #1 desta mesma rodada, vinda da medicao propria: no /meta:kg-freshness o custo NAO esta no julgamento, esta  |
+| 13.5 | `C_ATRITO_O_DADO_SAI_DA_MAQUINA` | typesafe-ai-2026-09 | O atrito e estrutural, nao de configuracao: usar Jev significa mandar o `state` — que num core de KG E o conteudo dos nos — pa |
+| 12.8 | `C_CONVERGENCIA_A_PIOR_VERDADE` | typesafe-ai-2026-09 | A convergencia doutrinaria e forte o bastante para ser desconfortavel: o Onion chegou por dor propria a "a pior verdade e aquela q |
+| 12.0 | `C_ALVOS_CANDIDATOS_NO_ONION` | typesafe-ai-2026-09 | Onde no Onion o formato encaixaria, se encaixar — e o encaixe mais limpo ja existe com o nome pronto: o veredito do /meta:kg-fre |
+| 12.0 | `C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL` | typesafe-ai-2026-09 | Jev NAO e um quarto motor do Onion: ele e a Economia de Motores encontrando um fornecedor para o MOTOR 2 que ate agora so existia  |
+| 11.2 | `C_RIVALIDADE_DE_TESE_NAO_DE_PRODUTO` | typesafe-ai-2026-09 | A relacao mais interessante nao e de integracao, e de TESE, e ela e adversaria: a TypeSafe diz "evite loops de agente quando um wo |
+| 10.2 | `C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO` | typesafe-ai-2026-09 | Aplicando a Abstraction Doctrine ao proprio achado: decisao-calibrada-como-servico tem HOJE um unico provider real (Jev e declarad |
+| 6.8 | `C_ESPELHO_DE_DISTRIBUICAO` | typesafe-ai-2026-09 | Um lab de US$ 40M com fundador co-inventor do RLHF escolheu, para alcancar desenvolvedores, EXATAMENTE a superficie que o Onion es |
+
+## whatsapp-api-2026-07 — 19 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.2 | `Q_WHATSAPP_API_REVISITA_20260903` | whatsapp-api-2026-07 | O que mudou no panorama de APIs de WhatsApp para o Onion (WAHA vs Meta Cloud API vs alternativas) desde 2026-07-17 — preços, li |
+| 3.2 | `C_S1_F10` | whatsapp-api-2026-07 | WhatsApp Business Platform é viável tecnicamente para fintech regulada (sem bloqueio de setor), mas exige due … |
+| 3.2 | `C_S1_F8` | whatsapp-api-2026-07 | Onboarding como Tech Provider exige: app Meta com caso de uso WhatsApp, portfólio de negócio conectado, acesso… |
+| 3.2 | `C_S2_F7` | whatsapp-api-2026-07 | Diferença prática Cloud API direto vs BSP: a Cloud API da Meta é gratuita de acesso (paga-se só por mensagem/c… |
+| 3.2 | `C_S2_F8` | whatsapp-api-2026-07 | Posicionamento fintech: Blip fez parceria com Efí Bank (instituição de pagamento autorizada pelo Banco Central… |
+| 3.2 | `C_S2_F9` | whatsapp-api-2026-07 | Portabilidade de número entre BSPs é suportada oficialmente (o novo BSP inicia solicitação, requer autorização… |
+| 3.2 | `C_S3_F1` | whatsapp-api-2026-07 | Evolution API é provavelmente o mais adotado em produtos/automação no-code em 2026 (integra com n8n, hospedage… |
+| 3.2 | `C_S4_F7` | whatsapp-api-2026-07 | Para fintech regulada no Brasil, usar canal não-oficial cria exposição dupla: risco contratual com a Meta (ban… |
+| 3.2 | `C_S4_F9` | whatsapp-api-2026-07 | Telemetria de biblioteca não-oficial que envia IP do servidor da fintech a terceiro pode configurar tratamento… |
+| 3.2 | `C_S5_F5` | whatsapp-api-2026-07 | EVENTO 2025→2026: Meta intensificou detecção e banimento de números associados a plataformas WhatsApp não-ofic… |
+| 3.2 | `C_S5_F9` | whatsapp-api-2026-07 | Tendência de mercado 2026: pressão dupla empurra para a API oficial — (a) Meta aumentando fiscalização/banimen… |
+| 2.4 | `C_S2_F11` | whatsapp-api-2026-07 | O 'Meta Tech Provider Program' é o programa oficial da Meta pelo qual ISVs/SaaS/plataformas empresariais se cr… |
+| 2.4 | `C_S2_F4` | whatsapp-api-2026-07 | Twilio cobra uma taxa própria de US$0,005 por mensagem (inbound ou outbound) além da tarifa por template da Me… |
+| 2.4 | `C_S2_F6` | whatsapp-api-2026-07 | Take Blip (Blip) é apontado como líder de mercado brasileiro para médias/grandes empresas via WhatsApp Busines… |
+| 2.4 | `C_S4_F5` | whatsapp-api-2026-07 | A Meta já tomou ação legal formal (notificações DMCA) contra projetos que fizeram engenharia reversa do WhatsA… |
+| 2.4 | `C_S4_F6` | whatsapp-api-2026-07 | Não há evidência de ação judicial (lawsuit, distinta de takedown administrativo) movida pela Meta contra desen… |
+| 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
+| 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
+| 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
+
+## elenxos-2026-08-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 24.0 | `Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM` | elenxos-2026-08-07 | ABERTO, e a F4 so tapou o primeiro caso: o SDAAL e Markdown lido por LLM ('documentacao substitui codigo executavel'). Um step de  |
+| 8.0 | `Q_SDAAL_EXECUTAVEL_ONDE_PARA` | elenxos-2026-08-07 | ABERTO: a F4 abriu a primeira peca EXECUTAVEL dentro de `.claude/utils/forge/` — necessaria porque um step de Actions e shell pu |
+
+## radar-E3-2026-09-04-r4 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
+
+## kg-ssot — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
+| 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
+| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
+| 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
+
+## guardas-revisao-2026-08 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.6 | `Q_GUARDAS_COERENTES` | guardas-revisao-2026-08 | as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna? |
+| 8.1 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
+| 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
+| 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
+
+## forge-evolve-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
+| 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
+
+## task-manager-capabilities-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 20.4 | `D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA` | task-manager-capabilities-2026-10 | Substrato: check de lint (REGRA 103), HARD, que roda também no repo derivado, porque os adapters viajam. Molde: ops-citation-trav |
+| 14.4 | `D_FORMATO_TSV_IRMAO_DO_ADAPTER` | task-manager-capabilities-2026-10 | Formato: TSV irmão do adapter (adapters/<p>.capabilities.tsv), com o vocabulário num bloco TSV marcado na interface. Nem YAML ne |
+| 6.8 | `C_TETO_FONTE_EXISTE_NAO_SUSTENTA` | task-manager-capabilities-2026-10 | TETO: a guarda confere que a fonte EXISTE (nó do grafo, trecho do adapter), não que ela SUSTENTA a afirmação. Um kg: que apont |
+| 5.1 | `C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA` | task-manager-capabilities-2026-10 | TETO: superfície de campo (field:priority, field:tags) é conferida só pela presença da palavra no adapter. Pega o adapter que  |
+| 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
+| 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
+
+## core — 47 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.6 | `Q_BATON_IDLE_SESSIONS_1112` | forge-baton-2026-11 | sessões ficam ociosas esperando algo enquanto há trabalho pronto em outra fila: como medir quem está parado com trabalho pronto |
+| 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
+| 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
+| 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
+| 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
+| 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
+| 12.0 | `Q_PEEK_LADDER_LEARNS_1113` | peek-ledger-2026-11 | a escada da espiada (nível por reversibilidade x severidade x incerteza) escolhe o esforço certo? O histórico de espiadas regis |
+| 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
+| 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
+| 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
+| 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
+| 7.7 | `Q_CORE_ACTIONS_SHA_PIN_1116` | outside-in-primaries-2026-11 | As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada? |
+| 7.7 | `Q_DOORS_ATTESTATION_1130` | outside-in-primaries-2026-11 | Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit. |
+| 7.2 | `Q_BATON_PHASE2_MATCH_AND_MEASURE_1112` | forge-baton-2026-11 | fase 2: casar a sessão ociosa com a fila dela (oferta, nunca ordem) e medir por um dia as horas ociosas com fila, antes e depois  |
+| 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
+| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
+| 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |
+| 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
+| 4.8 | `Q_ADOPTER_VETOES_RESIDUE_1108` | adopter-vetoes-2026-11 | Depois da REGRA 118, sobra um resíduo de classes de ato que ainda passa pelos hooks no adotante; ele vira pergunta própria, aber |
+| 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
+| 4.8 | `Q_PEEK_DECIDE_PORTAL_1113` | peek-ledger-2026-11 | 2º PR: o /meta:decide passa a exigir, por opção, a citação de mercado ou o registro 'espiei e não há' (um nó com x_peek_le |
+| 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
+| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 4.2 | `Q_IT_DOORBELL_INSTRUCTION_CLAUSES` | inbox-triage-1108 | As instructions da campainha não têm cláusula contra ação destrutiva nem contra autoescalada. |
+| 4.2 | `Q_IT_SYNC_MAIN_WRITE_PREFLIGHT` | inbox-triage-1108 | O sync-main-worktree confere a escrita nos arquivos do delta antes do ff e, havendo alvo protegido, pula com aviso em vez de quebr |
+| 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_MD_WAHA_NEW_NUMBER_BAN_1108` | maestro-decisions-1108 | Número novo no WAHA pode ser banido em minutos? É relato, não medida; medir no piloto do número dedicado. |
+| 4.0 | `Q_MD_WAHA_PROJECT_USE_TERMS_1108` | maestro-decisions-1108 | O uso de projeto no número dedicado é o uso não pessoal que os termos do WhatsApp vedam? Leitura ainda não medida; medir no pi |
+| 4.0 | `Q_MD_WAHA_READ_ONLY_BAN_FAQ_1108` | maestro-decisions-1108 | O modo só leitura também leva a banimento, como o FAQ trata? Leitura ainda não medida; medir no piloto do número dedicado. |
+| 4.0 | `Q_PS_PILOTO_EM_RASCUNHO_1117` | persona-servico-2026-11 | Início do piloto da persona de serviço em modo rascunho no hub, com o pacote que o hub precisa receber do core para começar. |
+| 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
+| 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
+| 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | A anonimização no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
+| 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | O comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
+| 3.6 | `Q_MD_CONSULTING_NEXT_UPDATE_1109` | maestro-decisions-1108 | O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI. |
+| 3.2 | `Q_IT_RESIDUE_GUARD_REMOTE_BRANCH` | inbox-triage-1108 | O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de  |
+| 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
+| 3.0 | `Q_BATON_PHASE3_TRAVEL_TO_DOORS_1112` | forge-baton-2026-11 | fase 3: o /meta:baton viaja às portas (standalone, plugins), com os números da fase 2? Gatilho: um dia de pulsos medidos mostrar |
+| 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
+| 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
+| 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
+| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
+| 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
+| 3.0 | `Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT` | inbox-triage-1108 | A fila do onion-messaging reentrega o job à sessão que já agiu e perdeu o lease: falta o teste, e a decisão de pôr ou não um |
+| 3.0 | `Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109` | maestro-decisions-1109b | O hook do onion-plugins funciona em pasta não confiada, e quais são os requisitos duros do diretório comunitário? |
+| 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
+| 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
+
+## fable-5-1-superacao-2026-09 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.6 | `Q_EXP_JUIZ_FABLE_CALIBRACAO` | fable-5-1-superacao-2026-09 | EXPERIMENTO: juiz do kg-freshness/censo opus/high → fable/high SO na faixa CONFIRMED. Metrica: re-rodar a calibracao contra o ME |
+| 6.4 | `C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE` | fable-5-1-superacao-2026-09 | HIPOTESE (nao selada; EMENDA DO JUIZ: 1M de contexto NAO e novidade do 5.1 — Opus 5 e Fable 5 ja eram 1M, agent-orchestration.md |
+| 5.6 | `D_TIERING_SSOT_UNICA_E_EFFORT` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (2 partes, sem experimento de modelo): (a) a tabela de tiering replicada em ~8 docs vira UMA fonte (agent-orchest |
+| 5.4 | `D_RETIER_COMPLIANCE_E_GATES_PREPR` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (barata, mas NAO selada — depende de leitura dos corpos, lacuna 3 do inventario): alinhar o model: dos agentes  |
+| 5.4 | `Q_EXP_WORKER_FABLE_NOS_COMPOSTOS` | fable-5-1-superacao-2026-09 | EXPERIMENTO: worker sonnet → fable APENAS em nos COMPOSTOS (os que deram 44-48% de subcontagem de denominador). Metrica unica: c |
+| 4.8 | `Q_EXP_AUTO_REVISAO_5_1` | fable-5-1-superacao-2026-09 | EXPERIMENTO (base empirica da REGRA 56): a taxa de auto-revisao medida em 2026-08-02 foi ZERO (15 auto-correcoes, 8 por gatilho so |
+| 4.5 | `Q_READONLY_CLAUSE_E_DEFEITO_DE_ESPEC` | fable-5-1-superacao-2026-09 | NAO E CASO DE MODELO: a clausula READ-ONLY do kg-freshness confunde POST com MUTACAO (pedir token por client_credentials e leitura |
+| 4.0 | `Q_EXP_LEITURA_KG_1M` | fable-5-1-superacao-2026-09 | EXPERIMENTO (pre-condicao: definir a metrica, que hoje NAO existe): numa sessao 5.1, contar quantas decisoes da sessao citam no do |
+| 3.3 | `Q_EXP_ELENXO_3_VS_6_LENTES` | fable-5-1-superacao-2026-09 | EXPERIMENTO: refutador Elenxo opus/high → fable permite 3 lentes independentes em vez de 4-6 sem perder cobertura adversarial? M |
+
+## d5-pricing-2026-07 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.2 | `C_compliance_pack` | d5-pricing-2026-07 | DEGRAU 3 Compliance-pack (cunha P4): faixa $15k-40k/ano CITÁVEL não-fechado. Terço inferior do mercado compliance-automation (a |
+| 10.8 | `C_sota_subscription` | d5-pricing-2026-07 | DEGRAU 4 Assinatura SOTA: $150-400/mês indiv. · $250-600 base + $60-120/seat empresa. Acima das ferramentas de codificação gen |
+| 7.5 | `Q_d2_l1l6_activation` | d5-pricing-2026-07 | GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue G |
+| 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
+| 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
+
+## websearch-cap-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
+
+## plugins-en-compliance-2026-09 — 23 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.0 | `D_PR02_VERDADE_NO_ARTEFATO_PUBLICO` | plugins-en-compliance-2026-09 | PR 2 — parar de mentir no artefato publico. TRES correcoes: (a) plugin-readme.sh:92 e marketplace-readme.sh:57 passam a descreve |
+| 13.5 | `D_PR04_EMENDA_L0` | plugins-en-compliance-2026-09 | PR 4 — a CONSTRAIN 1: emendar a L0 ANTES de qualquer linha de gerador. Quadro §1 (:41-42) passa a tratar description:/argument- |
+| 13.5 | `D_PR06_FLIP_PARA_EN` | plugins-en-compliance-2026-09 | PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace- |
+| 10.8 | `D_PR05_ASSENTO_DE_IDIOMA` | plugins-en-compliance-2026-09 | PR 5 — o assento unico, com saida BYTE-IDENTICA. Cria lang.conf (versionado), lang.local.conf (never-clobber do adotante; sobrev |
+| 10.8 | `D_PR07_REGRA_FRONTMATTER_EN` | plugins-en-compliance-2026-09 | PR 7 — a catraca ANTES da migracao. REGRA nova + plugin-language-check.sh + lib/lang-classify.py (promove o classify() de resear |
+| 10.8 | `D_PR09_DESCRICOES_DESCRITIVAS` | plugins-en-compliance-2026-09 | PR 9 — parar de dizer ao Claude COMO SE COMPORTAR. O criterio literal de rejeicao e 'Describe what the tool does. Do not tell Cl |
+| 10.2 | `D_FASE_A_SKILLS_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE A — as 8 skills de onion.manifest.sh:54-63 em EN, frontmatter E corpo. Primeira por ser o menor conjunto com a MAIOR |
+| 10.2 | `D_FASE_C_ONION_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE C — o resto do plugin onion (24 artefatos), incluindo /onion:onion e /onion:kg. Aqui o dogfood importa mais: sao os  |
+| 9.0 | `D_PR08_FRONTEIRA_DO_BUNDLE` | plugins-en-compliance-2026-09 | PR 8 — fechar a superficie da secao 2 (anti-injecao). TIRAR do bundle: co-evolve e co-relay (relacao core<->adotante, nao capaci |
+| 9.0 | `D_PR11_EXEMPLOS_EXECUTAVEIS` | plugins-en-compliance-2026-09 | PR 11 — o requisito 3.E, em duas camadas com UMA fonte. Array EXAMPLES=() em cada manifesto, formato slug·prompt do usuario·su |
+| 8.1 | `D_PR12_DOC_E_HIGIENE` | plugins-en-compliance-2026-09 | PR 12 — 3.C e higiene competitiva. Secoes GERADAS no README: ## Como funciona (o que carrega sempre versus sob invocacao, com o  |
+| 7.7 | `D_FASE_B_DESIGN_COMPLIANCE_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE B — onion-design e onion-compliance em EN (13 artefatos). Menor superficie e sem skill, entao e a fase que valida o  |
+| 7.7 | `D_FASE_D_ENGINEERING_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE D — onion-engineering (41 artefatos) em EN. Massa media. Mesmo protocolo; baseline encolhe. |
+| 7.7 | `D_FASE_E_PRODUCT_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE E — onion-product (49 artefatos) em EN. Maior massa do bundle. Mesmo protocolo; baseline encolhe. |
+| 7.2 | `D_PR03_GATE_VALIDATE_NA_CASA` | plugins-en-compliance-2026-09 | PR 3 — o gate da Anthropic vira gate da casa. Helper .claude/validation/plugin-cli-validate.sh no contrato TSV de plugin-bare-pa |
+| 5.7 | `Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO` | plugins-en-compliance-2026-09 | O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso |
+| 5.7 | `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` | plugins-en-compliance-2026-09 | A casa para onde o desacoplamento manda o público não tem porta nem balcão: onionevolve.com/en/ dá 404 e o site não tem pági |
+| 5.4 | `Q_SEMVER_DA_L0` | plugins-en-compliance-2026-09 | DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate |
+| 5.4 | `Q_SUBMISSAO_AO_PORTAL` | plugins-en-compliance-2026-09 | ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e |
+| 5.1 | `D_FASE_F_META_FABRICA_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE F — os 38 artefatos NAO embarcados (meta-fabrica). Por que existem nesta onda: deixar 38 description: em pt-BR na me |
+| 5.1 | `Q_TREE_SHA_ENDERECA_ENTRADA_NAO_SAIDA` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — `tree_sha` deve endereccar a SAIDA (o conteudo do plugin montado, excluindo o proprio provenance.json) em v |
+| 3.6 | `Q_CATEGORY_DO_COMPLIANCE` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou gover |
+| 3.6 | `Q_TETO_DE_CONTEXTO` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usado |
+
+## testes-evidencia-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.0 | `I_AUSENCIA_LIDA_COMO_RESULTADO` | testes-evidencia-2026-09 | ENTRA NO MESMO PR, e a razao e que o defeito esta num arquivo que o PR INTRODUZ. Sinal do adotante (2026-09-08): `inventory.sh:38` |
+| 14.2 | `I_CURAR_O_RESIDUO_DO_ELENXO` | testes-evidencia-2026-09 | BLOQUEIA O PR DA ONDA 0. Restam DEZ dos 14 achados (quatro ja curados: o gerador que afirmava, os dois MUT que nao executavam, e o |
+| 13.5 | `D_PR_DA_ONDA_0` | testes-evidencia-2026-09 | O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura |
+| 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
+| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
+
+## guard-forge-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO` | guard-forge-2026-10 | A DECISÃO QUE CRIOU A SUPERFÍCIE, e ela foi do maestro interrompendo uma forja à mão: "esta forja deveria ser reusável, ainda |
+| 10.2 | `C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR` | guard-forge-2026-10 | CANDIDATO 2 A GUARDA, selado pelo maestro em 2026-10-02. DEFEITO DATADO: eu descrevi os passos do /meta:forge-guard como se os est |
+| 9.0 | `C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT` | guard-forge-2026-10 | CANDIDATO 3 A GUARDA, selado pelo maestro em 2026-10-02, e o de MAIOR impacto porque e a classe mais caruna da sessao: QUATRO ocor |
+| 7.2 | `C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO` | guard-forge-2026-10 | CANDIDATO 1 A GUARDA, selado pelo maestro em 2026-10-02. Predicado: `carimbo role: hub` IMPLICA `registro role: hub`. DEFEITO DATA |
+
+## inbox-triage-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO` | inbox-triage-2026-10 | O `/meta:adopt --update` SOBRESCREVEU o `docs/knowledge-base/index.md` do adotante com a versao do core — ele perdeu frontmatter |
+| 7.6 | `Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE` | inbox-triage-2026-10 | A REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door` — logo NENHUMA guarda compara |
+| 7.2 | `Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP` | inbox-triage-2026-10 | O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain- |
+| 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
+| 3.0 | `Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub-operacoes-enterprise (sinal de 2026-09-30), arquivados sem triagem registrada — o |
+
+## m2-bridge-logto-2026-07 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `D_middleware_order_first` | m2-bridge-logto-2026-07 | FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app. |
+| 18.0 | `D_path_canon_guard` | m2-bridge-logto-2026-07 | FIX B fecho — GUARDA DE CANONICALIZAÇÃO OBRIGATÓRIA (canonicalPath), fail-closed: (1) decodifica em laço curto (3 voltas, pe |
+| 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
+| 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
+| 6.0 | `Q_route_inventory` | m2-bridge-logto-2026-07 | VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumer |
+| 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
+| 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
+| 3.6 | `Q_gated_m3` | m2-bridge-logto-2026-07 | GATED (não neste flip): RBAC MULTI-OPERADOR / plataforma admin M3 (Logto Organizations só no gatilho 1º role:consumer real) — |
+
+## ops-citation-travel-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 17.0 | `D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA` | ops-citation-travel-2026-10 | Substrato: check de lint (REGRA 100) com catraca, no core, na hora da autoria. Molde: kb-vendored-link-check.sh (6 casos), a guard |
+| 16.0 | `D_TRES_DECLARACOES_E_O_MARCADOR` | ops-citation-travel-2026-10 | A guarda não decide se a frase descreve o destinatário; obriga o autor a declarar. Três declarações calam: o marcador (core-o |
+| 5.1 | `C_TETO_CLASSE_SEM_O_TOKEN` | ops-citation-travel-2026-10 | TETO: comportamento do core descrito SEM o caminho (o script de merge verificado recusa…) passa calado. A classe sem o token ops |
+| 5.1 | `C_TETO_FORMA_NAO_SENTIDO` | ops-citation-travel-2026-10 | TETO: a guarda vê a FORMA (ops/<arquivo> sem declaração), não o SENTIDO. Ela acusa igual a frase que descreve o destinatário  |
+| 3.2 | `C_TETO_BANCADA_E_CORE_ONLY_FORA` | ops-citation-travel-2026-10 | TETO: lint-selftest.sh, fixtures/ e baselines ficam fora (a bancada executa o que cita e falha alto); árvore genérica em bloco c |
+
+## projection-ids-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 17.0 | `D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE` | projection-ids-2026-10 | Cura P9: o default do HOME só vale no papel source (sem stamp ou role: source) e em porta (kind: door, qualquer papel); fora dele |
+| 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
+| 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
+| 3.6 | `C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP` | projection-ids-2026-10 | TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue p |
+
+## dissect-families — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 16.8 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
+| 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
+| 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
+| 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
+| 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
+| 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
+| 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
+
+## private-repo-cite-2026-11 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 16.0 | `Q_CORE_PUBLICO_SEM_CITACAO_NAO_CONFERIVEL_NOVA` | private-repo-cite-2026-11 | no core público, grafo novo ou tocado que cita repo privado ou inalcançável por URL ou repo@sha sai com aviso no lint, e o pass |
+| 4.5 | `C_TETO_TERCEIRO_E_FORMAS_FORA_DA_LISTA` | private-repo-cite-2026-11 | teto: repo de terceiro que fechou, nome nu fora do registro, gist, GitLab, 'commit abc1234' em prosa, sha sem nome, grafo fora do  |
+
+## session-orchestration-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 16.0 | `D_SO_MECANISMO_EM_DEGRAUS` | session-orchestration-2026-11 | Proposta: a orquestração de sessões vira mecanismo em três degraus: à mão com registro (hoje), rascunho da próxima fila apr |
+
+## m3-federation-admin-2026-07 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 15.6 | `C_auth_logto_sdaal` | m3-federation-admin-2026-07 | AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariân |
+| 11.2 | `C_op_update` | m3-federation-admin-2026-07 | OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a  |
+| 8.4 | `C_op_promote` | m3-federation-admin-2026-07 | OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re |
+| 7.0 | `Q_gatilho` | m3-federation-admin-2026-07 | GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação e |
+| 5.8 | `C_op_revoke` | m3-federation-admin-2026-07 | OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar  |
+| 5.4 | `C_p3_agg_view` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no senti |
+| 5.4 | `C_p4_gate_visibility` | m3-federation-admin-2026-07 | REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e |
+| 5.2 | `C_p3_self_service` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O  |
+| 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
+| 4.9 | `Q_auth_decision` | m3-federation-admin-2026-07 | Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth b |
+| 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
+| 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
+
+## cedar-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 15.0 | `D_CEDAR_1001` | cedar-2026-10 | VEREDITO PROPOSTO — PARQUEAR, com gatilho nomeado (o maestro sela). Nao e `absorver`: a capacidade e propriedade da linguagem re |
+| 12.0 | `Q_CEDAR_ABSORVER_OU_NAO_1001` | cedar-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Cedar — e, mais precisamente, a capacidade que o torna interessante: ANALISE EST |
+| 2.4 | `E_N2_LACUNA_EXECUCAO` | cedar-2026-10 | LACUNA NOMEADA do N2, e ela nasce `open` por doutrina: o mecanismo foi lido em BLOG DE ENGENHARIA DO FORNECEDOR, nao executado nem |
+
+## review-gate-saldo-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 15.0 | `Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR` | review-gate-saldo-2026-09 | enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico  |
+
+## audit-evidence-machinery-2026-10 — 27 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.4 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY` | audit-evidence-machinery-2026-10 | relevant-evidence no OSCAL é description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), e o back-matter ac |
+| 9.6 | `C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING` | audit-evidence-machinery-2026-10 | FRD-PER (definição + nota) mais o teto estruturado do CPO-CSX-CPM: 'persistente' PODE variar e ser irregular, mas repete em cicl |
+| 9.0 | `C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE` | audit-evidence-machinery-2026-10 | TEST e EXAMINE operam sobre assessment objects e INTERVIEW sobre pessoas; acceptance é extensão do core, sem lastro no NIST, a d |
+| 7.2 | `C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT` | audit-evidence-machinery-2026-10 | Texto literal do CPO-CSX-CPM e do FRC-CSX-VVK (com as datas de updated) mais o default_artifact KSI: sustentam cadência declarada |
+| 7.2 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER` | audit-evidence-machinery-2026-10 | OSCAL v1.2.3, metaschema l.915-924: observation.methods é obrigatório (1..N), aceita valores locais (allow-other=yes) além de E |
+| 6.0 | `C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO A (recomendação do Elenxo): ao contrato kg-ssot os campos neutros (frequency, retention, owner_role sobre owner, locatio |
+| 6.0 | `C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST` | audit-evidence-machinery-2026-10 | OPÇÃO B: todos os campos nascem no core como x_ (x_frequency, x_evidence_type, x_oscal_method…), o radar do core lê x_frequen |
+| 5.4 | `C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE` | audit-evidence-machinery-2026-10 | CSA: 'You do not need a license if you are using the CCM for internal purposes' e 'A CCM license allows organizations to customize |
+| 5.4 | `C_SUPERACAO_20261021_LULA_THREE_CHALLENGES` | audit-evidence-machinery-2026-10 | O README do Lula lista TRÊS desafios da v1 (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão d |
+| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS` | audit-evidence-machinery-2026-10 | 'acceptance' tem zero ocorrências nos cinco metaschemas OSCAL v1.2.3 (assessment-common, assessment-results, poam, assessment-pla |
+| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED` | audit-evidence-machinery-2026-10 | Formulação corrigida: o OSCAL v1.2.3 não tem 'acceptance', mas o POA&M tem três construções de aceitação de risco: a prop  |
+| 5.4 | `C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED` | audit-evidence-machinery-2026-10 | A página do SCF declara: proibição de distribuir derivado, IA incluída na proibição de CRIAR derivados e licença comercial  |
+| 5.4 | `C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY` | audit-evidence-machinery-2026-10 | O trestle impõe schema aos documentos OSCAL que gerencia; isso entrega 'schema garantido' sem as inferências de que valida a exp |
+| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS` | audit-evidence-machinery-2026-10 | No OCSF 1.9.0, evidences da Compliance Finding é um array de artefatos (33 atributos) sem frescor, dono nem retenção: o OCSF n |
+| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES` | audit-evidence-machinery-2026-10 | A leitura crua do objeto evidences do OCSF 1.9.0 (33 atributos, nenhum de cadência ou retenção) e a 1.9.0 como Latest de 2026-0 |
+| 3.6 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL` | audit-evidence-machinery-2026-10 | No metaschema OSCAL v1.2.3 (l.974), a description de relevant-evidence é obrigatória (1..1) e o href é opcional; 'ponteiro prim |
+| 3.0 | `C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY` | audit-evidence-machinery-2026-10 | Capital em GRC open-source, só por agregador secundário: Comp AI levantou 34M em 2026-09-17 (Roo Capital, Grand Ventures; digg)  |
+| 3.0 | `C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM` | audit-evidence-machinery-2026-10 | O oscal-cli v3.2.0 tem subcomandos de validação por modelo (assessmentresults/ValidateSubcommand.java e poam/ValidateSubcommand. |
+| 2.7 | `C_OPCAO_C_ALL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO C: todos os nove campos entram no contrato kg-ssot, inclusive os de domínio de auditoria (oscal_method, source_norm, clai |
+| 2.4 | `C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS` | audit-evidence-machinery-2026-10 | intuitem.com/pricing confirma plano pago do CISO Assistant (Community, Pro SaaS a 39 euros por contribuidor por mês, Pro On-premi |
+| 2.4 | `C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED` | audit-evidence-machinery-2026-10 | Schema Prisma com provider postgresql no repo do Comp AI, em três pacotes (db, api e app), com pacotes db e kv: o Postgres está  |
+| 2.4 | `C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD` | audit-evidence-machinery-2026-10 | No CycloneDX 1.7, 'Justification should be specified' para not_affected é recomendação, sem required, allOf nem if no objeto an |
+| 2.4 | `C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED` | audit-evidence-machinery-2026-10 | O fedramp.gov/20x ressalva que datas futuras são estimativas ('not firm commitments'): o fim de novas certificações Rev5 em 11/ |
+| 2.4 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT` | audit-evidence-machinery-2026-10 | Observation (página de conceitos) e observation > subjects (JSON reference) são coisas distintas de Assessment Subject (elemento |
+| 2.4 | `C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED` | audit-evidence-machinery-2026-10 | Licença e banco do Probo medidos direto no repo: spdx MIT pela API e imagem postgres na linha 3 do compose.yaml. |
+| 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
+| 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
+
+## radar-E3-2026-10-03-r6 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.4 | `Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 3 (de 3), apontado pelo maestro e o mais consequente: a etapa 5 do /meta:radar cobre veredito que DERRUBA decisao  |
+| 10.8 | `Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 1 (de 3), apontado pelo maestro e medido: o eixo mede DELTA contra a baseline por desenho ("nunca re-deriva o que  |
+| 6.4 | `Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO` | radar-E3-2026-10-03-r6 | A 2.1.287 (01/10) adiciona DUAS coisas que tocam a arquitetura desta casa: "Added Claude Mods: plugins may now modify deeper behav |
+| 5.1 | `Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 2 (de 3), apontado pelo maestro: "visao da comunidade sobre a versao" NAO entra na rodada E3 por construcao. Medid |
+| 5.1 | `Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO` | radar-E3-2026-10-03-r6 | A 2.1.286 (30/09) — e NAO a 2.1.287 como a 1a passada afirmou, e a versao errada era de DENTRO da janela que eu declarei selada  |
+
+## identidade-onion-vps-2026-08 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.2 | `E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO` | identidade-onion-vps-2026-08 | O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotan |
+| 8.0 | `E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO` | identidade-onion-vps-2026-08 | O EIXO DO DINHEIRO RESPONDE O QUE DOUTRINA NENHUMA RESPONDE, e o veredito e desconfortavel: `Agent Memory Systems` e **3,4% dos de |
+| 7.2 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
+| 6.4 | `Q_REFUTES_EDGE_SEM_PAR` | identidade-onion-vps-2026-08 | A lacuna REAL que restou do Q_LACUNA refutado: a aresta REFUTES tipada (refutacao como cidada de 1a classe do grafo, com reconcili |
+| 5.6 | `Q_LOGTO_QUANDO_FECHAR_O_CADASTRO` | identidade-onion-vps-2026-08 | quando fechar de novo o cadastro do Logto (signInMode: SignIn) — GATILHO: o propósito do cadastro aberto acabar, surgir conta q |
+| 5.4 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps-2026-08 | ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maest |
+| 4.2 | `Q_HOOK_PIPE_OU_TRATADOR_NAO_COBERTO_1027` | identidade-onion-vps-2026-08 | PROPOSTO: o bash-empty-result-guard.sh deve cobrir 'cmd · filtro ·· tratador' (o exit do tratador vem do filtro), a forma do in |
+
+## onion-plugin-publication-2026-08 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.2 | `Q_UPDATE_EXIGE_ADOCAO_INTEGRADA` | onion-plugin-publication-2026-08 | ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto  |
+| 7.6 | `Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA` | onion-plugin-publication-2026-08 | DIVIDA MEDIDA (sinal de campo 2026-09-05): o repo publico marciocar/onion-plugins esta na geracao PRE-CONSOLIDACAO (8 plugins) enq |
+| 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
+| 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
+| 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
+
+## passada-adversarial-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 13.5 | `Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE` | passada-adversarial-2026-09 | COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a |
+| 6.8 | `Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER` | passada-adversarial-2026-09 | COMO FAZER O MAPA ENXERGAR O QUE A BANCADA EXERCITA POR FUNCAO-HELPER? Hoje ele le so o corpo de `run_*_selftests()`, e helpers de |
+
+## forge-comando-framework-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.8 | `O_N1_NAO_E_PADRAO` | forge-comando-framework-2026-09 | OBJEÇÃO SOBREVIVENTE (a ser absorvida no desenho, não removida): N=1 — uma instância não é padrão. Uma forja derivada só |
+| 7.5 | `Q_DESTINO_DIFERENCIAL_OU_LACUNA` | forge-comando-framework-2026-09 | HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em  |
+
+## triagem-evolve-kgssot-2026-10 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.8 | `Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL` | triagem-evolve-kgssot-2026-10 | MAQ-2 (confirmado, não curado): o veto do .env lê texto citado como shell em três pernas — parêntese entre aspas zera a past |
+| 3.2 | `C_DISTINCAO_TESTE_SEM_RAZAO` | triagem-evolve-kgssot-2026-10 | D2-0 (confirmado): test-engineer não declara a diferença frente a test-agent, test-planner e /test:*, e /validate:test-strategy: |
+| 3.2 | `C_FRESHNESS_SEM_WORKFLOW_SALVO` | triagem-evolve-kgssot-2026-10 | D6-2 (confirmado): /meta:context-freshness e /meta:kg-freshness mandam autorar o Workflow a cada execução, sem script salvo (o e |
+| 3.0 | `C_DISTINCAO_CREATORS_SO_NO_CORPO` | triagem-evolve-kgssot-2026-10 | D2-2 (confirmado): comando e agente criadores têm descrição quase igual e nenhum dos quatro declara a relação (o comando é a |
+| 3.0 | `C_GUARD_LINKS_TETO` | triagem-evolve-kgssot-2026-10 | teto do elo estrutural da seção 7: o filtro é por linha, não por argumento — mistura de código e mensagem e heredoc de mens |
+| 2.8 | `C_ENGINEER_SEM_RAZAO_FRENTE_AO_GITFLOW` | triagem-evolve-kgssot-2026-10 | D2-3 (parcialmente confirmado): /engineer:start e /engineer:pr não declaram por que coexistem com /git:flow; o hotfix cita. NUNCA |
+| 2.8 | `Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA` | triagem-evolve-kgssot-2026-10 | MAQ-1 (confirmado, não curado): a doutrina 'NUNCA casou' sai sem o N de sessões e sem rótulo de falta de objeto no papel |
+| 2.1 | `C_MAQ4_EXTRATOR_REGRA59_TETO` | triagem-evolve-kgssot-2026-10 | MAQ-4 (teto já declarado): o extrator da REGRA 59 ainda pode ler `bash …x.sh --flag` dentro de mensagem como invocação; sem d |
+| 1.8 | `C_KG_MD_ACIMA_DO_ALERTA` | triagem-evolve-kgssot-2026-10 | D1-1 (confirmado, oportunista): /meta:kg tem 519 linhas, acima do alerta de 500 e abaixo do teto |
+| 1.8 | `C_SKILLS_SEM_NAME` | triagem-evolve-kgssot-2026-10 | D8-0 (confirmado): 10 de 13 skills sem name: no frontmatter — o Claude Code usa o nome do diretório, então é forma, não defe |
+| 1.4 | `C_AGENTES_COM_MCP_DIRETO` | triagem-evolve-kgssot-2026-10 | D6-3 (confirmado, oportunista): dois agentes declaram ferramenta MCP direta; o do Jira é especialista (permitido pela doutrina),  |
+| 1.0 | `C_DISTINCOES_UNILATERAIS_D2_4_A_7` | triagem-evolve-kgssot-2026-10 | D2-4 a D2-7 (informado): declarações de distinção unilaterais ou ausentes em quatro clusters |
+
+## merge-process-onion-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `C_OPCAO_B_POSTMERGE_PROJECTION_WRITER` | merge-process-onion-2026-10 | OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções g |
+| 5.6 | `C_OPCAO_F_THIRD_PARTY_FREE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ain |
+| 5.4 | `C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketpl |
+| 4.5 | `Q_MERGE_LOTE_COM_BISSECCAO` | merge-process-onion-2026-10 | B (GATED): mergear em LOTE com bissecção quando o main quebrar? Gatilho medido: o main quebrar por COMBINAÇÃO de PRs que só a |
+| 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |
+| 2.0 | `C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT` | merge-process-onion-2026-10 | OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pe |
+| 1.0 | `C_OPCAO_J_STACKED_PRS_GRAPHITE` | merge-process-onion-2026-10 | OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs. |
+
+## port-spikes-qwen-vibe-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `Q_PORT_SPIKES_RODADA_2_LACUNAS_1104` | port-spikes-qwen-vibe-2026-11 | Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen;  |
+
+## private-names-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
+
+## dissect-forge-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 11.2 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do al |
+| 5.4 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
+
+## evolve-round-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.8 | `Q_D4_E_D5_NAO_RODARAM_NESTA_RODADA` | evolve-round-2026-10 | LACUNA DECLARADA, nunca zero: D4 (KBs vencidas, por /meta:kb-freshness) e D5 (conformidade de metaspec, por /meta:metaspec-validat |
+
+## inbox-sinais-2026-09 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.8 | `Q_DESIGN_SINK_TEM_DOIS_SINKS_REAIS` | inbox-sinais-2026-09 | DOIS sinais independentes, do portal-gamificacao (2026-09-07) e do jogo-da-vida (2026-09-07), pedem a mesma coisa por caminhos dif |
+| 10.8 | `Q_ONION_RESEARCH_NAO_DISTINGUE_VAZIO_DE_INALCANCAVEL` | inbox-sinais-2026-09 | Duas rodadas no mesmo dia, mesmo tema: a de busca aberta deu 13 claims de blog de escritorio que VENDE registro de marca (tier 3-5 |
+| 9.5 | `D_A_KB_PASSA_A_DIZER_O_QUE_O_MOTOR_FAZ` | inbox-sinais-2026-09 | SELADO pelo maestro 2026-09-11: alinhar a KB ao MOTOR, nao o contrario. `knowledge-graph-sdaal.md:195-196` promete CINCO reprovaco |
+| 9.0 | `I_LIGAR_A_PERNA_DE_LEITURA` | inbox-sinais-2026-09 | PRIMEIRO da fila por retorno sobre custo, e o unico que teria evitado o caso do sinal. A classe de hook JA EXISTE e roda a todo co |
+| 9.0 | `Q_POR_QUE_DRIFTED_NUNCA_FOI_USADO` | inbox-sinais-2026-09 | `drifted` = 0 em 3.715 nos, com o slot construido, peso 1.3 (o UNICO fator que SOBE) e o racional escrito. Nao e falta de motor. O |
+| 9.0 | `Q_SUPERACAO_DA_FONTE_INALCANCAVEL` | inbox-sinais-2026-09 | O maestro selou `falhar alto + distinguir vazio de inalcancavel` E PEDIU MAIS: `pensar na melhor superacao disso`. Entao NAO vira  |
+| 7.6 | `D_O_GATE_WCAG_PARA_DE_PULAR_EM_SILENCIO` | inbox-sinais-2026-09 | SELADO pelo maestro 2026-09-11, com escopo DELIBERADAMENTE estreito: desta leva entra SO o furo do gate WCAG, nao o provider de te |
+| 7.2 | `I_O_RADAR_PARA_DE_ESCONDER_O_VENCIMENTO` | inbox-sinais-2026-09 | SEGUNDO, e nao e feature nova — e parar de esconder. Hoje o `kg-radar.sh` sai VERDE com grafo vencido; quem cobra `review_after` |
+| 6.8 | `I_FECHAR_O_LACO_COM_QUEM_REPORTOU` | inbox-sinais-2026-09 | O doc-bridge tem produtor (`co-announce`) e carteiro (`co-deliver`), e nao tem o ato de RESPONDER. Consequencia medida duas vezes: |
+| 5.4 | `Q_AGENTE_EXPO_REACT_NATIVE` | inbox-sinais-2026-09 | O `react-developer` e orientado a web: cita shadcn/ui dez vezes, Next.js 13, e nao menciona React Native, Expo, Reanimated nem Rea |
+
+## librechat-kg-runtime-2026-08 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adot |
+| 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
+| 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
+
+## forge-decide-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.2 | `C_O_FILTRO_E_JULGAMENTO_DA_SESSAO` | forge-decide-2026-10 | teto declarado: o medidor lista o que está em voo e não decide o que é do maestro; o filtro medível/derivável/de outro dono  |
+| 3.0 | `Q_OPCOES_EM_CAMPO_ESTRUTURADO` | forge-decide-2026-10 | o contrato do .kg.yaml deveria ganhar um campo x_options para decisões abertas? Gatilho: as rodadas do /meta:decide mostrarem que |
+
+## hub-operacoes-enterprise-update-547-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
+
+## conductor-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.6 | `Q_CONDUCTOR_ABSORVER_OU_NAO_1011` | conductor-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Conductor (Microsoft) — orquestracao multiagente declarada em YAML que valida a  |
+| 3.0 | `E_N3_SCHEMA_NATIVO_LACUNA` | conductor-2026-10 | LACUNA NOMEADA — a validacao de FORMA o Onion ja recebe do harness (todo agente do onion-research.js leva schema:). Se o harness |
+
+## federation-health-2026-07 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
+| 8.0 | `C_METAGAMIFY_VENDOR_VNEXTPIN` | federation-health-2026-07 | metagamify onion/vendor tem 1 pin INVALIDO na historia: '2026-07-12' (uma DATA, nao commit — vnextpin). Merge-base pode ficar er |
+| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETERM |
+| 3.6 | `C_ADOPTER_PERSONALITY_SEEDS_PENDING` | federation-health-2026-07 | 6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-inst |
+
+## session-2026-07-18-evolve-review-triage — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.0 | `E_ITEM6_VERIFY` | session-2026-07-18-evolve-review-triage | drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); e |
+
+## intelligent-ui-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
+| 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
+| 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
+
+## company-brain-market-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
+
+## graduated-automation-elenxo-2026-07 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.0 | `Q_MONITORED_RUNG` | graduated-automation-elenxo-2026-07 | Onda 2: como nomear+mecanizar o degrau MONITORADO (shadow, roda+observado)? promover o onion-effect-gate.sh orfao; dogfood INTERNO |
+| 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
+| 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
+
+## spike-copilot-studio-mcp-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.0 | `C_IDENTIDADE_POR_CHAVE_POR_USUARIO` | spike-copilot-studio-mcp-2026-10 | INFERÊNCIA: sem header de identidade no Copilot Studio, a identidade do autor pode sair de uma API key por usuário, mapeada para |
+
+## aaif-projects-onion-2026-11 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.7 | `C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO` | aaif-projects-onion-2026-11 | Defeito medido, não corrigido aqui: .claude/utils/federation-transport/a2a-rt-mcp.py l.548-549 devolve em initialize a versão qu |
+| 4.0 | `Q_AAIF_NAO_MEDIDO_2026_11` | aaif-projects-onion-2026-11 | Sem medir depois da cura: adoção real de qualquer projeto; quem paga por projeto e receita; envio real ao perfil A2A por cliente |
+
+## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.7 | `D_QUADRO_CITACOES` | onion-doctrine-elenxo-bulbo-2026-07 | quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado)  |
+| 6.4 | `Q_BYTECODE_SEM_TESTE` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A SUPERACAO AINDA NAO COBRE: bytecode que nenhum teste confere — instrucao em prosa de comando que a VM obedece sem verifi |
+| 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
+| 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
+| 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
+
+## onion-messaging — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.7 | `Q_MESSAGING_SOURCE_URI_REFERENCE_1115` | outside-in-primaries-2026-11 | A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma. |
+
+## fila-2026-10-06 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.5 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
+| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
+| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
+| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
+| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
+
+## gtm-decisions-2026-07 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.5 | `D_D2_activation` | gtm-decisions-2026-07 | D2-ATIVAÇÃO — ligar o flywheel de moeda-dado (SSOT 6 camadas L1-L6 de mitigação de inferência, dogfoodado). Direção RATIF |
+| 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
+| 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
+| 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
+
+## door-role-parity-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
+| 6.3 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
+| 5.4 | `Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA` | door-role-parity-2026-09 | o commit durável da adoção deixa .gitignore e .env.example fora: a proteção de segredo que a adoção escreve no .gitignore n |
+
+## forge-cc-update-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE` | forge-cc-update-2026-10 | teto declarado: o medidor não decide se um item do CHANGELOG toca o Onion; casar por palavra-chave fabricaria as ligações que a |
+| 3.6 | `Q_ISSUE_PELO_ADAPTER_EXECUTAVEL` | forge-cc-update-2026-10 | quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão? |
+
+## rito-task-manager-2026-09 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `Q_CLAUSULA_11_ONDA_DERIVADA` | rito-task-manager-2026-09 | candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda deri |
+| 7.2 | `Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU` | rito-task-manager-2026-09 | o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion  |
+| 6.0 | `Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO` | rito-task-manager-2026-09 | nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01 |
+| 4.8 | `Q_COMPROMISSO_ESPERA_COLHEITA` | rito-task-manager-2026-09 | o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 1 |
+
+## evolve-staleness-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
+
+## hooks-python-isolated-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `C_TETO_EXECUTAVEL_NAO_FIXADO` | hooks-python-isolated-2026-11 | TETO: -I isola os imports do interpretador, não fixa QUAL executável roda, e não cobre a sobrescrita do próprio script de hook |
+| 6.4 | `C_VIAJA_PARA_PORTAS_E_ADOTANTES` | hooks-python-isolated-2026-11 | viajam às 4 portas e aos adotantes: os hooks curados, a guarda, a REGRA 115 e a família; a evidência e a receita não viajam |
+| 5.1 | `C_TETO_FORMA_DO_SEGREDO` | hooks-python-isolated-2026-11 | TETO: o modo por forma fecha 20,4% dos comandos reais e solta 13 dos 68 que o veto inteiro barra: 7 glob sem ponto, 5 padrão dupl |
+| 4.8 | `C_TETO_DE_CHAVES_FECHA_LEGITIMO` | hooks-python-isolated-2026-11 | TETO: o limite de 256 alternativas fecha comando legítimo em formas raras: JSON aninhado a partir de 8 objetos em echo e 12 em cu |
+| 4.5 | `C_TETO_GATE_DO_GIT` | hooks-python-isolated-2026-11 | TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da s |
+| 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
+| 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
+
+## ai-front-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_AI_FRONT_PILOTO3_RESULTADO` | ai-front-2026-10 | O piloto 3 da curadoria chega a 2 achados aceitos ou mais depois da revisão adversarial? Se chegar, a frente de IA vira estudo re |
+
+## anarlog-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_ANARLOG_PORTAO_EXPORT` | anarlog-2026-10 | Portão do anarlog: numa reunião de teste consentida, o export JSON traz palavras com start_ms, end_ms, channel e speaker, e a tr |
+| 4.0 | `E_AVISO_WINDOWS_RECUSA` | anarlog-2026-10 | RISCO ao costurar: a função de postar o aviso do anarlog recusa no Windows, e o maestro disse que a máquina dele é Windows. O  |
+
+## vexa-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_VEXA_PORTAO_MEET` | vexa-2026-10 | Portão do Meet: num teste consentido, sem dado real, a extensão + desktop da Vexa produz 1 segmento ou mais com speaker não vaz |
+| 3.0 | `Q_VEXA_TEAMS_PARQUEADO` | vexa-2026-10 | O Teams fica parqueado dentro do veredito enquanto o join autenticado da Vexa for admitido sem áudio (issue #1795 aberta). |
+
+## model-compare-onion-2026-11 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.6 | `Q_BANCADA_DE_MODELO_E_REVISOR_1111` | model-compare-onion-2026-11 | forjar a comparação como peça: incidente real vira caso de avaliação, e toda versão nova de modelo roda nela, com mais casos |
+| 5.6 | `Q_BANCADA_DO_VETO_POR_VERSAO_1111` | model-compare-onion-2026-11 | a cada atualização do Claude Code, disparar um veto real por Bash e por Monitor, e reprovar se o tool_name recebido mudar |
+| 5.6 | `Q_COMPARATIVO_COMPLETO_COM_ONION_E_KG_SSOT_1111` | model-compare-onion-2026-11 | estender a comparação de modelos a tarefas com o Onion completo e com o KG-SSOT, e decidir a fila com base nesse comparativo |
+| 4.2 | `Q_DATASETS_DE_TESTE_E_HUGGING_FACE_1111` | model-compare-onion-2026-11 | usar datasets de teste na bancada de modelos e aprender a buscá-los no Hugging Face |
+| 4.2 | `Q_ENXUGAR_O_CLAUDE_MD_1111` | model-compare-onion-2026-11 | auditar a redundância do que fica sempre carregado, começando pelo CLAUDE.md, medindo o efeito |
+| 4.2 | `Q_REVISOR_DE_OUTRO_FORNECEDOR_1111` | model-compare-onion-2026-11 | ponte opcional em que modelo de outro fornecedor revisa o que o Claude escreveu, medida pelo razão de revisões, com alternativa  |
+| 4.2 | `Q_SONDA_DO_LINEUP_LE_TODOS_OS_MODELOS_1111` | model-compare-onion-2026-11 | curar ops/model-lineup-probe.sh para medir todos os degraus, com caso na bancada |
+
+## radar-E3-2026-11-10-r24 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.6 | `Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110` | radar-E3-2026-11-10-r24 | re-rodar as células de mods do laboratório do exit 2 na 2.1.322, para saber se a carga no meio da sessão e o tool.check mudaram |
+
+## a2a-landscape-2026-11 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `C_SUPERACAO_20261104_INPUT_REQUIRED_PRESENT_GAP_IS_QUERY` | a2a-landscape-2026-11 | A spec v1 define GetTask, TaskPushNotificationConfig e os estados INPUT_REQUIRED e AUTH_REQUIRED; o perfil Onion JÁ devolve input |
+| 5.4 | `C_SUPERACAO_20261104_OAUTH_DEPRECATED_NOT_REMOVED` | a2a-landscape-2026-11 | Na v1.0, ImplicitOAuthFlow e PasswordOAuthFlow foram DEPRECIADOS (seguem no oneof com [deprecated = true]), DeviceCodeOAuthFlow en |
+| 5.4 | `C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY` | a2a-landscape-2026-11 | A spec v1.0.1 define push (TaskPushNotificationConfig + Create/Get/List/Delete) como capacidade OPCIONAL; o perfil Onion fica conf |
+| 3.0 | `C_SUPERACAO_20261104_A2A_1_0_LINE_AISIX_SELF_DECLARED` | a2a-landscape-2026-11 | A A2A 1.0 (v1.0.0 em 12/03/2026, v1.0.1 em 28/05/2026) traz tenant opcional e assinatura de card por JWS+JCS; o suporte do AISIX a |
+
+## constellation-dialogic-layer-2026-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `C_BOLETIM_INFORM` | constellation-dialogic-layer-2026-07 | 3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto |
+| 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
+
+## elenxo-mecanismos-lint-2026-08-13 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA` | elenxo-mecanismos-lint-2026-08-13 | O TETO DA GUARDA DIRTY-TREE GANHA DONO NO GRAFO (8o Elenxo, fechamento do Q_PARECER): no caminho benigno a guarda NAO emite nada  |
+
+## guard-pre-push-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
+| 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
+
+## adopter-shape-bench-2026-10 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.1 | `C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON` | adopter-shape-bench-2026-10 | TETO: numa máquina sem PyYAML e jsonschema o kg-contract-check segue saindo rc 2, e a família só mede onde eles existem. O temp |
+| 5.1 | `C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO` | adopter-shape-bench-2026-10 | TETO declarado: o *.env de trabalho que a sessão grava no scratchpad segue VETADO na leitura. A cura segura precisaria saber que  |
+| 5.1 | `C_TETO_SO_O_PAPEL_ADOPTED` | adopter-shape-bench-2026-10 | TETO: a família mede o papel adopted, o mais comum. hub e standalone cortam diferente (o standalone perde adoção e federação) |
+| 4.8 | `C_TETO_DETECTOR_E_LEXICAL` | adopter-shape-bench-2026-10 | TETO: o detector de 'não pude julgar' é LEXICAL (uma lista de frases) e só vê dependência citada pelo CAMINHO ou pelo nome do |
+| 4.8 | `C_TETO_PASSOS_COPIADOS_DO_ADOPT` | adopter-shape-bench-2026-10 | TETO: o materializador copia os passos DETERMINÍSTICOS do adopt.md, numa lista dele. Passo novo no procedimento (que é markdown) |
+| 3.6 | `Q_ENV_SCRATCHPAD_ISENCAO_SEGURA` | adopter-shape-bench-2026-10 | Aberto (sobra da Q_CURAS_DO_PR2): como isentar do veto do .env o *.env de trabalho que a sessão gravou no scratchpad, sem reabrir |
+| 3.2 | `C_TETO_GITIGNORE_DO_USUARIO` | adopter-shape-bench-2026-10 | TETO: um .gitignore local que o usuário nunca commitou entra INTEIRO no commit da adoção, com as linhas dele; e no .gitignore j |
+| 3.0 | `C_TETO_GO_VENDOR_NAO_MEDIDO` | adopter-shape-bench-2026-10 | NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem  |
+| 3.0 | `Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO` | adopter-shape-bench-2026-10 | Aberto: de onde veio o bloco da prova do gate impresso 3 vezes e com aspas escapadas no update do adotante? Os scripts o imprimem  |
+| 2.8 | `C_TETO_BUNDLE_DE_PLUGIN` | adopter-shape-bench-2026-10 | TETO: o bundle de plugin (onion.manifest.sh) também leva o kg-contract-check.sh e não leva vendor/kg-ssot. Lá o selador do /met |
+| 2.8 | `C_TETO_HUB_COM_REGISTRO_PROPRIO` | adopter-shape-bench-2026-10 | TETO: a REGRA 92 é source-only também no hub. Um hub com members.yaml próprio deixa de ter a paridade registro×carimbo julgada |
+| 2.8 | `C_TETO_VENDOR_PROPRIO_IGNORADO` | adopter-shape-bench-2026-10 | TETO: um vendor/kg-ssot PRÓPRIO do alvo e ignorado de propósito também seria forçado no commit da adoção. Nenhum adotante me |
+
+## kg-id-valid-from-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.1 | `C_TETO_PERFIL_YAML_E_DO_CONTRATO` | kg-id-valid-from-2026-10 | TETO: politica de extensoes e MUST x SHOULD de verified_at em PROD ficaram FORA de proposito — decisao do contrato formal do .kg |
+| 3.2 | `C_TETO_DATAS_ISO_SEM_ASPAS` | kg-id-valid-from-2026-10 | TETO: valid_from: 2026-10-01 sem aspas e lido como DATA (timestamp YAML 1.1) por um leitor tipado, nao como string — 88 ocorrenc |
+
+## audit-textual-gates-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
+| 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
+| 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
+
+## design-context-guard-2026-10 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `C_CEILING_FIRST_CYCLE_SOFT` | design-context-guard-2026-10 | Teto: no 1º ciclo todo achado é SOFT; a guarda avisa e não bloqueia até os dois adotantes migrarem (--strict sobe para HARD). |
+| 4.2 | `C_CEILING_BRIEF_BY_TRACE` | design-context-guard-2026-10 | Teto: o brief é reconhecido pelo trace igual a <design>/brief.md; um brief noutro arquivo não é cobrado. |
+| 4.2 | `C_CEILING_LINK_BY_PREFIX` | design-context-guard-2026-10 | Teto: a ligação do brief conta pela pasta do business-context no alvo da external_edge; se o nó-alvo existe é o gate do contra |
+| 4.0 | `Q_PROJECTION_CHECK_DEPENDENCY` | design-context-guard-2026-10 | O checador de projeção do kg-ssot (o .md com projection_of cita só ids que existem no grafo) existe? Dependência declarada da  |
+| 3.2 | `C_CEILING_TOKENS_GATE_FIXED_DIR` | design-context-guard-2026-10 | Teto: o lint-design-tokens.sh lê só docs/design-context; num repo que declara outra pasta o setup avisa e o gate não a vê. |
+| 3.0 | `Q_LOCATOR_CHECK_HOME` | design-context-guard-2026-10 | A checagem do locator de token migra para o kg_trace do contrato KG-SSOT ou fica na vertical de design do core? Em discussão com  |
+| 2.8 | `C_CEILING_MISSING_NEVER_EXPIRES` | design-context-guard-2026-10 | Teto: a question que declara a falta do business-context segue valendo depois que o alvo passa a existir; a guarda não acusa a fa |
+| 2.8 | `C_CEILING_ONLY_DEFAULT_PATHS` | design-context-guard-2026-10 | Teto: com --only, a REGRA 111 só responde a caminhos com design-context no nome; numa pasta de design declarada ela pula no --onl |
+| 2.8 | `C_CEILING_SETUP_TOP_LEVEL_TARGETS` | design-context-guard-2026-10 | Teto: o setup procura E_POSITIONING e ST_THEME_APPLIED só no nível de cima da pasta do contexto; grafo-alvo em subpasta vira que |
+| 2.8 | `C_CEILING_THEME_DETECTION` | design-context-guard-2026-10 | Teto: o alvo de tema do setup é heurística (components.json, @theme, tailwind.config, CSS); no core ela achou um CSS do site e o |
+
+## evolve-cures-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE` | evolve-cures-2026-10 | O TERCEIRO SITIO que o no C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA nomeava e a cura 4 NAO curou (achado R3 do Elenxo da leva 2 |
+
+## granaai-doctrine-absorption-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
+
+## member-paths-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_REGISTRO_DO_CONSULTORIA_DIVERGE_DO_CLONE` | member-paths-2026-11 | com o clone legível, o pin do registro (6c4272252528) diverge do carimbo da origin/main do clone (e4c954ebad47): o --seal do memb |
+
+## peek-ledger-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_PEEK_REDDIT_GAP_1113` | peek-ledger-2026-11 | o Reddit fica como lacuna declarada da espiada (403 medido); entra quando alguém medir um caminho que responda (.rss ou OAuth com |
+
+## cortex-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_CORTEX_FROTA_GATILHO` | cortex-2026-10 | Parque da frota: algum adotante do Onion pede N issues em worktrees paralelas com aprovação humana em lote e dados isolados por  |
+| 4.5 | `Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO` | cortex-2026-10 | Costura do gate de plano: onde o plano mora, se o .gitignore do core ignora a pasta de sessões, e como o script confere que o pla |
+| 4.5 | `Q_CORTEX_HANDOFF_GATILHO` | cortex-2026-10 | Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cor |
+| 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
+| 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
+
+## curadoria — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
+
+## duolingo-actor-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_DUOLINGO_REVISITA_CARTA_3T_2026` | duolingo-actor-2026-10 | Revisita trimestral: a carta do 3º trimestre de 2026 confirma a orientação do ano, a margem e o descompasso entre uso e reserva |
+
+## rea-method-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
+| 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
+
+## env-falso-positivo-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.2 | `C_TETO_GREP_RECURSIVO_SEM_INCLUDE` | env-falso-positivo-2026-10 | teto: grep -r ou rg sobre uma pasta lê o .env que estiver dentro dela, e o veto julga o argumento (a pasta), não o que a recurs |
+| 2.8 | `C_TETO_DISCO_NO_MOMENTO_DO_VETO` | env-falso-positivo-2026-10 | teto: o glob conferido no disco vê a pasta no momento do veto; um x.env criado na mesma linha por nome montado em runtime, sem ci |
+| 2.8 | `C_TETO_U4_RESIDUAL` | env-falso-positivo-2026-10 | teto do U4: `grep -l` sobre `.env*`, heredoc dentro de `{ … } > arquivo` e `for` sobre glob com pasta desconhecida seguem barrad |
+
+## radar-E3-2026-10-05-r7 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
+
+## vps-shared-tools-2026-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
+| 2.4 | `Q_WAHA_REVISAO_MENSAL_DA_VERSAO` | vps-shared-tools-2026-07 | Revisão periódica do WAHA (mensal; a próxima em 2026-11-22): há release mais nova que a fixada (2026.9.2)? Se houver, ler o ch |
+
+## brain — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `C_MA_EVIDENCE_FEED` | company-brain-multiaudiencia-2026-10 | Trabalho: uma coleta recorrente só leitura (nuvem, plataforma, alertas de dependência) que alimenta nós evidence lidos pelo neg |
+
+## guardrails-2nd-pr-state-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## meeting-capture-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
+
+## radar-E3-2026-11-04-r23 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_CENSO_DE_SESSOES_EM_BINARIO_DELETADO_1104` | radar-E3-2026-11-04-r23 | a casa lista os processos da conta em binário apagado, achados pelo executável (readlink no procfs) e não pelo nome claude: hoj |
+| 2.0 | `Q_CENSO_AVISA_O_FIM_DO_LOGIN_1104` | radar-E3-2026-11-04-r23 | o censo de frescor (currency-census.sh) ou o hook de início de sessão passa a ler loginExpiresAt e avisa o maestro antes do cort |
+| 2.0 | `Q_PREAMBULO_NOMEIA_O_CORTE_DE_3_MIN_1104` | radar-E3-2026-11-04-r23 | o preâmbulo do agente de execução nomeia o corte de 3 minutos e exige o rc do gate lido do arquivo de log, nunca a resposta do  |
+
+## fios-abertos — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
+| 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
+
+## task-progress-story-points-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_ADAPTER_LER_STORY_POINTS` | task-progress-story-points-2026-10 | Qual adapter passa primeiro a ler os pontos (estimate.points_read) e com que medição? ClickUp e Linear têm campo nativo ancorad |
+| 3.2 | `C_TETO_STATUS_BINARIO_POR_SUBTASK` | task-progress-story-points-2026-10 | TETO: o status é binário por subtask (meio feita conta como não feita), e numa task-mãe de task-mãe cada filha entra com os p |
+
+## radar-E3-2026-10-14-r11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO` | radar-E3-2026-10-14-r11 | o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em |
+
+## radar-E3-2026-11-03-r22 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_AGENTES_DECLARAM_O_ESFORCO_1103` | radar-E3-2026-11-03-r22 | os agentes cujo modelo difere do da sessão de quem os chama devem declarar effort no frontmatter, ou a casa fixa CLAUDE_CODE_SUBA |
+| 2.4 | `Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103` | radar-E3-2026-11-03-r22 | o card do teste A2A deve proibir retomar a sessão de teste pela dica de saída e mandar sempre a linha de comando inteira |
+
+## superpowers-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_REABRIR_CARIMBO_POR_PROBE` | superpowers-2026-10 | Vale um carimbador determinístico de verified_at por reexecução da medição? O plano v1 caiu por 3 objeções fatais: inviáve |
+| 3.0 | `Q_REABRIR_TRES_SKILLS` | superpowers-2026-10 | As 3 skills que o Onion não tem (systematic-debugging, test-driven-development como fluxo, diagnosing-superpowers) valem absorç |
+
+## direct-provider-api-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `Q_ESTENDER_O_ARMAMENTO_A_OUTRO_PROVEDOR` | direct-provider-api-2026-10 | O hook arma sozinho para ClickUp, Jira, Asana ou Zoho no dia em que nascer adapters/<p>.py e o provider ativo for ele. |
+
+## inbox-triage-2026-10-04 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO` | inbox-triage-2026-10-04 | LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transport |
+
+## radar-E3-2026-10-21-r15 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO` | radar-E3-2026-10-21-r15 | a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo |
+| 2.8 | `C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA` | radar-E3-2026-10-21-r15 | a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto? |
+
+## vetos-fail-closed-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
+
+## catraca-regra49-2026-08 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.4 | `D_SCRUB_FROZEN_POISON_IN_VENDORS` | catraca-regra49-2026-08 | FOLLOW-UP M2 (gatilho: o veneno congelado voltar a incomodar): poc(47)/gustavo(48) tem chaves estrangeiras JA rastreadas no onion/ |
+
+## kg-diagnose-automation-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.4 | `Q_orquestrador_gated` | kg-diagnose-automation-2026-07 | Follow-up GATED (2º passo): um comando que ROLA a sequência extract→consolidate→candidatos disparando agentes sozinho? Merec |
+
+## radar-E3-2026-10-14-r10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.4 | `Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS` | radar-E3-2026-10-14-r10 | selar a deriva da r9 (contagem de hooks, timeout e onFailure) pelo /meta:kg-freshness e medir a latência dos 2 vetos PreToolUse n |
+| 2.0 | `Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299` | radar-E3-2026-10-14-r10 | sondar o plugin onion publicado sob 2.1.299: o bash-empty-result-guard empacotado (PostToolUse com exit 2) e o env-guard mudam de  |
+
+## residuos-2026-08-18 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.4 | `Q_ALARME_DE_AUSENCIA_DE_AGENDADO` | residuos-2026-08-18 | GATED por Teste do Gatilho — alarme para agendado que PARA de rodar. GATILHO NOMEADO: a 1a vez que um run com event=schedule for |
+
+## radar-E3-2026-10-30-r21 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.2 | `Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030` | radar-E3-2026-10-30-r21 | a cobertura dos vetos sobre o Monitor deve virar caso da guarda de deriva de binário, ou ficar só declarada? |
+| 2.0 | `Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030` | radar-E3-2026-10-30-r21 | o veto nativo de escrita fora do diretório de trabalho cabe na casa (ou num adotante regulado), com as escritas legítimas declar |
+
+## kg-console-rich-design-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_live_narration` | kg-console-rich-design-2026-07 | Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré |
+
+## radar-E3-2026-10-17-r13 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL` | radar-E3-2026-10-17-r13 | medir um turno real do admin do /chat com o fork ligado (custo da cópia de contexto e saída em segundo plano antes do fim do tur |
+
+## vendor-multi-branch-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_three_or_more_branches` | vendor-multi-branch-2026-07 | Tres ou mais integration branches nao foram exercitadas. A convencao por-branch se estende por CONSTRUCAO, mas isso e inferencia,  |
 
