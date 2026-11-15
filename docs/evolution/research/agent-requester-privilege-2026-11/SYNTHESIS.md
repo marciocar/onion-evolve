@@ -25,6 +25,29 @@ privilégio próprio único, e o que uma auditoria pede como registro. Rodada em
 lidas, 0 inalcançáveis, 35 claims ancoradas, 10 rejeitadas (todas EXAGERADA), 38 objeções, 15 sobreviventes
 (5 bloqueiam), 13 superações (`E_LACUNAS_AGENT_REQUESTER_PRIVILEGE_1113`).
 
+## Rodada complemento 2026-11-15 — fecha a objeção + SELO do maestro
+
+Run `wf_d942cc72-e05` (modo primárias, 660.655 tokens, 8 agentes, ~16 min). **Fecha as DUAS metades** da
+objeção `E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED`:
+- **Conteúdo OWASP 2026** (5 evidências ancoradas verbatim): `LLM06:2025` renumerou para **`LLM03:2026` Excessive
+  Agency**; raiz-causa (funcionalidade/permissões/autonomia excessivas), exemplo de permissão excessiva (ferramenta
+  no contexto do usuário acessando com identidade genérica privilegiada), menor privilégio das ferramentas,
+  aprovação humana para alto impacto, e o **acréscimo da 2026**: *"preserve the original user context and
+  authorization scope across chained tool or agent calls"* — exatamente o on_behalf_of multiagente da tese.
+- **Atualidade NIST** (4 evidências): AI RMF 1.0 *"being revised as part of the White House AI Action Plan"*
+  (verbatim, vigente, sem sucessora), 1.0 de 2023, AI 600-1 de 2024, único item 2026 = nota conceitual de
+  infraestrutura crítica.
+
+A objeção sobrevive só em **grau limite** (etiqueta "novo na 2026" do trecho de contexto do usuário); 5 nós
+`LLM06:2025` passam a `superseded`. A edição 2026 **reforça** a tese (preservação de contexto em fluxos
+multiagente é agora prescrição explícita).
+
+**SELO do maestro (2026-11-15, via /meta:decide):** `D_AGENT_PRIVILEGE_ADOPTED_1115` — **adotar o padrão/kit de
+privilégio do agente como orientação Onion**: privilégio efetivo = menor(agente, solicitante); identidade pelo
+evento; on_behalf_of real (RFC 8693); aprovação humana para alto impacto; trilha por ato. Escolhida «Selar:
+adotar o padrão/kit», descartadas «re-escopo» e «ainda não». `TRACES_TO Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115`.
+Destrava a ponte (bridge) + bump do SDK.
+
 ## Rodada complemento 2026-11-14 — atualidade OWASP/NIST (fecha metade da objeção)
 
 Run `wf_148b5b18-17e` (modo primárias, 837.802 tokens, 10 agentes, ~20 min). Fecha a **metade OWASP** da

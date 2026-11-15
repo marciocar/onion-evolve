@@ -11,7 +11,21 @@ meta:
                                # draft-ietf-wimse-aims (ciclo de ~6 meses), a doc de plataforma (Microsoft, Slack) e a
                                # versão anual da OWASP. RFC 8693, Hardy e NIST valeriam 12 meses, mas não movem a revisita;
                                # 30d (ferramenta) giraria sem mudança nas fontes que decidem.
-  # ═══ TETO: 92 NÓS ═══
+  # ═══ TETO: 107 NÓS ═══
+  #   +1 (2026-11-15, SELO do maestro via /meta:decide, não da pesquisa): D_AGENT_PRIVILEGE_ADOPTED_1115 — adotar o
+  #   padrão/kit de privilégio como orientação Onion, objeção de atualidade fechada; TRACES_TO
+  #   Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115. O grafo nunca sela NO FLUXO da pesquisa; este é o selo do MAESTRO.
+  #   +13 (2026-11-15, rodada de primárias OWASP LLM03:2026 conteúdo + NIST atualidade): 9 evidências ancoradas
+  #   (5 OWASP LLM03:2026 — raiz-causa, exemplo de permissão excessiva, menor privilégio das ferramentas, preservação
+  #   do contexto do usuário, aprovação humana; 4 NIST — AI RMF 1.0 em revisão sem sucessora, 1.0 de 2023, AI 600-1 de
+  #   2024, nota conceitual de infraestrutura crítica de 2026), 1 contabilidade (E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115),
+  #   1 superação (C_SUPERACAO_20261115_COMPLETE_MEDIATION_GRADUATED_2026), 1 objeção sobrevivente limite
+  #   (E_OBJECAO_LLM03_2026_USER_CONTEXT_FRAMED_NEW) e 1 pergunta (Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115).
+  #   Esta rodada de primárias foi executada em 2026-11-15 para fechar a metade NIST (citação primária datada da
+  #   atualidade do AI RMF/AI 600-1 em 2026-11) e o conteúdo OWASP (texto do item Excessive Agency da edição 2026)
+  #   da objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED. As duas metades nomeadas FECHAM; 5 nós LLM06:2025 passam a
+  #   superseded pela edição 2026; a objeção de versão sobrevive só em grau limite (etiqueta 'novo na 2026' do trecho
+  #   de contexto do usuário); o selo segue não-selado (proposta de revisão em Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115).
   #   +19 (2026-11-14, rodada de primárias OWASP/NIST atuais): 16 evidências ancoradas (6 OWASP LLM, 5 OWASP
   #   agentic, 5 NIST AI 600-1), 1 contabilidade (E_LACUNAS_OWASP_NIST_VERSIONS_1114), 1 superação
   #   (C_SUPERACAO_20261114_ASI_EXPLICIT_USER_APPROVAL) e 1 pergunta (Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114).
@@ -349,7 +363,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.9
     verified_at: "2026-11-13"
@@ -368,7 +382,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.9
     verified_at: "2026-11-13"
@@ -387,7 +401,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.75
     verified_at: "2026-11-13"
@@ -406,7 +420,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.9
     verified_at: "2026-11-13"
@@ -444,7 +458,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.9
     verified_at: "2026-11-13"
@@ -1179,6 +1193,28 @@ nodes:
       scheme: owasp-llm-top10-2025
       lang: pt-BR
       definition: "Item LLM06:2025 do OWASP Top 10 for LLM Applications 2025, Excessive Agency: o agente com permissões, funcionalidade ou autonomia além do necessário."
+  - id: T_OWASP_LLM03
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-15"
+    verified_against: "a fonte ancorada na rodada de primárias NIST de 2026-11-15, lida para nomear o código que o lint de nomes (ops/kg-vocab-ci.sh) acusou sem termo"
+    provenance:
+      source: "https://genai.owasp.org/llmrisk/ (OWASP Top 10 for LLM Applications 2026, item LLM03:2026 Excessive Agency)"
+      locator: "título LLM03:2026 Excessive Agency, edição 2026 (renumeração de LLM06:2025)"
+      method: "reading: o nome do item na fonte ancorada pela rodada NIST de 2026-11-15"
+      locality: "web"
+    trace: "lint de nomes do pr-finalize de 2026-11-15 sobre este grafo (vocab.code-unresolved LLM03)"
+    label: "LLM03 neste grafo é o item LLM03:2026 (Excessive Agency) do OWASP Top 10 for LLM Applications 2026, renumeração do LLM06:2025."
+    x_term:
+      pref: "OWASP LLM03:2026 Excessive Agency"
+      notation: "LLM03"
+      scheme: owasp-llm-top10-2026
+      lang: pt-BR
+      definition: "Item LLM03:2026 do OWASP Top 10 for LLM Applications 2026, Excessive Agency (renumeração do LLM06:2025): o agente com permissões, funcionalidade ou autonomia além do necessário."
   - id: T_OWASP_ASI03
     node_type: entity
     layer: audit
@@ -1615,12 +1651,260 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.6
     label: "Com a metade OWASP da objeção de versão fechada (LLM Top 10 -> 2026; ASI Threats -> v1.1; Agentic Top 10 -> 2026), o selo pode ser revisto? Falta: (a) texto do item Excessive Agency #3 da edição 2026 e (b) citação primária datada de atualidade do NIST."
     narrative: "Esta rodada NÃO sela (o escritor nunca sela). Propõe revisão do selo que a objeção adiou: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED teve a metade OWASP conferida, mas SOBREVIVE em duas frentes (conteúdo da edição LLM 2026 não lido; atualidade NIST rejeitada na ancoragem). Caminho de fechamento (Elenxo): ancorar o texto do item EA #3 da edição 2026 e uma citação primária datada de atualidade do NIST; OU re-escopar a recomendação como 'versões vigentes em 2026-11-14 por identidade de documento; conteúdo de privilégio ancorado em LLM06:2025 + ASI03:2026 + RFC 8693 + prática Microsoft, NÃO na edição LLM 2026 cujo texto não foi lido'. A decisão de selo é do maestro."
     trace: "run /onion-research de 2026-11-14; objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED; Elenxo recommendation e gapsOpen"
+  - id: E_OWASP_LLM03_2026_ROOT_CAUSE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-15"
+    verified_against: "'The root cause of Excessive Agency is typically one or more of: excessive functionality, excessive permissions, excessive autonomy.' · LLM03:2026 Excessive Agency, Description (markdown final 2026/final/LLM03_ExcessiveAgency.md) · ancorada por verificador independente"
+    valid_from: "2026"
+    source_tier: 10
+    source_kind: primary
+    label: "OWASP LLM03:2026 Excessive Agency (renumerado de LLM06:2025): as causas-raiz são funcionalidade, permissões e autonomia excessivas; manifesta-se em ASI03 Identity & Privilege Abuse."
+    narrative: "Rodada de primárias de 2026-11-15, FECHA a lacuna (a) de conteúdo da edição 2026. Citação verbatim: \"The root cause of Excessive Agency is typically one or more of: excessive functionality, excessive permissions, excessive autonomy.\". A renumeração LLM06:2025 -> LLM03:2026 foi corroborada independentemente hoje (Cloud Security Alliance e múltiplas fontes 2026). SUPERSEDE as causas-raiz da edição 2025 (E_LLM06_EXCESSIVE_PERMISSIONS, E_LLM06_EXCESSIVE_AUTONOMY): o conteúdo da edição vigente está agora lido (antes kg-corpus-grep 'llm062026' = 0 nós). Locator de página (p.22) não conferido: PDF inacessível, âncora no markdown final do repo OWASP."
+    trace: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+      locator: "LLM03:2026 Excessive Agency, Description (p.22 não conferida, PDF inacessível; âncora no markdown final)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM03_2026_EXCESSIVE_PERMISSIONS_EXAMPLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-15"
+    verified_against: "'An LLM tool that is designed to perform operations in the context of an individual user accesses downstream systems with a generic high-privileged identity.' · LLM03:2026, Common Examples of Risk #5 Excessive Permissions · ancorada por verificador independente"
+    valid_from: "2026"
+    source_tier: 10
+    source_kind: primary
+    label: "OWASP LLM03:2026, exemplo de permissão excessiva: ferramenta que opera no contexto de um usuário mas acessa sistemas a jusante com identidade genérica de alto privilégio — o antipadrão da identidade única do agente."
+    narrative: "Citação verbatim: \"An LLM tool that is designed to perform operations in the context of an individual user accesses downstream systems with a generic high-privileged identity.\". É a redação da edição vigente para o antipadrão que a edição 2025 trazia como 'privileged account': SUPERSEDE E_LLM06_PRIVILEGED_ACCOUNT_ANTIPATTERN. On-point para a tese do privilégio-do-solicitante do agente. Locator de página (p.23) não conferido (PDF inacessível)."
+    trace: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+      locator: "LLM03:2026, Common Examples of Risk #5 Excessive Permissions (p.23 não conferida, PDF inacessível)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM03_2026_MINIMIZE_TOOL_PERMISSIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-15"
+    verified_against: "'Limit the permissions that LLM tools are granted to other systems to the minimum necessary in order to limit the scope of undesirable actions.' · LLM03:2026, Prevention and Mitigation Strategies #4 Minimize tool permissions · ancorada por verificador independente"
+    valid_from: "2026"
+    source_tier: 10
+    source_kind: primary
+    label: "OWASP LLM03:2026, mitigação #4: limitar as permissões das ferramentas do LLM ao mínimo necessário, para reduzir o escopo de ações indesejadas (menor privilégio)."
+    narrative: "Citação verbatim: \"Limit the permissions that LLM tools are granted to other systems to the minimum necessary in order to limit the scope of undesirable actions.\". Prescrição de menor privilégio da edição vigente; SUPPORTS o menor-entre (C_LESSER_OF_AGENT_AND_REQUESTER_1113), que a OWASP aponta sem enunciar. Locator de página (p.24) não conferido (PDF inacessível)."
+    trace: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+      locator: "LLM03:2026, Prevention and Mitigation Strategies #4 Minimize tool permissions (p.24 não conferida, PDF inacessível)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM03_2026_PRESERVE_USER_CONTEXT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-15"
+    verified_against: "'In delegated or multi-agent workflows, preserve the original user context and authorization scope across chained tool or agent calls, rather than relying only on the permissions of the calling agent or service identity.' · LLM03:2026, Mitigation #5 Execute tools in user's context · ancorada por verificador independente"
+    valid_from: "2026"
+    source_tier: 10
+    source_kind: primary
+    label: "OWASP LLM03:2026, mitigação #5: executar no contexto do usuário e, em fluxos delegados/multiagente, preservar o contexto e o escopo de autorização originais ao longo das chamadas encadeadas, não só o privilégio do agente chamador."
+    narrative: "Trecho MAIS on-point do round para a tese do privilégio-do-solicitante. Citação verbatim: \"In delegated or multi-agent workflows, preserve the original user context and authorization scope across chained tool or agent calls, rather than relying only on the permissions of the calling agent or service identity.\". É a redação da edição vigente para 'executar no contexto do usuário': SUPERSEDE E_LLM06_EXECUTE_IN_USER_CONTEXT (cuja citação 2025 ficou possivelmente truncada). ÂNCORA SÓ A PRESCRIÇÃO DA 2026; a moldura 'acréscimo da 2026 frente à 2025' NÃO foi medida contra o texto 2025 e fica CONSTRAINED por E_OBJECAO_LLM03_2026_USER_CONTEXT_FRAMED_NEW (mesmo modo-de-falha que derrubou o claim de 'complete mediation nova na 2026'). Locator de página (p.24) não conferido (PDF inacessível)."
+    trace: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+      locator: "LLM03:2026, Prevention and Mitigation Strategies #5 Execute tools in user's context (p.24 não conferida, PDF inacessível)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OWASP_LLM03_2026_REQUIRE_USER_APPROVAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-15"
+    verified_against: "'Use human-in-the-loop control to require a human to approve high-impact actions before they are taken.' · LLM03:2026, Mitigation #6 Require user approval · ancorada por verificador independente"
+    valid_from: "2026"
+    source_tier: 10
+    source_kind: primary
+    label: "OWASP LLM03:2026, mitigação #6: exigir aprovação humana (human-in-the-loop) para ações de alto impacto antes de executá-las."
+    narrative: "Citação verbatim: \"Use human-in-the-loop control to require a human to approve high-impact actions before they are taken.\". Redação da edição vigente para a aprovação humana: SUPERSEDE E_LLM06_HUMAN_IN_THE_LOOP. A fonte pede aprovação HUMANA, não por papel (restrição já conhecida, E_OBJECAO_ROLE_APPROVAL_AND_KIT_UNANCHORED). Locator de página (p.24) não conferido (PDF inacessível)."
+    trace: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/2026/final/LLM03_ExcessiveAgency.md"
+      locator: "LLM03:2026, Prevention and Mitigation Strategies #6 Require user approval (p.24 não conferida, PDF inacessível)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_RMF_1_0_BEING_REVISED_2026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-15"
+    verified_against: "'The AI RMF 1.0 is being revised as part of the White House AI Action Plan.' · nist.gov/itl/ai-risk-management-framework, banner e seção de visão geral (frase presente 2 vezes) · ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "NIST: a página oficial do AI RMF afirma que o AI RMF 1.0 está em revisão sob o White House AI Action Plan; a 1.0 segue vigente, sem sucessora publicada na página."
+    narrative: "Rodada de primárias de 2026-11-15, FECHA a lacuna (b) de atualidade NIST com citação primária datada de leitura. Citação verbatim (presente 2 vezes): \"The AI RMF 1.0 is being revised as part of the White House AI Action Plan.\". Corrige a claim anterior rejeitada na ancoragem ('afirmada-sem-citação', rebaixada pelo motor, registrada em E_LACUNAS_OWASP_NIST_VERSIONS_1114): agora há fonte primária e data de leitura. Corrige 'não há versão nova' para 'revisão anunciada, não publicada'. A atualidade é estado da página em 2026-11-15."
+    trace: "https://www.nist.gov/itl/ai-risk-management-framework"
+    provenance:
+      source: "https://www.nist.gov/itl/ai-risk-management-framework"
+      locator: "banner e seção de visão geral (frase presente 2 vezes)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_RMF_1_0_RELEASED_2023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-15"
+    verified_against: "'Released on January 26, 2023, the Framework was developed through a consensus-driven, open' · nist.gov/itl/ai-risk-management-framework, parágrafo de abertura · ancorada por verificador independente"
+    valid_from: "2023-01-26"
+    source_tier: 10
+    source_kind: primary
+    label: "NIST AI RMF 1.0 foi lançado em 26/01/2023."
+    narrative: "Citação verbatim: \"Released on January 26, 2023, the Framework was developed through a consensus-driven, open\". Fixa a data de lançamento da 1.0, ainda vigente (SUPPORTS E_NIST_RMF_1_0_BEING_REVISED_2026)."
+    trace: "https://www.nist.gov/itl/ai-risk-management-framework"
+    provenance:
+      source: "https://www.nist.gov/itl/ai-risk-management-framework"
+      locator: "parágrafo de abertura"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_AI_600_1_RELEASED_2024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-15"
+    verified_against: "'On July 26, 2024, NIST released NIST-AI-_600-1, Artificial Intelligence Risk Management Framework' · nist.gov/itl/ai-risk-management-framework, seção Generative AI Profile · ancorada por verificador independente"
+    valid_from: "2024-07-26"
+    source_tier: 10
+    source_kind: primary
+    label: "NIST AI 600-1 (Generative AI Profile) foi lançado em 26/07/2024; a página oficial não lista versão posterior."
+    narrative: "Citação verbatim: \"On July 26, 2024, NIST released NIST-AI-_600-1, Artificial Intelligence Risk Management Framework\". A página não lista versão posterior do AI 600-1; sustenta a atualidade do documento que embasa os controles NIST do kit (SUPPORTS E_NIST_600_GOVERN_2_1_ROLES_CURRENT)."
+    trace: "https://www.nist.gov/itl/ai-risk-management-framework"
+    provenance:
+      source: "https://www.nist.gov/itl/ai-risk-management-framework"
+      locator: "seção Generative AI Profile"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_NIST_2026_ONLY_CRITICAL_INFRA_CONCEPT_NOTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-15"
+    verified_against: "'On April 7, 2026, NIST released a concept note for an AI RMF Profile on Trustworthy AI in Critical Infrastructure' · nist.gov/itl/ai-risk-management-framework, banner e visão geral (lista de atualizações 2026) · ancorada por verificador independente"
+    valid_from: "2026-04-07"
+    source_kind: primary
+    label: "NIST: a única novidade datada de 2026 na página oficial do AI RMF é uma nota conceitual (07/04/2026) de perfil para infraestrutura crítica — não uma nova versão do AI RMF nem do AI 600-1."
+    narrative: "Citação verbatim: \"On April 7, 2026, NIST released a concept note for an AI RMF Profile on Trustworthy AI in Critical Infrastructure\". O leitor não declarou tier (tier=?): source_tier omitido. É o item 2026 mais recente da página; não é nova versão. Somado à leitura de hoje (2026-11-15), estabelece a atualidade DATADA em 2026-11 exigida pela lacuna (SUPPORTS E_NIST_RMF_1_0_BEING_REVISED_2026)."
+    trace: "https://www.nist.gov/itl/ai-risk-management-framework"
+    provenance:
+      source: "https://www.nist.gov/itl/ai-risk-management-framework"
+      locator: "banner e visão geral, lista de atualizações 2026"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-15"
+    verified_against: "contabilidade da rodada de primárias de 2026-11-15: 2 fontes de conteúdo lidas, 0 inalcançáveis, 9 claims ancoradas, 1 rejeitada na ancoragem, 0 objeções recusadas, 1 superação, 1 objeção sobrevivente (limite), 1 lacuna-precisão aberta"
+    label: "LACUNAS (rodada 2026-11-15): 2 fontes de conteúdo lidas (OWASP LLM03:2026, página NIST), 0 inalcançáveis; 9 claims ancoradas; 1 rejeitada; 0 recusadas; 1 superação; 1 objeção sobrevive (limite); 2 metades nomeadas fechadas."
+    narrative: "FONTES LIDAS (2 de conteúdo): markdown final LLM03:2026 do repo OWASP; página oficial nist.gov do AI RMF. INALCANÇÁVEIS: 0 (o PDF da edição OWASP 2026 ficou inacessível, por isso os locators de página p.22-24 não foram conferidos — limitação de PRECISÃO de citação, não de conteúdo; o conteúdo está ancorado no markdown final). CLAIMS ANCORADAS (9): 5 OWASP LLM03:2026 (raiz-causa, exemplo de permissão excessiva com identidade genérica privilegiada, menor privilégio das ferramentas, preservação do contexto do usuário em fluxos delegados/multiagente, aprovação humana) + 4 NIST (AI RMF 1.0 em revisão sob o AI Action Plan sem sucessora publicada; 1.0 de 26/01/2023; AI 600-1 de 26/07/2024; única novidade 2026 = nota conceitual de infraestrutura crítica de 07/04/2026). REJEITADAS NA ANCORAGEM (1, nunca vira nó): [owasp-llm06-2026] 'mediação completa e política graduada novas na 2026 (auto-aprova reversível, humano nas irreversíveis)' -> EXAGERADA: a quote de '#### 7. Complete mediation' existe verbatim (grep -cF = 1), mas a 2025 (LLM06:2025) já trazia '7. Complete mediation' e 'Enforce the complete mediation principle...'; o que a 2026 acrescenta é a política de enforcement graduada (audit, warn, block, escalate) e um PDP independente pré-execução. O claim esticou ao chamar a 'mediação completa' de nova na 2026. OBJEÇÕES RECUSADAS PELO MOTOR (sem critério ou sem superação): 0; nenhum alvo fica não-julgado por recusa. OBJEÇÃO SOBREVIVENTE (1, limite, modelada): E_OBJECAO_LLM03_2026_USER_CONTEXT_FRAMED_NEW — a etiqueta 'acréscimo da 2026 frente à 2025' do trecho de contexto do usuário não foi medida contra o texto 2025 (mesmo modo-de-falha da rejeição acima); CONSTRAINS a etiqueta, não o conteúdo, e não bloqueia o selo. LACUNAS FECHADAS (2 metades nomeadas da objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED): (a) conteúdo do item Excessive Agency da edição OWASP 2026 (agora LLM03:2026) — antes kg-corpus-grep 'llm062026' = 0 nós; (b) citação primária DATADA da atualidade do NIST em 2026-11 — corrige a claim de versão antes rejeitada ('afirmada-sem-citação'). LACUNA DE PRECISÃO ABERTA (1): locators de página p.22-24 e o PDF publicado da edição 2026 não conferidos. RESTRIÇÃO JÁ CONHECIDA (fora do escopo deste round): sub=solicitante/act=agente (RFC 8693) e 'log por ato' seguem SEM prescrição em OWASP ou NIST. SUPERAÇÕES: 1 nó C_SUPERACAO_20261115_COMPLETE_MEDIATION_GRADUATED_2026, com TRACES_TO para este nó. VEREDITO: as duas metades nomeadas FECHAM; o selo Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114 pode ser revisto (proposta em Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115); o escritor nunca sela."
+    trace: "run /onion-research de 2026-11-15, modo primárias, seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações"
+    provenance:
+      source: "run /onion-research de 2026-11-15, modo primárias"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada, conferida pelo escritor"
+      locality: "host"
+  - id: C_SUPERACAO_20261115_COMPLETE_MEDIATION_GRADUATED_2026
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação corrigida: a mediação completa já era a estratégia 7 da edição 2025; o que a edição 2026 acrescenta é a política de enforcement graduada (audit/warn/block/escalate) e o PDP independente pré-execução."
+    narrative: "Supera o claim rejeitado entregando o valor que ele prometia — distinguir o que a 2026 muda no controle de privilégio. Medida: comparei as duas edições. No markdown final da 2026, grep -cF da frase 'graduated enforcement policy' deu 1; na página oficial LLM06:2025, grep -i 'graduated' deu 0 e grep -i 'complete mediation' casou a estratégia 7. Logo a mediação completa já existia na 2025 e a política graduada (mais o PDP independente pré-execução) é o acréscimo da 2026. Critério: A2_CLAIM_ESTICA. Alvo reprovado (EXAGERADA na ancoragem, registrado em E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115): [owasp-llm06-2026] 'mediação completa e política graduada novas na 2026 (auto-aprova reversível, humano nas irreversíveis)'. Afirmação de UM juiz."
+    trace: "curl -sSL https://genai.owasp.org/llmrisk/llm062025-excessive-agency/ | grep -oi 'Enforce the complete mediation principle' | head -1 ; curl -sSL https://genai.owasp.org/llmrisk/llm062025-excessive-agency/ | grep -ci 'graduated enforcement'  # esperado: 1a linha imprime a frase (mediação completa já na 2025), 2a imprime 0 (política graduada é acréscimo da 2026)"
+  - id: E_OBJECAO_LLM03_2026_USER_CONTEXT_FRAMED_NEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-15"
+    verified_against: "objeção do Elenxo ao claim 4 (preservar contexto do usuário em fluxos delegados/multiagente como ACRÉSCIMO da 2026), com o critério E2_PROVA_MENOS e o comando de verificação diferencial em trace"
+    label: "OBJEÇÃO (limite): o trecho de preservar o contexto do usuário em fluxos delegados/multiagente está ancorado na edição 2026, mas a moldura 'acréscimo da 2026 frente à 2025' não foi medida contra o texto 2025."
+    narrative: "Alvo: E_OWASP_LLM03_2026_PRESERVE_USER_CONTEXT, especificamente a ETIQUETA 'novo na 2026'. Afirmação de 1 agente (Elenxo), triagem limite, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Evidência: o quote está presente verbatim na edição 2026 (lacuna de conteúdo fechada), mas nenhuma claim deste round leu o texto 2025 do item Excessive Agency para provar que o trecho é NOVO; é o mesmo modo-de-falha que já derrubou o claim de 'complete mediation nova na 2026'. CONSTRAINS a etiqueta, não derruba o conteúdo nem bloqueia o selo. Superação: nenhuma neste round (faltou o WebFetch+grep do markdown 2025 do item Excessive Agency)."
+    trace: "WebFetch do markdown da edição 2025 (https://raw.githubusercontent.com/OWASP/www-project-top-10-for-large-language-model-applications/main/2_0_vulns/LLM06_ExcessiveAgency.md) e grep -cF 'preserve the original user context' — se >0, a etiqueta 'acréscimo da 2026' cai; se =0, só então a novidade está provada"
+    provenance:
+      source: "run /onion-research de 2026-11-15, modo primárias"
+      locator: "Elenxo, objeção ao claim 4 [owasp-llm06-2026], triagem limite, critério E2_PROVA_MENOS"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Fechadas as duas metades (conteúdo do item Excessive Agency da edição 2026 e atualidade datada do NIST em 2026-11), a revisão do selo pode proceder? Resta só a etiqueta 'novo na 2026' do trecho de contexto do usuário (limite, não bloqueia)."
+    narrative: "Esta rodada NÃO sela (o escritor nunca sela). SUPERSEDE Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114, cujos dois bloqueios declarados foram resolvidos: (a) o texto do item Excessive Agency da edição 2026 (agora LLM03:2026) está ancorado (E_OWASP_LLM03_2026_*); (b) há citação primária datada da atualidade do NIST em 2026-11 (E_NIST_RMF_1_0_BEING_REVISED_2026, E_NIST_AI_600_1_RELEASED_2024, E_NIST_2026_ONLY_CRITICAL_INFRA_CONCEPT_NOTE). A objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED tem as duas metades nomeadas fechadas; sobra uma restrição de grau LIMITE (a etiqueta 'novo na 2026' do trecho de contexto do usuário, E_OBJECAO_LLM03_2026_USER_CONTEXT_FRAMED_NEW), que não bloqueia o selo. Caminho residual: ou medir a verificação diferencial contra o texto 2025, ou re-escopar a recomendação apresentando o trecho como prescrição DA 2026 sem a moldura de novidade. A decisão de selo é do maestro."
+    trace: "run /onion-research de 2026-11-15; objeção E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED; Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114; Elenxo gapsClosed e recommendation"
+  - id: D_AGENT_PRIVILEGE_ADOPTED_1115
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-15"
+    verified_against: "decisão do maestro em 2026-11-15, por pergunta com opções (/meta:decide): escolhida «Selar: adotar o padrão/kit»"
+    label: "Adotar o padrão/kit de privilégio do agente como orientação Onion: privilégio efetivo = menor(agente, solicitante); identidade pelo evento; on_behalf_of real (RFC 8693); aprovação humana para alto impacto; trilha por ato. Objeção de atualidade fechada nas 2 metades."
+    narrative: "Selado por /meta:decide em 2026-11-15: escolhida «Selar: adotar o padrão/kit»; descartadas: «Selar com re-escopo» · «Ainda não»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-15: «Selo o padrão do privilégio do agente como orientação do Onion, com a objeção de atualidade fechada nas 2 metades?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-15"
+      locality: "pessoa"
 edges:
   - from: E_RFC8693_IMPERSONATION_INDISTINGUISHABLE
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
@@ -1949,6 +2233,9 @@ edges:
   - from: T_OWASP_LLM06
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
     edge_type: TRACES_TO
+  - from: T_OWASP_LLM03
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
   - from: T_OWASP_ASI03
     to: Q_AGENT_REQUESTER_PRIVILEGE_1113
     edge_type: TRACES_TO
@@ -2081,4 +2368,103 @@ edges:
     edge_type: TRACES_TO
   - from: Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114
     to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM03_2026_ROOT_CAUSE
+    to: E_LLM06_EXCESSIVE_PERMISSIONS
+    edge_type: SUPERSEDES
+  - from: E_OWASP_LLM03_2026_ROOT_CAUSE
+    to: E_LLM06_EXCESSIVE_AUTONOMY
+    edge_type: SUPERSEDES
+  - from: E_OWASP_LLM03_2026_ROOT_CAUSE
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: E_OWASP_LLM03_2026_ROOT_CAUSE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM03_2026_EXCESSIVE_PERMISSIONS_EXAMPLE
+    to: E_LLM06_PRIVILEGED_ACCOUNT_ANTIPATTERN
+    edge_type: SUPERSEDES
+  - from: E_OWASP_LLM03_2026_EXCESSIVE_PERMISSIONS_EXAMPLE
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_OWASP_LLM03_2026_EXCESSIVE_PERMISSIONS_EXAMPLE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM03_2026_MINIMIZE_TOOL_PERMISSIONS
+    to: C_LESSER_OF_AGENT_AND_REQUESTER_1113
+    edge_type: SUPPORTS
+  - from: E_OWASP_LLM03_2026_MINIMIZE_TOOL_PERMISSIONS
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM03_2026_PRESERVE_USER_CONTEXT
+    to: E_LLM06_EXECUTE_IN_USER_CONTEXT
+    edge_type: SUPERSEDES
+  - from: E_OWASP_LLM03_2026_PRESERVE_USER_CONTEXT
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_OWASP_LLM03_2026_PRESERVE_USER_CONTEXT
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_OWASP_LLM03_2026_REQUIRE_USER_APPROVAL
+    to: E_LLM06_HUMAN_IN_THE_LOOP
+    edge_type: SUPERSEDES
+  - from: E_OWASP_LLM03_2026_REQUIRE_USER_APPROVAL
+    to: C_ELENXO_RECOMMENDATION_1113
+    edge_type: SUPPORTS
+  - from: E_OWASP_LLM03_2026_REQUIRE_USER_APPROVAL
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_RMF_1_0_BEING_REVISED_2026
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: E_NIST_RMF_1_0_BEING_REVISED_2026
+    to: E_NIST_600_GOVERN_2_1_ROLES_CURRENT
+    edge_type: SUPPORTS
+  - from: E_NIST_RMF_1_0_BEING_REVISED_2026
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_RMF_1_0_RELEASED_2023
+    to: E_NIST_RMF_1_0_BEING_REVISED_2026
+    edge_type: SUPPORTS
+  - from: E_NIST_RMF_1_0_RELEASED_2023
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_AI_600_1_RELEASED_2024
+    to: E_NIST_600_GOVERN_2_1_ROLES_CURRENT
+    edge_type: SUPPORTS
+  - from: E_NIST_AI_600_1_RELEASED_2024
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_NIST_2026_ONLY_CRITICAL_INFRA_CONCEPT_NOTE
+    to: E_NIST_RMF_1_0_BEING_REVISED_2026
+    edge_type: SUPPORTS
+  - from: E_NIST_2026_ONLY_CRITICAL_INFRA_CONCEPT_NOTE
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115
+    to: Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115
+    to: Q_AGENT_REQUESTER_PRIVILEGE_1113
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261115_COMPLETE_MEDIATION_GRADUATED_2026
+    to: E_LACUNAS_OWASP_NIST_CONTENT_CURRENCY_1115
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261115_COMPLETE_MEDIATION_GRADUATED_2026
+    to: E_OWASP_LLM06_2025_COMPLETE_MEDIATION
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_LLM03_2026_USER_CONTEXT_FRAMED_NEW
+    to: E_OWASP_LLM03_2026_PRESERVE_USER_CONTEXT
+    edge_type: CONSTRAINS
+  - from: Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115
+    to: Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114
+    edge_type: SUPERSEDES
+  - from: Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115
+    to: E_OBJECAO_OWASP_NIST_VERSION_UNCHECKED
+    edge_type: TRACES_TO
+  - from: D_AGENT_PRIVILEGE_ADOPTED_1115
+    to: Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115
     edge_type: TRACES_TO
