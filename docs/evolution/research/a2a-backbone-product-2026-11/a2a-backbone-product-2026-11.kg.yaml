@@ -476,7 +476,7 @@ nodes:
     verified_at: "2026-11-14"
     verified_against: "letsdatascience: 'protocol and framework agnostic'; votação 3-0"
     label: "BAND: camada de interação acima dos runtimes, agnóstica a protocolo e framework: confirma concorrente direto do backbone agente-neutro por 3ª fonte."
-    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Não houve superação (mesma lacuna de F15/F16). Objeção do Elenxo, confidence ≤0.6; tier 4 (agregador)."
+    narrative: "LIMITE (survives, triage=limite, E1_EVIDENCIA_CONTRARIA). Não houve superação (mesma lacuna das objeções anteriores de fonte fraca). Objeção do Elenxo, confidence ≤0.6; tier 4 (agregador)."
     provenance:
       source: "https://letsdatascience.com/news/band-launches-interaction-layer-raises-17m-seed-1842660e"
       locator: "camada de interação acima dos runtimes de agentes, 'protocol and framework agnostic'"
@@ -575,7 +575,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    label: "Interop A2A x MCP já demonstrada (ADK/LangGraph/AG2/CrewAI): a interoperabilidade é commons resolvido, aparando o que resta construir."
+    label: "Interop A2A x MCP já demonstrada (ADK/LangGraph/AutoGen/CrewAI): a interoperabilidade é commons resolvido, aparando o que resta construir."
     narrative: "SOBREVIVE (discarded-by-comodismo, triage=limite, E3_DESCARTE_SEM_MEDIDA). Cortada sem refutação; deveria ter integrado a decisão adotar. Superação achada (C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY). Objeção do Elenxo, confidence ≤0.6."
     provenance:
       source: "run /onion-research modo decision de 2026-11-14"
@@ -1037,7 +1037,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    label: "Adotar A2A+MCP complementares (interop demonstrada: ADK/LangGraph/AG2/CrewAI)."
+    label: "Adotar A2A+MCP complementares (interop demonstrada: ADK/LangGraph/AutoGen/CrewAI)."
     narrative: "Supera o alvo descartado-a2a-complementar-mcp-interop (E_OBJECAO_24). Medida: interop demonstrada citada na própria claim. Critério E3_DESCARTE_SEM_MEDIDA. Afirmação de UM juiz."
     trace: "E3_DESCARTE_SEM_MEDIDA: claim sem refutação no run (lista do prompt)"
 edges:
