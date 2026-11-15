@@ -1,0 +1,24 @@
+meta:
+  schema_version: "1"
+  id: valid-meta-dispose-basis-unicode-text
+  x_dispose_by: "2030-01-31"
+  x_dispose_basis: "\u00a0Lei\u00a0nº\u00a013.709\u3000"
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EN_A
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A entidade sintética A."
+edges:
+  - from: EN_A
+    to: Q_A
+    edge_type: TRACES_TO

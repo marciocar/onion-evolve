@@ -9,7 +9,7 @@
 | **Adopter** | A repository that brings in the contract by tag and runs the gate in CI |
 | **Audit package** | One row per questionnaire item, with the question, the answer, the verdict, the dated evidence, the evidence requests, the owner, and the computed gaps, in CSV, XLSX, or JSON (`kg_audit.py`), since 4.22.0 |
 | **Baseline** | The `.kg-ssot/gate/` folder with the debt the gate compares against: the contract identity and one record per graph (through 4.15.1, the single file `.kg-ssot/gate.json`) |
-| **Canonical profile** | The shape the SHOULD gives to an `x_` key that adopters repeat (`x_term`, `x_mirror`, `x_severity`...), since v4.11; `x_criterion` and `x_measured_under` since v4.12; `x_classification`, in `meta`, since v4.20. It only judges a key that is present, and only warns |
+| **Canonical profile** | The shape the SHOULD gives to an `x_` key that adopters repeat (`x_term`, `x_mirror`, `x_severity`...), since v4.11; `x_criterion` and `x_measured_under` since v4.12; `x_classification`, in `meta`, since v4.20; `x_dispose_by`, `x_dispose_basis`, and `x_hold`, in `meta`, since v4.23. It only judges a key that is present, and only warns |
 | **Class (of `method`)** | `measurement`, `reading`, `judges`, `derived`, or `testimony`; since v4.16 the Portuguese `medição`, `leitura`, `juízes`, `derivado`, and `testemunho` are accepted aliases; since v4.21 they warn as `form.deprecated.node.provenance.method`, and they leave in v5 |
 | **Code** | The stable identifier of a violation, such as `form.required.node.label` |
 | **Conformance suite** | The cases in `spec/conformance/` that every reader must pass |

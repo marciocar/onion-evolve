@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:701346cde334c89f -->
+<!-- translation-of: docs/manual/05-tools.md sha256:f50e12a7a5a9f690 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -95,7 +95,7 @@ Opções úteis:
 | `--limit N` | Com `--format json`, quantas ocorrências por arquivo (default 50); o resumo conta todas |
 | `-` no lugar do arquivo | Lê o grafo do stdin, sem arquivo temporário; `--stdin-format json` lê um grafo `.kg.json` (default `yaml`) |
 | `--should-schema F` | Com `--schema`, o schema SHOULD que acompanha (no lugar do vizinho) |
-| `--due AAAA-MM-DD` | No lugar do veredito, o relatório de vencimento na data (desde a 4.15.0): cada nó com `reverify_every` cujo `verified_at` somado à cadência cai na data ou antes, cada nó que tem cadência e não tem carimbo, e cada nó que só tem `reverify_on`. Desde a 4.19.0 lista também os perfis canônicos com cadência: cada sinônimo de um `x_term` que não está aposentado, o `x_mirror` (`synced_at` mais `resync_every`) e o `x_doc_cycle` (`checked_at` mais `recheck_every`), com `subject` e `detail` no JSON. O rc é 0 (ou 2 com entrada quebrada): o vencimento nunca reprova, e o relatório não julga o grafo (o gate segue sendo o `kg_gate.py`). Um arquivo que não parseia sai como `NÃO LIDO`; num job agendado, olhe essa lista, porque o rc não a acusa. A cadência fora da forma ou zerada fica fora do relatório (o aviso SHOULD a acusa), e o vencimento depois do ano 9999 também. Com `--format json`, a saída usa o formato `kg-ssot.due/1` (`spec/due.schema.json`) |
+| `--due AAAA-MM-DD` | No lugar do veredito, o relatório de vencimento na data (desde a 4.15.0): cada nó com `reverify_every` cujo `verified_at` somado à cadência cai na data ou antes, cada nó que tem cadência e não tem carimbo, e cada nó que só tem `reverify_on`. Desde a 4.19.0 lista também os perfis canônicos com cadência: cada sinônimo de um `x_term` que não está aposentado, o `x_mirror` (`synced_at` mais `resync_every`) e o `x_doc_cycle` (`checked_at` mais `recheck_every`), com `subject` e `detail` no JSON. O rc é 0 (ou 2 com entrada quebrada): o vencimento nunca reprova, e o relatório não julga o grafo (o gate segue sendo o `kg_gate.py`). Um arquivo que não parseia sai como `NÃO LIDO`; num job agendado, olhe essa lista, porque o rc não a acusa. A cadência fora da forma ou zerada fica fora do relatório (o aviso SHOULD a acusa), e o vencimento depois do ano 9999 também. Com `--format json`, a saída usa o formato `kg-ssot.due/1` (`spec/due.schema.json`). Desde a 4.52.0 (contrato v4.23), lista também o prazo de expurgo do grafo inteiro (`meta.x_dispose_by`, capítulo 3): o grafo cuja data cai na data pedida ou antes (`EXPURGO VENCIDO`, `dispose` no JSON), o mesmo grafo suspenso por um `x_hold` cujo `until` não passou (`EXPURGO SUSPENSO`, `dispose_held`) e, num grafo com `x_dispose_by`, todo nó com `retain_for` como conflito a decidir pelo dono (`CONFLITO`, `dispose_conflict`), sem calcular qual prevalece. O grafo cujo `x_dispose_by` não é uma data `AAAA-MM-DD` sai como `EXPURGO ILEGÍVEL` (`dispose_malformed`), em qualquer data, e o `x_hold` cujo `until` não se lê é nomeado na entrada (`hold_unreadable`) e não suspende. As listas só saem com conteúdo, e o relatório de um grafo sem o perfil sai igual ao de antes e segue válido no schema anterior: o `schema_version` não muda. O relatório que traz as listas novas não vale no schema anterior, que fecha o topo com `additionalProperties: false`: quem valida o relatório traz o `spec/due.schema.json` novo. O `days_late` 0 sai como `(na data)`, a data dada ao `--due`. O vencimento abre o procedimento de descarte; nada é apagado |
 
 As opções `--json OUT`, `--spike`, `--git`, `--rev` e `--list` são do instrumento de medição que deu origem ao
 contrato (o "spike"). Elas gravam e reproduzem um formato legado, congelado, e não fazem parte da interface estável.
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 570/570 (reprova)
+latest: 597/597 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -253,6 +253,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor`. O carimbo de frescor (`verified_at`, `verified_against`) e, desde a 4.50, a classe de `provenance.method` trocada entre um apelido em português e a sua classe canônica em inglês com o detalhe depois de `: ` igual byte a byte (a troca do `kg_migrate.py methods`) não tocam o nó; qualquer outra mudança toca, inclusive no method. O `--touched` não olha o MUST; com dois nós de mesmo id, que o MUST já reprova, vale o último |
 | `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. O `.kg.json` não é conferido aqui. Não combina com `--update` |
 | `--private-repos ARQ` | Desde a 4.51. Desligado por padrão. Reprova (rc 1) o repositório privado citado sem o marcador `private-cite:<id>` (contrato v4.22); veja *O repositório privado citado sem o marcador* abaixo. Não combina com `--update` |
+| `--classification-floor NÍVEL --area-policy ARQ` | Desde a 4.52. Desligado por padrão. Reprova (rc 1) o `.kg.yaml` ou `.kg.json` rastreado (com `--touched`, o alterado; os excludes padrão não valem, só o `--exclude`) cujo `meta.x_classification` está em `NÍVEL` ou acima, pela ordem dos `levels` da política (contrato v4.23); veja *O piso de classificação* abaixo. Não combina com `--update` |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
 
@@ -314,6 +315,60 @@ vem do `private-cite-id`. Escreva-o onde estava o repositório, registre o id,
 o repositório, o commit e o caminho na tabela de resolução do repositório privado, e deixe o `provenance.node_sha256`
 fora. Na prosa, troque só o nome do repositório pelo marcador.
 
+### O piso de classificação: `--classification-floor` (4.52.0)
+
+O `x_classification` (contrato v4.20, capítulo 3) marca quão sensível é um grafo, e o `kg-mcp` o faz valer quando
+serve. O `--classification-floor NÍVEL --area-policy ARQ` o faz valer onde o grafo entra num repositório: reprova
+(rc 1) cada grafo cujo `meta.x_classification` está em `NÍVEL` ou acima. Um repositório público, por exemplo, o
+roda com o primeiro nível que nunca pode guardar.
+
+1. **O que lê.** Todo `.kg.yaml` e `.kg.json` que o git rastreia, onde quer que esteja. Os excludes padrão da catraca
+   não valem: as fixtures (`*/fixtures/*`), `docs/materials/` e o vendor também são lidos, porque também guardam dado,
+   e o `--no-default-excludes` não muda nada aqui. Só um `--exclude GLOB` explícito tira um caminho. O vendor da
+   release inteira traz as fixtures da suíte, com níveis como `confidential` e níveis que a sua política não conhece:
+   exclua-o de forma explícita (`--exclude 'vendor/kg-ssot/*'`) ou vendorize o perfil `gate`, que não traz fixture.
+2. **A ordem vem da política.** `ARQ` é a política de áreas do `kg-mcp` (`levels`, `ceilings`, `default_level`), lida
+   pelo mesmo leitor estrito. A ordem de `levels`, do menos ao mais sensível, diz o que está acima do quê: o gate nunca
+   adivinha uma ordem pelos nomes.
+3. **A falha fecha.** O grafo sem a chave tem o `default_level` da política. O grafo que não parseia, não é UTF-8, cujo
+   `meta` não é mapa ou cujo nível não está em `levels` reprova, porque o nível dele é desconhecido. A política ausente,
+   ilegível ou inválida, a política sem `levels` e o `NÍVEL` que `levels` não tem são entrada quebrada (rc 2), como uma
+   opção sem a outra e um valor vazio (o `--classification-floor ""` desligaria o piso em silêncio).
+4. **O que imprime.** Uma linha por grafo que reprova, com o caminho e o nível, e uma linha de resumo.
+
+Funciona nos dois modos: na catraca, todo grafo que ele lê; com `--touched`, só os alterados desde o ancestral comum
+(o caminho novo conta como alterado, o `.kg.json` inclusive), e esses são lidos do índice do git, nunca do disco,
+porque é o índice que o commit leva; os bytes são comparados antes de decodificar, então um arquivo que não é UTF-8 e
+não mudou não conta, para um grafo que já estava lá não barrar uma mudança sem relação com ele. Não combina com `--update`: a
+conferência não faz parte da linha de base.
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-floor confidential --area-policy "$KG_AREA_POLICY"
+```
+
+```text
+✗ piso de classificação: docs/payroll.kg.yaml está em restricted, no nível confidential ou acima
+· --classification-floor confidential: 12 grafo(s) conferido(s), 1 no piso ou acima, ou com nível desconhecido
+```
+
+**O limite no CI.** No CI, o gate barra o merge, não a entrada do dado: quando ele roda, o commit com o grafo já existe
+na branch, no remoto que recebeu o push e em todo fork do pull request. Para barrar antes do commit, rode o mesmo gate
+com `--touched` num hook de pre-commit:
+
+```sh
+#!/bin/sh
+# .git/hooks/pre-commit: recusa o commit quando um grafo alterado está no piso ou acima
+exec python3 -I vendor/kg-ssot/tools/kg_gate.py --touched HEAD \
+  --classification-floor confidential --area-policy "$KG_AREA_POLICY"
+```
+
+O hook tem limites próprios. Ele mora em cada clone, e cada pessoa o instala; o `git commit --no-verify` o pula. O
+Para o piso, o `--touched` julga o índice do git, os bytes que o commit vai levar, não a árvore de trabalho: o grafo
+preparado num nível acima do piso reprova mesmo que o disco tenha agora outra versão, e o grafo adicionado e depois
+apagado do disco ainda conta. O grafo que só está no disco, nunca adicionado, não é julgado (e não vai no commit). As
+outras conferências do `--touched` (a dívida nos nós tocados) seguem comparando a árvore de trabalho. Num repositório ainda sem commit, o `HEAD` não resolve, e o gate para com
+rc 2. Por isso o CI mantém a mesma conferência: o hook pega o erro cedo, e o CI pega o hook que não rodou.
+
 ## `kg_vendor.py`: trazer e conferir a release
 
 O adotante nunca copia o contrato à mão. A ferramenta de vendor lê uma **tag** com `git archive` e grava um carimbo
@@ -353,7 +408,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | O repositório (caminho ou URL, como `https://github.com/marciocar/kg-ssot`) que tem a tag. Obrigatório quando você roda de dentro de um vendor |
 | `--dest DIR` | Onde fica o vendor (default `vendor/kg-ssot`) |
-| `--profile gate` | Traz só o mínimo para rodar o gate e o check (17 arquivos desde a 4.26.0, sem a suíte); `--profile full` volta à release inteira |
+| `--profile gate` | Traz só o mínimo para rodar o gate e o check (18 arquivos desde a 4.52.0, sem a suíte); `--profile full` volta à release inteira |
 | `--force` | Substitui um vendor editado localmente |
 | `--index` (no `check`) | Confere o índice do git em vez da árvore de trabalho |
 | `--ref COMMIT` (no `update`) | A bancada antes da tag (4.24): traz um commit que ainda não é release, de um repositório a que você chega. O carimbo diz `unreleased` |

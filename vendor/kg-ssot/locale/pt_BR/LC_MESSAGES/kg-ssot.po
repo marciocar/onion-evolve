@@ -334,9 +334,10 @@ msgid ""
 "Usage:\n"
 "  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
 "             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos FILE]\n"
+"             [--classification-floor LEVEL --area-policy FILE]\n"
 "             [--update [--accept-regression REASON] [--granularity graph|node]]\n"
 "       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
-"                  [--private-repos FILE]\n"
+"                  [--private-repos FILE] [--classification-floor LEVEL --area-policy FILE]\n"
 "\n"
 "--touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common\n"
 "ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new\n"
@@ -369,6 +370,19 @@ msgid ""
 "path that contains a pattern is masked (<key #i>, <node #i>, <graph #i>). A file that cannot be read or has no pattern is\n"
 "broken input (rc 2): an empty list checks nothing. It reads only the graphs the gate measures: never .kg.json, nor,\n"
 "by default, the fixtures, docs/materials, and the vendor, nor what --exclude leaves out. It does not go with --update.\n"
+"\n"
+"--classification-floor LEVEL --area-policy FILE (contract v4.23), together, in both modes: fails (rc 1) when a graph has\n"
+"its meta.x_classification at LEVEL or above, in the order of levels in the kg-mcp policy file (the same file as its\n"
+"--area-policy, read by the same strict reader). It reads every .kg.yaml and .kg.json that git tracks, without the\n"
+"ratchet's default excludes (the fixtures, docs/materials and the vendor are read) and only with an explicit --exclude.\n"
+"A graph without the key has the policy's default_level; a graph that does not parse, is not UTF-8, whose meta is not a\n"
+"map, or whose level the list does not have also fails (it fails closed). With --touched, only the graphs changed since\n"
+"the common ancestor (a new path counts), read from the git index and never from the disk, because the index is what\n"
+"the commit takes. A missing, unreadable, invalid policy, or one without levels, a LEVEL that\n"
+"levels does not have, one option without the other, and an empty value are broken input (rc 2). In CI, the\n"
+"gate blocks the merge, not the entry of the data: the commit with the graph already exists on the branch; to block it\n"
+"before the commit, run the same gate with --touched in a pre-commit hook (manual, chapter 5). It does not go with\n"
+"--update.\n"
 msgstr ""
 "O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
 "\n"
@@ -394,9 +408,10 @@ msgstr ""
 "Uso:\n"
 "  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
 "             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos ARQ]\n"
+"             [--classification-floor NÍVEL --area-policy ARQ]\n"
 "             [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
 "       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
-"                  [--private-repos ARQ]\n"
+"                  [--private-repos ARQ] [--classification-floor NÍVEL --area-policy ARQ]\n"
 "\n"
 "--touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e\n"
 "HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer\n"
@@ -429,6 +444,18 @@ msgstr ""
 "(<key #i>, <node #i>, <graph #i>). O arquivo ilegível ou sem nenhum padrão é entrada quebrada (rc 2): uma lista vazia\n"
 "não confere nada. Lê só os grafos que o gate mede: nunca o .kg.json, nem, por padrão, as fixtures, docs/materials e o\n"
 "vendor, nem o que o --exclude tira. Não combina com --update.\n"
+"\n"
+"--classification-floor NÍVEL --area-policy ARQ (contrato v4.23), juntos, nos dois modos: reprova (rc 1) o grafo cujo\n"
+"meta.x_classification está em NÍVEL ou acima, pela ordem de levels do arquivo de política do kg-mcp (o mesmo do\n"
+"--area-policy dele, lido pelo mesmo leitor estrito). Mede todo .kg.yaml e .kg.json que o git rastreia, sem os excludes\n"
+"padrão da catraca (as fixtures, docs/materials e o vendor entram) e só com o --exclude explícito. O grafo sem a chave\n"
+"tem o default_level da política; o que não parseia, não é UTF-8, cujo meta não é mapa ou cujo nível a lista não tem\n"
+"também reprova (a falha fecha). Com --touched, só os grafos alterados desde o ancestral comum (o caminho novo conta),\n"
+"lidos do índice do git e nunca do disco, porque é o índice que o commit leva.\n"
+"Política ausente, ilegível, fora do formato ou sem levels, NÍVEL que levels não tem, uma opção sem a outra e um valor\n"
+"vazio são entrada quebrada (rc 2). No CI, o gate barra o merge, não a entrada do dado: o\n"
+"commit com o grafo já existe na branch; para barrar antes do commit, o mesmo gate com --touched num hook de\n"
+"pre-commit (manual, capítulo 5). Não combina com --update.\n"
 
 #: tools/kg_gate.py
 msgid "✗ cited source does not match: {graph}#{node} {code} → {target}"
@@ -2051,8 +2078,8 @@ msgid "{root} has no .git (use init=True to create it)"
 msgstr "{root} não tem .git (use init=True para criar)"
 
 #: tools/kg_validate.py
-msgid " (today)"
-msgstr " (hoje)"
+msgid " (on the date)"
+msgstr " (na data)"
 
 #: tools/kg_validate.py
 msgid " ({n} days late)"
@@ -2208,7 +2235,10 @@ msgid ""
 "--corpus DIR enables the check of the external end of external_edges against the graphs under DIR.\n"
 "--due YYYY-MM-DD replaces the verdict with the due report: nodes whose verified_at plus the reverify_every cadence\n"
 "has passed on the date, nodes with a cadence and no stamp, and nodes with only reverify_on. It never changes the\n"
-"verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format.\n"
+"verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format. Since v4.23,\n"
+"it also lists the disposal deadline of the whole graph (meta.x_dispose_by): the one that came due, the one held by an\n"
+"x_hold in force and, in a graph with x_dispose_by, every node with retain_for as a conflict for the owner to decide,\n"
+"without computing which one prevails. The date opens the disposal procedure; nothing is deleted.\n"
 "--where adds, per file, one line per occurrence with the node or edge.\n"
 "--spike replaces the human output and the rc with those of the spike; --json OUT ALWAYS writes the frozen spike format.\n"
 "\n"
@@ -2243,7 +2273,10 @@ msgstr ""
 "--corpus DIR liga a conferência da ponta externa das external_edges contra os grafos sob DIR.\n"
 "--due AAAA-MM-DD troca o veredito pelo relatório de vencimento: o nó cujo verified_at somado à cadência\n"
 "reverify_every já passou na data, o que tem cadência e não tem carimbo, e o que só tem reverify_on. Nunca muda o\n"
-"veredito: o rc é 0, ou 2 com entrada quebrada. Com --format json, o relatório sai no formato kg-ssot.due/1.\n"
+"veredito: o rc é 0, ou 2 com entrada quebrada. Com --format json, o relatório sai no formato kg-ssot.due/1. Desde o\n"
+"v4.23, lista também o prazo de expurgo do grafo inteiro (meta.x_dispose_by): o vencido, o suspenso por um x_hold\n"
+"vigente e, num grafo com x_dispose_by, todo nó com retain_for como conflito a decidir pelo dono, sem calcular qual\n"
+"prevalece. A data abre o procedimento de descarte; nada é apagado.\n"
 "--where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta.\n"
 "--spike troca a saída humana e o rc pelos do spike; --json OUT grava SEMPRE o formato do spike, congelado.\n"
 "\n"
@@ -4536,3 +4569,154 @@ msgstr "--private-repos {path}: o padrão da linha {line} tem espaço ou #; o co
 #: tools/kg_gate.py
 msgid "--private-repos {path}: the pattern on line {line} has an invisible format character (Unicode category Cf)"
 msgstr "--private-repos {path}: o padrão da linha {line} tem um caractere de formatação invisível (categoria Cf do Unicode)"
+
+#: tools/kg_gate.py
+msgid "--area-policy {path} cannot be read ({error})"
+msgstr "--area-policy {path} não pode ser lido ({error})"
+
+#: tools/kg_gate.py
+msgid ""
+"--area-policy {path} has no levels: the order of the levels comes from the policy, and without it the floor cannot be judged"
+msgstr ""
+"--area-policy {path} não tem levels: a ordem dos níveis vem da política, e sem ela o piso não pode ser julgado"
+
+#: tools/kg_gate.py
+msgid "--area-policy {path} is not a valid policy: {error}"
+msgstr "--area-policy {path} não é uma política válida: {error}"
+
+#: tools/kg_gate.py
+msgid "--classification-floor {level} is not one of the levels of {path} ({levels})"
+msgstr "--classification-floor {level} não é um dos levels de {path} ({levels})"
+
+#: tools/kg_validate.py
+msgid "; the hold lapsed on {date}"
+msgstr "; a suspensão caducou em {date}"
+
+#: tools/kg_validate.py
+msgid "CONFLICT"
+msgstr "CONFLITO"
+
+#: tools/kg_validate.py
+msgid "DISPOSAL DUE"
+msgstr "EXPURGO VENCIDO"
+
+#: tools/kg_validate.py
+msgid "DISPOSAL HELD"
+msgstr "EXPURGO SUSPENSO"
+
+#: tools/kg_gate.py
+msgid ""
+"GATE BROKEN  --classification-floor and --area-policy go together (the order of the levels comes from the policy)"
+msgstr ""
+"GATE QUEBRADO  --classification-floor e --area-policy vão juntos (a ordem dos níveis vem da política)"
+
+#: tools/kg_gate.py
+msgid ""
+"GATE BROKEN  --classification-floor does not go with --update (the check is not part of the baseline)"
+msgstr ""
+"GATE QUEBRADO  --classification-floor não combina com --update (a conferência não faz parte da linha de base)"
+
+#: tools/kg_validate.py
+msgid "dispose by {date}, basis: {basis}"
+msgstr "descartar até {date}, base: {basis}"
+
+#: tools/kg_validate.py
+msgid "dispose by {date}, held until {until}: {reason}"
+msgstr "descartar até {date}, suspenso até {until}: {reason}"
+
+#: tools/kg_gate.py
+msgid ""
+"fails (rc 1) when a tracked .kg.yaml or .kg.json (with --touched, a changed one) has its meta.x_classification at LEVEL or above, in the order of levels in the kg-mcp policy given by --area-policy; the default excludes do not apply, only --exclude; a graph without the key has the policy's default_level; contract v4.23"
+msgstr ""
+"reprova (rc 1) quando um .kg.yaml ou .kg.json rastreado (com --touched, um alterado) tem o meta.x_classification em NÍVEL ou acima, pela ordem de levels da política do kg-mcp dada por --area-policy; os excludes padrão não valem, só o --exclude; o grafo sem a chave tem o default_level da política; contrato v4.23"
+
+#: tools/kg_validate.py
+msgid "not declared"
+msgstr "não declarada"
+
+#: tools/kg_validate.py
+msgid ""
+"retain_for {retain_for} in a graph with x_dispose_by {dispose_by}: the owner decides, the report does not compute which one prevails"
+msgstr ""
+"retain_for {retain_for} num grafo com x_dispose_by {dispose_by}: o dono decide, o relatório não calcula qual prevalece"
+
+#: tools/kg_gate.py
+msgid ""
+"the kg-mcp policy file whose levels order the --classification-floor; a missing, unreadable or invalid policy, a policy without levels, or a level it does not have is broken input (rc 2)"
+msgstr ""
+"o arquivo de política do kg-mcp cujo levels ordena o --classification-floor; a política ausente, ilegível ou inválida, a política sem levels, ou o nível que ela não tem é entrada quebrada (rc 2)"
+
+#: tools/kg_validate.py
+msgid ""
+"x_dispose_basis belongs in meta (v4.23), next to x_dispose_by: the unit of disposal is the graph, not the node."
+msgstr ""
+"x_dispose_basis fica no meta (v4.23), ao lado do x_dispose_by: a unidade do descarte é o grafo, não o nó."
+
+#: tools/kg_validate.py
+msgid ""
+"x_dispose_basis is the basis of the disposal deadline (v4.23): text that is not empty, such as the law, the contract, or the decision."
+msgstr ""
+"x_dispose_basis é a base do prazo de expurgo (v4.23): um texto não vazio, como a lei, o contrato ou a decisão."
+
+#: tools/kg_validate.py
+msgid ""
+"x_dispose_by belongs in meta (v4.23): the unit of disposal is the graph, not the node. Move the node to a graph of its own and declare the deadline in that graph's meta."
+msgstr ""
+"x_dispose_by fica no meta (v4.23): a unidade do descarte é o grafo, não o nó. Mova o nó para um grafo próprio e declare o prazo no meta desse grafo."
+
+#: tools/kg_validate.py
+msgid ""
+"x_dispose_by is the date by which the whole graph is to be disposed of (v4.23): a calendar date YYYY-MM-DD in quotes. Only its form is judged; the date coming due opens the disposal procedure, listed by kg_validate.py --due, and no tool deletes anything."
+msgstr ""
+"x_dispose_by é a data até a qual o grafo inteiro deve ser descartado (v4.23): uma data do calendário AAAA-MM-DD entre aspas. Só a forma é julgada; o vencimento abre o procedimento de descarte, listado pelo kg_validate.py --due, e nenhuma ferramenta apaga nada."
+
+#: tools/kg_validate.py
+msgid ""
+"x_hold belongs in meta (v4.23), next to x_dispose_by: the unit of disposal is the graph, not the node."
+msgstr "x_hold fica no meta (v4.23), ao lado do x_dispose_by: a unidade do descarte é o grafo, não o nó."
+
+#: tools/kg_validate.py
+msgid ""
+"x_hold suspends the disposal (v4.23): a map with reason (text that is not empty) and until (the date YYYY-MM-DD when the suspension lapses)."
+msgstr ""
+"x_hold suspende o descarte (v4.23): um mapa com reason (um texto não vazio) e until (a data AAAA-MM-DD em que a suspensão caduca)."
+
+#: tools/kg_gate.py
+msgid ""
+"· --classification-floor {level}: {checked} graph(s) checked, {hits} at or above the floor or with an unknown level"
+msgstr ""
+"· --classification-floor {level}: {checked} grafo(s) conferido(s), {hits} no piso ou acima, ou com nível desconhecido"
+
+#: tools/kg_validate.py
+msgid ""
+"· disposal: {due} due, {held} held, {malformed} unreadable, {conflict} conflict(s) with retain_for; the date opens the disposal procedure, and no tool deletes anything"
+msgstr ""
+"· expurgo: {due} vencido(s), {held} suspenso(s), {malformed} ilegível(is), {conflict} conflito(s) com retain_for; a data abre o procedimento de descarte, e nenhuma ferramenta apaga nada"
+
+#: tools/kg_gate.py
+msgid ""
+"✗ classification floor: {graph} has an unknown level (it is not UTF-8, it does not parse, its meta is not a map, or its x_classification is not one of the levels)"
+msgstr ""
+"✗ piso de classificação: {graph} tem nível desconhecido (não é UTF-8, não parseia, o meta não é mapa, ou o x_classification não é um dos levels)"
+
+#: tools/kg_gate.py
+msgid "✗ classification floor: {graph} is at {got}, at or above {level}"
+msgstr "✗ piso de classificação: {graph} está em {got}, no nível {level} ou acima"
+
+#: tools/kg_validate.py
+msgid "; x_hold cannot be read (its until is not a YYYY-MM-DD date), so it does not suspend"
+msgstr "; o x_hold não se lê (o until não é uma data AAAA-MM-DD), então não suspende"
+
+#: tools/kg_validate.py
+msgid "DISPOSAL UNREADABLE"
+msgstr "EXPURGO ILEGÍVEL"
+
+#: tools/kg_gate.py
+msgid ""
+"GATE BROKEN  --classification-floor and --area-policy cannot be empty (an empty value would switch the floor off in silence)"
+msgstr ""
+"GATE QUEBRADO  --classification-floor e --area-policy não podem ser vazios (o valor vazio desligaria o piso em silêncio)"
+
+#: tools/kg_validate.py
+msgid "x_dispose_by {value} is not a YYYY-MM-DD date: the deadline is not measured"
+msgstr "x_dispose_by {value} não é uma data AAAA-MM-DD: o prazo não é medido"

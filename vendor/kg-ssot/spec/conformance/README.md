@@ -91,6 +91,8 @@ What v4 changed in severity, and what it added:
 | `form.pattern.<scope>.key` (a name that is not a slug, without `x_`) | SHOULD | **MUST** (with `x_`, still SHOULD) |
 | `form.pattern.node.provenance.source` (a placeholder `source`: whitespace only, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hyphens, an em dash, `?`...) | — | **MUST** (an empty value still gives `form.range`) |
 | `form.pattern.node.provenance.source` (a `private-cite:` marker out of form, v4.22) | — | SHOULD |
+| `form.pattern`, `form.type`, or `form.required` on `meta.x_dispose_by`, `meta.x_dispose_basis`, or `meta.x_hold` (the disposal deadline out of form, v4.23) | — | SHOULD |
+| `form.misplaced.node.x_dispose_by`, `.x_dispose_basis`, `.x_hold` (the disposal profiles on a node, v4.23) | — | SHOULD |
 | `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony`, or, since v4.16, their Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, which warn as `form.deprecated.node.provenance.method` since v4.21) | — | SHOULD (MUST in v5) |
 | `form.unknown-key.node.provenance.<key>` (an unknown key inside `provenance`) | SHOULD | SHOULD |
 
@@ -256,6 +258,8 @@ v4.21 adds two SHOULD warnings. In `latest/form/method-vocabulary/`, the Portugu
 
 v4.22 adds one SHOULD rule. In `latest/form/private-cite/`, a `provenance.source` that starts with `private-cite:` (case-sensitive, with no leading space) and is not `private-cite:` followed by 22 to 43 base64url characters (`A-Z`, `a-z`, `0-9`, `-`, `_`) warns as `form.pattern.node.provenance.source`, the code of the placeholder rule at the SHOULD level (an `if` on the prefix with a `then` on the form). The marker cites a node in a private repository; it is also valid in `locator`, `trace`, `verified_against`, and the detail of `method`, where its form is not judged. A text that does not start with the prefix is not judged. One case keeps the MUST code on a placeholder in one node and the SHOULD warning on a malformed marker in another: the deduplication is per occurrence.
 
+v4.23 adds the disposal profiles, in the SHOULD (`latest/form/disposal/`), judged only when present and only by their form, never by the date coming due: in `meta`, `x_dispose_by` (a calendar date `YYYY-MM-DD`, the date by which the whole graph is to be disposed of), `x_dispose_basis` (text that is not empty: the law, the contract, or the decision; whitespace only, Unicode spaces such as NBSP, the ideographic space, and the BOM included, counts as empty, by an explicit character class that both readers match the same), and `x_hold` (a map with `reason`, text that is not empty, and `until`, a date). Out of form they warn as `form.pattern`, `form.type`, or `form.required` in `meta` (`form.required.meta.x_hold.until`, for example); an impossible date such as `2030-02-30` warns as `form.pattern`, as every date of the contract does. A date that has already passed is valid: the date coming due belongs to the due report (`kg_validate.py --due`), outside the verdict. `x_hold` is not a closed map. On a node, the three keys are not profiles and warn as `form.misplaced.node.<key>`, whatever the value; on an edge they stay free `x_` keys. Nothing that passed fails.
+
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 
 ## Folders
@@ -277,7 +281,7 @@ sealed, that is, merged into the product graph, **and** the schema in `spec/` al
 (for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
 Nothing gets ahead of an open decision.
 
-**Today's score.** The reference reader passes 100% of `latest/`: 570 cases against contract v4, 32 of them
+**Today's score.** The reference reader passes 100% of `latest/`: 597 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
 verdict v4 changes became `bad-*` cases. Every case uses a valid `method` in the canonical English class (`measurement: caso de conformidade`, since v4.21), so

@@ -50,9 +50,10 @@ reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
 Uso:
   kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]
              [--strict-identity] [--allow-unreleased] [--sources] [--private-repos ARQ]
+             [--classification-floor NÍVEL --area-policy ARQ]
              [--update [--accept-regression MOTIVO] [--granularity graph|node]]
        kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
-                  [--private-repos ARQ]
+                  [--private-repos ARQ] [--classification-floor NÍVEL --area-policy ARQ]
 
 --touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e
 HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer
@@ -85,6 +86,18 @@ no arquivo, nunca o padrão nem o valor: a chave, o id de nó e o caminho do gra
 (<key #i>, <node #i>, <graph #i>). O arquivo ilegível ou sem nenhum padrão é entrada quebrada (rc 2): uma lista vazia
 não confere nada. Lê só os grafos que o gate mede: nunca o .kg.json, nem, por padrão, as fixtures, docs/materials e o
 vendor, nem o que o --exclude tira. Não combina com --update.
+
+--classification-floor NÍVEL --area-policy ARQ (contrato v4.23), juntos, nos dois modos: reprova (rc 1) o grafo cujo
+meta.x_classification está em NÍVEL ou acima, pela ordem de levels do arquivo de política do kg-mcp (o mesmo do
+--area-policy dele, lido pelo mesmo leitor estrito). Mede todo .kg.yaml e .kg.json que o git rastreia, sem os excludes
+padrão da catraca (as fixtures, docs/materials e o vendor entram) e só com o --exclude explícito. O grafo sem a chave tem
+o default_level da política; o que não parseia, não é UTF-8, cujo meta não é mapa ou cujo nível a lista não tem também
+reprova (a falha fecha). Com --touched, só os grafos alterados desde o ancestral comum (o caminho novo conta), lidos
+do índice do git e nunca do disco, porque é o índice que o commit leva. Política
+ausente, ilegível, fora do formato ou sem levels, NÍVEL que levels não tem, uma opção sem a outra e um valor vazio são
+entrada quebrada (rc 2). No CI, o gate barra o merge, não a entrada do dado: o
+commit com o grafo já existe na branch; para barrar antes do commit, o mesmo gate com --touched num hook de pre-commit
+(manual, capítulo 5). Não combina com --update.
 """
 import argparse
 import collections
@@ -373,6 +386,103 @@ def private_repo_check(items, patterns):
     out.append(_("· --private-repos: {patterns} pattern(s) in {graphs} graph(s): {hits} field(s) cite a private "
                  "repository without the marker").format(patterns=len(patterns), graphs=len(items), hits=len(hits)))
     return out, bool(hits)
+
+
+# --classification-floor (contrato v4.23): o grafo medido no nível dado ou acima, pela ordem de levels da política
+def read_floor(level, policy_path):
+    """O teto (kg_policy.Ceiling) do --classification-floor: a ordem dos níveis vem de levels, no arquivo de política do
+    kg-mcp (--area-policy), lido pelo mesmo leitor estrito (kg_policy.py, o que o kg_mcp.py usa). Política ausente,
+    ilegível, fora do formato ou sem levels, e nível que levels não tem, são entrada quebrada (Broken, rc 2): a falha
+    fecha."""
+    if __package__:
+        from . import kg_policy
+    else:
+        import kg_policy  # noqa: E402
+    try:
+        with open(policy_path, encoding="utf-8") as fh:
+            text = fh.read()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Broken(_("--area-policy {path} cannot be read ({error})").format(
+            path=policy_path, error=getattr(exc, "strerror", None) or type(exc).__name__))
+    try:
+        policy = kg_policy.parse(text)
+    except (ValueError, RecursionError) as exc:  # JSONDecodeError é ValueError; aninhamento fundo, RecursionError
+        raise Broken(_("--area-policy {path} is not a valid policy: {error}").format(path=policy_path, error=exc))
+    if not policy.levels:
+        raise Broken(_("--area-policy {path} has no levels: the order of the levels comes from the policy, and without "
+                       "it the floor cannot be judged").format(path=policy_path))
+    if level not in policy.levels:
+        raise Broken(_("--classification-floor {level} is not one of the levels of {path} ({levels})").format(
+            level=level, path=policy_path, levels=", ".join(policy.levels)))
+    return kg_policy.Ceiling(policy.levels, level, policy.default)
+
+
+def _decoded(data):
+    """O texto UTF-8 de bytes, com o fim de linha normalizado, ou None quando não é UTF-8 (nível desconhecido)."""
+    try:
+        return data.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    except UnicodeDecodeError:
+        return None
+
+
+def _index_graphs(repo):
+    """Os .kg.yaml e .kg.json do índice do git, inclusive o que foi apagado do disco depois do git add."""
+    out = _git_out(repo, "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json")
+    if out.returncode != 0:
+        raise Broken(_("{repo} is not a git repository: {err}").format(
+            repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
+    return [n for n in out.stdout.decode("utf-8").split("\0") if n]
+
+
+def _blob(repo, rev, name):
+    """Os bytes de name na revisão rev (\"\" é o índice), ou None quando ele não existe lá."""
+    out = _git_out(repo, "show", f"{rev}:./{name}")
+    return out.stdout if out.returncode == 0 else None
+
+
+def floor_graphs(repo, exclude, base=None):
+    """[(caminho, texto ou None)]: os grafos que o --classification-floor mede, sem os excludes padrão da catraca e sem
+    pular o vendor: as fixtures, docs/materials e o vendor também guardam dado, e o piso existe para barrar o grafo
+    sensível em qualquer lugar do repositório. Só o --exclude explícito tira um caminho. Sem base (a catraca), é todo
+    .kg.yaml e .kg.json rastreado, lido do disco, que no CI é o checkout. Com base (o sha do ancestral, no --touched), é
+    o índice do git, lido pelo blob e nunca pelo disco, porque é o índice que o commit leva (o pre-commit): fica só o
+    grafo cujos bytes no índice diferem dos da base, e o caminho novo conta como alterado; o que foi apagado do disco
+    depois do git add ainda conta. Os bytes são comparados antes de decodificar: o grafo que não é UTF-8 e não mudou não
+    entra. O que não é UTF-8 vem com texto None (nível desconhecido)."""
+    out = []
+    names = tracked_graphs(repo) if base is None else _index_graphs(repo)
+    for name in names:
+        if any(fnmatch.fnmatchcase(name, g) for g in exclude):
+            continue
+        if base is None:
+            out.append((name, _decoded((pathlib.Path(repo) / name).read_bytes())))
+            continue
+        data = _blob(repo, "", name)
+        if data is None or data == _blob(repo, base, name):
+            continue
+        out.append((name, _decoded(data)))
+    return out
+
+
+def classification_check(items, floor, level):
+    """(linhas, achou): cada grafo de items (floor_graphs) cujo meta.x_classification está no nível do
+    --classification-floor ou acima, pela ordem de levels; o grafo sem a chave tem o default_level da política, e o
+    que não parseia, não é UTF-8, cujo meta não é mapa ou cujo nível a lista não tem, reprova (a falha fecha)."""
+    out, checked, hits = [], 0, 0
+    for name, text in items:
+        checked += 1
+        got = None if text is None else floor.level_of(name, text)
+        if got is None:
+            hits += 1
+            out.append(_("✗ classification floor: {graph} has an unknown level (it is not UTF-8, it does not parse, "
+                         "its meta is not a map, or its x_classification is not one of the levels)").format(graph=name))
+        elif floor.rank[got] >= floor.ceiling:
+            hits += 1
+            out.append(_("✗ classification floor: {graph} is at {got}, at or above {level}").format(
+                graph=name, got=got, level=level))
+    out.append(_("· --classification-floor {level}: {checked} graph(s) checked, {hits} at or above the floor or with "
+                 "an unknown level").format(level=level, checked=checked, hits=hits))
+    return out, hits > 0
 
 
 def _source_paths(kg_trace, node, graph, repo, tracked):
@@ -945,9 +1055,10 @@ fails (rc 1) unless --allow-unreleased is given, and it never writes the baselin
 Usage:
   kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
              [--strict-identity] [--allow-unreleased] [--sources] [--private-repos FILE]
+             [--classification-floor LEVEL --area-policy FILE]
              [--update [--accept-regression REASON] [--granularity graph|node]]
        kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
-                  [--private-repos FILE]
+                  [--private-repos FILE] [--classification-floor LEVEL --area-policy FILE]
 
 --touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common
 ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new
@@ -980,6 +1091,19 @@ node and field, with the line of the pattern in the file, never the pattern or t
 path that contains a pattern is masked (<key #i>, <node #i>, <graph #i>). A file that cannot be read or has no pattern is
 broken input (rc 2): an empty list checks nothing. It reads only the graphs the gate measures: never .kg.json, nor,
 by default, the fixtures, docs/materials, and the vendor, nor what --exclude leaves out. It does not go with --update.
+
+--classification-floor LEVEL --area-policy FILE (contract v4.23), together, in both modes: fails (rc 1) when a graph has
+its meta.x_classification at LEVEL or above, in the order of levels in the kg-mcp policy file (the same file as its
+--area-policy, read by the same strict reader). It reads every .kg.yaml and .kg.json that git tracks, without the
+ratchet's default excludes (the fixtures, docs/materials and the vendor are read) and only with an explicit --exclude.
+A graph without the key has the policy's default_level; a graph that does not parse, is not UTF-8, whose meta is not a
+map, or whose level the list does not have also fails (it fails closed). With --touched, only the graphs changed since
+the common ancestor (a new path counts), read from the git index and never from the disk, because the index is what
+the commit takes. A missing, unreadable, invalid policy, or one without levels, a LEVEL that
+levels does not have, one option without the other, and an empty value are broken input (rc 2). In CI, the
+gate blocks the merge, not the entry of the data: the commit with the graph already exists on the branch; to block it
+before the commit, run the same gate with --touched in a pre-commit hook (manual, chapter 5). It does not go with
+--update.
 """
 
 
@@ -991,6 +1115,8 @@ def run_touched(args):
         return 2
     exclude = (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude)
     try:
+        floor = (read_floor(args.classification_floor, args.area_policy) if args.classification_floor is not None
+                 else None)
         items = corpus(args.repo, exclude, skip_vendor=not args.no_default_excludes)
         sha, found, changed = touched_debt(args.repo, args.touched, items, exclude,
                                            skip_vendor=not args.no_default_excludes)
@@ -999,6 +1125,8 @@ def run_touched(args):
                                    else ([], False))
         private, private_failed = (private_repo_check(items, read_private_repos(args.private_repos))
                                    if args.private_repos else ([], False))
+        classified, classified_failed = (classification_check(floor_graphs(args.repo, tuple(args.exclude), sha), floor,
+                                                              args.classification_floor) if floor else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -1012,9 +1140,9 @@ def run_touched(args):
     else:
         print(_("· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})").format(
             base=sha[:12], graphs=changed))
-    for line in sources + private:
+    for line in sources + private + classified:
         print(line)
-    return 1 if found or tampered or sources_failed or private_failed else 0
+    return 1 if found or tampered or sources_failed or private_failed or classified_failed else 0
 
 
 def main(argv=None):
@@ -1055,8 +1183,31 @@ def main(argv=None):
                            "private-cite: marker; FILE lists one pattern per line (a URL prefix, owner/repo, or repo@; a "
                            "line starting with # is a comment), and a hit names graph, node and field, never the "
                            "pattern"))
+    ap.add_argument("--classification-floor", metavar="LEVEL",
+                    help=_("fails (rc 1) when a tracked .kg.yaml or .kg.json (with --touched, a changed one) has its "
+                           "meta.x_classification at LEVEL or above, in the order of levels in the kg-mcp policy given by "
+                           "--area-policy; the default excludes do not apply, only --exclude; a graph without the key has "
+                           "the policy's default_level; contract v4.23"))
+    ap.add_argument("--area-policy", metavar="FILE",
+                    help=_("the kg-mcp policy file whose levels order the --classification-floor; a missing, unreadable "
+                           "or invalid policy, a policy without levels, or a level it does not have is broken input "
+                           "(rc 2)"))
     args = ap.parse_args(argv)
     _utf8_stdio()
+    if (args.classification_floor is None) != (args.area_policy is None):
+        print(_("GATE BROKEN  --classification-floor and --area-policy go together (the order of the levels comes from "
+                "the policy)"))
+        return 2
+    floor_arg, policy_arg = args.classification_floor, args.area_policy
+    empty = floor_arg is not None and not (floor_arg.strip() and policy_arg.strip())
+    if empty:
+        print(_("GATE BROKEN  --classification-floor and --area-policy cannot be empty (an empty value would switch the "
+                "floor off in silence)"))
+        return 2
+    if args.classification_floor is not None and args.update:
+        print(_("GATE BROKEN  --classification-floor does not go with --update (the check is not part of the "
+                "baseline)"))
+        return 2
     if args.sources and args.update:
         print(_("GATE BROKEN  --sources does not go with --update (the sources are not part of the baseline)"))
         return 2
@@ -1097,6 +1248,10 @@ def main(argv=None):
         sources, sources_failed = source_check(args.repo, items) if args.sources else ([], False)
         private, private_failed = (private_repo_check(items, read_private_repos(args.private_repos))
                                    if args.private_repos else ([], False))
+        classified, classified_failed = (classification_check(floor_graphs(args.repo, tuple(args.exclude)),
+                                                              read_floor(args.classification_floor, args.area_policy),
+                                                              args.classification_floor)
+                                         if args.classification_floor is not None else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -1117,9 +1272,9 @@ def main(argv=None):
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
             print("\n".join(lines + [_("✗ --update refused: the vendor does not pass its stamp (see above)")]))
             return 1
-    print("\n".join(lines + detail(base, now) + sources + private))
+    print("\n".join(lines + detail(base, now) + sources + private + classified))
     if not args.update:
-        return 1 if sources_failed or private_failed else rc
+        return 1 if sources_failed or private_failed or classified_failed else rc
     if worse and not args.accept_regression:
         print(_("✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\""
                 " (it stays in the baseline)"))

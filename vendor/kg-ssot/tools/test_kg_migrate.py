@@ -4,7 +4,7 @@ invariância, gate, idempotência). Os casos do apply vieram da revisão do core
 o mapa em bloco como último campo do nó (o end_mark que engoliu um '- id:' na migração de um adotante), o bloco | e >
 no fim do nó, o comentário entre nós, o último nó sem quebra final, o nó em flow e o '- id:' na coluna 0."""
 import os
-os.environ.setdefault("KG_SSOT_LANG", "pt-BR")  # as asserções destes testes são da tradução pt-BR
+os.environ["KG_SSOT_LANG"] = "pt-BR"  # as asserções destes testes são da tradução pt-BR
 
 import collections
 import contextlib

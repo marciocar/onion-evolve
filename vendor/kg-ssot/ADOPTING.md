@@ -96,7 +96,8 @@ The published tags are listed by `git ls-remote --tags https://github.com/marcio
   - a vendor that differs from its stamp, unless you pass `--force`. This keeps a local edit from vanishing
     silently.
 - **Minimal profile:** if you only run the gate and the check, you can vendor the `gate` profile with
-  `--profile gate`. It has 17 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the vendor
+  `--profile gate`. It has 18 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the reader of
+  the kg-mcp area policy that the gate's `--classification-floor` uses (`tools/kg_policy.py`, since 4.52.0), the vendor
   tool, the trace check with the query module it imports and its output schema (`tools/kg_trace.py`,
   `tools/kg_query.py`, and `spec/trace.schema.json`, since 4.25.1), the vector module the query imports only for
   `--semantic` and its pinned requirements (`tools/kg_vector.py` and `tools/requirements-vector.txt`, since 4.26.0), the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
@@ -393,6 +394,24 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.51.0` to `kg-ssot-v4.52.0`, contract v4.23 comes in, SHOULD only: no graph that passed fails, and no MUST
+verdict changes. It adds the disposal deadline of the whole graph, in `meta`: `x_dispose_by` (a calendar date),
+`x_dispose_basis` (the basis, text that is not empty), and `x_hold` (a suspension with `reason` and `until`), judged
+only by their form, never by the date coming due; on a node, the three keys warn as `form.misplaced.node.<key>`. A graph
+that already used one of these names as a free `x_` key with another shape gets a SHOULD warning: a baseline per graph
+or per node sees it as a new debt code, and the fix is the shape (manual, chapter 3), or, to record it as debt with the
+reason, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.23: disposal profile
+out of form, debt recorded"`. `kg_validate.py --due` lists the disposal that came due, the one held, and the conflict
+with a node's `retain_for`; the lists show up only when they have something, so a scheduled job that reads the
+`kg-ssot.due/1` JSON of a graph without the profile reads the same bytes; a report that carries the new lists does not
+validate against the 4.51 schema, so a job that validates it brings the new `spec/due.schema.json`. A `days_late` of 0
+now reads `(on the date)`. The date opens the disposal procedure, and no
+tool deletes anything. The vendor brings one new file, `tools/kg_policy.py`, the pure reader of the kg-mcp area policy,
+also in the `gate` profile, which now has 18 files. Opt-in: `kg_gate.py --classification-floor LEVEL --area-policy FILE`
+fails a graph at the level or above, in the order of the policy's `levels`; it reads every tracked `.kg.yaml` and
+`.kg.json`, the vendor included, so with the full release vendored add `--exclude 'vendor/kg-ssot/*'`; in CI it blocks the merge, not the entry
+of the data, and the manual gives the pre-commit recipe with `--touched`.
 
 From `kg-ssot-v4.50.0` to `kg-ssot-v4.51.0`, contract v4.22 comes in, SHOULD only: no graph that passed fails, and no MUST
 verdict changes. It adds the `private-cite:<id>` marker for citing a node in a private repository from a public graph:

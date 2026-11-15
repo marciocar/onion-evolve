@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:4bd5f00edf1ce214 -->
+<!-- translation-of: spec/conformance/README.md sha256:2b2bffa357afc427 -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -94,6 +94,8 @@ O que o v4 mudou de severidade, e o que entrou:
 | `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
 | `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue dando `form.range`) |
 | `form.pattern.node.provenance.source` (o marcador `private-cite:` fora da forma, v4.22) | — | SHOULD |
+| `form.pattern`, `form.type` ou `form.required` em `meta.x_dispose_by`, `meta.x_dispose_basis` ou `meta.x_hold` (o prazo de expurgo fora da forma, v4.23) | — | SHOULD |
+| `form.misplaced.node.x_dispose_by`, `.x_dispose_basis`, `.x_hold` (os perfis de expurgo no nó, v4.23) | — | SHOULD |
 | `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` ou, desde o v4.16, nos alias em português `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, que alertam como `form.deprecated.node.provenance.method` desde o v4.21) | — | SHOULD (MUST no v5) |
 | `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
 
@@ -257,6 +259,8 @@ O v4.21 põe dois avisos no SHOULD. Em `latest/form/method-vocabulary/`, a class
 
 O v4.22 põe uma regra no SHOULD. Em `latest/form/private-cite/`, o `provenance.source` que começa com `private-cite:` (sensível à caixa, sem espaço antes) e não é `private-cite:` seguido de 22 a 43 caracteres base64url (`A-Z`, `a-z`, `0-9`, `-`, `_`) alerta como `form.pattern.node.provenance.source`, o código da regra do placeholder no nível SHOULD (um `if` com o prefixo e um `then` com a forma). O marcador cita um nó de repositório privado; ele vale também em `locator`, `trace`, `verified_against` e no detalhe do `method`, onde a forma não é julgada. O texto que não começa pelo prefixo não é julgado. Um caso mantém o código MUST no placeholder de um nó e o aviso SHOULD no marcador fora da forma de outro: a deduplicação é por ocorrência.
 
+O v4.23 põe no SHOULD os perfis do prazo de expurgo (`latest/form/disposal/`), julgados só quando presentes e só pela forma, nunca pelo vencimento: no `meta`, `x_dispose_by` (uma data do calendário `AAAA-MM-DD`, a data até a qual o grafo inteiro deve ser descartado), `x_dispose_basis` (um texto não vazio: a lei, o contrato ou a decisão; só espaço, inclusive o Unicode, como o NBSP, o ideográfico e o BOM, conta como vazio, por uma classe de caracteres explícita que os dois leitores casam igual) e `x_hold` (um mapa com `reason`, um texto não vazio, e `until`, uma data). Fora da forma alertam como `form.pattern`, `form.type` ou `form.required` no `meta` (`form.required.meta.x_hold.until`, por exemplo); a data impossível, como `2030-02-30`, alerta como `form.pattern`, como toda data do contrato. A data já passada vale: o vencimento é do relatório de vencimento (`kg_validate.py --due`), fora do veredito. O `x_hold` não é um mapa fechado. No nó, as três chaves não são perfil e alertam como `form.misplaced.node.<chave>`, com qualquer valor; na aresta, seguem chave `x_` livre. Nada que passava reprova.
+
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 
 ## Pastas
@@ -278,7 +282,7 @@ estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `sp
 (por exemplo, `trigger` em `integrity-trigger`). O PR da promoção esvazia `pending_on` e cita o nó selado. Nada
 antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 570 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 597 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
 v4 muda viraram casos `bad-*`. Todo caso usa `method` válido na classe canônica em inglês (`measurement: caso de conformidade`, desde o v4.21), para que os avisos de

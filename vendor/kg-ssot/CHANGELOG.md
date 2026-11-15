@@ -10,6 +10,35 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.52.0] - 2026-11-15
+
+Contract v4.23, SHOULD only: nothing that passed fails, and no MUST verdict changes.
+
+- Contract v4.23: the disposal deadline of the whole graph, in `meta`, judged only when present and only by its form,
+  never by the date coming due. `x_dispose_by` is a calendar date (`YYYY-MM-DD`), named as an action because *retain*
+  means a minimum keep; `x_dispose_basis` is the basis, in text that is not empty; `x_hold` suspends the disposal, a map
+  with `reason` and `until`. Out of form they warn as `form.pattern`, `form.type`, or `form.required` in `meta`; on a
+  node, as `form.misplaced.node.<key>`, as `x_classification` does. The description of `provenance.method` gains the
+  subagent rule: what a subagent of the session did belongs to the author, with the class of the act, and `testimony` is
+  for an external party. Both readers give the same verdict; the suite goes from 570 to 597 cases.
+- `kg_validate.py --due` lists the disposal that came due (`dispose`), the one held by an `x_hold` in force
+  (`dispose_held`), and, in a graph with `x_dispose_by`, every node with `retain_for` as a conflict for the owner
+  (`dispose_conflict`), without computing which one prevails. The date opens the disposal procedure; no tool deletes
+  anything. A deadline that is not a date shows up in `dispose_malformed`, and an `x_hold` whose `until` cannot be read is
+  named on the entry (`hold_unreadable`). The lists show up only when they have something, so the `kg-ssot.due/1`
+  version does not change and the report of a graph without the profile is the same as before. A report that carries
+  the new lists does not validate against the 4.51 schema (its top level is closed): if you validate the report, bring
+  the new `spec/due.schema.json`. A `days_late` of 0 now reads `(on the date)`, not `(today)`.
+- `kg_gate.py --classification-floor LEVEL --area-policy FILE`, opt-in, in both modes: fails a measured graph (with
+  `--touched`, a changed graph) whose `meta.x_classification` is at the level or above, in the order of `levels` in the
+  kg-mcp policy file. It reads every tracked `.kg.yaml` and `.kg.json`, fixtures, `docs/materials/`, and the vendor
+  included; only an explicit `--exclude` leaves a path out, and an empty value is broken input. A graph without the key has the policy's `default_level`; an unknown level fails. A missing,
+  unreadable, or invalid policy, one without `levels`, and a level it does not have are broken input (rc 2).
+- `tools/kg_policy.py`: the pure reader of the kg-mcp area policy, which `kg_mcp.py` and the gate share; it enters the
+  `gate` profile. `kg_mcp.py` behaves the same.
+- Manual: the disposal procedure with an aggregate record, the limit of the git history, the pre-commit recipe with
+  `--touched`, and the limit that in CI the gate blocks the merge, not the entry of the data.
+
 ## [4.51.0] - 2026-11-12
 
 Contract v4.22, SHOULD only: nothing that passed fails, and no MUST verdict changes. A public graph that cited a node of
