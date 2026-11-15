@@ -62,12 +62,14 @@ nodes:
   - id: D_A2A_BACKBONE_PRODUCT_2026_11
     node_type: decision
     layer: audit
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.5
     label: "DECISÃO ABERTA: core assume backbone A2A agente-neutro como produto+serviço? Opções: A construir já · B só uso interno · C adotar/costurar padrão · D não fazer. Elenxo REPROVA A e recomenda C+B (adotar o padrão, construir só a governança-de-grafo interna)."
     trace: "run /onion-research modo decision de 2026-11-14; pergunta Q_A2A_BACKBONE_PRODUCT_2026_11; segue backbone-piece-shape-2026-11 (forma A, repo próprio vendorizado, open-core indeciso) e no-external-service-dependency; vista em docs/evolution/research/a2a-backbone-product-2026-11/SYNTHESIS.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-11-15"
+    verified_against: "decisão do maestro em 2026-11-15, por pergunta com opções (/meta:decide): escolhida «C+B: adotar/costurar o A2A 1.0 como substrato + construir só a governança-de-grafo interna (conformidade/soberania acima do protocolo, incl. a lacuna de gestão/rotação/revogação de chaves); NÃO construir o protocolo (commodity aberta da Linux Foundation, espaço ocupado por Archestra e BAND)»"
     narrative: |-
       Opções: C_OPCAO_BUILD_PRODUCT_SERVICE, C_OPCAO_INTERNAL_ONLY, C_OPCAO_ADOPT_STITCH,
       C_OPCAO_DO_NOTHING.
@@ -105,6 +107,13 @@ nodes:
       governança-de-grafo como peça interna em dogfood, e reabrir a decisão de produto+serviço quando
       (1) o diferencial for medido entregando valor, (2) Archestra/BAND estiverem ancorados no corpus, e
       (3) a demanda paga for lida nas primárias. Este escritor NÃO sela: o maestro sela pelo /meta:decide.
+
+      Selado por /meta:decide em 2026-11-15: escolhida «C+B: adotar/costurar o A2A 1.0 como substrato + construir só a governança-de-grafo interna (conformidade/soberania acima do protocolo, incl. a lacuna de gestão/rotação/revogação de chaves); NÃO construir o protocolo (commodity aberta da Linux Foundation, espaço ocupado por Archestra e BAND)»; descartadas: «A construir já» · «B só uso interno» · «D não fazer».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-15: «vale o core assumir a orquestração definitiva do backbone A2A agente-neutro como produto e serviço?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-15"
+      locality: "pessoa"
   # ═══ OPÇÕES (1 claim por opção, OPEN; nenhuma morta por evidência) ═══
   - id: C_OPCAO_BUILD_PRODUCT_SERVICE
     node_type: claim
