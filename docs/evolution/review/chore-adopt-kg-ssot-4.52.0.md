@@ -2,7 +2,7 @@
 branch: chore/adopt-kg-ssot-4.52.0
 pr: pendente
 date: 2026-11-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: aecbb98c12b3100f9d437d8a77298a869ab7339f1659544660c0b3427979076e
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
