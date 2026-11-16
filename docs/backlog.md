@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1167 itens abertos** em 169 grafo(s) com aberto (de 228 no escopo) · 163 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1168 itens abertos** em 170 grafo(s) com aberto (de 229 no escopo) · 164 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1865,6 +1865,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## lgpd-package-core-seal-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `E_LGPD_INCIDENT_DEADLINE_UNVERIFIED_1116` | lgpd-package-core-seal-2026-11 | O prazo de três dias úteis da comunicação de incidente vem da Resolução CD/ANPD 15 de 2024, que nem a curadoria nem o core l |
 
 ## meeting-capture-2026-10 — 1 item(ns)
 
