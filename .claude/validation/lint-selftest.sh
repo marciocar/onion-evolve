@@ -59257,6 +59257,14 @@ BP_PC
     grep -q 'concessões de batuta-de-projeto NÃO LIDAS' <<< "${a}" && ! grep -q 'batuta-de-projeto: sim' <<< "${a}"; }
   _bpcase "(bb) grants.tsv ilegível é lacuna fail-closed, nunca concessão por palpite" \
     "if grant_st.startswith('unreadable'):" "if False:" _bp_bb
+  # (bc) linha TRUNCADA em grants.tsv (falta a coluna da concessão) NÃO concede, e linha de chave vazia não casa
+  #      ninguém: só «sim» escrito concede (revisão independente do #1665, 2026-11-16 — o default era «sim»).
+  mkdir -p "${sb}/state-grant-trunc"
+  printf 'alpha\tinterno\n\tinterno\tsim\tcore\n' > "${sb}/state-grant-trunc/grants.tsv"
+  _bp_bc() { local a; a="$(BP_STATE="${sb}/state-grant-trunc" _bpr "$1" --tsv)"; BP_WHY="$(grep -E "^session${T}(sid-alpha|sid-beta)|batutas-de-projeto" <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-alpha${T}.*batuta-de-projeto: não (interno, por ?)" <<< "${a}" && ! grep -q 'batuta-de-projeto: sim' <<< "${a}"; }
+  _bpcase "(bc) grants.tsv com linha truncada não concede; chave vazia não casa" \
+    "        tem = (r[2].strip().lower() if len(r) > 2 else '') in ('sim', 'yes', 'true', '1')" "        tem = (r[2].strip().lower() if len(r) > 2 else 'sim') in ('sim', 'yes', 'true', '1')" _bp_bc
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
