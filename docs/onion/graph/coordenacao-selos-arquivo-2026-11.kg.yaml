@@ -110,4 +110,61 @@ nodes:
       locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
       locality: "pessoa"
-edges: []
+  - id: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "decisão do maestro em 2026-11-16, por pergunta com opções (/meta:decide): escolhida «Curadoria escreve os casos, vps-ops julga»"
+    label: "Na rodada 3 da refutação do arnês de isolamento entre inquilinos, a curadoria escreve os ataques novos como casos de teste dentro do arnês e a sessão de operações da VPS só lê, roda e julga se cobrem."
+    narrative: "Selado por /meta:decide em 2026-11-16: escolhida «Curadoria escreve os casos, vps-ops julga»; descartadas: «Aceitar o v3 e abrir a Emenda» · «Fica suspensa»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-16: «Rodada 3 da refutação do arnês de isolamento: como segue?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-16"
+      locality: "pessoa"
+  - id: D_RITUAL_PROFILE_ISO8601_EVENT_RRULE_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "decisão do maestro em 2026-11-16, por pergunta com opções (/meta:decide): escolhida «Perfil sobre tipo existente; ISO 8601 + evento + RRULE validada»"
+    label: "O ritual do agente é perfil sobre tipo de nó existente; a cadência usa duração ISO 8601 e gatilho por evento julgados pelo contrato, mais um campo de calendário com RRULE da RFC 5545 exata, validada na forma."
+    narrative: "Selado por /meta:decide em 2026-11-16: escolhida «Perfil sobre tipo existente; ISO 8601 + evento + RRULE validada»; descartadas: «Tipo de nó novo» · «Fora do contrato, só o evento» · «RRULE pleno já no contrato» · «Só duração e evento por ora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-16: «Onde mora a definição do ritual e como fica a cadência?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-16"
+      locality: "pessoa"
+  - id: D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "decisão do maestro em 2026-11-16, por pergunta com opções (/meta:decide): escolhida «Teto 8 e migrar as 4 para tmux»"
+    label: "O teto de sessões interativas sobe de 4 para 8, e as quatro sessões que rodam fora do tmux são reabertas em tmux com resume, uma por vez, num ponto seguro."
+    narrative: "Selado por /meta:decide em 2026-11-16: escolhida «Teto 8 e migrar as 4 para tmux»; descartadas: «Manter teto 4, estacionar as ociosas» · «Só migrar para tmux, teto depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-16: «O pulso mede 8 sessões contra o teto de 4 e 4 fora do tmux: o que fazemos?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-16"
+      locality: "pessoa"
+edges:
+  - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
+    to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    edge_type: TRACES_TO
+  - from: D_RITUAL_PROFILE_ISO8601_EVENT_RRULE_1116
+    to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    edge_type: TRACES_TO
+  - from: D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116
+    to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    edge_type: TRACES_TO
