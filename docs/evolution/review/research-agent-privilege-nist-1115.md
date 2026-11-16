@@ -1,7 +1,8 @@
 ---
 branch: research/agent-privilege-nist-1115
 pr: pendente
-reviewed_diff_sha256: 872d97974ba0af51381048f0743dfda1bd81b806d0be1c4716003a226d5a3518
+reviewed_diff_sha256: 713b4d8a4cbdb59a0a5f3a1fa0a364d5c85f5a45db0d692cb8c99c19acfbd189
+reviewed_code_sha256: 9ea42a8d481a7c550a723544201167e8ba5bdecac7d96398fa127868d416c4f9
 date: 2026-11-15
 findings_total: 0
 findings_real: 0
