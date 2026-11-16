@@ -59281,6 +59281,7 @@ BP_PY
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
     env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
+      BATON_PROC="${BP_PROC:-${sb}/proc-empty}" \
       BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
   }
   _bpcase() {  # <nome> <OLD> <NEW> <função> [sem-farol]
@@ -59616,6 +59617,74 @@ BP_PC
     grep -q "^session${T}sid-alpha${T}.*batuta-de-projeto: não (interno, por ?)" <<< "${a}" && ! grep -q 'batuta-de-projeto: sim' <<< "${a}"; }
   _bpcase "(bc) grants.tsv com linha truncada não concede; chave vazia não casa" \
     "        tem = (r[2].strip().lower() if len(r) > 2 else '') in ('sim', 'yes', 'true', '1')" "        tem = (r[2].strip().lower() if len(r) > 2 else 'sim') in ('sim', 'yes', 'true', '1')" _bp_bc
+  # (an)-(au) higiene das sessões (D_SESSION_HYGIENE_TMUX_WORKTREE_1114, 2026-11-14): um /proc FALSO (BATON_PROC) com
+  #     processos sintéticos. Nomes fake; nenhum processo real é lido. O environ do h-mosh carrega um segredo de mentira
+  #     que NUNCA pode aparecer na saída (só a chave TMUX é olhada).
+  mkdir -p "${sb}/proc-empty" "${sb}/hs" "${sb}/hm" "${sb}/ht" "${sb}/hn" "${sb}/hu"
+  python3 - "${sb}" "${r}" > "${sb}/peers-hy.json" <<'BP_HY'
+import json, os, sys
+sb, r = sys.argv[1], sys.argv[2]; P = f'{sb}/proc-hy'
+def mk(pid, comm, state, ppid, env=None):
+    d = f'{P}/{pid}'; os.makedirs(d, exist_ok=True)
+    open(f'{d}/stat', 'w').write(f'{pid} ({comm}) {state} {ppid} 1 1 0 -1\n'); open(f'{d}/comm', 'w').write(comm + '\n')
+    if env is not None: open(f'{d}/environ', 'wb').write(b'\0'.join(e.encode() for e in env) + b'\0')
+mk(4100, 'bash', 'S', 4101); mk(4101, 'mosh-server', 'S', 1); mk(4102, 'tmux: server', 'S', 1); mk(4103, 'bash', 'S', 4102)
+mk(4001, 'claude', 'T', 4103, ['HOME=/x', 'TMUX=/tmp/tmux-1/default,1,0'])          # suspensa (Ctrl+Z) dentro do tmux
+mk(4002, 'claude', 'S', 4100, ['HOME=/x', 'FAKE_SECRET=nao-imprima-isto'])           # mosh fora do tmux
+mk(4003, 'claude', 'S', 4103, ['HOME=/x'])                                            # sem a chave, mas o avô é o tmux
+mk(4004, 'claude', 'S', 4103, ['TMUX=/tmp/tmux-1/default,1,0'])                       # mesmo checkout que 4005
+mk(4005, 'claude', 'S', 4103, ['TMUX=/tmp/tmux-1/default,1,0'])
+mk(4006, 'claude', 'S', 4103, ['TMUX=x'])                                             # fundo: fora da conta
+mk(4007, 'claude', 'S', 4999)                                                         # sem environ e pai sumido: NÃO medido
+mk(4008, 'node', 'S', 4100, ['TMUX=/tmp/tmux-1/default,1,0'])                         # não é claude: o environ não se abre
+S = [(4001, 'h-stop', f'{sb}/hs', 'interactive'), (4002, 'h-mosh', f'{sb}/hm', 'interactive'), (4003, 'h-tmux', f'{sb}/ht', 'interactive'),
+     (4004, 'h-dup1', r, 'interactive'), (4005, 'h-dup2', r, 'interactive'), (4006, 'h-bg', r, 'background'),
+     (4007, 'h-unread', f'{sb}/hu', 'interactive'), (4008, 'h-node', f'{sb}/hn', 'interactive')]
+print(json.dumps([{'pid': p, 'cwd': c, 'kind': k, 'sessionId': f'sid-{n}', 'name': n, 'status': 'idle'} for p, n, c, k in S]))
+BP_HY
+  _bphy() { BP_PROC="${sb}/proc-hy" _bpr "$1" --tsv --peers "${sb}/peers-hy.json" "${@:2}"; }
+  # (an) estado T no stat sai SESSION_STOPPED com o kill -CONT
+  _bp_an() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "^hygiene" <<< "${a}" | cut -f2,3 | tr '\t\n' ' |')"
+    grep -q "^hygiene${T}sid-h-stop${T}SESSION_STOPPED${T}.*cura: kill -CONT 4001" <<< "${a}"; }
+  _bpcase "(an) sessão suspensa (estado T) sai SESSION_STOPPED com o kill -CONT" \
+    "        if st[0] in ('T', 't'):" "        if False:" _bp_an
+  # (ao) sem TMUX e com árvore bash→mosh-server sai SESSION_NOT_IN_TMUX com o tmux new; o resto do ambiente NUNCA sai
+  _bp_ao() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "sid-h-mosh" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX${T}.*árvore bash→mosh-server.*tmux new -s h-mosh .*claude --resume sid-h-mosh" <<< "${a}" \
+      && ! grep -q 'nao-imprima-isto\|FAKE_SECRET' <<< "${a}"; }
+  _bpcase "(ao) sessão fora do tmux (mosh) sai SESSION_NOT_IN_TMUX, sem vazar o ambiente" \
+    "        if key or seen_tmux: continue" "        if True: continue" _bp_ao
+  # (ap) sem a chave TMUX mas com o tmux na árvore (comm «tmux: server», com espaço) NÃO é aviso
+  _bp_ap() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "sid-h-tmux" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-tmux${T}" <<< "${a}"; }
+  _bpcase "(ap) o tmux na árvore de processos vale como tmux" \
+    "            if c.startswith('tmux'): seen_tmux = True; break" "            if False: seen_tmux = True; break" _bp_ap
+  # (aq) o environ só se abre de processo `claude`: um node com TMUX no ambiente e árvore sem tmux sai fora do tmux
+  _bp_aq() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "sid-h-node" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}sid-h-node${T}SESSION_NOT_IN_TMUX${T}" <<< "${a}"; }
+  _bpcase "(aq) o environ de processo que não é claude não é lido" \
+    "        key = has_tmux_key(p['pid']) if comm == 'claude' else None" "        key = has_tmux_key(p['pid']) if True else None" _bp_aq
+  # (ar) duas interativas vivas no mesmo checkout: a 2ª sai SESSION_SAME_CHECKOUT com o claude --worktree; a de fundo não conta
+  _bp_ar() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "SAME_CHECKOUT" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}sid-h-dup2${T}SESSION_SAME_CHECKOUT${T}.*2 sessões interativas.*claude --worktree h-dup2-2" <<< "${a}" \
+      && ! grep -q "h-bg" <<< "$(grep "^hygiene${T}" <<< "${a}")"; }
+  _bpcase "(ar) duas sessões no mesmo checkout saem SESSION_SAME_CHECKOUT com o --worktree" \
+    "        if len(ps) < 2 or not top: continue" "        if True: continue" _bp_ar
+  # (as) 7 interativas vivas acima do teto de 4 saem SESSION_CAP; com --max-interactive 9, não
+  _bp_as() { local a b; a="$(_bphy "$1")"; b="$(_bphy "$1" --max-interactive 9)"; BP_WHY="$(grep "SESSION_CAP" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessões interativas vivas, acima do teto de 4" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
+  _bpcase "(as) interativas acima do teto saem SESSION_CAP" \
+    "    if len(inter) > int(max_inter):" "    if False:" _bp_as
+  # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
+  _bp_at() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E "h-unread|HYGIENE" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^gap${T}.*HYGIENE_UNMEASURED.*h-unread (pid 4007).*tmux NÃO medido" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-unread${T}" <<< "${a}"; }
+  _bpcase "(at) árvore ilegível é lacuna HYGIENE_UNMEASURED" \
+    "        if key is None and broken:" "        if False:" _bp_at
+  # (au) os avisos de higiene entram no sha: o --quiet não cala uma sessão que ficou suspensa
+  _bp_au() { local x y; x="$(_bphy "$1" | awk -F'\t' '$1=="sha"{print $2}')"; y="$(_bphy "$1" --max-interactive 9 | awk -F'\t' '$1=="sha"{print $2}')"
+    BP_WHY="sha teto 4=${x} · teto 9=${y}"; [ -n "${x}" ] && [ -n "${y}" ] && [ "${x}" != "${y}" ]; }
+  _bpcase "(au) aviso de higiene muda o sha" \
+    "for h in HY)}" "for h in [])}" _bp_au
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests

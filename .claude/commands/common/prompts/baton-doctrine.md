@@ -98,17 +98,36 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    Portal AI Explorer; patrocinador humano ao lado do dono, do Entra Agent ID). O mercado não tem nome para «agente
    dono de repo», e esse desenho é do Onion (`docs/evolution/research/agent-repo-ownership-2026-11/`).
 
-8. **A batuta-de-projeto (concessão em camadas) — lida, nunca concedida pelo pulso.** O core (a batuta do ecossistema)
-   **concede** a batuta-de-projeto a cada sessão-dona, por delegação do maestro (que é dono de tudo): a sessão rege e
-   defende o seu projeto, trabalha o backlog aberto do seu repo por conta (um escritor por repo), e reporta ao core. A
-   concessão mora em `grants.tsv` do estado da batuta (`sessão<TAB>camada<TAB>batuta-de-projeto<TAB>concedida-por`),
-   **estado declarado, irmão de `owners.tsv` e `parked.tsv`**: o pulso o **LÊ e reporta** (anota a batuta de cada sessão
-   na linha dela e conta no cabeçalho; ilegível é lacuna fail-closed, nunca «nenhuma»), e **nunca o escreve** — conceder
-   é ato do core por ordem do maestro, não do medidor. É o que **dissolve o gargalo** da orquestração hub-e-raio: em vez
-   de um ponto único (o maestro ou o core) por onde todo o trabalho passa, cada sessão toca o seu fio em paralelo, o
-   core roteia as dependências e escala só o MOAT em lote, e o maestro fica no MOAT e no selo estratégico. **Despachar
-   segue fora do pulso** (degrau 3): a batuta-de-projeto diz *quem rege o quê*, não manda a sessão fazer. Decisão
-   `D_LAYERED_BATON_GRANT_1116` (`docs/evolution/research/forge-baton-2026-11/`).
+9. **Sessão longa roda em tmux nomeado, a 2ª no mesmo checkout vai de `--worktree`, e o teto é de 4 sessões
+   interativas mais 5 agentes. O pulso avisa, nunca bloqueia.** Decidida pela sessão do core por delegação do maestro
+   em 2026-11-14 (`D_SESSION_HYGIENE_TMUX_WORKTREE_1114`, em
+   `docs/evolution/research/forge-baton-2026-11/forge-baton-2026-11.kg.yaml`). O incidente: a sessão do core rodava
+   num mosh fora do tmux e ficou suspensa por Ctrl+Z (estado T) sem ninguém ver, e o pulso mostrou duas sessões da
+   curadoria e duas do brain ao mesmo tempo. A forma é a do mercado: a doc do Remote Control manda rodar em tmux ou
+   screen na máquina remota, e o paralelismo no mesmo repo é por `claude --worktree`. O Agent View (`claude agents`,
+   em preview) fica para piloto, não migração. O `baton-pulse.sh` lê, por **processo** interativo vivo da lista de
+   peers, o `/proc/<pid>/stat` (estado e pai), o `comm` e, **só do processo `claude`, só a chave `TMUX` do
+   ambiente** (o resto do ambiente nunca sai, porque pode ter segredo). Ele dá quatro avisos, cada um com o comando
+   de cura como texto:
+   - `SESSION_STOPPED`: estado T, cura `kill -CONT <pid>` ou `fg`;
+   - `SESSION_NOT_IN_TMUX`: sem `TMUX` e sem tmux na árvore, cura `tmux new -s <nome> -c <pasta> 'claude --resume <id>'`;
+   - `SESSION_SAME_CHECKOUT`: duas interativas no mesmo topo git, cura `claude --worktree <nome>`;
+   - `SESSION_CAP`: interativas acima de `--max-interactive` (4).
+
+   Estado ou árvore ilegível é lacuna (`HYGIENE_UNMEASURED`), nunca «em tmux». A decisão é reversível, e por isso o
+   mecanismo é aviso: fechar, retomar ou abrir sessão continua sendo ato da sessão dona ou do maestro.
+
+10. **A batuta-de-projeto (concessão em camadas) — lida, nunca concedida pelo pulso.** O core (a batuta do ecossistema)
+    **concede** a batuta-de-projeto a cada sessão-dona, por delegação do maestro (que é dono de tudo): a sessão rege e
+    defende o seu projeto, trabalha o backlog aberto do seu repo por conta (um escritor por repo), e reporta ao core. A
+    concessão mora em `grants.tsv` do estado da batuta (`sessão<TAB>camada<TAB>batuta-de-projeto<TAB>concedida-por`),
+    **estado declarado, irmão de `owners.tsv` e `parked.tsv`**: o pulso o **LÊ e reporta** (anota a batuta de cada sessão
+    na linha dela e conta no cabeçalho; ilegível é lacuna fail-closed, nunca «nenhuma»), e **nunca o escreve** — conceder
+    é ato do core por ordem do maestro, não do medidor. É o que **dissolve o gargalo** da orquestração hub-e-raio: em vez
+    de um ponto único (o maestro ou o core) por onde todo o trabalho passa, cada sessão toca o seu fio em paralelo, o
+    core roteia as dependências e escala só o MOAT em lote, e o maestro fica no MOAT e no selo estratégico. **Despachar
+    segue fora do pulso** (degrau 3): a batuta-de-projeto diz *quem rege o quê*, não manda a sessão fazer. Decisão
+    `D_LAYERED_BATON_GRANT_1116` (`docs/evolution/research/forge-baton-2026-11/`).
 
 ## O que ela NÃO promete (fronteira declarada)
 
@@ -143,5 +162,5 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 - Medidor (peça 3): `.claude/validation/decide-census.sh`, com as linhas `ask` e `signal` e o estado PARADO
 - Registro de pergunta: `.claude/utils/orchestration/maestro-ask.sh`
 - Bancada (peça 7): `run_load_lease_selftests` (porta de admissão), `run_maestro_ask_selftests`, `run_batuta_census_selftests`, `run_baton_pulse_selftests` (o pulso)
-- Pulso (cláusula 7): comando [`/meta:baton`](../meta/baton.md) e medidor `.claude/validation/baton-pulse.sh`
+- Pulso (cláusulas 7 a 9): comando [`/meta:baton`](../meta/baton.md) e medidor `.claude/validation/baton-pulse.sh`
 - Colheita de mercado (core-only): `docs/evolution/research/session-orchestration-2026-11/data/market-supervision-2026-11-10.md`
