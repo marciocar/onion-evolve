@@ -59672,9 +59672,9 @@ BP_HY
     "        if len(ps) < 2 or not top: continue" "        if True: continue" _bp_ar
   # (as) 7 interativas vivas acima do teto de 4 saem SESSION_CAP; com --max-interactive 9, não
   _bp_as() { local a b; a="$(_bphy "$1")"; b="$(_bphy "$1" --max-interactive 9)"; BP_WHY="$(grep "SESSION_CAP" <<< "${a}" | tr '\t' ' ')"
-    grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessões interativas vivas, acima do teto de 4" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
+    grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessão(ões) interativa(s) distinta(s) acima do teto de 4" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
   _bpcase "(as) interativas acima do teto saem SESSION_CAP" \
-    "    if len(inter) > int(max_inter):" "    if False:" _bp_as
+    "    if inter_sessions > int(max_inter):" "    if False:" _bp_as
   # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
   _bp_at() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E "h-unread|HYGIENE" <<< "${a}" | tr '\t' ' ')"
     grep -q "^gap${T}.*HYGIENE_UNMEASURED.*h-unread (pid 4007).*tmux NÃO medido" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-unread${T}" <<< "${a}"; }
@@ -59685,6 +59685,47 @@ BP_HY
     BP_WHY="sha teto 4=${x} · teto 9=${y}"; [ -n "${x}" ] && [ -n "${y}" ] && [ "${x}" != "${y}" ]; }
   _bpcase "(au) aviso de higiene muda o sha" \
     "for h in HY)}" "for h in [])}" _bp_au
+  # (av)-(ax) curas da 2ª passada de revisão (2026-11-16): dedupe do teto por sessão, timeout do rev-parse por cwd, fora-de-git
+  mkdir -p "${sb}/plain"
+  python3 - "${sb}" "${r}" <<'BP_V'
+import json, os, sys
+sb, r = sys.argv[1], sys.argv[2]
+def fixture(P, S):
+    for pid, comm, state, ppid, env in S:
+        d = f'{P}/{pid}'; os.makedirs(d, exist_ok=True)
+        open(f'{d}/stat', 'w').write(f'{pid} ({comm}) {state} {ppid} 1 1 0 -1\n'); open(f'{d}/comm', 'w').write(comm + '\n')
+        if env is not None: open(f'{d}/environ', 'wb').write(b'\0'.join(e.encode() for e in env) + b'\0')
+TM = ['TMUX=/tmp/tmux-1/default,1,0']
+# (av) teto por sessão: 2 pids com o MESMO sid (retomada em dois terminais) + 1 solo = 2 sessões distintas, 3 processos
+fixture(f'{sb}/proc-cap', [(5001, 'claude', 'S', 1, TM), (5002, 'claude', 'S', 1, TM), (5003, 'claude', 'S', 1, TM)])
+cap = [{'pid': 5001, 'cwd': r, 'kind': 'interactive', 'sessionId': 'sid-dup', 'name': 'c-dup', 'status': 'idle'},
+       {'pid': 5002, 'cwd': r, 'kind': 'interactive', 'sessionId': 'sid-dup', 'name': 'c-dup', 'status': 'idle'},
+       {'pid': 5003, 'cwd': r, 'kind': 'interactive', 'sessionId': 'sid-solo', 'name': 'c-solo', 'status': 'idle'}]
+open(f'{sb}/peers-cap.json', 'w').write(json.dumps(cap))
+# (ax) duas interativas vivas no MESMO diretório que NÃO é repo git
+fixture(f'{sb}/proc-plain', [(5101, 'claude', 'S', 1, TM), (5102, 'claude', 'S', 1, TM)])
+plain = [{'pid': 5101, 'cwd': f'{sb}/plain', 'kind': 'interactive', 'sessionId': 'sid-pl1', 'name': 'c-pl1', 'status': 'idle'},
+         {'pid': 5102, 'cwd': f'{sb}/plain', 'kind': 'interactive', 'sessionId': 'sid-pl2', 'name': 'c-pl2', 'status': 'idle'}]
+open(f'{sb}/peers-plain.json', 'w').write(json.dumps(plain))
+BP_V
+  # (av) o teto conta SESSÕES distintas: a mesma sessão em dois terminais (mesmo sid) não estoura o teto de 2
+  _bp_av() { local a; a="$(BP_PROC="${sb}/proc-cap" _bpr "$1" --tsv --peers "${sb}/peers-cap.json" --max-interactive 2)"
+    BP_WHY="$(grep -E "SESSION_CAP|hygiene" <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    ! grep -q "SESSION_CAP" <<< "${a}"; }
+  _bpcase "(av) o teto conta sessões distintas, não processos (retomada em dois terminais conta uma)" \
+    "    if inter_sessions > int(max_inter):" "    if len(inter) > int(max_inter):" _bp_av
+  # (aw) rev-parse por cwd que estoura o teto (mount travado simulado por BATON_TOPLEVEL_TIMEOUT_S=0) vira LACUNA, nunca «mesmo checkout»
+  _bp_aw() { local a; a="$(export BATON_TOPLEVEL_TIMEOUT_S=0; _bphy "$1")"
+    BP_WHY="$(grep -E "pendurou|SAME_CHECKOUT" <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "pendurou.*checkout NÃO medido" <<< "${a}" && ! grep -q "SESSION_SAME_CHECKOUT" <<< "${a}"; }
+  _bpcase "(aw) rev-parse pendurado vira HYGIENE_UNMEASURED, nunca mesmo checkout por palpite" \
+    "            if rc_t is None:   # o rev-parse pendurou" "            if False:   # o rev-parse pendurou" _bp_aw
+  # (ax) duas interativas no mesmo diretório FORA de repo git NÃO saem SESSION_SAME_CHECKOUT (o remédio --worktree não se aplica)
+  _bp_ax() { local a; a="$(BP_PROC="${sb}/proc-plain" _bpr "$1" --tsv --peers "${sb}/peers-plain.json")"
+    BP_WHY="$(grep -E "SAME_CHECKOUT|hygiene|gap" <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    ! grep -q "SESSION_SAME_CHECKOUT" <<< "${a}"; }
+  _bpcase "(ax) fora de repo git não há mesmo checkout (nem cura --worktree)" \
+    "        if git_top is None: continue" "        if git_top is None: git_top = real(p['cwd'])" _bp_ax
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
