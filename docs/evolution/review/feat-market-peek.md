@@ -2,8 +2,7 @@
 branch: feat/market-peek
 pr: pendente
 date: 2026-11-16
-reviewed_diff_sha256: 1864faaa45a980e53134f6fbde3df0450429dcf4e7ea244f1b9112cd34f7f9d0
-reviewed_code_sha256: f2de2bb472af643f64c9903fc8570282ffe657ed2989079a601a9ef502c8dc0b
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 3
 findings_blocking: 0
@@ -11,7 +10,8 @@ tokens: 0
 duration_min: 15
 findings_fixed: 3
 verdict: FIXED
-elenxo: false
+elenxo: true
+elenxo_isolado: true
 reviewer: "1ª passada (2026-11-13): o próprio agente de execução, voz única, declarada (5 achados, 3 reais, 3 corrigidos). 2ª passada, INDEPENDENTE (2026-11-16): agente revisor separado, só leitura, mandato de refutar, lançado pela sessão do core sobre o diff rebaseado, incluindo o commit da exceção do corte por papel que entrou depois da 1ª: NO_FINDINGS. Medido por ele: bancada market_peek,role_cut 85 passaram e 0 falharam, com os mutantes do peek todos pegos; peek-census.sh no repo rc 0; community-peek.sh com curl falhando sai PARCIAL rc 1 (fail-closed); a exceção do corte casa só a palavra literal peek. Não verificado por ele: as fontes ao vivo (mandato sem rede). Observação não bloqueante: --sources com vírgula à frente dá rc 2 e com vírgula ao fim é tolerado."
 nota: "tokens 0 = não medido. Medido: bancada market_peek 36 de 36 (18 casos e 18 mutantes), radar --integrity --schema exit 0 e kg-contract-check rc 0 nos dois grafos, ops/kg-vocab-ci.sh rc 0, peek-census.sh no repo rc 0 (1 espiada, 0 inválidas), community-peek.sh ao vivo rc 0 (hn 200, github 200, lobsters 200, reddit GAP)."
 ---
