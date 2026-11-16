@@ -2,7 +2,8 @@
 branch: feat/session-open
 pr: pendente
 date: 2026-11-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 977691d08bb010e612211c55fe026d43c23c6a4cd19eac8df7cd59f50e31a51a
+reviewed_code_sha256: 458caf9806e87f142b8b885c7d8473d973b549db8e9ec8fbaf7ead8f340680b5
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
