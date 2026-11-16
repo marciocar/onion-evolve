@@ -66,9 +66,9 @@
 #   (BATON_PROC, padrão /proc): stat (estado, ppid), comm e, SÓ do processo `claude`, a chave TMUX do environ (presença;
 #   o resto do ambiente nunca sai). Aviso, nunca bloqueio; cada aviso traz o comando de cura como texto:
 #   SESSION_STOPPED        estado T|t (Ctrl+Z, SIGSTOP): suspensa e invisível, o harness segue listando idle.
-#   SESSION_NOT_IN_TMUX    sem TMUX e sem ancestral tmux (ex.: mosh-server→bash): morre com o terminal.
+#   SESSION_NOT_IN_TMUX    sem TMUX e sem ancestral tmux (ex.: mosh-server→bash): sem reanexar e sem sobreviver a reboot/fim do terminal.
 #   SESSION_SAME_CHECKOUT  duas interativas vivas no mesmo topo git: a 2ª abre com `claude --worktree`.
-#   SESSION_CAP            interativas vivas acima de --max-interactive (padrão 4).
+#   SESSION_CAP            SESSÕES interativas distintas (dedupe por sid; a retomada em dois terminais conta uma) acima de --max-interactive (padrão 4).
 #   Estado ou árvore ilegível é lacuna (HYGIENE_UNMEASURED), nunca «em tmux».
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
@@ -87,7 +87,7 @@
 # Env (bancada; todo override ativo é DECLARADO na saída):
 #   BATON_NOW=<epoch>  BATON_STATE_DIR=<dir> (padrão ~/.local/state/onion/baton)  BATON_PROJECTS_DIR=<dir>
 #   BATON_DECIDE_TSV=<arquivo> (saída pronta do decide-census --tsv)  BATON_CLAUDE=<binário>  ONION_ASK_DIR=<dir>
-#   BATON_PROC=<dir> (um /proc falso: a bancada da higiene)
+#   BATON_PROC=<dir> (um /proc falso: a bancada da higiene)  BATON_TOPLEVEL_TIMEOUT_S=<seg> (teto do rev-parse por cwd, padrão 5)
 # Exit: 0 = medido (inclusive com lacunas DECLARADAS) · 2 = entrada quebrada (opção, data, python3/PyYAML ausente).
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_baton_pulse_selftests).
 # ===========================================================================
@@ -162,7 +162,7 @@ if [ -f "${_ll}" ]; then
   bash "${_ll}" check >/dev/null 2>&1; case "$?" in 0) LOAD_LINE="${LOAD_LINE} · lease livre" ;; 3) LOAD_LINE="${LOAD_LINE} · lease OCUPADO (load ≥ HIGH)" ;; *) LOAD_LINE="${LOAD_LINE} · lease não mediu" ;; esac
 else LOAD_LINE="${LOAD_LINE} · lease ausente neste papel"; fi
 
-OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
+OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC|TOPLEVEL_TIMEOUT_S)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${QUIET}" "${SINCE}" "${LAST}" "${IDLE}" "${PEERS}" "${PEERS_SRC}" \
   "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" "${MAXI}" <<'PY'
@@ -192,8 +192,14 @@ def parse_since(s):
     d = d.replace(hour=int(m.group(2) or 0), minute=int(m.group(3) or 0), second=int(m.group(4) or 0))
     return int(d.timestamp())
 since_ts = parse_since(since)
-def git(*a, cwd=None):
-    r = subprocess.run(['git', '-C', cwd or repo, *a], capture_output=True, text=True); return r.returncode, r.stdout.strip()
+def git(*a, cwd=None, timeout=None):
+    # timeout=None (o default de toda chamada) = sem teto, comportamento inalterado; só a varredura de cwd dos peers
+    # passa um teto curto (cwd em mount travado pendura o pulso inteiro). Estouro → (None, '') e quem chamou nomeia a LACUNA.
+    try:
+        r = subprocess.run(['git', '-C', cwd or repo, *a], capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return None, ''
+    return r.returncode, r.stdout.strip()
 def real(p):
     try: return os.path.realpath(p)
     except Exception: return p
@@ -623,11 +629,16 @@ pc_line = ('peças: ' + ' · '.join(f'{c} {sum(1 for p in PIECES if p["cls"] == 
 #   comm    o nome, para subir a árvore e para conferir que o pid é `claude` ANTES de abrir o environ;
 #   environ SÓ do processo claude, e dele SÓ a chave TMUX (presença; o valor e o resto nunca saem: pode haver segredo).
 #   SESSION_STOPPED       estado T|t: a sessão suspensa (Ctrl+Z, SIGSTOP) é invisível ao harness, que a lista como idle.
-#   SESSION_NOT_IN_TMUX   sem TMUX no environ e sem ancestral tmux: morre com o terminal (mosh, ssh) e ninguém a vê.
-#   SESSION_SAME_CHECKOUT duas interativas vivas no mesmo checkout (topo git do cwd, não a worktree): a 2ª vai de --worktree.
-#   SESSION_CAP           interativas vivas acima de --max-interactive (padrão 4; o teto prático é 4 sessões + 5 agentes).
+#   SESSION_NOT_IN_TMUX   sem TMUX no environ e sem ancestral tmux: fora do tmux não há como reanexar nem sobreviver a
+#                         reboot ou ao fim do processo do terminal (ssh puro cai com a conexão; mosh sobrevive à queda de rede, não a isto).
+#   SESSION_SAME_CHECKOUT duas interativas vivas no mesmo checkout git (topo git do cwd, não a worktree): a 2ª vai de --worktree.
+#                         SÓ dentro de repo git: fora dele o remédio --worktree não existe, então não se classifica. O rev-parse por
+#                         cwd tem teto curto (BATON_TOPLEVEL_TIMEOUT_S, padrão 5s); estouro vira HYGIENE_UNMEASURED, nunca «mesmo checkout» por palpite.
+#   SESSION_CAP           SESSÕES interativas distintas (dedupe por sid) acima de --max-interactive (padrão 4; o teto prático é 4 sessões + 5 agentes).
 #   Ilegível nunca é limpo: estado ou árvore que não se leem saem como lacuna nomeada (HYGIENE_UNMEASURED), não «em tmux».
 proc_root = os.environ.get('BATON_PROC') or '/proc'
+try: toplevel_timeout = float(os.environ.get('BATON_TOPLEVEL_TIMEOUT_S') or 5)
+except ValueError: toplevel_timeout = 5.0
 def proc_stat(pid):
     """→ (estado, ppid) ou None. O comm entre parênteses pode ter espaço e ')': corta no ÚLTIMO ')'."""
     try: raw = open(os.path.join(proc_root, str(pid), 'stat'), encoding='utf-8', errors='replace').read()
@@ -672,12 +683,19 @@ if peers_ok:
         if key or seen_tmux: continue
         if key is None and broken:
             hy_gaps.append(f'{tag}: sem chave TMUX legível e árvore cortada em {"→".join(chain) or "?"}: tmux NÃO medido'); continue
-        HY.append(('SESSION_NOT_IN_TMUX', p, f'{tag} roda fora do tmux (sem TMUX no ambiente; árvore {"→".join(chain) or "—"}): morre com o terminal',
+        HY.append(('SESSION_NOT_IN_TMUX', p, f'{tag} roda fora do tmux (sem TMUX no ambiente; árvore {"→".join(chain) or "—"}): sem reanexar e sem sobreviver a reboot ou ao fim do processo do terminal (ssh puro cai com a conexão; mosh não)',
                    f'na sessão, /exit; depois: tmux new -s {tmux_name(p["name"])} -c {tilde(p["cwd"])} \'claude --resume {p["sid"]}\''))
     tops = {}
     for p in inter:
-        rc_t, top = git('rev-parse', '--show-toplevel', cwd=p['cwd']) if p['cwd'] and os.path.isdir(p['cwd']) else (1, '')
-        tops.setdefault(real(top) if rc_t == 0 and top else p['cwd'], []).append(p)
+        git_top = None
+        if p['cwd'] and os.path.isdir(p['cwd']):
+            rc_t, top = git('rev-parse', '--show-toplevel', cwd=p['cwd'], timeout=toplevel_timeout)
+            if rc_t is None:   # o rev-parse pendurou (cwd em mount travado): LACUNA nomeada, nunca «mesmo checkout» por palpite
+                hy_gaps.append(f'{p["name"] or p["sid"][:8]} (pid {p["pid"]}): git rev-parse --show-toplevel em {tilde(p["cwd"])} '
+                               f'pendurou (>{toplevel_timeout:g}s, mount travado?): checkout NÃO medido'); continue
+            if rc_t == 0 and top: git_top = real(top)
+        if git_top is None: continue   # fora de repo git (ou sem cwd): o remédio --worktree não se aplica, não é «mesmo checkout»
+        tops.setdefault(git_top, []).append(p)
     for top, ps in sorted(tops.items()):
         if len(ps) < 2 or not top: continue
         same_sid = len({p['sid'] for p in ps}) < len(ps)
@@ -688,8 +706,12 @@ if peers_ok:
                        (f'a mesma sessão em dois processos: feche o terminal de um deles (pids {", ".join(str(q["pid"]) for q in ps)}); '
                         f'trabalho paralelo abre com: cd {tilde(top)} && claude --worktree {tmux_name(p["name"])}-2') if same_sid else
                        f'feche a 2ª e reabra isolada: cd {tilde(top)} && claude --worktree {tmux_name(p["name"])}-2'))
-    if len(inter) > int(max_inter):
-        HY.append(('SESSION_CAP', None, f'{len(inter)} sessões interativas vivas, acima do teto de {max_inter} (teto prático: 4 sessões + 5 agentes)',
+    # o TETO conta SESSÕES distintas, não processos: a sessão retomada em dois terminais (mesmo sid, dois pids) conta uma
+    # vez (a contagem por processo fica onde é intencional: SESSION_SAME_CHECKOUT). Sid vazio não deduplica (conta por processo).
+    inter_sessions = len({p['sid'] for p in inter if p['sid']}) + sum(1 for p in inter if not p['sid'])
+    if inter_sessions > int(max_inter):
+        proc_note = f' ({len(inter)} processo(s))' if len(inter) != inter_sessions else ''
+        HY.append(('SESSION_CAP', None, f'{inter_sessions} sessão(ões) interativa(s) distinta(s){proc_note} acima do teto de {max_inter} (teto prático: 4 sessões + 5 agentes)',
                    'feche ou estacione (parked.tsv) a ociosa sem fila; agente em vez de sessão para trabalho curto'))
 else: hy_gaps.append('lista de peers não lida: sem pid não há processo a medir')
 HORD = {c: i for i, c in enumerate(('SESSION_STOPPED', 'SESSION_NOT_IN_TMUX', 'SESSION_SAME_CHECKOUT', 'SESSION_CAP'))}
