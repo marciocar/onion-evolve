@@ -1135,38 +1135,11 @@
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
 
-## guardas-revisao-2026-08 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 21.6 | `Q_GUARDAS_COERENTES` | guardas-revisao-2026-08 | as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna? |
-| 8.1 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
-| 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
-| 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
-
-## forge-evolve-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
-| 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
-
-## task-manager-capabilities-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 20.4 | `D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA` | task-manager-capabilities-2026-10 | Substrato: check de lint (REGRA 103), HARD, que roda também no repo derivado, porque os adapters viajam. Molde: ops-citation-trav |
-| 14.4 | `D_FORMATO_TSV_IRMAO_DO_ADAPTER` | task-manager-capabilities-2026-10 | Formato: TSV irmão do adapter (adapters/<p>.capabilities.tsv), com o vocabulário num bloco TSV marcado na interface. Nem YAML ne |
-| 6.8 | `C_TETO_FONTE_EXISTE_NAO_SUSTENTA` | task-manager-capabilities-2026-10 | TETO: a guarda confere que a fonte EXISTE (nó do grafo, trecho do adapter), não que ela SUSTENTA a afirmação. Um kg: que apont |
-| 5.1 | `C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA` | task-manager-capabilities-2026-10 | TETO: superfície de campo (field:priority, field:tags) é conferida só pela presença da palavra no adapter. Pega o adapter que  |
-| 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
-| 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
-
 ## core — 47 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 19.6 | `Q_BATON_IDLE_SESSIONS_1112` | forge-baton-2026-11 | sessões ficam ociosas esperando algo enquanto há trabalho pronto em outra fila: como medir quem está parado com trabalho pronto |
+| 22.4 | `Q_BATON_IDLE_SESSIONS_1112` | forge-baton-2026-11 | sessões ficam ociosas esperando algo enquanto há trabalho pronto em outra fila: como medir quem está parado com trabalho pronto |
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
 | 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
@@ -1174,12 +1147,12 @@
 | 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
 | 12.0 | `Q_PEEK_LADDER_LEARNS_1113` | peek-ledger-2026-11 | a escada da espiada (nível por reversibilidade x severidade x incerteza) escolhe o esforço certo? O histórico de espiadas regis |
 | 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
+| 9.6 | `Q_BATON_PHASE2_MATCH_AND_MEASURE_1112` | forge-baton-2026-11 | fase 2: casar a sessão ociosa com a fila dela (oferta, nunca ordem) e medir por um dia as horas ociosas com fila, antes e depois  |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
 | 7.7 | `Q_CORE_ACTIONS_SHA_PIN_1116` | outside-in-primaries-2026-11 | As 12 uses por tag móvel nos workflows do core passam a SHA, com atualização declarada? |
 | 7.7 | `Q_DOORS_ATTESTATION_1130` | outside-in-primaries-2026-11 | Cada publicação de porta sai com atestação verificável da procedência? Hoje só o carimbo source_commit. |
-| 7.2 | `Q_BATON_PHASE2_MATCH_AND_MEASURE_1112` | forge-baton-2026-11 | fase 2: casar a sessão ociosa com a fila dela (oferta, nunca ordem) e medir por um dia as horas ociosas com fila, antes e depois  |
 | 7.2 | `Q_PS_ESCADA_DE_AUTONOMIA_1113` | persona-servico-2026-11 | Escada de autonomia por tipo de ato da persona de serviço (rascunho, ato reversível, ato externo), forjada pelo /meta:forge como |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_PF_CHANNEL_TEMPLATES_1127` | persona-fases-2-3-2026-11 | Os modelos de mensagem por canal (chat, WhatsApp, e-mail, task manager), únicos para a persona e para o task manager, na mensager |
@@ -1213,6 +1186,33 @@
 | 3.0 | `Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109` | maestro-decisions-1109b | O hook do onion-plugins funciona em pasta não confiada, e quais são os requisitos duros do diretório comunitário? |
 | 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
 | 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
+
+## guardas-revisao-2026-08 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.6 | `Q_GUARDAS_COERENTES` | guardas-revisao-2026-08 | as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna? |
+| 8.1 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
+| 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
+| 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
+
+## forge-evolve-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
+| 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
+
+## task-manager-capabilities-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 20.4 | `D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA` | task-manager-capabilities-2026-10 | Substrato: check de lint (REGRA 103), HARD, que roda também no repo derivado, porque os adapters viajam. Molde: ops-citation-trav |
+| 14.4 | `D_FORMATO_TSV_IRMAO_DO_ADAPTER` | task-manager-capabilities-2026-10 | Formato: TSV irmão do adapter (adapters/<p>.capabilities.tsv), com o vocabulário num bloco TSV marcado na interface. Nem YAML ne |
+| 6.8 | `C_TETO_FONTE_EXISTE_NAO_SUSTENTA` | task-manager-capabilities-2026-10 | TETO: a guarda confere que a fonte EXISTE (nó do grafo, trecho do adapter), não que ela SUSTENTA a afirmação. Um kg: que apont |
+| 5.1 | `C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA` | task-manager-capabilities-2026-10 | TETO: superfície de campo (field:priority, field:tags) é conferida só pela presença da palavra no adapter. Pega o adapter que  |
+| 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
+| 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
 
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
