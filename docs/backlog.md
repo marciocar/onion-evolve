@@ -5,17 +5,18 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1136 itens abertos** em 170 grafo(s) com aberto (de 228 no escopo) · 164 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1137 itens abertos** em 170 grafo(s) com aberto (de 228 no escopo) · 164 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## agent-requester-privilege-2026-11 — 19 item(ns)
+## agent-requester-privilege-2026-11 — 20 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 283.5 | `Q_AGENT_REQUESTER_PRIVILEGE_1113` | agent-requester-privilege-2026-11 | Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próp |
-| 72.0 | `C_ELENXO_RECOMMENDATION_1113` | agent-requester-privilege-2026-11 | Recomendação do Elenxo: delegação (sub=solicitante, act=agente), nunca impersonation; autorização a jusante; aprovação hum |
-| 24.0 | `C_LESSER_OF_AGENT_AND_REQUESTER_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: privilégio efetivo = menor entre agente e solicitante é o padrão de 2026. Sustentada como prática de me |
+| 333.0 | `Q_AGENT_REQUESTER_PRIVILEGE_1113` | agent-requester-privilege-2026-11 | Como um agente que atende várias pessoas (ex.: bot de Slack) age com o privilégio de quem pediu, e não com um privilégio próp |
+| 81.0 | `C_ELENXO_RECOMMENDATION_1113` | agent-requester-privilege-2026-11 | Recomendação do Elenxo: delegação (sub=solicitante, act=agente), nunca impersonation; autorização a jusante; aprovação hum |
+| 26.0 | `C_LESSER_OF_AGENT_AND_REQUESTER_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: privilégio efetivo = menor entre agente e solicitante é o padrão de 2026. Sustentada como prática de me |
 | 16.8 | `C_AUDIT_KIT_NORMATIVE_BASIS_1113` | agent-requester-privilege-2026-11 | Hipótese da pergunta: aprovação por papel e o kit de auditoria (política, inventário de contas, matriz de papéis, log por at |
-| 4.8 | `Q_OWASP_HALF_CLOSED_SEAL_REVIEW_1114` | agent-requester-privilege-2026-11 | Com a metade OWASP da objeção de versão fechada (LLM Top 10 -> 2026; ASI Threats -> v1.1; Agentic Top 10 -> 2026), o selo pode  |
+| 12.0 | `Q_NIST_HALF_CLOSED_SEAL_REVIEW_1115` | agent-requester-privilege-2026-11 | Fechadas as duas metades (conteúdo do item Excessive Agency da edição 2026 e atualidade datada do NIST em 2026-11), a revisão  |
+| 4.5 | `C_SUPERACAO_20261115_COMPLETE_MEDIATION_GRADUATED_2026` | agent-requester-privilege-2026-11 | A formulação corrigida: a mediação completa já era a estratégia 7 da edição 2025; o que a edição 2026 acrescenta é a po |
 | 3.0 | `C_SUPERACAO_20261113_ASI08_PER_ACT_LOG` | agent-requester-privilege-2026-11 | A trilha por ato vem do log, não do token: OWASP ASI08 item 10 pede logs à prova de adulteração, com carimbo de tempo, ligados |
 | 3.0 | `C_SUPERACAO_20261113_HARDY_CLAUSE_VS_RESTRICTION` | agent-requester-privilege-2026-11 | Hardy, no mesmo parágrafo: cada cláusula nova abria falha de segurança em programa seguro, cada restrição nova quebrava progr |
 | 3.0 | `C_SUPERACAO_20261113_HARDY_EXPLICIT_DESIGNATION` | agent-requester-privilege-2026-11 | Hardy, mesmo trecho: a cura é a designação explícita por ato; o deputado usa capability PRÓPRIA para os recursos dele (STAT)  |
