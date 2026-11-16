@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1183 itens abertos** em 172 grafo(s) com aberto (de 231 no escopo) · 166 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1184 itens abertos** em 172 grafo(s) com aberto (de 231 no escopo) · 166 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1135,7 +1135,7 @@
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
 
-## core — 47 item(ns)
+## core — 48 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1143,6 +1143,7 @@
 | 17.5 | `Q_MA_AUDIENCES` | company-brain-multiaudiencia-2026-10 | Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento)  |
 | 15.0 | `C_MA_MCP_READ_LIVE` | company-brain-multiaudiencia-2026-10 | O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir  |
 | 14.4 | `Q_PF_ORDER_RECHECK_1117` | persona-fases-2-3-2026-11 | A ordem das peças: selo e áreas, filtro por área, identidade e papel, ponte, modelos de mensagem. Reconferida contra o D_MA_ARC |
+| 13.6 | `D_SESSION_HYGIENE_TMUX_WORKTREE_1114` | forge-baton-2026-11 | Higiene das sessões na VPS: toda sessão claude longa roda em tmux nomeado; a 2ª sessão interativa no mesmo checkout abre com c |
 | 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
 | 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
 | 12.0 | `Q_PEEK_LADDER_LEARNS_1113` | peek-ledger-2026-11 | a escada da espiada (nível por reversibilidade x severidade x incerteza) escolhe o esforço certo? O histórico de espiadas regis |
