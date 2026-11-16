@@ -10,6 +10,25 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.53.0] - 2026-11-16
+
+Sem mudança no contrato: nenhum veredito MUST ou SHOULD muda.
+
+- O `kg_audit.py` falha fechado no grafo que reprova no MUST do contrato. Antes, ele montava o pacote sem validar o
+  grafo e só reconhecia evidência por arestas `SUPPORTS` ou `TRACES_TO`: uma aresta com `edge_type` fora do enum
+  (`ANSWERS`, ou um `SUPPORT` truncado) fazia a evidência sumir do pacote, mostrava a lacuna falsa
+  `no-confirmed-evidence` e saía com rc 0. Agora ele confere os grafos que o pacote lê (os com
+  `x_questionnaire`, as respostas que o `DEPENDS_ON` puxa e os grafos com aresta que os toca) com o leitor de referência,
+  inclusive a ponta externa quando o grafo dela foi carregado; o grafo sem relação com o pacote não o bloqueia, e o grafo que parseia mas reprova no MUST é entrada
+  quebrada: rc 2, nenhum pacote e uma linha por grafo no stderr, com os códigos. Isso muda comportamento documentado: a
+  evidência confirmada cujo `verified_at` não é data saía como a lacuna `evidence-unstamped`, e agora para o pacote,
+  porque esse `verified_at` já reprova no MUST. O grafo que não parseia segue em `unreadable`, com rc 1. O
+  `kg_query.load` ganha `keep_texts`, que guarda o texto de cada grafo lido.
+
+- O perfil `gate` do vendor passa a levar o `tools/kg_vocab.py` (19 arquivos): a conferência de códigos da casa de um
+  repositório que adota o Onion o importa, e o adotante que vendoriza só o perfil `gate` saía com exit 1 sem ele. As
+  dependências dele (`kg_i18n`, `kg_query`, `kg_validate`) já estavam no perfil. Nenhum veredito muda.
+
 ## [4.52.0] - 2026-11-15
 
 Contrato v4.23, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.

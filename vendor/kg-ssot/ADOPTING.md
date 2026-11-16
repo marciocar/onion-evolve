@@ -96,9 +96,10 @@ The published tags are listed by `git ls-remote --tags https://github.com/marcio
   - a vendor that differs from its stamp, unless you pass `--force`. This keeps a local edit from vanishing
     silently.
 - **Minimal profile:** if you only run the gate and the check, you can vendor the `gate` profile with
-  `--profile gate`. It has 18 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the reader of
-  the kg-mcp area policy that the gate's `--classification-floor` uses (`tools/kg_policy.py`, since 4.52.0), the vendor
-  tool, the trace check with the query module it imports and its output schema (`tools/kg_trace.py`,
+  `--profile gate`. It has 19 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the reader of
+  the kg-mcp area policy that the gate's `--classification-floor` uses (`tools/kg_policy.py`, since 4.52.0), the
+  vocabulary lint that the house-codes check of an Onion-adopted repository imports (`tools/kg_vocab.py`, since
+  4.53.0), the vendor tool, the trace check with the query module it imports and its output schema (`tools/kg_trace.py`,
   `tools/kg_query.py`, and `spec/trace.schema.json`, since 4.25.1), the vector module the query imports only for
   `--semantic` and its pinned requirements (`tools/kg_vector.py` and `tools/requirements-vector.txt`, since 4.26.0), the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
   `requirements.txt`, this guide, `LICENSE`, and `NOTICE`. The conformance suite stays out, so `kg_conformance.py` and
@@ -363,7 +364,7 @@ The PR that changes the tag does three things:
 From 4.47.0 on, add `--verify-attestation` to the update to refuse a tree that does not match the manifest the release
 attested; it needs `gh` and the network ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)). In a sandbox where
 the user cache (`.cache` in the home directory) is read-only, run it with `XDG_CACHE_HOME` pointing to a writable directory, since `gh` writes the Sigstore
-trust root there; the verification stays whole.
+trust root there; if the data directory (`.local/share`) is read-only too, point `XDG_DATA_HOME` to a writable directory as well (seen in an adopter in 2026-11). The verification stays whole.
 
 A new SHOULD warning raises the debt by design. The contract's ramps (SHOULD today, MUST later) arrive this way, as a
 measured commitment.
@@ -394,6 +395,13 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.52.0` to `kg-ssot-v4.53.0`, nothing is required: the contract (v4.23) and the verdicts are the same, and
+the full release brings no new file. The `gate` profile now carries `tools/kg_vocab.py`, which was already in the full
+release, and has 19 files. One output can differ: `kg_audit.py` now checks the graphs the package reads with the
+reference reader, and a graph among them that fails the MUST is broken input (rc 2, no package) instead of a package with
+a false gap; a confirmed piece of evidence whose `verified_at` is not a date stops the package instead of showing an
+`evidence-unstamped` gap.
 
 From `kg-ssot-v4.51.0` to `kg-ssot-v4.52.0`, contract v4.23 comes in, SHOULD only: no graph that passed fails, and no MUST
 verdict changes. It adds the disposal deadline of the whole graph, in `meta`: `x_dispose_by` (a calendar date),

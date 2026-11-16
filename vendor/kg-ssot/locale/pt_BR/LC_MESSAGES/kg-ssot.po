@@ -4720,3 +4720,7 @@ msgstr ""
 #: tools/kg_validate.py
 msgid "x_dispose_by {value} is not a YYYY-MM-DD date: the deadline is not measured"
 msgstr "x_dispose_by {value} não é uma data AAAA-MM-DD: o prazo não é medido"
+
+#: tools/kg_audit.py
+msgid "{file} does not pass the contract MUST ({codes}): the package would read it wrong; see kg_validate.py {file}"
+msgstr "{file} não passa no MUST do contrato ({codes}): o pacote o leria errado; veja kg_validate.py {file}"

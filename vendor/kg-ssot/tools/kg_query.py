@@ -92,6 +92,7 @@ class Corpus:
         self._degree = {"in": collections.defaultdict(collections.Counter), "out": collections.defaultdict(collections.Counter)}
         self._degree_seen = 0
         self.end_path = None  # (arquivo que cita, caminho) -> caminho no corpus: só o filtro por área do kg_mcp liga
+        self.texts = None  # arquivo -> o texto lido: só quando quem carrega pede (o kg_audit confere o MUST de cada grafo)
 
     def internal_degree(self, key, side, edge_type=None):
         """Quantas arestas internas do grafo do nó tocam o nó, em in, out ou total, de um tipo ou de todos. A linha repetida
@@ -108,6 +109,8 @@ class Corpus:
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
             return
         self.files.append(name)
+        if self.texts is not None:
+            self.texts[name] = text
         _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(name, text) if not isinstance(text, kg_validate.JsonText)
                                             else text)
         if code or not isinstance(doc, dict):
@@ -256,13 +259,16 @@ def file_kept(name, exclude, vendors):
     return not (any(fnmatch.fnmatchcase(name, pat) for pat in exclude) or kg_validate.in_vendor(name, vendors))
 
 
-def load(root=None, files=(), exclude=(), defaults=True):
+def load(root=None, files=(), exclude=(), defaults=True, keep_texts=False):
     """O corpus de --root (os rastreados pelo git, ou todos sob a pasta) ou dos arquivos dados. exclude: padrões glob
     sobre o caminho relativo (export/*, *.kg.yaml) que ficam de fora, somados aos DEFAULT_EXCLUDE quando defaults.
     Com defaults, fica de fora também toda pasta com o carimbo do vendor (kg_validate.vendor_dirs), onde quer que ela
-    esteja. Os arquivos dados um a um nunca são excluídos. ValueError: entrada quebrada."""
+    esteja. Os arquivos dados um a um nunca são excluídos. keep_texts guarda o texto de cada arquivo em corpus.texts.
+    ValueError: entrada quebrada."""
     exclude = (DEFAULT_EXCLUDE if defaults else ()) + tuple(exclude)
     corpus = Corpus()
+    if keep_texts:
+        corpus.texts = {}
     if root is not None:
         base = pathlib.Path(root)
         if not base.is_dir():
