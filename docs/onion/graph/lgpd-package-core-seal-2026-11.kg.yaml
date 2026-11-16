@@ -1,0 +1,67 @@
+meta:
+  schema_version: "1"
+  id: lgpd-package-core-seal-2026-11
+  slug: lgpd-package-core-seal-2026-11
+  title: "Selo do core sobre o pacote LGPD mínimo do operador, pesquisado pela curadoria"
+  date: "2026-11-16"
+  baseline: "2026-11-16"
+  review_after: "2026-12-16"
+  purpose: "A curadoria pesquisou o pacote LGPD do operador e propôs o selo. Este grafo guarda o selo do core: quais elementos são bloqueantes antes do primeiro inquilino externo no serviço da VPS, e o que fica de fora do selo."
+  note: "TETO, declarado: sela a LISTA mínima de elementos, não a implementação de nenhum deles nem a pessoa jurídica do operador (decisão do maestro, com pesquisa antes). Selado pelo core em nome do maestro, revogável por ele. Não é parecer jurídico."
+external_edges:
+  - from: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
+    to: "docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml#D_LGPD_OPERATOR_LEGAL_ENTITY_RESEARCH_FIRST_1111"
+    edge_type: TRACES_TO
+nodes:
+  - id: E_LGPD_LAW_READ_BY_CORE_1116
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    evidence_class: measurement
+    verified_at: "2026-11-16"
+    verified_against: "texto da Lei 13.709/2018 lido pelo core em 2026-11-16 na página do Planalto: art. 5 VII (operador trata em nome do controlador), art. 15 e 16 (término e eliminação), art. 18 V, VI e parágrafo 6, art. 19 parágrafo 3, art. 37 (registro das operações por controlador e operador), art. 39 (operador trata segundo as instruções do controlador), art. 42 parágrafo 1 I (responsabilidade solidária do operador), art. 46 caput e parágrafos 1 e 2 (segurança desde a concepção), art. 47 (segurança mesmo após o término) e art. 48 (comunicação de incidente em prazo razoável definido pela autoridade). Cada base legal citada no estudo da curadoria confere com o texto."
+    label: "As bases legais que o estudo da curadoria atribui a cada um dos seis elementos conferem com o texto da Lei 13.709/2018 lido pelo core na fonte primária."
+    narrative: "Conferência do core antes de selar. Limite da leitura: a página foi lida por ferramenta de busca que transcreve trechos, não por cópia integral do arquivo; os artigos listados foram transcritos e batem com o estudo. O que a lei NÃO traz, e o estudo declara como padrão de mercado e não como obrigação legal: contrato escrito de operador, conteúdo do registro das operações, política de backup e o prazo em dias da comunicação de incidente."
+    provenance:
+      source: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+      locator: "arts. 5 VII, 15, 16, 18 V, VI e parágrafo 6, 19 parágrafo 3, 37, 39, 42 parágrafo 1 I, 46, 47 e 48"
+      method: "measurement: leitura do texto da lei na fonte primária em 2026-11-16"
+  - id: E_LGPD_INCIDENT_DEADLINE_UNVERIFIED_1116
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    evidence_class: testimony
+    label: "O prazo de três dias úteis da comunicação de incidente vem da Resolução CD/ANPD 15 de 2024, que nem a curadoria nem o core leram na fonte primária; fontes de terceiros convergem no prazo à autoridade e divergem no prazo ao titular."
+    narrative: "A lei diz só «prazo razoável, conforme definido pela autoridade nacional» (art. 48 parágrafo 1). O número em dias vem da resolução, cujo texto no Diário Oficial não abriu em 2026-11-16 para a curadoria nem para o core. Fontes de terceiros (escritórios e análises) convergem em três dias úteis à autoridade, contados do conhecimento do incidente, com complementação em vinte dias úteis; uma delas diz que o titular segue o mesmo prazo e outra diz «sem demora injustificada». As mesmas fontes dizem que o prazo conta em dobro para agente de pequeno porte, o que pode valer para o operador e para os primeiros inquilinos. Nada disso é número selado até a resolução ser lida."
+    provenance:
+      source: "busca do core em 2026-11-16 por fontes de terceiros sobre a Resolução CD/ANPD 15 de 2024"
+      locator: "resultados de escritórios e análises jurídicas; texto oficial não aberto"
+      method: "testimony: fontes de terceiros, sem leitura da primária"
+  - id: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-16"
+    verified_against: "proposta da curadoria no estudo do pacote LGPD do operador (pergunta de selo aberta por ela em 2026-11-16), conferida pelo core contra o texto da Lei 13.709/2018 no mesmo dia"
+    label: "O pacote LGPD mínimo e bloqueante do operador, antes do primeiro inquilino externo, tem seis elementos: contrato de operador, registro das operações por inquilino, plano de incidente, saída completa por inquilino, retenção e backup por inquilino, e segredos fora do contêiner."
+    narrative: "O core sela a LISTA dos seis como piso: nenhum inquilino externo entra no serviço da VPS sem os seis existirem e serem conferidos. Cada elemento carrega a base legal e o padrão de mercado do estudo da curadoria. Ressalva selada junto: no plano de incidente, o elemento é obrigatório, mas o prazo em dias NÃO está selado enquanto a resolução da autoridade não for lida na fonte primária; até lá o plano adota o prazo mais curto entre as leituras (três dias úteis para a autoridade e para o titular), por ser a escolha segura. Fora deste selo: a implementação de cada elemento, a pessoa jurídica do operador (decisão do maestro, com pesquisa antes) e qualquer parecer jurídico. Selado pelo core em nome do maestro, revogável por ele."
+    provenance:
+      source: "sessão do core, sobre a pesquisa da curadoria"
+      locator: "selo do core de 2026-11-16 sobre a proposta do pacote LGPD"
+      method: "derived: lente do core sobre o estudo da curadoria, confrontado com o texto da lei"
+edges:
+  - from: E_LGPD_LAW_READ_BY_CORE_1116
+    to: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
+    edge_type: SUPPORTS
+  - from: E_LGPD_INCIDENT_DEADLINE_UNVERIFIED_1116
+    to: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
+    edge_type: CONSTRAINS
