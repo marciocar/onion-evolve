@@ -1,7 +1,7 @@
 ---
 branch: feat/review-auto-with-fallback
 date: 2026-11-13
-reviewed_diff_sha256: 13c7fdaba7cfeb1ae18cfeeb95a64b53d687cfa2edad241e4af58b2c47a7e079
+reviewed_diff_sha256: 3a5fe47add1a30024cd9b9351460b5e88968fb76c0ff64c003b84cf0c01f1902
 reviewed_code_sha256: fc72e414a5cfb7e15f5a14b2a489e2f91362f026223310bfd28cef873b1f2bc9
 findings_total: 17
 findings_real: 16
