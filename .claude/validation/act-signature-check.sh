@@ -121,7 +121,10 @@ for n, s, marker, verbs in delegs:
 # em posição de comando, `$(…x.sh…)`) têm de estar numa linha ato/delega/fecho. Os dois executores do gate (lint-artifacts
 # e lint-selftest) são FRONTEIRA: estão no fecho, mas o que eles rodam (o resto de .claude/validation) não se desce — o
 # fecho inteiro dá ~130 arquivos e tornaria quase todo PR do core um merge do maestro (declarado no resíduo).
-FRONTEIRA = {".claude/validation/lint-artifacts.sh", ".claude/validation/lint-selftest.sh"}
+# O helper de guarda da revisão também é FRONTEIRA (#1652): ele NÃO executa script do repo (só gh/jq/git/awk); o que
+# casaria o EXEC é o array FIXED_PATTERNS dele — a LISTA de caminhos de guarda (DADO), não execução. Descer nele só
+# renderia falso-positivo (os caminhos da lista, que estão lá como padrão a casar, não como `bash x`). (core-only)
+FRONTEIRA = {".claude/validation/lint-artifacts.sh", ".claude/validation/lint-selftest.sh", "ops/review/guard-paths.sh"}  # (core-only): a maquinaria do moat/fecho é core-only
 EXEC = re.compile(r"""(?:^|[;&|(`{]|\$\(|(?:^|(?<=[\s;&|(`{]))\.\s+|\b(?:bash|sh|source|exec|python3?|timeout\s+\S+)\s+(?:-[\w-]+\s+)*)\s*["']?(?:\$\{?[A-Za-z_]\w*\}?/+|\./|"\$\{?[A-Za-z_]\w*\}?"/+)?((?:ops|\.claude)/[\w./-]+\.(?:sh|py))""", re.M)
 known = set(acts) | set(fecho) | set(d[1] for d in delegs)
 # CAMINHO EM VARIÁVEL (8ª passada do refutador do #1647): `ASM="${HERE}/assemble-plugin.sh"; bash "${ASM}"` não casava.
