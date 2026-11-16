@@ -149,6 +149,9 @@ nodes:
     owner: kg-ssot
     impact: 5
     confidence: 0.5
+    verified_against: "relato do kg-ssot ao core em 2026-11-16, conferido pelo core no vendor da 4.53.0: o CHANGELOG traz o perfil canônico x_classification (só no meta, julgado só quando presente, 4.49.0) e o piso por nível no gate (kg_gate --classification-floor e --area-policy, 4.52.0, adotada no PR 1662); a projeção por audiência é o kg_audit e o kg-mcp por área, curados na 4.53.0. O campo e o piso estão entregues; o nó segue aberto porque fechar a pergunta de produto é selo do maestro (Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION)."
+    evidence_class: measurement
+    verified_at: "2026-11-16"
     label: "Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência?"
     narrative: "É o bloqueador escondido apontado pelo hub: grafos e páginas carregam conteúdo sensível (de segurança e dados de pessoas), e locality: privado não é sensibilidade. Abrir leitura ao negócio pede o campo e a projeção redigida. Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 (não é selo). A decisão vai ao maestro porque mexe no contrato; antes do selo, uma rodada de padrão de mercado."
   - id: Q_MA_MARKET
@@ -191,6 +194,9 @@ nodes:
     owner: kg-ssot
     impact: 3
     confidence: 0.5
+    verified_against: "relato do kg-ssot ao core em 2026-11-16, conferido pelo core na origin/main do repo dele: a decisão D_CROSS_REPO_CONTRACT_1104 existe (grafo cross-repo-edge-2026-11) e diz que o contrato não muda agora; a proposta fica parqueada com gatilho e a consulta de quem cita segue sem alarme. Revisão do gatilho em 2026-12-04."
+    evidence_class: measurement
+    verified_at: "2026-11-16"
     label: "Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes?"
     narrative: "Só abre de fato se Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo (B, C ou a E do maestro, que liga os repos por vendorização com pin). Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CROSS_REPO_1028: as peças existem desde a 4.35.0; falta ferramenta, não contrato."
   - id: Q_MA_WIKI_BRIDGE
