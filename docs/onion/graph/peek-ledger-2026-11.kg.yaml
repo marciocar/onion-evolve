@@ -69,6 +69,38 @@ nodes:
       locator: "news.ycombinator.com/item?id=50393235 · id=50360940 · id=50333115 · id=50098626 · github.com/lightdash/lightdash/issues/32605"
       method: "measurement: community-peek.sh, http_code conferido por fonte"
       locality: "host"
+  - id: E_PEEK_SESSION_OPENER_TMUX_1116
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-16"
+    verified_against: "community-peek.sh \"claude code tmux\" --since-days 30 e \"claude code sessions tmux\" --since-days 90 --gh-in-body em 2026-11-16: hn 200, hn-comments 200, github 200, lobsters 200 nas duas; 3 leituras do HN Algolia items (200); 1 leitura do guia ligado pelo fio do HN de 174 pontos; 1 busca web"
+    x_peek_level: 1
+    x_peek_reversibility: two-way
+    x_peek_severity: 3
+    x_peek_uncertainty: med
+    x_peek_calls: 13
+    x_peek_override: "a tabela dá nível 0 para esta célula; subi ao nível 1 porque o maestro pediu, por escrito, conferir se é a maneira usada pela comunidade em novembro de 2026, e passei do teto de 10 chamadas do nível (13) por rodar duas consultas com janelas diferentes"
+    x_peek_sources:
+      - "hn:200:3"
+      - "hn-comments:200:20"
+      - "github:200:161(titulo,incomplete=false)"
+      - "lobsters:200:1"
+      - "hn-item:200:3"
+      - "guia-ligado-pelo-hn:200:1"
+    x_peek_changed_decision: "no"
+    x_peek_decision: "decisão D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116 e o abridor único ops/session-open.sh (core-only): uma sessão tmux por repo, com o nome do repo, por tmux new-session -A"
+    label: "Espiada (nível 1) sobre como manter várias sessões longas do Claude Code numa máquina remota: a comunidade usa tmux new-session -A, uma sessão por repo com o nome do repo, e sabe que o tmux não sobrevive a reboot."
+    narrative: "Dúvida: padronizar um abridor único sobre tmux é a forma usada em novembro de 2026? Achado (dado não confiável, orienta e não prova): o fio do HN com mais pontos na janela liga um guia que recomenda exatamente tmux new-session -A («attach-or-create», seguro de rodar repetido), uma sessão tmux por repo com o nome do repo e uma janela por agente dentro dela, e declara que nada no tmux sobrevive a reboot. Nos comentários aparecem como alternativas a visão de agentes do próprio Claude Code, combinada com tmux, e terminais novos feitos para agentes, com relato de quedas. A busca web mostra a visão de agentes como prévia de pesquisa desde maio de 2026, com fontes de terceiros divergindo sobre sobreviver ao sono da máquina. Não achei na janela uso corrente de restauração automática de sessões tmux depois de reboot. O que muda na decisão: nada de fundo; confirma o nome por repo e o new-session -A, e reforça que o reboot precisa de um comando que reabra a lista. Lacunas: Reddit e fóruns de fornecedor não cobertos; a documentação oficial não foi lida nesta espiada."
+    trace: "bash .claude/utils/peek/community-peek.sh \"claude code tmux\" --since-days 30 --markdown ; bash .claude/utils/peek/community-peek.sh \"claude code sessions tmux\" --since-days 90 --gh-in-body --markdown ; curl -s https://hn.algolia.com/api/v1/items/50148855"
+    provenance:
+      source: "HN Algolia search_by_date e items, GitHub REST search/issues, Lobsters, e o guia ligado pelo fio do HN"
+      locator: "news.ycombinator.com/item?id=50148855 · id=50294799 · crystl.dev/guides/tmux-for-ai-agents/"
+      method: "measurement: community-peek.sh, http_code conferido por fonte"
+      locality: "host"
   - id: Q_PEEK_DECIDE_PORTAL_1113
     node_type: question
     layer: audit
@@ -103,6 +135,9 @@ nodes:
       method: "measurement: curl com http_code, 2026-11-13"
       locality: "host"
 edges:
+  - from: E_PEEK_SESSION_OPENER_TMUX_1116
+    to: Q_PEEK_LADDER_LEARNS_1113
+    edge_type: SUPPORTS
   - from: E_PEEK_AGENT_IDENTITY_PER_TOOL_1113
     to: Q_PEEK_LADDER_LEARNS_1113
     edge_type: SUPPORTS
