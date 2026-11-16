@@ -358,12 +358,16 @@ def read_tsv(name):
     except (OSError, UnicodeDecodeError) as e: return None, p, f'unreadable ({type(e).__name__})'
 own_rows, own_p, own_st = read_tsv('owners.tsv')
 park_rows, park_p, park_st = read_tsv('parked.tsv')
+grant_rows, grant_p, grant_st = read_tsv('grants.tsv')
 park_unknown = park_st.startswith('unreadable')
 if park_unknown:
     gaps.append(f'parada por ordem NÃO MEDIDA: {park_p} {park_st} — fail-closed: nenhuma sessão alcançável é classificada '
                 'ociosa nem recebe oferta (classe PARK_UNMEASURED) até o arquivo voltar a ser legível')
 if own_st.startswith('unreadable'):
     gaps.append(f'rótulos declarados NÃO lidos: {own_p} {own_st} — os rótulos caem nos derivados (nome, pasta)')
+if grant_st.startswith('unreadable'):
+    gaps.append(f'concessões de batuta-de-projeto NÃO LIDAS: {grant_p} {grant_st} — a batuta-de-projeto de cada sessão fica '
+                'DESCONHECIDA (não «nenhuma»); o nível 0 segue, mas a concessão não é medida até o arquivo voltar a ser legível')
 owners_map = {r[0]: r[1] for r in (own_rows or []) if len(r) >= 2}
 def labels_of(s):
     for k in (s['sid'], s['name'], s['cwd']):
@@ -384,6 +388,18 @@ def parked_of(s, labels):
         if ut > now: return True, f'{why} (até {iso(ut)})', None
         return False, '', f'parada de {key} venceu em {iso(ut)} ({why}): não vale mais'
     return False, '', None
+def grant_of(s, labels):
+    """A batuta-de-projeto DECLARADA da sessão (grants.tsv, escrita pelo core por delegação do maestro — NUNCA por este
+    pulso: o nível 0 LÊ e reporta a concessão, não concede nem despacha). Casa a chave da linha contra o id, o nome, a
+    pasta e os rótulos da sessão. → (camada, tem_batuta, por) | None (sessão sem concessão declarada)."""
+    for r in (grant_rows or []):
+        key = r[0]
+        if key not in (s['sid'], s['name'], os.path.basename(s['cwd'] or ''), *labels): continue
+        camada = r[1] if len(r) > 1 else '?'
+        tem = (r[2].strip().lower() if len(r) > 2 else 'sim') in ('sim', 'yes', 'true', '1')
+        por = r[3] if len(r) > 3 else '?'
+        return (camada, tem, por)
+    return None
 
 # PR ↔ sessão: branch do farol, ou a worktree da branch é o cwd da sessão
 _, wtl = git('worktree', 'list', '--porcelain')
@@ -395,6 +411,7 @@ for ln in wtl.splitlines():
 claimed_owner = set(); claimed_pr = set()
 for s in S.values():
     labels, lab_src = labels_of(s); s['labels'], s['lab_src'] = labels, lab_src
+    s['grant'] = grant_of(s, labels)
     q = []
     for l in labels:
         if l == 'maestro': continue
@@ -621,7 +638,7 @@ if fmt == '--tsv':
     print('kind\tref\tclass\trepo\tidle_min\tqueue\tsource\tdetail')
     for s in sess_sorted:
         print('\t'.join(tsvc(x) for x in ('session', s['sid'], s['cls'], os.path.basename(s['cwd']), '' if s['idle_for'] is None else mins(s['idle_for']),
-              len(s['queue']), '+'.join(s['src']), f'{s["name"]} · {s["note"]} · rótulo {"/".join(s["labels"]) or "—"} · fila: {"; ".join(s["queue"]) or "—"}')))
+              len(s['queue']), '+'.join(s['src']), f'{s["name"]} · {s["note"]} · rótulo {"/".join(s["labels"]) or "—"}' + (f' · batuta-de-projeto: {"sim" if s["grant"][1] else "não"} ({s["grant"][0]}, por {s["grant"][2]})' if s.get('grant') else '') + f' · fila: {"; ".join(s["queue"]) or "—"}')))
     for o, v in sorted(orphan_queue.items()): print(f'orphan_queue\t{tsvc(o)}\t-\t-\t\t{len(v)}\tgrafo\t' + tsvc('; '.join(n for _, n, _ in v)))
     for p in prs: print('\t'.join(tsvc(x) for x in ('pr', p['ref'], 'CI_' + p['ci'].upper().replace(' ', '_'), p['branch'], '' if p['age'] is None else mins(p['age']), '', 'decide-census', p['state'])))
     for t in threads: print('\t'.join(tsvc(x) for x in ('thread', t['ref'], 'STOPPED' if t['stopped'] else 'MOVING', t['path'], '', '', 'decide-census', f'{t["label"]} · {t["state"]} · {t["actor"]}')))
@@ -654,6 +671,9 @@ print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} �
 print(f'classes: {cls_line}')
 print(ag_line)
 print(pc_line)
+_gr = [s for s in S.values() if s.get('grant') and s['grant'][1]]
+grant_src = grant_p if grant_rows is not None else ('ausente' if grant_st == 'absent' else grant_st + ': NÃO MEDIDO')
+print(f'batutas-de-projeto: {len(_gr)} concedida(s)' + (f' · {sum(1 for s in _gr if s["cls"] == "ACTIVE")} ACTIVE (tocando o próprio fio)' if _gr else '') + f' · fonte={grant_src}')
 for w in warns: print(f'⚠️ {w}')
 for g in gaps: print(f'🕳️ lacuna: {g}')
 if quiet:
@@ -677,7 +697,8 @@ print('|---|---|---|---|---|---|')
 for s in sess_sorted:
     me = ' (esta sessão)' if self_sid and s['sid'] == self_sid else ''
     qd = (f'{len(s["queue"])}: ' + '; '.join(s['queue'][:4]) + (f'; +{len(s["queue"]) - 4}' if len(s['queue']) > 4 else '')) if s['queue'] else '—'
-    print(f'| {s["cls"]} | {s["name"] or "—"} `{s["sid"][:8]}`{me} | {os.path.basename(s["cwd"]) or "—"} | {s["note"]} | {qd} | {"+".join(s["src"])} · rótulo {"/".join(s["labels"]) or "—"} |')
+    gr = f' · batuta-de-projeto: {"sim" if s["grant"][1] else "não"} ({s["grant"][0]}, por {s["grant"][2]})' if s.get('grant') else ''
+    print(f'| {s["cls"]} | {s["name"] or "—"} `{s["sid"][:8]}`{me} | {os.path.basename(s["cwd"]) or "—"} | {s["note"]} | {qd} | {"+".join(s["src"])} · rótulo {"/".join(s["labels"]) or "—"}{gr} |')
 if not S: print('| — | nenhuma sessão nas fontes medidas | | | | |')
 print('\n## Subagentes das sessões vivas (transcript em <projects>/*/<sessão>/subagents/ e subagents/workflows/<run>/)')
 if not agents_measured: print('- NÃO MEDIDO (sem diretório de transcripts): não é «nenhum parado»')

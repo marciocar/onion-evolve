@@ -58926,6 +58926,7 @@ print(json.dumps([{'pid': p, 'cwd': f'{sb}/{n}', 'kind': 'interactive', 'session
 BP_PY
   printf 'kind\tref\torigin\tlabel\tstate\tvia\toptions\tincoming\tactor\taction\thint\task\nmerge\tPR#7\tfeat/x\tum PR\tchecks 1 ok · 2 falha · 0 em curso · sem movimento há 30min\tgh\t\t\tfaço-eu\t\t\t\n' > "${sb}/dc.tsv"
   printf 'gamma\tordem do maestro: parada até a revisão\t-\n' > "${sb}/state/parked.tsv"
+  printf '# bancada: concessão de batuta-de-projeto\nalpha\tinterno\tsim\tcore\n' > "${sb}/state/grants.tsv"
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
     env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
@@ -59242,6 +59243,20 @@ BP_PC
     grep -q "^piece${T}p-ord3${T}PIECE_UNMEASURED${T}.*owners.tsv unreadable" <<< "${a}" && grep -q "^piece${T}p-ord2${T}PIECE_OWNED${T}" <<< "${a}"; }
   _bpcase "(am) owners.tsv ilegível: a peça sem owner_session sai PIECE_UNMEASURED, nunca dona pelo core" \
     "    elif pc['osrc'].startswith('core') and own_st.startswith('unreadable'):" "    elif False:" _bp_am
+  # (ba) batuta-de-projeto DECLARADA em grants.tsv (mecanismo da batuta-em-camadas, #7, 2026-11-16): alpha concedida
+  #      (interno, por core) aparece na linha dela; beta, sem concessão, NÃO. O core CONCEDE no grants.tsv; o pulso
+  #      nível-0 LÊ e reporta — nunca concede nem despacha. É estado declarado, irmão de owners.tsv/parked.tsv.
+  _bp_ba() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep -E "^session${T}(sid-alpha|sid-beta)" <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-alpha${T}.*batuta-de-projeto: sim (interno, por core)" <<< "${a}" && ! grep -q "^session${T}sid-beta${T}.*batuta-de-projeto" <<< "${a}"; }
+  _bpcase "(ba) batuta-de-projeto: sessão concedida em grants.tsv aparece; não-concedida não" \
+    "    s['grant'] = grant_of(s, labels)" "    s['grant'] = None" _bp_ba
+  # (bb) grants.tsv que EXISTE e não se lê (um diretório no lugar dele) é LACUNA: a batuta-de-projeto fica DESCONHECIDA
+  #      (não «nenhuma»), e nenhuma sessão ganha anotação de concessão por palpite. Fail-closed, como parked/owners.
+  mkdir -p "${sb}/state-grant-bad/grants.tsv"
+  _bp_bb() { local a; a="$(BP_STATE="${sb}/state-grant-bad" _bpr "$1")"; BP_WHY="$(grep -E '🕳️|batuta-de-projeto' <<< "${a}" | tr '\n' '|')"
+    grep -q 'concessões de batuta-de-projeto NÃO LIDAS' <<< "${a}" && ! grep -q 'batuta-de-projeto: sim' <<< "${a}"; }
+  _bpcase "(bb) grants.tsv ilegível é lacuna fail-closed, nunca concessão por palpite" \
+    "if grant_st.startswith('unreadable'):" "if False:" _bp_bb
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests

@@ -8,7 +8,9 @@ meta:
   x_supersedes_none: "Forja de superfície nova: nenhum grafo anterior é superado. O /meta:decide e o seu medidor são MOLDES e fonte, não o superado."
   # ═══ TETO: 14 NÓS ═══
   # 9 nós nascem aqui; a folga é para os dois selos do maestro («forjar com o /loop», «nomes em inglês, baton»), que o
-  # selador grava depois do commit da forja, e para a colheita da fase 2.
+  # selador grava depois do commit da forja, e para a colheita da fase 2. Da colheita da fase 2 nasceram 2026-11-16 a
+  # decisão D_LAYERED_BATON_GRANT_1116 (o maestro manda construir a batuta-em-camadas) e o claim do build com bancada
+  # C_LAYERED_BATON_GRANT_BUILT_1116. Agora 13 de 14.
 nodes:
   - id: Q_BATON_IDLE_SESSIONS_1112
     node_type: question
@@ -178,6 +180,37 @@ nodes:
       locator: "pergunta com opções de 2026-11-12: «Todos os nomes são em inglês: como fica a batuta?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-12"
       locality: "pessoa"
+  - id: D_LAYERED_BATON_GRANT_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "ordem do maestro 2026-11-15 («você concede este poder de batuta-de-projeto às sessões... que não seja só memória, e sim um mecanismo») e 2026-11-16 (escolha «Construir o #7 primeiro», por pergunta com opções)"
+    label: "O core (batuta do ecossistema) CONCEDE a batuta-de-projeto a cada sessão-dona, que rege e defende o seu projeto e reporta ao core; o maestro é dono de tudo. O pulso nível-0 LÊ e reporta a concessão (grants.tsv), nunca concede nem despacha."
+    narrative: "A superação da orquestração hub-e-raio: dissolve o gargalo único (o maestro OU o core) distribuindo a regência — cada sessão toca o seu fio em paralelo, o core roteia dependências e escala só o MOAT em lote, o maestro fica no MOAT e no selo estratégico. grants.tsv é estado declarado, irmão de owners.tsv e parked.tsv; o pulso não o escreve."
+    provenance:
+      source: "maestro, nas sessões de 2026-11-15 e 2026-11-16"
+      locator: "2026-11-15 «você concede este poder... não ser só memória»; 2026-11-16 pergunta com opções «Como seguir com a superação da orquestração» → «Construir o #7 primeiro»"
+      method: "testimony: decisão do maestro por ordem e por pergunta com opções"
+      locality: "pessoa"
+  - id: C_LAYERED_BATON_GRANT_BUILT_1116
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "baton-pulse.sh lê grants.tsv (read_tsv, irmão de owners/parked), anota a batuta-de-projeto por sessão no --tsv e no markdown e conta no cabeçalho; fail-closed quando ilegível. Bancada run_baton_pulse_selftests casos (ba) e (bb), ambos com mutante pego: 82 passaram, 0 falharam"
+    label: "O mecanismo da batuta-em-camadas está construído e com bancada: o pulso lê a concessão declarada e a reporta, nível 0 intacto."
+    provenance:
+      source: ".claude/validation/baton-pulse.sh e .claude/validation/lint-selftest.sh (run_baton_pulse_selftests), branch feat/layered-baton-grant"
+      locator: "baton-pulse.sh: read_tsv('grants.tsv'), grant_of(), anotação no --tsv e no markdown, contagem no cabeçalho; lint-selftest.sh casos (ba)/(bb)"
+      method: "measurement: bancada rodada em 2026-11-16, 82 passaram 0 falharam, mutantes (ba)/(bb) pegos; pulso dogfoodado contra o estado real (curadoria e kg-ssot mostram batuta-de-projeto: sim)"
+      locality: "repo"
 edges:
   - from: E_PEDIDO_DO_MAESTRO_BATON_LOOP_1112
     to: Q_BATON_IDLE_SESSIONS_1112
@@ -209,6 +242,15 @@ edges:
   - from: D_BATON_IDENTIFIERS_IN_ENGLISH_1112
     to: Q_BATON_IDLE_SESSIONS_1112
     edge_type: TRACES_TO
+  - from: C_LAYERED_BATON_GRANT_BUILT_1116
+    to: D_LAYERED_BATON_GRANT_1116
+    edge_type: SUPPORTS
+  - from: D_LAYERED_BATON_GRANT_1116
+    to: Q_BATON_IDLE_SESSIONS_1112
+    edge_type: TRACES_TO
+  - from: C_LAYERED_BATON_GRANT_BUILT_1116
+    to: Q_BATON_PHASE2_MATCH_AND_MEASURE_1112
+    edge_type: SUPPORTS
 external_edges:
   - from: C_BATON_PHASE1_PULSE_BUILT_1112
     to: "docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml#D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111"
