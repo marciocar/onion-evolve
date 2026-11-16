@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1137 itens abertos** em 170 grafo(s) com aberto (de 228 no escopo) · 164 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1182 itens abertos** em 171 grafo(s) com aberto (de 229 no escopo) · 165 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -462,6 +462,56 @@
 | 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
+
+## a2a-backbone-product-2026-11 — 45 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 55.0 | `Q_A2A_BACKBONE_PRODUCT_2026_11` | a2a-backbone-product-2026-11 | Vale a pena o core do Onion ASSUMIR a orquestração DEFINITIVA de um backbone A2A agente-neutro, como PRODUTO (self-hostable, gov |
+| 38.4 | `C_OPCAO_BUILD_PRODUCT_SERVICE` | a2a-backbone-product-2026-11 | OPÇÃO A) Construir o backbone A2A agente-neutro como produto+serviço (self-hostable, governado), definitivo, agora. |
+| 16.0 | `C_OPCAO_INTERNAL_ONLY` | a2a-backbone-product-2026-11 | OPÇÃO B) Só uso interno: dogfood da camada de governança-de-grafo sobre A2A adotado, parqueando produto+serviço. |
+| 9.6 | `E_LACUNAS_A2A_BACKBONE_2026_11` | a2a-backbone-product-2026-11 | Contabilidade da rodada: 44 objeções do Elenxo SOBREVIVENTES, TODAS 44 modeladas como E_OBJECAO_ (0 não modeladas). 8 claims re |
+| 4.5 | `E_OBJECAO_22_100_COS_SUPPORT_A2A` | a2a-backbone-product-2026-11 | 100+ empresas apoiam A2A (AWS, Cisco, MS, Salesforce, SAP, ServiceNow na massa crítica do padrão aberto): reforça adotar sobre  |
+| 4.5 | `E_OBJECAO_23_SIGNED_AGENT_CARDS_NATIVE` | a2a-backbone-product-2026-11 | Identidade assinada (Signed Agent Cards) é nativa do A2A, logo não se constrói identidade; mas o texto não traz auditoria/cert |
+| 4.5 | `E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP` | a2a-backbone-product-2026-11 | Interop A2A x MCP já demonstrada (ADK/LangGraph/AutoGen/CrewAI): a interoperabilidade é commons resolvido, aparando o que resta  |
+| 4.4 | `C_OPCAO_ADOPT_STITCH` | a2a-backbone-product-2026-11 | OPÇÃO C) Adotar/costurar um padrão existente: A2A 1.0 + MCP + CloudEvents/NATS + OTel + W3C PROV + OAuth2.1/OIDC + Agent Card J |
+| 3.6 | `C_SUPERACAO_20261114_ADOPT_A2A_COMMONS` | a2a-backbone-product-2026-11 | Adotar A2A como protocolo commons (150+ orgs). |
+| 3.6 | `C_SUPERACAO_20261114_ADOPT_A2A_PROTOCOL_LAYER` | a2a-backbone-product-2026-11 | Adotar A2A 1.0 como camada de protocolo e costurar por cima, em vez de inventar protocolo. |
+| 3.6 | `C_SUPERACAO_20261114_BUILD_ONLY_GOVERNANCE_LAYER` | a2a-backbone-product-2026-11 | Construir só a camada acima do protocolo (governança/grafo), sem reivindicar o protocolo. |
+| 3.6 | `E_OBJECAO_28_SOC2_TYPE2_6_12_MONTHS` | a2a-backbone-product-2026-11 | SOC2 Type 2 exige 3-12 meses de observação: um serviço vendável a cliente regulado NÃO existe antes de meses; o alvo promete  |
+| 3.6 | `E_OBJECAO_29_SOC2_HIDDEN_COSTS_PRODUCT_VS_SERVICE` | a2a-backbone-product-2026-11 | O modo PRODUTO self-host deixa o SOC2 com o adotante; o modo SERVIÇO o carrega (mais pentest US$5-15k, tooling US$5-50k, consulto |
+| 3.6 | `E_OBJECAO_30_LF_ROADMAP_GOVERNANCE_GAP` | a2a-backbone-product-2026-11 | O roadmap da LF aponta lacunas em registro, testes/ferramentas e segurança/deploy — EXATAMENTE o espaço de uma camada de gover |
+| 3.3 | `C_SUPERACAO_20261114_ADOPT_A2A_V1` | a2a-backbone-product-2026-11 | Adotar A2A 1.0 (padrão aberto pronto para produção, comitê técnico de 8 empresas). |
+| 3.2 | `E_OBJECAO_21_MARKET_BUILDS_MCP_NOT_A2A` | a2a-backbone-product-2026-11 | 'O incentivo de mercado é construir MCP servers, não agentes A2A' fura a tese de um backbone A2A como produto: se o mercado cons |
+| 3.2 | `E_OBJECAO_26_SECURITY_PRIVACY_SOVEREIGNTY_DRIVER` | a2a-backbone-product-2026-11 | Segurança/privacidade é o PILAR de demanda da tese self-host (61% citam risco de compliance), e foi cortado por orçamento: sem  |
+| 3.2 | `E_OBJECAO_39_UNREAD_ARTHUR_GOVERN_MULTI_AGENT` | a2a-backbone-product-2026-11 | Fonte-chave NÃO LIDA (arthur.ai how-enterprises-govern-multi-agent-ai-systems): a prova de demanda paga por governança/self-host |
+| 3.2 | `E_OBJECAO_40_UNREAD_MINTMCP_PLATFORMS_COMPARED` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (mintmcp.com agent-management-platforms-compared): comparativo de plataformas onde Archestra e concorrentes aparec |
+| 3.2 | `E_OBJECAO_43_UNREAD_SYNADIA_JEPSEN_NATS` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (synadia jepsen-nats-2.12.1): análise Jepsen do NATS JetStream, o transporte escolhido do backbone; operar como S |
+| 3.0 | `C_SUPERACAO_20261114_A2A_BACKBONE_CATEGORY_DISTINCT` | a2a-backbone-product-2026-11 | O incentivo de construir MCP servers supera o de agentes A2A individuais — mas isso NÃO enfraquece a tese de um backbone de coo |
+| 3.0 | `C_SUPERACAO_20261114_A2A_PRODUCTION_CONTESTED` | a2a-backbone-product-2026-11 | A adoção de A2A em produção é CONTESTADA, não ausente: a LF reporta deployments em produção em múltiplas indústrias e 15 |
+| 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_CRITICAL_MASS` | a2a-backbone-product-2026-11 | Adotar A2A (massa crítica medida: 100+ e 150+ orgs apoiadoras). |
+| 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY` | a2a-backbone-product-2026-11 | Adotar A2A+MCP complementares (interop demonstrada: ADK/LangGraph/AutoGen/CrewAI). |
+| 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_NOT_COMMODITIZE` | a2a-backbone-product-2026-11 | A2A TEM integração profunda e verificada em Google/MS/AWS e é camada líder de orquestração agente-a-agente — mas SEM 'padr |
+| 3.0 | `C_SUPERACAO_20261114_ADOPT_SIGNED_AGENT_CARDS` | a2a-backbone-product-2026-11 | Adotar Signed Agent Cards do A2A para identidade (nativo no padrão v1.0). |
+| 3.0 | `C_SUPERACAO_20261114_GOVERNANCE_ABOVE_PROTOCOL` | a2a-backbone-product-2026-11 | O protocolo A2A entrega neutralidade NO FIO (transporte, complementar ao MCP), mas orquestração, governança, registry/roteament |
+| 3.0 | `C_SUPERACAO_20261114_SOVEREIGNTY_DEMAND_INDEPENDENT` | a2a-backbone-product-2026-11 | A DEMANDA por evitar lock-in e por portabilidade/auditabilidade é real e documentada por fontes INDEPENDENTES do vendor (ISG, Inf |
+| 2.4 | `E_OBJECAO_18_SOC2_COST_12K_100K_SERVICE` | a2a-backbone-product-2026-11 | O custo de operar o modo SERVIÇO com SOC2 (US$12k-100k+ de auditoria) é objeção real cortada em vez de medida: as primárias g |
+| 2.4 | `E_OBJECAO_19_SOC2_FIRST_YEAR_25K_200K` | a2a-backbone-product-2026-11 | O custo de primeiro ano de SOC2 (US$25k-200k+) e manutenção (US$15-40k/ano) pesa no modo SERVIÇO e foi descartado por ser núme |
+| 2.4 | `E_OBJECAO_20_HN_A2A_NOT_IN_PRODUCTION` | a2a-backbone-product-2026-11 | 'A2A não chegou a produção' (HN) é sinal de ADOÇÃO REAL que pesa contra um produto A2A-cêntrico e só foi descartado por ti |
+| 2.4 | `E_OBJECAO_25_IDC_85_USE_AGENTS` | a2a-backbone-product-2026-11 | 85% já usam agentes (80% de terceiros / 48% internos): sinal de demanda-base por coordenação de agentes HETEROGÊNEOS (pro-tese |
+| 2.4 | `E_OBJECAO_31_BAND_GOVERNANCE_RUNTIME_MODEL_UNKNOWN` | a2a-backbone-product-2026-11 | A página não diz se BAND é SaaS/self-host/OSS nem se suporta A2A/MCP ou tem certs: cortar deixa o wedge 'aberto vs fechado' sem |
+| 2.4 | `E_OBJECAO_32_COORDINATION_CATEGORY_UNDEFINED` | a2a-backbone-product-2026-11 | A camada de coordenação ainda NÃO é categoria definida e é incerto se virará padrão: corta nos dois sentidos — sem incumb |
+| 2.4 | `E_OBJECAO_33_CC_20_TO_100K_MESSAGES` | a2a-backbone-product-2026-11 | CC 2.1.323 elevou de ~20 para 100.000 as mensagens inter-sessão sem prompt, expandindo a coordenação Claude<->Claude nativa e e |
+| 2.4 | `E_OBJECAO_34_CC_MCP_TASKS_CHURN` | a2a-backbone-product-2026-11 | A superfície MCP do cliente muda rápido (2.1.319 adiciona MCP tasks; 2.1.323 remove cliente MCP v1): alvo móvel para um backbon |
+| 1.8 | `E_OBJECAO_35_UNREAD_API7_A2A_GATEWAY` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (api7.ai/blog/a2a-protocol-gateway-layer) sobre lacunas/maturidade do A2A: justamente o que decide se há espaço  |
+| 1.8 | `E_OBJECAO_36_UNREAD_MICROSOFT_AGENT_FRAMEWORK` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (devblogs.microsoft.com agent-framework) sobre maturidade/lacunas do A2A 1.0 pela ótica do fornecedor concorrente |
+| 1.8 | `E_OBJECAO_37_UNREAD_TYK_A2A_ARCHITECTURE` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (tyk.io a2a-protocol-architecture-and-technical-specification) sobre a especificação e arquitetura do A2A. |
+| 1.8 | `E_OBJECAO_41_UNREAD_CIO_GOVERNANCE_MODEL` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (cio.com why-cios-should-choose-ai-governance-model-before-agents): sinal de decisor sobre governança antes do de |
+| 1.8 | `E_OBJECAO_42_UNREAD_KITEWORKS_SOVEREIGN_GOVERNANCE` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (kiteworks sovereign-ai-governance-problem): demanda por governança de IA soberana, pilar da tese self-host. |
+| 1.8 | `E_OBJECAO_44_UNREAD_GETAGENCY_SOC2_COST` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (getagency soc-2-compliance-cost-2026): custo real do SOC2, a conta do modo SERVIÇO. |
+| 1.6 | `E_OBJECAO_27_COHERE_SPONSORED_STUDY_CAVEAT` | a2a-backbone-product-2026-11 | O estudo IDC é encomendado pela Cohere e não avalia construir-ou-não nem cita A2A/BAND: a ressalva correta que reforça o achad |
+| 1.2 | `C_OPCAO_DO_NOTHING` | a2a-backbone-product-2026-11 | OPÇÃO D) Não fazer: não assumir backbone nem construir camada de governança. |
+| 1.2 | `E_OBJECAO_38_UNREAD_TECHSTRONG_A2A` | a2a-backbone-product-2026-11 | Fonte NÃO LIDA (techstrong.ai) sobre maturidade/lacunas do A2A 1.0: sinal de analista não medido. |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
