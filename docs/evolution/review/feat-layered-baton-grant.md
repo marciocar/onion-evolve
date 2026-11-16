@@ -1,7 +1,7 @@
 ---
 branch: feat/layered-baton-grant
 pr: pendente
-reviewed_diff_sha256: 23cfc989d74299c69bb40e67ca41d6b2d59d1dabae53ead8a01706976245f779
+reviewed_diff_sha256: 23228fb7a8f253ebd8faa4d3440ed280d1ebd7b3d7ec976109ba3792708f586a
 reviewed_code_sha256: d92fc21eeb231492ab71238ab1d45a0716fcec3f1bad75817de435a6fa27e079
 date: 2026-11-16
 findings_total: 2
