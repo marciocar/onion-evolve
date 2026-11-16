@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:11a20bfd3aa00d0f -->
+<!-- translation-of: ADOPTING.md sha256:11ad9b1dc7a798fa -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -97,9 +97,11 @@ As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/
   - um diretório sem carimbo, porque nunca apaga um diretório alheio;
   - um vendor que diverge do carimbo, a menos que venha `--force`. Isso evita que uma edição local suma em
     silêncio.
-- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 18 arquivos:
+- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 19 arquivos:
   o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o leitor da política de áreas do kg-mcp que o
-  `--classification-floor` do gate usa (`tools/kg_policy.py`, desde a 4.52.0), o vendor, o check do trace com o módulo de consulta
+  `--classification-floor` do gate usa (`tools/kg_policy.py`, desde a 4.52.0), o lint de vocabulário que a conferência
+  de códigos da casa de um repositório que adota o Onion importa (`tools/kg_vocab.py`, desde a
+  4.53.0), o vendor, o check do trace com o módulo de consulta
   que ele importa e o schema da saída dele (`tools/kg_trace.py`, `tools/kg_query.py` e `spec/trace.schema.json`, desde
   a 4.25.1), o módulo vetorial que a consulta importa só para o `--semantic` e os requirements fixados dele (`tools/kg_vector.py` e
   `tools/requirements-vector.txt`, desde a 4.26.0), o módulo de língua e o catálogo dele
@@ -365,7 +367,7 @@ O PR que muda a tag faz três coisas:
 A partir da 4.47.0, acrescente `--verify-attestation` ao update para recusar a árvore que não bate com o manifesto que a
 release atestou; pede o `gh` e a rede ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)). Num sandbox com o
 cache do usuário (o `.cache` na pasta pessoal) só de leitura, rode com o `XDG_CACHE_HOME` apontando para um diretório gravável, porque o `gh` grava ali o
-trust root do Sigstore; a verificação continua inteira.
+trust root do Sigstore; se a pasta de dados (`.local/share`) também for só de leitura, aponte também o `XDG_DATA_HOME` para um diretório gravável (visto num adotante em 2026-11). A verificação continua inteira.
 
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
@@ -395,6 +397,13 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.52.0` para a `kg-ssot-v4.53.0`, nada é obrigatório: o contrato (v4.23) e os vereditos são os mesmos, e a
+release inteira não traz arquivo novo. O perfil `gate` passa a levar o `tools/kg_vocab.py`, que já estava na release
+inteira, e tem 19 arquivos. Uma saída pode mudar: o `kg_audit.py` agora confere com o leitor de referência os grafos que
+o pacote lê, e um deles que reprova no MUST é entrada quebrada (rc 2, nenhum pacote), no lugar de um pacote com uma
+lacuna falsa; a evidência confirmada cujo `verified_at` não é data para o pacote, no lugar de sair como a lacuna
+`evidence-unstamped`.
 
 Da `kg-ssot-v4.51.0` para a `kg-ssot-v4.52.0`, entra o contrato v4.23, só SHOULD: nenhum grafo que passava reprova, e nenhum
 veredito MUST muda. Entra o prazo de expurgo do grafo inteiro, no `meta`: `x_dispose_by` (uma data do calendário),

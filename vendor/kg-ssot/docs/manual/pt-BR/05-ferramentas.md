@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:f50e12a7a5a9f690 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:314fdf0a03459adb -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -408,7 +408,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | O repositório (caminho ou URL, como `https://github.com/marciocar/kg-ssot`) que tem a tag. Obrigatório quando você roda de dentro de um vendor |
 | `--dest DIR` | Onde fica o vendor (default `vendor/kg-ssot`) |
-| `--profile gate` | Traz só o mínimo para rodar o gate e o check (18 arquivos desde a 4.52.0, sem a suíte); `--profile full` volta à release inteira |
+| `--profile gate` | Traz só o mínimo para rodar o gate e o check (19 arquivos desde a 4.53.0, sem a suíte); `--profile full` volta à release inteira |
 | `--force` | Substitui um vendor editado localmente |
 | `--index` (no `check`) | Confere o índice do git em vez da árvore de trabalho |
 | `--ref COMMIT` (no `update`) | A bancada antes da tag (4.24): traz um commit que ainda não é release, de um repositório a que você chega. O carimbo diz `unreleased` |
@@ -1484,7 +1484,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
 
 O auditor pede o pacote por pergunta: a resposta, as afirmações, a evidência com data, a lacuna e o dono, numa planilha.
 O grafo já guarda tudo isso; esta ferramenta o dispõe, uma linha por item de questionário, em CSV, XLSX ou JSON. Ela
-não julga a forma (isso é do `kg_validate.py`) e não escreve nada no grafo.
+não julga a forma (isso é do `kg_validate.py`), mas também não lê grafo fora dela, e não escreve nada no grafo.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --questionnaire "Q-2026" --as-of 2026-10-23
@@ -1511,7 +1511,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evid
   - `contradicted`: um `REFUTES` de um nó que não é `refuted` nem `superseded`;
   - `no-confirmed-evidence`: nenhuma evidência com `status: confirmed` (a evidência não confirmada entra na lista, mas
     não fecha lacuna);
-  - `evidence-unstamped`: evidência confirmada sem `verified_at` válido;
+  - `evidence-unstamped`: evidência confirmada sem `verified_at` (o `verified_at` que não é data reprova no MUST e
+    por isso para o pacote antes de chegar aqui);
   - `evidence-cadence-invalid`: evidência confirmada cujo `reverify_every` não é duração, e que por isso nunca venceria;
   - `evidence-due`: evidência confirmada cujo `verified_at` mais o `reverify_every` cai no `--as-of` ou antes (hoje, por
     padrão);
@@ -1531,8 +1532,21 @@ python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evid
     congelado e a célula cortada no teto do Excel, de 32.767 unidades UTF-16. O mesmo pacote dá os mesmos bytes.
   - `json`: `kg-ssot.audit/1` (`spec/audit.schema.json`), com tudo aninhado.
   - `human`: uma listagem curta para o terminal.
+- **Falha fechada no grafo fora do contrato.** Antes de montar o pacote, confere os grafos que o pacote lê contra o
+  MUST do contrato vigente com o leitor de referência (`kg_validate.py`): os grafos com nó que leva `x_questionnaire`
+  (no recorte do `--questionnaire`, quando dado), os das respostas que o `DEPENDS_ON` puxa e os que declaram aresta,
+  local ou em `external_edges`, que toca um desses nós. O grafo sem relação com o pacote não o bloqueia, nem com dívida
+  MUST que o adotante tolera por linha de base. A ponta externa é conferida contra os grafos carregados: a que aponta para
+  um nó que não existe num grafo carregado reprova, e a que aponta para fora do que foi carregado, como o vendor ou uma
+  fixture que o `--root` deixa de fora, não é conferida. O grafo que parseia
+  mas reprova no MUST é entrada quebrada: rc 2, nenhum pacote na saída e uma linha por grafo no stderr, com os códigos
+  (`ENTRADA QUEBRADA  <arquivo> não passa no MUST do contrato (form.enum.edge.edge_type) ...`). Sem isso, a aresta com
+  `edge_type` fora do enum (`ANSWERS`, ou um `SUPPORT` truncado) faria a evidência sumir e mostraria um
+  `no-confirmed-evidence` falso com rc 0. Corrija o grafo com `kg_validate.py <arquivo>`, que lista cada ocorrência, e
+  rode o pacote de novo.
 - **Saída e rc.** rc 0 quando exportou, 1 quando um grafo não se lê (o pacote ficaria incompleto em silêncio) ou, com
-  `--fail-on-gap`, quando um item tem lacuna ou algo foi pulado, e 2 com entrada quebrada. O `xlsx` pede `--output`. Dê o corpus com
+  `--fail-on-gap`, quando um item tem lacuna ou algo foi pulado, e 2 com entrada quebrada, o que inclui o grafo que
+  reprova no MUST. O `xlsx` pede `--output`. Dê o corpus com
   `--root`: a aresta para outro grafo se resolve pelo caminho a partir da raiz.
 
 ## `kg_trace.py`: o trace que não resolve (4.25.0)

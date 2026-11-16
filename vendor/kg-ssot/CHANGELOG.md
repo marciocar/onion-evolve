@@ -10,6 +10,26 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.53.0] - 2026-11-16
+
+No contract change: no MUST or SHOULD verdict changes.
+
+- `kg_audit.py` fails closed on a graph that fails the MUST of the contract. Before, it built the package without
+  validating the graph and recognized evidence only through `SUPPORTS` or `TRACES_TO` edges: an edge whose `edge_type` is
+  outside the enum (`ANSWERS`, or a truncated `SUPPORT`) made the evidence vanish from the package, showed a false
+  `no-confirmed-evidence` gap, and exited with rc 0. Now it checks the graphs the package reads (those with
+  `x_questionnaire`, the answers `DEPENDS_ON` pulls, and the graphs with an edge touching them) with the reference reader,
+  external ends included when their graph was loaded; a graph with no relation to the package does not block it, and a graph that parses but fails the MUST is
+  broken input: rc 2, no package, and one line per graph on standard error with its codes. This changes documented
+  behavior: a confirmed piece of evidence whose `verified_at` is not a date used to come out as an
+  `evidence-unstamped` gap, and now stops the package, because that `verified_at` already fails the MUST. A graph that
+  does not parse still comes out in `unreadable` with rc 1. `kg_query.load` gains `keep_texts`, which keeps the text of
+  each graph it read.
+
+- The `gate` vendor profile now carries `tools/kg_vocab.py` (19 files): the house-codes check of an Onion-adopted
+  repository imports it, and an adopter that vendors only the `gate` profile hit exit 1 when it was missing. Its
+  dependencies (`kg_i18n`, `kg_query`, `kg_validate`) were already in the profile. No verdict changes.
+
 ## [4.52.0] - 2026-11-15
 
 Contract v4.23, SHOULD only: nothing that passed fails, and no MUST verdict changes.

@@ -23,8 +23,14 @@ confirmed sai na lista, mas não fecha a lacuna. O nó com role fora do enum e o
 entram, nem o nó com x_questionnaire sem name ou sem uma lista questions não vazia: saem em "skipped" (no JSON, na planilha
 Skipped do XLSX, no CSV com --view skipped, no stderr e na saída humana), e o --fail-on-gap dá rc 1 com eles.
 
-Não julga a forma: isso é do kg_validate.py. Um grafo que não parseia sai em "unreadable" e dá rc 1, porque o pacote
-ficaria incompleto em silêncio.
+Não julga a forma, mas não lê grafo fora dela: os grafos que o pacote lê passam antes no MUST do contrato, pelo leitor
+de referência (kg_validate.py). São os que têm nó com x_questionnaire (no recorte do --questionnaire), os das respostas
+que o DEPENDS_ON puxa, e os que declaram aresta, local ou externa, que toca um desses nós (ou um nó que não existe no
+grafo de um item); o grafo sem relação com o
+pacote não bloqueia, nem com dívida MUST. A ponta externa é conferida contra os grafos carregados, e a que aponta para
+fora deles não. Um grafo lido que reprova no MUST (uma aresta com edge_type fora do enum, como ANSWERS ou SUPPORT)
+faria a evidência sumir e a lacuna aparecer em falso: é entrada quebrada, rc 2, sem pacote, com os códigos de cada grafo
+no stderr. Um grafo que não parseia sai em "unreadable" e dá rc 1, porque o pacote ficaria incompleto em silêncio.
 
 Uso:
   kg_audit.py [--root DIR [--exclude GLOB]... [--no-default-excludes] | ARQ...] [--questionnaire NOME]
@@ -34,7 +40,8 @@ Uso:
 --view diz qual planilha o CSV leva: as perguntas (uma linha por item), a evidência (uma linha por item e evidência)
 ou o que foi pulado; o XLSX leva as três, e o JSON (kg-ssot.audit/1, spec/audit.schema.json) leva tudo aninhado.
 
-rc: 0 exportou · 1 grafo ilegível, ou lacuna com --fail-on-gap · 2 entrada quebrada.
+rc: 0 exportou · 1 grafo ilegível, ou lacuna com --fail-on-gap · 2 entrada quebrada (inclusive o grafo que reprova no
+MUST).
 """
 import argparse
 import csv
@@ -236,6 +243,74 @@ def package(corpus, questionnaire=None, as_of=None, columns=()):
             "requests": [_ref(corpus, k, owner=_text(corpus.nodes[k].get("owner")) or None) for k in r_keys],
             "owners": list(owners), "gaps": [g for g in GAPS if found[g]]})
     return rows, skipped
+
+
+class _AnyId:
+    """Contém todo id: a ponta externa para um grafo que não foi carregado não é conferida."""
+
+    def __contains__(self, _nid):
+        return True
+
+
+class _LoadedIndex(dict):
+    """O índice {caminho: {ids}} dos grafos carregados, que só reprova a ponta externa cujo arquivo foi carregado: a
+    ponta para um grafo fora do --root (ou fora dos arquivos dados) segue sem conferência, como no kg_validate.py sem
+    --corpus."""
+
+    def get(self, path, default=None):
+        return dict.get(self, path, _AnyId())
+
+
+def read_graphs(corpus, questionnaire=None):
+    """Os grafos que o pacote lê: os que têm nó com x_questionnaire (no recorte do --questionnaire, o mesmo do package:
+    o perfil com name de outro questionário fica de fora), os das respostas que o DEPENDS_ON puxa de uma pergunta, e
+    os que declaram aresta, local ou em external_edges, que toca um desses nós ou um nó que não existe no grafo de um
+    item, de qualquer edge_type (a aresta fora do enum é justamente o que o pacote leria errado)."""
+    item_keys = set()
+    for key in corpus.order:
+        node = corpus.nodes[key]
+        if "x_questionnaire" not in node:
+            continue
+        raw = node.get("x_questionnaire")
+        name = raw.get("name") if isinstance(raw, dict) else None
+        if questionnaire is not None and isinstance(name, str) and name != questionnaire:
+            continue
+        item_keys.add(key)
+    for key in [k for k in item_keys if corpus.nodes[k].get("node_type") == "question"]:
+        for et, other, _r in list(corpus.out.get(key, ())) + list(corpus.into.get(key, ())):
+            if et == "DEPENDS_ON" and other in corpus.nodes:
+                item_keys.add(other)
+    item_files = {k[0] for k in item_keys}
+    files = set(item_files)
+    for e in corpus.edges:
+        for end in (e["from"], e["to"]):
+            # a ponta num nó de item, ou num nó que não existe no grafo de um item (a evidência que mira um id errado
+            # sumiria do pacote em silêncio)
+            if end in item_keys or (end[0] in item_files and end not in corpus.nodes):
+                files.add(e["file"])
+    return files
+
+
+def must_failures(corpus, questionnaire=None):
+    """[(arquivo, [códigos MUST])] dos grafos que o pacote lê (read_graphs) e que reprovam no contrato vigente, pelo
+    leitor de referência. O grafo sem relação com o pacote não bloqueia, nem com dívida MUST que o adotante tolera por
+    linha de base. O grafo que não parseia fica de fora: ele já sai em unreadable. A ponta externa é conferida contra
+    os grafos carregados: a que aponta para um nó que não existe num grafo carregado reprova
+    (integrity.dangling-external), e a que aponta para fora do que foi carregado segue sem conferência."""
+    must = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+    bad = {u["file"] for u in corpus.unreadable}
+    texts = [(n, corpus.texts[n]) for n in corpus.files if n not in bad and n in corpus.texts]
+    index = _LoadedIndex(kg_validate.index_texts(texts))
+    wanted = read_graphs(corpus, questionnaire)
+    out = []
+    for name, text in texts:
+        if name not in wanted:
+            continue
+        found = kg_validate.codes(text if isinstance(text, kg_validate.JsonText) else kg_validate.as_source(name, text),
+                                  must, index)
+        if found:
+            out.append((name, found))
+    return out
 
 
 def _join(values):
@@ -443,9 +518,15 @@ def main(argv=None):
         if as_of is None:
             return broken(_("--as-of {value} is not a YYYY-MM-DD date").format(value=args.as_of))
     try:
-        corpus = kg_query.load(args.root, args.files, args.exclude, not args.no_default_excludes)
+        corpus = kg_query.load(args.root, args.files, args.exclude, not args.no_default_excludes, keep_texts=True)
     except (OSError, ValueError, UnicodeDecodeError) as exc:
         return broken(exc)
+    failing = must_failures(corpus, args.questionnaire)
+    if failing:  # falha fechada: o pacote lido de um grafo fora da forma diria uma lacuna falsa com rc 0
+        for name, found in failing:
+            broken(_("{file} does not pass the contract MUST ({codes}): the package would read it wrong; see "
+                     "kg_validate.py {file}").format(file=name, codes=", ".join(found)))
+        return 2
     rows, skipped = package(corpus, args.questionnaire, as_of, args.column)
     if args.format == "json":
         data = (json.dumps({"schema_version": SCHEMA_VERSION, "as_of": (as_of or datetime.date.today()).isoformat(),

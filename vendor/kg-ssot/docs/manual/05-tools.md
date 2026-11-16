@@ -410,7 +410,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | The repository (a path or a URL, such as `https://github.com/marciocar/kg-ssot`) that has the tag. Required when you run it from inside a vendor |
 | `--dest DIR` | Where the vendor lives (default `vendor/kg-ssot`) |
-| `--profile gate` | Brings only the minimum to run the gate and the check (18 files since 4.52.0, without the suite); `--profile full` goes back to the whole release |
+| `--profile gate` | Brings only the minimum to run the gate and the check (19 files since 4.53.0, without the suite); `--profile full` goes back to the whole release |
 | `--force` | Replaces a locally edited vendor |
 | `--index` (on `check`) | Verifies the git index instead of the working tree |
 | `--ref COMMIT` (on `update`) | The bench before a tag (4.24): brings a commit that is not a release yet, from a repository where you can reach it. The stamp says `unreleased` |
@@ -1505,7 +1505,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
 
 An auditor asks for the package by question: the answer, the claims, the dated evidence, the gap, and the owner, in a
 spreadsheet. The graph already holds all of it; this tool lays it out, one row per questionnaire item, in CSV, XLSX, or
-JSON. It does not judge the form (that is `kg_validate.py`) and writes nothing to the graph.
+JSON. It does not judge the form (that is `kg_validate.py`), but it does not read a graph outside it either, and it
+writes nothing to the graph.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --questionnaire "Q-2026" --as-of 2026-10-23
@@ -1534,7 +1535,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evid
   - `contradicted`: a `REFUTES` from a node that is neither `refuted` nor `superseded`;
   - `no-confirmed-evidence`: no evidence with `status: confirmed` (evidence that is not confirmed is listed, but does
     not close a gap);
-  - `evidence-unstamped`: confirmed evidence without a valid `verified_at`;
+  - `evidence-unstamped`: confirmed evidence without a `verified_at` (a `verified_at` that is not a date fails the MUST,
+    so it stops the package before it gets here);
   - `evidence-cadence-invalid`: confirmed evidence whose `reverify_every` is not a duration, so it would never be due;
   - `evidence-due`: confirmed evidence whose `verified_at` plus `reverify_every` falls on or before `--as-of` (today by
     default);
@@ -1554,8 +1556,20 @@ python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evid
     frozen, and a cell cut at Excel's limit of 32,767 UTF-16 units. The same package gives the same bytes.
   - `json`: `kg-ssot.audit/1` (`spec/audit.schema.json`), with everything nested.
   - `human`: a short listing for the terminal.
+- **It fails closed on a graph outside the contract.** Before it builds the package, it checks the graphs the package
+  reads against the MUST of the current contract with the reference reader (`kg_validate.py`): the graphs with a node
+  that carries `x_questionnaire` (within `--questionnaire`, when given), the graphs of the answers that `DEPENDS_ON`
+  pulls, and the graphs that declare an edge, local or in `external_edges`, touching one of those nodes. A graph with no
+  relation to the package does not block it, even with MUST debt that the adopter tolerates by baseline. An external end
+  is checked against the graphs loaded: one that points to a missing node in a loaded graph fails, and one that points
+  outside what was loaded, such as the vendor or a fixture that `--root` leaves out, is not checked. A graph that parses but fails the MUST is broken input: rc 2, no package on the output, and one line per graph
+  on standard error, with its codes (`BROKEN INPUT  <file> does not pass the contract MUST (form.enum.edge.edge_type)
+  ...`). Without this, an edge whose `edge_type` is outside the enum (`ANSWERS`, or a truncated `SUPPORT`) would make the
+  evidence vanish and show a false `no-confirmed-evidence` with rc 0. Fix the graph with `kg_validate.py <file>`, which
+  lists each occurrence, and run the package again.
 - **Output and rc.** rc 0 when it exported, 1 when a graph does not read (the package would be incomplete in silence)
-  or, with `--fail-on-gap`, when an item has a gap or something was skipped, and 2 on broken input. `xlsx` needs `--output`. Give the corpus with
+  or, with `--fail-on-gap`, when an item has a gap or something was skipped, and 2 on broken input, which includes a
+  graph that fails the MUST. `xlsx` needs `--output`. Give the corpus with
   `--root`: an edge to another graph resolves by its path from the root.
 
 ## `kg_trace.py`: the trace that does not resolve (4.25.0)
