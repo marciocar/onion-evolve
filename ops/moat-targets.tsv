@@ -267,3 +267,4 @@ fecho	script	.claude/validation/testing-state.sh	-
 fecho	script	.claude/validation/vendor-scrub-form-check.sh	-
 fecho	script	.claude/utils/kg/kg-migrate-v3.py	-
 fecho	script	ops/testing/collect-selftest.sh	-
+fecho	script	ops/review/guard-paths.sh	-
