@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1167 itens abertos** em 169 grafo(s) com aberto (de 227 no escopo) · 163 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1166 itens abertos** em 169 grafo(s) com aberto (de 227 no escopo) · 163 grupo(s), agrupados por `owner:` (70 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 19 item(ns)
 
@@ -445,18 +445,17 @@
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
-## a2a-backbone-product-2026-11 — 46 item(ns)
+## a2a-backbone-product-2026-11 — 45 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 55.0 | `Q_A2A_BACKBONE_PRODUCT_2026_11` | a2a-backbone-product-2026-11 | Vale a pena o core do Onion ASSUMIR a orquestração DEFINITIVA de um backbone A2A agente-neutro, como PRODUTO (self-hostable, gov |
-| 40.0 | `D_A2A_BACKBONE_PRODUCT_2026_11` | a2a-backbone-product-2026-11 | DECISÃO ABERTA: core assume backbone A2A agente-neutro como produto+serviço? Opções: A construir já · B só uso interno · C |
 | 38.4 | `C_OPCAO_BUILD_PRODUCT_SERVICE` | a2a-backbone-product-2026-11 | OPÇÃO A) Construir o backbone A2A agente-neutro como produto+serviço (self-hostable, governado), definitivo, agora. |
 | 16.0 | `C_OPCAO_INTERNAL_ONLY` | a2a-backbone-product-2026-11 | OPÇÃO B) Só uso interno: dogfood da camada de governança-de-grafo sobre A2A adotado, parqueando produto+serviço. |
 | 9.6 | `E_LACUNAS_A2A_BACKBONE_2026_11` | a2a-backbone-product-2026-11 | Contabilidade da rodada: 44 objeções do Elenxo SOBREVIVENTES, TODAS 44 modeladas como E_OBJECAO_ (0 não modeladas). 8 claims re |
 | 4.5 | `E_OBJECAO_22_100_COS_SUPPORT_A2A` | a2a-backbone-product-2026-11 | 100+ empresas apoiam A2A (AWS, Cisco, MS, Salesforce, SAP, ServiceNow na massa crítica do padrão aberto): reforça adotar sobre  |
 | 4.5 | `E_OBJECAO_23_SIGNED_AGENT_CARDS_NATIVE` | a2a-backbone-product-2026-11 | Identidade assinada (Signed Agent Cards) é nativa do A2A, logo não se constrói identidade; mas o texto não traz auditoria/cert |
-| 4.5 | `E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP` | a2a-backbone-product-2026-11 | Interop A2A x MCP já demonstrada (ADK/LangGraph/AG2/CrewAI): a interoperabilidade é commons resolvido, aparando o que resta cons |
+| 4.5 | `E_OBJECAO_24_A2A_COMPLEMENTARY_MCP_INTEROP` | a2a-backbone-product-2026-11 | Interop A2A x MCP já demonstrada (ADK/LangGraph/AutoGen/CrewAI): a interoperabilidade é commons resolvido, aparando o que resta  |
 | 4.4 | `C_OPCAO_ADOPT_STITCH` | a2a-backbone-product-2026-11 | OPÇÃO C) Adotar/costurar um padrão existente: A2A 1.0 + MCP + CloudEvents/NATS + OTel + W3C PROV + OAuth2.1/OIDC + Agent Card J |
 | 3.6 | `C_SUPERACAO_20261114_ADOPT_A2A_COMMONS` | a2a-backbone-product-2026-11 | Adotar A2A como protocolo commons (150+ orgs). |
 | 3.6 | `C_SUPERACAO_20261114_ADOPT_A2A_PROTOCOL_LAYER` | a2a-backbone-product-2026-11 | Adotar A2A 1.0 como camada de protocolo e costurar por cima, em vez de inventar protocolo. |
@@ -473,7 +472,7 @@
 | 3.0 | `C_SUPERACAO_20261114_A2A_BACKBONE_CATEGORY_DISTINCT` | a2a-backbone-product-2026-11 | O incentivo de construir MCP servers supera o de agentes A2A individuais — mas isso NÃO enfraquece a tese de um backbone de coo |
 | 3.0 | `C_SUPERACAO_20261114_A2A_PRODUCTION_CONTESTED` | a2a-backbone-product-2026-11 | A adoção de A2A em produção é CONTESTADA, não ausente: a LF reporta deployments em produção em múltiplas indústrias e 15 |
 | 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_CRITICAL_MASS` | a2a-backbone-product-2026-11 | Adotar A2A (massa crítica medida: 100+ e 150+ orgs apoiadoras). |
-| 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY` | a2a-backbone-product-2026-11 | Adotar A2A+MCP complementares (interop demonstrada: ADK/LangGraph/AG2/CrewAI). |
+| 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_MCP_COMPLEMENTARY` | a2a-backbone-product-2026-11 | Adotar A2A+MCP complementares (interop demonstrada: ADK/LangGraph/AutoGen/CrewAI). |
 | 3.0 | `C_SUPERACAO_20261114_ADOPT_A2A_NOT_COMMODITIZE` | a2a-backbone-product-2026-11 | A2A TEM integração profunda e verificada em Google/MS/AWS e é camada líder de orquestração agente-a-agente — mas SEM 'padr |
 | 3.0 | `C_SUPERACAO_20261114_ADOPT_SIGNED_AGENT_CARDS` | a2a-backbone-product-2026-11 | Adotar Signed Agent Cards do A2A para identidade (nativo no padrão v1.0). |
 | 3.0 | `C_SUPERACAO_20261114_GOVERNANCE_ABOVE_PROTOCOL` | a2a-backbone-product-2026-11 | O protocolo A2A entrega neutralidade NO FIO (transporte, complementar ao MCP), mas orquestração, governança, registry/roteament |

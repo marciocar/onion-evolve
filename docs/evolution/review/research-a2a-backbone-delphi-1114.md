@@ -2,7 +2,8 @@
 branch: research/a2a-backbone-delphi-1114
 pr: pendente
 date: 2026-11-14
-reviewed_diff_sha256: db3adaed1bbb33b57e61036927648e6b8298543d177770bc857dabb68ec93cbb
+reviewed_diff_sha256: 9fc9e70bdb3fb4406cc947065eeff06c36de7b1ce67748bbdf8b0874f80102d9
+reviewed_code_sha256: 359ec6df320529db8e6084b224b4516f4783aeff038b2ec7c9ff6ea1914ff8ff
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
