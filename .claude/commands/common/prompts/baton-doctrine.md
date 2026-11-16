@@ -98,6 +98,18 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    Portal AI Explorer; patrocinador humano ao lado do dono, do Entra Agent ID). O mercado não tem nome para «agente
    dono de repo», e esse desenho é do Onion (`docs/evolution/research/agent-repo-ownership-2026-11/`).
 
+8. **A batuta-de-projeto (concessão em camadas) — lida, nunca concedida pelo pulso.** O core (a batuta do ecossistema)
+   **concede** a batuta-de-projeto a cada sessão-dona, por delegação do maestro (que é dono de tudo): a sessão rege e
+   defende o seu projeto, trabalha o backlog aberto do seu repo por conta (um escritor por repo), e reporta ao core. A
+   concessão mora em `grants.tsv` do estado da batuta (`sessão<TAB>camada<TAB>batuta-de-projeto<TAB>concedida-por`),
+   **estado declarado, irmão de `owners.tsv` e `parked.tsv`**: o pulso o **LÊ e reporta** (anota a batuta de cada sessão
+   na linha dela e conta no cabeçalho; ilegível é lacuna fail-closed, nunca «nenhuma»), e **nunca o escreve** — conceder
+   é ato do core por ordem do maestro, não do medidor. É o que **dissolve o gargalo** da orquestração hub-e-raio: em vez
+   de um ponto único (o maestro ou o core) por onde todo o trabalho passa, cada sessão toca o seu fio em paralelo, o
+   core roteia as dependências e escala só o MOAT em lote, e o maestro fica no MOAT e no selo estratégico. **Despachar
+   segue fora do pulso** (degrau 3): a batuta-de-projeto diz *quem rege o quê*, não manda a sessão fazer. Decisão
+   `D_LAYERED_BATON_GRANT_1116` (`docs/evolution/research/forge-baton-2026-11/`).
+
 ## O que ela NÃO promete (fronteira declarada)
 
 - **O pulso não vê o que o harness e o git não veem.** Sem a lista de peers, a classe sai só pela idade do farol, e uma
