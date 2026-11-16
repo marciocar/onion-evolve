@@ -2,7 +2,8 @@
 branch: feat/session-hygiene-v2
 pr: pendente
 date: 2026-11-15
-reviewed_diff_sha256: 4956e68d0eb544f598e3fcad1cd633d4d68ddc4443a71364ec953bb7957e72f7
+reviewed_diff_sha256: 996110c7d4e9ce025b1d910c0ed5e857dc13421e0b67aea6f1c8a6e427e7aec5
+reviewed_code_sha256: d8716a8c9aeda902a219f8822c8c5b6a441a00bbc46ffe4c5a406980e874012a
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
