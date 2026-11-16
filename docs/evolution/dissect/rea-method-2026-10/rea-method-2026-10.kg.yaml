@@ -72,8 +72,8 @@ nodes:
     impact: 3
     confidence: 0.5
     x_dissect_level: 3
-    verified_at: "2026-10-16"
-    verified_against: "git grep ancorado do x_dissect_criterion do D_REA_METHOD_2610: saída 1 em 2026-10-16 (só conductor-2026-10)"
+    verified_at: "2026-11-16"
+    verified_against: "re-medido pelo core em 2026-11-16 na origin/main ce493b503: o git grep ancorado do x_dissect_criterion saiu 2 (conductor-2026-10 e intelligent-ui-2026-10), a primeira metade do gatilho; a segunda metade não se cumpre: as três famílias de paridade que os planos nomeiam existem na bancada (run_research_workflow_selftests, run_decide_selftests, run_mcp_onion_kg_selftests), as duas dos planos já forjados citam a peça, e o terceiro plano (recurso de interface do onion-kg) segue gated e não foi forjado, então «depois do forge» não se aplica a ele. Medição anterior: saída 1 em 2026-10-16 (só conductor-2026-10)."
     label: "Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexistente, e os tipos de caso do REA variam por política."
     x_gatilho: "reabrir quando o x_dissect_criterion sair 2 ou mais E algum plano x_absorb_* ficar com a família de paridade inexistente ou sem citar a peça depois do forge. A cura é um check pós-forge, não mudança no dissect-plans.sh."
     trace: ".claude/validation/dissect-plans.sh"

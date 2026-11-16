@@ -129,6 +129,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-13: «Religar o revisor independente do CI agora que a sessão faz merge sozinha?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-13"
       locality: "pessoa"
+  - id: D_ISOLATED_REFUTER_CRITERION_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "decisão do maestro em 2026-11-16, por pergunta com opções (/meta:decide): escolhida «Vale: agente separado que refuta»"
+    label: "Conta como refutador isolado, para o resíduo de PR de guarda, o agente separado de quem escreveu, só leitura, com mandato de refutar e relatório que separa o medido do lido."
+    narrative: "Selado por /meta:decide em 2026-11-16: escolhida «Vale: agente separado que refuta»; descartadas: «Só o Elenxo completo» · «Vale agora, formalizar depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-16: «O critério de elenxo_isolado declarado no #1663 e no #1656 vale?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-16"
+      locality: "pessoa"
 edges:
   - from: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO
     to: E_REVISOR_CAI_POR_SALDO_DE_API
@@ -147,4 +163,7 @@ edges:
     edge_type: SUPPORTS
   - from: D_REVIEW_AUTO_WITH_FALLBACK_1113
     to: D_REVIEW_MODE_SWITCH_PADRAO_OFF
+    edge_type: TRACES_TO
+  - from: D_ISOLATED_REFUTER_CRITERION_1116
+    to: D_REVIEW_AUTO_WITH_FALLBACK_1113
     edge_type: TRACES_TO
