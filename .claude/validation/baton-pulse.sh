@@ -393,10 +393,12 @@ def grant_of(s, labels):
     pulso: o nível 0 LÊ e reporta a concessão, não concede nem despacha). Casa a chave da linha contra o id, o nome, a
     pasta e os rótulos da sessão. → (camada, tem_batuta, por) | None (sessão sem concessão declarada)."""
     for r in (grant_rows or []):
-        key = r[0]
+        key = r[0].strip()
+        if not key: continue   # linha sem chave não casa ninguém (uma chave vazia casaria a pasta de um cwd com barra final)
         if key not in (s['sid'], s['name'], os.path.basename(s['cwd'] or ''), *labels): continue
         camada = r[1] if len(r) > 1 else '?'
-        tem = (r[2].strip().lower() if len(r) > 2 else 'sim') in ('sim', 'yes', 'true', '1')
+        # fail-closed: a coluna da concessão AUSENTE (linha truncada) não concede — só «sim» escrito concede
+        tem = (r[2].strip().lower() if len(r) > 2 else '') in ('sim', 'yes', 'true', '1')
         por = r[3] if len(r) > 3 else '?'
         return (camada, tem, por)
     return None
