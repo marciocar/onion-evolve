@@ -1,0 +1,47 @@
+meta:
+  schema_version: "1"
+  id: viktor-core-seal-2026-11
+  slug: viktor-core-seal-2026-11
+  title: "Selo do core sobre a dissecação do Viktor feita pela curadoria"
+  date: "2026-11-16"
+  baseline: "2026-11-16"
+  review_after: "2026-12-16"
+  purpose: "A curadoria propõe e o core sela. Este grafo guarda o selo do destino da dissecação do Viktor: o checador de dissecação exige que a peça fechada aponte o nó do selo no core (x_dissect_sealed_by)."
+  note: "TETO, declarado: só o selo do destino. O conteúdo da dissecação e a colheita de ideias moram no grafo privado da curadoria e não são copiados para cá, porque este repositório é público; aqui fica a forma da decisão, sem o detalhe competitivo."
+nodes:
+  - id: E_VIKTOR_SEAL_BASIS_1116
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    evidence_class: testimony
+    verified_at: "2026-11-16"
+    verified_against: "relato da sessão da curadoria ao core em 2026-11-16 e o card de decisão que ela preparou no mesmo dia: veredito proposto composto, superação buscada e registrada como nenhuma, gatilho de reabertura declarado. O core leu o card; não releu o grafo da dissecação nó a nó."
+    label: "A curadoria dissecou o Viktor como ator de mercado e propôs parquear, com subida ao panorama competitivo e costura de três ideias; o veredito chegou composto, com gatilho de reabertura declarado."
+    narrative: "Base do selo. A dissecação é da curadoria e mora no repositório privado dela. O que o core confere aqui é a forma: havia veredito proposto, a busca por superação foi registrada e o gatilho de reabertura existe."
+    provenance:
+      source: "sessão da curadoria, relato ao core"
+      locator: "mensagens da curadoria ao core de 2026-11-16 e o card de decisão das três portas"
+      method: "testimony: relato de outra sessão, com o card lido pelo core"
+  - id: D_SEAL_VIKTOR_PARK_PANORAMA_1116
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-16"
+    verified_against: "decisão do maestro em 2026-11-16, por pergunta com opções feita pela sessão do core: escolhida «Parquear + panorama (Recomendado)»; descartadas «Parquear, sem costurar» e «Não selar ainda»"
+    label: "O Viktor fica parqueado e sobe ao panorama competitivo, e as três ideias de maior valor da dissecação são costuradas; o destino de cada ideia, público ou privado, é decidido pelo core uma a uma."
+    narrative: "Selo do destino da dissecação do Viktor. O maestro escolheu parquear, subir ao panorama e costurar as três ideias nomeadas pela curadoria. Fronteira: o detalhe de cada ideia é informação competitiva e fica no grafo privado da curadoria; o que pousar neste repositório público entra como forma (o que muda no Onion e por quê). A curadoria cita este nó em x_dissect_sealed_by."
+    provenance:
+      source: "maestro, por pergunta com opções da sessão do core"
+      locator: "pergunta com opções de 2026-11-16: «Selo do Viktor: qual veredito você sela?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-16"
+      locality: "pessoa"
+edges:
+  - from: E_VIKTOR_SEAL_BASIS_1116
+    to: D_SEAL_VIKTOR_PARK_PANORAMA_1116
+    edge_type: SUPPORTS
