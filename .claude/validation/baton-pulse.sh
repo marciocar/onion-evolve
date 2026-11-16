@@ -62,6 +62,14 @@
 #   PIECE_OWNER_NAME_MISMATCH há sessão viva com cwd no repo da peça, com outro nome: a retomada troca ref e nome, e o
 #                             desencontro não pode sair como dono ausente (pedido de rigor da curadoria).
 #   PIECE_UNMEASURED          sem a lista de peers não há nome a casar: NÃO medido, nunca «sem dono».
+#   HIGIENE (D_SESSION_HYGIENE_TMUX_WORKTREE_1114, 2026-11-14): por PROCESSO interativo vivo dos peers, lendo <proc>
+#   (BATON_PROC, padrão /proc): stat (estado, ppid), comm e, SÓ do processo `claude`, a chave TMUX do environ (presença;
+#   o resto do ambiente nunca sai). Aviso, nunca bloqueio; cada aviso traz o comando de cura como texto:
+#   SESSION_STOPPED        estado T|t (Ctrl+Z, SIGSTOP): suspensa e invisível, o harness segue listando idle.
+#   SESSION_NOT_IN_TMUX    sem TMUX e sem ancestral tmux (ex.: mosh-server→bash): morre com o terminal.
+#   SESSION_SAME_CHECKOUT  duas interativas vivas no mesmo topo git: a 2ª abre com `claude --worktree`.
+#   SESSION_CAP            interativas vivas acima de --max-interactive (padrão 4).
+#   Estado ou árvore ilegível é lacuna (HYGIENE_UNMEASURED), nunca «em tmux».
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
 #   isso vence, quando a lista de peers foi lida). Sem lista de peers, a classe é só pela idade do farol.
@@ -75,15 +83,16 @@
 #
 # Uso:  bash .claude/validation/baton-pulse.sh [<repo>] [--markdown|--tsv] [--quiet] [--since <iso|epoch>]
 #                [--last-sha <sha>] [--idle-min N] [--stall-min N] [--peers <arquivo.json|->] [--no-peers] [--no-family]
-#                [--skip-repo <caminho>]... [--no-gh] [--self <sessionId>]
+#                [--skip-repo <caminho>]... [--no-gh] [--self <sessionId>] [--max-interactive N]
 # Env (bancada; todo override ativo é DECLARADO na saída):
 #   BATON_NOW=<epoch>  BATON_STATE_DIR=<dir> (padrão ~/.local/state/onion/baton)  BATON_PROJECTS_DIR=<dir>
 #   BATON_DECIDE_TSV=<arquivo> (saída pronta do decide-census --tsv)  BATON_CLAUDE=<binário>  ONION_ASK_DIR=<dir>
+#   BATON_PROC=<dir> (um /proc falso: a bancada da higiene)
 # Exit: 0 = medido (inclusive com lacunas DECLARADAS) · 2 = entrada quebrada (opção, data, python3/PyYAML ausente).
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_baton_pulse_selftests).
 # ===========================================================================
 set -uo pipefail
-REPO=""; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
+REPO=""; MAXI="4"; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "baton-pulse: $1 exige um valor" >&2; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -99,6 +108,7 @@ while [ $# -gt 0 ]; do
     --skip-repo) _need "$@"; shift; SKIP="${SKIP}${SKIP:+
 }$1" ;;
     --no-gh) NOGH="1" ;;
+    --max-interactive) _need "$@"; shift; MAXI="$1" ;;
     --self) _need "$@"; shift; SELF="$1" ;;
     --*) echo "baton-pulse: opção desconhecida: $1" >&2; exit 2 ;;
     *) REPO="$1" ;;
@@ -107,6 +117,7 @@ while [ $# -gt 0 ]; do
 done
 case "${STALL}" in ''|*[!0-9]*|0) echo "baton-pulse: --stall-min inválido (${STALL}) — inteiro >= 1" >&2; exit 2 ;; esac
 case "${IDLE}" in ''|*[!0-9]*|0) echo "baton-pulse: --idle-min inválido (${IDLE}) — inteiro >= 1" >&2; exit 2 ;; esac
+case "${MAXI}" in ''|*[!0-9]*|0) echo "baton-pulse: --max-interactive inválido (${MAXI}) — inteiro >= 1" >&2; exit 2 ;; esac
 case "${BATON_NOW:-0}" in *[!0-9]*) echo "baton-pulse: BATON_NOW inválido (${BATON_NOW}) — epoch em segundos" >&2; exit 2 ;; esac
 case "${LAST}" in ''|*[!0-9a-f]*) [ -z "${LAST}" ] || { echo "baton-pulse: --last-sha inválido (${LAST}) — hexadecimal" >&2; exit 2; } ;; esac
 # --since se valida ANTES de medir (o decide-census custa ~15 s): a forma completa o Python confere de novo
@@ -151,13 +162,13 @@ if [ -f "${_ll}" ]; then
   bash "${_ll}" check >/dev/null 2>&1; case "$?" in 0) LOAD_LINE="${LOAD_LINE} · lease livre" ;; 3) LOAD_LINE="${LOAD_LINE} · lease OCUPADO (load ≥ HIGH)" ;; *) LOAD_LINE="${LOAD_LINE} · lease não mediu" ;; esac
 else LOAD_LINE="${LOAD_LINE} · lease ausente neste papel"; fi
 
-OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
+OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${QUIET}" "${SINCE}" "${LAST}" "${IDLE}" "${PEERS}" "${PEERS_SRC}" \
-  "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" <<'PY'
+  "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" "${MAXI}" <<'PY'
 import sys, os, re, json, glob, time, hashlib, subprocess, datetime
 (repo, fmt, quiet, since, last_sha, idle_min, peers_file, peers_src, family, skip, self_sid, here, dc_file, dc_rc,
- load_line, ovr, stall_min) = sys.argv[1:18]
+ load_line, ovr, stall_min, max_inter) = sys.argv[1:19]
 stall_s = int(stall_min) * 60
 quiet = quiet == '1'; idle_s = int(idle_min) * 60
 self_sid = self_sid or os.environ.get('CLAUDE_CODE_SESSION_ID', '')
@@ -204,12 +215,13 @@ S = {}   # sid → dict
 def sess(sid):
     return S.setdefault(sid, {'sid': sid, 'name': '', 'cwd': '', 'pid': None, 'status': '', 'state': '', 'kind': '',
                               'beacon': '', 'branch': '', 'started': None, 'act': None, 'act_src': '', 'src': []})
-peers_ok = False
+peers_ok = False; PROCS = []
 if peers_file and not peers_src.startswith(('falhou', 'ausente', 'desligada')):
     try:
         data = json.load(open(peers_file, encoding='utf-8'))
         if not isinstance(data, list): raise ValueError('não é lista')
         peers_ok = True
+        PROCS = [x for x in data if isinstance(x, dict)]
         for x in data:
             sid = str(x.get('sessionId') or x.get('id') or '')
             if not sid: continue
@@ -604,6 +616,87 @@ PIECES.sort(key=lambda p: (PORD[p['cls']], p['id']))
 PIECE_ALERT = ('PIECE_UNOWNED', 'PIECE_OWNER_NAME_MISMATCH', 'PIECE_UNMEASURED')
 pc_line = ('peças: ' + ' · '.join(f'{c} {sum(1 for p in PIECES if p["cls"] == c)}' for c in PORD)) if PIECES else f'peças: nenhuma declarada ({pieces_src})'
 
+# ── higiene das sessões (D_SESSION_HYGIENE_TMUX_WORKTREE_1114, cláusula 9 da doutrina) ──────────────────
+# Por PROCESSO dos peers (o mesmo sessionId aparece em dois pids quando a sessão foi retomada em dois terminais: S funde
+# por sid, aqui não). Só processo interativo e vivo. Aviso, nunca bloqueio. Lê de <proc> (BATON_PROC, padrão /proc):
+#   stat    o estado (3º campo DEPOIS do último ')': o comm pode ter espaço e parêntese, «tmux: server» quebra o awk) e o ppid;
+#   comm    o nome, para subir a árvore e para conferir que o pid é `claude` ANTES de abrir o environ;
+#   environ SÓ do processo claude, e dele SÓ a chave TMUX (presença; o valor e o resto nunca saem: pode haver segredo).
+#   SESSION_STOPPED       estado T|t: a sessão suspensa (Ctrl+Z, SIGSTOP) é invisível ao harness, que a lista como idle.
+#   SESSION_NOT_IN_TMUX   sem TMUX no environ e sem ancestral tmux: morre com o terminal (mosh, ssh) e ninguém a vê.
+#   SESSION_SAME_CHECKOUT duas interativas vivas no mesmo checkout (topo git do cwd, não a worktree): a 2ª vai de --worktree.
+#   SESSION_CAP           interativas vivas acima de --max-interactive (padrão 4; o teto prático é 4 sessões + 5 agentes).
+#   Ilegível nunca é limpo: estado ou árvore que não se leem saem como lacuna nomeada (HYGIENE_UNMEASURED), não «em tmux».
+proc_root = os.environ.get('BATON_PROC') or '/proc'
+def proc_stat(pid):
+    """→ (estado, ppid) ou None. O comm entre parênteses pode ter espaço e ')': corta no ÚLTIMO ')'."""
+    try: raw = open(os.path.join(proc_root, str(pid), 'stat'), encoding='utf-8', errors='replace').read()
+    except OSError: return None
+    i = raw.rfind(')'); f = raw[i + 2:].split() if i >= 0 else []
+    return (f[0], int(f[1])) if len(f) >= 2 and f[1].isdigit() else None
+def proc_comm(pid):
+    try: return open(os.path.join(proc_root, str(pid), 'comm'), encoding='utf-8', errors='replace').read().strip()
+    except OSError: return None
+def has_tmux_key(pid):
+    """True|False|None (não lido). SÓ a chave: o valor e as outras variáveis nunca entram em memória além do split."""
+    try: raw = open(os.path.join(proc_root, str(pid), 'environ'), 'rb').read()
+    except OSError: return None
+    return any(e.startswith(b'TMUX=') for e in raw.split(b'\0'))
+def tilde(x): return re.sub(r'^/home/[^/]+|^/root(?=/|$)', '~', x or '')
+def tmux_name(x): return re.sub(r'[^A-Za-z0-9_-]+', '-', x or 'sessao').strip('-') or 'sessao'
+HY, hy_gaps = [], []
+inter = []
+for x in PROCS:
+    pid = x.get('pid')
+    # vivo = existe <proc>/<pid>/stat (a mesma fonte que se lê a seguir; com o /proc real é o kill -0 sem sinal)
+    if x.get('kind') != 'interactive' or not str(pid or '').isdigit() or not os.path.exists(os.path.join(proc_root, str(pid), 'stat')): continue
+    inter.append({'pid': int(pid), 'sid': str(x.get('sessionId') or ''), 'name': str(x.get('name') or ''), 'cwd': real(str(x.get('cwd') or ''))})
+if peers_ok:
+    for p in inter:
+        tag = f'{p["name"] or p["sid"][:8]} (pid {p["pid"]})'
+        st = proc_stat(p['pid'])
+        if st is None: hy_gaps.append(f'{tag}: {proc_root}/{p["pid"]}/stat ilegível, estado e árvore NÃO medidos'); continue
+        if st[0] in ('T', 't'):
+            HY.append(('SESSION_STOPPED', p, f'{tag} está suspensa (estado {st[0]}): o harness a lista, mas ela não anda',
+                       f'kill -CONT {p["pid"]}  (ou `fg` no shell que a suspendeu)'))
+        comm = proc_comm(p['pid'])
+        key = has_tmux_key(p['pid']) if comm == 'claude' else None   # environ só de processo claude conferido
+        chain, q, seen_tmux, broken = [], st[1], False, False
+        for _ in range(32):
+            if q in (0, 1): break
+            c = proc_comm(q); nx = proc_stat(q)
+            if c is None or nx is None: broken = True; break
+            chain.append(c)
+            if c.startswith('tmux'): seen_tmux = True; break
+            q = nx[1]
+        if key or seen_tmux: continue
+        if key is None and broken:
+            hy_gaps.append(f'{tag}: sem chave TMUX legível e árvore cortada em {"→".join(chain) or "?"}: tmux NÃO medido'); continue
+        HY.append(('SESSION_NOT_IN_TMUX', p, f'{tag} roda fora do tmux (sem TMUX no ambiente; árvore {"→".join(chain) or "—"}): morre com o terminal',
+                   f'na sessão, /exit; depois: tmux new -s {tmux_name(p["name"])} -c {tilde(p["cwd"])} \'claude --resume {p["sid"]}\''))
+    tops = {}
+    for p in inter:
+        rc_t, top = git('rev-parse', '--show-toplevel', cwd=p['cwd']) if p['cwd'] and os.path.isdir(p['cwd']) else (1, '')
+        tops.setdefault(real(top) if rc_t == 0 and top else p['cwd'], []).append(p)
+    for top, ps in sorted(tops.items()):
+        if len(ps) < 2 or not top: continue
+        same_sid = len({p['sid'] for p in ps}) < len(ps)
+        who = ', '.join(f'{p["name"] or p["sid"][:8]} (pid {p["pid"]})' for p in ps)
+        for p in ps[1:]:
+            HY.append(('SESSION_SAME_CHECKOUT', p, f'{len(ps)} sessões interativas no mesmo checkout {os.path.basename(top)}: {who}'
+                       + (' · o mesmo sessionId em dois processos (retomada em dois terminais)' if same_sid else ''),
+                       (f'a mesma sessão em dois processos: feche o terminal de um deles (pids {", ".join(str(q["pid"]) for q in ps)}); '
+                        f'trabalho paralelo abre com: cd {tilde(top)} && claude --worktree {tmux_name(p["name"])}-2') if same_sid else
+                       f'feche a 2ª e reabra isolada: cd {tilde(top)} && claude --worktree {tmux_name(p["name"])}-2'))
+    if len(inter) > int(max_inter):
+        HY.append(('SESSION_CAP', None, f'{len(inter)} sessões interativas vivas, acima do teto de {max_inter} (teto prático: 4 sessões + 5 agentes)',
+                   'feche ou estacione (parked.tsv) a ociosa sem fila; agente em vez de sessão para trabalho curto'))
+else: hy_gaps.append('lista de peers não lida: sem pid não há processo a medir')
+HORD = {c: i for i, c in enumerate(('SESSION_STOPPED', 'SESSION_NOT_IN_TMUX', 'SESSION_SAME_CHECKOUT', 'SESSION_CAP'))}
+HY.sort(key=lambda h: (HORD[h[0]], h[1]['pid'] if h[1] else 0))
+for g in hy_gaps: gaps.append(f'higiene das sessões NÃO MEDIDA (HYGIENE_UNMEASURED): {g}')
+hy_line = f'higiene: {len(inter)} interativa(s) viva(s) · ' + (' · '.join(f'{c} {sum(1 for h in HY if h[0] == c)}' for c in HORD) if peers_ok else 'NÃO MEDIDA')
+
 orphan_queue = {o: v for o, v in owned.items() if o != 'maestro' and o not in claimed_owner}
 CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
 cnt = {c: sum(1 for s in S.values() if s['cls'] == c) for c in CLASSES}
@@ -629,7 +722,8 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'measured': [prs_measured, signals_measured, asks_measured, park_st],
          'cp': len(checkpoints), 'gaps': sorted(gaps),
          'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT],
-         'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES)}
+         'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES),
+         'hy': sorted((h[0], h[1]['sid'] if h[1] else '', h[1]['name'] if h[1] else '') for h in HY)}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 # «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
 # ficou vermelho sem evento datado passava calado. Sem --last-sha não há base, e a batida fala.
@@ -647,6 +741,8 @@ if fmt == '--tsv':
     for a in AG: print('\t'.join(tsvc(x) for x in ('agent', a['aid'], a['cls'], a['sid'], '', '', a['rel'], f'{a["desc"] or "—"} · {a["note"]} · pendente: {a["cmd"] or "—"}')))
     for p in PIECES: print('\t'.join(tsvc(x) for x in ('piece', p['id'], p['cls'], os.path.basename(str(p['lp'] or '')), '', '', p['osrc'],
               f'dono {p["owner"]} · sponsor {p["sponsor"] or "—"} · {p["note"]}' + (f' · arranque: {p["card"]}' if p['card'] else ''))))
+    for c, p, note, cure in HY: print('\t'.join(tsvc(x) for x in ('hygiene', p['sid'] if p else '-', c, os.path.basename(p['cwd']) if p else '-', '', '', '/proc',
+              f'{note} · cura: {cure}')))
     for r in signals: print(f'signal\t{tsvc(r.get("ref"))}\t-\t-\t\t\tdecide-census\t{tsvc(r.get("label"))}')
     print(f'maestro\tasks\t-\t-\t\t{sum(1 for a in asks if a["live"])}\tmaestro-ask\tvencidas {sum(1 for a in asks if not a["live"])}')
     print(f'maestro\tseal_candidates\t-\t-\t\t{len(seals)}\tdecide-census\tcheckpoints {len(checkpoints)} · nós open owner:maestro {len(owned.get("maestro", []))}')
@@ -664,7 +760,7 @@ ag_line = ('subagentes: ' + ' · '.join(f'{c} {acnt[c]}' for c in AORD)) if agen
 if quiet and not changed:
     unm = ' · '.join(x for x, ok in (('⚠️ PRs NÃO medidos', prs_measured), ('⚠️ sinais NÃO medidos', signals_measured),
                                        ('⚠️ perguntas NÃO medidas', asks_measured), ('⚠️ parada NÃO medida', not park_unknown)) if not ok)
-    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line} · {ag_line} · {pc_line}' + (f' · {unm}' if unm else ''))
+    print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line} · {ag_line} · {pc_line} · {hy_line}' + (f' · {unm}' if unm else ''))
     sys.exit(0)
 print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
@@ -676,6 +772,7 @@ print(pc_line)
 _gr = [s for s in S.values() if s.get('grant') and s['grant'][1]]
 grant_src = grant_p if grant_rows is not None else ('ausente' if grant_st == 'absent' else grant_st + ': NÃO MEDIDO')
 print(f'batutas-de-projeto: {len(_gr)} concedida(s)' + (f' · {sum(1 for s in _gr if s["cls"] == "ACTIVE")} ACTIVE (tocando o próprio fio)' if _gr else '') + f' · fonte={grant_src}')
+print(hy_line)
 for w in warns: print(f'⚠️ {w}')
 for g in gaps: print(f'🕳️ lacuna: {g}')
 if quiet:
@@ -690,6 +787,7 @@ if quiet:
         if p['ci'] == 'RED': print(f'- {p["ref"]} com CI vermelho ({p["branch"]})')
     for a in AG:
         if a['cls'] in AG_ALERT: print(f'- {a["cls"]}: {a["aid"]} da sessão {a["sid"][:8]} ({a["desc"] or "—"}) · {a["note"]}' + (f' · pendente: {md_code(a["cmd"])}' if a['cmd'] else ''))
+    for c, p, note, cure in HY: print(f'- {c}: {note} · cura: {md_code(cure)}')
     for p in PIECES:
         if p['cls'] in PIECE_ALERT: print(f'- {p["cls"]}: {p["id"]} · dono {p["owner"]} ({p["osrc"]}) · {p["note"]}' + (f' · arranque: {md_code(p["card"])}' if p['card'] else ''))
     sys.exit(0)
@@ -711,6 +809,9 @@ print('\n## Peças (sessão dona por peça: owner_session → owners.tsv → cor
 for p in PIECES:
     print(f'- {p["cls"]} `{p["id"]}` · dono «{p["owner"]}» ({p["osrc"]}) · sponsor {p["sponsor"] or "—"} · {p["note"]}' + (f' · arranque: {md_code(p["card"])}' if p['card'] else ''))
 if not PIECES: print(f'- nenhuma peça declarada ({pieces_src})')
+print('\n## Higiene das sessões (tmux nomeado, --worktree, teto; aviso, nunca bloqueio)')
+for c, p, note, cure in HY: print(f'- {c} · {note} · cura: {md_code(cure)}')
+if not HY: print('- nenhum aviso' if peers_ok else '- NÃO MEDIDA (sem lista de peers)')
 print('\n## Fila declarada sem sessão casada')
 if orphan_queue:
     for o, v in sorted(orphan_queue.items()):

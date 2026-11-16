@@ -73,6 +73,11 @@ escrita além do teto), `AGENT_RUNNING`, `AGENT_DONE` (texto final, relatório e
 não por quê, nem se o processo ainda vive; ferramenta longa legítima também passa do teto. Diante de um `AGENT_STALLED`, olhe o comando pendente e
 reporte à sessão dona; não mate nem reinicie o agente por ela.
 
+Higiene das sessões (cláusula 9 da doutrina, `D_SESSION_HYGIENE_TMUX_WORKTREE_1114`), por processo interativo vivo:
+`SESSION_STOPPED` (estado T no `/proc/<pid>/stat`), `SESSION_NOT_IN_TMUX` (sem a chave `TMUX` no ambiente do `claude` e sem
+tmux na árvore), `SESSION_SAME_CHECKOUT` (duas interativas no mesmo topo git) e `SESSION_CAP` (acima de `--max-interactive`,
+padrão 4). Cada aviso traz a cura como texto; reporte-a à sessão dona ou ao maestro, nunca a execute por eles.
+
 ## Procedimento
 
 1. **MEDIR.** O pulso injetado acima mede sem a conversa. Para a lista de peers, o medidor usa `claude agents --json`

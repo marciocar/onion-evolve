@@ -6,11 +6,14 @@ meta:
   baseline: "2026-11-12"
   review_after: "2026-12-12"   # 30d: cadência de ferramenta; a fase 2 (um dia medido) é o teste de verdade
   x_supersedes_none: "Forja de superfície nova: nenhum grafo anterior é superado. O /meta:decide e o seu medidor são MOLDES e fonte, não o superado."
-  # ═══ TETO: 14 NÓS ═══
+  # ═══ TETO: 16 NÓS (era 14) ═══
+  # Levantado em 2026-11-16: duas colheitas nasceram em paralelo sobre o teto de 14, os 3 nós da higiene das sessões
+  # (D_SESSION_HYGIENE_TMUX_WORKTREE_1114, de 2026-11-14) e os 2 da batuta-em-camadas (2026-11-16); as duas ficam aqui e o
+  # grafo fecha em 16. O próximo nó abre grafo novo.
   # 9 nós nascem aqui; a folga é para os dois selos do maestro («forjar com o /loop», «nomes em inglês, baton»), que o
   # selador grava depois do commit da forja, e para a colheita da fase 2. Da colheita da fase 2 nasceram 2026-11-16 a
   # decisão D_LAYERED_BATON_GRANT_1116 (o maestro manda construir a batuta-em-camadas) e o claim do build com bancada
-  # C_LAYERED_BATON_GRANT_BUILT_1116. Agora 13 de 14.
+  # C_LAYERED_BATON_GRANT_BUILT_1116. Com os 3 da higiene: 16 de 16.
 nodes:
   - id: Q_BATON_IDLE_SESSIONS_1112
     node_type: question
@@ -211,6 +214,55 @@ nodes:
       locator: "baton-pulse.sh: read_tsv('grants.tsv'), grant_of(), anotação no --tsv e no markdown, contagem no cabeçalho; lint-selftest.sh casos (ba)/(bb)"
       method: "measurement: bancada rodada em 2026-11-16, 82 passaram 0 falharam, mutantes (ba)/(bb) pegos; pulso dogfoodado contra o estado real (curadoria e kg-ssot mostram batuta-de-projeto: sim)"
       locality: "repo"
+  - id: E_MARKET_TMUX_WORKTREE_SESSIONS_1114
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "curl das três fontes em 2026-11-14: a doc do Remote Control (HTTP 200, frase do tmux/screen), a doc de fluxos comuns (exemplo claude --worktree) e a API do HN (item 50148855: título, 174 pontos, 2026-10-19)"
+    label: "o padrão de mercado para sessão longa de Claude Code em servidor é tmux nomeado, e o paralelismo no mesmo repo é por worktree (claude --worktree)"
+    narrative: "A doc oficial do Remote Control manda, em máquina remota, iniciar o claude dentro de tmux ou screen para a sessão sobreviver à desconexão. A doc de fluxos comuns mostra claude --worktree para sessões paralelas isoladas. A comunidade converge no mesmo desenho (thread do HN «Tmux and Claude Code: Sessions, Send-Keys, and the Ceiling», 174 pontos, 2026-10-19). O Agent View (claude agents, research preview desde 2.1.139) existe, mas é preview: piloto, não migração."
+    provenance:
+      source: "docs oficiais do Claude Code e thread do Hacker News"
+      locator: "https://code.claude.com/docs/en/remote-control · https://code.claude.com/docs/en/common-workflows · https://news.ycombinator.com/item?id=50148855"
+      method: "reading: leitura das fontes oficiais e do thread por curl, 2026-11-14"
+      locality: "web"
+  - id: E_CORE_STOPPED_OUTSIDE_TMUX_1114
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-11-14"
+    verified_against: "estado do kernel (stat por pid) dos processos claude em 2026-11-14T16:40Z e claude agents --json: um processo da sessão do core em estado T, e o mesmo sessionId em dois processos no mesmo checkout"
+    label: "a sessão do core ficou suspensa (estado T, Ctrl+Z) sem ninguém ver, e o pulso mostrou sessões duplicadas no mesmo checkout"
+    narrative: "Antes, a sessão do core rodava num mosh fora do tmux (pai mosh-server→bash) e ficou suspensa por Ctrl+Z; o harness seguia listando a sessão, e o pulso não lia o estado do processo. Na medição de 2026-11-14 havia 7 sessões interativas vivas (acima de 4), um processo do core em estado T e dois processos com o mesmo sessionId no checkout principal. Antes, o pulso registrou duas sessões interativas da curadoria e duas do brain ao mesmo tempo."
+    provenance:
+      source: ".claude/validation/baton-pulse.sh"
+      locator: "pulso de 2026-11-14T16:40Z, seção Higiene das sessões"
+      method: "measurement: leitura do estado do processo no kernel e da lista de peers do harness"
+      locality: "host"
+  - id: D_SESSION_HYGIENE_TMUX_WORKTREE_1114
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open   # decidida; fecha (done em PROD) quando o PR do pulso mergear e o pulso da main der os avisos
+    owner: core
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-14"
+    verified_against: "decisão da sessão do core por delegação do maestro (2026-11-14), virada mecanismo no baton-pulse.sh (avisos SESSION_STOPPED, SESSION_NOT_IN_TMUX, SESSION_SAME_CHECKOUT, SESSION_CAP) e na cláusula 9 da baton-doctrine"
+    label: "Higiene das sessões na VPS: toda sessão claude longa roda em tmux nomeado; a 2ª sessão interativa no mesmo checkout abre com claude --worktree; Agent View só em piloto; teto prático de 4 sessões interativas mais 5 agentes. O pulso avisa, nunca bloqueia."
+    narrative: "Decidida pela sessão do core por delegação do maestro em 2026-11-14 (o maestro delegou pesquisar, decidir e implementar). Reversível, por isso o mecanismo é aviso no pulso, não guarda: cada aviso traz o comando de cura (tmux new -s, claude --worktree, kill -CONT). O teto de 5 agentes já vinha da memória da casa (agent-concurrency-cap); o de 4 sessões interativas nasce aqui."
+    provenance:
+      source: "sessão do core, por delegação do maestro"
+      locator: "brief da batuta de 2026-11-14 (espiada de mercado nível 1 já feita)"
+      method: "measurement: bancada baton_pulse (8 casos SESSION_*, mutante por caso, 94/94); decisão da sessão do core por delegação do maestro"
+      locality: "repo"
 edges:
   - from: E_PEDIDO_DO_MAESTRO_BATON_LOOP_1112
     to: Q_BATON_IDLE_SESSIONS_1112
@@ -251,6 +303,15 @@ edges:
   - from: C_LAYERED_BATON_GRANT_BUILT_1116
     to: Q_BATON_PHASE2_MATCH_AND_MEASURE_1112
     edge_type: SUPPORTS
+  - from: E_MARKET_TMUX_WORKTREE_SESSIONS_1114
+    to: D_SESSION_HYGIENE_TMUX_WORKTREE_1114
+    edge_type: SUPPORTS
+  - from: E_CORE_STOPPED_OUTSIDE_TMUX_1114
+    to: D_SESSION_HYGIENE_TMUX_WORKTREE_1114
+    edge_type: SUPPORTS
+  - from: D_SESSION_HYGIENE_TMUX_WORKTREE_1114
+    to: C_BATON_PHASE1_PULSE_BUILT_1112
+    edge_type: TRACES_TO
 external_edges:
   - from: C_BATON_PHASE1_PULSE_BUILT_1112
     to: "docs/evolution/research/automation-levels-2026-11/automation-levels-2026-11.kg.yaml#D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111"
