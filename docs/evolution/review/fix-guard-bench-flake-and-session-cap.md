@@ -6,10 +6,11 @@ reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
-verdict: CURADO
-elenxo: false
-reviewer: passada própria sobre o próprio artefato (sem subagente) — gate mecânico: lint-selftest (famílias tocadas) + lint-artifacts
-nota: a passada independente (elenxo) eu lanço depois; este resíduo é o da própria sessão que forjou a cura.
+verdict: FIXED
+elenxo: true
+elenxo_isolado: true
+reviewer: 2ª passada independente (2026-11-17) — agente revisor separado, só leitura, mandato de refutar; achou 3 pontos (F1/F2/F3), todos curados nesta mesma branch (ver §"Revisão independente"). Gate mecânico: lint-selftest (private_repo_cite, baton_pulse, session_open) + lint-artifacts.
+nota: os 3 achados são da passada independente sobre o diff das mudanças A/B/C; as curas estão em commits novos nesta branch.
 ---
 
 # Três curas de guarda/bancada: o flake do hash só-dígitos, o teto de sessões 4→8 e o abridor na cura do pulso
@@ -83,8 +84,39 @@ claude dentro do tmux; `(e)` rc 2 para nome que não é repo; `(f)` `/proc` ileg
 o abridor. A linha leva o marcador `(core-only)` (REGRA 100, como `ops/load-lease.sh` na mesma casa). A
 cláusula 9 da doutrina e o caso `(ao)` da bancada foram atualizados para conferir as duas formas.
 
+## Revisão independente (2ª passada, 2026-11-17)
+
+Um agente revisor separado, só leitura, com mandato de refutar, releu o diff de A/B/C e achou três pontos.
+Os três foram curados nesta mesma branch, em commits novos.
+
+**F1 (relevante) — o abridor travava por causa de um `claude` de OUTRA conta.** Em `ops/session-open.sh`,
+`claude_pids` devolvia rc 2 (→ recusa rc 3) sempre que o `readlink` do cwd de um processo `claude` falhava —
+mas o cwd de um processo de outro usuário é ilegível por permissão, então um `claude` de outra conta na
+máquina travava o abridor para todo mundo. A bancada (caso `f`) afirmava essa recusa como correta. Cura: o
+script agora lê o DONO de `/proc/<pid>` (`stat -c %u`) e compara com «meu uid» (`MY_UID`, substituto de teste
+`SESSION_OPEN_UID`); se o cwd/environ não se lê e o processo é de OUTRO dono, IGNORA (não é a sessão desta
+conta); do MESMO dono (ou dono indeterminado), segue recusando — falha fechada de verdade. Mesma regra no
+`environ`. O caminho de ANEXAR, que engolia o erro com `|| out=""`, agora dá lacuna NOMEADA quando não mede um
+processo do mesmo dono. Casos novos na família `session_open`: `(f)` mesmo dono/cwd → rc 3; `(f2)` mesmo
+dono/environ → rc 3; `(i)` outro dono/cwd → cria normal; `(i2)` outro dono/environ → cria normal; `(h)`
+anexar com cwd ilegível do mesmo dono → lacuna nomeada. Cada um com mutante que morde.
+
+**F2 (baixa) — a cura do pulso citava o abridor com o nome errado.** `baton-pulse.sh` montava
+`bash ops/session-open.sh <name> --resume <id>` com o `name` do harness, mas o abridor resolve `~/<nome>` e
+exige repo: sessão sem `--name` virava «sessao» (rc 2) e sessão em worktree abriria o checkout principal. Cura:
+o helper `opener_name(cwd)` só devolve nome quando o cwd é a RAIZ de um repo em `~/<basename>`, e o nome é esse
+basename; em qualquer outro caso (worktree, fora de `~`, sem nome) o pulso imprime SÓ a forma `tmux new -s …`.
+Casos de bancada: `(ao)` o ramo tmux-only (cwd fora de `~`) e `(ay)` o ramo do abridor (repo em `~/<nome>`,
+prova que o basename é impresso, não o `name` da sessão), cada um com mutante.
+
+**F3 (baixa) — resíduo declarado.** O corte em 10 casas para hex só-dígitos (A2) deixa de fora commit privado
+citado por hash curto só-dígitos de 7 a 9 casas. O corte fica (baixá-lo acusaria inteiro comum de CSV — falso
+-positivo pior que o buraco); o resíduo foi DECLARADO no comentário do trecho em `private-repo-cite-check.sh`
+e aqui. Hash misto de 7+ segue coberto; só o só-dígitos curto escapa.
+
 ## Verificação
 
-Famílias tocadas (`--families private_repo_cite,baton_pulse,session_open`): 0 falhas. Lint completo:
-relatado no PR. As HARD regeneradas pelo `pr-finalize` (`docs/backlog.md`, `docs/onion/testing-inventory.md`)
-ficam para a sessão do core que finaliza.
+Famílias tocadas (`--families private_repo_cite,baton_pulse,session_open`): **189 passaram, 0 falharam, 0
+pularam** (inclui os casos novos de F1 e F2). Lint completo: a única HARD é `docs/onion/testing-inventory.md`
+(REGRA 80), regenerada aqui porque os casos novos defasaram o inventário do harness; `docs/backlog.md` fica
+para o `pr-finalize` da sessão do core que finaliza.

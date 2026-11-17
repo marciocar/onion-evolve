@@ -641,6 +641,10 @@ if data_files:
         #   occ_clone — occ MAIS o hex só-dígitos de 10+ casas: SÓ a camada de clones (COMMIT-PRIVADO-EM-DADO), que
         #               acusa apenas o que o _batch CONFIRMA ser commit real de um clone privado. Um número comum só
         #               casaria se fosse, por acaso, prefixo de um commit de verdade do clone — aí é referência a ele.
+        # RESÍDUO DECLARADO (achado F3 da revisão independente, 2026-11-17): o corte em 10 casas deixa de FORA o commit
+        # privado citado por hash curto SÓ-DÍGITOS de 7 a 9 casas. O corte fica de propósito: baixá-lo acusaria inteiro
+        # comum de CSV (preço, contagem, id de 7-9 dígitos) como commit — falso-positivo pior que o buraco. Hash misto
+        # de 7+ segue coberto (occ); só o só-dígitos CURTO escapa.
         occ, occ_clone = [], []
         for i, line in enumerate(lines, 1):
             for m in HEX_COMMIT.finditer(line):
