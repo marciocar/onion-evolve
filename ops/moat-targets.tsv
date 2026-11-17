@@ -208,6 +208,7 @@ fecho	script	.claude/validation/resolve-integration-branch.sh	-
 fecho	script	.claude/validation/review-artifact-check.sh	-
 fecho	script	.claude/validation/rules-registry.sh	-
 fecho	script	ops/bridge-backup.sh	-
+fecho	script	ops/kg-writer-backup.sh	-
 fecho	script	ops/door-seal-pin.sh	-
 fecho	script	ops/kg-gate-ci.sh	-
 fecho	script	ops/load-lease.sh	-
