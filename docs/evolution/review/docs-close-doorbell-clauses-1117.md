@@ -2,7 +2,8 @@
 branch: docs/close-doorbell-clauses-1117
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6ef5c367ddff61ad7f8565d5d9b183604f4d66aa8f01f8a7b53c938f453639ed
+reviewed_code_sha256: 64bdf18010bf1987391046c5b5a08644281139b58d700b3a4c17921942271cc4
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
