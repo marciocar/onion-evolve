@@ -21,6 +21,11 @@ hospedagem fica na família, uma instância por org. Por isso:
 
 Auth por X-Api-Key (fail-closed: sem ONION_KG_TOKEN não sobe).
 
+CONTADOR DE USO (opcional, env ONION_KG_USAGE_DIR): totais por dia (UTC), por ferramenta e por
+resultado (ok | erro), num TSV fora da raiz servida. Nada além disso é gravado: nem identidade,
+nem argumento, nem nome de grafo ou de nó, nem texto de busca, nem resposta. Sem a env o contador
+fica desligado. Leitura: `python3 ops/mcp-onion-kg/server.py --usage [--days N]` (não sobe servidor).
+
 Uso: ONION_KG_TOKEN=... [ONION_KG_ROOT=/caminho/do/worktree] python3 ops/mcp-onion-kg/server.py
      (MCP_HOST default 172.23.0.1, MCP_PORT default 3032; MCP_PORT=0 = porta efêmera, a linha
       de boot imprime a porta real). Runbook do degrau 1: ops/mcp-onion-kg/README.md.
@@ -29,8 +34,13 @@ import hmac
 import json
 import os
 import re
+import signal
+import stat
 import subprocess
-from datetime import datetime, timezone
+import sys
+import threading
+import time
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SERVER_REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -262,6 +272,163 @@ def inventory(_args):
             'nota': 'SSOT gerada do filesystem — os numeros canonicos do framework'}
 
 
+USAGE_FILE_NAME = 'tool-usage.tsv'
+USAGE_MAX_DAYS = 400  # teto de dias distintos guardados; os mais antigos são descartados a cada escrita
+USAGE_LOCK_WAIT = 5.0  # segundos: teto de espera pela trava (a contagem acontece depois da resposta)
+_USAGE_LINE_RE = re.compile(r'^(\d{4}-\d{2}-\d{2})\t([a-z0-9_]{1,64})\t(\d{1,15})\t(\d{1,15})$')
+
+
+class UsageCounter:
+    """Totais de uso por dia (UTC) × ferramenta × resultado (ok | erro), e mais nada.
+
+    A interface só recebe a CHAVE já normalizada (uma das ferramentas registradas ou `unknown`) e
+    um booleano: identidade, argumento, nome de grafo/nó, texto de busca e resposta nem chegam aqui.
+    Toda falha é engolida e contada em memória (`failures`); nenhuma chamada depende deste objeto.
+    """
+
+    def __init__(self, raw_dir):
+        self.raw = (raw_dir or '').strip()
+        self.enabled = False
+        self.path = None
+        self.reason = 'ONION_KG_USAGE_DIR ausente'
+        self.failures = 0
+        self._failures_lock = threading.Lock()
+
+    def start(self):
+        """Liga o contador se o diretório serve: fora da raiz, modo 700 e gravável (prova escrevendo)."""
+        if not self.raw:
+            return
+        try:
+            d = os.path.realpath(self.raw)
+            if d == ROOT or d.startswith(ROOT + os.sep):
+                self.reason = 'diretorio dentro da raiz servida'
+                return
+            os.makedirs(d, mode=0o700, exist_ok=True)
+            if stat.S_IMODE(os.stat(d).st_mode) & 0o077:
+                self.reason = 'diretorio aberto a grupo/outros (exige modo 700)'
+                return
+            self.path = os.path.join(d, USAGE_FILE_NAME)
+            self._rewrite()
+            self.enabled = True
+        except Exception as e:  # noqa: BLE001 — o contador nunca impede o servidor de subir
+            self.reason = f'diretorio nao gravavel ({type(e).__name__})'
+
+    @staticmethod
+    def load(path):
+        """{(dia, ferramenta): [ok, erro]} do arquivo; linha fora do formato é ignorada."""
+        counts = {}
+        try:
+            with open(path, encoding='utf-8', errors='replace') as fh:
+                for ln in fh:
+                    m = _USAGE_LINE_RE.match(ln.rstrip('\n'))
+                    if m:
+                        row = counts.setdefault((m.group(1), m.group(2)), [0, 0])
+                        row[0] += int(m.group(3))
+                        row[1] += int(m.group(4))
+        except FileNotFoundError:
+            pass
+        return counts
+
+    def _rewrite(self, bump=None):
+        """Lê, soma (se houver `bump`), poda e reescreve por temporário + rename, sob trava de arquivo."""
+        import fcntl
+        lock_fd = os.open(self.path + '.lock', os.O_RDWR | os.O_CREAT, 0o600)
+        try:
+            deadline = time.monotonic() + USAGE_LOCK_WAIT
+            while True:
+                try:
+                    fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if time.monotonic() >= deadline:
+                        raise
+                    time.sleep(0.005)
+            counts = self.load(self.path)
+            if bump:
+                day, tool, ok = bump
+                row = counts.setdefault((day, tool), [0, 0])
+                row[0 if ok else 1] += 1
+            days = sorted({d for d, _ in counts})
+            keep = set(days[-USAGE_MAX_DAYS:])
+            body = ''.join(f'{d}\t{t}\t{c[0]}\t{c[1]}\n' for (d, t), c in sorted(counts.items()) if d in keep)
+            tmp = self.path + '.tmp'
+            try:
+                os.unlink(tmp)
+            except FileNotFoundError:
+                pass
+            fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            try:
+                os.write(fd, body.encode())
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+            os.replace(tmp, self.path)
+        finally:
+            os.close(lock_fd)  # fechar o descritor solta a trava
+
+    def record(self, tool_key, ok):
+        """Soma 1 em (hoje UTC, tool_key, ok|erro). Nunca levanta."""
+        if not self.enabled:
+            return
+        try:
+            self._rewrite((datetime.now(timezone.utc).strftime('%Y-%m-%d'), tool_key, bool(ok)))
+        except Exception:  # noqa: BLE001 — falha do contador não é falha da chamada
+            with self._failures_lock:
+                self.failures += 1
+
+    def status(self):
+        estado = f'LIGADO em {self.path}' if self.enabled else f'DESLIGADO ({self.reason})'
+        return f'contador de uso {estado} · falhas do contador: {self.failures}'
+
+
+USAGE = UsageCounter(os.environ.get('ONION_KG_USAGE_DIR', ''))
+
+
+def usage_report(argv):
+    """`--usage [--days N]`: imprime os totais por ferramenta e devolve o rc. Não sobe servidor."""
+    window = None
+    if '--days' in argv:
+        i = argv.index('--days')
+        try:
+            window = int(argv[i + 1])
+            if window < 1:
+                raise ValueError
+        except (IndexError, ValueError):
+            print('--days: inteiro >= 1', file=sys.stderr)
+            return 2
+    if not USAGE.raw:
+        print('contador de uso desligado: ONION_KG_USAGE_DIR ausente', file=sys.stderr)
+        return 1
+    path = os.path.join(os.path.realpath(USAGE.raw), USAGE_FILE_NAME)
+    try:
+        counts = UsageCounter.load(path)
+    except OSError as e:
+        print(f'nao consegui ler {path}: {type(e).__name__}', file=sys.stderr)
+        return 1
+    since = None
+    if window is not None:
+        since = (datetime.now(timezone.utc) - timedelta(days=window - 1)).strftime('%Y-%m-%d')
+        counts = {k: v for k, v in counts.items() if k[0] >= since}
+    days = sorted({d for d, _ in counts})
+    janela = (f'ultimos {window} dias UTC (desde {since})' if window is not None
+              else f'tudo o que o arquivo guarda (teto {USAGE_MAX_DAYS} dias)')
+    periodo = f'{days[0]} a {days[-1]}, {len(days)} dia(s) com chamada' if days else 'nenhuma chamada registrada'
+    print(f'uso por ferramenta · {path}')
+    print(f'janela: {janela} · {periodo}')
+    print('ferramenta\tok\terro\ttotal\tdias')
+    names = list(TOOLS) + sorted({t for _, t in counts} - set(TOOLS) - {'unknown'}) + ['unknown']
+    tot_ok = tot_err = 0
+    for name in names:
+        ok = sum(v[0] for (_, t), v in counts.items() if t == name)
+        err = sum(v[1] for (_, t), v in counts.items() if t == name)
+        n_days = len({d for (d, t) in counts if t == name})
+        tot_ok += ok
+        tot_err += err
+        print(f'{name}\t{ok}\t{err}\t{ok + err}\t{n_days}')
+    print(f'TOTAL\t{tot_ok}\t{tot_err}\t{tot_ok + tot_err}\t{len(days)}')
+    return 0
+
+
 _GRAFO = {'type': 'string', 'description': 'caminho relativo do .kg.yaml (use kg_list)'}
 TOOLS = {
     'kg_list': (kg_list, 'Lista os grafos .kg.yaml versionados na raiz servida (o SSOT vivo do estado)', {}),
@@ -367,23 +534,44 @@ class Handler(BaseHTTPRequestHandler):
                              'recusa': f"usuario '{user or '(sem e-mail)'}' nao autorizado neste Brain — "
                                        'peca ao maestro para incluir o e-mail'}, ensure_ascii=False)}],
                         'isError': True}})
+            # Contador de uso: só a CHAVE normalizada sai daqui. Nome que não é ferramenta registrada vira
+            # `unknown` (o texto recebido é entrada de terceiro e não é gravado). A soma roda no `finally`,
+            # depois de a resposta ter sido escrita; a recusa por e-mail, acima, não é contada.
+            tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'
+            ok = False
             try:
                 r = executa(nome, params.get('arguments') or {})
+                ok = True
                 return self._json({'jsonrpc': '2.0', 'id': rid, 'result': {
                     'content': [{'type': 'text', 'text': json.dumps(r, ensure_ascii=False, indent=1)}],
                     'isError': False}})
             except Exception as e:  # noqa: BLE001 — erro vira resultado MCP legivel
+                ok = False
                 return self._json({'jsonrpc': '2.0', 'id': rid, 'result': {
                     'content': [{'type': 'text', 'text': json.dumps(_error_envelope(nome, e),
                                                                     ensure_ascii=False, indent=1)}],
                     'isError': True}})
+            finally:
+                USAGE.record(tool_key, ok)
         if metodo == 'ping':
             return self._json({'jsonrpc': '2.0', 'id': rid, 'result': {}})
         return self._json({'jsonrpc': '2.0', 'id': rid,
                            'error': {'code': -32601, 'message': f'metodo nao suportado: {metodo}'}})
 
 
+def _usage_exit_line(signum, _frame):
+    """SIGTERM: imprime o estado do contador e morre pelo MESMO sinal (o status de saída não muda)."""
+    try:
+        print(f'onion-kg uso (saida): {USAGE.status()}', flush=True)
+    except Exception:  # noqa: BLE001
+        pass
+    signal.signal(signum, signal.SIG_DFL)
+    os.kill(os.getpid(), signum)
+
+
 def main():
+    if '--usage' in sys.argv[1:]:
+        raise SystemExit(usage_report(sys.argv[1:]))
     if not TOKEN:
         raise SystemExit('ONION_KG_TOKEN ausente — fail-closed, nao subo sem auth')
     try:
@@ -395,6 +583,9 @@ def main():
           f'read-only · raiz {fr["root_source"]} @ {fr["served_commit"][:12]} · fetched_at {fr["fetched_at"]} · '
           f'usuarios {"so token (ONION_KG_ALLOWED_EMAILS ausente)" if ALLOWED_EMAILS is None else str(len(ALLOWED_EMAILS)) + " na lista"}',
           flush=True)
+    USAGE.start()
+    print(f'onion-kg uso: {USAGE.status()}', flush=True)
+    signal.signal(signal.SIGTERM, _usage_exit_line)
     srv.serve_forever()
 
 

@@ -10,13 +10,17 @@ rc 0 só se todos passaram. Uso: python3 -I ops/mcp-onion-kg/selftest.py [--serv
 """
 import json
 import os
+import re
 import shutil
+import socket
+import stat
 import subprocess
 import sys
 import tempfile
 import time
 import urllib.error
 import urllib.request
+from datetime import datetime, timedelta, timezone
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 SERVER = os.path.join(HERE, 'server.py')
@@ -105,7 +109,8 @@ def build_fixture(base):
 
 
 def start(env_extra, drop=()):
-    env = {k: v for k, v in os.environ.items() if k not in ('ONION_KG_ROOT', 'ONION_KG_TOKEN')}
+    env = {k: v for k, v in os.environ.items()
+           if k not in ('ONION_KG_ROOT', 'ONION_KG_TOKEN', 'ONION_KG_USAGE_DIR')}
     env.update({'MCP_HOST': '127.0.0.1', 'MCP_PORT': '0', 'ONION_KG_TOKEN': TOKEN})
     env.update(env_extra)
     for k in drop:
@@ -190,6 +195,250 @@ def mutant_tree(base):
     git(tree, 'commit', '-qm', 'mutante')
     SERVER = os.path.join(tree, 'ops/mcp-onion-kg/server.py')
     SERVER_REPO = tree
+
+
+USAGE_FILE = 'tool-usage.tsv'
+REGISTERED = ('kg_list', 'kg_radar', 'kg_node', 'kb_search', 'kb_get', 'diary_index', 'inventory')
+USAGE_STRICT_RE = re.compile(r'^(\d{4}-\d{2}-\d{2})\t(' + '|'.join(REGISTERED) + r'|unknown)\t\d+\t\d+$')
+S_TOOL = 'SENTINELA-FERRAMENTA-7731'
+S_TERM = 'SENTINELATERMO4417'
+S_NODE = 'SENTINELA_NO_5521'
+S_EMAIL = 'sentinela-pessoa-9093@exemplo.com'
+
+
+def call_sync(port, tool, args=None, headers=None):
+    """tools/call por socket cru, lendo até o EOF. O servidor só fecha a conexão depois de o handler
+    terminar, então ao voltar daqui a contagem daquela chamada já foi gravada (sem espera por tempo)."""
+    body = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'tools/call',
+                       'params': {'name': tool, 'arguments': args or {}}}).encode()
+    hdr = {'Host': 'x', 'Content-Type': 'application/json', 'X-Api-Key': TOKEN,
+           'Content-Length': str(len(body))}
+    hdr.update(headers or {})
+    raw = b''
+    try:
+        s = socket.create_connection(('127.0.0.1', port), timeout=60)
+        try:
+            s.sendall(('POST /mcp HTTP/1.1\r\n' + ''.join(f'{k}: {v}\r\n' for k, v in hdr.items())
+                       + '\r\n').encode() + body)
+            while True:
+                chunk = s.recv(65536)
+                if not chunk:
+                    break
+                raw += chunk
+        finally:
+            s.close()
+        res = json.loads(raw.split(b'\r\n\r\n', 1)[1]).get('result', {})
+        return bool(res.get('isError')), json.loads(res['content'][0]['text'])
+    except (OSError, ValueError, KeyError, IndexError) as e:
+        return None, {'_erro': str(e), '_raw': raw[:200].decode(errors='replace')}
+
+
+def usage_read(path):
+    """(texto, {ferramenta: [ok, erro]}) lido de forma TOLERANTE: o harness não confia no formato."""
+    try:
+        with open(path, encoding='utf-8', errors='replace') as fh:
+            text = fh.read()
+    except OSError as e:
+        return f'<<sem arquivo: {e}>>', {}
+    rows = {}
+    for ln in text.splitlines():
+        c = ln.split('\t')
+        if len(c) == 4 and c[2].isdigit() and c[3].isdigit():
+            r = rows.setdefault(c[1], [0, 0])
+            r[0] += int(c[2])
+            r[1] += int(c[3])
+    return text, rows
+
+
+def mode_of(path):
+    try:
+        return stat.S_IMODE(os.stat(path).st_mode)
+    except OSError:
+        return None
+
+
+def stop_and_drain(p):
+    """SIGTERM no processo que o harness subiu; devolve (rc, resto do stdout)."""
+    p.terminate()
+    try:
+        rc = p.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        p.kill()
+        rc = p.wait(timeout=5)
+    return rc, p.stdout.read()
+
+
+def usage_cases(base, wt):
+    """Contador de uso: só dia × ferramenta × ok|erro; nada de identidade, argumento ou nome de grafo."""
+    os.umask(0o022)  # umask conhecida: o modo 600 tem de vir do servidor, não da umask de quem roda
+    all_names = [
+        'usage-boot-desligado-sem-env', 'usage-boot-ligado', 'usage-arquivo-modo-600', 'usage-ok-conta-em-ok',
+        'usage-erro-conta-em-erro', 'usage-desconhecida-vira-unknown', 'usage-arquivo-sem-argumento',
+        'usage-arquivo-sem-nome-de-grafo', 'usage-arquivo-sem-email', 'usage-arquivo-sem-token',
+        'usage-arquivo-sem-ip', 'usage-arquivo-so-formato', 'usage-resposta-inalterada',
+        'usage-leitura-por-flag', 'usage-linha-de-saida', 'usage-dir-nao-gravavel-desliga',
+        'usage-dentro-da-raiz-desliga', 'usage-falha-em-runtime-contada', 'usage-poda-400-dias',
+        'usage-concorrencia-nao-perde']
+    done = set()
+
+    def ucase(name, ok, detail=''):
+        done.add(name)
+        case(name, ok, detail)
+
+    try:
+        # (u1) sem a env: desligado, declarado no boot, e a chamada responde
+        p = start({'ONION_KG_ROOT': wt})
+        port, _ = wait_port(p)
+        line = p.stdout.readline() if port else ''
+        e, pl = call_sync(port, 'kg_list') if port else (None, {})
+        ucase('usage-boot-desligado-sem-env', 'DESLIGADO (ONION_KG_USAGE_DIR ausente)' in line and e is False, line)
+        baseline = pl
+
+        # (u2) ligado: diretório criado pelo servidor
+        udir = os.path.join(base, 'uso', 'dados')
+        ufile = os.path.join(udir, USAGE_FILE)
+        p = start({'ONION_KG_ROOT': wt, 'ONION_KG_USAGE_DIR': udir})
+        port, _ = wait_port(p)
+        if port is None:
+            return
+        line = p.stdout.readline()
+        ucase('usage-boot-ligado', f'contador de uso LIGADO em {os.path.realpath(ufile)}' in line
+              and 'falhas do contador: 0' in line, line)
+        snaps = []
+
+        def do(tool, args=None):
+            r = call_sync(port, tool, args, {'X-User-Email': S_EMAIL})
+            snaps.append(usage_read(ufile)[0])
+            return r
+
+        e_ok, pl_ok = do('kg_list')
+        _, rows = usage_read(ufile)
+        ucase('usage-ok-conta-em-ok', e_ok is False and rows.get('kg_list') == [1, 0], rows)
+        ucase('usage-resposta-inalterada', pl_ok == baseline and 'data' in pl_ok, pl_ok)
+        ucase('usage-arquivo-modo-600', mode_of(ufile) == 0o600 and mode_of(udir) == 0o700
+              and mode_of(ufile + '.lock') == 0o600
+              and sorted(os.listdir(udir)) == [USAGE_FILE, USAGE_FILE + '.lock'],
+              f'arquivo={mode_of(ufile)} dir={mode_of(udir)} ls={os.listdir(udir)}')
+        e_err, _ = do('kg_node', {'grafo': 'docs/x.kg.yaml', 'id': S_NODE})
+        _, rows = usage_read(ufile)
+        ucase('usage-erro-conta-em-erro', e_err is True and rows.get('kg_node') == [0, 1], rows)
+        e_unk, _ = do(S_TOOL, {'x': 1})
+        text, rows = usage_read(ufile)
+        ucase('usage-desconhecida-vira-unknown', e_unk is True and rows.get('unknown') == [0, 1]
+              and S_TOOL not in text, text)
+        do('kb_search', {'termo': S_TERM})
+        do('kg_radar', {'grafo': 'docs/x.kg.yaml'})
+        do(['nome', 'que', 'nao', 'e', 'texto'])
+        seen = '\n'.join(snaps)
+        ucase('usage-arquivo-sem-argumento', S_TERM not in seen and S_NODE not in seen and len(snaps) == 6, seen)
+        ucase('usage-arquivo-sem-nome-de-grafo', 'x.kg.yaml' not in seen and 'docs/' not in seen, seen)
+        ucase('usage-arquivo-sem-email', S_EMAIL not in seen and '@' not in seen, seen)
+        ucase('usage-arquivo-sem-token', TOKEN not in seen, seen)
+        ucase('usage-arquivo-sem-ip', '127.0.0.1' not in seen, seen)
+        now = datetime.now(timezone.utc)
+        dias = {(now + timedelta(days=d)).strftime('%Y-%m-%d') for d in (-1, 0)}
+        linhas = [ln for s_ in snaps for ln in s_.splitlines()]
+        ucase('usage-arquivo-so-formato', linhas and all(
+            USAGE_STRICT_RE.match(ln) and ln.split('\t')[0] in dias for ln in linhas), seen)
+
+        # (u3) leitura pela flag: não sobe servidor, não pede token
+        env = {k: v for k, v in os.environ.items() if not k.startswith('ONION_KG_')}
+        r1 = subprocess.run([sys.executable, '-I', '-B', SERVER, '--usage'], capture_output=True, text=True,
+                            env={**env, 'ONION_KG_USAGE_DIR': udir}, timeout=30)
+        r2 = subprocess.run([sys.executable, '-I', '-B', SERVER, '--usage', '--days', '2'], capture_output=True,
+                            text=True, env={**env, 'ONION_KG_USAGE_DIR': udir}, timeout=30)
+        r3 = subprocess.run([sys.executable, '-I', '-B', SERVER, '--usage'], capture_output=True, text=True,
+                            env=env, timeout=30)
+        ucase('usage-leitura-por-flag', r1.returncode == 0 and 'kg_list\t1\t0\t1\t1\n' in r1.stdout
+              and 'kg_node\t0\t1\t1\t1\n' in r1.stdout and 'unknown\t0\t2\t2\t1\n' in r1.stdout
+              and 'inventory\t0\t0\t0\t0\n' in r1.stdout and 'TOTAL\t3\t3\t6\t1\n' in r1.stdout
+              and r2.returncode == 0 and 'TOTAL\t3\t3\t6\t1\n' in r2.stdout
+              and r3.returncode == 1 and 'desligado' in r3.stderr,
+              f'rc={r1.returncode},{r2.returncode},{r3.returncode} out={r1.stdout} err={r1.stderr}{r3.stderr}')
+
+        # (u4) linha de saída no SIGTERM, com o status de saída preservado
+        rc, rest = stop_and_drain(p)
+        ucase('usage-linha-de-saida', rc == -15 and 'onion-kg uso (saida): contador de uso LIGADO' in rest
+              and 'falhas do contador: 0' in rest, f'rc={rc} {rest}')
+
+        # (u5) diretório não gravável (o pai é um ARQUIVO: vale também para root): desligado, chamada responde
+        p = start({'ONION_KG_ROOT': wt, 'ONION_KG_USAGE_DIR': os.path.join(base, 'fora', 'segredo.md', 'sub')})
+        port, _ = wait_port(p)
+        line = p.stdout.readline() if port else ''
+        e, pl = call_sync(port, 'kg_list') if port else (None, {})
+        ucase('usage-dir-nao-gravavel-desliga', 'DESLIGADO (diretorio nao gravavel' in line and e is False
+              and pl == baseline, f'{line} {e}')
+
+        # (u6) diretório dentro da raiz servida: desligado, nada é criado lá (a árvore segue limpa)
+        inside = os.path.join(wt, 'uso-dentro')
+        p = start({'ONION_KG_ROOT': wt, 'ONION_KG_USAGE_DIR': inside})
+        port, _ = wait_port(p)
+        line = p.stdout.readline() if port else ''
+        e, pl = call_sync(port, 'kg_list') if port else (None, {})
+        existed = os.path.exists(inside)
+        shutil.rmtree(inside, ignore_errors=True)
+        ucase('usage-dentro-da-raiz-desliga', 'DESLIGADO (diretorio dentro da raiz servida)' in line
+              and not existed and e is False and pl.get('arvore_limpa') is True, f'{line} existia={existed}')
+
+        # (u7) o diretório some em runtime: a chamada responde igual e a falha é contada em memória
+        rdir = os.path.join(base, 'uso-runtime')
+        p = start({'ONION_KG_ROOT': wt, 'ONION_KG_USAGE_DIR': rdir})
+        port, _ = wait_port(p)
+        line = p.stdout.readline() if port else ''
+        if port and 'LIGADO em' in line:
+            os.rename(rdir, rdir + '.off')
+            write(rdir, 'um arquivo no lugar do diretorio\n')
+            e, pl = call_sync(port, 'kg_list')
+            rc, rest = stop_and_drain(p)
+            ucase('usage-falha-em-runtime-contada', e is False and pl == baseline
+                  and 'falhas do contador: 1' in rest, f'e={e} {rest}')
+        else:
+            ucase('usage-falha-em-runtime-contada', False, line)
+
+        # (u8) poda: 405 dias semeados (e uma linha fora do formato) viram 400 no boot
+        pdir = os.path.join(base, 'uso-poda')
+        os.makedirs(pdir, mode=0o700)
+        d0 = datetime(2020, 1, 1)
+        seed = ''.join(f'{(d0 + timedelta(days=i)).strftime("%Y-%m-%d")}\tkg_list\t1\t0\n' for i in range(405))
+        write(os.path.join(pdir, USAGE_FILE), seed + 'linha fora do formato\n')
+        p = start({'ONION_KG_ROOT': wt, 'ONION_KG_USAGE_DIR': pdir})
+        port, _ = wait_port(p)
+        line = p.stdout.readline() if port else ''
+        text, rows = usage_read(os.path.join(pdir, USAGE_FILE))
+        kept = sorted({ln.split('\t')[0] for ln in text.splitlines()})
+        ucase('usage-poda-400-dias', 'LIGADO em' in line and len(kept) == 400 and kept[0] == '2020-01-06'
+              and kept[-1] == '2021-02-08' and 'fora do formato' not in text and rows.get('kg_list') == [400, 0],
+              f'{line} dias={len(kept)} de {kept[:1]} a {kept[-1:]}')
+
+        # (u9) escritas concorrentes de processos distintos não perdem contagem (trava de arquivo)
+        cdir = os.path.join(base, 'uso-concorrente')
+        prog = ('import importlib.util, sys\n'
+                'spec = importlib.util.spec_from_file_location("srv", sys.argv[1])\n'
+                'm = importlib.util.module_from_spec(spec)\n'
+                'spec.loader.exec_module(m)\n'
+                'm.USAGE.start()\n'
+                'for _ in range(25):\n'
+                '    m.USAGE.record("kg_list", True)\n'
+                'print(m.USAGE.enabled, m.USAGE.failures)\n')
+        cenv = {**env, 'ONION_KG_ROOT': wt, 'ONION_KG_USAGE_DIR': cdir}
+        procs = [subprocess.Popen([sys.executable, '-I', '-B', '-c', prog, SERVER], env=cenv,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) for _ in range(4)]
+        outs = []
+        for cp in procs:
+            try:
+                o, er = cp.communicate(timeout=120)
+            except subprocess.TimeoutExpired:
+                cp.kill()
+                o, er = cp.communicate()
+            outs.append((cp.returncode, o.strip(), er.strip()[-200:]))
+        _, rows = usage_read(os.path.join(cdir, USAGE_FILE))
+        ucase('usage-concorrencia-nao-perde', all(o == (0, 'True 0', '') for o in outs)
+              and rows.get('kg_list') == [100, 0], f'{rows} {outs}')
+    finally:
+        # caso que não chegou a rodar (servidor não subiu, exceção no meio) reprova pelo NOME, não some
+        for name in all_names:
+            if name not in done:
+                case(name, False, 'caso nao executado')
 
 
 def main():
@@ -377,6 +626,9 @@ def main():
         else:
             e_v, pl_v = call_u(port4, 'kg_list', 'ana@exemplo.com')
             case('allowlist-vazia-nega-todos', e_v and 'data' not in pl_v, pl_v)
+
+        # (11) contador de uso por ferramenta
+        usage_cases(base, wt)
     finally:
         stop_all()
         shutil.rmtree(base, ignore_errors=True)
