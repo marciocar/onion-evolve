@@ -187,7 +187,12 @@ destinatários do cofre de senhas rodando o `gpg` como o dono da chave, e o `.gp
 
 **Retenção.** Só o rótulo `daily` envelhece: ficam os 14 mais novos. Os rotulados (`pre-*` e qualquer outro) ficam
 todos. A retenção só apaga arquivo regular, dentro do destino, cujo nome casa exatamente o padrão do diário; link
-simbólico não conta e não é seguido.
+simbólico não conta e não é seguido. O arquivo que a execução acabou de publicar nunca é candidato (relógio que
+recuou não derruba o backup recém-feito).
+
+**Raiz vazia.** Com a raiz de dados sem nenhuma entrada (serviço antes da primeira área) o backup sai vazio, com o
+aviso «raiz de dados sem área: backup vazio» no stderr e rc 0, e o deploy segue. Raiz com alguma entrada e nenhuma
+área com `.git/HEAD` é recusa: algo sumiu.
 
 **Quem escreve onde.** Como root, o root só lê a raiz de dados. O destino (criar, cifrar, conferir, renomear,
 apagar na retenção) e o arquivo de destinatários são tocados como o dono da chave, por `sudo -u`.
