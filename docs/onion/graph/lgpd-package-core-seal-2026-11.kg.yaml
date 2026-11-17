@@ -58,6 +58,21 @@ nodes:
       source: "sessão do core, sobre a pesquisa da curadoria"
       locator: "selo do core de 2026-11-16 sobre a proposta do pacote LGPD"
       method: "derived: lente do core sobre o estudo da curadoria, confrontado com o texto da lei"
+  - id: Q_PURPOSE_IN_GRAPH_CONTRACT_1117
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 4
+    confidence: 0.5
+    evidence_class: testimony
+    label: "A finalidade do tratamento entra no contrato do grafo, e como se concilia o histórico em git com a eliminação de dado pessoal?"
+    narrative: "Saiu do Delphi da classificação de 2026-11-17 (kg-ssot, curadoria e operações da VPS; três rodadas). A classificação governa acesso. A retenção já está no contrato do grafo (prazo de retenção, descarte e bloqueio), conferido pelo kg-ssot no esquema; a finalidade não é modelada. O ponto mais agudo: com armazenamento em git o histórico guarda toda versão, e apagar dado pessoal exige reescrever o histórico. O maestro selou o fecho do desenho da classificação com a finalidade como pergunta própria. A curadoria instrui: o que a lei exige, como o mercado modela finalidade em metadado, como outros resolvem a eliminação em histórico imutável, e as opções para o contrato com o custo em versão. Quem decide é o maestro."
+    provenance:
+      source: "Delphi classification-open-reading-1117 conduzido pelo core em 2026-11-17, e o selo do maestro do mesmo dia"
+      locator: "síntese do Delphi, item da finalidade; resposta do maestro: «Selo o fecho do desenho»"
+      method: "testimony: posições das três sessões e a decisão do maestro; a medição do esquema é relato do kg-ssot"
 edges:
   - from: E_LGPD_LAW_READ_BY_CORE_1116
     to: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
@@ -65,3 +80,6 @@ edges:
   - from: E_LGPD_INCIDENT_DEADLINE_UNVERIFIED_1116
     to: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
     edge_type: CONSTRAINS
+  - from: Q_PURPOSE_IN_GRAPH_CONTRACT_1117
+    to: D_SEAL_LGPD_MINIMUM_PACKAGE_1116
+    edge_type: TRACES_TO

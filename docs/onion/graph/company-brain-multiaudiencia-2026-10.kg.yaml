@@ -144,16 +144,25 @@ nodes:
   - id: Q_MA_CLASSIFICATION
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: kg-ssot
     impact: 5
     confidence: 0.5
-    verified_against: "relato do kg-ssot ao core em 2026-11-16, conferido pelo core no vendor da 4.53.0: o CHANGELOG traz o perfil canônico x_classification (só no meta, julgado só quando presente, 4.49.0) e o piso por nível no gate (kg_gate --classification-floor e --area-policy, 4.52.0, adotada no PR 1662); a projeção por audiência é o kg_audit e o kg-mcp por área, curados na 4.53.0. O campo e o piso estão entregues; o nó segue aberto porque fechar a pergunta de produto é selo do maestro (Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION)."
     evidence_class: measurement
-    verified_at: "2026-11-16"
     label: "Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência?"
-    narrative: "É o bloqueador escondido apontado pelo hub: grafos e páginas carregam conteúdo sensível (de segurança e dados de pessoas), e locality: privado não é sensibilidade. Abrir leitura ao negócio pede o campo e a projeção redigida. Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 (não é selo). A decisão vai ao maestro porque mexe no contrato; antes do selo, uma rodada de padrão de mercado."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-17"
+    verified_against: "decisão do maestro em 2026-11-17, por pergunta com opções (/meta:decide): escolhida «Selo o fecho do desenho: nível no meta do grafo (x_classification) mais a trilha de rebaixamento (x_downgrade); unidade de classificação é o grafo e a de visibilidade é a área; a projeção por audiência é a entrega do servidor por área, teto e papel. Ficam fora desta versão, com gatilho de reabertura: rótulo por nó (spike refeito medindo nível), negação por pessoa (primeiro adotante que precisar) e finalidade do tratamento (pergunta nova)»"
+    narrative: |-
+      É o bloqueador escondido apontado pelo hub: grafos e páginas carregam conteúdo sensível (de segurança e dados de pessoas), e locality: privado não é sensibilidade. Abrir leitura ao negócio pede o campo e a projeção redigida. Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 (não é selo). A decisão vai ao maestro porque mexe no contrato; antes do selo, uma rodada de padrão de mercado.
+
+      verified_against anterior: «relato do kg-ssot ao core em 2026-11-16, conferido pelo core no vendor da 4.53.0: o CHANGELOG traz o perfil canônico x_classification (só no meta, julgado só quando presente, 4.49.0) e o piso por nível no gate (kg_gate --classification-floor e --area-policy, 4.52.0, adotada no PR 1662); a projeção por audiência é o kg_audit e o kg-mcp por área, curados na 4.53.0. O campo e o piso estão entregues; o nó segue aberto porque fechar a pergunta de produto é selo do maestro (Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION).»
+      Selado por /meta:decide em 2026-11-17: escolhida «Selo o fecho do desenho: nível no meta do grafo (x_classification) mais a trilha de rebaixamento (x_downgrade); unidade de classificação é o grafo e a de visibilidade é a área; a projeção por audiência é a entrega do servidor por área, teto e papel. Ficam fora desta versão, com gatilho de reabertura: rótulo por nó (spike refeito medindo nível), negação por pessoa (primeiro adotante que precisar) e finalidade do tratamento (pergunta nova)»; descartadas: «Selo, mas rótulo por nó fica aberto» · «Não selo ainda».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-17: «O Delphi com kg-ssot, curadoria e operações da VPS fechou em três rodadas (dois aceites e uma objeção de operações só à redação da condição de implantação). Você sela o fecho do desenho da classificação?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
+      locality: "pessoa"
   - id: Q_MA_MARKET
     node_type: question
     layer: audit

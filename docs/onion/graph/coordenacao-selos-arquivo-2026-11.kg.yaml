@@ -174,6 +174,54 @@ nodes:
       locator: "pergunta com opções de 2026-11-16: «Abrir a Emenda da Fase 2 do arnês de isolamento depende da sua autorização. Autoriza?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-16"
       locality: "pessoa"
+  - id: D_KGSSOT_CONTRACT_DOWNGRADE_TRAIL_SEALED_1117
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-17"
+    verified_against: "decisão do maestro em 2026-11-17, por pergunta com opções (/meta:decide): escolhida «Selo e corta a release»"
+    label: "O maestro selou o contrato do kg-ssot com a trilha de rebaixamento de nível e autorizou o corte da release minor com as quatro curas da classificação"
+    narrative: "Selado por /meta:decide em 2026-11-17: escolhida «Selo e corta a release»; descartadas: «Selo, mas segura o corte» · «Quero ler a proposta antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-17: «A trilha de rebaixamento de nível está construída na main do kg-ssot, sem tag: campo novo no meta do grafo, só recomendado, e opção nova no gate. Você sela o contrato e autoriza o corte?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
+      locality: "pessoa"
+  - id: D_NODE_LABEL_SPIKE_REDO_MEASURING_LEVEL_1117
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-17"
+    verified_against: "decisão do maestro em 2026-11-17, por pergunta com opções (/meta:decide): escolhida «Refazer o spike medindo nível»"
+    label: "O maestro mandou refazer o spike do rótulo de sensibilidade por nó medindo nível, e não fonte, antes de decidir abrir ou não o contrato"
+    narrative: "Selado por /meta:decide em 2026-11-17: escolhida «Refazer o spike medindo nível»; descartadas: «Não abrir, com emenda» · «Abrir, como a regra mandava»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-17: «O spike mediu a fonte do nó, não o nível: 105 de 307 grafos misturavam fontes, e nenhum grafo real declara nível. O que você decide sobre o rótulo por nó?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
+      locality: "pessoa"
+  - id: D_NONDEV_READING_PLAN_AS_DOCUMENT_FIRST_1117
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-17"
+    verified_against: "decisão do maestro em 2026-11-17, por pergunta com opções (/meta:decide): escolhida «Plano em documento primeiro»"
+    label: "Abrir leitura do grafo a quem não é dev segue fechado; o plano de abertura sai primeiro em documento, pela sessão de operações com o kg-ssot, e cada passo em produção pede autorização do maestro"
+    narrative: "Selado por /meta:decide em 2026-11-17: escolhida «Plano em documento primeiro»; descartadas: «Só a regra no manual agora» · «Parquear a abertura»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-17: «As três sessões do Delphi dizem que hoje não dá para abrir leitura a quem não é dev: o servidor de produção não lê nível nem teto. Como seguimos?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -186,4 +234,13 @@ edges:
     edge_type: TRACES_TO
   - from: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
     to: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
+    edge_type: TRACES_TO
+  - from: D_KGSSOT_CONTRACT_DOWNGRADE_TRAIL_SEALED_1117
+    to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
+    edge_type: TRACES_TO
+  - from: D_NODE_LABEL_SPIKE_REDO_MEASURING_LEVEL_1117
+    to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
+    edge_type: TRACES_TO
+  - from: D_NONDEV_READING_PLAN_AS_DOCUMENT_FIRST_1117
+    to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
     edge_type: TRACES_TO
