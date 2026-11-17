@@ -56516,12 +56516,19 @@ _family run_agent_frontmatter_keys_selftests
 # defesa DUPLA, por isso não está na lista): o `os.path.isabs` do confinamento (o grafo tem de estar no `git
 # ls-files` e a KB tem prefixo fixo) e a recusa de raiz em runtime, que vale ANTES e DEPOIS da tool (a re-leitura
 # do HEAD que fecha a janela frescor→leitura também recusa raiz ilegível; cada uma sozinha segura o caso).
+# CONTADOR DE USO (2026-11-17, env ONION_KG_USAGE_DIR): 20 casos `usage-*` e 13 mutantes. O arquivo só pode
+# carregar dia × ferramenta × ok|erro: os mutantes de privacidade trocam a CHAVE normalizada pelo nome recebido,
+# pelo argumento, pelo e-mail, pelo token e pelo IP, e cada um morre no caso de grep negativo com a sentinela
+# dele. O harness lê o arquivo depois de CADA chamada (lê até o EOF do socket, que só vem depois de o handler
+# terminar), porque a linha fora do formato some na reescrita seguinte. TETO DECLARADO: a ordem "responde e
+# depois conta" e o `try/except` do record não têm mutante (o handler já respondeu; a falha só aparece no
+# contador em memória, que tem o dele).
 run_mcp_onion_kg_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg/selftest.py"
   if [ ! -f "${h}" ] || [ ! -f "${REPO_ROOT}/ops/mcp-onion-kg/server.py" ]; then
     record_skip "mcp-onion-kg: servidor ausente nesta árvore (ops/ não viaja para todo papel)"; return
   fi
-  local want_total=34 o rc
+  local want_total=54 o rc
   if o="$(LC_ALL=C python3 -I -B "${h}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
     record_pass "mcp-onion-kg: (a) servidor real por HTTP — ${want_total} casos (401, raiz inválida, -efoo, kg_node, frescor)"
@@ -56556,6 +56563,19 @@ if n < 0 or n > MAX_BODY:$(printf '\x1f')if False:$(printf '\x1f')content-length
 if not isinstance(params, dict):$(printf '\x1f')if False:$(printf '\x1f')params-nao-objeto-400
                 if user not in ALLOWED_EMAILS:$(printf '\x1f')                if False:$(printf '\x1f')allowlist-email-fora-recusa
 ALLOWED_EMAILS = None if _ALLOW_RAW is None else$(printf '\x1f')ALLOWED_EMAILS = None if not _ALLOW_RAW else$(printf '\x1f')allowlist-vazia-nega-todos
+tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'$(printf '\x1f')tool_key = str(nome)$(printf '\x1f')usage-desconhecida-vira-unknown
+tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'$(printf '\x1f')tool_key = str(nome) + ' ' + json.dumps(params.get('arguments'))$(printf '\x1f')usage-arquivo-sem-argumento
+tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'$(printf '\x1f')tool_key = str(nome) + ' ' + json.dumps(params.get('arguments'))$(printf '\x1f')usage-arquivo-sem-nome-de-grafo
+tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'$(printf '\x1f')tool_key = str(nome) + ' ' + str(self.headers.get('X-User-Email'))$(printf '\x1f')usage-arquivo-sem-email
+tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'$(printf '\x1f')tool_key = str(nome) + ' ' + str(self.headers.get('X-Api-Key'))$(printf '\x1f')usage-arquivo-sem-token
+tool_key = nome if isinstance(nome, str) and nome in TOOLS else 'unknown'$(printf '\x1f')tool_key = str(nome) + ' ' + str(self.client_address[0])$(printf '\x1f')usage-arquivo-sem-ip
+os.O_EXCL, 0o600)$(printf '\x1f')os.O_EXCL, 0o644)$(printf '\x1f')usage-arquivo-modo-600
+keep = set(days[-USAGE_MAX_DAYS:])$(printf '\x1f')keep = set(days)$(printf '\x1f')usage-poda-400-dias
+fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)$(printf '\x1f')pass$(printf '\x1f')usage-concorrencia-nao-perde
+row[0 if ok else 1] += 1$(printf '\x1f')row[0] += 1$(printf '\x1f')usage-erro-conta-em-erro
+                ok = True$(printf '\x1f')                ok = False$(printf '\x1f')usage-ok-conta-em-ok
+                self.failures += 1$(printf '\x1f')                pass$(printf '\x1f')usage-falha-em-runtime-contada
+if d == ROOT or d.startswith(ROOT + os.sep):$(printf '\x1f')if False:$(printf '\x1f')usage-dentro-da-raiz-desliga
 EOF_MUT
 }
 _family run_mcp_onion_kg_selftests

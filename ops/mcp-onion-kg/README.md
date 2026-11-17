@@ -32,6 +32,7 @@ própria resposta (`cobertura`): tipo, plano e verificação só vêm quando o n
 | `ONION_KG_TOKEN` | **sim** | token exigido no header `X-Api-Key`. Sem ela o servidor **não sobe** (fail-closed). |
 | `ONION_KG_ROOT` | não | a raiz servida, fixada **pela instância**. Nenhuma tool aceita raiz, org ou repo como argumento. Sem a env, a raiz é o próprio repo do servidor (o comportamento anterior), e a resposta declara isso em `root_source`. |
 | `ONION_KG_ALLOWED_EMAILS` | não (mas **obrigatória atrás do LibreChat**) | lista de e-mails, separados por vírgula, que podem usar `tools/call`, conferida no header `X-User-Email` (no LibreChat: `{{LIBRECHAT_USER_EMAIL}}`). **Definida e vazia = ninguém.** Ausente = só o token, sem autorização por usuário (aceitável só em ensaio local). Mesmo molde do SGE nesta stack. |
+| `ONION_KG_USAGE_DIR` | não | diretório do contador de uso por ferramenta (ver abaixo). **Ausente = contador desligado.** Tem de ficar fora da raiz servida. |
 | `MCP_HOST` | não | bind; default `172.23.0.1` |
 | `MCP_PORT` | não | porta; default `3032`. `0` = porta efêmera, e a linha de boot imprime a porta real. |
 
@@ -85,11 +86,68 @@ Tetos declarados: o termo do `kb_search` é regex BRE, então um padrão patoló
 thread até o timeout de 60 s (exige token); o servidor não confere o header `Origin` (a rede privada e
 o token mitigam). Os dois ficam para o degrau 2, onde o endpoint deixa de ser privado.
 
+## Contador de uso por ferramenta
+
+O servidor silencia o log de requisições. Para saber quanto cada ferramenta é usada existe um
+contador opcional, que guarda **só totais**.
+
+**O que é gravado**, uma linha por dia e ferramenta, em `<ONION_KG_USAGE_DIR>/tool-usage.tsv`:
+
+```
+dia<TAB>ferramenta<TAB>ok<TAB>erro
+2026-11-17	kg_list	12	0
+2026-11-17	kg_node	7	2
+2026-11-17	unknown	0	1
+```
+
+- `dia` é a data em UTC (`AAAA-MM-DD`).
+- `ferramenta` é uma das 7 registradas, ou `unknown` quando o nome pedido não é nenhuma delas.
+- `ok` conta as chamadas que devolveram resultado; `erro` conta as que devolveram `isError`.
+
+**O que nunca é gravado nem logado:** e-mail, cabeçalho, token, IP, argumentos da chamada, nome de
+grafo ou de nó, texto de busca, resposta, e o texto de um nome de ferramenta desconhecido (é entrada
+de terceiro, vira `unknown`). A recusa por e-mail fora da lista não é contada: ela acontece antes do
+despacho da ferramenta.
+
+**Como liga.** Defina `ONION_KG_USAGE_DIR` num diretório fora da raiz servida e fora de qualquer
+repo (sugestão: `/var/lib/onion-kg/<instância>`, ou o `StateDirectory=` do systemd). O servidor cria
+o diretório com modo 700 se ele não existir, e os arquivos com modo 600. O contador fica **desligado**,
+sem derrubar nada, quando a variável está ausente, quando o diretório fica dentro da raiz servida,
+quando ele já existe aberto a grupo ou a outros (o servidor não muda o modo de diretório alheio), ou
+quando não é gravável. O boot diz qual foi o caso, numa linha logo depois da linha da porta:
+
+```
+onion-kg uso: contador de uso LIGADO em /var/lib/onion-kg/hub/tool-usage.tsv · falhas do contador: 0
+onion-kg uso: contador de uso DESLIGADO (ONION_KG_USAGE_DIR ausente) · falhas do contador: 0
+```
+
+**O contador nunca afeta uma chamada.** A soma roda depois de a resposta ter sido escrita, toda falha
+dele é engolida e contada em memória, e o número sai na linha de boot e numa linha de saída
+(`onion-kg uso (saida): ...`) quando o processo recebe SIGTERM. Chamada cuja soma falhou não é contada.
+
+**Escrita e tamanho.** Cada soma relê o arquivo, reescreve num temporário e faz rename, sob trava
+(`tool-usage.tsv.lock`, `flock`), então duas instâncias no mesmo diretório não perdem contagem. Ficam
+no máximo 400 dias distintos; os mais antigos são descartados. Linha fora do formato é descartada na
+reescrita seguinte.
+
+**Como ler**, sem abrir o arquivo à mão e sem subir servidor (não pede token; rode como o usuário do
+serviço, porque o arquivo é 600):
+
+```bash
+ONION_KG_USAGE_DIR=/var/lib/onion-kg/hub python3 ops/mcp-onion-kg/server.py --usage            # tudo o que o arquivo guarda
+ONION_KG_USAGE_DIR=/var/lib/onion-kg/hub python3 ops/mcp-onion-kg/server.py --usage --days 30  # os últimos 30 dias (UTC)
+```
+
+A saída é uma tabela `ferramenta ok erro total dias`, com as 7 ferramentas (inclusive as de total
+zero), `unknown` e uma linha `TOTAL`. Para o corte por dia, o arquivo é TSV:
+`awk -F'\t' '$2=="kg_node"{print $1, $3+$4}' tool-usage.tsv`. Os totais **não** são expostos como
+ferramenta MCP nem por HTTP.
+
 ## Teste
 
 ```bash
-LC_ALL=C python3 -I ops/mcp-onion-kg/selftest.py          # 29 casos por HTTP de verdade
-LC_ALL=C bash .claude/validation/lint-selftest.sh --families mcp_onion_kg   # + 20 mutantes
+LC_ALL=C python3 -I ops/mcp-onion-kg/selftest.py          # 54 casos por HTTP de verdade
+LC_ALL=C bash .claude/validation/lint-selftest.sh --families mcp_onion_kg   # + 35 mutantes
 ```
 
 O harness sobe o servidor em `127.0.0.1` numa porta efêmera contra uma fixture em `mktemp` e mata só
@@ -112,7 +170,10 @@ os processos que ele mesmo subiu.
    reaproveite o token de outra instância.
 4. **systemd.** Unidade com `Environment=ONION_KG_ROOT=<base>/hub-served`, o token por
    `EnvironmentFile=` com modo 0600, `MCP_HOST` no IP da bridge privada do LibreChat e `MCP_PORT`
-   próprio da instância. `After=docker.service` (o IP da bridge só existe com ela de pé). Confira com
+   próprio da instância. `After=docker.service` (o IP da bridge só existe com ela de pé). Para o
+   contador de uso (opcional): `StateDirectory=onion-kg/<instância>` com `StateDirectoryMode=0700` e
+   `Environment=ONION_KG_USAGE_DIR=/var/lib/onion-kg/<instância>`, do mesmo usuário do serviço; a
+   linha `onion-kg uso:` do boot tem de dizer `LIGADO`. Confira com
    `curl -s http://<host>:<porta>/health` e um `tools/call` de `kg_list` com o token: o
    `served_commit` tem de ser o SHA do passo 2.
 5. **Firewall.** Libere a porta só para a sub-rede da bridge do LibreChat. Nesta VPS o Docker fura o
