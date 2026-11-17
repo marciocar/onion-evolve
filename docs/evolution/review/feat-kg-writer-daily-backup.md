@@ -28,6 +28,9 @@ nota: "tokens 0 e duration_min 0 = não medidos: a passada foi feita pelo própr
 - **`ops/mcp-onion-kg-writer/README.md`.** Seção do backup: o que pega, o que não pega, as variáveis e os passos do
   maestro (primeira execução, conferência, ensaio de restauração, agendamento sugerido como texto, como desfazer).
 - **`.claude/validation/lint-selftest.sh`.** Família nova `kg_writer_backup`: 29 verificações.
+- **`ops/moat-targets.tsv` (core-only).** Uma linha `fecho` para o script novo, exigida pela REGRA 117 (Ato de
+  deploy tem assinatura no veto).
+- **`docs/onion/testing-inventory.md`.** Regenerado pelo `harness-inventory.sh` (342 famílias).
 
 ## Achados
 
@@ -60,9 +63,11 @@ Dez pontos examinados. Oito reais, todos corrigidos neste diff; nenhum bloqueant
 9. **`tar` com rc 1 (arquivo que mudou durante a leitura) derruba o backup do dia (examinado, não é defeito).** É a
    falha fechada pedida. Fica declarado no README; se virar ruído no uso real, a decisão de tolerar o rc 1 é do
    maestro.
-10. **`ops/moat-targets.tsv` (core-only) não ganhou linha para o script novo (examinado, não corrigido de
-    propósito).** O script lê a raiz de dados por `sudo tar`. Se ele deve entrar como `ato` é decisão de guarda, e
-    este diff não mexe em guarda.
+10. **`ops/moat-targets.tsv` (core-only): o script novo entra como `fecho`, não como `ato` (examinado, não é
+    defeito).** A REGRA 117 (Ato de deploy tem assinatura no veto) reprovou a primeira versão: o
+    `update-kg-writer.sh` é ato e passou a executar um script fora da lista. A cura é a linha
+    `fecho script ops/kg-writer-backup.sh -`, no molde da linha do `bridge-backup.sh`: um PR que mude o backup passa
+    a ser PR de guarda. Promover o script a `ato` (vetar a sessão de rodá-lo) é decisão do maestro e não foi tomada.
 
 ## Mutantes
 
@@ -82,7 +87,8 @@ pelo caso nomeado:
 | aceitar destino que é symlink | `destino-symlink-recusa` |
 
 Medido: `LC_ALL=C ONION_LOAD_LEASE_HELD=1 bash .claude/validation/lint-selftest.sh --families kg_writer_backup --jobs 2`
-deu 29 passaram, 0 pularam, 0 falharam.
+deu 29 passaram, 0 pularam, 0 falharam. Com as duas famílias que leem o `moat-targets.tsv` (core-only) de verdade
+(`--families act_signature,moat_gate,kg_writer_backup`): 472 passaram, 0 pularam, 0 falharam.
 
 ## Limites declarados
 
@@ -104,3 +110,7 @@ deu 29 passaram, 0 pularam, 0 falharam.
 - **`ops/migrate-python-service.sh` (core-only) ainda faz um tar pré-troca em claro** da mesma raiz. Ficou fora do
   escopo deste diff.
 - **Mesmo disco.** O backup não é cópia fora da máquina.
+- **Bancada parcial.** A linha nova do `moat-targets.tsv` (core-only) seleciona 30 famílias pelo mapa da bancada;
+  rodaram as duas que julgam a tabela (`act_signature`, `moat_gate`) e a família nova. As outras 28 ficam para o CI.
+- **`lint-artifacts.sh` rodou uma vez inteiro** e acusou 2 HARD (REGRA 80 e REGRA 117), ambas deste diff e ambas
+  curadas depois; a cura foi conferida pelo helper de cada regra, não por uma segunda passada inteira do lint.
