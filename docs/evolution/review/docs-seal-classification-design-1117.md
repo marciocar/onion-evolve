@@ -2,7 +2,8 @@
 branch: docs/seal-classification-design-1117
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 56e298a5844bae7a5ce179e6a515df3c80985bae639f4388829ddd4c42ffbf53
+reviewed_code_sha256: 1c8d48b17fbf6832a925d2d8a792f9806703d29155f81d4a65015a90afb7ebdb
 findings_total: 2
 findings_real: 0
 findings_blocking: 0

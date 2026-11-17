@@ -1126,15 +1126,6 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## kg-ssot — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
-| 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
-| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
-| 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
-
 ## core — 47 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1649,6 +1640,14 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
+## kg-ssot — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
+| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
+| 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
+
 ## door-role-parity-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1839,11 +1838,12 @@
 | 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
 | 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
 
-## curadoria — 1 item(ns)
+## curadoria — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE` | coordenacao-sessoes-2026-10 | Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta. |
+| 4.0 | `Q_PURPOSE_IN_GRAPH_CONTRACT_1117` | lgpd-package-core-seal-2026-11 | A finalidade do tratamento entra no contrato do grafo, e como se concilia o histórico em git com a eliminação de dado pessoal? |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
 
