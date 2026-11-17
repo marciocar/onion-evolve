@@ -655,6 +655,15 @@ def has_tmux_key(pid):
     return any(e.startswith(b'TMUX=') for e in raw.split(b'\0'))
 def tilde(x): return re.sub(r'^/home/[^/]+|^/root(?=/|$)', '~', x or '')
 def tmux_name(x): return re.sub(r'[^A-Za-z0-9_-]+', '-', x or 'sessao').strip('-') or 'sessao'
+home_dir = real(os.environ.get('HOME') or os.path.expanduser('~'))
+def opener_name(cwd):
+    """O abridor ops/session-open.sh (core-only) resolve ~/<nome> e EXIGE repo: a cura por ele só vale quando o cwd é a
+    RAIZ de um repo em ~/<basename> — então o nome a imprimir é esse basename, nunca o `name` do harness (que pode ser
+    vazio → «sessao» rc 2) nem o de uma worktree (cujo cwd não fica em ~/<nome>, abriria o checkout principal). Fora
+    disso → None, e o pulso imprime só a forma `tmux new -s`. Retorna o basename do repo, ou None."""
+    if not cwd or os.path.dirname(cwd) != home_dir: return None
+    rc_t, top = git('rev-parse', '--show-toplevel', cwd=cwd, timeout=toplevel_timeout)
+    return os.path.basename(cwd) if rc_t == 0 and top and real(top) == cwd else None
 HY, hy_gaps = [], []
 inter = []
 for x in PROCS:
@@ -683,8 +692,14 @@ if peers_ok:
         if key or seen_tmux: continue
         if key is None and broken:
             hy_gaps.append(f'{tag}: sem chave TMUX legível e árvore cortada em {"→".join(chain) or "?"}: tmux NÃO medido'); continue
+        _repo = opener_name(p['cwd'])
+        _tmux_form = f'tmux new -s {tmux_name(p["name"])} -c {tilde(p["cwd"])} \'claude --resume {p["sid"]}\''
+        if _repo:
+            _cura = f'na sessão, /exit; depois: bash ops/session-open.sh {_repo} --resume {p["sid"]} (ou, sem o abridor: {_tmux_form})'  # (core-only): cita ops/session-open.sh (REGRA 100); só quando o cwd é raiz de repo em ~/<nome>, com a forma tmux como alternativa
+        else:
+            _cura = f'na sessão, /exit; depois: {_tmux_form}'
         HY.append(('SESSION_NOT_IN_TMUX', p, f'{tag} roda fora do tmux (sem TMUX no ambiente; árvore {"→".join(chain) or "—"}): sem reanexar e sem sobreviver a reboot ou ao fim do processo do terminal (ssh puro cai com a conexão; mosh não)',
-                   f'na sessão, /exit; depois: bash ops/session-open.sh {tmux_name(p["name"])} --resume {p["sid"]} (ou, sem o abridor: tmux new -s {tmux_name(p["name"])} -c {tilde(p["cwd"])} \'claude --resume {p["sid"]}\')'))  # (core-only): cita ops/session-open.sh (REGRA 100); a forma tmux fica como alternativa onde não há o abridor
+                   _cura))
     tops = {}
     for p in inter:
         git_top = None

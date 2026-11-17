@@ -59717,13 +59717,14 @@ BP_HY
     grep -q "^hygiene${T}sid-h-stop${T}SESSION_STOPPED${T}.*cura: kill -CONT 4001" <<< "${a}"; }
   _bpcase "(an) sessão suspensa (estado T) sai SESSION_STOPPED com o kill -CONT" \
     "        if st[0] in ('T', 't'):" "        if False:" _bp_an
-  # (ao) sem TMUX e com árvore bash→mosh-server sai SESSION_NOT_IN_TMUX com a cura pelo abridor (ops/session-open.sh) E a
-  #      forma tmux new como alternativa sem o abridor; o resto do ambiente NUNCA sai
+  # (ao) sem TMUX e com árvore bash→mosh-server sai SESSION_NOT_IN_TMUX. O cwd (${sb}/hm) NÃO é repo em ~/<nome>, então a
+  #      cura é SÓ a forma `tmux new -s`, SEM o abridor (achado F2 da revisão: o abridor só serve quando cwd é ~/<repo>).
+  #      O resto do ambiente NUNCA sai. Mutante: forçar o ramo do abridor imprime `ops/session-open.sh None`.
   _bp_ao() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "sid-h-mosh" <<< "${a}" | tr '\t' ' ')"
-    grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX${T}.*árvore bash→mosh-server.*ops/session-open.sh h-mosh --resume sid-h-mosh.*tmux new -s h-mosh .*claude --resume sid-h-mosh" <<< "${a}" \
-      && ! grep -q 'nao-imprima-isto\|FAKE_SECRET' <<< "${a}"; }
-  _bpcase "(ao) sessão fora do tmux (mosh) sai SESSION_NOT_IN_TMUX, sem vazar o ambiente" \
-    "        if key or seen_tmux: continue" "        if True: continue" _bp_ao
+    grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX${T}.*árvore bash→mosh-server.*tmux new -s h-mosh .*claude --resume sid-h-mosh" <<< "${a}" \
+      && ! grep -q 'ops/session-open.sh' <<< "${a}" && ! grep -q 'nao-imprima-isto\|FAKE_SECRET' <<< "${a}"; }
+  _bpcase "(ao) fora do tmux num cwd que não é ~/<repo>: cura só com tmux new, sem o abridor, sem vazar o ambiente" \
+    "        if _repo:" "        if True:" _bp_ao
   # (ap) sem a chave TMUX mas com o tmux na árvore (comm «tmux: server», com espaço) NÃO é aviso
   _bp_ap() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "sid-h-tmux" <<< "${a}" | tr '\t' ' ')"
     grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-tmux${T}" <<< "${a}"; }
@@ -59804,6 +59805,24 @@ BP_V
     ! grep -q "SESSION_SAME_CHECKOUT" <<< "${a}"; }
   _bpcase "(ax) fora de repo git não há mesmo checkout (nem cura --worktree)" \
     "        if git_top is None: continue" "        if git_top is None: git_top = real(p['cwd'])" _bp_ax
+  # (ay) cura do SESSION_NOT_IN_TMUX pelo abridor SÓ quando o cwd é a RAIZ de um repo em ~/<basename> — e com o BASENAME
+  #      do repo, não o `name` do harness (achado F2 da revisão). HOME e o repo são do sandbox; a sessão se chama
+  #      «ay-sess» mas o repo é «myrepo»: a cura tem de imprimir `ops/session-open.sh myrepo`, nunca «ay-sess».
+  "${G[@]}" -C "${sb}" init -q soroot/myrepo >/dev/null 2>&1
+  python3 - "${sb}" <<'BP_AY'
+import json, os, sys
+sb = sys.argv[1]; d = f'{sb}/proc-ay/5201'; os.makedirs(d, exist_ok=True)
+open(f'{d}/stat','w').write('5201 (claude) S 1 1 1 0 -1\n'); open(f'{d}/comm','w').write('claude\n')
+open(f'{d}/environ','wb').write(b'')  # environ vazio: sem TMUX
+open(f'{sb}/peers-ay.json','w').write(json.dumps(
+  [{'pid':5201,'cwd':f'{sb}/soroot/myrepo','kind':'interactive','sessionId':'sid-ay','name':'ay-sess','status':'idle'}]))
+BP_AY
+  _bp_ay() { local a; a="$(HOME="${sb}/soroot" BP_PROC="${sb}/proc-ay" _bpr "$1" --tsv --peers "${sb}/peers-ay.json")"
+    BP_WHY="$(grep "sid-ay" <<< "${a}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}sid-ay${T}SESSION_NOT_IN_TMUX${T}.*ops/session-open.sh myrepo --resume sid-ay.*tmux new -s ay-sess" <<< "${a}" \
+      && ! grep -q 'session-open.sh ay-sess' <<< "${a}"; }
+  _bpcase "(ay) cwd raiz de repo em ~/<nome>: a cura cita o abridor com o BASENAME do repo, não o name da sessão" \
+    "if not cwd or os.path.dirname(cwd) != home_dir: return None" "if not cwd or True: return None" _bp_ay
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
