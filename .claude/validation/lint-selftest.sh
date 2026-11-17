@@ -58474,6 +58474,41 @@ _prc_graph() {  # $1=id do grafo $2=source do nó E_A
   printf 'meta:\n  id: %s\nnodes:\n  - id: E_A\n    provenance:\n      source: "%s"\n' "$1" "$2"
 }
 _prc_git() { git -C "$1" -c user.email=t@t -c user.name=t "${@:2}"; }
+# commit --allow-empty num repo até o `--short=10` ter dígito E letra (o guard só reconhece hex misto como commit, e
+# ~0,9% dos hashes saem só-dígitos: a família era FLAKY por isso). Imprime o hash curto; vazio + rc 1 se estourar o teto
+# (o caso que o usa já exige `[ -n "${pc}" ]`, então o estouro vira falha explícita e visível, nunca verde calado).
+_prc_mixed_commit() {  # $1=repo → hash curto de 10 com dígito e letra (ou vazio+rc1)
+  local repo="$1" i pc
+  for i in $(seq 1 100); do
+    _prc_git "${repo}" commit -q --allow-empty -m "priv ${i}" >/dev/null 2>&1 || return 1
+    pc="$(git -C "${repo}" rev-parse --short=10 HEAD 2>/dev/null)"
+    if [[ "${pc}" == *[0-9]* && "${pc}" == *[a-f]* ]]; then printf '%s' "${pc}"; return 0; fi
+  done
+  return 1
+}
+# commit SOLTO (commit-tree, sem ref — o clone do CI não o alcança) cujo hash de 12 tem dígito E letra. Mesmo flake do
+# _prc_mixed_commit: a detecção do hex solto na linha do marcador também exige hex misto. Vazio+rc1 se estourar o teto.
+_prc_mixed_commit_tree() {  # $1=repo → hash de 12 misto de um commit sem ref (ou vazio+rc1)
+  local repo="$1" i h tree
+  tree="$(git -C "${repo}" rev-parse HEAD^{tree} 2>/dev/null)" || return 1
+  for i in $(seq 1 100); do
+    h="$(_prc_git "${repo}" commit-tree -m "solto ${i}" "${tree}" 2>/dev/null | cut -c1-12)"
+    if [[ "${h}" == *[0-9]* && "${h}" == *[a-f]* ]]; then printf '%s' "${h}"; return 0; fi
+  done
+  return 1
+}
+# commit --allow-empty até o `--short=10` ser SÓ DÍGITOS e inequívoco em 10 (p≈0,9%/tentativa, ~115 esperadas): para
+# montar o cenário do ponto cego (hex só-dígitos). Teto alto; vazio+rc1 se estourar — o caso então PULA (record_skip),
+# nunca reprova: não achar um hash só-dígitos é sorte do ambiente, não defeito do guard.
+_prc_digit_commit() {  # $1=repo → hash curto de 10 só-dígitos de um commit real (ou vazio+rc1)
+  local repo="$1" i pc
+  for i in $(seq 1 2000); do
+    _prc_git "${repo}" commit -q --allow-empty -m "d ${i}" >/dev/null 2>&1 || return 1
+    pc="$(git -C "${repo}" rev-parse --short=10 HEAD 2>/dev/null)"
+    [[ "${pc}" =~ ^[0-9]{10}$ ]] && { printf '%s' "${pc}"; return 0; }
+  done
+  return 1
+}
 _prc_box() {  # $1=caminho da guarda → imprime um repo-sandbox com a guarda COMO O RUNNER A INVOCA
   local sb; sb="$(TMPDIR=/tmp mktemp -d)" || return 1
   mkdir -p "${sb}/.claude/validation" "${sb}/g" "${sb}/docs/evolution/federation"
@@ -58580,7 +58615,7 @@ run_private_repo_cite_selftests() {
   printf 'meta:\n  id: mk6\nnodes:\n  - id: E_MK6\n    narrative: "private-cite:FFFFFFFFFFFFFFFFFFFFFF, pin do core %s e donoteste/repo-publico@abc1234"\n' "${own}" > "${sb}/g/mk6.kg.yaml"
   # (r3) o commit que só existe no git LOCAL (nenhum ref remoto nem tag o alcança) não é isento: o clone do CI não o tem
   #      (o 1º CI do #1648 reprovou exatamente nisso). Commit vazio fora da main, sem ref remoto.
-  local loc; loc="$(cd "${sb}" && git -c user.email=t@t -c user.name=t commit-tree -m solto "$(git rev-parse HEAD^{tree})" 2>/dev/null | cut -c1-12)"
+  local loc; loc="$(_prc_mixed_commit_tree "${sb}")"  # commit solto misto: determinístico (sem o flake do hex só-dígitos)
   printf 'meta:\n  id: mk7\nnodes:\n  - id: E_MK7\n    narrative: "private-cite:GGGGGGGGGGGGGGGGGGGGGG, pin local %s"\n' "${loc}" > "${sb}/g/mk7.kg.yaml"
   if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tMARCADOR-COM-COMMIT\tg/mk.kg.yaml\tnó E_MK, linha 5:' <<< "${o}" \
@@ -58623,8 +58658,8 @@ run_private_repo_cite_selftests() {
   #      dono/repo@<hex> público, o de dono de terceiro, o commit deste repo e o hex que já estava no arquivo na base.
   #      Com ONION_PRIVATE_CLONES, o commit de um clone privado acusa COMMIT-PRIVADO-EM-DADO mesmo em linha antiga.
   local pr pc prev; pr="$(TMPDIR=/tmp mktemp -d)"; prev="$(git -C "${sb}" rev-parse HEAD)"
-  ( cd "${pr}" && git init -q -b main && git -c user.email=t@t -c user.name=t commit -q --allow-empty -m priv ) >/dev/null 2>&1
-  pc="$(git -C "${pr}" rev-parse --short=10 HEAD 2>/dev/null)"
+  ( cd "${pr}" && git init -q -b main ) >/dev/null 2>&1
+  pc="$(_prc_mixed_commit "${pr}")"  # hash curto misto: determinístico (sem o flake do hex só-dígitos)
   mkdir -p "${sb}/r/data"
   printf 'linha velha com commit fe0d1c2b3a\nlinha velha com o privado %s\n' "${pc}" > "${sb}/r/data/v.txt"
   ( cd "${sb}" && git add -A && _prc_git "${sb}" commit -qm velho && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
@@ -58667,9 +58702,8 @@ run_private_repo_cite_selftests() {
   local par sb3 pv pc3; par="$(TMPDIR=/tmp mktemp -d)"
   if sb3="$(_prc_box "${chk}")" && mv "${sb3}" "${par}/core"; then
     sb3="${par}/core"; pv="${par}/segredo"
-    ( git init -q -b main "${pv}" && cd "${pv}" && git remote add origin https://github.com/donoteste/repo-secreto.git \
-        && git -c user.email=t@t -c user.name=t commit -q --allow-empty -m s ) >/dev/null 2>&1
-    pc3="$(git -C "${pv}" rev-parse --short=10 HEAD 2>/dev/null)"
+    ( git init -q -b main "${pv}" && cd "${pv}" && git remote add origin https://github.com/donoteste/repo-secreto.git ) >/dev/null 2>&1
+    pc3="$(_prc_mixed_commit "${pv}")"  # hash curto misto: determinístico (sem o flake do hex só-dígitos)
     mkdir -p "${sb3}/r/data"; printf 'antiga com %s\noutra\n' "${pc3}" > "${sb3}/r/data/x.txt"
     ( cd "${sb3}" && git add -A && _prc_git "${sb3}" commit -qm d && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
     printf 'antiga com %s\noutra, mexida\n' "${pc3}" > "${sb3}/r/data/x.txt"
@@ -58682,6 +58716,38 @@ run_private_repo_cite_selftests() {
     else record_fail "private-repo-cite: (s3) clones derivados" "rc=${q1}/${q2} pc=${pc3}; [$(tr '\n' '|' <<< "${w1}" | head -c 300)]"; fi
   else record_fail "private-repo-cite: (s3) clones derivados" "sandbox falhou"; fi
   rm -rf "${par}"
+  # (s4) o PONTO CEGO do hex SÓ-DÍGITOS na camada de clones (cura desta leva): um commit de clone privado cujo hash curto
+  #      é só de dígitos passava calado (a 2ª camada exige letra, para não acusar número comum). Agora a camada de CLONES
+  #      — que o _batch CONFIRMA contra commits reais — o acusa; a HEX-NAO-CONFERIDO segue só-misto. Monta o cenário uma
+  #      vez e mede o guard intacto (acusa) E o mutante que reverte o alargamento (volta a passar calado), na MESMA caixa.
+  #      Um número comum de 10+ dígitos que NÃO é commit de clone nenhum cala nas duas camadas (sem falso-positivo).
+  local par4 sb4 pv4 pcd; par4="$(TMPDIR=/tmp mktemp -d)"
+  if sb4="$(_prc_box "${chk}")" && mv "${sb4}" "${par4}/core"; then
+    sb4="${par4}/core"; pv4="${par4}/segredo"
+    ( git init -q -b main "${pv4}" && cd "${pv4}" && git remote add origin https://github.com/donoteste/repo-secreto.git ) >/dev/null 2>&1
+    pcd="$(_prc_digit_commit "${pv4}")"  # hash curto só-dígitos de um commit real
+    if [ -n "${pcd}" ]; then
+      mkdir -p "${sb4}/r/data"
+      printf 'linha com o commit do clone %s\nnúmero comum 1234509876 e id 20241117123456\n' "${pcd}" > "${sb4}/r/data/d.txt"
+      ( cd "${sb4}" && git add -A && _prc_git "${sb4}" commit -qm base4 && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+      printf 'linha com o commit do clone %s, mexida\nnúmero comum 1234509876 e id 20241117123456\n' "${pcd}" > "${sb4}/r/data/d.txt"
+      local z4 zr4 mt4="${sb4}/.claude/validation/mut-s4.sh" zm4
+      if z4="$(env -u ONION_PRIVATE_CLONES LC_ALL=C bash "${sb4}/.claude/validation/private-repo-cite-check.sh" "${sb4}" --tsv 2>&1)"; then zr4=0; else zr4=$?; fi
+      if [ "${zr4}" -eq 1 ] && grep -q $'^HARD\tCOMMIT-PRIVADO-EM-DADO\tr/data/d.txt\tlinha 1:' <<< "${z4}" \
+         && [ "$(grep -c 'COMMIT-PRIVADO-EM-DADO\|HEX-NAO-CONFERIDO-EM-DADO' <<< "${z4}")" -eq 1 ] && ! grep -q "${pcd}" <<< "${z4}"; then
+        record_pass "private-repo-cite: (s4) commit de clone privado com hash SÓ-DÍGITOS → COMMIT-PRIVADO-EM-DADO (camada de clones); número comum de 10+ dígitos que não é commit de clone cala, e a 2ª camada (HEX-NAO) não acusa só-dígitos"
+      else record_fail "private-repo-cite: (s4) hex só-dígitos de clone" "rc=${zr4} pcd=${pcd}; [$(tr '\n' '|' <<< "${z4}" | head -c 300)]"; fi
+      # (s4-mut) reverte o alargamento só-dígitos (`len(h) >= 10` → `False`): a camada de clones volta a ignorar o commit
+      if python3 -I -B -c 'import sys; s=open(sys.argv[1]).read(); a="elif has_digit and not has_letter and len(h) >= 10:"; assert s.count(a)==1; open(sys.argv[2],"w").write(s.replace(a,"elif False:"))' \
+           "${sb4}/.claude/validation/private-repo-cite-check.sh" "${mt4}" 2>/dev/null; then
+        zm4="$(env -u ONION_PRIVATE_CLONES LC_ALL=C bash "${mt4}" "${sb4}" --tsv 2>&1 || true)"
+        if ! grep -q 'COMMIT-PRIVADO-EM-DADO' <<< "${zm4}"; then
+          record_pass "private-repo-cite: (s4-mut) revertido o alargamento só-dígitos → o commit de clone só-dígitos volta a passar calado (mutante morde)"
+        else record_fail "private-repo-cite: (s4-mut) mutante NÃO morde" "o mutante ainda acusou COMMIT-PRIVADO-EM-DADO"; fi
+      else record_fail "private-repo-cite: (s4-mut) mutante não aplicou" "âncora ausente/não-única no guard"; fi
+    else record_skip "private-repo-cite: (s4) não saiu hash curto só-dígitos no teto (p≈0,9%/tentativa) — cenário não montado"; fi
+  else record_fail "private-repo-cite: (s4) clones derivados (só-dígitos)" "sandbox falhou"; fi
+  rm -rf "${par4}"
   # (d) SÓ O TOCADO É JULGADO (o histórico fica)
   if _prc_case_scope "${chk}"; then record_pass "private-repo-cite: (d) grafo que o diff não toca não é julgado (o histórico fica)"
   else record_fail "private-repo-cite: (d) escopo" "o grafo fora do diff foi julgado, ou o novo não"; fi

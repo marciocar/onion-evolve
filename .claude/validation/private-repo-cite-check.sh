@@ -635,15 +635,30 @@ if data_files:
         return out_, base_txt
     for f in data_files:
         lines = rd(os.path.join(root, f)).splitlines()
-        occ = [(i, m) for i, line in enumerate(lines, 1) for m in HEX_COMMIT.finditer(line)
-               if re.search(r"[0-9]", m.group(0)) and re.search(r"[A-Fa-f]", m.group(0)) and not own_commit(m.group(0))]
-        if not occ:
+        # dois acervos de hex (fora o commit do core alcançável), por camada:
+        #   occ       — hex MISTO (dígito E letra): a camada HEX-NAO-CONFERIDO-EM-DADO (falha fechada sobre o novo). A
+        #               exigência de letra evita que palavra/número comum (id, timestamp, telefone) vire falso-positivo.
+        #   occ_clone — occ MAIS o hex só-dígitos de 10+ casas: SÓ a camada de clones (COMMIT-PRIVADO-EM-DADO), que
+        #               acusa apenas o que o _batch CONFIRMA ser commit real de um clone privado. Um número comum só
+        #               casaria se fosse, por acaso, prefixo de um commit de verdade do clone — aí é referência a ele.
+        occ, occ_clone = [], []
+        for i, line in enumerate(lines, 1):
+            for m in HEX_COMMIT.finditer(line):
+                h = m.group(0)
+                if own_commit(h):
+                    continue
+                has_digit, has_letter = re.search(r"[0-9]", h), re.search(r"[A-Fa-f]", h)
+                if has_digit and has_letter:
+                    occ.append((i, m)); occ_clone.append((i, m))
+                elif has_digit and not has_letter and len(h) >= 10:
+                    occ_clone.append((i, m))
+        if not occ_clone:
             continue
         if _clones:
-            hs = sorted({m.group(0).lower() for _, m in occ}); pv = set()
+            hs = sorted({m.group(0).lower() for _, m in occ_clone}); pv = set()
             for c in _clones:
                 pv |= _batch(c, [h for h in hs if h not in pv])
-            for i in sorted({i for i, m in occ if m.group(0).lower() in pv}):
+            for i in sorted({i for i, m in occ_clone if m.group(0).lower() in pv}):
                 rc = 1
                 out("HARD", "COMMIT-PRIVADO-EM-DADO", f, f"linha {i}: commit de repositório privado num arquivo de dado público — troque por ⟨commit⟩ e registre na tabela privada")
         added, base_txt = _added(f)
