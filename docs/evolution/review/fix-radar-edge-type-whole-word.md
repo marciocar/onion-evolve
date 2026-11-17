@@ -2,7 +2,8 @@
 branch: fix/radar-edge-type-whole-word
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dc4e508b161af85f9318e541115dbde8d0a939c985085ad135a6eb7c196bca0f
+reviewed_code_sha256: c0ba5716bbbd071205f37ac4fc4f9891eb50ea509e4697580fd3d682935a32bb
 findings_total: 4
 findings_real: 2
 findings_blocking: 0
