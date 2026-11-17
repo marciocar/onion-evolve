@@ -6,7 +6,7 @@ KG-SSOT is a **verifiable knowledge graph** in a plain text file. Each claim can
 verified, and what it was verified against. A formal contract decides whether the file is well formed. This manual
 covers the `.kg.yaml` format, the contract, the tools, and how to adopt KG-SSOT in a repository.
 
-This manual describes release **4.53.0** (tag `kg-ssot-v4.53.0`). The current contract in this release is **v4**.
+This manual describes release **4.54.0** (tag `kg-ssot-v4.54.0`). The current contract in this release is **v4**.
 
 The manual is also available in Brazilian Portuguese, in [`docs/manual/pt-BR/`](pt-BR/README.md). When the two
 differ, the English text wins.
@@ -20,7 +20,7 @@ differ, the English text wins.
 | 3 | [Format reference](03-format.md) | Every `.kg.yaml` field, taken from the schema |
 | 4 | [The contract](04-contract.md) | MUST vs. SHOULD, error codes, versions, and tags |
 | 5 | [Tools](05-tools.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_query`, `kg_refs`, `kg_diff`, `kg_prov_export`, `kg_migrate`, with real output |
-| 6 | [Adoption and CI](06-adoption-and-ci.md) | The short path to bring the contract into a repository |
+| 6 | [Adoption and CI](06-adoption-and-ci.md) | The short path to bring the contract into a repository, and sensitivity classification end to end |
 | 7 | [Conformance and readers](07-conformance-and-readers.md) | The case suite and how to write your own reader |
 | 8 | [Recipes](08-recipes.md) | Common tasks, step by step |
 | 9 | [Troubleshooting](09-troubleshooting.md) | What each error means and how to fix it |

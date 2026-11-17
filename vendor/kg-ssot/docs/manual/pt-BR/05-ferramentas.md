@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:314fdf0a03459adb -->
+<!-- translation-of: docs/manual/05-tools.md sha256:c601b6905448c973 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 597/597 (reprova)
+latest: 621/621 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -254,6 +254,10 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. O `.kg.json` não é conferido aqui. Não combina com `--update` |
 | `--private-repos ARQ` | Desde a 4.51. Desligado por padrão. Reprova (rc 1) o repositório privado citado sem o marcador `private-cite:<id>` (contrato v4.22); veja *O repositório privado citado sem o marcador* abaixo. Não combina com `--update` |
 | `--classification-floor NÍVEL --area-policy ARQ` | Desde a 4.52. Desligado por padrão. Reprova (rc 1) o `.kg.yaml` ou `.kg.json` rastreado (com `--touched`, o alterado; os excludes padrão não valem, só o `--exclude`) cujo `meta.x_classification` está em `NÍVEL` ou acima, pela ordem dos `levels` da política (contrato v4.23); veja *O piso de classificação* abaixo. Não combina com `--update` |
+| `--classification-cites --area-policy ARQ` | Desde a 4.54.0. Desligado por padrão, com ou sem o piso. Reprova (rc 1) o grafo que cita, num campo estruturado, um grafo rastreado de nível maior que o dele, pela ordem dos `levels` da política; veja *Citação entre níveis* abaixo. Não combina com `--update` |
+| `--classification-downgrade --area-policy ARQ` | Desde a 4.54.0 (contrato v4.24). Desligado por padrão, com ou sem os outros dois. Reprova (rc 1) quando o nível de um grafo caiu frente à base (a do `--touched`, ou `--base REF` no modo da catraca) sem o registro da queda em `meta.x_downgrade`, ou com um aprovador que mudou o nível; veja *Rebaixar pede trilha* abaixo. Não com `--update` |
+| `--base REF` | Desde a 4.54.0. Só com `--classification-downgrade`, no modo da catraca: a base é o ancestral comum de `REF` e `HEAD`. Não com `--touched`, que tem a base dele |
+| `--area-policy-digest sha256:HEX\|@ARQ` | Só com `--area-policy`. O digest que a política tem de ter, como o `kg_policy.py digest ARQ` o imprime, dado como valor ou como `@ARQ`, um arquivo commitado que o guarda numa linha. A política com outro digest, o valor malformado e a opção sem `--area-policy` são entrada quebrada (rc 2); veja *Fixar a política* abaixo |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
 
@@ -332,8 +336,9 @@ roda com o primeiro nível que nunca pode guardar.
    adivinha uma ordem pelos nomes.
 3. **A falha fecha.** O grafo sem a chave tem o `default_level` da política. O grafo que não parseia, não é UTF-8, cujo
    `meta` não é mapa ou cujo nível não está em `levels` reprova, porque o nível dele é desconhecido. A política ausente,
-   ilegível ou inválida, a política sem `levels` e o `NÍVEL` que `levels` não tem são entrada quebrada (rc 2), como uma
-   opção sem a outra e um valor vazio (o `--classification-floor ""` desligaria o piso em silêncio).
+   ilegível ou inválida (inclusive a que deixa uma área compartilhada fora de `ceilings`), a política sem `levels` e o
+   `NÍVEL` que `levels` não tem são entrada quebrada (rc 2), como uma opção sem a outra e um valor vazio (o
+   `--classification-floor ""` desligaria o piso em silêncio).
 4. **O que imprime.** Uma linha por grafo que reprova, com o caminho e o nível, e uma linha de resumo.
 
 Funciona nos dois modos: na catraca, todo grafo que ele lê; com `--touched`, só os alterados desde o ancestral comum
@@ -368,6 +373,205 @@ preparado num nível acima do piso reprova mesmo que o disco tenha agora outra v
 apagado do disco ainda conta. O grafo que só está no disco, nunca adicionado, não é julgado (e não vai no commit). As
 outras conferências do `--touched` (a dívida nos nós tocados) seguem comparando a árvore de trabalho. Num repositório ainda sem commit, o `HEAD` não resolve, e o gate para com
 rc 2. Por isso o CI mantém a mesma conferência: o hook pega o erro cedo, e o CI pega o hook que não rodou.
+
+#### Fixar a política: `--area-policy-digest`
+
+O piso e o `kg-mcp` leem, cada um, o arquivo de política que recebem, em geral de lugares diferentes (um secret do CI,
+um arquivo no servidor). Duas cópias que se afastam julgam o mesmo grafo de dois jeitos: com outro `default_level`, um
+grafo sem a chave reprova no piso com uma e é servido com a outra. Para as duas pontas lerem a mesma política, fixe o
+digest dela, como um lockfile fixa uma dependência:
+
+```bash
+mkdir -p .kg-ssot
+python3 -I vendor/kg-ssot/tools/kg_policy.py digest "$KG_AREA_POLICY" > .kg-ssot/area-policy.digest
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-floor confidential --area-policy "$KG_AREA_POLICY" \
+  --area-policy-digest @.kg-ssot/area-policy.digest
+```
+
+O `kg_policy.py digest ARQ` imprime `sha256:<hex>` (rc 0), ou diz por que a política é inválida (rc 2). O digest é o
+SHA-256 do JSON canônico (chaves ordenadas, sem espaços, UTF-8) da política como o leitor estrito a vê. Ele muda
+sempre que o que o gate ou o servidor fariam pode mudar, e às vezes também sem mudar: o teto de papel igual ao teto da
+área e o teto de papel omitido dão o mesmo acesso e digests diferentes, como o papel que ninguém tem e a política sem
+ele. Essa diferença falha fechada (o pin não bate e a política é recusada), nunca aberta.
+
+- igual: a indentação, a ordem das chaves, a ordem e a repetição dos membros de um grupo, do `read` de um papel e dos
+  papéis de um membro, a caixa de um e-mail, `write` ausente ou `["own"]`, `canonical` ausente ou `null`, e `roles` ou
+  `members` ausentes ou vazios;
+- diferente: a ordem de `levels` (é a ordem de sensibilidade), qualquer teto, o `default_level`, um membro, um grupo,
+  um papel e `write: []`.
+
+O digest cobre a política inteira, inclusive os papéis e tetos que o piso não usa: o ponto é as duas pontas lerem uma
+política só, não só a parte de que o gate precisa. Com `--area-policy-digest`, a política lida tem de ter esse digest,
+ou o gate para com `GATE QUEBRADO` (rc 2), antes de julgar qualquer grafo. A mensagem não imprime nem o digest lido nem
+o fixado, porque um log de CI pode ser público: rode o `kg_policy.py digest` na sua cópia para comparar. O `@ARQ` lê o
+valor de um arquivo (os espaços e quebras de linha das pontas não contam, nem a marca de ordem de bytes do UTF-8; o
+arquivo em UTF-16, que o `>` do Windows PowerShell 5.1 grava, é recusado com a dica de gravá-lo em UTF-8, e o arquivo
+não guarda mais nada). Sem a opção, nada é conferido, como antes. O `kg-mcp` aceita a mesma opção (abaixo). Com o
+pacote (`pip install kg-ssot`) no lugar do vendor, o mesmo comando é `python3 -m kg_ssot.kg_policy digest ARQ`.
+
+**O que um digest público entrega.** O digest não revela a política, mas deixa qualquer um testar um palpite: quem
+conhece a forma da sua política (os níveis, as áreas, os papéis, quase sempre previsíveis) e tem uma lista dos seus
+funcionários pode tentar combinações de membros fora da rede até uma bater, e assim confirmar quem está num grupo. Se
+a filiação é ela mesma sensível, guarde o valor numa variável do CI e o arquivo no servidor, sem commitá-lo num
+repositório público. No servidor, passe-o como `@ARQ`, um arquivo local fora de `--root`, e não como valor literal na
+linha de comando, que qualquer usuário da máquina lê no `ps`.
+
+**A mesma versão nas duas pontas.** O digest é calculado pelo `kg_policy.py` da release que você roda. Uma release que
+muda a normalização muda o digest do mesmo arquivo: o gate e o servidor em releases diferentes passam a discordar e
+falham fechado (rc 2), e a correção é levar os dois à mesma tag. Uma release que muda só o jeito de o leitor julgar uma
+política mantém o mesmo digest, então o pin continua batendo enquanto o veredito sobre um grafo pode mudar: leia o
+changelog antes de atualizar uma das pontas.
+
+#### Citação entre níveis: `--classification-cites` (desde a 4.54.0)
+
+O nível vale para o grafo inteiro, então o nó mais sensível que o grafo dele vai para um grafo próprio, com o nível no
+`meta` desse grafo. A separação só vale se o grafo de nível menor não apontar para ele: o id costuma ser descritivo, e
+uma aresta de um grafo `internal` para `payroll.kg.yaml#SALARY_CUT_2027` já conta o que o grafo `restricted` guarda. O
+`--classification-cites --area-policy ARQ` reprova (rc 1) cada grafo que cita, num campo estruturado, um grafo
+rastreado de nível maior que o dele, pela ordem dos `levels` da política.
+
+1. **O que conta como citação.** Os campos lidos são as duas pontas de cada item de `external_edges`, o `trace`, o
+   `provenance.source` e o `provenance.locator` de um nó (em texto, lista ou mapa, em qualquer profundidade, e com
+   qualquer `scheme`) e o `criterion` de `x_measured_under.criteria`. O valor de qualquer deles que menciona
+   `.kg.yaml`, `.kg.yml` ou `.kg.json`, em qualquer caixa, é citação, com ou sem id: o arquivo inteiro também é citado.
+   Ele é resolvido pelo mesmo resolvedor do `kg_trace.py check`, com as regras dele: o `trace` como trace, os outros
+   campos como fonte; as aspas, os `<>`, o prefixo `kg-node://` do esquema do contrato (também com a autoridade vazia,
+   `kg-node:///`) e o que vem depois de `#`, `:` ou `?` saem; e o alvo é procurado a partir da raiz, da pasta do grafo e
+   da pasta pai dela. Uma regra entra para o gate: o valor que é exatamente o caminho de um grafo do índice do git
+   resolve para ele, mesmo com acento, espaço, `+` ou `@`, ou como nome solto ao lado do grafo. O índice é a verdade;
+   não há casamento por sufixo, nome de arquivo ou caixa. A citação que resolve em mais de um lugar é julgada pelo
+   maior nível entre eles.
+2. **O sentido.** O menor citando o maior reprova. O maior citando o menor, e o mesmo nível, passam: um grafo
+   `restricted` pode apontar para o `internal` em que se apoia. O grafo sem a chave tem o `default_level` da política.
+3. **A falha fecha (negar por padrão).** O valor que tem a forma de caminho relativo e não resolve para um grafo
+   rastreado reprova: o caminho que não existe (outra caixa inclusive, num sistema de arquivos que distingue caixa), o
+   `..` que sai da raiz, o grafo de outra área ou repositório nomeado por caminho relativo. No `provenance.source`, no
+   `provenance.locator`, nas pontas das `external_edges` e no `criterion`, que o índice do git resolve, todo segmento
+   `.` ou `..` e a barra repetida (`docs//x`) também reprovam; o `trace` é resolvido no disco, como o
+   `kg_trace.py check` o resolve, então `docs//x` e o `..` que fica dentro da raiz resolvem ali e são julgados pelo
+   nível. Também reprovam o nível desconhecido do grafo que cita ou de qualquer candidato e o grafo que cita e não
+   parseia ou não é UTF-8, porque as citações dele não se sabem.
+4. **A varredura do valor.** Além de resolvê-lo, o gate procura em todo valor que lê, resolvido ou não, URL ou não, o
+   caminho de cada grafo do índice do git, a regra de uma varredura de segredos (valores conhecidos procurados no
+   texto), com o índice como a verdade. Cada grafo é procurado pelo caminho a partir da raiz e, como o resolvedor faz, a
+   partir da pasta do grafo que cita e da pasta pai dela. O valor é tomado em NFC do Unicode, sem distinção de caixa
+   (dobrada dos dois lados), com `\` lido como `/` e sem o prefixo `kg-node://` (com qualquer número de barras), e um
+   caminho só conta com fronteira de caminho: o caractere antes dele não é letra ou dígito (ASCII), `_`, `-` ou `/` (o
+   `./` do começo é aceito), e o depois não é letra ou dígito (ASCII), `/` ou `-` (o ponto final, `!`, `?`, aspas de
+   qualquer tipo, `)`, `]`, `*`, `_`, `|`, `}` e o espaço de largura zero são fronteira). Assim se acham a prosa
+   (`verified_against do nó X em docs/a.kg.yaml.`), o Markdown, as aspas tipográficas, o `rev:caminho` do git, o caminho
+   depois de uma URL ou de um caminho absoluto e o grafo escondido depois de um caminho que resolve. Cada grafo achado é
+   uma citação julgada pelo nível: reprova só quando é de nível maior. A citação a uma revisão antiga
+   (`docs/a.kg.yaml@c8e0dcab`, `HEAD~1:docs/a.kg.yaml`) é julgada pelo nível que o grafo tem hoje. A varredura nunca
+   substitui a falha fechada: o valor com a forma de caminho que não resolve reprova, ache a varredura o que achar nele,
+   com uma exceção: o valor inteiro, sem a pontuação de fronteira das pontas (aspas de qualquer tipo, `.,;:!?)]}*_|` e
+   o espaço de largura zero), é exatamente um grafo do índice (`docs/a.kg.yaml.`, com ponto final). A prosa que não
+   nomeia grafo do índice é contada à parte e passa, como o `kg_trace.py check` também não a julga, e também o valor que
+   nomeia só o próprio grafo que cita. Toda URL, o caminho absoluto (o do Windows, como `C:\r\docs\a.kg.yaml`,
+   inclusive) e o marcador `private-cite:` (um nó de outro repositório, contrato v4.22) são contados e passam, salvo se a
+   varredura acha neles um grafo do índice. O que fica de fora: o texto livre (`label`, `narrative`, `verified_against`,
+   outros campos `x_`; capítulo 6, "O texto livre não é cortado") e o grafo de outro repositório, que não está neste
+   índice.
+5. **O que lê.** Todo `.kg.yaml` e `.kg.json` rastreado, como o piso: os excludes padrão não valem. O
+   `--exclude GLOB` tira um grafo que cita, nunca um citado, porque o nível de um grafo não muda por ele não ser medido.
+6. **O que imprime.** Uma linha por par de grafos que reprova, com os dois caminhos, os dois níveis, quantas citações e
+   em que tipos de campo, e uma linha por grafo que cita com citações que não resolvem; nunca o id citado nem conteúdo
+   nenhum, porque o log do CI pode ser público. Uma linha de resumo conta os grafos, os pares, os grafos que reprovam e
+   o que não foi julgado: as citações a caminho absoluto, URL ou private-cite, as em prosa e as que nomeiam só o
+   próprio grafo que cita.
+
+Com `--touched`, só conta o par com uma ponta alterada, lido do índice do git: o grafo alterado que cita, e o grafo
+parado que cita um alterado, cujo nível pode ter subido. A troca só da política (outra ordem de `levels`, outro
+`default_level`) não muda grafo nenhum, então o hook de pre-commit não a rejulga; o CI sem `--touched` lê todo par e a
+cobre. Combina com o `--classification-floor` e o `--area-policy-digest`, e não com o `--update`.
+
+Como o piso, lê todo grafo rastreado, fixtures e vendor inclusive, e o grafo que não parseia o reprova. O repositório
+com fixtures de teste que não parseiam de propósito (este tem dezenas), ou com o vendor inteiro, as tira
+explicitamente:
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-cites --area-policy "$KG_AREA_POLICY" \
+  --exclude 'vendor/kg-ssot/*' --exclude 'tests/fixtures/*'
+```
+
+```text
+✗ citação entre níveis: docs/team.kg.yaml (internal) cita docs/payroll.kg.yaml (restricted), um nível maior, em 1 lugar(es) (external_edges)
+· --classification-cites: 14 grafo(s) conferido(s), 3 par(es) de grafos citados, 1 reprovado(s); não julgadas: 0 citação(ões) a caminho absoluto, URL ou private-cite, 5 em prosa e 2 ao próprio grafo
+```
+
+O gate de um repositório só vê esse repositório: a citação relativa a um grafo de outra área não resolve aqui e
+reprova, como o contrato já reprova a ponta externa que não está no corpus (`integrity.dangling-external`); cite outra
+área por URL ou pelo marcador `private-cite:`, que são contados e não julgados. No servidor, o `kg-mcp` corta a aresta
+para o grafo que o leitor não pode ver (capítulo 6, passo 5).
+
+#### Rebaixar pede trilha: `--classification-downgrade` (desde a 4.54.0)
+
+O piso e o servidor confiam no `x_classification`, então baixar o rótulo é o caminho mais curto para passar pelos dois:
+troque `restricted` por `internal`, e o piso deixa o grafo entrar e o `kg-mcp` o entrega a uma audiência maior.
+`--classification-downgrade --area-policy ARQ` faz da queda um ato com registro: compara o nível de cada grafo com a
+base e reprova (rc 1) a queda sem o registro de `meta.x_downgrade` (capítulo 3) que a registra.
+
+1. **A base.** Com `--touched BASE`, o ancestral comum que o modo já usa, comparado com o índice do git (o que o commit
+   leva). No modo da catraca, `--base REF` a dá (o ancestral comum de `REF` e `HEAD`, em geral `--base origin/main` no
+   CI de um pull request), comparada com a árvore do checkout; sem `--base`, a opção é entrada quebrada (rc 2). Traga o
+   histórico (`fetch-depth: 0`): o clone raso não tem ancestral.
+2. **O par.** Cada `.kg.yaml` e `.kg.json` rastreado que mudou (os excludes padrão não valem, só o `--exclude`) é
+   pareado com os grafos da base que o git diz que podem ser ele: o do mesmo caminho; todo o de mesmo `meta.id` (para a
+   renomeação não esconder a queda); e a origem do rename que o git detecta, com a quebra de reescrita (`git diff -B
+   -M`), também para o caminho que já existia, então o grafo movido por cima de outro também pareia. O nível da base é o
+   maior entre eles. O grafo sem par é novo e não é julgado aqui (o piso o julga). O que este pareamento não vê vem
+   listado depois dos passos.
+3. **A queda.** O nível de cada ponta é lido como no piso: o grafo sem a chave tem o `default_level`, então tirar a
+   chave pode ser queda. O nível desconhecido agora reprova; o nível desconhecido na base conta como o mais alto de
+   `levels`, e um registro a partir dele cura.
+4. **O registro.** Na queda, o último registro de `meta.x_downgrade` tem de ter `from` e `to` iguais aos dois níveis,
+   `reason`, `approved_by` e `ref` não vazios e `date` uma data do calendário. A trilha da base tem de ficar como era,
+   prefixo da trilha de agora (apagar ou mudar um registro anterior reprova), e o último registro tem de vir depois dela
+   e não ser nenhum dos registros da base: um registro velho, ou um registro velho só com a `date` trocada, não serve a
+   uma queda nova. Uma segunda queda com o mesmo `from` e `to`, depois que o nível subiu de novo, pede um registro novo
+   acrescentado à trilha.
+5. **Quem aprova é outra pessoa.** O `approved_by` não pode nomear o autor nem o committer de um commit desde a base que
+   mudou o nível, nem quem vai commitar, como autor ou committer (`git var GIT_AUTHOR_IDENT` e `GIT_COMMITTER_IDENT`),
+   quando o índice ou a árvore difere de `HEAD`. A comparação é pelo e-mail e pelo nome, sem distinguir caixa; de `Nome
+   <e-mail>`, vale o e-mail. Quem só escreveu o registro, num commit que não mudou o nível, não é autor da queda. Quem
+   faz rebase da branch vira o committer dos commits dela: o aprovador aprova, não faz rebase.
+6. **O que imprime.** Uma linha por grafo reprovado, com o caminho e os dois níveis, e uma linha de resumo. Nunca o
+   motivo, o aprovador, a referência ou um id de nó.
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-downgrade --base origin/main \
+  --area-policy "$KG_AREA_POLICY" --exclude 'vendor/kg-ssot/*'
+```
+
+```text
+✗ rebaixamento de nível: docs/payroll.kg.yaml foi de restricted para internal sem registro de rebaixamento (o último item de meta.x_downgrade, de restricted para internal, com reason, approved_by, ref e date)
+· --classification-downgrade: 3 grafo(s) alterado(s) comparado(s) com 4f2a9c1e07b3, 1 rebaixamento(s), 1 reprovado(s)
+```
+
+**O que o pareamento não vê.** O pareamento é o que o git dá (caminho, `meta.id`, rename e reescrita); quatro casos
+ficam fora, declarados:
+
+- **Apagado e recriado, diluído.** O grafo apagado e recriado com outro caminho e outro `meta.id`, com o conteúdo
+  diluído abaixo da semelhança que o git pede, não tem par, e a queda passa. O pareamento por sobreposição de ids de nó
+  foi tentado e retirado: no histórico de um repositório real, ele casou 125 dos 150 grafos novos só pelos ids, porque
+  grafos feitos de um mesmo modelo dividem os ids de nó. Fica para o detector de conteúdo.
+- **Dividido em três.** O grafo dividido em vários, cada um com caminho e `meta.id` novos, pareia no máximo o pedaço que
+  o git toma pelo rename; os outros pedaços são grafos novos.
+- **Fundido, ou movido por cima de um grafo parecido.** O grafo da base absorvido por outro que fica no caminho dele
+  só pareia se o git quebrar a reescrita do destino (`-B`); abaixo disso, o git não dá rename, e a queda passa: apagar
+  um grafo `restricted` e pôr os nós dele num `public` que muda pouco, ou o `git mv -f` por cima de um destino de
+  conteúdo parecido, dá rc 0. Fica para o detector de conteúdo. Quando o par vem, o grafo é julgado pelo maior nível
+  entre os pares, e só a trilha do par nesse nível é cobrada como o prefixo a manter.
+- **A queda em vários passos.** Compara-se a base com o agora, não cada commit: baixar de `restricted` para
+  `confidential` e depois para `internal` na mesma branch pede um registro do salto inteiro, de `restricted` para
+  `internal`.
+
+**O gate não autentica o aprovador.** Ele confere que o registro existe, tem forma e não nomeia um autor da mudança de
+nível; não tem como conferir que a pessoa nomeada aprovou, porque quem escreve o grafo pode escrever outro nome. A trava
+real é o review do pull request com a branch protection: exija um review aprovado e ponha uma entrada no `CODEOWNERS`
+para os grafos e para a política, para quem aprova ser quem o forge autentica. O gate roda offline e nunca lê o review
+pela API do forge. Não combina com `--update`. Copiar o conteúdo para um grafo novo, ou para outro repositório, não é
+queda para este gate (capítulo 6, *O que ainda não está coberto*).
 
 ## `kg_vendor.py`: trazer e conferir a release
 
@@ -678,6 +882,7 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 | `--secret-env VAR` · `--secret-header H` | O segredo compartilhado, lido da variável `VAR`, que cada requisição HTTP traz no header `H` (padrão `X-Api-Key`), comparado por hmac |
 | `--identity-header H` | O perfil "atrás de proxy": a identidade de cada requisição vem do header `H` (um e-mail), com área e autor próprios; exige `--secret-env` |
 | `--area-policy ARQUIVO` | Arquivo JSON, fora de `--root`, com as áreas compartilhadas que cada identidade lê; exige `--identity-header` |
+| `--area-policy-digest sha256:HEX\|@ARQ` | Só com `--area-policy`: o digest que a política tem de ter (`kg_policy.py digest ARQ`), lido uma vez na partida; com outro digest o servidor não sobe (rc 2), e a política trocada por outro digest com ele de pé fecha a leitura (quando a troca muda o carimbo do arquivo: veja o filtro por área) |
 | `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
 | `--max-graphs N` | Grafos por armazém, ou por área no perfil; além disso, um nome novo é recusado |
 | `--max-concurrent N` | Requisições HTTP ao mesmo tempo; além disso, 503 |
@@ -750,6 +955,15 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     `c-<nome>` e os grupos `g-<nome>`, cada um numa pasta sob `--root`. Todos leem a canônica, e o grupo é lido por seus
     membros. O arquivo é relido quando muda, e a remoção de alguém vale na requisição seguinte. Depois de subir, um
     arquivo que some ou quebra fecha a leitura: cada identidade fica só com a própria área, até ele voltar a valer.
+  - **A política fixada:** com `--area-policy-digest` (o valor do `kg_policy.py digest`, ou `@ARQ`), a política tem
+    de ter esse digest. Com outro, o servidor não sobe (rc 2, `--area-policy não carregou`), e o arquivo trocado por
+    outro digest com ele de pé conta como política inválida e fecha a leitura, com
+    `the policy has the digest ..., not the pinned ...` no stderr; a mesma política com outra formatação segue
+    servindo. O stderr é do operador, que tem a política e o pin, então ele nomeia os dois digests; nenhum cliente o
+    vê. O servidor só relê o arquivo quando o carimbo dele (hora de modificação, tamanho, inode) muda: uma troca que
+    guarda os três, como um `cp -p` sobre um arquivo do mesmo tamanho ou um `touch -r`, não é relida até a próxima
+    mudança ou um reinício. O pin é lido uma vez, na partida: para trocar a política, troque o arquivo e o pin e reinicie, e a
+    leitura fica fechada no meio. O gate confere o mesmo valor (*Fixar a política*, acima).
   - **O que uma identidade lê:** a união da própria área, com os nomes de sempre, e das áreas que ela pode ler, cujos
     grafos aparecem como `@<área>/<grafo>`. Só essas áreas são abertas: o filtro vem antes da leitura. Gravar continua
     sendo só na própria área, e `kg_write` ou `kg_delete` num nome com `@` é recusado.
@@ -783,27 +997,33 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     no grafo oculto, no que não existe e no visível, em qualquer caixa do nome. Sem `ref`, o nome que difere de um grafo
     oculto só pela caixa, ou a pasta em outra caixa que só tem grafos ocultos, responde como o grafo numa pasta que não
     existe; a recusa por caixa só sai quando a outra grafia tem um grafo que quem lê alcança. A própria área da identidade não tem teto,
-    a área sem teto não é julgada, e sem `ceilings` nada muda. A política é lida de forma estrita: teto fora de
-    `levels`, área que não é a canônica nem um grupo ou `default_level` ausente invalidam o arquivo, e o arquivo
-    inválido fecha a leitura, como acima.
+    e sem as três chaves nada muda. Com elas, **toda área compartilhada tem teto** (negar por padrão): a canônica e cada
+    grupo têm de ser chave de `ceilings`, e a política que deixa uma de fora é inválida, com
+    `ceilings: with levels, every shared area has a ceiling; without one: ÁREAS`, as áreas em ordem alfabética. Até a
+    4.53.0 essa área não era julgada e servia todo nível, inclusive o desconhecido. Para a área que deve servir todo
+    nível conhecido, dê a ela o último de `levels`. A política é lida de forma estrita: teto fora de `levels`, área que
+    não é a canônica nem um grupo, área compartilhada sem teto ou `default_level` ausente invalidam o arquivo, e o
+    arquivo inválido fecha a leitura, como acima.
 
     ```json
     {"schema_version": 1, "canonical": "c-empresa",
      "groups": {"g-financeiro": ["ana@x.org"], "g-diretoria": ["bia@x.org"]},
      "levels": ["public", "internal", "confidential", "restricted"],
-     "ceilings": {"c-empresa": "internal", "g-financeiro": "confidential"},
+     "ceilings": {"c-empresa": "internal", "g-financeiro": "confidential", "g-diretoria": "restricted"},
      "default_level": "internal"}
     ```
 
-    Aqui a `c-empresa` entrega até `internal`, o `g-financeiro` até `confidential`, o `g-diretoria` não tem teto, e o
-    grafo sem nível conta como `internal`. O rótulo é marcação que esta política faz valer, não controle de acesso nó a
-    nó: a unidade é o grafo, e o nó mais sensível que o grafo vai para um grafo próprio (capítulo 3). O histórico do git
+    Aqui a `c-empresa` entrega até `internal`, o `g-financeiro` até `confidential`, o `g-diretoria` até `restricted`
+    (todo nível da lista, enquanto o desconhecido segue escondido), e o grafo sem nível conta como `internal`. Sem a
+    entrada do `g-diretoria`, o arquivo seria inválido. O rótulo é marcação que esta política faz valer, não controle de
+    acesso nó a nó: a unidade é o grafo, e o nó mais sensível que o grafo vai para um grafo próprio (capítulo 3). O
+    histórico do git
     da área ainda guarda o nó que foi movido para outro arquivo, e o `ref` alcança a versão antiga onde o nível dela
     deixa: mova-o antes de compartilhar o grafo, ou deixe o histórico antigo fora da área compartilhada. O mesmo limite
     vale no outro sentido: o `kg_history` de um grafo visível lista todas as versões antigas, as acima do teto também,
     com o `ref` e a mensagem do commit, e o `kg_get` dessa versão responde como o grafo que não existe. O conteúdo fica
     de fora, mas a lista mostra que houve uma versão mais sensível.
-  - **Papéis, com teto por papel (ainda não lançado):** duas chaves opcionais. `roles` dá nome a cada papel (um slug:
+  - **Papéis, com teto por papel (4.50.0):** duas chaves opcionais. `roles` dá nome a cada papel (um slug:
     minúsculas, dígitos, ponto, hífen ou sublinhado) e dá a ele `read` (as áreas compartilhadas que lê, ao menos uma,
     cada uma a canônica ou um grupo da política), `write` (opcional, e só `[]` ou `["own"]`: `own` é a própria área da
     identidade, a única em que o servidor grava, e por isso `write` restringe ou declara e nunca amplia; sem a chave,
@@ -812,9 +1032,9 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     `{"aud@x.org": ["auditor"], "g-auditoria": ["auditor"]}`. O acesso de uma pessoa é a união das concessões: a área
     canônica e cada grupo de que ela é membro (cada um vale como um papel que lê a área com o teto da área), e cada um
     dos seus papéis. **Quando duas concessões dão tetos diferentes à mesma área, vale o maior**, em qualquer ordem, e ele
-    nunca passa do teto da área; a concessão sem teto (área sem teto e papel sem teto) vence qualquer teto. Por isso o
-    papel com teto menor só restringe quem lê a área apenas por esse papel: quem é do grupo `g-compliance` a lê com o
-    teto da área, sejam quais forem os seus papéis. Quem tem ao menos um papel grava na própria área se algum dos seus
+    nunca passa do teto da área. Por isso o papel com teto menor só restringe quem lê a área apenas por esse papel: quem
+    é do grupo `g-compliance` a lê com o teto da área, sejam quais forem os seus papéis. Quem tem ao menos um papel
+    grava na própria área se algum dos seus
     papéis tem `write: ["own"]`; só com papéis `write: []`, o `kg_write` e o `kg_delete` saem da lista de ferramentas, a
     chamada a eles é recusada como ferramenta indisponível e a própria área não é criada (a área própria gravada antes
     segue legível, e a pasta própria que não abre, como a sem `.git` no backend git, fica como está enquanto as
@@ -835,16 +1055,17 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     membro, o papel e a área, nunca um grafo. O aviso escreve o e-mail do membro no stderr do servidor, que é dado
     pessoal no log do operador.
   - **Limites dos papéis:** o teto de um papel restringe só quem lê a área apenas por papéis com teto; um grupo da área,
-    ou outro papel sem teto, dá o teto maior, e o kg-mcp ainda não tem um teto por pessoa que nenhuma concessão passe (o
-    deny do mercado). O tempo de resposta pode separar o grafo oculto do inexistente: para julgar o teto, o servidor lê e
-    analisa o texto do grafo antes de recusar, e por isso o grafo oculto grande demora mais a ser recusado que o nome
-    que não existe, e quem adivinha o nome pode inferir que o grafo existe. O kg-mcp não iguala esse tempo.
+    ou outro papel sem teto de papel próprio (que usa o da área), dá o teto maior, e o kg-mcp ainda não tem um teto por
+    pessoa que nenhuma concessão passe (o deny do mercado). O tempo de resposta pode separar o grafo oculto do
+    inexistente: para julgar o teto, o servidor lê e analisa o texto do grafo antes de recusar, e por isso o grafo
+    oculto grande demora mais a ser recusado que o nome que não existe, e quem adivinha o nome pode inferir que o grafo
+    existe. O kg-mcp não iguala esse tempo.
 
     ```json
     {"schema_version": 1, "canonical": "c-empresa",
      "groups": {"g-compliance": ["dpo@x.org"], "g-auditoria": ["aud@x.org"]},
      "levels": ["public", "internal", "confidential", "restricted"],
-     "ceilings": {"g-compliance": "restricted"},
+     "ceilings": {"c-empresa": "internal", "g-compliance": "restricted", "g-auditoria": "internal"},
      "default_level": "internal",
      "roles": {"auditor": {"read": ["g-compliance"], "write": [], "ceilings": {"g-compliance": "confidential"}},
                "officer": {"read": ["g-compliance"]}},
@@ -1567,8 +1788,9 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   `not_text`; um nó com id repetido ou fora de texto, que o gate já reprova no MUST, não é lido aqui. Se os seus grafos
   ancoram numa pasta de fora do repositório (a memória de uma sessão), o check fica vermelho até que você a declare com
   `--external-root`. Sem nenhum grafo lido, ele avisa.
-- **O que é julgado.** O texto do trace até o primeiro `:` ou `#` (`arquivo:linha`, `arquivo#seção`), e só quando
-  parece caminho do repositório. Fora de julgamento, e contados à parte, nunca em silêncio:
+- **O que é julgado.** O texto do trace até o primeiro `:`, `#` ou `?` (`arquivo:linha`, `arquivo#seção`, uma
+  query), sem as aspas e os `<>` em volta e sem o prefixo `kg-node://` do esquema do contrato (desde a 4.54.0), e só
+  quando parece caminho do repositório. O alvo que só resolve normalizando (`docs//x`, `docs/./x`) não é lido. Fora de julgamento, e contados à parte, nunca em silêncio:
   - `absolute`: um caminho absoluto ou uma URL (outra máquina ou rede);
   - `external_root`: um prefixo que você declara com `--external-root` (uma pasta que mora fora do repositório);
   - `not_path`: um caractere fora de `[A-Za-z0-9_./-]` (um comando, prosa), um nome sem barra (palavra solta, chave de

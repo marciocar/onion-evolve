@@ -181,6 +181,7 @@ is free, and any other key warns. Enum values are codes, in English, whatever th
 | `x_provisional` | edge | `true` when the link still waits for a check |
 | `x_classification` | meta | the sensitivity level of the whole graph, one level of the organization's own scheme (v4.20) |
 | `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | the disposal deadline of the whole graph, its basis, and its suspension (v4.23) |
+| `x_downgrade` | meta | the trail of the level downgrades of the whole graph: from, to, reason, approver, reference, and date (v4.24) |
 
 ### `x_term`
 
@@ -415,6 +416,51 @@ from when it counts, so `--due` lists every node with it as `dispose_conflict` a
    repository only: it does not reach clones, forks, mirrors, and caches that already have the old commits. The deadline
    does not replace the first decision: data that must disappear for good is better kept out of a shared repository from
    the start.
+
+### `x_downgrade` (v4.24)
+
+The trail of the level downgrades of the whole graph. Lowering `x_classification` is an act with a reason, a second
+person, and a record, not a silent edit of the label (the market practice: a sensitivity label lowered with a
+justification, a blocked push bypassed with a reason and an approval). `x_downgrade` is a list, from the oldest entry
+to the newest, one entry for each downgrade:
+
+```yaml
+meta:
+  id: payroll-2026
+  x_classification: internal
+  x_downgrade:
+    - from: restricted
+      to: internal
+      reason: "the 2026 payroll was published in the annual report"
+      approved_by: "dpo@example.org"
+      ref: "https://example.org/acme/kg/pull/42"
+      date: "2026-11-16"
+```
+
+| Key | Form |
+|---|---|
+| `from` · `to` | the level before and the level after, in the slug form of `x_classification` |
+| `reason` | why, in text that is not empty (whitespace only, Unicode spaces included, counts as empty) |
+| `approved_by` | who approved, in text that is not empty; write the e-mail, which the gate compares with the commit author |
+| `ref` | the reference of the approval (the pull request, the ticket, the minutes), in text that is not empty |
+| `date` | the date of the approval, `YYYY-MM-DD` on the calendar, in quotes |
+
+Another key inside an entry is free. A list, and not a map, because a graph can be lowered more than once, and the
+earlier entry is the trail: replacing a map would erase the earlier downgrade from the file. The trail only grows:
+an entry already there is not deleted or edited, and the next one is appended after it.
+
+The contract judges only the form, and only when the key is present: a value that is not a list warns as
+`form.type.meta.x_downgrade`, an empty list as `form.range.meta.x_downgrade`, an entry that is not a map as
+`form.type.meta.x_downgrade.item`, a missing key as `form.required.meta.x_downgrade.<key>` (for example
+`form.required.meta.x_downgrade.approved_by`), and a value out of form as `form.pattern.meta.x_downgrade.<key>` or
+`form.type.meta.x_downgrade.<key>`. Each entry of the trail is judged. On a node, `x_downgrade` is not a profile and
+warns as `form.misplaced.node.x_downgrade`; on an edge, it is a free `x_` key.
+
+The contract does not say when an entry is required: a drop of the level is seen only between two versions of the
+graph, and in the order of the levels, which belongs to the organization's policy and not to the graph. That is the job
+of `kg_gate.py --classification-downgrade` (chapter 5), which compares each graph with the base and asks that the last
+entry record this drop, be appended after the trail of the base, which stays as it was, and name an approver who did
+not change the level.
 
 ## Recording an external event (recommended shape, not normative)
 

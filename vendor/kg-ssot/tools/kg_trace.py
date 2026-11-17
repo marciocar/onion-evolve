@@ -7,7 +7,9 @@ para um arquivo movido ou renomeado passa no gate e mente para quem tenta voltar
 
 O que é julgado (as regras de um resolvedor de adotante, medidas num corpus de milhares de traces; cada corte foi pago
 por um falso positivo):
-- só o texto do trace até o primeiro `:` (arquivo:linha, arquivo:seção) e o primeiro `#` (comentário, âncora);
+- só o texto do trace até o primeiro `:` (arquivo:linha, arquivo:seção), o primeiro `#` (comentário, âncora) e o
+  primeiro `?` (a query), sem as aspas e os <> em volta e sem o prefixo kg-node:// (clean_ref e cut_ref, que o
+  kg_gate.py --classification-cites também usa);
 - fora de julgamento, e contados à parte, nunca em silêncio:
   - absolute: caminho absoluto ou URL (outra máquina, outra rede);
   - external_root: um prefixo declarado com --external-root (um diretório fora do repo, como a memória da sessão);
@@ -55,6 +57,7 @@ import re
 import secrets
 import subprocess
 import sys
+import unicodedata
 import urllib.parse
 import fnmatch
 
@@ -151,6 +154,61 @@ CODE = "integrity.trace-target-missing"
 FIXTURE_SEGMENTS = {"fixture", "fixtures", "__fixtures__", "testdata", "__snapshots__"}
 
 
+KG_NODE_URL = "kg-node://"
+
+
+def clean_ref(value):
+    """O texto de um trace ou de um provenance.source antes do julgamento: sem os espaços, as aspas e os <> em volta (o
+    delimitador de URI do apêndice C da RFC 3986) e sem o prefixo kg-node://: kg-node é o esquema do contrato (v4.17)
+    para um nó de um grafo do repositório, e nunca nomeia um host. Não há NFC: o caminho julgável é ASCII (PATH_CHARS),
+    e o nome com acento já é not_path."""
+    text = value.strip().strip("\"'<>").strip()
+    if text[:len(KG_NODE_URL)].casefold() == KG_NODE_URL:
+        text = text[len(KG_NODE_URL):].lstrip("/")  # kg-node:///docs/x, com a autoridade vazia, é docs/x
+    return text
+
+
+def cut_ref(text):
+    """O caminho de um texto já limpo (clean_ref): até o primeiro #, : ou ? (a âncora, a linha ou a seção, e a query
+    da RFC 3986), sem as aspas e os <> que sobram. As barras repetidas não colapsam: o alvo que só resolve normalizando
+    (docs//x, docs/./x) não é lido, de propósito, e o locate_source o conta como outside_root."""
+    return re.split(r"[#:?]", text, maxsplit=1)[0].strip().strip("\"'<>").strip()
+
+
+def candidate_paths(target, graph_dir):
+    """Os caminhos relativos à raiz que um alvo pode nomear, na ordem em que se procura: a raiz, a pasta do grafo e a
+    pasta pai dela (esta só quando o grafo não está na raiz), com . e .. resolvidos e o que sai da raiz descartado. É a
+    mesma regra do locate e do locate_source, e o kg_gate.py --classification-cites a usa para achar o homônimo."""
+    import posixpath
+    gdir = pathlib.PurePosixPath(graph_dir)
+    rels = [pathlib.PurePosixPath(target)] + ([gdir / target] if str(gdir) != "." else []) + \
+        ([gdir.parent / target] if str(gdir) != "." and str(gdir.parent) != "." else [])
+    out = []
+    for rel in rels:
+        norm = posixpath.normpath(rel.as_posix())
+        if norm != ".." and not norm.startswith("../") and not norm.startswith("/"):
+            out.append(norm)
+    return list(dict.fromkeys(out))
+
+
+def exact_graph(target, graph_dir, graphs):
+    """O grafo rastreado que o alvo nomeia EXATAMENTE, ou None: o caminho, sem o ./ do começo, de um dos grafos de
+    graphs (os .kg.yaml e .kg.json do índice), a partir da raiz, da pasta do grafo ou da pasta pai dela, na junção crua
+    (sem resolver . nem .., sem colapsar barras), comparada em NFC dos dois lados (o macOS pode guardar o nome em NFD).
+    É a única exceção à forma de PATH_CHARS e do nome solto: o índice é a verdade, e um nome com acento, espaço, + ou @
+    que é o de um grafo rastreado resolve para ele. Nada de sufixo, nome de arquivo ou caixa."""
+    if not graphs or not target:
+        return None
+    while target.startswith("./"):
+        target = target[2:]
+    gdir = pathlib.PurePosixPath(graph_dir)
+    # a junção crua, sem normalizar: docs//x e docs/sub/../x não são o caminho exato de docs/x
+    raw = [target] + ([f"{gdir.as_posix()}/{target}"] if str(gdir) != "." else []) + \
+        ([f"{gdir.parent.as_posix()}/{target}"] if str(gdir) != "." and str(gdir.parent) != "." else [])
+    nfc = {unicodedata.normalize("NFC", g): g for g in graphs}
+    return next((nfc[c] for c in (unicodedata.normalize("NFC", r) for r in raw) if c in nfc), None)
+
+
 def tracked_root_files(root):
     """Os arquivos rastreados na raiz do repo (sem barra no nome), para a exceção do nome exato; sem git, os arquivos
     regulares da raiz."""
@@ -165,20 +223,24 @@ def classify(trace, graph_dir, root, root_files, external_roots=()):
     return locate(trace, graph_dir, root, root_files, external_roots)[:2]
 
 
-def locate(trace, graph_dir, root, root_files, external_roots=()):
+def locate(trace, graph_dir, root, root_files, external_roots=(), graphs=None):
     """(classe, alvo, caminho), desde a 4.25.1: o de classify() e, só no resolved, o arquivo que o check viu existir,
     relativo à raiz, com os links seguidos (um link seguido de .. não pode apontar para outro arquivo), e se ele é
-    file ou dir."""
+    file ou dir. graphs (os grafos do índice, opcional): o alvo que é EXATAMENTE o caminho de um deles resolve antes de
+    virar not_path (exact_graph); sem ele, a regra de sempre."""
     if is_private_cite_trace(trace):
         return "not_path", trace, None  # a citação privada declarada: nunca lida, nunca ausente (v4.22)
     if malformed_private_cite(trace):
         return "missing", trace.strip(), None  # o marcador fora da forma não nomeia arquivo: ausente (v4.22)
-    text = trace.strip().strip("\"'").strip()
+    text = clean_ref(trace)
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
-    original = re.split(r"[#:]", text, maxsplit=1)[0].strip().strip("\"'").strip()
+    original = cut_ref(text)
     if any(original.startswith(p) for p in external_roots):
         return "external_root", original, None
+    hit = exact_graph(original, graph_dir, graphs)
+    if hit is not None:  # o caminho exato de um grafo do índice: o índice é a verdade
+        return "resolved", original[2:] if original.startswith("./") else original, (hit, "file")
     if not original or not PATH_CHARS.fullmatch(original):
         return "not_path", original, None
     target = original
@@ -291,7 +353,7 @@ def unsafe_target(target):
     return any(seg in ("", ".", "..") or seg.rstrip(". ").casefold() == ".git" for seg in target.split("/"))
 
 
-def locate_source(source, graph_dir, root, tracked=_UNSET):
+def locate_source(source, graph_dir, root, tracked=_UNSET, graphs=None):
     """(classe, alvo, caminho) do provenance.source como caminho do repo, para o locator: diferente do trace, o nome
     solto com extensão (gone.json) é caminho, porque a fonte não é prosa; absolute para URL ou caminho absoluto;
     not_path para o texto que não parece arquivo (a fala de alguém); outside_root para o que sai da raiz ou não é um
@@ -299,25 +361,26 @@ def locate_source(source, graph_dir, root, tracked=_UNSET):
     do grafo e a pasta pai dele. Num repo git, só o índice decide (4.49.0): resolved é o arquivo rastreado (o link do
     índice seguido até um arquivo rastreado), untracked é o que mora num submódulo ou o link do índice que não se segue
     (contado, nunca lido), e missing é todo o resto, o que não está no índice, exista ou não no disco. Fora do git, o
-    disco, como antes. tracked: o tracked_index() já lido, para não chamar o git por nó."""
+    disco, como antes. tracked: o tracked_index() já lido, para não chamar o git por nó. graphs (opcional): como no
+    locate, o alvo que é EXATAMENTE o caminho de um grafo do índice resolve antes de virar not_path."""
     if malformed_private_cite(source):
         return "missing", source.strip(), None  # o marcador fora da forma não nomeia arquivo: ausente (v4.22)
-    text = source.strip().strip("\"'").strip()
+    text = clean_ref(source)
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
-    target = re.split(r"[#:]", text, maxsplit=1)[0].strip()
+    target = cut_ref(text)
     while target.startswith("./"):
         target = target[2:]
+    hit = exact_graph(target, graph_dir, graphs)
+    if hit is not None:  # o caminho exato de um grafo do índice: o índice é a verdade
+        return "resolved", target, (hit, "file")
     if not target or not PATH_CHARS.fullmatch(target) or "." not in target.rsplit("/", 1)[-1]:
         return "not_path", target, None
     if unsafe_target(target):
         return "outside_root", target, None
     if tracked is _UNSET:
         tracked = tracked_index(root)
-    gdir = pathlib.PurePosixPath(graph_dir)
-    rels = [pathlib.PurePosixPath(target)] + ([gdir / target] if str(gdir) != "." else []) + \
-        ([gdir.parent / target] if str(gdir) != "." and str(gdir.parent) != "." else [])
-    rels = list(dict.fromkeys(r.as_posix() for r in rels))
+    rels = candidate_paths(target, graph_dir)
     if tracked is not None:  # num repo git, só o índice decide: o disco (um stat, um arquivo do CI) não muda o resultado
         for rel in rels:
             real = tracked.follow(rel)
