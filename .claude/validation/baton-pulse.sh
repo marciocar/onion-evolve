@@ -684,7 +684,7 @@ if peers_ok:
         if key is None and broken:
             hy_gaps.append(f'{tag}: sem chave TMUX legível e árvore cortada em {"→".join(chain) or "?"}: tmux NÃO medido'); continue
         HY.append(('SESSION_NOT_IN_TMUX', p, f'{tag} roda fora do tmux (sem TMUX no ambiente; árvore {"→".join(chain) or "—"}): sem reanexar e sem sobreviver a reboot ou ao fim do processo do terminal (ssh puro cai com a conexão; mosh não)',
-                   f'na sessão, /exit; depois: tmux new -s {tmux_name(p["name"])} -c {tilde(p["cwd"])} \'claude --resume {p["sid"]}\''))
+                   f'na sessão, /exit; depois: bash ops/session-open.sh {tmux_name(p["name"])} --resume {p["sid"]} (ou, sem o abridor: tmux new -s {tmux_name(p["name"])} -c {tilde(p["cwd"])} \'claude --resume {p["sid"]}\')'))  # (core-only): cita ops/session-open.sh (REGRA 100); a forma tmux fica como alternativa onde não há o abridor
     tops = {}
     for p in inter:
         git_top = None

@@ -112,7 +112,7 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    ambiente** (o resto do ambiente nunca sai, porque pode ter segredo). Ele dá quatro avisos, cada um com o comando
    de cura como texto:
    - `SESSION_STOPPED`: estado T, cura `kill -CONT <pid>` ou `fg`;
-   - `SESSION_NOT_IN_TMUX`: sem `TMUX` e sem tmux na árvore, cura `tmux new -s <nome> -c <pasta> 'claude --resume <id>'`;
+   - `SESSION_NOT_IN_TMUX`: sem `TMUX` e sem tmux na árvore, cura `bash ops/session-open.sh <nome do repo> --resume <id>` (core-only; onde não há o abridor, `tmux new -s <nome> -c <pasta> 'claude --resume <id>'`);
    - `SESSION_SAME_CHECKOUT`: duas interativas no mesmo topo git, cura `claude --worktree <nome>`;
    - `SESSION_CAP`: interativas acima de `--max-interactive` (8).
 

@@ -235,7 +235,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature"
+SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -59717,9 +59717,10 @@ BP_HY
     grep -q "^hygiene${T}sid-h-stop${T}SESSION_STOPPED${T}.*cura: kill -CONT 4001" <<< "${a}"; }
   _bpcase "(an) sessão suspensa (estado T) sai SESSION_STOPPED com o kill -CONT" \
     "        if st[0] in ('T', 't'):" "        if False:" _bp_an
-  # (ao) sem TMUX e com árvore bash→mosh-server sai SESSION_NOT_IN_TMUX com o tmux new; o resto do ambiente NUNCA sai
+  # (ao) sem TMUX e com árvore bash→mosh-server sai SESSION_NOT_IN_TMUX com a cura pelo abridor (ops/session-open.sh) E a
+  #      forma tmux new como alternativa sem o abridor; o resto do ambiente NUNCA sai
   _bp_ao() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep "sid-h-mosh" <<< "${a}" | tr '\t' ' ')"
-    grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX${T}.*árvore bash→mosh-server.*tmux new -s h-mosh .*claude --resume sid-h-mosh" <<< "${a}" \
+    grep -q "^hygiene${T}sid-h-mosh${T}SESSION_NOT_IN_TMUX${T}.*árvore bash→mosh-server.*ops/session-open.sh h-mosh --resume sid-h-mosh.*tmux new -s h-mosh .*claude --resume sid-h-mosh" <<< "${a}" \
       && ! grep -q 'nao-imprima-isto\|FAKE_SECRET' <<< "${a}"; }
   _bpcase "(ao) sessão fora do tmux (mosh) sai SESSION_NOT_IN_TMUX, sem vazar o ambiente" \
     "        if key or seen_tmux: continue" "        if True: continue" _bp_ao
@@ -59746,13 +59747,13 @@ BP_HY
     grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessão(ões) interativa(s) distinta(s) acima do teto de 6" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
   _bpcase "(as) interativas acima do teto saem SESSION_CAP; no teto não" \
     "    if inter_sessions > int(max_inter):" "    if False:" _bp_as
-  # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
   # (as2) o PADRÃO é 8 (D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116, 2026-11-16): com 7 interativas e SEM --max-interactive,
   #       não dispara. Se o padrão voltar a 4, 7 > 4 e o SESSION_CAP volta — o mutante (MAXI="8" → MAXI="4") morde.
   _bp_as2() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E 'SESSION_CAP' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
     ! grep -q "SESSION_CAP" <<< "${a}"; }
   _bpcase "(as2) o teto padrão é 8: 7 interativas não disparam SESSION_CAP sem flag" \
     'MAXI="8"' 'MAXI="4"' _bp_as2
+  # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
   _bp_at() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E "h-unread|HYGIENE" <<< "${a}" | tr '\t' ' ')"
     grep -q "^gap${T}.*HYGIENE_UNMEASURED.*h-unread (pid 4007).*tmux NÃO medido" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-unread${T}" <<< "${a}"; }
   _bpcase "(at) árvore ilegível é lacuna HYGIENE_UNMEASURED" \
@@ -59806,6 +59807,122 @@ BP_V
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
+
+# ---------------------------------------------------------------------------
+# session_open — ops/session-open.sh: o ABRIDOR ÚNICO das sessões (core-only, D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116).
+# tmux new-session -A por repo (nome = nome do repo), RECUSA rc 3 um claude vivo na pasta FORA do tmux, --list/--all/
+# --dry-run. Dublês por ambiente (SESSION_OPEN_HOME/PROC/TMUX/CLAUDE, BATON_STATE_DIR): tmux de mentira que registra as
+# chamadas e responde has-session; /proc falso com comm/cwd/environ. NENHUM tmux, claude ou processo real é tocado;
+# tudo roda com --dry-run. Cada caso reprova contra o mutante dele.
+run_session_open_selftests() {
+  echo ""
+  echo "▸ session-open — abridor único: cria/anexa, recusa fora do tmux, nome inválido, /proc ilegível, --all por concessão"
+  local sut="${REPO_ROOT}/ops/session-open.sh"
+  [ -f "${sut}" ] || { record_fail "session-open: SUT ausente" "${sut} (core-only)"; return; }
+  command -v git >/dev/null 2>&1 || { record_skip "session-open: git ausente (SUT não exercido)"; return; }
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)" || { record_skip "session-open: mktemp falhou"; return; }
+  # tmux de mentira: registra args em SO_TLOG; has-session rc 0 se o nome ∈ SO_TSESS (espaço-separado), senão rc 1
+  cat > "${sb}/tmux" <<'SO_TMUX'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${SO_TLOG}"
+if [ "$1" = "has-session" ]; then
+  want="${3#=}"; for s in ${SO_TSESS:-}; do [ "${s}" = "${want}" ] && exit 0; done; exit 1
+fi
+exit 0
+SO_TMUX
+  chmod +x "${sb}/tmux"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${sb}/claude"; chmod +x "${sb}/claude"  # só precisa existir; nunca roda em --dry-run
+  local HM="${sb}/home"; mkdir -p "${HM}" "${sb}/proc-empty"
+  _so_repo() { mkdir -p "${HM}/$1"; ( cd "${HM}/$1" && git init -q -b main ) >/dev/null 2>&1; }
+  _so_repo myrepo
+  _so_proc() {  # $1=dir-/proc-falso $2=cwd-do-claude $3=in|out|broken|noenv → um único claude pid 4242
+    local d="${1}/4242"; rm -rf "${1:?}"; mkdir -p "${d}"; printf 'claude\n' > "${d}/comm"
+    [ "$3" = broken ] || ln -sfn "$2" "${d}/cwd"
+    case "$3" in
+      in)  printf 'HOME=/x\0TMUX=/tmp/t,1,0\0' > "${d}/environ" ;;
+      out) printf 'HOME=/x\0' > "${d}/environ" ;;
+      noenv) mkdir -p "${d}/environ" ;;  # environ ILEGÍVEL (é diretório)
+    esac
+  }
+  _so_run() {  # $1=SUT, resto=args → "rc<TAB>saída-numa-linha"; SO_TSESS/SO_PROC/SO_STATE do ambiente de chamada
+    local w="$1" o rc; shift; : > "${sb}/tlog"
+    if o="$(SESSION_OPEN_HOME="${HM}" SESSION_OPEN_PROC="${SO_PROC:-${sb}/proc-empty}" SESSION_OPEN_TMUX="${sb}/tmux" \
+            SESSION_OPEN_CLAUDE="${sb}/claude" BATON_STATE_DIR="${SO_STATE:-${sb}/state}" SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" \
+            LC_ALL=C bash "${w}" "$@" 2>&1)"; then rc=0; else rc=$?; fi
+    printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
+  }
+  _so_mutate() { cp "$1" "$2" && python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' "$2" "$3" "$4"; }
+  local mt="${sb}/mut.sh"
+  _so_case() {  # <nome> <fn> <OLD> <NEW>: fn(SUT) 0 ⇒ caso vale; muta e exige o mutante derrubar o caso
+    local name="$1" fn="$2" old="$3" new="$4" ri rm_
+    if "${fn}" "${sut}"; then ri=0; else ri=1; fi
+    if [ "${ri}" = 0 ]; then record_pass "session-open: ${name}"; else record_fail "session-open: ${name}" "${SO_WHY:-caso não satisfeito}"; fi
+    if ! _so_mutate "${sut}" "${mt}" "${old}" "${new}"; then record_fail "session-open: ${name} (MUT não aplicou)" "âncora ausente/não-única"; return; fi
+    if "${fn}" "${mt}"; then rm_=0; else rm_=1; fi
+    _prove_mutation "session-open: ${name} (MUT)" "${sut}" "${mt}" "${ri}" "${rm_}"
+  }
+  # (a) cria quando não há sessão tmux: ensaio de new-session com --name <repo>, e SEM canal doorbell (sem .mcp.json)
+  _so_a() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "ensaio: ${sb}/tmux new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --name myrepo" <<< "${r}" \
+      && ! grep -q 'server:doorbell' <<< "${r}"; }
+  _so_case "(a) cria quando não há sessão: ensaio de new-session com --name, sem doorbell sem .mcp.json" _so_a \
+    'cmd="${CLAUDE_BIN} --name ${n}"' 'cmd="${CLAUDE_BIN}"'
+  # (a2) repo com .mcp.json que declara doorbell: o ensaio carrega o canal server:doorbell
+  printf '{ "mcpServers": { "doorbell": {} } }\n' > "${HM}/myrepo/.mcp.json"
+  _so_a2() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -q 'server:doorbell' <<< "${r}"; }
+  _so_case "(a2) repo com .mcp.json doorbell: o ensaio carrega o canal server:doorbell" _so_a2 \
+    'cmd="${cmd} --dangerously-load-development-channels server:doorbell"' 'cmd="${cmd}"'
+  rm -f "${HM}/myrepo/.mcp.json"
+  # (b) sessão tmux já existe: ANEXA e NÃO cria (nenhum new-session no log do tmux)
+  _so_b() { local r; r="$(SO_TSESS="myrepo" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'a sessão tmux «myrepo» já existe — anexo, não crio outra.' <<< "${r}" \
+      && ! grep -q 'new-session' "${sb}/tlog"; }
+  _so_case "(b) sessão tmux existe: anexa e NÃO cria outra" _so_b \
+    'has_tmux_session() { "${TMUX_BIN}" has-session -t "=$1" 2>/dev/null; }' 'has_tmux_session() { false; }'
+  # (c) claude vivo na pasta FORA do tmux: RECUSA rc 3, não abre às cegas
+  _so_proc "${sb}/proc-out" "${HM}/myrepo" out
+  _so_c() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-out" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'já há um claude vivo' <<< "${r}" && grep -qF 'FORA do tmux' <<< "${r}"; }
+  _so_case "(c) claude vivo fora do tmux na pasta: RECUSA rc 3" _so_c \
+    'if [ -n "${out}" ]; then' 'if false; then'
+  # (d) claude vivo DENTRO do tmux (chave TMUX no environ): NÃO recusa, cria normal (rc 0)
+  _so_proc "${sb}/proc-in" "${HM}/myrepo" in
+  _so_d() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-in" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'ensaio:' <<< "${r}" && ! grep -q 'FORA do tmux' <<< "${r}"; }
+  _so_case "(d) claude DENTRO do tmux não recusa: cria normal (rc 0)" _so_d \
+    'grep -q '\''^TMUX='\'' <<< "${env}" && continue' 'grep -q '\''^TMUX='\'' <<< "${env}" && :'
+  # (e) nome que existe como pasta mas NÃO é repo git: rc 2
+  mkdir -p "${HM}/notrepo"
+  _so_e() { local r; r="$(SO_TSESS="" _so_run "$1" notrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 2 ] && grep -qF 'não é um repositório git' <<< "${r}"; }
+  _so_case "(e) nome que não é repo git: rc 2" _so_e \
+    '[ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo em ${HOME_DIR}"' \
+    ': # mutante: não confere o .git'
+  # (f) /proc ILEGÍVEL (cwd irresolúvel) NÃO vira «nenhum processo»: recusa rc 3 (fail-closed)
+  _so_proc "${sb}/proc-broken" "${HM}/myrepo" broken
+  _so_f() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-broken" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não li' <<< "${r}" && grep -qF 'às cegas' <<< "${r}"; }
+  _so_case "(f) /proc ilegível não vira «nenhum processo»: recusa rc 3 (fail-closed)" _so_f \
+    'cwd="$(readlink "${p}/cwd" 2>/dev/null)" || return 2' \
+    'cwd="$(readlink "${p}/cwd" 2>/dev/null)" || continue'
+  # (g) --all percorre só os nomes com concessão «sim» (repoB «não» fica fora)
+  _so_repo repoA; _so_repo repoB  # repoC: concessão sim, SEM pasta
+  mkdir -p "${sb}/state-all"
+  printf '# bancada\nrepoA\tinterno\tsim\tcore\nrepoB\tinterno\tnão\tcore\nrepoC\tinterno\tsim\tcore\n' > "${sb}/state-all/grants.tsv"
+  _so_g() { local r; r="$(SO_TSESS="" SO_STATE="${sb}/state-all" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -q 'new-session -d -s repoA' <<< "${r}" && ! grep -q 'repoB' <<< "${r}"; }
+  _so_case "(g) --all só percorre nome com concessão «sim» (repoB «não» fora)" _so_g \
+    'sim|yes|true|1) ;; *) continue ;;' 'sim|yes|true|1) ;; *) ;;'
+  # (g2) --all exclui nome concedido mas SEM pasta (repoC)
+  _so_g2() { local r; r="$(SO_TSESS="" SO_STATE="${sb}/state-all" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -q 'new-session -d -s repoA' <<< "${r}" && ! grep -q 'repoC' <<< "${r}"; }
+  _so_case "(g2) --all exclui nome concedido sem pasta (repoC)" _so_g2 \
+    '[ -d "$(dir_of "${k}")/.git" ] || [ -f "$(dir_of "${k}")/.git" ] || continue' \
+    '[ -d "$(dir_of "${k}")/.git" ] || [ -f "$(dir_of "${k}")/.git" ] || :'
+  rm -rf "${sb}"
+}
+_family run_session_open_selftests
 
 # ---------------------------------------------------------------------------
 # peek — o /meta:peek (espiar o mercado na dúvida, 2026-11-13): o EXECUTOR do nível 1
