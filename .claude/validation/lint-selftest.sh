@@ -59739,19 +59739,27 @@ BP_HY
       && ! grep -q "h-bg" <<< "$(grep "^hygiene${T}" <<< "${a}")"; }
   _bpcase "(ar) duas sessões no mesmo checkout saem SESSION_SAME_CHECKOUT com o --worktree" \
     "        if len(ps) < 2 or not top: continue" "        if True: continue" _bp_ar
-  # (as) 7 interativas vivas acima do teto de 4 saem SESSION_CAP; com --max-interactive 9, não
-  _bp_as() { local a b; a="$(_bphy "$1")"; b="$(_bphy "$1" --max-interactive 9)"; BP_WHY="$(grep "SESSION_CAP" <<< "${a}" | tr '\t' ' ')"
-    grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessão(ões) interativa(s) distinta(s) acima do teto de 4" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
-  _bpcase "(as) interativas acima do teto saem SESSION_CAP" \
+  # (as) 7 interativas vivas: acima do teto (--max-interactive 6) saem SESSION_CAP; no teto (7) não. As duas bordas
+  #      («acima dispara» e «no teto não dispara») provadas com teto EXPLÍCITO, independentes do valor do padrão (o
+  #      padrão em si é o caso (as2)).
+  _bp_as() { local a b; a="$(_bphy "$1" --max-interactive 6)"; b="$(_bphy "$1" --max-interactive 7)"; BP_WHY="$(grep "SESSION_CAP" <<< "${a}${b}" | tr '\t' ' ')"
+    grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessão(ões) interativa(s) distinta(s) acima do teto de 6" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
+  _bpcase "(as) interativas acima do teto saem SESSION_CAP; no teto não" \
     "    if inter_sessions > int(max_inter):" "    if False:" _bp_as
   # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
+  # (as2) o PADRÃO é 8 (D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116, 2026-11-16): com 7 interativas e SEM --max-interactive,
+  #       não dispara. Se o padrão voltar a 4, 7 > 4 e o SESSION_CAP volta — o mutante (MAXI="8" → MAXI="4") morde.
+  _bp_as2() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E 'SESSION_CAP' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    ! grep -q "SESSION_CAP" <<< "${a}"; }
+  _bpcase "(as2) o teto padrão é 8: 7 interativas não disparam SESSION_CAP sem flag" \
+    'MAXI="8"' 'MAXI="4"' _bp_as2
   _bp_at() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E "h-unread|HYGIENE" <<< "${a}" | tr '\t' ' ')"
     grep -q "^gap${T}.*HYGIENE_UNMEASURED.*h-unread (pid 4007).*tmux NÃO medido" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-unread${T}" <<< "${a}"; }
   _bpcase "(at) árvore ilegível é lacuna HYGIENE_UNMEASURED" \
     "        if key is None and broken:" "        if False:" _bp_at
   # (au) os avisos de higiene entram no sha: o --quiet não cala uma sessão que ficou suspensa
-  _bp_au() { local x y; x="$(_bphy "$1" | awk -F'\t' '$1=="sha"{print $2}')"; y="$(_bphy "$1" --max-interactive 9 | awk -F'\t' '$1=="sha"{print $2}')"
-    BP_WHY="sha teto 4=${x} · teto 9=${y}"; [ -n "${x}" ] && [ -n "${y}" ] && [ "${x}" != "${y}" ]; }
+  _bp_au() { local x y; x="$(_bphy "$1" --max-interactive 6 | awk -F'\t' '$1=="sha"{print $2}')"; y="$(_bphy "$1" --max-interactive 9 | awk -F'\t' '$1=="sha"{print $2}')"
+    BP_WHY="sha teto 6=${x} · teto 9=${y}"; [ -n "${x}" ] && [ -n "${y}" ] && [ "${x}" != "${y}" ]; }
   _bpcase "(au) aviso de higiene muda o sha" \
     "for h in HY)}" "for h in [])}" _bp_au
   # (av)-(ax) curas da 2ª passada de revisão (2026-11-16): dedupe do teto por sessão, timeout do rev-parse por cwd, fora-de-git

@@ -68,7 +68,7 @@
 #   SESSION_STOPPED        estado T|t (Ctrl+Z, SIGSTOP): suspensa e invisível, o harness segue listando idle.
 #   SESSION_NOT_IN_TMUX    sem TMUX e sem ancestral tmux (ex.: mosh-server→bash): sem reanexar e sem sobreviver a reboot/fim do terminal.
 #   SESSION_SAME_CHECKOUT  duas interativas vivas no mesmo topo git: a 2ª abre com `claude --worktree`.
-#   SESSION_CAP            SESSÕES interativas distintas (dedupe por sid; a retomada em dois terminais conta uma) acima de --max-interactive (padrão 4).
+#   SESSION_CAP            SESSÕES interativas distintas (dedupe por sid; a retomada em dois terminais conta uma) acima de --max-interactive (padrão 8, D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116, 2026-11-16).
 #   Estado ou árvore ilegível é lacuna (HYGIENE_UNMEASURED), nunca «em tmux».
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
@@ -92,7 +92,7 @@
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_baton_pulse_selftests).
 # ===========================================================================
 set -uo pipefail
-REPO=""; MAXI="4"; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
+REPO=""; MAXI="8"; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "baton-pulse: $1 exige um valor" >&2; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -634,7 +634,7 @@ pc_line = ('peças: ' + ' · '.join(f'{c} {sum(1 for p in PIECES if p["cls"] == 
 #   SESSION_SAME_CHECKOUT duas interativas vivas no mesmo checkout git (topo git do cwd, não a worktree): a 2ª vai de --worktree.
 #                         SÓ dentro de repo git: fora dele o remédio --worktree não existe, então não se classifica. O rev-parse por
 #                         cwd tem teto curto (BATON_TOPLEVEL_TIMEOUT_S, padrão 5s); estouro vira HYGIENE_UNMEASURED, nunca «mesmo checkout» por palpite.
-#   SESSION_CAP           SESSÕES interativas distintas (dedupe por sid) acima de --max-interactive (padrão 4; o teto prático é 4 sessões + 5 agentes).
+#   SESSION_CAP           SESSÕES interativas distintas (dedupe por sid) acima de --max-interactive (padrão 8; o teto prático é 8 sessões + 5 agentes; D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116, 2026-11-16).
 #   Ilegível nunca é limpo: estado ou árvore que não se leem saem como lacuna nomeada (HYGIENE_UNMEASURED), não «em tmux».
 proc_root = os.environ.get('BATON_PROC') or '/proc'
 try: toplevel_timeout = float(os.environ.get('BATON_TOPLEVEL_TIMEOUT_S') or 5)
@@ -711,7 +711,7 @@ if peers_ok:
     inter_sessions = len({p['sid'] for p in inter if p['sid']}) + sum(1 for p in inter if not p['sid'])
     if inter_sessions > int(max_inter):
         proc_note = f' ({len(inter)} processo(s))' if len(inter) != inter_sessions else ''
-        HY.append(('SESSION_CAP', None, f'{inter_sessions} sessão(ões) interativa(s) distinta(s){proc_note} acima do teto de {max_inter} (teto prático: 4 sessões + 5 agentes)',
+        HY.append(('SESSION_CAP', None, f'{inter_sessions} sessão(ões) interativa(s) distinta(s){proc_note} acima do teto de {max_inter} (teto prático: 8 sessões + 5 agentes)',
                    'feche ou estacione (parked.tsv) a ociosa sem fila; agente em vez de sessão para trabalho curto'))
 else: hy_gaps.append('lista de peers não lida: sem pid não há processo a medir')
 HORD = {c: i for i, c in enumerate(('SESSION_STOPPED', 'SESSION_NOT_IN_TMUX', 'SESSION_SAME_CHECKOUT', 'SESSION_CAP'))}
