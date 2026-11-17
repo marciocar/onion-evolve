@@ -103,7 +103,7 @@ Segunda passada, de um agente revisor separado, só leitura, com mandato de refu
   plugin e o inventário da bancada é lido por 69) e a faixa foi terminada pelo runner antes de reportar, com a carga
   da máquina acima da régua. Os dois commits saíram com `--no-verify`; a seleção e a completa ficam para o CI.
 - O lint do pre-commit rodou inteiro antes disso: 0 HARD, 31 SOFT, com o inventário da bancada regenerado pelo
-  próprio hook (2747 para 2754 sítios de asserção).
+  próprio hook (2747 para 2754 sítios de asserção no primeiro commit; 2758 depois dos casos das arestas externas).
 - `reviewed_diff_sha256` segue `pendente`: o carimbo é do `pr-finalize`, que não rodou.
 - Com o `vendor/kg-ssot` presente, o lint lê a integridade do contrato, que já reprovava `edge_type: SUPPORT`
   (`form.enum.edge.edge_type`, medido). O defeito alcançava quem roda o radar direto e o adotante sem o leitor.
