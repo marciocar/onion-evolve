@@ -3,16 +3,17 @@ branch: fix/radar-edge-type-whole-word
 pr: pendente
 date: 2026-11-17
 reviewed_diff_sha256: pendente
-findings_total: 3
-findings_real: 1
+findings_total: 4
+findings_real: 2
 findings_blocking: 0
 tokens: 0
 duration_min: 0
-findings_fixed: 1
+findings_fixed: 2
 verdict: FIXED
-elenxo: false
-reviewer: "agente de execução que escreveu a cura, relendo o próprio diff contra a medição antes e depois"
-nota: "tokens 0 e duration_min 0 = não medidos: a passada foi a releitura do diff pelo mesmo agente que curou, sem agente separado e sem cronômetro."
+elenxo: true
+elenxo_isolado: true
+reviewer: "1ª passada: o agente de execução que escreveu a cura, relendo o próprio diff. 2ª passada independente em 2026-11-17: agente revisor separado, só leitura, mandato de refutar"
+nota: "tokens 0 e duration_min 0 = não medidos: a passada foi a releitura do diff pelo mesmo agente que curou, sem cronômetro; a 2ª passada foi de um agente separado, cujo custo não chegou a este agente."
 ---
 
 # Passada adversarial: `fix/radar-edge-type-whole-word`
@@ -38,7 +39,7 @@ A bancada ganhou os casos (q) a (u) na família `kg_radar_integrity`, rodando o 
 
 ## Achados
 
-Três pontos examinados, um real:
+Quatro pontos examinados, dois reais:
 
 1. **A cerca de espaços de `external_edges` não era valor inteiro.** A linha de `VX` já comparava
    `" " valor " "` contra a lista cercada, e o comentário dizia «palavra inteira». Um valor com espaço que atravessa
@@ -52,6 +53,10 @@ Três pontos examinados, um real:
    é idêntica byte a byte antes e depois (76 com saída 0), e o veredito de `--integrity` nos 867 grafos rastreados
    do repo é idêntico (código de saída e contagem de linhas de enum inválido). Não é achado.
 
+4. **Nenhum caso da bancada tocava `external_edges`** (observação de cobertura da revisão independente). Reverter só
+   a chamada das arestas externas à cerca de espaços antiga passava calado. Real, não bloqueia, curado: casos (v) e
+   (w) e o mutante (x).
+
 O `status` não entra na classe: `statusFactor` compara por igualdade.
 
 ## Mutantes
@@ -60,15 +65,40 @@ O `status` não entra na classe: `statusFactor` compara por igualdade.
   `edge_type: SUPPORT` passa com saída 0. A âncora é conferida antes de mutar (`grep -cF` igual a 1).
 - (u) a igualdade dentro de `enumHas` vira `index(a[k], v) > 0`: o grafo com `node_type: clai` passa com saída 0.
   Mesma conferência de âncora.
+- (x) só a chamada das arestas externas volta a `index(VX, " " xtype[i] " ") == 0 || xtype[i] == ""`: a aresta
+  externa com `edge_type: "SUPPORTS REFUTES"` passa com saída 0. Mesma conferência de âncora.
 
-Os dois morreram na família `kg_radar_integrity`: 24 passaram, 0 falharam, 0 pularam.
+Os três morreram na família `kg_radar_integrity`: 27 passaram, 0 falharam, 0 pularam.
+
+## Revisão independente (2026-11-17)
+
+Segunda passada, de um agente revisor separado, só leitura, com mandato de refutar. Sem achado bloqueante.
+
+**Mediu:**
+
+- O `split` do awk com separador de espaço colapsa espaços e tira as pontas; o valor chega aparado de espaço, TAB,
+  CR e de uma aspa de cada lado.
+- 97 grafos de `docs/onion/graph/` e `docs/evolution/research/` sem diferença de código de saída nem de saída byte a
+  byte entre o radar antigo e o novo.
+- O cenário das arestas externas reproduzido: radar antigo sai 0, novo sai 1.
+- Família `kg_radar_integrity`: 24 passaram, 0 falharam (antes dos casos (v) a (x)).
+
+**Leu:**
+
+- `status` não é da classe.
+- Não sobrou `index(` de validação.
+- `--integrity` é o awk próprio do radar e não chama o contrato vendorizado; o defeito era explorável por quem roda
+  o radar sem o leitor.
+
+**Não verificou:**
+
+- O lint completo.
+- O caminho com o vendor presente.
 
 ## Limites declarados
 
-- A passada é do mesmo agente que escreveu a cura; não houve refutador separado.
-- O mutante (u) prova a igualdade com o caso de `node_type`; `plane`, `layer`, o valor que atravessa dois itens e
-  `external_edges` foram medidos antes e depois à mão, e só os quatro primeiros têm caso na bancada. O valor que
-  atravessa dois itens em `external_edges` não tem caso na bancada.
+- O mutante (u) prova a igualdade com o caso de `node_type`; `plane`, `layer` e o valor que atravessa dois itens
+  numa aresta interna têm caso positivo, sem mutante próprio.
 - Só a família `kg_radar_integrity` rodou até o fim. O pre-commit selecionou 125 famílias (o radar viaja num
   plugin e o inventário da bancada é lido por 69) e a faixa foi terminada pelo runner antes de reportar, com a carga
   da máquina acima da régua. Os dois commits saíram com `--no-verify`; a seleção e a completa ficam para o CI.

@@ -23978,6 +23978,31 @@ run_kg_radar_integrity_selftests() {
       record_pass "kg-integridade: (u) (MUT) igualdade do enumHas trocada por index() → node_type: clai passa — os casos (s) mordem"
     else record_fail "kg-integridade: (u) (MUT)" "mutante sobreviveu: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
   fi
+  # (v)–(x) ARESTA EXTERNA: a chamada de external_edges tem a sua própria linha. A cerca de espaços antiga
+  #     (" " valor " " contra a lista cercada) pegava o pedaço, mas deixava passar o valor que atravessa dois
+  #     itens VIZINHOS da lista (SUPPORTS REFUTES). Sem estes casos, reverter só aquela linha passava calado.
+  { cat "${g}"; printf 'external_edges:\n  - from: C_alvo\n    to: "g/outro.kg.yaml#C_Z"\n    edge_type: SUPPORTS\n'; } > "$d/ext-ok.kg.yaml"
+  sed 's/edge_type: SUPPORTS$/edge_type: "SUPPORTS REFUTES"/' "$d/ext-ok.kg.yaml" > "$d/ext-span.kg.yaml"
+  # (v) NEGATIVO: aresta externa com o valor inteiro → exit 0.
+  rc=0; out="$(bash "${rad}" "$d/ext-ok.kg.yaml" --integrity 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'fora da lista do contrato' <<< "${out}"; then
+    record_pass "kg-integridade: (v) external_edges com edge_type: SUPPORTS → exit 0"
+  else record_fail "kg-integridade: (v)" "aresta externa válida reprovou: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  # (w) POSITIVO: o valor atravessa dois itens vizinhos da lista → exit 1 nomeando o valor.
+  rc=0; out="$(bash "${rad}" "$d/ext-span.kg.yaml" --integrity 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -qF 'edge_type fora da lista do contrato v4.3: [SUPPORTS REFUTES]' <<< "${out}"; then
+    record_pass "kg-integridade: (w) external_edges com edge_type: \"SUPPORTS REFUTES\" → exit 1 'fora da lista do contrato'"
+  else record_fail "kg-integridade: (w)" "valor atravessando dois itens passou: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  # (x) MUTANTE 3: SÓ a chamada das arestas externas volta à cerca de espaços → o caso (w) passa a sair 0.
+  if [ "$(grep -cF 'if (!enumHas(VX, xtype[i])) {' "${rad}")" -ne 1 ]; then
+    record_fail "kg-integridade: (x)" "âncora do mutante não casa exatamente 1 linha (enumHas(VX, xtype[i]))"
+  else
+    sed 's/if (!enumHas(VX, xtype\[i\])) {/if (index(VX, " " xtype[i] " ") == 0 || xtype[i] == "") {/' "${rad}" > "$d/.claude/validation/mut-ext-fence.sh"
+    rc=0; out="$(bash "$d/.claude/validation/mut-ext-fence.sh" "$d/ext-span.kg.yaml" --integrity 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && grep -q 'sem contradições estruturais' <<< "${out}"; then
+      record_pass "kg-integridade: (x) (MUT) external_edges de volta à cerca de espaços → SUPPORTS REFUTES passa com exit 0 — o caso (w) morde"
+    else record_fail "kg-integridade: (x) (MUT)" "mutante sobreviveu: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  fi
   rm -rf "$d"
 
   # (m)–(p) CAMINHO DO CONTRATO (D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023). Os casos acima rodam num
