@@ -10,6 +10,135 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.54.0] - 2026-11-17
+
+Contrato v4.24, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda. O que muda para o
+adotante: a política de áreas do `kg-mcp` e do `kg_gate.py --classification-floor`, em que a política com `levels` que
+deixa uma área compartilhada fora de `ceilings` passa a ser inválida. Dê teto a cada área compartilhada antes de
+atualizar.
+
+- Contrato v4.24: o perfil canônico `x_downgrade`, só no `meta` e julgado só quando presente e só pela forma: a trilha
+  dos rebaixamentos de nível do grafo inteiro, uma lista não vazia de registros com `from` e `to` (níveis), `reason`,
+  `approved_by` e `ref` (texto não vazio) e `date` (uma data do calendário). Fora da forma, alerta como `form.type`,
+  `form.range`, `form.required` ou `form.pattern` em `meta.x_downgrade` e nas chaves dele; no nó, como
+  `form.misplaced.node.x_downgrade`. Os dois leitores dão o mesmo veredito; a suíte vai de 597 a 621 casos
+  (`latest/form/downgrade/`).
+- `kg_gate.py --classification-downgrade --area-policy ARQ`, desligado por padrão, nos dois modos, com ou sem o piso e
+  a conferência de citação: reprova (rc 1) a queda do nível de um grafo frente à base sem a trilha dela. É o desenho
+  escolhido para a lacuna "The level is declared, not checked": baixar o rótulo é um ato com motivo, com uma segunda
+  pessoa e com referência. A base é a do `--touched` (contra o índice do git) ou, no modo da catraca, `--base REF` (o
+  ancestral comum de `REF` e `HEAD`, contra o checkout). O grafo alterado é pareado com a base pelo caminho, pelo
+  `meta.id` e pelo rename que o git detecta com a quebra de reescrita (`-B -M`, que conta o grafo movido por cima de um
+  caminho que existia); o nível da base é o maior entre os pares. O grafo apagado e recriado com outro caminho e outro
+  `meta.id`, diluído abaixo da semelhança do git, não pareia (declarado, para o detector de conteúdo). Na queda, o último registro de `meta.x_downgrade` tem de registrá-la (`from` e `to`
+  iguais aos dois níveis, os textos não vazios, `date` do calendário) e vir depois da trilha da base, que fica como
+  era, e o `approved_by` não pode nomear, pelo e-mail ou pelo nome e sem distinguir caixa, o autor ou o committer de
+  commit que mudou o nível desde a base, nem quem vai commitar. O nível desconhecido agora reprova;
+  o desconhecido na base conta como o mais alto. A saída nomeia o arquivo e os níveis, nunca o motivo, o aprovador ou a
+  referência. Sem base, sem `--area-policy`, com `--update`, `--base` com `--touched` e `--base` sozinho são entrada
+  quebrada (rc 2). O gate não autentica o aprovador: a trava é o review do pull request, com a branch protection e o
+  `CODEOWNERS` (manual, capítulo 6, passo 7). O que fica fora: o grafo que nasce com o rótulo baixo, ou copiado para
+  outro repositório, não tem base para comparar (a lacuna "A level that starts too low is not checked"); o detector de
+  conteúdo vem depois.
+- **A identidade do contrato no seu gate muda.** O schema SHOULD muda, então o gate imprime o aviso `· identidade` na
+  primeira rodada depois da atualização e passa, salvo com `--strict-identity`; o `kg_gate.py --update` grava a
+  identidade nova. O grafo que já leva um `x_downgrade` fora da forma, ou no nó, vê dívida SHOULD nova e reprova na
+  catraca: corrija a forma, ou aceite-a como linha de base com o motivo, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py
+  --update --accept-regression "contract v4.24: the downgrade trail, debt that already existed"`. O grafo sem a chave
+  não vê nada novo.
+
+- `kg_trace.py` (e por isso o `kg_gate.py --sources` e o `--classification-cites`, que usam o mesmo resolvedor): o trace e
+  o `provenance.source` passam a ser lidos sem os `<>` em volta (o delimitador de URI do apêndice C da RFC 3986) e sem o
+  prefixo `kg-node://` do esquema do contrato, e o caminho para no `?` (a query), como já parava no `#` e no `:`.
+  `<docs/a.md>` e `docs/a.md?plain=1` resolvem, onde antes eram `not_path` e ficavam sem julgamento, e
+  `kg-node://docs/a.kg.yaml#N` (também `kg-node:///…`) resolve, onde antes era `absolute`; `<https://…>` é `absolute`.
+  **Uma conferência mais apertada:** as mesmas formas nomeando um arquivo que não existe (`<docs/gone.md>`,
+  `docs/gone.md?x`) eram `not_path` (rc 0) e passam a `missing` (rc 1, `integrity.trace-target-missing`), e também
+  `kg-node://docs/gone.md` e `kg-node:///docs/gone.md`, que eram `absolute` (rc 0). A saída do
+  `kg_trace.py check` neste repositório e no corpus do framework é igual byte a byte antes e depois. O alvo que só
+  resolve normalizando (`docs//x`) segue sem ser lido.
+
+- `kg_gate.py --classification-cites --area-policy ARQ`, desligado por padrão, com ou sem o `--classification-floor`:
+  reprova (rc 1) o grafo que cita, num campo estruturado, um grafo rastreado de nível maior que o dele, pela ordem dos
+  `levels` da política. É o desenho escolhido para a lacuna "Não há redação nó a nó": o nó mais sensível que o grafo
+  vai para um grafo próprio, e o grafo de nível menor não pode apontar para ele. Os campos lidos são as duas
+  pontas das `external_edges`, o `trace`, o `provenance.source` e o `provenance.locator` (texto, lista ou mapa,
+  qualquer `scheme`) e o `criterion` do `x_measured_under`; o valor que menciona um grafo é resolvido pelo resolvedor
+  do `kg_trace.py` (uma fonte só para os dois), e a citação que resolve em mais de um lugar é julgada pelo maior nível
+  entre eles. O texto livre não é lido. O maior citando o menor passa. A saída nomeia os dois arquivos e os níveis, nunca o id citado. O nível
+  desconhecido de uma das pontas e o grafo que cita e não parseia reprovam (a falha fecha); o valor com a forma de caminho relativo
+  que não resolve também reprova (negar por padrão), e o valor que é exatamente o caminho de um grafo do índice do git
+  resolve para ele (com acento, espaço, `+` ou `@` também); todo valor lido é também varrido atrás do caminho de cada grafo do
+  índice (a partir da raiz, da pasta do grafo e da pasta pai dela, sem distinção de caixa), com fronteira de caminho (a
+  regra de uma varredura de segredos), e cada grafo achado é julgado pelo nível, a citação a uma revisão antiga pelo
+  nível de hoje. A varredura nunca tira a falha fechada, salvo quando o valor inteiro, sem a pontuação de fronteira das
+  pontas, é exatamente um grafo do índice (o caminho com ponto final). A prosa que não nomeia grafo, o valor que nomeia
+  só o próprio grafo, toda URL, o caminho absoluto (o do Windows inclusive) e o marcador `private-cite:` são contados e
+  não julgados. Com `--touched`, só o par com uma ponta alterada, lido do índice. O
+  `--area-policy` passa a valer com qualquer das duas opções, e o vazio é entrada quebrada (rc 2). Não combina com
+  `--update`. Sem a opção, nada muda. O capítulo 5 a documenta ("Citação entre níveis"), e o capítulo 6 ganha o passo
+  "Separar o nó sensível"; a lacuna vira "Não há rótulo por nó, por desenho", com o que fica de fora (o nó rotulado
+  dentro de um grafo menor, o texto livre, a citação para outro repositório). Nenhuma mudança de contrato.
+
+- Política de áreas: com `levels`, toda área compartilhada tem teto (negar por padrão). A canônica e cada grupo (e por
+  isso toda área que um papel lê) têm de ser chave de `ceilings`; a política que deixa uma de fora é inválida, com
+  `ceilings: with levels, every shared area has a ceiling; without one: ÁREAS`, que nomeia cada área sem teto, em
+  ordem alfabética. Antes, essa área não era julgada e servia todo nível a quem a lia, inclusive o nível desconhecido e
+  o arquivo que não parseia. **Mudança de comportamento:** uma política que carregava na 4.53.0 pode agora ser
+  recusada. O `kg-mcp` não sobe com ela (rc 2, `--area-policy não carregou`), o que já está de pé fecha na releitura
+  seguinte (nenhuma área compartilhada é servida até o arquivo ser corrigido, e ninguém grava se o último arquivo
+  válido tinha `roles`), e o `kg_gate.py --classification-floor` para com `GATE QUEBRADO` (rc 2) antes de julgar
+  qualquer grafo. Isso vale mesmo para quem usa a política só no piso do gate e nunca sobe o `kg-mcp`. O que fazer: dar
+  teto a cada área compartilhada; para a área que deve servir todo nível conhecido, use o último de `levels` (o nível
+  desconhecido passa a ficar escondido ali também). O `kg-mcp` também se recusa, fora do leitor, a servir área
+  compartilhada sem teto numa política com `levels`. A política sem `levels` (sem classificação) e a área própria da identidade não mudam. A lacuna "A área
+  sem teto serve todo nível" sai da lista do capítulo 6, e os capítulos 5 e 6 dizem a regra e a mensagem.
+
+- A política de áreas fixada por digest: `--area-policy-digest sha256:HEX|@ARQ`, nova e opcional no `kg_gate.py` (com
+  `--area-policy`) e no `kg_mcp.py` (com `--area-policy`), e `python3 -I tools/kg_policy.py digest ARQ`, que imprime o
+  digest de uma política (rc 0) ou por que ela é inválida (rc 2). O digest é o SHA-256 do JSON canônico da política
+  como o leitor a vê: a formatação, a ordem das chaves, a ordem e a repetição dos membros de um grupo, do `read` de um
+  papel e dos papéis de um membro, e a caixa de um e-mail não o mudam; a ordem de `levels`, um teto, um membro, um
+  papel e o `default_level` mudam. Fixe o mesmo valor, literal ou num arquivo commitado lido com `@ARQ`, nas duas
+  pontas: a política com outro digest para o gate com `GATE QUEBRADO` (rc 2) antes de julgar qualquer grafo, sem
+  digest na mensagem (um log de CI pode ser público), impede o `kg-mcp` de subir (rc 2) e, trocada com o servidor de
+  pé, fecha a leitura como a política inválida quando o carimbo do arquivo muda. As duas pontas têm de rodar a mesma
+  release. Com o pacote, o comando é `python3 -m kg_ssot.kg_policy digest ARQ`. A marca de ordem de bytes do UTF-8 no
+  `@ARQ` é aceita, e o arquivo em UTF-16 é recusado com uma dica. O valor
+  malformado e a opção sem `--area-policy` são entrada quebrada (rc 2). Sem a opção, nada muda. A lacuna "Nada confere
+  que o gate e o servidor leem a mesma política" sai da lista do capítulo 6, que passa a recomendar fixar; quem não
+  passa a opção continua sem conferência.
+
+- O manual ganha um guia de ponta a ponta da classificação de sensibilidade, no capítulo 6 ("Classificar por
+  sensibilidade, de ponta a ponta"): escolher os níveis, marcar `x_classification`, escrever uma política de áreas com
+  tetos e papéis, ligar o `kg_gate.py --classification-floor` no CI e servir pelo `kg-mcp --area-policy` com o mesmo
+  arquivo. Ele diz o que o pacote de auditoria não faz (o `kg_audit.py` não lê nível nem audiência) e lista as lacunas
+  levantadas contra esta release, cada uma marcada como medida ou declarada: o nível declarado e nunca conferido contra
+  o conteúdo, sem redação nó a nó, o texto livre que não é cortado, nada que confira que o gate e o servidor leem a
+  mesma política nem que o piso fica acima do teto, o caminho excluído que o piso não julga, o grafo que entra e sai de
+  uma branch e fica no histórico, o teto aplicado só no perfil atrás de proxy, a área própria sem teto, o histórico que
+  lista uma versão mais sensível e o
+  teto de papel que outra concessão anula. O capítulo 5 deixa de marcar os papéis como não lançados: saíram na 4.50.0.
+  Nenhuma ferramenta muda.
+
+- O guia de ponta a ponta do capítulo 6 fecha o desenho da classificação com duas partes novas. "Quem lê por onde"
+  declara a regra: quem não é dev lê só pelo `kg-mcp` por HTTP atrás de um proxy que autentica, com a identidade posta
+  pelo proxy a partir de um e-mail verificado, nunca pelo cliente; as ferramentas de linha de comando (`kg_query.py`,
+  `kg_trace.py`, `kg_diff.py`, `kg_prov_export.py`), o pacote de auditoria (`kg_audit.py`) e o `kg-mcp` por stdio ou
+  com um armazém único são só para dev, fora do alcance do papel de negócio. Um teto para essas ferramentas é melhoria
+  posterior, puxada por demanda. "Fora da primeira versão" lista três escolhas deixadas de fora, cada uma com o que a
+  reabre: o rótulo por nó (uma medição refeita que cumpra as duas condições registradas antes dela), a negação por
+  pessoa e a precedência entre papéis (o primeiro adotante que precisar) e a finalidade do tratamento na lei de
+  proteção de dados (uma pergunta própria em aberto, com base na retenção que o contrato já tem e o limite de que o
+  histórico do git guarda toda versão). Nenhuma ferramenta muda.
+
+- `kg_vendor.py update --verify-attestation` agora separa o verificador do Sigstore que não subiu da release que não
+  verificou. Quando o `gh attestation verify` falha com `no valid Sigstore verifiers could be initialized` ou
+  `error creating Sigstore verifier` (não conseguiu gravar o cache TUF, como num sandbox com a pasta pessoal só de
+  leitura), a mensagem diz que a conferência não rodou, que isso não diz nada sobre a release, e manda definir
+  `XDG_CACHE_HOME` para uma pasta gravável e rodar de novo. Segue rc 2, e o vendor fica intocado; qualquer outra falha
+  mantém a mensagem antiga.
+
 ## [4.53.0] - 2026-11-16
 
 Sem mudança no contrato: nenhum veredito MUST ou SHOULD muda.

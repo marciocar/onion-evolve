@@ -93,6 +93,8 @@ What v4 changed in severity, and what it added:
 | `form.pattern.node.provenance.source` (a `private-cite:` marker out of form, v4.22) | — | SHOULD |
 | `form.pattern`, `form.type`, or `form.required` on `meta.x_dispose_by`, `meta.x_dispose_basis`, or `meta.x_hold` (the disposal deadline out of form, v4.23) | — | SHOULD |
 | `form.misplaced.node.x_dispose_by`, `.x_dispose_basis`, `.x_hold` (the disposal profiles on a node, v4.23) | — | SHOULD |
+| `form.type`, `form.range`, `form.required`, or `form.pattern` on `meta.x_downgrade` or its keys (the downgrade trail out of form, v4.24) | — | SHOULD |
+| `form.misplaced.node.x_downgrade` (the downgrade trail on a node, v4.24) | — | SHOULD |
 | `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony`, or, since v4.16, their Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, which warn as `form.deprecated.node.provenance.method` since v4.21) | — | SHOULD (MUST in v5) |
 | `form.unknown-key.node.provenance.<key>` (an unknown key inside `provenance`) | SHOULD | SHOULD |
 
@@ -260,6 +262,8 @@ v4.22 adds one SHOULD rule. In `latest/form/private-cite/`, a `provenance.source
 
 v4.23 adds the disposal profiles, in the SHOULD (`latest/form/disposal/`), judged only when present and only by their form, never by the date coming due: in `meta`, `x_dispose_by` (a calendar date `YYYY-MM-DD`, the date by which the whole graph is to be disposed of), `x_dispose_basis` (text that is not empty: the law, the contract, or the decision; whitespace only, Unicode spaces such as NBSP, the ideographic space, and the BOM included, counts as empty, by an explicit character class that both readers match the same), and `x_hold` (a map with `reason`, text that is not empty, and `until`, a date). Out of form they warn as `form.pattern`, `form.type`, or `form.required` in `meta` (`form.required.meta.x_hold.until`, for example); an impossible date such as `2030-02-30` warns as `form.pattern`, as every date of the contract does. A date that has already passed is valid: the date coming due belongs to the due report (`kg_validate.py --due`), outside the verdict. `x_hold` is not a closed map. On a node, the three keys are not profiles and warn as `form.misplaced.node.<key>`, whatever the value; on an edge they stay free `x_` keys. Nothing that passed fails.
 
+v4.24 adds the downgrade trail, in the SHOULD (`latest/form/downgrade/`), judged only when present and only by its form: in `meta`, `x_downgrade`, a list that is not empty of entries, each a map with `from` and `to` (levels, in the slug form of `x_classification`), `reason`, `approved_by`, and `ref` (text that is not empty, with the same character class for whitespace as v4.23), and `date` (a calendar date). Out of form it warns as `form.type.meta.x_downgrade` (not a list), `form.range.meta.x_downgrade` (an empty list), `form.type.meta.x_downgrade.item` (an entry that is not a map), `form.required.meta.x_downgrade.<key>`, and `form.pattern` or `form.type` on `meta.x_downgrade.<key>`. Every entry of the trail is judged, and another key inside an entry is free. Whether the level dropped, and whether the last entry matches the drop, is not the contract's to judge: it needs the base and the order of the policy's levels, and it belongs to `kg_gate.py --classification-downgrade`. On a node, `x_downgrade` warns as `form.misplaced.node.x_downgrade`; on an edge it is a free `x_` key. Nothing that passed fails.
+
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 
 ## Folders
@@ -281,7 +285,7 @@ sealed, that is, merged into the product graph, **and** the schema in `spec/` al
 (for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
 Nothing gets ahead of an open decision.
 
-**Today's score.** The reference reader passes 100% of `latest/`: 597 cases against contract v4, 32 of them
+**Today's score.** The reference reader passes 100% of `latest/`: 621 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
 verdict v4 changes became `bad-*` cases. Every case uses a valid `method` in the canonical English class (`measurement: caso de conformidade`, since v4.21), so

@@ -215,6 +215,10 @@ def _gh(*args):
         raise Broken(_("gh took more than {seconds} s: nothing was changed").format(seconds=GH_TIMEOUT)) from None
 
 
+# o sintoma do gh quando não consegue gravar o cache TUF do Sigstore (achado de campo: sandbox com pasta pessoal só de leitura)
+SIGSTORE_VERIFIER_DOWN = ("no valid Sigstore verifiers could be initialized", "error creating Sigstore verifier")
+
+
 def _gh_error(out):
     return (out.stderr or out.stdout).decode("utf-8", "replace").strip()[:300]
 
@@ -235,7 +239,14 @@ def verify_attestation(tag, hashes, release_blob, repo, workdir, expected):
               "--cert-identity", f"https://github.com/{repo}/.github/workflows/release.yml@refs/tags/{tag}",
               "--deny-self-hosted-runners")
     if out.returncode != 0:
-        raise Broken(_("attestation of {tag} did not verify in {repo}: {error}").format(tag=tag, repo=repo, error=_gh_error(out)))
+        error = _gh_error(out)
+        # o verificador do Sigstore não subiu (o gh não grava o cache TUF numa pasta pessoal só de leitura): a falha é da máquina,
+        # não da release; o veredito segue fail-closed, mas a mensagem diz o que é e o que fazer
+        if any(symptom in error for symptom in SIGSTORE_VERIFIER_DOWN):
+            raise Broken(_("attestation of {tag} was not checked: the Sigstore verifier of gh did not start (it could not "
+                           "write its TUF cache), so this says nothing about the release; set XDG_CACHE_HOME to a "
+                           "writable folder and run again: {error}").format(tag=tag, error=error))
+        raise Broken(_("attestation of {tag} did not verify in {repo}: {error}").format(tag=tag, repo=repo, error=error))
     data = (folder / name).read_bytes()
     try:
         manifest = json.loads(data)

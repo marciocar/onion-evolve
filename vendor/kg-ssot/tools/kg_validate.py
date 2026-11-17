@@ -92,7 +92,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.23"
+CONTRACT_VERSION = "4.24"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1921,6 +1921,13 @@ PROFILE_HINTS = {
                                  "the graph, not the node.",
     ("node", "x_hold"): "x_hold belongs in meta (v4.23), next to x_dispose_by: the unit of disposal is the graph, not "
                         "the node.",
+    # v4.24: a trilha do rebaixamento de nível, julgada só pela forma; a queda e o aprovador são do gate
+    ("meta", "x_downgrade"): "x_downgrade is the trail of the level downgrades of the whole graph (v4.24): a list that "
+                             "is not empty, from the oldest to the newest, each entry a map with from and to (levels, "
+                             "as slugs), reason, approved_by and ref (text that is not empty) and date (YYYY-MM-DD in "
+                             "quotes). kg_gate.py --classification-downgrade asks for the entry when the level drops.",
+    ("node", "x_downgrade"): "x_downgrade belongs in meta (v4.24), next to x_classification: the unit is the graph, not "
+                             "the node.",
 }
 
 

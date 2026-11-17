@@ -41,11 +41,14 @@ política, contrato v4.20): numa área com teto, o grafo cujo meta.x_classificat
 não conhece, não é entregue e responde como o grafo que não existe. Os papéis (roles e members na política): cada
 papel lê áreas, declara se grava na própria área e pode baixar o teto de uma área que lê; o acesso é a união das
 concessões (o grupo antigo vale como um papel com o teto da área), e na mesma área vale o maior teto entre elas.
+Com --area-policy-digest (sha256:<hex> ou @ARQ, o valor que kg_policy.py digest dá), a política lida tem de ter esse
+digest: com outro, o servidor não sobe (rc 2), e a política trocada por outra com ele de pé fecha a leitura. O gate
+(kg_gate.py --area-policy-digest) confere o mesmo valor, e as duas pontas leem a mesma política.
 
 Uso:
   kg_mcp.py --root DIR [--backend disk|git|versioned] [--init] [--author "Nome <email>"] [--read-only]
             [--http PORTA [--host 127.0.0.1] [--allow-remote] [--secret-env VAR [--secret-header H]]
-                          [--identity-header H [--area-policy ARQUIVO]] [--max-concurrent N]] [--max-bytes N]
+                          [--identity-header H [--area-policy ARQUIVO [--area-policy-digest D]]] [--max-concurrent N]] [--max-bytes N]
             [--max-graphs N]
 Sem --root, só kg_validate e kg_schema_help ficam disponíveis. Com --store-optional, uma raiz que não abre não derruba o
 servidor: ele sobe só com kg_validate e kg_schema_help e diz o motivo ao modelo, nas instruções, na descrição das duas
@@ -494,14 +497,18 @@ class AreaPolicy:
     aceita "own": nunca amplia a escrita além da própria área) e pode baixar o teto de uma área para quem o tem (ceilings,
     nunca acima do teto da área). members dá papéis a um e-mail ou a todos de um grupo. O acesso de uma pessoa é a união
     das concessões: a canônica e os grupos de que é membro (cada um equivale a um papel que lê a área com o teto dela) e os
-    papéis. Numa área concedida mais de uma vez, vale o maior teto entre as concessões (a área sem teto vence todas).
+    papéis. Numa área concedida mais de uma vez, vale o maior teto entre as concessões (a área sem teto, que só existe
+    na política sem levels, vence todas).
     Quem tem papel grava na própria área se algum papel seu tem write ["own"]; quem não tem papel grava como antes."""
 
     KEYS = kg_policy.KEYS
     ROLE_KEYS = kg_policy.ROLE_KEYS
 
-    def __init__(self, path, root=None):
+    def __init__(self, path, root=None, pin=None):
         self.path = pathlib.Path(path)
+        # o digest fixado (--area-policy-digest, já conferido por kg_policy.read_pin): o arquivo lido com outro digest
+        # não carrega na partida e, relido com o servidor de pé, fecha como a política inválida
+        self.pin = pin
         if root is not None:
             real, base = self.path.resolve(), pathlib.Path(root).resolve()
             if real == base or base in real.parents:
@@ -509,6 +516,9 @@ class AreaPolicy:
         self._lock = threading.Lock()
         self._stamp, self._doc = self._load()
         self._had_roles = bool(self._doc.roles)  # o último documento válido tinha papéis
+        # o último motivo de fechamento impresso: com a política fechada, cada requisição relê o arquivo, e o mesmo
+        # motivo (com os dois digests, se o pin não bate) não se repete no stderr a cada uma
+        self._closed_reason = None
 
     parse = staticmethod(kg_policy.parse)
     _parse_ceilings = staticmethod(kg_policy._parse_ceilings)
@@ -520,6 +530,11 @@ class AreaPolicy:
         if st.st_size > POLICY_MAX_BYTES:  # antes de ler: o arquivo grande demais nem chega à memória
             raise ValueError(P_("the policy is larger than {limit} bytes").format(limit=POLICY_MAX_BYTES))
         doc = self.parse(self.path.read_text(encoding="utf-8"))
+        # o stderr do servidor é do operador, que já tem a política e o pin: aqui os dois digests ajudam, e nenhum
+        # chega a um cliente (a resposta MCP não leva o motivo do fechamento)
+        if self.pin is not None and kg_policy.digest(doc) != self.pin:
+            raise ValueError(P_("the policy has the digest {read}, not the pinned {pinned}").format(
+                read=kg_policy.digest(doc), pinned=self.pin))
         for line in self.overridden(doc):
             print(f"kg_mcp: area policy: {line}", file=sys.stderr)
         return (st.st_mtime_ns, st.st_size, st.st_ino), doc
@@ -560,17 +575,31 @@ class AreaPolicy:
         """(áreas, {área: Ceiling}, grava) de uma só leitura da política, sob a mesma trava: a filiação, o teto e a
         escrita nunca vêm de versões diferentes do arquivo. A política que fechou não dá área nem teto; e, se o último
         documento válido tinha papéis, ninguém grava enquanto ela está fechada (o papel com write [] não pode ganhar a
-        escrita porque o arquivo quebrou). Sem papéis no último válido, a escrita segue como na v4.20."""
+        escrita porque o arquivo quebrou). Sem papéis no último válido, a escrita segue como na v4.20. Com levels, a área
+        compartilhada sem teto sai das áreas servidas e responde como a que não existe (a segunda trava, abaixo)."""
         with self._lock:
             try:
                 st = os.stat(self.path)
                 if (st.st_mtime_ns, st.st_size, st.st_ino) != self._stamp:
                     self._stamp, self._doc = self._load()
                     self._had_roles = bool(self._doc.roles)
+                    self._closed_reason = None
             except (OSError, ValueError, RecursionError) as exc:
                 self._stamp, self._doc = None, PolicyDoc()  # fecha; tenta de novo
-                print(f"kg_mcp: area policy closed: {exc}", file=sys.stderr)
+                if str(exc) != self._closed_reason:
+                    self._closed_reason = str(exc)
+                    print(f"kg_mcp: area policy closed: {exc}", file=sys.stderr)
             areas, ceilings, writes = self.grant(self._doc, identity)
+            if self._doc.levels is not None:
+                # a segunda trava, fora do leitor: com levels, a área sem teto não é servida (falha fechada, como a
+                # área que não existe). O kg_policy já recusa a política que deixa uma área fora de ceilings; isto
+                # segura o caso em que essa garantia falhe, em vez de servir a área sem filtro (o _view só filtra a
+                # área que tem teto)
+                open_areas = [a for a in areas if a not in ceilings]
+                if open_areas:
+                    print(f"kg_mcp: area policy: shared area without a ceiling not served: {', '.join(open_areas)}",
+                          file=sys.stderr)
+                    areas = [a for a in areas if a in ceilings]
             if self._stamp is None and self._had_roles:
                 writes = False
             return areas, ceilings, writes
@@ -584,7 +613,8 @@ class AreaPolicy:
         held = set(policy.members.get(identity, ()))
         for area in groups:
             held |= policy.members.get(area, frozenset())
-        # o teto de cada concessão: o rank do nível, ou None para a área sem teto (que vence as outras)
+        # o teto de cada concessão: o rank do nível, ou None para a área sem teto (que vence as outras; com levels,
+        # kg_policy exige teto em toda área compartilhada, e o None só vem da política sem levels)
         tops = {}
 
         def give(area, rank):
@@ -1524,6 +1554,10 @@ def main(argv=None):
     ap.add_argument("--area-policy", metavar="FILE",
                     help=_("JSON file, outside the root, naming the shared areas each identity reads; requires "
                            "--identity-header"))
+    ap.add_argument("--area-policy-digest", metavar="sha256:HEX|@FILE",
+                    help=_("only with --area-policy: the digest that the policy must have (kg_policy.py digest FILE), as "
+                           "a value or as @FILE, read once at startup; with another digest the server does not start, "
+                           "and a policy changed to another digest while it runs closes reading"))
     ap.add_argument("--max-concurrent", type=int, metavar="N", help=_("HTTP requests at the same time (503 beyond that)"))
     ap.add_argument("--gate-cmd", metavar="CMD",
                     help=_("an external gate, after the contract, on every write and removal: the command (no shell) "
@@ -1551,10 +1585,17 @@ def main(argv=None):
         return broken(_("--identity-header without --secret-env: a header identity is never enough on its own"))
     if args.area_policy is not None and not args.identity_header:
         return broken(_("--area-policy only applies with --identity-header"))
-    policy = None
+    if args.area_policy_digest is not None and args.area_policy is None:
+        return broken(_("--area-policy-digest only goes with --area-policy"))
+    policy = pin = None
+    if args.area_policy_digest is not None:
+        try:
+            pin = kg_policy.read_pin(args.area_policy_digest)
+        except ValueError as exc:
+            return broken(_("--area-policy-digest: {error}").format(error=exc))
     if args.area_policy is not None:
         try:
-            policy = AreaPolicy(args.area_policy, args.root)
+            policy = AreaPolicy(args.area_policy, args.root, pin)
         except (OSError, ValueError, RecursionError) as exc:
             return broken(_("--area-policy did not load: {error}").format(error=exc))
     if args.identity_header and args.author:

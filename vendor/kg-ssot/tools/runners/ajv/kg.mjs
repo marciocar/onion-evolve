@@ -489,7 +489,7 @@ export function formCodes(err, doc) {
   if (err.keyword === 'not' && isObj(err.schema) && 'pattern' in err.schema) kind = 'pattern';
   if (err.keyword === 'not' && isObj(err.schema) && 'required' in err.schema) kind = 'exclusive'; // v4.12: ref e text
   // v4.20: a chave fora do lugar (x_classification no nó; desde o v4.23, também x_dispose_by, x_dispose_basis e
-  // x_hold), por not com o schema vazio, que nada satisfaz
+  // x_hold; desde o v4.24, x_downgrade), por not com o schema vazio, que nada satisfaz
   if (err.keyword === 'not' && isObj(err.schema) && Object.keys(err.schema).length === 0) kind = 'misplaced';
   // v4.21: a forma aceita e em retirada (o apelido em português do method), por not com deprecated: true
   if (err.keyword === 'not' && isObj(err.schema) && err.schema.deprecated === true) kind = 'deprecated';

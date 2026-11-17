@@ -1,0 +1,210 @@
+{
+  "description": "O perfil canônico da trilha de rebaixamento de nível do grafo inteiro (v4.24): x_downgrade, no meta, uma lista não vazia de registros com from, to, reason, approved_by, ref e date. É SHOULD: julgado só quando presente e só pela forma. A queda do nível, o casamento do último registro com ela e o aprovador diferente do autor são do kg_gate.py --classification-downgrade, que compara com a base e lê a ordem dos níveis da política. No nó, x_downgrade não é perfil e alerta como form.misplaced.node.x_downgrade: a unidade é o grafo. Na aresta, segue chave x_ livre.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-meta-downgrade-one.kg.yaml",
+      "description": "um rebaixamento registrado no meta: de, para, motivo, aprovador, referência e data (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-downgrade-trail.kg.yaml",
+      "description": "a trilha com dois rebaixamentos, do mais antigo ao mais novo (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-downgrade-extra-key.kg.yaml",
+      "description": "o registro com uma chave a mais: o mapa não é fechado (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-downgrade-unicode-text.kg.yaml",
+      "description": "o motivo com texto fora do ASCII e espaço não separável no meio vale (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-downgrade-without-classification.kg.yaml",
+      "description": "a trilha sem x_classification: o contrato julga a forma de cada perfil sozinho; a coerência com o nível é do gate (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-downgrade-same-level.kg.yaml",
+      "description": "o registro com from igual a to vale na forma: a ordem dos níveis é da política, e quem julga a queda é o gate (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-edge-downgrade-free.kg.yaml",
+      "description": "x_downgrade na aresta não é perfil: segue chave x_ livre (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-downgrade-not-list.kg.yaml",
+      "description": "a trilha como mapa, não como lista (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_downgrade"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-empty.kg.yaml",
+      "description": "a trilha vazia (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.meta.x_downgrade"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-item-not-map.kg.yaml",
+      "description": "o registro como texto, não como mapa (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_downgrade.item"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-missing-approved-by.kg.yaml",
+      "description": "o registro sem aprovador (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_downgrade.approved_by"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-missing-reason-and-ref.kg.yaml",
+      "description": "o registro sem motivo e sem referência (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_downgrade.reason",
+        "form.required.meta.x_downgrade.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-from-uppercase.kg.yaml",
+      "description": "o nível de antes fora da forma de slug (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.from"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-to-integer.kg.yaml",
+      "description": "o nível de depois como número (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_downgrade.to"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-reason-blank.kg.yaml",
+      "description": "o motivo só com espaço (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.reason"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-approved-by-nbsp.kg.yaml",
+      "description": "o aprovador só com espaço não separável (U+00A0) (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.approved_by"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-ref-empty.kg.yaml",
+      "description": "a referência vazia (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-date-impossible.kg.yaml",
+      "description": "a data do registro que não existe no calendário (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.date"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-date-not-iso.kg.yaml",
+      "description": "a data do registro fora de AAAA-MM-DD (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.date"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-date-basic.kg.yaml",
+      "description": "a data do registro na forma básica da ISO 8601, sem hífens: o perfil pede AAAA-MM-DD (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_downgrade.date"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-date-unquoted.kg.yaml",
+      "description": "a data do registro sem aspas: o leitor YAML 1.1 a leria como data, e o aviso é o do arquivo, não o do perfil (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    },
+    {
+      "file": "warn-meta-downgrade-second-entry.kg.yaml",
+      "description": "o segundo registro sem data: cada registro da trilha é julgado pela forma (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_downgrade.date"
+      ]
+    },
+    {
+      "file": "warn-node-downgrade.kg.yaml",
+      "description": "x_downgrade no nó não é perfil: a unidade é o grafo (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_downgrade"
+      ]
+    },
+    {
+      "file": "warn-node-downgrade-with-meta.kg.yaml",
+      "description": "o meta com a trilha válida e o nó com outra: só o nó alerta (v4.24)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_downgrade"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:a807a339c762cd48 -->
+<!-- translation-of: docs/manual/03-format.md sha256:3ecadfc4f53c43f8 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -184,6 +184,7 @@ livre, e qualquer outra chave alerta. Os valores de enum são códigos, em ingl�
 | `x_provisional` | aresta | `true` quando a ligação ainda espera conferência |
 | `x_classification` | meta | o nível de sensibilidade do grafo inteiro, um nível do esquema próprio da organização (v4.20) |
 | `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | o prazo de expurgo do grafo inteiro, a base dele e a suspensão (v4.23) |
+| `x_downgrade` | meta | a trilha dos rebaixamentos de nível do grafo inteiro: de, para, motivo, aprovador, referência e data (v4.24) |
 
 ### `x_term`
 
@@ -415,6 +416,50 @@ conta, então o `--due` lista todo nó com ele como `dispose_conflict` e nunca c
    onde as versões antigas ainda o têm. Reescrever o histórico (o `git filter-repo`, por exemplo) muda só este
    repositório: não alcança clones, forks, espelhos e caches que já têm os commits antigos. O prazo não substitui a
    primeira decisão: o dado que tem de sumir de vez fica melhor fora de um repositório compartilhado desde o começo.
+
+### `x_downgrade` (v4.24)
+
+A trilha dos rebaixamentos de nível do grafo inteiro. Baixar o `x_classification` é um ato com motivo, com uma segunda
+pessoa e com registro, não uma edição silenciosa do rótulo (a prática de mercado: o rótulo de sensibilidade rebaixado
+com justificativa, o push barrado contornado com motivo e aprovação). `x_downgrade` é uma lista, do registro mais antigo
+ao mais novo, um registro por rebaixamento:
+
+```yaml
+meta:
+  id: payroll-2026
+  x_classification: internal
+  x_downgrade:
+    - from: restricted
+      to: internal
+      reason: "a folha de 2026 foi publicada no relatório anual"
+      approved_by: "dpo@example.org"
+      ref: "https://example.org/acme/kg/pull/42"
+      date: "2026-11-16"
+```
+
+| Chave | Forma |
+|---|---|
+| `from` · `to` | o nível de antes e o de depois, na forma de slug do `x_classification` |
+| `reason` | o motivo, em texto não vazio (só espaço, inclusive o Unicode, conta como vazio) |
+| `approved_by` | quem aprovou, em texto não vazio; escreva o e-mail, que o gate compara com o autor do commit |
+| `ref` | a referência da aprovação (o pull request, o chamado, a ata), em texto não vazio |
+| `date` | a data da aprovação, `AAAA-MM-DD` no calendário, entre aspas |
+
+Outra chave dentro de um registro é livre. Lista, e não mapa, porque o grafo pode ser rebaixado mais de uma vez, e o
+registro anterior é a trilha: trocar um mapa apagaria do arquivo o rebaixamento anterior. A trilha só cresce: o
+registro que já está lá não é apagado nem mudado, e o próximo vem depois dele.
+
+O contrato julga só a forma, e só quando a chave está presente: o valor que não é lista alerta como
+`form.type.meta.x_downgrade`, a lista vazia como `form.range.meta.x_downgrade`, o registro que não é mapa como
+`form.type.meta.x_downgrade.item`, a chave que falta como `form.required.meta.x_downgrade.<chave>` (por exemplo
+`form.required.meta.x_downgrade.approved_by`) e o valor fora da forma como `form.pattern.meta.x_downgrade.<chave>` ou
+`form.type.meta.x_downgrade.<chave>`. Cada registro da trilha é julgado. No nó, `x_downgrade` não é perfil e alerta como
+`form.misplaced.node.x_downgrade`; na aresta, é chave `x_` livre.
+
+O contrato não diz quando o registro é exigido: a queda do nível só se vê entre duas versões do grafo, e pela ordem dos
+níveis, que é da política da organização e não do grafo. Isso é do `kg_gate.py --classification-downgrade` (capítulo
+5), que compara cada grafo com a base e pede que o último registro seja esta queda, venha depois da trilha da base, que
+fica como era, e nomeie um aprovador que não mudou o nível.
 
 ## Registrar um evento externo (forma recomendada, não normativa)
 

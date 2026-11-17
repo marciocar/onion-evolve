@@ -364,7 +364,7 @@ The PR that changes the tag does three things:
 From 4.47.0 on, add `--verify-attestation` to the update to refuse a tree that does not match the manifest the release
 attested; it needs `gh` and the network ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)). In a sandbox where
 the user cache (`.cache` in the home directory) is read-only, run it with `XDG_CACHE_HOME` pointing to a writable directory, since `gh` writes the Sigstore
-trust root there; if the data directory (`.local/share`) is read-only too, point `XDG_DATA_HOME` to a writable directory as well (seen in an adopter in 2026-11). The verification stays whole.
+trust root there; if the data directory (`.local/share`) is read-only too, point `XDG_DATA_HOME` to a writable directory as well (seen in an adopter in 2026-11). The verification stays whole. When the Sigstore verifier of `gh` does not start, the update says so instead of reporting a failed release.
 
 A new SHOULD warning raises the debt by design. The contract's ramps (SHOULD today, MUST later) arrive this way, as a
 measured commitment.
@@ -395,6 +395,34 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.53.0` to `kg-ssot-v4.54.0`, contract v4.24 comes in, SHOULD only: no graph that passed fails, and no MUST
+verdict changes. **One behavior change comes first:** an area policy with `levels` must give a ceiling to every shared
+area (the canonical area and each group, so every area a role reads). A policy that leaves one out, which loaded in
+4.53.0, is now invalid (`ceilings: with levels, every shared area has a ceiling; without one: AREAS`): the `kg-mcp`
+does not start with it (rc 2), one already running closes on the next reload, and `kg_gate.py --classification-floor`
+stops with `GATE BROKEN` (rc 2), even if you use the policy only for the floor. Before you update, give every shared
+area a ceiling; for an area that should serve every level you know, use the last of `levels`. A policy without `levels`
+is unchanged. To pin the policy, print its digest with `python3 -I -B vendor/kg-ssot/tools/kg_policy.py digest FILE`
+(with the package, `python3 -m kg_ssot.kg_policy digest FILE`), commit it to a file, and pass the same
+`--area-policy-digest @FILE` (or `sha256:HEX`) to `kg_gate.py` and to `kg_mcp.py`, both on this release: a policy with
+another digest stops the gate (rc 2) and keeps the server from starting. Two gate options are new and off by default,
+both with `--area-policy`: `--classification-cites` fails a graph that cites, in a structured field, a tracked graph of
+a higher level, and `--classification-downgrade` fails a drop of a graph's level against the base (`--touched`, or
+`--base REF` in the ratchet mode) without its entry in `meta.x_downgrade`, the new canonical profile of the trail
+(`from`, `to`, `reason`, `approved_by`, `ref`, `date`), approved by someone other than whoever changed the level. The
+SHOULD schema changes, so the gate prints the `· identity` notice on the first run and passes (unless
+`--strict-identity`), and `kg_gate.py --update` records the new identity. A graph that already carries an
+`x_downgrade` out of form, or on a node, gets a SHOULD warning that a baseline per graph or per node sees as new debt:
+fix the form (manual, chapter 3), or record it with the reason, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+--accept-regression "contract v4.24: the downgrade trail, debt that already existed"`. A graph without the key sees
+nothing new. One check is tighter: `kg_trace.py` (and so `kg_gate.py --sources`) now reads a trace or a
+`provenance.source` without the `<>` around it and without the `kg-node://` prefix, and stops at a `?`, so such a value
+that names a missing file is now `missing` (rc 1) where before it went unjudged. The vendor brings no new file, and the
+`gate` profile keeps its 19 files. If you classify by sensitivity, read the rule that chapter 6 now declares ("Who
+reads through what"): a reader who is not a developer reads only through the `kg-mcp` over HTTP behind an
+authenticating proxy, and the command-line tools, `kg_audit.py`, and the `kg-mcp` over stdio or with a single store
+read every level, so give them only to developers.
 
 From `kg-ssot-v4.52.0` to `kg-ssot-v4.53.0`, nothing is required: the contract (v4.23) and the verdicts are the same, and
 the full release brings no new file. The `gate` profile now carries `tools/kg_vocab.py`, which was already in the full

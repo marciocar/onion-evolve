@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:11ad9b1dc7a798fa -->
+<!-- translation-of: ADOPTING.md sha256:b1585d45edb4fa0f -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -367,7 +367,7 @@ O PR que muda a tag faz três coisas:
 A partir da 4.47.0, acrescente `--verify-attestation` ao update para recusar a árvore que não bate com o manifesto que a
 release atestou; pede o `gh` e a rede ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)). Num sandbox com o
 cache do usuário (o `.cache` na pasta pessoal) só de leitura, rode com o `XDG_CACHE_HOME` apontando para um diretório gravável, porque o `gh` grava ali o
-trust root do Sigstore; se a pasta de dados (`.local/share`) também for só de leitura, aponte também o `XDG_DATA_HOME` para um diretório gravável (visto num adotante em 2026-11). A verificação continua inteira.
+trust root do Sigstore; se a pasta de dados (`.local/share`) também for só de leitura, aponte também o `XDG_DATA_HOME` para um diretório gravável (visto num adotante em 2026-11). A verificação continua inteira. Quando o verificador do Sigstore do `gh` não sobe, o update diz isso em vez de dar a release como reprovada.
 
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
@@ -397,6 +397,34 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.53.0` para a `kg-ssot-v4.54.0`, entra o contrato v4.24, só SHOULD: nenhum grafo que passava reprova, e nenhum
+veredito MUST muda. **Uma mudança de comportamento vem antes:** a política de áreas com `levels` tem de dar teto a toda
+área compartilhada (a canônica e cada grupo, e com isso toda área que um papel lê). A política que deixa uma de fora, que
+carregava na 4.53.0, agora é inválida (`ceilings: with levels, every shared area has a ceiling; without one: AREAS`):
+o `kg-mcp` não sobe com ela (rc 2), o que já está rodando fecha no próximo recarregamento, e o `kg_gate.py
+--classification-floor` para com `GATE BROKEN` (rc 2), mesmo que você use a política só para o piso. Antes do update,
+dê teto a toda área compartilhada; para a área que deve servir todo nível conhecido, use o último de `levels`. A
+política sem `levels` não muda. Para fixar a política, imprima o digest dela com `python3 -I -B
+vendor/kg-ssot/tools/kg_policy.py digest ARQ` (com o pacote, `python3 -m kg_ssot.kg_policy digest ARQ`), commite-o num
+arquivo e passe o mesmo `--area-policy-digest @ARQ` (ou `sha256:HEX`) ao `kg_gate.py` e ao `kg_mcp.py`, os dois nesta
+release: a política com outro digest para o gate (rc 2) e impede o servidor de subir. Duas opções do gate são novas e
+desligadas por padrão, as duas com `--area-policy`: `--classification-cites` reprova o grafo que cita, num campo
+estruturado, um grafo rastreado de nível maior, e `--classification-downgrade` reprova a queda do nível de um grafo
+frente à base (`--touched`, ou `--base REF` no modo da catraca) sem o registro dela em `meta.x_downgrade`, o perfil
+canônico novo da trilha (`from`, `to`, `reason`, `approved_by`, `ref`, `date`), aprovado por alguém que não mudou o
+nível. O schema SHOULD muda, então o gate imprime o aviso `· identity` na primeira rodada e passa (a não ser com
+`--strict-identity`), e o `kg_gate.py --update` grava a identidade nova. O grafo que já traz um `x_downgrade` fora da
+forma, ou num nó, ganha um aviso SHOULD que a linha de base por grafo ou por nó vê como dívida nova: conserte a forma
+(manual, capítulo 3) ou registre-a com o motivo, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+--accept-regression "contract v4.24: the downgrade trail, debt that already existed"`. O grafo sem a chave não vê nada
+novo. Uma conferência fica mais estrita: o `kg_trace.py` (e com ele o `kg_gate.py --sources`) agora lê um trace ou um
+`provenance.source` sem os `<>` em volta e sem o prefixo `kg-node://`, e para num `?`, então esse valor que nomeia um
+arquivo ausente agora é `missing` (rc 1), onde antes ficava sem julgamento. O vendor não traz arquivo novo, e o perfil
+`gate` segue com 19 arquivos. Se você classifica por sensibilidade, leia a regra que o capítulo 6 agora declara ("Quem
+lê por onde"): quem não é dev lê só pelo `kg-mcp` por HTTP atrás de um proxy que autentica, e as ferramentas de linha
+de comando, o `kg_audit.py` e o `kg-mcp` por stdio ou com um armazém único leem todo nível, então entregue-os só a
+dev.
 
 Da `kg-ssot-v4.52.0` para a `kg-ssot-v4.53.0`, nada é obrigatório: o contrato (v4.23) e os vereditos são os mesmos, e a
 release inteira não traz arquivo novo. O perfil `gate` passa a levar o `tools/kg_vocab.py`, que já estava na release

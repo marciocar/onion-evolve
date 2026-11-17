@@ -4,14 +4,24 @@ kg_gate.py --classification-floor (contrato v4.23) para ler a ordem dos níveis 
 estrito, sem trazer o servidor.
 
 {"schema_version": 1, "canonical": "c-empresa", "groups": {"g-financeiro": ["ana@x.org"]},
- "levels": ["public", "internal", "confidential"], "ceilings": {"c-empresa": "internal"}, "default_level": "internal"}
+ "levels": ["public", "internal", "confidential"], "ceilings": {"c-empresa": "internal",
+ "g-financeiro": "confidential"}, "default_level": "internal"}
 
 parse(texto) devolve a política (PolicyDoc) ou levanta ValueError com o que está errado: a chave repetida em qualquer
 nível, a chave fora da lista, levels, ceilings e default_level que não vêm juntos, o nível que não é slug ou que se
-repete, e os papéis e membros fora da forma. Ceiling(levels, teto, default) é o teto de uma área: level_of(nome, texto)
+repete, a área compartilhada (a canônica ou um grupo) sem teto numa política com levels (negar por padrão), e os papéis
+e membros fora da forma. Ceiling(levels, teto, default) é o teto de uma área: level_of(nome, texto)
 dá o nível declarado do grafo, o default_level quando o meta não declara, ou None quando não se sabe (a falha fecha).
 As mensagens são de protocolo: ficam em inglês em qualquer locale (kg_i18n.protocol).
+
+digest(política) é a impressão digital da política lida, "sha256:<hex>": o SHA-256 do JSON canônico da forma
+normalizada (normalized), a que o gate e o kg-mcp de fato usam. O gate (--area-policy-digest) e o kg-mcp (idem)
+conferem o arquivo que leem contra o mesmo valor fixado e commitado, como um lockfile: a política que diverge não passa
+em nenhuma das pontas. Na linha de comando, `python3 -I tools/kg_policy.py digest ARQ` imprime o digest (rc 0) ou diz
+por que a política é inválida (rc 2).
 """
+import argparse
+import hashlib
 import json
 import re
 import pathlib
@@ -26,6 +36,7 @@ else:  # script ou vendor
     import kg_validate  # noqa: E402
 
 P_ = kg_i18n.protocol
+_ = kg_i18n._
 
 
 # um e-mail em ASCII imprimível, sem espaço nem controle: o header chega decodificado em latin-1, e um byte acima de
@@ -146,6 +157,14 @@ def _parse_ceilings(doc, canonical, groups):
         if not isinstance(level, str) or level not in levels:
             raise ValueError(P_("ceilings: the ceiling of {area} is not one of levels").format(area=area))
         out[area] = Ceiling(levels, level, default)
+    # negar por padrão: com levels, toda área compartilhada (a canônica e cada grupo; as de roles[*].read estão entre
+    # elas) tem teto. A área fora de ceilings não seria julgada e serviria todo nível, o desconhecido também; a
+    # política que a deixa de fora é inválida, e o kg-mcp e o gate a recusam (a falha fecha). A área própria da
+    # identidade não é compartilhada e segue sem teto.
+    missing = sorted(known - set(out))
+    if missing:
+        raise ValueError(P_("ceilings: with levels, every shared area has a ceiling; without one: {areas}").format(
+            areas=", ".join(missing)))
     return out
 
 def _parse_roles(doc, policy):
@@ -249,3 +268,111 @@ class Ceiling:
     def allows(self, name, text):
         level = self.level_of(name, text)
         return level is not None and self.rank[level] <= self.ceiling
+
+
+# o digest da política (--area-policy-digest no gate e no kg-mcp): a forma normalizada, em JSON canônico
+DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
+DIGEST_FILE_MAX = 1024  # o arquivo commitado do @ARQ guarda uma linha; mais que isso não é um digest
+
+
+def normalized(policy):
+    """A forma normalizada de uma política lida (PolicyDoc): o que o gate e o kg-mcp usam dela, e nada do jeito em que o
+    arquivo foi escrito. Ela própria é uma política válida, que parse lê para o mesmo PolicyDoc. O digest dela muda
+    sempre que o comportamento pode mudar, e às vezes também sem mudar: o teto de papel igual ao da área e o teto
+    omitido dão o mesmo acesso e digests diferentes, como o papel que ninguém tem e a política sem ele. A diferença sem
+    efeito falha fechada (o pin não bate e a política é recusada), nunca aberta.
+
+    - todas as chaves presentes: canonical (null quando falta), groups, roles e members ({} quando faltam); levels,
+      ceilings e default_level só quando a política tem levels (os três vêm juntos);
+    - levels na ordem do arquivo: a ordem é a semântica (do menos ao mais sensível);
+    - os membros de cada grupo, o read de cada papel e os papéis de cada membro ordenados e sem repetição: o leitor
+      guarda conjuntos (frozenset), e a ordem e a repetição não mudam nada;
+    - as identidades em minúsculas, como check_identity as compara (Ana@X.org e ana@x.org são a mesma pessoa), e as
+      chaves de members que se fundem por isso, fundidas, como o leitor faz;
+    - write explícito: ["own"] quando o papel grava na própria área (o que write ausente quer dizer) e [] quando não;
+    - o ceilings do papel explícito ({} quando falta)."""
+    doc = {"schema_version": 1, "canonical": policy.canonical,
+           "groups": {area: sorted(members) for area, members in policy.groups.items()},
+           "roles": {name: {"read": sorted(role.read), "write": [OWN] if role.writes else [],
+                            "ceilings": dict(role.ceilings)}
+                     for name, role in policy.roles.items()},
+           "members": {who: sorted(names) for who, names in policy.members.items()}}
+    if policy.levels is not None:
+        doc["levels"] = list(policy.levels)
+        doc["ceilings"] = {area: policy.levels[top.ceiling] for area, top in policy.ceilings.items()}
+        doc["default_level"] = policy.default
+    return doc
+
+
+def canonical_json(doc):
+    """Os bytes do JSON canônico: chaves ordenadas, sem espaço, UTF-8. Numa política (só textos ASCII e o inteiro 1)
+    é o mesmo que o JCS (RFC 8785) daria."""
+    return json.dumps(doc, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def digest(policy):
+    """"sha256:<hex>" da forma normalizada de uma política lida (PolicyDoc)."""
+    return "sha256:" + hashlib.sha256(canonical_json(normalized(policy))).hexdigest()
+
+
+def digest_text(text):
+    """O digest do texto de uma política, pelo leitor estrito (ValueError ou RecursionError quando é inválida)."""
+    return digest(parse(text))
+
+
+def read_pin(value):
+    """O digest fixado de --area-policy-digest: o valor literal sha256:<64 hex minúsculos>, ou @ARQ, o arquivo commitado
+    que o guarda numa linha (os brancos das pontas não contam, nem o BOM do UTF-8, que um editor no Windows põe).
+    ValueError quando o valor não é um digest, ou o arquivo não se lê; o arquivo em UTF-16 (o `>` do Windows
+    PowerShell 5.1 grava assim) ganha a dica de gravá-lo em UTF-8."""
+    if not isinstance(value, str):
+        raise ValueError(P_("the digest is sha256:<64 lowercase hex digits>, or @FILE with that line"))
+    if value.startswith("@"):
+        path = value[1:]
+        try:
+            with open(path, "rb") as fh:
+                data = fh.read(DIGEST_FILE_MAX + 1)
+            if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+                raise ValueError(P_("the digest file {path} is UTF-16: save it as UTF-8 (in PowerShell, "
+                                    "kg_policy.py digest FILE | Out-File -Encoding utf8 {path})").format(path=path))
+            text = data.decode("utf-8").removeprefix("\ufeff")
+        except (OSError, UnicodeDecodeError) as exc:
+            raise ValueError(P_("the digest file {path} cannot be read ({error})").format(
+                path=path, error=getattr(exc, "strerror", None) or type(exc).__name__)) from None
+        if len(data) > DIGEST_FILE_MAX or not DIGEST.fullmatch(text.strip()):
+            raise ValueError(P_("the digest file {path} does not hold one sha256:<64 lowercase hex digits> line").format(
+                path=path))
+        return text.strip()
+    if not DIGEST.fullmatch(value):
+        raise ValueError(P_("the digest is sha256:<64 lowercase hex digits>, or @FILE with that line"))
+    return value
+
+
+def main(argv=None):
+    """kg_policy.py digest ARQ: o digest da política (rc 0), ou por que ela é inválida (rc 2)."""
+    ap = argparse.ArgumentParser(description=_("The kg-mcp area policy: digest FILE prints the sha256 of its normalized "
+                                               "form, the value that --area-policy-digest pins in the gate and in the "
+                                               "kg-mcp."))
+    ap.add_argument("command", choices=("digest",))
+    ap.add_argument("file", metavar=_("FILE"), help=_("the policy file (JSON)"))
+    args = ap.parse_args(argv)
+    kg_validate._utf8_stdio()
+    try:
+        with open(args.file, encoding="utf-8") as fh:
+            text = fh.read()
+    except (OSError, UnicodeDecodeError) as exc:
+        print(_("BROKEN INPUT  {error}").format(error=_("{path} cannot be read ({error})").format(
+            path=args.file, error=getattr(exc, "strerror", None) or type(exc).__name__)), file=sys.stderr)
+        return 2
+    try:
+        value = digest_text(text)
+    except (ValueError, RecursionError) as exc:  # JSONDecodeError é ValueError; aninhamento fundo, RecursionError
+        print(_("BROKEN INPUT  {error}").format(error=_("{path} is not a valid policy: {error}").format(
+            path=args.file, error=exc)), file=sys.stderr)
+        return 2
+    print(value)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

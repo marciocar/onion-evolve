@@ -10,6 +10,133 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.54.0] - 2026-11-17
+
+Contract v4.24, SHOULD only: nothing that passed fails, and no MUST verdict changes. What changes for an
+adopter: the area policy of the `kg-mcp` and of `kg_gate.py --classification-floor`, where a policy with `levels` that
+leaves a shared area out of `ceilings` is now invalid. Give each shared area a ceiling before you update.
+
+- Contract v4.24: the canonical profile `x_downgrade`, in `meta` only and judged only when present and only by its
+  form: the trail of the level downgrades of the whole graph, a list that is not empty of entries with `from` and `to`
+  (levels), `reason`, `approved_by`, and `ref` (text that is not empty), and `date` (a calendar date). Out of form it
+  warns as `form.type`, `form.range`, `form.required`, or `form.pattern` on `meta.x_downgrade` and its keys; on a node,
+  as `form.misplaced.node.x_downgrade`. Both readers give the same verdict; the suite goes from 597 to 621 cases
+  (`latest/form/downgrade/`).
+- `kg_gate.py --classification-downgrade --area-policy FILE`, off by default, in both modes, with or without the floor
+  and the citation check: fails (rc 1) a drop of the level of a graph against the base without its trail. This is the
+  design chosen for the gap "The level is declared, not checked": lowering the label is an act with a reason, a second
+  person, and a reference. The base is that of `--touched` (against the git index) or, in the ratchet mode, `--base REF`
+  (the common ancestor of `REF` and `HEAD`, against the checkout). A changed graph is paired with the base by path, by
+  `meta.id`, and by the rename git detects with rewrites broken (`-B -M`, so a graph moved over an existing path counts); the
+  level at the base is the highest among the pairs. A graph deleted and recreated under another path and `meta.id`,
+  diluted below git's similarity, is not paired (declared, for the content detector). On a drop, the last entry of `meta.x_downgrade` must record it (`from` and `to` equal to
+  the two levels, the texts not empty, a calendar `date`) and be appended after the trail of the base, which stays as
+  it was, and its `approved_by` must not name, by e-mail or name and without case, the author or the committer of a
+  commit that changed the level since the base, nor the identity about to commit. An unknown level now
+  fails; an unknown level at the base counts as the highest. The output names the file and the levels, never the
+  reason, the approver, or the reference. Without a base, without `--area-policy`, with `--update`, `--base` with
+  `--touched`, and `--base` alone are broken input (rc 2). The gate does not authenticate the approver: the review of
+  the pull request, with branch protection and `CODEOWNERS`, is the lock (manual, chapter 6, step 7). What stays out: a
+  graph born with a low label, or copied to another repository, has no base to compare with (the gap "A level that
+  starts too low is not checked"); the content detector comes later.
+- **Your gate's contract identity changes.** The SHOULD schema changes, so the gate prints the `· identity` notice on
+  the first run after the update and passes, unless you run it with `--strict-identity`; `kg_gate.py --update` records
+  the new identity. A graph that already carries an `x_downgrade` out of form, or on a node, sees new SHOULD debt and
+  fails the ratchet: fix the form, or accept it as baseline with the reason, `python3 -I -B
+  vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.24: the downgrade trail, debt that already
+  existed"`. A graph without the key sees nothing new.
+
+- `kg_trace.py` (and so `kg_gate.py --sources` and `--classification-cites`, which use the same resolver): a trace or a
+  `provenance.source` is now read without the `<>` around it (the URI delimiter of RFC 3986, appendix C) and without the
+  `kg-node://` prefix of the contract's scheme, and the path stops at a `?` (a query), as it already stopped at `#` and
+  `:`. `<docs/a.md>` and `docs/a.md?plain=1` resolve, where before they were `not_path` and went unjudged, and
+  `kg-node://docs/a.kg.yaml#N` (also `kg-node:///…`) resolves, where before it was `absolute`; `<https://…>` is
+  `absolute`. **A tighter check:** the same forms naming a file that does not exist (`<docs/gone.md>`,
+  `docs/gone.md?x`) were `not_path` (rc 0) and are now `missing` (rc 1, `integrity.trace-target-missing`), and so are
+  `kg-node://docs/gone.md` and `kg-node:///docs/gone.md`, which were `absolute` (rc 0). The output
+  of `kg_trace.py check` on this repository and on the framework's corpus is byte for byte the same before and after.
+  A target that resolves only after normalizing (`docs//x`) is still not read.
+
+- `kg_gate.py --classification-cites --area-policy FILE`, off by default, with or without `--classification-floor`:
+  fails (rc 1) a graph that cites, in a structured field, a tracked graph of a higher level than its own, in the order
+  of the policy's `levels`. This is the design chosen for the gap "No redaction node by node": the node more sensitive
+  than its graph goes to a graph of its own, and the lower graph may not point at it. The fields read are both ends
+  of `external_edges`, `trace`, `provenance.source` and `provenance.locator` (text, list or map, any `scheme`) and the
+  `criterion` of `x_measured_under`; a value that mentions a graph is resolved by the resolver of `kg_trace.py` (one
+  source for both), and a citation that resolves in more than one place is judged by the highest level among them.
+  Free text is not read. Higher citing lower passes. The output names both files and levels, never the cited id. An unknown level at
+  either end and a citing graph that does not parse fail closed; a value with the form of a relative path that does
+  not resolve fails too (deny by default), and a value that is exactly the path of a graph in the git index resolves to
+  it (with an accent, a space, `+` or `@` too); every value read is also scanned for the path of each graph of the
+  index (from the root, the graph's folder and its parent, without case), with a path boundary (the rule of a secret
+  scanner), and each graph found is judged by its level, a citation of an old revision by the level of today. The scan
+  never lifts the fail-closed rule, except when the whole value, without the boundary punctuation at its ends, is
+  exactly a graph of the index (a path with a full stop). Prose that names no graph, a value that names only the citing
+  graph, every URL, an absolute path (a Windows one included) and a `private-cite:` marker are counted and not judged. With `--touched`, only a pair with a changed end, read from the index. `--area-policy`
+  now goes with either option, and an empty one is broken input (rc 2). Not with `--update`. Without the option
+  nothing changes. Chapter 5 documents it ("Citations between levels"), and chapter 6 gains the step "Separate the
+  sensitive node"; the gap becomes "No label by node, by design", with what stays out (a node labelled inside a lower
+  graph, free text, a citation to another repository). No contract change.
+
+- Area policy: with `levels`, every shared area has a ceiling (deny by default). The canonical area and each group
+  (and so every area a role reads) must be a key of `ceilings`; a policy that leaves one out is invalid, with
+  `ceilings: with levels, every shared area has a ceiling; without one: AREAS`, which names each area without one, in
+  alphabetical order. Before, such an area was not judged and served every level to everyone who read it, an unknown
+  level and a file that does not parse included. **Behavior change:** a policy that loaded in 4.53.0 can now be
+  refused. The `kg-mcp` does not start with it (rc 2, `--area-policy did not load`), one already running closes on the
+  next reload (no shared area is served until the file is fixed, and nobody writes if the last valid file had
+  `roles`), and `kg_gate.py --classification-floor` stops with `GATE BROKEN` (rc 2) before judging any graph. This
+  holds even if you use the policy only for the floor of the gate and never run the `kg-mcp`. What to do: give every
+  shared area a ceiling; for an area that should serve every level you know, use the last of `levels` (an unknown
+  level is then hidden there too). The `kg-mcp` also refuses, outside the reader, to serve a shared area without a
+  ceiling under a policy with `levels`. A policy without
+  `levels` (no classification) and the identity's own area are unchanged. The gap "An area without a ceiling serves
+  every level" leaves the list of chapter 6, and chapters 5 and 6 state the rule and the message.
+
+- Area policy pinned by digest: `--area-policy-digest sha256:HEX|@FILE`, new and optional in `kg_gate.py` (with
+  `--area-policy`) and in `kg_mcp.py` (with `--area-policy`), and `python3 -I tools/kg_policy.py digest FILE`, which
+  prints the digest of a policy (rc 0) or why it is invalid (rc 2). The digest is the SHA-256 of the canonical JSON of
+  the policy as the reader sees it: formatting, key order, the order and repetition of group members, of a role's
+  `read` and of a member's roles, and the case of an e-mail do not change it; the order of `levels`, a ceiling, a
+  member, a role, and the `default_level` do. Pin the same value, a literal or a committed file read with `@FILE`, at
+  both ends: a policy with another digest stops the gate with `GATE BROKEN` (rc 2) before it judges any graph, with no
+  digest in the message (a CI log can be public), keeps the `kg-mcp` from starting (rc 2), and, changed while the
+  server runs, closes reading like an invalid policy once the file's stamp changes. Both ends must run the same
+  release. With the package, the command is `python3 -m kg_ssot.kg_policy digest FILE`. A UTF-8 byte order mark in
+  the `@FILE` is accepted, and a UTF-16 file is refused with a hint. A
+  malformed value, and the option without `--area-policy`, are broken input (rc 2). Without the option nothing
+  changes. The gap "Nothing checks that the gate and the server read the same policy" leaves the list of chapter 6,
+  which now recommends pinning; whoever does not pass the option still has no check.
+
+- The manual gains an end-to-end guide to sensitivity classification, in chapter 6 ("Classify by sensitivity, end to
+  end"): choose the levels, mark `x_classification`, write one area policy with ceilings and roles, turn on
+  `kg_gate.py --classification-floor` in CI, and serve with `kg-mcp --area-policy` under the same file. It says what
+  the audit package does not do (`kg_audit.py` reads no level and no audience) and lists the gaps found against
+  this release, each marked as measured or stated: a level that is declared and never checked against the content, no
+  redaction node by node, free text that is not cut, no check that the gate and the server read the same policy or that
+  the floor sits above the ceiling, an excluded path that the floor does not judge, a graph that enters and leaves a
+  branch and stays in its history, the ceiling applied only in the behind-a-proxy profile, the own area without a
+  ceiling, the history that lists a more sensitive
+  version, and a role ceiling that another grant overrides. Chapter 5 no longer marks roles as unreleased: they shipped
+  in 4.50.0. No tool changes.
+
+- The end-to-end guide of chapter 6 closes the design of the classification with two new parts. "Who reads through
+  what" declares the rule: a reader who is not a developer reads only through the `kg-mcp` over HTTP behind an
+  authenticating proxy, with the identity set by the proxy from a verified e-mail, never by the client; the
+  command-line tools (`kg_query.py`, `kg_trace.py`, `kg_diff.py`, `kg_prov_export.py`), the audit package
+  (`kg_audit.py`), and the `kg-mcp` over stdio or with a single store are for developers only, out of reach of a
+  business role. A ceiling for those tools is a later improvement, pulled by demand. "Out of the first version" lists
+  three choices left out, each with what reopens it: a label per node (a repeated measurement that meets both
+  conditions registered before it), a deny per person and precedence between roles (the first adopter who needs it),
+  and the purpose of the processing under data protection law (an open question of its own, based on the retention the
+  contract already has, with the limit that the git history keeps every version). No tool changes.
+
+- `kg_vendor.py update --verify-attestation` now tells apart a Sigstore verifier that did not start from a release that
+  did not verify. When `gh attestation verify` fails with `no valid Sigstore verifiers could be initialized` or
+  `error creating Sigstore verifier` (it could not write its TUF cache, as in a sandbox with a read-only home), the
+  message says the check did not run, that this says nothing about the release, and to set `XDG_CACHE_HOME` to a
+  writable folder and run again. Still rc 2, and the vendor is untouched; any other failure keeps the old message.
+
 ## [4.53.0] - 2026-11-16
 
 No contract change: no MUST or SHOULD verdict changes.

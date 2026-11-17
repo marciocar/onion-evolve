@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 597/597 (gates the rc)
+latest: 621/621 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -251,6 +251,10 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. `.kg.json` is not checked here. Not with `--update` |
 | `--private-repos FILE` | Since 4.51. Off by default. Fails (rc 1) when a private repository is cited without the `private-cite:<id>` marker (contract v4.22); see *A private repository cited without the marker* below. Not with `--update` |
 | `--classification-floor LEVEL --area-policy FILE` | Since 4.52. Off by default. Fails (rc 1) when a tracked `.kg.yaml` or `.kg.json` (with `--touched`, a changed one; the default excludes do not apply, only `--exclude`) has its `meta.x_classification` at `LEVEL` or above, in the order of the policy's `levels` (contract v4.23); see *A classification floor* below. Not with `--update` |
+| `--classification-cites --area-policy FILE` | Since 4.54.0. Off by default, with or without the floor. Fails (rc 1) when a graph cites, in a structured field, a tracked graph of a higher level than its own, in the order of the policy's `levels`; see *Citations between levels* below. Not with `--update` |
+| `--classification-downgrade --area-policy FILE` | Since 4.54.0 (contract v4.24). Off by default, with or without the other two. Fails (rc 1) when the level of a graph dropped against the base (the one of `--touched`, or `--base REF` in the ratchet mode) without the entry of the drop in `meta.x_downgrade`, or with an approver who changed the level; see *A downgrade asks for a trail* below. Not with `--update` |
+| `--base REF` | Since 4.54.0. Only with `--classification-downgrade`, in the ratchet mode: the base is the common ancestor of `REF` and `HEAD`. Not with `--touched`, which has its own base |
+| `--area-policy-digest sha256:HEX\|@FILE` | Only with `--area-policy`. The digest the policy must have, as printed by `kg_policy.py digest FILE`, given as the value or as `@FILE`, a committed file that holds it on one line. A policy with another digest, a malformed value, and the option without `--area-policy` are broken input (rc 2); see *Pin the policy* below |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |
 
@@ -331,9 +335,9 @@ the first level it must never hold.
    what is above what: the gate never guesses an order from the names.
 3. **It fails closed.** A graph without the key has the policy's `default_level`. A graph that does not parse, is not
    UTF-8, whose `meta` is not a map, or whose level is not in `levels` fails, because its level is unknown. A missing,
-   unreadable, or invalid policy, a policy without `levels`, and a `LEVEL` that `levels` does not have are broken input
-   (rc 2), and so are one option without the other and an empty value (`--classification-floor ""` would otherwise
-   switch the floor off in silence).
+   unreadable, or invalid policy (one that leaves a shared area out of `ceilings` included), a policy without `levels`,
+   and a `LEVEL` that `levels` does not have are broken input (rc 2), and so are one option without the other and an
+   empty value (`--classification-floor ""` would otherwise switch the floor off in silence).
 4. **What it prints.** One line per graph that fails, with its path and its level, and a summary line.
 
 It works in both modes: in the ratchet, every graph it reads; with `--touched`, only those changed since the common
@@ -369,6 +373,210 @@ the disk still counts. A graph that is only on disk, never added, is not judged 
 checks of `--touched` (the debt on touched nodes) still compare the working tree. In a repository with no commit yet, `HEAD` does not resolve, and the gate stops with
 rc 2. That is why the CI keeps the same check: the hook catches the mistake early, and the CI catches the hook that
 did not run.
+
+#### Pin the policy: `--area-policy-digest`
+
+The floor and the `kg-mcp` each read the policy file they are given, usually from different places (a CI secret, a
+file on the server). Two copies that drift apart judge the same graph in two ways: with another `default_level`, a
+graph without the key fails the floor with one and is served with the other. To make both ends read the same policy,
+pin its digest, as a lockfile pins a dependency:
+
+```bash
+mkdir -p .kg-ssot
+python3 -I vendor/kg-ssot/tools/kg_policy.py digest "$KG_AREA_POLICY" > .kg-ssot/area-policy.digest
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-floor confidential --area-policy "$KG_AREA_POLICY" \
+  --area-policy-digest @.kg-ssot/area-policy.digest
+```
+
+`kg_policy.py digest FILE` prints `sha256:<hex>` (rc 0), or says why the policy is invalid (rc 2). The digest is the
+SHA-256 of the canonical JSON (sorted keys, no spaces, UTF-8) of the policy as the strict reader sees it. It changes
+whenever what the gate or the server would do can change, and sometimes also when it cannot: a role ceiling equal to
+the area's ceiling and no role ceiling give the same access and different digests, as do a role that no one holds and
+the policy without it. Such a difference fails closed (the pin does not match and the policy is refused), never open.
+
+- the same: the indentation, the order of the keys, the order and repetition of the members of a group, of the `read`
+  of a role and of the roles of a member, the case of an e-mail, `write` left out or `["own"]`, `canonical` left out or
+  `null`, and `roles` or `members` left out or empty;
+- different: the order of `levels` (it is the order of sensitivity), any ceiling, the `default_level`, a member, a
+  group, a role, and `write: []`.
+
+The digest covers the whole policy, the roles and ceilings that the floor does not use included: the point is that
+both ends read one policy, not only the part the gate needs. With `--area-policy-digest`, the policy read must have
+that digest, or the gate stops with `GATE BROKEN` (rc 2), before it judges any graph. The message prints neither the
+digest read nor the one pinned, because a CI log can be public: run `kg_policy.py digest` on your copy to compare.
+`@FILE` reads the value from a file (the spaces and line breaks at the ends do not count, nor a UTF-8 byte order
+mark; a UTF-16 file, which the `>` of Windows PowerShell 5.1 writes, is refused with a hint to save it as UTF-8, and
+the file holds nothing else). Without the option, nothing is checked, as before. The `kg-mcp` takes the same option
+(below). With the package (`pip install kg-ssot`) instead of a vendor, the same command is
+`python3 -m kg_ssot.kg_policy digest FILE`.
+
+**What a public digest gives away.** The digest does not reveal the policy, but it lets anyone test a guess: someone
+who knows the shape of your policy (the levels, the areas, the roles, all fairly predictable) and has a list of your
+staff can try combinations of members offline until one matches, and so confirm who is in a group. If membership is
+itself sensitive, keep the value in a CI variable and the file on the server, not committed in a public repository.
+On the server, pass it as `@FILE`, a local file outside `--root`, and not as a literal on the command line, which
+any user of the machine can read in `ps`.
+
+**Same version at both ends.** The digest is computed by the `kg_policy.py` of the release you run. A release that
+changes the normalization changes the digest of the same file: the gate and the server on different releases then
+disagree and fail closed (rc 2), and the fix is to bring both to the same tag. A release that changes only how the
+reader judges a policy keeps the same digest, so the pin still matches while the verdict on a graph may change: read
+the changelog before you update one end.
+
+#### Citations between levels: `--classification-cites` (since 4.54.0)
+
+The level applies to the whole graph, so a node more sensitive than its graph goes to a graph of its own, with the
+level in that graph's `meta`. The separation holds only if the lower graph does not point at it: an id is often
+descriptive, and an edge from an `internal` graph to `payroll.kg.yaml#SALARY_CUT_2027` already tells what the
+`restricted` graph holds. `--classification-cites --area-policy FILE` fails (rc 1) each graph that cites, in a
+structured field, a tracked graph of a higher level than its own, in the order of the policy's `levels`.
+
+1. **What counts as a citation.** The fields read are both ends of each `external_edges` item, a node's `trace`,
+   `provenance.source`, and `provenance.locator` (as text, a list, or a map, at any depth, and with any `scheme`), and
+   the `criterion` of `x_measured_under.criteria`. A value in any of them that mentions `.kg.yaml`, `.kg.yml`, or
+   `.kg.json`, in any case, is a citation, with or without an id: the whole file is cited too. It is resolved by the
+   same resolver as `kg_trace.py check`, with its rules: the `trace` as a trace, the other fields as a source; quotes,
+   `<>`, the `kg-node://` prefix of the contract's scheme (also with an empty authority, `kg-node:///`), and what follows
+   a `#`, `:`, or `?` are cut; and the target is looked for from the root, the graph's folder, and its parent. One rule
+   is added for the gate: a value that is exactly the path of a graph in the git index resolves to it, even with an
+   accent, a space, `+`, or `@`, or as a bare name next to the graph. The index is the truth; there is no matching by
+   suffix, file name, or case. A citation that resolves in more than one place is judged by the highest level among
+   them.
+2. **The direction.** Lower citing higher fails. Higher citing lower, and the same level, pass: a `restricted` graph
+   may point at the `internal` one it builds on. A graph without the key has the policy's `default_level`.
+3. **It fails closed (deny by default).** A value that has the form of a relative path and does not resolve to a
+   tracked graph fails: a path that does not exist (another case included, on a file system that tells case apart), a
+   `..` that leaves the root, a graph of another area or repository named by a relative path. In `provenance.source`,
+   `provenance.locator`, the ends of `external_edges`, and the `criterion`, which are resolved by the git index, any
+   `.` or `..` segment and a repeated slash (`docs//x`) also fail; a `trace` is resolved on the disk, as
+   `kg_trace.py check` resolves it, so `docs//x` and a `..` that stays inside the root resolve there and are judged by
+   level. So does an unknown level in the citing graph or in any candidate, and a citing graph that does not parse or is
+   not UTF-8, since its citations are unknown.
+4. **The scan of the value.** Besides resolving it, the gate looks in every value it reads, resolved or not, URL or
+   not, for the path of each graph in the git index, the rule of a secret scanner (known values searched in the text),
+   with the index as the truth. Each graph is looked for by its path from the root and, as the resolver does, from the
+   citing graph's folder and its parent. The value is taken in Unicode NFC, without case (folded on both sides), with
+   `\` read as `/` and the `kg-node://` prefix (with any number of slashes) removed, and a path counts only with a path
+   boundary: the character before it is not a letter or digit (ASCII), `_`, `-`, or `/` (a leading `./` is accepted), and
+   the character after it is not a letter or digit (ASCII), `/`, or `-` (a full stop, `!`, `?`, quotes of any kind, `)`,
+   `]`, `*`, `_`, `|`, `}`, and a zero-width space are boundaries). So prose (`verified_against of node X in
+   docs/a.kg.yaml.`), Markdown, typographic quotes, a `rev:path` of git, a path after a URL or an absolute path, and a
+   graph hidden after a path that resolves are all found. Each graph found is a citation judged by its level: it fails
+   only when it is of a higher level. A citation of an old revision (`docs/a.kg.yaml@c8e0dcab`, `HEAD~1:docs/a.kg.yaml`)
+   is judged by the level the graph has today. The scan never replaces the fail-closed rule: a value with the form of a
+   path that does not resolve fails, whatever the scan finds in it, with one exception: the whole value, without the
+   boundary punctuation at its ends (quotes of any kind, `.,;:!?)]}*_|`, and a zero-width space), is exactly a graph of
+   the index (`docs/a.kg.yaml.`, with a full stop). Prose that names no graph of the index is counted apart and passes,
+   as `kg_trace.py check` does not judge it either, and so is a value that names only the citing graph itself. Every
+   URL, an absolute path (a Windows one such as `C:\r\docs\a.kg.yaml` included), and a `private-cite:` marker (a node
+   in another repository, contract v4.22) are counted and pass, unless the scan finds a graph of the index in them. What
+   stays out: free text (`label`, `narrative`, `verified_against`, other `x_` fields; chapter 6, "Free text is not cut")
+   and a graph of another repository, which is not in this index.
+5. **What it reads.** Every tracked `.kg.yaml` and `.kg.json`, like the floor: the default excludes do not apply.
+   `--exclude GLOB` leaves out a citing graph, never a cited one, because a graph's level does not change when it is
+   not measured.
+6. **What it prints.** One line per pair of graphs that fails, with both paths, both levels, how many citations, and
+   in which kinds of field, and one line per citing graph with citations that do not resolve; never the cited id or any
+   content, since a CI log can be public. A summary line counts the graphs, the pairs, the failing graphs, and what
+   was not judged: the citations to an absolute path, a URL, or a private-cite, those in prose, and those that name
+   only the citing graph itself.
+
+With `--touched`, only a pair with a changed end counts, read from the git index: a changed graph that cites, and an
+unchanged graph that cites a changed one, whose level may have gone up. A change of the policy alone (a new order of
+`levels`, another `default_level`) changes no graph, so the pre-commit hook does not judge it again; the CI run without
+`--touched` reads every pair and covers it. It goes with `--classification-floor` and `--area-policy-digest`, and not
+with `--update`.
+
+Like the floor, it reads every tracked graph, fixtures and vendor included, and a graph that does not parse fails it.
+A repository with test fixtures that do not parse on purpose (this one has dozens), or with the full vendor, leaves
+them out explicitly:
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-cites --area-policy "$KG_AREA_POLICY" \
+  --exclude 'vendor/kg-ssot/*' --exclude 'tests/fixtures/*'
+```
+
+```text
+✗ classification cites: docs/team.kg.yaml (internal) cites docs/payroll.kg.yaml (restricted), a higher level, in 1 place(s) (external_edges)
+· --classification-cites: 14 graph(s) checked, 3 pair(s) of graphs cited, 1 failing; not judged: 0 citation(s) to an absolute path, a URL or a private-cite, 5 in prose and 2 to the citing graph itself
+```
+
+The gate of one repository sees only that repository: a relative citation of a graph of another area does not
+resolve here and fails, as the contract already fails an external end that is not in the corpus
+(`integrity.dangling-external`); cite another area by a URL or a `private-cite:` marker, which are counted and not
+judged. On the server, the `kg-mcp` cuts an edge to a graph the reader may not see (chapter 6, step 5).
+
+#### A downgrade asks for a trail: `--classification-downgrade` (since 4.54.0)
+
+The floor and the server trust `x_classification`, so lowering the label is the shortest way past both: change
+`restricted` to `internal`, and the floor lets the graph in and the `kg-mcp` serves it to a wider audience.
+`--classification-downgrade --area-policy FILE` makes the drop an act with a record: it compares the level of each
+graph with the base and fails (rc 1) a drop without the entry of `meta.x_downgrade` (chapter 3) that records it.
+
+1. **The base.** With `--touched BASE`, the common ancestor the mode already uses, compared with the git index (what
+   the commit takes). In the ratchet mode, `--base REF` gives it (the common ancestor of `REF` and `HEAD`, usually
+   `--base origin/main` in the CI of a pull request), compared with the tree of the checkout; without `--base`, the
+   option is broken input (rc 2). Fetch the history (`fetch-depth: 0`): a shallow clone has no ancestor.
+2. **The pair.** Each tracked `.kg.yaml` and `.kg.json` that changed (the default excludes do not apply, only
+   `--exclude`) is paired with the graphs of the base that git says can be it: the one at the same path; every one with
+   the same `meta.id` (so a rename does not hide the drop); and the source of the rename that git detects, with rewrites
+   broken (`git diff -B -M`), also for a path that already existed, so a graph moved over another one is paired too. The
+   level at the base is the highest among them. A graph with no pair is new and is not judged here (the floor judges
+   it). What this pairing does not see is listed below the steps.
+3. **The drop.** The level of each end is read as by the floor: a graph without the key has the `default_level`, so
+   removing the key can be a drop. An unknown level now fails; an unknown level at the base counts as the highest of
+   `levels`, and an entry from that level cures it.
+4. **The entry.** On a drop, the last entry of `meta.x_downgrade` must have `from` and `to` equal to the two levels,
+   `reason`, `approved_by`, and `ref` not empty, and `date` a calendar date. The trail of the base must stay as it was,
+   a prefix of the trail now (deleting or editing an earlier entry fails), and the last entry must be appended after it
+   and be none of the entries of the base: an old entry, or an old entry with only its `date` changed, does not serve a
+   new drop. A second drop with the same `from` and `to`, after the level went up again, takes a new entry appended to
+   the trail.
+5. **The approver is another person.** `approved_by` must not name the author or the committer of a commit since the
+   base that changed the level, nor the identity about to commit, as author or committer (`git var GIT_AUTHOR_IDENT` and
+   `GIT_COMMITTER_IDENT`), when the index or the tree differs from `HEAD`. It is compared by e-mail and by name, without
+   case; from `Name <e-mail>`, the e-mail counts. A person who only wrote the entry, in a commit that did not change the
+   level, is not an author of the drop. Whoever rebases the branch becomes the committer of its commits: let the
+   approver approve, not rebase.
+6. **What it prints.** One line per graph that fails, with its path and the two levels, and a summary line. Never the
+   reason, the approver, the reference, or a node id.
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --classification-downgrade --base origin/main \
+  --area-policy "$KG_AREA_POLICY" --exclude 'vendor/kg-ssot/*'
+```
+
+```text
+✗ classification downgrade: docs/payroll.kg.yaml went from restricted to internal without a downgrade record (the last entry of meta.x_downgrade, from restricted to internal, with reason, approved_by, ref and date)
+· --classification-downgrade: 3 changed graph(s) compared with 4f2a9c1e07b3, 1 downgrade(s), 1 failed
+```
+
+**What the pairing does not see.** The pairing is the one git gives (path, `meta.id`, rename and rewrite); four
+cases stay out, declared:
+
+- **Deleted and recreated, diluted.** A graph deleted and recreated under another path and another `meta.id`, with its
+  content diluted below the similarity git asks for, has no pair, and its drop passes. Pairing by the overlap of node
+  ids was tried and removed: on the history of a real repository it matched 125 of the 150 new graphs by their ids
+  alone, because graphs built from one template share their node ids. This is left to the content detector.
+- **Split in three.** A graph split into several, each with a new path and a new `meta.id`, pairs at most the piece git
+  takes for the rename; the other pieces are new graphs.
+- **Merged, or moved over a similar graph.** A graph of the base taken in by another one that stays at its own path is
+  paired only when git breaks the rewrite of that destination (`-B`); below that, git gives no rename, and the drop
+  passes: deleting a `restricted` graph and putting its nodes into a `public` one that changes little, or `git mv -f`
+  over a destination with similar content, gives rc 0. This is left to the content detector. When the pair does come,
+  the graph is judged against the highest level among its pairs, and only the trail of the pair at that level is
+  checked as the prefix to keep.
+- **A drop in several steps.** The base and now are compared, not each commit: lowering from `restricted` to
+  `confidential` and then to `internal` within one branch asks for one entry of the whole jump, from `restricted` to
+  `internal`.
+
+**The gate does not authenticate the approver.** It checks that the entry exists, has its form, and does not name an
+author of the change of the level; it cannot check that the person named did approve, because anyone who writes the
+graph can write another name. The real lock is the review of the pull request with branch protection: require an
+approving review, and add a `CODEOWNERS` entry for the graphs and for the policy, so the person who approves is the one
+the forge authenticates. The gate runs offline and never reads the review from the forge's API. It does not go with
+`--update`. Copying the content to a new graph, or to another repository, is not a drop for this gate (chapter 6,
+*What is not covered yet*).
 
 ## `kg_vendor.py`: bring in and verify the release
 
@@ -686,6 +894,7 @@ A client configuration over stdio, with a versioned store outside the repository
 | `--secret-env VAR` · `--secret-header H` | The shared secret, read from the variable `VAR`, that each HTTP request carries in header `H` (default `X-Api-Key`), compared with hmac |
 | `--identity-header H` | The "behind a proxy" profile: each request's identity comes from header `H` (an email address), with its own area and author; requires `--secret-env` |
 | `--area-policy FILE` | JSON file, outside `--root`, naming the shared areas each identity reads; requires `--identity-header` |
+| `--area-policy-digest sha256:HEX\|@FILE` | Only with `--area-policy`: the digest the policy must have (`kg_policy.py digest FILE`), read once at startup; with another digest the server does not start (rc 2), and a policy changed to another digest while it runs closes reading (when the change moves the file's stamp: see the area filter) |
 | `--max-bytes N` | The maximum size of a graph (default 2,000,000) |
 | `--max-graphs N` | Graphs per store, or per area in the profile; past that, a new name is refused |
 | `--max-concurrent N` | HTTP requests at the same time; past that, 503 |
@@ -762,6 +971,15 @@ write or a name that does not exist comes with `isError: true`, so the model can
     read by its members. The file is read again when it changes, so removing someone takes effect on the next request.
     After startup, a file that disappears or breaks closes reading: each identity keeps only its own area until the file
     is valid again.
+  - **The pinned policy:** with `--area-policy-digest` (the value of `kg_policy.py digest`, or `@FILE`), the policy
+    must have that digest. With another one the server does not start (rc 2, `--area-policy did not load`), and a
+    file changed to another digest while it runs counts as an invalid policy and closes reading, with
+    `the policy has the digest ..., not the pinned ...` on stderr; the same policy with another formatting keeps
+    serving. The stderr is the operator's, who holds both the policy and the pin, so it names both digests; no client
+    sees it. The server rereads the file only when its stamp (modification time, size, inode) changes: a change that
+    keeps all three, as `cp -p` over a file of the same size or `touch -r` can, is not reread until the next change or
+    a restart. The pin is read once, at startup: to change the policy, change the file and the pin and restart, and
+    reading stays closed in between. The gate checks the same value (*Pin the policy*, above).
   - **What an identity reads:** the union of its own area, with the usual names, and the areas it may read, whose graphs
     appear as `@<area>/<graph>`. Only those areas are opened, so the filter comes before the read. Writing stays in the
     identity's own area, and `kg_write` or `kg_delete` on an `@` name is refused.
@@ -796,28 +1014,34 @@ write or a name that does not exist comes with `isError: true`, so the model can
     name, so a malformed `ref` gets the same refusal for a hidden graph, a missing one, and a visible one, whatever the
     case of the name. Without `ref`, a name that differs from a hidden graph only by case, or a folder in another case
     that holds only hidden graphs, answers like a graph in a folder that does not exist; the refusal by case comes only
-    when the other spelling holds a graph the reader can see. The identity's own area has no ceiling, an area without a ceiling is not judged, and without
-    `ceilings` nothing changes. The policy is parsed strictly: a ceiling outside `levels`, an area that is neither the
-    canonical one nor a group, or a missing `default_level` makes the file invalid, and an invalid file closes reading,
-    as above.
+    when the other spelling holds a graph the reader can see. The identity's own area has no ceiling, and without the
+    three keys nothing changes. With them, **every shared area has a ceiling** (deny by default): the canonical area and
+    each group must be keys of `ceilings`, and a policy that leaves one out is invalid, with
+    `ceilings: with levels, every shared area has a ceiling; without one: AREAS`, the areas in alphabetical order. Up to
+    4.53.0 such an area was not judged and served every level, an unknown one too. For an area that should serve every
+    level you know, give it the last of `levels`. The policy is parsed strictly: a ceiling outside `levels`, an area
+    that is neither the canonical one nor a group, a shared area without a ceiling, or a missing `default_level` makes
+    the file invalid, and an invalid file closes reading, as above.
 
     ```json
     {"schema_version": 1, "canonical": "c-company",
      "groups": {"g-finance": ["ana@x.org"], "g-board": ["bia@x.org"]},
      "levels": ["public", "internal", "confidential", "restricted"],
-     "ceilings": {"c-company": "internal", "g-finance": "confidential"},
+     "ceilings": {"c-company": "internal", "g-finance": "confidential", "g-board": "restricted"},
      "default_level": "internal"}
     ```
 
-    Here `c-company` serves up to `internal`, `g-finance` up to `confidential`, `g-board` has no ceiling, and a graph
-    with no level counts as `internal`. The label is a marking that this policy enforces, not access control node by
-    node: the unit is the graph, so a node more sensitive than its graph goes to a graph of its own (chapter 3). The git
+    Here `c-company` serves up to `internal`, `g-finance` up to `confidential`, `g-board` up to `restricted` (every
+    level of the list, while an unknown one stays hidden), and a graph with no level counts as `internal`. Without the
+    `g-board` entry, the file would be invalid. The label is a marking that this policy enforces, not access control
+    node by node: the unit is the graph, so a node more sensitive than its graph goes to a graph of its own (chapter 3).
+    The git
     history of the area still holds a node that was moved to another file, and `ref` reaches the old version wherever
     its level allows: move it before the graph is shared, or keep the old history out of the shared area. The same limit
     works the other way: `kg_history` of a visible graph lists every old version, those above the ceiling too, with
     their `ref` and commit message, and `kg_get` on such a version answers like a graph that does not exist. The content
     stays out, but the list shows that a more sensitive version once existed.
-  - **Roles, with a ceiling by role (unreleased):** two optional keys. `roles` names each role (a slug: lowercase,
+  - **Roles, with a ceiling by role (4.50.0):** two optional keys. `roles` names each role (a slug: lowercase,
     digits, dot, dash, or underscore) and gives it `read` (the shared areas it reads, at least one, each the canonical
     area or a group of the policy), `write` (optional, and only `[]` or `["own"]`: `own` is the identity's own area, the
     only area where the server writes, so `write` restricts or declares and never widens; without the key, `["own"]`),
@@ -826,9 +1050,9 @@ write or a name that does not exist comes with `isError: true`, so the model can
     `{"aud@x.org": ["auditor"], "g-audit": ["auditor"]}`. A person's access is the union of the grants: the canonical
     area and each group they belong to (each one is the same as a role that reads the area with the area's ceiling),
     and each of their roles. **When two grants give different ceilings to the same area, the higher one wins**, in any
-    order, and it can never pass the ceiling of the area; a grant with no ceiling (an area without a ceiling and no role
-    ceiling) wins over any ceiling. So a role with a lower ceiling only restricts someone who reads the area through
-    that role alone: someone in the group `g-compliance` reads it with the area's ceiling, whatever their roles. Someone
+    order, and it can never pass the ceiling of the area. So a role with a lower ceiling only restricts someone who
+    reads the area through that role alone: someone in the group `g-compliance` reads it with the area's ceiling,
+    whatever their roles. Someone
     with at least one role writes in their own area if any of their roles has `write: ["own"]`; with only `write: []`
     roles, `kg_write` and `kg_delete` leave the tool list, a call to them is refused as an unavailable tool, and the own
     area is not created (an own area written earlier stays readable, and an own folder that does not open, such as one
@@ -849,17 +1073,18 @@ write or a name that does not exist comes with `isError: true`, so the model can
     member, the role, and the area, never a graph. The warning writes the member's e-mail to the server's stderr, which
     is personal data in the operator's log.
   - **Limits of roles:** the ceiling of a role restricts only someone who reads the area only through roles with a
-    ceiling; a group of the area, or another role without a ceiling, gives the higher ceiling, and the kg-mcp does not
-    yet have a ceiling per person that no grant passes (the deny of the market). The response time can tell a hidden
-    graph from a missing one: to judge the ceiling, the server reads and parses the text of the graph before refusing,
-    so a large hidden graph takes longer to refuse than a name that does not exist, and someone who guesses the name can
+    ceiling; a group of the area, or another role without a role ceiling of its own (which uses the area's), gives the
+    higher ceiling, and the kg-mcp does not yet have a ceiling per person that no grant passes (the deny of the market).
+    The response time can tell a hidden graph from a missing one: to judge the ceiling, the server reads and parses the
+    text of the graph before refusing, so a large hidden graph takes longer to refuse than a name that does not exist,
+    and someone who guesses the name can
     infer that the graph exists. The kg-mcp does not equalize that time.
 
     ```json
     {"schema_version": 1, "canonical": "c-company",
      "groups": {"g-compliance": ["dpo@x.org"], "g-audit": ["aud@x.org"]},
      "levels": ["public", "internal", "confidential", "restricted"],
-     "ceilings": {"g-compliance": "restricted"},
+     "ceilings": {"c-company": "internal", "g-compliance": "restricted", "g-audit": "internal"},
      "default_level": "internal",
      "roles": {"auditor": {"read": ["g-compliance"], "write": [], "ceilings": {"g-compliance": "confidential"}},
                "officer": {"read": ["g-compliance"]}},
@@ -1590,8 +1815,10 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   is counted as `not_text`; a node with a repeated or non-text id, which the gate already fails on MUST, is not read
   here. If your graphs anchor in a folder outside the repository (a session's memory), the check stays red until you
   declare it with `--external-root`. With no graph read, it says so.
-- **What is judged.** The text of the trace up to its first `:` or `#` (`file:line`, `file#section`), and only when it
-  looks like a path of the repository. Not judged, and counted apart, never in silence:
+- **What is judged.** The text of the trace up to its first `:`, `#`, or `?` (`file:line`, `file#section`, a query),
+  without the quotes and `<>` around it and without the `kg-node://` prefix of the contract's scheme (since 4.54.0), and
+  only when it looks like a path of the repository. A target that resolves only after normalizing (`docs//x`,
+  `docs/./x`) is not read. Not judged, and counted apart, never in silence:
   - `absolute`: an absolute path or a URL (another machine or network);
   - `external_root`: a prefix you declare with `--external-root` (a folder that lives outside the repository);
   - `not_path`: a character outside `[A-Za-z0-9_./-]` (a command, prose), a name without a slash (a loose word, a

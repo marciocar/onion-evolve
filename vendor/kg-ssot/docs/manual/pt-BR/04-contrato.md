@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:081d661c8c27ae07 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:305dead8553dff7e -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -110,6 +110,8 @@ O v4 é uma versão **maior**: o que alertava passou a reprovar.
 | `form.pattern.node.provenance.source` (o marcador `private-cite:` fora da forma, v4.22) | — | SHOULD |
 | `form.pattern`, `form.type`, `form.required` em `meta.x_dispose_by`, `meta.x_dispose_basis`, `meta.x_hold` (o prazo de expurgo fora da forma, v4.23) | — | SHOULD |
 | `form.misplaced.node.x_dispose_by`, `.x_dispose_basis`, `.x_hold` (os perfis de expurgo no nó, v4.23) | — | SHOULD |
+| `form.type`, `form.range`, `form.required`, `form.pattern` em `meta.x_downgrade` e nas chaves dele (a trilha de rebaixamento fora da forma, v4.24) | — | SHOULD |
+| `form.misplaced.node.x_downgrade` (a trilha de rebaixamento no nó, v4.24) | — | SHOULD |
 | `form.pattern.node.provenance.method` (fora de `<classe>: <detalhe>`) | — | SHOULD (MUST no v5) |
 
 Desde o v4.21, dois avisos SHOULD preparam o v5. `form.deprecated.node.provenance.method`: a classe de `provenance.method` em português (`medição`, `leitura`, `juízes`, `derivado`, `testemunho`) segue passando, e o leitor pede a em inglês. No JSON Schema, é um `not` com a forma do apelido e a palavra `deprecated` do vocabulário de metadados do 2020-12, que só anota; o valor que já falha a forma fica só com `form.pattern.node.provenance.method`. O apelido sai no v5, nunca antes de 2027-03-31, e só quando a medida no primeiro adotante e no repositório de curadoria dele der zero. E `form.required.node.provenance` no nível SHOULD (proveniência sempre): o nó `evidence` sem `provenance` em qualquer status exceto `unverifiable`, e a `decision` `done` sem ela. É o código da regra MUST acima, de propósito: o campo e o conserto são os mesmos, e o código não muda quando o v5 promover a regra. O MUST não muda, e no nó em que o MUST já acusa o código, o leitor não o repete como aviso; em outro nó do mesmo documento o aviso segue valendo, porque a deduplicação é por ocorrência. Rebaixar um nó sem lhe dar fonte troca o MUST por um SHOULD no mesmo nó: a `evidence` `confirmed` que vai para `open`, ou a `decision` `done` que sai de PROD, segue sem `provenance`, e o gate acusa `form.required.node.provenance` como dívida SHOULD nova e pede `--accept-regression`. O caminho das dicas passa limpo: `unverifiable` para a `evidence` sem fonte recuperável, e, na decisão, a fonte é quem decidiu, com method `testimony`.
@@ -118,6 +120,8 @@ Desde o v4.22, uma regra SHOULD para citar um nó de repositório privado. Um gr
 
 Desde o v4.23, o prazo de expurgo do grafo inteiro, só no SHOULD: `x_dispose_by` (uma data do calendário), `x_dispose_basis` (um texto não vazio) e `x_hold` (um mapa com `reason` e `until`), no `meta`, julgados só quando presentes e só pela forma, nunca pelo vencimento, que é do `kg_validate.py --due`, fora do veredito. No nó, as três chaves alertam como `form.misplaced.node.<chave>`. O vencimento abre o procedimento de descarte, e nenhuma ferramenta apaga nada (capítulo 3). A descrição de `provenance.method` ganha a regra do subagente: o que um subagente da sessão fez é do autor, com a classe do ato, e `testimony` fica para parte externa. O gate ganha `--classification-floor NÍVEL --area-policy ARQ` (capítulo 5). O MUST não muda, e nada que passava reprova.
 
+Desde o v4.24, a trilha dos rebaixamentos de nível do grafo inteiro, só no SHOULD: `x_downgrade` no `meta`, uma lista não vazia de registros com `from` e `to` (níveis), `reason`, `approved_by` e `ref` (texto não vazio) e `date` (uma data do calendário), julgada só quando presente e só pela forma. No nó, alerta como `form.misplaced.node.x_downgrade`. Quando o registro é exigido não cabe ao contrato dizer: a queda só se vê entre duas versões do grafo, pela ordem dos níveis da política, e quem o pede é o `kg_gate.py --classification-downgrade` (capítulos 3 e 5). Nada que passava reprova.
+
 Um limite conhecido: o U+2028 literal dentro de um texto YAML é quebra de linha para o parser da referência em Python e texto comum para o leitor JavaScript. Logo depois de `<classe>: `, a referência alerta `form.pattern.node.provenance.method`, e o leitor JavaScript não (com um apelido, alerta `form.deprecated.node.provenance.method`). Os dois mantêm o arquivo válido, e já divergiam antes do v4.21. Escrito como o escape `\u2028`, os dois leem o mesmo valor.
 
 As versões menores da linha 4.x acrescentaram recursos sem mudar o veredito MUST de um grafo bem escrito, com uma exceção
@@ -125,7 +129,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 da 4.38.0 à 4.45.0, v4.19 da 4.46.0 à 4.48.0, v4.20 e v4.21 da 4.49.0 à 4.50.0, v4.22 na 4.51.0, v4.23 desde a 4.52.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 da 4.38.0 à 4.45.0, v4.19 da 4.46.0 à 4.48.0, v4.20 e v4.21 da 4.49.0 à 4.50.0, v4.22 na 4.51.0, v4.23 da 4.52.0 à 4.53.0, v4.24 desde a 4.54.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -160,6 +164,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.54 | Contrato v4.24, só SHOULD: a trilha de rebaixamento `x_downgrade` no `meta`, julgada só pela forma, com `form.misplaced.node.x_downgrade` no nó; o `kg_gate.py --classification-downgrade` reprova a queda do nível frente à base (`--touched`, ou `--base REF`) sem o registro, ou aprovada por um autor da mudança de nível |
 | 4.52 | Contrato v4.23, só SHOULD: o prazo de expurgo no `meta` (`x_dispose_by`, `x_dispose_basis`, `x_hold`), julgado só pela forma, com `form.misplaced.node.<chave>` no nó; o `kg_validate.py --due` lista o expurgo vencido, o suspenso e o conflito com o `retain_for`; o `kg_gate.py --classification-floor NÍVEL --area-policy ARQ` reprova o grafo no nível ou acima, pela ordem dos `levels` da política; a regra do subagente no `provenance.method` |
 | 4.51 | Contrato v4.22, só SHOULD: o marcador `private-cite:<id>` para um nó de repositório privado, cujo `provenance.source` fora da forma alerta como `form.pattern.node.provenance.source`; o `kg_trace.py` o conta e nunca o lê, o `kg_trace.py private-cite-id` gera um novo, e o `kg_gate.py --private-repos ARQ` reprova o repositório privado citado sem o marcador |
 | 4.49 | Contratos v4.20 e v4.21, só SHOULD: `x_classification` no `meta` (`form.misplaced.node.x_classification` no nó); a classe de `provenance.method` em português alerta como `form.deprecated.node.provenance.method`, e a `evidence` que não é `unverifiable` ou a `decision` `done` sem `provenance` alerta como `form.required.node.provenance` |

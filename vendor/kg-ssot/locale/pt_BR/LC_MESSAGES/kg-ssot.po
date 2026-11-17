@@ -334,10 +334,12 @@ msgid ""
 "Usage:\n"
 "  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
 "             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos FILE]\n"
-"             [--classification-floor LEVEL --area-policy FILE]\n"
+"             [--classification-floor LEVEL] [--classification-cites] [--classification-downgrade --base REF]\n"
+"             [--area-policy FILE [--area-policy-digest D]]\n"
 "             [--update [--accept-regression REASON] [--granularity graph|node]]\n"
 "       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
-"                  [--private-repos FILE] [--classification-floor LEVEL --area-policy FILE]\n"
+"                  [--private-repos FILE] [--classification-floor LEVEL] [--classification-cites] [--classification-downgrade]\n"
+"                  [--area-policy FILE [--area-policy-digest D]]\n"
 "\n"
 "--touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common\n"
 "ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new\n"
@@ -383,6 +385,46 @@ msgid ""
 "gate blocks the merge, not the entry of the data: the commit with the graph already exists on the branch; to block it\n"
 "before the commit, run the same gate with --touched in a pre-commit hook (manual, chapter 5). It does not go with\n"
 "--update.\n"
+"\n"
+"--classification-cites --area-policy FILE, in both modes, with or without --classification-floor: fails (rc 1) when a\n"
+"graph cites, in a structured field, a tracked graph of a HIGHER level than its own, in the same order of levels (a graph\n"
+"without the key has the default_level). The fields read are both ends of external_edges, trace, provenance.source and\n"
+"provenance.locator (text, list or map, any scheme) and the criterion of x_measured_under. A value that mentions\n"
+".kg.yaml, .kg.yml or .kg.json, in any case, is resolved by the resolver of kg_trace (the same rules as kg_trace check:\n"
+"locate for the trace, locate_source for the rest, from the root, the graph's folder and its parent), plus one rule: a\n"
+"value that is exactly the path of a graph in the git index resolves to it. A citation that resolves in more than one\n"
+"place is judged by the highest level among them. It fails closed, deny by default: a value with the form of a relative\n"
+"path that does not resolve to a tracked graph fails, and so do an unknown level and a citing graph that does not parse.\n"
+"Besides, every value read is scanned for the path of each graph of the index (from the root, the graph's folder and\n"
+"its parent, without case), with a path boundary, and each graph found is judged by its level (prose, a rev:path, a\n"
+"path after a URL). The scan never lifts the fail-closed rule, except when the whole value, without the boundary\n"
+"punctuation at its ends, is exactly a graph of the index (a path with a full stop). Prose that names no graph, a value\n"
+"that names only the citing graph, every URL, an absolute path and a private-cite marker are counted and not judged.\n"
+"Free text (label, narrative, verified_against, other x_ fields) is not read. The direction\n"
+"from higher to lower and the same level pass. The output names the files and levels, never the cited id. --exclude\n"
+"leaves out the citing graph, never the cited one. With --touched, only a pair with a changed end, read from the index; a\n"
+"change of the policy alone is not a change. It does not go with --update.\n"
+"\n"
+"--classification-downgrade --area-policy FILE (contract v4.24), in both modes, with or without the other two: fails (rc\n"
+"1) when the level of a graph dropped against the base without the record of the drop. The base is the common ancestor\n"
+"of --touched, compared with the git index; in the ratchet mode, --base REF gives it (the common ancestor of REF and\n"
+"HEAD), compared with the tree of the checkout, and without --base the option is broken input (rc 2). Each changed\n"
+".kg.yaml and .kg.json that git tracks (without the default excludes, only --exclude) is paired with the base by path,\n"
+"by meta.id and by the rename git detects (with rewrites broken, -B -M, so a path that already existed counts too); the\n"
+"level at the base is the highest among the pairs, a level unknown at the base counts as the highest of levels, and a\n"
+"graph with no pair is new and not judged here. The level of each end is read as by the floor (a graph without the key\n"
+"has the default_level). On a drop, the last entry of meta.x_downgrade must have from and to equal to the two levels,\n"
+"reason, approved_by and ref not empty, and date YYYY-MM-DD, and it must be appended after the trail of the base, which\n"
+"stays as it was (the trail of the base is a prefix of the trail now); its approved_by must not name (by e-mail or by\n"
+"name, without case) the author or the committer of a commit since the base that changed the level, nor the identity\n"
+"about to commit, as author or committer, when the index or the tree differs from HEAD. An unknown level now fails. The\n"
+"output names the file and the levels, never the reason, the approver, or the reference. The gate does not authenticate\n"
+"the approver: the review of the pull request, with branch protection, is the real lock (manual, chapter 6). It does not\n"
+"go with --update.\n"
+"\n"
+"--area-policy-digest D, only with --area-policy: D is sha256:<hex> (what kg_policy.py digest FILE prints) or @FILE, a\n"
+"committed file that holds it. The policy read must have that digest, or the gate stops with rc 2 before it judges any\n"
+"graph; pin the same value in the kg-mcp (its --area-policy-digest), and both ends read the same policy.\n"
 msgstr ""
 "O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
 "\n"
@@ -408,10 +450,12 @@ msgstr ""
 "Uso:\n"
 "  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
 "             [--strict-identity] [--allow-unreleased] [--sources] [--private-repos ARQ]\n"
-"             [--classification-floor NÍVEL --area-policy ARQ]\n"
+"             [--classification-floor NÍVEL] [--classification-cites] [--classification-downgrade --base REF]\n"
+"             [--area-policy ARQ [--area-policy-digest D]]\n"
 "             [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
 "       kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]\n"
-"                  [--private-repos ARQ] [--classification-floor NÍVEL --area-policy ARQ]\n"
+"                  [--private-repos ARQ] [--classification-floor NÍVEL] [--classification-cites] [--classification-downgrade]\n"
+"                  [--area-policy ARQ [--area-policy-digest D]]\n"
 "\n"
 "--touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e\n"
 "HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer\n"
@@ -456,6 +500,45 @@ msgstr ""
 "vazio são entrada quebrada (rc 2). No CI, o gate barra o merge, não a entrada do dado: o\n"
 "commit com o grafo já existe na branch; para barrar antes do commit, o mesmo gate com --touched num hook de\n"
 "pre-commit (manual, capítulo 5). Não combina com --update.\n"
+"\n"
+"--classification-cites --area-policy ARQ, nos dois modos, com ou sem o --classification-floor: reprova (rc 1) o grafo\n"
+"que cita, num campo estruturado, um grafo rastreado de nível MAIOR que o dele, pela mesma ordem de levels (o grafo sem a\n"
+"chave tem o default_level). Os campos lidos são as duas pontas das external_edges, o trace, o provenance.source e o\n"
+"provenance.locator (texto, lista ou mapa, qualquer scheme) e o criterion do x_measured_under. O valor que menciona\n"
+".kg.yaml, .kg.yml ou .kg.json, em qualquer caixa, é resolvido pelo resolvedor do kg_trace (as mesmas regras do kg_trace\n"
+"check: locate para o trace, locate_source para o resto, a partir da raiz, da pasta do grafo e da pasta pai dela), mais\n"
+"uma regra: o valor que é exatamente o caminho de um grafo do índice do git resolve para ele. A citação que resolve em\n"
+"mais de um lugar é julgada pelo maior nível entre eles. A falha fecha, negar por padrão: o valor com a forma de caminho\n"
+"relativo que não resolve para um grafo rastreado reprova, e também o nível desconhecido e o grafo que cita e não\n"
+"parseia. Além disso, todo valor lido é varrido atrás do caminho de cada grafo do índice (a partir da raiz, da pasta\n"
+"do grafo e da pasta pai dela, sem distinção de caixa), com fronteira de caminho, e cada grafo achado é julgado pelo\n"
+"nível (a prosa, o rev:caminho, o caminho depois de uma URL). A varredura nunca tira a falha fechada, salvo quando o\n"
+"valor inteiro, sem a pontuação de fronteira das pontas, é exatamente um grafo do índice (o caminho com ponto final). A\n"
+"prosa que não nomeia grafo, o valor que nomeia só o próprio grafo, toda URL, o caminho absoluto e o marcador\n"
+"private-cite são contados e não julgados. O texto livre (label, narrative, verified_against, outros campos x_) não é\n"
+"lido. O sentido do maior para o menor e o mesmo nível passam. A saída nomeia os arquivos e os níveis, nunca o id\n"
+"citado. O --exclude tira o grafo que cita, nunca o citado. Com --touched, só o par em que uma das pontas mudou, lido do\n"
+"índice; a troca só da política não é mudança. Não combina com --update.\n"
+"\n"
+"--classification-downgrade --area-policy ARQ (contrato v4.24), nos dois modos, com ou sem os outros dois: reprova (rc\n"
+"1) o grafo cujo nível caiu frente à base sem o registro da queda. A base é o ancestral comum do --touched, comparado\n"
+"com o índice do git; no modo da catraca, --base REF a dá (o ancestral comum de REF e HEAD), comparada com a árvore do\n"
+"checkout, e sem --base a opção é entrada quebrada (rc 2). Cada .kg.yaml e .kg.json rastreado que mudou (sem os excludes\n"
+"padrão, só o --exclude) é pareado com a base pelo caminho, pelo meta.id e pelo rename que o git detecta (com a quebra\n"
+"de reescrita, -B -M, que conta também o caminho que já existia); o nível da base é o maior entre os pares, o nível\n"
+"desconhecido na base conta como o mais alto de levels, e o grafo sem par é novo e não é julgado aqui. O nível de cada\n"
+"ponta é lido como no piso (o grafo sem a chave tem o default_level). Na queda, o último registro de meta.x_downgrade\n"
+"tem de ter from e to iguais aos dois níveis, reason, approved_by e ref não vazios e date AAAA-MM-DD, e tem de vir\n"
+"depois da trilha da base, que fica como era (a trilha da base é prefixo da de agora); o approved_by não pode nomear\n"
+"(pelo e-mail ou pelo nome, sem distinguir caixa) o autor ou o committer de commit desde a base que mudou o nível, nem\n"
+"quem vai commitar, como autor ou committer, quando o índice ou a árvore difere de HEAD. O nível desconhecido agora\n"
+"reprova. A saída nomeia o arquivo e os níveis, nunca o motivo, o aprovador ou a referência. O gate não autentica o\n"
+"aprovador: a trava real é o review do pull request com a branch protection (manual, capítulo 6). Não combina com\n"
+"--update.\n"
+"\n"
+"--area-policy-digest D, só com --area-policy: D é sha256:<hex> (o que kg_policy.py digest ARQ imprime) ou @ARQ, um\n"
+"arquivo commitado que o guarda. A política lida tem de ter esse digest, ou o gate para com rc 2 antes de julgar\n"
+"qualquer grafo; fixe o mesmo valor no kg-mcp (o --area-policy-digest dele), e as duas pontas leem a mesma política.\n"
 
 #: tools/kg_gate.py
 msgid "✗ cited source does not match: {graph}#{node} {code} → {target}"
@@ -4427,6 +4510,10 @@ msgid "attestation of {tag}: could not download {name} from {repo} (releases bef
 msgstr "atestação de {tag}: não deu para baixar {name} de {repo} (as releases antes da 4.47.0 não têm): {error}"
 
 #: tools/kg_vendor.py
+msgid "attestation of {tag} was not checked: the Sigstore verifier of gh did not start (it could not write its TUF cache), so this says nothing about the release; set XDG_CACHE_HOME to a writable folder and run again: {error}"
+msgstr "a atestação de {tag} não foi conferida: o verificador do Sigstore do gh não subiu (não conseguiu gravar o cache TUF), então isto não diz nada sobre a release; defina XDG_CACHE_HOME para uma pasta gravável e rode de novo: {error}"
+
+#: tools/kg_vendor.py
 msgid "attestation of {tag} did not verify in {repo}: {error}"
 msgstr "a atestação de {tag} não verificou em {repo}: {error}"
 
@@ -4642,9 +4729,9 @@ msgstr ""
 
 #: tools/kg_gate.py
 msgid ""
-"the kg-mcp policy file whose levels order the --classification-floor; a missing, unreadable or invalid policy, a policy without levels, or a level it does not have is broken input (rc 2)"
+"the kg-mcp policy file whose levels order the --classification-floor and the --classification-cites; a missing, unreadable or invalid policy, a policy without levels, or a level it does not have is broken input (rc 2)"
 msgstr ""
-"o arquivo de política do kg-mcp cujo levels ordena o --classification-floor; a política ausente, ilegível ou inválida, a política sem levels, ou o nível que ela não tem é entrada quebrada (rc 2)"
+"o arquivo de política do kg-mcp cujo levels ordena o --classification-floor e o --classification-cites; a política ausente, ilegível ou inválida, a política sem levels, ou o nível que ela não tem é entrada quebrada (rc 2)"
 
 #: tools/kg_validate.py
 msgid ""
@@ -4724,3 +4811,169 @@ msgstr "x_dispose_by {value} não é uma data AAAA-MM-DD: o prazo não é medido
 #: tools/kg_audit.py
 msgid "{file} does not pass the contract MUST ({codes}): the package would read it wrong; see kg_validate.py {file}"
 msgstr "{file} não passa no MUST do contrato ({codes}): o pacote o leria errado; veja kg_validate.py {file}"
+
+#: tools/kg_gate.py
+msgid ""
+"--area-policy {path} does not have the digest that --area-policy-digest pins: the gate and the server would not read the same policy (kg_policy.py digest FILE prints the digest of a policy, to compare locally)"
+msgstr ""
+"--area-policy {path} não tem o digest que o --area-policy-digest fixa: o gate e o servidor não leriam a mesma política (kg_policy.py digest ARQ imprime o digest de uma política, para comparar localmente)"
+
+#: tools/kg_mcp.py
+msgid "--area-policy-digest only goes with --area-policy"
+msgstr "--area-policy-digest só vale com --area-policy"
+
+#: tools/kg_gate.py tools/kg_mcp.py
+msgid "--area-policy-digest: {error}"
+msgstr "--area-policy-digest: {error}"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --area-policy-digest only goes with --area-policy"
+msgstr "GATE QUEBRADO  --area-policy-digest só vale com --area-policy"
+
+#: tools/kg_policy.py
+msgid ""
+"The kg-mcp area policy: digest FILE prints the sha256 of its normalized form, the value that --area-policy-digest pins in the gate and in the kg-mcp."
+msgstr ""
+"A política de áreas do kg-mcp: digest ARQ imprime o sha256 da forma normalizada dela, o valor que o --area-policy-digest fixa no gate e no kg-mcp."
+
+#: tools/kg_gate.py
+msgid ""
+"only with --area-policy: the digest that the policy must have (kg_policy.py digest FILE), as a value or as @FILE, a committed file that holds it; a policy with another digest, or a malformed value, is broken input (rc 2). Pin the same value in the kg-mcp"
+msgstr ""
+"só com --area-policy: o digest que a política tem de ter (kg_policy.py digest ARQ), como valor ou como @ARQ, um arquivo commitado que o guarda; a política com outro digest, ou um valor malformado, é entrada quebrada (rc 2). Fixe o mesmo valor no kg-mcp"
+
+#: tools/kg_mcp.py
+msgid ""
+"only with --area-policy: the digest that the policy must have (kg_policy.py digest FILE), as a value or as @FILE, read once at startup; with another digest the server does not start, and a policy changed to another digest while it runs closes reading"
+msgstr ""
+"só com --area-policy: o digest que a política tem de ter (kg_policy.py digest ARQ), como valor ou como @ARQ, lido uma vez na partida; com outro digest o servidor não sobe, e a política trocada por outro digest com ele de pé fecha a leitura"
+
+#: tools/kg_policy.py
+msgid "the policy file (JSON)"
+msgstr "o arquivo da política (JSON)"
+
+#: tools/kg_policy.py
+msgid "{path} cannot be read ({error})"
+msgstr "{path} não pode ser lido ({error})"
+
+#: tools/kg_policy.py
+msgid "{path} is not a valid policy: {error}"
+msgstr "{path} não é uma política válida: {error}"
+
+#: tools/kg_gate.py
+msgid ""
+"✗ classification cites: {graph} cannot be read (it is not UTF-8 or it does not parse), so its citations are unknown"
+msgstr ""
+"✗ citação entre níveis: {graph} não pode ser lido (não é UTF-8 ou não parseia), e as citações dele não se sabem"
+
+#: tools/kg_gate.py
+msgid ""
+"✗ classification cites: {graph} cites {target} in {count} place(s) ({fields}), and the level of {unknown} is unknown"
+msgstr ""
+"✗ citação entre níveis: {graph} cita {target} em {count} lugar(es) ({fields}), e o nível de {unknown} é desconhecido"
+
+#: tools/kg_gate.py
+msgid ""
+"✗ classification cites: {graph} ({low}) cites {target} ({high}), a higher level, in {count} place(s) ({fields})"
+msgstr ""
+"✗ citação entre níveis: {graph} ({low}) cita {target} ({high}), um nível maior, em {count} lugar(es) ({fields})"
+
+#: tools/kg_gate.py
+msgid ""
+"· --classification-cites: {checked} graph(s) checked, {pairs} pair(s) of graphs cited, {hits} failing; not judged: {counted} citation(s) to an absolute path, a URL or a private-cite, {prose} in prose and {selfs} to the citing graph itself"
+msgstr ""
+"· --classification-cites: {checked} grafo(s) conferido(s), {pairs} par(es) de grafos citados, {hits} reprovado(s); não julgadas: {counted} citação(ões) a caminho absoluto, URL ou private-cite, {prose} em prosa e {selfs} ao próprio grafo"
+
+#: tools/kg_gate.py
+msgid ""
+"✗ classification cites: {graph} names a graph that does not resolve to a tracked one in {count} place(s) ({fields}); a relative citation of a graph has to resolve (it fails closed)"
+msgstr ""
+"✗ citação entre níveis: {graph} nomeia um grafo que não resolve para um rastreado em {count} lugar(es) ({fields}); a citação relativa de um grafo tem de resolver (a falha fecha)"
+
+#: tools/kg_gate.py
+msgid ""
+"GATE BROKEN  --classification-cites needs --area-policy (the order of the levels comes from the policy)"
+msgstr ""
+"GATE QUEBRADO  --classification-cites precisa do --area-policy (a ordem dos níveis vem da política)"
+
+#: tools/kg_gate.py
+msgid ""
+"GATE BROKEN  --area-policy cannot be empty (an empty value would switch the check off in silence)"
+msgstr ""
+"GATE QUEBRADO  --area-policy não pode ser vazio (um valor vazio desligaria a conferência em silêncio)"
+
+#: tools/kg_gate.py
+msgid ""
+"GATE BROKEN  --classification-cites does not go with --update (the check is not part of the baseline)"
+msgstr ""
+"GATE QUEBRADO  --classification-cites não combina com --update (a conferência não faz parte da linha de base)"
+
+#: tools/kg_gate.py
+msgid ""
+"fails (rc 1) when a tracked graph cites, in a structured field (external_edges, trace, provenance.source, provenance.locator, the criterion of x_measured_under), resolved as kg_trace resolves it, a tracked graph of a higher level, in the order of levels in the policy given by --area-policy; with --touched, a pair with a changed end; the output names both files and levels, never the cited id; not with --update"
+msgstr ""
+"reprova (rc 1) o grafo rastreado que cita, num campo estruturado (external_edges, trace, provenance.source, provenance.locator, o criterion do x_measured_under), resolvido como o kg_trace o resolve, um grafo rastreado de nível maior, pela ordem de levels da política dada no --area-policy; com --touched, o par com uma ponta alterada; a saída nomeia os dois arquivos e os níveis, nunca o id citado; não combina com --update"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --base does not go with --touched (the base is that of --touched)"
+msgstr "GATE QUEBRADO  --base não combina com --touched (a base é a do --touched)"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --base only goes with --classification-downgrade"
+msgstr "GATE QUEBRADO  --base só vale com --classification-downgrade"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --classification-downgrade does not go with --update (the check is not part of the baseline)"
+msgstr "GATE QUEBRADO  --classification-downgrade não combina com --update (a conferência não faz parte da linha de base)"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --classification-downgrade needs --area-policy (the order of the levels comes from the policy)"
+msgstr "GATE QUEBRADO  --classification-downgrade pede --area-policy (a ordem dos níveis vem da política)"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --classification-downgrade needs a base: --touched BASE, or --base REF in the ratchet mode"
+msgstr "GATE QUEBRADO  --classification-downgrade pede uma base: --touched BASE, ou --base REF no modo da catraca"
+
+#: tools/kg_gate.py
+msgid "fails (rc 1) when the level of a tracked graph dropped against the base (paired by path, meta.id and the rename git detects) without the record of the drop appended to the trail of meta.x_downgrade, or with an approved_by that names an author or committer of the change of the level; the base is that of --touched, or --base REF in the ratchet mode; the order of the levels comes from --area-policy; contract v4.24; not with --update"
+msgstr "reprova (rc 1) quando o nível de um grafo rastreado caiu frente à base (pareado pelo caminho, pelo meta.id e pelo rename que o git detecta) sem o registro da queda acrescentado à trilha de meta.x_downgrade, ou com um approved_by que nomeia um autor ou committer da mudança de nível; a base é a do --touched, ou --base REF no modo da catraca; a ordem dos níveis vem do --area-policy; contrato v4.24; não com --update"
+
+#: tools/kg_gate.py
+msgid "only with --classification-downgrade, in the ratchet mode: the levels are compared with the common ancestor of REF and HEAD (with --touched, the base is that of --touched)"
+msgstr "só com --classification-downgrade, no modo da catraca: os níveis são comparados com o ancestral comum de REF e HEAD (com --touched, a base é a do --touched)"
+
+#: tools/kg_validate.py
+msgid "x_downgrade belongs in meta (v4.24), next to x_classification: the unit is the graph, not the node."
+msgstr "x_downgrade fica no meta (v4.24), ao lado do x_classification: a unidade é o grafo, não o nó."
+
+#: tools/kg_validate.py
+msgid "x_downgrade is the trail of the level downgrades of the whole graph (v4.24): a list that is not empty, from the oldest to the newest, each entry a map with from and to (levels, as slugs), reason, approved_by and ref (text that is not empty) and date (YYYY-MM-DD in quotes). kg_gate.py --classification-downgrade asks for the entry when the level drops."
+msgstr "x_downgrade é a trilha dos rebaixamentos de nível do grafo inteiro (v4.24): uma lista não vazia, do mais antigo ao mais novo, cada item um mapa com from e to (níveis, em forma de slug), reason, approved_by e ref (texto não vazio) e date (AAAA-MM-DD entre aspas). O kg_gate.py --classification-downgrade pede o registro quando o nível cai."
+
+#: tools/kg_gate.py
+msgid "· --classification-downgrade: {checked} changed graph(s) compared with {base}, {drops} downgrade(s), {hits} failed"
+msgstr "· --classification-downgrade: {checked} grafo(s) alterado(s) comparado(s) com {base}, {drops} rebaixamento(s), {hits} reprovado(s)"
+
+#: tools/kg_gate.py
+msgid "✗ classification downgrade: {graph} has an unknown level now (it is not UTF-8, it does not parse, its meta is not a map, or its x_classification is not one of the levels)"
+msgstr "✗ rebaixamento de nível: {graph} tem nível desconhecido agora (não é UTF-8, não parseia, o meta não é mapa ou o x_classification não é um dos níveis)"
+
+#: tools/kg_gate.py
+msgid "✗ classification downgrade: {graph} went from {old} to {new} without a downgrade record (the last entry of meta.x_downgrade, from {old} to {new}, with reason, approved_by, ref and date)"
+msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new} sem registro de rebaixamento (o último item de meta.x_downgrade, de {old} para {new}, com reason, approved_by, ref e date)"
+
+#: tools/kg_gate.py
+msgid "✗ classification downgrade: {graph} went from {old} to {new}, and approved_by names an author or committer of a change of the level since {base} ({count} change(s)): the approver is another person"
+msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new}, e o approved_by nomeia um autor ou committer de mudança do nível desde {base} ({count} mudança(s)): quem aprova é outra pessoa"
+
+#: tools/kg_gate.py
+msgid "✗ classification downgrade: {graph} went from {old} to {new}, and the last entry of meta.x_downgrade does not record this drop (from {old} to {new}, with reason, approved_by and ref not empty and date YYYY-MM-DD)"
+msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new}, e o último item de meta.x_downgrade não registra esta queda (de {old} para {new}, com reason, approved_by e ref não vazios e date AAAA-MM-DD)"
+
+#: tools/kg_gate.py
+msgid "✗ classification downgrade: {graph} went from {old} to {new}, and the last entry of meta.x_downgrade was already in the base: a new drop takes a new entry"
+msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new}, e o último item de meta.x_downgrade já estava na base: uma queda nova pede um registro novo"
+
+#: tools/kg_gate.py
+msgid "✗ classification downgrade: {graph} went from {old} to {new}, and meta.x_downgrade does not keep the trail of the base: the entries already there stay as they were, and the new one is appended after them"
+msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new}, e o meta.x_downgrade não guarda a trilha da base: os registros que já estavam ficam como eram, e o novo vai depois deles"

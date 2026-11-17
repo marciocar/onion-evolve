@@ -50,10 +50,12 @@ reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
 Uso:
   kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]
              [--strict-identity] [--allow-unreleased] [--sources] [--private-repos ARQ]
-             [--classification-floor NÍVEL --area-policy ARQ]
+             [--classification-floor NÍVEL] [--classification-cites] [--classification-downgrade --base REF]
+             [--area-policy ARQ [--area-policy-digest D]]
              [--update [--accept-regression MOTIVO] [--granularity graph|node]]
        kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
-                  [--private-repos ARQ] [--classification-floor NÍVEL --area-policy ARQ]
+                  [--private-repos ARQ] [--classification-floor NÍVEL] [--classification-cites] [--classification-downgrade]
+                  [--area-policy ARQ [--area-policy-digest D]]
 
 --touched BASE é outro modo, sem base de catraca: reprova (rc 1) só se um nó tocado desde o ancestral comum de BASE e
 HEAD carrega integrity.bare-decision ou integrity.superseded-without-successor. Tocado é o nó novo, o nó com qualquer
@@ -98,6 +100,45 @@ ausente, ilegível, fora do formato ou sem levels, NÍVEL que levels não tem, u
 entrada quebrada (rc 2). No CI, o gate barra o merge, não a entrada do dado: o
 commit com o grafo já existe na branch; para barrar antes do commit, o mesmo gate com --touched num hook de pre-commit
 (manual, capítulo 5). Não combina com --update.
+
+--classification-cites --area-policy ARQ, nos dois modos, com ou sem o --classification-floor: reprova (rc 1) o grafo
+que cita, num campo estruturado, um grafo rastreado de nível MAIOR que o dele, pela mesma ordem de levels (o grafo sem a
+chave tem o default_level). Os campos lidos são as duas pontas das external_edges, o trace, o provenance.source e o
+provenance.locator (texto, lista ou mapa, qualquer scheme) e o criterion do x_measured_under. O valor que menciona
+.kg.yaml, .kg.yml ou .kg.json, em qualquer caixa, é resolvido pelo resolvedor do kg_trace (as mesmas regras do kg_trace
+check: locate para o trace, locate_source para o resto, a partir da raiz, da pasta do grafo e da pasta pai dela), mais
+uma regra: o valor que é exatamente o caminho de um grafo do índice do git resolve para ele. A citação que resolve em
+mais de um lugar é julgada pelo maior nível entre eles. A falha fecha, negar por padrão: o valor com a forma de caminho
+relativo que não resolve para um grafo rastreado reprova, e também o nível desconhecido e o grafo que cita e não
+parseia. Além disso, todo valor lido é varrido atrás do caminho de cada grafo do índice (a partir da raiz, da pasta
+do grafo e da pasta pai dela, sem distinção de caixa), com fronteira de caminho, e cada grafo achado é julgado pelo
+nível (a prosa, o rev:caminho, o caminho depois de uma URL). A varredura nunca tira a falha fechada, salvo quando o
+valor inteiro, sem a pontuação de fronteira das pontas, é exatamente um grafo do índice (o caminho com ponto final). A
+prosa que não nomeia grafo, o valor que nomeia só o próprio grafo, toda URL, o caminho absoluto e o marcador
+private-cite são contados e não julgados. O texto livre (label, narrative, verified_against, outros campos x_) não é
+lido. O sentido do maior para o menor e o mesmo nível passam. A saída nomeia os arquivos e os níveis, nunca o id
+citado. O --exclude tira o grafo que cita, nunca o citado. Com --touched, só o par em que uma das pontas mudou, lido do
+índice; a troca só da política não é mudança. Não combina com --update.
+
+--classification-downgrade --area-policy ARQ (contrato v4.24), nos dois modos, com ou sem os outros dois: reprova (rc
+1) o grafo cujo nível caiu frente à base sem o registro da queda. A base é o ancestral comum do --touched, comparado
+com o índice do git; no modo da catraca, --base REF a dá (o ancestral comum de REF e HEAD), comparada com a árvore do
+checkout, e sem --base a opção é entrada quebrada (rc 2). Cada .kg.yaml e .kg.json rastreado que mudou (sem os excludes
+padrão, só o --exclude) é pareado com a base pelo caminho, pelo meta.id e pelo rename que o git detecta (com a quebra
+de reescrita, -B -M, que conta também o caminho que já existia); o nível da base é o maior entre os pares, o nível
+desconhecido na base conta como o mais alto de levels, e o grafo sem par é novo e não é julgado aqui. O nível de cada
+ponta é lido como no piso (o grafo sem a chave tem o default_level). Na queda, o último registro de meta.x_downgrade
+tem de ter from e to iguais aos dois níveis, reason, approved_by e ref não vazios e date AAAA-MM-DD, e tem de vir
+depois da trilha da base, que fica como era (a trilha da base é prefixo da de agora); o approved_by não pode nomear
+(pelo e-mail ou pelo nome, sem distinguir caixa) o autor ou o committer de commit desde a base que mudou o nível, nem
+quem vai commitar, como autor ou committer, quando o índice ou a árvore difere de HEAD. O nível desconhecido agora
+reprova. A saída nomeia o arquivo e os níveis, nunca o motivo, o aprovador ou a referência. O gate não autentica o
+aprovador: a trava real é o review do pull request com a branch protection (manual, capítulo 6). Não combina com
+--update.
+
+--area-policy-digest D, só com --area-policy: D é sha256:<hex> (o que kg_policy.py digest ARQ imprime) ou @ARQ, um
+arquivo commitado que o guarda. A política lida tem de ter esse digest, ou o gate para com rc 2 antes de julgar
+qualquer grafo; fixe o mesmo valor no kg-mcp (o --area-policy-digest dele), e as duas pontas leem a mesma política.
 """
 import argparse
 import collections
@@ -107,6 +148,7 @@ import hashlib
 import json
 import os
 import pathlib
+import posixpath
 import re
 import subprocess
 import sys
@@ -389,15 +431,22 @@ def private_repo_check(items, patterns):
 
 
 # --classification-floor (contrato v4.23): o grafo medido no nível dado ou acima, pela ordem de levels da política
-def read_floor(level, policy_path):
-    """O teto (kg_policy.Ceiling) do --classification-floor: a ordem dos níveis vem de levels, no arquivo de política do
+def read_floor(level, policy_path, pin=None):
+    """O teto (kg_policy.Ceiling) do --classification-floor (level None: só a ordem, para o --classification-cites
+    sem piso): a ordem dos níveis vem de levels, no arquivo de política do
     kg-mcp (--area-policy), lido pelo mesmo leitor estrito (kg_policy.py, o que o kg_mcp.py usa). Política ausente,
     ilegível, fora do formato ou sem levels, e nível que levels não tem, são entrada quebrada (Broken, rc 2): a falha
-    fecha."""
+    fecha. Com pin (--area-policy-digest: sha256:<hex> ou @ARQ), o digest da política lida tem de ser o fixado: o
+    valor malformado e o digest que não bate também são entrada quebrada, antes de julgar qualquer grafo."""
     if __package__:
         from . import kg_policy
     else:
         import kg_policy  # noqa: E402
+    if pin is not None:
+        try:
+            pin = kg_policy.read_pin(pin)
+        except ValueError as exc:
+            raise Broken(_("--area-policy-digest: {error}").format(error=exc)) from None
     try:
         with open(policy_path, encoding="utf-8") as fh:
             text = fh.read()
@@ -408,9 +457,17 @@ def read_floor(level, policy_path):
         policy = kg_policy.parse(text)
     except (ValueError, RecursionError) as exc:  # JSONDecodeError é ValueError; aninhamento fundo, RecursionError
         raise Broken(_("--area-policy {path} is not a valid policy: {error}").format(path=policy_path, error=exc))
+    # nem o digest lido nem o fixado vão para a saída: no log de um CI público, com o pin numa variável, o lido seria
+    # um oráculo (quem tenta uma política vê o digest dela) e o fixado vazaria o valor; quem tem a política o calcula
+    if pin is not None and kg_policy.digest(policy) != pin:
+        raise Broken(_("--area-policy {path} does not have the digest that --area-policy-digest pins: the gate and the "
+                       "server would not read the same policy (kg_policy.py digest FILE prints the digest of a policy, "
+                       "to compare locally)").format(path=policy_path))
     if not policy.levels:
         raise Broken(_("--area-policy {path} has no levels: the order of the levels comes from the policy, and without "
                        "it the floor cannot be judged").format(path=policy_path))
+    if level is None:  # só o --classification-cites: a ordem dos níveis, sem piso (o teto é o nível mais alto)
+        return kg_policy.Ceiling(policy.levels, policy.levels[-1], policy.default)
     if level not in policy.levels:
         raise Broken(_("--classification-floor {level} is not one of the levels of {path} ({levels})").format(
             level=level, path=policy_path, levels=", ".join(policy.levels)))
@@ -440,28 +497,286 @@ def _blob(repo, rev, name):
     return out.stdout if out.returncode == 0 else None
 
 
-def floor_graphs(repo, exclude, base=None):
-    """[(caminho, texto ou None)]: os grafos que o --classification-floor mede, sem os excludes padrão da catraca e sem
-    pular o vendor: as fixtures, docs/materials e o vendor também guardam dado, e o piso existe para barrar o grafo
-    sensível em qualquer lugar do repositório. Só o --exclude explícito tira um caminho. Sem base (a catraca), é todo
-    .kg.yaml e .kg.json rastreado, lido do disco, que no CI é o checkout. Com base (o sha do ancestral, no --touched), é
-    o índice do git, lido pelo blob e nunca pelo disco, porque é o índice que o commit leva (o pre-commit): fica só o
-    grafo cujos bytes no índice diferem dos da base, e o caminho novo conta como alterado; o que foi apagado do disco
+def level_graphs(repo, base=None):
+    """[(caminho, texto ou None, alterado)]: todo .kg.yaml e .kg.json rastreado, sem exclude nenhum. Sem base (a
+    catraca), lido do disco, que no CI é o checkout, e todo grafo conta como alterado. Com base (o sha do ancestral, no
+    --touched), lido do índice do git, pelo blob e nunca pelo disco, porque é o índice que o commit leva (o pre-commit):
+    alterado é o grafo cujos bytes no índice diferem dos da base, e o caminho novo conta; o que foi apagado do disco
     depois do git add ainda conta. Os bytes são comparados antes de decodificar: o grafo que não é UTF-8 e não mudou não
-    entra. O que não é UTF-8 vem com texto None (nível desconhecido)."""
+    é alterado. O que não é UTF-8 vem com texto None (nível desconhecido)."""
     out = []
     names = tracked_graphs(repo) if base is None else _index_graphs(repo)
     for name in names:
-        if any(fnmatch.fnmatchcase(name, g) for g in exclude):
-            continue
         if base is None:
-            out.append((name, _decoded((pathlib.Path(repo) / name).read_bytes())))
+            out.append((name, _decoded((pathlib.Path(repo) / name).read_bytes()), True))
             continue
         data = _blob(repo, "", name)
-        if data is None or data == _blob(repo, base, name):
+        if data is None:
             continue
-        out.append((name, _decoded(data)))
+        out.append((name, _decoded(data), data != _blob(repo, base, name)))
     return out
+
+
+def floor_graphs(repo, exclude, base=None, graphs=None):
+    """[(caminho, texto ou None)]: os grafos que o --classification-floor mede, sem os excludes padrão da catraca e sem
+    pular o vendor: as fixtures, docs/materials e o vendor também guardam dado, e o piso existe para barrar o grafo
+    sensível em qualquer lugar do repositório. Só o --exclude explícito tira um caminho. Sem base, todo grafo de
+    level_graphs; com base (o --touched), só o alterado. graphs: o level_graphs já lido, para não ler duas vezes."""
+    graphs = level_graphs(repo, base) if graphs is None else graphs
+    return [(name, text) for name, text, changed in graphs
+            if changed and not any(fnmatch.fnmatchcase(name, g) for g in exclude)]
+
+
+# --classification-cites: o grafo de nível menor não cita id de um grafo de nível maior (a lacuna 3, decidida em
+# 2026-11-16: o nó sensível vai para um grafo próprio de nível maior, e o grafo menor não pode apontar para ele)
+CITE_FIELDS = ("external_edges", "trace", "provenance.source", "provenance.locator", "x_measured_under.criteria")
+# o valor que menciona um grafo, em qualquer caixa: só ele vai ao resolvedor, e nunca some em silêncio
+GRAPH_MENTION = re.compile(r"\.kg\.(?:yaml|yml|json)", re.IGNORECASE)
+# a varredura do valor (named_in): o caminho de um grafo do índice dentro do texto, com fronteira de caminho. Antes dele,
+# nada que continue um caminho (letra ou dígito ASCII, _, - ou /; o ./ do começo é aceito); depois, nada que continue um
+# nome (letra ou dígito ASCII, / ou -): o ponto final, !, ?, aspas de qualquer tipo, ), ], *, _, |, } e o espaço de
+# largura zero são fronteira
+PATH_BEFORE = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-/")
+PATH_AFTER = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/-")
+KG_NODE_IN_TEXT = re.compile(r"kg-node:/{2,}", re.IGNORECASE)
+# a pontuação de fronteira tirada das pontas do valor inteiro (a exceção da falha fechada: o caminho com ponto final)
+EDGE_PUNCT = "\"'`“”‘’«»„‚‹›.,;:!?)]}*_|\u200b \t"
+WINDOWS_DRIVE = re.compile(r"[A-Za-z]:/")
+
+
+def _kg_trace():
+    if __package__:
+        from . import kg_trace
+    else:
+        import kg_trace  # noqa: E402
+    return kg_trace
+
+
+class CiteResolver:
+    """A resolução de uma citação a outro grafo pelo resolvedor do kg_trace (uma fonte só): locate para o trace e
+    locate_source para os outros campos, com a limpeza que ele faz (aspas, <>, kg-node://, a âncora, a linha e a
+    query) e as três raízes (a do repositório, a pasta do grafo e a pasta pai dela). Num repositório git, quem decide é
+    o índice."""
+
+    def __init__(self, repo, graphs):
+        self.kg_trace = _kg_trace()
+        self.root = pathlib.Path(repo)
+        self.graphs = set(graphs)
+        self.tracked = self.kg_trace.tracked_index(repo)
+        self.root_files = self.kg_trace.tracked_root_files(repo)
+        # o mapa NFC dos grafos, uma vez por conjunto: o caminho como o índice o guarda, pela forma NFC dele
+        self.nfc = {unicodedata.normalize("NFC", g): g for g in self.graphs}
+        self._needles = {}  # pasta do grafo que cita → [(caminho em caixa dobrada, grafo)], uma vez por pasta
+
+    def needles(self, gdir):
+        """Os caminhos que a varredura procura para um grafo na pasta gdir: o de cada grafo do índice a partir da raiz
+        e, como no candidate_paths, a partir da pasta do grafo e da pasta pai dela; em NFC e em caixa dobrada."""
+        if gdir not in self._needles:
+            bases = [b for b in (gdir, posixpath.dirname(gdir)) if b and b != "."][:2] if gdir != "." else []
+            out = []
+            for path, graph in self.nfc.items():
+                out.append((path.casefold(), graph))
+                for base in bases:
+                    if path.startswith(base + "/"):
+                        out.append((path[len(base) + 1:].casefold(), graph))
+            self._needles[gdir] = out
+        return self._needles[gdir]
+
+    def named_in(self, value, gdir="."):
+        """Os grafos do índice cujo caminho aparece no valor, a mesma regra da varredura de segredos (procurar valores
+        conhecidos no texto): o valor em NFC, com o prefixo kg-node:// tirado (ele não é um caminho), e cada caminho
+        rastreado procurado como substring, com fronteira de caminho antes e depois (PATH_BEFORE, PATH_AFTER). Pega a
+        prosa, o caminho com ponto final, entre aspas tipográficas ou em markdown, o rev:caminho do git, o caminho
+        depois de uma URL ou de um caminho absoluto, e o que se esconde depois de um caminho que resolve. Sem distinção
+        de caixa, com a barra invertida lida como barra, e com o caminho relativo à pasta do grafo e à pasta pai dela
+        (needles)."""
+        text = KG_NODE_IN_TEXT.sub(" ", unicodedata.normalize("NFC", value).replace("\\", "/")).casefold()
+        out = set()
+        for needle, graph in self.needles(gdir):
+            if graph in out:
+                continue
+            start = text.find(needle)
+            while start != -1:
+                end, before = start + len(needle), start
+                while before >= 2 and text[before - 2:before] == "./":  # o ./ do começo do caminho
+                    before -= 2
+                if (before == 0 or text[before - 1] not in PATH_BEFORE) and (end == len(text) or text[end] not in PATH_AFTER):
+                    out.add(graph)
+                    break
+                start = text.find(needle, start + 1)
+        return sorted(out)
+
+    def resolve(self, graph, field, value):
+        """None quando o valor não cita grafo; senão (classe, candidatos, nomeados). nomeados: os grafos do índice que
+        a varredura do valor acha nele (named_in), sempre, além da resolução, cada um julgado pelo nível. counted: o
+        caminho absoluto, toda URL e o marcador private-cite (outro repositório), contados e não julgados. prose: o texto
+        que o resolvedor não lê como caminho (not_path), contado quando a varredura não acha grafo nele. graphs: os
+        grafos rastreados
+        que o alvo pode nomear (o homônimo inteiro, a partir das três raízes, para o maior nível decidir), inclusive o
+        caminho exato de um grafo do índice com acento, espaço, + ou @ (exact_graph). failed: o caminho relativo que
+        não resolve para um grafo rastreado (o que não existe, o que sai da raiz, o que está num submódulo; fora do
+        trace, que o locate resolve pelo disco, também todo segmento . ou .. e a barra repetida): a falha fecha, negar
+        por padrão."""
+        kg_trace = self.kg_trace
+        if not isinstance(value, str):
+            return None
+        if kg_trace.is_private_cite(value.strip()) or kg_trace.is_private_cite_trace(value.strip()):
+            return "counted", [], []  # a citação declarada a outro repositório (v4.22): contada, nunca lida
+        if not GRAPH_MENTION.search(value):
+            return None  # sem .kg.yaml, .kg.yml nem .kg.json, nenhum caminho de grafo cabe no valor
+        gdir = pathlib.PurePosixPath(graph).parent.as_posix()
+        named = self.named_in(value, gdir)
+        value = value.replace("\\", "/")  # a barra invertida do Windows é barra
+        if WINDOWS_DRIVE.match(value.strip().strip(EDGE_PUNCT)):
+            return "counted", [], named  # C:\\...: um caminho absoluto de outra máquina
+        if field == "trace":
+            kind, target, found = kg_trace.locate(value, gdir, self.root, self.root_files, graphs=self.graphs)
+        else:
+            kind, target, found = kg_trace.locate_source(value, gdir, self.root, self.tracked, graphs=self.graphs)
+        if kind == "absolute":
+            return "counted", [], named
+        if kind == "not_path":
+            return "prose", [], named
+        if kind != "resolved":
+            # a falha fecha sempre, salvo quando o valor inteiro, sem a pontuação de fronteira das pontas, é exatamente
+            # um grafo do índice (o caminho com ponto final)
+            exact = kg_trace.exact_graph(unicodedata.normalize("NFC", value).strip(EDGE_PUNCT), gdir, self.nfc)
+            return ("graphs", [self.nfc[exact]], named) if exact is not None else ("failed", [], named)
+        cands = [c for c in kg_trace.candidate_paths(target, gdir) if c in self.graphs]
+        if found and found[0] in self.graphs and found[0] not in cands:
+            cands.append(found[0])  # o link do índice seguido até um grafo
+        if not cands and not named:
+            return None  # resolveu para um arquivo que não é grafo: não cita grafo
+        return "graphs", cands, named
+
+
+def _texts_of(value):
+    """Os textos de um valor: ele mesmo, ou os de cada item de lista e de cada valor de mapa, em qualquer profundidade."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [s for v in value for s in _texts_of(v)]
+    if isinstance(value, dict):
+        return [s for v in value.values() for s in _texts_of(v)]
+    return []
+
+
+def structured_cites(name, doc):
+    """[(campo, valor)]: os textos dos campos estruturados de um documento parseado que podem citar outro grafo: as
+    duas pontas de cada external_edges, o trace, o provenance.source e o provenance.locator de cada nó (texto, lista ou
+    mapa, em qualquer profundidade) e o criterion de cada x_measured_under.criteria. Quem decide se o valor cita um
+    grafo, e qual, é o CiteResolver. O texto livre (label, narrative, verified_against, campos x_ fora do criterion) não
+    é lido: é a lacuna nomeada no guia."""
+    out = []
+    if not isinstance(doc, dict):
+        return out
+    edges = doc.get("external_edges")
+    for e in edges if isinstance(edges, list) else []:
+        if isinstance(e, dict):
+            for end in ("from", "to"):
+                out += [("external_edges", s) for s in _texts_of(e.get(end))]
+    nodes = doc.get("nodes")
+    for n in nodes if isinstance(nodes, list) else []:
+        if not isinstance(n, dict):
+            continue
+        prov = n.get("provenance") if isinstance(n.get("provenance"), dict) else {}
+        for field, value in (("trace", n.get("trace")), ("provenance.source", prov.get("source")),
+                             ("provenance.locator", prov.get("locator"))):
+            out += [(field, s) for s in _texts_of(value)]
+        under = n.get("x_measured_under")
+        criteria = under.get("criteria") if isinstance(under, dict) else None
+        for item in criteria if isinstance(criteria, list) else []:
+            if isinstance(item, dict):
+                out += [("x_measured_under.criteria", s) for s in _texts_of(item.get("criterion"))]
+    return out
+
+
+def cite_check(graphs, floor, exclude, repo="."):
+    """(linhas, achou): cada grafo (level_graphs) cujas citações estruturadas (structured_cites, resolvidas pelo
+    CiteResolver, o resolvedor do kg_trace) nomeiam um grafo de nível MAIOR que o dele, pela ordem de levels, reprova;
+    o sentido do maior para o menor e o mesmo nível passam. A citação que pode nomear mais de um grafo (o homônimo nas
+    três raízes) é julgada pelo maior nível entre eles, e o nível desconhecido de qualquer um reprova. A falha fecha
+    (negar por padrão): o valor relativo que menciona um grafo e não resolve para um grafo rastreado reprova, e o grafo
+    que cita e não é UTF-8 ou não parseia também (as citações dele não se sabem). Só o caminho absoluto, a URL de outro
+    host e o marcador private-cite (outro repositório) são contados e não julgados. O grafo que cita é o que o --exclude
+    não tira; o citado é qualquer grafo rastreado. Com o --touched, só o par em que uma das pontas mudou; o grafo parado
+    que não se lê não é julgado de novo. A saída nomeia os arquivos e os níveis, e nunca o id citado nem conteúdo nenhum:
+    o log do CI pode ser público."""
+    texts = {name: text for name, text, _changed in graphs}
+    changed = {name for name, _text, ch in graphs if ch}
+    resolver = CiteResolver(repo, texts)
+    levels, out, pairs, failed, checked, counted, prose, selfs, broken = {}, [], {}, {}, 0, 0, 0, 0, 0
+
+    def level(name):
+        if name not in levels:
+            text = texts.get(name)
+            levels[name] = None if text is None else floor.level_of(name, text)
+        return levels[name]
+
+    def worst(cands):
+        """O candidato que decide: o de nível desconhecido, se houver; senão, o de maior nível."""
+        unknown = [c for c in cands if level(c) is None]
+        return unknown[0] if unknown else max(cands, key=lambda c: (floor.rank[level(c)], c))
+
+    for name, text, _ch in graphs:
+        if any(fnmatch.fnmatchcase(name, g) for g in exclude):
+            continue
+        doc = None
+        if text is not None:
+            _tree, doc, err = kg_validate.parse_v1(text if isinstance(text, kg_validate.JsonText)
+                                                   else kg_validate.as_source(name, text))
+            doc = doc if not err and isinstance(doc, dict) else None
+        if doc is None:
+            if name in changed:
+                broken += 1
+                out.append(_("✗ classification cites: {graph} cannot be read (it is not UTF-8 or it does not parse), "
+                             "so its citations are unknown").format(graph=name))
+            continue
+        checked += 1
+        for field, value in structured_cites(name, doc):
+            got = resolver.resolve(name, field, value)
+            if got is None:
+                continue
+            kind, cands, named = got
+            if kind == "counted":
+                counted += 1
+            elif kind == "prose" and not named:
+                prose += 1
+            elif kind == "failed" and name in changed:  # a falha fecha, mesmo quando a varredura acha um grafo
+                failed.setdefault(name, collections.Counter())[field] += 1
+            if kind in ("graphs", "prose") and {*(cands if kind == "graphs" else []), *named} == {name}:
+                selfs += 1  # o valor que nomeia só o próprio grafo: contado
+            # cada citação: a resolução (o homônimo, julgado pelo maior nível) e cada grafo que a varredura achou
+            resolved = set(cands) if kind == "graphs" else set()
+            # o grafo que a resolução já achou não conta de novo: um valor, uma citação por grafo
+            for group in ([cands] if kind == "graphs" else []) + [[g] for g in named if g not in resolved]:
+                others = [c for c in group if c != name]
+                if not others or (name not in changed and not any(c in changed for c in others)):
+                    continue
+                pairs.setdefault((name, worst(others)), collections.Counter())[field] += 1
+    hits = broken + len(failed)
+    for name, fields in sorted(failed.items()):
+        out.append(_("✗ classification cites: {graph} names a graph that does not resolve to a tracked one in {count} "
+                     "place(s) ({fields}); a relative citation of a graph has to resolve (it fails closed)").format(
+                         graph=name, count=sum(fields.values()), fields=", ".join(f for f in CITE_FIELDS if f in fields)))
+    for (name, target), fields in sorted(pairs.items()):
+        low, high = level(name), level(target)
+        where = ", ".join(f for f in CITE_FIELDS if f in fields)
+        if low is None or high is None:
+            hits += 1
+            out.append(_("✗ classification cites: {graph} cites {target} in {count} place(s) ({fields}), and the level "
+                         "of {unknown} is unknown").format(graph=name, target=target, count=sum(fields.values()),
+                                                           fields=where, unknown=name if low is None else target))
+        elif floor.rank[high] > floor.rank[low]:
+            hits += 1
+            out.append(_("✗ classification cites: {graph} ({low}) cites {target} ({high}), a higher level, in {count} "
+                         "place(s) ({fields})").format(graph=name, low=low, target=target, high=high,
+                                                       count=sum(fields.values()), fields=where))
+    out.append(_("· --classification-cites: {checked} graph(s) checked, {pairs} pair(s) of graphs cited, {hits} "
+                 "failing; not judged: {counted} citation(s) to an absolute path, a URL or a private-cite, {prose} in "
+                 "prose and {selfs} to the citing graph itself").format(checked=checked, pairs=len(pairs), hits=hits,
+                                                                        counted=counted, prose=prose, selfs=selfs))
+    return out, hits > 0
 
 
 def classification_check(items, floor, level):
@@ -482,6 +797,269 @@ def classification_check(items, floor, level):
                 graph=name, got=got, level=level))
     out.append(_("· --classification-floor {level}: {checked} graph(s) checked, {hits} at or above the floor or with "
                  "an unknown level").format(level=level, checked=checked, hits=hits))
+    return out, hits > 0
+
+
+# --classification-downgrade (contrato v4.24): a queda do nível frente à base exige o registro em meta.x_downgrade, com o
+# aprovador diferente de quem mudou o nível (a lacuna "The level is declared, not checked", decidida em 2026-11-16)
+GRAPH_SUFFIXES = (".kg.yaml", ".kg.json")
+DOWNGRADE_KEYS = ("from", "to", "reason", "approved_by", "ref", "date")
+_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+_IDENT = re.compile(r"^(.*) <([^<>]*)> \d+ [+-]\d{4}$")
+
+
+def _meta_of(name, text):
+    """O meta (dict) do grafo, ou None quando o texto falta, não parseia ou o meta não é mapa."""
+    if text is None:
+        return None
+    _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(name, text))
+    meta = doc.get("meta") if isinstance(doc, dict) and not code else None
+    return meta if isinstance(meta, dict) else None
+
+
+def _gid_of(name, text):
+    meta = _meta_of(name, text)
+    gid = meta.get("id") if meta else None
+    return gid if isinstance(gid, str) and gid else None
+
+
+def _filled(value):
+    """Texto com algo além de espaço (o Unicode inclusive, a mesma classe do SHOULD)."""
+    return isinstance(value, str) and not kg_validate.BLANK.fullmatch(value)
+
+
+def _is_date(value):
+    if not (isinstance(value, str) and _DATE.fullmatch(value)):
+        return False
+    try:
+        datetime.date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
+def _trail(meta):
+    trail = meta.get("x_downgrade") if isinstance(meta, dict) else None
+    return trail if isinstance(trail, list) else []
+
+
+def _canon_json(value):
+    return json.dumps(value, sort_keys=True, ensure_ascii=False, default=str)
+
+
+def _record_state(meta, base_metas, old, new):
+    """"ok", "missing" (sem trilha), "mismatch" (o último registro não é esta queda ou está fora da forma), "pruned" (a
+    trilha da base não é prefixo da de agora: um registro de antes foi apagado ou mudado) ou "reused" (o último
+    registro não foi acrescentado depois da trilha da base, ou já estava na trilha de um candidato da base).
+
+    base_metas: os metas dos candidatos da base no nível da base; a trilha que tem de ficar é a mais longa entre eles.
+    O registro novo é comparado inteiro com cada registro da base, e a trilha da base, registro a registro: trocar só a
+    date de um registro velho não o faz novo, porque a trilha da base deixa de ser prefixo."""
+    trail = _trail(meta)
+    if not trail:
+        return "missing", None
+    last = trail[-1]
+    if (not isinstance(last, dict) or last.get("from") != old or last.get("to") != new
+            or not all(_filled(last.get(k)) for k in ("reason", "approved_by", "ref")) or not _is_date(last.get("date"))):
+        return "mismatch", None
+    kept = max((_trail(m) for m in base_metas), key=len, default=[])
+    if [_canon_json(r) for r in trail[:len(kept)]] != [_canon_json(r) for r in kept]:
+        return "pruned", None
+    seen = {_canon_json(r) for m in base_metas for r in _trail(m)}
+    if len(trail) <= len(kept) or _canon_json(last) in seen:
+        return "reused", None
+    return "ok", last
+
+
+def _identities(value):
+    """As formas comparáveis de um approved_by: o texto inteiro e, de "Nome <e-mail>", o e-mail; sem caixa."""
+    value = value.strip().casefold()
+    out = {value}
+    m = re.search(r"<([^<>]+)>", value)
+    if m:
+        out.add(m.group(1).strip())
+    return out - {""}
+
+
+def _now_author(repo):
+    """{nome, e-mail} de quem vai commitar, como autor e como committer (git var GIT_AUTHOR_IDENT e
+    GIT_COMMITTER_IDENT, com as variáveis do ambiente), ou vazio."""
+    who = set()
+    for var in ("GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"):
+        out = _git_out(repo, "var", var)
+        m = _IDENT.match(out.stdout.decode("utf-8", "replace").strip()) if out.returncode == 0 else None
+        if m:
+            who |= {m.group(1).strip().casefold(), m.group(2).strip().casefold()} - {""}
+    return who
+
+
+class Downgrade:
+    """A leitura da base para o --classification-downgrade: os grafos da árvore do ancestral, por caminho, por meta.id e
+    pelo rename que o git detecta, com a quebra de reescrita (-B -M)."""
+
+    def __init__(self, repo, sha, floor, from_index):
+        self.repo, self.sha, self.floor, self.from_index = repo, sha, floor, from_index
+        out = _git_out(repo, "ls-tree", "-r", "-z", "--name-only", sha)
+        if out.returncode != 0:
+            raise Broken(_("{repo} is not a git repository: {err}").format(
+                repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
+        self.base = {n: None for n in out.stdout.decode("utf-8").split("\0") if n.endswith(GRAPH_SUFFIXES)}
+        self._ids = self._renames = None
+
+    def data(self, name):
+        if self.base.get(name) is None:
+            self.base[name] = _blob(self.repo, self.sha, name) or b""
+        return self.base[name]
+
+    def text(self, name):
+        return _decoded(self.data(name))
+
+    def by_id(self, gid):
+        if self._ids is None:
+            self._ids = collections.defaultdict(list)
+            for name in self.base:
+                found = _gid_of(name, self.text(name))
+                if found:
+                    self._ids[found].append(name)
+        return self._ids.get(gid, [])
+
+    def renamed_from(self, name):
+        if self._renames is None:
+            # -B quebra a reescrita: o caminho que já existia e recebeu outro conteúdo também pareia pelo rename
+            args = ["diff", "-B", "-M", "--name-status", "-z", "--relative"] + (["--cached"] if self.from_index else [])
+            out = _git_out(self.repo, *args, self.sha, "--")
+            if out.returncode != 0:
+                raise Broken(_("{repo} is not a git repository: {err}").format(
+                    repo=self.repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
+            parts, self._renames, i = out.stdout.decode("utf-8").split("\0"), {}, 0
+            while i < len(parts) and parts[i]:
+                status = parts[i]
+                if status[:1] in ("R", "C"):
+                    self._renames[parts[i + 2]] = parts[i + 1]
+                    i += 3
+                else:
+                    i += 2
+        old = self._renames.get(name)
+        return [old] if old in self.base and old != name else []
+
+    def candidates(self, name, text):
+        """Os grafos da base que podem ser este: o mesmo caminho, o mesmo meta.id e a origem do rename que o git dá
+        (também para o caminho que já existia, pela quebra de reescrita). A falha fecha: o nível da base é o maior
+        entre eles. Apagar e recriar com outro caminho, outro meta.id e o conteúdo diluído abaixo da semelhança do git
+        não pareia: é lacuna declarada, para o detector de conteúdo."""
+        out = [name] if name in self.base else []
+        gid = _gid_of(name, text)
+        for other in self.renamed_from(name) + (self.by_id(gid) if gid else []):
+            if other not in out:
+                out.append(other)
+        return out
+
+    def rank(self, name, text):
+        """O posto do nível (o desconhecido é None), pela ordem de levels."""
+        level = None if text is None else self.floor.level_of(name, text)
+        return None if level is None else self.floor.rank[level]
+
+    def changers(self, name, paths, base_rank, now_rank):
+        """{nome, e-mail} de quem fez as mudanças de nível no intervalo: o autor e o committer de cada commit de
+        base..HEAD que tocou um dos caminhos e deixou o nível diferente do anterior, e quem vai commitar, quando o lado
+        de agora difere de HEAD."""
+        out = _git_out(self.repo, "log", "--reverse", "--topo-order", "-z",
+                       "--format=%H%x00%an%x00%ae%x00%cn%x00%ce", f"{self.sha}..HEAD", "--", *paths)
+        if out.returncode != 0:
+            raise Broken(_("{repo} is not a git repository: {err}").format(
+                repo=self.repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
+        fields = [f for f in out.stdout.decode("utf-8", "replace").split("\0")]
+        who, prev, commits = set(), base_rank, 0
+
+        def rank_at(rev):
+            for path in paths:
+                data = _blob(self.repo, rev, path)
+                if data is not None:
+                    return True, self.rank(path, _decoded(data))
+            return False, None
+
+        for i in range(0, len(fields) - 4, 5):
+            sha, people = fields[i].strip(), fields[i + 1:i + 5]
+            present, rank = rank_at(sha)
+            if present and rank != prev:
+                who |= {p.strip().casefold() for p in people} - {""}
+                commits += 1
+                prev = rank
+        present, head = rank_at("HEAD")
+        if (head if present else base_rank) != now_rank:
+            who |= _now_author(self.repo)
+            commits += 1
+        return who, commits
+
+
+def downgrade_check(repo, sha, floor, exclude, from_index):
+    """(linhas, achou): cada grafo rastreado de agora (o índice no --touched, a árvore na catraca), fora do --exclude
+    explícito, cujo nível caiu frente à base sem o registro da queda em meta.x_downgrade, ou com o approved_by de um
+    autor da mudança de nível. A saída nomeia o arquivo e os níveis, nunca o conteúdo."""
+    names = _index_graphs(repo) if from_index else tracked_graphs(repo)
+    base = Downgrade(repo, sha, floor, from_index)
+    levels = sorted(floor.rank, key=floor.rank.get)
+    out, checked, drops, hits = [], 0, 0, 0
+    for name in names:
+        if any(fnmatch.fnmatchcase(name, g) for g in exclude):
+            continue
+        data = _blob(repo, "", name) if from_index else (pathlib.Path(repo) / name).read_bytes()
+        if data is None or (name in base.base and base.data(name) == data):
+            continue
+        text = _decoded(data)
+        cands = base.candidates(name, text)
+        if not cands:
+            continue  # o grafo novo: não há queda (o piso o julga)
+        checked += 1
+        now_rank = base.rank(name, text)
+        if now_rank is None:
+            hits += 1
+            out.append(_("✗ classification downgrade: {graph} has an unknown level now (it is not UTF-8, it does not "
+                         "parse, its meta is not a map, or its x_classification is not one of the levels)").format(
+                             graph=name))
+            continue
+        ranks = [base.rank(c, base.text(c)) for c in cands]
+        # o nível desconhecido na base conta como o mais alto de levels: a falha fecha, e o registro a partir dele cura
+        base_rank = max(len(levels) - 1 if r is None else r for r in ranks)
+        if now_rank >= base_rank:
+            continue
+        drops += 1
+        old, new = levels[base_rank], levels[now_rank]
+        at_base = [c for c, r in zip(cands, ranks) if (len(levels) - 1 if r is None else r) == base_rank]
+        state, record = _record_state(_meta_of(name, text), [_meta_of(c, base.text(c)) for c in at_base], old, new)
+        if state == "missing":
+            hits += 1
+            out.append(_("✗ classification downgrade: {graph} went from {old} to {new} without a downgrade record (the "
+                         "last entry of meta.x_downgrade, from {old} to {new}, with reason, approved_by, ref and "
+                         "date)").format(graph=name, old=old, new=new))
+            continue
+        if state == "mismatch":
+            hits += 1
+            out.append(_("✗ classification downgrade: {graph} went from {old} to {new}, and the last entry of "
+                         "meta.x_downgrade does not record this drop (from {old} to {new}, with reason, approved_by "
+                         "and ref not empty and date YYYY-MM-DD)").format(graph=name, old=old, new=new))
+            continue
+        if state == "pruned":
+            hits += 1
+            out.append(_("✗ classification downgrade: {graph} went from {old} to {new}, and meta.x_downgrade does not "
+                         "keep the trail of the base: the entries already there stay as they were, and the new one is "
+                         "appended after them").format(graph=name, old=old, new=new))
+            continue
+        if state == "reused":
+            hits += 1
+            out.append(_("✗ classification downgrade: {graph} went from {old} to {new}, and the last entry of "
+                         "meta.x_downgrade was already in the base: a new drop takes a new entry").format(
+                             graph=name, old=old, new=new))
+            continue
+        paths = [name] + [c for c in cands if c != name]
+        who, commits = base.changers(name, paths, base_rank, now_rank)
+        if _identities(record["approved_by"]) & who:
+            hits += 1
+            out.append(_("✗ classification downgrade: {graph} went from {old} to {new}, and approved_by names an author "
+                         "or committer of a change of the level since {base} ({count} change(s)): the approver is "
+                         "another person").format(graph=name, old=old, new=new, base=sha[:12], count=commits))
+    out.append(_("· --classification-downgrade: {checked} changed graph(s) compared with {base}, {drops} downgrade(s), "
+                 "{hits} failed").format(checked=checked, base=sha[:12], drops=drops, hits=hits))
     return out, hits > 0
 
 
@@ -1055,10 +1633,12 @@ fails (rc 1) unless --allow-unreleased is given, and it never writes the baselin
 Usage:
   kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
              [--strict-identity] [--allow-unreleased] [--sources] [--private-repos FILE]
-             [--classification-floor LEVEL --area-policy FILE]
+             [--classification-floor LEVEL] [--classification-cites] [--classification-downgrade --base REF]
+             [--area-policy FILE [--area-policy-digest D]]
              [--update [--accept-regression REASON] [--granularity graph|node]]
        kg_gate.py --touched BASE [--repo DIR] [--exclude GLOB ...] [--no-default-excludes] [--allow-unreleased] [--sources]
-                  [--private-repos FILE] [--classification-floor LEVEL --area-policy FILE]
+                  [--private-repos FILE] [--classification-floor LEVEL] [--classification-cites] [--classification-downgrade]
+                  [--area-policy FILE [--area-policy-digest D]]
 
 --touched BASE is another mode, with no ratchet baseline: it fails (rc 1) only when a node touched since the common
 ancestor of BASE and HEAD carries integrity.bare-decision or integrity.superseded-without-successor. Touched means a new
@@ -1104,6 +1684,46 @@ levels does not have, one option without the other, and an empty value are broke
 gate blocks the merge, not the entry of the data: the commit with the graph already exists on the branch; to block it
 before the commit, run the same gate with --touched in a pre-commit hook (manual, chapter 5). It does not go with
 --update.
+
+--classification-cites --area-policy FILE, in both modes, with or without --classification-floor: fails (rc 1) when a
+graph cites, in a structured field, a tracked graph of a HIGHER level than its own, in the same order of levels (a graph
+without the key has the default_level). The fields read are both ends of external_edges, trace, provenance.source and
+provenance.locator (text, list or map, any scheme) and the criterion of x_measured_under. A value that mentions
+.kg.yaml, .kg.yml or .kg.json, in any case, is resolved by the resolver of kg_trace (the same rules as kg_trace check:
+locate for the trace, locate_source for the rest, from the root, the graph's folder and its parent), plus one rule: a
+value that is exactly the path of a graph in the git index resolves to it. A citation that resolves in more than one
+place is judged by the highest level among them. It fails closed, deny by default: a value with the form of a relative
+path that does not resolve to a tracked graph fails, and so do an unknown level and a citing graph that does not parse.
+Besides, every value read is scanned for the path of each graph of the index (from the root, the graph's folder and
+its parent, without case), with a path boundary, and each graph found is judged by its level (prose, a rev:path, a
+path after a URL). The scan never lifts the fail-closed rule, except when the whole value, without the boundary
+punctuation at its ends, is exactly a graph of the index (a path with a full stop). Prose that names no graph, a value
+that names only the citing graph, every URL, an absolute path and a private-cite marker are counted and not judged.
+Free text (label, narrative, verified_against, other x_ fields) is not read. The direction
+from higher to lower and the same level pass. The output names the files and levels, never the cited id. --exclude
+leaves out the citing graph, never the cited one. With --touched, only a pair with a changed end, read from the index; a
+change of the policy alone is not a change. It does not go with --update.
+
+--classification-downgrade --area-policy FILE (contract v4.24), in both modes, with or without the other two: fails (rc
+1) when the level of a graph dropped against the base without the record of the drop. The base is the common ancestor
+of --touched, compared with the git index; in the ratchet mode, --base REF gives it (the common ancestor of REF and
+HEAD), compared with the tree of the checkout, and without --base the option is broken input (rc 2). Each changed
+.kg.yaml and .kg.json that git tracks (without the default excludes, only --exclude) is paired with the base by path,
+by meta.id and by the rename git detects (with rewrites broken, -B -M, so a path that already existed counts too); the
+level at the base is the highest among the pairs, a level unknown at the base counts as the highest of levels, and a
+graph with no pair is new and not judged here. The level of each end is read as by the floor (a graph without the key
+has the default_level). On a drop, the last entry of meta.x_downgrade must have from and to equal to the two levels,
+reason, approved_by and ref not empty, and date YYYY-MM-DD, and it must be appended after the trail of the base, which
+stays as it was (the trail of the base is a prefix of the trail now); its approved_by must not name (by e-mail or by
+name, without case) the author or the committer of a commit since the base that changed the level, nor the identity
+about to commit, as author or committer, when the index or the tree differs from HEAD. An unknown level now fails. The
+output names the file and the levels, never the reason, the approver, or the reference. The gate does not authenticate
+the approver: the review of the pull request, with branch protection, is the real lock (manual, chapter 6). It does not
+go with --update.
+
+--area-policy-digest D, only with --area-policy: D is sha256:<hex> (what kg_policy.py digest FILE prints) or @FILE, a
+committed file that holds it. The policy read must have that digest, or the gate stops with rc 2 before it judges any
+graph; pin the same value in the kg-mcp (its --area-policy-digest), and both ends read the same policy.
 """
 
 
@@ -1115,8 +1735,8 @@ def run_touched(args):
         return 2
     exclude = (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude)
     try:
-        floor = (read_floor(args.classification_floor, args.area_policy) if args.classification_floor is not None
-                 else None)
+        floor = (read_floor(args.classification_floor, args.area_policy, args.area_policy_digest)
+                 if args.area_policy is not None else None)
         items = corpus(args.repo, exclude, skip_vendor=not args.no_default_excludes)
         sha, found, changed = touched_debt(args.repo, args.touched, items, exclude,
                                            skip_vendor=not args.no_default_excludes)
@@ -1125,8 +1745,14 @@ def run_touched(args):
                                    else ([], False))
         private, private_failed = (private_repo_check(items, read_private_repos(args.private_repos))
                                    if args.private_repos else ([], False))
-        classified, classified_failed = (classification_check(floor_graphs(args.repo, tuple(args.exclude), sha), floor,
-                                                              args.classification_floor) if floor else ([], False))
+        graphs = level_graphs(args.repo, sha) if floor else None
+        classified, classified_failed = (classification_check(floor_graphs(args.repo, tuple(args.exclude), sha, graphs),
+                                                              floor, args.classification_floor)
+                                         if args.classification_floor is not None else ([], False))
+        cited, cited_failed = (cite_check(graphs, floor, tuple(args.exclude), args.repo) if args.classification_cites
+                               else ([], False))
+        lowered, lowered_failed = (downgrade_check(args.repo, sha, floor, tuple(args.exclude), from_index=True)
+                                   if args.classification_downgrade else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -1140,9 +1766,10 @@ def run_touched(args):
     else:
         print(_("· --touched: no touched node carries the debt since {base} (changed graphs: {graphs})").format(
             base=sha[:12], graphs=changed))
-    for line in sources + private + classified:
+    for line in sources + private + classified + cited + lowered:
         print(line)
-    return 1 if found or tampered or sources_failed or private_failed or classified_failed else 0
+    return 1 if (found or tampered or sources_failed or private_failed or classified_failed or cited_failed
+                 or lowered_failed) else 0
 
 
 def main(argv=None):
@@ -1188,13 +1815,60 @@ def main(argv=None):
                            "meta.x_classification at LEVEL or above, in the order of levels in the kg-mcp policy given by "
                            "--area-policy; the default excludes do not apply, only --exclude; a graph without the key has "
                            "the policy's default_level; contract v4.23"))
+    ap.add_argument("--classification-cites", action="store_true",
+                    help=_("fails (rc 1) when a tracked graph cites, in a structured field (external_edges, trace, "
+                           "provenance.source, provenance.locator, the criterion of x_measured_under), resolved "
+                           "as kg_trace resolves it, a tracked graph of a higher level, in the order "
+                           "of levels in the policy given by --area-policy; with --touched, a pair with a changed end; "
+                           "the output names both files and levels, never the cited id; not with --update"))
+    ap.add_argument("--classification-downgrade", action="store_true",
+                    help=_("fails (rc 1) when the level of a tracked graph dropped against the base (paired by path, "
+                           "meta.id and the rename git detects) without the record of "
+                           "the drop appended to the trail of meta.x_downgrade, or with an approved_by that names an "
+                           "author or committer of the change of the level; "
+                           "the base is that of --touched, or --base REF in the ratchet mode; the order of the levels "
+                           "comes from --area-policy; contract v4.24; not with --update"))
+    ap.add_argument("--base", metavar="REF",
+                    help=_("only with --classification-downgrade, in the ratchet mode: the levels are compared with "
+                           "the common ancestor of REF and HEAD (with --touched, the base is that of --touched)"))
     ap.add_argument("--area-policy", metavar="FILE",
-                    help=_("the kg-mcp policy file whose levels order the --classification-floor; a missing, unreadable "
+                    help=_("the kg-mcp policy file whose levels order the --classification-floor and the "
+                           "--classification-cites; a missing, unreadable "
                            "or invalid policy, a policy without levels, or a level it does not have is broken input "
                            "(rc 2)"))
+    ap.add_argument("--area-policy-digest", metavar="sha256:HEX|@FILE",
+                    help=_("only with --area-policy: the digest that the policy must have (kg_policy.py digest FILE), as "
+                           "a value or as @FILE, a committed file that holds it; a policy with another digest, or a "
+                           "malformed value, is broken input (rc 2). Pin the same value in the kg-mcp"))
     args = ap.parse_args(argv)
     _utf8_stdio()
-    if (args.classification_floor is None) != (args.area_policy is None):
+    if args.area_policy_digest is not None and args.area_policy is None:
+        print(_("GATE BROKEN  --area-policy-digest only goes with --area-policy"))
+        return 2
+    if args.classification_cites and args.area_policy is None:
+        print(_("GATE BROKEN  --classification-cites needs --area-policy (the order of the levels comes from the "
+                "policy)"))
+        return 2
+    if args.classification_downgrade and args.area_policy is None:
+        print(_("GATE BROKEN  --classification-downgrade needs --area-policy (the order of the levels comes from the "
+                "policy)"))
+        return 2
+    if args.base is not None and not args.classification_downgrade:
+        print(_("GATE BROKEN  --base only goes with --classification-downgrade"))
+        return 2
+    if args.base is not None and args.touched is not None:
+        print(_("GATE BROKEN  --base does not go with --touched (the base is that of --touched)"))
+        return 2
+    if args.classification_downgrade and args.touched is None and args.base is None:
+        print(_("GATE BROKEN  --classification-downgrade needs a base: --touched BASE, or --base REF in the ratchet "
+                "mode"))
+        return 2
+    if args.classification_downgrade and args.update:
+        print(_("GATE BROKEN  --classification-downgrade does not go with --update (the check is not part of the "
+                "baseline)"))
+        return 2
+    if ((args.classification_floor is None) != (args.area_policy is None) and not args.classification_cites
+            and not args.classification_downgrade):
         print(_("GATE BROKEN  --classification-floor and --area-policy go together (the order of the levels comes from "
                 "the policy)"))
         return 2
@@ -1204,8 +1878,15 @@ def main(argv=None):
         print(_("GATE BROKEN  --classification-floor and --area-policy cannot be empty (an empty value would switch the "
                 "floor off in silence)"))
         return 2
+    if policy_arg is not None and not policy_arg.strip():
+        print(_("GATE BROKEN  --area-policy cannot be empty (an empty value would switch the check off in silence)"))
+        return 2
     if args.classification_floor is not None and args.update:
         print(_("GATE BROKEN  --classification-floor does not go with --update (the check is not part of the "
+                "baseline)"))
+        return 2
+    if args.classification_cites and args.update:
+        print(_("GATE BROKEN  --classification-cites does not go with --update (the check is not part of the "
                 "baseline)"))
         return 2
     if args.sources and args.update:
@@ -1248,10 +1929,17 @@ def main(argv=None):
         sources, sources_failed = source_check(args.repo, items) if args.sources else ([], False)
         private, private_failed = (private_repo_check(items, read_private_repos(args.private_repos))
                                    if args.private_repos else ([], False))
-        classified, classified_failed = (classification_check(floor_graphs(args.repo, tuple(args.exclude)),
-                                                              read_floor(args.classification_floor, args.area_policy),
-                                                              args.classification_floor)
+        floor = (read_floor(args.classification_floor, args.area_policy, args.area_policy_digest)
+                 if args.area_policy is not None else None)
+        graphs = level_graphs(args.repo) if floor else None
+        classified, classified_failed = (classification_check(floor_graphs(args.repo, tuple(args.exclude), None,
+                                                                           graphs), floor, args.classification_floor)
                                          if args.classification_floor is not None else ([], False))
+        cited, cited_failed = (cite_check(graphs, floor, tuple(args.exclude), args.repo) if args.classification_cites
+                               else ([], False))
+        lowered, lowered_failed = (downgrade_check(args.repo, _common_ancestor(args.repo, args.base), floor,
+                                                   tuple(args.exclude), from_index=False)
+                                   if args.classification_downgrade else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -1272,9 +1960,9 @@ def main(argv=None):
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
             print("\n".join(lines + [_("✗ --update refused: the vendor does not pass its stamp (see above)")]))
             return 1
-    print("\n".join(lines + detail(base, now) + sources + private + classified))
+    print("\n".join(lines + detail(base, now) + sources + private + classified + cited + lowered))
     if not args.update:
-        return 1 if sources_failed or private_failed or classified_failed else rc
+        return 1 if sources_failed or private_failed or classified_failed or cited_failed or lowered_failed else rc
     if worse and not args.accept_regression:
         print(_("✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\""
                 " (it stays in the baseline)"))
