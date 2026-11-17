@@ -99,8 +99,8 @@ Agente revisor separado, só leitura, com mandato de refutar. Veredito: **NO_FIN
   nos casos que os miram.
 - **Lido por ele:** a chave gravada é só o nome registrado ou `unknown`; o motivo de desligado expõe só o nome da
   classe da exceção; o temporário usa criação exclusiva; a resposta e o status das ferramentas são os da main.
-- **Não verificado por ele:** a família completa da bancada (35 mutantes de uma vez), por carga da máquina acima da
-  régua durante a revisão. Fica com o CI.
+- **Família completa, rodada por ele depois que a carga caiu:** `lint-selftest.sh --families mcp_onion_kg` com saída 0:
+  54 casos verdes contra o servidor real por HTTP e os 35 mutantes mordendo, incluindo os 13 do contador.
 - **Limite que ele aponta e que fica declarado:** um arquivo de contagem adulterado por quem já escreve no diretório
   do operador pode trazer um nome de ferramenta arbitrário (só minúsculas, dígitos e sublinhado) que a leitura
   imprime. Exige acesso de escrita ao diretório de modo 700; não é caminho de quem chama o servidor.
