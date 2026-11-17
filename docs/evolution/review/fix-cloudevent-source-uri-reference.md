@@ -2,7 +2,8 @@
 branch: fix/cloudevent-source-uri-reference
 pr: 1676
 date: 2026-11-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 13a720b767e3a9884b2895ebb496b7d3ef16e767d4d01aa4afc47135a5332f5f
+reviewed_code_sha256: aa9bd9275175e80cd995398bca006cce3f9917bdc22a9c81e285b0df8e9724fe
 findings_total: 3
 findings_real: 1
 findings_blocking: 0
