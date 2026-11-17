@@ -20012,7 +20012,7 @@ PY
   cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
 
   # (ce-src) o `source` do CloudEvent só vale como URI-reference (RFC 3986), por casamento INTEIRO: a mesma régua do
-  # parse_cloudevent da fila (onion-messaging, queue/onion_queue/daemon.py). As duas listas são as que a sessão dona
+  # parse_cloudevent da fila de mensagens da família (queue/onion_queue/daemon.py, no repo dela). As duas listas são as que a sessão dona
   # da fila relatou; os dois leitores têm de dar o mesmo veredito para cada item. Um item por caso, para a falha
   # nomear o valor. Recusado = os quatro ce_* saem null (o evento passa a ser identificado pelo jti)
   cat > "${d}/ce-src.py" <<'PY'

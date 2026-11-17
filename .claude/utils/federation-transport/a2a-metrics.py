@@ -7,7 +7,7 @@
 # que o core não tinha: a contagem diária da fila (verbo `count` do leitor da fila viva; no core, ops/a2a-queue-live.sh (core-only)), o log de SOMBRA do
 # aceite e o registro dos RASCUNHOS do aviso. Este arquivo guarda as duas últimas e a peça comum às três:
 #   ce             o parse do CloudEvent dentro do corpo do sinal (só id, source, type e time; nunca o corpo);
-#                  o source só vale como URI-reference (RFC 3986), a régua da fila do onion-messaging
+#                  o source só vale como URI-reference (RFC 3986), a mesma régua da fila de mensagens da família
 #   shadow-append  uma linha do log de sombra do aceite (nasce no a2a-accept.sh e no archive --force-unaccepted)
 #   shadow-stats   a concordância regra × humano e a taxa de reversão          (o "a2a-shadow-stats" do PLAN-E)
 #                  --mode shadow|auto é OBRIGATÓRIO (o modo em vigor; cada gatilho conta só as linhas do seu modo).
@@ -160,10 +160,12 @@ def clean_str(v, limit=256):
 
 # O `source` do CloudEvent 1.0 é URI-reference (RFC 3986 §4.1: URI / relative-ref). Só ASCII: o IRI (RFC 3987)
 # não é o que o CloudEvents pede, e um caractere fora da gramática (espaço, `{`, `%` sem dois hex) recusa.
-# ORIGEM: cópia literal do bloco `_U … URI_REFERENCE_RE` de queue/onion_queue/daemon.py do repo onion-messaging
-# (origin/main em 5667402; a conferência entrou lá no PR #15). Os DOIS leitores têm de julgar o `source` igual:
-# quem mudar a gramática aqui muda lá no mesmo movimento, e vice-versa. A bancada (run_a2a_accept_selftests, casos
-# ce-src) afirma a mesma lista de aceita e de recusa que a sessão dona da fila relatou.
+# ORIGEM: cópia literal do bloco `_U … URI_REFERENCE_RE` de queue/onion_queue/daemon.py, no repo da fila de mensagens
+# da família (origin/main dele em 5667402, PR #15 de lá; o nome do repo está no resíduo
+# docs/evolution/review/fix-cloudevent-source-uri-reference.md: este arquivo viaja, e a varredura de publicação
+# barra o nome aqui). Os DOIS leitores têm de julgar o `source` igual: quem mudar a gramática aqui muda lá no
+# mesmo movimento, e vice-versa. A bancada (run_a2a_accept_selftests, casos ce-src) afirma
+# a mesma lista de aceita e de recusa que a sessão dona da fila relatou.
 _U = r"A-Za-z0-9\-._~"
 _S = r"!$&'()*+,;="
 _PCT = r"%[0-9A-Fa-f]{2}"
@@ -188,7 +190,7 @@ def parse_cloudevent(body):
 
     Corpo que não é JSON, ou JSON sem os atributos obrigatórios (specversion "1.0", id, source, type), não é
     CloudEvent: os quatro saem None. O `time` é opcional no CloudEvents e só vale em RFC 3339.
-    O `source` tem de ser URI-reference (RFC 3986) por casamento inteiro, a mesma régua da fila do onion-messaging:
+    O `source` tem de ser URI-reference (RFC 3986) por casamento inteiro, a mesma régua da fila de mensagens da família:
     fora da forma, o corpo não é CloudEvent (os quatro saem None, e o evento passa a ser identificado pelo jti).
     """
     out = {"ce_source": None, "ce_id": None, "ce_type": None, "ce_time": None}
