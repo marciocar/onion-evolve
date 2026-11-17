@@ -6,11 +6,14 @@ reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
+findings_blocking: 1
+tokens: 0
+duration_min: 0
 verdict: FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: 2ª passada independente (2026-11-17) — agente revisor separado, só leitura, mandato de refutar; achou 3 pontos (F1/F2/F3), todos curados nesta mesma branch (ver §"Revisão independente"). Gate mecânico: lint-selftest (private_repo_cite, baton_pulse, session_open) + lint-artifacts.
-nota: os 3 achados são da passada independente sobre o diff das mudanças A/B/C; as curas estão em commits novos nesta branch.
+nota: "os 3 achados são da passada independente sobre o diff das mudanças A/B/C; as curas estão em commits novos nesta branch. tokens 0 e duration_min 0 = não medidos (agentes em segundo plano, custo não recuperado nesta rodada)."
 ---
 
 # Três curas de guarda/bancada: o flake do hash só-dígitos, o teto de sessões 4→8 e o abridor na cura do pulso
