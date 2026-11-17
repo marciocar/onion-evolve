@@ -2,7 +2,8 @@
 branch: feat/mcp-kg-tool-usage-counter
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 773fc7b16306a90eefa433cbb5d707d17275c691e8b33480268770426b22a766
+reviewed_code_sha256: f069841fb6e87a8f7a556ce30913bc94019dcdf489ef3489b59e15d7f03324cf
 findings_total: 3
 findings_real: 2
 findings_blocking: 0
