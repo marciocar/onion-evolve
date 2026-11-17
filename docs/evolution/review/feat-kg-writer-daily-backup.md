@@ -112,5 +112,6 @@ deu 29 passaram, 0 pularam, 0 falharam. Com as duas famílias que leem o `moat-t
 - **Mesmo disco.** O backup não é cópia fora da máquina.
 - **Bancada parcial.** A linha nova do `moat-targets.tsv` (core-only) seleciona 30 famílias pelo mapa da bancada;
   rodaram as duas que julgam a tabela (`act_signature`, `moat_gate`) e a família nova. As outras 28 ficam para o CI.
-- **`lint-artifacts.sh` rodou uma vez inteiro** e acusou 2 HARD (REGRA 80 e REGRA 117), ambas deste diff e ambas
-  curadas depois; a cura foi conferida pelo helper de cada regra, não por uma segunda passada inteira do lint.
+- **`lint-artifacts.sh`:** a primeira passada inteira acusou 2 HARD, ambas deste diff: REGRA 80 (Números do harness
+  saem de SSOT gerada, nunca de comentário) e REGRA 117 (Ato de deploy tem assinatura no veto). Depois das duas
+  curas, a segunda passada inteira deu 0 HARD e 31 SOFT; as 31 já estavam na primeira passada e não são deste diff.
